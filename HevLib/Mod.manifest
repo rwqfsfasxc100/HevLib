@@ -1,0 +1,7 @@
+[package]
+
+id="hev.LIBRARY"
+name="HevLib"
+version="1.0.0"
+description="HEVLIB_MOD_DESCRIPTION"
+group="user_interface"

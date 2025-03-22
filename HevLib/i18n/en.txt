@@ -1,0 +1,3 @@
+locale|en
+
+HEVLIB_MOD_DESCRIPTION|Library mod containing several common functions created by __hev
