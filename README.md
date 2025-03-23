@@ -86,3 +86,6 @@ All functions in the library use a double underscore prefix to make it easier to
 ## __recursive_delete(path: String)
 * Recursively deletes the provided folder
 * Returns false if the folder doesn't load
+
+## func __format_for_large_numbers(num: int) -> String:
+* Formats numbers into a human-readable form, separated with a comma
