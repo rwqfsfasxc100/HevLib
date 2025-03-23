@@ -87,5 +87,5 @@ All functions in the library use a double underscore prefix to make it easier to
 * Recursively deletes the provided folder
 * Returns false if the folder doesn't load
 
-## func __format_for_large_numbers(num: int) -> String:
+## __format_for_large_numbers(num: int) -> String:
 * Formats numbers into a human-readable form, separated with a comma
