@@ -5,7 +5,7 @@ Library mod for ΔV: Rings of Saturn that provides several useful functions
 ## Instancing within a script
 Each script requires the library to be loaded as a variant to be able to access the functions. The following script will have it loaded as a variant:
 ```
-var HevLib = preload("res://HevLib/Globals.gd").new()
+var HevLib = preload("res://HevLib/Functions.gd").new()
 ```
 > [!NOTE]
 > The variant can be called anywhere in a function, however to get access to it in the entire file, it's recommended to put it just below the extends statement
@@ -16,7 +16,7 @@ Example script using the __array_to_string function from the library:
 ```
 extends Node
 
-var HevLib = preload("res://HevLib/Globals.gd").new()
+var HevLib = preload("res://HevLib/Functions.gd").new()
 
 func _ready():
   var array = ["this ", "is ", "an ", "example"]
