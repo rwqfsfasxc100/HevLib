@@ -27,7 +27,8 @@ The script returns "this is an example" as a string
 
 ## Functions
 
-All functions in the library use a double underscore prefix to make it easier to use with autocomplete. Typing `HevLib.__` should provide all available functions through it.
+> [!NOTE]
+> All functions in the library use a double underscore prefix to make it easier to use with autocomplete. Typing `HevLib.__` should provide all available functions through it.
 
 ## __array_to_string(arr: Array) -> String
 * Concatenates all parts of an array into a string
