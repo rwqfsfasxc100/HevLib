@@ -1,1 +1,3 @@
-testdata
+locale|en
+
+MODMENU_NOTIFICATIONS_CONFLICTS|MWC = %
