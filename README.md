@@ -89,9 +89,13 @@ All functions in the library use a double underscore prefix to make it easier to
 
 ## __format_for_large_numbers(num: int) -> String:
 * Formats numbers into a human-readable form, separated with a comma
+* 
 
 ## __webtranslate(URL: String):
 * Loads translations from a given Gihub repository
 * Has to be specifically a repository link
 * E.G. https://github.com/rwqfsfasxc100/HevLib
 
+## __webtranslate_reset(URL: String) -> bool
+* Clears the translation cache of a provided URL
+* Returns true if succeeded, false if it didn't
