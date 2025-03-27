@@ -99,3 +99,25 @@ The script returns "this is an example" as a string
 ## __webtranslate_reset(URL: String) -> bool
 * Clears the translation cache of a provided URL
 * Returns true if succeeded, false if it didn't
+
+## __get_current_achievements() -> Dictionary
+* Fetches and returns data from the achievement file
+* Returns a dictionary with four keys:
+* allAchievements is an array of names of all achievements currently in-game
+* unlockedAchievements is an array of names of all achievements currently unlocked in the achievements file
+* lockedAchievements is the inverse, listing the names of all locked achievements
+* stats are the names of all the current stats tracked, all with the stat: prefix
+
+## __get_achievement_data(achievementID: String) -> Dictionary
+* Gets the data of a provided achievement by it's ID
+* Returns a dictionary with 7 keys:
+* name = the achievement's ID for convenience
+* isUnlocked = boolean for whether the achievement is unlocked or not
+* stat = associated stat name, w/o the stat: prefix
+* limit = the stat's unlocking threshhold
+* data = any additional data that might be useful to provide. 
+  * currently only provides the ship/equipment names of playtime achievements in untranslated form
+* rare = based on whether the game considers an achievement rare
+* spoiler = whether the achievement is considered a spoilered achievement on steam. 
+  * manually inputted data, so may be missing data in the days following an update that adds achievements
+
