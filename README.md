@@ -100,14 +100,6 @@ The script returns "this is an example" as a string
 * Clears the translation cache of a provided URL
 * Returns true if succeeded, false if it didn't
 
-## ~__get_current_achievements() -> Dictionary~ (Until V.1.2.1)
-* Fetches and returns data from the achievement file
-* Returns a dictionary with four keys:
-* allAchievements is an array of names of all achievements currently in-game
-* unlockedAchievements is an array of names of all achievements currently unlocked in the achievements file
-* lockedAchievements is the inverse, listing the names of all locked achievements
-* stats are the names of all the current stats tracked, all with the stat: prefix
-
 ## __get_achievement_data(achievementID: String) -> Dictionary
 * Gets the data of a provided achievement by it's ID
 * Returns a dictionary with 7 keys:
@@ -121,3 +113,13 @@ The script returns "this is an example" as a string
 * spoiler = whether the achievement is considered a spoilered achievement on steam. 
   * manually inputted data, so may be missing data in the days following an update that adds achievements
 
+# Depreciated Functions
+These are functions that exist on older versions, and are kept for the sake of documentation
+
+## __get_current_achievements() -> Dictionary (Until V.1.2.1)
+* Fetches and returns data from the achievement file
+* Returns a dictionary with four keys:
+* allAchievements is an array of names of all achievements currently in-game
+* unlockedAchievements is an array of names of all achievements currently unlocked in the achievements file
+* lockedAchievements is the inverse, listing the names of all locked achievements
+* stats are the names of all the current stats tracked, all with the stat: prefix
