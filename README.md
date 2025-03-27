@@ -100,7 +100,7 @@ The script returns "this is an example" as a string
 * Clears the translation cache of a provided URL
 * Returns true if succeeded, false if it didn't
 
-## __get_current_achievements() -> Dictionary
+## ~__get_current_achievements() -> Dictionary~ (Until V.1.2.1)
 * Fetches and returns data from the achievement file
 * Returns a dictionary with four keys:
 * allAchievements is an array of names of all achievements currently in-game
