@@ -123,3 +123,5 @@ These are functions that exist on older versions, and are kept for the sake of d
 * unlockedAchievements is an array of names of all achievements currently unlocked in the achievements file
 * lockedAchievements is the inverse, listing the names of all locked achievements
 * stats are the names of all the current stats tracked, all with the stat: prefix
+
+* Replaced with the first index of the variable node data
