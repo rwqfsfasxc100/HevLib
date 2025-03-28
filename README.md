@@ -25,7 +25,36 @@ func _ready():
 ```
 The script returns "this is an example" as a string
 
-## Functions
+## Variable Node
+A Node is added to the root after the Autoloads have been properly initialized, which provides a few variables that are used by some functions and can be helpful to get.
+
+If your node is in the main scene tree, you can obtain access to it with the following variable:
+```
+var HevLibVariables = get_node("/root/HevLib~Variables")
+```
+
+If the node is not in the main tree, a small modification is needed to be used. Any autoload function can be used, just the ModLoader node is used for example. 
+```
+var HevLibVariables = ModLoader.get_node("/root/HevLib~Variables")
+```
+
+The node provides the following variables:
+### AchievementData
+
+* Returns a dictionary with four keys:
+  * allAchievements is an array of names of all achievements currently in-game
+  * unlockedAchievements is an array of names of all achievements currently unlocked in the achievements file
+  * lockedAchievements is the inverse, listing the names of all locked achievements
+  * stats are the names of all the current stats tracked, all with the stat: prefix
+* Replaces the old functionality of the `__get_achievement_data()` function
+
+### AchievementPercentageStats
+
+* Returns an array of arrays containing the Steam completion percentages of achievements
+* Each array is formatted as follows: [ACHIEVEMENT_NAME: String, PERCENTAGE: float]
+* Has to wait for the Steam server to return the data, is Null otherwise
+
+# Functions
 
 > [!NOTE]
 > All functions in the library use a double underscore prefix to make it easier to use with autocomplete. Typing `HevLib.__` should provide all available functions through it.
@@ -112,6 +141,14 @@ The script returns "this is an example" as a string
 * rare = based on whether the game considers an achievement rare
 * spoiler = whether the achievement is considered a spoilered achievement on steam. 
   * manually inputted data, so may be missing data in the days following an update that adds achievements
+
+## __webtranslate_timed(URL: String, MINUTES_DELAY: int = 30) -> Dictionary
+* Similar function to __webtranslate, however performs the task repetitively
+* URL is the same as the URL string for __webtranslate
+* Optional MINUTES_DELAY integer is the delay between runs of the __webtranslate tool
+  * Defaults to 30 minutes if left blank
+* Cannot be called as early as `_webtranslate`, as it requires the Variable node to have been added, which in of itself requires the Autoloads to have been completely initialized
+  * Using a timer to wait a couple of seconds should counter this issue
 
 # Depreciated Functions
 These are functions that exist on older versions, and are kept for the sake of documentation
