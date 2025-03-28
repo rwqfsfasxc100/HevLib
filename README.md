@@ -28,6 +28,8 @@ The script returns "this is an example" as a string
 ## Variable Node
 A Node is added to the root after the Autoloads have been properly initialized, which provides a few variables that are used by some functions and can be helpful to get.
 
+All variables can be fetched with the function `__get_lib_variables()`, and will provide a dictionary containing all variables. If it's optimal that only specific variables are fetched, they can be done manually by fetching the variable node through the following methods:
+
 If your node is in the main scene tree, you can obtain access to it with the following variable:
 ```
 var HevLibVariables = get_node("/root/HevLib~Variables")
@@ -141,6 +143,11 @@ The node provides the following variables:
 * rare = based on whether the game considers an achievement rare
 * spoiler = whether the achievement is considered a spoilered achievement on steam. 
   * manually inputted data, so may be missing data in the days following an update that adds achievements
+
+## __get_lib_variables() -> Object
+* Returns HevLib variables
+* Has to be done on ready, as it relies upon the Autoloads having finished loading
+* Some variables may take longer to load as they are fetched from the internet
 
 ## __webtranslate_timed(URL: String, MINUTES_DELAY: int = 30) -> Dictionary
 * Similar function to __webtranslate, however performs the task repetitively
