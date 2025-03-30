@@ -122,7 +122,7 @@ The node provides the following variables:
 ## __format_for_large_numbers(num: int) -> String:
 * Formats numbers into a human-readable form, separated with a comma
 
-## __webtranslate(URL: String):
+## [__webtranslate(URL: String):](https://github.com/rwqfsfasxc100/HevLib/wiki/webtranslate)
 * Loads translations from a given Gihub repository
 * Has to be specifically a repository link
 * E.G. https://github.com/rwqfsfasxc100/HevLib
