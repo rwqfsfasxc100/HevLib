@@ -160,7 +160,7 @@ The node provides the following variables:
 # Depreciated Functions
 These are functions that exist on older versions, and are kept for the sake of documentation
 
-## __get_current_achievements() -> Dictionary (Until V.1.2.1)
+## __get_current_achievements() -> Dictionary (V.1.2.1 only)
 * Fetches and returns data from the achievement file
 * Returns a dictionary with four keys:
 * allAchievements is an array of names of all achievements currently in-game
