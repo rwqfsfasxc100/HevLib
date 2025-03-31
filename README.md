@@ -149,7 +149,7 @@ The node provides the following variables:
 * Has to be done on ready, as it relies upon the Autoloads having finished loading
 * Some variables may take longer to load as they are fetched from the internet
 
-## __webtranslate_timed(URL: String, MINUTES_DELAY: int = 30)
+## [__webtranslate_timed(URL: String, MINUTES_DELAY: int = 30)](https://github.com/rwqfsfasxc100/HevLib/wiki/__webtranslate_timed)
 * Similar function to __webtranslate, however performs the task repetitively
 * URL is the same as the URL string for __webtranslate
 * Optional MINUTES_DELAY integer is the delay between runs of the __webtranslate tool
