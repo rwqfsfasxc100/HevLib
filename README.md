@@ -157,15 +157,10 @@ The node provides the following variables:
 * Cannot be called as early as `_webtranslate`, as it requires the Variable node to have been added, which in of itself requires the Autoloads to have been completely initialized
   * Using a timer to wait a couple of seconds should counter this issue
 
-# Depreciated Functions
-These are functions that exist on older versions, and are kept for the sake of documentation
-
-## __get_current_achievements() -> Dictionary (V.1.2.1 only)
+## __get_current_achievements() -> Dictionary
 * Fetches and returns data from the achievement file
 * Returns a dictionary with four keys:
-* allAchievements is an array of names of all achievements currently in-game
-* unlockedAchievements is an array of names of all achievements currently unlocked in the achievements file
-* lockedAchievements is the inverse, listing the names of all locked achievements
-* stats are the names of all the current stats tracked, all with the stat: prefix
-
-* Replaced with the first index of the variable node data
+  * allAchievements is an array of names of all achievements currently in-game
+  * unlockedAchievements is an array of names of all achievements currently unlocked in the achievements file
+  * lockedAchievements is the inverse, listing the names of all locked achievements
+  * stats are the names of all the current stats tracked, all with the stat: prefix
