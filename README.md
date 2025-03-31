@@ -119,15 +119,15 @@ The node provides the following variables:
 * Recursively deletes the provided folder
 * Returns false if the folder doesn't load
 
-## __format_for_large_numbers(num: int) -> String:
+## __format_for_large_numbers(num: int) -> String
 * Formats numbers into a human-readable form, separated with a comma
 
-## [__webtranslate(URL: String):](https://github.com/rwqfsfasxc100/HevLib/wiki/__webtranslate)
+## [__webtranslate(URL: String)](https://github.com/rwqfsfasxc100/HevLib/wiki/__webtranslate)
 * Loads translations from a given Gihub repository
 * Has to be specifically a repository link
 * E.G. https://github.com/rwqfsfasxc100/HevLib
 
-## __webtranslate_reset(URL: String) -> bool
+## [__webtranslate_reset(URL: String) -> bool](https://github.com/rwqfsfasxc100/HevLib/wiki/__webtranslate_reset)
 * Clears the translation cache of a provided URL
 * Returns true if succeeded, false if it didn't
 
