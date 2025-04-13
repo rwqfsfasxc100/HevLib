@@ -12,6 +12,8 @@ static func fetch_folder_files(folder, showFolders, returnFullPath):
 		var capture = true
 		if fileName.ends_with("/"):
 			capture = false
+		if fileName == "." or fileName == "..":
+			capture = false
 		if capture:
 			dirName = dir.get_current_dir()
 			Debug.l(fileName)

@@ -2,6 +2,8 @@
 
 id="hev.LIBRARY"
 name="HevLib"
-version="1.0.0"
+version="1.2.5"
 description="HEVLIB_MOD_DESCRIPTION"
-group="user_interface"
+group="library"
+github_homepage="https://github.com/rwqfsfasxc100/HevLib"
+github_releases="https://github.com/rwqfsfasxc100/HevLib/releases"

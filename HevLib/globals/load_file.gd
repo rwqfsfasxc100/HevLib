@@ -2,7 +2,7 @@ extends Node
 
 static func load_file(modDir, zipDir, hasManifest, manifestDirectory, hasIcon, iconDir):
 	Debug.l("HevLib: function 'load_file' instanced for %s @ %s. Is working with manifest? [%s] @ [%s]. Is working with mod icon? [%s] @ [%s]" % [modDir, zipDir, hasManifest, manifestDirectory, hasIcon, iconDir])
-	var Globals = load("res://HevLib/Globals.gd").new()
+	var Globals = preload("res://HevLib/Functions.gd").new()
 	var manifestName = ""
 	var manifestId = ""
 	var manifestVersion = ""

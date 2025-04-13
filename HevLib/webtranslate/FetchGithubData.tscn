@@ -1,0 +1,22 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://HevLib/webtranslate/FetchURLData.gd" type="Script" id=1]
+[ext_resource path="res://HevLib/webtranslate/FetchGithubData.gd" type="Script" id=2]
+[ext_resource path="res://HevLib/webtranslate/FetchBranchData.gd" type="Script" id=3]
+[ext_resource path="res://HevLib/webtranslate/FetchIndex.gd" type="Script" id=4]
+[ext_resource path="res://HevLib/webtranslate/FetchFileData.gd" type="Script" id=5]
+
+[node name="FetchGithubData" type="Node"]
+script = ExtResource( 2 )
+
+[node name="FetchURLData" type="HTTPRequest" parent="."]
+script = ExtResource( 1 )
+
+[node name="FetchBranchData" type="HTTPRequest" parent="."]
+script = ExtResource( 3 )
+
+[node name="FetchIndex" type="HTTPRequest" parent="."]
+script = ExtResource( 4 )
+
+[node name="FetchFileData" type="HTTPRequest" parent="."]
+script = ExtResource( 5 )

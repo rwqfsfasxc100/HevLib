@@ -4,7 +4,7 @@ static func recursive_delete(path: String) -> bool:
 	var dTest = Directory.new()
 	if not dTest.open(path) == OK:
 		return false
-	var Globals = load("res://HevLib/Globals.gd").new()
+	var Globals = preload("res://HevLib/Functions.gd").new()
 	if not path.ends_with("/"):
 		path = path + "/"
 	var filesForDeletion = []

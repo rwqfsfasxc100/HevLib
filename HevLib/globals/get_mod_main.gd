@@ -2,7 +2,7 @@ extends Node
 
 static func get_mod_main(file, split_into_array = false):
 	Debug.l("HevLib: function 'get_mod_main' instanced on %s. Outputting to an array? [%s]" % [file, split_into_array])
-	var Globals = load("res://HevLib/Globals.gd").new()
+	var Globals = preload("res://HevLib/Functions.gd").new()
 	var hasManifest = false
 	var manifestDir = ""
 	var hasIcon = false
