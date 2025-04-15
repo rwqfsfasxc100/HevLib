@@ -1,0 +1,23 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://HevLib/scenes/fetch_from_github/fs/FetchModManifestData.gd" type="Script" id=1]
+[ext_resource path="res://HevLib/scenes/fetch_from_github/fs/FetchGithubData.gd" type="Script" id=2]
+[ext_resource path="res://HevLib/scenes/fetch_from_github/fs/FetchBranchData.gd" type="Script" id=3]
+[ext_resource path="res://HevLib/scenes/fetch_from_github/fs/FetchURLData.gd" type="Script" id=4]
+[ext_resource path="res://HevLib/scenes/fetch_from_github/fs/FetchFileData.gd" type="Script" id=5]
+
+[node name="FetchGithubData" type="Node"]
+script = ExtResource( 2 )
+
+[node name="FetchURLData" type="HTTPRequest" parent="."]
+timeout = 5.0
+script = ExtResource( 4 )
+
+[node name="FetchBranchData" type="HTTPRequest" parent="."]
+script = ExtResource( 3 )
+
+[node name="FetchModMainData" type="HTTPRequest" parent="."]
+script = ExtResource( 5 )
+
+[node name="FetchModManifestData" type="HTTPRequest" parent="."]
+script = ExtResource( 1 )

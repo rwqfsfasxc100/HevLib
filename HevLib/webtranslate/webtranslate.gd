@@ -1,6 +1,6 @@
 extends Node
 
-static func webtranslate(URL):
+static func webtranslate(URL: String, fallback: Array = []):
 	Debug.l("HevLib WebTranslate: Fetching translations from %s" % URL)
 	var HevLib = preload("res://HevLib/webtranslate/FetchGithubData.tscn").instance()
 	var pms = Debug.get_node("/root")
@@ -21,6 +21,7 @@ static func webtranslate(URL):
 	
 	Debug.l("HevLib WebTranslate: attaching node @ FetchGithubData%s~%s" % [timestamp,str(nSize)])
 	HevLib.name = "FetchGithubData" + timestamp + "~" + str(nSize)
-	HevLib.editor_description = URL
+	HevLib.URLFullStopReformat = URL
+	HevLib.fallbackFiles = fallback
 	pms.call_deferred("add_child",HevLib)
 	

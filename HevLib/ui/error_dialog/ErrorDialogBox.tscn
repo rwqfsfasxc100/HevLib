@@ -1,0 +1,9 @@
+[gd_scene format=2]
+
+[node name="AcceptDialog" type="AcceptDialog"]
+visible = true
+margin_right = 300.0
+margin_bottom = 100.0
+window_title = "HEVLIB_GENERIC_ERROR_HEADER"
+dialog_text = "HEVLIB_GENERIC_ERROR_DIALOGUE_BOX"
+dialog_autowrap = true

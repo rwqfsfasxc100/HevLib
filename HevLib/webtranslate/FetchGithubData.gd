@@ -2,18 +2,21 @@ extends Node
 
 var currentUrl = ""
 
+var fallbackFiles = []
+
 var user = ""
 var repo = ""
 var githubDataBaseURL = ""
 var currentFile = ""
+
+var URLFullStopReformat = ""
 
 var MINUTES = 0.5
 
 var fallbackFunc = ""
 
 func _ready():
-	var URLFullStopReformat = self.editor_description
-	
+	fetch_github_data(URLFullStopReformat)
 
 func fetch_github_data(URL):
 	var urlSpl = str(URL).split("://")[1]
@@ -120,3 +123,11 @@ func fetchTranslations():
 		for child in children:
 			self.remove_child(child)
 		self.remove_and_skip()
+
+func on_timeout():
+	
+	if not fallbackFiles == []:
+		for file in fallbackFiles and fallbackFiles.size() >= 1:
+			var HevLib = preload("res://HevLib/pointers/Translations.gd").new()
+			HevLib.updateTL(file)
+		

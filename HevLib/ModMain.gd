@@ -5,7 +5,7 @@ extends Node
 const MOD_PRIORITY = INF
 # Name of the mod, used for writing to the logs
 const MOD_NAME = "HevLib"
-const MOD_VERSION = "1.2.5"
+const MOD_VERSION = "1.3.1"
 # Path of the mod folder, automatically generated on runtime
 var modPath:String = get_script().resource_path.get_base_dir() + "/"
 # Required var for the replaceScene() func to work
@@ -32,7 +32,8 @@ func _ready():
 	l("Readying")
 	updateTL("i18n/en.txt","|")
 	# Test button scene that i use for testing these functions
-	replaceScene("TitleScreen.tscn")
+	if ModLoader.is_debugged:
+		replaceScene("TitleScreen.tscn")
 	
 	
 	var NodeNew = Node.new()
