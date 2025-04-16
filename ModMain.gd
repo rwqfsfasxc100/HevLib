@@ -5,7 +5,7 @@ extends Node
 const MOD_PRIORITY = INF
 # Name of the mod, used for writing to the logs
 const MOD_NAME = "HevLib"
-const MOD_VERSION = "1.3.1"
+const MOD_VERSION = "1.3.2"
 # Path of the mod folder, automatically generated on runtime
 var modPath:String = get_script().resource_path.get_base_dir() + "/"
 # Required var for the replaceScene() func to work
@@ -20,6 +20,10 @@ var modConfig = {}
 # Script and scene replacements should be done here, before the originals are loaded
 func _init(modLoader = ModLoader):
 	l("Initializing DLC")
+	
+# Modify Settings.gd first so we can load config and DLC
+	loadSettings()
+	
 	loadDLC() # preloads DLC as things may break if this isn't done
 	
 	
@@ -51,6 +55,7 @@ func _ready():
 #
 #	Globals.__webtranslate(URL)
 
+	replaceScene("Game.tscn")
 	l("Ready")
 	
 
@@ -77,7 +82,7 @@ func loadTranslationsFromCache():
 # `delim` is the symbol used to seperate the values
 # `useRelativePath` setting it to false uses a `res://` relative path instead of relative to the file
 # `fullLogging` setting it to false reduces the number of logs written to only display the number of translations made
-# example usage: updateTL("i18n/translation.txt", "|")
+# exampleexample usage: updateTL("i18n/translation.txt", "|")
 func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, fullLogging:bool = true):
 	if useRelativePath:
 		path = str(modPath + path)
@@ -173,3 +178,16 @@ func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
 	Debug.l("[%s V%s]: %s" % [title, version, msg])
 	
 	
+# This function is a helper to provide any file configurations to your mod
+# You may want to replace any "Example" text with your own identifier to make it unique
+# Check the example Settings.gd file for how to setup that side of it
+func loadSettings():
+	installScriptExtension("Settings.gd")
+	l(MOD_NAME + ": Loading mod settings")
+	var settings = load("res://Settings.gd").new()
+	settings.load_HevLib_FromFile()
+	settings.save_HevLib_ToFile()
+	modConfig = settings.HevLib
+	l(MOD_NAME + ": Current settings: %s" % modConfig)
+	settings.queue_free()
+	l(MOD_NAME + ": Finished loading settings")

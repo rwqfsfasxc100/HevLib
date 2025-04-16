@@ -1,0 +1,21 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://HevLib/scenes/fetch_from_github/releases/ReleasesURLHandler.gd" type="Script" id=1]
+[ext_resource path="res://HevLib/scenes/fetch_from_github/releases/ZipDownloadHandler.gd" type="Script" id=2]
+[ext_resource path="res://HevLib/scenes/fetch_from_github/releases/handleDownloadedZips.gd" type="Script" id=3]
+[ext_resource path="res://HevLib/scenes/fetch_from_github/releases/NetHandles.gd" type="Script" id=4]
+
+[node name="NetHandles" type="Node"]
+script = ExtResource( 4 )
+
+[node name="ReleasesURLHandler" type="HTTPRequest" parent="."]
+script = ExtResource( 1 )
+
+[node name="ZipDownloadHandler" type="HTTPRequest" parent="."]
+script = ExtResource( 2 )
+
+[node name="handleDownloadedZips" type="Node" parent="."]
+script = ExtResource( 3 )
+
+[connection signal="request_completed" from="ReleasesURLHandler" to="ReleasesURLHandler" method="_on_release_request_completed"]
+[connection signal="request_completed" from="ZipDownloadHandler" to="ZipDownloadHandler" method="_on_zip_request_completed"]

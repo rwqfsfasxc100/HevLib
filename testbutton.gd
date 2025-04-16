@@ -68,8 +68,9 @@ func _on_Button_pressed():
 	
 	
 	var gh = preload("res://HevLib/pointers/Github.gd").new()
-	gh.__get_github_filesystem(URL, self, "normal", "1.0.0")
+#	gh.__get_github_filesystem(URL, self, "normal", "1.0.0")
 	
+	gh.__get_github_release("https://github.com/rwqfsfasxc100/HevLib", "user://temp", self, false, "any", "latest")
 	
 	
 	
@@ -83,4 +84,7 @@ func _on_update_completed(data):
 		count += 1
 
 func _github_filesystem_data(data):
+	pass
+
+func _downloaded_zip(file, folder):
 	pass
