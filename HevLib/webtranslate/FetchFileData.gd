@@ -1,12 +1,11 @@
 extends HTTPRequest
 
-var path = ""
-var modPath = ""
-
 var Globals = preload("res://HevLib/Functions.gd").new()
 
 var HevLibCache = "user://cache/.HevLib_Cache"
 var cacheExtension = ".hev"
+
+var Translations = preload("res://HevLib/pointers/Translations.gd").new()
 
 func _ready():
 	connect("request_completed",self,"_on_request_complete")
@@ -53,39 +52,8 @@ func _on_request_complete(result, response_code, headers, body):
 		file.store_string(releasesContent)
 		file.close()
 		
-		updateTL(fileName,delim)
+		Translations.__updateTL(fileName,delim)
 		
 	get_parent().fetchTranslations()
 
 
-
-func updateTL(path:String, delim:String = ","):
-	path = str(modPath + path)
-	Debug.l("Adding translations from: %s" % path)
-	var tlFile:File = File.new()
-	tlFile.open(path, File.READ)
-
-	var translations := []
-
-	var csvLine := tlFile.get_line().split(delim)
-	Debug.l("Adding translations as: %s" % csvLine)
-	for i in range(1, csvLine.size()):
-		var translationObject := Translation.new()
-		translationObject.locale = csvLine[i]
-		translations.append(translationObject)
-
-	while not tlFile.eof_reached():
-		csvLine = tlFile.get_csv_line(delim)
-
-		if csvLine.size() > 1:
-			var translationID := csvLine[0]
-			for i in range(1, csvLine.size()):
-				translations[i - 1].add_message(translationID, csvLine[i].c_unescape())
-			Debug.l("Added translation: %s" % csvLine)
-
-	tlFile.close()
-
-	for translationObject in translations:
-		TranslationServer.add_translation(translationObject)
-
-	Debug.l("Translations Updated")

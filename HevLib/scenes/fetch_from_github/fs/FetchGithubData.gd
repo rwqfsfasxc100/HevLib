@@ -139,6 +139,6 @@ func on_timeout():
 	
 	if not fallbackFiles == []:
 		for file in fallbackFiles and fallbackFiles.size() >= 1:
-			var HevLib = preload("res://HevLib/pointers/Translations.gd").new()
-			HevLib.updateTL(file)
+			var Translations = preload("res://HevLib/pointers/Translations.gd").new()
+			Translations.__updateTL(file)
 		
