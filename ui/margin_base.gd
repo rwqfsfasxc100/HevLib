@@ -17,9 +17,7 @@ func _process(delta):
 	margin_bottom = screenHeight
 	margin_left = 0
 	margin_top = 0
-#	var HevLib = preload("res://HevLib/Functions.gd").new()
-#	var ps = HevLib.__get_all_children(self, true, true, true)
-#	pass
+
 func _ready():
 	parseData()
 	
