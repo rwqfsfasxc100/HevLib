@@ -7,5 +7,3 @@ margin_right = 40.0
 margin_bottom = 40.0
 expand = true
 script = ExtResource( 1 )
-
-[connection signal="visibility_changed" from="." to="." method="_on_texture_panel_visibility_changed"]

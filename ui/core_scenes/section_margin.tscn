@@ -19,5 +19,3 @@ patch_margin_left = 16
 patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
-
-[connection signal="visibility_changed" from="." to="." method="_on_section_margin_visibility_changed"]

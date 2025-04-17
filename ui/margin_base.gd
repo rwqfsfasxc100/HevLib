@@ -4,7 +4,6 @@ var handle_resolution = preload("res://HevLib/ui/core_scripts/handle_resolution.
 
 var get_panel = preload("res://HevLib/ui/core_scripts/get_panel.gd")
 
-
 func _process(delta):
 	var vpRect = get_viewport_rect().size
 	var screenWidth = vpRect.x
@@ -30,8 +29,9 @@ func parseData():
 	var dataDictionary = get_parent().datastring
 	var path = get_path_to(self)
 	var make_child = load("res://HevLib/ui/core_scripts/make_child.gd").new()
-	make_child.make_child(dataDictionary, resolution, path)
-
+	for data in dataDictionary:
+		var panel = make_child.make_child(dataDictionary.get(data), resolution, path, data)
+		add_child(panel)
 
 
 

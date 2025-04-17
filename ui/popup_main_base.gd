@@ -1,6 +1,6 @@
 extends Popup
 
-export var datastring = ""
+export var datastring := {}
 
 func _process(delta):
 	
