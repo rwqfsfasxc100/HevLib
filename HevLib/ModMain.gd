@@ -5,7 +5,7 @@ extends Node
 const MOD_PRIORITY = INF
 # Name of the mod, used for writing to the logs
 const MOD_NAME = "HevLib"
-const MOD_VERSION = "1.3.3"
+const MOD_VERSION = "1.3.4"
 # Path of the mod folder, automatically generated on runtime
 var modPath:String = get_script().resource_path.get_base_dir() + "/"
 # Required var for the replaceScene() func to work
@@ -34,8 +34,8 @@ var Globals = preload("res://HevLib/Functions.gd").new()
 # At this point all AutoLoads are available and the game is loaded
 func _ready():
 	l("Readying")
-	
-	Globals.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]])
+	var WebTranslate = preload("res://HevLib/pointers/WebTranslate.gd")
+	WebTranslate.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]])
 	
 	# Test button scene that i use for testing these functions
 	if ModLoader.is_debugged:

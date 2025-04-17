@@ -10,7 +10,6 @@ var developer_hint = {
 }
 
 static func __updateTL(path:String, delim:String = ",", fullLogging:bool = true):
-	var HevLib = load("res://HevLib/pointers/ModInit.gd").new()
 	Debug.l("Adding translations from: %s" % path)
 	var tlFile:File = File.new()
 	tlFile.open(path, File.READ)
