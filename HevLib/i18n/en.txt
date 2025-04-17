@@ -2,7 +2,7 @@ locale|en
 
 HEVLIB_MOD_DESCRIPTION|Library mod containing several common functions created by __hev
 
-HEVLIB_GENERIC_ERROR_HEADER|
+HEVLIB_GENERIC_ERROR_HEADER|HevLib: Generic Error!
 
 HEVLIB_MOD_ERROR_HEADER|%s MOD ISSUES
 
