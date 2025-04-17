@@ -37,10 +37,10 @@ func load_HevLib_FromFile():
 	for section in HevLib:
 		for key in HevLib[section]:
 			HevLib[section][key] = CfgFile.get_value(section, key, HevLib[section][key])
-	loadKeymapFromConfig()
+	loadKeymapsFromConfig()
 
 # Keybind setting handlers
-func loadKeymapFromConfig():
+func loadKeymapsFromConfig():
 	for action_name in HevLib.input:
 		var addAction = true
 		for m in InputMap.get_actions():

@@ -5,7 +5,7 @@ extends Node
 const MOD_PRIORITY = INF
 # Name of the mod, used for writing to the logs
 const MOD_NAME = "HevLib"
-const MOD_VERSION = "1.3.4"
+const MOD_VERSION = "1.3.5"
 # Path of the mod folder, automatically generated on runtime
 var modPath:String = get_script().resource_path.get_base_dir() + "/"
 # Required var for the replaceScene() func to work
@@ -22,9 +22,9 @@ func _init(modLoader = ModLoader):
 	l("Initializing DLC")
 	
 # Modify Settings.gd first so we can load config and DLC
+	loadDLC() # preloads DLC as things may break if this isn't done
 	loadSettings()
 	
-	loadDLC() # preloads DLC as things may break if this isn't done
 	
 	
 	
