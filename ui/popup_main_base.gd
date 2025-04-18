@@ -19,7 +19,7 @@ export var datastring = ""
 
 func _pressed():
 	popup_centered()
-	$margin_base.resize_children()
+	$Tabs.get_node("margin_base").resize_children()
 
 func _ready():
 	var vpRect = get_viewport_rect().size

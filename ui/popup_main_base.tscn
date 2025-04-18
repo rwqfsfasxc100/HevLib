@@ -28,9 +28,13 @@ margin_right = 32.0
 margin_bottom = 32.0
 color = Color( 0, 0, 0, 0.941176 )
 
-[node name="margin_base" type="MarginContainer" parent="."]
+[node name="Tabs" type="Tabs" parent="."]
+margin_right = 40.0
+margin_bottom = 24.0
+
+[node name="margin_base" type="MarginContainer" parent="Tabs"]
 margin_right = 32.0
 margin_bottom = 32.0
 script = ExtResource( 1 )
 
-[connection signal="resized" from="margin_base" to="margin_base" method="_on_margin_base_resized"]
+[connection signal="resized" from="Tabs/margin_base" to="Tabs/margin_base" method="_on_margin_base_resized"]

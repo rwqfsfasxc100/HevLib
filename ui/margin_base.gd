@@ -5,7 +5,7 @@ var handle_resolution = preload("res://HevLib/ui/core_scripts/handle_resolution.
 var get_panel = preload("res://HevLib/ui/core_scripts/get_panel.gd")
 
 var calculated_child_nodes = []
-onready var dataDictionary = get_parent().datastring
+onready var dataDictionary = get_parent().get_parent().datastring
 
 func _ready():
 	var vpRect = get_viewport_rect().size
