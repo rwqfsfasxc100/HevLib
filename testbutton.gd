@@ -50,7 +50,9 @@ func _ready():
 	
 	connect("pressed",panel,"_pressed")
 	noMargins.add_child(panel)
-	
+	var nnd = load("res://HevLib/ui/core_scripts/get_nodes_to_act_on.gd").new()
+	var pnt = nnd.get_nodes_to_act_on(data, Vector2(1600,900))
+	pass
 
 func _on_Button_pressed():
 #	var webtranslate = preload("res://HevLib/webtranslate/webtranslate.gd").new()
