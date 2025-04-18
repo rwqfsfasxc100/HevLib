@@ -33,8 +33,7 @@ func _ready():
 							"rightSpacePercent":40,
 							"square":true,
 							"horizontal_align":"center",
-							"vertical_align":"top",
-							"data":{}
+							"vertical_align":"top"
 						}
 					}
 				},
@@ -45,8 +44,7 @@ func _ready():
 			"topSpacePercent":110,
 			"leftSpacePercent":50,
 			"bottomSpacePercent":70,
-			"rightSpacePercent":30,
-			"data":{}
+			"rightSpacePercent":30
 		},
 		"panel3":{
 			"type":"texture_panel",
