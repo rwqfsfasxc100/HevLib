@@ -6,7 +6,8 @@ var handle_resolution = preload("res://HevLib/ui/core_scripts/handle_resolution.
 
 func get_nodes_to_act_on(dataDictionary, resolution):
 	for data in dataDictionary:
-		proc(dataDictionary.get(data), data, resolution)
+		var path = data
+		proc(dataDictionary.get(data), path, resolution)
 	
 	
 	return appendage
@@ -32,4 +33,5 @@ func proc(dataDictionary, path, parent_resolution):
 	if not dataDict == {}:
 		
 		for data in dataDict:
-			proc(dataDict.get(data), data, checkdata[0])
+			var path2 = path + "/" + data
+			proc(dataDict.get(data), path2, checkdata[0])

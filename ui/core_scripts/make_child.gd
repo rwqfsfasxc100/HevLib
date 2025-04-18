@@ -2,6 +2,8 @@ extends Node
 
 func make_child(dataDictionary, resolution, path, panel_name):
 	
+	var vertical_margin = preload("res://HevLib/ui/core_scenes/vertical_margin.tscn")
+	var horizontal_margin = preload("res://HevLib/ui/core_scenes/horizontal_margin.tscn")
 	
 	var handle_resolution = preload("res://HevLib/ui/core_scripts/handle_resolution.gd")
 	
@@ -23,10 +25,16 @@ func make_child(dataDictionary, resolution, path, panel_name):
 
 	var panel = paneldata[0]
 	panel.panelTexturePath = paneldata[1]
+	panel.rect_min_size = checkdata[0]
 	panel.rect_size = checkdata[0]
+	
+	panel.set_size = checkdata[0]
+	panel.set_pos = checkdata[1]
+	
 	panel.rect_position = checkdata[1]
 	panel.datastring = paneldta
 	panel.name = panel_name
+	
 	
 	
 	panel.rightSpacePercent = d.get("rightSpacePercent")

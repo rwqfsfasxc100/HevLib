@@ -32,3 +32,5 @@ color = Color( 0, 0, 0, 0.941176 )
 margin_right = 32.0
 margin_bottom = 32.0
 script = ExtResource( 1 )
+
+[connection signal="resized" from="margin_base" to="margin_base" method="_on_margin_base_resized"]

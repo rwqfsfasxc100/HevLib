@@ -31,7 +31,7 @@ static func handle_resolution(vpRect: Vector2, rightSpacePercent: int, leftSpace
 			sizeWidth = sizeHeight
 	
 	
-	var rect_size = Vector2(sizeWidth, sizeHeight)
-	var rect_position = Vector2(offsetWidth, offsetHeight)
+	var rect_size = Vector2(round(sizeWidth), round(sizeHeight))
+	var rect_position = Vector2(round(offsetWidth), round(offsetHeight))
 	
 	return [rect_size, rect_position]

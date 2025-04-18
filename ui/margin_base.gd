@@ -4,10 +4,16 @@ var handle_resolution = preload("res://HevLib/ui/core_scripts/handle_resolution.
 
 var get_panel = preload("res://HevLib/ui/core_scripts/get_panel.gd")
 
+var calculated_child_nodes = []
+onready var dataDictionary = get_parent().datastring
+
 func _ready():
 	var vpRect = get_viewport_rect().size
 	var screenWidth = vpRect.x
 	var screenHeight = vpRect.y
+	var get_nodes_to_act_on = load("res://HevLib/ui/core_scripts/get_nodes_to_act_on.gd").new()
+	calculated_child_nodes = get_nodes_to_act_on.get_nodes_to_act_on(dataDictionary, vpRect)
+	
 	var panelWidth = Settings.maxScreenScale.x - 2
 	var panelHeight = Settings.maxScreenScale.y - 2
 	if OS.get_name() == "Windows":
@@ -21,7 +27,6 @@ func _ready():
 
 func parseData():
 	var resolution = get_viewport_rect().size
-	var dataDictionary = get_parent().datastring
 	var path = get_path_to(self)
 	var make_child = load("res://HevLib/ui/core_scripts/make_child.gd").new()
 	for data in dataDictionary:
@@ -29,92 +34,21 @@ func parseData():
 		var panel = make_child.make_child(dataDictionary.get(data), resolution, path, panel_name)
 		add_child(panel)
 
+func _process(delta):
+	if self.get_child_count() >= 1:
+		resize_children()
+
+func resize_children():
+	for item in calculated_child_nodes:
+		var path = item[0]
+		var size = item[1]
+		var pos = item[2]
+		var node = get_node(path)
+		node.rect_size = size
+		node.rect_position = pos
 
 
-
-
-
-
-
-
-
-#func makeChild(dataDictionary, resolution, path):
-#	for data in dataDictionary:
-#		var d = dataDictionary.get(data)
-#		var type = d.get("type")
-#		var texture = d.get("texture")
-#		var rightSpacePercent = d.get("rightSpacePercent")
-#		var leftSpacePercent = d.get("leftSpacePercent")
-#		var topSpacePercent = d.get("topSpacePercent")
-#		var bottomSpacePercent = d.get("bottomSpacePercent")
-#		var square = d.get("square")
-#		var square_align = d.get("square_align")
-#		var paneldta = d.get("data")
-#		var checkdata = handle_resolution.handle_resolution(resolution,rightSpacePercent,leftSpacePercent,topSpacePercent,bottomSpacePercent,square,square_align)
-#		var paneldata = get_panel.get_panel(type,texture)
-#
-#		var panel = paneldata[0]
-#		panel.panelTexturePath = paneldata[1]
-#		panel.rect_size = checkdata[0]
-#		panel.rect_position = checkdata[1]
-#		panel.datastring = paneldta
-#		panel.name = data
-#
-#
-#		panel.rightSpacePercent = data.get("rightSpacePercent")
-#		panel.leftSpacePercent = data.get("leftSpacePercent")
-#		panel.topSpacePercent = data.get("topSpacePercent")
-#		panel.bottomSpacePercent = data.get("bottomSpacePercent")
-#
-#
-#		add_child(panel)
-#		if paneldta != null:
-#			var panelPath = get_path_to(get_node(data))
-#			var panelRes = checkdata[0]
-#			get_node(data).makeChild(paneldta, panelRes, panelPath)
-#
-#
-#			pass
-#
-#
-#		pass
-#
-#
-#	pass
-
-
-
-
-func childManager(nodePath, data):
+func _on_margin_base_resized():
 	
-	
-	
-	pass
-
-#func _ready():
-#
-#	cHandle()
-#
-#func cHandle():
-#	var resolution = get_viewport_rect().size
-#	var dataDictionary = get_parent().datastring
-#	for each in dataDictionary:
-#		var data = dataDictionary.get(each)
-#		var checkdata = handle_resolution.handle_resolution(resolution,data.get("rightSpacePercent"),data.get("leftSpacePercent"),data.get("topSpacePercent"),data.get("bottomSpacePercent"),data.get("square"),data.get("square_align"))
-#		var paneldata = get_panel.get_panel(data.get("type"),data.get("texture"))
-#
-#		var panel = paneldata[0]
-#		panel.panelTexturePath = paneldata[1]
-#		panel.rect_size = checkdata[0]
-#		panel.rect_position = checkdata[1]
-#		panel.datastring = data.get("data")
-#		panel.name = each
-#
-#		panel.rightSpacePercent = data.get("rightSpacePercent")
-#		panel.leftSpacePercent = data.get("leftSpacePercent")
-#		panel.topSpacePercent = data.get("topSpacePercent")
-#		panel.bottomSpacePercent = data.get("bottomSpacePercent")
-#
-#
-#		add_child(panel)
-#		pass
+	if self.get_child_count() >= 1:
+		resize_children()
