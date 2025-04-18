@@ -55,6 +55,7 @@ func _ready():
 			"leftSpacePercent":70,
 			"bottomSpacePercent":70,
 			"rightSpacePercent":90,
+			"square":true
 			
 		}
 	}

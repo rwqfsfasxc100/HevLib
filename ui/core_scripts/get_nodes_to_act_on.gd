@@ -30,9 +30,8 @@ func proc(dataDictionary, path, parent_resolution):
 	
 	var cArray = [path, checkdata[0], checkdata[1]]
 	appendage.append(cArray)
-	var dataDict = d.get("data")
-	if not dataDict == {}:
+	if not paneldta == {}:
 		
-		for data in dataDict:
+		for data in paneldta:
 			var path2 = path + "/" + data
-			proc(dataDict.get(data), path2, checkdata[0])
+			proc(paneldta.get(data), path2, checkdata[0])
