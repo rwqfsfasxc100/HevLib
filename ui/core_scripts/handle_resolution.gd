@@ -24,21 +24,35 @@ static func handle_resolution(vpRect: Vector2, rightSpacePercent: int, leftSpace
 	var sizeH = abs((200.0 - bottomSpacePercent - topSpacePercent) / 200.0)
 	var sizeHeight = screenHeight * sizeH
 	
+	offsetWidth = round(offsetWidth)
+	offsetHeight = round(offsetHeight)
+	sizeWidth = round(sizeWidth)
+	sizeHeight = round(sizeHeight)
+	
 	if square:
 		match vertical_align:
-			"top":
-				pass
 			"bottom":
 				pass
 			"center":
 				pass
+			_:
+				pass
+		match horizontal_align:
+			"right":
+				pass
+			"center":
+				pass
+			_:
+				pass
+		
+		
 		if sizeHeight > sizeWidth:
 			sizeHeight = sizeWidth
 		else:
 			sizeWidth = sizeHeight
 	
 	
-	var rect_size = Vector2(round(sizeWidth), round(sizeHeight))
-	var rect_position = Vector2(round(offsetWidth), round(offsetHeight))
+	var rect_size = Vector2(sizeWidth, sizeHeight)
+	var rect_position = Vector2(offsetWidth, offsetHeight)
 	
 	return [rect_size, rect_position]
