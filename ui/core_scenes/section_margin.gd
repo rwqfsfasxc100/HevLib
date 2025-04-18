@@ -1,0 +1,35 @@
+extends MarginContainer
+
+export var datastring = ""
+
+export (float, 0, 200, 1) var leftSpacePercent = 20.0
+export (float, 0, 200, 1) var rightSpacePercent = 20.0
+export (float, 0, 200, 1) var topSpacePercent = 20.0
+export (float, 0, 200, 1) var bottomSpacePercent = 20.0
+
+export var set_size = Vector2(1280, 720)
+export var set_pos = Vector2(0,0)
+
+var handle_resolution = load("res://HevLib/ui/core_scripts/handle_resolution.gd").new()
+var get_panel = load("res://HevLib/ui/core_scripts/get_panel.gd").new()
+
+export (bool) var square = false
+
+export (String) var panelTexturePath = ""
+
+func _process(delta):
+	handler()
+
+func handler():
+	
+	var file = File.new()
+	if file.open(panelTexturePath, File.READ) == OK:
+		file.close()
+		var tex = load(panelTexturePath)
+		$NinePatchRect.texture = tex
+	else:
+		file.close()
+		var tex = load("res://HevLib/ui/panels/notexture.stex")
+		$NinePatchRect.texture = tex
+		
+	

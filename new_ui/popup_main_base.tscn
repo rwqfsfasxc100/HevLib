@@ -1,0 +1,34 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://HevLib/ui/margin_base.gd" type="Script" id=1]
+[ext_resource path="res://HevLib/ui/popup_main_base.gd" type="Script" id=2]
+[ext_resource path="res://HevLib/ui/margin_background.gd" type="Script" id=3]
+
+[node name="popup_main_base" type="Popup"]
+margin_right = 40.0
+margin_bottom = 40.0
+script = ExtResource( 2 )
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="margin_background" type="MarginContainer" parent="."]
+margin_right = 32.0
+margin_bottom = 32.0
+script = ExtResource( 3 )
+
+[node name="ReferenceRect" type="ReferenceRect" parent="margin_background"]
+visible = false
+margin_right = 32.0
+margin_bottom = 32.0
+editor_only = false
+
+[node name="ColorRect" type="ColorRect" parent="margin_background"]
+margin_right = 32.0
+margin_bottom = 32.0
+color = Color( 0, 0, 0, 0.941176 )
+
+[node name="margin_base" type="MarginContainer" parent="."]
+margin_right = 32.0
+margin_bottom = 32.0
+script = ExtResource( 1 )
