@@ -10,8 +10,8 @@ func _ready():
 	load_variables()
 
 func _process(delta):
-	ScreenWidth = Settings.maxScreenScale.x - 2
-	ScreenHeight = Settings.maxScreenScale.y - 2
+	ScreenWidth = Settings.maxScreenScale.x
+	ScreenHeight = Settings.maxScreenScale.y
 	if OS.get_name() == "Windows":
 		ScreenHeight -= 1
 
