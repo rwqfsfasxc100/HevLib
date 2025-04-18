@@ -47,6 +47,15 @@ func _ready():
 			"bottomSpacePercent":70,
 			"rightSpacePercent":30,
 			"data":{}
+		},
+		"panel3":{
+			"type":"texture_panel",
+			"texture":"res://ModMenu/icon.png.stex",
+			"topSpacePercent":90,
+			"leftSpacePercent":70,
+			"bottomSpacePercent":70,
+			"rightSpacePercent":90,
+			
 		}
 	}
 	var panel = load("res://HevLib/ui/popup_main_base.tscn").instance()
