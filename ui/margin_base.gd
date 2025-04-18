@@ -1,11 +1,11 @@
-extends MarginContainer
+extends Panel
 
 var handle_resolution = preload("res://HevLib/ui/core_scripts/handle_resolution.gd")
 
 var get_panel = preload("res://HevLib/ui/core_scripts/get_panel.gd")
 
 var calculated_child_nodes = []
-onready var dataDictionary = get_parent().get_parent().datastring
+onready var dataDictionary = get_parent().datastring
 
 func _ready():
 	var vpRect = get_viewport_rect().size
@@ -33,22 +33,3 @@ func parseData():
 		var panel_name = data
 		var panel = make_child.make_child(dataDictionary.get(data), resolution, path, panel_name)
 		add_child(panel)
-
-func _process(delta):
-	if self.get_child_count() >= 1:
-		resize_children()
-
-func resize_children():
-	for item in calculated_child_nodes:
-		var path = item[0]
-		var size = item[1]
-		var pos = item[2]
-		var node = get_node(path)
-		node.rect_size = size
-		node.rect_position = pos
-
-
-func _on_margin_base_resized():
-	
-	if self.get_child_count() >= 1:
-		resize_children()

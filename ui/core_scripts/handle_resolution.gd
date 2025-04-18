@@ -1,7 +1,7 @@
 extends Node
 
 
-static func handle_resolution(vpRect: Vector2, rightSpacePercent: int, leftSpacePercent: int, topSpacePercent: int, bottomSpacePercent: int, square: bool, square_align: String):
+static func handle_resolution(vpRect: Vector2, rightSpacePercent: int, leftSpacePercent: int, topSpacePercent: int, bottomSpacePercent: int, square: bool, vertical_align: String, horizontal_align: String):
 	
 #	var vpRect = get_parent().rect_size
 	var screenWidth = vpRect.x
@@ -25,6 +25,13 @@ static func handle_resolution(vpRect: Vector2, rightSpacePercent: int, leftSpace
 	var sizeHeight = screenHeight * sizeH
 	
 	if square:
+		match vertical_align:
+			"top":
+				pass
+			"bottom":
+				pass
+			"center":
+				pass
 		if sizeHeight > sizeWidth:
 			sizeHeight = sizeWidth
 		else:

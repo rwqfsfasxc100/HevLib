@@ -6,7 +6,7 @@
 flags = 4
 load_path = "res://HevLib/ui/panels/tr_bl.stex"
 
-[node name="section_margin" type="MarginContainer"]
+[node name="section_margin" type="Panel"]
 margin_right = 40.0
 margin_bottom = 40.0
 script = ExtResource( 1 )

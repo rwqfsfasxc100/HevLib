@@ -34,6 +34,6 @@ static func get_panel(panel, texture):
 		"notexture":
 			texturePath = "res://HevLib/ui/panels/notexture.stex"
 		_:
-			texturePath = "res://HevLib/ui/panels/tl_br.stex"
+			texturePath = texture
 		
 	return [panelPath.instance(), texturePath]

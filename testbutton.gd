@@ -9,14 +9,9 @@ func _ready():
 	var noMargins = get_parent().get_parent().get_parent().get_parent().get_parent().get_node("NoMargins")
 	var data = {
 		"panel1":{
-			"type":"panel_margin",
 			"texture":"panel_tl_tr",
-			"topSpacePercent":20,
-			"leftSpacePercent":20,
 			"bottomSpacePercent":120,
 			"rightSpacePercent":120,
-			"square":false,
-			"square_align":"left",
 			"data":{
 				"panel1":{
 					"type":"section_margin",
@@ -26,24 +21,35 @@ func _ready():
 					"bottomSpacePercent":60,
 					"rightSpacePercent":60,
 					"square":true,
-					"square_align":"right",
-					"data":{}
+					"horizontal_align":"right",
+					"vertical_align":"top",
+					"data":{
+						"panel1":{
+							"type":"texture_panel",
+							"texture":"res://ModMenu/icon.png.stex",
+							"topSpacePercent":40,
+							"leftSpacePercent":40,
+							"bottomSpacePercent":40,
+							"rightSpacePercent":40,
+							"square":true,
+							"horizontal_align":"center",
+							"vertical_align":"top",
+							"data":{}
+						}
+					}
 				},
 			}
 		},
 		"panel2":{
-			"type":"panel_margin",
 			"texture":"panel_tl_tr",
 			"topSpacePercent":110,
 			"leftSpacePercent":50,
 			"bottomSpacePercent":70,
 			"rightSpacePercent":30,
-			"square":false,
-			"square_align":"left",
 			"data":{}
 		}
 	}
-	var panel = preload("res://HevLib/ui/popup_main_base.tscn").instance()
+	var panel = load("res://HevLib/ui/popup_main_base.tscn").instance()
 	panel.datastring = data
 	
 	

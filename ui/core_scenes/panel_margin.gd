@@ -1,4 +1,4 @@
-extends MarginContainer
+extends Panel
 
 export var datastring = ""
 
@@ -41,3 +41,4 @@ func handler():
 		var panel = make_child.make_child(datastring.get(data), set_size, path, panel_name)
 		add_child(panel)
 	
+	$NinePatchRect.rect_size = rect_size

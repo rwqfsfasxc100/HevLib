@@ -1,0 +1,21 @@
+[gd_resource type="Theme" load_steps=5 format=2]
+
+[sub_resource type="StreamTexture" id=1]
+flags = 4
+load_path = "res://HevLib/ui/panels/none.stex"
+
+[sub_resource type="StyleBoxTexture" id=2]
+texture = SubResource( 1 )
+modulate_color = Color( 1, 1, 1, 0 )
+
+[sub_resource type="StreamTexture" id=3]
+flags = 4
+load_path = "res://HevLib/ui/panels/none.stex"
+
+[sub_resource type="StyleBoxTexture" id=4]
+texture = SubResource( 3 )
+modulate_color = Color( 1, 1, 1, 0 )
+
+[resource]
+Panel/styles/panel = SubResource( 2 )
+PanelContainer/styles/panel = SubResource( 4 )

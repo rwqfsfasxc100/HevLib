@@ -33,3 +33,10 @@ func handler():
 		texture = tex
 		
 	
+	var make_child = load("res://HevLib/ui/core_scripts/make_child.gd").new()
+	var path = get_path_to(self)
+	for data in datastring:
+		var panel_name = data
+		var panel = make_child.make_child(datastring.get(data), set_size, path, panel_name)
+		add_child(panel)
+	
