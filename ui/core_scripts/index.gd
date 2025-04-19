@@ -12,8 +12,6 @@ func panel(pan):
 		_: 
 			return "res://HevLib/ui/core_scenes/panel_margin.tscn"
 
-
-
 # Panel ninepatchrect textures
 func texture(tex):
 	match tex:
@@ -36,7 +34,7 @@ func texture(tex):
 		"notexture": 
 			return "res://HevLib/ui/panels/notexture.stex"
 		_:
-			return "res://HevLib/ui/panels/tl_br.stex"
+			return tex
 
 # Example dictionary used for UI generation
 # Dictionary used to create a heirarchical structure
@@ -44,52 +42,12 @@ func texture(tex):
   # Data dictionary within each entry handles heirarchy within the panel
 # Entry name is used purely for identification and doesn't matter what each is named
 var exampleDict = {
+		"panel":{},
 		"panel1":{
-			"texture":"panel_tl_tr",
-			"bottomSpacePercent":120,
-			"rightSpacePercent":120,
-			"data":{
-				"panel1":{
-					"type":"panel_margin",
-					"texture":"panel_tl_tr",
-					"topSpacePercent":60,
-					"leftSpacePercent":60,
-					"bottomSpacePercent":60,
-					"rightSpacePercent":60,
-					"square":true,
-					"horizontal_align":"right",
-					"vertical_align":"top",
-					"data":{
-						"panel1":{
-							"type":"texture_panel",
-							"texture":"res://ModMenu/icon.png.stex",
-							"topSpacePercent":40,
-							"leftSpacePercent":40,
-							"bottomSpacePercent":40,
-							"rightSpacePercent":40,
-							"square":true,
-							"horizontal_align":"center",
-							"vertical_align":"top"
-						}
-					}
-				},
-			}
-		},
-		"panel2":{
-			"texture":"panel_tl_tr",
-			"topSpacePercent":110,
-			"leftSpacePercent":50,
-			"bottomSpacePercent":70,
-			"rightSpacePercent":30
-		},
-		"panel3":{
-			"type":"texture_panel",
-			"texture":"res://ModMenu/icon.png.stex",
-			"topSpacePercent":90,
-			"leftSpacePercent":70,
-			"bottomSpacePercent":70,
-			"rightSpacePercent":90,
-			"square":true
-			
+			"leftSpacePercent":180,
+			"rightSpacePercent":10,
+			"topSpacePercent":50,
+			"bottomSpacePercent":50,
+			"texture":"panel_tr_br"
 		}
 	}

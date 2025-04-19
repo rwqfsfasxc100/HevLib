@@ -7,56 +7,8 @@ var HevLib = preload("res://HevLib/pointers/HevLib.gd").new()
 
 func _ready():
 	var noMargins = get_parent().get_parent().get_parent().get_parent().get_parent().get_node("NoMargins")
-	var data = {
-		"panel1":{
-			"texture":"panel_tl_tr",
-			"bottomSpacePercent":120,
-			"rightSpacePercent":120,
-			"data":{
-				"panel1":{
-					"type":"panel_margin",
-					"texture":"panel_tl_tr",
-					"topSpacePercent":60,
-					"leftSpacePercent":60,
-					"bottomSpacePercent":60,
-					"rightSpacePercent":60,
-					"square":true,
-					"horizontal_align":"right",
-					"vertical_align":"top",
-					"data":{
-						"panel1":{
-							"type":"texture_panel",
-							"texture":"res://ModMenu/icon.png.stex",
-							"topSpacePercent":40,
-							"leftSpacePercent":40,
-							"bottomSpacePercent":40,
-							"rightSpacePercent":40,
-							"square":true,
-							"horizontal_align":"center",
-							"vertical_align":"top"
-						}
-					}
-				},
-			}
-		},
-		"panel2":{
-			"texture":"panel_tl_tr",
-			"topSpacePercent":110,
-			"leftSpacePercent":50,
-			"bottomSpacePercent":70,
-			"rightSpacePercent":30
-		},
-		"panel3":{
-			"type":"texture_panel",
-			"texture":"res://ModMenu/icon.png.stex",
-			"topSpacePercent":90,
-			"leftSpacePercent":70,
-			"bottomSpacePercent":70,
-			"rightSpacePercent":90,
-			"square":true
-			
-		}
-	}
+	var index = preload("res://HevLib/ui/core_scripts/index.gd").new()
+	var data = index.exampleDict
 	var panel = load("res://HevLib/ui/popup_main_base.tscn").instance()
 	panel.datastring = data
 	

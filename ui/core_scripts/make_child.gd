@@ -32,12 +32,10 @@ func make_child(dataDictionary, resolution, path, panel_name):
 	panel.datastring = paneldta
 	panel.name = panel_name
 	
-	
-	
-	panel.rightSpacePercent = d.get("rightSpacePercent")
-	panel.leftSpacePercent = d.get("leftSpacePercent")
-	panel.topSpacePercent = d.get("topSpacePercent")
-	panel.bottomSpacePercent = d.get("bottomSpacePercent")
+	panel.rightSpacePercent = rightSpacePercent
+	panel.leftSpacePercent = leftSpacePercent
+	panel.topSpacePercent = topSpacePercent
+	panel.bottomSpacePercent = bottomSpacePercent
 	
 	return panel
 #	add_child(panel)

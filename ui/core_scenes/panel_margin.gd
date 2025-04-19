@@ -14,14 +14,19 @@ export var set_size = Vector2(1280, 720)
 export var set_pos = Vector2(0,0)
 
 export (bool) var square = false
+export (String, "top", "bottom", "center") var vertical_align = "top"
+export (String, "left", "right", "center") var horizontal_align = "left"
 
 export (String) var panelTexturePath = ""
 
-#func _process(delta):
-#	handler()
-
 func _ready():
 	handler()
+	var make_child = load("res://HevLib/ui/core_scripts/make_child.gd").new()
+	var path = get_path_to(self)
+	for data in datastring:
+		var panel_name = data
+		var panel = make_child.make_child(datastring.get(data), set_size, path, panel_name)
+		add_child(panel)
 
 func handler():
 	var file = File.new()
@@ -33,12 +38,11 @@ func handler():
 		file.close()
 		var tex = load("res://HevLib/ui/panels/tl_br.stex")
 		$NinePatchRect.texture = tex
-	
-	var make_child = load("res://HevLib/ui/core_scripts/make_child.gd").new()
-	var path = get_path_to(self)
-	for data in datastring:
-		var panel_name = data
-		var panel = make_child.make_child(datastring.get(data), set_size, path, panel_name)
-		add_child(panel)
-	
+	$NinePatchRect.rect_size = rect_size
+
+func _process(delta):
+	handler()
+	var checkdata = handle_resolution.handle_resolution(get_parent().rect_size,rightSpacePercent,leftSpacePercent,topSpacePercent,bottomSpacePercent,square,vertical_align, horizontal_align)
+	rect_size = checkdata[0]
+	rect_position = checkdata[1]
 	$NinePatchRect.rect_size = rect_size

@@ -4,26 +4,14 @@ var handle_resolution = preload("res://HevLib/ui/core_scripts/handle_resolution.
 
 var get_panel = preload("res://HevLib/ui/core_scripts/get_panel.gd")
 
-var calculated_child_nodes = []
 onready var dataDictionary = get_parent().datastring
 
 func _ready():
-	var vpRect = get_viewport_rect().size
-	var screenWidth = vpRect.x
-	var screenHeight = vpRect.y
-	var get_nodes_to_act_on = load("res://HevLib/ui/core_scripts/get_nodes_to_act_on.gd").new()
-	calculated_child_nodes = get_nodes_to_act_on.get_nodes_to_act_on(dataDictionary, vpRect)
-	
-	var panelWidth = Settings.maxScreenScale.x - 2
-	var panelHeight = Settings.maxScreenScale.y - 2
-	if OS.get_name() == "Windows":
-		screenHeight -= 1
-	margin_right = screenWidth
-	margin_bottom = screenHeight
-	margin_left = 0
-	margin_top = 0
 	parseData()
-	
+	handler()
+
+func _process(delta):
+	handler()
 
 func parseData():
 	var resolution = get_viewport_rect().size
@@ -33,3 +21,15 @@ func parseData():
 		var panel_name = data
 		var panel = make_child.make_child(dataDictionary.get(data), resolution, path, panel_name)
 		add_child(panel)
+
+func handler():
+	
+	var vpRect = get_viewport_rect().size
+	var screenWidth = vpRect.x
+	var screenHeight = vpRect.y
+	if OS.get_name() == "Windows":
+		screenHeight -= 1
+	margin_right = screenWidth
+	margin_bottom = screenHeight
+	margin_left = 0
+	margin_top = 0
