@@ -38,42 +38,56 @@ export var notexture = "res://HevLib/ui/panels/notexture.stex"
 
 # Example dictionary used for UI generation
 # Dictionary used to create a heirarchical structure
-  # Entries on the same level will be drawn at the same level
+  # Entries on the same level will be drawn at the same level, with earlier entries being drawn over by later entries
   # Data dictionary within each entry handles heirarchy within the panel
 # Entry name is used purely for identification and doesn't matter what each is named
 var exampleDict = {
-	"panel1":{
-		"type":"panel_margin",
-		"texture":"panel_tl_tr",
-		"topSpacePercent":20,
-		"leftSpacePercent":20,
-		"bottomSpacePercent":120,
-		"rightSpacePercent":120,
-		"square":false,
-		"square_align":"left",
-		"data":{
-			"panel1":{
-				"type":"panel_margin",
-				"texture":"panel_tl_tr",
-				"topSpacePercent":60,
-				"leftSpacePercent":60,
-				"bottomSpacePercent":60,
-				"rightSpacePercent":60,
-				"square":true,
-				"square_align":"right",
-				"data":{}
-			},
+		"panel1":{
+			"texture":"panel_tl_tr",
+			"bottomSpacePercent":120,
+			"rightSpacePercent":120,
+			"data":{
+				"panel1":{
+					"type":"section_margin",
+					"texture":"panel_tl_tr",
+					"topSpacePercent":60,
+					"leftSpacePercent":60,
+					"bottomSpacePercent":60,
+					"rightSpacePercent":60,
+					"square":true,
+					"horizontal_align":"right",
+					"vertical_align":"top",
+					"data":{
+						"panel1":{
+							"type":"texture_panel",
+							"texture":"res://ModMenu/icon.png.stex",
+							"topSpacePercent":40,
+							"leftSpacePercent":40,
+							"bottomSpacePercent":40,
+							"rightSpacePercent":40,
+							"square":true,
+							"horizontal_align":"center",
+							"vertical_align":"top"
+						}
+					}
+				},
+			}
+		},
+		"panel2":{
+			"texture":"panel_tl_tr",
+			"topSpacePercent":110,
+			"leftSpacePercent":50,
+			"bottomSpacePercent":70,
+			"rightSpacePercent":30
+		},
+		"panel3":{
+			"type":"texture_panel",
+			"texture":"res://ModMenu/icon.png.stex",
+			"topSpacePercent":90,
+			"leftSpacePercent":70,
+			"bottomSpacePercent":70,
+			"rightSpacePercent":90,
+			"square":true
+			
 		}
-	},
-	"panel2":{
-		"type":"panel_margin",
-		"texture":"panel_tl_tr",
-		"topSpacePercent":130,
-		"leftSpacePercent":50,
-		"bottomSpacePercent":70,
-		"rightSpacePercent":30,
-		"square":false,
-		"square_align":"left",
-		"data":{}
-	},
-}
+	}
