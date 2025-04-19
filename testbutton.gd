@@ -14,7 +14,7 @@ func _ready():
 			"rightSpacePercent":120,
 			"data":{
 				"panel1":{
-					"type":"section_margin",
+					"type":"panel_margin",
 					"texture":"panel_tl_tr",
 					"topSpacePercent":60,
 					"leftSpacePercent":60,
