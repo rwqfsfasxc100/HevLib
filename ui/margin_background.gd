@@ -6,7 +6,9 @@ func _process(delta):
 	var screenHeight = vpRect.y
 	var panelWidth = Settings.maxScreenScale.x - 2
 	var panelHeight = Settings.maxScreenScale.y - 2
-	if OS.get_name() == "Windows":
+	var windowed = Settings.cfg["display"]["windowed"]
+	var fullscreen = Settings.cfg["display"]["fullscreen"]
+	if OS.get_name() == "Windows" and windowed == false and fullscreen == false:
 		screenHeight -= 1
 	margin_right = screenWidth
 	margin_bottom = screenHeight

@@ -6,6 +6,7 @@ load_path = "res://HevLib/ui/panels/none.stex"
 
 [sub_resource type="StyleBoxTexture" id=2]
 texture = SubResource( 1 )
+region_rect = Rect2( 0, 0, 48, 48 )
 modulate_color = Color( 1, 1, 1, 0 )
 
 [sub_resource type="StreamTexture" id=3]
@@ -14,6 +15,7 @@ load_path = "res://HevLib/ui/panels/none.stex"
 
 [sub_resource type="StyleBoxTexture" id=4]
 texture = SubResource( 3 )
+region_rect = Rect2( 0, 0, 48, 48 )
 modulate_color = Color( 1, 1, 1, 0 )
 
 [resource]

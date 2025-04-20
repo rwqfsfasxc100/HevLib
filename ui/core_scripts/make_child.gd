@@ -22,7 +22,7 @@ func make_child(dataDictionary, resolution, path, panel_name):
 
 	var panel = paneldata[0]
 	panel.panelTexturePath = paneldata[1]
-	panel.rect_min_size = checkdata[0]
+#	panel.rect_min_size = checkdata[0]
 	panel.rect_size = checkdata[0]
 	
 	panel.set_size = checkdata[0]

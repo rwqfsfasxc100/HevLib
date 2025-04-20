@@ -48,3 +48,5 @@ func _process(delta):
 	var checkdata = handle_resolution.handle_resolution(get_parent().rect_size,rightSpacePercent,leftSpacePercent,topSpacePercent,bottomSpacePercent,square,vertical_align, horizontal_align)
 	rect_size = checkdata[0]
 	rect_position = checkdata[1]
+	set_size = checkdata[0]
+	set_pos = checkdata[1]

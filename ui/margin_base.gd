@@ -1,9 +1,5 @@
 extends Panel
 
-var handle_resolution = preload("res://HevLib/ui/core_scripts/handle_resolution.gd")
-
-var get_panel = preload("res://HevLib/ui/core_scripts/get_panel.gd")
-
 onready var dataDictionary = get_parent().datastring
 
 func _ready():
@@ -14,7 +10,7 @@ func _process(delta):
 	handler()
 
 func parseData():
-	var resolution = get_viewport_rect().size
+	var resolution = get_parent().size
 	var path = get_path_to(self)
 	var make_child = load("res://HevLib/ui/core_scripts/make_child.gd").new()
 	for data in dataDictionary:
@@ -23,8 +19,7 @@ func parseData():
 		add_child(panel)
 
 func handler():
-	
-	var vpRect = get_viewport_rect().size
+	var vpRect = get_parent().size
 	var screenWidth = vpRect.x
 	var screenHeight = vpRect.y
 	if OS.get_name() == "Windows":

@@ -42,12 +42,16 @@ func texture(tex):
   # Data dictionary within each entry handles heirarchy within the panel
 # Entry name is used purely for identification and doesn't matter what each is named
 var exampleDict = {
-		"panel":{},
 		"panel1":{
-			"leftSpacePercent":180,
+			"leftSpacePercent":175,
 			"rightSpacePercent":10,
 			"topSpacePercent":50,
 			"bottomSpacePercent":50,
 			"texture":"panel_tr_br"
+		},
+		"panel":{},
+		"panel2":{
+			"rightSpacePercent":160,
+			"topSpacePercent":5
 		}
 	}

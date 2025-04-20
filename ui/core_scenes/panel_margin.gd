@@ -38,11 +38,13 @@ func handler():
 		file.close()
 		var tex = load("res://HevLib/ui/panels/tl_br.stex")
 		$NinePatchRect.texture = tex
-	$NinePatchRect.rect_size = rect_size
 
 func _process(delta):
 	handler()
-	var checkdata = handle_resolution.handle_resolution(get_parent().rect_size,rightSpacePercent,leftSpacePercent,topSpacePercent,bottomSpacePercent,square,vertical_align, horizontal_align)
+	var parent_size = get_parent().rect_size
+	var checkdata = handle_resolution.handle_resolution(parent_size,rightSpacePercent,leftSpacePercent,topSpacePercent,bottomSpacePercent,square,vertical_align, horizontal_align)
 	rect_size = checkdata[0]
 	rect_position = checkdata[1]
-	$NinePatchRect.rect_size = rect_size
+	set_size = checkdata[0]
+	set_pos = checkdata[1]
+	$NinePatchRect.rect_size = checkdata[0]

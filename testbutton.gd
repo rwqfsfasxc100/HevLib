@@ -6,7 +6,8 @@ var Globals = preload("res://HevLib/Functions.gd").new()
 var HevLib = preload("res://HevLib/pointers/HevLib.gd").new()
 
 func _ready():
-	var noMargins = get_parent().get_parent().get_parent().get_parent().get_parent().get_node("NoMargins")
+#	var noMargins = get_parent().get_parent().get_parent().get_parent().get_parent().get_node("NoMargins")
+	var noMargins = get_node("/root/_HevLib_Gamespace_Canvas/MarginContainer")
 	var index = preload("res://HevLib/ui/core_scripts/index.gd").new()
 	var data = index.exampleDict
 	var panel = load("res://HevLib/ui/popup_main_base.tscn").instance()

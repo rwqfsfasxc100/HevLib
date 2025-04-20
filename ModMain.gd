@@ -45,9 +45,10 @@ func _ready():
 	var NodeNew = Node.new()
 	NodeNew.set_script(load("res://HevLib/Variables.gd"))
 	NodeNew.name = "HevLib~Variables"
+	var Gamespace_Canvas = load("res://HevLib/ui/core_scenes/_HevLib_Gamespace_Canvas.tscn").instance()
 	var CRoot = get_tree().get_root()
 	CRoot.call_deferred("add_child",NodeNew)
-	
+	CRoot.call_deferred("add_child",Gamespace_Canvas)
 	loadTranslationsFromCache()
 	
 	
