@@ -14,13 +14,33 @@ func make_child(dataDictionary, resolution, path, panel_name):
 	var topSpacePercent = d.get("topSpacePercent", 20)
 	var bottomSpacePercent = d.get("bottomSpacePercent", 20)
 	var square = d.get("square", false)
-	var vertical_align = d.get("vertical_align", "top")
-	var horizontal_align = d.get("horizontal_align", "left")
+	var square_vertical_align = d.get("square_vertical_align", "top")
+	var square_horizontal_align = d.get("square_horizontal_align", "left")
 	var paneldta = d.get("data", {})
-	var checkdata = handle_resolution.handle_resolution(resolution,rightSpacePercent,leftSpacePercent,topSpacePercent,bottomSpacePercent,square,vertical_align, horizontal_align)
+	var checkdata = handle_resolution.handle_resolution(resolution,rightSpacePercent,leftSpacePercent,topSpacePercent,bottomSpacePercent,square,square_vertical_align, square_horizontal_align)
 	var paneldata = get_panel.get_panel(type,texture)
-
 	var panel = paneldata[0]
+	if type == "label_margin":
+		panel.panelText = d.get("text", "")
+		panel.borderBuffer = d.get("borderBuffer", true)
+		panel.textboxOffset = d.get("textboxOffset", Vector2(0,0))
+		panel.autowrap = d.get("autowrap", true)
+		panel.text_horizontal_align = d.get("text_horizontal_align", 0)
+		panel.text_vertical_align = d.get("text_vertical_align", 0)
+		panel.clip_text = d.get("clip_text", false)
+		panel.uppercase = d.get("uppercase", false)
+		panel.visible_characters = d.get("visible_characters", -1)
+		panel.percent_visible = d.get("percent_visible", 1.0)
+		panel.lines_skipped = d.get("lines_skipped", 0)
+		panel.max_lines_visible = d.get("max_lines_visible", -1)
+		
+		rightSpacePercent = d.get("rightSpacePercent", 0)
+		leftSpacePercent = d.get("leftSpacePercent", 0)
+		topSpacePercent = d.get("topSpacePercent", 0)
+		bottomSpacePercent = d.get("bottomSpacePercent", 0)
+		texture = d.get("texture", "notexture")
+	
+	
 	panel.panelTexturePath = paneldata[1]
 #	panel.rect_min_size = checkdata[0]
 	panel.rect_size = checkdata[0]
@@ -36,6 +56,14 @@ func make_child(dataDictionary, resolution, path, panel_name):
 	panel.leftSpacePercent = leftSpacePercent
 	panel.topSpacePercent = topSpacePercent
 	panel.bottomSpacePercent = bottomSpacePercent
+	
+		
+		
+		
+		
+		
+		
+	
 	
 	return panel
 #	add_child(panel)

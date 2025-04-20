@@ -1,40 +1,50 @@
 extends Node
 
+var scene_folder = "res://HevLib/ui/core_scenes/"
+
+var texture_folder = "res://HevLib/ui/panels/"
 
 func panel(pan):
+	var panelType = "panel_margin.tscn"
 	match pan:
 		"popup_main_base":
-			return "res://HevLib/ui/core_scenes/popup_main_base.tscn"
+			panelType = "popup_main_base.tscn"
 		"panel_margin":
-			return "res://HevLib/ui/core_scenes/panel_margin.tscn"
+			panelType = "panel_margin.tscn"
 		"texture_panel": 
-			return "res://HevLib/ui/core_scenes/texture_panel.tscn"
+			panelType = "texture_panel.tscn"
+		"label_margin":
+			panelType = "label_margin.tscn"
 		_: 
-			return "res://HevLib/ui/core_scenes/panel_margin.tscn"
-
+			panelType = "panel_margin.tscn"
+	return scene_folder + panelType
 # Panel ninepatchrect textures
 func texture(tex):
+	var textureType = "tl_br.stex"
 	match tex:
 		"panel_corners_all":
-			return "res://HevLib/ui/panels/all.stex"
+			textureType = "all.stex"
 		"panel_bl_br": 
-			return "res://HevLib/ui/panels/bl_br.stex"
+			textureType = "bl_br.stex"
 		"panel_corners_none": 
-			return "res://HevLib/ui/panels/none.stex"
+			textureType = "none.stex"
 		"panel_tl_bl": 
-			return "res://HevLib/ui/panels/tl_bl.stex"
+			textureType = "tl_bl.stex"
 		"panel_tl_br": 
-			return "res://HevLib/ui/panels/tl_br.stex"
+			textureType = "tl_br.stex"
 		"panel_tl_tr": 
-			return "res://HevLib/ui/panels/tl_tr.stex"
+			textureType = "tl_tr.stex"
 		"panel_tr_bl": 
-			return "res://HevLib/ui/panels/tr_bl.stex"
+			textureType = "tr_bl.stex"
 		"panel_tr_br": 
-			return "res://HevLib/ui/panels/tr_br.stex"
+			textureType = "tr_br.stex"
 		"notexture": 
-			return "res://HevLib/ui/panels/notexture.stex"
+			textureType = "notexture.stex"
+		"none": 
+			textureType = "notexture.stex"
 		_:
-			return tex
+			textureType = tex
+	return texture_folder + textureType
 
 # Example dictionary used for UI generation
 # Dictionary used to create a heirarchical structure
@@ -52,6 +62,13 @@ var exampleDict = {
 		"panel":{},
 		"panel2":{
 			"rightSpacePercent":160,
-			"topSpacePercent":5
+			"topSpacePercent":5,
+			"data":{
+					"panel1":{
+					"type":"label_margin",
+					"text":"uiweysuhkdsygjhfusydgcxvgh",
+					"autowrap":true
+				}
+			}
 		}
 	}

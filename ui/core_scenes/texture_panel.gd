@@ -14,8 +14,8 @@ var handle_resolution = load("res://HevLib/ui/core_scripts/handle_resolution.gd"
 var get_panel = load("res://HevLib/ui/core_scripts/get_panel.gd").new()
 
 export (bool) var square = false
-export (String, "top", "bottom", "center") var vertical_align = "top"
-export (String, "left", "right", "center") var horizontal_align = "left"
+export (String, "top", "bottom", "center") var square_vertical_align = "top"
+export (String, "left", "right", "center") var square_horizontal_align = "left"
 
 export (String) var panelTexturePath = ""
 
@@ -45,7 +45,7 @@ func handler():
 
 func _process(delta):
 	handler()
-	var checkdata = handle_resolution.handle_resolution(get_parent().rect_size,rightSpacePercent,leftSpacePercent,topSpacePercent,bottomSpacePercent,square,vertical_align, horizontal_align)
+	var checkdata = handle_resolution.handle_resolution(get_parent().rect_size,rightSpacePercent,leftSpacePercent,topSpacePercent,bottomSpacePercent,square,square_vertical_align, square_horizontal_align)
 	rect_size = checkdata[0]
 	rect_position = checkdata[1]
 	set_size = checkdata[0]

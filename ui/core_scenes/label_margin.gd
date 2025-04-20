@@ -1,4 +1,4 @@
-extends Panel
+extends NinePatchRect
 
 export var datastring = ""
 
@@ -17,6 +17,19 @@ export (bool) var square = false
 export (String, "top", "bottom", "center") var square_vertical_align = "top"
 export (String, "left", "right", "center") var square_horizontal_align = "left"
 
+export (String) var panelText = ""
+export (bool) var borderBuffer = true
+export (Vector2) var textboxOffset = Vector2(0,0)
+export (bool) var autowrap = false
+export (int, "Left", "Right", "Center", "Fill") var text_horizontal_align = 0
+export (int, "Top", "Bottom", "Center", "Fill") var text_vertical_align = 0
+export (bool) var clip_text = false
+export (bool) var uppercase = false
+export (int) var visible_characters = -1
+export (float, 0, 1, 0.001) var percent_visible = 1.0
+export (int) var lines_skipped = 0
+export (int) var max_lines_visible = -1
+
 export (String) var panelTexturePath = ""
 
 func _ready():
@@ -29,15 +42,16 @@ func _ready():
 		add_child(panel)
 
 func handler():
+	$NinePatchRect.text = panelText
 	var file = File.new()
 	if file.open(panelTexturePath, File.READ) == OK:
 		file.close()
 		var tex = load(panelTexturePath)
-		$NinePatchRect.texture = tex
+		texture = tex
 	else:
 		file.close()
 		var tex = load("res://HevLib/ui/panels/tl_br.stex")
-		$NinePatchRect.texture = tex
+		texture = tex
 
 func _process(delta):
 	handler()
@@ -47,4 +61,22 @@ func _process(delta):
 	rect_position = checkdata[1]
 	set_size = checkdata[0]
 	set_pos = checkdata[1]
-	$NinePatchRect.rect_size = checkdata[0]
+	var textboxSize = checkdata[0]
+	var textboxOffset = Vector2(0,0)
+	if borderBuffer:
+		textboxSize = textboxSize - Vector2(32,32)
+		textboxOffset = textboxOffset + Vector2(16,16)
+	
+	$NinePatchRect.autowrap = autowrap
+	$NinePatchRect.align = text_horizontal_align
+	$NinePatchRect.valign = text_vertical_align
+	$NinePatchRect.clip_text = clip_text
+	$NinePatchRect.uppercase = uppercase
+	$NinePatchRect.visible_characters = visible_characters
+	$NinePatchRect.percent_visible = percent_visible
+	$NinePatchRect.lines_skipped = lines_skipped
+	$NinePatchRect.max_lines_visible = max_lines_visible
+	
+	$NinePatchRect.rect_size = textboxSize
+	$NinePatchRect.rect_position = textboxOffset
+	$NinePatchRect.hint_tooltip = panelText
