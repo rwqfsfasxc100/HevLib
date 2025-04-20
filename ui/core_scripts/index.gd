@@ -67,7 +67,8 @@ var exampleDict = {
 					"panel1":{
 					"type":"label_margin",
 					"text":"uiweysuhkdsygjhfusydgcxvgh",
-					"autowrap":true
+					"autowrap":true,
+					"uppercase":true
 				}
 			}
 		}

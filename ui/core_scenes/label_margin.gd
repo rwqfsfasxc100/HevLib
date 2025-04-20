@@ -79,4 +79,4 @@ func _process(delta):
 	
 	$NinePatchRect.rect_size = textboxSize
 	$NinePatchRect.rect_position = textboxOffset
-	$NinePatchRect.hint_tooltip = panelText
+	

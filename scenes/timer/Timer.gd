@@ -1,8 +1,11 @@
 extends Timer
 
-func start_timer(MINUTES):
+func start_timer(MINUTES, useSecondsInstead = false):
 	Debug.l("Timer started for %s minutes" % MINUTES)
-	wait_time = MINUTES*60
+	if useSecondsInstead == true:
+		wait_time = MINUTES
+	else:
+		wait_time = MINUTES*60
 	one_shot = true
 	start()
 

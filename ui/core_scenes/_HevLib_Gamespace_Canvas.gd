@@ -10,5 +10,8 @@ func _process(delta):
 	if not get_parent().get_node_or_null("Game") == null:
 		currentNodeRes = get_parent().get_node("Game/TitleAnimPlayer/SubtitleLayer/IntroContainer").rect_size
 	$MarginContainer.rect_size = currentNodeRes
+#	var siblingCount = get_parent().get_child_count()
+#	get_parent().move_child(self, siblingCount)
+	
 	
 	

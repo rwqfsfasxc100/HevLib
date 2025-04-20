@@ -8,8 +8,8 @@ func _ready():
 	var margins = get_node("NoMargins")
 	var mX = margins.rect_size.x
 	var mY = margins.rect_size.y
-	var offsetX = (screenWidth/2 - mX/2)
-	var offsetY = (screenHeight/2 - mY/2)
+	var offsetX = (screenWidth - mX)
+	var offsetY = (screenHeight - mY)
 	margins.rect_position = Vector2(offsetX,offsetY)
 	
 	

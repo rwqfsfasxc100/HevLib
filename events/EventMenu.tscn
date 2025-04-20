@@ -150,7 +150,7 @@ margin_top = 92.0
 margin_right = 1078.0
 margin_bottom = 116.0
 min_value = 1.0
-max_value = 1800.0
+max_value = 1350.0
 value = 1.0
 
 [node name="SpawnNow" type="Button" parent="NoMargins/CenterContainer/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]

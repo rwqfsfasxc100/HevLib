@@ -1,6 +1,5 @@
 extends OptionButton
 
-
 onready var ring = get_node("/root/Game/TheRing")
 
 var eventNames = {0:"none"}
@@ -23,16 +22,16 @@ func _on_SpawnNow_pressed():
 		ring.odditiesEvery = 0.1
 		startEventTimerNode()
 	
-
 func _ready():
-	defaultTestSpecificStoryElement = ring.testSpecificStoryElement
-	defaultOdditiesEvery = ring.odditiesEvery
-	var value = defaultOdditiesEvery
-	
-	get_parent().get_node("HBoxContainer/Timer").text = "%s s" % value
-	
-	
-	addEvents()
+	if not ring == null:
+		defaultTestSpecificStoryElement = ring.testSpecificStoryElement
+		defaultOdditiesEvery = ring.odditiesEvery
+		var value = defaultOdditiesEvery
+		
+		get_parent().get_node("HBoxContainer/Timer").text = "%s s" % value
+		
+		
+		addEvents()
 	
 func addEvents():
 	

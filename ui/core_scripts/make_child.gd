@@ -57,12 +57,6 @@ func make_child(dataDictionary, resolution, path, panel_name):
 	panel.topSpacePercent = topSpacePercent
 	panel.bottomSpacePercent = bottomSpacePercent
 	
-		
-		
-		
-		
-		
-		
 	
 	
 	return panel
