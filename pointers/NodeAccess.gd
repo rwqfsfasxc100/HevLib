@@ -15,3 +15,7 @@ static func __get_all_children(node, strip_supplied_node_from_array = false, ret
 	var f = load("res://HevLib/globals/get_all_children.gd").new()
 	var s = f.get_all_children(node, strip_supplied_node_from_array, return_only_paths, use_relative_paths)
 	return s
+
+static func __reparent(node, parent_node):
+	var f = load("res://HevLib/globals/reparent.gd")
+	f.reparent(node, parent_node)

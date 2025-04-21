@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://menu/MenuTheme.tres" type="Theme" id=1]
+[ext_resource path="res://HevLib/events/EventSelectorButton.gd" type="Script" id=2]
+
+[node name="EventButton" type="CheckButton"]
+margin_right = 76.0
+margin_bottom = 40.0
+theme = ExtResource( 1 )
+pressed = true
+script = ExtResource( 2 )
+
+[connection signal="toggled" from="." to="." method="_toggled"]

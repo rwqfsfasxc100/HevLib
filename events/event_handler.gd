@@ -19,6 +19,7 @@ func _process(delta):
 	else:
 		zone = ""
 	
+	
 func spawn_event(event):
 	if zone == "rings" and not busy:
 		ring = get_node("/root/Game/TheRing")
@@ -28,8 +29,6 @@ func spawn_event(event):
 		ring.testSpecificStoryElement = event
 		startEventTimerNode()
 	
-	
-
 func startEventTimerNode():
 	busy = true
 	var timer = get_child(0)
