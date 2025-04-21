@@ -17,3 +17,5 @@ EVENTDRIVER_EVENTS|Selected Event
 EVENTDRIVER_TIMER|Storyteller Event Timer
 
 EVENTDRIVER_SPAWNNOW|Force event spawn using selected event
+
+EVENTDRIVER_EVENT_SELECTOR|Event Selector
