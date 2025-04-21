@@ -7,6 +7,7 @@ extends "res://Settings.gd"
 var HevLib = {
 	"input":{
 		"open_debug_event_menu":[  ],
+		"debugger":[ "F10" ]
 	}, 
 }
 
@@ -53,3 +54,10 @@ func loadKeymapsFromConfig():
 			event.scancode = OS.find_scancode_from_string(key)
 			InputMap.action_add_event(action_name, event)
 	emit_signal("controlSchemeChaged")
+	
+	var actions = InputMap.get_action_list("debugger")
+	var keys = []
+	for a in actions:
+		var scancode = char(a.scancode)
+		keys.append(scancode)
+	

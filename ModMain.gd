@@ -42,7 +42,6 @@ func _ready():
 	if ModLoader.is_debugged:
 		replaceScene("scenes/scene_replacements/TitleScreen.tscn", "res://TitleScreen.tscn")
 	
-	
 	var NodeNew = Node.new()
 	NodeNew.set_script(load("res://HevLib/Variables.gd"))
 	NodeNew.name = "HevLib~Variables"
