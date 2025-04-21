@@ -4,6 +4,9 @@ onready var ring = get_node("/root/Game/TheRing")
 
 var all_events = {}
 
+func _process(delta):
+	get_parent().get_parent().get_parent().get_parent().get_parent().get_parent().selected_events = all_events
+
 func _ready():
 	
 	var events = ring.get_children()

@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://AsteroidField.tscn" type="PackedScene" id=1]
+[ext_resource path="res://HevLib/scenes/scene_replacements/AsteroidField.gd" type="Script" id=2]
+
+[node name="AsteroidField" instance=ExtResource( 1 )]
+script = ExtResource( 2 )
+
+[node name="DespawnObserver" parent="FocusMatch" index="0"]
+collision_mask = 2684878850
+
+[node name="DespawnObserverAsteroids" parent="FocusMatch" index="1"]
+collision_mask = 3221225472

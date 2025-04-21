@@ -53,6 +53,8 @@ func _ready():
 	CRoot.call_deferred("add_child",mouse)
 	loadTranslationsFromCache()
 	
+	
+	replaceScene("scenes/scene_replacements/AsteroidField.tscn", "res://AsteroidField.tscn")
 	replaceScene("scenes/scene_replacements/Game.tscn", "res://Game.tscn")
 	l("Ready")
 	

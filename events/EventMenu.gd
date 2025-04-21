@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+var selected_events = {}
+
 func _ready():
 	visible = false
 	var vpRect = get_node("/root").size
