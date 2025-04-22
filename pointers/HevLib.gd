@@ -65,7 +65,7 @@ static func __get_library_functionality() -> Dictionary:
 		for pFunc in pFuncs:
 			var pFuncName = pFunc.name
 			if pFuncName.begins_with("__"):
-				methods.merge({pFuncName:pointerLoad.developer_hint[pFuncName]})
+				methods.merge({pFuncName:pointerLoad.developer_hint.get(pFuncName, [TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_1"),TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_2")])})
 		var concat = {pointer:methods}
 		functions.merge(concat)
 	return functions

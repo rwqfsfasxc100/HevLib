@@ -33,7 +33,7 @@ func _on_Button_pressed():
 #
 #	var pointers = HevLib.__get_lib_pointers()
 #	var pointers2 = HevLib.__get_pointer_functions("Zip.gd")
-#	var pointers3 = HevLib.__get_library_functionality()
+	var pointers3 = HevLib.__get_library_functionality()
 	
 	
 #	var gh = preload("res://HevLib/pointers/Github.gd").new()
