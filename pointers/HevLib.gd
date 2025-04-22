@@ -12,12 +12,14 @@ var developer_hint = {
 	],
 	"__get_pointer_functions":[
 		"Returns a dictionary of the pointer's functions",
-		"Each key is the function name, with the respective array being notes on how the function is used"
+		"Each key is the function name, with the respective array being notes on how the function is used",
+		"Optional 'return_JSON' boolean returns a JSON-formatted string instead of a dictionary"
 	],
 	"__get_library_functionality":[
 		"Returns a dictionary containing info on the entire library",
 		" -> Top level of keys are the pointer names",
-		" -> Child keys are equivalent to using __get_pointer_functions() on the respective pointers"
+		" -> Child keys are equivalent to using __get_pointer_functions() on the respective pointers",
+		"Optional 'return_JSON' boolean returns a JSON-formatted string instead of a dictionary"
 	]
 }
 static func __get_lib_variables() -> Object:
@@ -37,7 +39,7 @@ static func __get_lib_pointers(return_as_full_path: bool = false) -> Array:
 	else:
 		return files
 
-static func __get_pointer_functions(pointer: String) -> Dictionary:
+static func __get_pointer_functions(pointer: String, return_JSON: bool = false) -> Dictionary:
 	var path = "res://HevLib/pointers/"
 	var pSplit = pointer.split("/")
 	var actualPointer = path + pSplit[pSplit.size() - 1]
@@ -47,11 +49,21 @@ static func __get_pointer_functions(pointer: String) -> Dictionary:
 	for pFunc in pFuncs:
 		var pFuncName = pFunc.name
 		if pFuncName.begins_with("__"):
-			methods.merge({pFuncName:pointerLoad.developer_hint[pFuncName]})
-	return methods
+			var data = pointerLoad.get_property_list()
+			var devHint = {}
+			for item in data:
+				if item.get("name") == "developer_hint":
+					devHint = pointerLoad.developer_hint
+			var desc = devHint.get(pFuncName, [TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_1"),TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_2")])
+			methods.merge({pFuncName:desc})
+	var psj = JSON.print(methods)
+	if return_JSON:
+		return psj
+	else:
+		return methods
 
 
-static func __get_library_functionality() -> Dictionary:
+static func __get_library_functionality(return_JSON: bool = false) -> Dictionary:
 	var Globals = preload("res://HevLib/Functions.gd").new()
 	var path = "res://HevLib/pointers/"
 	var functions = {}
@@ -65,7 +77,17 @@ static func __get_library_functionality() -> Dictionary:
 		for pFunc in pFuncs:
 			var pFuncName = pFunc.name
 			if pFuncName.begins_with("__"):
-				methods.merge({pFuncName:pointerLoad.developer_hint.get(pFuncName, [TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_1"),TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_2")])})
+				var data = pointerLoad.get_property_list()
+				var devHint = {}
+				for item in data:
+					if item.get("name") == "developer_hint":
+						devHint = pointerLoad.developer_hint
+				var desc = devHint.get(pFuncName, [TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_1"),TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_2")])
+				methods.merge({pFuncName:desc})
 		var concat = {pointer:methods}
 		functions.merge(concat)
-	return functions
+	var psj = JSON.print(functions)
+	if return_JSON:
+		return psj
+	else:
+		return functions

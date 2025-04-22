@@ -31,10 +31,9 @@ func _on_Button_pressed():
 #	Globals.__webtranslate_timed(URL, 5)
 #	var text = TranslationServer.translate("DIALOG_SALVAGE_EXPOSE_FAST_K37_3")
 #
-#	var pointers = HevLib.__get_lib_pointers()
-#	var pointers2 = HevLib.__get_pointer_functions("Zip.gd")
-	var pointers3 = HevLib.__get_library_functionality()
-	
+	var pointers = HevLib.__get_lib_pointers()
+	var pointers2 = HevLib.__get_pointer_functions("Zip.gd", true)
+	var pointers3 = HevLib.__get_library_functionality(true)
 	
 #	var gh = preload("res://HevLib/pointers/Github.gd").new()
 #	gh.__get_github_filesystem(URL, self, "normal", "1.0.0")

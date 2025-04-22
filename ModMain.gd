@@ -42,6 +42,10 @@ func loadTranslationsFromCache():
 			var filePath = str(folderPath + file)
 			var ffile = str(file)
 			var dm = ffile.split("--")[1]
+			if str(dm).ends_with("]"):
+				var dm5 = str(dm).split("[")[1]
+				var dm6 = str(dm5).split("]")[0]
+				dm = dm6
 			var vm = dm.split("-~-")
 			var mv = PoolByteArray()
 			for itm in vm:
