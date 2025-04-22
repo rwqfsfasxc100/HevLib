@@ -45,9 +45,17 @@ func _on_request_complete(result, response_code, headers, body):
 				psmp.append(concatStr)
 		if psmp != []:
 			nameContent = psmp
+		var utf8 = delim.to_utf8()
+		var utfc = ""
+		for ut in utf8:
+			var chars = utf8.size()
+			if utfc == "":
+				utfc = str(ut)
+			else:
+				utfc = utfc + "-~-" + str(ut)
 		Globals.__check_folder_exists(HevLibCache + "/WebTranslate/" + nameContent[0])
 		var file = File.new()
-		var fileName = HevLibCache + "/WebTranslate/" + nameContent[0] + "/" + nameContent[1] + cacheExtension + "--" + str(delim.to_utf8())
+		var fileName = HevLibCache + "/WebTranslate/" + nameContent[0] + "/" + nameContent[1] + cacheExtension + "--" + utfc
 		file.open(fileName,File.WRITE)
 		file.store_string(releasesContent)
 		file.close()

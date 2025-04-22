@@ -44,14 +44,18 @@ func loadTranslationsFromCache():
 			var dm = ffile.split("--")[1]
 			var dm5 = str(dm).split("[")[1]
 			var dm6 = str(dm5).split("]")[0]
-			var vm = [dm6]
-			var dm2 = PoolByteArray(vm)
-			var delim = dm2.get_string_from_utf8()
-			updateTL(filePath,delim,false)
+			var vm = dm6.split("-~-")
+			var mv = PoolByteArray()
+			for itm in vm:
+				mv.append(int(itm))
+			var delim = mv.get_string_from_utf8()
+			updateTL(filePath,delim,false,false)
 func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, fullLogging:bool = true):
 	if useRelativePath:
 		path = str(modPath + path)
-	l("Adding translations from: %s" % path)
+	var fileName = path.split("/")[path.split("/").size() - 1]
+	var folderName = path.split(fileName)[0]
+	l("Adding translations from [%s] in [%s]" % [fileName, folderName])
 	var tlFile:File = File.new()
 	tlFile.open(path, File.READ)
 	var translations := []
@@ -83,7 +87,7 @@ func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, full
 		TranslationServer.add_translation(translationObject)
 		var pms2 = translationObject.get_message_list()
 		var tr2 = TranslationServer.translate(pms[0])
-	l("%s Translations Updated" % translationCount)
+	l("%s Translations Updated from @ [%s]" % [translationCount, fileName])
 func installScriptExtension(path:String):
 	var childPath:String = str(modPath + path)
 	var childScript:Script = ResourceLoader.load(childPath)

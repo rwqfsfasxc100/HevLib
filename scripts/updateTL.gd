@@ -1,0 +1,38 @@
+extends Node
+
+static func updateTL(path:String, delim:String = ",", fullLogging:bool = true):
+	var fileName = path.split("/")[path.split("/").size() - 1]
+	var folderName = path.split(fileName)[0]
+	Debug.l("Adding translations from [%s] in [%s]" % [fileName, folderName])
+	var tlFile:File = File.new()
+	tlFile.open(path, File.READ)
+	var translations := []
+	var translationCount = 0
+	var csvLine := tlFile.get_line().split(delim)
+	if fullLogging:
+		Debug.l("Adding translations as: %s" % csvLine)
+	for i in range(1, csvLine.size()):
+		var translationObject := Translation.new()
+		translationObject.locale = csvLine[i]
+		translations.append(translationObject)
+	while not tlFile.eof_reached():
+		csvLine = tlFile.get_csv_line(delim)
+		if csvLine.size() > 1:
+			var translationID := csvLine[0]
+			for i in range(1, csvLine.size()):
+				translations[i - 1].add_message(translationID, csvLine[i].c_unescape())
+			if fullLogging:
+				Debug.l("Added translation: %s" % csvLine)
+			translationCount += 1
+	tlFile.close()
+	for translationObject in translations:
+		var pms = translationObject.get_message_list()
+		var pmL = []
+		for m in pms:
+			var pt = translationObject.get_message(m)
+			pmL.append([m,pt])
+		var tr = TranslationServer.translate(pms[0])
+		TranslationServer.add_translation(translationObject)
+		var pms2 = translationObject.get_message_list()
+		var tr2 = TranslationServer.translate(pms[0])
+	Debug.l("%s Translations Updated from @ [%s]" % [translationCount, fileName])
