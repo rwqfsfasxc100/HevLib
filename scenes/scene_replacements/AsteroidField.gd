@@ -16,7 +16,7 @@ func spawnOdditites(oddity, point, chaos) -> bool:
 			var name = item.name
 			names.append(name)
 	else:
-		names.append(oddity)
+		names.append(oddity.name)
 	var event = names[0]
 	var allow = event_selector.get(event)
 	if allow:
