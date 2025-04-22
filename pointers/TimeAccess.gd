@@ -1,6 +1,6 @@
 extends Node
 
-var editor_hint = {
+var developer_hint = {
 	"__compare_dates":[
 		"Compares two datetime strings in the format of Time.get_datetime_string_from_system()",
 		"First date is the one used as the base",

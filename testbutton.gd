@@ -2,6 +2,8 @@ extends Button
 
 var URL = "https://github.com/rwqfsfasxc100/HevLib"
 
+var rng = RandomNumberGenerator.new()
+
 var Globals = preload("res://HevLib/Functions.gd").new()
 var HevLib = preload("res://HevLib/pointers/HevLib.gd").new()
 
@@ -22,6 +24,7 @@ func _ready():
 	pass
 
 func _on_Button_pressed():
+	rng.randomize()
 #	var webtranslate = preload("res://HevLib/webtranslate/webtranslate.gd").new()
 #	webtranslate.webtranslate(URL)
 #	var pss = Globals.__get_current_achievements()
@@ -32,7 +35,7 @@ func _on_Button_pressed():
 #	var text = TranslationServer.translate("DIALOG_SALVAGE_EXPOSE_FAST_K37_3")
 #
 	var pointers = HevLib.__get_lib_pointers()
-	var pointers2 = HevLib.__get_pointer_functions("Zip.gd", true)
+	var pointers2 = HevLib.__get_pointer_functions(pointers[rng.randi_range(0, pointers.size() - 1)], true)
 	var pointers3 = HevLib.__get_library_functionality(true)
 	
 #	var gh = preload("res://HevLib/pointers/Github.gd").new()

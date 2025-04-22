@@ -8,6 +8,11 @@ var developer_hint = {
 		"Optional return_only_paths used to provide only NodePaths in the array",
 		"Optional use_relative_paths used to strip any path prefixes of node paths, ",
 		" -> requires return_only_paths to be true to work",
+	],
+	"__reparent":[
+		"Reparents a node to another node",
+		"'node' is the node which you want to move to a new parent",
+		"'parent_node' is the node which you would want to have made the new parent to 'node'"
 	]
 	}
 

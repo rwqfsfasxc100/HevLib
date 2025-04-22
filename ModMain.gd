@@ -42,16 +42,19 @@ func loadTranslationsFromCache():
 			var filePath = str(folderPath + file)
 			var ffile = str(file)
 			var dm = ffile.split("--")[1]
+			var does = true
 			if str(dm).ends_with("]"):
-				var dm5 = str(dm).split("[")[1]
-				var dm6 = str(dm5).split("]")[0]
-				dm = dm6
-			var vm = dm.split("-~-")
-			var mv = PoolByteArray()
-			for itm in vm:
-				mv.append(int(itm))
-			var delim = mv.get_string_from_utf8()
-			updateTL(filePath,delim,false,false)
+				does = false
+			if does:
+				var vm = dm.split("-~-")
+				var mv = PoolByteArray()
+				for itm in vm:
+					mv.append(int(itm))
+				var delim = mv.get_string_from_utf8()
+				updateTL(filePath,delim,false,false)
+			else:
+				var dir = Directory.new()
+				dir.remove(filePath)
 func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, fullLogging:bool = true):
 	if useRelativePath:
 		path = str(modPath + path)
