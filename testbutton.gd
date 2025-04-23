@@ -5,7 +5,6 @@ var URL = "https://github.com/rwqfsfasxc100/HevLib"
 var rng = RandomNumberGenerator.new()
 
 var Globals = preload("res://HevLib/Functions.gd").new()
-var HevLib = preload("res://HevLib/pointers/HevLib.gd").new()
 
 func _ready():
 #	var noMargins = get_parent().get_parent().get_parent().get_parent().get_parent().get_node("NoMargins")
@@ -34,10 +33,6 @@ func _on_Button_pressed():
 #	Globals.__webtranslate_timed(URL, 5)
 #	var text = TranslationServer.translate("DIALOG_SALVAGE_EXPOSE_FAST_K37_3")
 #
-	var pointers = HevLib.__get_lib_pointers()
-	var pointers2 = HevLib.__get_pointer_functions(pointers[rng.randi_range(0, pointers.size() - 1)], true)
-	var pointers3 = HevLib.__get_library_functionality(true)
-	
 #	var gh = preload("res://HevLib/pointers/Github.gd").new()
 #	gh.__get_github_filesystem(URL, self, "normal", "1.0.0")
 	

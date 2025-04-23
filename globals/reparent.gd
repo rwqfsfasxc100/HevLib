@@ -1,7 +1,7 @@
 extends Node
 
-static func reparent(node, new_parent) -> void:
+static func reparent(node: Node, new_parent: Node) -> void:
 	var nodeCopy = node.duplicate()
-	new_parent.add_child(nodeCopy)
-	node.remove_and_skip()
+	new_parent.call_deferred("add_child", nodeCopy)
+	node.call_deferred("remove_and_skip")
 	
