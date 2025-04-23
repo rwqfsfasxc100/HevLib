@@ -11,21 +11,21 @@ func _init(modLoader = ModLoader):
 	loadDLC()
 	loadSettings()
 	replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
-var Globals = preload("res://HevLib/Functions.gd").new()
-var HevLib = preload("res://HevLib/pointers/HevLib.gd").new()
+var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd").new()
 func _ready():
 	l("Readying")
 	var dir = Directory.new()
 	dir.make_dir_recursive("user://cache/.HevLib_Cache/")
 	var file = File.new()
-	file.open("user://cache/.HevLib_Cache/library_documentation.txt", File.WRITE)
-	file.store_string(HevLib.__get_library_functionality(true))
+	file.open("user://cache/.HevLib_Cache/library_documentation.json", File.WRITE)
+	file.store_string(load("res://HevLib/pointers/HevLib.gd").__get_library_functionality(true))
 	file.close()
 	var WebTranslate = preload("res://HevLib/pointers/WebTranslate.gd")
 	WebTranslate.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]])
 	replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
 	if ModLoader.is_debugged:
 		replaceScene("scenes/scene_replacements/TitleScreen.tscn", "res://TitleScreen.tscn")
+	replaceScene("scenes/equipment/Upgrades.tscn", "res://enceladus/Upgrades.tscn")
 	var NodeNew = Node.new()
 	NodeNew.set_script(load("res://HevLib/Variables.gd"))
 	NodeNew.name = "HevLib~Variables"
@@ -40,11 +40,11 @@ func _ready():
 	l("Ready")
 func loadTranslationsFromCache():
 	var WebTranslateCache = "user://cache/.HevLib_Cache/WebTranslate/"
-	Globals.__check_folder_exists(WebTranslateCache)
-	var cacheContent = Globals.__fetch_folder_files(WebTranslateCache, true)
+	FolderAccess.__check_folder_exists(WebTranslateCache)
+	var cacheContent = FolderAccess.__fetch_folder_files(WebTranslateCache, true)
 	for folder in cacheContent:
 		var folderPath = WebTranslateCache + folder
-		var files = Globals.__fetch_folder_files(folderPath)
+		var files = FolderAccess.__fetch_folder_files(folderPath)
 		for file in files:
 			var filePath = str(folderPath + file)
 			var ffile = str(file)

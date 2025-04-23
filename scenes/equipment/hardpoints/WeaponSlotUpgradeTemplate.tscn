@@ -1,7 +1,6 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=6 format=2]
 
-[ext_resource path="res://enceladus/UpgradeGroup.gd" type="Script" id=1]
-[ext_resource path="res://enceladus/SystemShipUpgradeUI.tscn" type="PackedScene" id=2]
+[ext_resource path="res://HevLib/scenes/equipment/UpgradeGroup.gd" type="Script" id=1]
 [ext_resource path="res://menu/MenuUpgrades.tres" type="Theme" id=3]
 [ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=4]
 [ext_resource path="res://menu/sfx/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=5]
@@ -37,13 +36,3 @@ align = 2
 [node name="PlaySoundsOnTheseButtons" parent="VBoxContainer/HBoxContainer/CheckButton" instance=ExtResource( 5 )]
 
 [node name="Preview" parent="VBoxContainer/HBoxContainer/CheckButton" instance=ExtResource( 6 )]
-
-[node name="None" parent="VBoxContainer" instance=ExtResource( 2 )]
-anchor_right = 0.0
-anchor_bottom = 0.0
-margin_top = 55.0
-margin_right = 1226.0
-margin_bottom = 125.0
-slot = "weaponSlot.main.type"
-system = "SYSTEM_NONE"
-default = true

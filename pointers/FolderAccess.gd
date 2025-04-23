@@ -13,6 +13,12 @@ var developer_hint = {
 	"__get_first_file":[
 		"Supplies the first file in a folder",
 		"If no files exists, returns false"
+	],
+	"__fetch_folder_files":[
+		"Returns the file contents of a folder",
+		" -> folder - path to the folder to check the contents of",
+		" -> showFolders - whether to add folders into the array of files. each folder will end with a slash to identify",
+		" -> returnFullPath - whether to return the full paths of the files and folders, rather the names"
 	]
 }
 
@@ -30,4 +36,9 @@ static func __recursive_delete(path: String):
 static func __get_first_file(folder: String) -> String:
 	var f = load("res://HevLib/globals/get_first_file.gd")
 	var s = f.get_first_file(folder)
+	return s
+
+static func __fetch_folder_files(folder: String, showFolders: bool = false, returnFullPath: bool = false) -> Array:
+	var f = load("res://HevLib/globals/fetch_folder_files.gd")
+	var s = f.fetch_folder_files(folder, showFolders, returnFullPath)
 	return s
