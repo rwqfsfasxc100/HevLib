@@ -1,32 +1,19 @@
 extends "res://TheRing.gd"
 
-var event_selector = {}
+var event_names = {}
 
-func _process(delta):
-	var rnode = get_parent().get_node_or_null("EventMenu")
-	if rnode == null:
-		pass
-	else:
-		event_selector = rnode.selected_events
-
-func getNextOnPlaylist():
-	var par = 0
-	var evnt = .getNextOnPlaylist()
-	var ename = evnt.name
-	var enabled = event_selector[ename]
-	if enabled:
-		return playlist[playNr]
-		par = 0
-	elif par < playlist.size():
-		par += 1
-		getNextOnPlaylist()
-	else:
-		par = 0
-		return playlist[0]
-
-#func canEventBeAt(event: String, position: Vector2) -> bool:
-#	var allow = event_selector.get(event)
-#	if allow:
-#		return .canEventBeAt(event, position)
-#	else:
-#		return false
+func _ready():
+	for events in get_children():
+		var ename = events.name
+		var dict = {ename:events}
+		event_names.merge(dict)
+	var disabled_events = Settings.HevLib["events"]["disabled_events"]
+	for event in disabled_events:
+		var evnt = null
+		for child in get_children():
+			if child.name == event:
+				evnt = child
+		if evnt == null:
+			pass
+		else:
+			remove_child(evnt)

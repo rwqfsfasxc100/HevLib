@@ -25,12 +25,28 @@ static func __make_equipment(equipment_data: Dictionary):
 	var slots = equipment_data.get("slots", [])
 	var slot_groups = equipment_data.get("slot_groups", [])
 	
-	
-	
-	
-	
-	
-	
+	itemTemplate.numVal = num_val
+	itemTemplate.system = system
+	itemTemplate.capabilityLock = capability_lock
+	itemTemplate.nameOverride = name_override
+	itemTemplate.description = description
+	itemTemplate.manual = manual
+	itemTemplate.specs = specs
+	itemTemplate.price = price
+	itemTemplate.testProtocol = test_protocol
+	itemTemplate.default = default
+	itemTemplate.control = control
+	itemTemplate.storyFlag = story_flag
+	itemTemplate.storyFlagMin = story_flag_min
+	itemTemplate.storyFlagMax = story_flag_max
+	itemTemplate.warnIfThermalBelow = warn_if_thermal_below
+	itemTemplate.warnIfElectricBelow = warn_if_electric_below
+	itemTemplate.stickerPriceFormat = sticker_price_format
+	itemTemplate.stickerPriceMultiFormat = sticker_price_multi_format
+	itemTemplate.installedColor = installed_color
+	itemTemplate.disbledColor = disabled_color
+	var dict = {"equipment":itemTemplate, "slots":slots, "slot_groups":slot_groups}
+	return dict
 
 static func __make_slot(slot_data: Dictionary) -> Node:
 	var systemSlot = slot_data.get("system_slot")

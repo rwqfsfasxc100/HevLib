@@ -1,7 +1,6 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://HevLib/ui/core_scenes/_HevLib_Gamespace_Canvas.gd" type="Script" id=1]
-[ext_resource path="res://HevLib/ui/core_scenes/shipZone.gd" type="Script" id=2]
 [ext_resource path="res://menu/MenuTheme.tres" type="Theme" id=3]
 
 [node name="_HevLib_Gamespace_Canvas" type="CanvasLayer"]
@@ -13,9 +12,3 @@ margin_right = 40.0
 margin_bottom = 40.0
 mouse_filter = 2
 theme = ExtResource( 3 )
-
-[node name="shipZone" type="Label" parent="MarginContainer"]
-visible = false
-margin_right = 40.0
-margin_bottom = 39.0
-script = ExtResource( 2 )

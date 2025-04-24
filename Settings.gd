@@ -5,6 +5,9 @@ extends "res://Settings.gd"
 # These are default config values
 # Any value not set in the config file will generate the missing values exactly as these are
 var HevLib = {
+	"events":{
+		"disabled_events":[  ]
+	},
 	"input":{
 		"open_debug_event_menu":[  ],
 		"debugger":[ "F10" ]

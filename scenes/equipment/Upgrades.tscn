@@ -220,6 +220,12 @@ onlyForShipNames = [  ]
 invertNameLogic = false
 slotGroups = [ "RECON_DRONE" ]
 
+[node name="SLOT8" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="32"]
+script = ExtResource( 3 )
+onlyForShipNames = [  ]
+invertNameLogic = false
+slotGroups = [  ]
+
 [connection signal="tree_entered" from="VB/MarginContainer/ScrollContainer/MarginContainer/Items" to="VB/MarginContainer/ScrollContainer/MarginContainer/Items" method="_tree_entered"]
 
 [editable path="VB/HeaderWithMoney"]

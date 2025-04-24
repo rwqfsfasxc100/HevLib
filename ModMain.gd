@@ -17,6 +17,8 @@ var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd").new()
 func _ready():
 	l("Readying")
+	addEquipmentSlot({"system_slot":"slot.new", "slot_node_name":"NewSlot","slot_displayName":"SLOT_DATA_DRIVEN_SLOT_TEST"})
+	addEquipmentItem({"system":"SYSTEM_TEST", "slots":"NewSlot"})
 	var dir = Directory.new()
 	dir.make_dir_recursive("user://cache/.HevLib_Cache/")
 	var file = File.new()
@@ -139,8 +141,8 @@ func loadSettings():
 	settings.queue_free()
 	l(MOD_NAME + ": Finished loading settings")
 func addEquipmentSlot(slot_data: Dictionary):
-	var slot = Equipment.__make_slot()
+	var slot = Equipment.__make_slot(slot_data)
 	ADD_EQUIPMENT_SLOTS.append(slot)
-func addEquipmentItems(slots: Array, equipment_data: Dictionary, equipment_group: Array):
-	var eqp = Equipment.__make_equipment(slots, equipment_data, equipment_group)
+func addEquipmentItem(item_data: Dictionary):
+	var eqp = Equipment.__make_equipment(item_data)
 	ADD_EQUIPMENT_ITEMS.append(eqp)
