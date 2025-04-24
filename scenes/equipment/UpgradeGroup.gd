@@ -1,10 +1,12 @@
 extends "res://enceladus/UpgradeGroup.gd"
 
-# Ported from IoE
+# Ship limiting code was ported from IoE
 # Thanks Space!
 
 export (Array, String) var onlyForShipNames
 export (bool) var invertNameLogic = false
+
+export (Array) var slotGroups = [] 
 
 func reexamine():	
 	var ship = CurrentGame.getPlayerShip()

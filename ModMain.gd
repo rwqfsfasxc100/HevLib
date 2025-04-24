@@ -6,11 +6,14 @@ const MOD_VERSION = "1.3.6"
 var modPath:String = get_script().resource_path.get_base_dir() + "/"
 var _savedObjects := []
 var modConfig = {}
+var ADD_EQUIPMENT_SLOTS = []
+var ADD_EQUIPMENT_ITEMS = []
 func _init(modLoader = ModLoader):
 	l("Initializing DLC")
 	loadDLC()
 	loadSettings()
 	replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
+var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd").new()
 func _ready():
 	l("Readying")
@@ -27,7 +30,7 @@ func _ready():
 		replaceScene("scenes/scene_replacements/TitleScreen.tscn", "res://TitleScreen.tscn")
 	replaceScene("scenes/equipment/Upgrades.tscn", "res://enceladus/Upgrades.tscn")
 	var NodeNew = Node.new()
-	NodeNew.set_script(load("res://HevLib/Variables.gd"))
+	NodeNew.set_script(load("res://HevLib/scripts/Variables.gd"))
 	NodeNew.name = "HevLib~Variables"
 	var Gamespace_Canvas = load("res://HevLib/ui/core_scenes/_HevLib_Gamespace_Canvas.tscn").instance()
 	var mouse = load("res://HevLib/scenes/scene_replacements/MouseLayer.tscn").instance()
@@ -135,3 +138,9 @@ func loadSettings():
 	l(MOD_NAME + ": Current settings: %s" % modConfig)
 	settings.queue_free()
 	l(MOD_NAME + ": Finished loading settings")
+func addEquipmentSlot(slot_data: Dictionary):
+	var slot = Equipment.__make_slot()
+	ADD_EQUIPMENT_SLOTS.append(slot)
+func addEquipmentItems(slots: Array, equipment_data: Dictionary, equipment_group: Array):
+	var eqp = Equipment.__make_equipment(slots, equipment_data, equipment_group)
+	ADD_EQUIPMENT_ITEMS.append(eqp)
