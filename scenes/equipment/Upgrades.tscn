@@ -32,193 +32,193 @@ script = ExtResource( 2 )
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "HARDPOINT", "HARDPOINT_HIGH_STRESS", "HARDPOINT_SPINAL", "HARDPOINT_CENTER", "NOT_HARDPOINT_LEFT", "NOT_HARDPOINT_RIGHT", "NOT_HARDPOINT_CRADLE", "NOT_HARDPOINT_SIDE", "HARDPOINT_FRONT_FACING_WEAPON" ]
 
 [node name="MainLowWeaponSlot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="1"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "HARDPOINT", "HARDPOINT_SPINAL", "HARDPOINT_CENTER", "NOT_HARDPOINT_LEFT", "NOT_HARDPOINT_RIGHT", "NOT_HARDPOINT_CRADLE", "NOT_HARDPOINT_MANIPULATION_ARM", "NOT_HARDPOINT_SIDE", "HARDPOINT_FRONT_FACING_WEAPON" ]
 
 [node name="LeftHighStress" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="2"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "HARDPOINT", "HARDPOINT_HIGH_STRESS", "HARDPOINT_SPINAL", "HARDPOINT_LEFT", "NOT_HARDPOINT_CENTER", "NOT_HARDPOINT_RIGHT", "NOT_HARDPOINT_CRADLE", "NOT_HARDPOINT_SIDE", "HARDPOINT_FRONT_FACING_WEAPON" ]
 
 [node name="RightHighStress" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="3"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "HARDPOINT", "HARDPOINT_HIGH_STRESS", "HARDPOINT_SPINAL", "HARDPOINT_RIGHT", "NOT_HARDPOINT_CENTER", "NOT_HARDPOINT_LEFT", "NOT_HARDPOINT_CRADLE", "NOT_HARDPOINT_SIDE", "HARDPOINT_FRONT_FACING_WEAPON" ]
 
 [node name="LeftWeaponSlot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="4"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "HARDPOINT", "HARDPOINT_LOW_STRESS", "HARDPOINT_LEFT", "HARDPOINT_SIDE", "HARDPOINT_FRONT_FACING_WEAPON", "HARDPOINT_BEACON", "NOT_HARDPOINT_RIGHT", "NOT_HARDPOINT_CENTER" ]
 
 [node name="MiddleLeftWeaponSlot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="5"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "HARDPOINT", "HARDPOINT_LOW_STRESS", "HARDPOINT_LEFT", "HARDPOINT_SIDE", "HARDPOINT_FRONT_FACING_WEAPON", "HARDPOINT_BEACON", "NOT_HARDPOINT_RIGHT", "NOT_HARDPOINT_CENTER", "NOT_HARDPOINT_CRADLE" ]
 
 [node name="RightWeaponSlot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="6"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "HARDPOINT", "HARDPOINT_LOW_STRESS", "HARDPOINT_RIGHT", "HARDPOINT_SIDE", "HARDPOINT_FRONT_FACING_WEAPON", "HARDPOINT_BEACON", "NOT_HARDPOINT_LEFT", "NOT_HARDPOINT_CENTER" ]
 
 [node name="MiddleRightWeaponSlot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="7"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "HARDPOINT", "HARDPOINT_LOW_STRESS", "HARDPOINT_RIGHT", "HARDPOINT_SIDE", "HARDPOINT_FRONT_FACING_WEAPON", "HARDPOINT_BEACON", "NOT_HARDPOINT_LEFT", "NOT_HARDPOINT_CENTER", "NOT_HARDPOINT_CRADLE" ]
 
 [node name="LeftDroneSlot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="8"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "HARDPOINT_DRONE_POINT", "HARDPOINT_LEFT" ]
 
 [node name="RightDroneSlot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="9"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "HARDPOINT_DRONE_POINT", "HARDPOINT_RIGHT" ]
 
 [node name="LeftRearSlot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="10"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "HARDPOINT_LOW_STRESS", "HARDPOINT_LEFT", "HARDPOINT_REAR", "NOT_HARDPOINT_RIGHT", "NOT_HARDPOINT_CENTER", "NOT_HARDPOINT_FRONT_FACING_WEAPON", "NOT_HARDPOINT_BEACON" ]
 
 [node name="RightRearSlot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="11"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "HARDPOINT_LOW_STRESS", "HARDPOINT_RIGHT", "HARDPOINT_REAR", "NOT_HARDPOINT_LEFT", "NOT_HARDPOINT_CENTER", "NOT_HARDPOINT_FRONT_FACING_WEAPON", "NOT_HARDPOINT_BEACON" ]
 
 [node name="LeftBay1" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="12"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "HARDPOINT_LEFT", "HARDPOINT_DOCKING_BAY", "HARDPOINT_TURRET", "HARDPOINT_DRONE_POINT", "NOT_HARDPOINT_RIGHT", "NOT_HARDPOINT_CENTER", "NOT_HARDPOINT_IMPACT_ABSORBER", "NOT_HARDPOINT_FRONT_FACING_WEAPON" ]
 
 [node name="RightBay1" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="13"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "HARDPOINT_RIGHT", "HARDPOINT_DOCKING_BAY", "HARDPOINT_TURRET", "HARDPOINT_DRONE_POINT", "NOT_HARDPOINT_LEFT", "NOT_HARDPOINT_CENTER", "NOT_HARDPOINT_IMPACT_ABSORBER", "NOT_HARDPOINT_FRONT_FACING_WEAPON" ]
 
 [node name="LeftBay2" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="14"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "HARDPOINT_LEFT", "HARDPOINT_DOCKING_BAY", "HARDPOINT_TURRET", "HARDPOINT_DRONE_POINT", "NOT_HARDPOINT_RIGHT", "NOT_HARDPOINT_CENTER", "NOT_HARDPOINT_IMPACT_ABSORBER", "NOT_HARDPOINT_FRONT_FACING_WEAPON", "NOT_HARDPOINT_BEACON" ]
 
 [node name="RightBay2" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="15"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "HARDPOINT_RIGHT", "HARDPOINT_DOCKING_BAY", "HARDPOINT_TURRET", "HARDPOINT_DRONE_POINT", "NOT_HARDPOINT_LEFT", "NOT_HARDPOINT_CENTER", "NOT_HARDPOINT_IMPACT_ABSORBER", "NOT_HARDPOINT_FRONT_FACING_WEAPON", "NOT_HARDPOINT_BEACON" ]
 
 [node name="LeftBay3" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="16"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "HARDPOINT_LEFT", "HARDPOINT_DOCKING_BAY", "HARDPOINT_TURRET", "HARDPOINT_DRONE_POINT", "NOT_HARDPOINT_RIGHT", "NOT_HARDPOINT_CENTER", "NOT_HARDPOINT_IMPACT_ABSORBER", "NOT_HARDPOINT_FRONT_FACING_WEAPON", "NOT_HARDPOINT_BEACON" ]
 
 [node name="RightBay3" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="17"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "HARDPOINT_RIGHT", "HARDPOINT_DOCKING_BAY", "HARDPOINT_TURRET", "HARDPOINT_DRONE_POINT", "NOT_HARDPOINT_LEFT", "NOT_HARDPOINT_CENTER", "NOT_HARDPOINT_IMPACT_ABSORBER", "NOT_HARDPOINT_FRONT_FACING_WEAPON", "NOT_HARDPOINT_BEACON" ]
 
 [node name="AmmunitionDelivery" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="18"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "MASS_DRIVER_AMMUNITION" ]
 
 [node name="DisposableDrones" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="19"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "NANODRONE_STORAGE" ]
 
 [node name="Propellant" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="20"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "PROPELLANT_TANK" ]
 
 [node name="Thrusters" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="21"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "STANDARD_REACTION_CONTROL_THRUSTERS" ]
 
 [node name="Torches" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="22"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "STANDARD_MAIN_ENGINE" ]
 
 [node name="Rods" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="23"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "FISSION_RODS" ]
 
 [node name="Capacitor" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="24"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "ULTRACAPACITOR" ]
 
 [node name="Turbine" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="25"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "FISSION_TURBINE" ]
 
 [node name="AuxilaryPower" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="26"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "AUX_POWER_SLOT" ]
 
 [node name="CargoBay" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="27"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "CARGO_BAY" ]
 
 [node name="Autopilot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="28"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "AUTOPILOT" ]
 
 [node name="Hud" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="29"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "HUD" ]
 
 [node name="Lidar" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="30"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "LIDAR" ]
 
 [node name="ReconDrone" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="31"]
 script = ExtResource( 3 )
 onlyForShipNames = [  ]
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = [ "RECON_DRONE" ]
 
 [connection signal="tree_entered" from="VB/MarginContainer/ScrollContainer/MarginContainer/Items" to="VB/MarginContainer/ScrollContainer/MarginContainer/Items" method="_tree_entered"]
 
