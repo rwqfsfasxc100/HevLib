@@ -1,6 +1,6 @@
 extends Node
 
-static func __make_equipment(slots: Array, equipment_data: Dictionary, equipment_groups: Array = []):
+static func __make_equipment(equipment_data: Dictionary):
 	var itemTemplate = load("res://enceladus/SystemShipUpgradeUI.tscn").instance()
 	var num_val = equipment_data.get("numVal", -1)
 	var system = equipment_data.get("system", "")
@@ -22,7 +22,8 @@ static func __make_equipment(slots: Array, equipment_data: Dictionary, equipment
 	var sticker_price_multi_format = equipment_data.get("stickerPriceMultiFormat", "%s E$ (x$d)")
 	var installed_color = equipment_data.get("installedColor", Color(0.0, 1.0, 0.0, 1.0))
 	var disabled_color = equipment_data.get("disabledColor", Color(0.2, 0.2, 0.2, 1.0))
-	
+	var slots = equipment_data.get("slots", [])
+	var slot_groups = equipment_data.get("slot_groups", [])
 	
 	
 	
