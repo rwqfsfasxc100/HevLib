@@ -70,11 +70,11 @@ static func __make_equipment(equipment_data: Dictionary):
 	itemTemplate.stickerPriceMultiFormat = sticker_price_multi_format
 	itemTemplate.installedColor = installed_color
 	itemTemplate.disbledColor = disabled_color
-	var dict = {"equipment":itemTemplate, "slots":slots, "slot_groups":slot_groups}
 	if name_override == "":
 		itemTemplate.name = system
 	else:
 		itemTemplate.name = name_override
+	var dict = {"equipment":itemTemplate, "slots":slots, "slot_groups":slot_groups}
 	return dict
 
 static func __make_slot(slot_data: Dictionary) -> Node:
