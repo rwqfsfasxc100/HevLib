@@ -2,12 +2,18 @@ extends Node
 
 const MOD_PRIORITY = INF
 const MOD_NAME = "HevLib"
-const MOD_VERSION = "1.3.6"
+const MOD_VERSION = "1.4.0"
 var modPath:String = get_script().resource_path.get_base_dir() + "/"
 var _savedObjects := []
 var modConfig = {}
+
+# Required for the addEquipmentSlot() function
 var ADD_EQUIPMENT_SLOTS = []
+
+# Required for the addEquipmentItem() function
 var ADD_EQUIPMENT_ITEMS = []
+
+
 func _init(modLoader = ModLoader):
 	l("Initializing DLC")
 	loadDLC()
@@ -17,14 +23,8 @@ var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd").new()
 func _ready():
 	l("Readying")
-	addEquipmentSlot({"system_slot":"slot.new", "slot_node_name":"NewSlot","slot_displayName":"SLOT_DATA_DRIVEN_SLOT_TEST"})
-	addEquipmentItem({"system":"SYSTEM_TEST", "slots":"NewSlot"})
-	var dir = Directory.new()
-	dir.make_dir_recursive("user://cache/.HevLib_Cache/")
-	var file = File.new()
-	file.open("user://cache/.HevLib_Cache/library_documentation.json", File.WRITE)
-	file.store_string(load("res://HevLib/pointers/HevLib.gd").__get_library_functionality(true))
-	file.close()
+#	addEquipmentSlot({"system_slot":"slot.new", "slot_node_name":"NewSlot","slot_displayName":"SLOT_DATA_DRIVEN_SLOT_TEST"})
+#	addEquipmentItem({"system":"SYSTEM_TEST", "slots":["NewSlot"]})
 	var WebTranslate = preload("res://HevLib/pointers/WebTranslate.gd")
 	WebTranslate.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]])
 	replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
@@ -42,6 +42,12 @@ func _ready():
 	CRoot.call_deferred("add_child",mouse)
 	loadTranslationsFromCache()
 	replaceScene("scenes/scene_replacements/Game.tscn", "res://Game.tscn")
+	var dir = Directory.new()
+	dir.make_dir_recursive("user://cache/.HevLib_Cache/")
+	var file = File.new()
+	file.open("user://cache/.HevLib_Cache/library_documentation.json", File.WRITE)
+	file.store_string(load("res://HevLib/pointers/HevLib.gd").__get_library_functionality(true))
+	file.close()
 	l("Ready")
 func loadTranslationsFromCache():
 	var WebTranslateCache = "user://cache/.HevLib_Cache/WebTranslate/"
@@ -140,9 +146,16 @@ func loadSettings():
 	l(MOD_NAME + ": Current settings: %s" % modConfig)
 	settings.queue_free()
 	l(MOD_NAME + ": Finished loading settings")
+
+# Adds new equipment slots from an input dictionary
+# Requires the ADD_EQUIPMENT_SLOTS variable to be set up
+# Check the documentation JSON for usage
 func addEquipmentSlot(slot_data: Dictionary):
 	var slot = Equipment.__make_slot(slot_data)
 	ADD_EQUIPMENT_SLOTS.append(slot)
+# Adds new equipment items from an input dictionary
+# Requires the ADD_EQUIPMENT_ITEMS variable to be set up
+# Check the documentation JSON for usage
 func addEquipmentItem(item_data: Dictionary):
 	var eqp = Equipment.__make_equipment(item_data)
 	ADD_EQUIPMENT_ITEMS.append(eqp)

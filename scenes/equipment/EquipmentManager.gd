@@ -90,7 +90,15 @@ func add_equipment():
 			for spt in newSlot:
 				var equipment = spt.get("equipment")
 				var eq_slots = spt.get("slots")
+				if typeof(eq_slots) == TYPE_ARRAY:
+					pass
+				else:
+					eq_slots = []
 				var groups = spt.get("slot_groups")
+				if typeof(groups) == TYPE_ARRAY:
+					pass
+				else:
+					groups = []
 				var current_slots = get_children()
 				for slt in current_slots:
 					var pdoes = check_groups(groups, slt.slotGroups)
