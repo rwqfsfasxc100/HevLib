@@ -71,12 +71,16 @@ static func __make_equipment(equipment_data: Dictionary):
 	itemTemplate.installedColor = installed_color
 	itemTemplate.disbledColor = disabled_color
 	var dict = {"equipment":itemTemplate, "slots":slots, "slot_groups":slot_groups}
+	if name_override == "":
+		itemTemplate.name = system
+	else:
+		itemTemplate.name = name_override
 	return dict
 
 static func __make_slot(slot_data: Dictionary) -> Node:
-	var systemSlot = slot_data.get("system_slot")
-	var slotNodeName = slot_data.get("slot_node_name")
-	var slotDisplayName = slot_data.get("slot_displayName")
+	var systemSlot = slot_data.get("system_slot", "")
+	var slotNodeName = slot_data.get("slot_node_name", "MISSING_SLOT_NAME")
+	var slotDisplayName = slot_data.get("slot_displayName", "SLOT_MISSING_DATA")
 	var slotGroups = slot_data.get("slot_groups", [])
 	var hasNone = slot_data.get("has_none", true)
 	var alwaysDisplay = slot_data.get("always_display", true)
