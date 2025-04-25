@@ -26,7 +26,6 @@ var developer_hint = {
 }
 
 static func __make_equipment(equipment_data: Dictionary):
-	var itemTemplate = load("res://enceladus/SystemShipUpgradeUI.tscn").instance()
 	var num_val = equipment_data.get("numVal", -1)
 	var system = equipment_data.get("system", "")
 	var capability_lock = equipment_data.get("capabilityLock", false)
@@ -49,32 +48,29 @@ static func __make_equipment(equipment_data: Dictionary):
 	var disabled_color = equipment_data.get("disabledColor", Color(0.2, 0.2, 0.2, 1.0))
 	var slots = equipment_data.get("slots", [])
 	var slot_groups = equipment_data.get("slot_groups", [])
-	
-	itemTemplate.numVal = num_val
-	itemTemplate.system = system
-	itemTemplate.capabilityLock = capability_lock
-	itemTemplate.nameOverride = name_override
-	itemTemplate.description = description
-	itemTemplate.manual = manual
-	itemTemplate.specs = specs
-	itemTemplate.price = price
-	itemTemplate.testProtocol = test_protocol
-	itemTemplate.default = default
-	itemTemplate.control = control
-	itemTemplate.storyFlag = story_flag
-	itemTemplate.storyFlagMin = story_flag_min
-	itemTemplate.storyFlagMax = story_flag_max
-	itemTemplate.warnIfThermalBelow = warn_if_thermal_below
-	itemTemplate.warnIfElectricBelow = warn_if_electric_below
-	itemTemplate.stickerPriceFormat = sticker_price_format
-	itemTemplate.stickerPriceMultiFormat = sticker_price_multi_format
-	itemTemplate.installedColor = installed_color
-	itemTemplate.disbledColor = disabled_color
-	if name_override == "":
-		itemTemplate.name = system
-	else:
-		itemTemplate.name = name_override
-	var dict = {"equipment":itemTemplate, "slots":slots, "slot_groups":slot_groups}
+	var equipment_node = {
+		"num_val":num_val,
+		"system":system,
+		"capability_lock":capability_lock,
+		"name_override":name_override,
+		"description":description,
+		"manual":manual,
+		"specs":specs,
+		"price":price,
+		"test_protocol":test_protocol,
+		"default":default,
+		"control":control,
+		"story_flag":story_flag,
+		"story_flag_min":story_flag_min,
+		"story_flag_max":story_flag_max,
+		"warn_if_thermal_below":warn_if_thermal_below,
+		"warn_if_electric_below":warn_if_electric_below,
+		"sticker_price_format":sticker_price_format,
+		"sticker_price_multi_format":sticker_price_multi_format,
+		"installed_color":installed_color,
+		"disabled_color":disabled_color
+	}
+	var dict = {"equipment":equipment_node, "slots":slots, "slot_groups":slot_groups}
 	return dict
 
 static func __make_slot(slot_data: Dictionary) -> Node:

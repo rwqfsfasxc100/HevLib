@@ -1,5 +1,7 @@
 extends VBoxContainer
 
+var itemSlot = preload("res://enceladus/SystemShipUpgradeUI.tscn")
+
 const ADDITIVES = [
 "HARDPOINT", # - Any hardpoint
 "HARDPOINT_LOW_STRESS", # - Any low-stress hardpoint
@@ -109,8 +111,34 @@ func add_equipment():
 						else:
 							eq_slots.append(slname)
 				for panel in eq_slots:
-					var parent = get_node(panel + "/VBoxContainer")
-					parent.add_child(equipment)
+					var parent = get_node(panel).get_node("VBoxContainer")
+					var itemTemplate = itemSlot.instance()
+					
+					itemTemplate.numVal = equipment.get("num_val")
+					itemTemplate.system = equipment.get("system")
+					itemTemplate.capabilityLock = equipment.get("capability_lock")
+					itemTemplate.nameOverride = equipment.get("name_override")
+					itemTemplate.description = equipment.get("description")
+					itemTemplate.manual = equipment.get("manual")
+					itemTemplate.specs = equipment.get("specs")
+					itemTemplate.price = equipment.get("price")
+					itemTemplate.testProtocol = equipment.get("test_protocol")
+					itemTemplate.default = equipment.get("default")
+					itemTemplate.control = equipment.get("control")
+					itemTemplate.storyFlag = equipment.get("story_flag")
+					itemTemplate.storyFlagMin = equipment.get("story_flag_min")
+					itemTemplate.storyFlagMax = equipment.get("story_flag_max")
+					itemTemplate.warnIfThermalBelow = equipment.get("warn_if_thermal_below")
+					itemTemplate.warnIfElectricBelow = equipment.get("warn_if_electric_below")
+					itemTemplate.stickerPriceFormat = equipment.get("sticker_price_format")
+					itemTemplate.stickerPriceMultiFormat = equipment.get("sticker_price_multi_format")
+					itemTemplate.installedColor = equipment.get("installed_color")
+					itemTemplate.disbledColor = equipment.get("disabled_color")
+					if equipment.get("name_override") == "":
+						itemTemplate.name = equipment.get("system")
+					else:
+						itemTemplate.name = equipment.get("name_override")
+					parent.add_child(itemTemplate)
 
 
 func check_groups(item_tags, compared_tags):
@@ -129,10 +157,16 @@ func check_groups(item_tags, compared_tags):
 	var allowed = false
 	var denied = false
 	for item in item_groups:
-		if item in compared_groups and not item.begins_with("NOT_"):
-			allowed = true
-		if item in compared_groups and item.begins_with("NOT_"):
-			denied = true
+		var is_negate = false
+		if item.begins_with("NOT_"):
+			is_negate = true
+		if is_negate:
+			var itmOpposite = item.split("NOT_")[1]
+			if itmOpposite in compared_groups:
+				denied = true
+		else:
+			if item in compared_groups:
+				allowed = true
 	if allowed == false or denied == true:
 		return false
 	if allowed == true and denied == false:
