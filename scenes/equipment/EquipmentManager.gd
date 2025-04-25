@@ -2,68 +2,70 @@ extends VBoxContainer
 
 var itemSlot = preload("res://enceladus/SystemShipUpgradeUI.tscn")
 
-const ADDITIVES = [
+var ADDITIVES = [
+# Hardpoint slots
 "HARDPOINT", # - Any hardpoint
 "HARDPOINT_LOW_STRESS", # - Any low-stress hardpoint
 "HARDPOINT_HIGH_STRESS", # - Any high-stress hardpoint
-"HARDPOINT_SPINAL", # - Any hardpoint w/o side access
-"HARDPOINT_LEFT", # - Any left hardpoint
-"HARDPOINT_RIGHT", # - Any right hardpoint
-"HARDPOINT_CENTER", # - Any central hardpoint
-"HARDPOINT_SIDE", # - Any hardpoint with side access
-"HARDPOINT_REAR", # - Any rear hardpoint
+"HARDPOINT_SPINAL", # - Any rear hardpoint
 "HARDPOINT_DOCKING_BAY", # - A docking-bay type hardpoint
 "HARDPOINT_DRONE_POINT", # - A drone hardpoint
-"HARDPOINT_DRONE_EMITTER", # - Any drone equipment
-"HARDPOINT_TURRET", # - Any turreted equipment
-"HARDPOINT_CRADLE", # - Any cradled equipment
-"HARDPOINT_CARGO_CONTAINER", # - Any cargo container like equipment
-"HARDPOINT_MINING_COMPANION", # - Any mining companion like equipment
-"HARDPOINT_IMPACT_ABSORBER", # - Any impact absorber like equipment
-"HARDPOINT_FRONT_FACING_WEAPON", # - Any front-facing equipment
-"HARDPOINT_PLASMA_THROWER", # - Any plasma thrower equipment
-"HARDPOINT_MANIPULATION_ARM", #- Any manipulator
-"HARDPOINT_MASS_DRIVER", # - Any mass driver equipment
-"HARDPOINT_RAILGUN", # - Any railgun like equipment
-"HARDPOINT_COILGUN", # - Any coilgun like equipment
-"HARDPOINT_IRON_THROWER", # - Any iron thrower like equipment
-"HARDPOINT_MINING_LASER", # - Any mining laser like equipment
-"HARDPOINT_MICROWAVE", # - Any microwave emitter like equipment
-"HARDPOINT_SYNCHROTRON", # - Any synchrotron like equipment
-"HARDPOINT_BEACON", # - Any beacon like equipment
+
+# Equipment alignment
+"ALIGNMENT_LEFT", # - Any left hardpoint
+"ALIGNMENT_RIGHT", # - Any right hardpoint
+"ALIGNMENT_CENTER", # - Any central hardpoint
+
+# Hardpoint Capabilities
+"CAPABILITY_SIDE_ACCESS", # - Equipment has access to the side of the hardpoint
+"CAPABILITY_SHIP_REAR", # - Equipment can be placed in rear slots
+"CAPABILITY_HEAVY_EQUIPMENT", # - Equipment is heavy and requires high-stress
+"CAPABILITY_SHIP_SPINE", # - Equipment is heavy, but light enough to fit on any spinal mount
+"CAPABILITY_TURRETS", # - Can fit turreted equipment
+"CAPABILITY_CRADLES", # - Can fit cradles
+"CAPABILITY_NANODRONES", # - Can fit nanodrones
+"CAPABILITY_PLASMA_THROWER", # - Can fit plasma throwers
+"CAPABILITY_FRONT_FACING", # - Can fit front-facing equipment
+
+# Equipment capabilities
+"EQUIPMENT_CARGO_CONTAINER", # - Any cargo container like equipment
+"EQUIPMENT_MINING_COMPANION", # - Any mining companion like equipment
+"EQUIPMENT_IMPACT_ABSORBER", # - Any impact absorber like equipment
+"EQUIPMENT_FRONT_FACING_WEAPON", # - Any front-facing equipment
+"EQUIPMENT_PLASMA_THROWER", # - Any plasma thrower equipment
+"EQUIPMENT_MANIPULATION_ARM", # - Any manipulator
+"EQUIPMENT_TURRET", # - 
+"EQUIPMENT_NANODRONE_PLANT", # - 
+"EQUIPMENT_RAILGUN", # - Any railgun like equipment
+"EQUIPMENT_COILGUN", # - Any coilgun like equipment
+"EQUIPMENT_IRON_THROWER", # - Any iron thrower like equipment
+"EQUIPMENT_MINING_LASER", # - Any mining laser like equipment
+"EQUIPMENT_MICROWAVE", # - Any microwave emitter like equipment
+"EQUIPMENT_SYNCHROTRON", # - Any synchrotron like equipment
+"EQUIPMENT_BEACON", # - Any beacon like equipment
+
+# Other slot tags
+"MASS_DRIVER_AMMUNITION",
+"NANODRONE_STORAGE",
+"PROPELLANT_TANK",
+"STANDARD_REACTION_CONTROL_THRUSTERS",
+"STANDARD_MAIN_ENGINE",
+"FISSION_RODS",
+"ULTRACAPACITOR",
+"FISSION_TURBINE",
+"AUX_POWER_SLOT",
+"CARGO_BAY",
+"AUTOPILOT",
+"HUD",
+"LIDAR",
+"RECON_DRONE",
 ]
 
-const SUBTRACTIVES = [
-"NOT_HARDPOINT_LEFT", # - Any left hardpoint
-"NOT_HARDPOINT_RIGHT", # - Any right hardpoint
-"NOT_HARDPOINT_CENTER", # - Any central hardpoint
-"NOT_HARDPOINT_SIDE", # - Any hardpoint with side access
-"NOT_HARDPOINT_REAR", # - Any rear hardpoint
-"NOT_HARDPOINT_HIGH_STRESS", # - Any high-stress hardpoint
-"NOT_HARDPOINT_LOW_STRESS", # - Any low-stress hardpoint
-"NOT_HARDPOINT_DRONE_EMITTER", # - Any drone equipment
-"NOT_HARDPOINT_DOCKING_BAY", # - A docking-bay type hardpoint
-"NOT_HARDPOINT_DRONE_POINT", # - A drone hardpoint
-"NOT_HARDPOINT", # - Any hardpoint
-"NOT_HARDPOINT_SPINAL", # - Any hardpoint w/o side access
-"NOT_HARDPOINT_TURRET", # - Any turreted equipment
-"NOT_HARDPOINT_CRADLE", # - Any cradled equipment
-"NOT_HARDPOINT_CARGO_CONTAINER", # - Any cargo container like equipment
-"NOT_HARDPOINT_MINING_COMPANION", # - Any mining companion like equipment
-"NOT_HARDPOINT_IMPACT_ABSORBER", # - Any impact absorber like equipment
-"NOT_HARDPOINT_FRONT_FACING_WEAPON", # - Any front-facing equipment
-"NOT_HARDPOINT_PLASMA_THROWER", # - Any plasma thrower equipment
-"NOT_HARDPOINT_MANIPULATION_ARM", # - Any manipulator
-"NOT_HARDPOINT_MASS_DRIVER", # - Any mass driver equipment
-"NOT_HARDPOINT_RAILGUN", # - Any railgun like equipment
-"NOT_HARDPOINT_COILGUN", # - Any coilgun like equipment
-"NOT_HARDPOINT_IRON_THROWER", # - Any iron thrower like equipment
-"NOT_HARDPOINT_MINING_LASER", # - Any mining laser like equipment
-"NOT_HARDPOINT_MICROWAVE", # - Any microwave emitter like equipment
-"NOT_HARDPOINT_SYNCHROTRON", # - Any synchrotron like equipment
-"NOT_HARDPOINT_BEACON", # - Any beacon like equipment
-]
+var SUBTRACTIVES = []
+
 func _tree_entered():
+	get_tags()
+	make_subtractives()
 	add_slots()
 	add_equipment()
 
@@ -181,8 +183,21 @@ func check_groups(item_tags, compared_tags):
 	else:
 		return false
 
+func get_tags():
+	var slots = ModLoader.get_children()
+	for slot in slots:
+		var data = slot.get_property_list()
+		var nodes = null
+		for item in data:
+			if item.get("name") == "EQUIPMENT_TAGS":
+				nodes = slot.get("EQUIPMENT_TAGS")
+		if not nodes == null:
+			for tag in nodes:
+				if tag in ADDITIVES:
+					pass
+				else:
+					ADDITIVES.append(tag)
 
-
-
-
-
+func make_subtractives():
+	for add in ADDITIVES:
+		SUBTRACTIVES.append("NOT_" + add)

@@ -102,3 +102,4 @@ static func __make_slot(slot_data: Dictionary) -> Node:
 	slotTemplate.invertNameLogic = invertLimitLogic
 	slotTemplate.slotGroups = slotGroups
 	return slotTemplate
+

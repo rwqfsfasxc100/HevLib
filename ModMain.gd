@@ -13,6 +13,8 @@ var ADD_EQUIPMENT_SLOTS = []
 # Required for the addEquipmentItem() function
 var ADD_EQUIPMENT_ITEMS = []
 
+# Required if any additional tags are going to be added. Only additive tags should be placed here.
+var EQUIPMENT_TAGS = []
 
 func _init(modLoader = ModLoader):
 	l("Initializing DLC")
