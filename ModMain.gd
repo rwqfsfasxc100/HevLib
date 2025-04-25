@@ -19,7 +19,6 @@ func _init(modLoader = ModLoader):
 	loadDLC()
 	loadSettings()
 	replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
-var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd").new()
 func _ready():
 	l("Readying")
@@ -146,6 +145,9 @@ func loadSettings():
 	l(MOD_NAME + ": Current settings: %s" % modConfig)
 	settings.queue_free()
 	l(MOD_NAME + ": Finished loading settings")
+
+# Instances the equipment pointer for use with the proper functions
+var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 
 # Adds new equipment slots from an input dictionary
 # Requires the ADD_EQUIPMENT_SLOTS variable to be set up
