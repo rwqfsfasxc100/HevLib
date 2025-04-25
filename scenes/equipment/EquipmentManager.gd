@@ -38,6 +38,8 @@ const SUBTRACTIVES = [
 "NOT_HARDPOINT_CENTER", # - Any central hardpoint
 "NOT_HARDPOINT_SIDE", # - Any hardpoint with side access
 "NOT_HARDPOINT_REAR", # - Any rear hardpoint
+"NOT_HARDPOINT_HIGH_STRESS", # - Any high-stress hardpoint
+"NOT_HARDPOINT_LOW_STRESS", # - Any low-stress hardpoint
 "NOT_HARDPOINT_DRONE_EMITTER", # - Any drone equipment
 "NOT_HARDPOINT_TURRET", # - Any turreted equipment
 "NOT_HARDPOINT_CRADLE", # - Any cradled equipment
