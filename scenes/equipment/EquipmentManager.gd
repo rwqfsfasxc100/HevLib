@@ -32,6 +32,7 @@ const ADDITIVES = [
 "HARDPOINT_SYNCHROTRON", # - Any synchrotron like equipment
 "HARDPOINT_BEACON", # - Any beacon like equipment
 ]
+
 const SUBTRACTIVES = [
 "NOT_HARDPOINT_LEFT", # - Any left hardpoint
 "NOT_HARDPOINT_RIGHT", # - Any right hardpoint
@@ -41,6 +42,10 @@ const SUBTRACTIVES = [
 "NOT_HARDPOINT_HIGH_STRESS", # - Any high-stress hardpoint
 "NOT_HARDPOINT_LOW_STRESS", # - Any low-stress hardpoint
 "NOT_HARDPOINT_DRONE_EMITTER", # - Any drone equipment
+"NOT_HARDPOINT_DOCKING_BAY", # - A docking-bay type hardpoint
+"NOT_HARDPOINT_DRONE_POINT", # - A drone hardpoint
+"NOT_HARDPOINT", # - Any hardpoint
+"NOT_HARDPOINT_SPINAL", # - Any hardpoint w/o side access
 "NOT_HARDPOINT_TURRET", # - Any turreted equipment
 "NOT_HARDPOINT_CRADLE", # - Any cradled equipment
 "NOT_HARDPOINT_CARGO_CONTAINER", # - Any cargo container like equipment
