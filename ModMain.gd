@@ -100,15 +100,7 @@ func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, full
 			translationCount += 1
 	tlFile.close()
 	for translationObject in translations:
-		var pms = translationObject.get_message_list()
-		var pmL = []
-		for m in pms:
-			var pt = translationObject.get_message(m)
-			pmL.append([m,pt])
-		var tr = TranslationServer.translate(pms[0])
 		TranslationServer.add_translation(translationObject)
-		var pms2 = translationObject.get_message_list()
-		var tr2 = TranslationServer.translate(pms[0])
 	l("%s Translations Updated from @ [%s]" % [translationCount, fileName])
 func installScriptExtension(path:String):
 	var childPath:String = str(modPath + path)
