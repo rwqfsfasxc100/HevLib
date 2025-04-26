@@ -16,6 +16,9 @@ var ADD_EQUIPMENT_ITEMS = []
 # Required if any additional tags are going to be added. Only additive tags should be placed here.
 var EQUIPMENT_TAGS = []
 
+# Additional tags that you'd like to add to any slots, pre-existing or new
+var SLOT_TAGS = {}
+
 func _init(modLoader = ModLoader):
 	l("Initializing DLC")
 	loadDLC()
@@ -24,6 +27,7 @@ func _init(modLoader = ModLoader):
 var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd").new()
 func _ready():
 	l("Readying")
+	SLOT_TAGS = tags
 #	addEquipmentSlot({"system_slot":"slot.new", "slot_node_name":"NewSlot","slot_displayName":"SLOT_DATA_DRIVEN_SLOT_TEST"})
 #	addEquipmentItem({"system":"SYSTEM_TEST", "slots":["NewSlot"]})
 	var WebTranslate = preload("res://HevLib/pointers/WebTranslate.gd")
@@ -155,3 +159,39 @@ func addEquipmentSlot(slot_data: Dictionary):
 func addEquipmentItem(item_data: Dictionary):
 	var eqp = Equipment.__make_equipment(item_data)
 	ADD_EQUIPMENT_ITEMS.append(eqp)
+
+# Slot tags used for the default slots used as an example
+var tags = {
+	"MainWeaponSlot":["HARDPOINT_HIGH_STRESS"],
+	"MainLowWeaponSlot":["HARDPOINT_SPINAL"],
+	"LeftHighStress":["HARDPOINT_HIGH_STRESS", "ALIGNMENT_LEFT"],
+	"RightHighStress":["HARDPOINT_HIGH_STRESS", "ALIGNMENT_RIGHT"],
+	"LeftWeaponSlot":["HARDPOINT_LOW_STRESS", "ALIGNMENT_LEFT"],
+	"MiddleLeftWeaponSlot":["HARDPOINT_LOW_STRESS", "ALIGNMENT_LEFT","NOT_CAPABILITY_CRADLES"],
+	"RightWeaponSlot":["HARDPOINT_LOW_STRESS", "ALIGNMENT_RIGHT"],
+	"MiddleRightWeaponSlot":["HARDPOINT_LOW_STRESS", "ALIGNMENT_RIGHT","NOT_CAPABILITY_CRADLES"],
+	"LeftDroneSlot":["HARDPOINT_DRONE_POINT", "ALIGNMENT_LEFT"],
+	"RightDroneSlot":["HARDPOINT_DRONE_POINT", "ALIGNMENT_RIGHT"],
+	"LeftRearSlot":["HARDPOINT_LOW_STRESS","ALIGNMENT_LEFT","NOT_CAPABILITY_FRONT_FACING", "CAPABILITY_SHIP_REAR", "NOT_EQUIPMENT_BEACON"],
+	"RightRearSlot":["HARDPOINT_LOW_STRESS","ALIGNMENT_RIGHT","NOT_CAPABILITY_FRONT_FACING", "CAPABILITY_SHIP_REAR", "NOT_EQUIPMENT_BEACON"],
+	"LeftBay1":["HARDPOINT_DOCKING_BAY", "ALIGNMENT_LEFT", "EQUIPMENT_BEACON"],
+	"RightBay1":["HARDPOINT_DOCKING_BAY", "ALIGNMENT_RIGHT", "EQUIPMENT_BEACON"],
+	"LeftBay2":["HARDPOINT_DOCKING_BAY", "ALIGNMENT_LEFT"],
+	"RightBay2":["HARDPOINT_DOCKING_BAY", "ALIGNMENT_RIGHT"],
+	"LeftBay3":["HARDPOINT_DOCKING_BAY", "ALIGNMENT_LEFT"],
+	"RightBay3":["HARDPOINT_DOCKING_BAY", "ALIGNMENT_RIGHT"],
+	"AmmunitionDelivery":["MASS_DRIVER_AMMUNITION"],
+	"DisposableDrones":["NANODRONE_STORAGE"],
+	"Propellant":["PROPELLANT_TANK"],
+	"Thrusters":["STANDARD_REACTION_CONTROL_THRUSTERS"],
+	"Torches":["STANDARD_MAIN_ENGINE"],
+	"Rods":["FISSION_RODS"],
+	"Capacitor":["ULTRACAPACITOR"],
+	"Turbine":["FISSION_TURBINE"],
+	"AuxilaryPower":["AUX_POWER_SLOT"],
+	"CargoBay":["CARGO_BAY"],
+	"Autopilot":["AUTOPILOT"],
+	"Hud":["HUD"],
+	"Lidar":["LIDAR"],
+	"ReconDrone":["RECON_DRONE"],
+}
