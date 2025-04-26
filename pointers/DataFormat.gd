@@ -1,4 +1,5 @@
 extends Node
+
 var developer_hint = {
 	"__array_to_string":[
 		"Concatenates all parts of an array into a string",

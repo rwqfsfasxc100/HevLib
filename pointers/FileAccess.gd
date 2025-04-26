@@ -1,4 +1,5 @@
 extends Node
+
 var developer_hint = {
 		"__get_file_content":[
 			"Returns the content from a file as a string"
