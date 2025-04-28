@@ -174,11 +174,4 @@ func add_slot_tags():
 				nodes = slot.get("SLOT_TAGS")
 			if not nodes == null:
 				for equipment in nodes:
-					var tags = nodes.get(equipment)
-					var relevant_node = get_node(equipment)
-					for tag in tags:
-						if tag in relevant_node.slotGroups:
-							pass
-						else:
-							relevant_node.slotGroups.append(tag)
-	pass
+					pass

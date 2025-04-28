@@ -6,7 +6,7 @@ extends "res://enceladus/UpgradeGroup.gd"
 export (Array, String) var onlyForShipNames
 export (bool) var invertNameLogic = false
 
-export (Array) var slotGroups = [] 
+export (Dictionary) var slotGroups = {}
 
 func reexamine():	
 	var ship = CurrentGame.getPlayerShip()
