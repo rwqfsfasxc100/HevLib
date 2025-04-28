@@ -2,7 +2,7 @@ extends VBoxContainer
 
 var itemSlot = preload("res://enceladus/SystemShipUpgradeUI.tscn")
 
-var ADDITIVES = [
+var hardpoint_types = [
 # Hardpoint slots
 "HARDPOINT", # - Any hardpoint
 "HARDPOINT_LOW_STRESS", # - Any low-stress hardpoint
