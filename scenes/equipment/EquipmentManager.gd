@@ -180,4 +180,54 @@ func add_slot_tags():
 				nodes = slot.get("SLOT_TAGS")
 			if not nodes == null:
 				for equipment in nodes:
+					var currentTag = get_node(equipment).slotGroups
+					var tags = nodes.get(equipment)
+					var dict2merge = {}
+					if currentTag.keys().size() == 0:
+						if tags.get("slot_type") == "HARDPOINT":
+							var slot_equipment = hardpoint_defaults.get(tags.get("hardpoint_type"))
+							var overrides = tags.get("equipment_overrides", {})
+							if overrides != {}:
+								for override in overrides:
+									if override == "additives":
+										for add in override:
+											if add in slot_equipment:
+												pass
+											else:
+												slot_equipment.append(add)
+									if override == "subtractives":
+										for negate in override:
+											var replace_array = []
+											for spt in slot_equipment:
+												if spt in negate:
+													pass
+												else:
+													replace_array.append(spt)
+											slot_equipment = replace_array
+							dict2merge = {"slot_type":tags.get("slot_type"),"hardpoint_alignment":tags.get("hardpoint_alignment"),"installable_equipment_types":slot_equipment}
+							
+						else:
+							dict2merge = tags
+						get_node(equipment).slotGroups.merge(dict2merge)
+					else:
+						if currentTag.get("slot_type") == "HARDPOINT":
+							var slot_equipment = currentTag.get("installable_equipment_types")
+							var overrides = tags.get("equipment_overrides", {})
+							if overrides != {}:
+								for override in overrides:
+									if override == "additives":
+										for add in override:
+											if add in slot_equipment:
+												pass
+											else:
+												slot_equipment.append(add)
+									if override == "subtractives":
+										for negate in override:
+											var replace_array = []
+											for spt in slot_equipment:
+												if spt in negate:
+													pass
+												else:
+													replace_array.append(spt)
+							get_node(equipment).slotGroups.installable_equipment_types = slot_equipment
 					pass

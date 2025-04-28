@@ -30,201 +30,201 @@ script = ExtResource( 2 )
 
 [node name="MainWeaponSlot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="0"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="MainLowWeaponSlot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="1"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="LeftHighStress" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="2"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="RightHighStress" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="3"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="LeftWeaponSlot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="4"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="MiddleLeftWeaponSlot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="5"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="RightWeaponSlot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="6"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="MiddleRightWeaponSlot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="7"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="LeftDroneSlot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="8"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="RightDroneSlot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="9"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="LeftRearSlot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="10"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="RightRearSlot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="11"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="LeftBay1" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="12"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="RightBay1" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="13"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="LeftBay2" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="14"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="RightBay2" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="15"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="LeftBay3" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="16"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="RightBay3" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="17"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="AmmunitionDelivery" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="18"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="DisposableDrones" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="19"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="Propellant" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="20"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="Thrusters" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="21"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="Torches" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="22"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="Rods" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="23"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="Capacitor" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="24"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="Turbine" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="25"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="AuxilaryPower" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="26"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="CargoBay" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="27"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="Autopilot" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="28"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="Hud" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="29"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="Lidar" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="30"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="ReconDrone" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="31"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [node name="SLOT8" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="32"]
 script = ExtResource( 3 )
-onlyForShipNames = [  ]
+onlyForShipNames = []
 invertNameLogic = false
-slotGroups = [  ]
+slotGroups = {}
 
 [connection signal="tree_entered" from="VB/MarginContainer/ScrollContainer/MarginContainer/Items" to="VB/MarginContainer/ScrollContainer/MarginContainer/Items" method="_tree_entered"]
 
