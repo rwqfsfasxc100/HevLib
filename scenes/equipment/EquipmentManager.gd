@@ -3,56 +3,56 @@ extends VBoxContainer
 var itemSlot = preload("res://enceladus/SystemShipUpgradeUI.tscn")
 
 var hardpoint_types = [
-# Hardpoint slots
-"HARDPOINT_LOW_STRESS", # - Any low-stress hardpoint
-"HARDPOINT_HIGH_STRESS", # - Any high-stress hardpoint
-"HARDPOINT_SPINAL", # - Any rear hardpoint
-"HARDPOINT_DOCKING_BAY", # - A docking-bay type hardpoint
-"HARDPOINT_DRONE_POINT", # - A drone hardpoint
+	# Hardpoint slots
+	"HARDPOINT_LOW_STRESS", # - Any low-stress hardpoint
+	"HARDPOINT_HIGH_STRESS", # - Any high-stress hardpoint
+	"HARDPOINT_SPINAL", # - Any rear hardpoint
+	"HARDPOINT_DOCKING_BAY", # - A docking-bay type hardpoint
+	"HARDPOINT_DRONE_POINT", # - A drone hardpoint
 ]
 var alignments = [
-# Equipment alignment
-"ALIGNMENT_LEFT", # - Any left hardpoint
-"ALIGNMENT_RIGHT", # - Any right hardpoint
-"ALIGNMENT_CENTER", # - Any central hardpoint
+	# Equipment alignment
+	"ALIGNMENT_LEFT", # - Any left hardpoint
+	"ALIGNMENT_RIGHT", # - Any right hardpoint
+	"ALIGNMENT_CENTER", # - Any central hardpoint
 ]
 
 var equipment_types = [
-# Cradled equipment
-"EQUIPMENT_CARGO_CONTAINER",
-"EQUIPMENT_MINING_COMPANION",
-"EQUIPMENT_IMPACT_ABSORBER",
-"EQUIPMENT_BEACON",
+	# Cradled equipment
+	"EQUIPMENT_CARGO_CONTAINER",
+	"EQUIPMENT_MINING_COMPANION",
+	"EQUIPMENT_IMPACT_ABSORBER",
+	"EQUIPMENT_BEACON",
 
-# Weapon tools
-"EQUIPMENT_PLASMA_THROWERS",
-"EQUIPMENT_PLASMA_THROWERS_HEAVY",
-"EQUIPMENT_MANIPULATION_ARMS",
-"EQUIPMENT_MASS_DRIVERS",
-"EQUIPMENT_TURRETS",
-"EQUIPMENT_NANODRONES",
-"EQUIPMENT_IRON_THROWERS",
-"EQUIPMENT_MINING_LASERS",
-"EQUIPMENT_MICROWAVES",
-"EQUIPMENT_SYNCHROTRONS",
+	# Weapon tools
+	"EQUIPMENT_PLASMA_THROWERS",
+	"EQUIPMENT_PLASMA_THROWERS_HEAVY",
+	"EQUIPMENT_MANIPULATION_ARMS",
+	"EQUIPMENT_MASS_DRIVERS",
+	"EQUIPMENT_TURRETS",
+	"EQUIPMENT_NANODRONES",
+	"EQUIPMENT_IRON_THROWERS",
+	"EQUIPMENT_MINING_LASERS",
+	"EQUIPMENT_MICROWAVES",
+	"EQUIPMENT_SYNCHROTRONS",
 ]
 var slot_types = [
 # Slot type tags
-"HARDPOINT",
-"MASS_DRIVER_AMMUNITION",
-"NANODRONE_STORAGE",
-"PROPELLANT_TANK",
-"STANDARD_REACTION_CONTROL_THRUSTERS",
-"STANDARD_MAIN_ENGINE",
-"FISSION_RODS",
-"ULTRACAPACITOR",
-"FISSION_TURBINE",
-"AUX_POWER_SLOT",
-"CARGO_BAY",
-"AUTOPILOT",
-"HUD",
-"LIDAR",
-"RECON_DRONE",
+	"HARDPOINT",
+	"MASS_DRIVER_AMMUNITION",
+	"NANODRONE_STORAGE",
+	"PROPELLANT_TANK",
+	"STANDARD_REACTION_CONTROL_THRUSTERS",
+	"STANDARD_MAIN_ENGINE",
+	"FISSION_RODS",
+	"ULTRACAPACITOR",
+	"FISSION_TURBINE",
+	"AUX_POWER_SLOT",
+	"CARGO_BAY",
+	"AUTOPILOT",
+	"HUD",
+	"LIDAR",
+	"RECON_DRONE",
 ]
 
 var hardpoint_defaults = {
@@ -63,13 +63,44 @@ var hardpoint_defaults = {
 	"HARDPOINT_DRONE_POINT":["EQUIPMENT_NANODRONES"],
 }
 
+var slots = ModLoader.get_children()
+
 func _tree_entered():
 	get_tags()
 	add_slots()
 	add_slot_tags()
 	add_equipment()
 
-var slots = ModLoader.get_children()
+func get_tags():
+	var slots = ModLoader.get_children()
+	for slot in slots:
+		var data = slot.get_property_list()
+		var nodes = null
+		for item in data:
+			if item.get("name") == "EQUIPMENT_TAGS":
+				nodes = slot.get("EQUIPMENT_TAGS")
+		if not nodes == null:
+			for tag in nodes:
+				var slotTypes = tag.get("slot_types",[])
+				var equipmentItems = tag.get("equipment_types",[])
+				var align = tag.get("alignments",[])
+				var hardpointTypes = tag.get("hardpoint_types",[])
+				var hardpointDefaults = tag.get("hardpoint_defaults",{})
+				if slotTypes.size() > 0:
+					for st in slotTypes:
+						slot_types.append(st)
+				if equipmentItems.size() > 0:
+					for st in equipmentItems:
+						equipment_types.append(st)
+				if align.size() > 0:
+					for st in align:
+						alignments.append(st)
+				if hardpointTypes.size() > 0:
+					for st in hardpointTypes:
+						hardpoint_types.append(st)
+				if hardpointDefaults.keys().size() > 0:
+					for st in hardpointDefaults:
+						hardpoint_defaults.merge(st)
 
 func add_slots():
 	for slot in slots:
@@ -82,6 +113,27 @@ func add_slots():
 			for spt in newSlot:
 				add_child(spt)
 
+func add_slot_tags():
+	var slot_tag_pool = {}
+	for slot in slots:
+		var data = slot.get_property_list()
+		var nodes = null
+		for item in data:
+			if item.get("name") == "SLOT_TAGS":
+				nodes = slot.get("SLOT_TAGS")
+		if not nodes == null:
+			for tag in nodes:
+				var ptag = nodes.get(tag)
+				var slot_dictionary = sort_equipment_assignment(tag, ptag)
+				slot_tag_pool.merge(slot_dictionary)
+	
+	for slot in slot_tag_pool:
+		var select = get_node(slot)
+		var dta = slot_tag_pool.get(slot)
+		select.slotGroups = dta
+	
+	
+	
 
 func add_equipment():
 	var slots = ModLoader.get_children()
@@ -98,136 +150,90 @@ func add_equipment():
 		for item in data:
 			if item.get("name") == "ADD_EQUIPMENT_ITEMS":
 				newSlot = slot.get("ADD_EQUIPMENT_ITEMS")
-		if typeof(newSlot) == TYPE_ARRAY:
-			for spt in newSlot:
-				var equipment = spt.get("equipment")
-				var eq_slots = spt.get("slots")
-				if typeof(eq_slots) == TYPE_ARRAY:
-					pass
-				else:
-					eq_slots = []
-				var groups = spt.get("slot_groups")
-				if typeof(groups) == TYPE_ARRAY:
-					pass
-				else:
-					groups = []
-				var current_slots = get_children()
-				for slt in current_slots:
-					pass
-				for panel in eq_slots:
-					var parent = get_node(panel).get_node("VBoxContainer")
-					var itemTemplate = itemSlot.instance()
-					
-					itemTemplate.numVal = equipment.get("num_val")
-					itemTemplate.system = equipment.get("system")
-					itemTemplate.capabilityLock = equipment.get("capability_lock")
-					itemTemplate.nameOverride = equipment.get("name_override")
-					itemTemplate.description = equipment.get("description")
-					itemTemplate.manual = equipment.get("manual")
-					itemTemplate.specs = equipment.get("specs")
-					itemTemplate.price = equipment.get("price")
-					itemTemplate.testProtocol = equipment.get("test_protocol")
-					itemTemplate.default = equipment.get("default")
-					itemTemplate.control = equipment.get("control")
-					itemTemplate.storyFlag = equipment.get("story_flag")
-					itemTemplate.storyFlagMin = equipment.get("story_flag_min")
-					itemTemplate.storyFlagMax = equipment.get("story_flag_max")
-					itemTemplate.warnIfThermalBelow = equipment.get("warn_if_thermal_below")
-					itemTemplate.warnIfElectricBelow = equipment.get("warn_if_electric_below")
-					itemTemplate.stickerPriceFormat = equipment.get("sticker_price_format")
-					itemTemplate.stickerPriceMultiFormat = equipment.get("sticker_price_multi_format")
-					itemTemplate.installedColor = equipment.get("installed_color")
-					itemTemplate.disbledColor = equipment.get("disabled_color")
-					if equipment.get("name_override") == "":
-						itemTemplate.name = equipment.get("system")
-					else:
-						itemTemplate.name = equipment.get("name_override")
-					parent.add_child(itemTemplate)
+		if not newSlot == null:
+			for equip in newSlot:
+				var equipment = equip.get("equipment")
+				var confirmed = equip.get("slots",[])
+				var groups = equip.get("slot_groups",{})
+				var alignment = groups.get("alignment", "")
+				var tags = groups.get("tags", "")
+				if groups.keys().size() > 0:
+					for sect in get_children():
+						var sectName = sect.name
+						var sectTags = sect.slotGroups
+						var type = sectTags.get("type","")
+						var sectAlignment = sectTags.get("alignment")
+						var sectEquipment = sectTags.get("equipment")
+						if type == "HARDPOINT":
+							var doesAlign = false
+							if alignment == "ALIGNMENT_CENTER" or alignment == "ALIGNMENT_RIGHT" or alignment == "ALIGNMENT_LEFT":
+								if alignment == sectAlignment:
+									doesAlign = true
+							else:
+								doesAlign = true
+							if doesAlign and tags in sectEquipment:
+								confirmed.append(sectName)
+				for panel in confirmed:
+					add_equipment_to_slot(panel, equipment)
 
-func get_tags():
-	var slots = ModLoader.get_children()
-	for slot in slots:
-		var data = slot.get_property_list()
-		var nodes = null
-		for item in data:
-			if item.get("name") == "EQUIPMENT_TAGS":
-				nodes = slot.get("EQUIPMENT_TAGS")
-		if not nodes == null:
-			for tag in nodes:
-				var slotTypes = tag.get("slot_types",[])
-				var equipmentItems = tag.get("equipment_types",[])
-				var align = tag.get("alignments",[])
-				var hardpointTypes = tag.get("hardpoint_types",[])
-				if slotTypes.size() > 0:
-					for st in slotTypes:
-						slot_types.append(st)
-				if equipmentItems.size() > 0:
-					for st in equipmentItems:
-						equipment_types.append(st)
-				if align.size() > 0:
-					for st in align:
-						alignments.append(st)
-				if hardpointTypes.size() > 0:
-					for st in hardpointTypes:
-						hardpoint_types.append(st)
 
-func add_slot_tags():
-	for slot in slots:
-		var data = slot.get_property_list()
-		var nodes = null
-		for item in data:
-			if item.get("name") == "SLOT_TAGS":
-				nodes = slot.get("SLOT_TAGS")
-			if not nodes == null:
-				for equipment in nodes:
-					var currentTag = get_node(equipment).slotGroups
-					var tags = nodes.get(equipment)
-					var dict2merge = {}
-					if currentTag.keys().size() == 0:
-						if tags.get("slot_type") == "HARDPOINT":
-							var slot_equipment = hardpoint_defaults.get(tags.get("hardpoint_type"))
-							var overrides = tags.get("equipment_overrides", {})
-							if overrides != {}:
-								for override in overrides:
-									if override == "additives":
-										for add in override:
-											if add in slot_equipment:
-												pass
-											else:
-												slot_equipment.append(add)
-									if override == "subtractives":
-										for negate in override:
-											var replace_array = []
-											for spt in slot_equipment:
-												if spt in negate:
-													pass
-												else:
-													replace_array.append(spt)
-											slot_equipment = replace_array
-							dict2merge = {"slot_type":tags.get("slot_type"),"hardpoint_alignment":tags.get("hardpoint_alignment"),"installable_equipment_types":slot_equipment}
-							
-						else:
-							dict2merge = tags
-						get_node(equipment).slotGroups.merge(dict2merge)
+
+
+func add_equipment_to_slot(panel: String, equipment: Dictionary):
+	var parent = get_node(panel).get_node("VBoxContainer")
+	var itemTemplate = itemSlot.instance()
+	
+	itemTemplate.numVal = equipment.get("num_val")
+	itemTemplate.system = equipment.get("system")
+	itemTemplate.capabilityLock = equipment.get("capability_lock")
+	itemTemplate.nameOverride = equipment.get("name_override")
+	itemTemplate.description = equipment.get("description")
+	itemTemplate.manual = equipment.get("manual")
+	itemTemplate.specs = equipment.get("specs")
+	itemTemplate.price = equipment.get("price")
+	itemTemplate.testProtocol = equipment.get("test_protocol")
+	itemTemplate.default = equipment.get("default")
+	itemTemplate.control = equipment.get("control")
+	itemTemplate.storyFlag = equipment.get("story_flag")
+	itemTemplate.storyFlagMin = equipment.get("story_flag_min")
+	itemTemplate.storyFlagMax = equipment.get("story_flag_max")
+	itemTemplate.warnIfThermalBelow = equipment.get("warn_if_thermal_below")
+	itemTemplate.warnIfElectricBelow = equipment.get("warn_if_electric_below")
+	itemTemplate.stickerPriceFormat = equipment.get("sticker_price_format")
+	itemTemplate.stickerPriceMultiFormat = equipment.get("sticker_price_multi_format")
+	itemTemplate.installedColor = equipment.get("installed_color")
+	itemTemplate.disbledColor = equipment.get("disabled_color")
+	if equipment.get("name_override") == "":
+		itemTemplate.name = equipment.get("system")
+	else:
+		itemTemplate.name = equipment.get("name_override")
+	parent.add_child(itemTemplate)
+
+func sort_equipment_assignment(tag, ptag):
+	var slot_dictionary = {}
+	var type = ptag.get("slot_type")
+	if type == "HARDPOINT":
+		var hardpoint_type = ptag.get("hardpoint_type","HARDPOINT_HIGH_STRESS")
+		var hardpoint_alignment = ptag.get("hardpoint_alignment","ALIGNMENT_CENTER")
+		var overridesdef = ptag.get("equipment_overrides",[])
+		var overrides = overridesdef.duplicate(true)
+		var equipmentdef = hardpoint_defaults.get(hardpoint_type)
+		var equipment = equipmentdef.duplicate(true)
+		if overrides.size() > 0:
+			var additives = overrides.get("additives",[])
+			var subtractives = overrides.get("subtractives",[])
+			for add in additives:
+				if not add in equipment:
+					equipment.append(add)
+			if subtractives.size() > 0:
+				var denied = []
+				for eqp in equipment:
+					if eqp in subtractives:
+						pass
 					else:
-						if currentTag.get("slot_type") == "HARDPOINT":
-							var slot_equipment = currentTag.get("installable_equipment_types")
-							var overrides = tags.get("equipment_overrides", {})
-							if overrides != {}:
-								for override in overrides:
-									if override == "additives":
-										for add in override:
-											if add in slot_equipment:
-												pass
-											else:
-												slot_equipment.append(add)
-									if override == "subtractives":
-										for negate in override:
-											var replace_array = []
-											for spt in slot_equipment:
-												if spt in negate:
-													pass
-												else:
-													replace_array.append(spt)
-							get_node(equipment).slotGroups.installable_equipment_types = slot_equipment
-					pass
+						denied.append(eqp)
+				equipment = denied
+		slot_dictionary = {tag:{"type":type, "alignment":hardpoint_alignment, "equipment":equipment}}
+	else:
+		slot_dictionary = {tag:{"type":type}}
+	return slot_dictionary
