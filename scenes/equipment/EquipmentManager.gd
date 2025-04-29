@@ -6,7 +6,7 @@ var hardpoint_types = [
 	# Hardpoint slots
 	"HARDPOINT_LOW_STRESS", # - Any low-stress hardpoint
 	"HARDPOINT_HIGH_STRESS", # - Any high-stress hardpoint
-	"HARDPOINT_SPINAL", # - Any rear hardpoint
+	"HARDPOINT_SPINAL", # - Any spinal hardpoint
 	"HARDPOINT_DOCKING_BAY", # - A docking-bay type hardpoint
 	"HARDPOINT_DRONE_POINT", # - A drone hardpoint
 ]
