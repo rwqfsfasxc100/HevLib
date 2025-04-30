@@ -1,79 +1,76 @@
-[gd_resource type="Theme" load_steps=10 format=2]
+[gd_resource type="Theme" load_steps=14 format=2]
 
 [ext_resource path="res://HevLib/ui/themes/font-verdana.tres" type="DynamicFont" id=1]
+[ext_resource path="res://HevLib/ui/themes/styles/focus_and_hover_flat.tres" type="StyleBox" id=2]
+[ext_resource path="res://HevLib/ui/themes/styles/disabled_flat.tres" type="StyleBox" id=3]
+[ext_resource path="res://HevLib/ui/themes/styles/normal_flat.tres" type="StyleBox" id=4]
+[ext_resource path="res://HevLib/ui/themes/styles/pressed_flat.tres" type="StyleBox" id=5]
 
-[sub_resource type="StyleBoxFlat" id=5]
-content_margin_left = 5.0
-content_margin_right = 5.0
-content_margin_top = 5.0
-content_margin_bottom = 5.0
-bg_color = Color( 0.588235, 0.588235, 0.588235, 0.0784314 )
+[sub_resource type="StreamTexture" id=13]
+flags = 4
+load_path = "res://HevLib/ui/themes/icons/on_25.stex"
 
-[sub_resource type="StyleBoxFlat" id=8]
-content_margin_left = 5.0
-content_margin_right = 5.0
-content_margin_top = 5.0
-content_margin_bottom = 5.0
-bg_color = Color( 0.392157, 0.392157, 0.392157, 0.313726 )
+[sub_resource type="StreamTexture" id=14]
+flags = 4
+load_path = "res://HevLib/ui/themes/icons/on_disabled_25.stex"
 
-[sub_resource type="StyleBoxFlat" id=4]
-content_margin_left = 5.0
-content_margin_right = 5.0
-content_margin_top = 5.0
-content_margin_bottom = 5.0
-bg_color = Color( 0.588235, 0.588235, 0.6, 0.588235 )
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color( 0, 0, 0, 1 )
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
-expand_margin_left = 1.0
-expand_margin_right = 1.0
-expand_margin_top = 1.0
-expand_margin_bottom = 1.0
+[sub_resource type="StreamTexture" id=15]
+flags = 4
+load_path = "res://HevLib/ui/themes/icons/off_25.stex"
 
-[sub_resource type="StyleBoxFlat" id=7]
-content_margin_left = 5.0
-content_margin_right = 5.0
-content_margin_top = 5.0
-content_margin_bottom = 5.0
-bg_color = Color( 0.6, 0.6, 0.6, 0.27451 )
+[sub_resource type="StreamTexture" id=16]
+flags = 4
+load_path = "res://HevLib/ui/themes/icons/off_disabled_25.stex"
 
 [sub_resource type="StreamTexture" id=12]
 flags = 4
-load_path = "res://HevLib/ui/themes/icons/off_tiny.stex"
+load_path = "res://HevLib/ui/themes/icons/off_25.stex"
 
 [sub_resource type="StreamTexture" id=9]
 flags = 4
-load_path = "res://HevLib/ui/themes/icons/off_disabled_tiny.stex"
+load_path = "res://HevLib/ui/themes/icons/off_disabled_25.stex"
 
 [sub_resource type="StreamTexture" id=10]
 flags = 4
-load_path = "res://HevLib/ui/themes/icons/on_tiny.stex"
+load_path = "res://HevLib/ui/themes/icons/on_25.stex"
 
 [sub_resource type="StreamTexture" id=11]
 flags = 4
-load_path = "res://HevLib/ui/themes/icons/on_disabled_tiny.stex"
+load_path = "res://HevLib/ui/themes/icons/on_disabled_25.stex"
 
 [resource]
 default_font = ExtResource( 1 )
 Button/colors/font_color_focus = Color( 0.870588, 0.870588, 0.501961, 1 )
 Button/colors/font_color_hover = Color( 0.870588, 0.870588, 0.501961, 1 )
-Button/styles/disabled = SubResource( 5 )
-Button/styles/focus = SubResource( 8 )
-Button/styles/hover = SubResource( 8 )
-Button/styles/normal = SubResource( 4 )
-Button/styles/pressed = SubResource( 7 )
+Button/colors/font_color_hover_pressed = Color( 0.870588, 0.870588, 0.501961, 1 )
+Button/styles/disabled = ExtResource( 3 )
+Button/styles/focus = ExtResource( 2 )
+Button/styles/hover = ExtResource( 2 )
+Button/styles/normal = ExtResource( 4 )
+Button/styles/pressed = ExtResource( 5 )
+CheckBox/colors/font_color_focus = Color( 0.870588, 0.870588, 0.501961, 1 )
+CheckBox/colors/font_color_hover = Color( 0.870588, 0.870588, 0.501961, 1 )
+CheckBox/colors/font_color_hover_pressed = Color( 0.870588, 0.870588, 0.501961, 1 )
+CheckBox/icons/checked = SubResource( 13 )
+CheckBox/icons/checked_disabled = SubResource( 14 )
+CheckBox/icons/unchecked = SubResource( 15 )
+CheckBox/icons/unchecked_disabled = SubResource( 16 )
+CheckBox/styles/disabled = ExtResource( 3 )
+CheckBox/styles/focus = ExtResource( 2 )
+CheckBox/styles/hover = ExtResource( 2 )
+CheckBox/styles/hover_pressed = ExtResource( 2 )
+CheckBox/styles/normal = ExtResource( 4 )
+CheckBox/styles/pressed = ExtResource( 5 )
+CheckButton/colors/font_color_focus = Color( 0.870588, 0.870588, 0.501961, 1 )
+CheckButton/colors/font_color_hover = Color( 0.870588, 0.870588, 0.501961, 1 )
+CheckButton/colors/font_color_hover_pressed = Color( 0.870588, 0.870588, 0.501961, 1 )
 CheckButton/icons/off = SubResource( 12 )
 CheckButton/icons/off_disabled = SubResource( 9 )
 CheckButton/icons/on = SubResource( 10 )
 CheckButton/icons/on_disabled = SubResource( 11 )
-CheckButton/styles/disabled = SubResource( 5 )
-CheckButton/styles/focus = SubResource( 8 )
-CheckButton/styles/hover = SubResource( 8 )
-CheckButton/styles/normal = SubResource( 4 )
-CheckButton/styles/pressed = SubResource( 7 )
+CheckButton/styles/disabled = ExtResource( 3 )
+CheckButton/styles/focus = ExtResource( 2 )
+CheckButton/styles/hover = ExtResource( 2 )
+CheckButton/styles/hover_pressed = ExtResource( 2 )
+CheckButton/styles/normal = ExtResource( 4 )
+CheckButton/styles/pressed = ExtResource( 5 )
