@@ -13,8 +13,9 @@ func _on_request_complete(result, response_code, headers, body):
 		var data
 		if not json.result == null:
 			releasesContent = json.result
+		else:
+			get_parent().on_timeout()
 		var branchToFetch = releasesContent.get("default_branch")
-	
 		Debug.l("HevLib WebTranslate: branch found @ %s" % branchToFetch)
 		get_parent().get_github_branch(branchToFetch)
 	
