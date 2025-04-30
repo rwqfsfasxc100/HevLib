@@ -1,0 +1,55 @@
+[gd_resource type="Theme" load_steps=10 format=2]
+
+[ext_resource path="res://HevLib/ui/themes/font-verdana.tres" type="DynamicFont" id=1]
+[ext_resource path="res://HevLib/ui/themes/off.stex" type="Texture" id=2]
+
+[sub_resource type="StyleBoxFlat" id=5]
+bg_color = Color( 0.588235, 0.588235, 0.588235, 0.0784314 )
+
+[sub_resource type="StyleBoxFlat" id=8]
+bg_color = Color( 0.6, 0.6, 0.6, 0.313726 )
+
+[sub_resource type="StyleBoxFlat" id=4]
+bg_color = Color( 0.588235, 0.588235, 0.6, 0.588235 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color( 0, 0, 0, 1 )
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+expand_margin_left = 1.0
+expand_margin_right = 1.0
+expand_margin_top = 1.0
+expand_margin_bottom = 1.0
+
+[sub_resource type="StyleBoxFlat" id=7]
+bg_color = Color( 0.6, 0.6, 0.6, 0.27451 )
+
+[sub_resource type="StreamTexture" id=9]
+flags = 4
+load_path = "res://HevLib/ui/themes/off_disabled.stex"
+
+[sub_resource type="StreamTexture" id=10]
+flags = 4
+load_path = "res://HevLib/ui/themes/on.stex"
+
+[sub_resource type="StreamTexture" id=11]
+flags = 4
+load_path = "res://HevLib/ui/themes/on_disabled.stex"
+
+[resource]
+default_font = ExtResource( 1 )
+Button/colors/font_color_focus = Color( 0.870588, 0.870588, 0.501961, 1 )
+Button/colors/font_color_hover = Color( 0.870588, 0.870588, 0.501961, 1 )
+Button/styles/disabled = SubResource( 5 )
+Button/styles/focus = SubResource( 8 )
+Button/styles/hover = SubResource( 8 )
+Button/styles/normal = SubResource( 4 )
+Button/styles/pressed = SubResource( 7 )
+CheckButton/icons/off = ExtResource( 2 )
+CheckButton/icons/off_disabled = SubResource( 9 )
+CheckButton/icons/on = SubResource( 10 )
+CheckButton/icons/on_disabled = SubResource( 11 )
