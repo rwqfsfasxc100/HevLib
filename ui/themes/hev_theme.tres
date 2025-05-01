@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=20 format=2]
+[gd_resource type="Theme" load_steps=28 format=2]
 
 [ext_resource path="res://HevLib/ui/themes/font-verdana.tres" type="DynamicFont" id=1]
 [ext_resource path="res://HevLib/ui/themes/styles/focus_and_hover_flat.tres" type="StyleBox" id=2]
@@ -11,6 +11,11 @@
 [ext_resource path="res://HevLib/ui/themes/styles/scrollbar/grabber_pressed_flat.tres" type="StyleBox" id=9]
 [ext_resource path="res://HevLib/ui/themes/styles/scrollbar/grabber_flat.tres" type="StyleBox" id=10]
 [ext_resource path="res://HevLib/ui/themes/styles/slider/slider_flat.tres" type="StyleBox" id=11]
+[ext_resource path="res://HevLib/ui/themes/styles/slider/grabber_area_flat.tres" type="StyleBox" id=12]
+[ext_resource path="res://HevLib/ui/themes/styles/slider/grabber_area_highlight_flat.tres" type="StyleBox" id=13]
+[ext_resource path="res://HevLib/ui/themes/styles/label/normal_flat.tres" type="StyleBox" id=14]
+[ext_resource path="res://HevLib/ui/themes/styles/label/read_only_flat.tres" type="StyleBox" id=15]
+[ext_resource path="res://HevLib/ui/themes/styles/label/focus_flat.tres" type="StyleBox" id=16]
 
 [sub_resource type="StreamTexture" id=13]
 flags = 4
@@ -44,11 +49,24 @@ load_path = "res://HevLib/ui/themes/icons/on_25.stex"
 flags = 4
 load_path = "res://HevLib/ui/themes/icons/on_disabled_25.stex"
 
+[sub_resource type="StreamTexture" id=17]
+flags = 4
+load_path = "res://HevLib/ui/themes/icons/radio_off.stex"
+
+[sub_resource type="StreamTexture" id=18]
+flags = 4
+load_path = "res://HevLib/ui/themes/icons/radio_disabled.stex"
+
+[sub_resource type="StreamTexture" id=19]
+flags = 4
+load_path = "res://HevLib/ui/themes/icons/radio_on.stex"
+
 [resource]
 default_font = ExtResource( 1 )
 Button/colors/font_color_focus = Color( 0.870588, 0.870588, 0.501961, 1 )
 Button/colors/font_color_hover = Color( 0.870588, 0.870588, 0.501961, 1 )
 Button/colors/font_color_hover_pressed = Color( 0.870588, 0.870588, 0.501961, 1 )
+Button/colors/font_color_pressed = Color( 0.870588, 0.870588, 0.501961, 1 )
 Button/styles/disabled = ExtResource( 3 )
 Button/styles/focus = ExtResource( 2 )
 Button/styles/hover = ExtResource( 2 )
@@ -85,4 +103,24 @@ HScrollBar/styles/grabber_highlight = ExtResource( 8 )
 HScrollBar/styles/grabber_pressed = ExtResource( 9 )
 HScrollBar/styles/scroll = ExtResource( 6 )
 HSeparator/styles/separator = ExtResource( 7 )
+HSlider/icons/grabber = SubResource( 17 )
+HSlider/icons/grabber_disabled = SubResource( 18 )
+HSlider/icons/grabber_highlight = SubResource( 19 )
+HSlider/styles/grabber_area = ExtResource( 12 )
+HSlider/styles/grabber_area_highlight = ExtResource( 13 )
 HSlider/styles/slider = ExtResource( 11 )
+Label/colors/font_color = Color( 0.941176, 0.941176, 0.941176, 1 )
+Label/colors/font_color_shadow = Color( 0.188235, 0.188235, 0.188235, 1 )
+Label/constants/shadow_offset_x = 5
+Label/constants/shadow_offset_y = 5
+Label/styles/normal = ExtResource( 14 )
+LineEdit/colors/cursor_color = Color( 0.941176, 0.941176, 0.941176, 1 )
+LineEdit/colors/font_color = Color( 0.941176, 0.941176, 0.941176, 1 )
+LineEdit/styles/focus = ExtResource( 16 )
+LineEdit/styles/normal = ExtResource( 14 )
+LineEdit/styles/read_only = ExtResource( 15 )
+LinkButton/colors/font_color = Color( 0.941176, 0.941176, 0.941176, 1 )
+LinkButton/colors/font_color_focus = Color( 1, 1, 1, 1 )
+LinkButton/colors/font_color_hover = Color( 1, 1, 1, 1 )
+LinkButton/colors/font_color_pressed = Color( 0.784314, 0.784314, 1, 1 )
+LinkButton/constants/underline_spacing = 5
