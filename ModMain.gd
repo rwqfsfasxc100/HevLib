@@ -53,6 +53,8 @@ func _ready():
 	file.open("user://cache/.HevLib_Cache/library_documentation.json", File.WRITE)
 	file.store_string(load("res://HevLib/pointers/HevLib.gd").__get_library_functionality(true))
 	file.close()
+	var keybind_interrupt = load("res://HevLib/scenes/keymapping/keybind_interrupt.tscn").instance()
+	CRoot.call_deferred("add_child",keybind_interrupt)
 	l("Ready")
 func loadTranslationsFromCache():
 	var WebTranslateCache = "user://cache/.HevLib_Cache/WebTranslate/"

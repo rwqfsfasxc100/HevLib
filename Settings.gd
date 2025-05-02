@@ -8,6 +8,9 @@ var HevLib = {
 	"events":{
 		"disabled_events":[  ]
 	},
+	"debug":{
+		"input_debugger":false
+	},
 	"input":{
 		"open_debug_event_menu":[  ],
 		"debugger":[ "F10" ]

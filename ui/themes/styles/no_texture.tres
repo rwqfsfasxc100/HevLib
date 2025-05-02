@@ -1,0 +1,10 @@
+[gd_resource type="StyleBoxTexture" load_steps=2 format=2]
+
+[sub_resource type="StreamTexture" id=1]
+flags = 4
+load_path = "res://HevLib/ui/panels/notexture.stex"
+
+[resource]
+texture = SubResource( 1 )
+region_rect = Rect2( 0, 0, 48, 48 )
+modulate_color = Color( 1, 1, 1, 0 )
