@@ -19,6 +19,8 @@ export (String, "left", "right", "center") var square_horizontal_align = "left"
 
 export (String) var panelTexturePath = ""
 
+export (String) var scriptPath = ""
+
 func _ready():
 	handler()
 	var make_child = load("res://HevLib/ui/core_scripts/make_child.gd").new()
@@ -27,6 +29,13 @@ func _ready():
 		var panel_name = data
 		var panel = make_child.make_child(datastring.get(data), set_size, path, panel_name)
 		add_child(panel)
+	var dir = Directory.new()
+	if dir.file_exists(scriptPath):
+		$script_node.set_script(load(scriptPath))
+	elif scriptPath == "":
+		Debug.l("No script for %s, skipping" % self.name)
+	else:
+		Debug.l("UI script failed to load at %s / %s" % [self.name, $script_node.name])
 
 func handler():
 	var file = File.new()
