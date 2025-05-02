@@ -6,21 +6,23 @@ var rng = RandomNumberGenerator.new()
 
 var Globals = preload("res://HevLib/Functions.gd").new()
 
-func _ready():
-#	var noMargins = get_parent().get_parent().get_parent().get_parent().get_parent().get_node("NoMargins")
-	var noMargins = get_node("/root/_HevLib_Gamespace_Canvas/MarginContainer")
-	var index = preload("res://HevLib/ui/core_scripts/index.gd").new()
-	var data = index.exampleDict
-	var panel = load("res://HevLib/ui/popup_main_base.tscn").instance()
+var hasGamespace = false
+var hasActedOnGamespace = false
+onready var panel = load("res://HevLib/ui/popup_main_base.tscn").instance()
+var index = preload("res://HevLib/ui/core_scripts/index.gd").new()
+var data = index.exampleDict
+
+func _physics_process(delta):
+	var noMargins = get_node_or_null("/root/_HevLib_Gamespace_Canvas/MarginContainer")
 	panel.datastring = data
-	
-	
-	
-	connect("pressed",panel,"_pressed")
-	noMargins.call_deferred("add_child",panel)
-	var nnd = load("res://HevLib/ui/core_scripts/get_nodes_to_act_on.gd").new()
-	var pnt = nnd.get_nodes_to_act_on(data, Vector2(1600,900))
-	pass
+	if not noMargins == null:
+		hasGamespace = true 
+	if hasGamespace == true and hasActedOnGamespace == false:
+		hasActedOnGamespace = true
+		connect("pressed",panel,"_pressed")
+		noMargins.call_deferred("add_child",panel)
+		var nnd = load("res://HevLib/ui/core_scripts/get_nodes_to_act_on.gd").new()
+		var pnt = nnd.get_nodes_to_act_on(data, Vector2(1600,900))
 
 func _on_Button_pressed():
 	rng.randomize()

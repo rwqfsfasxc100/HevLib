@@ -22,6 +22,20 @@ func make_child(dataDictionary, resolution, path, panel_name):
 	var paneldata = get_panel.get_panel(type,texture)
 	var panel = paneldata[0]
 	# LabelMargin specific data
+	
+	panel.panelTexturePath = paneldata[1]
+#	panel.rect_min_size = checkdata[0]
+	panel.rect_size = checkdata[0]
+	
+	panel.set_size = checkdata[0]
+	panel.set_pos = checkdata[1]
+	
+	panel.rect_position = checkdata[1]
+	panel.datastring = paneldta
+	panel.name = panel_name
+	
+	
+	panel.scriptPath = script
 	if type == "label_margin":
 		panel.panelText = d.get("text", "")
 		panel.borderBuffer = d.get("borderBuffer", true)
@@ -42,30 +56,21 @@ func make_child(dataDictionary, resolution, path, panel_name):
 		topSpacePercent = d.get("topSpacePercent", 0)
 		bottomSpacePercent = d.get("bottomSpacePercent", 0)
 		texture = d.get("texture", "notexture")
-	
-	
-	panel.panelTexturePath = paneldata[1]
-#	panel.rect_min_size = checkdata[0]
-	panel.rect_size = checkdata[0]
-	
-	panel.set_size = checkdata[0]
-	panel.set_pos = checkdata[1]
-	
-	panel.rect_position = checkdata[1]
-	panel.datastring = paneldta
-	panel.name = panel_name
+		var index = preload("res://HevLib/ui/core_scripts/index.gd").new()
+		panel.panelTexturePath = index.texture(texture)
+		pass
+	var dir = Directory.new()
+	var hasTheme = dir.file_exists(theme)
+	if hasTheme:
+		theme = load(theme)
+		panel.theme = theme
+	elif theme == "":
+		Debug.l("Theme for %s is blank, defaulting" % self.name)
+	else:
+		Debug.l("Invalid theme set for %s, skipping" % self.name)
 	
 	panel.rightSpacePercent = rightSpacePercent
 	panel.leftSpacePercent = leftSpacePercent
 	panel.topSpacePercent = topSpacePercent
 	panel.bottomSpacePercent = bottomSpacePercent
-	
-	panel.theme = theme
-	
-	panel.scriptPath = script
 	return panel
-#	add_child(panel)
-#	if paneldta != null:
-#		var panelPath = get_path_to(get_node(data))
-#		var panelRes = checkdata[0]
-#		get_node(data).makeChild(paneldta, panelRes, panelPath)

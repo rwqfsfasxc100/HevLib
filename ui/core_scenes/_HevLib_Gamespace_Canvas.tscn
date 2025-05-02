@@ -30,8 +30,6 @@ theme = ExtResource( 5 )
 script = ExtResource( 4 )
 
 [node name="InputDebug" type="Label" parent="MarginContainer/DebugPanel/ScrollContainer"]
-margin_left = 5.0
-margin_top = 5.0
-margin_right = 9.0
-margin_bottom = 41.0
+margin_right = 4.0
+margin_bottom = 36.0
 theme = ExtResource( 2 )

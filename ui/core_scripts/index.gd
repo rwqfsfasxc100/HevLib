@@ -63,13 +63,15 @@ var exampleDict = {
 		"panel2":{
 			"rightSpacePercent":160,
 			"topSpacePercent":5,
+			"theme":"res://HevLib/ui/themes/hev_theme.tres",
 			"data":{
-					"panel1":{
+				"panel1":{
 					"type":"label_margin",
 					"text":"uiweysuhkdsygjhfusydgcxvgh",
 					"autowrap":true,
-					"uppercase":true
-				}
-			}
+					"uppercase":true,
+					"bottomSpacePercent":180,
+				},
+			},
 		}
 	}
