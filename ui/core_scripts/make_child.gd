@@ -5,8 +5,9 @@ func make_child(dataDictionary, resolution, path, panel_name):
 	var handle_resolution = preload("res://HevLib/ui/core_scripts/handle_resolution.gd")
 	
 	var get_panel = preload("res://HevLib/ui/core_scripts/get_panel.gd")
-	
 	var d = dataDictionary
+	var script = d.get("script","")
+	var theme = d.get("theme","")
 	var type = d.get("type", "panel_margin")
 	var texture = d.get("texture", "panel_tl_br")
 	var rightSpacePercent = d.get("rightSpacePercent", 20)
@@ -20,6 +21,7 @@ func make_child(dataDictionary, resolution, path, panel_name):
 	var checkdata = handle_resolution.handle_resolution(resolution,rightSpacePercent,leftSpacePercent,topSpacePercent,bottomSpacePercent,square,square_vertical_align, square_horizontal_align)
 	var paneldata = get_panel.get_panel(type,texture)
 	var panel = paneldata[0]
+	# LabelMargin specific data
 	if type == "label_margin":
 		panel.panelText = d.get("text", "")
 		panel.borderBuffer = d.get("borderBuffer", true)
@@ -34,6 +36,7 @@ func make_child(dataDictionary, resolution, path, panel_name):
 		panel.lines_skipped = d.get("lines_skipped", 0)
 		panel.max_lines_visible = d.get("max_lines_visible", -1)
 		
+		# LabelMargin default overrides
 		rightSpacePercent = d.get("rightSpacePercent", 0)
 		leftSpacePercent = d.get("leftSpacePercent", 0)
 		topSpacePercent = d.get("topSpacePercent", 0)
@@ -57,8 +60,9 @@ func make_child(dataDictionary, resolution, path, panel_name):
 	panel.topSpacePercent = topSpacePercent
 	panel.bottomSpacePercent = bottomSpacePercent
 	
+	panel.theme = theme
 	
-	
+	panel.scriptPath = script
 	return panel
 #	add_child(panel)
 #	if paneldta != null:

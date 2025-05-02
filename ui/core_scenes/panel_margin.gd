@@ -23,6 +23,9 @@ export (String) var scriptPath = ""
 
 func _ready():
 	handler()
+	initialization()
+
+func initialization():
 	var make_child = load("res://HevLib/ui/core_scripts/make_child.gd").new()
 	var path = get_path_to(self)
 	for data in datastring:
