@@ -70,6 +70,7 @@ func _tree_entered():
 	add_slots()
 	add_slot_tags()
 	add_equipment()
+#	sort_slots()
 
 func get_tags():
 	var slots = ModLoader.get_children()
@@ -166,7 +167,7 @@ func add_equipment():
 						var sectEquipment = sectTags.get("equipment")
 						if type == "HARDPOINT":
 							var doesAlign = false
-							if alignment == "ALIGNMENT_CENTER" or alignment == "ALIGNMENT_RIGHT" or alignment == "ALIGNMENT_LEFT":
+							if alignment in alignments:
 								if alignment == sectAlignment:
 									doesAlign = true
 							else:
@@ -237,3 +238,31 @@ func sort_equipment_assignment(tag, ptag):
 	else:
 		slot_dictionary = {tag:{"type":type}}
 	return slot_dictionary
+
+
+func sort_slots():
+	var slots = get_children()
+	for slot in slots:
+		var items = slot.get_node("VBoxContainer").get_children()
+		var nodePositions = []
+		for item in items:
+			nodePositions.append([item, item.get_index()])
+		var noFail = false
+		var index = 2
+		var maxIndex = items.size()
+		while noFail == false:
+			
+			var hasDetectedInconsistency = false
+			if index + 1 > maxIndex and not hasDetectedInconsistency:
+				noFail = true
+			
+			elif index + 1 > maxIndex and hasDetectedInconsistency:
+				pass
+			else:
+				var par = slot.get_node("VBoxContainer")
+				var entryA = par.get_child(index - 1)
+				var entryB = par.get_child(index)
+				if entryA.price > entryB.price:
+					hasDetectedInconsistency = true
+					par.move_child(entryB, index - 1)
+			index += 1
