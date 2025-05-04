@@ -6,14 +6,15 @@ extends "res://Settings.gd"
 # Any value not set in the config file will generate the missing values exactly as these are
 var HevLib = {
 	"events":{
-		"disabled_events":[  ]
+		"disabled_events":[  ],
 	},
 	"debug":{
-		"input_debugger":false
+		"input_debugger":false,
+		"ring_position_data_debugger":false,
 	},
 	"input":{
 		"open_debug_event_menu":[  ],
-		"debugger":[ "F10" ]
+		"debugger":[ "F10" ],
 	}, 
 }
 
