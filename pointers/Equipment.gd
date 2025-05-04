@@ -47,7 +47,7 @@ static func __make_equipment(equipment_data: Dictionary):
 	var installed_color = equipment_data.get("installedColor", Color(0.0, 1.0, 0.0, 1.0))
 	var disabled_color = equipment_data.get("disabledColor", Color(0.2, 0.2, 0.2, 1.0))
 	var slots = equipment_data.get("slots", [])
-	var slot_groups = equipment_data.get("slot_groups", [])
+	var slot_groups = equipment_data.get("slot_groups", {})
 	var equipment_node = {
 		"num_val":num_val,
 		"system":system,
@@ -77,7 +77,7 @@ static func __make_slot(slot_data: Dictionary) -> Node:
 	var systemSlot = slot_data.get("system_slot", "")
 	var slotNodeName = slot_data.get("slot_node_name", "MISSING_SLOT_NAME")
 	var slotDisplayName = slot_data.get("slot_displayName", "SLOT_MISSING_DATA")
-	var slotGroups = slot_data.get("slot_groups", [])
+	var slotGroups = slot_data.get("slot_groups", {})
 	var hasNone = slot_data.get("has_none", true)
 	var alwaysDisplay = slot_data.get("always_display", true)
 	var restrictType = slot_data.get("restrict_type", "")
@@ -92,6 +92,7 @@ static func __make_slot(slot_data: Dictionary) -> Node:
 		itemTemplate.system = "SYSTEM_NONE"
 		itemTemplate.default = true
 		slotTemplate.get_node("VBoxContainer").add_child(itemTemplate)
+	slotGroups.merge({"system_slot":systemSlot}, false)
 	slotTemplate.slot = systemSlot
 	slotTemplate.name = slotNodeName
 	slotTemplate.get_node("VBoxContainer/HBoxContainer/CheckButton").text = slotDisplayName

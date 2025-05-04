@@ -155,6 +155,13 @@ func add_equipment():
 			for equip in newSlot:
 				var equipment = equip.get("equipment")
 				var confirmed = equip.get("slots",[])
+				var cnfmtp = typeof(confirmed)
+				if cnfmtp == TYPE_ARRAY:
+					pass
+				elif cnfmtp == TYPE_STRING:
+					confirmed = [confirmed]
+				else:
+					confirmed = []
 				var groups = equip.get("slot_groups",{})
 				var alignment = groups.get("alignment", "")
 				var tags = groups.get("tags", "")
@@ -183,7 +190,7 @@ func add_equipment():
 func add_equipment_to_slot(panel: String, equipment: Dictionary):
 	var parent = get_node(panel).get_node("VBoxContainer")
 	var itemTemplate = itemSlot.instance()
-	
+	itemTemplate.slot = get_node(panel).slotGroups.get("system_slot", "")
 	itemTemplate.numVal = equipment.get("num_val")
 	itemTemplate.system = equipment.get("system")
 	itemTemplate.capabilityLock = equipment.get("capability_lock")
@@ -234,9 +241,9 @@ func sort_equipment_assignment(tag, ptag):
 					else:
 						denied.append(eqp)
 				equipment = denied
-		slot_dictionary = {tag:{"type":type, "alignment":hardpoint_alignment, "equipment":equipment}}
+		slot_dictionary = {tag:{"type":type, "alignment":hardpoint_alignment, "equipment":equipment, "system_slot":ptag.get("system_slot", "")}}
 	else:
-		slot_dictionary = {tag:{"type":type}}
+		slot_dictionary = {tag:{"type":type, "system_slot":ptag.get("system_slot", "")}}
 	return slot_dictionary
 
 
