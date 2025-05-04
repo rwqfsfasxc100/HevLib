@@ -70,7 +70,8 @@ func _tree_entered():
 	add_slots()
 	add_slot_tags()
 	add_equipment()
-#	sort_slots()
+	if Settings.HevLib["equipment"]["do_sort_equipment_by_price"]:
+		sort_slots()
 
 func get_tags():
 	var slots = ModLoader.get_children()
@@ -255,21 +256,19 @@ func sort_slots():
 		for item in items:
 			nodePositions.append([item, item.get_index()])
 		var noFail = false
-		var index = 2
 		var maxIndex = items.size()
 		while noFail == false:
-			
-			var hasDetectedInconsistency = false
-			if index + 1 > maxIndex and not hasDetectedInconsistency:
-				noFail = true
-			
-			elif index + 1 > maxIndex and hasDetectedInconsistency:
-				pass
+			var doesFailThisLoop = false
+			for item in slot.get_child(0).get_children():
+				if item.get_index() < 2:
+					pass
+				else:
+					var A = item
+					var B = A.get_parent().get_child(A.get_index() - 1)
+					if A.price < B.price:
+						doesFailThisLoop = true
+						A.get_parent().move_child(A, B.get_index())
+			if doesFailThisLoop:
+				noFail = false
 			else:
-				var par = slot.get_node("VBoxContainer")
-				var entryA = par.get_child(index - 1)
-				var entryB = par.get_child(index)
-				if entryA.price > entryB.price:
-					hasDetectedInconsistency = true
-					par.move_child(entryB, index - 1)
-			index += 1
+				noFail = true

@@ -5,6 +5,9 @@ extends "res://Settings.gd"
 # These are default config values
 # Any value not set in the config file will generate the missing values exactly as these are
 var HevLib = {
+	"equipment":{
+		"do_sort_equipment_by_price":true,
+	},
 	"events":{
 		"disabled_events":[  ],
 	},
