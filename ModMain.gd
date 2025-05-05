@@ -35,8 +35,8 @@ func _ready():
 	if quit:
 		l("Readying")
 		SLOT_TAGS = tags
-	#	addEquipmentSlot({"system_slot":"slot.new", "slot_node_name":"NewSlot","slot_displayName":"SLOT_DATA_DRIVEN_SLOT_TEST"})
-	#	addEquipmentItem({"system":"SYSTEM_TEST", "slots":["NewSlot"]})
+#		addEquipmentSlot({"system_slot":"slot.new", "slot_node_name":"NewSlot","slot_displayName":"SLOT_DATA_DRIVEN_SLOT_TEST"})
+#		addEquipmentItem({"system":"SYSTEM_TEST", "slots":["NewSlot"]})
 		var WebTranslate = preload("res://HevLib/pointers/WebTranslate.gd")
 		WebTranslate.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]])
 		replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
