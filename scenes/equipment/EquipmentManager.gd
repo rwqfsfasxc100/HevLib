@@ -164,6 +164,7 @@ func add_equipment():
 				else:
 					confirmed = []
 				var groups = equip.get("slot_groups",{})
+				var desired_slot_type = groups.get("slot_type", "")
 				var alignment = groups.get("alignment", "")
 				var tags = groups.get("tags", "")
 				if groups.keys().size() > 0:
@@ -173,7 +174,19 @@ func add_equipment():
 						var type = sectTags.get("type","")
 						var sectAlignment = sectTags.get("alignment")
 						var sectEquipment = sectTags.get("equipment")
-						if type == "HARDPOINT":
+						if type == desired_slot_type and not desired_slot_type == "":
+							if type == "HARDPOINT":
+								var doesAlign = false
+								if alignment in alignments:
+									if alignment == sectAlignment:
+										doesAlign = true
+								else:
+									doesAlign = true
+								if doesAlign and tags in sectEquipment:
+									confirmed.append(sectName)
+							else:
+								confirmed.append(sectName)
+						elif type == "HARDPOINT":
 							var doesAlign = false
 							if alignment in alignments:
 								if alignment == sectAlignment:
