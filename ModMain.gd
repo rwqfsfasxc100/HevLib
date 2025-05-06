@@ -1,13 +1,11 @@
 extends Node
 
-const IS_STANDALONE_MOD = true
 const MOD_PRIORITY = INF
 const MOD_NAME = "HevLib"
 const MOD_VERSION = "1.4.4"
 var modPath:String = get_script().resource_path.get_base_dir() + "/"
 var _savedObjects := []
 var modConfig = {}
-var quit = true
 
 # Required for the addEquipmentSlot() function
 var ADD_EQUIPMENT_SLOTS = []
@@ -22,47 +20,41 @@ var EQUIPMENT_TAGS = {}
 var SLOT_TAGS = {}
 
 func _init(modLoader = ModLoader):
-	if not IS_STANDALONE_MOD:
-		checkIfStandalone()
-	if quit:
-		l("Initializing DLC")
-		loadDLC()
-		loadSettings()
-		replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
-	else:
-		l("Standalone HevLib found from an embedded version, skipping load")
+	l("Initializing DLC")
+	loadDLC()
+	loadSettings()
+	replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
 func _ready():
-	if quit:
-		l("Readying")
-		SLOT_TAGS = tags
-#		addEquipmentSlot({"system_slot":"slot.new", "slot_node_name":"NewSlot","slot_displayName":"SLOT_DATA_DRIVEN_SLOT_TEST"})
-#		addEquipmentItem({"system":"SYSTEM_TEST", "slots":["NewSlot"]})
-		var WebTranslate = preload("res://HevLib/pointers/WebTranslate.gd")
-		WebTranslate.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]])
-		replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
-		if ModLoader.is_debugged:
-			replaceScene("scenes/scene_replacements/TitleScreen.tscn", "res://TitleScreen.tscn")
-		replaceScene("scenes/equipment/Upgrades.tscn", "res://enceladus/Upgrades.tscn")
-		var NodeNew = Node.new()
-		NodeNew.set_script(load("res://HevLib/scripts/Variables.gd"))
-		NodeNew.name = "HevLib~Variables"
-		var Gamespace_Canvas = load("res://HevLib/ui/core_scenes/_HevLib_Gamespace_Canvas.tscn").instance()
-		var mouse = load("res://HevLib/scenes/scene_replacements/MouseLayer.tscn").instance()
-		var CRoot = get_tree().get_root()
-		CRoot.call_deferred("add_child",NodeNew)
-		CRoot.call_deferred("add_child",Gamespace_Canvas)
-		CRoot.call_deferred("add_child",mouse)
-		loadTranslationsFromCache()
-		replaceScene("scenes/scene_replacements/Game.tscn", "res://Game.tscn")
-		var dir = Directory.new()
-		dir.make_dir_recursive("user://cache/.HevLib_Cache/")
-		var file = File.new()
-		file.open("user://cache/.HevLib_Cache/library_documentation.json", File.WRITE)
-		file.store_string(load("res://HevLib/pointers/HevLib.gd").__get_library_functionality(true))
-		file.close()
-		var keybind_interrupt = load("res://HevLib/scenes/keymapping/keybind_interrupt.tscn").instance()
-		CRoot.call_deferred("add_child",keybind_interrupt)
-		l("Ready")
+	l("Readying")
+	SLOT_TAGS = tags
+#	addEquipmentSlot({"system_slot":"slot.new", "slot_node_name":"NewSlot","slot_displayName":"SLOT_DATA_DRIVEN_SLOT_TEST"})
+#	addEquipmentItem({"system":"SYSTEM_TEST", "slots":["NewSlot"]})
+	var WebTranslate = preload("res://HevLib/pointers/WebTranslate.gd")
+	WebTranslate.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]])
+	replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
+	if ModLoader.is_debugged:
+		replaceScene("scenes/scene_replacements/TitleScreen.tscn", "res://TitleScreen.tscn")
+	replaceScene("scenes/equipment/Upgrades.tscn", "res://enceladus/Upgrades.tscn")
+	var NodeNew = Node.new()
+	NodeNew.set_script(load("res://HevLib/scripts/Variables.gd"))
+	NodeNew.name = "HevLib~Variables"
+	var Gamespace_Canvas = load("res://HevLib/ui/core_scenes/_HevLib_Gamespace_Canvas.tscn").instance()
+	var mouse = load("res://HevLib/scenes/scene_replacements/MouseLayer.tscn").instance()
+	var CRoot = get_tree().get_root()
+	CRoot.call_deferred("add_child",NodeNew)
+	CRoot.call_deferred("add_child",Gamespace_Canvas)
+	CRoot.call_deferred("add_child",mouse)
+	loadTranslationsFromCache()
+	replaceScene("scenes/scene_replacements/Game.tscn", "res://Game.tscn")
+	var dir = Directory.new()
+	dir.make_dir_recursive("user://cache/.HevLib_Cache/")
+	var file = File.new()
+	file.open("user://cache/.HevLib_Cache/library_documentation.json", File.WRITE)
+	file.store_string(load("res://HevLib/pointers/HevLib.gd").__get_library_functionality(true))
+	file.close()
+	var keybind_interrupt = load("res://HevLib/scenes/keymapping/keybind_interrupt.tscn").instance()
+	CRoot.call_deferred("add_child",keybind_interrupt)
+	l("Ready")
 func loadTranslationsFromCache():
 	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd").new()
 	var WebTranslateCache = "user://cache/.HevLib_Cache/WebTranslate/"
@@ -153,33 +145,6 @@ func loadSettings():
 	l(MOD_NAME + ": Current settings: %s" % modConfig)
 	settings.queue_free()
 	l(MOD_NAME + ": Finished loading settings")
-func checkIfStandalone():
-	if not IS_STANDALONE_MOD:
-		var gameInstallDirectory = OS.get_executable_path().get_base_dir()
-		if OS.get_name() == "OSX":
-			gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
-		var modPathPrefix = gameInstallDirectory.plus_file("mods")
-		var dir = Directory.new()
-		var _modZipFiles = false
-		if dir.open(modPathPrefix) != OK:
-			l("Can't open mod folder %s." % modPathPrefix)
-			return 
-		if dir.list_dir_begin(true) != OK:
-			l("Can't read mod folder %s." % modPathPrefix)
-			return 
-		while true:
-			var fileName = dir.get_next()
-			if fileName == "":
-				break
-			if dir.current_is_dir():
-				continue
-			var modFSPath = modPathPrefix.plus_file(fileName)
-			if modFSPath.ends_with(".zip") and modFSPath.findn("hevlib"):
-				_modZipFiles = true
-				l("%s exists, panic!" % fileName)
-		dir.list_dir_end()
-		if _modZipFiles:
-			quit = false
 
 
 # Instances the equipment pointer for use with the proper functions
