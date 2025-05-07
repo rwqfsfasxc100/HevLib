@@ -134,9 +134,8 @@ func add_slot_tags():
 		select.slotGroups = dta
 		if select.needsVanillaEquipment:
 			var vanilla = Equipment.__add_vanilla_equipment(select.slotGroups, hardpoint_types, alignments, equipment_types, slot_types, hardpoint_defaults)
-			
-			
-			
+			for item in vanilla:
+				add_equipment_to_slot(slot, item)
 			select.needsVanillaEquipment = false
 	
 	
@@ -210,30 +209,30 @@ func add_equipment_to_slot(panel: String, equipment: Dictionary):
 	var parent = get_node(panel).get_node("VBoxContainer")
 	var itemTemplate = itemSlot.instance()
 	itemTemplate.slot = get_node(panel).slotGroups.get("system_slot", "")
-	itemTemplate.numVal = equipment.get("num_val")
-	itemTemplate.system = equipment.get("system")
-	itemTemplate.capabilityLock = equipment.get("capability_lock")
-	itemTemplate.nameOverride = equipment.get("name_override")
-	itemTemplate.description = equipment.get("description")
-	itemTemplate.manual = equipment.get("manual")
-	itemTemplate.specs = equipment.get("specs")
-	itemTemplate.price = equipment.get("price")
-	itemTemplate.testProtocol = equipment.get("test_protocol")
-	itemTemplate.default = equipment.get("default")
-	itemTemplate.control = equipment.get("control")
-	itemTemplate.storyFlag = equipment.get("story_flag")
-	itemTemplate.storyFlagMin = equipment.get("story_flag_min")
-	itemTemplate.storyFlagMax = equipment.get("story_flag_max")
-	itemTemplate.warnIfThermalBelow = equipment.get("warn_if_thermal_below")
-	itemTemplate.warnIfElectricBelow = equipment.get("warn_if_electric_below")
-	itemTemplate.stickerPriceFormat = equipment.get("sticker_price_format")
-	itemTemplate.stickerPriceMultiFormat = equipment.get("sticker_price_multi_format")
-	itemTemplate.installedColor = equipment.get("installed_color")
-	itemTemplate.disbledColor = equipment.get("disabled_color")
-	if equipment.get("name_override") == "":
-		itemTemplate.name = equipment.get("system")
+	itemTemplate.numVal = equipment.get("num_val", -1)
+	itemTemplate.system = equipment.get("system", "")
+	itemTemplate.capabilityLock = equipment.get("capability_lock", false)
+	itemTemplate.nameOverride = equipment.get("name_override", "")
+	itemTemplate.description = equipment.get("description", "")
+	itemTemplate.manual = equipment.get("manual", "")
+	itemTemplate.specs = equipment.get("specs", "")
+	itemTemplate.price = equipment.get("price", 0)
+	itemTemplate.testProtocol = equipment.get("test_protocol", "fire")
+	itemTemplate.default = equipment.get("default", false)
+	itemTemplate.control = equipment.get("control", "")
+	itemTemplate.storyFlag = equipment.get("story_flag", "")
+	itemTemplate.storyFlagMin = equipment.get("story_flag_min", -1)
+	itemTemplate.storyFlagMax = equipment.get("story_flag_max", -1)
+	itemTemplate.warnIfThermalBelow = equipment.get("warn_if_thermal_below", 0)
+	itemTemplate.warnIfElectricBelow = equipment.get("warn_if_electric_below", 0)
+	itemTemplate.stickerPriceFormat = equipment.get("sticker_price_format", "%s E$")
+	itemTemplate.stickerPriceMultiFormat = equipment.get("sticker_price_multi_format", "%s E$ (x%d)")
+	itemTemplate.installedColor = equipment.get("installed_color", Color(0.0, 1.0, 0.0, 1.0))
+	itemTemplate.disbledColor = equipment.get("disabled_color", Color(0.2, 0.2, 0.2, 1.0))
+	if equipment.get("name_override", "") == "":
+		itemTemplate.name = equipment.get("system", "MISSING_SYSTEM_NAME")
 	else:
-		itemTemplate.name = equipment.get("name_override")
+		itemTemplate.name = equipment.get("name_override", "MISSING_SYSTEM_NAME")
 	parent.add_child(itemTemplate)
 
 func sort_equipment_assignment(tag, ptag):
@@ -244,7 +243,7 @@ func sort_equipment_assignment(tag, ptag):
 		var hardpoint_alignment = ptag.get("hardpoint_alignment","ALIGNMENT_CENTER")
 		var overridesdef = ptag.get("equipment_overrides",[])
 		var overrides = overridesdef.duplicate(true)
-		var equipmentdef = hardpoint_defaults.get(hardpoint_type)
+		var equipmentdef = hardpoint_defaults.get(hardpoint_type, {})
 		var equipment = equipmentdef.duplicate(true)
 		if overrides.size() > 0:
 			var additives = overrides.get("additives",[])

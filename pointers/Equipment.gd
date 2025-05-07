@@ -26,6 +26,9 @@ var developer_hint = {
 	"__add_vanilla_equipment":[
 		"Internal function used to list vanilla equipment to be added to a slot based on a set of provided tags",
 		" -> 'tags' is an array of strings for applicable tags"
+	],
+	"__match_vanilla":[
+		"Internal function used to return an array of viable vanilla equipment options from a set of tags"
 	]
 }
 
@@ -111,14 +114,35 @@ static func __make_slot(slot_data: Dictionary) -> Node:
 	return slotTemplate
 
 static func __add_vanilla_equipment(tags: Dictionary, hardpoint_types: Array, alignments: Array, equipment_types: Array, slot_types: Array, hardpoint_defaults: Dictionary):
-	if not tags.get("type") in slot_types:
+	var type = tags.get("type")
+	if not type in slot_types:
 		return []
-	if tags.get("type") == "HARDPOINT":
-		var alignment = tags.get("alignment")
+	if type == "HARDPOINT":
+		var alignment = tags.get("alignment", "")
 		var equipment = tags.get("equipment")
-		
-		
-		
-		pass
+		var result = __match_vanilla(type, alignment, equipment, alignments)
+		return result
 	else:
-		pass
+		var alignment = ""
+		var equipment = tags.get("equipment")
+		var alignments3 = []
+		var result = __match_vanilla(type, alignment, equipment, alignments3)
+		return result
+
+static func __match_vanilla(type: String, align_to_match: String, desired_equipment: Array, list_of_alignments: Array):
+	var vanilla = load("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd").get_script_constant_map()
+	var matching = []
+	for item in vanilla:
+		var itemDict = vanilla.get(item)
+		var ps = itemDict.get("slot_groups")
+		var itemSlotType = ps.get("slot_type","")
+		if itemSlotType == type:
+			var itemAlign = ps.get("alignment", "")
+			var itemType = ps.get("tags","")
+			var alignmentMatches = true
+			if itemAlign in list_of_alignments and not itemAlign == "":
+				if not itemAlign == align_to_match:
+					alignmentMatches = false
+			if alignmentMatches and itemType in desired_equipment:
+				matching.append(itemDict)
+	return matching
