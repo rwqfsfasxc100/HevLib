@@ -8,6 +8,8 @@ export (bool) var invertNameLogic = false
 
 export (Dictionary) var slotGroups = {}
 
+export (bool) var needsVanillaEquipment = false
+
 func reexamine():	
 	var ship = CurrentGame.getPlayerShip()
 	.reexamine()

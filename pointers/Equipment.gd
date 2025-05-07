@@ -22,6 +22,10 @@ var developer_hint = {
 		" -> 'open_by_default' is a boolean to decide if the slot list is open when the equipment list is opened",
 		" -> 'limit_ships' is an array of ship names that limits the slot to. Courtesy of spaceDOTexe for it's implementation in IoE",
 		" -> 'invert_limit_logic' is a boolean to invert the previous array to avoid the ships in that list. Again courtesy of spaceDOTexe",
+	],
+	"__add_vanilla_equipment":[
+		"Internal function used to list vanilla equipment to be added to a slot based on a set of provided tags",
+		" -> 'tags' is an array of strings for applicable tags"
 	]
 }
 
@@ -84,13 +88,14 @@ static func __make_slot(slot_data: Dictionary) -> Node:
 	var openByDefault = slot_data.get("open_by_default", false)
 	var limitShips = slot_data.get("limit_ships", [])
 	var invertLimitLogic = slot_data.get("invert_limit_logic", false)
-	
+	var needsVanillaEquipment = slot_data.get("add_vanilla_equipment", true)
 	var slotTemplate = load("res://HevLib/scenes/equipment/hardpoints/WeaponSlotUpgradeTemplate.tscn").instance()
 	if hasNone:
 		var itemTemplate = load("res://enceladus/SystemShipUpgradeUI.tscn").instance()
 		itemTemplate.slot = "weaponSlot.main.type"
 		itemTemplate.system = "SYSTEM_NONE"
 		itemTemplate.default = true
+		itemTemplate.name = "None"
 		slotTemplate.get_node("VBoxContainer").add_child(itemTemplate)
 	slotGroups.merge({"system_slot":systemSlot}, false)
 	slotTemplate.slot = systemSlot
@@ -102,5 +107,18 @@ static func __make_slot(slot_data: Dictionary) -> Node:
 	slotTemplate.onlyForShipNames = limitShips
 	slotTemplate.invertNameLogic = invertLimitLogic
 	slotTemplate.slotGroups = slotGroups
+	slotTemplate.needsVanillaEquipment = needsVanillaEquipment
 	return slotTemplate
 
+static func __add_vanilla_equipment(tags: Dictionary, hardpoint_types: Array, alignments: Array, equipment_types: Array, slot_types: Array, hardpoint_defaults: Dictionary):
+	if not tags.get("type") in slot_types:
+		return []
+	if tags.get("type") == "HARDPOINT":
+		var alignment = tags.get("alignment")
+		var equipment = tags.get("equipment")
+		
+		
+		
+		pass
+	else:
+		pass

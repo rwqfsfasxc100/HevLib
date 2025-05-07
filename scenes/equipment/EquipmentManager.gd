@@ -77,11 +77,11 @@ func get_tags():
 	var slots = ModLoader.get_children()
 	for slot in slots:
 		var data = slot.get_property_list()
-		var nodes = null
+		var nodes = []
 		for item in data:
 			if item.get("name") == "EQUIPMENT_TAGS":
-				nodes = slot.get("EQUIPMENT_TAGS")
-		if not nodes == null:
+				nodes.append(slot.get("EQUIPMENT_TAGS"))
+		if not nodes == []:
 			for tag in nodes:
 				var slotTypes = tag.get("slot_types",[])
 				var equipmentItems = tag.get("equipment_types",[])
@@ -101,8 +101,7 @@ func get_tags():
 					for st in hardpointTypes:
 						hardpoint_types.append(st)
 				if hardpointDefaults.keys().size() > 0:
-					for st in hardpointDefaults:
-						hardpoint_defaults.merge(st)
+					hardpoint_defaults.merge(hardpointDefaults)
 
 func add_slots():
 	for slot in slots:
@@ -128,11 +127,17 @@ func add_slot_tags():
 				var ptag = nodes.get(tag)
 				var slot_dictionary = sort_equipment_assignment(tag, ptag)
 				slot_tag_pool.merge(slot_dictionary)
-	
+	var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 	for slot in slot_tag_pool:
 		var select = get_node(slot)
 		var dta = slot_tag_pool.get(slot)
 		select.slotGroups = dta
+		if select.needsVanillaEquipment:
+			var vanilla = Equipment.__add_vanilla_equipment(select.slotGroups, hardpoint_types, alignments, equipment_types, slot_types, hardpoint_defaults)
+			
+			
+			
+			select.needsVanillaEquipment = false
 	
 	
 	

@@ -27,8 +27,11 @@ func _init(modLoader = ModLoader):
 func _ready():
 	l("Readying")
 	SLOT_TAGS = tags
+	EQUIPMENT_TAGS = new_equipment_tags
 #	addEquipmentSlot({"system_slot":"slot.new", "slot_node_name":"NewSlot","slot_displayName":"SLOT_DATA_DRIVEN_SLOT_TEST"})
 #	addEquipmentItem({"system":"SYSTEM_TEST", "slots":["NewSlot"]})
+	addEquipmentSlot({"system_slot":"weaponSlot.turretLeft.type","slot_node_name":"TurretLeft","slot_displayName":"SLOT_TURRET_LEFT"})
+	addEquipmentSlot({"system_slot":"weaponSlot.turretRight.type","slot_node_name":"TurretRight","slot_displayName":"SLOT_TURRET_RIGHT"})
 	var WebTranslate = preload("res://HevLib/pointers/WebTranslate.gd")
 	WebTranslate.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]])
 	replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
@@ -197,4 +200,23 @@ var tags = {
 	"Hud":{"slot_type":"HUD","system_slot":"hud.type"},
 	"Lidar":{"slot_type":"LIDAR","system_slot":"lidar.type"},
 	"ReconDrone":{"slot_type":"RECON_DRONE","system_slot":"drone.scanner"},
+	
+	
+	"TurretLeft":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_TURRET","hardpoint_alignment":"ALIGNMENT_LEFT","system_slot":"weaponSlot.turretLeft.type"},
+	"TurretRight":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_TURRET","hardpoint_alignment":"ALIGNMENT_RIGHT","system_slot":"weaponSlot.turretRight.type"},
+}
+
+var new_equipment_tags = {
+	"slot_types":[
+		"SLOT_TURRETS"
+	],
+	"hardpoint_types":[
+		"HARDPOINT_TURRET"
+	],
+	"hardpoint_defaults":{
+		"HARDPOINT_TURRET":[
+			"EQUIPMENT_TURRETS",
+			"EQUIPMENT_NANODRONES"
+		]
+	}
 }
