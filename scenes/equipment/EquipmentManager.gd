@@ -35,6 +35,22 @@ var equipment_types = [
 	"EQUIPMENT_MINING_LASERS",
 	"EQUIPMENT_MICROWAVES",
 	"EQUIPMENT_SYNCHROTRONS",
+	
+	# Non-hardpoint equipment
+	"CONSUMABLE_MASS_DRIVER_AMMUNITION",
+	"CONSUMABLE_NANODRONES",
+	"CONSUMABLE_PROPELLANT",
+	"THRUSTER_STANDARD_REACTION_CONTROL_THRUSTERS",
+	"THRUSTER_STANDARD_MAIN_ENGINE",
+	"POWER_FISSION_RODS",
+	"POWER_ULTRACAPACITOR",
+	"POWER_FISSION_TURBINE",
+	"POWER_AUX_POWER_SLOT",
+	"CARGO_BAY",
+	"COMPUTER_AUTOPILOT",
+	"COMPUTER_HUD",
+	"SENSOR_LIDAR",
+	"SENSOR_RECON_DRONE",
 ]
 var slot_types = [
 # Slot type tags
@@ -62,6 +78,70 @@ var hardpoint_defaults = {
 	"HARDPOINT_DOCKING_BAY":["EQUIPMENT_CARGO_CONTAINER","EQUIPMENT_MINING_COMPANION","EQUIPMENT_TURRETS","EQUIPMENT_NANODRONES"],
 	"HARDPOINT_DRONE_POINT":["EQUIPMENT_NANODRONES"],
 }
+
+var slot_defaults = {
+	"MASS_DRIVER_AMMUNITION":["CONSUMABLE_MASS_DRIVER_AMMUNITION"],
+	"NANODRONE_STORAGE":["CONSUMABLE_NANODRONES"],
+	"PROPELLANT_TANK":["CONSUMABLE_PROPELLANT"],
+	"STANDARD_REACTION_CONTROL_THRUSTERS":["THRUSTER_STANDARD_REACTION_CONTROL_THRUSTERS"],
+	"STANDARD_MAIN_ENGINE":["THRUSTER_STANDARD_MAIN_ENGINE"],
+	"FISSION_RODS":["POWER_FISSION_RODS"],
+	"ULTRACAPACITOR":["POWER_ULTRACAPACITOR"],
+	"FISSION_TURBINE":["POWER_FISSION_TURBINE"],
+	"AUX_POWER_SLOT":["POWER_AUX_POWER_SLOT"],
+	"CARGO_BAY":["CARGO_BAY"],
+	"AUTOPILOT":["COMPUTER_AUTOPILOT"],
+	"HUD":["COMPUTER_HUD"],
+	"LIDAR":["SENSOR_LIDAR"],
+	"RECON_DRONE":["SENSOR_RECON_DRONE"],
+}
+
+# Slot defaults for vanilla equipment
+# This is formatted exactly like how it is done in a mod main, so can be used as reference
+
+const vanilla_equipment_defaults_for_reference = {
+	"MainWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_HIGH_STRESS","alignment":"ALIGNMENT_CENTER"},
+	"MainLowWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_SPINAL","alignment":"ALIGNMENT_CENTER"},
+	"LeftHighStress":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_HIGH_STRESS","alignment":"ALIGNMENT_LEFT"},
+	"RightHighStress":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_HIGH_STRESS","alignment":"ALIGNMENT_RIGHT"},
+	"LeftWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_LEFT"},
+	"MiddleLeftWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_LEFT","override_subtractive":["EQUIPMENT_BEACON","EQUIPMENT_CARGO_CONTAINER","EQUIPMENT_MINING_COMPANION","EQUIPMENT_IMPACT_ABSORBER"]},
+	"RightWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_RIGHT"},
+	"MiddleRightWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_RIGHT","override_subtractive":["EQUIPMENT_BEACON","EQUIPMENT_CARGO_CONTAINER","EQUIPMENT_MINING_COMPANION","EQUIPMENT_IMPACT_ABSORBER"]},
+	"LeftDroneSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DRONE_POINT","alignment":"ALIGNMENT_LEFT"},
+	"RightDroneSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DRONE_POINT","alignment":"ALIGNMENT_RIGHT"},
+	"LeftRearSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_LEFT","override_subtractive":["EQUIPMENT_MASS_DRIVERS","EQUIPMENT_IRON_THROWERS","EQUIPMENT_MINING_LASERS","EQUIPMENT_MICROWAVES","EQUIPMENT_SYNCHROTRONS","EQUIPMENT_BEACON"]},
+	"RightRearSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_RIGHT","override_subtractive":["EQUIPMENT_MASS_DRIVERS","EQUIPMENT_IRON_THROWERS","EQUIPMENT_MINING_LASERS","EQUIPMENT_MICROWAVES","EQUIPMENT_SYNCHROTRONS","EQUIPMENT_BEACON"]},
+	"LeftBay1":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_LEFT","override_additive":["EQUIPMENT_BEACON"]},
+	"RightBay1":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_RIGHT","override_additive":["EQUIPMENT_BEACON"]},
+	"LeftBay2":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_LEFT"},
+	"RightBay2":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_RIGHT"},
+	"LeftBay3":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_LEFT"},
+	"RightBay3":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_RIGHT"},
+	"AmmunitionDelivery":{"slot_type":"MASS_DRIVER_AMMUNITION"},
+	"DisposableDrones":{"slot_type":"NANODRONE_STORAGE"},
+	"Propellant":{"slot_type":"PROPELLANT_TANK"},
+	"Thrusters":{"slot_type":"STANDARD_REACTION_CONTROL_THRUSTERS"},
+	"Torches":{"slot_type":"STANDARD_MAIN_ENGINE"},
+	"Rods":{"slot_type":"FISSION_RODS"},
+	"Capacitor":{"slot_type":"ULTRACAPACITOR"},
+	"Turbine":{"slot_type":"FISSION_TURBINE"},
+	"AuxilaryPower":{"slot_type":"AUX_POWER_SLOT"},
+	"CargoBay":{"slot_type":"CARGO_BAY"},
+	"Autopilot":{"slot_type":"AUTOPILOT"},
+	"Hud":{"slot_type":"HUD"},
+	"Lidar":{"slot_type":"LIDAR"},
+	"ReconDrone":{"slot_type":"RECON_DRONE"},
+}
+
+
+
+
+
+
+
+
+# Actual code started
 
 var slots = ModLoader.get_children()
 
@@ -114,8 +194,11 @@ func add_slots():
 			for spt in newSlot:
 				add_child(spt)
 
+var slot_dictionary_temps = {}
+
 func add_slot_tags():
 	var slot_tag_pool = {}
+	slot_dictionary_temps.merge({"EquipmentManager.gd":vanilla_equipment_defaults_for_reference})
 	for slot in slots:
 		var data = slot.get_property_list()
 		var nodes = null
@@ -123,9 +206,32 @@ func add_slot_tags():
 			if item.get("name") == "SLOT_TAGS":
 				nodes = slot.get("SLOT_TAGS")
 		if not nodes == null:
-			for tag in nodes:
-				var ptag = nodes.get(tag)
-				var slot_dictionary = sort_equipment_assignment(tag, ptag)
+			if nodes.keys().size() >= 1:
+				slot_dictionary_temps.merge({slot.name.hash():nodes})
+	var master_slot_record = {}
+	for node in slot_dictionary_temps:
+		var nodes = slot_dictionary_temps.get(node)
+		var tags = slot_dictionary_temps.get(node)
+		for tag in tags:
+			var ptag = nodes.get(tag)
+			var slot_dictionary = sort_equipment_assignment(tag, ptag)
+			if slot_dictionary.keys().size() >= 1:
+				for try in slot_dictionary:
+					if try in master_slot_record:
+						var msrInstance = master_slot_record.get(try)
+						var msrEquipment = msrInstance.get("equipment",[])
+						var slot_dictionary_equipment = slot_dictionary.get(try).get("equipment",[])
+						if msrEquipment.size() >= 1 and slot_dictionary_equipment.size() >= 1:
+							for quip in slot_dictionary_equipment:
+								if quip in msrEquipment:
+									pass
+								else:
+									master_slot_record[try]["equipment"].append(quip)
+						elif msrEquipment.size() == 0 and slot_dictionary_equipment.size() >= 1:
+							master_slot_record[try]["equipment"] = slot_dictionary_equipment
+						
+					else:
+						master_slot_record.merge({try:slot_dictionary.get(try)})
 				slot_tag_pool.merge(slot_dictionary)
 	var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 	for slot in slot_tag_pool:
@@ -156,7 +262,7 @@ func add_equipment():
 		for item in data:
 			if item.get("name") == "ADD_EQUIPMENT_ITEMS":
 				newSlot = slot.get("ADD_EQUIPMENT_ITEMS")
-		if not newSlot == null:
+		if not newSlot == null and newSlot.size() >= 1:
 			for equip in newSlot:
 				var equipment = equip.get("equipment")
 				var confirmed = equip.get("slots",[])
@@ -176,42 +282,60 @@ func add_equipment():
 						var sectName = sect.name
 						var sectTags = sect.slotGroups
 						var type = sectTags.get("type","")
-						var sectAlignment = sectTags.get("alignment", "")
-						var sectEquipment = sectTags.get("equipment", [])
 						if type == desired_slot_type and not desired_slot_type == "":
-							if type == "HARDPOINT":
-								var doesAlign = false
-								if alignment in alignments:
-									if alignment == sectAlignment:
-										doesAlign = true
-								else:
-									doesAlign = true
-								if doesAlign and tags in sectEquipment:
-									confirmed.append(sectName)
-							elif not sectAlignment == "":
-								var doesAlign = false
-								if alignment in alignments:
-									if alignment == sectAlignment:
-										doesAlign = true
-								else:
-									doesAlign = true
-								if doesAlign and tags in sectEquipment:
-									confirmed.append(sectName)
-							else:
+							var does = check_equipment_validity(equip, sect, type)
+							if does:
 								confirmed.append(sectName)
-						elif type == "HARDPOINT":
-							var doesAlign = false
-							if alignment in alignments:
-								if alignment == sectAlignment:
-									doesAlign = true
+								Debug.l("Slot %s allowed the addition of %s" % [sectName, equipment.get("system","!!OOPS, someone forgot to provide a SYSTEM value to their equipment!! How was this allowed to be added??")])
 							else:
-								doesAlign = true
-							if doesAlign and tags in sectEquipment:
-								confirmed.append(sectName)
+								Debug.l("Slot %s did not permit the addition of %s" % [sectName, equipment.get("system","anything, actually. Someone forgot to provide a SYSTEM value to their equipment, and they wonder why it's not being added!! :P")])
 				for panel in confirmed:
 					add_equipment_to_slot(panel, equipment)
 
-
+func check_equipment_validity(raw_equipment_data, raw_slot_node, type):
+	var does_pass_check = false
+	
+	var slot_groups = raw_slot_node.slotGroups.duplicate()
+	var equipment_groups = raw_equipment_data.get("slot_groups").duplicate()
+	
+	if type == "HARDPOINT":
+		var passes_equipment_check = true
+		var slot_allowed_equipment = slot_groups.get("equipment",[])
+		var equipment_tag = equipment_groups.get("tags","")
+		if equipment_tag in slot_allowed_equipment:
+			pass
+		else:
+			passes_equipment_check = false
+		if passes_equipment_check:
+			var passes_alignment_check = true
+			var slot_alignment = slot_groups.get("alignment","")
+			var equipment_alignment = equipment_groups.get("alignment","")
+			if slot_alignment in alignments and equipment_alignment in alignments:
+				if slot_alignment == equipment_alignment:
+					pass
+				else:
+					passes_alignment_check = false
+			if passes_alignment_check:
+				does_pass_check = true
+			else:
+				return false
+	else:
+		does_pass_check = true
+	if does_pass_check:
+		var does_pass_restriction = true
+		var equipment_restriction = equipment_groups.get("restriction","")
+		var slot_restriction = slot_groups.get("restriction","")
+		if not equipment_restriction == "":
+			if equipment_restriction == slot_restriction:
+				does_pass_restriction = true
+			else:
+				does_pass_restriction = false
+		if does_pass_restriction:
+			return true
+		else:
+			return false
+	else:
+		return false
 
 
 func add_equipment_to_slot(panel: String, equipment: Dictionary):
@@ -247,6 +371,7 @@ func add_equipment_to_slot(panel: String, equipment: Dictionary):
 func sort_equipment_assignment(tag, ptag):
 	var slot_dictionary = {}
 	var type = ptag.get("slot_type")
+	var restriction = ptag.get("restriction","")
 	if type == "HARDPOINT":
 		var hardpoint_type = ptag.get("hardpoint_type","HARDPOINT_HIGH_STRESS")
 		var hardpoint_alignment = ptag.get("hardpoint_alignment","ALIGNMENT_CENTER")
@@ -268,9 +393,9 @@ func sort_equipment_assignment(tag, ptag):
 					else:
 						denied.append(eqp)
 				equipment = denied
-		slot_dictionary = {tag:{"type":type, "alignment":hardpoint_alignment, "equipment":equipment, "system_slot":ptag.get("system_slot", "")}}
+		slot_dictionary = {tag:{"type":type, "alignment":hardpoint_alignment, "equipment":equipment, "system_slot":ptag.get("system_slot", ""), "restriction":restriction}}
 	else:
-		slot_dictionary = {tag:{"type":type, "system_slot":ptag.get("system_slot", "")}}
+		slot_dictionary = {tag:{"type":type, "system_slot":ptag.get("system_slot", ""), "restriction":restriction}}
 	return slot_dictionary
 
 
@@ -298,3 +423,5 @@ func sort_slots():
 				noFail = false
 			else:
 				noFail = true
+
+

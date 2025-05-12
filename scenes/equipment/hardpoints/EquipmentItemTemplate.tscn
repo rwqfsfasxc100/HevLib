@@ -1,0 +1,139 @@
+[gd_scene load_steps=11 format=2]
+
+[ext_resource path="res://menu/MenuTheme.tres" type="Theme" id=1]
+[ext_resource path="res://HevLib/scenes/equipment/hardpoints/EquipmentItemTemplate.gd" type="Script" id=2]
+[ext_resource path="res://enceladus/MatchSystemName.gd" type="Script" id=3]
+[ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=4]
+[ext_resource path="res://hud/TNTRL-theme.tres" type="Theme" id=5]
+[ext_resource path="res://enceladus/Upgrades/buy.png" type="Texture" id=6]
+[ext_resource path="res://enceladus/Warnings/ship-temp-low.png" type="Texture" id=7]
+[ext_resource path="res://enceladus/Warnings/ship-power.png" type="Texture" id=8]
+[ext_resource path="res://menu/sfx/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=9]
+[ext_resource path="res://enceladus/Flicker.tscn" type="PackedScene" id=10]
+
+[node name="SystemShipUpgradeUI" type="MarginContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = -2.32135
+margin_bottom = -2.32135
+size_flags_horizontal = 3
+theme = ExtResource( 1 )
+custom_constants/margin_right = 16
+script = ExtResource( 2 )
+
+[node name="HBox" type="HBoxContainer" parent="."]
+margin_right = 1264.0
+margin_bottom = 70.0
+size_flags_horizontal = 3
+size_flags_vertical = 0
+custom_constants/separation = 8
+
+[node name="System" type="Button" parent="HBox"]
+margin_right = 1014.0
+margin_bottom = 70.0
+size_flags_horizontal = 3
+flat = true
+clip_text = true
+align = 0
+script = ExtResource( 3 )
+
+[node name="SmoothScrollTo" parent="HBox/System" instance=ExtResource( 4 )]
+focusAt = NodePath("../../..")
+
+[node name="V" type="GridContainer" parent="HBox"]
+margin_left = 1022.0
+margin_right = 1176.0
+margin_bottom = 70.0
+size_flags_horizontal = 0
+theme = ExtResource( 5 )
+
+[node name="Price" type="Label" parent="HBox/V"]
+visible = false
+margin_right = 154.0
+margin_bottom = 14.0
+rect_min_size = Vector2( 96, 0 )
+size_flags_horizontal = 3
+text = "UPGRADE_PRICE"
+align = 2
+uppercase = true
+
+[node name="StickerPrice" type="Label" parent="HBox/V"]
+margin_right = 154.0
+margin_bottom = 14.0
+rect_min_size = Vector2( 96, 0 )
+size_flags_horizontal = 3
+text = "%s E$ (x%d)"
+align = 2
+
+[node name="Installed" type="Label" parent="HBox/V"]
+modulate = Color( 0, 2, 0, 1 )
+margin_top = 14.0
+margin_right = 154.0
+margin_bottom = 28.0
+size_flags_horizontal = 3
+text = "UPGRADE_INSTALLED"
+align = 2
+uppercase = true
+
+[node name="Replace" type="Label" parent="HBox/V"]
+modulate = Color( 2, 0.5, 0.5, 1 )
+margin_top = 28.0
+margin_right = 154.0
+margin_bottom = 42.0
+size_flags_horizontal = 3
+text = "UPGRADE_REPLACE_BUY"
+align = 2
+uppercase = true
+
+[node name="Refund" type="Label" parent="HBox/V"]
+modulate = Color( 0, 2, 0, 1 )
+margin_top = 42.0
+margin_right = 154.0
+margin_bottom = 56.0
+size_flags_horizontal = 3
+text = "UPGRADE_REPLACE_REFUND"
+align = 2
+uppercase = true
+
+[node name="NetPrice" type="Label" parent="HBox/V"]
+margin_top = 56.0
+margin_right = 154.0
+margin_bottom = 70.0
+size_flags_horizontal = 3
+text = "%s E$"
+align = 2
+uppercase = true
+
+[node name="Buy" type="Button" parent="HBox"]
+margin_left = 1184.0
+margin_right = 1264.0
+margin_bottom = 70.0
+hint_tooltip = "UPGRADE_BUY"
+disabled = true
+icon = ExtResource( 6 )
+flat = true
+
+[node name="SmoothScrollTo" parent="HBox/Buy" instance=ExtResource( 4 )]
+focusAt = NodePath("../../..")
+
+[node name="Heat" type="Sprite" parent="HBox/Buy"]
+modulate = Color( 2, 1, 1, 1 )
+position = Vector2( 14, 24 )
+scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 7 )
+
+[node name="Power" type="Sprite" parent="HBox/Buy"]
+modulate = Color( 2, 1, 1, 1 )
+position = Vector2( 70, 24 )
+scale = Vector2( 0.5, 0.5 )
+texture = ExtResource( 8 )
+
+[node name="PlaySoundsOnTheseButtons" parent="HBox" instance=ExtResource( 9 )]
+
+[node name="Flicker" parent="." instance=ExtResource( 10 )]
+
+[connection signal="visibility_changed" from="." to="." method="_on_SystemShipUpgradeUI_visibility_changed"]
+[connection signal="focus_entered" from="HBox/System" to="." method="_on_System_focus_entered"]
+[connection signal="pressed" from="HBox/System" to="." method="_on_System_pressed"]
+[connection signal="focus_entered" from="HBox/Buy" to="." method="_on_Buy_focus_entered"]
+[connection signal="pressed" from="HBox/Buy" to="." method="_on_Buy_pressed"]
