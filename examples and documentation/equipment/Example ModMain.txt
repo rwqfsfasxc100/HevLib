@@ -1,0 +1,119 @@
+extends Node # A generic type that the mod main is added to the scene tree with
+
+var ADD_EQUIPMENT_ITEMS = [] # Variable detected by HevLib to add equipment. Any properly added item will be added to slots via the set values
+
+var ADD_EQUIPMENT_SLOTS = [] # Variable detected by HevLib to add slots. 
+
+var EQUIPMENT_TAGS := {} # Variable detected by HevLib to add data to the tagging system.
+
+var SLOT_TAGS := {} # Variable detected by HevLib to add extra data to slots.
+
+var equipment_example = { # Creating the variable used as the input for the addEquipment function.
+	"num_val":-1,
+	"system":"SYSTEM_PDT",
+	"capability_lock":false,
+	"name_override":"SYSTEM_PDT",
+	"description":"SYSTEM_PDT_DESC",
+	"manual":"SYSTEM_PDT_MANUAL",
+	"specs":"SYSTEM_PDT_SPECS",
+	"price":135000,
+	"test_protocol":"pdt",
+	"default":false,
+	"control":"ship_weapon_fire",
+	"story_flag":"hardware.nakamura",
+	"story_flag_min":5,
+	"story_flag_max":-1,
+	"warn_if_thermal_below":0,
+	"warn_if_electric_below":100,
+	"sticker_price_format":"%s E$",
+	"sticker_price_multi_format":"%s E$ (x%d)",
+	"installed_color":Color(0.0,1.0,0.0,1.0),
+	"disabled_color":Color(0.2,0.2,0.2,1.0),
+	"slots":["MainWeaponSlot","MainLowWeaponSlot"],
+	"alignment":"ALIGNMENT_CENTER",
+	"slot_type":"HARDPOINT",
+	"restriction":""
+}
+
+var slot_example = {
+	"system_slot":"weaponSlot.newHardpoint.type",
+	"slot_node_name":"NewHardpoint",
+	"slot_display_name":"SLOT_NEW_HARDPOINT",
+	"always_display":false,
+	"has_none":true,
+	"restrict_type":"",
+	"open_by_default":false,
+	"limit_ships":[],
+	"invert_limit_logic":false,
+	"add_vanilla_equipment":true,
+	"slot_type":"HARDPOINT",
+	"hardpoint_type":"HARDPOINT_NEW",
+	"alignment":"ALIGNMENT_CENTER",
+	"restriction":"",
+	"override_additive":[],
+	"override_subtractive":[]
+}
+
+var equipment_tags_example = { # Creating the variable used for the EQUIPMENT_TAGS variable.
+	 "slot_types":[
+		"SLOT_EXAMPLE_TYPE"
+	],
+	"equipment_types":[
+		"EQUIPMENT_EXAMPLE"
+	],
+	"alignments":[
+		"ALIGNMENT_REAR"
+	],
+	"hardpoint_types":[
+		"HARDPOINT_EXAMPLE"
+	],
+	"slot_defaults":{
+		"HARDPOINT_EXAMPLE":[
+			"EQUIPMENT_TURRETS",
+			"EQUIPMENT_NANODRONES"
+		],
+		"SLOT_EXAMPLE_TYPE":[
+			"EQUIPMENT_EXAMPLE"
+		]
+	}
+}
+
+var slot_tags_example = {
+	"RightRearSlot":{
+		"slot_type":"HARDPOINT",
+		"hardpoint_type":"HARDPOINT_LOW_STRESS",
+		"alignment":"ALIGNMENT_RIGHT",
+		"override_subtractive":["EQUIPMENT_MASS_DRIVERS","EQUIPMENT_IRON_THROWERS","EQUIPMENT_MINING_LASERS","EQUIPMENT_MICROWAVES","EQUIPMENT_SYNCHROTRONS","EQUIPMENT_BEACON"]
+	},
+	"LeftBay1":{
+		"slot_type":"HARDPOINT",
+		"hardpoint_type":"HARDPOINT_DOCKING_BAY",
+		"alignment":"ALIGNMENT_LEFT",
+		"override_additive":["EQUIPMENT_BEACON"]
+	}
+}
+
+
+# Instances the equipment pointer for use with addEquipment. 
+# Adding it here means it won't need to be loaded multiple times
+# This saves on both loading speed and on memory usage 
+var Equipment = preload("res://HevLib/pointers/Equipment.gd")
+
+func addSlot(slot_dictionary):
+	var slot = Equipment.__make_slot(slot_dictionary)
+	ADD_EQUIPMENT_SLOTS.append(slot)
+
+# Helper function to make the adding of multiple equipment items more streamlined
+func addEquipment(equipment_dictionary):
+	var item = Equipment.__make_equipment(equipment_dictionary)
+	ADD_EQUIPMENT_ITEMS.append(item)
+# Function that is run on the script's initialization, where the data will be added
+func _init():
+	# Runs the addEquipment function with the equipment example dictionary, which if done correctly will add the equipment
+	addEquipment(equipment_example)
+	# Runs the addSlot function with the slot example dictionary, which if done correctly will add a new slot
+	addEquipment(slot_example)
+	# Sets the EQUIPMENT_TAGS variable to the example dictionary
+	EQUIPMENT_TAGS = equipment_tags_example
+	# Sets the SLOT_TAGS variable to the example dictionary
+	SLOT_TAGS = slot_tags_example
