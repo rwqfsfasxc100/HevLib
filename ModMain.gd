@@ -35,7 +35,8 @@ func _ready():
 #	addEquipmentSlot({"system_slot":"weaponSlot.turretLeft.type","slot_node_name":"TurretLeft","slot_display_name":"SLOT_TURRET_LEFT"})
 #	addEquipmentSlot({"system_slot":"weaponSlot.turretRight.type","slot_node_name":"TurretRight","slot_display_name":"SLOT_TURRET_RIGHT"})
 #	SLOT_TAGS.merge(new_tags)
-	
+	installScriptExtension("scenes/equipment/UpgradeGroup.gd")
+	installScriptExtension("scenes/equipment/hardpoints/EquipmentItemTemplate.gd")
 	var WebTranslate = preload("res://HevLib/pointers/WebTranslate.gd")
 	WebTranslate.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]])
 	replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
@@ -172,38 +173,38 @@ func addEquipmentItem(item_data: Dictionary):
 
 # Slot tags used for the default slots used as an example
 var tags = {
-	"MainWeaponSlot":{"type":"HARDPOINT","hardpoint_type":"HARDPOINT_HIGH_STRESS","hardpoint_alignment":"ALIGNMENT_CENTER","system_slot":"weaponSlot.main.type"},
-	"MainLowWeaponSlot":{"type":"HARDPOINT","hardpoint_type":"HARDPOINT_SPINAL","hardpoint_alignment":"ALIGNMENT_CENTER","system_slot":"weaponSlot.mainLow.type"},
-	"LeftHighStress":{"type":"HARDPOINT","hardpoint_type":"HARDPOINT_HIGH_STRESS","hardpoint_alignment":"ALIGNMENT_LEFT","system_slot":"weaponSlot.mainLeft.type"},
-	"RightHighStress":{"type":"HARDPOINT","hardpoint_type":"HARDPOINT_HIGH_STRESS","hardpoint_alignment":"ALIGNMENT_RIGHT","system_slot":"weaponSlot.mainRight.type"},
-	"LeftWeaponSlot":{"type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","hardpoint_alignment":"ALIGNMENT_LEFT","system_slot":"weaponSlot.left.type"},
-	"MiddleLeftWeaponSlot":{"type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","hardpoint_alignment":"ALIGNMENT_LEFT","equipment_overrides":{"subtractives":["EQUIPMENT_BEACON","EQUIPMENT_CARGO_CONTAINER","EQUIPMENT_MINING_COMPANION","EQUIPMENT_IMPACT_ABSORBER"]},"system_slot":"weaponSlot.middleLeft.type"},
-	"RightWeaponSlot":{"type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","hardpoint_alignment":"ALIGNMENT_RIGHT","system_slot":"weaponSlot.right.type"},
-	"MiddleRightWeaponSlot":{"type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","hardpoint_alignment":"ALIGNMENT_RIGHT","equipment_overrides":{"subtractives":["EQUIPMENT_BEACON","EQUIPMENT_CARGO_CONTAINER","EQUIPMENT_MINING_COMPANION","EQUIPMENT_IMPACT_ABSORBER"]},"system_slot":"weaponSlot.middleRight.type"},
-	"LeftDroneSlot":{"type":"HARDPOINT","hardpoint_type":"HARDPOINT_DRONE_POINT","hardpoint_alignment":"ALIGNMENT_LEFT","system_slot":"weaponSlot.leftDrone.type"},
-	"RightDroneSlot":{"type":"HARDPOINT","hardpoint_type":"HARDPOINT_DRONE_POINT","hardpoint_alignment":"ALIGNMENT_RIGHT","system_slot":"weaponSlot.rightDrone.type"},
-	"LeftRearSlot":{"type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","hardpoint_alignment":"ALIGNMENT_LEFT","equipment_overrides":{"subtractives":["EQUIPMENT_MASS_DRIVERS","EQUIPMENT_IRON_THROWERS","EQUIPMENT_MINING_LASERS","EQUIPMENT_MICROWAVES","EQUIPMENT_SYNCHROTRONS","EQUIPMENT_BEACON"]},"system_slot":"weaponSlot.leftBack.type"},
-	"RightRearSlot":{"type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","hardpoint_alignment":"ALIGNMENT_RIGHT","equipment_overrides":{"subtractives":["EQUIPMENT_MASS_DRIVERS","EQUIPMENT_IRON_THROWERS","EQUIPMENT_MINING_LASERS","EQUIPMENT_MICROWAVES","EQUIPMENT_SYNCHROTRONS","EQUIPMENT_BEACON"]},"system_slot":"weaponSlot.rightBack.type"},
-	"LeftBay1":{"type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","hardpoint_alignment":"ALIGNMENT_LEFT","equipment_overrides":{"additives":["EQUIPMENT_BEACON"]},"system_slot":"weaponSlot.leftBay1.type"},
-	"RightBay1":{"type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","hardpoint_alignment":"ALIGNMENT_RIGHT","equipment_overrides":{"additives":["EQUIPMENT_BEACON"]},"system_slot":"weaponSlot.rightBay1.type"},
-	"LeftBay2":{"type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","hardpoint_alignment":"ALIGNMENT_LEFT","system_slot":"weaponSlot.leftBay2.type"},
-	"RightBay2":{"type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","hardpoint_alignment":"ALIGNMENT_RIGHT","system_slot":"weaponSlot.rightBay2.type"},
-	"LeftBay3":{"type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","hardpoint_alignment":"ALIGNMENT_LEFT","system_slot":"weaponSlot.leftBay3.type"},
-	"RightBay3":{"type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","hardpoint_alignment":"ALIGNMENT_RIGHT","system_slot":"weaponSlot.rightBay3.type"},
-	"AmmunitionDelivery":{"type":"MASS_DRIVER_AMMUNITION","system_slot":"ammo.capacity"},
-	"DisposableDrones":{"type":"NANODRONE_STORAGE","system_slot":"drones.capacity"},
-	"Propellant":{"type":"PROPELLANT_TANK","system_slot":"fuel.capacity"},
-	"Thrusters":{"type":"STANDARD_REACTION_CONTROL_THRUSTERS","system_slot":"propulsion.rcs"},
-	"Torches":{"type":"STANDARD_MAIN_ENGINE","system_slot":"propulsion.main"},
-	"Rods":{"type":"FISSION_RODS","system_slot":"reactor.power"},
-	"Capacitor":{"type":"ULTRACAPACITOR","system_slot":"capacitor.capacity"},
-	"Turbine":{"type":"FISSION_TURBINE","system_slot":"turbine.power"},
-	"AuxilaryPower":{"type":"AUX_POWER_SLOT","system_slot":"aux.power"},
-	"CargoBay":{"type":"CARGO_BAY","system_slot":"cargo.equipment"},
-	"Autopilot":{"type":"AUTOPILOT","system_slot":"autopilot.type"},
-	"Hud":{"type":"HUD","system_slot":"hud.type"},
-	"Lidar":{"type":"LIDAR","system_slot":"lidar.type"},
-	"ReconDrone":{"type":"RECON_DRONE","system_slot":"drone.scanner"},
+	"MainWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_HIGH_STRESS","alignment":"ALIGNMENT_CENTER"},
+	"MainLowWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_SPINAL","alignment":"ALIGNMENT_CENTER"},
+	"LeftHighStress":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_HIGH_STRESS","alignment":"ALIGNMENT_LEFT"},
+	"RightHighStress":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_HIGH_STRESS","alignment":"ALIGNMENT_RIGHT"},
+	"LeftWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_LEFT"},
+	"MiddleLeftWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_LEFT","override_subtractive":["EQUIPMENT_BEACON","EQUIPMENT_CARGO_CONTAINER","EQUIPMENT_MINING_COMPANION","EQUIPMENT_IMPACT_ABSORBER"]},
+	"RightWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_RIGHT"},
+	"MiddleRightWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_RIGHT","override_subtractive":["EQUIPMENT_BEACON","EQUIPMENT_CARGO_CONTAINER","EQUIPMENT_MINING_COMPANION","EQUIPMENT_IMPACT_ABSORBER"]},
+	"LeftDroneSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DRONE_POINT","alignment":"ALIGNMENT_LEFT"},
+	"RightDroneSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DRONE_POINT","alignment":"ALIGNMENT_RIGHT"},
+	"LeftRearSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_LEFT","override_subtractive":["EQUIPMENT_MASS_DRIVERS","EQUIPMENT_IRON_THROWERS","EQUIPMENT_MINING_LASERS","EQUIPMENT_MICROWAVES","EQUIPMENT_SYNCHROTRONS","EQUIPMENT_BEACON"]},
+	"RightRearSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_RIGHT","override_subtractive":["EQUIPMENT_MASS_DRIVERS","EQUIPMENT_IRON_THROWERS","EQUIPMENT_MINING_LASERS","EQUIPMENT_MICROWAVES","EQUIPMENT_SYNCHROTRONS","EQUIPMENT_BEACON"]},
+	"LeftBay1":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_LEFT","override_additive":["EQUIPMENT_BEACON"]},
+	"RightBay1":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_RIGHT","override_additive":["EQUIPMENT_BEACON"]},
+	"LeftBay2":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_LEFT"},
+	"RightBay2":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_RIGHT"},
+	"LeftBay3":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_LEFT"},
+	"RightBay3":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_RIGHT"},
+	"AmmunitionDelivery":{"slot_type":"MASS_DRIVER_AMMUNITION"},
+	"DisposableDrones":{"slot_type":"NANODRONE_STORAGE"},
+	"Propellant":{"slot_type":"PROPELLANT_TANK"},
+	"Thrusters":{"slot_type":"STANDARD_REACTION_CONTROL_THRUSTERS"},
+	"Torches":{"slot_type":"STANDARD_MAIN_ENGINE"},
+	"Rods":{"slot_type":"FISSION_RODS"},
+	"Capacitor":{"slot_type":"ULTRACAPACITOR"},
+	"Turbine":{"slot_type":"FISSION_TURBINE"},
+	"AuxilaryPower":{"slot_type":"AUX_POWER_SLOT"},
+	"CargoBay":{"slot_type":"CARGO_BAY"},
+	"Autopilot":{"slot_type":"AUTOPILOT"},
+	"Hud":{"slot_type":"HUD"},
+	"Lidar":{"slot_type":"LIDAR"},
+	"ReconDrone":{"slot_type":"RECON_DRONE"},
 }
 
 var new_tags = {

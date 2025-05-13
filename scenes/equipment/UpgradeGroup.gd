@@ -7,7 +7,7 @@ export (Array, String) var onlyForShipNames
 export (bool) var invertNameLogic = false
 
 # Variables used to tag equipment
-export (bool) var needsVanillaEquipment = true
+export (bool) var needsVanillaEquipment = false
 export (String) var slot_type = "HARDPOINT"
 export (String) var hardpoint_type = ""
 export (String) var alignment = ""
