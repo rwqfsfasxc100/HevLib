@@ -27,6 +27,7 @@ func _init(modLoader = ModLoader):
 	l("Initializing DLC")
 	loadDLC()
 	loadSettings()
+	installScriptExtension("events/TheRing.gd")
 	replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
 func _ready():
 	l("Readying")
