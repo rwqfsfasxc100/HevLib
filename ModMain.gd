@@ -2,10 +2,10 @@ extends Node
 
 const MOD_PRIORITY = INF
 const MOD_NAME = "HevLib"
-const MOD_VERSION = "1.5.0"
+const MOD_VERSION = "1.5.1"
 const MOD_VERSION_MAJOR = 1
 const MOD_VERSION_MINOR = 5
-const MOD_VERSION_BUGFIX = 0
+const MOD_VERSION_BUGFIX = 1
 const MOD_VERSION_METADATA = ""
 var modPath:String = get_script().resource_path.get_base_dir() + "/"
 var _savedObjects := []
