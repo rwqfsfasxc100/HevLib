@@ -58,7 +58,7 @@ static func __make_equipment(equipment_data: Dictionary) -> Node:
 	var equipment_type = equipment_data.get("equipment_type","")
 	var slot_type = equipment_data.get("slot_type","")
 	var restriction = equipment_data.get("restriction","")
-	var equip_node = load("res://HevLib/scenes/equipment/hardpoints/EquipmentItemTemplate.tscn").instance()
+	var equip_node = preload("res://HevLib/scenes/equipment/hardpoints/EquipmentItemTemplate.tscn").instance()
 	equip_node.numVal = num_val
 	equip_node.system = system
 	equip_node.name = system
@@ -97,7 +97,7 @@ static func __make_slot(slot_data: Dictionary) -> Node:
 	var openByDefault = slot_data.get("open_by_default", false)
 	var limitShips = slot_data.get("limit_ships", [])
 	var invertLimitLogic = slot_data.get("invert_limit_logic", false)
-	var needsVanillaEquipment = slot_data.get("add_vanilla_equipment", true)
+	var add_vanilla_equipment = slot_data.get("add_vanilla_equipment", true)
 	var slotTemplate = load("res://HevLib/scenes/equipment/hardpoints/WeaponSlotUpgradeTemplate.tscn").instance()
 	var slot_type = slot_data.get("slot_type","HARDPOINT")
 	var hardpoint_type = slot_data.get("hardpoint_type","")
@@ -118,9 +118,9 @@ static func __make_slot(slot_data: Dictionary) -> Node:
 	slotTemplate.always = alwaysDisplay
 	slotTemplate.restrictType = restrictType
 	slotTemplate.openByDefault = openByDefault
-	slotTemplate.onlyForShipNames = limitShips
-	slotTemplate.invertNameLogic = invertLimitLogic
-	slotTemplate.needsVanillaEquipment = needsVanillaEquipment
+	slotTemplate.limit_ships = limitShips
+	slotTemplate.invert_limit_logic = invertLimitLogic
+	slotTemplate.add_vanilla_equipment = add_vanilla_equipment
 	slotTemplate.slot_type = slot_type
 	slotTemplate.hardpoint_type = hardpoint_type
 	slotTemplate.alignment = alignment
