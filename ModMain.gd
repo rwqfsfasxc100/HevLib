@@ -10,19 +10,6 @@ const MOD_VERSION_METADATA = ""
 var modPath:String = get_script().resource_path.get_base_dir() + "/"
 var _savedObjects := []
 var modConfig = {}
-
-# Required for the addEquipmentSlot() function
-var ADD_EQUIPMENT_SLOTS = []
-
-# Required for the addEquipmentItem() function
-var ADD_EQUIPMENT_ITEMS = []
-
-# Required if any additional tags are going to be added. Only additive tags should be placed here.
-var EQUIPMENT_TAGS = {}
-
-# Additional tags that you'd like to add to any slots, pre-existing or new
-var SLOT_TAGS = {}
-
 func _init(modLoader = ModLoader):
 	l("Initializing DLC")
 	loadDLC()
@@ -31,15 +18,6 @@ func _init(modLoader = ModLoader):
 	replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
 func _ready():
 	l("Readying")
-	SLOT_TAGS = tags
-	
-	# Commented out examples for adding equipment and slots 
-#	addEquipmentSlot({"system_slot":"slot.new", "slot_node_name":"NewSlot","slot_display_name":"SLOT_DATA_DRIVEN_SLOT_TEST"})
-#	addEquipmentItem({"system":"SYSTEM_TEST", "slots":["NewSlot"]})
-#	EQUIPMENT_TAGS = new_equipment_tags
-#	addEquipmentSlot({"system_slot":"weaponSlot.turretLeft.type","slot_node_name":"TurretLeft","slot_display_name":"SLOT_TURRET_LEFT"})
-#	addEquipmentSlot({"system_slot":"weaponSlot.turretRight.type","slot_node_name":"TurretRight","slot_display_name":"SLOT_TURRET_RIGHT"})
-#	SLOT_TAGS.merge(new_tags)
 	installScriptExtension("scenes/equipment/UpgradeGroup.gd")
 	installScriptExtension("scenes/equipment/hardpoints/EquipmentItemTemplate.gd")
 	var WebTranslate = preload("res://HevLib/pointers/WebTranslate.gd")
@@ -158,76 +136,3 @@ func loadSettings():
 	l(MOD_NAME + ": Current settings: %s" % modConfig)
 	settings.queue_free()
 	l(MOD_NAME + ": Finished loading settings")
-
-
-# Instances the equipment pointer for use with the proper functions
-var Equipment = preload("res://HevLib/pointers/Equipment.gd")
-
-# Adds new equipment slots from an input dictionary
-# Requires the ADD_EQUIPMENT_SLOTS variable to be set up
-# Check the documentation JSON for usage
-func addEquipmentSlot(slot_data: Dictionary):
-	var slot = Equipment.__make_slot(slot_data)
-	ADD_EQUIPMENT_SLOTS.append(slot)
-# Adds new equipment items from an input dictionary
-# Requires the ADD_EQUIPMENT_ITEMS variable to be set up
-# Check the documentation JSON for usage
-func addEquipmentItem(item_data: Dictionary):
-	var eqp = Equipment.__make_equipment(item_data)
-	ADD_EQUIPMENT_ITEMS.append(eqp)
-
-# Slot tags used for the default slots used as an example
-var tags = {
-	"MainWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_HIGH_STRESS","alignment":"ALIGNMENT_CENTER"},
-	"MainLowWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_SPINAL","alignment":"ALIGNMENT_CENTER"},
-	"LeftHighStress":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_HIGH_STRESS","alignment":"ALIGNMENT_LEFT"},
-	"RightHighStress":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_HIGH_STRESS","alignment":"ALIGNMENT_RIGHT"},
-	"LeftWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_LEFT"},
-	"MiddleLeftWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_LEFT","override_subtractive":["EQUIPMENT_BEACON","EQUIPMENT_CARGO_CONTAINER","EQUIPMENT_MINING_COMPANION","EQUIPMENT_IMPACT_ABSORBER"]},
-	"RightWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_RIGHT"},
-	"MiddleRightWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_RIGHT","override_subtractive":["EQUIPMENT_BEACON","EQUIPMENT_CARGO_CONTAINER","EQUIPMENT_MINING_COMPANION","EQUIPMENT_IMPACT_ABSORBER"]},
-	"LeftDroneSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DRONE_POINT","alignment":"ALIGNMENT_LEFT"},
-	"RightDroneSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DRONE_POINT","alignment":"ALIGNMENT_RIGHT"},
-	"LeftRearSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_LEFT","override_subtractive":["EQUIPMENT_MASS_DRIVERS","EQUIPMENT_IRON_THROWERS","EQUIPMENT_MINING_LASERS","EQUIPMENT_MICROWAVES","EQUIPMENT_SYNCHROTRONS","EQUIPMENT_BEACON"]},
-	"RightRearSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_RIGHT","override_subtractive":["EQUIPMENT_MASS_DRIVERS","EQUIPMENT_IRON_THROWERS","EQUIPMENT_MINING_LASERS","EQUIPMENT_MICROWAVES","EQUIPMENT_SYNCHROTRONS","EQUIPMENT_BEACON"]},
-	"LeftBay1":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_LEFT","override_additive":["EQUIPMENT_BEACON"]},
-	"RightBay1":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_RIGHT","override_additive":["EQUIPMENT_BEACON"]},
-	"LeftBay2":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_LEFT"},
-	"RightBay2":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_RIGHT"},
-	"LeftBay3":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_LEFT"},
-	"RightBay3":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_RIGHT"},
-	"AmmunitionDelivery":{"slot_type":"MASS_DRIVER_AMMUNITION"},
-	"DisposableDrones":{"slot_type":"NANODRONE_STORAGE"},
-	"Propellant":{"slot_type":"PROPELLANT_TANK"},
-	"Thrusters":{"slot_type":"STANDARD_REACTION_CONTROL_THRUSTERS"},
-	"Torches":{"slot_type":"STANDARD_MAIN_ENGINE"},
-	"Rods":{"slot_type":"FISSION_RODS"},
-	"Capacitor":{"slot_type":"ULTRACAPACITOR"},
-	"Turbine":{"slot_type":"FISSION_TURBINE"},
-	"AuxilaryPower":{"slot_type":"AUX_POWER_SLOT"},
-	"CargoBay":{"slot_type":"CARGO_BAY"},
-	"Autopilot":{"slot_type":"AUTOPILOT"},
-	"Hud":{"slot_type":"HUD"},
-	"Lidar":{"slot_type":"LIDAR"},
-	"ReconDrone":{"slot_type":"RECON_DRONE"},
-}
-
-var new_tags = {
-	"TurretLeft":{"type":"HARDPOINT","hardpoint_type":"HARDPOINT_TURRET","hardpoint_alignment":"ALIGNMENT_LEFT","system_slot":"weaponSlot.turretLeft.type"},
-	"TurretRight":{"type":"HARDPOINT","hardpoint_type":"HARDPOINT_TURRET","hardpoint_alignment":"ALIGNMENT_RIGHT","system_slot":"weaponSlot.turretRight.type"},
-}
-
-var new_equipment_tags = {
-	"slot_types":[
-		"SLOT_TURRETS"
-	],
-	"hardpoint_types":[
-		"HARDPOINT_TURRET"
-	],
-	"hardpoint_defaults":{
-		"HARDPOINT_TURRET":[
-			"EQUIPMENT_TURRETS",
-			"EQUIPMENT_NANODRONES"
-		]
-	}
-}
