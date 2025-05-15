@@ -1,0 +1,38 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://enceladus/UpgradeGroup.gd" type="Script" id=1]
+[ext_resource path="res://menu/MenuUpgrades.tres" type="Theme" id=3]
+[ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=4]
+[ext_resource path="res://menu/sfx/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=5]
+[ext_resource path="res://enceladus/Upgrades/Preview.tscn" type="PackedScene" id=6]
+
+[node name="MainWeaponSlot" type="PanelContainer"]
+margin_right = 1258.0
+margin_bottom = 288.0
+theme = ExtResource( 3 )
+script = ExtResource( 1 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+margin_left = 16.0
+margin_top = 2.0
+margin_right = 1242.0
+margin_bottom = 286.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+margin_right = 1226.0
+margin_bottom = 51.0
+alignment = 2
+
+[node name="CheckButton" type="CheckButton" parent="VBoxContainer/HBoxContainer"]
+margin_right = 1226.0
+margin_bottom = 51.0
+size_flags_horizontal = 3
+text = "SLOT_MAIN"
+flat = true
+align = 2
+
+[node name="SmoothScrollTo" parent="VBoxContainer/HBoxContainer/CheckButton" instance=ExtResource( 4 )]
+
+[node name="PlaySoundsOnTheseButtons" parent="VBoxContainer/HBoxContainer/CheckButton" instance=ExtResource( 5 )]
+
+[node name="Preview" parent="VBoxContainer/HBoxContainer/CheckButton" instance=ExtResource( 6 )]

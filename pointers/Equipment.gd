@@ -58,7 +58,8 @@ static func __make_equipment(equipment_data: Dictionary) -> Node:
 	var equipment_type = equipment_data.get("equipment_type","")
 	var slot_type = equipment_data.get("slot_type","")
 	var restriction = equipment_data.get("restriction","")
-	var equip_node = preload("res://HevLib/scenes/equipment/hardpoints/EquipmentItemTemplate.tscn").instance()
+#	var equip_node = preload("res://HevLib/scenes/equipment/hardpoints/EquipmentItemTemplate.tscn").instance() # Old preload. Commented out because of possible bug with it
+	var equip_node = load("res://HevLib/scenes/equipment/hardpoints/unmodified/EquipmentItemTemplate.tscn").instance()
 	equip_node.numVal = num_val
 	equip_node.system = system
 	equip_node.name = system
@@ -98,7 +99,8 @@ static func __make_slot(slot_data: Dictionary) -> Node:
 	var limitShips = slot_data.get("limit_ships", [])
 	var invertLimitLogic = slot_data.get("invert_limit_logic", false)
 	var add_vanilla_equipment = slot_data.get("add_vanilla_equipment", true)
-	var slotTemplate = preload("res://HevLib/scenes/equipment/hardpoints/WeaponSlotUpgradeTemplate.tscn").instance()
+#	var slotTemplate = preload("res://HevLib/scenes/equipment/hardpoints/WeaponSlotUpgradeTemplate.tscn").instance() # Old preload. Commented out because of possible bug with it
+	var slotTemplate = load("res://HevLib/scenes/equipment/hardpoints/unmodified/WeaponSlotUpgradeTemplate.tscn").instance()
 	var slot_type = slot_data.get("slot_type","HARDPOINT")
 	var hardpoint_type = slot_data.get("hardpoint_type","")
 	var alignment = slot_data.get("alignment","")
@@ -106,7 +108,8 @@ static func __make_slot(slot_data: Dictionary) -> Node:
 	var override_additive = slot_data.get("override_additive",[])
 	var override_subtractive = slot_data.get("override_subtractive",[])
 	if hasNone:
-		var itemTemplate = load("res://HevLib/scenes/equipment/hardpoints/EquipmentItemTemplate.tscn").instance()
+#		var itemTemplate = load("res://HevLib/scenes/equipment/hardpoints/EquipmentItemTemplate.tscn").instance() # Old load. Commented out because of possible bug with it
+		var itemTemplate = load("res://HevLib/scenes/equipment/hardpoints/unmodified/EquipmentItemTemplate.tscn").instance()
 		itemTemplate.slot = "weaponSlot.main.type"
 		itemTemplate.system = "SYSTEM_NONE"
 		itemTemplate.default = true

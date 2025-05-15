@@ -23,3 +23,13 @@ EVENTDRIVER_EVENT_SELECTOR|Event Selector
 HEVLIB_MISSING_DOCUMENTATION_1|!!!!! No documentation for this feature was provided!
 
 HEVLIB_MISSING_DOCUMENTATION_2|!!!!! Please bring this to my (__hev) attention ASAP, as documentation is key for libraries such as this one for proper maintenance!
+
+EQUIPMENT_DISPLAY_FETCHING_TAGS|Process %s of %s: Fetching tags from ModMain files
+
+EQUIPMENT_DISPLAY_ADDING_SLOTS|Process %s of %s: Adding equipment slots
+
+EQUIPMENT_DISPLAY_ADDING_SLOT_TAGS|Process %s of %s: Adding additional tags to equipment slots
+
+EQUIPMENT_DISPLAY_ADDDING_EQUIPMENT|Process %s of %s: Adding equipment to slots
+
+EQUIPMENT_DISPLAY_SORTING_EQUIPMENT|Process %s of %s: Sorting equipment in slots

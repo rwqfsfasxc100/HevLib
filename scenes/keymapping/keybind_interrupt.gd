@@ -21,7 +21,7 @@ func _process(delta):
 	inputDebug = Settings.HevLib["debug"]["input_debugger"]
 	var siblingCount = get_parent().get_child_count()
 	get_parent().move_child(self, siblingCount)
-	var InputDebugPanel = get_parent().get_node("_HevLib_Gamespace_Canvas/MarginContainer/DebugPanel/ScrollContainer/VBoxContainer/InputDebug")
+	var InputDebugPanel = get_parent().get_node("_HevLib_Gamespace_Canvas/MarginContainer/DebugPanel/ScrollContainer/MarginContainer/VBoxContainer/InputDebug")
 	InputDebugPanel.text = str(currentKeyEvents)
 	InputDebugPanel.visible = inputDebug
 		

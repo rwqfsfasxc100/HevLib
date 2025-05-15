@@ -133,7 +133,9 @@ const vanilla_equipment_defaults_for_reference = {
 
 
 
-
+var display_line_0 := ""
+var display_line_1 := ""
+var display_line_2 := ""
 
 
 
@@ -144,12 +146,22 @@ var slots = ModLoader.get_children()
 
 var vanilla_equipment = load("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd").get_script_constant_map()
 
+func _process(delta):
+	pass
+
 func _tree_entered():
+	var has = Settings.HevLib["equipment"]["do_sort_equipment_by_price"]
+	var does = 1 if has else 0
+	display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_FETCHING_TAGS") % [str(1), str(4+does)]
 	get_tags()
+	display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_ADDING_SLOTS") % [str(2), str(4+does)]
 	add_slots()
+	display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_ADDING_SLOT_TAGS") % [str(3), str(4+does)]
 	add_slot_tags()
+	display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_ADDDING_EQUIPMENT") % [str(4), str(4+does)]
 	add_equipment()
-	if Settings.HevLib["equipment"]["do_sort_equipment_by_price"]:
+	if has:
+		display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_SORTING_EQUIPMENT") % [str(5), str(4+does)]
 		sort_slots()
 
 func get_tags():
