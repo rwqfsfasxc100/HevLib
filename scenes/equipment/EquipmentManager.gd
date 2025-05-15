@@ -152,16 +152,16 @@ func _process(delta):
 func _tree_entered():
 	var has = Settings.HevLib["equipment"]["do_sort_equipment_by_price"]
 	var does = 1 if has else 0
-	display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_FETCHING_TAGS") % [str(1), str(4+does)]
+	display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_PROCESS_NUM") + " " + str(1) + " / " + str(4+does) + ": " + TranslationServer.translate("EQUIPMENT_DISPLAY_FETCHING_TAGS")
 	get_tags()
-	display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_ADDING_SLOTS") % [str(2), str(4+does)]
+	display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_PROCESS_NUM") + " " + str(1) + " / " + str(4+does) + ": " + TranslationServer.translate("EQUIPMENT_DISPLAY_ADDING_SLOTS")
 	add_slots()
-	display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_ADDING_SLOT_TAGS") % [str(3), str(4+does)]
+	display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_PROCESS_NUM") + " " + str(1) + " / " + str(4+does) + ": " + TranslationServer.translate("EQUIPMENT_DISPLAY_ADDING_SLOT_TAGS")
 	add_slot_tags()
-	display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_ADDDING_EQUIPMENT") % [str(4), str(4+does)]
+	display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_PROCESS_NUM") + " " + str(1) + " / " + str(4+does) + ": " + TranslationServer.translate("EQUIPMENT_DISPLAY_ADDDING_EQUIPMENT")
 	add_equipment()
 	if has:
-		display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_SORTING_EQUIPMENT") % [str(5), str(4+does)]
+		display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_PROCESS_NUM") + " " + str(1) + " / " + str(4+does) + ": " + TranslationServer.translate("EQUIPMENT_DISPLAY_SORTING_EQUIPMENT")
 		sort_slots()
 
 func get_tags():
@@ -179,30 +179,46 @@ func get_tags():
 				var hardpointTypes = tag.get("hardpoint_types",[])
 				var slotDefaults = tag.get("slot_defaults",{})
 				if slotTypes.size() > 0:
+					display_line_1 = TranslationServer.translate("EQUIPMENT_DISPLAY_FETCHING_SLOT_TYPES_IN") + " " + str(slot.name)
 					for st in slotTypes:
+						display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_ATTEMPT_ADD_OF_SLOT_TYPE") + " " + str(st)
 						if not st in slot_types:
+							display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_ADD_SLOT_TYPE") + " " + str(st)
 							slot_types.append(st)
 				if equipmentItems.size() > 0:
+					display_line_1 = TranslationServer.translate("EQUIPMENT_DISPLAY_FETCHING_EQUIPMENT_ITEMS_IN") + " " + str(slot.name)
 					for st in equipmentItems:
+						display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_ATTEMPT_ADD_OF_EQUIPMENT_ITEM") + " " + str(st)
 						if not st in equipment_types:
+							display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_ADD_EQUIPMENT_ITEM") + " " + str(st)
 							equipment_types.append(st)
 				if align.size() > 0:
+					display_line_1 = TranslationServer.translate("EQUIPMENT_DISPLAY_FETCHING_ALIGNMENTS_IN") + " " + str(slot.name)
 					for st in align:
+						display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_ATTEMPTING_ADD_OF_ALIGNMENT") + " " + str(st)
 						if not st in alignments:
+							display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_ADDING_ALIGNMENT") + " " + str(st)
 							alignments.append(st)
 				if hardpointTypes.size() > 0:
+					display_line_1 = TranslationServer.translate("EQUIPMENT_DISPLAY_FETCHING_HARDPOINTS_IN") + " " + str(slot.name)
 					for st in hardpointTypes:
+						display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_ATTEMPTING_ADD_OF_HARDPOINT") + " " + str(st)
 						if not st in hardpoint_types:
+							display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_ADDING_ALIGNMENT") + " " + str(st)
 							hardpoint_types.append(st)
 				if slotDefaults.keys().size() > 0:
+					display_line_1 = TranslationServer.translate("EQUIPMENT_DISPLAY_FETCHING_SLOT_DEFAULTS") + " " + str(slot.name)
 					for st in slotDefaults:
+						display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_MODIFYING_SLOT_DEFAULTS_FOR_SLOT") + " " + str(st)
 						if st in slot_defaults.keys():
 							for item in slotDefaults.get(st):
 								if item in slot_defaults.get(st):
-									pass
+									display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_MODIFYING_SLOT_IN_ALREADY") + " " + str(item) + " " + TranslationServer.translate("EQUIPMENT_DISPLAY_MODIFYING_SLOT_IN_TAG_ALREADY") + " " + str(st)
 								else:
+									display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_MODIFYING_SLOT_IN") + " " + str(item) + " " + TranslationServer.translate("EQUIPMENT_DISPLAY_MODIFYING_SLOT_IN_TAG") + " " + str(st) 
 									slot_defaults[st].append(item)
 						else:
+							display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_MODIFYING_SLOT_ENTIRELY") + " " + str(st)
 							slot_defaults.merge({st:slotDefaults.get(st)})
 
 func add_slots():
@@ -213,7 +229,9 @@ func add_slots():
 			if item.get("name") == "ADD_EQUIPMENT_SLOTS":
 				newSlot = slot.get("ADD_EQUIPMENT_SLOTS")
 		if typeof(newSlot) == TYPE_ARRAY:
+			display_line_1 = TranslationServer.translate("EQUIPMENT_DISPLAY_ADDING_SLOTS") + " " + str(slot.name)
 			for spt in newSlot:
+				display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_ADDING_SLOT") + " " + str(spt)
 				add_child(spt)
 
 var slot_dictionary_temps = {}
