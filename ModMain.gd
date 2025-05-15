@@ -1,6 +1,6 @@
 extends Node
 
-const MOD_PRIORITY = INF
+const MOD_PRIORITY = -INF
 const MOD_NAME = "HevLib"
 const MOD_VERSION = "1.5.1"
 const MOD_VERSION_MAJOR = 1
@@ -15,11 +15,11 @@ func _init(modLoader = ModLoader):
 	loadDLC()
 	loadSettings()
 	installScriptExtension("events/TheRing.gd")
+	installScriptExtension("scenes/equipment/UpgradeGroup.gd")
+	installScriptExtension("scenes/equipment/hardpoints/EquipmentItemTemplate.gd")
 	replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
 func _ready():
 	l("Readying")
-	installScriptExtension("scenes/equipment/UpgradeGroup.gd")
-	installScriptExtension("scenes/equipment/hardpoints/EquipmentItemTemplate.gd")
 	var WebTranslate = preload("res://HevLib/pointers/WebTranslate.gd")
 	WebTranslate.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]])
 	replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")

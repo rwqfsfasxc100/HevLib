@@ -98,7 +98,7 @@ static func __make_slot(slot_data: Dictionary) -> Node:
 	var limitShips = slot_data.get("limit_ships", [])
 	var invertLimitLogic = slot_data.get("invert_limit_logic", false)
 	var add_vanilla_equipment = slot_data.get("add_vanilla_equipment", true)
-	var slotTemplate = load("res://HevLib/scenes/equipment/hardpoints/WeaponSlotUpgradeTemplate.tscn").instance()
+	var slotTemplate = preload("res://HevLib/scenes/equipment/hardpoints/WeaponSlotUpgradeTemplate.tscn").instance()
 	var slot_type = slot_data.get("slot_type","HARDPOINT")
 	var hardpoint_type = slot_data.get("hardpoint_type","")
 	var alignment = slot_data.get("alignment","")
