@@ -2,10 +2,10 @@
 
 id="hev.LIBRARY"
 name="HevLib"
-version="1.5.3"
+version="1.5.4"
 version_major=1
 version_minor=5
-version_bugfix=3
+version_bugfix=4
 version_metadata=""
 description="HEVLIB_MOD_DESCRIPTION"
 group="library"
