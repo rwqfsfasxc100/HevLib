@@ -157,6 +157,9 @@ func get_tags():
 			if item.get("name") == "EQUIPMENT_TAGS":
 				nodes.append(slot.get("EQUIPMENT_TAGS"))
 		if not nodes == []:
+#			var check = is_current_mod_cached(slot, "EQUIPMENT_TAGS", nodes)
+			
+			
 			for tag in nodes:
 				var slotTypes = tag.get("slot_types",[])
 				var equipmentItems = tag.get("equipment_types",[])
@@ -412,3 +415,19 @@ func display_slots() -> Array:
 		if child.get_parent() == self:
 			list.append(child)
 	return list
+
+func is_current_mod_cached(mod_node: Node, tag_type: String, data) -> bool:
+	var path = mod_node.get_script().get_path()
+	var path_hash = path.hash()
+	var tags_text = str(data)
+	var tags_hash = tags_text.hash()
+	var mod_cache_file = "user://cache/.HevLib_Cache/Equipment_Driver/" + str(path_hash) + "/" + tag_type
+	var mod_cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/" + str(path_hash) + "/"
+	var file = File.new()
+	file.open(mod_cache_file, File.READ)
+	var current_file_hash = file.get_as_text().hash()
+	file.close()
+	if current_file_hash == tags_hash:
+		return true
+	else:
+		return false
