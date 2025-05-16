@@ -17,7 +17,6 @@ func _init(modLoader = ModLoader):
 	installScriptExtension("events/TheRing.gd")
 	installScriptExtension("scenes/equipment/UpgradeGroup.gd")
 	installScriptExtension("scenes/equipment/hardpoints/EquipmentItemTemplate.gd")
-	replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
 func _ready():
 	l("Readying")
 	var WebTranslate = preload("res://HevLib/pointers/WebTranslate.gd")
@@ -36,6 +35,7 @@ func _ready():
 	CRoot.call_deferred("add_child",Gamespace_Canvas)
 	CRoot.call_deferred("add_child",mouse)
 	loadTranslationsFromCache()
+	replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
 	replaceScene("scenes/scene_replacements/Game.tscn", "res://Game.tscn")
 	var dir = Directory.new()
 	dir.make_dir_recursive("user://cache/.HevLib_Cache/")
