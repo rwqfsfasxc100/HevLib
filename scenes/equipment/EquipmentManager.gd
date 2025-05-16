@@ -137,7 +137,7 @@ var display_line_0 := ""
 var display_line_1 := ""
 var display_line_2 := ""
 
-
+var label_visibility = false
 
 
 # Actual code started
@@ -147,22 +147,29 @@ var slots = ModLoader.get_children()
 var vanilla_equipment = load("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd").get_script_constant_map()
 
 func _process(delta):
-	pass
+	var label = get_node_or_null("/root/_HevLib_Gamespace_Canvas/MarginContainer/DebugPanel/ScrollContainer/MarginContainer/VBoxContainer2/EquipmentLoad")
+	if label:
+		label.visible = label_visibility
+	if label_visibility:
+		var textConcat = str(display_line_0) + "\n" + str(display_line_1) + "\n" + str(display_line_2)
+		label.text = textConcat
 
 func _tree_entered():
+	label_visibility = true
 	var has = Settings.HevLib["equipment"]["do_sort_equipment_by_price"]
 	var does = 1 if has else 0
 	display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_PROCESS_NUM") + " " + str(1) + " / " + str(4+does) + ": " + TranslationServer.translate("EQUIPMENT_DISPLAY_FETCHING_TAGS")
 	get_tags()
-	display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_PROCESS_NUM") + " " + str(1) + " / " + str(4+does) + ": " + TranslationServer.translate("EQUIPMENT_DISPLAY_ADDING_SLOTS")
+	display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_PROCESS_NUM") + " " + str(2) + " / " + str(4+does) + ": " + TranslationServer.translate("EQUIPMENT_DISPLAY_ADDING_SLOTS")
 	add_slots()
-	display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_PROCESS_NUM") + " " + str(1) + " / " + str(4+does) + ": " + TranslationServer.translate("EQUIPMENT_DISPLAY_ADDING_SLOT_TAGS")
+	display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_PROCESS_NUM") + " " + str(3) + " / " + str(4+does) + ": " + TranslationServer.translate("EQUIPMENT_DISPLAY_ADDING_SLOT_TAGS")
 	add_slot_tags()
-	display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_PROCESS_NUM") + " " + str(1) + " / " + str(4+does) + ": " + TranslationServer.translate("EQUIPMENT_DISPLAY_ADDDING_EQUIPMENT")
+	display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_PROCESS_NUM") + " " + str(4) + " / " + str(4+does) + ": " + TranslationServer.translate("EQUIPMENT_DISPLAY_ADDDING_EQUIPMENT")
 	add_equipment()
 	if has:
-		display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_PROCESS_NUM") + " " + str(1) + " / " + str(4+does) + ": " + TranslationServer.translate("EQUIPMENT_DISPLAY_SORTING_EQUIPMENT")
+		display_line_0 = TranslationServer.translate("EQUIPMENT_DISPLAY_PROCESS_NUM") + " " + str(5) + " / " + str(4+does) + ": " + TranslationServer.translate("EQUIPMENT_DISPLAY_SORTING_EQUIPMENT")
 		sort_slots()
+	label_visibility = false
 
 func get_tags():
 	for slot in slots:
@@ -239,9 +246,11 @@ var slot_dictionary_temps = {}
 func add_slot_tags():
 	var slot_tag_pool = {}
 	for item in vanilla_equipment_defaults_for_reference:
+		display_line_1 = TranslationServer.translate("EQUIPMENT_DISPLAY_ADDING_VANILLA_TAG_SLOT") + " " + str(item)
 		var data = vanilla_equipment_defaults_for_reference.get(item)
 		for tag in data:
 			var content = data.get(tag)
+			display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_HANDLING_TAG") + " " + str(tag)
 			match tag:
 				"limit_ships":
 					get_node(item).limit_ships = content
@@ -275,6 +284,8 @@ func add_slot_tags():
 		var nodes = slot_dictionary_temps.get(node)
 		var tags = slot_dictionary_temps.get(node)
 		for tag in tags:
+			display_line_1 = TranslationServer.translate("EQUIPMENT_DISPLAY_ADDING_TAG_SLOT") + " " + str(tag)
+			display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_GENERIC_HANDLING")
 			var ptag = nodes.get(tag)
 			var limit_ships = ptag.get("limit_ships",[])
 			var invert_limit_logic = ptag.get("invert_limit_logic",false)
@@ -321,6 +332,8 @@ func add_slot_tags():
 					else:
 						slot_node.override_subtractive.append(over)
 	for item in display_slots():
+		display_line_1 = TranslationServer.translate("EQUIPMENT_DISPLAY_SORTING_ALLOWED_EQUIPMENT") + " " + str(item.name)
+		display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_OPERATING_ON_SLOT_OF_TYPE") + " " + str(item.slot_type)
 		var current_default_equipment := []
 		if item.slot_type == "HARDPOINT":
 			var hardpoint = item.hardpoint_type
@@ -344,10 +357,12 @@ func add_slot_tags():
 		item.allowed_equipment = rewrite
 		
 		if item.add_vanilla_equipment:
+			display_line_1 = TranslationServer.translate("EQUIPMENT_DISPLAY_ADDING_VANILLA_EQUIPMENT") + " " + str(item.name)
 			for v_equipment in vanilla_equipment:
 				var V2 = Equipment.__make_equipment(vanilla_equipment.get(v_equipment))
 				var does = confirm_equipment(V2, item.slot_type, item.alignment, item.restriction, item.allowed_equipment)
 				if does:
+					display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_ADDING_VANILLA_EQUIPMENT") + " " + str(v_equipment)
 					item.get_node("VBoxContainer").add_child(V2)
 
 func confirm_equipment(equipment_node, slot_type, slot_alignment, slot_restriction, slot_allowed_equipment) -> bool:
@@ -401,19 +416,26 @@ func add_equipment():
 			if item.get("name") == "ADD_EQUIPMENT_ITEMS":
 				newSlot = slot.get("ADD_EQUIPMENT_ITEMS")
 		if not newSlot == null and newSlot.size() >= 1:
+			display_line_1 = TranslationServer.translate("EQUIPMENT_DISPLAY_FETCHING_EQUIPMENT_FROM") + " " + str(slot.name)
 			for equip in newSlot:
+				display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_FOUND_EQUIPMENT") + " " + str(equip.system)
 				equipments.append(equip)
-				
 	for item in display_slots():
+		display_line_1 = TranslationServer.translate("EQUIPMENT_DISPLAY_CHECKING_FOR_SLOT_APPLICABILITY") + " " + str(item.name)
 		for equip in equipments:
 				var V2 = equip.duplicate()
 				var does = confirm_equipment(V2, item.slot_type, item.alignment, item.restriction, item.allowed_equipment)
 				if does:
+					display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_ADDING_EQUIPMENT_TO_SLOT") + " " + str(V2.system)
 					item.get_node("VBoxContainer").add_child(V2)
+				else:
+					V2.queue_free()
 
 func sort_slots():
 	var SLOTS = display_slots()
 	for slot in SLOTS:
+		display_line_1 = TranslationServer.translate("EQUIPMENT_DISPLAY_SORTING_SLOT") + " " + str(slot.name)
+		display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_SORTING")
 		var items = slot.get_node("VBoxContainer").get_children()
 		var nodePositions = []
 		for item in items:
@@ -438,9 +460,11 @@ func sort_slots():
 
 
 func display_slots() -> Array:
+	display_line_1 = TranslationServer.translate("EQUIPMENT_DISPLAY_RESYNCH")
 	var children = self.get_children()
 	var list = []
 	for child in children:
 		if child.get_parent() == self:
+			display_line_2 = TranslationServer.translate("EQUIPMENT_DISPLAY_RESYNCH_FOUND") + " " + str(child.name)
 			list.append(child)
 	return list

@@ -10,6 +10,9 @@ func _ready():
 	size = image.get_size()
 	
 func _process(delta):
+	get_parent().get_parent().rect_size = get_parent().get_parent().get_parent().get_parent().get_parent().rect_size
+	
+	
 	var visibility = Settings.HevLib["debug"]["ring_position_data_debugger"]
 	visible = visibility
 	if visibility:
