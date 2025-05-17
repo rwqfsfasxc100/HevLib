@@ -140,6 +140,8 @@ var slots = ModLoader.get_children()
 var vanilla_equipment = load("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd").get_script_constant_map()
 
 func _tree_entered():
+	pass
+#func start_processing():
 	var has = Settings.HevLib["equipment"]["do_sort_equipment_by_price"]
 	var does = 1 if has else 0
 	get_tags()
@@ -148,7 +150,14 @@ func _tree_entered():
 	add_equipment()
 	if has:
 		sort_slots()
-
+#	var node = get_parent().get_parent().get_parent().get_parent().get_parent()
+#	for main in ModLoader.get_children():
+#		var packs = main.get_property_list()
+#		for item in packs:
+#			var nname = item.get("name")
+#			if nname == "HevLibModMain":
+#				if main.HevLibModMain:
+#					main.repack(node)
 func get_tags():
 	for slot in slots:
 		var data = slot.get_property_list()
@@ -431,3 +440,4 @@ func is_current_mod_cached(mod_node: Node, tag_type: String, data) -> bool:
 		return true
 	else:
 		return false
+

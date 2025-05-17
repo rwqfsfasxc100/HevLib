@@ -10,6 +10,7 @@ const MOD_VERSION_METADATA = ""
 var modPath:String = get_script().resource_path.get_base_dir() + "/"
 var _savedObjects := []
 var modConfig = {}
+var HevLibModMain = true
 func _init(modLoader = ModLoader):
 	l("Initializing DLC")
 	loadDLC()
@@ -136,3 +137,11 @@ func loadSettings():
 	l(MOD_NAME + ": Current settings: %s" % modConfig)
 	settings.queue_free()
 	l(MOD_NAME + ": Finished loading settings")
+#
+#func repack(node):
+#	var save = PackedScene.new()
+#	var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd").new()
+#	NodeAccess.__claim_child_ownership(node)
+#	var ts = save.pack(node.duplicate())
+#	ResourceSaver.save("user://cache/.HevLib_Cache/Test.tscn", ts)
+#	pass

@@ -9,10 +9,9 @@ var developer_hint = {
 		"Optional use_relative_paths used to strip any path prefixes of node paths, ",
 		" -> requires return_only_paths to be true to work",
 	],
-	"__reparent":[
-		"Reparents a node to another node",
-		"'node' is the node which you want to move to a new parent",
-		"'parent_node' is the node which you would want to have made the new parent to 'node'"
+	"__claim_child_ownership":[
+		"Sets the ownership of all recursive children of the provided node",
+		"'node' is the node which you want to claim all subsequent ownership for"
 	]
 	}
 
@@ -21,6 +20,6 @@ static func __get_all_children(node, strip_supplied_node_from_array = false, ret
 	var s = f.get_all_children(node, strip_supplied_node_from_array, return_only_paths, use_relative_paths)
 	return s
 
-#static func __reparent(node, parent_node):
-#	var f = load("res://HevLib/globals/reparent.gd")
-#	f.reparent(node, parent_node)
+static func __claim_child_ownership(node:Node):
+	var f = load("res://HevLib/scripts/claim_child_ownership.gd").new()
+	f.claim_child_ownership(node)
