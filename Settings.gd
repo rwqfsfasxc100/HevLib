@@ -14,10 +14,12 @@ var HevLib = {
 	"debug":{
 		"input_debugger":false,
 		"ring_position_data_debugger":false,
+		"ring_position_accurate_events":false,
 	},
 	"input":{
 		"open_debug_event_menu":[  ],
 		"debugger":[ "F10" ],
+		"toggle_debug_menus":[ "F9" ],
 	}, 
 }
 

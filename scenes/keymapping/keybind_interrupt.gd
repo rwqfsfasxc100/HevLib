@@ -16,12 +16,15 @@ var inputDebug = false
 			
 
 var currentKeyEvents = ""
+onready var InputDebugPanel = get_parent().get_node("_HevLib_Gamespace_Canvas/MarginContainer/DebugPanel/ScrollContainer/MarginContainer/VBoxContainer/InputDebug")
+	
+func _ready():
+	InputDebugPanel.visible = inputDebug
 
 func _process(delta):
 	inputDebug = Settings.HevLib["debug"]["input_debugger"]
 	var siblingCount = get_parent().get_child_count()
 	get_parent().move_child(self, siblingCount)
-	var InputDebugPanel = get_parent().get_node("_HevLib_Gamespace_Canvas/MarginContainer/DebugPanel/ScrollContainer/MarginContainer/VBoxContainer/InputDebug")
 	InputDebugPanel.text = str(currentKeyEvents)
 	InputDebugPanel.visible = inputDebug
 		
@@ -52,6 +55,8 @@ var modifierMeta = false
 var modifierCommand = false
 func _input(event):
 	if inputDebug:
+		if Input.is_action_just_pressed("toggle_debug_menus"):
+			InputDebugPanel.visible = !InputDebugPanel.visible
 		if not event is InputEventAction:
 			var eventAction
 			for item in actionDict:
