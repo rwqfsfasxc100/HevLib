@@ -19,6 +19,8 @@ export (Array) var override_subtractive = []
 # Should improve efficiency over the previous version, which calculated it on the fly
 var allowed_equipment := []
 
+var data_dictionary = ""
+
 func reexamine():	
 	var ship = CurrentGame.getPlayerShip()
 	.reexamine()

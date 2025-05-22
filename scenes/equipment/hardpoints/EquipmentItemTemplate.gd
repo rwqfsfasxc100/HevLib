@@ -5,3 +5,5 @@ export (String) var alignment = ""
 export (String) var equipment_type = ""
 export (String) var slot_type = ""
 export (String) var restriction = ""
+
+var data_dictionary = ""

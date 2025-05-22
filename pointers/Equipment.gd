@@ -86,6 +86,7 @@ static func __make_equipment(equipment_data: Dictionary) -> Node:
 	equip_node.equipment_type = equipment_type
 	equip_node.slot_type = slot_type
 	equip_node.restriction = restriction
+	equip_node.data_dictionary = str(equipment_data)
 	return equip_node
 
 static func __make_slot(slot_data: Dictionary) -> Node:
@@ -130,6 +131,7 @@ static func __make_slot(slot_data: Dictionary) -> Node:
 	slotTemplate.restriction = restriction
 	slotTemplate.override_additive = override_additive
 	slotTemplate.override_subtractive = override_subtractive
+	slotTemplate.data_dictionary = str(slot_data)
 	return slotTemplate
 
 static func __add_vanilla_equipment(tags: Dictionary, hardpoint_types: Array, alignments: Array, equipment_types: Array, slot_types: Array, hardpoint_defaults: Dictionary):

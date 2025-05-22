@@ -1,6 +1,10 @@
 extends VBoxContainer
 
+# Stating HevLib pointers
 var Equipment = preload("res://HevLib/pointers/Equipment.gd")
+var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+
+var cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/"
 
 var hardpoint_types = [
 	# Hardpoint slots
@@ -135,12 +139,33 @@ const vanilla_equipment_defaults_for_reference = {
 
 # Actual code started
 
-var slots = ModLoader.get_children()
+var slots := []
 
 var vanilla_equipment = load("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd").get_script_constant_map()
 
 func _tree_entered():
-	pass
+	var conv := []
+	var mods = ModLoader.get_children()
+	for mod in mods:
+		var variants = mod.get_property_list()
+		var does = false
+		for it in variants:
+			var iname = it.get("name")
+			match iname:
+				"ADD_EQUIPMENT_SLOTS":
+					does = true
+				"ADD_EQUIPMENT_ITEMS":
+					does = true
+				"EQUIPMENT_TAGS":
+					does = true
+				"SLOT_TAGS":
+					does = true
+		if does:
+			var mPath = mod.get_script().get_path()
+			var mHash = mPath.hash()
+			conv.append([mod,mPath,mHash])
+	slots = conv
+	
 #func start_processing():
 	var has = Settings.HevLib["equipment"]["do_sort_equipment_by_price"]
 	var does = 1 if has else 0
@@ -150,6 +175,7 @@ func _tree_entered():
 	add_equipment()
 	if has:
 		sort_slots()
+#	call_deferred("repack",get_parent().get_parent().get_parent().get_parent().get_parent(), "user://cache/.HevLib_Cache/Test.tscn")
 #	var node = get_parent().get_parent().get_parent().get_parent().get_parent()
 #	for main in ModLoader.get_children():
 #		var packs = main.get_property_list()
@@ -159,7 +185,8 @@ func _tree_entered():
 #				if main.HevLibModMain:
 #					main.repack(node)
 func get_tags():
-	for slot in slots:
+	for its in slots:
+		var slot = its[0]
 		var data = slot.get_property_list()
 		var nodes = []
 		for item in data:
@@ -203,7 +230,8 @@ func get_tags():
 							slot_defaults.merge({st:slotDefaults.get(st)})
 
 func add_slots():
-	for slot in slots:
+	for its in slots:
+		var slot = its[0]
 		var data = slot.get_property_list()
 		var newSlot = null
 		for item in data:
@@ -240,7 +268,8 @@ func add_slot_tags():
 					get_node(item).override_additive = content
 				"override_subtractive":
 					get_node(item).override_subtractive = content
-	for slot in slots:
+	for its in slots:
+		var slot = its[0]
 		var data = slot.get_property_list()
 		var nodes = null
 		for item in data:
@@ -299,6 +328,7 @@ func add_slot_tags():
 						pass
 					else:
 						slot_node.override_subtractive.append(over)
+	
 	for item in display_slots():
 		var current_default_equipment := []
 		if item.slot_type == "HARDPOINT":
@@ -322,12 +352,6 @@ func add_slot_tags():
 				rewrite.append(it)
 		item.allowed_equipment = rewrite
 		
-		if item.add_vanilla_equipment:
-			for v_equipment in vanilla_equipment:
-				var V2 = Equipment.__make_equipment(vanilla_equipment.get(v_equipment))
-				var does = confirm_equipment(V2, item.slot_type, item.alignment, item.restriction, item.allowed_equipment)
-				if does:
-					item.get_node("VBoxContainer").add_child(V2)
 
 func confirm_equipment(equipment_node, slot_type, slot_alignment, slot_restriction, slot_allowed_equipment) -> bool:
 	var e_slot_type = equipment_node.slot_type
@@ -373,7 +397,8 @@ func confirm_equipment(equipment_node, slot_type, slot_alignment, slot_restricti
 
 func add_equipment():
 	var equipments = []
-	for slot in slots:
+	for its in slots:
+		var slot = its[0]
 		var data = slot.get_property_list()
 		var newSlot = null
 		for item in data:
@@ -383,6 +408,14 @@ func add_equipment():
 			for equip in newSlot:
 				equipments.append(equip)
 	for item in display_slots():
+		
+		if item.add_vanilla_equipment:
+			for v_equipment in vanilla_equipment:
+				var V2 = Equipment.__make_equipment(vanilla_equipment.get(v_equipment))
+				var does = confirm_equipment(V2, item.slot_type, item.alignment, item.restriction, item.allowed_equipment)
+				if does:
+					item.get_node("VBoxContainer").add_child(V2)
+		
 		for equip in equipments:
 				var V2 = equip.duplicate()
 				var does = confirm_equipment(V2, item.slot_type, item.alignment, item.restriction, item.allowed_equipment)
@@ -430,8 +463,8 @@ func is_current_mod_cached(mod_node: Node, tag_type: String, data) -> bool:
 	var path_hash = path.hash()
 	var tags_text = str(data)
 	var tags_hash = tags_text.hash()
-	var mod_cache_file = "user://cache/.HevLib_Cache/Equipment_Driver/" + str(path_hash) + "/" + tag_type
-	var mod_cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/" + str(path_hash) + "/"
+	var mod_cache_file = cache_folder + str(path_hash) + "/" + tag_type
+	var mod_cache_folder = cache_folder + str(path_hash) + "/"
 	var file = File.new()
 	file.open(mod_cache_file, File.READ)
 	var current_file_hash = file.get_as_text().hash()
@@ -441,3 +474,11 @@ func is_current_mod_cached(mod_node: Node, tag_type: String, data) -> bool:
 	else:
 		return false
 
+func repack(node, save_path):
+	var save = PackedScene.new()
+	var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd").new()
+	NodeAccess.__claim_child_ownership(node)
+	save.pack(node)
+	var save_folder = save_path.split(save_path.split("/")[save_path.split("/").size() - 1])[0]
+	FolderAccess.__check_folder_exists(save_folder)
+	ResourceSaver.save(save_path, save)
