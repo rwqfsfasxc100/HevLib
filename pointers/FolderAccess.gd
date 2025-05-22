@@ -22,9 +22,9 @@ var developer_hint = {
 	]
 }
 
-static func __check_folder_exists(folder: String) -> bool:
+static func __check_folder_exists(folder: String, status_array: bool = false) -> bool:
 	var f = load("res://HevLib/globals/check_folder_exists.gd")
-	var s = f.check_folder_exists(folder)
+	var s = f.check_folder_exists(folder, status_array)
 	return s
 
 static func __recursive_delete(path: String):
