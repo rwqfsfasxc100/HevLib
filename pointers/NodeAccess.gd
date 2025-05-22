@@ -12,6 +12,10 @@ var developer_hint = {
 	"__claim_child_ownership":[
 		"Sets the ownership of all recursive children of the provided node",
 		"'node' is the node which you want to claim all subsequent ownership for"
+	],
+	"__is_instanced_from_scene":[
+		"Checks if a node is instanced from a file",
+		"'p_node' is the node that is being checked"
 	]
 	}
 
@@ -23,3 +27,8 @@ static func __get_all_children(node, strip_supplied_node_from_array = false, ret
 static func __claim_child_ownership(node:Node):
 	var f = load("res://HevLib/scripts/claim_child_ownership.gd").new()
 	f.claim_child_ownership(node)
+
+static func __is_instanced_from_scene(p_node):
+	var f = load("res://HevLib/scripts/claim_child_ownership.gd").new()
+	var s = f.__is_instanced_from_scene(p_node)
+	return s
