@@ -3,8 +3,11 @@ extends VBoxContainer
 # Stating HevLib pointers
 var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 
 var cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/"
+
+var NEW_INSTALL = false
 
 var hardpoint_types = [
 	# Hardpoint slots
@@ -143,8 +146,12 @@ var slots := []
 
 var vanilla_equipment = load("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd").get_script_constant_map()
 
+var has = false
+
 func _tree_entered():
 	var conv := []
+	var paths = []
+	
 	var mods = ModLoader.get_children()
 	for mod in mods:
 		var variants = mod.get_property_list()
@@ -164,17 +171,26 @@ func _tree_entered():
 			var mPath = mod.get_script().get_path()
 			var mHash = mPath.hash()
 			conv.append([mod,mPath,mHash])
+			paths.append(mPath)
 	slots = conv
 	
+	var installed_hash = str(paths).hash()
+	var hFile = File.new()
+	hFile.open(cache_folder + "driver_index", File.READ_WRITE)
+	var hData = hFile.get_as_text()
+	var de = DataFormat.__compare_with_byte_array(installed_hash, hData)
+	NEW_INSTALL = de
+	hFile.store_string(installed_hash)
+	hFile.close()
+	
 #func start_processing():
-	var has = Settings.HevLib["equipment"]["do_sort_equipment_by_price"]
+	has = Settings.HevLib["equipment"]["do_sort_equipment_by_price"]
 	var does = 1 if has else 0
 	get_tags()
 	add_slots()
 	add_slot_tags()
 	add_equipment()
-	if has:
-		sort_slots()
+	pass
 #	call_deferred("repack",get_parent().get_parent().get_parent().get_parent().get_parent(), "user://cache/.HevLib_Cache/Test.tscn")
 #	var node = get_parent().get_parent().get_parent().get_parent().get_parent()
 #	for main in ModLoader.get_children():
@@ -228,10 +244,13 @@ func get_tags():
 									slot_defaults[st].append(item)
 						else:
 							slot_defaults.merge({st:slotDefaults.get(st)})
+var slots_that_need_vanilla_validation := []
+var slots_with_cache := []
 
 func add_slots():
 	for its in slots:
 		var slot = its[0]
+		var mod_hash = str(its[2])
 		var data = slot.get_property_list()
 		var newSlot = null
 		for item in data:
@@ -239,9 +258,176 @@ func add_slots():
 				newSlot = slot.get("ADD_EQUIPMENT_SLOTS")
 		if typeof(newSlot) == TYPE_ARRAY:
 			for spt in newSlot:
-				add_child(spt)
+				var slot_name = spt.name
+				var slot_folder = cache_folder + mod_hash + "/ADD_EQUIPMENT_SLOTS/" + slot_name + "/"
+				FolderAccess.__check_folder_exists(slot_folder)
+				var file = File.new()
+				file.open(slot_folder + "data_dictionary", File.READ_WRITE)
+				var slot_file_data = file.get_as_text()
+				file.close()
+				var slot_data_dictionary = str(spt.data_dictionary)
+				var comp = DataFormat.__compare_with_byte_array(slot_data_dictionary, slot_file_data)
+				if comp and not NEW_INSTALL:
+					slots_with_cache.append(mod_hash + ":" + slot_name)
+					add_child(spt)
+				else:
+					var file2 = File.new()
+					file2.open(slot_folder + "data_dictionary", File.WRITE)
+					file2.store_string(slot_data_dictionary)
+					file2.close()
+					slots_that_need_vanilla_validation.append(mod_hash + ":" + slot_name)
+					add_child(spt)
 
 var slot_dictionary_temps = {}
+
+var validated_equipment = {}
+var unvalidated_equipment = {}
+
+func add_equipment():
+	for its in slots:
+		var slot = its[0]
+		var mod_hash = str(its[2])
+		var data = slot.get_property_list()
+		var newSlot = null
+		for item in data:
+			if item.get("name") == "ADD_EQUIPMENT_ITEMS":
+				newSlot = slot.get("ADD_EQUIPMENT_ITEMS")
+		if not newSlot == null and newSlot.size() >= 1:
+			for equip in newSlot:
+				
+				var slot_name = equip.name
+				var slot_folder = cache_folder + mod_hash + "/ADD_EQUIPMENT_ITEMS/" + slot_name + "/"
+				FolderAccess.__check_folder_exists(slot_folder)
+				var file = File.new()
+				file.open(slot_folder + "data_dictionary", File.READ_WRITE)
+				var slot_file_data = file.get_as_text()
+				file.close()
+				var slot_data_dictionary = str(equip.data_dictionary)
+				var comp = DataFormat.__compare_with_byte_array(slot_data_dictionary, slot_file_data)
+				if comp and not NEW_INSTALL:
+					var slot_appendages = []
+					var f = File.new()
+					f.open(slot_folder + "index", File.READ)
+					var index_data = f.get_as_text()
+					f.close()
+					var index = index_data.split("\n")
+					validated_equipment.merge({slot_name:[equip,index]})
+				else:
+					var f = File.new()
+					f.open(slot_folder + "index", File.WRITE)
+					f.store_string("")
+					f.close()
+					unvalidated_equipment.merge({slot_name:[equip,slot_folder]})
+				
+	
+	
+	
+	for slot in slots_that_need_vanilla_validation:
+		var slot_mod = slot.split(":")
+		var mod = slot_mod[0]
+		var item = get_node(slot_mod[1])
+		var vanilla_store = cache_folder + mod + "/ADD_EQUIPMENT_SLOTS/" + slot_mod[1] + "/vanilla_slots/"
+		FolderAccess.__check_folder_exists(vanilla_store)
+		for v_equipment in vanilla_equipment:
+			var V2 = Equipment.__make_equipment(vanilla_equipment.get(v_equipment))
+			var does = confirm_equipment(V2, item.slot_type, item.alignment, item.restriction, item.allowed_equipment)
+			if does:
+				repack(V2,vanilla_store + v_equipment + ".tscn")
+				item.get_node("VBoxContainer").add_child(V2)
+	
+	
+	
+	
+	for slot in slots_with_cache:
+		var slot_mod = slot.split(":")
+		var mod = slot_mod[0]
+		var item = get_node(slot_mod[1])
+		var vanilla_store = cache_folder + mod + "/ADD_EQUIPMENT_SLOTS/" + slot_mod[1] + "/vanilla_slots/"
+		var files = FolderAccess.__fetch_folder_files(vanilla_store, false, true)
+		for file in files:
+			item.get_node("VBoxContainer").add_child(load(file).instance())
+	
+	
+	
+	for slot in display_slots():
+		
+		
+		var current_default_equipment := []
+		if slot.slot_type == "HARDPOINT":
+			var hardpoint = slot.hardpoint_type
+			var items = slot_defaults.get(hardpoint,[])
+			slot.allowed_equipment.append_array(items)
+		else:
+			var items = slot_defaults.get(slot.slot_type,[])
+			slot.allowed_equipment.append_array(items)
+		for add in slot.override_additive:
+			if add in slot.allowed_equipment:
+				pass
+			else:
+				slot.allowed_equipment.append(add)
+		var current = slot.allowed_equipment
+		var rewrite = []
+		for it in current:
+			if it in slot.override_subtractive:
+				pass
+			else:
+				rewrite.append(it)
+		slot.allowed_equipment = rewrite
+		
+		for equip in validated_equipment:
+			var data = validated_equipment.get(equip)
+			if slot.name in data[1]:
+				slot.get_node("VBoxContainer").add_child(data[0].duplicate())
+		
+		
+		for equip in unvalidated_equipment:
+			var data = unvalidated_equipment.get(equip)
+			var V2 = data[0].duplicate()
+			var does = confirm_equipment(V2, slot.slot_type, slot.alignment, slot.restriction, slot.allowed_equipment)
+			if does:
+				var f = File.new()
+				f.open(data[1] + "index", File.READ_WRITE)
+				var sData = f.get_as_text()
+				var returnData = sData + "\n" + slot.name
+				f.store_string(returnData)
+				f.close()
+				slot.get_node("VBoxContainer").add_child(V2)
+			else:
+				V2.queue_free()
+		
+		
+#		for equip in equipments:
+#				var V2 = equip.duplicate()
+#				var does = confirm_equipment(V2, slot.slot_type, slot.alignment, slot.restriction, slot.allowed_equipment)
+#				if does:
+#					slot.get_node("VBoxContainer").add_child(V2)
+#				else:
+#					V2.queue_free()
+		
+		
+		
+		if has:
+			var items = slot.get_node("VBoxContainer").get_children()
+			var nodePositions = []
+			for item in items:
+				nodePositions.append([item, item.get_index()])
+			var noFail = false
+			var maxIndex = items.size()
+			while noFail == false:
+				var doesFailThisLoop = false
+				for item in slot.get_child(0).get_children():
+					if item.get_index() < 2:
+						pass
+					else:
+						var A = item
+						var B = A.get_parent().get_child(A.get_index() - 1)
+						if A.price < B.price:
+							doesFailThisLoop = true
+							A.get_parent().move_child(A, B.get_index())
+				if doesFailThisLoop:
+					noFail = false
+				else:
+					noFail = true
 
 func add_slot_tags():
 	var slot_tag_pool = {}
@@ -328,30 +514,30 @@ func add_slot_tags():
 						pass
 					else:
 						slot_node.override_subtractive.append(over)
-	
-	for item in display_slots():
-		var current_default_equipment := []
-		if item.slot_type == "HARDPOINT":
-			var hardpoint = item.hardpoint_type
-			var items = slot_defaults.get(hardpoint,[])
-			item.allowed_equipment.append_array(items)
-		else:
-			var items = slot_defaults.get(item.slot_type,[])
-			item.allowed_equipment.append_array(items)
-		for add in item.override_additive:
-			if add in item.allowed_equipment:
-				pass
-			else:
-				item.allowed_equipment.append(add)
-		var current = item.allowed_equipment
-		var rewrite = []
-		for it in current:
-			if it in item.override_subtractive:
-				pass
-			else:
-				rewrite.append(it)
-		item.allowed_equipment = rewrite
-		
+
+func display_slots() -> Array:
+	var children = self.get_children()
+	var list = []
+	for child in children:
+		if child.get_parent() == self:
+			list.append(child)
+	return list
+
+func is_current_mod_cached(mod_node: Node, tag_type: String, data) -> bool:
+	var path = mod_node.get_script().get_path()
+	var path_hash = path.hash()
+	var tags_text = str(data)
+	var tags_hash = tags_text.hash()
+	var mod_cache_file = cache_folder + str(path_hash) + "/" + tag_type
+	var mod_cache_folder = cache_folder + str(path_hash) + "/"
+	var file = File.new()
+	file.open(mod_cache_file, File.READ)
+	var current_file_hash = file.get_as_text().hash()
+	file.close()
+	if current_file_hash == tags_hash:
+		return true
+	else:
+		return false
 
 func confirm_equipment(equipment_node, slot_type, slot_alignment, slot_restriction, slot_allowed_equipment) -> bool:
 	var e_slot_type = equipment_node.slot_type
@@ -394,85 +580,6 @@ func confirm_equipment(equipment_node, slot_type, slot_alignment, slot_restricti
 		return false
 	return false
 	
-
-func add_equipment():
-	var equipments = []
-	for its in slots:
-		var slot = its[0]
-		var data = slot.get_property_list()
-		var newSlot = null
-		for item in data:
-			if item.get("name") == "ADD_EQUIPMENT_ITEMS":
-				newSlot = slot.get("ADD_EQUIPMENT_ITEMS")
-		if not newSlot == null and newSlot.size() >= 1:
-			for equip in newSlot:
-				equipments.append(equip)
-	for item in display_slots():
-		
-		if item.add_vanilla_equipment:
-			for v_equipment in vanilla_equipment:
-				var V2 = Equipment.__make_equipment(vanilla_equipment.get(v_equipment))
-				var does = confirm_equipment(V2, item.slot_type, item.alignment, item.restriction, item.allowed_equipment)
-				if does:
-					item.get_node("VBoxContainer").add_child(V2)
-		
-		for equip in equipments:
-				var V2 = equip.duplicate()
-				var does = confirm_equipment(V2, item.slot_type, item.alignment, item.restriction, item.allowed_equipment)
-				if does:
-					item.get_node("VBoxContainer").add_child(V2)
-				else:
-					V2.queue_free()
-
-func sort_slots():
-	var SLOTS = display_slots()
-	for slot in SLOTS:
-		var items = slot.get_node("VBoxContainer").get_children()
-		var nodePositions = []
-		for item in items:
-			nodePositions.append([item, item.get_index()])
-		var noFail = false
-		var maxIndex = items.size()
-		while noFail == false:
-			var doesFailThisLoop = false
-			for item in slot.get_child(0).get_children():
-				if item.get_index() < 2:
-					pass
-				else:
-					var A = item
-					var B = A.get_parent().get_child(A.get_index() - 1)
-					if A.price < B.price:
-						doesFailThisLoop = true
-						A.get_parent().move_child(A, B.get_index())
-			if doesFailThisLoop:
-				noFail = false
-			else:
-				noFail = true
-
-
-func display_slots() -> Array:
-	var children = self.get_children()
-	var list = []
-	for child in children:
-		if child.get_parent() == self:
-			list.append(child)
-	return list
-
-func is_current_mod_cached(mod_node: Node, tag_type: String, data) -> bool:
-	var path = mod_node.get_script().get_path()
-	var path_hash = path.hash()
-	var tags_text = str(data)
-	var tags_hash = tags_text.hash()
-	var mod_cache_file = cache_folder + str(path_hash) + "/" + tag_type
-	var mod_cache_folder = cache_folder + str(path_hash) + "/"
-	var file = File.new()
-	file.open(mod_cache_file, File.READ)
-	var current_file_hash = file.get_as_text().hash()
-	file.close()
-	if current_file_hash == tags_hash:
-		return true
-	else:
-		return false
 
 func repack(node, save_path):
 	var save = PackedScene.new()
