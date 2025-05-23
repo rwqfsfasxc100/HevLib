@@ -151,7 +151,7 @@ var has = false
 func _tree_entered():
 	var conv := []
 	var paths = []
-	
+	FolderAccess.__check_folder_exists(cache_folder)
 	var mods = ModLoader.get_children()
 	for mod in mods:
 		var variants = mod.get_property_list()
@@ -174,12 +174,12 @@ func _tree_entered():
 			paths.append(mPath)
 	slots = conv
 	
-	var installed_hash = str(paths).hash()
+	var installed_hash = str(str(paths).hash())
 	var hFile = File.new()
 	hFile.open(cache_folder + "driver_index", File.READ_WRITE)
 	var hData = hFile.get_as_text()
-	var de = DataFormat.__compare_with_byte_array(installed_hash, hData)
-	NEW_INSTALL = de
+	var de = DataFormat.__compare_with_byte_array(installed_hash, str(hData))
+	NEW_INSTALL = !de
 	hFile.store_string(installed_hash)
 	hFile.close()
 	
