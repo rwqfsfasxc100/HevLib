@@ -176,12 +176,15 @@ func _tree_entered():
 	
 	var installed_hash = str(str(paths).hash())
 	var hFile = File.new()
-	hFile.open(cache_folder + "driver_index", File.READ_WRITE)
+	hFile.open(cache_folder + "driver_index", File.READ)
 	var hData = hFile.get_as_text()
+	hFile.close()
 	var de = DataFormat.__compare_with_byte_array(installed_hash, str(hData))
 	NEW_INSTALL = !de
-	hFile.store_string(installed_hash)
-	hFile.close()
+	var f2 = File.new()
+	f2.open(cache_folder + "driver_index", File.WRITE)
+	f2.store_string(installed_hash)
+	f2.close()
 	
 #func start_processing():
 	has = Settings.HevLib["equipment"]["do_sort_equipment_by_price"]
@@ -299,7 +302,7 @@ func add_equipment():
 				var slot_folder = cache_folder + mod_hash + "/ADD_EQUIPMENT_ITEMS/" + slot_name + "/"
 				FolderAccess.__check_folder_exists(slot_folder)
 				var file = File.new()
-				file.open(slot_folder + "data_dictionary", File.READ_WRITE)
+				file.open(slot_folder + "index", File.READ)
 				var slot_file_data = file.get_as_text()
 				file.close()
 				var slot_data_dictionary = str(equip.data_dictionary)
