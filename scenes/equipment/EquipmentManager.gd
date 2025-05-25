@@ -149,10 +149,13 @@ var vanilla_equipment = load("res://HevLib/scenes/equipment/vanilla_defaults/equ
 var has = false
 
 func _tree_entered():
+	var sTime = OS.get_system_time_msecs()
+	l("Started checking and modifying equipment")
 	var conv := []
 	var paths = []
 	FolderAccess.__check_folder_exists(cache_folder)
 	var mods = ModLoader.get_children()
+	l("Scanning installed mods for applicable mods")
 	for mod in mods:
 		var variants = mod.get_property_list()
 		var does = false
@@ -172,8 +175,9 @@ func _tree_entered():
 			var mHash = mPath.hash()
 			conv.append([mod,mPath,mHash])
 			paths.append(mPath)
+			l("Found mod at %s, labelling as %s" % [mPath, str(mHash)])
 	slots = conv
-	
+	l("Finished scanning mods. %s mods are using HevLib Equipment Driver." % slots.size())
 	var installed_hash = str(str(paths).hash())
 	var hFile = File.new()
 	hFile.open(cache_folder + "driver_index", File.READ)
@@ -185,14 +189,23 @@ func _tree_entered():
 	f2.open(cache_folder + "driver_index", File.WRITE)
 	f2.store_string(installed_hash)
 	f2.close()
-	
+	l("Handled cache, starting to operate on mods.")
 #func start_processing():
 	has = Settings.HevLib["equipment"]["do_sort_equipment_by_price"]
 	var does = 1 if has else 0
+	l("Starting to operate on mod data. Will slots be sorted? [%s]" % has)
 	get_tags()
 	add_slots()
 	add_slot_tags()
 	add_equipment()
+	var finish_time = OS.get_system_time_msecs()
+	var total_time = str(float(finish_time - sTime)/1000)
+	var spl = total_time.split(".")
+	var secs = str(spl[0])
+	var msecs = str(spl[1])
+	while msecs.begins_with("0"):
+		msecs = msecs.substr(1)
+	l("Finished adding equipment. Process took a total time of %s seconds, %s milliseconds" % [secs,msecs])
 	pass
 #	call_deferred("repack",get_parent().get_parent().get_parent().get_parent().get_parent(), "user://cache/.HevLib_Cache/Test.tscn")
 #	var node = get_parent().get_parent().get_parent().get_parent().get_parent()
@@ -213,7 +226,7 @@ func get_tags():
 				nodes.append(slot.get("EQUIPMENT_TAGS"))
 		if not nodes == []:
 #			var check = is_current_mod_cached(slot, "EQUIPMENT_TAGS", nodes)
-			
+			l("Adding equipment tags for %s" % str(its[2]))
 			
 			for tag in nodes:
 				var slotTypes = tag.get("slot_types",[])
@@ -260,6 +273,7 @@ func add_slots():
 			if item.get("name") == "ADD_EQUIPMENT_SLOTS":
 				newSlot = slot.get("ADD_EQUIPMENT_SLOTS")
 		if typeof(newSlot) == TYPE_ARRAY:
+			l("Adding slots for %s" % mod_hash)
 			for spt in newSlot:
 				var slot_name = spt.name
 				var slot_folder = cache_folder + mod_hash + "/ADD_EQUIPMENT_SLOTS/" + slot_name + "/"
@@ -273,6 +287,7 @@ func add_slots():
 				if comp and not NEW_INSTALL:
 					slots_with_cache.append(mod_hash + ":" + slot_name)
 					add_child(spt)
+					l("Added slot %s from cache." % slot_name)
 				else:
 					var file2 = File.new()
 					file2.open(slot_folder + "data_dictionary", File.WRITE)
@@ -280,6 +295,7 @@ func add_slots():
 					file2.close()
 					slots_that_need_vanilla_validation.append(mod_hash + ":" + slot_name)
 					add_child(spt)
+					l("Added slot %s without cache, will process and recache during equipment process" % slot_name)
 
 var slot_dictionary_temps = {}
 
@@ -296,17 +312,18 @@ func add_equipment():
 			if item.get("name") == "ADD_EQUIPMENT_ITEMS":
 				newSlot = slot.get("ADD_EQUIPMENT_ITEMS")
 		if not newSlot == null and newSlot.size() >= 1:
+			l("Adding equipment for %s" % mod_hash)
 			for equip in newSlot:
 				
 				var slot_name = equip.name
 				var slot_folder = cache_folder + mod_hash + "/ADD_EQUIPMENT_ITEMS/" + slot_name + "/"
 				FolderAccess.__check_folder_exists(slot_folder)
 				var file = File.new()
-				file.open(slot_folder + "index", File.READ)
+				file.open(slot_folder + "data_dictionary", File.READ)
 				var slot_file_data = file.get_as_text()
 				file.close()
 				var slot_data_dictionary = str(equip.data_dictionary)
-				var comp = DataFormat.__compare_with_byte_array(slot_data_dictionary, slot_file_data)
+				var comp = DataFormat.__compare_with_byte_array(str(slot_data_dictionary.hash()), str(slot_file_data))
 				if comp and not NEW_INSTALL:
 					var slot_appendages = []
 					var f = File.new()
@@ -315,12 +332,14 @@ func add_equipment():
 					f.close()
 					var index = index_data.split("\n")
 					validated_equipment.merge({slot_name:[equip,index]})
+					l("Equipment %s is already cached, appending to cached equipment process list" % slot_name)
 				else:
 					var f = File.new()
-					f.open(slot_folder + "index", File.WRITE)
-					f.store_string("")
+					f.open(slot_folder + "data_dictionary", File.WRITE)
+					f.store_string(str(slot_data_dictionary.hash()))
 					f.close()
 					unvalidated_equipment.merge({slot_name:[equip,slot_folder]})
+					l("Equipment %s is not cached, appending to caching process list" % slot_name)
 				
 	
 	
@@ -330,6 +349,7 @@ func add_equipment():
 		var mod = slot_mod[0]
 		var item = get_node(slot_mod[1])
 		var vanilla_store = cache_folder + mod + "/ADD_EQUIPMENT_SLOTS/" + slot_mod[1] + "/vanilla_slots/"
+		l("Adding vanilla equipment to uncached slot %s from mod %s" % [slot_mod[1],mod])
 		FolderAccess.__check_folder_exists(vanilla_store)
 		for v_equipment in vanilla_equipment:
 			var V2 = Equipment.__make_equipment(vanilla_equipment.get(v_equipment))
@@ -337,6 +357,9 @@ func add_equipment():
 			if does:
 				repack(V2,vanilla_store + v_equipment + ".tscn")
 				item.get_node("VBoxContainer").add_child(V2)
+				l("Vanilla equipment %s is applicable, adding & caching" % v_equipment)
+			else:
+				l("%s was not applicable, skipping" % v_equipment)
 	
 	
 	
@@ -345,6 +368,7 @@ func add_equipment():
 		var slot_mod = slot.split(":")
 		var mod = slot_mod[0]
 		var item = get_node(slot_mod[1])
+		l("Adding vanilla equipment from slot cache of %s from mod %s" % [slot_mod[1],mod])
 		var vanilla_store = cache_folder + mod + "/ADD_EQUIPMENT_SLOTS/" + slot_mod[1] + "/vanilla_slots/"
 		var files = FolderAccess.__fetch_folder_files(vanilla_store, false, true)
 		for file in files:
@@ -353,8 +377,9 @@ func add_equipment():
 	
 	
 	for slot in display_slots():
-		
-		
+		var slot_name = slot.name
+		l("Working on slot %s" % slot_name)
+		l("Adding tags to slot")
 		var current_default_equipment := []
 		if slot.slot_type == "HARDPOINT":
 			var hardpoint = slot.hardpoint_type
@@ -377,12 +402,19 @@ func add_equipment():
 				rewrite.append(it)
 		slot.allowed_equipment = rewrite
 		
+		var num_of_equipment_added_total = 0
+		var num_of_cached_equipment = 0
+		var num_of_uncached_equipment = 0
+		l("Adding equipment from cache")
 		for equip in validated_equipment:
 			var data = validated_equipment.get(equip)
-			if slot.name in data[1]:
+			if slot_name in data[1]:
 				slot.get_node("VBoxContainer").add_child(data[0].duplicate())
+				num_of_cached_equipment += 1
+				num_of_equipment_added_total += 1
+				
 		
-		
+		l("Adding non-cached equipment")
 		for equip in unvalidated_equipment:
 			var data = unvalidated_equipment.get(equip)
 			var V2 = data[0].duplicate()
@@ -391,13 +423,17 @@ func add_equipment():
 				var f = File.new()
 				f.open(data[1] + "index", File.READ_WRITE)
 				var sData = f.get_as_text()
-				var returnData = sData + "\n" + slot.name
+				var returnData = sData + "\n" + slot_name
 				f.store_string(returnData)
 				f.close()
 				slot.get_node("VBoxContainer").add_child(V2)
+#				l("Added %s to slot %s and adding to cache" % [V2.name, slot_name])
+				num_of_equipment_added_total += 1
+				num_of_uncached_equipment += 1
 			else:
+#				l("%s denied from slot %s" % [V2.name, slot_name])
 				V2.queue_free()
-		
+		l("Added %s equipment items to slot %s. [%s from cache, %s added to cache]" % [num_of_equipment_added_total, slot_name, num_of_cached_equipment, num_of_uncached_equipment])
 		
 #		for equip in equipments:
 #				var V2 = equip.duplicate()
@@ -410,6 +446,7 @@ func add_equipment():
 		
 		
 		if has:
+			l("Sorting equipment for slot %s" % slot_name)
 			var items = slot.get_node("VBoxContainer").get_children()
 			var nodePositions = []
 			for item in items:
@@ -592,3 +629,7 @@ func repack(node, save_path):
 	var save_folder = save_path.split(save_path.split("/")[save_path.split("/").size() - 1])[0]
 	FolderAccess.__check_folder_exists(save_folder)
 	ResourceSaver.save(save_path, save)
+
+var MODULE_IDENTIFIER = "Equipment Driver"
+func l(msg:String, ID:String = MODULE_IDENTIFIER, title:String = "HevLib"):
+	Debug.l("[%s %s]: %s" % [title, ID, msg])
