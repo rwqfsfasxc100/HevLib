@@ -1,12 +1,13 @@
 extends Node
 
-const MOD_PRIORITY = -INF
+const MOD_PRIORITY = INF
 const MOD_NAME = "HevLib"
 const MOD_VERSION = "1.5.6"
 const MOD_VERSION_MAJOR = 1
 const MOD_VERSION_MINOR = 5
 const MOD_VERSION_BUGFIX = 6
 const MOD_VERSION_METADATA = ""
+const MOD_IS_LIBRARY = true
 var modPath:String = get_script().resource_path.get_base_dir() + "/"
 var _savedObjects := []
 var modConfig = {}
@@ -16,26 +17,14 @@ func _init(modLoader = ModLoader):
 	loadDLC()
 	loadSettings()
 	installScriptExtension("events/TheRing.gd")
-	installScriptExtension("scenes/equipment/UpgradeGroup.gd")
-	installScriptExtension("scenes/equipment/hardpoints/EquipmentItemTemplate.gd")
 func _ready():
 	l("Readying")
-	var WebTranslate = preload("res://HevLib/pointers/WebTranslate.gd")
-	WebTranslate.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]])
 	replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
 	if ModLoader.is_debugged:
 		replaceScene("scenes/scene_replacements/TitleScreen.tscn", "res://TitleScreen.tscn")
-	replaceScene("scenes/equipment/Upgrades.tscn", "res://enceladus/Upgrades.tscn")
-	var NodeNew = Node.new()
-	NodeNew.set_script(load("res://HevLib/scripts/Variables.gd"))
-	NodeNew.name = "HevLib~Variables"
-	var Gamespace_Canvas = load("res://HevLib/ui/core_scenes/_HevLib_Gamespace_Canvas.tscn").instance()
 	var mouse = load("res://HevLib/scenes/scene_replacements/MouseLayer.tscn").instance()
 	var CRoot = get_tree().get_root()
-	CRoot.call_deferred("add_child",NodeNew)
-	CRoot.call_deferred("add_child",Gamespace_Canvas)
 	CRoot.call_deferred("add_child",mouse)
-	loadTranslationsFromCache()
 	replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
 	replaceScene("scenes/scene_replacements/Game.tscn", "res://Game.tscn")
 	var dir = Directory.new()
@@ -44,64 +33,7 @@ func _ready():
 	file.open("user://cache/.HevLib_Cache/library_documentation.json", File.WRITE)
 	file.store_string(load("res://HevLib/pointers/HevLib.gd").__get_library_functionality(true))
 	file.close()
-	var keybind_interrupt = load("res://HevLib/scenes/keymapping/keybind_interrupt.tscn").instance()
-	CRoot.call_deferred("add_child",keybind_interrupt)
 	l("Ready")
-func loadTranslationsFromCache():
-	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd").new()
-	var WebTranslateCache = "user://cache/.HevLib_Cache/WebTranslate/"
-	FolderAccess.__check_folder_exists(WebTranslateCache)
-	var cacheContent = FolderAccess.__fetch_folder_files(WebTranslateCache, true)
-	for folder in cacheContent:
-		var folderPath = WebTranslateCache + folder
-		var files = FolderAccess.__fetch_folder_files(folderPath)
-		for file in files:
-			var filePath = str(folderPath + file)
-			var ffile = str(file)
-			var dm = ffile.split("--")[1]
-			var does = true
-			if str(dm).ends_with("]"):
-				does = false
-			if does:
-				var vm = dm.split("-~-")
-				var mv = PoolByteArray()
-				for itm in vm:
-					mv.append(int(itm))
-				var delim = mv.get_string_from_utf8()
-				updateTL(filePath,delim,false,false)
-			else:
-				var dir = Directory.new()
-				dir.remove(filePath)
-func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, fullLogging:bool = true):
-	if useRelativePath:
-		path = str(modPath + path)
-	var fileName = path.split("/")[path.split("/").size() - 1]
-	var folderName = path.split(fileName)[0]
-	l("Adding translations from [%s] in [%s]" % [fileName, folderName])
-	var tlFile:File = File.new()
-	tlFile.open(path, File.READ)
-	var translations := []
-	var translationCount = 0
-	var csvLine := tlFile.get_line().split(delim)
-	if fullLogging:
-		l("Adding translations as: %s" % csvLine)
-	for i in range(1, csvLine.size()):
-		var translationObject := Translation.new()
-		translationObject.locale = csvLine[i]
-		translations.append(translationObject)
-	while not tlFile.eof_reached():
-		csvLine = tlFile.get_csv_line(delim)
-		if csvLine.size() > 1:
-			var translationID := csvLine[0]
-			for i in range(1, csvLine.size()):
-				translations[i - 1].add_message(translationID, csvLine[i].c_unescape())
-			if fullLogging:
-				l("Added translation: %s" % csvLine)
-			translationCount += 1
-	tlFile.close()
-	for translationObject in translations:
-		TranslationServer.add_translation(translationObject)
-	l("%s Translations Updated from @ [%s]" % [translationCount, fileName])
 func installScriptExtension(path:String):
 	var childPath:String = str(modPath + path)
 	var childScript:Script = ResourceLoader.load(childPath)
@@ -137,11 +69,3 @@ func loadSettings():
 	l(MOD_NAME + ": Current settings: %s" % modConfig)
 	settings.queue_free()
 	l(MOD_NAME + ": Finished loading settings")
-#
-#func repack(node):
-#	var save = PackedScene.new()
-#	var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd").new()
-#	NodeAccess.__claim_child_ownership(node)
-#	var ts = save.pack(node.duplicate())
-#	ResourceSaver.save("user://cache/.HevLib_Cache/Test.tscn", ts)
-#	pass
