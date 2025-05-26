@@ -193,7 +193,9 @@ func _tree_entered():
 	var hData = hFile.get_as_text()
 	hFile.close()
 	var de = DataFormat.__compare_with_byte_array(installed_hash, str(hData))
-	NEW_INSTALL = !de
+	if not de:
+		NEW_INSTALL = !de
+		FolderAccess.__recursive_delete(cache_folder)
 	var f2 = File.new()
 	f2.open(ddFile, File.WRITE)
 	f2.store_string(installed_hash)
