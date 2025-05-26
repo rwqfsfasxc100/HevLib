@@ -178,15 +178,24 @@ func _tree_entered():
 			l("Found mod at %s, labelling as %s" % [mPath, str(mHash)])
 	slots = conv
 	l("Finished scanning mods. %s mods are using HevLib Equipment Driver." % slots.size())
-	var installed_hash = str(str(paths).hash())
+	var installed_hash = str(str(paths).hash() + str(load("res://HevLib/ModMain.gd").MOD_VERSION).hash())
+	var ddFile = cache_folder + "driver_index"
+	var dir = Directory.new()
+	dir.open(cache_folder)
+	var de2 = dir.file_exists(ddFile)
+	if not de2:
+		var f03 = File.new()
+		f03.open(ddFile,File.WRITE)
+		f03.store_string("")
+		f03.close()
 	var hFile = File.new()
-	hFile.open(cache_folder + "driver_index", File.READ)
+	hFile.open(ddFile, File.READ)
 	var hData = hFile.get_as_text()
 	hFile.close()
 	var de = DataFormat.__compare_with_byte_array(installed_hash, str(hData))
 	NEW_INSTALL = !de
 	var f2 = File.new()
-	f2.open(cache_folder + "driver_index", File.WRITE)
+	f2.open(ddFile, File.WRITE)
 	f2.store_string(installed_hash)
 	f2.close()
 	l("Handled cache, starting to operate on mods.")
@@ -277,9 +286,18 @@ func add_slots():
 			for spt in newSlot:
 				var slot_name = spt.name
 				var slot_folder = cache_folder + mod_hash + "/ADD_EQUIPMENT_SLOTS/" + slot_name + "/"
+				var ddFile = slot_folder + "data_dictionary"
 				FolderAccess.__check_folder_exists(slot_folder)
+				var dir = Directory.new()
+				dir.open(slot_folder)
+				var does = dir.file_exists(ddFile)
+				if not does:
+					var f2 = File.new()
+					f2.open(ddFile, File.WRITE)
+					f2.store_string("")
+					f2.close()
 				var file = File.new()
-				file.open(slot_folder + "data_dictionary", File.READ_WRITE)
+				file.open(ddFile, File.READ_WRITE)
 				var slot_file_data = file.get_as_text()
 				file.close()
 				var slot_data_dictionary = str(spt.data_dictionary)
@@ -290,7 +308,7 @@ func add_slots():
 					l("Added slot %s from cache." % slot_name)
 				else:
 					var file2 = File.new()
-					file2.open(slot_folder + "data_dictionary", File.WRITE)
+					file2.open(ddFile, File.WRITE)
 					file2.store_string(slot_data_dictionary)
 					file2.close()
 					slots_that_need_vanilla_validation.append(mod_hash + ":" + slot_name)
@@ -346,8 +364,17 @@ func add_equipment():
 				var slot_name = equip.name
 				var slot_folder = cache_folder + mod_hash + "/ADD_EQUIPMENT_ITEMS/" + slot_name + "/"
 				FolderAccess.__check_folder_exists(slot_folder)
+				var ddFile = slot_folder + "data_dictionary"
+				var dir = Directory.new()
+				dir.open(slot_folder)
+				var does = dir.file_exists(ddFile)
+				if not does:
+					var f2 = File.new()
+					f2.open(ddFile, File.WRITE)
+					f2.store_string("")
+					f2.close()
 				var file = File.new()
-				file.open(slot_folder + "data_dictionary", File.READ)
+				file.open(ddFile, File.READ)
 				var slot_file_data = file.get_as_text()
 				file.close()
 				var slot_data_dictionary = str(equip.data_dictionary)
@@ -435,8 +462,18 @@ func add_equipment():
 			var V2 = data[0].duplicate()
 			var does = confirm_equipment(V2, slot.slot_type, slot.alignment, slot.restriction, slot.allowed_equipment)
 			if does:
+				var folder = data[1]
+				var ddFile = folder + "index"
+				var dir = Directory.new()
+				dir.open(folder)
+				var do = dir.file_exists(ddFile)
+				if not do:
+					var f2 = File.new()
+					f2.open(ddFile,File.WRITE)
+					f2.store_string("")
+					f2.close()
 				var f = File.new()
-				f.open(data[1] + "index", File.READ_WRITE)
+				f.open(ddFile, File.READ_WRITE)
 				var sData = f.get_as_text()
 				var returnData = sData + "\n" + slot_name
 				f.store_string(returnData)
