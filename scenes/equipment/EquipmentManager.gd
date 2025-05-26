@@ -303,6 +303,34 @@ var validated_equipment = {}
 var unvalidated_equipment = {}
 
 func add_equipment():
+	
+	for slot in display_slots():
+		var slot_name = slot.name
+		l("Working on slot %s" % slot_name)
+		l("Adding tags to slot")
+		var current_default_equipment := []
+		if slot.slot_type == "HARDPOINT":
+			var hardpoint = slot.hardpoint_type
+			var items = slot_defaults.get(hardpoint,[])
+			slot.allowed_equipment.append_array(items)
+		else:
+			var items = slot_defaults.get(slot.slot_type,[])
+			slot.allowed_equipment.append_array(items)
+		for add in slot.override_additive:
+			if add in slot.allowed_equipment:
+				pass
+			else:
+				slot.allowed_equipment.append(add)
+		var current = slot.allowed_equipment
+		var rewrite = []
+		for it in current:
+			if it in slot.override_subtractive:
+				pass
+			else:
+				rewrite.append(it)
+		slot.allowed_equipment = rewrite
+	
+	
 	for its in slots:
 		var slot = its[0]
 		var mod_hash = str(its[2])
@@ -323,11 +351,20 @@ func add_equipment():
 				var slot_file_data = file.get_as_text()
 				file.close()
 				var slot_data_dictionary = str(equip.data_dictionary)
-				var comp = DataFormat.__compare_with_byte_array(str(slot_data_dictionary.hash()), str(slot_file_data))
+				var comp = DataFormat.__compare_with_byte_array(str(slot_data_dictionary), str(slot_file_data))
 				if comp and not NEW_INSTALL:
 					var slot_appendages = []
+					var indexFile = slot_folder + "index"
+					var d = Directory.new()
+					d.open(slot_folder)
+					var dd = d.file_exists(indexFile)
+					if not dd:
+						var fs = File.new()
+						fs.open(indexFile, File.WRITE)
+						fs.store_string("")
+						fs.close()
 					var f = File.new()
-					f.open(slot_folder + "index", File.READ)
+					f.open(indexFile, File.READ)
 					var index_data = f.get_as_text()
 					f.close()
 					var index = index_data.split("\n")
@@ -336,7 +373,7 @@ func add_equipment():
 				else:
 					var f = File.new()
 					f.open(slot_folder + "data_dictionary", File.WRITE)
-					f.store_string(str(slot_data_dictionary.hash()))
+					f.store_string(str(slot_data_dictionary))
 					f.close()
 					unvalidated_equipment.merge({slot_name:[equip,slot_folder]})
 					l("Equipment %s is not cached, appending to caching process list" % slot_name)
@@ -378,29 +415,7 @@ func add_equipment():
 	
 	for slot in display_slots():
 		var slot_name = slot.name
-		l("Working on slot %s" % slot_name)
-		l("Adding tags to slot")
-		var current_default_equipment := []
-		if slot.slot_type == "HARDPOINT":
-			var hardpoint = slot.hardpoint_type
-			var items = slot_defaults.get(hardpoint,[])
-			slot.allowed_equipment.append_array(items)
-		else:
-			var items = slot_defaults.get(slot.slot_type,[])
-			slot.allowed_equipment.append_array(items)
-		for add in slot.override_additive:
-			if add in slot.allowed_equipment:
-				pass
-			else:
-				slot.allowed_equipment.append(add)
-		var current = slot.allowed_equipment
-		var rewrite = []
-		for it in current:
-			if it in slot.override_subtractive:
-				pass
-			else:
-				rewrite.append(it)
-		slot.allowed_equipment = rewrite
+		
 		
 		var num_of_equipment_added_total = 0
 		var num_of_cached_equipment = 0
