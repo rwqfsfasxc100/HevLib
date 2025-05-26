@@ -4,6 +4,16 @@ Library mod for ΔV: Rings of Saturn that provides several useful functions.
 This library is run through a set of 'pointers', which are small snippets of code that act, like the namesake, as pointers towards each function's file and as a way to organize a larger number of features into an easy to access location.
 
 # Usage
+> [!WARNING]
+> Do note that this library is comprised of several ModMain.gd files. If you plan on modding with this library, and some features do not work properly in the Godot editor, you will need to load all (at the time of writing) 5 of the library's ModMain files, which are as follows:
+> ```
+> "res://HevLib/ModMain.gd",
+> "res://HevLib/scenes/keymapping/ModMain.gd",
+> "res://HevLib/scenes/equipment/ModMain.gd",
+> "res://HevLib/scenes/weaponslot/ModMain.gd",
+> "res://HevLib/webtranslate/ModMain.gd",
+> ```
+
 Each pointer is found within the dedicated pointer folder at `res://HevLib/pointers/`, and can be called as a variant through means such as the following:
 ```
 var FileAccess = preload("res://HevLib/pointers/FileAccess.gd").new()
