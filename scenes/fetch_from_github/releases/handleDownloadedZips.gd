@@ -1,15 +1,15 @@
 extends Node
 
-var Globals = preload("res://ModMenu/Globals.gd").new()
+var Globals = preload("res://HevLib/Functions.gd").new()
 
 
-var cacheExtension = ".modmenucache"
-var slatedForUpdateCacheFolder = "user://cache/.Mod_Menu_Cache/updatecache/current_mod_caches/"
-var githubDataCache = "user://cache/.Mod_Menu_Cache/updatecache/github_cache/"
-var persistUpdateCacheFolder = "user://cache/.Mod_Menu_Cache/updatecache/persistent_mod_caches/"
-var zipStore = "user://cache/.Mod_Menu_Cache/updatecache/downloaded_zips/"
-var zipCache = "user://cache/.Mod_Menu_Cache/updatecache/zip_data_cache/"
-var debugPrefix = "Mod Menu Update Checker: "
+var cacheExtension = ".hevlibucache"
+var slatedForUpdateCacheFolder = "user://cache/.HevLib_Cache/updatecache/current_mod_caches/"
+var githubDataCache = "user://cache/.HevLib_Cache/updatecache/github_cache/"
+var persistUpdateCacheFolder = "user://cache/.HevLib_Cache/updatecache/persistent_mod_caches/"
+var zipStore = "user://cache/.HevLib_Cache/updatecache/downloaded_zips/"
+var zipCache = "user://cache/.HevLib_Cache/updatecache/zip_data_cache/"
+var debugPrefix = "HevLib Github Release Fetcher: "
 
 
 var childData = {}
@@ -60,7 +60,7 @@ func handleZips():
 			updates = updates + updateData
 		
 		var file = File.new()
-		file.open("user://cache/.Mod_Menu_Cache/updatecache/mod.updates", File.WRITE)
+		file.open("user://cache/.HevLib_Cache/updatecache/mod.updates", File.WRITE)
 		file.store_string(updates)
 		file.close()
 	
