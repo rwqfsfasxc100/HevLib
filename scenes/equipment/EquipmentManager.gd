@@ -178,7 +178,7 @@ func _tree_entered():
 			l("Found mod at %s, labelling as %s" % [mPath, str(mHash)])
 	slots = conv
 	l("Finished scanning mods. %s mods are using HevLib Equipment Driver." % slots.size())
-	var installed_hash = str(str(paths).hash() + str(load("res://HevLib/ModMain.gd").MOD_VERSION).hash())
+	var installed_hash = str(str(paths).hash() + str(load("res://HevLib/ModMain.gd").MOD_VERSION_MAJOR).hash() + str(load("res://HevLib/ModMain.gd").MOD_VERSION_MINOR).hash() + str(load("res://HevLib/ModMain.gd").MOD_VERSION_BUGFIX).hash() + str(load("res://HevLib/ModMain.gd").MOD_VERSION_METADATA).hash())
 	var ddFile = cache_folder + "driver_index"
 	var dir = Directory.new()
 	dir.open(cache_folder)
