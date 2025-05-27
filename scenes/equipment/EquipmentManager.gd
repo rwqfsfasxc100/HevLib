@@ -196,10 +196,7 @@ func _tree_entered():
 	if not de:
 		NEW_INSTALL = !de
 		FolderAccess.__recursive_delete(cache_folder)
-	var f2 = File.new()
-	f2.open(ddFile, File.WRITE)
-	f2.store_string(installed_hash)
-	f2.close()
+	
 	l("Handled cache, starting to operate on mods.")
 #func start_processing():
 	has = Settings.HevLib["equipment"]["do_sort_equipment_by_price"]
@@ -217,7 +214,10 @@ func _tree_entered():
 	while msecs.begins_with("0"):
 		msecs = msecs.substr(1)
 	l("Finished adding equipment. Process took a total time of %s seconds, %s milliseconds" % [secs,msecs])
-	pass
+	var f2 = File.new()
+	f2.open(ddFile, File.WRITE)
+	f2.store_string(installed_hash)
+	f2.close()
 #	call_deferred("repack",get_parent().get_parent().get_parent().get_parent().get_parent(), "user://cache/.HevLib_Cache/Test.tscn")
 #	var node = get_parent().get_parent().get_parent().get_parent().get_parent()
 #	for main in ModLoader.get_children():
