@@ -196,7 +196,7 @@ func _tree_entered():
 	if not de:
 		NEW_INSTALL = !de
 		FolderAccess.__recursive_delete(cache_folder)
-	
+		l("Attempting to clear EquipmentDriver cache. Check later logs for success from other processes")
 	l("Handled cache, starting to operate on mods.")
 #func start_processing():
 	has = Settings.HevLib["equipment"]["do_sort_equipment_by_price"]
