@@ -19,12 +19,12 @@ func _init(modLoader = ModLoader):
 	installScriptExtension("events/TheRing.gd")
 func _ready():
 	l("Readying")
-	replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
+#	replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
 	if ModLoader.is_debugged:
 		replaceScene("scenes/scene_replacements/TitleScreen.tscn", "res://TitleScreen.tscn")
-	var mouse = load("res://HevLib/scenes/scene_replacements/MouseLayer.tscn").instance()
+#	var mouse = load("res://HevLib/scenes/scene_replacements/MouseLayer.tscn").instance()
 	var CRoot = get_tree().get_root()
-	CRoot.call_deferred("add_child",mouse)
+#	CRoot.call_deferred("add_child",mouse)
 	replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
 	replaceScene("scenes/scene_replacements/Game.tscn", "res://Game.tscn")
 	var dir = Directory.new()
