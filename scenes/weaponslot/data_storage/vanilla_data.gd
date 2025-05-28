@@ -32,3 +32,14 @@ const equipment_position_defaults = {
 	"SYSTEM_PDTL-R":Vector2(71,19),
 	"SYSTEM_PDTL":Vector2(0,-15)
 }
+const equipment_rotation_defaults = {
+	"SYSTEM_EINAT":-180,
+	"SYSTEM_NANI":-180,
+	"SYSTEM_PDMWG-L":-60,
+	"SYSTEM_PDMWG-R":60,
+	"SYSTEM_PDT-L":-30,
+	"SYSTEM_PDT-R":30,
+	"SYSTEM_IROH":-180,
+	"SYSTEM_PDTL-L":-30,
+	"SYSTEM_PDTL-R":30
+}
