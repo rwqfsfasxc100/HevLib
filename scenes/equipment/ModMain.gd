@@ -22,6 +22,7 @@ var _savedObjects := []
 # This function is executed before the majority of the game is loaded
 # Only the Tool and Debug AutoLoads are available
 # Script and scene replacements should be done here, before the originals are loaded
+
 func _init(modLoader = ModLoader):
 	l("Initializing Equipment Driver")
 	
@@ -31,6 +32,7 @@ func _init(modLoader = ModLoader):
 func _ready():
 	l("Readying")
 	replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")
+	
 	l("Ready")
 	
 func installScriptExtension(path:String):

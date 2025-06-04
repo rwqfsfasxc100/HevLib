@@ -151,32 +151,9 @@ var has = false
 func _tree_entered():
 	var sTime = OS.get_system_time_msecs()
 	l("Started checking and modifying equipment")
-	var conv := []
-	var paths = []
-	FolderAccess.__check_folder_exists(cache_folder)
-	var mods = ModLoader.get_children()
-	l("Scanning installed mods for applicable mods")
-	for mod in mods:
-		var variants = mod.get_property_list()
-		var does = false
-		for it in variants:
-			var iname = it.get("name")
-			match iname:
-				"ADD_EQUIPMENT_SLOTS":
-					does = true
-				"ADD_EQUIPMENT_ITEMS":
-					does = true
-				"EQUIPMENT_TAGS":
-					does = true
-				"SLOT_TAGS":
-					does = true
-		if does:
-			var mPath = mod.get_script().get_path()
-			var mHash = mPath.hash()
-			conv.append([mod,mPath,mHash])
-			paths.append(mPath)
-			l("Found mod at %s, labelling as %s" % [mPath, str(mHash)])
-	slots = conv
+	var CRoot = get_tree().get_root().get_node("EquipmentDriver")
+	slots = CRoot.conv
+	var paths = CRoot.paths
 	l("Finished scanning mods. %s mods are using HevLib Equipment Driver." % slots.size())
 	var installed_hash = str(str(paths).hash() + str(load("res://HevLib/ModMain.gd").MOD_VERSION_MAJOR).hash() + str(load("res://HevLib/ModMain.gd").MOD_VERSION_MINOR).hash() + str(load("res://HevLib/ModMain.gd").MOD_VERSION_BUGFIX).hash() + str(load("res://HevLib/ModMain.gd").MOD_VERSION_METADATA).hash())
 	var ddFile = cache_folder + "driver_index"
@@ -196,6 +173,7 @@ func _tree_entered():
 	if not de:
 		NEW_INSTALL = !de
 		FolderAccess.__recursive_delete(cache_folder)
+		FolderAccess.__check_folder_exists(cache_folder)
 		l("Attempting to clear EquipmentDriver cache. Check later logs for success from other processes")
 	l("Handled cache, starting to operate on mods.")
 #func start_processing():
@@ -229,63 +207,53 @@ func _tree_entered():
 #					main.repack(node)
 func get_tags():
 	for its in slots:
-		var slot = its[0]
-		var data = slot.get_property_list()
-		var nodes = []
-		for item in data:
-			if item.get("name") == "EQUIPMENT_TAGS":
-				nodes.append(slot.get("EQUIPMENT_TAGS"))
-		if not nodes == []:
+		var nodes = its[0].get("EQUIPMENT_TAGS",{})
+		if nodes.keys().size() >= 1:
 #			var check = is_current_mod_cached(slot, "EQUIPMENT_TAGS", nodes)
 			l("Adding equipment tags for %s" % str(its[2]))
 			
-			for tag in nodes:
-				var slotTypes = tag.get("slot_types",[])
-				var equipmentItems = tag.get("equipment_types",[])
-				var align = tag.get("alignments",[])
-				var hardpointTypes = tag.get("hardpoint_types",[])
-				var slotDefaults = tag.get("slot_defaults",{})
-				if slotTypes.size() > 0:
-					for st in slotTypes:
-						if not st in slot_types:
-							slot_types.append(st)
-				if equipmentItems.size() > 0:
-					for st in equipmentItems:
-						if not st in equipment_types:
-							equipment_types.append(st)
-				if align.size() > 0:
-					for st in align:
-						if not st in alignments:
-							alignments.append(st)
-				if hardpointTypes.size() > 0:
-					for st in hardpointTypes:
-						if not st in hardpoint_types:
-							hardpoint_types.append(st)
-				if slotDefaults.keys().size() > 0:
-					for st in slotDefaults:
-						if st in slot_defaults.keys():
-							for item in slotDefaults.get(st):
-								if item in slot_defaults.get(st):
-									pass
-								else:
-									slot_defaults[st].append(item)
-						else:
-							slot_defaults.merge({st:slotDefaults.get(st)})
+			var slotTypes = nodes.get("slot_types",[])
+			var equipmentItems = nodes.get("equipment_types",[])
+			var align = nodes.get("alignments",[])
+			var hardpointTypes = nodes.get("hardpoint_types",[])
+			var slotDefaults = nodes.get("slot_defaults",{})
+			if slotTypes.size() > 0:
+				for st in slotTypes:
+					if not st in slot_types:
+						slot_types.append(st)
+			if equipmentItems.size() > 0:
+				for st in equipmentItems:
+					if not st in equipment_types:
+						equipment_types.append(st)
+			if align.size() > 0:
+				for st in align:
+					if not st in alignments:
+						alignments.append(st)
+			if hardpointTypes.size() > 0:
+				for st in hardpointTypes:
+					if not st in hardpoint_types:
+						hardpoint_types.append(st)
+			if slotDefaults.keys().size() > 0:
+				for st in slotDefaults:
+					if st in slot_defaults.keys():
+						for item in slotDefaults.get(st):
+							if item in slot_defaults.get(st):
+								pass
+							else:
+								slot_defaults[st].append(item)
+					else:
+						slot_defaults.merge({st:slotDefaults.get(st)})
 var slots_that_need_vanilla_validation := []
 var slots_with_cache := []
 
 func add_slots():
 	for its in slots:
-		var slot = its[0]
+		var newSlot = its[0].get("ADD_EQUIPMENT_SLOTS",[])
 		var mod_hash = str(its[2])
-		var data = slot.get_property_list()
-		var newSlot = null
-		for item in data:
-			if item.get("name") == "ADD_EQUIPMENT_SLOTS":
-				newSlot = slot.get("ADD_EQUIPMENT_SLOTS")
-		if typeof(newSlot) == TYPE_ARRAY:
+		if newSlot.size() >= 1:
 			l("Adding slots for %s" % mod_hash)
-			for spt in newSlot:
+			for slotDict in newSlot:
+				var spt = Equipment.__make_slot(slotDict)
 				var slot_name = spt.name
 				var slot_folder = cache_folder + mod_hash + "/ADD_EQUIPMENT_SLOTS/" + slot_name + "/"
 				var ddFile = slot_folder + "data_dictionary"
@@ -352,18 +320,13 @@ func add_equipment():
 	
 	
 	for its in slots:
-		var slot = its[0]
+		var newSlot = its[0].get("ADD_EQUIPMENT_ITEMS",[])
 		var mod_hash = str(its[2])
-		var data = slot.get_property_list()
-		var newSlot = null
-		for item in data:
-			if item.get("name") == "ADD_EQUIPMENT_ITEMS":
-				newSlot = slot.get("ADD_EQUIPMENT_ITEMS")
-		if not newSlot == null and newSlot.size() >= 1:
+		if newSlot.size() >= 1:
 			l("Adding equipment for %s" % mod_hash)
 			for equip in newSlot:
 				
-				var slot_name = equip.name
+				var slot_name = equip.get("system","OOPS! MISSING SYSTEM NAME!")
 				var slot_folder = cache_folder + mod_hash + "/ADD_EQUIPMENT_ITEMS/" + slot_name + "/"
 				FolderAccess.__check_folder_exists(slot_folder)
 				var ddFile = slot_folder + "data_dictionary"
@@ -379,7 +342,7 @@ func add_equipment():
 				file.open(ddFile, File.READ)
 				var slot_file_data = file.get_as_text()
 				file.close()
-				var slot_data_dictionary = str(equip.data_dictionary)
+				var slot_data_dictionary = str(equip)
 				var comp = DataFormat.__compare_with_byte_array(str(slot_data_dictionary), str(slot_file_data))
 				if comp and not NEW_INSTALL:
 					var slot_appendages = []
@@ -453,7 +416,7 @@ func add_equipment():
 		for equip in validated_equipment:
 			var data = validated_equipment.get(equip)
 			if slot_name in data[1]:
-				slot.get_node("VBoxContainer").add_child(data[0].duplicate())
+				slot.get_node("VBoxContainer").add_child(Equipment.__make_equipment(data[0]))
 				num_of_cached_equipment += 1
 				num_of_equipment_added_total += 1
 				
@@ -461,7 +424,7 @@ func add_equipment():
 		l("Adding non-cached equipment")
 		for equip in unvalidated_equipment:
 			var data = unvalidated_equipment.get(equip)
-			var V2 = data[0].duplicate()
+			var V2 = Equipment.__make_equipment(data[0])
 			var does = confirm_equipment(V2, slot.slot_type, slot.alignment, slot.restriction, slot.allowed_equipment)
 			if does:
 				var folder = data[1]
@@ -549,15 +512,9 @@ func add_slot_tags():
 				"override_subtractive":
 					get_node(item).override_subtractive = content
 	for its in slots:
-		var slot = its[0]
-		var data = slot.get_property_list()
-		var nodes = null
-		for item in data:
-			if item.get("name") == "SLOT_TAGS":
-				nodes = slot.get("SLOT_TAGS")
-		if not nodes == null:
-			if nodes.keys().size() >= 1:
-				slot_dictionary_temps.merge({slot.name.hash():nodes})
+		var nodes = its[0].get("SLOT_TAGS",{})
+		if nodes.keys().size() >= 1:
+			slot_dictionary_temps.merge({its[3].hash():nodes})
 	var master_slot_record = {}
 	for node in slot_dictionary_temps:
 		var nodes = slot_dictionary_temps.get(node)

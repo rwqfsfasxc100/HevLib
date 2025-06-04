@@ -1,7 +1,8 @@
 extends "res://ships/WeaponSlot.gd"
 
-var current_ship = ""
+export var slot_group = ""
 
+var current_ship = ""
 var WeaponSlot = preload("res://HevLib/pointers/WeaponSlot.gd")
 
 func _enter_tree():

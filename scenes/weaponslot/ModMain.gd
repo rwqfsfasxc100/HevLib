@@ -2,7 +2,7 @@ extends Node
 
 # Set mod priority if you want it to load before/after other mods
 # Mods are loaded from lowest to highest priority, default is 0
-const MOD_PRIORITY = 0
+const MOD_PRIORITY = -INF
 # Name of the mod, used for writing to the logs
 const MOD_NAME = "HevLib Library WeaponSlot Driver Module"
 const MOD_VERSION = "1.0.0"
