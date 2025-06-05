@@ -30,9 +30,9 @@ static func get_mod_data() -> Dictionary:
 					mod_name = cfg["package"].get("name",mod_name)
 					legacy_mod_version = cfg["package"].get("version",legacy_mod_version)
 					mod_version_major = cfg["package"].get("version_major",mod_version_major)
-					mod_version_minor = cfg["package"].get("version_major",mod_version_minor)
-					mod_version_bugfix = cfg["package"].get("version_major",mod_version_bugfix)
-					mod_version_metadata = cfg["package"].get("version_major",mod_version_metadata)
+					mod_version_minor = cfg["package"].get("version_minor",mod_version_minor)
+					mod_version_bugfix = cfg["package"].get("version_bugfix",mod_version_bugfix)
+					mod_version_metadata = cfg["package"].get("version_metadata",mod_version_metadata)
 				if "manifest_definitions" in cfg.keys():
 					manifest_version = cfg["manifest_definitions"].get("manifest_version",manifest_version)
 				manifest_data = cfg
@@ -42,7 +42,7 @@ static func get_mod_data() -> Dictionary:
 		var mod_version_string = str(mod_version_major) + "." + str(mod_version_minor) + "." + str(mod_version_bugfix)
 		if not str(mod_version_metadata) == "":
 			mod_version_array.append(mod_version_metadata)
-			mod_version_string = mod_version_string + "-" + mod_version_metadata
+			mod_version_string = mod_version_string + "-" + str(mod_version_metadata)
 		var version_dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
 		var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"is_a_library":mod_is_library,"node":mod,"manifest":manifestEntry}}
 		mod_dictionary.merge(mod_entry)
