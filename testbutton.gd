@@ -11,7 +11,7 @@ var hasActedOnGamespace = false
 onready var panel = load("res://HevLib/ui/popup_main_base.tscn").instance()
 var index = preload("res://HevLib/ui/core_scripts/index.gd").new()
 var data = index.exampleDict
-var ModManagement = preload("res://HevLib/pointers/ModManagement.gd")
+var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 func _physics_process(delta):
 	var noMargins = get_node_or_null("/root/_HevLib_Gamespace_Canvas/MarginContainer")
 	panel.datastring = data
@@ -26,7 +26,7 @@ func _physics_process(delta):
 
 func _on_Button_pressed():
 	rng.randomize()
-	var mods = ModManagement.__get_mod_data()
+	var mods = ManifestV2.__get_mod_data()
 #	var webtranslate = preload("res://HevLib/webtranslate/webtranslate.gd").new()
 #	webtranslate.webtranslate(URL)
 #	var pss = Globals.__get_current_achievements()

@@ -10,7 +10,7 @@ const MOD_VERSION_MAJOR = 1
 const MOD_VERSION_MINOR = 0
 const MOD_VERSION_BUGFIX = 0
 const MOD_VERSION_METADATA = ""
-const MOD_IS_LIBRARY = false
+const MOD_IS_LIBRARY = true
 # Path of the mod folder, automatically generated on runtime
 var modPath:String = get_script().resource_path.get_base_dir() + "/"
 # Required var for the replaceScene() func to work
