@@ -21,16 +21,23 @@ static func get_mod_data() -> Dictionary:
 		var content = FolderAccess.__fetch_folder_files(folder_path)
 		var has_mod_manifest = false
 		var manifest_data = {}
+		var manifest_version = 1
 		for file in content:
 			if file.to_lower() == "mod.manifest":
 				has_mod_manifest = true
 				var cfg = FileAccess.__config_parse(folder_path + file)
-				pass
+				if "package" in cfg.keys():
+					mod_name = cfg["package"].get("name",mod_name)
+					legacy_mod_version = cfg["package"].get("version",legacy_mod_version)
+					mod_version_major = cfg["package"].get("version_major",mod_version_major)
+					mod_version_minor = cfg["package"].get("version_major",mod_version_minor)
+					mod_version_bugfix = cfg["package"].get("version_major",mod_version_bugfix)
+					mod_version_metadata = cfg["package"].get("version_major",mod_version_metadata)
+				if "manifest_definitions" in cfg.keys():
+					manifest_version = cfg["manifest_definitions"].get("manifest_version",manifest_version)
+				manifest_data = cfg
 		
 		var manifestEntry = {"has_manifest":has_mod_manifest,"manifest_data":manifest_data}
-		
-		
-		
 		var mod_version_array = [mod_version_major,mod_version_minor,mod_version_bugfix]
 		var mod_version_string = str(mod_version_major) + "." + str(mod_version_minor) + "." + str(mod_version_bugfix)
 		if not mod_version_metadata == "":

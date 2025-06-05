@@ -11,3 +11,7 @@ description="HEVLIB_MOD_DESCRIPTION"
 group="library"
 github_homepage="https://github.com/rwqfsfasxc100/HevLib"
 github_releases="https://github.com/rwqfsfasxc100/HevLib/releases"
+
+[manifest_definitions]
+
+manifest_version=1
