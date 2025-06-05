@@ -1,6 +1,6 @@
 extends Node
 
-static func get_mod_data() -> Dictionary:
+static func get_mod_data(print_json) -> Dictionary:
 	var mods = ModLoader.get_children()
 	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 	var FileAccess = preload("res://HevLib/pointers/FileAccess.gd")
@@ -18,6 +18,7 @@ static func get_mod_data() -> Dictionary:
 		var mod_version_metadata = constants.get("MOD_VERSION_METADATA","")
 		
 		var mod_is_library = constants.get("MOD_IS_LIBRARY",false)
+		var hide_library = constants.get("LIBRARY_HIDDEN_BY_DEFAULT",true)
 		var content = FolderAccess.__fetch_folder_files(folder_path)
 		var has_mod_manifest = false
 		var manifest_data = {}
@@ -44,8 +45,12 @@ static func get_mod_data() -> Dictionary:
 			mod_version_array.append(mod_version_metadata)
 			mod_version_string = mod_version_string + "-" + str(mod_version_metadata)
 		var version_dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
-		var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"is_a_library":mod_is_library,"node":mod,"manifest":manifestEntry}}
+		var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"library_information":{"is_a_library":mod_is_library,"keep_library_hidden":hide_library},"node":mod,"manifest":manifestEntry}}
 		mod_dictionary.merge(mod_entry)
 	var statistics = {"installed_mod_count":mods.size()}
 	var returnValues = {"mods":mod_dictionary,"statistics":statistics}
-	return returnValues
+	if print_json:
+		var psj = JSON.print(returnValues, "\t")
+		return psj
+	else:
+		return returnValues
