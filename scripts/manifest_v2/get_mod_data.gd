@@ -40,7 +40,7 @@ static func get_mod_data() -> Dictionary:
 		var manifestEntry = {"has_manifest":has_mod_manifest,"manifest_data":manifest_data}
 		var mod_version_array = [mod_version_major,mod_version_minor,mod_version_bugfix]
 		var mod_version_string = str(mod_version_major) + "." + str(mod_version_minor) + "." + str(mod_version_bugfix)
-		if not mod_version_metadata == "":
+		if not str(mod_version_metadata) == "":
 			mod_version_array.append(mod_version_metadata)
 			mod_version_string = mod_version_string + "-" + mod_version_metadata
 		var version_dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
