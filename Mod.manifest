@@ -8,10 +8,10 @@ version_minor=6
 version_bugfix=2
 version_metadata=""
 description="HEVLIB_MOD_DESCRIPTION"
-group="library"
-github_homepage="https://github.com/rwqfsfasxc100/HevLib"
-github_releases="https://github.com/rwqfsfasxc100/HevLib/releases"
+groups=["library"]
+github="https://github.com/rwqfsfasxc100/HevLib"
+link_github_releases=true
 
 [manifest_definitions]
 
-manifest_version=1
+manifest_version=2

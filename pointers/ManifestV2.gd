@@ -6,7 +6,7 @@ var developer_hint = {
 	]
 }
 
-static func __get_mod_data(print_json: bool = false) -> Dictionary:
+static func __get_mod_data(format_to_manifest_version:bool = false, print_json: bool = false) -> Dictionary:
 	var f = load("res://HevLib/scripts/manifest_v2/get_mod_data.gd").new()
-	var s = f.get_mod_data(print_json)
+	var s = f.get_mod_data(format_to_manifest_version,print_json)
 	return s

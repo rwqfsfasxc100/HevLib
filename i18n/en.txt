@@ -23,3 +23,5 @@ EVENTDRIVER_EVENT_SELECTOR|Event Selector
 HEVLIB_MISSING_DOCUMENTATION_1|!!!!! No documentation for this feature was provided!
 
 HEVLIB_MISSING_DOCUMENTATION_2|!!!!! Please bring this to my (__hev) attention ASAP, as documentation is key for libraries such as this one for proper maintenance!
+
+HEVLIB_DESCRIPTION_PLACEHOLDER|This mod does not have a description. \n\nPlease check the webpage or thread where you obtained this mod for info, or ask the creator for a description.
