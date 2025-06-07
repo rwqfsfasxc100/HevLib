@@ -11,9 +11,9 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 	for mod in mods:
 		var constants = mod.get_script().get_script_constant_map()
 		var script_path = mod.get_script().get_path()
-		var folder_path = script_path.split(script_path.split("/")[script_path.split("/").size() - 1])[0]
+		var folder_path = str(script_path.split(script_path.split("/")[script_path.split("/").size() - 1])[0])
 		var mod_priority = constants.get("MOD_PRIORITY",0)
-		var mod_name = constants.get("MOD_NAME",script_path.split("/")[2])
+		var mod_name = str(constants.get("MOD_NAME",script_path.split("/")[2]))
 		var legacy_mod_version = constants.get("MOD_VERSION","1.0.0")
 		var mod_version_major = constants.get("MOD_VERSION_MAJOR",1)
 		var mod_version_minor = constants.get("MOD_VERSION_MINOR",0)
@@ -30,6 +30,8 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 		var has_mod_manifest = false
 		var manifest_data = {}
 		var manifest_version = 1
+		var has_icon_file = false
+		var icon_path = ""
 		for file in content:
 			if file.to_lower() == "mod.manifest":
 				has_mod_manifest = true
@@ -129,7 +131,10 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 								package.merge({"custom_data":custom_data})
 							
 							manifest_data = {"package":package,"manifest_definitions":{"manifest_version":manifest_version}}
-							
+			if file.to_lower().begins_with("icon") and file.to_lower().ends_with(".stex"):
+				has_icon_file = true
+				icon_path = folder_path + file
+		var icon_dict = {"has_icon_file":has_icon_file,"icon_path":icon_path}
 		var manifestEntry = {"has_manifest":has_mod_manifest,"manifest_version":manifest_version,"manifest_data":manifest_data}
 		var mod_version_array = [mod_version_major,mod_version_minor,mod_version_bugfix]
 		var mod_version_string = str(mod_version_major) + "." + str(mod_version_minor) + "." + str(mod_version_bugfix)
@@ -137,7 +142,7 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 			mod_version_array.append(mod_version_metadata)
 			mod_version_string = mod_version_string + "-" + str(mod_version_metadata)
 		var version_dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
-		var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"library_information":{"is_a_library":mod_is_library,"keep_library_hidden":hide_library},"node":mod,"manifest":manifestEntry}}
+		var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_a_library":mod_is_library,"keep_library_hidden":hide_library},"node":mod,"manifest":manifestEntry}}
 		mod_dictionary.merge(mod_entry)
 	var statistics = {"total_mod_count":mods.size(),"breakdown":{"mods":non_library_count,"libraries":library_count},"mods_using_manifests":manifest_count}
 	var returnValues = {"mods":mod_dictionary,"statistics":statistics}
