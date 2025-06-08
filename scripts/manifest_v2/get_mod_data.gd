@@ -129,6 +129,11 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 							var custom_data = manifest_data["package"].get("custom_data",[])
 							if not custom_data == []:
 								package.merge({"custom_data":custom_data})
+							var author = manifest_data["package"].get("author","Unknown")
+							package.merge({"author":author})
+							var credits = manifest_data["package"].get("credits","")
+							if not credits == "":
+								package.merge({"credits":credits})
 							
 							manifest_data = {"package":package,"manifest_definitions":{"manifest_version":manifest_version}}
 			if file.to_lower().begins_with("icon") and file.to_lower().ends_with(".stex"):

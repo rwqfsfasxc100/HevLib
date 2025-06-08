@@ -28,7 +28,7 @@ func _on_Button_pressed():
 	rng.randomize()
 	var mods = ManifestV2.__get_mod_data_from_files("user://cache/.HevLib_Cache/ManifestV2/derelictdelights/ModMain.gd", true)
 	var did = ManifestV2.__compare_versions(mods)
-#	var webtranslate = preload("res://HevLib/webtranslate/webtranslate.gd").new()
+	breakpoint#	var webtranslate = preload("res://HevLib/webtranslate/webtranslate.gd").new()
 #	webtranslate.webtranslate(URL)
 #	var pss = Globals.__get_current_achievements()
 #	var psm = Globals.__get_achievement_data("DIVER_10")
