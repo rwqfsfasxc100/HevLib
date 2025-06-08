@@ -2,15 +2,17 @@
 
 id="hev.LIBRARY"
 name="HevLib"
-version="1.6.4"
+version="1.6.5"
 version_major=1
 version_minor=6
-version_bugfix=4
+version_bugfix=5
 version_metadata=""
 description="HEVLIB_MOD_DESCRIPTION"
 groups=["library"]
 github="https://github.com/rwqfsfasxc100/HevLib"
 link_github_releases=true
+author="__hev"
+credits=["Za'krin - Mod Main design, original implementation of updateTL","spaceDOTexe - Manifest design, UpgradeGroup ship limiting logic"]
 
 [manifest_definitions]
 
