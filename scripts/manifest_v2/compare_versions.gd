@@ -9,7 +9,7 @@ static func compare_versions(checked_mod_data:Dictionary) -> bool:
 		var installed_mName = installed_mods["mods"][installed_mod].get("name","")
 		if installed_mName == check_name:
 			installed_dict = installed_mods["mods"][installed_mod].duplicate()
-	if installed_dict == {}:
+	if installed_dict.keys().size() == 0:
 		return false
 	var checked_manifest_version = checked_mod_data[checked_mod_data.keys()[0]]["manifest"]["manifest_version"]
 	var installed_manifest_version = installed_dict["manifest"]["manifest_version"]
