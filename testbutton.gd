@@ -26,9 +26,9 @@ func _physics_process(delta):
 
 func _on_Button_pressed():
 	rng.randomize()
-	var mods = ManifestV2.__get_mod_data_from_files("user://cache/.HevLib_Cache/ManifestV2/derelictdelights/ModMain.gd", true)
-	var did = ManifestV2.__compare_versions(mods)
-	breakpoint#	var webtranslate = preload("res://HevLib/webtranslate/webtranslate.gd").new()
+#	var mods = ManifestV2.__get_mod_data_from_files("user://cache/.HevLib_Cache/ManifestV2/derelictdelights/ModMain.gd", true)
+#	var did = ManifestV2.__compare_versions(mods)
+#	var webtranslate = preload("res://HevLib/webtranslate/webtranslate.gd").new()
 #	webtranslate.webtranslate(URL)
 #	var pss = Globals.__get_current_achievements()
 #	var psm = Globals.__get_achievement_data("DIVER_10")
@@ -36,14 +36,16 @@ func _on_Button_pressed():
 #	var stat = Globals.__get_stat_data("stat:salvaged_ships")
 #	Globals.__webtranslate_timed(URL, 5)
 #	var text = TranslationServer.translate("DIALOG_SALVAGE_EXPOSE_FAST_K37_3")
-#
+#	
 #	var gh = preload("res://HevLib/pointers/Github.gd").new()
 #	gh.__get_github_filesystem(URL, self, "normal", "1.0.0")
-	
+#	
 #	gh.__get_github_release("https://github.com/rwqfsfasxc100/HevLib", "user://temp", self, false, "any", "latest")
-	
-	
-	pass
+#	var hevlib_check = preload("res://HevLib/examples and documentation/hevlib_check.gd")
+#	var hevlib_check_with_version = preload("res://HevLib/examples and documentation/hevlib_check_with_version.gd")
+#	var does1 = hevlib_check.__hevlib_check()
+#	var does2 = hevlib_check_with_version.__hevlib_check_with_version([1,7,1])
+	breakpoint
 
 var updates = {}
 var count = 1
