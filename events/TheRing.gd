@@ -2,6 +2,10 @@ extends "res://TheRing.gd"
 
 var event_names = []
 
+var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+
+var cache_folder = "user://cache/.HevLib_Cache/"
+
 func _ready():
 	image = map.get_data()
 	size = image.get_size()
@@ -10,6 +14,7 @@ func _ready():
 	veinSize = veinImage.get_size()
 	
 	var disabled_events = Settings.HevLib["events"]["disabled_events"]
+	var write_events = Settings.HevLib["events"]["write_events"]
 	
 	for kid in get_children():
 		var kidName = kid.name
@@ -22,3 +27,15 @@ func _ready():
 				playlist.append(kid)
 	if not Engine.is_editor_hint():
 		CurrentGame.connect("inGameTimePassed", self, "_gameTimeProcess")
+	if write_events:
+		var string = ""
+		for event in event_names:
+			if string == "":
+				string = event
+			else:
+				string = string + "\n" + event
+		FolderAccess.__check_folder_exists(cache_folder)
+		var file = File.new()
+		file.open(cache_folder + "current_events.txt",File.WRITE)
+		file.store_string(string)
+		file.close()

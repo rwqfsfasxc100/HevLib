@@ -10,6 +10,7 @@ var HevLib = {
 	},
 	"events":{
 		"disabled_events":[  ],
+		"write_events":true,
 	},
 	"debug":{
 		"input_debugger":false,
