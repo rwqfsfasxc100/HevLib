@@ -16,7 +16,7 @@ static func store_config(configuration: Dictionary, mod: String):
 	var config_data = cfg.parse(FileCFG.get_as_text(true))
 	FileCFG.close()
 	var cfg_sections = cfg.get_sections()
-	
+	breakpoint
 	var sections = configuration.keys()
 	for section in sections:
 		var sect_name = mod + "/" + section
