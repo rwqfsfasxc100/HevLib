@@ -56,7 +56,9 @@ func _on_Button_pressed():
 #	Translations.__updateTL_drom_dictionary(tData)
 #	Translations.__inject_translations(tData)
 	
+	var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 	
+	ConfigDriver.__store_config(config,"HevLib")
 	
 	breakpoint
 
@@ -73,3 +75,25 @@ func _github_filesystem_data(data):
 
 func _downloaded_zip(file, folder):
 	pass
+
+
+
+var config = {
+	"equipment":{
+		"do_sort_equipment_by_price":true,
+	},
+	"events":{
+		"disabled_events":[  ],
+		"write_events":true,
+	},
+	"debug":{
+		"input_debugger":false,
+		"ring_position_data_debugger":false,
+		"ring_position_accurate_events":false,
+	},
+	"input":{
+		"open_debug_event_menu":[  ],
+		"debugger":[ "F10" ],
+		"toggle_debug_menus":[ "F9" ],
+	}, 
+}
