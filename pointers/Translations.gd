@@ -13,6 +13,10 @@ static func __updateTL(path:String, delim:String = ",", fullLogging:bool = true)
 	var f = load("res://HevLib/scripts/translations/updateTL.gd")
 	f.updateTL(path, delim, fullLogging)
 
+static func __updateTL_drom_dictionary(dictionary:Dictionary, delim:String = ",", fullLogging:bool = true):
+	var f = load("res://HevLib/scripts/translations/updateTL_from_dictionary.gd")
+	f.updateTL_from_dictionary(dictionary, delim, fullLogging)
+
 static func __fetch_all_translation_objects(number_of_objects_to_iterate_through: int = 100000) -> Array:
 	var f = load("res://HevLib/scripts/translations/fetch_all_translation_objects.gd")
 	var s = f.fetch_all_translation_objects(number_of_objects_to_iterate_through)

@@ -64,7 +64,7 @@ static func __get_pointer_functions(pointer: String, return_JSON: bool = false) 
 
 
 static func __get_library_functionality(return_JSON: bool = false) -> Dictionary:
-	var Globals = preload("res://HevLib/Functions.gd").new()
+	var Globals = preload("res://HevLib/pointers/FolderAccess.gd").new()
 	var path = "res://HevLib/pointers/"
 	var functions = {}
 	var files = Globals.__fetch_folder_files(path)

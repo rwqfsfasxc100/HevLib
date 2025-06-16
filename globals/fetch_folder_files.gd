@@ -4,6 +4,7 @@ static func fetch_folder_files(folder, showFolders, returnFullPath):
 	Debug.l("HevLib: function 'fetch_folder_files' instanced in %s, with folders included? [%s]" % [folder, showFolders])
 	var fileList = []
 	var dir = Directory.new()
+#	folder = ProjectSettings.localize_path(folder)
 	var does = dir.dir_exists(folder)
 	if not does:
 		return []

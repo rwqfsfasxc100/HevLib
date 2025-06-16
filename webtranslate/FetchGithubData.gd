@@ -53,27 +53,30 @@ var listOfFiles = []
 var webTranslateFiles = []
 var webtranslateFolderURL = ""
 func sort_data(P):
-	var treeData = P.get("tree")
-	for m in treeData:
-		if m.get("type") != "tree":
-			var filePath = m.get("path")
-			listOfFiles.append(filePath)
-	for f in listOfFiles:
-		var pmp = str(str(f).split("/")[str(f).split("/").size()-1])
-		if pmp.to_lower() == "index.wt":
-			pathToWebtranslate = f.split(pmp)[0]
-			if str(pathToWebtranslate).split("/")[str(pathToWebtranslate).split("/").size() - 1] == "":
-				pathToWebtranslate = str(pathToWebtranslate).substr(0,str(pathToWebtranslate).length()-1)
-			
-			indexFile = pmp
-	if pathToWebtranslate != "":
-		for s in listOfFiles:
-			if str(s).begins_with(pathToWebtranslate):
-				webTranslateFiles.append(str(s))
-	var fullIndexPath = githubDataBaseURL + pathToWebtranslate + "/" + indexFile
-	
-	Debug.l("HevLib WebTranslate: fetching index file from @ %s" % fullIndexPath)
-	$FetchIndex.request(fullIndexPath)
+	if P == null:
+		on_timeout()
+	else:
+		var treeData = P.get("tree")
+		for m in treeData:
+			if m.get("type") != "tree":
+				var filePath = m.get("path")
+				listOfFiles.append(filePath)
+		for f in listOfFiles:
+			var pmp = str(str(f).split("/")[str(f).split("/").size()-1])
+			if pmp.to_lower() == "index.wt":
+				pathToWebtranslate = f.split(pmp)[0]
+				if str(pathToWebtranslate).split("/")[str(pathToWebtranslate).split("/").size() - 1] == "":
+					pathToWebtranslate = str(pathToWebtranslate).substr(0,str(pathToWebtranslate).length()-1)
+				
+				indexFile = pmp
+		if pathToWebtranslate != "":
+			for s in listOfFiles:
+				if str(s).begins_with(pathToWebtranslate):
+					webTranslateFiles.append(str(s))
+		var fullIndexPath = githubDataBaseURL + pathToWebtranslate + "/" + indexFile
+		
+		Debug.l("HevLib WebTranslate: fetching index file from @ %s" % fullIndexPath)
+		$FetchIndex.request(fullIndexPath)
 
 var specificPaths = []
 var indexData
@@ -130,7 +133,13 @@ func fetchTranslations():
 func on_timeout():
 	
 	if not fallbackFiles == []:
-		for file in fallbackFiles and fallbackFiles.size() >= 1:
+		var confirmed_files = []
+		for file in fallbackFiles:
+			var dir = Directory.new()
+			var does = dir.file_exists(file)
+			if does:
+				confirmed_files.append(file)
+		for file in confirmed_files:
 			var Translations = preload("res://HevLib/pointers/Translations.gd").new()
 			var type = file.typeof()
 			if type == TYPE_STRING:
