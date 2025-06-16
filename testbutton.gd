@@ -26,9 +26,10 @@ func _physics_process(delta):
 
 func _on_Button_pressed():
 	rng.randomize()
+	var Translations = preload("res://HevLib/pointers/Translations.gd")
 #	var mods = ManifestV2.__get_mod_data_from_files("user://cache/.HevLib_Cache/ManifestV2/derelictdelights/ModMain.gd", true)
 #	var did = ManifestV2.__compare_versions(mods)
-#	var webtranslate = preload("res://HevLib/webtranslate/webtranslate.gd").new()
+#	var webtranslate = preload("res://HevLib/pointers/WebTranslate.gd")
 #	webtranslate.webtranslate(URL)
 #	var pss = Globals.__get_current_achievements()
 #	var psm = Globals.__get_achievement_data("DIVER_10")
@@ -45,6 +46,18 @@ func _on_Button_pressed():
 #	var hevlib_check_with_version = preload("res://HevLib/examples and documentation/hevlib_check_with_version.gd")
 #	var does1 = hevlib_check.__hevlib_check()
 #	var does2 = hevlib_check_with_version.__hevlib_check_with_version([1,7,1])
+#	webtranslate.__webtranslate_reset_by_file_check("file_check")
+	var tData = {
+		"en":{
+			"STRING_A":"Yes",
+			"STRING_B":"No",
+		},
+	}
+	
+	Translations.__inject_translations(tData)
+	
+	
+	
 	breakpoint
 
 var updates = {}

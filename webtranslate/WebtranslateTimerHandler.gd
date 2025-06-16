@@ -5,12 +5,13 @@ var Globals = preload("res://HevLib/Functions.gd").new()
 export var URL = ""
 export var MINUTES = 30
 export var fallback = []
+export var file_check = ""
 
 func _ready():
 	var timer = preload("res://HevLib/Scenes/timer/Timer.tscn").instance()
 	add_child(timer)
 	get_child(0).start_timer(MINUTES)
-	Globals.__webtranslate(URL, fallback)
+	Globals.__webtranslate(URL, fallback, file_check)
 
 
 func onTimerComplete():

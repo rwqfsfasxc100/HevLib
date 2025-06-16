@@ -24,15 +24,20 @@ var developer_hint = {
 	]
 }
 
-static func __webtranslate(URL: String, fallback: Array = []):
+static func __webtranslate(URL: String, fallback: Array = [], file_check: String = ""):
 	var f = load("res://HevLib/webtranslate/webtranslate.gd")
-	f.webtranslate(URL)
+	f.webtranslate(URL, fallback, file_check)
 
-static func __webtranslate_reset(URL: String) -> bool:
+static func __webtranslate_reset_by_URL(URL: String) -> bool:
 	var f = load("res://HevLib/webtranslate/webtranslate_reset.gd")
 	var s = f.webtranslate_reset(URL)
 	return s
 
-static func __webtranslate_timed(URL: String, MINUTES_DELAY: int = 30, fallback: Array = []):
+static func __webtranslate_reset_by_file_check(file_check: String) -> bool:
+	var f = load("res://HevLib/webtranslate/webtranslate_reset_by_file_check.gd")
+	var s = f.webtranslate_reset_by_file_check(file_check)
+	return s
+
+static func __webtranslate_timed(URL: String, MINUTES_DELAY: int = 30, fallback: Array = [], file_check: String = ""):
 	var f = load("res://HevLib/webtranslate/webtranslate_timed.gd").new()
-	var s = f.webtranslate_timed(URL, MINUTES_DELAY)
+	var s = f.webtranslate_timed(URL, MINUTES_DELAY, fallback, file_check)

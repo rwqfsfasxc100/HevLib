@@ -5,6 +5,8 @@ var Globals = preload("res://HevLib/Functions.gd").new()
 var HevLibCache = "user://cache/.HevLib_Cache"
 var cacheExtension = ".hev"
 
+var file_check = ""
+
 var Translations = preload("res://HevLib/pointers/Translations.gd").new()
 
 func _ready():
@@ -53,15 +55,22 @@ func _on_request_complete(result, response_code, headers, body):
 				utfc = str(ut)
 			else:
 				utfc = utfc + "-~-" + str(ut)
-		Globals.__check_folder_exists(HevLibCache + "/WebTranslate/" + nameContent[0])
+		var base_folder = HevLibCache + "/WebTranslate/" + nameContent[0]
+		Globals.__check_folder_exists(base_folder)
 		var file = File.new()
-		var fileName = HevLibCache + "/WebTranslate/" + nameContent[0] + "/" + nameContent[1] + cacheExtension + "--" + utfc
+		var fileName = base_folder + "/" + nameContent[1] + cacheExtension + "--" + utfc
 		file.open(fileName,File.WRITE)
 		file.store_string(releasesContent)
 		file.close()
 		
 		Translations.__updateTL(fileName,delim)
-		
+		if file_check == "":
+			Globals.__recursive_delete(fileName)
+		else:
+			var f = File.new()
+			f.open(base_folder + "/" + str(file_check.hash()) + ".file_check_cache",File.WRITE)
+			f.store_string(file_check)
+			f.close()
 	get_parent().fetchTranslations()
 
 

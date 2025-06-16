@@ -15,6 +15,8 @@ var MINUTES = 0.5
 
 var fallbackFunc = ""
 
+var file_check = ""
+
 func _ready():
 	fetch_github_data(URLFullStopReformat)
 
@@ -115,6 +117,7 @@ func fetchTranslations():
 		specificPaths = resetPaths
 		
 		Debug.l("HevLib WebTranslate: fetching specific translations @ %s" % translationForFetching)
+		$FetchFileData.file_check = file_check
 		$FetchFileData.request(translationForFetching)
 		
 	else:

@@ -18,13 +18,16 @@ func _ready():
 	l("Readying")
 	
 	var WebTranslate = preload("res://HevLib/pointers/WebTranslate.gd")
-	WebTranslate.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]])
+	WebTranslate.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]], "res://HevLib/webtranslate/ModMain.gd")
 	
 	loadTranslationsFromCache()
 	
 	l("Ready")
-	
+
+var cache_extension = ".file_check_cache"
+
 func loadTranslationsFromCache():
+	var accepted = false
 	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd").new()
 	var WebTranslateCache = "user://cache/.HevLib_Cache/WebTranslate/"
 	FolderAccess.__check_folder_exists(WebTranslateCache)
@@ -32,23 +35,46 @@ func loadTranslationsFromCache():
 	for folder in cacheContent:
 		var folderPath = WebTranslateCache + folder
 		var files = FolderAccess.__fetch_folder_files(folderPath)
+		var cache_location_exists = false
 		for file in files:
 			var filePath = str(folderPath + file)
 			var ffile = str(file)
-			var dm = ffile.split("--")[1]
-			var does = true
-			if str(dm).ends_with("]"):
-				does = false
-			if does:
-				var vm = dm.split("-~-")
-				var mv = PoolByteArray()
-				for itm in vm:
-					mv.append(int(itm))
-				var delim = mv.get_string_from_utf8()
-				updateTL(filePath,delim,false,false)
-			else:
+			if ffile.ends_with(cache_extension):
+				cache_location_exists = true
+				var f = File.new()
+				f.open(filePath,File.READ)
+				var txt = f.get_as_text()
+				f.close()
 				var dir = Directory.new()
-				dir.remove(filePath)
+				var does = dir.file_exists(txt)
+				if does:
+					Debug.l("WebTranslate: available translations from cache at %s" % ffile)
+					accepted = true
+				
+			else:
+				continue
+		if not cache_location_exists:
+			FolderAccess.__recursive_delete(folderPath)
+		if accepted:
+			for file in files:
+				var filePath = str(folderPath + file)
+				var ffile = str(file)
+				if ffile.ends_with(cache_extension):
+					continue
+				var dm = ffile.split("--")[1]
+				var does = true
+				if str(dm).ends_with("]"):
+					does = false
+				if does:
+					var vm = dm.split("-~-")
+					var mv = PoolByteArray()
+					for itm in vm:
+						mv.append(int(itm))
+					var delim = mv.get_string_from_utf8()
+					updateTL(filePath,delim,false,false)
+				else:
+					var dir = Directory.new()
+					dir.remove(filePath)
 # Helper script to load translations using csv format
 # `path` is the path to the transalation file
 # `delim` is the symbol used to seperate the values

@@ -10,5 +10,15 @@ var developer_hint = {
 }
 
 static func __updateTL(path:String, delim:String = ",", fullLogging:bool = true):
-	var f = load("res://HevLib/scripts/updateTL.gd")
+	var f = load("res://HevLib/scripts/translations/updateTL.gd")
 	f.updateTL(path, delim, fullLogging)
+
+static func __fetch_all_translation_objects(number_of_objects_to_iterate_through: int = 100000) -> Array:
+	var f = load("res://HevLib/scripts/translations/fetch_all_translation_objects.gd")
+	var s = f.fetch_all_translation_objects(number_of_objects_to_iterate_through)
+	return s
+
+static func __inject_translations(translation_data: Dictionary,number_of_objects_to_iterate_through: int = 100000) -> Array:
+	var f = load("res://HevLib/scripts/translations/inject_translations.gd")
+	var s = f.inject_translations(translation_data,number_of_objects_to_iterate_through)
+	return s
