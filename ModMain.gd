@@ -88,7 +88,6 @@ func _ready():
 	CRoot.call_deferred("add_child",vNode)
 	
 	
-	
 	l("Ready")
 func installScriptExtension(path:String):
 	var childPath:String = str(modPath + path)
