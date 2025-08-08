@@ -10,5 +10,5 @@ static func fetch_all_translation_objects(index) -> Array:
 		var data = obj.get_class()
 		if not data == "Translation":
 			continue
-		translations.append(obj)
+		translations.append(obj) # for future, see if obj.self works to get the node instead of a reference
 	return translations
