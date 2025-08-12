@@ -3,19 +3,6 @@ extends Node
 static func parse_as_manifest(file_path: String, format_to_manifest_version: bool = false) -> Dictionary:
   var cfg = FileAccess.__config_parse(file_path)
   var manifest_data : Dictionary = {}
-  var mod_name : String = ""
-  var legacy_mod_version = ""
-  var mod_version_major : int = 1
-  var mod_version_minor : int = 0
-  var mod_version_bugfix : int = 0
-  var mod_version_metadata : String = ""
-  if "package" in cfg.keys():
-    mod_name = cfg["package"].get("name",mod_name)
-    legacy_mod_version = cfg["package"].get("version",legacy_mod_version)
-    mod_version_major = cfg["package"].get("version_major",mod_version_major)
-    mod_version_minor = cfg["package"].get("version_minor",mod_version_minor)
-    mod_version_bugfix = cfg["package"].get("version_bugfix",mod_version_bugfix)
-    mod_version_metadata = cfg["package"].get("version_metadata",mod_version_metadata)
   if "manifest_definitions" in cfg.keys():
     manifest_version = cfg["manifest_definitions"].get("manifest_version",manifest_version)
   manifest_data = cfg
