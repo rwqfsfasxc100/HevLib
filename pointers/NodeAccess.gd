@@ -16,6 +16,13 @@ var developer_hint = {
 	"__is_instanced_from_scene":[
 		"Checks if a node is instanced from a file",
 		"'p_node' is the node that is being checked"
+	],
+	"__dynamic_crew_expander":[
+		"Creates a valid scene file that can be used to extend the number of crew capable of boarding a derelict",
+		"folder_path -> the folder where the scene will be stored",
+		"max_crew -> the desired new maximum crew count that can board derelicts. Fails when equal to 24 or less due to HevLib doing it automatically",
+		"Returns a string as the filepath to the generated scene. The scene is given a generated name, so be careful which folder is chosen.",
+		"If the function fails, an empty string is returned instead."
 	]
 	}
 
@@ -31,4 +38,9 @@ static func __claim_child_ownership(node:Node):
 static func __is_instanced_from_scene(p_node):
 	var f = load("res://HevLib/scripts/claim_child_ownership.gd").new()
 	var s = f.__is_instanced_from_scene(p_node)
+	return s
+
+static func __dynamic_crew_expander(folder_path: String, max_crew:int = 24) -> String:
+	var f = load("res://HevLib/scenes/crew_extensions/dynamic_crew_expander.gd").new()
+	var s = f.dynamic_crew_expander(folder_path, max_crew)
 	return s

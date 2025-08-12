@@ -27,12 +27,14 @@ static func get_mod_data_from_files(script_path:String, format_to_manifest_versi
 		if file.to_lower() == "mod.manifest":
 			has_mod_manifest = true
 			manifest_data = ManifestV2.__parse_file_as_manifest(folder_path + file, true)
-			mod_name = manifest_data["package"].get("name",mod_name)
-			legacy_mod_version = manifest_data["package"].get("version",legacy_mod_version)
-			mod_version_major = manifest_data["package"].get("version_major",mod_version_major)
-			mod_version_minor = manifest_data["package"].get("version_minor",mod_version_minor)
-			mod_version_bugfix = manifest_data["package"].get("version_bugfix",mod_version_bugfix)
-			mod_version_metadata = manifest_data["package"].get("version_metadata",mod_version_metadata)
+			mod_name = manifest_data["mod_information"].get("name",mod_name)
+			legacy_mod_version = manifest_data["version"].get("version_string",legacy_mod_version)
+			mod_version_major = manifest_data["version"].get("version_major",mod_version_major)
+			mod_version_minor = manifest_data["version"].get("version_minor",mod_version_minor)
+			mod_version_bugfix = manifest_data["version"].get("version_bugfix",mod_version_bugfix)
+			mod_version_metadata = manifest_data["version"].get("version_metadata",mod_version_metadata)
+			mod_is_library = manifest_data["tags"].get("is_library_mod",false)
+			hide_library = manifest_data["tags"].get("library_hidden_by_default",true)
 		if file.to_lower().begins_with("icon") and file.to_lower().ends_with(".stex"):
 			has_icon_file = true
 			icon_path = folder_path + file

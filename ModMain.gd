@@ -38,6 +38,7 @@ func _ready():
 	file.close()
 	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 	var cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/"
+	replaceScene("scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
 #	var CRoot = get_tree().get_root()
 	var conv := []
 	var paths = []
