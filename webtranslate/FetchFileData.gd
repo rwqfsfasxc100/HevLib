@@ -16,61 +16,62 @@ func _ready():
 func _on_request_complete(result, response_code, headers, body):
 	if not result == 0:
 		get_parent().on_timeout()
-	var json = body.get_string_from_utf8()
-	var releasesContent
-	var data
-	if not json == null:
-		releasesContent = json
-	if releasesContent:
-		var cFile = str(get_parent().currentFile)
-		var CContent = str(cFile.split("https://raw.githubusercontent.com/")[1])
-		var nameContent = CContent.split("/refs/heads/")
-		var indexData = str(get_parent().indexData)
-		var delim = ""
-		var index = str(indexData.split("\n")[0])
-		if index.begins_with("delimiter:"):
-			delim = index.split("delimiter:")[1]
-		else:
-			delim = "|"
-		var psmp = []
-		for p in nameContent:
-			var als = str(p).split("/")
-			var pindex = 0
-			var concatStr = ""
-			while pindex <= als.size() - 1:
-				if pindex == 0:
-					concatStr = als[pindex]
-				else:
-					concatStr = concatStr + "~_~" + als[pindex]
-				pindex += 1
-			if concatStr != "":
-				psmp.append(concatStr)
-		if psmp != []:
-			nameContent = psmp
-		var utf8 = delim.to_utf8()
-		var utfc = ""
-		for ut in utf8:
-			var chars = utf8.size()
-			if utfc == "":
-				utfc = str(ut)
+	else:
+		var json = body.get_string_from_utf8()
+		var releasesContent
+		var data
+		if not json == null:
+			releasesContent = json
+		if releasesContent:
+			var cFile = str(get_parent().currentFile)
+			var CContent = str(cFile.split("https://raw.githubusercontent.com/")[1])
+			var nameContent = CContent.split("/refs/heads/")
+			var indexData = str(get_parent().indexData)
+			var delim = ""
+			var index = str(indexData.split("\n")[0])
+			if index.begins_with("delimiter:"):
+				delim = index.split("delimiter:")[1]
 			else:
-				utfc = utfc + "-~-" + str(ut)
-		var base_folder = HevLibCache + "/WebTranslate/" + nameContent[0]
-		Globals.__check_folder_exists(base_folder)
-		var file = File.new()
-		var fileName = base_folder + "/" + nameContent[1] + cacheExtension + "--" + utfc
-		file.open(fileName,File.WRITE)
-		file.store_string(releasesContent)
-		file.close()
-		
-		Translations.__updateTL(fileName,delim)
-		if file_check == "":
-			Globals.__recursive_delete(fileName)
-		else:
-			var f = File.new()
-			f.open(base_folder + "/" + str(file_check.hash()) + ".file_check_cache",File.WRITE)
-			f.store_string(file_check)
-			f.close()
-	get_parent().fetchTranslations()
+				delim = "|"
+			var psmp = []
+			for p in nameContent:
+				var als = str(p).split("/")
+				var pindex = 0
+				var concatStr = ""
+				while pindex <= als.size() - 1:
+					if pindex == 0:
+						concatStr = als[pindex]
+					else:
+						concatStr = concatStr + "~_~" + als[pindex]
+					pindex += 1
+				if concatStr != "":
+					psmp.append(concatStr)
+			if psmp != []:
+				nameContent = psmp
+			var utf8 = delim.to_utf8()
+			var utfc = ""
+			for ut in utf8:
+				var chars = utf8.size()
+				if utfc == "":
+					utfc = str(ut)
+				else:
+					utfc = utfc + "-~-" + str(ut)
+			var base_folder = HevLibCache + "/WebTranslate/" + nameContent[0]
+			Globals.__check_folder_exists(base_folder)
+			var file = File.new()
+			var fileName = base_folder + "/" + nameContent[1] + cacheExtension + "--" + utfc
+			file.open(fileName,File.WRITE)
+			file.store_string(releasesContent)
+			file.close()
+			
+			Translations.__updateTL(fileName,delim)
+			if file_check == "":
+				Globals.__recursive_delete(fileName)
+			else:
+				var f = File.new()
+				f.open(base_folder + "/" + str(file_check.hash()) + ".file_check_cache",File.WRITE)
+				f.store_string(file_check)
+				f.close()
+		get_parent().fetchTranslations()
 
 
