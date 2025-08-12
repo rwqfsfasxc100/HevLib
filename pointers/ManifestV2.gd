@@ -25,3 +25,8 @@ static func __get_mod_data_from_files(script_path:String, format_to_manifest_ver
 	var f = load("res://HevLib/scripts/manifest_v2/get_mod_data_from_files.gd").new()
 	var s = f.get_mod_data_from_files(script_path,format_to_manifest_version)
 	return s
+
+static func __parse_as_manifest(file_path: String, format_to_manifest_version: bool = false) -> Dictionary:
+	var f = load("res://HevLib/scripts/manifest_v2/parse_as_manifest.gd").new()
+	var s = f.parse_as_manifest(file_path, format_to_manifest_version)
+	return s
