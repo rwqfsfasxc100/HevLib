@@ -4,6 +4,7 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 	var mods = ModLoader.get_children()
 	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 	var FileAccess = preload("res://HevLib/pointers/FileAccess.gd")
+	var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 	var mod_dictionary = {}
 	var manifest_count = 0
 	var library_count = 0
@@ -36,6 +37,7 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 			if file.to_lower() == "mod.manifest":
 				has_mod_manifest = true
 				manifest_count += 1
+				var manifest_cfg = ManifestV2.__parse_as_manifest(folder_path + file, true)
 				var cfg = FileAccess.__config_parse(folder_path + file)
 				if "package" in cfg.keys():
 					mod_name = cfg["package"].get("name",mod_name)
