@@ -102,5 +102,3 @@ static func parse_as_manifest(file_path: String, format_to_manifest_version: boo
           package.merge({"credits":credits})
         manifest_data = {"package":package,"manifest_definitions":{"manifest_version":manifest_version}}
   return manifest_data
-							
-							manifest_data = {"package":package,"manifest_definitions":{"manifest_version":manifest_version}}
