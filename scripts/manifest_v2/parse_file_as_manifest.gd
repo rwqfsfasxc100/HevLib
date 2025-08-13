@@ -124,6 +124,7 @@ static func parse_as_manifest(file_path: String, format_to_manifest_version: boo
 				dict_template["tags"]["handle_extra_crew"] = manifest_data["tags"].get("handle_extra_crew",24)
 				dict_template["tags"]["visual"] = manifest_data["tags"].get("visual",false)
 				dict_template["tags"]["fun"] = manifest_data["tags"].get("fun",false)
+				dict_template["tags"]["language"] = manifest_data["tags"].get("language","en")
 				
 				# links
 				dict_template["links"]["github"] = manifest_data["links"].get("github",{"link":"","has_releases":false})
