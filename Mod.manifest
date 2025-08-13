@@ -17,6 +17,7 @@ version_bugfix=7
 allow_achievements=true
 is_library_mod=true
 library_hidden_by_default=false
+language=["en"]
 
 [links]
 
