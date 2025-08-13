@@ -4,7 +4,7 @@ var developer_hint = {
 	"__config_parse":[
 			"Parses a config file as a dictionary",
 			"Supply the path to a text file containing the data",
-			"File must be formatted using the ConfigFile module"
+			"File must be formatted to ini standards, e.g. through using the ConfigFile module"
 		]
 }
 
