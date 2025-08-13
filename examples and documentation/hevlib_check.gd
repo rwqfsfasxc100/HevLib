@@ -67,7 +67,7 @@ var mod_exists : bool
 
 
 
-
+# Main function body
 
 func _ready():
 	Debug.l("Mod Checker Script: starting check for mod [%s]" % mod_name)
@@ -109,6 +109,8 @@ func _ready():
 		if show_dialogue_box:
 			var box = AcceptDialog.new()
 			box.connect("confirmed", self, "_confirmed_pressed")
+			box.window_title = dialogue_box_title
+			box.popup_exclusive = true
 			box.rect_min_size = Vector2(300,150)
 			
 			if custom_message_string == "":
