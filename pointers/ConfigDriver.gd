@@ -13,6 +13,6 @@ static func __config_parse(file: String) -> Dictionary:
 	var s = f.config_parse(file)
 	return s
 
-static func __store_config(configuration: Dictionary, mod: String):
+static func __store_config(configuration: Dictionary, mod_id: String):
 	var f = load("res://HevLib/scripts/configs/store_config.gd")
-	f.store_config(configuration,mod)
+	f.store_config(configuration,mod_id)

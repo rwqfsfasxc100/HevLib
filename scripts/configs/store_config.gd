@@ -1,10 +1,9 @@
 extends Node
 
-static func store_config(configuration: Dictionary, mod: String):
+static func store_config(configuration: Dictionary, mod_id: String):
 	var cfg_folder = "user://cfg/"
-	var cfg_file = "HevLib_Mod_Configurations" + ".cfg"
-	var dir = Directory.new()
-	var check = dir.file_exists(cfg_file)
+	var cfg_file = "Mod_Configurations" + ".cfg"
+	var check = Directory.new().file_exists(cfg_file)
 	if not check:
 		var tmpf = File.new()
 		tmpf.open(cfg_folder+cfg_file,File.WRITE)
@@ -19,7 +18,7 @@ static func store_config(configuration: Dictionary, mod: String):
 	breakpoint
 	var sections = configuration.keys()
 	for section in sections:
-		var sect_name = mod + "/" + section
+		var sect_name = mod_id + "/" + section
 		if sect_name in cfg_sections:
 			pass
 		else:
