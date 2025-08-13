@@ -115,21 +115,36 @@ func _ready():
 			
 			if custom_message_string == "":
 				var text = ""
-				var header = "Warning! The mod %s is not currently installed with the correct version." % mod_name
+				var header = "Warning! The mod %s is not currently installed with the correct version.\n\n" % mod_name
+				var body = "Please install a copy of %s that is " % mod_name
+				var mx = false
+				if not max_version_major == INF:
+					mx = true
+					var txt = "older than version %s.%s.%s" % [max_version_major,max_version_minor,max_version_bugfix]
+					body = body + txt
 				
-				var min_version_dialogue = ""
-				
-				box.dialog_text = ""
-			
+				if not min_version_major == -INF:
+					if mx:
+						body = body + " or is "
+					var txt = "newer than version %s.%s.%s" % [min_version_major,min_version_minor,min_version_bugfix]
+					body = body + txt
+				var bottom = ". \n\nPlease ensure that the mod was downloaded from the correct page, for instance the releases page on GitHub."
+				box.dialog_text = header + body + bottom
+			else:
+				box.dialog_text = custom_message_string
 			box.visible = true
 		else:
 			_confirmed_pressed()
 		pass
 
 func _confirmed_pressed():
-	pass
-
-
+	Debug.l("Mod Checker Script: mod [%s] exists? [%s]" % mod_exists)
+	
+	if not mod_exists and crash_if_not_found:
+		Debug.l("Mod Checker Script: mod %s not found within desired version range, exiting game" % mod_name)
+		Loader.go(exit)
+	
+onready var exit = Loader.prepare("res://Exit.tscn")
 
 
 static func fetch_folder_files(folder) -> Array:
