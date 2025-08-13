@@ -234,7 +234,7 @@ func parse_as_manifest(file_path: String, format_to_manifest_version: bool = fal
 			}
 		}
 		match manifest_version:
-			1, 1.0, _:
+			1, 1.0:
 				dict_template["mod_information"]["id"] = manifest_data["package"].get("id",null)
 				dict_template["mod_information"]["name"] = manifest_data["package"].get("name",null)
 				var version = manifest_data["package"].get("version","unknown")
