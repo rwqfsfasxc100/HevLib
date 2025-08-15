@@ -135,10 +135,16 @@ func on_timeout():
 	if not fallbackFiles == []:
 		var confirmed_files = []
 		for file in fallbackFiles:
-			var dir = Directory.new()
-			var does = dir.file_exists(file)
-			if does:
-				confirmed_files.append(file)
+			if file is String:
+				var dir = Directory.new()
+				var does = dir.file_exists(file)
+				if does:
+					confirmed_files.append(file)
+			elif file is Array:
+				var dir = Directory.new()
+				var does = dir.file_exists(file[0])
+				if does:
+					confirmed_files.append(file)
 		for file in confirmed_files:
 			var Translations = preload("res://HevLib/pointers/Translations.gd").new()
 			var type = file.typeof()
