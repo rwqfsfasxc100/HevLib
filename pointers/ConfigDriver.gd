@@ -15,10 +15,7 @@ static func __config_parse(file: String) -> Dictionary:
 
 static func __store_config(configuration: Dictionary, mod_id: String):
 	var f = load("res://HevLib/scripts/configs/store_config.gd")
-<<<<<<< Updated upstream
 	f.store_config(configuration,mod_id)
-=======
-	f.store_config(configuration,mod)
 
 static func __store_value(mod: String, section: String, key: String, value):
 	var f = load("res://HevLib/scripts/configs/store_value.gd")
@@ -37,4 +34,3 @@ static func __get_value(mod: String, section: String, key: String):
 static func __load_configs():
 	var f = load("res://HevLib/scripts/configs/load_configs.gd")
 	f.load_configs()
->>>>>>> Stashed changes
