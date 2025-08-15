@@ -56,8 +56,8 @@ static func __get_pointer_functions(pointer: String, return_JSON: bool = false) 
 					devHint = pointerLoad.developer_hint
 			var desc = devHint.get(pFuncName, [TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_1"),TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_2")])
 			methods.merge({pFuncName:desc})
-	var psj = JSON.print(methods, "\t")
 	if return_JSON:
+		var psj = JSON.print(methods, "\t")
 		return psj
 	else:
 		return methods
@@ -86,8 +86,8 @@ static func __get_library_functionality(return_JSON: bool = false) -> Dictionary
 				methods.merge({pFuncName:desc})
 		var concat = {pointer:methods}
 		functions.merge(concat)
-	var psj = JSON.print(functions, "\t")
 	if return_JSON:
+		var psj = JSON.print(functions, "\t")
 		return psj
 	else:
 		return functions

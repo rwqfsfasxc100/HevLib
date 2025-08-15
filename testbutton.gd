@@ -55,10 +55,25 @@ func _on_Button_pressed():
 #	}
 #	Translations.__updateTL_drom_dictionary(tData)
 #	Translations.__inject_translations(tData)
-	
+#
 	var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+#
+#	ConfigDriver.__store_config(config,"He/vL/ib/")
+#
+#	ConfigDriver.__store_value("HevLib","equipment","do_sort_equipment_by_price",false)
+#	var does = ConfigDriver.__get_config("HevLib")
+#	var el = ConfigDriver.__get_value("HevLib","equipment","do_sort_equipment_by_price")
 	
-	ConfigDriver.__store_config(config,"HevLib")
+	
+	ConfigDriver.__load_configs()
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	breakpoint
 
@@ -79,19 +94,19 @@ func _downloaded_zip(file, folder):
 
 
 var config = {
-	"equipment":{
+	"equi/pme/nt":{
 		"do_sort_equipment_by_price":true,
 	},
-	"events":{
+	"e/vents":{
 		"disabled_events":[  ],
 		"write_events":true,
 	},
-	"debug":{
+	"de/bug":{
 		"input_debugger":false,
 		"ring_position_data_debugger":false,
 		"ring_position_accurate_events":false,
 	},
-	"input":{
+	"in/put":{
 		"open_debug_event_menu":[  ],
 		"debugger":[ "F10" ],
 		"toggle_debug_menus":[ "F9" ],
