@@ -6,6 +6,8 @@ func _ready():
 
 
 func _on_StatFetch_request_completed(result, response_code, headers, body):
+	if result != 0:
+		return
 	var json = JSON.parse(body.get_string_from_utf8())
 	var releasesContent
 	var data

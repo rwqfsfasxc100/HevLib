@@ -69,12 +69,22 @@ func _on_Button_pressed():
 	
 	
 	
+	var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
+	var crew = NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",25)
+	if not crew == "":
+		var scene := load(crew)
+		scene.take_over_path("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
 	
+	var crew2 = NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",30)
+	if not crew2 == "":
+		var scene2 := load(crew2)
+		scene2.take_over_path("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
 	
-	
-	
-	
-	
+	var test = load("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn").instance()
+	var children = test.get_children()
+	var names = []
+	for child in children:
+		names.append(child.name)
 	breakpoint
 
 var updates = {}

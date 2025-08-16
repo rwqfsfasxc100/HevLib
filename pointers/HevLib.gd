@@ -71,7 +71,8 @@ static func __get_library_functionality(return_JSON: bool = false) -> Dictionary
 	for pointer in files:
 		var pSplit = pointer.split("/")
 		var actualPointer = path + pSplit[pSplit.size() - 1]
-		var pointerLoad = load(actualPointer).new()
+		var pl = load(actualPointer)
+		var pointerLoad = pl.new()
 		var pFuncs = pointerLoad.get_method_list()
 		var methods = {}
 		for pFunc in pFuncs:

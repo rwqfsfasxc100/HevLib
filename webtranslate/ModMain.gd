@@ -86,8 +86,11 @@ func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, full
 		path = str(modPath + path)
 	l("Adding translations from: %s" % path)
 	var tlFile:File = File.new()
-	tlFile.open(path, File.READ)
-
+	var err = tlFile.open(path, File.READ)
+	
+	if err != OK:
+		return
+	
 	var translations := []
 	
 	var translationCount = 0
@@ -98,10 +101,10 @@ func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, full
 		var translationObject := Translation.new()
 		translationObject.locale = csvLine[i]
 		translations.append(translationObject)
-
+	
 	while not tlFile.eof_reached():
 		csvLine = tlFile.get_csv_line(delim)
-
+	
 		if csvLine.size() > 1:
 			var translationID := csvLine[0]
 			for i in range(1, csvLine.size()):
@@ -109,9 +112,9 @@ func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, full
 			if fullLogging:
 				l("Added translation: %s" % csvLine)
 			translationCount += 1
-
+	
 	tlFile.close()
-
+	
 	for translationObject in translations:
 		TranslationServer.add_translation(translationObject)
 	l("%s Translations Updated" % translationCount)

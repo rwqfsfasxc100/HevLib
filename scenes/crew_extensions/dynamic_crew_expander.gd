@@ -1,11 +1,12 @@
 extends Node
 
-
 static func dynamic_crew_expander(folder_path: String, max_crew:int = 24) -> String:
 	
 	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 	
 	var log_header = "TSCN Writer for dynamic crew handler: "
+	
+	var line_to_test = "DIALOG_DERELICT_SWITCH_CREW"
 	
 	var base = 24
 	
@@ -23,8 +24,24 @@ static func dynamic_crew_expander(folder_path: String, max_crew:int = 24) -> Str
 	var dynamic_line_7 = "agendaNotSame = true"
 	
 	
+	var test = load("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn").instance()
+	var children = test.get_children()
+	var names = []
+	for child in children:
+		names.append(child.name)
+	var maximum = 0
+	for line in names:
+		if line.begins_with(line_to_test):
+			var spl = line.split("|")
+			if int(spl[1]) > maximum:
+				maximum = int(spl[1])
+	var tester = maximum + 1
+	if tester > base:
+		base = tester
+	
+	
 	if max_crew <= base:
-		Debug.l(log_header + "desired expansion to [%s] is less than or equal to the base expansion of [24]" % max_crew)
+		Debug.l(log_header + "desired expansion to [%s] is less than or equal to the currently expanded number of [%s]" % [max_crew,base])
 		return ""
 	else:
 		var header = static_line_1 + "\n\n" + static_line_3 + "\n" + static_line_4 + "\n\n" + static_line_6 + "\n\n"
@@ -32,14 +49,15 @@ static func dynamic_crew_expander(folder_path: String, max_crew:int = 24) -> Str
 		var compacted_string = header
 		
 		while max_crew > base:
-			base += 1
 			
 			var compact = dynamic_line_1 % [base,base + 4] + "\n" + dynamic_line_2 + "\n" + dynamic_line_3 + "\n" + dynamic_line_4 + "\n" + dynamic_line_5 + "\n" + dynamic_line_6 % base + "\n" + dynamic_line_7 + "\n\n"
 			
 			compacted_string = compacted_string + compact
+			
+			base += 1
 		if not folder_path.ends_with("/"):
 			folder_path = folder_path + "/"
-		var save_file_path = folder_path + "/dynamic_crew_x%s.tscn" % base
+		var save_file_path = folder_path + "dynamic_crew_x%s.tscn" % base
 		FolderAccess.__check_folder_exists(folder_path)
 		var file = File.new()
 		file.open(save_file_path,File.WRITE)

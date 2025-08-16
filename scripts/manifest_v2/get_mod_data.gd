@@ -40,6 +40,7 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 				mod_version_metadata = manifest_data["version"].get("version_metadata",mod_version_metadata)
 				mod_is_library = manifest_data["tags"].get("is_library_mod",false)
 				hide_library = manifest_data["tags"].get("library_hidden_by_default",true)
+				manifest_version = manifest_data["version"].get("manifest_version",1)
 			if file.to_lower().begins_with("icon") and file.to_lower().ends_with(".stex"):
 				has_icon_file = true
 				icon_path = folder_path + file
