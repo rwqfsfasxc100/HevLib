@@ -1,16 +1,15 @@
 extends Node
 
-static func store_config(configuration: Dictionary, mod_id: String):
+static func store_config(configuration: Dictionary, mod_id: String, cfg_filename : String = "Mod_Configurations" + ".cfg"):
 	var cfg_folder = "user://cfg/"
-	var cfg_file = "Mod_Configurations" + ".cfg"
-	var check = Directory.new().file_exists(cfg_file)
+	var check = Directory.new().file_exists(cfg_filename)
 	if not check:
 		var tmpf = File.new()
-		tmpf.open(cfg_folder+cfg_file,File.WRITE)
+		tmpf.open(cfg_folder+cfg_filename,File.WRITE)
 		tmpf.store_string("")
 		tmpf.close()
 	var FileCFG = File.new()
-	FileCFG.open(cfg_folder+cfg_file,File.READ)
+	FileCFG.open(cfg_folder+cfg_filename,File.READ)
 	var cfg = ConfigFile.new()
 	var config_data = cfg.parse(FileCFG.get_as_text(true))
 	FileCFG.close()

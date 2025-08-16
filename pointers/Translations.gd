@@ -26,3 +26,8 @@ static func __inject_translations(translation_data: Dictionary,number_of_objects
 	var f = load("res://HevLib/scripts/translations/inject_translations.gd")
 	var s = f.inject_translations(translation_data,number_of_objects_to_iterate_through)
 	return s
+
+static func __translation_file_to_dictionary(path: String) -> Dictionary:
+	var f = load("res://HevLib/scripts/translations/translation_file_to_dictionary.gd")
+	var s = f.inject_translations(path)
+	return s

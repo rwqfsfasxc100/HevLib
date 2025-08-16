@@ -13,22 +13,22 @@ static func __config_parse(file: String) -> Dictionary:
 	var s = f.config_parse(file)
 	return s
 
-static func __store_config(configuration: Dictionary, mod_id: String):
+static func __store_config(configuration: Dictionary, mod_id: String, cfg_filename : String = "Mod_Configurations" + ".cfg"):
 	var f = load("res://HevLib/scripts/configs/store_config.gd")
-	f.store_config(configuration,mod_id)
+	f.store_config(configuration,mod_id,cfg_filename)
 
-static func __store_value(mod: String, section: String, key: String, value):
+static func __store_value(mod: String, section: String, key: String, value, cfg_filename : String = "Mod_Configurations" + ".cfg"):
 	var f = load("res://HevLib/scripts/configs/store_value.gd")
-	f.store_value(mod, section, key, value)
+	f.store_value(mod, section, key, value,cfg_filename)
 
-static func __get_config(mod: String) -> Dictionary:
+static func __get_config(mod: String, cfg_filename : String = "Mod_Configurations" + ".cfg") -> Dictionary:
 	var f = load("res://HevLib/scripts/configs/get_config.gd")
-	var s = f.get_config(mod)
+	var s = f.get_config(mod,cfg_filename)
 	return s
 
-static func __get_value(mod: String, section: String, key: String):
+static func __get_value(mod: String, section: String, key: String, cfg_filename : String = "Mod_Configurations" + ".cfg"):
 	var f = load("res://HevLib/scripts/configs/get_value.gd")
-	var s = f.get_value(mod, section, key)
+	var s = f.get_value(mod, section, key, cfg_filename)
 	return s
 
 static func __load_configs():
