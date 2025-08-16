@@ -91,6 +91,14 @@ func _ready():
 	CRoot.call_deferred("add_child",vNode)
 	
 	
+	
+#	var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
+#	var crew = NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",25)
+#	if not crew == "":
+#		var scene := load(crew)
+#		scene.take_over_path("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
+	
+	
 	l("Ready")
 func installScriptExtension(path:String):
 	var childPath:String = str(modPath + path)
