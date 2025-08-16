@@ -53,6 +53,7 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 				"nexus":"",
 				"donations":"",
 				"wiki":"",
+				"bug_reports":"",
 				"custom_links":{}
 			},
 			"configs":{
@@ -143,6 +144,7 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 					dict_template["links"]["nexus"] = manifest_data["links"].get("nexus","")
 					dict_template["links"]["donations"] = manifest_data["links"].get("donations","")
 					dict_template["links"]["wiki"] = manifest_data["links"].get("wiki","")
+					dict_template["links"]["bug_reports"] = manifest_data["links"].get("bug_reports","")
 					dict_template["links"]["custom_links"] = manifest_data["links"].get("custom_links",{})
 				
 				
