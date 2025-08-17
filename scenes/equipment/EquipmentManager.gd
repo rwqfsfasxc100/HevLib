@@ -9,135 +9,18 @@ var cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/"
 
 var NEW_INSTALL = false
 
-var hardpoint_types = [
-	# Hardpoint slots
-	"HARDPOINT_LOW_STRESS", # - Any low-stress hardpoint
-	"HARDPOINT_HIGH_STRESS", # - Any high-stress hardpoint
-	"HARDPOINT_SPINAL", # - Any spinal hardpoint
-	"HARDPOINT_DOCKING_BAY", # - A docking-bay type hardpoint
-	"HARDPOINT_DRONE_POINT", # - A drone hardpoint
-]
-var alignments = [
-	# Equipment alignment
-	"ALIGNMENT_LEFT", # - Any left hardpoint
-	"ALIGNMENT_RIGHT", # - Any right hardpoint
-	"ALIGNMENT_CENTER", # - Any central hardpoint
-]
 
-var equipment_types = [
-	# Cradled equipment
-	"EQUIPMENT_CARGO_CONTAINER",
-	"EQUIPMENT_MINING_COMPANION",
-	"EQUIPMENT_IMPACT_ABSORBER",
-	"EQUIPMENT_BEACON",
+var slot_types : Array = []
 
-	# Weapon tools
-	"EQUIPMENT_PLASMA_THROWERS",
-	"EQUIPMENT_PLASMA_THROWERS_HEAVY",
-	"EQUIPMENT_MANIPULATION_ARMS",
-	"EQUIPMENT_MASS_DRIVERS",
-	"EQUIPMENT_TURRETS",
-	"EQUIPMENT_NANODRONES",
-	"EQUIPMENT_IRON_THROWERS",
-	"EQUIPMENT_MINING_LASERS",
-	"EQUIPMENT_MICROWAVES",
-	"EQUIPMENT_SYNCHROTRONS",
-	
-	# Non-hardpoint equipment
-	"CONSUMABLE_MASS_DRIVER_AMMUNITION",
-	"CONSUMABLE_NANODRONES",
-	"CONSUMABLE_PROPELLANT",
-	"THRUSTER_STANDARD_REACTION_CONTROL_THRUSTERS",
-	"THRUSTER_STANDARD_MAIN_ENGINE",
-	"POWER_FISSION_RODS",
-	"POWER_ULTRACAPACITOR",
-	"POWER_FISSION_TURBINE",
-	"POWER_AUX_POWER_SLOT",
-	"CARGO_BAY",
-	"COMPUTER_AUTOPILOT",
-	"COMPUTER_HUD",
-	"SENSOR_LIDAR",
-	"SENSOR_RECON_DRONE",
-]
-var slot_types = [
-# Slot type tags
-	"HARDPOINT",
-	"MASS_DRIVER_AMMUNITION",
-	"NANODRONE_STORAGE",
-	"PROPELLANT_TANK",
-	"STANDARD_REACTION_CONTROL_THRUSTERS",
-	"STANDARD_MAIN_ENGINE",
-	"FISSION_RODS",
-	"ULTRACAPACITOR",
-	"FISSION_TURBINE",
-	"AUX_POWER_SLOT",
-	"CARGO_BAY",
-	"AUTOPILOT",
-	"HUD",
-	"LIDAR",
-	"RECON_DRONE",
-]
+var equipment_types : Array = []
 
-var slot_defaults = {
-	"HARDPOINT_LOW_STRESS":["EQUIPMENT_MASS_DRIVERS","EQUIPMENT_TURRETS","EQUIPMENT_NANODRONES","EQUIPMENT_IRON_THROWERS","EQUIPMENT_MINING_LASERS","EQUIPMENT_MICROWAVES","EQUIPMENT_SYNCHROTRONS","EQUIPMENT_CARGO_CONTAINER","EQUIPMENT_MINING_COMPANION","EQUIPMENT_IMPACT_ABSORBER","EQUIPMENT_BEACON"],
-	"HARDPOINT_HIGH_STRESS":["EQUIPMENT_MASS_DRIVERS","EQUIPMENT_PLASMA_THROWERS","EQUIPMENT_PLASMA_THROWERS_HEAVY","EQUIPMENT_MANIPULATION_ARMS","EQUIPMENT_TURRETS","EQUIPMENT_NANODRONES","EQUIPMENT_IRON_THROWERS","EQUIPMENT_MINING_LASERS","EQUIPMENT_MICROWAVES"],
-	"HARDPOINT_SPINAL":["EQUIPMENT_MASS_DRIVERS","EQUIPMENT_PLASMA_THROWERS","EQUIPMENT_TURRETS","EQUIPMENT_NANODRONES","EQUIPMENT_IRON_THROWERS","EQUIPMENT_MINING_LASERS","EQUIPMENT_MICROWAVES"],
-	"HARDPOINT_DOCKING_BAY":["EQUIPMENT_CARGO_CONTAINER","EQUIPMENT_MINING_COMPANION","EQUIPMENT_TURRETS","EQUIPMENT_NANODRONES"],
-	"HARDPOINT_DRONE_POINT":["EQUIPMENT_NANODRONES"],
-	"MASS_DRIVER_AMMUNITION":["CONSUMABLE_MASS_DRIVER_AMMUNITION"],
-	"NANODRONE_STORAGE":["CONSUMABLE_NANODRONES"],
-	"PROPELLANT_TANK":["CONSUMABLE_PROPELLANT"],
-	"STANDARD_REACTION_CONTROL_THRUSTERS":["THRUSTER_STANDARD_REACTION_CONTROL_THRUSTERS"],
-	"STANDARD_MAIN_ENGINE":["THRUSTER_STANDARD_MAIN_ENGINE"],
-	"FISSION_RODS":["POWER_FISSION_RODS"],
-	"ULTRACAPACITOR":["POWER_ULTRACAPACITOR"],
-	"FISSION_TURBINE":["POWER_FISSION_TURBINE"],
-	"AUX_POWER_SLOT":["POWER_AUX_POWER_SLOT"],
-	"CARGO_BAY":["CARGO_BAY"],
-	"AUTOPILOT":["COMPUTER_AUTOPILOT"],
-	"HUD":["COMPUTER_HUD"],
-	"LIDAR":["SENSOR_LIDAR"],
-	"RECON_DRONE":["SENSOR_RECON_DRONE"],
-}
+var alignments : Array = []
 
-# Slot defaults for vanilla equipment
-# This is formatted exactly like how it is done in a mod main, so can be used as reference
+var hardpoint_types : Array = []
 
-const vanilla_equipment_defaults_for_reference = {
-	"MainWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_HIGH_STRESS","alignment":"ALIGNMENT_CENTER"},
-	"MainLowWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_SPINAL","alignment":"ALIGNMENT_CENTER"},
-	"LeftHighStress":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_HIGH_STRESS","alignment":"ALIGNMENT_LEFT"},
-	"RightHighStress":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_HIGH_STRESS","alignment":"ALIGNMENT_RIGHT"},
-	"LeftWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_LEFT"},
-	"MiddleLeftWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_LEFT","override_subtractive":["EQUIPMENT_BEACON","EQUIPMENT_CARGO_CONTAINER","EQUIPMENT_MINING_COMPANION","EQUIPMENT_IMPACT_ABSORBER"]},
-	"RightWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_RIGHT"},
-	"MiddleRightWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_RIGHT","override_subtractive":["EQUIPMENT_BEACON","EQUIPMENT_CARGO_CONTAINER","EQUIPMENT_MINING_COMPANION","EQUIPMENT_IMPACT_ABSORBER"]},
-	"LeftDroneSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DRONE_POINT","alignment":"ALIGNMENT_LEFT"},
-	"RightDroneSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DRONE_POINT","alignment":"ALIGNMENT_RIGHT"},
-	"LeftRearSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_LEFT","override_subtractive":["EQUIPMENT_MASS_DRIVERS","EQUIPMENT_IRON_THROWERS","EQUIPMENT_MINING_LASERS","EQUIPMENT_MICROWAVES","EQUIPMENT_SYNCHROTRONS","EQUIPMENT_BEACON"]},
-	"RightRearSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_RIGHT","override_subtractive":["EQUIPMENT_MASS_DRIVERS","EQUIPMENT_IRON_THROWERS","EQUIPMENT_MINING_LASERS","EQUIPMENT_MICROWAVES","EQUIPMENT_SYNCHROTRONS","EQUIPMENT_BEACON"]},
-	"LeftBay1":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_LEFT","override_additive":["EQUIPMENT_BEACON"]},
-	"RightBay1":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_RIGHT","override_additive":["EQUIPMENT_BEACON"]},
-	"LeftBay2":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_LEFT"},
-	"RightBay2":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_RIGHT"},
-	"LeftBay3":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_LEFT"},
-	"RightBay3":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_RIGHT"},
-	"AmmunitionDelivery":{"slot_type":"MASS_DRIVER_AMMUNITION"},
-	"DisposableDrones":{"slot_type":"NANODRONE_STORAGE"},
-	"Propellant":{"slot_type":"PROPELLANT_TANK"},
-	"Thrusters":{"slot_type":"STANDARD_REACTION_CONTROL_THRUSTERS"},
-	"Torches":{"slot_type":"STANDARD_MAIN_ENGINE"},
-	"Rods":{"slot_type":"FISSION_RODS"},
-	"Capacitor":{"slot_type":"ULTRACAPACITOR"},
-	"Turbine":{"slot_type":"FISSION_TURBINE"},
-	"AuxilaryPower":{"slot_type":"AUX_POWER_SLOT"},
-	"CargoBay":{"slot_type":"CARGO_BAY"},
-	"Autopilot":{"slot_type":"AUTOPILOT"},
-	"Hud":{"slot_type":"HUD"},
-	"Lidar":{"slot_type":"LIDAR"},
-	"ReconDrone":{"slot_type":"RECON_DRONE"},
-}
+var slot_defaults : Dictionary = {}
 
+var vanilla_equipment_defaults_for_reference : Dictionary = {}
 
 
 # Actual code started
@@ -147,6 +30,15 @@ var slots := []
 var vanilla_equipment = load("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd").get_script_constant_map()
 
 var has = false
+
+func _ready():
+	var data = load("res://HevLib/scenes/equipment/vanilla_defaults/slot_tagging.gd").get_script_constant_map()
+	slot_types = data["slot_types"]
+	equipment_types = data["equipment_types"]
+	alignments = data["alignments"]
+	hardpoint_types = data["hardpoint_types"]
+	slot_defaults = data["slot_defaults"]
+	vanilla_equipment_defaults_for_reference = data["vanilla_equipment_defaults_for_reference"]
 
 func _tree_entered():
 	var sTime = OS.get_system_time_msecs()

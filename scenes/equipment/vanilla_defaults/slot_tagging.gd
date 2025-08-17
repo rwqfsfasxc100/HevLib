@@ -1,140 +1,131 @@
 extends Node
 
-# Set mod priority if you want it to load before/after other mods
-# Mods are loaded from lowest to highest priority, default is 0
-const MOD_PRIORITY = 0
-# Name of the mod, used for writing to the logs
-const MOD_NAME = "Example Mod"
-const MOD_VERSION = "1.0.0"
-# Path of the mod folder, automatically generated on runtime
-var modPath:String = get_script().resource_path.get_base_dir() + "/"
-# Required var for the replaceScene() func to work
-var _savedObjects := []
 
-var modConfig = {}
-#Initializes the configuration variable. Used by loadSettings.
+const hardpoint_types = [
+	# Hardpoint slots
+	"HARDPOINT_LOW_STRESS", # - Any low-stress hardpoint
+	"HARDPOINT_HIGH_STRESS", # - Any high-stress hardpoint
+	"HARDPOINT_SPINAL", # - Any spinal hardpoint
+	"HARDPOINT_DOCKING_BAY", # - A docking-bay type hardpoint
+	"HARDPOINT_DRONE_POINT", # - A drone hardpoint
+]
+const alignments = [
+	# Equipment alignment
+	"ALIGNMENT_LEFT", # - Any left hardpoint
+	"ALIGNMENT_RIGHT", # - Any right hardpoint
+	"ALIGNMENT_CENTER", # - Any central hardpoint
+]
 
-# Initialize the mod
-# This function is executed before the majority of the game is loaded
-# Only the Tool and Debug AutoLoads are available
-# Script and scene replacements should be done here, before the originals are loaded
-func _init(modLoader = ModLoader):
-	l("Initializing DLC")
+const equipment_types = [
+	# Cradled equipment
+	"EQUIPMENT_CARGO_CONTAINER",
+	"EQUIPMENT_MINING_COMPANION",
+	"EQUIPMENT_IMPACT_ABSORBER",
+	"EQUIPMENT_BEACON",
+
+	# Weapon tools
+	"EQUIPMENT_PLASMA_THROWERS",
+	"EQUIPMENT_PLASMA_THROWERS_HEAVY",
+	"EQUIPMENT_MANIPULATION_ARMS",
+	"EQUIPMENT_MASS_DRIVERS",
+	"EQUIPMENT_TURRETS",
+	"EQUIPMENT_NANODRONES",
+	"EQUIPMENT_IRON_THROWERS",
+	"EQUIPMENT_MINING_LASERS",
+	"EQUIPMENT_MICROWAVES",
+	"EQUIPMENT_SYNCHROTRONS",
 	
-	# Modify Settings.gd first so we can load config and DLC
-	loadSettings()
-	
-	loadDLC() # preloads DLC as things may break if this isn't done
-	
-	
-	
-	# Loads translation file. For this example, the english translation file is used. 
-	updateTL("i18n/en.txt", "|")
-	
-# Do stuff on ready
-# At this point all AutoLoads are available and the game is loaded
-func _ready():
-	l("Readying")
-	l("Ready")
-	
-# This function is a helper to provide any file configurations to your mod
-# You may want to replace any "Example" text with your own identifier to make it unique
-# Check the example Settings.gd file for how to setup that side of it
-func loadSettings():
-	installScriptExtension("Settings.gd")
-	l(MOD_NAME + ": Loading mod settings")
-	var settings = load("res://Settings.gd").new()
-	settings.load_ExampleMod_FromFile()
-	settings.save_ExampleMod_ToFile()
-	modConfig = settings.ExampleMod
-	l(MOD_NAME + ": Current settings: %s" % modConfig)
-	settings.queue_free()
-	l(MOD_NAME + ": Finished loading settings")
+	# Non-hardpoint equipment
+	"CONSUMABLE_MASS_DRIVER_AMMUNITION",
+	"CONSUMABLE_NANODRONES",
+	"CONSUMABLE_PROPELLANT",
+	"THRUSTER_STANDARD_REACTION_CONTROL_THRUSTERS",
+	"THRUSTER_STANDARD_MAIN_ENGINE",
+	"POWER_FISSION_RODS",
+	"POWER_ULTRACAPACITOR",
+	"POWER_FISSION_TURBINE",
+	"POWER_AUX_POWER_SLOT",
+	"CARGO_BAY",
+	"COMPUTER_AUTOPILOT",
+	"COMPUTER_HUD",
+	"SENSOR_LIDAR",
+	"SENSOR_RECON_DRONE",
+]
+const slot_types = [
+# Slot type tags
+	"HARDPOINT",
+	"MASS_DRIVER_AMMUNITION",
+	"NANODRONE_STORAGE",
+	"PROPELLANT_TANK",
+	"STANDARD_REACTION_CONTROL_THRUSTERS",
+	"STANDARD_MAIN_ENGINE",
+	"FISSION_RODS",
+	"ULTRACAPACITOR",
+	"FISSION_TURBINE",
+	"AUX_POWER_SLOT",
+	"CARGO_BAY",
+	"AUTOPILOT",
+	"HUD",
+	"LIDAR",
+	"RECON_DRONE",
+]
 
-# Helper script to load translations using csv format
-# `path` is the path to the transalation file
-# `delim` is the symbol used to seperate the values
-# `useRelativePath` setting it to false uses a `res://` relative path instead of relative to the file
-# `fullLogging` setting it to false reduces the number of logs written to only display the number of translations made
-# example usage: updateTL("i18n/translation.txt", "|")
-func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, fullLogging:bool = true):
-	if useRelativePath:
-		path = str(modPath + path)
-	l("Adding translations from: %s" % path)
-	var tlFile:File = File.new()
-	tlFile.open(path, File.READ)
+const slot_defaults = {
+	"HARDPOINT_LOW_STRESS":["EQUIPMENT_MASS_DRIVERS","EQUIPMENT_TURRETS","EQUIPMENT_NANODRONES","EQUIPMENT_IRON_THROWERS","EQUIPMENT_MINING_LASERS","EQUIPMENT_MICROWAVES","EQUIPMENT_SYNCHROTRONS","EQUIPMENT_CARGO_CONTAINER","EQUIPMENT_MINING_COMPANION","EQUIPMENT_IMPACT_ABSORBER","EQUIPMENT_BEACON"],
+	"HARDPOINT_HIGH_STRESS":["EQUIPMENT_MASS_DRIVERS","EQUIPMENT_PLASMA_THROWERS","EQUIPMENT_PLASMA_THROWERS_HEAVY","EQUIPMENT_MANIPULATION_ARMS","EQUIPMENT_TURRETS","EQUIPMENT_NANODRONES","EQUIPMENT_IRON_THROWERS","EQUIPMENT_MINING_LASERS","EQUIPMENT_MICROWAVES"],
+	"HARDPOINT_SPINAL":["EQUIPMENT_MASS_DRIVERS","EQUIPMENT_PLASMA_THROWERS","EQUIPMENT_TURRETS","EQUIPMENT_NANODRONES","EQUIPMENT_IRON_THROWERS","EQUIPMENT_MINING_LASERS","EQUIPMENT_MICROWAVES"],
+	"HARDPOINT_DOCKING_BAY":["EQUIPMENT_CARGO_CONTAINER","EQUIPMENT_MINING_COMPANION","EQUIPMENT_TURRETS","EQUIPMENT_NANODRONES"],
+	"HARDPOINT_DRONE_POINT":["EQUIPMENT_NANODRONES"],
+	"MASS_DRIVER_AMMUNITION":["CONSUMABLE_MASS_DRIVER_AMMUNITION"],
+	"NANODRONE_STORAGE":["CONSUMABLE_NANODRONES"],
+	"PROPELLANT_TANK":["CONSUMABLE_PROPELLANT"],
+	"STANDARD_REACTION_CONTROL_THRUSTERS":["THRUSTER_STANDARD_REACTION_CONTROL_THRUSTERS"],
+	"STANDARD_MAIN_ENGINE":["THRUSTER_STANDARD_MAIN_ENGINE"],
+	"FISSION_RODS":["POWER_FISSION_RODS"],
+	"ULTRACAPACITOR":["POWER_ULTRACAPACITOR"],
+	"FISSION_TURBINE":["POWER_FISSION_TURBINE"],
+	"AUX_POWER_SLOT":["POWER_AUX_POWER_SLOT"],
+	"CARGO_BAY":["CARGO_BAY"],
+	"AUTOPILOT":["COMPUTER_AUTOPILOT"],
+	"HUD":["COMPUTER_HUD"],
+	"LIDAR":["SENSOR_LIDAR"],
+	"RECON_DRONE":["SENSOR_RECON_DRONE"],
+}
 
-	var translations := []
-	
-	var translationCount = 0
-	var csvLine := tlFile.get_line().split(delim)
-	if fullLogging:
-		l("Adding translations as: %s" % csvLine)
-	for i in range(1, csvLine.size()):
-		var translationObject := Translation.new()
-		translationObject.locale = csvLine[i]
-		translations.append(translationObject)
+# Slot defaults for vanilla equipment
+# This is formatted exactly like how it is done in a mod main, so can be used as reference
 
-	while not tlFile.eof_reached():
-		csvLine = tlFile.get_csv_line(delim)
-
-		if csvLine.size() > 1:
-			var translationID := csvLine[0]
-			for i in range(1, csvLine.size()):
-				translations[i - 1].add_message(translationID, csvLine[i].c_unescape())
-			if fullLogging:
-				l("Added translation: %s" % csvLine)
-			translationCount += 1
-
-	tlFile.close()
-
-	for translationObject in translations:
-		TranslationServer.add_translation(translationObject)
-	l("%s Translations Updated" % translationCount)
-
-
-# Helper function to extend scripts
-# Loads the script you pass, checks what script is extended, and overrides it
-func installScriptExtension(path:String):
-	var childPath:String = str(modPath + path)
-	var childScript:Script = ResourceLoader.load(childPath)
-
-	childScript.new()
-
-	var parentScript:Script = childScript.get_base_script()
-	var parentPath:String = parentScript.resource_path
-
-	l("Installing script extension: %s <- %s" % [parentPath, childPath])
-
-	childScript.take_over_path(parentPath)
-
-
-# Helper function to replace scenes
-# Can either be passed a single path, or two paths
-# With a single path, it will replace the vanilla scene in the same relative position
-func replaceScene(newPath:String, oldPath:String = ""):
-	l("Updating scene: %s" % newPath)
-
-	if oldPath.empty():
-		oldPath = str("res://" + newPath)
-
-	newPath = str(modPath + newPath)
-
-	var scene := load(newPath)
-	scene.take_over_path(oldPath)
-	_savedObjects.append(scene)
-	l("Finished updating: %s" % oldPath)
-
-
-# Instances Settings.gd, loads DLC, then frees the script.
-func loadDLC():
-	l("Preloading DLC as workaround")
-	var DLCLoader:Settings = preload("res://Settings.gd").new()
-	DLCLoader.loadDLC()
-	DLCLoader.queue_free()
-	l("Finished loading DLC")
-
-
-# Func to print messages to the logs
-func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
-	Debug.l("[%s V%s]: %s" % [title, version, msg])
+const vanilla_equipment_defaults_for_reference = {
+	"MainWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_HIGH_STRESS","alignment":"ALIGNMENT_CENTER"},
+	"MainLowWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_SPINAL","alignment":"ALIGNMENT_CENTER"},
+	"LeftHighStress":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_HIGH_STRESS","alignment":"ALIGNMENT_LEFT"},
+	"RightHighStress":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_HIGH_STRESS","alignment":"ALIGNMENT_RIGHT"},
+	"LeftWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_LEFT"},
+	"MiddleLeftWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_LEFT","override_subtractive":["EQUIPMENT_BEACON","EQUIPMENT_CARGO_CONTAINER","EQUIPMENT_MINING_COMPANION","EQUIPMENT_IMPACT_ABSORBER"]},
+	"RightWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_RIGHT"},
+	"MiddleRightWeaponSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_RIGHT","override_subtractive":["EQUIPMENT_BEACON","EQUIPMENT_CARGO_CONTAINER","EQUIPMENT_MINING_COMPANION","EQUIPMENT_IMPACT_ABSORBER"]},
+	"LeftDroneSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DRONE_POINT","alignment":"ALIGNMENT_LEFT"},
+	"RightDroneSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DRONE_POINT","alignment":"ALIGNMENT_RIGHT"},
+	"LeftRearSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_LEFT","override_subtractive":["EQUIPMENT_MASS_DRIVERS","EQUIPMENT_IRON_THROWERS","EQUIPMENT_MINING_LASERS","EQUIPMENT_MICROWAVES","EQUIPMENT_SYNCHROTRONS","EQUIPMENT_BEACON"]},
+	"RightRearSlot":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_LOW_STRESS","alignment":"ALIGNMENT_RIGHT","override_subtractive":["EQUIPMENT_MASS_DRIVERS","EQUIPMENT_IRON_THROWERS","EQUIPMENT_MINING_LASERS","EQUIPMENT_MICROWAVES","EQUIPMENT_SYNCHROTRONS","EQUIPMENT_BEACON"]},
+	"LeftBay1":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_LEFT","override_additive":["EQUIPMENT_BEACON"]},
+	"RightBay1":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_RIGHT","override_additive":["EQUIPMENT_BEACON"]},
+	"LeftBay2":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_LEFT"},
+	"RightBay2":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_RIGHT"},
+	"LeftBay3":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_LEFT"},
+	"RightBay3":{"slot_type":"HARDPOINT","hardpoint_type":"HARDPOINT_DOCKING_BAY","alignment":"ALIGNMENT_RIGHT"},
+	"AmmunitionDelivery":{"slot_type":"MASS_DRIVER_AMMUNITION"},
+	"DisposableDrones":{"slot_type":"NANODRONE_STORAGE"},
+	"Propellant":{"slot_type":"PROPELLANT_TANK"},
+	"Thrusters":{"slot_type":"STANDARD_REACTION_CONTROL_THRUSTERS"},
+	"Torches":{"slot_type":"STANDARD_MAIN_ENGINE"},
+	"Rods":{"slot_type":"FISSION_RODS"},
+	"Capacitor":{"slot_type":"ULTRACAPACITOR"},
+	"Turbine":{"slot_type":"FISSION_TURBINE"},
+	"AuxilaryPower":{"slot_type":"AUX_POWER_SLOT"},
+	"CargoBay":{"slot_type":"CARGO_BAY"},
+	"Autopilot":{"slot_type":"AUTOPILOT"},
+	"Hud":{"slot_type":"HUD"},
+	"Lidar":{"slot_type":"LIDAR"},
+	"ReconDrone":{"slot_type":"RECON_DRONE"},
+}

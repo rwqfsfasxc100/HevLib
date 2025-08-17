@@ -167,3 +167,8 @@ static func __match_vanilla(type: String, align_to_match: String, desired_equipm
 			if alignmentMatches and itemType in desired_equipment:
 				matching.append(itemDict)
 	return matching
+
+static func __make_upgrades_scene():
+	var f = load("res://HevLib/scenes/equipment/make_upgrades_scene.gd")
+	var s = f.make_upgrades_scene()
+	return s
