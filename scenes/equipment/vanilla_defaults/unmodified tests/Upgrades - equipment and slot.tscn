@@ -1,0 +1,63 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://enceladus/Upgrades.tscn" type="PackedScene" id=1]
+[ext_resource path="res://HevLib/scenes/equipment/hardpoints/unmodified/WeaponSlotUpgradeTemplate.tscn" type="PackedScene" id=2]
+[ext_resource path="res://HevLib/scenes/equipment/hardpoints/unmodified/EquipmentItemTemplate.tscn" type="PackedScene" id=3]
+
+[node name="Upgrades" instance=ExtResource( 1 )]
+
+[node name="MarginContainer" parent="VB/MarginContainer/ScrollContainer" index="0"]
+margin_top = 0.0
+margin_bottom = 25623.0
+
+[node name="Items" parent="VB/MarginContainer/ScrollContainer/MarginContainer" index="0"]
+margin_bottom = 25623.0
+
+[node name="MainLowLeft" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="33" instance=ExtResource( 2 )]
+margin_top = 25494.0
+margin_right = 1228.0
+margin_bottom = 25623.0
+slot = "weaponSlot.mainLowLeft.type"
+always = false
+
+[node name="VBoxContainer" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items/MainLowLeft" index="0"]
+margin_right = 1212.0
+margin_bottom = 127.0
+
+[node name="HBoxContainer" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items/MainLowLeft/VBoxContainer" index="0"]
+margin_right = 1196.0
+
+[node name="CheckButton" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items/MainLowLeft/VBoxContainer/HBoxContainer" index="0"]
+margin_right = 1196.0
+
+[node name="SYSTEM_TEST" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items/MainLowLeft/VBoxContainer" index="1" instance=ExtResource( 3 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 55.0
+margin_right = 1196.0
+margin_bottom = 125.0
+system = "SYSTEM_TEST"
+
+[editable path="VB/HeaderWithMoney"]
+[editable path="VB/WindowMargin/TabHintContainer"]
+[editable path="VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/MarginContainer/ShipParams"]
+[editable path="VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/MarginContainer/CargoHold/CargoHold"]
+[editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/MainWeaponSlot"]
+[editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/MainLowWeaponSlot"]
+[editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/LeftHighStress"]
+[editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/RightHighStress"]
+[editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/LeftWeaponSlot"]
+[editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/MiddleLeftWeaponSlot"]
+[editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/RightWeaponSlot"]
+[editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/MiddleRightWeaponSlot"]
+[editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/LeftDroneSlot"]
+[editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/RightDroneSlot"]
+[editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/LeftRearSlot"]
+[editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/RightRearSlot"]
+[editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/LeftBay1"]
+[editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/RightBay1"]
+[editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/LeftBay2"]
+[editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/RightBay2"]
+[editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/LeftBay3"]
+[editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/RightBay3"]
+[editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/MainLowLeft"]
