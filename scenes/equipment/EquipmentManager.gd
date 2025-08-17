@@ -180,10 +180,14 @@ func _tree_entered():
 	has = Settings.HevLib["equipment"]["do_sort_equipment_by_price"]
 	var does = 1 if has else 0
 	l("Starting to operate on mod data. Will slots be sorted? [%s]" % has)
-	get_tags()
-	add_slots()
-	add_slot_tags()
-	add_equipment()
+	if Settings.HevLib["equipment"]["use_legacy_equipment_handler"]:
+		get_tags()
+		add_slots()
+		add_slot_tags()
+		add_equipment()
+	else:
+		for slot in display_slots():
+			sort_slot(slot)
 	var finish_time = OS.get_system_time_msecs()
 	var total_time = str(float(finish_time - sTime)/1000)
 	var spl = total_time.split(".")
@@ -463,28 +467,32 @@ func add_equipment():
 		
 		
 		if has:
-			l("Sorting equipment for slot %s" % slot_name)
-			var items = slot.get_node("VBoxContainer").get_children()
-			var nodePositions = []
-			for item in items:
-				nodePositions.append([item, item.get_index()])
-			var noFail = false
-			var maxIndex = items.size()
-			while noFail == false:
-				var doesFailThisLoop = false
-				for item in slot.get_child(0).get_children():
-					if item.get_index() < 2:
-						pass
-					else:
-						var A = item
-						var B = A.get_parent().get_child(A.get_index() - 1)
-						if A.price < B.price:
-							doesFailThisLoop = true
-							A.get_parent().move_child(A, B.get_index())
-				if doesFailThisLoop:
-					noFail = false
-				else:
-					noFail = true
+			sort_slot(slot)
+
+func sort_slot(slot):
+	l("Sorting equipment for slot %s" % slot.name)
+	var items = slot.get_node("VBoxContainer").get_children()
+	var nodePositions = []
+	for item in items:
+		nodePositions.append([item, item.get_index()])
+	var noFail = false
+	var maxIndex = items.size()
+	while noFail == false:
+		var doesFailThisLoop = false
+		for item in slot.get_child(0).get_children():
+			if item.get_index() < 2:
+				pass
+			else:
+				var A = item
+				var B = A.get_parent().get_child(A.get_index() - 1)
+				if A.price < B.price:
+					doesFailThisLoop = true
+					A.get_parent().move_child(A, B.get_index())
+		if doesFailThisLoop:
+			noFail = false
+		else:
+			noFail = true
+
 
 func add_slot_tags():
 	var slot_tag_pool = {}
