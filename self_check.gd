@@ -23,7 +23,8 @@ var modmain_res_path : String = "res://HevLib/ModMain.gd"
 
 var custom_message_string : String = "HEVLIB_SELF_CHECK_ERROR_MESSAGE"
 
-
+var open_download_page_on_OK : bool = false
+var download_URL : String = ""
 
 
 
@@ -106,6 +107,8 @@ func _ready():
 					var txt = "newer than version %s.%s.%s" % [min_version_major,min_version_minor,min_version_bugfix]
 					body = body + txt
 				var bottom = ". \n\nPlease ensure that the mod was downloaded from the correct page, for instance the releases page on GitHub."
+				if open_download_page_on_OK:
+					bottom = bottom + "\n\nPress OK to open the downloads page."
 				box.dialog_text = header + body + bottom
 			else:
 				box.dialog_text = custom_message_string
@@ -116,7 +119,9 @@ func _ready():
 
 func _confirmed_pressed():
 	Debug.l("Mod Checker Script: mod [%s] exists? [%s]" % mod_exists)
-	
+	if open_download_page_on_OK:
+		Debug.l("Mod Checker Script: attempting to open downloads link @ [%s]" % download_URL)
+		OS.shell_open(download_URL)
 	if not mod_exists and crash_if_not_found:
 		Debug.l("Mod Checker Script: mod %s not found within desired version range, exiting game" % mod_name)
 		Loader.go(exit)
