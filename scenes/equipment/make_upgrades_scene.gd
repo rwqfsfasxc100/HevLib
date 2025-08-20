@@ -5,9 +5,9 @@ func make_upgrades_scene() -> String:
 	var vanilla_data = preload("res://HevLib/scenes/equipment/vanilla_defaults/slot_tagging.gd")
 	var UpgradeMenu : Node = load("res://enceladus/Upgrades.tscn").instance()
 	var nodes_parent = UpgradeMenu.get_node("VB/MarginContainer/ScrollContainer/MarginContainer/Items")
-	var vanilla_slot_nodes = []
+	var vanilla_slot_names = []
 	for slot in nodes_parent.get_children():
-		vanilla_slot_nodes.append(slot.name)
+		vanilla_slot_names.append(slot.name)
 	
 	var CRoot = get_tree().get_root().get_node("EquipmentDriver")
 	var slots = CRoot.conv
@@ -21,7 +21,11 @@ func make_upgrades_scene() -> String:
 	
 	UpgradeMenu.free()
 	
+	var all_slot_node_names = []
+	all_slot_node_names.append_array(vanilla_slot_names)
 	var slots_for_adding = []
+	
+	
 	
 	for its in slots:
 		var nodes = its[0].get("EQUIPMENT_TAGS",{})
@@ -65,6 +69,7 @@ func make_upgrades_scene() -> String:
 			l("Adding slots for %s" % mod_hash)
 			for slotDict in newSlot:
 				slots_for_adding.append(slotDict)
+				all_slot_node_names.append(slotDict.get("slot_node_name",""))
 		
 	return ""
 

@@ -113,9 +113,11 @@ func _ready():
 	if mod_exists:
 		Debug.l("Mod Checker Script: %s exists and is running the correct version" % mod_name)
 	else:
+		get_tree().paused = true
 		if show_dialogue_box:
 			var box = AcceptDialog.new()
 			box.connect("confirmed", self, "_confirmed_pressed")
+			box.connect("popup_hide", self, "_popup_hide")
 			box.window_title = dialogue_box_title
 			box.popup_exclusive = true
 			box.rect_min_size = Vector2(300,150)
@@ -151,12 +153,14 @@ func _confirmed_pressed():
 	if open_download_page_on_OK:
 		Debug.l("Mod Checker Script: attempting to open downloads link @ [%s]" % download_URL)
 		OS.shell_open(download_URL)
-	if not mod_exists and crash_if_not_found:
-		Debug.l("Mod Checker Script: mod %s not found within desired version range, exiting game" % mod_name)
-		Loader.go(exit)
+	_popup_hide()
 	
 onready var exit = Loader.prepare("res://Exit.tscn")
 
+func _popup_hide():
+	if not mod_exists and crash_if_not_found:
+		Debug.l("Mod Checker Script: mod %s not found within desired version range, exiting game" % mod_name)
+		Loader.go(exit)
 
 static func fetch_folder_files(folder) -> Array:
 	var fileList = []
@@ -250,4 +254,5 @@ func config_parse(file):
 		cfg_dictionary.merge({section:data})
 	return cfg_dictionary
 
-
+func _init():
+	pause_mode = Node.PAUSE_MODE_PROCESS
