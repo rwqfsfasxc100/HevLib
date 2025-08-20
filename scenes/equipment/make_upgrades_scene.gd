@@ -21,6 +21,56 @@ func make_upgrades_scene() -> String:
 	
 	UpgradeMenu.free()
 	
+	var slots_for_adding = []
 	
-	
+	for its in slots:
+		var nodes = its[0].get("EQUIPMENT_TAGS",{})
+		if nodes.keys().size() >= 1:
+			l("Adding equipment tags for %s" % str(its[2]))
+			
+			var slotTypes = nodes.get("slot_types",[])
+			var equipmentItems = nodes.get("equipment_types",[])
+			var align = nodes.get("alignments",[])
+			var hardpointTypes = nodes.get("hardpoint_types",[])
+			var slotDefaults = nodes.get("slot_defaults",{})
+			if slotTypes.size() > 0:
+				for st in slotTypes:
+					if not st in slot_types:
+						slot_types.append(st)
+			if equipmentItems.size() > 0:
+				for st in equipmentItems:
+					if not st in equipment_types:
+						equipment_types.append(st)
+			if align.size() > 0:
+				for st in align:
+					if not st in alignments:
+						alignments.append(st)
+			if hardpointTypes.size() > 0:
+				for st in hardpointTypes:
+					if not st in hardpoint_types:
+						hardpoint_types.append(st)
+			if slotDefaults.keys().size() > 0:
+				for st in slotDefaults:
+					if st in slot_defaults.keys():
+						for item in slotDefaults.get(st):
+							if item in slot_defaults.get(st):
+								pass
+							else:
+								slot_defaults[st].append(item)
+					else:
+						slot_defaults.merge({st:slotDefaults.get(st)})
+		var newSlot = its[0].get("ADD_EQUIPMENT_SLOTS",[])
+		var mod_hash = str(its[2])
+		if newSlot.size() >= 1:
+			l("Adding slots for %s" % mod_hash)
+			for slotDict in newSlot:
+				slots_for_adding.append(slotDict)
+		
 	return ""
+
+
+
+var MODULE_IDENTIFIER = "Equipment Driver"
+func l(msg:String, ID:String = MODULE_IDENTIFIER, title:String = "HevLib"):
+	Debug.l("[%s %s]: %s" % [title, ID, msg])
+
