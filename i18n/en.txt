@@ -26,6 +26,6 @@ HEVLIB_MISSING_DOCUMENTATION_2|!!!!! Please bring this to my (__hev) attention A
 
 HEVLIB_DESCRIPTION_PLACEHOLDER|This mod does not have a description. \n\nPlease check the webpage or thread where you obtained this mod for info, or ask the creator for a description.
 
-HEVLIB_SELF_CHECK_ERROR_MESSAGE|
+HEVLIB_SELF_CHECK_ERROR_MESSAGE|HevLib was not installed correctly. Please double check the download source, and make sure that the root folder looks as follows: HevLib.zip/HevLib/\n\nPressing OK will exit the game and open the latest release page in your browser.
 
-HEVLIB_SELF_CHECK_ERROR_HEADER|
+HEVLIB_SELF_CHECK_ERROR_HEADER|HEVLIB LOAD ERROR!
