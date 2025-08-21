@@ -108,22 +108,28 @@ func _ready():
 							bugfix = dictionary["version"]["version_bugfix"]
 							
 					
-					if min_version_major > major:
-						mod_exists = false
-					if min_version_major == major:
-						if min_version_minor > minor:
+					if min_version_major == int(INF):
+						pass
+					else:
+						if min_version_major > major:
 							mod_exists = false
-						if min_version_minor == minor:
-							if min_version_bugfix > bugfix:
+						if min_version_major == major:
+							if min_version_minor > minor:
 								mod_exists = false
-					if major > max_version_major:
-						mod_exists = false
-					if max_version_major == major:
-						if minor > max_version_minor:
+							if min_version_minor == minor:
+								if min_version_bugfix > bugfix:
+									mod_exists = false
+					if max_version_major == int(INF):
+						pass
+					else:
+						if major > max_version_major:
 							mod_exists = false
-						if max_version_minor == minor:
-							if bugfix > max_version_bugfix:
+						if max_version_major == major:
+							if minor > max_version_minor:
 								mod_exists = false
+							if max_version_minor == minor:
+								if bugfix > max_version_bugfix:
+									mod_exists = false
 		else:
 			mod_exists = true
 	else:
