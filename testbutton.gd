@@ -56,6 +56,9 @@ func _on_Button_pressed():
 #	Translations.__updateTL_drom_dictionary(tData)
 #	Translations.__inject_translations(tData)
 #
+	
+	var mods = ManifestV2.__get_mod_data()
+	
 	var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 #
 #	ConfigDriver.__store_config(config,"He/vL/ib/")
