@@ -89,7 +89,7 @@ func _init():
 					var con = script.get_script_constant_map()
 					var major = con.get("MOD_VERSION_MAJOR",1)
 					var minor = con.get("MOD_VERSION_MINOR",0)
-					var bugfix = con.get("MOD_VERSION_MBUGFIX",0)
+					var bugfix = con.get("MOD_VERSION_BUGFIX",0)
 					
 					var fsplit = modmain_res_path.split(modmain_res_path.split("/")[modmain_res_path.split("/").size() - 1])
 					var parent_folder = modmain_res_path.split(fsplit)[0]
