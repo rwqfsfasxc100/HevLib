@@ -129,7 +129,7 @@ func _ready():
 	else:
 		mod_exists = false
 	if mod_exists:
-		Debug.l("Mod Checker Script: %s exists and is running the correct version" % mod_name)
+		Debug.l("Mod Checker Script: %s exists and is running the correct version!" % mod_name)
 	else:
 		if show_dialogue_box:
 			get_tree().paused = true
