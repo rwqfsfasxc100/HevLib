@@ -1,11 +1,16 @@
-extends Node
+extends AcceptDialog
 
-# This script can be copied into any mod and loaded to check for HevLib, or any other mod desired
+# This script and scene can be copied into any mod and loaded to check for HevLib, or any other mod desired
 # Upon being loaded, it will automatically run and perform the check for the desired mod
+# IMPORTANT: Copy both the scene and script files. MAKE SURE that the scene's script is this file after copying.
 # Run the script by instancing it as such:
-# var mod_check = load("res://path/to/script/hevlib_check.gd").new() 
+# func _init():
+# 	var self_path = self.get_script().get_path()
+# 	var self_directory = self_path.split(self_path.split("/")[self_path.split("/").size() - 1])[0]
+# 	var check = load(self_directory + "mod_checker_script.tscn").instance()
+# 	add_child(check)
 # If the variable crash_if_not_found is set to false, the result of the query can be found by fetching the mod_exists variable from the variable
-# var mod_exists = mod_check.mod_exists
+# var mod_exists = check.mod_exists
 
 
 # The display name of the mod the script is checking for, used by the dialogue box text and for logging
@@ -21,12 +26,12 @@ var this_mod_name : String = "Example Mod"
 # If neither the manifest or mod main have proper versioning, the check automatically fails
 # Setting INF for the max major version and -INF for the min major version will act as standard operators and mean that no maximum or no minimum is set respectively
 # 
-var min_version_major : int = 1 # Setting this to -INF will mean no min version is checked
+var min_version_major : int = 1 # Setting this to INF will mean no min version is checked
 var min_version_minor : int = 0
-var min_version_bugfix : int = 0
+var min_version_bugfix : int =0
 
-var max_version_major : int = 4 # Setting this to INF will mean no max version is checked
-var max_version_minor : int = 2
+var max_version_major : int = INF # Setting this to INF will mean no max version is checked
+var max_version_minor : int = 0
 var max_version_bugfix : int = 0
 
 var check_mod_version : bool = true
@@ -35,7 +40,7 @@ var check_mod_version : bool = true
 # Will use a default message and mod name if the custom_message_string variable is left blank as ""
 # dialogue_box_title sets text to be displayed at the top of the box
 var show_dialogue_box : bool = true
-var dialogue_box_title : String = ""
+var dialogue_box_title : String = "HEVLIB ERROR!"
 
 # If true, the game will close after either the dialogue box is closed, or if show_dialogue_box is false, immediately after the query fails
 # If no dialogue box is used, there will be extra logging performed to make sure that the issue is made very clear.
@@ -52,8 +57,8 @@ var custom_message_string : String = ""
 # open_download_page_on_OK will attempt to open the provided link from download_URL in the browser
 # download_URL is intended to be a link to the download page of a mod
 # For GitHub links, it's recommended to use the /releases/latest link - e.g. https://github.com/rwqfsfasxc100/HevLib/releases/latest
-var open_download_page_on_OK : bool = false
-var download_URL : String = ""
+var open_download_page_on_OK : bool = true
+var download_URL : String = "https://github.com/rwqfsfasxc100/HevLib/releases/latest"
 
 
 
@@ -73,11 +78,11 @@ var mod_exists : bool
 
 # Main function body
 
-func _init():
-	pause_mode = Node.PAUSE_MODE_PROCESS
+onready var tree = get_tree().get_root()
 
+func _ready():
 	Debug.l("Mod Checker Script: starting check for mod [%s]" % mod_name)
-	mod_exists = false
+	mod_exists = true
 	var dir = Directory.new()
 	var does = dir.file_exists(modmain_res_path)
 	if does:
@@ -102,12 +107,23 @@ func _init():
 							minor = dictionary["version"]["version_minor"]
 							bugfix = dictionary["version"]["version_bugfix"]
 							
-					if min_version_major > major or major > max_version_major:
+					
+					if min_version_major > major:
 						mod_exists = false
-					if min_version_minor > minor or minor > max_version_minor:
+					if min_version_major == major:
+						if min_version_minor > minor:
+							mod_exists = false
+						if min_version_minor == minor:
+							if min_version_bugfix > bugfix:
+								mod_exists = false
+					if major > max_version_major:
 						mod_exists = false
-					if min_version_bugfix > bugfix or bugfix > max_version_bugfix:
-						mod_exists = false
+					if max_version_major == major:
+						if minor > max_version_minor:
+							mod_exists = false
+						if max_version_minor == minor:
+							if bugfix > max_version_bugfix:
+								mod_exists = false
 		else:
 			mod_exists = true
 	else:
@@ -115,37 +131,14 @@ func _init():
 	if mod_exists:
 		Debug.l("Mod Checker Script: %s exists and is running the correct version" % mod_name)
 	else:
-		get_tree().paused = true
 		if show_dialogue_box:
-			var box = AcceptDialog.new()
-			box.connect("confirmed", self, "_confirmed_pressed")
-			box.connect("popup_hide", self, "_popup_hide")
-			box.window_title = dialogue_box_title
-			box.popup_exclusive = true
-			box.rect_min_size = Vector2(300,150)
+			get_tree().paused = true
+			self.connect("confirmed", self, "_confirmed_pressed")
+			self.connect("popup_hide", self, "_popup_hide")
+			self.connect("tree_exited",self,"_tree_exited")
 			
-			if custom_message_string == "":
-				var text = ""
-				var header = "Warning! The mod %s is not currently installed with the correct version.\n\n" % mod_name
-				var body = "Please install a copy of %s that is " % mod_name
-				var mx = false
-				if not max_version_major == INF:
-					mx = true
-					var txt = "older than version %s.%s.%s" % [max_version_major,max_version_minor,max_version_bugfix]
-					body = body + txt
-				
-				if not min_version_major == -INF:
-					if mx:
-						body = body + " or is "
-					var txt = "newer than version %s.%s.%s" % [min_version_major,min_version_minor,min_version_bugfix]
-					body = body + txt
-				var bottom = ". \n\nPlease ensure that the mod was downloaded from the correct page, for instance the releases page on GitHub."
-				if open_download_page_on_OK:
-					bottom = bottom + "\n\nPress OK to open the downloads page."
-				box.dialog_text = header + body + bottom
-			else:
-				box.dialog_text = custom_message_string
-			box.visible = true
+			get_parent().call_deferred("remove_child",self)
+			
 		else:
 			_confirmed_pressed()
 		pass
@@ -156,13 +149,60 @@ func _confirmed_pressed():
 		Debug.l("Mod Checker Script: attempting to open downloads link @ [%s]" % download_URL)
 		OS.shell_open(download_URL)
 	_popup_hide()
-	
-onready var exit = Loader.prepare("res://Exit.tscn")
 
 func _popup_hide():
 	if not mod_exists and crash_if_not_found:
 		Debug.l("Mod Checker Script: mod %s not found within desired version range, exiting game" % mod_name)
-		Loader.go(exit)
+		var PID = OS.get_process_id()
+		OS.kill(PID)
+
+func _tree_exited():
+	self.window_title = dialogue_box_title
+	self.popup_exclusive = true
+	self.rect_min_size = Vector2(300,150)
+	
+	if custom_message_string == "":
+		var text = ""
+		var header = "Warning! The mod %s is not currently installed with the correct version" % mod_name
+		var body = "\n\nPlease install a copy of %s that is " % mod_name
+		var mx = false
+		if min_version_major == int(INF):
+			pass
+		else:
+			var txt = "version %s.%s.%s or newer" % [min_version_major,min_version_minor,min_version_bugfix]
+			body = body + txt
+			mx = true
+			
+		
+		if max_version_major == int(INF):
+			pass
+		else:
+			if mx:
+				body = body + ", and/or is "
+			var txt = "version %s.%s.%s or older" % [max_version_major,max_version_minor,max_version_bugfix]
+			body = body + txt
+		
+		if max_version_major == int(INF) and min_version_major == int(INF):
+			body = ""
+		var bottom = ". \n\nPlease ensure that the mod was downloaded from the correct page, for instance the releases page on GitHub."
+		if open_download_page_on_OK:
+			bottom = bottom + "\n\nPress OK to open the downloads page."
+		self.dialog_text = header + body + bottom
+	else:
+		self.dialog_text = custom_message_string
+	var control = CanvasLayer.new()
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+	var cnum = str(rng.randi())
+	rng.randomize()
+	var bnum = str(rng.randi())
+	control.name = cnum
+	self.name = bnum
+	control.pause_mode = Node.PAUSE_MODE_PROCESS
+	control.layer = 127
+	control.add_child(self)
+	tree.call_deferred("add_child",control)
+	
 
 static func fetch_folder_files(folder) -> Array:
 	var fileList = []
@@ -255,3 +295,16 @@ func config_parse(file):
 			data.merge({key:item})
 		cfg_dictionary.merge({section:data})
 	return cfg_dictionary
+
+func _init():
+	self.process_priority = -INF
+	self.pause_mode = Node.PAUSE_MODE_PROCESS
+
+func _physics_process(delta):
+	if mod_exists == false:
+		var screen = OS.get_screen_size()
+		rect_position.x = (screen.x - rect_size.x)/2
+		rect_position.y = (screen.y - rect_size.y)/2
+		self.visible = true
+	else:
+		self.visible = false

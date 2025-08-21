@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://HevLib/mod_checker_script.gd" type="Script" id=1]
+
+[node name="mod_checker_script" type="AcceptDialog"]
+margin_right = 83.0
+margin_bottom = 58.0
+script = ExtResource( 1 )
