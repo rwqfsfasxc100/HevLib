@@ -76,7 +76,7 @@ var mod_exists : bool
 func _init():
 	pause_mode = Node.PAUSE_MODE_PROCESS
 
-	Debug.l("Mod Checker Script: starting check for mod [%s]" % mod_name)
+	Debug.l("Mod Checker Script: starting check for mod [%s]" % [mod_name,mod_exists])
 	mod_exists = false
 	var dir = Directory.new()
 	var does = dir.file_exists(modmain_res_path)
