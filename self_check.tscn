@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://HevLib/self_check.gd" type="Script" id=1]
+
+[node name="self_check" type="AcceptDialog"]
+margin_right = 83.0
+margin_bottom = 58.0
+script = ExtResource( 1 )

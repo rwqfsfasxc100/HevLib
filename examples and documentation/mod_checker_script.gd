@@ -169,7 +169,7 @@ func _tree_exited():
 	
 	if custom_message_string == "":
 		var text = ""
-		var header = "Warning! The mod %s is not currently installed with the correct version" % mod_name
+		var header = "Warning! Missing dependancy for %s\nThe mod %s is not currently installed with the correct version" % [this_mod_name,mod_name]
 		var body = "\n\nPlease install a copy of %s that is " % mod_name
 		var mx = false
 		if min_version_major == int(INF):
