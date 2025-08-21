@@ -147,7 +147,7 @@ func on_timeout():
 					confirmed_files.append(file)
 		for file in confirmed_files:
 			var Translations = preload("res://HevLib/pointers/Translations.gd").new()
-			var type = file.typeof()
+			var type = typeof(file)
 			if type == TYPE_STRING:
 				Translations.__updateTL(file, "|", false)
 			elif type == TYPE_ARRAY:
