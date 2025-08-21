@@ -73,7 +73,9 @@ var mod_exists : bool
 
 # Main function body
 
-func _ready():
+func _init():
+	pause_mode = Node.PAUSE_MODE_PROCESS
+
 	Debug.l("Mod Checker Script: starting check for mod [%s]" % mod_name)
 	mod_exists = false
 	var dir = Directory.new()
@@ -253,6 +255,3 @@ func config_parse(file):
 			data.merge({key:item})
 		cfg_dictionary.merge({section:data})
 	return cfg_dictionary
-
-func _init():
-	pause_mode = Node.PAUSE_MODE_PROCESS
