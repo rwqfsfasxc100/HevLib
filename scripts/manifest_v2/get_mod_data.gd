@@ -8,6 +8,21 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 	var manifest_count = 0
 	var library_count = 0
 	var non_library_count = 0
+	var stat_tags = {
+				"adds_equipment":[],
+				"adds_events":[],
+				"adds_gameplay_mechanics":[],
+				"adds_ships":[],
+				"allow_achievements":0,
+				"fun":0,
+				"handle_extra_crew":24,
+				"is_library_mod":0,
+				"library_hidden_by_default":0,
+				"overhaul":0,
+				"quality_of_life":0,
+				"uses_hevlib_research":0,
+				"visual":0
+				}
 	for mod in mods:
 		var constants = mod.get_script().get_script_constant_map()
 		var script_path = mod.get_script().get_path()
@@ -41,6 +56,64 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 				mod_is_library = manifest_data["tags"].get("is_library_mod",false)
 				hide_library = manifest_data["tags"].get("library_hidden_by_default",true)
 				manifest_version = manifest_data["version"].get("manifest_version",1)
+				
+				var equipment = manifest_data["tags"].get("adds_equipment",[])
+				for item in equipment:
+					if not item in stat_tags["adds_equipment"]:
+						stat_tags["adds_equipment"].append(item)
+				
+				var events = manifest_data["tags"].get("adds_events",[])
+				for item in events:
+					if not item in stat_tags["adds_events"]:
+						stat_tags["adds_events"].append(item)
+				
+				var gameplay = manifest_data["tags"].get("adds_gameplay_mechanics",[])
+				for item in gameplay:
+					if not item in stat_tags["adds_gameplay_mechanics"]:
+						stat_tags["adds_gameplay_mechanics"].append(item)
+				
+				var ships = manifest_data["tags"].get("adds_ships",[])
+				for item in ships:
+					if not item in stat_tags["adds_ships"]:
+						stat_tags["adds_ships"].append(item)
+				
+				var allow_achievements = manifest_data["tags"].get("allow_achievements",false)
+				if allow_achievements:
+					stat_tags["allow_achievements"] += 1
+				
+				var fun = manifest_data["tags"].get("fun",false)
+				if fun:
+					stat_tags["allow_achievements"] += 1
+				
+				var handle_extra_crew = manifest_data["tags"].get("handle_extra_crew",24)
+				if handle_extra_crew > stat_tags["handle_extra_crew"]:
+					stat_tags["handle_extra_crew"] = handle_extra_crew
+				
+				var is_library_mod = manifest_data["tags"].get("is_library_mod",false)
+				if is_library_mod:
+					stat_tags["is_library_mod"] += 1
+				
+					var library_hidden_by_default = manifest_data["tags"].get("library_hidden_by_default",false)
+					if library_hidden_by_default:
+						stat_tags["library_hidden_by_default"] += 1
+				
+				var overhaul = manifest_data["tags"].get("overhaul",false)
+				if overhaul:
+					stat_tags["overhaul"] += 1
+				
+				var quality_of_life = manifest_data["tags"].get("quality_of_life",false)
+				if quality_of_life:
+					stat_tags["quality_of_life"] += 1
+				
+				var uses_hevlib_research = manifest_data["tags"].get("uses_hevlib_research",false)
+				if uses_hevlib_research:
+					stat_tags["uses_hevlib_research"] += 1
+				
+				var visual = manifest_data["tags"].get("visual",false)
+				if visual:
+					stat_tags["visual"] += 1
+				
+				
 			if file.to_lower().begins_with("icon") and file.to_lower().ends_with(".stex"):
 				has_icon_file = true
 				icon_path = folder_path + file
@@ -58,7 +131,9 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 		var version_dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
 		var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_a_library":mod_is_library,"keep_library_hidden":hide_library},"node":mod,"manifest":manifestEntry}}
 		mod_dictionary.merge(mod_entry)
-	var statistics = {"total_mod_count":mods.size(),"breakdown":{"mods":non_library_count,"libraries":library_count},"mods_using_manifests":manifest_count}
+	var stat_count = {"total_mod_count":mods.size(),"mods_using_manifests":manifest_count,"mods":non_library_count,"libraries":library_count}
+	
+	var statistics = {"counts":stat_count}
 	var returnValues = {"mods":mod_dictionary,"statistics":statistics}
 	if print_json:
 		var psj = JSON.print(returnValues, "\t")
