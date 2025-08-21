@@ -76,7 +76,7 @@ var mod_exists : bool
 func _init():
 	pause_mode = Node.PAUSE_MODE_PROCESS
 
-	Debug.l("Mod Checker Script: starting check for mod [%s]" % [mod_name,mod_exists])
+	Debug.l("Mod Checker Script: starting check for mod [%s]" % mod_name)
 	mod_exists = false
 	var dir = Directory.new()
 	var does = dir.file_exists(modmain_res_path)
@@ -151,7 +151,7 @@ func _init():
 		pass
 
 func _confirmed_pressed():
-	Debug.l("Mod Checker Script: mod [%s] exists? [%s]" % mod_exists)
+	Debug.l("Mod Checker Script: mod [%s] exists? [%s]" % [mod_name,mod_exists])
 	if open_download_page_on_OK:
 		Debug.l("Mod Checker Script: attempting to open downloads link @ [%s]" % download_URL)
 		OS.shell_open(download_URL)
