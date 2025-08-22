@@ -1,7 +1,3 @@
-I am currently away ; please use [this link](https://forms.gle/vUoarawnYjy3hXJi9) to report bugs. Feature requests may still use the issues tab
-
-~ Hev
-
 # HevLib
 Library mod for ΔV: Rings of Saturn that provides several useful functions.
 
