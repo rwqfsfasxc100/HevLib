@@ -21,7 +21,7 @@ func make_upgrades_scene() -> String:
 	var slot_defaults = vanilla_data.slot_defaults.duplicate()
 	var vanilla_equipment_defaults_for_reference = vanilla_data.vanilla_equipment_defaults_for_reference.duplicate()
 	
-	tag_vanilla_slots(vanilla_equipment_defaults_for_reference)
+	
 	
 	UpgradeMenu.free()
 	
@@ -29,6 +29,7 @@ func make_upgrades_scene() -> String:
 	all_slot_node_names.append_array(vanilla_slot_names)
 	var slots_for_adding = []
 	
+	var tag_modifications = {}
 	
 	
 	for its in slots:
@@ -75,15 +76,21 @@ func make_upgrades_scene() -> String:
 				slots_for_adding.append(slotDict)
 				all_slot_node_names.append(slotDict.get("slot_node_name",""))
 		
-		var slot_dictionary_temps = {}
 		
 		for itm in slots:
 			var node = itm[0].get("SLOT_TAGS",{})
 			if node.keys().size() >= 1:
-				slot_dictionary_temps.merge({itm[3].hash():node})
+				tag_modifications.merge({itm[3].hash():node})
 		
-		
-		pass
+	
+	
+	
+	
+	
+	
+	
+	
+	tag_vanilla_slots(vanilla_equipment_defaults_for_reference)
 	return ""
 
 var tagged_vanilla_slots = PoolStringArray()
