@@ -28,7 +28,7 @@ var this_mod_name : String = "Example Mod"
 # 
 var min_version_major : int = 1 # Setting this to INF will mean no min version is checked
 var min_version_minor : int = 0
-var min_version_bugfix : int =0
+var min_version_bugfix : int = 0
 
 var max_version_major : int = INF # Setting this to INF will mean no max version is checked
 var max_version_minor : int = 0

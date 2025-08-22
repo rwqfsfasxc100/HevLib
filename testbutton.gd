@@ -56,6 +56,11 @@ func _on_Button_pressed():
 #	Translations.__updateTL_drom_dictionary(tData)
 #	Translations.__inject_translations(tData)
 #
+#	var node = Node.new()
+	var mf = load("res://HevLib/scenes/equipment/make_upgrades_scene.gd").new()
+#	node.set_script(mf)
+#	add_child(node)
+	mf.make_upgrades_scene()
 	
 	var mods = ManifestV2.__get_mod_data()
 	

@@ -6,19 +6,11 @@
 
 [node name="Upgrades" instance=ExtResource( 1 )]
 
-[node name="MainLowLeft" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="33" instance=ExtResource( 2 )]
-margin_top = 25494.0
-margin_right = 1228.0
-margin_bottom = 25623.0
+[node name="MainLowLeft" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" instance=ExtResource( 2 )]
 slot = "weaponSlot.mainLowLeft.type"
 always = false
 
 [node name="SYSTEM_TEST" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items/MainLowLeft/VBoxContainer" index="1" instance=ExtResource( 3 )]
-anchor_right = 0.0
-anchor_bottom = 0.0
-margin_top = 55.0
-margin_right = 1196.0
-margin_bottom = 125.0
 system = "SYSTEM_TEST"
 
 [editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/MainLowLeft"]

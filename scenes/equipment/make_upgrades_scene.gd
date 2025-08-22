@@ -1,5 +1,7 @@
 extends Node
 
+var SCENE_HEADER = "[gd_scene load_steps=4 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/unmodified/WeaponSlotUpgradeTemplate.tscn\" type=\"PackedScene\" id=2]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/unmodified/EquipmentItemTemplate.tscn\" type=\"PackedScene\" id=3]\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]\n\n"
+
 func make_upgrades_scene() -> String:
 	var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 	var vanilla_data = preload("res://HevLib/scenes/equipment/vanilla_defaults/slot_tagging.gd")
@@ -9,7 +11,7 @@ func make_upgrades_scene() -> String:
 	for slot in nodes_parent.get_children():
 		vanilla_slot_names.append(slot.name)
 	
-	var CRoot = get_tree().get_root().get_node("EquipmentDriver")
+	var CRoot = Debug.get_parent().get_node("EquipmentDriver")
 	var slots = CRoot.conv
 	
 	var hardpoint_types = vanilla_data.hardpoint_types.duplicate()
@@ -18,6 +20,8 @@ func make_upgrades_scene() -> String:
 	var slot_types = vanilla_data.slot_types.duplicate()
 	var slot_defaults = vanilla_data.slot_defaults.duplicate()
 	var vanilla_equipment_defaults_for_reference = vanilla_data.vanilla_equipment_defaults_for_reference.duplicate()
+	
+	tag_vanilla_slots(vanilla_equipment_defaults_for_reference)
 	
 	UpgradeMenu.free()
 	
@@ -71,11 +75,58 @@ func make_upgrades_scene() -> String:
 				slots_for_adding.append(slotDict)
 				all_slot_node_names.append(slotDict.get("slot_node_name",""))
 		
+		var slot_dictionary_temps = {}
+		
+		for itm in slots:
+			var node = itm[0].get("SLOT_TAGS",{})
+			if node.keys().size() >= 1:
+				slot_dictionary_temps.merge({itm[3].hash():node})
+		
+		
+		pass
 	return ""
 
-
+var tagged_vanilla_slots = PoolStringArray()
 
 var MODULE_IDENTIFIER = "Equipment Driver"
 func l(msg:String, ID:String = MODULE_IDENTIFIER, title:String = "HevLib"):
 	Debug.l("[%s %s]: %s" % [title, ID, msg])
 
+const SLOT_HEADER = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\" instance=ExtResource( 2 )]"
+
+func tag_vanilla_slots(vanilla_equipment_defaults_for_reference):
+	
+	for item in vanilla_equipment_defaults_for_reference:
+		var data = vanilla_equipment_defaults_for_reference.get(item)
+		
+		var string : String = ""
+		
+		string = SLOT_HEADER % item
+		for tag in data:
+			var content = data.get(tag)
+			match tag:
+				"limit_ships", "override_subtractive", "override_additive":
+					string = format_for_arrays(string, tag, content)
+				"add_vanilla_equipment", "invert_limit_logic":
+					string = format_for_bools(string, tag, content)
+				"slot_type", "hardpoint_type", "alignment", "restriction":
+					string = format_for_strings(string, tag, content)
+		tagged_vanilla_slots.append(string)
+
+func format_for_arrays(string, tag, content) -> String:
+	var initial = string + "\n" + tag + " = ["
+	var one = false
+	for item in content:
+		if one == false:
+			one = true
+		else:
+			initial = initial + ", "
+		initial = initial + "\"" + item + "\""
+	initial = initial + "]"
+	return initial
+
+func format_for_strings(string, tag, content) -> String:
+	return string + "\n" + tag + " = \"" + str(content) + "\""
+
+func format_for_bools(string, tag, content) -> String:
+	return string + "\n" + tag + " = " + str(content)

@@ -31,6 +31,6 @@ static func __get_value(mod: String, section: String, key: String, cfg_filename 
 	var s = f.get_value(mod, section, key, cfg_filename)
 	return s
 
-static func __load_configs():
+static func __load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
 	var f = load("res://HevLib/scripts/configs/load_configs.gd")
-	f.load_configs()
+	f.load_configs(cfg_filename)

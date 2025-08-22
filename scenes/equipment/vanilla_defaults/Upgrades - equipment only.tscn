@@ -5,7 +5,7 @@
 
 [node name="Upgrades" instance=ExtResource( 1 )]
 
-[node name="SYSTEM_TEST" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items/MainWeaponSlot/VBoxContainer" index="35" instance=ExtResource( 2 )]
+[node name="SYSTEM_TEST" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items/MainWeaponSlot/VBoxContainer" instance=ExtResource( 2 )]
 anchor_right = 0.0
 anchor_bottom = 0.0
 margin_top = 1387.0

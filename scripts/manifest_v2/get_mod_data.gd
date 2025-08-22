@@ -92,7 +92,7 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 				var is_library_mod = manifest_data["tags"].get("is_library_mod",false)
 				if is_library_mod:
 					stat_tags["is_library_mod"] += 1
-				
+					library_count += 1
 					var library_hidden_by_default = manifest_data["tags"].get("library_hidden_by_default",false)
 					if library_hidden_by_default:
 						stat_tags["library_hidden_by_default"] += 1
@@ -121,10 +121,10 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 		var manifestEntry = {"has_manifest":has_mod_manifest,"manifest_version":manifest_version,"manifest_data":manifest_data}
 		var mod_version_array = [mod_version_major,mod_version_minor,mod_version_bugfix]
 		var mod_version_string = str(mod_version_major) + "." + str(mod_version_minor) + "." + str(mod_version_bugfix)
-		if mod_is_library:
-			library_count += 1
-		else:
-			non_library_count += 1
+#		if mod_is_library:
+#			library_count += 1
+#		else:
+#			non_library_count += 1
 		if not str(mod_version_metadata) == "":
 			mod_version_array.append(mod_version_metadata)
 			mod_version_string = mod_version_string + "-" + str(mod_version_metadata)
@@ -133,7 +133,7 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 		mod_dictionary.merge(mod_entry)
 	var stat_count = {"total_mod_count":mods.size(),"mods_using_manifests":manifest_count,"mods":non_library_count,"libraries":library_count}
 	
-	var statistics = {"counts":stat_count}
+	var statistics = {"counts":stat_count,"tags":stat_tags}
 	var returnValues = {"mods":mod_dictionary,"statistics":statistics}
 	if print_json:
 		var psj = JSON.print(returnValues, "\t")
