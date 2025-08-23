@@ -31,7 +31,7 @@ var vanilla_equipment = load("res://HevLib/scenes/equipment/vanilla_defaults/equ
 
 var has = false
 
-func _ready():
+func _init():
 	var data = load("res://HevLib/scenes/equipment/vanilla_defaults/slot_tagging.gd").get_script_constant_map()
 	slot_types = data["slot_types"]
 	equipment_types = data["equipment_types"]

@@ -10,7 +10,10 @@
 slot = "weaponSlot.mainLowLeft.type"
 always = false
 
-[node name="SYSTEM_TEST" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items/MainLowLeft/VBoxContainer" index="1" instance=ExtResource( 3 )]
+[node name="CheckButton" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items/MainLowLeft/VBoxContainer/HBoxContainer"]
+text = "SLOT_MAIN_LOW_LEFT"
+
+[node name="SYSTEM_TEST" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items/MainLowLeft/VBoxContainer" instance=ExtResource( 3 )]
 system = "SYSTEM_TEST"
 
 [editable path="VB/MarginContainer/ScrollContainer/MarginContainer/Items/MainLowLeft"]

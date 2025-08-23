@@ -29,10 +29,10 @@ func _init(modLoader = ModLoader):
 # At this point all AutoLoads are available and the game is loaded
 func _ready():
 	l("Readying")
-	
 	installScriptExtension("weapon_slot_handler.gd")
 	l("Ready")
 	
+
 # Helper function to extend scripts
 # Loads the script you pass, checks what script is extended, and overrides it
 func installScriptExtension(path:String):

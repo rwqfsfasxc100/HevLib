@@ -172,3 +172,195 @@ static func __make_upgrades_scene():
 	var f = load("res://HevLib/scenes/equipment/make_upgrades_scene.gd")
 	var s = f.make_upgrades_scene()
 	return s
+
+
+static func __make_equipment_for_scene(equipment_data: Dictionary) -> String:
+	var num_val = equipment_data.get("num_val", -1)
+	var system = equipment_data.get("system", "")
+	var capability_lock = equipment_data.get("capability_lock", false)
+	var name_override = equipment_data.get("name_override", "")
+	var description = equipment_data.get("description", "")
+	var manual = equipment_data.get("manual", "")
+	var specs = equipment_data.get("specs", "")
+	var price = equipment_data.get("price", 0)
+	var test_protocol = equipment_data.get("test_protocol", "fire")
+	var default = equipment_data.get("default", false)
+	var control = equipment_data.get("control", "")
+	var story_flag = equipment_data.get("story_flag", "")
+	var story_flag_min = equipment_data.get("story_flag_min", -1)
+	var story_flag_max = equipment_data.get("story_flag_max", -1)
+	var warn_if_thermal_below = equipment_data.get("warn_if_thermal_below", 0)
+	var warn_if_electric_below = equipment_data.get("warn_if_electric_below", 0)
+	var sticker_price_format = equipment_data.get("sticker_price_format", "%s E$")
+	var sticker_price_multi_format = equipment_data.get("sticker_price_multi_format", "%s E$ (x%d)")
+	var installed_color = equipment_data.get("installed_color", Color(0.0, 1.0, 0.0, 1.0))
+	var disabled_color = equipment_data.get("disabled_color", Color(0.2, 0.2, 0.2, 1.0))
+	var slots = equipment_data.get("slots",[])
+	var alignment = equipment_data.get("alignment","")
+	var equipment_type = equipment_data.get("equipment_type","")
+	var slot_type = equipment_data.get("slot_type","")
+	var restriction = equipment_data.get("restriction","")
+	
+	var base = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%%s/VBoxContainer\" instance=ExtResource( 3 )]" % [system.to_upper()]
+	if num_val != -1:
+		base = base + "\nnumVal = " + str(num_val)
+	if system != "":
+		base = base + "\nsystem = \"" + system + "\""
+	if capability_lock:
+		base = base + "\ncapabilityLock = true"
+	if name_override != "":
+		base = base + "\nnameOverride = \"" + name_override + "\""
+	if description != "":
+		base = base + "\ndescription = \"" + description + "\""
+	if manual != "":
+		base = base + "\nmanual = \"" + manual + "\""
+	if specs != "":
+		base = base + "\nspecs = \"" + specs + "\""
+	if price != 0:
+		base = base + "\nprice = \"" + str(price)
+	if test_protocol != "":
+		base = base + "\ntestProtocol = \"" + test_protocol + "\""
+	if default:
+		base = base + "\ndefault = true"
+	if control != "":
+		base = base + "\ncontrol = \"" + control + "\""
+	if story_flag != "":
+		base = base + "\nstoryFlag = \"" + story_flag + "\""
+	if story_flag_min != -1:
+		base = base + "\nstoryFlagMin = \"" + str(story_flag_min)
+	if story_flag_max != -1:
+		base = base + "\nstoryFlagMax = \"" + str(story_flag_max)
+	if warn_if_thermal_below != 0:
+		base = base + "\nwarnIfThermalBelow = \"" + str(warn_if_thermal_below)
+	if warn_if_electric_below != 0:
+		base = base + "\nwarnIfElectricBelow = \"" + str(warn_if_thermal_below)
+	if sticker_price_format != "%s E$":
+		base = base + "\nstickerPriceFormat = \"" + sticker_price_format + "\""
+	if sticker_price_multi_format != "%s E$ (x%d)":
+		base = base + "\nstickerPriceMultiFormat" + sticker_price_multi_format + "\""
+	if installed_color != Color(0.0, 1.0, 0.0, 1.0):
+		base = base + "\ninstalledColor = " + str(Color(0.0, 1.0, 0.0, 1.0))
+	if disabled_color != Color(0.2, 0.2, 0.2, 1.0):
+		base = base + "\ndisabledColor = " + str(Color(0.2, 0.2, 0.2, 1.0))
+	
+#	var equip_node = preload("res://HevLib/scenes/equipment/hardpoints/EquipmentItemTemplate.tscn").instance() # Old preload. Commented out because of possible bug with it
+#	var equip_node = load("res://HevLib/scenes/equipment/hardpoints/unmodified/EquipmentItemTemplate.tscn").instance()
+#	equip_node.numVal = num_val
+#	equip_node.system = system
+#	equip_node.name = system
+#	equip_node.capabilityLock = capability_lock
+#	equip_node.nameOverride = name_override
+#	equip_node.description = description
+#	equip_node.manual = manual
+#	equip_node.specs = specs
+#	equip_node.price = price
+#	equip_node.testProtocol = test_protocol
+#	equip_node.default = default
+#	equip_node.control = control
+#	equip_node.storyFlag = story_flag
+#	equip_node.storyFlagMin = story_flag_min
+#	equip_node.storyFlagMax = story_flag_max
+#	equip_node.warnIfThermalBelow = warn_if_thermal_below
+#	equip_node.warnIfElectricBelow = warn_if_electric_below
+#	equip_node.stickerPriceFormat = sticker_price_format
+#	equip_node.stickerPriceMultiFormat = sticker_price_multi_format
+#	equip_node.installedColor = installed_color
+#	equip_node.disbledColor = disabled_color
+#	equip_node.slots = slots
+#	equip_node.alignment = alignment
+#	equip_node.equipment_type = equipment_type
+#	equip_node.slot_type = slot_type
+#	equip_node.restriction = restriction
+#	equip_node.data_dictionary = str(equipment_data)
+	return base
+
+static func __make_slot_for_scene(slot_data: Dictionary) -> Dictionary:
+	var systemSlot = slot_data.get("system_slot", "")
+	var slotNodeName = slot_data.get("slot_node_name", "MISSING_SLOT_NAME")
+	var slotDisplayName = slot_data.get("slot_display_name", "SLOT_MISSING_DATA")
+	var hasNone = slot_data.get("has_none", true)
+	var alwaysDisplay = slot_data.get("always_display", true)
+	var restrictType = slot_data.get("restrict_type", "")
+	var openByDefault = slot_data.get("open_by_default", false)
+	var limitShips = slot_data.get("limit_ships", [])
+	var invertLimitLogic = slot_data.get("invert_limit_logic", false)
+	var add_vanilla_equipment = slot_data.get("add_vanilla_equipment", true)
+#	var slotTemplate = preload("res://HevLib/scenes/equipment/hardpoints/WeaponSlotUpgradeTemplate.tscn").instance() # Old preload. Commented out because of possible bug with it
+#	var slotTemplate = load("res://HevLib/scenes/equipment/hardpoints/unmodified/WeaponSlotUpgradeTemplate.tscn").instance()
+	var slot_type = slot_data.get("slot_type","HARDPOINT")
+	var hardpoint_type = slot_data.get("hardpoint_type","")
+	var alignment = slot_data.get("alignment","")
+	var restriction = slot_data.get("restriction","")
+	var override_additive = slot_data.get("override_additive",[])
+	var override_subtractive = slot_data.get("override_subtractive",[])
+	
+	
+	var base = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\" instance=ExtResource( 2 )]" % slotNodeName
+	if systemSlot != "":
+		base = base + "\nslot = \"" + systemSlot + "\""
+	if alwaysDisplay:
+		base = base + "\nalways = true"
+	if openByDefault:
+		base = base + "\nopenByDefault = true"
+	if restrictType != "":
+		base = base + "\nslot = \"" + restrictType + "\""
+	if limitShips != []:
+		var initial = base + "\nlimit_ships = ["
+		var one = false
+		for item in limitShips:
+			if one == false:
+				one = true
+			else:
+				initial = initial + ", "
+			initial = initial + "\"" + item + "\""
+		initial = initial + "]"
+		base = initial
+	if invertLimitLogic:
+		base = base + "\ninvert_limit_logic = true"
+	
+#	if hasNone:
+#		var itemTemplate = load("res://HevLib/scenes/equipment/hardpoints/EquipmentItemTemplate.tscn").instance() # Old load. Commented out because of possible bug with it
+#		var itemTemplate = load("res://HevLib/scenes/equipment/hardpoints/unmodified/EquipmentItemTemplate.tscn").instance()
+#		itemTemplate.slot = "weaponSlot.main.type"
+#		itemTemplate.system = "SYSTEM_NONE"
+#		itemTemplate.default = true
+#		itemTemplate.name = "None"
+#		slotTemplate.get_node("VBoxContainer").add_child(itemTemplate)
+#	slotTemplate.slot = systemSlot
+#	slotTemplate.name = slotNodeName
+#	slotTemplate.get_node("VBoxContainer/HBoxContainer/CheckButton").text = slotDisplayName
+#	slotTemplate.always = alwaysDisplay
+#	slotTemplate.restrictType = restrictType
+#	slotTemplate.openByDefault = openByDefault
+#	slotTemplate.limit_ships = limitShips
+#	slotTemplate.invert_limit_logic = invertLimitLogic
+#	slotTemplate.add_vanilla_equipment = add_vanilla_equipment
+#	slotTemplate.slot_type = slot_type
+#	slotTemplate.hardpoint_type = hardpoint_type
+#	slotTemplate.alignment = alignment
+#	slotTemplate.restriction = restriction
+#	slotTemplate.override_additive = override_additive
+#	slotTemplate.override_subtractive = override_subtractive
+#	slotTemplate.data_dictionary = str(slot_data)
+	base = base + "\n\n[node name=\"CheckButton\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s/VBoxContainer/HBoxContainer\"]\ntext = \"%s\"" % [slotNodeName,slotDisplayName]
+	
+	if hasNone:
+		var eq = load("res://HevLib/pointers/Equipment.gd")
+		var dta = eq.__make_equipment_for_scene({"system":"SYSTEM_NONE","default":true,"name":"None"}) % slotNodeName
+		base = base + "\n\n" + dta
+	var editable_path = "[editable path=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s\"]" % slotNodeName
+	
+	var dict = {}
+	dict.merge(
+		{
+			"add_vanilla_equipment":add_vanilla_equipment,
+			"hardpoint_type":hardpoint_type,
+			"alignment":alignment,
+			"restriction":restriction,
+			"override_additive":override_additive,
+			"override_subtractive":override_subtractive,
+		}
+	)
+	
+	return {slotNodeName:[base, editable_path, dict]}
+
