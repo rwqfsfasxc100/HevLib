@@ -1,6 +1,6 @@
 extends Node
 
-var SCENE_HEADER = "[gd_scene load_steps=4 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/unmodified/WeaponSlotUpgradeTemplate.tscn\" type=\"PackedScene\" id=2]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/unmodified/EquipmentItemTemplate.tscn\" type=\"PackedScene\" id=3]\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]\n\n"
+var SCENE_HEADER = "[gd_scene load_steps=4 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/unmodified/WeaponSlotUpgradeTemplate.tscn\" type=\"PackedScene\" id=2]\n[ext_resource path=\"res://enceladus/SystemShipUpgradeUI.tscn\" type=\"PackedScene\" id=3]\n\n[sub_resource type=\"ViewportTexture\" id=1]\nflags = 5\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain1/Viewport\")\n\n[sub_resource type=\"ViewportTexture\" id=2]\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain2/Control\")\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]\n\n[node name=\"TextureRect\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 2 )\n\n[node name=\"TextureRect2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 2 )"
 
 var vanilla_equipment = load("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd").get_script_constant_map()
 var vanilla_data = preload("res://HevLib/scenes/equipment/vanilla_defaults/slot_tagging.gd")
@@ -13,42 +13,136 @@ var vanilla_equipment_defaults_for_reference
 
 func _init():
 	
-	hardpoint_types = vanilla_data.hardpoint_types.duplicate()
-	alignments = vanilla_data.alignments.duplicate()
-	equipment_types = vanilla_data.equipment_types.duplicate()
-	slot_types = vanilla_data.slot_types.duplicate()
-	slot_defaults = vanilla_data.slot_defaults.duplicate()
-	vanilla_equipment_defaults_for_reference = vanilla_data.vanilla_equipment_defaults_for_reference.duplicate()
+	hardpoint_types = vanilla_data.hardpoint_types.duplicate(true)
+	alignments = vanilla_data.alignments.duplicate(true)
+	equipment_types = vanilla_data.equipment_types.duplicate(true)
+	slot_types = vanilla_data.slot_types.duplicate(true)
+	slot_defaults = vanilla_data.slot_defaults.duplicate(true)
+	vanilla_equipment_defaults_for_reference = vanilla_data.vanilla_equipment_defaults_for_reference.duplicate(true)
 
-func make_upgrades_scene() -> String:
+func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/Upgrades.tscn"):
 	var Equipment = preload("res://HevLib/pointers/Equipment.gd")
-	
+	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 	var UpgradeMenu : Node = load("res://enceladus/Upgrades.tscn").instance()
 	var nodes_parent = UpgradeMenu.get_node("VB/MarginContainer/ScrollContainer/MarginContainer/Items")
 	var vanilla_slot_names = []
+	var vanilla_slot_types = {}
 	for slot in nodes_parent.get_children():
+		var children = slot.get_node("VBoxContainer").get_children()
+		if children.size() <= 1:
+			continue
 		vanilla_slot_names.append(slot.name)
+		var sys_slot = slot.slot
+		var index = 1
+		if sys_slot == "":
+			while not sys_slot:
+				sys_slot = children[index].slot
+				index += 1
+		vanilla_slot_types.merge({slot.name:sys_slot})
 	
-	var CRoot = Debug.get_parent().get_node("EquipmentDriver")
-	var slots = CRoot.conv
+	var folders = FolderAccess.__fetch_folder_files("res://", true, true)
+	var data_state : Array = []
+	for folder in folders:
+		if folder.ends_with("/"):
+			var folder_2 = FolderAccess.__fetch_folder_files(folder, true, true)
+			for check in folder_2:
+				if check.ends_with("HEVLIB_EQUIPMENT_DRIVER_TAGS/"):
+					var files = FolderAccess.__fetch_folder_files(check, false, true)
+					var mod = check.hash()
+					var dicti = {}
+					for file in files:
+						var last_bit = file.split("/")[file.split("/").size() - 1]
+						match last_bit:
+							"ADD_EQUIPMENT_ITEMS.gd":
+								var data = load(check + last_bit)
+								var constants = data.get_script_constant_map()
+								var arr2 = []
+								for item in constants:
+									var equipment = data.get(item).duplicate(true)
+									arr2.append(equipment)
+								dicti.merge({"ADD_EQUIPMENT_ITEMS":arr2})
+							"ADD_EQUIPMENT_SLOTS.gd":
+								var data = load(check + last_bit)
+								var constants = data.get_script_constant_map()
+								var arr2 = []
+								for item in constants:
+									var equipment = data.get(item).duplicate(true)
+									arr2.append(equipment)
+								dicti.merge({"ADD_EQUIPMENT_SLOTS":arr2})
+							"EQUIPMENT_TAGS.gd":
+								var data = load(check + last_bit)
+								var constants = data.get_script_constant_map()
+								var ar = constants.get("EQUIPMENT_TAGS",{}).duplicate(true)
+								dicti.merge({"EQUIPMENT_TAGS":ar})
+							"SLOT_TAGS.gd":
+								var data = load(check + last_bit)
+								var constants = data.get_script_constant_map()
+								var ar = constants.get("SLOT_TAGS",{}).duplicate(true)
+								dicti.merge({"SLOT_TAGS":ar})
+					var mname = check.split("/")[2]
+						
+					data_state.append([dicti,check,mod,mname])
 	
-	var hardpoint_types = vanilla_data.hardpoint_types.duplicate()
-	var alignments = vanilla_data.alignments.duplicate()
-	var equipment_types = vanilla_data.equipment_types.duplicate()
-	var slot_types = vanilla_data.slot_types.duplicate()
-	var slot_defaults = vanilla_data.slot_defaults.duplicate()
-	var vanilla_equipment_defaults_for_reference = vanilla_data.vanilla_equipment_defaults_for_reference.duplicate()
 	
+	
+	
+	
+#	breakpoint
+#	var conv := []
+#	var paths = []
+#	var mods = ModLoader.get_children()
+#	l("Scanning installed mods for applicable mods")
+#	for mod in mods:
+#		var variants = mod.get_property_list()
+#		var dict = {}
+#		var does = false
+#		for it in variants:
+#			var iname = it.get("name")
+#			match iname:
+#				"ADD_EQUIPMENT_SLOTS":
+#					does = true
+#					var arr = mod.ADD_EQUIPMENT_SLOTS
+#					var arr2 = []
+#					for item in arr:
+#						arr2.append(item.duplicate(7))
+#					dict.merge({"ADD_EQUIPMENT_SLOTS":arr2})
+#				"ADD_EQUIPMENT_ITEMS":
+#					does = true
+#					var arr = mod.ADD_EQUIPMENT_ITEMS
+#					var arr2 = []
+#					for item in arr:
+#						arr2.append(item.duplicate(7))
+#					dict.merge({"ADD_EQUIPMENT_ITEMS":arr2})
+#				"EQUIPMENT_TAGS":
+#					does = true
+#					var item = mod.EQUIPMENT_TAGS
+#					dict.merge({"EQUIPMENT_TAGS":item.duplicate(true)})
+#					pass
+#				"SLOT_TAGS":
+#					does = true
+#					var item = mod.SLOT_TAGS
+#					dict.merge({"SLOT_TAGS":item.duplicate(true)})
+#					pass
+#		if does:
+#			var mPath = mod.get_script().get_path()
+#			var mHash = mPath.hash()
+#			conv.append([dict,mPath,mHash,mod.name])
+#			paths.append(mPath)
+#			l("Found mod at %s, labelling as %s" % [mPath, str(mHash)])
+	
+	
+	
+	var slots = data_state
 	
 	
 	
 	var all_slot_node_names = []
 	all_slot_node_names.append_array(vanilla_slot_names)
 	var slots_for_adding = []
-	
+	var slots_for_adding_dict = {}
 	var tag_modifications = {}
 	
-	var equipment_for_adding = []
+	var equipment_for_adding = {}
 	
 	for its in slots:
 		var nodes = its[0].get("EQUIPMENT_TAGS",{})
@@ -91,6 +185,7 @@ func make_upgrades_scene() -> String:
 			l("Adding slots for %s" % mod_hash)
 			for slotDict in newSlot:
 				slots_for_adding.append(slotDict)
+				slots_for_adding_dict.merge({slotDict.get("slot_node_name",""):slotDict})
 				all_slot_node_names.append(slotDict.get("slot_node_name",""))
 		for itm in slots:
 			var node = itm[0].get("SLOT_TAGS",{})
@@ -99,7 +194,7 @@ func make_upgrades_scene() -> String:
 		var ns = its[0].get("ADD_EQUIPMENT_ITEMS",[])
 		if ns.size() >= 1:
 			for m in ns:
-				equipment_for_adding.append(m)
+				equipment_for_adding.merge({m.get("system",""):m})
 	
 	var slots_full : Array = []
 	var slots_format : PoolStringArray = []
@@ -108,6 +203,8 @@ func make_upgrades_scene() -> String:
 	var slot_eligibility : Array = []
 	
 	var equipment : PoolStringArray = []
+	
+	var slot_allowed_equipment : Dictionary = {}
 	
 	for slot in slots_for_adding:
 		var m = slot.get("slot_node_name","")
@@ -135,14 +232,153 @@ func make_upgrades_scene() -> String:
 		slots_format.append(format.get(m)[0])
 		editable_paths.append(format.get(m)[1])
 		slots_full.append(format)
+	for slot in vanilla_equipment_defaults_for_reference:
+		var vslot_data = vanilla_equipment_defaults_for_reference[slot]
+		var vslot_additives = vslot_data.get("override_additive",[])
+		var vslot_subtractives = vslot_data.get("override_subtractive",[])
+		for mod in tag_modifications:
+			var dict = tag_modifications[mod]
+			if slot in dict.keys():
+				var tag_data = dict[slot]
+				var tag_add = tag_data.get("override_additive",[])
+				var tag_sub = tag_data.get("override_subtractive",[])
+				if vslot_additives != []:
+					for add in tag_add:
+						if add in vslot_additives:
+							pass
+						else:
+							vslot_additives.append(add)
+				else:
+					vslot_additives = tag_add.duplicate()
+				if vslot_subtractives != []:
+					for sub in tag_sub:
+						if sub in vslot_subtractives:
+							pass
+						else:
+							vslot_subtractives.append(sub)
+				else:
+					vslot_subtractives = tag_sub.duplicate()
+		if vslot_additives != []:
+			vslot_data["override_additive"] = vslot_additives
+		if vslot_subtractives != []:
+			vslot_data["override_subtractive"] = vslot_subtractives
+		
+		
+	for slot in all_slot_node_names:
+		if slot in vanilla_equipment_defaults_for_reference.keys():
+			var data = vanilla_equipment_defaults_for_reference[slot]
+			var slot_type = data.get("slot_type","HARDPOINT").to_upper()
+			if slot_type == "HARDPOINT":
+				var hardpoint = data.get("hardpoint_type", "")
+				var yk = slot_defaults.get(hardpoint,[]).duplicate(true)
+				var items = yk.duplicate(true)
+				var additives = data.get("override_additive",[])
+				var subtractives = data.get("override_subtractive",[])
+				for item in additives:
+					if item in items:
+						pass
+					else:
+						items.append(item)
+				for item in subtractives:
+					var tmp = []
+					for i in items:
+						if i in subtractives:
+							pass
+						else:
+							tmp.append(i)
+					items = tmp.duplicate(true)
+				
+				slot_allowed_equipment.merge({slot:items})
+			else:
+				var items = slot_defaults.get(slot_type,[])
+				slot_allowed_equipment.merge({slot:items})
+		elif slot in slots_for_adding_dict.keys():
+			var data = slots_for_adding_dict[slot]
+			var slot_type = data.get("slot_type","HARDPOINT").to_upper()
+			if slot_type == "HARDPOINT":
+				var hardpoint = data.get("hardpoint_type", "")
+				var yk = slot_defaults.get(hardpoint,[]).duplicate(true)
+				var items = yk.duplicate(true)
+				var additives = data.get("override_additive",[])
+				var subtractives = data.get("override_subtractive",[])
+				for item in additives:
+					if item in items:
+						pass
+					else:
+						items.append(item)
+				for item in subtractives:
+					var tmp = []
+					for i in items:
+						if i in subtractives:
+							pass
+						else:
+							tmp.append(i)
+					items = tmp.duplicate(true)
+				
+				slot_allowed_equipment.merge({slot:items})
+			else:
+				var items = slot_defaults.get(slot_type,[])
+				slot_allowed_equipment.merge({slot:items})
+		
+		
+	var equipment_format : PoolStringArray = []
 	
-	
-	
-#	tag_vanilla_slots(vanilla_equipment_defaults_for_reference)
-	
-	
+	for slot in slots_for_adding:
+		if slot.get("add_vanilla_equipment",true):
+			for equip in vanilla_equipment:
+				var item = vanilla_equipment[equip]
+				var allowed_equipment = slot_allowed_equipment.get(slot.get("slot_node_name",""),[]).duplicate(true)
+				
+				var does = confirm_equipment(vanilla_equipment[equip], slot.get("slot_type",""), slot.get("alignment",""), slot.get("restriction",""), allowed_equipment)
+				if does:
+					var system_slot = slot.get("system_slot","")
+					var string = Equipment.__make_equipment_for_scene(item, slot.get("slot_node_name",""), system_slot)
+					if system_slot == "":
+						pass
+					equipment_format.append(string)
+	for slot in all_slot_node_names:
+		if slot in slot_allowed_equipment.keys():
+			for equip in equipment_for_adding:
+				var item = equipment_for_adding[equip]
+				var allowed_equipment = slot_allowed_equipment.get(slot,[]).duplicate(true)
+				var slot_type = ""
+				var alignment = ""
+				var restriction = ""
+				var system_slot = ""
+				if slot in vanilla_equipment_defaults_for_reference.keys():
+					slot_type = vanilla_equipment_defaults_for_reference[slot].get("slot_type","")
+					alignment = vanilla_equipment_defaults_for_reference[slot].get("alignment","")
+					restriction = vanilla_equipment_defaults_for_reference[slot].get("restriction","")
+					system_slot = vanilla_slot_types[slot]
+				elif slot in slots_for_adding_dict.keys():
+					slot_type = slots_for_adding_dict[slot].get("slot_type","")
+					alignment = slots_for_adding_dict[slot].get("alignment","")
+					restriction = slots_for_adding_dict[slot].get("restriction","")
+					system_slot = slots_for_adding_dict[slot].get("system_slot","")
+				var does = confirm_equipment(equipment_for_adding[equip], slot_type, alignment, restriction, allowed_equipment)
+				if does:
+					var string = Equipment.__make_equipment_for_scene(item, slot, system_slot)
+					if system_slot == "":
+						pass
+					if string in equipment_format:
+						pass
+					else:
+						equipment_format.append(string)
+			
+	var concat = ""
+	concat = SCENE_HEADER
+	for ref in slots_format:
+		concat = concat + "\n\n" + ref
+	for equip in equipment_format:
+		concat = concat + "\n\n" + equip
+	for path in editable_paths:
+		concat = concat + "\n\n" + path
+#	FolderAccess.__check_folder_exists(file_save_path.split("/")[file_save_path.split("/").size() - 1])
+	var file = File.new()
+	file.open(file_save_path,File.WRITE)
+	file.store_string(concat)
+	file.close()
 	UpgradeMenu.free()
-	return ""
 
 var tagged_vanilla_slots = PoolStringArray()
 

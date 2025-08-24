@@ -168,13 +168,12 @@ static func __match_vanilla(type: String, align_to_match: String, desired_equipm
 				matching.append(itemDict)
 	return matching
 
-static func __make_upgrades_scene():
-	var f = load("res://HevLib/scenes/equipment/make_upgrades_scene.gd")
-	var s = f.make_upgrades_scene()
-	return s
+static func __make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/Upgrades.tscn"):
+	var f = load("res://HevLib/scenes/equipment/make_upgrades_scene.gd").new()
+	f.make_upgrades_scene(file_save_path)
 
 
-static func __make_equipment_for_scene(equipment_data: Dictionary) -> String:
+static func __make_equipment_for_scene(equipment_data: Dictionary, slot_node_name : String, system_slot: String) -> String:
 	var num_val = equipment_data.get("num_val", -1)
 	var system = equipment_data.get("system", "")
 	var capability_lock = equipment_data.get("capability_lock", false)
@@ -201,13 +200,16 @@ static func __make_equipment_for_scene(equipment_data: Dictionary) -> String:
 	var slot_type = equipment_data.get("slot_type","")
 	var restriction = equipment_data.get("restriction","")
 	
-	var base = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%%s/VBoxContainer\" instance=ExtResource( 3 )]" % [system.to_upper()]
+	var base = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s/VBoxContainer\" instance=ExtResource( 3 )]" % [system.to_upper(),slot_node_name]
 	if num_val != -1:
 		base = base + "\nnumVal = " + str(num_val)
+	base = base + "\nslot = \"" + system_slot + "\""
 	if system != "":
 		base = base + "\nsystem = \"" + system + "\""
 	if capability_lock:
 		base = base + "\ncapabilityLock = true"
+	else:
+		base = base + "\ncapabilityLock = false"
 	if name_override != "":
 		base = base + "\nnameOverride = \"" + name_override + "\""
 	if description != "":
@@ -217,23 +219,25 @@ static func __make_equipment_for_scene(equipment_data: Dictionary) -> String:
 	if specs != "":
 		base = base + "\nspecs = \"" + specs + "\""
 	if price != 0:
-		base = base + "\nprice = \"" + str(price)
+		base = base + "\nprice = " + str(price)
 	if test_protocol != "":
 		base = base + "\ntestProtocol = \"" + test_protocol + "\""
 	if default:
 		base = base + "\ndefault = true"
+	else:
+		base = base + "\ndefault = false"
 	if control != "":
 		base = base + "\ncontrol = \"" + control + "\""
 	if story_flag != "":
 		base = base + "\nstoryFlag = \"" + story_flag + "\""
 	if story_flag_min != -1:
-		base = base + "\nstoryFlagMin = \"" + str(story_flag_min)
+		base = base + "\nstoryFlagMin = " + str(story_flag_min)
 	if story_flag_max != -1:
-		base = base + "\nstoryFlagMax = \"" + str(story_flag_max)
+		base = base + "\nstoryFlagMax = " + str(story_flag_max)
 	if warn_if_thermal_below != 0:
-		base = base + "\nwarnIfThermalBelow = \"" + str(warn_if_thermal_below)
+		base = base + "\nwarnIfThermalBelow = " + str(warn_if_thermal_below)
 	if warn_if_electric_below != 0:
-		base = base + "\nwarnIfElectricBelow = \"" + str(warn_if_thermal_below)
+		base = base + "\nwarnIfElectricBelow = " + str(warn_if_thermal_below)
 	if sticker_price_format != "%s E$":
 		base = base + "\nstickerPriceFormat = \"" + sticker_price_format + "\""
 	if sticker_price_multi_format != "%s E$ (x%d)":
@@ -300,8 +304,12 @@ static func __make_slot_for_scene(slot_data: Dictionary) -> Dictionary:
 		base = base + "\nslot = \"" + systemSlot + "\""
 	if alwaysDisplay:
 		base = base + "\nalways = true"
+	else:
+		base = base + "\nalways = false"
 	if openByDefault:
 		base = base + "\nopenByDefault = true"
+	else:
+		base = base + "\nopenByDefault = false"
 	if restrictType != "":
 		base = base + "\nslot = \"" + restrictType + "\""
 	if limitShips != []:
@@ -346,7 +354,7 @@ static func __make_slot_for_scene(slot_data: Dictionary) -> Dictionary:
 	
 	if hasNone:
 		var eq = load("res://HevLib/pointers/Equipment.gd")
-		var dta = eq.__make_equipment_for_scene({"system":"SYSTEM_NONE","default":true,"name":"None"}) % slotNodeName
+		var dta = eq.__make_equipment_for_scene({"system":"SYSTEM_NONE","default":true,"name":"None"}, slotNodeName, systemSlot)
 		base = base + "\n\n" + dta
 	var editable_path = "[editable path=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s\"]" % slotNodeName
 	

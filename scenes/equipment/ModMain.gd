@@ -25,14 +25,14 @@ var _savedObjects := []
 
 func _init(modLoader = ModLoader):
 	l("Initializing Equipment Driver")
-	
+#	installScriptExtension("check.gd")
 	installScriptExtension("UpgradeGroup.gd")
 	installScriptExtension("hardpoints/EquipmentItemTemplate.gd")
 	
 func _ready():
 	l("Readying")
 	replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")
-	
+#	replaceScene("Enceladus.tscn","res://enceladus/Enceladus.tscn")
 	l("Ready")
 	
 func installScriptExtension(path:String):

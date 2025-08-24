@@ -286,7 +286,13 @@ func add_equipment():
 			var does = confirm_equipment(V2, item.slot_type, item.alignment, item.restriction, item.allowed_equipment)
 			if does:
 				repack(V2,vanilla_store + v_equipment + ".tscn")
-				item.get_node("VBoxContainer").add_child(V2)
+				var container = item.get_node("VBoxContainer")
+				var sys_slot = item.slot
+				var index = 1
+				while not sys_slot:
+					sys_slot = container.get_child(index).slot
+					index += 1
+				container.add_child(V2)
 				l("Vanilla equipment %s is applicable, adding & caching" % v_equipment)
 			else:
 				l("%s was not applicable, skipping" % v_equipment)
@@ -302,7 +308,15 @@ func add_equipment():
 		var vanilla_store = cache_folder + mod + "/ADD_EQUIPMENT_SLOTS/" + slot_mod[1] + "/vanilla_slots/"
 		var files = FolderAccess.__fetch_folder_files(vanilla_store, false, true)
 		for file in files:
-			item.get_node("VBoxContainer").add_child(load(file).instance())
+			
+				var container = item.get_node("VBoxContainer")
+				var sys_slot = item.slot
+				var index = 1
+				while not sys_slot:
+					sys_slot = container.get_child(index).slot
+					index += 1
+				
+				container.add_child(load(file).instance())
 	
 	
 	
@@ -317,7 +331,16 @@ func add_equipment():
 		for equip in validated_equipment:
 			var data = validated_equipment.get(equip)
 			if slot_name in data[1]:
-				slot.get_node("VBoxContainer").add_child(Equipment.__make_equipment(data[0]))
+				
+				var container = slot.get_node("VBoxContainer")
+				var sys_slot = slot.slot
+				var index = 1
+				while not sys_slot:
+					sys_slot = container.get_child(index).slot
+					index += 1
+				
+				
+				container.add_child(Equipment.__make_equipment(data[0]))
 				num_of_cached_equipment += 1
 				num_of_equipment_added_total += 1
 				
@@ -344,7 +367,15 @@ func add_equipment():
 				var returnData = sData + "\n" + slot_name
 				f.store_string(returnData)
 				f.close()
-				slot.get_node("VBoxContainer").add_child(V2)
+				
+				var container = slot.get_node("VBoxContainer")
+				var sys_slot = slot.slot
+				var index = 1
+				while not sys_slot:
+					sys_slot = container.get_child(index).slot
+					index += 1
+				container.add_child(V2)
+				
 #				l("Added %s to slot %s and adding to cache" % [V2.name, slot_name])
 				num_of_equipment_added_total += 1
 				num_of_uncached_equipment += 1

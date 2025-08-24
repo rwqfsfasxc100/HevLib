@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://enceladus/Enceladus.tscn" type="PackedScene" id=1]
+
+[node name="Enceladus" instance=ExtResource( 1 )]
+
+[editable path="AnimationPlayer/CanvasLayer/CRT"]
+[editable path="Background/BackgroundViewportContainer/Viewport/Offset/EnceladusIndustrialDock"]
+[editable path="Background/BackgroundViewportContainer/Viewport/Offset/EnceladusIndustrialDock/DockingArm"]
+[editable path="Background/BackgroundViewportContainer/Viewport/Offset/EnceladusIndustrialDock/DockingArm/Arm"]
+[editable path="Background/BackgroundViewportContainer/Viewport/Offset/EnceladusIndustrialDock/DockingArm/Arm/A/B/Spotlight"]
+[editable path="Background/BackgroundViewportContainer/Viewport/Offset/swirl/wirescreen"]
+[editable path="EnceladusMenu/MenuContainer/MarginContainer/HBoxContainer/Options"]
