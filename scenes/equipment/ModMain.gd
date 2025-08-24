@@ -29,6 +29,14 @@ func _init(modLoader = ModLoader):
 	installScriptExtension("UpgradeGroup.gd")
 	installScriptExtension("hardpoints/EquipmentItemTemplate.gd")
 	
+	var Equipment = preload("res://HevLib/pointers/Equipment.gd")
+	Equipment.__make_upgrades_scene()
+	var upgrades = load("user://cache/.HevLib_Cache/Upgrades.tscn")
+	upgrades.take_over_path("res://enceladus/Upgrades.tscn")
+	_savedObjects.append(upgrades)
+	var ws = load("user://cache/.HevLib_Cache/WeaponSlot.tscn")
+	ws.take_over_path("res://weapons/WeaponSlot.tscn")
+	_savedObjects.append(ws)
 func _ready():
 	l("Readying")
 	replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")

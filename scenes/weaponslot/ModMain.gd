@@ -24,12 +24,12 @@ var _savedObjects := []
 # Script and scene replacements should be done here, before the originals are loaded
 func _init(modLoader = ModLoader):
 	l("Initializing WeaponSlot Driver")
+	installScriptExtension("weapon_slot_handler.gd")
 	
 # Do stuff on ready
 # At this point all AutoLoads are available and the game is loaded
 func _ready():
 	l("Readying")
-	installScriptExtension("weapon_slot_handler.gd")
 	l("Ready")
 	
 

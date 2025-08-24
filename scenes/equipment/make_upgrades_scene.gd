@@ -27,6 +27,33 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/U
 	var nodes_parent = UpgradeMenu.get_node("VB/MarginContainer/ScrollContainer/MarginContainer/Items")
 	var vanilla_slot_names = []
 	var vanilla_slot_types = {}
+	var p = load("res://ModLoader.gd")
+	var ps = p.get_script_constant_map()
+	var running_in_debugged = false
+	var debugged_defined_mods = []
+	for item in ps:
+		if item == "is_debugged":
+			running_in_debugged = true
+			var pf = File.new()
+			pf.open("res://ModLoader.gd",File.READ)
+			var fs = pf.get_as_text(true)
+			pf.close()
+			var lines = fs.split("\n")
+			var reading = false
+			var contents = []
+			for line in lines:
+				
+				
+				
+				if line.begins_with("var addedMods"):
+					reading = true
+				if reading:
+					var split = line.split("\"")
+					if split.size() > 1 and split.size() == 3:
+						if split[0].begins_with("#"):
+							contents.append(split[1])
+			
+			debugged_defined_mods = contents.duplicate(true)
 	for slot in nodes_parent.get_children():
 		var children = slot.get_node("VBoxContainer").get_children()
 		if children.size() <= 1:
@@ -42,14 +69,28 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/U
 	
 	var folders = FolderAccess.__fetch_folder_files("res://", true, true)
 	var data_state : Array = []
+	var ws_state : Array = []
 	for folder in folders:
+		var semi_root = folder.split("/")[2]
+		if semi_root.begins_with("."):
+			continue
+					
 		if folder.ends_with("/"):
+			var mods_to_avoid = []
+			if running_in_debugged:
+				for mod in debugged_defined_mods:
+					var home = mod.split("/")[2]
+					if home == semi_root:
+						mods_to_avoid.append(home)
 			var folder_2 = FolderAccess.__fetch_folder_files(folder, true, true)
 			for check in folder_2:
+				if semi_root in mods_to_avoid:
+					continue
 				if check.ends_with("HEVLIB_EQUIPMENT_DRIVER_TAGS/"):
 					var files = FolderAccess.__fetch_folder_files(check, false, true)
 					var mod = check.hash()
 					var dicti = {}
+					var dictr = {}
 					for file in files:
 						var last_bit = file.split("/")[file.split("/").size() - 1]
 						match last_bit:
@@ -79,14 +120,54 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/U
 								var constants = data.get_script_constant_map()
 								var ar = constants.get("SLOT_TAGS",{}).duplicate(true)
 								dicti.merge({"SLOT_TAGS":ar})
+							"WEAPONSLOT_ADD.gd":
+								var data = load(check + last_bit)
+								var constants = data.get_script_constant_map()
+								var arr2 = []
+								for item in constants:
+									var equipment = data.get(item).duplicate(true)
+									arr2.append(equipment)
+								dictr.merge({"WEAPONSLOT_ADD":arr2})
 					var mname = check.split("/")[2]
-						
-					data_state.append([dicti,check,mod,mname])
+					if dicti.keys().size() >= 1:
+						data_state.append([dicti,check,mod,mname])
+					if dictr.keys().size() >= 1:
+						ws_state.append([dictr,check,mod,mname])
 	
 	
 	
 	
 	
+	var ws_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://weapons/WeaponSlot.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"WeaponSlot\" instance=ExtResource( 1 )]"
+	
+	var equipment_header = "[node name=\"%s\" parent=\".\" instance_placeholder=\"%s\"]"
+	var equipment_header_noref = "[node name=\"%s\" parent=\".\"]"
+	
+	var weaponslot_string = ws_header
+	for entry in ws_state:
+		var d = entry[0]
+		var opts = d.keys()
+		for opt in opts:
+			match opt:
+				"WEAPONSLOT_ADD":
+					var additions = d.get(opt)
+					
+	
+					for add in additions:
+						var aname = add.get("name","SYSTEM_ERROR")
+						var apath = add.get("path","")
+						var add_header = ""
+						if apath == "":
+							equipment_header_noref % aname
+						else:
+							add_header = equipment_header % [aname,apath]
+						weaponslot_string = weaponslot_string + "\n\n" + add_header
+						for it in add.get("data",[]):
+							weaponslot_string = weaponslot_string + "\n" + it.get("property") + " = " + it.get("value")
+	var f = File.new()
+	f.open("user://cache/.HevLib_Cache/WeaponSlot.tscn",File.WRITE)
+	f.store_string(weaponslot_string)
+	f.close()
 #	breakpoint
 #	var conv := []
 #	var paths = []
