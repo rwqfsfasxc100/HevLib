@@ -29,8 +29,7 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 				"version_minor":0,
 				"version_bugfix":0,
 				"version_metadata":"",
-				"version_string":"1.0.0",
-				"manifest_version":1
+				"version_string":"1.0.0"
 			},
 			"tags":{
 				"adds_equipment":[],
@@ -54,10 +53,16 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 				"donations":"",
 				"wiki":"",
 				"bug_reports":"",
-				"custom_links":{}
+				"custom_links":{},
 			},
 			"configs":{
 				
+			},
+			"manifest_definitions":{
+				"manifest_version":1,
+				"dependancy_mod_ids":[],
+				"conflicting_mod_ids":[],
+				"complimentary_mod_ids":[],
 			}
 		}
 		match manifest_version:
@@ -147,14 +152,18 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 					dict_template["links"]["bug_reports"] = manifest_data["links"].get("bug_reports","")
 					dict_template["links"]["custom_links"] = manifest_data["links"].get("custom_links",{})
 				
-				
+				# manifest definitions
+				if "manifest_definitions" in manifest_data.keys():
+					dict_template["manifest_definitions"]["manifest_version"] = manifest_data["manifest_definitions"].get("manifest_version",manifest_version)
+					dict_template["manifest_definitions"]["dependancy_mod_ids"] = manifest_data["manifest_definitions"].get("dependancy_mod_ids",[])
+					dict_template["manifest_definitions"]["conflicting_mod_ids"] = manifest_data["manifest_definitions"].get("conflicting_mod_ids",[])
+					dict_template["manifest_definitions"]["complimentary_mod_ids"] = manifest_data["manifest_definitions"].get("complimentary_mod_ids",[])
 				
 		var version_metadata = dict_template["version"]["version_metadata"]
 		var version_string = str(dict_template["version"]["version_major"]) + "." + str(dict_template["version"]["version_minor"]) + "." + str(dict_template["version"]["version_bugfix"])
 		if not version_metadata == "":
 			version_string = version_string + "-" + version_metadata
 		dict_template["version"]["version_string"] = version_string
-		dict_template["version"]["manifest_version"] = manifest_version
 		
 		return dict_template
 	return manifest_data
