@@ -136,86 +136,40 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/U
 	
 	
 	
-	
-	
-	var ws_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://weapons/WeaponSlot.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"WeaponSlot\" instance=ExtResource( 1 )]"
-	
-	var equipment_header = "[node name=\"%s\" parent=\".\" instance_placeholder=\"%s\"]"
-	var equipment_header_noref = "[node name=\"%s\" parent=\".\"]"
-	
-	var weaponslot_string = ws_header
-	for entry in ws_state:
-		var d = entry[0]
-		var opts = d.keys()
-		for opt in opts:
-			match opt:
-				"WEAPONSLOT_ADD":
-					var additions = d.get(opt)
-					
-	
-					for add in additions:
-						var aname = add.get("name","SYSTEM_ERROR")
-						var apath = add.get("path","")
-						var add_header = ""
-						if apath == "":
-							add_header = equipment_header_noref % aname
-						else:
-							add_header = equipment_header % [aname,apath]
-						weaponslot_string = weaponslot_string + "\n\n" + add_header
-						for it in add.get("data",[]):
-							weaponslot_string = weaponslot_string + "\n" + it.get("property") + " = " + it.get("value")
-	var f = File.new()
-	f.open("user://cache/.HevLib_Cache/WeaponSlot.tscn",File.WRITE)
-	f.store_string(weaponslot_string)
-	f.close()
-#	breakpoint
-#	var conv := []
-#	var paths = []
-#	var mods = ModLoader.get_children()
-#	l("Scanning installed mods for applicable mods")
-#	for mod in mods:
-#		var variants = mod.get_property_list()
-#		var dict = {}
-#		var does = false
-#		for it in variants:
-#			var iname = it.get("name")
-#			match iname:
-#				"ADD_EQUIPMENT_SLOTS":
-#					does = true
-#					var arr = mod.ADD_EQUIPMENT_SLOTS
-#					var arr2 = []
-#					for item in arr:
-#						arr2.append(item.duplicate(7))
-#					dict.merge({"ADD_EQUIPMENT_SLOTS":arr2})
-#				"ADD_EQUIPMENT_ITEMS":
-#					does = true
-#					var arr = mod.ADD_EQUIPMENT_ITEMS
-#					var arr2 = []
-#					for item in arr:
-#						arr2.append(item.duplicate(7))
-#					dict.merge({"ADD_EQUIPMENT_ITEMS":arr2})
-#				"EQUIPMENT_TAGS":
-#					does = true
-#					var item = mod.EQUIPMENT_TAGS
-#					dict.merge({"EQUIPMENT_TAGS":item.duplicate(true)})
-#					pass
-#				"SLOT_TAGS":
-#					does = true
-#					var item = mod.SLOT_TAGS
-#					dict.merge({"SLOT_TAGS":item.duplicate(true)})
-#					pass
-#		if does:
-#			var mPath = mod.get_script().get_path()
-#			var mHash = mPath.hash()
-#			conv.append([dict,mPath,mHash,mod.name])
-#			paths.append(mPath)
-#			l("Found mod at %s, labelling as %s" % [mPath, str(mHash)])
-	
-	
-	
 	var slots = data_state
 	
-	
+	for item in slots:
+		var files = item[0]
+		if "ADD_EQUIPMENT_ITEMS" in files.keys():
+			var data = files.get("ADD_EQUIPMENT_ITEMS")
+			var for_ws = [{"WEAPONSLOT_ADD":[]}]
+			for object in data:
+				if "weapon_slot" in object.keys():
+					var obj = object.get("weapon_slot").duplicate(true)
+					var wname = object.get("system","")
+					var wprice = object.get("price",0)
+					var objdata = obj.get("data",[])
+					var has_price = false
+					var has_invis = false
+					var price_string = str(wprice)
+					if "name" in obj.keys():
+						pass
+					else:
+						object["weapon_slot"].merge({"name":wname})
+					for d in objdata:
+						if d.get("property","") == "repairReplacementPrice":
+							d["value"] = price_string
+							has_price = true
+						if d.get("property","") == "visible":
+							has_invis = true
+					if not has_price:
+						objdata.append({"property":"repairReplacementPrice","value":price_string})
+					if not has_invis:
+						objdata.append({"property":"visible","value":"false"})
+					object["weapon_slot"]["data"] = objdata.duplicate(true)
+					var eq_for_ws = object["weapon_slot"].duplicate(true)
+					for_ws[0]["WEAPONSLOT_ADD"].append(eq_for_ws)
+			ws_state.append(for_ws)
 	
 	var all_slot_node_names = []
 	all_slot_node_names.append_array(vanilla_slot_names)
@@ -455,10 +409,45 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/U
 	for path in editable_paths:
 		concat = concat + "\n\n" + path
 #	FolderAccess.__check_folder_exists(file_save_path.split("/")[file_save_path.split("/").size() - 1])
-	var file = File.new()
-	file.open(file_save_path,File.WRITE)
-	file.store_string(concat)
-	file.close()
+	
+	
+	
+	
+	
+	var ws_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://weapons/WeaponSlot.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"WeaponSlot\" instance=ExtResource( 1 )]"
+	
+	var equipment_header = "[node name=\"%s\" parent=\".\" instance_placeholder=\"%s\"]"
+	var equipment_header_noref = "[node name=\"%s\" parent=\".\"]"
+	
+	var weaponslot_string = ws_header
+	for entry in ws_state:
+		var d = entry[0]
+		var opts = d.keys()
+		for opt in opts:
+			match opt:
+				"WEAPONSLOT_ADD":
+					var additions = d.get(opt)
+					
+	
+					for add in additions:
+						var aname = add.get("name","SYSTEM_ERROR")
+						var apath = add.get("path","")
+						var add_header = ""
+						if apath == "":
+							add_header = equipment_header_noref % aname
+						else:
+							add_header = equipment_header % [aname,apath]
+						weaponslot_string = weaponslot_string + "\n\n" + add_header
+						for it in add.get("data",[]):
+							weaponslot_string = weaponslot_string + "\n" + it.get("property") + " = " + it.get("value")
+	var f = File.new()
+	f.open("user://cache/.HevLib_Cache/WeaponSlot.tscn",File.WRITE)
+	f.store_string(weaponslot_string)
+	f.close()
+	
+	f.open(file_save_path,File.WRITE)
+	f.store_string(concat)
+	f.close()
 	UpgradeMenu.free()
 
 var tagged_vanilla_slots = PoolStringArray()
