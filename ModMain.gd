@@ -25,7 +25,14 @@ func _ready():
 	l("Readying")
 	
 #	replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
-	if ModLoader.is_debugged:
+	var p = load("res://ModLoader.gd")
+	var ps = p.get_script_constant_map()
+	var running_in_debugged = false
+	var debugged_defined_mods = []
+	for item in ps:
+		if item == "is_debugged":
+			running_in_debugged = true
+	if running_in_debugged:
 		replaceScene("scenes/scene_replacements/TitleScreen.tscn", "res://TitleScreen.tscn")
 #	var mouse = load("res://HevLib/scenes/scene_replacements/MouseLayer.tscn").instance()
 	var CRoot = get_tree().get_root()
