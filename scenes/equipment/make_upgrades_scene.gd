@@ -158,7 +158,7 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/U
 						var apath = add.get("path","")
 						var add_header = ""
 						if apath == "":
-							equipment_header_noref % aname
+							add_header = equipment_header_noref % aname
 						else:
 							add_header = equipment_header % [aname,apath]
 						weaponslot_string = weaponslot_string + "\n\n" + add_header
