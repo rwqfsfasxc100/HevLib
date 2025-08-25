@@ -20,6 +20,8 @@ static func inject_translations(translation_data: Dictionary, iterations: int = 
 				disengaged_translations.append(tsl)
 				TranslationServer.remove_translation(tsl)
 				var dict = {locale:{key:wanted.get(key)}}
+				
+				
 				var message = dict[locale].get(key)
 				tsl.erase_message(key)
 				tsl.add_message(key,message)
@@ -27,9 +29,8 @@ static func inject_translations(translation_data: Dictionary, iterations: int = 
 				
 				
 #				var did = TranslationServer.translate(key)
-#				breakpoint
-				
-				
+#
+#
 #				Translations.__updateTL_drom_dictionary(dict)
 #
 #

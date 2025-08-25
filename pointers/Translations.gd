@@ -36,5 +36,5 @@ static func __inject_translations(translation_data: Dictionary,number_of_objects
 
 static func __translation_file_to_dictionary(path: String) -> Dictionary:
 	var f = load("res://HevLib/scripts/translations/translation_file_to_dictionary.gd")
-	var s = f.inject_translations(path)
+	var s = f.translation_file_to_dictionary(path)
 	return s

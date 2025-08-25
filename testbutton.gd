@@ -54,15 +54,15 @@ func _on_Button_pressed():
 		},
 	}
 #	Translations.__updateTL_drom_dictionary(tData)
-	Translations.__inject_translations(tData)
-	breakpoint
+#	Translations.__inject_translations(tData)
+#	breakpoint
 #	var node = Node.new()	
 	
 #	var wps = load("res://weapons/WeaponSlot.tscn").instance()
 #	var nodes = []
 #	for child in wps.get_children():
 #		nodes.append(child.name)
-	
+	var value = TranslationServer.translate("TUTORIAL_GREETING_1")
 	var mf = load("res://HevLib/scenes/equipment/make_upgrades_scene.gd").new()
 	mf.make_upgrades_scene()
 	breakpoint
