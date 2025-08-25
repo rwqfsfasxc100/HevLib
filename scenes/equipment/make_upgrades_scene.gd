@@ -66,10 +66,13 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/U
 				sys_slot = children[index].slot
 				index += 1
 		vanilla_slot_types.merge({slot.name:sys_slot})
-	
+	var weaponslot_modify_file = "user://cache/.HevLib_Cache/WSLT_MODIFY.json"
 	var folders = FolderAccess.__fetch_folder_files("res://", true, true)
 	var data_state : Array = []
 	var ws_state : Array = []
+	var wpfl = File.new().open(weaponslot_modify_file,File.WRITE)
+	wpfl.store_string("{}")
+	wpfl.close()
 	for folder in folders:
 		var semi_root = folder.split("/")[2]
 		if semi_root.begins_with("."):
@@ -128,6 +131,20 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/U
 									var equipment = data.get(item).duplicate(true)
 									arr2.append(equipment)
 								dictr.merge({"WEAPONSLOT_ADD":arr2})
+							"WEAPONSLOT_MODIFY.gd":
+								var data = load(check + last_bit)
+								var constants = data.get_script_constant_map()
+								var ar = constants.get("WEAPONSLOT_MODIFY",{}).duplicate(true)
+								var fi = File.new()
+								fi.open(weaponslot_modify_file,File.READ_WRITE)
+								var filedata = fi.get_as_text(true)
+								var sort = JSON.parse(filedata)
+								if sort == OK:
+									var founddata : Dictionary = sort.result
+									founddata.merge(ar, true)
+									fi.store_string(founddata)
+								fi.close()
+								
 					var mname = check.split("/")[2]
 					if dicti.keys().size() >= 1:
 						data_state.append([dicti,check,mod,mname])
