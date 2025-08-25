@@ -29,6 +29,23 @@ var developer_hint = {
 	],
 	"__match_vanilla":[
 		"Internal function used to return an array of viable vanilla equipment options from a set of tags"
+	],
+	"__make_upgrades_scene":[
+		"Creates Upgrades.tscn and WeaponSlot.tscn files based on data from mods' equipment data tags",
+		"upgrades_save_path -> (optional) the filepath to save the Upgrades.tscn file to. Defaults to \"user://cache/.HevLib_Cache/Upgrades.tscn\"",
+		"weaponslot_save_path -> (optional) the filepath to save the WeaponSlot.tscn file to. Defaults to \"user://cache/.HevLib_Cache/WeaponSlot.tscn\""
+	],
+	"__make_equipment_for_scene":[
+		"Returns a string containing PackedScene data for Upgrades.tscn based on provided data",
+		"equipment_data -> a dictionary containing a standard equipment data dictionary, as by EquipmentDriver standards",
+		"slot_node_name -> a string for the desired node to add the equipment to",
+		"system_slot -> a string for the slot type",
+		"This function is typically used internally for __make_upgrades_scene, preferrably use that to make scene files"
+	],
+	"__make_slot_for_scene":[
+		"Returns a string containing PackedScene data for Upgrades.tscn based on provided data",
+		"slot_data -> a dictionary containing a standard slot data dictionary, as by EquipmentDriver standards",
+		"This function is typically used internally for __make_upgrades_scene, preferrably use that to make scene files"
 	]
 }
 
@@ -168,9 +185,9 @@ static func __match_vanilla(type: String, align_to_match: String, desired_equipm
 				matching.append(itemDict)
 	return matching
 
-static func __make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/Upgrades.tscn"):
+static func __make_upgrades_scene(upgrades_save_path : String = "user://cache/.HevLib_Cache/Upgrades.tscn", weaponslot_save_path : String = "user://cache/.HevLib_Cache/WeaponSlot.tscn"):
 	var f = load("res://HevLib/scenes/equipment/make_upgrades_scene.gd").new()
-	f.make_upgrades_scene(file_save_path)
+	f.make_upgrades_scene(upgrades_save_path, weaponslot_save_path)
 
 
 static func __make_equipment_for_scene(equipment_data: Dictionary, slot_node_name : String, system_slot: String) -> String:

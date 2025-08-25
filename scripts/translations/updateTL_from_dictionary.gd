@@ -1,6 +1,6 @@
 extends Node
 
-static func updateTL_from_dictionary(path:Dictionary, delim:String = ",", fullLogging:bool = true):
+static func updateTL_from_dictionary(path:Dictionary, fullLogging:bool = true):
 	
 	Debug.l("Adding translations from dictionary")
 	var translations := []

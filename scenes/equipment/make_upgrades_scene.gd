@@ -20,7 +20,7 @@ func _init():
 	slot_defaults = vanilla_data.slot_defaults.duplicate(true)
 	vanilla_equipment_defaults_for_reference = vanilla_data.vanilla_equipment_defaults_for_reference.duplicate(true)
 
-func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/Upgrades.tscn"):
+func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/Upgrades.tscn", weaponslot_save_path : String = "user://cache/.HevLib_Cache/WeaponSlot.tscn"):
 	var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 	var UpgradeMenu : Node = load("res://enceladus/Upgrades.tscn").instance()
@@ -441,7 +441,7 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/U
 						for it in add.get("data",[]):
 							weaponslot_string = weaponslot_string + "\n" + it.get("property") + " = " + it.get("value")
 	var f = File.new()
-	f.open("user://cache/.HevLib_Cache/WeaponSlot.tscn",File.WRITE)
+	f.open(weaponslot_save_path,File.WRITE)
 	f.store_string(weaponslot_string)
 	f.close()
 	

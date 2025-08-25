@@ -7,6 +7,12 @@ var developer_hint = {
 	],
 	"__format_for_large_numbers":[
 		"Formats numbers into a human-readable form, separated with a comma"
+	],
+	"__compare_with_byte_array":[
+		"Compared two strings bitwise to make a more efficient check",
+		"input_string -> the first string to compare",
+		"comparison_string -> the second string to compare",
+		"returns a boolean whether the scripts match"
 	]
 }
 
