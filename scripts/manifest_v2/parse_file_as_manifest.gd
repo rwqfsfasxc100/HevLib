@@ -137,7 +137,7 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 					dict_template["tags"]["uses_hevlib_research"] = bool(manifest_data["tags"].get("uses_hevlib_research",false))
 					dict_template["tags"]["overhaul"] = bool(manifest_data["tags"].get("overhaul",false))
 					dict_template["tags"]["adds_events"] = Array(manifest_data["tags"].get("adds_events",[]))
-					dict_template["tags"]["handle_extra_crew"] = float(manifest_data["tags"].get("handle_extra_crew",24))
+					dict_template["tags"]["handle_extra_crew"] = int(manifest_data["tags"].get("handle_extra_crew",24))
 					dict_template["tags"]["visual"] = bool(manifest_data["tags"].get("visual",false))
 					dict_template["tags"]["fun"] = bool(manifest_data["tags"].get("fun",false))
 					dict_template["tags"]["language"] = PoolStringArray(manifest_data["tags"].get("language",["en"]))
