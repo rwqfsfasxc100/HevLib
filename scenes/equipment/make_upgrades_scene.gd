@@ -70,7 +70,8 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/U
 	var folders = FolderAccess.__fetch_folder_files("res://", true, true)
 	var data_state : Array = []
 	var ws_state : Array = []
-	var wpfl = File.new().open(weaponslot_modify_file,File.WRITE)
+	var wpfl = File.new()
+	wpfl.open(weaponslot_modify_file,File.WRITE)
 	wpfl.store_string("{}")
 	wpfl.close()
 	for folder in folders:
@@ -139,10 +140,9 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/U
 								fi.open(weaponslot_modify_file,File.READ_WRITE)
 								var filedata = fi.get_as_text(true)
 								var sort = JSON.parse(filedata)
-								if sort == OK:
-									var founddata : Dictionary = sort.result
-									founddata.merge(ar, true)
-									fi.store_string(founddata)
+								var founddata : Dictionary = sort.result
+								founddata.merge(ar, true)
+								fi.store_string(JSON.print(founddata))
 								fi.close()
 								
 					var mname = check.split("/")[2]
@@ -433,10 +433,14 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/U
 	
 	var ws_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://weapons/WeaponSlot.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"WeaponSlot\" instance=ExtResource( 1 )]"
 	
-	var equipment_header = "[node name=\"%s\" parent=\".\" instance_placeholder=\"%s\"]"
-	var equipment_header_noref = "[node name=\"%s\" parent=\".\"]"
+	var equipment_header = "[node name=\"%s\" parent=\"%s\" instance_placeholder=\"%s\"]"
+	var equipment_header_noref = "[node name=\"%s\" parent=\"%s\"]"
+	var equipment_editable_path_base = "[editable path=\"%s\"]"
+	
 	
 	var weaponslot_string = ws_header
+	var ws_editable_paths = ""
+	var weaponslot_properties = {}
 	for entry in ws_state:
 		var d = entry[0]
 		var opts = d.keys()
@@ -451,12 +455,61 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/U
 						var apath = add.get("path","")
 						var add_header = ""
 						if apath == "":
-							add_header = equipment_header_noref % aname
+							add_header = equipment_header_noref % [aname,"."]
 						else:
-							add_header = equipment_header % [aname,apath]
-						weaponslot_string = weaponslot_string + "\n\n" + add_header
+							add_header = equipment_header % [aname,".",apath]
+						weaponslot_properties.merge({add_header:[]})
+						if ws_editable_paths == "":
+							ws_editable_paths = equipment_editable_path_base % aname
+						else:
+							ws_editable_paths = ws_editable_paths + "\n" + equipment_editable_path_base % aname
+						
 						for it in add.get("data",[]):
-							weaponslot_string = weaponslot_string + "\n" + it.get("property") + " = " + it.get("value")
+							var ws_property_string = ""
+							var ws_property = it.get("property")
+							var ws_value = it.get("value")
+							var split = ws_property.split("/")
+							var property = split[split.size() - 1]
+							var parent_path = "."
+							if split.size() >= 3:
+								var node = split[split.size() - 2]
+								var nonode = ws_property.split(node)
+								if nonode[0].ends_with("/"):
+									nonode[0] = nonode[0].rstrip("/")
+								if nonode[1].begins_with("/"):
+									nonode[1] = nonode[1].lstrip("/")
+								var prop_header = equipment_header_noref % [node,aname + "/" + nonode[0]]
+								if prop_header in weaponslot_properties.keys():
+									pass
+								else:
+									weaponslot_properties.merge({prop_header:[]})
+								weaponslot_properties[prop_header].append([nonode[1],ws_value])
+							elif split.size() == 2:
+								var prop_header = equipment_header_noref % [split[0],aname]
+								if prop_header in weaponslot_properties.keys():
+									pass
+								else:
+									weaponslot_properties.merge({prop_header:[]})
+								weaponslot_properties[prop_header].append([split[1],ws_value])
+							else:
+								if add_header in weaponslot_properties.keys():
+									pass
+								else:
+									weaponslot_properties.merge({add_header:[]})
+								weaponslot_properties[add_header].append([ws_property,ws_value])
+	
+	for property in weaponslot_properties:
+		weaponslot_string = weaponslot_string + "\n\n" + property
+		var data = weaponslot_properties.get(property)
+		for dp in data:
+			weaponslot_string = weaponslot_string + "\n" + dp[0] + " = " + dp[1]
+	
+	
+	
+	
+	
+	if not ws_editable_paths == "":
+		weaponslot_string = weaponslot_string + "\n\n" + ws_editable_paths
 	var f = File.new()
 	f.open(weaponslot_save_path,File.WRITE)
 	f.store_string(weaponslot_string)

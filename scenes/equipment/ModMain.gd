@@ -39,7 +39,7 @@ func _init(modLoader = ModLoader):
 	_savedObjects.append(ws)
 func _ready():
 	l("Readying")
-#	replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")
+	replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")
 #	replaceScene("Enceladus.tscn","res://enceladus/Enceladus.tscn")
 	l("Ready")
 	
