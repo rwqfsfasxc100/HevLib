@@ -29,12 +29,14 @@ func _init(modLoader = ModLoader):
 	installScriptExtension("UpgradeGroup.gd")
 	installScriptExtension("hardpoints/EquipmentItemTemplate.gd")
 	
+	var upgrades_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn"
+	var weaponslot_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot.tscn"
 	var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 	Equipment.__make_upgrades_scene()
-	var upgrades = load("user://cache/.HevLib_Cache/Upgrades.tscn")
+	var upgrades = load(upgrades_path)
 	upgrades.take_over_path("res://enceladus/Upgrades.tscn")
 	_savedObjects.append(upgrades)
-	var ws = load("user://cache/.HevLib_Cache/WeaponSlot.tscn")
+	var ws = load(weaponslot_path)
 	ws.take_over_path("res://weapons/WeaponSlot.tscn")
 	_savedObjects.append(ws)
 func _ready():

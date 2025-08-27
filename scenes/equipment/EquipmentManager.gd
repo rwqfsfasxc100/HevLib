@@ -580,36 +580,3 @@ func repack(node, save_path):
 var MODULE_IDENTIFIER = "Equipment Driver"
 func l(msg:String, ID:String = MODULE_IDENTIFIER, title:String = "HevLib"):
 	Debug.l("[%s %s]: %s" % [title, ID, msg])
-
-func weaponslot_handle():
-	
-	var folders = FolderAccess.__fetch_folder_files("res://", true, true)
-	var data_state : Array = []
-	for folder in folders:
-		if folder.split("/")[2].begins_with("."):
-			continue
-		if folder.ends_with("/"):
-			var folder_2 = FolderAccess.__fetch_folder_files(folder, true, true)
-			for check in folder_2:
-				if check.ends_with("HEVLIB_EQUIPMENT_DRIVER_TAGS/"):
-					var files = FolderAccess.__fetch_folder_files(check, false, true)
-					var mod = check.hash()
-					var dicti = {}
-					for file in files:
-						var last_bit = file.split("/")[file.split("/").size() - 1]
-						match last_bit:
-							"WEAPONSLOT_ADD.gd":
-								var data = load(check + last_bit)
-								var constants = data.get_script_constant_map()
-								var arr2 = []
-								for item in constants:
-									var equipment = data.get(item).duplicate(true)
-									arr2.append(equipment)
-								dicti.merge({"WEAPONSLOT_ADD":arr2})
-					var mname = check.split("/")[2]
-					if dicti.keys().size() >= 1:
-						data_state.append([dicti,check,mod,mname])
-	var file = File.new()
-	file.open("user://cache/.HevLib_Cache/WSLT.json",File.WRITE)
-	file.store_string(JSON.print(data_state, "\t"))
-	file.close()

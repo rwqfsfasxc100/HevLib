@@ -20,7 +20,7 @@ func _init():
 	slot_defaults = vanilla_data.slot_defaults.duplicate(true)
 	vanilla_equipment_defaults_for_reference = vanilla_data.vanilla_equipment_defaults_for_reference.duplicate(true)
 
-func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/Upgrades.tscn", weaponslot_save_path : String = "user://cache/.HevLib_Cache/WeaponSlot.tscn"):
+func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn", weaponslot_save_path : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot.tscn"):
 	var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 	var UpgradeMenu : Node = load("res://enceladus/Upgrades.tscn").instance()
@@ -66,12 +66,18 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/U
 				sys_slot = children[index].slot
 				index += 1
 		vanilla_slot_types.merge({slot.name:sys_slot})
-	var weaponslot_modify_file = "user://cache/.HevLib_Cache/WSLT_MODIFY.json"
+	var weaponslot_modify_templates_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_TEMPLATES.json"
+	var weaponslot_modify_standalone_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_STANDALONE.json"
 	var folders = FolderAccess.__fetch_folder_files("res://", true, true)
 	var data_state : Array = []
 	var ws_state : Array = []
+	FolderAccess.__check_folder_exists(file_save_path.split(file_save_path.split("/")[file_save_path.split("/").size() - 1])[0])
+	FolderAccess.__check_folder_exists(weaponslot_save_path.split(weaponslot_save_path.split("/")[weaponslot_save_path.split("/").size() - 1])[0])
 	var wpfl = File.new()
-	wpfl.open(weaponslot_modify_file,File.WRITE)
+	wpfl.open(weaponslot_modify_templates_file,File.WRITE)
+	wpfl.store_string("{}")
+	wpfl.close()
+	wpfl.open(weaponslot_modify_standalone_file,File.WRITE)
 	wpfl.store_string("{}")
 	wpfl.close()
 	for folder in folders:
@@ -95,6 +101,7 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/U
 					var mod = check.hash()
 					var dicti = {}
 					var dictr = {}
+					var dictf = {}
 					for file in files:
 						var last_bit = file.split("/")[file.split("/").size() - 1]
 						match last_bit:
@@ -132,12 +139,29 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/U
 									var equipment = data.get(item).duplicate(true)
 									arr2.append(equipment)
 								dictr.merge({"WEAPONSLOT_ADD":arr2})
+							"WEAPONSLOT_ADD_TEMPLATES.gd":
+								var data = load(check + last_bit)
+								var constants = data.get_script_constant_map()
+								var ar = constants.get("WEAPONSLOT_ADD_TEMPLATES",{}).duplicate(true)
+								dictf.merge({"WEAPONSLOT_ADD_TEMPLATES":ar})
+							"WEAPONSLOT_MODIFY_TEMPLATES.gd":
+								var data = load(check + last_bit)
+								var constants = data.get_script_constant_map()
+								var ar = constants.get("WEAPONSLOT_MODIFY_TEMPLATES",{}).duplicate(true)
+								var fi = File.new()
+								fi.open(weaponslot_modify_templates_file,File.READ_WRITE)
+								var filedata = fi.get_as_text(true)
+								var sort = JSON.parse(filedata)
+								var founddata : Dictionary = sort.result
+								founddata.merge(ar, true)
+								fi.store_string(JSON.print(founddata))
+								fi.close()
 							"WEAPONSLOT_MODIFY.gd":
 								var data = load(check + last_bit)
 								var constants = data.get_script_constant_map()
 								var ar = constants.get("WEAPONSLOT_MODIFY",{}).duplicate(true)
 								var fi = File.new()
-								fi.open(weaponslot_modify_file,File.READ_WRITE)
+								fi.open(weaponslot_modify_standalone_file,File.READ_WRITE)
 								var filedata = fi.get_as_text(true)
 								var sort = JSON.parse(filedata)
 								var founddata : Dictionary = sort.result
@@ -427,7 +451,11 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/U
 		concat = concat + "\n\n" + path
 #	FolderAccess.__check_folder_exists(file_save_path.split("/")[file_save_path.split("/").size() - 1])
 	
-	
+	for entry in ws_state:
+		for opt in entry[0].keys():
+			match opt:
+				"WEAPONSLOT_TAGS":
+					pass
 	
 	
 	

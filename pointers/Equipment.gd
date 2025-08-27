@@ -185,7 +185,7 @@ static func __match_vanilla(type: String, align_to_match: String, desired_equipm
 				matching.append(itemDict)
 	return matching
 
-static func __make_upgrades_scene(upgrades_save_path : String = "user://cache/.HevLib_Cache/Upgrades.tscn", weaponslot_save_path : String = "user://cache/.HevLib_Cache/WeaponSlot.tscn"):
+static func __make_upgrades_scene(upgrades_save_path : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn", weaponslot_save_path : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot.tscn"):
 	var f = load("res://HevLib/scenes/equipment/make_upgrades_scene.gd").new()
 	f.make_upgrades_scene(upgrades_save_path, weaponslot_save_path)
 
