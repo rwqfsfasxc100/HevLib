@@ -129,14 +129,14 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 				# tags
 				if "tags" in manifest_data.keys():
 					dict_template["tags"]["allow_achievements"] = bool(manifest_data["tags"].get("allow_achievements",false))
-					dict_template["tags"]["adds_ships"] = PoolStringArray(manifest_data["tags"].get("adds_ships",[]))
-					dict_template["tags"]["adds_equipment"] = PoolStringArray(manifest_data["tags"].get("adds_equipment",[]))
+					dict_template["tags"]["adds_ships"] = Array(manifest_data["tags"].get("adds_ships",[]))
+					dict_template["tags"]["adds_equipment"] = Array(manifest_data["tags"].get("adds_equipment",[]))
 					dict_template["tags"]["quality_of_life"] = bool(manifest_data["tags"].get("quality_of_life",false))
 					dict_template["tags"]["is_library_mod"] = bool(manifest_data["tags"].get("is_library_mod",false))
-					dict_template["tags"]["adds_gameplay_mechanics"] = PoolStringArray(manifest_data["tags"].get("adds_gameplay_mechanics",[]))
+					dict_template["tags"]["adds_gameplay_mechanics"] = Array(manifest_data["tags"].get("adds_gameplay_mechanics",[]))
 					dict_template["tags"]["uses_hevlib_research"] = bool(manifest_data["tags"].get("uses_hevlib_research",false))
 					dict_template["tags"]["overhaul"] = bool(manifest_data["tags"].get("overhaul",false))
-					dict_template["tags"]["adds_events"] = PoolStringArray(manifest_data["tags"].get("adds_events",[]))
+					dict_template["tags"]["adds_events"] = Array(manifest_data["tags"].get("adds_events",[]))
 					dict_template["tags"]["handle_extra_crew"] = float(manifest_data["tags"].get("handle_extra_crew",24))
 					dict_template["tags"]["visual"] = bool(manifest_data["tags"].get("visual",false))
 					dict_template["tags"]["fun"] = bool(manifest_data["tags"].get("fun",false))
