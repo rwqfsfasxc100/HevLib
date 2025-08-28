@@ -68,6 +68,7 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 		vanilla_slot_types.merge({slot.name:sys_slot})
 	var weaponslot_modify_templates_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_TEMPLATES.json"
 	var weaponslot_modify_standalone_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_STANDALONE.json"
+	var slot_order_cache_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order.json"
 	var folders = FolderAccess.__fetch_folder_files("res://", true, true)
 	var data_state : Array = []
 	var ws_state : Array = []
@@ -80,6 +81,9 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 	wpfl.close()
 	wpfl.open(weaponslot_modify_standalone_file,File.WRITE)
 	wpfl.store_string("{}")
+	wpfl.close()
+	wpfl.open(slot_order_cache_file,File.WRITE)
+	wpfl.store_string("[]")
 	wpfl.close()
 	for folder in folders:
 		var semi_root = folder.split("/")[2]
@@ -127,6 +131,19 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 								var constants = data.get_script_constant_map()
 								var ar = constants.get("EQUIPMENT_TAGS",{}).duplicate(true)
 								dicti.merge({"EQUIPMENT_TAGS":ar})
+							"SLOT_ORDER.gd":
+								var f = File.new()
+								f.open(slot_order_cache_file,File.READ_WRITE)
+								var data = JSON.parse(f.get_as_text()).result
+								var cache = load(check + last_bit).get_script_constant_map()
+								var orders = cache.get("SLOT_ORDER")
+								for order in orders:
+									if order in data:
+										pass
+									else:
+										data.append(order)
+								f.store_string(JSON.print(data))
+								f.close()
 							"SLOT_TAGS.gd":
 								var data = load(check + last_bit)
 								var constants = data.get_script_constant_map()

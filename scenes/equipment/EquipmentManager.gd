@@ -584,11 +584,17 @@ var MODULE_IDENTIFIER = "Equipment Driver"
 func l(msg:String, ID:String = MODULE_IDENTIFIER, title:String = "HevLib"):
 	Debug.l("[%s %s]: %s" % [title, ID, msg])
 
-
+var slot_order_cache_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order.json"
 func reorganize_slots():
 	var slot_names = []
 	var slot_types = {}
+	var f = File.new()
+	f.open(slot_order_cache_file,File.READ)
+	var order = JSON.parse(f.get_as_text(true)).result
+	f.close()
+	var slotnames = []
 	for slot in get_children():
+		slotnames.append(slot.name)
 		var children = slot.get_node("VBoxContainer").get_children()
 		if children.size() <= 1:
 			continue
@@ -611,9 +617,14 @@ func reorganize_slots():
 	var index = 0
 	for sys in sys_dict:
 		var arr = sys_dict.get(sys)
+		var ordering = []
+		for item in order:
+			if item in arr:
+				ordering.append(item)
 		for item in arr:
-			move_child(get_node(item),index)
-			index += 1
-	
-	
-	breakpoint
+			if item in slotnames:
+				move_child(get_node(item),index)
+				index += 1
+		for item in ordering:
+			move_child(get_node(item),index - 1)
+		
