@@ -168,7 +168,7 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 													var datadict = {}
 													for prop in ar[template][datapoint]:
 														datadict.merge({prop.get("property"):prop.get("value")})
-													var totalindex = ar[template][datapoint].size()
+													var totalindex = founddata[template][datapoint].size()
 													var index = 0
 													while index < totalindex:
 														var datai = founddata[template][datapoint][index]
