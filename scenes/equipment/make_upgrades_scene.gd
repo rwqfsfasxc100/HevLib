@@ -74,8 +74,9 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 	FolderAccess.__check_folder_exists(file_save_path.split(file_save_path.split("/")[file_save_path.split("/").size() - 1])[0])
 	FolderAccess.__check_folder_exists(weaponslot_save_path.split(weaponslot_save_path.split("/")[weaponslot_save_path.split("/").size() - 1])[0])
 	var wpfl = File.new()
+	var ws_default_templates = load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
 	wpfl.open(weaponslot_modify_templates_file,File.WRITE)
-	wpfl.store_string("{}")
+	wpfl.store_string(JSON.print(ws_default_templates.get("TEMPLATES",{})))
 	wpfl.close()
 	wpfl.open(weaponslot_modify_standalone_file,File.WRITE)
 	wpfl.store_string("{}")
@@ -153,7 +154,36 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 								var filedata = fi.get_as_text(true)
 								var sort = JSON.parse(filedata)
 								var founddata : Dictionary = sort.result
-								founddata.merge(ar, true)
+								for template in ar:
+									if template in founddata.keys():
+										for datapoint in ar[template]:
+											match datapoint:
+												"equipment":
+													for item in ar[template][datapoint]:
+														if item in founddata[template][datapoint]:
+															pass
+														else:
+															founddata[template][datapoint].append(item)
+												"data":
+													var datadict = {}
+													for prop in ar[template][datapoint]:
+														datadict.merge({prop.get("property"):prop.get("value")})
+													var totalindex = ar[template][datapoint].size()
+													var index = 0
+													while index < totalindex:
+														var datai = founddata[template][datapoint][index]
+														if datai.get("property") in datadict:
+															founddata[template][datapoint][index]["value"] = datadict.get(datai.get("property"))
+														else:
+															var additiondict = {"property":datai.get("property"),"value":datai.get("value")}
+															founddata[template][datapoint].append(additiondict)
+															breakpoint
+														
+														index += 1
+													breakpoint
+									else:
+										founddata[template] = ar.get(template).duplicate(true)
+								
 								fi.store_string(JSON.print(founddata))
 								fi.close()
 							"WEAPONSLOT_MODIFY.gd":

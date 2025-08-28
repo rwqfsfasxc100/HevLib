@@ -1,12 +1,11 @@
 extends Node
 
-var TEMPLATES = {
+const TEMPLATES = {
 	"CENTER_TURRETS":{
 		"equipment":[
 			"SYSTEM_PDTL",
 			"SYSTEM_PDT",
 		],
-		"alignment":"ALIGNMENT_CENTER",
 		"data":[
 			{
 				"property":"position",
@@ -19,7 +18,6 @@ var TEMPLATES = {
 			"SYSTEM_PDMWG",
 			"SYSTEM_MWG"
 		],
-		"alignment":"ALIGNMENT_CENTER",
 		"data":[
 			{
 				"property":"position",
@@ -32,7 +30,6 @@ var TEMPLATES = {
 			"SYSTEM_PDT-L",
 			"SYSTEM_PDTL-L"
 		],
-		"alignment":"ALIGNMENT_LEFT",
 		"data":[
 			{
 				"property":"position",
@@ -48,7 +45,6 @@ var TEMPLATES = {
 		"equipment":[
 			"SYSTEM_PDMWG-L"
 		],
-		"alignment":"ALIGNMENT_LEFT",
 		"data":[
 			{
 				"property":"position",
@@ -65,7 +61,6 @@ var TEMPLATES = {
 			"SYSTEM_PDT-R",
 			"SYSTEM_PDTL-R"
 		],
-		"alignment":"ALIGNMENT_RIGHT",
 		"data":[
 			{
 				"property":"position",
@@ -81,7 +76,6 @@ var TEMPLATES = {
 		"equipment":[
 			"SYSTEM_PDMWG-R"
 		],
-		"alignment":"ALIGNMENT_RIGHT",
 		"data":[
 			{
 				"property":"position",
