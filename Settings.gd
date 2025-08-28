@@ -7,6 +7,7 @@ extends "res://Settings.gd"
 var HevLib = {
 	"equipment":{
 		"do_sort_equipment_by_price":true,
+		"do_sort_slots_by_type":true,
 		"use_legacy_equipment_handler":false,
 	},
 	"events":{

@@ -85,8 +85,11 @@ func _tree_entered():
 		l("Skipping equipment addition phase; dynamic equipment handler is being used and all equipment has been added during mod ready setup.")
 #func start_processing():
 		l("Performing slot sort check. Will slots be sorted? [%s]" % has)
-		for slot in display_slots():
-			sort_slot(slot)
+		if Settings.HevLib["equipment"]["do_sort_equipment_by_price"]:
+			for slot in display_slots():
+				sort_slot(slot)
+		if Settings.HevLib["equipment"]["do_sort_slots_by_type"]:
+			reorganize_slots()
 	var finish_time = OS.get_system_time_msecs()
 	var total_time = str(float(finish_time - sTime)/1000)
 	var spl = total_time.split(".")
@@ -580,3 +583,37 @@ func repack(node, save_path):
 var MODULE_IDENTIFIER = "Equipment Driver"
 func l(msg:String, ID:String = MODULE_IDENTIFIER, title:String = "HevLib"):
 	Debug.l("[%s %s]: %s" % [title, ID, msg])
+
+
+func reorganize_slots():
+	var slot_names = []
+	var slot_types = {}
+	for slot in get_children():
+		var children = slot.get_node("VBoxContainer").get_children()
+		if children.size() <= 1:
+			continue
+		slot_names.append(slot.name)
+		var sys_slot = slot.slot
+		var index = 1
+		if sys_slot == "":
+			while not sys_slot:
+				sys_slot = children[index].slot
+				index += 1
+		slot_types.merge({slot.name:sys_slot})
+	var sys_dict = {}
+	for slot in slot_types:
+		var sys = slot_types[slot].split(".")
+		var sys_main = sys[0]
+		if sys_main in sys_dict.keys():
+			sys_dict[sys_main].append(slot)
+		else:
+			sys_dict[sys_main] = [slot]
+	var index = 0
+	for sys in sys_dict:
+		var arr = sys_dict.get(sys)
+		for item in arr:
+			move_child(get_node(item),index)
+			index += 1
+	
+	
+	breakpoint
