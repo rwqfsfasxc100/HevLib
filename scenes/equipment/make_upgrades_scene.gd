@@ -69,6 +69,8 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 	var weaponslot_modify_templates_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_TEMPLATES.json"
 	var weaponslot_modify_standalone_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_STANDALONE.json"
 	var slot_order_cache_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order.json"
+	var weaponslot_ship_templates_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_SHIP_TEMPLATES.json"
+	var weaponslot_ship_standalone_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_SHIP_STANDALONE.json"
 	var folders = FolderAccess.__fetch_folder_files("res://", true, true)
 	var data_state : Array = []
 	var ws_state : Array = []
@@ -76,10 +78,17 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 	FolderAccess.__check_folder_exists(weaponslot_save_path.split(weaponslot_save_path.split("/")[weaponslot_save_path.split("/").size() - 1])[0])
 	var wpfl = File.new()
 	var ws_default_templates = load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
+	var ws_ship_templates = load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
 	wpfl.open(weaponslot_modify_templates_file,File.WRITE)
 	wpfl.store_string(JSON.print(ws_default_templates.get("TEMPLATES",{})))
 	wpfl.close()
 	wpfl.open(weaponslot_modify_standalone_file,File.WRITE)
+	wpfl.store_string("{}")
+	wpfl.close()
+	wpfl.open(weaponslot_ship_templates_file,File.WRITE)
+	wpfl.store_string(JSON.print(ws_ship_templates.get("SHIP_TEMPLATES",{})))
+	wpfl.close()
+	wpfl.open(weaponslot_ship_standalone_file,File.WRITE)
 	wpfl.store_string("{}")
 	wpfl.close()
 	wpfl.open(slot_order_cache_file,File.WRITE)
@@ -182,22 +191,17 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 														else:
 															founddata[template][datapoint].append(item)
 												"data":
-													var datadict = {}
-													for prop in ar[template][datapoint]:
-														datadict.merge({prop.get("property"):prop.get("value")})
-													var totalindex = founddata[template][datapoint].size()
-													var index = 0
-													while index < totalindex:
-														var datai = founddata[template][datapoint][index]
-														if datai.get("property") in datadict:
-															founddata[template][datapoint][index]["value"] = datadict.get(datai.get("property"))
-														else:
-															var additiondict = {"property":datai.get("property"),"value":datai.get("value")}
-															founddata[template][datapoint].append(additiondict)
-															breakpoint
-														
-														index += 1
-													breakpoint
+													var data_formatted = {}
+													for item in ar[template][datapoint]:
+														data_formatted.merge({item.get("property"):item.get("value")})
+													for key in data_formatted.keys():
+														var is_in_dict = false
+														for lps in founddata[template][datapoint]:
+															if lps.get("property") == key:
+																is_in_dict = true
+																lps["value"] = data_formatted[key]
+														if not is_in_dict:
+															founddata[template][datapoint].append({"property":key,"value":data_formatted.get(key)})
 									else:
 										founddata[template] = ar.get(template).duplicate(true)
 								
@@ -212,10 +216,29 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 								var filedata = fi.get_as_text(true)
 								var sort = JSON.parse(filedata)
 								var founddata : Dictionary = sort.result
-								founddata.merge(ar, true)
+								for item in ar:
+									if item in founddata:
+										var new_dict = {}
+										for c in ar.get(item):
+											var prop = c.get("property")
+											var val = c.get("value")
+											new_dict.merge({prop:val})
+										var old_dict = {}
+										var current_item_data = founddata.get(item)
+										for c in current_item_data:
+											var prop = c.get("property")
+											var val = c.get("value")
+											old_dict.merge({prop:val})
+										for op in new_dict:
+											old_dict[op] = new_dict[op]
+										var processed = []
+										for u in old_dict:
+											processed.append({"property":u,"value":old_dict.get(u)})
+										founddata.merge({item:processed},true)
+									else:
+										founddata.merge({item:ar.get(item)})
 								fi.store_string(JSON.print(founddata))
 								fi.close()
-								
 					var mname = check.split("/")[2]
 					if dicti.keys().size() >= 1:
 						data_state.append([dicti,check,mod,mname])

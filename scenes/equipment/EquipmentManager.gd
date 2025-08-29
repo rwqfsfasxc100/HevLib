@@ -627,4 +627,4 @@ func reorganize_slots():
 				index += 1
 		for item in ordering:
 			move_child(get_node(item),index - 1)
-		
+	
