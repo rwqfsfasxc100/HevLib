@@ -69,7 +69,8 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 	var weaponslot_modify_templates_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_TEMPLATES.json"
 	var weaponslot_modify_standalone_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_STANDALONE.json"
 	var slot_order_cache_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order.json"
-	var weaponslot_ship_modify_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_SHIP_STANDALONE.json"
+	var weaponslot_ship_templates_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_SHIP_TEMPLATES.json"
+	var weaponslot_ship_standalone_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_SHIP_STANDALONE.json"
 	var folders = FolderAccess.__fetch_folder_files("res://", true, true)
 	var data_state : Array = []
 	var ws_state : Array = []
@@ -78,14 +79,18 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 	var wpfl = File.new()
 	var ws_default_templates = load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
 	var ws_ship_templates = load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
+	var ws_ship_templates_2 = load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd").get_script_constant_map()
 	wpfl.open(weaponslot_modify_templates_file,File.WRITE)
 	wpfl.store_string(JSON.print(ws_default_templates.get("TEMPLATES",{})))
 	wpfl.close()
 	wpfl.open(weaponslot_modify_standalone_file,File.WRITE)
 	wpfl.store_string("{}")
 	wpfl.close()
-	wpfl.open(weaponslot_ship_modify_file,File.WRITE)
+	wpfl.open(weaponslot_ship_standalone_file,File.WRITE)
 	wpfl.store_string(JSON.print(ws_ship_templates.get("SHIP_MODIFY",{})))
+	wpfl.close()
+	wpfl.open(weaponslot_ship_templates_file,File.WRITE)
+	wpfl.store_string(JSON.print(ws_ship_templates_2.get("SHIP_TEMPLATES",{})))
 	wpfl.close()
 	wpfl.open(slot_order_cache_file,File.WRITE)
 	wpfl.store_string("[]")
@@ -230,8 +235,34 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 										founddata.merge({item:ar.get(item)})
 								fi.store_string(JSON.print(founddata))
 								fi.close()
+							"WEAPONSLOT_SHIP_TEMPLATES.gd":
+								var data = load(check + last_bit)
+								var constants = data.get_script_constant_map()
+								var ar = constants.get("WEAPONSLOT_SHIP_TEMPLATES",{}).duplicate(true)
+								var fi = File.new()
+								fi.open(weaponslot_ship_templates_file,File.READ_WRITE)
+								var filedata = fi.get_as_text(true)
+								var sort = JSON.parse(filedata)
+								var founddata : Dictionary = sort.result
+								
+								
+								
+								fi.store_string(JSON.print(founddata))
+								fi.close()
 							"WEAPONSLOT_SHIP_MODIFY.gd":
-								pass
+								var data = load(check + last_bit)
+								var constants = data.get_script_constant_map()
+								var ar = constants.get("WEAPONSLOT_SHIP_MODIFY",{}).duplicate(true)
+								var fi = File.new()
+								fi.open(weaponslot_ship_standalone_file,File.READ_WRITE)
+								var filedata = fi.get_as_text(true)
+								var sort = JSON.parse(filedata)
+								var founddata : Dictionary = sort.result
+								
+								
+								
+								fi.store_string(JSON.print(founddata))
+								fi.close()
 					var mname = check.split("/")[2]
 					if dicti.keys().size() >= 1:
 						data_state.append([dicti,check,mod,mname])

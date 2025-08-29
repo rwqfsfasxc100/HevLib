@@ -1,7 +1,7 @@
 extends Node
 
 const TEMPLATES = {
-	"CENTER_TURRETS":{
+	"CENTER_WEAPON_TURRETS":{
 		"equipment":[
 			"SYSTEM_PDTL",
 			"SYSTEM_PDT",
@@ -16,7 +16,6 @@ const TEMPLATES = {
 	"CENTER_MIKE_TURRETS":{
 		"equipment":[
 			"SYSTEM_PDMWG",
-			"SYSTEM_MWG"
 		],
 		"data":[
 			{
@@ -25,7 +24,7 @@ const TEMPLATES = {
 			}
 		]
 	},
-	"LEFT_TURRETS":{
+	"LEFT_WEAPON_TURRETS":{
 		"equipment":[
 			"SYSTEM_PDT-L",
 			"SYSTEM_PDTL-L"
@@ -56,7 +55,7 @@ const TEMPLATES = {
 			},
 		]
 	},
-	"RIGHT_TURRETS":{
+	"RIGHT_WEAPON_TURRETS":{
 		"equipment":[
 			"SYSTEM_PDT-R",
 			"SYSTEM_PDTL-R"
@@ -167,4 +166,131 @@ const TEMPLATES = {
 			}
 		]
 	},
+	"FIXED_MICROWAVES":{
+		"equipment":[
+			"SYSTEM_MWG"
+		],
+		"data":[]
+	},
+	"NANODRONES":{
+		"equipment":[
+			"SYSTEM_DND_TS",
+			"SYSTEM_DND_HAUL",
+			"SYSTEM_DND_FIX"
+		],
+		"data":[]
+	},
+	"LASERS":{
+		"equipment":[
+			"SYSTEM_CL150",
+			"SYSTEM_CL600P",
+			"SYSTEM_ACL200P",
+			"SYSTEM_PDTL",
+			"SYSTEM_PDTL-L",
+			"SYSTEM_PDTL-R"
+		],
+		"data":[]
+	},
+	"GIMBALS":{
+		"equipment":[
+			"SYSTEM_ACL200P",
+			"SYSTEM_ACTEMD14"
+		],
+		"data":[]
+	},
+	"TURRETS":{
+		"equipment":[
+			"SYSTEM_PDMWG",
+			"SYSTEM_PDMWG-L",
+			"SYSTEM_PDMWG-R",
+			"SYSTEM_PDT-R",
+			"SYSTEM_PDT-L",
+			"SYSTEM_PDT",
+			"SYSTEM_PDTL",
+			"SYSTEM_PDTL-L",
+			"SYSTEM_PDTL-R",
+		],
+		"data":[]
+	},
+	"FRONT_FACING_WEAPONS":{
+		"equipment":[
+			"SYSTEM_MWG",
+			"SYSTEM_CL150",
+			"SYSTEM_CL600P",
+			"SYSTEM_EMD14",
+			"SYSTEM_EMD17RF",
+			"SYSTEM_RAILTOR",
+			"SYSTEM_ACTEMD14",
+			"SYSTEM_ACL200P",
+			"SYSTEM_SYNCHRO-L",
+			"SYSTEM_SYNCHRO-R",
+			"SYSTEM_IROH"
+		],
+		"data":[]
+	},
+	"SYNCHROTRONS":{
+		"equipment":[
+			"SYSTEM_SYNCHRO-R",
+			"SYSTEM_SYNCHRO-L"
+		],
+		"data":[]
+	},
+	"CARGO_CONTAINERS":{
+		"equipment":[
+			"SYSTEM_EXMONO-L",
+			"SYSTEM_EXMONO-R",
+			"SYSTEM_EXSTORAGE-L",
+			"SYSTEM_EXSTORAGE-R"
+		],
+		"data":[]
+	},
+	"CONTAINERS":{
+		"equipment":[
+			"SYSTEM_EXMONO-L",
+			"SYSTEM_EXMONO-R",
+			"SYSTEM_EXSTORAGE-L",
+			"SYSTEM_EXSTORAGE-R",
+			"SYSTEM_SCOOP-R",
+			"SYSTEM_SCOOP-L"
+		],
+		"data":[]
+	},
+	"MINING_COMPANIONS":{
+		"equipment":[
+			"SYSTEM_SCOOP-R",
+			"SYSTEM_SCOOP-L"
+		],
+		"data":[]
+	},
+	"IMPACT_ABSORBERS":{
+		"equipment":[
+			"SYSTEM_HUNK-R",
+			"SYSTEM_HUNK-L"
+		],
+		"data":[]
+	},
+	"CLAIM_BEACONS":{
+		"equipment":[
+			"SYSTEM_CLAIM-L",
+			"SYSTEM_CLAIM-R"
+		],
+		"data":[]
+	},
+	"RAILGUNS":{
+		"equipment":[
+			"SYSTEM_RAILTOR",
+			"SYSTEM_PDT-R",
+			"SYSTEM_PDT-L",
+			"SYSTEM_PDT"
+		],
+		"data":[]
+	},
+	"COILGUNS":{
+		"equipment":[
+			"SYSTEM_EMD14",
+			"SYSTEM_EMD17RF",
+			"SYSTEM_ACTEMD14"
+		],
+		"data":[]
+	}
 }
