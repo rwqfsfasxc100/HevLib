@@ -317,8 +317,6 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 					if dictr.keys().size() >= 1:
 						ws_state.append([dictr,check,mod,mname])
 	
-	
-	
 	var slots = data_state
 	
 	for item in slots:
