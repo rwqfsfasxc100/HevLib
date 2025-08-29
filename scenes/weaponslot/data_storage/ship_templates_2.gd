@@ -450,46 +450,6 @@ const SHIP_TEMPLATES = {
 			"CARGO_CONTAINERS":[
 				{
 					"property":"position",
-					"value":"Vector2( -48, -86 )"
-				},
-				{
-					"property":"z_index",
-					"value":"-10"
-				}
-			],
-			"CLAIM_BEACONS":[
-				{
-					"property":"position",
-					"value":"Vector2( -60, 60 )"
-				}
-			],
-			"GIMBALS":[
-				{
-					"property":"position",
-					"value":"Vector2( -15, 0 )"
-				},
-				{
-					"property":"rotation",
-					"value":"-0.0174533"
-				}
-			],
-			"MINING_COMPANIONS":[
-				{
-					"property":"position",
-					"value":"Vector2( -52, -100 )"
-				}
-			],
-			"IMPACT_ABSORBERS":[
-				{
-					"property":"position",
-					"value":"Vector2( 0, 176 )"
-				}
-			]
-		},
-		"right":{
-			"CARGO_CONTAINERS":[
-				{
-					"property":"position",
 					"value":"Vector2( 48, -86 )"
 				},
 				{
@@ -506,11 +466,11 @@ const SHIP_TEMPLATES = {
 			"GIMBALS":[
 				{
 					"property":"position",
-					"value":"Vector2( 15, 0 )"
+					"value":"Vector2( -15, 0 )"
 				},
 				{
 					"property":"rotation",
-					"value":"0.0174533"
+					"value":"-0.0174533"
 				}
 			],
 			"MINING_COMPANIONS":[
@@ -525,36 +485,8 @@ const SHIP_TEMPLATES = {
 					"value":"Vector2( 0, 176 )"
 				}
 			]
-		}
-	},
-	"SHIP_PROSPECTOR_BALD":{
-		"middleLeft":{
-			"CRADLES":[
-				{
-					"property":"position",
-					"value":"Vector2( -60, 60 )"
-				},
-				{
-					"property":"z_index",
-					"value":"-10"
-				}
-			],
 		},
-		"middleRight":{
-			"CRADLES":[
-				{
-					"property":"position",
-					"value":"Vector2( 60, 60 )"
-				},
-				{
-					"property":"z_index",
-					"value":"-10"
-				}
-			],
-		}
-	},
-	"SHIP_PROSPECTOR_FAT":{
-		"left":{
+		"right":{
 			"CARGO_CONTAINERS":[
 				{
 					"property":"position",
@@ -568,37 +500,7 @@ const SHIP_TEMPLATES = {
 			"CLAIM_BEACONS":[
 				{
 					"property":"position",
-					"value":"Vector2( -42, 60 )"
-				}
-			],
-			"GIMBALS":[
-				{
-					"property":"position",
-					"value":"Vector2( -15, 0 )"
-				},
-				{
-					"property":"rotation",
-					"value":"-0.0174533"
-				}
-			],
-			"MINING_COMPANIONS":[
-				{
-					"property":"position",
-					"value":"Vector2( -52, -100 )"
-				}
-			],
-		},
-		"right":{
-			"CARGO_CONTAINERS":[
-				{
-					"property":"position",
-					"value":"Vector2( 48, -86 )"
-				}
-			],
-			"CLAIM_BEACONS":[
-				{
-					"property":"position",
-					"value":"Vector2( 42, 60 )"
+					"value":"Vector2( -60, 60 )"
 				}
 			],
 			"GIMBALS":[
@@ -614,17 +516,23 @@ const SHIP_TEMPLATES = {
 			"MINING_COMPANIONS":[
 				{
 					"property":"position",
-					"value":"Vector2( 52, -100 )"
+					"value":"Vector2( -52, -100 )"
 				}
 			],
-		},
+			"IMPACT_ABSORBERS":[
+				{
+					"property":"position",
+					"value":"Vector2( 0, 176 )"
+				}
+			]
+		}
 	},
 	"SHIP_PROSPECTOR_VP":{
 		"left":{
 			"CLAIM_BEACONS":[
 				{
 					"property":"position",
-					"value":"Vector2( -50, 60 )"
+					"value":"Vector2( 50, 60 )"
 				}
 			],
 		},
@@ -632,7 +540,7 @@ const SHIP_TEMPLATES = {
 			"CLAIM_BEACONS":[
 				{
 					"property":"position",
-					"value":"Vector2( 50, 60 )"
+					"value":"Vector2( -50, 60 )"
 				}
 			],
 		},
@@ -677,6 +585,28 @@ const SHIP_TEMPLATES = {
 					"value":"Vector2( 0, 64 )"
 				}
 			],
+		},
+	},
+	"SHIP_OCP209":{
+		"mainLeft":{
+			"MANIPULATION_ARMS":[
+				{
+					"property":"flip",
+					"value":"true"
+				},
+				{
+					"property":"feedVelocity",
+					"value":"Vector2( -140, -280 )"
+				},
+			]
+		},
+		"mainRight":{
+			"MANIPULATION_ARMS":[
+				{
+					"property":"feedVelocity",
+					"value":"Vector2( 140, -280 )"
+				},
+			]
 		},
 	},
 	"SHIP_TRTL_K44":{

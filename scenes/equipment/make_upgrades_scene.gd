@@ -245,8 +245,31 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 								var sort = JSON.parse(filedata)
 								var founddata : Dictionary = sort.result
 								
-								
-								
+								for ship in ar:
+									if ship in founddata.keys():
+										var shipdata = ar.get(ship)
+										for slot in shipdata:
+											if slot in founddata[ship]:
+												var compile = {}
+												var current_dict = {}
+												var new_dict = {}
+												for type in founddata[ship][slot]:
+													compile.merge({type:[]},true)
+													current_dict.merge({type:{}},true)
+													for equip in founddata[ship][slot][type]:
+														current_dict[type].merge({equip.get("property"):equip.get("value")})
+												for type in shipdata[slot]:
+													compile.merge({type:[]},true)
+													new_dict.merge({type:{}},true)
+													for equip in shipdata[slot][type]:
+														new_dict[type].merge({equip.get("property"):equip.get("value")})
+												current_dict.merge(new_dict,true)
+												for item in current_dict:
+													for equip in current_dict[item]:
+														compile[item].append({"property":equip,"value":current_dict[item].get(equip)})
+												founddata[ship][slot] = compile.duplicate(true)
+											else:
+												founddata[ship][slot] = shipdata.get(slot).duplicate(true)
 								fi.store_string(JSON.print(founddata))
 								fi.close()
 							"WEAPONSLOT_SHIP_MODIFY.gd":
@@ -260,6 +283,31 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 								var founddata : Dictionary = sort.result
 								
 								
+								for ship in ar:
+									if ship in founddata.keys():
+										var shipdata = ar.get(ship)
+										for slot in shipdata:
+											if slot in founddata[ship]:
+												var compile = {}
+												var current_dict = {}
+												var new_dict = {}
+												for type in founddata[ship][slot]:
+													compile.merge({type:[]},true)
+													current_dict.merge({type:{}},true)
+													for equip in founddata[ship][slot][type]:
+														current_dict[type].merge({equip.get("property"):equip.get("value")})
+												for type in shipdata[slot]:
+													compile.merge({type:[]},true)
+													new_dict.merge({type:{}},true)
+													for equip in shipdata[slot][type]:
+														new_dict[type].merge({equip.get("property"):equip.get("value")})
+												current_dict.merge(new_dict,true)
+												for item in current_dict:
+													for equip in current_dict[item]:
+														compile[item].append({"property":equip,"value":current_dict[item].get(equip)})
+												founddata[ship][slot] = compile.duplicate(true)
+											else:
+												founddata[ship][slot] = shipdata.get(slot).duplicate(true)
 								
 								fi.store_string(JSON.print(founddata))
 								fi.close()

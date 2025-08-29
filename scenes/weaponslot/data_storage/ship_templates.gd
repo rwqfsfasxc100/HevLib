@@ -332,7 +332,7 @@ const SHIP_MODIFY = {
 				},
 				{
 					"property":"rotation",
-					"value":"0.174533"
+					"value":"-0.174533"
 				}
 			]
 		},
@@ -446,16 +446,6 @@ const SHIP_MODIFY = {
 			"SYSTEM_EXSTORAGE-L":[
 				{
 					"property":"position",
-					"value":"Vector2( -48, -86 )"
-				},
-				{
-					"property":"z_index",
-					"value":"-10"
-				}
-			],
-			"SYSTEM_EXSTORAGE-R":[
-				{
-					"property":"position",
 					"value":"Vector2( 48, -86 )"
 				},
 				{
@@ -464,12 +454,6 @@ const SHIP_MODIFY = {
 				}
 			],
 			"SYSTEM_CLAIM-L":[
-				{
-					"property":"position",
-					"value":"Vector2( -60, 60 )"
-				}
-			],
-			"SYSTEM_CLAIM-R":[
 				{
 					"property":"position",
 					"value":"Vector2( 60, 60 )"
@@ -486,12 +470,6 @@ const SHIP_MODIFY = {
 				}
 			],
 			"SYSTEM_SCOOP-L":[
-				{
-					"property":"position",
-					"value":"Vector2( -52, -100 )"
-				}
-			],
-			"SYSTEM_SCOOP-R":[
 				{
 					"property":"position",
 					"value":"Vector2( 52, -100 )"
@@ -506,7 +484,7 @@ const SHIP_MODIFY = {
 			"SYSTEM_EXMONO-L":[
 				{
 					"property":"position",
-					"value":"Vector2( -48, -86 )"
+					"value":"Vector2( 48, -86 )"
 				},
 				{
 					"property":"z_index",
@@ -515,7 +493,7 @@ const SHIP_MODIFY = {
 			]
 		},
 		"right":{
-			"SYSTEM_EXSTORAGE-L":[
+			"SYSTEM_EXSTORAGE-R":[
 				{
 					"property":"position",
 					"value":"Vector2( -48, -86 )"
@@ -525,26 +503,10 @@ const SHIP_MODIFY = {
 					"value":"-10"
 				}
 			],
-			"SYSTEM_EXSTORAGE-R":[
-				{
-					"property":"position",
-					"value":"Vector2( 48, -86 )"
-				},
-				{
-					"property":"z_index",
-					"value":"-10"
-				}
-			],
-			"SYSTEM_CLAIM-L":[
-				{
-					"property":"position",
-					"value":"Vector2( -60, 60 )"
-				}
-			],
 			"SYSTEM_CLAIM-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 60, 60 )"
+					"value":"Vector2( -60, 60 )"
 				}
 			],
 			"SYSTEM_ACTEMD14":[
@@ -557,16 +519,10 @@ const SHIP_MODIFY = {
 					"value":"0.0174533"
 				}
 			],
-			"SYSTEM_SCOOP-L":[
-				{
-					"property":"position",
-					"value":"Vector2( -52, -100 )"
-				}
-			],
 			"SYSTEM_SCOOP-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 52, -100 )"
+					"value":"Vector2( -52, -100 )"
 				}
 			],
 			"SYSTEM_HUNK-R":[
@@ -578,7 +534,7 @@ const SHIP_MODIFY = {
 			"SYSTEM_EXMONO-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 48, -86 )"
+					"value":"Vector2( -48, -86 )"
 				},
 				{
 					"property":"z_index",
@@ -586,257 +542,21 @@ const SHIP_MODIFY = {
 				}
 			]
 		}
-	},
-	"SHIP_PROSPECTOR_BALD":{
-		"middleLeft":{
-			"SYSTEM_EXSTORAGE-L":[
-				{
-					"property":"position",
-					"value":"Vector2( -60, 60 )"
-				},
-				{
-					"property":"z_index",
-					"value":"-10"
-				}
-			],
-			"SYSTEM_EXSTORAGE-R":[
-				{
-					"property":"position",
-					"value":"Vector2( -60, 60 )"
-				},
-				{
-					"property":"z_index",
-					"value":"-10"
-				}
-			],
-			"SYSTEM_CLAIM-L":[
-				{
-					"property":"position",
-					"value":"Vector2( -60, 60 )"
-				}
-			],
-			"SYSTEM_CLAIM-R":[
-				{
-					"property":"position",
-					"value":"Vector2( 60, 60 )"
-				}
-			],
-			"SYSTEM_SCOOP-L":[
-				{
-					"property":"position",
-					"value":"Vector2( -60, 68 )"
-				}
-			],
-			"SYSTEM_SCOOP-R":[
-				{
-					"property":"position",
-					"value":"Vector2( 60, 60 )"
-				}
-			],
-			"SYSTEM_EXMONO-L":[
-				{
-					"property":"position",
-					"value":"Vector2( -60, 60 )"
-				}
-			]
-		},
-		"middleRight":{
-			"SYSTEM_EXSTORAGE-L":[
-				{
-					"property":"position",
-					"value":"Vector2( -60, 60 )"
-				},
-				{
-					"property":"z_index",
-					"value":"-10"
-				}
-			],
-			"SYSTEM_EXSTORAGE-R":[
-				{
-					"property":"position",
-					"value":"Vector2( 60, 60 )"
-				}
-			],
-			"SYSTEM_CLAIM-L":[
-				{
-					"property":"position",
-					"value":"Vector2( -60, 60 )"
-				}
-			],
-			"SYSTEM_CLAIM-R":[
-				{
-					"property":"position",
-					"value":"Vector2( 60, 60 )"
-				}
-			],
-			"SYSTEM_SCOOP-L":[
-				{
-					"property":"position",
-					"value":"Vector2( -60, 60 )"
-				}
-			],
-			"SYSTEM_SCOOP-R":[
-				{
-					"property":"position",
-					"value":"Vector2( 60, 68 )"
-				}
-			],
-			"SYSTEM_EXMONO-R":[
-				{
-					"property":"position",
-					"value":"Vector2( 60, 60 )"
-				}
-			]
-		}
-	},
-	"SHIP_PROSPECTOR_FAT":{
-		"left":{
-			"SYSTEM_EXSTORAGE-L":[
-				{
-					"property":"position",
-					"value":"Vector2( -48, -86 )"
-				},
-				{
-					"property":"z_index",
-					"value":"-10"
-				}
-			],
-			"SYSTEM_EXSTORAGE-R":[
-				{
-					"property":"position",
-					"value":"Vector2( 48, -86 )"
-				},
-				{
-					"property":"z_index",
-					"value":"-10"
-				}
-			],
-			"SYSTEM_CLAIM-L":[
-				{
-					"property":"position",
-					"value":"Vector2( -42, 60 )"
-				}
-			],
-			"SYSTEM_CLAIM-R":[
-				{
-					"property":"position",
-					"value":"Vector2( 60, 60 )"
-				}
-			],
-			"SYSTEM_ACTEMD14":[
-				{
-					"property":"position",
-					"value":"Vector2( -15, 0 )"
-				},
-				{
-					"property":"rotation",
-					"value":"-0.0174533"
-				}
-			],
-			"SYSTEM_SCOOP-L":[
-				{
-					"property":"position",
-					"value":"Vector2( -52, -100 )"
-				}
-			],
-			"SYSTEM_SCOOP-R":[
-				{
-					"property":"position",
-					"value":"Vector2( 52, -100 )"
-				}
-			],
-			"SYSTEM_EXMONO-L":[
-				{
-					"property":"position",
-					"value":"Vector2( -48, -86 )"
-				}
-			]
-		},
-		"right":{
-			"SYSTEM_EXSTORAGE-L":[
-				{
-					"property":"position",
-					"value":"Vector2( -48, -86 )"
-				},
-				{
-					"property":"z_index",
-					"value":"-10"
-				}
-			],
-			"SYSTEM_EXSTORAGE-R":[
-				{
-					"property":"position",
-					"value":"Vector2( 48, -86 )"
-				}
-			],
-			"SYSTEM_CLAIM-L":[
-				{
-					"property":"position",
-					"value":"Vector2( -60, 60 )"
-				}
-			],
-			"SYSTEM_CLAIM-R":[
-				{
-					"property":"position",
-					"value":"Vector2( 42, 60 )"
-				}
-			],
-			"SYSTEM_ACTEMD14":[
-				{
-					"property":"position",
-					"value":"Vector2( -15, 0 )"
-				},
-				{
-					"property":"rotation",
-					"value":"-0.0174533"
-				}
-			],
-			"SYSTEM_SCOOP-L":[
-				{
-					"property":"position",
-					"value":"Vector2( -52, -100 )"
-				}
-			],
-			"SYSTEM_SCOOP-R":[
-				{
-					"property":"position",
-					"value":"Vector2( 52, -100 )"
-				}
-			],
-			"SYSTEM_EXMONO-R":[
-				{
-					"property":"position",
-					"value":"Vector2( 48, -86 )"
-				}
-			]
-		},
 	},
 	"SHIP_PROSPECTOR_VP":{
 		"left":{
 			"SYSTEM_CLAIM-L":[
 				{
 					"property":"position",
-					"value":"Vector2( -50, 60 )"
-				}
-			],
-			"SYSTEM_CLAIM-R":[
-				{
-					"property":"position",
 					"value":"Vector2( 50, 60 )"
 				}
 			],
 		},
 		"right":{
-			"SYSTEM_CLAIM-L":[
-				{
-					"property":"position",
-					"value":"Vector2( -50, 60 )"
-				}
-			],
 			"SYSTEM_CLAIM-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 50, 60 )"
+					"value":"Vector2( -50, 60 )"
 				}
 			],
 		},
@@ -850,12 +570,6 @@ const SHIP_MODIFY = {
 				}
 			],
 			"SYSTEM_CLAIM-L":[
-				{
-					"property":"position",
-					"value":"Vector2( 0, 64 )"
-				}
-			],
-			"SYSTEM_SCOOP-R":[
 				{
 					"property":"position",
 					"value":"Vector2( 0, 64 )"
