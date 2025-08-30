@@ -29,6 +29,11 @@ func _init(modLoader = ModLoader):
 	installScriptExtension("UpgradeGroup.gd")
 	installScriptExtension("hardpoints/EquipmentItemTemplate.gd")
 	
+	
+	installScriptExtension("../better_title_screen/SaveSlotButton.gd")
+	replaceScene("../better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
+	
+	
 	var upgrades_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn"
 	var weaponslot_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot.tscn"
 	var Equipment = preload("res://HevLib/pointers/Equipment.gd")

@@ -1,0 +1,6 @@
+Tested up to seed: 10
+Seed 2: astro at 3700, geologist at 6500, mechanic at 2400 - total 12600
+Seed 5: astro at 2600, mechanic at 2600 - total 5200
+Seed 6: astro at 2700, geologist at 4900 - total 7800
+Seed 7: astro at 5800, geologist at 2800, mechanic at 2500, pilot at 2500 - total 13600
+Seed 8: pilot at 2900, astro at 1700, mechanic at 2500, geologist at 3200 - total 10300

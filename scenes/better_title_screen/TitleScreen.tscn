@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://TitleScreen.tscn" type="PackedScene" id=1]
-[ext_resource path="res://HevLib/scenes/better_title_screen/SaveSettings.gd" type="Script" id=2]
+[ext_resource path="res://HevLib/scenes/better_title_screen/SaveSettings2.tscn" type="PackedScene" id=2]
 
 [sub_resource type="StreamTexture" id=1]
 flags = 4
@@ -15,47 +15,12 @@ anchor_bottom = 0.0
 margin_right = 1280.0
 margin_bottom = 720.0
 
-[node name="SaveSettings" type="Popup" parent="MenuLayer/TitleMenu/NoMargins/Popups" index="3"]
-margin_left = 640.0
-margin_top = 360.0
-margin_right = 640.0
-margin_bottom = 360.0
-script = ExtResource( 2 )
-
-[node name="PanelContainer" type="PanelContainer" parent="MenuLayer/TitleMenu/NoMargins/Popups/SaveSettings" index="0"]
-margin_left = -200.0
-margin_right = 194.0
-margin_bottom = 45.0
-
-[node name="VBoxContainer2" type="VBoxContainer" parent="MenuLayer/TitleMenu/NoMargins/Popups/SaveSettings/PanelContainer" index="0"]
-margin_left = 16.0
-margin_top = 2.0
-margin_right = 525.0
-margin_bottom = 131.0
-
-[node name="VBoxContainer" type="VBoxContainer" parent="MenuLayer/TitleMenu/NoMargins/Popups/SaveSettings/PanelContainer/VBoxContainer2" index="0"]
-margin_right = 509.0
-margin_bottom = 41.0
-
-[node name="DELETE_SAVE" type="Button" parent="MenuLayer/TitleMenu/NoMargins/Popups/SaveSettings/PanelContainer/VBoxContainer2/VBoxContainer" index="0"]
-margin_right = 509.0
-margin_bottom = 41.0
-text = "CONFIRM_OVERRIDE_GAME"
-
-[node name="SPACER" type="Label" parent="MenuLayer/TitleMenu/NoMargins/Popups/SaveSettings/PanelContainer/VBoxContainer2" index="1"]
-margin_top = 45.0
-margin_right = 509.0
-margin_bottom = 84.0
-
-[node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/TitleMenu/NoMargins/Popups/SaveSettings/PanelContainer/VBoxContainer2" index="2"]
-margin_top = 88.0
-margin_right = 509.0
-margin_bottom = 129.0
-
-[node name="CANCEL" type="Button" parent="MenuLayer/TitleMenu/NoMargins/Popups/SaveSettings/PanelContainer/VBoxContainer2/HBoxContainer" index="0"]
-margin_right = 362.0
-margin_bottom = 41.0
-text = "SETTINGS_CANCEL"
+[node name="SaveSettings" parent="MenuLayer/TitleMenu/NoMargins/Popups" index="3" instance=ExtResource( 2 )]
+visible = false
+margin_left = 282.0
+margin_top = 60.0
+margin_right = 998.0
+margin_bottom = 660.0
 
 [node name="NewA" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="0"]
 rect_min_size = Vector2( 64, 41 )
