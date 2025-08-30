@@ -104,6 +104,7 @@ func _ready():
 		CRoot.call_deferred("add_child",vNode)
 	var scene = load("res://HevLib/scenes/better_title_screen/TitleScreen.tscn")
 	
+	installScriptExtension("scenes/better_title_screen/SaveSlotButton.gd")
 	replaceScene("scenes/better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
 	
 #	var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
