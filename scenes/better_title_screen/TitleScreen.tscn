@@ -1,0 +1,179 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://TitleScreen.tscn" type="PackedScene" id=1]
+[ext_resource path="res://HevLib/scenes/better_title_screen/SaveSettings.gd" type="Script" id=2]
+
+[sub_resource type="StreamTexture" id=1]
+flags = 4
+load_path = "res://HevLib/ui/themes/icons/config_icon.stex"
+
+[node name="TitleScreen" instance=ExtResource( 1 )]
+
+[node name="ExtensionPopup" parent="MenuLayer/TitleMenu/NoMargins" index="2"]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 1280.0
+margin_bottom = 720.0
+
+[node name="SaveSettings" type="Popup" parent="MenuLayer/TitleMenu/NoMargins/Popups" index="3"]
+margin_left = 640.0
+margin_top = 360.0
+margin_right = 640.0
+margin_bottom = 360.0
+script = ExtResource( 2 )
+
+[node name="PanelContainer" type="PanelContainer" parent="MenuLayer/TitleMenu/NoMargins/Popups/SaveSettings" index="0"]
+margin_left = -200.0
+margin_right = 194.0
+margin_bottom = 45.0
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MenuLayer/TitleMenu/NoMargins/Popups/SaveSettings/PanelContainer" index="0"]
+margin_left = 16.0
+margin_top = 2.0
+margin_right = 525.0
+margin_bottom = 131.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MenuLayer/TitleMenu/NoMargins/Popups/SaveSettings/PanelContainer/VBoxContainer2" index="0"]
+margin_right = 509.0
+margin_bottom = 41.0
+
+[node name="DELETE_SAVE" type="Button" parent="MenuLayer/TitleMenu/NoMargins/Popups/SaveSettings/PanelContainer/VBoxContainer2/VBoxContainer" index="0"]
+margin_right = 509.0
+margin_bottom = 41.0
+text = "CONFIRM_OVERRIDE_GAME"
+
+[node name="SPACER" type="Label" parent="MenuLayer/TitleMenu/NoMargins/Popups/SaveSettings/PanelContainer/VBoxContainer2" index="1"]
+margin_top = 45.0
+margin_right = 509.0
+margin_bottom = 84.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/TitleMenu/NoMargins/Popups/SaveSettings/PanelContainer/VBoxContainer2" index="2"]
+margin_top = 88.0
+margin_right = 509.0
+margin_bottom = 129.0
+
+[node name="CANCEL" type="Button" parent="MenuLayer/TitleMenu/NoMargins/Popups/SaveSettings/PanelContainer/VBoxContainer2/HBoxContainer" index="0"]
+margin_right = 362.0
+margin_bottom = 41.0
+text = "SETTINGS_CANCEL"
+
+[node name="NewA" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="0"]
+rect_min_size = Vector2( 64, 41 )
+icon = null
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewA" index="0"]
+margin_right = 64.0
+margin_bottom = 41.0
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewA/HBoxContainer" index="0"]
+margin_right = 64.0
+margin_bottom = 41.0
+size_flags_horizontal = 3
+texture = SubResource( 1 )
+expand = true
+stretch_mode = 6
+
+[node name="NewB" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="2"]
+rect_min_size = Vector2( 64, 41 )
+icon = null
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewB" index="0"]
+margin_right = 64.0
+margin_bottom = 41.0
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewB/HBoxContainer" index="0"]
+margin_right = 64.0
+margin_bottom = 41.0
+size_flags_horizontal = 3
+texture = SubResource( 1 )
+expand = true
+stretch_mode = 6
+
+[node name="NewC" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="4"]
+rect_min_size = Vector2( 64, 41 )
+icon = null
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewC" index="0"]
+margin_right = 64.0
+margin_bottom = 41.0
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewC/HBoxContainer" index="0"]
+margin_right = 64.0
+margin_bottom = 41.0
+size_flags_horizontal = 3
+texture = SubResource( 1 )
+expand = true
+stretch_mode = 6
+
+[node name="NewD" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="6"]
+rect_min_size = Vector2( 64, 41 )
+icon = null
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewD" index="0"]
+margin_right = 64.0
+margin_bottom = 41.0
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewD/HBoxContainer" index="0"]
+margin_right = 64.0
+margin_bottom = 41.0
+size_flags_horizontal = 3
+texture = SubResource( 1 )
+expand = true
+stretch_mode = 6
+
+[node name="NewE" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="8"]
+rect_min_size = Vector2( 64, 41 )
+icon = null
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewE" index="0"]
+margin_right = 64.0
+margin_bottom = 41.0
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewE/HBoxContainer" index="0"]
+margin_right = 64.0
+margin_bottom = 41.0
+size_flags_horizontal = 3
+texture = SubResource( 1 )
+expand = true
+stretch_mode = 6
+
+[node name="NewF" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="10"]
+rect_min_size = Vector2( 64, 41 )
+icon = null
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewF" index="0"]
+margin_right = 64.0
+margin_bottom = 41.0
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewF/HBoxContainer" index="0"]
+margin_right = 64.0
+margin_bottom = 41.0
+size_flags_horizontal = 3
+texture = SubResource( 1 )
+expand = true
+stretch_mode = 6
+
+[node name="NewG" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="12"]
+rect_min_size = Vector2( 64, 41 )
+icon = null
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewG" index="0"]
+margin_right = 64.0
+margin_bottom = 41.0
+alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewG/HBoxContainer" index="0"]
+margin_right = 64.0
+margin_bottom = 41.0
+size_flags_horizontal = 3
+texture = SubResource( 1 )
+expand = true
+stretch_mode = 6
+
+[editable path="AsteroidField"]
