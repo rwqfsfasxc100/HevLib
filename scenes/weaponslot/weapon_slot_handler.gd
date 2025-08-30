@@ -9,11 +9,12 @@ var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 var shipName = ""
 var baseShipName = ""
 
-func _enter_tree():
-	var found = false
+onready var parent = get_parent()
+#func _enter_tree():
+func _ready():
 	
-	breakpoint
-	
+	shipName=ship.shipName
+	baseShipName=ship.baseShipName
 	
 	var file = File.new()
 	file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_TEMPLATES.json",File.READ)
@@ -30,7 +31,7 @@ func _enter_tree():
 	var ship_modify_standalone = JSON.parse(file.get_as_text(true)).result
 	file.close()
 	
-	
+	var equipment_templates = {}
 	
 	
 	var node_names = []
@@ -45,7 +46,43 @@ func _enter_tree():
 			if check in equipment:
 				var node = get_node(check)
 				for property in data:
-					
-					breakpoint
+					node[property.get("property")] = property.get("value")
+		equipment_templates.merge({template:generic_modify_templates[template].get("equipment").duplicate(true)})
+	for standalone in generic_modify_standalone:
+		if standalone in node_names:
+			var node = get_node(standalone)
+			node[standalone.get("property")] = standalone.get("value")
+	for template in ship_modify_templates:
+		if baseShipName == template:
+			var data = ship_modify_templates[template]
+			for reg in data:
+				if slot == reg:
+					var slot_data = data[reg]
+					for tmp in slot_data:
+						var equipment = equipment_templates[tmp]
+						var properties = slot_data[tmp]
+						for item in equipment:
+							var node = get_node(item)
+							for property in properties:
+								node[property.get("property")] = property.get("value")
+		if shipName != baseShipName:
+			if shipName == template:
+				var data = ship_modify_templates[template]
+				for reg in data:
+					if slot == reg:
+						var slot_data = data[reg]
+						for tmp in slot_data:
+							var equipment = equipment_templates[tmp]
+							var properties = slot_data[tmp]
+							for item in equipment:
+								var node = get_node(item)
+								for property in properties:
+									node[property.get("property")] = property.get("value")
 		
+		
+#		breakpoint
 	
+	
+	
+	
+#	breakpoint
