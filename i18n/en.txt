@@ -29,3 +29,7 @@ HEVLIB_DESCRIPTION_PLACEHOLDER|This mod does not have a description. \n\nPlease 
 HEVLIB_SELF_CHECK_ERROR_MESSAGE|HevLib was not installed correctly. Please double check the download source, and make sure that the root folder looks as follows: HevLib.zip/HevLib/\n\nPressing OK will exit the game and open the latest release page in your browser.
 
 HEVLIB_SELF_CHECK_ERROR_HEADER|HEVLIB LOAD ERROR!
+
+HEVLIB_INCORRECT_SHIP|(ERROR!) Missing ship type: '%s'\nThis save cannot be opened as the active ship isn't available!\nTo load this save, please reinstall the mod containing the ship type!
+
+HEVLIB_SLOT|Slot

@@ -13,12 +13,13 @@ const MOD_VERSION_METADATA = ""
 const MOD_IS_LIBRARY = true
 func _init(modLoader = ModLoader):
 	l("Initializing WebTranslate")
+	updateTL("res://HevLib/i18n/en.txt","|",false)
 var modPath:String = get_script().resource_path.get_base_dir() + "/"
 func _ready():
 	l("Readying")
 	
-	var WebTranslate = preload("res://HevLib/pointers/WebTranslate.gd")
-	WebTranslate.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]], "res://HevLib/webtranslate/ModMain.gd")
+	# var WebTranslate = preload("res://HevLib/pointers/WebTranslate.gd")
+	# WebTranslate.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]], "res://HevLib/webtranslate/ModMain.gd")
 	
 	loadTranslationsFromCache()
 	

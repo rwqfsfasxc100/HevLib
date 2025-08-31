@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://TitleScreen.tscn" type="PackedScene" id=1]
-[ext_resource path="res://HevLib/scenes/better_title_screen/SaveSettings2.tscn" type="PackedScene" id=2]
+[ext_resource path="res://HevLib/scenes/better_title_screen/SaveSettings.tscn" type="PackedScene" id=2]
+[ext_resource path="res://menu/Foolish.tscn" type="PackedScene" id=3]
 
 [sub_resource type="StreamTexture" id=1]
 flags = 4
@@ -16,7 +17,6 @@ margin_right = 1280.0
 margin_bottom = 720.0
 
 [node name="SaveSettings" parent="MenuLayer/TitleMenu/NoMargins/Popups" index="3" instance=ExtResource( 2 )]
-visible = false
 margin_left = 282.0
 margin_top = 60.0
 margin_right = 998.0
@@ -39,6 +39,10 @@ texture = SubResource( 1 )
 expand = true
 stretch_mode = 6
 
+[node name="Foolish" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/SlotA" index="0" instance=ExtResource( 3 )]
+hint_tooltip = ""
+mouse_filter = 2
+
 [node name="NewB" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="2"]
 rect_min_size = Vector2( 64, 41 )
 icon = null
@@ -55,6 +59,10 @@ size_flags_horizontal = 3
 texture = SubResource( 1 )
 expand = true
 stretch_mode = 6
+
+[node name="Foolish" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/SlotB" index="0" instance=ExtResource( 3 )]
+hint_tooltip = ""
+mouse_filter = 2
 
 [node name="NewC" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="4"]
 rect_min_size = Vector2( 64, 41 )
@@ -73,6 +81,10 @@ texture = SubResource( 1 )
 expand = true
 stretch_mode = 6
 
+[node name="Foolish" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/SlotC" index="0" instance=ExtResource( 3 )]
+hint_tooltip = ""
+mouse_filter = 2
+
 [node name="NewD" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="6"]
 rect_min_size = Vector2( 64, 41 )
 icon = null
@@ -89,6 +101,10 @@ size_flags_horizontal = 3
 texture = SubResource( 1 )
 expand = true
 stretch_mode = 6
+
+[node name="Foolish" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/SlotD" index="0" instance=ExtResource( 3 )]
+hint_tooltip = ""
+mouse_filter = 2
 
 [node name="NewE" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="8"]
 rect_min_size = Vector2( 64, 41 )
@@ -107,6 +123,10 @@ texture = SubResource( 1 )
 expand = true
 stretch_mode = 6
 
+[node name="Foolish" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/SlotE" index="0" instance=ExtResource( 3 )]
+hint_tooltip = ""
+mouse_filter = 2
+
 [node name="NewF" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="10"]
 rect_min_size = Vector2( 64, 41 )
 icon = null
@@ -124,6 +144,10 @@ texture = SubResource( 1 )
 expand = true
 stretch_mode = 6
 
+[node name="Foolish" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/SlotF" index="0" instance=ExtResource( 3 )]
+hint_tooltip = ""
+mouse_filter = 2
+
 [node name="NewG" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="12"]
 rect_min_size = Vector2( 64, 41 )
 icon = null
@@ -140,5 +164,9 @@ size_flags_horizontal = 3
 texture = SubResource( 1 )
 expand = true
 stretch_mode = 6
+
+[node name="Foolish" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/SlotG" index="0" instance=ExtResource( 3 )]
+hint_tooltip = ""
+mouse_filter = 2
 
 [editable path="AsteroidField"]

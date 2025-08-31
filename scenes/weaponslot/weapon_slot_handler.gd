@@ -5,9 +5,12 @@ export var slot_group = ""
 var current_ship = ""
 var WeaponSlot = preload("res://HevLib/pointers/WeaponSlot.gd")
 var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
 
 var shipName = ""
 var baseShipName = ""
+
+var equipment_templates = {}
 
 onready var parent = get_parent()
 #func _enter_tree():
@@ -31,7 +34,6 @@ func _ready():
 	var ship_modify_standalone = JSON.parse(file.get_as_text(true)).result
 	file.close()
 	
-	var equipment_templates = {}
 	
 	
 	var node_names = []
@@ -44,14 +46,28 @@ func _ready():
 		var data = generic_modify_templates[template]["data"]
 		for check in node_names:
 			if check in equipment:
-				var node = get_node(check)
+#				var node = get_node(check)
 				for property in data:
-					node[property.get("property")] = property.get("value")
+					if check in node_names:
+						if check in equipment_templates.keys():
+							pass
+						else:
+							equipment_templates[check] = {}
+						equipment_templates[check][property.get("property")] = property.get("value")
+					
+#					node[property.get("property")] = property.get("value")
 		equipment_templates.merge({template:generic_modify_templates[template].get("equipment").duplicate(true)})
 	for standalone in generic_modify_standalone:
 		if standalone in node_names:
-			var node = get_node(standalone)
-			node[standalone.get("property")] = standalone.get("value")
+				if standalone in equipment_templates.keys():
+					pass
+				else:
+					equipment_templates[standalone] = {}
+				equipment_templates[standalone][standalone.get("property")] = standalone.get("value")
+			
+#			breakpoint
+#			var node = get_node(standalone)
+#			node[standalone.get("property")] = standalone.get("value")
 	for template in ship_modify_templates:
 		if baseShipName == template:
 			var data = ship_modify_templates[template]
@@ -62,9 +78,19 @@ func _ready():
 						var equipment = equipment_templates[tmp]
 						var properties = slot_data[tmp]
 						for item in equipment:
-							var node = get_node(item)
+#							var node = get_node(item)
 							for property in properties:
-								node[property.get("property")] = property.get("value")
+								if item in node_names:
+#								breakpoint
+									if item in equipment_templates.keys():
+										pass
+									else:
+										equipment_templates[item] = {}
+									equipment_templates[item][property.get("property")] = property.get("value")
+					
+								
+								
+#								node[property.get("property")] = property.get("value")
 		if shipName != baseShipName:
 			if shipName == template:
 				var data = ship_modify_templates[template]
@@ -75,14 +101,38 @@ func _ready():
 							var equipment = equipment_templates[tmp]
 							var properties = slot_data[tmp]
 							for item in equipment:
-								var node = get_node(item)
+#								var node = get_node(item)
 								for property in properties:
-									node[property.get("property")] = property.get("value")
+									if item in node_names:
+										if item in equipment_templates.keys():
+											pass
+										else:
+											equipment_templates[item] = {}
+										equipment_templates[item][property.get("property")] = property.get("value")
+	
+
+func loadPlaceholder():
+	var t = "weaponSlot.%s.type" % slot
+	var sysname = ""
+	var placeholder: InstancePlaceholder = get_node_or_null(String(mounted))
+	if placeholder:
+		if directMount:
+			key = name + "_" + mounted
+		else:
+			key = t + "_" + mounted
+		placeholder.replace_by_instance()
+		system = get_node_or_null(mounted)
+		sysname = system.name
+		system.name = name + "_" + system.name
+		system.visible = true
 		
-		
-#		breakpoint
-	
-	
-	
-	
-#	breakpoint
+		if "slotName" in system:
+			system.slotName = t + "_" + system.systemName
+	ship.changeExternalPlaceholders( - 1)
+	if sysname in equipment_templates:
+		var datapoint = equipment_templates[sysname]
+		for property in datapoint:
+			var value = datapoint.get(property)
+			var current = system.get(property)
+			var newVal = NodeAccess.__convert_var_from_string(value)
+			system.set_deferred(property,newVal)

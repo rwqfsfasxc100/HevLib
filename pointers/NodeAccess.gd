@@ -23,6 +23,13 @@ var developer_hint = {
 		"max_crew -> the desired new maximum crew count that can board derelicts. Fails when equal to 24 or less due to HevLib doing it automatically",
 		"Returns a string as the filepath to the generated scene. The scene is given a generated name, so be careful which folder is chosen.",
 		"If the function fails, an empty string is returned instead."
+	],
+	"__convert_var_from_string":[
+		"Converts a variant stored literally as a string to the respective variable",
+		"For instance, Vector2(x,y) is stored as \"Vector2(x,y)\", a string ABC is stored as \"\"ABC\"\" (Note that the string has to use double quotations to ensure that one set of quotes is stored)",
+		"string -> the string used to convert to the variant",
+		"folder -> (optional) the folder used to store the cache file used in the operation. Defaults to \"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/file_caches\"",
+		"Returns the variant"
 	]
 	}
 
@@ -43,4 +50,9 @@ static func __is_instanced_from_scene(p_node):
 static func __dynamic_crew_expander(folder_path: String, max_crew:int = 24) -> String:
 	var f = load("res://HevLib/scenes/crew_extensions/dynamic_crew_expander.gd").new()
 	var s = f.dynamic_crew_expander(folder_path, max_crew)
+	return s
+
+static func __convert_var_from_string(string : String, folder : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/file_caches"):
+	var f = load("res://HevLib/scripts/convert_var_from_string.gd").new()
+	var s = f.convert_var_from_string(string,folder)
 	return s

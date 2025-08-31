@@ -66,6 +66,7 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 				sys_slot = children[index].slot
 				index += 1
 		vanilla_slot_types.merge({slot.name:sys_slot})
+	
 	var weaponslot_modify_templates_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_TEMPLATES.json"
 	var weaponslot_modify_standalone_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_STANDALONE.json"
 	var slot_order_cache_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order.json"
@@ -74,12 +75,20 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 	var folders = FolderAccess.__fetch_folder_files("res://", true, true)
 	var data_state : Array = []
 	var ws_state : Array = []
+	
+	
+	var menu_folder = "user://cache/.HevLib_Cache/MenuDriver/"
+	var save_menu_file = menu_folder + "save_buttons.json"
+	
+	
 	FolderAccess.__check_folder_exists(file_save_path.split(file_save_path.split("/")[file_save_path.split("/").size() - 1])[0])
 	FolderAccess.__check_folder_exists(weaponslot_save_path.split(weaponslot_save_path.split("/")[weaponslot_save_path.split("/").size() - 1])[0])
+	FolderAccess.__check_folder_exists(menu_folder)
 	var wpfl = File.new()
 	var ws_default_templates = load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
 	var ws_ship_templates = load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
 	var ws_ship_templates_2 = load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd").get_script_constant_map()
+	
 	wpfl.open(weaponslot_modify_templates_file,File.WRITE)
 	wpfl.store_string(JSON.print(ws_default_templates.get("TEMPLATES",{})))
 	wpfl.close()
@@ -93,6 +102,9 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 	wpfl.store_string(JSON.print(ws_ship_templates_2.get("SHIP_TEMPLATES",{})))
 	wpfl.close()
 	wpfl.open(slot_order_cache_file,File.WRITE)
+	wpfl.store_string("[]")
+	wpfl.close()
+	wpfl.open(save_menu_file,File.WRITE)
 	wpfl.store_string("[]")
 	wpfl.close()
 	for folder in folders:
@@ -316,7 +328,31 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 						data_state.append([dicti,check,mod,mname])
 					if dictr.keys().size() >= 1:
 						ws_state.append([dictr,check,mod,mname])
-	
+				if check.ends_with("HEVLIB_MENU/"):
+					var files = FolderAccess.__fetch_folder_files(check, false, true)
+					var mod = check.hash()
+					var dicti = {}
+					var dictr = {}
+					var dictf = {}
+					for file in files:
+						var last_bit = file.split("/")[file.split("/").size() - 1]
+						match last_bit:
+							"SAVE_BUTTONS.gd":
+								var data = load(check + last_bit)
+								var constants = data.get_script_constant_map()
+								var ar = constants.get("SAVE_BUTTONS",[]).duplicate(true)
+								var fi = File.new()
+								fi.open(save_menu_file,File.READ_WRITE)
+								var filedata = fi.get_as_text(true)
+								var sort = JSON.parse(filedata)
+								var founddata = sort.result
+								
+								for button in ar:
+									founddata.append(button)
+								
+								fi.store_string(JSON.print(founddata))
+								fi.close()
+								
 	var slots = data_state
 	
 	for item in slots:
