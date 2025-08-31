@@ -62,12 +62,10 @@ func _on_Button_pressed():
 #	var nodes = []
 #	for child in wps.get_children():
 #		nodes.append(child.name)
-	var value = TranslationServer.translate("TUTORIAL_GREETING_1")
-	var mf = load("res://HevLib/scenes/equipment/make_upgrades_scene.gd").new()
-	mf.make_upgrades_scene()
-	breakpoint
-	var mod_data = ManifestV2.__get_mod_data()
 	
+	
+	var s = ManifestV2.__get_mod_by_id("hev.IndustriesOfEnceladus")
+	breakpoint
 	var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 #
 #	ConfigDriver.__store_config(config,"He/vL/ib/")

@@ -39,6 +39,7 @@ func _physics_process(delta):
 
 
 func checkSave():
+#	var mpm = getDataFromSave(saveSlotFile)
 	var new_meta = getMetaFromSave(saveSlotFile)
 	if new_meta:
 		var change = false
@@ -139,3 +140,13 @@ func getMetaFromSave(file):
 			return null
 	else:
 		return null
+
+func getDataFromSave(file):
+	var f = File.new()
+	if f.file_exists(file):
+		f.open_encrypted_with_pass(file, File.READ, password)
+		var sg = f.get_line()
+		var savedState = parse_json(sg)
+		f.close()
+		return savedState
+	return {}

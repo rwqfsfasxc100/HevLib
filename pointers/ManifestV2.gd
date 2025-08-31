@@ -27,6 +27,13 @@ var developer_hint = {
 		"file_path -> string of that is the full path to the file.",
 		"format_to_manifest_version -> (optional) bool whether to conform the returning dictionary to the manifest's version rather than a raw dictionary. Defaults to false",
 		"Returns a dictionary containing the formatted data"
+	],
+	"__get_mod_by_id":[
+		"Fetches information about a mod by it's ID (found in the mod_information -> id section in the manifest)",
+		"ID is case sensitive, an incorrect capitalization will not make a match unless case_insensitive is set to true",
+		"id -> string for the ID that is being looked for",
+		"case_sensitive -> (optional) boolean that decides whether the ID being looked for should care about capitalization. Enabled by default",
+		"Returns a dictionary containing manifest-formatted information. Returns an empty dictionary if not found."
 	]
 }
 
@@ -54,3 +61,9 @@ static func __parse_file_as_manifest(file_path: String, format_to_manifest_versi
 	var f = load("res://HevLib/scripts/manifest_v2/parse_file_as_manifest.gd").new()
 	var s = f.parse_file_as_manifest(file_path, format_to_manifest_version)
 	return s
+
+static func __get_mod_by_id(id: String, case_sensitive: bool = true) -> Dictionary:
+	var f = load("res://HevLib/scripts/manifest_v2/get_mod_by_id.gd").new()
+	var s = f.get_mod_by_id(id, case_sensitive)
+	return s
+
