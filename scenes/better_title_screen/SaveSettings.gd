@@ -1,5 +1,7 @@
 extends Popup
 
+var first_time = true
+
 var save_slot_file = "user://savegame.dv"
 
 var delete_color = Color(1,1,1,1)
@@ -33,9 +35,16 @@ func cancel():
 
 var enable_on_save_buttons = []
 
+var connections = {
+	"POPUP_ROOT":[],
+	"SAVE_BUTTON":[],
+	"ADDITIONAL":[],
+	"GENERIC":[]
+}
+
 var menu_folder = "user://cache/.HevLib_Cache/MenuDriver/"
 var save_menu_file = menu_folder + "save_buttons.json"
-func _ready():
+func create():
 	var file = File.new()
 	file.open(save_menu_file,File.READ)
 	var buttons = JSON.parse(file.get_as_text(true)).result
@@ -52,14 +61,18 @@ func _ready():
 			match button.get("popup_override"):
 				"POPUP_ROOT":
 					BUTTON.connect("pressed",self,method)
+					connections["POPUP_ROOT"].append({BUTTON:["pressed",self,method]})
 				"SAVE_BUTTON":
 					BUTTON.connect("pressed",sender,method)
+					connections["SAVE_BUTTON"].append({BUTTON:["pressed",sender,method]})
 		else:
 			var popup = load(popup_path).instance()
 			if button.get("send_additional_info",false):
 				BUTTON.connect("pressed",popup,method,[self.save_slot_file,self.sender])
+				connections["ADDITIONAL"].append({BUTTON:["pressed",popup,method]})
 			else:
 				BUTTON.connect("pressed",popup,method)
+				connections["GENERIC"].append({BUTTON:["pressed",popup,method]})
 			popup_container.call_deferred("add_child",popup)
 		var enable_on_save = button.get("enable_on_save",false)
 		if enable_on_save:
@@ -71,7 +84,11 @@ func _ready():
 #	breakpoint
 
 func _about_to_show():
-	
+	if first_time:
+		create()
+		first_time = false
+	else:
+		reconnect()
 	var alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","1","2","3","4","5","6","7","8","9","10"]
 	
 	registered_text = TranslationServer.translate(display_text) + " - " + TranslationServer.translate("HEVLIB_SLOT") + " " + alphabet[index/2]
@@ -92,3 +109,26 @@ func _input(event):
 	if visible:
 		if event.is_action_pressed("ui_cancel"):
 			cancel()
+
+func reconnect():
+	for button in connections["POPUP_ROOT"]:
+		var object = button.keys()[0]
+		var data = button.get(object)
+		object.disconnect(data[0],data[1],data[2])
+		object.connect(data[0],data[1],data[2])
+	for button in connections["SAVE_BUTTON"]:
+		var object = button.keys()[0]
+		var data = button.get(object)
+		object.disconnect(data[0],data[1],data[2])
+		object.connect(data[0],data[1],data[2])
+	for button in connections["ADDITIONAL"]:
+		var object = button.keys()[0]
+		var data = button.get(object)
+		object.disconnect(data[0],data[1],data[2])
+		object.connect(data[0],data[1],data[2],[self.save_slot_file,self.sender])
+	for button in connections["GENERIC"]:
+		var object = button.keys()[0]
+		var data = button.get(object)
+		object.disconnect(data[0],data[1],data[2])
+		object.connect(data[0],data[1],data[2])
+	

@@ -553,6 +553,12 @@ const SHIP_TEMPLATES = {
 					"value":"Vector2( 0, 64 )"
 				}
 			],
+			"CRADLES":[
+				{
+					"property":"position",
+					"value":"Vector2( 0, 64 )"
+				}
+			],
 			"CLAIM_BEACONS":[
 				{
 					"property":"position",
@@ -568,6 +574,12 @@ const SHIP_TEMPLATES = {
 		},
 		"right":{
 			"CARGO_CONTAINERS":[
+				{
+					"property":"position",
+					"value":"Vector2( 0, 64 )"
+				}
+			],
+			"CRADLES":[
 				{
 					"property":"position",
 					"value":"Vector2( 0, 64 )"
