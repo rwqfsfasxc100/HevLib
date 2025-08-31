@@ -10,7 +10,6 @@ This library is run through a set of 'pointers', which are small snippets of cod
 > "res://HevLib/ModMain.gd",
 > "res://HevLib/scenes/keymapping/ModMain.gd",
 > "res://HevLib/scenes/equipment/ModMain.gd",
-> "res://HevLib/scenes/weaponslot/ModMain.gd",
 > "res://HevLib/webtranslate/ModMain.gd",
 > ```
 
