@@ -9,8 +9,8 @@ credits=["Za'krin - Mod Main design, original implementation of updateTL","space
 [version]
 
 version_major=1
-version_minor=6
-version_bugfix=9
+version_minor=7
+version_bugfix=0
 
 [tags]
 
