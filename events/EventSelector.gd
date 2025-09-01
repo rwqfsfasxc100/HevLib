@@ -9,7 +9,10 @@ func _process(delta):
 
 func _ready():
 	var disabled_events = Settings.HevLib["events"]["disabled_events"]
-	var events = ring.event_names
+	var event_names = []
+	for item in ring.get_children():
+		event_names.append(item.name)
+	var events = event_names
 	for evnt in events:
 		var does = true
 		if evnt in disabled_events:
