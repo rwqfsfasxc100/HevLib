@@ -89,7 +89,8 @@ func checkSave():
 func newSave():
 	Debug.l("new %s pressed" % saveSlotFile)
 	CurrentGame.saveFile = saveSlotFile
-	emit_signal("newGame")
+#	emit_signal("newGame")
+	get_node("../../../../../NoMargins/NewGamePlus").popup_centered()
 
 func _pressed():
 	if meta:
