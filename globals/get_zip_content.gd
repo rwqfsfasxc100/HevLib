@@ -1,7 +1,7 @@
 extends Node
 
 static func get_zip_content(path, stripFolder = false, lowerCase = false):
-	Debug.l("HevLib: function 'get_zip_content' instanced at %s. Stripping the root folder? [%s] Outputting lowercase? [%s]" % [path, stripFolder, lowerCase])
+#	Debug.l("HevLib: function 'get_zip_content' instanced at %s. Stripping the root folder? [%s] Outputting lowercase? [%s]" % [path, stripFolder, lowerCase])
 	var listOfNames = []
 	var gdunzip = load("res://vendor/gdunzip.gd").new()
 	gdunzip.load(path)
@@ -20,5 +20,5 @@ static func get_zip_content(path, stripFolder = false, lowerCase = false):
 			dFiles = m
 		else:
 			dFiles = dFiles + ", " + m
-	Debug.l("HevLib: get_zip_content returning as %s" % dFiles)
+#	Debug.l("HevLib: get_zip_content returning as %s" % dFiles)
 	return listOfNames

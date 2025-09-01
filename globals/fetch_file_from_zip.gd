@@ -7,7 +7,7 @@ static func fetch_file_from_zip(path, cacheDir, desiredFiles):
 			dFiles = m
 		else:
 			dFiles = dFiles + ", " + m
-	Debug.l("HevLib: function 'fetch_file_from_zip' instanced for %s in %s, looking for %s" % [path,cacheDir,dFiles])
+#	Debug.l("HevLib: function 'fetch_file_from_zip' instanced for %s in %s, looking for %s" % [path,cacheDir,dFiles])
 	var listOfNames = []
 	var uncompressed = {}
 	var zip = path.split("/")
@@ -46,6 +46,6 @@ static func fetch_file_from_zip(path, cacheDir, desiredFiles):
 			mFiles = m
 		else:
 			mFiles = mFiles + ", " + m
-	Debug.l("HevLib: fetch_file_from_zip returning as %s" % mFiles)
+#	Debug.l("HevLib: fetch_file_from_zip returning as %s" % mFiles)
 	return savedFiles
 	

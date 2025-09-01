@@ -2,10 +2,10 @@ extends Node
 
 static func translation_file_to_dictionary(path : String, delimiter : String = "|") -> Dictionary:
 	var log_header = "HevLib Translations: "
-	Debug.l(log_header + "__translation_file_to_dictionary started for file at [%s] using CSV delimiter as [%s]" % [path, delimiter])
+#	Debug.l(log_header + "__translation_file_to_dictionary started for file at [%s] using CSV delimiter as [%s]" % [path, delimiter])
 	var exists = Directory.new().file_exists(path)
 	if not exists:
-		Debug.l(log_header + "file at [%s] does not exist, returning empty dictionary" % path)
+#		Debug.l(log_header + "file at [%s] does not exist, returning empty dictionary" % path)
 		return {}
 	var dictionary = {}
 	var file = File.new()
@@ -16,10 +16,10 @@ static func translation_file_to_dictionary(path : String, delimiter : String = "
 	var lang_data = lines[0]
 	var language_lines = lang_data.split(delimiter)
 	if not language_lines[0] == "locale":
-		Debug.l(log_header + "improper localization header for [%s], exiting with empty dictionary" % path)
+#		Debug.l(log_header + "improper localization header for [%s], exiting with empty dictionary" % path)
 		return {}
 	if language_lines.size() <= 1:
-		Debug.l(log_header + "no languages specified at [%s], exiting with empty dictionary" % path)
+#		Debug.l(log_header + "no languages specified at [%s], exiting with empty dictionary" % path)
 		return {}
 	var languages = []
 	var lsize = language_lines.size()
@@ -55,5 +55,5 @@ static func translation_file_to_dictionary(path : String, delimiter : String = "
 			tlindex += 1
 		index += 1
 		translation_count += 1
-	Debug.l(log_header + "fetched translations from [%s], which contains [%s] languages and [%s] translations" % [path,languages.size(),translation_count])
+#	Debug.l(log_header + "fetched translations from [%s], which contains [%s] languages and [%s] translations" % [path,languages.size(),translation_count])
 	return dictionary

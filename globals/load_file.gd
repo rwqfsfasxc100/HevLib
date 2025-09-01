@@ -1,7 +1,7 @@
 extends Node
 
 static func load_file(modDir, zipDir, hasManifest, manifestDirectory, hasIcon, iconDir):
-	Debug.l("HevLib: function 'load_file' instanced for %s @ %s. Is working with manifest? [%s] @ [%s]. Is working with mod icon? [%s] @ [%s]" % [modDir, zipDir, hasManifest, manifestDirectory, hasIcon, iconDir])
+#	Debug.l("HevLib: function 'load_file' instanced for %s @ %s. Is working with manifest? [%s] @ [%s]. Is working with mod icon? [%s] @ [%s]" % [modDir, zipDir, hasManifest, manifestDirectory, hasIcon, iconDir])
 	var Globals = preload("res://HevLib/Functions.gd").new()
 	var manifestName = ""
 	var manifestId = ""
@@ -23,7 +23,7 @@ static func load_file(modDir, zipDir, hasManifest, manifestDirectory, hasIcon, i
 	var f = File.new()
 	if hasManifest and not parentFolder == "disabled_mod_cache":
 		f.open(manifestDirectory, File.READ)
-		Debug.l("HevLib: load_file attempting to load manifest @%s" % manifestDirectory)
+#		Debug.l("HevLib: load_file attempting to load manifest @%s" % manifestDirectory)
 		var manifestData = Globals.__load_manifest_from_file(manifestDirectory)
 		manifestName = manifestData["package"]["name"]
 		manifestId = manifestData["package"]["id"]
@@ -39,7 +39,7 @@ static func load_file(modDir, zipDir, hasManifest, manifestDirectory, hasIcon, i
 		custom_link = manifestData["package"]["custom_link"]
 		custom_link_name = manifestData["package"]["custom_link_name"]
 		f.close()
-	Debug.l("HevLib: load_file attempting to reload file @%s" % modDir)
+#	Debug.l("HevLib: load_file attempting to reload file @%s" % modDir)
 	f.open(modDir, File.READ)
 	var modFolderSplit = modDir.split("/ModMain.gd")
 	var modFolderCount = modFolderSplit.size()
@@ -124,5 +124,5 @@ static func load_file(modDir, zipDir, hasManifest, manifestDirectory, hasIcon, i
 	else:
 		iconDir = "empty"
 	var compiledData = modName + "\n" + fallbackDir + "\n" + prioStr + "\n" + modFolder + "\n" + verData + "\n" + manifestDescription + "\n" + github_homepage + "\n" + github_releases + "\n" + discord_thread + "\n" + nexus_page + "\n" + donations_page + "\n" + wiki_page + "\n" + custom_link + "\n" + custom_link_name + "\n" + iconDir + "\n" + manifestId
-	Debug.l("HevLib: load_file returning as %s" % compiledData)
+#	Debug.l("HevLib: load_file returning as %s" % compiledData)
 	return compiledData

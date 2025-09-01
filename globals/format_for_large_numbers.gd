@@ -1,7 +1,7 @@
 extends Node
 
 static func format_for_large_numbers(num):
-	Debug.l("HevLib: function 'format_for_large_numbers' instanced, making %s readable" % num)
+#	Debug.l("HevLib: function 'format_for_large_numbers' instanced, making %s readable" % num)
 	var length = num.length()
 	if length > 3:
 		var concat = []
@@ -22,8 +22,8 @@ static func format_for_large_numbers(num):
 				total = m
 			else:
 				total = total + "," + m
-		Debug.l("HevLib: formatted %s to %s" % [num, total])
+#		Debug.l("HevLib: formatted %s to %s" % [num, total])
 		return total
 	else:
-		Debug.l("HevLib: formatting not needed, returning %s" % num)
+#		Debug.l("HevLib: formatting not needed, returning %s" % num)
 		return str(num)

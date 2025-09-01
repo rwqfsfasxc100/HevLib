@@ -7,7 +7,7 @@ static func get_config(mod, cfg_filename : String = "Mod_Configurations" + ".cfg
 	var cfg = ConfigFile.new()
 	var error = cfg.load(cfg_folder+cfg_filename)
 	if error != OK:
-		Debug.l("HevLib Config File: Error loading settings %s" % error)
+#		Debug.l("HevLib Config File: Error loading settings %s" % error)
 		return {}
 	var dictionary = {}
 	var config_sections = cfg.get_sections()

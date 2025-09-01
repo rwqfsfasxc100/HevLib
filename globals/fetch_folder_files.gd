@@ -1,7 +1,7 @@
 extends Node
 
 static func fetch_folder_files(folder, showFolders, returnFullPath):
-	Debug.l("HevLib: function 'fetch_folder_files' instanced in %s, with folders included? [%s]" % [folder, showFolders])
+#	Debug.l("HevLib: function 'fetch_folder_files' instanced in %s, with folders included? [%s]" % [folder, showFolders])
 	var fileList = []
 	var dir = Directory.new()
 #	folder = ProjectSettings.localize_path(folder)
@@ -20,7 +20,7 @@ static func fetch_folder_files(folder, showFolders, returnFullPath):
 			capture = false
 		if capture:
 			dirName = dir.get_current_dir()
-			Debug.l(fileName)
+#			Debug.l(fileName)
 			if fileName == "":
 				break
 			if dir.current_is_dir() and not showFolders:
@@ -40,5 +40,5 @@ static func fetch_folder_files(folder, showFolders, returnFullPath):
 			dFiles = m
 		else:
 			dFiles = dFiles + ", " + m
-	Debug.l("HevLib: fetch_folder_files returning as %s" % dFiles)
+#	Debug.l("HevLib: fetch_folder_files returning as %s" % dFiles)
 	return fileList
