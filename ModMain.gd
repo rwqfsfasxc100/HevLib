@@ -104,7 +104,7 @@ func _ready():
 		CRoot.call_deferred("add_child",vNode)
 	var scene = load("res://HevLib/scenes/better_title_screen/TitleScreen.tscn")
 	
-	
+	replaceScene("scenes/equipment/Enceladus.tscn","res://enceladus/Enceladus.tscn")
 	
 #	var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
 #	var crew = NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",25)

@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://enceladus/Upgrades.tscn" type="PackedScene" id=1]
 [ext_resource path="res://HevLib/scenes/equipment/EquipmentManager.gd" type="Script" id=2]
+[ext_resource path="res://HevLib/scenes/equipment/Upgrades.gd" type="Script" id=3]
 
 [sub_resource type="ViewportTexture" id=1]
 flags = 5
@@ -11,6 +12,7 @@ viewport_path = NodePath("VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULA
 viewport_path = NodePath("VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain2/Control")
 
 [node name="Upgrades" instance=ExtResource( 1 )]
+script = ExtResource( 3 )
 
 [node name="TextureRect" parent="VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP" index="2"]
 texture = SubResource( 1 )
