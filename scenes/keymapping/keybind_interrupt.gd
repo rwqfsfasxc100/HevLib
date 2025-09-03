@@ -2,25 +2,51 @@ extends Node
 
 var actionDict = {}
 
+var actionTypes = []
+
+var current_key_inputs = []
+
+
+
 var inputDebug = false
 #
 #func _ready():
 #	if inputDebug:
 #		var actions = InputMap.get_actions()
 #		var bActionDict = {}
+#		breakpoint
 #		for action in actions:
 #			var act = InputMap.get_action_list(action)
 #			actionDict.merge({action:act})
 #			for active in act:
 #				InputMap.action_erase_event(action, active)
-			
+#
+
+func _ready():
+	InputDebugPanel.visible = inputDebug
+#	var actions = InputMap.get_actions()
+#	var bActionDict = {}
+##	breakpoint
+#	for action in actions:
+#		var act = InputMap.get_action_list(action)
+#		actionDict.merge({action:act})
+#		for active in act:
+#			var ck = match_event_type(active)
+#			for item in ck:
+#				match item:
+#					"InputEvent","InputEventWithModifiers":
+#						pass
+#					_:
+#						if item in actionTypes:
+#							pass
+#						else:
+#							actionTypes.append(item)
+#			InputMap.action_erase_event(action, active)
+#	breakpoint
 
 var currentKeyEvents = ""
 onready var InputDebugPanel = get_parent().get_node("_HevLib_Gamespace_Canvas/MarginContainer/DebugPanel/ScrollContainer/MarginContainer/VBoxContainer/InputDebug")
 	
-func _ready():
-	InputDebugPanel.visible = inputDebug
-
 func _process(delta):
 	inputDebug = Settings.HevLib["debug"]["input_debugger"]
 	var siblingCount = get_parent().get_child_count()
@@ -111,27 +137,29 @@ func _input(event):
 					modifierMeta = event.meta
 					modifierCommand = event.command
 			currentKeyEvents = "Device: " + str(eventDevice) + "\nJoyCon Buttons: [ButtonIndex: " + str(joyButtonIndex) + ", Pressure: " + str(joyButtonPressure) + "],\n\tJoypadMotion: [Axis: " + str(joyAxis) + ", AxisValue: " + str(joyAxisValue) + "]\nKey: " + str(key) + "\nMouse Generic: [ButtonMask: " + str(mouseButtonMask) + ", Position: " + str(mousePosition) + ", GlobalPosition: " + str(mouseGlobalPosition) + "],\n\tMouseButtons: [Factor: " + str(mouseFactor) + ", ButtonIndex: " + str(mouseButtonIndex) + ", Canceled: " + str(mouseCanceled) + ", DoubleClick: " + str(mouseDoubleClick) + "],\n\tMouseMotion: [Tilt: " + str(mouseTilt) + ", Pressure: " + str(mousePressure) + ", PenInverted: " + str(mousePenInverted) + ", Relative: " + str(mouseRelative) + ", Speed: " + str(mouseSpeed) + "]\nModifiers: [Alt: " + str(modifierAlt) + ", Shift: " + str(modifierShift) + ", Control: " + str(modifierControl) + ", Meta: " + str(modifierMeta) + ", Command: " + str(modifierCommand) + "]"
-
 			
 			
-			
-			
-	#		if "InputEventKey" in eventType:
-	#			var scancode = null
-	##			scancode = OS.keyboard_get_scancode_from_physical(event.scancode)
-	##			if scancode == null:
-	#			scancode = OS.keyboard_get_scancode_from_physical(event.physical_scancode)
-	#			var label = OS.get_scancode_string(scancode) + " (" + str(scancode) + ")"
-	#			var pressed = event.pressed
-	#			if pressed and not label in currentKeyEvents:
-	#				currentKeyEvents.append(label)
-	#			if not pressed and label in currentKeyEvents:
-	#				var repl = []
-	#				for it in currentKeyEvents:
-	#					if not it == label:
-	#						repl.append(it)
-	#				currentKeyEvents = repl
-	#		get_viewport().set_input_as_handled()
+#
+##			breakpoint
+#			for evnt in actionDict:
+#				var events = actionDict.get(evnt)
+#				for it in events:
+#					var type = match_event_type(it)
+#					var does = false
+#					for item in type:
+#						if item in actionTypes:
+#							does = true
+#							break
+#					if does:
+#						var action = InputEventAction.new()
+#						action.action = evnt
+#						action.pressed = true
+#						Input.parse_input_event(action)
+#						if event is InputEventAction:
+#							breakpoint
+#						else:
+#
+#							get_viewport().set_input_as_handled()
 		
 
 func match_event_type(event):
