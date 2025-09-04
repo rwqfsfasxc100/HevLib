@@ -106,6 +106,7 @@ func _ready():
 	
 	replaceScene("scenes/equipment/Enceladus.tscn","res://enceladus/Enceladus.tscn")
 	
+	
 #	var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
 #	var crew = NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",25)
 #	if not crew == "":

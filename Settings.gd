@@ -16,6 +16,7 @@ var HevLib = {
 	},
 	"debug":{
 		"input_debugger":false,
+		"input_event_debugger":false,
 		"ring_position_data_debugger":false,
 		"ring_position_accurate_events":false,
 	},

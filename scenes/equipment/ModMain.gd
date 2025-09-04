@@ -26,6 +26,11 @@ var _savedObjects := []
 func _init(modLoader = ModLoader):
 	l("Initializing Equipment Driver")
 #	installScriptExtension("check.gd")
+	installScriptExtension("../scene_replacements/blanks/MPU.gd")
+	installScriptExtension("../scene_replacements/blanks/Hud.gd")
+	installScriptExtension("../scene_replacements/ship-ctrl.gd")
+	
+	
 	installScriptExtension("UpgradeGroup.gd")
 	installScriptExtension("hardpoints/EquipmentItemTemplate.gd")
 	

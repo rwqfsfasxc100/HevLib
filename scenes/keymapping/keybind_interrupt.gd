@@ -9,6 +9,7 @@ var current_key_inputs = []
 
 
 var inputDebug = false
+var inputEventDebug = false
 #
 #func _ready():
 #	if inputDebug:
@@ -21,9 +22,18 @@ var inputDebug = false
 #			for active in act:
 #				InputMap.action_erase_event(action, active)
 #
+var key_actions = []
+
+var action_dict = {}
 
 func _ready():
 	InputDebugPanel.visible = inputDebug
+	InputEventDebugPanel.visible = inputEventDebug
+	key_actions = InputMap.get_actions()
+	for action in key_actions:
+		action_dict.merge({action:false})
+	
+#	breakpoint
 #	var actions = InputMap.get_actions()
 #	var bActionDict = {}
 ##	breakpoint
@@ -46,13 +56,17 @@ func _ready():
 
 var currentKeyEvents = ""
 onready var InputDebugPanel = get_parent().get_node("_HevLib_Gamespace_Canvas/MarginContainer/DebugPanel/ScrollContainer/MarginContainer/VBoxContainer/InputDebug")
+onready var InputEventDebugPanel = get_parent().get_node("_HevLib_Gamespace_Canvas/MarginContainer/DebugPanel/ScrollContainer/MarginContainer/VBoxContainer/inputEventDebug")
 	
 func _process(delta):
 	inputDebug = Settings.HevLib["debug"]["input_debugger"]
+	inputEventDebug = Settings.HevLib["debug"]["input_event_debugger"]
 	var siblingCount = get_parent().get_child_count()
 	get_parent().move_child(self, siblingCount)
 	InputDebugPanel.text = str(currentKeyEvents)
 	InputDebugPanel.visible = inputDebug
+	InputEventDebugPanel.text = JSON.print(action_dict,"\t")
+	InputEventDebugPanel.visible = inputEventDebug
 		
 
 var pressed = false
@@ -80,8 +94,15 @@ var modifierControl = false
 var modifierMeta = false
 var modifierCommand = false
 func _input(event):
+	if inputEventDebug:
+		for evnt in action_dict:
+			if Input.is_action_just_pressed(evnt):
+				action_dict[evnt] = true
+			else:
+				action_dict[evnt] = false
+	
 	if inputDebug:
-		if Input.is_action_just_pressed("toggle_debug_menus"):
+		if Input.is_action_pressed("toggle_debug_menus"):
 			InputDebugPanel.visible = !InputDebugPanel.visible
 		if not event is InputEventAction:
 			var eventAction

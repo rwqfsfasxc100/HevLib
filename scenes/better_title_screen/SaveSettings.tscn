@@ -1,13 +1,13 @@
 [gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://HevLib/scenes/better_title_screen/SaveSettings.gd" type="Script" id=1]
+[ext_resource path="res://HevLib/scenes/better_title_screen/SaveSettings_Align.gd" type="Script" id=2]
 [ext_resource path="res://enceladus/ScrollWithAnalog.gd" type="Script" id=3]
 [ext_resource path="res://hud/TabHintContainer.tscn" type="PackedScene" id=4]
 [ext_resource path="res://menu/MenuTheme.tres" type="Theme" id=7]
 [ext_resource path="res://menu/PanelWithHugeShadow.tres" type="StyleBox" id=8]
 [ext_resource path="res://menu/TabsWithGamepadControl.gd" type="Script" id=10]
 [ext_resource path="res://menu/sfx/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=11]
-[ext_resource path="res://ModMenu/menu/buttons/descriptions/DescriptionAlign.gd" type="Script" id=12]
 
 [node name="SaveSettings" type="Popup"]
 margin_left = -400.0
@@ -40,7 +40,7 @@ margin_bottom = 716.0
 rect_min_size = Vector2( 716, 600 )
 size_flags_horizontal = 3
 size_flags_vertical = 3
-script = ExtResource( 12 )
+script = ExtResource( 2 )
 
 [node name="TabHintContainer" parent="NoMargins/CenterContainer" instance=ExtResource( 4 )]
 anchor_right = 0.0
