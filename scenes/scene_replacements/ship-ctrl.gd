@@ -20,3 +20,7 @@ func _init():
 #func _process(delta):
 #	if !self.cutscene and self.isPlayerControlled():
 #		breakpoint
+
+func _input(event):
+	if !self.cutscene and self.isPlayerControlled():
+		breakpoint
