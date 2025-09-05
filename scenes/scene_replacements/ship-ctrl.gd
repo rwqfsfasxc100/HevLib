@@ -3,7 +3,7 @@ extends "res://ships/ship-ctrl.gd"
 var MPUs = []
 var HUDs = []
 
-func _init():
+func _ready():
 	var mname = self.shipName
 	if !self.cutscene and self.isPlayerControlled():
 		var children = get_children()

@@ -87,10 +87,10 @@ func checkSave():
 	display_text = text
 
 func newSave():
-	Debug.l("new %s pressed" % saveSlotFile)
+	Debug.l("delete %s pressed" % saveSlotFile)
 	CurrentGame.saveFile = saveSlotFile
-#	emit_signal("newGame")
-	get_node("../../../../../NoMargins/NewGamePlus").popup_centered()
+	emit_signal("newGame")
+	
 
 func _pressed():
 	if meta:
@@ -98,7 +98,9 @@ func _pressed():
 		CurrentGame.saveFile = saveSlotFile
 		emit_signal("continueGame")
 	else:
-		newSave()
+		Debug.l("new %s pressed" % saveSlotFile)
+		CurrentGame.saveFile = saveSlotFile
+		get_node("../../../../../NoMargins/NewGamePlus").popup_centered()
 
 func _unhandled_input(event):
 	if first:
