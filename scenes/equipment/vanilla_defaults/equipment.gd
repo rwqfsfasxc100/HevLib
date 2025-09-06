@@ -571,6 +571,16 @@ const RCS_K69V = {
 	"slot_type":"STANDARD_REACTION_CONTROL_THRUSTERS",
 	"equipment_type":"THRUSTER_STANDARD_REACTION_CONTROL_THRUSTERS"
 }
+const RCS_MADTX4 = {
+	"system":"SYSTEM_THRUSTER_MADTX4",
+	"manual":"SYSTEM_THRUSTER_MANUAL",
+	"price":31250,
+	"test_protocol":"autopilot",
+	"warn_if_thermal_below":22,
+	"warn_if_electric_below":110,
+	"slot_type":"STANDARD_REACTION_CONTROL_THRUSTERS",
+	"equipment_type":"THRUSTER_STANDARD_REACTION_CONTROL_THRUSTERS"
+}
 const TORCH_PNTR = {
 	"system":"SYSTEM_MAIN_ENGINE_PNTR",
 	"manual":"SYSTEM_MAIN_ENGINE_MANUAL",
