@@ -8,7 +8,7 @@ var password = "FTWOMG"
 
 onready var ship_models = Shipyard.ships.keys()
 
-onready var foolish = $Foolish
+var foolish
 
 var val = 0.0
 
@@ -23,6 +23,32 @@ var display_text = ""
 var index = 0
 
 func _ready():
+	var foolish = load("res://menu/Foolish.tscn").instance()
+	foolish.name = "Foolish"
+	add_child(foolish)
+	var box = HBoxContainer.new()
+	box.alignment = BoxContainer.ALIGN_CENTER
+	box.rect_size = Vector2(64,41)
+	box.name = "HBoxContainer"
+	var texture = TextureRect.new()
+	var stream = StreamTexture.new()
+	stream.load_path = "res://HevLib/ui/themes/icons/config_icon.stex"
+	stream.flags = 4
+	texture.texture = stream
+	texture.expand = true
+	texture.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	texture.margin_right = 64.0
+	texture.margin_bottom = 41.0
+	texture.size_flags_horizontal = 3
+	texture.name = "TextureRect"
+	box.add_child(texture)
+	var delete = get_node(accompanyingDelete)
+	delete.icon = null
+	delete.rect_min_size = Vector2(64,41)
+	delete.add_child(box)
+	
+	foolish = $Foolish
+	
 	connect("newGame",CurrentGame,"newGame")
 	foolish.visible = false
 	disabled = false
@@ -37,54 +63,63 @@ func _physics_process(delta):
 		checkSave()
 #		breakpoint
 
+var standHash = 0
 
+var file = File.new()
 func checkSave():
 #	var mpm = getDataFromSave(saveSlotFile)
-	var new_meta = getMetaFromSave(saveSlotFile)
-	if new_meta:
-		var change = false
-		if meta:
-			if new_meta.hash() != meta.hash():
-				meta = new_meta
-				change = true
-		else:
-			meta = new_meta
-			change = true
-		if change:
-			var demoLimit = CurrentGame.getGameStartTime() + 24 * 3600 * 30 * 256
-			text = "%s %s" % [meta.transponder, meta.name]
-			if first_time:
-				if CurrentGame.oldestSave < meta.time:
-					CurrentGame.oldestSave = meta.time
-					if is_visible_in_tree():
-						grab_focus()
-			if false and (CurrentGame.isDemo() and meta.gameTime > demoLimit):
-				disabled = true
-				slot_available = false
-				delete_color = Color(1, 1, 1, 0.25)
-				hint_tooltip = "DEMO_UNLOCK"
-				newNode.hint_tooltip = "DEMO_UNLOCK"
-			else:
-				slot_available = true
-				delete_color = Color(1, 1, 1, 1)
-			var model_error = TranslationServer.translate("HEVLIB_INCORRECT_SHIP")
-			if meta.model in ship_models:
-				foolish.visible = false
-				hint_tooltip = ""
-	#			foolish.hint_tooltip = ""
-				disabled = false
-			else:
-				foolish.visible = true
-				hint_tooltip = model_error % meta.model
-	#			foolish.hint_tooltip = model_error % meta.model
-				disabled = true
+	var does = false
+	var has_save = true
+	var check = file.file_exists(saveSlotFile)
+	if check:
+		file.open_encrypted_with_pass(saveSlotFile,File.READ,password)
+		var _hash = file.get_as_text(true).hash()
+		file.close()
+		if _hash != standHash:
+			does = true
+			standHash = _hash
 	else:
-		slot_available = false
-		delete_color = Color(1, 1, 1, 0.25)
-		text = newText
-		if first_time and first:
-			grab_focus()
-	display_text = text
+		standHash = 0
+		has_save = false
+	if does:
+		if has_save:
+			meta = getMetaFromSave(saveSlotFile)
+			
+			if true:
+				var demoLimit = CurrentGame.getGameStartTime() + 24 * 3600 * 30 * 256
+				text = "%s %s" % [meta.transponder, meta.name]
+				if first_time:
+					if CurrentGame.oldestSave < meta.time:
+						CurrentGame.oldestSave = meta.time
+						if is_visible_in_tree():
+							grab_focus()
+				if false and (CurrentGame.isDemo() and meta.gameTime > demoLimit):
+					disabled = true
+					slot_available = false
+					delete_color = Color(1, 1, 1, 0.25)
+					hint_tooltip = "DEMO_UNLOCK"
+					newNode.hint_tooltip = "DEMO_UNLOCK"
+				else:
+					slot_available = true
+					delete_color = Color(1, 1, 1, 1)
+				var model_error = TranslationServer.translate("HEVLIB_INCORRECT_SHIP")
+				if meta.model in ship_models:
+					$Foolish.visible = false
+					hint_tooltip = ""
+		#			foolish.hint_tooltip = ""
+					disabled = false
+				else:
+					$Foolish.visible = true
+					hint_tooltip = model_error % meta.model
+		#			foolish.hint_tooltip = model_error % meta.model
+					disabled = true
+		else:
+			slot_available = false
+			delete_color = Color(1, 1, 1, 0.25)
+			text = newText
+			if first_time and first:
+				grab_focus()
+		display_text = text
 
 func newSave():
 	Debug.l("delete %s pressed" % saveSlotFile)

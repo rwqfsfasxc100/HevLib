@@ -1,12 +1,7 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://TitleScreen.tscn" type="PackedScene" id=1]
 [ext_resource path="res://HevLib/scenes/better_title_screen/SaveSettings.tscn" type="PackedScene" id=2]
-[ext_resource path="res://menu/Foolish.tscn" type="PackedScene" id=3]
-
-[sub_resource type="StreamTexture" id=1]
-flags = 4
-load_path = "res://HevLib/ui/themes/icons/config_icon.stex"
 
 [node name="TitleScreen" instance=ExtResource( 1 )]
 
@@ -27,147 +22,28 @@ margin_bottom = 660.0
 rect_min_size = Vector2( 64, 41 )
 icon = null
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewA" index="0"]
-margin_right = 64.0
-margin_bottom = 41.0
-alignment = 1
-
-[node name="TextureRect" type="TextureRect" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewA/HBoxContainer" index="0"]
-margin_right = 64.0
-margin_bottom = 41.0
-size_flags_horizontal = 3
-texture = SubResource( 1 )
-expand = true
-stretch_mode = 6
-
-[node name="Foolish" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/SlotA" index="0" instance=ExtResource( 3 )]
-hint_tooltip = ""
-mouse_filter = 2
-
 [node name="NewB" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="2"]
 rect_min_size = Vector2( 64, 41 )
 icon = null
-
-[node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewB" index="0"]
-margin_right = 64.0
-margin_bottom = 41.0
-alignment = 1
-
-[node name="TextureRect" type="TextureRect" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewB/HBoxContainer" index="0"]
-margin_right = 64.0
-margin_bottom = 41.0
-size_flags_horizontal = 3
-texture = SubResource( 1 )
-expand = true
-stretch_mode = 6
-
-[node name="Foolish" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/SlotB" index="0" instance=ExtResource( 3 )]
-hint_tooltip = ""
-mouse_filter = 2
 
 [node name="NewC" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="4"]
 rect_min_size = Vector2( 64, 41 )
 icon = null
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewC" index="0"]
-margin_right = 64.0
-margin_bottom = 41.0
-alignment = 1
-
-[node name="TextureRect" type="TextureRect" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewC/HBoxContainer" index="0"]
-margin_right = 64.0
-margin_bottom = 41.0
-size_flags_horizontal = 3
-texture = SubResource( 1 )
-expand = true
-stretch_mode = 6
-
-[node name="Foolish" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/SlotC" index="0" instance=ExtResource( 3 )]
-hint_tooltip = ""
-mouse_filter = 2
-
 [node name="NewD" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="6"]
 rect_min_size = Vector2( 64, 41 )
 icon = null
-
-[node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewD" index="0"]
-margin_right = 64.0
-margin_bottom = 41.0
-alignment = 1
-
-[node name="TextureRect" type="TextureRect" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewD/HBoxContainer" index="0"]
-margin_right = 64.0
-margin_bottom = 41.0
-size_flags_horizontal = 3
-texture = SubResource( 1 )
-expand = true
-stretch_mode = 6
-
-[node name="Foolish" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/SlotD" index="0" instance=ExtResource( 3 )]
-hint_tooltip = ""
-mouse_filter = 2
 
 [node name="NewE" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="8"]
 rect_min_size = Vector2( 64, 41 )
 icon = null
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewE" index="0"]
-margin_right = 64.0
-margin_bottom = 41.0
-alignment = 1
-
-[node name="TextureRect" type="TextureRect" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewE/HBoxContainer" index="0"]
-margin_right = 64.0
-margin_bottom = 41.0
-size_flags_horizontal = 3
-texture = SubResource( 1 )
-expand = true
-stretch_mode = 6
-
-[node name="Foolish" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/SlotE" index="0" instance=ExtResource( 3 )]
-hint_tooltip = ""
-mouse_filter = 2
-
 [node name="NewF" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="10"]
 rect_min_size = Vector2( 64, 41 )
 icon = null
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewF" index="0"]
-margin_right = 64.0
-margin_bottom = 41.0
-alignment = 1
-
-[node name="TextureRect" type="TextureRect" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewF/HBoxContainer" index="0"]
-margin_right = 64.0
-margin_bottom = 41.0
-size_flags_horizontal = 3
-texture = SubResource( 1 )
-expand = true
-stretch_mode = 6
-
-[node name="Foolish" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/SlotF" index="0" instance=ExtResource( 3 )]
-hint_tooltip = ""
-mouse_filter = 2
-
 [node name="NewG" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="12"]
 rect_min_size = Vector2( 64, 41 )
 icon = null
-
-[node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewG" index="0"]
-margin_right = 64.0
-margin_bottom = 41.0
-alignment = 1
-
-[node name="TextureRect" type="TextureRect" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/NewG/HBoxContainer" index="0"]
-margin_right = 64.0
-margin_bottom = 41.0
-size_flags_horizontal = 3
-texture = SubResource( 1 )
-expand = true
-stretch_mode = 6
-
-[node name="Foolish" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves/SlotG" index="0" instance=ExtResource( 3 )]
-hint_tooltip = ""
-mouse_filter = 2
 
 [editable path="AsteroidField"]
