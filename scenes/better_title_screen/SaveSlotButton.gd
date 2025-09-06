@@ -65,13 +65,16 @@ func _physics_process(delta):
 
 var standHash = 0
 
+var has_save = false
+
 var file = File.new()
 func checkSave():
 #	var mpm = getDataFromSave(saveSlotFile)
 	var does = false
-	var has_save = true
+	
 	var check = file.file_exists(saveSlotFile)
 	if check:
+		has_save = true
 		file.open_encrypted_with_pass(saveSlotFile,File.READ,password)
 		var _hash = file.get_as_text(true).hash()
 		file.close()
@@ -120,6 +123,12 @@ func checkSave():
 			if first_time and first:
 				grab_focus()
 		display_text = text
+	if not has_save:
+		slot_available = false
+		delete_color = Color(1, 1, 1, 0.25)
+		text = newText
+		if first_time and first:
+			grab_focus()
 
 func newSave():
 	Debug.l("delete %s pressed" % saveSlotFile)
