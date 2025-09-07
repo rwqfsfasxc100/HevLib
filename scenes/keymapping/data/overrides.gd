@@ -14,6 +14,6 @@ const actions_ignore = [
 	"ui_page_down",
 	"ui_home",
 	"ui_end",
-	"zoom_in",
-	"zoom_out",
+#	"zoom_in",
+#	"zoom_out",
 ]
