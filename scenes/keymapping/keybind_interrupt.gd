@@ -5,183 +5,257 @@ var actionDict = {}
 var actionTypes = []
 
 var current_key_inputs = []
+var current_key_data = {}
 
+var is_active_window = true
 
+var single_input_actions = {}
 
-var inputDebug = false
-var inputEventDebug = false
-#
-#func _ready():
-#	if inputDebug:
-#		var actions = InputMap.get_actions()
-#		var bActionDict = {}
-#		breakpoint
-#		for action in actions:
-#			var act = InputMap.get_action_list(action)
-#			actionDict.merge({action:act})
-#			for active in act:
-#				InputMap.action_erase_event(action, active)
-#
-var key_actions = []
+var deadzones = {}
 
-var action_dict = {}
+var overrides = load("res://HevLib/scenes/keymapping/data/overrides.gd").get_script_constant_map()
 
 func _ready():
-	InputDebugPanel.visible = inputDebug
-	InputEventDebugPanel.visible = inputEventDebug
-	key_actions = InputMap.get_actions()
-	for action in key_actions:
-		action_dict.merge({action:false})
-	
-#	breakpoint
-#	var actions = InputMap.get_actions()
-#	var bActionDict = {}
-##	breakpoint
-#	for action in actions:
-#		var act = InputMap.get_action_list(action)
-#		actionDict.merge({action:act})
-#		for active in act:
-#			var ck = match_event_type(active)
-#			for item in ck:
-#				match item:
-#					"InputEvent","InputEventWithModifiers":
-#						pass
-#					_:
-#						if item in actionTypes:
-#							pass
-#						else:
-#							actionTypes.append(item)
-#			InputMap.action_erase_event(action, active)
-#	breakpoint
-
-var currentKeyEvents = ""
-onready var InputDebugPanel = get_parent().get_node("_HevLib_Gamespace_Canvas/MarginContainer/DebugPanel/ScrollContainer/MarginContainer/VBoxContainer/InputDebug")
-onready var InputEventDebugPanel = get_parent().get_node("_HevLib_Gamespace_Canvas/MarginContainer/DebugPanel/ScrollContainer/MarginContainer/VBoxContainer/inputEventDebug")
-	
-func _process(delta):
-	inputDebug = Settings.HevLib["debug"]["input_debugger"]
-	inputEventDebug = Settings.HevLib["debug"]["input_event_debugger"]
-	var siblingCount = get_parent().get_child_count()
-	get_parent().move_child(self, siblingCount)
-	InputDebugPanel.text = str(currentKeyEvents)
-	InputDebugPanel.visible = inputDebug
-	InputEventDebugPanel.text = JSON.print(action_dict,"\t")
-	InputEventDebugPanel.visible = inputEventDebug
-		
-
-var pressed = false
-var eventDevice = 0
-var joyButtonIndex = 0
-var joyButtonPressure = 0
-var joyAxis = 0
-var joyAxisValue = 0
-var key = ""
-var mouseButtonMask = 0
-var mousePosition = Vector2(0,0)
-var mouseGlobalPosition = Vector2(0,0)
-var mouseTilt = Vector2(0,0)
-var mousePressure = 0
-var mousePenInverted = false
-var mouseRelative = Vector2(0,0)
-var mouseSpeed = Vector2(0,0)
-var mouseFactor = 0
-var mouseButtonIndex = 0
-var mouseCanceled = false
-var mouseDoubleClick = false
-var modifierAlt = false
-var modifierShift = false
-var modifierControl = false
-var modifierMeta = false
-var modifierCommand = false
-func _input(event):
-	if inputEventDebug:
-		for evnt in action_dict:
-			if Input.is_action_just_pressed(evnt):
-				action_dict[evnt] = true
-			else:
-				action_dict[evnt] = false
-	
-	if inputDebug:
-		if Input.is_action_pressed("toggle_debug_menus"):
-			InputDebugPanel.visible = !InputDebugPanel.visible
-		if not event is InputEventAction:
-			var eventAction
-			for item in actionDict:
-				var does = Input.is_action_pressed(item)
-				if does:
-					eventAction = item
-			var eventTypes = match_event_type(event)
-			for eventType in eventTypes:
-				if eventType == "InputEvent":
-					eventDevice = event.device
-				if eventType == "InputEventAction":
-					pass
-				if eventType == "InputEventGesture":
-					pass
-				if eventType == "InputEventJoypadButton":
-					joyButtonIndex = event.button_index
-					joyButtonPressure = event.pressure
-				if eventType == "InputEventJoypadMotion":
-					joyAxis = event.axis
-					joyAxisValue = event.axis_value
-				if eventType == "InputEventKey":
+	self.pause_mode = Node.PAUSE_MODE_PROCESS
+	var actions = InputMap.get_actions()
+	for action in actions:
+		if action in overrides.actions_ignore:
+			continue
+		var act = InputMap.get_action_list(action)
+		var deadzone = InputMap.action_get_deadzone(action)
+		deadzones.merge({action:deadzone})
+		for event in act:
+			if event is InputEventKey:
+					
+				var key = ""
+				var is_scancode = true
+				var is_physical = true
+				if event.scancode == 0:
+					is_scancode = false
+				if event.physical_scancode == 0:
+					is_physical = false
+				if is_scancode:
+					key = OS.get_scancode_string(event.scancode)
+				elif is_physical:
 					key = OS.get_scancode_string(event.physical_scancode)
-				if eventType == "InputEventMIDI":
+				if not key in single_input_actions.keys():
+					single_input_actions.merge({key:[]})
+				var current_binds = single_input_actions[key]
+				if action in current_binds:
 					pass
-				if eventType == "InputEventMagnifyGesture":
+				else:
+					single_input_actions[key].append(action)
+			if event is InputEventJoypadMotion:
+				var key = "JoyAxis" + str(event.axis)
+				if not key in single_input_actions.keys():
+					single_input_actions.merge({key:[]})
+				var current_binds = single_input_actions[key]
+				if action in current_binds:
 					pass
-				if eventType == "InputEventMouse":
-					mouseButtonMask = event.button_mask
-					mousePosition = event.position
-					mouseGlobalPosition = event.global_position
-				if eventType == "InputEventMouseButton":
-					mouseFactor = event.factor
-					mouseButtonIndex = event.button_index
-					mouseCanceled = event.canceled
-					mouseDoubleClick = event.doubleclick
-				if eventType == "InputEventMouseMotion":
-					mouseTilt = event.tilt
-					mousePressure = event.pressure
-					mousePenInverted = event.pen_inverted
-					mouseRelative = event.relative
-					mouseSpeed = event.speed
-				if eventType == "InputEventPanGesture":
+				else:
+					single_input_actions[key].append(action)
+				
+			if event is InputEventJoypadButton:
+				var key = "JoyButton" + str(event.button_index)
+				if not key in single_input_actions.keys():
+					single_input_actions.merge({key:[]})
+				var current_binds = single_input_actions[key]
+				if action in current_binds:
 					pass
-				if eventType == "InputEventScreenDrag":
+				else:
+					single_input_actions[key].append(action)
+				
+			if event is InputEventMouseButton:
+				var key = "Mouse" + str(event.button_index)
+				if not key in single_input_actions.keys():
+					single_input_actions.merge({key:[]})
+				var current_binds = single_input_actions[key]
+				if action in current_binds:
 					pass
-				if eventType == "InputEventScreenTouch":
-					pass
-				if eventType == "InputEventWithModifiers":
-					modifierAlt = event.alt
-					modifierShift = event.shift
-					modifierControl = event.control
-					modifierMeta = event.meta
-					modifierCommand = event.command
-			currentKeyEvents = "Device: " + str(eventDevice) + "\nJoyCon Buttons: [ButtonIndex: " + str(joyButtonIndex) + ", Pressure: " + str(joyButtonPressure) + "],\n\tJoypadMotion: [Axis: " + str(joyAxis) + ", AxisValue: " + str(joyAxisValue) + "]\nKey: " + str(key) + "\nMouse Generic: [ButtonMask: " + str(mouseButtonMask) + ", Position: " + str(mousePosition) + ", GlobalPosition: " + str(mouseGlobalPosition) + "],\n\tMouseButtons: [Factor: " + str(mouseFactor) + ", ButtonIndex: " + str(mouseButtonIndex) + ", Canceled: " + str(mouseCanceled) + ", DoubleClick: " + str(mouseDoubleClick) + "],\n\tMouseMotion: [Tilt: " + str(mouseTilt) + ", Pressure: " + str(mousePressure) + ", PenInverted: " + str(mousePenInverted) + ", Relative: " + str(mouseRelative) + ", Speed: " + str(mouseSpeed) + "]\nModifiers: [Alt: " + str(modifierAlt) + ", Shift: " + str(modifierShift) + ", Control: " + str(modifierControl) + ", Meta: " + str(modifierMeta) + ", Command: " + str(modifierCommand) + "]"
-			
-			
-#
-##			breakpoint
-#			for evnt in actionDict:
-#				var events = actionDict.get(evnt)
-#				for it in events:
-#					var type = match_event_type(it)
-#					var does = false
-#					for item in type:
-#						if item in actionTypes:
-#							does = true
-#							break
-#					if does:
-#						var action = InputEventAction.new()
-#						action.action = evnt
-#						action.pressed = true
-#						Input.parse_input_event(action)
-#						if event is InputEventAction:
-#							breakpoint
-#						else:
-#
-#							get_viewport().set_input_as_handled()
+				else:
+					single_input_actions[key].append(action)
+				
 		
+#		breakpoint
+		actionDict.merge({action:act})
+		for active in act:
+			var ck = match_event_type(active)
+			for item in ck:
+				match item:
+					"InputEvent","InputEventWithModifiers":
+						pass
+					_:
+						if item in actionTypes:
+							pass
+						else:
+							actionTypes.append(item)
+			InputMap.action_erase_event(action, active)
+#	breakpoint
+
+func _physics_process(delta):
+	is_active_window = OS.is_window_focused()
+	if not is_active_window:
+		for item in current_key_data:
+			current_key_data[item]["pressed"] = false
+		current_key_inputs = []
+
+func _input(event):
+	if InputEventAction in event:
+		pass
+	else:
+		var is_key = false
+		var is_joy_motion = false
+		var is_joy_button = false
+		var is_mouse_button = false
+	#	var is_mouse_motion = false
+	#	var is_mouse = false
+		var index = 0
+		
+		if event is InputEventKey:
+			is_key = true
+			index += 1
+		if event is InputEventJoypadMotion:
+			is_joy_motion = true
+			index += 1
+		if event is InputEventJoypadButton:
+			is_joy_button = true
+			index += 1
+		if event is InputEventMouseButton:
+			is_mouse_button = true
+			index += 1
+	#	if event is InputEventMouse:
+	#		is_mouse = true
+	#		index += 1
+	#	if event is InputEventMouseMotion:
+	#		is_mouse_motion = true
+		if index >= 1:
+			if is_key:
+				var key = ""
+				var is_scancode = true
+				var is_physical = true
+				if event.scancode == 0:
+					is_scancode = false
+				if event.physical_scancode == 0:
+					is_physical = false
+				if is_scancode:
+					key = OS.get_scancode_string(event.scancode)
+				elif is_physical:
+					key = OS.get_scancode_string(event.physical_scancode)
+				if not key in current_key_data.keys():
+					current_key_data.merge({key:{}})
+				var pressed = event.pressed
+				if pressed:
+					if key in current_key_inputs:
+						pass
+					else:
+						current_key_inputs.append(key)
+				else:
+					if key in current_key_inputs:
+						var new_array = []
+						for item in current_key_inputs:
+							if item == key:
+								pass
+							else:
+								new_array.append(item)
+						current_key_inputs = new_array
+				var echo = event.echo
+				if key != "":
+					current_key_data[key]["pressed"] = pressed
+					current_key_data[key]["echo"] = echo
+					current_key_data[key]["type"] = "InputEventKey"
+			if is_mouse_button:
+				var mouseString = "Mouse" + str(event.button_index)
+				if not mouseString in current_key_data.keys():
+					current_key_data.merge({mouseString:{}})
+				var pressed = event.pressed
+				if pressed:
+					if mouseString in current_key_inputs:
+						pass
+					else:
+						current_key_inputs.append(mouseString)
+				else:
+					if mouseString in current_key_inputs:
+						var new_array = []
+						for item in current_key_inputs:
+							if item == mouseString:
+								pass
+							else:
+								new_array.append(item)
+						current_key_inputs = new_array
+				var doubleclick = event.doubleclick
+				current_key_data[mouseString]["pressed"] = pressed
+				current_key_data[mouseString]["doubleclick"] = doubleclick
+				current_key_data[mouseString]["type"] = "InputEventMouseButton"
+			if is_joy_button:
+				var joyButtonString = "JoyButton" + str(event.button_index)
+				if not joyButtonString in current_key_data.keys():
+					current_key_data.merge({joyButtonString:{}})
+				var pressed = event.pressed
+				if pressed:
+					if joyButtonString in current_key_inputs:
+						pass
+					else:
+						current_key_inputs.append(joyButtonString)
+				else:
+					if joyButtonString in current_key_inputs:
+						var new_array = []
+						for item in current_key_inputs:
+							if item == joyButtonString:
+								pass
+							else:
+								new_array.append(item)
+						current_key_inputs = new_array
+				current_key_data[joyButtonString]["pressed"] = pressed
+				current_key_data[joyButtonString]["type"] = "InputEventJoypadButton"
+			if is_joy_motion:
+				var joyAxisString = "JoyAxis" + str(event.axis)
+				if not joyAxisString in current_key_data.keys():
+					current_key_data.merge({joyAxisString:{}})
+				var axis = event.axis
+				var axis_value = event.axis_value
+				
+				if abs(axis_value) >= 0.1:
+					if joyAxisString in current_key_inputs:
+						pass
+					else:
+						current_key_inputs.append(joyAxisString)
+				else:
+					if joyAxisString in current_key_inputs:
+						var new_array = []
+						for item in current_key_inputs:
+							if item == joyAxisString:
+								pass
+							else:
+								new_array.append(item)
+						current_key_inputs = new_array
+				
+				current_key_data[joyAxisString]["axis"] = axis
+				current_key_data[joyAxisString]["axis_value"] = axis_value
+				current_key_data[joyAxisString]["type"] = "InputEventJoypadMotion"
+				
+	#		breakpoint
+			for key in single_input_actions:
+				var actions = single_input_actions[key]
+				if key in current_key_data:
+					for action in actions:
+						var act = InputEventAction.new()
+						var data = current_key_data[key]
+						var pressed = false
+						if data["type"] == "InputEventJoypadMotion":
+							var deadzone = deadzones[action]
+							if data["axis_value"] >= deadzone:
+								pressed = true
+						else:
+							pressed = current_key_data[key]["pressed"]
+						act.pressed = pressed
+						act.action = action
+						Input.parse_input_event(act)
+		
+		
+		
+	
+	
+
 
 func match_event_type(event):
 	var eventType = []
@@ -219,6 +293,3 @@ func match_event_type(event):
 		return false
 	else:
 		return eventType
-	
-	
-	
