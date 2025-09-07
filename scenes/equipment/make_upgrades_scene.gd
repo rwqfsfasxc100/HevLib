@@ -361,31 +361,32 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 			var data = files.get("ADD_EQUIPMENT_ITEMS")
 			var for_ws = [{"WEAPONSLOT_ADD":[]}]
 			for object in data:
-				if "weapon_slot" in object.keys():
-					var obj = object.get("weapon_slot").duplicate(true)
-					var wname = object.get("system","")
-					var wprice = object.get("price",0)
-					var objdata = obj.get("data",[])
-					var has_price = false
-					var has_invis = false
-					var price_string = str(wprice)
-					if "name" in obj.keys():
-						pass
-					else:
-						object["weapon_slot"].merge({"name":wname})
-					for d in objdata:
-						if d.get("property","") == "repairReplacementPrice":
-							d["value"] = price_string
-							has_price = true
-						if d.get("property","") == "visible":
-							has_invis = true
-					if not has_price:
-						objdata.append({"property":"repairReplacementPrice","value":price_string})
-					if not has_invis:
-						objdata.append({"property":"visible","value":"false"})
-					object["weapon_slot"]["data"] = objdata.duplicate(true)
-					var eq_for_ws = object["weapon_slot"].duplicate(true)
-					for_ws[0]["WEAPONSLOT_ADD"].append(eq_for_ws)
+				if object.get("slot_type","HARDPOINT") == "HARDPOINT":
+					if "weapon_slot" in object.keys():
+						var obj = object.get("weapon_slot").duplicate(true)
+						var wname = object.get("system","")
+						var wprice = object.get("price",0)
+						var objdata = obj.get("data",[])
+						var has_price = false
+						var has_invis = false
+						var price_string = str(wprice)
+						if "name" in obj.keys():
+							pass
+						else:
+							object["weapon_slot"].merge({"name":wname})
+						for d in objdata:
+							if d.get("property","") == "repairReplacementPrice":
+								d["value"] = price_string
+								has_price = true
+							if d.get("property","") == "visible":
+								has_invis = true
+						if not has_price:
+							objdata.append({"property":"repairReplacementPrice","value":price_string})
+						if not has_invis:
+							objdata.append({"property":"visible","value":"false"})
+						object["weapon_slot"]["data"] = objdata.duplicate(true)
+						var eq_for_ws = object["weapon_slot"].duplicate(true)
+						for_ws[0]["WEAPONSLOT_ADD"].append(eq_for_ws)
 			ws_state.append(for_ws)
 	
 	var all_slot_node_names = []
