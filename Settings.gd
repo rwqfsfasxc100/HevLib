@@ -14,6 +14,9 @@ var HevLib = {
 		"disabled_events":[  ],
 		"write_events":true,
 	},
+	"drivers":{
+		"use_input_virtualization":true
+	},
 	"debug":{
 		"input_debugger":false,
 		"input_event_debugger":false,

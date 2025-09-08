@@ -17,7 +17,9 @@ var overrides = load("res://HevLib/scenes/keymapping/data/overrides.gd").get_scr
 
 var INPUT_DRIVER_ACTIVE = false
 
+
 func _ready():
+	INPUT_DRIVER_ACTIVE = Settings.HevLib["drivers"]["use_input_virtualization"]
 	if INPUT_DRIVER_ACTIVE:
 		self.pause_mode = Node.PAUSE_MODE_PROCESS
 		var actions = InputMap.get_actions()
@@ -105,6 +107,7 @@ func _physics_process(delta):
 
 func _input(event):
 	if INPUT_DRIVER_ACTIVE:
+		
 		var c = true
 		var l = event.get_script()
 		if l != null:
@@ -115,6 +118,7 @@ func _input(event):
 					c = false
 		
 		if c:
+			
 			var is_key = false
 			var is_joy_motion = false
 			var is_joy_button = false
@@ -124,15 +128,19 @@ func _input(event):
 			var index = 0
 			
 			if event is InputEventKey:
+				get_viewport().set_input_as_handled()
 				is_key = true
 				index += 1
 			if event is InputEventJoypadMotion:
+				get_viewport().set_input_as_handled()
 				is_joy_motion = true
 				index += 1
 			if event is InputEventJoypadButton:
+				get_viewport().set_input_as_handled()
 				is_joy_button = true
 				index += 1
 			if event is InputEventMouseButton:
+				get_viewport().set_input_as_handled()
 				is_mouse_button = true
 				index += 1
 		#	if event is InputEventMouse:
@@ -180,6 +188,7 @@ func _input(event):
 					var mouseString = "Mouse" + str(event.button_index)
 					if not mouseString in current_key_data.keys():
 						current_key_data.merge({mouseString:{}})
+					var echo = current_key_data[mouseString].get("pressed",false)
 					var pressed = event.pressed
 					if pressed:
 						if mouseString in current_key_inputs:
@@ -198,6 +207,8 @@ func _input(event):
 					var factor = event.factor
 					var canceled = event.canceled
 					var doubleclick = event.doubleclick
+					
+					current_key_data[mouseString]["echo"] = echo
 					current_key_data[mouseString]["button_index"] = event.button_index
 					current_key_data[mouseString]["factor"] = factor
 					current_key_data[mouseString]["canceled"] = canceled
@@ -208,6 +219,7 @@ func _input(event):
 					var joyButtonString = "JoyButton" + str(event.button_index)
 					if not joyButtonString in current_key_data.keys():
 						current_key_data.merge({joyButtonString:{}})
+					var echo = current_key_data[joyButtonString].get("pressed",false)
 					var pressed = event.pressed
 					if pressed:
 						if joyButtonString in current_key_inputs:
@@ -223,13 +235,15 @@ func _input(event):
 								else:
 									new_array.append(item)
 							current_key_inputs = new_array
+					current_key_data[joyButtonString]["echo"] = echo
 					current_key_data[joyButtonString]["pressed"] = pressed
 					current_key_data[joyButtonString]["button_index"] = event.button_index
 					current_key_data[joyButtonString]["type"] = "InputEventJoypadButton"
 				if is_joy_motion:
+					var joyAxisString = "JoyAxis" + str(event.axis)
+					var echo = current_key_data[joyAxisString].get("axis_value",0.0)
 					var axis_value = event.axis_value
 					var axis = event.axis
-					var joyAxisString = "JoyAxis" + str(event.axis)
 					if abs(axis_value) >= 0.1:
 						if not joyAxisString in current_key_data.keys():
 							current_key_data.merge({joyAxisString:{}})
@@ -248,50 +262,53 @@ func _input(event):
 									new_array.append(item)
 							current_key_inputs = new_array
 					if abs(axis_value) >= 0.1:
+						current_key_data[joyAxisString]["echo"] = echo
 						current_key_data[joyAxisString]["axis"] = axis
 						current_key_data[joyAxisString]["axis_value"] = axis_value
 						current_key_data[joyAxisString]["type"] = "InputEventJoypadMotion"
-					
+					else:
+						if current_key_data.has(joyAxisString):
+							current_key_data[joyAxisString]["axis_value"] = 0.0
 	#			breakpoint
 				
 				pass
 				
 				
-#				for key in single_input_actions:
-#					var actions = single_input_actions[key]
-#					if key in current_key_data:
-#						for action in actions:
-#							var data = current_key_data[key]
-#							var type = data["type"]
-#							match type:
-#								"InputEventKey":
-#									var act = InputEventKey.new()
-#									act.pressed = data["pressed"]
-#									act.scancode = data["scancode"]
-#									act.echo = data["echo"]
-#									act.set_script(load("res://HevLib/scenes/keymapping/data/inject.gd"))
-#									Input.parse_input_event(act)
-#								"InputEventMouseButton":
-#									var act = InputEventMouseButton.new()
-#									act.button_index = data["button_index"]
-#									act.factor = data["factor"]
-#									act.canceled = data["canceled"]
-#									act.pressed = data["pressed"]
-#									act.doubleclick = data["doubleclick"]
-#									act.set_script(load("res://HevLib/scenes/keymapping/data/inject.gd"))
-#									Input.parse_input_event(act)
-#								"InputEventJoypadMotion":
-#									var act = InputEventJoypadMotion.new()
-#									act.axis = data["axis"]
-#									act.axis_value = data["axis_value"]
-#									act.set_script(load("res://HevLib/scenes/keymapping/data/inject.gd"))
-#									Input.parse_input_event(act)
-#								"InputEventJoypadButton":
-#									var act = InputEventJoypadButton.new()
-#									act.pressed = data["pressed"]
-#									act.button_index = data["button_index"]
-#									act.set_script(load("res://HevLib/scenes/keymapping/data/inject.gd"))
-#									Input.parse_input_event(act)
+				for key in single_input_actions:
+					var actions = single_input_actions[key]
+					if key in current_key_data:
+						for action in actions:
+							var data = current_key_data[key]
+							var type = data["type"]
+							match type:
+								"InputEventKey":
+									var act = InputEventKey.new()
+									act.pressed = data["pressed"]
+									act.scancode = data["scancode"]
+									act.echo = data["echo"]
+									act.set_script(load("res://HevLib/scenes/keymapping/data/inject.gd"))
+									Input.parse_input_event(act)
+								"InputEventMouseButton":
+									var act = InputEventMouseButton.new()
+									act.button_index = data["button_index"]
+									act.factor = data["factor"]
+									act.canceled = data["canceled"]
+									act.pressed = data["pressed"]
+									act.doubleclick = data["doubleclick"]
+									act.set_script(load("res://HevLib/scenes/keymapping/data/inject.gd"))
+									Input.parse_input_event(act)
+								"InputEventJoypadMotion":
+									var act = InputEventJoypadMotion.new()
+									act.axis = data["axis"]
+									act.axis_value = data["axis_value"]
+									act.set_script(load("res://HevLib/scenes/keymapping/data/inject.gd"))
+									Input.parse_input_event(act)
+								"InputEventJoypadButton":
+									var act = InputEventJoypadButton.new()
+									act.pressed = data["pressed"]
+									act.button_index = data["button_index"]
+									act.set_script(load("res://HevLib/scenes/keymapping/data/inject.gd"))
+									Input.parse_input_event(act)
 			
 			
 			
