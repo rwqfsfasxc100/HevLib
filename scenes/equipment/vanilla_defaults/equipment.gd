@@ -671,6 +671,15 @@ const TORCH_ZAP = {
 	"slot_type":"STANDARD_MAIN_ENGINE",
 	"equipment_type":"THRUSTER_STANDARD_MAIN_ENGINE"
 }
+const TORCH_CHEVAL = {
+	"system":"SYSTEM_MAIN_ENGINE_CHEVAL",
+	"price":400000,
+	"test_protocol":"autopilot",
+	"warn_if_thermal_below":37.5,
+	"warn_if_electric_below":230,
+	"slot_type":"STANDARD_MAIN_ENGINE",
+	"equipment_type":"THRUSTER_STANDARD_MAIN_ENGINE"
+}
 const FISSION_RODS_4 = {
 	"num_val":4,
 	"system":"SYSTEM_RODS_4",
