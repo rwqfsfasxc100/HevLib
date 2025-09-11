@@ -124,13 +124,16 @@ func checkSave():
 			text = newText
 			if first_time and first:
 				grab_focus()
-		display_text = text
 	if not has_save:
 		slot_available = false
 		delete_color = Color(1, 1, 1, 0.25)
 		text = newText
 		if first_time and first:
 			grab_focus()
+
+	display_text = text
+	if display_text == "":
+		display_text = newText
 
 func newSave():
 	Debug.l("delete %s pressed" % saveSlotFile)
