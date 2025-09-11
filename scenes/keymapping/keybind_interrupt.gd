@@ -17,10 +17,12 @@ var overrides = load("res://HevLib/scenes/keymapping/data/overrides.gd").get_scr
 
 var INPUT_DRIVER_ACTIVE = false
 
+const ALLOW_KEYBIND_MODIFICATIONS = false
+
 
 func _ready():
 	INPUT_DRIVER_ACTIVE = Settings.HevLib["drivers"]["use_input_virtualization"]
-	if INPUT_DRIVER_ACTIVE:
+	if ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE:
 		self.pause_mode = Node.PAUSE_MODE_PROCESS
 		var actions = InputMap.get_actions()
 		for action in actions:
@@ -98,7 +100,7 @@ func _ready():
 	#	breakpoint
 
 func _physics_process(delta):
-	if INPUT_DRIVER_ACTIVE:
+	if ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE:
 		is_active_window = OS.is_window_focused()
 		if not is_active_window:
 			for item in current_key_data:
@@ -106,7 +108,7 @@ func _physics_process(delta):
 			current_key_inputs = []
 
 func _input(event):
-	if INPUT_DRIVER_ACTIVE:
+	if ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE:
 		
 		var c = true
 		var l = event.get_script()
