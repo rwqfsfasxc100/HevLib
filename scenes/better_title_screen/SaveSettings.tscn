@@ -147,6 +147,8 @@ margin_right = 606.0
 margin_bottom = 50.0
 text = "SETTINGS_CANCEL"
 
+[node name="Timer" type="Timer" parent="."]
+
 [connection signal="about_to_show" from="." to="." method="_about_to_show"]
 [connection signal="pressed" from="NoMargins/CenterContainer/TabHintContainer/TabsWithGamepadControl/HEVLIB_SAVE_OPTIONS/MarginContainer2/HBoxContainer/CANCEL" to="." method="cancel"]
 

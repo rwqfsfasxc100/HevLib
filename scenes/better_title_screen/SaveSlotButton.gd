@@ -4,6 +4,8 @@ onready var popup_path = get_parent().get_parent().get_parent().get_parent().get
 
 onready var menu_path = popup_path.get_node("Popups/SaveSettings")
 
+onready var delete_path = popup_path.get_node("Popups/Override")
+
 var password = "FTWOMG"
 
 onready var ship_models = Shipyard.ships.keys()
@@ -137,7 +139,8 @@ func newSave():
 	
 
 func _pressed():
-	if meta:
+	var exists = file.file_exists(saveSlotFile)
+	if exists:
 		Debug.l("pressed %s" % saveSlotFile)
 		CurrentGame.saveFile = saveSlotFile
 		emit_signal("continueGame")
