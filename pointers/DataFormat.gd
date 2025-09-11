@@ -31,3 +31,8 @@ static func __compare_with_byte_array(input_string: String, comparison_string: S
 	var f = load("res://HevLib/scripts/compare_with_byte_array.gd")
 	var s = f.compare_with_byte_array(input_string, comparison_string)
 	return s
+
+static func __rotate_point(point: Vector2, angle: float, degrees:bool = true) -> Vector2:
+	var f = load("res://HevLib/scripts/rotate_point.gd")
+	var s = f.rotate_point(point, angle, degrees)
+	return s
