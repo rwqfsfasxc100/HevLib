@@ -20,7 +20,19 @@ func _init():
 	slot_defaults = vanilla_data.slot_defaults.duplicate(true)
 	vanilla_equipment_defaults_for_reference = vanilla_data.vanilla_equipment_defaults_for_reference.duplicate(true)
 
+var version = [1,0,0]
 func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn", weaponslot_save_path : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot.tscn"):
+	var pls = File.new()
+	pls.open("res://VersionLabel.tscn",File.READ)
+	var ptxt = pls.get_as_text(true)
+	pls.close()
+	for line in ptxt.split("\n"):
+		if line.begins_with("text = "):
+			var data = line.split(" = ")[1].split(".")
+			version[0] = int(data[0])
+			version[1] = int(data[1])
+			version[2] = int(data[2])
+	
 	var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 	var UpgradeMenu : Node = load("res://enceladus/Upgrades.tscn").instance()
@@ -776,7 +788,23 @@ func confirm_equipment(equipment_node, slot_type, slot_alignment, slot_restricti
 	var e_equipment = equipment_node.get("equipment_type","")
 	var e_alignment = equipment_node.get("alignment","")
 	var e_restriction = equipment_node.get("restriction","")
-	
+	if equipment_node.get("system","") in vanilla_data.min_version:
+		var data = vanilla_data.min_version.get(equipment_node.system)
+		if data[0] < version[0]:
+			pass
+		elif data[0] == version[0]:
+			if data[1] < version[1]:
+				pass
+			elif data[1] == version[1]:
+				if data[2] <= version[2]:
+					pass
+				else:
+					return false
+			else:
+				return false
+		else:
+			return false
+		
 	if e_slot_type == slot_type:
 		var passes_slot_check = false
 		if e_equipment in slot_allowed_equipment:
