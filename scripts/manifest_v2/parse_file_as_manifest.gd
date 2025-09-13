@@ -45,7 +45,8 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 				"quality_of_life":false,
 				"uses_hevlib_research":false,
 				"visual":false,
-				"language":PoolStringArray(["en"])
+				"language":PoolStringArray(["en"]),
+				"user_interface":false
 			},
 			"links":{
 				"github":"",
@@ -143,6 +144,7 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 					dict_template["tags"]["visual"] = bool(manifest_data["tags"].get("visual",false))
 					dict_template["tags"]["fun"] = bool(manifest_data["tags"].get("fun",false))
 					dict_template["tags"]["language"] = PoolStringArray(manifest_data["tags"].get("language",["en"]))
+					dict_template["tags"]["user_interface"] = bool(manifest_data["tags"].get("user_interface",false))
 				
 				# links
 				if "links" in manifest_data.keys():
