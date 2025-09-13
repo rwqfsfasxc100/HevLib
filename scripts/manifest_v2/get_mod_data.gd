@@ -21,7 +21,8 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 				"overhaul":0,
 				"quality_of_life":0,
 				"uses_hevlib_research":0,
-				"visual":0
+				"visual":0,
+				"language":{"en":0}
 				}
 	for mod in mods:
 		var constants = mod.get_script().get_script_constant_map()
@@ -113,6 +114,14 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 				if visual:
 					stat_tags["visual"] += 1
 				
+				var language = manifest_data["tags"].get("language",["en"])
+				for lang in language:
+					if lang in stat_tags["language"].keys():
+						stat_tags["language"][lang] += 1
+					else:
+						stat_tags["language"].merge({lang:1})
+					
+					
 				
 			if file.to_lower().begins_with("icon") and file.to_lower().ends_with(".stex"):
 				has_icon_file = true
@@ -132,7 +141,7 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 		var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_a_library":mod_is_library,"keep_library_hidden":hide_library},"node":mod,"manifest":manifestEntry}}
 		mod_dictionary.merge(mod_entry)
 	var stat_count = {"total_mod_count":mods.size(),"mods_using_manifests":manifest_count,"mods":non_library_count,"libraries":library_count}
-	
+#	breakpoint
 	var statistics = {"counts":stat_count,"tags":stat_tags}
 	var returnValues = {"mods":mod_dictionary,"statistics":statistics}
 	if print_json:

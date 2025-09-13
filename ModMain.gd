@@ -37,20 +37,21 @@ func _ready():
 #	var mouse = load("res://HevLib/scenes/scene_replacements/MouseLayer.tscn").instance()
 	var CRoot = get_tree().get_root()
 #	CRoot.call_deferred("add_child",mouse)
+	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
 	replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
 	replaceScene("scenes/scene_replacements/Game.tscn", "res://Game.tscn")
 	var dir = Directory.new()
 	dir.make_dir_recursive("user://cache/.HevLib_Cache/")
 	var file = File.new()
 	file.open("user://cache/.HevLib_Cache/library_documentation.json", File.WRITE)
-	var HevLib = preload("res://HevLib/pointers/HevLib.gd")
+	var HevLib = load("res://HevLib/pointers/HevLib.gd")
 	var functionality = HevLib.__get_library_functionality(true)
 	file.store_string(functionality)
 	file.close()
 	file.open("user://cache/.HevLib_Cache/currently_installed_mods.json", File.WRITE)
-	file.store_string(str(load("res://HevLib/pointers/ManifestV2.gd").__get_mod_data(true,true)))
+	file.store_string(str(ManifestV2.__get_mod_data(true,true)))
 	file.close()
-	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 	var cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/"
 	replaceScene("scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
 #	var CRoot = get_tree().get_root()
@@ -104,14 +105,19 @@ func _ready():
 		CRoot.call_deferred("add_child",vNode)
 	var scene = load("res://HevLib/scenes/better_title_screen/TitleScreen.tscn")
 	
-	replaceScene("scenes/equipment/Enceladus.tscn","res://enceladus/Enceladus.tscn")
+#	replaceScene("scenes/equipment/Enceladus.tscn","res://enceladus/Enceladus.tscn")
 	
-	
-#	var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
-#	var crew = NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",25)
-#	if not crew == "":
-#		var scene := load(crew)
-#		scene.take_over_path("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
+	var ncrew = ManifestV2.__get_manifest_entry("tags","handle_extra_crew")
+	var count = 24
+	for mod in ncrew:
+		var data = ncrew[mod]
+		if data > count:
+			count = data
+	var NodeAccess = load("res://HevLib/pointers/NodeAccess.gd")
+	var crew = NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",count)
+	if not crew == "":
+		var escene := load(crew)
+		escene.take_over_path("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
 	
 	
 	l("Ready")

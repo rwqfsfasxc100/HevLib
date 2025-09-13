@@ -9,7 +9,7 @@ var developer_hint = {
 		" -> Defaults to an empty array ([])",
 		" -> Each entry must be the full res:// path to the file"
 	],
-	"__webtranslate_reset":[
+	"__webtranslate_reset_by_URL":[
 		"Clears the translation cache of a provided URL",
 		"Returns true if succeeded, false if it didn't"
 	],
@@ -21,6 +21,10 @@ var developer_hint = {
 		"Optional fallback array is a list of files that will be used for translations in the case that WebTranslate can't fetch data after 10 seconds",
 		" -> Defaults to an empty array ([])",
 		" -> Each entry must be the full res:// path to the file"
+	],
+	"__webtranslate_reset_by_file_check":[
+		"Similar function to __webtranslate_reset_by_URL, instead resets by the file_check string used in __webtranslate",
+		"file_check -> string used as the file check. If found in the cache, resets translations for it"
 	]
 }
 

@@ -133,6 +133,7 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 					dict_template["tags"]["adds_equipment"] = Array(manifest_data["tags"].get("adds_equipment",[]))
 					dict_template["tags"]["quality_of_life"] = bool(manifest_data["tags"].get("quality_of_life",false))
 					dict_template["tags"]["is_library_mod"] = bool(manifest_data["tags"].get("is_library_mod",false))
+					dict_template["tags"]["library_hidden_by_default"] = bool(manifest_data["tags"].get("library_hidden_by_default",true))
 					dict_template["tags"]["adds_gameplay_mechanics"] = Array(manifest_data["tags"].get("adds_gameplay_mechanics",[]))
 					dict_template["tags"]["uses_hevlib_research"] = bool(manifest_data["tags"].get("uses_hevlib_research",false))
 					dict_template["tags"]["overhaul"] = bool(manifest_data["tags"].get("overhaul",false))

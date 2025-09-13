@@ -130,6 +130,7 @@ func checkSave():
 		text = newText
 		if first_time and first:
 			grab_focus()
+	first_time = false
 
 	display_text = text
 	if display_text == "":

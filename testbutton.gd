@@ -64,7 +64,8 @@ func _on_Button_pressed():
 #		nodes.append(child.name)
 	
 	
-	var s = ManifestV2.__get_mod_by_id("hev.IndustriesOfEnceladus")
+	
+	var s = ManifestV2.__check_mod_complementary("hev.e")
 	breakpoint
 	var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 #

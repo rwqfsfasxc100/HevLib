@@ -34,6 +34,59 @@ var developer_hint = {
 		"id -> string for the ID that is being looked for",
 		"case_sensitive -> (optional) boolean that decides whether the ID being looked for should care about capitalization. Enabled by default",
 		"Returns a dictionary containing manifest-formatted information. Returns an empty dictionary if not found."
+	],
+	"__get_tags":[
+		"Returns a dictionary containing all tag data for installed mods"
+	],
+	"__get_mod_tags":[
+		"Returns a dictionary containing the tag data for a provided mod id",
+		"mod_id -> string for the desired mod id. Returns blank if the provided mod isn't installed"
+	],
+	"__get_mods_from_tag":[
+		"Returns an array of strings for all mods that have the provided tag",
+		"tag_name -> string to fetch the mods that use the provided tag"
+	],
+	"__get_mods_and_tags_from_tag":[
+		"Returns a dictionary containing the data of all mods with the provided tag",
+		"tag_name -> string to fetch the mods and tag data of the tag"
+	],
+	"__get_manifest_section":[
+		"Gets a manifest section from all mods or a specific mod",
+		"section -> string for the desired section to fetch",
+		"mod_id -> (optional) string that defines a specific mod to look through. If omitted or left blank (\"\"), the sections for all installed mods will be returned instead"
+	],
+	"__get_mod_ids":[
+		"Returns an array of the mod IDs of all installed mods with an applicable manifest"
+	],
+	"__get_manifest_entry":[
+		"Gets an entry from a manifest section from all mods or a specific mod",
+		"section -> string for the section where the entry resides",
+		"entry -> string for the desired entry field",
+		"mod_id -> (optional) string for the desired mod id",
+		"If a mod id is provided, returns the value of the entry",
+		"Otherwise, a dictionary will list all applicable mod ids with their values set to the entry for the mod",
+		"If all checks fail, returns an empty dictionary"
+	],
+	"__check_complementary":[
+		"Returns a dictionary containing the complementary mod ids for all installed mods"
+	],
+	"__check_mod_complementary":[
+		"Returns an array containing the compliementary mod ids for for the provided mod id",
+		"mod_id -> string for the mod id of the requested mod"
+	],
+	"__check_conflicts":[
+		"Returns a dictionary containing the conflicting mod ids for all installed mods"
+	],
+	"__check_mod_conflicts":[
+		"Returns an array containing the conflicting mod ids for for the provided mod id",
+		"mod_id -> string for the mod id of the requested mod"
+	],
+	"__check_dependancies":[
+		"Returns a dictionary containing the dependancy mod ids for all installed mods"
+	],
+	"__check_mod_dependancies":[
+		"Returns an array containing the dependancy mod ids for for the provided mod id",
+		"mod_id -> string for the mod id of the requested mod"
 	]
 }
 
@@ -67,3 +120,67 @@ static func __get_mod_by_id(id: String, case_sensitive: bool = true) -> Dictiona
 	var s = f.get_mod_by_id(id, case_sensitive)
 	return s
 
+static func __get_tags() -> Dictionary:
+	var f = load("res://HevLib/scripts/manifest_v2/get_tags.gd")
+	var s = f.get_tags()
+	return s
+
+static func __get_mod_tags(mod_id: String) -> Dictionary:
+	var f = load("res://HevLib/scripts/manifest_v2/get_mod_tags.gd")
+	var s = f.get_mod_tags(mod_id)
+	return s
+
+static func __get_mods_from_tag(tag_name: String) -> Array:
+	var f = load("res://HevLib/scripts/manifest_v2/get_mods_from_tag.gd")
+	var s = f.get_mods_from_tag(tag_name)
+	return s
+
+static func __get_mods_and_tags_from_tag(tag_name: String) -> Dictionary:
+	var f = load("res://HevLib/scripts/manifest_v2/get_mods_and_tags_from_tag.gd")
+	var s = f.get_mods_and_tags_from_tag(tag_name)
+	return s
+
+static func __get_manifest_section(section: String, mod_id: String = "") -> Dictionary:
+	var f = load("res://HevLib/scripts/manifest_v2/get_manifest_section.gd")
+	var s = f.get_manifest_section(section, mod_id)
+	return s
+
+static func __get_mod_ids() -> Array:
+	var f = load("res://HevLib/scripts/manifest_v2/get_mod_ids.gd")
+	var s = f.get_mod_ids()
+	return s
+
+static func __get_manifest_entry(section: String, entry: String, mod_id: String = ""):
+	var f = load("res://HevLib/scripts/manifest_v2/get_manifest_entry.gd")
+	var s = f.get_manifest_entry(section, entry, mod_id)
+	return s
+
+static func __check_complementary() -> Array:
+	var f = load("res://HevLib/scripts/manifest_v2/mod_checking/check_complementary.gd")
+	var s = f.check_complementary()
+	return s
+
+static func __check_mod_complementary(mod_id) -> Array:
+	var f = load("res://HevLib/scripts/manifest_v2/mod_checking/check_mod_complementary.gd")
+	var s = f.check_mod_complementary(mod_id)
+	return s
+
+static func __check_dependancies() -> Array:
+	var f = load("res://HevLib/scripts/manifest_v2/mod_checking/check_dependancies.gd")
+	var s = f.check_dependancies()
+	return s
+
+static func __check_mod_dependancies(mod_id) -> Array:
+	var f = load("res://HevLib/scripts/manifest_v2/mod_checking/check_mod_dependancies.gd")
+	var s = f.check_mod_dependancies(mod_id)
+	return s
+
+static func __check_conflicts() -> Array:
+	var f = load("res://HevLib/scripts/manifest_v2/mod_checking/check_conflicts.gd")
+	var s = f.check_conflicts()
+	return s
+
+static func __check_mod_conflicts(mod_id) -> Array:
+	var f = load("res://HevLib/scripts/manifest_v2/mod_checking/check_mod_conflicts.gd")
+	var s = f.check_mod_conflicts(mod_id)
+	return s

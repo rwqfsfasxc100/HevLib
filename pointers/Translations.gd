@@ -13,7 +13,20 @@ var developer_hint = {
 		"dictionary -> the dictionary where translations will be sourced",
 		"fullLogging -> (optional) whether to use more verbose logging. Defaults to true"
 	],
-	
+	"__fetch_all_translation_objects":[
+		"Returns an array of all translation objects within the selected PID range",
+		"number_of_objects_to_iterate_through -> (optional) integer for the maximum number of PIDs to iterate through. Defaults to 100000"
+	],
+	"__inject_translations":[
+		"Attempts to override loaded translations with a translation dictionary",
+		"translation_data -> dictionary containing the translation data, formatted to translation dictionary standards",
+		"number_of_objects_to_iterate_through -> (optional) integer for the maximum number of PIDs to iterate through for overriding. Defaults to 100000"
+	],
+	"__translation_file_to_dictionary":[
+		"Converts a CSV formatted translation file to a translation dictionary",
+		"path -> string to the translation file's location",
+		"delimiter -> (optional) string containing the character to split the CSV line by. Defaults to '|"
+	]
 }
 
 static func __updateTL(path:String, delim:String = ",", fullLogging:bool = true):
@@ -34,7 +47,7 @@ static func __inject_translations(translation_data: Dictionary,number_of_objects
 	var s = f.inject_translations(translation_data,number_of_objects_to_iterate_through)
 	return s
 
-static func __translation_file_to_dictionary(path: String) -> Dictionary:
+static func __translation_file_to_dictionary(path: String, delimiter : String = "|") -> Dictionary:
 	var f = load("res://HevLib/scripts/translations/translation_file_to_dictionary.gd")
-	var s = f.translation_file_to_dictionary(path)
+	var s = f.translation_file_to_dictionary(path,delimiter)
 	return s

@@ -13,6 +13,12 @@ var developer_hint = {
 		"input_string -> the first string to compare",
 		"comparison_string -> the second string to compare",
 		"returns a boolean whether the scripts match"
+	],
+	"__rotate_point":[
+		"Rotates a Vector2 point around the origin",
+		"point -> Vector2 point to be rotated (this is set as angle 0)",
+		"angle -> float to set as the desired rotation",
+		"degrees -> (optional) whether to have the angle treated as degrees rather than radians. Defaults to true"
 	]
 }
 
