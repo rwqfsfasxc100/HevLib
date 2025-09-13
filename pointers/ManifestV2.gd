@@ -87,6 +87,11 @@ var developer_hint = {
 	"__check_mod_dependancies":[
 		"Returns an array containing the dependancy mod ids for for the provided mod id",
 		"mod_id -> string for the mod id of the requested mod"
+	],
+	"__parse_tags":[
+		"Trims a formatted dictionary from __parse_file_as_manifest to only display values changed from the default",
+		"A notable exception is the language tag, which is provided regardless",
+		"tag_data -> dictionary from __parse_file_as_manifest to trim down. Must have been made with 'format_to_manifest_version' set to true"
 	]
 }
 
