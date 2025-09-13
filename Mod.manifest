@@ -10,7 +10,7 @@ credits=["Za'krin - Mod Main design, original implementation of updateTL","space
 
 version_major=1
 version_minor=7
-version_bugfix=3
+version_bugfix=4
 
 [tags]
 
@@ -23,6 +23,9 @@ language=["en"]
 
 github={"link":"https://github.com/rwqfsfasxc100/HevLib","has_releases":true}
 discord="https://discord.com/channels/426287934870781952/1354537481197850655"
+nexus="https://www.nexusmods.com/dvringsofsaturn/mods/16"
+donations="https://ko-fi.com/00hev"
+wiki="https://github.com/rwqfsfasxc100/HevLib/wiki"
 bug_reports="https://forms.gle/RmC4Zgonp6frFgnK7"
 
 [manifest_definitions]
