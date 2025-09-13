@@ -184,3 +184,8 @@ static func __check_mod_conflicts(mod_id) -> Array:
 	var f = load("res://HevLib/scripts/manifest_v2/mod_checking/check_mod_conflicts.gd")
 	var s = f.check_mod_conflicts(mod_id)
 	return s
+
+static func __parse_tags(tag_data) -> Dictionary:
+	var f = load("res://HevLib/scripts/manifest_v2/parse_tags.gd")
+	var s = f.parse_tags(tag_data)
+	return s

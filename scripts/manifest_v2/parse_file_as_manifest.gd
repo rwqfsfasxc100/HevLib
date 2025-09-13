@@ -22,7 +22,7 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 				"id":null,
 				"description":"",
 				"author":"",
-				"credits":[]
+				"credits":PoolStringArray([])
 			},
 			"version":{
 				"version_major":1,
@@ -32,10 +32,10 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 				"version_string":"1.0.0"
 			},
 			"tags":{
-				"adds_equipment":[],
-				"adds_events":[],
-				"adds_gameplay_mechanics":[],
-				"adds_ships":[],
+				"adds_equipment":PoolStringArray([]),
+				"adds_events":PoolStringArray([]),
+				"adds_gameplay_mechanics":PoolStringArray([]),
+				"adds_ships":PoolStringArray([]),
 				"allow_achievements":false,
 				"fun":false,
 				"handle_extra_crew":24,
@@ -44,10 +44,11 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 				"overhaul":false,
 				"quality_of_life":false,
 				"uses_hevlib_research":false,
-				"visual":false
+				"visual":false,
+				"language":PoolStringArray(["en"])
 			},
 			"links":{
-				"github":{"link":"","has_releases":false},
+				"github":"",
 				"discord":"",
 				"nexus":"",
 				"donations":"",
@@ -77,7 +78,7 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 				var d = false
 				if not github_releases == "":
 					d = true
-				dict_template["links"]["github"] = {"link":manifest_data["package"].get("github_homepage",""),"has_releases":d}
+				dict_template["links"]["github"] = manifest_data["package"].get("github_homepage","")
 				
 				dict_template["links"]["discord"] = manifest_data["package"].get("discord_thread","")
 				dict_template["links"]["nexus"] = manifest_data["package"].get("nexus_page","")
@@ -98,7 +99,7 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 				dict_template["version"]["version_metadata"] = manifest_data["package"].get("version_metadata","")
 				dict_template["mod_information"]["description"] = manifest_data["package"].get("description","HEVLIB_DESCRIPTION_PLACEHOLDER")
 				var groups = manifest_data["package"].get("groups",[])
-				dict_template["links"]["github"] = {"link":manifest_data["package"].get("github",""),"has_releases":manifest_data["package"].get("link_github_releases",false)}
+				dict_template["links"]["github"] = manifest_data["package"].get("github","")
 				dict_template["links"]["discord"] = manifest_data["package"].get("discord_thread","")
 				dict_template["links"]["nexus"] = manifest_data["package"].get("nexus_page","")
 				dict_template["links"]["donations"] = manifest_data["package"].get("donations_page","")
@@ -145,7 +146,9 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 				
 				# links
 				if "links" in manifest_data.keys():
-					dict_template["links"]["github"] = Dictionary(manifest_data["links"].get("github",{"link":"","has_releases":false}))
+					if typeof(manifest_data["links"].get("github","")) == TYPE_DICTIONARY:
+						manifest_data["links"]["github"] = manifest_data["links"]["github"]["link"]
+					dict_template["links"]["github"] = String(manifest_data["links"].get("github",""))
 					dict_template["links"]["discord"] = String(manifest_data["links"].get("discord",""))
 					dict_template["links"]["nexus"] = String(manifest_data["links"].get("nexus",""))
 					dict_template["links"]["donations"] = String(manifest_data["links"].get("donations",""))

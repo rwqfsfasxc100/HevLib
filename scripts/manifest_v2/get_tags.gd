@@ -5,22 +5,7 @@ static func get_tags() -> Dictionary:
 	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 	var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 	
-	var tag_dict = {
-				"adds_equipment":{},
-				"adds_events":{},
-				"adds_gameplay_mechanics":{},
-				"adds_ships":{},
-				"allow_achievements":{},
-				"fun":{},
-				"handle_extra_crew":{},
-				"is_library_mod":{},
-				"library_hidden_by_default":{},
-				"overhaul":{},
-				"quality_of_life":{},
-				"uses_hevlib_research":{},
-				"visual":{},
-				"language":{}
-			}
+	var tag_dict = {}
 	
 	for mod in mods:
 		var constants = mod.get_script().get_script_constant_map()
@@ -37,24 +22,9 @@ static func get_tags() -> Dictionary:
 				if mod_id:
 					if manifest_version >= 2.1:
 						var tag_data = manifest_data["tags"]
-						for entry in tag_dict:
-							match entry:
-								"adds_equipment","adds_events","adds_gameplay_mechanics","adds_ships":
-									var k = tag_data.get(entry,[])
-									var num = k.size()
-									if num >= 1:
-										tag_dict[entry].merge({mod_id:k})
-								"handle_extra_crew":
-									var k = tag_data.get(entry,24)
-									if k >= 25:
-										tag_dict[entry].merge({mod_id:k})
-								"language":
-									var k = tag_data.get(entry,["en"])
-									if k.size() >= 1:
-										tag_dict[entry].merge({mod_id:k})
-								_:
-									var k = tag_data.get(entry,false)
-									tag_dict[entry].merge({mod_id:true})
-#						breakpoint
-#	breakpoint
+						var p = ManifestV2.__parse_tags(tag_data)
+						for entry in p:
+							if not entry in tag_dict:
+								tag_dict.merge({entry:{}})
+							tag_dict[entry].merge({mod_id:p[entry]})
 	return tag_dict

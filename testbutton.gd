@@ -65,7 +65,7 @@ func _on_Button_pressed():
 	
 	
 	
-	var s = ManifestV2.__check_mod_complementary("hev.e")
+	var s = ManifestV2.__get_tags()
 	breakpoint
 	var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 #
