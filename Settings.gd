@@ -15,7 +15,8 @@ var HevLib = {
 		"write_events":true,
 	},
 	"drivers":{
-		"use_input_virtualization":true
+		"use_input_virtualization":true,
+		"show_hidden_libraries":false,
 	},
 	"debug":{
 		"input_debugger":false,

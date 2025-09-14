@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=42 format=2]
+[gd_resource type="Theme" load_steps=43 format=2]
 
 [ext_resource path="res://HevLib/ui/themes/font-verdana.tres" type="DynamicFont" id=1]
 [ext_resource path="res://HevLib/ui/themes/styles/focus_and_hover_flat.tres" type="StyleBox" id=2]
@@ -26,6 +26,7 @@
 [ext_resource path="res://HevLib/ui/themes/styles/panel/tab_background_flat.tres" type="StyleBox" id=24]
 [ext_resource path="res://HevLib/ui/themes/styles/scrollbar/scroll_vertical_flat.tres" type="StyleBox" id=25]
 [ext_resource path="res://HevLib/ui/themes/styles/slider/slider_vertical_flat.tres" type="StyleBox" id=26]
+[ext_resource path="res://HevLib/ui/themes/styles/tooltip/panel.tres" type="StyleBox" id=27]
 
 [sub_resource type="StreamTexture" id=13]
 flags = 4
@@ -182,6 +183,7 @@ TabContainer/styles/panel = ExtResource( 18 )
 TabContainer/styles/tab_bg = ExtResource( 24 )
 TabContainer/styles/tab_disabled = ExtResource( 23 )
 TabContainer/styles/tab_fg = ExtResource( 22 )
+TooltipPanel/styles/panel = ExtResource( 27 )
 VScrollBar/styles/grabber = ExtResource( 10 )
 VScrollBar/styles/grabber_highlight = ExtResource( 8 )
 VScrollBar/styles/grabber_pressed = ExtResource( 9 )

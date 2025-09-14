@@ -33,3 +33,25 @@ HEVLIB_SELF_CHECK_ERROR_HEADER|HEVLIB LOAD ERROR!
 HEVLIB_INCORRECT_SHIP|(ERROR!) Missing ship type: '%s'\nThis save cannot be opened as the active ship isn't available!\nTo load this save, please reinstall the mod containing the ship type!
 
 HEVLIB_SLOT|Slot
+
+HEVLIB_MOD_MENU|Mod Menu
+
+HEVLIB_MISSING_MOD_NAME|Mod Name Unavailable :(
+
+HEVLIB_MISSING_DESCRIPTION|This mod does not have a description :( \n\nPlease check the webpage or thread where you obtained this mod for info, or ask the creator for a description.
+
+HEVLIB_AUTHOR|Author:
+
+HEVLIB_CREDITS|Credits:
+
+HEVLIB_UNKNOWN|Unknown
+
+HEVLIB_MM_TOOLTIP_HEADER|Mod Information:
+
+HEVLIB_MM_TOOLTIP_ID|\nMod ID: %s
+
+HEVLIB_MM_TOOLTIP_MV|\nManifest Version: %s
+
+HEVLIB_MM_TOOLTIP_ZIP|\nZip File: %s
+
+HEVLIB_MM_TOOLTIP_LIBRARY|\nLibrary: %s \ Hidden: %s

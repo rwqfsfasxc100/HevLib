@@ -8,6 +8,7 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 	var manifest_count = 0
 	var library_count = 0
 	var non_library_count = 0
+	# FUTURE ME: FIX THIS TO USE PARSE TAGS
 	var stat_tags = {
 				"adds_equipment":[],
 				"adds_events":[],
@@ -22,7 +23,8 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 				"quality_of_life":0,
 				"uses_hevlib_research":0,
 				"visual":0,
-				"language":{"en":0}
+				"language":{"en":0},
+				"user_interface":0
 				}
 	for mod in mods:
 		var constants = mod.get_script().get_script_constant_map()
@@ -56,7 +58,7 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 				mod_version_metadata = manifest_data["version"].get("version_metadata",mod_version_metadata)
 				mod_is_library = manifest_data["tags"].get("is_library_mod",false)
 				hide_library = manifest_data["tags"].get("library_hidden_by_default",true)
-				manifest_version = manifest_data["version"].get("manifest_version",1)
+				manifest_version = manifest_data["manifest_definitions"].get("manifest_version",1)
 				
 				var equipment = manifest_data["tags"].get("adds_equipment",[])
 				for item in equipment:
@@ -113,6 +115,10 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dic
 				var visual = manifest_data["tags"].get("visual",false)
 				if visual:
 					stat_tags["visual"] += 1
+				
+				var user_interface = manifest_data["tags"].get("user_interface",false)
+				if user_interface:
+					stat_tags["user_interface"] += 1
 				
 				var language = manifest_data["tags"].get("language",["en"])
 				for lang in language:

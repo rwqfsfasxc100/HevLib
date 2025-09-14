@@ -1,0 +1,205 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://HevLib/scenes/mod_menu/ModMenu.gd" type="Script" id=1]
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=2]
+[ext_resource path="res://enceladus/ScrollWithAnalog.gd" type="Script" id=3]
+[ext_resource path="res://HevLib/scenes/mod_menu/mod_list/ModList.gd" type="Script" id=4]
+[ext_resource path="res://HevLib/scenes/mod_menu/mod_info/ModInfo.gd" type="Script" id=5]
+[ext_resource path="res://menu/MenuTheme.tres" type="Theme" id=6]
+[ext_resource path="res://HevLib/scenes/mod_menu/mod_info/ScrollWithKB.gd" type="Script" id=7]
+[ext_resource path="res://HevLib/scenes/mod_menu/mod_info/LinkButton.tscn" type="PackedScene" id=8]
+
+[node name="ModMenu" type="Popup"]
+theme = ExtResource( 2 )
+popup_exclusive = true
+script = ExtResource( 1 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_right = 1280.0
+margin_bottom = 720.0
+color = Color( 0, 0, 0, 0.882353 )
+
+[node name="base" type="MarginContainer" parent="."]
+margin_right = 1280.0
+margin_bottom = 720.0
+
+[node name="PanelContainer" type="PanelContainer" parent="base"]
+margin_right = 1280.0
+margin_bottom = 720.0
+
+[node name="ModContainer" type="HBoxContainer" parent="base/PanelContainer"]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 1275.0
+margin_bottom = 715.0
+
+[node name="ModList" type="HBoxContainer" parent="base/PanelContainer/ModContainer"]
+margin_right = 629.0
+margin_bottom = 710.0
+size_flags_horizontal = 3
+script = ExtResource( 4 )
+
+[node name="ScrollContainer" type="ScrollContainer" parent="base/PanelContainer/ModContainer/ModList"]
+margin_right = 629.0
+margin_bottom = 710.0
+size_flags_horizontal = 3
+script = ExtResource( 3 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="base/PanelContainer/ModContainer/ModList/ScrollContainer"]
+margin_right = 629.0
+size_flags_horizontal = 3
+
+[node name="VSeparator" type="VSeparator" parent="base/PanelContainer/ModContainer"]
+margin_left = 633.0
+margin_right = 637.0
+margin_bottom = 710.0
+
+[node name="ModInfo" type="VBoxContainer" parent="base/PanelContainer/ModContainer"]
+margin_left = 641.0
+margin_right = 1270.0
+margin_bottom = 710.0
+size_flags_horizontal = 3
+script = ExtResource( 5 )
+
+[node name="NAME" type="Label" parent="base/PanelContainer/ModContainer/ModInfo"]
+margin_right = 629.0
+margin_bottom = 80.0
+rect_min_size = Vector2( 0, 80 )
+theme = ExtResource( 6 )
+text = "MOD_NAME"
+align = 1
+valign = 1
+autowrap = true
+uppercase = true
+
+[node name="DESC" type="Button" parent="base/PanelContainer/ModContainer/ModInfo"]
+margin_top = 84.0
+margin_right = 629.0
+margin_bottom = 641.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+disabled = true
+
+[node name="ScrollContainer" type="ScrollContainer" parent="base/PanelContainer/ModContainer/ModInfo/DESC"]
+mouse_filter = 1
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 7 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="base/PanelContainer/ModContainer/ModInfo/DESC/ScrollContainer"]
+margin_right = 11.0
+margin_bottom = 1229.0
+size_flags_horizontal = 3
+
+[node name="DESCRIPTION" type="Label" parent="base/PanelContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
+margin_right = 11.0
+margin_bottom = 38.0
+autowrap = true
+
+[node name="DASPLIT" type="HBoxContainer" parent="base/PanelContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
+margin_top = 42.0
+margin_right = 11.0
+margin_bottom = 42.0
+
+[node name="AHEADER" type="Label" parent="base/PanelContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
+margin_top = 46.0
+margin_right = 11.0
+margin_bottom = 574.0
+text = "HEVLIB_AUTHOR"
+autowrap = true
+
+[node name="AUTHOR" type="Label" parent="base/PanelContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
+margin_top = 578.0
+margin_right = 11.0
+margin_bottom = 616.0
+autowrap = true
+
+[node name="AHSPLIT" type="HBoxContainer" parent="base/PanelContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
+margin_top = 620.0
+margin_right = 11.0
+margin_bottom = 620.0
+
+[node name="CHEADER" type="Label" parent="base/PanelContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
+margin_top = 624.0
+margin_right = 11.0
+margin_bottom = 1187.0
+text = "HEVLIB_CREDITS"
+autowrap = true
+
+[node name="CREDITS" type="Label" parent="base/PanelContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
+margin_top = 1191.0
+margin_right = 11.0
+margin_bottom = 1229.0
+autowrap = true
+
+[node name="Links" type="VBoxContainer" parent="base/PanelContainer/ModContainer/ModInfo"]
+margin_top = 645.0
+margin_right = 629.0
+margin_bottom = 710.0
+rect_min_size = Vector2( 0, 65 )
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="base/PanelContainer/ModContainer/ModInfo/Links"]
+margin_right = 629.0
+margin_bottom = 65.0
+rect_min_size = Vector2( 0, 65 )
+alignment = 1
+
+[node name="github" parent="base/PanelContainer/ModContainer/ModInfo/Links/HBoxContainer" instance=ExtResource( 8 )]
+scale_factor = 0.8
+
+[node name="VSeparator" type="VSeparator" parent="base/PanelContainer/ModContainer/ModInfo/Links/HBoxContainer"]
+margin_left = 120.0
+margin_right = 124.0
+margin_bottom = 65.0
+
+[node name="discord" parent="base/PanelContainer/ModContainer/ModInfo/Links/HBoxContainer" instance=ExtResource( 8 )]
+dynamic_mode = "discord"
+
+[node name="VSeparator2" type="VSeparator" parent="base/PanelContainer/ModContainer/ModInfo/Links/HBoxContainer"]
+margin_left = 197.0
+margin_right = 201.0
+margin_bottom = 65.0
+
+[node name="nexus" parent="base/PanelContainer/ModContainer/ModInfo/Links/HBoxContainer" instance=ExtResource( 8 )]
+scale_factor = 0.8
+dynamic_mode = "nexus"
+
+[node name="VSeparator3" type="VSeparator" parent="base/PanelContainer/ModContainer/ModInfo/Links/HBoxContainer"]
+margin_left = 274.0
+margin_right = 278.0
+margin_bottom = 65.0
+
+[node name="donations" parent="base/PanelContainer/ModContainer/ModInfo/Links/HBoxContainer" instance=ExtResource( 8 )]
+scale_factor = 0.8
+dynamic_mode = "donations"
+
+[node name="VSeparator4" type="VSeparator" parent="base/PanelContainer/ModContainer/ModInfo/Links/HBoxContainer"]
+margin_left = 351.0
+margin_right = 355.0
+margin_bottom = 65.0
+
+[node name="wiki" parent="base/PanelContainer/ModContainer/ModInfo/Links/HBoxContainer" instance=ExtResource( 8 )]
+dynamic_mode = "wiki"
+
+[node name="VSeparator5" type="VSeparator" parent="base/PanelContainer/ModContainer/ModInfo/Links/HBoxContainer"]
+margin_left = 428.0
+margin_right = 432.0
+margin_bottom = 65.0
+
+[node name="bug reports" parent="base/PanelContainer/ModContainer/ModInfo/Links/HBoxContainer" instance=ExtResource( 8 )]
+scale_factor = 0.9
+dynamic_mode = "bug_reports"
+
+[node name="VSeparator6" type="VSeparator" parent="base/PanelContainer/ModContainer/ModInfo/Links/HBoxContainer"]
+margin_left = 505.0
+margin_right = 509.0
+margin_bottom = 65.0
+
+[node name="custom" parent="base/PanelContainer/ModContainer/ModInfo/Links/HBoxContainer" instance=ExtResource( 8 )]
+dynamic_mode = "custom_links"
+
+[connection signal="about_to_show" from="." to="." method="_about_to_show"]
+[connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
+[connection signal="focus_entered" from="base/PanelContainer/ModContainer/ModInfo/DESC" to="base/PanelContainer/ModContainer/ModInfo" method="_focus_entered"]
+[connection signal="focus_exited" from="base/PanelContainer/ModContainer/ModInfo/DESC" to="base/PanelContainer/ModContainer/ModInfo" method="_focus_exited"]
