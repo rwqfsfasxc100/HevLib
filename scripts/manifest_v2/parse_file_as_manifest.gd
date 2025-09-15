@@ -64,7 +64,7 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 				"manifest_version":1,
 				"dependancy_mod_ids":PoolStringArray([]),
 				"conflicting_mod_ids":PoolStringArray([]),
-				"complimentary_mod_ids":PoolStringArray([]),
+				"complementary_mod_ids":PoolStringArray([]),
 			}
 		}
 		match manifest_version:
@@ -163,7 +163,7 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 					dict_template["manifest_definitions"]["manifest_version"] = float(manifest_data["manifest_definitions"].get("manifest_version",manifest_version))
 					dict_template["manifest_definitions"]["dependancy_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("dependancy_mod_ids",[]))
 					dict_template["manifest_definitions"]["conflicting_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("conflicting_mod_ids",[]))
-					dict_template["manifest_definitions"]["complimentary_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("complimentary_mod_ids",[]))
+					dict_template["manifest_definitions"]["complementary_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("complementary_mod_ids",[]))
 				
 		var version_metadata = dict_template["version"]["version_metadata"]
 		var version_string = str(dict_template["version"]["version_major"]) + "." + str(dict_template["version"]["version_minor"]) + "." + str(dict_template["version"]["version_bugfix"])
