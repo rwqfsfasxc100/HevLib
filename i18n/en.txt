@@ -55,3 +55,19 @@ HEVLIB_MM_TOOLTIP_MV|\nManifest Version: %s
 HEVLIB_MM_TOOLTIP_ZIP|\nZip File: %s
 
 HEVLIB_MM_TOOLTIP_LIBRARY|\nLibrary: %s \ Hidden: %s
+
+HEVLIB_MM_BUTTON_TOOLTIP_GITHUB|Mod Github Page
+
+HEVLIB_MM_BUTTON_TOOLTIP_DISCORD|Mod Discord Thread
+
+HEVLIB_MM_BUTTON_TOOLTIP_NEXUS|Nexus mods page
+
+HEVLIB_MM_BUTTON_TOOLTIP_DONATIONS|Donate to the project
+
+HEVLIB_MM_BUTTON_TOOLTIP_WIKI|Mod wiki page
+
+HEVLIB_MM_BUTTON_TOOLTIP_BUGREPORTS|Report a bug
+
+HEVLIB_MM_BUTTON_TOOLTIP_CUSTOM|More...
+
+HEVLIB_VANILLA_DESCRIPTION|A physics-based mining sim, set in the thickest debris field in Sol. Every action has a reaction, lasers are invisible without a medium, and your thrust is a potent weapon. Find trade, adapt your equipment to your playstyle, hire a crew to help. Unravel the mysteries of the rings, or just get rich.

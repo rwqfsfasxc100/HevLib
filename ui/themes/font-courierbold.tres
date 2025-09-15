@@ -3,5 +3,7 @@
 [ext_resource path="res://HevLib/ui/themes/courbd.ttf" type="DynamicFontData" id=1]
 
 [resource]
-size = 25
+size = 40
+use_mipmaps = true
+use_filter = true
 font_data = ExtResource( 1 )
