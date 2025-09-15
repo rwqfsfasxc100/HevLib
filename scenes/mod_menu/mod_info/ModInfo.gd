@@ -74,7 +74,7 @@ func _process(delta):
 	
 	
 	var focus = get_focus_owner().name
-	if focus != "DESC":
+	if focus == "ModButton":
 		desc_container.scrollWithGamepad = false
 		desc_container.scrollWithKeyboard = false
 		scrollcontainer.scrollWithGamepad = true
