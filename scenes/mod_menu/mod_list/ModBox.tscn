@@ -146,28 +146,28 @@ flags = 4
 load_path = "res://HevLib/ui/themes/icons/dropdown_arrow.stex"
 
 [node name="ModBox" type="HBoxContainer"]
-margin_right = 40.0
-margin_bottom = 40.0
-rect_min_size = Vector2( 600, 130 )
+margin_right = 600.0
+margin_bottom = 100.0
+rect_min_size = Vector2( 600, 100 )
 theme = ExtResource( 1 )
 script = ExtResource( 2 )
 
 [node name="Icon" type="TextureRect" parent="."]
-margin_right = 130.0
-margin_bottom = 130.0
-rect_min_size = Vector2( 130, 130 )
+margin_right = 100.0
+margin_bottom = 100.0
+rect_min_size = Vector2( 100, 100 )
 texture = SubResource( 1 )
 expand = true
 stretch_mode = 6
 
 [node name="Control" type="Control" parent="Icon"]
-margin_right = 130.0
-margin_bottom = 130.0
+margin_right = 100.0
+margin_bottom = 100.0
 
 [node name="Conflicts" type="TextureRect" parent="Icon/Control"]
 modulate = Color( 1, 1, 0.164706, 0.25098 )
-margin_right = 64.0
-margin_bottom = 64.0
+margin_right = 49.0
+margin_bottom = 49.0
 texture = SubResource( 2 )
 expand = true
 
@@ -178,10 +178,10 @@ anims/RESET = SubResource( 7 )
 
 [node name="Dependancies" type="TextureRect" parent="Icon/Control"]
 modulate = Color( 1, 1, 0.164706, 0.25098 )
-margin_left = 78.0
-margin_top = 12.0
-margin_right = 118.0
-margin_bottom = 52.0
+margin_left = 60.0
+margin_top = 8.0
+margin_right = 92.0
+margin_bottom = 40.0
 texture = SubResource( 3 )
 expand = true
 
@@ -192,9 +192,9 @@ anims/RESET = SubResource( 9 )
 
 [node name="Updates" type="TextureRect" parent="Icon/Control"]
 modulate = Color( 1, 1, 0.164706, 0.25098 )
-margin_top = 66.0
-margin_right = 64.0
-margin_bottom = 130.0
+margin_top = 50.0
+margin_right = 50.0
+margin_bottom = 100.0
 texture = SubResource( 4 )
 expand = true
 
@@ -205,10 +205,10 @@ anims/RESET = SubResource( 11 )
 
 [node name="Complementary" type="TextureRect" parent="Icon/Control"]
 modulate = Color( 0.0491119, 1, 0.0491119, 0.88029 )
-margin_left = 90.0
-margin_top = 90.0
-margin_right = 122.0
-margin_bottom = 122.0
+margin_left = 75.0
+margin_top = 75.0
+margin_right = 95.0
+margin_bottom = 95.0
 texture = SubResource( 5 )
 expand = true
 
@@ -216,9 +216,9 @@ expand = true
 anims/Modulate = SubResource( 12 )
 
 [node name="ModButton" type="Button" parent="."]
-margin_left = 134.0
+margin_left = 104.0
 margin_right = 596.0
-margin_bottom = 130.0
+margin_bottom = 100.0
 focus_neighbour_left = NodePath(".")
 size_flags_horizontal = 3
 align = 0
@@ -230,36 +230,34 @@ focusAt = NodePath("../..")
 margin_left = 4.0
 margin_top = 2.0
 margin_right = 216.0
-margin_bottom = 130.0
+margin_bottom = 96.0
 size_flags_horizontal = 3
-size_flags_vertical = 3
 alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="ModButton/VBoxContainer"]
-margin_top = 2.0
 margin_right = 212.0
-margin_bottom = 126.0
+margin_bottom = 94.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ModButton/VBoxContainer/HBoxContainer"]
 margin_right = 40.0
-margin_bottom = 124.0
+margin_bottom = 94.0
 size_flags_vertical = 3
 alignment = 1
 
 [node name="Library" type="TextureRect" parent="ModButton/VBoxContainer/HBoxContainer/VBoxContainer"]
 modulate = Color( 0.784314, 0.784314, 0, 1 )
 margin_right = 40.0
-margin_bottom = 60.0
-rect_min_size = Vector2( 40, 60 )
+margin_bottom = 45.0
+rect_min_size = Vector2( 40, 45 )
 texture = SubResource( 13 )
 expand = true
 stretch_mode = 6
 
 [node name="Children" type="TextureRect" parent="ModButton/VBoxContainer/HBoxContainer/VBoxContainer"]
-margin_top = 64.0
+margin_top = 49.0
 margin_right = 40.0
-margin_bottom = 124.0
-rect_min_size = Vector2( 40, 60 )
+margin_bottom = 94.0
+rect_min_size = Vector2( 40, 45 )
 texture = SubResource( 14 )
 expand = true
 stretch_mode = 6
@@ -267,8 +265,8 @@ stretch_mode = 6
 [node name="Label" type="Label" parent="ModButton/VBoxContainer/HBoxContainer"]
 margin_left = 44.0
 margin_right = 212.0
-margin_bottom = 124.0
-rect_min_size = Vector2( 0, 124 )
+margin_bottom = 94.0
+rect_min_size = Vector2( 0, 94 )
 size_flags_horizontal = 3
 size_flags_vertical = 7
 text = "MOD_NAME"
@@ -279,7 +277,7 @@ max_lines_visible = 2
 [node name="BriefInfoLabel" type="VBoxContainer" parent="."]
 margin_left = 600.0
 margin_right = 600.0
-margin_bottom = 130.0
+margin_bottom = 100.0
 
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
 [connection signal="focus_exited" from="ModButton" to="." method="_focus_exited"]

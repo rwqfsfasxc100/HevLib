@@ -8,6 +8,10 @@ func _ready():
 	var data = ManifestV2.__get_mod_data()["mods"]
 	var groups = {}
 	var mod_data = {}
+	var vdata = load("res://HevLib/scenes/mod_menu/vanilla/data_dict.gd").get_script_constant_map()
+	var vd = vdata.VANILLA
+	mod_data.merge({"VANILLA":vd})
+	
 	for mod in data:
 		var fname = mod.split("/")[2]
 		var info = data[mod]
@@ -53,6 +57,7 @@ func _ready():
 	var BS = HBoxContainer.new()
 	BS.set_script(load("res://HevLib/scenes/mod_menu/mod_list/BottomSeparator.gd"))
 	BS.connect("visibility_changed",BS,"_visibility_changed")
+	BS.name = "HEVLIB_NODE_SEPARATOR_IGNORE_PLS"
 	node.add_child(BS)
 	
 

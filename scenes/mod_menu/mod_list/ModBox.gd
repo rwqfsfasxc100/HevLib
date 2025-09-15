@@ -85,34 +85,59 @@ func _draw():
 	if is_a_library:
 		tooltip_text = tooltip_text + TranslationServer.translate("HEVLIB_MM_TOOLTIP_LIBRARY") % [is_a_library,lib_hidden]
 	button.hint_tooltip = tooltip_text
-	_refocus()
+#	_refocus()
+var descbox = "../ModInfo/DESC"
 
 func _input(event):
 	if Input.is_action_just_pressed("ui_focus_next") or Input.is_action_just_pressed("ui_focus_prev"):
 		var foc = get_focus_owner()
-		var select = ModContainer.get_node("ModInfo/DESC")
+		var select = ModContainer.get_node(descbox)
 		if foc == get_node("ModButton"):
 			select.grab_focus()
 			get_viewport().set_input_as_handled()
 
+onready var desc_box = ModContainer.get_node(descbox)
+onready var mod_box = get_node("ModButton")
 func _visibility_changed():
 	MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)
-#	button_size = MAX_SIZE
-#	button_box.rect_size = button_size - Vector2(8,4)
-#	button_box.rect_position = Vector2(4,2)
 	button_box.rect_size.x = button.rect_size.x - 4
-#	button_box2.rect_size.x = button_box.rect_size.x - 4
-#	button_label.rect_size.x = button_box2.rect_size.x - 4
 	
+	var pos = get_position_in_parent()
+	var parent = get_parent()
+	var end_pos = get_parent().get_node("HEVLIB_NODE_SEPARATOR_IGNORE_PLS").get_position_in_parent()
+	
+	var upper = null
+	var lower = null
+	var mb = mod_box.get_path_to(mod_box)
+	mod_box.focus_neighbour_left = mb
+	mod_box.focus_neighbour_right = mod_box.get_path_to(desc_box)
+	mod_box.focus_next = mod_box.get_path_to(desc_box)
+	mod_box.focus_previous = mod_box.get_path_to(desc_box)
+	
+	if pos == 0:
+		mod_box.focus_neighbour_top = mb
+		mod_box.focus_neighbour_bottom = mod_box.get_path_to(get_button(pos+1))
+	elif pos + 1 == end_pos:
+		mod_box.focus_neighbour_top = mod_box.get_path_to(get_button(pos-1))
+		mod_box.focus_neighbour_bottom = mb
+	else:
+		mod_box.focus_neighbour_top = mod_box.get_path_to(get_button(pos-1))
+		mod_box.focus_neighbour_bottom = mod_box.get_path_to(get_button(pos+1))
+#	mod_box.focus_neighbor_top = get_path_to(upper)
+#	mod_box.focus_neighbor_bottom = get_path_to(lower)
+	
+
+func get_button(pos):
+	return get_parent().get_child(pos).get_node("ModButton")
 
 func _refocus():
 	var index = get_parent().get_position_in_parent()
 	var parent = get_parent()
 	var parent_count = parent.get_child_count()-1
 	focus_neighbour_left = get_path_to(self)
-	focus_neighbour_right = get_path_to(ModContainer.get_node("ModInfo/DESC"))
-	focus_next = get_path_to(ModContainer.get_node("ModInfo/DESC"))
-	focus_previous = get_path_to(ModContainer.get_node("ModInfo/DESC"))
+	focus_neighbour_right = get_path_to(ModContainer.get_node(descbox))
+	focus_next = get_path_to(ModContainer.get_node(descbox))
+	focus_previous = get_path_to(ModContainer.get_node(descbox))
 #	breakpoint
 	if index == 0:
 		focus_neighbour_top = get_path_to(self)
@@ -127,7 +152,7 @@ func _refocus():
 var isfocus = false
 
 func _pressed():
-	var node = ModContainer.get_node("ModInfo")
+	var node = ModContainer.get_node("../ModInfo")
 	node.selected_mod = self
 	node.update()
 	if isfocus:
@@ -135,7 +160,7 @@ func _pressed():
 	isfocus = true
 
 func _change_focus():
-	var node = ModContainer.get_node("ModInfo/DESC")
+	var node = ModContainer.get_node(descbox)
 	node.grab_focus()
 
 

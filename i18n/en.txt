@@ -71,3 +71,11 @@ HEVLIB_MM_BUTTON_TOOLTIP_BUGREPORTS|Report a bug
 HEVLIB_MM_BUTTON_TOOLTIP_CUSTOM|More...
 
 HEVLIB_VANILLA_DESCRIPTION|A physics-based mining sim, set in the thickest debris field in Sol. Every action has a reaction, lasers are invisible without a medium, and your thrust is a potent weapon. Find trade, adapt your equipment to your playstyle, hire a crew to help. Unravel the mysteries of the rings, or just get rich.
+
+HEVLIB_MODMENU_MODS|Mods
+
+HEVLIB_MODMENU_CLOSE|Close
+
+HEVLIB_MODMENU_OPENFOLDER|Open Mods Folder
+
+HEVLIB_MODMENU_MODS_VISIBLE|Showing %d mods

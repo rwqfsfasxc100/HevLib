@@ -48,16 +48,16 @@ func update():
 	
 
 func _draw():
-	var nodes = get_node("../ModList/ScrollContainer/VBoxContainer").get_children()
 	
 	desc_container.rect_size = desc_button.rect_size - Vector2(7,12)
 #		desc_vb.rect_size.x = desc_container.rect_size.y + 2
 	desc_container.rect_position = Vector2(1,1)
-	var node = nodes[0]
-	selected_mod = node
+	
 	update()
 	_focus_exited()
 
+
+onready var scrollcontainer = get_parent().get_node("SPLIT/ModList/ScrollContainer")
 
 
 
@@ -70,11 +70,35 @@ func _process(delta):
 			pass
 		elif Input.is_action_just_pressed("ui_down"):
 			pass
+	
+	
+	
+	var focus = get_focus_owner().name
+	if focus != "DESC":
+		desc_container.scrollWithGamepad = false
+		desc_container.scrollWithKeyboard = false
+		scrollcontainer.scrollWithGamepad = true
+	else:
+		desc_container.scrollWithGamepad = true
+		desc_container.scrollWithKeyboard = true
+		scrollcontainer.scrollWithGamepad = false
+
+
+
+
+func _visibility_changed():
+	if scrollcontainer:
+		var nodes = scrollcontainer.get_node("VBoxContainer").get_children()
+		var node = nodes[0]
+		selected_mod = node
+
+
+
 
 func _focus_entered():
 	desc_container.scrollWithGamepad = true
 	desc_container.scrollWithKeyboard = true
-	get_parent().get_node("ModList/ScrollContainer").scrollWithGamepad = false
+	scrollcontainer.scrollWithGamepad = false
 	desc_button.focus_neighbour_right = get_path_to(self)
 	desc_button.focus_neighbour_top = get_path_to(self)
 	desc_button.focus_neighbour_bottom = get_path_to(self)
@@ -87,5 +111,4 @@ func _focus_entered():
 func _focus_exited():
 	desc_container.scrollWithGamepad = false
 	desc_container.scrollWithKeyboard = false
-	get_parent().get_node("ModList/ScrollContainer").scrollWithGamepad = true
-
+	scrollcontainer.scrollWithGamepad = true
