@@ -19,6 +19,11 @@ var developer_hint = {
 		" -> folder - path to the folder to check the contents of",
 		" -> showFolders - whether to add folders into the array of files. each folder will end with a slash to identify",
 		" -> returnFullPath - whether to return the full paths of the files and folders, rather the names"
+	],
+	"__copy_file":[
+		"Copies (and overrides) a file to a folder, and can account for globalized and Windows paths",
+		"file -> string for the path to the file, can be global or local path",
+		"folder -> string for the path to the folder, can be global or local path"
 	]
 }
 
@@ -42,3 +47,11 @@ static func __fetch_folder_files(folder: String, showFolders: bool = false, retu
 	var f = load("res://HevLib/globals/fetch_folder_files.gd")
 	var s = f.fetch_folder_files(folder, showFolders, returnFullPath)
 	return s
+
+static func __copy_file(file, folder):
+	var prepfile = ProjectSettings.localize_path(file)
+#	var current_mods = FolderAccess.__fetch_folder_files(folder)
+	var fn = prepfile.split("/")[prepfile.split("/").size() - 1]
+	
+	var dir = Directory.new()
+	dir.copy(prepfile,folder + "/" + fn)

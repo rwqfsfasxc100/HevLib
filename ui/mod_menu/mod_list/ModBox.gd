@@ -23,6 +23,22 @@ var button_size = Vector2(0,0)
 
 var MAX_SIZE = Vector2(0,0)
 
+var information_nodes = {}
+
+func _pressed():
+	pass
+
+
+
+
+
+
+
+
+
+
+
+
 func _draw():
 	MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)
 	
@@ -85,6 +101,7 @@ func _draw():
 	if is_a_library:
 		tooltip_text = tooltip_text + TranslationServer.translate("HEVLIB_MM_TOOLTIP_LIBRARY") % [is_a_library,lib_hidden]
 	button.hint_tooltip = tooltip_text
+	
 #	_refocus()
 var descbox = "../ModInfo/DESC"
 
@@ -101,7 +118,6 @@ onready var mod_box = get_node("ModButton")
 func _visibility_changed():
 	MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)
 	button_box.rect_size.x = button.rect_size.x - 4
-	
 	var pos = get_position_in_parent()
 	var parent = get_parent()
 	var end_pos = get_parent().get_node("HEVLIB_NODE_SEPARATOR_IGNORE_PLS").get_position_in_parent()
@@ -125,7 +141,10 @@ func _visibility_changed():
 		mod_box.focus_neighbour_bottom = mod_box.get_path_to(get_button(pos+1))
 #	mod_box.focus_neighbor_top = get_path_to(upper)
 #	mod_box.focus_neighbor_bottom = get_path_to(lower)
-	
+	if is_visible_in_tree():
+		if pos == 0:
+			
+			button.grab_focus()
 
 func get_button(pos):
 	return get_parent().get_child(pos).get_node("ModButton")
@@ -151,19 +170,4 @@ func _refocus():
 	
 var isfocus = false
 
-func _pressed():
-	var node = ModContainer.get_node("../ModInfo")
-	node.selected_mod = self
-	node.update()
-	if isfocus:
-		_change_focus()
-	isfocus = true
 
-func _change_focus():
-	var node = ModContainer.get_node(descbox)
-	node.grab_focus()
-
-
-
-func _focus_exited():
-	isfocus = false

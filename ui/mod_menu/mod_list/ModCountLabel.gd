@@ -8,4 +8,4 @@ func _process(delta):
 			count += 1
 	var txt = TranslationServer.translate("HEVLIB_MODMENU_MODS_VISIBLE")
 	
-	text = txt % count - 1
+	text = txt % int(count - 1)

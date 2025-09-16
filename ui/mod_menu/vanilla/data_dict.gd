@@ -14,7 +14,7 @@ const VANILLA = {
 	},
 	"mod_icon":{
 		"has_icon_file":true,
-		"icon_path":"res://HevLib/scenes/mod_menu/vanilla/vanilla_icon.stex"
+		"icon_path":"res://HevLib/ui/mod_menu/vanilla/vanilla_icon.stex"
 	},
 	"library_information":{
 		"is_a_library":false,

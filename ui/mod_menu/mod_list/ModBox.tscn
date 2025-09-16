@@ -280,5 +280,4 @@ margin_right = 600.0
 margin_bottom = 100.0
 
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
-[connection signal="focus_exited" from="ModButton" to="." method="_focus_exited"]
 [connection signal="pressed" from="ModButton" to="." method="_pressed"]

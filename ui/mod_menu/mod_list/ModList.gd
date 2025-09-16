@@ -2,13 +2,40 @@ extends HBoxContainer
 
 var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 
-export var mod_box = preload("res://HevLib/scenes/mod_menu/mod_list/ModBox.tscn")
+export var mod_box = preload("res://HevLib/ui/mod_menu/mod_list/ModBox.tscn")
+
+export var info_icon = NodePath("")
+export var info_name = NodePath("")
+export var info_version = NodePath("")
+export var info_author = NodePath("")
+export var info_settings_button = NodePath("")
+export var info_settings_icon = NodePath("")
+export var info_desc = NodePath("")
+export var info_desc_text = NodePath("")
+export var info_desc_author = NodePath("")
+export var info_desc_credits = NodePath("")
+
+
+
+
 
 func _ready():
+	var information_nodes = {
+		"info_icon":get_node(info_icon),
+		"info_name":get_node(info_name),
+		"info_version":get_node(info_version),
+		"info_author":get_node(info_author),
+		"info_settings_button":get_node(info_settings_button),
+		"info_settings_icon":get_node(info_settings_icon),
+		"info_desc":get_node(info_desc),
+		"info_desc_text":get_node(info_desc_text),
+		"info_desc_author":get_node(info_desc_author),
+		"info_desc_credits":get_node(info_desc_credits)
+	}
 	var data = ManifestV2.__get_mod_data()["mods"]
 	var groups = {}
 	var mod_data = {}
-	var vdata = load("res://HevLib/scenes/mod_menu/vanilla/data_dict.gd").get_script_constant_map()
+	var vdata = load("res://HevLib/ui/mod_menu/vanilla/data_dict.gd").get_script_constant_map()
 	var vd = vdata.VANILLA
 	mod_data.merge({"VANILLA":vd})
 	
@@ -46,6 +73,7 @@ func _ready():
 		button.MOD_INFO = info
 		button.name = info["name"]
 		button.ModContainer = get_parent()
+		button.information_nodes = information_nodes
 		$ScrollContainer/VBoxContainer.add_child(button)
 	var node = get_node("ScrollContainer/VBoxContainer")
 	var index = 1
@@ -55,7 +83,7 @@ func _ready():
 	for n in sorted_nodes:
 		node.move_child(n,sorted_nodes.size())
 	var BS = HBoxContainer.new()
-	BS.set_script(load("res://HevLib/scenes/mod_menu/mod_list/BottomSeparator.gd"))
+	BS.set_script(load("res://HevLib/ui/mod_menu/mod_list/BottomSeparator.gd"))
 	BS.connect("visibility_changed",BS,"_visibility_changed")
 	BS.name = "HEVLIB_NODE_SEPARATOR_IGNORE_PLS"
 	node.add_child(BS)
