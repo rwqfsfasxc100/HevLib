@@ -7,6 +7,8 @@ export var mod_box = preload("res://HevLib/ui/mod_menu/mod_list/ModBox.tscn")
 export var info_icon = NodePath("")
 export var info_name = NodePath("")
 export var info_version = NodePath("")
+export var info_priority = NodePath("")
+export var info_mod_id = NodePath("")
 export var info_author = NodePath("")
 export var info_settings_button = NodePath("")
 export var info_settings_icon = NodePath("")
@@ -16,15 +18,25 @@ export var info_desc_author = NodePath("")
 export var info_desc_credits = NodePath("")
 
 
+onready var listContainer = $ScrollContainer/VBoxContainer
 
+onready var desc_scroll = get_node("../../ModInfo/DESC/ScrollContainer")
 
+func about_to_show():
+	var nodes = listContainer.get_children()
+	if nodes.size() >= 2:
+		nodes[0]._pressed()
+
+var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 
 func _ready():
 	var information_nodes = {
 		"info_icon":get_node(info_icon),
 		"info_name":get_node(info_name),
 		"info_version":get_node(info_version),
+		"info_priority":get_node(info_priority),
 		"info_author":get_node(info_author),
+		"info_mod_id":get_node(info_mod_id),
 		"info_settings_button":get_node(info_settings_button),
 		"info_settings_icon":get_node(info_settings_icon),
 		"info_desc":get_node(info_desc),
@@ -37,6 +49,22 @@ func _ready():
 	var mod_data = {}
 	var vdata = load("res://HevLib/ui/mod_menu/vanilla/data_dict.gd").get_script_constant_map()
 	var vd = vdata.VANILLA
+	
+	var ver = DataFormat.__get_vanilla_version()
+	var verstr = str(ver[0]) + "." + str(ver[1]) + "." +str(ver[2])
+	
+	vd["manifest"]["manifest_data"]["version"]["version_major"] = ver[0]
+	vd["manifest"]["manifest_data"]["version"]["version_minor"] = ver[1]
+	vd["manifest"]["manifest_data"]["version"]["version_bugfix"] = ver[2]
+	vd["manifest"]["manifest_data"]["version"]["version_string"] = verstr
+	
+	vd["version_data"]["version_major"] = ver[0]
+	vd["version_data"]["version_minor"] = ver[1]
+	vd["version_data"]["version_bugfix"] = ver[2]
+	vd["version_data"]["full_version_array"] = ver
+	vd["version_data"]["full_version_string"] = verstr
+	vd["version_data"]["legacy_mod_version"] = verstr
+	
 	mod_data.merge({"VANILLA":vd})
 	
 	for mod in data:
@@ -74,7 +102,7 @@ func _ready():
 		button.name = info["name"]
 		button.ModContainer = get_parent()
 		button.information_nodes = information_nodes
-		$ScrollContainer/VBoxContainer.add_child(button)
+		listContainer.add_child(button)
 	var node = get_node("ScrollContainer/VBoxContainer")
 	var index = 1
 	var sorting  = true
@@ -92,3 +120,7 @@ func _ready():
 func sort(a: Node, b: Node): 
 	return a.MOD_INFO.name.naturalnocasecmp_to(b.MOD_INFO.name) < 0
 	
+
+func _draw():
+	
+	desc_scroll.rect_size = desc_scroll.get_parent().rect_size

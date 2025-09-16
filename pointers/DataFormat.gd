@@ -19,7 +19,8 @@ var developer_hint = {
 		"point -> Vector2 point to be rotated (this is set as angle 0)",
 		"angle -> float to set as the desired rotation",
 		"degrees -> (optional) whether to have the angle treated as degrees rather than radians. Defaults to true"
-	]
+	],
+	
 }
 
 
@@ -41,4 +42,9 @@ static func __compare_with_byte_array(input_string: String, comparison_string: S
 static func __rotate_point(point: Vector2, angle: float, degrees:bool = true) -> Vector2:
 	var f = load("res://HevLib/scripts/rotate_point.gd")
 	var s = f.rotate_point(point, angle, degrees)
+	return s
+
+static func __get_vanilla_version() -> Array:
+	var f = load("res://HevLib/scripts/get_vanilla_version.gd")
+	var s = f.get_vanilla_version()
 	return s

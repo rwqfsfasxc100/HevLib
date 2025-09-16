@@ -3,7 +3,7 @@ extends Popup
 var offset = Vector2(12,12)
 
 func _about_to_show():
-	
+	$base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList.about_to_show()
 	lastFocus = get_focus_owner()
 	
 func _unhandled_input(event):

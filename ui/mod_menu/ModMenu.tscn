@@ -18,6 +18,7 @@ flags = 4
 load_path = "res://HevLib/ui/themes/icons/config_icon.stex"
 
 [node name="ModMenu" type="Popup"]
+visible = true
 theme = ExtResource( 2 )
 popup_exclusive = true
 script = ExtResource( 7 )
@@ -108,8 +109,10 @@ size_flags_vertical = 3
 script = ExtResource( 6 )
 info_icon = NodePath("../../ModInfo/Header/ICON")
 info_name = NodePath("../../ModInfo/Header/TEXT/NAME")
-info_version = NodePath("../../ModInfo/Header/TEXT/VERSION")
-info_author = NodePath("../../ModInfo/Header/TEXT/AUTHOR")
+info_version = NodePath("../../ModInfo/Header/TEXT/NUMBERS/VERSION")
+info_priority = NodePath("../../ModInfo/Header/TEXT/PRIO & NAMES/PRIO")
+info_mod_id = NodePath("../../ModInfo/Header/TEXT/NUMBERS/MID")
+info_author = NodePath("../../ModInfo/Header/TEXT/PRIO & NAMES/AUTHOR")
 info_settings_button = NodePath("../../ModInfo/Header/BUTTONCONTAINER/SETTINGS")
 info_settings_icon = NodePath("../../ModInfo/Header/BUTTONCONTAINER/SETTINGS/SETTINGSICON")
 info_desc = NodePath("../../ModInfo/DESC")
@@ -183,23 +186,63 @@ margin_bottom = 29.0
 size_flags_horizontal = 3
 custom_fonts/font = ExtResource( 3 )
 text = "MOD_NAME"
-autowrap = true
+clip_text = true
 uppercase = true
 
-[node name="VERSION" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/TEXT"]
+[node name="NUMBERS" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/TEXT"]
+modulate = Color( 0.54902, 0.54902, 0.54902, 1 )
 margin_top = 33.0
 margin_right = 459.0
 margin_bottom = 62.0
+
+[node name="MID" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/TEXT/NUMBERS"]
+margin_right = 82.0
+margin_bottom = 29.0
+custom_fonts/font = ExtResource( 3 )
+text = "MOD_ID"
+
+[node name="SPLIT" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/TEXT/NUMBERS"]
+margin_left = 86.0
+margin_right = 108.0
+margin_bottom = 29.0
+custom_fonts/font = ExtResource( 3 )
+text = "|"
+
+[node name="VERSION" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/TEXT/NUMBERS"]
+margin_left = 112.0
+margin_right = 459.0
+margin_bottom = 29.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
 custom_fonts/font = ExtResource( 3 )
 text = "MOD_VERSION"
 
-[node name="AUTHOR" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/TEXT"]
+[node name="PRIO & NAMES" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/TEXT"]
+modulate = Color( 0.54902, 0.54902, 0.54902, 1 )
 margin_top = 66.0
 margin_right = 459.0
 margin_bottom = 95.0
+
+[node name="PRIO" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/TEXT/PRIO & NAMES"]
+margin_right = 106.0
+margin_bottom = 29.0
+custom_fonts/font = ExtResource( 3 )
+text = "MOD_PRIO"
+
+[node name="SPLIT" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/TEXT/PRIO & NAMES"]
+margin_left = 110.0
+margin_right = 132.0
+margin_bottom = 29.0
+custom_fonts/font = ExtResource( 3 )
+text = "|"
+
+[node name="AUTHOR" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/TEXT/PRIO & NAMES"]
+margin_left = 136.0
+margin_right = 459.0
+margin_bottom = 29.0
+size_flags_horizontal = 3
 custom_fonts/font = ExtResource( 3 )
 text = "MOD_AUTHOR"
-clip_text = true
 
 [node name="BUTTONCONTAINER" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header"]
 margin_left = 567.0
@@ -225,7 +268,7 @@ margin_right = 629.0
 margin_bottom = 245.0
 alignment = 1
 
-[node name="Button" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/BUTTONS"]
+[node name="LINKS" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/BUTTONS"]
 margin_left = 299.0
 margin_right = 329.0
 margin_bottom = 62.0
@@ -239,55 +282,56 @@ size_flags_vertical = 3
 disabled = true
 
 [node name="ScrollContainer" type="ScrollContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC"]
+rect_min_size = Vector2( 80, 80 )
 mouse_filter = 1
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource( 8 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer"]
-margin_right = 11.0
-margin_bottom = 1229.0
+margin_right = 70.0
+margin_bottom = 459.0
 size_flags_horizontal = 3
 
 [node name="DESCRIPTION" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
-margin_right = 11.0
+margin_right = 70.0
 margin_bottom = 38.0
 autowrap = true
 
 [node name="DASPLIT" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
 margin_top = 42.0
-margin_right = 11.0
+margin_right = 70.0
 margin_bottom = 42.0
 
 [node name="AHEADER" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
 margin_top = 46.0
-margin_right = 11.0
-margin_bottom = 574.0
+margin_right = 70.0
+margin_bottom = 189.0
 text = "HEVLIB_AUTHOR"
 autowrap = true
 
 [node name="AUTHOR" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
-margin_top = 578.0
-margin_right = 11.0
-margin_bottom = 616.0
+margin_top = 193.0
+margin_right = 70.0
+margin_bottom = 231.0
 autowrap = true
 
 [node name="AHSPLIT" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
-margin_top = 620.0
-margin_right = 11.0
-margin_bottom = 620.0
+margin_top = 235.0
+margin_right = 70.0
+margin_bottom = 235.0
 
 [node name="CHEADER" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
-margin_top = 624.0
-margin_right = 11.0
-margin_bottom = 1187.0
+margin_top = 239.0
+margin_right = 70.0
+margin_bottom = 417.0
 text = "HEVLIB_CREDITS"
 autowrap = true
 
 [node name="CREDITS" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
-margin_top = 1191.0
-margin_right = 11.0
-margin_bottom = 1229.0
+margin_top = 421.0
+margin_right = 70.0
+margin_bottom = 459.0
 autowrap = true
 
 [node name="HSeparator" type="HSeparator" parent="base/PanelContainer/VBoxContainer"]

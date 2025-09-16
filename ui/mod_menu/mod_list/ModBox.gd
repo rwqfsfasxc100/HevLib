@@ -26,7 +26,29 @@ var MAX_SIZE = Vector2(0,0)
 var information_nodes = {}
 
 func _pressed():
-	pass
+	
+	information_nodes["info_name"].text = MOD_INFO["name"]
+	var prio = MOD_INFO["priority"]
+	var ver = MOD_INFO["version_data"]["full_version_string"]
+	information_nodes["info_version"].text = TranslationServer.translate("HEVLIB_MODMENU_VERSION") % ver
+	information_nodes["info_priority"].text = TranslationServer.translate("HEVLIB_MODMENU_PRIO") % prio
+	if MOD_INFO["mod_icon"]["has_icon_file"]:
+		var tex = StreamTexture.new()
+		tex.load_path = MOD_INFO["mod_icon"]["icon_path"]
+		information_nodes["info_icon"].texture = tex
+	information_nodes["info_mod_id"].text = MOD_INFO["manifest"]["manifest_data"]["mod_information"]["id"]
+	information_nodes["info_author"].text = MOD_INFO["manifest"]["manifest_data"]["mod_information"]["author"]
+	information_nodes["info_desc_author"].text = MOD_INFO["manifest"]["manifest_data"]["mod_information"]["author"]
+	information_nodes["info_desc_text"].text = MOD_INFO["manifest"]["manifest_data"]["mod_information"]["description"]
+	var creditText = ""
+	for item in MOD_INFO["manifest"]["manifest_data"]["mod_information"]["credits"]:
+		if creditText == "":
+			creditText = item
+		else:
+			creditText = creditText + "\n" + item
+	information_nodes["info_desc_credits"].text = creditText
+	
+#	breakpoint
 
 
 
@@ -80,12 +102,12 @@ func _draw():
 	var md = manifest["manifest_data"]
 	if md:
 		ID = md["mod_information"]["id"]
-	tooltip_text = tooltip_text + TranslationServer.translate("HEVLIB_MM_TOOLTIP_MV") % manifest["manifest_version"]
+	tooltip_text = tooltip_text + "\n" + TranslationServer.translate("HEVLIB_MM_TOOLTIP_MV") % manifest["manifest_version"]
 	if ID:
-		tooltip_text = tooltip_text + TranslationServer.translate("HEVLIB_MM_TOOLTIP_ID") % ID
+		tooltip_text = tooltip_text + "\n" + TranslationServer.translate("HEVLIB_MM_TOOLTIP_ID") % ID
 	var zip = MOD_INFO["zip"]
 	if zip:
-		tooltip_text = tooltip_text + TranslationServer.translate("HEVLIB_MM_TOOLTIP_ZIP") % zip
+		tooltip_text = tooltip_text + "\n" + TranslationServer.translate("HEVLIB_MM_TOOLTIP_ZIP") % zip
 	
 	
 	
@@ -99,7 +121,7 @@ func _draw():
 		else:
 			visible = false
 	if is_a_library:
-		tooltip_text = tooltip_text + TranslationServer.translate("HEVLIB_MM_TOOLTIP_LIBRARY") % [is_a_library,lib_hidden]
+		tooltip_text = tooltip_text + "\n" + TranslationServer.translate("HEVLIB_MM_TOOLTIP_LIBRARY") % [is_a_library,lib_hidden]
 	button.hint_tooltip = tooltip_text
 	
 #	_refocus()

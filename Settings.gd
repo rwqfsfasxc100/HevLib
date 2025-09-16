@@ -81,3 +81,4 @@ func loadKeymapsFromConfig():
 		var scancode = char(a.scancode)
 		keys.append(scancode)
 	
+var needs_restart_after_adding_mods = false

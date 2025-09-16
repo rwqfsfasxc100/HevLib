@@ -48,13 +48,13 @@ HEVLIB_UNKNOWN|Unknown
 
 HEVLIB_MM_TOOLTIP_HEADER|Mod Information:
 
-HEVLIB_MM_TOOLTIP_ID|\nMod ID: %s
+HEVLIB_MM_TOOLTIP_ID|Mod ID: %s
 
-HEVLIB_MM_TOOLTIP_MV|\nManifest Version: %s
+HEVLIB_MM_TOOLTIP_MV|Manifest Version: %s
 
-HEVLIB_MM_TOOLTIP_ZIP|\nZip File: %s
+HEVLIB_MM_TOOLTIP_ZIP|Zip File: %s
 
-HEVLIB_MM_TOOLTIP_LIBRARY|\nLibrary: %s \ Hidden: %s
+HEVLIB_MM_TOOLTIP_LIBRARY|Library: %s \ Hidden: %s
 
 HEVLIB_MM_BUTTON_TOOLTIP_GITHUB|Mod Github Page
 
@@ -81,3 +81,9 @@ HEVLIB_MODMENU_OPENFOLDER|Open Mods Folder
 HEVLIB_MODMENU_MODS_VISIBLE|Showing %d mods
 
 HEVLIB_DROP_FILES_TO_ADD_MODS|Drag and drop files into this window to add mods
+
+HEVLIB_MODMENU_VER_AND_PRIO|Version: v%s / Priority: %s
+
+HEVLIB_MODMENU_PRIO|Priority: %s
+
+HEVLIB_MODMENU_VERSION|Version: v%s
