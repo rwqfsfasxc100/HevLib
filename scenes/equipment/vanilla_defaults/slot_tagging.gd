@@ -131,7 +131,5 @@ const vanilla_equipment_defaults_for_reference = {
 }
 
 const min_version = {
-	"SYSTEM_MAIN_ENGINE_CHEVAL":[1,80,1],
-	"SYSTEM_THRUSTER_MADTX4":[1,79,0]
 }
 
