@@ -262,77 +262,105 @@ texture = SubResource( 2 )
 expand = true
 
 [node name="BUTTONS" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo"]
-visible = false
 margin_top = 183.0
 margin_right = 629.0
-margin_bottom = 245.0
+margin_bottom = 216.0
 alignment = 1
 
-[node name="LINKS" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/BUTTONS"]
-margin_left = 299.0
-margin_right = 329.0
-margin_bottom = 62.0
+[node name="LINKBOX" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/BUTTONS"]
+margin_right = 312.0
+margin_bottom = 33.0
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="LINKS" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/BUTTONS/LINKBOX"]
+margin_left = 31.0
+margin_right = 281.0
+margin_bottom = 33.0
+rect_min_size = Vector2( 250, 0 )
+custom_fonts/font = ExtResource( 3 )
+text = "MOD_WEBSITE"
+
+[node name="BRBOX" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/BUTTONS"]
+margin_left = 316.0
+margin_right = 629.0
+margin_bottom = 33.0
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="BUGREPORTS" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/BUTTONS/BRBOX"]
+margin_left = 31.0
+margin_right = 281.0
+margin_bottom = 33.0
+rect_min_size = Vector2( 250, 0 )
+custom_fonts/font = ExtResource( 3 )
+text = "MOD_REPORT_BUGS"
 
 [node name="DESC" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo"]
-margin_top = 183.0
+margin_top = 220.0
 margin_right = 629.0
-margin_bottom = 648.0
+margin_bottom = 644.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 disabled = true
 
 [node name="ScrollContainer" type="ScrollContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC"]
-rect_min_size = Vector2( 80, 80 )
+rect_min_size = Vector2( 550, 350 )
 mouse_filter = 1
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource( 8 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer"]
-margin_right = 70.0
-margin_bottom = 459.0
+margin_right = 550.0
+margin_bottom = 214.0
 size_flags_horizontal = 3
 
 [node name="DESCRIPTION" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
-margin_right = 70.0
+margin_right = 550.0
 margin_bottom = 38.0
 autowrap = true
 
 [node name="DASPLIT" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
 margin_top = 42.0
-margin_right = 70.0
+margin_right = 550.0
 margin_bottom = 42.0
 
 [node name="AHEADER" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
 margin_top = 46.0
-margin_right = 70.0
-margin_bottom = 189.0
+margin_right = 550.0
+margin_bottom = 84.0
 text = "HEVLIB_AUTHOR"
 autowrap = true
 
 [node name="AUTHOR" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
-margin_top = 193.0
-margin_right = 70.0
-margin_bottom = 231.0
+margin_top = 88.0
+margin_right = 550.0
+margin_bottom = 126.0
 autowrap = true
 
 [node name="AHSPLIT" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
-margin_top = 235.0
-margin_right = 70.0
-margin_bottom = 235.0
+margin_top = 130.0
+margin_right = 550.0
+margin_bottom = 130.0
 
 [node name="CHEADER" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
-margin_top = 239.0
-margin_right = 70.0
-margin_bottom = 417.0
+margin_top = 134.0
+margin_right = 550.0
+margin_bottom = 172.0
 text = "HEVLIB_CREDITS"
 autowrap = true
 
 [node name="CREDITS" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
-margin_top = 421.0
-margin_right = 70.0
-margin_bottom = 459.0
+margin_top = 176.0
+margin_right = 550.0
+margin_bottom = 214.0
 autowrap = true
+
+[node name="MarginContainer" type="MarginContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo"]
+margin_top = 648.0
+margin_right = 629.0
+margin_bottom = 648.0
 
 [node name="HSeparator" type="HSeparator" parent="base/PanelContainer/VBoxContainer"]
 margin_top = 652.0

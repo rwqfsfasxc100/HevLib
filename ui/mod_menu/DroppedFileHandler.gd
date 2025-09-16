@@ -15,6 +15,3 @@ func _files_dropped(files,screen):
 	if is_visible_in_tree():
 		for file in files:
 			FolderAccess.__copy_file(file,modPathPrefix)
-	
-	
-	
