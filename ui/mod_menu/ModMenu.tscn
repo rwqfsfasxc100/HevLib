@@ -18,7 +18,6 @@ flags = 4
 load_path = "res://HevLib/ui/themes/icons/config_icon.stex"
 
 [node name="ModMenu" type="Popup"]
-visible = true
 theme = ExtResource( 2 )
 popup_exclusive = true
 script = ExtResource( 7 )
