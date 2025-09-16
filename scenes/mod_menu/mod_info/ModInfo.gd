@@ -1,6 +1,14 @@
 extends VBoxContainer
 
-onready var nameplate = $NAME
+# Header nodes
+onready var nameplate = $Header/TEXT/NAME
+onready var iconplate = $Header/ICON
+onready var versionplate = $Header/TEXT/VERSION
+onready var authorplate = $Header/TEXT/AUTHOR
+onready var settings = $Header/BUTTONCONTAINER/SETTINGS
+onready var settings_icon = $Header/BUTTONCONTAINER/SETTINGS/SETTINGSICON
+
+# Body nodes
 onready var description_label = $DESC/ScrollContainer/VBoxContainer/DESCRIPTION
 onready var author_label = $DESC/ScrollContainer/VBoxContainer/AUTHOR
 onready var credits_label = $DESC/ScrollContainer/VBoxContainer/CREDITS
@@ -91,6 +99,7 @@ func _visibility_changed():
 		var nodes = scrollcontainer.get_node("VBoxContainer").get_children()
 		var node = nodes[0]
 		selected_mod = node
+		node.get_node("ModButton").grab_focus()
 
 
 
