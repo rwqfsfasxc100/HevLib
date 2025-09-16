@@ -5,4 +5,5 @@ func _ready():
 	
 
 func _files_dropped(files,screen):
+	var modpaths = ModLoader._modZipFiles
 	breakpoint
