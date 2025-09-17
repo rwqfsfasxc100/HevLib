@@ -21,6 +21,7 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 				"name":null,
 				"id":null,
 				"description":"",
+				"brief":"",
 				"author":"",
 				"credits":PoolStringArray([])
 			},
@@ -39,6 +40,13 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 			},
 			"configs":{
 				
+			},
+			"languages":{
+				
+			},
+			"library":{
+				"is_library":false,
+				"always_display":false,
 			},
 			"manifest_definitions":{
 				"manifest_version":1,
@@ -192,6 +200,7 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 					dict_template["mod_information"]["id"] = String(manifest_data["mod_information"].get("id",null))
 					dict_template["mod_information"]["name"] = String(manifest_data["mod_information"].get("name",null))
 					dict_template["mod_information"]["description"] = String(manifest_data["mod_information"].get("description","HEVLIB_DESCRIPTION_PLACEHOLDER"))
+					dict_template["mod_information"]["brief"] = String(manifest_data["mod_information"].get("brief",""))
 					dict_template["mod_information"]["author"] = String(manifest_data["mod_information"].get("author","Unknown"))
 					dict_template["mod_information"]["credits"] = PoolStringArray(manifest_data["mod_information"].get("credits",[]))
 				
@@ -209,13 +218,25 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 				
 				if "links" in manifest_data.keys():
 					var links = manifest_data["links"]
-					
+					for link in links:
+						dict_template["links"].merge({link:links.get(link)})
 				if "tags" in manifest_data.keys():
 					var tags = manifest_data["tags"]
-					
+					for tag in tags:
+						dict_template["tags"].merge({tag:tags.get(tag)})
 				if "languages" in manifest_data.keys():
 					var languages = manifest_data["languages"]
+					for language in languages:
+						dict_template["languages"].merge({language:languages.get(language)})
+				else:
+					dict_template["languages"].merge({"en":"100%"})
+				if "library" in manifest_data.keys():
+					dict_template["library"]["is_library"] = manifest_data["library"].get("is_library",false)
+					dict_template["library"]["always_display"] = manifest_data["library"].get("always_display",false)
 					
+				
+				
+				
 		var version_metadata = dict_template["version"]["version_metadata"]
 		var version_string = str(dict_template["version"]["version_major"]) + "." + str(dict_template["version"]["version_minor"]) + "." + str(dict_template["version"]["version_bugfix"])
 		if not version_metadata == "":

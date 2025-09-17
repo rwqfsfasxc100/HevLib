@@ -32,7 +32,8 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 			version[0] = int(data[0])
 			version[1] = int(data[1])
 			version[2] = int(data[2])
-	Debug.l("HevLib make_upgrades_scene manager: observed game version of %s") % str(version)
+	var text = "HevLib make_upgrades_scene manager: observed game version of %s"  % str(version)
+	Debug.l(text)
 	var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 	var UpgradeMenu : Node = load("res://enceladus/Upgrades.tscn").instance()
@@ -790,6 +791,7 @@ func confirm_equipment(equipment_node, slot_type, slot_alignment, slot_restricti
 	var e_restriction = equipment_node.get("restriction","")
 	if equipment_node.get("system","") in vanilla_data.min_version:
 		var data = vanilla_data.min_version.get(equipment_node.system)
+		var failtext = "Equipment %s not adding due to old game version. Needed min version: %s ; observed game version: %s" % [str(equipment_node.get("system","")), str(data), str(version)]
 		if data[0] < version[0]:
 			pass
 		elif data[0] == version[0]:
@@ -799,13 +801,13 @@ func confirm_equipment(equipment_node, slot_type, slot_alignment, slot_restricti
 				if data[2] <= version[2]:
 					pass
 				else:
-					Debug.l("Equipment %s not adding due to old game version. Needed min version: %s ; observed game version: %s") % [str(equipment_node.get("system","")), str(data), str(version)]
+					Debug.l(failtext)
 					return false
 			else:
-				Debug.l("Equipment %s not adding due to old game version. Needed min version: %s ; observed game version: %s") % [str(equipment_node.get("system","")), str(data), str(version)]
+				Debug.l(failtext)
 				return false
 		else:
-			Debug.l("Equipment %s not adding due to old game version. Needed min version: %s ; observed game version: %s") % [str(equipment_node.get("system","")), str(data), str(version)]
+			Debug.l(failtext)
 			return false
 		
 	if e_slot_type == slot_type:

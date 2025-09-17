@@ -1,6 +1,8 @@
 locale|en
 
-HEVLIB_MOD_DESCRIPTION|Library mod containing several common functions created by __hev
+HEVLIB_MOD_BRIEF|Library mod containing several common functions created by __hev
+
+HEVLIB_MOD_DESCRIPTION|A library providing several functional parts:\n\n * Common functionality provided through 'pointer' files.\n * Handling of mod manifest files via versioning to create a unified medium to fetch information from them.\n * EquipmentDriver - Add & manage equipment items, slots, and more...\n * WeaponSlotDriver - Add and modify equipment added to ship hardpoints.\n\nThis library also aims to keep a consistent method to make modding easier. Compatability with mods is also a primary focus of the functionality provided.\n\nFor more information, please check this mod's wiki. If you have any suggestons or ideas, please leave them in the Discord or a GitHub issue.
 
 HEVLIB_GENERIC_ERROR_HEADER|
 

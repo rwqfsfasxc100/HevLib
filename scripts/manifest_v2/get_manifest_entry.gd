@@ -36,8 +36,9 @@ static func get_manifest_entry(section: String, entry: String, mod_id: String = 
 			var dict = {}
 			for mod in sec:
 				var id = mod_data[mod]["manifest"]["manifest_data"]["mod_information"]["id"]
-				var e = sec[mod][entry]
-				dict.merge({id:e})
+				if entry in sec[mod].keys():
+					var e = sec[mod][entry]["value"]
+					dict.merge({id:e})
 			return dict
 		"specific":
 			if entry in sec:

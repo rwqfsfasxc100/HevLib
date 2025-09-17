@@ -3,6 +3,7 @@
 id="hev.LIBRARY"
 name="HevLib"
 description="HEVLIB_MOD_DESCRIPTION"
+brief="HEVLIB_MOD_BRIEF"
 author="__hev"
 credits=["Za'krin - Mod Main design, original implementation of updateTL","spaceDOTexe - Manifest design, UpgradeGroup ship limiting logic"]
 
@@ -14,20 +15,26 @@ version_bugfix=4
 
 [tags]
 
-allow_achievements=true
-is_library_mod=true
-library_hidden_by_default=false
-language=["en"]
+allow_achievements={"type":"bool","value":true}
 
 [links]
 
-github={"link":"https://github.com/rwqfsfasxc100/HevLib","has_releases":true}
-discord="https://discord.com/channels/426287934870781952/1354537481197850655"
-nexus="https://www.nexusmods.com/dvringsofsaturn/mods/16"
-donations="https://ko-fi.com/00hev"
-wiki="https://github.com/rwqfsfasxc100/HevLib/wiki"
-bug_reports="https://forms.gle/RmC4Zgonp6frFgnK7"
+HEVLIB_GITHUB={"URL":"https://github.com/rwqfsfasxc100/HevLib"}
+HEVLIB_DISCORD={"URL":"https://discord.com/channels/426287934870781952/1354537481197850655"}
+HEVLIB_NEXUS={"URL":"https://www.nexusmods.com/dvringsofsaturn/mods/16"}
+HEVLIB_DONATIONS={"URL":"https://ko-fi.com/00hev"}
+HEVLIB_WIKI={"URL":"https://github.com/rwqfsfasxc100/HevLib/wiki"}
+HEVLIB_BUGREPORTS={"URL":"https://forms.gle/RmC4Zgonp6frFgnK7"}
+
+[languages]
+
+en="100%"
+
+[library]
+
+is_library=true
+always_display=true
 
 [manifest_definitions]
 
-manifest_version=2.1
+manifest_version=2.2
