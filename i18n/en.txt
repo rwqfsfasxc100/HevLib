@@ -87,3 +87,23 @@ HEVLIB_MODMENU_VER_AND_PRIO|Version: v%s / Priority: %s
 HEVLIB_MODMENU_PRIO|Priority: %s
 
 HEVLIB_MODMENU_VERSION|Version: v%s
+
+HEVLIB_GITHUB|GitHub Repository
+
+HEVLIB_DISCORD|Discord Thread
+
+HEVLIB_NEXUS|Nexusmods page
+
+HEVLIB_DONATIONS|Donate to the project
+
+HEVLIB_WIKI|Wiki
+
+HEVLIB_BUGREPORTS|Report a bug
+
+HEVLIB_FILTER_BY_TAGS|Filter mods by tags
+
+HEVLIB_SETTINGS_BUTTON_TOOLTIP|Open the configuration menu
+
+HEVLIB_LINKS_TOOLTIP|Display respective links
+
+HEVLIB_BUGREPORTS_TOOLTIP|Open bug report link

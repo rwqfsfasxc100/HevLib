@@ -1,0 +1,54 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://menu/sfx/PlaySoundsOnTheseButtons.gd" type="Script" id=1]
+[ext_resource path="res://menu/sfx/focus.wav" type="AudioStream" id=2]
+[ext_resource path="res://menu/sfx/hover.wav" type="AudioStream" id=3]
+[ext_resource path="res://menu/sfx/select.wav" type="AudioStream" id=4]
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=5]
+
+[node name="PlaySoundsOnTheseButtons" type="Node"]
+pause_mode = 2
+script = ExtResource( 1 )
+tooltipLabelPath = NodePath("Separation/Tooltip/MarginContainer/PanelContainer/TooltipLabel")
+tooltipContainerPath = NodePath("Separation/Tooltip/MarginContainer")
+tooltipPositionPath = NodePath("Separation/Tooltip")
+
+[node name="focus" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 2 )
+volume_db = -5.0
+bus = "UI"
+
+[node name="hover" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 3 )
+volume_db = -10.0
+bus = "UI"
+
+[node name="select" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 4 )
+bus = "UI"
+
+[node name="Separation" type="Node" parent="."]
+
+[node name="Tooltip" type="Node2D" parent="Separation"]
+visible = false
+
+[node name="MarginContainer" type="MarginContainer" parent="Separation/Tooltip"]
+modulate = Color( 2, 2, 2, 0.51 )
+light_mask = 0
+margin_right = 40.0
+margin_bottom = 40.0
+mouse_filter = 2
+theme = ExtResource( 5 )
+
+[node name="PanelContainer" type="PanelContainer" parent="Separation/Tooltip/MarginContainer"]
+light_mask = 0
+margin_right = 40.0
+margin_bottom = 48.0
+mouse_filter = 2
+
+[node name="TooltipLabel" type="Label" parent="Separation/Tooltip/MarginContainer/PanelContainer"]
+light_mask = 0
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 35.0
+margin_bottom = 43.0

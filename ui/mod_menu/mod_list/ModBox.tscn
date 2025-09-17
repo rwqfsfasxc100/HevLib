@@ -1,8 +1,9 @@
-[gd_scene load_steps=18 format=2]
+[gd_scene load_steps=19 format=2]
 
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=1]
 [ext_resource path="res://HevLib/ui/mod_menu/mod_list/ModBox.gd" type="Script" id=2]
 [ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=3]
+[ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=4]
 
 [sub_resource type="StreamTexture" id=1]
 flags = 4
@@ -273,6 +274,8 @@ text = "MOD_NAME"
 valign = 1
 autowrap = true
 max_lines_visible = 2
+
+[node name="PlaySoundsOnTheseButtons" parent="ModButton" instance=ExtResource( 4 )]
 
 [node name="BriefInfoLabel" type="VBoxContainer" parent="."]
 margin_left = 600.0
