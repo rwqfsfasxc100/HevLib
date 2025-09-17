@@ -115,11 +115,11 @@ func _ready():
 	BS.connect("visibility_changed",BS,"_visibility_changed")
 	BS.name = "HEVLIB_NODE_SEPARATOR_IGNORE_PLS"
 	node.add_child(BS)
-	
 
 func sort(a: Node, b: Node): 
 	return a.MOD_INFO.name.naturalnocasecmp_to(b.MOD_INFO.name) < 0
 	
+
 
 func _draw():
 	

@@ -5,6 +5,7 @@ var offset = Vector2(12,12)
 func _about_to_show():
 	$base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList.about_to_show()
 	lastFocus = get_focus_owner()
+	_on_resize()
 	
 func _unhandled_input(event):
 	if visible and Input.is_action_just_pressed("ui_cancel"):
@@ -17,7 +18,6 @@ func show_menu():
 func cancel():
 	hide()
 	refocus()
-
 
 var lastFocus = null
 func refocus():
@@ -33,5 +33,4 @@ func _on_resize():
 	$base.rect_position = offset/2
 
 func _visibility_changed():
-	
-	call_deferred("_on_resize")
+	_on_resize()

@@ -90,6 +90,8 @@ HEVLIB_MODMENU_PRIO|Priority: %s
 
 HEVLIB_MODMENU_VERSION|Version: v%s
 
+HEVLIB_MODMENU_PRIO_MID_HEADER|Mod ID and Priority
+
 HEVLIB_GITHUB|GitHub Repository
 
 HEVLIB_DISCORD|Discord Thread
