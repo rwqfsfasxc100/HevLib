@@ -17,8 +17,7 @@ onready var button_label = $ModButton/VBoxContainer/HBoxContainer/LABELS/NAME
 onready var button_brief = $ModButton/VBoxContainer/HBoxContainer/LABELS/BRIEF
 onready var button_lib_icon = $ModButton/VBoxContainer/HBoxContainer/VBoxContainer/Library
 onready var button_children_icon = $ModButton/VBoxContainer/HBoxContainer/VBoxContainer/Children
-
-onready var brief_box = $BriefInfoLabel
+onready var button_children_count = $ModButton/VBoxContainer/HBoxContainer/VBoxContainer/Children/Count
 
 var button_size = Vector2(0,0)
 
@@ -30,6 +29,11 @@ func _pressed():
 	
 	information_nodes["info_name"].text = MOD_INFO["name"]
 	var prio = MOD_INFO["priority"]
+	if prio.ends_with("INF"):
+		if prio.begins_with("-"):
+			prio = "-INF"
+		else:
+			prio = "INF"
 	var ver = MOD_INFO["version_data"]["full_version_string"]
 	information_nodes["info_version"].text = TranslationServer.translate("HEVLIB_MODMENU_VERSION") % ver
 	information_nodes["info_priority"].text = TranslationServer.translate("HEVLIB_MODMENU_PRIO") % prio
@@ -76,6 +80,11 @@ func _draw():
 	
 	var mod_name = MOD_INFO["name"]
 	var prio = MOD_INFO["priority"]
+	if prio.ends_with("INF"):
+		if prio.begins_with("-"):
+			prio = "-INF"
+		else:
+			prio = "INF"
 	var version_arr = MOD_INFO["version_data"]["full_version_array"]
 	var version_print = MOD_INFO["version_data"]["full_version_string"]
 	var icon = ""
@@ -103,9 +112,15 @@ func _draw():
 	var md = manifest["manifest_data"]
 	if md:
 		ID = md["mod_information"]["id"]
+		
 	tooltip_text = tooltip_text + "\n" + TranslationServer.translate("HEVLIB_MM_TOOLTIP_MV") % manifest["manifest_version"]
 	if ID:
 		tooltip_text = tooltip_text + "\n" + TranslationServer.translate("HEVLIB_MM_TOOLTIP_ID") % ID
+		if ID == "kodera.vanilla":
+			var tex = StreamTexture.new()
+			tex.load_path = "res://HevLib/ui/mod_menu/vanilla/kodera.stex"
+			button_lib_icon.texture = tex
+			button_lib_icon.visible = true
 	var zip = MOD_INFO["zip"]
 	if zip:
 		tooltip_text = tooltip_text + "\n" + TranslationServer.translate("HEVLIB_MM_TOOLTIP_ZIP") % zip

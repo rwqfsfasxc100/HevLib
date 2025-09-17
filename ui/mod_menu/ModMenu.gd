@@ -31,6 +31,7 @@ func _on_resize():
 	$ColorRect.rect_size = size
 	$base.rect_size = size - offset
 	$base.rect_position = offset/2
+	
 
 func _visibility_changed():
 	_on_resize()

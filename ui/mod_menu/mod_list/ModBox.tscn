@@ -219,7 +219,7 @@ anims/Modulate = SubResource( 12 )
 
 [node name="ModButton" type="Button" parent="."]
 margin_left = 104.0
-margin_right = 596.0
+margin_right = 600.0
 margin_bottom = 100.0
 focus_neighbour_left = NodePath(".")
 size_flags_horizontal = 3
@@ -264,10 +264,22 @@ texture = SubResource( 14 )
 expand = true
 stretch_mode = 6
 
+[node name="Count" type="Label" parent="ModButton/VBoxContainer/HBoxContainer/VBoxContainer/Children"]
+margin_left = 5.0
+margin_top = 30.0
+margin_right = 45.0
+margin_bottom = 59.0
+rect_min_size = Vector2( 40, 10 )
+rect_scale = Vector2( 0.75, 0.75 )
+custom_fonts/font = ExtResource( 5 )
+text = "0"
+align = 1
+
 [node name="LABELS" type="VBoxContainer" parent="ModButton/VBoxContainer/HBoxContainer"]
 margin_left = 44.0
 margin_right = 212.0
 margin_bottom = 94.0
+rect_min_size = Vector2( 0, 94 )
 size_flags_horizontal = 3
 
 [node name="NAME" type="Label" parent="ModButton/VBoxContainer/HBoxContainer/LABELS"]
@@ -290,11 +302,6 @@ autowrap = true
 max_lines_visible = 2
 
 [node name="PlaySoundsOnTheseButtons" parent="ModButton" instance=ExtResource( 4 )]
-
-[node name="BriefInfoLabel" type="VBoxContainer" parent="."]
-margin_left = 600.0
-margin_right = 600.0
-margin_bottom = 100.0
 
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
 [connection signal="pressed" from="ModButton" to="." method="_pressed"]

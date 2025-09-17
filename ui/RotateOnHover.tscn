@@ -1,0 +1,40 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://HevLib/ui/mod_menu/RotateOnHover.gd" type="Script" id=1]
+
+[sub_resource type="Animation" id=1]
+resource_name = "Hover"
+tracks/0/type = "value"
+tracks/0/path = NodePath("@@806/@@8472/@@8246/@@8247/@@8248/@@8249/@@8250/@@8251/RotateOnHover:rotation_degs")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ 0, 180 ]
+}
+
+[sub_resource type="Animation" id=2]
+resource_name = "Unhover"
+tracks/0/type = "value"
+tracks/0/path = NodePath("@@806/@@8472/@@8246/@@8247/@@8248/@@8249/@@8250/@@8251/RotateOnHover:rotation_degs")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ 180, 0 ]
+}
+
+[node name="RotateOnHover" type="AnimationPlayer"]
+root_node = NodePath("../../../../../../../../..")
+anims/Hover = SubResource( 1 )
+anims/Unhover = SubResource( 2 )
+script = ExtResource( 1 )
+rotation_degs = 180

@@ -82,7 +82,7 @@ HEVLIB_MODMENU_OPENFOLDER|Open Mods Folder
 
 HEVLIB_MODMENU_MODS_VISIBLE|Showing %d mods
 
-HEVLIB_DROP_FILES_TO_ADD_MODS|Drag and drop files into this window to add mods
+HEVLIB_DROP_FILES_TO_ADD_MODS|Drag and drop files into this window to add mods.\nIdentical mod file names will be overwritten
 
 HEVLIB_MODMENU_VER_AND_PRIO|Version: v%s / Priority: %s
 
