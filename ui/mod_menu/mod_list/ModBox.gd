@@ -13,7 +13,8 @@ onready var icon_complementary = $Icon/Control/Complementary
 onready var button = $ModButton
 onready var button_box = $ModButton/VBoxContainer
 onready var button_box2 = $ModButton/VBoxContainer/HBoxContainer
-onready var button_label = $ModButton/VBoxContainer/HBoxContainer/Label
+onready var button_label = $ModButton/VBoxContainer/HBoxContainer/LABELS/NAME
+onready var button_brief = $ModButton/VBoxContainer/HBoxContainer/LABELS/BRIEF
 onready var button_lib_icon = $ModButton/VBoxContainer/HBoxContainer/VBoxContainer/Library
 onready var button_children_icon = $ModButton/VBoxContainer/HBoxContainer/VBoxContainer/Children
 
@@ -110,7 +111,7 @@ func _draw():
 		tooltip_text = tooltip_text + "\n" + TranslationServer.translate("HEVLIB_MM_TOOLTIP_ZIP") % zip
 	
 	
-	
+	button_brief.text = MOD_INFO["manifest"]["manifest_data"]["mod_information"]["brief"]
 	
 	
 	

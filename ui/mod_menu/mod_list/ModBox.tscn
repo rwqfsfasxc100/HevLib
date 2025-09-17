@@ -1,9 +1,10 @@
-[gd_scene load_steps=19 format=2]
+[gd_scene load_steps=20 format=2]
 
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=1]
 [ext_resource path="res://HevLib/ui/mod_menu/mod_list/ModBox.gd" type="Script" id=2]
 [ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=3]
 [ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=4]
+[ext_resource path="res://HevLib/ui/themes/font-courierbold.tres" type="DynamicFont" id=5]
 
 [sub_resource type="StreamTexture" id=1]
 flags = 4
@@ -263,15 +264,28 @@ texture = SubResource( 14 )
 expand = true
 stretch_mode = 6
 
-[node name="Label" type="Label" parent="ModButton/VBoxContainer/HBoxContainer"]
+[node name="LABELS" type="VBoxContainer" parent="ModButton/VBoxContainer/HBoxContainer"]
 margin_left = 44.0
 margin_right = 212.0
 margin_bottom = 94.0
-rect_min_size = Vector2( 0, 94 )
 size_flags_horizontal = 3
-size_flags_vertical = 7
+
+[node name="NAME" type="Label" parent="ModButton/VBoxContainer/HBoxContainer/LABELS"]
+margin_right = 168.0
+margin_bottom = 38.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
 text = "MOD_NAME"
-valign = 1
+autowrap = true
+max_lines_visible = 2
+
+[node name="BRIEF" type="Label" parent="ModButton/VBoxContainer/HBoxContainer/LABELS"]
+modulate = Color( 0.54902, 0.54902, 0.54902, 1 )
+margin_top = 42.0
+margin_right = 168.0
+margin_bottom = 71.0
+custom_fonts/font = ExtResource( 5 )
+text = "MOD_BRIEF"
 autowrap = true
 max_lines_visible = 2
 

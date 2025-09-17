@@ -21,7 +21,7 @@ func _ready():
 	# var WebTranslate = preload("res://HevLib/pointers/WebTranslate.gd")
 	# WebTranslate.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]], "res://HevLib/webtranslate/ModMain.gd")
 	
-	loadTranslationsFromCache()
+#	loadTranslationsFromCache()
 	
 	l("Ready")
 

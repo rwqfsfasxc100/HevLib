@@ -29,6 +29,7 @@ const VANILLA = {
 				"name":"ΔV: Rings of Saturn",
 				"id":"kodera.vanilla",
 				"description":"HEVLIB_VANILLA_DESCRIPTION",
+				"brief":"HEVLIB_VANILLA_BRIEF",
 				"author":"Kodera Software",
 				"credits":[]
 			},
