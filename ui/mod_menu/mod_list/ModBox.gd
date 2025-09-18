@@ -29,8 +29,8 @@ func _pressed():
 	
 	information_nodes["info_name"].text = MOD_INFO["name"]
 	var prio = MOD_INFO["priority"]
-	if prio.ends_with("INF"):
-		if prio.begins_with("-"):
+	if str(prio).ends_with("INF"):
+		if str(prio).begins_with("-"):
 			prio = "-INF"
 		else:
 			prio = "INF"
@@ -80,8 +80,8 @@ func _draw():
 	
 	var mod_name = MOD_INFO["name"]
 	var prio = MOD_INFO["priority"]
-	if prio.ends_with("INF"):
-		if prio.begins_with("-"):
+	if str(prio).ends_with("INF"):
+		if str(prio).begins_with("-"):
 			prio = "-INF"
 		else:
 			prio = "INF"
@@ -120,6 +120,7 @@ func _draw():
 			var tex = StreamTexture.new()
 			tex.load_path = "res://HevLib/ui/mod_menu/vanilla/kodera.stex"
 			button_lib_icon.texture = tex
+			button_lib_icon.modulate = Color(1,1,1,1)
 			button_lib_icon.visible = true
 	var zip = MOD_INFO["zip"]
 	if zip:

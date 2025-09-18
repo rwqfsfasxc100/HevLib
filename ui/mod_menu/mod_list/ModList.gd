@@ -20,7 +20,7 @@ export var info_desc_credits = NodePath("")
 
 onready var listContainer = $ScrollContainer/VBoxContainer
 
-onready var desc_scroll = get_node("../../ModInfo/DESC/ScrollContainer")
+
 
 func about_to_show():
 	var nodes = listContainer.get_children()
@@ -119,8 +119,11 @@ func _ready():
 func sort(a: Node, b: Node): 
 	return a.MOD_INFO.name.naturalnocasecmp_to(b.MOD_INFO.name) < 0
 	
-
+export var desc_scroll_box = NodePath("")
+onready var dp = get_node(desc_scroll_box)
 
 func _draw():
-	
-	desc_scroll.rect_size = desc_scroll.get_parent().rect_size
+	var dp_d_size = dp.get_parent().rect_size
+	dp.rect_min_size = dp_d_size
+	dp.rect_size = dp_d_size
+	pass
