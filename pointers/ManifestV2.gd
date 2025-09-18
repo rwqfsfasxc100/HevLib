@@ -115,7 +115,7 @@ static func __get_mod_data_from_files(script_path:String, format_to_manifest_ver
 	var s = f.get_mod_data_from_files(script_path,format_to_manifest_version)
 	return s
 
-static func __parse_file_as_manifest(file_path: String, format_to_manifest_version: bool = false) -> Dictionary:
+static func __parse_file_as_manifest(file_path: String, format_to_manifest_version: bool = false) -> Dictionary: # UPDATED FOR MANIFESTV2.2
 	var f = load("res://HevLib/scripts/manifest_v2/parse_file_as_manifest.gd").new()
 	var s = f.parse_file_as_manifest(file_path, format_to_manifest_version)
 	return s
@@ -190,7 +190,7 @@ static func __check_mod_conflicts(mod_id) -> Array:
 	var s = f.check_mod_conflicts(mod_id)
 	return s
 
-static func __parse_tags(tag_data) -> Dictionary:
+static func __parse_tags(tag_data) -> Dictionary: # UPDATING FOR MANIFESTV2.2
 	var f = load("res://HevLib/scripts/manifest_v2/parse_tags.gd")
 	var s = f.parse_tags(tag_data)
 	return s

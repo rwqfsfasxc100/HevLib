@@ -134,33 +134,33 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 				if "tags" in manifest_data.keys():
 					var current_tags = manifest_data["tags"].keys()
 					if "allow_achievements" in current_tags:
-						dict_template["tags"].merge({"allow_achievements":{"type":"boolean","value":manifest_data["tags"].get("allow_achievements")}})
+						dict_template["tags"].merge({"TAG_ALLOW_ACHIEVEMENTS":{"type":"boolean","value":manifest_data["tags"].get("TAG_ALLOW_ACHIEVEMENTS")}})
 					if "quality_of_life" in current_tags:
-						dict_template["tags"].merge({"quality_of_life":{"type":"boolean","value":manifest_data["tags"].get("quality_of_life")}})
+						dict_template["tags"].merge({"TAG_QOL":{"type":"boolean","value":manifest_data["tags"].get("TAG_QOL")}})
 					if "is_library_mod" in current_tags:
-						dict_template["tags"].merge({"is_library_mod":{"type":"boolean","value":manifest_data["tags"].get("is_library_mod")}})
+						dict_template["library"]["is_library"] = manifest_data["tags"].get("is_library_mod")
 					if "uses_hevlib_research" in current_tags:
-						dict_template["tags"].merge({"uses_hevlib_research":{"type":"boolean","value":manifest_data["tags"].get("uses_hevlib_research")}})
+						dict_template["tags"].merge({"TAG_USING_HEVLIB_RESEARCH":{"type":"boolean","value":manifest_data["tags"].get("TAG_USING_HEVLIB_RESEARCH")}})
 					if "overhaul" in current_tags:
-						dict_template["tags"].merge({"overhaul":{"type":"bool","value":manifest_data["tags"].get("overhaul")}})
+						dict_template["tags"].merge({"TAG_OVERHAUL":{"type":"bool","value":manifest_data["tags"].get("TAG_OVERHAUL")}})
 					if "visual" in current_tags:
-						dict_template["tags"].merge({"visual":{"type":"bool","value":manifest_data["tags"].get("visual")}})
+						dict_template["tags"].merge({"TAG_VISUAL":{"type":"bool","value":manifest_data["tags"].get("TAG_VISUAL")}})
 					if "fun" in current_tags:
-						dict_template["tags"].merge({"fun":{"type":"bool","value":manifest_data["tags"].get("fun")}})
+						dict_template["tags"].merge({"TAG_FUN":{"type":"bool","value":manifest_data["tags"].get("TAG_FUN")}})
 					if "user_interface" in current_tags:
 						dict_template["tags"].merge({"user_interface":{"type":"bool","value":manifest_data["tags"].get("user_interface")}})
 					
 					if "adds_ships" in current_tags:
-						dict_template["tags"].merge({"adds_ships":{"type":"array","value":manifest_data["tags"].get("adds_ships")}})
+						dict_template["tags"].merge({"TAG_ADDS_SHIPS":{"type":"array","value":manifest_data["tags"].get("TAG_ADDS_SHIPS")}})
 					if "adds_equipment" in current_tags:
-						dict_template["tags"].merge({"adds_equipment":{"type":"array","value":manifest_data["tags"].get("adds_equipment")}})
+						dict_template["tags"].merge({"TAG_ADDS_EQUIPMENT":{"type":"array","value":manifest_data["tags"].get("TAG_ADDS_EQUIPMENT")}})
 					if "adds_gameplay_mechanics" in current_tags:
-						dict_template["tags"].merge({"adds_gameplay_mechanics":{"type":"array","value":manifest_data["tags"].get("adds_gameplay_mechanics")}})
+						dict_template["tags"].merge({"TAG_ADDS_GAMEPLAY_MECHANICS":{"type":"array","value":manifest_data["tags"].get("TAG_ADDS_GAMEPLAY_MECHANICS")}})
 					if "adds_events" in current_tags:
-						dict_template["tags"].merge({"adds_events":{"type":"array","value":manifest_data["tags"].get("adds_events")}})
+						dict_template["tags"].merge({"TAG_ADDS_EVENTS":{"type":"array","value":manifest_data["tags"].get("TAG_ADDS_EVENTS")}})
 					
 					if "handle_extra_crew" in current_tags:
-						dict_template["tags"].merge({"handle_extra_crew":{"type":"integer","value":manifest_data["tags"].get("handle_extra_crew")}})
+						dict_template["tags"].merge({"TAG_HANDLE_EXTRA_CREW":{"type":"integer","value":manifest_data["tags"].get("TAG_HANDLE_EXTRA_CREW")}})
 					
 				# links
 				if "links" in manifest_data.keys():

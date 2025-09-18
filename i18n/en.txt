@@ -115,3 +115,27 @@ HEVLIB_BUGREPORTS_BUTTON|Bug reports
 HEVLIB_LINKS_TOOLTIP|Display respective links
 
 HEVLIB_BUGREPORTS_TOOLTIP|Open bug report link
+
+TAG_ALLOW_ACHIEVEMENTS|Allows achievements
+
+TAG_QOL|Quality of life
+
+TAG_USING_HEVLIB_RESEARCH|Using HevLib Research
+
+TAG_OVERHAUL|Overhaul
+
+TAG_VISUAL|Visual
+
+TAG_FUN|Fun
+
+TAG_UI|User interface (UI)
+
+TAG_ADDS_SHIPS|Adds new ships
+
+TAG_ADDS_EQUIPMENT|Adds new equipment
+
+TAG_ADDS_GAMEPLAY_MECHANICS|Adds new gameplay mechanics
+
+TAG_ADDS_EVENTS|Adds new ring events
+
+TAG_HANDLE_EXTRA_CREW|Handles extra crew
