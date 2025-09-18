@@ -7,8 +7,18 @@ static func parse_tags(tag_data) -> Dictionary:
 		if type != TYPE_DICTIONARY:
 			return tag_dict
 		var tag_type = tag_data[entry].get("type")
+		tag_type = tag_type.to_lower()
 		match tag_type:
 			"boolean","bool":
-				var val = tag_data[entry].get("value")
+				var val = bool(tag_data[entry].get("value"))
+				tag_dict.merge({entry:val})
+			"string","str":
+				var val = str(tag_data[entry].get("value"))
+				tag_dict.merge({entry:val})
+			"integer","int":
+				var val = int(tag_data[entry].get("value"))
+				tag_dict.merge({entry:val})
+			"array","arr":
+				var val = Array(tag_data[entry].get("value"))
 				tag_dict.merge({entry:val})
 	return tag_dict
