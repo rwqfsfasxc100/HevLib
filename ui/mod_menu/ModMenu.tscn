@@ -24,7 +24,6 @@ flags = 4
 load_path = "res://HevLib/ui/themes/icons/config_icon.stex"
 
 [node name="ModMenu" type="Popup"]
-visible = true
 theme = ExtResource( 2 )
 popup_exclusive = true
 script = ExtResource( 7 )
@@ -278,6 +277,11 @@ margin_right = 281.0
 margin_bottom = 33.0
 rect_min_size = Vector2( 250, 0 )
 hint_tooltip = "HEVLIB_LINKS_TOOLTIP"
+focus_neighbour_top = NodePath("../../../../BUTTONCONTAINER/SETTINGS")
+focus_neighbour_right = NodePath("../../BRBOX/BUGREPORTS")
+focus_neighbour_bottom = NodePath("../../../DESC")
+focus_next = NodePath("../../BRBOX/BUGREPORTS")
+focus_previous = NodePath("../../../../BUTTONCONTAINER/SETTINGS")
 custom_fonts/font = ExtResource( 3 )
 text = "HEVLIB_LINKS_BUTTON"
 
@@ -296,6 +300,12 @@ margin_right = 305.0
 margin_bottom = 33.0
 rect_min_size = Vector2( 250, 0 )
 hint_tooltip = "HEVLIB_BUGREPORTS_TOOLTIP"
+focus_neighbour_left = NodePath("../../LINKBOX/LINKS")
+focus_neighbour_top = NodePath("../../../../BUTTONCONTAINER/SETTINGS")
+focus_neighbour_right = NodePath(".")
+focus_neighbour_bottom = NodePath("../../../DESC")
+focus_next = NodePath("../../../DESC")
+focus_previous = NodePath("../../LINKBOX/LINKS")
 custom_fonts/font = ExtResource( 3 )
 text = "HEVLIB_BUGREPORTS_BUTTON"
 
@@ -305,6 +315,10 @@ text = "HEVLIB_BUGREPORTS_BUTTON"
 margin_top = 220.0
 margin_right = 629.0
 margin_bottom = 648.0
+focus_neighbour_top = NodePath("../BUTTONS/BRBOX/BUGREPORTS")
+focus_neighbour_right = NodePath(".")
+focus_neighbour_bottom = NodePath("../../../../../FooterButtons/Close")
+focus_previous = NodePath("../BUTTONS/BRBOX/BUGREPORTS")
 size_flags_horizontal = 3
 size_flags_vertical = 3
 disabled = true
@@ -317,7 +331,7 @@ size_flags_vertical = 3
 script = ExtResource( 8 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/InfoMargin/Panel/ModInfo/DESC/ScrollContainer"]
-margin_right = 540.0
+margin_right = 550.0
 margin_bottom = 368.0
 size_flags_horizontal = 3
 
@@ -414,6 +428,12 @@ margin_right = 62.0
 margin_bottom = 62.0
 rect_min_size = Vector2( 62, 62 )
 hint_tooltip = "HEVLIB_SETTINGS_BUTTON_TOOLTIP"
+focus_neighbour_left = NodePath("../../../../SPLIT/ListHeader/SearchBox/FILTER")
+focus_neighbour_top = NodePath(".")
+focus_neighbour_right = NodePath(".")
+focus_neighbour_bottom = NodePath("../../ModInfo/BUTTONS/BRBOX/BUGREPORTS")
+focus_next = NodePath("../../ModInfo/BUTTONS/LINKBOX/LINKS")
+focus_previous = NodePath("../../../../SPLIT/ListHeader/SearchBox/FILTER")
 
 [node name="SETTINGSICON" type="TextureRect" parent="base/PanelContainer/VBoxContainer/ModContainer/InfoMargin/Panel/BUTTONCONTAINER/SETTINGS"]
 margin_right = 40.0
