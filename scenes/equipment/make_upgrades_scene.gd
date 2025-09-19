@@ -21,7 +21,34 @@ func _init():
 	vanilla_equipment_defaults_for_reference = vanilla_data.vanilla_equipment_defaults_for_reference.duplicate(true)
 
 var version = [1,0,0]
-func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn", weaponslot_save_path : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot.tscn"):
+func make_upgrades_scene():
+	
+	
+	# FILE PATHS
+	var FILE_PATHS = [
+		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn",
+		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot.tscn",
+		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/aux_power_slot/AuxSlot.tscn",
+		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_TEMPLATES.json",
+		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_STANDALONE.json",
+		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order.json",
+		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_SHIP_TEMPLATES.json",
+		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_SHIP_STANDALONE.json",
+		"user://cache/.HevLib_Cache/MenuDriver/save_buttons.json",
+	]
+	
+	var file_save_path : String = FILE_PATHS[0]
+	var weaponslot_save_path : String = FILE_PATHS[1]
+	var auxslot_save_path : String = FILE_PATHS[2]
+	var weaponslot_modify_templates_file = FILE_PATHS[3]
+	var weaponslot_modify_standalone_file = FILE_PATHS[4]
+	var slot_order_cache_file = FILE_PATHS[5]
+	var weaponslot_ship_templates_file = FILE_PATHS[6]
+	var weaponslot_ship_standalone_file = FILE_PATHS[7]
+	var save_menu_file = FILE_PATHS[8]
+	
+	
+	
 	var pls = File.new()
 	pls.open("res://VersionLabel.tscn",File.READ)
 	var ptxt = pls.get_as_text(true)
@@ -80,23 +107,15 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 				index += 1
 		vanilla_slot_types.merge({slot.name:sys_slot})
 	
-	var weaponslot_modify_templates_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_TEMPLATES.json"
-	var weaponslot_modify_standalone_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_STANDALONE.json"
-	var slot_order_cache_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order.json"
-	var weaponslot_ship_templates_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_SHIP_TEMPLATES.json"
-	var weaponslot_ship_standalone_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_SHIP_STANDALONE.json"
+	
 	var folders = FolderAccess.__fetch_folder_files("res://", true, true)
 	var data_state : Array = []
 	var ws_state : Array = []
 	
 	
-	var menu_folder = "user://cache/.HevLib_Cache/MenuDriver/"
-	var save_menu_file = menu_folder + "save_buttons.json"
 	
-	
-	FolderAccess.__check_folder_exists(file_save_path.split(file_save_path.split("/")[file_save_path.split("/").size() - 1])[0])
-	FolderAccess.__check_folder_exists(weaponslot_save_path.split(weaponslot_save_path.split("/")[weaponslot_save_path.split("/").size() - 1])[0])
-	FolderAccess.__check_folder_exists(menu_folder)
+	for item in FILE_PATHS:
+		FolderAccess.__check_folder_exists(item.split(item.split("/")[item.split("/").size() - 1])[0])
 	var wpfl = File.new()
 	var ws_default_templates = load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
 	var ws_ship_templates = load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
@@ -136,7 +155,7 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 			for check in folder_2:
 				if semi_root in mods_to_avoid:
 					continue
-				if check.ends_with("HEVLIB_EQUIPMENT_DRIVER_TAGS/"):
+				if check.ends_with("HEVLIB_EQUIPMENT_DRIVER_TAGS/"): # EQUIPMENTDRIVER FILES
 					var files = FolderAccess.__fetch_folder_files(check, false, true)
 					var mod = check.hash()
 					var dicti = {}
@@ -341,7 +360,7 @@ func make_upgrades_scene(file_save_path : String = "user://cache/.HevLib_Cache/D
 						data_state.append([dicti,check,mod,mname])
 					if dictr.keys().size() >= 1:
 						ws_state.append([dictr,check,mod,mname])
-				if check.ends_with("HEVLIB_MENU/"):
+				if check.ends_with("HEVLIB_MENU/"): # MENUDRIVER FILES
 					var files = FolderAccess.__fetch_folder_files(check, false, true)
 					var mod = check.hash()
 					var dicti = {}

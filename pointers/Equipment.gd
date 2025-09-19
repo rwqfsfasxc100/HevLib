@@ -31,9 +31,7 @@ var developer_hint = {
 		"Internal function used to return an array of viable vanilla equipment options from a set of tags"
 	],
 	"__make_upgrades_scene":[
-		"Creates Upgrades.tscn and WeaponSlot.tscn files based on data from mods' equipment data tags",
-		"upgrades_save_path -> (optional) the filepath to save the Upgrades.tscn file to. Defaults to \"user://cache/.HevLib_Cache/Upgrades.tscn\"",
-		"weaponslot_save_path -> (optional) the filepath to save the WeaponSlot.tscn file to. Defaults to \"user://cache/.HevLib_Cache/WeaponSlot.tscn\""
+		"Creates Upgrades.tscn and WeaponSlot.tscn files based on data from mods' equipment data tags"
 	],
 	"__make_equipment_for_scene":[
 		"Returns a string containing PackedScene data for Upgrades.tscn based on provided data",
@@ -185,9 +183,9 @@ static func __match_vanilla(type: String, align_to_match: String, desired_equipm
 				matching.append(itemDict)
 	return matching
 
-static func __make_upgrades_scene(upgrades_save_path : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn", weaponslot_save_path : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot.tscn"):
+static func __make_upgrades_scene():
 	var f = load("res://HevLib/scenes/equipment/make_upgrades_scene.gd").new()
-	f.make_upgrades_scene(upgrades_save_path, weaponslot_save_path)
+	f.make_upgrades_scene()
 
 
 static func __make_equipment_for_scene(equipment_data: Dictionary, slot_node_name : String, system_slot: String) -> String:

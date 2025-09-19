@@ -145,52 +145,52 @@ static func __get_mods_and_tags_from_tag(tag_name: String) -> Dictionary:
 	var s = f.get_mods_and_tags_from_tag(tag_name)
 	return s
 
-static func __get_manifest_section(section: String, mod_id: String = "") -> Dictionary:
+static func __get_manifest_section(section: String, mod_id: String = "") -> Dictionary: # DOES NOT NEED UPDATE FOR MV2.2
 	var f = load("res://HevLib/scripts/manifest_v2/get_manifest_section.gd")
 	var s = f.get_manifest_section(section, mod_id)
 	return s
 
-static func __get_mod_ids() -> Array:
+static func __get_mod_ids() -> Array: # DOES NOT NEED UPDATE FOR MV2.2
 	var f = load("res://HevLib/scripts/manifest_v2/get_mod_ids.gd")
 	var s = f.get_mod_ids()
 	return s
 
-static func __get_manifest_entry(section: String, entry: String, mod_id: String = ""):
+static func __get_manifest_entry(section: String, entry: String, mod_id: String = ""): # DOES NOT NEED UPDATE FOR MV2.2
 	var f = load("res://HevLib/scripts/manifest_v2/get_manifest_entry.gd")
 	var s = f.get_manifest_entry(section, entry, mod_id)
 	return s
 
-static func __check_complementary() -> Array:
+static func __check_complementary() -> Array: # DOES NOT NEED UPDATE FOR MV2.2
 	var f = load("res://HevLib/scripts/manifest_v2/mod_checking/check_complementary.gd")
 	var s = f.check_complementary()
 	return s
 
-static func __check_mod_complementary(mod_id) -> Array:
+static func __check_mod_complementary(mod_id) -> Array: # DOES NOT NEED UPDATE FOR MV2.2
 	var f = load("res://HevLib/scripts/manifest_v2/mod_checking/check_mod_complementary.gd")
 	var s = f.check_mod_complementary(mod_id)
 	return s
 
-static func __check_dependancies() -> Array:
+static func __check_dependancies() -> Array: # DOES NOT NEED UPDATE FOR MV2.2
 	var f = load("res://HevLib/scripts/manifest_v2/mod_checking/check_dependancies.gd")
 	var s = f.check_dependancies()
 	return s
 
-static func __check_mod_dependancies(mod_id) -> Array:
+static func __check_mod_dependancies(mod_id) -> Array: # DOES NOT NEED UPDATE FOR MV2.2
 	var f = load("res://HevLib/scripts/manifest_v2/mod_checking/check_mod_dependancies.gd")
 	var s = f.check_mod_dependancies(mod_id)
 	return s
 
-static func __check_conflicts() -> Array:
+static func __check_conflicts() -> Array: # DOES NOT NEED UPDATE FOR MV2.2
 	var f = load("res://HevLib/scripts/manifest_v2/mod_checking/check_conflicts.gd")
 	var s = f.check_conflicts()
 	return s
 
-static func __check_mod_conflicts(mod_id) -> Array:
+static func __check_mod_conflicts(mod_id) -> Array: # DOES NOT NEED UPDATE FOR MV2.2
 	var f = load("res://HevLib/scripts/manifest_v2/mod_checking/check_mod_conflicts.gd")
 	var s = f.check_mod_conflicts(mod_id)
 	return s
 
-static func __parse_tags(tag_data) -> Dictionary: # UPDATING FOR MANIFESTV2.2
+static func __parse_tags(tag_data) -> Dictionary: # UPDATED FOR MANIFESTV2.2 / ADD SUPPORT FOR MORE TYPES LATER
 	var f = load("res://HevLib/scripts/manifest_v2/parse_tags.gd")
 	var s = f.parse_tags(tag_data)
 	return s
