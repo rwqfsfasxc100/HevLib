@@ -65,7 +65,7 @@ func _on_Button_pressed():
 	
 	
 	
-	var s = ManifestV2.__get_mods_and_tags_from_tag("TAG_ALLOW_ACHIEVEMENTS")
+	var s = ManifestV2.__get_mod_by_id("hev.LIBRARY")
 	breakpoint
 	var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 #

@@ -95,37 +95,37 @@ var developer_hint = {
 	]
 }
 
-static func __get_mod_data(format_to_manifest_version:bool = false, print_json: bool = false) -> Dictionary:
+static func __get_mod_data(format_to_manifest_version:bool = false, print_json: bool = false) -> Dictionary: # UPDATED FOR MV2.2
 	var f = load("res://HevLib/scripts/manifest_v2/get_mod_data.gd").new()
 	var s = f.get_mod_data(format_to_manifest_version,print_json)
 	return s
 
-static func __match_mod_path_to_zip(mod_main_path:String) -> String:
+static func __match_mod_path_to_zip(mod_main_path:String) -> String: # DOES NOT NEED UPDATE FOR MV2.2
 	var f = load("res://HevLib/scripts/manifest_v2/match_mod_path_to_zip.gd").new()
 	var s = f.match_mod_path_to_zip(mod_main_path)
 	return s
 
-static func __compare_versions(checked_mod_data:Dictionary) -> bool:
+static func __compare_versions(checked_mod_data:Dictionary) -> bool: # DOES NOT NEED UPDATE FOR MV2.2
 	var f = load("res://HevLib/scripts/manifest_v2/compare_versions.gd").new()
 	var s = f.compare_versions(checked_mod_data)
 	return s
 
-static func __get_mod_data_from_files(script_path:String, format_to_manifest_version: bool = false) -> Dictionary:
+static func __get_mod_data_from_files(script_path:String, format_to_manifest_version: bool = true) -> Dictionary: # NOT UPDATED YET
 	var f = load("res://HevLib/scripts/manifest_v2/get_mod_data_from_files.gd").new()
 	var s = f.get_mod_data_from_files(script_path,format_to_manifest_version)
 	return s
 
-static func __parse_file_as_manifest(file_path: String, format_to_manifest_version: bool = false) -> Dictionary: # UPDATED FOR MANIFESTV2.2
+static func __parse_file_as_manifest(file_path: String, format_to_manifest_version: bool = true) -> Dictionary: # UPDATED FOR MANIFESTV2.2
 	var f = load("res://HevLib/scripts/manifest_v2/parse_file_as_manifest.gd").new()
 	var s = f.parse_file_as_manifest(file_path, format_to_manifest_version)
 	return s
 
-static func __get_mod_by_id(id: String, case_sensitive: bool = true) -> Dictionary:
+static func __get_mod_by_id(id: String, case_sensitive: bool = true) -> Dictionary: # DOES NOT NEED UPDATE FOR MV2.2
 	var f = load("res://HevLib/scripts/manifest_v2/get_mod_by_id.gd").new()
 	var s = f.get_mod_by_id(id, case_sensitive)
 	return s
 
-static func __get_tags() -> Dictionary:
+static func __get_tags() -> Dictionary: # DOES NOT NEED UPDATE FOR MV2.2
 	var f = load("res://HevLib/scripts/manifest_v2/get_tags.gd")
 	var s = f.get_tags()
 	return s
@@ -140,7 +140,7 @@ static func __get_mods_from_tag(tag_name: String) -> Array: # DOES NOT NEED UPDA
 	var s = f.get_mods_from_tag(tag_name)
 	return s
 
-static func __get_mods_and_tags_from_tag(tag_name: String) -> Dictionary:
+static func __get_mods_and_tags_from_tag(tag_name: String) -> Dictionary: # DOES NOT NEED UPDATE FOR MV2.2
 	var f = load("res://HevLib/scripts/manifest_v2/get_mods_and_tags_from_tag.gd")
 	var s = f.get_mods_and_tags_from_tag(tag_name)
 	return s
