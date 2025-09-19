@@ -28,7 +28,8 @@ func make_upgrades_scene():
 	var FILE_PATHS = [
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn",
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot.tscn",
-		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/aux_power_slot/AuxSlot.tscn",
+		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/AuxSlot.tscn",
+		
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_TEMPLATES.json",
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_STANDALONE.json",
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order.json",
@@ -46,7 +47,6 @@ func make_upgrades_scene():
 	var weaponslot_ship_templates_file = FILE_PATHS[6]
 	var weaponslot_ship_standalone_file = FILE_PATHS[7]
 	var save_menu_file = FILE_PATHS[8]
-	
 	
 	
 	var pls = File.new()
@@ -111,6 +111,7 @@ func make_upgrades_scene():
 	var folders = FolderAccess.__fetch_folder_files("res://", true, true)
 	var data_state : Array = []
 	var ws_state : Array = []
+	var power_state = []
 	
 	
 	
@@ -139,6 +140,8 @@ func make_upgrades_scene():
 	wpfl.open(save_menu_file,File.WRITE)
 	wpfl.store_string("[]")
 	wpfl.close()
+	
+	
 	for folder in folders:
 		var semi_root = folder.split("/")[2]
 		if semi_root.begins_with("."):
@@ -160,7 +163,7 @@ func make_upgrades_scene():
 					var mod = check.hash()
 					var dicti = {}
 					var dictr = {}
-					var dictf = {}
+					var OneOff = {}
 					for file in files:
 						var last_bit = file.split("/")[file.split("/").size() - 1]
 						match last_bit:
@@ -203,6 +206,18 @@ func make_upgrades_scene():
 								var constants = data.get_script_constant_map()
 								var ar = constants.get("SLOT_TAGS",{}).duplicate(true)
 								dicti.merge({"SLOT_TAGS":ar})
+
+
+							"AUX_POWER_SLOT.gd":
+								var data = load(check + last_bit)
+								var constants = data.get_script_constant_map()
+								var arr2 = []
+								for item in constants:
+									var equipment = data.get(item).duplicate(true)
+									arr2.append(equipment)
+								OneOff.merge({"AUX_POWER_SLOT":arr2})
+
+
 							"WEAPONSLOT_ADD.gd":
 								var data = load(check + last_bit)
 								var constants = data.get_script_constant_map()
@@ -360,12 +375,13 @@ func make_upgrades_scene():
 						data_state.append([dicti,check,mod,mname])
 					if dictr.keys().size() >= 1:
 						ws_state.append([dictr,check,mod,mname])
+					if OneOff.keys().size() >= 1:
+						power_state.append(OneOff)
 				if check.ends_with("HEVLIB_MENU/"): # MENUDRIVER FILES
 					var files = FolderAccess.__fetch_folder_files(check, false, true)
 					var mod = check.hash()
 					var dicti = {}
 					var dictr = {}
-					var dictf = {}
 					for file in files:
 						var last_bit = file.split("/")[file.split("/").size() - 1]
 						match last_bit:
@@ -392,6 +408,7 @@ func make_upgrades_scene():
 		if "ADD_EQUIPMENT_ITEMS" in files.keys():
 			var data = files.get("ADD_EQUIPMENT_ITEMS")
 			var for_ws = [{"WEAPONSLOT_ADD":[]}]
+			var for_aux_power = {"AUX_POWER_SLOT":[]}
 			for object in data:
 				if object.get("slot_type","HARDPOINT") == "HARDPOINT":
 					if "weapon_slot" in object.keys():
@@ -419,6 +436,20 @@ func make_upgrades_scene():
 						object["weapon_slot"]["data"] = objdata.duplicate(true)
 						var eq_for_ws = object["weapon_slot"].duplicate(true)
 						for_ws[0]["WEAPONSLOT_ADD"].append(eq_for_ws)
+				if object.get("slot_type","HARDPOINT") == "AUX_POWER_SLOT":
+					if "auxiliary_power_unit" in object.keys():
+						var bp = object.get("auxiliary_power_unit")
+						if "system" in bp.keys():
+							pass
+						else:
+							bp.merge({"system":object.get("system","SYSTEM_MISSING_NAME")})
+						if "price" in bp.keys():
+							pass
+						else:
+							bp.merge({"price":object.get("price",0)})
+						
+						for_aux_power["AUX_POWER_SLOT"].append(bp)
+			power_state.append(for_aux_power)
 			ws_state.append(for_ws)
 	
 	var all_slot_node_names = []
@@ -741,6 +772,65 @@ func make_upgrades_scene():
 		for dp in data:
 			weaponslot_string = weaponslot_string + "\n" + dp[0] + " = " + dp[1]
 	
+	var aux_power_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://ships/modules/AuxSlot.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"AuxSlot\" instance=ExtResource( 1 )]"
+	
+	var MPDG_header = "[node name=\"%s\" parent=\".\" instance_placeholder=\"res://ships/modules/AuxMpd.tscn\"]"
+	var SMES_header = "[node name=\"%s\" parent=\".\" instance_placeholder=\"res://ships/modules/AuxSmes.tscn\"]"
+	
+	var aux_power_string = aux_power_header
+	
+	var property = "%s = %s"
+	
+	for mod in power_state:
+		for type in mod:
+			match type:
+				"AUX_POWER_SLOT":
+					for data in mod.get(type):
+						var aux_path = data.get("path","")
+						var aux_type = data.get("type","MPDG").to_upper()
+						match aux_type:
+							"MPDG":
+								var system = data.get("system","SYSTEM_NAME_MISSING")
+								var system_display = "\n" + property % ["systemName","\"" + system + "\""]
+								var price = "\n" + property % ["repairReplacementPrice",str(data.get("price",30000))]
+								var repair_time = "\n" + property % ["repairReplacementTime",str(data.get("repair_time",1))]
+								var fix_price = "\n" + property % ["repairFixPrice",str(data.get("fix_price",5000))]
+								var fix_time = "\n" + property % ["repairFixTime",str(data.get("fix_time",4))]
+								var command = "\n" + property % ["command","\"" + data.get("command","") + "\""]
+								var power_draw = "\n" + property % ["powerDraw",str(float(data.get("power_draw",50000.0)))]
+								var thermal = "\n" + property % ["thermal",str(float(data.get("thermal",500000.0)))]
+								var power_supply = "\n" + property % ["powerSupply",str(float(data.get("power_supply",350000.0)))]
+								var windup_time = "\n" + property % ["windupTime",str(data.get("windup_time",2))]
+								var mass = "\n" + property % ["mass",str(float(data.get("mass",0.0)))]
+								
+								var cc = price + repair_time + fix_price + fix_time + command + power_draw + thermal + power_supply + windup_time + mass + system_display
+								
+								var MPDG = "\n\n" + MPDG_header % system + cc
+								
+								aux_power_string = aux_power_string + MPDG
+								
+							"SMES":
+								var system = data.get("system","SYSTEM_NAME_MISSING")
+								var system_display = "\n" + property % ["systemName","\"" + system + "\""]
+								var price = "\n" + property % ["repairReplacementPrice",str(data.get("price",40000))]
+								var repair_time = "\n" + property % ["repairReplacementTime",str(data.get("repair_time",1))]
+								var fix_price = "\n" + property % ["repairFixPrice",str(data.get("fix_price",25000))]
+								var fix_time = "\n" + property % ["repairFixTime",str(data.get("fix_time",4))]
+								var capacitor_ratio = "\n" + property % ["capacitorRatio",str(float(data.get("capacitor_ratio",0.9)))]
+								var command = "\n" + property % ["command","\"" + data.get("command","") + "\""]
+								var power_draw = "\n" + property % ["powerDraw",str(float(data.get("power_draw",50000.0)))]
+								var capacity = "\n" + property % ["capacity",str(float(data.get("capacity",600000.0)))]
+								var power_supply = "\n" + property % ["powerSupply",str(float(data.get("power_supply",200000.0)))]
+								var switch_time = "\n" + property % ["switchTime",str(float(data.get("switch_time",2)))]
+								var mass = "\n" + property % ["mass",str(data.get("mass",0))]
+								
+								var cc = price + repair_time + fix_price + fix_time + capacitor_ratio + command + power_draw + power_supply + capacity + system_display + switch_time + mass
+								
+								var SMES = "\n\n" + SMES_header % system + cc
+								
+								aux_power_string = aux_power_string + SMES
+	
+	
 	
 	
 	
@@ -755,6 +845,12 @@ func make_upgrades_scene():
 	f.open(file_save_path,File.WRITE)
 	f.store_string(concat)
 	f.close()
+	
+	f.open(auxslot_save_path,File.WRITE)
+	f.store_string(aux_power_string)
+	f.close()
+	
+	
 	UpgradeMenu.free()
 
 var tagged_vanilla_slots = PoolStringArray()
