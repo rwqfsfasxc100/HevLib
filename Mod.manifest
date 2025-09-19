@@ -15,7 +15,7 @@ version_bugfix=4
 
 [tags]
 
-allow_achievements={"type":"bool","value":true}
+TAG_ALLOW_ACHIEVEMENTS={"type":"bool","value":true}
 
 [links]
 

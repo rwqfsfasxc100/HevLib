@@ -130,12 +130,12 @@ static func __get_tags() -> Dictionary:
 	var s = f.get_tags()
 	return s
 
-static func __get_mod_tags(mod_id: String) -> Dictionary:
+static func __get_mod_tags(mod_id: String) -> Dictionary: # Updated for MV2.2
 	var f = load("res://HevLib/scripts/manifest_v2/get_mod_tags.gd")
 	var s = f.get_mod_tags(mod_id)
 	return s
 
-static func __get_mods_from_tag(tag_name: String) -> Array:
+static func __get_mods_from_tag(tag_name: String) -> Array: # DOES NOT NEED UPDATE FOR MV2.2
 	var f = load("res://HevLib/scripts/manifest_v2/get_mods_from_tag.gd")
 	var s = f.get_mods_from_tag(tag_name)
 	return s
