@@ -90,18 +90,16 @@ func _draw():
 	var icon = ""
 	if MOD_INFO["mod_icon"]["has_icon_file"]:
 		icon = MOD_INFO["mod_icon"]["icon_path"]
-	var is_a_library = MOD_INFO["library_information"]["is_a_library"]
-	var lib_hidden = true
-	if is_a_library:
-		lib_hidden = MOD_INFO["library_information"]["keep_library_hidden"]
+	var is_library = MOD_INFO["library_information"]["is_library"]
+	var always_display = false
+	if is_library:
+		always_display = MOD_INFO["library_information"]["always_display"]
 	var manifest = MOD_INFO["manifest"]
 	var children = {}
 	if "children" in MOD_INFO.keys():
 		children = MOD_INFO["children"]
-	if is_a_library:
+	if is_library:
 		button_lib_icon.visible = true
-	else:
-		lib_hidden = false
 	button_label.text = mod_name
 	if icon != "":
 		var tex = StreamTexture.new()
@@ -132,13 +130,15 @@ func _draw():
 	
 	
 	var showHidden = Settings.HevLib["drivers"]["show_hidden_libraries"]
-	if lib_hidden:
-		if showHidden:
+	if is_library:
+		if showHidden or always_display:
 			visible = true
 		else:
 			visible = false
-	if is_a_library:
-		tooltip_text = tooltip_text + "\n" + TranslationServer.translate("HEVLIB_MM_TOOLTIP_LIBRARY") % [is_a_library,lib_hidden]
+	
+	
+	if is_library:
+		tooltip_text = tooltip_text + "\n" + TranslationServer.translate("HEVLIB_MM_TOOLTIP_LIBRARY") % [is_library,always_display]
 	button.hint_tooltip = tooltip_text
 	
 #	_refocus()

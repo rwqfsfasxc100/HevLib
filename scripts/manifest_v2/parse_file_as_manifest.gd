@@ -62,12 +62,8 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 				var version = manifest_data["package"].get("version","unknown")
 				dict_template["mod_information"]["description"] = manifest_data["package"].get("description","MODMENU_DESCRIPTION_PLACEHOLDER")
 				
-				if typeof(manifest_data["package"].get("github","")) == TYPE_DICTIONARY:
-					var url = manifest_data["package"]["github"]["link"]
-					if url != "":
-						dict_template["links"].merge({"HEVLIB_GITHUB":{"URL":url}})
-				elif typeof(manifest_data["package"].get("github","")) == TYPE_STRING:
-					var url = manifest_data["package"]["github"]
+				if typeof(manifest_data["package"].get("github_homepage","")) == TYPE_STRING:
+					var url = manifest_data["package"]["github_homepage"]
 					if url != "":
 						dict_template["links"].merge({"HEVLIB_GITHUB":{"URL":url}})
 				var discURL = manifest_data["package"].get("discord","")

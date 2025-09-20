@@ -54,7 +54,7 @@ HEVLIB_MM_TOOLTIP_MV|Manifest Version: %s
 
 HEVLIB_MM_TOOLTIP_ZIP|Zip File: %s
 
-HEVLIB_MM_TOOLTIP_LIBRARY|Library: %s \ Hidden: %s
+HEVLIB_MM_TOOLTIP_LIBRARY|Library: %s \ Always Display: %s
 
 HEVLIB_MM_BUTTON_TOOLTIP_GITHUB|Mod Github Page
 

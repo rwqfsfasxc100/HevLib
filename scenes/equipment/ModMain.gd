@@ -36,6 +36,8 @@ func _init(modLoader = ModLoader):
 	
 	installScriptExtension("../weaponslot/weapon_slot_handler.gd")
 	
+	installScriptExtension("ShipModificationDriver/InternalStorageMod.gd")
+	
 	installScriptExtension("../better_title_screen/SaveSlotButton.gd")
 	replaceScene("../better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
 	

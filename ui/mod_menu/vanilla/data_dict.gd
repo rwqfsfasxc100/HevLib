@@ -17,13 +17,13 @@ const VANILLA = {
 		"icon_path":"res://HevLib/ui/mod_menu/vanilla/vanilla_icon.stex"
 	},
 	"library_information":{
-		"is_a_library":false,
-		"keep_library_hidden":true
+		"is_library":false,
+		"always_display":true
 	},
 	"node":null,
 	"manifest":{
 		"has_manifest":true,
-		"manifest_version":2.1,
+		"manifest_version":2.2,
 		"manifest_data":{
 			"mod_information":{
 				"name":"ΔV: Rings of Saturn",
@@ -41,30 +41,15 @@ const VANILLA = {
 				"version_string":"1.0.0"
 			},
 			"tags":{
-				"adds_equipment":PoolStringArray([]),
-				"adds_events":PoolStringArray([]),
-				"adds_gameplay_mechanics":PoolStringArray([]),
-				"adds_ships":PoolStringArray([]),
-				"allow_achievements":false,
-				"fun":false,
-				"handle_extra_crew":24,
-				"is_library_mod":false,
-				"library_hidden_by_default":true,
-				"overhaul":false,
-				"quality_of_life":false,
-				"uses_hevlib_research":false,
-				"visual":false,
-				"language":PoolStringArray(["en"]),
-				"user_interface":false
+				
 			},
 			"links":{
-				"github":"https://discord.com/channels/426287934870781952/1067385553261166602",
-				"discord":"https://discord.gg/dv",
-				"nexus":"https://www.nexusmods.com/games/dvringsofsaturn",
-				"donations":"https://store.steampowered.com/app/846030/DV_Rings_of_Saturn/",
-				"wiki":"https://delta-v.kodera.pl/index.php/Main_Page",
-				"bug_reports":"",
-				"custom_links":{}
+				"HEVLIB_DISCORD":{"URL":"https://discord.gg/dv"},
+				"HEVLIB_NEXUS":{"URL":"https://www.nexusmods.com/games/dvringsofsaturn"},
+				"HEVLIB_DONATIONS":{"URL":"https://store.steampowered.com/app/846030/DV_Rings_of_Saturn/"},
+				"HEVLIB_WIKI":{"URL":"https://delta-v.kodera.pl/index.php/Main_Page"},
+				"HEVLIB_BUGREPORTS":{"URL":"https://discord.com/channels/426287934870781952/1067385553261166602"},
+
 			},
 			"configs":{
 				
