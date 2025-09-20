@@ -20,7 +20,12 @@ var developer_hint = {
 		"angle -> float to set as the desired rotation",
 		"degrees -> (optional) whether to have the angle treated as degrees rather than radians. Defaults to true"
 	],
-	
+	"__sift_dictionary":[
+		"Searches for any matches in keys or values within a dictionary",
+		"dictionary -> the dictionary to search through",
+		"search_keys -> array of keys and values to look for. Can contain any type, will return any match.",
+		"Returns an array of the values matched from within the search_keys array"
+	]
 }
 
 
@@ -47,4 +52,9 @@ static func __rotate_point(point: Vector2, angle: float, degrees:bool = true) ->
 static func __get_vanilla_version() -> Array:
 	var f = load("res://HevLib/scripts/get_vanilla_version.gd")
 	var s = f.get_vanilla_version()
+	return s
+
+static func __sift_dictionary(dictionary: Dictionary,search_keys: Array) -> Array:
+	var f = load("res://HevLib/scripts/sift_dictionary.gd")
+	var s = f.sift_dictionary(dictionary,search_keys)
 	return s
