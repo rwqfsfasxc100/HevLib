@@ -673,6 +673,7 @@ const TORCH_ZAP = {
 }
 const TORCH_CHEVAL = {
 	"system":"SYSTEM_MAIN_ENGINE_CHEVAL",
+	"manual":"SYSTEM_MAIN_ENGINE_MANUAL",
 	"price":400000,
 	"test_protocol":"autopilot",
 	"warn_if_thermal_below":37.5,
