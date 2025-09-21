@@ -38,6 +38,7 @@ func make_upgrades_scene():
 		"user://cache/.HevLib_Cache/MenuDriver/save_buttons.json",
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_mods.json",
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/node_definitions.json",
+		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_register.json",
 	]
 	
 	var file_save_path : String = FILE_PATHS[0]
@@ -51,6 +52,7 @@ func make_upgrades_scene():
 	var save_menu_file = FILE_PATHS[8]
 	var processed_storage_file = FILE_PATHS[9]
 	var node_definitions_file = FILE_PATHS[10]
+	var ship_node_register_file = FILE_PATHS[11]
 	
 	
 	
@@ -126,6 +128,10 @@ func make_upgrades_scene():
 	var ws_default_templates = load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
 	var ws_ship_templates = load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
 	var ws_ship_templates_2 = load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd").get_script_constant_map()
+	var ship_register = load("res://HevLib/scenes/equipment/ShipModificationDriver/ship_register_vanilla.gd").get_script_constant_map()
+	var register_default_ships = []
+	for item in ship_register:
+		register_default_ships.append(ship_register[item])
 	
 	wpfl.open(weaponslot_modify_templates_file,File.WRITE)
 	wpfl.store_string(JSON.print(ws_default_templates.get("TEMPLATES",{})))
@@ -150,6 +156,9 @@ func make_upgrades_scene():
 	wpfl.close()
 	wpfl.open(node_definitions_file,File.WRITE)
 	wpfl.store_string("{}")
+	wpfl.close()
+	wpfl.open(ship_node_register_file,File.WRITE)
+	wpfl.store_string(JSON.print(register_default_ships))
 	wpfl.close()
 	
 	
@@ -246,6 +255,15 @@ func make_upgrades_scene():
 								var pfdata = JSON.parse(wpfl.get_as_text()).result
 								for item in constants:
 									pfdata.merge({item:constants.get(item)})
+								wpfl.store_string(JSON.print(pfdata))
+								wpfl.close()
+							"SHIP_NODE_REGISTER.gd":
+								var data = load(check + last_bit)
+								var constants = data.get_script_constant_map()
+								wpfl.open(ship_node_register_file,File.READ_WRITE)
+								var pfdata = JSON.parse(wpfl.get_as_text()).result
+								for item in constants:
+									pfdata.append(constants.get(item))
 								wpfl.store_string(JSON.print(pfdata))
 								wpfl.close()
 

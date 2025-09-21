@@ -1,6 +1,127 @@
 extends "res://ships/ship-ctrl.gd"
 
+var ship_register_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_register.json"
+var node_definitons_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/node_definitions.json"
 
+var processed_node_definitions = {}
+var processed_ship_register = {}
+
+var file = File.new()
+var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
+var DF = preload("res://HevLib/pointers/DataFormat.gd")
 
 func _ready():
-	pass
+	processed_node_definitions = process_node_definitons()
+	processed_ship_register = process_ship_register()
+	
+	
+	var n_store = {}
+	
+	var get_base_ship_fallback = true
+	var fallback_ship = baseShipName
+	
+	if shipName in processed_ship_register:
+		var datafetch = processed_ship_register[shipName]["node_definitions"]
+		get_base_ship_fallback = datafetch.get("fallback_to_base_ship",true)
+		fallback_ship = datafetch.get("fallback_override",baseShipName)
+		n_store = datafetch
+	if get_base_ship_fallback:
+		if fallback_ship in processed_ship_register:
+			var datafetch = processed_ship_register[fallback_ship]["node_definitions"]
+			for obj in datafetch:
+				if obj in n_store:
+					pass
+				else:
+					n_store.merge({obj:datafetch[obj]})
+	
+	
+	
+	
+	for object in n_store:
+		var obj_data = n_store[object]
+		var node_data = processed_node_definitions[object]
+		var properties = obj_data
+		for p in node_data.get("properties",{}):
+			if p in properties:
+				pass
+			else:
+				properties.merge({p:node_data["properties"][p]})
+		var node = node_data["node"]
+		
+		
+		
+		
+		breakpoint
+
+
+
+
+
+
+
+
+
+
+
+
+func process_ship_register():
+	var pd = {}
+	file.open(ship_register_file,File.READ)
+	var data = JSON.parse(file.get_as_text()).result
+	file.close()
+	
+	for object in data:
+		var obj_ship_name = object.get("ship_name","")
+		if obj_ship_name != "":
+			var obj_fallback_to_base_ship = object.get("fallback_to_base_ship",true)
+			var obj_fallback_override = object.get("fallback_override",baseShipName)
+			var obj_node_definitions = object.get("node_definitions",{})
+			
+			if obj_ship_name in pd.keys():
+				for definition in obj_node_definitions:
+					if definition in processed_node_definitions:
+						var def = obj_node_definitions[definition]
+						pd[obj_ship_name]["node_definitions"].merge({definition:def})
+			else:
+				var dictionary = {}
+				for definition in obj_node_definitions:
+					if definition in processed_node_definitions:
+							var def = obj_node_definitions[definition]
+							dictionary.merge({definition:def})
+				var dict = {
+					obj_ship_name:{
+						"fallback_to_base_ship":obj_fallback_to_base_ship,
+						"fallback_override":obj_fallback_override,
+						"node_definitions":dictionary
+					}
+				}
+				
+				pd.merge(dict)
+			
+	return pd
+
+
+
+
+func process_node_definitons():
+	var pd = {}
+	file.open(node_definitons_file,File.READ)
+	var data = JSON.parse(file.get_as_text()).result
+	file.close()
+	
+	for module in data:
+		var md = data[module]
+		if "path" in md:
+			var filepath = md["path"]
+			var exists = file.file_exists(filepath)
+			if exists:
+				var node = load(filepath)
+				var properties = md.get("properties",{})
+				var pos = md.get("position",[0,0])
+				var scl = md.get("scale",[1])
+				var rot = md.get("rotation",0)
+				var pos_basic = {"position":pos,"scale":scl,"rotation":rot}
+				pd.merge({module:{"node":node,"properties":properties,"position_data":pos_basic}})
+	
+	return pd
+	

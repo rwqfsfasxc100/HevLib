@@ -7,13 +7,14 @@ onready var base_storage_type = processedCargoStorageType
 onready var base_propellant = reactiveMassMax
 onready var base_crew_count = crew
 onready var base_crew_morale = crewMoraleBonus
-
+onready var base_mass = mass
 
 var storage_add = 0
 var ammo_add = 0
 var nano_add = 0
 var multi = 1.0
 var propellant_add = 0
+var mass_add = 0
 
 func _ready():
 	l("Readying ship. Base storage of %s proc / %s ammo / %s nanodrones on storage type of %s" % [base_proc_storage, base_ammo_storage, base_nano_storage, base_storage_type])
@@ -33,6 +34,7 @@ func _ready():
 		var listingForceType = item.get("force_type","")
 		var listingCrewCount = item.get("crew_count",0)
 		var listingCrewMorale = item.get("crew_morale",0.0)
+		var listingMass = float(item.get("mass",0.0))
 		listings.merge({
 			listingSystemName:{
 				"storage_flat":listingStorageFlat,
@@ -42,7 +44,8 @@ func _ready():
 				"force_type":listingForceType,
 				"storage_propellant":listingStoragePropellant,
 				"crew_count":listingCrewCount,
-				"crew_morale":listingCrewMorale
+				"crew_morale":listingCrewMorale,
+				"mass":listingMass,
 			}
 		})
 	var installed = DataFormat.__sift_dictionary(shipConfig,listings.keys())
@@ -82,6 +85,9 @@ func _ready():
 				"crew_morale":
 					var val = iddata[key]
 					modifyable_crew_morale += val
+				"mass":
+					var val = iddata[key]
+					mass_add += val
 				
 	
 	var modifyable_add_capacity = storage_add
@@ -89,6 +95,7 @@ func _ready():
 	var modifyable_add_nano = nano_add
 	var modifyable_multi = multi
 	var modifyable_propellant = propellant_add
+	var modifyable_mass = float(mass_add)/1000.0
 	
 	if modifyable_type != "":
 		l("Setting desired hold type")
@@ -128,7 +135,7 @@ func _ready():
 	crew = modifyable_crew_count
 	crewMoraleBonus = clamp(modifyable_crew_morale,-0.5,0.5)
 	
-	
+	l("Ensuring crew correctness")
 	if "preferredCrew" in shipConfig:
 		if shipConfig["preferredCrew"].size() > crew:
 			shipConfig["preferredCrew"].resize(crew)
@@ -137,8 +144,13 @@ func _ready():
 	var active = getCurrentlyActiveCrewNames()
 	if active.size() > crew:
 		deactivateCrew(crew)
-	
-	
+	if mass_add > 0:
+		var new_mass = mass + modifyable_mass
+		mass = new_mass
+		l("Adding %s kg of mass. Base ship mass changing from %s to %s" % [mass_add,base_mass * 1000,new_mass * 1000])
+	else:
+		l("No additional mass needed, skipping")
+
 func deactivateCrew(maximum):
 	var count = 0
 	for m in CurrentGame.state.crew:
