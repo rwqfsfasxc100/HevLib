@@ -40,18 +40,76 @@ func _ready():
 	for object in n_store:
 		var obj_data = n_store[object]
 		var node_data = processed_node_definitions[object]
-		var properties = obj_data
+		var properties = {}
+		var position_data = {}
 		for p in node_data.get("properties",{}):
 			if p in properties:
 				pass
 			else:
 				properties.merge({p:node_data["properties"][p]})
-		var node = node_data["node"]
+		for p in node_data.get("position_data",{}):
+			if p in position_data:
+				pass
+			else:
+				position_data.merge({p:node_data["position_data"][p]})
+		
+		var node = node_data["node"].instance()
+		
+		if "position" in node:
+			var npos = position_data.get("position")
+			var new_pos = Vector2(0,0)
+			match typeof(npos):
+				TYPE_VECTOR2:
+					new_pos = npos
+					node.set("position",new_pos)
+				TYPE_VECTOR2_ARRAY:
+					if npos.size() >= 1:
+						new_pos = npos[0]
+						node.set("position",new_pos)
+				TYPE_ARRAY, TYPE_INT_ARRAY, TYPE_REAL_ARRAY:
+					var scan = DF.__convert_arr_to_vec2arr(npos)
+					if scan.size() >= 1:
+						new_pos = scan[0]
+						node.set("position",new_pos)
+		if "rotation" in node:
+			var nrot = position_data.get("rotation")
+			var new_rot = 0.0
+			match typeof(nrot):
+				TYPE_INT:
+					var rot = deg2rad(nrot)
+					node.set("rotation",rot)
+				TYPE_REAL:
+					var rot = deg2rad(nrot)
+					node.set("rotation",rot)
+					
+			
+			
+		
+		if "scale" in node:
+			var nscale = position_data.get("scale")
+			var new_scale = Vector2(1,1)
+			match typeof(nscale):
+				TYPE_ARRAY, TYPE_RAW_ARRAY, TYPE_REAL_ARRAY, TYPE_INT_ARRAY:
+					if nscale.size() >=2:
+						new_scale = Vector2(nscale[0],nscale[1])
+					elif nscale.size() == 1:
+						new_scale = Vector2(nscale[0],nscale[0])
+					node.set("scale",new_scale)
+				TYPE_INT, TYPE_REAL:
+					new_scale = Vector2(nscale,nscale)
+					node.set("scale",new_scale)
+				TYPE_VECTOR2:
+					new_scale = nscale
+					node.set("scale",new_scale)
+				TYPE_VECTOR2_ARRAY:
+					if nscale.size() >= 1:
+						new_scale = nscale[0]
+						node.set("scale",new_scale)
 		
 		
 		
-		
-#		breakpoint
+		breakpoint
+		add_child(node)
 
 
 
