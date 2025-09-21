@@ -36,7 +36,8 @@ func make_upgrades_scene():
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_SHIP_TEMPLATES.json",
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_SHIP_STANDALONE.json",
 		"user://cache/.HevLib_Cache/MenuDriver/save_buttons.json",
-		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/processed_storage_mods.json",
+		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_mods.json",
+		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/node_definitions.json",
 	]
 	
 	var file_save_path : String = FILE_PATHS[0]
@@ -49,7 +50,7 @@ func make_upgrades_scene():
 	var weaponslot_ship_standalone_file = FILE_PATHS[7]
 	var save_menu_file = FILE_PATHS[8]
 	var processed_storage_file = FILE_PATHS[9]
-	
+	var node_definitions_file = FILE_PATHS[10]
 	
 	
 	
@@ -147,6 +148,9 @@ func make_upgrades_scene():
 	wpfl.open(processed_storage_file,File.WRITE)
 	wpfl.store_string("[]")
 	wpfl.close()
+	wpfl.open(node_definitions_file,File.WRITE)
+	wpfl.store_string("{}")
+	wpfl.close()
 	
 	
 	for folder in folders:
@@ -234,6 +238,15 @@ func make_upgrades_scene():
 									var pdata = constants.MODIFY_INTERNALS
 									pfdata.append_array(pdata)
 									wpfl.store_string(JSON.print(pfdata))
+								wpfl.close()
+							"NODE_DEFINITIONS.gd":
+								var data = load(check + last_bit)
+								var constants = data.get_script_constant_map()
+								wpfl.open(node_definitions_file,File.READ_WRITE)
+								var pfdata = JSON.parse(wpfl.get_as_text()).result
+								for item in constants:
+									pfdata.merge({item:constants.get(item)})
+								wpfl.store_string(JSON.print(pfdata))
 								wpfl.close()
 
 							"WEAPONSLOT_ADD.gd":

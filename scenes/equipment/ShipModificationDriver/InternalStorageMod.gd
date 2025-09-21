@@ -18,7 +18,7 @@ var propellant_add = 0
 func _ready():
 	l("Readying ship. Base storage of %s proc / %s ammo / %s nanodrones on storage type of %s" % [base_proc_storage, base_ammo_storage, base_nano_storage, base_storage_type])
 	var file = File.new()
-	file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/processed_storage_mods.json",File.READ)
+	file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_mods.json",File.READ)
 	var config_data = JSON.parse(file.get_as_text()).result
 	file.close()
 	
