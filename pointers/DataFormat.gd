@@ -25,6 +25,10 @@ var developer_hint = {
 		"dictionary -> the dictionary to search through",
 		"search_keys -> array of keys and values to look for. Can contain any type, will return any match.",
 		"Returns an array of the values matched from within the search_keys array"
+	],
+	"__convert_arr_to_vec2arr":[
+		"Returns a PoolVector2Array from an array of integers and floats",
+		"array -> Array used as the input integers/floats. Must have an even size and contain only ints or floats"
 	]
 }
 
@@ -57,4 +61,9 @@ static func __get_vanilla_version() -> Array:
 static func __sift_dictionary(dictionary: Dictionary,search_keys: Array) -> Array:
 	var f = load("res://HevLib/scripts/sift_dictionary.gd")
 	var s = f.sift_dictionary(dictionary,search_keys)
+	return s
+
+static func __convert_arr_to_vec2arr(array: Array) -> PoolVector2Array:
+	var f = load("res://HevLib/scripts/convert_arr_to_vec2arr.gd")
+	var s = f.convert_arr_to_vec2arr(array)
 	return s
