@@ -35,13 +35,29 @@ func _ready():
 					n_store.merge({obj:datafetch[obj]})
 	
 	
-	
+	var selfpath = get_path()
 	
 	for object in n_store:
 		var obj_data = n_store[object]
 		var node_data = processed_node_definitions[object]
+		var childNames = []
+		for c in get_children():
+			childNames.append(c.name)
+		if object in childNames:
+			continue
 		var properties = {}
 		var position_data = {}
+		for p in obj_data.get("properties",{}):
+			if p in properties:
+				pass
+			else:
+				properties.merge({p:obj_data["properties"][p]})
+		for p in obj_data.get("position_data",{}):
+			if p in position_data:
+				pass
+			else:
+				position_data.merge({p:obj_data["position_data"][p]})
+		
 		for p in node_data.get("properties",{}):
 			if p in properties:
 				pass
@@ -53,8 +69,10 @@ func _ready():
 			else:
 				position_data.merge({p:node_data["position_data"][p]})
 		
-		var node = node_data["node"].instance()
+		var nodeset = node_data["node"]
 		
+		var node = nodeset.instance()
+		node.name = object
 		if "position" in node:
 			var npos = position_data.get("position")
 			var new_pos = Vector2(0,0)
@@ -102,12 +120,23 @@ func _ready():
 						new_scale = nscale[0]
 						node.set("scale",new_scale)
 		
+		var prop_bin = {}
+		
+		for prop in properties:
+			breakpoint
+		
+		
+		
+#		breakpoint
+		call_deferred("add_child",node)
 		
 		
 		
 		
-		breakpoint
-		add_child(node)
+		
+		
+		
+		
 
 
 
