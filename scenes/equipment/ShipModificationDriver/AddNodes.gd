@@ -81,10 +81,6 @@ func _ready():
 				TYPE_REAL:
 					var rot = deg2rad(nrot)
 					node.set("rotation",rot)
-					
-			
-			
-		
 		if "scale" in node:
 			var nscale = position_data.get("scale")
 			var new_scale = Vector2(1,1)
@@ -105,6 +101,8 @@ func _ready():
 					if nscale.size() >= 1:
 						new_scale = nscale[0]
 						node.set("scale",new_scale)
+		
+		
 		
 		
 		
