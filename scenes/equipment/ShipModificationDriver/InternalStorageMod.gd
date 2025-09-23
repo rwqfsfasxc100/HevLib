@@ -7,7 +7,7 @@ onready var base_storage_type = processedCargoStorageType
 onready var base_propellant = reactiveMassMax
 onready var base_crew_count = crew
 onready var base_crew_morale = crewMoraleBonus
-onready var base_mass = mass
+onready var base_mass = currentMass
 
 var storage_add = 0
 var ammo_add = 0
@@ -144,12 +144,9 @@ func _ready():
 	var active = getCurrentlyActiveCrewNames()
 	if active.size() > crew:
 		deactivateCrew(crew)
-	if mass_add > 0:
-		var new_mass = mass + modifyable_mass
-		mass = new_mass
-		l("Adding %s kg of mass. Base ship mass changing from %s to %s" % [mass_add,base_mass * 1000,new_mass * 1000])
-	else:
-		l("No additional mass needed, skipping")
+	var new_mass = shipInitialMass + modifyable_mass
+	shipInitialMass = new_mass
+	l("Adding %s kg of mass. Base ship mass changing from %s to %s" % [mass_add,base_mass * 1000,shipInitialMass * 1000])
 
 func deactivateCrew(maximum):
 	var count = 0

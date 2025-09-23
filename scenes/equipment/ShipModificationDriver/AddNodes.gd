@@ -15,6 +15,7 @@ func _ready():
 	processed_ship_register = process_ship_register()
 	
 	
+	
 	var n_store = {}
 	
 	var get_base_ship_fallback = true
@@ -40,6 +41,12 @@ func _ready():
 	for object in n_store:
 		var obj_data = n_store[object]
 		var node_data = processed_node_definitions[object]
+		
+		
+		var ignorance = node_data["ships_to_ignore"]
+		if shipName in ignorance:
+			continue
+		
 		var childNames = []
 		for c in get_children():
 			childNames.append(c.name)
@@ -91,14 +98,15 @@ func _ready():
 						node.set("position",new_pos)
 		if "rotation" in node:
 			var nrot = position_data.get("rotation")
-			var new_rot = 0.0
-			match typeof(nrot):
-				TYPE_INT:
-					var rot = deg2rad(nrot)
-					node.set("rotation",rot)
-				TYPE_REAL:
-					var rot = deg2rad(nrot)
-					node.set("rotation",rot)
+			if nrot != 0.0:
+				var new_rot = 0.0
+				match typeof(nrot):
+					TYPE_INT:
+						var rot = deg2rad(nrot)
+						node.set("rotation",rot)
+					TYPE_REAL:
+						var rot = deg2rad(nrot)
+						node.set("rotation",rot)
 		if "scale" in node:
 			var nscale = position_data.get("scale")
 			var new_scale = Vector2(1,1)
@@ -120,30 +128,84 @@ func _ready():
 						new_scale = nscale[0]
 						node.set("scale",new_scale)
 		
-		var prop_bin = {}
-		
 		for prop in properties:
-			breakpoint
+			var data = properties[prop]
+			var pointer = node
+			var split = prop.split("/")
+			if split.size() == 1:
+				if prop in pointer:
+					var setter = format_properties(data.get("value",null),data.get("method",""))
+					pointer.set(prop,setter)
+					
+					
+			else:
+				var nprop = split[split.size() - 1]
+				var npath = str(prop.split(nprop)[0])
+				if npath.ends_with("/"):
+					npath = npath.rstrip("/")
+				pointer = pointer.get_node_or_null(npath)
+				if pointer == null:
+					continue
+				if prop in pointer:
+					var setter = format_properties(data.get("value",null),data.get("method",""))
+					pointer.set(prop,setter)
 		
 		
 		
 #		breakpoint
 		call_deferred("add_child",node)
-		
-		
-		
-		
-		
-		
-		
-		
 
 
 
 
+func format_properties(data,format):
+	match format:
+		"arr2vec2arr":
+			return convert_arr_to_vec2arr(data)
+		"arr2vec2":
+			return convert_arr_to_vec2(data)
+		_:
+			return data
 
+func convert_arr_to_vec2(array:Array) -> Vector2:
+	var new_scale = Vector2(0,0)
+	if array.size() >=2:
+		new_scale = Vector2(float(array[0]),float(array[1]))
+	elif array.size() == 1:
+		new_scale = Vector2(float(array[0]),float(array[0]))
+	return new_scale
 
-
+func convert_arr_to_vec2arr(array:Array) -> PoolVector2Array:
+	var converted = PoolVector2Array([])
+	var size = array.size()
+	if size % 2 == 1:
+		Debug.l("Cannot convert array to PoolVector2Array with an odd number of entries")
+		return PoolVector2Array([])
+	var index = 0
+	while index < size:
+		var a = array[index]
+		var b = array[index + 1]
+		var atype = typeof(a)
+		var btype = typeof(b)
+		if atype == TYPE_INT:
+			pass
+		elif atype == TYPE_REAL:
+			pass
+		else:
+			Debug.l("Cannot convert type %s for PoolVector2Array" % atype)
+			return PoolVector2Array([])
+		if btype == TYPE_INT:
+			pass
+		elif btype == TYPE_REAL:
+			pass
+		else:
+			Debug.l("Cannot convert type %s for PoolVector2Array" % btype)
+			return PoolVector2Array([])
+		var pooling = Vector2(a,b)
+		converted.append(pooling)
+		index += 2
+#	breakpoint
+	return converted
 
 
 
@@ -206,7 +268,8 @@ func process_node_definitons():
 				var scl = md.get("scale",[1])
 				var rot = md.get("rotation",0)
 				var pos_basic = {"position":pos,"scale":scl,"rotation":rot}
-				pd.merge({module:{"node":node,"properties":properties,"position_data":pos_basic}})
+				var ignore = md.get("ships_to_ignore",[])
+				pd.merge({module:{"node":node,"properties":properties,"position_data":pos_basic,"ships_to_ignore":ignore}})
 	
 	return pd
 	

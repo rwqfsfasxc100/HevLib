@@ -342,7 +342,7 @@ static func __make_slot_for_scene(slot_data: Dictionary) -> Dictionary:
 	if invertLimitLogic:
 		base = base + "\ninvert_limit_logic = true"
 	if restrict_hold_type != "":
-		base = base + "\nrestrict_hold_type = %s" % restrict_hold_type
+		base = base + "\nrestrict_hold_type = \"%s\"" % restrict_hold_type
 #	if hasNone:
 #		var itemTemplate = load("res://HevLib/scenes/equipment/hardpoints/EquipmentItemTemplate.tscn").instance() # Old load. Commented out because of possible bug with it
 #		var itemTemplate = load("res://HevLib/scenes/equipment/hardpoints/unmodified/EquipmentItemTemplate.tscn").instance()
