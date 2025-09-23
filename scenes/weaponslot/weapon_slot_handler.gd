@@ -108,7 +108,38 @@ func _ready():
 										else:
 											equipment_templates[item] = {}
 										equipment_templates[item][property.get("property")] = property.get("value")
-	
+	for standalone in ship_modify_standalone:
+		if baseShipName == standalone:
+			var sldta = ship_modify_standalone[baseShipName]
+			for key in sldta:
+				if slot == key:
+					var eq = sldta[key]
+					for item in eq:
+						var properties = eq[item]
+						for property in properties:
+							if item in node_names:
+#								breakpoint
+								if item in equipment_templates.keys():
+									pass
+								else:
+									equipment_templates[item] = {}
+								equipment_templates[item][property.get("property")] = property.get("value")
+		if shipName != baseShipName:
+			if shipName == standalone:
+				var sldta = ship_modify_standalone[shipName]
+				for key in sldta:
+					if slot == key:
+						var eq = sldta[key]
+						for item in eq:
+							var properties = eq[item]
+							for property in properties:
+								if item in node_names:
+	#								breakpoint
+									if item in equipment_templates.keys():
+										pass
+									else:
+										equipment_templates[item] = {}
+									equipment_templates[item][property.get("property")] = property.get("value")
 
 func loadPlaceholder():
 	var t = "weaponSlot.%s.type" % slot

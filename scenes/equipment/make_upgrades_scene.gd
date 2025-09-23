@@ -378,6 +378,8 @@ func make_upgrades_scene():
 												founddata[ship][slot] = compile.duplicate(true)
 											else:
 												founddata[ship][slot] = shipdata.get(slot).duplicate(true)
+									else:
+										founddata.merge(ar)
 								fi.store_string(JSON.print(founddata))
 								fi.close()
 							"WEAPONSLOT_SHIP_MODIFY.gd":
@@ -416,7 +418,8 @@ func make_upgrades_scene():
 												founddata[ship][slot] = compile.duplicate(true)
 											else:
 												founddata[ship][slot] = shipdata.get(slot).duplicate(true)
-								
+									else:
+										founddata.merge(ar)
 								fi.store_string(JSON.print(founddata))
 								fi.close()
 					var mname = check.split("/")[2]
