@@ -37,7 +37,7 @@ func reexamine():
 			else:
 				visible = logic
 		if restrict_hold_type != "":
-			if restrict_hold_type == ship.base_storage_type:
+			if restrict_hold_type.to_upper() == ship.base_storage_type.to_upper():
 				visible = true
 			else:
 				visible = false
