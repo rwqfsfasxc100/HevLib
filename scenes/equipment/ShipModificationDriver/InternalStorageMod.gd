@@ -28,8 +28,8 @@ func _ready():
 		var listingSystemName = item.get("system","SYSTEM_MISSING_NAME")
 		var listingStorageFlat = item.get("storage_flat",0)
 		var listingStorageAmmo = item.get("storage_ammo",0)
-		var listingStorageNano = item.get("storage_nanodrones",0)
-		var listingStoragePropellant = item.get("storage_propellant",0)
+		var listingStorageNano = item.get("storage_nanodrones",0.0)
+		var listingStoragePropellant = item.get("storage_propellant",0.0)
 		var listingStorageMulti = float(item.get("storage_multi_upper",1.0))/float(item.get("storage_multi_lower",1.0))
 		var listingForceType = item.get("force_type","")
 		var listingCrewCount = item.get("crew_count",0)
@@ -48,7 +48,16 @@ func _ready():
 				"mass":listingMass,
 			}
 		})
-	var installed = DataFormat.__sift_dictionary(shipConfig,listings.keys())
+	var skip_keys = ["damage"]
+	
+	var nf_config = {}
+	for obj in shipConfig.keys():
+		if obj in skip_keys:
+			pass
+		else:
+			nf_config.merge({obj:shipConfig[obj]})
+	
+	var installed = DataFormat.__sift_dictionary(nf_config,listings.keys())
 	
 	var modifyable_type = base_storage_type
 	var modifyable_ammo = base_ammo_storage
