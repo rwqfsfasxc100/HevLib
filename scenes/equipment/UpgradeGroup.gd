@@ -14,6 +14,7 @@ export (String) var alignment = ""
 export (String) var restriction = ""
 export (Array) var override_additive = []
 export (Array) var override_subtractive = []
+export (String) var restrict_hold_type = ""
 
 # Internal variable used to more easily assign equipment
 # Should improve efficiency over the previous version, which calculated it on the fly
@@ -35,3 +36,8 @@ func reexamine():
 				visible = !logic
 			else:
 				visible = logic
+		if restrict_hold_type != "":
+			if restrict_hold_type == ship.base_storage_type:
+				visible = true
+			else:
+				visible = false
