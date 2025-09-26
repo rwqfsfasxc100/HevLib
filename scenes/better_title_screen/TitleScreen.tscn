@@ -23,23 +23,6 @@ margin_bottom = 660.0
 margin_right = 1280.0
 margin_bottom = 720.0
 
-[node name="MarginContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer" index="0"]
-margin_bottom = 315.0
-
-[node name="Logo" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer" index="0"]
-margin_bottom = 315.0
-
-[node name="SteamAwardsNomination2022" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer" index="1"]
-margin_bottom = 315.0
-
-[node name="SteamAwards" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer/SteamAwardsNomination2022" index="0"]
-margin_top = 47.0
-margin_bottom = 267.0
-
-[node name="HBoxContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer" index="1"]
-margin_top = 319.0
-margin_bottom = 630.0
-
 [node name="NewA" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/HBoxContainer/Saves" index="0"]
 rect_min_size = Vector2( 64, 41 )
 icon = null
@@ -68,13 +51,8 @@ icon = null
 rect_min_size = Vector2( 64, 41 )
 icon = null
 
-[node name="MarginContainer2" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer" index="2"]
-margin_top = 634.0
-
-[node name="GridContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2" index="0"]
-margin_bottom = 86.0
-
 [node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2/GridContainer" index="1"]
+visible = false
 margin_top = 45.0
 margin_right = 961.0
 margin_bottom = 86.0
