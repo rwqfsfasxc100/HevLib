@@ -14,8 +14,6 @@ func _ready():
 	processed_node_definitions = process_node_definitons()
 	processed_ship_register = process_ship_register()
 	
-	
-	
 	var n_store = {}
 	
 	var get_base_ship_fallback = true
@@ -30,10 +28,12 @@ func _ready():
 		if fallback_ship in processed_ship_register:
 			var datafetch = processed_ship_register[fallback_ship]["node_definitions"]
 			for obj in datafetch:
+				var objdata = datafetch[obj]
+				
 				if obj in n_store:
 					pass
 				else:
-					n_store.merge({obj:datafetch[obj]})
+					n_store.merge({obj:objdata})
 	
 	
 	var selfpath = get_path()
@@ -43,6 +43,16 @@ func _ready():
 		var node_data = processed_node_definitions[object]
 		
 		
+		
+		var recurse_to_variants = node_data["recurse_to_variants"]
+		
+		if not recurse_to_variants:
+			var sh = processed_ship_register.get(shipName,{"node_definitions":{}})
+			var def = sh["node_definitions"]
+			if object in def:
+				pass
+			else:
+				continue
 		var ignorance = node_data["ships_to_ignore"]
 		if shipName in ignorance:
 			continue
@@ -153,8 +163,8 @@ func _ready():
 		
 		
 #		breakpoint
-		call_deferred("add_child",node)
-
+#		call_deferred("add_child",node)
+		add_child(node)
 
 
 
@@ -280,7 +290,8 @@ func process_node_definitons():
 				var rot = md.get("rotation",0)
 				var pos_basic = {"position":pos,"scale":scl,"rotation":rot}
 				var ignore = md.get("ships_to_ignore",[])
-				pd.merge({module:{"node":node,"properties":properties,"position_data":pos_basic,"ships_to_ignore":ignore}})
+				var recursive = md.get("recurse_to_variants",true)
+				pd.merge({module:{"node":node,"properties":properties,"position_data":pos_basic,"ships_to_ignore":ignore,"recurse_to_variants":recursive}})
 	
 	return pd
 	
