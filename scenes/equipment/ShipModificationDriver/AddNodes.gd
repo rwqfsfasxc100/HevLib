@@ -134,7 +134,7 @@ func _ready():
 			var split = prop.split("/")
 			if split.size() == 1:
 				if prop in pointer:
-					var setter = format_properties(data.get("value",null),data.get("method",""))
+					var setter = format_properties(data,data.get("method",""))
 					pointer.set(prop,setter)
 					
 					
@@ -147,7 +147,7 @@ func _ready():
 				if pointer == null:
 					continue
 				if prop in pointer:
-					var setter = format_properties(data.get("value",null),data.get("method",""))
+					var setter = format_properties(data,data.get("method",""))
 					pointer.set(prop,setter)
 		
 		
@@ -161,11 +161,11 @@ func _ready():
 func format_properties(data,format):
 	match format:
 		"arr2vec2arr":
-			return convert_arr_to_vec2arr(data)
+			return convert_arr_to_vec2arr(data.get("value",null))
 		"arr2vec2":
-			return convert_arr_to_vec2(data)
+			return convert_arr_to_vec2(data.get("value",null))
 		_:
-			return data
+			return data.get("value",null)
 
 func convert_arr_to_vec2(array:Array) -> Vector2:
 	var new_scale = Vector2(0,0)
