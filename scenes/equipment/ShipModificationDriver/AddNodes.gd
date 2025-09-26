@@ -164,6 +164,8 @@ func format_properties(data,format):
 			return convert_arr_to_vec2arr(data.get("value",null))
 		"arr2vec2":
 			return convert_arr_to_vec2(data.get("value",null))
+		"copy":
+			return copy_property(data.get("node_path",""),data.get("property",null))
 		_:
 			return data.get("value",null)
 
@@ -206,6 +208,15 @@ func convert_arr_to_vec2arr(array:Array) -> PoolVector2Array:
 		index += 2
 #	breakpoint
 	return converted
+
+func copy_property(path: String,property: String):
+	var node = self
+	if path:
+		node = get_node_or_null(path)
+	if node and property in node:
+		return node.get(property)
+	return
+
 
 
 
