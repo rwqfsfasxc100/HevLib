@@ -156,7 +156,7 @@ func _ready():
 				pointer = pointer.get_node_or_null(npath)
 				if pointer == null:
 					continue
-				if prop in pointer:
+				if nprop in pointer:
 					var setter = format_properties(data,data.get("method",""))
 					pointer.set(prop,setter)
 		
