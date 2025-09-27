@@ -27,27 +27,39 @@ func _ready():
 		var listings = {}
 		for item in config_data:
 			var listingSystemName = item.get("system","SYSTEM_MISSING_NAME")
+			var ls = {}
+			
 			var listingStorageFlat = item.get("storage_flat",0)
+			if listingStorageFlat != 0.0:
+				ls.merge({"storage_flat":listingStorageFlat})
 			var listingStorageAmmo = item.get("storage_ammo",0)
+			if listingStorageAmmo != 0.0:
+				ls.merge({"storage_ammo":listingStorageAmmo})
 			var listingStorageNano = item.get("storage_nanodrones",0.0)
+			if listingStorageNano != 0.0:
+				ls.merge({"storage_nano":listingStorageNano})
 			var listingStoragePropellant = item.get("storage_propellant",0.0)
+			if listingStoragePropellant != 0.0:
+				ls.merge({"storage_propellant":listingStoragePropellant})
 			var listingStorageMulti = float(item.get("storage_multi_upper",1.0))/float(item.get("storage_multi_lower",1.0))
+			if listingStorageMulti != 1.0:
+				ls.merge({"storage_multi":listingStorageMulti})
 			var listingForceType = item.get("force_type","")
+			if listingForceType != "":
+				ls.merge({"force_type":listingForceType})
 			var listingCrewCount = item.get("crew_count",0)
+			if listingCrewCount != 0.0:
+				ls.merge({"crew_count":listingCrewCount})
 			var listingCrewMorale = item.get("crew_morale",0.0)
+			if listingCrewMorale != 0.0:
+				ls.merge({"crew_morale":listingCrewMorale})
 			var listingMass = float(item.get("mass",0.0))
+			if listingMass != 0.0:
+				ls.merge({"mass":listingMass})
+			
+			
 			listings.merge({
-				listingSystemName:{
-					"storage_flat":listingStorageFlat,
-					"storage_ammo":listingStorageAmmo,
-					"storage_nano":listingStorageNano,
-					"storage_multi":listingStorageMulti,
-					"force_type":listingForceType,
-					"storage_propellant":listingStoragePropellant,
-					"crew_count":listingCrewCount,
-					"crew_morale":listingCrewMorale,
-					"mass":listingMass,
-				}
+				listingSystemName:ls
 			})
 		var skip_keys = ["damage"]
 		
@@ -129,7 +141,7 @@ func _ready():
 		
 		
 		processedCargoCapacity = int(float(modifyable_capacity) * modifyable_multi)
-		l("Changing base hold size of %s by multipler %s. Results in new size of %s" % [modifyable_capacity,modifyable_multi,processedCargoCapacity])
+		l("Changing base hold size of %s by multiplier %s. Results in new size of %s" % [modifyable_capacity,modifyable_multi,processedCargoCapacity])
 		processedCargoCapacity += modifyable_add_capacity
 		l("Adding storage bonus of %s. New size of %s" % [modifyable_add_capacity,processedCargoCapacity])
 		
