@@ -26,14 +26,15 @@ func _ready():
 		n_store = datafetch
 	if get_base_ship_fallback:
 		if fallback_ship in processed_ship_register:
-			var datafetch = processed_ship_register[fallback_ship]["node_definitions"]
+			var db = processed_ship_register[fallback_ship]
+			var datafetch = db["node_definitions"]
 			for obj in datafetch:
 				var objdata = datafetch[obj]
-				
-				if obj in n_store:
-					pass
-				else:
-					n_store.merge({obj:objdata})
+				if processed_node_definitions[obj]["recurse_to_variants"]:
+					if obj in n_store:
+						pass
+					else:
+						n_store.merge({obj:objdata})
 	
 	
 	var selfpath = get_path()
