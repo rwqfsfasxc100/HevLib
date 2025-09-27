@@ -158,7 +158,7 @@ func _ready():
 					continue
 				if nprop in pointer:
 					var setter = format_properties(data,data.get("method",""))
-					pointer.set(prop,setter)
+					pointer.set(nprop,setter)
 		
 		
 		
