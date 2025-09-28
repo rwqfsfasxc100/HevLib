@@ -145,7 +145,7 @@ func _ready():
 			var split = prop.split("/")
 			if split.size() == 1:
 				if prop in pointer:
-					var setter = format_properties(data,data.get("method",""))
+					var setter = format_properties(data,data.get("method",""),prop,"",node)
 					pointer.set(prop,setter)
 					
 					
@@ -158,7 +158,7 @@ func _ready():
 				if pointer == null:
 					continue
 				if nprop in pointer:
-					var setter = format_properties(data,data.get("method",""))
+					var setter = format_properties(data,data.get("method",""),nprop,npath,node)
 					pointer.set(nprop,setter)
 		
 		
@@ -169,14 +169,18 @@ func _ready():
 
 
 
-func format_properties(data,format):
+func format_properties(data,format,property,property_path,base_node):
 	match format:
 		"arr2vec2arr":
 			return convert_arr_to_vec2arr(data.get("value",null))
 		"arr2vec2":
 			return convert_arr_to_vec2(data.get("value",null))
 		"copy":
-			return copy_property(data.get("node_path",""),data.get("property",null))
+			return copy_property(data.get("node_path",""),data.get("property",property))
+		"center_to_ship":
+			return center_to_ship(property_path,base_node,data.get("ignore_scaling",false))
+		"invert_scaling":
+			return invert_scaling(property_path,base_node)
 		_:
 			return data.get("value",null)
 
@@ -227,6 +231,84 @@ func copy_property(path: String,property: String):
 	if node and property in node:
 		return node.get(property)
 	return
+
+func center_to_ship(property,base_node,ignore_scaling = false):
+	var node_to_get = property
+	if base_node.get_node_or_null(node_to_get) == null:
+		return
+	var true_position = Vector2(0,0)
+	var positions = {}
+	if "position" in base_node:
+		var pos = base_node.position
+		if ignore_scaling and "scale" in base_node:
+			var s = base_node.scale
+			pos.x = pos.x * (1/s.x)
+			pos.y = pos.y * (1/s.y)
+		true_position -= pos
+		positions.merge({"base_node":pos})
+	var split = Array(node_to_get.split("/"))
+	var iterations = split.size()
+	while iterations >= 1:
+		var nd = ""
+		for item in split:
+			if nd == "":
+				nd = item
+			else:
+				nd = nd + "/" + item
+		var node = base_node.get_node_or_null(nd)
+		if node:
+			if ignore_scaling and "position" in node:
+				var pos = node.position
+				if "scale" in node:
+					var s = node.scale
+					pos.x = pos.x * (1/s.x)
+					pos.y = pos.y * (1/s.y)
+				true_position -= pos
+				positions.merge({nd:pos})
+		iterations -= 1
+		split.pop_back()
+	
+	
+	return Vector2(true_position.x,true_position.y)
+
+func invert_scaling(node_path,base_node):
+	var scalings = {}
+	
+	var x_mod = 1.0
+	var y_mod = 1.0
+	
+	if "scale" in base_node:
+		var s = base_node.scale
+		var x = float(s.x)
+		var y = float(s.y)
+		scalings.merge({"base_node":s})
+		x_mod = x_mod * (1/x)
+		y_mod = y_mod * (1/y)
+	
+	var split = Array(node_path.split("/"))
+	var iterations = split.size()
+	while iterations >= 1:
+		var nd = ""
+		for item in split:
+			if nd == "":
+				nd = item
+			else:
+				nd = nd + "/" + item
+		var node = base_node.get_node_or_null(nd)
+		if node:
+			if "scale" in node:
+				var s = node.scale
+				scalings.merge({nd:s})
+				var x = float(s.x)
+				var y = float(s.y)
+				x_mod = x_mod * (1/x)
+				y_mod = y_mod * (1/y)
+				
+				
+		iterations -= 1
+		split.pop_back()
+	
+	return Vector2(x_mod,y_mod)
 
 
 
