@@ -20,3 +20,7 @@ func _ready():
 func _input(event):
 	if event.is_action_pressed("open_debug_event_menu"):
 		visible = not visible
+		CurrentGame.in_hevlib_menu = visible
+	if visible: 
+		if event.is_action_pressed("ui_cancel"):
+			visible = false

@@ -25,6 +25,11 @@ var _savedObjects := []
 
 func _init(modLoader = ModLoader):
 	l("Initializing Equipment Driver")
+	
+	# Adds in_hevlib_menu to the CurrentGame script and preventing controls while it's true
+	installScriptExtension("../../events/controls/CurrentGame.gd")
+	installScriptExtension("../../events/controls/ship-ctrl.gd")
+	
 #	installScriptExtension("check.gd")
 	installScriptExtension("../scene_replacements/blanks/MPU.gd")
 	installScriptExtension("../scene_replacements/blanks/Hud.gd")
