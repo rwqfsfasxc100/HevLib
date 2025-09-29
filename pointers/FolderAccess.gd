@@ -24,6 +24,11 @@ var developer_hint = {
 		"Copies (and overrides) a file to a folder, and can account for globalized and Windows paths",
 		"file -> string for the path to the file, can be global or local path",
 		"folder -> string for the path to the folder, can be global or local path"
+	],
+	"__get_folder_structure":[
+		"Recursive equivalent to __fetch_folder_files",
+		"folder -> absolute path to the folder desired. Can be literal, res://, or user://",
+		"store_file_content -> (optional) bool to decide whether to store a stringified version of each file's content"
 	]
 }
 
@@ -55,3 +60,8 @@ static func __copy_file(file, folder):
 	
 	var dir = Directory.new()
 	dir.copy(prepfile,folder + "/" + fn)
+
+static func __get_folder_structure(folder,store_file_content = false):
+	var f = load("res://HevLib/scripts/get_folder_structure.gd")
+	var s = f.get_folder_structure(folder,store_file_content)
+	return s
