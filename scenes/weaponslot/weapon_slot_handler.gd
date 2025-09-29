@@ -1,19 +1,24 @@
 extends "res://ships/WeaponSlot.gd"
 
-export var slot_group = ""
+#export var slot_group = ""
 
-var current_ship = ""
-var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
-var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
+#var current_ship = ""
 
-var shipName = ""
-var baseShipName = ""
 
-var equipment_templates = {}
-
-onready var parent = get_parent()
 #func _enter_tree():
 func _ready():
+	var equipment_templates = {}
+	var eqt_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/internal_equipment_templates.json"
+	
+	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+	var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
+
+	var shipName = ""
+	var baseShipName = ""
+
+	
+	var parent = get_parent()
+	
 	
 	shipName=ship.shipName
 	baseShipName=ship.baseShipName
@@ -141,6 +146,10 @@ func _ready():
 										equipment_templates[item] = {}
 									equipment_templates[item][property.get("property")] = property.get("value")
 
+	file.open(eqt_file,File.WRITE)
+	file.store_string(JSON.print(equipment_templates))
+	file.close()
+
 func loadPlaceholder():
 	var t = "weaponSlot.%s.type" % slot
 	var sysname = ""
@@ -159,7 +168,14 @@ func loadPlaceholder():
 		if "slotName" in system:
 			system.slotName = t + "_" + system.systemName
 	ship.changeExternalPlaceholders( - 1)
+	var file = File.new()
+	var eqt_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/internal_equipment_templates.json"
+	file.open(eqt_file,File.READ)
+	var equipment_templates = JSON.parse(file.get_as_text(true)).result
+	file.close()
 	if sysname in equipment_templates:
+		var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+		var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
 		var datapoint = equipment_templates[sysname]
 		for property in datapoint:
 			var value = datapoint.get(property)

@@ -2,7 +2,7 @@ extends Node
 
 var SCENE_HEADER = "[gd_scene load_steps=4 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/unmodified/WeaponSlotUpgradeTemplate.tscn\" type=\"PackedScene\" id=2]\n[ext_resource path=\"res://enceladus/SystemShipUpgradeUI.tscn\" type=\"PackedScene\" id=3]\n\n[sub_resource type=\"ViewportTexture\" id=1]\nflags = 5\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain1/Viewport\")\n\n[sub_resource type=\"ViewportTexture\" id=2]\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain2/Control\")\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]\n\n[node name=\"TextureRect\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 2 )\n\n[node name=\"TextureRect2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 2 )"
 
-var vanilla_equipment = load("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd").get_script_constant_map()
+var vanilla_equipment = preload("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd").get_script_constant_map()
 var vanilla_data = preload("res://HevLib/scenes/equipment/vanilla_defaults/slot_tagging.gd")
 var hardpoint_types
 var alignments
@@ -21,7 +21,7 @@ func _init():
 	vanilla_equipment_defaults_for_reference = vanilla_data.vanilla_equipment_defaults_for_reference.duplicate(true)
 
 var version = [1,0,0]
-func make_upgrades_scene():
+func make_upgrades_scene(is_onready: bool = true):
 	
 	
 	# FILE PATHS
@@ -55,17 +55,8 @@ func make_upgrades_scene():
 	var ship_node_register_file = FILE_PATHS[11]
 	
 	
-	
-	var pls = File.new()
-	pls.open("res://VersionLabel.tscn",File.READ)
-	var ptxt = pls.get_as_text(true)
-	pls.close()
-	for line in ptxt.split("\n"):
-		if line.begins_with("text = "):
-			var data = line.split(" = ")[1].split(".")
-			version[0] = int(data[0])
-			version[1] = int(data[1])
-			version[2] = int(data[2])
+	var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
+	var version = DataFormat.__get_vanilla_version()
 	var text = "HevLib make_upgrades_scene manager: observed game version of %s"  % str(version)
 	Debug.l(text)
 	var Equipment = preload("res://HevLib/pointers/Equipment.gd")
@@ -74,33 +65,52 @@ func make_upgrades_scene():
 	var nodes_parent = UpgradeMenu.get_node("VB/MarginContainer/ScrollContainer/MarginContainer/Items")
 	var vanilla_slot_names = []
 	var vanilla_slot_types = {}
-	var p = load("res://ModLoader.gd")
-	var ps = p.get_script_constant_map()
 	var running_in_debugged = false
 	var debugged_defined_mods = []
-	for item in ps:
-		if item == "is_debugged":
-			running_in_debugged = true
-			var pf = File.new()
-			pf.open("res://ModLoader.gd",File.READ)
-			var fs = pf.get_as_text(true)
-			pf.close()
-			var lines = fs.split("\n")
-			var reading = false
-			var contents = []
-			for line in lines:
-				
-				
-				
-				if line.begins_with("var addedMods"):
-					reading = true
-				if reading:
-					var split = line.split("\"")
-					if split.size() > 1 and split.size() == 3:
-						if split[0].begins_with("#"):
-							contents.append(split[1])
-			
-			debugged_defined_mods = contents.duplicate(true)
+	
+	var onready_mod_paths = []
+	var onready_mod_folders = []
+	
+	# Use when not loading from ready
+	if not is_onready:
+		var p = load("res://ModLoader.gd")
+		var ps = p.get_script_constant_map()
+		for item in ps:
+			if item == "is_debugged":
+				running_in_debugged = true
+				var pf = File.new()
+#				if pf.file_exists("res://ModLoader.gd"):
+#					l("Can see ModLoader.gd")
+#				else:
+#					l("Cannot see ModLoader.tscn")
+				pf.open("res://ModLoader.gd",File.READ)
+				var fs = pf.get_as_text(true)
+				pf.close()
+				var lines = fs.split("\n")
+				var reading = false
+				var contents = []
+				for line in lines:
+
+					if line.begins_with("var addedMods"):
+						reading = true
+					if reading:
+						var split = line.split("\"")
+						if split.size() > 1 and split.size() == 3:
+							if split[0].begins_with("#"):
+								contents.append(split[1])
+
+				debugged_defined_mods = contents.duplicate(true)
+	
+	
+	# Use when running on ready
+	var mods = ModLoader.get_children()
+	for mod in mods:
+		var path = mod.get_script().get_path()
+		onready_mod_paths.append(path)
+		var split = path.split("/")
+		onready_mod_folders.append(split[2])
+	
+	
 	for slot in nodes_parent.get_children():
 		var children = slot.get_node("VBoxContainer").get_children()
 		if children.size() <= 1:
@@ -169,15 +179,20 @@ func make_upgrades_scene():
 					
 		if folder.ends_with("/"):
 			var mods_to_avoid = []
-			if running_in_debugged:
-				for mod in debugged_defined_mods:
-					var home = mod.split("/")[2]
-					if home == semi_root:
-						mods_to_avoid.append(home)
+			if not is_onready:
+				if running_in_debugged:
+					for mod in debugged_defined_mods:
+						var home = mod.split("/")[2]
+						if home == semi_root:
+							mods_to_avoid.append(home)
 			var folder_2 = FolderAccess.__fetch_folder_files(folder, true, true)
 			for check in folder_2:
-				if semi_root in mods_to_avoid:
-					continue
+				if not is_onready:
+					if semi_root in mods_to_avoid:
+						continue
+				else:
+					if not semi_root in onready_mod_folders:
+						continue
 				if check.ends_with("HEVLIB_EQUIPMENT_DRIVER_TAGS/"): # EQUIPMENTDRIVER FILES
 					var files = FolderAccess.__fetch_folder_files(check, false, true)
 					var mod = check.hash()
@@ -210,6 +225,10 @@ func make_upgrades_scene():
 								dicti.merge({"EQUIPMENT_TAGS":ar})
 							"SLOT_ORDER.gd":
 								var f = File.new()
+#								if wpfl.file_exists(slot_order_cache_file):
+#									l("Can see %s" % slot_order_cache_file)
+#								else:
+#									l("Cannot see %s" % slot_order_cache_file)
 								f.open(slot_order_cache_file,File.READ_WRITE)
 								var data = JSON.parse(f.get_as_text()).result
 								var cache = load(check + last_bit).get_script_constant_map()
@@ -241,6 +260,10 @@ func make_upgrades_scene():
 							"MODIFY_INTERNALS.gd":
 								var data = load(check + last_bit)
 								var constants = data.get_script_constant_map()
+#								if wpfl.file_exists(processed_storage_file):
+#									l("Can see %s" % processed_storage_file)
+#								else:
+#									l("Cannot see %s" % processed_storage_file)
 								wpfl.open(processed_storage_file,File.READ_WRITE)
 								var pfdata = JSON.parse(wpfl.get_as_text()).result
 								if "MODIFY_INTERNALS" in constants:
@@ -251,6 +274,10 @@ func make_upgrades_scene():
 							"NODE_DEFINITIONS.gd":
 								var data = load(check + last_bit)
 								var constants = data.get_script_constant_map()
+#								if wpfl.file_exists(node_definitions_file):
+#									l("Can see %s" % node_definitions_file)
+#								else:
+#									l("Cannot see %s" % node_definitions_file)
 								wpfl.open(node_definitions_file,File.READ_WRITE)
 								var pfdata = JSON.parse(wpfl.get_as_text()).result
 								for item in constants:
@@ -260,6 +287,10 @@ func make_upgrades_scene():
 							"SHIP_NODE_REGISTER.gd":
 								var data = load(check + last_bit)
 								var constants = data.get_script_constant_map()
+#								if wpfl.file_exists(ship_node_register_file):
+#									l("Can see %s" % ship_node_register_file)
+#								else:
+#									l("Cannot see %s" % ship_node_register_file)
 								wpfl.open(ship_node_register_file,File.READ_WRITE)
 								var pfdata = JSON.parse(wpfl.get_as_text()).result
 								for item in constants:
@@ -280,6 +311,10 @@ func make_upgrades_scene():
 								var constants = data.get_script_constant_map()
 								var ar = constants.get("WEAPONSLOT_MODIFY_TEMPLATES",{}).duplicate(true)
 								var fi = File.new()
+#								if wpfl.file_exists(weaponslot_modify_templates_file):
+#									l("Can see %s" % weaponslot_modify_templates_file)
+#								else:
+#									l("Cannot see %s" % weaponslot_modify_templates_file)
 								fi.open(weaponslot_modify_templates_file,File.READ_WRITE)
 								var filedata = fi.get_as_text(true)
 								var sort = JSON.parse(filedata)
@@ -316,6 +351,10 @@ func make_upgrades_scene():
 								var constants = data.get_script_constant_map()
 								var ar = constants.get("WEAPONSLOT_MODIFY",{}).duplicate(true)
 								var fi = File.new()
+#								if wpfl.file_exists(weaponslot_modify_standalone_file):
+#									l("Can see %s" % weaponslot_modify_standalone_file)
+#								else:
+#									l("Cannot see %s" % weaponslot_modify_standalone_file)
 								fi.open(weaponslot_modify_standalone_file,File.READ_WRITE)
 								var filedata = fi.get_as_text(true)
 								var sort = JSON.parse(filedata)
@@ -348,6 +387,10 @@ func make_upgrades_scene():
 								var constants = data.get_script_constant_map()
 								var ar = constants.get("WEAPONSLOT_SHIP_TEMPLATES",{}).duplicate(true)
 								var fi = File.new()
+#								if wpfl.file_exists(weaponslot_ship_templates_file):
+#									l("Can see %s" % weaponslot_ship_templates_file)
+#								else:
+#									l("Cannot see %s" % weaponslot_ship_templates_file)
 								fi.open(weaponslot_ship_templates_file,File.READ_WRITE)
 								var filedata = fi.get_as_text(true)
 								var sort = JSON.parse(filedata)
@@ -387,6 +430,10 @@ func make_upgrades_scene():
 								var constants = data.get_script_constant_map()
 								var ar = constants.get("WEAPONSLOT_SHIP_MODIFY",{}).duplicate(true)
 								var fi = File.new()
+#								if wpfl.file_exists(weaponslot_ship_standalone_file):
+#									l("Can see %s" % weaponslot_ship_standalone_file)
+#								else:
+#									l("Cannot see %s" % weaponslot_ship_standalone_file)
 								fi.open(weaponslot_ship_standalone_file,File.READ_WRITE)
 								var filedata = fi.get_as_text(true)
 								var sort = JSON.parse(filedata)
@@ -442,6 +489,10 @@ func make_upgrades_scene():
 								var constants = data.get_script_constant_map()
 								var ar = constants.get("SAVE_BUTTONS",[]).duplicate(true)
 								var fi = File.new()
+#								if wpfl.file_exists(save_menu_file):
+#									l("Can see %s" % save_menu_file)
+#								else:
+#									l("Cannot see %s" % save_menu_file)
 								fi.open(save_menu_file,File.READ_WRITE)
 								var filedata = fi.get_as_text(true)
 								var sort = JSON.parse(filedata)
