@@ -29,6 +29,10 @@ var developer_hint = {
 	"__convert_arr_to_vec2arr":[
 		"Returns a PoolVector2Array from an array of integers and floats",
 		"array -> Array used as the input integers/floats. Must have an even size and contain only ints or floats"
+	],
+	"__get_vanilla_version":[
+		"Gets the vanilla game version",
+		"get_from_files -> (optional) bool deciding whether to get the version from the files. Generally slower than it being disabled, however is the only way to get it before the onready phase. Only works in debug builds due to bytecode compiled data"
 	]
 }
 
@@ -53,9 +57,9 @@ static func __rotate_point(point: Vector2, angle: float, degrees:bool = true) ->
 	var s = f.rotate_point(point, angle, degrees)
 	return s
 
-static func __get_vanilla_version() -> Array:
+static func __get_vanilla_version(get_from_files: bool = false) -> Array:
 	var f = load("res://HevLib/scripts/get_vanilla_version.gd")
-	var s = f.get_vanilla_version()
+	var s = f.get_vanilla_version(get_from_files)
 	return s
 
 static func __sift_dictionary(dictionary: Dictionary,search_keys: Array) -> Array:
