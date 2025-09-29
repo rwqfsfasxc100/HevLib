@@ -1,9 +1,7 @@
 extends Popup
 
-var filter_offset = Vector2(300,450)
 
-func _filter_pressed():
-	show_menu()
+var filter_offset = Vector2(200,200)
 
 
 func _visibility_changed():
@@ -32,6 +30,7 @@ func _on_resize():
 
 func show_menu():
 	popup()
+#	$base/URLContainer.show()
 
 func cancel():
 	hide()
@@ -40,8 +39,6 @@ func cancel():
 
 func _about_to_show():
 	lastFocus = get_focus_owner()
-	var container = $base/FilterContainer/VBoxContainer/ScrollContainer/VBoxContainer
-	var c = container.get_children()
-	if c.size() >= 1:
-		container.get_child(0).get_node("CheckButton").grab_focus()
+	var container = $base/URLContainer/VBoxContainer/ScrollContainer/VBoxContainer
+	
 	_on_resize()

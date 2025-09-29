@@ -53,6 +53,12 @@ func _pressed():
 			creditText = creditText + "\n" + item
 	information_nodes["info_desc_credits"].text = creditText
 	
+	var default_URL_icon = "res://HevLib/ui/themes/icons/alias.stex"
+	information_nodes["links_menu_path"].MOD_INFO = MOD_INFO
+	information_nodes["links_menu_path"].update()
+	var links = MOD_INFO["manifest"]["manifest_data"]["links"]
+#	for link in links:
+#		breakpoint
 #	breakpoint
 
 

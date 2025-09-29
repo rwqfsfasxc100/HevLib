@@ -24,6 +24,9 @@ onready var count_label = get_node(count_label_path)
 export var filter_btn_path = NodePath("")
 onready var filter_btn = get_node(filter_btn_path)
 
+export var links_menu_path = NodePath("")
+onready var links_menu = get_node(links_menu_path)
+
 onready var listContainer = $ScrollContainer/VBoxContainer
 
 
@@ -55,6 +58,7 @@ func _ready():
 		"info_bugreports_button":get_node(info_bugreports_button),
 		"count_label_path":get_node(count_label_path),
 		"filter_btn_path":get_node(filter_btn_path),
+		"links_menu_path":get_node(links_menu_path),
 	}
 	var data = ManifestV2.__get_mod_data()["mods"]
 	var groups = {}
@@ -143,7 +147,8 @@ func _draw():
 var aligned_zero_focus = false
 
 func _process(_delta):
-	if count_label.count <= 1 and not aligned_zero_focus:
+	if count_label.count <= 1:
+		if not aligned_zero_focus:
 			get_node(info_desc).grab_focus()
 			get_node(info_name).text = ""
 			get_node(info_version).text = ""
@@ -153,10 +158,53 @@ func _process(_delta):
 			get_node(info_desc_text).text = ""
 			get_node(info_desc_author).text = ""
 			get_node(info_desc_credits).text = ""
-			get_node(info_icon).texture.load_path = ""
-			get_node(info_settings_button).disabled = true
-			get_node(info_links_button).disabled = true
-			get_node(info_bugreports_button).disabled = true
+			get_node(info_icon).texture = null
+			get_node(info_settings_button).visible = false
+			get_node(info_links_button).visible = false
+			get_node(info_bugreports_button).visible = false
 			aligned_zero_focus = true
 	else:
-		aligned_zero_focus = false
+		if aligned_zero_focus:
+			var node = get_visible_mods()
+			if node.size() >= 1:
+				var ar = node[0]
+				var tex = StreamTexture.new()
+				tex.load_path = "res://HevLib/ui/themes/icons/missing_icon.png.stex"
+				if ar["mod_icon"]["has_icon_file"]:
+					tex.load_path = ar["mod_icon"]["icon_path"]
+				get_node(info_name).text = ar["name"]
+				get_node(info_version).text = ar["version_data"]["full_version_string"]
+				get_node(info_priority).text = str(ar["priority"])
+				get_node(info_mod_id).text = ar["manifest"]["manifest_data"]["mod_information"]["id"]
+				get_node(info_author).text = ar["manifest"]["manifest_data"]["mod_information"]["author"]
+				get_node(info_desc_text).text = ar["manifest"]["manifest_data"]["mod_information"]["description"]
+				get_node(info_desc_author).text = ar["manifest"]["manifest_data"]["mod_information"]["author"]
+				var credits = ""
+				for c in ar["manifest"]["manifest_data"]["mod_information"]["credits"]:
+					if credits == "":
+						credits = c
+					else:
+						credits = credits + "\n" + c
+				get_node(info_desc_credits).text = credits
+				get_node(info_icon).texture = tex
+				get_node(info_settings_button).visible = true
+				get_node(info_links_button).visible = true
+				get_node(info_bugreports_button).visible = true
+			
+			aligned_zero_focus = false
+
+
+func get_visible_mods():
+	var array = []
+	var skip_name = "HEVLIB_NODE_SEPARATOR_IGNORE_PLS"
+	var node = get_node("ScrollContainer/VBoxContainer")
+	var children = node.get_children()
+	for child in children:
+		if child.name == skip_name:
+			continue
+		
+		var visibility = child.visible
+		if visibility:
+			array.append(child.MOD_INFO)
+		
+	return array

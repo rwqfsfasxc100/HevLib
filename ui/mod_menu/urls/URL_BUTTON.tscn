@@ -1,0 +1,40 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=1]
+[ext_resource path="res://HevLib/ui/mod_menu/urls/URL_BUTTON.gd" type="Script" id=2]
+
+[sub_resource type="StreamTexture" id=1]
+flags = 4
+load_path = "res://HevLib/ui/themes/icons/alias.stex"
+
+[node name="URL_BUTTON" type="HBoxContainer"]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 300, 90 )
+size_flags_horizontal = 3
+script = ExtResource( 2 )
+
+[node name="Control" type="Control" parent="."]
+margin_right = 90.0
+margin_bottom = 90.0
+rect_min_size = Vector2( 90, 90 )
+
+[node name="TextureRect" type="TextureRect" parent="Control"]
+margin_left = 9.0
+margin_top = 9.0
+margin_right = 99.0
+margin_bottom = 99.0
+rect_min_size = Vector2( 90, 90 )
+rect_scale = Vector2( 0.8, 0.8 )
+texture = SubResource( 1 )
+expand = true
+
+[node name="Button" type="Button" parent="."]
+margin_left = 94.0
+margin_right = 300.0
+margin_bottom = 90.0
+size_flags_horizontal = 3
+theme = ExtResource( 1 )
+text = "TAG_MISSING"
+
+[connection signal="pressed" from="Button" to="." method="_pressed"]

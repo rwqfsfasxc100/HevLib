@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=2]
+[gd_scene load_steps=20 format=2]
 
 [ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=1]
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=2]
@@ -14,6 +14,8 @@
 [ext_resource path="res://HevLib/ui/mod_menu/filters/OpenFolder.gd" type="Script" id=12]
 [ext_resource path="res://HevLib/ui/mod_menu/filters/FilterPopup.gd" type="Script" id=13]
 [ext_resource path="res://HevLib/ui/mod_menu/filters/FilterContainer.gd" type="Script" id=14]
+[ext_resource path="res://HevLib/ui/mod_menu/urls/URLPopup.gd" type="Script" id=15]
+[ext_resource path="res://HevLib/ui/mod_menu/urls/URLContainer.gd" type="Script" id=16]
 
 [sub_resource type="StreamTexture" id=3]
 flags = 4
@@ -97,7 +99,7 @@ mouse_filter = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox"]
 margin_left = 79.0
-margin_right = 575.0
+margin_right = 506.0
 margin_bottom = 65.0
 rect_min_size = Vector2( 250, 65 )
 mouse_filter = 2
@@ -106,13 +108,12 @@ size_flags_horizontal = 3
 [node name="Label" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox/PanelContainer"]
 margin_left = 5.0
 margin_top = 13.0
-margin_right = 491.0
+margin_right = 422.0
 margin_bottom = 51.0
 text = "_"
 clip_text = true
 
 [node name="FILTER" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox"]
-visible = false
 margin_left = 510.0
 margin_right = 575.0
 margin_bottom = 65.0
@@ -175,6 +176,7 @@ info_links_button = NodePath("../../ModInfo/LINKBOX/LINKS")
 info_bugreports_button = NodePath("../../ModInfo/LINKBOX/BUGREPORTS")
 count_label_path = NodePath("../Count/ModCountLabel")
 filter_btn_path = NodePath("../ListHeader/SearchBox/FILTER")
+links_menu_path = NodePath("../../../../../../URLPopup/base/URLContainer")
 desc_scroll_box = NodePath("../../ModInfo/DESC/ScrollContainer")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList"]
@@ -572,13 +574,27 @@ margin_top = 5.0
 margin_right = 445.0
 margin_bottom = 295.0
 
-[node name="Header" type="Label" parent="FilterPopup/base/FilterContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="FilterPopup/base/FilterContainer/VBoxContainer"]
+margin_top = 248.0
 margin_right = 440.0
-margin_bottom = 38.0
+margin_bottom = 290.0
+alignment = 2
+
+[node name="Header" type="Label" parent="FilterPopup/base/FilterContainer/VBoxContainer/HBoxContainer"]
+margin_top = -248.0
+margin_right = 440.0
+margin_bottom = -210.0
 size_flags_horizontal = 3
 text = "HEVLIB_TAG_FILTER"
 align = 1
 valign = 1
+
+[node name="CloseButton" type="Button" parent="FilterPopup/base/FilterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 86.0
+margin_right = 440.0
+margin_bottom = 42.0
+rect_min_size = Vector2( 75, 0 )
+text = "HEVLIB_MODMENU_CLOSE"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="FilterPopup/base/FilterContainer/VBoxContainer"]
 margin_top = 42.0
@@ -594,23 +610,77 @@ margin_bottom = 202.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="HBoxContainer" type="HBoxContainer" parent="FilterPopup/base/FilterContainer/VBoxContainer"]
-margin_top = 248.0
-margin_right = 440.0
-margin_bottom = 290.0
+[node name="URLPopup" type="Popup" parent="."]
+visible = true
+margin_right = 40.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+popup_exclusive = true
+script = ExtResource( 15 )
+
+[node name="ColorRect" type="ColorRect" parent="URLPopup"]
+margin_right = 1280.0
+margin_bottom = 720.0
+mouse_filter = 2
+color = Color( 0, 0, 0, 0.705882 )
+
+[node name="base" type="MarginContainer" parent="URLPopup"]
+margin_right = 40.0
+margin_bottom = 40.0
+
+[node name="URLContainer" type="PanelContainer" parent="URLPopup/base"]
+margin_right = 684.0
+margin_bottom = 300.0
+rect_min_size = Vector2( 450, 300 )
+script = ExtResource( 16 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="URLPopup/base/URLContainer"]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 679.0
+margin_bottom = 295.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="URLPopup/base/URLContainer/VBoxContainer"]
+margin_right = 674.0
+margin_bottom = 42.0
 alignment = 2
 
-[node name="CloseButton" type="Button" parent="FilterPopup/base/FilterContainer/VBoxContainer/HBoxContainer"]
-margin_left = 86.0
-margin_right = 440.0
+[node name="Header" type="Label" parent="URLPopup/base/URLContainer/VBoxContainer/HBoxContainer"]
+margin_top = 2.0
+margin_right = 316.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+text = "HEVLIB_LINKS_BUTTON"
+align = 1
+valign = 1
+
+[node name="CloseButton" type="Button" parent="URLPopup/base/URLContainer/VBoxContainer/HBoxContainer"]
+margin_left = 320.0
+margin_right = 674.0
 margin_bottom = 42.0
 rect_min_size = Vector2( 75, 0 )
 text = "HEVLIB_MODMENU_CLOSE"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="URLPopup/base/URLContainer/VBoxContainer"]
+margin_top = 46.0
+margin_right = 674.0
+margin_bottom = 290.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 5 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="URLPopup/base/URLContainer/VBoxContainer/ScrollContainer"]
+margin_right = 674.0
+margin_bottom = 244.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
 [connection signal="about_to_show" from="." to="." method="_about_to_show"]
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
 [connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox/FILTER" to="FilterPopup" method="_filter_pressed"]
 [connection signal="visibility_changed" from="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox/FILTER" to="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox/FILTER" method="_visibility_changed"]
+[connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/LINKBOX/LINKS" to="URLPopup" method="show_menu"]
 [connection signal="visibility_changed" from="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/LINKBOX/LINKS/LabelContainer" to="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/LINKBOX/LINKS/LabelContainer" method="_visibility_changed"]
 [connection signal="visibility_changed" from="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/LINKBOX/BUGREPORTS/LabelContainer" to="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/LINKBOX/BUGREPORTS/LabelContainer" method="_visibility_changed"]
 [connection signal="pressed" from="base/PanelContainer/VBoxContainer/FooterButtons/OpenFolder" to="base/PanelContainer/VBoxContainer/FooterButtons/OpenFolder" method="_pressed"]
@@ -618,3 +688,6 @@ text = "HEVLIB_MODMENU_CLOSE"
 [connection signal="about_to_show" from="FilterPopup" to="FilterPopup" method="_about_to_show"]
 [connection signal="visibility_changed" from="FilterPopup" to="FilterPopup" method="_visibility_changed"]
 [connection signal="pressed" from="FilterPopup/base/FilterContainer/VBoxContainer/HBoxContainer/CloseButton" to="FilterPopup" method="cancel"]
+[connection signal="about_to_show" from="URLPopup" to="URLPopup" method="_about_to_show"]
+[connection signal="visibility_changed" from="URLPopup" to="URLPopup" method="_visibility_changed"]
+[connection signal="pressed" from="URLPopup/base/URLContainer/VBoxContainer/HBoxContainer/CloseButton" to="URLPopup" method="cancel"]
