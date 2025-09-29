@@ -48,12 +48,16 @@ func _init(modLoader = ModLoader):
 	replaceScene("../better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
 	
 	
+func _ready():
+	l("Readying")
+	
+	
 	var upgrades_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn"
 	var weaponslot_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot.tscn"
 	var aux_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/AuxSlot.tscn"
 	
 	var Equipment = preload("res://HevLib/pointers/Equipment.gd")
-	Equipment.__make_upgrades_scene()
+	Equipment.__make_upgrades_scene(true)
 	var upgrades = load(upgrades_path)
 	upgrades.take_over_path("res://enceladus/Upgrades.tscn")
 	_savedObjects.append(upgrades)
@@ -63,8 +67,7 @@ func _init(modLoader = ModLoader):
 	var aux = load(aux_path)
 	aux.take_over_path("res://ships/modules/AuxSlot.tscn")
 	_savedObjects.append(aux)
-func _ready():
-	l("Readying")
+	
 	replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")
 #	replaceScene("Enceladus.tscn","res://enceladus/Enceladus.tscn")
 	l("Ready")
