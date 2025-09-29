@@ -16,10 +16,11 @@ export var info_desc = NodePath("")
 export var info_desc_text = NodePath("")
 export var info_desc_author = NodePath("")
 export var info_desc_credits = NodePath("")
+export var info_links_button = NodePath("")
+export var info_bugreports_button = NodePath("")
 
 export var count_label_path = NodePath("")
 onready var count_label = get_node(count_label_path)
-
 export var filter_btn_path = NodePath("")
 onready var filter_btn = get_node(filter_btn_path)
 
@@ -49,7 +50,11 @@ func _ready():
 		"info_desc":get_node(info_desc),
 		"info_desc_text":get_node(info_desc_text),
 		"info_desc_author":get_node(info_desc_author),
-		"info_desc_credits":get_node(info_desc_credits)
+		"info_desc_credits":get_node(info_desc_credits),
+		"info_links_button":get_node(info_links_button),
+		"info_bugreports_button":get_node(info_bugreports_button),
+		"count_label_path":get_node(count_label_path),
+		"filter_btn_path":get_node(filter_btn_path),
 	}
 	var data = ManifestV2.__get_mod_data()["mods"]
 	var groups = {}
@@ -138,9 +143,20 @@ func _draw():
 var aligned_zero_focus = false
 
 func _process(_delta):
-	if count_label.count <= 1:
-		if not aligned_zero_focus:
+	if count_label.count <= 1 and not aligned_zero_focus:
 			get_node(info_desc).grab_focus()
+			get_node(info_name).text = ""
+			get_node(info_version).text = ""
+			get_node(info_priority).text = ""
+			get_node(info_mod_id).text = ""
+			get_node(info_author).text = ""
+			get_node(info_desc_text).text = ""
+			get_node(info_desc_author).text = ""
+			get_node(info_desc_credits).text = ""
+			get_node(info_icon).texture.load_path = ""
+			get_node(info_settings_button).disabled = true
+			get_node(info_links_button).disabled = true
+			get_node(info_bugreports_button).disabled = true
 			aligned_zero_focus = true
 	else:
 		aligned_zero_focus = false

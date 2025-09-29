@@ -139,3 +139,5 @@ TAG_ADDS_GAMEPLAY_MECHANICS|Adds new gameplay mechanics
 TAG_ADDS_EVENTS|Adds new ring events
 
 TAG_HANDLE_EXTRA_CREW|Handles extra crew
+
+HEVLIB_TAG_FILTER|Filter mods by tag

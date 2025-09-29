@@ -19,7 +19,7 @@ func _ready():
 		node.name = tag
 		node.get_node("P/Label").text = tag
 		node.get_node("CheckButton").pressed = false
-		$ScrollContainer/VBoxContainer.add_child(node)
+		$VBoxContainer/ScrollContainer/VBoxContainer.add_child(node)
 		tag_visibility.merge({tag:false})
 	
 
