@@ -14,6 +14,23 @@ func _ready():
 	processed_node_definitions = process_node_definitons()
 	processed_ship_register = process_ship_register()
 	
+	var ship_match = false
+#	if "transponder" in fullConfig:
+#		ship_match = CurrentGame.state.ship.transponder == fullConfig.transponder
+	
+	
+	if ship_match:
+		Debug.l("HevLib Add Nodes: Getting config init")
+		if shipName in processed_ship_register:
+			Debug.l("HevLib Add Nodes: Planned base addition - \n\n%s" % JSON.print(processed_ship_register[shipName],"\t"))
+		if baseShipName in processed_ship_register and shipName != baseShipName:
+			Debug.l("HevLib Add Nodes: Planned base addition parent - \n\n%s" % JSON.print(processed_ship_register[baseShipName],"\t"))
+		var chld = get_children()
+		var child_names = []
+		for n in chld:
+			child_names.append(n.name)
+		Debug.l("HevLib Add Nodes: Ship nodes before addition: %s" % JSON.print(child_names,"\t"))
+		
 	var n_store = {}
 	
 	var get_base_ship_fallback = true
@@ -167,7 +184,12 @@ func _ready():
 #		call_deferred("add_child",node)
 		add_child(node)
 
-
+	if ship_match:
+		var chld = get_children()
+		var child_names = []
+		for n in chld:
+			child_names.append(n.name)
+		Debug.l("HevLib Add Nodes: Ship nodes after addition: %s" % JSON.print(child_names,"\t"))
 
 func format_properties(data,format,property,property_path,base_node):
 	match format:
