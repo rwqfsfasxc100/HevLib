@@ -109,7 +109,7 @@ func _ready():
 	
 #	replaceScene("scenes/equipment/Enceladus.tscn","res://enceladus/Enceladus.tscn")
 	
-	var ncrew = ManifestV2.__get_manifest_entry("tags","handle_extra_crew")
+	var ncrew = ManifestV2.__get_manifest_entry("tags","TAG_HANDLE_EXTRA_CREW")
 	var count = 24
 	for mod in ncrew:
 		var data = ncrew[mod]
@@ -121,7 +121,10 @@ func _ready():
 		var escene := load(crew)
 		escene.take_over_path("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
 	
-	
+	var gameFiles = FolderAccess.__get_folder_structure("res://",false)
+	file.open("user://cache/.HevLib_Cache/filesys.json",File.WRITE)
+	file.store_string(JSON.print(gameFiles,"\t"))
+	file.close()
 	l("Ready")
 func installScriptExtension(path:String):
 	var childPath:String = str(modPath + path)
