@@ -17,6 +17,11 @@ export var info_desc_text = NodePath("")
 export var info_desc_author = NodePath("")
 export var info_desc_credits = NodePath("")
 
+export var count_label_path = NodePath("")
+onready var count_label = get_node(count_label_path)
+
+export var filter_btn_path = NodePath("")
+onready var filter_btn = get_node(filter_btn_path)
 
 onready var listContainer = $ScrollContainer/VBoxContainer
 
@@ -26,6 +31,8 @@ func about_to_show():
 	var nodes = listContainer.get_children()
 	if nodes.size() >= 2:
 		nodes[0]._pressed()
+	filter_btn.current_text = ""
+	filter_btn.keys_pressed = ""
 
 var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 
@@ -127,3 +134,13 @@ func _draw():
 	dp.rect_min_size = dp_d_size
 	dp.rect_size = dp_d_size
 	pass
+
+var aligned_zero_focus = false
+
+func _process(_delta):
+	if count_label.count <= 1:
+		if not aligned_zero_focus:
+			get_node(info_desc).grab_focus()
+			aligned_zero_focus = true
+	else:
+		aligned_zero_focus = false

@@ -171,6 +171,8 @@ info_desc = NodePath("../../ModInfo/DESC")
 info_desc_text = NodePath("../../ModInfo/DESC/ScrollContainer/VBoxContainer/DESCRIPTION")
 info_desc_author = NodePath("../../ModInfo/DESC/ScrollContainer/VBoxContainer/AUTHOR")
 info_desc_credits = NodePath("../../ModInfo/DESC/ScrollContainer/VBoxContainer/CREDITS")
+count_label_path = NodePath("../Count/ModCountLabel")
+filter_btn_path = NodePath("../ListHeader/SearchBox/FILTER")
 desc_scroll_box = NodePath("../../ModInfo/DESC/ScrollContainer")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList"]
@@ -545,7 +547,6 @@ text = "HEVLIB_MODMENU_CLOSE"
 visible = true
 margin_right = 40.0
 margin_bottom = 40.0
-popup_exclusive = true
 script = ExtResource( 13 )
 
 [node name="ColorRect" type="ColorRect" parent="FilterPopup"]

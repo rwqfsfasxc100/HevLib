@@ -257,7 +257,7 @@ var cursor = true
 var cursor_time = 0.0
 
 func _process(delta):
-	if text_label and is_visible_in_tree():
+	if text_label and get_parent().is_visible_in_tree():
 		cursor_time += delta
 		if cursor_time >= 0.5:
 			cursor = !cursor
