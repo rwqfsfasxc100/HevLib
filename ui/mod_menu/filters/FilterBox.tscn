@@ -1,0 +1,37 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=1]
+[ext_resource path="res://HevLib/ui/mod_menu/filters/FilterBox.gd" type="Script" id=2]
+
+[node name="FilterBox" type="HBoxContainer"]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 420, 50 )
+size_flags_horizontal = 3
+theme = ExtResource( 1 )
+script = ExtResource( 2 )
+
+[node name="P" type="PanelContainer" parent="."]
+margin_right = 330.0
+margin_bottom = 50.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="P"]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 325.0
+margin_bottom = 45.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "TAG_EMPTY"
+align = 1
+valign = 1
+
+[node name="CheckButton" type="CheckButton" parent="."]
+margin_left = 334.0
+margin_right = 420.0
+margin_bottom = 50.0
+size_flags_vertical = 3
+
+[connection signal="toggled" from="CheckButton" to="." method="_toggled"]

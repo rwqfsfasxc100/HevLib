@@ -90,8 +90,6 @@ load_path = "res://HevLib/ui/themes/icons/radio_on.stex"
 
 [resource]
 default_font = ExtResource( 1 )
-Button/colors/font_color_focus = Color( 0.870588, 0.870588, 0.501961, 1 )
-Button/colors/font_color_hover = Color( 0.870588, 0.870588, 0.501961, 1 )
 Button/colors/font_color_hover_pressed = Color( 0.870588, 0.870588, 0.501961, 1 )
 Button/colors/font_color_pressed = Color( 0.870588, 0.870588, 0.501961, 1 )
 Button/styles/disabled = ExtResource( 3 )

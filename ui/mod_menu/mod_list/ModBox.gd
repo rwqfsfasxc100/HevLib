@@ -141,6 +141,13 @@ func _draw():
 		tooltip_text = tooltip_text + "\n" + TranslationServer.translate("HEVLIB_MM_TOOLTIP_LIBRARY") % [is_library,always_display]
 	button.hint_tooltip = tooltip_text
 	
+	if is_visible_in_tree():
+		var pos = get_position_in_parent()
+		if pos == 0:
+			button.grab_focus()
+	
+	
+	
 #	_refocus()
 var descbox = "../ModInfo/DESC"
 
@@ -154,6 +161,74 @@ func _input(event):
 
 onready var desc_box = ModContainer.get_node(descbox)
 onready var mod_box = get_node("ModButton")
+#func _process(_delta):
+#	if is_visible_in_tree():
+#		MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)
+#		button_box.rect_size.x = button.rect_size.x - 4
+		
+		
+
+func get_button(pos):
+	return get_parent().get_child(pos).get_node("ModButton")
+
+func _refocus():
+	MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)
+	button_box.rect_size.x = button.rect_size.x - 4
+	var index = get_parent().get_position_in_parent()
+	var parent = get_parent()
+	var parent_count = parent.get_child_count()-1
+	focus_neighbour_left = get_path_to(self)
+	focus_neighbour_right = get_path_to(ModContainer.get_node(descbox))
+	focus_next = get_path_to(ModContainer.get_node(descbox))
+	focus_previous = get_path_to(ModContainer.get_node(descbox))
+#	breakpoint
+	if index == 0:
+#		focus_neighbour_top = get_path_to(self)
+		focus_neighbour_top = mod_box.get_path_to(filter_button)
+		focus_neighbour_bottom = get_path_to(parent.get_child(index+1).get_node("ModButton"))
+	elif index == parent_count:
+		focus_neighbour_top = get_path_to(parent.get_child(index-1).get_node("ModButton"))
+		focus_neighbour_bottom = get_path_to(self)
+	else:
+		focus_neighbour_top = get_path_to(parent.get_child(index-1).get_node("ModButton"))
+		focus_neighbour_bottom = get_path_to(parent.get_child(index+1).get_node("ModButton"))
+	
+var isfocus = false
+
+
+var filter_button_path = "../../../../ListHeader/SearchBox/FILTER"
+onready var filter_button = get_node(filter_button_path)
+var openMods_button = "../../../../../../FooterButtons/OpenFolder"
+
+var mod_menu_panel_path = "../../../../../../../../.."
+onready var mod_menu_panel = get_node(mod_menu_panel_path)
+
+var filterContainerPath = mod_menu_panel_path + "/FilterPopup/base/FilterContainer"
+onready var filter_container = get_node(filterContainerPath)
+
+func _process(_delta):
+	if mod_menu_panel and mod_menu_panel.visible:
+		var check_against = MOD_INFO["name"].to_upper()
+		var current_selection = filter_button.keys_pressed
+		if current_selection and current_selection != "":
+			var i = check_against.countn(current_selection)
+			if i:
+				visible = true
+			else:
+				visible = false
+		else:
+			visible = true
+		if visible:
+			var MID = MOD_INFO["manifest"]["manifest_data"]["mod_information"]["id"]
+			if filter_container.filtering:
+				if MID in filter_container.mod_visibility:
+					visible = true
+				else:
+					visible = false
+			else:
+				visible = true
+#			breakpoint
+
 func _visibility_changed():
 	MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)
 	button_box.rect_size.x = button.rect_size.x - 4
@@ -170,11 +245,13 @@ func _visibility_changed():
 	mod_box.focus_previous = mod_box.get_path_to(desc_box)
 	
 	if pos == 0:
-		mod_box.focus_neighbour_top = mb
+#		mod_box.focus_neighbour_top = mb
+		mod_box.focus_neighbour_top = mod_box.get_path_to(filter_button)
 		mod_box.focus_neighbour_bottom = mod_box.get_path_to(get_button(pos+1))
 	elif pos + 1 == end_pos:
 		mod_box.focus_neighbour_top = mod_box.get_path_to(get_button(pos-1))
-		mod_box.focus_neighbour_bottom = mb
+		mod_box.focus_neighbour_bottom = mod_box.get_path_to(get_node(openMods_button))
+		get_node(openMods_button).focus_neighbour_top = get_node(openMods_button).get_path_to(mod_box)
 	else:
 		mod_box.focus_neighbour_top = mod_box.get_path_to(get_button(pos-1))
 		mod_box.focus_neighbour_bottom = mod_box.get_path_to(get_button(pos+1))
@@ -184,29 +261,3 @@ func _visibility_changed():
 		if pos == 0:
 			
 			button.grab_focus()
-
-func get_button(pos):
-	return get_parent().get_child(pos).get_node("ModButton")
-
-func _refocus():
-	var index = get_parent().get_position_in_parent()
-	var parent = get_parent()
-	var parent_count = parent.get_child_count()-1
-	focus_neighbour_left = get_path_to(self)
-	focus_neighbour_right = get_path_to(ModContainer.get_node(descbox))
-	focus_next = get_path_to(ModContainer.get_node(descbox))
-	focus_previous = get_path_to(ModContainer.get_node(descbox))
-#	breakpoint
-	if index == 0:
-		focus_neighbour_top = get_path_to(self)
-		focus_neighbour_bottom = get_path_to(parent.get_child(index+1).get_node("ModButton"))
-	elif index == parent_count:
-		focus_neighbour_top = get_path_to(parent.get_child(index-1).get_node("ModButton"))
-		focus_neighbour_bottom = get_path_to(self)
-	else:
-		focus_neighbour_top = get_path_to(parent.get_child(index-1).get_node("ModButton"))
-		focus_neighbour_bottom = get_path_to(parent.get_child(index+1).get_node("ModButton"))
-	
-var isfocus = false
-
-

@@ -28,9 +28,11 @@ func refocus():
 
 func _on_resize():
 	var size = Settings.getViewportSize()
+	rect_size = size
 	$ColorRect.rect_size = size
 	$base.rect_size = size - offset
 	$base.rect_position = offset/2
+	
 	var bn = $base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList/ScrollContainer/VBoxContainer
 	if bn:
 		if bn.get_children().size() >= 1:
@@ -44,3 +46,4 @@ func _on_resize():
 
 func _visibility_changed():
 	_on_resize()
+
