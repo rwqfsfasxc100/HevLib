@@ -230,7 +230,9 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 					dict_template["library"]["is_library"] = manifest_data["library"].get("is_library",false)
 					dict_template["library"]["always_display"] = manifest_data["library"].get("always_display",false)
 					
-				
+				if "configs" in manifest_data.keys():
+					var configs = manifest_data["configs"]
+					dict_template["configs"].merge(configs)
 				
 				
 		var version_metadata = dict_template["version"]["version_metadata"]

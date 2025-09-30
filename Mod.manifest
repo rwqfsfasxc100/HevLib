@@ -35,6 +35,33 @@ en="100%"
 is_library=true
 always_display=true
 
+[configs]
+
+equipment={
+	"do_sort_equipment_by_price":true,
+	"do_sort_slots_by_type":true,
+	"use_legacy_equipment_handler":false,
+}
+events={
+	"disabled_events":[  ],
+	"write_events":true,
+}
+drivers={
+	"use_input_virtualization":true,
+	"show_hidden_libraries":false,
+}
+debug={
+	"input_debugger":false,
+	"input_event_debugger":false,
+	"ring_position_data_debugger":false,
+	"ring_position_accurate_events":false,
+}
+input={
+	"open_debug_event_menu":[  ],
+	"debugger":[ "F10" ],
+	"toggle_debug_menus":[ "F9" ],
+}
+
 [manifest_definitions]
 
 manifest_version=2.2

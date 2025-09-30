@@ -25,7 +25,8 @@ func _init(modLoader = ModLoader):
 	add_child(self_check)
 func _ready():
 	l("Readying")
-	
+	var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+	ConfigDriver.__load_configs()
 #	replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
 	var p = load("res://ModLoader.gd")
 	var ps = p.get_script_constant_map()
