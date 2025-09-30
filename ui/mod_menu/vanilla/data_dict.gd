@@ -46,10 +46,13 @@ const VANILLA = {
 			"links":{
 				"HEVLIB_DISCORD":{"URL":"https://discord.gg/dv"},
 				"HEVLIB_NEXUS":{"URL":"https://www.nexusmods.com/games/dvringsofsaturn"},
-				"HEVLIB_DONATIONS":{"URL":"https://store.steampowered.com/app/846030/DV_Rings_of_Saturn/"},
 				"HEVLIB_WIKI":{"URL":"https://delta-v.kodera.pl/index.php/Main_Page"},
 				"HEVLIB_BUGREPORTS":{"URL":"https://discord.com/channels/426287934870781952/1067385553261166602"},
-
+				"HEVLIB_VANILLA_STEAM_STORE":{"URL":"https://store.steampowered.com/app/846030/DV_Rings_of_Saturn/","ICON":"res://HevLib/ui/themes/icons/steam.stex","TOOLTIP":"HEVLIB_VANILLA_STEAM_STORE_TOOLTIP"},
+				"HEVLIB_VANILLA_ITCH_STORE":{"URL":"https://koder.itch.io/dv-rings-of-saturn/","ICON":"res://HevLib/ui/themes/icons/itch.stex","TOOLTIP":"HEVLIB_VANILLA_ITCH_STORE_TOOLTIP"},
+				"HEVLIB_VANILLA_EPIC_STORE":{"URL":"https://store.epicgames.com/en-US/p/deltav-rings-of-saturn-4cd187/","ICON":"res://HevLib/ui/themes/icons/epic.stex","TOOLTIP":"HEVLIB_VANILLA_EPIC_STORE_TOOLTIP"},
+				"HEVLIB_VANILLA_GOG_STORE":{"URL":"https://www.gog.com/en/game/dv_rings_of_saturn/","ICON":"res://HevLib/ui/themes/icons/gog.stex","TOOLTIP":"HEVLIB_VANILLA_GOG_STORE_TOOLTIP"},
+				
 			},
 			"configs":{
 				

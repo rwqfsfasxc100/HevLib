@@ -151,3 +151,19 @@ TAG_ADDS_EVENTS|Adds new ring events
 TAG_HANDLE_EXTRA_CREW|Handles extra crew
 
 HEVLIB_TAG_FILTER|Filter mods by tag
+
+HEVLIB_VANILLA_STEAM_STORE|Steam
+
+HEVLIB_VANILLA_STEAM_STORE_TOOLTIP|Opens the Steam page for the game
+
+HEVLIB_VANILLA_ITCH_STORE|itch.io
+
+HEVLIB_VANILLA_ITCH_STORE_TOOLTIP|Opens the itch.io page for the game
+
+HEVLIB_VANILLA_EPIC_STORE|Epic Games
+
+HEVLIB_VANILLA_EPIC_STORE_TOOLTIP|Opens the Epic Games page for the game
+
+HEVLIB_VANILLA_GOG_STORE|GOG
+
+HEVLIB_VANILLA_GOG_STORE_TOOLTIP|Opens the GOG page for the game
