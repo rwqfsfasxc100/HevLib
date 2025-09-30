@@ -1,15 +1,31 @@
 extends Popup
 
 var offset = Vector2(12,12)
-
+var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+var cache_folder = "user://cache/.Mod_Menu_2_Cache/"
+var filter_cache_file = "menu_filter_cache.json"
+var file = File.new()
 func _about_to_show():
+	FolderAccess.__check_folder_exists(cache_folder)
+	file.open(cache_folder + filter_cache_file,File.WRITE)
+	file.store_string(JSON.print([]))
+	file.close()
+	var nodes = $FilterPopup/base/FilterContainer/VBoxContainer/ScrollContainer/VBoxContainer.get_children()
+	for node in nodes:
+		var c = node.get_node("CheckButton")
+		c.pressed = true
 	$base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList.about_to_show()
 	lastFocus = get_focus_owner()
 	_on_resize()
 	
 func _unhandled_input(event):
 	if visible and Input.is_action_just_pressed("ui_cancel"):
-		cancel()
+		if $URLPopup.visible:
+			$URLPopup.cancel()
+		elif $FilterPopup.visible:
+			$FilterPopup.cancel()
+		else:
+			cancel()
 		get_tree().set_input_as_handled()
 
 func show_menu():
@@ -30,8 +46,9 @@ func _on_resize():
 	var size = Settings.getViewportSize()
 	rect_size = size
 	$ColorRect.rect_size = size
-	$base.rect_size = size - offset
+	$base.rect_min_size = size - offset
 	$base.rect_position = offset/2
+	
 	
 	var bn = $base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList/ScrollContainer/VBoxContainer
 	if bn:

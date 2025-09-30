@@ -25,8 +25,12 @@ var MAX_SIZE = Vector2(0,0)
 
 var information_nodes = {}
 
+var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
+
+onready var all_tags = ManifestV2.__get_tags()
+
 func _pressed():
-	
+	var manifestData = MOD_INFO["manifest"]["manifest_data"]
 	information_nodes["info_name"].text = MOD_INFO["name"]
 	var prio = MOD_INFO["priority"]
 	if str(prio).ends_with("INF"):
@@ -41,26 +45,62 @@ func _pressed():
 		var tex = StreamTexture.new()
 		tex.load_path = MOD_INFO["mod_icon"]["icon_path"]
 		information_nodes["info_icon"].texture = tex
-	information_nodes["info_mod_id"].text = MOD_INFO["manifest"]["manifest_data"]["mod_information"]["id"]
-	information_nodes["info_author"].text = MOD_INFO["manifest"]["manifest_data"]["mod_information"]["author"]
-	information_nodes["info_desc_author"].text = MOD_INFO["manifest"]["manifest_data"]["mod_information"]["author"]
-	information_nodes["info_desc_text"].text = MOD_INFO["manifest"]["manifest_data"]["mod_information"]["description"]
+	var id = ""
+	if manifestData:
+		id = manifestData["mod_information"]["id"]
+	information_nodes["info_mod_id"].text = id
+	var author = ""
+	if manifestData:
+		author = manifestData["mod_information"]["author"]
+	information_nodes["info_author"].text = author
+	information_nodes["info_desc_author"].text = author
+	var description = ""
+	if manifestData:
+		description = manifestData["mod_information"]["description"]
+	information_nodes["info_desc_text"].text = description
 	var creditText = ""
-	for item in MOD_INFO["manifest"]["manifest_data"]["mod_information"]["credits"]:
-		if creditText == "":
-			creditText = item
-		else:
-			creditText = creditText + "\n" + item
+	if manifestData:
+		for item in manifestData["mod_information"]["credits"]:
+			if creditText == "":
+				creditText = item
+			else:
+				creditText = creditText + "\n" + item
 	information_nodes["info_desc_credits"].text = creditText
 	
 	var default_URL_icon = "res://HevLib/ui/themes/icons/alias.stex"
 	information_nodes["links_menu_path"].MOD_INFO = MOD_INFO
 	information_nodes["links_menu_path"].update()
-	var links = MOD_INFO["manifest"]["manifest_data"]["links"]
-#	for link in links:
-#		breakpoint
-#	breakpoint
-
+	if manifestData:
+		var links = manifestData["links"]
+		var configs = manifestData["configs"]
+		var link_size = links.size()
+		var config_size = configs.size()
+		if link_size == 0:
+			information_nodes["info_links_button"].visible = false
+			information_nodes["info_bugreports_button"].visible = false
+			information_nodes["info_bugreports_button"].url = ""
+		else:
+			var has_bug_reports = false
+			if "HEVLIB_BUGREPORTS" in links:
+				has_bug_reports = true
+				information_nodes["info_bugreports_button"].visible = true
+				information_nodes["info_bugreports_button"].url = links["HEVLIB_BUGREPORTS"].get("URL","")
+			else:
+				information_nodes["info_bugreports_button"].visible = false
+			if link_size == 1 and has_bug_reports:
+				information_nodes["info_links_button"].visible = false
+			else:
+				information_nodes["info_links_button"].visible = true
+		
+		if config_size == 0:
+			information_nodes["info_settings_button"].visible = false
+		else:
+			information_nodes["info_settings_button"].visible = true
+		
+	else:
+		information_nodes["info_settings_button"].visible = false
+		information_nodes["info_links_button"].visible = false
+		information_nodes["info_bugreports_button"].visible = false
 
 
 
@@ -130,8 +170,11 @@ func _draw():
 	if zip:
 		tooltip_text = tooltip_text + "\n" + TranslationServer.translate("HEVLIB_MM_TOOLTIP_ZIP") % zip
 	
-	
-	button_brief.text = MOD_INFO["manifest"]["manifest_data"]["mod_information"]["brief"]
+	var manifestData = MOD_INFO["manifest"]["manifest_data"]
+	var brief = ""
+	if manifestData:
+		brief = manifestData["mod_information"]["brief"]
+	button_brief.text = brief
 	
 	
 	
@@ -212,29 +255,46 @@ onready var mod_menu_panel = get_node(mod_menu_panel_path)
 var filterContainerPath = mod_menu_panel_path + "/FilterPopup/base/FilterContainer"
 onready var filter_container = get_node(filterContainerPath)
 
+var cache_folder = "user://cache/.Mod_Menu_2_Cache/"
+var filter_cache_file = "menu_filter_cache.json"
+
 func _process(_delta):
 	if mod_menu_panel and mod_menu_panel.visible:
+		var manifestData = MOD_INFO["manifest"]["manifest_data"]
 		var check_against = MOD_INFO["name"].to_upper()
+		var id_against = ""
+		if manifestData:
+			id_against = manifestData["mod_information"]["id"].to_upper()
 		var current_selection = filter_button.keys_pressed
-		if current_selection and current_selection != "":
-			var i = check_against.countn(current_selection)
-			if i:
-				visible = true
+		
+		if all_tags:
+			file.open(cache_folder + filter_cache_file,File.READ)
+			var filter_data = JSON.parse(file.get_as_text()).result
+			file.close()
+			if filter_data.size() >= 1:
+				var tag_visible = false
+				for tag in all_tags:
+					if not tag in filter_data:
+						var tag_mods = all_tags[tag]
+						for md in tag_mods:
+							if md.to_upper() == id_against:
+								tag_visible = true
+	#					breakpoint
+	#			breakpoint
+				visible = tag_visible
 			else:
-				visible = false
-		else:
-			visible = true
-		if visible:
-			var MID = MOD_INFO["manifest"]["manifest_data"]["mod_information"]["id"]
-			if filter_container.filtering:
-				if MID in filter_container.mod_visibility:
-					visible = true
+				visible = true
+			if visible:
+				if current_selection and current_selection != "":
+					var i = check_against.countn(current_selection)
+					var f = id_against.countn(current_selection)
+					if i or f:
+						visible = true
+					else:
+						visible = false
 				else:
-					visible = false
-			else:
-				visible = true
-#			breakpoint
-
+					visible = true
+var file = File.new()
 func _visibility_changed():
 	MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)
 	button_box.rect_size.x = button.rect_size.x - 4

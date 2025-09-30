@@ -33,5 +33,6 @@ margin_left = 334.0
 margin_right = 420.0
 margin_bottom = 50.0
 size_flags_vertical = 3
+pressed = true
 
 [connection signal="toggled" from="CheckButton" to="." method="_toggled"]

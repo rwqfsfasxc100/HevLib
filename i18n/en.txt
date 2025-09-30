@@ -92,17 +92,29 @@ HEVLIB_MODMENU_VERSION|Version: v%s
 
 HEVLIB_MODMENU_PRIO_MID_HEADER|Mod ID and Priority
 
-HEVLIB_GITHUB|GitHub Repository
+HEVLIB_GITHUB|GitHub
 
-HEVLIB_DISCORD|Discord Thread
+HEVLIB_DISCORD|Discord
 
-HEVLIB_NEXUS|Nexusmods page
+HEVLIB_NEXUS|Nexusmods
 
-HEVLIB_DONATIONS|Donate to the project
+HEVLIB_DONATIONS|Make a Donation
 
 HEVLIB_WIKI|Wiki
 
 HEVLIB_BUGREPORTS|Report a bug
+
+HEVLIB_GITHUB_TOOLTIP|GitHub repository for the project
+
+HEVLIB_DISCORD_TOOLTIP|Discord thread/channel/server for the project
+
+HEVLIB_NEXUS_TOOLTIP|Nexusmods page for the project
+
+HEVLIB_DONATIONS_TOOLTIP|Donate to the project
+
+HEVLIB_WIKI_TOOLTIP|Wiki page(s) for the project
+
+HEVLIB_BUGREPORTS_TOOLTIP|Report a bug via the project's reports link
 
 HEVLIB_FILTER_BY_TAGS|Filter mods by tags
 
@@ -112,9 +124,7 @@ HEVLIB_LINKS_BUTTON|Links
 
 HEVLIB_BUGREPORTS_BUTTON|Bug reports
 
-HEVLIB_LINKS_TOOLTIP|Display respective links
-
-HEVLIB_BUGREPORTS_TOOLTIP|Open bug report link
+HEVLIB_LINKS_TOOLTIP|Display the project's links
 
 TAG_ALLOW_ACHIEVEMENTS|Allows achievements
 

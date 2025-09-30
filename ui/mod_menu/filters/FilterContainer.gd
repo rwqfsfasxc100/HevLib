@@ -18,7 +18,7 @@ func _ready():
 		var node = filter_box_nd.instance()
 		node.name = tag
 		node.get_node("P/Label").text = tag
-		node.get_node("CheckButton").pressed = false
+		node.get_node("CheckButton").pressed = true
 		$VBoxContainer/ScrollContainer/VBoxContainer.add_child(node)
 		tag_visibility.merge({tag:false})
 	

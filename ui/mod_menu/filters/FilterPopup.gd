@@ -17,10 +17,10 @@ func refocus():
 		Debug.l("I have no focus to fall back to!")
 
 
-func _unhandled_input(event):
-	if visible and Input.is_action_just_pressed("ui_cancel"):
-		cancel()
-		get_tree().set_input_as_handled()
+#func _unhandled_input(event):
+#	if visible and Input.is_action_just_pressed("ui_cancel"):
+#		cancel()
+#		get_tree().set_input_as_handled()
 
 func _on_resize():
 	var size = Settings.getViewportSize()
@@ -40,8 +40,8 @@ func cancel():
 
 func _about_to_show():
 	lastFocus = get_focus_owner()
-	var container = $base/FilterContainer/VBoxContainer/ScrollContainer/VBoxContainer
-	var c = container.get_children()
-	if c.size() >= 1:
-		container.get_child(0).get_node("CheckButton").grab_focus()
+#	var container = $base/FilterContainer/VBoxContainer/ScrollContainer/VBoxContainer
+#	var c = container.get_children()
+#	if c.size() >= 1:
+#		container.get_child(0).get_node("CheckButton").grab_focus()
 	_on_resize()
