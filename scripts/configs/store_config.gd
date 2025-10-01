@@ -2,32 +2,31 @@ extends Node
 
 static func store_config(configuration: Dictionary, mod_id: String, cfg_filename : String = "Mod_Configurations" + ".cfg"):
 	var cfg_folder = "user://cfg/"
-	var check = Directory.new().file_exists(cfg_filename)
-	if not check:
-		var tmpf = File.new()
-		tmpf.open(cfg_folder+cfg_filename,File.WRITE)
+	var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+	var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
+	mod_id = DataFormat.__array_to_string(mod_id.split("/"))
+	mod_id = DataFormat.__array_to_string(mod_id.split(" "))
+	var tmpf = File.new()
+	var cfg_file = cfg_folder + cfg_filename
+	if not tmpf.file_exists(cfg_file):
+		tmpf.open(cfg_folder+cfg_file,File.WRITE)
 		tmpf.store_string("")
 		tmpf.close()
 	var FileCFG = File.new()
-	FileCFG.open(cfg_folder+cfg_filename,File.READ)
+	FileCFG.open(cfg_file,File.READ)
 	var cfg = ConfigFile.new()
-	var config_data = cfg.parse(FileCFG.get_as_text(true))
+	var txt = FileCFG.get_as_text(true)
+	cfg.parse(txt)
 	FileCFG.close()
 	var cfg_sections = cfg.get_sections()
-	breakpoint
 	var sections = configuration.keys()
 	for section in sections:
 		var sect_name = mod_id + "/" + section
 		if sect_name in cfg_sections:
-			pass
+			breakpoint
 		else:
-			pass
+			breakpoint
 		
-	
-	for section in config_data:
-		for key in config_data[section]:
-			cfg.set_value(section,key,config_data[section][key])
-	
 	
 	
 	
