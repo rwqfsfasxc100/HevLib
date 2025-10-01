@@ -131,5 +131,6 @@ const vanilla_equipment_defaults_for_reference = {
 }
 
 const min_version = {
+	"SYSTEM_HUD_CERF":[1,81,0]
 }
 

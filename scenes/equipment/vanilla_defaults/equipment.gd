@@ -1029,6 +1029,15 @@ const HUD_OCP = {
 	"slot_type":"HUD",
 	"equipment_type":"COMPUTER_HUD"
 }
+const HUD_CERF = {
+	"system":"SYSTEM_HUD_CERF",
+	"manual":"SYSTEM_HUD_MANUAL",
+	"specs":"",
+	"price":18000,
+	"test_protocol":"hud",
+	"slot_type":"HUD",
+	"equipment_type":"COMPUTER_HUD"
+}
 const HUD_EIME = {
 	"system":"SYSTEM_HUD_EIME",
 	"manual":"SYSTEM_HUD_MANUAL",
