@@ -23,6 +23,12 @@ var _savedObjects := []
 # Only the Tool and Debug AutoLoads are available
 # Script and scene replacements should be done here, before the originals are loaded
 
+var upgrades_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn"
+var weaponslot_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot.tscn"
+var aux_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/AuxSlot.tscn"
+
+var Equipment = preload("res://HevLib/pointers/Equipment.gd")
+
 func _init(modLoader = ModLoader):
 	l("Initializing Equipment Driver")
 	
@@ -47,23 +53,23 @@ func _init(modLoader = ModLoader):
 	installScriptExtension("../better_title_screen/SaveSlotButton.gd")
 	replaceScene("../better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
 	
+	Equipment.__make_upgrades_scene(false)
+	var ws = load(weaponslot_path)
+	ws.take_over_path("res://weapons/WeaponSlot.tscn")
+	_savedObjects.append(ws)
 	
 func _ready():
 	l("Readying")
 	
 	
-	var upgrades_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn"
-	var weaponslot_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot.tscn"
-	var aux_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/AuxSlot.tscn"
 	
-	var Equipment = preload("res://HevLib/pointers/Equipment.gd")
+	
+	
 	Equipment.__make_upgrades_scene(true)
 	var upgrades = load(upgrades_path)
 	upgrades.take_over_path("res://enceladus/Upgrades.tscn")
 	_savedObjects.append(upgrades)
-	var ws = load(weaponslot_path)
-	ws.take_over_path("res://weapons/WeaponSlot.tscn")
-	_savedObjects.append(ws)
+	
 	var aux = load(aux_path)
 	aux.take_over_path("res://ships/modules/AuxSlot.tscn")
 	_savedObjects.append(aux)

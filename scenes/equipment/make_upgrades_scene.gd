@@ -54,11 +54,11 @@ func make_upgrades_scene(is_onready: bool = true):
 	var node_definitions_file = FILE_PATHS[10]
 	var ship_node_register_file = FILE_PATHS[11]
 	
-	
-	var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
-	var version = DataFormat.__get_vanilla_version()
-	var text = "HevLib make_upgrades_scene manager: observed game version of %s"  % str(version)
-	Debug.l(text)
+	if is_onready:
+		var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
+		var version = DataFormat.__get_vanilla_version()
+		var text = "HevLib make_upgrades_scene manager: observed game version of %s"  % str(version)
+		Debug.l(text)
 	var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 	var UpgradeMenu : Node = load("res://enceladus/Upgrades.tscn").instance()
@@ -67,7 +67,7 @@ func make_upgrades_scene(is_onready: bool = true):
 	var vanilla_slot_types = {}
 	var running_in_debugged = false
 	var debugged_defined_mods = []
-	
+	FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/ship_data/")
 	var onready_mod_paths = []
 	var onready_mod_folders = []
 	
@@ -103,12 +103,13 @@ func make_upgrades_scene(is_onready: bool = true):
 	
 	
 	# Use when running on ready
-	var mods = ModLoader.get_children()
-	for mod in mods:
-		var path = mod.get_script().get_path()
-		onready_mod_paths.append(path)
-		var split = path.split("/")
-		onready_mod_folders.append(split[2])
+	if is_onready:
+		var mods = ModLoader.get_children()
+		for mod in mods:
+			var path = mod.get_script().get_path()
+			onready_mod_paths.append(path)
+			var split = path.split("/")
+			onready_mod_folders.append(split[2])
 	
 	
 	for slot in nodes_parent.get_children():

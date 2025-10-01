@@ -31,7 +31,8 @@ var developer_hint = {
 		"Internal function used to return an array of viable vanilla equipment options from a set of tags"
 	],
 	"__make_upgrades_scene":[
-		"Creates Upgrades.tscn and WeaponSlot.tscn files based on data from mods' equipment data tags"
+		"Creates Upgrades.tscn and WeaponSlot.tscn files based on data from mods' equipment data tags",
+		"is_onready -> (optional) depends on whether the scenes are being made after the onready phase. defaults to true"
 	],
 	"__make_equipment_for_scene":[
 		"Returns a string containing PackedScene data for Upgrades.tscn based on provided data",
