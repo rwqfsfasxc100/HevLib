@@ -22,13 +22,12 @@ static func store_config(configuration: Dictionary, mod_id: String, cfg_filename
 	var sections = configuration.keys()
 	for section in sections:
 		var sect_name = mod_id + "/" + section
-		if sect_name in cfg_sections:
-			breakpoint
-		else:
-			breakpoint
-		
+		var sect_data = configuration[section]
+		for s in sect_data:
+			var sr = sect_data[s]
+			cfg.set_value(sect_name,s,sr)
 	
-	
+	cfg.save(cfg_file)
 	
 	
 	

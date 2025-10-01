@@ -4,10 +4,47 @@ const config_name = "Mod_Configurations"
 
 var developer_hint = {
 	"__config_parse":[
-			"Parses a config file as a dictionary",
-			"Supply the path to a text file containing the data",
-			"File must be formatted to ini standards, e.g. through using the ConfigFile module"
-		]
+		"Parses a config file as a dictionary",
+		"file -> string containing the file path to the config",
+		"File must be formatted to ini standards, e.g. through using the ConfigFile module"
+	],
+	"__store_config":[
+		"Stores a config formatted through a dictionary",
+		"id -> string containing the config's identification.",
+		"cfg_filename -> (optional) string for the filename for the config file stored in the user://cfg/ folder. Defaults to Mod_Configurations.cfg",
+		"To associate a config with a mod, set the id to use the mod's name in the mod.manifest file."
+	],
+	"__get_config":[
+		"Retrieves a specific config formatted through a dictionary.",
+		"id -> string containing the config's identification.",
+		"cfg_filename -> (optional) string for the filename for the config file stored in the user://cfg/ folder. Defaults to Mod_Configurations.cfg",
+		"To fetch a config associated with a mod, set the id to use the mod's name in the mod.manifest file.",
+		"If no respective configuration exists, returns an empty dictionary"
+	],
+	"__store_value":[
+		"Stores an entry into the configuration",
+		"id -> string containing the config's identification",
+		"section -> string containing the config section",
+		"key -> string containing the entry within the section",
+		"value -> the desired value of the key. Can be any variable type",
+		"cfg_filename -> (optional) string for the filename for the config file stored in the user://cfg/ folder. Defaults to Mod_Configurations.cfg",
+		"To assign a config entry to be associated with a mod, set the id to use the mod's name in the mod.manifest file.",
+	],
+	"__get_value":[
+		"Fetches an entry from the configuration file",
+		"id -> string containing the config's identification",
+		"section -> string containing the config section",
+		"key -> string containing the entry within the section",
+		"cfg_filename -> (optional) string for the filename for the config file stored in the user://cfg/ folder. Defaults to Mod_Configurations.cfg",
+		"To fetch a config entry associated with a mod, set the id to use the mod's name in the mod.manifest file.",
+		"If no respective entry, section, or configuration exists, returns null"
+	],
+	"__load_configs":[
+		"Initializes a configuration file at the given location",
+		"Will automatically assign default configurations to any missing entries or sections in the config",
+		"Must be run on ready as mod data won't be available before then",
+		"cfg_filename -> (optional) string for the filename for the config file stored in the user://cfg/ folder. Defaults to Mod_Configurations.cfg",
+	]
 }
 
 static func __config_parse(file: String) -> Dictionary:
@@ -15,22 +52,22 @@ static func __config_parse(file: String) -> Dictionary:
 	var s = f.config_parse(file)
 	return s
 
-static func __store_config(configuration: Dictionary, mod_id: String, cfg_filename : String = config_name + ".cfg"):
+static func __store_config(id: String, configuration: Dictionary, cfg_filename : String = config_name + ".cfg"):
 	var f = load("res://HevLib/scripts/configs/store_config.gd")
-	f.store_config(configuration,mod_id,cfg_filename)
+	f.store_config(configuration,id,cfg_filename)
 
-static func __store_value(mod: String, section: String, key: String, value, cfg_filename : String = config_name + ".cfg"):
+static func __store_value(id: String, section: String, key: String, value, cfg_filename : String = config_name + ".cfg"):
 	var f = load("res://HevLib/scripts/configs/store_value.gd")
-	f.store_value(mod, section, key, value,cfg_filename)
+	f.store_value(id, section, key, value,cfg_filename)
 
-static func __get_config(mod: String, cfg_filename : String = config_name + ".cfg") -> Dictionary:
+static func __get_config(id: String, cfg_filename : String = config_name + ".cfg") -> Dictionary:
 	var f = load("res://HevLib/scripts/configs/get_config.gd")
-	var s = f.get_config(mod,cfg_filename)
+	var s = f.get_config(id,cfg_filename)
 	return s
 
-static func __get_value(mod: String, section: String, key: String, cfg_filename : String = config_name + ".cfg"):
+static func __get_value(id: String, section: String, key: String, cfg_filename : String = config_name + ".cfg"):
 	var f = load("res://HevLib/scripts/configs/get_value.gd")
-	var s = f.get_value(mod, section, key, cfg_filename)
+	var s = f.get_value(id, section, key, cfg_filename)
 	return s
 
 static func __load_configs(cfg_filename : String = config_name + ".cfg"):

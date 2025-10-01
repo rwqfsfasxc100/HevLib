@@ -67,7 +67,7 @@ func _on_Button_pressed():
 	
 #	var s = ManifestV2.__get_mod_by_id("hev.LIBRARY")
 #	breakpoint
-	var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+#	var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 #
 #	ConfigDriver.__store_config(config,"He/vL/ib/")
 #
@@ -76,8 +76,6 @@ func _on_Button_pressed():
 #	var el = ConfigDriver.__get_value("HevLib","equipment","do_sort_equipment_by_price")
 	
 	
-	var jk = ConfigDriver.__store_config({"equipment":{"do_sort_equipment_by_price":true},"TEST":{"example":false}},"HevLib")
-	breakpoint
 	
 #	var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
 #	var crew = NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",25)
