@@ -53,6 +53,7 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 				"dependancy_mod_ids":PoolStringArray([]),
 				"conflicting_mod_ids":PoolStringArray([]),
 				"complementary_mod_ids":PoolStringArray([]),
+				"manifest_url":"", # EXAMPLE: https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest
 			}
 		}
 		match manifest_version:
@@ -211,6 +212,7 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 					dict_template["manifest_definitions"]["dependancy_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("dependancy_mod_ids",[]))
 					dict_template["manifest_definitions"]["conflicting_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("conflicting_mod_ids",[]))
 					dict_template["manifest_definitions"]["complementary_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("complementary_mod_ids",[]))
+					dict_template["manifest_definitions"]["manifest_url"] = String(manifest_data["manifest_definitions"].get("manifest_url",""))
 				
 				if "links" in manifest_data.keys():
 					var links = manifest_data["links"]
