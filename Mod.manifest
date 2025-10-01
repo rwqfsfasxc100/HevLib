@@ -65,3 +65,4 @@ input={
 [manifest_definitions]
 
 manifest_version=2.2
+manifest_url="https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest"
