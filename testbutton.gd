@@ -94,8 +94,8 @@ func _on_Button_pressed():
 #	for child in children:
 #		names.append(child.name)
 	
-	var RingInfo = preload("res://HevLib/pointers/RingInfo.gd")
-	var p = RingInfo.__get_pixel_at(Vector2(100000,100000))
+#	var RingInfo = preload("res://HevLib/pointers/RingInfo.gd")
+#	var p = RingInfo.__get_pixel_at(Vector2(100000,100000))
 	
 #	var tex_path = "user://cache/.HevLib_Cache/pixel.png"
 #	var tex_path2 = "user://cache/.HevLib_Cache/chaos.png"
@@ -123,17 +123,17 @@ func _on_Button_pressed():
 #	img2.save_png(tex_path2)
 #	img3.save_png(tex_path3)
 	
-	var s = preload("res://HevLib/scripts/generate_ring_images.gd")
-	for x in range(0,15):
-		for y in range(0,15):
-			var data = {
-				"h_index":x,
-				"v_index":y,
-				"factor":2
-			}
-			var thread = Thread.new()
-			thread.start(s.new(),"generate",data)
-			running.append(thread)
+#	var s = preload("res://HevLib/scripts/generate_ring_images.gd")
+#	for x in range(0,15):
+#		for y in range(0,15):
+#			var data = {
+#				"h_index":x,
+#				"v_index":y,
+#				"factor":2
+#			}
+#			var thread = Thread.new()
+#			thread.start(s.new(),"generate",data)
+#			running.append(thread)
 	
 #	thread_1.start(s.new(),"generate",0)
 #	thread_2.start(s.new(),"generate",1)
