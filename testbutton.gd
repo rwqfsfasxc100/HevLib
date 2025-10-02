@@ -124,19 +124,73 @@ func _on_Button_pressed():
 #	img3.save_png(tex_path3)
 	
 	var s = preload("res://HevLib/scripts/generate_ring_images.gd")
-#	s.generate()
+	for x in range(0,15):
+		for y in range(0,15):
+			var data = {
+				"h_index":x,
+				"v_index":y,
+				"factor":2
+			}
+			var thread = Thread.new()
+			thread.start(s.new(),"generate",data)
+			running.append(thread)
 	
-	thread_1.start(s.new(),"generate",0)
-	thread_2.start(s.new(),"generate",1)
-	thread_3.start(s.new(),"generate",2)
-	thread_4.start(s.new(),"generate",3)
+#	thread_1.start(s.new(),"generate",0)
+#	thread_2.start(s.new(),"generate",1)
+#	thread_3.start(s.new(),"generate",2)
+#	thread_4.start(s.new(),"generate",3)
+#
+#	thread_5.start(s.new(),"generate",4)
+#	thread_6.start(s.new(),"generate",5)
+#	thread_7.start(s.new(),"generate",6)
+#	thread_8.start(s.new(),"generate",7)
+#
+#	thread_9.start(s.new(),"generate",8)
+#	thread_10.start(s.new(),"generate",9)
+#	thread_11.start(s.new(),"generate",10)
+#	thread_12.start(s.new(),"generate",11)
+#
+#	thread_13.start(s.new(),"generate",12)
+#	thread_14.start(s.new(),"generate",13)
+#	thread_15.start(s.new(),"generate",14)
+#	thread_16.start(s.new(),"generate",15)
+#	OS.window_minimized = true
 	
 	
-#	breakpoint
-var thread_1 = Thread.new()
-var thread_2 = Thread.new()
-var thread_3 = Thread.new()
-var thread_4 = Thread.new()
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	breakpoint
+
+var running = []
+
+#var thread_1 = Thread.new()
+#var thread_2 = Thread.new()
+#var thread_3 = Thread.new()
+#var thread_4 = Thread.new()
+#var thread_5 = Thread.new()
+#var thread_6 = Thread.new()
+#var thread_7 = Thread.new()
+#var thread_8 = Thread.new()
+#var thread_9 = Thread.new()
+#var thread_10 = Thread.new()
+#var thread_11 = Thread.new()
+#var thread_12 = Thread.new()
+#var thread_13 = Thread.new()
+#var thread_14 = Thread.new()
+#var thread_15 = Thread.new()
+#var thread_16 = Thread.new()
 var updates = {}
 var count = 1
 
