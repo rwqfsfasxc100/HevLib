@@ -31,7 +31,8 @@ onready var all_tags = ManifestV2.__get_tags()
 
 func _pressed():
 	var manifestData = MOD_INFO["manifest"]["manifest_data"]
-	information_nodes["info_name"].text = MOD_INFO["name"]
+	var mod_name = MOD_INFO["name"]
+	information_nodes["info_name"].text = mod_name
 	var prio = MOD_INFO["priority"]
 	if str(prio).ends_with("INF"):
 		if str(prio).begins_with("-"):
@@ -96,6 +97,8 @@ func _pressed():
 			information_nodes["info_settings_button"].visible = false
 		else:
 			information_nodes["info_settings_button"].visible = true
+			information_nodes["settings_menu"].SELECTED_MOD = mod_name
+			information_nodes["settings_menu"].SELECTED_MOD_ID = id
 		
 	else:
 		information_nodes["info_settings_button"].visible = false

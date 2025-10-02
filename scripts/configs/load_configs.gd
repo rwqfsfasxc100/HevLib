@@ -39,7 +39,14 @@ static func load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
 				if key in current_config[sect]:
 					pass
 				else:
-					current_config[sect].merge({key:sectData[key]})
+					var key_data = sectData[key]
+					match typeof(key_data):
+						TYPE_DICTIONARY:
+							if "default" in key_data:
+								current_config[sect].merge({key:key_data["default"]})
+								
+						_:
+							pass
 	var c = ConfigFile.new()
 	for section in current_config:
 		for key in current_config[section]:

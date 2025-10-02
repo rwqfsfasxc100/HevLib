@@ -26,6 +26,8 @@ onready var filter_btn = get_node(filter_btn_path)
 
 export var links_menu_path = NodePath("")
 onready var links_menu = get_node(links_menu_path)
+export var settings_menu_path = NodePath("")
+onready var settings_menu = get_node(settings_menu_path)
 
 onready var listContainer = $ScrollContainer/VBoxContainer
 
@@ -59,6 +61,7 @@ func _ready():
 		"count_label_path":get_node(count_label_path),
 		"filter_btn_path":get_node(filter_btn_path),
 		"links_menu_path":get_node(links_menu_path),
+		"settings_menu":get_node(settings_menu_path),
 	}
 	var data = ManifestV2.__get_mod_data()["mods"]
 	var groups = {}

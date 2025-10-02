@@ -38,28 +38,98 @@ always_display=true
 [configs]
 
 equipment={
-	"do_sort_equipment_by_price":true,
-	"do_sort_slots_by_type":true,
-	"use_legacy_equipment_handler":false,
+	"do_sort_equipment_by_price":{
+		"name":"HEVLIB_CONFIG_SORT_BY_PRICE",
+		"description":"HEVLIB_CONFIG_SORT_BY_PRICE_TOOLTIP",
+		"type":"bool",
+		"script":"",
+		"default":true
+	},
+	"do_sort_slots_by_type":{
+		"name":"HEVLIB_CONFIG_SORT_SLOT_BY_TYPE",
+		"description":"HEVLIB_CONFIG_SORT_SLOT_BY_TYPE_TOOLTIP",
+		"type":"bool",
+		"script":"",
+		"default":true
+	},
+	"use_legacy_equipment_handler":{
+		"name":"HEVLIB_CONFIG_USE_LEGACY_EQUIPMENT_HANDLING",
+		"description":"HEVLIB_CONFIG_USE_LEGACY_EQUIPMENT_HANDLING_TOOLTIP",
+		"type":"bool",
+		"script":"",
+		"default":false
+	},
 }
 events={
-	"disabled_events":[  ],
-	"write_events":true,
+	"write_events":{
+		"name":"HEVLIB_CONFIG_WRITE_EVENTS",
+		"description":"HEVLIB_CONFIG_WRITE_EVENTS_TOOLTIP",
+		"type":"bool",
+		"script":"",
+		"default":true
+	},
 }
 drivers={
-	"use_input_virtualization":true,
-	"show_hidden_libraries":false,
+	"show_hidden_libraries":{
+		"name":"HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES",
+		"description":"HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES_TOOLTIP",
+		"type":"bool",
+		"script":"",
+		"default":false
+	},
 }
 debug={
-	"input_debugger":false,
-	"input_event_debugger":false,
-	"ring_position_data_debugger":false,
-	"ring_position_accurate_events":false,
+	"input_debugger":{
+		"name":"HEVLIB_CONFIG_INPUT_DEBUGGER",
+		"description":"HEVLIB_CONFIG_INPUT_DEBUGGER_TOOLTIP",
+		"type":"bool",
+		"script":"",
+		"default":false
+	},
+	"input_event_debugger":{
+		"name":"HEVLIB_CONFIG_EVENT_DEBUGGER",
+		"description":"HEVLIB_CONFIG_EVENT_DEBUGGER_TOOLTIP",
+		"type":"bool",
+		"script":"",
+		"default":false
+	},
+	"ring_position_data_debugger":{
+		"name":"HEVLIB_CONFIG_POSITION_DATA_DEBUGGER",
+		"description":"HEVLIB_CONFIG_POSITION_DATA_DEBUGGER_TOOLTIP",
+		"type":"bool",
+		"script":"",
+		"default":false
+	},
+	"ring_position_accurate_events":{
+		"name":"HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS",
+		"description":"HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS_TOOLTIP",
+		"type":"bool",
+		"script":"",
+		"default":false
+	},
 }
 input={
-	"open_debug_event_menu":[  ],
-	"debugger":[ "F10" ],
-	"toggle_debug_menus":[ "F9" ],
+	"open_debug_event_menu":{
+		"name":"HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU",
+		"description":"HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU_TOOLTIP",
+		"type":"Input",
+		"script":"",
+		"default":[  ]
+	},
+	"debugger":{
+		"name":"HEVLIB_CONFIG_OPEN_DEBUGGER",
+		"description":"HEVLIB_CONFIG_OPEN_DEBUGGER_TOOLTIP",
+		"type":"Input",
+		"script":"",
+		"default":[ "F10" ]
+	},
+	"toggle_debug_menus":{
+		"name":"HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS",
+		"description":"HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS_TOOLTIP",
+		"type":"Input",
+		"script":"",
+		"default":[ "F9" ]
+	},
 }
 
 [manifest_definitions]

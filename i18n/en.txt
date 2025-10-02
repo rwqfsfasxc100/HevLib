@@ -167,3 +167,51 @@ HEVLIB_VANILLA_EPIC_STORE_TOOLTIP|Opens the Epic Games page for the game
 HEVLIB_VANILLA_GOG_STORE|GOG
 
 HEVLIB_VANILLA_GOG_STORE_TOOLTIP|Opens the GOG page for the game
+
+HEVLIB_CONFIG_SORT_BY_PRICE|Sort equipment by price
+
+HEVLIB_CONFIG_SORT_BY_PRICE_TOOLTIP|Forces equipment to be sorted by price. Will break AUX unit sorting by type, but prevents issues with modded equipment.
+
+HEVLIB_CONFIG_SORT_SLOT_BY_TYPE|Sort slots by type
+
+HEVLIB_CONFIG_SORT_SLOT_BY_TYPE_TOOLTIP|Sorts slots by similarity. Prevents arbritrary sorting by modded slots.
+
+HEVLIB_CONFIG_USE_LEGACY_EQUIPMENT_HANDLING|Use legacy equipment handling
+
+HEVLIB_CONFIG_USE_LEGACY_EQUIPMENT_HANDLING_TOOLTIP|Enables pre-1.7 equipment handling. Only use for old mods that don't work with the newer system. Don't expect this to work for most mods.
+
+HEVLIB_CONFIG_WRITE_EVENTS|Write event names
+
+HEVLIB_CONFIG_WRITE_EVENTS_TOOLTIP|Writes to a cache file located in user://cache/.HevLib_Cache/current_events.txt that contains all events loaded by the game at the time the rings are loaded.
+
+HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES|Show hidden libraries
+
+HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES_TOOLTIP|Makes any library without the always display tag visible.
+
+HEVLIB_CONFIG_INPUT_DEBUGGER|Input debugger
+
+HEVLIB_CONFIG_INPUT_DEBUGGER_TOOLTIP|Displays debug information about current inputs.
+
+HEVLIB_CONFIG_EVENT_DEBUGGER|Event debugger
+
+HEVLIB_CONFIG_EVENT_DEBUGGER_TOOLTIP|Exposes key events and displays if they're active or inactive.
+
+HEVLIB_CONFIG_POSITION_DATA_DEBUGGER|Position data debugger
+
+HEVLIB_CONFIG_POSITION_DATA_DEBUGGER_TOOLTIP|Displays the current chaos and an estimated number of event possibilities while on a dive.
+
+HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS|Show accurate events
+
+HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS_TOOLTIP|Used in conjunction with Position data debugger. Displays an actual count of events in the area. Due to the way this setting works, it will decrease performance by a significant enough amount, and will generate thousands of logs per minute.\n\nUSE OF THIS SETTING IS COMPLETELY UNSUPPORTED AND WILL INVALIDATE ALL BUG REPORTS! YOU HAVE BEEN WARNED!
+
+HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU|Debug event menu
+
+HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU_TOOLTIP|Keys used to open the event debugger menu.
+
+HEVLIB_CONFIG_OPEN_DEBUGGER|Toggle debug display
+
+HEVLIB_CONFIG_OPEN_DEBUGGER_TOOLTIP|Toggles visibility of the --debug-console display without the need for the command line.
+
+HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS|HevLib debugger menus
+
+HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS_TOOLTIP|Toggles visibility of the input debugger and event debugger if they are enabled

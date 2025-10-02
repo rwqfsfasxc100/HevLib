@@ -165,12 +165,6 @@ func _on_Button_pressed():
 	
 	
 	
-	
-	
-	
-	
-	
-	
 	breakpoint
 
 var running = []

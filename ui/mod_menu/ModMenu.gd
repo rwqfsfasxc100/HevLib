@@ -24,6 +24,8 @@ func _unhandled_input(event):
 			$URLPopup.cancel()
 		elif $FilterPopup.visible:
 			$FilterPopup.cancel()
+		elif $ModSettingsMenu.visible:
+			$ModSettingsMenu.cancel()
 		else:
 			cancel()
 		get_tree().set_input_as_handled()
