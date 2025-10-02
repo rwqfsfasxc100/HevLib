@@ -97,34 +97,46 @@ func _on_Button_pressed():
 	var RingInfo = preload("res://HevLib/pointers/RingInfo.gd")
 	var p = RingInfo.__get_pixel_at(Vector2(100000,100000))
 	
-	var tex_path = "user://cache/.HevLib_Cache/pixel.png"
-	var tex_path2 = "user://cache/.HevLib_Cache/chaos.png"
-	var tex_path3 = "user://cache/.HevLib_Cache/density.png"
-	var img = Image.new()
-	var img2 = Image.new()
-	var img3 = Image.new()
-	img.create(3000,3000,false,Image.FORMAT_RGBA8)
-	img2.create(3000,3000,false,Image.FORMAT_RGBA8)
-	img3.create(3000,3000,false,Image.FORMAT_RGBA8)
-	img.lock()
-	img2.lock()
-	img3.lock()
-	for x in range(1,3000):
-		for y in range(1,3000):
-			var point = Vector2(x,y)
-			var it = RingInfo.__get_pixel_at(point*10000)
-			img.set_pixelv(point,it)
-			img2.set_pixelv(point,Color(it.r,0,0,1))
-			img2.set_pixelv(point,Color(0,0,it.b,1))
-	img.unlock()
-	img2.unlock()
-	img3.unlock()
-	img.save_png(tex_path)
-	img2.save_png(tex_path2)
-	img3.save_png(tex_path3)
+#	var tex_path = "user://cache/.HevLib_Cache/pixel.png"
+#	var tex_path2 = "user://cache/.HevLib_Cache/chaos.png"
+#	var tex_path3 = "user://cache/.HevLib_Cache/density.png"
+#	var img = Image.new()
+#	var img2 = Image.new()
+#	var img3 = Image.new()
+#	img.create(3000,3000,false,Image.FORMAT_RGBA8)
+#	img2.create(3000,3000,false,Image.FORMAT_RGBA8)
+#	img3.create(3000,3000,false,Image.FORMAT_RGBA8)
+#	img.lock()
+#	img2.lock()
+#	img3.lock()
+#	for x in range(1,3000):
+#		for y in range(1,3000):
+#			var point = Vector2(x,y)
+#			var it = RingInfo.__get_pixel_at(point*10000)
+#			img.set_pixelv(point,it)
+#			img2.set_pixelv(point,Color(it.r,0,0,1))
+#			img2.set_pixelv(point,Color(0,0,it.b,1))
+#	img.unlock()
+#	img2.unlock()
+#	img3.unlock()
+#	img.save_png(tex_path)
+#	img2.save_png(tex_path2)
+#	img3.save_png(tex_path3)
 	
-	breakpoint
-
+	var s = preload("res://HevLib/scripts/generate_ring_images.gd")
+#	s.generate()
+	
+	thread_1.start(s.new(),"generate",0)
+	thread_2.start(s.new(),"generate",1)
+	thread_3.start(s.new(),"generate",2)
+	thread_4.start(s.new(),"generate",3)
+	
+	
+#	breakpoint
+var thread_1 = Thread.new()
+var thread_2 = Thread.new()
+var thread_3 = Thread.new()
+var thread_4 = Thread.new()
 var updates = {}
 var count = 1
 
