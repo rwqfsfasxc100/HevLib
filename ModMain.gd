@@ -23,6 +23,8 @@ func _init(modLoader = ModLoader):
 	var self_directory = self_path.split(self_path.split("/")[self_path.split("/").size() - 1])[0]
 	var self_check = load(self_directory + "self_check.tscn").instance()
 	add_child(self_check)
+	
+	installScriptExtension("scenes/scene_replacements/Shipyard.gd")
 func _ready():
 	l("Readying")
 	var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")

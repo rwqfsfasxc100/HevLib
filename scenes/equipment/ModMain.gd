@@ -53,10 +53,10 @@ func _init(modLoader = ModLoader):
 	installScriptExtension("../better_title_screen/SaveSlotButton.gd")
 	replaceScene("../better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
 	
-	Equipment.__make_upgrades_scene(false)
-	var ws = load(weaponslot_path)
-	ws.take_over_path("res://weapons/WeaponSlot.tscn")
-	_savedObjects.append(ws)
+#	Equipment.__make_upgrades_scene(false)
+#	var ws = load(weaponslot_path)
+#	ws.take_over_path("res://weapons/WeaponSlot.tscn")
+#	_savedObjects.append(ws)
 	
 func _ready():
 	l("Readying")
@@ -74,8 +74,14 @@ func _ready():
 	aux.take_over_path("res://ships/modules/AuxSlot.tscn")
 	_savedObjects.append(aux)
 	
+	var ws = load(weaponslot_path)
+	ws.take_over_path("res://weapons/WeaponSlot.tscn")
+	_savedObjects.append(ws)
+	
 	replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")
 #	replaceScene("Enceladus.tscn","res://enceladus/Enceladus.tscn")
+#	installScriptExtension("../scene_replacements/Shipyard.gd")
+
 	l("Ready")
 	
 func installScriptExtension(path:String):
