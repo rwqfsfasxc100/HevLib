@@ -215,3 +215,5 @@ HEVLIB_CONFIG_OPEN_DEBUGGER_TOOLTIP|Toggles visibility of the --debug-console di
 HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS|HevLib debugger menus
 
 HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS_TOOLTIP|Toggles visibility of the input debugger and event debugger if they are enabled
+
+HEVLIB_CONFIG_LINEEDIT_PLACEHOLDER|Insert text

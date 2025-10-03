@@ -122,6 +122,7 @@ rect_min_size = Vector2( 65, 65 )
 hint_tooltip = "HEVLIB_FILTER_BY_TAGS"
 script = ExtResource( 11 )
 text_label_path = NodePath("../PanelContainer/Label")
+root_path = NodePath("../../../../../../../..")
 
 [node name="TextureRect" type="TextureRect" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox/FILTER"]
 margin_right = 65.0

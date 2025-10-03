@@ -27,3 +27,5 @@ func _ready():
 #func _process(_delta):
 func _draw():
 	$MarginContainer.rect_size = rect_size
+	
+	name = mod

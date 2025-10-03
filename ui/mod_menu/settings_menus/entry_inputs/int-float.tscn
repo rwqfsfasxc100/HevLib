@@ -13,6 +13,7 @@ load_path = "res://HevLib/ui/themes/icons/reset.stex"
 margin_right = 40.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 300, 50 )
+focus_mode = 2
 size_flags_horizontal = 3
 theme = ExtResource( 1 )
 script = ExtResource( 4 )
@@ -35,6 +36,13 @@ focusAt = NodePath("../..")
 
 [node name="PlaySoundsOnTheseButtons" parent="Label/LABELBUTTON" instance=ExtResource( 3 )]
 
+[node name="Label2" type="Label" parent="."]
+margin_left = 367.0
+margin_top = 6.0
+margin_right = 377.0
+margin_bottom = 44.0
+size_flags_horizontal = 3
+
 [node name="reset" type="Button" parent="."]
 visible = false
 margin_left = 305.0
@@ -55,20 +63,54 @@ focusAt = NodePath("../../..")
 
 [node name="PlaySoundsOnTheseButtons" parent="reset/TextureRect" instance=ExtResource( 3 )]
 
-[node name="SpinBox" type="SpinBox" parent="."]
+[node name="spinbox" type="SpinBox" parent="."]
+visible = false
 margin_left = 367.0
 margin_right = 517.0
 margin_bottom = 50.0
-rect_min_size = Vector2( 150, 50 )
+rect_min_size = Vector2( 550, 50 )
 max_value = 10.0
 align = 2
 
-[node name="Label" type="Label" parent="SpinBox"]
+[node name="Label" type="Label" parent="spinbox"]
 margin_right = 10.0
 margin_bottom = 38.0
 rect_min_size = Vector2( 0, 50 )
 
-[node name="SmoothScrollTo" parent="SpinBox/Label" instance=ExtResource( 2 )]
+[node name="SmoothScrollTo" parent="spinbox/Label" instance=ExtResource( 2 )]
 focusAt = NodePath("../../..")
 
-[node name="PlaySoundsOnTheseButtons" parent="SpinBox/Label" instance=ExtResource( 3 )]
+[node name="PlaySoundsOnTheseButtons" parent="spinbox/Label" instance=ExtResource( 3 )]
+
+[node name="SliderLabel" type="Label" parent="."]
+margin_left = 381.0
+margin_right = 481.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 100, 50 )
+size_flags_horizontal = 4
+align = 2
+valign = 1
+
+[node name="slider" type="HSlider" parent="."]
+margin_left = 485.0
+margin_right = 935.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 450, 50 )
+focus_neighbour_left = NodePath(".")
+focus_neighbour_right = NodePath(".")
+max_value = 10.0
+
+[node name="Label" type="Label" parent="slider"]
+margin_right = 10.0
+margin_bottom = 38.0
+rect_min_size = Vector2( 0, 50 )
+
+[node name="SmoothScrollTo" parent="slider/Label" instance=ExtResource( 2 )]
+focusAt = NodePath("../../..")
+
+[node name="PlaySoundsOnTheseButtons" parent="slider/Label" instance=ExtResource( 3 )]
+
+[connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
+[connection signal="pressed" from="reset" to="." method="_reset_pressed"]
+[connection signal="value_changed" from="spinbox" to="." method="_value_changed"]
+[connection signal="value_changed" from="slider" to="." method="_value_changed"]

@@ -233,32 +233,38 @@ var acceptable_keys = [
 export var text_label_path = NodePath("")
 onready var text_label = get_node(text_label_path)
 
+export var root_path = NodePath("")
+onready var root = get_node(root_path)
+
 func _unhandled_key_input(event):
 	if text_label and is_visible and event.pressed:
-		var scan = event.scancode
-		if current_text == "" and OS.get_scancode_string(scan) == "Space":
-			return
-		if scan in variant_keys:
-			var key = ""
-			var vari = variant_keys[scan]
-			var vk = ""
-			match typeof(vari):
-				TYPE_STRING:
-					vk = vari
-					key = vari
-				TYPE_INT:
-					vk = OS.get_scancode_string(vari)
-					key = OS.get_scancode_string(scan)
-			keys_pressed = keys_pressed + vk
-			current_text = current_text + key
-		elif scan in acceptable_keys:
-			var key = OS.get_scancode_string(scan)
-			current_text = current_text + key
-			var vk = OS.get_scancode_string(scan)
-			keys_pressed = keys_pressed + vk
-		if scan in clear_keys:
-			keys_pressed = ""
-			current_text = ""
+		if root.get_node("FilterPopup").visible or root.get_node("URLPopup").visible or root.get_node("ModSettingsMenu").visible:
+			pass
+		else:
+			var scan = event.scancode
+			if current_text == "" and OS.get_scancode_string(scan) == "Space":
+				return
+			if scan in variant_keys:
+				var key = ""
+				var vari = variant_keys[scan]
+				var vk = ""
+				match typeof(vari):
+					TYPE_STRING:
+						vk = vari
+						key = vari
+					TYPE_INT:
+						vk = OS.get_scancode_string(vari)
+						key = OS.get_scancode_string(scan)
+				keys_pressed = keys_pressed + vk
+				current_text = current_text + key
+			elif scan in acceptable_keys:
+				var key = OS.get_scancode_string(scan)
+				current_text = current_text + key
+				var vk = OS.get_scancode_string(scan)
+				keys_pressed = keys_pressed + vk
+			if scan in clear_keys:
+				keys_pressed = ""
+				current_text = ""
 		
 func _visibility_changed():
 	current_text = ""

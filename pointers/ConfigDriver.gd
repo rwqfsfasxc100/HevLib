@@ -73,3 +73,24 @@ static func __get_value(id: String, section: String, key: String, cfg_filename :
 static func __load_configs(cfg_filename : String = config_name + ".cfg"):
 	var f = load("res://HevLib/scripts/configs/load_configs.gd")
 	f.load_configs(cfg_filename)
+
+static func __set_button_focus(button,check_button):
+	var f = load("res://HevLib/scripts/configs/set_button_focus.gd")
+	f.set_button_focus(button,check_button)
+
+
+
+
+#	Config types - this explains formatting for config types for manifests
+#	
+#	BOOL:
+#	{
+#	"name":"" - string used to provide a name for the entry
+#	"description":"" - string used to provide the description tooltip
+#	"type":"bool" - string used to define type, in this case a bool. can be bool or boolean, not case sensitive
+#	"default":true - bool used for default value. false if absent
+#	"requires_bools":[] - array of strings for bool settings used to enable this option. as long as there is one valid entry that's true, this option will be enabled. formatted like "Mod/section/entry" (e.g. HevLib/equipment/do_sort_equipment_by_price)
+#	"invert_bool_requirement":false - bool used to decide that this option will instead be enabled until there is one true setting in the array
+#	}
+#	
+#	

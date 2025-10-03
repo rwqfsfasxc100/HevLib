@@ -16,6 +16,7 @@ func _ready():
 		Tool.remove(self)
 	$Label.text = CONFIG_DATA.get("name","BOOL_MISSING_NAME")
 	$CheckButton.pressed = value
+	$Label/LABELBUTTON.hint_tooltip = CONFIG_DATA.get("description","")
 
 func _toggled(button_pressed):
 	ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,button_pressed)
@@ -33,7 +34,49 @@ func _process(_delta):
 		$reset.visible = true
 	else:
 		$reset.visible = false
-
+	var requirements = PoolStringArray(CONFIG_DATA.get("requires_bools",[]))
+	if requirements.size() >= 1:
+		var show = true
+		var valid_options = 0
+		var true_valids = 0
+		var flip = CONFIG_DATA.get("invert_bool_requirement",false)
+		for option in requirements:
+			
+			var split = option.split("/")
+			if split.size() == 3:
+				var value = ConfigDriver.__get_value(split[0],split[1],split[2])
+				if typeof(value) == TYPE_BOOL:
+					valid_options += 1
+					if value == true:
+						true_valids += 1
+		if valid_options >= 1:
+			if flip:
+				if true_valids >= 1:
+					$reset.modulate = Color(0.6,0.6,0.6,1)
+					$reset.disabled = true
+					$CheckButton.modulate = Color(0.6,0.6,0.6,1)
+					$CheckButton.disabled = true
+				else:
+					$reset.modulate = Color(1,1,1,1)
+					$reset.disabled = false
+					$CheckButton.modulate = Color(1,1,1,1)
+					$CheckButton.disabled = false
+			else:
+				if true_valids >= 1:
+					$reset.modulate = Color(1,1,1,1)
+					$reset.disabled = false
+					$CheckButton.modulate = Color(1,1,1,1)
+					$CheckButton.disabled = false
+				else:
+					$reset.modulate = Color(0.6,0.6,0.6,1)
+					$reset.disabled = true
+					$CheckButton.modulate = Color(0.6,0.6,0.6,1)
+					$CheckButton.disabled = true
+	else:
+		$reset.modulate = Color(1,1,1,1)
+		$reset.disabled = false
+		$CheckButton.modulate = Color(1,1,1,1)
+		$CheckButton.disabled = false
 
 func _reset_pressed():
 	$CheckButton.pressed = CONFIG_DATA.get("default",false)
@@ -47,38 +90,8 @@ func _draw():
 func refocus():
 	$Label/LABELBUTTON.rect_size = $Label.rect_size
 	
+	ConfigDriver.__set_button_focus(self,get_node("CheckButton"))
 	
-	var parent = get_parent()
-	var children = parent.get_children()
-	var pos = get_position_in_parent()
-	var icon_button = get_node("Label/LABELBUTTON")
-	var reset_button = get_node("reset")
-	var check_button = get_node("CheckButton")
-	if pos == 0:
-		icon_button.focus_neighbour_top = "."
-		reset_button.focus_neighbour_top = "."
-		check_button.focus_neighbour_top = "."
-
-		icon_button.focus_neighbour_bottom = icon_button.get_path_to(parent.get_child(pos + 1).get_node("Label/LABELBUTTON"))
-		reset_button.focus_neighbour_bottom = reset_button.get_path_to(parent.get_child(pos + 1).get_node("reset"))
-		check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("CheckButton"))
-	elif pos == children.size() - 1:
-		icon_button.focus_neighbour_bottom = "."
-		reset_button.focus_neighbour_bottom = "."
-		check_button.focus_neighbour_bottom = "."
-
-		icon_button.focus_neighbour_top = icon_button.get_path_to(parent.get_child(pos - 1).get_node("Label/LABELBUTTON"))
-		reset_button.focus_neighbour_top = reset_button.get_path_to(parent.get_child(pos - 1).get_node("reset"))
-		check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("CheckButton"))
-	else:
-		icon_button.focus_neighbour_top = icon_button.get_path_to(parent.get_child(pos - 1).get_node("Label/LABELBUTTON"))
-		reset_button.focus_neighbour_top = reset_button.get_path_to(parent.get_child(pos - 1).get_node("reset"))
-		check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("CheckButton"))
-
-		icon_button.focus_neighbour_bottom = icon_button.get_path_to(parent.get_child(pos + 1).get_node("Label/LABELBUTTON"))
-		reset_button.focus_neighbour_bottom = reset_button.get_path_to(parent.get_child(pos + 1).get_node("reset"))
-		check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("CheckButton"))
-
 
 func _visibility_changed():
 	refocus()
