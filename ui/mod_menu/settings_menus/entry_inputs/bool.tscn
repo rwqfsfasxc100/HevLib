@@ -17,6 +17,7 @@ load_path = "res://HevLib/ui/themes/icons/off_25.stex"
 margin_right = 40.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 300, 50 )
+size_flags_horizontal = 3
 theme = ExtResource( 2 )
 script = ExtResource( 1 )
 

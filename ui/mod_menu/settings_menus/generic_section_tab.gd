@@ -13,20 +13,19 @@ func _draw():
 
 func _ready():
 	for entry in section_info:
-		for i in range(1,10):
-			var entry_info = section_info[entry]
-			var entry_values = section_values[entry]
-			
-			var type = entry_info["type"].to_lower()
-			match type:
-				"bool":
-					var input = BOOL.instance()
-					input.name = entry
-					input.CONFIG_DATA = entry_info
-					input.CONFIG_ENTRY = entry
-					input.CONFIG_SECTION = name
-					input.CONFIG_MOD = mod
-					$MarginContainer/ScrollContainer/VBoxContainer.add_child(input)
+		var entry_info = section_info[entry]
+		var entry_values = section_values[entry]
+		
+		var type = entry_info["type"].to_lower()
+		match type:
+			"bool":
+				var input = BOOL.instance()
+				input.name = entry
+				input.CONFIG_DATA = entry_info
+				input.CONFIG_ENTRY = entry
+				input.CONFIG_SECTION = name
+				input.CONFIG_MOD = mod
+				$MarginContainer/ScrollContainer/VBoxContainer.add_child(input)
 		
 			
 	
