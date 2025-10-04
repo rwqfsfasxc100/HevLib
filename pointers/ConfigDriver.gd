@@ -44,6 +44,9 @@ var developer_hint = {
 		"Will automatically assign default configurations to any missing entries or sections in the config",
 		"Must be run on ready as mod data won't be available before then",
 		"cfg_filename -> (optional) string for the filename for the config file stored in the user://cfg/ folder. Defaults to Mod_Configurations.cfg",
+	],
+	"__set_button_focus":[
+		"Internal function used for the focusing of buttons"
 	]
 }
 
