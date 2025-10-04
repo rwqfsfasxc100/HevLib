@@ -73,7 +73,7 @@ equipment={
 		"default":"",
 		"max_length":0,
 		"secret":false,
-		"clear_button":"true",
+		"clear_button":true,
 		"placeholder":"HEVLIB_CONFIG_LINEEDIT_PLACEHOLDER",
 	},
 }

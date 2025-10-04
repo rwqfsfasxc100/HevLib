@@ -98,7 +98,6 @@ margin_bottom = 50.0
 rect_min_size = Vector2( 450, 50 )
 focus_neighbour_left = NodePath(".")
 focus_neighbour_right = NodePath(".")
-focus_mode = 0
 max_value = 10.0
 
 [node name="Label" type="Label" parent="slider"]
@@ -111,7 +110,12 @@ focusAt = NodePath("../../..")
 
 [node name="PlaySoundsOnTheseButtons" parent="slider/Label" instance=ExtResource( 3 )]
 
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.05
+one_shot = true
+
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
 [connection signal="pressed" from="reset" to="." method="_reset_pressed"]
 [connection signal="value_changed" from="spinbox" to="." method="_value_changed"]
 [connection signal="value_changed" from="slider" to="." method="_value_changed"]
+[connection signal="timeout" from="Timer" to="." method="_timeout"]
