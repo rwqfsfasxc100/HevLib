@@ -126,7 +126,11 @@ func _ready():
 	
 	var gameFiles = FolderAccess.__get_folder_structure("res://",false)
 	file.open("user://cache/.HevLib_Cache/filesys.json",File.WRITE)
-	file.store_string(JSON.print(gameFiles,"\t"))
+	if gameFiles.size() == 0:
+		printerr("FAILED TO FETCH FILE SYSTEM")
+		l("ERROR! FAILED TO FETCH FILE SYSTEM")
+	var sys = JSON.print(gameFiles,"\t")
+	file.store_string(sys)
 	file.close()
 	l("Ready")
 func installScriptExtension(path:String):

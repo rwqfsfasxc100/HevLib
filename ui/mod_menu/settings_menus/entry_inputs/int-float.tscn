@@ -98,6 +98,7 @@ margin_bottom = 50.0
 rect_min_size = Vector2( 450, 50 )
 focus_neighbour_left = NodePath(".")
 focus_neighbour_right = NodePath(".")
+focus_mode = 0
 max_value = 10.0
 
 [node name="Label" type="Label" parent="slider"]
