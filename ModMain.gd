@@ -24,8 +24,45 @@ func _init(modLoader = ModLoader):
 	add_child(self_check)
 	
 	installScriptExtension("scenes/scene_replacements/Shipyard.gd")
+
+var file = File.new()
+var update_urls = PoolStringArray([])
+var url_store = "user://cache/.HevLib_Cache/url_refs.json"
+var update_store = "user://cache/.HevLib_Cache/needs_updates.json"
 func _ready():
 	l("Readying")
+	file.open(url_store,File.WRITE)
+	file.store_string("[]")
+	file.close()
+	file.open(update_store,File.WRITE)
+	file.store_string("{}")
+	file.close()
+	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
+	var mod_data = ManifestV2.__get_mod_data(true,true)
+	var md = ManifestV2.__get_mod_data()
+	for item in md["mods"]:
+		var data = md["mods"][item]["manifest"]
+		if data["has_manifest"]:
+			var url = data["manifest_data"]["manifest_definitions"]["manifest_url"]
+			if url != "":
+				var http = HTTPRequest.new()
+				var pm = md["mods"][item]
+				file.open(url_store,File.READ_WRITE)
+				var current = JSON.parse(file.get_as_text()).result
+				current.append([pm["name"],pm["manifest"]["manifest_data"]["mod_information"]["id"],pm["version_data"]["version_major"],pm["version_data"]["version_minor"],pm["version_data"]["version_bugfix"]])
+				file.store_string(JSON.print(current))
+				file.close()
+				http.name = str(item.hash())
+				http.connect("request_completed",self,"network_return")
+				add_child(http)
+				http.timeout = 20
+				
+				http.request(url)
+				update_urls.append(pm["manifest"]["manifest_data"]["mod_information"]["id"])
+				
+	
+	
+	
 	var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
 	ConfigDriver.__load_configs()
 #	replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
@@ -41,7 +78,6 @@ func _ready():
 #	var mouse = load("res://HevLib/scenes/scene_replacements/MouseLayer.tscn").instance()
 	var CRoot = get_tree().get_root()
 #	CRoot.call_deferred("add_child",mouse)
-	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
 	replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
 	replaceScene("scenes/scene_replacements/Game.tscn", "res://Game.tscn")
 	var dir = Directory.new()
@@ -53,7 +89,7 @@ func _ready():
 	file.store_string(functionality)
 	file.close()
 	file.open("user://cache/.HevLib_Cache/currently_installed_mods.json", File.WRITE)
-	file.store_string(str(ManifestV2.__get_mod_data(true,true)))
+	file.store_string(str(mod_data))
 	file.close()
 	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 	var cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/"
@@ -159,3 +195,34 @@ func l(msg:String, title:String = MOD_NAME, version:String = str(MOD_VERSION_MAJ
 	if not MOD_VERSION_METADATA == "":
 		version = version + "-" + MOD_VERSION_METADATA
 	Debug.l("[%s V%s]: %s" % [title, version, msg])
+func network_return(result, response_code,headers,body):
+	if result == 0:
+		var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
+		var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
+		var p = body.get_string_from_utf8()
+		var path = "user://cache/.HevLib_Cache/network_manifest.cfg"
+		var path2 = "user://cache/.HevLib_Cache/network_manifest.json"
+		file.open(path,File.WRITE)
+		file.store_string(p)
+		file.close()
+		file.open(url_store,File.READ)
+		var current = JSON.parse(file.get_as_text(true)).result
+		file.close()
+#		var data = ConfigDriver.__config_parse(path)
+#		file.open(path2,File.WRITE)
+#		file.store_string(JSON.print(data))
+#		file.close()
+		var manifest = ManifestV2.__parse_file_as_manifest(path,true)
+		var DataFormat = load("res://HevLib/pointers/DataFormat.gd")
+		for item in current:
+			if item[1] in update_urls:
+				var nv1 = manifest["version"]["version_major"]
+				var nv2 = manifest["version"]["version_minor"]
+				var nv3 = manifest["version"]["version_bugfix"]
+				var does = DataFormat.__compare_versions(item[2],item[3],item[4],nv1,nv2,nv3)
+				if does:
+					file.open(update_store,File.READ_WRITE)
+					var updates = JSON.parse(file.get_as_text()).result
+					updates.merge({item[1]:{"name":item[0],"id":item[1],"version":[item[2],item[3],item[4]],"display":item[0] + " (" + item[1] + ")"}})
+					file.store_string(JSON.print(updates))
+					file.close()

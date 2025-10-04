@@ -206,7 +206,7 @@ anims/Blink = SubResource( 10 )
 anims/RESET = SubResource( 11 )
 
 [node name="Complementary" type="TextureRect" parent="Icon/Control"]
-modulate = Color( 0.0491119, 1, 0.0491119, 0.88029 )
+modulate = Color( 0.186623, 1, 0.186623, 0.545107 )
 margin_left = 75.0
 margin_top = 75.0
 margin_right = 95.0

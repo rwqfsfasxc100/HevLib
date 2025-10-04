@@ -31,7 +31,13 @@ onready var settings_menu = get_node(settings_menu_path)
 
 onready var listContainer = $ScrollContainer/VBoxContainer
 
+export var conflict_button_path = NodePath("")
+export var dependancies_button_path = NodePath("")
+export var updates_button_path = NodePath("")
 
+onready var conflict_button = get_node(conflict_button_path)
+onready var dependancies_button = get_node(dependancies_button_path)
+onready var updates_button = get_node(updates_button_path)
 
 func about_to_show():
 	var nodes = listContainer.get_children()
@@ -62,6 +68,9 @@ func _ready():
 		"filter_btn_path":get_node(filter_btn_path),
 		"links_menu_path":get_node(links_menu_path),
 		"settings_menu":get_node(settings_menu_path),
+		"conflict_button":get_node(conflict_button_path),
+		"dependancies_button":get_node(dependancies_button_path),
+		"updates_button":get_node(updates_button_path),
 	}
 	var data = ManifestV2.__get_mod_data()["mods"]
 	var groups = {}

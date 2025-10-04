@@ -29,6 +29,11 @@ var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 
 onready var all_tags = ManifestV2.__get_tags()
 
+
+var conflicts = []
+var dependancies = []
+var complementary = []
+
 func _pressed():
 	var manifestData = MOD_INFO["manifest"]["manifest_data"]
 	var mod_name = MOD_INFO["name"]
@@ -104,7 +109,9 @@ func _pressed():
 		information_nodes["info_settings_button"].visible = false
 		information_nodes["info_links_button"].visible = false
 		information_nodes["info_bugreports_button"].visible = false
-
+	
+	
+	
 
 
 const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
@@ -197,6 +204,16 @@ func _draw():
 		var pos = get_position_in_parent()
 		if pos == 0:
 			button.grab_focus()
+	
+	conflicts = ManifestV2.__check_mod_conflicts(ID)
+	dependancies = ManifestV2.__check_mod_dependancies(ID)
+	complementary = ManifestV2.__check_mod_complementary(ID)
+	if conflicts:
+		$Icon/Control/Conflicts.visible = true
+	if dependancies:
+		$Icon/Control/Dependancies.visible = true
+	if complementary:
+		$Icon/Control/Complementary.visible = true
 	
 	
 	

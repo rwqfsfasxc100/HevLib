@@ -33,6 +33,11 @@ var developer_hint = {
 	"__get_vanilla_version":[
 		"Gets the vanilla game version",
 		"get_from_files -> (optional) bool deciding whether to get the version from the files. Generally slower than it being disabled, however is the only way to get it before the onready phase. Only works in debug builds due to bytecode compiled data"
+	],
+	"__compare_versions":[
+		"Compares two sets of versions. If the first one is newer, returns true, otherwise returns false",
+		"First three int inputs are the major, minor and bugfix for the first version",
+		"Second three int inputs are the major, minor and bugfix for the second version",
 	]
 }
 
@@ -70,4 +75,9 @@ static func __sift_dictionary(dictionary: Dictionary,search_keys: Array) -> Arra
 static func __convert_arr_to_vec2arr(array: Array) -> PoolVector2Array:
 	var f = load("res://HevLib/scripts/convert_arr_to_vec2arr.gd")
 	var s = f.convert_arr_to_vec2arr(array)
+	return s
+
+static func __compare_versions(primary_major : int,primary_minor : int,primary_bugfix : int, compare_major : int, compare_minor : int, compare_bugfix : int) -> bool:
+	var f = load("res://HevLib/scripts/compare_versions.gd")
+	var s = f.compare_versions(primary_major ,primary_minor ,primary_bugfix , compare_major , compare_minor , compare_bugfix )
 	return s
