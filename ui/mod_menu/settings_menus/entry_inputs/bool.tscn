@@ -31,6 +31,7 @@ text = "BOOL_NAME_MISSING"
 [node name="LABELBUTTON" type="Button" parent="Label"]
 margin_right = 10.0
 margin_bottom = 50.0
+focus_neighbour_right = NodePath("../../CheckButton")
 size_flags_horizontal = 3
 flat = true
 

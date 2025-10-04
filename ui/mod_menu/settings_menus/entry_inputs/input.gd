@@ -1,5 +1,6 @@
 extends HBoxContainer
 
+
 var CONFIG_DATA = {}
 
 var CONFIG_ENTRY = ""
@@ -15,29 +16,11 @@ func _ready():
 	if value == null:
 		Tool.remove(self)
 	$Label.text = CONFIG_DATA.get("name","BOOL_MISSING_NAME")
-	$CheckButton.pressed = value
 	$Label/LABELBUTTON.hint_tooltip = CONFIG_DATA.get("description","")
 	add_to_group("hevlib_settings_tab",true)
 
-func _toggled(button_pressed):
-	ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,button_pressed)
-	var tex = StreamTexture.new()
-	if button_pressed:
-		tex.load_path = "res://HevLib/ui/themes/icons/on_25.stex"
-	else:
-		tex.load_path = "res://HevLib/ui/themes/icons/off_25.stex"
-	get_tree().call_group("hevlib_settings_tab","recheck_availability")
-	
-	$CheckButton.icon = tex
-
 func recheck_availability():
-	$CheckButton.pressed = ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
-	if $CheckButton.pressed != CONFIG_DATA.get("default",false):
-		$reset.visible = true
-		$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($reset)
-	else:
-		$reset.visible = false
-		$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($CheckButton)
+	
 	var requirements = PoolStringArray(CONFIG_DATA.get("requires_bools",[]))
 	if requirements.size() >= 1:
 		var show = true
@@ -58,32 +41,31 @@ func recheck_availability():
 				if true_valids >= 1:
 					$reset.modulate = Color(0.6,0.6,0.6,1)
 					$reset.disabled = true
-					$CheckButton.modulate = Color(0.6,0.6,0.6,1)
-					$CheckButton.disabled = true
+					$Label/LABELBUTTON.modulate = Color(0.6,0.6,0.6,1)
+					$Label/LABELBUTTON.disabled = true
 				else:
 					$reset.modulate = Color(1,1,1,1)
 					$reset.disabled = false
-					$CheckButton.modulate = Color(1,1,1,1)
-					$CheckButton.disabled = false
+					$Label/LABELBUTTON.modulate = Color(1,1,1,1)
+					$Label/LABELBUTTON.disabled = false
 			else:
 				if true_valids >= 1:
 					$reset.modulate = Color(1,1,1,1)
 					$reset.disabled = false
-					$CheckButton.modulate = Color(1,1,1,1)
-					$CheckButton.disabled = false
+					$Label/LABELBUTTON.modulate = Color(1,1,1,1)
+					$Label/LABELBUTTON.disabled = false
 				else:
 					$reset.modulate = Color(0.6,0.6,0.6,1)
 					$reset.disabled = true
-					$CheckButton.modulate = Color(0.6,0.6,0.6,1)
-					$CheckButton.disabled = true
+					$Label/LABELBUTTON.modulate = Color(0.6,0.6,0.6,1)
+					$Label/LABELBUTTON.disabled = true
 	else:
 		$reset.modulate = Color(1,1,1,1)
 		$reset.disabled = false
-		$CheckButton.modulate = Color(1,1,1,1)
-		$CheckButton.disabled = false
+		$Label/LABELBUTTON.modulate = Color(1,1,1,1)
+		$Label/LABELBUTTON.disabled = false
 
 func _reset_pressed():
-	$CheckButton.pressed = CONFIG_DATA.get("default",false)
 	ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,CONFIG_DATA.get("default",false))
 	$CheckButton.grab_focus()
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
@@ -96,11 +78,10 @@ func refocus():
 	$Label/LABELBUTTON.rect_size = $Label.rect_size
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 	
-	ConfigDriver.__set_button_focus(self,get_node("CheckButton"))
+	ConfigDriver.__set_button_focus(self,get_node("Label/LABELBUTTON"))
 	
 
 func _visibility_changed():
 	if get_position_in_parent() == 0:
 		$Label/LABELBUTTON.grab_focus()
 	refocus()
-

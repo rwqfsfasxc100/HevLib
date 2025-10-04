@@ -48,14 +48,17 @@ func _ready():
 		spinbox.visible = false
 		slider.visible = true
 		SliderLabel.visible = true
+		$Label/LABELBUTTON.focus_neighbour_right = get_path_to($slider)
 	elif style == "spinbox":
 		spinbox.visible = true
 		slider.visible = false
 		SliderLabel.visible = false
+		$Label/LABELBUTTON.focus_neighbour_right = get_path_to($spinbox)
 	slider.value = value
 	spinbox.value = value
 	SliderLabel.text = str(value)
 	$Label/LABELBUTTON.hint_tooltip = CONFIG_DATA.get("description","")
+	add_to_group("hevlib_settings_tab",true)
 
 func _reset_pressed():
 	var val = CONFIG_DATA.get("default",10.0)
@@ -83,6 +86,7 @@ func refocus():
 		slider.visible = false
 		SliderLabel.visible = false
 	ConfigDriver.__set_button_focus(self,get_node(style))
+	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 	
 
 func _value_changed(value):
@@ -93,18 +97,26 @@ func _value_changed(value):
 
 func _visibility_changed():
 	refocus()
+	if get_position_in_parent() == 0:
+		$Label/LABELBUTTON.grab_focus()
 
 
 
-func _process(_delta):
+func recheck_availability():
 	var v = ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	slider.set("value" , float(v))
 	SliderLabel.text = str(v)
 	spinbox.set("value" , float(v))
 	if v != CONFIG_DATA.get("default",10.0):
 		$reset.visible = true
+		$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($reset)
 	else:
 		$reset.visible = false
+		match style:
+			"slider":
+				$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($slider)
+			"spinbox":
+				$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($spinbox)
 	var requirements = PoolStringArray(CONFIG_DATA.get("requires_bools",[]))
 	if requirements.size() >= 1:
 		var show = true
@@ -194,8 +206,10 @@ func _input(event):
 				action_passed = true
 		if action_passed:
 			get_viewport().set_input_as_handled()
+			get_tree().call_group("hevlib_settings_tab","recheck_availability")
 			$Timer.start()
 
 
 func _timeout():
 	slider.grab_focus()
+

@@ -1,0 +1,82 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=1]
+[ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=2]
+[ext_resource path="res://HevLib/ui/mod_menu/settings_menus/entry_inputs/option_button.gd" type="Script" id=3]
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=4]
+
+[sub_resource type="StreamTexture" id=1]
+flags = 4
+load_path = "res://HevLib/ui/themes/icons/reset.stex"
+
+[node name="OPTIONBUTTONCONTAINER" type="HBoxContainer"]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 300, 50 )
+size_flags_horizontal = 3
+theme = ExtResource( 4 )
+script = ExtResource( 3 )
+
+[node name="button" type="HBoxContainer" parent="."]
+margin_right = 301.0
+margin_bottom = 50.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="button"]
+margin_top = 6.0
+margin_right = 301.0
+margin_bottom = 44.0
+size_flags_horizontal = 3
+text = "BOOL_NAME_MISSING"
+
+[node name="LABELBUTTON" type="Button" parent="button/Label"]
+margin_right = 10.0
+margin_bottom = 50.0
+focus_neighbour_right = NodePath("../../CheckButton")
+size_flags_horizontal = 3
+flat = true
+
+[node name="SmoothScrollTo" parent="button/Label/LABELBUTTON" instance=ExtResource( 1 )]
+focusAt = NodePath("../..")
+
+[node name="PlaySoundsOnTheseButtons" parent="button/Label/LABELBUTTON" instance=ExtResource( 2 )]
+
+[node name="reset" type="Button" parent="button"]
+visible = false
+margin_left = 305.0
+margin_right = 355.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 50, 50 )
+flat = true
+
+[node name="TextureRect" type="TextureRect" parent="button/reset"]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 50, 50 )
+texture = SubResource( 1 )
+expand = true
+
+[node name="SmoothScrollTo" parent="button/reset/TextureRect" instance=ExtResource( 1 )]
+focusAt = NodePath("../../../..")
+
+[node name="PlaySoundsOnTheseButtons" parent="button/reset/TextureRect" instance=ExtResource( 2 )]
+
+[node name="OptionButton" type="OptionButton" parent="."]
+margin_left = 305.0
+margin_right = 455.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 150, 50 )
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="OptionButton"]
+margin_right = 10.0
+margin_bottom = 38.0
+
+[node name="SmoothScrollTo" parent="OptionButton/Label" instance=ExtResource( 1 )]
+focusAt = NodePath("../../..")
+
+[node name="PlaySoundsOnTheseButtons" parent="OptionButton/Label" instance=ExtResource( 2 )]
+
+[connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
+[connection signal="pressed" from="button/reset" to="." method="_reset_pressed"]
+[connection signal="item_selected" from="OptionButton" to="." method="_on_OptionButton_item_selected"]

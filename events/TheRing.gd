@@ -3,7 +3,7 @@ extends "res://TheRing.gd"
 var event_names = []
 
 var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
-
+const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 var cache_folder = "user://cache/.HevLib_Cache/"
 
 func _ready():
@@ -13,7 +13,10 @@ func _ready():
 	veinImage = veins.get_data()
 	veinSize = veinImage.get_size()
 	
-	var disabled_events = Settings.HevLib["events"]["disabled_events"]
+	var de = ConfigDriver.__get_value("HevLib","events","disabled_events")
+	if de == null:
+		ConfigDriver.__store_value("HevLib","events","disabled_events",[])
+	var disabled_events = ConfigDriver.__get_value("HevLib","events","disabled_events")
 	var write_events = Settings.HevLib["events"]["write_events"]
 	
 	for kid in get_children():

@@ -4,7 +4,7 @@ extends VBoxContainer
 var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
-
+const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 var cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/"
 
 var NEW_INSTALL = false
@@ -42,9 +42,9 @@ func _init():
 
 func _tree_entered():
 	var sTime = OS.get_system_time_msecs()
-	if Settings.HevLib["equipment"]["use_legacy_equipment_handler"]:
+	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","use_legacy_equipment_handler"):
 		l("Legacy equipment handler is enabled; started checking and modifying equipment")
-		has = Settings.HevLib["equipment"]["do_sort_equipment_by_price"]
+		ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_equipment_by_price",has)
 		var does = 1 if has else 0
 		var CRoot = get_tree().get_root().get_node("EquipmentDriver")
 		slots = CRoot.conv
@@ -85,10 +85,10 @@ func _tree_entered():
 		l("Skipping equipment addition phase; dynamic equipment handler is being used and all equipment has been added during mod ready setup.")
 #func start_processing():
 		l("Performing slot sort check. Will slots be sorted? [%s]" % has)
-		if Settings.HevLib["equipment"]["do_sort_equipment_by_price"]:
+		if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_equipment_by_price"):
 			for slot in display_slots():
 				sort_slot(slot)
-		if Settings.HevLib["equipment"]["do_sort_slots_by_type"]:
+		if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_slots_by_type"):
 			reorganize_slots()
 	var finish_time = OS.get_system_time_msecs()
 	var total_time = str(float(finish_time - sTime)/1000)

@@ -107,7 +107,7 @@ func _pressed():
 
 
 
-
+const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 
 
 
@@ -181,7 +181,7 @@ func _draw():
 	
 	
 	
-	var showHidden = Settings.HevLib["drivers"]["show_hidden_libraries"]
+	var showHidden = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_hidden_libraries")
 	if is_library:
 		if showHidden or always_display:
 			visible = true

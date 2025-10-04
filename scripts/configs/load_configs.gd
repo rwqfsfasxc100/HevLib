@@ -36,10 +36,11 @@ static func load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
 			else:
 				current_config.merge({sect:{}})
 			for key in sectData:
+				var key_data = sectData[key]
 				if key in current_config[sect]:
 					pass
 				else:
-					var key_data = sectData[key]
+					
 					match typeof(key_data):
 						TYPE_DICTIONARY:
 							if "default" in key_data:
@@ -52,5 +53,24 @@ static func load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		for key in current_config[section]:
 			c.set_value(section,key,current_config[section][key])
 	c.save(cfg_file)
-	
+	for mod in configs:
+		var data = ConfigDriver.__get_config(mod)
+		for section in configs[mod]:
+			var sectData = configs[mod][section]
+			for key in sectData:
+				var key_data = sectData[key]
+				if key_data["type"].to_lower() == "input":
+					var p = ConfigDriver.__get_value(mod,section,key)
+					if p == null:
+						p = key_data["default"]
+					var addAction = true
+					for m in InputMap.get_actions():
+						if m == key:
+							addAction = false
+					if addAction:
+						InputMap.add_action(key)
+					for k in p:
+						var event = InputEventKey.new()
+						event.scancode = OS.find_scancode_from_string(k)
+						InputMap.action_add_event(key, event)
 	

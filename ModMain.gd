@@ -10,12 +10,11 @@ const MOD_IS_LIBRARY = true
 const LIBRARY_HIDDEN_BY_DEFAULT = false
 var modPath:String = get_script().resource_path.get_base_dir() + "/"
 var _savedObjects := []
-var modConfig = {}
+
 var HevLibModMain = true
 func _init(modLoader = ModLoader):
 	l("Initializing DLC")
 	loadDLC()
-	loadSettings()
 	installScriptExtension("events/TheRing.gd")
 	
 	
@@ -27,7 +26,7 @@ func _init(modLoader = ModLoader):
 	installScriptExtension("scenes/scene_replacements/Shipyard.gd")
 func _ready():
 	l("Readying")
-	var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+	var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
 	ConfigDriver.__load_configs()
 #	replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
 	var p = load("res://ModLoader.gd")
@@ -60,7 +59,7 @@ func _ready():
 	var cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/"
 	replaceScene("scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
 #	var CRoot = get_tree().get_root()
-	if modConfig["equipment"]["use_legacy_equipment_handler"]:
+	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","use_legacy_equipment_handler"):
 		var conv := []
 		var paths = []
 		FolderAccess.__check_folder_exists(cache_folder)
@@ -160,18 +159,3 @@ func l(msg:String, title:String = MOD_NAME, version:String = str(MOD_VERSION_MAJ
 	if not MOD_VERSION_METADATA == "":
 		version = version + "-" + MOD_VERSION_METADATA
 	Debug.l("[%s V%s]: %s" % [title, version, msg])
-func loadSettings():
-	installScriptExtension("Settings.gd")
-	l(MOD_NAME + ": Loading mod settings")
-	var settings = load("res://Settings.gd").new()
-	settings.load_HevLib_FromFile()
-	settings.save_HevLib_ToFile()
-	modConfig = settings.HevLib
-	l(MOD_NAME + ": Current settings: %s" % modConfig)
-	settings.queue_free()
-	l(MOD_NAME + ": Finished loading settings")
-
-	
-	
-	
-	

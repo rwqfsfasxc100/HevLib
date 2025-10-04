@@ -29,3 +29,23 @@ func _draw():
 	$MarginContainer.rect_size = rect_size
 	
 	name = mod
+
+#func _gui_input(event):
+#	var this_pos = get_position_in_parent()
+#	if get_parent().current_tab == this_pos:
+#		if event.is_action_pressed("ui_page_up"):
+#			var subtab_count = container.get_child_count()
+#			if current_tab != 0:
+#				current_tab -= 1
+#			else:
+#				if not this_pos == 0:
+#					get_parent().current_tab -= 1
+#
+#		if event.is_action_pressed("ui_page_down"):
+#			var subtab_count = container.get_child_count()
+#			if current_tab != subtab_count - 1:
+#				current_tab += 1
+#			else:
+#				if not this_pos == get_parent().get_child_count() - 1:
+#					get_parent().current_tab += 1
+	

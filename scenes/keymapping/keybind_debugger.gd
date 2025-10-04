@@ -57,9 +57,11 @@ func _input(event):
 	if inputDebug:
 		iDebug(event)
 
+const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+
 func _process(delta):
-	inputDebug = Settings.HevLib["debug"]["input_debugger"]
-	inputEventDebug = Settings.HevLib["debug"]["input_event_debugger"]
+	inputDebug = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","input_debugger")
+	inputEventDebug = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","input_event_debugger")
 	var siblingCount = get_parent().get_parent().get_child_count()
 	get_parent().get_parent().move_child(get_parent(), siblingCount)
 	InputDebugPanel.text = str(currentKeyEvents)

@@ -47,9 +47,22 @@ func _ready():
 				input.CONFIG_SECTION = name
 				input.CONFIG_MOD = mod
 				$MarginContainer/ScrollContainer/VBoxContainer.add_child(input)
-				
-			
-			
+			"option","optionbutton","option_button":
+				var input = OPTION.instance()
+				input.name = entry
+				input.CONFIG_DATA = entry_info
+				input.CONFIG_ENTRY = entry
+				input.CONFIG_SECTION = name
+				input.CONFIG_MOD = mod
+				$MarginContainer/ScrollContainer/VBoxContainer.add_child(input)
+			"input":
+				var input = INPUT.instance()
+				input.name = entry
+				input.CONFIG_DATA = entry_info
+				input.CONFIG_ENTRY = entry
+				input.CONFIG_SECTION = name
+				input.CONFIG_MOD = mod
+				$MarginContainer/ScrollContainer/VBoxContainer.add_child(input)
 	
 	
 #	breakpoint
@@ -59,3 +72,5 @@ func _ready():
 const BOOL = preload("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.tscn")
 const INT_FLOAT = preload("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/int-float.tscn")
 const STRING = preload("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/string.tscn")
+const OPTION = preload("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/option_button.tscn")
+const INPUT = preload("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/input.tscn")

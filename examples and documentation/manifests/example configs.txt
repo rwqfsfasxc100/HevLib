@@ -1,43 +1,7 @@
-[mod_information]
-
-id="hev.LIBRARY"
-name="HevLib"
-description="HEVLIB_MOD_DESCRIPTION"
-brief="HEVLIB_MOD_BRIEF"
-author="__hev"
-credits=["Za'krin - Mod Main design, original implementation of updateTL","spaceDOTexe - Manifest design, UpgradeGroup ship limiting logic"]
-
-[version]
-
-version_major=1
-version_minor=8
-version_bugfix=7
-
-[tags]
-
-TAG_ALLOW_ACHIEVEMENTS={"type":"bool","value":true}
-
-[links]
-
-HEVLIB_GITHUB={"URL":"https://github.com/rwqfsfasxc100/HevLib"}
-HEVLIB_DISCORD={"URL":"https://discord.com/channels/426287934870781952/1354537481197850655"}
-HEVLIB_NEXUS={"URL":"https://www.nexusmods.com/dvringsofsaturn/mods/16"}
-HEVLIB_DONATIONS={"URL":"https://ko-fi.com/00hev"}
-HEVLIB_WIKI={"URL":"https://github.com/rwqfsfasxc100/HevLib/wiki"}
-HEVLIB_BUGREPORTS={"URL":"https://forms.gle/RmC4Zgonp6frFgnK7"}
-
-[languages]
-
-en="100%"
-
-[library]
-
-is_library=true
-always_display=true
 
 [configs]
 
-HEVLIB_CONFIG_SECTION_EQUIPMENT={
+equipment={
 	"do_sort_equipment_by_price":{
 		"name":"HEVLIB_CONFIG_SORT_BY_PRICE",
 		"description":"HEVLIB_CONFIG_SORT_BY_PRICE_TOOLTIP",
@@ -56,8 +20,44 @@ HEVLIB_CONFIG_SECTION_EQUIPMENT={
 		"type":"bool",
 		"default":false,
 	},
+	"text_float":{
+		"name":"HEVLIB_CONFIG_TEST_FLOAT",
+		"description":"HEVLIB_CONFIG_TEST_FLOAT_TOOLTIP",
+		"type":"int",
+		"default":10.0,
+		"min":0,
+		"max":20,
+		"step":0.5,
+		"style":"slider"
+	},
+	"text_lineedit":{
+		"name":"HEVLIB_CONFIG_TEST_LINEEDIT",
+		"description":"HEVLIB_CONFIG_TEST_LINEEDIT_TOOLTIP",
+		"type":"string",
+		"default":"",
+		"max_length":0,
+		"secret":false,
+		"clear_button":true,
+		"placeholder":"HEVLIB_CONFIG_LINEEDIT_PLACEHOLDER",
+	},
+	"text_optionbutton":{
+		"name":"HEVLIB_CONFIG_TEST_OPTIONBUTTON",
+		"description":"HEVLIB_CONFIG_TEST_OPTIONBUTTON_TOOLTIP",
+		"type":"option",
+		"store_method":"string",
+		"default":"none",
+		"options":["none","opt_1","opt_2"]
+	},
+	"text_optionbutton2":{
+		"name":"HEVLIB_CONFIG_TEST_OPTIONBUTTON",
+		"description":"HEVLIB_CONFIG_TEST_OPTIONBUTTON_TOOLTIP",
+		"type":"option",
+		"store_method":"int",
+		"default":0,
+		"options":["none","opt_1","opt_2"]
+	},
 }
-HEVLIB_CONFIG_SECTION_EVENTS={
+events={
 	"write_events":{
 		"name":"HEVLIB_CONFIG_WRITE_EVENTS",
 		"description":"HEVLIB_CONFIG_WRITE_EVENTS_TOOLTIP",
@@ -65,7 +65,7 @@ HEVLIB_CONFIG_SECTION_EVENTS={
 		"default":true
 	},
 }
-HEVLIB_CONFIG_SECTION_DRIVERS={
+drivers={
 	"show_hidden_libraries":{
 		"name":"HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES",
 		"description":"HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES_TOOLTIP",
@@ -73,7 +73,7 @@ HEVLIB_CONFIG_SECTION_DRIVERS={
 		"default":false
 	},
 }
-HEVLIB_CONFIG_SECTION_DEBUG={
+debug={
 	"input_debugger":{
 		"name":"HEVLIB_CONFIG_INPUT_DEBUGGER",
 		"description":"HEVLIB_CONFIG_INPUT_DEBUGGER_TOOLTIP",
@@ -99,7 +99,7 @@ HEVLIB_CONFIG_SECTION_DEBUG={
 		"default":false
 	},
 }
-HEVLIB_CONFIG_SECTION_INPUT={
+input={
 	"open_debug_event_menu":{
 		"name":"HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU",
 		"description":"HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU_TOOLTIP",
@@ -122,8 +122,3 @@ HEVLIB_CONFIG_SECTION_INPUT={
 		"default":[ "F9" ]
 	},
 }
-
-[manifest_definitions]
-
-manifest_version=2.2
-manifest_url="https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest"

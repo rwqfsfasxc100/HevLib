@@ -1,47 +1,40 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
-[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=1]
+[ext_resource path="res://HevLib/ui/mod_menu/settings_menus/entry_inputs/components/TextDefiningActionButton.tscn" type="PackedScene" id=1]
 [ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=2]
 [ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=3]
-[ext_resource path="res://HevLib/ui/mod_menu/settings_menus/entry_inputs/string.gd" type="Script" id=4]
+[ext_resource path="res://HevLib/ui/mod_menu/settings_menus/entry_inputs/input.gd" type="Script" id=4]
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=5]
 
 [sub_resource type="StreamTexture" id=1]
 flags = 4
 load_path = "res://HevLib/ui/themes/icons/reset.stex"
 
-[node name="STRINGCONTAINER" type="HBoxContainer"]
+[node name="INPUTCONTAINER" type="HBoxContainer"]
 margin_right = 40.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 300, 50 )
 size_flags_horizontal = 3
-theme = ExtResource( 1 )
+theme = ExtResource( 5 )
 script = ExtResource( 4 )
 
 [node name="Label" type="Label" parent="."]
 margin_top = 6.0
-margin_right = 328.0
+margin_right = 301.0
 margin_bottom = 44.0
 size_flags_horizontal = 3
-text = "STRING_NAME_MISSING"
+text = "BOOL_NAME_MISSING"
 
-[node name="LABELBUTTON" type="Button" parent="Label"]
+[node name="LABELBUTTON" parent="Label" instance=ExtResource( 1 )]
 margin_right = 10.0
 margin_bottom = 50.0
-focus_neighbour_right = NodePath("../../LineEdit")
-size_flags_horizontal = 3
-flat = true
+rect_min_size = Vector2( 300, 50 )
+theme = ExtResource( 5 )
 
 [node name="SmoothScrollTo" parent="Label/LABELBUTTON" instance=ExtResource( 2 )]
 focusAt = NodePath("../..")
 
 [node name="PlaySoundsOnTheseButtons" parent="Label/LABELBUTTON" instance=ExtResource( 3 )]
-
-[node name="Label2" type="Label" parent="."]
-margin_left = 332.0
-margin_top = 6.0
-margin_right = 342.0
-margin_bottom = 44.0
-size_flags_horizontal = 3
 
 [node name="reset" type="Button" parent="."]
 visible = false
@@ -62,21 +55,3 @@ expand = true
 focusAt = NodePath("../../..")
 
 [node name="PlaySoundsOnTheseButtons" parent="reset/TextureRect" instance=ExtResource( 3 )]
-
-[node name="LineEdit" type="LineEdit" parent="."]
-margin_left = 346.0
-margin_right = 796.0
-margin_bottom = 50.0
-rect_min_size = Vector2( 450, 50 )
-align = 2
-placeholder_text = "HEVLIB_CONFIG_LINEEDIT_PLACEHOLDER"
-caret_blink = true
-
-[node name="Timer" type="Timer" parent="."]
-wait_time = 0.05
-one_shot = true
-
-[connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
-[connection signal="pressed" from="reset" to="." method="_reset_pressed"]
-[connection signal="text_changed" from="LineEdit" to="." method="_on_LineEdit_text_entered"]
-[connection signal="timeout" from="Timer" to="." method="_timeout"]

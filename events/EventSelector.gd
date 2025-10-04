@@ -3,12 +3,15 @@ extends ScrollContainer
 onready var ring = get_node("/root/Game/TheRing")
 
 var all_events = {}
-
+const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 func _process(delta):
 	get_parent().get_parent().get_parent().get_parent().get_parent().get_parent().selected_events = all_events
 
 func _ready():
-	var disabled_events = Settings.HevLib["events"]["disabled_events"]
+	var de = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
+	if de == null:
+		ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
+	var disabled_events = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
 	var event_names = []
 	for item in ring.get_children():
 		event_names.append(item.name)

@@ -1,0 +1,119 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://menu/keybinds/arrow-down.png" type="Texture" id=1]
+[ext_resource path="res://HevLib/ui/mod_menu/settings_menus/entry_inputs/components/ContextSensitiveControlDisplay.gd" type="Script" id=2]
+[ext_resource path="res://hud/components/MousebindDisplay.tscn" type="PackedScene" id=3]
+[ext_resource path="res://hud/components/AnalogAxisDisplay.tscn" type="PackedScene" id=4]
+[ext_resource path="res://hud/components/GamepadKeybindDisplay.tscn" type="PackedScene" id=5]
+[ext_resource path="res://hud/components/KeySeparator.tscn" type="PackedScene" id=6]
+[ext_resource path="res://hud/components/KeybindDisplay.tscn" type="PackedScene" id=7]
+
+[sub_resource type="Animation" id=1]
+resource_name = "Plomp"
+length = 2.0
+loop = true
+step = 0.05
+tracks/0/type = "value"
+tracks/0/path = NodePath("CenterContainer/C/Bobb:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.15, 0.55, 0.85, 0.95, 2 ),
+"transitions": PoolRealArray( 1, 2, -2, -2, -2, -2 ),
+"update": 0,
+"values": [ Vector2( 0, -18 ), Vector2( 0, -18 ), Vector2( 0, -7 ), Vector2( 0, -7 ), Vector2( 0, -12 ), Vector2( 0, -12 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("CenterContainer/C/Bobb:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("CenterContainer/C/Bobb:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.2, 0.35, 0.351, 0.75, 0.9, 2 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0.757576 ), Color( 1, 1, 1, 0.757576 ), Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 0 ) ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Keys:rect_position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 0.5, 0.6, 0.9, 1 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Vector2( 0, 0 ), Vector2( 0, 0 ), Vector2( 0, 4 ), Vector2( 0, 4 ), Vector2( 0, 0 ) ]
+}
+
+[sub_resource type="Animation" id=2]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath("Keys:rect_position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 0, 0 ) ]
+}
+
+[node name="ContextSensitiveControlDisplay" type="MarginContainer" groups=["hevlib_settings_tab"]]
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_scale = Vector2( 1.5, 1.5 )
+script = ExtResource( 2 )
+keybindDisplay = ExtResource( 7 )
+gamepadKeyDisplay = ExtResource( 5 )
+mouseButtonDisplay = ExtResource( 3 )
+analogAxisDisplay = ExtResource( 4 )
+separator = ExtResource( 6 )
+
+[node name="Player" type="AnimationPlayer" parent="."]
+anims/Plomp = SubResource( 1 )
+anims/RESET = SubResource( 2 )
+
+[node name="Keys" type="HBoxContainer" parent="."]
+margin_right = 1280.0
+margin_bottom = 720.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+margin_right = 1280.0
+margin_bottom = 720.0
+
+[node name="C" type="Control" parent="CenterContainer"]
+margin_left = 640.0
+margin_top = 360.0
+margin_right = 640.0
+margin_bottom = 360.0
+
+[node name="Bobb" type="Sprite" parent="CenterContainer/C"]
+modulate = Color( 1, 1, 1, 0 )
+self_modulate = Color( 1, 1, 1, 0.121569 )
+position = Vector2( 0, -18 )
+scale = Vector2( 0.35, 0.35 )
+z_index = 2
+texture = ExtResource( 1 )
+
+[connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
