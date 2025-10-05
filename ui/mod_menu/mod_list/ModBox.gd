@@ -1,24 +1,25 @@
-extends HBoxContainer
+extends VBoxContainer
 
 var MOD_INFO = {}
 
 var ModContainer = null
 
-onready var icon_node = $Icon
-onready var icon_conflicts = $Icon/Control/Conflicts
-onready var icon_dependancies = $Icon/Control/Dependancies
-onready var icon_updates = $Icon/Control/Updates
-onready var icon_complementary = $Icon/Control/Complementary
+onready var icon_node = $BaseModBox/Icon
+onready var icon_conflicts = $BaseModBox/Icon/Control/Conflicts
+onready var icon_dependancies = $BaseModBox/Icon/Control/Dependancies
+onready var icon_updates = $BaseModBox/Icon/Control/Updates
+onready var icon_complementary = $BaseModBox/Icon/Control/Complementary
 
-onready var button = $ModButton
-onready var button_box = $ModButton/VBoxContainer
-onready var button_box2 = $ModButton/VBoxContainer/HBoxContainer
-onready var button_label = $ModButton/VBoxContainer/HBoxContainer/LABELS/NAME
-onready var button_brief = $ModButton/VBoxContainer/HBoxContainer/LABELS/BRIEF
-onready var button_lib_icon = $ModButton/VBoxContainer/HBoxContainer/VBoxContainer/Library
-onready var button_children_icon = $ModButton/VBoxContainer/HBoxContainer/VBoxContainer/Children
-onready var button_children_count = $ModButton/VBoxContainer/HBoxContainer/VBoxContainer/Children/Count
+onready var button = $BaseModBox/ModButton
+onready var button_box = $BaseModBox/ModButton/VBoxContainer
+onready var button_box2 = $BaseModBox/ModButton/VBoxContainer/HBoxContainer
+onready var button_label = $BaseModBox/ModButton/VBoxContainer/HBoxContainer/LABELS/NAME
+onready var button_brief = $BaseModBox/ModButton/VBoxContainer/HBoxContainer/LABELS/BRIEF
+onready var button_lib_icon = $BaseModBox/ModButton/VBoxContainer/HBoxContainer/VBoxContainer/Library
+onready var button_children_icon = $BaseModBox/ModButton/VBoxContainer/HBoxContainer/VBoxContainer/Children
+onready var button_children_count = $BaseModBox/ModButton/VBoxContainer/HBoxContainer/VBoxContainer/Children/Count
 
+var ModButton = NodePath("ModButton")
 var button_size = Vector2(0,0)
 
 var MAX_SIZE = Vector2(0,0)
@@ -120,7 +121,7 @@ const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 
 
 
-
+var ID = null
 
 func _draw():
 	MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)
@@ -131,6 +132,39 @@ func _draw():
 	icon_conflicts.visible = false
 	icon_dependancies.visible = false
 	icon_updates.visible = false
+	
+	
+	file.open(update_store,File.READ)
+	var updt = JSON.parse(file.get_as_text()).result
+	file.close()
+	file.open(conflicts_store,File.READ)
+	var conf = JSON.parse(file.get_as_text()).result
+	file.close()
+	file.open(dependancies_store,File.READ)
+	var dep = JSON.parse(file.get_as_text()).result
+	file.close()
+	file.open(complementary_store,File.READ)
+	var comp = JSON.parse(file.get_as_text()).result
+	file.close()
+	
+	
+	if ID in updt:
+		icon_updates.visible = true
+	else:
+		icon_updates.visible = false
+	if ID in conf:
+		icon_conflicts.visible = true
+	else:
+		icon_conflicts.visible = false
+	if ID in dep:
+		icon_dependancies.visible = true
+	else:
+		icon_dependancies.visible = false
+	if ID in comp:
+		icon_complementary.visible = true
+	else:
+		icon_complementary.visible = false
+	
 	
 	button_box.rect_size.x = button.rect_size.x - 4
 	
@@ -162,7 +196,7 @@ func _draw():
 		tex.load_path = icon
 		icon_node.texture = tex
 	var tooltip_text = TranslationServer.translate("HEVLIB_MM_TOOLTIP_HEADER")
-	var ID = null
+
 	var md = manifest["manifest_data"]
 	if md:
 		ID = md["mod_information"]["id"]
@@ -205,6 +239,17 @@ func _draw():
 		if pos == 0:
 			button.grab_focus()
 	
+	if children:
+		button_children_icon.visible = true
+		button_children_count.visible = true
+		button_children_count.text = "%s" % children.size()
+		
+		
+	
+	
+	
+	
+	
 #	conflicts = ManifestV2.__check_mod_conflicts(ID)
 #	dependancies = ManifestV2.__check_mod_dependancies(ID)
 #	complementary = ManifestV2.__check_mod_complementary(ID)
@@ -219,17 +264,15 @@ func _draw():
 	
 #	_refocus()
 var descbox = "../ModInfo/DESC"
-
 func _input(event):
 	if Input.is_action_just_pressed("ui_focus_next") or Input.is_action_just_pressed("ui_focus_prev"):
 		var foc = get_focus_owner()
 		var select = ModContainer.get_node(descbox)
-		if foc == get_node("ModButton"):
+		if foc == button:
 			select.grab_focus()
 			get_viewport().set_input_as_handled()
 
 onready var desc_box = ModContainer.get_node(descbox)
-onready var mod_box = get_node("ModButton")
 #func _process(_delta):
 #	if is_visible_in_tree():
 #		MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)
@@ -238,7 +281,7 @@ onready var mod_box = get_node("ModButton")
 		
 
 func get_button(pos):
-	return get_parent().get_child(pos).get_node("ModButton")
+	return get_parent().get_child(pos).get_node(ModButton)
 
 func _refocus():
 	MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)
@@ -246,21 +289,32 @@ func _refocus():
 	var index = get_parent().get_position_in_parent()
 	var parent = get_parent()
 	var parent_count = parent.get_child_count()-1
-	focus_neighbour_left = get_path_to(self)
-	focus_neighbour_right = get_path_to(ModContainer.get_node(descbox))
-	focus_next = get_path_to(ModContainer.get_node(descbox))
-	focus_previous = get_path_to(ModContainer.get_node(descbox))
-#	breakpoint
-	if index == 0:
-#		focus_neighbour_top = get_path_to(self)
-		focus_neighbour_top = mod_box.get_path_to(filter_button)
-		focus_neighbour_bottom = get_path_to(parent.get_child(index+1).get_node("ModButton"))
-	elif index == parent_count:
-		focus_neighbour_top = get_path_to(parent.get_child(index-1).get_node("ModButton"))
-		focus_neighbour_bottom = get_path_to(self)
+	
+	
+	var upper = null
+	var lower = null
+	var mb = button.get_path_to(button)
+	button.focus_neighbour_left = mb
+	button.focus_neighbour_right = button.get_path_to(desc_box)
+	button.focus_next = button.get_path_to(desc_box)
+	button.focus_previous = button.get_path_to(desc_box)
+	
+	
+	var pos = get_position_in_parent()
+	var end_pos = get_parent().get_node("HEVLIB_NODE_SEPARATOR_IGNORE_PLS").get_position_in_parent()
+	
+	if pos == 0:
+#		button.focus_neighbour_top = mb
+		button.focus_neighbour_top = button.get_path_to(filter_button)
+		button.focus_neighbour_bottom = button.get_path_to(get_button(pos+1))
+	elif pos + 1 == end_pos:
+		button.focus_neighbour_top = button.get_path_to(get_button(pos-1))
+		button.focus_neighbour_bottom = button.get_path_to(get_node(openMods_button))
+		get_node(openMods_button).focus_neighbour_top = get_node(openMods_button).get_path_to(button)
 	else:
-		focus_neighbour_top = get_path_to(parent.get_child(index-1).get_node("ModButton"))
-		focus_neighbour_bottom = get_path_to(parent.get_child(index+1).get_node("ModButton"))
+		button.focus_neighbour_top = button.get_path_to(get_button(pos-1))
+		button.focus_neighbour_bottom = button.get_path_to(get_button(pos+1))
+	
 	
 var isfocus = false
 
@@ -315,35 +369,19 @@ func _process(_delta):
 				else:
 					visible = true
 var file = File.new()
+
+var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
+var dependancies_store = "user://cache/.Mod_Menu_2_Cache/dependancies/dependancies.json"
+var conflicts_store = "user://cache/.Mod_Menu_2_Cache/conflicts/conflicts.json"
+var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/complementary.json"
+
 func _visibility_changed():
 	MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)
 	button_box.rect_size.x = button.rect_size.x - 4
-	var pos = get_position_in_parent()
-	var parent = get_parent()
-	var end_pos = get_parent().get_node("HEVLIB_NODE_SEPARATOR_IGNORE_PLS").get_position_in_parent()
 	
-	var upper = null
-	var lower = null
-	var mb = mod_box.get_path_to(mod_box)
-	mod_box.focus_neighbour_left = mb
-	mod_box.focus_neighbour_right = mod_box.get_path_to(desc_box)
-	mod_box.focus_next = mod_box.get_path_to(desc_box)
-	mod_box.focus_previous = mod_box.get_path_to(desc_box)
-	
-	if pos == 0:
-#		mod_box.focus_neighbour_top = mb
-		mod_box.focus_neighbour_top = mod_box.get_path_to(filter_button)
-		mod_box.focus_neighbour_bottom = mod_box.get_path_to(get_button(pos+1))
-	elif pos + 1 == end_pos:
-		mod_box.focus_neighbour_top = mod_box.get_path_to(get_button(pos-1))
-		mod_box.focus_neighbour_bottom = mod_box.get_path_to(get_node(openMods_button))
-		get_node(openMods_button).focus_neighbour_top = get_node(openMods_button).get_path_to(mod_box)
-	else:
-		mod_box.focus_neighbour_top = mod_box.get_path_to(get_button(pos-1))
-		mod_box.focus_neighbour_bottom = mod_box.get_path_to(get_button(pos+1))
-#	mod_box.focus_neighbor_top = get_path_to(upper)
-#	mod_box.focus_neighbor_bottom = get_path_to(lower)
+#	button.focus_neighbor_top = get_path_to(upper)
+#	button.focus_neighbor_bottom = get_path_to(lower)
 	if is_visible_in_tree():
-		if pos == 0:
+		if get_position_in_parent() == 0:
 			
 			button.grab_focus()

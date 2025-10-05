@@ -147,14 +147,20 @@ load_path = "res://.import/jury-rig.png-2961033ba0d8d889260a2ea25a68d49e.stex"
 flags = 4
 load_path = "res://HevLib/ui/themes/icons/dropdown_arrow.stex"
 
-[node name="ModBox" type="HBoxContainer"]
+[node name="ModBox" type="VBoxContainer"]
 margin_right = 600.0
 margin_bottom = 100.0
 rect_min_size = Vector2( 600, 100 )
 theme = ExtResource( 1 )
 script = ExtResource( 2 )
 
-[node name="Icon" type="TextureRect" parent="."]
+[node name="BaseModBox" type="HBoxContainer" parent="."]
+margin_right = 600.0
+margin_bottom = 100.0
+rect_min_size = Vector2( 600, 100 )
+theme = ExtResource( 1 )
+
+[node name="Icon" type="TextureRect" parent="BaseModBox"]
 margin_right = 100.0
 margin_bottom = 100.0
 rect_min_size = Vector2( 100, 100 )
@@ -162,23 +168,23 @@ texture = SubResource( 1 )
 expand = true
 stretch_mode = 6
 
-[node name="Control" type="Control" parent="Icon"]
+[node name="Control" type="Control" parent="BaseModBox/Icon"]
 margin_right = 100.0
 margin_bottom = 100.0
 
-[node name="Conflicts" type="TextureRect" parent="Icon/Control"]
+[node name="Conflicts" type="TextureRect" parent="BaseModBox/Icon/Control"]
 modulate = Color( 1, 1, 0.164706, 0.25098 )
 margin_right = 49.0
 margin_bottom = 49.0
 texture = SubResource( 2 )
 expand = true
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Icon/Control/Conflicts"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="BaseModBox/Icon/Control/Conflicts"]
 autoplay = "Blink"
 anims/Blink = SubResource( 6 )
 anims/RESET = SubResource( 7 )
 
-[node name="Dependancies" type="TextureRect" parent="Icon/Control"]
+[node name="Dependancies" type="TextureRect" parent="BaseModBox/Icon/Control"]
 modulate = Color( 1, 1, 0.164706, 0.25098 )
 margin_left = 60.0
 margin_top = 8.0
@@ -187,12 +193,12 @@ margin_bottom = 40.0
 texture = SubResource( 3 )
 expand = true
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Icon/Control/Dependancies"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="BaseModBox/Icon/Control/Dependancies"]
 autoplay = "Blink"
 anims/Blink = SubResource( 8 )
 anims/RESET = SubResource( 9 )
 
-[node name="Updates" type="TextureRect" parent="Icon/Control"]
+[node name="Updates" type="TextureRect" parent="BaseModBox/Icon/Control"]
 modulate = Color( 1, 1, 0.164706, 0.25098 )
 margin_top = 50.0
 margin_right = 50.0
@@ -200,24 +206,24 @@ margin_bottom = 100.0
 texture = SubResource( 4 )
 expand = true
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Icon/Control/Updates"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="BaseModBox/Icon/Control/Updates"]
 autoplay = "Blink"
 anims/Blink = SubResource( 10 )
 anims/RESET = SubResource( 11 )
 
-[node name="Complementary" type="TextureRect" parent="Icon/Control"]
+[node name="Complementary" type="TextureRect" parent="BaseModBox/Icon/Control"]
 modulate = Color( 0.186623, 1, 0.186623, 0.545107 )
-margin_left = 75.0
-margin_top = 75.0
-margin_right = 95.0
-margin_bottom = 95.0
+margin_left = 67.0
+margin_top = 67.0
+margin_right = 97.0
+margin_bottom = 97.0
 texture = SubResource( 5 )
 expand = true
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Icon/Control/Complementary"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="BaseModBox/Icon/Control/Complementary"]
 anims/Modulate = SubResource( 12 )
 
-[node name="ModButton" type="Button" parent="."]
+[node name="ModButton" type="Button" parent="BaseModBox"]
 margin_left = 104.0
 margin_right = 600.0
 margin_bottom = 100.0
@@ -225,10 +231,10 @@ focus_neighbour_left = NodePath(".")
 size_flags_horizontal = 3
 align = 0
 
-[node name="SmoothScrollTo" parent="ModButton" instance=ExtResource( 3 )]
+[node name="SmoothScrollTo" parent="BaseModBox/ModButton" instance=ExtResource( 3 )]
 focusAt = NodePath("../..")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ModButton"]
+[node name="VBoxContainer" type="VBoxContainer" parent="BaseModBox/ModButton"]
 margin_left = 4.0
 margin_top = 2.0
 margin_right = 216.0
@@ -236,18 +242,18 @@ margin_bottom = 96.0
 size_flags_horizontal = 3
 alignment = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="ModButton/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="BaseModBox/ModButton/VBoxContainer"]
 margin_right = 212.0
 margin_bottom = 94.0
 size_flags_horizontal = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ModButton/VBoxContainer/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="BaseModBox/ModButton/VBoxContainer/HBoxContainer"]
 margin_right = 40.0
 margin_bottom = 94.0
 size_flags_vertical = 3
 alignment = 1
 
-[node name="Library" type="TextureRect" parent="ModButton/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="Library" type="TextureRect" parent="BaseModBox/ModButton/VBoxContainer/HBoxContainer/VBoxContainer"]
 modulate = Color( 0.784314, 0.784314, 0, 1 )
 margin_right = 40.0
 margin_bottom = 45.0
@@ -256,7 +262,7 @@ texture = SubResource( 13 )
 expand = true
 stretch_mode = 6
 
-[node name="Children" type="TextureRect" parent="ModButton/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="Children" type="TextureRect" parent="BaseModBox/ModButton/VBoxContainer/HBoxContainer/VBoxContainer"]
 margin_top = 49.0
 margin_right = 40.0
 margin_bottom = 94.0
@@ -265,7 +271,7 @@ texture = SubResource( 14 )
 expand = true
 stretch_mode = 6
 
-[node name="Count" type="Label" parent="ModButton/VBoxContainer/HBoxContainer/VBoxContainer/Children"]
+[node name="Count" type="Label" parent="BaseModBox/ModButton/VBoxContainer/HBoxContainer/VBoxContainer/Children"]
 margin_left = 5.0
 margin_top = 30.0
 margin_right = 45.0
@@ -276,14 +282,14 @@ custom_fonts/font = ExtResource( 5 )
 text = "0"
 align = 1
 
-[node name="LABELS" type="VBoxContainer" parent="ModButton/VBoxContainer/HBoxContainer"]
+[node name="LABELS" type="VBoxContainer" parent="BaseModBox/ModButton/VBoxContainer/HBoxContainer"]
 margin_left = 44.0
 margin_right = 212.0
 margin_bottom = 94.0
 rect_min_size = Vector2( 0, 94 )
 size_flags_horizontal = 3
 
-[node name="NAME" type="Label" parent="ModButton/VBoxContainer/HBoxContainer/LABELS"]
+[node name="NAME" type="Label" parent="BaseModBox/ModButton/VBoxContainer/HBoxContainer/LABELS"]
 margin_right = 168.0
 margin_bottom = 38.0
 size_flags_horizontal = 3
@@ -292,7 +298,7 @@ text = "MOD_NAME"
 autowrap = true
 max_lines_visible = 2
 
-[node name="BRIEF" type="Label" parent="ModButton/VBoxContainer/HBoxContainer/LABELS"]
+[node name="BRIEF" type="Label" parent="BaseModBox/ModButton/VBoxContainer/HBoxContainer/LABELS"]
 modulate = Color( 0.54902, 0.54902, 0.54902, 1 )
 margin_top = 42.0
 margin_right = 168.0
@@ -303,7 +309,7 @@ text = "MOD_BRIEF"
 autowrap = true
 max_lines_visible = 2
 
-[node name="PlaySoundsOnTheseButtons" parent="ModButton" instance=ExtResource( 4 )]
+[node name="PlaySoundsOnTheseButtons" parent="BaseModBox/ModButton" instance=ExtResource( 4 )]
 
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
-[connection signal="pressed" from="ModButton" to="." method="_pressed"]
+[connection signal="pressed" from="BaseModBox/ModButton" to="." method="_pressed"]
