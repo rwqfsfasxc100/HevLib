@@ -18,9 +18,9 @@ static func set_button_focus(button,check_button):
 		icon_button.focus_neighbour_top = "."
 		reset_button.focus_neighbour_top = "."
 		check_button.focus_neighbour_top = "."
-		icon_button.focus_neighbour_bottom = "."
-		reset_button.focus_neighbour_bottom = "."
-		check_button.focus_neighbour_bottom = "."
+#		icon_button.focus_neighbour_bottom = "."
+#		reset_button.focus_neighbour_bottom = "."
+#		check_button.focus_neighbour_bottom = "."
 	elif pos == 0:
 		icon_button.focus_neighbour_top = "."
 		reset_button.focus_neighbour_top = "."
@@ -50,9 +50,10 @@ static func set_button_focus(button,check_button):
 			_:
 				breakpoint
 	elif pos == children.size() - 1:
-		icon_button.focus_neighbour_bottom = "."
-		reset_button.focus_neighbour_bottom = "."
-		check_button.focus_neighbour_bottom = "."
+		pass
+#		icon_button.focus_neighbour_bottom = "."
+#		reset_button.focus_neighbour_bottom = "."
+#		check_button.focus_neighbour_bottom = "."
 
 		var script_path = parent.get_child(pos-1).get_script().get_path()
 		

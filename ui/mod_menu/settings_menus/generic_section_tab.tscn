@@ -12,14 +12,32 @@ script = ExtResource( 1 )
 margin_right = 40.0
 margin_bottom = 40.0
 
-[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer"]
-margin_right = 40.0
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+margin_right = 182.0
 margin_bottom = 40.0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+margin_right = 182.0
+margin_bottom = 16.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource( 2 )
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/ScrollContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer"]
 margin_right = 300.0
 margin_bottom = 300.0
 rect_min_size = Vector2( 300, 300 )
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+margin_top = 20.0
+margin_right = 182.0
+margin_bottom = 40.0
+alignment = 2
+
+[node name="CloseButton" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+margin_right = 182.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 75, 0 )
+text = "HEVLIB_MODMENU_CLOSE"
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/CloseButton" to="." method="cancel"]

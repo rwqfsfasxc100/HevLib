@@ -1,0 +1,85 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=1]
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=2]
+[ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=3]
+[ext_resource path="res://HevLib/ui/themes/font-courierbold.tres" type="DynamicFont" id=4]
+
+[sub_resource type="StreamTexture" id=1]
+flags = 4
+load_path = "res://HevLib/ui/themes/icons/missing_icon.png.stex"
+
+[node name="BaseModBox" type="HBoxContainer"]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 605.0
+margin_bottom = 105.0
+rect_min_size = Vector2( 600, 100 )
+theme = ExtResource( 2 )
+
+[node name="Label" type="Label" parent="."]
+margin_top = 31.0
+margin_right = 50.0
+margin_bottom = 69.0
+rect_min_size = Vector2( 50, 0 )
+
+[node name="Icon" type="TextureRect" parent="."]
+margin_left = 54.0
+margin_right = 154.0
+margin_bottom = 100.0
+rect_min_size = Vector2( 100, 100 )
+texture = SubResource( 1 )
+expand = true
+stretch_mode = 6
+
+[node name="ModButton" type="Button" parent="."]
+margin_left = 158.0
+margin_right = 600.0
+margin_bottom = 100.0
+focus_neighbour_left = NodePath(".")
+size_flags_horizontal = 3
+align = 0
+
+[node name="SmoothScrollTo" parent="ModButton" instance=ExtResource( 1 )]
+focusAt = NodePath("../..")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ModButton"]
+margin_left = 4.0
+margin_top = 2.0
+margin_right = 216.0
+margin_bottom = 96.0
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ModButton/VBoxContainer"]
+margin_right = 212.0
+margin_bottom = 94.0
+size_flags_horizontal = 3
+
+[node name="LABELS" type="VBoxContainer" parent="ModButton/VBoxContainer/HBoxContainer"]
+margin_right = 212.0
+margin_bottom = 94.0
+rect_min_size = Vector2( 0, 94 )
+size_flags_horizontal = 3
+
+[node name="NAME" type="Label" parent="ModButton/VBoxContainer/HBoxContainer/LABELS"]
+margin_right = 212.0
+margin_bottom = 38.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+text = "MOD_NAME"
+autowrap = true
+max_lines_visible = 2
+
+[node name="BRIEF" type="Label" parent="ModButton/VBoxContainer/HBoxContainer/LABELS"]
+modulate = Color( 0.54902, 0.54902, 0.54902, 1 )
+margin_top = 42.0
+margin_right = 212.0
+margin_bottom = 71.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 4 )
+text = "MOD_BRIEF"
+autowrap = true
+max_lines_visible = 2
+
+[node name="PlaySoundsOnTheseButtons" parent="ModButton" instance=ExtResource( 3 )]

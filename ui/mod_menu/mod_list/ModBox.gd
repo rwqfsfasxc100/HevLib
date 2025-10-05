@@ -22,6 +22,8 @@ onready var button_children_count = $BaseModBox/ModButton/VBoxContainer/HBoxCont
 var ModButton = NodePath("ModButton")
 var button_size = Vector2(0,0)
 
+const SubModBox = preload("res://HevLib/ui/mod_menu/mod_list/SubModBox.tscn")
+
 var MAX_SIZE = Vector2(0,0)
 
 var information_nodes = {}
@@ -35,9 +37,14 @@ var conflicts = []
 var dependancies = []
 var complementary = []
 
+var already_pressed = false
+
 func _pressed():
 	var manifestData = MOD_INFO["manifest"]["manifest_data"]
+	already_pressed = false
 	var mod_name = MOD_INFO["name"]
+	if information_nodes["info_name"].text == mod_name:
+		already_pressed = true
 	information_nodes["info_name"].text = mod_name
 	var prio = MOD_INFO["priority"]
 	if str(prio).ends_with("INF"):
@@ -110,7 +117,11 @@ func _pressed():
 		information_nodes["info_settings_button"].visible = false
 		information_nodes["info_links_button"].visible = false
 		information_nodes["info_bugreports_button"].visible = false
-	
+	if already_pressed:
+		if get_child_count() >= 2:
+			for i in range(1,get_child_count()):
+				var node = get_child(i)
+				node.visible = !node.visible
 	
 	
 
@@ -118,7 +129,29 @@ func _pressed():
 const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 
 
-
+var children = {}
+func _ready():
+	if "children" in MOD_INFO.keys():
+		children = MOD_INFO["children"]
+	
+	for i in children:
+		var pdata = children[i]
+		var panel = SubModBox.instance()
+		var pname = pdata["name"]
+		if pdata["mod_icon"]["has_icon_file"]:
+			var tex = StreamTexture.new()
+			tex.load_path = pdata["mod_icon"]["icon_path"]
+			panel.get_node("Icon").texture = tex
+		panel.get_node("ModButton/VBoxContainer/HBoxContainer/LABELS/NAME").text = pname
+		if pdata["manifest"]["has_manifest"]:
+			panel.get_node("ModButton/VBoxContainer/HBoxContainer/LABELS/BRIEF").text = pdata["manifest"]["manifest_data"]["mod_information"]["brief"]
+		else:
+			panel.get_node("ModButton/VBoxContainer/HBoxContainer/LABELS/BRIEF").text = ""
+		panel.name = pname
+		panel.visible = false
+		add_child(panel)
+#		breakpoint
+	
 
 
 var ID = null
@@ -185,9 +218,6 @@ func _draw():
 	if is_library:
 		always_display = MOD_INFO["library_information"]["always_display"]
 	var manifest = MOD_INFO["manifest"]
-	var children = {}
-	if "children" in MOD_INFO.keys():
-		children = MOD_INFO["children"]
 	if is_library:
 		button_lib_icon.visible = true
 	button_label.text = mod_name
@@ -244,7 +274,7 @@ func _draw():
 		button_children_count.visible = true
 		button_children_count.text = "%s" % children.size()
 		
-		
+		handle_sub_mods()
 	
 	
 	
@@ -281,7 +311,7 @@ onready var desc_box = ModContainer.get_node(descbox)
 		
 
 func get_button(pos):
-	return get_parent().get_child(pos).get_node(ModButton)
+	return get_parent().get_child(pos).get_node("BaseModBox/ModButton")
 
 func _refocus():
 	MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)
@@ -333,6 +363,7 @@ var cache_folder = "user://cache/.Mod_Menu_2_Cache/"
 var filter_cache_file = "menu_filter_cache.json"
 
 func _process(_delta):
+	handle_sub_mods()
 	if mod_menu_panel and mod_menu_panel.visible:
 		var manifestData = MOD_INFO["manifest"]["manifest_data"]
 		var check_against = MOD_INFO["name"].to_upper()
@@ -378,10 +409,26 @@ var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/compleme
 func _visibility_changed():
 	MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)
 	button_box.rect_size.x = button.rect_size.x - 4
-	
+	_refocus()
+	handle_sub_mods()
 #	button.focus_neighbor_top = get_path_to(upper)
 #	button.focus_neighbor_bottom = get_path_to(lower)
 	if is_visible_in_tree():
 		if get_position_in_parent() == 0:
 			
 			button.grab_focus()
+
+func handle_sub_mods():
+	var panels = get_child_count()
+	if panels >= 2:
+		for i in range(1,panels):
+			var panel = get_child(i)
+			if panel.visible:
+#				panel.rect_pivot_offset = Vector2(panel.rect_size.x / 2,panel.rect_size.y / 2)
+#				panel.rect_scale = Vector2(0.5,0.5)
+#				if i == panels - 1:
+#					panel.get_node("Label/Line2D").points.size(3)
+				
+				panel.get_node("ModButton/VBoxContainer").rect_size.x = panel.get_node("ModButton").rect_size.x - 4
+#				breakpoint
+	

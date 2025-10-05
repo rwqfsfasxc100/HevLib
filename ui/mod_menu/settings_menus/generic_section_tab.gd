@@ -8,7 +8,7 @@ var mod = ""
 
 func _draw():
 	$MarginContainer.rect_size = rect_size
-	$MarginContainer/ScrollContainer/VBoxContainer.rect_min_size = $MarginContainer.rect_size
+	$MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer.rect_min_size = $MarginContainer.rect_size
 
 
 func _ready():
@@ -25,7 +25,7 @@ func _ready():
 				input.CONFIG_ENTRY = entry
 				input.CONFIG_SECTION = name
 				input.CONFIG_MOD = mod
-				$MarginContainer/ScrollContainer/VBoxContainer.add_child(input)
+				$MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer.add_child(input)
 			"float","int","integer","real":
 				var input = INT_FLOAT.instance()
 				input.name = entry
@@ -38,7 +38,7 @@ func _ready():
 						input.val_type = "int"
 					"float","real":
 						input.val_type = "float"
-				$MarginContainer/ScrollContainer/VBoxContainer.add_child(input)
+				$MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer.add_child(input)
 			"string","str":
 				var input = STRING.instance()
 				input.name = entry
@@ -46,7 +46,7 @@ func _ready():
 				input.CONFIG_ENTRY = entry
 				input.CONFIG_SECTION = name
 				input.CONFIG_MOD = mod
-				$MarginContainer/ScrollContainer/VBoxContainer.add_child(input)
+				$MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer.add_child(input)
 			"option","optionbutton","option_button":
 				var input = OPTION.instance()
 				input.name = entry
@@ -54,7 +54,7 @@ func _ready():
 				input.CONFIG_ENTRY = entry
 				input.CONFIG_SECTION = name
 				input.CONFIG_MOD = mod
-				$MarginContainer/ScrollContainer/VBoxContainer.add_child(input)
+				$MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer.add_child(input)
 			"input":
 				var input = INPUT.instance()
 				input.name = entry
@@ -62,7 +62,7 @@ func _ready():
 				input.CONFIG_ENTRY = entry
 				input.CONFIG_SECTION = name
 				input.CONFIG_MOD = mod
-				$MarginContainer/ScrollContainer/VBoxContainer.add_child(input)
+				$MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer.add_child(input)
 	
 	
 #	breakpoint
@@ -74,3 +74,7 @@ const INT_FLOAT = preload("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/
 const STRING = preload("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/string.tscn")
 const OPTION = preload("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/option_button.tscn")
 const INPUT = preload("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/input.tscn")
+
+
+func cancel():
+	get_parent().get_parent().get_parent().get_parent().get_parent().get_parent().cancel()

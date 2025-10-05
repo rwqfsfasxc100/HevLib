@@ -117,7 +117,7 @@ func _ready():
 			mainmod.merge({"children":{}})
 			for item in groups[mod]:
 				if item != main:
-					mainmod["children"].merge({item:groups[mod]})
+					mainmod["children"].merge({item:groups[mod][item]})
 			mod_data[main] = mainmod
 		else:
 			var modgroup = groups[mod].keys()[0]
