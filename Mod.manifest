@@ -10,7 +10,7 @@ credits=["Za'krin - Mod Main design, original implementation of updateTL","space
 [version]
 
 version_major=1
-version_minor=9
+version_minor=8
 version_bugfix=0
 
 [tags]
@@ -126,4 +126,7 @@ HEVLIB_CONFIG_SECTION_INPUT={
 [manifest_definitions]
 
 manifest_version=2.2
+dependancy_mod_ids=["hev.IndustriesOfEnceladus"]
+conflicting_mod_ids=["hev.IndustriesOfEnceladus"]
+complementary_mod_ids=["hev.IndustriesOfEnceladus"]
 manifest_url="https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest"

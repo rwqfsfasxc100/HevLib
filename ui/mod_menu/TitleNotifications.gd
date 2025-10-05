@@ -7,6 +7,11 @@ func _ready():
 	$Timer.start()
 	visible = false
 var visibility = false
+
+var dependancies_store = "user://cache/.Mod_Menu_2_Cache/dependancies/dependancies.json"
+var conflicts_store = "user://cache/.Mod_Menu_2_Cache/conflicts/conflicts.json"
+var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/complementary.json"
+
 func check():
 	file.open(update_store,File.READ)
 	var update_data = JSON.parse(file.get_as_text()).result
@@ -19,8 +24,13 @@ func check():
 		height += 50
 		$NotificationBox/VBoxContainer/Updates.visible = true
 		$NotificationBox/VBoxContainer/Updates/Label.text = TranslationServer.translate("HEVLIB_UPDATE_COUNT") % update_data.keys().size()
-	var conflicts = ManifestV2.__check_conflicts()
-	var dependancies = ManifestV2.__check_dependancies()
+	
+	file.open(conflicts_store,File.READ)
+	var conflicts = JSON.parse(file.get_as_text()).result
+	file.close()
+	file.open(dependancies_store,File.READ)
+	var dependancies = JSON.parse(file.get_as_text()).result
+	file.close()
 	if conflicts.keys().size() == 0:
 		$NotificationBox/VBoxContainer/Conflicts.visible = false
 	else:

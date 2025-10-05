@@ -17,7 +17,7 @@ func _ready():
 	if de == null:
 		ConfigDriver.__store_value("HevLib","events","disabled_events",[])
 	var disabled_events = ConfigDriver.__get_value("HevLib","events","disabled_events")
-	var write_events = Settings.HevLib["events"]["write_events"]
+	var write_events = ConfigDriver.__get_value("HevLib","events","write_events")
 	
 	for kid in get_children():
 		var kidName = kid.name

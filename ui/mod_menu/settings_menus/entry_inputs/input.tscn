@@ -19,17 +19,19 @@ theme = ExtResource( 5 )
 script = ExtResource( 4 )
 
 [node name="Label" type="Label" parent="."]
-margin_top = 6.0
 margin_right = 301.0
-margin_bottom = 44.0
+margin_bottom = 50.0
 size_flags_horizontal = 3
+size_flags_vertical = 1
 text = "BOOL_NAME_MISSING"
+valign = 1
 
 [node name="LABELBUTTON" parent="Label" instance=ExtResource( 1 )]
 margin_right = 10.0
 margin_bottom = 50.0
 rect_min_size = Vector2( 300, 50 )
 theme = ExtResource( 5 )
+flat = true
 
 [node name="SmoothScrollTo" parent="Label/LABELBUTTON" instance=ExtResource( 2 )]
 focusAt = NodePath("../..")

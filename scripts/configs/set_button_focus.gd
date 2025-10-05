@@ -72,9 +72,9 @@ static func set_button_focus(button,check_button):
 			"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/string.gd":
 				check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("LineEdit"))
 			"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/option_button.gd":
-				check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos - 1).get_node("OptionButton"))
+				check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("OptionButton"))
 			"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/input.gd":
-				check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos - 1).get_node("Label/LABELBUTTON"))
+				check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("Label/LABELBUTTON"))
 			_:
 				breakpoint
 	else:
@@ -95,9 +95,9 @@ static func set_button_focus(button,check_button):
 			"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/string.gd":
 				check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("LineEdit"))
 			"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/option_button.gd":
-				check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos - 1).get_node("OptionButton"))
+				check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("OptionButton"))
 			"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/input.gd":
-				check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos - 1).get_node("Label/LABELBUTTON"))
+				check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("Label/LABELBUTTON"))
 			_:
 				breakpoint
 

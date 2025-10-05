@@ -29,10 +29,18 @@ var file = File.new()
 var update_urls = PoolStringArray([])
 var url_store = "user://cache/.Mod_Menu_2_Cache/updates/url_refs.json"
 var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
+
+var dependancies_store = "user://cache/.Mod_Menu_2_Cache/dependancies/dependancies.json"
+var conflicts_store = "user://cache/.Mod_Menu_2_Cache/conflicts/conflicts.json"
+var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/complementary.json"
+
 func _ready():
 	l("Readying")
 	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/")
+	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/dependancies/")
+	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/conflicts/")
+	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/complementary/")
 	
 	file.open(url_store,File.WRITE)
 	file.store_string("[]")
@@ -63,8 +71,19 @@ func _ready():
 				http.request(url)
 				update_urls.append(pm["manifest"]["manifest_data"]["mod_information"]["id"])
 
+	var conflicts = ManifestV2.__check_conflicts()
+	var dependancies = ManifestV2.__check_dependancies()
+	var complementary = ManifestV2.__check_complementary()
 	
-	
+	file.open(conflicts_store,File.WRITE)
+	file.store_string(JSON.print(conflicts))
+	file.close()
+	file.open(dependancies_store,File.WRITE)
+	file.store_string(JSON.print(dependancies))
+	file.close()
+	file.open(complementary_store,File.WRITE)
+	file.store_string(JSON.print(complementary))
+	file.close()
 	
 	var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
 	ConfigDriver.__load_configs()
