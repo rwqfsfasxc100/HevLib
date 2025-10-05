@@ -27,10 +27,13 @@ func _init(modLoader = ModLoader):
 
 var file = File.new()
 var update_urls = PoolStringArray([])
-var url_store = "user://cache/.HevLib_Cache/url_refs.json"
-var update_store = "user://cache/.HevLib_Cache/needs_updates.json"
+var url_store = "user://cache/.Mod_Menu_2_Cache/updates/url_refs.json"
+var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
 func _ready():
 	l("Readying")
+	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
+	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/")
+	
 	file.open(url_store,File.WRITE)
 	file.store_string("[]")
 	file.close()
@@ -56,10 +59,10 @@ func _ready():
 				http.connect("request_completed",self,"network_return")
 				add_child(http)
 				http.timeout = 20
-				
+
 				http.request(url)
 				update_urls.append(pm["manifest"]["manifest_data"]["mod_information"]["id"])
-				
+
 	
 	
 	
@@ -91,7 +94,7 @@ func _ready():
 	file.open("user://cache/.HevLib_Cache/currently_installed_mods.json", File.WRITE)
 	file.store_string(str(mod_data))
 	file.close()
-	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
+	
 	var cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/"
 	replaceScene("scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
 #	var CRoot = get_tree().get_root()
@@ -200,9 +203,12 @@ func network_return(result, response_code,headers,body):
 		var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
 		var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
 		var p = body.get_string_from_utf8()
-		var path = "user://cache/.HevLib_Cache/network_manifest.cfg"
-		var path2 = "user://cache/.HevLib_Cache/network_manifest.json"
-		file.open(path,File.WRITE)
+		var path = "user://cache/.Mod_Menu_2_Cache/updates/network_manifest_%s.cfg"
+		var path2 = "user://cache/.Mod_Menu_2_Cache/updates/network_manifest.json"
+		var id = 0
+		for i in body:
+			id += i
+		file.open(path % id,File.WRITE)
 		file.store_string(p)
 		file.close()
 		file.open(url_store,File.READ)
@@ -212,7 +218,7 @@ func network_return(result, response_code,headers,body):
 #		file.open(path2,File.WRITE)
 #		file.store_string(JSON.print(data))
 #		file.close()
-		var manifest = ManifestV2.__parse_file_as_manifest(path,true)
+		var manifest = ManifestV2.__parse_file_as_manifest(path % id,true)
 		var DataFormat = load("res://HevLib/pointers/DataFormat.gd")
 		for item in current:
 			if item[1] in update_urls:
@@ -220,9 +226,9 @@ func network_return(result, response_code,headers,body):
 				var nv2 = manifest["version"]["version_minor"]
 				var nv3 = manifest["version"]["version_bugfix"]
 				var does = DataFormat.__compare_versions(item[2],item[3],item[4],nv1,nv2,nv3)
-				if does:
+				if not does and item[1] == manifest["mod_information"]["id"]:
 					file.open(update_store,File.READ_WRITE)
 					var updates = JSON.parse(file.get_as_text()).result
-					updates.merge({item[1]:{"name":item[0],"id":item[1],"version":[item[2],item[3],item[4]],"display":item[0] + " (" + item[1] + ")"}})
+					updates.merge({item[1]:{"name":item[0],"id":item[1],"version":[item[2],item[3],item[4]],"new_version":[nv1,nv2,nv3],"display":item[0] + " (" + item[1] + ")"}})
 					file.store_string(JSON.print(updates))
 					file.close()

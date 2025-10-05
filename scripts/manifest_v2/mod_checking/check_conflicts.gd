@@ -12,5 +12,6 @@ static func check_conflicts():
 			for item in keys:
 				if item in mods:
 					items.append(item)
-			complimentaries.merge({mod:items})
+			if items.size() >= 1:
+				complimentaries.merge({mod:items})
 	return complimentaries

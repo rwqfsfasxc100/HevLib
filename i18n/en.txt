@@ -227,3 +227,11 @@ HEVLIB_CONFIG_SECTION_DRIVERS|Drivers
 HEVLIB_CONFIG_SECTION_DEBUG|Debug
 
 HEVLIB_CONFIG_SECTION_INPUT|Binds
+
+HEVLIB_NOTIFICATIONS|Mod Notifications
+
+HEVLIB_UPDATE_COUNT|%s mod(s) are in need of updates!
+
+HEVLIB_DEPENDANCY_COUNT|%s mod(s) are missing dependancies!
+
+HEVLIB_CONFLICT_COUNT|%s mod(s) are in conflict!

@@ -24,6 +24,10 @@ func _physics_process(delta):
 		var nnd = load("res://HevLib/ui/core_scripts/get_nodes_to_act_on.gd").new()
 		var pnt = nnd.get_nodes_to_act_on(data, Vector2(1600,900))
 
+
+const DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
+
+
 func _on_Button_pressed():
 	rng.randomize()
 	var Translations = preload("res://HevLib/pointers/Translations.gd")
@@ -159,7 +163,9 @@ func _on_Button_pressed():
 	
 	
 	
-	
+	var compare = DataFormat.__compare_versions(1,0,0,1,0,1)
+	var compare2 = DataFormat.__compare_versions(1,0,1,1,0,1)
+	var compare3 = DataFormat.__compare_versions(1,0,2,1,0,1)
 	
 	
 	

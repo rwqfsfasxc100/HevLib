@@ -1,0 +1,161 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://HevLib/ui/themes/font-courierbold.tres" type="DynamicFont" id=1]
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=2]
+[ext_resource path="res://HevLib/ui/mod_menu/TitleNotifications.gd" type="Script" id=3]
+
+[sub_resource type="StreamTexture" id=1]
+flags = 4
+load_path = "res://.import/warning-overlay.png-be42a86fade8ccba15678c65ff71dde5.stex"
+
+[sub_resource type="Animation" id=2]
+resource_name = "Blink"
+length = 2.0
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.6, 0.8, 1 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 0.164706, 0.25098 ), Color( 1, 1, 0.164706, 0.25098 ), Color( 1, 1, 0.164706, 1 ), Color( 1, 1, 0.164706, 0.25098 ) ]
+}
+
+[sub_resource type="Animation" id=3]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 0.164706, 0.25098 ) ]
+}
+
+[node name="Notifications" type="Button"]
+margin_left = 911.0
+margin_right = 961.0
+margin_bottom = 41.0
+rect_min_size = Vector2( 50, 41 )
+script = ExtResource( 3 )
+
+[node name="ICON" type="TextureRect" parent="."]
+modulate = Color( 1, 1, 0.164706, 0.25098 )
+margin_top = -5.0
+margin_right = 50.0
+margin_bottom = 45.0
+texture = SubResource( 1 )
+expand = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="ICON"]
+autoplay = "Blink"
+anims/Blink = SubResource( 2 )
+anims/RESET = SubResource( 3 )
+
+[node name="NotificationBox" type="PanelContainer" parent="."]
+margin_left = -300.0
+margin_top = -55.0
+margin_right = 50.0
+margin_bottom = 5.0
+grow_horizontal = 0
+grow_vertical = 0
+rect_min_size = Vector2( 50, 60 )
+size_flags_horizontal = 2
+size_flags_vertical = 4
+theme = ExtResource( 2 )
+
+[node name="ColorRect" type="ColorRect" parent="NotificationBox"]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 345.0
+margin_bottom = 55.0
+size_flags_horizontal = 5
+size_flags_vertical = 5
+color = Color( 0, 0, 0, 0.980392 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="NotificationBox"]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 345.0
+margin_bottom = 45.0
+size_flags_horizontal = 3
+size_flags_vertical = 0
+
+[node name="Title" type="Label" parent="NotificationBox/VBoxContainer"]
+margin_right = 340.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 0, 40 )
+custom_constants/shadow_offset_x = 0
+custom_constants/shadow_offset_y = 0
+custom_fonts/font = ExtResource( 1 )
+text = "HEVLIB_NOTIFICATIONS"
+align = 1
+
+[node name="Updates" type="HBoxContainer" parent="NotificationBox/VBoxContainer"]
+visible = false
+margin_top = 54.0
+margin_right = 324.0
+margin_bottom = 104.0
+rect_min_size = Vector2( 0, 50 )
+
+[node name="Label" type="Label" parent="NotificationBox/VBoxContainer/Updates"]
+margin_top = 10.0
+margin_right = 324.0
+margin_bottom = 39.0
+size_flags_horizontal = 3
+custom_constants/shadow_offset_x = 0
+custom_constants/shadow_offset_y = 0
+custom_fonts/font = ExtResource( 1 )
+align = 2
+
+[node name="Conflicts" type="HBoxContainer" parent="NotificationBox/VBoxContainer"]
+visible = false
+margin_top = 54.0
+margin_right = 324.0
+margin_bottom = 104.0
+rect_min_size = Vector2( 0, 50 )
+
+[node name="Label" type="Label" parent="NotificationBox/VBoxContainer/Conflicts"]
+margin_top = 10.0
+margin_right = 324.0
+margin_bottom = 39.0
+size_flags_horizontal = 3
+custom_constants/shadow_offset_x = 0
+custom_constants/shadow_offset_y = 0
+custom_fonts/font = ExtResource( 1 )
+align = 2
+
+[node name="Dependancies" type="HBoxContainer" parent="NotificationBox/VBoxContainer"]
+visible = false
+margin_top = 54.0
+margin_right = 324.0
+margin_bottom = 104.0
+rect_min_size = Vector2( 0, 50 )
+
+[node name="Label" type="Label" parent="NotificationBox/VBoxContainer/Dependancies"]
+margin_top = 10.0
+margin_right = 324.0
+margin_bottom = 39.0
+size_flags_horizontal = 3
+custom_constants/shadow_offset_x = 0
+custom_constants/shadow_offset_y = 0
+custom_fonts/font = ExtResource( 1 )
+align = 2
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
+[connection signal="focus_entered" from="." to="." method="_focus_entered"]
+[connection signal="focus_exited" from="." to="." method="_focus_exited"]
+[connection signal="mouse_entered" from="." to="." method="_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_mouse_exited"]
+[connection signal="timeout" from="Timer" to="." method="_timeout"]

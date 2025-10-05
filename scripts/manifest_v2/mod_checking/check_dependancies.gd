@@ -14,5 +14,6 @@ static func check_dependancies():
 					pass
 				else:
 					items.append(item)
-			complimentaries.merge({mod:items})
+			if items.size() >= 1:
+				complimentaries.merge({mod:items})
 	return complimentaries

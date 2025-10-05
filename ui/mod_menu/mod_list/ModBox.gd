@@ -205,15 +205,15 @@ func _draw():
 		if pos == 0:
 			button.grab_focus()
 	
-	conflicts = ManifestV2.__check_mod_conflicts(ID)
-	dependancies = ManifestV2.__check_mod_dependancies(ID)
-	complementary = ManifestV2.__check_mod_complementary(ID)
-	if conflicts:
-		$Icon/Control/Conflicts.visible = true
-	if dependancies:
-		$Icon/Control/Dependancies.visible = true
-	if complementary:
-		$Icon/Control/Complementary.visible = true
+#	conflicts = ManifestV2.__check_mod_conflicts(ID)
+#	dependancies = ManifestV2.__check_mod_dependancies(ID)
+#	complementary = ManifestV2.__check_mod_complementary(ID)
+#	if conflicts:
+#		$Icon/Control/Conflicts.visible = true
+#	if dependancies:
+#		$Icon/Control/Dependancies.visible = true
+#	if complementary:
+#		$Icon/Control/Complementary.visible = true
 	
 	
 	

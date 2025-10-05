@@ -35,7 +35,7 @@ var developer_hint = {
 		"get_from_files -> (optional) bool deciding whether to get the version from the files. Generally slower than it being disabled, however is the only way to get it before the onready phase. Only works in debug builds due to bytecode compiled data"
 	],
 	"__compare_versions":[
-		"Compares two sets of versions. If the first one is newer, returns true, otherwise returns false",
+		"Compares two sets of versions. If the first one is equal to or newer, returns true, otherwise returns false",
 		"First three int inputs are the major, minor and bugfix for the first version",
 		"Second three int inputs are the major, minor and bugfix for the second version",
 	]
