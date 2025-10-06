@@ -32,6 +32,13 @@ var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 func _init(modLoader = ModLoader):
 	l("Initializing Equipment Driver")
 	
+	var minerals = preload("res://HevLib/scenes/minerals/make_mineral_scripting.gd")
+	minerals.make_mineral_scripting(false)
+	
+	
+	
+	
+	
 	# Adds in_hevlib_menu to the CurrentGame script and preventing controls while it's true
 	installScriptExtension("../../events/controls/CurrentGame.gd")
 	installScriptExtension("../../events/controls/ship-ctrl.gd")

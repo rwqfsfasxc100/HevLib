@@ -53,9 +53,9 @@ func make_upgrades_scene(is_onready: bool = true):
 	var processed_storage_file = FILE_PATHS[9]
 	var node_definitions_file = FILE_PATHS[10]
 	var ship_node_register_file = FILE_PATHS[11]
-	
+	var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 	if is_onready:
-		var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
+		
 		var version = DataFormat.__get_vanilla_version()
 		var text = "HevLib make_upgrades_scene manager: observed game version of %s"  % str(version)
 		Debug.l(text)
