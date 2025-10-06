@@ -37,7 +37,7 @@ var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/compleme
 func _ready():
 	l("Readying")
 	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
-	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/")
+	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/")
 	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/dependancies/")
 	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/conflicts/")
 	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/complementary/")
@@ -222,7 +222,7 @@ func network_return(result, response_code,headers,body):
 		var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
 		var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
 		var p = body.get_string_from_utf8()
-		var path = "user://cache/.Mod_Menu_2_Cache/updates/network_manifest_%s.cfg"
+		var path = "user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/network_manifest_%s.cfg"
 		var path2 = "user://cache/.Mod_Menu_2_Cache/updates/network_manifest.json"
 		var id = 0
 		for i in body:
