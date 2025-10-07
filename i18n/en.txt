@@ -247,3 +247,7 @@ HEVLIB_UPDATE_ALL|Update all mods
 HEVLIB_IGNORE_UPDATE|Ignore update
 
 HEVLIB_UPDATE_MOD|Update mod
+
+HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD|Update the selected mod [%s]? \n\nThis may take a while, depending on the size of the mod.
+
+HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MOD_UPDATE|Ignore the update for mod [%s] to version [%s]? \n\nThis decision can be reset in the mod menu config.

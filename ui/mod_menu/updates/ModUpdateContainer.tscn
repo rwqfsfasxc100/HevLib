@@ -11,7 +11,7 @@ theme = ExtResource( 1 )
 script = ExtResource( 2 )
 
 [node name="ModInfo" type="HBoxContainer" parent="."]
-margin_right = 460.0
+margin_right = 456.0
 margin_bottom = 60.0
 size_flags_horizontal = 3
 
@@ -22,8 +22,8 @@ margin_bottom = 49.0
 text = "MOD_NAME_HERE"
 
 [node name="Buttons" type="HBoxContainer" parent="."]
-margin_left = 464.0
-margin_right = 1100.0
+margin_left = 460.0
+margin_right = 1096.0
 margin_bottom = 60.0
 
 [node name="Ignore" type="Button" parent="Buttons"]
@@ -36,3 +36,27 @@ margin_left = 341.0
 margin_right = 636.0
 margin_bottom = 60.0
 text = "HEVLIB_UPDATE_MOD"
+
+[node name="Popups" type="Control" parent="."]
+margin_bottom = 60.0
+
+[node name="IgnorePopup" type="ConfirmationDialog" parent="Popups"]
+margin_right = 300.0
+margin_bottom = 105.0
+rect_min_size = Vector2( 450, 250 )
+popup_exclusive = true
+window_title = "Ignore mod?"
+dialog_text = "HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MOD_UPDATE"
+dialog_autowrap = true
+
+[node name="UpdatePopup" type="ConfirmationDialog" parent="Popups"]
+margin_right = 300.0
+margin_bottom = 105.0
+rect_min_size = Vector2( 450, 250 )
+popup_exclusive = true
+window_title = "Update mod?"
+dialog_text = "HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD"
+dialog_autowrap = true
+
+[connection signal="pressed" from="Buttons/Ignore" to="." method="_Ignore_pressed"]
+[connection signal="pressed" from="Buttons/Update" to="." method="_Update_pressed"]

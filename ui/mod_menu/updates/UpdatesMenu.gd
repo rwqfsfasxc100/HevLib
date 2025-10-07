@@ -21,6 +21,9 @@ func _about_to_show():
 	for mod in update_data:
 		var md = update_data[mod]
 		var info = ManifestV2.__get_mod_by_id(mod)
+		var display_name = md["display"]
+		var old_version = md["version"]
+		var new_version = md["new_version"]
 		breakpoint
 	
 	lastFocus = get_focus_owner()
