@@ -86,7 +86,6 @@ func _ready():
 	file.close()
 	
 	var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
-	ConfigDriver.__load_configs()
 #	replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
 	var p = load("res://ModLoader.gd")
 	var ps = p.get_script_constant_map()
@@ -100,7 +99,7 @@ func _ready():
 #	var mouse = load("res://HevLib/scenes/scene_replacements/MouseLayer.tscn").instance()
 	var CRoot = get_tree().get_root()
 #	CRoot.call_deferred("add_child",mouse)
-	replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
+	
 	replaceScene("scenes/scene_replacements/Game.tscn", "res://Game.tscn")
 	var dir = Directory.new()
 	dir.make_dir_recursive("user://cache/.HevLib_Cache/")

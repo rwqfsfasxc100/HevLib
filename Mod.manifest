@@ -72,6 +72,12 @@ HEVLIB_CONFIG_SECTION_DRIVERS={
 		"type":"bool",
 		"default":false
 	},
+	"randomize_minerals":{
+		"name":"HEVLIB_CONFIG_RANDOMIZE_MINERALS",
+		"description":"HEVLIB_CONFIG_RANDOMIZE_MINERALS_TOOLTIP",
+		"type":"bool",
+		"default":true
+	},
 }
 HEVLIB_CONFIG_SECTION_DEBUG={
 	"input_debugger":{

@@ -235,3 +235,7 @@ HEVLIB_UPDATE_COUNT|%s mod(s) are in need of updates!
 HEVLIB_DEPENDANCY_COUNT|%s mod(s) are missing dependancies!
 
 HEVLIB_CONFLICT_COUNT|%s mod(s) are in conflict!
+
+HEVLIB_CONFIG_RANDOMIZE_MINERALS|Randomize mineral seed
+
+HEVLIB_CONFIG_RANDOMIZE_MINERALS_TOOLTIP|Randomizes the mineral seeds upon every game launch. \n\nIf false, uses a predetermined array of constants for mineral seeds

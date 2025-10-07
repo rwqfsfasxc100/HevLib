@@ -1,0 +1,44 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://HevLib/scenes/minerals/mineral.gd" type="Script" id=0]
+[ext_resource path="res://asteroids/mineral.material" type="Material" id=1]
+[ext_resource path="res://HevLib/scenes/minerals/icons/minerals-c-nocolor.stex" type="StreamTexture" id=2]
+[ext_resource path="res://asteroids/minerals-n.png" type="Texture" id=3]
+[ext_resource path="res://lights/distant-proxy.png" type="Texture" id=4]
+
+[sub_resource type="CircleShape2D" id=1]
+radius = 10.4048
+
+[node name="mineral" type="RigidBody2D"]
+mass = 14.0
+script = ExtResource( 0 )
+purity = 0.74
+mineral = "V"
+
+[node name="Sprite" type="Sprite" parent="."]
+material = ExtResource( 1 )
+scale = Vector2( 0.25, 0.25 )
+texture = ExtResource( 2 )
+normal_map = ExtResource( 3 )
+region_enabled = true
+region_rect = Rect2( 146, 1096, 146, 146 )
+
+[node name="Light2D" type="Light2D" parent="."]
+position = Vector2( -95.3953, -318.615 )
+editor_only = true
+texture = ExtResource( 4 )
+energy = 5.0
+range_height = 100.0
+
+[node name="Light2D2" type="Light2D" parent="."]
+position = Vector2( 604.685, 536.586 )
+editor_only = true
+texture = ExtResource( 4 )
+color = Color( 0, 0.179688, 1, 1 )
+energy = 5.0
+range_height = -100.0
+
+[node name="Collision" type="CollisionShape2D" parent="."]
+light_mask = 0
+z_index = 20
+shape = SubResource( 1 )

@@ -9,15 +9,15 @@ var cache_folder = "user://cache/.HevLib_Cache/"
 func _ready():
 	image = map.get_data()
 	size = image.get_size()
-	
+	breakpoint
 	veinImage = veins.get_data()
 	veinSize = veinImage.get_size()
 	
-	var de = ConfigDriver.__get_value("HevLib","events","disabled_events")
+	var de = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
 	if de == null:
-		ConfigDriver.__store_value("HevLib","events","disabled_events",[])
-	var disabled_events = ConfigDriver.__get_value("HevLib","events","disabled_events")
-	var write_events = ConfigDriver.__get_value("HevLib","events","write_events")
+		ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
+	var disabled_events = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
+	var write_events = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","write_events")
 	
 	for kid in get_children():
 		var kidName = kid.name

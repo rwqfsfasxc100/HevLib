@@ -27,14 +27,31 @@ var upgrades_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrade
 var weaponslot_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot.tscn"
 var aux_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/AuxSlot.tscn"
 
-var Equipment = preload("res://HevLib/pointers/Equipment.gd")
+var asteroid_path = "user://cache/.HevLib_Cache/Minerals/AsteroidSpawner.gd"
+var currentgame_path = "user://cache/.HevLib_Cache/Minerals/CurrentGame.gd"
+var thering_path = "user://cache/.HevLib_Cache/Minerals/TheRing.gd"
+var ringscene_path = "user://cache/.HevLib_Cache/Minerals/TheRing.tscn"
 
+var Equipment = preload("res://HevLib/pointers/Equipment.gd")
+var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 func _init(modLoader = ModLoader):
 	l("Initializing Equipment Driver")
+	
+	
+	
 	
 	var minerals = preload("res://HevLib/scenes/minerals/make_mineral_scripting.gd")
 	minerals.make_mineral_scripting(false)
 	
+	var asteroids = ResourceLoader.load(asteroid_path)
+	asteroids.new()
+	asteroids.take_over_path("res://AsteroidSpawner.gd")
+	_savedObjects.append(asteroids)
+	
+	var cg = ResourceLoader.load(currentgame_path)
+	cg.new()
+	cg.take_over_path("res://CurrentGame.gd")
+	_savedObjects.append(cg)
 	
 	
 	
@@ -67,8 +84,23 @@ func _init(modLoader = ModLoader):
 	
 func _ready():
 	l("Readying")
+	ConfigDriver.__load_configs()
 	
 	
+	var ring = preload("res://HevLib/scenes/minerals/make_ring_modifications.gd")
+	ring.make_ring_modifications()
+	
+	var tr = ResourceLoader.load(thering_path)
+	tr.new()
+	tr.take_over_path("res://TheRing.gd")
+	_savedObjects.append(tr)
+	var f = File.new()
+	f.open(ringscene_path,File.WRITE)
+	f.store_string("[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"%s\" type=\"Script\" id=1]\n[ext_resource path=\"res://story/TheRing.tscn\" type=\"PackedScene\" id=2]\n\n[node name=\"TheRing\" instance=ExtResource( 2 )]\nscript = ExtResource( 1 )\n" % thering_path)
+	f.close()
+	var rs := load(ringscene_path)
+	rs.take_over_path("res://story/TheRing.tscn")
+	_savedObjects.append(rs)
 	
 	
 	

@@ -163,13 +163,32 @@ func _on_Button_pressed():
 	
 	
 	
-	var compare = DataFormat.__compare_versions(1,0,0,1,0,1)
-	var compare2 = DataFormat.__compare_versions(1,0,1,1,0,1)
-	var compare3 = DataFormat.__compare_versions(1,0,2,1,0,1)
-	
-	
-	
-	
+#	var compare = DataFormat.__compare_versions(1,0,0,1,0,1)
+#	var compare2 = DataFormat.__compare_versions(1,0,1,1,0,1)
+#	var compare3 = DataFormat.__compare_versions(1,0,2,1,0,1)
+#
+#	var minerals = load("res://HevLib/scenes/minerals/icons/minerals-c-overlay.png")
+#	var md = minerals.get_data()
+#	md.lock()
+#	var img = Image.new()
+#	img.create(1024,2048,false,Image.FORMAT_RGBA8)
+#	img.lock()
+#	var img2 = Image.new()
+#	img2.create(1024,2048,false,Image.FORMAT_RGBA8)
+#	img2.lock()
+#	for x in range(0,1024):
+#		for y in range(0,2048):
+#			var p = md.get_pixel(x, y)
+#			if p.r == 0.0 and p.g == 0.0 and p.b == 0.0:
+#				img.set_pixel(x,y,Color(0,0,0,0))
+#			else:
+#				img.set_pixel(x,y,p)
+#	md.unlock()
+#	img.unlock()
+#	img2.unlock()
+#	img.save_png("user://cache/.HevLib_Cache/equal.png")
+#	img2.save_png("user://cache/.HevLib_Cache/unequal.png")
+#
 	
 	breakpoint
 

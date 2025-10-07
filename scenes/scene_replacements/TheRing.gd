@@ -1,5 +1,8 @@
 extends "res://TheRing.gd"
 
+func _ready():
+	breakpoint
+
 #var event_names = {}
 
 #func _ready():
