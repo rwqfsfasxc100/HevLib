@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=1]
+[ext_resource path="res://HevLib/ui/mod_menu/updates/ModUpdateContainer.gd" type="Script" id=2]
+
+[node name="ModUpdateContainer" type="HBoxContainer"]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 1100, 60 )
+theme = ExtResource( 1 )
+script = ExtResource( 2 )
+
+[node name="ModInfo" type="HBoxContainer" parent="."]
+margin_right = 460.0
+margin_bottom = 60.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="ModInfo"]
+margin_top = 11.0
+margin_right = 243.0
+margin_bottom = 49.0
+text = "MOD_NAME_HERE"
+
+[node name="Buttons" type="HBoxContainer" parent="."]
+margin_left = 464.0
+margin_right = 1100.0
+margin_bottom = 60.0
+
+[node name="Ignore" type="Button" parent="Buttons"]
+margin_right = 337.0
+margin_bottom = 60.0
+text = "HEVLIB_IGNORE_UPDATE"
+
+[node name="Update" type="Button" parent="Buttons"]
+margin_left = 341.0
+margin_right = 636.0
+margin_bottom = 60.0
+text = "HEVLIB_UPDATE_MOD"
