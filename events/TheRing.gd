@@ -9,7 +9,7 @@ var cache_folder = "user://cache/.HevLib_Cache/"
 func _ready():
 	image = map.get_data()
 	size = image.get_size()
-	breakpoint
+	
 	veinImage = veins.get_data()
 	veinSize = veinImage.get_size()
 	
