@@ -187,6 +187,7 @@ func _draw():
 		icon_updates.visible = false
 	if ID in conf:
 		icon_conflicts.visible = true
+		icon_conflicts.hint_tooltip == TranslationServer.translate("HEVLIB_ICON_TOOLTIP_CONFLICT") % ""
 	else:
 		icon_conflicts.visible = false
 	if ID in dep:

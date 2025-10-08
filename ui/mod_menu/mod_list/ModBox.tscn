@@ -176,6 +176,7 @@ margin_bottom = 100.0
 modulate = Color( 1, 1, 0.164706, 0.25098 )
 margin_right = 49.0
 margin_bottom = 49.0
+mouse_filter = 0
 texture = SubResource( 2 )
 expand = true
 
