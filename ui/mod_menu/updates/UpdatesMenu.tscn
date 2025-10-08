@@ -4,7 +4,6 @@
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=2]
 
 [node name="UpdatesMenu" type="Popup"]
-visible = true
 margin_right = 40.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 1280, 720 )

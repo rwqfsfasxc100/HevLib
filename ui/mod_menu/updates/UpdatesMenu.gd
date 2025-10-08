@@ -10,6 +10,8 @@ var file = File.new()
 
 const ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 
+const update_container = preload("res://HevLib/ui/mod_menu/updates/ModUpdateContainer.tscn")
+
 func _about_to_show():
 	for child in container.get_children():
 		Tool.remove(child)
@@ -19,11 +21,13 @@ func _about_to_show():
 	file.close()
 	
 	for mod in update_data:
+		var c = update_container.instance()
 		var md = update_data[mod]
 		var info = ManifestV2.__get_mod_by_id(mod)
 		var display_name = md["display"]
 		var old_version = md["version"]
 		var new_version = md["new_version"]
+		c.get_node("ModInfo/Label").text = display_name
 		breakpoint
 	
 	lastFocus = get_focus_owner()

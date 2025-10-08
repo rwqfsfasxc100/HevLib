@@ -38,6 +38,8 @@ margin_bottom = 60.0
 text = "HEVLIB_UPDATE_MOD"
 
 [node name="Popups" type="Control" parent="."]
+margin_left = 1100.0
+margin_right = 1100.0
 margin_bottom = 60.0
 
 [node name="IgnorePopup" type="ConfirmationDialog" parent="Popups"]
