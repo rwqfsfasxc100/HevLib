@@ -45,7 +45,8 @@ func _on_release_request_completed(result, response_code, headers, body):
 				if not isLatest:
 					acceptable = false
 			if file_to_download == "all":
-				pass  # IMPLEMENT HANDLING FOR "ALL" TAG
+				Debug.l("HevLib Github Release Downloader: ERROR! IMPLEMENT HANDLING FOR \"ALL\" TAG")
+				breakpoint  # IMPLEMENT HANDLING FOR "ALL" TAG
 			if acceptable:
 				urlToFetch.append(item[0])
 				break
@@ -53,7 +54,9 @@ func _on_release_request_completed(result, response_code, headers, body):
 		if urlToFetch.size() == 1:
 			downloadZip(urlToFetch[0], folder)
 		elif urlToFetch.size() >= 2:
-			pass # IMPLEMENT HANDLING FOR "ALL" TAG
+			Debug.l("HevLib Github Release Downloader: ERROR! IMPLEMENT HANDLING FOR \"ALL\" TAG")
+			
+			breakpoint # IMPLEMENT HANDLING FOR "ALL" TAG
 
 func checkIfAcceptable(n):
 	if n["draft"]:
