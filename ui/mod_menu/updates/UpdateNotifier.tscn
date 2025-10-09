@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=1]
+[ext_resource path="res://HevLib/ui/mod_menu/updates/UpdateNotifier.gd" type="Script" id=2]
+
+[node name="UpdateNotifier" type="ConfirmationDialog"]
+margin_right = 200.0
+margin_bottom = 70.0
+rect_min_size = Vector2( 400, 250 )
+theme = ExtResource( 1 )
+popup_exclusive = true
+window_title = "Update mods?"
+dialog_text = "HEVLIB_MODMENU_UPDATE_NOTIFIER"
+dialog_autowrap = true
+script = ExtResource( 2 )
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.1
+one_shot = true
+
+[connection signal="about_to_show" from="." to="." method="_about_to_show"]
+[connection signal="confirmed" from="." to="." method="_confirmed"]
+[connection signal="timeout" from="Timer" to="." method="show_menu"]

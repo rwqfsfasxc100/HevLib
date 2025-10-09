@@ -1,9 +1,7 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://TitleScreen.tscn" type="PackedScene" id=1]
 [ext_resource path="res://HevLib/testbutton.gd" type="Script" id=2]
-[ext_resource path="res://HevLib/ui/mod_menu/ModMenu.tscn" type="PackedScene" id=3]
-[ext_resource path="res://HevLib/ui/mod_menu/ModNotificationButton.tscn" type="PackedScene" id=4]
 
 [node name="TitleScreen" instance=ExtResource( 1 )]
 
@@ -13,54 +11,36 @@ anchor_bottom = 0.0
 margin_right = 1280.0
 margin_bottom = 720.0
 
-[node name="ModMenu" parent="MenuLayer/TitleMenu/NoMargins" index="4" instance=ExtResource( 3 )]
-margin_right = 1280.0
-margin_bottom = 720.0
-
 [node name="MarginContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer" index="0"]
-margin_bottom = 270.0
+margin_bottom = 315.0
 
 [node name="Logo" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer" index="0"]
-margin_bottom = 270.0
+margin_bottom = 315.0
 
 [node name="SteamAwardsNomination2022" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer" index="1"]
-margin_bottom = 270.0
+margin_bottom = 315.0
 
 [node name="SteamAwards" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer/SteamAwardsNomination2022" index="0"]
-margin_top = 25.0
-margin_bottom = 245.0
+margin_top = 47.0
+margin_bottom = 267.0
 
 [node name="HBoxContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer" index="1"]
-margin_top = 274.0
-margin_bottom = 585.0
+margin_top = 319.0
+margin_bottom = 630.0
 
 [node name="MarginContainer2" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer" index="2"]
-margin_top = 589.0
+margin_top = 634.0
 
 [node name="GridContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2" index="0"]
-margin_bottom = 131.0
+margin_bottom = 86.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2/GridContainer" index="1"]
+[node name="Button" type="Button" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2/GridContainer" index="1"]
 margin_top = 45.0
 margin_right = 961.0
 margin_bottom = 86.0
-
-[node name="ModMenu" type="Button" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2/GridContainer/HBoxContainer" index="0"]
-margin_right = 907.0
-margin_bottom = 41.0
-size_flags_horizontal = 3
-text = "HEVLIB_MOD_MENU"
-
-[node name="Notifications" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2/GridContainer/HBoxContainer" index="1" instance=ExtResource( 4 )]
-
-[node name="Button" type="Button" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2/GridContainer" index="2"]
-margin_top = 90.0
-margin_right = 961.0
-margin_bottom = 131.0
 text = "HevLib Test Button"
 script = ExtResource( 2 )
 
-[connection signal="pressed" from="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2/GridContainer/HBoxContainer/ModMenu" to="MenuLayer/TitleMenu/NoMargins/ModMenu" method="show_menu"]
 [connection signal="pressed" from="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2/GridContainer/Button" to="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2/GridContainer/Button" method="_on_Button_pressed"]
 
 [editable path="AsteroidField"]

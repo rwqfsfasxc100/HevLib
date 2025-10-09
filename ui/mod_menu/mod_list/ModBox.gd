@@ -183,19 +183,34 @@ func _draw():
 	
 	if ID in updt:
 		icon_updates.visible = true
+		icon_updates.hint_tooltip = TranslationServer.translate("HEVLIB_ICON_TOOLTIP_UPDATES") % [str(updt[ID]["version"][0])+"."+str(updt[ID]["version"][1])+"."+str(updt[ID]["version"][2]),str(updt[ID]["new_version"][0])+"."+str(updt[ID]["new_version"][1])+"."+str(updt[ID]["new_version"][2])]
 	else:
 		icon_updates.visible = false
 	if ID in conf:
 		icon_conflicts.visible = true
-		icon_conflicts.hint_tooltip == TranslationServer.translate("HEVLIB_ICON_TOOLTIP_CONFLICT") % ""
+		var cd = ""
+		for i in conf[ID]:
+			var mname = ManifestV2.__get_mod_by_id(i)["name"]
+			cd = cd + "\n" + mname
+		icon_conflicts.hint_tooltip = TranslationServer.translate("HEVLIB_ICON_TOOLTIP_CONFLICT") % cd
 	else:
 		icon_conflicts.visible = false
 	if ID in dep:
 		icon_dependancies.visible = true
+		var cd = ""
+		for i in dep[ID]:
+			var mname = ManifestV2.__get_mod_by_id(i)["name"]
+			cd = cd + "\n" + mname
+		icon_dependancies.hint_tooltip = TranslationServer.translate("HEVLIB_ICON_TOOLTIP_DEPENDANCIES") % cd
 	else:
 		icon_dependancies.visible = false
 	if ID in comp:
 		icon_complementary.visible = true
+		var cd = ""
+		for i in comp[ID]:
+			var mname = ManifestV2.__get_mod_by_id(i)["name"]
+			cd = cd + "\n" + mname
+		icon_complementary.hint_tooltip = TranslationServer.translate("HEVLIB_ICON_TOOLTIP_COMPLEMENTARY") % cd
 	else:
 		icon_complementary.visible = false
 	

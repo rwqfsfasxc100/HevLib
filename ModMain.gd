@@ -29,21 +29,27 @@ var file = File.new()
 var update_urls = PoolStringArray([])
 var url_store = "user://cache/.Mod_Menu_2_Cache/updates/url_refs.json"
 var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
+var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 
 var dependancies_store = "user://cache/.Mod_Menu_2_Cache/dependancies/dependancies.json"
 var conflicts_store = "user://cache/.Mod_Menu_2_Cache/conflicts/conflicts.json"
 var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/complementary.json"
 
+
 func _ready():
 	l("Readying")
 	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/")
+	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/")
 	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/dependancies/")
 	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/conflicts/")
 	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/complementary/")
 	
 	file.open(url_store,File.WRITE)
 	file.store_string("[]")
+	file.close()
+	file.open(has_updated_store,File.WRITE)
+	file.store_string("false")
 	file.close()
 	file.open(update_store,File.WRITE)
 	file.store_string("{}")
@@ -247,6 +253,6 @@ func network_return(result, response_code,headers,body):
 				if not does and item[1] == manifest["mod_information"]["id"]:
 					file.open(update_store,File.READ_WRITE)
 					var updates = JSON.parse(file.get_as_text()).result
-					updates.merge({item[1]:{"name":item[0],"id":item[1],"version":[item[2],item[3],item[4]],"new_version":[nv1,nv2,nv3],"display":item[0] + " (" + item[1] + ")"}})
+					updates.merge({item[1]:{"name":item[0],"id":item[1],"version":[item[2],item[3],item[4]],"new_version":[nv1,nv2,nv3],"github":manifest["links"].get("HEVLIB_GITHUB",{"URL":""}).get("URL",""),"nexus":manifest["links"].get("HEVLIB_NEXUS",{"URL":""}).get("URL",""),"display":item[0] + " (" + item[1] + ")"}})
 					file.store_string(JSON.print(updates))
 					file.close()

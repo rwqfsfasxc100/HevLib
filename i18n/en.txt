@@ -242,12 +242,30 @@ HEVLIB_CONFIG_RANDOMIZE_MINERALS_TOOLTIP|Randomizes the mineral seeds upon every
 
 HEVLIB_UPDATE_CENTER|Mod Update Center
 
+HEVLIB_UPDATE_CENTER_DESC|The following mods have updates
+
 HEVLIB_UPDATE_ALL|Update all mods
 
 HEVLIB_IGNORE_UPDATE|Ignore update
 
 HEVLIB_UPDATE_MOD|Update mod
 
-HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD|Update the selected mod [%s]? \n\nThis may take a while, depending on the size of the mod.
+HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD|Update the selected mod [%s] to version [%s]? \n\nThis may take a while, depending on the size of the mod.
 
 HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MOD_UPDATE|Ignore the update for mod [%s] to version [%s]? \n\nThis decision can be reset in the mod menu config.
+
+HEVLIB_ICON_TOOLTIP_CONFLICT|This mod conflicts with the following mods:%s
+
+HEVLIB_ICON_TOOLTIP_DEPENDANCIES|This mod is missing the following mod dependancies:%s
+
+HEVLIB_ICON_TOOLTIP_COMPLEMENTARY|This mod complements the following mods:%s
+
+HEVLIB_ICON_TOOLTIP_UPDATES|This mod has an update! \nVersion [%s] -> Version [%s]
+
+HEVLIB_MODMENU_UPDATE_NOTIFIER|There are updates for your mods. \n\nDo you want to open the update menu?
+
+HEVLIB_PLEASE_WAIT|Please wait...
+
+HEVLIB_EXIT_INSTEAD|Exit game instead
+
+HEVLIB_RESTART_BECAUSE_NEW_MODS|The game needs to restart to apply the new mod versions. \n\nPressing OK will restart the game. \n\nAlternatively, you can close the game, or press cancel to continue playing to allow you to save.
