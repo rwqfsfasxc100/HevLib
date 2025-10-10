@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=2]
+[gd_scene load_steps=32 format=2]
 
 [ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=1]
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=2]
@@ -18,6 +18,7 @@
 [ext_resource path="res://HevLib/ui/mod_menu/urls/URLContainer.gd" type="Script" id=16]
 [ext_resource path="res://HevLib/ui/mod_menu/urls/SimpleURLButton.gd" type="Script" id=17]
 [ext_resource path="res://HevLib/ui/mod_menu/settings_menus/ModSettingsMenu.tscn" type="PackedScene" id=18]
+[ext_resource path="res://HevLib/ui/mod_menu/updates/MMRestartDialog.tscn" type="PackedScene" id=19]
 
 [sub_resource type="StreamTexture" id=3]
 flags = 4
@@ -291,7 +292,11 @@ settings_menu_path = NodePath("../../../../../../ModSettingsMenu")
 conflict_button_path = NodePath("../../ModInfo/WarningButtons/CFB")
 dependancies_button_path = NodePath("../../ModInfo/WarningButtons/DB")
 updates_button_path = NodePath("../../ModInfo/WarningButtons/UB")
+subroot_path = NodePath("../../../../../..")
 desc_scroll_box = NodePath("../../ModInfo/DESC/ScrollContainer")
+conflict_menu_path = NodePath("../../../../../../ConflictMenu")
+dependancy_menu_path = NodePath("../../../../../../DependancyMenu")
+update_menu_path = NodePath("../../../../../../UpdateDialog")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList"]
 margin_right = 629.0
@@ -497,10 +502,85 @@ valign = 1
 
 [node name="Timer" type="Timer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/LINKBOX/BUGREPORTS"]
 
-[node name="DESC" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo"]
+[node name="WarningButtons" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo"]
 margin_top = 220.0
 margin_right = 629.0
-margin_bottom = 579.0
+margin_bottom = 285.0
+rect_min_size = Vector2( 0, 65 )
+alignment = 1
+
+[node name="CFB" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons"]
+margin_left = 213.0
+margin_right = 278.0
+margin_bottom = 65.0
+rect_min_size = Vector2( 65, 65 )
+
+[node name="Conflicts" type="TextureRect" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons/CFB"]
+modulate = Color( 1, 1, 0.164706, 0.25098 )
+margin_right = 65.0
+margin_bottom = 65.0
+rect_min_size = Vector2( 65, 65 )
+rect_scale = Vector2( 1.25, 1.25 )
+rect_pivot_offset = Vector2( 32.5, 32.5 )
+texture = SubResource( 4 )
+expand = true
+stretch_mode = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons/CFB/Conflicts"]
+autoplay = "Blink"
+anims/Blink = SubResource( 5 )
+anims/RESET = SubResource( 6 )
+
+[node name="PlaySoundsOnTheseButtons" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons/CFB" instance=ExtResource( 1 )]
+
+[node name="DB" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons"]
+margin_left = 282.0
+margin_right = 347.0
+margin_bottom = 65.0
+rect_min_size = Vector2( 65, 65 )
+
+[node name="Dependancies" type="TextureRect" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons/DB"]
+modulate = Color( 1, 1, 0.164706, 0.25098 )
+margin_right = 65.0
+margin_bottom = 65.0
+rect_min_size = Vector2( 65, 65 )
+texture = SubResource( 7 )
+expand = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons/DB/Dependancies"]
+autoplay = "Blink"
+anims/Blink = SubResource( 8 )
+anims/RESET = SubResource( 9 )
+
+[node name="PlaySoundsOnTheseButtons" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons/DB" instance=ExtResource( 1 )]
+
+[node name="UB" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons"]
+margin_left = 351.0
+margin_right = 416.0
+margin_bottom = 65.0
+rect_min_size = Vector2( 65, 65 )
+
+[node name="Updates" type="TextureRect" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons/UB"]
+modulate = Color( 1, 1, 0.164706, 0.25098 )
+margin_right = 65.0
+margin_bottom = 65.0
+rect_min_size = Vector2( 65, 65 )
+rect_scale = Vector2( 1.25, 1.25 )
+rect_pivot_offset = Vector2( 32.5, 32.5 )
+texture = SubResource( 10 )
+expand = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons/UB/Updates"]
+autoplay = "Blink"
+anims/Blink = SubResource( 11 )
+anims/RESET = SubResource( 12 )
+
+[node name="PlaySoundsOnTheseButtons" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons/UB" instance=ExtResource( 1 )]
+
+[node name="DESC" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo"]
+margin_top = 289.0
+margin_right = 629.0
+margin_bottom = 648.0
 focus_neighbour_right = NodePath(".")
 focus_neighbour_bottom = NodePath("../../../FooterButtons/Close")
 mouse_filter = 2
@@ -605,75 +685,6 @@ margin_right = 242.0
 margin_bottom = 29.0
 custom_fonts/font = ExtResource( 3 )
 text = "MOD_PRIO"
-
-[node name="WarningButtons" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo"]
-margin_top = 583.0
-margin_right = 629.0
-margin_bottom = 648.0
-rect_min_size = Vector2( 0, 65 )
-alignment = 1
-
-[node name="CFB" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons"]
-margin_left = 213.0
-margin_right = 278.0
-margin_bottom = 65.0
-rect_min_size = Vector2( 65, 65 )
-
-[node name="Conflicts" type="TextureRect" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons/CFB"]
-modulate = Color( 1, 1, 0.164706, 0.25098 )
-margin_right = 65.0
-margin_bottom = 65.0
-rect_min_size = Vector2( 65, 65 )
-rect_scale = Vector2( 1.25, 1.25 )
-rect_pivot_offset = Vector2( 32.5, 32.5 )
-texture = SubResource( 4 )
-expand = true
-stretch_mode = 1
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons/CFB/Conflicts"]
-autoplay = "Blink"
-anims/Blink = SubResource( 5 )
-anims/RESET = SubResource( 6 )
-
-[node name="DB" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons"]
-margin_left = 282.0
-margin_right = 347.0
-margin_bottom = 65.0
-rect_min_size = Vector2( 65, 65 )
-
-[node name="Dependancies" type="TextureRect" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons/DB"]
-modulate = Color( 1, 1, 0.164706, 0.25098 )
-margin_right = 65.0
-margin_bottom = 65.0
-rect_min_size = Vector2( 65, 65 )
-texture = SubResource( 7 )
-expand = true
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons/DB/Dependancies"]
-autoplay = "Blink"
-anims/Blink = SubResource( 8 )
-anims/RESET = SubResource( 9 )
-
-[node name="UB" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons"]
-margin_left = 351.0
-margin_right = 416.0
-margin_bottom = 65.0
-rect_min_size = Vector2( 65, 65 )
-
-[node name="Updates" type="TextureRect" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons/UB"]
-modulate = Color( 1, 1, 0.164706, 0.25098 )
-margin_right = 65.0
-margin_bottom = 65.0
-rect_min_size = Vector2( 65, 65 )
-rect_scale = Vector2( 1.25, 1.25 )
-rect_pivot_offset = Vector2( 32.5, 32.5 )
-texture = SubResource( 10 )
-expand = true
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons/UB/Updates"]
-autoplay = "Blink"
-anims/Blink = SubResource( 11 )
-anims/RESET = SubResource( 12 )
 
 [node name="HSeparator" type="HSeparator" parent="base/PanelContainer/VBoxContainer"]
 margin_top = 652.0
@@ -869,6 +880,62 @@ columns = 2
 
 [node name="ModSettingsMenu" parent="." instance=ExtResource( 18 )]
 
+[node name="ConflictMenu" type="AcceptDialog" parent="."]
+margin_right = 118.0
+margin_bottom = 104.0
+rect_min_size = Vector2( 700, 450 )
+popup_exclusive = true
+window_title = "HEVLIB_CONFLICT_INFO_HEADER"
+dialog_text = "HEVLIB_CONFLICT_INFO_BODY"
+dialog_autowrap = true
+
+[node name="DependancyMenu" type="AcceptDialog" parent="."]
+margin_right = 118.0
+margin_bottom = 104.0
+rect_min_size = Vector2( 700, 450 )
+popup_exclusive = true
+window_title = "HEVLIB_DEPENDANCY_INFO_HEADER"
+resizable = true
+dialog_text = "HEVLIB_DEPENDANCY_INFO_BODY"
+
+[node name="UpdateDialog" type="ConfirmationDialog" parent="."]
+margin_right = 263.0
+margin_bottom = 104.0
+rect_min_size = Vector2( 700, 450 )
+popup_exclusive = true
+window_title = "HEVLIB_UPDATE_INFO_HEADER"
+dialog_autowrap = true
+
+[node name="WAIT" type="Popup" parent="."]
+margin_right = 200.0
+margin_bottom = 30.0
+rect_min_size = Vector2( 200, 30 )
+popup_exclusive = true
+
+[node name="PanelContainer" type="PanelContainer" parent="WAIT"]
+margin_right = 200.0
+margin_bottom = 30.0
+rect_min_size = Vector2( 200, 30 )
+
+[node name="Button" type="Button" parent="WAIT/PanelContainer"]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 205.0
+margin_bottom = 47.0
+rect_min_size = Vector2( 200, 30 )
+
+[node name="Label" type="Label" parent="WAIT/PanelContainer/Button"]
+margin_right = 200.0
+margin_bottom = 73.0
+rect_min_size = Vector2( 200, 30 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "HEVLIB_PLEASE_WAIT"
+align = 1
+autowrap = true
+
+[node name="MMRestartDialog" parent="." instance=ExtResource( 19 )]
+
 [connection signal="about_to_show" from="." to="." method="_about_to_show"]
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
 [connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox/FILTER" to="FilterPopup" method="_filter_pressed"]
@@ -879,6 +946,9 @@ columns = 2
 [connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/LINKBOX/BUGREPORTS" to="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/LINKBOX/BUGREPORTS" method="_pressed"]
 [connection signal="visibility_changed" from="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/LINKBOX/BUGREPORTS/LabelContainer" to="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/LINKBOX/BUGREPORTS/LabelContainer" method="_visibility_changed"]
 [connection signal="timeout" from="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/LINKBOX/BUGREPORTS/Timer" to="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/LINKBOX/BUGREPORTS" method="_timeout"]
+[connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons/CFB" to="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList" method="_open_conflicts"]
+[connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons/DB" to="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList" method="_open_dependancies"]
+[connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/WarningButtons/UB" to="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList" method="_open_updates"]
 [connection signal="pressed" from="base/PanelContainer/VBoxContainer/FooterButtons/OpenFolder" to="base/PanelContainer/VBoxContainer/FooterButtons/OpenFolder" method="_pressed"]
 [connection signal="pressed" from="base/PanelContainer/VBoxContainer/FooterButtons/Close" to="." method="cancel"]
 [connection signal="about_to_show" from="FilterPopup" to="FilterPopup" method="_about_to_show"]
@@ -887,3 +957,4 @@ columns = 2
 [connection signal="about_to_show" from="URLPopup" to="URLPopup" method="_about_to_show"]
 [connection signal="visibility_changed" from="URLPopup" to="URLPopup" method="_visibility_changed"]
 [connection signal="pressed" from="URLPopup/base/URLContainer/VBoxContainer/HBoxContainer/CloseButton" to="URLPopup" method="cancel"]
+[connection signal="confirmed" from="UpdateDialog" to="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList" method="updates_started"]

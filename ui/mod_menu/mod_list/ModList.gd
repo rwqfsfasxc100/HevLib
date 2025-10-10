@@ -40,6 +40,10 @@ onready var dependancies_button = get_node(dependancies_button_path)
 onready var updates_button = get_node(updates_button_path)
 
 func about_to_show():
+	var restart_dialog = subroot.restart_menu
+	restart_dialog.get_node("PanelContainer/VBoxContainer/HBoxContainer/Restart/Button").connect("pressed",self,"_restart")
+	restart_dialog.get_node("PanelContainer/VBoxContainer/HBoxContainer/Exit/Button").connect("pressed",self,"_exit")
+	restart_dialog.get_node("PanelContainer/VBoxContainer/HBoxContainer/Cancel/Button").connect("pressed",self,"restart_cancel")
 	var nodes = listContainer.get_children()
 	if nodes.size() >= 2:
 		nodes[0]._pressed()
@@ -48,8 +52,23 @@ func about_to_show():
 
 var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 
+export var subroot_path = NodePath("")
+onready var subroot = get_node(subroot_path)
+
+func _restart():
+	OS.set_restart_on_exit(true,OS.get_cmdline_args())
+
+func _exit():
+	OS.kill(OS.get_process_id())
+
+func restart_cancel():
+	subroot.restart_menu.hide()
+
 func _ready():
+	
+	
 	var information_nodes = {
+		"mod_list":self,
 		"info_icon":get_node(info_icon),
 		"info_name":get_node(info_name),
 		"info_version":get_node(info_version),
@@ -205,6 +224,14 @@ func _process(_delta):
 			
 			aligned_zero_focus = false
 
+var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
+var dependancies_store = "user://cache/.Mod_Menu_2_Cache/dependancies/dependancies.json"
+var conflicts_store = "user://cache/.Mod_Menu_2_Cache/conflicts/conflicts.json"
+var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/complementary.json"
+
+var currently_selected_mod_id = ""
+
+var file = File.new()
 
 func get_visible_mods():
 	var array = []
@@ -220,3 +247,100 @@ func get_visible_mods():
 			array.append(child.MOD_INFO)
 		
 	return array
+
+export var conflict_menu_path = NodePath("")
+export var dependancy_menu_path = NodePath("")
+export var update_menu_path = NodePath("")
+onready var conflict_menu = get_node(conflict_menu_path)
+onready var dependancy_menu = get_node(dependancy_menu_path)
+onready var update_menu = get_node(update_menu_path)
+
+func _open_conflicts():
+	var conflicts = ManifestV2.__check_mod_conflicts(currently_selected_mod_id)
+	var cfmods = ""
+	for mod in conflicts:
+		var data = ManifestV2.__get_mod_by_id(mod)
+		cfmods = cfmods + "\n" + data["name"] + " (" + data["manifest"]["manifest_data"]["mod_information"]["id"] + ")"
+	conflict_menu.dialog_text = TranslationServer.translate("HEVLIB_CONFLICT_INFO_BODY") % cfmods
+	conflict_menu.popup()
+	var size = Settings.getViewportSize()
+	var offset = (size - conflict_menu.rect_size) / 2
+	conflict_menu.rect_position = offset
+	conflict_menu.rect_size = Vector2(700,450)
+
+func _open_dependancies():
+	var conflicts = ManifestV2.__check_mod_dependancies(currently_selected_mod_id)
+	var cfmods = ""
+	for mod in conflicts:
+		var data = ManifestV2.__get_mod_by_id(mod)
+		cfmods = cfmods + "\n" + data["name"] + " (" + data["manifest"]["manifest_data"]["mod_information"]["id"] + ")"
+	dependancy_menu.dialog_text = TranslationServer.translate("HEVLIB_DEPENDANCY_INFO_BODY") % cfmods
+	dependancy_menu.popup()
+	var size = Settings.getViewportSize()
+	var offset = (size - dependancy_menu.rect_size) / 2
+	dependancy_menu.rect_position = offset
+	dependancy_menu.rect_size = Vector2(700,450)
+
+func _open_updates():
+	file.open(update_store,File.READ)
+	var udata = JSON.parse(file.get_as_text()).result
+	file.close()
+	var tex = TranslationServer.translate("HEVLIB_UPDATE_INFO_BODY") % [str(udata[currently_selected_mod_id]["version"][0]) + "." + str(udata[currently_selected_mod_id]["version"][1]) + "." + str(udata[currently_selected_mod_id]["version"][2]),str(udata[currently_selected_mod_id]["new_version"][0]) + "." + str(udata[currently_selected_mod_id]["new_version"][1]) + "." + str(udata[currently_selected_mod_id]["new_version"][2])]
+	update_menu.dialog_text = tex
+	update_menu.popup()
+	var size = Settings.getViewportSize()
+	var offset = (size - update_menu.rect_size) / 2
+	update_menu.rect_position = offset
+	update_menu.rect_size = Vector2(700,450)
+	
+
+var zip_folder = "user://cache/.Mod_Menu_2_Cache/updates/zip_cache/"
+const Github = preload("res://HevLib/pointers/Github.gd")
+func updates_started():
+	file.open(update_store,File.READ)
+	var data = JSON.parse(file.get_as_text()).result
+	file.close()
+	var github = data[currently_selected_mod_id]["github"]
+	var nexus = data[currently_selected_mod_id]["nexus"]
+	if github:
+		if github.ends_with("/"):
+			github.rstrip("/")
+		if not github.ends_with("/releases"):
+			github = github + "/releases"
+		Github.__get_github_release(github,zip_folder,self,true,"zip")
+	elif nexus:
+		if nexus.ends_with("/"):
+			nexus.rstrip("/")
+		OS.shell_open(nexus + "?tab=files")
+	
+	get_node("../../../../../../WAIT").popup_centered()
+var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
+
+
+
+
+
+
+const FileAccess = preload("res://HevLib/pointers/FileAccess.gd")
+func _downloaded_zip(file, filepath):
+	get_node("../../../../../../WAIT").hide()
+	var fi = File.new()
+	fi.open(update_store,File.READ)
+	var data = JSON.parse(fi.get_as_text()).result
+	fi.close()
+	
+	if currently_selected_mod_id in data:
+		data.erase(currently_selected_mod_id)
+	fi.open(update_store,File.WRITE)
+	fi.store_string(JSON.print(data))
+	fi.close()
+	fi.open(has_updated_store,File.WRITE)
+	fi.store_string("true")
+	fi.close()
+	var gameInstallDirectory = OS.get_executable_path().get_base_dir()
+	if OS.get_name() == "OSX":
+		gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
+	var modPathPrefix = gameInstallDirectory.plus_file("mods")
+	subroot.restart_menu.popup_centered()
+	FileAccess.__copy_file(filepath,modPathPrefix)
+	updates_button.visible = false

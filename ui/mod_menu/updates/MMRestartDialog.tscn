@@ -1,19 +1,15 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=2 format=2]
 
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=1]
-[ext_resource path="res://HevLib/ui/mod_menu/updates/UpdateNotifier.gd" type="Script" id=2]
 
-[node name="UpdateNotifier" type="Popup"]
-margin_right = 200.0
-margin_bottom = 70.0
-rect_min_size = Vector2( 500, 250 )
+[node name="MMRestartDialog" type="Popup"]
+margin_left = 390.0
+margin_top = 210.0
+margin_right = 890.0
+margin_bottom = 510.0
+rect_min_size = Vector2( 500, 300 )
 theme = ExtResource( 1 )
 popup_exclusive = true
-script = ExtResource( 2 )
-
-[node name="Timer" type="Timer" parent="."]
-wait_time = 0.25
-one_shot = true
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 margin_right = 10.0
@@ -23,7 +19,7 @@ rect_min_size = Vector2( 500, 250 )
 [node name="ColorRect" type="ColorRect" parent="PanelContainer"]
 margin_left = 5.0
 margin_top = 5.0
-margin_right = 670.0
+margin_right = 908.0
 margin_bottom = 245.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -32,36 +28,49 @@ color = Color( 0, 0, 0, 0.941176 )
 [node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
 margin_left = 5.0
 margin_top = 5.0
-margin_right = 670.0
+margin_right = 908.0
 margin_bottom = 245.0
 size_flags_vertical = 3
 
 [node name="Label" type="Label" parent="PanelContainer/VBoxContainer"]
-margin_right = 665.0
+margin_right = 903.0
 margin_bottom = 194.0
 size_flags_horizontal = 3
 size_flags_vertical = 7
-text = "HEVLIB_MODMENU_UPDATE_NOTIFIER"
+text = "HEVLIB_RESTART_BECAUSE_NEW_MODS"
+autowrap = true
 
 [node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
 margin_top = 198.0
-margin_right = 665.0
+margin_right = 903.0
 margin_bottom = 240.0
 
-[node name="OK" type="HBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer"]
-margin_right = 307.0
+[node name="Restart" type="HBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+margin_right = 232.0
 margin_bottom = 42.0
 size_flags_horizontal = 3
 alignment = 1
 
-[node name="Button" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer/OK"]
-margin_right = 307.0
+[node name="Button" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer/Restart"]
+margin_right = 232.0
 margin_bottom = 42.0
-text = "HEVLIB_MODMENU_OK"
+text = "HEVLIB_RESTART"
+
+[node name="Exit" type="HBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+margin_left = 236.0
+margin_right = 545.0
+margin_bottom = 42.0
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="Button" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer/Exit"]
+margin_right = 309.0
+margin_bottom = 42.0
+text = "HEVLIB_EXIT_INSTEAD"
 
 [node name="Cancel" type="HBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer"]
-margin_left = 311.0
-margin_right = 665.0
+margin_left = 549.0
+margin_right = 903.0
 margin_bottom = 42.0
 size_flags_horizontal = 3
 alignment = 1
@@ -70,8 +79,3 @@ alignment = 1
 margin_right = 354.0
 margin_bottom = 42.0
 text = "HEVLIB_MODMENU_CLOSE"
-
-[connection signal="about_to_show" from="." to="." method="_about_to_show"]
-[connection signal="timeout" from="Timer" to="." method="show_menu"]
-[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/OK/Button" to="." method="_confirmed"]
-[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/Cancel/Button" to="." method="cancel"]

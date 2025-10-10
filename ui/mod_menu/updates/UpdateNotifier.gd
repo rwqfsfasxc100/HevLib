@@ -1,4 +1,4 @@
-extends ConfirmationDialog
+extends Popup
 
 export var update_menu_path = NodePath("")
 onready var update_menu = get_node(update_menu_path)
@@ -49,3 +49,4 @@ func _about_to_show():
 func _confirmed():
 	update_menu.popup()
 	cancel()
+	update_menu.lastFocus = lastFocus

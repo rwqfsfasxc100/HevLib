@@ -76,6 +76,8 @@ HEVLIB_VANILLA_BRIEF|The vanilla game
 
 HEVLIB_MODMENU_MODS|Mods
 
+HEVLIB_MODMENU_OK|Ok
+
 HEVLIB_MODMENU_CLOSE|Close
 
 HEVLIB_MODMENU_OPENFOLDER|Open Mods Folder
@@ -236,6 +238,18 @@ HEVLIB_DEPENDANCY_COUNT|%s mod(s) are missing dependancies!
 
 HEVLIB_CONFLICT_COUNT|%s mod(s) are in conflict!
 
+HEVLIB_UPDATE_INFO_HEADER|This mod has pending updates!
+
+HEVLIB_DEPENDANCY_INFO_HEADER|This mod has missing dependancies!
+
+HEVLIB_CONFLICT_INFO_HEADER|This mod is currently in conflict!
+
+HEVLIB_UPDATE_INFO_BODY|Update this mod from version [%s] to version [%s]?
+
+HEVLIB_DEPENDANCY_INFO_BODY|This mod requires the following mods, which are missing:\n%s\n\n\n\nDo not expect this mod to operate as intended!
+
+HEVLIB_CONFLICT_INFO_BODY|This mod is in conflict with other installed mods. Please install a compatable version of the following mods:\n%s\n\n\n\nDo not expect this mod to operate as intended!
+
 HEVLIB_CONFIG_RANDOMIZE_MINERALS|Randomize mineral seed
 
 HEVLIB_CONFIG_RANDOMIZE_MINERALS_TOOLTIP|Randomizes the mineral seeds upon every game launch. \n\nIf false, uses a predetermined array of constants for mineral seeds
@@ -246,6 +260,8 @@ HEVLIB_UPDATE_CENTER_DESC|The following mods have updates
 
 HEVLIB_UPDATE_ALL|Update all mods
 
+HEVLIB_IGNORE_ALL|Ignore all mods
+
 HEVLIB_IGNORE_UPDATE|Ignore update
 
 HEVLIB_UPDATE_MOD|Update mod
@@ -253,6 +269,10 @@ HEVLIB_UPDATE_MOD|Update mod
 HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD|Update the selected mod [%s] to version [%s]? \n\nThis may take a while, depending on the size of the mod.
 
 HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MOD_UPDATE|Ignore the update for mod [%s] to version [%s]? \n\nThis decision can be reset in the mod menu config.
+
+HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MODS|Update all mods displayed in this menu? \n\nThis may take a while, depending on the number and size of the mods.
+
+HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MODS|Ignore all mod updates displayed in this menu? \n\nThis decision can be reset in the mod menu config.
 
 HEVLIB_ICON_TOOLTIP_CONFLICT|This mod conflicts with the following mods:%s
 
@@ -266,6 +286,22 @@ HEVLIB_MODMENU_UPDATE_NOTIFIER|There are updates for your mods. \n\nDo you want 
 
 HEVLIB_PLEASE_WAIT|Please wait...
 
+HEVLIB_RESTART|Restart game
+
 HEVLIB_EXIT_INSTEAD|Exit game instead
 
-HEVLIB_RESTART_BECAUSE_NEW_MODS|The game needs to restart to apply the new mod versions. \n\nPressing OK will restart the game. \n\nAlternatively, you can close the game, or press cancel to continue playing to allow you to save.
+HEVLIB_RESTART_BECAUSE_NEW_MODS|The game needs to restart to apply changes to mods. \n\nAlternatively, you can close the game, or close this window to continue playing to allow you to save.
+
+HEVLIB_WAIT_TO_UPDATE_ALL|Please wait... \n\nDownloading mod %02d of %02d \n%s [%s] version [%s]
+
+HEVLIB_TITLE_IGNORE_MOD|Ignore mod?
+
+HEVLIB_TITLE_UPDATE_MOD|Update mod?
+
+HEVLIB_TITLE_IGNORE_MODS|Ignore mods?
+
+HEVLIB_TITLE_UPDATE_MODS|Update mods?
+
+HEVLIB_DLCLIST_DLC_HEADER|------- DLC ------
+
+HEVLIB_DLCLIST_MODS_HEADER|------ MODS ------

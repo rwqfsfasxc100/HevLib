@@ -26,6 +26,14 @@ func _unhandled_input(event):
 			$FilterPopup.cancel()
 		elif $ModSettingsMenu.visible:
 			$ModSettingsMenu.cancel()
+		elif $ConflictMenu.visible:
+			$ConflictMenu.hide()
+		elif $DependancyMenu.visible:
+			$DependancyMenu.hide()
+		elif $UpdateDialog.visible:
+			$UpdateDialog.hide()
+		elif $WAIT.visible:
+			Debug.l("Currently downloading a mod update for %s, not closing wait window.")
 		else:
 			cancel()
 		get_tree().set_input_as_handled()
@@ -43,6 +51,8 @@ func refocus():
 		lastFocus.grab_focus()
 	else:
 		Debug.l("I have no focus to fall back to!")
+
+onready var restart_menu = $MMRestartDialog
 
 func _on_resize():
 	var size = Settings.getViewportSize()

@@ -122,8 +122,76 @@ func _pressed():
 			for i in range(1,get_child_count()):
 				var node = get_child(i)
 				node.visible = !node.visible
+	information_nodes["mod_list"].currently_selected_mod_id = ID
+	file.open(update_store,File.READ)
+	var update_data = JSON.parse(file.get_as_text()).result
+	file.close()
+	file.open(conflicts_store,File.READ)
+	var conflict_data = JSON.parse(file.get_as_text()).result
+	file.close()
+	file.open(dependancies_store,File.READ)
+	var dependancy_data = JSON.parse(file.get_as_text()).result
+	file.close()
+	
+	var has_update = false
+	var has_dep = false
+	var has_conf = false
+	
+	if id in update_data:
+		information_nodes["updates_button"].visible = true
+		information_nodes["updates_button"].hint_tooltip = TranslationServer.translate("HEVLIB_ICON_TOOLTIP_UPDATES") % [str(update_data[ID]["version"][0])+"."+str(update_data[ID]["version"][1])+"."+str(update_data[ID]["version"][2]),str(update_data[ID]["new_version"][0])+"."+str(update_data[ID]["new_version"][1])+"."+str(update_data[ID]["new_version"][2])]
+		has_update = true
+	else:
+		information_nodes["updates_button"].visible = false
+		
+	
+	if id in dependancy_data:
+		information_nodes["dependancies_button"].visible = true
+		var cd = ""
+		for i in dependancy_data[id]:
+			var mname = ManifestV2.__get_mod_by_id(i)["name"]
+			cd = cd + "\n" + mname
+		information_nodes["dependancies_button"].hint_tooltip = TranslationServer.translate("HEVLIB_ICON_TOOLTIP_DEPENDANCIES") % cd
+		has_dep = true
+	else:
+		information_nodes["dependancies_button"].visible = false
+		
+	if id in conflict_data:
+		information_nodes["conflict_button"].visible = true
+		var cd = ""
+		for i in conflict_data[id]:
+			var mname = ManifestV2.__get_mod_by_id(i)["name"]
+			cd = cd + "\n" + mname
+		information_nodes["conflict_button"].hint_tooltip = TranslationServer.translate("HEVLIB_ICON_TOOLTIP_CONFLICT") % cd
+		has_conf = true
+	else:
+		information_nodes["conflict_button"].visible = false
+	if information_nodes["info_links_button"].is_visible_in_tree():
+		information_nodes["info_desc"].focus_neighbour_top = NodePath("../LINKBOX/LINKS")
+	elif information_nodes["info_bugreports_button"].is_visible_in_tree():
+		information_nodes["info_desc"].focus_neighbour_top = NodePath("../LINKBOX/BUGREPORTS")
+	elif information_nodes["info_settings_button"].is_visible_in_tree():
+		information_nodes["info_desc"].focus_neighbour_top = NodePath("../Header/SETTINGS")
+	else:
+		information_nodes["info_desc"].focus_neighbour_top = NodePath("../../SPLIT/ListHeader/SearchBox/FILTER")
+		
+#	information_nodes["info_desc"].focus_neighbour_top = NodePath("")
+	
+	if has_update:
+		information_nodes["info_desc"].focus_neighbour_top = NodePath("../WarningButtons/UB")
+	if has_dep:
+		information_nodes["info_desc"].focus_neighbour_top = NodePath("../WarningButtons/DB")
+	if has_conf:
+		information_nodes["info_desc"].focus_neighbour_top = NodePath("../WarningButtons/CFB")
 	
 	
+
+var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
+var dependancies_store = "user://cache/.Mod_Menu_2_Cache/dependancies/dependancies.json"
+var conflicts_store = "user://cache/.Mod_Menu_2_Cache/conflicts/conflicts.json"
+var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/complementary.json"
+
+
 
 
 const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
@@ -416,11 +484,6 @@ func _process(_delta):
 				else:
 					visible = true
 var file = File.new()
-
-var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
-var dependancies_store = "user://cache/.Mod_Menu_2_Cache/dependancies/dependancies.json"
-var conflicts_store = "user://cache/.Mod_Menu_2_Cache/conflicts/conflicts.json"
-var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/complementary.json"
 
 func _visibility_changed():
 	MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)

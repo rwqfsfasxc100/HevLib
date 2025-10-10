@@ -44,7 +44,13 @@ func _ready():
 	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/dependancies/")
 	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/conflicts/")
 	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/complementary/")
-	
+	var zips = FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/",true,true)
+	var manifests = FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/",true,true)
+	var d = Directory.new()
+	for f in zips:
+		d.remove(f)
+	for f in manifests:
+		d.remove(f)
 	file.open(url_store,File.WRITE)
 	file.store_string("[]")
 	file.close()

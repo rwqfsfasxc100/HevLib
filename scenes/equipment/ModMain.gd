@@ -37,6 +37,8 @@ var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 func _init(modLoader = ModLoader):
 	l("Initializing Equipment Driver")
 	
+	installScriptExtension("../scene_replacements/DLClist.gd")
+	replaceScene("../scene_replacements/DLClist.tscn","res://tools/DLClist.tscn")
 	
 	
 	

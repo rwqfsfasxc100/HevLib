@@ -24,6 +24,7 @@ func _Ignore_pressed():
 func _Update_pressed():
 	$Popups/UpdatePopup.popup_centered()
 
+var display_wait_popup = true
 
 func _ignore_confirmed():
 	var currently_ignored = ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
@@ -52,7 +53,8 @@ func _update_confirmed():
 		if nexus.ends_with("/"):
 			nexus.rstrip("/")
 		OS.shell_open(nexus + "?tab=files")
-	$Popups/WAIT.popup_centered()
+	if display_wait_popup:
+		$Popups/WAIT.popup_centered()
 var modPathPrefix = ""
 const FileAccess = preload("res://HevLib/pointers/FileAccess.gd")
 func _downloaded_zip(file, filepath):
@@ -72,6 +74,7 @@ func _downloaded_zip(file, filepath):
 	fi.close()
 	repos()
 	FileAccess.__copy_file(filepath,modPathPrefix)
+	manager.move_to_next_mod()
 	Tool.remove(self)
 
 
