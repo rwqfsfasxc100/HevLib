@@ -15,8 +15,8 @@ func _ready():
 	var currently_ignored = ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
 	if currently_ignored == null:
 		currently_ignored = {}
-	for u in updates:
-		if u in currently_ignored:
+	for u in currently_ignored:
+		if u in updates:
 			if currently_ignored[u] == str(updates[u]["new_version"][0]) + "." + str(updates[u]["new_version"][1]) + "." + str(updates[u]["new_version"][2]):
 				updates.erase(u)
 			else:

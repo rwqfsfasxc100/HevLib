@@ -18,6 +18,7 @@ func _ready():
 #	if "transponder" in fullConfig:
 #		ship_match = CurrentGame.state.ship.transponder == fullConfig.transponder
 	
+	
 	if ship_match:
 		Debug.l("HevLib Add Nodes: Getting config init")
 		if shipName in processed_ship_register:

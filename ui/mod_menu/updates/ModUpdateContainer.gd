@@ -90,3 +90,5 @@ func repos():
 		get_parent().get_parent().get_parent().get_node("ButtonContainer/Cancel/Button").grab_focus()
 		get_parent().get_parent().get_parent().get_node("ButtonContainer/UpdateAll/Button").disabled = true
 		get_parent().get_parent().get_parent().get_node("ButtonContainer/UpdateAll/Button").modulate = Color(0.7,0.7,0.7,1)
+		get_parent().get_parent().get_parent().get_node("ButtonContainer/IgnoreAll/Button").disabled = true
+		get_parent().get_parent().get_parent().get_node("ButtonContainer/IgnoreAll/Button").modulate = Color(0.7,0.7,0.7,1)

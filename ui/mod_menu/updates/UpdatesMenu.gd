@@ -29,8 +29,8 @@ func _about_to_show():
 	var currently_ignored = ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
 	if currently_ignored == null:
 		currently_ignored = {}
-	for u in update_data:
-		if u in currently_ignored:
+	for u in currently_ignored:
+		if u in update_data:
 			if currently_ignored[u] == str(update_data[u]["new_version"][0]) + "." + str(update_data[u]["new_version"][1]) + "." + str(update_data[u]["new_version"][2]):
 				update_data.erase(u)
 			else:
@@ -49,6 +49,13 @@ func _about_to_show():
 		c.current_version = str(old_version[0]) + "." + str(old_version[1]) + "." + str(old_version[2])
 		c.new_version = str(new_version[0]) + "." + str(new_version[1]) + "." + str(new_version[2])
 		container.add_child(c)
+	
+	if update_data.size() == 0:
+		
+		$base/VBoxContainer/ButtonContainer/UpdateAll/Button.disabled = true
+		$base/VBoxContainer/ButtonContainer/UpdateAll/Button.modulate = Color(0.7,0.7,0.7,1)
+		$base/VBoxContainer/ButtonContainer/IgnoreAll/Button.disabled = true
+		$base/VBoxContainer/ButtonContainer/IgnoreAll/Button.modulate = Color(0.7,0.7,0.7,1)
 	
 	lastFocus = get_focus_owner()
 	_on_resize()
@@ -138,6 +145,12 @@ func _ignore_all_pressed():
 	var mods = container.get_children()
 	for mod in mods:
 		mod._ignore_confirmed()
+	
+	$base/VBoxContainer/ButtonContainer/Cancel/Button.grab_focus()
+	$base/VBoxContainer/ButtonContainer/UpdateAll/Button.disabled = true
+	$base/VBoxContainer/ButtonContainer/UpdateAll/Button.modulate = Color(0.7,0.7,0.7,1)
+	$base/VBoxContainer/ButtonContainer/IgnoreAll/Button.disabled = true
+	$base/VBoxContainer/ButtonContainer/IgnoreAll/Button.modulate = Color(0.7,0.7,0.7,1)
 
 
 func _update_all_desired():

@@ -39,11 +39,15 @@ onready var conflict_button = get_node(conflict_button_path)
 onready var dependancies_button = get_node(dependancies_button_path)
 onready var updates_button = get_node(updates_button_path)
 
+var yet_to_connect = true
+
 func about_to_show():
-	var restart_dialog = subroot.restart_menu
-	restart_dialog.get_node("PanelContainer/VBoxContainer/HBoxContainer/Restart/Button").connect("pressed",self,"_restart")
-	restart_dialog.get_node("PanelContainer/VBoxContainer/HBoxContainer/Exit/Button").connect("pressed",self,"_exit")
-	restart_dialog.get_node("PanelContainer/VBoxContainer/HBoxContainer/Cancel/Button").connect("pressed",self,"restart_cancel")
+	if yet_to_connect:
+		yet_to_connect = false
+		var restart_dialog = subroot.restart_menu
+		restart_dialog.get_node("PanelContainer/VBoxContainer/HBoxContainer/Restart/Button").connect("pressed",self,"_restart")
+		restart_dialog.get_node("PanelContainer/VBoxContainer/HBoxContainer/Exit/Button").connect("pressed",self,"_exit")
+		restart_dialog.get_node("PanelContainer/VBoxContainer/HBoxContainer/Cancel/Button").connect("pressed",self,"restart_cancel")
 	var nodes = listContainer.get_children()
 	if nodes.size() >= 2:
 		nodes[0]._pressed()
