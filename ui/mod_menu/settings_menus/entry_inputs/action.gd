@@ -16,6 +16,9 @@ func _ready():
 	$Label.text = CONFIG_DATA.get("name","BOOL_MISSING_NAME")
 	$Label/LABELBUTTON.hint_tooltip = CONFIG_DATA.get("description","")
 	script_path = CONFIG_DATA.get("script_path","")
+	$ActionNode.set_script(load(script_path))
+	$Button.text = CONFIG_DATA.get("button_label","")
+	$Button.connect("pressed",$ActionNode,CONFIG_DATA.get("method","_pressed"))
 	add_to_group("hevlib_settings_tab",true)
 
 func _pressed():
@@ -53,8 +56,6 @@ func recheck_availability():
 					$Button.modulate = Color(0.6,0.6,0.6,1)
 					$Button.disabled = true
 	else:
-		$reset.modulate = Color(1,1,1,1)
-		$reset.disabled = false
 		$Button.modulate = Color(1,1,1,1)
 		$Button.disabled = false
 

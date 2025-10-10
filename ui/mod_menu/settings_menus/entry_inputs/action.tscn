@@ -50,4 +50,10 @@ focusAt = NodePath("../../..")
 
 [node name="ActionNode" type="Node" parent="."]
 
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+margin_left = 319.0
+margin_right = 369.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 50, 0 )
+
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]

@@ -43,8 +43,13 @@ static func load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
 					
 					match typeof(key_data):
 						TYPE_DICTIONARY:
-							if "default" in key_data:
-								current_config[sect].merge({key:key_data["default"]})
+							if "type" in key_data:
+								match key_data["type"]:
+									"action":
+										current_config[sect].merge({key:key_data.get("method","_pressed")})
+									_:
+										if "default" in key_data:
+											current_config[sect].merge({key:key_data["default"]})
 								
 						_:
 							pass

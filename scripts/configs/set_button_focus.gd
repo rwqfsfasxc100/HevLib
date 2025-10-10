@@ -10,6 +10,9 @@ static func set_button_focus(button,check_button):
 		"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/option_button.gd":
 			icon_button = button.get_node("button/Label/LABELBUTTON")
 			reset_button = button.get_node("button/reset")
+		"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/action.gd":
+			icon_button = button.get_node("Label/LABELBUTTON")
+			reset_button = Button.new()
 		_:
 			icon_button = button.get_node("Label/LABELBUTTON")
 			reset_button = button.get_node("reset")
