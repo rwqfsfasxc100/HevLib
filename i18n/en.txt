@@ -305,3 +305,15 @@ HEVLIB_TITLE_UPDATE_MODS|Update mods?
 HEVLIB_DLCLIST_DLC_HEADER|------- DLC ------
 
 HEVLIB_DLCLIST_MODS_HEADER|------ MODS ------
+
+HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST|Show always displayed libraries in DLC list
+
+HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST_TOOLTIP|Allows libraries with the 'always_display' tag (such as HevLib) to appear in the DLC list mods section
+
+HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST|Show all libraries in DLC list
+
+HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST_TOOLTIP|Allows all libraries to appear in the DLC list mods section. This can cause the list to get very large with libraries that have a lot of mod main files for sub processes.
+
+HEVLIB_CONFIG_DLCLIST_SORT_ORDER|DLC list mod sort order
+
+HEVLIB_CONFIG_DLCLIST_SORT_ORDER_TOOLTIP|If and how the DLC list mod section should be sorted.

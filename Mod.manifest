@@ -72,6 +72,26 @@ HEVLIB_CONFIG_SECTION_DRIVERS={
 		"type":"bool",
 		"default":false
 	},
+	"show_always_display_libraries_in_dlclist":{
+		"name":"HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST",
+		"description":"HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST_TOOLTIP",
+		"type":"bool",
+		"default":true
+	},
+	"show_all_libraries_in_dlclist":{
+		"name":"HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST",
+		"description":"HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST_TOOLTIP",
+		"type":"bool",
+		"default":false
+	},
+	"dlc_mod_list_sort_order":{
+		"name":"HEVLIB_CONFIG_DLCLIST_SORT_ORDER",
+		"description":"HEVLIB_CONFIG_DLCLIST_SORT_ORDER_TOOLTIP",
+		"type":"option",
+		"store_method":"string",
+		"options":["none","alphabetical_ascending","alphabetical_descending","length_ascending","length_descending"],
+		"default":"none",
+	},
 	"randomize_minerals":{
 		"name":"HEVLIB_CONFIG_RANDOMIZE_MINERALS",
 		"description":"HEVLIB_CONFIG_RANDOMIZE_MINERALS_TOOLTIP",

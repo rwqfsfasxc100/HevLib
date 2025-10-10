@@ -55,10 +55,12 @@ func _pressed():
 	var ver = MOD_INFO["version_data"]["full_version_string"]
 	information_nodes["info_version"].text = TranslationServer.translate("HEVLIB_MODMENU_VERSION") % ver
 	information_nodes["info_priority"].text = TranslationServer.translate("HEVLIB_MODMENU_PRIO") % prio
+	var tex = StreamTexture.new()
 	if MOD_INFO["mod_icon"]["has_icon_file"]:
-		var tex = StreamTexture.new()
 		tex.load_path = MOD_INFO["mod_icon"]["icon_path"]
-		information_nodes["info_icon"].texture = tex
+	else:
+		tex.load_path = "res://HevLib/ui/themes/icons/missing_icon.png.stex"
+	information_nodes["info_icon"].texture = tex
 	var id = ""
 	if manifestData:
 		id = manifestData["mod_information"]["id"]
@@ -67,7 +69,11 @@ func _pressed():
 	if manifestData:
 		author = manifestData["mod_information"]["author"]
 	information_nodes["info_author"].text = author
-	information_nodes["info_desc_author"].text = author
+	if author != "":
+		information_nodes["info_desc_author"].text = author
+		information_nodes["info_desc_author"].visible = true
+	else:
+		information_nodes["info_desc_author"].visible = true
 	var description = ""
 	if manifestData:
 		description = manifestData["mod_information"]["description"]
@@ -79,8 +85,12 @@ func _pressed():
 				creditText = item
 			else:
 				creditText = creditText + "\n" + item
-	information_nodes["info_desc_credits"].text = creditText
-	
+	if creditText != "":
+		information_nodes["info_desc_credits"].text = creditText
+		information_nodes["info_desc_credits"].visible = true
+	else:
+		information_nodes["info_desc_credits"].visible = false
+		
 	var default_URL_icon = "res://HevLib/ui/themes/icons/alias.stex"
 	information_nodes["links_menu_path"].MOD_INFO = MOD_INFO
 	information_nodes["links_menu_path"].update()
