@@ -38,6 +38,8 @@ static func set_button_focus(button,check_button):
 		match script_path:
 			"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.gd":
 				check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("CheckButton"))
+			"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/action.gd":
+				check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("Button"))
 			"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/int-float.gd":
 				var style = parent.get_child(pos+1).style
 				check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node_or_null(style))
@@ -67,6 +69,8 @@ static func set_button_focus(button,check_button):
 		match script_path:
 			"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.gd":
 				check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("CheckButton"))
+			"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/action.gd":
+				check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos - 1).get_node("Button"))
 			"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/int-float.gd":
 				var style = parent.get_child(pos-1).style
 				check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node_or_null(style))
@@ -90,6 +94,8 @@ static func set_button_focus(button,check_button):
 		match script_path:
 			"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.gd":
 				check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("CheckButton"))
+			"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/action.gd":
+				check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos - 1).get_node("Button"))
 			"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/int-float.gd":
 				var style = parent.get_child(pos-1).style
 				check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node_or_null(style))
@@ -114,6 +120,8 @@ static func set_button_focus(button,check_button):
 		match script_path2:
 			"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.gd":
 				check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("CheckButton"))
+			"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/action.gd":
+				check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("Button"))
 			"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/int-float.gd":
 				var style = parent.get_child(pos+1).style
 				check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node_or_null(style))
