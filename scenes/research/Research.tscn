@@ -1,0 +1,375 @@
+[gd_scene load_steps=11 format=2]
+
+[ext_resource path="res://enceladus/ScrollWithAnalog.gd" type="Script" id=1]
+[ext_resource path="res://HevLib/scenes/research/ActivatableProjects.gd" type="Script" id=2]
+[ext_resource path="res://HevLib/scenes/research/Research.gd" type="Script" id=3]
+[ext_resource path="res://HevLib/scenes/research/CurrentResearchManagement.gd" type="Script" id=4]
+[ext_resource path="res://enceladus/Shower.tscn" type="PackedScene" id=5]
+[ext_resource path="res://enceladus/HeaderWithMoney.tscn" type="PackedScene" id=6]
+[ext_resource path="res://hud/TabHintContainer.tscn" type="PackedScene" id=7]
+[ext_resource path="res://menu/SubMenuTheme.tres" type="Theme" id=8]
+[ext_resource path="res://enceladus/Subwindow.theme" type="Theme" id=9]
+[ext_resource path="res://menu/TabsWithGamepadControl.gd" type="Script" id=10]
+
+[node name="Research" type="MarginContainer"]
+margin_right = 1184.0
+margin_bottom = 624.0
+theme = ExtResource( 8 )
+script = ExtResource( 3 )
+
+[node name="Shower" parent="." instance=ExtResource( 5 )]
+
+[node name="TabHintContainer" parent="." instance=ExtResource( 7 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 1184.0
+margin_bottom = 624.0
+
+[node name="MarginContainer" parent="TabHintContainer" index="0"]
+margin_right = 1184.0
+margin_bottom = 45.0
+
+[node name="HBoxContainer" parent="TabHintContainer/MarginContainer" index="0"]
+modulate = Color( 1, 1, 1, 0.498039 )
+margin_right = 1184.0
+margin_bottom = 43.0
+
+[node name="Right" parent="TabHintContainer/MarginContainer/HBoxContainer" index="0"]
+margin_bottom = 39.0
+
+[node name="Label" parent="TabHintContainer/MarginContainer/HBoxContainer" index="1"]
+margin_top = 0.0
+margin_right = 1104.0
+margin_bottom = 39.0
+
+[node name="Left" parent="TabHintContainer/MarginContainer/HBoxContainer" index="2"]
+margin_left = 1104.0
+margin_right = 1184.0
+margin_bottom = 39.0
+
+[node name="Tabs" type="TabContainer" parent="TabHintContainer"]
+show_behind_parent = true
+margin_right = 1184.0
+margin_bottom = 624.0
+script = ExtResource( 10 )
+
+[node name="HEVLIB_RESEARCH_CURRENT" type="Tabs" parent="TabHintContainer/Tabs"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 1.0
+margin_top = 50.0
+margin_right = -1.0
+margin_bottom = -1.0
+
+[node name="CurrentResearchManagement" type="MarginContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+custom_constants/margin_right = -16
+script = ExtResource( 4 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement"]
+margin_right = 1198.0
+margin_bottom = 573.0
+size_flags_horizontal = 3
+custom_constants/separation = 16
+
+[node name="ResearchStats" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer"]
+visible = false
+modulate = Color( 0.501961, 0.501961, 0.501961, 1 )
+margin_right = 1198.0
+margin_bottom = 39.0
+text = "HEVLIB_RESEARCH_STATS"
+
+[node name="MarginContainer" type="MarginContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer"]
+visible = false
+margin_top = 55.0
+margin_right = 1198.0
+margin_bottom = 140.0
+custom_constants/margin_right = 16
+
+[node name="GridContainer" type="GridContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer"]
+margin_right = 1182.0
+margin_bottom = 85.0
+size_flags_horizontal = 3
+theme = ExtResource( 9 )
+custom_constants/vseparation = 0
+custom_constants/hseparation = 32
+columns = 2
+
+[node name="Active" type="MarginContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+
+[node name="ActiveLabel" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer/Active"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "CREW_STATS_ACTIVE"
+
+[node name="ActiveValue" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer/Active"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "%d / %d"
+align = 2
+
+[node name="Salary" type="MarginContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer"]
+margin_left = 607.0
+margin_right = 1182.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+
+[node name="SalaryLabel" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer/Salary"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "CREW_STATS_SALARY"
+
+[node name="SalaryValue" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer/Salary"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "%f"
+align = 2
+
+[node name="Adrenaline" type="MarginContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer"]
+margin_top = 17.0
+margin_right = 575.0
+margin_bottom = 34.0
+size_flags_horizontal = 3
+
+[node name="PilotAdrenalineLabel" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer/Adrenaline"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "CREW_STATS_PILOT_ADRENALINE"
+
+[node name="PilotAdrenalineValue" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer/Adrenaline"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "%.0f%%"
+align = 2
+
+[node name="Anticipation" type="MarginContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer"]
+margin_left = 607.0
+margin_top = 17.0
+margin_right = 1182.0
+margin_bottom = 34.0
+size_flags_horizontal = 3
+
+[node name="PilotAnticipationLabel" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer/Anticipation"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "CREW_STATS_PILOT_ANTICIPATION"
+
+[node name="PilotAnticipationValue" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer/Anticipation"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "%.1f s"
+align = 2
+
+[node name="Fix" type="MarginContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer"]
+margin_top = 34.0
+margin_right = 575.0
+margin_bottom = 51.0
+size_flags_horizontal = 3
+
+[node name="MechanicFixLabel" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer/Fix"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "CREW_STATS_MECHANIC_FIX"
+
+[node name="MechanicFixValue" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer/Fix"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "%.0f%%"
+align = 2
+
+[node name="JuryRig" type="MarginContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer"]
+margin_left = 607.0
+margin_top = 34.0
+margin_right = 1182.0
+margin_bottom = 51.0
+size_flags_horizontal = 3
+
+[node name="MechanicJuryRigValue" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer/JuryRig"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "%.0f%%"
+align = 2
+
+[node name="MechanicJuryRigLabel" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer/JuryRig"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "CREW_STATS_MECHANIC_JURYRIG"
+
+[node name="Prediction" type="MarginContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer"]
+margin_top = 51.0
+margin_right = 575.0
+margin_bottom = 68.0
+size_flags_horizontal = 3
+
+[node name="GeologistPredictionLabel" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer/Prediction"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "CREW_STATS_GEOLOGIST_PREDICTION"
+
+[node name="GeologistPredictionValue" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer/Prediction"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "%.0f%%"
+align = 2
+
+[node name="GeologistRange" type="MarginContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer"]
+margin_left = 607.0
+margin_top = 51.0
+margin_right = 1182.0
+margin_bottom = 68.0
+size_flags_horizontal = 3
+
+[node name="GeologistRangeLabel" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer/GeologistRange"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "CREW_STATS_GEOLOGIST_RANGE"
+
+[node name="GeologistRangeValue" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer/GeologistRange"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "%.0f m"
+align = 2
+
+[node name="AstrogatorRange" type="MarginContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer"]
+margin_top = 68.0
+margin_right = 575.0
+margin_bottom = 85.0
+size_flags_horizontal = 3
+
+[node name="AstrogatorRangeLabel" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer/AstrogatorRange"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "CREW_STATS_ASTROGATOR_RANGE"
+
+[node name="AstrogatorRangeValue" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer/AstrogatorRange"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "%.0f m"
+align = 2
+
+[node name="AstrogatorTime" type="MarginContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer"]
+margin_left = 607.0
+margin_top = 68.0
+margin_right = 1182.0
+margin_bottom = 85.0
+size_flags_horizontal = 3
+
+[node name="AstrogatorTimeLabel" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer/AstrogatorTime"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "CREW_STATS_ASTROGATOR_TIME"
+
+[node name="AstrogatorTimeValue" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer/GridContainer/AstrogatorTime"]
+margin_right = 575.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "%.0f m"
+align = 2
+
+[node name="CurrentProjects" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer"]
+modulate = Color( 0.501961, 0.501961, 0.501961, 1 )
+margin_right = 1198.0
+margin_bottom = 39.0
+text = "HEVLIB_CURRENT_PROJECTS"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer"]
+margin_top = 55.0
+margin_right = 1198.0
+margin_bottom = 573.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+follow_focus = true
+script = ExtResource( 1 )
+
+[node name="Projects" type="VBoxContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/ScrollContainer"]
+margin_top = 16.0
+margin_right = 1198.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+
+[node name="HEVLIB_RESEARCH_AVAILABLE" type="Tabs" parent="TabHintContainer/Tabs"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 1.0
+margin_top = 50.0
+margin_right = -1.0
+margin_bottom = -1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_AVAILABLE"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="VBoxContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_AVAILABLE/MarginContainer"]
+margin_right = 1182.0
+margin_bottom = 573.0
+
+[node name="HeaderWithMoney" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_AVAILABLE/MarginContainer/HBoxContainer" instance=ExtResource( 6 )]
+margin_right = 1182.0
+margin_bottom = 39.0
+
+[node name="MarketLabel" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_AVAILABLE/MarginContainer/HBoxContainer/HeaderWithMoney" index="0"]
+margin_right = 1101.0
+margin_bottom = 39.0
+text = "ENCELADUS_CREW"
+
+[node name="VBoxContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_AVAILABLE/MarginContainer/HBoxContainer/HeaderWithMoney" index="1"]
+margin_left = 1105.0
+margin_right = 1182.0
+margin_bottom = 39.0
+
+[node name="Money" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_AVAILABLE/MarginContainer/HBoxContainer/HeaderWithMoney/VBoxContainer" index="0"]
+margin_right = 77.0
+margin_bottom = 39.0
+
+[node name="ActivatableProjects" type="MarginContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_AVAILABLE/MarginContainer/HBoxContainer"]
+margin_top = 43.0
+margin_right = 1182.0
+margin_bottom = 573.0
+size_flags_vertical = 3
+custom_constants/margin_right = -16
+script = ExtResource( 2 )
+
+[node name="Scroll" type="ScrollContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_AVAILABLE/MarginContainer/HBoxContainer/ActivatableProjects"]
+margin_right = 1198.0
+margin_bottom = 530.0
+size_flags_horizontal = 3
+scroll_horizontal_enabled = false
+script = ExtResource( 1 )
+
+[node name="Items" type="VBoxContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_AVAILABLE/MarginContainer/HBoxContainer/ActivatableProjects/Scroll"]
+margin_top = 16.0
+margin_right = 1198.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+
+[editable path="TabHintContainer"]
+[editable path="TabHintContainer/Tabs/HEVLIB_RESEARCH_AVAILABLE/MarginContainer/HBoxContainer/HeaderWithMoney"]

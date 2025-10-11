@@ -1,0 +1,90 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://enceladus/Enceladus.tscn" type="PackedScene" id=1]
+[ext_resource path="res://HevLib/scenes/research/Research.tscn" type="PackedScene" id=2]
+
+[sub_resource type="ViewportTexture" id=1]
+viewport_path = NodePath("Background/BackgroundViewportContainer/Viewport/Offset/swirl/wirescreen/Display/Viewport")
+
+[sub_resource type="ViewportTexture" id=2]
+flags = 4
+viewport_path = NodePath("Background/BackgroundViewportContainer/Viewport/Offset/swirl/wirescreen/Display/Viewport")
+
+[sub_resource type="ViewportTexture" id=3]
+flags = 4
+viewport_path = NodePath("Background/BackgroundViewportContainer/Viewport/Offset/swirl/wirescreen/Display/LightPort")
+
+[sub_resource type="ViewportTexture" id=4]
+viewport_path = NodePath("Background/BackgroundViewportContainer/Viewport")
+
+[node name="Enceladus" instance=ExtResource( 1 )]
+
+[node name="Sprite" parent="Background/BackgroundViewportContainer/Viewport/Offset/swirl/wirescreen/Display/LightPort" index="0"]
+texture = SubResource( 1 )
+
+[node name="DisplayLight" parent="Background/BackgroundViewportContainer/Viewport/Offset/swirl/wirescreen" index="2"]
+texture = SubResource( 2 )
+
+[node name="DisplayGlow" parent="Background/BackgroundViewportContainer/Viewport/Offset/swirl/wirescreen" index="3"]
+texture = SubResource( 3 )
+
+[node name="TextureRect" parent="Background" index="1"]
+texture = SubResource( 4 )
+
+[node name="MarginContainer" parent="EnceladusMenu/MenuContainer" index="3"]
+margin_bottom = 807.0
+
+[node name="HBoxContainer" parent="EnceladusMenu/MenuContainer/MarginContainer" index="0"]
+margin_bottom = 799.0
+
+[node name="Options" parent="EnceladusMenu/MenuContainer/MarginContainer/HBoxContainer" index="0"]
+margin_bottom = 751.0
+
+[node name="Research" type="Button" parent="EnceladusMenu/MenuContainer/MarginContainer/HBoxContainer/Options" index="5"]
+margin_top = 225.0
+margin_right = 590.0
+margin_bottom = 266.0
+text = "HEVLIB_RESEARCH"
+
+[node name="ShipMarket" parent="EnceladusMenu/MenuContainer/MarginContainer/HBoxContainer/Options" index="6"]
+margin_top = 270.0
+margin_bottom = 311.0
+
+[node name="OwnedShips" parent="EnceladusMenu/MenuContainer/MarginContainer/HBoxContainer/Options" index="7"]
+margin_top = 315.0
+margin_bottom = 356.0
+
+[node name="Crew" parent="EnceladusMenu/MenuContainer/MarginContainer/HBoxContainer/Options" index="8"]
+margin_top = 360.0
+margin_bottom = 401.0
+
+[node name="Logs" parent="EnceladusMenu/MenuContainer/MarginContainer/HBoxContainer/Options" index="9"]
+margin_top = 405.0
+margin_bottom = 446.0
+
+[node name="RingDive" parent="EnceladusMenu/MenuContainer/MarginContainer/HBoxContainer/Options" index="10"]
+margin_top = 450.0
+margin_bottom = 491.0
+
+[node name="spacer" parent="EnceladusMenu/MenuContainer/MarginContainer/HBoxContainer/Options" index="12"]
+margin_top = 495.0
+margin_bottom = 751.0
+
+[node name="Research" parent="EnceladusMenu/MenuContainer/MarginContainer/CanvasLayer/MarginContainer" index="5" instance=ExtResource( 2 )]
+visible = false
+margin_left = 224.0
+margin_right = 1248.0
+margin_bottom = 688.0
+rect_min_size = Vector2( 1024, 0 )
+size_flags_horizontal = 8
+research_button_path = NodePath("../../../HBoxContainer/Options/Research")
+
+[connection signal="pressed" from="EnceladusMenu/MenuContainer/MarginContainer/HBoxContainer/Options/Research" to="EnceladusMenu/MenuContainer/MarginContainer/CanvasLayer/MarginContainer/Research" method="_on_Research_pressed"]
+
+[editable path="AnimationPlayer/CanvasLayer/CRT"]
+[editable path="Background/BackgroundViewportContainer/Viewport/Offset/EnceladusIndustrialDock"]
+[editable path="Background/BackgroundViewportContainer/Viewport/Offset/EnceladusIndustrialDock/DockingArm"]
+[editable path="Background/BackgroundViewportContainer/Viewport/Offset/EnceladusIndustrialDock/DockingArm/Arm"]
+[editable path="Background/BackgroundViewportContainer/Viewport/Offset/EnceladusIndustrialDock/DockingArm/Arm/A/B/Spotlight"]
+[editable path="Background/BackgroundViewportContainer/Viewport/Offset/swirl/wirescreen"]
+[editable path="EnceladusMenu/MenuContainer/MarginContainer/HBoxContainer/Options"]

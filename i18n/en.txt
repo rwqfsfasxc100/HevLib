@@ -317,3 +317,14 @@ HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST_TOOLTIP|Allows all libraries to appe
 HEVLIB_CONFIG_DLCLIST_SORT_ORDER|DLC list mod sort order
 
 HEVLIB_CONFIG_DLCLIST_SORT_ORDER_TOOLTIP|If and how the DLC list mod section should be sorted.
+
+HEVLIB_RESEARCH|Research
+
+HEVLIB_RESEARCH_CURRENT|Current Research
+
+HEVLIB_CURRENT_PROJECTS|Active Research Projects
+
+HEVLIB_RESEARCH_STATS|All Project Stats
+
+HEVLIB_RESEARCH_AVAILABLE|Available Projects
+
