@@ -136,6 +136,8 @@ static func make_mineral_scripting(is_onready = false):
 	
 	f.open(mineral_cache_file,File.READ)
 	var mineral_data = JSON.parse(f.get_as_text()).result
+	if mineral_data.size() >= 1:
+		installScriptExtension("res://HevLib/scenes/minerals/AstrogatorPanel.gd")
 	f.close()
 	for m in mineral_data:
 		if "color" in m:
@@ -260,3 +262,10 @@ static func handle_mineral_values_and_colors(mineral_data):
 	trace_text = trace_text + "\t])"
 	collective_text = collective_text + "\n\n" + price_text + "\n\n" + color_text + "\n\n" + trace_text
 	return collective_text
+
+static func installScriptExtension(path:String):
+	var childScript:Script = ResourceLoader.load(path)
+	childScript.new()
+	var parentScript:Script = childScript.get_base_script()
+	var parentPath:String = parentScript.resource_path
+	childScript.take_over_path(parentPath)
