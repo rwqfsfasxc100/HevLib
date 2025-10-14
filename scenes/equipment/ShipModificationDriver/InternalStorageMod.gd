@@ -15,6 +15,9 @@ var nano_add = 0
 var multi = 1.0
 var propellant_add = 0
 var mass_add = 0
+var mass_per_crew = 0
+var mass_per_processed_tonne = 0
+var mass_per_tonne_total_storage_added = 0
 
 func _ready():
 	if isPlayerControlled():
@@ -57,6 +60,16 @@ func _ready():
 			if listingMass != 0.0:
 				ls.merge({"mass":listingMass})
 			
+			var listingCrewMassMod = float(item.get("mass_per_crew_member",0.0))
+			if listingCrewMassMod != 0.0:
+				ls.merge({"mass_per_crew_member":listingCrewMassMod})
+			var listingOreMassMod = float(item.get("mass_per_tonne_of_processed_ore",0.0))
+			if listingOreMassMod != 0.0:
+				ls.merge({"mass_per_tonne_of_processed_ore":listingOreMassMod})
+			var listingTotalAddedStorageMassMod = float(item.get("mass_per_tonne_total_storage_added",0.0))
+			if listingTotalAddedStorageMassMod != 0.0:
+				ls.merge({"mass_per_tonne_total_storage_added":listingOreMassMod})
+			
 			
 			listings.merge({
 				listingSystemName:ls
@@ -79,6 +92,8 @@ func _ready():
 		var modifyable_crew_count = base_crew_count
 		var modifyable_crew_morale = base_crew_morale
 		
+		var total_added_capacity = 0
+		
 		for item in installed:
 			var iddata = listings[item]
 			for key in iddata:
@@ -86,18 +101,22 @@ func _ready():
 					"storage_flat":
 						var val = iddata[key]
 						storage_add += val
+						total_added_capacity += val
 					"storage_ammo":
 						var val = iddata[key]
 						ammo_add += val
+						total_added_capacity += val
 					"storage_nano":
 						var val = iddata[key]
 						nano_add += val
+						total_added_capacity += val
 					"storage_multi":
 						var val = iddata[key]
 						multi *= float(val)
 					"storage_propellant":
 						var val = iddata[key]
 						propellant_add += val
+						total_added_capacity += val
 					"force_type":
 						var val = iddata[key]
 						modifyable_type = val
@@ -110,14 +129,28 @@ func _ready():
 					"mass":
 						var val = iddata[key]
 						mass_add += val
-					
+					"mass_per_crew_member":
+						var val = iddata[key]
+						mass_per_crew += val
+					"mass_per_tonne_of_processed_ore":
+						var val = iddata[key]
+						mass_per_processed_tonne += val
+					"mass_per_tonne_total_storage_added":
+						var val = iddata[key]
+						mass_per_tonne_total_storage_added += val
+		
+		
+		if modifyable_crew_count > 0:
+			l("Adding mass @ %s kg for each of %s crew members" % [mass_per_crew,modifyable_crew_count])
+			mass_add += (modifyable_crew_count * mass_per_crew)
 		
 		var modifyable_add_capacity = storage_add
 		var modifyable_add_ammo = ammo_add
 		var modifyable_add_nano = nano_add
 		var modifyable_multi = multi
 		var modifyable_propellant = propellant_add
-		var modifyable_mass = float(mass_add)/1000.0
+		
+		
 		
 		if modifyable_type != "":
 			l("Setting desired hold type")
@@ -134,6 +167,7 @@ func _ready():
 				l("Hold type isn't changed (is this equipment in the right slot?)")
 			if modifyable_type != "divided":
 				modifyable_add_capacity = storage_add * 6
+				mass_per_processed_tonne = mass_per_processed_tonne * 6
 				l("Hold type isn't divided, multiplying addition of %s by 6 to new addition of %s" % [storage_add,modifyable_add_capacity])
 			
 		else:
@@ -146,15 +180,31 @@ func _ready():
 		l("Adding storage bonus of %s. New size of %s" % [modifyable_add_capacity,processedCargoCapacity])
 		
 		
+		if multi != 1.0:
+			var change = base_proc_storage - processedCargoCapacity
+			total_added_capacity += change
+		
+		if mass_per_processed_tonne > 0:
+			l("Adding mass @ %s kg for every tonne of processed capacity" % mass_per_processed_tonne)
+			mass_add += ((float(processedCargoCapacity)/1000.0) * mass_per_processed_tonne)
+		
+		
 		l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [modifyable_add_ammo, modifyable_add_nano, modifyable_propellant])
 		
 		massDriverAmmoMax += modifyable_add_ammo
 		dronePartsMax += modifyable_add_nano
 		reactiveMassMax += modifyable_propellant
 		
-		l("Making modificatins to crew. Crew count changed from %s to %s / crew morale changed from %s to %s" % [base_crew_count,modifyable_crew_count,base_crew_morale,modifyable_crew_morale])
+		if mass_per_tonne_total_storage_added != 0:
+			l("Changing mass by %s kg for every tonne of total storage changed by" % total_added_capacity)
+			mass_add += ((float(total_added_capacity) /1000.0) * mass_per_tonne_total_storage_added)
 		
-		crew = modifyable_crew_count
+		
+		l("Making modificatins to crew. Crew count changed from %s to %s / crew morale changed from %s to %s" % [base_crew_count,modifyable_crew_count,base_crew_morale,modifyable_crew_morale])
+		if modifyable_crew_count < 0:
+			crew = 0
+		else:
+			crew = modifyable_crew_count
 		crewMoraleBonus = clamp(modifyable_crew_morale,-0.5,0.5)
 		
 		var cfg = shipConfig
@@ -162,6 +212,9 @@ func _ready():
 		
 		var chash = cfg.hash()
 		var shash = state.hash()
+		
+		
+		var modifyable_mass = float(mass_add)/1000.0
 		
 		
 		
@@ -175,8 +228,16 @@ func _ready():
 			var active = getCurrentlyActiveCrewNames()
 			if active.size() > crew:
 				deactivateCrew(crew)
-		var new_mass = shipInitialMass + modifyable_mass
-		shipInitialMass = new_mass
+		var massNodeName = "InternalStorageMod_MassModifier"
+		var vn = get_node_or_null(massNodeName)
+		if vn != null:
+			vn.mass = mass_add
+		else:
+			var vmass = Node2D.new()
+			vmass.set_script(load("res://HevLib/scenes/equipment/var_nodes/add_mass.gd"))
+			vmass.mass = mass_add
+			vmass.name = massNodeName
+			add_child(vmass)
 		l("Adding %s kg of mass. Base ship mass changing from %s to %s" % [mass_add,base_mass * 1000,shipInitialMass * 1000])
 
 func deactivateCrew(maximum):
