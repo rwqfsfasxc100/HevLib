@@ -57,3 +57,11 @@ expand = true
 focusAt = NodePath("../../..")
 
 [node name="PlaySoundsOnTheseButtons" parent="reset/TextureRect" instance=ExtResource( 3 )]
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+margin_left = 305.0
+margin_right = 315.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 10, 0 )
+
+[connection signal="pressed" from="reset" to="." method="_reset_pressed"]

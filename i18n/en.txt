@@ -328,3 +328,18 @@ HEVLIB_RESEARCH_STATS|All Project Stats
 
 HEVLIB_RESEARCH_AVAILABLE|Available Projects
 
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT|UI Scroll Left
+
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT_TOOLTIP|Primary left scroll input for horizontal-only scroll menus
+
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT|UI Scroll Right
+
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT_TOOLTIP|Primary right scroll input for horizontal-only scroll menus
+
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2|UI Scroll Left (alt)
+
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2_TOOLTIP|Alternate left scroll input for horizontal-only scroll menus
+
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2|UI Scroll Right (alt)
+
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2_TOOLTIP|Alternate right scroll input for horizontal-only scroll menus

@@ -147,6 +147,34 @@ HEVLIB_CONFIG_SECTION_INPUT={
 		"hint":"",
 		"default":[ "F9" ]
 	},
+	"ui_scroll_left":{
+		"name":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT",
+		"description":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT_TOOLTIP",
+		"type":"Input",
+		"hint":"",
+		"default":[ "JoyAxis -0" ]
+	},
+	"ui_scroll_right":{
+		"name":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT",
+		"description":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT_TOOLTIP",
+		"type":"Input",
+		"hint":"",
+		"default":[ "JoyAxis 0" ]
+	},
+	"ui_scroll_left2":{
+		"name":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2",
+		"description":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2_TOOLTIP",
+		"type":"Input",
+		"hint":"",
+		"default":[ "JoyAxis -2" ]
+	},
+	"ui_scroll_right2":{
+		"name":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2",
+		"description":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2_TOOLTIP",
+		"type":"Input",
+		"hint":"",
+		"default":[ "JoyAxis 2" ]
+	},
 }
 
 [manifest_definitions]

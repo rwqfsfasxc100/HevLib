@@ -21,6 +21,13 @@ func _ready():
 
 func recheck_availability():
 	
+	var values = ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
+	if values.hash() != CONFIG_DATA.get("default",[]).hash():
+		$reset.visible = true
+		$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($reset)
+	else:
+		$reset.visible = false
+		$Label/LABELBUTTON.focus_neighbour_right = "."
 	var requirements = PoolStringArray(CONFIG_DATA.get("requires_bools",[]))
 	if requirements.size() >= 1:
 		var show = true
@@ -66,8 +73,8 @@ func recheck_availability():
 		$Label/LABELBUTTON.disabled = false
 
 func _reset_pressed():
-	ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,CONFIG_DATA.get("default",false))
-	$CheckButton.grab_focus()
+	ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,CONFIG_DATA.get("default",[]))
+	$Label/LABELBUTTON.grab_focus()
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 
 func _draw():

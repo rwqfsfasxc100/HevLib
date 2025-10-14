@@ -67,7 +67,7 @@ func _init(modLoader = ModLoader):
 	installScriptExtension("../scene_replacements/blanks/Hud.gd")
 	installScriptExtension("../scene_replacements/ship-ctrl.gd")
 	
-	
+	installScriptExtension("ThrusterSlot.gd")
 	installScriptExtension("UpgradeGroup.gd")
 	installScriptExtension("hardpoints/EquipmentItemTemplate.gd")
 	
@@ -111,9 +111,9 @@ func _ready():
 	upgrades.take_over_path("res://enceladus/Upgrades.tscn")
 	_savedObjects.append(upgrades)
 	
-	var aux = load(aux_path)
-	aux.take_over_path("res://ships/modules/AuxSlot.tscn")
-	_savedObjects.append(aux)
+#	var aux = load(aux_path)
+#	aux.take_over_path("res://ships/modules/AuxSlot.tscn")
+#	_savedObjects.append(aux)
 	
 	var ws = load(weaponslot_path)
 	ws.take_over_path("res://weapons/WeaponSlot.tscn")

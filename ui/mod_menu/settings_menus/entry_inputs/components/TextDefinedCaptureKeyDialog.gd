@@ -64,20 +64,30 @@ func remakeActionButtons():
 	addButton.visible = actions.size() < 5
 	$PanelContainer / MarginContainer / VBoxContainer / CenterContainer2 / HBoxContainer / Ok.grab_focus()
 		
-	
+
 var store = []
 func _on_CaptureKeyDialog_about_to_show():
+	lastFocus = get_focus_owner()
 	remakeActionButtons()
 	store = ConfigDriver.__get_value(mod,section,action)
-
 var capturing = false
 
+var lastFocus = null
+func refocus():
+	if lastFocus and lastFocus.has_method("grab_focus"):
+		lastFocus.grab_focus()
+	else:
+		Debug.l("I have no focus to fall back to!")
+
 func _input(event):
-	if event.is_action_pressed("ui_cancel"):
+	if capturing and event is InputEventJoypadButton and event.button_index == 1:
+		pass
+	elif event.is_action_pressed("ui_cancel"):
 		if capturing:
 			stopCapturing()
 		else:
 			hide()
+			refocus()
 		get_tree().set_input_as_handled()
 		return
 
@@ -94,7 +104,34 @@ func _input(event):
 					ent.append(key)
 					ConfigDriver.__store_value(mod,section,action,ent)
 					remakeActionButtons()
+		elif (event is InputEventJoypadButton or event is InputEventJoypadMotion) and event.is_pressed():
+			get_tree().set_input_as_handled()
+			var key = joyEventToString(event)
+			if event is InputEventJoypadButton and event.button_index == JOY_BUTTON_11:
+				stopCapturing()
+			else:
+				stopCapturing()
+				var ent = ConfigDriver.__get_value(mod,section,action)
+				if not ent.has(key):
+					ent.append(key)
+					ConfigDriver.__store_value(mod,section,action,ent)
+					remakeActionButtons()
 			
+
+func joyEventToString(event):
+	if event is InputEventJoypadButton:
+		return "JoyButton %s" % event.button_index
+	if event is InputEventJoypadMotion:
+		return "JoyAxis %s" % [is_pos_or_neg(event) + str(event.axis)]
+	
+
+func is_pos_or_neg(event):
+	var val = event.axis_value
+	if val >= 0:
+		return ""
+	else:
+		return "-"
+
 func _on_Add_pressed():
 	if capturing:
 		stopCapturing()
@@ -114,14 +151,14 @@ func _on_Cancel_pressed():
 	ConfigDriver.__store_value(mod,section,action,store)
 	Settings.applySettings()
 	hide()
-	
+	refocus()
 func _on_Ok_pressed():
 	
 	stopCapturing()
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 	Settings.applySettings()
 	hide()
-
+	refocus()
 
 func _on_CaptureKeyDialog_focus_entered():
 	remakeActionButtons()

@@ -138,6 +138,7 @@ static func make_mineral_scripting(is_onready = false):
 	var mineral_data = JSON.parse(f.get_as_text()).result
 	if mineral_data.size() >= 1:
 		installScriptExtension("res://HevLib/scenes/minerals/AstrogatorPanel.gd")
+		installScriptExtension("res://HevLib/scenes/minerals/OMS.gd")
 	f.close()
 	for m in mineral_data:
 		if "color" in m:

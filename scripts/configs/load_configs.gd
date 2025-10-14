@@ -74,8 +74,26 @@ static func load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
 							addAction = false
 					if addAction:
 						InputMap.add_action(key)
-					for k in p:
-						var event = InputEventKey.new()
-						event.scancode = OS.find_scancode_from_string(k)
-						InputMap.action_add_event(key, event)
+					for i in p:
+						if i.begins_with("Mouse "):
+							var event = InputEventMouseButton.new()
+							event.button_index = int(i.split("Mouse ")[1])
+							InputMap.action_add_event(key, event)
+						if i.begins_with("JoyButton "):
+							var event = InputEventJoypadButton.new()
+							event.button_index = int(i.split("JoyButton ")[1])
+							InputMap.action_add_event(key, event)
+						if i.begins_with("JoyAxis "):
+							var event = InputEventJoypadMotion.new()
+							event.axis = abs(int(i.split("JoyAxis ")[1]))
+							if i.split("JoyAxis ")[1].begins_with("-"):
+								event.axis_value = -1.0
+							else:
+								event.axis_value = 1.0
+							InputMap.action_add_event(key, event)
+							
+						else:
+							var event = InputEventKey.new()
+							event.scancode = OS.find_scancode_from_string(i)
+							InputMap.action_add_event(key, event)
 	

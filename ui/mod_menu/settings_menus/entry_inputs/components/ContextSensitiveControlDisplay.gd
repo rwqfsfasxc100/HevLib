@@ -193,6 +193,18 @@ func recheck_availability():
 			d.name = i
 			keys.add_child(d)
 #			breakpoint
+		elif i.begins_with("JoyButton "):
+			var d = gamepadKeyDisplay.instance()
+			d.key = int(i.split("JoyButton ")[1])
+			d.name = i
+			keys.add_child(d)
+#			breakpoint
+		elif i.begins_with("JoyAxis "):
+			var d = analogAxisDisplay.instance()
+			d.key = abs(int(i.split("JoyAxis ")[1]))
+			d.name = i
+			keys.add_child(d)
+#			breakpoint
 		
 		else:
 			var d = keybindDisplay.instance()

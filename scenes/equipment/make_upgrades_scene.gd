@@ -39,6 +39,7 @@ func make_upgrades_scene(is_onready: bool = true):
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_mods.json",
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/node_definitions.json",
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_register.json",
+		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/AuxSlot.json",
 	]
 	
 	var file_save_path : String = FILE_PATHS[0]
@@ -53,6 +54,7 @@ func make_upgrades_scene(is_onready: bool = true):
 	var processed_storage_file = FILE_PATHS[9]
 	var node_definitions_file = FILE_PATHS[10]
 	var ship_node_register_file = FILE_PATHS[11]
+	var auxslot_data_path = FILE_PATHS[12]
 	var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 	if is_onready:
 		
@@ -167,6 +169,9 @@ func make_upgrades_scene(is_onready: bool = true):
 	wpfl.close()
 	wpfl.open(node_definitions_file,File.WRITE)
 	wpfl.store_string("{}")
+	wpfl.close()
+	wpfl.open(auxslot_data_path,File.WRITE)
+	wpfl.store_string("[]")
 	wpfl.close()
 	wpfl.open(ship_node_register_file,File.WRITE)
 	wpfl.store_string(JSON.print(register_default_ships))
@@ -884,12 +889,17 @@ func make_upgrades_scene(is_onready: bool = true):
 	var aux_power_string = aux_power_header
 	
 	var property = "%s = %s"
-	
+	var file = File.new()
 	for mod in power_state:
 		for type in mod:
 			match type:
 				"AUX_POWER_SLOT":
 					for data in mod.get(type):
+						file.open(auxslot_data_path,File.READ_WRITE)
+						var a = JSON.parse(file.get_as_text()).result
+						a.append(data)
+						file.store_string(JSON.print(a))
+						file.close()
 						var aux_path = data.get("path","")
 						var aux_type = data.get("type","MPDG").to_upper()
 						match aux_type:
