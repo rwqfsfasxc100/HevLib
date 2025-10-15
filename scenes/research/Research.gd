@@ -21,8 +21,8 @@ func _ready():
 	get_parent().connect("hidefoka", self, "hide")
 	
 	var tag_exists = ManifestV2.__get_tags()
-#	if not "TAG_USING_HEVLIB_RESEARCH" in tag_exists:
-#		Tool.remove(research_button)
+	if not "TAG_USING_HEVLIB_RESEARCH" in tag_exists:
+		Tool.remove(research_button)
 
 const ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 

@@ -192,7 +192,7 @@ func _ready():
 		processedCargoCapacity += modifyable_add_capacity
 		l("Adding storage bonus of %s. New size of %s" % [modifyable_add_capacity,processedCargoCapacity])
 		
-		
+		processedCargoCapacity = clamp(processedCargoCapacity,0,INF)
 		if multi != 1.0:
 			var change = base_proc_storage - processedCargoCapacity
 			total_added_capacity += change
@@ -205,9 +205,9 @@ func _ready():
 		
 		l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [modifyable_add_ammo, modifyable_add_nano, modifyable_propellant])
 		
-		massDriverAmmoMax += modifyable_add_ammo
-		dronePartsMax += modifyable_add_nano
-		reactiveMassMax += modifyable_propellant
+		massDriverAmmoMax += clamp(modifyable_add_ammo,0,INF)
+		dronePartsMax += clamp(modifyable_add_nano,0,INF)
+		reactiveMassMax += clamp(modifyable_propellant,0,INF)
 		
 		if mass_per_tonne_total_storage_added != 0:
 			l("Changing mass by %s kg for every tonne of total storage changed by" % total_added_capacity)
@@ -216,10 +216,8 @@ func _ready():
 		
 		
 		l("Making modificatins to crew. Crew count changed from %s to %s / crew morale changed from %s to %s" % [base_crew_count,modifyable_crew_count,base_crew_morale,modifyable_crew_morale])
-		if modifyable_crew_count < 0:
-			crew = 0
-		else:
-			crew = modifyable_crew_count
+		
+		crew = clamp(modifyable_crew_count,0,INF)
 		crewMoraleBonus = clamp(modifyable_crew_morale,-0.5,0.5)
 		
 		var cfg = shipConfig
