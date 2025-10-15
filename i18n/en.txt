@@ -344,4 +344,4 @@ HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2|UI Scroll Right (alt)
 
 HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2_TOOLTIP|Alternate right scroll input for horizontal-only scroll menus
 
-SYSTEM_HEVLIB_INTERNALS_NODE|Internal SysMod Handle
+SYSTEM_HEVLIB_INTERNALS_NODE|Internal System Mod Handle
