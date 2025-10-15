@@ -69,7 +69,7 @@ func _ready():
 				ls.merge({"mass_per_tonne_of_processed_ore":listingOreMassMod})
 			var listingTotalAddedStorageMassMod = float(item.get("mass_per_tonne_total_storage_added",0.0))
 			if listingTotalAddedStorageMassMod != 0.0:
-				ls.merge({"mass_per_tonne_total_storage_added":listingOreMassMod})
+				ls.merge({"mass_per_tonne_total_storage_added":listingTotalAddedStorageMassMod})
 			
 			
 			listings.merge({
@@ -197,9 +197,10 @@ func _ready():
 			var change = base_proc_storage - processedCargoCapacity
 			total_added_capacity += change
 		
-		if mass_per_processed_tonne > 0:
+		if mass_per_processed_tonne != 0:
 			l("Adding mass @ %s kg for every tonne of processed capacity" % mass_per_processed_tonne)
-			mass_add += ((float(processedCargoCapacity)/1000.0) * mass_per_processed_tonne)
+			var change = ((float(processedCargoCapacity)/1000.0) * mass_per_processed_tonne)
+			mass_add += change
 		
 		
 		l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [modifyable_add_ammo, modifyable_add_nano, modifyable_propellant])
@@ -210,7 +211,8 @@ func _ready():
 		
 		if mass_per_tonne_total_storage_added != 0:
 			l("Changing mass by %s kg for every tonne of total storage changed by" % total_added_capacity)
-			mass_add += ((float(total_added_capacity) /1000.0) * mass_per_tonne_total_storage_added)
+			var change = ((float(total_added_capacity) /1000.0) * mass_per_tonne_total_storage_added)
+			mass_add += change
 		
 		
 		l("Making modificatins to crew. Crew count changed from %s to %s / crew morale changed from %s to %s" % [base_crew_count,modifyable_crew_count,base_crew_morale,modifyable_crew_morale])
