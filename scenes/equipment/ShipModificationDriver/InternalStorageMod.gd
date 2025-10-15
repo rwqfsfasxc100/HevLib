@@ -21,6 +21,7 @@ var mass_per_tonne_total_storage_added = 0
 
 func _ready():
 	if isPlayerControlled():
+		var has_made_change = false
 		l("Readying ship. Base storage of %s proc / %s ammo / %s nanodrones on storage type of %s" % [base_proc_storage, base_ammo_storage, base_nano_storage, base_storage_type])
 		var file = File.new()
 		file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_mods.json",File.READ)
@@ -102,42 +103,54 @@ func _ready():
 						var val = iddata[key]
 						storage_add += val
 						total_added_capacity += val
+						has_made_change = true
 					"storage_ammo":
 						var val = iddata[key]
 						ammo_add += val
 						total_added_capacity += val
+						has_made_change = true
 					"storage_nano":
 						var val = iddata[key]
 						nano_add += val
 						total_added_capacity += val
+						has_made_change = true
 					"storage_multi":
 						var val = iddata[key]
 						multi *= float(val)
+						has_made_change = true
 					"storage_propellant":
 						var val = iddata[key]
 						propellant_add += val
 						total_added_capacity += val
+						has_made_change = true
 					"force_type":
 						var val = iddata[key]
 						modifyable_type = val
+						has_made_change = true
 					"crew_count":
 						var val = iddata[key]
 						modifyable_crew_count += val
+						has_made_change = true
 					"crew_morale":
 						var val = iddata[key]
 						modifyable_crew_morale += val
+						has_made_change = true
 					"mass":
 						var val = iddata[key]
 						mass_add += val
+						has_made_change = true
 					"mass_per_crew_member":
 						var val = iddata[key]
 						mass_per_crew += val
+						has_made_change = true
 					"mass_per_tonne_of_processed_ore":
 						var val = iddata[key]
 						mass_per_processed_tonne += val
+						has_made_change = true
 					"mass_per_tonne_total_storage_added":
 						var val = iddata[key]
 						mass_per_tonne_total_storage_added += val
+						has_made_change = true
 		
 		
 		if modifyable_crew_count > 0:
@@ -228,17 +241,28 @@ func _ready():
 			var active = getCurrentlyActiveCrewNames()
 			if active.size() > crew:
 				deactivateCrew(crew)
-		var massNodeName = "InternalStorageMod_MassModifier"
-		var vn = get_node_or_null(massNodeName)
-		if vn != null:
-			vn.mass = mass_add
-		else:
+		
+		if has_made_change:
 			var vmass = Node2D.new()
 			vmass.set_script(load("res://HevLib/scenes/equipment/var_nodes/add_mass.gd"))
 			vmass.mass = mass_add
 			vmass.name = massNodeName
 			add_child(vmass)
+			call_deferred("move_child",vmass,get_child_count())
+		
 		l("Adding %s kg of mass. Base ship mass changing from %s to %s" % [mass_add,base_mass * 1000,shipInitialMass * 1000])
+var massNodeName = "InternalStorageMod_MassModifier"
+#func sensorGet(sensor):
+#	match sensor:
+#		"mass":
+#			return .sensorGet(sensor) + mass_add
+#		_:
+#			return .sensorGet(sensor)
+
+#func computeCurrentMass():
+#	.computeCurrentMass()
+#	if mass_add != 0:
+#		currentMass = currentMass + float(float(mass_add)/1000.0)
 
 func deactivateCrew(maximum):
 	var count = 0
