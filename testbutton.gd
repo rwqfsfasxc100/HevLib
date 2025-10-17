@@ -12,17 +12,17 @@ onready var panel = load("res://HevLib/ui/popup_main_base.tscn").instance()
 var index = preload("res://HevLib/ui/core_scripts/index.gd").new()
 var data = index.exampleDict
 var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
-func _physics_process(delta):
-	var noMargins = get_node_or_null("/root/_HevLib_Gamespace_Canvas/MarginContainer")
-	panel.datastring = data
-	if not noMargins == null:
-		hasGamespace = true 
-	if hasGamespace == true and hasActedOnGamespace == false:
-		hasActedOnGamespace = true
-		connect("pressed",panel,"_pressed")
-		noMargins.call_deferred("add_child",panel)
-		var nnd = load("res://HevLib/ui/core_scripts/get_nodes_to_act_on.gd").new()
-		var pnt = nnd.get_nodes_to_act_on(data, Vector2(1600,900))
+#func _physics_process(delta):
+#	var noMargins = get_node_or_null("/root/_HevLib_Gamespace_Canvas/MarginContainer")
+#	panel.datastring = data
+#	if not noMargins == null:
+#		hasGamespace = true 
+#	if hasGamespace == true and hasActedOnGamespace == false:
+#		hasActedOnGamespace = true
+#		connect("pressed",panel,"_pressed")
+#		noMargins.call_deferred("add_child",panel)
+#		var nnd = load("res://HevLib/ui/core_scripts/get_nodes_to_act_on.gd").new()
+#		var pnt = nnd.get_nodes_to_act_on(data, Vector2(1600,900))
 
 
 const DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
