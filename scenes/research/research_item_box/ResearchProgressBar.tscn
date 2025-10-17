@@ -1,0 +1,12 @@
+[gd_scene format=2]
+
+[node name="ProgressBar" type="ProgressBar"]
+margin_right = 290.0
+margin_bottom = 42.0
+size_flags_horizontal = 3
+
+[node name="Button" type="Button" parent="."]
+margin_right = 290.0
+margin_bottom = 42.0
+size_flags_horizontal = 3
+flat = true

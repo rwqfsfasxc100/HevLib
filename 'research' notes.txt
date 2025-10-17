@@ -1,0 +1,101 @@
+RESEARCH IDEA CENTER
+
+Allow research to appear after a set amount of time, randomly, or dissapear for specified/unspecified time
+unlimited researches, or 1-n allowed at one time.
+Set initial research cost. will have to pay again if cancelled / limit reduced
+Use multiple story tags to define different tasks and allow variable finishing lengths. e.g. 6 conversations with miners, 2 payments of 100k each, wait a total of 10 days
+Progress bar uses custom tooltip to define sections
+
+Research points (RP?), collected idly or can be purchased for larger amounts of cash could be used to advance research tasks
+Gained naturally through flying in the rings, when not docked and above 5 m/s. Linear acceleration also plays a part, providing a marginal multiplier between 0.75 and 1.25 times depending on how much you've accelerated in the last minute?
+Same methods used to provide crew experience and/or education could be used for additional incentives for non-afk play.
+
+
+DATA FORMAT
+- story_only - using the NDPT as an example as it's the closest method to vanilla story unlocking 
+{
+	"name":"SYSTEM_PDT",							# Name
+	"description":"SYSTEM_PDT_TOOLTIP",				# Tooltip description
+	"story_flag":"hardware.nakamura",				# Story flag used to check whether the project can appear
+	"story_min":0,									# Min value for the story for the research to appear. Setting to -1 means no minimum
+	"story_max":5,									# Max value for the story for the research to appear. Setting to -1 means no maximum
+	"mode":"story_only",							# Mode used to define research completion behaviour. See section on modes
+	"progress_zero":0,								# Story flag value to set as the zero percent value. Values below this still display as zero
+	"progress_complete":5,							# Story flag value to set as the hundred percent value. When this is met or exceeded, project is marked as complete
+	"display_mode":"sprite",						# Method used to display the icon. Can be `sprite` to use a stream image (.stex), or `scene` to use a scene within the viewport to display the object. If left blank, defaults to a fallback icon
+	"display_path":"res://path_to_example.tscn",	# File path of the display object or sprite. Works for either method. If left blank, defaults to a fallback icon
+}
+
+- story_progress
+{
+	"name":"RESEARCH_NAME_TEMPLATE",				# Name
+	"description":"RESEARCH_TOOLTIP_TEMPLATE",		# Tooltip description
+	"story_flag":"example.story",					# Story flag used to check whether the project can appear
+	"story_min":0,									# Min value for the story for the research to appear. Setting to -1 means no minimum
+	"story_max":-1,									# Max value for the story for the research to appear. Setting to -1 means no maximum
+	"tooltip_text":"STORY_EXAMPLE_TEXT",			# Tooltip used for the top progress bar
+	"mode":"story_progress",						# Mode used to define research completion behaviour. See section on modes
+	"progress_zero":0,								# Story flag value to set as the zero percent value. Values below this still display as zero
+	"progress_complete":5,							# Story flag value to set as the hundred percent value. When this is met or exceeded, project is marked as complete
+	"unlock_story":"example.story.complete",		# Story flag to use as the completion value when progress_complete is met or exceeded
+	"unlock_set":5,									# Value to set the unlock_story to when the project is complete
+	"display_mode":"scene",							# Method used to display the icon. Can be `sprite` to use a stream image (.stex), or `scene` to use a scene within the viewport to display the object. If left blank, defaults to a fallback icon
+	"display_path":"res://path_to_example.tscn",	# File path of the display object or sprite. Works for either method. If left blank, defaults to a fallback icon
+	"display_positioning":{							# Dictionary used to handle transformations of an object. Only used for `scene` method, and is ignored for `sprite`
+		"position":Vector2(95,95),
+		"rotation":90,
+		"scale":Vector2(0.5,0.5),
+	},
+}
+
+- isolated
+{
+	"name":"RESEARCH_NAME_TEMPLATE2",				# Name
+	"description":"RESEARCH_TOOLTIP_TEMPLATE",		# Tooltip description
+	"mode":"isolated",								# Mode used to define research completion behaviour. See section on modes
+	"initiation_price":100000,						# How much has to be paid to start the project.
+	"tasks":[										# Defines each specific part of the research project, one for each sub progress bar
+		{
+			"mode":"story",							# Using the story flag progress. Generic progress based on a story flag value
+			"story_flag":"example.story",			# Story flag used
+			"story_min":0,							# Zero value for this progress
+			"story_max":10,							# Hundred value for this progress
+			"tooltip_text":"STORY_EXAMPLE_TEXT",	# Tooltip used for this progress bar
+			"reset_on_halt":false,					# Whether to reset this progress when the project is halted. If true, sets story_flag to story_min. Defaults to false.
+		},
+		{
+			"mode":"payment",						# Using the payment flag progress. How much needs to be paid to progress this section.
+			"amount":1000000,						# How much has to be paid to complete this task.
+			"tooltip_text":"STORY_EXAMPLE_TEXT",	# Tooltip used for this progress bar
+			"reset_on_halt":false,					# Whether to reset this progress when the project is halted. If true, sets story_flag to story_min. Defaults to false.
+		},
+		{
+			"mode":"time",							# Using the time flag progress. Time that must be spent with the task enabled to progress.
+			"minutes":5,							# Minutes added to the wait
+			"hours":5,								# Hours added to the wait
+			"days":3,								# Days added to the wait
+			"months":1,								# Months added to the wait
+			"years":0,								# Years added to the wait
+			"tooltip_text":"STORY_EXAMPLE_TEXT",	# Tooltip used for this progress bar
+			"reset_on_halt":false,					# Whether to reset this progress when the project is halted. If true, sets story_flag to story_min. Defaults to false.
+		},
+	],
+	"unlock_story":"example.story.complete",		# Story flag to use as the completion value when progress_complete is met or exceeded
+	"unlock_set":5,									# Value to set the unlock_story to when the project is complete
+	"show_when":{									# Defines the conditions for the project to appear by
+		
+	},
+	"display_mode":"scene",							# Method used to display the icon. Can be `sprite` to use a stream image (.stex), or `scene` to use a scene within the viewport to display the object. If left blank, defaults to a fallback icon
+	"display_path":"res://path_to_example.tscn",	# File path of the display object or sprite. Works for either method. If left blank, defaults to a fallback icon
+	"display_positioning":{							# Dictionary used to handle transformations of an object. Only used for `scene` method, and is ignored for `sprite`
+		"position":Vector2(110,80),
+		"rotation":180,
+		"scale":Vector2(0.5,0.5),
+	},
+}
+
+MODES
+
+`story_only` uses just the `story_flag` value to define when to unlock, and must define a value to set which marks the equipment's unlock point
+`story_progress` uses the `story_flag` value to define progress, but unlocking the equipment is set with a different story flag. This can be useful to ensure that changes made to the project don't affect the unlocked equipment
+`isolated` defines that the advanced research setup is used.
