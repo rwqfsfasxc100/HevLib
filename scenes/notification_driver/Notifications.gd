@@ -14,6 +14,12 @@ onready var change_to = $PC / Generic / H / C / To
 
 var dir = Directory.new()
 
+func _ready():
+	CurrentGame.connect("generic_notification",self,"_notification_start")
+
+func _notification_start(data):
+	pass
+
 func add_vp():
 	pass
 

@@ -16,7 +16,7 @@ func _init(modLoader = ModLoader):
 	l("Initializing DLC")
 	loadDLC()
 	installScriptExtension("events/TheRing.gd")
-	
+	installScriptExtension("scenes/notification_driver/CurrentGame.gd")
 	
 	var self_path = self.get_script().get_path()
 	var self_directory = self_path.split(self_path.split("/")[self_path.split("/").size() - 1])[0]
