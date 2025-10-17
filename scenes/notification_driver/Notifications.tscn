@@ -1,11 +1,8 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=18 format=2]
 
 [ext_resource path="res://achievement/Notifications.tscn" type="PackedScene" id=1]
 [ext_resource path="res://lights/color-square.png" type="Texture" id=2]
-
-[sub_resource type="StreamTexture" id=15]
-flags = 4
-load_path = "res://HevLib/ui/themes/icons/missing_icon.png.stex"
+[ext_resource path="res://HevLib/scenes/notification_driver/Notifications.gd" type="Script" id=3]
 
 [sub_resource type="CanvasItemMaterial" id=11]
 blend_mode = 1
@@ -35,37 +32,339 @@ color_ramp = SubResource( 13 )
 hue_variation = 0.16
 hue_variation_random = 0.19
 
+[sub_resource type="StreamTexture" id=15]
+flags = 4
+load_path = "res://HevLib/ui/themes/icons/missing_icon.png.stex"
+
+[sub_resource type="Animation" id=16]
+resource_name = "generic"
+length = 4.0
+tracks/0/type = "value"
+tracks/0/path = NodePath("DiscoverySound:playing")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("PC/Generic/Title:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.6, 4 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 3, 3, 3, 1 ), Color( 1, 1, 1, 0 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("PC/Generic:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 4 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("PC/Generic/DescriptionA:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 0.7, 1.3, 4 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 0 ), Color( 3, 3, 3, 1 ), Color( 1, 1, 1, 0 ) ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("PC/Generic/DescriptionA:modulate")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0, 0.6, 4 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 3, 3, 3, 1 ), Color( 1, 1, 1, 0 ) ]
+}
+tracks/5/type = "value"
+tracks/5/path = NodePath("PC/Achievement/What/Control/Particles2D:emitting")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/keys = {
+"times": PoolRealArray( 1.1 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
+
+[sub_resource type="Animation" id=18]
+resource_name = "show"
+length = 4.0
+tracks/0/type = "value"
+tracks/0/path = NodePath("PC/Generic:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 4 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+
+[sub_resource type="Animation" id=17]
+resource_name = "Sound"
+length = 4.0
+tracks/0/type = "value"
+tracks/0/path = NodePath("DiscoverySound:playing")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
+
+[sub_resource type="Animation" id=19]
+resource_name = "Title"
+length = 4.0
+tracks/0/type = "value"
+tracks/0/path = NodePath("PC/Generic/Title:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.6, 4 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 3, 3, 3, 1 ), Color( 1, 1, 1, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("PC/Generic/Title:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 4 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+
+[sub_resource type="Animation" id=20]
+resource_name = "DescA"
+length = 4.0
+tracks/0/type = "value"
+tracks/0/path = NodePath("PC/Generic/DescriptionA:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.6, 4 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 3, 3, 3, 1 ), Color( 1, 1, 1, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("PC/Generic/DescriptionA:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 4 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+
+[sub_resource type="Animation" id=21]
+resource_name = "DescB"
+length = 4.0
+tracks/0/type = "value"
+tracks/0/path = NodePath("PC/Generic/DescriptionB:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.7, 1.3, 4 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 0 ), Color( 3, 3, 3, 1 ), Color( 1, 1, 1, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("PC/Generic/DescriptionB:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 4 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+
+[sub_resource type="Animation" id=22]
+resource_name = "ParticlesPlay"
+length = 4.0
+tracks/0/type = "value"
+tracks/0/path = NodePath("PC/Generic/HBoxContainer/VBoxContainer/Control/Particles2D:emitting")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 1.1 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("PC/Generic/HBoxContainer/VBoxContainer/Control/Particles2D:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 4 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+
+[sub_resource type="Animation" id=23]
+resource_name = "IconPlay"
+length = 4.0
+tracks/0/type = "value"
+tracks/0/path = NodePath("PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport/TextureRect:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.6, 2.5, 4 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 3, 3, 3, 1 ), Color( 1.94118, 1.94118, 1.94118, 1 ), Color( 1, 1, 1, 0 ) ]
+}
+
+[sub_resource type="Animation" id=24]
+resource_name = "VP"
+length = 4.0
+tracks/0/type = "value"
+tracks/0/path = NodePath("PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport/Container:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.6, 2.5, 4 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 3, 3, 3, 1 ), Color( 1.94118, 1.94118, 1.94118, 1 ), Color( 1, 1, 1, 0 ) ]
+}
+tracks/1/type = "method"
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 4 ),
+"transitions": PoolRealArray( 1, 1 ),
+"values": [ {
+"args": [  ],
+"method": "add_vp"
+}, {
+"args": [  ],
+"method": "clear_vp"
+} ]
+}
+
 [node name="Notifications" instance=ExtResource( 1 )]
+script = ExtResource( 3 )
+
+[node name="PC" parent="." index="0"]
+margin_left = 286.0
+margin_top = 94.0
+margin_right = 993.0
+margin_bottom = 265.0
+
+[node name="POI" parent="PC" index="0"]
+margin_right = 581.0
+
+[node name="Discovered" parent="PC/POI" index="0"]
+margin_right = 453.0
+
+[node name="Established" parent="PC/POI" index="2"]
+margin_top = 43.0
+margin_right = 453.0
+margin_bottom = 82.0
+
+[node name="What" parent="PC/POI" index="3"]
+visible = true
+margin_top = 86.0
+margin_right = 598.0
+margin_bottom = 125.0
 
 [node name="Achievement" parent="PC" index="1"]
-margin_right = 632.0
-margin_bottom = 189.0
+margin_right = 581.0
 
 [node name="Achieved" parent="PC/Achievement" index="0"]
-margin_right = 504.0
+margin_right = 453.0
 
 [node name="What" parent="PC/Achievement" index="1"]
-margin_right = 504.0
+margin_right = 453.0
+
+[node name="Particles2D" parent="PC/Achievement/What/Control" index="0"]
+visible = false
 
 [node name="Money" parent="PC" index="2"]
-margin_right = 249.0
-margin_bottom = 146.0
+margin_right = 641.0
+margin_bottom = 189.0
 
 [node name="HowChanged" parent="PC/Money" index="0"]
-margin_right = 121.0
+margin_right = 513.0
 margin_bottom = 39.0
 
 [node name="Money" parent="PC/Money" index="1"]
 margin_top = 43.0
-margin_right = 121.0
+margin_right = 513.0
 margin_bottom = 82.0
+
+[node name="XP" parent="PC" index="3"]
+margin_bottom = 240.0
 
 [node name="From" parent="PC/XP/H/C" index="0"]
 margin_top = 128.0
 
 [node name="Ship" parent="PC" index="4"]
 margin_right = 616.0
-margin_bottom = 236.0
+margin_bottom = 240.0
 
 [node name="Acquired" parent="PC/Ship" index="0"]
 margin_right = 438.0
@@ -74,14 +373,15 @@ margin_right = 438.0
 margin_right = 488.0
 
 [node name="ShipName" parent="PC/Ship" index="3"]
+visible = true
+modulate = Color( 2.25926, 2.25926, 2.25926, 0.62963 )
 margin_right = 488.0
 
 [node name="Generic" type="VBoxContainer" parent="PC" index="5"]
-visible = false
 margin_left = 128.0
 margin_top = 64.0
 margin_right = 579.0
-margin_bottom = 236.0
+margin_bottom = 107.0
 mouse_filter = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="PC/Generic" index="0"]
@@ -95,53 +395,11 @@ margin_right = 225.0
 
 [node name="Control" type="Control" parent="PC/Generic/HBoxContainer/VBoxContainer" index="0"]
 
-[node name="ViewportContainer" type="ViewportContainer" parent="PC/Generic/HBoxContainer/VBoxContainer/Control" index="0"]
-margin_left = -100.0
-margin_top = -200.0
-margin_right = 100.0
-
-[node name="Viewport" type="Viewport" parent="PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer" index="0"]
-size = Vector2( 200, 200 )
-handle_input_locally = false
-render_target_update_mode = 0
-
-[node name="Container" type="Node2D" parent="PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport" index="0"]
-
-[node name="TextureRect" type="TextureRect" parent="PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport" index="1"]
-margin_right = 200.0
-margin_bottom = 200.0
-rect_min_size = Vector2( 200, 200 )
-texture = SubResource( 15 )
-expand = true
-stretch_mode = 7
-
-[node name="Title" type="Label" parent="PC/Generic" index="1"]
-margin_top = 4.0
-margin_right = 451.0
-margin_bottom = 43.0
-text = "TITLE"
-align = 1
-
-[node name="DescriptionA" type="Label" parent="PC/Generic" index="2"]
-margin_top = 47.0
-margin_right = 451.0
-margin_bottom = 86.0
-text = "DESCRIPTION_A"
-align = 1
-
-[node name="Control" type="Control" parent="PC/Generic/DescriptionA" index="0"]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-mouse_filter = 2
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Particles2D" type="Particles2D" parent="PC/Generic/DescriptionA/Control" index="0"]
+[node name="Particles2D" type="Particles2D" parent="PC/Generic/HBoxContainer/VBoxContainer/Control" index="0"]
+visible = false
 modulate = Color( 1, 1, 1, 0.501961 )
 material = SubResource( 11 )
+position = Vector2( 0, 75 )
 emitting = false
 amount = 512
 lifetime = 3.0
@@ -150,7 +408,50 @@ explosiveness = 0.9
 process_material = SubResource( 14 )
 texture = ExtResource( 2 )
 
+[node name="ViewportContainer" type="ViewportContainer" parent="PC/Generic/HBoxContainer/VBoxContainer/Control" index="1"]
+margin_left = -100.0
+margin_top = -200.0
+margin_right = 100.0
+
+[node name="Viewport" type="Viewport" parent="PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer" index="0"]
+size = Vector2( 200, 200 )
+handle_input_locally = false
+render_target_update_mode = 3
+
+[node name="Container" type="Node2D" parent="PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport" index="0"]
+modulate = Color( 1, 1, 1, 0 )
+position = Vector2( 100, 100 )
+
+[node name="TextureRect" type="TextureRect" parent="PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport" index="1"]
+modulate = Color( 1, 1, 1, 0 )
+margin_right = 200.0
+margin_bottom = 200.0
+rect_min_size = Vector2( 200, 200 )
+texture = SubResource( 15 )
+expand = true
+stretch_mode = 7
+
+[node name="Title" type="Label" parent="PC/Generic" index="1"]
+visible = false
+modulate = Color( 1, 1, 1, 0 )
+margin_top = 4.0
+margin_right = 451.0
+margin_bottom = 43.0
+text = "TITLE"
+align = 1
+
+[node name="DescriptionA" type="Label" parent="PC/Generic" index="2"]
+visible = false
+modulate = Color( 1, 1, 1, 0 )
+margin_top = 47.0
+margin_right = 451.0
+margin_bottom = 86.0
+text = "DESCRIPTION_A"
+align = 1
+
 [node name="DescriptionB" type="Label" parent="PC/Generic" index="3"]
+visible = false
+modulate = Color( 1, 1, 1, 0 )
 margin_top = 90.0
 margin_right = 451.0
 margin_bottom = 129.0
@@ -158,9 +459,9 @@ text = "DESCRIPTION_B"
 align = 1
 
 [node name="H" type="HBoxContainer" parent="PC/Generic" index="4"]
-margin_top = 133.0
+margin_top = 4.0
 margin_right = 451.0
-margin_bottom = 172.0
+margin_bottom = 43.0
 mouse_filter = 2
 custom_constants/separation = 20
 alignment = 1
@@ -187,3 +488,40 @@ margin_right = 248.0
 margin_bottom = 39.0
 size_flags_vertical = 5
 text = "New Level"
+
+[node name="AnimationPlayer" parent="." index="2"]
+anims/generic = SubResource( 16 )
+
+[node name="Animations" type="Node" parent="." index="3"]
+
+[node name="Show" type="AnimationPlayer" parent="Animations" index="0"]
+root_node = NodePath("../..")
+anims/show = SubResource( 18 )
+
+[node name="SoundPlay" type="AnimationPlayer" parent="Animations" index="1"]
+root_node = NodePath("../..")
+anims/Sound = SubResource( 17 )
+
+[node name="TitlePlay" type="AnimationPlayer" parent="Animations" index="2"]
+root_node = NodePath("../..")
+anims/Title = SubResource( 19 )
+
+[node name="DescAPlay" type="AnimationPlayer" parent="Animations" index="3"]
+root_node = NodePath("../..")
+anims/DescA = SubResource( 20 )
+
+[node name="DescBPlay" type="AnimationPlayer" parent="Animations" index="4"]
+root_node = NodePath("../..")
+anims/DescB = SubResource( 21 )
+
+[node name="ParticlesPlay" type="AnimationPlayer" parent="Animations" index="5"]
+root_node = NodePath("../..")
+anims/ParticlesPlay = SubResource( 22 )
+
+[node name="IconPlay" type="AnimationPlayer" parent="Animations" index="6"]
+root_node = NodePath("../..")
+anims/IconPlay = SubResource( 23 )
+
+[node name="VPPlay" type="AnimationPlayer" parent="Animations" index="7"]
+root_node = NodePath("../..")
+anims/VP = SubResource( 24 )
