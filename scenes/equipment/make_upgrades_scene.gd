@@ -181,10 +181,10 @@ func make_upgrades_scene(is_onready: bool = true):
 	wpfl.store_string(JSON.print(register_default_ships))
 	wpfl.close()
 	wpfl.open(weaponslot_additions,File.WRITE)
-	wpfl.store_string("{}")
+	wpfl.store_string("[]")
 	wpfl.close()
 	wpfl.open(weaponslot_modifications,File.WRITE)
-	wpfl.store_string("{}")
+	wpfl.store_string("[]")
 	wpfl.close()
 	
 	
@@ -828,6 +828,10 @@ func make_upgrades_scene(is_onready: bool = true):
 	var weaponslot_string = ws_header
 	var ws_editable_paths = ""
 	var weaponslot_properties = {}
+	
+	var ws_stuff_to_add = []
+	var ws_stuff_to_modify = []
+	
 	for entry in ws_state:
 		var d = entry[0]
 		var opts = d.keys()
@@ -836,6 +840,51 @@ func make_upgrades_scene(is_onready: bool = true):
 				"WEAPONSLOT_ADD":
 					var additions = d.get(opt)
 					
+					for add in additions:
+						var aname = add.get("name","SYSTEM_ERROR")
+						var apath = add.get("path","")
+						var item_data = {}
+						for it in add.get("data",[]):
+							var ws_property_string = ""
+							var ws_property = it.get("property")
+							var ws_value = it.get("value")
+							var split = ws_property.split("/")
+							var property = split[split.size() - 1]
+							if split.size() >= 3:
+								var node = split[split.size() - 2]
+								var nonode = ws_property.split(node)
+								if nonode[0].ends_with("/"):
+									nonode[0] = nonode[0].rstrip("/")
+								if nonode[1].begins_with("/"):
+									nonode[1] = nonode[1].lstrip("/")
+								if nonode[0] in item_data:
+									pass
+								else:
+									item_data.merge({nonode[0]:[]})
+								item_data[nonode[0]].append([nonode[1],ws_value])
+							elif split.size() == 2:
+								if split[0] in item_data:
+									pass
+								else:
+									item_data.merge({split[0]:[]})
+								item_data[split[0]].append([split[1],ws_value])
+							else:
+								if "." in item_data:
+									pass
+								else:
+									item_data.merge({".":[]})
+								item_data["."].append([ws_property,ws_value])
+						if apath == "":
+							ws_stuff_to_modify.append({"name":aname,"data":item_data})
+						else:
+							ws_stuff_to_add.append({"name":aname,"path":apath,"data":item_data})
+	
+	
+	
+	
+	
+	
+	
 	
 					for add in additions:
 						var aname = add.get("name","SYSTEM_ERROR")
@@ -898,8 +947,21 @@ func make_upgrades_scene(is_onready: bool = true):
 	
 	var aux_power_string = aux_power_header
 	
+	
+	
+	
+	
 	var property = "%s = %s"
 	var file = File.new()
+	
+	file.open(weaponslot_additions,File.WRITE)
+	file.store_string(JSON.print(ws_stuff_to_add))
+	file.close()
+	file.open(weaponslot_modifications,File.WRITE)
+	file.store_string(JSON.print(ws_stuff_to_modify))
+	file.close()
+	
+	
 	for mod in power_state:
 		for type in mod:
 			match type:

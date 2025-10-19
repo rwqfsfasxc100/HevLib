@@ -126,9 +126,9 @@ func _ready():
 #	aux.take_over_path("res://ships/modules/AuxSlot.tscn")
 #	_savedObjects.append(aux)
 	
-	var ws = load(weaponslot_path)
-	ws.take_over_path("res://weapons/WeaponSlot.tscn")
-	_savedObjects.append(ws)
+#	var ws = load(weaponslot_path)
+#	ws.take_over_path("res://weapons/WeaponSlot.tscn")
+#	_savedObjects.append(ws)
 	
 	replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")
 #	replaceScene("Enceladus.tscn","res://enceladus/Enceladus.tscn")
