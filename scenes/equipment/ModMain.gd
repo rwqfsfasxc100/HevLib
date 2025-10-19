@@ -34,6 +34,7 @@ var ringscene_path = "user://cache/.HevLib_Cache/Minerals/TheRing.tscn"
 
 var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 func _init(modLoader = ModLoader):
 	l("Initializing Equipment Driver")
 	
@@ -84,10 +85,21 @@ func _init(modLoader = ModLoader):
 #	ws.take_over_path("res://weapons/WeaponSlot.tscn")
 #	_savedObjects.append(ws)
 	
+var f = File.new()
 func _ready():
 	l("Readying")
 	ConfigDriver.__load_configs()
-	
+	var zip_ref_store = "user://cache/.HevLib_Cache/zip_ref_store.json"
+	f.open(zip_ref_store,File.WRITE)
+	f.store_string("{}")
+	f.close()
+	var modzips = {}
+	for mod in ManifestV2.__get_mod_data()["mods"]:
+		var zipinfo = match_mod_path_to_zip(mod)
+		modzips.merge({mod:zipinfo})
+	f.open(zip_ref_store,File.WRITE)
+	f.store_string(JSON.print(modzips))
+	f.close()
 	
 	var ring = preload("res://HevLib/scenes/minerals/make_ring_modifications.gd")
 	ring.make_ring_modifications()
@@ -96,7 +108,6 @@ func _ready():
 	tr.new()
 	tr.take_over_path("res://TheRing.gd")
 	_savedObjects.append(tr)
-	var f = File.new()
 	f.open(ringscene_path,File.WRITE)
 	f.store_string("[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"%s\" type=\"Script\" id=1]\n[ext_resource path=\"res://story/TheRing.tscn\" type=\"PackedScene\" id=2]\n\n[node name=\"TheRing\" instance=ExtResource( 2 )]\nscript = ExtResource( 1 )\n" % thering_path)
 	f.close()
@@ -158,3 +169,51 @@ func replaceScene(newPath:String, oldPath:String = ""):
 # Func to print messages to the logs
 func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
 	Debug.l("[%s V%s]: %s" % [title, version, msg])
+
+func match_mod_path_to_zip(mod_main_path:String) -> String:
+	var _modZipFiles = []
+	var gameInstallDirectory = OS.get_executable_path().get_base_dir()
+	if OS.get_name() == "OSX":
+		gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
+	var modPathPrefix = gameInstallDirectory.plus_file("mods")
+	var gd = load("res://HevLib/scripts/vendor/gdunzip.gd")
+	var dir = Directory.new()
+	if dir.open(modPathPrefix) != OK:
+#		Debug.l("HevLib ManifestV2: Can't open mod folder %s." % modPathPrefix)
+		return ""
+	if dir.list_dir_begin() != OK:
+#		Debug.l("HevLib ManifestV2: Can't read mod folder %s." % modPathPrefix)
+		return ""
+
+	while true:
+		var fileName = dir.get_next()
+		if fileName == "":
+			break
+		if dir.current_is_dir():
+			continue
+		var modFSPath = modPathPrefix.plus_file(fileName)
+		var modGlobalPath = ProjectSettings.globalize_path(modFSPath)
+		if not ProjectSettings.load_resource_pack(modGlobalPath, true):
+#			Debug.l("HevLib ManifestV2: %s failed to add." % fileName)
+			continue
+		_modZipFiles.append(modFSPath)
+#		Debug.l("HevLib ManifestV2: %s added." % fileName)
+	dir.list_dir_end()
+	
+	var initScripts = []
+#	Debug.l("HevLib ManifestV2: checking zips")
+	for modFSPath in _modZipFiles:
+		var gdunzip = gd.new()
+		gdunzip.load(modFSPath)
+		for modEntryPath in gdunzip.files:
+			var modEntryName = modEntryPath.get_file().to_lower()
+			if modEntryName.begins_with("modmain") and modEntryName.ends_with(".gd"):
+				var modGlobalPath = "res://" + modEntryPath
+				var zipName = modFSPath.split("/")[modFSPath.split("/").size() - 1]
+				initScripts.append([modGlobalPath,zipName])
+	for item in initScripts:
+		if item[0] == mod_main_path:
+#			Debug.l("HevLib ManifestV2: %s matches, returning as %s." % [item[0],item[1]])
+			return item[1]
+#	Debug.l("HevLib ManifestV2: no matches found, is the mod installed or run via the Godot editor?.")
+	return ""

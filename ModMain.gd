@@ -36,7 +36,7 @@ var dependancies_store = "user://cache/.Mod_Menu_2_Cache/dependancies/dependanci
 var conflicts_store = "user://cache/.Mod_Menu_2_Cache/conflicts/conflicts.json"
 var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/complementary.json"
 
-var zip_ref_store = "user://cache/.HevLib_Cache/zip_ref_store.json"
+
 
 func _ready():
 	l("Readying")
@@ -66,16 +66,7 @@ func _ready():
 	var mod_data = ManifestV2.__get_mod_data(true,true)
 	var md = ManifestV2.__get_mod_data()
 	
-	file.open(zip_ref_store,File.WRITE)
-	file.store_string("{}")
-	file.close()
-	var modzips = {}
-	for mod in md["mods"]:
-		var zipinfo = match_mod_path_to_zip(mod)
-		modzips.merge({mod:zipinfo})
-	file.open(zip_ref_store,File.WRITE)
-	file.store_string(JSON.print(modzips))
-	file.close()
+	
 	
 	
 	for item in md["mods"]:
@@ -280,53 +271,5 @@ func network_return(result, response_code,headers,body):
 					updates.merge({item[1]:{"name":item[0],"id":item[1],"version":[item[2],item[3],item[4]],"new_version":[nv1,nv2,nv3],"github":manifest["links"].get("HEVLIB_GITHUB",{"URL":""}).get("URL",""),"nexus":manifest["links"].get("HEVLIB_NEXUS",{"URL":""}).get("URL",""),"display":item[0] + " (" + item[1] + ")"}})
 					file.store_string(JSON.print(updates))
 					file.close()
-
-func match_mod_path_to_zip(mod_main_path:String) -> String:
-	var _modZipFiles = []
-	var gameInstallDirectory = OS.get_executable_path().get_base_dir()
-	if OS.get_name() == "OSX":
-		gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
-	var modPathPrefix = gameInstallDirectory.plus_file("mods")
-	var gd = load("res://HevLib/scripts/vendor/gdunzip.gd")
-	var dir = Directory.new()
-	if dir.open(modPathPrefix) != OK:
-#		Debug.l("HevLib ManifestV2: Can't open mod folder %s." % modPathPrefix)
-		return ""
-	if dir.list_dir_begin() != OK:
-#		Debug.l("HevLib ManifestV2: Can't read mod folder %s." % modPathPrefix)
-		return ""
-
-	while true:
-		var fileName = dir.get_next()
-		if fileName == "":
-			break
-		if dir.current_is_dir():
-			continue
-		var modFSPath = modPathPrefix.plus_file(fileName)
-		var modGlobalPath = ProjectSettings.globalize_path(modFSPath)
-		if not ProjectSettings.load_resource_pack(modGlobalPath, true):
-#			Debug.l("HevLib ManifestV2: %s failed to add." % fileName)
-			continue
-		_modZipFiles.append(modFSPath)
-#		Debug.l("HevLib ManifestV2: %s added." % fileName)
-	dir.list_dir_end()
-	
-	var initScripts = []
-#	Debug.l("HevLib ManifestV2: checking zips")
-	for modFSPath in _modZipFiles:
-		var gdunzip = gd.new()
-		gdunzip.load(modFSPath)
-		for modEntryPath in gdunzip.files:
-			var modEntryName = modEntryPath.get_file().to_lower()
-			if modEntryName.begins_with("modmain") and modEntryName.ends_with(".gd"):
-				var modGlobalPath = "res://" + modEntryPath
-				var zipName = modFSPath.split("/")[modFSPath.split("/").size() - 1]
-				initScripts.append([modGlobalPath,zipName])
-	for item in initScripts:
-		if item[0] == mod_main_path:
-#			Debug.l("HevLib ManifestV2: %s matches, returning as %s." % [item[0],item[1]])
-			return item[1]
-#	Debug.l("HevLib ManifestV2: no matches found, is the mod installed or run via the Godot editor?.")
-	return ""
 
 
