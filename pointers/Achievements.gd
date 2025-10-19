@@ -18,14 +18,12 @@ var developer_hint = {
 		"Gets the numerical value of the provided stat"
 		]
 }
-
+const gad = preload("res://HevLib/achievements/get_achievement_data.gd")
 static func __get_achievement_data(achievementID: String) -> Dictionary:
-	var f = load("res://HevLib/achievements/get_achievement_data.gd")
-	var s = f.get_achievement_data(achievementID)
+	var s = gad.get_achievement_data(achievementID)
 	return s
 
-
+const gsd = preload("res://HevLib/achievements/get_stat_data.gd")
 static func __get_stat_data(stat: String) -> int:
-	var f = load("res://HevLib/achievements/get_stat_data.gd")
-	var s = f.get_stat_data(stat)
+	var s = gsd.get_stat_data(stat)
 	return s

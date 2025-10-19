@@ -1,7 +1,7 @@
 extends Node
 
 static func get_mod_ids() -> Array:
-	var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
+	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
 	var mod_data = ManifestV2.__get_mod_data(true)["mods"]
 	var returning = []
 	for mod in mod_data:

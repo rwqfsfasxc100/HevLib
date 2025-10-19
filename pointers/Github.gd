@@ -23,13 +23,13 @@ var developer_hint = {
 		" -> Optional file_to_download - string that decides what order to choose the file, currently supports 'first' to get the first file in the list, or 'latest' to get the latest uploaded file"
 	]
 }
-
+const ggf = preload("res://HevLib/scenes/fetch_from_github/get_github_filesystem.gd")
 static func __get_github_filesystem(URL: String, node_to_return_to: Node, behaviour: String = "normal", special_behaviour_data = ""):
-	var f = preload("res://HevLib/scenes/fetch_from_github/get_github_filesystem.gd").new()
+	var f = ggf.new()
 	var s = f.get_github_filesystem(URL, node_to_return_to, behaviour, special_behaviour_data)
 	
-
+const ggr = preload("res://HevLib/scenes/fetch_from_github/get_github_release.gd")
 static func __get_github_release(URL: String, folder: String, node_to_return_to: Node, get_pre_releases: bool = false, file_preference: String = "any", file_to_download: String = "first"):
-	var f = preload("res://HevLib/scenes/fetch_from_github/get_github_release.gd").new()
+	var f = ggr.new()
 	var s = f.get_github_release(URL, folder, node_to_return_to, get_pre_releases, file_preference, file_to_download)
 	

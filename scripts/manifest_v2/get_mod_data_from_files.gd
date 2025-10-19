@@ -1,9 +1,9 @@
 extends Node
 
 static func get_mod_data_from_files(script_path:String, format_to_manifest_version: bool = false) -> Dictionary:
-	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
-	var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
-	var FileAccess = preload("res://HevLib/pointers/FileAccess.gd")
+	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
+	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
+	var FileAccess = load("res://HevLib/pointers/FileAccess.gd")
 	var constants = load(script_path).get_script_constant_map()
 	var folder_path = str(script_path.split(script_path.split("/")[script_path.split("/").size() - 1])[0])
 	var mod_priority = constants.get("MOD_PRIORITY",0)

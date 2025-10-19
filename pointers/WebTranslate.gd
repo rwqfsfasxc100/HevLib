@@ -27,21 +27,18 @@ var developer_hint = {
 		"file_check -> string used as the file check. If found in the cache, resets translations for it"
 	]
 }
-
+const wt = preload("res://HevLib/webtranslate/webtranslate.gd")
 static func __webtranslate(URL: String, fallback: Array = [], file_check: String = ""):
-	var f = load("res://HevLib/webtranslate/webtranslate.gd")
-	f.webtranslate(URL, fallback, file_check)
-
+	wt.webtranslate(URL, fallback, file_check)
+const wtrbu = preload("res://HevLib/webtranslate/webtranslate_reset.gd")
 static func __webtranslate_reset_by_URL(URL: String) -> bool:
-	var f = load("res://HevLib/webtranslate/webtranslate_reset.gd")
-	var s = f.webtranslate_reset(URL)
+	var s = wtrbu.webtranslate_reset(URL)
 	return s
-
+const wtrbfc = preload("res://HevLib/webtranslate/webtranslate_reset_by_file_check.gd")
 static func __webtranslate_reset_by_file_check(file_check: String) -> bool:
-	var f = load("res://HevLib/webtranslate/webtranslate_reset_by_file_check.gd")
-	var s = f.webtranslate_reset_by_file_check(file_check)
+	var s = wtrbfc.webtranslate_reset_by_file_check(file_check)
 	return s
-
+const wtt = preload("res://HevLib/webtranslate/webtranslate_timed.gd")
 static func __webtranslate_timed(URL: String, MINUTES_DELAY: int = 30, fallback: Array = [], file_check: String = ""):
-	var f = load("res://HevLib/webtranslate/webtranslate_timed.gd").new()
+	var f = wtt.new()
 	var s = f.webtranslate_timed(URL, MINUTES_DELAY, fallback, file_check)

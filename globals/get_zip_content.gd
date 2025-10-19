@@ -1,10 +1,10 @@
 extends Node
-
+const gdunzip = preload("res://HevLib/scripts/vendor/gdunzip.gd")
 static func get_zip_content(path, stripFolder = false, lowerCase = false):
 #	Debug.l("HevLib: function 'get_zip_content' instanced at %s. Stripping the root folder? [%s] Outputting lowercase? [%s]" % [path, stripFolder, lowerCase])
 	var listOfNames = []
-	var gdunzip = load("res://vendor/gdunzip.gd").new()
-	gdunzip.load(path)
+	var g = gdunzip.new()
+	g.load(path)
 	var fileList = gdunzip.files
 	for m in fileList.keys():
 		if stripFolder:

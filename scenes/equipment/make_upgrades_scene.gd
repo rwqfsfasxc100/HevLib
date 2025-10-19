@@ -40,6 +40,8 @@ func make_upgrades_scene(is_onready: bool = true):
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/node_definitions.json",
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_register.json",
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/AuxSlot.json",
+		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_additions.json",
+		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_modifications.json",
 	]
 	
 	var file_save_path : String = FILE_PATHS[0]
@@ -55,14 +57,16 @@ func make_upgrades_scene(is_onready: bool = true):
 	var node_definitions_file = FILE_PATHS[10]
 	var ship_node_register_file = FILE_PATHS[11]
 	var auxslot_data_path = FILE_PATHS[12]
-	var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
+	var weaponslot_additions = FILE_PATHS[13]
+	var weaponslot_modifications = FILE_PATHS[14]
+	var DataFormat = load("res://HevLib/pointers/DataFormat.gd")
 	if is_onready:
 		
 		var version = DataFormat.__get_vanilla_version()
 		var text = "HevLib make_upgrades_scene manager: observed game version of %s"  % str(version)
 		Debug.l(text)
-	var Equipment = preload("res://HevLib/pointers/Equipment.gd")
-	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+	var Equipment = load("res://HevLib/pointers/Equipment.gd")
+	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 	var UpgradeMenu : Node = load("res://enceladus/Upgrades.tscn").instance()
 	var nodes_parent = UpgradeMenu.get_node("VB/MarginContainer/ScrollContainer/MarginContainer/Items")
 	var vanilla_slot_names = []
@@ -175,6 +179,12 @@ func make_upgrades_scene(is_onready: bool = true):
 	wpfl.close()
 	wpfl.open(ship_node_register_file,File.WRITE)
 	wpfl.store_string(JSON.print(register_default_ships))
+	wpfl.close()
+	wpfl.open(weaponslot_additions,File.WRITE)
+	wpfl.store_string("{}")
+	wpfl.close()
+	wpfl.open(weaponslot_modifications,File.WRITE)
+	wpfl.store_string("{}")
 	wpfl.close()
 	
 	

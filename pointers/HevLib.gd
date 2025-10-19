@@ -22,13 +22,14 @@ var developer_hint = {
 		"Optional 'return_JSON' boolean returns a JSON-formatted string instead of a dictionary"
 	]
 }
+const glv = preload("res://HevLib/globals/get_lib_variables.gd")
 static func __get_lib_variables() -> Object:
-	var f = load("res://HevLib/globals/get_lib_variables.gd").new()
+	var f = glv.new()
 	var s = f.get_lib_variables()
 	return s
-
+const Globals = preload("res://HevLib/Functions.gd")
 static func __get_lib_pointers(return_as_full_path: bool = false) -> Array:
-	var Globals = preload("res://HevLib/Functions.gd").new()
+	
 	var path = "res://HevLib/pointers/"
 	var files = Globals.__fetch_folder_files(path)
 	if return_as_full_path:

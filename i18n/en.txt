@@ -345,3 +345,9 @@ HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2|UI Scroll Right (alt)
 HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2_TOOLTIP|Alternate right scroll input for horizontal-only scroll menus
 
 SYSTEM_HEVLIB_INTERNALS_NODE|Internal System Mod Handle
+
+NOTIFICATION_NAME_PLACEHOLDER|{Notification Body Missing}
+
+NOTIFICATION_TITLE_PLACEHOLDER|{Notification Name Missing}
+
+HEVLIB_AVAILABLE_RESEARCH|Available Research Projects

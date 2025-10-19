@@ -94,103 +94,83 @@ var developer_hint = {
 		"tag_data -> dictionary from __parse_file_as_manifest to trim down. Must have been made with 'format_to_manifest_version' set to true"
 	]
 }
-
-static func __get_mod_data(format_to_manifest_version:bool = false, print_json: bool = false) -> Dictionary: # UPDATED FOR MV2.2
-	var f = load("res://HevLib/scripts/manifest_v2/get_mod_data.gd").new()
-	var s = f.get_mod_data(format_to_manifest_version,print_json)
+const gmd = preload("res://HevLib/scripts/manifest_v2/get_mod_data.gd")
+static func __get_mod_data(format_to_manifest_version:bool = false, print_json: bool = false) -> Dictionary:
+	var s = gmd.get_mod_data(format_to_manifest_version,print_json)
 	return s
-
-static func __match_mod_path_to_zip(mod_main_path:String) -> String: # DOES NOT NEED UPDATE FOR MV2.2
-	var f = load("res://HevLib/scripts/manifest_v2/match_mod_path_to_zip.gd").new()
-	var s = f.match_mod_path_to_zip(mod_main_path)
+const mmptz = preload("res://HevLib/scripts/manifest_v2/match_mod_path_to_zip.gd")
+static func __match_mod_path_to_zip(mod_main_path:String) -> String:
+	var s = mmptz.match_mod_path_to_zip(mod_main_path)
 	return s
-
-static func __compare_versions(checked_mod_data:Dictionary) -> bool: # DOES NOT NEED UPDATE FOR MV2.2
-	var f = load("res://HevLib/scripts/manifest_v2/compare_versions.gd").new()
-	var s = f.compare_versions(checked_mod_data)
+const cv = preload("res://HevLib/scripts/manifest_v2/compare_versions.gd")
+static func __compare_versions(checked_mod_data:Dictionary) -> bool:
+	var s = cv.compare_versions(checked_mod_data)
 	return s
-
+const gmdff = preload("res://HevLib/scripts/manifest_v2/get_mod_data_from_files.gd")
 static func __get_mod_data_from_files(script_path:String, format_to_manifest_version: bool = true) -> Dictionary: # NOT UPDATED YET
-	var f = load("res://HevLib/scripts/manifest_v2/get_mod_data_from_files.gd").new()
-	var s = f.get_mod_data_from_files(script_path,format_to_manifest_version)
+	var s = gmdff.get_mod_data_from_files(script_path,format_to_manifest_version)
 	return s
-
-static func __parse_file_as_manifest(file_path: String, format_to_manifest_version: bool = true) -> Dictionary: # UPDATED FOR MANIFESTV2.2
-	var f = load("res://HevLib/scripts/manifest_v2/parse_file_as_manifest.gd").new()
-	var s = f.parse_file_as_manifest(file_path, format_to_manifest_version)
+const pfam = preload("res://HevLib/scripts/manifest_v2/parse_file_as_manifest.gd")
+static func __parse_file_as_manifest(file_path: String, format_to_manifest_version: bool = true) -> Dictionary:
+	var s = pfam.parse_file_as_manifest(file_path, format_to_manifest_version)
 	return s
-
-static func __get_mod_by_id(id: String, case_sensitive: bool = true) -> Dictionary: # DOES NOT NEED UPDATE FOR MV2.2
-	var f = load("res://HevLib/scripts/manifest_v2/get_mod_by_id.gd").new()
-	var s = f.get_mod_by_id(id, case_sensitive)
+const gmbi = preload("res://HevLib/scripts/manifest_v2/get_mod_by_id.gd")
+static func __get_mod_by_id(id: String, case_sensitive: bool = true) -> Dictionary:
+	var s = gmbi.get_mod_by_id(id, case_sensitive)
 	return s
-
-static func __get_tags() -> Dictionary: # DOES NOT NEED UPDATE FOR MV2.2
-	var f = load("res://HevLib/scripts/manifest_v2/get_tags.gd")
-	var s = f.get_tags()
+const gt = preload("res://HevLib/scripts/manifest_v2/get_tags.gd")
+static func __get_tags() -> Dictionary:
+	var s = gt.get_tags()
 	return s
-
-static func __get_mod_tags(mod_id: String) -> Dictionary: # Updated for MV2.2
-	var f = load("res://HevLib/scripts/manifest_v2/get_mod_tags.gd")
-	var s = f.get_mod_tags(mod_id)
+const gmt = preload("res://HevLib/scripts/manifest_v2/get_mod_tags.gd")
+static func __get_mod_tags(mod_id: String) -> Dictionary:
+	var s = gmt.get_mod_tags(mod_id)
 	return s
-
-static func __get_mods_from_tag(tag_name: String) -> Array: # DOES NOT NEED UPDATE FOR MV2.2
-	var f = load("res://HevLib/scripts/manifest_v2/get_mods_from_tag.gd")
-	var s = f.get_mods_from_tag(tag_name)
+const gmft = preload("res://HevLib/scripts/manifest_v2/get_mods_from_tag.gd")
+static func __get_mods_from_tag(tag_name: String) -> Array:
+	var s = gmft.get_mods_from_tag(tag_name)
 	return s
-
-static func __get_mods_and_tags_from_tag(tag_name: String) -> Dictionary: # DOES NOT NEED UPDATE FOR MV2.2
-	var f = load("res://HevLib/scripts/manifest_v2/get_mods_and_tags_from_tag.gd")
-	var s = f.get_mods_and_tags_from_tag(tag_name)
+const gmatft = preload("res://HevLib/scripts/manifest_v2/get_mods_and_tags_from_tag.gd")
+static func __get_mods_and_tags_from_tag(tag_name: String) -> Dictionary:
+	var s = gmatft.get_mods_and_tags_from_tag(tag_name)
 	return s
-
-static func __get_manifest_section(section: String, mod_id: String = "") -> Dictionary: # DOES NOT NEED UPDATE FOR MV2.2
-	var f = load("res://HevLib/scripts/manifest_v2/get_manifest_section.gd")
-	var s = f.get_manifest_section(section, mod_id)
+const gms = preload("res://HevLib/scripts/manifest_v2/get_manifest_section.gd")
+static func __get_manifest_section(section: String, mod_id: String = "") -> Dictionary:
+	var s = gms.get_manifest_section(section, mod_id)
 	return s
-
-static func __get_mod_ids() -> Array: # DOES NOT NEED UPDATE FOR MV2.2
-	var f = load("res://HevLib/scripts/manifest_v2/get_mod_ids.gd")
-	var s = f.get_mod_ids()
+const gmi = preload("res://HevLib/scripts/manifest_v2/get_mod_ids.gd")
+static func __get_mod_ids() -> Array:
+	var s = gmi.get_mod_ids()
 	return s
-
-static func __get_manifest_entry(section: String, entry: String, mod_id: String = ""): # DOES NOT NEED UPDATE FOR MV2.2
-	var f = load("res://HevLib/scripts/manifest_v2/get_manifest_entry.gd")
-	var s = f.get_manifest_entry(section, entry, mod_id)
+const gme = preload("res://HevLib/scripts/manifest_v2/get_manifest_entry.gd")
+static func __get_manifest_entry(section: String, entry: String, mod_id: String = ""):
+	var s = gme.get_manifest_entry(section, entry, mod_id)
 	return s
-
-static func __check_complementary() -> Array: # DOES NOT NEED UPDATE FOR MV2.2
-	var f = load("res://HevLib/scripts/manifest_v2/mod_checking/check_complementary.gd")
-	var s = f.check_complementary()
+const cc = preload("res://HevLib/scripts/manifest_v2/mod_checking/check_complementary.gd")
+static func __check_complementary() -> Array:
+	var s = cc.check_complementary()
 	return s
-
-static func __check_mod_complementary(mod_id) -> Array: # DOES NOT NEED UPDATE FOR MV2.2
-	var f = load("res://HevLib/scripts/manifest_v2/mod_checking/check_mod_complementary.gd")
-	var s = f.check_mod_complementary(mod_id)
+const cmc = preload("res://HevLib/scripts/manifest_v2/mod_checking/check_mod_complementary.gd")
+static func __check_mod_complementary(mod_id) -> Array:
+	var s = cmc.check_mod_complementary(mod_id)
 	return s
-
-static func __check_dependancies() -> Array: # DOES NOT NEED UPDATE FOR MV2.2
-	var f = load("res://HevLib/scripts/manifest_v2/mod_checking/check_dependancies.gd")
-	var s = f.check_dependancies()
+const cd = preload("res://HevLib/scripts/manifest_v2/mod_checking/check_dependancies.gd")
+static func __check_dependancies() -> Array:
+	var s = cd.check_dependancies()
 	return s
-
-static func __check_mod_dependancies(mod_id) -> Array: # DOES NOT NEED UPDATE FOR MV2.2
-	var f = load("res://HevLib/scripts/manifest_v2/mod_checking/check_mod_dependancies.gd")
-	var s = f.check_mod_dependancies(mod_id)
+const cmd = preload("res://HevLib/scripts/manifest_v2/mod_checking/check_mod_dependancies.gd")
+static func __check_mod_dependancies(mod_id) -> Array:
+	var s = cmd.check_mod_dependancies(mod_id)
 	return s
-
-static func __check_conflicts() -> Array: # DOES NOT NEED UPDATE FOR MV2.2
-	var f = load("res://HevLib/scripts/manifest_v2/mod_checking/check_conflicts.gd")
-	var s = f.check_conflicts()
+const cco = preload("res://HevLib/scripts/manifest_v2/mod_checking/check_conflicts.gd")
+static func __check_conflicts() -> Array:
+	var s = cco.check_conflicts()
 	return s
-
-static func __check_mod_conflicts(mod_id) -> Array: # DOES NOT NEED UPDATE FOR MV2.2
-	var f = load("res://HevLib/scripts/manifest_v2/mod_checking/check_mod_conflicts.gd")
-	var s = f.check_mod_conflicts(mod_id)
+const cmco = preload("res://HevLib/scripts/manifest_v2/mod_checking/check_mod_conflicts.gd")
+static func __check_mod_conflicts(mod_id) -> Array:
+	var s = cmco.check_mod_conflicts(mod_id)
 	return s
-
-static func __parse_tags(tag_data) -> Dictionary: # UPDATED FOR MANIFESTV2.2 / ADD SUPPORT FOR MORE TYPES LATER
-	var f = load("res://HevLib/scripts/manifest_v2/parse_tags.gd")
-	var s = f.parse_tags(tag_data)
+const pt = preload("res://HevLib/scripts/manifest_v2/parse_tags.gd")
+static func __parse_tags(tag_data) -> Dictionary:
+	var s = pt.parse_tags(tag_data)
 	return s

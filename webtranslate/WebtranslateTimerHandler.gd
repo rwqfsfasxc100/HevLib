@@ -8,7 +8,7 @@ export var fallback = []
 export var file_check = ""
 
 func _ready():
-	var timer = preload("res://HevLib/Scenes/timer/Timer.tscn").instance()
+	var timer = preload("res://HevLib/scenes/timer/Timer.tscn").instance()
 	add_child(timer)
 	get_child(0).start_timer(MINUTES)
 	Globals.__webtranslate(URL, fallback, file_check)

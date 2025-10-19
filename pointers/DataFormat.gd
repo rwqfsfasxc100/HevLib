@@ -41,43 +41,35 @@ var developer_hint = {
 	]
 }
 
-
+const ats = preload("res://HevLib/globals/array_to_string.gd")
 static func __array_to_string(arr: Array) -> String:
-	var f = load("res://HevLib/globals/array_to_string.gd").new()
-	var s = f.array_to_string(arr)
+	var s = ats.array_to_string(arr)
 	return s
-
+const ffln = preload("res://HevLib/globals/format_for_large_numbers.gd")
 static func __format_for_large_numbers(num: int) -> String:
-	var f = load("res://HevLib/globals/format_for_large_numbers.gd")
-	var s = f.format_for_large_numbers(num)
+	var s = ffln.format_for_large_numbers(num)
 	return s
-
+const cwba = preload("res://HevLib/scripts/compare_with_byte_array.gd")
 static func __compare_with_byte_array(input_string: String, comparison_string: String) -> bool:
-	var f = load("res://HevLib/scripts/compare_with_byte_array.gd")
-	var s = f.compare_with_byte_array(input_string, comparison_string)
+	var s = cwba.compare_with_byte_array(input_string, comparison_string)
 	return s
-
+const rp = preload("res://HevLib/scripts/rotate_point.gd")
 static func __rotate_point(point: Vector2, angle: float, degrees:bool = true) -> Vector2:
-	var f = load("res://HevLib/scripts/rotate_point.gd")
-	var s = f.rotate_point(point, angle, degrees)
+	var s = rp.rotate_point(point, angle, degrees)
 	return s
-
+const gvv = preload("res://HevLib/scripts/get_vanilla_version.gd")
 static func __get_vanilla_version(get_from_files: bool = false) -> Array:
-	var f = load("res://HevLib/scripts/get_vanilla_version.gd")
-	var s = f.get_vanilla_version(get_from_files)
+	var s = gvv.get_vanilla_version(get_from_files)
 	return s
-
+const sd = preload("res://HevLib/scripts/sift_dictionary.gd")
 static func __sift_dictionary(dictionary: Dictionary,search_keys: Array) -> Array:
-	var f = load("res://HevLib/scripts/sift_dictionary.gd")
-	var s = f.sift_dictionary(dictionary,search_keys)
+	var s = sd.sift_dictionary(dictionary,search_keys)
 	return s
-
+const catv = preload("res://HevLib/scripts/convert_arr_to_vec2arr.gd")
 static func __convert_arr_to_vec2arr(array: Array) -> PoolVector2Array:
-	var f = load("res://HevLib/scripts/convert_arr_to_vec2arr.gd")
-	var s = f.convert_arr_to_vec2arr(array)
+	var s = catv.convert_arr_to_vec2arr(array)
 	return s
-
+const cv = preload("res://HevLib/scripts/compare_versions.gd")
 static func __compare_versions(primary_major : int,primary_minor : int,primary_bugfix : int, compare_major : int, compare_minor : int, compare_bugfix : int) -> bool:
-	var f = load("res://HevLib/scripts/compare_versions.gd")
-	var s = f.compare_versions(primary_major ,primary_minor ,primary_bugfix , compare_major , compare_minor , compare_bugfix )
+	var s = cv.compare_versions(primary_major ,primary_minor ,primary_bugfix , compare_major , compare_minor , compare_bugfix )
 	return s

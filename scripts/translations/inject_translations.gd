@@ -1,7 +1,7 @@
 extends Node
 
 static func inject_translations(translation_data: Dictionary, iterations: int = 100000):
-	var Translations = preload("res://HevLib/pointers/Translations.gd")
+	var Translations = load("res://HevLib/pointers/Translations.gd")
 	var objects = Translations.__fetch_all_translation_objects(iterations)
 	var disengaged_translations = [] # check to see if modifying the original object and reinjecting it works
 	for tsl in objects:

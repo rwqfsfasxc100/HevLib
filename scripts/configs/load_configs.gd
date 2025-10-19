@@ -1,8 +1,8 @@
 extends Node
 
 static func load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
-	var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
-	var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
+	var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
+	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
 	var f = ManifestV2.__get_mod_data()
 	var mod_entries = f["mods"]
 	var configs = {}

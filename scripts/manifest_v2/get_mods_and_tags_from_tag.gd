@@ -1,7 +1,7 @@
 extends Node
 
 static func get_mods_and_tags_from_tag(tag_name: String) -> Dictionary:
-	var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
+	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
 	var alldata = ManifestV2.__get_tags()
 	var data = alldata.get(tag_name,{})
 	var ex_data = {}

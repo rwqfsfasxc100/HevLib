@@ -9,10 +9,26 @@ onready var current_project_management = $TabHintContainer/Tabs/HEVLIB_RESEARCH_
 onready var dormant_project_management = $TabHintContainer/Tabs/HEVLIB_RESEARCH_AVAILABLE/MarginContainer/HBoxContainer/ActivatableProjects
 
 func show():
-	if visible or $Shower.is_playing():
+	if $Shower.is_playing():
 		return
 	lastFocus = get_focus_owner()
 	$Shower.play("show")
+	if visible:
+		hide()
+#
+#
+#	var notif = {
+#		"title":{"text":"Title Test"},
+#		"body":{"text":"Body Test"},
+#		"description":{"text":"Desc Test"},
+#		"particles":{"show":true},
+#		"transition":{"label":"Label Test","old":"Old Value","new":"New Value"},
+#		"scene":{"path":"res://ships/RA-TRTL.tscn","position":Vector2(-25,0),"scale":Vector2(0.5,0.5),"rotation":90,"rotation_speed":180}
+#	}
+#
+#
+#	CurrentGame.send_notification(notif)
+	
 		
 func hide():
 	if not visible or $Shower.current_animation == "hide":
@@ -23,6 +39,9 @@ func _ready():
 	visible = false
 	get_parent().connect("hidefoka", self, "hide")
 	
+	var mod_ids = ManifestV2.__get_mod_ids()
+	current_project_management.current_mod_ids = mod_ids
+	dormant_project_management.current_mod_ids = mod_ids
 	var tag_exists = ManifestV2.__get_tags()
 	if not "TAG_USING_HEVLIB_RESEARCH" in tag_exists:
 		Tool.remove(research_button)
@@ -56,12 +75,13 @@ func get_research_data():
 	var tags = ManifestV2.__get_mods_and_tags_from_tag("TAG_USING_HEVLIB_RESEARCH")
 	for mod in tags:
 		for p in tags[mod]:
-			var id = mod + "_" + p.name
+			var id = mod + "|" + p.name
 			p.merge({"source":mod})
 			if not id in research_state:
 				var state = {
 					"active":false,
 					"time_while_active":-1,
+					"completed":false,
 				}
 				p.merge({"state":state})
 			research_state.merge({id:p},true)

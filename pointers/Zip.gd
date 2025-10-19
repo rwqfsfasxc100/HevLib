@@ -18,13 +18,11 @@ var developer_hint = {
 		"Handles case insensitivities"
 	]
 }
-
+const HevLib = preload("res://HevLib/Functions.gd")
 static func __get_zip_content(path: String, Strip_Parent_Folder: bool = false, To_Lower_Case: bool = false) -> Array:
-	var HevLib = load("res://HevLib/Functions.gd").new()
 	var s = HevLib.__get_zip_content(path, Strip_Parent_Folder, To_Lower_Case)
 	return s
 
 static func __fetch_file_from_zip(path: String, Destination_Folder_Path: String, Desired_File_Paths: Array) -> Array:
-	var HevLib = load("res://HevLib/Functions.gd").new()
 	var s = HevLib.__fetch_file_from_zip(path, Destination_Folder_Path, Desired_File_Paths)
 	return s

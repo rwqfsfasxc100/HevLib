@@ -183,9 +183,9 @@ static func __match_vanilla(type: String, align_to_match: String, desired_equipm
 			if alignmentMatches and itemType in desired_equipment:
 				matching.append(itemDict)
 	return matching
-
+const mus = preload("res://HevLib/scenes/equipment/make_upgrades_scene.gd")
 static func __make_upgrades_scene(is_onready: bool = true):
-	var f = load("res://HevLib/scenes/equipment/make_upgrades_scene.gd").new()
+	var f = mus.new()
 	f.make_upgrades_scene(is_onready)
 
 

@@ -1,7 +1,7 @@
 extends Node
 
 static func get_manifest_entry(section: String, entry: String, mod_id: String = ""):
-	var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
+	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
 	
 	var mod_data = ManifestV2.__get_mod_data(true)["mods"]
 	var mode = "all"

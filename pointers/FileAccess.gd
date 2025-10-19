@@ -15,15 +15,13 @@ var developer_hint = {
 			"folder -> string for the path to the folder, can be global or local path"
 		]
 	}
-
+const gfc = preload("res://HevLib/globals/get_file_content.gd")
 static func __get_file_content(file: String) -> String:
-	var f = load("res://HevLib/globals/get_file_content.gd")
-	var s = f.get_file_content(file)
+	var s = gfc.get_file_content(file)
 	return s
-
+const cfg = preload("res://HevLib/scripts/configs/config_parse.gd")
 static func __config_parse(file: String) -> Dictionary:
-	var f = load("res://HevLib/scripts/configs/config_parse.gd")
-	var s = f.config_parse(file)
+	var s = cfg.config_parse(file)
 	return s
 
 static func __copy_file(file, folder):

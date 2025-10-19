@@ -1,8 +1,11 @@
-[gd_scene load_steps=18 format=2]
+[gd_scene load_steps=27 format=2]
 
 [ext_resource path="res://achievement/Notifications.tscn" type="PackedScene" id=1]
 [ext_resource path="res://lights/color-square.png" type="Texture" id=2]
 [ext_resource path="res://HevLib/scenes/notification_driver/Notifications.gd" type="Script" id=3]
+[ext_resource path="res://lights/distant-proxy.png" type="Texture" id=4]
+[ext_resource path="res://WorldEnvironmentHDR.tscn" type="PackedScene" id=5]
+[ext_resource path="res://enceladus/SleepEverything.gd" type="Script" id=6]
 
 [sub_resource type="CanvasItemMaterial" id=11]
 blend_mode = 1
@@ -32,85 +35,24 @@ color_ramp = SubResource( 13 )
 hue_variation = 0.16
 hue_variation_random = 0.19
 
+[sub_resource type="StreamTexture" id=28]
+flags = 4
+load_path = "res://HevLib/ui/panels/none.stex"
+
+[sub_resource type="CircleShape2D" id=30]
+radius = 512.0
+
 [sub_resource type="StreamTexture" id=15]
 flags = 4
 load_path = "res://HevLib/ui/themes/icons/missing_icon.png.stex"
 
+[sub_resource type="StreamTexture" id=29]
+flags = 4
+load_path = "res://HevLib/achievements/achievement_border.stex"
+
 [sub_resource type="Animation" id=16]
 resource_name = "generic"
-length = 4.0
-tracks/0/type = "value"
-tracks/0/path = NodePath("DiscoverySound:playing")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ true ]
-}
-tracks/1/type = "value"
-tracks/1/path = NodePath("PC/Generic/Title:modulate")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0, 0.6, 4 ),
-"transitions": PoolRealArray( 1, 1, 1 ),
-"update": 0,
-"values": [ Color( 1, 1, 1, 0 ), Color( 3, 3, 3, 1 ), Color( 1, 1, 1, 0 ) ]
-}
-tracks/2/type = "value"
-tracks/2/path = NodePath("PC/Generic:visible")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/keys = {
-"times": PoolRealArray( 0, 4 ),
-"transitions": PoolRealArray( 1, 1 ),
-"update": 1,
-"values": [ true, false ]
-}
-tracks/3/type = "value"
-tracks/3/path = NodePath("PC/Generic/DescriptionA:modulate")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/keys = {
-"times": PoolRealArray( 0, 0.7, 1.3, 4 ),
-"transitions": PoolRealArray( 1, 1, 1, 1 ),
-"update": 0,
-"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 0 ), Color( 3, 3, 3, 1 ), Color( 1, 1, 1, 0 ) ]
-}
-tracks/4/type = "value"
-tracks/4/path = NodePath("PC/Generic/DescriptionA:modulate")
-tracks/4/interp = 1
-tracks/4/loop_wrap = true
-tracks/4/imported = false
-tracks/4/enabled = true
-tracks/4/keys = {
-"times": PoolRealArray( 0, 0.6, 4 ),
-"transitions": PoolRealArray( 1, 1, 1 ),
-"update": 0,
-"values": [ Color( 1, 1, 1, 0 ), Color( 3, 3, 3, 1 ), Color( 1, 1, 1, 0 ) ]
-}
-tracks/5/type = "value"
-tracks/5/path = NodePath("PC/Achievement/What/Control/Particles2D:emitting")
-tracks/5/interp = 1
-tracks/5/loop_wrap = true
-tracks/5/imported = false
-tracks/5/enabled = true
-tracks/5/keys = {
-"times": PoolRealArray( 1.1 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ true ]
-}
+length = 4.01
 
 [sub_resource type="Animation" id=18]
 resource_name = "show"
@@ -269,31 +211,19 @@ tracks/0/keys = {
 "times": PoolRealArray( 0, 0.6, 2.5, 4 ),
 "transitions": PoolRealArray( 1, 1, 1, 1 ),
 "update": 0,
-"values": [ Color( 1, 1, 1, 0 ), Color( 3, 3, 3, 1 ), Color( 1.94118, 1.94118, 1.94118, 1 ), Color( 1, 1, 1, 0 ) ]
+"values": [ Color( 1, 1, 1, 0 ), Color( 1.5, 1.5, 1.5, 1 ), Color( 0.94, 0.94, 0.94, 1 ), Color( 1, 1, 1, 0 ) ]
 }
 
 [sub_resource type="Animation" id=24]
 resource_name = "VP"
 length = 4.0
-tracks/0/type = "value"
-tracks/0/path = NodePath("PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport/Container:modulate")
+tracks/0/type = "method"
+tracks/0/path = NodePath(".")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/keys = {
-"times": PoolRealArray( 0, 0.6, 2.5, 4 ),
-"transitions": PoolRealArray( 1, 1, 1, 1 ),
-"update": 0,
-"values": [ Color( 1, 1, 1, 0 ), Color( 3, 3, 3, 1 ), Color( 1.94118, 1.94118, 1.94118, 1 ), Color( 1, 1, 1, 0 ) ]
-}
-tracks/1/type = "method"
-tracks/1/path = NodePath(".")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
 "times": PoolRealArray( 0, 4 ),
 "transitions": PoolRealArray( 1, 1 ),
 "values": [ {
@@ -304,32 +234,252 @@ tracks/1/keys = {
 "method": "clear_vp"
 } ]
 }
+tracks/1/type = "value"
+tracks/1/path = NodePath("PC/Generic/HBoxContainer/VBoxContainer/Control/Background:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 4 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("PC/Generic/HBoxContainer/VBoxContainer/Control/Background:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.3, 3.5, 4 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1.5, 1.5, 1.5, 1 ), Color( 0.94, 0.94, 0.94, 1 ), Color( 1, 1, 1, 0 ) ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("PC/Generic/HBoxContainer/VBoxContainer/Control/Border:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 4 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("PC/Generic/HBoxContainer/VBoxContainer/Control/Border:modulate")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0, 0.3, 3.5, 4 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1.5, 1.5, 1.5, 1 ), Color( 0.94, 0.94, 0.94, 1 ), Color( 1, 1, 1, 0 ) ]
+}
+tracks/5/type = "value"
+tracks/5/path = NodePath("PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer:visible")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/keys = {
+"times": PoolRealArray( 0.3, 3.5 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+tracks/6/type = "value"
+tracks/6/path = NodePath("PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer:modulate")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/keys = {
+"times": PoolRealArray( 0, 0.3, 0.9, 2.8, 3.5, 4 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 0 ), Color( 1.5, 1.5, 1.5, 1 ), Color( 0.94, 0.94, 0.94, 1 ), Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 0 ) ]
+}
+
+[sub_resource type="Animation" id=25]
+resource_name = "Type"
+length = 4.0
+tracks/0/type = "value"
+tracks/0/path = NodePath("../PC/Generic/H/Type:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.6, 1.1, 4 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0.0187691 ), Color( 1, 1, 1, 0.00963366 ), Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0.00963366 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("../PC/Generic/H:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 4 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("../PC/Generic/H/Type:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 4 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+
+[sub_resource type="Animation" id=26]
+resource_name = "From"
+length = 4.0
+tracks/0/type = "value"
+tracks/0/path = NodePath("../PC/Generic/H/C/From:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.6, 1, 1.7 ),
+"transitions": PoolRealArray( 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("../PC/Generic/H/C/From:margin_top")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 1, 1.7 ),
+"transitions": PoolRealArray( 2, 2 ),
+"update": 0,
+"values": [ 0, 128 ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("../PC/Generic/H:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 4 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("../PC/Generic/H/C/From:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 4 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("../PC/Generic/H/C:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0, 4 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+
+[sub_resource type="Animation" id=27]
+resource_name = "To"
+length = 4.0
+tracks/0/type = "value"
+tracks/0/path = NodePath("../PC/Generic/H:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 4 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("../PC/Generic/H/C/To:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 4 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("../PC/Generic/H/C/To:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 1, 1.4, 3.4, 4 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 0 ), Color( 3, 3, 3, 1 ), Color( 3, 3, 3, 1 ), Color( 1, 1, 1, 0 ) ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("../PC/Generic/H/C/To:margin_top")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 1, 1.4 ),
+"transitions": PoolRealArray( 0.5, 0.5 ),
+"update": 0,
+"values": [ -128, 0.0 ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("../PC/Generic/H/C:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0, 4 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, false ]
+}
 
 [node name="Notifications" instance=ExtResource( 1 )]
 script = ExtResource( 3 )
 
-[node name="PC" parent="." index="0"]
-margin_left = 286.0
-margin_top = 94.0
-margin_right = 993.0
-margin_bottom = 265.0
-
-[node name="POI" parent="PC" index="0"]
-margin_right = 581.0
-
 [node name="Discovered" parent="PC/POI" index="0"]
 margin_right = 453.0
-
-[node name="Established" parent="PC/POI" index="2"]
-margin_top = 43.0
-margin_right = 453.0
-margin_bottom = 82.0
-
-[node name="What" parent="PC/POI" index="3"]
-visible = true
-margin_top = 86.0
-margin_right = 598.0
-margin_bottom = 125.0
 
 [node name="Achievement" parent="PC" index="1"]
 margin_right = 581.0
@@ -344,27 +494,30 @@ margin_right = 453.0
 visible = false
 
 [node name="Money" parent="PC" index="2"]
-margin_right = 641.0
-margin_bottom = 189.0
+margin_right = 249.0
+margin_bottom = 146.0
 
 [node name="HowChanged" parent="PC/Money" index="0"]
-margin_right = 513.0
+margin_right = 121.0
 margin_bottom = 39.0
 
 [node name="Money" parent="PC/Money" index="1"]
 margin_top = 43.0
-margin_right = 513.0
+margin_right = 121.0
 margin_bottom = 82.0
 
 [node name="XP" parent="PC" index="3"]
-margin_bottom = 240.0
+margin_bottom = 197.0
 
-[node name="From" parent="PC/XP/H/C" index="0"]
-margin_top = 128.0
+[node name="H" parent="PC/XP" index="2"]
+visible = true
+
+[node name="Type" parent="PC/XP/H" index="0"]
+modulate = Color( 1, 1, 1, 0.0187691 )
 
 [node name="Ship" parent="PC" index="4"]
-margin_right = 616.0
-margin_bottom = 240.0
+margin_right = 404.0
+margin_bottom = 197.0
 
 [node name="Acquired" parent="PC/Ship" index="0"]
 margin_right = 438.0
@@ -373,25 +526,21 @@ margin_right = 438.0
 margin_right = 488.0
 
 [node name="ShipName" parent="PC/Ship" index="3"]
-visible = true
-modulate = Color( 2.25926, 2.25926, 2.25926, 0.62963 )
 margin_right = 488.0
 
 [node name="Generic" type="VBoxContainer" parent="PC" index="5"]
+visible = false
 margin_left = 128.0
 margin_top = 64.0
-margin_right = 579.0
-margin_bottom = 107.0
+margin_right = 128.0
+margin_bottom = 64.0
 mouse_filter = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="PC/Generic" index="0"]
-margin_right = 451.0
 size_flags_horizontal = 3
 alignment = 1
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PC/Generic/HBoxContainer" index="0"]
-margin_left = 225.0
-margin_right = 225.0
 
 [node name="Control" type="Control" parent="PC/Generic/HBoxContainer/VBoxContainer" index="0"]
 
@@ -408,21 +557,61 @@ explosiveness = 0.9
 process_material = SubResource( 14 )
 texture = ExtResource( 2 )
 
-[node name="ViewportContainer" type="ViewportContainer" parent="PC/Generic/HBoxContainer/VBoxContainer/Control" index="1"]
+[node name="Background" type="TextureRect" parent="PC/Generic/HBoxContainer/VBoxContainer/Control" index="1"]
+visible = false
+modulate = Color( 1, 1, 1, 0 )
+margin_left = -100.0
+margin_top = -200.0
+margin_right = 100.0
+rect_min_size = Vector2( 200, 200 )
+texture = SubResource( 28 )
+expand = true
+
+[node name="ViewportContainer" type="ViewportContainer" parent="PC/Generic/HBoxContainer/VBoxContainer/Control" index="2"]
+visible = false
 margin_left = -100.0
 margin_top = -200.0
 margin_right = 100.0
 
 [node name="Viewport" type="Viewport" parent="PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer" index="0"]
 size = Vector2( 200, 200 )
+own_world = true
 handle_input_locally = false
-render_target_update_mode = 3
+render_target_update_mode = 0
+gui_disable_input = true
+shadow_atlas_quad_0 = 0
+shadow_atlas_quad_1 = 0
+shadow_atlas_quad_2 = 0
+shadow_atlas_quad_3 = 0
 
-[node name="Container" type="Node2D" parent="PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport" index="0"]
-modulate = Color( 1, 1, 1, 0 )
-position = Vector2( 100, 100 )
+[node name="Camera2D" type="Camera2D" parent="PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport" index="0"]
+rotating = true
+current = true
+zoom = Vector2( 1.5, 1.5 )
 
-[node name="TextureRect" type="TextureRect" parent="PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport" index="1"]
+[node name="Light2D" type="Light2D" parent="PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport" index="1"]
+texture = ExtResource( 4 )
+texture_scale = 2.0
+energy = 1.83
+range_height = 235.0
+
+[node name="Light2D2" type="Light2D" parent="PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport" index="2"]
+position = Vector2( -500, 500 )
+texture = ExtResource( 4 )
+texture_scale = 4.0
+color = Color( 0.952941, 1, 0.392157, 1 )
+energy = 4.0
+range_height = 64.0
+
+[node name="SleepEverything" type="Area2D" parent="PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport" index="3"]
+script = ExtResource( 6 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport/SleepEverything" index="0"]
+shape = SubResource( 30 )
+
+[node name="WorldEnvironment" parent="PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport" index="4" instance=ExtResource( 5 )]
+
+[node name="TextureRect" type="TextureRect" parent="PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport" index="5"]
 modulate = Color( 1, 1, 1, 0 )
 margin_right = 200.0
 margin_bottom = 200.0
@@ -431,11 +620,25 @@ texture = SubResource( 15 )
 expand = true
 stretch_mode = 7
 
+[node name="Container" type="Node2D" parent="PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport" index="6"]
+
+[node name="Rotation_offset" type="Node2D" parent="PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport/Container" index="0"]
+
+[node name="Border" type="TextureRect" parent="PC/Generic/HBoxContainer/VBoxContainer/Control" index="3"]
+visible = false
+modulate = Color( 1, 1, 1, 0 )
+margin_left = -100.0
+margin_top = -200.0
+margin_right = 100.0
+rect_min_size = Vector2( 200, 200 )
+texture = SubResource( 29 )
+expand = true
+
 [node name="Title" type="Label" parent="PC/Generic" index="1"]
 visible = false
 modulate = Color( 1, 1, 1, 0 )
 margin_top = 4.0
-margin_right = 451.0
+margin_right = 97.0
 margin_bottom = 43.0
 text = "TITLE"
 align = 1
@@ -444,7 +647,7 @@ align = 1
 visible = false
 modulate = Color( 1, 1, 1, 0 )
 margin_top = 47.0
-margin_right = 451.0
+margin_right = 276.0
 margin_bottom = 86.0
 text = "DESCRIPTION_A"
 align = 1
@@ -453,41 +656,50 @@ align = 1
 visible = false
 modulate = Color( 1, 1, 1, 0 )
 margin_top = 90.0
-margin_right = 451.0
+margin_right = 276.0
 margin_bottom = 129.0
 text = "DESCRIPTION_B"
 align = 1
 
 [node name="H" type="HBoxContainer" parent="PC/Generic" index="4"]
-margin_top = 4.0
-margin_right = 451.0
-margin_bottom = 43.0
+visible = false
+margin_top = 133.0
+margin_right = 276.0
+margin_bottom = 133.0
 mouse_filter = 2
 custom_constants/separation = 20
 alignment = 1
 
 [node name="Type" type="Label" parent="PC/Generic/H" index="0"]
-margin_right = 183.0
+visible = false
+modulate = Color( 1, 1, 1, 0.00963366 )
+margin_left = 92.0
+margin_right = 184.0
 margin_bottom = 39.0
-text = "EXP_TYPE"
+text = "TYPE"
 align = 2
 
 [node name="C" type="MarginContainer" parent="PC/Generic/H" index="1"]
-margin_left = 203.0
-margin_right = 451.0
+visible = false
+margin_left = 194.0
+margin_right = 194.0
 margin_bottom = 39.0
 mouse_filter = 2
 
 [node name="From" type="Label" parent="PC/Generic/H/C" index="0"]
-margin_right = 248.0
+visible = false
+modulate = Color( 1, 1, 1, 0 )
+margin_right = 177.0
 margin_bottom = 39.0
-text = "Previous Level"
+text = "PREVIOUS"
 
 [node name="To" type="Label" parent="PC/Generic/H/C" index="1"]
-margin_right = 248.0
+visible = false
+modulate = Color( 1, 1, 1, 0 )
+margin_right = 78.0
 margin_bottom = 39.0
 size_flags_vertical = 5
-text = "New Level"
+text = "NEW"
 
 [node name="AnimationPlayer" parent="." index="2"]
 anims/generic = SubResource( 16 )
@@ -525,3 +737,14 @@ anims/IconPlay = SubResource( 23 )
 [node name="VPPlay" type="AnimationPlayer" parent="Animations" index="7"]
 root_node = NodePath("../..")
 anims/VP = SubResource( 24 )
+
+[node name="TypePlay" type="AnimationPlayer" parent="Animations" index="8"]
+anims/Type = SubResource( 25 )
+
+[node name="FromPlay" type="AnimationPlayer" parent="Animations" index="9"]
+anims/From = SubResource( 26 )
+
+[node name="ToPlay" type="AnimationPlayer" parent="Animations" index="10"]
+anims/To = SubResource( 27 )
+
+[connection signal="body_entered" from="PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport/SleepEverything" to="PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport/SleepEverything" method="_on_SleepEverything_body_entered"]

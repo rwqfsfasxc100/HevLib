@@ -15,7 +15,7 @@ DATA FORMAT
 - story_only - using the NDPT as an example as it's the closest method to vanilla story unlocking 
 {
 	"name":"SYSTEM_PDT",							# Name
-	"description":"SYSTEM_PDT_TOOLTIP",				# Tooltip description
+	"tooltip_text":"SYSTEM_PDT_TOOLTIP",			# Tooltip description
 	"story_flag":"hardware.nakamura",				# Story flag used to check whether the project can appear
 	"story_min":0,									# Min value for the story for the research to appear. Setting to -1 means no minimum
 	"story_max":5,									# Max value for the story for the research to appear. Setting to -1 means no maximum
@@ -29,7 +29,6 @@ DATA FORMAT
 - story_progress
 {
 	"name":"RESEARCH_NAME_TEMPLATE",				# Name
-	"description":"RESEARCH_TOOLTIP_TEMPLATE",		# Tooltip description
 	"story_flag":"example.story",					# Story flag used to check whether the project can appear
 	"story_min":0,									# Min value for the story for the research to appear. Setting to -1 means no minimum
 	"story_max":-1,									# Max value for the story for the research to appear. Setting to -1 means no maximum
@@ -51,7 +50,7 @@ DATA FORMAT
 - isolated
 {
 	"name":"RESEARCH_NAME_TEMPLATE2",				# Name
-	"description":"RESEARCH_TOOLTIP_TEMPLATE",		# Tooltip description
+	"tooltip_text":"RESEARCH_TOOLTIP_TEMPLATE",		# Tooltip description
 	"mode":"isolated",								# Mode used to define research completion behaviour. See section on modes
 	"initiation_price":100000,						# How much has to be paid to start the project.
 	"tasks":[										# Defines each specific part of the research project, one for each sub progress bar
@@ -65,12 +64,14 @@ DATA FORMAT
 		},
 		{
 			"mode":"payment",						# Using the payment flag progress. How much needs to be paid to progress this section.
+			"story_flag":"example.payment",			# Story flag used to keep track of how much has been spent in seconds
 			"amount":1000000,						# How much has to be paid to complete this task.
 			"tooltip_text":"STORY_EXAMPLE_TEXT",	# Tooltip used for this progress bar
 			"reset_on_halt":false,					# Whether to reset this progress when the project is halted. If true, sets story_flag to story_min. Defaults to false.
 		},
 		{
 			"mode":"time",							# Using the time flag progress. Time that must be spent with the task enabled to progress.
+			"story_flag":"example.time",			# Story flag used to keep track of how much time has passed
 			"minutes":5,							# Minutes added to the wait
 			"hours":5,								# Hours added to the wait
 			"days":3,								# Days added to the wait

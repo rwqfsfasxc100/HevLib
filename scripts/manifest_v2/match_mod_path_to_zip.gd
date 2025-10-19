@@ -1,6 +1,17 @@
 extends Node
+const gd = preload("res://HevLib/scripts/vendor/gdunzip.gd")
 
 static func match_mod_path_to_zip(mod_main_path:String) -> String:
+	var zip_ref_store = "user://cache/.HevLib_Cache/zip_ref_store.json"
+	var file = File.new()
+	file.open(zip_ref_store,File.READ)
+	var data = JSON.parse(file.get_as_text()).result
+	file.close()
+	var return_val = data.get(mod_main_path,"")
+	return return_val
+
+
+static func old_match_mod_path_to_zip(mod_main_path:String) -> String:
 	var _modZipFiles = []
 	var gameInstallDirectory = OS.get_executable_path().get_base_dir()
 	if OS.get_name() == "OSX":
@@ -33,7 +44,7 @@ static func match_mod_path_to_zip(mod_main_path:String) -> String:
 	var initScripts = []
 #	Debug.l("HevLib ManifestV2: checking zips")
 	for modFSPath in _modZipFiles:
-		var gdunzip = load("res://vendor/gdunzip.gd").new()
+		var gdunzip = gd.new()
 		gdunzip.load(modFSPath)
 		for modEntryPath in gdunzip.files:
 			var modEntryName = modEntryPath.get_file().to_lower()

@@ -31,26 +31,22 @@ var developer_hint = {
 		"store_file_content -> (optional) bool to decide whether to store a stringified version of each file's content"
 	]
 }
-
+const cfe = preload("res://HevLib/globals/check_folder_exists.gd")
 static func __check_folder_exists(folder: String, status_array: bool = false) -> bool:
-	var f = load("res://HevLib/globals/check_folder_exists.gd")
-	var s = f.check_folder_exists(folder, status_array)
+	var s = cfe.check_folder_exists(folder, status_array)
 	return s
-
+const rd = preload("res://HevLib/globals/recursive_delete.gd")
 static func __recursive_delete(path: String):
 	Debug.l("HevLib: function 'recursive_delete' started on @%s" % path)
-	var f = load("res://HevLib/globals/recursive_delete.gd")
-	var s = f.recursive_delete(path)
+	var s = rd.recursive_delete(path)
 	return s
-
+const gff = preload("res://HevLib/globals/get_first_file.gd")
 static func __get_first_file(folder: String) -> String:
-	var f = load("res://HevLib/globals/get_first_file.gd")
-	var s = f.get_first_file(folder)
+	var s = gff.get_first_file(folder)
 	return s
-
+const fff = preload("res://HevLib/globals/fetch_folder_files.gd")
 static func __fetch_folder_files(folder: String, showFolders: bool = false, returnFullPath: bool = false) -> Array:
-	var f = load("res://HevLib/globals/fetch_folder_files.gd")
-	var s = f.fetch_folder_files(folder, showFolders, returnFullPath)
+	var s = fff.fetch_folder_files(folder, showFolders, returnFullPath)
 	return s
 
 static func __copy_file(file, folder):
@@ -60,8 +56,7 @@ static func __copy_file(file, folder):
 	
 	var dir = Directory.new()
 	dir.copy(prepfile,folder + "/" + fn)
-
+const gfs = preload("res://HevLib/scripts/get_folder_structure.gd")
 static func __get_folder_structure(folder,store_file_content = false):
-	var f = load("res://HevLib/scripts/get_folder_structure.gd")
-	var s = f.get_folder_structure(folder,store_file_content)
+	var s = gfs.get_folder_structure(folder,store_file_content)
 	return s

@@ -1,7 +1,7 @@
 extends Node
 
 static func get_folder_structure(folder,store_file_content = false):
-	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 	var file = File.new()
 	var folder_structure = {}
 	var files = FolderAccess.__fetch_folder_files(folder,true,false)

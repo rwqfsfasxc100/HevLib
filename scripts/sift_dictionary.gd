@@ -1,7 +1,7 @@
 extends Node
 
 static func sift_dictionary(dictionary, string_array):
-	var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
+	var DataFormat = load("res://HevLib/pointers/DataFormat.gd")
 	var returning_keys = []
 	for key in dictionary:
 		if key in string_array:

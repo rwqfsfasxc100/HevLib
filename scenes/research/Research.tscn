@@ -339,7 +339,7 @@ margin_bottom = 39.0
 [node name="MarketLabel" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_AVAILABLE/MarginContainer/HBoxContainer/HeaderWithMoney" index="0"]
 margin_right = 1101.0
 margin_bottom = 39.0
-text = "ENCELADUS_CREW"
+text = "HEVLIB_AVAILABLE_RESEARCH"
 
 [node name="VBoxContainer" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_AVAILABLE/MarginContainer/HBoxContainer/HeaderWithMoney" index="1"]
 margin_left = 1105.0
