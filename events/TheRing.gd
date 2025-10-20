@@ -18,7 +18,7 @@ func _ready():
 		ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
 	var disabled_events = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
 	var write_events = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","write_events")
-	
+	playlist = []
 	for kid in get_children():
 		var kidName = kid.name
 		event_names.append(kidName)
@@ -28,8 +28,6 @@ func _ready():
 			Debug.l("%s is not in disabled events list, adding to playlist" % kidName)
 			if kid.has_method("makeAt") and kid.has_method("canBeAt"):
 				playlist.append(kid)
-	if not Engine.is_editor_hint():
-		CurrentGame.connect("inGameTimePassed", self, "_gameTimeProcess")
 	if write_events:
 		var string = ""
 		for event in event_names:

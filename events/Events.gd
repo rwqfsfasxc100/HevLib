@@ -14,15 +14,49 @@ var busy = false
 var sliderOdditiesEvery = 450
 var sliderValue = 0
 
+var focusObject
+
 func _on_SpawnNow_pressed():
 	if busy == false:
 		if cnode == "none":
 			cnode = ""
-		ring.testSpecificStoryElement = cnode
-		ring.odditiesEvery = 0.1
-		startEventTimerNode()
-	
+			ring.testSpecificStoryElement = cnode
+			ring.odditiesEvery = 0.1
+			startEventTimerNode()
+		else:
+			var event_node = event_objects[cnode]
+			if event_node.has_method("makeAt"):
+				var pos = getPos()
+				var oddity = event_node.makeAt(pos)
+				ring.requestOdditySpawn(oddity)
+				
+
+var spawnDirectionScale = 0.75
+var odditySpawnRadiusMin = 24000
+var odditySpawnRadiusMinCutscene = 6000
+var odditySpawnRadiusMax = 38000
+var odditySpawnRadiusSafemax = 80000
+var odditySpawnFailures = 0
+var odditySpawnRadiusSafemaxSteps = 40
+
+func getPos():
+	if Tool.claim(focusObject):
+		var cutscene = ("cutscene" in focusObject and focusObject.cutscene) and ("fastTravelDirection" in focusObject and focusObject.fastTravelDirection < 0)
+		var focusPoint = focusObject.global_position
+		var randomVector = Vector2(rand_range( - 1, 1), rand_range( - 1, 1)).normalized()
+		var directionVector = focusObject.linear_velocity.normalized() * spawnDirectionScale
+		var dirvec = (randomVector + directionVector).normalized()
+		if dirvec.length() < 0.9:
+			dirvec = randomVector
+		var oddityFocusOffset = dirvec * rand_range(odditySpawnRadiusMin if not cutscene else odditySpawnRadiusMinCutscene, lerp(odditySpawnRadiusMax, odditySpawnRadiusSafemax, clamp(float(odditySpawnFailures) / float(odditySpawnRadiusSafemaxSteps), 0, 1)))
+		
+		var oddityPoint = focusPoint + oddityFocusOffset
+		Tool.release(focusObject)
+		return CurrentGame.globalCoords(oddityPoint)
+		
+
 func _ready():
+	focusObject = CurrentGame.getPlayerShip()
 	if not ring == null:
 		defaultTestSpecificStoryElement = ring.testSpecificStoryElement
 		defaultOdditiesEvery = ring.odditiesEvery
@@ -32,7 +66,7 @@ func _ready():
 		
 		
 		addEvents()
-	
+var event_objects = {}
 func addEvents():
 	
 	var events = ring.get_children()
@@ -40,6 +74,7 @@ func addEvents():
 	for evnt in events:
 		var ename = evnt.name
 		eventNames.merge({indx:ename})
+		event_objects.merge({ename:evnt})
 		justEvents.append(ename)
 		indx += 1
 	for event in eventNames:
