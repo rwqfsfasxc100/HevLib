@@ -36,7 +36,7 @@ var dependancies_store = "user://cache/.Mod_Menu_2_Cache/dependancies/dependanci
 var conflicts_store = "user://cache/.Mod_Menu_2_Cache/conflicts/conflicts.json"
 var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/complementary.json"
 
-
+var weaponslot_cache = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/ship_data"
 
 func _ready():
 	l("Readying")
@@ -53,6 +53,8 @@ func _ready():
 		d.remove(f)
 	for f in manifests:
 		d.remove(f)
+	if d.dir_exists(weaponslot_cache):
+		FolderAccess.__recursive_delete(weaponslot_cache)
 	file.open(url_store,File.WRITE)
 	file.store_string("[]")
 	file.close()

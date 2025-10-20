@@ -40,6 +40,9 @@ func _ready():
 	file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_SHIP_STANDALONE.json",File.READ)
 	var ship_modify_standalone = JSON.parse(file.get_as_text(true)).result
 	file.close()
+	file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFIED_NAMES.json",File.READ)
+	var eqnames = JSON.parse(file.get_as_text(true)).result
+	file.close()
 	
 	
 	
@@ -47,7 +50,10 @@ func _ready():
 	var children = self.get_children()
 	for child in children:
 		node_names.append(child.name)
-	
+	for item in eqnames:
+		if not item in node_names:
+			node_names.append(item)
+	var templates = {}
 	for template in generic_modify_templates:
 		var equipment = generic_modify_templates[template]["equipment"]
 		var data = generic_modify_templates[template]["data"]
@@ -63,7 +69,7 @@ func _ready():
 						equipment_templates[check][property.get("property")] = property.get("value")
 					
 #					node[property.get("property")] = property.get("value")
-		equipment_templates.merge({template:generic_modify_templates[template].get("equipment").duplicate(true)})
+		templates.merge({template:generic_modify_templates[template].get("equipment").duplicate(true)})
 	for standalone in generic_modify_standalone:
 		if standalone in node_names:
 				if standalone in equipment_templates.keys():
@@ -82,7 +88,7 @@ func _ready():
 				if slot == reg:
 					var slot_data = data[reg]
 					for tmp in slot_data:
-						var equipment = equipment_templates[tmp]
+						var equipment = templates[tmp]
 						var properties = slot_data[tmp]
 						for item in equipment:
 #							var node = get_node(item)
@@ -105,7 +111,7 @@ func _ready():
 					if slot == reg:
 						var slot_data = data[reg]
 						for tmp in slot_data:
-							var equipment = equipment_templates[tmp]
+							var equipment = templates[tmp]
 							var properties = slot_data[tmp]
 							for item in equipment:
 #								var node = get_node(item)
@@ -163,6 +169,8 @@ func modify():
 	var file = File.new()
 	var dir = Directory.new()
 	
+	var node
+	
 	file.open(ws_add,File.READ)
 	var additions = JSON.parse(file.get_as_text()).result
 	file.close()
@@ -175,7 +183,7 @@ func modify():
 	for item in additions:
 		var iname = item.get("name")
 		if iname == c and dir.file_exists(item.get("path")):
-			var node = load(item.get("path")).instance()
+			node = load(item.get("path")).instance()
 			for obj in item.get("data",{}):
 				var properties = item.get("data",{})[obj]
 				for property in properties:
@@ -187,9 +195,8 @@ func modify():
 						breakpoint
 					properties_to_modify.append([sn,p,newVal])
 			var sysn = name + "_" + iname
-			node.name = sysn
-			add_child(node)
 			system = node
+			node.name = sysn
 	for item in modifications:
 		var iname = item.get("name")
 		if iname == c:
@@ -209,29 +216,40 @@ func modify():
 	file.open(eqt_file % [shipName,slot],File.READ)
 	var equipment_templates = JSON.parse(file.get_as_text(true)).result
 	file.close()
-	if c in equipment_templates:
-		var datapoint = equipment_templates[c]
+	var equipment_modifications = {}
+	for item in equipment_templates:
+		var data = equipment_templates[item]
+		match typeof(data):
+			TYPE_DICTIONARY:
+				equipment_modifications[item] = data
+			TYPE_ARRAY:
+				breakpoint
+	
+	
+	if c in equipment_modifications:
+		var datapoint = equipment_modifications[c]
 		for property in datapoint:
 			var value = datapoint.get(property)
 			var current = system.get(property)
 			var newVal = NodeAccess.__convert_var_from_string(value)
-			var sn = get_node(key)
-			if sn == null:
+			if system == null:
 				breakpoint
-			properties_to_modify.append([sn,property,newVal])
+			properties_to_modify.append([system,property,newVal])
 	if properties_to_modify.size() >= 1:
 		for property in properties_to_modify:
 			match property[1]:
 				"visible":
-					property[0].set_deferred(property[1],true)
+					property[0].set(property[1],true)
 				_:
-					property[0].set_deferred(property[1],property[2])
-	
-	systemName = _getSystemName()
-	slotName = _getSlotName()
-	inspection = _getInspection()
-	repairFixPrice = _getRepairFixPrice()
-	repairFixTime = _getRepairFixTime()
-	repairReplacementPrice = _repairReplacementPrice()
-	repairReplacementTime = _repairReplacementTime()
-	mass = _getMass()
+					property[0].set(property[1],property[2])
+	if node:
+		add_child(node)
+		key = name + "_" + mounted
+		systemName = _getSystemName()
+		slotName = _getSlotName()
+		inspection = _getInspection()
+		repairFixPrice = _getRepairFixPrice()
+		repairFixTime = _getRepairFixTime()
+		repairReplacementPrice = _repairReplacementPrice()
+		repairReplacementTime = _repairReplacementTime()
+		mass = _getMass()

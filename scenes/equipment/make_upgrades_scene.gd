@@ -42,6 +42,7 @@ func make_upgrades_scene(is_onready: bool = true):
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/AuxSlot.json",
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_additions.json",
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_modifications.json",
+		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFIED_NAMES.json",
 	]
 	
 	var file_save_path : String = FILE_PATHS[0]
@@ -59,6 +60,7 @@ func make_upgrades_scene(is_onready: bool = true):
 	var auxslot_data_path = FILE_PATHS[12]
 	var weaponslot_additions = FILE_PATHS[13]
 	var weaponslot_modifications = FILE_PATHS[14]
+	var weaponslot_modify_equipment_names = FILE_PATHS[15]
 	var DataFormat = load("res://HevLib/pointers/DataFormat.gd")
 	if is_onready:
 		
@@ -137,7 +139,7 @@ func make_upgrades_scene(is_onready: bool = true):
 	var ws_state : Array = []
 	var power_state = []
 	
-	
+	var ws_equipment_names = []
 	
 	for item in FILE_PATHS:
 		FolderAccess.__check_folder_exists(item.split(item.split("/")[item.split("/").size() - 1])[0])
@@ -175,6 +177,9 @@ func make_upgrades_scene(is_onready: bool = true):
 	wpfl.store_string("{}")
 	wpfl.close()
 	wpfl.open(auxslot_data_path,File.WRITE)
+	wpfl.store_string("[]")
+	wpfl.close()
+	wpfl.open(weaponslot_modify_equipment_names,File.WRITE)
 	wpfl.store_string("[]")
 	wpfl.close()
 	wpfl.open(ship_node_register_file,File.WRITE)
@@ -320,7 +325,11 @@ func make_upgrades_scene(is_onready: bool = true):
 								var arr2 = []
 								for item in constants:
 									var equipment = data.get(item).duplicate(true)
-									arr2.append(equipment)
+									var n = equipment.get("name",null)
+									if n:
+										if not n in ws_equipment_names:
+											ws_equipment_names.append(n)
+										arr2.append(equipment)
 								dictr.merge({"WEAPONSLOT_ADD":arr2})
 							"WEAPONSLOT_MODIFY_TEMPLATES.gd":
 								var data = load(check + last_bit)
@@ -341,6 +350,8 @@ func make_upgrades_scene(is_onready: bool = true):
 											match datapoint:
 												"equipment":
 													for item in ar[template][datapoint]:
+														if not item in ws_equipment_names:
+															ws_equipment_names.append(item)
 														if item in founddata[template][datapoint]:
 															pass
 														else:
@@ -376,6 +387,8 @@ func make_upgrades_scene(is_onready: bool = true):
 								var sort = JSON.parse(filedata)
 								var founddata : Dictionary = sort.result
 								for item in ar:
+									if not item in ws_equipment_names:
+										ws_equipment_names.append(item)
 									if item in founddata:
 										var new_dict = {}
 										for c in ar.get(item):
@@ -457,6 +470,13 @@ func make_upgrades_scene(is_onready: bool = true):
 								
 								
 								for ship in ar:
+									var slots = ar[ship]
+									for slot in slots:
+										var equipment = slots[slot]
+										for item in equipment:
+											if not item in ws_equipment_names:
+												ws_equipment_names.append(item)
+									
 									if ship in founddata.keys():
 										var shipdata = ar.get(ship)
 										for slot in shipdata:
@@ -521,6 +541,10 @@ func make_upgrades_scene(is_onready: bool = true):
 								fi.close()
 								
 	var slots = data_state
+	
+	wpfl.open(weaponslot_modify_equipment_names,File.WRITE)
+	wpfl.store_string(JSON.print(ws_equipment_names))
+	wpfl.close()
 	
 	for item in slots:
 		var files = item[0]
@@ -878,10 +902,6 @@ func make_upgrades_scene(is_onready: bool = true):
 							ws_stuff_to_modify.append({"name":aname,"data":item_data})
 						else:
 							ws_stuff_to_add.append({"name":aname,"path":apath,"data":item_data})
-	
-	
-	
-	
 	
 	
 	
