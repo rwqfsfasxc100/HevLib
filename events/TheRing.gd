@@ -6,6 +6,25 @@ var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 var cache_folder = "user://cache/.HevLib_Cache/"
 
+var current_event_log = {}
+
+func exitNearby(what, id):
+#	breakpoint
+	.exitNearby(what, id)
+
+func getNextOnPlaylist():
+	var o = .getNextOnPlaylist()
+	var log_data = {}
+	var id = hash(o)
+	log_data.merge({"object":o})
+	var n = o.name
+	log_data.merge({"time_added":Time.get_datetime_dict_from_system(true)})
+	current_event_log.merge({id:log_data})
+	return o
+
+func logNaturalEvents():
+	pass
+
 func _ready():
 	image = map.get_data()
 	size = image.get_size()

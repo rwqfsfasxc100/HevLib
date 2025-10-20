@@ -5,7 +5,7 @@ static func config_parse(file):
 	f2.open(file,File.READ)
 	var txt = f2.get_as_text()
 	f2.close()
-	Debug.l("Config Parse: Loading config as ||\n\n%s\n\n||" % txt)
+#	Debug.l("Config Parse: Loading config as ||\n\n%s\n\n||" % txt)
 	var cfg = ConfigFile.new()
 	cfg.parse(txt)
 	var cfg_sections = cfg.get_sections()

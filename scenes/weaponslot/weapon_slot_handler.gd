@@ -206,7 +206,7 @@ func modify():
 					var p = property[0]
 					var value = property[1]
 					var newVal = NodeAccess.__convert_var_from_string(value)
-					var n = get_node(item.get("name"))
+					var n = get_node(name + "_" + mounted)
 					var sn = n.get_node(obj)
 					if sn == null:
 						breakpoint
