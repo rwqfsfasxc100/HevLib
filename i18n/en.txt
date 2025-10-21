@@ -20,6 +20,8 @@ EVENTDRIVER_SPAWNNOW|Force event spawn using selected event
 
 EVENTDRIVER_EVENT_SELECTOR|Event Selector
 
+EVENTDRIVER_CLEAREVENT|Clear selected event(s)
+
 HEVLIB_MISSING_DOCUMENTATION_1|!!!!! No documentation for this feature was provided!
 
 HEVLIB_MISSING_DOCUMENTATION_2|!!!!! Please bring this to my (__hev) attention ASAP, as documentation is key for libraries such as this one for proper maintenance!

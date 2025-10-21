@@ -34,8 +34,11 @@ func _process(delta):
 #		yield(ring,"ready")
 		available = true
 	visibility = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_position_data_debugger")
-	
-	
+	accurate_event_counter = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_position_accurate_events")
+	if visibility:
+		visible = true
+	else:
+		visible = false
 	if visibility and available:
 		var nodes = get_tree().get_root().get_children()
 		var nodeNames = []
@@ -44,10 +47,12 @@ func _process(delta):
 		var tex = "null"
 		var ZonePrefix = "Zone: "
 		var ChaosPrefix = "Chaos: "
+		var DensityPrefix = "Density: "
 		var EventNoPrefix = "Currently Possible Events (predicted): "
 		var ActualEventPrefix = "Currently Possible Events (actual): "
 		var EventNo = 0
 		var chaos = 0
+		var density = 0
 		var actualEventNo = 0
 		var isInGame = false
 		if "Game" in nodeNames:
@@ -63,10 +68,12 @@ func _process(delta):
 			if ship == null:
 				tex = "null"
 				chaos = 0
+				density = 0
 			else:
 				tex = ship.zone
 				var currentPos = CurrentGame.globalCoords(ship.global_position)
 				chaos = getChaosAt(currentPos)
+				density = getRawDensityAt(currentPos)
 #				var ring = load("res://story/TheRing.tscn").instance()
 				nodes = ring.get_children()
 				var chaosNums = []
@@ -95,23 +102,27 @@ func _process(delta):
 		else:
 			tex = ""
 			chaos = ""
+			density = ""
 			ZonePrefix = ""
 			ChaosPrefix = ""
+			DensityPrefix = ""
 			EventNoPrefix = ""
 			EventNo = ""
 			ActualEventPrefix = ""
 			actualEventNo = ""
-			if tex == "" and chaos == "" and EventNo == "" and actualEventNo == "":
+			if tex == "" and chaos == "" and density == "" and EventNo == "" and actualEventNo == "":
 				visible = false
 			else:
 				visible = true
-		var textToDisplay = ZonePrefix + tex + "\n" + ChaosPrefix + str(chaos) + "\n" + EventNoPrefix + str(EventNo)
+		var textToDisplay = ZonePrefix + tex + "\n" + ChaosPrefix + str(chaos) + "\n" + DensityPrefix + str(density) + "\n" + EventNoPrefix + str(EventNo)
 		if accurate_event_counter:
 			textToDisplay = textToDisplay + "\n" + ActualEventPrefix + str(actualEventNo)
 		text = textToDisplay
 
 func getChaosAt(pos):
 	return getPixelAt(pos).r
+func getRawDensityAt(pos):
+	return getPixelAt(pos).b
 
 func getPixelAt(pos):
 	var x = int(clamp(floor(pos.x / pixelToKm), 0, size.x - 1))

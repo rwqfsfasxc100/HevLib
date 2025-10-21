@@ -154,6 +154,12 @@ margin_right = 1078.0
 margin_bottom = 163.0
 text = "EVENTDRIVER_SPAWNNOW"
 
+[node name="ClearEventOfType" type="Button" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
+margin_top = 169.0
+margin_right = 1078.0
+margin_bottom = 210.0
+text = "EVENTDRIVER_CLEAREVENT"
+
 [node name="EVENTDRIVER_EVENT_SELECTOR" type="Tabs" parent="NoMargins/TabHintContainer/TabsWithGamepadControl"]
 visible = false
 margin_right = 40.0
@@ -180,5 +186,6 @@ script = ExtResource( 7 )
 [connection signal="timeout" from="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Events/Timer" to="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Events" method="_timer_complete"]
 [connection signal="value_changed" from="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/HSlider" to="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Events" method="_on_HSlider_value_changed"]
 [connection signal="pressed" from="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/SpawnNow" to="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Events" method="_on_SpawnNow_pressed"]
+[connection signal="pressed" from="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/ClearEventOfType" to="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Events" method="_on_ClearEvent_pressed"]
 
 [editable path="NoMargins/TabHintContainer"]

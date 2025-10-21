@@ -8,7 +8,22 @@ var cache_folder = "user://cache/.HevLib_Cache/"
 
 var current_event_log = {}
 
+var group = {}
+var all_oddities = []
 
+func addNearbyOddity(nearby, oddity, pos: Vector2):
+	if oddity is Array:
+		for o in oddity:
+			if not nearby in group:
+				group[nearby] = []
+			group[nearby].append(o)
+			all_oddities.append(o)
+	else:
+		if not nearby in group:
+			group[nearby] = []
+		group[nearby].append(oddity)
+		all_oddities.append(oddity)
+	.addNearbyOddity(nearby, oddity, pos)
 
 
 func enterNearby(what, id):
@@ -22,6 +37,7 @@ func enterNearby(what, id):
 		if "exit_time" in current_event_log[what][id].keys():
 			current_event_log[what][id].erase("exit_time")
 	logEvents()
+	
 	.enterNearby(what,id)
 
 func exitNearby(what, id):
@@ -40,14 +56,55 @@ func getNextOnPlaylist():
 		return null
 
 var event_log_file = "user://cache/.HevLib_Cache/Event_Driver/event_log.json"
+var active_events_file = "user://cache/.HevLib_Cache/Event_Driver/active_events.txt"
+var latest_event_file = "user://cache/.HevLib_Cache/Event_Driver/latest_event.txt"
 
 var file = File.new()
 func logEvents():
 	file.open(event_log_file,File.WRITE)
 	file.store_string(JSON.print(current_event_log,"\t"))
 	file.close()
+	var current_events = []
+	var active_events = ""
+	var latest_event = ""
+	var latest_event_time = 0
+	for eventType in current_event_log:
+		var evt = current_event_log[eventType]
+		for id in evt:
+			var entries = evt[id]
+			if not "exit_time" in entries and not eventType in current_events:
+				current_events.append(eventType)
+				var time = entries.get("enter_time",null)
+				if time:
+					var actualTime = Time.get_unix_time_from_datetime_string(time)
+					if actualTime > latest_event_time:
+						latest_event_time = actualTime
+						latest_event = eventType
+	file.open(latest_event_file,File.READ)
+	var currentLatest = file.get_as_text()
+	file.close()
+	if latest_event != currentLatest:
+		file.open(latest_event_file,File.WRITE)
+		file.store_string(latest_event)
+		file.close()
+	for event in current_events:
+		active_events = active_events + event + "\n"
+	file.open(active_events_file,File.WRITE)
+	file.store_string(active_events)
+	file.close()
 
 func _ready():
+	
+	file.open(event_log_file,File.WRITE)
+	file.store_string("{}")
+	file.close()
+	file.open(active_events_file,File.WRITE)
+	file.store_string("")
+	file.close()
+	file.open(latest_event_file,File.WRITE)
+	file.store_string("")
+	file.close()
+	current_event_log = {}
 	image = map.get_data()
 	size = image.get_size()
 	

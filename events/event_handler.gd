@@ -12,16 +12,28 @@ func _ready():
 	timer.name = "Timer"
 	add_child(timer)
 var focusObject
-func spawn_event(event):
+func spawn_event(event,thering: Node):
+	ring = thering
 	focusObject = CurrentGame.getPlayerShip()
 	if focusObject.zone == "rings":
-		ring = get_node("/root/Game/TheRing")
 		
 		var event_node = ring.get_node_or_null(event)
 		if event_node and event_node.has_method("makeAt"):
 			var pos = getPos()
 			var oddity = event_node.makeAt(pos)
-			ring.requestOdditySpawn(oddity)
+			if oddity is Array:
+				for o in oddity:
+					if not event in ring.group:
+						ring.group[event] = []
+					ring.group[event].append(o)
+					ring.all_oddities.append(o)
+					ring.requestOdditySpawn(o)
+			else:
+				if not event in ring.group:
+					ring.group[event] = []
+				ring.group[event].append(oddity)
+				ring.all_oddities.append(oddity)
+				ring.requestOdditySpawn(oddity)
 		
 		
 		

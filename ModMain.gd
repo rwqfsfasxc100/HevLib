@@ -39,6 +39,8 @@ var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/compleme
 var weaponslot_cache = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/ship_data"
 
 var event_log_file = "user://cache/.HevLib_Cache/Event_Driver/event_log.json"
+var active_events_file = "user://cache/.HevLib_Cache/Event_Driver/active_events.txt"
+var latest_event_file = "user://cache/.HevLib_Cache/Event_Driver/latest_event.txt"
 
 func _ready():
 	l("Readying")
@@ -69,6 +71,12 @@ func _ready():
 	file.close()
 	file.open(event_log_file,File.WRITE)
 	file.store_string("{}")
+	file.close()
+	file.open(active_events_file,File.WRITE)
+	file.store_string("")
+	file.close()
+	file.open(latest_event_file,File.WRITE)
+	file.store_string("")
 	file.close()
 	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
 	var mod_data = ManifestV2.__get_mod_data(true,true)

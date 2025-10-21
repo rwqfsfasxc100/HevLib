@@ -7,6 +7,10 @@ var developer_hint = {
 	]
 }
 const se = preload("res://HevLib/events/event_handler.gd")
-static func __spawn_event(event):
+static func __spawn_event(event, thering):
 	var f = se.new()
-	f.spawn_event(event)
+	f.spawn_event(event,thering)
+const ce = preload("res://HevLib/events/clear_event.gd")
+static func __clear_event(event,ring):
+	var f = ce.new()
+	f.clear_event(event,ring)
