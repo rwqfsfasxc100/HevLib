@@ -38,6 +38,8 @@ var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/compleme
 
 var weaponslot_cache = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/ship_data"
 
+var event_log_file = "user://cache/.HevLib_Cache/Event_Driver/event_log.json"
+
 func _ready():
 	l("Readying")
 	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
@@ -46,6 +48,7 @@ func _ready():
 	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/dependancies/")
 	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/conflicts/")
 	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/complementary/")
+	FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Event_Driver/")
 	var zips = FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/",true,true)
 	var manifests = FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/",true,true)
 	var d = Directory.new()
@@ -62,6 +65,9 @@ func _ready():
 	file.store_string("false")
 	file.close()
 	file.open(update_store,File.WRITE)
+	file.store_string("{}")
+	file.close()
+	file.open(event_log_file,File.WRITE)
 	file.store_string("{}")
 	file.close()
 	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")

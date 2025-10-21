@@ -8,22 +8,44 @@ var cache_folder = "user://cache/.HevLib_Cache/"
 
 var current_event_log = {}
 
+
+
+
+func enterNearby(what, id):
+	if not what in current_event_log:
+		current_event_log.merge({what:{}})
+	var ctime = Time.get_datetime_string_from_system(true)
+	if not id in current_event_log[what]:
+		current_event_log[what].merge({id:{}})
+	current_event_log[what][id]["enter_time"] = ctime
+	if Time.get_unix_time_from_datetime_string(ctime) > Time.get_unix_time_from_datetime_string(current_event_log[what][id].get("exit_time","2020-01-01T03:45:01")):
+		if "exit_time" in current_event_log[what][id].keys():
+			current_event_log[what][id].erase("exit_time")
+	logEvents()
+	.enterNearby(what,id)
+
 func exitNearby(what, id):
-#	breakpoint
-	.exitNearby(what, id)
+	var ctime = Time.get_datetime_string_from_system(true)
+	current_event_log[what][id]["exit_time"] = ctime
+	logEvents()
+	.exitNearby(what,id)
 
 func getNextOnPlaylist():
-	var o = .getNextOnPlaylist()
-	var log_data = {}
-	var id = hash(o)
-	log_data.merge({"object":o})
-	var n = o.name
-	log_data.merge({"time_added":Time.get_datetime_dict_from_system(true)})
-	current_event_log.merge({id:log_data})
-	return o
+	if playlist.size() > 0:
+		var value = .getNextOnPlaylist()
+		var ev_name = value.name
+		
+		return value
+	else:
+		return null
 
-func logNaturalEvents():
-	pass
+var event_log_file = "user://cache/.HevLib_Cache/Event_Driver/event_log.json"
+
+var file = File.new()
+func logEvents():
+	file.open(event_log_file,File.WRITE)
+	file.store_string(JSON.print(current_event_log,"\t"))
+	file.close()
 
 func _ready():
 	image = map.get_data()
@@ -59,3 +81,44 @@ func _ready():
 		file.open(cache_folder + "current_events.txt",File.WRITE)
 		file.store_string(string)
 		file.close()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#func exitNearby(what, id):
+#	if id in potential_events:
+#		current_event_log[id].merge({"time_exited":Time.get_datetime_dict_from_system(true)})
+#		logEvents()
+#	.exitNearby(what, id)
+#
+#func enterNearby(what, id):
+#	if id in potential_events:
+#		var log_data = potential_events[id]
+#		log_data.merge({"time_added":Time.get_datetime_dict_from_system(true)})
+#		current_event_log.merge({id:log_data})
+#		logEvents()
+#		potential_events.clear()
+#	.enterNearby(what, id)
+#
+#var potential_events = {}
+#func getNextOnPlaylist():
+#	var o = .getNextOnPlaylist()
+#	var log_data = {}
+#	var id = hash(o)
+#	log_data.merge({"object":o})
+#	var n = o.name
+#	log_data.merge({"time_added":Time.get_datetime_dict_from_system(true)})
+#	potential_events.merge({id:log_data})
+##	logEvents()
+#	return o
