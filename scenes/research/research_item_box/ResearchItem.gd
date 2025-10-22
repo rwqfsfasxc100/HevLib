@@ -7,11 +7,13 @@ onready var total_progress_container = $Progress/FullProgress
 
 const progress_bar = preload("res://HevLib/scenes/research/research_item_box/ResearchProgressBar.tscn")
 
+var mark_for_completion = false
+
 func _ready():
 	
 #	breakpoint
-	
-	match this_research_project.get("mode","story_only"):
+	var project_mode = this_research_project.get("mode","story_only")
+	match project_mode:
 		"story_only":
 			var story_flag = this_research_project.get("story_flag")
 			var story_val = getStory(story_flag)
@@ -32,7 +34,15 @@ func _ready():
 			
 			$Progress/Button.text = project_name
 			
-			
+			var bar = progress_bar.instance()
+			bar.source = source
+			bar.mode = project_mode
+			bar.story_flag = story_flag
+			bar.story_min = progress_min
+			bar.story_max = progress_max
+			bar.parent = self
+			bar.is_total = true
+			$Progress/FullProgress.add_child(bar)
 			
 #			breakpoint
 		"story_progress":
@@ -136,3 +146,11 @@ func getStory(story):
 const NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
 
 var default_vp_positioning = {"position":Vector2(0,0),"rotation":90,"scale":Vector2(1,1)}
+
+func _process(_delta):
+	if is_visible_in_tree():
+		if mark_for_completion:
+			$AnimationPlayer.play("Complete")
+		else:
+			$AnimationPlayer.stop()
+			$Icon/PanelContainer.self_modulate = Color(1,1,1,1)

@@ -13,8 +13,13 @@ func show():
 		return
 	lastFocus = get_focus_owner()
 	$Shower.play("show")
+	var actives = current_project_management.get_node("VBoxContainer/ScrollContainer/Projects")
+	if actives.get_child_count() > 0:
+		var first = actives.get_child(0).get_node("Progress/Button")
+		first.grab_focus()
 	if visible:
 		hide()
+	
 #
 #
 #	var notif = {
@@ -34,7 +39,8 @@ func hide():
 	if not visible or $Shower.current_animation == "hide":
 		return
 	$Shower.play("hide")
-		
+	if lastFocus:
+		lastFocus.grab_focus()
 func _ready():
 	visible = false
 	get_parent().connect("hidefoka", self, "hide")
@@ -51,7 +57,6 @@ func _ready():
 			CurrentGame.state.merge({"hevlib_research":{}})
 		get_research_data()
 
-var research_state = {}
 
 const ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 
@@ -59,8 +64,9 @@ func _input(event):
 	if visible and (Input.is_action_just_pressed("ui_cancel") or Input.is_action_just_pressed("pause")):
 		get_tree().set_input_as_handled()
 		hide()
-		if lastFocus:
-			lastFocus.grab_focus()
+		
+#		if lastFocus:
+#			lastFocus.grab_focus()
 
 func unfocus():
 	if lastFocus and get_focus_owner() == null:
@@ -71,19 +77,19 @@ func _on_Research_pressed():
 	show()
 
 func get_research_data():
-	research_state = CurrentGame.state.hevlib_research
 	var tags = ManifestV2.__get_mods_and_tags_from_tag("TAG_USING_HEVLIB_RESEARCH")
 	for mod in tags:
 		for p in tags[mod]:
 			var id = mod + "|" + p.name
-			p.merge({"source":mod})
-			if not id in research_state:
+			if not "source" in p:
+				p.merge({"source":mod})
+			if not "state" in CurrentGame.state.hevlib_research:
 				var state = {
 					"active":false,
 					"time_while_active":-1,
 					"completed":false,
 				}
 				p.merge({"state":state})
-			research_state.merge({id:p},true)
+			CurrentGame.state.hevlib_research.merge({id:p},true)
 	current_project_management._initialize()
 	dormant_project_management._initialize()

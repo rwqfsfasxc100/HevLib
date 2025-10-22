@@ -18,9 +18,14 @@ export (int) var days = 0
 export (int) var months = 0
 export (int) var years = 0
 
+var parent
+
+var is_total = false
+
 func _ready():
+	$Button.hint_tooltip = tooltip_text
 	match mode:
-		"story":
+		"story_only":
 			min_value = story_min
 			max_value = story_max
 			step = 1
@@ -52,10 +57,13 @@ func handle_time(datetime_dict : Dictionary):
 
 func set_progress():
 	var val = getStory(story_flag)
+	$Button.rect_size = rect_size - Vector2(4,0)
 #	breakpoint
 	match mode:
-		"story":
+		"story_only":
 			value = clamp(val, story_min,story_max)
+			if is_total and val >= story_max:
+				parent.mark_for_completion = true
 		"payment":
 			pass
 		"time":

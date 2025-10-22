@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://HevLib/scenes/research/research_item_box/ResearchProgressBar.gd" type="Script" id=1]
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=2]
+[ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=3]
 
 [node name="ResearchProgressBar" type="ProgressBar"]
 margin_right = 290.0
@@ -13,5 +14,8 @@ script = ExtResource( 1 )
 [node name="Button" type="Button" parent="."]
 margin_right = 290.0
 margin_bottom = 42.0
+hint_tooltip = "HEVLIB_RESEARCH_TOTAL_TOOLTIP"
 size_flags_horizontal = 3
 flat = true
+
+[node name="PlaySoundsOnTheseButtons" parent="Button" instance=ExtResource( 3 )]

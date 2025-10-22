@@ -43,6 +43,7 @@ func enterNearby(what, id):
 func exitNearby(what, id):
 	var ctime = Time.get_datetime_string_from_system(true)
 	current_event_log[what][id]["exit_time"] = ctime
+	
 	logEvents()
 	.exitNearby(what,id)
 
@@ -94,7 +95,7 @@ func logEvents():
 	file.close()
 
 func _ready():
-	
+	connect("tree_exiting",self,"wipe_lists")
 	file.open(event_log_file,File.WRITE)
 	file.store_string("{}")
 	file.close()
@@ -139,7 +140,9 @@ func _ready():
 		file.store_string(string)
 		file.close()
 
-
+func wipe_lists():
+	group.clear()
+	all_oddities.clear()
 
 
 
