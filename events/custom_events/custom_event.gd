@@ -1,6 +1,8 @@
 extends Node
 
 const scripts_to_fetch_from = [
+	"res://story/ClaimBeacon-1.gd",
+	"res://story/ClaimBeaconForeign.gd",
 	"res://story/DeadBody.gd",
 	"res://story/FlightForRescue.gd",
 	"res://story/HumongousHollowRock.gd",
