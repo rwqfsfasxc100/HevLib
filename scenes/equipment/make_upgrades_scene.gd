@@ -2,6 +2,7 @@ extends Node
 
 var SCENE_HEADER = "[gd_scene load_steps=4 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/unmodified/WeaponSlotUpgradeTemplate.tscn\" type=\"PackedScene\" id=2]\n[ext_resource path=\"res://enceladus/SystemShipUpgradeUI.tscn\" type=\"PackedScene\" id=3]\n\n[sub_resource type=\"ViewportTexture\" id=1]\nflags = 5\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain1/Viewport\")\n\n[sub_resource type=\"ViewportTexture\" id=2]\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain2/Control\")\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]\n\n[node name=\"TextureRect\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 2 )\n\n[node name=\"TextureRect2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 2 )"
 
+const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 var vanilla_equipment = preload("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd").get_script_constant_map()
 var vanilla_data = preload("res://HevLib/scenes/equipment/vanilla_defaults/slot_tagging.gd")
 var hardpoint_types
@@ -229,7 +230,18 @@ func make_upgrades_scene(is_onready: bool = true):
 								var arr2 = []
 								for item in constants:
 									var equipment = data.get(item).duplicate(true)
-									arr2.append(equipment)
+									var allow = true
+									if "config" in equipment:
+										var cf = equipment["config"]
+										var id = cf.get("id",null)
+										var section = cf.get("section",null)
+										var opt = cf.get("entry",null)
+										if id and section and opt:
+											var cv = ConfigDriver.__get_value(id,section,opt)
+											if typeof(cv) == TYPE_BOOL:
+												allow = cv
+									if allow:
+										arr2.append(equipment)
 								dicti.merge({"ADD_EQUIPMENT_ITEMS":arr2})
 							"ADD_EQUIPMENT_SLOTS.gd":
 								var data = load(check + last_bit)
@@ -237,7 +249,18 @@ func make_upgrades_scene(is_onready: bool = true):
 								var arr2 = []
 								for item in constants:
 									var equipment = data.get(item).duplicate(true)
-									arr2.append(equipment)
+									var allow = true
+									if "config" in equipment:
+										var cf = equipment["config"]
+										var id = cf.get("id",null)
+										var section = cf.get("section",null)
+										var opt = cf.get("entry",null)
+										if id and section and opt:
+											var cv = ConfigDriver.__get_value(id,section,opt)
+											if typeof(cv) == TYPE_BOOL:
+												allow = cv
+									if allow:
+										arr2.append(equipment)
 								dicti.merge({"ADD_EQUIPMENT_SLOTS":arr2})
 							"EQUIPMENT_TAGS.gd":
 								var data = load(check + last_bit)
