@@ -195,8 +195,9 @@ func modify():
 						breakpoint
 					properties_to_modify.append([sn,p,newVal])
 			var sysn = name + "_" + iname
-			system = node
 			node.name = sysn
+			system = node
+			
 	for item in modifications:
 		var iname = item.get("name")
 		if iname == c:
@@ -230,7 +231,6 @@ func modify():
 		var datapoint = equipment_modifications[c]
 		for property in datapoint:
 			var value = datapoint.get(property)
-			var current = system.get(property)
 			var newVal = NodeAccess.__convert_var_from_string(value)
 			if system == null:
 				breakpoint
@@ -243,8 +243,8 @@ func modify():
 				_:
 					property[0].set(property[1],property[2])
 	if node:
-		add_child(node)
 		key = name + "_" + mounted
+		add_child(node)
 		systemName = _getSystemName()
 		slotName = _getSlotName()
 		inspection = _getInspection()
