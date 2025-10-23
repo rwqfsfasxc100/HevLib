@@ -34,7 +34,7 @@ bus = "UI"
 visible = false
 
 [node name="MarginContainer" type="MarginContainer" parent="Separation/Tooltip"]
-modulate = Color( 2, 2, 2, 0.51 )
+modulate = Color( 2, 2, 2, 0.784314 )
 light_mask = 0
 margin_right = 40.0
 margin_bottom = 40.0
