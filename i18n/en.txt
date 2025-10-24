@@ -355,3 +355,5 @@ NOTIFICATION_TITLE_PLACEHOLDER|{Notification Name Missing}
 HEVLIB_AVAILABLE_RESEARCH|Available Research Projects
 
 HEVLIB_RESEARCH_TOTAL_TOOLTIP|Total progress towards this project
+
+DLC_ANDROID|Android face pack
