@@ -56,7 +56,7 @@ const SHIP_TEMPLATES = {
 					"property":"position",
 					"value":"Vector2( 69, -71 )"
 				}
-			]
+			],
 		},
 		"leftBay1":{
 			"MINING_COMPANIONS":[
@@ -103,6 +103,16 @@ const SHIP_TEMPLATES = {
 					"value":"27"
 				}
 			],
+			"NANODRONES":[
+				{
+					"property":"position",
+					"value":"Vector2( -172, 142 )"
+				},
+				{
+					"property":"rotation",
+					"value":"-1.5708"
+				},
+			]
 		},
 		"leftBay2":{
 			"MINING_COMPANIONS":[
@@ -149,6 +159,16 @@ const SHIP_TEMPLATES = {
 					"value":"27"
 				}
 			],
+			"NANODRONES":[
+				{
+					"property":"position",
+					"value":"Vector2( -172, 142 )"
+				},
+				{
+					"property":"rotation",
+					"value":"-1.5708"
+				},
+			]
 		},
 		"leftBay3":{
 			"MINING_COMPANIONS":[
@@ -195,6 +215,16 @@ const SHIP_TEMPLATES = {
 					"value":"27"
 				}
 			],
+			"NANODRONES":[
+				{
+					"property":"position",
+					"value":"Vector2( -172, 142 )"
+				},
+				{
+					"property":"rotation",
+					"value":"-1.5708"
+				},
+			]
 		},
 		"rightBay1":{
 			"MINING_COMPANIONS":[
@@ -241,6 +271,16 @@ const SHIP_TEMPLATES = {
 					"value":"27"
 				}
 			],
+			"NANODRONES":[
+				{
+					"property":"position",
+					"value":"Vector2( 172, 142 )"
+				},
+				{
+					"property":"rotation",
+					"value":"1.5708"
+				},
+			]
 		},
 		"rightBay2":{
 			"MINING_COMPANIONS":[
@@ -287,6 +327,16 @@ const SHIP_TEMPLATES = {
 					"value":"27"
 				}
 			],
+			"NANODRONES":[
+				{
+					"property":"position",
+					"value":"Vector2( 172, 142 )"
+				},
+				{
+					"property":"rotation",
+					"value":"1.5708"
+				},
+			]
 		},
 		"rightBay3":{
 			"MINING_COMPANIONS":[
@@ -333,6 +383,16 @@ const SHIP_TEMPLATES = {
 					"value":"27"
 				}
 			],
+			"NANODRONES":[
+				{
+					"property":"position",
+					"value":"Vector2( 172, 142 )"
+				},
+				{
+					"property":"rotation",
+					"value":"1.5708"
+				},
+			]
 		},
 	},
 	"SHIP_COTHON":{
