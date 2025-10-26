@@ -65,9 +65,9 @@ static func __check_folder_exists(folder: String) -> bool:
 # Returns the files in the supplied folder
 # If showFolders is set to true, includes folders with the output
 # If ReturnFullPath is set to true, returns the complete path of the folder's contents, not just relative
-static func __fetch_folder_files(folder: String, showFolders: bool = false, returnFullPath: bool = false) -> Array:
+static func __fetch_folder_files(folder: String, showFolders: bool = false, returnFullPath: bool = false,globalizePath: bool = false) -> Array:
 	var f = load("res://HevLib/globals/fetch_folder_files.gd")
-	var s = f.fetch_folder_files(folder, showFolders, returnFullPath)
+	var s = f.fetch_folder_files(folder, showFolders, returnFullPath,globalizePath)
 	return s
 
 # Returns the content from a file as a string

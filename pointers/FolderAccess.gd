@@ -45,8 +45,8 @@ static func __get_first_file(folder: String) -> String:
 	var s = gff.get_first_file(folder)
 	return s
 const fff = preload("res://HevLib/globals/fetch_folder_files.gd")
-static func __fetch_folder_files(folder: String, showFolders: bool = false, returnFullPath: bool = false) -> Array:
-	var s = fff.fetch_folder_files(folder, showFolders, returnFullPath)
+static func __fetch_folder_files(folder: String, showFolders: bool = false, returnFullPath: bool = false,globalizePath: bool = false) -> Array:
+	var s = fff.fetch_folder_files(folder, showFolders, returnFullPath,globalizePath)
 	return s
 
 static func __copy_file(file, folder):

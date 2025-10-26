@@ -26,11 +26,15 @@ var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 
 
 const DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
+const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+const Translations = preload("res://HevLib/pointers/Translations.gd")
 
 
 func _on_Button_pressed():
+	
+	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 #	rng.randomize()
-#	var Translations = preload("res://HevLib/pointers/Translations.gd")
+#	
 #	var mods = ManifestV2.__get_mod_data_from_files("user://cache/.HevLib_Cache/ManifestV2/derelictdelights/ModMain.gd", true)
 #	var did = ManifestV2.__compare_versions(mods)
 #	var webtranslate = preload("res://HevLib/pointers/WebTranslate.gd")
@@ -71,7 +75,7 @@ func _on_Button_pressed():
 	
 #	var s = ManifestV2.__get_mod_by_id("hev.LIBRARY")
 #	breakpoint
-#	var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+#	
 #
 #	ConfigDriver.__store_config(config,"He/vL/ib/")
 #
@@ -97,7 +101,6 @@ func _on_Button_pressed():
 #	var names = []
 #	for child in children:
 #		names.append(child.name)
-	
 	
 	
 	breakpoint
