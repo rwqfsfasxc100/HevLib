@@ -2,6 +2,8 @@ extends ProgressBar
 
 var source = ""
 
+signal storyFlag(flag,val)
+
 export (String, "story", "payment", "time","total") var mode = "story"
 export (String) var tooltip_text = ""
 export (bool) var reset_on_halt = false
@@ -79,3 +81,8 @@ func set_progress():
 
 func getStory(story):
 	return int(CurrentGame.state.story.get(story, -1))
+
+
+func _pressed():
+	if is_total:
+		emit_signal("storyFlag",story_flag,getStory(story_flag))

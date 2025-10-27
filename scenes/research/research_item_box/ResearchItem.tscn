@@ -15,7 +15,7 @@ load_path = "res://HevLib/ui/themes/icons/missing_icon.png.stex"
 
 [sub_resource type="Animation" id=3]
 resource_name = "Complete"
-length = 3.0
+length = 1.5
 loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath("Icon/PanelContainer:self_modulate")
@@ -24,7 +24,7 @@ tracks/0/loop_wrap = true
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/keys = {
-"times": PoolRealArray( 0, 1.5, 3 ),
+"times": PoolRealArray( 0, 0.75, 1.5 ),
 "transitions": PoolRealArray( 1, 1, 1 ),
 "update": 0,
 "values": [ Color( 1, 1, 1, 1 ), Color( 3, 3, 0.5, 1 ), Color( 1, 1, 1, 1 ) ]

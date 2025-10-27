@@ -42,6 +42,7 @@ func _ready():
 			bar.story_max = progress_max
 			bar.parent = self
 			bar.is_total = true
+			bar.connect("storyFlag",self,"handle_story")
 			$Progress/FullProgress.add_child(bar)
 			
 #			breakpoint
@@ -102,7 +103,7 @@ func _ready():
 							bar.story_flag = story_flag
 							bar.story_min = task.get("story_min",0)
 							bar.story_max = task.get("story_max",1000)
-							
+							bar.connect("storyFlag",self,"handle_story")
 							sub_progress_container.add_child(bar)
 						"payment":
 							var bar = progress_bar.instance()
@@ -137,6 +138,10 @@ func _ready():
 			
 			
 			
+
+func handle_story(flag,value):
+	
+	pass
 
 func exit():
 	Tool.remove(self)

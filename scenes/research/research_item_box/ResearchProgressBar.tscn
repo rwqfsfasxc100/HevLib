@@ -19,3 +19,5 @@ size_flags_horizontal = 3
 flat = true
 
 [node name="PlaySoundsOnTheseButtons" parent="Button" instance=ExtResource( 3 )]
+
+[connection signal="pressed" from="Button" to="." method="_pressed"]
