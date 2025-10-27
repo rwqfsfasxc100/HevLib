@@ -91,20 +91,20 @@ static func make_mineral_scripting(is_onready = false):
 	f.open(mineral_cache_file,File.WRITE)
 	f.store_string("[]")
 	f.close()
-	
+	var mods_to_avoid = []
 	for folder in folders:
 		var semi_root = folder.split("/")[2]
 		if semi_root.begins_with("."):
 			continue
 					
 		if folder.ends_with("/"):
-			var mods_to_avoid = []
+			
 			if not is_onready:
 				if running_in_debugged:
 					for mod in debugged_defined_mods:
 						var home = mod.split("/")[2]
 						if home == semi_root:
-							mods_to_avoid.append(home)
+								mods_to_avoid.append(home)
 			var folder_2 = FolderAccess.__fetch_folder_files(folder, true, true)
 			for check in folder_2:
 				if not is_onready:

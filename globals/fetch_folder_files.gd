@@ -25,10 +25,10 @@ static func fetch_folder_files(folder, showFolders, returnFullPath,globalizePath
 				break
 			if dir.current_is_dir() and not showFolders:
 				continue
-			elif dir.current_is_dir() and showFolders:
+			elif dir.current_is_dir() and showFolders and not fileName.ends_with("/"):
 				fileName = fileName + "/"
 			if returnFullPath:
-				fileName = folder + "/" + fileName
+				fileName = folder + fileName
 			if globalizePath:
 				fileList.append(ProjectSettings.globalize_path(fileName))
 			else:

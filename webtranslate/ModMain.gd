@@ -29,7 +29,7 @@ var cache_extension = ".file_check_cache"
 
 func loadTranslationsFromCache():
 	var accepted = false
-	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd").new()
+	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd").new()
 	var WebTranslateCache = "user://cache/.HevLib_Cache/WebTranslate/"
 	FolderAccess.__check_folder_exists(WebTranslateCache)
 	var cacheContent = FolderAccess.__fetch_folder_files(WebTranslateCache, true)

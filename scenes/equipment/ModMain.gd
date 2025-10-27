@@ -43,7 +43,7 @@ func _init(modLoader = ModLoader):
 	
 	
 	
-	var minerals = preload("res://HevLib/scenes/minerals/make_mineral_scripting.gd")
+	var minerals = load("res://HevLib/scenes/minerals/make_mineral_scripting.gd")
 	minerals.make_mineral_scripting(false)
 	
 	var asteroids = ResourceLoader.load(asteroid_path)
