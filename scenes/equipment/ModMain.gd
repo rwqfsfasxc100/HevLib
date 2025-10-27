@@ -38,9 +38,9 @@ var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 func _init(modLoader = ModLoader):
 	l("Initializing Equipment Driver")
 	
+	installScriptExtension("../../ui/ExtensionPopup.gd")
 	installScriptExtension("../scene_replacements/DLClist.gd")
 	replaceScene("../scene_replacements/DLClist.tscn","res://tools/DLClist.tscn")
-	
 	
 	
 	var minerals = load("res://HevLib/scenes/minerals/make_mineral_scripting.gd")
