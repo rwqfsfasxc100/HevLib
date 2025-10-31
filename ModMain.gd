@@ -11,6 +11,8 @@ const LIBRARY_HIDDEN_BY_DEFAULT = false
 var modPath:String = get_script().resource_path.get_base_dir() + "/"
 var _savedObjects := []
 
+var enable_research = false
+
 var HevLibModMain = true
 func _init(modLoader = ModLoader):
 	l("Initializing DLC")
@@ -219,8 +221,8 @@ func _ready():
 	if not crew == "":
 		var escene := load(crew)
 		escene.take_over_path("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
-	
-	replaceScene("scenes/research/Enceladus.tscn","res://enceladus/Enceladus.tscn")
+	if enable_research:
+		replaceScene("scenes/research/Enceladus.tscn","res://enceladus/Enceladus.tscn")
 	
 	
 	var gameFiles = FolderAccess.__get_folder_structure("res://",false)
