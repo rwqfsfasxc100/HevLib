@@ -26,10 +26,6 @@ texture = SubResource( 1 )
 [node name="ControlTexture2" parent="VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims" index="1"]
 texture = SubResource( 2 )
 
-[node name="MarginContainer" parent="VB/MarginContainer/ScrollContainer" index="0"]
-margin_top = 0.0
-margin_bottom = 25490.0
-
 [node name="Items" parent="VB/MarginContainer/ScrollContainer/MarginContainer" index="0"]
 script = ExtResource( 2 )
 
