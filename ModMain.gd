@@ -200,6 +200,10 @@ func _ready():
 		vNode.paths = paths
 		vNode.name = "EquipmentDriver"
 		CRoot.call_deferred("add_child",vNode)
+	installScriptExtension("scenes/research/overhead_handle/Enceladus.gd")
+	installScriptExtension("scenes/research/overhead_handle/AsteroidSpawner.gd")
+	var nNode = load("res://HevLib/scenes/research/overhead_handle/ResearchOverheadHandle.tscn").instance()
+	CRoot.call_deferred("add_child",nNode)
 	var scene = load("res://HevLib/scenes/better_title_screen/TitleScreen.tscn")
 	
 #	replaceScene("scenes/equipment/Enceladus.tscn","res://enceladus/Enceladus.tscn")
