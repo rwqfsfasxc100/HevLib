@@ -174,14 +174,15 @@ export var desc_scroll_box = NodePath("")
 onready var dp = get_node(desc_scroll_box)
 
 func _draw():
-	var dp_d_size = dp.get_parent().rect_size
-	dp.rect_min_size = dp_d_size
-	dp.rect_size = dp_d_size
 	pass
 
 var aligned_zero_focus = false
 
 func _process(_delta):
+	
+	var dp_d_size = dp.get_parent().rect_size
+	dp.rect_min_size = dp_d_size
+	dp.rect_size = dp_d_size
 	if count_label.count <= 1:
 		if not aligned_zero_focus:
 			get_node(info_desc).grab_focus()

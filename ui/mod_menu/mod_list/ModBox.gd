@@ -493,6 +493,9 @@ func _process(_delta):
 						visible = false
 				else:
 					visible = true
+	var btnResize = Vector2($BaseModBox.rect_size.x - $BaseModBox/ModButton.rect_position.x,$BaseModBox.rect_size.y)
+	$BaseModBox/ModButton.rect_size = btnResize
+	button_box.rect_size.x = button.rect_size.x - 4
 var file = File.new()
 
 func _visibility_changed():
