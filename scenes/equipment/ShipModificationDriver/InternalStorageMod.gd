@@ -13,6 +13,10 @@ var storage_add = 0
 var ammo_add = 0
 var nano_add = 0
 var multi = 1.0
+var ammo_multi = 1.0
+var nano_multi = 1.0
+var propellant_multi = 1.0
+var mass_multi = 1.0
 var propellant_add = 0
 var mass_add = 0
 var mass_per_crew = 0
@@ -48,6 +52,18 @@ func _ready():
 			var listingStorageMulti = float(item.get("storage_multi_upper",1.0))/float(item.get("storage_multi_lower",1.0))
 			if listingStorageMulti != 1.0:
 				ls.merge({"storage_multi":listingStorageMulti})
+			var listingAmmoMulti = float(item.get("ammo_multi_upper",1.0))/float(item.get("ammo_multi_lower",1.0))
+			if listingAmmoMulti != 1.0:
+				ls.merge({"ammo_multi":listingAmmoMulti})
+			var nanoMulti = float(item.get("nano_multi_upper",1.0))/float(item.get("nano_multi_lower",1.0))
+			if nanoMulti != 1.0:
+				ls.merge({"nano_multi":nanoMulti})
+			var propellantMulti = float(item.get("propellant_multi_upper",1.0))/float(item.get("propellant_multi_lower",1.0))
+			if propellantMulti != 1.0:
+				ls.merge({"propellant_multi":propellantMulti})
+			var massMulti = float(item.get("mass_multi_upper",1.0))/float(item.get("mass_multi_lower",1.0))
+			if massMulti != 1.0:
+				ls.merge({"mass_multi":massMulti})
 			var listingForceType = item.get("force_type","")
 			if listingForceType != "":
 				ls.merge({"force_type":listingForceType})
@@ -117,6 +133,22 @@ func _ready():
 					"storage_multi":
 						var val = iddata[key]
 						multi *= float(val)
+						has_made_change = true
+					"ammo_multi":
+						var val = iddata[key]
+						ammo_multi *= float(val)
+						has_made_change = true
+					"nano_multi":
+						var val = iddata[key]
+						nano_multi *= float(val)
+						has_made_change = true
+					"propellant_multi":
+						var val = iddata[key]
+						propellant_multi *= float(val)
+						has_made_change = true
+					"mass_multi":
+						var val = iddata[key]
+						mass_multi *= float(val)
 						has_made_change = true
 					"storage_propellant":
 						var val = iddata[key]
@@ -202,12 +234,21 @@ func _ready():
 			var change = ((float(processedCargoCapacity)/1000.0) * mass_per_processed_tonne)
 			mass_add += change
 		
+		l("Modifying consumables multiplicatively")
+		if ammo_multi != 1.0:
+			modifyable_add_ammo += ((base_ammo_storage + modifyable_add_ammo) * ammo_multi) - (base_ammo_storage + modifyable_add_ammo) 
+		if nano_multi != 1.0:
+			modifyable_add_nano += (base_nano_storage + modifyable_add_nano) - ((base_nano_storage + modifyable_add_nano) * nano_multi)
+		if propellant_multi != 1.0:
+			propellant_add += (base_nano_storage + propellant_add) - ((base_propellant + propellant_add) * propellant_multi)
+		if mass_multi != 1.0:
+			mass_add += (mass + mass_add) - ((mass * mass_add) * mass_multi)
 		
 		l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [modifyable_add_ammo, modifyable_add_nano, modifyable_propellant])
 		
-		massDriverAmmoMax += clamp(modifyable_add_ammo,0,INF)
-		dronePartsMax += clamp(modifyable_add_nano,0,INF)
-		reactiveMassMax += clamp(modifyable_propellant,0,INF)
+		extra_ammo += clamp(modifyable_add_ammo,0,INF)
+		extra_nano += clamp(modifyable_add_nano,0,INF)
+		extra_propellant += clamp(modifyable_propellant,0,INF)
 		
 		if mass_per_tonne_total_storage_added != 0:
 			l("Changing mass by %s kg for every tonne of total storage changed by" % total_added_capacity)
@@ -251,6 +292,43 @@ func _ready():
 			call_deferred("move_child",vmass,get_child_count())
 		
 		l("Adding %s kg of mass. Base ship mass changing from %s to %s" % [mass_add,base_mass * 1000,shipInitialMass * 1000])
+
+var extra_ammo = 0
+var extra_nano = 0
+var extra_propellant = 0
+
+func drawDrones(kg, really = true):
+	if extra_nano > 0:
+		if really:
+			if extra_nano >= kg:
+				extra_nano -= kg
+			elif extra_nano + droneParts >= kg:
+				var take = kg - extra_nano
+				extra_nano = 0.0
+				droneParts -= take
+			else:
+				droneParts -= kg
+		return kg
+	else:
+		.drawDrones(kg,really)
+
+# Write additional functions for the following:
+# handleAmmoDelivery
+# drawAmmo
+# drawReactiveMass
+# FIX CRASH
+
+func sensorGet(sensor):
+	match sensor:
+		"ammo":
+			return massDriverAmmo + extra_ammo
+		"drones":
+			return droneParts + extra_nano
+		"fuel":
+			return reactiveMass + extra_propellant
+		_:
+			return .sensorGet(sensor)
+
 var massNodeName = "InternalStorageMod_MassModifier"
 #func sensorGet(sensor):
 #	match sensor:
