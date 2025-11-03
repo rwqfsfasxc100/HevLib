@@ -297,6 +297,26 @@ var extra_ammo = 0
 var extra_nano = 0
 var extra_propellant = 0
 
+func drawAmmo(kg,really = true):
+	if availableAmmoToDrawNow < kg:
+		return 0
+	else:
+		if really:
+			availableAmmoToDrawNow -= kg
+	if extra_ammo > 0:
+		if really:
+			if extra_ammo >= kg:
+				extra_ammo -= kg
+			elif extra_ammo + massDriverAmmo >= kg:
+				var take = kg - extra_ammo
+				extra_ammo = 0.0
+				massDriverAmmo -= take
+			else:
+				massDriverAmmo -= kg
+		return kg
+	else:
+		return .drawAmmo(kg,really)
+
 func drawDrones(kg, really = true):
 	if extra_nano > 0:
 		if really:
@@ -310,22 +330,36 @@ func drawDrones(kg, really = true):
 				droneParts -= kg
 		return kg
 	else:
-		.drawDrones(kg,really)
+		return .drawDrones(kg,really)
+
+func drawReactiveMass(kg, really = true):
+	if extra_propellant > 0:
+		if really:
+			if extra_propellant >= kg:
+				extra_propellant -= kg
+			elif extra_propellant + reactiveMass >= kg:
+				var take = kg - extra_propellant
+				extra_propellant = 0.0
+				reactiveMass -= take
+			else:
+				reactiveMass -= kg
+		return kg
+	else:
+		return .drawReactiveMass(kg,really)
 
 # Write additional functions for the following:
 # handleAmmoDelivery
 # drawAmmo
 # drawReactiveMass
-# FIX CRASH
 
 func sensorGet(sensor):
 	match sensor:
 		"ammo":
-			return massDriverAmmo + extra_ammo
+			return .sensorGet(sensor) + extra_ammo
 		"drones":
-			return droneParts + extra_nano
+			return .sensorGet(sensor) + extra_nano
 		"fuel":
-			return reactiveMass + extra_propellant
+			return .sensorGet(sensor) + extra_propellant
 		_:
 			return .sensorGet(sensor)
 
