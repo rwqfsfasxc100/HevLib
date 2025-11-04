@@ -30,7 +30,6 @@ texture = SubResource( 2 )
 script = ExtResource( 2 )
 
 [node name="Thrusters" parent="VB/MarginContainer/ScrollContainer/MarginContainer/Items" index="21"]
-slot = "propulsion.main"
 always = false
 
 [connection signal="tree_entered" from="VB/MarginContainer/ScrollContainer/MarginContainer/Items" to="VB/MarginContainer/ScrollContainer/MarginContainer/Items" method="_tree_entered"]
