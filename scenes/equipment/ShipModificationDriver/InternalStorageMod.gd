@@ -300,10 +300,8 @@ var extra_propellant = 0
 func drawAmmo(kg,really = true):
 	if availableAmmoToDrawNow < kg:
 		return 0
-	else:
-		if really:
-			availableAmmoToDrawNow -= kg
 	if extra_ammo > 0:
+		availableAmmoToDrawNow -= kg
 		if really:
 			if extra_ammo >= kg:
 				extra_ammo -= kg
