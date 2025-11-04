@@ -3,8 +3,10 @@ extends "res://enceladus/UpgradeGroup.gd"
 # Ship limiting code was ported from IoE
 # Thanks Space! The modding community misses you!
 
-export (Array, String) var limit_ships
-export (bool) var invert_limit_logic = false
+export (Array) var limit_ships = []
+export (Array) var prevent_ships = []
+
+# REMEMBER TO ADD SUPPORT FOR THESE IN EQUIPMENT DRIVER
 
 # Variables used to tag equipment
 export (bool) var add_vanilla_equipment = false
@@ -32,10 +34,13 @@ func reexamine():
 				logic = true
 			else:
 				logic = false
-			if invert_limit_logic:
-				visible = !logic
+			visible = logic
+		if prevent_ships:
+			if ship.shipName in prevent_ships:
+				logic = false
 			else:
-				visible = logic
+				logic = true
+			visible = logic
 		if restrict_hold_type != "":
 			if restrict_hold_type.to_upper() == ship.base_storage_type.to_upper():
 				visible = true

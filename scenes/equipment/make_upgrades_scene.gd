@@ -1101,9 +1101,9 @@ func tag_vanilla_slots(vanilla_equipment_defaults_for_reference):
 		for tag in data:
 			var content = data.get(tag)
 			match tag:
-				"limit_ships", "override_subtractive", "override_additive":
+				"limit_ships", "prevent_ships", "override_subtractive", "override_additive":
 					string = format_for_arrays(string, tag, content)
-				"add_vanilla_equipment", "invert_limit_logic":
+				"add_vanilla_equipment":
 					string = format_for_bools(string, tag, content)
 				"slot_type", "hardpoint_type", "alignment", "restriction":
 					string = format_for_strings(string, tag, content)
