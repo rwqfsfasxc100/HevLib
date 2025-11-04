@@ -297,6 +297,20 @@ var extra_ammo = 0
 var extra_nano = 0
 var extra_propellant = 0
 
+var nanoDeliveryPerSecond = {
+	0.0: 20, 
+	1000.0: 20, 
+	5000.0: 100, 
+	10000.0: 100, 
+	20000.0: 100, 
+	50000.0: 100
+}
+
+var availableNanoToDrawNow = 0.0
+func handleNanoDelivery(delta):
+	var ps = nanoDeliveryPerSecond.get(dronePartsMax, nanoDeliveryPerSecond[0.0])
+	availableNanoToDrawNow = clamp(availableNanoToDrawNow + delta * ps, 0, ps)
+
 func drawAmmo(kg,really = true):
 	if availableAmmoToDrawNow < kg:
 		return 0
@@ -316,6 +330,11 @@ func drawAmmo(kg,really = true):
 		return .drawAmmo(kg,really)
 
 func drawDrones(kg, really = true):
+	if availableNanoToDrawNow < kg:
+		return 0
+	else:
+		if really:
+			availableNanoToDrawNow -= kg
 	if extra_nano > 0:
 		if really:
 			if extra_nano >= kg:
@@ -392,7 +411,9 @@ func getCurrentlyActiveCrewNames():
 			pf.append(m)
 	return pf
 
-
+func _physics_process(delta):
+	if not dead:
+		handleNanoDelivery(delta)
 
 var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 
