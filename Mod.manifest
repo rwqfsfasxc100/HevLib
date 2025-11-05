@@ -98,6 +98,12 @@ HEVLIB_CONFIG_SECTION_DRIVERS={
 		"options":["none","alphabetical_ascending","alphabetical_descending","length_ascending","length_descending"],
 		"default":"none",
 	},
+	"show_currently_playing":{
+		"name":"HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING",
+		"description":"HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING_TOOLTIP",
+		"type":"bool",
+		"default":true,
+	},
 	"randomize_minerals":{
 		"name":"HEVLIB_CONFIG_RANDOMIZE_MINERALS",
 		"description":"HEVLIB_CONFIG_RANDOMIZE_MINERALS_TOOLTIP",

@@ -43,7 +43,7 @@ func _init(modLoader = ModLoader):
 	installScriptExtension("../scene_replacements/DLClist.gd")
 	replaceScene("../scene_replacements/DLClist.tscn","res://tools/DLClist.tscn")
 	
-	
+	installScriptExtension("../better_title_screen/CurrentlyPlaying.gd")
 	var minerals = load("res://HevLib/scenes/minerals/make_mineral_scripting.gd")
 	minerals.make_mineral_scripting(false)
 	

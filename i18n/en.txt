@@ -361,3 +361,7 @@ DLC_ANDROID|Android face pack
 HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT|Limit nanodrone storage output
 
 HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT_TOOLTIP|Prevents nanodrones from being used if the consumption rate exceeds that of the installed storage medium. \nNote: this likely will never be met outside of very specific configurations.
+
+HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING|Display current player count
+
+HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING_TOOLTIP|Whether to display the number of concurrent players on Steam clients.\nNote that numbers are separate between full game and demo.
