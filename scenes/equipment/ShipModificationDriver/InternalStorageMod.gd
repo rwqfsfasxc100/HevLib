@@ -1,13 +1,13 @@
 extends "res://ships/ship-ctrl.gd"
 
-onready var base_proc_storage = processedCargoCapacity
-onready var base_ammo_storage = massDriverAmmoMax
-onready var base_nano_storage = dronePartsMax
-onready var base_storage_type = processedCargoStorageType
-onready var base_propellant = reactiveMassMax
-onready var base_crew_count = crew
-onready var base_crew_morale = crewMoraleBonus
-onready var base_mass = currentMass
+onready var base_proc_storage = 0
+onready var base_ammo_storage = 0
+onready var base_nano_storage = 0
+onready var base_storage_type = 0
+onready var base_propellant = 0
+onready var base_crew_count = 0
+onready var base_crew_morale = 0
+onready var base_mass = 0
 
 var storage_add = 0
 var ammo_add = 0
@@ -25,6 +25,17 @@ var mass_per_tonne_total_storage_added = 0
 
 func _ready():
 	if isPlayerControlled():
+		base_proc_storage = processedCargoCapacity
+		base_ammo_storage = massDriverAmmoMax
+		base_nano_storage = dronePartsMax
+		base_storage_type = processedCargoStorageType
+		base_propellant = reactiveMassMax
+		base_crew_count = crew
+		base_crew_morale = crewMoraleBonus
+		base_mass = currentMass
+		
+		
+		
 		var has_made_change = false
 		l("Readying ship. Base storage of %s proc / %s ammo / %s nanodrones on storage type of %s" % [base_proc_storage, base_ammo_storage, base_nano_storage, base_storage_type])
 		var file = File.new()
@@ -308,7 +319,7 @@ var nanoDeliveryPerSecond = {
 
 var availableNanoToDrawNow = 0.0
 func handleNanoDelivery(delta):
-	var ps = nanoDeliveryPerSecond.get(dronePartsMax, nanoDeliveryPerSecond[0.0])
+	var ps = nanoDeliveryPerSecond.get(shipConfig.get("drones",{}).get("capacity",0.0), nanoDeliveryPerSecond[0.0])
 	availableNanoToDrawNow = clamp(availableNanoToDrawNow + delta * ps, 0, ps)
 
 const ismCFGD = preload("res://HevLib/pointers/ConfigDriver.gd")
@@ -366,11 +377,6 @@ func drawReactiveMass(kg, really = true):
 	else:
 		return .drawReactiveMass(kg,really)
 
-# Write additional functions for the following:
-# handleAmmoDelivery
-# drawAmmo
-# drawReactiveMass
-
 func sensorGet(sensor):
 	match sensor:
 		"ammo":
@@ -383,17 +389,6 @@ func sensorGet(sensor):
 			return .sensorGet(sensor)
 
 var massNodeName = "InternalStorageMod_MassModifier"
-#func sensorGet(sensor):
-#	match sensor:
-#		"mass":
-#			return .sensorGet(sensor) + mass_add
-#		_:
-#			return .sensorGet(sensor)
-
-#func computeCurrentMass():
-#	.computeCurrentMass()
-#	if mass_add != 0:
-#		currentMass = currentMass + float(float(mass_add)/1000.0)
 
 func deactivateCrew(maximum):
 	var count = 0
