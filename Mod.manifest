@@ -56,6 +56,12 @@ HEVLIB_CONFIG_SECTION_EQUIPMENT={
 		"type":"bool",
 		"default":false,
 	},
+	"limit_nanodrone_output":{
+		"name":"HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT",
+		"description":"HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT_TOOLTIP",
+		"type":"bool",
+		"default":true,
+	},
 }
 HEVLIB_CONFIG_SECTION_EVENTS={
 	"write_events":{

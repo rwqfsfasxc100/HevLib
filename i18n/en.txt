@@ -357,3 +357,7 @@ HEVLIB_AVAILABLE_RESEARCH|Available Research Projects
 HEVLIB_RESEARCH_TOTAL_TOOLTIP|Total progress towards this project
 
 DLC_ANDROID|Android face pack
+
+HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT|Limit nanodrone storage output
+
+HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT_TOOLTIP|Prevents nanodrones from being used if the consumption rate exceeds that of the installed storage medium. \nNote: this likely will never be met outside of very specific configurations.

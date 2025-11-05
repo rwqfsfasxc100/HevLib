@@ -311,6 +311,7 @@ func handleNanoDelivery(delta):
 	var ps = nanoDeliveryPerSecond.get(dronePartsMax, nanoDeliveryPerSecond[0.0])
 	availableNanoToDrawNow = clamp(availableNanoToDrawNow + delta * ps, 0, ps)
 
+const ismCFGD = preload("res://HevLib/pointers/ConfigDriver.gd")
 func drawAmmo(kg,really = true):
 	if availableAmmoToDrawNow < kg:
 		return 0
@@ -330,11 +331,12 @@ func drawAmmo(kg,really = true):
 		return .drawAmmo(kg,really)
 
 func drawDrones(kg, really = true):
-	if availableNanoToDrawNow < kg:
-		return 0
-	else:
-		if really:
-			availableNanoToDrawNow -= kg
+	if ismCFGD.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","limit_nanodrone_output"):
+		if availableNanoToDrawNow < kg:
+			return 0
+		else:
+			if really:
+				availableNanoToDrawNow -= kg
 	if extra_nano > 0:
 		if really:
 			if extra_nano >= kg:
@@ -412,7 +414,7 @@ func getCurrentlyActiveCrewNames():
 	return pf
 
 func _physics_process(delta):
-	if not dead:
+	if not dead and ismCFGD.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","limit_nanodrone_output"):
 		handleNanoDelivery(delta)
 
 var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
