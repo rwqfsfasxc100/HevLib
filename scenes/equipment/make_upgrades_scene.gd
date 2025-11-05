@@ -44,6 +44,7 @@ func make_upgrades_scene(is_onready: bool = true):
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_additions.json",
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_modifications.json",
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFIED_NAMES.json",
+		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Slot_Limits.tscn",
 	]
 	
 	var file_save_path : String = FILE_PATHS[0]
@@ -62,6 +63,7 @@ func make_upgrades_scene(is_onready: bool = true):
 	var weaponslot_additions = FILE_PATHS[13]
 	var weaponslot_modifications = FILE_PATHS[14]
 	var weaponslot_modify_equipment_names = FILE_PATHS[15]
+	var upgrades_slot_limits = FILE_PATHS[16]
 	var DataFormat = load("res://HevLib/pointers/DataFormat.gd")
 	if is_onready:
 		
@@ -624,6 +626,9 @@ func make_upgrades_scene(is_onready: bool = true):
 	var slots_for_adding_dict = {}
 	var tag_modifications = {}
 	
+	var ship_limitations = {}
+	var ship_limitation_string = ""
+	
 	var equipment_for_adding = {}
 	
 	for its in slots:
@@ -666,6 +671,36 @@ func make_upgrades_scene(is_onready: bool = true):
 		if newSlot.size() >= 1:
 			l("Adding slots for %s" % mod_hash)
 			for slotDict in newSlot:
+				var snn = slotDict.get("slot_node_name","")
+				var spp = ship_limitations.get(snn,{})
+				if "limit_ships" in slotDict:
+					var val = slotDict["limit_ships"].duplicate()
+					if snn in ship_limitations:
+						if "limit_ships" in spp:
+							for i in val:
+								if i in spp:
+									pass
+								else:
+									ship_limitations[snn]["limit_ships"] = i
+						else:
+							ship_limitations[snn]["limit_ships"] = spp["limit_ships"]
+					else:
+						ship_limitations.merge({snn:{}})
+						ship_limitations[snn]["limit_ships"] = val
+				if "prevent_ships" in slotDict:
+					var val = slotDict["prevent_ships"].duplicate()
+					if snn in ship_limitations:
+						if "prevent_ships" in spp:
+							for i in val:
+								if i in spp:
+									pass
+								else:
+									ship_limitations[snn]["prevent_ships"] = i
+						else:
+							ship_limitations[snn]["prevent_ships"] = spp["prevent_ships"]
+					else:
+						ship_limitations.merge({snn:{}})
+						ship_limitations[snn]["prevent_ships"] = val
 				slots_for_adding.append(slotDict)
 				slots_for_adding_dict.merge({slotDict.get("slot_node_name",""):slotDict})
 				all_slot_node_names.append(slotDict.get("slot_node_name",""))
@@ -673,6 +708,38 @@ func make_upgrades_scene(is_onready: bool = true):
 			var node = itm[0].get("SLOT_TAGS",{})
 			if node.keys().size() >= 1:
 				tag_modifications.merge({itm[3].hash():node})
+				for i in node:
+					var data = node[i]
+					var snn = i
+					var spp = ship_limitations.get(snn,{})
+					if "limit_ships" in data:
+						var val = data["limit_ships"].duplicate()
+						if snn in ship_limitations:
+							if "limit_ships" in spp:
+								for f in val:
+									if f in spp:
+										pass
+									else:
+										ship_limitations[snn]["limit_ships"] = f
+							else:
+								ship_limitations[snn]["limit_ships"] = spp["limit_ships"]
+						else:
+							ship_limitations.merge({snn:{}})
+							ship_limitations[snn]["limit_ships"] = val.duplicate()
+					if "prevent_ships" in data:
+						var val = data["prevent_ships"].duplicate()
+						if snn in ship_limitations:
+							if "prevent_ships" in spp:
+								for f in val:
+									if f in spp:
+										pass
+									else:
+										ship_limitations[snn]["prevent_ships"] = f
+							else:
+								ship_limitations[snn]["prevent_ships"] = spp["prevent_ships"]
+						else:
+							ship_limitations.merge({snn:{}})
+							ship_limitations[snn]["prevent_ships"] = val.duplicate()
 		var ns = its[0].get("ADD_EQUIPMENT_ITEMS",[])
 		if ns.size() >= 1:
 			for m in ns:
@@ -744,6 +811,7 @@ func make_upgrades_scene(is_onready: bool = true):
 			vslot_data["override_additive"] = vslot_additives
 		if vslot_subtractives != []:
 			vslot_data["override_subtractive"] = vslot_subtractives
+		vanilla_equipment_defaults_for_reference[slot] = vslot_data
 		
 		
 	for slot in all_slot_node_names:
@@ -773,6 +841,21 @@ func make_upgrades_scene(is_onready: bool = true):
 				slot_allowed_equipment.merge({slot:items})
 			else:
 				var items = slot_defaults.get(slot_type,[])
+				var additives = data.get("override_additive",[])
+				var subtractives = data.get("override_subtractive",[])
+				for item in additives:
+					if item in items:
+						pass
+					else:
+						items.append(item)
+				for item in subtractives:
+					var tmp = []
+					for i in items:
+						if i in subtractives:
+							pass
+						else:
+							tmp.append(i)
+					items = tmp.duplicate(true)
 				slot_allowed_equipment.merge({slot:items})
 		elif slot in slots_for_adding_dict.keys():
 			var data = slots_for_adding_dict[slot]
@@ -846,7 +929,7 @@ func make_upgrades_scene(is_onready: bool = true):
 						pass
 					else:
 						equipment_format.append(string)
-			
+		
 	var concat = ""
 	concat = SCENE_HEADER
 	for ref in slots_format:
@@ -1058,8 +1141,33 @@ func make_upgrades_scene(is_onready: bool = true):
 								var SMES = "\n\n" + SMES_header % system + cc
 								
 								aux_power_string = aux_power_string + SMES
-	
-	
+	var lim_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]"
+	var lim_item = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\"]"
+	ship_limitation_string = lim_header
+	for i in ship_limitations:
+		var cc = "\n\n" + lim_item % i
+		var data = ship_limitations[i]
+		if "limit_ships" in data:
+			var sl = "limit_ships = [ "
+			if typeof(data["limit_ships"]) == TYPE_STRING:
+				data["limit_ships"] = [data["limit_ships"]]
+			for f in range(0,data["limit_ships"].size()):
+				if f < data["limit_ships"].size() - 1:
+					sl = sl + "\"" + data["limit_ships"][f] + "\", "
+				else:
+					sl = sl + "\"" + data["limit_ships"][f] + "\" ]"
+			cc = cc + "\n" + sl
+		if "prevent_ships" in data:
+			var sl = "prevent_ships = [ "
+			if typeof(data["prevent_ships"]) == TYPE_STRING:
+				data["prevent_ships"] = [data["prevent_ships"]]
+			for f in range(0,data["prevent_ships"].size()):
+				if f < data["prevent_ships"].size() - 1:
+					sl = sl + "\"" + data["prevent_ships"][f] + "\", "
+				else:
+					sl = sl + "\"" + data["prevent_ships"][f] + "\" ]"
+			cc = cc + "\n" + sl
+		ship_limitation_string = ship_limitation_string + cc
 	
 	
 	
@@ -1077,6 +1185,10 @@ func make_upgrades_scene(is_onready: bool = true):
 	
 	f.open(auxslot_save_path,File.WRITE)
 	f.store_string(aux_power_string)
+	f.close()
+	
+	f.open(upgrades_slot_limits,File.WRITE)
+	f.store_string(ship_limitation_string)
 	f.close()
 	
 	

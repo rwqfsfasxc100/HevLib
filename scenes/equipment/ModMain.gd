@@ -26,6 +26,7 @@ var _savedObjects := []
 var upgrades_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn"
 var weaponslot_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot.tscn"
 var aux_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/AuxSlot.tscn"
+var slot_limits_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Slot_Limits.tscn"
 
 var asteroid_path = "user://cache/.HevLib_Cache/Minerals/AsteroidSpawner.gd"
 var currentgame_path = "user://cache/.HevLib_Cache/Minerals/CurrentGame.gd"
@@ -121,6 +122,10 @@ func _ready():
 	var upgrades = load(upgrades_path)
 	upgrades.take_over_path("res://enceladus/Upgrades.tscn")
 	_savedObjects.append(upgrades)
+	
+	var slot_limits = load(slot_limits_path)
+	slot_limits.take_over_path("res://enceladus/Upgrades.tscn")
+	_savedObjects.append(slot_limits)
 	
 #	var aux = load(aux_path)
 #	aux.take_over_path("res://ships/modules/AuxSlot.tscn")

@@ -26,21 +26,19 @@ var data_dictionary = ""
 
 func reexamine():	
 	var ship = CurrentGame.getPlayerShip()
+	var shipname = ship.shipName
+	if limit_ships:
+		if shipname in limit_ships:
+			visible = true
+		else:
+			visible = false
+	if prevent_ships:
+		if shipname in prevent_ships:
+			visible = false
+		else:
+			visible = true
 	.reexamine()
 	if visible:
-		var logic:bool
-		if limit_ships:
-			if ship.shipName in limit_ships:
-				logic = true
-			else:
-				logic = false
-			visible = logic
-		if prevent_ships:
-			if ship.shipName in prevent_ships:
-				logic = false
-			else:
-				logic = true
-			visible = logic
 		if restrict_hold_type != "":
 			if restrict_hold_type.to_upper() == ship.base_storage_type.to_upper():
 				visible = true

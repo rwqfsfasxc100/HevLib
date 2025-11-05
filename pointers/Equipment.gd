@@ -303,7 +303,7 @@ static func __make_slot_for_scene(slot_data: Dictionary) -> Dictionary:
 	var restrictType = slot_data.get("restrict_type", "")
 	var openByDefault = slot_data.get("open_by_default", false)
 	var limitShips = slot_data.get("limit_ships", [])
-	var invertLimitLogic = slot_data.get("invert_limit_logic", false)
+	var preventShips = slot_data.get("prevent_ships", [])
 	var add_vanilla_equipment = slot_data.get("add_vanilla_equipment", true)
 #	var slotTemplate = preload("res://HevLib/scenes/equipment/hardpoints/WeaponSlotUpgradeTemplate.tscn").instance() # Old preload. Commented out because of possible bug with it
 #	var slotTemplate = load("res://HevLib/scenes/equipment/hardpoints/unmodified/WeaponSlotUpgradeTemplate.tscn").instance()
@@ -340,8 +340,17 @@ static func __make_slot_for_scene(slot_data: Dictionary) -> Dictionary:
 			initial = initial + "\"" + item + "\""
 		initial = initial + "]"
 		base = initial
-	if invertLimitLogic:
-		base = base + "\ninvert_limit_logic = true"
+	if preventShips != []:
+		var initial = base + "\nprevent_ships = ["
+		var one = false
+		for item in preventShips:
+			if one == false:
+				one = true
+			else:
+				initial = initial + ", "
+			initial = initial + "\"" + item + "\""
+		initial = initial + "]"
+		base = initial
 	if restrict_hold_type != "":
 		base = base + "\nrestrict_hold_type = \"%s\"" % restrict_hold_type
 #	if hasNone:
