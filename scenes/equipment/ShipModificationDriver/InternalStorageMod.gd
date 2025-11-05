@@ -22,8 +22,15 @@ var mass_add = 0
 var mass_per_crew = 0
 var mass_per_processed_tonne = 0
 var mass_per_tonne_total_storage_added = 0
+var ammo_speed_add = 0
+var nano_speed_add = 0
+var ammo_speed_multi = 1.0
+var nano_speed_multi = 1.0
+
+var nanodroneMagazine = 0
 
 func _ready():
+	nanodroneMagazine = getConfig("drones.capacity")
 	if isPlayerControlled():
 		base_proc_storage = processedCargoCapacity
 		base_ammo_storage = massDriverAmmoMax
@@ -97,7 +104,18 @@ func _ready():
 			var listingTotalAddedStorageMassMod = float(item.get("mass_per_tonne_total_storage_added",0.0))
 			if listingTotalAddedStorageMassMod != 0.0:
 				ls.merge({"mass_per_tonne_total_storage_added":listingTotalAddedStorageMassMod})
-			
+			var listingAmmoSpeed = float(item.get("ammo_speed_add",0.0))
+			if listingAmmoSpeed != 0.0:
+				ls.merge({"ammo_speed_add":listingAmmoSpeed})
+			var listingNanoSpeed = float(item.get("nano_speed_add",0.0))
+			if listingNanoSpeed != 0.0:
+				ls.merge({"nano_speed_add":listingNanoSpeed})
+			var listingAmmoSpeedMulti = float(item.get("ammo_speed_multi_upper",1.0))/float(item.get("ammo_speed_multi_lower",1.0))
+			if listingAmmoSpeedMulti != 1.0:
+				ls.merge({"ammo_speed_multi":listingAmmoSpeedMulti})
+			var listingNanoSpeedMulti = float(item.get("nano_speed_multi_upper",1.0))/float(item.get("nano_speed_multi_lower",1.0))
+			if listingNanoSpeedMulti != 1.0:
+				ls.merge({"nano_speed_multi":listingNanoSpeedMulti})
 			
 			listings.merge({
 				listingSystemName:ls
@@ -193,6 +211,22 @@ func _ready():
 					"mass_per_tonne_total_storage_added":
 						var val = iddata[key]
 						mass_per_tonne_total_storage_added += val
+						has_made_change = true
+					"ammo_speed_add":
+						var val = iddata[key]
+						ammo_speed_add += val
+						has_made_change = true
+					"nano_speed_add":
+						var val = iddata[key]
+						nano_speed_add += val
+						has_made_change = true
+					"ammo_speed_multi":
+						var val = iddata[key]
+						ammo_speed_multi *= val
+						has_made_change = true
+					"nano_speed_multi":
+						var val = iddata[key]
+						nano_speed_multi *= val
 						has_made_change = true
 		
 		
@@ -319,8 +353,18 @@ var nanoDeliveryPerSecond = {
 
 var availableNanoToDrawNow = 0.0
 func handleNanoDelivery(delta):
-	var ps = nanoDeliveryPerSecond.get(shipConfig.get("drones",{}).get("capacity",0.0), nanoDeliveryPerSecond[0.0])
+	var ps = nanoDeliveryPerSecond.get(nanodroneMagazine, nanoDeliveryPerSecond[0.0])
 	availableNanoToDrawNow = clamp(availableNanoToDrawNow + delta * ps, 0, ps)
+	if nano_speed_multi != 1.0:
+		availableNanoToDrawNow *= nano_speed_multi
+	availableNanoToDrawNow += nano_speed_add
+
+func handleAmmoDelivery(delta):
+	.handleAmmoDelivery(delta)
+	if ammo_speed_multi != 1.0:
+		availableAmmoToDrawNow *= ammo_speed_multi
+	availableAmmoToDrawNow += ammo_speed_add
+	
 
 const ismCFGD = preload("res://HevLib/pointers/ConfigDriver.gd")
 func drawAmmo(kg,really = true):
