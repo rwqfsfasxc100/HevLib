@@ -1,14 +1,16 @@
 extends "res://ships/ship-ctrl.gd"
 
-onready var base_proc_storage = 0
-onready var base_ammo_storage = 0
-onready var base_nano_storage = 0
-onready var base_storage_type = 0
-onready var base_propellant = 0
-onready var base_crew_count = 0
-onready var base_crew_morale = 0
-onready var base_mass = 0
-onready var base_emp_resist = 0
+var base_proc_storage = 0
+var base_ammo_storage = 0
+var base_nano_storage = 0
+var base_storage_type = 0
+var base_propellant = 0
+var base_crew_count = 0
+var base_crew_morale = 0
+var base_mass = 0
+var base_emp_resist = 0
+
+
 var storage_add = 0
 var ammo_add = 0
 var nano_add = 0
@@ -31,7 +33,7 @@ var emp_resistance = 0
 
 var nanodroneMagazine = 0
 
-func _init():
+func _ready():
 	nanodroneMagazine = getConfig("drones.capacity")
 	base_proc_storage = processedCargoCapacity
 	base_ammo_storage = massDriverAmmoMax
