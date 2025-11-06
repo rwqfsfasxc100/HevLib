@@ -8,7 +8,7 @@ var base_propellant = 0
 var base_crew_count = 0
 var base_crew_morale = 0
 var base_mass = 0
-var base_emp_resist = 0
+var base_emp_shielding = 0
 
 
 var storage_add = 0
@@ -28,7 +28,7 @@ var ammo_speed_add = 0
 var nano_speed_add = 0
 var ammo_speed_multi = 1.0
 var nano_speed_multi = 1.0
-var emp_resistance = 0
+var emp_shieldingance = 0
 
 
 var nanodroneMagazine = 0
@@ -43,7 +43,7 @@ func _ready():
 	base_crew_count = crew
 	base_crew_morale = crewMoraleBonus
 	base_mass = currentMass
-	base_emp_resist = empShield
+	base_emp_shielding = empShield
 	
 	
 	var has_made_change = false
@@ -119,9 +119,9 @@ func _ready():
 		var listingNanoSpeedMulti = float(item.get("nano_speed_multi_upper",1.0))/float(item.get("nano_speed_multi_lower",1.0))
 		if listingNanoSpeedMulti != 1.0:
 			ls.merge({"nano_speed_multi":listingNanoSpeedMulti})
-		var listingEMP = int(item.get("emp_resist",0))
+		var listingEMP = int(item.get("emp_shielding",0))
 		if listingEMP != 0:
-			ls.merge({"emp_resist":listingEMP})
+			ls.merge({"emp_shielding":listingEMP})
 		
 		listings.merge({
 			listingSystemName:ls
@@ -215,8 +215,8 @@ func _ready():
 				"nano_speed_multi":
 					nano_speed_multi *= val
 					has_made_change = true
-				"emp_resist":
-					emp_resistance += val
+				"emp_shielding":
+					emp_shieldingance += val
 					has_made_change = true
 	
 	
@@ -302,7 +302,7 @@ func _ready():
 	var chash = cfg.hash()
 	var shash = state.hash()
 	
-	empShield += emp_resistance
+	empShield += emp_shieldingance
 	
 	var modifyable_mass = float(mass_add)/1000.0
 	
