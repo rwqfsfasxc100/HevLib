@@ -127,16 +127,8 @@ func _ready():
 			listings.merge({
 				listingSystemName:ls
 			})
-		var skip_keys = ["damage"]
 		
-		var nf_config = {}
-		for obj in shipConfig.keys():
-			if obj in skip_keys:
-				pass
-			else:
-				nf_config.merge({obj:shipConfig[obj]})
-		
-		var installed = DataFormat.__sift_dictionary(nf_config,listings.keys())
+		var installed = DataFormat.__sift_dictionary(shipConfig,listings.keys())
 		
 		var modifyable_type = base_storage_type
 		var modifyable_ammo = base_ammo_storage
