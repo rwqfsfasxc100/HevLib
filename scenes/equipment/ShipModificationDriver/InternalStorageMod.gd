@@ -46,7 +46,7 @@ func _ready():
 		base_mass = currentMass
 		base_emp_shielding = empShield
 		
-		
+#		CurrentGame.setStory("dd.story.interplanetary",10)
 		var has_made_change = false
 		l("Readying ship. Base storage of %s proc / %s ammo / %s nanodrones on storage type of %s" % [base_proc_storage, base_ammo_storage, base_nano_storage, base_storage_type])
 		var file = File.new()
