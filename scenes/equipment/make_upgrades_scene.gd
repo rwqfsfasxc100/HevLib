@@ -45,6 +45,7 @@ func make_upgrades_scene(is_onready: bool = true):
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_modifications.json",
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFIED_NAMES.json",
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Slot_Limits.tscn",
+		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_modify.json",
 	]
 	
 	var file_save_path : String = FILE_PATHS[0]
@@ -64,6 +65,7 @@ func make_upgrades_scene(is_onready: bool = true):
 	var weaponslot_modifications = FILE_PATHS[14]
 	var weaponslot_modify_equipment_names = FILE_PATHS[15]
 	var upgrades_slot_limits = FILE_PATHS[16]
+	var ship_node_modify_file = FILE_PATHS[17]
 	var DataFormat = load("res://HevLib/pointers/DataFormat.gd")
 	if is_onready:
 		
@@ -187,6 +189,9 @@ func make_upgrades_scene(is_onready: bool = true):
 	wpfl.close()
 	wpfl.open(ship_node_register_file,File.WRITE)
 	wpfl.store_string(JSON.print(register_default_ships))
+	wpfl.close()
+	wpfl.open(ship_node_modify_file,File.WRITE)
+	wpfl.store_string("[]")
 	wpfl.close()
 	wpfl.open(weaponslot_additions,File.WRITE)
 	wpfl.store_string("[]")
@@ -338,6 +343,15 @@ func make_upgrades_scene(is_onready: bool = true):
 #								else:
 #									l("Cannot see %s" % ship_node_register_file)
 								wpfl.open(ship_node_register_file,File.READ_WRITE)
+								var pfdata = JSON.parse(wpfl.get_as_text()).result
+								for item in constants:
+									pfdata.append(constants.get(item))
+								wpfl.store_string(JSON.print(pfdata))
+								wpfl.close()
+							"SHIP_NODE_MODIFY.gd":
+								var data = load(check + last_bit)
+								var constants = data.get_script_constant_map()
+								wpfl.open(ship_node_modify_file,File.READ_WRITE)
 								var pfdata = JSON.parse(wpfl.get_as_text()).result
 								for item in constants:
 									pfdata.append(constants.get(item))
