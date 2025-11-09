@@ -56,6 +56,7 @@ func _ready():
 	
 	var selfpath = get_path()
 	var node_parent_path = get_path_to(self)
+	var thisNode = node_parent_path
 	for object in n_store:
 		var obj_data = n_store[object]
 		var node_data = processed_node_definitions[object]
@@ -186,6 +187,8 @@ func _ready():
 		var p = get_node_or_null(node_parent_path)
 		if p == null:
 			p = self
+		if str(get_path_to(p)) != str(thisNode) and "registerExternal" in node:
+			node.registerExternal = true
 		p.add_child(node)
 
 	if ship_match:
@@ -194,6 +197,8 @@ func _ready():
 		for n in chld:
 			child_names.append(n.name)
 		Debug.l("HevLib Add Nodes: Ship nodes after addition: %s" % JSON.print(child_names,"\t"))
+
+		
 
 func format_properties(data,format,property,property_path,base_node):
 	match format:
