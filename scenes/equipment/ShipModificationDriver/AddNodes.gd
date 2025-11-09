@@ -55,7 +55,7 @@ func _ready():
 	
 	
 	var selfpath = get_path()
-	
+	var node_parent_path = get_path_to(self)
 	for object in n_store:
 		var obj_data = n_store[object]
 		var node_data = processed_node_definitions[object]
@@ -82,6 +82,7 @@ func _ready():
 			continue
 		var properties = {}
 		var position_data = {}
+		node_parent_path = NodePath(obj_data.get("parent_node_path",get_path_to(self)))
 		for p in obj_data.get("properties",{}):
 			if p in properties:
 				pass
@@ -182,7 +183,10 @@ func _ready():
 		
 #		breakpoint
 #		call_deferred("add_child",node)
-		add_child(node)
+		var p = get_node_or_null(node_parent_path)
+		if p == null:
+			p = self
+		p.add_child(node)
 
 	if ship_match:
 		var chld = get_children()
