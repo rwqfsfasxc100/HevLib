@@ -8,8 +8,6 @@ onready var delete_path = popup_path.get_node("Popups/Override")
 
 var password = "FTWOMG"
 
-onready var ship_models = Shipyard.ships.keys()
-
 var foolish
 
 var val = 0.0
@@ -108,7 +106,7 @@ func checkSave():
 					slot_available = true
 					delete_color = Color(1, 1, 1, 1)
 				var model_error = TranslationServer.translate("HEVLIB_INCORRECT_SHIP")
-				if meta.model in ship_models:
+				if meta.model in Shipyard.ships.keys():
 					$Foolish.visible = false
 					hint_tooltip = ""
 		#			foolish.hint_tooltip = ""

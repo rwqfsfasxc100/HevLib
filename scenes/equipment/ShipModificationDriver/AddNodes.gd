@@ -1,6 +1,7 @@
 extends "res://ships/ship-ctrl.gd"
 
 var ship_register_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_register.json"
+var ship_modify_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_modify.json"
 var node_definitons_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/node_definitions.json"
 
 var processed_node_definitions = {}
@@ -10,7 +11,21 @@ var file = File.new()
 var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
 var DF = preload("res://HevLib/pointers/DataFormat.gd")
 
-func _ready():
+#func registerCapability(key, system):
+#	nodeModify()
+#	.registerCapability(key, system)
+func _enter_tree():
+	make_node_mods()
+
+#func _ready():
+#	make_node_mods()
+
+#var has_modified = false
+
+func make_node_mods():
+#	if has_modified:
+#		return
+#	has_modified = true
 	processed_node_definitions = process_node_definitons()
 	processed_ship_register = process_ship_register()
 	
@@ -198,8 +213,38 @@ func _ready():
 			child_names.append(n.name)
 		Debug.l("HevLib Add Nodes: Ship nodes after addition: %s" % JSON.print(child_names,"\t"))
 
-		
+	nodeModify()
 
+
+func nodeModify():
+	file.open(ship_modify_file,File.READ)
+	var modify_data = JSON.parse(file.get_as_text()).result
+	file.close()
+	
+	if shipName != baseShipName:
+		if baseShipName in modify_data:
+			var thisShipData = modify_data[baseShipName]
+			for i in thisShipData:
+				if i.get("recurse_to_variants",false):
+					var node = get_node_or_null(i.get("path","."))
+					var value = i.get("value",null)
+					var property = i.get("property","null_value_to_ensure_that_this_fails_when_absent_lol_hi")
+					if node and property in node:
+						node.set(property,value)
+	
+	if shipName in modify_data:
+		var thisShipData = modify_data[shipName]
+		for i in thisShipData:
+			var node = get_node_or_null(i.get("path","."))
+			var value = i.get("value",null)
+			var property = i.get("property","null_value_to_ensure_that_this_fails_when_absent_lol_hi")
+			if node and property in node:
+				node.set(property,value)
+	
+	
+
+#	if isPlayerControlled():
+#		CurrentGame.emit_signal("playerShipChanged")
 func format_properties(data,format,property,property_path,base_node):
 	match format:
 		"arr2vec2arr":

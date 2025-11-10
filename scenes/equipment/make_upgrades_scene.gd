@@ -191,7 +191,7 @@ func make_upgrades_scene(is_onready: bool = true):
 	wpfl.store_string(JSON.print(register_default_ships))
 	wpfl.close()
 	wpfl.open(ship_node_modify_file,File.WRITE)
-	wpfl.store_string("[]")
+	wpfl.store_string("{}")
 	wpfl.close()
 	wpfl.open(weaponslot_additions,File.WRITE)
 	wpfl.store_string("[]")
@@ -354,7 +354,15 @@ func make_upgrades_scene(is_onready: bool = true):
 								wpfl.open(ship_node_modify_file,File.READ_WRITE)
 								var pfdata = JSON.parse(wpfl.get_as_text()).result
 								for item in constants:
-									pfdata.append(constants.get(item))
+									var ship = constants[item].get("ship_name","")
+									if ship != "":
+										if ship in pfdata:
+											pass
+										else:
+											pfdata[ship] = []
+										for modification in constants[item].get("modifications",[]):
+											
+											pfdata[ship].append(modification)
 								wpfl.store_string(JSON.print(pfdata))
 								wpfl.close()
 

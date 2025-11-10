@@ -3,7 +3,7 @@ extends "res://ships/ship-ctrl.gd"
 var base_proc_storage = 0
 var base_ammo_storage = 0
 var base_nano_storage = 0
-var base_storage_type = 0
+onready var base_storage_type = processedCargoStorageType
 var base_propellant = 0
 var base_crew_count = 0
 var base_crew_morale = 0
