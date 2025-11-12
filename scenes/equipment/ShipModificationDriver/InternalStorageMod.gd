@@ -33,7 +33,7 @@ var emp_shieldingance = 0
 
 var nanodroneMagazine = 0
 
-func _ready():
+func _enter_tree():
 	nanodroneMagazine = getConfig("drones.capacity")
 	if isPlayerControlled():
 		base_proc_storage = processedCargoCapacity
@@ -43,7 +43,7 @@ func _ready():
 		base_propellant = reactiveMassMax
 		base_crew_count = crew
 		base_crew_morale = crewMoraleBonus
-		base_mass = currentMass
+		base_mass = mass
 		base_emp_shielding = empShield
 		
 #		CurrentGame.setStory("dd.story.interplanetary",10)
@@ -268,15 +268,10 @@ func _ready():
 		if nano_multi != 1.0:
 			modifyable_add_nano += (base_nano_storage + modifyable_add_nano) - ((base_nano_storage + modifyable_add_nano) * nano_multi)
 		if propellant_multi != 1.0:
-			propellant_add += (base_nano_storage + propellant_add) - ((base_propellant + propellant_add) * propellant_multi)
+			modifyable_propellant += (base_nano_storage + propellant_add) - ((base_propellant + propellant_add) * propellant_multi)
 		if mass_multi != 1.0:
 			mass_add += (mass + mass_add) - ((mass * mass_add) * mass_multi)
 		
-		l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [modifyable_add_ammo, modifyable_add_nano, modifyable_propellant])
-		
-		extra_ammo += clamp(modifyable_add_ammo,0,INF)
-		extra_nano += clamp(modifyable_add_nano,0,INF)
-		extra_propellant += clamp(modifyable_propellant,0,INF)
 		
 		if mass_per_tonne_total_storage_added != 0:
 			l("Changing mass by %s kg for every tonne of total storage changed by" % total_added_capacity)
@@ -319,12 +314,22 @@ func _ready():
 			vmass.name = massNodeName
 			add_child(vmass)
 			call_deferred("move_child",vmass,get_child_count())
+			l("Adding %s kg of mass. Base ship mass changing from %s to %s" % [mass_add,base_mass * 1000,shipInitialMass * 1000])
 		
-		l("Adding %s kg of mass. Base ship mass changing from %s to %s" % [mass_add,base_mass * 1000,shipInitialMass * 1000])
-
-var extra_ammo = 0
-var extra_nano = 0
-var extra_propellant = 0
+		
+		l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [modifyable_add_ammo, modifyable_add_nano, modifyable_propellant])
+		
+		var total_ammo = clamp(massDriverAmmoMax + modifyable_add_ammo,500,INF)
+		var total_nano = clamp(dronePartsMax + modifyable_add_nano,500,INF)
+		var total_propellant = clamp(reactiveMassMax + modifyable_propellant,10000,INF)
+		massDriverAmmoMax = total_ammo
+		massDriverAmmo = total_ammo
+		dronePartsMax = total_nano
+		droneParts = total_nano
+		reactiveMassMax = total_propellant
+		reactiveMass = total_propellant
+		
+		
 
 var nanoDeliveryPerSecond = {
 	0.0: 20, 
@@ -351,24 +356,6 @@ func handleAmmoDelivery(delta):
 	
 
 const ismCFGD = preload("res://HevLib/pointers/ConfigDriver.gd")
-func drawAmmo(kg,really = true):
-	if availableAmmoToDrawNow < kg:
-		return 0
-	if extra_ammo > 0:
-		availableAmmoToDrawNow -= kg
-		if really:
-			if extra_ammo >= kg:
-				extra_ammo -= kg
-			elif extra_ammo + massDriverAmmo >= kg:
-				var take = kg - extra_ammo
-				extra_ammo = 0.0
-				massDriverAmmo -= take
-			else:
-				massDriverAmmo -= kg
-		return kg
-	else:
-		return .drawAmmo(kg,really)
-
 func drawDrones(kg, really = true):
 	if ismCFGD.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","limit_nanodrone_output"):
 		if availableNanoToDrawNow < kg:
@@ -376,46 +363,7 @@ func drawDrones(kg, really = true):
 		else:
 			if really:
 				availableNanoToDrawNow -= kg
-	if extra_nano > 0:
-		if really:
-			if extra_nano >= kg:
-				extra_nano -= kg
-			elif extra_nano + droneParts >= kg:
-				var take = kg - extra_nano
-				extra_nano = 0.0
-				droneParts -= take
-			else:
-				droneParts -= kg
-		return kg
-	else:
-		return .drawDrones(kg,really)
-
-func drawReactiveMass(kg, really = true):
-	if extra_propellant > 0:
-		if really:
-			if extra_propellant >= kg:
-				extra_propellant -= kg
-			elif extra_propellant + reactiveMass >= kg:
-				var take = kg - extra_propellant
-				extra_propellant = 0.0
-				reactiveMass -= take
-			else:
-				reactiveMass -= kg
-		return kg
-	else:
-		return .drawReactiveMass(kg,really)
-
-func sensorGet(sensor):
-	match sensor:
-		"ammo":
-			return .sensorGet(sensor) + extra_ammo
-		"drones":
-			return .sensorGet(sensor) + extra_nano
-		"fuel":
-			return .sensorGet(sensor) + extra_propellant
-		_:
-			return .sensorGet(sensor)
-
+	return .drawDrones(kg, really)
 var massNodeName = "InternalStorageMod_MassModifier"
 
 func deactivateCrew(maximum):
