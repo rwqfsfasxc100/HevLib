@@ -32,107 +32,107 @@ var emp_shieldingance = 0
 
 
 var nanodroneMagazine = 0
+var listings = {}
+var config_data = {}
 
 func _enter_tree():
+	var file = File.new()
+	file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_mods.json",File.READ)
+	config_data = JSON.parse(file.get_as_text()).result
+	file.close()
+	
+	
+	for item in config_data:
+		var listingSystemName = item.get("system","SYSTEM_MISSING_NAME")
+		var ls = {}
+		
+		var listingStorageFlat = item.get("storage_flat",0)
+		if listingStorageFlat != 0.0:
+			ls.merge({"storage_flat":listingStorageFlat})
+		var listingStorageAmmo = item.get("storage_ammo",0)
+		if listingStorageAmmo != 0.0:
+			ls.merge({"storage_ammo":listingStorageAmmo})
+		var listingStorageNano = item.get("storage_nanodrones",0.0)
+		if listingStorageNano != 0.0:
+			ls.merge({"storage_nano":listingStorageNano})
+		var listingStoragePropellant = item.get("storage_propellant",0.0)
+		if listingStoragePropellant != 0.0:
+			ls.merge({"storage_propellant":listingStoragePropellant})
+		var listingStorageMulti = float(item.get("storage_multi_upper",1.0))/float(item.get("storage_multi_lower",1.0))
+		if listingStorageMulti != 1.0:
+			ls.merge({"storage_multi":listingStorageMulti})
+		var listingAmmoMulti = float(item.get("ammo_multi_upper",1.0))/float(item.get("ammo_multi_lower",1.0))
+		if listingAmmoMulti != 1.0:
+			ls.merge({"ammo_multi":listingAmmoMulti})
+		var nanoMulti = float(item.get("nano_multi_upper",1.0))/float(item.get("nano_multi_lower",1.0))
+		if nanoMulti != 1.0:
+			ls.merge({"nano_multi":nanoMulti})
+		var propellantMulti = float(item.get("propellant_multi_upper",1.0))/float(item.get("propellant_multi_lower",1.0))
+		if propellantMulti != 1.0:
+			ls.merge({"propellant_multi":propellantMulti})
+		var massMulti = float(item.get("mass_multi_upper",1.0))/float(item.get("mass_multi_lower",1.0))
+		if massMulti != 1.0:
+			ls.merge({"mass_multi":massMulti})
+		var listingForceType = item.get("force_type","")
+		if listingForceType != "":
+			ls.merge({"force_type":listingForceType})
+		var listingCrewCount = item.get("crew_count",0)
+		if listingCrewCount != 0.0:
+			ls.merge({"crew_count":listingCrewCount})
+		var listingCrewMorale = item.get("crew_morale",0.0)
+		if listingCrewMorale != 0.0:
+			ls.merge({"crew_morale":listingCrewMorale})
+		var listingMass = float(item.get("mass",0.0))
+		if listingMass != 0.0:
+			ls.merge({"mass":listingMass})
+		
+		var listingCrewMassMod = float(item.get("mass_per_crew_member",0.0))
+		if listingCrewMassMod != 0.0:
+			ls.merge({"mass_per_crew_member":listingCrewMassMod})
+		var listingOreMassMod = float(item.get("mass_per_tonne_of_processed_ore",0.0))
+		if listingOreMassMod != 0.0:
+			ls.merge({"mass_per_tonne_of_processed_ore":listingOreMassMod})
+		var listingTotalAddedStorageMassMod = float(item.get("mass_per_tonne_total_storage_added",0.0))
+		if listingTotalAddedStorageMassMod != 0.0:
+			ls.merge({"mass_per_tonne_total_storage_added":listingTotalAddedStorageMassMod})
+		var listingAmmoSpeed = float(item.get("ammo_speed_add",0.0))
+		if listingAmmoSpeed != 0.0:
+			ls.merge({"ammo_speed_add":listingAmmoSpeed})
+		var listingNanoSpeed = float(item.get("nano_speed_add",0.0))
+		if listingNanoSpeed != 0.0:
+			ls.merge({"nano_speed_add":listingNanoSpeed})
+		var listingAmmoSpeedMulti = float(item.get("ammo_speed_multi_upper",1.0))/float(item.get("ammo_speed_multi_lower",1.0))
+		if listingAmmoSpeedMulti != 1.0:
+			ls.merge({"ammo_speed_multi":listingAmmoSpeedMulti})
+		var listingNanoSpeedMulti = float(item.get("nano_speed_multi_upper",1.0))/float(item.get("nano_speed_multi_lower",1.0))
+		if listingNanoSpeedMulti != 1.0:
+			ls.merge({"nano_speed_multi":listingNanoSpeedMulti})
+		var listingEMP = int(item.get("emp_shielding",0))
+		if listingEMP != 0:
+			ls.merge({"emp_shielding":listingEMP})
+		
+		listings.merge({
+			listingSystemName:ls
+		})
+	installed = DataFormat.__sift_dictionary(shipConfig,listings.keys())
+
+var installed = []
+func _ready():
+	init_vars()
+	base_mass = currentMass
 	nanodroneMagazine = getConfig("drones.capacity")
 	if isPlayerControlled():
-		base_proc_storage = processedCargoCapacity
-		base_ammo_storage = massDriverAmmoMax
-		base_nano_storage = dronePartsMax
-		base_storage_type = processedCargoStorageType
-		base_propellant = reactiveMassMax
-		base_crew_count = crew
-		base_crew_morale = crewMoraleBonus
-		base_mass = mass
-		base_emp_shielding = empShield
+		
 		
 #		CurrentGame.setStory("dd.story.interplanetary",10)
 		var has_made_change = false
 		l("Readying ship. Base storage of %s proc / %s ammo / %s nanodrones on storage type of %s" % [base_proc_storage, base_ammo_storage, base_nano_storage, base_storage_type])
-		var file = File.new()
-		file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_mods.json",File.READ)
-		var config_data = JSON.parse(file.get_as_text()).result
-		file.close()
 		
-		var listings = {}
-		for item in config_data:
-			var listingSystemName = item.get("system","SYSTEM_MISSING_NAME")
-			var ls = {}
-			
-			var listingStorageFlat = item.get("storage_flat",0)
-			if listingStorageFlat != 0.0:
-				ls.merge({"storage_flat":listingStorageFlat})
-			var listingStorageAmmo = item.get("storage_ammo",0)
-			if listingStorageAmmo != 0.0:
-				ls.merge({"storage_ammo":listingStorageAmmo})
-			var listingStorageNano = item.get("storage_nanodrones",0.0)
-			if listingStorageNano != 0.0:
-				ls.merge({"storage_nano":listingStorageNano})
-			var listingStoragePropellant = item.get("storage_propellant",0.0)
-			if listingStoragePropellant != 0.0:
-				ls.merge({"storage_propellant":listingStoragePropellant})
-			var listingStorageMulti = float(item.get("storage_multi_upper",1.0))/float(item.get("storage_multi_lower",1.0))
-			if listingStorageMulti != 1.0:
-				ls.merge({"storage_multi":listingStorageMulti})
-			var listingAmmoMulti = float(item.get("ammo_multi_upper",1.0))/float(item.get("ammo_multi_lower",1.0))
-			if listingAmmoMulti != 1.0:
-				ls.merge({"ammo_multi":listingAmmoMulti})
-			var nanoMulti = float(item.get("nano_multi_upper",1.0))/float(item.get("nano_multi_lower",1.0))
-			if nanoMulti != 1.0:
-				ls.merge({"nano_multi":nanoMulti})
-			var propellantMulti = float(item.get("propellant_multi_upper",1.0))/float(item.get("propellant_multi_lower",1.0))
-			if propellantMulti != 1.0:
-				ls.merge({"propellant_multi":propellantMulti})
-			var massMulti = float(item.get("mass_multi_upper",1.0))/float(item.get("mass_multi_lower",1.0))
-			if massMulti != 1.0:
-				ls.merge({"mass_multi":massMulti})
-			var listingForceType = item.get("force_type","")
-			if listingForceType != "":
-				ls.merge({"force_type":listingForceType})
-			var listingCrewCount = item.get("crew_count",0)
-			if listingCrewCount != 0.0:
-				ls.merge({"crew_count":listingCrewCount})
-			var listingCrewMorale = item.get("crew_morale",0.0)
-			if listingCrewMorale != 0.0:
-				ls.merge({"crew_morale":listingCrewMorale})
-			var listingMass = float(item.get("mass",0.0))
-			if listingMass != 0.0:
-				ls.merge({"mass":listingMass})
-			
-			var listingCrewMassMod = float(item.get("mass_per_crew_member",0.0))
-			if listingCrewMassMod != 0.0:
-				ls.merge({"mass_per_crew_member":listingCrewMassMod})
-			var listingOreMassMod = float(item.get("mass_per_tonne_of_processed_ore",0.0))
-			if listingOreMassMod != 0.0:
-				ls.merge({"mass_per_tonne_of_processed_ore":listingOreMassMod})
-			var listingTotalAddedStorageMassMod = float(item.get("mass_per_tonne_total_storage_added",0.0))
-			if listingTotalAddedStorageMassMod != 0.0:
-				ls.merge({"mass_per_tonne_total_storage_added":listingTotalAddedStorageMassMod})
-			var listingAmmoSpeed = float(item.get("ammo_speed_add",0.0))
-			if listingAmmoSpeed != 0.0:
-				ls.merge({"ammo_speed_add":listingAmmoSpeed})
-			var listingNanoSpeed = float(item.get("nano_speed_add",0.0))
-			if listingNanoSpeed != 0.0:
-				ls.merge({"nano_speed_add":listingNanoSpeed})
-			var listingAmmoSpeedMulti = float(item.get("ammo_speed_multi_upper",1.0))/float(item.get("ammo_speed_multi_lower",1.0))
-			if listingAmmoSpeedMulti != 1.0:
-				ls.merge({"ammo_speed_multi":listingAmmoSpeedMulti})
-			var listingNanoSpeedMulti = float(item.get("nano_speed_multi_upper",1.0))/float(item.get("nano_speed_multi_lower",1.0))
-			if listingNanoSpeedMulti != 1.0:
-				ls.merge({"nano_speed_multi":listingNanoSpeedMulti})
-			var listingEMP = int(item.get("emp_shielding",0))
-			if listingEMP != 0:
-				ls.merge({"emp_shielding":listingEMP})
-			
-			listings.merge({
-				listingSystemName:ls
-			})
 		
-		var installed = DataFormat.__sift_dictionary(shipConfig,listings.keys())
+		
+		
 		
 		var modifyable_type = base_storage_type
-		var modifyable_ammo = base_ammo_storage
-		var modifyable_nano = base_nano_storage
 		var modifyable_capacity = base_proc_storage
 		var modifyable_crew_count = base_crew_count
 		var modifyable_crew_morale = base_crew_morale
@@ -162,6 +162,7 @@ func _enter_tree():
 					"ammo_multi":
 						ammo_multi *= float(val)
 						has_made_change = true
+						
 					"nano_multi":
 						nano_multi *= float(val)
 						has_made_change = true
@@ -217,11 +218,6 @@ func _enter_tree():
 			l("Adding mass @ %s kg for each of %s crew members" % [mass_per_crew,modifyable_crew_count])
 			mass_add += (modifyable_crew_count * mass_per_crew)
 		
-		var modifyable_add_capacity = storage_add
-		var modifyable_add_ammo = ammo_add
-		var modifyable_add_nano = nano_add
-		var modifyable_multi = multi
-		var modifyable_propellant = propellant_add
 		
 		
 		
@@ -239,22 +235,31 @@ func _enter_tree():
 			else:
 				l("Hold type isn't changed (is this equipment in the right slot?)")
 			if modifyable_type != "divided":
-				modifyable_add_capacity = storage_add * 6
+				storage_add = storage_add * 6
 				mass_per_processed_tonne = mass_per_processed_tonne * 6
-				l("Hold type isn't divided, multiplying addition of %s by 6 to new addition of %s" % [storage_add,modifyable_add_capacity])
+				l("Hold type isn't divided, multiplying addition of %s by 6 to new addition of %s" % [storage_add,storage_add])
 			
 		else:
 			l("No desired hold type being set, skipping hold manipulation")
 		
 		
-		processedCargoCapacity = int(float(modifyable_capacity) * modifyable_multi)
-		l("Changing base hold size of %s by multiplier %s. Results in new size of %s" % [modifyable_capacity,modifyable_multi,processedCargoCapacity])
-		processedCargoCapacity += modifyable_add_capacity
-		l("Adding storage bonus of %s. New size of %s" % [modifyable_add_capacity,processedCargoCapacity])
+		processedCargoCapacity = int(float(modifyable_capacity) * multi)
+		l("Changing base hold size of %s by multiplier %s. Results in new size of %s" % [modifyable_capacity,multi,processedCargoCapacity])
+		processedCargoCapacity += storage_add
+		l("Adding storage bonus of %s. New size of %s" % [storage_add,processedCargoCapacity])
 		
 		processedCargoCapacity = clamp(processedCargoCapacity,0,INF)
 		if multi != 1.0:
 			var change = base_proc_storage - processedCargoCapacity
+			total_added_capacity += change
+		if ammo_multi != 1.0:
+			var change = base_ammo_storage - massDriverAmmoMax
+			total_added_capacity += change
+		if nano_multi != 1.0:
+			var change = base_nano_storage - dronePartsMax
+			total_added_capacity += change
+		if propellant_multi != 1.0:
+			var change = base_propellant - reactiveMassMax
 			total_added_capacity += change
 		
 		if mass_per_processed_tonne != 0:
@@ -264,13 +269,21 @@ func _enter_tree():
 		
 		l("Modifying consumables multiplicatively")
 		if ammo_multi != 1.0:
-			modifyable_add_ammo += ((base_ammo_storage + modifyable_add_ammo) * ammo_multi) - (base_ammo_storage + modifyable_add_ammo) 
+			var val = 0
+			val = ((base_ammo_storage + ammo_add) * ammo_multi) - (base_ammo_storage + ammo_add)
+			ammo_add += val
 		if nano_multi != 1.0:
-			modifyable_add_nano += (base_nano_storage + modifyable_add_nano) - ((base_nano_storage + modifyable_add_nano) * nano_multi)
+			var val = 0
+			val = ((base_nano_storage + nano_add) * nano_multi) - (base_nano_storage + nano_add)
+			nano_add += val
 		if propellant_multi != 1.0:
-			modifyable_propellant += (base_nano_storage + propellant_add) - ((base_propellant + propellant_add) * propellant_multi)
+			var val = 0
+			val = ((base_propellant + propellant_add) * propellant_multi) - (base_propellant + propellant_add)
+			propellant_add += val
 		if mass_multi != 1.0:
-			mass_add += (mass + mass_add) - ((mass * mass_add) * mass_multi)
+			var val = 0
+			val = ((mass * mass_add) * mass_multi) - (mass + mass_add)
+			mass_add += val
 		
 		
 		if mass_per_tonne_total_storage_added != 0:
@@ -317,11 +330,11 @@ func _enter_tree():
 			l("Adding %s kg of mass. Base ship mass changing from %s to %s" % [mass_add,base_mass * 1000,shipInitialMass * 1000])
 		
 		
-		l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [modifyable_add_ammo, modifyable_add_nano, modifyable_propellant])
+		l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [ammo_add, nano_add, propellant_add])
 		
-		var total_ammo = clamp(massDriverAmmoMax + modifyable_add_ammo,500,INF)
-		var total_nano = clamp(dronePartsMax + modifyable_add_nano,500,INF)
-		var total_propellant = clamp(reactiveMassMax + modifyable_propellant,10000,INF)
+		var total_ammo = clamp(massDriverAmmoMax + ammo_add,500,INF)
+		var total_nano = clamp(dronePartsMax + nano_add,500,INF)
+		var total_propellant = clamp(reactiveMassMax + propellant_add,10000,INF)
 		massDriverAmmoMax = total_ammo
 		massDriverAmmo = total_ammo
 		dronePartsMax = total_nano
@@ -393,3 +406,13 @@ var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 func l(text):
 	if isPlayerControlled():
 		Debug.l("HevLib Ship Modification: " + text)
+
+func init_vars():
+	base_proc_storage = processedCargoCapacity
+	base_ammo_storage = massDriverAmmoMax
+	base_nano_storage = dronePartsMax
+	base_storage_type = processedCargoStorageType
+	base_propellant = reactiveMassMax
+	base_crew_count = crew
+	base_crew_morale = crewMoraleBonus
+	base_emp_shielding = empShield
