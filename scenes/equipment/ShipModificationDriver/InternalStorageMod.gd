@@ -331,9 +331,15 @@ func _ready():
 		
 		
 		l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [ammo_add, nano_add, propellant_add])
+		var ammo_min = 0
+		var nano_min = 0
+		if massDriverAmmoMax:
+			ammo_min = 100
+		if dronePartsMax:
+			nano_min = 100
 		
-		var total_ammo = clamp(massDriverAmmoMax + ammo_add,500,INF)
-		var total_nano = clamp(dronePartsMax + nano_add,500,INF)
+		var total_ammo = clamp(massDriverAmmoMax + ammo_add,ammo_min,INF)
+		var total_nano = clamp(dronePartsMax + nano_add,nano_min,INF)
 		var total_propellant = clamp(reactiveMassMax + propellant_add,10000,INF)
 		massDriverAmmoMax = total_ammo
 		massDriverAmmo = total_ammo
