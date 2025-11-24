@@ -353,7 +353,7 @@ func _ready():
 		
 		
 		
-		
+		clampConsumables()
 
 var nanoDeliveryPerSecond = {
 	0.0: 20, 
@@ -431,6 +431,7 @@ func getCurrentlyActiveCrewNames():
 func _physics_process(delta):
 	if not dead and ismCFGD.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","limit_nanodrone_output"):
 		handleNanoDelivery(delta)
+	
 
 var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 
