@@ -46,18 +46,48 @@ func _enter_tree():
 		var listingSystemName = item.get("system","SYSTEM_MISSING_NAME")
 		var ls = {}
 		
-		var listingStorageFlat = item.get("storage_flat",0)
-		if listingStorageFlat != 0.0:
-			ls.merge({"storage_flat":listingStorageFlat})
-		var listingStorageAmmo = item.get("storage_ammo",0)
-		if listingStorageAmmo != 0.0:
-			ls.merge({"storage_ammo":listingStorageAmmo})
-		var listingStorageNano = item.get("storage_nanodrones",0.0)
-		if listingStorageNano != 0.0:
-			ls.merge({"storage_nano":listingStorageNano})
-		var listingStoragePropellant = item.get("storage_propellant",0.0)
-		if listingStoragePropellant != 0.0:
-			ls.merge({"storage_propellant":listingStoragePropellant})
+		for data in item:
+			match data:
+				"storage_flat":
+					ls.merge({"storage_flat":item.get("storage_flat")})
+				"storage_ammo","storage_ammunition":
+					ls.merge({"storage_ammo":item.get("storage_ammo",item.get("storage_ammunition"))})
+				"storage_nano","storage_nanodrones":
+					ls.merge({"storage_nano":item.get("storage_nano",item.get("storage_nanodrones"))})
+				"storage_propellant","storage_prop":
+					ls.merge({"storage_propellant":item.get("storage_propellant",item.get("storage_prop"))})
+				"force_type":
+					ls.merge({"force_type":item.get("force_type")})
+				"crew_count":
+					ls.merge({"crew_count":item.get("crew_count")})
+				"crew_morale":
+					ls.merge({"crew_morale":item.get("crew_morale")})
+				"mass":
+					ls.merge({"mass":item.get("mass")})
+				"mass_per_crew_member":
+					ls.merge({"mass_per_crew_member":item.get("mass_per_crew_member")})
+				"mass_per_tonne_of_processed_ore":
+					ls.merge({"mass_per_tonne_of_processed_ore":item.get("mass_per_tonne_of_processed_ore")})
+				"mass_per_tonne_total_storage_added":
+					ls.merge({"mass_per_tonne_total_storage_added":item.get("mass_per_tonne_total_storage_added")})
+				"ammo_speed_add":
+					ls.merge({"ammo_speed_add":item.get("ammo_speed_add")})
+				"nano_speed_add":
+					ls.merge({"nano_speed_add":item.get("nano_speed_add")})
+				"emp_shielding":
+					ls.merge({"emp_shielding":item.get("emp_shielding")})
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		var listingStorageMulti = float(item.get("storage_multi_upper",1.0))/float(item.get("storage_multi_lower",1.0))
 		if listingStorageMulti != 1.0:
 			ls.merge({"storage_multi":listingStorageMulti})
@@ -73,43 +103,15 @@ func _enter_tree():
 		var massMulti = float(item.get("mass_multi_upper",1.0))/float(item.get("mass_multi_lower",1.0))
 		if massMulti != 1.0:
 			ls.merge({"mass_multi":massMulti})
-		var listingForceType = item.get("force_type","")
-		if listingForceType != "":
-			ls.merge({"force_type":listingForceType})
-		var listingCrewCount = item.get("crew_count",0)
-		if listingCrewCount != 0.0:
-			ls.merge({"crew_count":listingCrewCount})
-		var listingCrewMorale = item.get("crew_morale",0.0)
-		if listingCrewMorale != 0.0:
-			ls.merge({"crew_morale":listingCrewMorale})
-		var listingMass = float(item.get("mass",0.0))
-		if listingMass != 0.0:
-			ls.merge({"mass":listingMass})
 		
-		var listingCrewMassMod = float(item.get("mass_per_crew_member",0.0))
-		if listingCrewMassMod != 0.0:
-			ls.merge({"mass_per_crew_member":listingCrewMassMod})
-		var listingOreMassMod = float(item.get("mass_per_tonne_of_processed_ore",0.0))
-		if listingOreMassMod != 0.0:
-			ls.merge({"mass_per_tonne_of_processed_ore":listingOreMassMod})
-		var listingTotalAddedStorageMassMod = float(item.get("mass_per_tonne_total_storage_added",0.0))
-		if listingTotalAddedStorageMassMod != 0.0:
-			ls.merge({"mass_per_tonne_total_storage_added":listingTotalAddedStorageMassMod})
-		var listingAmmoSpeed = float(item.get("ammo_speed_add",0.0))
-		if listingAmmoSpeed != 0.0:
-			ls.merge({"ammo_speed_add":listingAmmoSpeed})
-		var listingNanoSpeed = float(item.get("nano_speed_add",0.0))
-		if listingNanoSpeed != 0.0:
-			ls.merge({"nano_speed_add":listingNanoSpeed})
+		
 		var listingAmmoSpeedMulti = float(item.get("ammo_speed_multi_upper",1.0))/float(item.get("ammo_speed_multi_lower",1.0))
 		if listingAmmoSpeedMulti != 1.0:
 			ls.merge({"ammo_speed_multi":listingAmmoSpeedMulti})
 		var listingNanoSpeedMulti = float(item.get("nano_speed_multi_upper",1.0))/float(item.get("nano_speed_multi_lower",1.0))
 		if listingNanoSpeedMulti != 1.0:
 			ls.merge({"nano_speed_multi":listingNanoSpeedMulti})
-		var listingEMP = int(item.get("emp_shielding",0))
-		if listingEMP != 0:
-			ls.merge({"emp_shielding":listingEMP})
+		
 		
 		listings.merge({
 			listingSystemName:ls
@@ -285,6 +287,26 @@ func _ready():
 			val = ((mass * mass_add) * mass_multi) - (mass + mass_add)
 			mass_add += val
 		
+		l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [ammo_add, nano_add, propellant_add])
+		var ammo_min = 0
+		var nano_min = 0
+		if massDriverAmmoMax:
+			ammo_min = 100
+		if dronePartsMax:
+			nano_min = 100
+		
+#		var total_ammo = clamp(massDriverAmmoMax + ammo_add,ammo_min,INF)
+#		if total_ammo:
+#			massDriverAmmoMax = total_ammo
+#			massDriverAmmo = total_ammo
+#		var total_nano = clamp(dronePartsMax + nano_add,nano_min,INF)
+#		if total_nano:
+#			dronePartsMax = total_nano
+#			droneParts = total_nano
+		
+		addPropellantCapacity(propellant_add)
+		addAmmoCapacity(ammo_add)
+		addDronesCapacity(nano_add)
 		
 		if mass_per_tonne_total_storage_added != 0:
 			l("Changing mass by %s kg for every tonne of total storage changed by" % total_added_capacity)
@@ -330,23 +352,6 @@ func _ready():
 			l("Adding %s kg of mass. Base ship mass changing from %s to %s" % [mass_add,base_mass * 1000,shipInitialMass * 1000])
 		
 		
-		l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [ammo_add, nano_add, propellant_add])
-		var ammo_min = 0
-		var nano_min = 0
-		if massDriverAmmoMax:
-			ammo_min = 100
-		if dronePartsMax:
-			nano_min = 100
-		
-		var total_ammo = clamp(massDriverAmmoMax + ammo_add,ammo_min,INF)
-		var total_nano = clamp(dronePartsMax + nano_add,nano_min,INF)
-		var total_propellant = clamp(reactiveMassMax + propellant_add,10000,INF)
-		massDriverAmmoMax = total_ammo
-		massDriverAmmo = total_ammo
-		dronePartsMax = total_nano
-		droneParts = total_nano
-		reactiveMassMax = total_propellant
-		reactiveMass = total_propellant
 		
 		
 
@@ -394,6 +399,26 @@ func deactivateCrew(maximum):
 		else:
 			if CurrentGame.state.crew[m].get("active", true):
 				CurrentGame.state.crew[m]["active"] = false
+
+func addAmmoCapacity(kg: float):
+	var change = massDriverAmmoMax + kg
+	if change < 0:
+		kg += change
+	.addAmmoCapacity(kg)
+
+func addDronesCapacity(kg: float):
+	var change = dronePartsMax + kg
+	if change < 0:
+		kg += change
+	.addDronesCapacity(kg)
+
+func addPropellantCapacity(kg: float):
+	var change = reactiveMassMax + kg
+	if change < 0:
+		kg += change
+	reactiveMassMax += kg
+	if reactiveMass == 0:
+		reactiveMass += kg
 
 
 func getCurrentlyActiveCrewNames():

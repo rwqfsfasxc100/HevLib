@@ -182,7 +182,7 @@ func make_upgrades_scene(is_onready: bool = true):
 	wpfl.store_string("{}")
 	wpfl.close()
 	wpfl.open(auxslot_data_path,File.WRITE)
-	wpfl.store_string("[]")
+	wpfl.store_string("{}")
 	wpfl.close()
 	wpfl.open(weaponslot_modify_equipment_names,File.WRITE)
 	wpfl.store_string("[]")
@@ -298,7 +298,7 @@ func make_upgrades_scene(is_onready: bool = true):
 								dicti.merge({"SLOT_TAGS":ar})
 
 
-							"AUX_POWER_SLOT.gd":
+							"AUX_POWER_SLOT.gd","THRUSTERS.gd","AUX_POWER_AND_THRUSTERS.gd":
 								var data = load(check + last_bit)
 								var constants = data.get_script_constant_map()
 								var arr2 = []
@@ -1113,11 +1113,18 @@ func make_upgrades_scene(is_onready: bool = true):
 	for mod in power_state:
 		for type in mod:
 			match type:
-				"AUX_POWER_SLOT":
+				"AUX_POWER_SLOT","THRUSTERS","AUX_POWER_AND_THRUSTERS":
 					for data in mod.get(type):
 						file.open(auxslot_data_path,File.READ_WRITE)
 						var a = JSON.parse(file.get_as_text()).result
-						a.append(data)
+						var equipSlots = data.get("slots",[])
+						for slot in equipSlots:
+							slot = slot.split(".")[0]
+							if slot in a:
+								pass
+							else:
+								a.merge({slot:[]})
+							a[slot].append(data)
 						file.store_string(JSON.print(a))
 						file.close()
 						var aux_path = data.get("path","")
