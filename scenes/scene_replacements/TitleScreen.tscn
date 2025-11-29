@@ -34,24 +34,24 @@ margin_top = 634.0
 [node name="GridContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2" index="0"]
 margin_bottom = 86.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2/GridContainer" index="1"]
+[node name="DeveloperButtons" type="HBoxContainer" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2/GridContainer" index="1"]
 margin_top = 45.0
 margin_right = 961.0
 margin_bottom = 86.0
 
-[node name="driver" type="Button" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2/GridContainer/HBoxContainer" index="0"]
+[node name="driver" type="Button" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2/GridContainer/DeveloperButtons" index="0"]
 margin_right = 632.0
 margin_bottom = 41.0
 size_flags_horizontal = 3
 text = "Create Driver Files"
 
-[node name="test" type="Button" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2/GridContainer/HBoxContainer" index="1"]
+[node name="test" type="Button" parent="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2/GridContainer/DeveloperButtons" index="1"]
 margin_left = 636.0
 margin_right = 961.0
 margin_bottom = 41.0
 text = "HevLib Test Code"
 script = ExtResource( 2 )
 
-[connection signal="pressed" from="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2/GridContainer/HBoxContainer/test" to="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2/GridContainer/HBoxContainer/test" method="_on_Button_pressed"]
+[connection signal="pressed" from="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2/GridContainer/DeveloperButtons/test" to="MenuLayer/TitleMenu/MarginContainer/VBoxContainer/MarginContainer2/GridContainer/DeveloperButtons/test" method="_on_Button_pressed"]
 
 [editable path="AsteroidField"]
