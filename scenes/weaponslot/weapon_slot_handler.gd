@@ -163,7 +163,7 @@ func _ready():
 
 func loadPlaceholder():
 	.loadPlaceholder()
-	yield(get_tree().create_timer(0.05),"timeout")
+	yield(get_tree(),"idle_frame")
 	modify()
 func modify():
 	var file = File.new()

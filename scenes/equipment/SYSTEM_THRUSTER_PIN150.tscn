@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://sfx/exhaust.tscn" type="PackedScene" id=1]
+[ext_resource path="res://sfx/ball-of-flame.png" type="Texture" id=2]
+
+[sub_resource type="CircleShape2D" id=1]
+radius = 2.87
+
+[node name="exhaust" instance=ExtResource( 1 )]
+mass = 0.1
+lightLagChance = 0
+baseLifetime = 0.25
+lifetime = 0.25
+endScale = 0.02
+selfRemove = true
+
+[node name="CollisionShape2D" parent="." index="0"]
+shape = SubResource( 1 )
+
+[node name="Sprite" parent="." index="1"]
+texture = ExtResource( 2 )
+scale = Vector2(0.5,0.5)

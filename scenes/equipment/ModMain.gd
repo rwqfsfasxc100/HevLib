@@ -22,6 +22,7 @@ var _savedObjects := []
 # This function is executed before the majority of the game is loaded
 # Only the Tool and Debug AutoLoads are available
 # Script and scene replacements should be done here, before the originals are loaded
+var exhaust_cache_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/Exhaust_Cache"
 
 var upgrades_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn"
 var weaponslot_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot.tscn"
@@ -94,11 +95,16 @@ func _init(modLoader = ModLoader):
 var f = File.new()
 func _ready():
 	l("Readying")
+	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
+	var d = Directory.new()
+	if d.dir_exists(exhaust_cache_path):
+		FolderAccess.__recursive_delete(exhaust_cache_path)
 	ConfigDriver.__load_configs()
 	var zip_ref_store = "user://cache/.HevLib_Cache/zip_ref_store.json"
 	f.open(zip_ref_store,File.WRITE)
 	f.store_string("{}")
 	f.close()
+	
 	var modzips = {}
 	for mod in ManifestV2.__get_mod_data()["mods"]:
 		var zipinfo = match_mod_path_to_zip(mod)

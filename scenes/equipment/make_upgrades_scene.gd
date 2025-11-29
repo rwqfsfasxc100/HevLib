@@ -28,7 +28,7 @@ func make_upgrades_scene(is_onready: bool = true):
 	# FILE PATHS
 	var FILE_PATHS = [
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn",
-		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot.tscn",
+		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/Exhaust_Cache",
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/AuxSlot.tscn",
 		
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_TEMPLATES.json",
@@ -49,7 +49,7 @@ func make_upgrades_scene(is_onready: bool = true):
 	]
 	
 	var file_save_path : String = FILE_PATHS[0]
-	var weaponslot_save_path : String = FILE_PATHS[1]
+	var exhaust_cache_path : String = FILE_PATHS[1]
 	var auxslot_save_path : String = FILE_PATHS[2]
 	var weaponslot_modify_templates_file = FILE_PATHS[3]
 	var weaponslot_modify_standalone_file = FILE_PATHS[4]
@@ -181,6 +181,9 @@ func make_upgrades_scene(is_onready: bool = true):
 	wpfl.open(node_definitions_file,File.WRITE)
 	wpfl.store_string("{}")
 	wpfl.close()
+#	wpfl.open(exhaust_cache_file,File.WRITE)
+#	wpfl.store_string("{}")
+#	wpfl.close()
 	wpfl.open(auxslot_data_path,File.WRITE)
 	wpfl.store_string("{}")
 	wpfl.close()
@@ -305,7 +308,11 @@ func make_upgrades_scene(is_onready: bool = true):
 								for item in constants:
 									var equipment = data.get(item).duplicate(true)
 									arr2.append(equipment)
-								OneOff.merge({"AUX_POWER_SLOT":arr2})
+								if "AUX_POWER_SLOT" in OneOff:
+									pass
+								else:
+									OneOff.merge({"AUX_POWER_SLOT":[]})
+								OneOff["AUX_POWER_SLOT"].append_array(arr2)
 
 
 							"MODIFY_INTERNALS.gd":
@@ -1095,7 +1102,8 @@ func make_upgrades_scene(is_onready: bool = true):
 	
 	var aux_power_string = aux_power_header
 	
-	
+	var thruster_header = "[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://sfx/exhaust.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"%s\" type=\"%s\" id=2]\n\n[sub_resource type=\"CircleShape2D\" id=1]\nradius = %s\n\n[node name=\"exhaust\" instance=ExtResource( 1 )]"
+	var thruster_footer = "[node name=\"Sprite\" parent=\".\" index=\"1\"]\ntexture = ExtResource( 2 )"
 	
 	
 	
@@ -1108,6 +1116,7 @@ func make_upgrades_scene(is_onready: bool = true):
 	file.open(weaponslot_modifications,File.WRITE)
 	file.store_string(JSON.print(ws_stuff_to_modify))
 	file.close()
+	
 	
 	
 	for mod in power_state:
@@ -1130,46 +1139,90 @@ func make_upgrades_scene(is_onready: bool = true):
 						var aux_path = data.get("path","")
 						var aux_type = data.get("type","MPDG").to_upper()
 						match aux_type:
-							"MPDG":
-								var system = data.get("system","SYSTEM_NAME_MISSING")
-								var system_display = "\n" + property % ["systemName","\"" + system + "\""]
-								var price = "\n" + property % ["repairReplacementPrice",str(data.get("price",30000))]
-								var repair_time = "\n" + property % ["repairReplacementTime",str(data.get("repair_time",1))]
-								var fix_price = "\n" + property % ["repairFixPrice",str(data.get("fix_price",5000))]
-								var fix_time = "\n" + property % ["repairFixTime",str(data.get("fix_time",4))]
-								var command = "\n" + property % ["command","\"" + data.get("command","") + "\""]
-								var power_draw = "\n" + property % ["powerDraw",str(float(data.get("power_draw",50000.0)))]
-								var thermal = "\n" + property % ["thermal",str(float(data.get("thermal",500000.0)))]
-								var power_supply = "\n" + property % ["powerSupply",str(float(data.get("power_supply",350000.0)))]
-								var windup_time = "\n" + property % ["windupTime",str(data.get("windup_time",2))]
-								var mass = "\n" + property % ["mass",str(float(data.get("mass",0.0)))]
+							"THRUSTER","RCS","TORCH","MAIN_PROPULSION":
+								var sys = data.get("system","SYSTEM_NAME_MISSING")
+								var light_lag_chance = data.get("exhaust_light_lag_chance",0)
+								var base_lifetime = data.get("exhaust_base_lifetime",0.25)
+								var lifetime = data.get("exhaust_lifetime",0.25)
+								var end_scale = data.get("exhaust_end_scale",0.02)
+								var self_remove = data.get("exhaust_self_remove",0.02)
+								var mass = data.get("exhaust_mass",0.1)
+								var sprite = data.get("exhaust_sprite","res://sfx/ball-of-flame.png")
+								var sprite_scale = data.get("exhaust_sprite_scale",Vector2(0.5,0.5))
+								var radius = data.get("exhaust_collider_radius",2.87)
 								
-								var cc = price + repair_time + fix_price + fix_time + command + power_draw + thermal + power_supply + windup_time + mass + system_display
+								var tex_type = ""
+								if sprite.ends_with(".png"):
+									tex_type = "Texture"
+								elif sprite.ends_with(".stex"):
+									tex_type = "StreamTexture"
+								else:
+									tex_type = "Texture"
+									sprite = "res://sfx/ball-of-flame.png"
 								
-								var MPDG = "\n\n" + MPDG_header % system + cc
+								var thruster_text = thruster_header % [sprite,tex_type,str(radius)]
 								
-								aux_power_string = aux_power_string + MPDG
+								thruster_text = thruster_text + "\nmass = %s" % mass
+								thruster_text = thruster_text + "\nlightLagChance = %s" % light_lag_chance
+								thruster_text = thruster_text + "\nbaseLifetime = %s" % base_lifetime
+								thruster_text = thruster_text + "\nlifetime = %s" % lifetime
+								thruster_text = thruster_text + "\nendScale = %s" % end_scale
+								if self_remove:
+									thruster_text = thruster_text + "\nselfRemove = true"
+								else:
+									thruster_text = thruster_text + "\nselfRemove = false"
 								
-							"SMES":
-								var system = data.get("system","SYSTEM_NAME_MISSING")
-								var system_display = "\n" + property % ["systemName","\"" + system + "\""]
-								var price = "\n" + property % ["repairReplacementPrice",str(data.get("price",40000))]
-								var repair_time = "\n" + property % ["repairReplacementTime",str(data.get("repair_time",1))]
-								var fix_price = "\n" + property % ["repairFixPrice",str(data.get("fix_price",25000))]
-								var fix_time = "\n" + property % ["repairFixTime",str(data.get("fix_time",4))]
-								var capacitor_ratio = "\n" + property % ["capacitorRatio",str(float(data.get("capacitor_ratio",0.9)))]
-								var command = "\n" + property % ["command","\"" + data.get("command","") + "\""]
-								var power_draw = "\n" + property % ["powerDraw",str(float(data.get("power_draw",50000.0)))]
-								var capacity = "\n" + property % ["capacity",str(float(data.get("capacity",600000.0)))]
-								var power_supply = "\n" + property % ["powerSupply",str(float(data.get("power_supply",200000.0)))]
-								var switch_time = "\n" + property % ["switchTime",str(float(data.get("switch_time",2)))]
-								var mass = "\n" + property % ["mass",str(data.get("mass",0))]
+								thruster_text = thruster_text + "\n\n[node name=\"CollisionShape2D\" parent=\".\" index=\"0\"]\nshape = SubResource( 1 )\n\n" + thruster_footer
+								thruster_text = thruster_text + "\nscale = Vector2(%s,%s)" % [sprite_scale.x,sprite_scale.y]
 								
-								var cc = price + repair_time + fix_price + fix_time + capacitor_ratio + command + power_draw + power_supply + capacity + system_display + switch_time + mass
+								FolderAccess.__check_folder_exists(exhaust_cache_path + "/" + aux_type)
 								
-								var SMES = "\n\n" + SMES_header % system + cc
-								
-								aux_power_string = aux_power_string + SMES
+								file.open(exhaust_cache_path + "/" + aux_type + "/" + sys + ".tscn",File.WRITE)
+								file.store_string(thruster_text)
+								file.close()
+							
+							
+							
+#							"MPDG":
+#								var system = data.get("system","SYSTEM_NAME_MISSING")
+#								var system_display = "\n" + property % ["systemName","\"" + system + "\""]
+#								var price = "\n" + property % ["repairReplacementPrice",str(data.get("price",30000))]
+#								var repair_time = "\n" + property % ["repairReplacementTime",str(data.get("repair_time",1))]
+#								var fix_price = "\n" + property % ["repairFixPrice",str(data.get("fix_price",5000))]
+#								var fix_time = "\n" + property % ["repairFixTime",str(data.get("fix_time",4))]
+#								var command = "\n" + property % ["command","\"" + data.get("command","") + "\""]
+#								var power_draw = "\n" + property % ["powerDraw",str(float(data.get("power_draw",50000.0)))]
+#								var thermal = "\n" + property % ["thermal",str(float(data.get("thermal",500000.0)))]
+#								var power_supply = "\n" + property % ["powerSupply",str(float(data.get("power_supply",350000.0)))]
+#								var windup_time = "\n" + property % ["windupTime",str(data.get("windup_time",2))]
+#								var mass = "\n" + property % ["mass",str(float(data.get("mass",0.0)))]
+#
+#								var cc = price + repair_time + fix_price + fix_time + command + power_draw + thermal + power_supply + windup_time + mass + system_display
+#
+#								var MPDG = "\n\n" + MPDG_header % system + cc
+#
+#								aux_power_string = aux_power_string + MPDG
+#
+#							"SMES":
+#								var system = data.get("system","SYSTEM_NAME_MISSING")
+#								var system_display = "\n" + property % ["systemName","\"" + system + "\""]
+#								var price = "\n" + property % ["repairReplacementPrice",str(data.get("price",40000))]
+#								var repair_time = "\n" + property % ["repairReplacementTime",str(data.get("repair_time",1))]
+#								var fix_price = "\n" + property % ["repairFixPrice",str(data.get("fix_price",25000))]
+#								var fix_time = "\n" + property % ["repairFixTime",str(data.get("fix_time",4))]
+#								var capacitor_ratio = "\n" + property % ["capacitorRatio",str(float(data.get("capacitor_ratio",0.9)))]
+#								var command = "\n" + property % ["command","\"" + data.get("command","") + "\""]
+#								var power_draw = "\n" + property % ["powerDraw",str(float(data.get("power_draw",50000.0)))]
+#								var capacity = "\n" + property % ["capacity",str(float(data.get("capacity",600000.0)))]
+#								var power_supply = "\n" + property % ["powerSupply",str(float(data.get("power_supply",200000.0)))]
+#								var switch_time = "\n" + property % ["switchTime",str(float(data.get("switch_time",2)))]
+#								var mass = "\n" + property % ["mass",str(data.get("mass",0))]
+#
+#								var cc = price + repair_time + fix_price + fix_time + capacitor_ratio + command + power_draw + power_supply + capacity + system_display + switch_time + mass
+#
+#								var SMES = "\n\n" + SMES_header % system + cc
+#
+#								aux_power_string = aux_power_string + SMES
 	var lim_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]"
 	var lim_item = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\"]"
 	ship_limitation_string = lim_header
@@ -1197,16 +1250,17 @@ func make_upgrades_scene(is_onready: bool = true):
 					sl = sl + "\"" + data["prevent_ships"][f] + "\" ]"
 			cc = cc + "\n" + sl
 		ship_limitation_string = ship_limitation_string + cc
-	
-	
-	
-	
+
+
+
+
 	if not ws_editable_paths == "":
 		weaponslot_string = weaponslot_string + "\n\n" + ws_editable_paths
+	
 	var f = File.new()
-	f.open(weaponslot_save_path,File.WRITE)
-	f.store_string(weaponslot_string)
-	f.close()
+#	f.open(exhaust_cache_file,File.WRITE)
+#	f.store_string(JSON.print(exhaust_state))
+#	f.close()
 	
 	f.open(file_save_path,File.WRITE)
 	f.store_string(concat)
