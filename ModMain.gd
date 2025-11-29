@@ -125,14 +125,7 @@ func _ready():
 	
 	var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
 #	replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
-	var p = load("res://ModLoader.gd")
-	var ps = p.get_script_constant_map()
-	var running_in_debugged = false
-	var debugged_defined_mods = []
-	for item in ps:
-		if item == "is_debugged":
-			running_in_debugged = true
-	if running_in_debugged:
+	if OS.has_feature("editor"):
 		replaceScene("scenes/scene_replacements/TitleScreen.tscn", "res://TitleScreen.tscn")
 #	var mouse = load("res://HevLib/scenes/scene_replacements/MouseLayer.tscn").instance()
 	var CRoot = get_tree().get_root()

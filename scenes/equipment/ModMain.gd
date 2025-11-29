@@ -39,6 +39,11 @@ var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 func _init(modLoader = ModLoader):
 	l("Initializing Equipment Driver")
 	
+	var ml = MainLoop.new()
+	ml.set_script(load("res://HevLib/scripts/crash_handler.gd"))
+	_savedObjects.append(ml)
+	
+	
 	installScriptExtension("../../ui/ExtensionPopup.gd")
 	installScriptExtension("../scene_replacements/DLClist.gd")
 	replaceScene("../scene_replacements/DLClist.tscn","res://tools/DLClist.tscn")
