@@ -46,6 +46,7 @@ func make_upgrades_scene(is_onready: bool = true):
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFIED_NAMES.json",
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Slot_Limits.tscn",
 		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_modify.json",
+		"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_thruster_colors.json",
 	]
 	
 	var file_save_path : String = FILE_PATHS[0]
@@ -66,6 +67,7 @@ func make_upgrades_scene(is_onready: bool = true):
 	var weaponslot_modify_equipment_names = FILE_PATHS[15]
 	var upgrades_slot_limits = FILE_PATHS[16]
 	var ship_node_modify_file = FILE_PATHS[17]
+	var ship_thruster_color_file = FILE_PATHS[18]
 	var DataFormat = load("res://HevLib/pointers/DataFormat.gd")
 	if is_onready:
 		
@@ -179,6 +181,9 @@ func make_upgrades_scene(is_onready: bool = true):
 	wpfl.store_string("[]")
 	wpfl.close()
 	wpfl.open(node_definitions_file,File.WRITE)
+	wpfl.store_string("{}")
+	wpfl.close()
+	wpfl.open(ship_thruster_color_file,File.WRITE)
 	wpfl.store_string("{}")
 	wpfl.close()
 #	wpfl.open(exhaust_cache_file,File.WRITE)
@@ -372,6 +377,31 @@ func make_upgrades_scene(is_onready: bool = true):
 											pfdata[ship].append(modification)
 								wpfl.store_string(JSON.print(pfdata))
 								wpfl.close()
+							"SHIP_THRUSTER_COLORS.gd":
+								var data = load(check + last_bit)
+								var cd = data.get_script_constant_map().get("SHIP_THRUSTER_COLORS",{})
+								if cd.keys().size() > 0:
+									wpfl.open(ship_thruster_color_file,File.READ)
+									var current = JSON.parse(wpfl.get_as_text()).result
+									wpfl.close()
+									for ship in cd:
+										if ship in current:
+											pass
+										else:
+											current.merge({ship:{"node":{},"type":{}}})
+										if "type" in cd[ship]:
+											current[ship]["type"].merge(cd[ship]["type"],true)
+										if "node" in cd[ship]:
+											current[ship]["node"].merge(cd[ship]["node"],true)
+										if "recurse_to_variants" in cd[ship]:
+											current[ship]["recurse_to_variants"] = cd[ship]["recurse_to_variants"]
+										
+									wpfl.open(ship_thruster_color_file,File.WRITE)
+									wpfl.store_string(JSON.print(current))
+									wpfl.close()
+									
+								
+								pass
 
 							"WEAPONSLOT_ADD.gd":
 								var data = load(check + last_bit)
@@ -1148,7 +1178,7 @@ func make_upgrades_scene(is_onready: bool = true):
 								var self_remove = data.get("exhaust_self_remove",0.02)
 								var mass = data.get("exhaust_mass",0.1)
 								var sprite = data.get("exhaust_sprite","res://sfx/ball-of-flame.png")
-								var sprite_scale = data.get("exhaust_sprite_scale",Vector2(0.5,0.5))
+								var sprite_scale = data.get("exhaust_sprite_scale",[0.5,0.5])
 								var radius = data.get("exhaust_collider_radius",2.87)
 								
 								var tex_type = ""
@@ -1173,7 +1203,7 @@ func make_upgrades_scene(is_onready: bool = true):
 									thruster_text = thruster_text + "\nselfRemove = false"
 								
 								thruster_text = thruster_text + "\n\n[node name=\"CollisionShape2D\" parent=\".\" index=\"0\"]\nshape = SubResource( 1 )\n\n" + thruster_footer
-								thruster_text = thruster_text + "\nscale = Vector2(%s,%s)" % [sprite_scale.x,sprite_scale.y]
+								thruster_text = thruster_text + "\nscale = Vector2(%s,%s)" % [sprite_scale[0],sprite_scale[1]]
 								
 								FolderAccess.__check_folder_exists(exhaust_cache_path + "/" + aux_type)
 								
