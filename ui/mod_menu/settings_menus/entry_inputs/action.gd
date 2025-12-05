@@ -70,8 +70,3 @@ func refocus():
 	ConfigDriver.__set_button_focus(self,get_node("Button"))
 	
 
-func _visibility_changed():
-	if get_position_in_parent() == 0:
-		$Label/LABELBUTTON.grab_focus()
-	refocus()
-

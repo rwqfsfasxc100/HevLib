@@ -10,7 +10,6 @@ func _draw():
 	$MarginContainer.rect_size = rect_size
 	$MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer.rect_min_size = $MarginContainer.rect_size
 
-
 func _ready():
 	for entry in section_info:
 		var entry_info = section_info[entry]

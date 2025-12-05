@@ -22,6 +22,6 @@ func resetter_timeout():
 
 func createShipByConfig(cfg: Dictionary, new = true, age = 24 * 3600 * 365 * 100, sd = 0):
 	var ship = .createShipByConfig(cfg, new, age, sd)
-	var script = load("res://ships/ship-ctrl.gd")
-	ship.set_script(script)
+#	var script = load("res://ships/ship-ctrl.gd")
+#	ship.set_script(script)
 	return ship

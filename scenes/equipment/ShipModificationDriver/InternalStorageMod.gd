@@ -33,16 +33,16 @@ var emp_shieldingance = 0
 
 var nanodroneMagazine = 0
 var listings = {}
-var config_data = {}
+var hevlib_config_data = {}
 
 func _enter_tree():
 	var file = File.new()
 	file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_mods.json",File.READ)
-	config_data = JSON.parse(file.get_as_text()).result
+	hevlib_config_data = JSON.parse(file.get_as_text()).result
 	file.close()
 	
 	
-	for item in config_data:
+	for item in hevlib_config_data:
 		var listingSystemName = item.get("system","SYSTEM_MISSING_NAME")
 		var ls = {}
 		
