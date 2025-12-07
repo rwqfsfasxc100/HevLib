@@ -365,3 +365,31 @@ HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT_TOOLTIP|Prevents nanodrones from being used
 HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING|Display current player count
 
 HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING_TOOLTIP|Whether to display the number of concurrent players on Steam clients.\nNote that numbers are separate between full game and demo.
+
+HEVLIB_CLEAR_LEADERBOARDS|Clear leaderboard stats
+
+HEVLIB_CLEAR_LEADERBOARDS_TOOLTIP|Opens a menu that lets you reset individual leaderboard stats.\n\nNOTE: Steam releases only
+
+HEVLIB_OPEN_MENU|Open menu
+
+STEAMSTAT_best_haul|Best haul (complete)
+
+STEAMSTAT_best_ore|Best haul (ore)
+
+STEAMSTAT_longest_dive|Longest dive (including astrogation)
+
+STEAMSTAT_longest_dive_realtime|Longest dive (pilot time)
+
+STEAMSTAT_money_per_day|Average income per day
+
+STEAMSTAT_time|Days working in the rings
+
+STEAMSTAT_total_money|Wealth
+
+STEAMSTAT_CLEAR_STAT|Clear stat
+
+HEVLIB_CONFIRM|Confirm Action
+
+HEVLIB_WIPE_STAT_ARE_YOU_SURE|Are you sure you want to wipe the stat %s?
+
+HEVLIB_NOSTEAM|This menu only works on Steam builds.

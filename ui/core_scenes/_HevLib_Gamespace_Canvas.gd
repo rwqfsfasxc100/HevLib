@@ -3,6 +3,8 @@ extends CanvasLayer
 var currentNodeRes = Vector2(1280,720)
 
 func _process(delta):
+#	var siblingCount = get_parent().get_child_count()
+#	get_parent().move_child(self, siblingCount)
 	if not get_parent().get_node_or_null("TitleScreen") == null:
 		currentNodeRes = get_parent().get_node("TitleScreen/MenuLayer/TitleMenu").rect_size
 	if not get_parent().get_node_or_null("Enceladus") == null:

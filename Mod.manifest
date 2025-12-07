@@ -136,6 +136,14 @@ HEVLIB_CONFIG_SECTION_DEBUG={
 		"type":"bool",
 		"default":false
 	},
+	"clear_leaderboards":{
+		"name":"HEVLIB_CLEAR_LEADERBOARDS",
+		"description":"HEVLIB_CLEAR_LEADERBOARDS_TOOLTIP",
+		"type":"action",
+		"script_path":"res://HevLib/achievements/OpenClearLeaderboards.gd",
+		"method":"_open",
+		"button_label":"HEVLIB_OPEN_MENU",
+	},
 }
 HEVLIB_CONFIG_SECTION_INPUT={
 	"open_debug_event_menu":{

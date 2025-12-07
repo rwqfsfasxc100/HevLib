@@ -101,8 +101,15 @@ func _on_Button_pressed():
 #	var names = []
 #	for child in children:
 #		names.append(child.name)
-	
-	
+	var steamNode
+	for i in Achivements.get_children():
+		if i.has_method("updateLeaderboard"):
+			steamNode = i
+	if steamNode:
+		steamNode.keepBest = false
+		steamNode.updateLeaderboard("best_haul",31745318)
+		steamNode.updateLeaderboard("best_ore",31745318)
+		steamNode.keepBest = true
 	breakpoint
 
 var running = []
