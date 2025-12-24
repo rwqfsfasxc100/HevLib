@@ -270,7 +270,7 @@ func parse_as_manifest(file_path: String, format_to_manifest_version: bool = fal
 				dict_template["version"]["version_minor"] = manifest_data["package"].get("version_minor",0)
 				dict_template["version"]["version_bugfix"] = manifest_data["package"].get("version_bugfix",0)
 				dict_template["version"]["version_metadata"] = manifest_data["package"].get("version_metadata","")
-			2.1:
+			2.1,2.2:
 				dict_template["version"]["version_major"] = manifest_data["version"].get("version_major",1)
 				dict_template["version"]["version_minor"] = manifest_data["version"].get("version_minor",0)
 				dict_template["version"]["version_bugfix"] = manifest_data["version"].get("version_bugfix",0)
