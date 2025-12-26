@@ -44,7 +44,6 @@ func _init(modLoader = ModLoader):
 	ml.set_script(load("res://HevLib/scripts/crash_handler.gd"))
 	_savedObjects.append(ml)
 	
-	installScriptExtension("../sfx/PlaySoundsOnTheseButtons.gd")
 	
 	installScriptExtension("../../ui/ExtensionPopup.gd")
 	installScriptExtension("../scene_replacements/DLClist.gd")
