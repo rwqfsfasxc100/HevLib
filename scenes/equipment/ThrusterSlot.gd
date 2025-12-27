@@ -45,7 +45,7 @@ const nozzle_template = {
 var aux_type
 func loadPlaceholder():
 	.loadPlaceholder()
-	yield(get_tree(),"idle_frame")
+#	yield(get_tree(),"idle_frame")
 	modify()
 func modify():
 	file.open(auxslot_save_path,File.READ)
