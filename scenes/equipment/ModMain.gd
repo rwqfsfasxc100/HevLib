@@ -64,7 +64,8 @@ func _init(modLoader = ModLoader):
 	_savedObjects.append(cg)
 	
 	
-	
+	var dir = Directory.new()
+	dir.make_dir("user://cfg/")
 	
 	# Adds in_hevlib_menu to the CurrentGame script and preventing controls while it's true
 	installScriptExtension("../../events/controls/CurrentGame.gd")
