@@ -1,0 +1,395 @@
+locale|uk_UA
+
+HEVLIB_MOD_BRIEF|Мод-бібліотека, що містить кілька загальних функцій, створених __hev
+
+HEVLIB_MOD_DESCRIPTION|Бібліотека, що надає кілька функціональних частин:\n\n * Загальний функціонал через 'pointer' файли.\n * Обробка файлів маніфесту модів через версіонування для створення єдиного середовища отримання інформації з них.\n * EquipmentDriver - Додавання та управління предметами обладнання, слотами тощо...\n * WeaponSlotDriver - Додавання та модифікація обладнання, що додається до кріплень корабля.\n\nЦя бібліотека також має на меті зберегти послідовний метод для полегшення створення модів. Сумісність з модами також є основним фокусом наданого функціоналу.\n\nДля отримання додаткової інформації, будь ласка, перевірте вікі цього мода. Якщо у вас є пропозиції чи ідеї, будь ласка, залиште їх у Discord або як issue на GitHub.
+
+HEVLIB_MOD_ERROR_HEADER|ПРОБЛЕМИ З МОДОМ %s
+
+HEVLIB_MOD_ERROR_DEPENDANCY_DIALOGUE_BOX|Наразі виявлено %s невиконаних залежностей модів. Будь ласка, задовольніть ці вимоги або видаліть моди, які їх потребують: %s
+
+HEVLIB_GENERIC_ERROR_DIALOGUE_BOX|Щось пішло не так. Будь ласка, перезапустіть гру!
+
+EVENTDRIVER_MENU|Меню налагодження EventDriver
+
+EVENTDRIVER_EVENTS|Обрана подія
+
+EVENTDRIVER_TIMER|Таймер подій Storyteller
+
+EVENTDRIVER_SPAWNNOW|Примусовий спаун події з використанням обраної події
+
+EVENTDRIVER_EVENT_SELECTOR|Вибір події
+
+EVENTDRIVER_CLEAREVENT|Очистити обрану подію/події
+
+HEVLIB_MISSING_DOCUMENTATION_1|!!!!! Для цієї функції не надано документації!
+
+HEVLIB_MISSING_DOCUMENTATION_2|!!!!! Будь ласка, повідомте мене (__hev) про це ЯКОМОГА ШВИДШЕ, оскільки документація є ключовою для таких бібліотек, як ця, для належної підтримки!
+
+HEVLIB_DESCRIPTION_PLACEHOLDER|Цей мод не має опису. \n\nБудь ласка, перевірте веб-сторінку або гілку форуму, де ви отримали цей мод, для інформації, або запитайте опис у автора.
+
+HEVLIB_SELF_CHECK_ERROR_MESSAGE|HevLib встановлено неправильно. Будь ласка, перевірте джерело завантаження та переконайтеся, що коренева папка виглядає наступним чином: HevLib.zip/HevLib/\n\nНатискання OK закриє гру та відкриє сторінку останнього релізу у вашому браузері.
+
+HEVLIB_SELF_CHECK_ERROR_HEADER|ПОМИЛКА ЗАВАНТАЖЕННЯ HEVLIB!
+
+HEVLIB_INCORRECT_SHIP|(ПОМИЛКА!) Відсутній тип судна: '%s'\nЦе збереження не може бути відкрито, оскільки активне судно недоступне!\nЩоб завантажити це збереження, будь ласка, перевстановіть мод, що містить цей тип судна!
+
+HEVLIB_SLOT|Слот
+
+HEVLIB_MOD_MENU|Меню модів
+
+HEVLIB_MISSING_MOD_NAME|Назва мода недоступна :(
+
+HEVLIB_MISSING_DESCRIPTION|Цей мод не має опису :( \n\nБудь ласка, перевірте веб-сторінку або гілку форуму, де ви отримали цей мод, для інформації, або запитайте опис у автора.
+
+HEVLIB_AUTHOR|Автор:
+
+HEVLIB_CREDITS|Подяки:
+
+HEVLIB_UNKNOWN|Невідомо
+
+HEVLIB_MM_TOOLTIP_HEADER|Інформація про мод:
+
+HEVLIB_MM_TOOLTIP_ID|ID мода: %s
+
+HEVLIB_MM_TOOLTIP_MV|Версія маніфесту: %s
+
+HEVLIB_MM_TOOLTIP_ZIP|Zip-файл: %s
+
+HEVLIB_MM_TOOLTIP_LIBRARY|Бібліотека: %s \ Завжди відображати: %s
+
+HEVLIB_MM_BUTTON_TOOLTIP_GITHUB|Сторінка мода на Github
+
+HEVLIB_MM_BUTTON_TOOLTIP_DISCORD|Гілка мода в Discord
+
+HEVLIB_MM_BUTTON_TOOLTIP_NEXUS|Сторінка Nexus mods
+
+HEVLIB_MM_BUTTON_TOOLTIP_DONATIONS|Пожертвувати проекту
+
+HEVLIB_MM_BUTTON_TOOLTIP_WIKI|Вікі-сторінка мода
+
+HEVLIB_MM_BUTTON_TOOLTIP_BUGREPORTS|Повідомити про помилку
+
+HEVLIB_MM_BUTTON_TOOLTIP_CUSTOM|Більше...
+
+HEVLIB_VANILLA_DESCRIPTION|Симулятор видобутку на основі фізики, дія якого відбувається в найгустішому полі уламків у Сонячній системі. Кожна дія має протидію, лазери невидимі без середовища, а ваша тяга є потужною зброєю. Знаходьте торгівлю, адаптуйте обладнання до свого стилю гри, наймайте екіпаж для допомоги. Розкривайте таємниці кілець або просто багатійте.
+
+HEVLIB_VANILLA_BRIEF|Оригінальна гра
+
+HEVLIB_MODMENU_MODS|Моди
+
+HEVLIB_MODMENU_OK|Гаразд
+
+HEVLIB_MODMENU_CLOSE|Закрити
+
+HEVLIB_MODMENU_OPENFOLDER|Відкрити папку модів
+
+HEVLIB_MODMENU_MODS_VISIBLE|Відображається %d модів
+
+HEVLIB_DROP_FILES_TO_ADD_MODS|Перетягніть файли у це вікно, щоб додати моди.\nФайли з однаковими назвами будуть перезаписані
+
+HEVLIB_MODMENU_VER_AND_PRIO|Версія: v%s / Пріоритет: %s
+
+HEVLIB_MODMENU_PRIO|Пріоритет: %s
+
+HEVLIB_MODMENU_VERSION|Версія: v%s
+
+HEVLIB_MODMENU_PRIO_MID_HEADER|ID та пріоритет мода
+
+HEVLIB_GITHUB|GitHub
+
+HEVLIB_DISCORD|Discord
+
+HEVLIB_NEXUS|Nexusmods
+
+HEVLIB_DONATIONS|Зробити пожертву
+
+HEVLIB_WIKI|Вікі
+
+HEVLIB_BUGREPORTS|Повідомити про помилку
+
+HEVLIB_GITHUB_TOOLTIP|Репозиторій GitHub для цього проекту
+
+HEVLIB_DISCORD_TOOLTIP|Гілка/канал/сервер Discord для цього проекту
+
+HEVLIB_NEXUS_TOOLTIP|Сторінка Nexusmods для цього проекту
+
+HEVLIB_DONATIONS_TOOLTIP|Пожертвувати цьому проекту
+
+HEVLIB_WIKI_TOOLTIP|Вікі-сторінка(и) для цього проекту
+
+HEVLIB_BUGREPORTS_TOOLTIP|Повідомити про помилку через посилання проекту на звіти
+
+HEVLIB_FILTER_BY_TAGS|Фільтрувати моди за тегами
+
+HEVLIB_SETTINGS_BUTTON_TOOLTIP|Відкрити меню налаштувань
+
+HEVLIB_LINKS_BUTTON|Посилання
+
+HEVLIB_BUGREPORTS_BUTTON|Звіти про помилки
+
+HEVLIB_LINKS_TOOLTIP|Відобразити посилання проекту
+
+TAG_ALLOW_ACHIEVEMENTS|Дозволяє досягнення
+
+TAG_QOL|QoL
+
+TAG_USING_HEVLIB_RESEARCH|Використовує дослідження HevLib
+
+TAG_OVERHAUL|Overhaul
+
+TAG_VISUAL|Visual
+
+TAG_FUN|Fun
+
+TAG_UI|Інтерфейс користувача (UI)
+
+TAG_ADDS_SHIPS|Додає нові кораблі
+
+TAG_ADDS_EQUIPMENT|Додає нове обладнання
+
+TAG_ADDS_GAMEPLAY_MECHANICS|Додає нові ігрові механіки
+
+TAG_ADDS_EVENTS|Додає нові події в кільцях
+
+TAG_HANDLE_EXTRA_CREW|Обробляє додатковий екіпаж
+
+HEVLIB_TAG_FILTER|Фільтрувати моди за тегом
+
+HEVLIB_VANILLA_STEAM_STORE|Steam
+
+HEVLIB_VANILLA_STEAM_STORE_TOOLTIP|Відкриває сторінку гри в Steam
+
+HEVLIB_VANILLA_ITCH_STORE|itch.io
+
+HEVLIB_VANILLA_ITCH_STORE_TOOLTIP|Відкриває сторінку гри на itch.io
+
+HEVLIB_VANILLA_EPIC_STORE|Epic Games
+
+HEVLIB_VANILLA_EPIC_STORE_TOOLTIP|Відкриває сторінку гри в Epic Games
+
+HEVLIB_VANILLA_GOG_STORE|GOG
+
+HEVLIB_VANILLA_GOG_STORE_TOOLTIP|Відкриває сторінку гри в GOG
+
+HEVLIB_CONFIG_SORT_BY_PRICE|Сортувати обладнання за ціною
+
+HEVLIB_CONFIG_SORT_BY_PRICE_TOOLTIP|Примусово сортує обладнання за ціною. Порушить сортування допоміжних (AUX) модулів за типом, але запобігає проблемам з модованим обладнанням.
+
+HEVLIB_CONFIG_SORT_SLOT_BY_TYPE|Сортувати слоти за типом
+
+HEVLIB_CONFIG_SORT_SLOT_BY_TYPE_TOOLTIP|Сортує слоти за подібністю. Запобігає довільному сортуванню модованих слотів.
+
+HEVLIB_CONFIG_USE_LEGACY_EQUIPMENT_HANDLING|Використовувати застарілу обробку обладнання
+
+HEVLIB_CONFIG_USE_LEGACY_EQUIPMENT_HANDLING_TOOLTIP|Вмикає обробку обладнання як до версії 1.7. Використовуйте лише для старих модів, які не працюють з новою системою. Не очікуйте, що це спрацює для більшості модів.
+
+HEVLIB_CONFIG_WRITE_EVENTS|Записувати назви подій
+
+HEVLIB_CONFIG_WRITE_EVENTS_TOOLTIP|Записує до кеш-файлу, розташованого в user://cache/.HevLib_Cache/current_events.txt, який містить усі події, завантажені грою на момент завантаження кілець.
+
+HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES|Показувати приховані бібліотеки
+
+HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES_TOOLTIP|Робить видимою будь-яку бібліотеку без тегу always display.
+
+HEVLIB_CONFIG_INPUT_DEBUGGER|Налагоджувач вводу
+
+HEVLIB_CONFIG_INPUT_DEBUGGER_TOOLTIP|Відображає інформацію налагодження про поточний ввід.
+
+HEVLIB_CONFIG_EVENT_DEBUGGER|Налагоджувач подій
+
+HEVLIB_CONFIG_EVENT_DEBUGGER_TOOLTIP|Відкриває ключові події та відображає, активні вони чи неактивні.
+
+HEVLIB_CONFIG_POSITION_DATA_DEBUGGER|Налагоджувач даних позиції
+
+HEVLIB_CONFIG_POSITION_DATA_DEBUGGER_TOOLTIP|Відображає поточний хаос та приблизну кількість можливих подій під час занурення.
+
+HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS|Показувати точні події
+
+HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS_TOOLTIP|Використовується разом з Налагоджувачем даних позиції. Відображає фактичну кількість подій у зоні. Через принцип роботи цього налаштування продуктивність знизиться на значну величину, і це генеруватиме тисячі логів за хвилину.\n\nВИКОРИСТАННЯ ЦЬОГО НАЛАШТУВАННЯ ПОВНІСТЮ НЕ ПІДТРИМУЄТЬСЯ І АНУЛЮЄ ВСІ ЗВІТИ ПРО ПОМИЛКИ! ВАС ПОПЕРЕДИЛИ!
+
+HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU|Меню налагодження подій
+
+HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU_TOOLTIP|Клавіші, що використовуються для відкриття меню налагодження подій.
+
+HEVLIB_CONFIG_OPEN_DEBUGGER|Перемкнути відображення налагодження
+
+HEVLIB_CONFIG_OPEN_DEBUGGER_TOOLTIP|Перемикає видимість консолі налагодження (--debug-console) без необхідності командного рядка.
+
+HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS|Меню налагодження HevLib
+
+HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS_TOOLTIP|Перемикає видимість налагоджувача вводу та налагоджувача подій, якщо вони увімкнені
+
+HEVLIB_CONFIG_LINEEDIT_PLACEHOLDER|Вставте текст
+
+HEVLIB_CONFIG_SECTION_EQUIPMENT|Обладнання
+
+HEVLIB_CONFIG_SECTION_EVENTS|Події
+
+HEVLIB_CONFIG_SECTION_DRIVERS|Драйвери
+
+HEVLIB_CONFIG_SECTION_DEBUG|Налагодження
+
+HEVLIB_CONFIG_SECTION_INPUT|Прив'язки
+
+HEVLIB_NOTIFICATIONS|Сповіщення модів
+
+HEVLIB_UPDATE_COUNT|%s мод(ів) потребують оновлення!
+
+HEVLIB_DEPENDANCY_COUNT|%s мод(ів) мають відсутні залежності!
+
+HEVLIB_CONFLICT_COUNT|%s мод(ів) конфліктують!
+
+HEVLIB_UPDATE_INFO_HEADER|Цей мод має очікувані оновлення!
+
+HEVLIB_DEPENDANCY_INFO_HEADER|Цей мод має відсутні залежності!
+
+HEVLIB_CONFLICT_INFO_HEADER|Цей мод наразі конфліктує!
+
+HEVLIB_UPDATE_INFO_BODY|Оновити цей мод з версії [%s] до версії [%s]?
+
+HEVLIB_DEPENDANCY_INFO_BODY|Цей мод вимагає наступних модів, які відсутні:\n%s\n\n\n\nНе очікуйте, що цей мод працюватиме як задумано!
+
+HEVLIB_CONFLICT_INFO_BODY|Цей мод конфліктує з іншими встановленими модами. Будь ласка, встановіть сумісну версію наступних модів:\n%s\n\n\n\nНе очікуйте, що цей мод працюватиме як задумано!
+
+HEVLIB_CONFIG_RANDOMIZE_MINERALS|Рандомізувати сід мінералів
+
+HEVLIB_CONFIG_RANDOMIZE_MINERALS_TOOLTIP|Змінює сід (seed) генерації мінералів при кожному запуску гри. \n\nЯкщо вимкнено, використовує заздалегідь визначений масив констант для сідів мінералів
+
+HEVLIB_UPDATE_CENTER|Центр оновлення модів
+
+HEVLIB_UPDATE_CENTER_DESC|Наступні моди мають оновлення
+
+HEVLIB_UPDATE_ALL|Оновити всі моди
+
+HEVLIB_IGNORE_ALL|Ігнорувати всі моди
+
+HEVLIB_IGNORE_UPDATE|Ігнорувати оновлення
+
+HEVLIB_UPDATE_MOD|Оновити мод
+
+HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD|Оновити обраний мод [%s] до версії [%s]? \n\nЦе може зайняти певний час, залежно від розміру мода.
+
+HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MOD_UPDATE|Ігнорувати оновлення для мода [%s] до версії [%s]? \n\nЦе рішення можна скинути в налаштуваннях меню модів.
+
+HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MODS|Оновити всі моди, що відображаються в цьому меню? \n\nЦе може зайняти певний час, залежно від кількості та розміру модів.
+
+HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MODS|Ігнорувати всі оновлення модів, що відображаються в цьому меню? \n\nЦе рішення можна скинути в налаштуваннях меню модів.
+
+HEVLIB_ICON_TOOLTIP_CONFLICT|Цей мод конфліктує з наступними модами:%s
+
+HEVLIB_ICON_TOOLTIP_DEPENDANCIES|Цей мод не має наступних залежностей:%s
+
+HEVLIB_ICON_TOOLTIP_COMPLEMENTARY|Цей мод доповнює наступні моди:%s
+
+HEVLIB_ICON_TOOLTIP_UPDATES|Цей мод має оновлення! \nВерсія [%s] -> Версія [%s]
+
+HEVLIB_MODMENU_UPDATE_NOTIFIER|Є оновлення для ваших модів. \n\nБажаєте відкрити меню оновлень?
+
+HEVLIB_PLEASE_WAIT|Будь ласка, зачекайте...
+
+HEVLIB_RESTART|Перезапустити гру
+
+HEVLIB_EXIT_INSTEAD|Вийти з гри натомість
+
+HEVLIB_RESTART_BECAUSE_NEW_MODS|Гру потрібно перезапустити, щоб застосувати зміни до модів. \n\nАбо ж ви можете закрити гру, або закрити це вікно, щоб продовжити гру та зберегтися.
+
+HEVLIB_WAIT_TO_UPDATE_ALL|Будь ласка, зачекайте... \n\nЗавантаження мода %02d з %02d \n%s [%s] версія [%s]
+
+HEVLIB_TITLE_IGNORE_MOD|Ігнорувати мод?
+
+HEVLIB_TITLE_UPDATE_MOD|Оновити мод?
+
+HEVLIB_TITLE_IGNORE_MODS|Ігнорувати моди?
+
+HEVLIB_TITLE_UPDATE_MODS|Оновити моди?
+
+HEVLIB_DLCLIST_DLC_HEADER|------- DLC ------
+
+HEVLIB_DLCLIST_MODS_HEADER|------ MODS ------
+
+HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST|Показувати бібліотеки "завжди відображати" у списку DLC
+
+HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST_TOOLTIP|Дозволяє бібліотекам з тегом 'always_display' (таким як HevLib) з'являтися в розділі модів списку DLC
+
+HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST|Показувати всі бібліотеки у списку DLC
+
+HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST_TOOLTIP|Дозволяє всім бібліотекам з'являтися в розділі модів списку DLC. Це може зробити список дуже великим через бібліотеки, які мають багато основних файлів модів для підпроцесів.
+
+HEVLIB_CONFIG_DLCLIST_SORT_ORDER|Порядок сортування модів у списку DLC
+
+HEVLIB_CONFIG_DLCLIST_SORT_ORDER_TOOLTIP|Чи потрібно сортувати розділ модів у списку DLC і як саме.
+
+HEVLIB_RESEARCH|Дослідження
+
+HEVLIB_RESEARCH_CURRENT|Поточне дослідження
+
+HEVLIB_CURRENT_PROJECTS|Активні проекти досліджень
+
+HEVLIB_RESEARCH_STATS|Статистика всіх проектів
+
+HEVLIB_RESEARCH_AVAILABLE|Доступні проекти
+
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT|Прокрутка інтерфейсу вліво
+
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT_TOOLTIP|Основний ввід прокрутки вліво для меню з лише горизонтальною прокруткою
+
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT|Прокрутка інтерфейсу вправо
+
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT_TOOLTIP|Основний ввід прокрутки вправо для меню з лише горизонтальною прокруткою
+
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2|Прокрутка інтерфейсу вліво (альт)
+
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2_TOOLTIP|Альтернативний ввід прокрутки вліво для меню з лише горизонтальною прокруткою
+
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2|Прокрутка інтерфейсу вправо (альт)
+
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2_TOOLTIP|Альтернативний ввід прокрутки вправо для меню з лише горизонтальною прокруткою
+
+SYSTEM_HEVLIB_INTERNALS_NODE|Мод обробки внутрішніх систем
+
+NOTIFICATION_NAME_PLACEHOLDER|{Тіло сповіщення відсутнє}
+
+NOTIFICATION_TITLE_PLACEHOLDER|{Назва сповіщення відсутня}
+
+HEVLIB_AVAILABLE_RESEARCH|Доступні проекти досліджень
+
+HEVLIB_RESEARCH_TOTAL_TOOLTIP|Загальний прогрес у цьому проекті
+
+DLC_ANDROID|Пакет облич андроїдів
+
+HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT|Обмежити вихід нанодронів
+
+HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT_TOOLTIP|Запобігає використанню нанодронів, якщо швидкість споживання перевищує швидкість встановленого сховища. \nПримітка: це, ймовірно, ніколи не буде досягнуто, крім дуже специфічних конфігурацій.
+
+HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING|Відображати кількість гравців
+
+HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING_TOOLTIP|Чи відображати кількість одночасних гравців на клієнтах Steam.\nЗауважте, що цифри для повної гри та демо-версії розділені.
+
+HEVLIB_CLEAR_LEADERBOARDS|Очистити статистику таблиці лідерів
+
+HEVLIB_CLEAR_LEADERBOARDS_TOOLTIP|Відкриває меню, яке дозволяє скинути окремі статистики таблиці лідерів.\n\nПРИМІТКА: Тільки для релізів Steam
+
+HEVLIB_OPEN_MENU|Відкрити меню
+
+STEAMSTAT_best_haul|Найкращий улов (повний)
+
+STEAMSTAT_best_ore|Найкращий улов (руда)
+
+STEAMSTAT_longest_dive|Найдовше занурення (включаючи астрогацію)
+
+STEAMSTAT_longest_dive_realtime|Найдовше занурення (час пілотування)
+
+STEAMSTAT_money_per_day|Середній дохід за день
+
+STEAMSTAT_time|Дні роботи в кільцях
+
+STEAMSTAT_total_money|Багатство
+
+STEAMSTAT_CLEAR_STAT|Очистити статистику
+
+HEVLIB_CONFIRM|Підтвердити дію
+
+HEVLIB_WIPE_STAT_ARE_YOU_SURE|Ви впевнені, що хочете очистити статистику %s?
+
+HEVLIB_NOSTEAM|Це меню працює тільки на збірках Steam.
