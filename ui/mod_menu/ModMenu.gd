@@ -32,6 +32,8 @@ func _unhandled_input(event):
 			$DependancyMenu.hide()
 		elif $UpdateDialog.visible:
 			$UpdateDialog.hide()
+		elif $ProfilesMenu.visible:
+			$ProfilesMenu.hide()
 		elif $WAIT.visible:
 			Debug.l("Currently downloading a mod update for %s, not closing wait window.")
 		else:

@@ -1,6 +1,7 @@
 extends Node
 
 static func store_config(configuration: Dictionary, mod_id: String, cfg_filename : String = "Mod_Configurations" + ".cfg"):
+	var profiles_dir = "user://cfg/.profiles/"
 	var cfg_folder = "user://cfg/"
 	var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
 	var DataFormat = load("res://HevLib/pointers/DataFormat.gd")
@@ -27,8 +28,7 @@ static func store_config(configuration: Dictionary, mod_id: String, cfg_filename
 			var sr = sect_data[s]
 			cfg.set_value(sect_name,s,sr)
 	
+	var profile = cfg.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","default")
 	cfg.save(cfg_file)
-	
-	
-	
-	
+	cfg.save(profiles_dir+profile + ".cfg")
+	Loader.saved()

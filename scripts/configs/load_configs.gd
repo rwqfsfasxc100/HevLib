@@ -3,15 +3,48 @@ extends Node
 static func load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
 	var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
 	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
-	var f = ManifestV2.__get_mod_data()
-	var mod_entries = f["mods"]
-	var configs = {}
+	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 	var file = File.new()
+	var dir = Directory.new()
+	var c = ConfigFile.new()
 	var cfg_file = "user://cfg/" + cfg_filename
+	var profiles_dir = "user://cfg/.profiles/"
+	var profiles_setter = ".profiles.ini"
+	dir.make_dir_recursive(profiles_dir)
+	if not file.file_exists(profiles_dir + profiles_setter):
+		c.clear()
+		c.set_value("profiles","selected","Default")
+		c.save(profiles_dir + profiles_setter)
+		c.clear()
 	if not file.file_exists(cfg_file):
 		file.open(cfg_file,File.WRITE)
 		file.store_string("")
 		file.close()
+	c.load(profiles_dir + profiles_setter)
+	var desired_profile = c.get_value("profiles","selected","Default")
+	c.clear()
+	c.load(cfg_file)
+	var current_profile = c.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","Default")
+	var profile_is_current = true
+	if current_profile != desired_profile:
+		profile_is_current = false
+		dir.remove(cfg_file)
+		for m in FolderAccess.__fetch_folder_files("user://cfg/.profiles/"):
+			if m != ".profiles.ini":
+				c.load(profiles_dir + m)
+				var this_profile = c.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name")
+				if this_profile == desired_profile:
+					dir.copy(profiles_dir + m,cfg_file)
+					profile_is_current = true
+				c.clear()
+	if not profile_is_current:
+		c.clear()
+		c.set_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name",desired_profile)
+		c.save(cfg_file)
+	
+	var f = ManifestV2.__get_mod_data()
+	var mod_entries = f["mods"]
+	var configs = {}
 	var current_config = ConfigDriver.__config_parse(cfg_file)
 	for mod in mod_entries:
 		var manifest = mod_entries[mod]["manifest"]
@@ -53,11 +86,13 @@ static func load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
 								
 						_:
 							pass
-	var c = ConfigFile.new()
+	if not "profile_name" in current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",{}):
+		current_config["HevLib/HEVLIB_CONFIG_SECTION_DRIVERS"]["profile_name"] = "Default"
 	for section in current_config:
 		for key in current_config[section]:
 			c.set_value(section,key,current_config[section][key])
 	c.save(cfg_file)
+	c.save(profiles_dir + current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",{}).get("profile_name","Default") + ".cfg")
 	for mod in configs:
 		var data = ConfigDriver.__get_config(mod)
 		for section in configs[mod]:

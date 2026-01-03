@@ -393,3 +393,21 @@ HEVLIB_CONFIRM|Confirm Action
 HEVLIB_WIPE_STAT_ARE_YOU_SURE|Are you sure you want to wipe the stat %s?
 
 HEVLIB_NOSTEAM|This menu only works on Steam builds.
+
+HEVLIB_OPT_PROFILES|Settings Profiles
+
+HEVLIB_PROFILE_SELECT|Select Profile
+
+HEVLIB_ADD_PROFILE|Add profile
+
+HEVLIB_RENAME_PROFILE|Rename profile
+
+HEVLIB_DELETE_PROFILE|Delete profile
+
+HEVLIB_PROFILENAME_ADD|Add profile
+
+HEVLIB_PROFILENAME_RENAME|Rename profile
+
+HEVLIB_PROFILE_DELETE|Delete profile
+
+HEVLIB_PROFILE_DELETE_ARE_YOU_SURE|Are you sure you want to delete this profile?
