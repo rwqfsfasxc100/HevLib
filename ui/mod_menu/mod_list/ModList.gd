@@ -60,7 +60,7 @@ export var subroot_path = NodePath("")
 onready var subroot = get_node(subroot_path)
 
 func _restart():
-	OS.set_restart_on_exit(true,OS.get_cmdline_args())
+	Settings.restartGame()
 
 func _exit():
 	OS.kill(OS.get_process_id())
