@@ -13,27 +13,45 @@ func _ready():
 	add_child(timer)
 var focusObject
 func spawn_event(event,thering: Node):
+	if thering == null:
+		Debug.l("No ring object specified, returning")
+		return
 	ring = thering
 	focusObject = CurrentGame.getPlayerShip()
 	if focusObject.zone == "rings":
-		
+		var tree = ring.get_tree()
 		var event_node = ring.get_node_or_null(event)
 		if event_node and event_node.has_method("makeAt"):
 			var pos = getPos()
 			var oddity = event_node.makeAt(pos)
-			if oddity is Array:
-				for o in oddity:
+			if oddity:
+				if oddity is Array:
+					for o in oddity:
+						var groups = o.get_groups()
+						if "stations" in groups:
+							for c in tree.get_nodes_in_group("stations"):
+								if c.name == o.name:
+									Debug.l("Station already spawned")
+									Tool.remove(o)
+									return
+						if not event in ring.group:
+							ring.group[event] = []
+						ring.group[event].append(o)
+						ring.all_oddities.append(o)
+						ring.requestOdditySpawn(o)
+				else:
+					var groups = oddity.get_groups()
+					if "stations" in groups:
+						for c in tree.get_nodes_in_group("stations"):
+							if c.name == oddity.name:
+								Debug.l("Station already spawned")
+								Tool.remove(oddity)
+								return
 					if not event in ring.group:
 						ring.group[event] = []
-					ring.group[event].append(o)
-					ring.all_oddities.append(o)
-					ring.requestOdditySpawn(o)
-			else:
-				if not event in ring.group:
-					ring.group[event] = []
-				ring.group[event].append(oddity)
-				ring.all_oddities.append(oddity)
-				ring.requestOdditySpawn(oddity)
+					ring.group[event].append(oddity)
+					ring.all_oddities.append(oddity)
+					ring.requestOdditySpawn(oddity)
 		
 		
 		
