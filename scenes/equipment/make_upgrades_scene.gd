@@ -688,7 +688,8 @@ func make_upgrades_scene(is_onready: bool = true):
 	var ship_limitations = {}
 	var ship_limitation_string = ""
 	
-	var equipment_for_adding = {}
+	var equipment_for_adding = []
+#	var equipment_for_adding = {}
 	
 	for its in slots:
 		var nodes = its[0].get("EQUIPMENT_TAGS",{})
@@ -802,7 +803,8 @@ func make_upgrades_scene(is_onready: bool = true):
 		var ns = its[0].get("ADD_EQUIPMENT_ITEMS",[])
 		if ns.size() >= 1:
 			for m in ns:
-				equipment_for_adding.merge({m.get("system",""):m})
+#				equipment_for_adding.merge({m.get("system",""):m})
+				equipment_for_adding.append(m)
 	
 	var slots_full : Array = []
 	var slots_format : PoolStringArray = []
@@ -962,8 +964,9 @@ func make_upgrades_scene(is_onready: bool = true):
 					equipment_format.append(string)
 	for slot in all_slot_node_names:
 		if slot in slot_allowed_equipment.keys():
-			for equip in equipment_for_adding:
-				var item = equipment_for_adding[equip]
+#			for equip in equipment_for_adding:
+			for item in equipment_for_adding:
+#				var item = equipment_for_adding[equip]
 				var allowed_equipment = slot_allowed_equipment.get(slot,[]).duplicate(true)
 				var slot_type = ""
 				var alignment = ""
@@ -979,7 +982,8 @@ func make_upgrades_scene(is_onready: bool = true):
 					alignment = slots_for_adding_dict[slot].get("alignment","")
 					restriction = slots_for_adding_dict[slot].get("restriction","")
 					system_slot = slots_for_adding_dict[slot].get("system_slot","")
-				var does = confirm_equipment(equipment_for_adding[equip], slot_type, alignment, restriction, allowed_equipment)
+#				var does = confirm_equipment(equipment_for_adding[equip], slot_type, alignment, restriction, allowed_equipment)
+				var does = confirm_equipment(item, slot_type, alignment, restriction, allowed_equipment)
 				if does:
 					var string = Equipment.__make_equipment_for_scene(item, slot, system_slot)
 					if system_slot == "":
