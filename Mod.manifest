@@ -16,6 +16,7 @@ version_bugfix=11
 [tags]
 
 TAG_ALLOW_ACHIEVEMENTS={"type":"bool","value":true}
+TAG_ADD_TRANSIT_TIPS={"type":"array","value":["HEVLIB_TRANSIT_TIP_1","HEVLIB_TRANSIT_TIP_2","HEVLIB_TRANSIT_TIP_3","HEVLIB_TRANSIT_TIP_4","HEVLIB_TRANSIT_TIP_5","HEVLIB_TRANSIT_TIP_6","HEVLIB_TRANSIT_TIP_7","HEVLIB_TRANSIT_TIP_8","HEVLIB_TRANSIT_TIP_9","HEVLIB_TRANSIT_TIP_10"]}
 
 [links]
 
@@ -29,6 +30,7 @@ HEVLIB_BUGREPORTS={"URL":"https://forms.gle/RmC4Zgonp6frFgnK7"}
 [languages]
 
 en="100%"
+uk_UA="90%"
 
 [library]
 

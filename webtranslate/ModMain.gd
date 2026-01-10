@@ -13,7 +13,9 @@ const MOD_VERSION_METADATA = ""
 const MOD_IS_LIBRARY = true
 func _init(modLoader = ModLoader):
 	l("Initializing WebTranslate")
-	updateTL("res://HevLib/i18n/en.txt","|",false)
+	updateTL("res://HevLib/i18n/en.txt","|",false,false)
+	updateTL("res://HevLib/i18n/en_transit_tips.txt","|",false,false)
+	updateTL("res://HevLib/i18n/uk_UA.txt","|",false,false)
 var modPath:String = get_script().resource_path.get_base_dir() + "/"
 func _ready():
 	l("Readying")
@@ -96,6 +98,7 @@ func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, full
 	
 	var translationCount = 0
 	var csvLine := tlFile.get_line().split(delim)
+	
 	if fullLogging:
 		l("Adding translations as: %s" % csvLine)
 	for i in range(1, csvLine.size()):
@@ -105,10 +108,18 @@ func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, full
 	
 	while not tlFile.eof_reached():
 		csvLine = tlFile.get_csv_line(delim)
-	
-		if csvLine.size() > 1:
+		var size = csvLine.size()
+		if size > 1:
+			if size > 2:
+				var i = 0
+				while i < size:
+					if csvLine[i].ends_with("\\") and i < size:
+						csvLine[i] = csvLine[i] + delim + csvLine[i + 1]
+						csvLine.remove(i + 1)
+						size -= 1
+					i += 1
 			var translationID := csvLine[0]
-			for i in range(1, csvLine.size()):
+			for i in range(1, size):
 				translations[i - 1].add_message(translationID, csvLine[i].c_unescape())
 			if fullLogging:
 				l("Added translation: %s" % csvLine)
