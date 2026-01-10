@@ -96,25 +96,32 @@ func make_node_mods():
 			childNames.append(c.name)
 		if object in childNames:
 			continue
-		var properties = {}
+		var properties = []
 		var position_data = {}
 		node_parent_path = NodePath(obj_data.get("parent_node_path",get_path_to(self)))
-		for p in obj_data.get("properties",{}):
-			if p in properties:
-				pass
-			else:
-				properties.merge({p:obj_data["properties"][p]})
+		var obj_prop = obj_data.get("properties",[])
+		match typeof(obj_prop):
+			TYPE_ARRAY:
+				properties.append_array(obj_prop)
+			TYPE_DICTIONARY:
+				for p in obj_prop:
+					var dv = obj_prop[p].duplicate(true)
+					dv.merge({"property":p})
+					properties.append(dv)
 		for p in obj_data.get("position_data",{}):
 			if p in position_data:
 				pass
 			else:
 				position_data.merge({p:obj_data["position_data"][p]})
-		
-		for p in node_data.get("properties",{}):
-			if p in properties:
-				pass
-			else:
-				properties.merge({p:node_data["properties"][p]})
+		var node_prop = node_data.get("properties",{})
+		match typeof(node_prop):
+			TYPE_ARRAY:
+				properties.append_array(node_prop)
+			TYPE_DICTIONARY:
+				for p in node_prop:
+					var dv = node_prop[p].duplicate(true)
+					dv.merge({"property":p})
+					properties.append(dv)
 		for p in node_data.get("position_data",{}):
 			if p in position_data:
 				pass
@@ -172,28 +179,67 @@ func make_node_mods():
 					if nscale.size() >= 1:
 						new_scale = nscale[0]
 						node.set("scale",new_scale)
-		
-		for prop in properties:
-			var data = properties[prop]
-			var pointer = node
-			var split = prop.split("/")
-			if split.size() == 1:
-				if prop in pointer:
-					var setter = format_properties(data,data.get("method",""),prop,"",node)
-					pointer.set(prop,setter)
-					
-					
-			else:
-				var nprop = split[split.size() - 1]
-				var npath = str(prop.split(nprop)[0])
-				if npath.ends_with("/"):
-					npath = npath.rstrip("/")
-				pointer = pointer.get_node_or_null(npath)
-				if pointer == null:
-					continue
-				if nprop in pointer:
-					var setter = format_properties(data,data.get("method",""),nprop,npath,node)
-					pointer.set(nprop,setter)
+		match typeof(properties):
+			TYPE_ARRAY:
+				for data in properties:
+#					var data = properties[prop]
+					var prop = data.get("property",null)
+					if prop == null or typeof(prop) != TYPE_STRING:
+						continue
+					var pointer = node
+					var split = prop.split("/")
+					if split.size() == 1:
+						if prop in pointer:
+							var setter = format_properties(data,data.get("method",""),prop,"",node,node_parent_path)
+							if data.get("defer",false):
+								pointer.set_deferred(prop,setter)
+							else:
+								pointer.set(prop,setter)
+							
+							
+					else:
+						var nprop = split[split.size() - 1]
+						var npath = str(prop.split(nprop)[0])
+						if npath.ends_with("/"):
+							npath = npath.rstrip("/")
+						pointer = pointer.get_node_or_null(npath)
+						if pointer == null:
+							continue
+						if nprop in pointer:
+							var setter = format_properties(data,data.get("method",""),nprop,npath,node,node_parent_path)
+							if data.get("defer",false):
+								pointer.set_deferred(nprop,setter)
+							else:
+								pointer.set(nprop,setter)
+			
+			TYPE_DICTIONARY:
+				for prop in properties:
+					var data = properties[prop]
+					var pointer = node
+					var split = prop.split("/")
+					if split.size() == 1:
+						if prop in pointer:
+							var setter = format_properties(data,data.get("method",""),prop,"",node,node_parent_path)
+							if data.get("defer",false):
+								pointer.set_deferred(prop,setter)
+							else:
+								pointer.set(prop,setter)
+							
+							
+					else:
+						var nprop = split[split.size() - 1]
+						var npath = str(prop.split(nprop)[0])
+						if npath.ends_with("/"):
+							npath = npath.rstrip("/")
+						pointer = pointer.get_node_or_null(npath)
+						if pointer == null:
+							continue
+						if nprop in pointer:
+							var setter = format_properties(data,data.get("method",""),nprop,npath,node,node_parent_path)
+							if data.get("defer",false):
+								pointer.set_deferred(nprop,setter)
+							else:
+								pointer.set(nprop,setter)
 		
 		
 		
@@ -245,20 +291,25 @@ func nodeModify():
 
 #	if isPlayerControlled():
 #		CurrentGame.emit_signal("playerShipChanged")
-func format_properties(data,format,property,property_path,base_node):
+func format_properties(data,format,property,property_path,base_node,parent_path):
 	match format:
-		"arr2vec2arr":
-			return convert_arr_to_vec2arr(data.get("value",null))
-		"arr2vec2":
-			return convert_arr_to_vec2(data.get("value",null))
 		"copy":
-			return copy_property(data.get("node_path",""),data.get("property",property))
+			return copy_property(data.get("node_path",""),data.get("property",property),data.get("format",""))
 		"center_to_ship":
-			return center_to_ship(property_path,base_node,data.get("ignore_scaling",false))
+			return center_to_ship(property_path,base_node,data.get("ignore_scaling",false),parent_path)
 		"invert_scaling":
 			return invert_scaling(property_path,base_node)
 		_:
-			return data.get("value",null)
+			return format_data(data.get("value",null),format)
+
+func format_data(data, format):
+	match format:
+		"arr2vec2arr":
+			return convert_arr_to_vec2arr(data)
+		"arr2vec2":
+			return convert_arr_to_vec2(data)
+		_:
+			return data
 
 func convert_arr_to_vec2(array:Array) -> Vector2:
 	var new_scale = Vector2(0,0)
@@ -300,15 +351,18 @@ func convert_arr_to_vec2arr(array:Array) -> PoolVector2Array:
 #	breakpoint
 	return converted
 
-func copy_property(path: String,property: String):
+func copy_property(path: String,property: String,method: String = ""):
 	var node = self
+	var p = property.split("/")[property.split("/").size() - 1]
 	if path:
 		node = get_node_or_null(path)
-	if node and property in node:
-		return node.get(property)
+	if node and p in node:
+		var v = node.get(p)
+		var data = format_data(v, method)
+		return data
 	return
 
-func center_to_ship(property,base_node,ignore_scaling = false):
+func center_to_ship(property,base_node,ignore_scaling = false,parent_path = "."):
 	var node_to_get = property
 	if base_node.get_node_or_null(node_to_get) == null:
 		return
@@ -322,6 +376,16 @@ func center_to_ship(property,base_node,ignore_scaling = false):
 			pos.y = pos.y * (1/s.y)
 		true_position -= pos
 		positions.merge({"base_node":pos})
+	var parent = get_node(parent_path)
+	while parent != self and parent != null:
+		var pos = parent.position
+		if ignore_scaling and "scale" in parent:
+			var s = parent.scale
+			pos.x = pos.x * (1/s.x)
+			pos.y = pos.y * (1/s.y)
+		true_position -= pos
+		positions.merge({parent.name:pos})
+		parent = parent.get_parent()
 	var split = Array(node_to_get.split("/"))
 	var iterations = split.size()
 	while iterations >= 1:
