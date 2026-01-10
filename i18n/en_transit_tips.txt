@@ -20,10 +20,8 @@ HEVLIB_TRANSIT_TIP_9|Habitats will always pay at least a small premium over the 
 
 HEVLIB_TRANSIT_TIP_10|Using too many nanodrones catching worthless ores? Configure your geologist's filters to catch only what you want and save on drones too.
 
-HEVLIB_TRANSIT_TIP_11|
+HEVLIB_TRANSIT_TIP_11|Having problems with your mods? Submit a report on the site you obtained them from, or join the Discord for realtime support.
 
-HEVLIB_TRANSIT_TIP_12|
+HEVLIB_TRANSIT_TIP_12|Got a suggestion for a mod? Join the Discord and feel free to ask.
 
-HEVLIB_TRANSIT_TIP_13|
-
-HEVLIB_TRANSIT_TIP_14|Want to find more mods? Check out the mod list at 'https://delta-v.kodera.pl/index.php/Mod_List'
+HEVLIB_TRANSIT_TIP_13|Want to find more mods? Check out the entire collection at 'https://delta-v.kodera.pl/index.php/Mod_List'
