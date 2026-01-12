@@ -25,3 +25,11 @@ HEVLIB_TRANSIT_TIP_11|Having problems with your mods? Submit a report on the sit
 HEVLIB_TRANSIT_TIP_12|Got a suggestion for a mod? Join the Discord and feel free to ask.
 
 HEVLIB_TRANSIT_TIP_13|Want to find more mods? Check out the entire collection at 'https://delta-v.kodera.pl/index.php/Mod_List'
+
+HEVLIB_TRANSIT_TIP_14|Keep in mind that anything that can break apart rocks can also damage other ships by some means.
+
+HEVLIB_TRANSIT_TIP_15|Autonomous systems do work as intended, however you may need to be patient to let them work.
+
+HEVLIB_TRANSIT_TIP_16|Enjoying the mods you're using? Consider supporting their authors!
+
+HEVLIB_TRANSIT_TIP_17|Mods behaving slightly differently after an update? Check any recent changelogs or ask the author.

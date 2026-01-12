@@ -24,7 +24,7 @@ var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 #		var nnd = load("res://HevLib/ui/core_scripts/get_nodes_to_act_on.gd").new()
 #		var pnt = nnd.get_nodes_to_act_on(data, Vector2(1600,900))
 
-
+var file = File.new()
 const DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 const Translations = preload("res://HevLib/pointers/Translations.gd")
@@ -101,15 +101,34 @@ func _on_Button_pressed():
 #	var names = []
 #	for child in children:
 #		names.append(child.name)
-	var steamNode
-	for i in Achivements.get_children():
-		if i.has_method("updateLeaderboard"):
-			steamNode = i
-	if steamNode:
-		steamNode.keepBest = false
-		steamNode.updateLeaderboard("best_haul",31745318)
-		steamNode.updateLeaderboard("best_ore",31745318)
-		steamNode.keepBest = true
+#	var steamNode
+#	for i in Achivements.get_children():
+#		if i.has_method("updateLeaderboard"):
+#			steamNode = i
+#	if steamNode:
+#		steamNode.keepBest = false
+#		steamNode.updateLeaderboard("best_haul",31745318)
+#		steamNode.updateLeaderboard("best_ore",31745318)
+#		steamNode.keepBest = true
+	
+#	file.open_encrypted_with_pass("user://achievements.dv",File.READ,"b0ngadabonga")
+#	var ach = JSON.parse(file.get_as_text()).result
+#	file.close()
+#	file.open("user://achievements.txt",File.WRITE)
+#	file.store_string(JSON.print(ach,"\t"))
+#	file.close()
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	breakpoint
 
 var running = []
