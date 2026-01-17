@@ -40,6 +40,14 @@ var complementary = []
 var already_pressed = false
 
 func _pressed():
+	var has_update = false
+	var has_dep = false
+	var has_conf = false
+	var has_links = false
+	var has_bugreports = false
+	var has_settings = false
+	
+	
 	var manifestData = MOD_INFO["manifest"]["manifest_data"]
 	already_pressed = false
 	var mod_name = MOD_INFO["name"]
@@ -104,21 +112,23 @@ func _pressed():
 			information_nodes["info_bugreports_button"].visible = false
 			information_nodes["info_bugreports_button"].url = ""
 		else:
-			var has_bug_reports = false
+			
 			if "HEVLIB_BUGREPORTS" in links:
-				has_bug_reports = true
+				has_bugreports = true
 				information_nodes["info_bugreports_button"].visible = true
 				information_nodes["info_bugreports_button"].url = links["HEVLIB_BUGREPORTS"].get("URL","")
 			else:
 				information_nodes["info_bugreports_button"].visible = false
-			if link_size == 1 and has_bug_reports:
+			if link_size == 1 and has_bugreports:
 				information_nodes["info_links_button"].visible = false
 			else:
 				information_nodes["info_links_button"].visible = true
+				has_links = true
 		
 		if config_size == 0:
 			information_nodes["info_settings_button"].visible = false
 		else:
+			has_settings = true
 			information_nodes["info_settings_button"].visible = true
 			information_nodes["settings_menu"].SELECTED_MOD = mod_name
 			information_nodes["settings_menu"].SELECTED_MOD_ID = id
@@ -143,9 +153,7 @@ func _pressed():
 	var dependancy_data = JSON.parse(file.get_as_text()).result
 	file.close()
 	
-	var has_update = false
-	var has_dep = false
-	var has_conf = false
+	
 	
 	if id in update_data:
 		information_nodes["updates_button"].visible = true
@@ -176,11 +184,11 @@ func _pressed():
 		has_conf = true
 	else:
 		information_nodes["conflict_button"].visible = false
-	if information_nodes["info_links_button"].is_visible_in_tree():
+	if has_links:
 		information_nodes["info_desc"].focus_neighbour_top = NodePath("../LINKBOX/LINKS")
-	elif information_nodes["info_bugreports_button"].is_visible_in_tree():
+	elif has_bugreports:
 		information_nodes["info_desc"].focus_neighbour_top = NodePath("../LINKBOX/BUGREPORTS")
-	elif information_nodes["info_settings_button"].is_visible_in_tree():
+	elif has_settings:
 		information_nodes["info_desc"].focus_neighbour_top = NodePath("../Header/SETTINGS")
 	else:
 		information_nodes["info_desc"].focus_neighbour_top = NodePath("../../SPLIT/ListHeader/SearchBox/FILTER")
@@ -189,9 +197,9 @@ func _pressed():
 	
 	if has_update:
 		information_nodes["info_desc"].focus_neighbour_top = NodePath("../WarningButtons/UB")
-	if has_dep:
+	elif has_dep:
 		information_nodes["info_desc"].focus_neighbour_top = NodePath("../WarningButtons/DB")
-	if has_conf:
+	elif has_conf:
 		information_nodes["info_desc"].focus_neighbour_top = NodePath("../WarningButtons/CFB")
 	
 	

@@ -959,6 +959,7 @@ autowrap = true
 [node name="MMRestartDialog" parent="." instance=ExtResource( 19 )]
 
 [node name="ProfilesMenu" parent="." instance=ExtResource( 20 )]
+visible = false
 
 [connection signal="about_to_show" from="." to="." method="_about_to_show"]
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]

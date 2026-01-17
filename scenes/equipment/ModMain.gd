@@ -22,7 +22,7 @@ var _savedObjects := []
 # This function is executed before the majority of the game is loaded
 # Only the Tool and Debug AutoLoads are available
 # Script and scene replacements should be done here, before the originals are loaded
-var exhaust_cache_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/Exhaust_Cache"
+#var exhaust_cache_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/Exhaust_Cache"
 
 var upgrades_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn"
 var weaponslot_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot.tscn"
@@ -40,50 +40,55 @@ var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 func _init(modLoader = ModLoader):
 	l("Initializing Equipment Driver")
 	
+	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
+	var d = Directory.new()
+	if d.dir_exists("user://cache/.HevLib_Cache"):
+		FolderAccess.__recursive_delete("user://cache/.HevLib_Cache")
+	
 	var ml = MainLoop.new()
 	ml.set_script(load("res://HevLib/scripts/crash_handler.gd"))
 	_savedObjects.append(ml)
-	
-	
+
+
 	installScriptExtension("../../ui/ExtensionPopup.gd")
 	installScriptExtension("../scene_replacements/DLClist.gd")
 	replaceScene("../scene_replacements/DLClist.tscn","res://tools/DLClist.tscn")
-	
+
 	installScriptExtension("../better_title_screen/CurrentlyPlaying.gd")
 	var minerals = load("res://HevLib/scenes/minerals/make_mineral_scripting.gd")
 	minerals.make_mineral_scripting(false)
-	
+
 	var asteroids = ResourceLoader.load(asteroid_path)
 	asteroids.new()
 	asteroids.take_over_path("res://AsteroidSpawner.gd")
 	_savedObjects.append(asteroids)
-	
+
 	var cg = ResourceLoader.load(currentgame_path)
 	cg.new()
 	cg.take_over_path("res://CurrentGame.gd")
 	_savedObjects.append(cg)
-	
-	
+
+
 	# Adds in_hevlib_menu to the CurrentGame script and preventing controls while it's true
 	installScriptExtension("../../events/controls/CurrentGame.gd")
 	installScriptExtension("../../events/controls/ship-ctrl.gd")
-	
+
 #	installScriptExtension("check.gd")
 	installScriptExtension("../scene_replacements/blanks/MPU.gd")
 	installScriptExtension("../scene_replacements/blanks/Hud.gd")
 	installScriptExtension("../scene_replacements/ship-ctrl.gd")
-	
+
 	installScriptExtension("ThrusterSlot.gd")
 	installScriptExtension("UpgradeGroup.gd")
 	installScriptExtension("hardpoints/EquipmentItemTemplate.gd")
-	
+
 	installScriptExtension("../weaponslot/weapon_slot_handler.gd")
-	
+
 	installScriptExtension("ShipModificationDriver/InternalStorageMod.gd")
 	installScriptExtension("ShipModificationDriver/AddNodes.gd")
-	
+
 	installScriptExtension("../better_title_screen/SaveSlotButton.gd")
-	replaceScene("../better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
+#	replaceScene("../better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
 	
 #	Equipment.__make_upgrades_scene(false)
 #	var ws = load(weaponslot_path)
@@ -93,10 +98,7 @@ func _init(modLoader = ModLoader):
 var f = File.new()
 func _ready():
 	l("Readying")
-	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
-	var d = Directory.new()
-	if d.dir_exists(exhaust_cache_path):
-		FolderAccess.__recursive_delete(exhaust_cache_path)
+	
 	ConfigDriver.__load_configs()
 	var zip_ref_store = "user://cache/.HevLib_Cache/zip_ref_store.json"
 	f.open(zip_ref_store,File.WRITE)

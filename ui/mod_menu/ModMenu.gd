@@ -59,8 +59,10 @@ onready var restart_menu = $MMRestartDialog
 func _on_resize():
 	var size = Settings.getViewportSize()
 	rect_size = size
+	$ColorRect.rect_min_size = size
 	$ColorRect.rect_size = size
 	$base.rect_min_size = size - offset
+	$base.rect_size = size - offset
 	$base.rect_position = offset/2
 	
 	

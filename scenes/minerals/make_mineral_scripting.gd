@@ -197,7 +197,7 @@ static func handle_ore_scenes(mineral_data):
 	return content
 	
 
-const as_header = "extends \"res://AsteroidSpawner.gd\"\n\nfunc _init():\n\tobjectClass[objectClass.size()-1].merge({\n"
+const as_header = "extends \"res://AsteroidSpawner.gd\"\n\nfunc _ready():\n\tobjectClass[objectClass.size()-1].merge({\n"
 
 const folder_base = "user://cache/.HevLib_Cache/Minerals/mineral_store/%s-%s/"
 
@@ -230,7 +230,7 @@ static func make_asteroid_spawner_section(mineral : String,scenes : PoolStringAr
 
 
 const cg_header = "extends \"res://CurrentGame.gd\"\n\n"
-const ready_header = "func _init():\n"
+const ready_header = "func _ready():\n"
 const price_header = "\tmineralPrices.merge({\n"
 const color_header = "\tspecificMineralColors.merge({\n"
 const trace_header = "\ttraceMinerals.append_array([\n"
