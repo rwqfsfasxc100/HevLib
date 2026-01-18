@@ -230,7 +230,7 @@ static func make_asteroid_spawner_section(mineral : String,scenes : PoolStringAr
 
 
 const cg_header = "extends \"res://CurrentGame.gd\"\n\n"
-const ready_header = "func _ready():\n"
+const ready_header = "func _init():\n"
 const price_header = "\tmineralPrices.merge({\n"
 const color_header = "\tspecificMineralColors.merge({\n"
 const trace_header = "\ttraceMinerals.append_array([\n"
