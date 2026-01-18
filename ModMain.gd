@@ -200,7 +200,7 @@ func _ready():
 	var scene = load("res://HevLib/scenes/better_title_screen/TitleScreen.tscn")
 	
 #	replaceScene("scenes/equipment/Enceladus.tscn","res://enceladus/Enceladus.tscn")
-	
+	ManifestV2.__get_mod_versions(true)
 	var ncrew = ManifestV2.__get_manifest_entry("tags","TAG_HANDLE_EXTRA_CREW")
 	var count = 24
 	for mod in ncrew:

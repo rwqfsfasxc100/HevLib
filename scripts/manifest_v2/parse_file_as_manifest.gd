@@ -54,6 +54,7 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 				"conflicting_mod_ids":PoolStringArray([]),
 				"complementary_mod_ids":PoolStringArray([]),
 				"manifest_url":"", # EXAMPLE: https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest
+				"changelog_path":"", # This is relative to the ModMain.gd file. EXAMPLE: for a file at 'res://Example Mod/data/folder/changelogs.txt', you would put 'data/folder/changelogs.txt'
 			}
 		}
 		match manifest_version:
@@ -213,6 +214,7 @@ static func parse_file_as_manifest(file_path: String, format_to_manifest_version
 					dict_template["manifest_definitions"]["conflicting_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("conflicting_mod_ids",[]))
 					dict_template["manifest_definitions"]["complementary_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("complementary_mod_ids",[]))
 					dict_template["manifest_definitions"]["manifest_url"] = String(manifest_data["manifest_definitions"].get("manifest_url",""))
+					dict_template["manifest_definitions"]["changelog_path"] = String(manifest_data["manifest_definitions"].get("changelog_path",""))
 				
 				if "links" in manifest_data.keys():
 					var links = manifest_data["links"]

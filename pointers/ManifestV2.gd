@@ -92,6 +92,25 @@ var developer_hint = {
 		"Trims a formatted dictionary from __parse_file_as_manifest to only display values changed from the default",
 		"A notable exception is the language tag, which is provided regardless",
 		"tag_data -> dictionary from __parse_file_as_manifest to trim down. Must have been made with 'format_to_manifest_version' set to true"
+	],
+	"__have_mods_updated":[
+		"Checks all installed mods for a differing mod version against the previous runtime",
+		"Returns a dictionary containing relevant information for each mod ID that runs a differing version to equivalents contained in the file",
+		"Works only on mods with a valid manifest using MV2.0 or newer",
+		"Will always trigger for new installs",
+		"File and folder paths can be changed, but only if you intend on using your own version checking system. See '__get_mod_versions'",
+		"folder -> (optional) string for the folder containing the version cache file. Defaults to 'user://cache/.Mod_Menu_2_Cache/changelogs/'",
+		"previous_file -> (optional) string for the file name containing the version cache data from the previous game session. Defaults to 'mods_from_last_launch.json'",
+		"this_file -> (optional) string for the file name containing the version cache data from the current game session. Defaults to 'mods_from_this_launch.json'",
+	],
+	"__get_mod_versions":[
+		"Returns version info on all installed mods running MV2.0 or newer.",
+		"Intended to be used in tandem with __have_mods_updated, as this function is used to write the file it reads from.",
+		"Unless you plan on writing your own implementation, store should be left false.",
+		"store -> (optional) bool for whether it should store the cache to file, dictated by the following folder and file variables. Defaults to false",
+		"folder -> (optional) string for the folder containing the version cache file. Defaults to 'user://cache/.Mod_Menu_2_Cache/changelogs/'",
+		"previous_file -> (optional) string for the file name containing the version cache data from the previous game session. Defaults to 'mods_from_last_launch.json'",
+		"this_file -> (optional) string for the file name containing the version cache data from the current game session. Defaults to 'mods_from_this_launch.json'",
 	]
 }
 const gmd = preload("res://HevLib/scripts/manifest_v2/get_mod_data.gd")
@@ -173,4 +192,12 @@ static func __check_mod_conflicts(mod_id) -> Array:
 const pt = preload("res://HevLib/scripts/manifest_v2/parse_tags.gd")
 static func __parse_tags(tag_data) -> Dictionary:
 	var s = pt.parse_tags(tag_data)
+	return s
+const hmu = preload("res://HevLib/scripts/manifest_v2/have_mods_updated.gd")
+static func __have_mods_updated(folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",previous_file = "mods_from_last_launch.json",this_file = "mods_from_this_launch.json"):
+	var s = hmu.have_mods_updated(folder,previous_file,this_file)
+	return s
+const gmv = preload("res://HevLib/scripts/manifest_v2/get_mod_versions.gd")
+static func __get_mod_versions(store = false,folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",previous_file = "mods_from_last_launch.json",this_file = "mods_from_this_launch.json"):
+	var s = gmv.get_mod_versions(store,folder,previous_file,this_file)
 	return s
