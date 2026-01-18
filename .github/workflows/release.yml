@@ -1,0 +1,116 @@
+name: Manual Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      force_update:
+        description: 'Update existing release?'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read Manifest Version
+        id: manifest
+        run: |
+          MAJOR=$(grep -oP 'version_major=\K\d+' Mod.manifest)
+          MINOR=$(grep -oP 'version_minor=\K\d+' Mod.manifest)
+          BUGFIX=$(grep -oP 'version_bugfix=\K\d+' Mod.manifest)
+          
+          if [ -z "$MAJOR" ] || [ -z "$MINOR" ] || [ -z "$BUGFIX" ]; then
+             echo "::error::Could not parse version components from Mod.manifest!"
+             exit 1
+          fi
+
+          MOD_VERSION="${MAJOR}.${MINOR}.${BUGFIX}"
+
+          echo "Detected Version: $MOD_VERSION"
+          echo "version=$MOD_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Check for Existing Tags
+        id: check_tags
+        run: |
+          VERSION=${{ steps.manifest.outputs.version }}
+          FORCE=${{ inputs.force_update }}
+          
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+            if [ "$FORCE" == "true" ]; then
+              echo "Tag v$VERSION exists, but 'Force Update' is ON. Proceeding..."
+            else
+              echo "::error::Tag v$VERSION already exists! Enable 'Force Update' to overwrite."
+              exit 1
+            fi
+            
+          elif git rev-parse "$VERSION" >/dev/null 2>&1; then
+             if [ "$FORCE" == "true" ]; then
+              echo "Tag $VERSION (legacy) exists, but 'Force Update' is ON. Proceeding..."
+            else
+              echo "::error::Tag $VERSION already exists! Enable 'Force Update' to overwrite."
+              exit 1
+            fi
+          fi
+
+      - name: Prepare Zip
+        run: |
+          REPO_NAME="${{ github.event.repository.name }}"
+          mkdir -p build/"$REPO_NAME"
+          
+          rsync -av . build/"$REPO_NAME" \
+            --exclude '.git*' \
+            --exclude '.github' \
+            --exclude 'build' \
+            --exclude '*.zip'
+          
+          if [ ! -f "build/$REPO_NAME/Mod.manifest" ]; then
+            echo "::error::Mod.manifest is missing from the build folder! Rsync failed."
+            exit 1
+          fi
+
+          cd build
+          zip -r ../"$REPO_NAME.zip" "$REPO_NAME"
+
+      - name: Create or Update Tag
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          
+          VERSION=v${{ steps.manifest.outputs.version }}
+          FORCE=${{ inputs.force_update }}
+
+          if [ "$FORCE" == "true" ]; then
+            git tag -f $VERSION
+            git push -f origin $VERSION
+          else
+            git tag $VERSION
+            git push origin $VERSION
+          fi
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.event.repository.name }}-build
+          path: ${{ github.event.repository.name }}.zip
+          retention-days: 5
+
+      - name: Create or Update Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ steps.manifest.outputs.version }}
+          name: v${{ steps.manifest.outputs.version }}
+          artifacts: ${{ github.event.repository.name }}.zip
+          allowUpdates: ${{ inputs.force_update }}
+          removeArtifacts: true
+          draft: ${{ inputs.force_update == false }}
+          generateReleaseNotes: ${{ inputs.force_update == false }}
+          makeLatest: true
