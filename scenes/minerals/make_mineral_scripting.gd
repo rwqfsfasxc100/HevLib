@@ -246,7 +246,8 @@ static func handle_mineral_values_and_colors(mineral_data):
 		var mname = mineral["name"]
 		var price = mineral["price"]
 		var color = mineral["color"]
-		prices.merge({mname:price})
+		if price > 0.0:
+			prices.merge({mname:price})
 		colors.merge({mname:color})
 		traces.append(mname)
 	var price_text = price_header
