@@ -44,11 +44,11 @@ jobs:
           VERSION=${{ steps.manifest.outputs.version }}
           FORCE=${{ inputs.force_update }}
           
-          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+          if git rev-parse "$VERSION" >/dev/null 2>&1; then
             if [ "$FORCE" == "true" ]; then
-              echo "Tag v$VERSION exists, but 'Force Update' is ON. Proceeding..."
+              echo "Tag $VERSION exists, but 'Force Update' is ON. Proceeding..."
             else
-              echo "::error::Tag v$VERSION already exists! Enable 'Force Update' to overwrite."
+              echo "::error::Tag $VERSION already exists! Enable 'Force Update' to overwrite."
               exit 1
             fi
             
@@ -85,7 +85,7 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           
-          VERSION=v${{ steps.manifest.outputs.version }}
+          VERSION=${{ steps.manifest.outputs.version }}
           FORCE=${{ inputs.force_update }}
 
           if [ "$FORCE" == "true" ]; then
@@ -106,8 +106,8 @@ jobs:
       - name: Create or Update Release
         uses: ncipollo/release-action@v1
         with:
-          tag: v${{ steps.manifest.outputs.version }}
-          name: v${{ steps.manifest.outputs.version }}
+          tag: ${{ steps.manifest.outputs.version }}
+          name: ${{ steps.manifest.outputs.version }}
           artifacts: ${{ github.event.repository.name }}.zip
           allowUpdates: ${{ inputs.force_update }}
           removeArtifacts: true
