@@ -18,11 +18,25 @@ var registered_text = "TEMPLATE"
 
 onready var popup_container = get_parent().get_parent()
 
+#var can_draw
+
+#func _ready():
+#	yield(get_tree(),"idle_frame")
+#	var screen = get_viewport().size
+#
+#	var size = $NoMargins.rect_size
+#
+#	var x = (screen.x - size.x)/2
+#	var y = (screen.y - size.y)/2
+#	var pos = Vector2(x,y)
+##	breakpoint
+#	$NoMargins.rect_position = pos - self.rect_position
+
 func _process(delta):
 	var screen = get_viewport().size
-	
+
 	var size = $NoMargins.rect_size
-	
+
 	var x = (screen.x - size.x)/2
 	var y = (screen.y - size.y)/2
 	var pos = Vector2(x,y)

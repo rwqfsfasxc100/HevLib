@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=1]
+[ext_resource path="res://HevLib/ui/mod_menu/updates/MMRestartDialog.gd" type="Script" id=2]
 
 [node name="MMRestartDialog" type="Popup"]
 margin_left = 390.0
@@ -10,6 +11,7 @@ margin_bottom = 510.0
 rect_min_size = Vector2( 500, 300 )
 theme = ExtResource( 1 )
 popup_exclusive = true
+script = ExtResource( 2 )
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 margin_right = 10.0
@@ -79,3 +81,7 @@ alignment = 1
 margin_right = 354.0
 margin_bottom = 42.0
 text = "HEVLIB_MODMENU_CLOSE"
+
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/Restart/Button" to="." method="_restart"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/Exit/Button" to="." method="_exit"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/Cancel/Button" to="." method="restart_cancel"]

@@ -84,7 +84,7 @@ func _ready():
 	var mod_data = ManifestV2.__get_mod_data(true,true)
 	var md = ManifestV2.__get_mod_data()
 	
-	
+	replaceScene("scenes/better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
 	
 	
 	for item in md["mods"]:
@@ -123,8 +123,8 @@ func _ready():
 	
 	var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
 #	replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
-	if OS.has_feature("editor"):
-		replaceScene("scenes/scene_replacements/TitleScreen.tscn", "res://TitleScreen.tscn")
+#	if OS.has_feature("editor"):
+#		replaceScene("scenes/scene_replacements/TitleScreen.tscn", "res://TitleScreen.tscn")
 #	var mouse = load("res://HevLib/scenes/scene_replacements/MouseLayer.tscn").instance()
 	var CRoot = get_tree().get_root()
 #	CRoot.call_deferred("add_child",mouse)
