@@ -209,3 +209,4 @@ HEVLIB_CONFIG_SECTION_INPUT={
 
 manifest_version=2.2
 manifest_url="https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest"
+changelog_path="changelog.txt"

@@ -111,6 +111,12 @@ var developer_hint = {
 		"folder -> (optional) string for the folder containing the version cache file. Defaults to 'user://cache/.Mod_Menu_2_Cache/changelogs/'",
 		"previous_file -> (optional) string for the file name containing the version cache data from the previous game session. Defaults to 'mods_from_last_launch.json'",
 		"this_file -> (optional) string for the file name containing the version cache data from the current game session. Defaults to 'mods_from_this_launch.json'",
+	],
+	"__parse_changelog":[
+		"Reads and converts a formatted changelog file to a dictionary usable by this library",
+		"Changelogs are ini-formatted, with the version number [MUST be major.minor.bugfix], and each entry incrementing by one (e.g. 1=\"\",2=\"\", etc.).",
+		"Subsections are done similarly, with an appended .x against it's parent increment with x meaning it's index (e.g. 1.1, 1.2, etc.) This can be done up to a fourth depth (1.1.1.1), nothing past will be parsed.",
+		"file_path -> absolute file path for the changelog file."
 	]
 }
 const gmd = preload("res://HevLib/scripts/manifest_v2/get_mod_data.gd")
@@ -200,4 +206,8 @@ static func __have_mods_updated(folder = "user://cache/.Mod_Menu_2_Cache/changel
 const gmv = preload("res://HevLib/scripts/manifest_v2/get_mod_versions.gd")
 static func __get_mod_versions(store = false,folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",previous_file = "mods_from_last_launch.json",this_file = "mods_from_this_launch.json"):
 	var s = gmv.get_mod_versions(store,folder,previous_file,this_file)
+	return s
+const pc = preload("res://HevLib/scripts/manifest_v2/parse_changelogs.gd")
+static func __parse_changelog(file_path):
+	var s = pc.parse_changelogs(file_path)
 	return s

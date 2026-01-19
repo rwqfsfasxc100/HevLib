@@ -21,7 +21,7 @@ static func have_mods_updated(folder: String,last_seen_file: String,this_file:St
 			var manifest = data["manifest"]["manifest_data"]
 			var info = manifest["mod_information"]
 			var version = manifest["version"]
-			mods[info["id"]] = {"name":info["name"],"version":{"major":version["version_major"],"minor":version["version_minor"],"bugfix":version["version_bugfix"]},"path":data["node"].get_script().get_path()}
+			mods[info["id"]] = {"name":info["name"],"version":{"major":version["version_major"],"minor":version["version_minor"],"bugfix":version["version_bugfix"]},"path":data["node"].get_script().get_path(),"changelog":manifest["manifest_definitions"]["changelog_path"]}
 	var last = {}
 	if file.file_exists(folder + last_seen_file):
 		file.open(folder + last_seen_file,File.READ)

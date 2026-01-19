@@ -30,6 +30,8 @@ var information_nodes = {}
 
 var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 
+var file = File.new()
+
 onready var all_tags = ManifestV2.__get_tags()
 
 
@@ -132,11 +134,27 @@ func _pressed():
 			information_nodes["info_settings_button"].visible = true
 			information_nodes["settings_menu"].SELECTED_MOD = mod_name
 			information_nodes["settings_menu"].SELECTED_MOD_ID = id
+		var changelog = manifestData["manifest_definitions"]["changelog_path"]
+		if changelog != "":
+			var path = MOD_INFO["node"].get_script().get_path()
+			var modpath = path.split(path.split("/")[path.split("/").size() - 1])[0]
+			var c = modpath + changelog
+			if file.file_exists(c):
+				information_nodes["info_changelog_button"].visible = true
+				information_nodes["changelog_menu"].update_this(c)
+			else:
+				information_nodes["info_changelog_button"].visible = false
+				information_nodes["changelog_menu"].clear()
+		else:
+			information_nodes["info_changelog_button"].visible = false
+			information_nodes["changelog_menu"].clear()
 		
 	else:
 		information_nodes["info_settings_button"].visible = false
 		information_nodes["info_links_button"].visible = false
 		information_nodes["info_bugreports_button"].visible = false
+		information_nodes["info_changelog_button"].visible = false
+		information_nodes["changelog_menu"].clear()
 	if already_pressed:
 		if get_child_count() >= 2:
 			for i in range(1,get_child_count()):
@@ -504,7 +522,6 @@ func _process(_delta):
 	var btnResize = Vector2($BaseModBox.rect_size.x - $BaseModBox/ModButton.rect_position.x,$BaseModBox.rect_size.y)
 	$BaseModBox/ModButton.rect_size = btnResize
 	button_box.rect_size.x = button.rect_size.x - 4
-var file = File.new()
 
 func _visibility_changed():
 	MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)

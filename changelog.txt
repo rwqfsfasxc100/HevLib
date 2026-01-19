@@ -1,0 +1,351 @@
+[1.11.2]
+
+1="* Updated ManifestV2.2 to include a new changelog_path entry in the manifest_definitions section."
+1.1="* This is used to point to a changelog file, relative to the mod's ModMain.gd file."
+1.2="* For example: a file at 'res://Example Mod/data/folder/changelogs.txt', you would put 'data/folder/changelogs.txt'"
+1.3="* All formatting has examples found within this mod's changelog.txt file"
+2="* Adjusted way minerals are added through this library"
+2.1="* Now are properly aware of other mods adding minerals. If another mod adds a mineral of the same name, then it is skipped during processing for the particular stage (pricing, colour, or adding to the ring)"
+2.2="* No longer attempts to add minerals to the ring when setting a price of 0.0, bringing it in line with not appearing in the mineral market"
+2.3="* Added logging to potentially help debug issues"
+3="* Added multi-mineral functionality"
+3.1="* This is an improved version of the equivalent feature from Za'krin's MoreMinerals mod"
+3.2="* Disabled by default to keep the impression of no gameplay changed when used as a PnP utility"
+
+[1.11.1]
+
+1="* Fixed crash caused by the last release"
+
+[1.11.0]
+
+1="* Fixed issues with certain Mod Menu 2 buttons being inaccessible with a keyboard or controller. They should now have the intended buttons set as the focus for directional buttons."
+2="* Reduced the spaghetti code that is Mod Menu 2's restart after update system. The restart button should now restart the game properly this time around."
+3="* Fixed missing background for the clear Steam leaderboards menu, which should no longer be completely transparent."
+4="* For developers: Removed test button clutter, as I've deferred these to my own private test mod, so launching through Godot should be a little closer to release builds."
+5="* Rearranged load order for some specific interactions that prevented vanilla translation strings from being overridden"
+6="* Minerals added through ADD_MINERALS.gd now no longer let you sell or trade a mineral if the price is set to 0.0."
+6.1="* This lets you register minerals without having them appear in the mineral market or end dive screen, e.g. carbon in vanilla."
+7="* Updated the ManifestV2.gd pointer:"
+7.1="* Added __have_mods_updated which returns a dictionary of mods that have had their version number changed since last launch (inclusive for either direction)"
+7.2="* Added __get_mod_versions which returns a dictionary of mods containing data surrounding their version. Only works on mods with a manifest using MV2.0 or newer due to technical limitations."
+
+[1.10.12]
+
+1="* Added transit tips. 13 are added via this mod already, but more can be added via setting the TAG_ADD_TRANSIT_TIPS tag in the manifest."
+2="* Fixed Ukranian translations not being loaded"
+
+[1.10.11]
+
+1="* When modifying properties of a node with NODE_DEFINITIONS.gd or SHIP_NODE_REGISTER.gd, you are now able to use an array of dictionaries instead of a dictionary. The string used to define the property, and if on a child node, node path is set with the property entry, given there is no longer a key that defines the data."
+2="* Modifying properties of a node with NODE_DEFINITIONS.gd or SHIP_NODE_REGISTER.gd can now be defered to the next idle frame by adding a "defer":true entry. This is false by default"
+
+[1.10.10]
+1="* Fixed issue causing equipment to not be processed if two or more entries used the same system name"
+
+[1.10.9]
+1="* Fixed crash when force spawning and event, and the creator returned null."
+2="* Force spawning stations no longer spawns two stations at once. As a result, you can no longer have multiple of any specific station in the vicinity at all."
+
+[1.10.8]
+
+1="* Fixed restart game button not restarting the game after updates on some release builds"
+
+[1.10.7]
+
+1="* Added support for new config profiles"
+
+[1.10.6]
+
+1="* Added Ukrainian translations (Thanks @1-WT-1)"
+
+[1.10.5]
+
+1="* Fixed user://cfg/ folder not being created"
+
+[1.10.4]
+
+1="* Fixed modded hardpoint equipment and thrusters from being positioned at the bottom of OMS system lists, looking out of place away from similar slots"
+
+[1.10.3]
+
+1="* fix for crash caused by repairing equipment too quickly"
+
+[1.10.2]
+
+1="* Added menu that lets you wipe specific Steam stats back to 0. For obvious reasons, only works on Steam releases."
+
+[1.10.1]
+
+1="* Fixed issue with ships losing their configuration upon initialization, and causing a crash when observed"
+2="* Config menus will now properly focus on the first option when opened for the first time"
+
+[1.10.0]
+
+1="* Added procedural thruster handling, allowing thrusters to be added without the need to deal with load order"
+2="* Addition of auxiliary power units is now more efficiently processed"
+3="* Aux units now require an additional variable to be added"
+4="* Aux unit code is used to handle thrusters, so the same driver file can be used interchangeably"
+4.1="* New aliases for this file have also been added: THRUSTERS.gd and AUX_POWER_AND_THRUSTERS.gd"
+5="* Fixed issue with consumable storages procuring space out of thin air randomly"
+6="* Fixed memory leak caused by modded auxiliary power units"
+7="* Geologist filter scroll bars now no longer require minerals to be added through the library to appear"
+7.1="* This is to allow for equipment with long names to work at all times"
+8="* Added SHIP_THRUSTER_COLORS.gd driver."
+8.1="* This allows you to customise a ship's thrusters and override it's flare color, letting you choose a specific color to match the ship."
+
+[1.9.13]
+
+1="* Changed the way that slots can be added or removed from specific vessels through the use of a new prevent_ships array, replacing the invert_limit_logic boolean."
+2="* Using ShipModificationDriver, you can now add ammunition, nanodrones, propellant or mass based on the amount currently added to the ship. consumables (mass driver ammo, nanodrone components and propellant) will take into account other sources of additional consumable into the percentage, while mass takes only the base ship mass into account"
+3="* ShipModificationDriver can now be used to add EMP shielding to a ship."
+4="* Nanodrones, like mass driver ammo, are now limited to the output of the nanodrone storage. This will rarely ever be reached, even with modded drone mounts (like those from NTCED), so likely will never be an actual issue, however you can still turn this off if so desired."
+5="* Added toggle to disable the current players text on Steam clients"
+6="* Added modified ConversationPlayer script to allow events to be spawned alongside dialogue, however this is purely to be used in custom dialogue scenes as no dialogue helper scripts are planned for anytime soon unless desired by other modders"
+7="* Added optional parent_node_path property for nodes being added to ships via SHIP_NODE_REGISTER.gd. This allows you to specify a path to a node to act as the added node's parent. If the path is invalid or not provided, resorts to default behaviour of having the ship node act as the parent."
+8="* Added new driver to ShipModificationDriver: SHIP_NODE_MODIFY.gd"
+8.1="* This is used to modify the properties of a node contained within a ship, including other nodes added via ShipModificationDriver"
+9="* Improved reliability of nodes being added to ships"
+
+[1.9.12]
+
+1="* Added translation support for the Android face pack"
+2="* Fixed drone launcher positioning on titans"
+3="* Fixed __fetch_folder_files providing incorrect file paths when using returnFullPath"
+4="* Added globalizePath option to __fetch_folder_files, providing a globalized path when using returnFullPath"
+5="* Fixed extension selection menu being locked to a 1280x720px window when another mod modifies the title screen"
+6="* Fixed issues with mod menu scaling"
+
+[1.9.11]
+
+1="* Equipment added via this library now accepts damage property. This fixes a large range of issues that could happen, from the failure text not displaying properly all the way to pseudo-invincibility"
+2="* Increased tooltip opacity to make them considerably more readable"
+
+[1.9.10]
+
+1="* Fixed event debug menus not displaying when toggled in ring"
+2="* Added density value to event debug menus"
+3="* Now logs to several files relating to event spawns in the rings "
+3.1="* event_log.json - a full log for event spawns, including timestamps for spawns and despawns"
+3.2="* active_events.txt - a list of all active events"
+3.3="* latest_event.txt - the last event to enter the area"
+3.4="* All are stored in a folder at user://cache/.HevLib_Cache/Event_Driver/"
+4="* EquipmentDriver sourced equipment and slots can now be prevented from being added with a new "config" entry in the equipment or slot data"
+
+[1.9.9]
+
+1="* Fixed equipment having properties modified in the idle phase after the onready phase, preventing some equipment from using modifications which are only seen during said onready phase."
+2="* Fixed crash caused when a vanilla WeaponSlot subnode attempted to be modified."
+3="* Improved Events.gd.__spawn_event event spawning method to use the same methods that the game uses to spawn an event oddity, rather than hijacking the force event spawner."
+3.1="* This change is reflected across the EventSpawner event menu as well."
+
+[1.9.8]
+
+1="* Fixed crash caused by returning to Enceladus in release builds"
+2="* Adjusted how ManifestV2.__match_mod_path_to_zip functions, it's data is now fetched and cached during the start of the onready phase, which this function is now used to fetch and find the provided mod's result from the cache."
+3="* Pointer-based functions will now no longer spam the engine logs when using --verbose"
+4="* Reworked WeaponSlotDriver to fix hardpoint equipment not installing correctly on some vessels"
+
+[1.9.7]
+
+1="* Fixed mass not working for MODIFY_INTERNALS.gd"
+2="* Added 3 new options for MODIFY_INTERNALS.gd:"
+2.1="* mass_per_crew - increases the mass of the equipment for every crew slot that the ship can fit. This dynamically changes when modifying crew numbers"
+2.2="* mass_per_processed_tonne - adds mass based on how much processed capacity the ship has, at a ratio of x kg per tonne of processed storage capacity. Will take into account amorphic holds, and multiply by 6 accordingly"
+2.3="* mass_per_tonne_total_storage_added - adds mass based on how much storage is added by the equipment, based on the values of storage_flat, storage_ammo, storage_nanodrones, storage_propellant, storage_multi_upper, and storage_multi_lower at a ratio of x kg per tonne of storage added. This also works conversely, where any decrease in storage will also decrease mass."
+3="* Allowed more values to allow negative integer or float inputs to remove storage or capacity, as well as more checks to ensure a resulting property won't end up negative where it would normally result in a crash otherwise."
+
+[1.9.6]
+
+1="* The astrogation marker colour selector now shrinks down and allows you to scroll when another mod adds new mineral types."
+2="* The geologist menu toggles now has a scrollbar when the number of minerals added would cause the display to vanish past the edge of the panel."
+3="* Changed the way aux units are fitted to ships via AuxPowerDriver. This should stop random occurrences where a ship would fly out without a modded aux unit installed, if one were applied in the equipment menu."
+4="* ManifestV2.2 inputs now accept joy buttons and sticks. Do note that there is no current visual for axis direction due to it using vanilla icons, however the displayed sign in the button select window will display it."
+5="* Input type config options now can be reset to default from menus"
+6="* Added 4 new input options for handling geologist menu scrolling, one for each horizontal direction and joystick on a standard controller"
+
+[1.9.5]
+
+1="* Fixed missing theme for the DLC list"
+
+[1.9.4]
+
+1="* Added options to display libraries in the DLC list mod section. Only displays the libraries with always_display set to true by default"
+2="* Added the ability to choose how the DLC list mod section, with the following options: alphabetical_ascending, alphabetical_descending, length_ascending, length_descending."
+
+[1.9.3]
+
+1="* Added DLC list to pause menus"
+2="* DLC list now displays mods installed, and makes a distinction between DLC and mods installed"
+3="* Added action type to the manifest config types, allowing you to make generic buttons that don't have a configuration attached"
+
+[1.9.2]
+
+1="* Fixed EventDriver creating the wrong config sections when entering the rings"
+2="* Added MineralDriver:"
+2.1="* Allows for an easy method of adding minerals to the game"
+2.2="* Supports pre-made ore chunk scenes as well as creating a procedural set of sprites out of existing game assets"
+2.3="* New config HEVLIB_CONFIG_SECTION_DRIVERS/randomize_minerals allows for the player to decide whether the seeding for minerals added by mods is random or predetermined"
+
+[1.9.1]
+
+1="* Fixed crash caused by change in config system"
+
+[1.9.0]
+
+1="* Added full support for the ConfigDriver.gd pointer."
+1.1="* __config_parse"
+1.1.1="* Reads an ini-formatted config file and parses it as a dictionary"
+1.1.2="* file - string for the file's path"
+1.2="* __store_config"
+1.2.1="* Parses a configuration dictionary (like one generated by __config_parse), and adds it's data to a config file."
+1.2.2="* id - string for the configuration's unique identifier. Best use is the mod manifest's name identifier, as this is what the manifest config parser uses. Will automatically strip spaces and forward slashes."
+1.2.3="* configuration - the dictionary used to store the config with. See __get_config"
+1.2.4="* cfg_filename - (optional) config file to save the data to. Defaults to Mod_Configurations.cfg"
+1.3="* __store_value"
+1.3.1="* Stores a singular value to a configuration file."
+1.3.2="* id - string for the configuration's unique identifier. Will automatically strip spaces and forward slashes."
+1.3.3="* section - string for the section name"
+1.3.4="* key - string for the entry key"
+1.3.5="* value - value to set the entry to"
+1.3.6="* cfg_filename - (optional) config file to save the data to. Defaults to Mod_Configurations.cfg"
+1.4="* __get_config"
+1.4.1="* Fetches a configuration dictionary from a config file"
+1.4.2="* id - string for the configuration's unique identifier. Will automatically strip spaces and forward slashes."
+1.4.3="* cfg_filename - (optional) config file to save the data to. Defaults to Mod_Configurations.cfg"
+1.5="* __get_value"
+1.5.1="* Fetches a value from a key within a config file."
+1.5.2="* id - string for the configuration's unique identifier. Will automatically strip spaces and forward slashes."
+1.5.3="* section - string for the section name"
+1.5.4="* key - string for the entry key"
+1.5.5="* cfg_filename - (optional) config file to save the data to. Defaults to Mod_Configurations.cfg"
+1.6="* __load_configs"
+1.6.1="* Loads manifest configs to a config file and registers inputs from those configs. This is a system function, so support will be minimal"
+1.6.2="* cfg_filename - (optional) config file to save the data to. Defaults to Mod_Configurations.cfg"
+2="* Added logging for any cases where the filesystem could not be reached"
+3="* Updated configs to use the new system"
+
+[1.8.7]
+
+1="* Added support for the MAD CERF HUD for custom hud slots"
+2="* Added script to ensure equipment and ship modifications made during the onready phase can now be loaded"
+
+[1.8.6]
+
+1="* WeaponSlotDriver now properly adds and modifies equipment again."
+2="* Added manifest_url to the manifest_definitions section of MV2.2"
+2.1="* Intended to provide a link to a text-only page containing an up-to-date mod.manifest file, for instance raw github content"
+2.1.1="* example for this mod: https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest"
+2.1.2="* This can be obtained by opening the file in github on a browser and clicking the raw button on the top right of the file's content"
+2.2="* This allows for any updater scripts to quickly determine the latest version of the mod, and allows the API calls to be significantly fewer than previous methods that could break after checking for only a couple of mods."
+
+[1.8.5]
+
+1="* updated crew expander to use the modern TAG_HANDLE_EXTRA_CREW tag name"
+2="* added __get_folder_structure to FolderAccess.gd"
+2.1="* Used as a recursive equivalent to __fetch_folder_files"
+2.2="* folder -> string used for the absolute path to the folder. Can be literal, res://, or user://"
+2.3="* store_file_content -> (optional) bool to decide whether to store a stringified version of each file's content. If set to false, each file entry is just a string containing 'FILE'"
+3="* Improved __get_vanilla_version to now fetch from predetermined sources. Now states that it is required to be run after the onready phase starts, however an optional get_from_files bool can be used in debug (editor-launched) builds."
+4="* EquipmentDriver now is run after the onready phase. This allows for version checked equipment to work as intended, as well as making it easier to log and keep compatibility with traditional upgrade additions"
+
+[1.8.4]
+
+1="* copy method for node property modification now no longer requires the property value to be set. if not defined, will look for the same property name as the one being copied to"
+2="* Added center_to_ship method for node property modification. This will attempt to change the node's position to Vector2(0,0) on the ship node by reversing the position properties of parent nodes. "
+2.1="* Optional ignore_scaling (bool) property will reposition the node to account for scaling to ensure that it's positioned at true 0,0 rather than a scaled 0,0. Use this before repositioning sub nodes if you're having problems moving them relative to the ship. Disabled by default"
+3="* Added invert_scaling method for node property modification. This will attempt to rescale the node to be at a 1,1 scale relative to the ship. Use this before modifying scale if you're having problems with a scale or position."
+
+[1.8.3]
+
+1="* Removed test main menu modifications"
+2="* Added recurse_to_variants to NODE_DEFINITIONS.gd"
+2.1="* Defaults to true"
+2.2="* If set to false, the node will not be added to a ship if referenced from the fallback / baseShipName variables, requiring every ship you desire it to be added on to have it as a defined node."
+3="* Added copy to NODE_DEFINITIONS.gd and SHIP_NODE_REGISTER.gd property methods"
+3.1="* Allows you to copy a property from a node relative to the ship-ctrl.gd script."
+3.2="* Instead of 'value' input, uses 'node_path' and 'property' to define inputs"
+3.2.1="* node_path - string to the node in relation to the ship-ctrl script (must be a valid path or else nothing will happen). Leaving this blank ('') will look for the property in the script itself"
+3.2.2="* property - string for the property to copy from the defined node. If it doesn't exist or is a different type to the variable being set, does nothing"
+4="* Modifying child nodes of defined nodes now works"
+5="* Fixed unset properties of internal modifiers overriding desired hold changes"
+
+[1.8.2]
+
+1="* Fixed WEAPONSLOT_SHIP_MODIFY.gd not being initiated"
+
+[1.8.1]
+
+1="* Internal modifications no longer register equipment in the damage dictionary"
+2="* Internal modifications now only apply to the player ship"
+3="* Fixed critical issue with crew. The ship now checks against the save state before considering crew removals"
+
+[1.8.0]
+
+1="* Added user_interface tag to ManifestV2.1"
+2="* Fixed manifest version info with __get_mod_data"
+3="* MAD Cheval now has the correct manual on non-vanilla slots"
+4="* Added __copy_file to FileAccess.gd and FolderAccess.gd pointers. This is a simplified function to allow for copying to global or local paths without issue"
+5="* Added __get_vanilla_version and __make_polygon_from_array to the DataFormat.gd pointer"
+6="* Added logging for EquipmentDriver version restrictions to help debug future issues with version-limited equipment"
+7="* Added optional restrict_hold_type variable to ADD_EQUIPMENT_SLOT.gd constants."
+7.1="* Allows for slots to be limited to only ships of a certain processed hold type."
+8="* Updated main manifest version to ManifestV2.2:"
+8.1="* This changes tags and links into a more dynamic structure to allow for custom tags to exist. Most from previous MV2 iterations should translate OK while on their respective manifest versions, however some depreciated tags won't function, and custom links are not supported at all."
+8.2="* language has been renamed to languages got split into it's own section, which allows you to define a language and it's completeness."
+8.3="* collect_legacy_values is now a completely depreciated feature during formatting to manifest version"
+8.4="* A new section (library has been added to act as a handler for all library-related information"
+8.5="* Tag and link identifiers are now the translation strings for each respective entry. The ones officially supported by the library are based on the tags and links provided in previous MV2 versions, and are as follows (in format of identifier and translation): "
+8.5.1="* Tags"
+8.5.1.1="* TAG_ALLOW_ACHIEVEMENTS : Allows Achievements"
+8.5.1.2="* TAG_QOL : Quality of Life"
+8.5.1.3="* TAG_USING_HEVLIB_RESEARCH : Using HevLib Research"
+8.5.1.4="* TAG_OVERHAUL : Overhaul"
+8.5.1.5="* TAG_VISUAL : Visual"
+8.5.1.6="* TAG_FUN : Fun"
+8.5.1.7="* TAG_UI : User Interface (UI)"
+8.5.1.8="* TAG_ADDS_SHIPS : Adds new ships"
+8.5.1.9="* TAG_ADDS_EQUIPMENT : Adds new equipment"
+8.5.1.10="* TAG_ADDS_GAMEPLAY_MECHANICS : Adds new gameplay mechanics"
+9.5.1.11="* TAG_ADDS_EVENTS : Adds new ring events"
+8.5.1.12="* TAG_HANDLE_EXTRA_CREW : Handles extra crew"
+8.5.2="* Links"
+8.5.2.1="* HEVLIB_GITHUB : GitHub Repository"
+8.5.2.2="* HEVLIB_DISCORD : Discord Thread"
+8.5.2.3="* HEVLIB_NEXUS : Nexusmods page"
+8.5.2.4="* HEVLIB_DONATIONS : Donate to the project"
+8.5.2.5="* HEVLIB_WIKI : Wiki"
+9="* WebTranslate now no longer automatically loads cached translations"
+10="* __make_upgrades_scene now no longer can set the scene save paths, and are now static variables within the function"
+10.1="* This is to make it easier for future use as more scenes are being saved"
+11="* Added AuxPowerDriver"
+11.1="* Can be used outright in it's own file (AUX_POWER_SLOT.gd), or via shorthands"
+11.2="* More info can be found on it's dedicated page"
+12="* Added ShipModificationDriver "
+12.1="* Allows for modifications to be made to ships programatically"
+12.2="* MODIFY_INTERNALS.gd - Allows for quick and easy modification of the internal systems (processed minerals, driver ammo, nanodrone storage, propellant, crew count and crew morale modifier) to be modified when specified equipment is installed."
+12.3="* NODE_DEFINITIONS.gd - Defines the paths to, default properties of, and any specifc ships to prevent the addition of, nodes to be added to ships"
+12.4="* SHIP_NODE_REGISTER.gd - Specifies the addition of nodes provided from NODE_DEFINITIONS to ships, as well as modifications to any properties and modify the ship to use for anything not specified on the vessel directly."
+
+[1.7.4]
+
+1="* Added missing language tags to several MV2 functions"
+2="* Added __get_tags, __get_mods_from_tag, __get_mods_and_tags_from_tag, __get_mod_tags, __get_manifest_section, __get_mod_ids, __get_manifest_entry, __check_complementary, __check_conflicts, __check_dependancies, __check_mod_complementary, __check_mod_conflicts, __check_mod_dependancies, and __parse_tags to the ManifestV2.gd pointer"
+3="* __translation_file_to_dictionary now can use a delimiter string again"
+4="* Updated generated docs"
+5="* Ensured ModMain no longer uses preloads to ensure incorrectly installed copies don't break sooner than the self check"
+6="* Fixed title screen drawing the selected button to the first slot every handful of seconds"
+7="* The handle_extra_crew manifest tag is now operational. Having it set above 24 will allow for the derelict dialogue to use as many crew for the selection."
+8="* Fixed __parse_file_as_manifest missing a language tag in certain conditions"
+9="* github value in MV2 is now a string as the release page can be inferred. The old dictionary format will be automatically converted."
+10="* Updated manifest with more links"
+
+[1.7.3]
+
+1="* Added support for the MAD Luciole 1.2 RCS and MAD Cheval 5.0 thrusters"
+2="* Improved efficiency of the title screen refresh & ensured that starting a new save operates properly"
+3="* Additional check made to ensure use of HARDPOINT slot type when using WEAPONSLOT_ADD shorthand in ADD_EQUIPMENT_ITEMS.gd"
+4="* Added __rotate_point to the DataFormat.gd"
+4.1="* Allows for a Vector2 point to be quickly rotated around the origin based on the provide angle"
+4.2="* point - The given point to rotate around the origin with"
+4.3="* angle - The desired angle that the point's new position should be rotated to. NOTE the provided point parameter is equivalent to a 0 angle"
+4.4="* degrees (optional) - Whether to have the input angle as degrees or radians. Set to true by default"

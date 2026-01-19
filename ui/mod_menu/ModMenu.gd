@@ -20,7 +20,9 @@ func _about_to_show():
 	
 func _unhandled_input(event):
 	if visible and Input.is_action_just_pressed("ui_cancel"):
-		if $URLPopup.visible:
+		if $WAIT.visible:
+			Debug.l("Currently downloading a mod update for %s, not closing wait window.")
+		elif $URLPopup.visible:
 			$URLPopup.cancel()
 		elif $FilterPopup.visible:
 			$FilterPopup.cancel()
@@ -34,8 +36,8 @@ func _unhandled_input(event):
 			$UpdateDialog.hide()
 		elif $ProfilesMenu.visible:
 			$ProfilesMenu.hide()
-		elif $WAIT.visible:
-			Debug.l("Currently downloading a mod update for %s, not closing wait window.")
+		elif $MMChangelogMenu.visible:
+			$MMChangelogMenu.hide()
 		else:
 			cancel()
 		get_tree().set_input_as_handled()

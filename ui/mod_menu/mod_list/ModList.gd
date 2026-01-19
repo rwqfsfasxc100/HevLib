@@ -18,6 +18,7 @@ export var info_desc_author = NodePath("")
 export var info_desc_credits = NodePath("")
 export var info_links_button = NodePath("")
 export var info_bugreports_button = NodePath("")
+export var info_changelog_button = NodePath("")
 
 export var count_label_path = NodePath("")
 onready var count_label = get_node(count_label_path)
@@ -28,6 +29,8 @@ export var links_menu_path = NodePath("")
 onready var links_menu = get_node(links_menu_path)
 export var settings_menu_path = NodePath("")
 onready var settings_menu = get_node(settings_menu_path)
+export var changelogs_menu_path = NodePath("")
+onready var changelogs_menu = get_node(changelogs_menu_path)
 
 onready var listContainer = $ScrollContainer/VBoxContainer
 
@@ -87,10 +90,12 @@ func _ready():
 		"info_desc_credits":get_node(info_desc_credits),
 		"info_links_button":get_node(info_links_button),
 		"info_bugreports_button":get_node(info_bugreports_button),
+		"info_changelog_button":get_node(info_changelog_button),
 		"count_label_path":get_node(count_label_path),
 		"filter_btn_path":get_node(filter_btn_path),
 		"links_menu_path":get_node(links_menu_path),
 		"settings_menu":get_node(settings_menu_path),
+		"changelog_menu":get_node(changelogs_menu_path),
 		"conflict_button":get_node(conflict_button_path),
 		"dependancies_button":get_node(dependancies_button_path),
 		"updates_button":get_node(updates_button_path),
@@ -198,6 +203,7 @@ func _process(_delta):
 			get_node(info_settings_button).visible = false
 			get_node(info_links_button).visible = false
 			get_node(info_bugreports_button).visible = false
+			get_node(info_changelog_button).visible = false
 			aligned_zero_focus = true
 	else:
 		if aligned_zero_focus:
@@ -226,6 +232,7 @@ func _process(_delta):
 				get_node(info_settings_button).visible = true
 				get_node(info_links_button).visible = true
 				get_node(info_bugreports_button).visible = true
+				get_node(info_changelog_button).visible = true
 			
 			aligned_zero_focus = false
 
