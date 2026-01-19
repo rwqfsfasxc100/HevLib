@@ -134,7 +134,7 @@ func _pressed():
 			information_nodes["info_settings_button"].visible = true
 			information_nodes["settings_menu"].SELECTED_MOD = mod_name
 			information_nodes["settings_menu"].SELECTED_MOD_ID = id
-		var changelog = manifestData["manifest_definitions"]["changelog_path"]
+		var changelog = manifestData["manifest_definitions"].get("changelog_path","")
 		if changelog != "":
 			var path = MOD_INFO["node"].get_script().get_path()
 			var modpath = path.split(path.split("/")[path.split("/").size() - 1])[0]
