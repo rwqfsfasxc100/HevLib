@@ -48,8 +48,16 @@ func _init(modLoader = ModLoader):
 	var ml = MainLoop.new()
 	ml.set_script(load("res://HevLib/scripts/crash_handler.gd"))
 	_savedObjects.append(ml)
-
-
+	
+	
+	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk"):
+		installScriptExtension("../minerals/multiminerals/mineral.gd")
+		installScriptExtension("../minerals/multiminerals/MineralProcessingUnit.gd")
+		installScriptExtension("../minerals/multiminerals/AsteroidSpawner.gd")
+		replaceScene("../minerals/multiminerals/AsteroidField.tscn","res://AsteroidField.tscn")
+	
+	
+	
 	installScriptExtension("../../ui/ExtensionPopup.gd")
 	installScriptExtension("../scene_replacements/DLClist.gd")
 	replaceScene("../scene_replacements/DLClist.tscn","res://tools/DLClist.tscn")

@@ -112,6 +112,12 @@ HEVLIB_CONFIG_SECTION_DRIVERS={
 		"type":"bool",
 		"default":true
 	},
+	"multiple_minerals_per_chunk":{
+		"name":"HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK",
+		"description":"HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK_TOOLTIP",
+		"type":"bool",
+		"default":false
+	},
 }
 HEVLIB_CONFIG_SECTION_DEBUG={
 	"input_debugger":{

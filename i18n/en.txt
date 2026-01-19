@@ -413,3 +413,7 @@ HEVLIB_PROFILE_DELETE|Delete profile
 HEVLIB_PROFILE_DELETE_ARE_YOU_SURE|Are you sure you want to delete this profile?
 
 HEVLIB_CHANGELOGS|Changelogs
+
+HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK|Multiple minerals per chunk
+
+HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK_TOOLTIP|Adds functionality that permits multiple ores to exist within the same ore chunk. \n\nCredit: Za'krin for the original implementation this adapts and improves from.

@@ -224,7 +224,7 @@ static func make_asteroid_spawner_section(mineral : String,scenes : PoolStringAr
 		return ""
 	var mh = "\n\t\"" + str(mineral) + "\":[\n"
 	for mineral in scenes:
-		mh = mh + "\t\tpreload(\"" + mineral + "\"),\n"
+		mh = mh + "\t\tload(\"" + mineral + "\"),\n"
 	mh = mh + "\t],\n"
 	return mh
 
