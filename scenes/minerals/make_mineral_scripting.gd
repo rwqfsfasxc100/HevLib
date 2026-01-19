@@ -158,46 +158,56 @@ static func make_mineral_scripting(is_onready = false):
 
 
 static func handle_ore_scenes(mineral_data):
-	var mineral_list = []
+	var mineral_list = {}
 	for mineral in mineral_data:
 		var mname = mineral["name"]
 		var handle = mineral.get("handle","none")
-		match handle:
-			"scenes":
-				var scenes = PoolStringArray([])
-				for i in range(0,7):
-					scenes.append(mineral.get("ore_%s" % (i + 1),""))
-				var item = make_asteroid_spawner_section(mname,scenes)
-				mineral_list.append(item)
-			"recolor":
-				var base = "fe"
-				var color = mineral.get("color",Color(1,1,1,1))
-				match mineral.get("base","fe").to_lower():
-					"fe","iron":
-						base = "fe"
-					"v","vanadium":
-						base = "v"
-					"be","beryllium":
-						base = "be"
-					"pd","palladium":
-						base = "pd"
-					"pt","platinum":
-						base = "pt"
-					"w","tungsten","wolfram":
-						base = "w"
-				var roc = make_custom_rocks(mname,color,base)
-				var rt = make_asteroid_spawner_section(mname,roc)
-				mineral_list.append(rt)
-			_:
-				pass
+		var price = mineral.get("price",0.0)
+		if price > 0.0:
+			match handle:
+				"scenes":
+					var scenes = PoolStringArray([])
+					for i in range(0,7):
+						scenes.append(mineral.get("ore_%s" % (i + 1),""))
+					var item = make_asteroid_spawner_section(mname,scenes)
+					mineral_list.merge({mname:item})
+					Debug.l("HevLib Mineral Manager: adding mineral %s using handler [scene]")
+				"recolor":
+					var base = "fe"
+					var color = mineral.get("color",Color(1,1,1,1))
+					match mineral.get("base","fe").to_lower():
+						"fe","iron":
+							base = "fe"
+						"v","vanadium":
+							base = "v"
+						"be","beryllium":
+							base = "be"
+						"pd","palladium":
+							base = "pd"
+						"pt","platinum":
+							base = "pt"
+						"w","tungsten","wolfram":
+							base = "w"
+					var roc = make_custom_rocks(mname,color,base)
+					var rt = make_asteroid_spawner_section(mname,roc)
+					mineral_list.merge({mname:rt})
+					Debug.l("HevLib Mineral Manager: adding mineral %s using handler [recolor]")
+				_:
+					
+					Debug.l("HevLib Mineral Manager: mineral %s using incorrect handler, set price to 0.0 or less to prevent being registered to exist in the ring or crashes may happen" % mineral)
+		else:
+			Debug.l("HevLib Mineral Manager: adding only color references for mineral %s, value set to zero or below" % mineral)
 	var content = as_header
 	for m in mineral_list:
-		content = content + m
-	content = content + "})"
+		content = content + dict_checker % [m,"objectClass[objectClass.size() - 1]","objectClass[objectClass.size() - 1]"] + mineral_list[m] + "})"
+#	content = content
 	return content
 	
 
-const as_header = "extends \"res://AsteroidSpawner.gd\"\n\nfunc _ready():\n\tobjectClass[objectClass.size()-1].merge({\n"
+const as_header = "extends \"res://AsteroidSpawner.gd\"\n\nfunc _init():\n\tpass"#\n\tobjectClass[objectClass.size()-1].merge({\n"
+
+const dict_checker = "\n\tif not \"%s\" in %s:\n\t\t%s.merge({"
+const arr_checker = "\n\tif not \"%s\" in %s:\n\t\t%s.append("
 
 const folder_base = "user://cache/.HevLib_Cache/Minerals/mineral_store/%s-%s/"
 
@@ -224,7 +234,7 @@ static func make_asteroid_spawner_section(mineral : String,scenes : PoolStringAr
 		return ""
 	var mh = "\n\t\"" + str(mineral) + "\":[\n"
 	for mineral in scenes:
-		mh = mh + "\t\tload(\"" + mineral + "\"),\n"
+		mh = mh + "\t\tpreload(\"" + mineral + "\"),\n"
 	mh = mh + "\t],\n"
 	return mh
 
@@ -248,20 +258,21 @@ static func handle_mineral_values_and_colors(mineral_data):
 		var color = mineral["color"]
 		if price > 0.0:
 			prices.merge({mname:price})
+			traces.append(mname)
 		colors.merge({mname:color})
-		traces.append(mname)
-	var price_text = price_header
+	var price_text = ""#price_header
 	for price in prices:
-		price_text = price_text + "\t\t\"" + str(price) + "\" : " + str(prices[price]) + ",\n"
-	price_text = price_text + general_footer
-	var color_text = color_header
+		price_text = price_text + dict_checker % [price,"mineralPrices","mineralPrices"] + "\"" + str(price) + "\" : " + str(prices[price]) + "})"
+#	price_text = price_text + general_footer
+	var color_text = ""#color_header
 	for color in colors:
-		color_text = color_text + "\t\t\"" + str(color) + "\" : Color(" + str(colors[color].r) + "," + str(colors[color].g) + "," + str(colors[color].b) + "," + str(colors[color].a) + "),\n"
-	color_text = color_text + general_footer
-	var trace_text = trace_header
+		color_text = color_text + dict_checker % [color,"specificMineralColors","specificMineralColors"] + "\"" + str(color) + "\" : Color(" + str(colors[color]) + ")})"
+#	color_text = color_text + general_footer
+	var trace_text = ""#trace_header
 	for trace in traces:
-		trace_text = trace_text + "\t\t\"" + str(trace) + "\",\n"
-	trace_text = trace_text + "\t])"
+#		trace_text = trace_text + "\t\t\"" + str(trace) + "\",\n"
+		trace_text = trace_text + arr_checker % [trace,"traceMinerals","traceMinerals"] + "\"" + str(trace) + "\")"
+#	trace_text = trace_text + "\t])"
 	collective_text = collective_text + "\n\n" + price_text + "\n\n" + color_text + "\n\n" + trace_text
 	return collective_text
 

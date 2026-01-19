@@ -54,7 +54,6 @@ func _init(modLoader = ModLoader):
 		installScriptExtension("../minerals/multiminerals/mineral.gd")
 		installScriptExtension("../minerals/multiminerals/MineralProcessingUnit.gd")
 		installScriptExtension("../minerals/multiminerals/AsteroidSpawner.gd")
-		replaceScene("../minerals/multiminerals/AsteroidField.tscn","res://AsteroidField.tscn")
 	
 	
 	
@@ -158,6 +157,7 @@ func _ready():
 #	replaceScene("Enceladus.tscn","res://enceladus/Enceladus.tscn")
 #	installScriptExtension("../scene_replacements/Shipyard.gd")
 
+	replaceScene("../minerals/multiminerals/AsteroidField.tscn","res://AsteroidField.tscn")
 	l("Ready")
 	
 func installScriptExtension(path:String):
