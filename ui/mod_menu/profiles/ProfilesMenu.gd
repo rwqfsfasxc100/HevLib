@@ -86,6 +86,8 @@ func show_menu():
 	popup_centered()
 
 func cancel():
+	$AnimateAppear.play("hider")
+func hider():
 	hide()
 	refocus()
 

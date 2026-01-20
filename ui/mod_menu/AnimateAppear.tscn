@@ -1,6 +1,36 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://HevLib/ui/mod_menu/AnimateAppear.gd" type="Script" id=1]
+
+[sub_resource type="Animation" id=3]
+resource_name = "hider"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.25, 0.5 ),
+"transitions": PoolRealArray( 4, 1, 14.9285 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ) ]
+}
+tracks/1/type = "method"
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0.25 ),
+"transitions": PoolRealArray( 1 ),
+"values": [ {
+"args": [  ],
+"method": "hider"
+} ]
+}
 
 [sub_resource type="Animation" id=1]
 resource_name = "show"
@@ -33,6 +63,9 @@ tracks/0/keys = {
 }
 
 [node name="AnimateAppear" type="AnimationPlayer"]
+anims/hider = SubResource( 3 )
 anims/show = SubResource( 1 )
 anims/show_flat = SubResource( 2 )
 script = ExtResource( 1 )
+mode = "flat"
+speed = 2.0

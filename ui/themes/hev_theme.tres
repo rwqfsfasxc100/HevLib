@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=43 format=2]
+[gd_resource type="Theme" load_steps=44 format=2]
 
 [ext_resource path="res://HevLib/ui/themes/font-verdana.tres" type="DynamicFont" id=1]
 [ext_resource path="res://HevLib/ui/themes/styles/focus_and_hover_flat.tres" type="StyleBox" id=2]
@@ -27,6 +27,7 @@
 [ext_resource path="res://HevLib/ui/themes/styles/scrollbar/scroll_vertical_flat.tres" type="StyleBox" id=25]
 [ext_resource path="res://HevLib/ui/themes/styles/slider/slider_vertical_flat.tres" type="StyleBox" id=26]
 [ext_resource path="res://HevLib/ui/themes/styles/tooltip/panel.tres" type="StyleBox" id=27]
+[ext_resource path="res://HevLib/ui/themes/styles/panel/panel_container_background_flat.tres" type="StyleBox" id=28]
 
 [sub_resource type="StreamTexture" id=13]
 flags = 4
@@ -169,6 +170,10 @@ OptionButton/styles/normal = ExtResource( 4 )
 OptionButton/styles/pressed = ExtResource( 5 )
 Panel/styles/panel = ExtResource( 18 )
 PanelContainer/styles/panel = ExtResource( 19 )
+PopupMenu/constants/vseparation = 2
+PopupMenu/fonts/font = ExtResource( 1 )
+PopupMenu/styles/panel = ExtResource( 28 )
+PopupMenu/styles/separator = ExtResource( 7 )
 ProgressBar/styles/bg = ExtResource( 20 )
 ProgressBar/styles/fg = ExtResource( 21 )
 RichTextLabel/constants/shadow_offset_x = 5

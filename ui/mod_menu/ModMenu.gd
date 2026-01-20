@@ -36,9 +36,9 @@ func _unhandled_input(event):
 		elif $UpdateDialog.visible:
 			$UpdateDialog.hide()
 		elif $ProfilesMenu.visible:
-			$ProfilesMenu.hide()
+			$ProfilesMenu.cancel()
 		elif $MMChangelogMenu.visible:
-			$MMChangelogMenu.hide()
+			$MMChangelogMenu.cancel()
 		else:
 			cancel()
 		get_tree().set_input_as_handled()
@@ -47,6 +47,9 @@ func show_menu():
 	popup()
 
 func cancel():
+	$AnimateAppear.play("hider")
+
+func hider():
 	hide()
 	refocus()
 

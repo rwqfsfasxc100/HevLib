@@ -148,7 +148,7 @@ tracks/0/keys = {
 }
 
 [node name="ModMenu" type="Popup"]
-modulate = Color( 1.00021, 1.00021, 1.00021, 1 )
+modulate = Color( 1.00309, 1.00309, 1.00309, 0.0123457 )
 mouse_filter = 2
 theme = ExtResource( 2 )
 popup_exclusive = true
@@ -801,6 +801,7 @@ theme = ExtResource( 2 )
 text = "HEVLIB_MODMENU_CLOSE"
 
 [node name="FilterPopup" type="Popup" parent="."]
+modulate = Color( 1.00309, 1.00309, 1.00309, 0.0123457 )
 margin_right = 40.0
 margin_bottom = 40.0
 script = ExtResource( 13 )
@@ -863,7 +864,10 @@ margin_bottom = 202.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
+[node name="AnimateAppear" parent="FilterPopup" instance=ExtResource( 22 )]
+
 [node name="URLPopup" type="Popup" parent="."]
+modulate = Color( 1.00309, 1.00309, 1.00309, 0.0123457 )
 margin_right = 40.0
 margin_bottom = 40.0
 size_flags_horizontal = 3
@@ -934,6 +938,8 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 columns = 2
 
+[node name="AnimateAppear" parent="URLPopup" instance=ExtResource( 22 )]
+
 [node name="ModSettingsMenu" parent="." instance=ExtResource( 18 )]
 
 [node name="ConflictMenu" type="AcceptDialog" parent="."]
@@ -993,13 +999,10 @@ autowrap = true
 [node name="MMRestartDialog" parent="." instance=ExtResource( 19 )]
 
 [node name="ProfilesMenu" parent="." instance=ExtResource( 20 )]
-visible = false
 
 [node name="MMChangelogMenu" parent="." instance=ExtResource( 21 )]
 
 [node name="AnimateAppear" parent="." instance=ExtResource( 22 )]
-mode = "flat"
-speed = 2.0
 
 [connection signal="about_to_show" from="." to="." method="_about_to_show"]
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]

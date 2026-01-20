@@ -1,13 +1,14 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://HevLib/ui/mod_menu/profiles/ProfilesMenu.gd" type="Script" id=1]
 [ext_resource path="res://HevLib/ui/themes/font-courierbold.tres" type="DynamicFont" id=2]
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=3]
 [ext_resource path="res://HevLib/ui/mod_menu/profiles/DeleteSure.gd" type="Script" id=4]
 [ext_resource path="res://HevLib/ui/mod_menu/profiles/NameInput.gd" type="Script" id=5]
+[ext_resource path="res://HevLib/ui/mod_menu/AnimateAppear.tscn" type="PackedScene" id=6]
 
 [node name="ProfilesMenu" type="Popup"]
-visible = true
+modulate = Color( 1.00309, 1.00309, 1.00309, 0.0123457 )
 margin_right = 650.0
 margin_bottom = 300.0
 rect_min_size = Vector2( 800, 300 )
@@ -218,6 +219,8 @@ margin_bottom = 33.0
 custom_fonts/font = ExtResource( 2 )
 text = "HEVLIB_MODMENU_CLOSE"
 
+[node name="AnimateAppear" parent="NameInput" instance=ExtResource( 6 )]
+
 [node name="DeleteSure" type="Popup" parent="."]
 visible = true
 margin_right = 500.0
@@ -286,6 +289,10 @@ margin_right = 250.0
 margin_bottom = 33.0
 custom_fonts/font = ExtResource( 2 )
 text = "HEVLIB_MODMENU_CLOSE"
+
+[node name="AnimateAppear" parent="DeleteSure" instance=ExtResource( 6 )]
+
+[node name="AnimateAppear" parent="." instance=ExtResource( 6 )]
 
 [connection signal="about_to_show" from="." to="." method="_about_to_show"]
 [connection signal="item_selected" from="PanelContainer/VBoxContainer/Main/VBoxContainer/ProfileSelections" to="." method="profile_select"]

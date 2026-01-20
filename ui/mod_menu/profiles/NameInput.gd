@@ -35,9 +35,11 @@ func show_menu(mode = "add"):
 	popup_centered()
 
 func cancel():
+	$AnimateAppear.play("hider")
+
+func hider():
 	hide()
 	refocus()
-
 var lastFocus = null
 func refocus():
 	if lastFocus and lastFocus.has_method("grab_focus"):

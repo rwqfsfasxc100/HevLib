@@ -34,6 +34,8 @@ func show_menu():
 	popup()
 
 func cancel():
+	$AnimateAppear.play("hider")
+func hider():
 	hide()
 	refocus()
 

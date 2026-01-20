@@ -1,8 +1,10 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://HevLib/ui/mod_menu/settings_menus/ModSettingsMenu.gd" type="Script" id=1]
+[ext_resource path="res://HevLib/ui/mod_menu/AnimateAppear.tscn" type="PackedScene" id=2]
 
 [node name="ModSettingsMenu" type="Popup"]
+modulate = Color( 1.00309, 1.00309, 1.00309, 0.0123457 )
 margin_right = 40.0
 margin_bottom = 40.0
 popup_exclusive = true
@@ -21,6 +23,8 @@ margin_bottom = 40.0
 [node name="TabContainer" type="TabContainer" parent="base"]
 margin_right = 40.0
 margin_bottom = 40.0
+
+[node name="AnimateAppear" parent="." instance=ExtResource( 2 )]
 
 [connection signal="about_to_show" from="." to="." method="_about_to_show"]
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]

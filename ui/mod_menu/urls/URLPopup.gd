@@ -43,6 +43,9 @@ func show_menu():
 #	$base/URLContainer.show()
 
 func cancel():
+	$AnimateAppear.play("hider")
+
+func hider():
 	hide()
 	refocus()
 
