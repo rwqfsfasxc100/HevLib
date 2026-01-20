@@ -72,7 +72,8 @@ func restart_cancel():
 	subroot.restart_menu.hide()
 
 func _ready():
-	
+	tween = Tween.new()
+	add_child(tween)
 	
 	var information_nodes = {
 		"mod_list":self,
@@ -158,6 +159,7 @@ func _ready():
 		button.name = info["name"]
 		button.ModContainer = get_parent()
 		button.information_nodes = information_nodes
+		button.modulate = Color(1,1,1,0)
 		listContainer.add_child(button)
 	var node = get_node("ScrollContainer/VBoxContainer")
 	var index = 1
@@ -356,3 +358,18 @@ func _downloaded_zip(file, filepath):
 	subroot.restart_menu.popup_centered()
 	FileAccess.__copy_file(filepath,modPathPrefix)
 	updates_button.visible = false
+var tween
+func _visibility_changed():
+	yield(get_tree(),"idle_frame")
+	var count = 0.03125
+	for child in listContainer.get_children():
+		if "MOD_INFO" in child:
+			tween.interpolate_property(child,"modulate",Color(1,1,1,0),Color(1,1,1,1),0.25,Tween.TRANS_LINEAR,Tween.EASE_IN,count)
+			tween.start()
+			count += 0.03125
+
+func hide_mods():
+	for child in listContainer.get_children():
+		if "MOD_INFO" in child:
+			child.modulate = Color(1,1,1,0)
+	

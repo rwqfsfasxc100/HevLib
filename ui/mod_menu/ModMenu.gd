@@ -17,6 +17,7 @@ func _about_to_show():
 	$base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList.about_to_show()
 	lastFocus = get_focus_owner()
 	_on_resize()
+	$base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList.hide_mods()
 	
 func _unhandled_input(event):
 	if visible and Input.is_action_just_pressed("ui_cancel"):

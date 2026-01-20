@@ -1,9 +1,11 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://HevLib/ui/mod_menu/settings_menus/generic_section_tab.gd" type="Script" id=1]
 [ext_resource path="res://enceladus/ScrollWithAnalog.gd" type="Script" id=2]
+[ext_resource path="res://HevLib/ui/mod_menu/AnimateAppear.tscn" type="PackedScene" id=3]
 
 [node name="generic_section_tab" type="Tabs"]
+modulate = Color( 1.00167, 1.00167, 1.00167, 1 )
 margin_right = 40.0
 margin_bottom = 24.0
 script = ExtResource( 1 )
@@ -39,5 +41,7 @@ margin_right = 182.0
 margin_bottom = 20.0
 rect_min_size = Vector2( 75, 0 )
 text = "HEVLIB_MODMENU_CLOSE"
+
+[node name="AnimateAppear" parent="." instance=ExtResource( 3 )]
 
 [connection signal="pressed" from="MarginContainer/VBoxContainer/HBoxContainer/CloseButton" to="." method="cancel"]

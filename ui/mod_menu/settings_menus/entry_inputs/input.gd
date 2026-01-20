@@ -83,7 +83,7 @@ func _draw():
 
 func refocus():
 	$Label/LABELBUTTON.rect_size = $Label.rect_size
-	get_tree().call_group("hevlib_settings_tab","recheck_availability")
+#	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 	
 	ConfigDriver.__set_button_focus(self,get_node("Label/LABELBUTTON"))
 	
@@ -92,3 +92,4 @@ func _visibility_changed():
 	if get_position_in_parent() == 0:
 		$Label/LABELBUTTON.grab_focus()
 	refocus()
+	

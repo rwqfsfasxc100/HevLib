@@ -23,6 +23,8 @@ func _ready():
 		tab.section_values = data[section]
 		tab.mod = mod
 		container.add_child(tab)
+		yield(get_tree(),"idle_frame")
+		pass
 	
 #func _process(_delta):
 func _draw():

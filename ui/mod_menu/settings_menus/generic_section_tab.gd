@@ -9,6 +9,7 @@ var mod = ""
 func _draw():
 	$MarginContainer.rect_size = rect_size
 	$MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer.rect_min_size = $MarginContainer.rect_size
+	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 
 func _ready():
 	for entry in section_info:
@@ -70,7 +71,8 @@ func _ready():
 				input.CONFIG_SECTION = name
 				input.CONFIG_MOD = mod
 				$MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer.add_child(input)
-	
+		
+		yield(get_tree(),"idle_frame")
 #	breakpoint
 
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=2]
+[gd_scene load_steps=21 format=2]
 
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=1]
 [ext_resource path="res://HevLib/ui/mod_menu/mod_list/ModBox.gd" type="Script" id=2]
@@ -147,6 +147,21 @@ load_path = "res://.import/jury-rig.png-2961033ba0d8d889260a2ea25a68d49e.stex"
 flags = 4
 load_path = "res://HevLib/ui/themes/icons/dropdown_arrow.stex"
 
+[sub_resource type="Animation" id=15]
+resource_name = "show"
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.3, 1 ),
+"transitions": PoolRealArray( 1, 0.25, 4 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1.5, 1.5, 1.5, 1 ), Color( 1, 1, 1, 1 ) ]
+}
+
 [node name="ModBox" type="VBoxContainer"]
 margin_right = 600.0
 margin_bottom = 100.0
@@ -156,6 +171,7 @@ theme = ExtResource( 1 )
 script = ExtResource( 2 )
 
 [node name="BaseModBox" type="HBoxContainer" parent="."]
+modulate = Color( 1.00021, 1.00021, 1.00021, 1 )
 margin_right = 600.0
 margin_bottom = 100.0
 rect_min_size = Vector2( 600, 100 )
@@ -312,6 +328,9 @@ autowrap = true
 max_lines_visible = 2
 
 [node name="PlaySoundsOnTheseButtons" parent="BaseModBox/ModButton" instance=ExtResource( 4 )]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="BaseModBox"]
+anims/show = SubResource( 15 )
 
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
 [connection signal="pressed" from="BaseModBox/ModButton" to="." method="_pressed"]

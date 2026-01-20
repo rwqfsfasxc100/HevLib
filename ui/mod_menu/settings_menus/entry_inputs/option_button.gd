@@ -106,7 +106,7 @@ func _draw():
 
 func refocus():
 	$button/Label/LABELBUTTON.rect_size = $button/Label.rect_size
-	get_tree().call_group("hevlib_settings_tab","recheck_availability")
+#	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 	
 	ConfigDriver.__set_button_focus(self,get_node("OptionButton"))
 	

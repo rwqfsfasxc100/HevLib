@@ -1,15 +1,17 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=1]
 [ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=2]
 [ext_resource path="res://HevLib/ui/mod_menu/settings_menus/entry_inputs/option_button.gd" type="Script" id=3]
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=4]
+[ext_resource path="res://HevLib/ui/mod_menu/AnimateAppear.tscn" type="PackedScene" id=5]
 
 [sub_resource type="StreamTexture" id=1]
 flags = 4
 load_path = "res://HevLib/ui/themes/icons/reset.stex"
 
 [node name="OPTIONBUTTONCONTAINER" type="HBoxContainer"]
+modulate = Color( 1.00167, 1.00167, 1.00167, 1 )
 margin_right = 40.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 300, 50 )
@@ -76,6 +78,8 @@ margin_bottom = 38.0
 focusAt = NodePath("../../..")
 
 [node name="PlaySoundsOnTheseButtons" parent="OptionButton/Label" instance=ExtResource( 2 )]
+
+[node name="AnimateAppear" parent="." instance=ExtResource( 5 )]
 
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
 [connection signal="pressed" from="button/reset" to="." method="_reset_pressed"]

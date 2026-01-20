@@ -86,12 +86,13 @@ func refocus():
 		slider.visible = false
 		SliderLabel.visible = false
 	ConfigDriver.__set_button_focus(self,get_node(style))
-	get_tree().call_group("hevlib_settings_tab","recheck_availability")
+#	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 	
 
 func _value_changed(value):
 	ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,value)
 	SliderLabel.text = str(value)
+	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 	refocus()
 
 
