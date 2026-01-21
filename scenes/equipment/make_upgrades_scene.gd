@@ -2,6 +2,7 @@ extends Node
 
 var SCENE_HEADER = "[gd_scene load_steps=4 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/unmodified/WeaponSlotUpgradeTemplate.tscn\" type=\"PackedScene\" id=2]\n[ext_resource path=\"res://enceladus/SystemShipUpgradeUI.tscn\" type=\"PackedScene\" id=3]\n\n[sub_resource type=\"ViewportTexture\" id=1]\nflags = 5\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain1/Viewport\")\n\n[sub_resource type=\"ViewportTexture\" id=2]\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain2/Control\")\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]\n\n[node name=\"TextureRect\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 2 )\n\n[node name=\"TextureRect2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 2 )"
 
+const DriverManagement = preload("res://HevLib/pointers/DriverManagement.gd")
 const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 var vanilla_equipment = preload("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd").get_script_constant_map()
 var vanilla_data = preload("res://HevLib/scenes/equipment/vanilla_defaults/slot_tagging.gd")
@@ -12,6 +13,7 @@ var slot_types
 var slot_defaults
 var vanilla_equipment_defaults_for_reference
 
+var file = File.new()
 func _init():
 	
 	hardpoint_types = vanilla_data.hardpoint_types.duplicate(true)
@@ -80,52 +82,10 @@ func make_upgrades_scene(is_onready: bool = true):
 	var nodes_parent = UpgradeMenu.get_node("VB/MarginContainer/ScrollContainer/MarginContainer/Items")
 	var vanilla_slot_names = []
 	var vanilla_slot_types = {}
-	var running_in_debugged = false
-	var debugged_defined_mods = []
+	
+	
 	FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/ship_data/")
-	var onready_mod_paths = []
-	var onready_mod_folders = []
-	
-	# Use when not loading from ready
-	if not is_onready:
-		var p = load("res://ModLoader.gd")
-		var ps = p.get_script_constant_map()
-		for item in ps:
-			if item == "is_debugged":
-				running_in_debugged = true
-				var pf = File.new()
-#				if pf.file_exists("res://ModLoader.gd"):
-#					l("Can see ModLoader.gd")
-#				else:
-#					l("Cannot see ModLoader.tscn")
-				pf.open("res://ModLoader.gd",File.READ)
-				var fs = pf.get_as_text(true)
-				pf.close()
-				var lines = fs.split("\n")
-				var reading = false
-				var contents = []
-				for line in lines:
 
-					if line.begins_with("var addedMods"):
-						reading = true
-					if reading:
-						var split = line.split("\"")
-						if split.size() > 1 and split.size() == 3:
-							if split[0].begins_with("#"):
-								contents.append(split[1])
-
-				debugged_defined_mods = contents.duplicate(true)
-	
-	
-	# Use when running on ready
-	if is_onready:
-		var mods = ModLoader.get_children()
-		for mod in mods:
-			var path = mod.get_script().get_path()
-			onready_mod_paths.append(path)
-			var split = path.split("/")
-			onready_mod_folders.append(split[2])
-	
 	
 	for slot in nodes_parent.get_children():
 		var children = slot.get_node("VBoxContainer").get_children()
@@ -150,7 +110,7 @@ func make_upgrades_scene(is_onready: bool = true):
 	
 	for item in FILE_PATHS:
 		FolderAccess.__check_folder_exists(item.split(item.split("/")[item.split("/").size() - 1])[0])
-	var wpfl = File.new()
+	
 	var ws_default_templates = load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
 	var ws_ship_templates = load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
 	var ws_ship_templates_2 = load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd").get_script_constant_map()
@@ -159,92 +119,70 @@ func make_upgrades_scene(is_onready: bool = true):
 	for item in ship_register:
 		register_default_ships.append(ship_register[item])
 	
-	wpfl.open(weaponslot_modify_templates_file,File.WRITE)
-	wpfl.store_string(JSON.print(ws_default_templates.get("TEMPLATES",{})))
-	wpfl.close()
-	wpfl.open(weaponslot_modify_standalone_file,File.WRITE)
-	wpfl.store_string("{}")
-	wpfl.close()
-	wpfl.open(weaponslot_ship_standalone_file,File.WRITE)
-	wpfl.store_string(JSON.print(ws_ship_templates.get("SHIP_MODIFY",{})))
-	wpfl.close()
-	wpfl.open(weaponslot_ship_templates_file,File.WRITE)
-	wpfl.store_string(JSON.print(ws_ship_templates_2.get("SHIP_TEMPLATES",{})))
-	wpfl.close()
-	wpfl.open(slot_order_cache_file,File.WRITE)
-	wpfl.store_string("[]")
-	wpfl.close()
-	wpfl.open(save_menu_file,File.WRITE)
-	wpfl.store_string("[]")
-	wpfl.close()
-	wpfl.open(processed_storage_file,File.WRITE)
-	wpfl.store_string("[]")
-	wpfl.close()
-	wpfl.open(node_definitions_file,File.WRITE)
-	wpfl.store_string("{}")
-	wpfl.close()
-	wpfl.open(ship_thruster_color_file,File.WRITE)
-	wpfl.store_string("{}")
-	wpfl.close()
-#	wpfl.open(exhaust_cache_file,File.WRITE)
-#	wpfl.store_string("{}")
-#	wpfl.close()
-	wpfl.open(auxslot_data_path,File.WRITE)
-	wpfl.store_string("{}")
-	wpfl.close()
-	wpfl.open(weaponslot_modify_equipment_names,File.WRITE)
-	wpfl.store_string("[]")
-	wpfl.close()
-	wpfl.open(ship_node_register_file,File.WRITE)
-	wpfl.store_string(JSON.print(register_default_ships))
-	wpfl.close()
-	wpfl.open(ship_node_modify_file,File.WRITE)
-	wpfl.store_string("{}")
-	wpfl.close()
-	wpfl.open(weaponslot_additions,File.WRITE)
-	wpfl.store_string("[]")
-	wpfl.close()
-	wpfl.open(weaponslot_modifications,File.WRITE)
-	wpfl.store_string("[]")
-	wpfl.close()
+	file.open(weaponslot_modify_templates_file,File.WRITE)
+	file.store_string(JSON.print(ws_default_templates.get("TEMPLATES",{})))
+	file.close()
+	file.open(weaponslot_modify_standalone_file,File.WRITE)
+	file.store_string("{}")
+	file.close()
+	file.open(weaponslot_ship_standalone_file,File.WRITE)
+	file.store_string(JSON.print(ws_ship_templates.get("SHIP_MODIFY",{})))
+	file.close()
+	file.open(weaponslot_ship_templates_file,File.WRITE)
+	file.store_string(JSON.print(ws_ship_templates_2.get("SHIP_TEMPLATES",{})))
+	file.close()
+	file.open(slot_order_cache_file,File.WRITE)
+	file.store_string("[]")
+	file.close()
+	file.open(save_menu_file,File.WRITE)
+	file.store_string("[]")
+	file.close()
+	file.open(processed_storage_file,File.WRITE)
+	file.store_string("[]")
+	file.close()
+	file.open(node_definitions_file,File.WRITE)
+	file.store_string("{}")
+	file.close()
+	file.open(ship_thruster_color_file,File.WRITE)
+	file.store_string("{}")
+	file.close()
+#	file.open(exhaust_cache_file,File.WRITE)
+#	file.store_string("{}")
+#	file.close()
+	file.open(auxslot_data_path,File.WRITE)
+	file.store_string("{}")
+	file.close()
+	file.open(weaponslot_modify_equipment_names,File.WRITE)
+	file.store_string("[]")
+	file.close()
+	file.open(ship_node_register_file,File.WRITE)
+	file.store_string(JSON.print(register_default_ships))
+	file.close()
+	file.open(ship_node_modify_file,File.WRITE)
+	file.store_string("{}")
+	file.close()
+	file.open(weaponslot_additions,File.WRITE)
+	file.store_string("[]")
+	file.close()
+	file.open(weaponslot_modifications,File.WRITE)
+	file.store_string("[]")
+	file.close()
 	
+	var drivers = DriverManagement.__get_drivers()
 	
-	for folder in folders:
-		var semi_root = folder.split("/")[2]
-		if semi_root.begins_with("."):
-			continue
-					
-		if folder.ends_with("/"):
-			var mods_to_avoid = []
-			if not is_onready:
-				if running_in_debugged:
-					for mod in debugged_defined_mods:
-						var home = mod.split("/")[2]
-						if home == semi_root:
-							mods_to_avoid.append(home)
-			var folder_2 = FolderAccess.__fetch_folder_files(folder, true, true)
-			for check in folder_2:
-				if not is_onready:
-					if semi_root in mods_to_avoid:
-						continue
-				else:
-					if not semi_root in onready_mod_folders:
-						continue
-				if check.ends_with("HEVLIB_EQUIPMENT_DRIVER_TAGS/"): # EQUIPMENTDRIVER FILES
-					var files = FolderAccess.__fetch_folder_files(check, false, true)
+	for cvh in drivers:
+					var check = cvh.get("mod_directory")
 					var mod = check.hash()
 					var dicti = {}
 					var dictr = {}
 					var OneOff = {}
-					for file in files:
-						var last_bit = file.split("/")[file.split("/").size() - 1]
+					for last_bit in cvh.get("drivers"):
+						var constants = cvh["drivers"][last_bit]
 						match last_bit:
 							"ADD_EQUIPMENT_ITEMS.gd":
-								var data = load(check + last_bit)
-								var constants = data.get_script_constant_map()
 								var arr2 = []
 								for item in constants:
-									var equipment = data.get(item).duplicate(true)
+									var equipment = constants.get(item).duplicate(true)
 									var allow = true
 									if "config" in equipment:
 										var cf = equipment["config"]
@@ -259,11 +197,9 @@ func make_upgrades_scene(is_onready: bool = true):
 										arr2.append(equipment)
 								dicti.merge({"ADD_EQUIPMENT_ITEMS":arr2})
 							"ADD_EQUIPMENT_SLOTS.gd":
-								var data = load(check + last_bit)
-								var constants = data.get_script_constant_map()
 								var arr2 = []
 								for item in constants:
-									var equipment = data.get(item).duplicate(true)
+									var equipment = constants.get(item).duplicate(true)
 									var allow = true
 									if "config" in equipment:
 										var cf = equipment["config"]
@@ -278,40 +214,31 @@ func make_upgrades_scene(is_onready: bool = true):
 										arr2.append(equipment)
 								dicti.merge({"ADD_EQUIPMENT_SLOTS":arr2})
 							"EQUIPMENT_TAGS.gd":
-								var data = load(check + last_bit)
-								var constants = data.get_script_constant_map()
 								var ar = constants.get("EQUIPMENT_TAGS",{}).duplicate(true)
 								dicti.merge({"EQUIPMENT_TAGS":ar})
 							"SLOT_ORDER.gd":
-								var f = File.new()
-#								if wpfl.file_exists(slot_order_cache_file):
-#									l("Can see %s" % slot_order_cache_file)
-#								else:
-#									l("Cannot see %s" % slot_order_cache_file)
-								f.open(slot_order_cache_file,File.READ_WRITE)
-								var data = JSON.parse(f.get_as_text()).result
-								var cache = load(check + last_bit).get_script_constant_map()
-								var orders = cache.get("SLOT_ORDER")
+								file.open(slot_order_cache_file,File.READ)
+								var data = JSON.parse(file.get_as_text()).result
+								file.close()
+								
+								var orders = constants.get("SLOT_ORDER")
 								for order in orders:
 									if order in data:
 										pass
 									else:
 										data.append(order)
-								f.store_string(JSON.print(data))
-								f.close()
+								file.open(slot_order_cache_file,File.WRITE)
+								file.store_string(JSON.print(data))
+								file.close()
 							"SLOT_TAGS.gd":
-								var data = load(check + last_bit)
-								var constants = data.get_script_constant_map()
 								var ar = constants.get("SLOT_TAGS",{}).duplicate(true)
 								dicti.merge({"SLOT_TAGS":ar})
 
 
 							"AUX_POWER_SLOT.gd","THRUSTERS.gd","AUX_POWER_AND_THRUSTERS.gd":
-								var data = load(check + last_bit)
-								var constants = data.get_script_constant_map()
 								var arr2 = []
 								for item in constants:
-									var equipment = data.get(item).duplicate(true)
+									var equipment = constants.get(item).duplicate(true)
 									arr2.append(equipment)
 								if "AUX_POWER_SLOT" in OneOff:
 									pass
@@ -321,50 +248,40 @@ func make_upgrades_scene(is_onready: bool = true):
 
 
 							"MODIFY_INTERNALS.gd":
-								var data = load(check + last_bit)
-								var constants = data.get_script_constant_map()
-#								if wpfl.file_exists(processed_storage_file):
-#									l("Can see %s" % processed_storage_file)
-#								else:
-#									l("Cannot see %s" % processed_storage_file)
-								wpfl.open(processed_storage_file,File.READ_WRITE)
-								var pfdata = JSON.parse(wpfl.get_as_text()).result
+								file.open(processed_storage_file,File.READ)
+								var pfdata = JSON.parse(file.get_as_text()).result
+								file.close()
 								if "MODIFY_INTERNALS" in constants:
 									var pdata = constants.MODIFY_INTERNALS
 									pfdata.append_array(pdata)
-									wpfl.store_string(JSON.print(pfdata))
-								wpfl.close()
+									
+									file.open(processed_storage_file,File.WRITE)
+									file.store_string(JSON.print(pfdata))
+								file.close()
 							"NODE_DEFINITIONS.gd":
-								var data = load(check + last_bit)
-								var constants = data.get_script_constant_map()
-#								if wpfl.file_exists(node_definitions_file):
-#									l("Can see %s" % node_definitions_file)
-#								else:
-#									l("Cannot see %s" % node_definitions_file)
-								wpfl.open(node_definitions_file,File.READ_WRITE)
-								var pfdata = JSON.parse(wpfl.get_as_text()).result
+								file.open(node_definitions_file,File.READ)
+								var pfdata = JSON.parse(file.get_as_text()).result
+								file.close()
 								for item in constants:
 									pfdata.merge({item:constants.get(item)})
-								wpfl.store_string(JSON.print(pfdata))
-								wpfl.close()
+									
+								file.open(node_definitions_file,File.WRITE)
+								file.store_string(JSON.print(pfdata))
+								file.close()
 							"SHIP_NODE_REGISTER.gd":
-								var data = load(check + last_bit)
-								var constants = data.get_script_constant_map()
-#								if wpfl.file_exists(ship_node_register_file):
-#									l("Can see %s" % ship_node_register_file)
-#								else:
-#									l("Cannot see %s" % ship_node_register_file)
-								wpfl.open(ship_node_register_file,File.READ_WRITE)
-								var pfdata = JSON.parse(wpfl.get_as_text()).result
+								file.open(ship_node_register_file,File.READ)
+								var pfdata = JSON.parse(file.get_as_text()).result
+								file.close()
 								for item in constants:
 									pfdata.append(constants.get(item))
-								wpfl.store_string(JSON.print(pfdata))
-								wpfl.close()
+									
+								file.open(ship_node_register_file,File.WRITE)
+								file.store_string(JSON.print(pfdata))
+								file.close()
 							"SHIP_NODE_MODIFY.gd":
-								var data = load(check + last_bit)
-								var constants = data.get_script_constant_map()
-								wpfl.open(ship_node_modify_file,File.READ_WRITE)
-								var pfdata = JSON.parse(wpfl.get_as_text()).result
+								file.open(ship_node_modify_file,File.READ)
+								var pfdata = JSON.parse(file.get_as_text()).result
+								file.close()
 								for item in constants:
 									var ship = constants[item].get("ship_name","")
 									if ship != "":
@@ -375,15 +292,16 @@ func make_upgrades_scene(is_onready: bool = true):
 										for modification in constants[item].get("modifications",[]):
 											
 											pfdata[ship].append(modification)
-								wpfl.store_string(JSON.print(pfdata))
-								wpfl.close()
+								
+								file.open(ship_node_modify_file,File.WRITE)
+								file.store_string(JSON.print(pfdata))
+								file.close()
 							"SHIP_THRUSTER_COLORS.gd":
-								var data = load(check + last_bit)
-								var cd = data.get_script_constant_map().get("SHIP_THRUSTER_COLORS",{})
+								var cd = constants.get("SHIP_THRUSTER_COLORS",{})
 								if cd.keys().size() > 0:
-									wpfl.open(ship_thruster_color_file,File.READ)
-									var current = JSON.parse(wpfl.get_as_text()).result
-									wpfl.close()
+									file.open(ship_thruster_color_file,File.READ)
+									var current = JSON.parse(file.get_as_text()).result
+									file.close()
 									for ship in cd:
 										if ship in current:
 											pass
@@ -396,19 +314,17 @@ func make_upgrades_scene(is_onready: bool = true):
 										if "recurse_to_variants" in cd[ship]:
 											current[ship]["recurse_to_variants"] = cd[ship]["recurse_to_variants"]
 										
-									wpfl.open(ship_thruster_color_file,File.WRITE)
-									wpfl.store_string(JSON.print(current))
-									wpfl.close()
+									file.open(ship_thruster_color_file,File.WRITE)
+									file.store_string(JSON.print(current))
+									file.close()
 									
 								
 								pass
 
 							"WEAPONSLOT_ADD.gd":
-								var data = load(check + last_bit)
-								var constants = data.get_script_constant_map()
 								var arr2 = []
 								for item in constants:
-									var equipment = data.get(item).duplicate(true)
+									var equipment = constants.get(item).duplicate(true)
 									var n = equipment.get("name",null)
 									if n:
 										if not n in ws_equipment_names:
@@ -416,16 +332,10 @@ func make_upgrades_scene(is_onready: bool = true):
 										arr2.append(equipment)
 								dictr.merge({"WEAPONSLOT_ADD":arr2})
 							"WEAPONSLOT_MODIFY_TEMPLATES.gd":
-								var data = load(check + last_bit)
-								var constants = data.get_script_constant_map()
 								var ar = constants.get("WEAPONSLOT_MODIFY_TEMPLATES",{}).duplicate(true)
-								var fi = File.new()
-#								if wpfl.file_exists(weaponslot_modify_templates_file):
-#									l("Can see %s" % weaponslot_modify_templates_file)
-#								else:
-#									l("Cannot see %s" % weaponslot_modify_templates_file)
-								fi.open(weaponslot_modify_templates_file,File.READ_WRITE)
-								var filedata = fi.get_as_text(true)
+								file.open(weaponslot_modify_templates_file,File.READ)
+								var filedata = file.get_as_text(true)
+								file.close()
 								var sort = JSON.parse(filedata)
 								var founddata : Dictionary = sort.result
 								for template in ar:
@@ -455,19 +365,14 @@ func make_upgrades_scene(is_onready: bool = true):
 									else:
 										founddata[template] = ar.get(template).duplicate(true)
 								
-								fi.store_string(JSON.print(founddata))
-								fi.close()
+								file.open(weaponslot_modify_templates_file,File.WRITE)
+								file.store_string(JSON.print(founddata))
+								file.close()
 							"WEAPONSLOT_MODIFY.gd":
-								var data = load(check + last_bit)
-								var constants = data.get_script_constant_map()
 								var ar = constants.get("WEAPONSLOT_MODIFY",{}).duplicate(true)
-								var fi = File.new()
-#								if wpfl.file_exists(weaponslot_modify_standalone_file):
-#									l("Can see %s" % weaponslot_modify_standalone_file)
-#								else:
-#									l("Cannot see %s" % weaponslot_modify_standalone_file)
-								fi.open(weaponslot_modify_standalone_file,File.READ_WRITE)
-								var filedata = fi.get_as_text(true)
+								file.open(weaponslot_modify_standalone_file,File.READ)
+								var filedata = file.get_as_text(true)
+								file.close()
 								var sort = JSON.parse(filedata)
 								var founddata : Dictionary = sort.result
 								for item in ar:
@@ -493,19 +398,15 @@ func make_upgrades_scene(is_onready: bool = true):
 										founddata.merge({item:processed},true)
 									else:
 										founddata.merge({item:ar.get(item)})
-								fi.store_string(JSON.print(founddata))
-								fi.close()
+								
+								file.open(weaponslot_modify_standalone_file,File.WRITE)
+								file.store_string(JSON.print(founddata))
+								file.close()
 							"WEAPONSLOT_SHIP_TEMPLATES.gd":
-								var data = load(check + last_bit)
-								var constants = data.get_script_constant_map()
 								var ar = constants.get("WEAPONSLOT_SHIP_TEMPLATES",{}).duplicate(true)
-								var fi = File.new()
-#								if wpfl.file_exists(weaponslot_ship_templates_file):
-#									l("Can see %s" % weaponslot_ship_templates_file)
-#								else:
-#									l("Cannot see %s" % weaponslot_ship_templates_file)
-								fi.open(weaponslot_ship_templates_file,File.READ_WRITE)
-								var filedata = fi.get_as_text(true)
+								file.open(weaponslot_ship_templates_file,File.READ)
+								var filedata = file.get_as_text(true)
+								file.close()
 								var sort = JSON.parse(filedata)
 								var founddata : Dictionary = sort.result
 								
@@ -536,19 +437,14 @@ func make_upgrades_scene(is_onready: bool = true):
 												founddata[ship][slot] = shipdata.get(slot).duplicate(true)
 									else:
 										founddata.merge(ar)
-								fi.store_string(JSON.print(founddata))
-								fi.close()
+								file.open(weaponslot_ship_templates_file,File.WRITE)
+								file.store_string(JSON.print(founddata))
+								file.close()
 							"WEAPONSLOT_SHIP_MODIFY.gd":
-								var data = load(check + last_bit)
-								var constants = data.get_script_constant_map()
 								var ar = constants.get("WEAPONSLOT_SHIP_MODIFY",{}).duplicate(true)
-								var fi = File.new()
-#								if wpfl.file_exists(weaponslot_ship_standalone_file):
-#									l("Can see %s" % weaponslot_ship_standalone_file)
-#								else:
-#									l("Cannot see %s" % weaponslot_ship_standalone_file)
-								fi.open(weaponslot_ship_standalone_file,File.READ_WRITE)
-								var filedata = fi.get_as_text(true)
+								file.open(weaponslot_ship_standalone_file,File.READ)
+								var filedata = file.get_as_text(true)
+								file.close()
 								var sort = JSON.parse(filedata)
 								var founddata : Dictionary = sort.result
 								
@@ -587,48 +483,35 @@ func make_upgrades_scene(is_onready: bool = true):
 												founddata[ship][slot] = shipdata.get(slot).duplicate(true)
 									else:
 										founddata.merge(ar)
-								fi.store_string(JSON.print(founddata))
-								fi.close()
-					var mname = check.split("/")[2]
-					if dicti.keys().size() >= 1:
-						data_state.append([dicti,check,mod,mname])
-					if dictr.keys().size() >= 1:
-						ws_state.append([dictr,check,mod,mname])
-					if OneOff.keys().size() >= 1:
-						power_state.append(OneOff)
-				if check.ends_with("HEVLIB_MENU/"): # MENUDRIVER FILES
-					var files = FolderAccess.__fetch_folder_files(check, false, true)
-					var mod = check.hash()
-					var dicti = {}
-					var dictr = {}
-					for file in files:
-						var last_bit = file.split("/")[file.split("/").size() - 1]
-						match last_bit:
+								file.open(weaponslot_ship_standalone_file,File.WRITE)
+								file.store_string(JSON.print(founddata))
+								file.close()
 							"SAVE_BUTTONS.gd":
-								var data = load(check + last_bit)
-								var constants = data.get_script_constant_map()
 								var ar = constants.get("SAVE_BUTTONS",[]).duplicate(true)
-								var fi = File.new()
-#								if wpfl.file_exists(save_menu_file):
-#									l("Can see %s" % save_menu_file)
-#								else:
-#									l("Cannot see %s" % save_menu_file)
-								fi.open(save_menu_file,File.READ_WRITE)
-								var filedata = fi.get_as_text(true)
+								file.open(save_menu_file,File.READ)
+								var filedata = file.get_as_text(true)
+								file.close()
 								var sort = JSON.parse(filedata)
 								var founddata = sort.result
 								
 								for button in ar:
 									founddata.append(button)
 								
-								fi.store_string(JSON.print(founddata))
-								fi.close()
-								
+								file.open(save_menu_file,File.WRITE)
+								file.store_string(JSON.print(founddata))
+								file.close()
+					var mname = check.split("/")[check.split("/").size() - 2]
+					if dicti.keys().size() >= 1:
+						data_state.append([dicti,check,mod,mname])
+					if dictr.keys().size() >= 1:
+						ws_state.append([dictr,check,mod,mname])
+					if OneOff.keys().size() >= 1:
+						power_state.append(OneOff)
 	var slots = data_state
 	
-	wpfl.open(weaponslot_modify_equipment_names,File.WRITE)
-	wpfl.store_string(JSON.print(ws_equipment_names))
-	wpfl.close()
+	file.open(weaponslot_modify_equipment_names,File.WRITE)
+	file.store_string(JSON.print(ws_equipment_names))
+	file.close()
 	
 	for item in slots:
 		var files = item[0]
@@ -1142,7 +1025,6 @@ func make_upgrades_scene(is_onready: bool = true):
 	
 	
 	var property = "%s = %s"
-	var file = File.new()
 	
 	file.open(weaponslot_additions,File.WRITE)
 	file.store_string(JSON.print(ws_stuff_to_add))
@@ -1158,8 +1040,9 @@ func make_upgrades_scene(is_onready: bool = true):
 			match type:
 				"AUX_POWER_SLOT","THRUSTERS","AUX_POWER_AND_THRUSTERS":
 					for data in mod.get(type):
-						file.open(auxslot_data_path,File.READ_WRITE)
+						file.open(auxslot_data_path,File.READ)
 						var a = JSON.parse(file.get_as_text()).result
+						file.close()
 						var equipSlots = data.get("slots",[])
 						for slot in equipSlots:
 							slot = slot.split(".")[0]
@@ -1168,6 +1051,8 @@ func make_upgrades_scene(is_onready: bool = true):
 							else:
 								a.merge({slot:[]})
 							a[slot].append(data)
+						
+						file.open(auxslot_data_path,File.WRITE)
 						file.store_string(JSON.print(a))
 						file.close()
 						var aux_path = data.get("path","")
@@ -1291,22 +1176,17 @@ func make_upgrades_scene(is_onready: bool = true):
 	if not ws_editable_paths == "":
 		weaponslot_string = weaponslot_string + "\n\n" + ws_editable_paths
 	
-	var f = File.new()
-#	f.open(exhaust_cache_file,File.WRITE)
-#	f.store_string(JSON.print(exhaust_state))
-#	f.close()
+	file.open(file_save_path,File.WRITE)
+	file.store_string(concat)
+	file.close()
 	
-	f.open(file_save_path,File.WRITE)
-	f.store_string(concat)
-	f.close()
+	file.open(auxslot_save_path,File.WRITE)
+	file.store_string(aux_power_string)
+	file.close()
 	
-	f.open(auxslot_save_path,File.WRITE)
-	f.store_string(aux_power_string)
-	f.close()
-	
-	f.open(upgrades_slot_limits,File.WRITE)
-	f.store_string(ship_limitation_string)
-	f.close()
+	file.open(upgrades_slot_limits,File.WRITE)
+	file.store_string(ship_limitation_string)
+	file.close()
 	
 	
 	UpgradeMenu.free()

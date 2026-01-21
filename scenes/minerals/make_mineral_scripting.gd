@@ -2,6 +2,7 @@ extends Node
 
 const DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 const FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+const DriverManagement = preload("res://HevLib/pointers/DriverManagement.gd")
 
 const custom_mineral_path = "user://cache/.HevLib_Cache/Minerals/mineral_store/"
 
@@ -33,119 +34,17 @@ static func make_mineral_scripting(is_onready = false):
 		var text = "HevLib Mineral Manager: observed game version of %s"  % str(version)
 		Debug.l(text)
 	
-	
-	var folders = FolderAccess.__fetch_folder_files("res://", true, true)
-	
-	
-	
-	
-	
-	var running_in_debugged = false
-	var debugged_defined_mods = []
-	var onready_mod_paths = []
-	var onready_mod_folders = []
-	
-	# Use when not loading from ready
-	if not is_onready:
-		var p = load("res://ModLoader.gd")
-		var ps = p.get_script_constant_map()
-		for item in ps:
-			if item == "is_debugged":
-				running_in_debugged = true
-				var pf = File.new()
-#				if pf.file_exists("res://ModLoader.gd"):
-#					l("Can see ModLoader.gd")
-#				else:
-#					l("Cannot see ModLoader.tscn")
-				pf.open("res://ModLoader.gd",File.READ)
-				var fs = pf.get_as_text(true)
-				pf.close()
-				var lines = fs.split("\n")
-				var reading = false
-				var contents = []
-				for line in lines:
-
-					if line.begins_with("var addedMods"):
-						reading = true
-					if reading:
-						var split = line.split("\"")
-						if split.size() > 1 and split.size() == 3:
-							if split[0].begins_with("#"):
-								contents.append(split[1])
-
-				debugged_defined_mods = contents.duplicate(true)
-	
-	
-	# Use when running on ready
-	if is_onready:
-		var mods = ModLoader.get_children()
-		for mod in mods:
-			var path = mod.get_script().get_path()
-			onready_mod_paths.append(path)
-			var split = path.split("/")
-			onready_mod_folders.append(split[2])
-	
 	var f = File.new()
-	
-	
-	f.open(mineral_cache_file,File.WRITE)
-	f.store_string("[]")
-	f.close()
-	var mods_to_avoid = []
-	for folder in folders:
-		var semi_root = folder.split("/")[2]
-		if semi_root.begins_with("."):
-			continue
-					
-		if folder.ends_with("/"):
-			
-			if not is_onready:
-				if running_in_debugged:
-					for mod in debugged_defined_mods:
-						var home = mod.split("/")[2]
-						if home == semi_root:
-								mods_to_avoid.append(home)
-			var folder_2 = FolderAccess.__fetch_folder_files(folder, true, true)
-			for check in folder_2:
-				if not is_onready:
-					if semi_root in mods_to_avoid:
-						continue
-				else:
-					if not semi_root in onready_mod_folders:
-						continue
-				if check.ends_with("HEVLIB_MINERAL_DRIVER_TAGS/"): # MINERALDRIVER FILES
-					var files = FolderAccess.__fetch_folder_files(check, false, true)
-					var mod = check.hash()
-					var mineral_dict = []
-					for file in files:
-						var last_bit = file.split("/")[file.split("/").size() - 1]
-						match last_bit:
-							"ADD_MINERALS.gd":
-								var data = load(check + last_bit)
-								var constants = data.get_script_constant_map()
-								for item in constants:
-									var equipment = data.get(item).duplicate(true)
-									mineral_dict.append(equipment)
-					
-					f.open(mineral_cache_file,File.READ_WRITE)
-					var md = JSON.parse(f.get_as_text(true)).result
-					md.append_array(mineral_dict)
-					f.store_string(JSON.print(md))
-					f.close()
-					
-	
-	f.open(mineral_cache_file,File.READ)
-	var mineral_data = JSON.parse(f.get_as_text()).result
-	
+	var drivers = DriverManagement.__get_drivers()
+	var mineral_data = []
+	for driver in drivers:
+		var dv = driver["drivers"]
+		if "ADD_MINERALS.gd" in dv:
+			var mineral_dict = dv["ADD_MINERALS.gd"]
+			for mineral in mineral_dict:
+				mineral_data.append(mineral_dict[mineral])
 	installScriptExtension("res://HevLib/scenes/minerals/AstrogatorPanel.gd")
 	installScriptExtension("res://HevLib/scenes/minerals/OMS.gd")
-	f.close()
-	for m in mineral_data:
-		if "color" in m:
-			var c = m["color"]
-			var s = c.split(",")
-			var color = Color(s[0],s[1],s[2],s[3])
-			m["color"] = color
 	var current_game = handle_mineral_values_and_colors(mineral_data)
 	f.open(current_game_script,File.WRITE)
 	f.store_string(current_game)

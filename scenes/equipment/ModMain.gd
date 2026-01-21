@@ -37,8 +37,14 @@ var ringscene_path = "user://cache/.HevLib_Cache/Minerals/TheRing.tscn"
 var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
+#var DriverManagement = preload("res://HevLib/pointers/DriverManagement.gd")
+
+
 func _init(modLoader = ModLoader):
 	l("Initializing Equipment Driver")
+	
+	var injector = load("res://HevLib/scripts/translations/inject_translations.gd")
+	injector.inject_translations()
 	
 	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 	var d = Directory.new()
@@ -48,6 +54,7 @@ func _init(modLoader = ModLoader):
 	var ml = MainLoop.new()
 	ml.set_script(load("res://HevLib/scripts/crash_handler.gd"))
 	_savedObjects.append(ml)
+	
 	
 	
 	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk"):

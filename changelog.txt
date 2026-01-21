@@ -1,3 +1,25 @@
+[1.11.3]
+
+1="* Severely improved performance of ModMenu2 settings menus, with larger settings pages (for example, VelocityPlus) loading almost instantly compared to the 2+ second wait when opening the settings page"
+2="* MM2 settings pages no longer have a severe stutter when switching tabs"
+3="* Added animations and flares when opening and closing MM2 menus."
+4="* Removed __inject_translations from the Translations.gd pointer"
+5="* Added DriverManagement.gd pointer. Intended to hold functions surrounding HevLib driver files."
+5.1="* Currently only adds __get_drivers, which returns an array of mods and their drivers, ordered by mod priority."
+5.2="* Optional argument of get_ids for an array of mod IDs to specifically fetch, otherwise lists all mods regardless of manifest if blank. Defaults to []"
+6="* Added REPLACE_TRANSLATIONS.gd driver."
+6.1="* Used to register translations intended to replace translation strings existing within vanilla or other mods."
+6.2="* Will still accept and register new translation strings regardless of it existing prior to runtime."
+6.3="* Formatted to translation dictionary standards, using a singular constant const TRANSLATIONS = {}"
+7="* Removed the folder restriction for drivers. HEVLIB_EQUIPMENT_DRIVER_TAGS, HEVLIB_MENU, HEVLIB_MINERAL_DRIVER_TAGS, and a new 'generic' folder HEVLIB_DRIVERS can house driver files without issue."
+8="* Updated TranslationDictionary standards:"
+8.1="* Added unique handling for translating entire csv formatted files through an exclusive 'file' language"
+8.2="* Added ability to lock translation loading translations behind a configuration."
+8.3="* If an invalid config is used, or the config returns something other than a boolean, the translation will always be added"
+8.4="* An optional invert parameter can be used to invert the behaviour in all cases. Defaults to false"
+8.5="* The same can also be done with file translations."
+
+
 [1.11.2]
 
 1="* Updated ManifestV2.2 to include a new changelog_path entry in the manifest_definitions section."

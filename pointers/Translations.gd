@@ -17,11 +17,6 @@ var developer_hint = {
 		"Returns an array of all translation objects within the selected PID range",
 		"number_of_objects_to_iterate_through -> (optional) integer for the maximum number of PIDs to iterate through. Defaults to 100000"
 	],
-	"__inject_translations":[
-		"Attempts to override loaded translations with a translation dictionary",
-		"translation_data -> dictionary containing the translation data, formatted to translation dictionary standards",
-		"number_of_objects_to_iterate_through -> (optional) integer for the maximum number of PIDs to iterate through for overriding. Defaults to 100000"
-	],
 	"__translation_file_to_dictionary":[
 		"Converts a CSV formatted translation file to a translation dictionary",
 		"path -> string to the translation file's location",
@@ -37,10 +32,6 @@ static func __updateTL_from_dictionary(dictionary:Dictionary, fullLogging:bool =
 const fato = preload("res://HevLib/scripts/translations/fetch_all_translation_objects.gd")
 static func __fetch_all_translation_objects(number_of_objects_to_iterate_through: int = 100000) -> Array:
 	var s = fato.fetch_all_translation_objects(number_of_objects_to_iterate_through)
-	return s
-const it = preload("res://HevLib/scripts/translations/inject_translations.gd")
-static func __inject_translations(translation_data: Dictionary,number_of_objects_to_iterate_through: int = 100000) -> Array:
-	var s = it.inject_translations(translation_data,number_of_objects_to_iterate_through)
 	return s
 const tftd = preload("res://HevLib/scripts/translations/translation_file_to_dictionary.gd")
 static func __translation_file_to_dictionary(path: String, delimiter : String = "|") -> Dictionary:
