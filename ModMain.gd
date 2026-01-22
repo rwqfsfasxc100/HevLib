@@ -46,6 +46,11 @@ var latest_event_file = "user://cache/.HevLib_Cache/Event_Driver/latest_event.tx
 
 func _ready():
 	l("Readying")
+	var p = ProjectSettings.get_setting("locale/translations")
+	for i in p:
+		var translation = ResourceLoader.load(i,"",true)
+		TranslationServer.add_translation(translation)
+	
 	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/")
 	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/")
