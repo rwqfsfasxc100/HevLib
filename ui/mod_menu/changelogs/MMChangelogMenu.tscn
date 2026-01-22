@@ -84,3 +84,5 @@ margin_bottom = 44.0
 text = "   "
 
 [node name="AnimateAppear" parent="." instance=ExtResource( 4 )]
+
+[connection signal="pressed" from="base/PanelContainer/VBoxContainer/FooterButtons/Close" to="." method="cancel"]
