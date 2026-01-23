@@ -31,3 +31,8 @@ static func __copy_file(file, folder):
 	
 	var dir = Directory.new()
 	dir.copy(prepfile,folder + "/" + fn)
+
+const lp = preload("res://HevLib/scripts/load_png.gd")
+static func __load_png(path) -> Texture:
+	var s = lp.load_png(path)
+	return s
