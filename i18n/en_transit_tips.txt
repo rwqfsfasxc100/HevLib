@@ -12,7 +12,7 @@ HEVLIB_TRANSIT_TIP_5|Your geologist can restrict what your equipment can see. Be
 
 HEVLIB_TRANSIT_TIP_6|If you need more insurance and you aren't getting enough from Jameson's monthly allowance, hit up Search and Rescue vessels in the rings.
 
-HEVLIB_TRANSIT_TIP_7|A happy crew will work a little harder, and an unhappy crew will feel less motiated to work.
+HEVLIB_TRANSIT_TIP_7|A happy crew will work a little harder, and an unhappy crew will feel less motivated to work.
 
 HEVLIB_TRANSIT_TIP_8|If selecting an object with the autopilot, microseismic drones will scan the target object, otherwise they will scan whatever is beneath the mouse.
 
