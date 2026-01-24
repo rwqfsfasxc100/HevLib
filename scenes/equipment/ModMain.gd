@@ -160,6 +160,9 @@ func _ready():
 #	ws.take_over_path("res://weapons/WeaponSlot.tscn")
 #	_savedObjects.append(ws)
 	
+	installScriptExtension("../minerals/Summary.gd")
+#	replaceScene("../minerals/DiveSummary.tscn","res://enceladus/DiveSummary.tscn")
+	
 	replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")
 #	replaceScene("Enceladus.tscn","res://enceladus/Enceladus.tscn")
 #	installScriptExtension("../scene_replacements/Shipyard.gd")
