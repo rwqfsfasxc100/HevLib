@@ -5,13 +5,13 @@ name="HevLib"
 description="HEVLIB_MOD_DESCRIPTION"
 brief="HEVLIB_MOD_BRIEF"
 author="__hev"
-credits=["Za'krin - Mod Main design, original implementation of updateTL","spaceDOTexe - Manifest design, UpgradeGroup ship limiting logic"]
+credits=["   --- Contributors ---   ","Za'krin - Mod Main design, original implementation of updateTL","spaceDOTexe - Manifest design, UpgradeGroup ship limiting logic","WT - Ukranian translations","Hedrauta - German translations","   --- Supporters ---   ","GAZI - supporter (ko-fi)"]
 
 [version]
 
 version_major=1
 version_minor=11
-version_bugfix=3
+version_bugfix=4
 
 [tags]
 

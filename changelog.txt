@@ -1,3 +1,28 @@
+[1.11.4]
+
+1="* Fixed changelog menu cancel button not working"
+2="* Moved vanilla translation re-adding to the end of the modloading onready phase, this should fix any issues with translation addition and overridden"
+3="* Added __load_png() to FileAccess.gd"
+3.1="* Used to arbitrarily load png files and returns an object of Texture type of the image data"
+4="* Fixed typos in the transit tips"
+5="* Fixed a large number of minerals on the dive summary menu overflowing the screen, and added a scrollbar when necessary"
+6="* Added ADD_SHIPS.gd driver. This is used to register ships to the game, but does not inherently add ships to the dealership and a modification to CurrentGame.gd is still needed for that process. "
+6.1="* Each constant contains a dictionary that registers an individual ship."
+6.2="* name - required string used for the ship identifier name."
+6.3="* path - required string used for the filepath of the ship's scene."
+6.4="* alias - optional string used for the ship alias, used to get configs among similar ships. If not used, uses the name value for this."
+6.5="* config - optional dictionary used for the ship's base config. Uses the K37 default if omitted"
+6.6="* used_configs - optional array of dictionaries for additional used configurations the ship can use. Inversely to the config option value, the top level config key is not used, and is stripped and the value is used if added."
+7="* Added REGISTER_SHIP_NUMERICS.gd driver. This is used to help register sell values, and either delivery speed or mass values of the 5 numerical equipment dictated by the upgradeLimits dictionary in ship-ctrl.gd. Equipment options have to be added separately (be it via driver or Upgrades.tscn modification), and any values set outside vanilla bounds have to be permitted in relevant upgradeLimits for desired ships. "
+7.1="* Accepts 5 different constants. REGISTER_AMMO, REGISTER_NANO, REGISTER_REACTOR_RODS, REGISTER_ULTRACAPACITORS, and REGISTER_TURBINES."
+7.2="* REGISTER_AMMO - dictionary that lets you choose the price and delivery speed of new ammunition magazines"
+7.3="* REGISTER_NANO - dictionary that lets you choose the price and delivery speed of new nanodrone storages"
+7.4="* REGISTER_REACTOR_RODS - dictionary that lets you choose the price and mass of new reactor rods"
+7.5="* REGISTER_ULTRACAPACITORS - dictionary that lets you choose the price and mass of new ultracapacitors"
+7.6="* REGISTER_TURBINES - dictionary that lets you choose the price and mass of new turbines"
+8="* Properly attributed all contributors and supporters in the manifest credits."
+9="* Added German translations (thanks @Hedrauta)"
+
 [1.11.3]
 
 1="* Severely improved performance of ModMenu2 settings menus, with larger settings pages (for example, VelocityPlus) loading almost instantly compared to the 2+ second wait when opening the settings page"
