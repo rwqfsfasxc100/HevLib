@@ -35,6 +35,7 @@ var nanodroneMagazine = 0
 var listings = {}
 var hevlib_config_data = {}
 
+
 func _enter_tree():
 	var file = File.new()
 	file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_mods.json",File.READ)
@@ -120,6 +121,7 @@ func _enter_tree():
 
 var installed = []
 func _ready():
+	var file = File.new()
 	init_vars()
 	base_mass = currentMass
 	nanodroneMagazine = getConfig("drones.capacity")
@@ -351,7 +353,11 @@ func _ready():
 			call_deferred("move_child",vmass,get_child_count())
 			l("Adding %s kg of mass. Base ship mass changing from %s to %s" % [mass_add,base_mass * 1000,shipInitialMass * 1000])
 		
-		
+		file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/drone_delivery_speed.json",File.READ)
+		var droneData = JSON.parse(file.get_as_text()).result
+		file.close()
+		for amnt in droneData:
+			nanoDeliveryPerSecond[int(amnt)] = droneData[amnt]
 		
 		clampConsumables()
 

@@ -7,7 +7,7 @@ var node_definitons_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/
 var processed_node_definitions = {}
 var processed_ship_register = {}
 
-var file = File.new()
+
 var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
 var DF = preload("res://HevLib/pointers/DataFormat.gd")
 
@@ -263,6 +263,7 @@ func make_node_mods():
 
 
 func nodeModify():
+	var file = File.new()
 	file.open(ship_modify_file,File.READ)
 	var modify_data = JSON.parse(file.get_as_text()).result
 	file.close()
@@ -456,6 +457,7 @@ func invert_scaling(node_path,base_node):
 
 
 func process_ship_register():
+	var file = File.new()
 	var pd = {}
 	file.open(ship_register_file,File.READ)
 	var data = JSON.parse(file.get_as_text()).result
@@ -495,6 +497,7 @@ func process_ship_register():
 
 
 func process_node_definitons():
+	var file = File.new()
 	var pd = {}
 	file.open(node_definitons_file,File.READ)
 	var data = JSON.parse(file.get_as_text()).result
