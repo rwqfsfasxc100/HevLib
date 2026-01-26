@@ -1,35 +1,35 @@
-locale|en
+locale|de
 
-HEVLIB_TRANSIT_TIP_1|Having multiple crew with the same profession can let them work in tandem.
+HEVLIB_TRANSIT_TIP_1|Mehr Besatzung des gleichen Berufes lässt diese zusammen arbeiten.
 
-HEVLIB_TRANSIT_TIP_2|Unlike the autopilot, your thrusters can still operate by using manual input, without needing your computer or HUD to be online. 
+HEVLIB_TRANSIT_TIP_2|Abgesehen vom Autopiloten können deine Triebwerke immer noch angesteuert werden, auch wenn Bordcomputer oder HUD nicht mehr online sind.
 
-HEVLIB_TRANSIT_TIP_3|When rescuing a lifepod, an unused cradle arm can let you get a secure hold on it without clogging your cargo bay.
+HEVLIB_TRANSIT_TIP_3|Beim bergen einer Rettungskapsel kann ein freier Halterungsarm diese sicher halten, während dein Frachtraum nicht zugemüllt wird.
 
-HEVLIB_TRANSIT_TIP_4|Broadcasting a claim can bring more attention to the area.
+HEVLIB_TRANSIT_TIP_4|Eine Beanspruchungsbake kann mehr Aufmerksamkeit erzeugen.
 
-HEVLIB_TRANSIT_TIP_5|Your geologist can restrict what your equipment can see. Being more restrictive on the filters can help prevent your ship's systems from being overwhelmed.
+HEVLIB_TRANSIT_TIP_5|Dein Geologe kann einschränken, was deine Ausrüstung erkennen kan. Je strenger die Filter sind, desto weniger werden die Systeme überfordert.
 
-HEVLIB_TRANSIT_TIP_6|If you need more insurance and you aren't getting enough from Jameson's monthly allowance, hit up Search and Rescue vessels in the rings.
+HEVLIB_TRANSIT_TIP_6|Wenn dir Jameson's monatlicher Satz zu wenig ist, kannst du im Ring ein Search-and-Rescue-Schiff aufsuchen, um mehr Versicherung zu erhalten.
 
-HEVLIB_TRANSIT_TIP_7|A happy crew will work a little harder, and an unhappy crew will feel less motiated to work.
+HEVLIB_TRANSIT_TIP_7|Eine glückliche Besatzung arbeitet weniger hart und unglücklich fühlen sie sich weniger motiviert.
 
-HEVLIB_TRANSIT_TIP_8|If selecting an object with the autopilot, microseismic drones will scan the target object, otherwise they will scan whatever is beneath the mouse.
+HEVLIB_TRANSIT_TIP_8|Wenn ein object mit dem Autopiloten auswählt wurde, können mikroseismische Drohnen das Zielobjekt scannen, ansonsten wird das Objekt gescannt, was sich unter der Maus befindet
 
-HEVLIB_TRANSIT_TIP_9|Habitats will always pay at least a small premium over the market value of a mineral.
+HEVLIB_TRANSIT_TIP_9|Habitate zahlen immer bessere Preise als den aktuellen  Marktpreis.
 
-HEVLIB_TRANSIT_TIP_10|Using too many nanodrones catching worthless ores? Configure your geologist's filters to catch only what you want and save on drones too.
+HEVLIB_TRANSIT_TIP_10|Zu viele Nanodrohnen genutzt, die unnützes Erz sammeln? Richte deinen Filter im Geologen ein, um nur das zu erhalten, was du möchtest und spare dabei an Drohnen.
 
-HEVLIB_TRANSIT_TIP_11|Having problems with your mods? Submit a report on the site you obtained them from, or join the Discord for realtime support.
+HEVLIB_TRANSIT_TIP_11|Probleme mit Mods? Melde es dort, wo du sie herbekommen hast, oder versuche es im Discord für zeitnahen Support. 
 
-HEVLIB_TRANSIT_TIP_12|Got a suggestion for a mod? Join the Discord and feel free to ask.
+HEVLIB_TRANSIT_TIP_12|Hast du einen Vorschlag für einen mods? Betritt den Discord und frage freundlich nach.
 
-HEVLIB_TRANSIT_TIP_13|Want to find more mods? Check out the entire collection at 'https://delta-v.kodera.pl/index.php/Mod_List'
+HEVLIB_TRANSIT_TIP_13|Möchtest du mehr mods? Schau die dir hier die ganze Liste an: 'https://delta-v.kodera.pl/index.php/Mod_List'
 
-HEVLIB_TRANSIT_TIP_14|Keep in mind that anything that can break apart rocks can also damage other ships by some means.
+HEVLIB_TRANSIT_TIP_14|Behalte im Hinterkopf, das alles, was Steine zerstören kann, auch andere Schiffe beschädigen kann.
 
-HEVLIB_TRANSIT_TIP_15|Autonomous systems do work as intended, however you may need to be patient to let them work.
+HEVLIB_TRANSIT_TIP_15|Autonome Systeme arbeiten wie vorgesehen, jedoch braucht es Geduld, damit sie arbeiten.
 
-HEVLIB_TRANSIT_TIP_16|Enjoying the mods you're using? Consider supporting their authors!
+HEVLIB_TRANSIT_TIP_16|Gefallen dir die Mods, die du nutzt? Unterstütze doch die Schöpfer!
 
-HEVLIB_TRANSIT_TIP_17|Mods behaving slightly differently after an update? Check any recent changelogs or ask the author.
+HEVLIB_TRANSIT_TIP_17|Mods verhalten sich nach einem Update anders? Schau in das Änderungsprotokoll oder frag den Verfasser.

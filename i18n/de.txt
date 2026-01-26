@@ -1,52 +1,52 @@
-locale|en
+locale|de
 
-HEVLIB_MOD_BRIEF|Library mod containing several common functions created by __hev
+HEVLIB_MOD_BRIEF|Mod-Bibliothek für die meistgenutzten Funktionen erstellt von __hev
 
-HEVLIB_MOD_DESCRIPTION|A library providing several functional parts:\n\n * Common functionality provided through 'pointer' files.\n * Handling of mod manifest files via versioning to create a unified medium to fetch information from them.\n * EquipmentDriver - Add & manage equipment items, slots, and more...\n * WeaponSlotDriver - Add and modify equipment added to ship hardpoints.\n\nThis library also aims to keep a consistent method to make modding easier. Compatability with mods is also a primary focus of the functionality provided.\n\nFor more information, please check this mod's wiki. If you have any suggestons or ideas, please leave them in the Discord or a GitHub issue.
+HEVLIB_MOD_DESCRIPTION|Eine Programmbibliothek beitet eine Reihe von Funktionen für andere Mods duch 'Pointer'-Dateien. \n * Umgang mit Mod-Manifest-Dateien mittels Versionierung, um ein einheitliches Medium zur Abfrage von Informationen daraus zu schaffen.\n * EquipmentTreiber - Hinzufügen und verwalten von Ausrüstungs-Items\\-Plätzen und mehr...\n * WaffenPlatzTreiber - Hinzufügen und verwalten von Ausrüstung für die Befestigungen.\n\nDiese Bibliothek verfolgt außerdem das Ziel, eine konsistente Vorgehensweise beizubehalten, um Modding zu erleichtern. Die Kompatibilität mit Mods ist ebenfalls ein zentraler Schwerpunkt der bereitgestellten Funktionalität.\n\nWeitere Informationen findest du im Wiki dieses Mods. Wenn du Vorschläge oder Ideen hast, hinterlasse sie bitte im Discord oder als GitHub-Issue.
 
 HEVLIB_MOD_ERROR_HEADER|%s MOD ISSUES
 
-HEVLIB_MOD_ERROR_DEPENDANCY_DIALOGUE_BOX|There are currently %s unmet mod dependancies. Please satisfy these requirements or remove the mods that need them: %s
+HEVLIB_MOD_ERROR_DEPENDANCY_DIALOGUE_BOX|Es gibt aktuell %s ubefriedigte Mod-Abhängigkeiten. Stelle sicher dass die Vorraussetzungen vorhanden sind, oder entferne die Mods: %s
 
-HEVLIB_GENERIC_ERROR_DIALOGUE_BOX|Something has gone wrong. Please restart the game!
+HEVLIB_GENERIC_ERROR_DIALOGUE_BOX|Etwas ist schief gelaufen. Bitte das Spiel neustarten!
 
-EVENTDRIVER_MENU|EventDriver Debug Menu
+EVENTDRIVER_MENU|EventDriver Debug Menü
 
-EVENTDRIVER_EVENTS|Selected Event
+EVENTDRIVER_EVENTS|Ausgewähltes Event
 
 EVENTDRIVER_TIMER|Storyteller Event Timer
 
-EVENTDRIVER_SPAWNNOW|Force event spawn using selected event
+EVENTDRIVER_SPAWNNOW|Erzwinge aktuell gewähltes Event zu starten
 
-EVENTDRIVER_EVENT_SELECTOR|Event Selector
+EVENTDRIVER_EVENT_SELECTOR|Event Selektor
 
-EVENTDRIVER_CLEAREVENT|Clear selected event(s)
+EVENTDRIVER_CLEAREVENT|Ausgewählte(s) Event(s) bereinigen
 
-HEVLIB_MISSING_DOCUMENTATION_1|!!!!! No documentation for this feature was provided!
+HEVLIB_MISSING_DOCUMENTATION_1|!!!!! Für dieses Feature wurde keine Dokumentation bereitgestellt!
 
-HEVLIB_MISSING_DOCUMENTATION_2|!!!!! Please bring this to my (__hev) attention ASAP, as documentation is key for libraries such as this one for proper maintenance!
+HEVLIB_MISSING_DOCUMENTATION_2|!!!!! Bitte teile es mir (__hev) ASAP mit, da Dokumentationen der Schlüssel für Bibliotheken wie diese sind, um Instandhaltung zu wahren!
 
-HEVLIB_DESCRIPTION_PLACEHOLDER|This mod does not have a description. \n\nPlease check the webpage or thread where you obtained this mod for info, or ask the creator for a description.
+HEVLIB_DESCRIPTION_PLACEHOLDER|Dieser Mods hat keine Beschreibung. \n\nÜberprüfe die Webseite, wo du den Mod erhalten hast oder frage beim Ersteller nach einer Beschreibung.
 
-HEVLIB_SELF_CHECK_ERROR_MESSAGE|HevLib was not installed correctly. Please double check the download source, and make sure that the root folder looks as follows: HevLib.zip/HevLib/\n\nPressing OK will exit the game and open the latest release page in your browser.
+HEVLIB_SELF_CHECK_ERROR_MESSAGE|HevLib wurde nicht korrekt installiert. Überprüfe deine Quelle und stelle sicher, dass es wie folgt aussieht: HevLib.zip/HevLib/\n\nMit OK wird das Spiel beendet und du es werden die aktuellsten Releases im Browser geöffnet.
 
 HEVLIB_SELF_CHECK_ERROR_HEADER|HEVLIB LOAD ERROR!
 
-HEVLIB_INCORRECT_SHIP|(ERROR!) Missing ship type: '%s'\nThis save cannot be opened as the active ship isn't available!\nTo load this save, please reinstall the mod containing the ship type!
+HEVLIB_INCORRECT_SHIP|(ERROR!) Fehlender Schiffs-Typ: '%s'\nDas Save kann nicht geladen werden, da das aktive Schiff nicht verügbar ist!\nUm das Save zu laden, installiere bitte den Mod erneut, der diesen Schiffs-Typ enthält!
 
 HEVLIB_SLOT|Slot
 
-HEVLIB_MOD_MENU|Mod Menu
+HEVLIB_MOD_MENU|Mod Menü
 
-HEVLIB_MISSING_MOD_NAME|Mod Name Unavailable :(
+HEVLIB_MISSING_MOD_NAME|Mod Name nicht verfügbar :(
 
-HEVLIB_MISSING_DESCRIPTION|This mod does not have a description :( \n\nPlease check the webpage or thread where you obtained this mod for info, or ask the creator for a description.
+HEVLIB_MISSING_DESCRIPTION|Dieser Mods hat keine Beschreibung. :( \n\nÜberprüfe die Webseite, wo du den Mod erhalten hast oder frage beim Ersteller nach einer Beschreibung.
 
-HEVLIB_AUTHOR|Author:
+HEVLIB_AUTHOR|Ersteller:
 
-HEVLIB_CREDITS|Credits:
+HEVLIB_CREDITS|Danksagung:
 
-HEVLIB_UNKNOWN|Unknown
+HEVLIB_UNKNOWN|Unbekannt
 
 HEVLIB_MM_TOOLTIP_HEADER|Mod Information:
 
@@ -56,45 +56,45 @@ HEVLIB_MM_TOOLTIP_MV|Manifest Version: %s
 
 HEVLIB_MM_TOOLTIP_ZIP|Zip File: %s
 
-HEVLIB_MM_TOOLTIP_LIBRARY|Library: %s \ Always Display: %s
+HEVLIB_MM_TOOLTIP_LIBRARY|Bibliothek: %s \ Immer zeigen: %s
 
-HEVLIB_MM_BUTTON_TOOLTIP_GITHUB|Mod Github Page
+HEVLIB_MM_BUTTON_TOOLTIP_GITHUB|Mod Github Seite
 
 HEVLIB_MM_BUTTON_TOOLTIP_DISCORD|Mod Discord Thread
 
-HEVLIB_MM_BUTTON_TOOLTIP_NEXUS|Nexus mods page
+HEVLIB_MM_BUTTON_TOOLTIP_NEXUS|Nexus Mods Seite
 
-HEVLIB_MM_BUTTON_TOOLTIP_DONATIONS|Donate to the project
+HEVLIB_MM_BUTTON_TOOLTIP_DONATIONS|Spenden ans Projekt
 
-HEVLIB_MM_BUTTON_TOOLTIP_WIKI|Mod wiki page
+HEVLIB_MM_BUTTON_TOOLTIP_WIKI|Mod Wiki Seite
 
-HEVLIB_MM_BUTTON_TOOLTIP_BUGREPORTS|Report a bug
+HEVLIB_MM_BUTTON_TOOLTIP_BUGREPORTS|Einen Fehler melden
 
-HEVLIB_MM_BUTTON_TOOLTIP_CUSTOM|More...
+HEVLIB_MM_BUTTON_TOOLTIP_CUSTOM|Mehr...
 
-HEVLIB_VANILLA_DESCRIPTION|A physics-based mining sim, set in the thickest debris field in Sol. Every action has a reaction, lasers are invisible without a medium, and your thrust is a potent weapon. Find trade, adapt your equipment to your playstyle, hire a crew to help. Unravel the mysteries of the rings, or just get rich.
+HEVLIB_VANILLA_DESCRIPTION|Eine physikbasierte Bergbau-Simulation, angesiedelt im dichtesten Trümmerfeld des Sonnensystems. Jede Aktion hat eine Reaktion, Laser sind ohne ein Medium unsichtbar, und dein Schub ist eine mächtige Waffe. Finde Handelspartner, passe deine Ausrüstung an deinen Spielstil an und heuere eine Crew zur Unterstützung an. Lüfte die Geheimnisse der Ringe – oder werde einfach nur reich.
 
-HEVLIB_VANILLA_BRIEF|The vanilla game
+HEVLIB_VANILLA_BRIEF|Das Basis Spiel
 
 HEVLIB_MODMENU_MODS|Mods
 
 HEVLIB_MODMENU_OK|Ok
 
-HEVLIB_MODMENU_CLOSE|Close
+HEVLIB_MODMENU_CLOSE|Schließen
 
-HEVLIB_MODMENU_OPENFOLDER|Open Mods Folder
+HEVLIB_MODMENU_OPENFOLDER|Öffne Mod-Ordner
 
-HEVLIB_MODMENU_MODS_VISIBLE|Showing %d mods
+HEVLIB_MODMENU_MODS_VISIBLE|Zeige %d Mods
 
-HEVLIB_DROP_FILES_TO_ADD_MODS|Drag and drop files into this window to add mods.\nIdentical mod file names will be overwritten
+HEVLIB_DROP_FILES_TO_ADD_MODS|Ziehe Dateien per Drag-and-drop in dieses Fenster, um Mods hinzuzufügen.\nMod-Dateien mit identischem Namen werden überschrieben.
 
-HEVLIB_MODMENU_VER_AND_PRIO|Version: v%s / Priority: %s
+HEVLIB_MODMENU_VER_AND_PRIO|Version: v%s / Priorität: %s
 
-HEVLIB_MODMENU_PRIO|Priority: %s
+HEVLIB_MODMENU_PRIO|Priorität: %s
 
 HEVLIB_MODMENU_VERSION|Version: v%s
 
-HEVLIB_MODMENU_PRIO_MID_HEADER|Mod ID and Priority
+HEVLIB_MODMENU_PRIO_MID_HEADER|Mod ID und Priorität
 
 HEVLIB_GITHUB|GitHub
 
@@ -102,320 +102,320 @@ HEVLIB_DISCORD|Discord
 
 HEVLIB_NEXUS|Nexusmods
 
-HEVLIB_DONATIONS|Make a Donation
+HEVLIB_DONATIONS|Eine Spende machen
 
 HEVLIB_WIKI|Wiki
 
-HEVLIB_BUGREPORTS|Report a bug
+HEVLIB_BUGREPORTS|Melde einen Fehler
 
-HEVLIB_GITHUB_TOOLTIP|GitHub repository for the project
+HEVLIB_GITHUB_TOOLTIP|GitHub repository für das Projekt
 
-HEVLIB_DISCORD_TOOLTIP|Discord thread/channel/server for the project
+HEVLIB_DISCORD_TOOLTIP|Discord thread/channel/server für das Projekt
 
-HEVLIB_NEXUS_TOOLTIP|Nexusmods page for the project
+HEVLIB_NEXUS_TOOLTIP|Nexusmods Seite für das Projekt
 
-HEVLIB_DONATIONS_TOOLTIP|Donate to the project
+HEVLIB_DONATIONS_TOOLTIP|Spende an das Projekt
 
-HEVLIB_WIKI_TOOLTIP|Wiki page(s) for the project
+HEVLIB_WIKI_TOOLTIP|Wiki Seite(n) für das Projekt
 
-HEVLIB_BUGREPORTS_TOOLTIP|Report a bug via the project's reports link
+HEVLIB_BUGREPORTS_TOOLTIP|Melde Fehler über des Projekt's Melde-Link
 
-HEVLIB_FILTER_BY_TAGS|Filter mods by tags
+HEVLIB_FILTER_BY_TAGS|Filter Mods bei Schlagwort
 
-HEVLIB_SETTINGS_BUTTON_TOOLTIP|Open the configuration menu
+HEVLIB_SETTINGS_BUTTON_TOOLTIP|Öffne das Einstellungen-Menü
 
 HEVLIB_LINKS_BUTTON|Links
 
-HEVLIB_BUGREPORTS_BUTTON|Bug reports
+HEVLIB_BUGREPORTS_BUTTON|Fehlermeldungen
 
-HEVLIB_LINKS_TOOLTIP|Display the project's links
+HEVLIB_LINKS_TOOLTIP|Links des Projekts zeigen
 
-TAG_ALLOW_ACHIEVEMENTS|Allows achievements
+TAG_ALLOW_ACHIEVEMENTS|Erlaube Errungenschaften
 
 TAG_QOL|Quality of life
 
-TAG_USING_HEVLIB_RESEARCH|Using HevLib Research
+TAG_USING_HEVLIB_RESEARCH|Nutzt HevLib Research
 
-TAG_OVERHAUL|Overhaul
+TAG_OVERHAUL|
 
-TAG_VISUAL|Visual
+TAG_VISUAL|Visuell
 
-TAG_FUN|Fun
+TAG_FUN|Spaß
 
 TAG_UI|User interface (UI)
 
-TAG_ADDS_SHIPS|Adds new ships
+TAG_ADDS_SHIPS|Fügt neue Schiffe hinzu
 
-TAG_ADDS_EQUIPMENT|Adds new equipment
+TAG_ADDS_EQUIPMENT|Fügt neue Ausrüstung hinzu
 
-TAG_ADDS_GAMEPLAY_MECHANICS|Adds new gameplay mechanics
+TAG_ADDS_GAMEPLAY_MECHANICS|Fügt neue Gamplay-Mechaniken hinzu
 
-TAG_ADDS_EVENTS|Adds new ring events
+TAG_ADDS_EVENTS|Fügt neue Ring-Events hinzu
 
-TAG_HANDLE_EXTRA_CREW|Handles extra crew
+TAG_HANDLE_EXTRA_CREW|Handhabt extra Besatzung
 
-HEVLIB_TAG_FILTER|Filter mods by tag
+HEVLIB_TAG_FILTER|Filter Mods durch Schlagwort
 
 HEVLIB_VANILLA_STEAM_STORE|Steam
 
-HEVLIB_VANILLA_STEAM_STORE_TOOLTIP|Opens the Steam page for the game
+HEVLIB_VANILLA_STEAM_STORE_TOOLTIP|Öffnet die Steam-Store-Seite für das Spiel
 
 HEVLIB_VANILLA_ITCH_STORE|itch.io
 
-HEVLIB_VANILLA_ITCH_STORE_TOOLTIP|Opens the itch.io page for the game
+HEVLIB_VANILLA_ITCH_STORE_TOOLTIP|Öffnet die itch.io-Seite für das Spiel
 
 HEVLIB_VANILLA_EPIC_STORE|Epic Games
 
-HEVLIB_VANILLA_EPIC_STORE_TOOLTIP|Opens the Epic Games page for the game
+HEVLIB_VANILLA_EPIC_STORE_TOOLTIP|Öffnet die Epic Games-Seite für das Spiel
 
 HEVLIB_VANILLA_GOG_STORE|GOG
 
-HEVLIB_VANILLA_GOG_STORE_TOOLTIP|Opens the GOG page for the game
+HEVLIB_VANILLA_GOG_STORE_TOOLTIP|Öffnet die GOG-Seite für das Spiel
 
-HEVLIB_CONFIG_SORT_BY_PRICE|Sort equipment by price
+HEVLIB_CONFIG_SORT_BY_PRICE|Ausrüstung nach Preis sortieren
 
-HEVLIB_CONFIG_SORT_BY_PRICE_TOOLTIP|Forces equipment to be sorted by price. Will break AUX unit sorting by type, but prevents issues with modded equipment.
+HEVLIB_CONFIG_SORT_BY_PRICE_TOOLTIP|Zwingt die Ausrüstung nach Preis zu sortieren.	\nDies zerstört zwar die Hilfsenergieeinheit, aber beugt Fehler mit gemoddeter Ausrüstung vor. 
 
-HEVLIB_CONFIG_SORT_SLOT_BY_TYPE|Sort slots by type
+HEVLIB_CONFIG_SORT_SLOT_BY_TYPE|Sortiere Plätze nach Typ
 
-HEVLIB_CONFIG_SORT_SLOT_BY_TYPE_TOOLTIP|Sorts slots by similarity. Prevents arbritrary sorting by modded slots.
+HEVLIB_CONFIG_SORT_SLOT_BY_TYPE_TOOLTIP|Sortiert Plätze nach Typ. Verhindert das willkürliche Versetzen von gemoddeten Plätzen.
 
-HEVLIB_CONFIG_USE_LEGACY_EQUIPMENT_HANDLING|Use legacy equipment handling
+HEVLIB_CONFIG_USE_LEGACY_EQUIPMENT_HANDLING|Veraltetes System für Ausrüstung verwenden
 
-HEVLIB_CONFIG_USE_LEGACY_EQUIPMENT_HANDLING_TOOLTIP|Enables pre-1.7 equipment handling. Only use for old mods that don't work with the newer system. Don't expect this to work for most mods.
+HEVLIB_CONFIG_USE_LEGACY_EQUIPMENT_HANDLING_TOOLTIP|Verwendet das Ausrüstungssystem von vor v1.7\nSollte nur für ältere Mods verwendet werden.\nFunktionalität wird nicht garantiert.
 
-HEVLIB_CONFIG_WRITE_EVENTS|Write event names
+HEVLIB_CONFIG_WRITE_EVENTS|Events aufzeichnen
 
-HEVLIB_CONFIG_WRITE_EVENTS_TOOLTIP|Writes to a cache file located in user://cache/.HevLib_Cache/current_events.txt that contains all events loaded by the game at the time the rings are loaded.
+HEVLIB_CONFIG_WRITE_EVENTS_TOOLTIP|Schreibt in eine Datei unter user://cache/.HevLib_Cache/current_events.txt, welche alle Events beinhaltet, die bei Spielstart geladen werden.
 
-HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES|Show hidden libraries
+HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES|Zeige verstecke Bibliotheken
 
-HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES_TOOLTIP|Makes any library without the always display tag visible.
+HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES_TOOLTIP|Zeigt alle Bibliotheken, welche nicht dauerhaft angezeigt.
 
 HEVLIB_CONFIG_INPUT_DEBUGGER|Input debugger
 
-HEVLIB_CONFIG_INPUT_DEBUGGER_TOOLTIP|Displays debug information about current inputs.
+HEVLIB_CONFIG_INPUT_DEBUGGER_TOOLTIP|Zeigt Debug-Informationen über deine aktuellen Eingaben.
 
 HEVLIB_CONFIG_EVENT_DEBUGGER|Event debugger
 
-HEVLIB_CONFIG_EVENT_DEBUGGER_TOOLTIP|Exposes key events and displays if they're active or inactive.
+HEVLIB_CONFIG_EVENT_DEBUGGER_TOOLTIP|Zeigt Schlüsselereignisse und ob diese in-/aktiv sind.
 
 HEVLIB_CONFIG_POSITION_DATA_DEBUGGER|Position data debugger
 
-HEVLIB_CONFIG_POSITION_DATA_DEBUGGER_TOOLTIP|Displays the current chaos and an estimated number of event possibilities while on a dive.
+HEVLIB_CONFIG_POSITION_DATA_DEBUGGER_TOOLTIP|Zeigt das aktuelle Chaos und die erwartete Anzahl an möglichen Ereignissen währen eines Tauchvorganges
 
-HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS|Show accurate events
+HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS|Zeige genaue Events
 
-HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS_TOOLTIP|Used in conjunction with Position data debugger. Displays an actual count of events in the area. Due to the way this setting works, it will decrease performance by a significant enough amount, and will generate thousands of logs per minute.\n\nUSE OF THIS SETTING IS COMPLETELY UNSUPPORTED AND WILL INVALIDATE ALL BUG REPORTS! YOU HAVE BEEN WARNED!
+HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS_TOOLTIP|Wird im Zusammenhang mit dem Position data debugger verwendet. Zeigt einen Zähler für alle vorhandene Events Im Bereich.\nBasierend darauf, wie wie diese Einstellung funktioniert, wird die Performance stark beeinträchtigt und es werden tausende Zeilen Logs geschrieben.\n\nDIE NUTZUNG WIRD NICHT UNTERSTÜTZT UND INVALIDIERT ALLE FEHLERMELDUNGEN! DU WURDEST GEWARNT!
 
-HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU|Debug event menu
+HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU|Debug event Menü
 
-HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU_TOOLTIP|Keys used to open the event debugger menu.
+HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU_TOOLTIP|Welche Taste öffnet das Event debugger Menü.
 
-HEVLIB_CONFIG_OPEN_DEBUGGER|Toggle debug display
+HEVLIB_CONFIG_OPEN_DEBUGGER|Debug display umschalten
 
-HEVLIB_CONFIG_OPEN_DEBUGGER_TOOLTIP|Toggles visibility of the --debug-console display without the need for the command line.
+HEVLIB_CONFIG_OPEN_DEBUGGER_TOOLTIP|Schaltet die Sichtbarkeit der --debug-console Anzeige, welches normalerweise ein Argument benötigt.
 
-HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS|HevLib debugger menus
+HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS|HevLib debugger Menüs
 
-HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS_TOOLTIP|Toggles visibility of the input debugger and event debugger if they are enabled
+HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS_TOOLTIP|Wenn aktiviert, zeigt es den Input debugger sowie Event debugger
 
-HEVLIB_CONFIG_LINEEDIT_PLACEHOLDER|Insert text
+HEVLIB_CONFIG_LINEEDIT_PLACEHOLDER|Text einfügen
 
-HEVLIB_CONFIG_SECTION_EQUIPMENT|Equipment
+HEVLIB_CONFIG_SECTION_EQUIPMENT|Ausrüstung
 
 HEVLIB_CONFIG_SECTION_EVENTS|Events
 
-HEVLIB_CONFIG_SECTION_DRIVERS|Drivers
+HEVLIB_CONFIG_SECTION_DRIVERS|Treiber
 
 HEVLIB_CONFIG_SECTION_DEBUG|Debug
 
-HEVLIB_CONFIG_SECTION_INPUT|Binds
+HEVLIB_CONFIG_SECTION_INPUT|Tasten
 
-HEVLIB_NOTIFICATIONS|Mod Notifications
+HEVLIB_NOTIFICATIONS|Mod Benachrichtigungen
 
-HEVLIB_UPDATE_COUNT|%s mod(s) are in need of updates!
+HEVLIB_UPDATE_COUNT|Neue Updates: %s Mod(s)!
 
-HEVLIB_DEPENDANCY_COUNT|%s mod(s) are missing dependancies!
+HEVLIB_DEPENDANCY_COUNT|Fehlende Abhängigkeiten: %s Mod(s)!
 
-HEVLIB_CONFLICT_COUNT|%s mod(s) are in conflict!
+HEVLIB_CONFLICT_COUNT|%s mod(s) konfligieren!
 
-HEVLIB_UPDATE_INFO_HEADER|This mod has pending updates!
+HEVLIB_UPDATE_INFO_HEADER|Dieser Mod hat ausstehende Updates!
 
-HEVLIB_DEPENDANCY_INFO_HEADER|This mod has missing dependancies!
+HEVLIB_DEPENDANCY_INFO_HEADER|Diesem Mod fehlen Abhängigkeiten!
 
-HEVLIB_CONFLICT_INFO_HEADER|This mod is currently in conflict!
+HEVLIB_CONFLICT_INFO_HEADER|Dieser Mod steht im Konflikt!
 
-HEVLIB_UPDATE_INFO_BODY|Update this mod from version [%s] to version [%s]?
+HEVLIB_UPDATE_INFO_BODY|Den Mod von Version [%s] auf Version [%s] upgraden?
 
-HEVLIB_DEPENDANCY_INFO_BODY|This mod requires the following mods, which are missing:\n%s\n\n\n\nDo not expect this mod to operate as intended!
+HEVLIB_DEPENDANCY_INFO_BODY|Diesem Mod fehlen folgende Abhängigkeiten:\n%s\n\n\n\Erwarte nicht, dass der Mods wie erwartet funktioniert!
 
-HEVLIB_CONFLICT_INFO_BODY|This mod is in conflict with other installed mods. Please install a compatable version of the following mods:\n%s\n\n\n\nDo not expect this mod to operate as intended!
+HEVLIB_CONFLICT_INFO_BODY|Dieser Mod steht in Konflikt mit anderen Mods. Bitte nutze eine kompatiblere Version für die folgenden Mods:\n%s\n\n\n\Erwarte nicht, dass der Mods wie erwartet funktioniert!
 
-HEVLIB_CONFIG_RANDOMIZE_MINERALS|Randomize mineral seed
+HEVLIB_CONFIG_RANDOMIZE_MINERALS|Zufälliger Mineral-Seed
 
-HEVLIB_CONFIG_RANDOMIZE_MINERALS_TOOLTIP|Randomizes the mineral seeds upon every game launch. \n\nIf false, uses a predetermined array of constants for mineral seeds
+HEVLIB_CONFIG_RANDOMIZE_MINERALS_TOOLTIP|Erstellt bei Spielstart immer einen zufälligen Seed für die Mineralien. \n\nWenn deaktiviert, wird ein vorrausbestimmte Liste an Konstanten für die Seeds verwendet.
 
 HEVLIB_UPDATE_CENTER|Mod Update Center
 
-HEVLIB_UPDATE_CENTER_DESC|The following mods have updates
+HEVLIB_UPDATE_CENTER_DESC|Die folgenden Mods haben Updates
 
-HEVLIB_UPDATE_ALL|Update all mods
+HEVLIB_UPDATE_ALL|Update alle Mods
 
-HEVLIB_IGNORE_ALL|Ignore all mods
+HEVLIB_IGNORE_ALL|Ignorier alle Mods
 
-HEVLIB_IGNORE_UPDATE|Ignore update
+HEVLIB_IGNORE_UPDATE|Update ignorieren
 
-HEVLIB_UPDATE_MOD|Update mod
+HEVLIB_UPDATE_MOD|Mod updaten
 
-HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD|Update the selected mod [%s] to version [%s]? \n\nThis may take a while, depending on the size of the mod.
+HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD|Den Mod von Version [%s] auf [%s] updaten? \n\nJe nach Größe des Mods kann dies etwas dauern.
 
-HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MOD_UPDATE|Ignore the update for mod [%s] to version [%s]? \n\nThis decision can be reset in the mod menu config.
+HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MOD_UPDATE|Das Update des Mods von Version [%s] auf [%s] ignorieren? \n\nDiese Entscheidung kann im Mod-Menü zurückgesetzt werden.
 
-HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MODS|Update all mods displayed in this menu? \n\nThis may take a while, depending on the number and size of the mods.
+HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MODS|Alle Mods updaten? \n\nJe nach Größe und Anzahl der Mods kann dies etwas dauern.
 
-HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MODS|Ignore all mod updates displayed in this menu? \n\nThis decision can be reset in the mod menu config.
+HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MODS|Alle Mod-Updates ignorieren? \n\nDiese Entscheidung kann im Mod-Menü zurückgesetzt werden.
 
-HEVLIB_ICON_TOOLTIP_CONFLICT|This mod conflicts with the following mods:%s
+HEVLIB_ICON_TOOLTIP_CONFLICT|Dieser Mods steht in Konflikt mit folgenden Mods:%s
 
-HEVLIB_ICON_TOOLTIP_DEPENDANCIES|This mod is missing the following mod dependancies:%s
+HEVLIB_ICON_TOOLTIP_DEPENDANCIES|Diesem Mod fehlen folgende Abhängigkeiten:%s
 
-HEVLIB_ICON_TOOLTIP_COMPLEMENTARY|This mod complements the following mods:%s
+HEVLIB_ICON_TOOLTIP_COMPLEMENTARY|Dieser Mod ergänzt die folgenden Mods:%s
 
-HEVLIB_ICON_TOOLTIP_UPDATES|This mod has an update! \nVersion [%s] -> Version [%s]
+HEVLIB_ICON_TOOLTIP_UPDATES|Dieser Mod hat ein Update! \nVersion [%s] -> Version [%s]
 
-HEVLIB_MODMENU_UPDATE_NOTIFIER|There are updates for your mods. \n\nDo you want to open the update menu?
+HEVLIB_MODMENU_UPDATE_NOTIFIER|Es sind Mod-Updates verfügbar. \n\nWillst du das Update-Menü öffnen?
 
-HEVLIB_PLEASE_WAIT|Please wait...
+HEVLIB_PLEASE_WAIT|Bitte warte...
 
-HEVLIB_RESTART|Restart game
+HEVLIB_RESTART|Spiel neustarten
 
-HEVLIB_EXIT_INSTEAD|Exit game instead
+HEVLIB_EXIT_INSTEAD|Spiel beenden
 
-HEVLIB_RESTART_BECAUSE_NEW_MODS|The game needs to restart to apply changes to mods. \n\nAlternatively, you can close the game, or close this window to continue playing to allow you to save.
+HEVLIB_RESTART_BECAUSE_NEW_MODS|Ein Neustart wird benötigt. \n\nAlternativ kann dieses Fenster geschlossen werden, damit du noch vorher speichern kannst.
 
-HEVLIB_WAIT_TO_UPDATE_ALL|Please wait... \n\nDownloading mod %02d of %02d \n%s [%s] version [%s]
+HEVLIB_WAIT_TO_UPDATE_ALL|Bitte warte... \n\nDownloade Mod %02d von %02d \n%s [%s] Version [%s]
 
-HEVLIB_TITLE_IGNORE_MOD|Ignore mod?
+HEVLIB_TITLE_IGNORE_MOD|Mod ignorieren?
 
-HEVLIB_TITLE_UPDATE_MOD|Update mod?
+HEVLIB_TITLE_UPDATE_MOD|Mod updaten?
 
-HEVLIB_TITLE_IGNORE_MODS|Ignore mods?
+HEVLIB_TITLE_IGNORE_MODS|Mods ignorieren?
 
-HEVLIB_TITLE_UPDATE_MODS|Update mods?
+HEVLIB_TITLE_UPDATE_MODS|Mods updaten?
 
 HEVLIB_DLCLIST_DLC_HEADER|------- DLC ------
 
 HEVLIB_DLCLIST_MODS_HEADER|------ MODS ------
 
-HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST|Show always displayed libraries in DLC list
+HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST|Bibliotheken mit "Immer zeigen" in der DLC-Liste auflisten
 
-HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST_TOOLTIP|Allows libraries with the 'always_display' tag (such as HevLib) to appear in the DLC list mods section
+HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST_TOOLTIP|Bibliotheken mit dem 'Immer Zeigen' tag (so wie HevLib) erlauben, in der DLC-Mod-Liste zu erscheinen.
 
-HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST|Show all libraries in DLC list
+HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST|Alle Bibliotheken auflisten
 
-HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST_TOOLTIP|Allows all libraries to appear in the DLC list mods section. This can cause the list to get very large with libraries that have a lot of mod main files for sub processes.
+HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST_TOOLTIP|Alle Bibliotheken in der DLC-Mod-Liste auflisten. Die Liste kann durch Mods mit vielen Sub-Prozessen sehr lang werden.
 
-HEVLIB_CONFIG_DLCLIST_SORT_ORDER|DLC list mod sort order
+HEVLIB_CONFIG_DLCLIST_SORT_ORDER|DLC-Mod-Liste Sortierung
 
-HEVLIB_CONFIG_DLCLIST_SORT_ORDER_TOOLTIP|If and how the DLC list mod section should be sorted.
+HEVLIB_CONFIG_DLCLIST_SORT_ORDER_TOOLTIP|Ob und wie die Liste sortiert werden soll.
 
-HEVLIB_RESEARCH|Research
+HEVLIB_RESEARCH|Forschung
 
-HEVLIB_RESEARCH_CURRENT|Current Research
+HEVLIB_RESEARCH_CURRENT|Aktuelle Forschung
 
-HEVLIB_CURRENT_PROJECTS|Active Research Projects
+HEVLIB_CURRENT_PROJECTS|Aktive Forschungsprojekte
 
-HEVLIB_RESEARCH_STATS|All Project Stats
+HEVLIB_RESEARCH_STATS|Alle Projektstatistiken
 
-HEVLIB_RESEARCH_AVAILABLE|Available Projects
+HEVLIB_RESEARCH_AVAILABLE|Verfügbare Projekte
 
-HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT|UI Scroll Left
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT|UI links scrollen
 
-HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT_TOOLTIP|Primary left scroll input for horizontal-only scroll menus
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT_TOOLTIP|Primäre Taste für horizontale Bildlaufmenüs
 
-HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT|UI Scroll Right
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT|UI rechts scrollen
 
-HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT_TOOLTIP|Primary right scroll input for horizontal-only scroll menus
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT_TOOLTIP|Primäre Taste für horizontale Bildlaufmenüs
 
-HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2|UI Scroll Left (alt)
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2|UI links scrollen (alt)
 
-HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2_TOOLTIP|Alternate left scroll input for horizontal-only scroll menus
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2_TOOLTIP|Alternative Taste für horizontale Bildlaufmenüs
 
-HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2|UI Scroll Right (alt)
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2|UI rechts scrollen (alt)
 
-HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2_TOOLTIP|Alternate right scroll input for horizontal-only scroll menus
+HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2_TOOLTIP|Alternative Alternative Taste für horizontale Bildlaufmenüs
 
-SYSTEM_HEVLIB_INTERNALS_NODE|Internal System Mod Handle
+SYSTEM_HEVLIB_INTERNALS_NODE|Interne System Mod Laufzeit
 
-NOTIFICATION_NAME_PLACEHOLDER|{Notification Body Missing}
+NOTIFICATION_NAME_PLACEHOLDER|{Benachrichtigungskörper fehlt}
 
-NOTIFICATION_TITLE_PLACEHOLDER|{Notification Name Missing}
+NOTIFICATION_TITLE_PLACEHOLDER|{Benachrichtigungsname fehlt}
 
-HEVLIB_AVAILABLE_RESEARCH|Available Research Projects
+HEVLIB_AVAILABLE_RESEARCH|Verfügbare Forschungsprojekte
 
-HEVLIB_RESEARCH_TOTAL_TOOLTIP|Total progress towards this project
+HEVLIB_RESEARCH_TOTAL_TOOLTIP|Gesammter Forschungsstand für das Projekt
 
 DLC_ANDROID|Android face pack
 
-HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT|Limit nanodrone storage output
+HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT|Limitiere Nanodrohnenlagerarbeitsleistung
 
-HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT_TOOLTIP|Prevents nanodrones from being used if the consumption rate exceeds that of the installed storage medium. \nNote: this likely will never be met outside of very specific configurations.
+HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT_TOOLTIP|Verhindert, dass Nanodrohnen mehr als das vom installiertem Medium bereitgestellten Rate nutzen können. \nNotiz: Dies wird nur in speziellen Konfigurationen passieren.
 
-HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING|Display current player count
+HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING|Zeige aktuelle Spieleranzahl
 
-HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING_TOOLTIP|Whether to display the number of concurrent players on Steam clients.\nNote that numbers are separate between full game and demo.
+HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING_TOOLTIP|Zeigt die Anzahl aller Steam-Clienten in der oberen linken Bildschirmecke.\nDieser Zähler unterscheidet zwischen Vollversion und Demo.
 
-HEVLIB_CLEAR_LEADERBOARDS|Clear leaderboard stats
+HEVLIB_CLEAR_LEADERBOARDS|Leaderboardstatistiken resetten
 
-HEVLIB_CLEAR_LEADERBOARDS_TOOLTIP|Opens a menu that lets you reset individual leaderboard stats.\n\nNOTE: Steam releases only
+HEVLIB_CLEAR_LEADERBOARDS_TOOLTIP|Öffnet ein Menü, in welchem man individuelle Statistiken zurücksetzen kann. \n\nNOTIZ: Nur für Steam-Versionen
 
-HEVLIB_OPEN_MENU|Open menu
+HEVLIB_OPEN_MENU|Öffne Menü
 
-STEAMSTAT_best_haul|Best haul (complete)
+STEAMSTAT_best_haul|Beste Ausbeute (komplett)
 
-STEAMSTAT_best_ore|Best haul (ore)
+STEAMSTAT_best_ore|Beste Ausbeute (Erz)
 
-STEAMSTAT_longest_dive|Longest dive (including astrogation)
+STEAMSTAT_longest_dive|Längster Tauchgang (mit Astrogation)
 
-STEAMSTAT_longest_dive_realtime|Longest dive (pilot time)
+STEAMSTAT_longest_dive_realtime|Längster Tauchgang (Steuerzeit)
 
-STEAMSTAT_money_per_day|Average income per day
+STEAMSTAT_money_per_day|Durchschnittliche Einnahmen pro Tag
 
-STEAMSTAT_time|Days working in the rings
+STEAMSTAT_time|Tage in den Ringen
 
-STEAMSTAT_total_money|Wealth
+STEAMSTAT_total_money|Vermögen
 
-STEAMSTAT_CLEAR_STAT|Clear stat
+STEAMSTAT_CLEAR_STAT|Statistik reinigen
 
-HEVLIB_CONFIRM|Confirm Action
+HEVLIB_CONFIRM|Aktion bestätigen
 
-HEVLIB_WIPE_STAT_ARE_YOU_SURE|Are you sure you want to wipe the stat %s?
+HEVLIB_WIPE_STAT_ARE_YOU_SURE|Bist du dir sicher, dass du %s ausradieren willst?
 
-HEVLIB_NOSTEAM|This menu only works on Steam builds.
+HEVLIB_NOSTEAM|Dieses Menü funktioniert auf Steam.
 
-HEVLIB_OPT_PROFILES|Settings Profiles
+HEVLIB_OPT_PROFILES|Einstellungsprofile
 
-HEVLIB_PROFILE_SELECT|Select Profile
+HEVLIB_PROFILE_SELECT|Profil wählen
 
-HEVLIB_ADD_PROFILE|Add profile
+HEVLIB_ADD_PROFILE|Profil hinzufügen
 
-HEVLIB_RENAME_PROFILE|Rename profile
+HEVLIB_RENAME_PROFILE|Profil umbenennen
 
-HEVLIB_DELETE_PROFILE|Delete profile
+HEVLIB_DELETE_PROFILE|Profil löschen
 
-HEVLIB_PROFILENAME_ADD|Add profile
+HEVLIB_PROFILENAME_ADD|Profil hinzufügen
 
-HEVLIB_PROFILENAME_RENAME|Rename profile
+HEVLIB_PROFILENAME_RENAME|Profil umbenennen
 
-HEVLIB_PROFILE_DELETE|Delete profile
+HEVLIB_PROFILE_DELETE|Profil löschen
 
-HEVLIB_PROFILE_DELETE_ARE_YOU_SURE|Are you sure you want to delete this profile?
+HEVLIB_PROFILE_DELETE_ARE_YOU_SURE|Bist du dir sicher, dass du das Profil löschen willst?
 
-HEVLIB_CHANGELOGS|Changelogs
+HEVLIB_CHANGELOGS|Änderungsprotokoll
 
-HEVLIB_CHANGELOGS_NEW|New Changelogs
+HEVLIB_CHANGELOGS_NEW|Neues Änderungsprotokoll
 
-HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK|Multiple minerals per chunk
+HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK|Multiple Mineralien pro Brocken
 
-HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK_TOOLTIP|Adds functionality that permits multiple ores to exist within the same ore chunk. \n\nCredit: Za'krin for the original implementation this adapts and improves from.
+HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK_TOOLTIP|Verbietet, dass multiple Mineralien sich auf einen Erz-Brocken sammeln. \n\nDank an Za'krin für die ursprüngliche Implementierung. Diese Version adaptiert und verbessert sie.
