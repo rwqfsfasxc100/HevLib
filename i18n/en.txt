@@ -419,3 +419,11 @@ HEVLIB_CHANGELOGS_NEW|New Changelogs
 HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK|Multiple minerals per chunk
 
 HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK_TOOLTIP|Adds functionality that permits multiple ores to exist within the same ore chunk. \n\nCredit: Za'krin for the original implementation this adapts and improves from.
+
+HEVLIB_GITHUB_PROGRESS_WAITING_ON_RESPONSE|Waiting for response from server.
+
+HEVLIB_GITHUB_PROGRESS_ZIP_FOUND_AND_REQUESTING|Response received. Requesting file.
+
+HEVLIB_GITHUB_PROGRESS_DOWNLOADING|Downloading file.\n%030d percent\n%d downloaded of %d bytes
+
+HEVLIB_GITHUB_PROGRESS_DOWNLOADING_ONLY_BYTES|Downloading file.\n%d bytes downloaded

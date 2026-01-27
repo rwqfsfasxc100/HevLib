@@ -88,6 +88,7 @@ func downloadZip(url, folder):
 		var rnd = rng.randi_range(1, 32767)
 		
 		zipName = str(rnd) + "_" + zipName
-	get_parent().get_node("ZipDownloadHandler").set_download_file(folder + zipName)
-	get_parent().get_node("ZipDownloadHandler").request(url)
+	var handler = get_parent().get_node("ZipDownloadHandler")
+	handler.set_download_file(folder + zipName)
+	handler.request(url)
 	

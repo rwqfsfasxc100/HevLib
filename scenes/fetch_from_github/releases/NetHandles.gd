@@ -7,10 +7,15 @@ var get_pre_releases = false
 var file_preference = "any"
 var file_to_download = "first"
 
+
 func _ready():
 	if not releases_URL == "":
 		var urlSplitByGithub = releases_URL.split("https://github.com/")
 		var urlSplitByReleases = urlSplitByGithub[1].split("/releases")
+		
+		if nodeToReturnTo and nodeToReturnTo.has_method("_get_github_progress"):
+			nodeToReturnTo._get_github_progress("HEVLIB_GITHUB_PROGRESS_WAITING_ON_RESPONSE",0,0,0)
+		
 		var githubApiURL = "https://api.github.com/repos/" + urlSplitByReleases[0] + "/releases"
 		$ReleasesURLHandler.get_pre_releases = get_pre_releases
 		$ReleasesURLHandler.folder = folder
