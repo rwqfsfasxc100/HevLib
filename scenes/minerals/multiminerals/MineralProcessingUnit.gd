@@ -12,7 +12,7 @@ func _physics_process(delta):
 				if "comp_val" in p and (p.fillerContent < 0.05 or p.mass < 0.02):
 					#For every material in the chunk
 					for type in p.composition:
-						#If the material is not the filler AND it's not disabled in the geologist menu
+						#If the material is not the filler
 						if type != p.filler:
 							#Calculate how much of the mineral to store
 							var store = 1000 * p.composition[type] * mineralEfficiency

@@ -70,7 +70,7 @@ static func handle_ore_scenes(mineral_data):
 						scenes.append(mineral.get("ore_%s" % (i + 1),""))
 					var item = make_asteroid_spawner_section(mname,scenes)
 					mineral_list.merge({mname:item})
-					Debug.l("HevLib Mineral Manager: adding mineral %s using handler [scene]")
+					Debug.l("HevLib Mineral Manager: adding mineral %s using handler [scene]" % mname)
 				"recolor":
 					var base = "fe"
 					var color = mineral.get("color",Color(1,1,1,1))
@@ -90,7 +90,7 @@ static func handle_ore_scenes(mineral_data):
 					var roc = make_custom_rocks(mname,color,base)
 					var rt = make_asteroid_spawner_section(mname,roc)
 					mineral_list.merge({mname:rt})
-					Debug.l("HevLib Mineral Manager: adding mineral %s using handler [recolor]")
+					Debug.l("HevLib Mineral Manager: adding mineral %s using handler [recolor]" % mname)
 				_:
 					
 					Debug.l("HevLib Mineral Manager: mineral %s using incorrect handler, set price to 0.0 or less to prevent being registered to exist in the ring or crashes may happen" % mineral)
