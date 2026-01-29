@@ -28,13 +28,15 @@ var ammo_speed_add = 0
 var nano_speed_add = 0
 var ammo_speed_multi = 1.0
 var nano_speed_multi = 1.0
-var emp_shieldingance = 0
-
+var emp_shielding = 0
+var emp_scale_multi = 1.0
 
 var nanodroneMagazine = 0
 var listings = {}
 var hevlib_config_data = {}
 
+var system_name_registers = []
+var add_systems = []
 
 func _enter_tree():
 	var file = File.new()
@@ -81,8 +83,9 @@ func _enter_tree():
 		
 		
 		
-		
-		
+		var dname = item.get("display_system",{})
+		if dname.keys().size() > 0:
+			ls.merge({"display_system":dname})
 		
 		
 		
@@ -113,12 +116,23 @@ func _enter_tree():
 		if listingNanoSpeedMulti != 1.0:
 			ls.merge({"nano_speed_multi":listingNanoSpeedMulti})
 		
+		var listingEmpScaleMulti = float(item.get("emp_scale_multi_upper",1.0))/float(item.get("emp_scale_multi_upper",1.0))
+		if listingEmpScaleMulti != 1.0:
+			ls.merge({"emp_scale_multi":listingEmpScaleMulti})
+		
 		
 		listings.merge({
 			listingSystemName:ls
 		})
-	installed = DataFormat.__sift_dictionary(shipConfig,listings.keys())
+	configMutex.lock()
+	current = DataFormat.__sift_ship_config(shipConfig.duplicate(true),listings.keys(),cfgs_to_ignore)
+	configMutex.unlock()
+	for i in current:
+		installed.append(i.split(".")[i.split(".").size() - 1])
 
+var cfgs_to_ignore = ["currentCargo","currentCargoBy","currentCargoComposition","damage","juryRig","preferredCrew","processedCargo","remoteCargo","tuning"]
+
+var current = []
 var installed = []
 func _ready():
 	var file = File.new()
@@ -145,77 +159,73 @@ func _ready():
 		
 		for item in installed:
 			var iddata = listings[item]
+			has_made_change = true
 			for key in iddata:
 				var val = iddata[key]
 				match key:
 					"storage_flat":
 						storage_add += val
 						total_added_capacity += val
-						has_made_change = true
 					"storage_ammo":
 						ammo_add += val
 						total_added_capacity += val
-						has_made_change = true
 					"storage_nano":
 						nano_add += val
 						total_added_capacity += val
-						has_made_change = true
 					"storage_multi":
 						multi *= float(val)
-						has_made_change = true
 					"ammo_multi":
 						ammo_multi *= float(val)
-						has_made_change = true
-						
+					"display_system":
+						var dname = val.get("name","")
+						var mv = val.get("can_display_multiple",false)
+						if (dname and dname != "") and ((not dname in system_name_registers) or mv):
+							var status = val.get("status",100.0)
+							var power = val.get("power",0.0)
+							
+							var o = {
+								"name":dname,
+								"can_display_multiple":mv,
+								"power":power,
+								"status":status,
+							}
+							system_name_registers.append(dname)
+							add_systems.append(o)
 					"nano_multi":
 						nano_multi *= float(val)
-						has_made_change = true
 					"propellant_multi":
 						propellant_multi *= float(val)
-						has_made_change = true
+					"emp_scale_multi":
+						emp_scale_multi *= float(val)
 					"mass_multi":
 						mass_multi *= float(val)
-						has_made_change = true
 					"storage_propellant":
 						propellant_add += val
 						total_added_capacity += val
-						has_made_change = true
 					"force_type":
 						modifyable_type = val
-						has_made_change = true
 					"crew_count":
 						modifyable_crew_count += val
-						has_made_change = true
 					"crew_morale":
 						modifyable_crew_morale += val
-						has_made_change = true
 					"mass":
 						mass_add += val
-						has_made_change = true
 					"mass_per_crew_member":
 						mass_per_crew += val
-						has_made_change = true
 					"mass_per_tonne_of_processed_ore":
 						mass_per_processed_tonne += val
-						has_made_change = true
 					"mass_per_tonne_total_storage_added":
 						mass_per_tonne_total_storage_added += val
-						has_made_change = true
 					"ammo_speed_add":
 						ammo_speed_add += val
-						has_made_change = true
 					"nano_speed_add":
 						nano_speed_add += val
-						has_made_change = true
 					"ammo_speed_multi":
 						ammo_speed_multi *= val
-						has_made_change = true
 					"nano_speed_multi":
 						nano_speed_multi *= val
-						has_made_change = true
 					"emp_shielding":
-						emp_shieldingance += val
-						has_made_change = true
+						emp_shielding += val
 		
 		
 		if modifyable_crew_count > 0:
@@ -327,7 +337,7 @@ func _ready():
 		var chash = cfg.hash()
 		var shash = state.hash()
 		
-		empShield += emp_shieldingance
+		empShield += emp_shielding
 		
 		var modifyable_mass = float(mass_add)/1000.0
 		
@@ -343,6 +353,20 @@ func _ready():
 			var active = getCurrentlyActiveCrewNames()
 			if active.size() > crew:
 				deactivateCrew(crew)
+		
+		for i in add_systems:
+			var dname = i.get("name","")
+			var power = i.get("power",0.0)
+			var status = i.get("status",100.0)
+			
+			
+			var sys = Node2D.new()
+			sys.set_script(load("res://HevLib/scenes/equipment/var_nodes/system_display.gd"))
+			sys.systemName = dname
+			sys.power = power
+			sys.status = status
+			add_child(sys)
+			call_deferred("move_child",sys,get_child_count())
 		
 		if has_made_change:
 			var vmass = Node2D.new()

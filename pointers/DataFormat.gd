@@ -38,6 +38,9 @@ var developer_hint = {
 		"Compares two sets of versions. If the first one is equal to or newer, returns true, otherwise returns false",
 		"First three int inputs are the major, minor and bugfix for the first version",
 		"Second three int inputs are the major, minor and bugfix for the second version",
+	],
+	"__sift_ship_config":[
+		
 	]
 }
 
@@ -72,4 +75,8 @@ static func __convert_arr_to_vec2arr(array: Array) -> PoolVector2Array:
 const cv = preload("res://HevLib/scripts/compare_versions.gd")
 static func __compare_versions(primary_major : int,primary_minor : int,primary_bugfix : int, compare_major : int, compare_minor : int, compare_bugfix : int) -> bool:
 	var s = cv.compare_versions(primary_major ,primary_minor ,primary_bugfix , compare_major , compare_minor , compare_bugfix )
+	return s
+const ssc = preload("res://HevLib/scripts/sift_ship_config.gd")
+static func __sift_ship_config(dictionary: Dictionary,search_keys: Array, cfgs_to_ignore:Array) -> Array:
+	var s = ssc.sift_ship_config(dictionary,search_keys,cfgs_to_ignore)
 	return s
