@@ -8,6 +8,8 @@ export (int) var mass = 0
 export var power = 0.0
 export var status = 100.0
 
+export var affect_inspection = false
+export var inspection = false
 
 func getStatus():
 	return clamp(status,0.0,100.0)
@@ -19,6 +21,8 @@ func getPower():
 		TYPE_REAL:
 			value = power
 	return value
+func _ready():
+	inspection = affect_inspection
 
 var power_downcycle = false
 

@@ -53,6 +53,8 @@ func _enter_tree():
 			match data:
 				"storage_flat":
 					ls.merge({"storage_flat":item.get("storage_flat")})
+				"show_modifier_system":
+					ls.merge({"show_modifier_system":item.get("show_modifier_system")})
 				"storage_ammo","storage_ammunition":
 					ls.merge({"storage_ammo":item.get("storage_ammo",item.get("storage_ammunition"))})
 				"storage_nano","storage_nanodrones":
@@ -135,6 +137,8 @@ var cfgs_to_ignore = ["currentCargo","currentCargoBy","currentCargoComposition",
 var current = []
 var installed = []
 func _ready():
+#	if not setup:
+#		yield(self,"setup")
 	var file = File.new()
 	init_vars()
 	base_mass = currentMass
@@ -159,7 +163,8 @@ func _ready():
 		
 		for item in installed:
 			var iddata = listings[item]
-			has_made_change = true
+			if iddata.get("show_modifier_system",true):
+				has_made_change = true
 			for key in iddata:
 				var val = iddata[key]
 				match key:
@@ -354,10 +359,12 @@ func _ready():
 			if active.size() > crew:
 				deactivateCrew(crew)
 		
-		for i in add_systems:
+		for a in range(add_systems.size()):
+			var i = add_systems[a]
 			var dname = i.get("name","")
 			var power = i.get("power",0.0)
 			var status = i.get("status",100.0)
+			var inspect = i.get("affect_inspection",false)
 			
 			
 			var sys = Node2D.new()
@@ -365,6 +372,7 @@ func _ready():
 			sys.systemName = dname
 			sys.power = power
 			sys.status = status
+			sys.affect_inspection = inspect
 			add_child(sys)
 			call_deferred("move_child",sys,get_child_count())
 		
