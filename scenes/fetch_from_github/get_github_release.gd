@@ -2,7 +2,7 @@ extends Node
 
 func get_github_release(URL: String, folder: String, node_to_return_to: Node, get_pre_releases: bool = false, file_preference: String = "any", file_to_download: String = "first"):
 	var cancel = false
-	if node_to_return_to == null or (not Node in node_to_return_to):
+	if node_to_return_to == null or (not node_to_return_to is Node):
 		cancel = true
 		var e = "HevLib Github Release Downloader: ERROR! Provided node [%s] either does not exist or is not of [Node] type." % str(node_to_return_to)
 		Debug.l(e)

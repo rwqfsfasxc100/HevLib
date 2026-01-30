@@ -137,7 +137,7 @@ func _get_github_progress(response:String,percent:float,bytes_downloaded:int,tot
 		download_text = txt
 
 func _process(delta):
-	if frameCounter > 1:
+	if frameCounter > 10:
 		download_text = ""
 	manager.download_status = download_text
 	frameCounter += delta
