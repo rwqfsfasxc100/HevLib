@@ -268,7 +268,7 @@ HEVLIB_IGNORE_UPDATE|Update ignorieren
 
 HEVLIB_UPDATE_MOD|Mod updaten
 
-HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD|Den Mod von Version [%s] auf [%s] updaten? \n\nJe nach Größe des Mods kann dies etwas dauern.
+HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD|Den Mod von Version [%s v%s] auf [%s] updaten? \n\nJe nach Größe des Mods kann dies etwas dauern.
 
 HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MOD_UPDATE|Das Update des Mods von Version [%s] auf [%s] ignorieren? \n\nDiese Entscheidung kann im Mod-Menü zurückgesetzt werden.
 

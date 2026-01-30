@@ -11,7 +11,7 @@ var file = File.new()
 onready var manager = get_parent().get_parent().get_parent().get_parent().get_parent()
 func _ready():
 	$Popups/IgnorePopup.dialog_text = TranslationServer.translate("HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MOD_UPDATE") % [mod_name,new_version]
-	$Popups/UpdatePopup.dialog_text = TranslationServer.translate("HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD") % [mod_name,new_version]
+	$Popups/UpdatePopup.dialog_text = TranslationServer.translate("HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD") % [mod_name,current_version,new_version]
 	var gameInstallDirectory = OS.get_executable_path().get_base_dir()
 	if OS.get_name() == "OSX":
 		gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
@@ -132,7 +132,15 @@ func _get_github_progress(response:String,percent:float,bytes_downloaded:int,tot
 					t_label = "HEVLIB_SIZE_LABEL_MEGABYTES"
 			txt = TranslationServer.translate(response) % [percent,c,TranslationServer.translate(c_label),t,TranslationServer.translate(t_label)]
 		"HEVLIB_GITHUB_PROGRESS_DOWNLOADING_ONLY_BYTES":
-			txt = TranslationServer.translate(response) % bytes_downloaded
+			var c = float(bytes_downloaded)
+			var c_label = "HEVLIB_SIZE_LABEL_BYTES"
+			if c > 1000:
+				c /= 1024
+				c_label = "HEVLIB_SIZE_LABEL_KILOBYTES"
+				if c > 1000:
+					c /=1024
+					c_label = "HEVLIB_SIZE_LABEL_MEGABYTES"
+			txt = TranslationServer.translate(response) % [c,TranslationServer.translate(c_label)]
 	if txt != "":
 		download_text = txt
 

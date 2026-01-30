@@ -268,7 +268,7 @@ HEVLIB_IGNORE_UPDATE|Ignore update
 
 HEVLIB_UPDATE_MOD|Update mod
 
-HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD|Update the selected mod [%s] to version [%s]? \n\nThis may take a while, depending on the size of the mod.
+HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD|Update the selected mod [%s v%s] to version [%s]? \n\nThis may take a while, depending on the size of the mod.
 
 HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MOD_UPDATE|Ignore the update for mod [%s] to version [%s]? \n\nThis decision can be reset in the mod menu config.
 
@@ -426,7 +426,7 @@ HEVLIB_GITHUB_PROGRESS_ZIP_FOUND_AND_REQUESTING|Response received. Requesting fi
 
 HEVLIB_GITHUB_PROGRESS_DOWNLOADING|Downloading file \| %06.2f%%\n\n%0.2f %s downloaded of %0.2f %s
 
-HEVLIB_GITHUB_PROGRESS_DOWNLOADING_ONLY_BYTES|Downloading file.\n%d bytes downloaded
+HEVLIB_GITHUB_PROGRESS_DOWNLOADING_ONLY_BYTES|Downloading file.\n\n%0.2f %s downloaded
 
 HEVLIB_GITHUB_PROGRESS_DOWNLOADED_FILE|Download finished.
 
