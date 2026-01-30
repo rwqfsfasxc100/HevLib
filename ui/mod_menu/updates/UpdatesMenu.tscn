@@ -28,13 +28,15 @@ margin_bottom = 692.5
 rect_min_size = Vector2( 1180, 645 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="base"]
-margin_right = 1180.0
-margin_bottom = 645.0
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 1175.0
+margin_bottom = 640.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="Label" type="Label" parent="base/VBoxContainer"]
-margin_right = 1180.0
+margin_right = 1170.0
 margin_bottom = 60.0
 rect_min_size = Vector2( 0, 60 )
 text = "HEVLIB_UPDATE_CENTER"
@@ -44,7 +46,7 @@ valign = 1
 [node name="Label2" type="Label" parent="base/VBoxContainer"]
 modulate = Color( 0.705882, 0.705882, 0.705882, 1 )
 margin_top = 64.0
-margin_right = 1180.0
+margin_right = 1170.0
 margin_bottom = 124.0
 rect_min_size = Vector2( 0, 60 )
 size_flags_horizontal = 5
@@ -55,89 +57,90 @@ valign = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="base/VBoxContainer"]
 margin_top = 128.0
-margin_right = 1180.0
-margin_bottom = 596.0
+margin_right = 1170.0
+margin_bottom = 586.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource( 3 )
 
 [node name="LabelContainer" type="VBoxContainer" parent="base/VBoxContainer/ScrollContainer"]
-margin_right = 1180.0
-margin_bottom = 468.0
+margin_right = 1170.0
+margin_bottom = 458.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="ButtonContainer" type="HBoxContainer" parent="base/VBoxContainer"]
-margin_top = 600.0
-margin_right = 1180.0
-margin_bottom = 645.0
+margin_top = 590.0
+margin_right = 1170.0
+margin_bottom = 635.0
 rect_min_size = Vector2( 450, 45 )
 size_flags_horizontal = 3
 alignment = 1
 
 [node name="UpdateAll" type="HBoxContainer" parent="base/VBoxContainer/ButtonContainer"]
-margin_right = 588.0
+margin_right = 387.0
 margin_bottom = 45.0
 size_flags_horizontal = 3
 alignment = 1
 
 [node name="Button" type="Button" parent="base/VBoxContainer/ButtonContainer/UpdateAll"]
-margin_left = 154.0
-margin_right = 434.0
+margin_left = 53.0
+margin_right = 333.0
 margin_bottom = 45.0
 focus_neighbour_right = NodePath("../../IgnoreAll/Button")
 text = "HEVLIB_UPDATE_ALL"
 
 [node name="IgnoreAll" type="HBoxContainer" parent="base/VBoxContainer/ButtonContainer"]
-margin_right = 588.0
+margin_left = 391.0
+margin_right = 778.0
 margin_bottom = 45.0
 size_flags_horizontal = 3
 alignment = 1
 
 [node name="Button" type="Button" parent="base/VBoxContainer/ButtonContainer/IgnoreAll"]
-margin_left = 154.0
-margin_right = 434.0
+margin_left = 52.0
+margin_right = 335.0
 margin_bottom = 45.0
 focus_neighbour_left = NodePath("../../UpdateAll/Button")
 focus_neighbour_right = NodePath("../../Cancel/Button")
 text = "HEVLIB_IGNORE_ALL"
 
 [node name="Cancel" type="HBoxContainer" parent="base/VBoxContainer/ButtonContainer"]
-margin_left = 592.0
-margin_right = 1180.0
+margin_left = 782.0
+margin_right = 1170.0
 margin_bottom = 45.0
 size_flags_horizontal = 3
 alignment = 1
 
 [node name="Button" type="Button" parent="base/VBoxContainer/ButtonContainer/Cancel"]
-margin_left = 117.0
-margin_right = 471.0
+margin_left = 17.0
+margin_right = 371.0
 margin_bottom = 45.0
 focus_neighbour_left = NodePath("../../IgnoreAll/Button")
 text = "HEVLIB_MODMENU_CLOSE"
 
 [node name="WAIT" type="Popup" parent="."]
-margin_right = 450.0
-margin_bottom = 300.0
+margin_right = 460.0
+margin_bottom = 400.0
 rect_min_size = Vector2( 450, 300 )
 popup_exclusive = true
 
 [node name="PanelContainer" type="PanelContainer" parent="WAIT"]
-margin_right = 200.0
-margin_bottom = 75.0
+margin_right = 460.0
+margin_bottom = 400.0
 rect_min_size = Vector2( 450, 300 )
 
 [node name="Button" type="Button" parent="WAIT/PanelContainer"]
 margin_left = 5.0
 margin_top = 5.0
-margin_right = 205.0
-margin_bottom = 47.0
+margin_right = 455.0
+margin_bottom = 395.0
 rect_min_size = Vector2( 450, 300 )
 
 [node name="Label" type="Label" parent="WAIT/PanelContainer/Button"]
-margin_right = 200.0
-margin_bottom = 73.0
-rect_min_size = Vector2( 450, 300 )
+margin_right = 450.0
+margin_bottom = 390.0
+rect_min_size = Vector2( 450, 390 )
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "HEVLIB_PLEASE_WAIT"

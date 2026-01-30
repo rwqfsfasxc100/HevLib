@@ -116,22 +116,33 @@ var update_all_current = 0
 func _update_all_pressed():
 	updating_all = true
 	var mods = container.get_children()
-	update_all_count = mods.size()
+#	update_all_count = mods.size()
 	for mod in mods:
 		mods_to_download.append({"name":mod.mod_name,"id":mod.mod_id,"version":mod.new_version,"container":mod})
+	start_updates()
+
+func start_updates():
+	update_all_count = mods_to_download.size()
 	move_to_next_mod()
 	$WAIT.popup_centered()
+
+var current_mod_text = ""
+var download_status = ""
 
 func move_to_next_mod():
 	if mods_to_download.size() >= 1:
 		var current = mods_to_download.pop_front()
 		update_all_current += 1
-		$WAIT/PanelContainer/Button/Label.text = TranslationServer.translate("HEVLIB_WAIT_TO_UPDATE_ALL") % [update_all_current,update_all_count,current["name"],current["id"],current["version"]]
+		current_mod_text = TranslationServer.translate("HEVLIB_WAIT_TO_UPDATE_ALL") % [update_all_current,update_all_count,current["name"],current["id"],current["version"]]
 		current["container"].display_wait_popup = false
 		current["container"]._update_confirmed()
 		$WAIT/PanelContainer/Button.grab_focus()
 	else:
 		$WAIT.hide()
+
+func _process(delta):
+	if $WAIT.visible:
+		$WAIT/PanelContainer/Button/Label.text = current_mod_text + "\n\n" + download_status
 
 func _confirmed():
 	OS.set_restart_on_exit(true,OS.get_cmdline_args())

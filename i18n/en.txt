@@ -424,6 +424,14 @@ HEVLIB_GITHUB_PROGRESS_WAITING_ON_RESPONSE|Waiting for response from server.
 
 HEVLIB_GITHUB_PROGRESS_ZIP_FOUND_AND_REQUESTING|Response received. Requesting file.
 
-HEVLIB_GITHUB_PROGRESS_DOWNLOADING|Downloading file.\n%030d percent\n%d downloaded of %d bytes
+HEVLIB_GITHUB_PROGRESS_DOWNLOADING|Downloading file \| %06.2f%%\n\n%0.2f %s downloaded of %0.2f %s
 
 HEVLIB_GITHUB_PROGRESS_DOWNLOADING_ONLY_BYTES|Downloading file.\n%d bytes downloaded
+
+HEVLIB_GITHUB_PROGRESS_DOWNLOADED_FILE|Download finished.
+
+HEVLIB_SIZE_LABEL_BYTES|bytes
+
+HEVLIB_SIZE_LABEL_KILOBYTES|kilobytes
+
+HEVLIB_SIZE_LABEL_MEGABYTES|megabytes

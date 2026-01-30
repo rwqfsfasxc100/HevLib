@@ -116,7 +116,7 @@ func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, full
 				var i = 0
 				while i < size:
 					if csvLine[i].ends_with("\\") and i < size:
-						csvLine[i] = csvLine[i] + delim + csvLine[i + 1]
+						csvLine[i] = csvLine[i].rstrip("\\") + delim + csvLine[i + 1]
 						csvLine.remove(i + 1)
 						size -= 1
 					i += 1

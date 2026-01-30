@@ -91,4 +91,4 @@ autowrap = true
 [connection signal="pressed" from="Buttons/Ignore" to="." method="_Ignore_pressed"]
 [connection signal="pressed" from="Buttons/Update" to="." method="_Update_pressed"]
 [connection signal="confirmed" from="Popups/IgnorePopup" to="." method="_ignore_confirmed"]
-[connection signal="confirmed" from="Popups/UpdatePopup" to="." method="_update_confirmed"]
+[connection signal="confirmed" from="Popups/UpdatePopup" to="." method="_do_update"]

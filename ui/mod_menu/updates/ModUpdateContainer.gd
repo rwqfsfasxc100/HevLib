@@ -37,6 +37,12 @@ func _ignore_confirmed():
 	Tool.remove(self)
 var zip_folder = "user://cache/.Mod_Menu_2_Cache/updates/zip_cache/"
 const Github = preload("res://HevLib/pointers/Github.gd")
+
+func _do_update():
+	var dv = {"name":mod_name,"id":mod_id,"version":new_version,"container":self}
+	manager.mods_to_download.append(dv)
+	manager.start_updates()
+
 func _update_confirmed():
 	file.open(update_store,File.READ)
 	var data = JSON.parse(file.get_as_text()).result
@@ -74,7 +80,7 @@ func _downloaded_zip(file, filepath):
 	fi.close()
 	repos()
 	FileAccess.__copy_file(filepath,modPathPrefix)
-	manager.move_to_next_mod()
+	Tool.deferCallInPhysics(manager,"move_to_next_mod")
 	Tool.remove(self)
 
 
@@ -92,3 +98,46 @@ func repos():
 		get_parent().get_parent().get_parent().get_node("ButtonContainer/UpdateAll/Button").modulate = Color(0.7,0.7,0.7,1)
 		get_parent().get_parent().get_parent().get_node("ButtonContainer/IgnoreAll/Button").disabled = true
 		get_parent().get_parent().get_parent().get_node("ButtonContainer/IgnoreAll/Button").modulate = Color(0.7,0.7,0.7,1)
+
+var frameCounter = 0
+
+var download_text = ""
+
+func _get_github_progress(response:String,percent:float,bytes_downloaded:int,total_bytes:int):
+	var txt = ""
+	frameCounter = 0
+	match response:
+		"HEVLIB_GITHUB_PROGRESS_WAITING_ON_RESPONSE":
+			txt = TranslationServer.translate(response)
+		"HEVLIB_GITHUB_PROGRESS_ZIP_FOUND_AND_REQUESTING":
+			txt = TranslationServer.translate(response)
+		"HEVLIB_GITHUB_PROGRESS_DOWNLOADED_FILE":
+			txt = TranslationServer.translate(response)
+		"HEVLIB_GITHUB_PROGRESS_DOWNLOADING":
+			var c = float(bytes_downloaded)
+			var t = float(total_bytes)
+			var c_label = "HEVLIB_SIZE_LABEL_BYTES"
+			var t_label = "HEVLIB_SIZE_LABEL_BYTES"
+			if c > 1000:
+				c /= 1024
+				c_label = "HEVLIB_SIZE_LABEL_KILOBYTES"
+				if c > 1000:
+					c /=1024
+					c_label = "HEVLIB_SIZE_LABEL_MEGABYTES"
+			if t > 1000:
+				t /= 1024
+				t_label = "HEVLIB_SIZE_LABEL_KILOBYTES"
+				if t > 1000:
+					t /=1024
+					t_label = "HEVLIB_SIZE_LABEL_MEGABYTES"
+			txt = TranslationServer.translate(response) % [percent,c,TranslationServer.translate(c_label),t,TranslationServer.translate(t_label)]
+		"HEVLIB_GITHUB_PROGRESS_DOWNLOADING_ONLY_BYTES":
+			txt = TranslationServer.translate(response) % bytes_downloaded
+	if txt != "":
+		download_text = txt
+
+func _process(delta):
+	if frameCounter > 1:
+		download_text = ""
+	manager.download_status = download_text
+	frameCounter += delta
