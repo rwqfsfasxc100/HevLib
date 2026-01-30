@@ -118,7 +118,7 @@ func _enter_tree():
 		if listingNanoSpeedMulti != 1.0:
 			ls.merge({"nano_speed_multi":listingNanoSpeedMulti})
 		
-		var listingEmpScaleMulti = float(item.get("emp_scale_multi_upper",1.0))/float(item.get("emp_scale_multi_upper",1.0))
+		var listingEmpScaleMulti = float(item.get("emp_scale_multi_upper",1.0))/float(item.get("emp_scale_multi_lower",1.0))
 		if listingEmpScaleMulti != 1.0:
 			ls.merge({"emp_scale_multi":listingEmpScaleMulti})
 		
@@ -187,12 +187,13 @@ func _ready():
 						if (dname and dname != "") and ((not dname in system_name_registers) or mv):
 							var status = val.get("status",100.0)
 							var power = val.get("power",0.0)
-							
+							var inspect = val.get("affect_inspection",false)
 							var o = {
 								"name":dname,
 								"can_display_multiple":mv,
 								"power":power,
 								"status":status,
+								"affect_inspection":inspect
 							}
 							system_name_registers.append(dname)
 							add_systems.append(o)
