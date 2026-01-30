@@ -40,7 +40,12 @@ var developer_hint = {
 		"Second three int inputs are the major, minor and bugfix for the second version",
 	],
 	"__sift_ship_config":[
-		
+		"Ship config specific equivalent to __sift_dictionary",
+		"Allows you to remove specific keys from the top level of the dictionary, useful for getting rid of specific config entries that may sour the data",
+		"dictionary -> the dictionary to search through",
+		"search_keys -> array of keys and values to look for. Can contain any type, will return any match.",
+		"cfgs_to_ignore -> (optional) array used to remove keys from the top level of the dictionary",
+		"Returns an array of the values matched from within the search_keys array in config format with the system appended to the end, e.g. weaponSlot.main.type.SYSTEM_EMD14"
 	]
 }
 
