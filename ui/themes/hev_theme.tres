@@ -135,6 +135,7 @@ HSlider/icons/grabber_highlight = SubResource( 19 )
 HSlider/styles/grabber_area = ExtResource( 12 )
 HSlider/styles/grabber_area_highlight = ExtResource( 13 )
 HSlider/styles/slider = ExtResource( 11 )
+HSplitContainer/constants/separation = 6
 Label/colors/font_color = Color( 0.941176, 0.941176, 0.941176, 1 )
 Label/colors/font_color_shadow = Color( 0.188235, 0.188235, 0.188235, 1 )
 Label/constants/shadow_offset_x = 2
