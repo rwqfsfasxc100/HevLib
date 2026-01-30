@@ -9,11 +9,13 @@ var percent:float = 0
 var bytes_downloaded: int = 0
 var total_bytes: int = 0
 
+var state_progress = true
+
 func _ready():
 	is_updating(false)
 
 func request(url,custom_headers:PoolStringArray = [],ssl_validate_domain: bool = true, method = 0,request_data:String = ""):
-	if nodeToReturnTo and nodeToReturnTo.has_method("_get_github_progress"):
+	if state_progress:
 		nodeToReturnTo._get_github_progress("HEVLIB_GITHUB_PROGRESS_ZIP_FOUND_AND_REQUESTING",0,0,0)
 		Tool.deferCallInPhysics(self,"is_updating",[true])
 	.request(url,custom_headers,ssl_validate_domain,method,request_data)
@@ -27,13 +29,10 @@ func _on_zip_request_completed(result, response_code, headers, body):
 	if not filePath.ends_with("/"):
 		filePath = filePath + "/"
 	filePath = filePath + downloadedFile
-	is_updating(false)
-	if nodeToReturnTo.has_method("_get_github_progress"):
+	if state_progress:
+		is_updating(false)
 		nodeToReturnTo._get_github_progress("HEVLIB_GITHUB_PROGRESS_DOWNLOADED_FILE",0,0,0)
-	if nodeToReturnTo.has_method("_downloaded_zip"):
-		nodeToReturnTo._downloaded_zip(downloadedFile, filePath)
-	else:
-		Debug.l("HevLib Github Release Downloader: Error! Function _downloaded_zip does not exist at the target [%s]" % str(nodeToReturnTo))
+	nodeToReturnTo._downloaded_zip(downloadedFile, filePath)
 	
 	
 #	Tool.deferCallInPhysics(self,"is_updating",[false])
