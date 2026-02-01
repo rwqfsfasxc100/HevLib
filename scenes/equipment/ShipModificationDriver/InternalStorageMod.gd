@@ -313,15 +313,6 @@ func _ready():
 		if dronePartsMax:
 			nano_min = 100
 		
-#		var total_ammo = clamp(massDriverAmmoMax + ammo_add,ammo_min,INF)
-#		if total_ammo:
-#			massDriverAmmoMax = total_ammo
-#			massDriverAmmo = total_ammo
-#		var total_nano = clamp(dronePartsMax + nano_add,nano_min,INF)
-#		if total_nano:
-#			dronePartsMax = total_nano
-#			droneParts = total_nano
-		
 		addPropellantCapacity(propellant_add)
 		addAmmoCapacity(ammo_add)
 		addDronesCapacity(nano_add)
