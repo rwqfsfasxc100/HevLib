@@ -5,6 +5,10 @@ This library is run through a set of 'pointers', which are small snippets of cod
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/M4M01L6LMF)
 
+# Quick Links:
+* [Installation Steps](https://github.com/rwqfsfasxc100/HevLib?tab=readme-ov-file#installation)
+* [Download Zip](https://github.com/rwqfsfasxc100/HevLib/releases/latest)
+
 # Usage
 > [!WARNING]
 > Do note that this library is comprised of several ModMain.gd files. If you plan on writing mods which makes use of functions provided by this library, and some features do not work properly in the Godot editor, you will need to load all (at the time of writing) 4 of the library's ModMain files, which are as follows:
