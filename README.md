@@ -16,3 +16,14 @@ This library is run through a set of 'pointers', which are small snippets of cod
 > ```
 
 [Information is kept on the (current WIP) wiki, please take a look here for further information.](https://github.com/rwqfsfasxc100/HevLib/wiki)
+
+# Installation
+
+1. Download the `HevLib.zip` file from the [latest release page](https://github.com/rwqfsfasxc100/HevLib/releases/latest).
+2. Locate the game's directory (i.e. where the .exe/.x86_64 file is located). Create a folder named `mods` inside of this directory.
+3. Copy the `HevLib.zip` file to the `mods` folder
+4. Set the `--enable-mods` launch parameter for the Delta-V executable file
+4a. **Steam**: Properties -> General -> Launch Options
+4b. **GOG**: Manage Installation -> Configure -> Features -> Arguments (you will need to duplicate the default profile to edit these)
+4c. **Command Line**: Delta-V.exe --enable-mods or ./Delta-V.exe --enable-mods
+5. Launch game
