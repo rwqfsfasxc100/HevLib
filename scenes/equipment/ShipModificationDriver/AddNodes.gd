@@ -57,7 +57,7 @@ func make_node_mods():
 		fallback_ship = datafetch.get("fallback_override",baseShipName)
 		n_store = datafetch
 	if get_base_ship_fallback:
-		if fallback_ship in processed_ship_register:
+		if fallback_ship != "" and fallback_ship in processed_ship_register:
 			var db = processed_ship_register[fallback_ship]
 			var datafetch = db["node_definitions"]
 			for obj in datafetch:
