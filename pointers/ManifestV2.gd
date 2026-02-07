@@ -119,9 +119,13 @@ var developer_hint = {
 		"file_path -> absolute file path for the changelog file."
 	]
 }
+
+const FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+const FileAccess = preload("res://HevLib/pointers/FileAccess.gd")
+
 const gmd = preload("res://HevLib/scripts/manifest_v2/get_mod_data.gd")
 static func __get_mod_data(format_to_manifest_version:bool = false, print_json: bool = false) -> Dictionary:
-	var s = gmd.get_mod_data(format_to_manifest_version,print_json)
+	var s = gmd.get_mod_data(format_to_manifest_version,print_json,FolderAccess)
 	return s
 const mmptz = preload("res://HevLib/scripts/manifest_v2/match_mod_path_to_zip.gd")
 static func __match_mod_path_to_zip(mod_main_path:String) -> String:
@@ -137,7 +141,7 @@ static func __get_mod_data_from_files(script_path:String, format_to_manifest_ver
 	return s
 const pfam = preload("res://HevLib/scripts/manifest_v2/parse_file_as_manifest.gd")
 static func __parse_file_as_manifest(file_path: String, format_to_manifest_version: bool = true) -> Dictionary:
-	var s = pfam.parse_file_as_manifest(file_path, format_to_manifest_version)
+	var s = pfam.parse_file_as_manifest(file_path, format_to_manifest_version,FileAccess)
 	return s
 const gmbi = preload("res://HevLib/scripts/manifest_v2/get_mod_by_id.gd")
 static func __get_mod_by_id(id: String, case_sensitive: bool = true) -> Dictionary:
@@ -145,11 +149,11 @@ static func __get_mod_by_id(id: String, case_sensitive: bool = true) -> Dictiona
 	return s
 const gt = preload("res://HevLib/scripts/manifest_v2/get_tags.gd")
 static func __get_tags() -> Dictionary:
-	var s = gt.get_tags()
+	var s = gt.get_tags(FolderAccess)
 	return s
 const gmt = preload("res://HevLib/scripts/manifest_v2/get_mod_tags.gd")
 static func __get_mod_tags(mod_id: String) -> Dictionary:
-	var s = gmt.get_mod_tags(mod_id)
+	var s = gmt.get_mod_tags(mod_id,FolderAccess)
 	return s
 const gmft = preload("res://HevLib/scripts/manifest_v2/get_mods_from_tag.gd")
 static func __get_mods_from_tag(tag_name: String) -> Array:
@@ -201,11 +205,11 @@ static func __parse_tags(tag_data) -> Dictionary:
 	return s
 const hmu = preload("res://HevLib/scripts/manifest_v2/have_mods_updated.gd")
 static func __have_mods_updated(folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",previous_file = "mods_from_last_launch.json",this_file = "mods_from_this_launch.json"):
-	var s = hmu.have_mods_updated(folder,previous_file,this_file)
+	var s = hmu.have_mods_updated(folder,previous_file,this_file,FolderAccess)
 	return s
 const gmv = preload("res://HevLib/scripts/manifest_v2/get_mod_versions.gd")
 static func __get_mod_versions(store = false,folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",previous_file = "mods_from_last_launch.json",this_file = "mods_from_this_launch.json"):
-	var s = gmv.get_mod_versions(store,folder,previous_file,this_file)
+	var s = gmv.get_mod_versions(store,folder,previous_file,this_file,FolderAccess)
 	return s
 const pc = preload("res://HevLib/scripts/manifest_v2/parse_changelogs.gd")
 static func __parse_changelog(file_path):

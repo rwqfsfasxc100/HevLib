@@ -1,7 +1,6 @@
 extends Node
 
-static func convert_var_from_string(string : String, folder : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/file_caches"):
-	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+static func convert_var_from_string(string : String, folder : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/file_caches",FolderAccess = null):
 	if folder.ends_with("/"):
 		pass
 	else:

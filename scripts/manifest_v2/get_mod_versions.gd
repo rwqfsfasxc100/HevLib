@@ -1,6 +1,6 @@
 extends Node
 
-static func get_mod_versions(store,folder,last_seen_file,this_seen_file) -> Dictionary:
+static func get_mod_versions(store,folder,last_seen_file,this_seen_file,FolderAccess = null) -> Dictionary:
 	var mods = {}
 	var MV2 = load("res://HevLib/pointers/ManifestV2.gd")
 	var all_mods = MV2.__get_mod_data()["mods"]
@@ -17,7 +17,6 @@ static func get_mod_versions(store,folder,last_seen_file,this_seen_file) -> Dict
 		if last_seen_file.begins_with("/"):
 			last_seen_file.lstrip("/")
 		var file = File.new()
-		var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 		FolderAccess.__check_folder_exists(folder)
 		if file.file_exists(folder + this_seen_file):
 			file.open(folder + this_seen_file,File.READ)

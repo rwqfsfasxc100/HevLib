@@ -1,7 +1,8 @@
 extends Node
 
+const DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
+
 static func get_config(mod, cfg_filename : String = "Mod_Configurations" + ".cfg") -> Dictionary:
-	var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 	mod = DataFormat.__array_to_string(mod.split("/"))
 	mod = DataFormat.__array_to_string(mod.split(" "))
 	var cfg_folder = "user://cfg/"

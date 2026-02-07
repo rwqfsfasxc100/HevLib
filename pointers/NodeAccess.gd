@@ -36,6 +36,9 @@ var developer_hint = {
 		"node -> the object to remove script and recursive child scripts from"
 	]
 }
+
+const FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+
 const gac = preload("res://HevLib/globals/get_all_children.gd")
 static func __get_all_children(node, strip_supplied_node_from_array = false, return_only_paths = false, use_relative_paths = false):
 	var f = gac.new()
@@ -53,12 +56,12 @@ static func __is_instanced_from_scene(p_node):
 const dce = preload("res://HevLib/scenes/crew_extensions/dynamic_crew_expander.gd")
 static func __dynamic_crew_expander(folder_path: String, max_crew:int = 24) -> String:
 	var f = dce.new()
-	var s = f.dynamic_crew_expander(folder_path, max_crew)
+	var s = f.dynamic_crew_expander(folder_path, max_crew,FolderAccess)
 	return s
 const cvfs = preload("res://HevLib/scripts/convert_var_from_string.gd")
 static func __convert_var_from_string(string : String, folder : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/file_caches"):
 	var f = cvfs.new()
-	var s = f.convert_var_from_string(string,folder)
+	var s = f.convert_var_from_string(string,folder,FolderAccess)
 	return s
 
 static func __remove_scripts(node):

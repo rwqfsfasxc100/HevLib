@@ -1,13 +1,12 @@
 extends Node
 
-static func have_mods_updated(folder: String,last_seen_file: String,this_file:String) -> Dictionary:
+static func have_mods_updated(folder: String,last_seen_file: String,this_file:String,FolderAccess = null) -> Dictionary:
 	var file = File.new()
 	if not folder.ends_with("/"):
 		folder = folder + "/"
 	if last_seen_file.begins_with("/"):
 		last_seen_file.lstrip("/")
 	var MV2 = load("res://HevLib/pointers/ManifestV2.gd")
-	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 	var all_mods = MV2.__get_mod_data()["mods"]
 	FolderAccess.__check_folder_exists(folder)
 	if not file.file_exists(folder + last_seen_file):

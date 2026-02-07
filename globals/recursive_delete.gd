@@ -1,10 +1,9 @@
 extends Node
 
-static func recursive_delete(path: String) -> bool:
+static func recursive_delete(path: String,Globals = null) -> bool:
 	var dTest = Directory.new()
 	if not dTest.open(path) == OK:
 		return false
-	var Globals = preload("res://HevLib/Functions.gd").new()
 	if not path.ends_with("/"):
 		path = path + "/"
 	var filesForDeletion = []
@@ -21,7 +20,7 @@ static func recursive_delete(path: String) -> bool:
 		dir.open(path)
 		dir.remove(splitFiles)
 	for folder in foldersForDeletion:
-		Globals.__recursive_delete(folder)
+		recursive_delete(folder,Globals)
 	var dm = Directory.new()
 	dm.open(path)
 	dm.remove(path)

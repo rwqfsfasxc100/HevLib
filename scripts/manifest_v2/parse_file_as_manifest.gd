@@ -1,7 +1,6 @@
 extends Node
 
-static func parse_file_as_manifest(file_path: String, format_to_manifest_version: bool = false) -> Dictionary:
-	var FileAccess = preload("res://HevLib/pointers/FileAccess.gd")  
+static func parse_file_as_manifest(file_path: String, format_to_manifest_version: bool = false,FileAccess = null) -> Dictionary:
 	var cfg = FileAccess.__config_parse(file_path)
 	var manifest_data : Dictionary = {}
 	var manifest_version = 1

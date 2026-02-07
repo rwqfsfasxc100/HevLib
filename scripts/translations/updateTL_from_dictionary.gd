@@ -1,8 +1,6 @@
 extends Node
 
-const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
-
-static func updateTL_from_dictionary(path:Dictionary, fullLogging:bool = true):
+static func updateTL_from_dictionary(path:Dictionary, fullLogging:bool = true,ConfigDriver = null):
 	var Translations = load("res://HevLib/pointers/Translations.gd")
 	Debug.l("Adding translations from dictionary")
 	var translations := []

@@ -1,7 +1,8 @@
 extends Node
 
+const DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
+
 static func store_value(mod, section, key, value, cfg_filename : String = "Mod_Configurations" + ".cfg"):
-	var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 	mod = DataFormat.__array_to_string(mod.split("/"))
 	mod = DataFormat.__array_to_string(mod.split(" "))
 	section = DataFormat.__array_to_string(section.split("/"))

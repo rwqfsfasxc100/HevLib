@@ -1,9 +1,7 @@
 extends Node
 
-static func load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
+static func load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg",ManifestV2 = null,FolderAccess = null):
 	var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
-	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
-	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 	var file = File.new()
 	var dir = Directory.new()
 	var c = ConfigFile.new()

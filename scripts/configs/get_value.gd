@@ -1,7 +1,6 @@
 extends Node
 
-static func get_value(mod: String, section: String, key: String, cfg_filename : String = "Mod_Configurations" + ".cfg"):
-	var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
+static func get_value(mod: String, section: String, key: String, cfg_filename : String = "Mod_Configurations" + ".cfg",DataFormat = null):
 	mod = DataFormat.__array_to_string(mod.split("/"))
 	mod = DataFormat.__array_to_string(mod.split(" "))
 	var cfg_folder = "user://cfg/"

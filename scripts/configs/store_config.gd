@@ -1,10 +1,8 @@
 extends Node
 
-static func store_config(configuration: Dictionary, mod_id: String, cfg_filename : String = "Mod_Configurations" + ".cfg"):
+static func store_config(configuration: Dictionary, mod_id: String, cfg_filename : String = "Mod_Configurations" + ".cfg",DataFormat = null):
 	var profiles_dir = "user://cfg/.profiles/"
 	var cfg_folder = "user://cfg/"
-	var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
-	var DataFormat = load("res://HevLib/pointers/DataFormat.gd")
 	mod_id = DataFormat.__array_to_string(mod_id.split("/"))
 	mod_id = DataFormat.__array_to_string(mod_id.split(" "))
 	var tmpf = File.new()

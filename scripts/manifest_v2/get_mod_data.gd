@@ -1,8 +1,7 @@
 extends Node
 
-static func get_mod_data(format_to_manifest_version:bool,print_json:bool) -> Dictionary:
+static func get_mod_data(format_to_manifest_version:bool,print_json:bool,FolderAccess = null) -> Dictionary:
 	var mods = ModLoader.get_children()
-	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
 	var mod_dictionary = {}
 	var manifest_count = 0

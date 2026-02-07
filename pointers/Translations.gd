@@ -23,12 +23,15 @@ var developer_hint = {
 		"delimiter -> (optional) string containing the character to split the CSV line by. Defaults to '|"
 	]
 }
+
+const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+
 const utl = preload("res://HevLib/scripts/translations/updateTL.gd")
 static func __updateTL(path:String, delim:String = ",", fullLogging:bool = true):
 	utl.updateTL(path, delim, fullLogging)
 const utlfd = preload("res://HevLib/scripts/translations/updateTL_from_dictionary.gd")
 static func __updateTL_from_dictionary(dictionary:Dictionary, fullLogging:bool = true):
-	utlfd.updateTL_from_dictionary(dictionary, fullLogging)
+	utlfd.updateTL_from_dictionary(dictionary, fullLogging, ConfigDriver)
 const fato = preload("res://HevLib/scripts/translations/fetch_all_translation_objects.gd")
 static func __fetch_all_translation_objects(number_of_objects_to_iterate_through: int = 100000) -> Array:
 	var s = fato.fetch_all_translation_objects(number_of_objects_to_iterate_through)

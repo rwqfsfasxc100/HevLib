@@ -1,10 +1,6 @@
 extends Node
 
-const FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
-const FileAccess = preload("res://HevLib/pointers/FileAccess.gd")
-const MV2 = preload("res://HevLib/pointers/ManifestV2.gd")
-
-static func get_drivers(get_ids):
+static func get_drivers(get_ids,FolderAccess = null,FileAccess = null,MV2 = null):
 	var DriverManagement = load("res://HevLib/pointers/DriverManagement.gd")
 	var is_onready = CurrentGame != null
 	var running_in_debugged = false

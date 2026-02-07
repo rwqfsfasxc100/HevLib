@@ -1,8 +1,7 @@
 extends Node
 
-static func dynamic_crew_expander(folder_path: String = "user://cache/.HevLib_Cache/dynamic_crew_expander/", max_crew:int = 24) -> String:
+static func dynamic_crew_expander(folder_path: String = "user://cache/.HevLib_Cache/dynamic_crew_expander/", max_crew:int = 24,FolderAccess = null) -> String:
 	
-	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 	FolderAccess.__check_folder_exists(folder_path)
 	var log_header = "TSCN Writer for dynamic crew handler: "
 	

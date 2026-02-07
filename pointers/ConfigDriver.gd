@@ -49,13 +49,18 @@ var developer_hint = {
 		"Internal function used for the focusing of buttons"
 	]
 }
+
+const DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
+const ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
+const FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+
 const cfp = preload("res://HevLib/scripts/configs/config_parse.gd")
 static func __config_parse(file: String) -> Dictionary:
 	var s = cfp.config_parse(file)
 	return s
 const sc = preload("res://HevLib/scripts/configs/store_config.gd")
 static func __store_config(id: String, configuration: Dictionary, cfg_filename : String = config_name + ".cfg"):
-	sc.store_config(configuration,id,cfg_filename)
+	sc.store_config(configuration,id,cfg_filename,DataFormat)
 const sv = preload("res://HevLib/scripts/configs/store_value.gd")
 static func __store_value(id: String, section: String, key: String, value, cfg_filename : String = config_name + ".cfg"):
 	sv.store_value(id, section, key, value,cfg_filename)
@@ -65,11 +70,11 @@ static func __get_config(id: String, cfg_filename : String = config_name + ".cfg
 	return s
 const gv = preload("res://HevLib/scripts/configs/get_value.gd")
 static func __get_value(id: String, section: String, key: String, cfg_filename : String = config_name + ".cfg"):
-	var s = gv.get_value(id, section, key, cfg_filename)
+	var s = gv.get_value(id, section, key, cfg_filename,DataFormat)
 	return s
 const lc = preload("res://HevLib/scripts/configs/load_configs.gd")
 static func __load_configs(cfg_filename : String = config_name + ".cfg"):
-	lc.load_configs(cfg_filename)
+	lc.load_configs(cfg_filename,ManifestV2,FolderAccess)
 const sbf = preload("res://HevLib/scripts/configs/set_button_focus.gd")
 static func __set_button_focus(button,check_button):
 	sbf.set_button_focus(button,check_button)
