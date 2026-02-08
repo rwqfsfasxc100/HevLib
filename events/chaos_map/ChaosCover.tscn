@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://HevLib/events/chaos_map/ChaosCover.tres" type="Material" id=1]
+[ext_resource path="res://HevLib/events/chaos_map/ChaosCover.gd" type="Script" id=2]
+
+[sub_resource type="StreamTexture" id=1]
+flags = 4
+load_path = "res://HevLib/events/chaos_map/chaos_border.stex"
+
+[node name="ChaosCover" type="TextureRect"]
+material = ExtResource( 1 )
+margin_right = 600.0
+margin_bottom = 600.0
+mouse_filter = 2
+texture = SubResource( 1 )
+expand = true
+script = ExtResource( 2 )

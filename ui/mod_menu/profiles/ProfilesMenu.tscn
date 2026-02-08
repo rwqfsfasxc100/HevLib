@@ -1,11 +1,12 @@
 [gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://HevLib/ui/mod_menu/profiles/ProfilesMenu.gd" type="Script" id=1]
-[ext_resource path="res://HevLib/ui/themes/font-courierbold.tres" type="DynamicFont" id=2]
+[ext_resource path="res://HevLib/ui/themes/fonts/courier_new/font-courierbold.tres" type="DynamicFont" id=2]
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=3]
 [ext_resource path="res://HevLib/ui/mod_menu/profiles/DeleteSure.gd" type="Script" id=4]
 [ext_resource path="res://HevLib/ui/mod_menu/profiles/NameInput.gd" type="Script" id=5]
 [ext_resource path="res://HevLib/ui/mod_menu/AnimateAppear.tscn" type="PackedScene" id=6]
+
 
 [node name="ProfilesMenu" type="Popup"]
 modulate = Color( 1.00309, 1.00309, 1.00309, 0.0123457 )

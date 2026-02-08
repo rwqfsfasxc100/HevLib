@@ -45,10 +45,12 @@ func _physics_process(delta):
 		var frac = float(bytes_downloaded)/float(total_bytes)
 		var f2 = frac * 100
 		percent = f2
+		print("HevLib GitHub Zip Downloader: Updating percent: %s%% | %s of %s" % [str(percent),bytes_downloaded,total_bytes])
 		if bytes_downloaded > 0.0:
 			_handle_downloaded_percent()
 
 func is_updating(how):
+	print("HevLib GitHub Zip Downloader: setting physics process to [%s]" % str(how))
 	set_physics_process(how)
 	updating_percent = how
 	if not how:

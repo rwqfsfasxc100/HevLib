@@ -81,6 +81,12 @@ focusAt = NodePath("../../..")
 
 [node name="AnimateAppear" parent="." instance=ExtResource( 5 )]
 
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+margin_left = 409.0
+margin_right = 424.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 15, 0 )
+
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
 [connection signal="pressed" from="reset" to="." method="_reset_pressed"]
 [connection signal="toggled" from="CheckButton" to="." method="_toggled"]

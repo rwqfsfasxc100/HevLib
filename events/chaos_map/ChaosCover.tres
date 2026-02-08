@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=2]
+
+[ext_resource path="res://HevLib/events/chaos_map/chaos_darken.tres" type="Shader" id=1]
+
+[sub_resource type="StreamTexture" id=3]
+flags = 4
+load_path = "res://HevLib/events/chaos_map/chaos_border.stex"
+
+[resource]
+shader = ExtResource( 1 )
+shader_param/darken_factor = 0.0
+shader_param/min_chaos = 0.65
+shader_param/max_chaos = 1.0
+shader_param/opacity = 0.35
+shader_param/chaos_map = SubResource( 3 )

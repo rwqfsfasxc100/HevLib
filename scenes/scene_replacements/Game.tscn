@@ -2,7 +2,7 @@
 
 [ext_resource path="res://Game.tscn" type="PackedScene" id=1]
 [ext_resource path="res://HevLib/events/EventMenu.tscn" type="PackedScene" id=2]
-[ext_resource path="res://HevLib/ui/core_scenes/_HevLib_Ringspace_Canvas.tscn" type="PackedScene" id=3]
+[ext_resource path="res://HevLib/logging/_HevLib_Ringspace_Canvas.tscn" type="PackedScene" id=3]
 
 [node name="Game" instance=ExtResource( 1 )]
 

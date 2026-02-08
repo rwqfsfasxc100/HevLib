@@ -11,7 +11,7 @@ credits=["   --- Contributors ---   ","Za'krin - Mod Main design, original imple
 
 version_major=1
 version_minor=11
-version_bugfix=5
+version_bugfix=6
 
 [tags]
 
@@ -145,6 +145,32 @@ HEVLIB_CONFIG_SECTION_DEBUG={
 		"type":"bool",
 		"default":false
 	},
+	"ring_chaos_map_overlay":{
+		"name":"HEVLIB_CONFIG_SHOW_CHAOS_OVERLAY",
+		"description":"HEVLIB_CONFIG_SHOW_CHAOS_OVERLAY_TOOLTIP",
+		"type":"bool",
+		"default":false
+	},
+	"ring_chaos_map_min_chaos":{
+		"name":"HEVLIB_CONFIG_CHAOS_OVERLAY_MIN_CHAOS",
+		"description":"HEVLIB_CONFIG_CHAOS_OVERLAY_MIN_CHAOS_TOOLTIP",
+		"type":"float",
+        "style":"slider",
+        "min":0.0,
+        "max":1.0,
+        "step":0.05,
+		"default":0.65,
+	},
+	"ring_chaos_map_opacity":{
+		"name":"HEVLIB_CONFIG_CHAOS_OVERLAY_OPACITY",
+		"description":"HEVLIB_CONFIG_CHAOS_OVERLAY_OPACITY_TOOLTIP",
+		"type":"float",
+        "style":"slider",
+        "min":0.0,
+        "max":1.0,
+        "step":0.05,
+		"default":0.35,
+	},
 	"clear_leaderboards":{
 		"name":"HEVLIB_CLEAR_LEADERBOARDS",
 		"description":"HEVLIB_CLEAR_LEADERBOARDS_TOOLTIP",
@@ -158,6 +184,41 @@ HEVLIB_CONFIG_SECTION_INPUT={
 	"open_debug_event_menu":{
 		"name":"HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU",
 		"description":"HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU_TOOLTIP",
+		"type":"Input",
+		"hint":"",
+		"default":[  ]
+	},
+	"toggle_chaos_map_overlay":{
+		"name":"HEVLIB_CONFIG_TOGGLE_CHAOS_MAP_OVERLAY",
+		"description":"HEVLIB_CONFIG_TOGGLE_CHAOS_MAP_OVERLAY_TOOLTIP",
+		"type":"Input",
+		"hint":"",
+		"default":[  ]
+	},
+	"chaos_map_overlay_step_up":{
+		"name":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_UP",
+		"description":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_UP_TOOLTIP",
+		"type":"Input",
+		"hint":"",
+		"default":[  ]
+	},
+	"chaos_map_overlay_step_down":{
+		"name":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_DOWN",
+		"description":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_DOWN_TOOLTIP",
+		"type":"Input",
+		"hint":"",
+		"default":[  ]
+	},
+	"chaos_map_overlay_opacity_up":{
+		"name":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_UP",
+		"description":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_UP_TOOLTIP",
+		"type":"Input",
+		"hint":"",
+		"default":[  ]
+	},
+	"chaos_map_overlay_opacity_down":{
+		"name":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_DOWN",
+		"description":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_DOWN_TOOLTIP",
 		"type":"Input",
 		"hint":"",
 		"default":[  ]

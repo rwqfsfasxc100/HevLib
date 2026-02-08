@@ -4,7 +4,7 @@
 [ext_resource path="res://HevLib/ui/mod_menu/mod_list/ModBox.gd" type="Script" id=2]
 [ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=3]
 [ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=4]
-[ext_resource path="res://HevLib/ui/themes/font-courierbold.tres" type="DynamicFont" id=5]
+[ext_resource path="res://HevLib/ui/themes/fonts/courier_new/font-courierbold.tres" type="DynamicFont" id=5]
 
 [sub_resource type="StreamTexture" id=1]
 flags = 4

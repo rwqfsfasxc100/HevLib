@@ -1,6 +1,6 @@
-[gd_resource type="Theme" load_steps=44 format=2]
+[gd_resource type="Theme" load_steps=48 format=2]
 
-[ext_resource path="res://HevLib/ui/themes/font-verdana.tres" type="DynamicFont" id=1]
+[ext_resource path="res://HevLib/ui/themes/fonts/verdana/font-verdanabolditalic.tres" type="DynamicFont" id=1]
 [ext_resource path="res://HevLib/ui/themes/styles/focus_and_hover_flat.tres" type="StyleBox" id=2]
 [ext_resource path="res://HevLib/ui/themes/styles/disabled_flat.tres" type="StyleBox" id=3]
 [ext_resource path="res://HevLib/ui/themes/styles/normal_flat.tres" type="StyleBox" id=4]
@@ -28,6 +28,10 @@
 [ext_resource path="res://HevLib/ui/themes/styles/slider/slider_vertical_flat.tres" type="StyleBox" id=26]
 [ext_resource path="res://HevLib/ui/themes/styles/tooltip/panel.tres" type="StyleBox" id=27]
 [ext_resource path="res://HevLib/ui/themes/styles/panel/panel_container_background_flat.tres" type="StyleBox" id=28]
+[ext_resource path="res://HevLib/ui/themes/fonts/verdana/font-verdanaitalic.tres" type="DynamicFont" id=29]
+[ext_resource path="res://HevLib/ui/themes/fonts/verdana/font-verdanabold.tres" type="DynamicFont" id=30]
+[ext_resource path="res://HevLib/ui/themes/fonts/verdana/font-verdana.tres" type="DynamicFont" id=31]
+[ext_resource path="res://HevLib/ui/themes/fonts/courier_new/font-courierbold.tres" type="DynamicFont" id=32]
 
 [sub_resource type="StreamTexture" id=13]
 flags = 4
@@ -90,7 +94,7 @@ flags = 4
 load_path = "res://HevLib/ui/themes/icons/radio_on.stex"
 
 [resource]
-default_font = ExtResource( 1 )
+default_font = ExtResource( 31 )
 Button/colors/font_color_hover_pressed = Color( 0.870588, 0.870588, 0.501961, 1 )
 Button/colors/font_color_pressed = Color( 0.870588, 0.870588, 0.501961, 1 )
 Button/styles/disabled = ExtResource( 3 )
@@ -172,13 +176,18 @@ OptionButton/styles/pressed = ExtResource( 5 )
 Panel/styles/panel = ExtResource( 18 )
 PanelContainer/styles/panel = ExtResource( 19 )
 PopupMenu/constants/vseparation = 2
-PopupMenu/fonts/font = ExtResource( 1 )
+PopupMenu/fonts/font = ExtResource( 31 )
 PopupMenu/styles/panel = ExtResource( 28 )
 PopupMenu/styles/separator = ExtResource( 7 )
 ProgressBar/styles/bg = ExtResource( 20 )
 ProgressBar/styles/fg = ExtResource( 21 )
 RichTextLabel/constants/shadow_offset_x = 5
 RichTextLabel/constants/shadow_offset_y = 5
+RichTextLabel/fonts/bold_font = ExtResource( 30 )
+RichTextLabel/fonts/bold_italics_font = ExtResource( 1 )
+RichTextLabel/fonts/italics_font = ExtResource( 29 )
+RichTextLabel/fonts/mono_font = ExtResource( 32 )
+RichTextLabel/fonts/normal_font = ExtResource( 31 )
 RichTextLabel/styles/focus = ExtResource( 16 )
 RichTextLabel/styles/normal = ExtResource( 14 )
 TabContainer/colors/font_color_bg = Color( 1, 1, 1, 1 )

@@ -82,7 +82,7 @@ func _init(modLoader = ModLoader):
 	cg.take_over_path("res://CurrentGame.gd")
 	_savedObjects.append(cg)
 
-
+	replaceScene("../../events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn")
 	# Adds in_hevlib_menu to the CurrentGame script and preventing controls while it's true
 	installScriptExtension("../../events/controls/CurrentGame.gd")
 	installScriptExtension("../../events/controls/ship-ctrl.gd")
@@ -129,6 +129,8 @@ func _ready():
 	
 	var ring = preload("res://HevLib/scenes/minerals/make_ring_modifications.gd")
 	ring.make_ring_modifications()
+	
+	
 	
 	var tr = ResourceLoader.load(thering_path)
 	tr.new()

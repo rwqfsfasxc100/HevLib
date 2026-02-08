@@ -435,3 +435,35 @@ HEVLIB_SIZE_LABEL_BYTES|bytes
 HEVLIB_SIZE_LABEL_KILOBYTES|kilobytes
 
 HEVLIB_SIZE_LABEL_MEGABYTES|megabytes
+
+HEVLIB_CONFIG_SHOW_CHAOS_OVERLAY|Ring map chaos overlay
+
+HEVLIB_CONFIG_SHOW_CHAOS_OVERLAY_TOOLTIP|Overlays the specified minimum ring chaos against the Ring map. Overlay is limited to 1km^2 coverage, and steps at 0.05 chaos.
+
+HEVLIB_CONFIG_CHAOS_OVERLAY_MIN_CHAOS|Chaos overlay minimum chaos
+
+HEVLIB_CONFIG_CHAOS_OVERLAY_MIN_CHAOS_TOOLTIP|The minimum chaos to show the chaos overlay over a specific area.
+
+HEVLIB_CONFIG_TOGGLE_CHAOS_MAP_OVERLAY|Toggle ring map chaos overlay
+
+HEVLIB_CONFIG_TOGGLE_CHAOS_MAP_OVERLAY_TOOLTIP|Toggles the chaos map overlay without needing to go through the Mod Menu
+
+HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_UP|Increase minimum chaos
+
+HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_UP_TOOLTIP|Keybind used to increase the minimum chaos for ring map chaos overlay, done in steps of 0.05
+
+HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_DOWN|Decrease minimum chaos
+
+HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_DOWN_TOOLTIP|Keybind used to decrease the minimum chaos for ring map chaos overlay, done in steps of 0.05
+
+HEVLIB_CONFIG_CHAOS_OVERLAY_OPACITY|Chaos overlay opacity
+
+HEVLIB_CONFIG_CHAOS_OVERLAY_OPACITY_TOOLTIP|The opacity at which the chaos overlay appears against the ring map.
+
+HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_UP|Increase chaos overlay opacity
+
+HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_UP_TOOLTIP|Keybind used to increase the opacity of the ring map chaos overlay, done in steps of 5%
+
+HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_DOWN|Decrease chaos overlay opacity
+
+HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_DOWN_TOOLTIP|Keybind used to decrease the opacity of the ring map chaos overlay, done in steps of 5%

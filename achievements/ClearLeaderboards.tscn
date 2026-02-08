@@ -2,7 +2,8 @@
 
 [ext_resource path="res://HevLib/achievements/ClearLeaderboards.gd" type="Script" id=1]
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=2]
-[ext_resource path="res://HevLib/ui/themes/font-courierbold.tres" type="DynamicFont" id=3]
+[ext_resource path="res://HevLib/ui/themes/fonts/courier_new/font-courierbold.tres" type="DynamicFont" id=3]
+
 
 [node name="ClearLeaderboards" type="Popup"]
 margin_right = 750.0
