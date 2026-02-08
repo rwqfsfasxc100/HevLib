@@ -5,6 +5,7 @@ var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
 var offset = Vector2(100,75)
 
 onready var container = $base/VBoxContainer/ScrollContainer/LabelContainer
+onready var no_download_popup = $NoDownload
 
 var file = File.new()
 

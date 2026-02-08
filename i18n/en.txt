@@ -467,3 +467,7 @@ HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_UP_TOOLTIP|Keybind used to increase the 
 HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_DOWN|Decrease chaos overlay opacity
 
 HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_DOWN_TOOLTIP|Keybind used to decrease the opacity of the ring map chaos overlay, done in steps of 5%
+
+HEVLIB_NO_DOWNLOAD_HEADER|NO PROVIDED LINK!
+
+HEVLIB_NO_DOWNLOAD_CONTENT|NOTICE: mod [%s] has no valid download link provided, and has not been downloaded. \n\nPlease refer to the source of this mod for any updates, and please inform the mod's author.

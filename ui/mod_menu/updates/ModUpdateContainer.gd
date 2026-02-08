@@ -59,6 +59,11 @@ func _update_confirmed():
 		if nexus.ends_with("/"):
 			nexus.rstrip("/")
 		OS.shell_open(nexus + "?tab=files")
+	else:
+		var nod = manager.no_download_popup
+		nod.dialog_text = TranslationServer.translate("HEVLIB_NO_DOWNLOAD_CONTENT") % mod_name
+		nod.current_mod = self
+		nod.call_deferred("popup_centered")
 	if display_wait_popup:
 		$Popups/WAIT.popup_centered()
 var modPathPrefix = ""
@@ -79,7 +84,8 @@ func _downloaded_zip(file, filepath):
 	fi.store_string("true")
 	fi.close()
 	repos()
-	FileAccess.__copy_file(filepath,modPathPrefix)
+	if filepath and modPathPrefix:
+		FileAccess.__copy_file(filepath,modPathPrefix)
 	Tool.deferCallInPhysics(manager,"move_to_next_mod")
 	Tool.remove(self)
 
