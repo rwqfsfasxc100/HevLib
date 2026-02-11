@@ -1,15 +1,15 @@
 extends Node
 
-const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 
 const not_random_seeds = PoolIntArray([1861,2531,1337,1776,2014,1384,2684,842,2802,1597,2116,755,1596,2661,1928,-1861,-2531,-1337,-1776,-2014,-1384,-2684,-842,-2802,-1597,-2116,-755,-1596,-2661,-1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928])
 
-static func make_ring_modifications():
+static func make_ring_modifications(pointers):
 	
 	var p = CurrentGame.traceMinerals
 	var s = p.size()
 	var m = (s / 4) + 1
-	var do_randomize = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","randomize_minerals")
+	var do_randomize = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","randomize_minerals")
 	
 	var seeds = []
 	

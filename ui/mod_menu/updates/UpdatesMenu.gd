@@ -8,9 +8,9 @@ onready var container = $base/VBoxContainer/ScrollContainer/LabelContainer
 onready var no_download_popup = $NoDownload
 
 var file = File.new()
-
-const ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
-const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+#const ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
+#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 const update_container = preload("res://HevLib/ui/mod_menu/updates/ModUpdateContainer.tscn")
 var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 
@@ -27,7 +27,7 @@ func _about_to_show():
 	var update_data = JSON.parse(file.get_as_text()).result
 	file.close()
 	
-	var currently_ignored = ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
+	var currently_ignored = pointers.ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
 	if currently_ignored == null:
 		currently_ignored = {}
 	for u in currently_ignored:
@@ -40,7 +40,7 @@ func _about_to_show():
 	for mod in update_data:
 		var c = update_container.instance()
 		var md = update_data[mod]
-		var info = ManifestV2.__get_mod_by_id(mod)
+		var info = pointers.ManifestV2.__get_mod_by_id(mod)
 		var display_name = md["display"]
 		var old_version = md["version"]
 		var new_version = md["new_version"]
@@ -180,7 +180,7 @@ func notifications_pressed():
 	updates = JSON.parse(file.get_as_text()).result
 	file.close()
 	
-	var currently_ignored = ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
+	var currently_ignored = pointers.ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
 	if currently_ignored == null:
 		currently_ignored = {}
 	for u in updates:

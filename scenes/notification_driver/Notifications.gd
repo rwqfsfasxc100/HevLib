@@ -36,7 +36,7 @@ func _ready():
 	
 
 var vp_objects = []
-
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 var tween
 func _notification_start(data):
 	var title = data.get("title",{}).get("text","NOTIFICATION_TITLE_PLACEHOLDER")
@@ -85,7 +85,7 @@ func _notification_start(data):
 		animations.Icon.play("IconPlay")
 	if scene != "" and scene.ends_with(".tscn"):
 		var i = load(scene).instance()
-		NodeAccess.__remove_scripts(i)
+		pointers.NodeAccess.__remove_scripts(i)
 		
 		boxes.VP.get_node("Container/Rotation_offset").add_child(i)
 		vp_objects.append(i)
@@ -121,7 +121,7 @@ func _notification_start(data):
 	
 	
 
-const NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
+#const NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
 
 func add_vp():
 	pass

@@ -1,11 +1,11 @@
 extends VBoxContainer
 
 var path = ""
-const MV2 = preload("res://HevLib/pointers/ManifestV2.gd")
+#const MV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 const header_label = preload("res://HevLib/ui/mod_menu/changelogs/labels/version_label.tscn")
 const entry_label = preload("res://HevLib/ui/mod_menu/changelogs/labels/changelog_entry.tscn")
 onready var linecontainer = $ScrollContainer/VBoxContainer
-
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 export (String,"singular","dynamic") var operation = "singular"
 
 func _ready():
@@ -19,7 +19,7 @@ func _ready():
 var refs = []
 
 func parse():
-	var data = MV2.__parse_changelog(path)
+	var data = pointers.ManifestV2.__parse_changelog(path)
 	var index = 1
 	for config in data:
 		var lines = data[config]

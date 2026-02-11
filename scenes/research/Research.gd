@@ -41,14 +41,15 @@ func hide():
 	$Shower.play("hide")
 	if lastFocus:
 		lastFocus.grab_focus()
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 func _ready():
 	visible = false
 	get_parent().connect("hidefoka", self, "hide")
 	
-	var mod_ids = ManifestV2.__get_mod_ids()
+	var mod_ids = pointers.ManifestV2.__get_mod_ids()
 	current_project_management.current_mod_ids = mod_ids
 	dormant_project_management.current_mod_ids = mod_ids
-	var tag_exists = ManifestV2.__get_tags()
+	var tag_exists = pointers.ManifestV2.__get_tags()
 	if not "TAG_USING_HEVLIB_RESEARCH" in tag_exists:
 		Tool.remove(research_button)
 	else:
@@ -58,7 +59,7 @@ func _ready():
 		get_research_data()
 
 
-const ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
+#const ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 
 func _input(event):
 	if visible and (Input.is_action_just_pressed("ui_cancel") or Input.is_action_just_pressed("pause")):
@@ -77,7 +78,7 @@ func _on_Research_pressed():
 	show()
 
 func get_research_data():
-	var tags = ManifestV2.__get_mods_and_tags_from_tag("TAG_USING_HEVLIB_RESEARCH")
+	var tags = pointers.ManifestV2.__get_mods_and_tags_from_tag("TAG_USING_HEVLIB_RESEARCH")
 	for mod in tags:
 		for p in tags[mod]:
 			var id = mod + "|" + p.name

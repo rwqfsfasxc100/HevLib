@@ -11,7 +11,8 @@ enum control{
 	auto, 
 	key
 }
-const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 export (PackedScene) var keybindDisplay
 export (PackedScene) var gamepadKeyDisplay
 export (PackedScene) var mouseButtonDisplay
@@ -146,7 +147,7 @@ func recheck_availability():
 	var m = get_parent().get_parent().mod
 	var s = get_parent().get_parent().section
 	var a = get_parent().get_parent().action
-	var info = ConfigDriver.__get_value(m,s,a)
+	var info = pointers.ConfigDriver.__get_value(m,s,a)
 #	var scheme = forceScheme
 #	if scheme == Settings.control.auto:
 #		scheme = Settings.controlScheme

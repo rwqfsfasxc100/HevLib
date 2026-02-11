@@ -1,17 +1,20 @@
 extends ScrollContainer
 
 onready var ring = get_node("/root/Game/TheRing")
-
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 var all_events = {}
-const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 func _process(delta):
 	get_parent().get_parent().get_parent().get_parent().get_parent().get_parent().selected_events = all_events
 
 func _ready():
-	var de = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
-	if de == null:
-		ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
-	var disabled_events = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
+#	var de = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
+#	if de == null:
+#		
+	var disabled_events = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
+	if disabled_events == null:
+		pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
+		disabled_events = []
 	var event_names = []
 	for item in ring.get_children():
 		event_names.append(item.name)

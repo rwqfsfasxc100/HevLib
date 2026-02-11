@@ -134,11 +134,11 @@ func handleVersionCheck():
 	nodeToReturnTo._on_update_completed(update_data)
 	
 	
-	
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 func on_timeout():
 	
 	if not fallbackFiles == []:
 		for file in fallbackFiles and fallbackFiles.size() >= 1:
-			var Translations = preload("res://HevLib/pointers/Translations.gd").new()
-			Translations.__updateTL(file)
+#			var Translations = preload("res://HevLib/pointers/Translations.gd").new()
+			pointers.Translations.__updateTL(file)
 		

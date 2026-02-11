@@ -7,8 +7,8 @@ var CONFIG_ENTRY = ""
 var CONFIG_SECTION = ""
 
 var CONFIG_MOD = ""
-
-const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 
 var script_path = ""
 
@@ -35,7 +35,7 @@ func recheck_availability():
 			
 			var split = option.split("/")
 			if split.size() == 3:
-				var value = ConfigDriver.__get_value(split[0],split[1],split[2])
+				var value = pointers.ConfigDriver.__get_value(split[0],split[1],split[2])
 				if typeof(value) == TYPE_BOOL:
 					valid_options += 1
 					if value == true:
@@ -67,6 +67,6 @@ func refocus():
 	$Label/LABELBUTTON.rect_size = $Label.rect_size
 #	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 	
-	ConfigDriver.__set_button_focus(self,get_node("Button"))
+	pointers.ConfigDriver.__set_button_focus(self,get_node("Button"))
 	
 

@@ -17,6 +17,8 @@ var fallbackFunc = ""
 
 var file_check = ""
 
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+
 func _ready():
 	fetch_github_data(URLFullStopReformat)
 
@@ -146,10 +148,10 @@ func on_timeout():
 				if does:
 					confirmed_files.append(file)
 		for file in confirmed_files:
-			var Translations = preload("res://HevLib/pointers/Translations.gd").new()
+#			var Translations = preload("res://HevLib/pointers/Translations.gd").new()
 			var type = typeof(file)
 			if type == TYPE_STRING:
-				Translations.__updateTL(file, "|", false)
+				pointers.Translations.__updateTL(file, "|", false)
 			elif type == TYPE_ARRAY:
-				Translations.__updateTL(file[0],file[1], false)
+				pointers.Translations.__updateTL(file[0],file[1], false)
 		

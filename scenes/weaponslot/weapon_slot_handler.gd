@@ -7,11 +7,11 @@ var eqt_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/
 
 var ws_add = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_additions.json"
 var ws_modify = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_modifications.json"
-
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 var shipName = ""
 var baseShipName = ""
-var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
-var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
+#var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+#var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
 #func _enter_tree():
 func _ready():
 	var file = File.new()
@@ -19,7 +19,7 @@ func _ready():
 	shipName=ship.shipName
 	baseShipName=ship.baseShipName
 	
-	FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/ship_data/%s/" % shipName)
+	pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/ship_data/%s/" % shipName)
 
 	
 	
@@ -189,7 +189,7 @@ func modify():
 				for property in properties:
 					var p = property[0]
 					var value = property[1]
-					var newVal = NodeAccess.__convert_var_from_string(value)
+					var newVal = pointers.NodeAccess.__convert_var_from_string(value)
 					var sn = node.get_node(obj)
 					if sn == null:
 						breakpoint
@@ -206,7 +206,7 @@ func modify():
 				for property in properties:
 					var p = property[0]
 					var value = property[1]
-					var newVal = NodeAccess.__convert_var_from_string(value)
+					var newVal = pointers.NodeAccess.__convert_var_from_string(value)
 					var n = get_node(name + "_" + mounted)
 					var sn = n.get_node(obj)
 					if sn == null:
@@ -231,7 +231,7 @@ func modify():
 		var datapoint = equipment_modifications[c]
 		for property in datapoint:
 			var value = datapoint.get(property)
-			var newVal = NodeAccess.__convert_var_from_string(value)
+			var newVal = pointers.NodeAccess.__convert_var_from_string(value)
 			if system == null:
 				breakpoint
 			properties_to_modify.append([system,property,newVal])

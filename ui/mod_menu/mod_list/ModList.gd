@@ -1,7 +1,7 @@
 extends HBoxContainer
 
-var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
-
+#var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 export var mod_box = preload("res://HevLib/ui/mod_menu/mod_list/ModBox.tscn")
 
 export var info_icon = NodePath("")
@@ -57,7 +57,7 @@ func about_to_show():
 	filter_btn.current_text = ""
 	filter_btn.keys_pressed = ""
 
-var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
+#var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 
 export var subroot_path = NodePath("")
 onready var subroot = get_node(subroot_path)
@@ -101,13 +101,13 @@ func _ready():
 		"dependancies_button":get_node(dependancies_button_path),
 		"updates_button":get_node(updates_button_path),
 	}
-	var data = ManifestV2.__get_mod_data()["mods"]
+	var data = pointers.ManifestV2.__get_mod_data()["mods"]
 	var groups = {}
 	var mod_data = {}
 	var vdata = load("res://HevLib/ui/mod_menu/vanilla/data_dict.gd").get_script_constant_map()
 	var vd = vdata.VANILLA
 	
-	var ver = DataFormat.__get_vanilla_version()
+	var ver = pointers.DataFormat.__get_vanilla_version()
 	var verstr = str(ver[0]) + "." + str(ver[1]) + "." +str(ver[2])
 	
 	vd["manifest"]["manifest_data"]["version"]["version_major"] = ver[0]
@@ -127,7 +127,7 @@ func _ready():
 	for mod in data:
 		var fname = mod.split("/")[2]
 		var info = data[mod]
-		var zipinfo = ManifestV2.__match_mod_path_to_zip(mod)
+		var zipinfo = pointers.ManifestV2.__match_mod_path_to_zip(mod)
 		info.merge({"zip":zipinfo})
 		if not fname in groups:
 			groups.merge({fname:{}})
@@ -270,10 +270,10 @@ onready var dependancy_menu = get_node(dependancy_menu_path)
 onready var update_menu = get_node(update_menu_path)
 
 func _open_conflicts():
-	var conflicts = ManifestV2.__check_mod_conflicts(currently_selected_mod_id)
+	var conflicts = pointers.ManifestV2.__check_mod_conflicts(currently_selected_mod_id)
 	var cfmods = ""
 	for mod in conflicts:
-		var data = ManifestV2.__get_mod_by_id(mod)
+		var data = pointers.ManifestV2.__get_mod_by_id(mod)
 		cfmods = cfmods + "\n" + data["name"] + " (" + data["manifest"]["manifest_data"]["mod_information"]["id"] + ")"
 	conflict_menu.dialog_text = TranslationServer.translate("HEVLIB_CONFLICT_INFO_BODY") % cfmods
 	conflict_menu.popup()
@@ -283,10 +283,10 @@ func _open_conflicts():
 	conflict_menu.rect_size = Vector2(700,450)
 
 func _open_dependancies():
-	var conflicts = ManifestV2.__check_mod_dependancies(currently_selected_mod_id)
+	var conflicts = pointers.ManifestV2.__check_mod_dependancies(currently_selected_mod_id)
 	var cfmods = ""
 	for mod in conflicts:
-		var data = ManifestV2.__get_mod_by_id(mod)
+		var data = pointers.ManifestV2.__get_mod_by_id(mod)
 		cfmods = cfmods + "\n" + data["name"] + " (" + data["manifest"]["manifest_data"]["mod_information"]["id"] + ")"
 	dependancy_menu.dialog_text = TranslationServer.translate("HEVLIB_DEPENDANCY_INFO_BODY") % cfmods
 	dependancy_menu.popup()
@@ -309,7 +309,7 @@ func _open_updates():
 	
 
 var zip_folder = "user://cache/.Mod_Menu_2_Cache/updates/zip_cache/"
-const Github = preload("res://HevLib/pointers/Github.gd")
+#const Github = preload("res://HevLib/pointers/Github.gd")
 func updates_started():
 	file.open(update_store,File.READ)
 	var data = JSON.parse(file.get_as_text()).result
@@ -321,7 +321,7 @@ func updates_started():
 			github.rstrip("/")
 		if not github.ends_with("/releases"):
 			github = github + "/releases"
-		Github.__get_github_release(github,zip_folder,self,true,"zip")
+		pointers.Github.__get_github_release(github,zip_folder,self,true,"zip")
 	elif nexus:
 		if nexus.ends_with("/"):
 			nexus.rstrip("/")
@@ -335,7 +335,7 @@ var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 
 
 
-const FileAccess = preload("res://HevLib/pointers/FileAccess.gd")
+#const FileAccess = preload("res://HevLib/pointers/FileAccess.gd")
 func _downloaded_zip(file, filepath):
 	get_node("../../../../../../WAIT").hide()
 	var fi = File.new()
@@ -356,7 +356,7 @@ func _downloaded_zip(file, filepath):
 		gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
 	var modPathPrefix = gameInstallDirectory.plus_file("mods")
 	subroot.restart_menu.popup_centered()
-	FileAccess.__copy_file(filepath,modPathPrefix)
+	pointers.FileAccess.__copy_file(filepath,modPathPrefix)
 	updates_button.visible = false
 var tween
 func _visibility_changed():

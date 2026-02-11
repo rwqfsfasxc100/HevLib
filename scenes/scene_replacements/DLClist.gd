@@ -1,7 +1,8 @@
 extends "res://tools/DLClist.gd"
 
-var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
-var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+#var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
+#var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 func _ready():
 	grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	if get_child_count() >= 1:
@@ -12,7 +13,7 @@ func _ready():
 		add_child(make_label("HEVLIB_DLCLIST_MODS_HEADER"))
 		
 		pass
-	var mods = ManifestV2.__get_mod_data()["mods"]
+	var mods = pointers.ManifestV2.__get_mod_data()["mods"]
 	var labels = []
 	var names = []
 	for mod in mods:
@@ -20,13 +21,13 @@ func _ready():
 		if not data["library_information"]["is_library"]:
 			labels.append(make_label(data["name"]))
 			names.append(data["name"])
-		elif data["library_information"]["always_display"] and ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_always_display_libraries_in_dlclist"):
+		elif data["library_information"]["always_display"] and pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_always_display_libraries_in_dlclist"):
 			labels.append(make_label(data["name"]))
 			names.append(data["name"])
-		elif ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_all_libraries_in_dlclist"):
+		elif pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_all_libraries_in_dlclist"):
 			labels.append(make_label(data["name"]))
 			names.append(data["name"])
-	match ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","dlc_mod_list_sort_order"):
+	match pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","dlc_mod_list_sort_order"):
 		"alphabetical_ascending":
 			descending = true
 			labels.sort_custom(self,"sort_alphabetical")

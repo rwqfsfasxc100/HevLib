@@ -24,7 +24,7 @@ func _on_SpawnNow_pressed():
 			ring.odditiesEvery = 0.1
 			startEventTimerNode()
 		else:
-			Events.__spawn_event(cnode,ring)
+			pointers.Events.__spawn_event(cnode,ring)
 				
 
 var spawnDirectionScale = 0.75
@@ -103,8 +103,8 @@ func _timer_complete():
 	ring.testSpecificStoryElement = defaultTestSpecificStoryElement
 	ring.odditiesEvery = defaultOdditiesEvery
 	busy = false
-
-const Events = preload("res://HevLib/pointers/Events.gd")
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+#const Events = preload("res://HevLib/pointers/Events.gd")
 func _on_ClearEvent_pressed():
 	
-	Events.__clear_event(cnode,ring)
+	pointers.Events.__clear_event(cnode,ring)

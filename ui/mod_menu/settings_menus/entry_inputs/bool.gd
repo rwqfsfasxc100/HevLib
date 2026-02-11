@@ -7,11 +7,11 @@ var CONFIG_ENTRY = ""
 var CONFIG_SECTION = ""
 
 var CONFIG_MOD = ""
-
-const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 
 func _ready():
-	var value = ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
+	var value = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	if value == null:
 		Tool.remove(self)
 	$Label.text = CONFIG_DATA.get("name","BOOL_MISSING_NAME")
@@ -20,7 +20,7 @@ func _ready():
 	add_to_group("hevlib_settings_tab",true)
 
 func _toggled(button_pressed):
-	ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,button_pressed)
+	pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,button_pressed)
 	var tex = StreamTexture.new()
 	if button_pressed:
 		tex.load_path = "res://HevLib/ui/themes/icons/on_25.stex"
@@ -31,7 +31,7 @@ func _toggled(button_pressed):
 	$CheckButton.icon = tex
 
 func recheck_availability():
-	$CheckButton.pressed = ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
+	$CheckButton.pressed = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	if $CheckButton.pressed != CONFIG_DATA.get("default",false):
 		$reset.visible = true
 		$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($reset)
@@ -48,7 +48,7 @@ func recheck_availability():
 			
 			var split = option.split("/")
 			if split.size() == 3:
-				var value = ConfigDriver.__get_value(split[0],split[1],split[2])
+				var value = pointers.ConfigDriver.__get_value(split[0],split[1],split[2])
 				if typeof(value) == TYPE_BOOL:
 					valid_options += 1
 					if value == true:
@@ -84,7 +84,7 @@ func recheck_availability():
 
 func _reset_pressed():
 	$CheckButton.pressed = CONFIG_DATA.get("default",false)
-	ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,CONFIG_DATA.get("default",false))
+	pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,CONFIG_DATA.get("default",false))
 	$CheckButton.grab_focus()
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 
@@ -96,7 +96,7 @@ func refocus():
 	$Label/LABELBUTTON.rect_size = $Label.rect_size
 #	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 	
-	ConfigDriver.__set_button_focus(self,get_node("CheckButton"))
+	pointers.ConfigDriver.__set_button_focus(self,get_node("CheckButton"))
 	
 
 func _visibility_changed():

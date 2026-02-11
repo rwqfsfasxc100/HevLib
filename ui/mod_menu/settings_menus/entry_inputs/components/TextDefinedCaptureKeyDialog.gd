@@ -1,5 +1,7 @@
 extends Popup
 
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+
 onready var keybox = $PanelContainer / MarginContainer / VBoxContainer / CK / Keys
 
 onready var deleteButton = preload("res://menu/DeleteKeybind.tscn")
@@ -14,7 +16,7 @@ onready var mod = hbttn.get_parent().get_parent().CONFIG_MOD
 onready var section = hbttn.get_parent().get_parent().CONFIG_SECTION
 onready var action = hbttn.get_parent().get_parent().CONFIG_ENTRY
 
-var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+#var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 
 func _exit_tree():
 	deleteButton = null
@@ -36,16 +38,16 @@ func _on_ActionDefining_pressed():
 	
 func _remove_key(key):
 	
-	var n = ConfigDriver.__get_value(mod,section,action)
+	var n = pointers.ConfigDriver.__get_value(mod,section,action)
 	n.erase(key)
-	ConfigDriver.__store_value(mod,section,action,n)
+	pointers.ConfigDriver.__store_value(mod,section,action,n)
 	remakeActionButtons()
 
 func remakeActionButtons():
 	for k in keybox.get_children():
 		k.queue_free()
 		
-	var actions = ConfigDriver.__get_value(mod,section,action)
+	var actions = pointers.ConfigDriver.__get_value(mod,section,action)
 	
 	
 	for n in actions:
@@ -69,7 +71,7 @@ var store = []
 func _on_CaptureKeyDialog_about_to_show():
 	lastFocus = get_focus_owner()
 	remakeActionButtons()
-	store = ConfigDriver.__get_value(mod,section,action)
+	store = pointers.ConfigDriver.__get_value(mod,section,action)
 var capturing = false
 
 var lastFocus = null
@@ -99,10 +101,10 @@ func _input(event):
 				stopCapturing()
 			else:
 				stopCapturing()
-				var ent = ConfigDriver.__get_value(mod,section,action)
+				var ent = pointers.ConfigDriver.__get_value(mod,section,action)
 				if not ent.has(key):
 					ent.append(key)
-					ConfigDriver.__store_value(mod,section,action,ent)
+					pointers.ConfigDriver.__store_value(mod,section,action,ent)
 					remakeActionButtons()
 		elif (event is InputEventJoypadButton or event is InputEventJoypadMotion) and event.is_pressed():
 			get_tree().set_input_as_handled()
@@ -111,10 +113,10 @@ func _input(event):
 				stopCapturing()
 			else:
 				stopCapturing()
-				var ent = ConfigDriver.__get_value(mod,section,action)
+				var ent = pointers.ConfigDriver.__get_value(mod,section,action)
 				if not ent.has(key):
 					ent.append(key)
-					ConfigDriver.__store_value(mod,section,action,ent)
+					pointers.ConfigDriver.__store_value(mod,section,action,ent)
 					remakeActionButtons()
 			
 
@@ -148,7 +150,7 @@ func stopCapturing():
 
 func _on_Cancel_pressed():
 	stopCapturing()
-	ConfigDriver.__store_value(mod,section,action,store)
+	pointers.ConfigDriver.__store_value(mod,section,action,store)
 	Settings.applySettings()
 	hide()
 	refocus()

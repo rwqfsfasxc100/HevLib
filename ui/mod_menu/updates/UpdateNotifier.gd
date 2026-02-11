@@ -4,15 +4,15 @@ export var update_menu_path = NodePath("")
 onready var update_menu = get_node(update_menu_path)
 
 var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
-
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 var file = File.new()
-const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 func _ready():
 	file.open(update_store,File.READ)
 	var updates = JSON.parse(file.get_as_text()).result
 	file.close()
 	
-	var currently_ignored = ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
+	var currently_ignored = pointers.ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
 	if currently_ignored == null:
 		currently_ignored = {}
 	for u in currently_ignored:

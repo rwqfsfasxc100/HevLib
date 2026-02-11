@@ -13,7 +13,7 @@ var _savedObjects := []
 
 var enable_research = false
 
-var pointers = preload("res://HevLib/pointers.gd").new()
+var pointers = load("res://HevLib/pointers.gd").new()
 
 var HevLibModMain = true
 func _init(modLoader = ModLoader):
@@ -227,7 +227,6 @@ func _ready():
 		replaceScene("scenes/research/Enceladus.tscn","res://enceladus/Enceladus.tscn")
 	
 	
-	
 	var gameFiles = pointers.FolderAccess.__get_folder_structure("res://",false)
 	file.open("user://cache/.HevLib_Cache/filesys.json",File.WRITE)
 	if gameFiles.size() == 0:
@@ -236,6 +235,12 @@ func _ready():
 	var sys = JSON.print(gameFiles,"\t")
 	file.store_string(sys)
 	file.close()
+	
+	var PointerNode = Node.new()
+	PointerNode.name = "HevLib~Pointers"
+	PointerNode.set_script(pointers)
+	CRoot.call_deferred("add_child",PointerNode)
+	
 	l("Ready")
 func installScriptExtension(path:String):
 	var childPath:String = str(modPath + path)

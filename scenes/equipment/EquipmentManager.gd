@@ -1,12 +1,12 @@
 extends VBoxContainer
 
 # Stating HevLib pointers
-var Equipment = preload("res://HevLib/pointers/Equipment.gd")
-var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
-var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
-const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+#var Equipment = preload("res://HevLib/pointers/Equipment.gd")
+#var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+#var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
+#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 var cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/"
-
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 var NEW_INSTALL = false
 
 
@@ -42,9 +42,9 @@ func _init():
 
 func _tree_entered():
 	var sTime = OS.get_system_time_msecs()
-	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","use_legacy_equipment_handler"):
+	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","use_legacy_equipment_handler"):
 		l("Legacy equipment handler is enabled; started checking and modifying equipment")
-		ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_equipment_by_price",has)
+		pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_equipment_by_price",has)
 		var does = 1 if has else 0
 		var CRoot = get_tree().get_root().get_node("EquipmentDriver")
 		slots = CRoot.conv
@@ -65,11 +65,11 @@ func _tree_entered():
 		hFile.open(ddFile, File.READ)
 		var hData = hFile.get_as_text()
 		hFile.close()
-		var de = DataFormat.__compare_with_byte_array(installed_hash, str(hData))
+		var de = pointers.DataFormat.__compare_with_byte_array(installed_hash, str(hData))
 		if not de:
 			NEW_INSTALL = !de
-			FolderAccess.__recursive_delete(cache_folder)
-			FolderAccess.__check_folder_exists(cache_folder)
+			pointers.FolderAccess.__recursive_delete(cache_folder)
+			pointers.FolderAccess.__check_folder_exists(cache_folder)
 			l("Attempting to clear EquipmentDriver cache. Check later logs for success from other processes")
 		var f2 = File.new()
 		f2.open(ddFile, File.WRITE)
@@ -85,10 +85,10 @@ func _tree_entered():
 		l("Skipping equipment addition phase; dynamic equipment handler is being used and all equipment has been added during mod ready setup.")
 #func start_processing():
 		l("Performing slot sort check. Will slots be sorted? [%s]" % has)
-		if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_equipment_by_price"):
+		if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_equipment_by_price"):
 			for slot in display_slots():
 				sort_slot(slot)
-		if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_slots_by_type"):
+		if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_slots_by_type"):
 			reorganize_slots()
 	var finish_time = OS.get_system_time_msecs()
 	var total_time = str(float(finish_time - sTime)/1000)
@@ -157,11 +157,11 @@ func add_slots():
 		if newSlot.size() >= 1:
 			l("Adding slots for %s" % mod_hash)
 			for slotDict in newSlot:
-				var spt = Equipment.__make_slot(slotDict)
+				var spt = pointers.Equipment.__make_slot(slotDict)
 				var slot_name = spt.name
 				var slot_folder = cache_folder + mod_hash + "/ADD_EQUIPMENT_SLOTS/" + slot_name + "/"
 				var ddFile = slot_folder + "data_dictionary"
-				FolderAccess.__check_folder_exists(slot_folder)
+				pointers.FolderAccess.__check_folder_exists(slot_folder)
 				var dir = Directory.new()
 				dir.open(slot_folder)
 				var does = dir.file_exists(ddFile)
@@ -175,7 +175,7 @@ func add_slots():
 				var slot_file_data = file.get_as_text()
 				file.close()
 				var slot_data_dictionary = str(spt.data_dictionary)
-				var comp = DataFormat.__compare_with_byte_array(slot_data_dictionary, slot_file_data)
+				var comp = pointers.DataFormat.__compare_with_byte_array(slot_data_dictionary, slot_file_data)
 				if comp and not NEW_INSTALL:
 					slots_with_cache.append(mod_hash + ":" + slot_name)
 					add_child(spt)
@@ -232,7 +232,7 @@ func add_equipment():
 				
 				var slot_name = equip.get("system","OOPS! MISSING SYSTEM NAME!")
 				var slot_folder = cache_folder + mod_hash + "/ADD_EQUIPMENT_ITEMS/" + slot_name + "/"
-				FolderAccess.__check_folder_exists(slot_folder)
+				pointers.FolderAccess.__check_folder_exists(slot_folder)
 				var ddFile = slot_folder + "data_dictionary"
 				var dir = Directory.new()
 				dir.open(slot_folder)
@@ -247,7 +247,7 @@ func add_equipment():
 				var slot_file_data = file.get_as_text()
 				file.close()
 				var slot_data_dictionary = str(equip)
-				var comp = DataFormat.__compare_with_byte_array(str(slot_data_dictionary), str(slot_file_data))
+				var comp = pointers.DataFormat.__compare_with_byte_array(str(slot_data_dictionary), str(slot_file_data))
 				if comp and not NEW_INSTALL:
 					var slot_appendages = []
 					var indexFile = slot_folder + "index"
@@ -283,9 +283,9 @@ func add_equipment():
 		var item = get_node(slot_mod[1])
 		var vanilla_store = cache_folder + mod + "/ADD_EQUIPMENT_SLOTS/" + slot_mod[1] + "/vanilla_slots/"
 		l("Adding vanilla equipment to uncached slot %s from mod %s" % [slot_mod[1],mod])
-		FolderAccess.__check_folder_exists(vanilla_store)
+		pointers.FolderAccess.__check_folder_exists(vanilla_store)
 		for v_equipment in vanilla_equipment:
-			var V2 = Equipment.__make_equipment(vanilla_equipment.get(v_equipment))
+			var V2 = pointers.Equipment.__make_equipment(vanilla_equipment.get(v_equipment))
 			var does = confirm_equipment(V2, item.slot_type, item.alignment, item.restriction, item.allowed_equipment)
 			if does:
 				repack(V2,vanilla_store + v_equipment + ".tscn")
@@ -309,7 +309,7 @@ func add_equipment():
 		var item = get_node(slot_mod[1])
 		l("Adding vanilla equipment from slot cache of %s from mod %s" % [slot_mod[1],mod])
 		var vanilla_store = cache_folder + mod + "/ADD_EQUIPMENT_SLOTS/" + slot_mod[1] + "/vanilla_slots/"
-		var files = FolderAccess.__fetch_folder_files(vanilla_store, false, true)
+		var files = pointers.FolderAccess.__fetch_folder_files(vanilla_store, false, true)
 		for file in files:
 			
 				var container = item.get_node("VBoxContainer")
@@ -343,7 +343,7 @@ func add_equipment():
 					index += 1
 				
 				
-				container.add_child(Equipment.__make_equipment(data[0]))
+				container.add_child(pointers.Equipment.__make_equipment(data[0]))
 				num_of_cached_equipment += 1
 				num_of_equipment_added_total += 1
 				
@@ -351,7 +351,7 @@ func add_equipment():
 		l("Adding non-cached equipment")
 		for equip in unvalidated_equipment:
 			var data = unvalidated_equipment.get(equip)
-			var V2 = Equipment.__make_equipment(data[0])
+			var V2 = pointers.Equipment.__make_equipment(data[0])
 			var does = confirm_equipment(V2, slot.slot_type, slot.alignment, slot.restriction, slot.allowed_equipment)
 			if does:
 				var folder = data[1]
@@ -573,11 +573,11 @@ func confirm_equipment(equipment_node, slot_type, slot_alignment, slot_restricti
 
 func repack(node, save_path):
 	var save = PackedScene.new()
-	var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd").new()
-	NodeAccess.__claim_child_ownership(node)
+#	var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd").new()
+	pointers.NodeAccess.__claim_child_ownership(node)
 	save.pack(node)
 	var save_folder = save_path.split(save_path.split("/")[save_path.split("/").size() - 1])[0]
-	FolderAccess.__check_folder_exists(save_folder)
+	pointers.FolderAccess.__check_folder_exists(save_folder)
 	ResourceSaver.save(save_path, save)
 
 var MODULE_IDENTIFIER = "Equipment Driver"

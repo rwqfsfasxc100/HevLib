@@ -37,4 +37,4 @@ func _initialize():
 
 func getStory(story):
 	return int(CurrentGame.state.story.get(story, -1))
-const NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
+#const NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")

@@ -1,9 +1,9 @@
 extends "res://TheRing.gd"
 
 var event_names = []
-
-var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
-const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+#var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 var cache_folder = "user://cache/.HevLib_Cache/"
 
 var current_event_log = {}
@@ -112,11 +112,14 @@ func _ready():
 	veinImage = veins.get_data()
 	veinSize = veinImage.get_size()
 	
-	var de = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
-	if de == null:
-		ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
-	var disabled_events = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
-	var write_events = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","write_events")
+#	var de = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
+#	if de == null:
+#		
+	var disabled_events = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
+	if disabled_events == null:
+		pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
+		disabled_events = []
+	var write_events = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","write_events")
 	playlist = []
 	for kid in get_children():
 		var kidName = kid.name
@@ -134,7 +137,7 @@ func _ready():
 				string = event
 			else:
 				string = string + "\n" + event
-		FolderAccess.__check_folder_exists(cache_folder)
+		pointers.FolderAccess.__check_folder_exists(cache_folder)
 		var file = File.new()
 		file.open(cache_folder + "current_events.txt",File.WRITE)
 		file.store_string(string)

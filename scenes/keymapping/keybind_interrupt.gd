@@ -22,8 +22,8 @@ onready var joy_button_events = key_codes["JOYBUTTONS"]
 onready var joy_axis_events = key_codes["JOYAXES"]
 
 var overrides = load("res://HevLib/scenes/keymapping/data/overrides.gd").get_script_constant_map()
-
-var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+#var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 
 var INPUT_DRIVER_ACTIVE = false
 
@@ -40,11 +40,11 @@ var joyaxis_file = keybind_folder + "joyaxes.txt"
 
 var file = File.new()
 
-const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 
 
 func _ready():
-	FolderAccess.__check_folder_exists(keybind_folder)
+	pointers.FolderAccess.__check_folder_exists(keybind_folder)
 	file.open(key_file,File.WRITE)
 	file.store_string("[]")
 	file.close()
@@ -57,7 +57,7 @@ func _ready():
 	file.open(joyaxis_file,File.WRITE)
 	file.store_string("[]")
 	file.close()
-	INPUT_DRIVER_ACTIVE = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","use_input_virtualization")
+	INPUT_DRIVER_ACTIVE = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","use_input_virtualization")
 	if ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE:
 		self.pause_mode = Node.PAUSE_MODE_PROCESS
 		var actions = InputMap.get_actions()

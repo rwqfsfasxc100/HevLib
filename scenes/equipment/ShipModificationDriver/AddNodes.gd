@@ -7,9 +7,9 @@ var node_definitons_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/
 var processed_node_definitions = {}
 var processed_ship_register = {}
 
-
-var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
-var DF = preload("res://HevLib/pointers/DataFormat.gd")
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+#var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
+#var DF = preload("res://HevLib/pointers/DataFormat.gd")
 
 #func registerCapability(key, system):
 #	nodeModify()
@@ -144,7 +144,7 @@ func make_node_mods():
 						new_pos = npos[0]
 						node.set("position",new_pos)
 				TYPE_ARRAY, TYPE_INT_ARRAY, TYPE_REAL_ARRAY:
-					var scan = DF.__convert_arr_to_vec2arr(npos)
+					var scan = pointers.DataFormat.__convert_arr_to_vec2arr(npos)
 					if scan.size() >= 1:
 						new_pos = scan[0]
 						node.set("position",new_pos)

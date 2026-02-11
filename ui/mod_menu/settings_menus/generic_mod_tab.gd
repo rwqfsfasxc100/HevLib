@@ -2,9 +2,9 @@ extends Tabs
 
 export var mod = ""
 export var mod_id = ""
-
-const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
-const ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+#const ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 
 const tab_base = preload("res://HevLib/ui/mod_menu/settings_menus/generic_section_tab.tscn")
 
@@ -12,8 +12,8 @@ onready var container = $MarginContainer/TabContainer
 
 func _ready():
 	name = mod
-	var data = ConfigDriver.__get_config(mod)
-	var mdata = ManifestV2.__get_mod_by_id(mod_id)["manifest"]["manifest_data"].get("configs",{})
+	var data = pointers.ConfigDriver.__get_config(mod)
+	var mdata = pointers.ManifestV2.__get_mod_by_id(mod_id)["manifest"]["manifest_data"].get("configs",{})
 	
 	for section in mdata:
 		var sec_data = mdata[section]

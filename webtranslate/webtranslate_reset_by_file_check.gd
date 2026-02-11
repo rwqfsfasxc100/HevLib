@@ -5,12 +5,12 @@ static func webtranslate_reset_by_file_check(file_check):
 	var folder_to_delete = ""
 	var cache = "user://cache/.HevLib_Cache/WebTranslate/"
 	var dir = Directory.new()
-	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
-	var files = FolderAccess.__fetch_folder_files(cache, true, true)
+	var pointers = preload("res://HevLib/pointers.gd").new()
+	var files = pointers.FolderAccess.__fetch_folder_files(cache, true, true)
 	for file in files:
 		if not file.ends_with("/"):
 			continue
-		var cFiles = FolderAccess.__fetch_folder_files(file, false, true)
+		var cFiles = pointers.FolderAccess.__fetch_folder_files(file, false, true)
 		for f in cFiles:
 			if not f.ends_with(".file_check_cache"):
 				continue
@@ -23,5 +23,6 @@ static func webtranslate_reset_by_file_check(file_check):
 			else:
 				continue
 	if not folder_to_delete == "":
-		did = FolderAccess.__recursive_delete(folder_to_delete)
+		did = pointers.FolderAccess.__recursive_delete(folder_to_delete)
+	pointers.free()
 	return did

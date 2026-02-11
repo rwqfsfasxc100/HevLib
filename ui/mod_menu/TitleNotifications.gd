@@ -1,5 +1,5 @@
 extends Button
-const ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
+
 var file = File.new()
 var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
 func _ready():

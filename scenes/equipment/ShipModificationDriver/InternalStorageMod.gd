@@ -127,7 +127,7 @@ func _enter_tree():
 			listingSystemName:ls
 		})
 	configMutex.lock()
-	current = DataFormat.__sift_ship_config(shipConfig.duplicate(true),listings.keys(),cfgs_to_ignore)
+	current = ismPointers.DataFormat.__sift_ship_config(shipConfig.duplicate(true),listings.keys(),cfgs_to_ignore)
 	configMutex.unlock()
 	for i in current:
 		installed.append(i.split(".")[i.split(".").size() - 1])
@@ -408,10 +408,10 @@ func handleAmmoDelivery(delta):
 		availableAmmoToDrawNow *= ammo_speed_multi
 	availableAmmoToDrawNow += ammo_speed_add
 	
-
-const ismCFGD = preload("res://HevLib/pointers/ConfigDriver.gd")
+onready var ismPointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+#const ismCFGD = preload("res://HevLib/pointers/ConfigDriver.gd")
 func drawDrones(kg, really = true):
-	if ismCFGD.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","limit_nanodrone_output"):
+	if ismPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","limit_nanodrone_output"):
 		if availableNanoToDrawNow < kg:
 			return 0
 		else:
@@ -459,11 +459,11 @@ func getCurrentlyActiveCrewNames():
 	return pf
 
 func _physics_process(delta):
-	if not dead and ismCFGD.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","limit_nanodrone_output"):
+	if not dead and ismPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","limit_nanodrone_output"):
 		handleNanoDelivery(delta)
 	
 
-var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
+#var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 
 func l(text):
 	if isPlayerControlled():

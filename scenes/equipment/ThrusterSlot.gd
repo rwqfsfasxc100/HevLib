@@ -10,7 +10,8 @@ var smes = load("res://ships/modules/AuxSmes.tscn")
 var thruster = load("res://sfx/thruster.tscn")
 var exhaust = load("res://sfx/exhaust.tscn")
 var nozzle = load("res://ships/modules/nozzle-conventonal.tscn")
-const NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
+#const NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
+
 
 const torch_base_scale = [0.939,1.395]
 const rcs_base_scale = [0.2,0.2]

@@ -1,7 +1,7 @@
 extends Popup
 
-const FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
-
+#const FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 var profiles = []
 var display = []
 
@@ -26,7 +26,7 @@ func refresh_list():
 	profiles = []
 	display = []
 	profile_selections.clear()
-	profiles = FolderAccess.__fetch_folder_files(profiles_dir)
+	profiles = pointers.FolderAccess.__fetch_folder_files(profiles_dir)
 	if ".profiles.ini" in profiles:
 		profiles.erase(".profiles.ini")
 	for i in profiles:

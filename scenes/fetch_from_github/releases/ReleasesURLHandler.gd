@@ -1,7 +1,7 @@
 extends HTTPRequest
 
-var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd").new()
-
+#var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd").new()
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 var folder = ""
 var get_pre_releases = false
 var file_preference = "any" # Accepts "any" or "zip"
@@ -12,7 +12,7 @@ var urlToFetch = []
 func _on_release_request_completed(result, response_code, headers, body):
 	var json = JSON.parse(body.get_string_from_utf8())
 	var releasesContent
-	var TimeAccess = preload("res://HevLib/pointers/TimeAccess.gd").new()
+#	var TimeAccess = preload("res://HevLib/pointers/TimeAccess.gd").new()
 	var assetURLs = []
 	if not json.result == null:
 		releasesContent = json.result
@@ -39,7 +39,7 @@ func _on_release_request_completed(result, response_code, headers, body):
 				var isLatest = true
 				for item2 in assetURLs:
 					var date = item2[1]
-					var comparison = TimeAccess.__compare_dates(item[1],date)
+					var comparison = pointers.TimeAccess.__compare_dates(item[1],date)
 					if comparison == "older":
 						isLatest = false
 				if not isLatest:
@@ -73,7 +73,7 @@ func checkIfAcceptable(n):
 func downloadZip(url, folder):
 	if not folder.ends_with("/"):
 		folder = folder + "/"
-	var check = FolderAccess.__check_folder_exists(folder)
+	var check = pointers.FolderAccess.__check_folder_exists(folder)
 	if not check:
 		return
 	var zipName = url.split("/")[url.split("/").size() - 1]

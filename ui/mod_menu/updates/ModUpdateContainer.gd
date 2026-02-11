@@ -1,12 +1,14 @@
 extends HBoxContainer
 
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+
 var mod_id = ""
 var mod_name = ""
 var current_version = ""
 var new_version = ""
 var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
 var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
-const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 var file = File.new()
 onready var manager = get_parent().get_parent().get_parent().get_parent().get_parent()
 func _ready():
@@ -27,16 +29,16 @@ func _Update_pressed():
 var display_wait_popup = true
 
 func _ignore_confirmed():
-	var currently_ignored = ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
+	var currently_ignored = pointers.ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
 	if currently_ignored == null:
-		ConfigDriver.__store_value("ModMenu2","datastore","ignored_updates",{})
-	currently_ignored = ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
+		pointers.ConfigDriver.__store_value("ModMenu2","datastore","ignored_updates",{})
+	currently_ignored = pointers.ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
 	currently_ignored[mod_id] = new_version
-	ConfigDriver.__store_value("ModMenu2","datastore","ignored_updates",currently_ignored)
+	pointers.ConfigDriver.__store_value("ModMenu2","datastore","ignored_updates",currently_ignored)
 	repos()
 	Tool.remove(self)
 var zip_folder = "user://cache/.Mod_Menu_2_Cache/updates/zip_cache/"
-const Github = preload("res://HevLib/pointers/Github.gd")
+#const Github = preload("res://HevLib/pointers/Github.gd")
 
 func _do_update():
 	var dv = {"name":mod_name,"id":mod_id,"version":new_version,"container":self}
@@ -54,7 +56,7 @@ func _update_confirmed():
 			github.rstrip("/")
 		if not github.ends_with("/releases"):
 			github = github + "/releases"
-		Github.__get_github_release(github,zip_folder,self,true,"zip")
+		pointers.Github.__get_github_release(github,zip_folder,self,true,"zip")
 	elif nexus:
 		if nexus.ends_with("/"):
 			nexus.rstrip("/")
@@ -67,7 +69,7 @@ func _update_confirmed():
 	if display_wait_popup:
 		$Popups/WAIT.popup_centered()
 var modPathPrefix = ""
-const FileAccess = preload("res://HevLib/pointers/FileAccess.gd")
+#const FileAccess = preload("res://HevLib/pointers/FileAccess.gd")
 func _downloaded_zip(file, filepath):
 	$Popups/WAIT.hide()
 	var fi = File.new()
@@ -85,7 +87,7 @@ func _downloaded_zip(file, filepath):
 	fi.close()
 	repos()
 	if filepath and modPathPrefix:
-		FileAccess.__copy_file(filepath,modPathPrefix)
+		pointers.FileAccess.__copy_file(filepath,modPathPrefix)
 	Tool.deferCallInPhysics(manager,"move_to_next_mod")
 	Tool.remove(self)
 

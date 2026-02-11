@@ -34,22 +34,22 @@ var currentgame_path = "user://cache/.HevLib_Cache/Minerals/CurrentGame.gd"
 var thering_path = "user://cache/.HevLib_Cache/Minerals/TheRing.gd"
 var ringscene_path = "user://cache/.HevLib_Cache/Minerals/TheRing.tscn"
 
-var Equipment = preload("res://HevLib/pointers/Equipment.gd")
-var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
-var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
+#var Equipment = preload("res://HevLib/pointers/Equipment.gd")
+#var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+#var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 #var DriverManagement = preload("res://HevLib/pointers/DriverManagement.gd")
 
-
+var pointers = preload("res://HevLib/pointers.gd").new()
 func _init(modLoader = ModLoader):
 	l("Initializing Equipment Driver")
 	
 	var injector = load("res://HevLib/scripts/translations/inject_translations.gd")
-	injector.inject_translations()
+	injector.inject_translations(pointers)
 	
-	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
+#	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 	var d = Directory.new()
 	if d.dir_exists("user://cache/.HevLib_Cache"):
-		FolderAccess.__recursive_delete("user://cache/.HevLib_Cache")
+		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache")
 	
 	var ml = MainLoop.new()
 	ml.set_script(load("res://HevLib/scripts/crash_handler.gd"))
@@ -57,7 +57,7 @@ func _init(modLoader = ModLoader):
 	
 	
 	
-	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk"):
+	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk"):
 		installScriptExtension("../minerals/multiminerals/mineral.gd")
 		installScriptExtension("../minerals/multiminerals/MineralProcessingUnit.gd")
 		installScriptExtension("../minerals/multiminerals/AsteroidSpawner.gd")
@@ -70,7 +70,7 @@ func _init(modLoader = ModLoader):
 
 	installScriptExtension("../better_title_screen/CurrentlyPlaying.gd")
 	var minerals = load("res://HevLib/scenes/minerals/make_mineral_scripting.gd")
-	minerals.make_mineral_scripting(false)
+	minerals.make_mineral_scripting(false,pointers)
 
 	var asteroids = ResourceLoader.load(asteroid_path)
 	asteroids.new()
@@ -113,14 +113,14 @@ var f = File.new()
 func _ready():
 	l("Readying")
 	
-	ConfigDriver.__load_configs()
+	pointers.ConfigDriver.__load_configs()
 	var zip_ref_store = "user://cache/.HevLib_Cache/zip_ref_store.json"
 	f.open(zip_ref_store,File.WRITE)
 	f.store_string("{}")
 	f.close()
 	
 	var modzips = {}
-	for mod in ManifestV2.__get_mod_data()["mods"]:
+	for mod in pointers.ManifestV2.__get_mod_data()["mods"]:
 		var zipinfo = match_mod_path_to_zip(mod)
 		modzips.merge({mod:zipinfo})
 	f.open(zip_ref_store,File.WRITE)
@@ -128,7 +128,7 @@ func _ready():
 	f.close()
 	
 	var ring = preload("res://HevLib/scenes/minerals/make_ring_modifications.gd")
-	ring.make_ring_modifications()
+	ring.make_ring_modifications(pointers)
 	
 	
 	
@@ -145,7 +145,7 @@ func _ready():
 	
 	
 	
-	Equipment.__make_upgrades_scene(true)
+	pointers.Equipment.__make_upgrades_scene(true)
 	var upgrades = load(upgrades_path)
 	upgrades.take_over_path("res://enceladus/Upgrades.tscn")
 	_savedObjects.append(upgrades)
@@ -170,6 +170,8 @@ func _ready():
 #	installScriptExtension("../scene_replacements/Shipyard.gd")
 
 	replaceScene("../minerals/multiminerals/AsteroidField.tscn","res://AsteroidField.tscn")
+	
+	pointers.free()
 	l("Ready")
 	
 func installScriptExtension(path:String):

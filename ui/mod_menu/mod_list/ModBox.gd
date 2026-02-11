@@ -28,11 +28,11 @@ var MAX_SIZE = Vector2(0,0)
 
 var information_nodes = {}
 
-var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
-
+#var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 var file = File.new()
 
-onready var all_tags = ManifestV2.__get_tags()
+onready var all_tags = pointers.ManifestV2.__get_tags()
 
 
 var conflicts = []
@@ -185,7 +185,7 @@ func _pressed():
 		information_nodes["dependancies_button"].visible = true
 		var cd = ""
 		for i in dependancy_data[id]:
-			var mname = ManifestV2.__get_mod_by_id(i)["name"]
+			var mname = pointers.ManifestV2.__get_mod_by_id(i)["name"]
 			cd = cd + "\n" + mname
 		information_nodes["dependancies_button"].hint_tooltip = TranslationServer.translate("HEVLIB_ICON_TOOLTIP_DEPENDANCIES") % cd
 		has_dep = true
@@ -196,7 +196,7 @@ func _pressed():
 		information_nodes["conflict_button"].visible = true
 		var cd = ""
 		for i in conflict_data[id]:
-			var mname = ManifestV2.__get_mod_by_id(i)["name"]
+			var mname = pointers.ManifestV2.__get_mod_by_id(i)["name"]
 			cd = cd + "\n" + mname
 		information_nodes["conflict_button"].hint_tooltip = TranslationServer.translate("HEVLIB_ICON_TOOLTIP_CONFLICT") % cd
 		has_conf = true
@@ -230,7 +230,7 @@ var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/compleme
 
 
 
-const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 
 
 var children = {}
@@ -294,7 +294,7 @@ func _draw():
 		icon_conflicts.visible = true
 		var cd = ""
 		for i in conf[ID]:
-			var mname = ManifestV2.__get_mod_by_id(i)["name"]
+			var mname = pointers.ManifestV2.__get_mod_by_id(i)["name"]
 			cd = cd + "\n" + mname
 		icon_conflicts.hint_tooltip = TranslationServer.translate("HEVLIB_ICON_TOOLTIP_CONFLICT") % cd
 	else:
@@ -303,7 +303,7 @@ func _draw():
 		icon_dependancies.visible = true
 		var cd = ""
 		for i in dep[ID]:
-			var mname = ManifestV2.__get_mod_by_id(i)["name"]
+			var mname = pointers.ManifestV2.__get_mod_by_id(i)["name"]
 			cd = cd + "\n" + mname
 		icon_dependancies.hint_tooltip = TranslationServer.translate("HEVLIB_ICON_TOOLTIP_DEPENDANCIES") % cd
 	else:
@@ -312,7 +312,7 @@ func _draw():
 		icon_complementary.visible = true
 		var cd = ""
 		for i in comp[ID]:
-			var mname = ManifestV2.__get_mod_by_id(i)["name"]
+			var mname = pointers.ManifestV2.__get_mod_by_id(i)["name"]
 			cd = cd + "\n" + mname
 		icon_complementary.hint_tooltip = TranslationServer.translate("HEVLIB_ICON_TOOLTIP_COMPLEMENTARY") % cd
 	else:
@@ -372,7 +372,7 @@ func _draw():
 	
 	
 	
-	var showHidden = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_hidden_libraries")
+	var showHidden = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_hidden_libraries")
 	if is_library:
 		if showHidden or always_display:
 			visible = true

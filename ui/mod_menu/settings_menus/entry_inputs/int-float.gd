@@ -7,8 +7,8 @@ var CONFIG_ENTRY = ""
 var CONFIG_SECTION = ""
 
 var CONFIG_MOD = ""
-
-const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 
 export (String,"slider","spinbox") var style = "slider"
 
@@ -20,7 +20,7 @@ onready var spinbox = $spinbox
 onready var SliderLabel = $SliderLabel
 
 func _ready():
-	var value = ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
+	var value = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	if value == null:
 		Tool.remove(self)
 	label.text = CONFIG_DATA.get("name","BOOL_MISSING_NAME")
@@ -65,7 +65,7 @@ func _reset_pressed():
 	slider.value = val
 	spinbox.value = val
 	SliderLabel.text = str(val)
-	ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,val)
+	pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,val)
 	match style:
 		"slider":
 			slider.grab_focus()
@@ -85,12 +85,12 @@ func refocus():
 		spinbox.visible = true
 		slider.visible = false
 		SliderLabel.visible = false
-	ConfigDriver.__set_button_focus(self,get_node(style))
+	pointers.ConfigDriver.__set_button_focus(self,get_node(style))
 #	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 	
 
 func _value_changed(value):
-	ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,value)
+	pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,value)
 	SliderLabel.text = str(value)
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 	refocus()
@@ -104,7 +104,7 @@ func _visibility_changed():
 
 
 func recheck_availability():
-	var v = ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
+	var v = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	slider.set("value" , float(v))
 	SliderLabel.text = str(v)
 	spinbox.set("value" , float(v))
@@ -128,7 +128,7 @@ func recheck_availability():
 			
 			var split = option.split("/")
 			if split.size() == 3:
-				var value = ConfigDriver.__get_value(split[0],split[1],split[2])
+				var value = pointers.ConfigDriver.__get_value(split[0],split[1],split[2])
 				if typeof(value) == TYPE_BOOL:
 					valid_options += 1
 					if value == true:

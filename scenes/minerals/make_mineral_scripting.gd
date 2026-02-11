@@ -1,12 +1,12 @@
 extends Node
 
-const DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
-const FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
-const DriverManagement = preload("res://HevLib/pointers/DriverManagement.gd")
+#const DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
+#const FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+#const DriverManagement = preload("res://HevLib/pointers/DriverManagement.gd")
 
 const custom_mineral_path = "user://cache/.HevLib_Cache/Minerals/mineral_store/"
 
-static func make_mineral_scripting(is_onready = false):
+static func make_mineral_scripting(is_onready = false,pointers = null):
 	
 	var FILE_PATHS = [
 		"user://cache/.HevLib_Cache/Minerals/mineral_cache.json",
@@ -17,10 +17,10 @@ static func make_mineral_scripting(is_onready = false):
 	
 	
 	for file in FILE_PATHS:
-		FolderAccess.__check_folder_exists(file.split(file.split("/")[file.split("/").size() - 1])[0])
-	FolderAccess.__check_folder_exists(custom_mineral_path)
-	for f in FolderAccess.__fetch_folder_files(custom_mineral_path,true,true):
-		FolderAccess.__recursive_delete(f)
+		pointers.FolderAccess.__check_folder_exists(file.split(file.split("/")[file.split("/").size() - 1])[0])
+	pointers.FolderAccess.__check_folder_exists(custom_mineral_path)
+	for f in pointers.FolderAccess.__fetch_folder_files(custom_mineral_path,true,true):
+		pointers.FolderAccess.__recursive_delete(f)
 		
 	var mineral_cache_file = FILE_PATHS[0]
 	var asteroid_spawner_script = FILE_PATHS[1]
@@ -30,12 +30,12 @@ static func make_mineral_scripting(is_onready = false):
 	
 	if is_onready:
 		
-		var version = DataFormat.__get_vanilla_version()
+		var version = pointers.DataFormat.__get_vanilla_version()
 		var text = "HevLib Mineral Manager: observed game version of %s"  % str(version)
 		Debug.l(text)
 	
 	var f = File.new()
-	var drivers = DriverManagement.__get_drivers()
+	var drivers = pointers.DriverManagement.__get_drivers()
 	var mineral_data = []
 	for driver in drivers:
 		var dv = driver["drivers"]
@@ -49,14 +49,14 @@ static func make_mineral_scripting(is_onready = false):
 	f.open(current_game_script,File.WRITE)
 	f.store_string(current_game)
 	f.close()
-	var asteroid_spawner = handle_ore_scenes(mineral_data)
+	var asteroid_spawner = handle_ore_scenes(mineral_data,pointers)
 	f.open("user://cache/.HevLib_Cache/Minerals/AsteroidSpawner.gd",File.WRITE)
 	f.store_string(asteroid_spawner)
 	f.close()
 
 
 
-static func handle_ore_scenes(mineral_data):
+static func handle_ore_scenes(mineral_data,pointers):
 	var mineral_list = {}
 	for mineral in mineral_data:
 		var mname = mineral["name"]
@@ -87,7 +87,7 @@ static func handle_ore_scenes(mineral_data):
 							base = "pt"
 						"w","tungsten","wolfram":
 							base = "w"
-					var roc = make_custom_rocks(mname,color,base)
+					var roc = make_custom_rocks(mname,color,base,pointers)
 					var rt = make_asteroid_spawner_section(mname,roc)
 					mineral_list.merge({mname:rt})
 					Debug.l("HevLib Mineral Manager: adding mineral %s using handler [recolor]" % mname)
@@ -110,7 +110,7 @@ const arr_checker = "\n\tif not \"%s\" in %s:\n\t\t%s.append("
 
 const folder_base = "user://cache/.HevLib_Cache/Minerals/mineral_store/%s-%s/"
 
-static func make_custom_rocks(mineral,color,base):
+static func make_custom_rocks(mineral,color,base,pointers):
 	var header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://HevLib/scenes/minerals/base_scenes/mineral-%s-%s.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"mineral\" instance=ExtResource( 1 )]"
 	var content = "\nmineral = \"%s\"\ncolor = Color( %s, %s, %s, 1 )" % [mineral,color.r,color.g,color.b]
 	var folder = folder_base % [mineral,str(int(color.r*255)) + str(int(color.g*255)) + str(int(color.b*255))]
@@ -119,7 +119,7 @@ static func make_custom_rocks(mineral,color,base):
 	var rt = []
 	for i in range(0,7):
 		var id = i + 1
-		FolderAccess.__check_folder_exists(folder)
+		pointers.FolderAccess.__check_folder_exists(folder)
 		var fn = folder + "h%s.tscn" % id
 		var data = header % [base,id] + content
 		file.open(fn,File.WRITE)

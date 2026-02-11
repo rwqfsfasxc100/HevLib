@@ -1,13 +1,11 @@
 extends HTTPRequest
 
-var Globals = preload("res://HevLib/Functions.gd").new()
-
 var HevLibCache = "user://cache/.HevLib_Cache"
 var cacheExtension = ".hev"
 
 var file_check = ""
 
-var Translations = preload("res://HevLib/pointers/Translations.gd").new()
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 
 func _ready():
 	connect("request_completed",self,"_on_request_complete")
@@ -57,16 +55,16 @@ func _on_request_complete(result, response_code, headers, body):
 				else:
 					utfc = utfc + "-~-" + str(ut)
 			var base_folder = HevLibCache + "/WebTranslate/" + nameContent[0]
-			Globals.__check_folder_exists(base_folder)
+			pointers.FolderAcces.__check_folder_exists(base_folder)
 			var file = File.new()
 			var fileName = base_folder + "/" + nameContent[1] + cacheExtension + "--" + utfc
 			file.open(fileName,File.WRITE)
 			file.store_string(releasesContent)
 			file.close()
 			
-			Translations.__updateTL(fileName,delim)
+			pointers.Translations.__updateTL(fileName,delim)
 			if file_check == "":
-				Globals.__recursive_delete(fileName)
+				pointers.FolderAccess.__recursive_delete(fileName)
 			else:
 				var f = File.new()
 				f.open(base_folder + "/" + str(file_check.hash()) + ".file_check_cache",File.WRITE)

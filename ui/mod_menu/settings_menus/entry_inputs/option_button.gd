@@ -8,15 +8,15 @@ var CONFIG_ENTRY = ""
 var CONFIG_SECTION = ""
 
 var CONFIG_MOD = ""
-
-const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 
 export (String,"string","int") var store_method = "int"
 
 var options = []
 
 func _ready():
-	var value = ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
+	var value = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	if value == null:
 		Tool.remove(self)
 	store_method = CONFIG_DATA.get("store_method","int")
@@ -34,7 +34,7 @@ func _ready():
 
 
 func recheck_availability():
-	var val = ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
+	var val = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	
 	$OptionButton.selected = find_int(val)
 	var def = find_int(CONFIG_DATA.get("default",false))
@@ -55,7 +55,7 @@ func recheck_availability():
 			
 			var split = option.split("/")
 			if split.size() == 3:
-				var value = ConfigDriver.__get_value(split[0],split[1],split[2])
+				var value = pointers.ConfigDriver.__get_value(split[0],split[1],split[2])
 				if typeof(value) == TYPE_BOOL:
 					valid_options += 1
 					if value == true:
@@ -96,7 +96,7 @@ func _reset_pressed():
 		"string":
 			var index = find_int(CONFIG_DATA.get("default",false))
 			$OptionButton.selected = index
-	ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,CONFIG_DATA.get("default",false))
+	pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,CONFIG_DATA.get("default",false))
 	$OptionButton.grab_focus()
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 
@@ -108,7 +108,7 @@ func refocus():
 	$button/Label/LABELBUTTON.rect_size = $button/Label.rect_size
 #	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 	
-	ConfigDriver.__set_button_focus(self,get_node("OptionButton"))
+	pointers.ConfigDriver.__set_button_focus(self,get_node("OptionButton"))
 	
 
 func _visibility_changed():
@@ -121,10 +121,10 @@ func _on_OptionButton_item_selected(index):
 	
 	match store_method:
 		"int":
-			ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,index)
+			pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,index)
 		"string":
 			var o = options[index]
-			ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,o)
+			pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,o)
 	
 	
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")

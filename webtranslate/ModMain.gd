@@ -33,13 +33,13 @@ var cache_extension = ".file_check_cache"
 
 func loadTranslationsFromCache():
 	var accepted = false
-	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd").new()
+	var pointers = load("res://HevLib/pointers.gd").new()
 	var WebTranslateCache = "user://cache/.HevLib_Cache/WebTranslate/"
-	FolderAccess.__check_folder_exists(WebTranslateCache)
-	var cacheContent = FolderAccess.__fetch_folder_files(WebTranslateCache, true)
+	pointers.FolderAccess.__check_folder_exists(WebTranslateCache)
+	var cacheContent = pointers.FolderAccess.__fetch_folder_files(WebTranslateCache, true)
 	for folder in cacheContent:
 		var folderPath = WebTranslateCache + folder
-		var files = FolderAccess.__fetch_folder_files(folderPath)
+		var files = pointers.FolderAccess.__fetch_folder_files(folderPath)
 		var cache_location_exists = false
 		for file in files:
 			var filePath = str(folderPath + file)
@@ -59,7 +59,7 @@ func loadTranslationsFromCache():
 			else:
 				continue
 		if not cache_location_exists:
-			FolderAccess.__recursive_delete(folderPath)
+			pointers.FolderAccess.__recursive_delete(folderPath)
 		if accepted:
 			for file in files:
 				var filePath = str(folderPath + file)
@@ -80,6 +80,7 @@ func loadTranslationsFromCache():
 				else:
 					var dir = Directory.new()
 					dir.remove(filePath)
+	pointers.free()
 # Helper script to load translations using csv format
 # `path` is the path to the transalation file
 # `delim` is the symbol used to seperate the values

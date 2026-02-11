@@ -1,7 +1,7 @@
 extends "res://ships/Shipyard.gd"
 
-const DriverManagement = preload("res://HevLib/pointers/DriverManagement.gd")
-
+#const DriverManagement = preload("res://HevLib/pointers/DriverManagement.gd")
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 
 func _ready():
 	var file = File.new()
@@ -15,7 +15,7 @@ func _ready():
 	yield(get_tree(),"idle_frame")
 	resetter_timeout()
 	var nano_delivery = {}
-	var drivers = DriverManagement.__get_drivers()
+	var drivers = pointers.DriverManagement.__get_drivers()
 	for mod in drivers:
 		var list = mod["drivers"]
 		if "ADD_SHIPS.gd" in list:

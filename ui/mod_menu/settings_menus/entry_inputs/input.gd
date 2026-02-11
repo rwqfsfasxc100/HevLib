@@ -8,11 +8,11 @@ var CONFIG_ENTRY = ""
 var CONFIG_SECTION = ""
 
 var CONFIG_MOD = ""
-
-const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 
 func _ready():
-	var value = ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
+	var value = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	if value == null:
 		Tool.remove(self)
 	$Label.text = CONFIG_DATA.get("name","BOOL_MISSING_NAME")
@@ -21,7 +21,7 @@ func _ready():
 
 func recheck_availability():
 	
-	var values = ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
+	var values = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	if values.hash() != CONFIG_DATA.get("default",[]).hash():
 		$reset.visible = true
 		$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($reset)
@@ -38,7 +38,7 @@ func recheck_availability():
 			
 			var split = option.split("/")
 			if split.size() == 3:
-				var value = ConfigDriver.__get_value(split[0],split[1],split[2])
+				var value = pointers.ConfigDriver.__get_value(split[0],split[1],split[2])
 				if typeof(value) == TYPE_BOOL:
 					valid_options += 1
 					if value == true:
@@ -73,7 +73,7 @@ func recheck_availability():
 		$Label/LABELBUTTON.disabled = false
 
 func _reset_pressed():
-	ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,CONFIG_DATA.get("default",[]))
+	pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,CONFIG_DATA.get("default",[]))
 	$Label/LABELBUTTON.grab_focus()
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 
@@ -85,7 +85,7 @@ func refocus():
 	$Label/LABELBUTTON.rect_size = $Label.rect_size
 #	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 	
-	ConfigDriver.__set_button_focus(self,get_node("Label/LABELBUTTON"))
+	pointers.ConfigDriver.__set_button_focus(self,get_node("Label/LABELBUTTON"))
 	
 
 func _visibility_changed():
