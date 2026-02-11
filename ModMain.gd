@@ -13,6 +13,8 @@ var _savedObjects := []
 
 var enable_research = false
 
+var pointers = preload("res://HevLib/pointers.gd").new()
+
 var HevLibModMain = true
 func _init(modLoader = ModLoader):
 	l("Initializing DLC")
@@ -27,6 +29,9 @@ func _init(modLoader = ModLoader):
 	add_child(self_check)
 	
 	installScriptExtension("scenes/scene_replacements/Shipyard.gd")
+	
+	var md = pointers.DataFormat.__get_script_constant_map_without_load("res://IndustriesOfEnceladusRewrite/HEVLIB_EQUIPMENT_DRIVER_TAGS/SLOT_ORDER.gd")
+	
 
 var file = File.new()
 var update_urls = PoolStringArray([])
@@ -51,22 +56,22 @@ func _ready():
 		var translation = ResourceLoader.load(i,"",true)
 		TranslationServer.add_translation(translation)
 	
-	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
-	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/")
-	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/")
-	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/dependancies/")
-	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/conflicts/")
-	FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/complementary/")
-	FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Event_Driver/")
-	var zips = FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/",true,true)
-	var manifests = FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/",true,true)
+#	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
+	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/")
+	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/")
+	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/dependancies/")
+	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/conflicts/")
+	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/complementary/")
+	pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Event_Driver/")
+	var zips = pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/",true,true)
+	var manifests = pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/",true,true)
 	var d = Directory.new()
 	for f in zips:
 		d.remove(f)
 	for f in manifests:
 		d.remove(f)
 	if d.dir_exists(weaponslot_cache):
-		FolderAccess.__recursive_delete(weaponslot_cache)
+		pointers.FolderAccess.__recursive_delete(weaponslot_cache)
 	file.open(url_store,File.WRITE)
 	file.store_string("[]")
 	file.close()
@@ -85,9 +90,9 @@ func _ready():
 	file.open(latest_event_file,File.WRITE)
 	file.store_string("")
 	file.close()
-	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
-	var mod_data = ManifestV2.__get_mod_data(true,true)
-	var md = ManifestV2.__get_mod_data()
+#	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
+	var mod_data = pointers.ManifestV2.__get_mod_data(true,true)
+	var md = pointers.ManifestV2.__get_mod_data()
 	
 	replaceScene("scenes/better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
 	
@@ -112,9 +117,9 @@ func _ready():
 				http.request(url)
 				update_urls.append(pm["manifest"]["manifest_data"]["mod_information"]["id"])
 
-	var conflicts = ManifestV2.__check_conflicts()
-	var dependancies = ManifestV2.__check_dependancies()
-	var complementary = ManifestV2.__check_complementary()
+	var conflicts = pointers.ManifestV2.__check_conflicts()
+	var dependancies = pointers.ManifestV2.__check_dependancies()
+	var complementary = pointers.ManifestV2.__check_complementary()
 	
 	file.open(conflicts_store,File.WRITE)
 	file.store_string(JSON.print(conflicts))
@@ -126,7 +131,7 @@ func _ready():
 	file.store_string(JSON.print(complementary))
 	file.close()
 	
-	var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
+#	var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
 #	replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
 #	if OS.has_feature("editor"):
 #		replaceScene("scenes/scene_replacements/TitleScreen.tscn", "res://TitleScreen.tscn")
@@ -140,8 +145,8 @@ func _ready():
 	dir.make_dir_recursive("user://cache/.HevLib_Cache/")
 	var file = File.new()
 	file.open("user://cache/.HevLib_Cache/library_documentation.json", File.WRITE)
-	var HevLib = load("res://HevLib/pointers/HevLib.gd")
-	var functionality = HevLib.__get_library_functionality(true)
+#	var HevLib = load("res://HevLib/pointers/HevLib.gd")
+	var functionality = pointers.HevLib.__get_library_functionality(true)
 	file.store_string(functionality)
 	file.close()
 	file.open("user://cache/.HevLib_Cache/currently_installed_mods.json", File.WRITE)
@@ -151,10 +156,10 @@ func _ready():
 	var cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/"
 	replaceScene("scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
 #	var CRoot = get_tree().get_root()
-	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","use_legacy_equipment_handler"):
+	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","use_legacy_equipment_handler"):
 		var conv := []
 		var paths = []
-		FolderAccess.__check_folder_exists(cache_folder)
+		pointers.FolderAccess.__check_folder_exists(cache_folder)
 		var mods = ModLoader.get_children()
 		l("Scanning installed mods for applicable mods")
 		for mod in mods:
@@ -206,15 +211,15 @@ func _ready():
 	var scene = load("res://HevLib/scenes/better_title_screen/TitleScreen.tscn")
 	
 #	replaceScene("scenes/equipment/Enceladus.tscn","res://enceladus/Enceladus.tscn")
-	ManifestV2.__get_mod_versions(true)
-	var ncrew = ManifestV2.__get_manifest_entry("tags","TAG_HANDLE_EXTRA_CREW")
+	pointers.ManifestV2.__get_mod_versions(true)
+	var ncrew = pointers.ManifestV2.get_manifest_entry("tags","TAG_HANDLE_EXTRA_CREW")
 	var count = 24
 	for mod in ncrew:
 		var data = ncrew[mod]
 		if data > count:
 			count = data
-	var NodeAccess = load("res://HevLib/pointers/NodeAccess.gd")
-	var crew = NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",count)
+#	var NodeAccess = load("res://HevLib/pointers/NodeAccess.gd")
+	var crew = pointers.NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",count)
 	if not crew == "":
 		var escene := load(crew)
 		escene.take_over_path("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
@@ -222,7 +227,8 @@ func _ready():
 		replaceScene("scenes/research/Enceladus.tscn","res://enceladus/Enceladus.tscn")
 	
 	
-	var gameFiles = FolderAccess.__get_folder_structure("res://",false)
+	
+	var gameFiles = pointers.FolderAccess.__get_folder_structure("res://",false)
 	file.open("user://cache/.HevLib_Cache/filesys.json",File.WRITE)
 	if gameFiles.size() == 0:
 		printerr("FAILED TO FETCH FILE SYSTEM")
@@ -260,8 +266,8 @@ func l(msg:String, title:String = MOD_NAME, version:String = str(MOD_VERSION_MAJ
 	Debug.l("[%s V%s]: %s" % [title, version, msg])
 func network_return(result, response_code,headers,body):
 	if result == 0:
-		var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
-		var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
+#		var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
+#		var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
 		var p = body.get_string_from_utf8()
 		var path = "user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/network_manifest_%s.cfg"
 		var path2 = "user://cache/.Mod_Menu_2_Cache/updates/network_manifest.json"
@@ -274,18 +280,18 @@ func network_return(result, response_code,headers,body):
 		file.open(url_store,File.READ)
 		var current = JSON.parse(file.get_as_text(true)).result
 		file.close()
-#		var data = ConfigDriver.__config_parse(path)
+#		var data = ConfigDriver.config_parse(path)
 #		file.open(path2,File.WRITE)
 #		file.store_string(JSON.print(data))
 #		file.close()
-		var manifest = ManifestV2.__parse_file_as_manifest(path % id,true)
-		var DataFormat = load("res://HevLib/pointers/DataFormat.gd")
+		var manifest = pointers.ManifestV2.__parse_file_as_manifest(path % id,true)
+#		var DataFormat = load("res://HevLib/pointers/DataFormat.gd")
 		for item in current:
 			if item[1] in update_urls:
 				var nv1 = manifest["version"]["version_major"]
 				var nv2 = manifest["version"]["version_minor"]
 				var nv3 = manifest["version"]["version_bugfix"]
-				var does = DataFormat.__compare_versions(item[2],item[3],item[4],nv1,nv2,nv3)
+				var does = pointers.DataFormat.__compare_versions(item[2],item[3],item[4],nv1,nv2,nv3)
 				if not does and item[1] == manifest["mod_information"]["id"]:
 					file.open(update_store,File.READ_WRITE)
 					var updates = JSON.parse(file.get_as_text()).result
