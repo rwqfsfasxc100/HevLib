@@ -17,9 +17,18 @@ static func updateTL(path:String, delim:String = ",", fullLogging:bool = true):
 		translations.append(translationObject)
 	while not tlFile.eof_reached():
 		csvLine = tlFile.get_csv_line(delim)
-		if csvLine.size() > 1:
+		var size = csvLine.size()
+		if size > 1:
+			if size > 2:
+				var i = 0
+				while i < size:
+					if csvLine[i].ends_with("\\") and i < size:
+						csvLine[i] = csvLine[i].rstrip("\\") + delim + csvLine[i + 1]
+						csvLine.remove(i + 1)
+						size -= 1
+					i += 1
 			var translationID := csvLine[0]
-			for i in range(1, csvLine.size()):
+			for i in range(1, size):
 				translations[i - 1].add_message(translationID, csvLine[i].c_unescape())
 			if fullLogging:
 				Debug.l("Added translation: %s" % csvLine)
