@@ -1,6 +1,6 @@
 extends Node
 
-static func get_drivers(get_ids,FolderAccess = null,FileAccess = null,MV2 = null):
+static func get_drivers(get_ids,FolderAccess = null,FileAccess = null,MV2 = null,DataFormat = null):
 	var DriverManagement = load("res://HevLib/pointers/DriverManagement.gd")
 	var is_onready = CurrentGame != null
 	var running_in_debugged = false
@@ -19,8 +19,7 @@ static func get_drivers(get_ids,FolderAccess = null,FileAccess = null,MV2 = null
 			var split = path.split("/")
 			onready_mod_folders.append(split[2])
 	else:
-		var p = load("res://ModLoader.gd")
-		var ps = p.get_script_constant_map()
+		var ps = DataFormat.__get_script_constant_map_without_load("res://ModLoader.gd")
 		for item in ps:
 			if item == "is_debugged":
 				running_in_debugged = true
@@ -89,12 +88,14 @@ static func get_drivers(get_ids,FolderAccess = null,FileAccess = null,MV2 = null
 					var mm_prio = 0
 					var modmain = FileAccess.__get_file_content(folder + modmain_path)
 					for line in modmain.split("\n"):
-						var lsp = line.split("MOD_PRIORITY")
-						if lsp.size() > 1:
-							var lp = lsp[1].split("=")
-							for vms in lp[1].split(" "):
-								if vms != "":
-									mm_prio = str2var(vms)
+						if line.to_lower().begins_with("const "):
+							var lsp = line.split("MOD_PRIORITY")
+							if lsp.size() > 1:
+								var lp = lsp[1].split("=")
+								var vms = lp[1]
+								while vms.begins_with(" "):
+									vms = vms.trim_prefix(" ")
+								mm_prio = str2var(vms)
 					if typeof(mm_prio) == TYPE_STRING:
 						if mm_prio == "INF":
 							mm_prio = INF
@@ -165,9 +166,9 @@ static func get_drivers(get_ids,FolderAccess = null,FileAccess = null,MV2 = null
 			if id != "":
 				this_mod_data.merge({"id":id})
 			
-			var mp = mod_data["node"].get_script().get_path()
+#			var mp = mod_data["node"].get_script().get_path()
 			
-			var folder = mp.split(mp.split("/")[mp.split("/").size() - 1])[0]
+			var folder = mod.split(mod.split("/")[mod.split("/").size() - 1])[0]
 			var folderCheck = FolderAccess.__fetch_folder_files(folder,true)
 			
 			
