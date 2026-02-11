@@ -1,5 +1,5 @@
 extends Node
-const gd = preload("res://HevLib/scripts/vendor/gdunzip.gd")
+const gdunzip = preload("res://HevLib/scripts/vendor/gdunzip.gd")
 static func fetch_file_from_zip(path, cacheDir, desiredFiles):
 	var dFiles = ""
 	for m in desiredFiles:
@@ -13,9 +13,9 @@ static func fetch_file_from_zip(path, cacheDir, desiredFiles):
 	var zip = path.split("/")
 	var splitSize = zip.size()
 	var zipName = zip[splitSize - 1]
-	var gdunzip = gd.new()
-	gdunzip.load(path)
-	var fileList = gdunzip.files
+	var g = gdunzip.new()
+	g.load(path)
+	var fileList = g.files
 	for m in fileList.keys():
 		listOfNames.append(m)
 	for f in listOfNames:
@@ -31,7 +31,7 @@ static func fetch_file_from_zip(path, cacheDir, desiredFiles):
 			if str(M).to_lower() == str(d).to_lower():
 				var fileToFetch = modFolder + d
 				var saveDir = cacheDir + fileToFetch
-				var data = gdunzip.uncompress(F).get_string_from_utf8()
+				var data = g.uncompress(F).get_string_from_utf8()
 				if data:
 					var file = File.new()
 					file.open(saveDir, File.WRITE)
