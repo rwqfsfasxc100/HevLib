@@ -1,17 +1,93 @@
 extends Node
 
-static func get_mod_data(format_to_manifest_version:bool,print_json:bool,FolderAccess = null) -> Dictionary:
-	var mods = ModLoader.get_children()
+static func get_mod_data(format_to_manifest_version:bool,print_json:bool,FolderAccess = null,DataFormat = null) -> Dictionary:
+#	var mods = ModLoader.get_children()
 	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
+	
 	var mod_dictionary = {}
 	var manifest_count = 0
 	var library_count = 0
 	var non_library_count = 0
+	var total_mod_count = 0
 	# FUTURE ME: FIX THIS TO USE PARSE TAGS
 	var stat_tags = {}
-	for mod in mods:
-		var constants = mod.get_script().get_script_constant_map()
-		var script_path = mod.get_script().get_path()
+	
+	var modListArr = []
+	var is_onready = CurrentGame != null
+	if is_onready:
+		var mods = ModLoader.get_children()
+		for mod in mods:
+			var constants = mod.get_script().get_script_constant_map()
+			var script_path = mod.get_script().get_path()
+			modListArr.append({"constants":constants,"script_path":script_path,"node":mod})
+	
+	else:
+		var running_in_debugged = false
+		var debugged_defined_mods = []
+		
+		var ps = DataFormat.__get_script_constant_map_without_load("res://ModLoader.gd")
+		for item in ps:
+			if item == "is_debugged":
+				running_in_debugged = true
+				var pf = File.new()
+				pf.open("res://ModLoader.gd",File.READ)
+				var fs = pf.get_as_text(true)
+				pf.close()
+				var lines = fs.split("\n")
+				var reading = false
+				var contents = []
+				for line in lines:
+
+					if line.begins_with("var addedMods"):
+						reading = true
+					if reading:
+						var split = line.split("\"")
+						if split.size() > 1 and split.size() == 3:
+							if split[0].begins_with("#"):
+								contents.append(split[1])
+
+				debugged_defined_mods = contents.duplicate(true)
+		
+		
+		
+		var folders = FolderAccess.__fetch_folder_files("res://", true, true)
+		var mods_to_avoid = []
+		for folder in folders:
+			var semi_root = folder.split("/")[2]
+			if semi_root.begins_with("."):
+				continue
+						
+			if folder.ends_with("/"):
+				
+				if running_in_debugged:
+					for mod in debugged_defined_mods:
+						var home = mod.split("/")[2]
+						if home == semi_root:
+								mods_to_avoid.append(home)
+				var folderCheck = FolderAccess.__fetch_folder_files(folder,true)
+				var has_mod = false
+				var has_manifest = false
+				var modmain_path = ""
+				var manifest_path = ""
+				for item in folderCheck:
+					var modEntryName = item.to_lower()
+					if modEntryName.begins_with("modmain") and modEntryName.ends_with(".gd"):
+						if (folder + item) in debugged_defined_mods:
+							has_mod = false
+						else:
+							has_mod = true
+						modmain_path = item
+				if has_mod:
+					var mv = folder + modmain_path
+					var constants = DataFormat.__get_script_constant_map_without_load(mv)
+					modListArr.append({"constants":constants,"script_path":mv,"node":null})
+	total_mod_count = modListArr.size()
+	for mod in modListArr:
+		
+		var constants = mod.get("constants")
+		var script_path = mod.get("script_path")
+		var node = mod.get("node")
+		
 		var folder_path = str(script_path.split(script_path.split("/")[script_path.split("/").size() - 1])[0])
 		var mod_priority = constants.get("MOD_PRIORITY",0)
 		var mod_name = str(constants.get("MOD_NAME",script_path.split("/")[2]))
@@ -61,14 +137,15 @@ static func get_mod_data(format_to_manifest_version:bool,print_json:bool,FolderA
 			mod_version_array.append(mod_version_metadata)
 			mod_version_string = mod_version_string + "-" + str(mod_version_metadata)
 		var version_dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
-		var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"node":mod,"manifest":manifestEntry}}
+		var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"node":node,"manifest":manifestEntry}}
 		mod_dictionary.merge(mod_entry)
 		if is_library:
 			library_count += 1
 		else:
 			non_library_count += 1
-	var stat_count = {"total_mod_count":mods.size(),"mods_using_manifests":manifest_count,"mods":non_library_count,"libraries":library_count}
-#	breakpoint
+	
+	
+	var stat_count = {"total_mod_count":total_mod_count,"mods_using_manifests":manifest_count,"mods":non_library_count,"libraries":library_count}
 	var statistics = {"counts":stat_count,"tags":stat_tags}
 	var returnValues = {"mods":mod_dictionary,"statistics":statistics}
 	if print_json:
