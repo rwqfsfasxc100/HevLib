@@ -21,7 +21,7 @@ static func format_for_large_numbers(num):
 			if total == "":
 				total = m
 			else:
-				total = total + "," + m
+				total = total + TranslationServer.translate("SEPARATOR_THOUSAND") + m
 #		Debug.l("HevLib: formatted %s to %s" % [num, total])
 		return total
 	else:
