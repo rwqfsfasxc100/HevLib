@@ -1,6 +1,6 @@
 extends Node
 
-static func have_mods_updated(folder: String,last_seen_file: String,this_file:String,FolderAccess = null) -> Dictionary:
+static func have_mods_updated(folder: String,last_seen_file: String,FolderAccess = null) -> Dictionary:
 	var file = File.new()
 	if not folder.ends_with("/"):
 		folder = folder + "/"
