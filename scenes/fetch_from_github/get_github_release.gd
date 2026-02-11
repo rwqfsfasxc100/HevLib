@@ -13,7 +13,6 @@ func get_github_release(URL: String, folder: String, node_to_return_to: Node, ge
 		Debug.l(e)
 		printerr(e)
 	if cancel:
-		Tool.deferCallInPhysics(Tool,"remove",[self])
 		return
 	var CRoot = Tool.get_tree().get_root()
 	var gitHubFS = preload("res://HevLib/scenes/fetch_from_github/releases/NetHandles.tscn").instance()
