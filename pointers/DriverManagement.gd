@@ -15,10 +15,11 @@ var developer_hint = {
 const FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 const FileAccess = preload("res://HevLib/pointers/FileAccess.gd")
 const MV2 = preload("res://HevLib/pointers/ManifestV2.gd")
+const DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 
 const gd = preload("res://HevLib/scripts/driver_management/get_drivers.gd")
 static func __get_drivers(get_ids : Array = []) -> Array:
-	var s = gd.get_drivers(get_ids,FolderAccess,FileAccess,MV2)
+	var s = gd.get_drivers(get_ids,FolderAccess,FileAccess,MV2,DataFormat)
 	return s
 
 const cdd = preload("res://HevLib/scripts/driver_management/compare_driver_dictionaries.gd")

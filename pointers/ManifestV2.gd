@@ -101,7 +101,6 @@ var developer_hint = {
 		"File and folder paths can be changed, but only if you intend on using your own version checking system. See '__get_mod_versions'",
 		"folder -> (optional) string for the folder containing the version cache file. Defaults to 'user://cache/.Mod_Menu_2_Cache/changelogs/'",
 		"previous_file -> (optional) string for the file name containing the version cache data from the previous game session. Defaults to 'mods_from_last_launch.json'",
-		"this_file -> (optional) string for the file name containing the version cache data from the current game session. Defaults to 'mods_from_this_launch.json'",
 	],
 	"__get_mod_versions":[
 		"Returns version info on all installed mods running MV2.0 or newer.",
@@ -122,10 +121,11 @@ var developer_hint = {
 
 const FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 const FileAccess = preload("res://HevLib/pointers/FileAccess.gd")
+const DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 
 const gmd = preload("res://HevLib/scripts/manifest_v2/get_mod_data.gd")
 static func __get_mod_data(format_to_manifest_version:bool = false, print_json: bool = false) -> Dictionary:
-	var s = gmd.get_mod_data(format_to_manifest_version,print_json,FolderAccess)
+	var s = gmd.get_mod_data(format_to_manifest_version,print_json,FolderAccess,DataFormat)
 	return s
 const mmptz = preload("res://HevLib/scripts/manifest_v2/match_mod_path_to_zip.gd")
 static func __match_mod_path_to_zip(mod_main_path:String) -> String:
@@ -149,11 +149,11 @@ static func __get_mod_by_id(id: String, case_sensitive: bool = true) -> Dictiona
 	return s
 const gt = preload("res://HevLib/scripts/manifest_v2/get_tags.gd")
 static func __get_tags() -> Dictionary:
-	var s = gt.get_tags(FolderAccess)
+	var s = gt.get_tags(FolderAccess,DataFormat)
 	return s
 const gmt = preload("res://HevLib/scripts/manifest_v2/get_mod_tags.gd")
 static func __get_mod_tags(mod_id: String) -> Dictionary:
-	var s = gmt.get_mod_tags(mod_id,FolderAccess)
+	var s = gmt.get_mod_tags(mod_id,FolderAccess,DataFormat)
 	return s
 const gmft = preload("res://HevLib/scripts/manifest_v2/get_mods_from_tag.gd")
 static func __get_mods_from_tag(tag_name: String) -> Array:
@@ -204,8 +204,8 @@ static func __parse_tags(tag_data) -> Dictionary:
 	var s = pt.parse_tags(tag_data)
 	return s
 const hmu = preload("res://HevLib/scripts/manifest_v2/have_mods_updated.gd")
-static func __have_mods_updated(folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",previous_file = "mods_from_last_launch.json",this_file = "mods_from_this_launch.json"):
-	var s = hmu.have_mods_updated(folder,previous_file,this_file,FolderAccess)
+static func __have_mods_updated(folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",previous_file = "mods_from_last_launch.json"):
+	var s = hmu.have_mods_updated(folder,previous_file,FolderAccess)
 	return s
 const gmv = preload("res://HevLib/scripts/manifest_v2/get_mod_versions.gd")
 static func __get_mod_versions(store = false,folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",previous_file = "mods_from_last_launch.json",this_file = "mods_from_this_launch.json"):

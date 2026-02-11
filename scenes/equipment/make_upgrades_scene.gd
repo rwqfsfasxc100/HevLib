@@ -2,9 +2,10 @@ extends Node
 
 var SCENE_HEADER = "[gd_scene load_steps=4 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/unmodified/WeaponSlotUpgradeTemplate.tscn\" type=\"PackedScene\" id=2]\n[ext_resource path=\"res://enceladus/SystemShipUpgradeUI.tscn\" type=\"PackedScene\" id=3]\n\n[sub_resource type=\"ViewportTexture\" id=1]\nflags = 5\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain1/Viewport\")\n\n[sub_resource type=\"ViewportTexture\" id=2]\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain2/Control\")\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]\n\n[node name=\"TextureRect\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 2 )\n\n[node name=\"TextureRect2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 2 )"
 
-const DriverManagement = preload("res://HevLib/pointers/DriverManagement.gd")
+#const DriverManagement = preload("res://HevLib/pointers/DriverManagement.gd")
 const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
-var vanilla_equipment = preload("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd").get_script_constant_map()
+const DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
+var vanilla_equipment = {}
 var vanilla_data = preload("res://HevLib/scenes/equipment/vanilla_defaults/slot_tagging.gd")
 var hardpoint_types
 var alignments
@@ -15,7 +16,7 @@ var vanilla_equipment_defaults_for_reference
 
 var file = File.new()
 func _init():
-	
+	vanilla_equipment = DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd")
 	hardpoint_types = vanilla_data.hardpoint_types.duplicate(true)
 	alignments = vanilla_data.alignments.duplicate(true)
 	equipment_types = vanilla_data.equipment_types.duplicate(true)
@@ -70,7 +71,6 @@ func make_upgrades_scene(is_onready: bool = true):
 	var upgrades_slot_limits = FILE_PATHS[16]
 	var ship_node_modify_file = FILE_PATHS[17]
 	var ship_thruster_color_file = FILE_PATHS[18]
-	var DataFormat = load("res://HevLib/pointers/DataFormat.gd")
 	if is_onready:
 		
 		var version = DataFormat.__get_vanilla_version()
@@ -111,10 +111,10 @@ func make_upgrades_scene(is_onready: bool = true):
 	for item in FILE_PATHS:
 		FolderAccess.__check_folder_exists(item.split(item.split("/")[item.split("/").size() - 1])[0])
 	
-	var ws_default_templates = load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
-	var ws_ship_templates = load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
-	var ws_ship_templates_2 = load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd").get_script_constant_map()
-	var ship_register = load("res://HevLib/scenes/equipment/ShipModificationDriver/ship_register_vanilla.gd").get_script_constant_map()
+	var ws_default_templates = DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
+	var ws_ship_templates = DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
+	var ws_ship_templates_2 = DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd").get_script_constant_map()
+	var ship_register = DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/equipment/ShipModificationDriver/ship_register_vanilla.gd") #load("res://HevLib/scenes/equipment/ShipModificationDriver/ship_register_vanilla.gd").get_script_constant_map()
 	var register_default_ships = []
 	for item in ship_register:
 		register_default_ships.append(ship_register[item])
@@ -168,7 +168,7 @@ func make_upgrades_scene(is_onready: bool = true):
 	file.store_string("[]")
 	file.close()
 	
-	var drivers = DriverManagement.__get_drivers()
+	var drivers = load("res://HevLib/pointers/DriverManagement.gd").__get_drivers()
 	
 	for cvh in drivers:
 					var check = cvh.get("mod_directory")

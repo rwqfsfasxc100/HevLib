@@ -46,6 +46,10 @@ var developer_hint = {
 		"search_keys -> array of keys and values to look for. Can contain any type, will return any match.",
 		"cfgs_to_ignore -> (optional) array used to remove keys from the top level of the dictionary",
 		"Returns an array of the values matched from within the search_keys array in config format with the system appended to the end, e.g. weaponSlot.main.type.SYSTEM_EMD14"
+	],
+	"__get_script_constant_map_without_load":[
+		"Fetches and returns the constant map of a script without loading and initializing the script, useful to prevent double loading of ModMain.gd files",
+		"script_path -> string used to provide the full filepath to the script file"
 	]
 }
 
@@ -84,4 +88,8 @@ static func __compare_versions(primary_major : int,primary_minor : int,primary_b
 const ssc = preload("res://HevLib/scripts/sift_ship_config.gd")
 static func __sift_ship_config(dictionary: Dictionary,search_keys: Array, cfgs_to_ignore:Array) -> Array:
 	var s = ssc.sift_ship_config(dictionary,search_keys,cfgs_to_ignore)
+	return s
+const scmwl = preload("res://HevLib/scripts/get_script_constant_map_without_load.gd")
+static func __get_script_constant_map_without_load(script_path : String) -> Dictionary:
+	var s = scmwl.get_script_constant_map_without_load(script_path)
 	return s
