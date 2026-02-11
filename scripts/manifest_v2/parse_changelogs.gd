@@ -7,9 +7,6 @@ static func parse_changelogs(file_path):
 	var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
 	var versions = c.get_sections()
 	var spacing = "  "
-	var spc = ConfigDriver.__get_value("ModMenu2","MODMENU2_CONFIG_GENERAL","changelog_spacing_size")
-	if spc != "" or spc != null:
-		spacing = spc
 	for version in versions:
 		changelog.merge({version:[]})
 		var keys = c.get_section_keys(version)
