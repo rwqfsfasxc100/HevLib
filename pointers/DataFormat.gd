@@ -50,6 +50,14 @@ var developer_hint = {
 	"__get_script_constant_map_without_load":[
 		"Fetches and returns the constant map of a script without loading and initializing the script, useful to prevent double loading of ModMain.gd files",
 		"script_path -> string used to provide the full filepath to the script file"
+	],
+	"__trim_scripts":[
+		"Takes a script and extracts only script variables and constants from it",
+		"Returns an array with three values",
+		"First value is a string containing a valid script with only the original script's variables and constants",
+		"Second value is an array of all script variable names in order",
+		"Third value is an array of all constant names in order",
+		"file_path -> string for the input script's filepath"
 	]
 }
 
@@ -89,7 +97,11 @@ const ssc = preload("res://HevLib/scripts/sift_ship_config.gd")
 static func __sift_ship_config(dictionary: Dictionary,search_keys: Array, cfgs_to_ignore:Array) -> Array:
 	var s = ssc.sift_ship_config(dictionary,search_keys,cfgs_to_ignore)
 	return s
-const scmwl = preload("res://HevLib/scripts/get_script_constant_map_without_load.gd")
+const gscmwl = preload("res://HevLib/scripts/get_script_constant_map_without_load.gd")
 static func __get_script_constant_map_without_load(script_path : String) -> Dictionary:
-	var s = scmwl.get_script_constant_map_without_load(script_path)
+	var s = gscmwl.get_script_constant_map_without_load(script_path,ts)
+	return s
+const ts = preload("res://HevLib/scripts/trim_scripts.gd")
+static func __trim_scripts(file_path: String) -> Array:
+	var s = ts.trim_scripts(file_path)
 	return s

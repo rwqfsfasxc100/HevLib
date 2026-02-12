@@ -705,71 +705,125 @@ class _DataFormat:
 					arr.append_array(__sift_ship_config(kdata,search_keys,[],p))
 		return arr
 	
-	func __get_script_constant_map_without_load(script_path : String):
-		if file.open(script_path,File.READ):
-			return []
-		else:
-			var data = file.get_as_text(true)
-			file.close()
-			var constants = {}
-			var cname = ""
-			var cval = ""
-			for line in data.split("\n"):
-				if line.to_lower().begins_with("const "):
-					if cname != "":
-						constants[str(cname)] = cval
-					cname = ""
-					cval = ""
-					line.erase(0,6)
-					var l = line.split("=")
-					var n = l[0].strip_escapes()
-					while n.begins_with(" "):
-						n = n.lstrip(" ")
-					while n.ends_with(" "):
-						n = n.rstrip(" ")
-					var val = l[1]
-					while val.begins_with(" "):
-						val = val.lstrip(" ")
-					while val.ends_with(" "):
-						val = val.rstrip(" ")
-					cname = n
-					cval = val
-					
+	func __get_script_constant_map_without_load(script_path) -> Dictionary:
+		var filepath = "user://cache/.HevLib_Cache/"
+		var pathway = __trim_scripts(script_path)
+		if pathway[2].size() == 0:
+			return {}
+		var file = File.new()
+		var dir = Directory.new()
+		var n = filepath + str(Time.get_ticks_usec()) + ".gd"
+		file.open(n,File.WRITE)
+		file.store_string(pathway[0])
+		file.close()
+		var dict = {}
+		var l = load(n).new().get_script().get_script_constant_map()
+		for i in pathway[2]:
+			dict[i] = l[i]
+		dir.remove(n)
+		return dict
+		
+	const function_prefixes = [
+		"func ",
+		"static func ",
+		"remote func ",
+		"master func ",
+		"puppet func ",
+		"remotesync func ",
+		"mastersync func ",
+		"puppetsync func ",
+		"sync func "
+	]
+	func __trim_scripts(file_path : String):
+		var file = File.new()
+		file.open(file_path,File.READ)
+		var data = file.get_as_text(true)
+		file.close()
+		
+		
+		var streaming = false
+		var this_stream : String = ""
+		var concat : String = ""
+		var const_names = []
+		var var_names = []
+		
+		var lines = data.split("\n")
+		for line in lines:
+			var result : String = ""
+			var is_part_of_string = false
+			var prev_char_escape = false
+			while line != "":
+				var part:String = line.substr(0,1)
+				if part == "\\":
+					prev_char_escape = !prev_char_escape
 				else:
-					var vp = line.strip_escapes().length()
-					if vp:
-						var val = line.split("#")[0]
-						while val.begins_with(" "):
-							val = val.lstrip(" ")
-						while val.ends_with(" "):
-							val = val.rstrip(" ")
-						
-						cval = cval + "\n" + val
-					else:
-						if cname != "":
-							constants[str(cname)] = cval
-						cname = ""
-						cval = ""
-			return constants
-	func strConstructor(string,beginner_char = "\""):
-		var val = string
-		pass
-		if val == "INF":
-			val = INF
-		elif val == "-INF":
-			val = -INF
-		elif val == "PI":
-			val = PI
-		elif val == "-PI":
-			val = -PI
-		elif val == "TAU":
-			val = TAU
-		elif val == "-TAU":
-			val = -TAU
-		elif val == "NAN":
-			val = NAN
-		elif val == "-NAN":
-			val = -NAN
+					prev_char_escape = false
+				if part == "\"" and not prev_char_escape:
+					is_part_of_string = !is_part_of_string
+				if part == "#" and (not is_part_of_string and not prev_char_escape):
+					break
+				
+				
+				pass
+				line.erase(0,1)
+				result += part
+			line = result
+			var has_prefix = false
+			for prefix in function_prefixes:
+				if line.begins_with(prefix):
+					has_prefix = true
+			if has_prefix:
+				if streaming:
+					concat = concat + this_stream.strip_edges() + "\n"
+					this_stream = ""
+					streaming = false
+			elif line.begins_with("const "):
+				if streaming:
+					concat = concat + this_stream.strip_edges() + "\n"
+					this_stream = ""
+					streaming = false
+				var cname = line.split("=",false)[0].strip_edges().split("const ",true)[1].strip_edges().split(":",false)[0].strip_edges()
+				const_names.append(cname)
+				streaming = true
+			elif line.begins_with("var "):
+				if streaming:
+					concat = concat + this_stream.strip_edges() + "\n"
+					this_stream = ""
+					streaming = false
+				var vname = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
+				var_names.append(vname)
+				streaming = true
+			elif line.begins_with("export") and " var " in line:
+				if streaming:
+					concat = concat + this_stream.strip_edges() + "\n"
+					this_stream = ""
+					streaming = false
+				var vname = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
+				var_names.append(vname)
+				streaming = true
+			elif line.begins_with("onready") and " var " in line:
+				if streaming:
+					concat = concat + this_stream.strip_edges() + "\n"
+					this_stream = ""
+					streaming = false
+				var vname = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
+				var_names.append(vname)
+				streaming = true
+			elif line.begins_with("extends "):
+				if streaming:
+					concat = concat + this_stream.strip_edges() + "\n"
+					this_stream = ""
+					streaming = false
+				streaming = true
+			if streaming:
+				this_stream = this_stream + "\n" + line
+		if streaming:
+			concat = concat + this_stream.strip_edges() + "\n"
+			this_stream = ""
+			streaming = false
+		return [concat,var_names,const_names]
+		
+		
 
 class _DriverManagement:
 	var scripts = [
