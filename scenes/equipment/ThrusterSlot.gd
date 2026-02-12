@@ -45,9 +45,9 @@ const nozzle_template = {
 }
 var aux_type
 func loadPlaceholder():
+	modify()
 	.loadPlaceholder()
 #	yield(get_tree(),"idle_frame")
-	modify()
 func modify():
 	file.open(auxslot_save_path,File.READ)
 	var datastore = JSON.parse(file.get_as_text()).result
@@ -84,9 +84,9 @@ func modify():
 						"RCS","TORCH":
 							item = thruster.instance()
 				
-				var sysn = name + "_" + sys
-				item.name = sysn
-				system = item
+#				var sysn = name + "_" + sys
+				item.name = sys
+#				system = item
 				
 #				item.name = sys\
 				if not valid_scene:
