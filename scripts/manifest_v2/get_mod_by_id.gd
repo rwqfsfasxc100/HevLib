@@ -2,7 +2,7 @@ extends Node
 
 static func get_mod_by_id(id:String, case_sensitive: bool = true) -> Dictionary:
 	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
-	var data = ManifestV2.__get_mod_data(true)
+	var data = ManifestV2.__get_mod_data()
 	var mods = data["mods"]
 	for mod in mods:
 		var ID = ""
