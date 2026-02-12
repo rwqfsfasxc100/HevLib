@@ -6,7 +6,7 @@ extends VBoxContainer
 #var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 #const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 var cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/"
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+var pointers
 var NEW_INSTALL = false
 
 
@@ -42,6 +42,7 @@ func _init():
 
 func _tree_entered():
 	var sTime = OS.get_system_time_msecs()
+	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","use_legacy_equipment_handler"):
 		l("Legacy equipment handler is enabled; started checking and modifying equipment")
 		pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_equipment_by_price",has)

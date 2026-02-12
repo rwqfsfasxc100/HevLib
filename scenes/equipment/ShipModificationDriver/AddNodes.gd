@@ -7,7 +7,7 @@ var node_definitons_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/
 var processed_node_definitions = {}
 var processed_ship_register = {}
 
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+var pointers
 #var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
 #var DF = preload("res://HevLib/pointers/DataFormat.gd")
 
@@ -15,6 +15,7 @@ onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 #	nodeModify()
 #	.registerCapability(key, system)
 func _enter_tree():
+	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	make_node_mods()
 
 #func _ready():

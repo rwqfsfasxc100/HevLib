@@ -30,7 +30,11 @@ func _init(modLoader = ModLoader):
 	
 	installScriptExtension("scenes/scene_replacements/Shipyard.gd")
 	
-	var md = pointers.DataFormat.__get_script_constant_map_without_load("res://IndustriesOfEnceladusRewrite/HEVLIB_EQUIPMENT_DRIVER_TAGS/SLOT_ORDER.gd")
+#	var md = pointers.DataFormat.__get_script_constant_map_without_load("res://IndustriesOfEnceladusRewrite/HEVLIB_EQUIPMENT_DRIVER_TAGS/SLOT_ORDER.gd")
+	
+	
+	
+	
 	
 
 var file = File.new()
@@ -212,7 +216,7 @@ func _ready():
 	
 #	replaceScene("scenes/equipment/Enceladus.tscn","res://enceladus/Enceladus.tscn")
 	pointers.ManifestV2.__get_mod_versions(true)
-	var ncrew = pointers.ManifestV2.get_manifest_entry("tags","TAG_HANDLE_EXTRA_CREW")
+	var ncrew = pointers.ManifestV2.__get_manifest_entry("tags","TAG_HANDLE_EXTRA_CREW")
 	var count = 24
 	for mod in ncrew:
 		var data = ncrew[mod]
@@ -236,11 +240,13 @@ func _ready():
 	file.store_string(sys)
 	file.close()
 	
-	var PointerNode = Node.new()
-	PointerNode.name = "HevLib~Pointers"
-	PointerNode.set_script(pointers)
-	CRoot.call_deferred("add_child",PointerNode)
 	
+	var PointerNode = ResourceLoader.load("res://HevLib/pointers.gd","",true).new()
+#	var PointerNode = Node.new()
+#	PointerNode.set_script(load("res://HevLib/pointers.gd").new())
+	PointerNode.name = "HevLib~Pointers"
+	CRoot.call_deferred("add_child",PointerNode)
+#	pointers.free()
 	l("Ready")
 func installScriptExtension(path:String):
 	var childPath:String = str(modPath + path)

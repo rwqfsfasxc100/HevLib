@@ -39,6 +39,7 @@ var system_name_registers = []
 var add_systems = []
 
 func _enter_tree():
+	ismPointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	var file = File.new()
 	file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_mods.json",File.READ)
 	hevlib_config_data = JSON.parse(file.get_as_text()).result
@@ -408,7 +409,7 @@ func handleAmmoDelivery(delta):
 		availableAmmoToDrawNow *= ammo_speed_multi
 	availableAmmoToDrawNow += ammo_speed_add
 	
-onready var ismPointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+var ismPointers
 #const ismCFGD = preload("res://HevLib/pointers/ConfigDriver.gd")
 func drawDrones(kg, really = true):
 	if ismPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","limit_nanodrone_output"):

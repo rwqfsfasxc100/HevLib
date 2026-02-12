@@ -1,7 +1,7 @@
 extends "res://ships/Shipyard.gd"
 
 #const DriverManagement = preload("res://HevLib/pointers/DriverManagement.gd")
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+onready var pointers = load("res://HevLib/pointers.gd").new()
 
 func _ready():
 	var file = File.new()
@@ -84,6 +84,7 @@ func _ready():
 	file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/drone_delivery_speed.json",File.WRITE)
 	file.store_string(JSON.print(nano_delivery))
 	file.close()
+	pointers.free()
 #	yield(get_tree(),"idle_frame")
 #	yield(get_tree(),"idle_frame")
 #	yield(get_tree(),"idle_frame")

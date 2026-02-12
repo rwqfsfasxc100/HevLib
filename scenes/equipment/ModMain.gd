@@ -50,7 +50,7 @@ func _init(modLoader = ModLoader):
 	var d = Directory.new()
 	if d.dir_exists("user://cache/.HevLib_Cache"):
 		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache")
-	
+	d.make_dir_recursive("user://cache/.HevLib_Cache")
 	var ml = MainLoop.new()
 	ml.set_script(load("res://HevLib/scripts/crash_handler.gd"))
 	_savedObjects.append(ml)
@@ -171,7 +171,7 @@ func _ready():
 
 	replaceScene("../minerals/multiminerals/AsteroidField.tscn","res://AsteroidField.tscn")
 	
-	pointers.free()
+	
 	l("Ready")
 	
 func installScriptExtension(path:String):
