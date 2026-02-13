@@ -21,7 +21,8 @@ var TimeAccess : _TimeAccess = _TimeAccess.new()
 var Translations : _Translations = _Translations.new(ConfigDriver)
 var WebTranslate : _WebTranslate = _WebTranslate.new(FolderAccess)
 
-
+func _ready():
+	ConfigDriver.ready()
 class _Achievements:
 	var scripts = [
 		
@@ -117,6 +118,8 @@ class _ConfigDriver:
 		DataFormat = d
 		ManifestV2 = m
 		FolderAccess = f
+	func ready():
+		pushCFG()
 	
 	signal config_changed()
 	
@@ -268,6 +271,19 @@ class _ConfigDriver:
 			else:
 				return null
 	
+	func pushCFG(cfg_filename : String = "Mod_Configurations" + ".cfg"):
+		var cfg_file = "user://cfg/" + cfg_filename
+		var current_config = __config_parse(cfg_file)
+		settings = current_config.duplicate(true)
+		settingsHash = settings.hash()
+		__change_made()
+		
+	
+	func __establish_connection(method: String, node: Node):
+		if not is_connected("config_changed",node,method):
+			connect("config_changed",node,method)
+	
+	
 	func __load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var dir = Directory.new()
 		var c = ConfigFile.new()
@@ -356,6 +372,7 @@ class _ConfigDriver:
 				c.set_value(section,key,current_config[section][key])
 		settings = current_config.duplicate(true)
 		settingsHash = settings.hash()
+		__change_made()
 		c.save(cfg_file)
 		c.save(profiles_dir + current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",{}).get("profile_name","Default") + ".cfg")
 		for mod in configs:
@@ -396,6 +413,8 @@ class _ConfigDriver:
 								var event = InputEventKey.new()
 								event.scancode = OS.find_scancode_from_string(i)
 								InputMap.action_add_event(key, event)
+	
+	
 	
 	func __set_button_focus(button,check_button):
 		var parent = button.get_parent()
@@ -758,6 +777,24 @@ class _DataFormat:
 		var l = load(n).new().get_script().get_script_constant_map()
 		for i in pathway[2]:
 			dict[i] = l[i]
+		dir.remove(n)
+		return dict
+	
+	func __get_script_variables_without_load(script_path) -> Dictionary:
+		var filepath = "user://cache/.HevLib_Cache/"
+		var pathway = __trim_scripts(script_path)
+		if pathway[2].size() == 0:
+			return {}
+		var file = File.new()
+		var dir = Directory.new()
+		var n = filepath + str(Time.get_ticks_usec()) + ".gd"
+		file.open(n,File.WRITE)
+		file.store_string(pathway[0])
+		file.close()
+		var dict = {}
+		var l = load(n).new()
+		for i in pathway[1]:
+			dict[i] = l.get(i)
 		dir.remove(n)
 		return dict
 		
@@ -1573,10 +1610,21 @@ class _FolderAccess:
 				folder_structure.merge({object:fd})
 		return folder_structure
 	
+	func __get_modmain_files() -> Array:
+		var structure = __get_folder_structure("res://")
+		var dvs = siftFolderStructure(structure)
+		return dvs
 	
-	
-	
-	
+	func siftFolderStructure(structure:Dictionary,path:String = "res://"):
+		var out = []
+		for i in structure:
+			if i.ends_with("/"):
+				out.append_array(siftFolderStructure(structure[i],path + i))
+			else:
+				var f = i.to_lower()
+				if f.begins_with("modmain") and f.ends_with(".gd"):
+					out.append(path + i)
+		return out
 	
 
 class _Github:
@@ -1955,58 +2003,22 @@ class _ManifestV2:
 				for item in ps:
 					if item == "is_debugged":
 						running_in_debugged = true
-						var pf = File.new()
-						pf.open("res://ModLoader.gd",File.READ)
-						var fs = pf.get_as_text(true)
-						pf.close()
-						var lines = fs.split("\n")
-						var reading = false
-						var contents = []
-						for line in lines:
-
-							if line.begins_with("var addedMods"):
-								reading = true
-							if reading:
-								var split = line.split("\"")
-								if split.size() > 1 and split.size() == 3:
-									if split[0].begins_with("#"):
-										contents.append(split[1])
-
-						debugged_defined_mods = contents.duplicate(true)
-				
-				
-				
-				var folders = FolderAccess.__fetch_folder_files("res://", true, true)
-				var mods_to_avoid = []
-				for folder in folders:
-					var semi_root = folder.split("/")[2]
-					if semi_root.begins_with("."):
-						continue
-								
-					if folder.ends_with("/"):
 						
-						if running_in_debugged:
-							for mod in debugged_defined_mods:
-								var home = mod.split("/")[2]
-								if home == semi_root:
-										mods_to_avoid.append(home)
-						var folderCheck = FolderAccess.__fetch_folder_files(folder,true)
-						var has_mod = false
-						var has_manifest = false
-						var modmain_path = ""
-						var manifest_path = ""
-						for item in folderCheck:
-							var modEntryName = item.to_lower()
-							if modEntryName.begins_with("modmain") and modEntryName.ends_with(".gd"):
-								if (folder + item) in debugged_defined_mods:
-									has_mod = false
-								else:
-									has_mod = true
-								modmain_path = item
-						if has_mod:
-							var mv = folder + modmain_path
-							var constants = DataFormat.__get_script_constant_map_without_load(mv)
-							modListArr.append({"constants":constants,"script_path":mv,"node":null})
+						var tfs = DataFormat.__get_script_variables_without_load("res://ModLoader.gd")
+						debugged_defined_mods = tfs.get("addedMods",[]).duplicate(true)
+				
+				
+				
+				var folders = FolderAccess.__get_modmain_files()
+				for item in folders:
+					var has_mod = false
+					if item in debugged_defined_mods:
+						has_mod = true
+					else:
+						has_mod = false
+					if has_mod:
+						var constants = DataFormat.__get_script_constant_map_without_load(item)
+						modListArr.append({"constants":constants,"script_path":item,"node":null})
 			total_mod_count = modListArr.size()
 			modListArr.sort_custom(self,"sortModList")
 			for mod in modListArr:
@@ -2035,7 +2047,7 @@ class _ManifestV2:
 					if file.to_lower() == "mod.manifest":
 						has_mod_manifest = true
 						manifest_count += 1
-						manifest_data = __parse_file_as_manifest(folder_path + file, true)
+						manifest_data = __parse_file_as_manifest(folder_path + file)
 						mod_name = manifest_data["mod_information"].get("name",mod_name)
 						legacy_mod_version = manifest_data["version"].get("version_string",legacy_mod_version)
 						mod_version_major = manifest_data["version"].get("version_major",mod_version_major)
@@ -2087,8 +2099,8 @@ class _ManifestV2:
 		var c2 = b.get("constants",{}).get("MOD_PRIORITY",0)
 		if c1 != c2:
 			return c1 < c2
-		var b1 = a.get("mod_path","").to_ascii().split("/")
-		var b2 = b.get("mod_path","").to_ascii().split("/")
+		var b1 = a.get("mod_path","").to_ascii()#.split("/")
+		var b2 = b.get("mod_path","").to_ascii()#.split("/")
 		if b1 != b2:
 			return b1 < b2
 		return false
@@ -2471,7 +2483,8 @@ class _ManifestV2:
 				dict_template["version"]["version_string"] = version_string
 				
 				out = dict_template
-			out = manifest_data
+			else:
+				out = manifest_data
 			cached_manifests[cachevar] = out.duplicate(true)
 			return out
 	
@@ -2502,194 +2515,34 @@ class _ManifestV2:
 		return {}
 	
 	func __get_tags() -> Dictionary:
-#		var mods = ModLoader.get_children()
-		
 		var tag_dict = {}
-		var modListArr = []
-		var is_onready = CurrentGame != null
-		if is_onready:
-			var mods = ModLoader.get_children()
-			for mod in mods:
-				var constants = mod.get_script().get_script_constant_map()
-				var script_path = mod.get_script().get_path()
-				modListArr.append({"constants":constants,"script_path":script_path})
-		
-		else:
-			var running_in_debugged = false
-			var debugged_defined_mods = []
-			
-			var ps = DataFormat.__get_script_constant_map_without_load("res://ModLoader.gd")
-			for item in ps:
-				if item == "is_debugged":
-					running_in_debugged = true
-					var pf = File.new()
-					pf.open("res://ModLoader.gd",File.READ)
-					var fs = pf.get_as_text(true)
-					pf.close()
-					var lines = fs.split("\n")
-					var reading = false
-					var contents = []
-					for line in lines:
-
-						if line.begins_with("var addedMods"):
-							reading = true
-						if reading:
-							var split = line.split("\"")
-							if split.size() > 1 and split.size() == 3:
-								if split[0].begins_with("#"):
-									contents.append(split[1])
-
-					debugged_defined_mods = contents.duplicate(true)
-			
-			
-			
-			var folders = FolderAccess.__fetch_folder_files("res://", true, true)
-			var mods_to_avoid = []
-			for folder in folders:
-				var semi_root = folder.split("/")[2]
-				if semi_root.begins_with("."):
-					continue
-							
-				if folder.ends_with("/"):
-					
-					if running_in_debugged:
-						for mod in debugged_defined_mods:
-							var home = mod.split("/")[2]
-							if home == semi_root:
-									mods_to_avoid.append(home)
-					var folderCheck = FolderAccess.__fetch_folder_files(folder,true)
-					var has_mod = false
-					var has_manifest = false
-					var modmain_path = ""
-					var manifest_path = ""
-					for item in folderCheck:
-						var modEntryName = item.to_lower()
-						if modEntryName.begins_with("modmain") and modEntryName.ends_with(".gd"):
-							if (folder + item) in debugged_defined_mods:
-								has_mod = false
-							else:
-								has_mod = true
-							modmain_path = item
-					if has_mod:
-						var mv = folder + modmain_path
-						var constants = DataFormat.__get_script_constant_map_without_load(mv)
-						modListArr.append({"constants":constants,"script_path":mv})
-		
-		for mod in modListArr:
-			var constants = mod.get("constants")
-			var script_path = mod.get("script_path")
-			
-			var folder_path = str(script_path.split(script_path.split("/")[script_path.split("/").size() - 1])[0])
-			var content = FolderAccess.__fetch_folder_files(folder_path)
-			var has_mod_manifest = false
-			for file in content:
-				if file.to_lower() == "mod.manifest":
-					has_mod_manifest = true
-					var manifest_data = __parse_file_as_manifest(folder_path + file, true)
-					var mod_id = manifest_data["mod_information"]["id"]
-					var manifest_version = manifest_data["manifest_definitions"]["manifest_version"]
-					if mod_id:
-						if manifest_version >= 2.1:
-							var tag_data = manifest_data["tags"]
-							var p = __parse_tags(tag_data)
-							for entry in p:
-								if not entry in tag_dict:
-									tag_dict.merge({entry:{}})
-								tag_dict[entry].merge({mod_id:p[entry]})
+		var mods = __get_mod_data()["mods"]
+		for mod in mods:
+			if mods[mod]["manifest"]["has_manifest"]:
+				var md = mods[mod]["manifest"]["manifest_data"]
+				var id = md["mod_information"].get("id",null)
+				if id and "tags" in md:
+					var tags = md["tags"]
+					for tag in tags:
+						if not tag in tag_dict:
+							tag_dict[tag] = {}
+						var td = tags[tag]
+						
+						tag_dict[tag][id] = td["value"] 
+						pass
+				pass
 		return tag_dict
 	
 	func __get_mod_tags(mod_id: String) -> Dictionary:
-#		var mods = ModLoader.get_children()
-		
 		var tag_dict = {}
-		
-		var modListArr = []
-		var is_onready = CurrentGame != null
-		if is_onready:
-			var mods = ModLoader.get_children()
-			for mod in mods:
-				var constants = mod.get_script().get_script_constant_map()
-				var script_path = mod.get_script().get_path()
-				modListArr.append({"constants":constants,"script_path":script_path})
-		
-		else:
-			var running_in_debugged = false
-			var debugged_defined_mods = []
-			
-			var ps = DataFormat.__get_script_constant_map_without_load("res://ModLoader.gd")
-			for item in ps:
-				if item == "is_debugged":
-					running_in_debugged = true
-					var pf = File.new()
-					pf.open("res://ModLoader.gd",File.READ)
-					var fs = pf.get_as_text(true)
-					pf.close()
-					var lines = fs.split("\n")
-					var reading = false
-					var contents = []
-					for line in lines:
-
-						if line.begins_with("var addedMods"):
-							reading = true
-						if reading:
-							var split = line.split("\"")
-							if split.size() > 1 and split.size() == 3:
-								if split[0].begins_with("#"):
-									contents.append(split[1])
-
-					debugged_defined_mods = contents.duplicate(true)
-			
-			
-			
-			var folders = FolderAccess.__fetch_folder_files("res://", true, true)
-			var mods_to_avoid = []
-			for folder in folders:
-				var semi_root = folder.split("/")[2]
-				if semi_root.begins_with("."):
-					continue
-							
-				if folder.ends_with("/"):
-					
-					if running_in_debugged:
-						for mod in debugged_defined_mods:
-							var home = mod.split("/")[2]
-							if home == semi_root:
-									mods_to_avoid.append(home)
-					var folderCheck = FolderAccess.__fetch_folder_files(folder,true)
-					var has_mod = false
-					var has_manifest = false
-					var modmain_path = ""
-					var manifest_path = ""
-					for item in folderCheck:
-						var modEntryName = item.to_lower()
-						if modEntryName.begins_with("modmain") and modEntryName.ends_with(".gd"):
-							if (folder + item) in debugged_defined_mods:
-								has_mod = false
-							else:
-								has_mod = true
-							modmain_path = item
-					if has_mod:
-						var mv = folder + modmain_path
-						var constants = DataFormat.__get_script_constant_map_without_load(mv)
-						modListArr.append({"constants":constants,"script_path":mv})
-		
-		for mod in modListArr:
-			var constants = mod.get("constants")
-			var script_path = mod.get("script_path")
-			
-			var folder_path = str(script_path.split(script_path.split("/")[script_path.split("/").size() - 1])[0])
-			var content = FolderAccess.__fetch_folder_files(folder_path)
-			var has_mod_manifest = false
-			for file in content:
-				if file.to_lower() == "mod.manifest":
-					has_mod_manifest = true
-					var manifest_data = __parse_file_as_manifest(folder_path + file, true)
-					var this_mod_id = manifest_data["mod_information"]["id"]
-					if this_mod_id == mod_id:
-						var manifest_version = manifest_data["manifest_definitions"]["manifest_version"]
-						if manifest_version >= 2.1:
-							var tag_data = manifest_data["tags"]
-							return __parse_tags(tag_data)
+		var tags = __get_tags()
+		for tag in tags:
+			var td = tags[tag]
+			if mod_id in td:
+				if not tag in tag_dict:
+					tag_dict[tag] = null
+				tag_dict[tag] = td[mod_id]
+				pass
 		return tag_dict
 	
 	func __get_mods_from_tag(tag_name: String) -> Array:
