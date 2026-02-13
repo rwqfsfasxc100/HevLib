@@ -1,25 +1,81 @@
 [gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://HevLib/scenes/development_tools/CargoBayCoverageVisual.gd" type="Script" id=1]
+[sub_resource type="GDScript" id=1]
+script/source = "tool
+extends CanvasLayer
+
+onready var center = $Center
+onready var rect = $Center/ColorRect
+onready var ref = $Center/Offset/ReferenceRect
+onready var within_ref = $Center/Offset/ReferenceRect/ReferenceRect
+onready var set = $Center/Offset
+export var editor_only = true
+var count = 0
+var colorswap = false
+func _physics_process(delta):
+	if Engine.is_editor_hint() or not editor_only:
+		count += 1
+		
+		if count > 5:
+			count = 0
+			
+			var parent = get_parent()
+			if colorswap:
+				rect.color.b -= 0.05
+				if rect.color.b <= 0.6:
+					colorswap = false
+			else:
+				rect.color.b += 0.05
+				if rect.color.b >= 0.9:
+					colorswap = true
+			if parent.has_method(\"getConfig\"):
+				if \"cargoHoldArea\" in parent:
+					var cam = parent.get_global_transform_with_canvas()
+					center.global_position = cam.origin
+					center.global_rotation = cam.get_rotation()
+					center.scale = cam.get_scale()
+					var area = parent.cargoHoldArea
+					rect.rect_position = area.position
+					rect.rect_size = area.size
+					if \"cargoHoldOffset\" in parent:
+						ref.rect_size = Vector2(260,230)
+						set.position = parent.cargoHoldOffset
+						
+						
+						var h2w_ratio = area.size.y / area.size.x
+						var scale_ratio = rect.rect_size.y / ref.rect_size.y
+						within_ref.rect_size = rect.rect_size / scale_ratio
+						within_ref.rect_position = (ref.rect_size - within_ref.rect_size) / 2
+	else:
+		Tool.remove(self)
+"
 
 [node name="CargoBayCoverageVisual" type="CanvasLayer"]
 layer = 128
-script = ExtResource( 1 )
+script = SubResource( 1 )
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="Center" type="Node2D" parent="."]
+
+[node name="ColorRect" type="ColorRect" parent="Center"]
 margin_top = 19.0
 margin_right = 40.0
 margin_bottom = 59.0
-color = Color( 1, 1, 1, 0.498039 )
+color = Color( 1, 1, 0.8, 0.498039 )
 
-[node name="Offset" type="Node2D" parent="."]
-position = Vector2( -130, -282 )
+[node name="Offset" type="Node2D" parent="Center"]
 
-[node name="ReferenceRect" type="ReferenceRect" parent="Offset"]
+[node name="ReferenceRect" type="ReferenceRect" parent="Center/Offset"]
 margin_left = -130.0
 margin_top = -282.0
 margin_right = 130.0
 margin_bottom = -52.0
 rect_min_size = Vector2( 98, 198 )
+border_width = 5.0
+editor_only = false
+
+[node name="ReferenceRect" type="ReferenceRect" parent="Center/Offset/ReferenceRect"]
+margin_right = 40.0
+margin_bottom = 40.0
+border_color = Color( 0, 1, 0, 1 )
 border_width = 5.0
 editor_only = false
