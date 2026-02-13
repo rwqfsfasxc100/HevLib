@@ -95,7 +95,7 @@ func _ready():
 	file.store_string("")
 	file.close()
 #	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
-	var mod_data = pointers.ManifestV2.__get_mod_data(true,true)
+	var mod_data = pointers.ManifestV2.__get_mod_data(true)
 	var md = pointers.ManifestV2.__get_mod_data()
 	
 	replaceScene("scenes/better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")

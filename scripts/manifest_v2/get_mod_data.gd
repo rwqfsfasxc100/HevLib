@@ -1,6 +1,6 @@
 extends Node
 
-static func get_mod_data(format_to_manifest_version:bool,print_json:bool,FolderAccess = null,DataFormat = null) -> Dictionary:
+static func get_mod_data(print_json:bool,FolderAccess = null,DataFormat = null) -> Dictionary:
 #	var mods = ModLoader.get_children()
 	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
 	

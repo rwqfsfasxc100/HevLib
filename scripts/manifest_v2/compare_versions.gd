@@ -2,7 +2,7 @@ extends Node
 
 static func compare_versions(checked_mod_data:Dictionary) -> bool:
 	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
-	var installed_mods = ManifestV2.__get_mod_data(true)
+	var installed_mods = ManifestV2.__get_mod_data()
 	var check_name = checked_mod_data[checked_mod_data.keys()[0]].get("name","")
 	var installed_dict = {}
 	for installed_mod in installed_mods["mods"]:

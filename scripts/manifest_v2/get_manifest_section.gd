@@ -2,7 +2,7 @@ extends Node
 
 static func get_manifest_section(section: String, mod_id: String = "") -> Dictionary:
 	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
-	var mod_data = ManifestV2.__get_mod_data(true)["mods"]
+	var mod_data = ManifestV2.__get_mod_data()["mods"]
 	var mode = "all"
 	var return_data = {}
 	if mod_id != "":

@@ -143,7 +143,7 @@ class _ConfigDriver:
 			cfg_dictionary.merge({section:data})
 		return cfg_dictionary
 	
-	func __store_config(configuration: Dictionary, mod_id: String, cfg_filename : String = "Mod_Configurations" + ".cfg",DataFormat = null):
+	func __store_config(configuration: Dictionary, mod_id: String, cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var profiles_dir = "user://cfg/.profiles/"
 		var cfg_folder = "user://cfg/"
 		mod_id = DataFormat.__array_to_string(mod_id.split("/"))
@@ -162,16 +162,27 @@ class _ConfigDriver:
 		FileCFG.close()
 		var cfg_sections = cfg.get_sections()
 		var sections = configuration.keys()
+		
 		for section in sections:
 			var sect_name = mod_id + "/" + section
 			var sect_data = configuration[section]
+			
+			if not sect_name in settings:
+				settings[sect_name] = {}
+			
 			for s in sect_data:
 				var sr = sect_data[s]
+				settings[sect_name][s] = sr
+				
 				cfg.set_value(sect_name,s,sr)
+		
+		
 		
 		var profile = cfg.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","default")
 		cfg.save(cfg_file)
 		cfg.save(profiles_dir+profile + ".cfg")
+		
+		__change_made()
 		Loader.saved()
 	
 	func __store_value(mod_id, section, key, value, cfg_filename : String = "Mod_Configurations" + ".cfg"):
@@ -186,51 +197,76 @@ class _ConfigDriver:
 		cfg.set_value(modSection,key,value)
 		var profile = cfg.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","default")
 		
+		if not modSection in settings:
+			settings[modSection] = {}
+		settings[modSection][key] = value
+		
 		cfg.save(cfg_folder+cfg_filename)
 		cfg.save(profiles_dir+profile + ".cfg")
+		
+		__change_made()
 		Loader.saved()
 	
 	func __get_config(mod_id, cfg_filename : String = "Mod_Configurations" + ".cfg") -> Dictionary:
 		mod_id = DataFormat.__array_to_string(mod_id.split("/"))
 		mod_id = DataFormat.__array_to_string(mod_id.split(" "))
 		var cfg_folder = "user://cfg/"
-		var cfg = ConfigFile.new()
-		var error = cfg.load(cfg_folder+cfg_filename)
-		if error != OK:
-			return {}
 		var dictionary = {}
-		var config_sections = cfg.get_sections()
-		for section in config_sections:
-			var split = section.split("/")
-			if split[0] == mod_id:
-				var sub = {}
-				var keys = cfg.get_section_keys(section)
-				for key in keys:
-					var value = cfg.get_value(section, key)
-					sub.merge({key:value})
-				dictionary.merge({split[1]:sub})
+		
+		if settingsHash:
+			for section in settings.keys():
+				var split = section.split("/")
+				if split[0] == mod_id:
+					var sub = {}
+					for key in settings[section]:
+						sub.merge({key:settings[section].duplicate(true)[key]})
+					dictionary.merge({split[1]:sub})
+		else:
+			var cfg = ConfigFile.new()
+			var error = cfg.load(cfg_folder+cfg_filename)
+			if error != OK:
+				return {}
+			var config_sections = cfg.get_sections()
+			for section in config_sections:
+				var split = section.split("/")
+				if split[0] == mod_id:
+					var sub = {}
+					var keys = cfg.get_section_keys(section)
+					for key in keys:
+						var value = cfg.get_value(section, key)
+						sub.merge({key:value})
+					dictionary.merge({split[1]:sub})
 		return dictionary
 	
 	func __get_value(mod_id: String, section: String, key: String, cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		mod_id = DataFormat.__array_to_string(mod_id.split("/"))
 		mod_id = DataFormat.__array_to_string(mod_id.split(" "))
+		section = DataFormat.__array_to_string(section.split("/"))
 		var cfg_folder = "user://cfg/"
-		
-		var cfg = ConfigFile.new()
-		var error = cfg.load(cfg_folder+cfg_filename)
-		if error != OK:
-	#		Debug.l("HevLib Config File: Error loading settings %s" % error)
-			return {}
 		var full = mod_id+"/"+section
-		if cfg.has_section(full):
-			var keys = cfg.get_section_keys(full)
-			if key in keys:
-				var data = cfg.get_value(full,key)
-				return data
+		
+		if settingsHash:
+			if full in settings:
+				if key in settings[full]:
+					return settings[full].duplicate(true)[key]
+				return null
+			return null
+		else:
+			var cfg = ConfigFile.new()
+			var error = cfg.load(cfg_folder+cfg_filename)
+			if error != OK:
+		#		Debug.l("HevLib Config File: Error loading settings %s" % error)
+				return null
+			
+			if cfg.has_section(full):
+				var keys = cfg.get_section_keys(full)
+				if key in keys:
+					var data = cfg.get_value(full,key)
+					return data
+				else:
+					return null
 			else:
 				return null
-		else:
-			return null
 	
 	func __load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var dir = Directory.new()
@@ -273,7 +309,7 @@ class _ConfigDriver:
 		var f = ManifestV2.__get_mod_data()
 		var mod_entries = f["mods"]
 		var configs = {}
-		var current_config = self.__config_parse(cfg_file)
+		var current_config = __config_parse(cfg_file)
 		for mod in mod_entries:
 			var manifest = mod_entries[mod]["manifest"]
 			var has_manifest = manifest["has_manifest"]
@@ -318,16 +354,18 @@ class _ConfigDriver:
 		for section in current_config:
 			for key in current_config[section]:
 				c.set_value(section,key,current_config[section][key])
+		settings = current_config.duplicate(true)
+		settingsHash = settings.hash()
 		c.save(cfg_file)
 		c.save(profiles_dir + current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",{}).get("profile_name","Default") + ".cfg")
 		for mod in configs:
-			var data = self.__get_config(mod)
+			var data = __get_config(mod)
 			for section in configs[mod]:
 				var sectData = configs[mod][section]
 				for key in sectData:
 					var key_data = sectData[key]
 					if key_data["type"].to_lower() == "input":
-						var p = self.__get_value(mod,section,key)
+						var p = __get_value(mod,section,key)
 						if p == null:
 							p = key_data["default"]
 						var addAction = true
@@ -723,30 +761,17 @@ class _DataFormat:
 		dir.remove(n)
 		return dict
 		
-	const function_prefixes = [
-		"func ",
-		"static func ",
-		"remote func ",
-		"master func ",
-		"puppet func ",
-		"remotesync func ",
-		"mastersync func ",
-		"puppetsync func ",
-		"sync func "
-	]
+	const function_prefixes = ["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func "]
 	func __trim_scripts(file_path : String):
 		var file = File.new()
 		file.open(file_path,File.READ)
 		var data = file.get_as_text(true)
 		file.close()
-		
-		
 		var streaming = false
 		var this_stream : String = ""
 		var concat : String = ""
 		var const_names = []
 		var var_names = []
-		
 		var lines = data.split("\n")
 		for line in lines:
 			var result : String = ""
@@ -762,9 +787,6 @@ class _DataFormat:
 					is_part_of_string = !is_part_of_string
 				if part == "#" and (not is_part_of_string and not prev_char_escape):
 					break
-				
-				
-				pass
 				line.erase(0,1)
 				result += part
 			line = result
@@ -1898,165 +1920,193 @@ class _ManifestV2:
 	
 	var file = File.new()
 	
-	func __get_mod_data(format_to_manifest_version:bool = false, print_json: bool = false) -> Dictionary:
-		var mod_dictionary = {}
-		var manifest_count = 0
-		var library_count = 0
-		var non_library_count = 0
-		var total_mod_count = 0
-		# FUTURE ME: FIX THIS TO USE PARSE TAGS
-		var stat_tags = {}
-		
-		var modListArr = []
-		var is_onready = CurrentGame != null
-		if is_onready:
-			var mods = ModLoader.get_children()
-			for mod in mods:
-				var constants = mod.get_script().get_script_constant_map()
-				var script_path = mod.get_script().get_path()
-				modListArr.append({"constants":constants,"script_path":script_path,"node":mod})
-		
-		else:
-			var running_in_debugged = false
-			var debugged_defined_mods = []
-			
-			var ps = DataFormat.__get_script_constant_map_without_load("res://ModLoader.gd")
-			for item in ps:
-				if item == "is_debugged":
-					running_in_debugged = true
-					var pf = File.new()
-					pf.open("res://ModLoader.gd",File.READ)
-					var fs = pf.get_as_text(true)
-					pf.close()
-					var lines = fs.split("\n")
-					var reading = false
-					var contents = []
-					for line in lines:
-
-						if line.begins_with("var addedMods"):
-							reading = true
-						if reading:
-							var split = line.split("\"")
-							if split.size() > 1 and split.size() == 3:
-								if split[0].begins_with("#"):
-									contents.append(split[1])
-
-					debugged_defined_mods = contents.duplicate(true)
-			
-			
-			
-			var folders = FolderAccess.__fetch_folder_files("res://", true, true)
-			var mods_to_avoid = []
-			for folder in folders:
-				var semi_root = folder.split("/")[2]
-				if semi_root.begins_with("."):
-					continue
-							
-				if folder.ends_with("/"):
-					
-					if running_in_debugged:
-						for mod in debugged_defined_mods:
-							var home = mod.split("/")[2]
-							if home == semi_root:
-									mods_to_avoid.append(home)
-					var folderCheck = FolderAccess.__fetch_folder_files(folder,true)
-					var has_mod = false
-					var has_manifest = false
-					var modmain_path = ""
-					var manifest_path = ""
-					for item in folderCheck:
-						var modEntryName = item.to_lower()
-						if modEntryName.begins_with("modmain") and modEntryName.ends_with(".gd"):
-							if (folder + item) in debugged_defined_mods:
-								has_mod = false
-							else:
-								has_mod = true
-							modmain_path = item
-					if has_mod:
-						var mv = folder + modmain_path
-						var constants = DataFormat.__get_script_constant_map_without_load(mv)
-						modListArr.append({"constants":constants,"script_path":mv,"node":null})
-		total_mod_count = modListArr.size()
-		for mod in modListArr:
-			
-			var constants = mod.get("constants")
-			var script_path = mod.get("script_path")
-			var node = mod.get("node")
-			
-			var folder_path = str(script_path.split(script_path.split("/")[script_path.split("/").size() - 1])[0])
-			var mod_priority = constants.get("MOD_PRIORITY",0)
-			var mod_name = str(constants.get("MOD_NAME",script_path.split("/")[2]))
-			var legacy_mod_version = constants.get("MOD_VERSION","1.0.0")
-			var mod_version_major = constants.get("MOD_VERSION_MAJOR",1)
-			var mod_version_minor = constants.get("MOD_VERSION_MINOR",0)
-			var mod_version_bugfix = constants.get("MOD_VERSION_BUGFIX",0)
-			var mod_version_metadata = constants.get("MOD_VERSION_METADATA","")
-			var is_library = constants.get("MOD_IS_LIBRARY",false)
-			var always_display = constants.get("ALWAYS_DISPLAY",false)
-			var content = FolderAccess.__fetch_folder_files(folder_path)
-			var has_mod_manifest = false
-			var manifest_data = {}
-			var manifest_version = 1
-			var has_icon_file = false
-			var icon_path = ""
-			for file in content:
-				if file.to_lower() == "mod.manifest":
-					has_mod_manifest = true
-					manifest_count += 1
-					manifest_data = self.__parse_file_as_manifest(folder_path + file, true)
-					mod_name = manifest_data["mod_information"].get("name",mod_name)
-					legacy_mod_version = manifest_data["version"].get("version_string",legacy_mod_version)
-					mod_version_major = manifest_data["version"].get("version_major",mod_version_major)
-					mod_version_minor = manifest_data["version"].get("version_minor",mod_version_minor)
-					mod_version_bugfix = manifest_data["version"].get("version_bugfix",mod_version_bugfix)
-					mod_version_metadata = manifest_data["version"].get("version_metadata",mod_version_metadata)
-					is_library = manifest_data["library"].get("is_library",false)
-					always_display = manifest_data["library"].get("always_display",false)
-					manifest_version = manifest_data["manifest_definitions"].get("manifest_version",1)
-					
-					if "tags" in manifest_data.keys():
-						for tag in manifest_data["tags"]:
-							if tag in stat_tags:
-								stat_tags[tag] += 1
-							else:
-								stat_tags.merge({tag:1})
-					
-				if file.to_lower().begins_with("icon") and file.to_lower().ends_with(".stex"):
-					has_icon_file = true
-					icon_path = folder_path + file
-			var icon_dict = {"has_icon_file":has_icon_file,"icon_path":icon_path}
-			var manifestEntry = {"has_manifest":has_mod_manifest,"manifest_version":manifest_version,"manifest_data":manifest_data}
-			var mod_version_array = [mod_version_major,mod_version_minor,mod_version_bugfix]
-			var mod_version_string = str(mod_version_major) + "." + str(mod_version_minor) + "." + str(mod_version_bugfix)
-			if not str(mod_version_metadata) == "":
-				mod_version_array.append(mod_version_metadata)
-				mod_version_string = mod_version_string + "-" + str(mod_version_metadata)
-			var version_dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
-			var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"node":node,"manifest":manifestEntry}}
-			mod_dictionary.merge(mod_entry)
-			if is_library:
-				library_count += 1
+	var cached_mod_list : Dictionary = {}
+	
+	func __get_mod_data(print_json: bool = false) -> Dictionary:
+		if not cached_mod_list.empty():
+			if print_json:
+				var psj = JSON.print(cached_mod_list, "\t")
+				return psj
 			else:
-				non_library_count += 1
-		
-		
-		var stat_count = {"total_mod_count":total_mod_count,"mods_using_manifests":manifest_count,"mods":non_library_count,"libraries":library_count}
-		var statistics = {"counts":stat_count,"tags":stat_tags}
-		var returnValues = {"mods":mod_dictionary,"statistics":statistics}
-		if print_json:
-			var psj = JSON.print(returnValues, "\t")
-			return psj
+				return cached_mod_list.duplicate(true)
 		else:
-			return returnValues
+			var mod_dictionary = {}
+			var manifest_count = 0
+			var library_count = 0
+			var non_library_count = 0
+			var total_mod_count = 0
+			# FUTURE ME: FIX THIS TO USE PARSE TAGS
+			var stat_tags = {}
+			
+			var modListArr = []
+			var is_onready = CurrentGame != null
+			if is_onready:
+				var mods = ModLoader.get_children()
+				for mod in mods:
+					var constants = mod.get_script().get_script_constant_map()
+					var script_path = mod.get_script().get_path()
+					modListArr.append({"constants":constants,"script_path":script_path,"node":mod})
+			
+			else:
+				var running_in_debugged = false
+				var debugged_defined_mods = []
+				
+				var ps = DataFormat.__get_script_constant_map_without_load("res://ModLoader.gd")
+				for item in ps:
+					if item == "is_debugged":
+						running_in_debugged = true
+						var pf = File.new()
+						pf.open("res://ModLoader.gd",File.READ)
+						var fs = pf.get_as_text(true)
+						pf.close()
+						var lines = fs.split("\n")
+						var reading = false
+						var contents = []
+						for line in lines:
+
+							if line.begins_with("var addedMods"):
+								reading = true
+							if reading:
+								var split = line.split("\"")
+								if split.size() > 1 and split.size() == 3:
+									if split[0].begins_with("#"):
+										contents.append(split[1])
+
+						debugged_defined_mods = contents.duplicate(true)
+				
+				
+				
+				var folders = FolderAccess.__fetch_folder_files("res://", true, true)
+				var mods_to_avoid = []
+				for folder in folders:
+					var semi_root = folder.split("/")[2]
+					if semi_root.begins_with("."):
+						continue
+								
+					if folder.ends_with("/"):
+						
+						if running_in_debugged:
+							for mod in debugged_defined_mods:
+								var home = mod.split("/")[2]
+								if home == semi_root:
+										mods_to_avoid.append(home)
+						var folderCheck = FolderAccess.__fetch_folder_files(folder,true)
+						var has_mod = false
+						var has_manifest = false
+						var modmain_path = ""
+						var manifest_path = ""
+						for item in folderCheck:
+							var modEntryName = item.to_lower()
+							if modEntryName.begins_with("modmain") and modEntryName.ends_with(".gd"):
+								if (folder + item) in debugged_defined_mods:
+									has_mod = false
+								else:
+									has_mod = true
+								modmain_path = item
+						if has_mod:
+							var mv = folder + modmain_path
+							var constants = DataFormat.__get_script_constant_map_without_load(mv)
+							modListArr.append({"constants":constants,"script_path":mv,"node":null})
+			total_mod_count = modListArr.size()
+			modListArr.sort_custom(self,"sortModList")
+			for mod in modListArr:
+				
+				var constants = mod.get("constants")
+				var script_path = mod.get("script_path")
+				var node = mod.get("node")
+				
+				var folder_path = str(script_path.split(script_path.split("/")[script_path.split("/").size() - 1])[0])
+				var mod_priority = constants.get("MOD_PRIORITY",0)
+				var mod_name = str(constants.get("MOD_NAME",script_path.split("/")[2]))
+				var legacy_mod_version = constants.get("MOD_VERSION","1.0.0")
+				var mod_version_major = constants.get("MOD_VERSION_MAJOR",1)
+				var mod_version_minor = constants.get("MOD_VERSION_MINOR",0)
+				var mod_version_bugfix = constants.get("MOD_VERSION_BUGFIX",0)
+				var mod_version_metadata = constants.get("MOD_VERSION_METADATA","")
+				var is_library = constants.get("MOD_IS_LIBRARY",false)
+				var always_display = constants.get("ALWAYS_DISPLAY",false)
+				var content = FolderAccess.__fetch_folder_files(folder_path)
+				var has_mod_manifest = false
+				var manifest_data = {}
+				var manifest_version = 1
+				var has_icon_file = false
+				var icon_path = ""
+				for file in content:
+					if file.to_lower() == "mod.manifest":
+						has_mod_manifest = true
+						manifest_count += 1
+						manifest_data = __parse_file_as_manifest(folder_path + file, true)
+						mod_name = manifest_data["mod_information"].get("name",mod_name)
+						legacy_mod_version = manifest_data["version"].get("version_string",legacy_mod_version)
+						mod_version_major = manifest_data["version"].get("version_major",mod_version_major)
+						mod_version_minor = manifest_data["version"].get("version_minor",mod_version_minor)
+						mod_version_bugfix = manifest_data["version"].get("version_bugfix",mod_version_bugfix)
+						mod_version_metadata = manifest_data["version"].get("version_metadata",mod_version_metadata)
+						is_library = manifest_data["library"].get("is_library",false)
+						always_display = manifest_data["library"].get("always_display",false)
+						manifest_version = manifest_data["manifest_definitions"].get("manifest_version",1)
+						
+						if "tags" in manifest_data.keys():
+							for tag in manifest_data["tags"]:
+								if tag in stat_tags:
+									stat_tags[tag] += 1
+								else:
+									stat_tags.merge({tag:1})
+						
+					if file.to_lower().begins_with("icon") and file.to_lower().ends_with(".stex"):
+						has_icon_file = true
+						icon_path = folder_path + file
+				var icon_dict = {"has_icon_file":has_icon_file,"icon_path":icon_path}
+				var manifestEntry = {"has_manifest":has_mod_manifest,"manifest_version":manifest_version,"manifest_data":manifest_data}
+				var mod_version_array = [mod_version_major,mod_version_minor,mod_version_bugfix]
+				var mod_version_string = str(mod_version_major) + "." + str(mod_version_minor) + "." + str(mod_version_bugfix)
+				if not str(mod_version_metadata) == "":
+					mod_version_array.append(mod_version_metadata)
+					mod_version_string = mod_version_string + "-" + str(mod_version_metadata)
+				var version_dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
+				var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"node":node,"manifest":manifestEntry}}
+				mod_dictionary.merge(mod_entry)
+				if is_library:
+					library_count += 1
+				else:
+					non_library_count += 1
+			
+			
+			var stat_count = {"total_mod_count":total_mod_count,"mods_using_manifests":manifest_count,"mods":non_library_count,"libraries":library_count}
+			var statistics = {"counts":stat_count,"tags":stat_tags}
+			var returnValues = {"mods":mod_dictionary,"statistics":statistics}
+			cached_mod_list = returnValues.duplicate(true)
+			if print_json:
+				var psj = JSON.print(cached_mod_list, "\t")
+				return psj
+			else:
+				return cached_mod_list.duplicate(true)
+	
+	static func sortModList(a,b):
+		var c1 = a.get("constants",{}).get("MOD_PRIORITY",0)
+		var c2 = b.get("constants",{}).get("MOD_PRIORITY",0)
+		if c1 != c2:
+			return c1 < c2
+		var b1 = a.get("mod_path","").to_ascii().split("/")
+		var b2 = b.get("mod_path","").to_ascii().split("/")
+		if b1 != b2:
+			return b1 < b2
+		return false
+	
+	var cached_zip_refs = {}
 	
 	func __match_mod_path_to_zip(mod_main_path:String) -> String:
-		var zip_ref_store = "user://cache/.HevLib_Cache/zip_ref_store.json"
-		var file = File.new()
-		file.open(zip_ref_store,File.READ)
-		var data = JSON.parse(file.get_as_text()).result
-		file.close()
-		var return_val = data.get(mod_main_path,"")
-		return return_val
+		if mod_main_path in cached_zip_refs:
+			return cached_zip_refs[mod_main_path]
+		else:
+			var zip_ref_store = "user://cache/.HevLib_Cache/zip_ref_store.json"
+			var file = File.new()
+			file.open(zip_ref_store,File.READ)
+			var data = JSON.parse(file.get_as_text()).result
+			file.close()
+			var return_val = data.get(mod_main_path,"")
+			cached_zip_refs[mod_main_path] = return_val
+			return return_val
 	
 	func __old_match_mod_path_to_zip(mod_main_path:String) -> String:
 		var _modZipFiles = []
@@ -2100,7 +2150,7 @@ class _ManifestV2:
 		return ""
 	
 	func __compare_versions(checked_mod_data:Dictionary) -> bool:
-		var installed_mods = self.__get_mod_data(true)
+		var installed_mods = __get_mod_data()
 		var check_name = checked_mod_data[checked_mod_data.keys()[0]].get("name","")
 		var installed_dict = {}
 		for installed_mod in installed_mods["mods"]:
@@ -2125,7 +2175,7 @@ class _ManifestV2:
 			return true
 		return false
 	
-	func __get_mod_data_from_files(script_path:String, format_to_manifest_version: bool = false) -> Dictionary:
+	func __get_mod_data_from_files(script_path:String) -> Dictionary:
 		var constants = DataFormat.__get_script_constant_map_without_load(script_path)
 		var folder_path = str(script_path.split(script_path.split("/")[script_path.split("/").size() - 1])[0])
 		var mod_priority = constants.get("MOD_PRIORITY",0)
@@ -2148,7 +2198,7 @@ class _ManifestV2:
 		for file in content:
 			if file.to_lower() == "mod.manifest":
 				has_mod_manifest = true
-				manifest_data = self.__parse_file_as_manifest(folder_path + file, true)
+				manifest_data = __parse_file_as_manifest(folder_path + file, true)
 				mod_name = manifest_data["mod_information"].get("name",mod_name)
 				legacy_mod_version = manifest_data["version"].get("version_string",legacy_mod_version)
 				mod_version_major = manifest_data["version"].get("version_major",mod_version_major)
@@ -2171,254 +2221,267 @@ class _ManifestV2:
 		var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":mod_is_library,"keep_library_hidden":hide_library},"manifest":manifestEntry}}
 		return(mod_entry)
 	
-	func __parse_file_as_manifest(file_path: String, format_to_manifest_version: bool = false) -> Dictionary:
-		var cfg = FileAccess.__config_parse(file_path)
-		var manifest_data : Dictionary = {}
-		var manifest_version = 1
-		if "manifest_definitions" in cfg.keys():
-			manifest_version = cfg["manifest_definitions"].get("manifest_version",manifest_version)
-			var tpf = typeof(manifest_version)
-			if tpf == TYPE_INT or tpf == TYPE_REAL:
-				pass
-			else:
-				manifest_version = 1
-		manifest_data = cfg
-		if format_to_manifest_version:
-			var dict_template = {
-				"mod_information":{
-					"name":null,
-					"id":null,
-					"description":"",
-					"brief":"",
-					"author":"",
-					"credits":PoolStringArray([])
-				},
-				"version":{
-					"version_major":1,
-					"version_minor":0,
-					"version_bugfix":0,
-					"version_metadata":"",
-					"version_string":"1.0.0"
-				},
-				"tags":{
-					
-				},
-				"links":{
-					
-				},
-				"configs":{
-					
-				},
-				"languages":{
-					
-				},
-				"library":{
-					"is_library":false,
-					"always_display":false,
-				},
-				"manifest_definitions":{
-					"manifest_version":1,
-					"dependancy_mod_ids":PoolStringArray([]),
-					"conflicting_mod_ids":PoolStringArray([]),
-					"complementary_mod_ids":PoolStringArray([]),
-					"manifest_url":"", # EXAMPLE: https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest
-					"changelog_path":"", # This is relative to the ModMain.gd file. EXAMPLE: for a file at 'res://Example Mod/data/folder/changelogs.txt', you would put 'data/folder/changelogs.txt'
+	var cached_manifests = {}
+	
+	func __parse_file_as_manifest(file_path: String, format_to_manifest_version: bool = true) -> Dictionary:
+		var cachevar = file_path + ":" + str(format_to_manifest_version)
+		if cachevar in cached_manifests:
+			return cached_manifests[cachevar]
+		else:
+			var out = {}
+			var cfg = FileAccess.__config_parse(file_path)
+			var manifest_data : Dictionary = {}
+			var manifest_version = 1
+			if "manifest_definitions" in cfg.keys():
+				manifest_version = cfg["manifest_definitions"].get("manifest_version",manifest_version)
+				var tpf = typeof(manifest_version)
+				if tpf == TYPE_INT or tpf == TYPE_REAL:
+					pass
+				else:
+					manifest_version = 1
+			manifest_data = cfg
+			if format_to_manifest_version:
+				var dict_template = {
+					"mod_information":{
+						"name":null,
+						"id":null,
+						"description":"",
+						"brief":"",
+						"author":"",
+						"credits":PoolStringArray([])
+					},
+					"version":{
+						"version_major":1,
+						"version_minor":0,
+						"version_bugfix":0,
+						"version_metadata":"",
+						"version_string":"1.0.0"
+					},
+					"tags":{
+						
+					},
+					"links":{
+						
+					},
+					"configs":{
+						
+					},
+					"languages":{
+						
+					},
+					"library":{
+						"is_library":false,
+						"always_display":false,
+					},
+					"manifest_definitions":{
+						"manifest_version":1,
+						"dependancy_mod_ids":PoolStringArray([]),
+						"conflicting_mod_ids":PoolStringArray([]),
+						"complementary_mod_ids":PoolStringArray([]),
+						"manifest_url":"", # EXAMPLE: https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest
+						"changelog_path":"", # This is relative to the ModMain.gd file. EXAMPLE: for a file at 'res://Example Mod/data/folder/changelogs.txt', you would put 'data/folder/changelogs.txt'
+					}
 				}
-			}
-			match manifest_version:
-				1, 1.0:
-					dict_template["mod_information"]["id"] = manifest_data["package"].get("id",null)
-					dict_template["mod_information"]["name"] = manifest_data["package"].get("name",null)
-					var version = manifest_data["package"].get("version","unknown")
-					dict_template["mod_information"]["description"] = manifest_data["package"].get("description","MODMENU_DESCRIPTION_PLACEHOLDER")
-					
-					if typeof(manifest_data["package"].get("github_homepage","")) == TYPE_STRING:
-						var url = manifest_data["package"]["github_homepage"]
-						if url != "":
-							dict_template["links"].merge({"HEVLIB_GITHUB":{"URL":url}})
-					var discURL = manifest_data["package"].get("discord","")
-					if discURL != "":
-						dict_template["links"].merge({"HEVLIB_DISCORD":{"URL":discURL}})
-					var nexusURL = manifest_data["package"].get("nexus","")
-					if nexusURL != "":
-						dict_template["links"].merge({"HEVLIB_NEXUS":{"URL":nexusURL}})
-					var donationURL = manifest_data["package"].get("donations","")
-					if donationURL != "":
-						dict_template["links"].merge({"HEVLIB_DONATIONS":{"URL":donationURL}})
-					var wikiURL = manifest_data["package"].get("wiki","")
-					if wikiURL != "":
-						dict_template["links"].merge({"HEVLIB_WIKI":{"URL":wikiURL}})
-					
-				2, 2.0:
-					dict_template["mod_information"]["id"] = manifest_data["package"].get("id",null)
-					dict_template["mod_information"]["name"] = manifest_data["package"].get("name",null)
-					dict_template["version"]["version_major"] = manifest_data["package"].get("version_major",1)
-					dict_template["version"]["version_minor"] = manifest_data["package"].get("version_minor",0)
-					dict_template["version"]["version_bugfix"] = manifest_data["package"].get("version_bugfix",0)
-					dict_template["version"]["version_metadata"] = manifest_data["package"].get("version_metadata","")
-					dict_template["mod_information"]["description"] = manifest_data["package"].get("description","HEVLIB_DESCRIPTION_PLACEHOLDER")
-					if typeof(manifest_data["package"].get("github","")) == TYPE_DICTIONARY:
-						var url = manifest_data["package"]["github"]["link"]
-						if url != "":
-							dict_template["links"].merge({"HEVLIB_GITHUB":{"URL":url}})
-					elif typeof(manifest_data["package"].get("github","")) == TYPE_STRING:
-						var url = manifest_data["package"]["github"]
-						if url != "":
-							dict_template["links"].merge({"HEVLIB_GITHUB":{"URL":url}})
-					var discURL = manifest_data["package"].get("discord","")
-					if discURL != "":
-						dict_template["links"].merge({"HEVLIB_DISCORD":{"URL":discURL}})
-					var nexusURL = manifest_data["package"].get("nexus","")
-					if nexusURL != "":
-						dict_template["links"].merge({"HEVLIB_NEXUS":{"URL":nexusURL}})
-					var donationURL = manifest_data["package"].get("donations","")
-					if donationURL != "":
-						dict_template["links"].merge({"HEVLIB_DONATIONS":{"URL":donationURL}})
-					var wikiURL = manifest_data["package"].get("wiki","")
-					if wikiURL != "":
-						dict_template["links"].merge({"HEVLIB_WIKI":{"URL":wikiURL}})
-					dict_template["mod_information"]["author"] = manifest_data["package"].get("author","Unknown")
-					dict_template["mod_information"]["credits"] = manifest_data["package"].get("credits",[])
-					
-				2.1:
-					# information
-					if "mod_information" in manifest_data.keys():
-						dict_template["mod_information"]["id"] = String(manifest_data["mod_information"].get("id",null))
-						dict_template["mod_information"]["name"] = String(manifest_data["mod_information"].get("name",null))
-						dict_template["mod_information"]["description"] = String(manifest_data["mod_information"].get("description","HEVLIB_DESCRIPTION_PLACEHOLDER"))
-						dict_template["mod_information"]["author"] = String(manifest_data["mod_information"].get("author","Unknown"))
-						dict_template["mod_information"]["credits"] = PoolStringArray(manifest_data["mod_information"].get("credits",[]))
-					
-					# versioning
-					if "version" in manifest_data.keys():
-						dict_template["version"]["version_major"] = int(manifest_data["version"].get("version_major",1))
-						dict_template["version"]["version_minor"] = int(manifest_data["version"].get("version_minor",0))
-						dict_template["version"]["version_bugfix"] = int(manifest_data["version"].get("version_bugfix",0))
-						dict_template["version"]["version_metadata"] = String(manifest_data["version"].get("version_metadata",""))
-					
-					# tags
-					if "tags" in manifest_data.keys():
-						var current_tags = manifest_data["tags"].keys()
-						if "allowself" in current_tags:
-							dict_template["tags"].merge({"TAG_ALLOWself":{"type":"boolean","value":manifest_data["tags"].get("allowself")}})
-						if "quality_of_life" in current_tags:
-							dict_template["tags"].merge({"TAG_QOL":{"type":"boolean","value":manifest_data["tags"].get("quality_of_life")}})
-						if "is_library_mod" in current_tags:
-							dict_template["library"]["is_library"] = manifest_data["tags"].get("is_library_mod")
-						if "uses_hevlib_research" in current_tags:
-							dict_template["tags"].merge({"TAG_USING_HEVLIB_RESEARCH":{"type":"boolean","value":manifest_data["tags"].get("uses_hevlib_research")}})
-						if "overhaul" in current_tags:
-							dict_template["tags"].merge({"TAG_OVERHAUL":{"type":"bool","value":manifest_data["tags"].get("overhaul")}})
-						if "visual" in current_tags:
-							dict_template["tags"].merge({"TAG_VISUAL":{"type":"bool","value":manifest_data["tags"].get("visual")}})
-						if "fun" in current_tags:
-							dict_template["tags"].merge({"TAG_FUN":{"type":"bool","value":manifest_data["tags"].get("fun")}})
-						if "user_interface" in current_tags:
-							dict_template["tags"].merge({"TAG_UI":{"type":"bool","value":manifest_data["tags"].get("user_interface")}})
+				match manifest_version:
+					1, 1.0:
+						dict_template["mod_information"]["id"] = manifest_data["package"].get("id",null)
+						dict_template["mod_information"]["name"] = manifest_data["package"].get("name",null)
+						var version = manifest_data["package"].get("version","unknown")
+						dict_template["mod_information"]["description"] = manifest_data["package"].get("description","MODMENU_DESCRIPTION_PLACEHOLDER")
 						
-						if "adds_ships" in current_tags:
-							dict_template["tags"].merge({"TAG_ADDS_SHIPS":{"type":"array","value":manifest_data["tags"].get("adds_ships")}})
-						if "adds_equipment" in current_tags:
-							dict_template["tags"].merge({"TAG_ADDS_EQUIPMENT":{"type":"array","value":manifest_data["tags"].get("adds_equipment")}})
-						if "adds_gameplay_mechanics" in current_tags:
-							dict_template["tags"].merge({"TAG_ADDS_GAMEPLAY_MECHANICS":{"type":"array","value":manifest_data["tags"].get("adds_gameplay_mechanics")}})
-						if "adds_events" in current_tags:
-							dict_template["tags"].merge({"TAG_ADDS_EVENTS":{"type":"array","value":manifest_data["tags"].get("adds_events")}})
-						
-						if "handle_extra_crew" in current_tags:
-							dict_template["tags"].merge({"TAG_HANDLE_EXTRA_CREW":{"type":"integer","value":manifest_data["tags"].get("handle_extra_crew")}})
-						
-					# links
-					if "links" in manifest_data.keys():
-						if typeof(manifest_data["links"].get("github","")) == TYPE_DICTIONARY:
-							var url = manifest_data["links"]["github"]["link"]
+						if typeof(manifest_data["package"].get("github_homepage","")) == TYPE_STRING:
+							var url = manifest_data["package"]["github_homepage"]
 							if url != "":
 								dict_template["links"].merge({"HEVLIB_GITHUB":{"URL":url}})
-						elif typeof(manifest_data["links"].get("github","")) == TYPE_STRING:
-							var url = manifest_data["links"]["github"]
-							if url != "":
-								dict_template["links"].merge({"HEVLIB_GITHUB":{"URL":url}})
-						var discURL = manifest_data["links"].get("discord","")
+						var discURL = manifest_data["package"].get("discord","")
 						if discURL != "":
 							dict_template["links"].merge({"HEVLIB_DISCORD":{"URL":discURL}})
-						var nexusURL = manifest_data["links"].get("nexus","")
+						var nexusURL = manifest_data["package"].get("nexus","")
 						if nexusURL != "":
 							dict_template["links"].merge({"HEVLIB_NEXUS":{"URL":nexusURL}})
-						var donationURL = manifest_data["links"].get("donations","")
+						var donationURL = manifest_data["package"].get("donations","")
 						if donationURL != "":
 							dict_template["links"].merge({"HEVLIB_DONATIONS":{"URL":donationURL}})
-						var wikiURL = manifest_data["links"].get("wiki","")
+						var wikiURL = manifest_data["package"].get("wiki","")
 						if wikiURL != "":
 							dict_template["links"].merge({"HEVLIB_WIKI":{"URL":wikiURL}})
-						var bugreportsURL = manifest_data["links"].get("bug_reports","")
-						if bugreportsURL != "":
-							dict_template["links"].merge({"HEVLIB_BUGREPORTS":{"URL":bugreportsURL}})
-					
-					# manifest definitions
-					if "manifest_definitions" in manifest_data.keys():
-						dict_template["manifest_definitions"]["manifest_version"] = float(manifest_data["manifest_definitions"].get("manifest_version",manifest_version))
-						dict_template["manifest_definitions"]["dependancy_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("dependancy_mod_ids",[]))
-						dict_template["manifest_definitions"]["conflicting_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("conflicting_mod_ids",[]))
-						dict_template["manifest_definitions"]["complementary_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("complementary_mod_ids",[]))
-				2.2:
-					
-					if "mod_information" in manifest_data.keys():
-						dict_template["mod_information"]["id"] = String(manifest_data["mod_information"].get("id",null))
-						dict_template["mod_information"]["name"] = String(manifest_data["mod_information"].get("name",null))
-						dict_template["mod_information"]["description"] = String(manifest_data["mod_information"].get("description","HEVLIB_DESCRIPTION_PLACEHOLDER"))
-						dict_template["mod_information"]["brief"] = String(manifest_data["mod_information"].get("brief",""))
-						dict_template["mod_information"]["author"] = String(manifest_data["mod_information"].get("author","Unknown"))
-						dict_template["mod_information"]["credits"] = PoolStringArray(manifest_data["mod_information"].get("credits",[]))
-					
-					if "version" in manifest_data.keys():
-						dict_template["version"]["version_major"] = int(manifest_data["version"].get("version_major",1))
-						dict_template["version"]["version_minor"] = int(manifest_data["version"].get("version_minor",0))
-						dict_template["version"]["version_bugfix"] = int(manifest_data["version"].get("version_bugfix",0))
-						dict_template["version"]["version_metadata"] = String(manifest_data["version"].get("version_metadata",""))
-					
-					if "manifest_definitions" in manifest_data.keys():
-						dict_template["manifest_definitions"]["manifest_version"] = float(manifest_data["manifest_definitions"].get("manifest_version",manifest_version))
-						dict_template["manifest_definitions"]["dependancy_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("dependancy_mod_ids",[]))
-						dict_template["manifest_definitions"]["conflicting_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("conflicting_mod_ids",[]))
-						dict_template["manifest_definitions"]["complementary_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("complementary_mod_ids",[]))
-						dict_template["manifest_definitions"]["manifest_url"] = String(manifest_data["manifest_definitions"].get("manifest_url",""))
-						dict_template["manifest_definitions"]["changelog_path"] = String(manifest_data["manifest_definitions"].get("changelog_path",""))
-					
-					if "links" in manifest_data.keys():
-						var links = manifest_data["links"]
-						for link in links:
-							dict_template["links"].merge({link:links.get(link)})
-					if "tags" in manifest_data.keys():
-						var tags = manifest_data["tags"]
-						for tag in tags:
-							dict_template["tags"].merge({tag:tags.get(tag)})
-					if "languages" in manifest_data.keys():
-						var languages = manifest_data["languages"]
-						for language in languages:
-							dict_template["languages"].merge({language:languages.get(language)})
-					else:
-						dict_template["languages"].merge({"en":"100%"})
-					if "library" in manifest_data.keys():
-						dict_template["library"]["is_library"] = manifest_data["library"].get("is_library",false)
-						dict_template["library"]["always_display"] = manifest_data["library"].get("always_display",false)
 						
-					if "configs" in manifest_data.keys():
-						var configs = manifest_data["configs"]
-						dict_template["configs"].merge(configs)
-					
-					
-			var version_metadata = dict_template["version"]["version_metadata"]
-			var version_string = str(dict_template["version"]["version_major"]) + "." + str(dict_template["version"]["version_minor"]) + "." + str(dict_template["version"]["version_bugfix"])
-			if not version_metadata == "":
-				version_string = version_string + "-" + version_metadata
-			dict_template["version"]["version_string"] = version_string
-			
-			return dict_template
-		return manifest_data
+					2, 2.0:
+						dict_template["mod_information"]["id"] = manifest_data["package"].get("id",null)
+						dict_template["mod_information"]["name"] = manifest_data["package"].get("name",null)
+						dict_template["version"]["version_major"] = manifest_data["package"].get("version_major",1)
+						dict_template["version"]["version_minor"] = manifest_data["package"].get("version_minor",0)
+						dict_template["version"]["version_bugfix"] = manifest_data["package"].get("version_bugfix",0)
+						dict_template["version"]["version_metadata"] = manifest_data["package"].get("version_metadata","")
+						dict_template["mod_information"]["description"] = manifest_data["package"].get("description","HEVLIB_DESCRIPTION_PLACEHOLDER")
+						if typeof(manifest_data["package"].get("github","")) == TYPE_DICTIONARY:
+							var url = manifest_data["package"]["github"]["link"]
+							if url != "":
+								dict_template["links"].merge({"HEVLIB_GITHUB":{"URL":url}})
+						elif typeof(manifest_data["package"].get("github","")) == TYPE_STRING:
+							var url = manifest_data["package"]["github"]
+							if url != "":
+								dict_template["links"].merge({"HEVLIB_GITHUB":{"URL":url}})
+						var discURL = manifest_data["package"].get("discord","")
+						if discURL != "":
+							dict_template["links"].merge({"HEVLIB_DISCORD":{"URL":discURL}})
+						var nexusURL = manifest_data["package"].get("nexus","")
+						if nexusURL != "":
+							dict_template["links"].merge({"HEVLIB_NEXUS":{"URL":nexusURL}})
+						var donationURL = manifest_data["package"].get("donations","")
+						if donationURL != "":
+							dict_template["links"].merge({"HEVLIB_DONATIONS":{"URL":donationURL}})
+						var wikiURL = manifest_data["package"].get("wiki","")
+						if wikiURL != "":
+							dict_template["links"].merge({"HEVLIB_WIKI":{"URL":wikiURL}})
+						dict_template["mod_information"]["author"] = manifest_data["package"].get("author","Unknown")
+						dict_template["mod_information"]["credits"] = manifest_data["package"].get("credits",[])
+						
+					2.1:
+						# information
+						if "mod_information" in manifest_data.keys():
+							dict_template["mod_information"]["id"] = String(manifest_data["mod_information"].get("id",null))
+							dict_template["mod_information"]["name"] = String(manifest_data["mod_information"].get("name",null))
+							dict_template["mod_information"]["description"] = String(manifest_data["mod_information"].get("description","HEVLIB_DESCRIPTION_PLACEHOLDER"))
+							dict_template["mod_information"]["author"] = String(manifest_data["mod_information"].get("author","Unknown"))
+							dict_template["mod_information"]["credits"] = PoolStringArray(manifest_data["mod_information"].get("credits",[]))
+						
+						# versioning
+						if "version" in manifest_data.keys():
+							dict_template["version"]["version_major"] = int(manifest_data["version"].get("version_major",1))
+							dict_template["version"]["version_minor"] = int(manifest_data["version"].get("version_minor",0))
+							dict_template["version"]["version_bugfix"] = int(manifest_data["version"].get("version_bugfix",0))
+							dict_template["version"]["version_metadata"] = String(manifest_data["version"].get("version_metadata",""))
+						
+						# tags
+						if "tags" in manifest_data.keys():
+							var current_tags = manifest_data["tags"].keys()
+							if "allowself" in current_tags:
+								dict_template["tags"].merge({"TAG_ALLOWself":{"type":"boolean","value":manifest_data["tags"].get("allowself")}})
+							if "quality_of_life" in current_tags:
+								dict_template["tags"].merge({"TAG_QOL":{"type":"boolean","value":manifest_data["tags"].get("quality_of_life")}})
+							if "is_library_mod" in current_tags:
+								dict_template["library"]["is_library"] = manifest_data["tags"].get("is_library_mod")
+							if "uses_hevlib_research" in current_tags:
+								dict_template["tags"].merge({"TAG_USING_HEVLIB_RESEARCH":{"type":"boolean","value":manifest_data["tags"].get("uses_hevlib_research")}})
+							if "overhaul" in current_tags:
+								dict_template["tags"].merge({"TAG_OVERHAUL":{"type":"bool","value":manifest_data["tags"].get("overhaul")}})
+							if "visual" in current_tags:
+								dict_template["tags"].merge({"TAG_VISUAL":{"type":"bool","value":manifest_data["tags"].get("visual")}})
+							if "fun" in current_tags:
+								dict_template["tags"].merge({"TAG_FUN":{"type":"bool","value":manifest_data["tags"].get("fun")}})
+							if "user_interface" in current_tags:
+								dict_template["tags"].merge({"TAG_UI":{"type":"bool","value":manifest_data["tags"].get("user_interface")}})
+							
+							if "adds_ships" in current_tags:
+								dict_template["tags"].merge({"TAG_ADDS_SHIPS":{"type":"array","value":manifest_data["tags"].get("adds_ships")}})
+							if "adds_equipment" in current_tags:
+								dict_template["tags"].merge({"TAG_ADDS_EQUIPMENT":{"type":"array","value":manifest_data["tags"].get("adds_equipment")}})
+							if "adds_gameplay_mechanics" in current_tags:
+								dict_template["tags"].merge({"TAG_ADDS_GAMEPLAY_MECHANICS":{"type":"array","value":manifest_data["tags"].get("adds_gameplay_mechanics")}})
+							if "adds_events" in current_tags:
+								dict_template["tags"].merge({"TAG_ADDS_EVENTS":{"type":"array","value":manifest_data["tags"].get("adds_events")}})
+							
+							if "handle_extra_crew" in current_tags:
+								dict_template["tags"].merge({"TAG_HANDLE_EXTRA_CREW":{"type":"integer","value":manifest_data["tags"].get("handle_extra_crew")}})
+							
+						# links
+						if "links" in manifest_data.keys():
+							if typeof(manifest_data["links"].get("github","")) == TYPE_DICTIONARY:
+								var url = manifest_data["links"]["github"]["link"]
+								if url != "":
+									dict_template["links"].merge({"HEVLIB_GITHUB":{"URL":url}})
+							elif typeof(manifest_data["links"].get("github","")) == TYPE_STRING:
+								var url = manifest_data["links"]["github"]
+								if url != "":
+									dict_template["links"].merge({"HEVLIB_GITHUB":{"URL":url}})
+							var discURL = manifest_data["links"].get("discord","")
+							if discURL != "":
+								dict_template["links"].merge({"HEVLIB_DISCORD":{"URL":discURL}})
+							var nexusURL = manifest_data["links"].get("nexus","")
+							if nexusURL != "":
+								dict_template["links"].merge({"HEVLIB_NEXUS":{"URL":nexusURL}})
+							var donationURL = manifest_data["links"].get("donations","")
+							if donationURL != "":
+								dict_template["links"].merge({"HEVLIB_DONATIONS":{"URL":donationURL}})
+							var wikiURL = manifest_data["links"].get("wiki","")
+							if wikiURL != "":
+								dict_template["links"].merge({"HEVLIB_WIKI":{"URL":wikiURL}})
+							var bugreportsURL = manifest_data["links"].get("bug_reports","")
+							if bugreportsURL != "":
+								dict_template["links"].merge({"HEVLIB_BUGREPORTS":{"URL":bugreportsURL}})
+						
+						# manifest definitions
+						if "manifest_definitions" in manifest_data.keys():
+							dict_template["manifest_definitions"]["manifest_version"] = float(manifest_data["manifest_definitions"].get("manifest_version",manifest_version))
+							dict_template["manifest_definitions"]["dependancy_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("dependancy_mod_ids",[]))
+							dict_template["manifest_definitions"]["conflicting_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("conflicting_mod_ids",[]))
+							dict_template["manifest_definitions"]["complementary_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("complementary_mod_ids",[]))
+					2.2:
+						
+						if "mod_information" in manifest_data.keys():
+							dict_template["mod_information"]["id"] = String(manifest_data["mod_information"].get("id",null))
+							dict_template["mod_information"]["name"] = String(manifest_data["mod_information"].get("name",null))
+							dict_template["mod_information"]["description"] = String(manifest_data["mod_information"].get("description","HEVLIB_DESCRIPTION_PLACEHOLDER"))
+							dict_template["mod_information"]["brief"] = String(manifest_data["mod_information"].get("brief",""))
+							dict_template["mod_information"]["author"] = String(manifest_data["mod_information"].get("author","Unknown"))
+							dict_template["mod_information"]["credits"] = PoolStringArray(manifest_data["mod_information"].get("credits",[]))
+						
+						if "version" in manifest_data.keys():
+							dict_template["version"]["version_major"] = int(manifest_data["version"].get("version_major",1))
+							dict_template["version"]["version_minor"] = int(manifest_data["version"].get("version_minor",0))
+							dict_template["version"]["version_bugfix"] = int(manifest_data["version"].get("version_bugfix",0))
+							dict_template["version"]["version_metadata"] = String(manifest_data["version"].get("version_metadata",""))
+						
+						if "manifest_definitions" in manifest_data.keys():
+							dict_template["manifest_definitions"]["manifest_version"] = float(manifest_data["manifest_definitions"].get("manifest_version",manifest_version))
+							dict_template["manifest_definitions"]["dependancy_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("dependancy_mod_ids",[]))
+							dict_template["manifest_definitions"]["conflicting_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("conflicting_mod_ids",[]))
+							dict_template["manifest_definitions"]["complementary_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("complementary_mod_ids",[]))
+							dict_template["manifest_definitions"]["manifest_url"] = String(manifest_data["manifest_definitions"].get("manifest_url",""))
+							dict_template["manifest_definitions"]["changelog_path"] = String(manifest_data["manifest_definitions"].get("changelog_path",""))
+						
+						if "links" in manifest_data.keys():
+							var links = manifest_data["links"]
+							for link in links:
+								dict_template["links"].merge({link:links.get(link)})
+						if "tags" in manifest_data.keys():
+							var tags = manifest_data["tags"]
+							for tag in tags:
+								dict_template["tags"].merge({tag:tags.get(tag)})
+						if "languages" in manifest_data.keys():
+							var languages = manifest_data["languages"]
+							for language in languages:
+								dict_template["languages"].merge({language:languages.get(language)})
+						else:
+							dict_template["languages"].merge({"en":"100%"})
+						if "library" in manifest_data.keys():
+							dict_template["library"]["is_library"] = manifest_data["library"].get("is_library",false)
+							dict_template["library"]["always_display"] = manifest_data["library"].get("always_display",false)
+							
+						if "configs" in manifest_data.keys():
+							var configs = manifest_data["configs"]
+							dict_template["configs"].merge(configs)
+						
+						
+				var version_metadata = dict_template["version"]["version_metadata"]
+				var version_string = str(dict_template["version"]["version_major"]) + "." + str(dict_template["version"]["version_minor"]) + "." + str(dict_template["version"]["version_bugfix"])
+				if not version_metadata == "":
+					version_string = version_string + "-" + version_metadata
+				dict_template["version"]["version_string"] = version_string
+				
+				out = dict_template
+			out = manifest_data
+			cached_manifests[cachevar] = out.duplicate(true)
+			return out
 	
 	func __get_mod_by_id(id:String, case_sensitive: bool = true) -> Dictionary:
-		var data = self.__get_mod_data(true)
-		var mods = data["mods"]
+		var mods = {}
+		if not cached_mod_list.empty():
+			mods = cached_mod_list["mods"]
+		else:
+			var data = __get_mod_data()
+			mods = data["mods"]
 		for mod in mods:
 			var ID = ""
 			var moddata = mods.get(mod)
@@ -2522,13 +2585,13 @@ class _ManifestV2:
 			for file in content:
 				if file.to_lower() == "mod.manifest":
 					has_mod_manifest = true
-					var manifest_data = self.__parse_file_as_manifest(folder_path + file, true)
+					var manifest_data = __parse_file_as_manifest(folder_path + file, true)
 					var mod_id = manifest_data["mod_information"]["id"]
 					var manifest_version = manifest_data["manifest_definitions"]["manifest_version"]
 					if mod_id:
 						if manifest_version >= 2.1:
 							var tag_data = manifest_data["tags"]
-							var p = self.__parse_tags(tag_data)
+							var p = __parse_tags(tag_data)
 							for entry in p:
 								if not entry in tag_dict:
 									tag_dict.merge({entry:{}})
@@ -2620,17 +2683,17 @@ class _ManifestV2:
 			for file in content:
 				if file.to_lower() == "mod.manifest":
 					has_mod_manifest = true
-					var manifest_data = self.__parse_file_as_manifest(folder_path + file, true)
+					var manifest_data = __parse_file_as_manifest(folder_path + file, true)
 					var this_mod_id = manifest_data["mod_information"]["id"]
 					if this_mod_id == mod_id:
 						var manifest_version = manifest_data["manifest_definitions"]["manifest_version"]
 						if manifest_version >= 2.1:
 							var tag_data = manifest_data["tags"]
-							return self.__parse_tags(tag_data)
+							return __parse_tags(tag_data)
 		return tag_dict
 	
 	func __get_mods_from_tag(tag_name: String) -> Array:
-		var alldata = self.__get_tags()
+		var alldata = __get_tags()
 		var data = alldata.get(tag_name,{})
 		var keys = data.keys()
 		if keys.size() >=1:
@@ -2638,7 +2701,7 @@ class _ManifestV2:
 		return []
 	
 	func __get_mods_and_tags_from_tag(tag_name: String) -> Dictionary:
-		var alldata = self.__get_tags()
+		var alldata = __get_tags()
 		var data = alldata.get(tag_name,{})
 		var ex_data = {}
 		var keys = data.keys()
@@ -2663,7 +2726,11 @@ class _ManifestV2:
 		return ex_data
 	
 	func __get_manifest_section(section: String, mod_id: String = "") -> Dictionary:
-		var mod_data = self.__get_mod_data(true)["mods"]
+		var mod_data = {}
+		if not cached_mod_list.empty():
+			mod_data = cached_mod_list["mods"]
+		else:
+			mod_data = __get_mod_data()["mods"]
 		var mode = "all"
 		var return_data = {}
 		if mod_id != "":
@@ -2677,7 +2744,7 @@ class _ManifestV2:
 					
 			"specific":
 				for mod in mod_data:
-					if mod_id in self.__get_mod_ids():
+					if mod_id in __get_mod_ids():
 						var manifest = mod_data[mod]["manifest"]["manifest_data"]
 						if "mod_information" in manifest.keys():
 							if mod_id in manifest["mod_information"]["id"]:
@@ -2687,7 +2754,11 @@ class _ManifestV2:
 		return return_data
 	
 	func __get_mod_ids() -> Array:
-		var mod_data = self.__get_mod_data(true)["mods"]
+		var mod_data = {}
+		if not cached_mod_list.empty():
+			mod_data = cached_mod_list["mods"]
+		else:
+			mod_data = __get_mod_data()["mods"]
 		var returning = []
 		for mod in mod_data:
 			var data = mod_data[mod]["manifest"]["manifest_data"]
@@ -2698,7 +2769,11 @@ class _ManifestV2:
 		return returning
 	
 	func __get_manifest_entry(section: String, entry: String, mod_id: String = ""):
-		var mod_data = self.__get_mod_data(true)["mods"]
+		var mod_data = {}
+		if not cached_mod_list.empty():
+			mod_data = cached_mod_list["mods"]
+		else:
+			mod_data = __get_mod_data()["mods"]
 		var mode = "all"
 		var return_data = {}
 		if mod_id != "":
@@ -2712,7 +2787,7 @@ class _ManifestV2:
 					
 			"specific":
 				for mod in mod_data:
-					if mod_id in self.__get_mod_ids():
+					if mod_id in __get_mod_ids():
 						var manifest = mod_data[mod]["manifest"]["manifest_data"]
 						if "mod_information" in manifest.keys():
 							if mod_id in manifest["mod_information"]["id"]:
@@ -2739,8 +2814,12 @@ class _ManifestV2:
 		return {}
 	
 	func __check_complementary():
-		var mods = self.__get_mod_ids()
-		var tags = self.__get_manifest_entry("manifest_definitions","complementary_mod_ids")
+		var mods = {}
+		if not cached_mod_list.empty():
+			mods = cached_mod_list["mods"]
+		else:
+			mods = __get_mod_data()["mods"]
+		var tags = __get_manifest_entry("manifest_definitions","complementary_mod_ids")
 		var complimentaries = {}
 		for mod in tags:
 			var keys = tags[mod]
@@ -2754,8 +2833,12 @@ class _ManifestV2:
 		return complimentaries
 	
 	func __check_mod_complementary(mod_id):
-		var mods = self.__get_mod_ids()
-		var tags = self.__get_manifest_entry("manifest_definitions","complementary_mod_ids",mod_id)
+		var mods = {}
+		if not cached_mod_list.empty():
+			mods = cached_mod_list["mods"]
+		else:
+			mods = __get_mod_data()["mods"]
+		var tags = __get_manifest_entry("manifest_definitions","complementary_mod_ids",mod_id)
 		var complimentaries = []
 		for mod in tags:
 			if mod in mods:
@@ -2763,8 +2846,8 @@ class _ManifestV2:
 		return complimentaries
 	
 	func __check_dependancies():
-		var mods = self.__get_mod_ids()
-		var tags = self.__get_manifest_entry("manifest_definitions","dependancy_mod_ids")
+		var mods = __get_mod_ids()
+		var tags = __get_manifest_entry("manifest_definitions","dependancy_mod_ids")
 		var complimentaries = {}
 		for mod in tags:
 			var keys = tags[mod]
@@ -2780,8 +2863,8 @@ class _ManifestV2:
 		return complimentaries
 	
 	func __check_mod_dependancies(mod_id):
-		var mods = self.__get_mod_ids()
-		var tags = self.__get_manifest_entry("manifest_definitions","dependancy_mod_ids",mod_id)
+		var mods = __get_mod_ids()
+		var tags = __get_manifest_entry("manifest_definitions","dependancy_mod_ids",mod_id)
 		var complimentaries = []
 		for mod in tags:
 			if mod in mods:
@@ -2791,8 +2874,8 @@ class _ManifestV2:
 		return complimentaries
 	
 	func __check_conflicts():
-		var mods = self.__get_mod_ids()
-		var tags = self.__get_manifest_entry("manifest_definitions","conflicting_mod_ids")
+		var mods = __get_mod_ids()
+		var tags = __get_manifest_entry("manifest_definitions","conflicting_mod_ids")
 		var complimentaries = {}
 		for mod in tags:
 			var keys = tags[mod]
@@ -2806,8 +2889,8 @@ class _ManifestV2:
 		return complimentaries
 	
 	func __check_mod_conflicts(mod_id):
-		var mods = self.__get_mod_ids()
-		var tags = self.__get_manifest_entry("manifest_definitions","conflicting_mod_ids",mod_id)
+		var mods = __get_mod_ids()
+		var tags = __get_manifest_entry("manifest_definitions","conflicting_mod_ids",mod_id)
 		var complimentaries = []
 		for mod in tags:
 			if mod in mods:
@@ -2845,7 +2928,7 @@ class _ManifestV2:
 			folder = folder + "/"
 		if last_seen_file.begins_with("/"):
 			last_seen_file.lstrip("/")
-		var all_mods = self.__get_mod_data()["mods"]
+		var all_mods = __get_mod_data()["mods"]
 		FolderAccess.__check_folder_exists(folder)
 		if not file.file_exists(folder + last_seen_file):
 			file.open(folder + last_seen_file,File.WRITE)
@@ -2885,7 +2968,11 @@ class _ManifestV2:
 	
 	func __get_mod_versions(store = false,folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",last_seen_file = "mods_from_last_launch.json",this_seen_file = "mods_from_this_launch.json") -> Dictionary:
 		var mods = {}
-		var all_mods = self.__get_mod_data()["mods"]
+		var all_mods = {}
+		if not cached_mod_list.empty():
+			all_mods = cached_mod_list["mods"]
+		else:
+			all_mods = __get_mod_data()["mods"]
 		for mod in all_mods:
 			var data = all_mods[mod]
 			if data["manifest"]["has_manifest"] and data["manifest"]["manifest_version"] >= 2.0:
@@ -3319,8 +3406,8 @@ class _Translations:
 				var delim = file_paths[file]
 				match typeof(delim):
 					TYPE_STRING:
-						var dict = self.__translation_file_to_dictionary(file,delim)
-						self.__updateTL_from_dictionary(dict,fullLogging)
+						var dict = __translation_file_to_dictionary(file,delim)
+						__updateTL_from_dictionary(dict,fullLogging)
 					TYPE_DICTIONARY:
 						var string = delim.get("string","")
 						var mod = delim.get("mod","")
@@ -3334,8 +3421,8 @@ class _Translations:
 						if invert:
 							do = !do
 						if do and string != "":
-							var dict = self.__translation_file_to_dictionary(file,string)
-							self.__updateTL_from_dictionary(dict,fullLogging)
+							var dict = __translation_file_to_dictionary(file,string)
+							__updateTL_from_dictionary(dict,fullLogging)
 						
 			path.erase("file")
 		for lang in path.keys():

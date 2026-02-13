@@ -2,7 +2,8 @@ extends Node
 
 var developer_hint = {
 	"__get_mod_data":[
-		"Returns a dictionary containing info on all mods currently installed"
+		"Returns a dictionary containing info on all mods currently installed",
+		"print_json -> (optional) bool for whether the returned data is a JSON-formatted string. Defaults to false"
 	],
 	"__match_mod_path_to_zip":[
 		"Matches a mod zip file to the provided mod main path. Will pick the first zip found, if multiple zips contain the same mod.",
@@ -124,8 +125,8 @@ const FileAccess = preload("res://HevLib/pointers/FileAccess.gd")
 const DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 
 const gmd = preload("res://HevLib/scripts/manifest_v2/get_mod_data.gd")
-static func __get_mod_data(format_to_manifest_version:bool = false, print_json: bool = false) -> Dictionary:
-	var s = gmd.get_mod_data(format_to_manifest_version,print_json,FolderAccess,DataFormat)
+static func __get_mod_data(print_json: bool = false) -> Dictionary:
+	var s = gmd.get_mod_data(print_json,FolderAccess,DataFormat)
 	return s
 const mmptz = preload("res://HevLib/scripts/manifest_v2/match_mod_path_to_zip.gd")
 static func __match_mod_path_to_zip(mod_main_path:String) -> String:
