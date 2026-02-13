@@ -9,16 +9,25 @@ var available = false
 var accurate_event_counter = false
 var visibility = false
 
+var pointers
+
+
+func updateValues():
+	if pointers:
+		visibility = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_position_data_debugger")
 #const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 func _ready():
+	yield(get_tree(),"idle_frame")
 	image = map.get_data()
 	size = image.get_size()
+	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+	pointers.ConfigDriver.__establish_connection("updateValues",self)
 	
+	updateValues()
 	accurate_event_counter = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_position_accurate_events")
 	if accurate_event_counter:
 		Debug.l("HevLib: EventDriver\n\n\n\n###############################################################################################################################################################################\n\nWARNING! HevLib setting 'ring_position_accurate_events' is enabled. Due to the way this setting works, it will decrease performance by a significant enough amount, and will generate thousands of logs per minute.\n\nUSE OF THIS SETTING IS COMPLETELY UNSUPPORTED AND WILL INVALIDATE ALL BUG REPORTS! YOU HAVE BEEN WARNED!\n\n###############################################################################################################################################################################\n\n\n\n")
-	visibility = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_position_data_debugger")
+	
 	visible = visibility
 	
 func _input(event):

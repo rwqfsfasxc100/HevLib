@@ -114,6 +114,8 @@ var f = File.new()
 func _ready():
 	l("Readying")
 	
+	
+	
 	var zip_ref_store = "user://cache/.HevLib_Cache/zip_ref_store.json"
 	f.open(zip_ref_store,File.WRITE)
 	f.store_string("{}")
