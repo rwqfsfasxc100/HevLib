@@ -43,6 +43,7 @@ var pointers = preload("res://HevLib/pointers.gd").new()
 func _init(modLoader = ModLoader):
 	l("Initializing Equipment Driver")
 	
+	pointers.ConfigDriver.__load_configs()
 	var injector = load("res://HevLib/scripts/translations/inject_translations.gd")
 	injector.inject_translations(pointers)
 	
@@ -113,7 +114,6 @@ var f = File.new()
 func _ready():
 	l("Readying")
 	
-	pointers.ConfigDriver.__load_configs()
 	var zip_ref_store = "user://cache/.HevLib_Cache/zip_ref_store.json"
 	f.open(zip_ref_store,File.WRITE)
 	f.store_string("{}")

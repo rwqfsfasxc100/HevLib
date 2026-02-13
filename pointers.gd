@@ -143,7 +143,7 @@ class _ConfigDriver:
 			cfg_dictionary.merge({section:data})
 		return cfg_dictionary
 	
-	func __store_config(configuration: Dictionary, mod_id: String, cfg_filename : String = "Mod_Configurations" + ".cfg",DataFormat = null):
+	func __store_config(configuration: Dictionary, mod_id: String, cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var profiles_dir = "user://cfg/.profiles/"
 		var cfg_folder = "user://cfg/"
 		mod_id = DataFormat.__array_to_string(mod_id.split("/"))
@@ -162,16 +162,27 @@ class _ConfigDriver:
 		FileCFG.close()
 		var cfg_sections = cfg.get_sections()
 		var sections = configuration.keys()
+		
 		for section in sections:
 			var sect_name = mod_id + "/" + section
 			var sect_data = configuration[section]
+			
+			if not sect_name in settings:
+				settings[sect_name] = {}
+			
 			for s in sect_data:
 				var sr = sect_data[s]
+				settings[sect_name][s] = sr
+				
 				cfg.set_value(sect_name,s,sr)
+		
+		
 		
 		var profile = cfg.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","default")
 		cfg.save(cfg_file)
 		cfg.save(profiles_dir+profile + ".cfg")
+		
+		__change_made()
 		Loader.saved()
 	
 	func __store_value(mod_id, section, key, value, cfg_filename : String = "Mod_Configurations" + ".cfg"):
@@ -186,51 +197,76 @@ class _ConfigDriver:
 		cfg.set_value(modSection,key,value)
 		var profile = cfg.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","default")
 		
+		if not modSection in settings:
+			settings[modSection] = {}
+		settings[modSection][key] = value
+		
 		cfg.save(cfg_folder+cfg_filename)
 		cfg.save(profiles_dir+profile + ".cfg")
+		
+		__change_made()
 		Loader.saved()
 	
 	func __get_config(mod_id, cfg_filename : String = "Mod_Configurations" + ".cfg") -> Dictionary:
 		mod_id = DataFormat.__array_to_string(mod_id.split("/"))
 		mod_id = DataFormat.__array_to_string(mod_id.split(" "))
 		var cfg_folder = "user://cfg/"
-		var cfg = ConfigFile.new()
-		var error = cfg.load(cfg_folder+cfg_filename)
-		if error != OK:
-			return {}
 		var dictionary = {}
-		var config_sections = cfg.get_sections()
-		for section in config_sections:
-			var split = section.split("/")
-			if split[0] == mod_id:
-				var sub = {}
-				var keys = cfg.get_section_keys(section)
-				for key in keys:
-					var value = cfg.get_value(section, key)
-					sub.merge({key:value})
-				dictionary.merge({split[1]:sub})
+		
+		if settingsHash:
+			for section in settings.keys():
+				var split = section.split("/")
+				if split[0] == mod_id:
+					var sub = {}
+					for key in settings[section]:
+						sub.merge({key:settings[section].duplicate(true)[key]})
+					dictionary.merge({split[1]:sub})
+		else:
+			var cfg = ConfigFile.new()
+			var error = cfg.load(cfg_folder+cfg_filename)
+			if error != OK:
+				return {}
+			var config_sections = cfg.get_sections()
+			for section in config_sections:
+				var split = section.split("/")
+				if split[0] == mod_id:
+					var sub = {}
+					var keys = cfg.get_section_keys(section)
+					for key in keys:
+						var value = cfg.get_value(section, key)
+						sub.merge({key:value})
+					dictionary.merge({split[1]:sub})
 		return dictionary
 	
 	func __get_value(mod_id: String, section: String, key: String, cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		mod_id = DataFormat.__array_to_string(mod_id.split("/"))
 		mod_id = DataFormat.__array_to_string(mod_id.split(" "))
+		section = DataFormat.__array_to_string(section.split("/"))
 		var cfg_folder = "user://cfg/"
-		
-		var cfg = ConfigFile.new()
-		var error = cfg.load(cfg_folder+cfg_filename)
-		if error != OK:
-	#		Debug.l("HevLib Config File: Error loading settings %s" % error)
-			return {}
 		var full = mod_id+"/"+section
-		if cfg.has_section(full):
-			var keys = cfg.get_section_keys(full)
-			if key in keys:
-				var data = cfg.get_value(full,key)
-				return data
+		
+		if settingsHash:
+			if full in settings:
+				if key in settings[full]:
+					return settings[full].duplicate(true)[key]
+				return null
+			return null
+		else:
+			var cfg = ConfigFile.new()
+			var error = cfg.load(cfg_folder+cfg_filename)
+			if error != OK:
+		#		Debug.l("HevLib Config File: Error loading settings %s" % error)
+				return null
+			
+			if cfg.has_section(full):
+				var keys = cfg.get_section_keys(full)
+				if key in keys:
+					var data = cfg.get_value(full,key)
+					return data
+				else:
+					return null
 			else:
 				return null
-		else:
-			return null
 	
 	func __load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var dir = Directory.new()
@@ -318,6 +354,8 @@ class _ConfigDriver:
 		for section in current_config:
 			for key in current_config[section]:
 				c.set_value(section,key,current_config[section][key])
+		settings = current_config.duplicate(true)
+		settingsHash = settings.hash()
 		c.save(cfg_file)
 		c.save(profiles_dir + current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",{}).get("profile_name","Default") + ".cfg")
 		for mod in configs:
