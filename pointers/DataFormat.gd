@@ -105,3 +105,7 @@ const ts = preload("res://HevLib/scripts/trim_scripts.gd")
 static func __trim_scripts(file_path: String) -> Array:
 	var s = ts.trim_scripts(file_path)
 	return s
+const gsvwl = preload("res://HevLib/scripts/get_script_variables_without_load.gd")
+static func __get_script_variables_without_load(script_path : String) -> Dictionary:
+	var s = gsvwl.get_script_variables_without_load(script_path,ts)
+	return s
