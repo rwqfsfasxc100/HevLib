@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://HevLib/scenes/development_tools/CargoBayCoverageVisual.gd" type="Script" id=1]
+
+[node name="CargoBayCoverageVisual" type="CanvasLayer"]
+layer = 128
+script = ExtResource( 1 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_top = 19.0
+margin_right = 40.0
+margin_bottom = 59.0
+color = Color( 1, 1, 1, 0.498039 )
+
+[node name="Offset" type="Node2D" parent="."]
+position = Vector2( -130, -282 )
+
+[node name="ReferenceRect" type="ReferenceRect" parent="Offset"]
+margin_left = -130.0
+margin_top = -282.0
+margin_right = 130.0
+margin_bottom = -52.0
+rect_min_size = Vector2( 98, 198 )
+border_width = 5.0
+editor_only = false
