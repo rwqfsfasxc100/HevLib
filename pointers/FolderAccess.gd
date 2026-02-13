@@ -78,3 +78,21 @@ static func __get_folder_structure(folder,store_file_content = false):
 				file.close()
 			folder_structure.merge({object:fd})
 	return folder_structure
+
+static func __get_modmain_files() -> Array:
+	var structure = __get_folder_structure("res://")
+	var dvs = siftFolderStructure(structure)
+	return dvs
+
+
+static func siftFolderStructure(structure:Dictionary,path:String = "res://"):
+	var out = []
+	for i in structure:
+		if i.ends_with("/"):
+			out.append_array(siftFolderStructure(structure[i],path + i))
+		else:
+			var f = i.to_lower()
+			if f.begins_with("modmain") and f.ends_with(".gd"):
+				out.append(path + i)
+	return out
+
