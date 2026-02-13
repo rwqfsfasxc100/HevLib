@@ -5,10 +5,11 @@ var path = ""
 const header_label = preload("res://HevLib/ui/mod_menu/changelogs/labels/version_label.tscn")
 const entry_label = preload("res://HevLib/ui/mod_menu/changelogs/labels/changelog_entry.tscn")
 onready var linecontainer = $ScrollContainer/VBoxContainer
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+var pointers
 export (String,"singular","dynamic") var operation = "singular"
 
 func _ready():
+	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	if operation == "singular" and path != "":
 		rect_size = get_parent().rect_size
 		linecontainer.rect_min_size = rect_size - Vector2(0,6)
