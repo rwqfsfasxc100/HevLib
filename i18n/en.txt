@@ -471,3 +471,7 @@ HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_DOWN_TOOLTIP|Keybind used to decrease th
 HEVLIB_NO_DOWNLOAD_HEADER|NO PROVIDED LINK!
 
 HEVLIB_NO_DOWNLOAD_CONTENT|NOTICE: mod [%s] has no valid download link provided, and has not been downloaded. \n\nPlease refer to the source of this mod for any updates, and please inform the mod's author.
+
+HEVLIB_SAVEOPT_FIX_CORRUPTED_CARGO|Fix corrupted cargo crash
+
+HEVLIB_SAVEOPT_FIX_CORRUPTED_CARGO_TOOLTIP|Use this to fix a save if it does not load due to having brought back invalid cargo during the previous dive. \n\nTelltale signs of this would be the second to last line of the engine_log.txt file showing: \n'ERROR: No loader found for resource: res://.' after crashing on return from the rings / loading the save.
