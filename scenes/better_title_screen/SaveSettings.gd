@@ -56,19 +56,31 @@ var connections = {
 	"GENERIC":[]
 }
 
+var tt_label = preload("res://menu/sfx/PlaySoundsOnTheseButtons.tscn")
 var menu_folder = "user://cache/.HevLib_Cache/MenuDriver/"
 var save_menu_file = menu_folder + "save_buttons.json"
 func create():
+	var buttons = [{
+		"display_name":"CONFIRM_OVERRIDE_GAME",
+		"popup_path":null,
+		"popup_override":"POPUP_ROOT", # "POPUP_ROOT" for menu root node, "SAVE_BUTTON" for obv save button
+		"connect_method":"_on_DELETE_SAVE_pressed",
+		"enable_on_save":true,
+	}]
 	var file = File.new()
 	file.open(save_menu_file,File.READ)
-	var buttons = JSON.parse(file.get_as_text(true)).result
+	buttons.append_array(JSON.parse(file.get_as_text(true)).result)
 	file.close()
 #	breakpoint
 	for button in buttons:
 		var BUTTON = Button.new()
 		var displayname = button.get("display_name","MISSING_BUTTON_NAME")
+		var tooltip = button.get("tooltip","")
 		BUTTON.name = displayname
 		BUTTON.text = displayname
+		if tooltip:
+			BUTTON.hint_tooltip = tooltip
+			BUTTON.add_child(tt_label.instance())
 		var popup_path = button.get("popup_path")
 		var method = button.get("connect_method","_on_save_option_button_pressed")
 		if popup_path == "" or popup_path == null:
