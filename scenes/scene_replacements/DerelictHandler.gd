@@ -113,7 +113,7 @@ func makeAt(pos):
 		"derelict":
 			var velocity = Vector2(randf() - 0.5, randf() - 0.5).normalized() * pow(randf(), gauss) * maxLinear
 			
-			var wreckage = Shipyard.createShipBuildByName(model, "helpless", randf() > (1 - stock_chance))
+			var wreckage = Shipyard.createShipBuildByName(model, "helpless", randf() > clamp((1 - stock_chance),0,1))
 			wreckage.angular_velocity = (grandf()) * maxAngular
 			wreckage.linear_velocity = velocity
 			wreckage.setReactorState(false)
