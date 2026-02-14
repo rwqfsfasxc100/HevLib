@@ -59,7 +59,7 @@ func is_updating(how):
 		total_bytes = 0
 
 func _handle_downloaded_percent():
-	if nodeToReturnTo and nodeToReturnTo.has_method("_get_github_progress"):
+	if nodeToReturnTo.has_method("_get_github_progress"):
 		if total_bytes > 0:
 			nodeToReturnTo._get_github_progress("HEVLIB_GITHUB_PROGRESS_DOWNLOADING",percent,bytes_downloaded,total_bytes)
 		else:

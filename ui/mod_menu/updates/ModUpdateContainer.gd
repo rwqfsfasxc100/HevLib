@@ -151,9 +151,12 @@ func _get_github_progress(response:String,percent:float,bytes_downloaded:int,tot
 			txt = TranslationServer.translate(response) % [c,TranslationServer.translate(c_label)]
 	if txt != "":
 		download_text = txt
-
+var prev_dt = ""
 func _process(delta):
-	if frameCounter > 10:
-		download_text = ""
-	manager.download_status = download_text
-	frameCounter += delta
+	if is_visible_in_tree():
+		if frameCounter > 10:
+			download_text = ""
+		if download_text != prev_dt:
+			manager.download_status = download_text
+			prev_dt = download_text
+		frameCounter += delta
