@@ -20,7 +20,7 @@ func _init(modLoader = ModLoader):
 	l("Initializing DLC")
 	loadDLC()
 	installScriptExtension("events/TheRing.gd")
-	installScriptExtension("scenes/notification_driver/CurrentGame.gd")
+	replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
 	replaceScene("scenes/notification_driver/Notifications.tscn","res://achievement/Notifications.tscn")
 	installScriptExtension("scripts/transit_tips/TransitTip.gd")
 	var self_path = self.get_script().get_path()
@@ -142,6 +142,7 @@ func _ready():
 #	var mouse = load("res://HevLib/scenes/scene_replacements/MouseLayer.tscn").instance()
 	var CRoot = get_tree().get_root()
 #	CRoot.call_deferred("add_child",mouse)
+	
 	
 	
 	replaceScene("scenes/scene_replacements/Game.tscn", "res://Game.tscn")

@@ -34,6 +34,8 @@ var currentgame_path = "user://cache/.HevLib_Cache/Minerals/CurrentGame.gd"
 var thering_path = "user://cache/.HevLib_Cache/Minerals/TheRing.gd"
 var ringscene_path = "user://cache/.HevLib_Cache/Minerals/TheRing.tscn"
 
+var ship_driver_path = "user://cache/.HevLib_Cache/ShipDriver/"
+
 #var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 #var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 #var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
@@ -49,15 +51,38 @@ func _init(modLoader = ModLoader):
 	
 #	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 	var d = Directory.new()
-	if d.dir_exists("user://cache/.HevLib_Cache"):
-		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache")
-	d.make_dir_recursive("user://cache/.HevLib_Cache")
+	var cache_dir = "user://cache/.HevLib_Cache"
+	if d.dir_exists(cache_dir):
+		pointers.FolderAccess.__recursive_delete(cache_dir)
+	d.make_dir_recursive(ship_driver_path)
 	var ml = MainLoop.new()
 	ml.set_script(load("res://HevLib/scripts/crash_handler.gd"))
 	_savedObjects.append(ml)
 	
 	
+	var drivers = pointers.DriverManagement.__get_drivers()
+	var ship_driver = {}
+	var register_driver = {}
 	
+	for mod in drivers:
+		var data = mod["drivers"]
+		var id = mod.get("id",null)
+		if id:
+			if "ADD_SHIPS.gd" in data:
+				var driver = data["ADD_SHIPS.gd"]
+				ship_driver[id] = driver
+			if "REGISTER_SHIP_NUMERICS.gd" in data:
+				var driver = data["REGISTER_SHIP_NUMERICS.gd"]
+				register_driver[id] = driver
+	f.open(ship_driver_path + "driver_data.json",File.WRITE)
+	f.store_string(JSON.print(ship_driver))
+	f.close()
+	
+	f.open(ship_driver_path + "register_data.json",File.WRITE)
+	f.store_string(JSON.print(register_driver))
+	f.close()
+	
+	installScriptExtension("../notification_driver/CurrentGame.gd")
 	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk"):
 		installScriptExtension("../minerals/multiminerals/mineral.gd")
 		installScriptExtension("../minerals/multiminerals/MineralProcessingUnit.gd")

@@ -1,5 +1,49 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
+[ext_resource path="res://HevLib/scenes/scene_replacements/DerelictHandler.gd" type="Script" id=1]
 [ext_resource path="res://story/TheRing.tscn" type="PackedScene" id=2]
 
 [node name="TheRing" instance=ExtResource( 2 )]
+
+[node name="DerelictHandler1" type="Node" parent="." index="97"]
+script = ExtResource( 1 )
+
+[node name="DerelictHandler2" type="Node" parent="." index="98"]
+script = ExtResource( 1 )
+index = 2
+
+[node name="DerelictHandler3" type="Node" parent="." index="99"]
+script = ExtResource( 1 )
+index = 3
+
+[node name="DerelictHandler4" type="Node" parent="." index="100"]
+script = ExtResource( 1 )
+index = 4
+
+[node name="DerelictHandler5" type="Node" parent="." index="101"]
+script = ExtResource( 1 )
+index = 5
+
+[node name="MinerHandler1" type="Node" parent="." index="102"]
+script = ExtResource( 1 )
+mode = "miner"
+
+[node name="MinerHandler2" type="Node" parent="." index="103"]
+script = ExtResource( 1 )
+index = 2
+mode = "miner"
+
+[node name="MinerHandler3" type="Node" parent="." index="104"]
+script = ExtResource( 1 )
+index = 3
+mode = "miner"
+
+[node name="MinerHandler4" type="Node" parent="." index="105"]
+script = ExtResource( 1 )
+index = 4
+mode = "miner"
+
+[node name="MinerHandler5" type="Node" parent="." index="106"]
+script = ExtResource( 1 )
+index = 5
+mode = "miner"
