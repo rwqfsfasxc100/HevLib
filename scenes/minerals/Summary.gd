@@ -24,4 +24,10 @@ func loadOutput(outputData, processed = {}, rem = {}) -> bool:
 		vb.remove_child(byShipNode)
 		vb2.add_child(byShipNode)
 		current_scroll.share(new_scroll_bar)
+		sizeUp(new_scroll_bar,current_scroll)
 	return has
+
+func sizeUp(scroll,current_scroll):
+	yield(get_tree(),"idle_frame")
+	scroll.visible = current_scroll.visible
+	pass
