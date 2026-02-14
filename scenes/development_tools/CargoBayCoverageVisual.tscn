@@ -12,6 +12,9 @@ onready var set = $Center/Offset
 export var editor_only = true
 var count = 0
 var colorswap = false
+func _init():
+	visible = (Engine.is_editor_hint() or not editor_only)
+
 func _physics_process(delta):
 	if Engine.is_editor_hint() or not editor_only:
 		count += 1
@@ -60,7 +63,7 @@ script = SubResource( 1 )
 margin_top = 19.0
 margin_right = 40.0
 margin_bottom = 59.0
-color = Color( 1, 1, 0.8, 0.498039 )
+color = Color( 1, 1, 0.7, 0.498039 )
 
 [node name="Offset" type="Node2D" parent="Center"]
 
