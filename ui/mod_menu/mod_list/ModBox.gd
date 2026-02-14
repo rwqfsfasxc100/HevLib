@@ -29,10 +29,8 @@ var MAX_SIZE = Vector2(0,0)
 var information_nodes = {}
 
 #var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+var pointers
 var file = File.new()
-
-onready var all_tags = pointers.ManifestV2.__get_tags()
 
 
 var conflicts = []
@@ -491,7 +489,9 @@ func _process(_delta):
 		if manifestData:
 			id_against = manifestData["mod_information"]["id"].to_upper()
 		var current_selection = filter_button.keys_pressed
-		
+		if pointers == null:
+			getPointers()
+			
 		if all_tags:
 			file.open(cache_folder + filter_cache_file,File.READ)
 			var filter_data = JSON.parse(file.get_as_text()).result
@@ -549,3 +549,8 @@ func handle_sub_mods():
 				panel.get_node("ModButton/VBoxContainer").rect_size.x = panel.get_node("ModButton").rect_size.x - 4
 #				breakpoint
 	
+var all_tags
+func getPointers():
+	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+	all_tags = pointers.ManifestV2.__get_tags()
+	pass

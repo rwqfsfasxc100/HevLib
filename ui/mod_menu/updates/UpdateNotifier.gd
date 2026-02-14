@@ -11,7 +11,9 @@ func _ready():
 	file.open(update_store,File.READ)
 	var updates = JSON.parse(file.get_as_text()).result
 	file.close()
-	
+	if pointers == null:
+		yield(get_tree(),"idle_frame")
+		pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	var currently_ignored = pointers.ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
 	if currently_ignored == null:
 		currently_ignored = {}

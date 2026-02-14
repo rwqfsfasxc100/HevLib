@@ -1,6 +1,6 @@
 extends "res://tools/DLClist.gd"
 
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+var pointers
 #var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 #var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 func _ready():
@@ -13,6 +13,10 @@ func _ready():
 		add_child(make_label("HEVLIB_DLCLIST_MODS_HEADER"))
 		
 		pass
+	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+	if pointers == null:
+		yield(get_tree(),"idle_frame")
+		pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	var mods = pointers.ManifestV2.__get_mod_data()["mods"]
 	var labels = []
 	var names = []

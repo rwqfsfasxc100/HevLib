@@ -55,12 +55,15 @@ func _ready():
 	hint_tooltip = ""
 	foolish.hint_tooltip = ""
 	index = get_index()
+	yield(get_tree(),"idle_frame")
+	checkSave(true)
 
 func _physics_process(delta):
 	val = val + delta
 	if val >= 5.0:
 		val = 0.0
-		checkSave()
+		if is_visible_in_tree():
+			checkSave()
 #		breakpoint
 
 var standHash = 0
@@ -68,7 +71,7 @@ var standHash = 0
 var has_save = false
 
 var file = File.new()
-func checkSave():
+func checkSave(force = false):
 #	var mpm = getDataFromSave(saveSlotFile)
 	var does = false
 	
@@ -84,38 +87,37 @@ func checkSave():
 	else:
 		standHash = 0
 		has_save = false
-	if does:
+	if does or force:
 		if has_save:
 			meta = getMetaFromSave(saveSlotFile)
 			
-			if true:
-				var demoLimit = CurrentGame.getGameStartTime() + 24 * 3600 * 30 * 256
-				text = "%s %s" % [meta.transponder, meta.name]
-				if first_time:
-					if CurrentGame.oldestSave < meta.time:
-						CurrentGame.oldestSave = meta.time
-						if is_visible_in_tree():
-							grab_focus()
-				if false and (CurrentGame.isDemo() and meta.gameTime > demoLimit):
-					disabled = true
-					slot_available = false
-					delete_color = Color(1, 1, 1, 0.25)
-					hint_tooltip = "DEMO_UNLOCK"
-					newNode.hint_tooltip = "DEMO_UNLOCK"
-				else:
-					slot_available = true
-					delete_color = Color(1, 1, 1, 1)
-				var model_error = TranslationServer.translate("HEVLIB_INCORRECT_SHIP")
-				if meta.model in Shipyard.ships.keys():
-					$Foolish.visible = false
-					hint_tooltip = ""
-		#			foolish.hint_tooltip = ""
-					disabled = false
-				else:
-					$Foolish.visible = true
-					hint_tooltip = model_error % meta.model
-		#			foolish.hint_tooltip = model_error % meta.model
-					disabled = true
+			var demoLimit = CurrentGame.getGameStartTime() + 24 * 3600 * 30 * 256
+			text = "%s %s" % [meta.transponder, meta.name]
+			if first_time:
+				if CurrentGame.oldestSave < meta.time:
+					CurrentGame.oldestSave = meta.time
+					if is_visible_in_tree():
+						grab_focus()
+			if false and (CurrentGame.isDemo() and meta.gameTime > demoLimit):
+				disabled = true
+				slot_available = false
+				delete_color = Color(1, 1, 1, 0.25)
+				hint_tooltip = "DEMO_UNLOCK"
+				newNode.hint_tooltip = "DEMO_UNLOCK"
+			else:
+				slot_available = true
+				delete_color = Color(1, 1, 1, 1)
+			var model_error = TranslationServer.translate("HEVLIB_INCORRECT_SHIP")
+			if meta.model in Shipyard.ships.keys():
+				$Foolish.visible = false
+				hint_tooltip = ""
+	#			foolish.hint_tooltip = ""
+				disabled = false
+			else:
+				$Foolish.visible = true
+				hint_tooltip = model_error % meta.model
+	#			foolish.hint_tooltip = model_error % meta.model
+				disabled = true
 		else:
 			slot_available = false
 			delete_color = Color(1, 1, 1, 0.25)
