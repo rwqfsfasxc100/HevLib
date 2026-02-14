@@ -324,6 +324,7 @@ class _ConfigDriver:
 		
 		var f = ManifestV2.__get_mod_data()
 		var mod_entries = f["mods"]
+		Debug.l("ConfigDriver: [%s] mod entries found" % mod_entries.size())
 		var configs = {}
 		var current_config = __config_parse(cfg_file)
 		for mod in mod_entries:
@@ -336,6 +337,7 @@ class _ConfigDriver:
 					var cfg = manifest["manifest_data"]["configs"]
 					if not cfg.hash() == {}.hash():
 						configs.merge({mod_name:cfg})
+		Debug.l("ConfigDriver: config contains [%s] mods" % configs.size())
 		for mod in configs:
 			var data = configs[mod]
 			mod = DataFormat.__array_to_string(mod.split("/"))
@@ -375,14 +377,20 @@ class _ConfigDriver:
 		__change_made()
 		c.save(cfg_file)
 		c.save(profiles_dir + current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",{}).get("profile_name","Default") + ".cfg")
+		Debug.l("ConfigDriver: loaded [%s] mod configurations" % configs.size())
 		for mod in configs:
+			Debug.l("ConfigDriver: inspecting [%s]" % mod)
 			var data = __get_config(mod)
+			Debug.l("ConfigDriver: found [%s] sections" % data.size())
 			for section in configs[mod]:
+				Debug.l("ConfigDriver: inspecting section [%s]" % section)
 				var sectData = configs[mod][section]
 				for key in sectData:
 					var key_data = sectData[key]
+					Debug.l("ConfigDriver: found entry [%s] of type [%s] with a default of [%s]" % [key,key_data["type"],key_data.get("default","Null")])
+					var p = __get_value(mod,section,key)
+					Debug.l("ConfigDriver: value of [%s] is [%s]" % [key,p])
 					if key_data["type"].to_lower() == "input":
-						var p = __get_value(mod,section,key)
 						if p == null:
 							p = key_data["default"]
 						var addAction = true
@@ -390,16 +398,27 @@ class _ConfigDriver:
 							if m == key:
 								addAction = false
 						if addAction:
+							Debug.l("ConfigDriver: Adding input key [%s]" % key)
 							InputMap.add_action(key)
+						else:
+							Debug.l("ConfigDriver: Input key [%s] already exists, skipping" % key)
 						for i in p:
 							if i.begins_with("Mouse "):
 								var event = InputEventMouseButton.new()
 								event.button_index = int(i.split("Mouse ")[1])
-								InputMap.action_add_event(key, event)
+								if not InputMap.action_has_event(key,event):
+									Debug.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
+									InputMap.action_add_event(key, event)
+								else:
+									Debug.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
 							if i.begins_with("JoyButton "):
 								var event = InputEventJoypadButton.new()
 								event.button_index = int(i.split("JoyButton ")[1])
-								InputMap.action_add_event(key, event)
+								if not InputMap.action_has_event(key,event):
+									Debug.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
+									InputMap.action_add_event(key, event)
+								else:
+									Debug.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
 							if i.begins_with("JoyAxis "):
 								var event = InputEventJoypadMotion.new()
 								event.axis = abs(int(i.split("JoyAxis ")[1]))
@@ -407,13 +426,20 @@ class _ConfigDriver:
 									event.axis_value = -1.0
 								else:
 									event.axis_value = 1.0
-								InputMap.action_add_event(key, event)
+								if not InputMap.action_has_event(key,event):
+									Debug.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
+									InputMap.action_add_event(key, event)
+								else:
+									Debug.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
 								
 							else:
 								var event = InputEventKey.new()
 								event.scancode = OS.find_scancode_from_string(i)
-								InputMap.action_add_event(key, event)
-	
+								if not InputMap.action_has_event(key,event):
+									Debug.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
+									InputMap.action_add_event(key, event)
+								else:
+									Debug.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
 	
 	
 	func __set_button_focus(button,check_button):
@@ -800,87 +826,87 @@ class _DataFormat:
 		
 	const function_prefixes = ["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func "]
 	func __trim_scripts(file_path : String):
-		var file = File.new()
-		file.open(file_path,File.READ)
-		var data = file.get_as_text(true)
-		file.close()
-		var streaming = false
-		var this_stream : String = ""
 		var concat : String = ""
 		var const_names = []
 		var var_names = []
-		var lines = data.split("\n")
-		for line in lines:
-			var result : String = ""
-			var is_part_of_string = false
-			var prev_char_escape = false
-			while line != "":
-				var part:String = line.substr(0,1)
-				if part == "\\":
-					prev_char_escape = !prev_char_escape
-				else:
-					prev_char_escape = false
-				if part == "\"" and not prev_char_escape:
-					is_part_of_string = !is_part_of_string
-				if part == "#" and (not is_part_of_string and not prev_char_escape):
-					break
-				line.erase(0,1)
-				result += part
-			line = result
-			var has_prefix = false
-			for prefix in function_prefixes:
-				if line.begins_with(prefix):
-					has_prefix = true
-			if has_prefix:
+		var file = File.new()
+		if file.open(file_path,File.READ) == OK:
+			var data = file.get_as_text(true)
+			file.close()
+			var streaming = false
+			var this_stream : String = ""
+			var lines = data.split("\n")
+			for line in lines:
+				var result : String = ""
+				var is_part_of_string = false
+				var prev_char_escape = false
+				while line != "":
+					var part:String = line.substr(0,1)
+					if part == "\\":
+						prev_char_escape = !prev_char_escape
+					else:
+						prev_char_escape = false
+					if part == "\"" and not prev_char_escape:
+						is_part_of_string = !is_part_of_string
+					if part == "#" and (not is_part_of_string and not prev_char_escape):
+						break
+					line.erase(0,1)
+					result += part
+				line = result
+				var has_prefix = false
+				for prefix in function_prefixes:
+					if line.begins_with(prefix):
+						has_prefix = true
+				if has_prefix:
+					if streaming:
+						concat = concat + this_stream.strip_edges() + "\n"
+						this_stream = ""
+						streaming = false
+				elif line.begins_with("const "):
+					if streaming:
+						concat = concat + this_stream.strip_edges() + "\n"
+						this_stream = ""
+						streaming = false
+					var cname = line.split("=",false)[0].strip_edges().split("const ",true)[1].strip_edges().split(":",false)[0].strip_edges()
+					const_names.append(cname)
+					streaming = true
+				elif line.begins_with("var "):
+					if streaming:
+						concat = concat + this_stream.strip_edges() + "\n"
+						this_stream = ""
+						streaming = false
+					var vname = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
+					var_names.append(vname)
+					streaming = true
+				elif line.begins_with("export") and " var " in line:
+					if streaming:
+						concat = concat + this_stream.strip_edges() + "\n"
+						this_stream = ""
+						streaming = false
+					var vname = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
+					var_names.append(vname)
+					streaming = true
+				elif line.begins_with("onready") and " var " in line:
+					if streaming:
+						concat = concat + this_stream.strip_edges() + "\n"
+						this_stream = ""
+						streaming = false
+					var vname = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
+					var_names.append(vname)
+					streaming = true
+				elif line.begins_with("extends "):
+					if streaming:
+						concat = concat + this_stream.strip_edges() + "\n"
+						this_stream = ""
+						streaming = false
+					streaming = true
 				if streaming:
-					concat = concat + this_stream.strip_edges() + "\n"
-					this_stream = ""
-					streaming = false
-			elif line.begins_with("const "):
-				if streaming:
-					concat = concat + this_stream.strip_edges() + "\n"
-					this_stream = ""
-					streaming = false
-				var cname = line.split("=",false)[0].strip_edges().split("const ",true)[1].strip_edges().split(":",false)[0].strip_edges()
-				const_names.append(cname)
-				streaming = true
-			elif line.begins_with("var "):
-				if streaming:
-					concat = concat + this_stream.strip_edges() + "\n"
-					this_stream = ""
-					streaming = false
-				var vname = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
-				var_names.append(vname)
-				streaming = true
-			elif line.begins_with("export") and " var " in line:
-				if streaming:
-					concat = concat + this_stream.strip_edges() + "\n"
-					this_stream = ""
-					streaming = false
-				var vname = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
-				var_names.append(vname)
-				streaming = true
-			elif line.begins_with("onready") and " var " in line:
-				if streaming:
-					concat = concat + this_stream.strip_edges() + "\n"
-					this_stream = ""
-					streaming = false
-				var vname = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
-				var_names.append(vname)
-				streaming = true
-			elif line.begins_with("extends "):
-				if streaming:
-					concat = concat + this_stream.strip_edges() + "\n"
-					this_stream = ""
-					streaming = false
-				streaming = true
+					this_stream = this_stream + "\n" + line
 			if streaming:
-				this_stream = this_stream + "\n" + line
-		if streaming:
-			concat = concat + this_stream.strip_edges() + "\n"
-			this_stream = ""
-			streaming = false
-		return [concat,var_names,const_names]
+				concat = concat + this_stream.strip_edges() + "\n"
+				this_stream = ""
+				streaming = false
+		return [concat if concat !="" else "extends Node",var_names,const_names]
 		
 		
 
@@ -1978,6 +2004,7 @@ class _ManifestV2:
 			else:
 				return cached_mod_list.duplicate(true)
 		else:
+			Debug.l("ManifestV2: Fetching mods from file")
 			var mod_dictionary = {}
 			var manifest_count = 0
 			var library_count = 0
@@ -1989,6 +2016,7 @@ class _ManifestV2:
 			var modListArr = []
 			var is_onready = CurrentGame != null
 			if is_onready:
+				Debug.l("ManifestV2: is onready, getting mods from ModLoader children")
 				var mods = ModLoader.get_children()
 				for mod in mods:
 					var constants = mod.get_script().get_script_constant_map()
@@ -1996,12 +2024,14 @@ class _ManifestV2:
 					modListArr.append({"constants":constants,"script_path":script_path,"node":mod})
 			
 			else:
+				Debug.l("ManifestV2: is not onready, getting mods from filesystem")
 				var running_in_debugged = false
 				var debugged_defined_mods = []
 				
 				var ps = DataFormat.__get_script_constant_map_without_load("res://ModLoader.gd")
 				for item in ps:
 					if item == "is_debugged":
+						Debug.l("ManifestV2: running in debugged")
 						running_in_debugged = true
 						
 						var tfs = DataFormat.__get_script_variables_without_load("res://ModLoader.gd")
@@ -2010,16 +2040,20 @@ class _ManifestV2:
 				
 				
 				var folders = FolderAccess.__get_modmain_files()
+				Debug.l("ManifestV2: found [%s] modmain files" % folders.size())
 				for item in folders:
-					var has_mod = false
-					if item in debugged_defined_mods:
-						has_mod = true
-					else:
-						has_mod = false
+					var has_mod = true
+					if running_in_debugged:
+						if item in debugged_defined_mods:
+							has_mod = true
+						else:
+							has_mod = false
 					if has_mod:
+						Debug.l("ManifestV2: registering %s" % item)
 						var constants = DataFormat.__get_script_constant_map_without_load(item)
 						modListArr.append({"constants":constants,"script_path":item,"node":null})
 			total_mod_count = modListArr.size()
+			print("ManifestV2: solved [%s] modmain files" % total_mod_count)
 			modListArr.sort_custom(self,"sortModList")
 			for mod in modListArr:
 				
