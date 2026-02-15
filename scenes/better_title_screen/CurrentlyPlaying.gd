@@ -1,9 +1,7 @@
 extends "res://menu/CurrentlyPlaying.gd"
 
-#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
-
 func display():
-	var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+	var pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	if pointers == null:
 		yield(get_tree(),"idle_frame")
 		pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
