@@ -367,7 +367,7 @@ func _draw():
 	if manifestData:
 		brief = manifestData["mod_information"]["brief"]
 	button_brief.text = brief
-	
+	getPointers()
 	
 	
 	var showHidden = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_hidden_libraries")
