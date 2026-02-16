@@ -114,7 +114,7 @@ func _ready():
 	var vd = vdata.VANILLA
 	
 	var ver = pointers.DataFormat.__get_vanilla_version()
-	var verstr = str(ver[0]) + "." + str(ver[1]) + "." +str(ver[2])
+	var verstr = str(ver[0]) + "." + str(ver[1]) + "." + str(ver[2])
 	
 	vd["manifest"]["manifest_data"]["version"]["version_major"] = ver[0]
 	vd["manifest"]["manifest_data"]["version"]["version_minor"] = ver[1]
@@ -366,7 +366,7 @@ func _downloaded_zip(file, filepath):
 	updates_button.visible = false
 var tween
 func _visibility_changed():
-	yield(get_tree(),"idle_frame")
+	yield(CurrentGame.get_tree(),"idle_frame")
 	var count = 0.03125
 	for child in listContainer.get_children():
 		if "MOD_INFO" in child:

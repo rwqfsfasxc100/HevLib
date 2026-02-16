@@ -148,7 +148,6 @@ tracks/0/keys = {
 }
 
 [node name="ModMenu" type="Popup"]
-modulate = Color( 1.00309, 1.00309, 1.00309, 0.0123457 )
 mouse_filter = 2
 theme = ExtResource( 2 )
 popup_exclusive = true
