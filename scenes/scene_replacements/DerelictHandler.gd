@@ -46,6 +46,8 @@ func _ready():
 	file.close()
 	for mod in data:
 		var md = data[mod]
+		randomize()
+		md.shuffle()
 		for ship in md:
 			var fd = md[ship]
 			if mode in fd:
