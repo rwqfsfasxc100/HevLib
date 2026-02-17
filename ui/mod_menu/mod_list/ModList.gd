@@ -203,7 +203,7 @@ func _process(_delta):
 			get_node(info_version).text = ""
 			get_node(info_priority).text = ""
 			get_node(info_mod_id).text = ""
-			get_node(info_author).text = ""
+			get_node(info_author).bbcode_text = ""
 			get_node(info_desc_text).text = ""
 			get_node(info_desc_author).text = ""
 			get_node(info_desc_credits).text = ""
@@ -226,8 +226,8 @@ func _process(_delta):
 				get_node(info_version).text = ar["version_data"]["full_version_string"]
 				get_node(info_priority).text = str(ar["priority"])
 				get_node(info_mod_id).text = ar["manifest"]["manifest_data"]["mod_information"]["id"]
-				get_node(info_author).text = ar["manifest"]["manifest_data"]["mod_information"]["author"]
-				get_node(info_desc_text).text = ar["manifest"]["manifest_data"]["mod_information"]["description"]
+				get_node(info_author).parse_bbcode(TranslationServer.translate(ar["manifest"]["manifest_data"]["mod_information"]["author"]))
+				get_node(info_desc_text).parse_bbcode(TranslationServer.translate(ar["manifest"]["manifest_data"]["mod_information"]["description"]))
 				get_node(info_desc_author).text = ar["manifest"]["manifest_data"]["mod_information"]["author"]
 				var credits = ""
 				for c in ar["manifest"]["manifest_data"]["mod_information"]["credits"]:

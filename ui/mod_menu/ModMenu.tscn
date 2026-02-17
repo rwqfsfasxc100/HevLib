@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=2]
+[gd_scene load_steps=37 format=2]
 
 [ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=1]
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=2]
@@ -22,6 +22,7 @@
 [ext_resource path="res://HevLib/ui/mod_menu/profiles/ProfilesMenu.tscn" type="PackedScene" id=20]
 [ext_resource path="res://HevLib/ui/mod_menu/changelogs/MMChangelogMenu.tscn" type="PackedScene" id=21]
 [ext_resource path="res://HevLib/ui/mod_menu/AnimateAppear.tscn" type="PackedScene" id=22]
+[ext_resource path="res://HevLib/ui/themes/fonts/courier_new/font-courierbolditalic.tres" type="DynamicFont" id=23]
 
 [sub_resource type="StreamTexture" id=3]
 flags = 4
@@ -148,6 +149,7 @@ tracks/0/keys = {
 }
 
 [node name="ModMenu" type="Popup"]
+visible = true
 mouse_filter = 2
 theme = ExtResource( 2 )
 popup_exclusive = true
@@ -165,7 +167,7 @@ margin_bottom = 720.0
 mouse_filter = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="base"]
-margin_right = 1280.0
+margin_right = 1301.0
 margin_bottom = 720.0
 mouse_filter = 2
 
@@ -422,13 +424,20 @@ margin_top = 66.0
 margin_right = 588.0
 margin_bottom = 95.0
 
-[node name="AUTHOR" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/TEXT/PRIO & NAMES"]
+[node name="AUTHOR" type="RichTextLabel" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/TEXT/PRIO & NAMES"]
 margin_right = 588.0
 margin_bottom = 29.0
+rect_min_size = Vector2( 0, 29 )
 size_flags_horizontal = 3
-custom_fonts/font = ExtResource( 3 )
+custom_fonts/mono_font = ExtResource( 3 )
+custom_fonts/bold_italics_font = ExtResource( 23 )
+custom_fonts/italics_font = ExtResource( 23 )
+custom_fonts/bold_font = ExtResource( 3 )
+custom_fonts/normal_font = ExtResource( 3 )
+bbcode_enabled = true
+bbcode_text = "MOD_AUTHOR"
 text = "MOD_AUTHOR"
-clip_text = true
+scroll_active = false
 
 [node name="SETTINGS" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header"]
 margin_left = 696.0
@@ -650,74 +659,76 @@ size_flags_vertical = 3
 script = ExtResource( 8 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer"]
-margin_right = 550.0
-margin_bottom = 368.0
+margin_right = 540.0
+margin_bottom = 369.0
 mouse_filter = 2
 size_flags_horizontal = 3
 
-[node name="DESCRIPTION" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
+[node name="DESCRIPTION" type="RichTextLabel" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 38.0
-autowrap = true
+margin_bottom = 39.0
+bbcode_enabled = true
+fit_content_height = true
+scroll_active = false
 
 [node name="DASPLIT" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
-margin_top = 42.0
+margin_top = 43.0
 margin_right = 540.0
-margin_bottom = 67.0
+margin_bottom = 68.0
 rect_min_size = Vector2( 0, 25 )
 mouse_filter = 2
 
 [node name="AHEADER" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
-margin_top = 71.0
+margin_top = 72.0
 margin_right = 540.0
-margin_bottom = 109.0
+margin_bottom = 110.0
 text = "HEVLIB_AUTHOR"
 autowrap = true
 
 [node name="AUTHOR" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
-margin_top = 113.0
+margin_top = 114.0
 margin_right = 540.0
-margin_bottom = 151.0
+margin_bottom = 152.0
 autowrap = true
 
 [node name="AHSPLIT" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
-margin_top = 155.0
+margin_top = 156.0
 margin_right = 540.0
-margin_bottom = 180.0
+margin_bottom = 181.0
 rect_min_size = Vector2( 0, 25 )
 mouse_filter = 2
 
 [node name="CHEADER" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
-margin_top = 184.0
+margin_top = 185.0
 margin_right = 540.0
-margin_bottom = 222.0
+margin_bottom = 223.0
 text = "HEVLIB_CREDITS"
 autowrap = true
 
 [node name="CREDITS" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
-margin_top = 226.0
+margin_top = 227.0
 margin_right = 540.0
-margin_bottom = 264.0
+margin_bottom = 265.0
 autowrap = true
 
 [node name="PSPLIT" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
-margin_top = 268.0
+margin_top = 269.0
 margin_right = 540.0
-margin_bottom = 293.0
+margin_bottom = 294.0
 rect_min_size = Vector2( 0, 25 )
 mouse_filter = 2
 
 [node name="PHEADER" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
-margin_top = 297.0
+margin_top = 298.0
 margin_right = 540.0
-margin_bottom = 335.0
+margin_bottom = 336.0
 text = "HEVLIB_MODMENU_PRIO_MID_HEADER"
 
 [node name="PDIVIDE" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer/VBoxContainer"]
 modulate = Color( 0.54902, 0.54902, 0.54902, 1 )
-margin_top = 339.0
+margin_top = 340.0
 margin_right = 540.0
-margin_bottom = 368.0
+margin_bottom = 369.0
 mouse_filter = 2
 size_flags_horizontal = 3
 

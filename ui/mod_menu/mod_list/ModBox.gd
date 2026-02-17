@@ -76,7 +76,7 @@ func _pressed():
 	var author = ""
 	if manifestData:
 		author = manifestData["mod_information"]["author"]
-	information_nodes["info_author"].text = author
+	information_nodes["info_author"].parse_bbcode(TranslationServer.translate(author))
 	if author != "":
 		information_nodes["info_desc_author"].text = author
 		information_nodes["info_desc_author"].visible = true
@@ -85,7 +85,7 @@ func _pressed():
 	var description = ""
 	if manifestData:
 		description = manifestData["mod_information"]["description"]
-	information_nodes["info_desc_text"].text = description
+	information_nodes["info_desc_text"].parse_bbcode(TranslationServer.translate(description))
 	var creditText = ""
 	if manifestData:
 		for item in manifestData["mod_information"]["credits"]:
