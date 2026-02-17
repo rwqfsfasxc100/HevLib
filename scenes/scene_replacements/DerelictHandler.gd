@@ -46,6 +46,8 @@ func _ready():
 	file.close()
 	for mod in data:
 		var md = data[mod]
+		randomize()
+		md.shuffle()
 		for ship in md:
 			var fd = md[ship]
 			if mode in fd:
@@ -70,13 +72,29 @@ var pirate_chance = 0.3
 var chaos = 0.0
 
 var model = "TRTL"
-
+var defaults = {
+	chance = 1.0,
+	minimum_chance = 0.1,
+	money = 10000000.0,
+	stock_chance = 0.2,
+	allow_damage = true,
+	cause_extra_damage = true,
+	rock_cluster_chance = 0.3,
+	rock_cluster_count = 33,
+	clump = false,
+	clump_velocity = 25,
+	ring_storm_chance = 0.3,
+	pirate_chance = 0.3,
+	chaos = 0.0,
+}
 func canBeAt(pos):
 	if prevent:
 		return false
 	var sn = ship_pool.keys()[randi() % ship_pool.keys().size()]
 	var selected = ship_pool[sn]
 	model = sn
+	for i in defaults:
+		set(i,defaults[i])
 	for i in selected:
 		set(i,selected[i])
 	match mode:

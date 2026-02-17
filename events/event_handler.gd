@@ -21,8 +21,9 @@ func spawn_event(event,thering: Node):
 	if focusObject.zone == "rings":
 		var tree = ring.get_tree()
 		var event_node = ring.get_node_or_null(event)
-		if event_node and event_node.has_method("makeAt"):
+		if event_node and event_node.has_method("canBeAt") and event_node.has_method("makeAt"):
 			var pos = getPos()
+			event_node.canBeAt(pos)
 			var oddity = event_node.makeAt(pos)
 			if oddity:
 				if oddity is Array:
