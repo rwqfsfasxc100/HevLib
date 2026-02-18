@@ -3,6 +3,18 @@
 1="* Derelicts added through ShipDriver now no longer uses the previous derelict's stats when not providing all operands"
 2="* Improved randomness of modded derelicts added through ShipDriver"
 3="* EventDriver event calling now calls canBeAt on the target event to better simulate ring situations for events that use it to prepare the event"
+4="* Events.__make_upgrades_scene is now local to pointers.gd. This should improve boot times"
+5="* credits array within the mod.manifest now has each entry run through the TranslationServer when displayed on ModMenu2"
+6="* ModMenu2 now supports BBCode for all author, credits and description labels"
+7="* Equipment and slots added through ADD_EQUIPMENT_ITEMS or ADD_EQUIPMENT_SLOTS respectively can now be limited based on other mod IDs within currently loaded mods."
+7.1="* mod_requirements - Array of arrays for mods needed to be present for the item/slot to be added"
+7.1.1="* Upper level array contains arrays, all must have at least one valid ID to permit addition of this item/slot"
+7.1.2="* Lower level array contains strings for each mod ID that are checked for, of which only one of these IDs must be present for the entire array to register as valid"
+7.1.3="* e.g. [["hev.LIBRARY"],["hev.IndustriesOfEnceladus","hev.VelocityPlus"]] - To make this item/slot be valid, HevLib's ID must be present in all cases, however either IoE's or VelocityPlus's ID can be present, or both, but one of those two is needed. Assuming HevLib and IoE/VelocityPlus are present, it will be added"
+7.2="* mod_incompatabilities - Array of arrays for mods needed to be present for the item/slot to be prevented from being added"
+7.2.1="* Upper level array contains arrays, all must have at least one valid ID to permit removal of this item/slot"
+7.2.2="* Lower level array contains strings for each mod ID that are checked for, of which only one of these IDs must be present for the entire array to register as valid"
+7.2.3="* e.g. [["hev.LIBRARY"],["hev.IndustriesOfEnceladus","hev.VelocityPlus"]] - To make this item/slot be valid for removal, HevLib's ID must be present in all cases, however either IoE's or VelocityPlus's ID can be present, or both, but one of those two is needed. Assuming HevLib and IoE/VelocityPlus are present, it will be removed"
 
 [1.11.13]
 
