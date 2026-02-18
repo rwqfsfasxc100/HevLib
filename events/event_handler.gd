@@ -28,26 +28,12 @@ func spawn_event(event,thering: Node):
 			if oddity:
 				if oddity is Array:
 					for o in oddity:
-						var groups = o.get_groups()
-						if "stations" in groups:
-							for c in tree.get_nodes_in_group("stations"):
-								if c.name == o.name:
-									Debug.l("Station already spawned")
-									Tool.remove(o)
-									return
 						if not event in ring.group:
 							ring.group[event] = []
 						ring.group[event].append(o)
 						ring.all_oddities.append(o)
 						ring.requestOdditySpawn(o)
 				else:
-					var groups = oddity.get_groups()
-					if "stations" in groups:
-						for c in tree.get_nodes_in_group("stations"):
-							if c.name == oddity.name:
-								Debug.l("Station already spawned")
-								Tool.remove(oddity)
-								return
 					if not event in ring.group:
 						ring.group[event] = []
 					ring.group[event].append(oddity)

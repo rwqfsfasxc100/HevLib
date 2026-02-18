@@ -1,3 +1,138 @@
+[1.11.14]
+
+1="* Derelicts added through ShipDriver now no longer uses the previous derelict's stats when not providing all operands"
+2="* Improved randomness of modded derelicts added through ShipDriver"
+3="* EventDriver event calling now calls canBeAt on the target event to better simulate ring situations for events that use it to prepare the event"
+
+[1.11.13]
+
+1="* Fixed crash that occurred when trying to draw the mod menu"
+
+[1.11.12]
+
+1="* Fixed crash that occurred when buffering inputs on the splash screen, causing the title screen to load during the frame that was preparing pointers"
+2="* Fixed crash that occurred when starting a dive while using certain game setting combinations"
+
+[1.11.11]
+
+1="* Fixed logic error that failed to recognize an environment as release, resulting in mod configurations not being initialized at the beginning of the boot sequence"
+
+[1.11.10]
+
+1="* Fixed issues with the MM2 mod updater's download progress text failing to display on the first download"
+
+[1.11.9]
+
+1="* Added tool accessible through the save options menu that is able to fix saves that crash due to the presence of invalid cargo obtained during the previous dive."
+2="* Save options can now have tooltips, added through a string parsed through a tooltip entry"
+3="* Added a developer tool that simplifies the modifying of a ship's cargo bay scanner coverage, located in res://HevLib/scenes\development_tools\CargoBayCoverageVisual.tscn"
+4="* Fixed dive summary menu having a scrollbar visible when one wasn't necessary"
+5="* Updated handling of added ships through ADD_SHIPS.gd to allow the ship to appear in the dealer, as well as appearing as derelicts or NPC miners"
+5.1="* Each part is handled through additional dictionaries added to the ship's constant. The presence of it as an entry is what permits it to spawn, and can be empty to just use default values."
+5.2="* "dealer":{}:"
+5.2.1="* Used to add the ship to the used ship pool"
+5.2.2="* Ships added through here will have up to 5 entries appended to the current pool, which past that will have those 5 entries randomly pick a modded ship"
+5.2.3="* age - the ship's age in years. Defaults to 200"
+5.2.4="* weight - the number of times this ship will be added to the modded ship pool. Defaults to 1"
+5.3="* "derelict":{}:"
+5.3.1="* Used to add the ship to the derelict pool."
+5.3.2="* chance - the base chance of the derelict being permitted to spawn at 0 E$. Defaults to 1.0"
+5.3.3="* minimum_chance - the absolute minimum chance that the spawn is permissible. Defaults to 0.1"
+5.3.4="* money - the money ceiling used for the spawn chance calculation. uses the equation clamp(chance * (1 - <current cash> / money), minimum_chance, 1) to determine the chance. Defaults to 10000000.0"
+5.3.5="* stock_chance - the chance at which the ship's stock configuration is used. Defaults to 0.2"
+5.3.6="* allow_damage - whether the derelict can have severe damage. Defaults to true"
+5.3.7="* cause_extra_damage - whether extra damage will be inflicted on the ship at a random point on the ship. Defaults to true"
+5.3.8="* rock_cluster_chance - chance at which the derelict will be within a ringroid field. Defaults to 0.3"
+5.3.9="* rock_cluster_count - number of ringroids to spawn around the derelict if it passes the cluster chance. Defaults to 33"
+5.3.10="* clump - whether to cluster all objects spawned by the event around the spawn position. Defaults to false"
+5.3.11="* clump_velocity - the velocity added to objects towards the spawn position when clumping. Defaults to 25"
+5.3.12="* ring_storm_chance - the chance at which a ringstorm will engulf the derelict's area. Defaults to 0.3"
+5.3.13="* pirate_chance - the chance at which a pirate abductor will spawn near the derelict. Defaults to 0.3"
+5.3.14="* chaos - the minimum chaos allowed to spawn the event. See the ring map chaos debug tool for what this pertains to. Defaults to 0.0"
+5.4="* "miner":{}:"
+5.4.1="* Used to allow NPC miners to use the ship"
+5.4.2="* chaos - the minimum chaos allowed to spawn the event. See the ring map chaos debug tool for what this pertains to. Defaults to 0.0"
+
+[1.11.8]
+
+1="* Added res://HevLib/pointers.gd to replace the current pointer system"
+2="* Configurations are now initialized and updated at the start of the modloading phase, so all mods should be able to access updated configs during the initialization phase"
+3="* Added developer tool for configuring a ship's cargo bay scanner areas, located at res://HevLib/scenes\development_tools\CargoBayCoverageVisual.tscn"
+4="* Fixed DataFormat.format_for_large_numbers not respecting locale-specific separators"
+5="* Fixed crash when attempting to fetch github releases subsequent times after providing either no node or a node without a '_downloaded_zip' method available"
+6="* Removed unused this_file operator from ManifestV2.__have_mods_updated()"
+7="* Removed ability to change the spacing for changelog menus"
+8="* Updated Translations.updateTL() to support returned delimiter chars"
+9="* Fixed issues with thrusters added through pointers being unable to be tuned or damaged"
+10="* Added FolderAccess.__get_modmain_files"
+10.1="* Returns an array of the filepaths of all modmain scripts in the filesystem"
+10.2="* For Developers: Does not take into account scripts not loaded by the game"
+11="* Updated DataFormat:"
+11.1="* __get_script_constant_map_without_load"
+11.1.1="* Allows you to get a script's constant map without loading the script, especially helpful for fetching constants from ModMain.gd files without double loading them"
+11.1.2="* Is not a complete replacement for get_script().get_script_constant_map(), as that method is faster"
+11.1.3="* Unlike get_script_constant_map(), this is deterministic and will always produce the same dictionary every time"
+11.1.4="* Also useful for scraping ModMain.gd files or other scripts that run code on _init() to prevent them from running"
+11.2="* __trim_scripts"
+11.2.1="* Accepts an input script filepath, and returns an array with three values: "
+11.2.1.1="* A: string containing a valid script with everything except script variables and constants"
+11.2.1.2="* B: Array containing all script variable names"
+11.2.1.2="* C: Array containing all constant names"
+11.3="* __get_script_variables_without_load"
+11.3.1="* Equivalent to __get_script_constant_map_without_load, however for initialized script variables"
+11.3.2="* Only intended to use to avoid loading scripts"
+
+[1.11.7]
+
+1="* Added dialogue boxes that show when a mod with a manifest URL without providing a GitHub or Nexus link is asked to update, and explain that it cannot be updated, instead of stalling and forcing the game to be quit"
+
+[1.11.6]
+
+1="* Added ring map chaos visualizer debug tool"
+1.1="* Overlays a HSV-scaled map of the chaos level above all ring maps when enabled"
+1.2="* Can change the minimum chaos for it to be shown. Defaults to 0.65"
+1.3="* Can change the opacity of the overlay. Defaults to 0.35"
+1.4="* All toggles and values can be assigned keybinds"
+2="* Added extra logging for github downloads"
+
+[1.11.5]
+
+1="* Fixed missing logged mineral info when adding minerals through MineralDriver"
+2="* Added several options for equipment modified through MODIFY_INTERNALS.gd:"
+2.1="* EMP damage scaling - scales the damage taken by EMP sources"
+2.1.1="* Modified through a fraction defined by emp_scale_multi_upper (defaults to 1.0) and emp_scale_multi_lower (defaults to 1.0)"
+2.2="* Display system - add an equipment item to the system list"
+2.2.1="* Uses a dictionary to dictate how it displays this item"
+2.2.2="* name - the display name for the system"
+2.2.3="* can_display_multiple - whether installing multiple copies of the equipment supplying this system will show this display multiple times. Defaults to false."
+2.2.4="* power - the brightness of the display to indicate how much this system is "active". Two options for how this is displayed. If using a float to set this (i.e. 0.5), the power scale range is clamped between 0-1. If using an integer (i.e. 50), will be used as the percentage of power (50 = 0.5 for floats). Defaults to 0.0."
+2.2.5="* status - the condition of the equipment, listed as a percentage. NOTE: this does affect what balanced difficulty permits the storyteller to spawn. Defaults to 100."
+2.2.6="* affect_inspection - whether the equipment will interfere with the launch process. NOTE: setting this to true and having the status below 70 will prevent you from undocking from Enceladus in vanilla. Defaults to false."
+2.3="* Display modifier system"
+2.3.1="* Whether this specific equipment will cause the Internal System Mod Handle system to appear when using this driver."
+2.3.2="* If this is false, will not prevent other equipment not setting it to false from hiding it."
+2.3.3="* Defaults to true."
+3="* Added __sift_ship_config to DataFormat.gd pointer."
+3.1="* Very to __sift_dictionary"
+3.2="* Adds an additional entry for keys to not check from the top level of the dictionary"
+3.3="* All found systems list the config path. E.g. weaponSlot.main.type.SYSTEM_EMD14"
+4="* Updated Github.gd.__get_github_release:"
+4.1="* Now can catch, log an error, and cancel to prevent a crash when node_to_return_to is either null, not of Node type, or does not have the _downloaded_zip(file, filepath) function called at the end of the download."
+4.2="* Now reports the status of the download, and only will do so if node_to_return_to has the function _get_github_progress(response:String, percent:float, bytes_downloaded:int, total_bytes:int)"
+4.3="* response - string returned based on the current process being performed."
+4.3.1="* HEVLIB_GITHUB_PROGRESS_WAITING_ON_RESPONSE - sent when the process starts"
+4.3.2="* HEVLIB_GITHUB_PROGRESS_ZIP_FOUND_AND_REQUESTING - sent when the zip has been located, and downloading has started"
+4.3.3="* HEVLIB_GITHUB_PROGRESS_DOWNLOADING - sent every physics frame during the download. percent, bytes_downloaded, and total_bytes will be populated with the current percentage of the file downloaded, the current bytes downloaded, and total byte count of the file respectively."
+4.3.4="* HEVLIB_GITHUB_PROGRESS_DOWNLOADING_ONLY_BYTES - fallback equivalent to the previous response sent every physics frame during the download during cases where the server does not provide a total byte count of the file. Only bytes_downloaded will be sent with correct information"
+4.3.5="* HEVLIB_GITHUB_PROGRESS_DOWNLOADED_FILE - Sent once the file has been downloaded, and precedes the _downloaded_zip call."
+4.3.6="* All 5 of these response strings have equivalent translation strings used by Mod Menu 2 to display download information, and can be used as raw (and in some cases formattable) strings for display if the text is desirable."
+4.4="* percent - float used as a percentage of the file downloaded. Equivalent to (bytes_downloaded / total_bytes ) * 100.0. If HEVLIB_GITHUB_PROGRESS_DOWNLOADING_ONLY_BYTES is the response string, do not trust this value due to it being sent whenever total_bytes is less than zero."
+4.5="* bytes_downloaded - total byte count of downloaded data."
+4.6="* total_bytes - the downloading file's total size in bytes. If HEVLIB_GITHUB_PROGRESS_DOWNLOADING_ONLY_BYTES is the response string, likely was returned -1"
+5="* Added download progress to all Mod Menu 2 download operations, and unified the wait menu."
+6="* Fixed MM2's updates screen having a slightly lighter background compared to all other MM2 windows."
+7="* MM2's update mod popup now displays the current mod version"
+
 [1.11.4]
 
 1="* Fixed changelog menu cancel button not working"
