@@ -184,9 +184,9 @@ static func __match_vanilla(type: String, align_to_match: String, desired_equipm
 				matching.append(itemDict)
 	return matching
 
-static func __make_upgrades_scene(is_onready: bool = true):
-	var f = load("res://HevLib/scenes/equipment/make_upgrades_scene.gd").new()
-	f.make_upgrades_scene(is_onready)
+#static func __make_upgrades_scene(is_onready: bool = true):
+#	var f = load("res://HevLib/scenes/equipment/make_upgrades_scene.gd").new()
+#	f.make_upgrades_scene(is_onready)
 
 
 static func __make_equipment_for_scene(equipment_data: Dictionary, slot_node_name : String, system_slot: String) -> String:
