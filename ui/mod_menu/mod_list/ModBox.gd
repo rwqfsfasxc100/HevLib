@@ -78,7 +78,7 @@ func _pressed():
 		author = manifestData["mod_information"]["author"]
 	information_nodes["info_author"].parse_bbcode(TranslationServer.translate(author))
 	if author != "":
-		information_nodes["info_desc_author"].text = author
+		information_nodes["info_desc_author"].parse_bbcode(TranslationServer.translate(author))
 		information_nodes["info_desc_author"].visible = true
 	else:
 		information_nodes["info_desc_author"].visible = true
@@ -94,7 +94,7 @@ func _pressed():
 			else:
 				creditText = creditText + "\n" + item
 	if creditText != "":
-		information_nodes["info_desc_credits"].text = creditText
+		information_nodes["info_desc_credits"].parse_bbcode(TranslationServer.translate(creditText))
 		information_nodes["info_desc_credits"].visible = true
 	else:
 		information_nodes["info_desc_credits"].visible = false

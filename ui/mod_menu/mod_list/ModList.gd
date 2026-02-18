@@ -228,14 +228,15 @@ func _process(_delta):
 				get_node(info_mod_id).text = ar["manifest"]["manifest_data"]["mod_information"]["id"]
 				get_node(info_author).parse_bbcode(TranslationServer.translate(ar["manifest"]["manifest_data"]["mod_information"]["author"]))
 				get_node(info_desc_text).parse_bbcode(TranslationServer.translate(ar["manifest"]["manifest_data"]["mod_information"]["description"]))
-				get_node(info_desc_author).text = ar["manifest"]["manifest_data"]["mod_information"]["author"]
+				get_node(info_desc_author).parse_bbcode(TranslationServer.translate(ar["manifest"]["manifest_data"]["mod_information"]["author"]))
 				var credits = ""
 				for c in ar["manifest"]["manifest_data"]["mod_information"]["credits"]:
+					c = TranslationServer.translate(c)
 					if credits == "":
 						credits = c
 					else:
 						credits = credits + "\n" + c
-				get_node(info_desc_credits).text = credits
+				get_node(info_desc_credits).parse_bbcode(credits)
 				get_node(info_icon).texture = tex
 				get_node(info_settings_button).visible = true
 				get_node(info_links_button).visible = true
