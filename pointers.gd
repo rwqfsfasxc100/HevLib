@@ -1483,9 +1483,11 @@ class _Equipment:
 									if typeof(cv) == TYPE_BOOL:
 										allow = cv
 							var current_mods = []
-							if "mod_requirements" in equipment or "mod_incompatabilities" in equipment:
+							var mr = "mod_requirements" in equipment
+							var mi = "mod_incompatabilities" in equipment
+							if mr or mi:
 								current_mods = ManifestV2.__get_mod_ids()
-							if "mod_requirements" in equipment:
+							if mr:
 								var needs = equipment["mod_requirements"]
 								var can = 0
 								for i in needs:
@@ -1496,7 +1498,7 @@ class _Equipment:
 										if has:
 											can += 1
 								allow = can == needs.size()
-							if "mod_incompatabilities" in equipment:
+							if mi:
 								var needs = equipment["mod_incompatabilities"]
 								var can = 0
 								for i in needs:
