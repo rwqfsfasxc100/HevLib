@@ -1493,9 +1493,9 @@ class _Equipment:
 										var has = false
 										if f in current_mods:
 											has = true
-										if not has:
+										if has:
 											can += 1
-								allow = can == current_mods.size()
+								allow = can == needs.size()
 							if "mod_incompatabilities" in equipment:
 								var needs = equipment["mod_incompatabilities"]
 								var can = 0
@@ -1509,7 +1509,7 @@ class _Equipment:
 											cv = true
 									if cv:
 										can += 1
-								allow = can != current_mods.size()
+								allow = can != needs.size()
 							if allow:
 								arr2.append(equipment)
 						dicti.merge({"ADD_EQUIPMENT_ITEMS":arr2})
