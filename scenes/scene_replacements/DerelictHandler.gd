@@ -46,9 +46,10 @@ func _ready():
 	file.close()
 	for mod in data:
 		var md = data[mod]
+		var ir = md.keys()
 		randomize()
-		md.shuffle()
-		for ship in md:
+		ir.shuffle()
+		for ship in ir:
 			var fd = md[ship]
 			if mode in fd:
 				var shipName = fd["name"]
