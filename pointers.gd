@@ -1527,18 +1527,34 @@ class _Equipment:
 									var cv = ConfigDriver.__get_value(id,section,opt)
 									if typeof(cv) == TYPE_BOOL:
 										allow = cv
+							var current_mods = []
+							if "mod_requirements" in equipment or "mod_incompatabilities" in equipment:
+								current_mods = ManifestV2.__get_mod_ids()
 							if "mod_requirements" in equipment:
 								var needs = equipment["mod_requirements"]
-								var current_mods = ManifestV2.__get_mod_ids()
-								var can = true
+								var can = 0
 								for i in needs:
 									for f in i:
 										var has = false
 										if f in current_mods:
 											has = true
-										if not has:
-											can = false
-								allow = can
+										if has:
+											can += 1
+								allow = can == needs.size()
+							if "mod_incompatabilities" in equipment:
+								var needs = equipment["mod_incompatabilities"]
+								var can = 0
+								for i in needs:
+									var cv = false
+									for f in i:
+										var has = false
+										if f in current_mods:
+											has = true
+										if has:
+											cv = true
+									if cv:
+										can += 1
+								allow = can != needs.size()
 							if allow:
 								arr2.append(equipment)
 						dicti.merge({"ADD_EQUIPMENT_SLOTS":arr2})
