@@ -1,3 +1,9 @@
+[1.11.15]
+
+1="* Equipment added through WEAPONSLOT_ADD can now make use of mod_requirements and mod_incompatabilities entries. These are formatted and behave the exact same as the equivalent for ADD_EQUIPMENT_ITEMS and ADD_EQUIPMENT_SLOTS"
+2="* Improved handling for WeaponSlot equipment. Tuning and damage should now work properly for all equipment"
+3="* Fixed __fetch_folder_files appending a slash to the directory when returnFullPath is true, if one was not at the end of the folder value"
+
 [1.11.14]
 
 1="* Derelicts added through ShipDriver now no longer uses the previous derelict's stats when not providing all operands"
