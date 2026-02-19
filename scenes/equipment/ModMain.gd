@@ -38,9 +38,7 @@ var cache_dir = "user://cache/.HevLib_Cache"
 
 var ship_driver_path = "user://cache/.HevLib_Cache/ShipDriver/"
 
-var wipe_directories = [
-	"user://cache/.HevLib_Cache"
-]
+var checksum = "user://cache/.HevLib_Cache/checksums"
 
 #var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 #var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
@@ -57,8 +55,9 @@ func _init(modLoader = ModLoader):
 	
 #	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 	var d = Directory.new()
-	for dcv in wipe_directories:
-		if d.dir_exists(dcv):
+	var folder = pointers.FolderAccess.__fetch_folder_files(cache_dir,true,true)
+	for dcv in folder:
+		if dcv != checksum:
 			pointers.FolderAccess.__recursive_delete(dcv)
 	d.make_dir_recursive(ship_driver_path)
 	var ml = MainLoop.new()
