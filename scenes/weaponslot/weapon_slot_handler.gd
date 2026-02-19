@@ -159,31 +159,54 @@ func _ready():
 	file.store_string(JSON.print(equipment_templates))
 	file.close()
 
-
+func cvLoadPlaceholder():
+	var t = "weaponSlot.%s.type" % slot
+	var placeholder = get_node_or_null(String(mounted))
+	if placeholder:
+		if directMount:
+			key = name + "_" + mounted
+		else:
+			key = t + "_" + mounted
+		if placeholder.has_method("replace_by_instance"):
+			placeholder.replace_by_instance()
+		system = get_node_or_null(mounted)
+		system.name = name + "_" + system.name
+		system.visible = true
+		if "slotName" in system:
+			system.slotName = t + "_" + system.systemName
+	ship.changeExternalPlaceholders( - 1)
 
 func loadPlaceholder():
-	.loadPlaceholder()
+#	.loadPlaceholder()
 #	yield(get_tree(),"idle_frame")
 	modify()
+	cvLoadPlaceholder()
+	exModify()
+	
+
+var file = File.new()
+var dir = Directory.new()
+var c
+
+var properties_to_modify = []
 func modify():
-	var file = File.new()
-	var dir = Directory.new()
 	
 	var node
 	
 	file.open(ws_add,File.READ)
 	var additions = JSON.parse(file.get_as_text()).result
 	file.close()
-	file.open(ws_modify,File.READ)
-	var modifications = JSON.parse(file.get_as_text()).result
-	file.close()
+	
 	var sysname = "weaponSlot.%s.type" % slot
-	var c = ship.getConfig(sysname)
-	var properties_to_modify = []
+	c = ship.getConfig(sysname)
+	properties_to_modify.clear()
 	for item in additions:
 		var iname = item.get("name")
-		if iname == c and dir.file_exists(item.get("path")):
-			node = load(item.get("path")).instance()
+		if iname == c:
+			if dir.file_exists(item.get("path")):
+				node = load(item.get("path")).instance()
+			else:
+				return
 			for obj in item.get("data",{}):
 				var properties = item.get("data",{})[obj]
 				for property in properties:
@@ -194,10 +217,25 @@ func modify():
 					if sn == null:
 						breakpoint
 					properties_to_modify.append([sn,p,newVal])
-			var sysn = name + "_" + iname
-			node.name = sysn
-			system = node
-			
+#			var sysn = name + "_" + iname
+			node.name = iname
+#			system = node
+	if node:
+		key = name + "_" + mounted
+		add_child(node)
+		systemName = _getSystemName()
+		slotName = _getSlotName()
+		inspection = _getInspection()
+		repairFixPrice = _getRepairFixPrice()
+		repairFixTime = _getRepairFixTime()
+		repairReplacementPrice = _repairReplacementPrice()
+		repairReplacementTime = _repairReplacementTime()
+		mass = _getMass()
+func exModify():
+	file.open(ws_modify,File.READ)
+	var modifications = JSON.parse(file.get_as_text()).result
+	file.close()
+	
 	for item in modifications:
 		var iname = item.get("name")
 		if iname == c:
@@ -242,14 +280,4 @@ func modify():
 					property[0].set(property[1],true)
 				_:
 					property[0].set(property[1],property[2])
-	if node:
-		key = name + "_" + mounted
-		add_child(node)
-		systemName = _getSystemName()
-		slotName = _getSlotName()
-		inspection = _getInspection()
-		repairFixPrice = _getRepairFixPrice()
-		repairFixTime = _getRepairFixTime()
-		repairReplacementPrice = _repairReplacementPrice()
-		repairReplacementTime = _repairReplacementTime()
-		mass = _getMass()
+	

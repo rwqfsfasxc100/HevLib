@@ -12,6 +12,12 @@ var exhaust = load("res://sfx/exhaust.tscn")
 var nozzle = load("res://ships/modules/nozzle-conventonal.tscn")
 #const NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
 
+func _exit_tree():
+	mpdg = null
+	smes = null
+	thruster = null
+	exhaust = null
+	nozzle = null
 
 const torch_base_scale = [0.939,1.395]
 const rcs_base_scale = [0.2,0.2]

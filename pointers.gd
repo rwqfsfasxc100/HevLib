@@ -1321,7 +1321,6 @@ class _Equipment:
 		var FILE_PATHS = [
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn",
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/Exhaust_Cache",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/AuxSlot.tscn",
 			
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_TEMPLATES.json",
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_STANDALONE.json",
@@ -1343,23 +1342,22 @@ class _Equipment:
 		
 		var file_save_path : String = FILE_PATHS[0]
 		var exhaust_cache_path : String = FILE_PATHS[1]
-		var auxslot_save_path : String = FILE_PATHS[2]
-		var weaponslot_modify_templates_file = FILE_PATHS[3]
-		var weaponslot_modify_standalone_file = FILE_PATHS[4]
-		var slot_order_cache_file = FILE_PATHS[5]
-		var weaponslot_ship_templates_file = FILE_PATHS[6]
-		var weaponslot_ship_standalone_file = FILE_PATHS[7]
-		var save_menu_file = FILE_PATHS[8]
-		var processed_storage_file = FILE_PATHS[9]
-		var node_definitions_file = FILE_PATHS[10]
-		var ship_node_register_file = FILE_PATHS[11]
-		var auxslot_data_path = FILE_PATHS[12]
-		var weaponslot_additions = FILE_PATHS[13]
-		var weaponslot_modifications = FILE_PATHS[14]
-		var weaponslot_modify_equipment_names = FILE_PATHS[15]
-		var upgrades_slot_limits = FILE_PATHS[16]
-		var ship_node_modify_file = FILE_PATHS[17]
-		var ship_thruster_color_file = FILE_PATHS[18]
+		var weaponslot_modify_templates_file = FILE_PATHS[2]
+		var weaponslot_modify_standalone_file = FILE_PATHS[3]
+		var slot_order_cache_file = FILE_PATHS[4]
+		var weaponslot_ship_templates_file = FILE_PATHS[5]
+		var weaponslot_ship_standalone_file = FILE_PATHS[6]
+		var save_menu_file = FILE_PATHS[7]
+		var processed_storage_file = FILE_PATHS[8]
+		var node_definitions_file = FILE_PATHS[9]
+		var ship_node_register_file = FILE_PATHS[10]
+		var auxslot_data_path = FILE_PATHS[11]
+		var weaponslot_additions = FILE_PATHS[12]
+		var weaponslot_modifications = FILE_PATHS[13]
+		var weaponslot_modify_equipment_names = FILE_PATHS[14]
+		var upgrades_slot_limits = FILE_PATHS[15]
+		var ship_node_modify_file = FILE_PATHS[16]
+		var ship_thruster_color_file = FILE_PATHS[17]
 		if is_onready:
 			
 			version = DataFormat.__get_vanilla_version()
@@ -1435,9 +1433,6 @@ class _Equipment:
 		file.open(ship_thruster_color_file,File.WRITE)
 		file.store_string("{}")
 		file.close()
-	#	file.open(exhaust_cache_file,File.WRITE)
-	#	file.store_string("{}")
-	#	file.close()
 		file.open(auxslot_data_path,File.WRITE)
 		file.store_string("{}")
 		file.close()
@@ -2263,43 +2258,73 @@ class _Equipment:
 						var additions = d.get(opt)
 						
 						for add in additions:
-							var aname = add.get("name","SYSTEM_ERROR")
-							var apath = add.get("path","")
-							var item_data = {}
-							for it in add.get("data",[]):
-								var ws_property_string = ""
-								var ws_property = it.get("property")
-								var ws_value = it.get("value")
-								var split = ws_property.split("/")
-								var property = split[split.size() - 1]
-								if split.size() >= 3:
-									var node = split[split.size() - 2]
-									var nonode = ws_property.split(node)
-									if nonode[0].ends_with("/"):
-										nonode[0] = nonode[0].rstrip("/")
-									if nonode[1].begins_with("/"):
-										nonode[1] = nonode[1].lstrip("/")
-									if nonode[0] in item_data:
-										pass
+							var allow = true
+							var mr = "mod_requirements" in add
+							var mi = "mod_incompatabilities" in add
+							if mr:
+								var needs = add["mod_requirements"]
+								var can = 0
+								for i in needs:
+									for f in i:
+										var has = false
+										if f in current_mod_ids:
+											has = true
+										if has:
+											can += 1
+								allow = can == needs.size()
+							if mi:
+								var needs = add["mod_incompatabilities"]
+								var can = 0
+								for i in needs:
+									var cv = false
+									for f in i:
+										var has = false
+										if f in current_mod_ids:
+											has = true
+										if has:
+											cv = true
+									if cv:
+										can += 1
+								allow = can != needs.size()
+							
+							if allow:
+								var aname = add.get("name","SYSTEM_ERROR")
+								var apath = add.get("path","")
+								var item_data = {}
+								for it in add.get("data",[]):
+									var ws_property_string = ""
+									var ws_property = it.get("property")
+									var ws_value = it.get("value")
+									var split = ws_property.split("/")
+									var property = split[split.size() - 1]
+									if split.size() >= 3:
+										var node = split[split.size() - 2]
+										var nonode = ws_property.split(node)
+										if nonode[0].ends_with("/"):
+											nonode[0] = nonode[0].rstrip("/")
+										if nonode[1].begins_with("/"):
+											nonode[1] = nonode[1].lstrip("/")
+										if nonode[0] in item_data:
+											pass
+										else:
+											item_data.merge({nonode[0]:[]})
+										item_data[nonode[0]].append([nonode[1],ws_value])
+									elif split.size() == 2:
+										if split[0] in item_data:
+											pass
+										else:
+											item_data.merge({split[0]:[]})
+										item_data[split[0]].append([split[1],ws_value])
 									else:
-										item_data.merge({nonode[0]:[]})
-									item_data[nonode[0]].append([nonode[1],ws_value])
-								elif split.size() == 2:
-									if split[0] in item_data:
-										pass
-									else:
-										item_data.merge({split[0]:[]})
-									item_data[split[0]].append([split[1],ws_value])
+										if "." in item_data:
+											pass
+										else:
+											item_data.merge({".":[]})
+										item_data["."].append([ws_property,ws_value])
+								if apath == "":
+									ws_stuff_to_modify.append({"name":aname,"data":item_data})
 								else:
-									if "." in item_data:
-										pass
-									else:
-										item_data.merge({".":[]})
-									item_data["."].append([ws_property,ws_value])
-							if apath == "":
-								ws_stuff_to_modify.append({"name":aname,"data":item_data})
-							else:
-								ws_stuff_to_add.append({"name":aname,"path":apath,"data":item_data})
+									ws_stuff_to_add.append({"name":aname,"path":apath,"data":item_data})
 		
 		
 		
@@ -2485,9 +2510,9 @@ class _Equipment:
 		file.store_string(concat)
 		file.close()
 		
-		file.open(auxslot_save_path,File.WRITE)
-		file.store_string(aux_power_string)
-		file.close()
+#		file.open(auxslot_save_path,File.WRITE)
+#		file.store_string(aux_power_string)
+#		file.close()
 		
 		file.open(upgrades_slot_limits,File.WRITE)
 		file.store_string(ship_limitation_string)
