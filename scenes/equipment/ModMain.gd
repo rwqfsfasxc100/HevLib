@@ -34,7 +34,13 @@ var currentgame_path = "user://cache/.HevLib_Cache/Minerals/CurrentGame.gd"
 var thering_path = "user://cache/.HevLib_Cache/Minerals/TheRing.gd"
 var ringscene_path = "user://cache/.HevLib_Cache/Minerals/TheRing.tscn"
 
+var cache_dir = "user://cache/.HevLib_Cache"
+
 var ship_driver_path = "user://cache/.HevLib_Cache/ShipDriver/"
+
+var wipe_directories = [
+	"user://cache/.HevLib_Cache"
+]
 
 #var Equipment = preload("res://HevLib/pointers/Equipment.gd")
 #var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
@@ -51,9 +57,9 @@ func _init(modLoader = ModLoader):
 	
 #	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 	var d = Directory.new()
-	var cache_dir = "user://cache/.HevLib_Cache"
-	if d.dir_exists(cache_dir):
-		pointers.FolderAccess.__recursive_delete(cache_dir)
+	for dcv in wipe_directories:
+		if d.dir_exists(dcv):
+			pointers.FolderAccess.__recursive_delete(dcv)
 	d.make_dir_recursive(ship_driver_path)
 	var ml = MainLoop.new()
 	ml.set_script(load("res://HevLib/scripts/crash_handler.gd"))

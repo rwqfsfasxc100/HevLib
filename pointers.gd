@@ -1459,6 +1459,8 @@ class _Equipment:
 		
 		var drivers = DriverManagement.__get_drivers()
 		
+		var current_mod_ids = ManifestV2.__get_mod_ids()
+		
 		for cvh in drivers:
 			var check = cvh.get("mod_directory")
 			var mod = check.hash()
@@ -1482,18 +1484,16 @@ class _Equipment:
 									var cv = ConfigDriver.__get_value(id,section,opt)
 									if typeof(cv) == TYPE_BOOL:
 										allow = cv
-							var current_mods = []
+							
 							var mr = "mod_requirements" in equipment
 							var mi = "mod_incompatabilities" in equipment
-							if mr or mi:
-								current_mods = ManifestV2.__get_mod_ids()
 							if mr:
 								var needs = equipment["mod_requirements"]
 								var can = 0
 								for i in needs:
 									for f in i:
 										var has = false
-										if f in current_mods:
+										if f in current_mod_ids:
 											has = true
 										if has:
 											can += 1
@@ -1505,7 +1505,7 @@ class _Equipment:
 									var cv = false
 									for f in i:
 										var has = false
-										if f in current_mods:
+										if f in current_mod_ids:
 											has = true
 										if has:
 											cv = true
@@ -1529,18 +1529,15 @@ class _Equipment:
 									var cv = ConfigDriver.__get_value(id,section,opt)
 									if typeof(cv) == TYPE_BOOL:
 										allow = cv
-							var current_mods = []
 							var mr = "mod_requirements" in equipment
 							var mi = "mod_incompatabilities" in equipment
-							if mr or mi:
-								current_mods = ManifestV2.__get_mod_ids()
 							if mr:
 								var needs = equipment["mod_requirements"]
 								var can = 0
 								for i in needs:
 									for f in i:
 										var has = false
-										if f in current_mods:
+										if f in current_mod_ids:
 											has = true
 										if has:
 											can += 1
@@ -1552,7 +1549,7 @@ class _Equipment:
 									var cv = false
 									for f in i:
 										var has = false
-										if f in current_mods:
+										if f in current_mod_ids:
 											has = true
 										if has:
 											cv = true
