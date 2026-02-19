@@ -2921,6 +2921,8 @@ class _FolderAccess:
 	
 	func __fetch_folder_files(folder: String, showFolders: bool = false, returnFullPath: bool = false,globalizePath: bool = false):
 		var fileList = []
+		if not folder.ends_with("/"):
+			folder += "/"
 		var dir = Directory.new()
 		var does = dir.dir_exists(folder)
 		if not does:
