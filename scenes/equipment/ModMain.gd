@@ -45,16 +45,19 @@ var checksum = "user://cache/.HevLib_Cache/checksums"
 #var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 #var DriverManagement = preload("res://HevLib/pointers/DriverManagement.gd")
 
-var pointers = preload("res://HevLib/pointers.gd").new()
+var pointers
 func _init(modLoader = ModLoader):
 	l("Initializing Equipment Driver")
+	var d = Directory.new()
+	d.make_dir_recursive("user://cache/.HevLib_Cache")
+	
+	pointers = load("res://HevLib/pointers.gd").new()
 	
 	pointers.ConfigDriver.__load_configs()
 	var injector = load("res://HevLib/scripts/translations/inject_translations.gd")
 	injector.inject_translations(pointers)
 	
 #	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
-	var d = Directory.new()
 	var folder = pointers.FolderAccess.__fetch_folder_files(cache_dir,true,true)
 	for dcv in folder:
 		if dcv != checksum:
@@ -94,7 +97,7 @@ func _init(modLoader = ModLoader):
 		installScriptExtension("../minerals/multiminerals/AsteroidSpawner.gd")
 	
 	
-	
+	installScriptExtension("SystemBuyUI.gd")
 	installScriptExtension("../../ui/ExtensionPopup.gd")
 	installScriptExtension("../scene_replacements/DLClist.gd")
 	replaceScene("../scene_replacements/DLClist.tscn","res://tools/DLClist.tscn")
