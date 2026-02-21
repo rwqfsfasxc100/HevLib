@@ -119,6 +119,16 @@ HEVLIB_CONFIG_SECTION_DRIVERS={
 		"type":"bool",
 		"default":false
 	},
+	"max_modded_dealership_pools":{
+		"name":"HEVLIB_CONFIG_MAX_MODDED_DEALERSHIP_POOLS",
+		"description":"HEVLIB_CONFIG_MAX_MODDED_DEALERSHIP_POOLS_TOOLTIP",
+		"type":"int",
+        "style":"slider",
+        "min":1,
+        "max":50,
+        "step":1,
+		"default":7,
+	},
 }
 HEVLIB_CONFIG_SECTION_DEBUG={
 	"input_debugger":{
