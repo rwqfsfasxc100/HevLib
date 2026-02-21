@@ -1,3 +1,16 @@
+[1.11.16]
+
+1="* Fixed crash caused by an uninitialized cache"
+2="* Added ConfigDriver.__load_inputs_from_string_array"
+2.1="* Used to add a list of input events to an existing input action"
+2.2="* key -> string for the input action to register inputs to"
+2.3="* strings -> array of strings for the input events to use. Mouse inputs are prefixed with 'Mouse %s', joy axis inputs are prefixed with 'JoyAxis %s', and joy button inputs are prefixed with 'JoyButton %s'"
+3="* added always_binds to input type configs"
+3.1="* used to register specific events that cannot be changed"
+3.2="* best used for cases where vanilla binds are being involved, with binds specifically not displayed in the settings menu"
+4="* Fixed inputs not being changed until the game has been restarted"
+5="* Inputs now respect vanilla settings and won't override them if a config adds inputs to a settings tab input event"
+
 [1.11.15]
 
 1="* Equipment added through WEAPONSLOT_ADD can now make use of mod_requirements and mod_incompatabilities entries. These are formatted and behave the exact same as the equivalent for ADD_EQUIPMENT_ITEMS and ADD_EQUIPMENT_SLOTS"
