@@ -624,7 +624,7 @@ const SHIP_MODIFY = {
 				},
 				{
 					"property":"feedVelocity",
-					"value":"Vector2( -140, -280 )"
+					"value":"Vector2( 0, -280 )"
 				},
 			]
 		},
@@ -632,7 +632,7 @@ const SHIP_MODIFY = {
 			"SYSTEM_SALVAGE_ARM":[
 				{
 					"property":"feedVelocity",
-					"value":"Vector2( 140, -280 )"
+					"value":"Vector2( 0, -280 )"
 				},
 			]
 		},

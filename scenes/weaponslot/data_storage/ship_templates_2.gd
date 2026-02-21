@@ -668,7 +668,7 @@ const SHIP_TEMPLATES = {
 				},
 				{
 					"property":"feedVelocity",
-					"value":"Vector2( -140, -280 )"
+					"value":"Vector2( 0, -280 )"
 				},
 			]
 		},
@@ -676,7 +676,7 @@ const SHIP_TEMPLATES = {
 			"MANIPULATION_ARMS":[
 				{
 					"property":"feedVelocity",
-					"value":"Vector2( 140, -280 )"
+					"value":"Vector2( 0, -280 )"
 				},
 			]
 		},
