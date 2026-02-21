@@ -475,3 +475,11 @@ HEVLIB_NO_DOWNLOAD_CONTENT|NOTICE: mod [%s] has no valid download link provided,
 HEVLIB_SAVEOPT_FIX_CORRUPTED_CARGO|Fix corrupted cargo crash
 
 HEVLIB_SAVEOPT_FIX_CORRUPTED_CARGO_TOOLTIP|Use this to fix a save if it does not load due to having brought back invalid cargo during the previous dive. \n\nTelltale signs of this would be the second to last line of the engine_log.txt file showing: \n'ERROR: No loader found for resource: res://.' after crashing on return from the rings / loading the save.
+
+HEVLIB_CONFIG_MAX_MODDED_DEALERSHIP_POOLS|Maximum modded dealership entries
+
+HEVLIB_CONFIG_MAX_MODDED_DEALERSHIP_POOLS_TOOLTIP|The maximum number of modded ship pools added to the dealership's used ship list. This only handles ships added through ShipDriver.
+
+HEVLIB_SAVEOPT_CLEAR_SOLD_SHIPS|Clear sold ship cache
+
+HEVLIB_SAVEOPT_CLEAR_SOLD_SHIPS_TOOLTIP|Clears any data stored about sold ships. This is used to fix issues with sold modded ships having a persistent ghost ship left in the dealership forever.
