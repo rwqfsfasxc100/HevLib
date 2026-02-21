@@ -11,7 +11,7 @@ credits=["   --- Contributors ---   ","Za'krin - Mod Main design, original imple
 
 version_major=1
 version_minor=11
-version_bugfix=15
+version_bugfix=16
 
 [tags]
 
@@ -220,14 +220,13 @@ HEVLIB_CONFIG_SECTION_INPUT={
 		"name":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_DOWN",
 		"description":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_DOWN_TOOLTIP",
 		"type":"Input",
-		"hint":"",
 		"default":[  ]
 	},
 	"debugger":{
 		"name":"HEVLIB_CONFIG_OPEN_DEBUGGER",
 		"description":"HEVLIB_CONFIG_OPEN_DEBUGGER_TOOLTIP",
 		"type":"Input",
-		"hint":"",
+		"always_binds":[ "QuoteLeft" ],
 		"default":[ "F10" ]
 	},
 	"toggle_debug_menus":{

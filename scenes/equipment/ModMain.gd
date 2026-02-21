@@ -97,7 +97,6 @@ func _init(modLoader = ModLoader):
 		installScriptExtension("../minerals/multiminerals/AsteroidSpawner.gd")
 	
 	
-	installScriptExtension("SystemBuyUI.gd")
 	installScriptExtension("../../ui/ExtensionPopup.gd")
 	installScriptExtension("../scene_replacements/DLClist.gd")
 	replaceScene("../scene_replacements/DLClist.tscn","res://tools/DLClist.tscn")

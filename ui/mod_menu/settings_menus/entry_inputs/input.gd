@@ -17,6 +17,9 @@ func _ready():
 		Tool.remove(self)
 	$Label.text = CONFIG_DATA.get("name","BOOL_MISSING_NAME")
 	$Label/LABELBUTTON.hint_tooltip = CONFIG_DATA.get("description","")
+	var ab = CONFIG_DATA.get("always_binds",[])
+	if ab.size() > 0:
+		$Label/LABELBUTTON.always_binds = ab
 	add_to_group("hevlib_settings_tab",true)
 
 func recheck_availability():
@@ -75,6 +78,7 @@ func recheck_availability():
 func _reset_pressed():
 	pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,CONFIG_DATA.get("default",[]))
 	$Label/LABELBUTTON.grab_focus()
+	$Label/LABELBUTTON/CanvasLayer/CaptureKeyDialog.applySettings()
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 
 func _draw():

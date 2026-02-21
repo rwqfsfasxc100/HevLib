@@ -96,7 +96,7 @@ func _input(event):
 	if capturing:
 		if (event is InputEventKey or event is InputEventMouseButton) and event.is_pressed():
 			get_tree().set_input_as_handled()
-			var key = Settings.eventToString(event)
+			var key = eventToString(event)
 			if event is InputEventKey and event.scancode == KEY_ESCAPE:
 				stopCapturing()
 			else:
@@ -127,6 +127,13 @@ func joyEventToString(event):
 		return "JoyAxis %s" % [is_pos_or_neg(event) + str(event.axis)]
 	
 
+func eventToString(event: InputEvent) -> String:
+	if event is InputEventKey:
+		return OS.get_scancode_string(event.scancode)
+	if event is InputEventMouseButton:
+		return "Mouse %d" % event.button_index
+	return ""
+
 func is_pos_or_neg(event):
 	var val = event.axis_value
 	if val >= 0:
@@ -147,18 +154,28 @@ func stopCapturing():
 	capturing = false
 	addButton.setColor()
 
+func applySettings():
+	var always_binds = hbttn.always_binds
+	always_binds.append_array(pointers.ConfigDriver.__get_value(mod,section,action))
+	var vbinds = Settings.cfg.get("input",{})
+	if action in vbinds:
+		always_binds.append_array(vbinds[action])
+	var action_list = InputMap.get_action_list(action)
+	for action_name in action_list:
+		InputMap.action_erase_event(action, action_name)
+	pointers.ConfigDriver.__load_inputs_from_string_array(action,always_binds)
 
 func _on_Cancel_pressed():
 	stopCapturing()
 	pointers.ConfigDriver.__store_value(mod,section,action,store)
-	Settings.applySettings()
+	applySettings()
 	hide()
 	refocus()
 func _on_Ok_pressed():
 	
 	stopCapturing()
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
-	Settings.applySettings()
+	applySettings()
 	hide()
 	refocus()
 

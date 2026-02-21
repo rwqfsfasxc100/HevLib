@@ -15,6 +15,8 @@ var moused = false
 
 onready var initialModulate = modulate
 
+var always_binds = [  ]
+
 func _ready():
 	mod = get_parent().get_parent().CONFIG_MOD
 	section = get_parent().get_parent().CONFIG_SECTION

@@ -402,45 +402,47 @@ class _ConfigDriver:
 							InputMap.add_action(key)
 						else:
 							Debug.l("ConfigDriver: Input key [%s] already exists, skipping" % key)
-						for i in p:
-							if i.begins_with("Mouse "):
-								var event = InputEventMouseButton.new()
-								event.button_index = int(i.split("Mouse ")[1])
-								if not InputMap.action_has_event(key,event):
-									Debug.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
-									InputMap.action_add_event(key, event)
-								else:
-									Debug.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
-							if i.begins_with("JoyButton "):
-								var event = InputEventJoypadButton.new()
-								event.button_index = int(i.split("JoyButton ")[1])
-								if not InputMap.action_has_event(key,event):
-									Debug.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
-									InputMap.action_add_event(key, event)
-								else:
-									Debug.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
-							if i.begins_with("JoyAxis "):
-								var event = InputEventJoypadMotion.new()
-								event.axis = abs(int(i.split("JoyAxis ")[1]))
-								if i.split("JoyAxis ")[1].begins_with("-"):
-									event.axis_value = -1.0
-								else:
-									event.axis_value = 1.0
-								if not InputMap.action_has_event(key,event):
-									Debug.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
-									InputMap.action_add_event(key, event)
-								else:
-									Debug.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
-								
-							else:
-								var event = InputEventKey.new()
-								event.scancode = OS.find_scancode_from_string(i)
-								if not InputMap.action_has_event(key,event):
-									Debug.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
-									InputMap.action_add_event(key, event)
-								else:
-									Debug.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
+						__load_inputs_from_string_array(key,p)
 	
+	func __load_inputs_from_string_array(key:String, strings: Array):
+		for i in strings:
+			if i.begins_with("Mouse "):
+				var event = InputEventMouseButton.new()
+				event.button_index = int(i.split("Mouse ")[1])
+				if not InputMap.action_has_event(key,event):
+					Debug.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
+					InputMap.action_add_event(key, event)
+				else:
+					Debug.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
+			if i.begins_with("JoyButton "):
+				var event = InputEventJoypadButton.new()
+				event.button_index = int(i.split("JoyButton ")[1])
+				if not InputMap.action_has_event(key,event):
+					Debug.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
+					InputMap.action_add_event(key, event)
+				else:
+					Debug.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
+			if i.begins_with("JoyAxis "):
+				var event = InputEventJoypadMotion.new()
+				event.axis = abs(int(i.split("JoyAxis ")[1]))
+				if i.split("JoyAxis ")[1].begins_with("-"):
+					event.axis_value = -1.0
+				else:
+					event.axis_value = 1.0
+				if not InputMap.action_has_event(key,event):
+					Debug.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
+					InputMap.action_add_event(key, event)
+				else:
+					Debug.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
+				
+			else:
+				var event = InputEventKey.new()
+				event.scancode = OS.find_scancode_from_string(i)
+				if not InputMap.action_has_event(key,event):
+					Debug.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
+					InputMap.action_add_event(key, event)
+				else:
+					Debug.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
 	
 	func __set_button_focus(button,check_button):
 		var parent = button.get_parent()
