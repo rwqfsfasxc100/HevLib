@@ -4,6 +4,7 @@
 1.1="* This is intended for ghost ship cases where a sold modded ship would be intangible and persistent"
 2="* The modded ship dealership pool can now be adjusted, and has the max pool size default increased to 7 ships"
 3="* Fixed ship templates using an old OCP layout"
+4="* Fixed a rare crash caused by quickly swapping ships"
 
 [1.11.16]
 
