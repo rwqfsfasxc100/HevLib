@@ -11,6 +11,29 @@ var current_event_log = {}
 var group = {}
 var all_oddities = []
 
+var mod_requested_events = []
+var mod_request_log = {}
+
+func request_event(oddity,event):
+	mod_requested_events.append(oddity)
+	Debug.l("HevLib Event Driver: event %s requested" % event)
+	
+	var id = hash(oddity)
+	if not event in mod_request_log:
+		mod_request_log.merge({event:{}})
+	var ctime = Time.get_datetime_string_from_system(true)
+	if not id in mod_request_log[event]:
+		mod_request_log[event].merge({id:{}})
+	mod_request_log[event][id]["enter_time"] = ctime
+	file.open(mod_request_file,File.WRITE)
+	file.store_string(JSON.print(mod_request_log,"\t"))
+	file.close()
+
+func getOddityAt(pos: Vector2):
+	if mod_requested_events.size() > 0:
+		return mod_requested_events.pop_front()
+	return .getOddityAt(pos)
+
 func addNearbyOddity(nearby, oddity, pos: Vector2):
 	if oddity is Array:
 		for o in oddity:
@@ -59,6 +82,7 @@ func getNextOnPlaylist():
 var event_log_file = "user://cache/.HevLib_Cache/Event_Driver/event_log.json"
 var active_events_file = "user://cache/.HevLib_Cache/Event_Driver/active_events.txt"
 var latest_event_file = "user://cache/.HevLib_Cache/Event_Driver/latest_event.txt"
+var mod_request_file = "user://cache/.HevLib_Cache/Event_Driver/requested_events_from_mods.txt"
 
 var file = File.new()
 func logEvents():
@@ -103,6 +127,9 @@ func _ready():
 	file.store_string("")
 	file.close()
 	file.open(latest_event_file,File.WRITE)
+	file.store_string("")
+	file.close()
+	file.open(mod_request_file,File.WRITE)
 	file.store_string("")
 	file.close()
 	current_event_log = {}

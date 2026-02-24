@@ -25,20 +25,8 @@ func spawn_event(event,thering: Node):
 			var pos = getPos()
 			event_node.canBeAt(pos)
 			var oddity = event_node.makeAt(pos)
-			if oddity:
-				if oddity is Array:
-					for o in oddity:
-						if not event in ring.group:
-							ring.group[event] = []
-						ring.group[event].append(o)
-						ring.all_oddities.append(o)
-						ring.requestOdditySpawn(o)
-				else:
-					if not event in ring.group:
-						ring.group[event] = []
-					ring.group[event].append(oddity)
-					ring.all_oddities.append(oddity)
-					ring.requestOdditySpawn(oddity)
+			if oddity and ring.has_method("request_event"):
+				ring.request_event(oddity, event)
 		
 		
 		
