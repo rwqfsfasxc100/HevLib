@@ -72,6 +72,7 @@ func _init(modLoader = ModLoader):
 	var ship_driver = {}
 	var register_driver = {}
 	
+	# move this handle to make upgrades scene
 	for mod in drivers:
 		var data = mod["drivers"]
 		var id = mod.get("id",null)

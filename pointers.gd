@@ -1537,6 +1537,7 @@ class _Equipment:
 										can += 1
 								allow = can != needs.size()
 							
+							# update subdriver filtering
 							match equipment.get("slot_type","HARDPOINT"):
 								"HARDPOINT":
 									pass
