@@ -1,3 +1,13 @@
+[1.11.18]
+
+1="* Events spawned through EventDriver now consistently spawn the requested event"
+1.1="* This is due to the events now being passively requested instead of actively pushing them onto the ring scene"
+1.2="* It should also prevent some slowdowns with events containing larger numbers of objects, as now the game adds objects through the timer normally used"
+1.3="* Event debugger menu and comms using EventDriver are automatically affected"
+2="* EventDriver event spawning is now logged, both to the game logs and to EventDriver cache logs"
+3="* Added support for a config field and improved the handling of the mod_requirements and mod_incompatabilities fields on WeaponSlot drivers"
+4="* Added support for config, mod_requirements, and mod_incompatabilities fields to all thruster and aux slot drivers to match equipment, slot, and WeaponSlot drivers"
+
 [1.11.17]
 
 1="* Added button in the save options menu to clear the sold ships cache of a save"

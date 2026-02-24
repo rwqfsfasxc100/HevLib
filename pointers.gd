@@ -1390,7 +1390,6 @@ class _Equipment:
 			vanilla_slot_types.merge({slot.name:sys_slot})
 		
 		
-		var folders = FolderAccess.__fetch_folder_files("res://", true, true)
 		var data_state : Array = []
 		var ws_state : Array = []
 		var power_state = []
@@ -1458,6 +1457,34 @@ class _Equipment:
 		
 		var current_mod_ids = ManifestV2.__get_mod_ids()
 		
+		var driver_store = {
+			"ADD_EQUIPMENT_ITEMS":[],
+			"ADD_EQUIPMENT_SLOTS":[],
+			"EQUIPMENT_TAGS":[],
+			"SLOT_ORDER":[],
+			"SLOT_TAGS":[],
+			"AUX_POWER_AND_THRUSTERS":[],
+			"MODIFY_INTERNALS":[],
+			"NODE_DEFINITIONS":[],
+			"SHIP_NODE_REGISTER":[],
+			"SHIP_NODE_MODIFY":{},
+			"SHIP_THRUSTER_COLORS":{},
+			"WEAPONSLOT_ADD":[],
+			"WEAPONSLOT_MODIFY_TEMPLATES":[],
+			"WEAPONSLOT_MODIFY":[],
+			"WEAPONSLOT_SHIP_TEMPLATES":{},
+			"WEAPONSLOT_SHIP_MODIFY":{},
+			"SAVE_BUTTONS":[],
+			
+		}
+		
+		var wsmtpls = ws_default_templates.get("TEMPLATES",{})
+		for i in wsmtpls:
+			var d = wsmtpls[i].duplicate(true)
+			driver_store["WEAPONSLOT_MODIFY_TEMPLATES"].append({i:d})
+		
+		
+		
 		for cvh in drivers:
 			var check = cvh.get("mod_directory")
 			var mod = check.hash()
@@ -1509,8 +1536,33 @@ class _Equipment:
 									if cv:
 										can += 1
 								allow = can != needs.size()
+							
+							match equipment.get("slot_type","HARDPOINT"):
+								"HARDPOINT":
+									pass
+								"MASS_DRIVER_AMMUNITION":
+									pass
+								"NANODRONE_STORAGE":
+									pass
+								"PROPELLANT_TANK":
+									pass
+								"STANDARD_REACTION_CONTROL_THRUSTERS":
+									pass
+								"STANDARD_MAIN_ENGINE":
+									pass
+								"FISSION_RODS":
+									pass
+								"ULTRACAPACITOR":
+									pass
+								"FISSION_TURBINE":
+									pass
+								"AUX_POWER_SLOT":
+									pass
+							
+							
 							if allow:
 								arr2.append(equipment)
+								driver_store["ADD_EQUIPMENT_ITEMS"].append(equipment.duplicate(true))
 						dicti.merge({"ADD_EQUIPMENT_ITEMS":arr2})
 					"ADD_EQUIPMENT_SLOTS.gd":
 						var arr2 = []
@@ -1555,10 +1607,12 @@ class _Equipment:
 								allow = can != needs.size()
 							if allow:
 								arr2.append(equipment)
+								driver_store["ADD_EQUIPMENT_SLOTS"].append(equipment.duplicate(true))
 						dicti.merge({"ADD_EQUIPMENT_SLOTS":arr2})
 					"EQUIPMENT_TAGS.gd":
 						var ar = constants.get("EQUIPMENT_TAGS",{}).duplicate(true)
 						dicti.merge({"EQUIPMENT_TAGS":ar})
+						driver_store["EQUIPMENT_TAGS"].append(ar.duplicate(true))
 					"SLOT_ORDER.gd":
 						file.open(slot_order_cache_file,File.READ)
 						var data = JSON.parse(file.get_as_text()).result
@@ -1570,19 +1624,62 @@ class _Equipment:
 								pass
 							else:
 								data.append(order)
+							if not order in driver_store["SLOT_ORDER"]:
+								driver_store["SLOT_ORDER"].append(order)
 						file.open(slot_order_cache_file,File.WRITE)
 						file.store_string(JSON.print(data))
 						file.close()
 					"SLOT_TAGS.gd":
 						var ar = constants.get("SLOT_TAGS",{}).duplicate(true)
 						dicti.merge({"SLOT_TAGS":ar})
+						driver_store["SLOT_TAGS"].append(ar.duplicate(true))
 
 
 					"AUX_POWER_SLOT.gd","THRUSTERS.gd","AUX_POWER_AND_THRUSTERS.gd":
 						var arr2 = []
 						for item in constants:
 							var equipment = constants.get(item).duplicate(true)
-							arr2.append(equipment)
+							var allow = true
+							if "config" in equipment:
+								var cf = equipment["config"]
+								var id = cf.get("id",null)
+								var section = cf.get("section",null)
+								var opt = cf.get("entry",null)
+								if id and section and opt:
+									var cv = ConfigDriver.__get_value(id,section,opt)
+									if typeof(cv) == TYPE_BOOL:
+										allow = cv
+							
+							var mr = "mod_requirements" in equipment
+							var mi = "mod_incompatabilities" in equipment
+							if mr:
+								var needs = equipment["mod_requirements"]
+								var can = 0
+								for i in needs:
+									for f in i:
+										var has = false
+										if f in current_mod_ids:
+											has = true
+										if has:
+											can += 1
+								allow = can == needs.size()
+							if mi:
+								var needs = equipment["mod_incompatabilities"]
+								var can = 0
+								for i in needs:
+									var cv = false
+									for f in i:
+										var has = false
+										if f in current_mod_ids:
+											has = true
+										if has:
+											cv = true
+									if cv:
+										can += 1
+								allow = can != needs.size()
+							if allow:
+								arr2.append(equipment)
+								driver_store["AUX_POWER_AND_THRUSTERS"].append(equipment.duplicate(true))
 						if "AUX_POWER_SLOT" in OneOff:
 							pass
 						else:
@@ -1595,9 +1692,10 @@ class _Equipment:
 						var pfdata = JSON.parse(file.get_as_text()).result
 						file.close()
 						if "MODIFY_INTERNALS" in constants:
+							
 							var pdata = constants.MODIFY_INTERNALS
 							pfdata.append_array(pdata)
-							
+							driver_store["MODIFY_INTERNALS"].append_array(pdata.duplicate(true))
 							file.open(processed_storage_file,File.WRITE)
 							file.store_string(JSON.print(pfdata))
 						file.close()
@@ -1606,7 +1704,9 @@ class _Equipment:
 						var pfdata = JSON.parse(file.get_as_text()).result
 						file.close()
 						for item in constants:
-							pfdata.merge({item:constants.get(item)})
+							var xd = {item:constants.get(item)}
+							pfdata.merge(xd)
+							driver_store["NODE_DEFINITIONS"].append(xd.duplicate(true))
 							
 						file.open(node_definitions_file,File.WRITE)
 						file.store_string(JSON.print(pfdata))
@@ -1616,7 +1716,9 @@ class _Equipment:
 						var pfdata = JSON.parse(file.get_as_text()).result
 						file.close()
 						for item in constants:
-							pfdata.append(constants.get(item))
+							var xd = constants.get(item)
+							pfdata.append(xd)
+							driver_store["SHIP_NODE_REGISTER"].append(xd.duplicate(true))
 							
 						file.open(ship_node_register_file,File.WRITE)
 						file.store_string(JSON.print(pfdata))
@@ -1632,9 +1734,14 @@ class _Equipment:
 									pass
 								else:
 									pfdata[ship] = []
+								if ship in driver_store["SHIP_NODE_MODIFY"]:
+									pass
+								else:
+									driver_store["SHIP_NODE_MODIFY"][ship] = []
 								for modification in constants[item].get("modifications",[]):
 									
 									pfdata[ship].append(modification)
+									driver_store["SHIP_NODE_MODIFY"][ship].append(modification.duplicate(true))
 						
 						file.open(ship_node_modify_file,File.WRITE)
 						file.store_string(JSON.print(pfdata))
@@ -1646,10 +1753,13 @@ class _Equipment:
 							var current = JSON.parse(file.get_as_text()).result
 							file.close()
 							for ship in cd:
+								if not ship in driver_store["SHIP_THRUSTER_COLORS"]:
+									driver_store["SHIP_THRUSTER_COLORS"][ship] = []
 								if ship in current:
 									pass
 								else:
 									current.merge({ship:{"node":{},"type":{}}})
+								driver_store["SHIP_THRUSTER_COLORS"][ship].append(cd[ship].duplicate(true))
 								if "type" in cd[ship]:
 									current[ship]["type"].merge(cd[ship]["type"],true)
 								if "node" in cd[ship]:
@@ -1672,7 +1782,47 @@ class _Equipment:
 							if n:
 								if not n in ws_equipment_names:
 									ws_equipment_names.append(n)
-								arr2.append(equipment)
+								var allow = true
+								if "config" in equipment:
+									var cf = equipment["config"]
+									var id = cf.get("id",null)
+									var section = cf.get("section",null)
+									var opt = cf.get("entry",null)
+									if id and section and opt:
+										var cv = ConfigDriver.__get_value(id,section,opt)
+										if typeof(cv) == TYPE_BOOL:
+											allow = cv
+								
+								var mr = "mod_requirements" in equipment
+								var mi = "mod_incompatabilities" in equipment
+								if mr:
+									var needs = equipment["mod_requirements"]
+									var can = 0
+									for i in needs:
+										for f in i:
+											var has = false
+											if f in current_mod_ids:
+												has = true
+											if has:
+												can += 1
+									allow = can == needs.size()
+								if mi:
+									var needs = equipment["mod_incompatabilities"]
+									var can = 0
+									for i in needs:
+										var cv = false
+										for f in i:
+											var has = false
+											if f in current_mod_ids:
+												has = true
+											if has:
+												cv = true
+										if cv:
+											can += 1
+									allow = can != needs.size()
+								if allow:
+									arr2.append(equipment)
+									driver_store["WEAPONSLOT_ADD"].append(equipment.duplicate(true))
 						dictr.merge({"WEAPONSLOT_ADD":arr2})
 					"WEAPONSLOT_MODIFY_TEMPLATES.gd":
 						var ar = constants.get("WEAPONSLOT_MODIFY_TEMPLATES",{}).duplicate(true)
@@ -1707,7 +1857,9 @@ class _Equipment:
 													founddata[template][datapoint].append({"property":key,"value":data_formatted.get(key)})
 							else:
 								founddata[template] = ar.get(template).duplicate(true)
-						
+						for i in ar:
+							var d = ar[i].duplicate(true)
+							driver_store["WEAPONSLOT_MODIFY_TEMPLATES"].append({i:d})
 						file.open(weaponslot_modify_templates_file,File.WRITE)
 						file.store_string(JSON.print(founddata))
 						file.close()
@@ -1741,6 +1893,7 @@ class _Equipment:
 								founddata.merge({item:processed},true)
 							else:
 								founddata.merge({item:ar.get(item)})
+							driver_store["WEAPONSLOT_MODIFY"].append({item:ar.get(item).duplicate(true)})
 						
 						file.open(weaponslot_modify_standalone_file,File.WRITE)
 						file.store_string(JSON.print(founddata))
@@ -1754,6 +1907,9 @@ class _Equipment:
 						var founddata : Dictionary = sort.result
 						
 						for ship in ar:
+							if not ship in driver_store["WEAPONSLOT_SHIP_TEMPLATES"]:
+								driver_store["WEAPONSLOT_SHIP_TEMPLATES"][ship] = []
+							driver_store["WEAPONSLOT_SHIP_TEMPLATES"][ship].append({ship:ar[ship].duplicate(true)})
 							if ship in founddata.keys():
 								var shipdata = ar.get(ship)
 								for slot in shipdata:
@@ -1793,6 +1949,9 @@ class _Equipment:
 						
 						
 						for ship in ar:
+							if not ship in driver_store["WEAPONSLOT_SHIP_MODIFY"]:
+								driver_store["WEAPONSLOT_SHIP_MODIFY"][ship] = []
+							driver_store["WEAPONSLOT_SHIP_MODIFY"][ship].append({ship:ar[ship].duplicate(true)})
 							var slots = ar[ship]
 							for slot in slots:
 								var equipment = slots[slot]
@@ -1839,6 +1998,7 @@ class _Equipment:
 						
 						for button in ar:
 							founddata.append(button)
+							driver_store["SAVE_BUTTONS"].append(button.duplicate(true))
 						
 						file.open(save_menu_file,File.WRITE)
 						file.store_string(JSON.print(founddata))
@@ -1850,6 +2010,10 @@ class _Equipment:
 				ws_state.append([dictr,check,mod,mname])
 			if OneOff.keys().size() >= 1:
 				power_state.append(OneOff)
+		
+		
+		
+#		breakpoint
 		var slots = data_state
 		
 		file.open(weaponslot_modify_equipment_names,File.WRITE)
