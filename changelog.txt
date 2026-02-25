@@ -9,6 +9,7 @@
 4="* Added support for config, mod_requirements, and mod_incompatabilities fields to all thruster and aux slot drivers to match equipment, slot, and WeaponSlot drivers"
 5="* Partially refactored the equipment handling scripts"
 5.1="* Reduced a good portion of the spaghetti code to increase performance. It has been replaced with penne code."
+6="* Cache is now only rebuilt when the installed mod cache changes"
 
 [1.11.17]
 
