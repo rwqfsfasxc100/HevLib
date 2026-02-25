@@ -22,6 +22,7 @@
 6.1="* Reduced a good portion of the spaghetti code to increase performance. It has been replaced with penne code."
 7="* Cache is now only rebuilt when the installed mod cache changes. This should improve load times on lower-end systems"
 8="* Fixed crew not updating when switching ships"
+9="* Added a tool that when added as an immediate child to a ship node that lets you automatically set a config. Must be positioned above nodes that read that config to ensure that they will see the change."
 
 [1.11.17]
 
