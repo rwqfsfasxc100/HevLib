@@ -413,7 +413,7 @@ class _ConfigDriver:
 			file.open(checksum,File.READ)
 			current_check = int(file.get_as_text())
 			file.close()
-		var mvCache = ManifestV2.__get_manifest_cache()
+		var mvCache = ManifestV2.__get_mod_data()
 		var mvCheck = hash(mvCache)
 		file.open(checksum,File.WRITE)
 		file.store_string(str(mvCheck))
