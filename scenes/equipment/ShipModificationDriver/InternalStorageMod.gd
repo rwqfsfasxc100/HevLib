@@ -332,8 +332,7 @@ func _ready():
 		var cfg = shipConfig
 		var state = CurrentGame.state.ship.config
 		
-		var chash = cfg.hash()
-		var shash = state.hash()
+		
 		
 		empShield += emp_shielding
 		
@@ -341,16 +340,6 @@ func _ready():
 		
 		
 		
-		l("Ensuring crew correctness")
-		if chash == shash:
-			if "preferredCrew" in CurrentGame.state.ship.config:
-				if CurrentGame.state.ship.config["preferredCrew"].size() > crew:
-					CurrentGame.state.ship.config["preferredCrew"].resize(crew)
-		
-		
-			var active = getCurrentlyActiveCrewNames()
-			if active.size() > crew:
-				deactivateCrew(crew)
 		
 		for a in range(add_systems.size()):
 			var i = add_systems[a]
@@ -385,6 +374,22 @@ func _ready():
 			nanoDeliveryPerSecond[int(amnt)] = droneData[amnt]
 		
 		clampConsumables()
+		
+		yield(CurrentGame.get_tree(),"idle_frame")
+		
+		
+		l("Ensuring crew correctness")
+		var chash = cfg.hash()
+		var shash = state.hash()
+		if chash == shash:
+			if "preferredCrew" in CurrentGame.state.ship.config:
+				if CurrentGame.state.ship.config["preferredCrew"].size() > crew:
+					CurrentGame.state.ship.config["preferredCrew"].resize(crew)
+		
+		
+			var active = getCurrentlyActiveCrewNames()
+			if active.size() > crew:
+				deactivateCrew(crew)
 
 var nanoDeliveryPerSecond = {
 	0.0: 20, 
