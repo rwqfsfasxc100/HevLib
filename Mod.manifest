@@ -10,8 +10,8 @@ credits=["   --- Contributors ---   ","Za'krin - Mod Main design, original imple
 [version]
 
 version_major=1
-version_minor=11
-version_bugfix=17
+version_minor=12
+version_bugfix=0
 
 [tags]
 
