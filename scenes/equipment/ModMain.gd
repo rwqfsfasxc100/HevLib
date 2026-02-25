@@ -58,38 +58,38 @@ func _init(modLoader = ModLoader):
 	injector.inject_translations(pointers)
 	
 #	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
-	var folder = pointers.FolderAccess.__fetch_folder_files(cache_dir,true,true)
-	for dcv in folder:
-		if dcv != checksum:
-			pointers.FolderAccess.__recursive_delete(dcv)
+#	var folder = pointers.FolderAccess.__fetch_folder_files(cache_dir,true,true)
+#	for dcv in folder:
+#		if dcv != checksum:
+#			pointers.FolderAccess.__recursive_delete(dcv)
 	d.make_dir_recursive(ship_driver_path)
 	var ml = MainLoop.new()
 	ml.set_script(load("res://HevLib/scripts/crash_handler.gd"))
 	_savedObjects.append(ml)
 	
 	
-	var drivers = pointers.DriverManagement.__get_drivers()
-	var ship_driver = {}
-	var register_driver = {}
-	
-	# move this handle to make upgrades scene
-	for mod in drivers:
-		var data = mod["drivers"]
-		var id = mod.get("id",null)
-		if id:
-			if "ADD_SHIPS.gd" in data:
-				var driver = data["ADD_SHIPS.gd"]
-				ship_driver[id] = driver
-			if "REGISTER_SHIP_NUMERICS.gd" in data:
-				var driver = data["REGISTER_SHIP_NUMERICS.gd"]
-				register_driver[id] = driver
-	f.open(ship_driver_path + "driver_data.json",File.WRITE)
-	f.store_string(JSON.print(ship_driver))
-	f.close()
-	
-	f.open(ship_driver_path + "register_data.json",File.WRITE)
-	f.store_string(JSON.print(register_driver))
-	f.close()
+#	var drivers = pointers.DriverManagement.__get_drivers()
+#	var ship_driver = {}
+#	var register_driver = {}
+#
+#	# move this handle to make upgrades scene
+#	for mod in drivers:
+#		var data = mod["drivers"]
+#		var id = mod.get("id",null)
+#		if id:
+#			if "ADD_SHIPS.gd" in data:
+#				var driver = data["ADD_SHIPS.gd"]
+#				ship_driver[id] = driver
+#			if "REGISTER_SHIP_NUMERICS.gd" in data:
+#				var driver = data["REGISTER_SHIP_NUMERICS.gd"]
+#				register_driver[id] = driver
+#	f.open(ship_driver_path + "driver_data.json",File.WRITE)
+#	f.store_string(JSON.print(ship_driver))
+#	f.close()
+#
+#	f.open(ship_driver_path + "register_data.json",File.WRITE)
+#	f.store_string(JSON.print(register_driver))
+#	f.close()
 	
 	installScriptExtension("../notification_driver/CurrentGame.gd")
 	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk"):

@@ -13,69 +13,68 @@ func _ready():
 	file.open(ship_driver_path + "register_data.json",File.READ)
 	var drivers2 = JSON.parse(file.get_as_text()).result
 	file.close()
-	for mod in drivers:
-		var data = drivers[mod]
-		for ship in data:
-			var sd = data[ship]
-			var ship_name = sd.get("name","")
-			var path = sd.get("path","")
-			var alias = sd.get("alias",ship_name)
-			var config = sd.get("config",{})
-			if not "config" in config:
-				var nc = {"config":config.duplicate(true)}
-				config = nc
-			var usedConfigs = sd.get("used_configs",[])
-			if ship_name and path and file.file_exists(path):
-				ships[ship_name] = load(path)
-				configAlias[ship_name] = alias
-				defaultShipConfig[ship_name] = config
-				for cfg in usedConfigs:
-					if not ship_name in usedShipConfigs:
-						usedShipConfigs[ship_name] = []
-					if "config" in cfg:
-						var nv = cfg["config"].duplicate(true)
-						cfg = nv
-					usedShipConfigs[ship_name].append(cfg)
-	for mod in drivers2:
-		var data = drivers2[mod]
-		for register in data:
-			var sd = data[register]
-			match register:
-				"REGISTER_AMMO":
-					for value in sd:
-						var entries = sd[value]
+	for sd in drivers:
+		var ship_name = sd.get("name","")
+		var path = sd.get("path","")
+		var alias = sd.get("alias",ship_name)
+		var config = sd.get("config",{})
+		if not "config" in config:
+			var nc = {"config":config.duplicate(true)}
+			config = nc
+		var usedConfigs = sd.get("used_configs",[])
+		if ship_name and path and file.file_exists(path):
+			ships[ship_name] = load(path)
+			configAlias[ship_name] = alias
+			defaultShipConfig[ship_name] = config
+			for cfg in usedConfigs:
+				if not ship_name in usedShipConfigs:
+					usedShipConfigs[ship_name] = []
+				if "config" in cfg:
+					var nv = cfg["config"].duplicate(true)
+					cfg = nv
+				usedShipConfigs[ship_name].append(cfg)
+	for data in drivers2:
+		match data:
+			"REGISTER_AMMO":
+				for v in drivers2[data]:
+					for value in v:
+						var entries = v[value]
 						value = float(value)
 						if "price" in entries:
 							ammoValue[value] = float(entries["price"])
 						if "delivery_speed" in entries:
 							ammoDeliveryPerSeocond[value] = float(entries["delivery_speed"])
-				"REGISTER_NANO":
-					for value in sd:
-						var entries = sd[value]
+			"REGISTER_NANO":
+				for v in drivers2[data]:
+					for value in v:
+						var entries = v[value]
 						value = float(value)
 						if "price" in entries:
 							droneValue[value] = float(entries["price"])
 						if "delivery_speed" in entries:
 							nano_delivery[value] = float(entries["delivery_speed"])
-				"REGISTER_REACTOR_RODS":
-					for value in sd:
-						var entries = sd[value]
+			"REGISTER_REACTOR_RODS":
+				for v in drivers2[data]:
+					for value in v:
+						var entries = v[value]
 						value = float(value)
 						if "price" in entries:
 							rodsValue[value] = float(entries["price"])
 						if "mass" in entries:
 							rodsMass[value] = float(entries["mass"])
-				"REGISTER_ULTRACAPACITORS":
-					for value in sd:
-						var entries = sd[value]
+			"REGISTER_ULTRACAPACITORS":
+				for v in drivers2[data]:
+					for value in v:
+						var entries = v[value]
 						value = float(value)
 						if "price" in entries:
 							capacitorValue[value] = float(entries["price"])
 						if "mass" in entries:
 							capacitorMass[value] = float(entries["mass"])
-				"REGISTER_TURBINES":
-					for value in sd:
-						var entries = sd[value]
+			"REGISTER_TURBINES":
+				for v in drivers2[data]:
+					for value in v:
+						var entries = v[value]
 						value = float(value)
 						if "price" in entries:
 							turbineValue[value] = float(entries["price"])

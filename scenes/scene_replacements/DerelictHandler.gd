@@ -44,17 +44,19 @@ func _ready():
 	file.open(ship_driver_path + "driver_data.json",File.READ)
 	var data = JSON.parse(file.get_as_text()).result
 	file.close()
-	for mod in data:
-		var md = data[mod]
-		var ir = md.keys()
-		randomize()
-		ir.shuffle()
-		for ship in ir:
-			var fd = md[ship]
-			if mode in fd:
-				var shipName = fd["name"]
-				var event = fd[mode]
-				ship_pool.merge({shipName:event})
+	randomize()
+	data.shuffle()
+	for fd in data:
+#		var md = data[mod]
+#		var ir = md.keys()
+#		randomize()
+#		ir.shuffle()
+#		for ship in ir:
+#		var fd = md[ship]
+		if mode in fd:
+			var shipName = fd["name"]
+			var event = fd[mode]
+			ship_pool.merge({shipName:event})
 	if ship_pool.keys().size() < index:
 		prevent = true
 

@@ -7,6 +7,8 @@
 2="* EventDriver event spawning is now logged, both to the game logs and to EventDriver cache logs"
 3="* Added support for a config field and improved the handling of the mod_requirements and mod_incompatabilities fields on WeaponSlot drivers"
 4="* Added support for config, mod_requirements, and mod_incompatabilities fields to all thruster and aux slot drivers to match equipment, slot, and WeaponSlot drivers"
+5="* Partially refactored the equipment handling scripts"
+5.1="* Reduced a good portion of the spaghetti code to increase performance. It has been replaced with penne code."
 
 [1.11.17]
 

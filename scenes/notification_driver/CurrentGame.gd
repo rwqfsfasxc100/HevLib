@@ -18,16 +18,13 @@ func _ready():
 	file.open(ship_driver_path + "driver_data.json",File.READ)
 	var data = JSON.parse(file.get_as_text()).result
 	file.close()
-	for mod in data:
-		var md = data[mod]
-		for ship in md:
-			var fd = md[ship]
-			if "dealer" in fd:
-				var shipName = fd["name"]
-				var age = fd["dealer"].get("age",200)
-				var dict = {"name":shipName,"age":24 * 3600 * 365 * age}
-				for i in range(max(0,fd["dealer"].get("weight",1))):
-					modded_ship_list.append(dict)
+	for fd in data:
+		if "dealer" in fd:
+			var shipName = fd["name"]
+			var age = fd["dealer"].get("age",200)
+			var dict = {"name":shipName,"age":24 * 3600 * 365 * age}
+			for i in range(max(0,fd["dealer"].get("weight",1))):
+				modded_ship_list.append(dict)
 	init_ships_to_dealer()
 
 func createShipInstanceWithCache(nv, age, sd, stock = false):

@@ -7,9 +7,9 @@ var DataFormat : _DataFormat = _DataFormat.new()
 var FolderAccess : _FolderAccess = _FolderAccess.new()
 var FileAccess : _FileAccess = _FileAccess.new()
 var ManifestV2 : _ManifestV2 = _ManifestV2.new(DataFormat,FolderAccess,FileAccess)
-var ConfigDriver : _ConfigDriver = _ConfigDriver.new(DataFormat,ManifestV2,FolderAccess)
+var ConfigDriver : _ConfigDriver = _ConfigDriver.new(DataFormat,ManifestV2,FolderAccess,self)
 var DriverManagement : _DriverManagement = _DriverManagement.new(FolderAccess,DataFormat,ManifestV2)
-var Equipment : _Equipment = _Equipment.new(DataFormat,FolderAccess,DriverManagement,ConfigDriver,ManifestV2)
+var Equipment : _Equipment = _Equipment.new(DataFormat,FolderAccess,DriverManagement,ConfigDriver,ManifestV2,self)
 var Events : _Events = _Events.new()
 var Github : _Github = _Github.new()
 var HevLib : _HevLib = _HevLib.new(FolderAccess)
@@ -20,6 +20,8 @@ var RingInfo : _RingInfo = _RingInfo.new()
 var TimeAccess : _TimeAccess = _TimeAccess.new()
 var Translations : _Translations = _Translations.new(ConfigDriver)
 var WebTranslate : _WebTranslate = _WebTranslate.new(FolderAccess)
+
+var needs_cache_rebuild = false
 
 func _ready():
 	ConfigDriver.ready()
@@ -114,10 +116,12 @@ class _ConfigDriver:
 	var DataFormat
 	var ManifestV2
 	var FolderAccess
-	func _init(d,m,f):
+	var Parent
+	func _init(d,m,f,p):
 		DataFormat = d
 		ManifestV2 = m
 		FolderAccess = f
+		Parent = p
 	func ready():
 		pushCFG()
 	
@@ -403,6 +407,20 @@ class _ConfigDriver:
 						else:
 							Debug.l("ConfigDriver: Input key [%s] already exists, skipping" % key)
 						__load_inputs_from_string_array(key,p)
+		var checksum = "user://cache/.HevLib_Cache/checksums"
+		var current_check = 0
+		if file.file_exists(checksum):
+			file.open(checksum,File.READ)
+			current_check = int(file.get_as_text())
+			file.close()
+		var mvCache = ManifestV2.__get_manifest_cache()
+		var mvCheck = hash(mvCache)
+		file.open(checksum,File.WRITE)
+		file.store_string(str(mvCheck))
+		file.close()
+		if mvCheck != current_check:
+			Parent.needs_cache_rebuild = true
+			
 	
 	func __load_inputs_from_string_array(key:String, strings: Array):
 		for i in strings:
@@ -1161,13 +1179,15 @@ class _Equipment:
 	var DriverManagement
 	var ConfigDriver
 	var ManifestV2
+	var Parent
 	
-	func _init(d,f,m,c,v):
+	func _init(d,f,m,c,v,p):
 		DataFormat = d
 		FolderAccess = f
 		DriverManagement = m
 		ConfigDriver = c
 		ManifestV2 = v
+		Parent = p
 		
 		vanilla_equipment = DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd")
 		hardpoint_types = vanilla_data.hardpoint_types.duplicate(true)
@@ -1316,6 +1336,8 @@ class _Equipment:
 	var version = [1,0,0]
 	
 	func __make_upgrades_scene(is_onready: bool = true):
+		if Parent.needs_cache_rebuild == false:
+			return
 		var SCENE_HEADER = "[gd_scene load_steps=4 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/unmodified/WeaponSlotUpgradeTemplate.tscn\" type=\"PackedScene\" id=2]\n[ext_resource path=\"res://enceladus/SystemShipUpgradeUI.tscn\" type=\"PackedScene\" id=3]\n\n[sub_resource type=\"ViewportTexture\" id=1]\nflags = 5\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain1/Viewport\")\n\n[sub_resource type=\"ViewportTexture\" id=2]\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain2/Control\")\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]\n\n[node name=\"TextureRect\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 2 )\n\n[node name=\"TextureRect2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 2 )"
 
 		
@@ -1340,6 +1362,10 @@ class _Equipment:
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Slot_Limits.tscn",
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_modify.json",
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_thruster_colors.json",
+			"user://cache/.HevLib_Cache/ShipDriver/",
+			
+			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/Driver_Store.json"
+			
 		]
 		
 		var file_save_path : String = FILE_PATHS[0]
@@ -1360,13 +1386,13 @@ class _Equipment:
 		var upgrades_slot_limits = FILE_PATHS[15]
 		var ship_node_modify_file = FILE_PATHS[16]
 		var ship_thruster_color_file = FILE_PATHS[17]
+		var ship_driver_path = FILE_PATHS[18]
+		var storage_for_driver_store = FILE_PATHS[19]
 		if is_onready:
 			
 			version = DataFormat.__get_vanilla_version()
 			var text = "HevLib make_upgrades_scene manager: observed game version of %s"  % str(version)
 			Debug.l(text)
-#		var Equipment = load("res://HevLib/pointers/Equipment.gd")
-#		var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 		var UpgradeMenu : Node = load("res://enceladus/Upgrades.tscn").instance()
 		var nodes_parent = UpgradeMenu.get_node("VB/MarginContainer/ScrollContainer/MarginContainer/Items")
 		var vanilla_slot_names = []
@@ -1389,10 +1415,6 @@ class _Equipment:
 					index += 1
 			vanilla_slot_types.merge({slot.name:sys_slot})
 		
-		
-		var data_state : Array = []
-		var ws_state : Array = []
-		var power_state = []
 		
 		var ws_equipment_names = []
 		
@@ -1452,6 +1474,11 @@ class _Equipment:
 		file.open(weaponslot_modifications,File.WRITE)
 		file.store_string("[]")
 		file.close()
+		file.open(storage_for_driver_store,File.WRITE)
+		file.store_string("{}")
+		file.close()
+		
+		
 		
 		var drivers = DriverManagement.__get_drivers()
 		
@@ -1475,6 +1502,8 @@ class _Equipment:
 			"WEAPONSLOT_SHIP_TEMPLATES":{},
 			"WEAPONSLOT_SHIP_MODIFY":{},
 			"SAVE_BUTTONS":[],
+			"ADD_SHIPS":[],
+			"REGISTER_SHIP_NUMERICS":{},
 			
 		}
 		
@@ -1486,11 +1515,6 @@ class _Equipment:
 		
 		
 		for cvh in drivers:
-			var check = cvh.get("mod_directory")
-			var mod = check.hash()
-			var dicti = {}
-			var dictr = {}
-			var OneOff = {}
 			for last_bit in cvh.get("drivers"):
 				var constants = cvh["drivers"][last_bit]
 				match last_bit:
@@ -1537,34 +1561,174 @@ class _Equipment:
 										can += 1
 								allow = can != needs.size()
 							
-							# update subdriver filtering
-							match equipment.get("slot_type","HARDPOINT"):
-								"HARDPOINT":
-									pass
-								"MASS_DRIVER_AMMUNITION":
-									pass
-								"NANODRONE_STORAGE":
-									pass
-								"PROPELLANT_TANK":
-									pass
-								"STANDARD_REACTION_CONTROL_THRUSTERS":
-									pass
-								"STANDARD_MAIN_ENGINE":
-									pass
-								"FISSION_RODS":
-									pass
-								"ULTRACAPACITOR":
-									pass
-								"FISSION_TURBINE":
-									pass
-								"AUX_POWER_SLOT":
-									pass
-							
-							
 							if allow:
-								arr2.append(equipment)
+								
+								match equipment.get("slot_type","HARDPOINT"):
+									"HARDPOINT":
+										if "weapon_slot" in equipment:
+											var obj = equipment.get("weapon_slot").duplicate(true)
+											var wname = equipment.get("system","")
+											var wprice = equipment.get("price",0)
+											var objdata = obj.get("data",[])
+											var has_price = false
+											var has_invis = false
+											var price_string = str(wprice)
+											if not "name" in obj:
+												obj.merge({"name":wname})
+											for d in objdata:
+												if d.get("property","") == "repairReplacementPrice":
+													d["value"] = price_string
+													has_price = true
+												if d.get("property","") == "visible":
+													has_invis = true
+											if not has_price:
+												objdata.append({"property":"repairReplacementPrice","value":price_string})
+											if not has_invis:
+												objdata.append({"property":"visible","value":"false"})
+											obj["data"] = objdata.duplicate(true)
+											driver_store["WEAPONSLOT_ADD"].append(obj)
+										if "WEAPONSLOT_ADD" in equipment:
+											var obj = equipment.get("WEAPONSLOT_ADD").duplicate(true)
+											var wname = equipment.get("system","")
+											var wprice = equipment.get("price",0)
+											var objdata = obj.get("data",[])
+											var has_price = false
+											var has_invis = false
+											var price_string = str(wprice)
+											if not "name" in obj:
+												obj.merge({"name":wname})
+											for d in objdata:
+												if d.get("property","") == "repairReplacementPrice":
+													d["value"] = price_string
+													has_price = true
+												if d.get("property","") == "visible":
+													has_invis = true
+											if not has_price:
+												objdata.append({"property":"repairReplacementPrice","value":price_string})
+											if not has_invis:
+												objdata.append({"property":"visible","value":"false"})
+											obj["data"] = objdata.duplicate(true)
+											driver_store["WEAPONSLOT_ADD"].append(obj)
+									"MASS_DRIVER_AMMUNITION":
+										if "REGISTER_AMMO" in equipment:
+											if not "REGISTER_AMMO" in driver_store["REGISTER_SHIP_NUMERICS"]:
+												driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_AMMO"] = []
+											var bp = equipment["REGISTER_AMMO"].duplicate(true)
+											if not "price" in bp:
+												bp["price"] = equipment["price"]
+											var dc = {equipment.get("num_val",0):bp}
+											driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_AMMO"].append(dc)
+									"NANODRONE_STORAGE":
+										if "REGISTER_NANO" in equipment:
+											if not "REGISTER_NANO" in driver_store["REGISTER_SHIP_NUMERICS"]:
+												driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_NANO"] = []
+											var bp = equipment["REGISTER_NANO"].duplicate(true)
+											if not "price" in bp:
+												bp["price"] = equipment["price"]
+											var dc = {equipment.get("num_val",0):bp}
+											driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_NANO"].append(dc)
+									"STANDARD_REACTION_CONTROL_THRUSTERS":
+										if "AUX_POWER_SLOT" in equipment:
+											var bp = equipment["AUX_POWER_SLOT"].duplicate(true)
+											if not "system" in bp:
+												bp["system"] = equipment["system"]
+											if not "price" in bp:
+												bp["price"] = equipment["price"]
+											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
+										if "THRUSTERS" in equipment:
+											var bp = equipment["THRUSTERS"].duplicate(true)
+											if not "system" in bp:
+												bp["system"] = equipment["system"]
+											if not "price" in bp:
+												bp["price"] = equipment["price"]
+											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
+										if "AUX_POWER_AND_THRUSTERS" in equipment:
+											var bp = equipment["AUX_POWER_AND_THRUSTERS"].duplicate(true)
+											if not "system" in bp:
+												bp["system"] = equipment["system"]
+											if not "price" in bp:
+												bp["price"] = equipment["price"]
+											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
+									"STANDARD_MAIN_ENGINE":
+										if "AUX_POWER_SLOT" in equipment:
+											var bp = equipment["AUX_POWER_SLOT"].duplicate(true)
+											if not "system" in bp:
+												bp["system"] = equipment["system"]
+											if not "price" in bp:
+												bp["price"] = equipment["price"]
+											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
+										if "THRUSTERS" in equipment:
+											var bp = equipment["THRUSTERS"].duplicate(true)
+											if not "system" in bp:
+												bp["system"] = equipment["system"]
+											if not "price" in bp:
+												bp["price"] = equipment["price"]
+											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
+										if "AUX_POWER_AND_THRUSTERS" in equipment:
+											var bp = equipment["AUX_POWER_AND_THRUSTERS"].duplicate(true)
+											if not "system" in bp:
+												bp["system"] = equipment["system"]
+											if not "price" in bp:
+												bp["price"] = equipment["price"]
+											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
+									"FISSION_RODS":
+										if "REGISTER_REACTOR_RODS" in equipment:
+											if not "REGISTER_REACTOR_RODS" in driver_store["REGISTER_SHIP_NUMERICS"]:
+												driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_REACTOR_RODS"] = []
+											var bp = equipment["REGISTER_REACTOR_RODS"].duplicate(true)
+											if not "price" in bp:
+												bp["price"] = equipment["price"]
+											var dc = {equipment.get("num_val",0):bp}
+											driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_REACTOR_RODS"].append(dc)
+									"ULTRACAPACITOR":
+										if "REGISTER_ULTRACAPACITORS" in equipment:
+											if not "REGISTER_ULTRACAPACITORS" in driver_store["REGISTER_SHIP_NUMERICS"]:
+												driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_ULTRACAPACITORS"] = []
+											var bp = equipment["REGISTER_ULTRACAPACITORS"].duplicate(true)
+											if not "price" in bp:
+												bp["price"] = equipment["price"]
+											var dc = {equipment.get("num_val",0):bp}
+											driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_ULTRACAPACITORS"].append(dc)
+									"FISSION_TURBINE":
+										if "REGISTER_TURBINES" in equipment:
+											if not "REGISTER_TURBINES" in driver_store["REGISTER_SHIP_NUMERICS"]:
+												driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_TURBINES"] = []
+											var bp = equipment["REGISTER_TURBINES"].duplicate(true)
+											if not "price" in bp:
+												bp["price"] = equipment["price"]
+											var dc = {equipment.get("num_val",0):bp}
+											driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_TURBINES"].append(dc)
+									"AUX_POWER_SLOT":
+										if "auxiliary_power_unit" in equipment:
+											var bp = equipment["auxiliary_power_unit"].duplicate(true)
+											if not "system" in bp:
+												bp["system"] = equipment["system"]
+											if not "price" in bp:
+												bp["price"] = equipment["price"]
+											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
+										if "AUX_POWER_SLOT" in equipment:
+											var bp = equipment["AUX_POWER_SLOT"].duplicate(true)
+											if not "system" in bp:
+												bp["system"] = equipment["system"]
+											if not "price" in bp:
+												bp["price"] = equipment["price"]
+											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
+										if "THRUSTERS" in equipment:
+											var bp = equipment["THRUSTERS"].duplicate(true)
+											if not "system" in bp:
+												bp["system"] = equipment["system"]
+											if not "price" in bp:
+												bp["price"] = equipment["price"]
+											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
+										if "AUX_POWER_AND_THRUSTERS" in equipment:
+											var bp = equipment["AUX_POWER_AND_THRUSTERS"].duplicate(true)
+											if not "system" in bp:
+												bp["system"] = equipment["system"]
+											if not "price" in bp:
+												bp["price"] = equipment["price"]
+											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
+								
 								driver_store["ADD_EQUIPMENT_ITEMS"].append(equipment.duplicate(true))
-						dicti.merge({"ADD_EQUIPMENT_ITEMS":arr2})
 					"ADD_EQUIPMENT_SLOTS.gd":
 						var arr2 = []
 						for item in constants:
@@ -1607,12 +1771,9 @@ class _Equipment:
 										can += 1
 								allow = can != needs.size()
 							if allow:
-								arr2.append(equipment)
 								driver_store["ADD_EQUIPMENT_SLOTS"].append(equipment.duplicate(true))
-						dicti.merge({"ADD_EQUIPMENT_SLOTS":arr2})
 					"EQUIPMENT_TAGS.gd":
 						var ar = constants.get("EQUIPMENT_TAGS",{}).duplicate(true)
-						dicti.merge({"EQUIPMENT_TAGS":ar})
 						driver_store["EQUIPMENT_TAGS"].append(ar.duplicate(true))
 					"SLOT_ORDER.gd":
 						file.open(slot_order_cache_file,File.READ)
@@ -1632,7 +1793,6 @@ class _Equipment:
 						file.close()
 					"SLOT_TAGS.gd":
 						var ar = constants.get("SLOT_TAGS",{}).duplicate(true)
-						dicti.merge({"SLOT_TAGS":ar})
 						driver_store["SLOT_TAGS"].append(ar.duplicate(true))
 
 
@@ -1679,14 +1839,7 @@ class _Equipment:
 										can += 1
 								allow = can != needs.size()
 							if allow:
-								arr2.append(equipment)
 								driver_store["AUX_POWER_AND_THRUSTERS"].append(equipment.duplicate(true))
-						if "AUX_POWER_SLOT" in OneOff:
-							pass
-						else:
-							OneOff.merge({"AUX_POWER_SLOT":[]})
-						OneOff["AUX_POWER_SLOT"].append_array(arr2)
-
 
 					"MODIFY_INTERNALS.gd":
 						file.open(processed_storage_file,File.READ)
@@ -1822,9 +1975,7 @@ class _Equipment:
 											can += 1
 									allow = can != needs.size()
 								if allow:
-									arr2.append(equipment)
 									driver_store["WEAPONSLOT_ADD"].append(equipment.duplicate(true))
-						dictr.merge({"WEAPONSLOT_ADD":arr2})
 					"WEAPONSLOT_MODIFY_TEMPLATES.gd":
 						var ar = constants.get("WEAPONSLOT_MODIFY_TEMPLATES",{}).duplicate(true)
 						file.open(weaponslot_modify_templates_file,File.READ)
@@ -2004,88 +2155,47 @@ class _Equipment:
 						file.open(save_menu_file,File.WRITE)
 						file.store_string(JSON.print(founddata))
 						file.close()
-			var mname = check.split("/")[check.split("/").size() - 2]
-			if dicti.keys().size() >= 1:
-				data_state.append([dicti,check,mod,mname])
-			if dictr.keys().size() >= 1:
-				ws_state.append([dictr,check,mod,mname])
-			if OneOff.keys().size() >= 1:
-				power_state.append(OneOff)
+					"ADD_SHIPS.gd":
+						for ar in constants:
+							var ac = constants[ar]
+							driver_store["ADD_SHIPS"].append(ac.duplicate(true))
+					"REGISTER_SHIP_NUMERICS.gd":
+						for ar in constants:
+							if not ar in driver_store["REGISTER_SHIP_NUMERICS"]:
+								driver_store["REGISTER_SHIP_NUMERICS"][ar] = []
+							var ac = constants[ar]
+							for v in ac:
+								driver_store["REGISTER_SHIP_NUMERICS"][ar].append({v:ac[v].duplicate(true)})
 		
+		file.open(ship_driver_path + "driver_data.json",File.WRITE)
+		file.store_string(JSON.print(driver_store["ADD_SHIPS"]))
+		file.close()
 		
+		file.open(ship_driver_path + "register_data.json",File.WRITE)
+		file.store_string(JSON.print(driver_store["REGISTER_SHIP_NUMERICS"]))
+		file.close()
 		
-#		breakpoint
-		var slots = data_state
+		file.open(storage_for_driver_store,File.WRITE)
+		file.store_string(JSON.print(driver_store))
+		file.close()
 		
 		file.open(weaponslot_modify_equipment_names,File.WRITE)
 		file.store_string(JSON.print(ws_equipment_names))
 		file.close()
 		
-		for item in slots:
-			var files = item[0]
-			if "ADD_EQUIPMENT_ITEMS" in files.keys():
-				var data = files.get("ADD_EQUIPMENT_ITEMS")
-				var for_ws = [{"WEAPONSLOT_ADD":[]}]
-				var for_aux_power = {"AUX_POWER_SLOT":[]}
-				for object in data:
-					if object.get("slot_type","HARDPOINT") == "HARDPOINT":
-						if "weapon_slot" in object.keys():
-							var obj = object.get("weapon_slot").duplicate(true)
-							var wname = object.get("system","")
-							var wprice = object.get("price",0)
-							var objdata = obj.get("data",[])
-							var has_price = false
-							var has_invis = false
-							var price_string = str(wprice)
-							if "name" in obj.keys():
-								pass
-							else:
-								object["weapon_slot"].merge({"name":wname})
-							for d in objdata:
-								if d.get("property","") == "repairReplacementPrice":
-									d["value"] = price_string
-									has_price = true
-								if d.get("property","") == "visible":
-									has_invis = true
-							if not has_price:
-								objdata.append({"property":"repairReplacementPrice","value":price_string})
-							if not has_invis:
-								objdata.append({"property":"visible","value":"false"})
-							object["weapon_slot"]["data"] = objdata.duplicate(true)
-							var eq_for_ws = object["weapon_slot"].duplicate(true)
-							for_ws[0]["WEAPONSLOT_ADD"].append(eq_for_ws)
-					if object.get("slot_type","HARDPOINT") == "AUX_POWER_SLOT":
-						if "auxiliary_power_unit" in object.keys():
-							var bp = object.get("auxiliary_power_unit")
-							if "system" in bp.keys():
-								pass
-							else:
-								bp.merge({"system":object.get("system","SYSTEM_MISSING_NAME")})
-							if "price" in bp.keys():
-								pass
-							else:
-								bp.merge({"price":object.get("price",0)})
-							
-							for_aux_power["AUX_POWER_SLOT"].append(bp)
-				power_state.append(for_aux_power)
-				ws_state.append(for_ws)
-		
 		var all_slot_node_names = []
 		all_slot_node_names.append_array(vanilla_slot_names)
 		var slots_for_adding = []
 		var slots_for_adding_dict = {}
-		var tag_modifications = {}
+		var tag_modifications = []
 		
 		var ship_limitations = {}
 		var ship_limitation_string = ""
 		
 		var equipment_for_adding = []
-	#	var equipment_for_adding = {}
 		
-		for its in slots:
-			var nodes = its[0].get("EQUIPMENT_TAGS",{})
+		for nodes in driver_store["EQUIPMENT_TAGS"]:
 			if nodes.keys().size() >= 1:
-				l("Adding equipment tags for %s" % str(its[2]))
 				var slotTypes = nodes.get("slot_types",[])
 				var equipmentItems = nodes.get("equipment_types",[])
 				var align = nodes.get("alignments",[])
@@ -2117,85 +2227,78 @@ class _Equipment:
 									slot_defaults[st].append(item)
 						else:
 							slot_defaults.merge({st:slotDefaults.get(st)})
-			var newSlot = its[0].get("ADD_EQUIPMENT_SLOTS",[])
-			var mod_hash = str(its[2])
-			if newSlot.size() >= 1:
-				l("Adding slots for %s" % mod_hash)
-				for slotDict in newSlot:
-					var snn = slotDict.get("slot_node_name","")
+		for slotDict in driver_store["ADD_EQUIPMENT_SLOTS"]:
+			var snn = slotDict.get("slot_node_name","")
+			var spp = ship_limitations.get(snn,{})
+			if "limit_ships" in slotDict:
+				var val = slotDict["limit_ships"].duplicate()
+				if snn in ship_limitations:
+					if "limit_ships" in spp:
+						for i in val:
+							if i in spp:
+								pass
+							else:
+								ship_limitations[snn]["limit_ships"] = i
+					else:
+						ship_limitations[snn]["limit_ships"] = spp["limit_ships"]
+				else:
+					ship_limitations.merge({snn:{}})
+					ship_limitations[snn]["limit_ships"] = val
+			if "prevent_ships" in slotDict:
+				var val = slotDict["prevent_ships"].duplicate()
+				if snn in ship_limitations:
+					if "prevent_ships" in spp:
+						for i in val:
+							if i in spp:
+								pass
+							else:
+								ship_limitations[snn]["prevent_ships"] = i
+					else:
+						ship_limitations[snn]["prevent_ships"] = spp["prevent_ships"]
+				else:
+					ship_limitations.merge({snn:{}})
+					ship_limitations[snn]["prevent_ships"] = val
+			slots_for_adding.append(slotDict)
+			slots_for_adding_dict.merge({slotDict.get("slot_node_name",""):slotDict})
+			all_slot_node_names.append(slotDict.get("slot_node_name",""))
+		for node in driver_store["SLOT_TAGS"]:
+			if node.keys().size() >= 1:
+				tag_modifications.append(node)
+				for i in node:
+					var data = node[i]
+					var snn = i
 					var spp = ship_limitations.get(snn,{})
-					if "limit_ships" in slotDict:
-						var val = slotDict["limit_ships"].duplicate()
+					if "limit_ships" in data:
+						var val = data["limit_ships"].duplicate()
 						if snn in ship_limitations:
 							if "limit_ships" in spp:
-								for i in val:
-									if i in spp:
+								for f in val:
+									if f in spp:
 										pass
 									else:
-										ship_limitations[snn]["limit_ships"] = i
+										ship_limitations[snn]["limit_ships"] = f
 							else:
 								ship_limitations[snn]["limit_ships"] = spp["limit_ships"]
 						else:
 							ship_limitations.merge({snn:{}})
-							ship_limitations[snn]["limit_ships"] = val
-					if "prevent_ships" in slotDict:
-						var val = slotDict["prevent_ships"].duplicate()
+							ship_limitations[snn]["limit_ships"] = val.duplicate()
+					if "prevent_ships" in data:
+						var val = data["prevent_ships"].duplicate()
 						if snn in ship_limitations:
 							if "prevent_ships" in spp:
-								for i in val:
-									if i in spp:
+								for f in val:
+									if f in spp:
 										pass
 									else:
-										ship_limitations[snn]["prevent_ships"] = i
+										ship_limitations[snn]["prevent_ships"] = f
 							else:
 								ship_limitations[snn]["prevent_ships"] = spp["prevent_ships"]
 						else:
 							ship_limitations.merge({snn:{}})
-							ship_limitations[snn]["prevent_ships"] = val
-					slots_for_adding.append(slotDict)
-					slots_for_adding_dict.merge({slotDict.get("slot_node_name",""):slotDict})
-					all_slot_node_names.append(slotDict.get("slot_node_name",""))
-			for itm in slots:
-				var node = itm[0].get("SLOT_TAGS",{})
-				if node.keys().size() >= 1:
-					tag_modifications.merge({itm[3].hash():node})
-					for i in node:
-						var data = node[i]
-						var snn = i
-						var spp = ship_limitations.get(snn,{})
-						if "limit_ships" in data:
-							var val = data["limit_ships"].duplicate()
-							if snn in ship_limitations:
-								if "limit_ships" in spp:
-									for f in val:
-										if f in spp:
-											pass
-										else:
-											ship_limitations[snn]["limit_ships"] = f
-								else:
-									ship_limitations[snn]["limit_ships"] = spp["limit_ships"]
-							else:
-								ship_limitations.merge({snn:{}})
-								ship_limitations[snn]["limit_ships"] = val.duplicate()
-						if "prevent_ships" in data:
-							var val = data["prevent_ships"].duplicate()
-							if snn in ship_limitations:
-								if "prevent_ships" in spp:
-									for f in val:
-										if f in spp:
-											pass
-										else:
-											ship_limitations[snn]["prevent_ships"] = f
-								else:
-									ship_limitations[snn]["prevent_ships"] = spp["prevent_ships"]
-							else:
-								ship_limitations.merge({snn:{}})
-								ship_limitations[snn]["prevent_ships"] = val.duplicate()
-			var ns = its[0].get("ADD_EQUIPMENT_ITEMS",[])
+							ship_limitations[snn]["prevent_ships"] = val.duplicate()
+		for ns in driver_store["ADD_EQUIPMENT_ITEMS"]:
 			if ns.size() >= 1:
-				for m in ns:
-	#				equipment_for_adding.merge({m.get("system",""):m})
-					equipment_for_adding.append(m)
+				equipment_for_adding.append(ns)
 		
 		var slots_full : Array = []
 		var slots_format : PoolStringArray = []
@@ -2210,8 +2313,7 @@ class _Equipment:
 		for slot in slots_for_adding:
 			var m = slot.get("slot_node_name","")
 			var format = __make_slot_for_scene(slot)
-			for tag in tag_modifications:
-				var data = tag_modifications.get(tag)
+			for data in tag_modifications:
 				if m in data.keys():
 					for check in format:
 						if check.keys()[0] == m:
@@ -2237,8 +2339,7 @@ class _Equipment:
 			var vslot_data = vanilla_equipment_defaults_for_reference[slot]
 			var vslot_additives = vslot_data.get("override_additive",[])
 			var vslot_subtractives = vslot_data.get("override_subtractive",[])
-			for mod in tag_modifications:
-				var dict = tag_modifications[mod]
+			for dict in tag_modifications:
 				if slot in dict.keys():
 					var tag_data = dict[slot]
 					var tag_add = tag_data.get("override_additive",[])
@@ -2355,9 +2456,7 @@ class _Equipment:
 						equipment_format.append(string)
 		for slot in all_slot_node_names:
 			if slot in slot_allowed_equipment.keys():
-	#			for equip in equipment_for_adding:
 				for item in equipment_for_adding:
-	#				var item = equipment_for_adding[equip]
 					var allowed_equipment = slot_allowed_equipment.get(slot,[]).duplicate(true)
 					var slot_type = ""
 					var alignment = ""
@@ -2373,7 +2472,6 @@ class _Equipment:
 						alignment = slots_for_adding_dict[slot].get("alignment","")
 						restriction = slots_for_adding_dict[slot].get("restriction","")
 						system_slot = slots_for_adding_dict[slot].get("system_slot","")
-	#				var does = confirm_equipment(equipment_for_adding[equip], slot_type, alignment, restriction, allowed_equipment)
 					var does = confirm_equipment(item, slot_type, alignment, restriction, allowed_equipment)
 					if does:
 						var string = __make_equipment_for_scene(item, slot, system_slot)
@@ -2392,13 +2490,6 @@ class _Equipment:
 			concat = concat + "\n\n" + equip
 		for path in editable_paths:
 			concat = concat + "\n\n" + path
-	#	FolderAccess.__check_folder_exists(file_save_path.split("/")[file_save_path.split("/").size() - 1])
-		
-		for entry in ws_state:
-			for opt in entry[0].keys():
-				match opt:
-					"WEAPONSLOT_TAGS":
-						pass
 		
 		
 		
@@ -2416,133 +2507,125 @@ class _Equipment:
 		var ws_stuff_to_add = []
 		var ws_stuff_to_modify = []
 		
-		for entry in ws_state:
-			var d = entry[0]
-			var opts = d.keys()
-			for opt in opts:
-				match opt:
-					"WEAPONSLOT_ADD":
-						var additions = d.get(opt)
-						
-						for add in additions:
-							var allow = true
-							var mr = "mod_requirements" in add
-							var mi = "mod_incompatabilities" in add
-							if mr:
-								var needs = add["mod_requirements"]
-								var can = 0
-								for i in needs:
-									for f in i:
-										var has = false
-										if f in current_mod_ids:
-											has = true
-										if has:
-											can += 1
-								allow = can == needs.size()
-							if mi:
-								var needs = add["mod_incompatabilities"]
-								var can = 0
-								for i in needs:
-									var cv = false
-									for f in i:
-										var has = false
-										if f in current_mod_ids:
-											has = true
-										if has:
-											cv = true
-									if cv:
-										can += 1
-								allow = can != needs.size()
-							
-							if allow:
-								var aname = add.get("name","SYSTEM_ERROR")
-								var apath = add.get("path","")
-								var item_data = {}
-								for it in add.get("data",[]):
-									var ws_property_string = ""
-									var ws_property = it.get("property")
-									var ws_value = it.get("value")
-									var split = ws_property.split("/")
-									var property = split[split.size() - 1]
-									if split.size() >= 3:
-										var node = split[split.size() - 2]
-										var nonode = ws_property.split(node)
-										if nonode[0].ends_with("/"):
-											nonode[0] = nonode[0].rstrip("/")
-										if nonode[1].begins_with("/"):
-											nonode[1] = nonode[1].lstrip("/")
-										if nonode[0] in item_data:
-											pass
-										else:
-											item_data.merge({nonode[0]:[]})
-										item_data[nonode[0]].append([nonode[1],ws_value])
-									elif split.size() == 2:
-										if split[0] in item_data:
-											pass
-										else:
-											item_data.merge({split[0]:[]})
-										item_data[split[0]].append([split[1],ws_value])
-									else:
-										if "." in item_data:
-											pass
-										else:
-											item_data.merge({".":[]})
-										item_data["."].append([ws_property,ws_value])
-								if apath == "":
-									ws_stuff_to_modify.append({"name":aname,"data":item_data})
-								else:
-									ws_stuff_to_add.append({"name":aname,"path":apath,"data":item_data})
-		
-		
-		
-		
-						for add in additions:
-							var aname = add.get("name","SYSTEM_ERROR")
-							var apath = add.get("path","")
-							var add_header = ""
-							if apath == "":
-								add_header = equipment_header_noref % [aname,"."]
-							else:
-								add_header = equipment_header % [aname,".",apath]
-							weaponslot_properties.merge({add_header:[]})
-							if ws_editable_paths == "":
-								ws_editable_paths = equipment_editable_path_base % aname
-							else:
-								ws_editable_paths = ws_editable_paths + "\n" + equipment_editable_path_base % aname
-							
-							for it in add.get("data",[]):
-								var ws_property_string = ""
-								var ws_property = it.get("property")
-								var ws_value = it.get("value")
-								var split = ws_property.split("/")
-								var property = split[split.size() - 1]
-								var parent_path = "."
-								if split.size() >= 3:
-									var node = split[split.size() - 2]
-									var nonode = ws_property.split(node)
-									if nonode[0].ends_with("/"):
-										nonode[0] = nonode[0].rstrip("/")
-									if nonode[1].begins_with("/"):
-										nonode[1] = nonode[1].lstrip("/")
-									var prop_header = equipment_header_noref % [node,aname + "/" + nonode[0]]
-									if prop_header in weaponslot_properties.keys():
-										pass
-									else:
-										weaponslot_properties.merge({prop_header:[]})
-									weaponslot_properties[prop_header].append([nonode[1],ws_value])
-								elif split.size() == 2:
-									var prop_header = equipment_header_noref % [split[0],aname]
-									if prop_header in weaponslot_properties.keys():
-										pass
-									else:
-										weaponslot_properties.merge({prop_header:[]})
-									weaponslot_properties[prop_header].append([split[1],ws_value])
-								else:
-									if add_header in weaponslot_properties.keys():
-										pass
-									else:
-										weaponslot_properties.merge({add_header:[]})
-									weaponslot_properties[add_header].append([ws_property,ws_value])
+		for add in driver_store["WEAPONSLOT_ADD"]:
+			var allow = true
+			var mr = "mod_requirements" in add
+			var mi = "mod_incompatabilities" in add
+			if mr:
+				var needs = add["mod_requirements"]
+				var can = 0
+				for i in needs:
+					for f in i:
+						var has = false
+						if f in current_mod_ids:
+							has = true
+						if has:
+							can += 1
+				allow = can == needs.size()
+			if mi:
+				var needs = add["mod_incompatabilities"]
+				var can = 0
+				for i in needs:
+					var cv = false
+					for f in i:
+						var has = false
+						if f in current_mod_ids:
+							has = true
+						if has:
+							cv = true
+					if cv:
+						can += 1
+				allow = can != needs.size()
+			
+			if allow:
+				var aname = add.get("name","SYSTEM_ERROR")
+				var apath = add.get("path","")
+				var item_data = {}
+				for it in add.get("data",[]):
+					var ws_property_string = ""
+					var ws_property = it.get("property")
+					var ws_value = it.get("value")
+					var split = ws_property.split("/")
+					var property = split[split.size() - 1]
+					if split.size() >= 3:
+						var node = split[split.size() - 2]
+						var nonode = ws_property.split(node)
+						if nonode[0].ends_with("/"):
+							nonode[0] = nonode[0].rstrip("/")
+						if nonode[1].begins_with("/"):
+							nonode[1] = nonode[1].lstrip("/")
+						if nonode[0] in item_data:
+							pass
+						else:
+							item_data.merge({nonode[0]:[]})
+						item_data[nonode[0]].append([nonode[1],ws_value])
+					elif split.size() == 2:
+						if split[0] in item_data:
+							pass
+						else:
+							item_data.merge({split[0]:[]})
+						item_data[split[0]].append([split[1],ws_value])
+					else:
+						if "." in item_data:
+							pass
+						else:
+							item_data.merge({".":[]})
+						item_data["."].append([ws_property,ws_value])
+				if apath == "":
+					ws_stuff_to_modify.append({"name":aname,"data":item_data})
+				else:
+					ws_stuff_to_add.append({"name":aname,"path":apath,"data":item_data})
+
+
+
+
+#						for add in additions:
+			var aname = add.get("name","SYSTEM_ERROR")
+			var apath = add.get("path","")
+			var add_header = ""
+			if apath == "":
+				add_header = equipment_header_noref % [aname,"."]
+			else:
+				add_header = equipment_header % [aname,".",apath]
+			weaponslot_properties.merge({add_header:[]})
+			if ws_editable_paths == "":
+				ws_editable_paths = equipment_editable_path_base % aname
+			else:
+				ws_editable_paths = ws_editable_paths + "\n" + equipment_editable_path_base % aname
+			
+			for it in add.get("data",[]):
+				var ws_property_string = ""
+				var ws_property = it.get("property")
+				var ws_value = it.get("value")
+				var split = ws_property.split("/")
+				var property = split[split.size() - 1]
+				var parent_path = "."
+				if split.size() >= 3:
+					var node = split[split.size() - 2]
+					var nonode = ws_property.split(node)
+					if nonode[0].ends_with("/"):
+						nonode[0] = nonode[0].rstrip("/")
+					if nonode[1].begins_with("/"):
+						nonode[1] = nonode[1].lstrip("/")
+					var prop_header = equipment_header_noref % [node,aname + "/" + nonode[0]]
+					if prop_header in weaponslot_properties.keys():
+						pass
+					else:
+						weaponslot_properties.merge({prop_header:[]})
+					weaponslot_properties[prop_header].append([nonode[1],ws_value])
+				elif split.size() == 2:
+					var prop_header = equipment_header_noref % [split[0],aname]
+					if prop_header in weaponslot_properties.keys():
+						pass
+					else:
+						weaponslot_properties.merge({prop_header:[]})
+					weaponslot_properties[prop_header].append([split[1],ws_value])
+				else:
+					if add_header in weaponslot_properties.keys():
+						pass
+					else:
+						weaponslot_properties.merge({add_header:[]})
+					weaponslot_properties[add_header].append([ws_property,ws_value])
 		
 		for property in weaponslot_properties:
 			weaponslot_string = weaponslot_string + "\n\n" + property
@@ -2573,70 +2656,66 @@ class _Equipment:
 		
 		
 		
-		for mod in power_state:
-			for type in mod:
-				match type:
-					"AUX_POWER_SLOT","THRUSTERS","AUX_POWER_AND_THRUSTERS":
-						for data in mod.get(type):
-							file.open(auxslot_data_path,File.READ)
-							var a = JSON.parse(file.get_as_text()).result
-							file.close()
-							var equipSlots = data.get("slots",[])
-							for slot in equipSlots:
-								slot = slot.split(".")[0]
-								if slot in a:
-									pass
-								else:
-									a.merge({slot:[]})
-								a[slot].append(data)
-							
-							file.open(auxslot_data_path,File.WRITE)
-							file.store_string(JSON.print(a))
-							file.close()
-							var aux_path = data.get("path","")
-							var aux_type = data.get("type","MPDG").to_upper()
-							match aux_type:
-								"THRUSTER","RCS","TORCH","MAIN_PROPULSION":
-									var sys = data.get("system","SYSTEM_NAME_MISSING")
-									var light_lag_chance = data.get("exhaust_light_lag_chance",0)
-									var base_lifetime = data.get("exhaust_base_lifetime",0.25)
-									var lifetime = data.get("exhaust_lifetime",0.25)
-									var end_scale = data.get("exhaust_end_scale",0.02)
-									var self_remove = data.get("exhaust_self_remove",0.02)
-									var mass = data.get("exhaust_mass",0.1)
-									var sprite = data.get("exhaust_sprite","res://sfx/ball-of-flame.png")
-									var sprite_scale = data.get("exhaust_sprite_scale",[0.5,0.5])
-									var radius = data.get("exhaust_collider_radius",2.87)
-									
-									var tex_type = ""
-									if sprite.ends_with(".png"):
-										tex_type = "Texture"
-									elif sprite.ends_with(".stex"):
-										tex_type = "StreamTexture"
-									else:
-										tex_type = "Texture"
-										sprite = "res://sfx/ball-of-flame.png"
-									
-									var thruster_text = thruster_header % [sprite,tex_type,str(radius)]
-									
-									thruster_text = thruster_text + "\nmass = %s" % mass
-									thruster_text = thruster_text + "\nlightLagChance = %s" % light_lag_chance
-									thruster_text = thruster_text + "\nbaseLifetime = %s" % base_lifetime
-									thruster_text = thruster_text + "\nlifetime = %s" % lifetime
-									thruster_text = thruster_text + "\nendScale = %s" % end_scale
-									if self_remove:
-										thruster_text = thruster_text + "\nselfRemove = true"
-									else:
-										thruster_text = thruster_text + "\nselfRemove = false"
-									
-									thruster_text = thruster_text + "\n\n[node name=\"CollisionShape2D\" parent=\".\" index=\"0\"]\nshape = SubResource( 1 )\n\n" + thruster_footer
-									thruster_text = thruster_text + "\nscale = Vector2(%s,%s)" % [sprite_scale[0],sprite_scale[1]]
-									
-									FolderAccess.__check_folder_exists(exhaust_cache_path + "/" + aux_type)
-									
-									file.open(exhaust_cache_path + "/" + aux_type + "/" + sys + ".tscn",File.WRITE)
-									file.store_string(thruster_text)
-									file.close()
+		for data in driver_store["AUX_POWER_AND_THRUSTERS"]:
+			file.open(auxslot_data_path,File.READ)
+			var a = JSON.parse(file.get_as_text()).result
+			file.close()
+			var equipSlots = data.get("slots",[])
+			for slot in equipSlots:
+				slot = slot.split(".")[0]
+				if slot in a:
+					pass
+				else:
+					a.merge({slot:[]})
+				a[slot].append(data)
+			
+			file.open(auxslot_data_path,File.WRITE)
+			file.store_string(JSON.print(a))
+			file.close()
+			var aux_path = data.get("path","")
+			var aux_type = data.get("type","MPDG").to_upper()
+			match aux_type:
+				"THRUSTER","RCS","TORCH","MAIN_PROPULSION":
+					var sys = data.get("system","SYSTEM_NAME_MISSING")
+					var light_lag_chance = data.get("exhaust_light_lag_chance",0)
+					var base_lifetime = data.get("exhaust_base_lifetime",0.25)
+					var lifetime = data.get("exhaust_lifetime",0.25)
+					var end_scale = data.get("exhaust_end_scale",0.02)
+					var self_remove = data.get("exhaust_self_remove",0.02)
+					var mass = data.get("exhaust_mass",0.1)
+					var sprite = data.get("exhaust_sprite","res://sfx/ball-of-flame.png")
+					var sprite_scale = data.get("exhaust_sprite_scale",[0.5,0.5])
+					var radius = data.get("exhaust_collider_radius",2.87)
+					
+					var tex_type = ""
+					if sprite.ends_with(".png"):
+						tex_type = "Texture"
+					elif sprite.ends_with(".stex"):
+						tex_type = "StreamTexture"
+					else:
+						tex_type = "Texture"
+						sprite = "res://sfx/ball-of-flame.png"
+					
+					var thruster_text = thruster_header % [sprite,tex_type,str(radius)]
+					
+					thruster_text = thruster_text + "\nmass = %s" % mass
+					thruster_text = thruster_text + "\nlightLagChance = %s" % light_lag_chance
+					thruster_text = thruster_text + "\nbaseLifetime = %s" % base_lifetime
+					thruster_text = thruster_text + "\nlifetime = %s" % lifetime
+					thruster_text = thruster_text + "\nendScale = %s" % end_scale
+					if self_remove:
+						thruster_text = thruster_text + "\nselfRemove = true"
+					else:
+						thruster_text = thruster_text + "\nselfRemove = false"
+					
+					thruster_text = thruster_text + "\n\n[node name=\"CollisionShape2D\" parent=\".\" index=\"0\"]\nshape = SubResource( 1 )\n\n" + thruster_footer
+					thruster_text = thruster_text + "\nscale = Vector2(%s,%s)" % [sprite_scale[0],sprite_scale[1]]
+					
+					FolderAccess.__check_folder_exists(exhaust_cache_path + "/" + aux_type)
+					
+					file.open(exhaust_cache_path + "/" + aux_type + "/" + sys + ".tscn",File.WRITE)
+					file.store_string(thruster_text)
+					file.close()
 								
 								
 		var lim_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]"
@@ -4470,6 +4549,9 @@ class _ManifestV2:
 			
 			pass
 		return changelog
+	
+	func __get_manifest_cache() -> Dictionary:
+		return cached_manifests
 	
 
 class _NodeAccess:
