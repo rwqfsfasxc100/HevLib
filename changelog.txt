@@ -1,3 +1,7 @@
+[1.12.2]
+
+1="* Fixed regression causing modded equipment to be unable to be fixed"
+
 [1.12.1]
 
 1="* Fixed rare crash that occurred when the Steam servers timed out"

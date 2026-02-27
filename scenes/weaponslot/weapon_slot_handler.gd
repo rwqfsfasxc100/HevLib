@@ -242,4 +242,12 @@ func loadPlaceholder():
 			system.visible = true
 			if "slotName" in system:
 				system.slotName = t + "_" + system.systemName
+			systemName = _getSystemName()
+			slotName = _getSlotName()
+			inspection = _getInspection()
+			repairFixPrice = _getRepairFixPrice()
+			repairFixTime = _getRepairFixTime()
+			repairReplacementPrice = _repairReplacementPrice()
+			repairReplacementTime = _repairReplacementTime()
+			mass = _getMass()
 	ship.changeExternalPlaceholders( - 1)
