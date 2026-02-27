@@ -6,8 +6,9 @@ var Achievements : _Achievements = _Achievements.new()
 var DataFormat : _DataFormat = _DataFormat.new()
 var FolderAccess : _FolderAccess = _FolderAccess.new()
 var FileAccess : _FileAccess = _FileAccess.new()
+var Keymapping : _Keymapping = _Keymapping.new(FolderAccess,FileAccess)
 var ManifestV2 : _ManifestV2 = _ManifestV2.new(DataFormat,FolderAccess,FileAccess)
-var ConfigDriver : _ConfigDriver = _ConfigDriver.new(DataFormat,ManifestV2,FolderAccess,self)
+var ConfigDriver : _ConfigDriver = _ConfigDriver.new(DataFormat,ManifestV2,FolderAccess,self,Keymapping)
 var DriverManagement : _DriverManagement = _DriverManagement.new(FolderAccess,DataFormat,ManifestV2)
 var Equipment : _Equipment = _Equipment.new(DataFormat,FolderAccess,DriverManagement,ConfigDriver,ManifestV2,self)
 var Events : _Events = _Events.new()
@@ -117,11 +118,13 @@ class _ConfigDriver:
 	var ManifestV2
 	var FolderAccess
 	var Parent
-	func _init(d,m,f,p):
+	var Keymapping
+	func _init(d,m,f,p,k):
 		DataFormat = d
 		ManifestV2 = m
 		FolderAccess = f
 		Parent = p
+		Keymapping = k
 	func ready():
 		pushCFG()
 	
@@ -289,6 +292,7 @@ class _ConfigDriver:
 	
 	
 	func __load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
+		Keymapping.__define_vanilla_binds()
 		var dir = Directory.new()
 		var c = ConfigFile.new()
 		var cfg_file = "user://cfg/" + cfg_filename
@@ -419,7 +423,7 @@ class _ConfigDriver:
 		file.open(checksum,File.WRITE)
 		file.store_string(str(mvCheck))
 		file.close()
-		if mvCheck != current_check:
+		if mvCheck != current_check or OS.has_feature("editor"):
 			Parent.needs_cache_rebuild = true
 			
 	
@@ -1340,7 +1344,11 @@ class _Equipment:
 		if Parent.needs_cache_rebuild == false:
 			return
 		var SCENE_HEADER = "[gd_scene load_steps=4 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/unmodified/WeaponSlotUpgradeTemplate.tscn\" type=\"PackedScene\" id=2]\n[ext_resource path=\"res://enceladus/SystemShipUpgradeUI.tscn\" type=\"PackedScene\" id=3]\n\n[sub_resource type=\"ViewportTexture\" id=1]\nflags = 5\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain1/Viewport\")\n\n[sub_resource type=\"ViewportTexture\" id=2]\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain2/Control\")\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]\n\n[node name=\"TextureRect\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 2 )\n\n[node name=\"TextureRect2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 2 )"
-
+		
+		FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/")
+		FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/")
+		FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/")
+		FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/")
 		
 		# FILE PATHS
 		var FILE_PATHS = [
@@ -3394,6 +3402,97 @@ class _HevLib:
 	
 	
 
+class _Keymapping:
+	var scripts = [
+		
+	]
+	
+	var FolderAccess
+	var FileAccess
+	
+	func _init(f,a):
+		FolderAccess = f
+		FileAccess = a
+	var keybind_folder = "user://cache/.HevLib_Cache/Keybinds/"
+	
+	var key_file = keybind_folder + "keys.txt"
+	var mouse_file = keybind_folder + "mousebuttons.txt"
+	var joybutton_file = keybind_folder + "joybuttons.txt"
+	var joyaxis_file = keybind_folder + "joyaxes.txt"
+	
+	var file = File.new()
+	
+	func __load_inputs_from_string_array(key:String, strings: Array):
+		for i in strings:
+			if i.begins_with("Mouse "):
+				var event = InputEventMouseButton.new()
+				event.button_index = int(i.split("Mouse ")[1])
+				if not InputMap.action_has_event(key,event):
+					Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
+					InputMap.action_add_event(key, event)
+				else:
+					Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+			if i.begins_with("JoyButton "):
+				var event = InputEventJoypadButton.new()
+				event.button_index = int(i.split("JoyButton ")[1])
+				if not InputMap.action_has_event(key,event):
+					Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
+					InputMap.action_add_event(key, event)
+				else:
+					Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+			if i.begins_with("JoyAxis "):
+				var event = InputEventJoypadMotion.new()
+				event.axis = abs(int(i.split("JoyAxis ")[1]))
+				if i.split("JoyAxis ")[1].begins_with("-"):
+					event.axis_value = -1.0
+				else:
+					event.axis_value = 1.0
+				if not InputMap.action_has_event(key,event):
+					Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
+					InputMap.action_add_event(key, event)
+				else:
+					Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+				
+			else:
+				var event = InputEventKey.new()
+				event.scancode = OS.find_scancode_from_string(i)
+				if not InputMap.action_has_event(key,event):
+					Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
+					InputMap.action_add_event(key, event)
+				else:
+					Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+	
+	func __define_vanilla_binds():
+		FolderAccess.__check_folder_exists(keybind_folder)
+		var output = {}
+		var bound = {}
+		if file.file_exists("user://settings.cfg"):
+			bound = FileAccess.__config_parse("user://settings.cfg").get("input",{})
+		for ie in InputMap.get_actions():
+			var events = InputMap.get_action_list(ie)
+			for event in events:
+				var ev = __event_to_string(event)
+				pass
+		
+		pass
+	
+	func __event_to_string(event):
+		if event is InputEventKey:
+			var key = OS.get_scancode_string(event.physical_scancode) if event.scancode == 0 else OS.get_scancode_string(event.scancode)
+			return key
+		elif event is InputEventJoypadMotion:
+			var joyAxisString = "JoyAxis " + str(event.axis)
+			return joyAxisString
+		elif event is InputEventJoypadButton:
+			var joyButtonString = "JoyButton " + str(event.button_index)
+			return joyButtonString
+		elif event is InputEventMouseButton:
+			var mouseString = "Mouse " + str(event.button_index)
+			return mouseString
+		return ""
+	
+	
+
 class _ManifestV1:
 	var scripts = [
 		
@@ -4692,10 +4791,11 @@ class _NodeAccess:
 		FolderAccess.__check_folder_exists(folder)
 		var header = "extends Node\n\nconst VARIABLE = "
 		var file = File.new()
-		file.open(folder + "conversion.gd",File.WRITE)
+		var tc = OS.get_ticks_usec()
+		file.open(folder + "%s.gd" % tc,File.WRITE)
 		file.store_string(header + string)
 		file.close()
-		var script = load(folder + "conversion.gd")
+		var script = load(folder + "%s.gd" % tc)
 		var variable = script.VARIABLE
 		return variable
 	

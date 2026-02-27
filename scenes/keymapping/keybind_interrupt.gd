@@ -25,7 +25,7 @@ var overrides = load("res://HevLib/scenes/keymapping/data/overrides.gd").get_scr
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 #var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 
-var INPUT_DRIVER_ACTIVE = false
+var INPUT_DRIVER_ACTIVE = true
 
 const ALLOW_KEYBIND_MODIFICATIONS = false
 
@@ -43,6 +43,8 @@ var file = File.new()
 #const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 
 
+const BREAK_OPERATION = true
+
 func _ready():
 	pointers.FolderAccess.__check_folder_exists(keybind_folder)
 	file.open(key_file,File.WRITE)
@@ -57,7 +59,7 @@ func _ready():
 	file.open(joyaxis_file,File.WRITE)
 	file.store_string("[]")
 	file.close()
-	INPUT_DRIVER_ACTIVE = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","use_input_virtualization")
+	INPUT_DRIVER_ACTIVE = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","use_input_virtualization")
 	if ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE:
 		self.pause_mode = Node.PAUSE_MODE_PROCESS
 		var actions = InputMap.get_actions()
@@ -89,7 +91,7 @@ func _ready():
 					else:
 						single_input_actions[key].append(action)
 				if event is InputEventJoypadMotion:
-					var key = "JoyAxis" + str(event.axis)
+					var key = "JoyAxis " + str(event.axis)
 					if not key in single_input_actions.keys():
 						single_input_actions.merge({key:[]})
 					var current_binds = single_input_actions[key]
@@ -99,7 +101,7 @@ func _ready():
 						single_input_actions[key].append(action)
 					
 				if event is InputEventJoypadButton:
-					var key = "JoyButton" + str(event.button_index)
+					var key = "JoyButton " + str(event.button_index)
 					if not key in single_input_actions.keys():
 						single_input_actions.merge({key:[]})
 					var current_binds = single_input_actions[key]
@@ -109,7 +111,7 @@ func _ready():
 						single_input_actions[key].append(action)
 					
 				if event is InputEventMouseButton:
-					var key = "Mouse" + str(event.button_index)
+					var key = "Mouse " + str(event.button_index)
 					if not key in single_input_actions.keys():
 						single_input_actions.merge({key:[]})
 					var current_binds = single_input_actions[key]
@@ -133,7 +135,7 @@ func _ready():
 							else:
 								actionTypes.append(item)
 				InputMap.action_erase_event(action, active)
-	#	breakpoint
+#		breakpoint
 	
 	
 	for action_name in key_events:
@@ -204,152 +206,158 @@ func _input(event):
 		for action in key_events:
 			var string = OS.get_scancode_string(key_events[action])
 			var does = Input.is_action_just_pressed(action)
-			if does:
+			if does and not string in current_key_inputs:
 				current_key_inputs.append(string)
 			var neg = Input.is_action_just_released(action)
 			if neg:
 				if string in current_key_inputs:
-					var replace = []
-					for key in current_key_inputs:
-						if key == string:
-							pass
-						else:
-							replace.append(key)
-					current_key_inputs = replace
+					current_key_inputs.erase(string)
 		for action in mouse_button_events:
 			var string = "Mouse " + str(mouse_button_events[action])
 			var does = Input.is_action_just_pressed(action)
-			if does:
+			if does and not string in current_key_inputs:
 				current_key_inputs.append(string)
 			var neg = Input.is_action_just_released(action)
 			if neg:
 				if string in current_key_inputs:
-					var replace = []
-					for key in current_key_inputs:
-						if key == string:
-							pass
-						else:
-							replace.append(key)
-					current_key_inputs = replace
+					current_key_inputs.erase(string)
 		for action in joy_axis_events:
 			var string = "JoyAxis " + str(joy_axis_events[action])
 			var does = Input.is_action_just_pressed(action)
-			if does:
+			if does and not string in current_key_inputs:
 				current_key_inputs.append(string)
 			var neg = Input.is_action_just_released(action)
 			if neg:
 				if string in current_key_inputs:
-					var replace = []
-					for key in current_key_inputs:
-						if key == string:
-							pass
-						else:
-							replace.append(key)
-					current_key_inputs = replace
+					current_key_inputs.erase(string)
 		for action in joy_button_events:
 			var string = "JoyButton " + str(joy_button_events[action])
 			var does = Input.is_action_just_pressed(action)
-			if does:
+			if does and not string in current_key_inputs:
 				current_key_inputs.append(string)
 			var neg = Input.is_action_just_released(action)
 			if neg:
 				if string in current_key_inputs:
-					var replace = []
-					for key in current_key_inputs:
-						if key == string:
-							pass
-						else:
-							replace.append(key)
-					current_key_inputs = replace
+					current_key_inputs.erase(string)
 		
-#		if current_key_inputs.size() >=1:
-#			breakpoint
-		
-		handle_inputs()
-		
-		
-		
-		
-
-
-func handle_inputs():
-	for item in vanilla_binds:
-		var keys = vanilla_binds[item]
-		for key in keys:
-			if key in current_key_inputs:
-				parse_input(key,item)
-	
-	
-	
-	
-
-
-
-func parse_input(key: String,input_event: String):
-	var event
-	var new_inputs = []
-	var echo_inputs = []
-	var depress_inputs = []
-	
-	for item in current_key_inputs:
-		if item in old_actions:
-			pass
-		else:
-			new_inputs.append(item)
-	
-	for item in old_actions:
-		if item in current_key_inputs:
-			if item in new_inputs:
-				pass
+		if ("W" in current_key_inputs):
+			if "Shift" in current_key_inputs:
+				Input.action_press("autopilot_up")
+				if Input.is_action_pressed("ship_forward"):
+					Input.action_release("ship_forward")
 			else:
-				echo_inputs.append(item)
+				Input.action_press("ship_forward")
+				if Input.is_action_pressed("autopilot_up"):
+					Input.action_release("autopilot_up")
 		else:
-			depress_inputs.append(item)
-	
-	
-	if key.begins_with("Mouse"):
-		var id = key.split(" ")[1]
-		event = InputEventMouseButton.new()
-		event.button_index = id
-		if key in old_actions:
-			event.pressed = false
-		else:
-			event.pressed = true
-	elif key.begins_with("JoyButton"):
-		var id = key.split(" ")[1]
-		event = InputEventJoypadButton.new()
-		event.button_index = id
-		if key in old_actions:
-			event.pressed = false
-		else:
-			event.pressed = true
-	elif key.begins_with("JoyAxis"):
-		var id = key.split(" ")[1]
-		event = InputEventJoypadMotion.new()
-		event.axis = id
-		if key in old_actions:
-			event.axis_value = 0.0
-		else:
-			event.axis_value = 1.0
-	else:
-		event = InputEventKey.new()
-		event.scancode = OS.find_scancode_from_string(key)
-		if key in old_actions:
-			event.pressed = false
-		else:
-			event.pressed = true
-		if key in echo_inputs:
-			event.echo = true
-		else:
-			event.echo = false
+			if Input.is_action_pressed("ship_forward"):
+				Input.action_release("ship_forward")
+			if Input.is_action_pressed("autopilot_up"):
+				Input.action_release("autopilot_up")
+		
+		
+		
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#func handle_inputs():
+#	for item in vanilla_binds:
+#		var keys = vanilla_binds[item]
+#		for key in keys:
+#			if key in current_key_inputs:
+#				parse_input(key,item)
+#
+#
+#
+#
+#
+#
+#
+#func parse_input(key: String,input_event: String):
+#	var event
+#	var new_inputs = []
+#	var echo_inputs = []
+#	var depress_inputs = []
+#
+#	for item in current_key_inputs:
+#		if item in old_actions:
+#			pass
+#		else:
+#			new_inputs.append(item)
+#
+#	for item in old_actions:
+#		if item in current_key_inputs:
+#			if item in new_inputs:
+#				pass
+#			else:
+#				echo_inputs.append(item)
+#		else:
+#			depress_inputs.append(item)
+#
+#
+#	if key.begins_with("Mouse"):
+#		var id = key.split(" ")[1]
+#		event = InputEventMouseButton.new()
+#		event.button_index = id
+#		if key in old_actions:
+#			event.pressed = false
+#		else:
+#			event.pressed = true
+#	elif key.begins_with("JoyButton"):
+#		var id = key.split(" ")[1]
+#		event = InputEventJoypadButton.new()
+#		event.button_index = id
+#		if key in old_actions:
+#			event.pressed = false
+#		else:
+#			event.pressed = true
+#	elif key.begins_with("JoyAxis"):
+#		var id = key.split(" ")[1]
+#		event = InputEventJoypadMotion.new()
+#		event.axis = id
+#		if key in old_actions:
+#			event.axis_value = 0.0
+#		else:
+#			event.axis_value = 1.0
+#	else:
+#		event = InputEventKey.new()
+#		event.scancode = OS.find_scancode_from_string(key)
+#		if key in old_actions:
+#			event.pressed = false
+#		else:
+#			event.pressed = true
+#		if key in echo_inputs:
+#			event.echo = true
+#		else:
+#			event.echo = false
 #	breakpoint
-	
-	Input.parse_input_event(event)
-	
-	
-	
-	
-	old_actions = current_key_inputs
+#
+#
+##	Input.parse_input_event(event)
+#
+#
+#
+#
+#	old_actions = current_key_inputs
 
 
 
@@ -368,19 +376,19 @@ func register_input(event):
 	var index = 0
 	
 	if event is InputEventKey:
-		get_viewport().set_input_as_handled()
+#		get_viewport().set_input_as_handled()
 		is_key = true
 		index += 1
 	if event is InputEventJoypadMotion:
-		get_viewport().set_input_as_handled()
+#		get_viewport().set_input_as_handled()
 		is_joy_motion = true
 		index += 1
 	if event is InputEventJoypadButton:
-		get_viewport().set_input_as_handled()
+#		get_viewport().set_input_as_handled()
 		is_joy_button = true
 		index += 1
 	if event is InputEventMouseButton:
-		get_viewport().set_input_as_handled()
+#		get_viewport().set_input_as_handled()
 		is_mouse_button = true
 		index += 1
 #	if event is InputEventMouse:
