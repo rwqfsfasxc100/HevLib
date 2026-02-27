@@ -345,7 +345,7 @@ func make_timer():
 		timerObject.wait_time = 0.5
 		timerObject.one_shot = true
 		timerObject.connect("timeout",self,"recolor")
-		get_tree().get_root().add_child(timerObject)
+		CurrentGame.get_tree().get_root().add_child(timerObject)
 		timerObject.call_deferred("start")
 
 func convert_to_nozzle(noz):

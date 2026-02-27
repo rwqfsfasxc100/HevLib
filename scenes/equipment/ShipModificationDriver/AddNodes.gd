@@ -53,13 +53,13 @@ func make_node_mods():
 	var fallback_ship = baseShipName
 	
 	if shipName in processed_ship_register:
-		var datafetch = processed_ship_register[shipName]["node_definitions"]
+		var datafetch = processed_ship_register[shipName]["node_definitions"].duplicate(true)
 		get_base_ship_fallback = datafetch.get("fallback_to_base_ship",true)
 		fallback_ship = datafetch.get("fallback_override",baseShipName)
 		n_store = datafetch
 	if get_base_ship_fallback:
 		if fallback_ship != "" and fallback_ship in processed_ship_register:
-			var db = processed_ship_register[fallback_ship]
+			var db = processed_ship_register[fallback_ship].duplicate(true)
 			var datafetch = db["node_definitions"]
 			for obj in datafetch:
 				var objdata = datafetch[obj]
@@ -74,8 +74,8 @@ func make_node_mods():
 	var node_parent_path = get_path_to(self)
 	var thisNode = node_parent_path
 	for object in n_store:
-		var obj_data = n_store[object]
-		var node_data = processed_node_definitions[object]
+		var obj_data = n_store[object].duplicate(true)
+		var node_data = processed_node_definitions[object].duplicate(true)
 		
 		
 		
@@ -133,22 +133,25 @@ func make_node_mods():
 		
 		var node = nodeset.instance()
 		node.name = object
+		
+		
+		
 		if "position" in node:
 			var npos = position_data.get("position")
 			var new_pos = Vector2(0,0)
 			match typeof(npos):
 				TYPE_VECTOR2:
 					new_pos = npos
-					node.set("position",new_pos)
+					node.set_deferred("position",new_pos)
 				TYPE_VECTOR2_ARRAY:
 					if npos.size() >= 1:
 						new_pos = npos[0]
-						node.set("position",new_pos)
+						node.set_deferred("position",new_pos)
 				TYPE_ARRAY, TYPE_INT_ARRAY, TYPE_REAL_ARRAY:
 					var scan = pointers.DataFormat.__convert_arr_to_vec2arr(npos)
 					if scan.size() >= 1:
 						new_pos = scan[0]
-						node.set("position",new_pos)
+						node.set_deferred("position",new_pos)
 		if "rotation" in node:
 			var nrot = position_data.get("rotation")
 			if nrot != 0.0:
@@ -156,10 +159,10 @@ func make_node_mods():
 				match typeof(nrot):
 					TYPE_INT:
 						var rot = deg2rad(nrot)
-						node.set("rotation",rot)
+						node.set_deferred("rotation",rot)
 					TYPE_REAL:
 						var rot = deg2rad(nrot)
-						node.set("rotation",rot)
+						node.set_deferred("rotation",rot)
 		if "scale" in node:
 			var nscale = position_data.get("scale")
 			var new_scale = Vector2(1,1)
@@ -169,17 +172,17 @@ func make_node_mods():
 						new_scale = Vector2(nscale[0],nscale[1])
 					elif nscale.size() == 1:
 						new_scale = Vector2(nscale[0],nscale[0])
-					node.set("scale",new_scale)
+					node.set_deferred("scale",new_scale)
 				TYPE_INT, TYPE_REAL:
 					new_scale = Vector2(nscale,nscale)
-					node.set("scale",new_scale)
+					node.set_deferred("scale",new_scale)
 				TYPE_VECTOR2:
 					new_scale = nscale
-					node.set("scale",new_scale)
+					node.set_deferred("scale",new_scale)
 				TYPE_VECTOR2_ARRAY:
 					if nscale.size() >= 1:
 						new_scale = nscale[0]
-						node.set("scale",new_scale)
+						node.set_deferred("scale",new_scale)
 		match typeof(properties):
 			TYPE_ARRAY:
 				for data in properties:
@@ -243,15 +246,15 @@ func make_node_mods():
 								pointer.set(nprop,setter)
 		
 		
-		
-#		breakpoint
-#		call_deferred("add_child",node)
 		var p = get_node_or_null(node_parent_path)
 		if p == null:
 			p = self
 		if str(get_path_to(p)) != str(thisNode) and "registerExternal" in node:
 			node.registerExternal = true
 		p.add_child(node)
+#		breakpoint
+#		call_deferred("add_child",node)
+		
 
 	if ship_match:
 		var chld = get_children()
@@ -278,7 +281,7 @@ func nodeModify():
 					var value = i.get("value",null)
 					var property = i.get("property","null_value_to_ensure_that_this_fails_when_absent_lol_hi")
 					if node and property in node:
-						node.set(property,value)
+						node.set_deferred(property,value)
 	
 	if shipName in modify_data:
 		var thisShipData = modify_data[shipName]
@@ -287,7 +290,7 @@ func nodeModify():
 			var value = i.get("value",null)
 			var property = i.get("property","null_value_to_ensure_that_this_fails_when_absent_lol_hi")
 			if node and property in node:
-				node.set(property,value)
+				node.set_deferred(property,value)
 	
 	
 
