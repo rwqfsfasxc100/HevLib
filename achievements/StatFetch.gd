@@ -13,7 +13,7 @@ func _on_StatFetch_request_completed(result, response_code, headers, body):
 	var data
 	if not json.result == null:
 		releasesContent = json.result
-	if not releasesContent == null:
+	if (not releasesContent == null and releasesContent.size()):
 		data = releasesContent.get("achievementpercentages").get("achievements")
 	var aData = []
 	if not data == null:
