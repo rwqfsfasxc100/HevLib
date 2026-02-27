@@ -17,7 +17,17 @@ var mod_request_log = {}
 func request_event(oddity,event):
 	mod_requested_events.append(oddity)
 	Debug.l("HevLib Event Driver: event %s requested" % event)
-	
+	if oddity is Array:
+		for o in oddity:
+			if not event in group:
+				group[event] = []
+			group[event].append(o)
+			all_oddities.append(o)
+	else:
+		if not event in group:
+			group[event] = []
+		group[event].append(oddity)
+		all_oddities.append(oddity)
 	var id = hash(oddity)
 	if not event in mod_request_log:
 		mod_request_log.merge({event:{}})
