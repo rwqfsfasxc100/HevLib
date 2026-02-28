@@ -200,8 +200,13 @@ HEVLIB_CONFIG_SECTION_INPUT={
 	"open_debug_event_menu":{
 		"name":"HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU",
 		"description":"HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU_TOOLTIP",
+		"activation":"press",
+		"context":"in_game",
+		"allow_empty_bind":false,
+		"allow_extra_keys":true,
+		"order_sensitive":true,
+		"exclusive":false,
 		"type":"Input",
-		"hint":"",
 		"default":[  ]
 	},
 	"toggle_chaos_map_overlay":{
