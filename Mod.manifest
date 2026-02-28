@@ -11,7 +11,7 @@ credits=["   --- Contributors ---   ","Za'krin - Mod Main design, original imple
 
 version_major=1
 version_minor=12
-version_bugfix=2
+version_bugfix=3
 
 [tags]
 
@@ -140,12 +140,6 @@ HEVLIB_CONFIG_SECTION_DEBUG={
 	"input_event_debugger":{
 		"name":"HEVLIB_CONFIG_EVENT_DEBUGGER",
 		"description":"HEVLIB_CONFIG_EVENT_DEBUGGER_TOOLTIP",
-		"type":"bool",
-		"default":false
-	},
-	"use_input_virtualization":{
-		"name":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION",
-		"description":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_TOOLTIP",
 		"type":"bool",
 		"default":false
 	},
