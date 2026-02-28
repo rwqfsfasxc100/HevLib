@@ -236,6 +236,20 @@ func loadPlaceholder():
 						var d = i[0]
 						var g = i[1]
 						np[d] = g
+			for i in this_template:
+				var d = i[0]
+				var g = i[1]
+				pv[d] = g
+			for f in this_modification:
+				var db = f.get("data",{})
+				for nodepath in db:
+					var o = db[nodepath]
+					var np = pv.get_node_or_null(nodepath)
+					if np:
+						for i in o:
+							var d = i[0]
+							var g = i[1]
+							np[d] = g
 			add_child(pv)
 			system = pv
 			system.name = name + "_" + system.name
