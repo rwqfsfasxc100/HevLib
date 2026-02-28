@@ -292,13 +292,18 @@ class _ConfigDriver:
 	
 	
 	func __load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
-		Keymapping.__define_vanilla_binds()
+		var default_binds = Keymapping.__define_vanilla_binds(false)
 		var dir = Directory.new()
 		var c = ConfigFile.new()
+		var keybinds_cache = "user://cache/.HevLib_Cache/Keybinds/"
 		var cfg_file = "user://cfg/" + cfg_filename
 		var profiles_dir = "user://cfg/.profiles/"
 		var profiles_setter = ".profiles.ini"
 		dir.make_dir_recursive(profiles_dir)
+		dir.make_dir_recursive(keybinds_cache)
+		file.open(keybinds_cache + "vanilla_binds.json",File.WRITE)
+		file.store_string(JSON.print(default_binds))
+		file.close()
 		if not file.file_exists(profiles_dir + profiles_setter):
 			c.clear()
 			c.set_value("profiles","selected","Default")
@@ -386,6 +391,7 @@ class _ConfigDriver:
 		c.save(cfg_file)
 		c.save(profiles_dir + current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",{}).get("profile_name","Default") + ".cfg")
 		Debug.l("ConfigDriver: loaded [%s] mod configurations" % configs.size())
+		var actionList = InputMap.get_actions()
 		for mod in configs:
 			Debug.l("ConfigDriver: inspecting [%s]" % mod)
 			var data = __get_config(mod)
@@ -396,21 +402,37 @@ class _ConfigDriver:
 				for key in sectData:
 					var key_data = sectData[key]
 					Debug.l("ConfigDriver: found entry [%s] of type [%s] with a default of [%s]" % [key,key_data["type"],key_data.get("default","Null")])
-					var p = __get_value(mod,section,key)
-					Debug.l("ConfigDriver: value of [%s] is [%s]" % [key,p])
 					if key_data["type"].to_lower() == "input":
+						var p = __get_value(mod,section,key)
+						Debug.l("ConfigDriver: value of [%s] is [%s]" % [key,p])
+						var default = key_data.get("default",[])
+						Debug.l("ConfigDriver: [%s] default is [%s]" % [key,default])
+						
+						var activation = key_data.get("activation","press") # can be `press`, `release`, or `both`. Defines when the keybind activates
+						var context = key_data.get("context","in_game") # can be `in_game`, `in_menu`, or `both`. Defines whether the bind works in menus (OMS included) or in game
+						var allow_empty_bind = key_data.get("allow_empty_bind",false) # Defines if an empty keybind is valid (always active)
+						var allow_extra_keys = key_data.get("allow_extra_keys",true) # Are additional keys allowed to be held to still activate the keybind
+						var order_sensitive = key_data.get("order_sensitive",true) # Defines if the keys have to be pressed in the order they were inputted
+						var exclusive = key_data.get("exclusive",false) # If true, then no other binds can have been activated prior to this bind
+						
+						var opts = {
+							"activation":activation,
+							"context":context,
+							"allow_empty_bind":allow_empty_bind,
+							"allow_extra_keys":allow_extra_keys,
+							"order_sensitive":order_sensitive,
+							"exclusive":exclusive
+						}
 						if p == null:
-							p = key_data["default"]
+							p = default
 						var addAction = true
-						for m in InputMap.get_actions():
-							if m == key:
-								addAction = false
-						if addAction:
+						if not key in actionList:
 							Debug.l("ConfigDriver: Adding input key [%s]" % key)
 							InputMap.add_action(key)
+							actionList.append(key)
 						else:
 							Debug.l("ConfigDriver: Input key [%s] already exists, skipping" % key)
-						__load_inputs_from_string_array(key,p)
+						Keymapping.__load_input_data(key,p,default,opts)
 		var checksum = "user://cache/.HevLib_Cache/checksums"
 		var current_check = 0
 		if file.file_exists(checksum):
@@ -3087,12 +3109,12 @@ class _FileAccess:
 		return s
 	
 	func __config_parse(file: String) -> Dictionary:
+		var cfg = ConfigFile.new()
 		var f2 = File.new()
 		f2.open(file,File.READ)
 		var txt = f2.get_as_text()
 		f2.close()
 	#	Debug.l("Config Parse: Loading config as ||\n\n%s\n\n||" % txt)
-		var cfg = ConfigFile.new()
 		cfg.parse(txt)
 		var cfg_sections = cfg.get_sections()
 		var cfg_dictionary = {}
@@ -3413,68 +3435,93 @@ class _Keymapping:
 	func _init(f,a):
 		FolderAccess = f
 		FileAccess = a
-	var keybind_folder = "user://cache/.HevLib_Cache/Keybinds/"
 	
-	var key_file = keybind_folder + "keys.txt"
-	var mouse_file = keybind_folder + "mousebuttons.txt"
-	var joybutton_file = keybind_folder + "joybuttons.txt"
-	var joyaxis_file = keybind_folder + "joyaxes.txt"
+	
+	
+	var keybind_folder = "user://cache/.HevLib_Cache/Keybinds/"
 	
 	var file = File.new()
 	
-	func __load_inputs_from_string_array(key:String, strings: Array):
-		for i in strings:
-			if i.begins_with("Mouse "):
-				var event = InputEventMouseButton.new()
-				event.button_index = int(i.split("Mouse ")[1])
-				if not InputMap.action_has_event(key,event):
-					Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
-					InputMap.action_add_event(key, event)
-				else:
-					Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
-			if i.begins_with("JoyButton "):
-				var event = InputEventJoypadButton.new()
-				event.button_index = int(i.split("JoyButton ")[1])
-				if not InputMap.action_has_event(key,event):
-					Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
-					InputMap.action_add_event(key, event)
-				else:
-					Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
-			if i.begins_with("JoyAxis "):
-				var event = InputEventJoypadMotion.new()
-				event.axis = abs(int(i.split("JoyAxis ")[1]))
-				if i.split("JoyAxis ")[1].begins_with("-"):
-					event.axis_value = -1.0
-				else:
-					event.axis_value = 1.0
-				if not InputMap.action_has_event(key,event):
-					Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
-					InputMap.action_add_event(key, event)
-				else:
-					Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
-				
-			else:
-				var event = InputEventKey.new()
-				event.scancode = OS.find_scancode_from_string(i)
-				if not InputMap.action_has_event(key,event):
-					Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
-					InputMap.action_add_event(key, event)
-				else:
-					Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+	var overrides = load("res://HevLib/scenes/keymapping/data/overrides.gd").get_script_constant_map()
 	
-	func __define_vanilla_binds():
+	
+	func __load_input_data(key:String, controls: Array,default: Array,opts:Dictionary):
+		var current_binds = {}
+		for revis in controls:
+			if typeof(revis) == TYPE_STRING:
+				revis = [revis]
+			for i in revis:
+				if i.begins_with("Mouse "):
+					var event = InputEventMouseButton.new()
+					event.button_index = int(i.split("Mouse ")[1])
+					if not InputMap.action_has_event(key,event):
+						Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
+						InputMap.action_add_event(key, event)
+					else:
+						Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+				elif i.begins_with("JoyButton "):
+					var event = InputEventJoypadButton.new()
+					event.button_index = int(i.split("JoyButton ")[1])
+					if not InputMap.action_has_event(key,event):
+						Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
+						InputMap.action_add_event(key, event)
+					else:
+						Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+				elif i.begins_with("JoyAxis "):
+					var event = InputEventJoypadMotion.new()
+					event.axis = abs(int(i.split("JoyAxis ")[1]))
+					if i.split("JoyAxis ")[1].begins_with("-"):
+						event.axis_value = -1.0
+					else:
+						event.axis_value = 1.0
+					if not InputMap.action_has_event(key,event):
+						Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
+						InputMap.action_add_event(key, event)
+					else:
+						Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+					
+				else:
+					var event = InputEventKey.new()
+					event.scancode = OS.find_scancode_from_string(i)
+					if not InputMap.action_has_event(key,event):
+						Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
+						InputMap.action_add_event(key, event)
+					else:
+						Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+	
+	var input_cache = {}
+	
+	func __define_vanilla_binds(ignore_engine_inputs = true):
+		var recache = input_cache.empty()
 		FolderAccess.__check_folder_exists(keybind_folder)
+		var subm = {}
 		var output = {}
 		var bound = {}
 		if file.file_exists("user://settings.cfg"):
 			bound = FileAccess.__config_parse("user://settings.cfg").get("input",{})
-		for ie in InputMap.get_actions():
-			var events = InputMap.get_action_list(ie)
-			for event in events:
-				var ev = __event_to_string(event)
-				pass
 		
-		pass
+		if recache:
+			for ie in InputMap.get_actions():
+				subm[ie] = []
+				var events = InputMap.get_action_list(ie)
+				for event in events:
+					var ev = __event_to_string(event)
+					if not ev in subm[ie]:
+						subm[ie].append(ev)
+			input_cache = subm.duplicate(true)
+		else:
+			subm = input_cache.duplicate(true)
+		for ie in subm:
+			var sect = {"can_be_rebound":false,"inputs":[],"deadzone":InputMap.action_get_deadzone(ie)}
+			var dv = subm[ie]
+			if ignore_engine_inputs and ie in overrides["actions_ignore"]:
+				continue
+			if ie in bound:
+				sect.can_be_rebound = true
+			for action in dv:
+				sect.inputs.append(action)
+			output[ie] = sect
+		return output
 	
 	func __event_to_string(event):
 		if event is InputEventKey:
@@ -3490,6 +3537,44 @@ class _Keymapping:
 			var mouseString = "Mouse " + str(event.button_index)
 			return mouseString
 		return ""
+	
+	
+	func __match_event_type(event):
+		var eventType = []
+		if event is InputEvent:
+			eventType.append("InputEvent")
+		if event is InputEventAction:
+			eventType.append("InputEventAction")
+		if event is InputEventGesture:
+			eventType.append("InputEventGesture")
+		if event is InputEventJoypadButton:
+			eventType.append("InputEventJoypadButton")
+		if event is InputEventJoypadMotion:
+			eventType.append("InputEventJoypadMotion")
+		if event is InputEventKey:
+			eventType.append("InputEventKey")
+		if event is InputEventMIDI:
+			eventType.append("InputEventMIDI")
+		if event is InputEventMagnifyGesture:
+			eventType.append("InputEventMagnifyGesture")
+		if event is InputEventMouse:
+			eventType.append("InputEventMouse")
+		if event is InputEventMouseButton:
+			eventType.append("InputEventMouseButton")
+		if event is InputEventMouseMotion:
+			eventType.append("InputEventMouseMotion")
+		if event is InputEventPanGesture:
+			eventType.append("InputEventPanGesture")
+		if event is InputEventScreenDrag:
+			eventType.append("InputEventScreenDrag")
+		if event is InputEventScreenTouch:
+			eventType.append("InputEventTouch")
+		if event is InputEventWithModifiers:
+			eventType.append("InputEventWithModifiers")
+		return eventType
+	
+	
+	
 	
 	
 
@@ -3988,7 +4073,7 @@ class _ManifestV2:
 			var cfg = FileAccess.__config_parse(file_path)
 			var manifest_data : Dictionary = {}
 			var manifest_version = 1
-			if "manifest_definitions" in cfg.keys():
+			if "manifest_definitions" in cfg:
 				manifest_version = cfg["manifest_definitions"].get("manifest_version",manifest_version)
 				var tpf = typeof(manifest_version)
 				if tpf == TYPE_INT or tpf == TYPE_REAL:
