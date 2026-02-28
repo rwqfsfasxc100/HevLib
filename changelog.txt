@@ -4,7 +4,7 @@
 2="* Added a (WIP) Keymapping pointer used for future keybind handler rework"
 2.1="* __load_input_data - more modern equivalent of the __load_inputs_from_string_array function from ConfigDriver (which will be kept the same for backwards-compat). Just used to better handle changes made for the future"
 2.2="* __define_vanilla_binds - used to collect information regarding keybinds as Godot sees them"
-2.3="* __match_event_type - provides the input event type as a string"
+2.3="* __match_event_type - provides the input types from an input event object as an array"
 2.4="* __event_to_string - Converts a compatible input event into a string usable by configs. By default handles InputEventKey, InputEventMouseButton, InputEventJoypadButton, and InputEventJoypadMotion; returns false otherwise"
 3="* Improved efficiency of input mapping from configs"
 
