@@ -1,5 +1,11 @@
 extends Node
 
+const ADJUSTMENT = {
+	"MOUSEBUTTONS":10000,
+	"JOYBUTTONS":11000,
+	"JOYAXES":12000,
+}
+
 const KEYS = {
 	"KEY_ESCAPE": 16777217,
 	"KEY_TAB": 16777218,

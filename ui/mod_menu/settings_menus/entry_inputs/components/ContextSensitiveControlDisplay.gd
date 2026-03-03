@@ -186,34 +186,47 @@ func recheck_availability():
 #					key.key = bind.axis
 #					if key.rect_size.x > 0:
 #						f.append(key)
-	for i in info:
-		var type = OS.find_scancode_from_string(i)
-		if i.begins_with("Mouse "):
-			var d = mouseButtonDisplay.instance()
-			d.key = int(i.split("Mouse ")[1])
-			d.name = i
-			keys.add_child(d)
-#			breakpoint
-		elif i.begins_with("JoyButton "):
-			var d = gamepadKeyDisplay.instance()
-			d.key = int(i.split("JoyButton ")[1])
-			d.name = i
-			keys.add_child(d)
-#			breakpoint
-		elif i.begins_with("JoyAxis "):
-			var d = analogAxisDisplay.instance()
-			d.key = abs(int(i.split("JoyAxis ")[1]))
-			d.name = i
-			keys.add_child(d)
-#			breakpoint
-		
-		else:
-			var d = keybindDisplay.instance()
-			d.text = i
-			d.name = i
-			keys.add_child(d)
+	for ref in info:
+		if typeof(ref) == TYPE_STRING:
+			ref = [ref]
+		for iv in range(ref.size()):
 			
+			var i = ref[iv]
+			var type = OS.find_scancode_from_string(i)
+			if i.begins_with("Mouse "):
+				var d = mouseButtonDisplay.instance()
+				d.key = int(i.split("Mouse ")[1])
+				d.name = i
+				keys.add_child(d)
+	#			breakpoint
+			elif i.begins_with("JoyButton "):
+				var d = gamepadKeyDisplay.instance()
+				d.key = int(i.split("JoyButton ")[1])
+				d.name = i
+				keys.add_child(d)
+	#			breakpoint
+			elif i.begins_with("JoyAxis "):
+				var d = analogAxisDisplay.instance()
+				d.key = abs(int(i.split("JoyAxis ")[1]))
+				d.name = i
+				keys.add_child(d)
+	#			breakpoint
 			
+			else:
+				var d = keybindDisplay.instance()
+				d.text = i
+				d.name = i
+				keys.add_child(d)
+			
+			if iv != ref.size() - 1:
+				var splitLabel = Label.new()
+				splitLabel.set_theme(load("res://hud/TNTRL-theme.tres"))
+				splitLabel.size_flags_horizontal = SIZE_EXPAND_FILL
+				splitLabel.size_flags_vertical = SIZE_EXPAND_FILL
+				splitLabel.rect_size = Vector2(15,14)
+				splitLabel.text = "+"
+				keys.add_child(splitLabel)
+				pass
 #			breakpoint
 		
 		

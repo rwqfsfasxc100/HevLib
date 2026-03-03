@@ -26,6 +26,8 @@ var needs_cache_rebuild = false
 
 func _ready():
 	ConfigDriver.ready()
+	yield(get_tree(),"idle_frame")
+	get_parent().move_child(self,get_parent().get_child_count())
 class _Achievements:
 	var scripts = [
 		
@@ -129,8 +131,10 @@ class _ConfigDriver:
 		pushCFG()
 	
 	signal config_changed()
+	signal input_changed()
 	
 	var settingsHash = 0
+	var settingsInputHash = 0
 	var has_loaded = false
 	var settings = {}
 	
@@ -286,9 +290,19 @@ class _ConfigDriver:
 		__change_made()
 		
 	
-	func __establish_connection(method: String, node: Node):
-		if not is_connected("config_changed",node,method):
-			connect("config_changed",node,method)
+	func __establish_connection(method: String, node: Node, type: String = "config"): # Type accepts "config", "input", or "both"
+		match type.to_lower():
+			"string":
+				if not is_connected("config_changed",node,method):
+					connect("config_changed",node,method)
+			"input":
+				if not is_connected("input_changed",node,method):
+					connect("input_changed",node,method)
+			"both":
+				if not is_connected("input_changed",node,method):
+					connect("input_changed",node,method)
+				if not is_connected("config_changed",node,method):
+					connect("config_changed",node,method)
 	
 	
 	func __load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
@@ -303,6 +317,9 @@ class _ConfigDriver:
 		dir.make_dir_recursive(keybinds_cache)
 		file.open(keybinds_cache + "vanilla_binds.json",File.WRITE)
 		file.store_string(JSON.print(default_binds))
+		file.close()
+		file.open(keybinds_cache + "defined_control_configs.json",File.WRITE)
+		file.store_string("{}")
 		file.close()
 		if not file.file_exists(profiles_dir + profiles_setter):
 			c.clear()
@@ -364,22 +381,37 @@ class _ConfigDriver:
 					current_config.merge({sect:{}})
 				for key in sectData:
 					var key_data = sectData[key]
-					if key in current_config[sect]:
-						pass
-					else:
-						
-						match typeof(key_data):
-							TYPE_DICTIONARY:
-								if "type" in key_data:
-									match key_data["type"]:
-										"action":
-											current_config[sect].merge({key:key_data.get("method","_pressed")})
-										_:
-											if "default" in key_data:
-												current_config[sect].merge({key:key_data["default"]})
-									
-							_:
-								pass
+					if typeof(key_data) == TYPE_DICTIONARY:
+						var type = key_data.get("type",null)
+						if not type:
+							continue
+						type = type.to_lower()
+						if key in current_config[sect]:
+							if type == "input":
+								var val = current_config[sect]
+								for b in val:
+									var out = []
+									for a in val[b]:
+										if typeof(a) == TYPE_STRING:
+											a = [a]
+										out.append(a)
+									current_config[sect][b] = out
+						else:
+							match type:
+								"action":
+									current_config[sect].merge({key:key_data.get("method","_pressed")})
+								"input":
+									var df = key_data["default"]
+									var out = []
+									for a in df:
+										if typeof(a) == TYPE_STRING:
+											a = [a]
+										out.append(a)
+									current_config[sect].merge({key:out})
+								_:
+									if "default" in key_data:
+										current_config[sect].merge({key:key_data["default"]})
+								
 		if not "profile_name" in current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",{}):
 			current_config["HevLib/HEVLIB_CONFIG_SECTION_DRIVERS"]["profile_name"] = "Default"
 		for section in current_config:
@@ -407,32 +439,25 @@ class _ConfigDriver:
 						Debug.l("ConfigDriver: value of [%s] is [%s]" % [key,p])
 						var default = key_data.get("default",[])
 						Debug.l("ConfigDriver: [%s] default is [%s]" % [key,default])
+						var b = []
+						for h in p:
+							if typeof(h) == TYPE_STRING:
+								h = [h]
+							b.append(h)
+						p = b
+						var deadzone = key_data.get("deadzone",0.5) # Control deadzone value
 						
-						var activation = key_data.get("activation","press") # can be `press`, `release`, or `both`. Defines when the keybind activates
-						var context = key_data.get("context","in_game") # can be `in_game`, `in_menu`, or `both`. Defines whether the bind works in menus (OMS included) or in game
-						var allow_empty_bind = key_data.get("allow_empty_bind",false) # Defines if an empty keybind is valid (always active)
-						var allow_extra_keys = key_data.get("allow_extra_keys",true) # Are additional keys allowed to be held to still activate the keybind
-						var order_sensitive = key_data.get("order_sensitive",true) # Defines if the keys have to be pressed in the order they were inputted
-						var exclusive = key_data.get("exclusive",false) # If true, then no other binds can have been activated prior to this bind
-						
-						var opts = {
-							"activation":activation,
-							"context":context,
-							"allow_empty_bind":allow_empty_bind,
-							"allow_extra_keys":allow_extra_keys,
-							"order_sensitive":order_sensitive,
-							"exclusive":exclusive
-						}
+						var opts = Keymapping.__get_opts_from_key_data(key_data)
 						if p == null:
 							p = default
 						var addAction = true
 						if not key in actionList:
 							Debug.l("ConfigDriver: Adding input key [%s]" % key)
-							InputMap.add_action(key)
+							InputMap.add_action(key,deadzone)
 							actionList.append(key)
 						else:
 							Debug.l("ConfigDriver: Input key [%s] already exists, skipping" % key)
-						Keymapping.__load_input_data(key,p,default,opts)
+						Keymapping.__load_input_data(key,p,opts)
 		var checksum = "user://cache/.HevLib_Cache/checksums"
 		var current_check = 0
 		if file.file_exists(checksum):
@@ -629,8 +654,37 @@ class _ConfigDriver:
 	func __change_made():
 		var shs = settings.hash()
 		if shs != settingsHash:
+			__input_change_made()
 			emit_signal("config_changed")
 			settingsHash = shs
+	
+	func __input_change_made():
+		var ic = []
+		var ax = ManifestV2.__get_manifest_cache()
+		for sect in ax:
+			var dv = ax[sect]
+			var dl = dv.get("configs",{})
+			for sec in dl:
+				var sv = dl[sec]
+				for setting in sv:
+					var data = sv[setting]
+					if data.get("type").to_lower() == "input":
+						var n = dv["mod_information"]["name"]
+						var vf = __get_value(n,sec,setting)
+						var out = []
+						var resave = false
+						for a in vf:
+							if typeof(a) == TYPE_STRING:
+								a = [a]
+								resave = true
+							out.append(a)
+						if resave:
+							__store_value(n,sec,setting,out)
+						ic.append(str(n)+str(sec)+str(setting)+str(out))
+		var shs = ic.hash()
+		if shs != settingsInputHash:
+			emit_signal("input_changed")
+			settingsInputHash = shs
 	
 	
 
@@ -836,7 +890,7 @@ class _DataFormat:
 		return arr
 	
 	func __get_script_constant_map_without_load(script_path) -> Dictionary:
-		var filepath = "user://cache/.HevLib_Cache/"
+		var filepath = "user://cache/.HevLib_Cache/Variable_Fetch/"
 		var pathway = __trim_scripts(script_path)
 		if pathway[2].size() == 0:
 			return {}
@@ -854,7 +908,7 @@ class _DataFormat:
 		return dict
 	
 	func __get_script_variables_without_load(script_path) -> Dictionary:
-		var filepath = "user://cache/.HevLib_Cache/"
+		var filepath = "user://cache/.HevLib_Cache/Variable_Fetch/"
 		var pathway = __trim_scripts(script_path)
 		if pathway[2].size() == 0:
 			return {}
@@ -3445,63 +3499,71 @@ class _Keymapping:
 	var overrides = load("res://HevLib/scenes/keymapping/data/overrides.gd").get_script_constant_map()
 	
 	
-	func __load_input_data(key:String, controls: Array,default: Array,opts:Dictionary):
-		var current_binds = {}
-		for revis in controls:
-			if typeof(revis) == TYPE_STRING:
-				revis = [revis]
-			for i in revis:
-				if i.begins_with("Mouse "):
-					var event = InputEventMouseButton.new()
-					event.button_index = int(i.split("Mouse ")[1])
-					if not InputMap.action_has_event(key,event):
-						Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
-						InputMap.action_add_event(key, event)
-					else:
-						Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
-				elif i.begins_with("JoyButton "):
-					var event = InputEventJoypadButton.new()
-					event.button_index = int(i.split("JoyButton ")[1])
-					if not InputMap.action_has_event(key,event):
-						Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
-						InputMap.action_add_event(key, event)
-					else:
-						Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
-				elif i.begins_with("JoyAxis "):
-					var event = InputEventJoypadMotion.new()
-					event.axis = abs(int(i.split("JoyAxis ")[1]))
-					if i.split("JoyAxis ")[1].begins_with("-"):
-						event.axis_value = -1.0
-					else:
-						event.axis_value = 1.0
-					if not InputMap.action_has_event(key,event):
-						Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
-						InputMap.action_add_event(key, event)
-					else:
-						Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
-					
-				else:
-					var event = InputEventKey.new()
-					event.scancode = OS.find_scancode_from_string(i)
-					if not InputMap.action_has_event(key,event):
-						Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
-						InputMap.action_add_event(key, event)
-					else:
-						Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+	func __load_input_data(key:String, controls: Array,opts:Dictionary):
+		file.open(keybind_folder + "defined_control_configs.json",File.READ)
+		var current = JSON.parse(file.get_as_text(true)).result
+		file.close()
+		if not key in current:
+			current[key] = {"controls":controls,"opts":opts}
+
+		file.open(keybind_folder + "defined_control_configs.json",File.WRITE)
+		file.store_string(JSON.print(current))
+		file.close()
+#		for revis in controls:
+#			if typeof(revis) == TYPE_STRING:
+#				revis = [revis]
+#			for i in revis:
+#				if i.begins_with("Mouse "):
+#					var event = InputEventMouseButton.new()
+#					event.button_index = int(i.split("Mouse ")[1])
+#					if not InputMap.action_has_event(key,event):
+#						Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
+#						InputMap.action_add_event(key, event)
+#					else:
+#						Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+#				elif i.begins_with("JoyButton "):
+#					var event = InputEventJoypadButton.new()
+#					event.button_index = int(i.split("JoyButton ")[1])
+#					if not InputMap.action_has_event(key,event):
+#						Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
+#						InputMap.action_add_event(key, event)
+#					else:
+#						Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+#				elif i.begins_with("JoyAxis "):
+#					var event = InputEventJoypadMotion.new()
+#					event.axis = abs(int(i.split("JoyAxis ")[1]))
+#					if i.split("JoyAxis ")[1].begins_with("-"):
+#						event.axis_value = -1.0
+#					else:
+#						event.axis_value = 1.0
+#					if not InputMap.action_has_event(key,event):
+#						Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
+#						InputMap.action_add_event(key, event)
+#					else:
+#						Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+#
+#				else:
+#					var event = InputEventKey.new()
+#					event.scancode = OS.find_scancode_from_string(i)
+#					if not InputMap.action_has_event(key,event):
+#						Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
+#						InputMap.action_add_event(key, event)
+#					else:
+#						Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
 	
 	var input_cache = {}
 	
-	func __define_vanilla_binds(ignore_engine_inputs = true):
+	func __define_vanilla_binds(ignore_builtin = true):
 		var recache = input_cache.empty()
 		FolderAccess.__check_folder_exists(keybind_folder)
 		var subm = {}
-		var output = {}
+		var output = {"actions":{},"keys":{}}
 		var bound = {}
 		if file.file_exists("user://settings.cfg"):
 			bound = FileAccess.__config_parse("user://settings.cfg").get("input",{})
 		
 		if recache:
-			for ie in InputMap.get_actions():
+			for ie in __get_vanilla_action_list():
 				subm[ie] = []
 				var events = InputMap.get_action_list(ie)
 				for event in events:
@@ -3511,16 +3573,32 @@ class _Keymapping:
 			input_cache = subm.duplicate(true)
 		else:
 			subm = input_cache.duplicate(true)
+		var vopts = overrides["vanilla_bind_opts"]
+		var missing = ""
 		for ie in subm:
-			var sect = {"can_be_rebound":false,"inputs":[],"deadzone":InputMap.action_get_deadzone(ie)}
+			var sect = {"can_be_rebound":false,"inputs":[],"deadzone":InputMap.action_get_deadzone(ie),"opts":{}}
 			var dv = subm[ie]
-			if ignore_engine_inputs and ie in overrides["actions_ignore"]:
+			
+			if ie in vopts:
+				sect["opts"] = vopts[ie].duplicate(true)
+			else:
+				missing += "\n\t\"" + ie + "\":{},"
+				printerr("HevLib Keymapping: vanilla ActionEvent ",ie," does NOT have defined opt overrides.")
+			if ignore_builtin and ie in __get_built_in_action_list():
 				continue
 			if ie in bound:
 				sect.can_be_rebound = true
 			for action in dv:
+				if typeof(action) == TYPE_STRING:
+					action = [action]
 				sect.inputs.append(action)
-			output[ie] = sect
+				if not action in output["keys"]:
+					output["keys"][action] = []
+				if not ie in output["keys"][action]:
+					output["keys"][action].append(ie)
+			output["actions"][ie] = sect
+		if missing:
+			printerr(missing)
 		return output
 	
 	func __event_to_string(event):
@@ -3537,6 +3615,21 @@ class _Keymapping:
 			var mouseString = "Mouse " + str(event.button_index)
 			return mouseString
 		return ""
+	
+	func __string_to_scancode(event:String) -> int:
+		if event.begins_with("JoyAxis "):
+			var joyAxisString = int(event.split("JoyAxis ")[1]) + 12000
+			return joyAxisString
+		elif event.begins_with("JoyButton "):
+			var joyButtonString = int(event.split("JoyButton ")[1]) + 11000
+			return joyButtonString
+		elif event.begins_with("Mouse "):
+			var mouseString = int(event.split("Mouse ")[1]) + 10000
+			return mouseString
+		else:
+			var key = OS.find_scancode_from_string(event)
+			return key
+		return 0
 	
 	
 	func __match_event_type(event):
@@ -3573,7 +3666,70 @@ class _Keymapping:
 			eventType.append("InputEventWithModifiers")
 		return eventType
 	
+	func __simulate_input_press(action,continuous = true):
+		if continuous:
+			var ie = InputEventAction.new()
+			ie.action = action
+			ie.pressed = true
+			Input.parse_input_event(ie)
+		else:
+			Input.action_press(action)
 	
+	func __simulate_input_depress(action,continuous = true):
+		if continuous:
+			var ie = InputEventAction.new()
+			ie.action = action
+			ie.pressed = false
+			Input.parse_input_event(ie)
+		else:
+			Input.action_release(action)
+	
+	var base_action_list = []
+	
+	func __get_vanilla_action_list():
+		if not base_action_list:
+			for setting in ProjectSettings.get_property_list():
+				if setting.name.begins_with('input/'):
+					base_action_list.append(setting.name.split("/")[1])
+		return base_action_list.duplicate(true)
+	
+	func __get_built_in_action_list():
+		return [
+			"ui_accept",
+			"ui_select",
+			"ui_cancel",
+			"ui_focus_next",
+			"ui_focus_prev",
+			"ui_left",
+			"ui_right",
+			"ui_up",
+			"ui_down",
+			"ui_page_up",
+			"ui_page_down",
+			"ui_home",
+			"ui_end",
+		]
+	
+	func __get_opts_from_key_data(key_data):
+		var activation = key_data.get("activation","press") # can be `press`, `release`, or `both`. Defines when the keybind activates
+		var context = key_data.get("context","in_game") # can be `in_game`, `in_menu`, or `both`. Defines whether the bind works in menus (OMS included) or in game
+		var allow_empty_bind = key_data.get("allow_empty_bind",false) # Defines if an empty keybind is valid (always active)
+		var allow_extra_keys = key_data.get("allow_extra_keys",true) # Are additional keys allowed to be held to still activate the keybind
+		var order_sensitive = key_data.get("order_sensitive",true) # Defines if the keys have to be pressed in the order they were inputted
+		var exclusive = key_data.get("exclusive",false) # If true, then no other binds can have been activated prior to this bind
+		var direct = key_data.get("direct",true) # If true, then emits InputActionEvents containing the action, which allows event.is_action_event(action) to hear the event.
+		
+		var opts = {
+			"activation":activation,
+			"context":context,
+			"allow_empty_bind":allow_empty_bind,
+			"direct":direct,
+			"allow_extra_keys":allow_extra_keys,
+			"order_sensitive":order_sensitive,
+			"exclusive":exclusive
+		}
+		
+		return opts
 	
 	
 	

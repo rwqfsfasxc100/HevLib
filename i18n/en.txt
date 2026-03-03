@@ -483,3 +483,11 @@ HEVLIB_CONFIG_MAX_MODDED_DEALERSHIP_POOLS_TOOLTIP|The maximum number of modded s
 HEVLIB_SAVEOPT_CLEAR_SOLD_SHIPS|Clear sold ship cache
 
 HEVLIB_SAVEOPT_CLEAR_SOLD_SHIPS_TOOLTIP|Clears any data stored about sold ships. This is used to fix issues with sold modded ships having a persistent ghost ship left in the dealership forever.
+
+HEVLIB_CONFIG_INPUT_VIRTUALIZATION|Input virtualization (WIP)
+
+HEVLIB_CONFIG_INPUT_VIRTUALIZATION_TOOLTIP|Uses a software-based system to handle inputs instead of the game. Permits use of multi-key bind actions.
+
+HEVLIB_CONFIG_INPUT_VIRTUALIZATION_OVERRIDE_BUILTIN|Ignore built-in binds
+
+HEVLIB_CONFIG_INPUT_VIRTUALIZATION_OVERRIDE_BUILTIN_TOOLTIP|Whether Input Virtualization should not handle engine built-in keybinds, even those not intended to be rebound.

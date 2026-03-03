@@ -50,15 +50,18 @@ func remakeActionButtons():
 	var actions = pointers.ConfigDriver.__get_value(mod,section,action)
 	
 	
-	for n in actions:
-		var label = Label.new()
-		label.text = n
-		label.align = label.ALIGN_CENTER
-		keybox.add_child(label)
-		var rem = deleteButton.instance()
-		keybox.add_child(rem)
-		rem.connect("pressed", self, "_remove_key", [n])
-		addButton.focus_neighbour_top = rem.get_path()
+	for act in actions:
+		if typeof(act) == TYPE_STRING:
+			act = [act]
+		for n in act:
+			var label = Label.new()
+			label.text = n
+			label.align = label.ALIGN_CENTER
+			keybox.add_child(label)
+			var rem = deleteButton.instance()
+			keybox.add_child(rem)
+			rem.connect("pressed", self, "_remove_key", [n])
+			addButton.focus_neighbour_top = rem.get_path()
 		
 	
 		
@@ -163,7 +166,8 @@ func applySettings():
 	var action_list = InputMap.get_action_list(action)
 	for action_name in action_list:
 		InputMap.action_erase_event(action, action_name)
-	pointers.ConfigDriver.__load_inputs_from_string_array(action,always_binds)
+	var opts = {}
+	pointers.Keymapping.__load_input_data(action,always_binds,opts)
 
 func _on_Cancel_pressed():
 	stopCapturing()

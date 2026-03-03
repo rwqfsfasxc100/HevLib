@@ -1,7 +1,7 @@
 extends Node
 
 static func get_script_variables_without_load(script_path,DataFormat = null) -> Dictionary:
-		var filepath = "user://cache/.HevLib_Cache/"
+		var filepath = "user://cache/.HevLib_Cache/Variable_Fetch/"
 		var pathway = DataFormat.trim_scripts(script_path)
 		if pathway[2].size() == 0:
 			return {}

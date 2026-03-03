@@ -149,6 +149,12 @@ HEVLIB_CONFIG_SECTION_DEBUG={
 		"type":"bool",
 		"default":false
 	},
+	"input_virtualization_ignore_builtin":{
+		"name":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_OVERRIDE_BUILTIN",
+		"description":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_OVERRIDE_BUILTIN_TOOLTIP",
+		"type":"bool",
+		"default":true
+	},
 	"ring_position_data_debugger":{
 		"name":"HEVLIB_CONFIG_POSITION_DATA_DEBUGGER",
 		"description":"HEVLIB_CONFIG_POSITION_DATA_DEBUGGER_TOOLTIP",

@@ -59,15 +59,20 @@ func _input(event):
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 #const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 
-func _process(delta):
-	inputDebug = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","input_debugger")
-	inputEventDebug = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","input_event_debugger")
-	var siblingCount = get_parent().get_parent().get_child_count()
-	get_parent().get_parent().move_child(get_parent(), siblingCount)
-	InputDebugPanel.text = str(currentKeyEvents)
-	InputDebugPanel.visible = inputDebug
-	InputEventDebugPanel.text = JSON.print(action_dict,"\t")
-	InputEventDebugPanel.visible = inputEventDebug
+var count = 0
+func _physics_process(delta):
+	count += 1
+	if count % 10 == 0:
+		count = 0
+		inputDebug = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","input_debugger")
+		inputEventDebug = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","input_event_debugger")
+		var siblingCount = get_parent().get_parent().get_child_count()
+		get_parent().get_parent().move_child(get_parent(), siblingCount)
+		get_parent().get_parent().move_child(pointers, siblingCount - 1)
+		InputDebugPanel.text = str(currentKeyEvents)
+		InputDebugPanel.visible = inputDebug
+		InputEventDebugPanel.text = JSON.print(action_dict,"\t")
+		InputEventDebugPanel.visible = inputEventDebug
 
 
 

@@ -49,9 +49,14 @@ var pointers
 func _init(modLoader = ModLoader):
 	l("Initializing Equipment Driver")
 	var d = Directory.new()
-	d.make_dir_recursive("user://cache/.HevLib_Cache")
+	var variables_folder = "user://cache/.HevLib_Cache/Variable_Fetch/"
+	d.make_dir_recursive(variables_folder)
 	
 	pointers = load("res://HevLib/pointers.gd").new()
+	
+	var scv = pointers.FolderAccess.__fetch_folder_files(variables_folder,false,true)
+	for s in scv:
+		d.remove(s)
 	
 	pointers.ConfigDriver.__load_configs()
 	var injector = load("res://HevLib/scripts/translations/inject_translations.gd")

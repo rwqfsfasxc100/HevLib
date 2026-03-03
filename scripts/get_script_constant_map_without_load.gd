@@ -1,7 +1,7 @@
 extends Node
 
 static func get_script_constant_map_without_load(script_path,trim_scripts) -> Dictionary:
-	var filepath = "user://cache/.HevLib_Cache/"
+	var filepath = "user://cache/.HevLib_Cache/Variable_Fetch/"
 	var pathway = trim_scripts.trim_scripts(script_path)
 	if pathway[2].size() == 0:
 		return {}
