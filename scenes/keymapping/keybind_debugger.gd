@@ -68,7 +68,7 @@ func _physics_process(delta):
 		inputEventDebug = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","input_event_debugger")
 		var siblingCount = get_parent().get_parent().get_child_count()
 		get_parent().get_parent().move_child(get_parent(), siblingCount)
-		get_parent().get_parent().move_child(pointers, siblingCount - 1)
+#		get_parent().get_parent().move_child(pointers, siblingCount - 1)
 		InputDebugPanel.text = str(currentKeyEvents)
 		InputDebugPanel.visible = inputDebug
 		InputEventDebugPanel.text = JSON.print(action_dict,"\t")
