@@ -1,3 +1,7 @@
+[1.12.4]
+
+1="* Ensured that equipment is provided the hardpoint key, ensuring equipment can be repaired properly."
+
 [1.12.3]
 
 1="* Fixed modded equipment not receiving weaponslot modifications or templates"

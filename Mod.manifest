@@ -11,7 +11,7 @@ credits=["   --- Contributors ---   ","Za'krin - Mod Main design, original imple
 
 version_major=1
 version_minor=12
-version_bugfix=3
+version_bugfix=4
 
 [tags]
 
@@ -143,6 +143,12 @@ HEVLIB_CONFIG_SECTION_DEBUG={
 		"type":"bool",
 		"default":false
 	},
+	"use_input_virtualization":{
+		"name":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION",
+		"description":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_TOOLTIP",
+		"type":"bool",
+		"default":false
+	},
 	"ring_position_data_debugger":{
 		"name":"HEVLIB_CONFIG_POSITION_DATA_DEBUGGER",
 		"description":"HEVLIB_CONFIG_POSITION_DATA_DEBUGGER_TOOLTIP",
@@ -200,6 +206,7 @@ HEVLIB_CONFIG_SECTION_INPUT={
 		"allow_extra_keys":true,
 		"order_sensitive":true,
 		"exclusive":false,
+		"deadzone":0.5,
 		"type":"Input",
 		"default":[  ]
 	},

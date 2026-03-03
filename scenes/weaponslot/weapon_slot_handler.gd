@@ -250,6 +250,8 @@ func loadPlaceholder():
 							var d = i[0]
 							var g = i[1]
 							np[d] = g
+			if "key" in pv:
+				pv.key = key
 			add_child(pv)
 			system = pv
 			system.name = name + "_" + system.name
