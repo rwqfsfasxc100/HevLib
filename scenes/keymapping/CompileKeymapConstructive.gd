@@ -22,7 +22,7 @@ var direct = "false"
 func compile_keymap():
 	var p = {}
 	file.open(vanilla,File.READ)
-	var h = JSON.parse(file.get_as_text()).result["actions"]
+	var h = JSON.parse(file.get_as_text()).result
 	file.close()
 	for action in h:
 		var d = h[action]

@@ -27,7 +27,7 @@ onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 #var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 
 
-onready var compiler = preload("res://HevLib/scenes/keymapping/CompileKeymap.gd").new(pointers)
+onready var compiler = preload("res://HevLib/scenes/keymapping/compile_keymap.gd").new(pointers)
 
 var INPUT_DRIVER_ACTIVE = true
 
@@ -36,10 +36,14 @@ const ALLOW_KEYBIND_MODIFICATIONS = true
 var old_actions = []
 
 var keybind_folder = "user://cache/.HevLib_Cache/Keybinds/"
+var vanilla_binds_file = "user://cfg/Vanilla_Binds.cfg"
 
 var file = File.new()
 
 var input_handle = null
+
+# NEEDS TO COMBINE BOTH COMPILATION AND DETECTION METHODS
+# DECIDE WHICH TO USE BASED ON WHETHER THE CONTROL IS INDIVIDUAL OR CONTINUOUS
 
 func _ready():
 	pointers.FolderAccess.__check_folder_exists(keybind_folder)
@@ -48,6 +52,10 @@ func _ready():
 	if ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE:
 		var actions = InputMap.get_actions()
 		var sortedAv = pointers.Keymapping.__get_built_in_action_list()
+		var vb = pointers.FileAccess.__config_parse(vanilla_binds_file)
+		file.open(keybind_folder + "defined_control_configs.json",File.READ)
+		var mb = JSON.parse(file.get_as_text()).result
+		
 		
 		var ignore_builtin = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","input_virtualization_ignore_builtin")
 		
@@ -58,6 +66,10 @@ func _ready():
 			var act = InputMap.get_action_list(action)
 			for active in act:
 				InputMap.action_erase_event(action, active)
+			if action in vb:
+				pointers.Keymapping.__create_input_event(action,vb[action]["inputs"])
+			if action in mb:
+				pointers.Keymapping.__create_input_event(action,mb[action]["controls"])
 		compile()
 		pointers.ConfigDriver.__establish_connection("compile",self,"input")
 		
@@ -86,12 +98,12 @@ func _physics_process(delta):
 
 func _input(event):
 	if ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE:
-		event.set_script(load("res://HevLib/scenes/keymapping/data/inject.gd"))
+#		event.set_script(load("res://HevLib/scenes/keymapping/data/inject.gd"))
 		if handle_raw_inputs(event):
 #			event.checker = true
 #			get_tree().set_input_as_handled()
-#			Debug.l("Current Index: " + str(current_key_inputs))
-			input_handle.handle_input(current_key_inputs)
+			Debug.l("Current Index: " + str(current_key_inputs))
+			input_handle.handle_input(current_key_inputs, event)
 		
 #		if ("W" in current_key_inputs):
 #			if "Shift" in current_key_inputs:
