@@ -1,3 +1,9 @@
+[1.12.5]
+
+1="* Added fallback for null save files created by quitting the tutorial"
+2="* Keybind displays now properly support array of arrays in preparation for multi-key binds"
+3="* Improved some logging to aide with debugging"
+
 [1.12.4]
 
 1="* Ensured that equipment is provided the hardpoint key, ensuring equipment can be repaired properly."
