@@ -3762,7 +3762,7 @@ class _Keymapping:
 #		var allow_empty_bind = key_data.get("allow_empty_bind",false) # Defines if an empty keybind is valid (always active)
 		var allow_extra_keys = key_data.get("allow_extra_keys",true) # Are additional keys allowed to be held to still activate the keybind
 		var order_sensitive = key_data.get("order_sensitive",true) # Defines if the keys have to be pressed in the order they were inputted
-		var exclusive = key_data.get("exclusive",false) # If true, then no other binds can have been activated prior to this bind
+		var exclusive = key_data.get("exclusive",false) # If true, then cancels other exclusive actions containing only part of the binds this action uses.
 		
 		var opts = {
 #			"activation":activation,
@@ -3775,33 +3775,35 @@ class _Keymapping:
 		
 		return opts
 	
-	func __create_input_event(action: String, event: Array):
+	func __create_input_event(action: String, event: Array,opts:Dictionary):
 		for ev in event:
-			var scan = __string_to_scancode(ev[-1],true)
-			match scan[1]:
-				0:
-					var ie = InputEventKey.new()
-					var s = scan[0]
-					ie.scancode = s
-					ie.physical_scancode = s
-					InputMap.action_add_event(action,ie)
-				1:
-					var ie = InputEventMouseButton.new()
-					var s = scan[0] - 10000
-					ie.button_index = s
-					InputMap.action_add_event(action,ie)
-				2:
-					var ie = InputEventJoypadButton.new()
-					var s = scan[0] - 11000
-					ie.button_index = s
-					InputMap.action_add_event(action,ie)
-				3:
-					var ie = InputEventJoypadMotion.new()
-					var s = scan[0] - 12000
-					if s > 100:
-						pass
-					ie.axis = s
-					InputMap.action_add_event(action,ie)
+			if opts.order_sensitive:
+				var scan = __string_to_scancode(ev[-1],true)
+				match scan[1]:
+					0:
+						var ie = InputEventKey.new()
+						var s = scan[0]
+						ie.scancode = s
+						ie.physical_scancode = s
+						InputMap.action_add_event(action,ie)
+					1:
+						var ie = InputEventMouseButton.new()
+						var s = scan[0] - 10000
+						ie.button_index = s
+						InputMap.action_add_event(action,ie)
+					2:
+						var ie = InputEventJoypadButton.new()
+						var s = scan[0] - 11000
+						ie.button_index = s
+						InputMap.action_add_event(action,ie)
+					3:
+						var ie = InputEventJoypadMotion.new()
+						var s = scan[0] - (12000 * sign(scan[0]))
+						ie.axis = s
+						InputMap.action_add_event(action,ie)
+			else:
+				breakpoint
+	
 	
 	
 	

@@ -24,14 +24,13 @@ onready var adjustments = key_codes["ADJUSTMENT"]
 
 var overrides = load("res://HevLib/scenes/keymapping/data/overrides.gd").get_script_constant_map()
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-#var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 
 
 onready var compiler = preload("res://HevLib/scenes/keymapping/compile_keymap.gd").new(pointers)
 
 var INPUT_DRIVER_ACTIVE = true
 
-const ALLOW_KEYBIND_MODIFICATIONS = true
+const ALLOW_KEYBIND_MODIFICATIONS = false
 
 var old_actions = []
 
@@ -45,9 +44,12 @@ var input_handle = null
 # NEEDS TO COMBINE BOTH COMPILATION AND DETECTION METHODS
 # DECIDE WHICH TO USE BASED ON WHETHER THE CONTROL IS INDIVIDUAL OR CONTINUOUS
 
+# BEFOREHAND, TRY RELEASING ACTION AS WELL AS SETTING AS HANDLED - AND IT WORKS!
+
 func _ready():
 	pointers.FolderAccess.__check_folder_exists(keybind_folder)
 	self.pause_mode = Node.PAUSE_MODE_PROCESS
+	self.process_priority = -32768
 	INPUT_DRIVER_ACTIVE = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","use_input_virtualization")
 	if ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE:
 		var actions = InputMap.get_actions()
@@ -61,15 +63,15 @@ func _ready():
 		
 #		print(str(actions),"\n\n",str(pointers.Keymapping.__get_vanilla_action_list()))
 		for action in actions:
-			if ignore_builtin and action in sortedAv:
-				continue
+#			if ignore_builtin and action in sortedAv:
+#				continue
 			var act = InputMap.get_action_list(action)
 			for active in act:
 				InputMap.action_erase_event(action, active)
 			if action in vb:
-				pointers.Keymapping.__create_input_event(action,vb[action]["inputs"])
+				pointers.Keymapping.__create_input_event(action,vb[action]["inputs"],vb[action]["opts"])
 			if action in mb:
-				pointers.Keymapping.__create_input_event(action,mb[action]["controls"])
+				pointers.Keymapping.__create_input_event(action,mb[action]["controls"],mb[action]["opts"])
 		compile()
 		pointers.ConfigDriver.__establish_connection("compile",self,"input")
 		
@@ -143,7 +145,7 @@ func _input(event):
 		
 
 var bit_index = 0
-var scancode_order = []
+var scancode_order = PoolIntArray([])
 
 func handle_raw_inputs(event):
 	var m = false
