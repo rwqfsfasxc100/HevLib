@@ -12,7 +12,7 @@ const MOD_VERSION_BUGFIX = 0
 const MOD_VERSION_METADATA = ""
 const MOD_IS_LIBRARY = true
 func _init(modLoader = ModLoader):
-	l("Initializing WebTranslate")
+#	l("Initializing WebTranslate")
 	updateTL("res://HevLib/i18n/en.txt","|",false,false)
 	updateTL("res://HevLib/i18n/de.txt","|",false,false)
 	updateTL("res://HevLib/i18n/en_transit_tips.txt","|",false,false)
@@ -20,14 +20,13 @@ func _init(modLoader = ModLoader):
 	updateTL("res://HevLib/i18n/uk_UA.txt","|",false,false)
 var modPath:String = get_script().resource_path.get_base_dir() + "/"
 func _ready():
-	l("Readying")
+#	l("Readying")
 	
 	# var WebTranslate = preload("res://HevLib/pointers/WebTranslate.gd")
 	# WebTranslate.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]], "res://HevLib/webtranslate/ModMain.gd")
 	
 #	loadTranslationsFromCache()
-	
-	l("Ready")
+	Debug.l("Device Information: [\n%s\n]" % get_device_info())
 
 var cache_extension = ".file_check_cache"
 
@@ -87,7 +86,7 @@ func loadTranslationsFromCache():
 # `useRelativePath` setting it to false uses a `res://` relative path instead of relative to the file
 # `fullLogging` setting it to false reduces the number of logs written to only display the number of translations made
 # example usage: updateTL("i18n/translation.txt", "|")
-func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, fullLogging:bool = true):
+func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, fullLogging:bool = false):
 	if useRelativePath:
 		path = str(modPath + path)
 	l("Adding translations from: %s" % path)
@@ -138,3 +137,32 @@ func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, full
 # Func to print messages to the logs
 func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
 	Debug.l("[%s V%s]: %s" % [title, version, msg])
+
+func get_device_info() -> String:
+	var out = ""
+	
+	out += "Booting from %s on %s[%s] as %s" % [OS.get_model_name(),OS.get_name(),OS.get_process_id(),str(OS.get_unique_id())]
+	
+	out += "\nCPU Information: %s [%s cores]" % [OS.get_processor_name(),OS.get_processor_count()]
+	
+	out += "\nBattery state (if any): %s/%s/%s" % [OS.get_power_percent_left(),OS.get_power_state(),OS.get_power_seconds_left()]
+	
+	var screens = OS.get_screen_count()
+	out += "\nScreens: %s @ %s dpi" % [screens,OS.get_screen_dpi()]
+	for i in range(screens):
+		out += "\n\t%s: %s / %s / %s hz" % [i,str(OS.get_screen_size(i)),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)]
+	
+	
+	var audioDrivers = OS.get_audio_driver_count()
+	out += "\n[%s] audio drivers:" % audioDrivers
+	for i in range(audioDrivers):
+		out += "\n\t%s" % OS.get_audio_driver_name(i)
+	out += "\nKeyboard variant: %s @ %s/%s" % [OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()]
+	out += "\nExecutable path: %s" % OS.get_executable_path()
+	out += "\nUser directory: %s" % OS.get_user_data_dir()
+	
+	out += "\nCMD args: %s" % str(OS.get_cmdline_args())
+	
+	
+	
+	return out
