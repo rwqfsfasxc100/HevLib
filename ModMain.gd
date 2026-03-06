@@ -247,6 +247,9 @@ func _ready():
 #	PointerNode.set_script(load("res://HevLib/pointers.gd").new())
 	PointerNode.name = "HevLib~Pointers"
 	CRoot.call_deferred("add_child",PointerNode)
+
+#	var console = ResourceLoader.load("res://HevLib/logging/Console.tscn").instance()
+#	CRoot.call_deferred("add_child",console)
 #	pointers.free()
 	l("Ready")
 func installScriptExtension(path:String):
