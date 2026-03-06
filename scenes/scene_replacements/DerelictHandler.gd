@@ -96,6 +96,7 @@ func canBeAt(pos):
 	var sn = ship_pool.keys()[randi() % ship_pool.keys().size()]
 	var selected = ship_pool[sn]
 	model = sn
+	Debug.l("* %s handler %s attempting spawn of ship %s" % [mode,str(index),sn])
 	for i in defaults:
 		set(i,defaults[i])
 	for i in selected:
@@ -172,9 +173,12 @@ func makeAt(pos):
 			if randf() < ring_storm_chance:
 				var storm = stormBeacon.instance()
 				ships.append(storm)
-
 			if randf() < pirate_chance:
-				ships.append(makeAbductor())
+				match Settings.getDifficulty():
+					0:
+						Debug.l("Preventing spawn of abductor due to low difficulty")
+					_:
+						ships.append(makeAbductor())
 
 			if clump:
 				for s in ships:
