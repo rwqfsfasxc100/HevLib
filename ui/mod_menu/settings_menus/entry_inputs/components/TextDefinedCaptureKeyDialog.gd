@@ -37,7 +37,8 @@ func _on_ActionDefining_pressed():
 	remakeActionButtons()
 	
 func _remove_key(key):
-	
+	if typeof(key) == TYPE_STRING:
+		key = [key]
 	var n = pointers.ConfigDriver.__get_value(mod,section,action)
 	n.erase(key)
 	pointers.ConfigDriver.__store_value(mod,section,action,n)

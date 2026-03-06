@@ -24,8 +24,22 @@ func _ready():
 
 func recheck_availability():
 	
+	var default = CONFIG_DATA.get("default",[])
 	var values = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
-	if values.hash() != CONFIG_DATA.get("default",[]).hash():
+	var reset = false
+	if default.size() != values.size():
+		reset = true
+	else:
+		for g in range(values.size()):
+			var i = values[g]
+			if typeof(i) == TYPE_STRING:
+				i = [i]
+			var a = default[g]
+			if typeof(a) == TYPE_STRING:
+				a = [a]
+			if hash(i) != hash(a):
+				reset = true
+	if reset:
 		$reset.visible = true
 		$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($reset)
 	else:
