@@ -1,3 +1,8 @@
+[1.12.6]
+
+1="* Fixed inputs not being removable in input-type config options"
+2="* Fixed input-type configs always displaying the reset button, even when it didn't need to"
+
 [1.12.5]
 
 1="* Added fallback for null save files created by quitting the tutorial"
