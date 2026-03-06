@@ -71,34 +71,39 @@ func compile_keymap():
 		var opts = data["opts"]
 		if opts["exclusive"]:
 			exclusives[action] = data
-	
-	for action in p:
-		var data = p[action]
-		var keys = data["controls"]
-		var opts = data["opts"]
-		for key in keys:
-			if key.size() > 1:
-				var handler = orderspecific_checker_entry % action
-				var expression = ""
-				var map = {}
-				var mx = 214748364
-				var cb = 0
-				for kv in key:
-					var sc = pointers.Keymapping.__string_to_scancode(kv)
-					map[cb] = sc
-					handler += orderspecific_part_def % [cb,sc]
-					
-					if not expression:
-						var v = "(" + orderspecific_expr_part % [cb,cb,mx-cb]
-						expression += v
+		else:
+			var keys = data["controls"]
+			for key in keys:
+				if key.size() > 1:
+					if opts["order_sensitive"]:
+						var handler = orderspecific_checker_entry % action
+						var expression = ""
+						var map = {}
+						var mx = 214748364
+						var cb = 0
+						for kv in key:
+							var sc = pointers.Keymapping.__string_to_scancode(kv)
+							map[cb] = sc
+							handler += orderspecific_part_def % [cb,sc]
+							
+							if not expression:
+								var v = "(" + orderspecific_expr_part % [cb,cb,mx-cb]
+								expression += v
+							else:
+								var v = " < " + orderspecific_expr_part % [cb,cb,mx-cb]
+								expression += v
+							cb += 1
+						expression += ")"
+						handler += orderspecific_other_buttons_pressed % [expression,action]
+						handler += orderspecific_checker_end % action
+						scripting += handler
 					else:
-						var v = " < " + orderspecific_expr_part % [cb,cb,mx-cb]
-						expression += v
-					cb += 1
-				expression += ")"
-				handler += orderspecific_other_buttons_pressed % [expression,action]
-				handler += orderspecific_checker_end % action
-				scripting += handler
+						breakpoint
+	for action in exclusives:
+		var data = exclusives[action]
+		var opts = data["opts"]
+		
+		breakpoint
 	return scripting
 	
 	
