@@ -1008,8 +1008,35 @@ class _DataFormat:
 				this_stream = ""
 				streaming = false
 		return [concat if concat !="" else "extends Node",var_names,const_names]
-		
-		
+	
+	func __factorial(n:int) -> int:
+		var holdvalue = 0
+		var boolis = true
+		var s = sign(n)
+		n = abs(n)
+		if n == 0 or n == 1:
+			holdvalue = 1
+		else:
+			while n > 0:
+				if boolis:
+					boolis = false
+					holdvalue = n
+				else:
+					holdvalue = holdvalue * n
+				n = n-1
+		return (holdvalue * s)
+	
+	func __get_unique_pairs(max_value: int) -> Array:
+		var pairs := []
+		for i in range(max_value + 1):
+			for j in range(i + 1, max_value):
+				pairs.append([i, j])
+		return pairs
+	
+	
+	
+	
+	
 
 class _DriverManagement:
 	var scripts = [
