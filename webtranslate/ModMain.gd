@@ -163,6 +163,4 @@ func get_device_info() -> String:
 	
 	out += "\nCMD args: %s" % str(OS.get_cmdline_args())
 	
-	
-	
 	return out
