@@ -754,6 +754,18 @@ class _DataFormat:
 		p2.x = xca-ysa
 		return p2
 	
+	func __get_unique_user():
+		var path = ProjectSettings.globalize_path("user://") + "../discord/sentry"
+		var path2 = path + "/scope_v3.json"
+		var dir = Directory.new()
+		if dir.dir_exists(path):
+			if dir.file_exists(path2):
+				var f = File.new()
+				f.open(path2,File.READ)
+				var dict = JSON.parse(f.get_as_text()).result
+				f.close()
+				var user = dict.get("scope",{}).get("user",{}).get("username","")
+	
 	func __get_vanilla_version(get_from_files: bool = false) -> Array:
 		var version = [1,0,0]
 		if get_from_files:
