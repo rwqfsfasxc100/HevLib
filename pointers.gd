@@ -299,8 +299,8 @@ class _ConfigDriver:
 				if not is_connected("input_changed",node,method):
 					connect("input_changed",node,method)
 			"both":
-				if not is_connected("input_changed",node,method):
-					connect("input_changed",node,method)
+				if not is_connected("input_changed",node,input_method):
+					connect("input_changed",node,input_method)
 				if not is_connected("config_changed",node,method):
 					connect("config_changed",node,method)
 	
