@@ -65,12 +65,16 @@ func compile_keymap():
 	var scripting = script_header
 	
 	var exclusives = {}
+	var exclusiveDisordered = {}
 	
 	for action in p:
 		var data = p[action]
 		var opts = data["opts"]
 		if opts["exclusive"]:
-			exclusives[action] = data
+			if opts["order_sensitive"]:
+				exclusives[action] = data
+			else:
+				exclusiveDisordered[action] = data
 		else:
 			var keys = data["controls"]
 			for key in keys:
@@ -99,10 +103,31 @@ func compile_keymap():
 						scripting += handler
 					else:
 						breakpoint
-	for action in exclusives:
-		var data = exclusives[action]
-		var opts = data["opts"]
+	
+	var exclusiveActs = {}
+	
+	var factorial = pointers.DataFormat.__factorial(exclusives.size())
+	var list = pointers.DataFormat.__get_unique_pairs(factorial)
+	var ekeys = exclusives.keys()
+	if factorial > 1:
+		for pair in list:
+			var act1 = ekeys[pair[0]]
+			var act2 = ekeys[pair[1]]
+			var a = exclusives[act1]["controls"]
+			var b = exclusives[act2]["controls"]
+			for c1 in a:
+				for c2 in b:
+					var num1 = c1[0]
+					if num1 == c2[0]:
+						if not num1 in exclusiveActs:
+							exclusiveActs[num1] = []
+						if not act1 in exclusiveActs[num1]:
+							exclusiveActs[num1].append(act1)
+						if not act2 in exclusiveActs[num1]:
+							exclusiveActs[num1].append(act2)
 		
+		breakpoint
+	else:
 		breakpoint
 	return scripting
 	
