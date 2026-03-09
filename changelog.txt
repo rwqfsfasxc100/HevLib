@@ -1,3 +1,19 @@
+[1.12.7]
+
+1="* updated __establish_connection to connect both config and input-specific changes"
+1.1="* Added third parameter: type"
+1.2="* Accepts config, input, or both. Defaults to config"
+1.3="* config - updates whenever a config is changed. Original behaviour"
+1.4="* input - updates whenever input-type options are changed"
+1.5="* both - updates whenever either inputs or a config is changed."
+1.5.1="* Input changes update both, so a fourth input_method parameter defines a specific method input updates are sent to. Defaults to input_changed"
+2="* Improved the randomizer for MineralDriver while randomize minerals is enabled"
+3="* Added 2 new functions to DataFormat:"
+3.1="* __factorial - function that calculates the factorial of an integer. Does not currently support floating point factorials"
+3.2="* __get_unique_pairs - function that returns all integer pairs between 0 and the provided integer (exclusive)"
+4="* Greatly improved logging for modded derelicts and NPCs"
+5="* Modded derelicts no longer spawn ringstorms or abductors in peaceful"
+
 [1.12.6]
 
 1="* Fixed inputs not being removable in input-type config options"
