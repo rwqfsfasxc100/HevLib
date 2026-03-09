@@ -119,7 +119,7 @@ func makeAt(pos):
 	
 	var ships = []
 	
-	
+	Debug.l("* %s handler %s spawning ship %s at (%d,%d)" % [mode,str(index),model,pos.x,pos.y])
 	match mode:
 		"miner":
 			var config = Shipyard.getBuildConfigByName(model)
@@ -171,8 +171,12 @@ func makeAt(pos):
 					ships.append(a)
 					
 			if randf() < ring_storm_chance:
-				var storm = stormBeacon.instance()
-				ships.append(storm)
+				match Settings.getDifficulty():
+					0:
+						Debug.l("Preventing spawn of ringstorm due to low difficulty")
+					_:
+						var storm = stormBeacon.instance()
+						ships.append(storm)
 			if randf() < pirate_chance:
 				match Settings.getDifficulty():
 					0:
