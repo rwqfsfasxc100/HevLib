@@ -1,3 +1,7 @@
+[1.12.8]
+
+1="* Fixed crash caused from some nodes not in the scene tree attempting to get the tree."
+
 [1.12.7]
 
 1="* updated __establish_connection to connect both config and input-specific changes"
