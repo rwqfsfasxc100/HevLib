@@ -292,7 +292,7 @@ class _ConfigDriver:
 	
 	func __establish_connection(method: String, node: Node, type: String = "config"): # Type accepts "config", "input", or "both"
 		match type.to_lower():
-			"string":
+			"config":
 				if not is_connected("config_changed",node,method):
 					connect("config_changed",node,method)
 			"input":
