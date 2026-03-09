@@ -290,7 +290,7 @@ class _ConfigDriver:
 		__change_made()
 		
 	
-	func __establish_connection(method: String, node: Node, type: String = "config"): # Type accepts "config", "input", or "both"
+	func __establish_connection(method: String, node: Node, type: String = "config", input_method: String = "input_changed"): # Type accepts "config", "input", or "both"
 		match type.to_lower():
 			"config":
 				if not is_connected("config_changed",node,method):
