@@ -1042,7 +1042,7 @@ class _DataFormat:
 		var pairs := []
 		for i in range(max_value + 1):
 			for j in range(i + 1, max_value):
-				pairs.append([i, j])
+				pairs.append(PoolIntArray([i, j]))
 		return pairs
 	
 	
