@@ -145,46 +145,48 @@ func compile_keymap():
 	var exclusiveActs = {}
 	var exclusiveSize = {}
 	
-	var factorial = pointers.DataFormat.__factorial(exclusives.size())
-	var list = pointers.DataFormat.__get_unique_pairs(factorial)
-	var ekeys = exclusives.keys()
-	if factorial > 1:
-		for pair in list:
-			var act1 = ekeys[pair[0]]
-			var act2 = ekeys[pair[1]]
-			var a = exclusives[act1]["controls"]
-			var b = exclusives[act2]["controls"]
-			for c1 in a:
-				for c2 in b:
-					var num1 = c1[0]
-					if num1 == c2[0]:
-						if not num1 in exclusiveActs:
-							exclusiveActs[num1] = []
-						if not num1 in exclusiveKeys:
-							exclusiveKeys.append(num1)
-						if not num1 in exclusiveSize:
-							exclusiveSize[num1] = 0
-						if not act1 in exclusiveActs[num1]:
-							exclusiveActs[num1].append(act1)
-						if not act2 in exclusiveActs[num1]:
-							exclusiveActs[num1].append(act2)
-						var s1 = c1.size()
-						var s2 = c2.size()
-						if s1 > exclusiveSize[num1]:
-							exclusiveSize[num1] = s1
-						if s2 > exclusiveSize[num1]:
-							exclusiveSize[num1] = s2
-	else:
+	var exclSize = exclusives.size()
+	if exclSize > 0:
+		var factorial = pointers.DataFormat.__factorial(exclSize)
+		var list = pointers.DataFormat.__get_unique_pairs(factorial)
+		var ekeys = exclusives.keys()
+		if factorial > 1:
+			for pair in list:
+				var act1 = ekeys[pair[0]]
+				var act2 = ekeys[pair[1]]
+				var a = exclusives[act1]["controls"]
+				var b = exclusives[act2]["controls"]
+				for c1 in a:
+					for c2 in b:
+						var num1 = c1[0]
+						if num1 == c2[0]:
+							if not num1 in exclusiveActs:
+								exclusiveActs[num1] = []
+							if not num1 in exclusiveKeys:
+								exclusiveKeys.append(num1)
+							if not num1 in exclusiveSize:
+								exclusiveSize[num1] = 0
+							if not act1 in exclusiveActs[num1]:
+								exclusiveActs[num1].append(act1)
+							if not act2 in exclusiveActs[num1]:
+								exclusiveActs[num1].append(act2)
+							var s1 = c1.size()
+							var s2 = c2.size()
+							if s1 > exclusiveSize[num1]:
+								exclusiveSize[num1] = s1
+							if s2 > exclusiveSize[num1]:
+								exclusiveSize[num1] = s2
+		else:
+			
+			
+			breakpoint
 		
-		
-		breakpoint
-	
-	for key in exclusiveKeys:
-		
-		
-		
-		
-		breakpoint
+		for key in exclusiveKeys:
+			
+			
+			
+			
+			breakpoint
 	
 	
 	
