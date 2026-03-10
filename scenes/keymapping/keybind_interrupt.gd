@@ -30,7 +30,7 @@ onready var compiler = preload("res://HevLib/scenes/keymapping/compile_keymap.gd
 
 var INPUT_DRIVER_ACTIVE = true
 
-const ALLOW_KEYBIND_MODIFICATIONS = false
+const ALLOW_KEYBIND_MODIFICATIONS = true
 
 var old_actions = []
 

@@ -15,6 +15,9 @@ var vanilla = keybind_folder + "vanilla_binds.json"
 # Code prefabs
 var script_header = "extends Reference\n\nvar pointers\n\nfunc _init(p):\n\tpointers = p\n\nfunc handle_input(bits: PoolIntArray, event):\n\tpass"
 
+var bit_size_check = "(bits.size() == %s) and"
+
+
 # Order specific checkers
 var orderspecific_checker_entry = "\n\tif event.is_action_pressed(\"%s\", true):"
 var orderspecific_checker_end = "\n\telse:\n\t\tInput.action_release(\"%s\")"
@@ -22,6 +25,12 @@ var orderspecific_other_buttons_pressed = "\n\t\tif not %s:\n\t\t\tCurrentGame.g
 
 var orderspecific_part_def = "\n\t\tvar p%d = bits.find(%s)"
 var orderspecific_expr_part = "(%d if p%d > -1 else %d)"
+
+# Order nonspecific checkers
+var ordernonspecific_part_def = "\n\t\tvar p%d = %s in bits"
+var ordernonspecific_expr_part = "p%d"
+
+
 
 
 func compile_keymap():
@@ -98,13 +107,43 @@ func compile_keymap():
 								expression += v
 							cb += 1
 						expression += ")"
+						
+						if not opts["allow_extra_keys"]:
+							expression = bit_size_check % key.size() + expression
+						
 						handler += orderspecific_other_buttons_pressed % [expression,action]
 						handler += orderspecific_checker_end % action
 						scripting += handler
 					else:
-						breakpoint
+						var handler = orderspecific_checker_entry % action
+						var expression = ""
+						var map = {}
+						var mx = 214748364
+						var cb = 0
+						for kv in key:
+							var sc = pointers.Keymapping.__string_to_scancode(kv)
+							map[cb] = sc
+							handler += ordernonspecific_part_def % [cb,sc]
+							
+							if not expression:
+								var v = "(" + ordernonspecific_expr_part % cb
+								expression += v
+							else:
+								var v = " and " + ordernonspecific_expr_part % cb
+								expression += v
+							cb += 1
+						expression += ")"
+						
+						if not opts["allow_extra_keys"]:
+							expression = bit_size_check % key.size() + expression
+						
+						handler += orderspecific_other_buttons_pressed % [expression,action]
+						handler += orderspecific_checker_end % action
+						scripting += handler
 	
+	var exclusiveKeys = []
 	var exclusiveActs = {}
+	var exclusiveSize = {}
 	
 	var factorial = pointers.DataFormat.__factorial(exclusives.size())
 	var list = pointers.DataFormat.__get_unique_pairs(factorial)
@@ -121,14 +160,34 @@ func compile_keymap():
 					if num1 == c2[0]:
 						if not num1 in exclusiveActs:
 							exclusiveActs[num1] = []
+						if not num1 in exclusiveKeys:
+							exclusiveKeys.append(num1)
+						if not num1 in exclusiveSize:
+							exclusiveSize[num1] = 0
 						if not act1 in exclusiveActs[num1]:
 							exclusiveActs[num1].append(act1)
 						if not act2 in exclusiveActs[num1]:
 							exclusiveActs[num1].append(act2)
+						var s1 = c1.size()
+						var s2 = c2.size()
+						if s1 > exclusiveSize[num1]:
+							exclusiveSize[num1] = s1
+						if s2 > exclusiveSize[num1]:
+							exclusiveSize[num1] = s2
+	else:
+		
 		
 		breakpoint
-	else:
+	
+	for key in exclusiveKeys:
+		
+		
+		
+		
 		breakpoint
+	
+	
+	
 	return scripting
 	
 	
