@@ -9,7 +9,7 @@ assignees: rwqfsfasxc100
 
 **NOTE BEFORE REPORTING**
 
-This page should be used second to [my bug report form](https://forms.gle/AsDf9d7gRkqB3iiKA), and you should only use this if you are either unable to use the form, or the form is not all-encompassing for providing information you want to share with (which you should state here)
+This page should be used second to my bug report form (found here: https://forms.gle/AsDf9d7gRkqB3iiKA), and you should only use this if you are either unable to use the form, or the form is not all-encompassing for providing information you want to share with (which you should state here)
 
 Bug reports on GitHub are rather slow. If you want the issue to be fixed as soon as, or want real-time data on the progress of reporting the bug, please join the [ΔV Discord server](https://discord.gg/dv), and head to the thread for HevLib, found [here](https://discord.com/channels/426287934870781952/1354537481197850655) 
 
