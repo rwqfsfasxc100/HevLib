@@ -181,6 +181,8 @@ func compile_keymap():
 			
 			breakpoint
 		
+		# Make sure to always check the common key is pressed to consider cancelling
+		
 		for key in exclusiveKeys:
 			
 			
