@@ -171,16 +171,12 @@ func makeAt(pos):
 					ships.append(a)
 					
 			if randf() < ring_storm_chance:
-				match Settings.getDifficulty():
-					0:
-						Debug.l("Preventing spawn of ringstorm due to low difficulty")
-					_:
-						var storm = stormBeacon.instance()
-						ships.append(storm)
+				var storm = stormBeacon.instance()
+				ships.append(storm)
 			if randf() < pirate_chance:
 				match Settings.getDifficulty():
 					0:
-						Debug.l("Preventing spawn of abductor due to low difficulty")
+						Debug.l("Preventing spawn of abductor due to peaceful difficulty")
 					_:
 						ships.append(makeAbductor())
 
