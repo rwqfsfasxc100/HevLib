@@ -4626,8 +4626,8 @@ class _ManifestV2:
 						if not tag in tag_dict:
 							tag_dict[tag] = {}
 						var td = tags[tag]
-						
-						tag_dict[tag][id] = td["value"] 
+						if typeof(td) == TYPE_DICTIONARY and "value" in td and "type" in td:
+							tag_dict[tag][id] = td["value"] 
 						pass
 				pass
 		return tag_dict
