@@ -281,7 +281,10 @@ func nodeModify():
 					var value = i.get("value",null)
 					var property = i.get("property","null_value_to_ensure_that_this_fails_when_absent_lol_hi")
 					if node and property in node:
-						node.set_deferred(property,value)
+						if i.get("defer",false):
+							node.set_deferred(property,value)
+						else:
+							node.set(property,value)
 	
 	if shipName in modify_data:
 		var thisShipData = modify_data[shipName]
@@ -290,7 +293,10 @@ func nodeModify():
 			var value = i.get("value",null)
 			var property = i.get("property","null_value_to_ensure_that_this_fails_when_absent_lol_hi")
 			if node and property in node:
-				node.set_deferred(property,value)
+				if i.get("defer",false):
+					node.set_deferred(property,value)
+				else:
+					node.set(property,value)
 	
 	
 
