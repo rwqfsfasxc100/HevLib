@@ -30,7 +30,7 @@ onready var compiler = preload("res://HevLib/scenes/keymapping/compile_keymap.gd
 
 var INPUT_DRIVER_ACTIVE = true
 
-const ALLOW_KEYBIND_MODIFICATIONS = false
+const ALLOW_KEYBIND_MODIFICATIONS = true
 
 var old_actions = []
 
@@ -40,11 +40,6 @@ var vanilla_binds_file = "user://cfg/Vanilla_Binds.cfg"
 var file = File.new()
 
 var input_handle = null
-
-# NEEDS TO COMBINE BOTH COMPILATION AND DETECTION METHODS
-# DECIDE WHICH TO USE BASED ON WHETHER THE CONTROL IS INDIVIDUAL OR CONTINUOUS
-
-# BEFOREHAND, TRY RELEASING ACTION AS WELL AS SETTING AS HANDLED - AND IT WORKS!
 
 func _ready():
 	pointers.FolderAccess.__check_folder_exists(keybind_folder)
@@ -78,7 +73,14 @@ func _ready():
 #		var v = InputEventKey.new()
 #		v.scancode = OS.find_scancode_from_string("F10")
 #		InputMap.action_add_event("debugger",v)
-		
+#	InputMap.add_action("ACT1")
+#	InputMap.add_action("ACT2")
+#	var v = InputEventKey.new()
+#	v.scancode = OS.find_scancode_from_string("F7")
+#	InputMap.action_add_event("ACT1",v)
+#	var v1 = InputEventKey.new()
+#	v1.scancode = OS.find_scancode_from_string("F7")
+#	InputMap.action_add_event("ACT2",v1)
 
 func compile():
 	var active_script = compiler.compile_keymap()
@@ -99,6 +101,8 @@ func _physics_process(delta):
 			scancode_order.clear()
 
 func _input(event):
+#	if event.is_action("ACT1") and event.is_action("ACT2"):
+#		breakpoint
 	if ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE:
 #		event.set_script(load("res://HevLib/scenes/keymapping/data/inject.gd"))
 		if handle_raw_inputs(event):
