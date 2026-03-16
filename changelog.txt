@@ -1,3 +1,17 @@
+[1.12.9]
+
+1="* Restored comments to HL's GDUNZIP instance"
+2="* Modded derelicts once again can have ringstrom encounters while in peaceful difficulty"
+2.1="* Reverted change due to incorrect assumption of the fix for the equivalent issue with vanilla derelicts"
+3="* Moved all library shaders to a unique folder"
+4="* SHIP_NODE_MODIFY entries now modify properties instantly by default instead of waiting for an idle frame"
+5="* Added defer entry to SHIP_NODE_MODIFY entries"
+5.1="* Equivalent to the same call for SHIP_NODE_REGISTER entries. Defaults to false"
+6="* Fixed crash that occurred with a malformatted manifest tag"
+6.1="* All tags now NEED to be a dictionary type, and have "type" and "value" entries present"
+7="* Fixed issue with minerals occasionally phasing through the hull after interacting with modded MPU-like equipment"
+7.1="* This was specifically due to minerals being 'overprocessed', and ending up with 0 mass while in the hold."
+
 [1.12.8]
 
 1="* Fixed crash caused from some nodes not in the scene tree attempting to get the tree."
