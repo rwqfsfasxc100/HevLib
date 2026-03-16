@@ -24,7 +24,7 @@ func calc_comp():
 			composition.erase(type)
 
 	#Set mineral content to zero so we can abuse the MPU code later
-	mineralContent = 0.0
+#	mineralContent = 0.0
 
 
 #Func to let scanners detect all minerals

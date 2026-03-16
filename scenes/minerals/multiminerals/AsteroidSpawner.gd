@@ -64,6 +64,7 @@ func spawnAsteroidByClass(oc, spot, chaos, spawnPointRandomness = 0.0, initialLi
 		if i.has_method("update_mass"):
 			i.update_mass()
 		else:
+			printerr("Mineral [",i,"] lacks update_mass() method")
 			var ps = update_mass(i)
 			i = ps
 		
