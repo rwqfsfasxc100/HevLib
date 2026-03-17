@@ -1,5 +1,8 @@
 extends Node
 
+const ALLOW_KEYBIND_MODIFICATIONS = !true
+var INPUT_DRIVER_ACTIVE = true
+
 var actionDict = {}
 
 var actionTypes = []
@@ -27,10 +30,6 @@ onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 
 
 onready var compiler = preload("res://HevLib/scenes/keymapping/compile_keymap.gd").new(pointers)
-
-var INPUT_DRIVER_ACTIVE = true
-
-const ALLOW_KEYBIND_MODIFICATIONS = !true
 
 var old_actions = []
 

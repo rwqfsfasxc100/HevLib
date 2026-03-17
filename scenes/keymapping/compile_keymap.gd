@@ -15,7 +15,7 @@ var vanilla = keybind_folder + "vanilla_binds.json"
 # Code prefabs
 var script_header = "extends Reference\n\nvar pointers\n\nfunc _init(p):\n\tpointers = p\n\nfunc handle_input(bits: PoolIntArray, event):\n\tpass"
 
-var bit_size_check = "(bits.size() == %s) and"
+var bit_size_check = "(bits.size() == %s) and "
 
 
 # Order specific checkers
@@ -165,6 +165,7 @@ func compile_keymap():
 							var s1 = c1.size()
 							var s2 = c2.size()
 							var depth = (s1 if s1 > s2 else s2)
+							var maxKeys = (c1 if s1 > s2 else c2)
 							var dp = depth
 							# Create a key trace with exclusivesTree so the code can reverse recursively 
 							# travel through the branches to have each exclusive combination effectively
@@ -174,8 +175,22 @@ func compile_keymap():
 							# level's inputs with those lower down the branch. It also makes it easier
 							# to not need to deal with orderless binds, as they can be clumped together
 							# with the same keys as ordered binds, just w/o the need for order checks
+							var thisTree = exclusivesTree
+							for d in range(dp):
+								var thisKey = maxKeys[d]
+								if not thisKey in thisTree:
+									thisTree.merge({thisKey:{"actions":[],"branch":{}}})
+#									thisTree.merge({thisKey:{"actions":{},"branch":{}}})
+								if s1 > d and not act1 in thisTree[thisKey]["actions"]:
+									thisTree[thisKey]["actions"].append(act1)
+#									thisTree[thisKey]["actions"].merge({act1:exclusives[act1]["opts"]})
+								if s2 > d and not act2 in thisTree[thisKey]["actions"]:
+									thisTree[thisKey]["actions"].append(act2)
+#									thisTree[thisKey]["actions"].merge({act2:exclusives[act2]["opts"]})
+								thisTree = thisTree[thisKey]["branch"]
 							
-							breakpoint
+							
+#							breakpoint
 							if not num1 in exclusiveKeys:
 								exclusiveKeys.append(num1)
 							if not num1 in exclusiveSize:
@@ -220,28 +235,36 @@ func compile_keymap():
 			breakpoint
 		
 		# Make sure to always check the common key is pressed to consider cancelling
+		var out = format_exclusives(exclusivesTree)
 		
-		for key in exclusiveKeys:
-			var size = exclusiveSize[key]["max"]
-			var check_statement = ""
-			var keyExtras = exclusiveExtraKeys[key]
-			while size > 0:
-				
-				var actions = exclusiveSize[key][size]
-				for action in actions:
-					var operate = exclusives[action]
-					if check_statement:
-						check_statement += "and %s" % exclusives_check_for_input % action
-					else:
-						check_statement = "\n\tif " + exclusives_check_for_input % action
-				
-				breakpoint
-				size -= 1
-			check_statement += ":"
-	
+		
+#		for key in exclusiveKeys:
+#			var size = exclusiveSize[key]["max"]
+#			var check_statement = ""
+#			var keyExtras = exclusiveExtraKeys[key]
+#			while size > 0:
+#
+#				var actions = exclusiveSize[key][size]
+#				for action in actions:
+#					var operate = exclusives[action]
+#					if check_statement:
+#						check_statement += "and %s" % exclusives_check_for_input % action
+#					else:
+#						check_statement = "\n\tif " + exclusives_check_for_input % action
+#
+#				breakpoint
+#				size -= 1
+#			check_statement += ":"
+#
 	
 	
 	return scripting
+
+func format_exclusives(tree : Dictionary) -> String:
+	var out = ""
 	
-	
-	
+	breakpoint
+	return out
+
+
+
