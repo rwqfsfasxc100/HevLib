@@ -1,0 +1,14 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=2]
+
+[ext_resource path="res://HevLib/ui/shaders/ascii.tres" type="Shader" id=1]
+
+[sub_resource type="StreamTexture" id=1]
+flags = 4
+load_path = "res://HevLib/ui/shaders/ascii.stex"
+
+[resource]
+shader = ExtResource( 1 )
+shader_param/ascii_size = Vector2( 1, 2 )
+shader_param/available_columns = 10
+shader_param/max_columns = 16
+shader_param/ascii_tex = SubResource( 1 )
