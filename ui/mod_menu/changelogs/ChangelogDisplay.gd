@@ -31,8 +31,9 @@ func parse():
 		refs.append(header)
 		linecontainer.add_child(header)
 		for l in lines:
-			var label = rich_entry_label.instance()
-			label.parse_bbcode(TranslationServer.translate(l))
+			var label = entry_label.instance()
+			var tex = TranslationServer.translate(l)
+			label.text = tex
 			refs.append(label)
 			linecontainer.add_child(label)
 			yield(CurrentGame.get_tree(),"idle_frame")
