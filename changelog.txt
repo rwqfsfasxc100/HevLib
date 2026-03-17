@@ -1,3 +1,7 @@
+[1.12.10]
+
+1="* Changelog entries now can use translation strings"
+
 [1.12.9]
 
 1="* Restored comments to HL's GDUNZIP instance"
