@@ -4,6 +4,7 @@ var path = ""
 #const MV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 const header_label = preload("res://HevLib/ui/mod_menu/changelogs/labels/version_label.tscn")
 const entry_label = preload("res://HevLib/ui/mod_menu/changelogs/labels/changelog_entry.tscn")
+const rich_entry_label = preload("res://HevLib/ui/mod_menu/changelogs/labels/rich_changelog_entry.tscn")
 onready var linecontainer = $ScrollContainer/VBoxContainer
 var pointers
 export (String,"singular","dynamic") var operation = "singular"
@@ -30,8 +31,8 @@ func parse():
 		refs.append(header)
 		linecontainer.add_child(header)
 		for l in lines:
-			var label = entry_label.instance()
-			label.text = l
+			var label = rich_entry_label.instance()
+			label.parse_bbcode(TranslationServer.translate(l))
 			refs.append(label)
 			linecontainer.add_child(label)
 			yield(CurrentGame.get_tree(),"idle_frame")

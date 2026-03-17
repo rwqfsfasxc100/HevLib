@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://enceladus/Subwindow.theme" type="Theme" id=1]
+
+[node name="rich_changelog_entry" type="RichTextLabel"]
+modulate = Color( 0.6, 0.6, 0.6, 1 )
+margin_right = 40.0
+margin_bottom = 40.0
+theme = ExtResource( 1 )
+bbcode_enabled = true
+bbcode_text = "* this is an example entry"
+text = "* this is an example entry"
+fit_content_height = true
