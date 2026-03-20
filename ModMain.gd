@@ -13,31 +13,37 @@ var _savedObjects := []
 
 var enable_research = false
 
-var pointers = load("res://HevLib/pointers.gd").new()
-
-var HevLibModMain = true
-func _init(modLoader = ModLoader):
-	l("Initializing DLC")
-	loadDLC()
-	installScriptExtension("events/TheRing.gd")
-	replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
-	replaceScene("scenes/notification_driver/Notifications.tscn","res://achievement/Notifications.tscn")
-	installScriptExtension("scripts/transit_tips/TransitTip.gd")
-	var self_path = self.get_script().get_path()
-	var self_directory = self_path.split(self_path.split("/")[self_path.split("/").size() - 1])[0]
-	var self_check = load(self_directory + "self_check.tscn").instance()
-	add_child(self_check)
-	
-	installScriptExtension("scenes/scene_replacements/Shipyard.gd")
-	
-#	var md = pointers.DataFormat.__get_script_constant_map_without_load("res://IndustriesOfEnceladusRewrite/HEVLIB_EQUIPMENT_DRIVER_TAGS/SLOT_ORDER.gd")
-	
-	
-	
-	
-	
+var pointers = null
 
 var file = File.new()
+var correct = file.file_exists("res://HevLib/pointers.gd")
+var HevLibModMain = true
+func _init(modLoader = ModLoader):
+	if correct:
+		l("Initializing HevLib")
+		pointers = load("res://HevLib/pointers.gd").new()
+		
+		l("Initializing DLC")
+		loadDLC()
+		installScriptExtension("events/TheRing.gd")
+		replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
+		replaceScene("scenes/notification_driver/Notifications.tscn","res://achievement/Notifications.tscn")
+		installScriptExtension("scripts/transit_tips/TransitTip.gd")
+		var self_path = self.get_script().get_path()
+		var self_directory = self_path.split(self_path.split("/")[self_path.split("/").size() - 1])[0]
+		var self_check = load(self_directory + "self_check.tscn").instance()
+		add_child(self_check)
+		
+		installScriptExtension("scenes/scene_replacements/Shipyard.gd")
+		
+#		var md = pointers.DataFormat.__get_script_constant_map_without_load("res://IndustriesOfEnceladusRewrite/HEVLIB_EQUIPMENT_DRIVER_TAGS/SLOT_ORDER.gd")
+		
+	else:
+		l("Folder structure not correct, exiting HevLib load")
+	
+	
+	
+
 var update_urls = PoolStringArray([])
 var url_store = "user://cache/.Mod_Menu_2_Cache/updates/url_refs.json"
 var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
@@ -54,204 +60,209 @@ var active_events_file = "user://cache/.HevLib_Cache/Event_Driver/active_events.
 var latest_event_file = "user://cache/.HevLib_Cache/Event_Driver/latest_event.txt"
 
 func _ready():
-	l("Readying")
-	var p = ProjectSettings.get_setting("locale/translations")
-	for i in p:
-		var translation = ResourceLoader.load(i,"",true)
-		TranslationServer.add_translation(translation)
-	
-#	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
-	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/")
-	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/")
-	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/dependancies/")
-	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/conflicts/")
-	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/complementary/")
-	pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Event_Driver/")
-	var zips = pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/",true,true)
-	var manifests = pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/",true,true)
-	var d = Directory.new()
-	for f in zips:
-		d.remove(f)
-	for f in manifests:
-		d.remove(f)
-	if d.dir_exists(weaponslot_cache):
-		pointers.FolderAccess.__recursive_delete(weaponslot_cache)
-	file.open(url_store,File.WRITE)
-	file.store_string("[]")
-	file.close()
-	file.open(has_updated_store,File.WRITE)
-	file.store_string("false")
-	file.close()
-	file.open(update_store,File.WRITE)
-	file.store_string("{}")
-	file.close()
-	file.open(event_log_file,File.WRITE)
-	file.store_string("{}")
-	file.close()
-	file.open(active_events_file,File.WRITE)
-	file.store_string("")
-	file.close()
-	file.open(latest_event_file,File.WRITE)
-	file.store_string("")
-	file.close()
-#	var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
-	var mod_data = pointers.ManifestV2.__get_mod_data(true)
-	var md = pointers.ManifestV2.__get_mod_data()
-	
-	replaceScene("scenes/better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
-	
-	
-	for item in md["mods"]:
-		var data = md["mods"][item]["manifest"]
-		if data["has_manifest"]:
-			var url = data["manifest_data"]["manifest_definitions"]["manifest_url"]
-			if url != "":
-				var http = HTTPRequest.new()
-				var pm = md["mods"][item]
-				file.open(url_store,File.READ_WRITE)
-				var current = JSON.parse(file.get_as_text()).result
-				current.append([pm["name"],pm["manifest"]["manifest_data"]["mod_information"]["id"],pm["version_data"]["version_major"],pm["version_data"]["version_minor"],pm["version_data"]["version_bugfix"]])
-				file.store_string(JSON.print(current))
-				file.close()
-				http.name = str(item.hash())
-				http.connect("request_completed",self,"network_return")
-				add_child(http)
-				http.timeout = 20
+	if correct:
+		l("Readying")
+		var p = ProjectSettings.get_setting("locale/translations")
+		for i in p:
+			var translation = ResourceLoader.load(i,"",true)
+			TranslationServer.add_translation(translation)
+		
+#		var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
+		pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/")
+		pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/")
+		pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/dependancies/")
+		pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/conflicts/")
+		pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/complementary/")
+		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Event_Driver/")
+		var zips = pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/",true,true)
+		var manifests = pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/",true,true)
+		var d = Directory.new()
+		for f in zips:
+			d.remove(f)
+		for f in manifests:
+			d.remove(f)
+		if d.dir_exists(weaponslot_cache):
+			pointers.FolderAccess.__recursive_delete(weaponslot_cache)
+		file.open(url_store,File.WRITE)
+		file.store_string("[]")
+		file.close()
+		file.open(has_updated_store,File.WRITE)
+		file.store_string("false")
+		file.close()
+		file.open(update_store,File.WRITE)
+		file.store_string("{}")
+		file.close()
+		file.open(event_log_file,File.WRITE)
+		file.store_string("{}")
+		file.close()
+		file.open(active_events_file,File.WRITE)
+		file.store_string("")
+		file.close()
+		file.open(latest_event_file,File.WRITE)
+		file.store_string("")
+		file.close()
+#		var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
+		var mod_data = pointers.ManifestV2.__get_mod_data(true)
+		var md = pointers.ManifestV2.__get_mod_data()
+		
+		replaceScene("scenes/better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
+		
+		
+		for item in md["mods"]:
+			var data = md["mods"][item]["manifest"]
+			if data["has_manifest"]:
+				var url = data["manifest_data"]["manifest_definitions"]["manifest_url"]
+				if url != "":
+					var http = HTTPRequest.new()
+					var pm = md["mods"][item]
+					file.open(url_store,File.READ_WRITE)
+					var current = JSON.parse(file.get_as_text()).result
+					current.append([pm["name"],pm["manifest"]["manifest_data"]["mod_information"]["id"],pm["version_data"]["version_major"],pm["version_data"]["version_minor"],pm["version_data"]["version_bugfix"]])
+					file.store_string(JSON.print(current))
+					file.close()
+					http.name = str(item.hash())
+					http.connect("request_completed",self,"network_return")
+					add_child(http)
+					http.timeout = 20
 
-				http.request(url)
-				update_urls.append(pm["manifest"]["manifest_data"]["mod_information"]["id"])
+					http.request(url)
+					update_urls.append(pm["manifest"]["manifest_data"]["mod_information"]["id"])
 
-	var conflicts = pointers.ManifestV2.__check_conflicts()
-	var dependancies = pointers.ManifestV2.__check_dependancies()
-	var complementary = pointers.ManifestV2.__check_complementary()
-	
-	file.open(conflicts_store,File.WRITE)
-	file.store_string(JSON.print(conflicts))
-	file.close()
-	file.open(dependancies_store,File.WRITE)
-	file.store_string(JSON.print(dependancies))
-	file.close()
-	file.open(complementary_store,File.WRITE)
-	file.store_string(JSON.print(complementary))
-	file.close()
-	
-#	var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
-#	replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
-#	if OS.has_feature("editor"):
-#		replaceScene("scenes/scene_replacements/TitleScreen.tscn", "res://TitleScreen.tscn")
-#	var mouse = load("res://HevLib/scenes/scene_replacements/MouseLayer.tscn").instance()
-	var CRoot = get_tree().get_root()
-#	CRoot.call_deferred("add_child",mouse)
-	
-	
-	
-	replaceScene("scenes/scene_replacements/Game.tscn", "res://Game.tscn")
-	var dir = Directory.new()
-	dir.make_dir_recursive("user://cache/.HevLib_Cache/")
-	var file = File.new()
-	file.open("user://cache/.HevLib_Cache/library_documentation.json", File.WRITE)
-#	var HevLib = load("res://HevLib/pointers/HevLib.gd")
-	var functionality = pointers.HevLib.__get_library_functionality(true)
-	file.store_string(functionality)
-	file.close()
-	file.open("user://cache/.HevLib_Cache/currently_installed_mods.json", File.WRITE)
-	file.store_string(str(mod_data))
-	file.close()
-	
-	var cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/"
-	replaceScene("scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
-#	var CRoot = get_tree().get_root()
-	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","use_legacy_equipment_handler"):
-		var conv := []
-		var paths = []
-		pointers.FolderAccess.__check_folder_exists(cache_folder)
-		var mods = ModLoader.get_children()
-		l("Scanning installed mods for applicable mods")
-		for mod in mods:
-			var variants = mod.get_property_list()
-			var dict = {}
-			var does = false
-			for it in variants:
-				var iname = it.get("name")
-				match iname:
-					"ADD_EQUIPMENT_SLOTS":
-						does = true
-						var arr = mod.ADD_EQUIPMENT_SLOTS
-						var arr2 = []
-						for item in arr:
-							arr2.append(item.duplicate(7))
-						dict.merge({"ADD_EQUIPMENT_SLOTS":arr2})
-					"ADD_EQUIPMENT_ITEMS":
-						does = true
-						var arr = mod.ADD_EQUIPMENT_ITEMS
-						var arr2 = []
-						for item in arr:
-							arr2.append(item.duplicate(7))
-						dict.merge({"ADD_EQUIPMENT_ITEMS":arr2})
-					"EQUIPMENT_TAGS":
-						does = true
-						var item = mod.EQUIPMENT_TAGS
-						dict.merge({"EQUIPMENT_TAGS":item.duplicate(true)})
-						pass
-					"SLOT_TAGS":
-						does = true
-						var item = mod.SLOT_TAGS
-						dict.merge({"SLOT_TAGS":item.duplicate(true)})
-						pass
-			if does:
-				var mPath = mod.get_script().get_path()
-				var mHash = mPath.hash()
-				conv.append([dict,mPath,mHash,mod.name])
-				paths.append(mPath)
-				l("Found mod at %s, labelling as %s" % [mPath, str(mHash)])
-		var vNode = load("res://HevLib/scenes/equipment/var_nodes/EquipmentDriver.tscn").instance()
-		vNode.conv = conv
-		vNode.paths = paths
-		vNode.name = "EquipmentDriver"
-		CRoot.call_deferred("add_child",vNode)
-	installScriptExtension("scenes/research/overhead_handle/Enceladus.gd")
-	installScriptExtension("scenes/research/overhead_handle/AsteroidSpawner.gd")
-	var nNode = load("res://HevLib/scenes/research/overhead_handle/ResearchOverheadHandle.tscn").instance()
-	CRoot.call_deferred("add_child",nNode)
-	var scene = load("res://HevLib/scenes/better_title_screen/TitleScreen.tscn")
-	
-#	replaceScene("scenes/equipment/Enceladus.tscn","res://enceladus/Enceladus.tscn")
-	pointers.ManifestV2.__get_mod_versions(true)
-	var ncrew = pointers.ManifestV2.__get_manifest_entry("tags","TAG_HANDLE_EXTRA_CREW")
-	var count = 24
-	for mod in ncrew:
-		var data = ncrew[mod]
-		if data > count:
-			count = data
-#	var NodeAccess = load("res://HevLib/pointers/NodeAccess.gd")
-	var crew = pointers.NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",count)
-	if not crew == "":
-		var escene := load(crew)
-		escene.take_over_path("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
-	if enable_research:
-		replaceScene("scenes/research/Enceladus.tscn","res://enceladus/Enceladus.tscn")
-	
-	
-	var gameFiles = pointers.FolderAccess.__get_folder_structure("res://",false)
-	file.open("user://cache/.HevLib_Cache/filesys.json",File.WRITE)
-	if gameFiles.size() == 0:
-		printerr("FAILED TO FETCH FILE SYSTEM")
-		l("ERROR! FAILED TO FETCH FILE SYSTEM")
-	var sys = JSON.print(gameFiles,"\t")
-	file.store_string(sys)
-	file.close()
-	
-	
-	var PointerNode = ResourceLoader.load("res://HevLib/pointers.gd","",true).new()
-#	var PointerNode = Node.new()
-#	PointerNode.set_script(load("res://HevLib/pointers.gd").new())
-	PointerNode.name = "HevLib~Pointers"
-	CRoot.call_deferred("add_child",PointerNode)
+		var conflicts = pointers.ManifestV2.__check_conflicts()
+		var dependancies = pointers.ManifestV2.__check_dependancies()
+		var complementary = pointers.ManifestV2.__check_complementary()
+		
+		file.open(conflicts_store,File.WRITE)
+		file.store_string(JSON.print(conflicts))
+		file.close()
+		file.open(dependancies_store,File.WRITE)
+		file.store_string(JSON.print(dependancies))
+		file.close()
+		file.open(complementary_store,File.WRITE)
+		file.store_string(JSON.print(complementary))
+		file.close()
+		
+#		var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
+#		replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
+#		if OS.has_feature("editor"):
+#			replaceScene("scenes/scene_replacements/TitleScreen.tscn", "res://TitleScreen.tscn")
+#		var mouse = load("res://HevLib/scenes/scene_replacements/MouseLayer.tscn").instance()
+		var CRoot = get_tree().get_root()
+#		CRoot.call_deferred("add_child",mouse)
+		
+		
+		
+		replaceScene("scenes/scene_replacements/Game.tscn", "res://Game.tscn")
+		var dir = Directory.new()
+		dir.make_dir_recursive("user://cache/.HevLib_Cache/")
+		var file = File.new()
+		file.open("user://cache/.HevLib_Cache/library_documentation.json", File.WRITE)
+	#	var HevLib = load("res://HevLib/pointers/HevLib.gd")
+		var functionality = pointers.HevLib.__get_library_functionality(true)
+		file.store_string(functionality)
+		file.close()
+		file.open("user://cache/.HevLib_Cache/currently_installed_mods.json", File.WRITE)
+		file.store_string(str(mod_data))
+		file.close()
+		
+		var cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/"
+		replaceScene("scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
+#		var CRoot = get_tree().get_root()
+		if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","use_legacy_equipment_handler"):
+			var conv := []
+			var paths = []
+			pointers.FolderAccess.__check_folder_exists(cache_folder)
+			var mods = ModLoader.get_children()
+			l("Scanning installed mods for applicable mods")
+			for mod in mods:
+				var variants = mod.get_property_list()
+				var dict = {}
+				var does = false
+				for it in variants:
+					var iname = it.get("name")
+					match iname:
+						"ADD_EQUIPMENT_SLOTS":
+							does = true
+							var arr = mod.ADD_EQUIPMENT_SLOTS
+							var arr2 = []
+							for item in arr:
+								arr2.append(item.duplicate(7))
+							dict.merge({"ADD_EQUIPMENT_SLOTS":arr2})
+						"ADD_EQUIPMENT_ITEMS":
+							does = true
+							var arr = mod.ADD_EQUIPMENT_ITEMS
+							var arr2 = []
+							for item in arr:
+								arr2.append(item.duplicate(7))
+							dict.merge({"ADD_EQUIPMENT_ITEMS":arr2})
+						"EQUIPMENT_TAGS":
+							does = true
+							var item = mod.EQUIPMENT_TAGS
+							dict.merge({"EQUIPMENT_TAGS":item.duplicate(true)})
+							pass
+						"SLOT_TAGS":
+							does = true
+							var item = mod.SLOT_TAGS
+							dict.merge({"SLOT_TAGS":item.duplicate(true)})
+							pass
+				if does:
+					var mPath = mod.get_script().get_path()
+					var mHash = mPath.hash()
+					conv.append([dict,mPath,mHash,mod.name])
+					paths.append(mPath)
+					l("Found mod at %s, labelling as %s" % [mPath, str(mHash)])
+			var vNode = load("res://HevLib/scenes/equipment/var_nodes/EquipmentDriver.tscn").instance()
+			vNode.conv = conv
+			vNode.paths = paths
+			vNode.name = "EquipmentDriver"
+			CRoot.call_deferred("add_child",vNode)
+		installScriptExtension("scenes/research/overhead_handle/Enceladus.gd")
+		installScriptExtension("scenes/research/overhead_handle/AsteroidSpawner.gd")
+		var nNode = load("res://HevLib/scenes/research/overhead_handle/ResearchOverheadHandle.tscn").instance()
+		CRoot.call_deferred("add_child",nNode)
+		var scene = load("res://HevLib/scenes/better_title_screen/TitleScreen.tscn")
+		
+#		replaceScene("scenes/equipment/Enceladus.tscn","res://enceladus/Enceladus.tscn")
+		pointers.ManifestV2.__get_mod_versions(true)
+		var ncrew = pointers.ManifestV2.__get_manifest_entry("tags","TAG_HANDLE_EXTRA_CREW")
+		var count = 24
+		for mod in ncrew:
+			var data = ncrew[mod]
+			if data > count:
+				count = data
+#		var NodeAccess = load("res://HevLib/pointers/NodeAccess.gd")
+		var crew = pointers.NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",count)
+		if not crew == "":
+			var escene := load(crew)
+			escene.take_over_path("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
+		if enable_research:
+			replaceScene("scenes/research/Enceladus.tscn","res://enceladus/Enceladus.tscn")
+		
+		
+		var gameFiles = pointers.FolderAccess.__get_folder_structure("res://",false)
+		file.open("user://cache/.HevLib_Cache/filesys.json",File.WRITE)
+		if gameFiles.size() == 0:
+			printerr("FAILED TO FETCH FILE SYSTEM")
+			l("ERROR! FAILED TO FETCH FILE SYSTEM")
+		var sys = JSON.print(gameFiles,"\t")
+		file.store_string(sys)
+		file.close()
+		
+		
+		var PointerNode = ResourceLoader.load("res://HevLib/pointers.gd","",true).new()
+#		var PointerNode = Node.new()
+#		PointerNode.set_script(load("res://HevLib/pointers.gd").new())
+		PointerNode.name = "HevLib~Pointers"
+		CRoot.call_deferred("add_child",PointerNode)
 
-#	var console = ResourceLoader.load("res://HevLib/logging/Console.tscn").instance()
-#	CRoot.call_deferred("add_child",console)
-#	pointers.free()
-	l("Ready")
+#		var console = ResourceLoader.load("res://HevLib/logging/Console.tscn").instance()
+#		CRoot.call_deferred("add_child",console)
+#		pointers.free()
+		l("Ready")
+	
+	else:
+		l("HevLib onready process cannot be carried out")
+	
 func installScriptExtension(path:String):
 	var childPath:String = str(modPath + path)
 	var childScript:Script = ResourceLoader.load(childPath)

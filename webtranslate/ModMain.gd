@@ -11,13 +11,17 @@ const MOD_VERSION_MINOR = 0
 const MOD_VERSION_BUGFIX = 0
 const MOD_VERSION_METADATA = ""
 const MOD_IS_LIBRARY = true
+
+var file = File.new()
+var correct = file.file_exists("res://HevLib/pointers.gd")
 func _init(modLoader = ModLoader):
 #	l("Initializing WebTranslate")
-	updateTL("res://HevLib/i18n/en.txt","|",false,false)
-	updateTL("res://HevLib/i18n/de.txt","|",false,false)
-	updateTL("res://HevLib/i18n/en_transit_tips.txt","|",false,false)
-	updateTL("res://HevLib/i18n/de_transit_tips.txt","|",false,false)
-	updateTL("res://HevLib/i18n/uk_UA.txt","|",false,false)
+	if correct:
+		updateTL("res://HevLib/i18n/en.txt","|",false,false)
+		updateTL("res://HevLib/i18n/de.txt","|",false,false)
+		updateTL("res://HevLib/i18n/en_transit_tips.txt","|",false,false)
+		updateTL("res://HevLib/i18n/de_transit_tips.txt","|",false,false)
+		updateTL("res://HevLib/i18n/uk_UA.txt","|",false,false)
 var modPath:String = get_script().resource_path.get_base_dir() + "/"
 func _ready():
 #	l("Readying")

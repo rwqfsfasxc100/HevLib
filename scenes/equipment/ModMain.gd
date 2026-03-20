@@ -44,176 +44,178 @@ var checksum = "user://cache/.HevLib_Cache/checksums"
 #var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 #var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 #var DriverManagement = preload("res://HevLib/pointers/DriverManagement.gd")
-
-var pointers
+var d = Directory.new()
+var correct = d.file_exists("res://HevLib/pointers.gd")
+var pointers = null
 func _init(modLoader = ModLoader):
-	l("Initializing Equipment Driver")
-	var d = Directory.new()
-	var variables_folder = "user://cache/.HevLib_Cache/Variable_Fetch/"
-	d.make_dir_recursive(variables_folder)
+	if correct:
+		l("Initializing Equipment Driver")
+		var variables_folder = "user://cache/.HevLib_Cache/Variable_Fetch/"
+		d.make_dir_recursive(variables_folder)
+		pointers = load("res://HevLib/pointers.gd").new()
 	
-	pointers = load("res://HevLib/pointers.gd").new()
-	
-	var scv = pointers.FolderAccess.__fetch_folder_files(variables_folder,false,true)
-	for s in scv:
-		d.remove(s)
-	
-	pointers.ConfigDriver.__load_configs()
-	var injector = load("res://HevLib/scripts/translations/inject_translations.gd")
-	injector.inject_translations(pointers)
-	
-#	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
-#	var folder = pointers.FolderAccess.__fetch_folder_files(cache_dir,true,true)
-#	for dcv in folder:
-#		if dcv != checksum:
-#			pointers.FolderAccess.__recursive_delete(dcv)
-	d.make_dir_recursive(ship_driver_path)
-	var ml = MainLoop.new()
-	ml.set_script(load("res://HevLib/scripts/crash_handler.gd"))
-	_savedObjects.append(ml)
-	
-	
-#	var drivers = pointers.DriverManagement.__get_drivers()
-#	var ship_driver = {}
-#	var register_driver = {}
+		var scv = pointers.FolderAccess.__fetch_folder_files(variables_folder,false,true)
+		for s in scv:
+			d.remove(s)
+		
+		pointers.ConfigDriver.__load_configs()
+		var injector = load("res://HevLib/scripts/translations/inject_translations.gd")
+		injector.inject_translations(pointers)
+		
+#		var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
+#		var folder = pointers.FolderAccess.__fetch_folder_files(cache_dir,true,true)
+#		for dcv in folder:
+#			if dcv != checksum:
+#				pointers.FolderAccess.__recursive_delete(dcv)
+		d.make_dir_recursive(ship_driver_path)
+		var ml = MainLoop.new()
+		ml.set_script(load("res://HevLib/scripts/crash_handler.gd"))
+		_savedObjects.append(ml)
+		
+		
+#		var drivers = pointers.DriverManagement.__get_drivers()
+#		var ship_driver = {}
+#		var register_driver = {}
 #
-#	# move this handle to make upgrades scene
-#	for mod in drivers:
-#		var data = mod["drivers"]
-#		var id = mod.get("id",null)
-#		if id:
-#			if "ADD_SHIPS.gd" in data:
-#				var driver = data["ADD_SHIPS.gd"]
-#				ship_driver[id] = driver
-#			if "REGISTER_SHIP_NUMERICS.gd" in data:
-#				var driver = data["REGISTER_SHIP_NUMERICS.gd"]
-#				register_driver[id] = driver
-#	f.open(ship_driver_path + "driver_data.json",File.WRITE)
-#	f.store_string(JSON.print(ship_driver))
-#	f.close()
+#		# move this handle to make upgrades scene
+#		for mod in drivers:
+#			var data = mod["drivers"]
+#			var id = mod.get("id",null)
+#			if id:
+#				if "ADD_SHIPS.gd" in data:
+#					var driver = data["ADD_SHIPS.gd"]
+#					ship_driver[id] = driver
+#				if "REGISTER_SHIP_NUMERICS.gd" in data:
+#					var driver = data["REGISTER_SHIP_NUMERICS.gd"]
+#					register_driver[id] = driver
+#		f.open(ship_driver_path + "driver_data.json",File.WRITE)
+#		f.store_string(JSON.print(ship_driver))
+#		f.close()
 #
-#	f.open(ship_driver_path + "register_data.json",File.WRITE)
-#	f.store_string(JSON.print(register_driver))
-#	f.close()
+#		f.open(ship_driver_path + "register_data.json",File.WRITE)
+#		f.store_string(JSON.print(register_driver))
+#		f.close()
+		
+		installScriptExtension("../notification_driver/CurrentGame.gd")
+		if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk"):
+			installScriptExtension("../minerals/multiminerals/mineral.gd")
+			installScriptExtension("../minerals/multiminerals/MineralProcessingUnit.gd")
+			installScriptExtension("../minerals/multiminerals/AsteroidSpawner.gd")
+		
+		
+		installScriptExtension("../../ui/ExtensionPopup.gd")
+		installScriptExtension("../scene_replacements/DLClist.gd")
+		replaceScene("../scene_replacements/DLClist.tscn","res://tools/DLClist.tscn")
+
+		installScriptExtension("../better_title_screen/CurrentlyPlaying.gd")
+		var minerals = load("res://HevLib/scenes/minerals/make_mineral_scripting.gd")
+		minerals.make_mineral_scripting(false,pointers)
+
+		var asteroids = ResourceLoader.load(asteroid_path)
+		asteroids.new()
+		asteroids.take_over_path("res://AsteroidSpawner.gd")
+		_savedObjects.append(asteroids)
+
+		var cg = ResourceLoader.load(currentgame_path)
+		cg.new()
+		cg.take_over_path("res://CurrentGame.gd")
+		_savedObjects.append(cg)
+
+		replaceScene("../../events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn")
+		# Adds in_hevlib_menu to the CurrentGame script and preventing controls while it's true
+		installScriptExtension("../../events/controls/CurrentGame.gd")
+		installScriptExtension("../../events/controls/ship-ctrl.gd")
+
+#		installScriptExtension("check.gd")
+		installScriptExtension("../scene_replacements/blanks/MPU.gd")
+		installScriptExtension("../scene_replacements/blanks/Hud.gd")
+		installScriptExtension("../scene_replacements/ship-ctrl.gd")
+
+		installScriptExtension("ThrusterSlot.gd")
+		installScriptExtension("UpgradeGroup.gd")
+		installScriptExtension("hardpoints/EquipmentItemTemplate.gd")
+
+		installScriptExtension("../weaponslot/weapon_slot_handler.gd")
+
+		installScriptExtension("ShipModificationDriver/InternalStorageMod.gd")
+		installScriptExtension("ShipModificationDriver/AddNodes.gd")
+
+		installScriptExtension("../better_title_screen/SaveSlotButton.gd")
+#		replaceScene("../better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
+
+#		Equipment.__make_upgrades_scene(false)
+#		var ws = load(weaponslot_path)
+#		ws.take_over_path("res://weapons/WeaponSlot.tscn")
+#		_savedObjects.append(ws)
 	
-	installScriptExtension("../notification_driver/CurrentGame.gd")
-	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk"):
-		installScriptExtension("../minerals/multiminerals/mineral.gd")
-		installScriptExtension("../minerals/multiminerals/MineralProcessingUnit.gd")
-		installScriptExtension("../minerals/multiminerals/AsteroidSpawner.gd")
-	
-	
-	installScriptExtension("../../ui/ExtensionPopup.gd")
-	installScriptExtension("../scene_replacements/DLClist.gd")
-	replaceScene("../scene_replacements/DLClist.tscn","res://tools/DLClist.tscn")
-
-	installScriptExtension("../better_title_screen/CurrentlyPlaying.gd")
-	var minerals = load("res://HevLib/scenes/minerals/make_mineral_scripting.gd")
-	minerals.make_mineral_scripting(false,pointers)
-
-	var asteroids = ResourceLoader.load(asteroid_path)
-	asteroids.new()
-	asteroids.take_over_path("res://AsteroidSpawner.gd")
-	_savedObjects.append(asteroids)
-
-	var cg = ResourceLoader.load(currentgame_path)
-	cg.new()
-	cg.take_over_path("res://CurrentGame.gd")
-	_savedObjects.append(cg)
-
-	replaceScene("../../events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn")
-	# Adds in_hevlib_menu to the CurrentGame script and preventing controls while it's true
-	installScriptExtension("../../events/controls/CurrentGame.gd")
-	installScriptExtension("../../events/controls/ship-ctrl.gd")
-
-#	installScriptExtension("check.gd")
-	installScriptExtension("../scene_replacements/blanks/MPU.gd")
-	installScriptExtension("../scene_replacements/blanks/Hud.gd")
-	installScriptExtension("../scene_replacements/ship-ctrl.gd")
-
-	installScriptExtension("ThrusterSlot.gd")
-	installScriptExtension("UpgradeGroup.gd")
-	installScriptExtension("hardpoints/EquipmentItemTemplate.gd")
-
-	installScriptExtension("../weaponslot/weapon_slot_handler.gd")
-
-	installScriptExtension("ShipModificationDriver/InternalStorageMod.gd")
-	installScriptExtension("ShipModificationDriver/AddNodes.gd")
-
-	installScriptExtension("../better_title_screen/SaveSlotButton.gd")
-#	replaceScene("../better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
-	
-#	Equipment.__make_upgrades_scene(false)
-#	var ws = load(weaponslot_path)
-#	ws.take_over_path("res://weapons/WeaponSlot.tscn")
-#	_savedObjects.append(ws)
+	else:
+		l("Folder structure not correct, exiting HevLib load")
 	
 var f = File.new()
 func _ready():
-	l("Readying")
-	
-	
-	
-	var zip_ref_store = "user://cache/.HevLib_Cache/zip_ref_store.json"
-	f.open(zip_ref_store,File.WRITE)
-	f.store_string("{}")
-	f.close()
-	
-	var modzips = {}
-	for mod in pointers.ManifestV2.__get_mod_data()["mods"]:
-		var zipinfo = match_mod_path_to_zip(mod)
-		modzips.merge({mod:zipinfo})
-	f.open(zip_ref_store,File.WRITE)
-	f.store_string(JSON.print(modzips))
-	f.close()
-	
-	var ring = preload("res://HevLib/scenes/minerals/make_ring_modifications.gd")
-	ring.make_ring_modifications(pointers)
-	
-	
-	
-	var tr = ResourceLoader.load(thering_path)
-	tr.new()
-	tr.take_over_path("res://TheRing.gd")
-	_savedObjects.append(tr)
-	f.open(ringscene_path,File.WRITE)
-	f.store_string("[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"%s\" type=\"Script\" id=1]\n[ext_resource path=\"res://story/TheRing.tscn\" type=\"PackedScene\" id=2]\n\n[node name=\"TheRing\" instance=ExtResource( 2 )]\nscript = ExtResource( 1 )\n" % thering_path)
-	f.close()
-	var rs := load(ringscene_path)
-	rs.take_over_path("res://story/TheRing.tscn")
-	_savedObjects.append(rs)
-	
-	
-	
-	pointers.Equipment.__make_upgrades_scene(true)
-	var upgrades = load(upgrades_path)
-	upgrades.take_over_path("res://enceladus/Upgrades.tscn")
-	_savedObjects.append(upgrades)
-	
-	var slot_limits = load(slot_limits_path)
-	slot_limits.take_over_path("res://enceladus/Upgrades.tscn")
-	_savedObjects.append(slot_limits)
-	
-#	var aux = load(aux_path)
-#	aux.take_over_path("res://ships/modules/AuxSlot.tscn")
-#	_savedObjects.append(aux)
-	
-#	var ws = load(weaponslot_path)
-#	ws.take_over_path("res://weapons/WeaponSlot.tscn")
-#	_savedObjects.append(ws)
-	
-	installScriptExtension("../minerals/Summary.gd")
-#	replaceScene("../minerals/DiveSummary.tscn","res://enceladus/DiveSummary.tscn")
-	
-	replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")
-#	replaceScene("Enceladus.tscn","res://enceladus/Enceladus.tscn")
-#	installScriptExtension("../scene_replacements/Shipyard.gd")
+	if correct:
+		l("Readying")
+		var zip_ref_store = "user://cache/.HevLib_Cache/zip_ref_store.json"
+		f.open(zip_ref_store,File.WRITE)
+		f.store_string("{}")
+		f.close()
+		
+		var modzips = {}
+		for mod in pointers.ManifestV2.__get_mod_data()["mods"]:
+			var zipinfo = match_mod_path_to_zip(mod)
+			modzips.merge({mod:zipinfo})
+		f.open(zip_ref_store,File.WRITE)
+		f.store_string(JSON.print(modzips))
+		f.close()
+		
+		var ring = load("res://HevLib/scenes/minerals/make_ring_modifications.gd")
+		ring.make_ring_modifications(pointers)
+		
+		
+		
+		var tr = ResourceLoader.load(thering_path)
+		tr.new()
+		tr.take_over_path("res://TheRing.gd")
+		_savedObjects.append(tr)
+		f.open(ringscene_path,File.WRITE)
+		f.store_string("[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"%s\" type=\"Script\" id=1]\n[ext_resource path=\"res://story/TheRing.tscn\" type=\"PackedScene\" id=2]\n\n[node name=\"TheRing\" instance=ExtResource( 2 )]\nscript = ExtResource( 1 )\n" % thering_path)
+		f.close()
+		var rs := load(ringscene_path)
+		rs.take_over_path("res://story/TheRing.tscn")
+		_savedObjects.append(rs)
+		
+		
+		
+		pointers.Equipment.__make_upgrades_scene(true)
+		var upgrades = load(upgrades_path)
+		upgrades.take_over_path("res://enceladus/Upgrades.tscn")
+		_savedObjects.append(upgrades)
+		
+		var slot_limits = load(slot_limits_path)
+		slot_limits.take_over_path("res://enceladus/Upgrades.tscn")
+		_savedObjects.append(slot_limits)
+		
+#		var aux = load(aux_path)
+#		aux.take_over_path("res://ships/modules/AuxSlot.tscn")
+#		_savedObjects.append(aux)
 
-	replaceScene("../minerals/multiminerals/AsteroidField.tscn","res://AsteroidField.tscn")
-	
-	
-	l("Ready")
-	
+#		var ws = load(weaponslot_path)
+#		ws.take_over_path("res://weapons/WeaponSlot.tscn")
+#		_savedObjects.append(ws)
+		
+		installScriptExtension("../minerals/Summary.gd")
+#		replaceScene("../minerals/DiveSummary.tscn","res://enceladus/DiveSummary.tscn")
+		
+		replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")
+#		replaceScene("Enceladus.tscn","res://enceladus/Enceladus.tscn")
+#		installScriptExtension("../scene_replacements/Shipyard.gd")
+
+		replaceScene("../minerals/multiminerals/AsteroidField.tscn","res://AsteroidField.tscn")
+		
+		
+		l("Ready")
+	else:
+		l("HevLib Equipment Driver onready process cannot be carried out")
 func installScriptExtension(path:String):
 	var childPath:String = str(modPath + path)
 	var childScript:Script = ResourceLoader.load(childPath)
