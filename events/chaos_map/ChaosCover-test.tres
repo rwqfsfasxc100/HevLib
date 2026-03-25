@@ -1,0 +1,69 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=2]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+
+uniform float min_chaos : hint_range(0.0, 1.0, 0.05) = 0.65;
+uniform float max_chaos : hint_range(0.0, 1.0, 0.05) = 1.0;
+uniform float opacity : hint_range(0.0, 1.0, 0.05) = 0.35;
+uniform sampler2D chaos_map;
+uniform float pixelToKm = 10000.0;
+uniform float pxSize = 3000.0;
+
+vec3 rgb_to_hsv(vec3 c) {
+    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+    float d = q.x - min(q.w, q.y);
+    float e = 1.0e-10; // Small epsilon to prevent division by zero
+    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
+void fragment() {
+	vec4 color = vec4(0.0,0.0,0.0,0.0);
+	
+	vec2 size = 1.0 / TEXTURE_PIXEL_SIZE;
+	vec2 pixel_coord = UV / TEXTURE_PIXEL_SIZE;
+	vec2 integer_coord = floor(pixel_coord);
+	
+	vec2 pos = pixel_coord * pixelToKm * vec2(1.0,1.0/10000.0);
+	
+	float x = (clamp(((pos.x) / pixelToKm),0,(size.x) - 1.0));
+	float sy = (size.y);
+	float y = mod((mod((pos.y),sy) + sy),sy);
+	float x1 = (clamp(x + 1.0, 0.0, size.x - 1.0));
+	float y1 = mod((y + 1.0),(size.y));
+	
+	if (x > 0.0) {
+		vec4 p00 = texture(TEXTURE, (vec2(x,y) + 0.5) * TEXTURE_PIXEL_SIZE);
+		vec4 p10 = texture(TEXTURE, (vec2(x1,y) + 0.5) * TEXTURE_PIXEL_SIZE);
+		vec4 p11 = texture(TEXTURE, (vec2(x1,y1) + 0.5) * TEXTURE_PIXEL_SIZE);
+		vec4 p01 = texture(TEXTURE, (vec2(x,y1) + 0.5) * TEXTURE_PIXEL_SIZE);
+		
+		float cx = (pos.x - floor(pos.x / pixelToKm) * pixelToKm) / pixelToKm;
+		float cy = (pos.y - floor(pos.y / pixelToKm) * pixelToKm) / pixelToKm;
+		
+		vec4 pu = (p00 * (1.0 - cx) + p10 * (cx));
+		vec4 pd = (p01 * (1.0 - cx) + p11 * (cx));
+		
+		color = pu * (1.0 - cy) + pd * (cy);
+	}
+	vec3 cf = vec3(color.r,color.g,color.b);
+//	vec3 cf = rgb_to_hsv(vec3(color.r,color.g,color.b));
+	COLOR = vec4(cf.r,cf.g,cf.b,opacity);
+	
+}
+"
+
+[sub_resource type="StreamTexture" id=2]
+flags = 7
+load_path = "res://.import/ring-map.png-0ef0636848104563872691b30398835f.stex"
+
+[resource]
+shader = SubResource( 1 )
+shader_param/min_chaos = 0.65
+shader_param/max_chaos = 1.0
+shader_param/opacity = 0.35
+shader_param/pixelToKm = 10000.0
+shader_param/pxSize = 3000.0
+shader_param/chaos_map = SubResource( 2 )

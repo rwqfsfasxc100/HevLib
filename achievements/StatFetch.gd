@@ -15,10 +15,10 @@ func _on_StatFetch_request_completed(result, response_code, headers, body):
 		releasesContent = json.result
 	if (not releasesContent == null and releasesContent.size()):
 		data = releasesContent.get("achievementpercentages").get("achievements")
-	var aData = []
+	var aData = {}
 	if not data == null:
 		for dic in data:
-			aData.append([dic.get("name"),dic.get("percent")])
+			aData.merge({dic.get("name"):dic.get("percent")})
 		
 		
 	get_parent().get_node("/root/HevLib~Variables").AchievementPercentageStats = aData
