@@ -1,7 +1,13 @@
 [gd_scene load_steps=2 format=2]
 
 [sub_resource type="GDScript" id=1]
-script/source = "tool
+script/source = "# This tool is used to visualize the coverage of the cargo bay
+# 
+# Flashing yellow box marks the area that is covered by the scanner
+# Red box marks the bounding box of the EIME HUD's cargo display
+# Green box marks the shape that the cargo hold will cover in the EIME HUD display
+
+tool
 extends CanvasLayer
 
 onready var center = $Center
@@ -63,7 +69,7 @@ script = SubResource( 1 )
 margin_top = 19.0
 margin_right = 40.0
 margin_bottom = 59.0
-color = Color( 1, 1, 0.7, 0.498039 )
+color = Color( 1, 1, 0.8, 0.498039 )
 
 [node name="Offset" type="Node2D" parent="Center"]
 

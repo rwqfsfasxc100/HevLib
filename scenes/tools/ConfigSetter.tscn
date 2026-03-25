@@ -1,6 +1,27 @@
 [gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://HevLib/scenes/tools/ConfigSetter.gd" type="Script" id=1]
+[sub_resource type="GDScript" id=1]
+script/source = "# Tool used to automatically set a config value for the ship it's attached to
+# Useful for providing access to equipment that would otherwise remove itself
+# without the config present, e.g. MPUs
+
+extends Node
+
+export var slot = \"\"
+export var system = \"\"
+
+var ship
+func _enter_tree():
+	ship = getShip()
+	ship.setConfig(slot,system)
+	Tool.remove(self)
+
+func getShip():
+	var c = self
+	while not c.has_method(\"getConfig\") and c != null:
+		c = c.get_parent()
+	return c
+"
 
 [node name="ConfigSetter" type="Node"]
-script = ExtResource( 1 )
+script = SubResource( 1 )
