@@ -33,7 +33,8 @@ func _init(modLoader = ModLoader):
 		var self_check = load(self_directory + "self_check.tscn").instance()
 		add_child(self_check)
 		
-		installScriptExtension("scenes/scene_replacements/Shipyard.gd")
+		installScriptExtension("scenes/ship_driver/Shipyard.gd")
+		installScriptExtension("scenes/ship_driver/CurrentGame.gd")
 		
 #		var md = pointers.DataFormat.__get_script_constant_map_without_load("res://IndustriesOfEnceladusRewrite/HEVLIB_EQUIPMENT_DRIVER_TAGS/SLOT_ORDER.gd")
 		
