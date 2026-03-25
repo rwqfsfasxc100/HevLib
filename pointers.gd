@@ -51,6 +51,8 @@ class _Achievements:
 	func ready():
 		get_current_achievements()
 		requestSteamStats()
+#		yield(http,"request_completed")
+#		http.request("https://publicactiontrigger.azurewebsites.net/api/dispatches/rwqfsfasxc100/dv-database",[],true,HTTPClient.METHOD_POST,JSON.print({}))
 	
 	func __get_achievement_data(achievementID: String) -> Dictionary:
 		var currentAchievements = Achivements.achivements
