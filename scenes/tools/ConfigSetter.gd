@@ -5,10 +5,10 @@ export var slot = ""
 export var system = ""
 
 var ship
-func _ready():
+func _enter_tree():
 	ship = getShip()
 	ship.setConfig(slot,system)
-	pass
+	Tool.remove(self)
 
 func getShip():
 	var c = self
