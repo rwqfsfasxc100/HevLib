@@ -313,10 +313,12 @@ func _ready():
 			ammo_min = 100
 		if dronePartsMax:
 			nano_min = 100
-		
-		addPropellantCapacity(propellant_add)
-		addAmmoCapacity(ammo_add)
-		addDronesCapacity(nano_add)
+		if propellant_add != 0:
+			addPropellantCapacity(propellant_add)
+		if ammo_add != 0:
+			addAmmoCapacity(ammo_add)
+		if nano_add != 0:
+			addDronesCapacity(nano_add)
 		
 		if mass_per_tonne_total_storage_added != 0:
 			l("Changing mass by %s kg for every tonne of total storage changed by" % total_added_capacity)
