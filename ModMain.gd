@@ -13,7 +13,7 @@ var _savedObjects := []
 
 var enable_research = false
 
-var pointers = null
+var pointers
 
 var file = File.new()
 var correct = file.file_exists("res://HevLib/pointers.gd")
@@ -22,7 +22,6 @@ func _init(modLoader = ModLoader):
 	if correct:
 		l("Initializing HevLib")
 		pointers = load("res://HevLib/pointers.gd").new()
-		
 		l("Initializing DLC")
 		loadDLC()
 		installScriptExtension("events/TheRing.gd")
