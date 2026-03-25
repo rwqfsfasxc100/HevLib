@@ -17,11 +17,11 @@ func _ready():
 	if correct:
 		l("Readying")
 		var CRoot = get_tree().get_root()
-		var NodeNew = Node.new()
-		NodeNew.set_script(load("res://HevLib/scripts/Variables.gd"))
-		NodeNew.name = "HevLib~Variables"
+#		var NodeNew = Node.new()
+#		NodeNew.set_script(load("res://HevLib/scripts/Variables.gd"))
+#		NodeNew.name = "HevLib~Variables"
+#		CRoot.call_deferred("add_child",NodeNew)
 		var Gamespace_Canvas = load("res://HevLib/logging/_HevLib_Gamespace_Canvas.tscn").instance()
-		CRoot.call_deferred("add_child",NodeNew)
 		CRoot.call_deferred("add_child",Gamespace_Canvas)
 
 		var keybind_interrupt = load("res://HevLib/scenes/keymapping/keybind_interrupt.tscn").instance()
