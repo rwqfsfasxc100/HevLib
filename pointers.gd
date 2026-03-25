@@ -2,7 +2,9 @@ extends Node
 
 const gdunzip = preload("res://HevLib/scripts/vendor/gdunzip.gd")
 
-var Achievements : _Achievements = _Achievements.new()
+var http = HTTPRequest.new()
+
+var Achievements : _Achievements = _Achievements.new(self,http)
 var DataFormat : _DataFormat = _DataFormat.new()
 var FolderAccess : _FolderAccess = _FolderAccess.new()
 var FileAccess : _FileAccess = _FileAccess.new()
@@ -26,12 +28,30 @@ var needs_cache_rebuild = false
 
 func _ready():
 	ConfigDriver.ready()
+	Achievements.ready()
 	yield(get_tree(),"idle_frame")
 	get_parent().move_child(self,get_parent().get_child_count())
 class _Achievements:
 	var scripts = [
 		
 	]
+	
+	var achievementsFile = "user://achievements.dv"
+	var password = "b0ngadabonga"
+	var file = File.new()
+	var http
+	
+	var parent
+	
+	func _init(p,h):
+		parent = p
+		http = h
+		parent.add_child(http)
+	
+	func ready():
+		get_current_achievements()
+		requestSteamStats()
+	
 	func __get_achievement_data(achievementID: String) -> Dictionary:
 		var currentAchievements = Achivements.achivements
 		var playtimeStats = Achivements.playtimeStats
@@ -69,17 +89,9 @@ class _Achievements:
 		
 		var isUnlocked = false
 		for ach in currentAchievements:
-			
-			
 			if ach == achievementID:
-			
-			
 				isUnlocked = true
 		var statAssociation = []
-		
-		
-		
-		
 		var currentStatData = []
 		for each in playtimeAchAndData:
 			if each[0] == achievementID:
@@ -110,6 +122,83 @@ class _Achievements:
 		var achievements = Achivements.achivements
 		var stat = achievements.get(STAT)
 		return stat
+	
+	func __get_achievement_percentage() -> float:
+		var percent = 0.0
+		var ach = Achivements.achievementRarity
+		var size = float(Achivements.achievementRarity.size())
+		var achivements = {}
+		if file.file_exists(achievementsFile):
+			if file.open_encrypted_with_pass(achievementsFile, File.READ, password) == OK:
+				var sg = file.get_line()
+				achivements = parse_json(sg)
+			else:
+				Debug.l("Error loading achievements file")
+		file.close()
+		
+		var count = 0.0
+		
+		for i in ach:
+			if i in achivements and achivements[i]:
+				count += 1
+		
+		if count:
+			percent = count/size
+		
+		return percent * 100.0
+	
+	func __get_current_achievements() -> Dictionary:
+		return currentAchievementCache
+	
+	func __get_steam_achievement_percentages() -> Dictionary:
+		return completionCache
+	
+	var currentAchievementCache = {}
+	func get_current_achievements():
+		var unlockedAchievements = []
+		var lockedAchievements = []
+		var allAchievements = []
+		var stats = []
+		# Fetches data from the achievements file
+		var achievementData = Achivements.achivements
+		# gets the rarity dict
+		# This is used to compare the achievements file to, as the achievements file only contains unlocked achievements and stats that are above zero
+		var rarity = Achivements.achievementRarity
+		for m in achievementData:
+			if not str(m).begins_with("stat:"):
+				unlockedAchievements.append(m)
+			else:
+				stats.append(m)
+		for m in rarity.keys():
+			allAchievements.append(m)
+		if unlockedAchievements.size() != allAchievements.size():
+			for f in allAchievements:
+				if not unlockedAchievements.has(f):
+					lockedAchievements.append(f)
+		var ccDictionary = {"allAchievements":allAchievements,"unlockedAchievements":unlockedAchievements,"lockedAchievements":lockedAchievements,"stats":stats}
+		currentAchievementCache = ccDictionary.duplicate(true)
+	
+	var completionCache = {}
+	
+	func requestSteamStats():
+		
+		if not http.has_signal("out"):
+			http.connect("request_completed",self,"out")
+		http.request("https://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/?gameid=846030")
+	
+	func out(result, response_code, headers, body):
+		if result != 0:
+			return
+		
+		var d = JSON.parse(body.get_string_from_utf8()).result
+		var data = {}
+		if d:
+			data = d.get("achievementpercentages").get("achievements")
+		var aData = {}
+		if not data == null:
+			for dic in data:
+				aData.merge({dic.get("name"):dic.get("percent")})
+		completionCache = aData.duplicate(true)
 	
 
 class _Analytics:
