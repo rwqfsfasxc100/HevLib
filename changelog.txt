@@ -1,3 +1,12 @@
+[1.12.11]
+
+1="* Removed HevLib~Variables node due to obsolescence"
+2="* Added several functions to the Achievements pointer"
+2.1="* __get_achievement_percentage() - Returns the current completion percentage of the achievements file"
+2.2="* __get_current_achievements() - Returns the currently earned achievements and stats as a combined dictionary. Returns an empty dictionary when requested before the onready phase has happened."
+2.3="* __get_steam_achievement_percentages() - Returns a dictionary containing the Steam completion percentages of all achievements. Returns an empty dictionary when requested before the achievement data has been received."
+3="* Improved config setter tool"
+
 [1.12.10]
 
 1="* Changelog entries now can use translation strings"
