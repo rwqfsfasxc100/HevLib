@@ -615,28 +615,28 @@ const SHIP_MODIFY = {
 			],
 		},
 	},
-	"SHIP_OCP209":{
-		"mainLeft":{
-			"SYSTEM_SALVAGE_ARM":[
-				{
-					"property":"flip",
-					"value":"true"
-				},
-				{
-					"property":"feedVelocity",
-					"value":"Vector2( -140, -280 )"
-				},
-			]
-		},
-		"mainRight":{
-			"SYSTEM_SALVAGE_ARM":[
-				{
-					"property":"feedVelocity",
-					"value":"Vector2( 140, -280 )"
-				},
-			]
-		},
-	},
+#	"SHIP_OCP209":{
+#		"mainLeft":{
+#			"SYSTEM_SALVAGE_ARM":[
+#				{
+#					"property":"flip",
+#					"value":"true"
+#				},
+#				{
+#					"property":"feedVelocity",
+#					"value":"Vector2( -140, -280 )"
+#				},
+#			]
+#		},
+#		"mainRight":{
+#			"SYSTEM_SALVAGE_ARM":[
+#				{
+#					"property":"feedVelocity",
+#					"value":"Vector2( 140, -280 )"
+#				},
+#			]
+#		},
+#	},
 	"SHIP_TRTL_K44":{
 		"leftBack":{
 			"SYSTEM_HUNK-L":[
