@@ -1,11 +1,20 @@
 [1.12.11]
 
-1="* Removed HevLib~Variables node due to obsolescence"
-2="* Added several functions to the Achievements pointer"
-2.1="* __get_achievement_percentage() - Returns the current completion percentage of the achievements file"
+1="* Removed HevLib~Variables node due to obsolescence."
+2="* Added several functions to the Achievements pointer."
+2.1="* __get_achievement_percentage() - Returns the current completion percentage of the achievements file."
 2.2="* __get_current_achievements() - Returns the currently earned achievements and stats as a combined dictionary. Returns an empty dictionary when requested before the onready phase has happened."
 2.3="* __get_steam_achievement_percentages() - Returns a dictionary containing the Steam completion percentages of all achievements. Returns an empty dictionary when requested before the achievement data has been received."
-3="* Improved config setter tool"
+3="* Improved config setter tool."
+4="* Cargo bay coverage visualizer and config setter tools now have comments explaining use."
+5="* Updated ShipDriver to allow for improvements to config management."
+5.1="* A ship scene is no longer required for other ship parts to be added."
+5.1.1="* This means that a mod can add extra used configs, override the default config, or override the ship alias."
+5.2="* Added a new entry to a ship's config: alternate_configs"
+5.2.1="* Can be either a string or array of strings for ship identifiers (equivalent to the ship_name property) to fetch additional configs from."
+5.2.2="* If any exist for the ship identifier, will append the default config and/or used configs to this ship's used config list."
+5.2.3="* Ship identifiers can be stated multiple times to have the configs added multiple times. Use cases for this would be to create several config lists, and then have some show up more frequently than others."
+6="* Fixed arms on the OCP using the wrong target vector for arms to drag objects into the bay."
 
 [1.12.10]
 
