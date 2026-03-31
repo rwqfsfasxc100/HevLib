@@ -1,4 +1,4 @@
-[gd_scene load_steps=37 format=2]
+[gd_scene load_steps=38 format=2]
 
 [ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=1]
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=2]
@@ -26,11 +26,15 @@
 
 [sub_resource type="StreamTexture" id=3]
 flags = 4
-load_path = "res://HevLib/ui/themes/icons/flash.stex"
+load_path = "res://HevLib/ui/themes/icons/list.stex"
 
 [sub_resource type="StreamTexture" id=13]
 flags = 4
-load_path = "res://HevLib/ui/themes/icons/save.stex"
+load_path = "res://HevLib/ui/themes/icons/profile.stex"
+
+[sub_resource type="StreamTexture" id=14]
+flags = 4
+load_path = "res://HevLib/ui/themes/icons/USB.stex"
 
 [sub_resource type="StreamTexture" id=1]
 flags = 4
@@ -149,6 +153,7 @@ tracks/0/keys = {
 }
 
 [node name="ModMenu" type="Popup"]
+visible = true
 mouse_filter = 2
 theme = ExtResource( 2 )
 popup_exclusive = true
@@ -173,30 +178,30 @@ mouse_filter = 2
 [node name="VBoxContainer" type="VBoxContainer" parent="base/PanelContainer"]
 margin_left = 5.0
 margin_top = 5.0
-margin_right = 1296.0
+margin_right = 1275.0
 margin_bottom = 715.0
 mouse_filter = 2
 
 [node name="ModContainer" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer"]
-margin_right = 1291.0
+margin_right = 1270.0
 margin_bottom = 648.0
 mouse_filter = 2
 size_flags_vertical = 3
 
 [node name="SPLIT" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer"]
-margin_right = 521.0
+margin_right = 500.0
 margin_bottom = 648.0
 mouse_filter = 2
 size_flags_horizontal = 3
 
 [node name="ListHeader" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT"]
-margin_right = 521.0
-margin_bottom = 107.0
+margin_right = 500.0
+margin_bottom = 176.0
 mouse_filter = 2
 size_flags_horizontal = 3
 
 [node name="Label" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader"]
-margin_right = 521.0
+margin_right = 500.0
 margin_bottom = 38.0
 text = "HEVLIB_MODMENU_MODS"
 align = 1
@@ -204,20 +209,20 @@ valign = 1
 
 [node name="SearchBox" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader"]
 margin_top = 42.0
-margin_right = 521.0
+margin_right = 500.0
 margin_bottom = 107.0
 mouse_filter = 2
 alignment = 1
 
 [node name="VBoxContainer" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox"]
-margin_right = 75.0
+margin_right = 50.0
 margin_bottom = 65.0
-rect_min_size = Vector2( 75, 0 )
+rect_min_size = Vector2( 50, 0 )
 mouse_filter = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox"]
-margin_left = 79.0
-margin_right = 329.0
+margin_left = 54.0
+margin_right = 446.0
 margin_bottom = 65.0
 rect_min_size = Vector2( 250, 65 )
 mouse_filter = 2
@@ -226,22 +231,40 @@ size_flags_horizontal = 3
 [node name="Label" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox/PanelContainer"]
 margin_left = 5.0
 margin_top = 13.0
-margin_right = 245.0
+margin_right = 387.0
 margin_bottom = 51.0
 text = "_"
 clip_text = true
 
-[node name="FILTER" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox"]
-margin_left = 333.0
-margin_right = 398.0
+[node name="VBoxContainer2" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox"]
+margin_left = 450.0
+margin_right = 500.0
+margin_bottom = 65.0
+rect_min_size = Vector2( 50, 0 )
+mouse_filter = 2
+
+[node name="OptionButtonBox" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader"]
+margin_top = 111.0
+margin_right = 500.0
+margin_bottom = 176.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox"]
+margin_right = 144.0
+margin_bottom = 65.0
+rect_min_size = Vector2( 50, 0 )
+size_flags_horizontal = 3
+
+[node name="FILTER" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox"]
+margin_left = 148.0
+margin_right = 213.0
 margin_bottom = 65.0
 rect_min_size = Vector2( 65, 65 )
 hint_tooltip = "HEVLIB_FILTER_BY_TAGS"
 script = ExtResource( 11 )
-text_label_path = NodePath("../PanelContainer/Label")
+text_label_path = NodePath("../../SearchBox/PanelContainer/Label")
 root_path = NodePath("../../../../../../../..")
 
-[node name="TextureRect" type="TextureRect" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox/FILTER"]
+[node name="TextureRect" type="TextureRect" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/FILTER"]
 margin_right = 65.0
 margin_bottom = 65.0
 rect_min_size = Vector2( 65, 65 )
@@ -250,16 +273,16 @@ mouse_filter = 2
 texture = SubResource( 3 )
 expand = true
 
-[node name="PlaySoundsOnTheseButtons" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox/FILTER" instance=ExtResource( 1 )]
+[node name="PlaySoundsOnTheseButtons" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/FILTER" instance=ExtResource( 1 )]
 
-[node name="PROFILES" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox"]
-margin_left = 402.0
-margin_right = 467.0
+[node name="PROFILES" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox"]
+margin_left = 217.0
+margin_right = 282.0
 margin_bottom = 65.0
 rect_min_size = Vector2( 65, 65 )
 hint_tooltip = "HEVLIB_OPT_PROFILES"
 
-[node name="TextureRect" type="TextureRect" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox/PROFILES"]
+[node name="TextureRect" type="TextureRect" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/PROFILES"]
 margin_right = 40.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 65, 65 )
@@ -267,19 +290,35 @@ mouse_filter = 2
 texture = SubResource( 13 )
 expand = true
 
-[node name="PlaySoundsOnTheseButtons" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox/PROFILES" instance=ExtResource( 1 )]
+[node name="PlaySoundsOnTheseButtons" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/PROFILES" instance=ExtResource( 1 )]
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox"]
-margin_left = 471.0
-margin_right = 521.0
+[node name="MODPACKS" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox"]
+margin_left = 286.0
+margin_right = 351.0
+margin_bottom = 65.0
+rect_min_size = Vector2( 65, 65 )
+hint_tooltip = "HEVLIB_OPT_MODPACKS"
+
+[node name="TextureRect" type="TextureRect" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/MODPACKS"]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 65, 65 )
+texture = SubResource( 14 )
+expand = true
+
+[node name="PlaySoundsOnTheseButtons" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/MODPACKS" instance=ExtResource( 1 )]
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox"]
+margin_left = 355.0
+margin_right = 500.0
 margin_bottom = 65.0
 rect_min_size = Vector2( 50, 0 )
-mouse_filter = 2
+size_flags_horizontal = 3
 
 [node name="Count" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT"]
-margin_top = 111.0
-margin_right = 521.0
-margin_bottom = 151.0
+margin_top = 180.0
+margin_right = 500.0
+margin_bottom = 220.0
 mouse_filter = 2
 
 [node name="ModCountLabel" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/Count"]
@@ -289,8 +328,8 @@ rect_min_size = Vector2( 250, 40 )
 script = ExtResource( 4 )
 
 [node name="ModList" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT"]
-margin_top = 155.0
-margin_right = 521.0
+margin_top = 224.0
+margin_right = 500.0
 margin_bottom = 648.0
 mouse_filter = 2
 size_flags_horizontal = 3
@@ -312,7 +351,7 @@ info_links_button = NodePath("../../ModInfo/LINKBOX/LINKS")
 info_bugreports_button = NodePath("../../ModInfo/LINKBOX/BUGREPORTS")
 info_changelog_button = NodePath("../../ModInfo/LINKBOX/CHANGELOG")
 count_label_path = NodePath("../Count/ModCountLabel")
-filter_btn_path = NodePath("../ListHeader/SearchBox/FILTER")
+filter_btn_path = NodePath("../ListHeader/OptionButtonBox/FILTER")
 links_menu_path = NodePath("../../../../../../URLPopup/base/URLContainer")
 settings_menu_path = NodePath("../../../../../../ModSettingsMenu")
 changelogs_menu_path = NodePath("../../../../../../MMChangelogMenu")
@@ -326,25 +365,25 @@ dependancy_menu_path = NodePath("../../../../../../DependancyMenu")
 update_menu_path = NodePath("../../../../../../UpdateDialog")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList"]
-margin_right = 521.0
-margin_bottom = 493.0
+margin_right = 500.0
+margin_bottom = 424.0
 size_flags_horizontal = 3
 script = ExtResource( 5 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList/ScrollContainer"]
-margin_right = 521.0
+margin_right = 500.0
 mouse_filter = 2
 size_flags_horizontal = 3
 
 [node name="VSeparator" type="VSeparator" parent="base/PanelContainer/VBoxContainer/ModContainer"]
-margin_left = 525.0
-margin_right = 529.0
+margin_left = 504.0
+margin_right = 508.0
 margin_bottom = 648.0
 mouse_filter = 2
 
 [node name="ModInfo" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer"]
-margin_left = 533.0
-margin_right = 1291.0
+margin_left = 512.0
+margin_right = 1270.0
 margin_bottom = 648.0
 mouse_filter = 2
 size_flags_horizontal = 3
@@ -444,12 +483,12 @@ margin_right = 758.0
 margin_bottom = 62.0
 rect_min_size = Vector2( 62, 62 )
 hint_tooltip = "HEVLIB_SETTINGS_BUTTON_TOOLTIP"
-focus_neighbour_left = NodePath("../../../SPLIT/ListHeader/SearchBox/FILTER")
+focus_neighbour_left = NodePath("../../../SPLIT/ListHeader/OptionButtonBox/FILTER")
 focus_neighbour_top = NodePath(".")
 focus_neighbour_right = NodePath(".")
 focus_neighbour_bottom = NodePath("../../LINKBOX/BUGREPORTS")
 focus_next = NodePath("../../LINKBOX/LINKS")
-focus_previous = NodePath("../../../SPLIT/ListHeader/SearchBox/FILTER")
+focus_previous = NodePath("../../../SPLIT/ListHeader/OptionButtonBox/FILTER")
 size_flags_horizontal = 0
 size_flags_vertical = 0
 
@@ -658,7 +697,7 @@ size_flags_vertical = 3
 script = ExtResource( 8 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer"]
-margin_right = 550.0
+margin_right = 540.0
 margin_bottom = 371.0
 mouse_filter = 2
 size_flags_horizontal = 3
@@ -757,20 +796,20 @@ text = "MOD_PRIO"
 
 [node name="HSeparator" type="HSeparator" parent="base/PanelContainer/VBoxContainer"]
 margin_top = 652.0
-margin_right = 1291.0
+margin_right = 1270.0
 margin_bottom = 656.0
 mouse_filter = 2
 
 [node name="FooterButtons" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer"]
 margin_top = 660.0
-margin_right = 1291.0
+margin_right = 1270.0
 margin_bottom = 710.0
 rect_min_size = Vector2( 0, 50 )
 alignment = 1
 
 [node name="OpenFolder" type="Button" parent="base/PanelContainer/VBoxContainer/FooterButtons"]
-margin_left = 178.0
-margin_right = 618.0
+margin_left = 168.0
+margin_right = 608.0
 margin_bottom = 50.0
 rect_min_size = Vector2( 400, 0 )
 focus_neighbour_left = NodePath(".")
@@ -782,28 +821,28 @@ text = "HEVLIB_MODMENU_OPENFOLDER"
 script = ExtResource( 12 )
 
 [node name="Label" type="Label" parent="base/PanelContainer/VBoxContainer/FooterButtons"]
-margin_left = 622.0
+margin_left = 612.0
 margin_top = 6.0
-margin_right = 659.0
+margin_right = 649.0
 margin_bottom = 44.0
 text = "   "
 
 [node name="VSeparator" type="VSeparator" parent="base/PanelContainer/VBoxContainer/FooterButtons"]
-margin_left = 663.0
-margin_right = 667.0
+margin_left = 653.0
+margin_right = 657.0
 margin_bottom = 50.0
 mouse_filter = 2
 
 [node name="Label2" type="Label" parent="base/PanelContainer/VBoxContainer/FooterButtons"]
-margin_left = 671.0
+margin_left = 661.0
 margin_top = 6.0
-margin_right = 708.0
+margin_right = 698.0
 margin_bottom = 44.0
 text = "   "
 
 [node name="Close" type="Button" parent="base/PanelContainer/VBoxContainer/FooterButtons"]
-margin_left = 712.0
-margin_right = 1112.0
+margin_left = 702.0
+margin_right = 1102.0
 margin_bottom = 50.0
 rect_min_size = Vector2( 400, 0 )
 focus_neighbour_left = NodePath("../OpenFolder")
@@ -1019,9 +1058,9 @@ autowrap = true
 
 [connection signal="about_to_show" from="." to="." method="_about_to_show"]
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
-[connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox/FILTER" to="FilterPopup" method="_filter_pressed"]
-[connection signal="visibility_changed" from="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox/FILTER" to="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox/FILTER" method="_visibility_changed"]
-[connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/SearchBox/PROFILES" to="ProfilesMenu" method="show_menu"]
+[connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/FILTER" to="FilterPopup" method="_filter_pressed"]
+[connection signal="visibility_changed" from="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/FILTER" to="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/FILTER" method="_visibility_changed"]
+[connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/PROFILES" to="ProfilesMenu" method="show_menu"]
 [connection signal="visibility_changed" from="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList" to="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList" method="_visibility_changed"]
 [connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/SETTINGS" to="ModSettingsMenu" method="show_menu"]
 [connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/LINKBOX/LINKS" to="URLPopup" method="show_menu"]

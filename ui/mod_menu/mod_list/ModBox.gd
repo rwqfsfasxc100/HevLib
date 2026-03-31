@@ -467,7 +467,7 @@ func _refocus():
 var isfocus = false
 
 
-var filter_button_path = "../../../../ListHeader/SearchBox/FILTER"
+var filter_button_path = "../../../../ListHeader/OptionButtonBox/FILTER"
 onready var filter_button = get_node(filter_button_path)
 var openMods_button = "../../../../../../FooterButtons/OpenFolder"
 

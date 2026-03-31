@@ -20,3 +20,5 @@ func _files_dropped(files,screen):
 			for file in files:
 				if file.ends_with(".zip"):
 					pointers.FolderAccess.__copy_file(file,modPathPrefix)
+				elif file.ends_with(".dvmodpack"):
+					pass
