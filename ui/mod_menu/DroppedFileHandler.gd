@@ -18,4 +18,5 @@ func _files_dropped(files,screen):
 		if pointers:
 			pointers.FolderAccess.__check_folder_exists(modPathPrefix)
 			for file in files:
-				pointers.FolderAccess.__copy_file(file,modPathPrefix)
+				if file.ends_with(".zip"):
+					pointers.FolderAccess.__copy_file(file,modPathPrefix)
