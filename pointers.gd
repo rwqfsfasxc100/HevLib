@@ -203,33 +203,6 @@ class _Achievements:
 		completionCache = aData.duplicate(true)
 	
 
-class _Analytics:
-	var scripts = [
-		
-	]
-	 
-	var allow_analytics = false
-	
-	func __get_discord_username():
-		# Only works for Windows machines right now, assuming default installation of both game and Discord
-		# I don't like having a tool like this (why I have the entire pointer disabled by default), however
-		# this is purely to provide an in-game way to report bugs
-		if allow_analytics:
-			var path = ProjectSettings.globalize_path("user://") + "../discord/sentry"
-			var path2 = path + "/scope_v3.json"
-			var dir = Directory.new()
-			if dir.dir_exists(path):
-				if dir.file_exists(path2):
-					var f = File.new()
-					f.open(path2,File.READ)
-					var dict = JSON.parse(f.get_as_text()).result
-					f.close()
-					var user = dict.get("scope",{}).get("user",{}).get("username","")
-					return user
-		else:
-			return "HEVLIB_ANALYTICS_DISABLED"
-	
-
 class _ConfigDriver:
 	var scripts = [
 		

@@ -1,6 +1,6 @@
 extends Node
 
-const ALLOW_KEYBIND_MODIFICATIONS = !true
+const ALLOW_KEYBIND_MODIFICATIONS = ! true
 var INPUT_DRIVER_ACTIVE = true
 
 var actionDict = {}

@@ -139,103 +139,131 @@ func compile_keymap():
 						handler += orderspecific_checker_end % action
 						scripting += handler
 	
-	var exclusiveKeys = []
-#	var exclusiveActs = {}
-	var exclusiveSize = {}
-	
-	var exclusiveExtraKeys = {}
-	
-	var exclusivesTree = {}
+	var sorted_exclusives = {}
 	
 	var exclSize = exclusives.size()
 	if exclSize > 0:
-		var factorial = pointers.DataFormat.__factorial(exclSize)
-		var list = pointers.DataFormat.__get_unique_pairs(factorial)
-		var ekeys = exclusives.keys()
-		if factorial > 1:
-			for pair in list:
-				var act1 = ekeys[pair[0]]
-				var act2 = ekeys[pair[1]]
-				var a = exclusives[act1]["controls"]
-				var b = exclusives[act2]["controls"]
-				for c1 in a:
-					for c2 in b:
-						var num1 = c1[0]
-						if num1 == c2[0]:
-							var s1 = c1.size()
-							var s2 = c2.size()
-							var depth = (s1 if s1 > s2 else s2)
-							var maxKeys = (c1 if s1 > s2 else c2)
-							var dp = depth
-							# Create a key trace with exclusivesTree so the code can reverse recursively 
-							# travel through the branches to have each exclusive combination effectively
-							# served on a plate. 
-							#
-							# Have each level contain an "actions" and a "branch" entry to separate that 
-							# level's inputs with those lower down the branch. It also makes it easier
-							# to not need to deal with orderless binds, as they can be clumped together
-							# with the same keys as ordered binds, just w/o the need for order checks
-							var thisTree = exclusivesTree
-							for d in range(dp):
-								var thisKey = maxKeys[d]
-								if not thisKey in thisTree:
-									thisTree.merge({thisKey:{"actions":[],"branch":{}}})
-#									thisTree.merge({thisKey:{"actions":{},"branch":{}}})
-								if s1 > d and not act1 in thisTree[thisKey]["actions"]:
-									thisTree[thisKey]["actions"].append(act1)
-#									thisTree[thisKey]["actions"].merge({act1:exclusives[act1]["opts"]})
-								if s2 > d and not act2 in thisTree[thisKey]["actions"]:
-									thisTree[thisKey]["actions"].append(act2)
-#									thisTree[thisKey]["actions"].merge({act2:exclusives[act2]["opts"]})
-								thisTree = thisTree[thisKey]["branch"]
-							
-							
-#							breakpoint
-							if not num1 in exclusiveKeys:
-								exclusiveKeys.append(num1)
-							if not num1 in exclusiveSize:
-								exclusiveSize[num1] = {"max":0}
-#							if not num1 in exclusiveActs:
-#								exclusiveActs[num1] = []
-#							if not act1 in exclusiveActs[num1]:
-#								exclusiveActs[num1].append(act1)
-#							if not act2 in exclusiveActs[num1]:
-#								exclusiveActs[num1].append(act2)
-							if s1 > 0:
-								if not s1 in exclusiveSize[num1]:
-									exclusiveSize[num1][s1] = []
-								if not act1 in exclusiveSize[num1][s1]:
-									exclusiveSize[num1][s1].append(act1)
-								if s1 > 1:
-									if not num1 in exclusiveExtraKeys:
-										exclusiveExtraKeys[num1] = {}
-									if not act1 in exclusiveExtraKeys[num1]:
-										exclusiveExtraKeys[num1][act1] = []
-									if not c1 in exclusiveExtraKeys[num1][act1]:
-										exclusiveExtraKeys[num1][act1].append(c1)
-							
-							if s2 > 0:
-								if not s2 in exclusiveSize[num1]:
-									exclusiveSize[num1][s2] = []
-								if not act1 in exclusiveSize[num1][s2]:
-									exclusiveSize[num1][s2].append(act2)
-								if s2 > 1:
-									if not num1 in exclusiveExtraKeys:
-										exclusiveExtraKeys[num1] = {}
-									if not act2 in exclusiveExtraKeys[num1]:
-										exclusiveExtraKeys[num1][act2] = []
-									if not c2 in exclusiveExtraKeys[num1][act2]:
-										exclusiveExtraKeys[num1][act2].append(c2)
-							
-							if depth > exclusiveSize[num1]["max"]:
-								exclusiveSize[num1]["max"] = depth
+		if exclSize > 1:
+			var ordered = {}
+			var disordered = {}
+			for e in exclusives:
+				var x = exclusives[e]
+				if x["opts"]["order_sensitive"]:
+					ordered[e] = x
+				else:
+					disordered[e] = x
+			
+			for i in ordered:
+				var data = ordered[i]
+				var controls = data["controls"]
+				var opts = data["opts"]
+				
+				breakpoint
+			
+			breakpoint
+			
+			
+			
+#		var factorial = pointers.DataFormat.__factorial(exclSize)
+#		var list = pointers.DataFormat.__get_unique_pairs(factorial)
+#		var ekeys = exclusives.keys()
+#		if factorial > 1:
+#			for pair in list:
+#				var act1 = ekeys[pair[0]]
+#				var act2 = ekeys[pair[1]]
+#				var a = exclusives[act1]["controls"]
+#				var b = exclusives[act2]["controls"]
+#				for c1 in a:
+#					for c2 in b:
+#						var num1 = c1[0]
+#						if num1 == c2[0]:
+#							var s1 = c1.size()
+#							var s2 = c2.size()
+#							var depth = (s1 if s1 > s2 else s2)
+#							var maxKeys = (c1 if s1 > s2 else c2)
+#							var dp = depth
+#							# Create a key trace with exclusivesTree so the code can reverse recursively 
+#							# travel through the branches to have each exclusive combination effectively
+#							# served on a plate. 
+#							#
+#							# Have each level contain an "actions" and a "branch" entry to separate that 
+#							# level's inputs with those lower down the branch. It also makes it easier
+#							# to not need to deal with orderless binds, as they can be clumped together
+#							# with the same keys as ordered binds, just w/o the need for order checks
+#							var thisTree = exclusivesTree
+#							var previousKeys = []
+#							for d in range(dp):
+#								var thisKey = maxKeys[d]
+#								previousKeys.append(thisKey)
+#								var dupl = previousKeys.duplicate(true)
+#								dupl.sort()
+#								var pk = hash(dupl)
+#								keyHashes.merge({pk:previousKeys.duplicate(true)})
+#								if not thisKey in thisTree:
+#									thisTree.merge({thisKey:{"actions":[],"branch":{}}})
+##									thisTree.merge({thisKey:{"actions":{},"branch":{}}})
+#								if not pk in flatTree:
+#									flatTree[pk] = []
+#								if s1 > d:
+#									if not act1 in thisTree[thisKey]["actions"]:
+#										thisTree[thisKey]["actions"].append(act1)
+##										thisTree[thisKey]["actions"].merge({act1:exclusives[act1]["opts"]})
+#									if not act1 in flatTree[pk]:
+#										flatTree[pk].append(act1)
+#									pass
+#								if s2 > d:
+#									if not act2 in thisTree[thisKey]["actions"]:
+#										thisTree[thisKey]["actions"].append(act2)
+##										thisTree[thisKey]["actions"].merge({act2:exclusives[act2]["opts"]})
+#									if not act2 in flatTree[pk]:
+#										flatTree[pk].append(act2)
+#									pass
+#								thisTree = thisTree[thisKey]["branch"]
+#
+#
+##							breakpoint
+#							if not num1 in exclusiveKeys:
+#								exclusiveKeys.append(num1)
+#							if not num1 in exclusiveSize:
+#								exclusiveSize[num1] = {"max":0}
+##							if not num1 in exclusiveActs:
+##								exclusiveActs[num1] = []
+##							if not act1 in exclusiveActs[num1]:
+##								exclusiveActs[num1].append(act1)
+##							if not act2 in exclusiveActs[num1]:
+##								exclusiveActs[num1].append(act2)
+#							if s1 > 0:
+#								if not s1 in exclusiveSize[num1]:
+#									exclusiveSize[num1][s1] = []
+#								if not act1 in exclusiveSize[num1][s1]:
+#									exclusiveSize[num1][s1].append(act1)
+#								if s1 > 1:
+#									if not num1 in exclusiveExtraKeys:
+#										exclusiveExtraKeys[num1] = {}
+#									if not act1 in exclusiveExtraKeys[num1]:
+#										exclusiveExtraKeys[num1][act1] = []
+#									if not c1 in exclusiveExtraKeys[num1][act1]:
+#										exclusiveExtraKeys[num1][act1].append(c1)
+#
+#							if s2 > 0:
+#								if not s2 in exclusiveSize[num1]:
+#									exclusiveSize[num1][s2] = []
+#								if not act1 in exclusiveSize[num1][s2]:
+#									exclusiveSize[num1][s2].append(act2)
+#								if s2 > 1:
+#									if not num1 in exclusiveExtraKeys:
+#										exclusiveExtraKeys[num1] = {}
+#									if not act2 in exclusiveExtraKeys[num1]:
+#										exclusiveExtraKeys[num1][act2] = []
+#									if not c2 in exclusiveExtraKeys[num1][act2]:
+#										exclusiveExtraKeys[num1][act2].append(c2)
+#
+#							if depth > exclusiveSize[num1]["max"]:
+#								exclusiveSize[num1]["max"] = depth
 		else:
 			
 			
 			breakpoint
-		
-		# Make sure to always check the common key is pressed to consider cancelling
-		var out = format_exclusives(exclusivesTree)
 		
 		
 #		for key in exclusiveKeys:
@@ -259,12 +287,3 @@ func compile_keymap():
 	
 	
 	return scripting
-
-func format_exclusives(tree : Dictionary) -> String:
-	var out = ""
-	
-	breakpoint
-	return out
-
-
-
