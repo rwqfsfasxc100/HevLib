@@ -24,6 +24,13 @@ func _init(modLoader = ModLoader):
 		pointers = load("res://HevLib/pointers.gd").new()
 		l("Initializing DLC")
 		loadDLC()
+		
+		installScriptExtension("scenes/ship_driver/Shipyard.gd")
+		installScriptExtension("scenes/ship_driver/CurrentGame.gd")
+		installScriptExtension("scenes/ship_driver/TheRing.gd")
+		
+		
+		
 		installScriptExtension("events/TheRing.gd")
 		replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
 		replaceScene("scenes/notification_driver/Notifications.tscn","res://achievement/Notifications.tscn")
@@ -33,8 +40,6 @@ func _init(modLoader = ModLoader):
 		var self_check = load(self_directory + "self_check.tscn").instance()
 		add_child(self_check)
 		
-		installScriptExtension("scenes/ship_driver/Shipyard.gd")
-		installScriptExtension("scenes/ship_driver/CurrentGame.gd")
 		
 #		var md = pointers.DataFormat.__get_script_constant_map_without_load("res://IndustriesOfEnceladusRewrite/HEVLIB_EQUIPMENT_DRIVER_TAGS/SLOT_ORDER.gd")
 		

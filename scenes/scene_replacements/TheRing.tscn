@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://HevLib/scenes/scene_replacements/DerelictHandler.gd" type="Script" id=1]
+[ext_resource path="res://HevLib/scenes/ship_driver/DerelictHandler.gd" type="Script" id=1]
 [ext_resource path="res://story/TheRing.tscn" type="PackedScene" id=2]
 
 [node name="TheRing" instance=ExtResource( 2 )]

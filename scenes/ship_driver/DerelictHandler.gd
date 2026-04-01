@@ -73,6 +73,7 @@ var clump_velocity = 25
 var ring_storm_chance = 0.3
 var pirate_chance = 0.3
 var chaos = 0.0
+var rescue = false
 
 var model = "TRTL"
 var defaults = {
@@ -89,6 +90,7 @@ var defaults = {
 	ring_storm_chance = 0.3,
 	pirate_chance = 0.3,
 	chaos = 0.0,
+	rescue = false,
 }
 func canBeAt(pos):
 	if prevent:
@@ -179,7 +181,14 @@ func makeAt(pos):
 						Debug.l("Preventing spawn of abductor due to peaceful difficulty")
 					_:
 						ships.append(makeAbductor())
-
+			
+			if rescue:
+				var helper = Shipyard.createShipBuildByName("MADCERF", "helper", randf() > clamp((1 - stock_chance),0,1))
+				helper.ai = true
+				helper.preheat = true
+				helper.rotation = randf() * 2 * PI
+				ships.append(helper)
+			
 			if clump:
 				for s in ships:
 					s.connect("tree_entered", self, "doClump", [s, pos, velocity])
