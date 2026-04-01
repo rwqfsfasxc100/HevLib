@@ -53,7 +53,7 @@ func _ready():
 #		ir.shuffle()
 #		for ship in ir:
 #		var fd = md[ship]
-		if mode in fd:
+		if mode in fd and "name" in fd and "path" in fd:
 			var shipName = fd["name"]
 			var event = fd[mode]
 			ship_pool.merge({shipName:event})
