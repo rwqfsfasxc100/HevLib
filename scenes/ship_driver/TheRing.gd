@@ -7,11 +7,11 @@ func _ready():
 	var data = JSON.parse(file.get_as_text()).result
 	file.close()
 	
-	var ro = preload("res://story/RescueOperation.gd")
+	var ro = load("res://story/RescueOperation.gd")
 	for i in range(data.size()):
 		var ship = data[i]
-		if "derelict" in ship:
-			var derelict_data = ship["derelict"]
+		if "name" in ship:
+			var derelict_data = ship.get("derelict",{})
 			var model = ship.get("name","TRTL")
 			var dname = ship["specific_event_name"] if "specific_event_name" in ship else ("ModdedDerelict_" + model)
 			var node = ro.new()
