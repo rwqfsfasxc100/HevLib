@@ -39,6 +39,8 @@ func _unhandled_input(event):
 			$ProfilesMenu.cancel()
 		elif $MMChangelogMenu.visible:
 			$MMChangelogMenu.cancel()
+		elif $ModpacksMenu.visible:
+			$ModpacksMenu.cancel()
 		else:
 			cancel()
 		get_tree().set_input_as_handled()

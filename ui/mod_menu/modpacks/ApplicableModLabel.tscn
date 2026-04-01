@@ -1,0 +1,42 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=1]
+[ext_resource path="res://HevLib/ui/themes/fonts/verdana/font-verdana-small.tres" type="DynamicFont" id=2]
+[ext_resource path="res://HevLib/ui/mod_menu/modpacks/ApplicableModLabel.gd" type="Script" id=3]
+[ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=4]
+[ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=5]
+
+[node name="ApplicableModLabel" type="HBoxContainer"]
+margin_right = 40.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+theme = ExtResource( 1 )
+script = ExtResource( 3 )
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+margin_right = 15.0
+margin_bottom = 42.0
+rect_min_size = Vector2( 15, 0 )
+
+[node name="CheckBox" type="CheckBox" parent="."]
+margin_left = 19.0
+margin_right = 105.0
+margin_bottom = 42.0
+hint_tooltip = "HEVLIB_MODPACK_TOGGLE"
+pressed = true
+
+[node name="SmoothScrollTo" parent="CheckBox" instance=ExtResource( 4 )]
+
+[node name="PlaySoundsOnTheseButtons" parent="CheckBox" instance=ExtResource( 5 )]
+
+[node name="Label" type="Label" parent="."]
+margin_left = 109.0
+margin_right = 365.0
+margin_bottom = 42.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_fonts/font = ExtResource( 2 )
+text = "HEVLIB_EXAMPLE_TEXT"
+valign = 1
+
+[connection signal="toggled" from="CheckBox" to="." method="_toggled"]
