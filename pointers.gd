@@ -4546,8 +4546,8 @@ class _ManifestV2:
 						# tags
 						if "tags" in manifest_data.keys():
 							var current_tags = manifest_data["tags"].keys()
-							if "allowself" in current_tags:
-								dict_template["tags"].merge({"TAG_ALLOWself":{"type":"boolean","value":manifest_data["tags"].get("allowself")}})
+							if "allow_achievements" in current_tags:
+								dict_template["tags"].merge({"TAG_ALLOW_ACHIEVEMENTS":{"type":"boolean","value":manifest_data["tags"].get("allow_achievements")}})
 							if "quality_of_life" in current_tags:
 								dict_template["tags"].merge({"TAG_QOL":{"type":"boolean","value":manifest_data["tags"].get("quality_of_life")}})
 							if "is_library_mod" in current_tags:
@@ -4659,7 +4659,7 @@ class _ManifestV2:
 				if not version_metadata == "":
 					version_string = version_string + "-" + version_metadata
 				dict_template["version"]["version_string"] = version_string
-				
+				dict_template["mod_information"]["name"] = TranslationServer.translate(dict_template["mod_information"]["name"])
 				out = dict_template
 			else:
 				out = manifest_data
