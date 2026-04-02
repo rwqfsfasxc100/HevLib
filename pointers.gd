@@ -4659,7 +4659,6 @@ class _ManifestV2:
 				if not version_metadata == "":
 					version_string = version_string + "-" + version_metadata
 				dict_template["version"]["version_string"] = version_string
-				dict_template["mod_information"]["name"] = TranslationServer.translate(dict_template["mod_information"]["name"])
 				out = dict_template
 			else:
 				out = manifest_data
