@@ -13,7 +13,7 @@ func _ready():
 		if "name" in ship:
 			var derelict_data = ship.get("derelict",{})
 			var model = ship.get("name","TRTL")
-			var dname = ship["specific_event_name"] if "specific_event_name" in ship else ("ModdedDerelict_" + model)
+			var dname = ship.get("specific_derelict_name","ModdedDerelict_" + model)
 			var node = ro.new()
 			node.name = dname
 			var newname = node.name
