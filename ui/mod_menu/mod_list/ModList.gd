@@ -232,10 +232,10 @@ func _process(_delta):
 				var credits = ""
 				for c in ar["manifest"]["manifest_data"]["mod_information"]["credits"]:
 					c = TranslationServer.translate(c)
-					if credits == "":
-						credits = c
-					else:
+					if credits:
 						credits = credits + "\n" + c
+					else:
+						credits = c
 				get_node(info_desc_credits).parse_bbcode(credits)
 				get_node(info_icon).texture = tex
 				get_node(info_settings_button).visible = true
