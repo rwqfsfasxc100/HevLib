@@ -4611,7 +4611,7 @@ class _ManifestV2:
 						
 						if "mod_information" in manifest_data.keys():
 							dict_template["mod_information"]["id"] = String(manifest_data["mod_information"].get("id",null))
-							dict_template["mod_information"]["name"] = String(manifest_data["mod_information"].get("name",null))
+							dict_template["mod_information"]["name"] = String(manifest_data["mod_information"].get("name",""))
 							dict_template["mod_information"]["description"] = String(manifest_data["mod_information"].get("description","HEVLIB_DESCRIPTION_PLACEHOLDER"))
 							dict_template["mod_information"]["brief"] = String(manifest_data["mod_information"].get("brief",""))
 							dict_template["mod_information"]["author"] = String(manifest_data["mod_information"].get("author","Unknown"))

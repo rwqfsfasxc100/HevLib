@@ -90,7 +90,7 @@ func loadTranslationsFromCache():
 # `useRelativePath` setting it to false uses a `res://` relative path instead of relative to the file
 # `fullLogging` setting it to false reduces the number of logs written to only display the number of translations made
 # example usage: updateTL("i18n/translation.txt", "|")
-func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, fullLogging:bool = false):
+func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, fullLogging:bool = true):
 	if useRelativePath:
 		path = str(modPath + path)
 	l("Adding translations from: %s" % path)
@@ -113,7 +113,10 @@ func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, full
 		translations.append(translationObject)
 	
 	while not tlFile.eof_reached():
-		csvLine = tlFile.get_csv_line(delim)
+		var line = tlFile.get_line()
+		if line.begins_with("#"):
+			continue
+		csvLine = line.split(delim)
 		var size = csvLine.size()
 		if size > 1:
 			if size > 2:
