@@ -9,7 +9,6 @@
 [ext_resource path="res://HevLib/ui/mod_menu/mod_info/ScrollWithKB.gd" type="Script" id=7]
 
 [node name="ModpacksMenu" type="Popup"]
-visible = true
 margin_right = 800.0
 margin_bottom = 450.0
 theme = ExtResource( 3 )
