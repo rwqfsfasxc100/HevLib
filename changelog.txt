@@ -1,13 +1,13 @@
 [1.12.12]
 
 1="* Moved development helpers and other tools to a dedicated development_tools folder"
-2="* Added new supporters"
+2="* Added new supporters to the credits"
 3="* Dropping files in the Mod Menu now only copies zip files to the mod folder"
 4="* Updated icons for the Mod Menu"
 5="* Derelicts added with ShipDriver now can be allowed to spawn with a SAR CERF with a new rescue property. Defaults to false."
 6="* All entries added through ShipDriver with a name and path provided will have a respective derelict event added to the events list."
 6.1="* These cannot spawn naturally, and are purely to let them be spawned through unnatural means (comms, event spawner menu, etc.)"
-6.2="* By default, these use the naming convention of ModdedDerelict_<ship identifier name>, but can be changed with a specific_derelict_name in the base dictionary."
+6.2="* By default, these use the naming convention of ModdedDerelict_<ship identifier name>, but can be changed with a specific_derelict_name entry in the base dictionary."
 6.3="* If a derelict entry is provided, it will make use of properties defined there (obviously excluding chance, minimum_chance, money, and chaos, considering these are used for natural spawn chances)."
 7="* Fixed crash caused by derelict handler attempting to add ship entries that were used for configs"
 
