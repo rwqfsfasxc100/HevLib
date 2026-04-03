@@ -1,3 +1,8 @@
+[1.12.14]
+
+1="* Added ability to check against a config for the comms script"
+2="* Moved comms extender script to the development_tools folder and added comments"
+
 [1.12.13]
 
 1="* Added several functions to the DataFormat driver"
