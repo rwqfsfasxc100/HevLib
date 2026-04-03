@@ -21,6 +21,9 @@
 3="* Greatly improved the performance of MineralDriver due to the same reasons"
 4="* MineralDriver operations now no longer cache the data"
 5="* NodeAccess.__convert_var_from_string now no longer endlessly creates temporary scripts in the cache, and the folder now gets cleared after every boot. Previously, this could fill the cache with over 50,000-100,000 files if left to run for long enough."
+6="* Updated updateTL function in both ModMain and TranslationsDriver functions"
+7="* Improved efficiency of the modlist"
+8="* Fixed tags for MV2.1"
 
 [1.12.12]
 
