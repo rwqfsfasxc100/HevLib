@@ -81,7 +81,7 @@ func _ready():
 #	v1.scancode = OS.find_scancode_from_string("F7")
 #	InputMap.action_add_event("ACT2",v1)
 
-func compile():
+func compile_old():
 	var active_script = compiler.compile_keymap()
 	file.open(keybind_folder + "handle_input.gd",File.WRITE)
 	file.store_string(active_script)
@@ -89,7 +89,12 @@ func compile():
 	input_handle = null
 	
 	input_handle = ResourceLoader.load(keybind_folder + "handle_input.gd","",true).new(pointers)
-	
+
+func compile():
+	var active_script = compiler.compile_keymap()
+	input_handle = null
+	var gd = pointers.DataFormat.__compile_to_script_object(active_script,pointers)
+	input_handle = gd
 
 func _physics_process(delta):
 	if ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE:

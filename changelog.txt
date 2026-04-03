@@ -1,3 +1,27 @@
+[1.12.13]
+
+1="* Added several functions to the DataFormat driver"
+1.1="* __compile_script - compiles source GDScript and returns it as an object."
+1.1.1="* source_code -> string containing the GDScript source"
+1.2="* __compile_to_script - Slower than __compile_script, compiles source GDScript and returns it as an object with input parameters."
+1.2.1="* source_code -> string containing the GDScript source"
+1.2.2="* params -> (optional) either a single variable or array of variables that will be passed to the script when calling .new(), if it's initialization call requires it. Defaults to []"
+1.3="* __compile_and_override_script - Compiles source GDScript and overrides it's base script. Equivalent to a ModMain's installScriptExtension function."
+1.3.1="* source_code -> string containing the GDScript source"
+1.3.2="* params -> (optional) either a single variable or array of variables that will be passed to the script when calling .new(), if it's initialization call requires it. Defaults to []"
+1.3.3="* script_storage_object -> (optional) object used to store the script to keep it loaded in memory. Should be used for cases where the pointers node would be unloaded, such as in a ModMain script. Defaults to null"
+1.3.4="* script_storage_array_name -> (optional) string for the name of the array variable within the storage object which should be used to store the script in. Defaults to "_savedObjects""
+1.4="* __compile_and_override_script_with_scene - Equivalent to __compile_and_override_script, but loads a scene if the script override would not normally have the extension work without extending the scene."
+1.4.1="* source_code -> string containing the GDScript source"
+1.4.2="* params -> (optional) either a single variable or array of variables that will be passed to the script when calling .new(), if it's initialization call requires it. Defaults to []"
+1.4.3="* script_storage_object -> (optional) object used to store the script to keep it loaded in memory. Should be used for cases where the pointers node would be unloaded, such as in a ModMain script. Defaults to null"
+1.4.4="* script_storage_array_name -> (optional) string for the name of the array variable within the storage object which should be used to store the script in. Defaults to "_savedObjects""
+1.4.5="* scene_path -> (optional) string for the full filepath of the scene to replace. Defaults to """
+2="* Greatly improved the performance of NodeAccess.__convert_var_from_string due to using __compile_script"
+3="* Greatly improved the performance of MineralDriver due to the same reasons"
+4="* MineralDriver operations now no longer cache the data"
+5="* NodeAccess.__convert_var_from_string now no longer endlessly creates temporary scripts in the cache, and the folder now gets cleared after every boot. Previously, this could fill the cache with over 50,000-100,000 files if left to run for long enough."
+
 [1.12.12]
 
 1="* Moved development helpers and other tools to a dedicated development_tools folder"

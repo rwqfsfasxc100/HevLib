@@ -4,7 +4,7 @@ extends Node
 
 const not_random_seeds = PoolIntArray([1861,-2531,1337,1776,2014,1384,2684,842,2802,1597,2116,755,1596,2661,1928,-1861,-2531,-1337,-1776,-2014,-1384,-2684,-842,-2802,-1597,-2116,-755,-1596,-2661,-1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928])
 
-static func make_ring_modifications(pointers):
+static func make_ring_modifications(pointers,modmain):
 	
 	var p = CurrentGame.traceMinerals
 	var s = p.size()
@@ -48,7 +48,12 @@ static func make_ring_modifications(pointers):
 	
 	var footer = "\tvar total = 0\n\tfor n in range(CurrentGame.traceMinerals.size()):\n\t\tvar tm = CurrentGame.traceMinerals[n]\n\t\tvalues[n] = pow(values[n] / pow(CurrentGame.mineralPrices.get(tm, 1), 0.2), 4)\n\t\ttotal += values[n]\n\tvar rnd = randf() * total\n\tvar nr = 0\n\tfor n in values:\n\t\trnd -= n\n\t\tif rnd < 0:\n\t\t\treturn CurrentGame.traceMinerals[nr]\n\t\tnr += 1\n\n\treturn CurrentGame.traceMinerals[0]"
 	var total = variable_statements + footer
-	var f = File.new()
-	f.open("user://cache/.HevLib_Cache/Minerals/TheRing.gd",File.WRITE)
-	f.store_string(total)
-	f.close()
+#	var f = File.new()
+#	f.open("user://cache/.HevLib_Cache/Minerals/TheRing.gd",File.WRITE)
+#	f.store_string(total)
+#	f.close()
+	
+	installScriptDirect(total,pointers,modmain,"res://story/TheRing.tscn")
+
+static func installScriptDirect(source:String,pointers,modmain,scene_path):
+	pointers.DataFormat.__compile_and_override_script_with_scene(source,[],modmain,"_savedObjects",scene_path)

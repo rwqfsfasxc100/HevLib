@@ -5,9 +5,9 @@ const gdunzip = preload("res://HevLib/scripts/vendor/gdunzip.gd")
 var http = HTTPRequest.new()
 
 var Achievements : _Achievements = _Achievements.new(self,http)
-var DataFormat : _DataFormat = _DataFormat.new()
 var FolderAccess : _FolderAccess = _FolderAccess.new()
 var FileAccess : _FileAccess = _FileAccess.new()
+var DataFormat : _DataFormat = _DataFormat.new(FolderAccess)
 var Keymapping : _Keymapping = _Keymapping.new(FolderAccess,FileAccess)
 var ManifestV2 : _ManifestV2 = _ManifestV2.new(DataFormat,FolderAccess,FileAccess)
 var ConfigDriver : _ConfigDriver = _ConfigDriver.new(DataFormat,ManifestV2,FolderAccess,self,Keymapping)
@@ -18,7 +18,7 @@ var Github : _Github = _Github.new()
 var HevLib : _HevLib = _HevLib.new(FolderAccess)
 var Zip : _Zip = _Zip.new()
 var ManifestV1 : _ManifestV1 = _ManifestV1.new(DataFormat,Zip)
-var NodeAccess : _NodeAccess = _NodeAccess.new(FolderAccess)
+var NodeAccess : _NodeAccess = _NodeAccess.new(FolderAccess,DataFormat)
 var RingInfo : _RingInfo = _RingInfo.new()
 var TimeAccess : _TimeAccess = _TimeAccess.new()
 var Translations : _Translations = _Translations.new(ConfigDriver)
@@ -786,6 +786,10 @@ class _DataFormat:
 	
 	var file = File.new()
 	
+	var FolderAccess
+	func _init(f):
+		FolderAccess = f
+	
 	func __array_to_string(arr: Array) -> String:
 		var s = ""
 		for i in arr:
@@ -1124,7 +1128,104 @@ class _DataFormat:
 				pairs.append(PoolIntArray([i, j]))
 		return pairs
 	
+	func __compile_script(source_code : String) -> Script:
+		var out = GDScript.new()
+		out.set_source_code(source_code)
+		out.reload()
+		return out.new()
 	
+	func __compile_to_script_object(source_code : String, params = []) -> Script:
+		if not params is Array:
+			params = [params]
+		
+		var gd = GDScript.new()
+		gd.set_source_code(source_code)
+		gd.reload()
+		var out
+		if params:
+			var f = funcref(gd,"new")
+			var param_part = "_%d"
+			var pb = ""
+			var pd = ""
+			for i in range(params.size()):
+				var p = params[i]
+				var pv = param_part % i
+				if pb:
+					pb += "," + pv
+				else:
+					pb = pv
+				if pd:
+					pd += "\n\tvar %s = arr[%d]" % [pv,i]
+				else:
+					pd = "\n\tvar %s = arr[%d]" % [pv,i]
+			var sv = "static func parse(ref,arr):%s\n\treturn ref.call_func(%s)" % [pd,pb] 
+			
+			var g = GDScript.new()
+			g.set_source_code(sv)
+			g.reload()
+			g.new()
+			out = g.parse(f,params)
+		else:
+			out = gd.new()
+		return out
+	
+	var _savedScriptObjects := []
+	func __compile_and_override_script(source_code : String, params = [], script_storage_node = null, script_storage_array_name : String = "_savedObjects") -> void:
+		if not params is Array:
+			params = [params]
+		
+		var out = GDScript.new()
+		out.set_source_code(source_code)
+		out.reload()
+		
+		var parentScript:Script = out.get_base_script()
+		var parentPath:String = parentScript.resource_path
+		out.take_over_path(parentPath)
+		
+		if script_storage_node and script_storage_array_name:
+			var h = script_storage_node.get(script_storage_array_name)
+			h.append(out)
+		else:
+			_savedScriptObjects.append(out)
+	
+	func __compile_and_override_script_with_scene(source_code : String, params = [], script_storage_node = null, script_storage_array_name : String = "_savedObjects", scene_path : String = "") -> void:
+		if not params is Array:
+			params = [params]
+		
+		var out = GDScript.new()
+		out.set_source_code(source_code)
+		out.reload()
+		
+		var parentScript:Script = out.get_base_script()
+		var parentPath:String = parentScript.resource_path
+		out.take_over_path(parentPath)
+		
+		if script_storage_node and script_storage_array_name:
+			var h = script_storage_node.get(script_storage_array_name)
+			h.append(out)
+		else:
+			_savedScriptObjects.append(out)
+		
+		var file = File.new()
+		file.open(scene_path,File.READ)
+		var txt = file.get_as_text(true)
+		file.close()
+		var root = ""
+		for line in txt.split("\n"):
+			if line.begins_with("[node "):
+				var split = line.split(" ")
+				if split.size() < 4:
+					root = split[1].split("\"")[1]
+					break
+		var scene_replacement = "user://cache/.HevLib_Cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec()
+		var p = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"%s\" type=\"PackedScene\" id=1]\n\n[node name=\"%s\" instance=ExtResource( 1 )]" % [scene_path,root]
+		FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
+		file.open(scene_replacement,File.WRITE)
+		file.store_string(p)
+		file.close()
+		var scene := load(scene_replacement)
+		scene.take_over_path(scene_path)
+		_savedScriptObjects.append(scene)
 	
 	
 	
@@ -5093,8 +5194,10 @@ class _NodeAccess:
 	]
 	
 	var FolderAccess
-	func _init(f):
+	var DataFormat
+	func _init(f,d):
 		FolderAccess = f
+		DataFormat = d
 	
 	func __get_all_children(node, strip_supplied_node_from_array = false, return_only_paths = false, use_relative_paths = false):
 		var children = getAllChildren(node)
@@ -5216,19 +5319,9 @@ class _NodeAccess:
 			
 			return save_file_path
 	
-	func __convert_var_from_string(string : String, folder : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/file_caches"):
-		if folder.ends_with("/"):
-			pass
-		else:
-			folder = folder + "/"
-		FolderAccess.__check_folder_exists(folder)
-		var header = "extends Node\n\nconst VARIABLE = "
-		var file = File.new()
-		var tc = OS.get_ticks_usec()
-		file.open(folder + "%s.gd" % tc,File.WRITE)
-		file.store_string(header + string)
-		file.close()
-		var script = load(folder + "%s.gd" % tc)
+	func __convert_var_from_string(string : String):
+		var header = "extends Reference\nconst VARIABLE = "
+		var script = DataFormat.__compile_script(header + string)
 		var variable = script.VARIABLE
 		return variable
 	

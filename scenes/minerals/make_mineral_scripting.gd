@@ -6,7 +6,7 @@ extends Node
 
 const custom_mineral_path = "user://cache/.HevLib_Cache/Minerals/mineral_store/"
 
-static func make_mineral_scripting(is_onready = false,pointers = null):
+static func make_mineral_scripting(is_onready = false,pointers = null,modmain = null):
 	
 	var FILE_PATHS = [
 		"user://cache/.HevLib_Cache/Minerals/mineral_cache.json",
@@ -46,13 +46,17 @@ static func make_mineral_scripting(is_onready = false,pointers = null):
 	installScriptExtension("res://HevLib/scenes/minerals/AstrogatorPanel.gd")
 	installScriptExtension("res://HevLib/scenes/minerals/OMS.gd")
 	var current_game = handle_mineral_values_and_colors(mineral_data)
-	f.open(current_game_script,File.WRITE)
-	f.store_string(current_game)
-	f.close()
+#	f.open(current_game_script,File.WRITE)
+#	f.store_string(current_game)
+#	f.close()
 	var asteroid_spawner = handle_ore_scenes(mineral_data,pointers)
-	f.open("user://cache/.HevLib_Cache/Minerals/AsteroidSpawner.gd",File.WRITE)
-	f.store_string(asteroid_spawner)
-	f.close()
+#	f.open("user://cache/.HevLib_Cache/Minerals/AsteroidSpawner.gd",File.WRITE)
+#	f.store_string(asteroid_spawner)
+#	f.close()
+	
+	installScriptDirect(current_game,pointers,modmain)
+	installScriptDirect(asteroid_spawner,pointers,modmain)
+	
 
 
 
@@ -181,3 +185,5 @@ static func installScriptExtension(path:String):
 	var parentScript:Script = childScript.get_base_script()
 	var parentPath:String = parentScript.resource_path
 	childScript.take_over_path(parentPath)
+static func installScriptDirect(source:String,pointers,modmain):
+	pointers.DataFormat.__compile_and_override_script(source,[],modmain)

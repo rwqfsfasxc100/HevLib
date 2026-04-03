@@ -57,7 +57,9 @@ func _init(modLoader = ModLoader):
 		var scv = pointers.FolderAccess.__fetch_folder_files(variables_folder,false,true)
 		for s in scv:
 			d.remove(s)
-		
+		var fstr_old = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/file_caches"
+		if d.dir_exists(fstr_old):
+			pointers.FolderAccess.__recursive_delete()
 		pointers.ConfigDriver.__load_configs()
 		var injector = load("res://HevLib/scripts/translations/inject_translations.gd")
 		injector.inject_translations(pointers)
@@ -109,17 +111,17 @@ func _init(modLoader = ModLoader):
 
 		installScriptExtension("../better_title_screen/CurrentlyPlaying.gd")
 		var minerals = load("res://HevLib/scenes/minerals/make_mineral_scripting.gd")
-		minerals.make_mineral_scripting(false,pointers)
+		minerals.make_mineral_scripting(false,pointers,self)
 
-		var asteroids = ResourceLoader.load(asteroid_path)
-		asteroids.new()
-		asteroids.take_over_path("res://AsteroidSpawner.gd")
-		_savedObjects.append(asteroids)
-
-		var cg = ResourceLoader.load(currentgame_path)
-		cg.new()
-		cg.take_over_path("res://CurrentGame.gd")
-		_savedObjects.append(cg)
+#		var asteroids = ResourceLoader.load(asteroid_path)
+#		asteroids.new()
+#		asteroids.take_over_path("res://AsteroidSpawner.gd")
+#		_savedObjects.append(asteroids)
+#
+#		var cg = ResourceLoader.load(currentgame_path)
+#		cg.new()
+#		cg.take_over_path("res://CurrentGame.gd")
+#		_savedObjects.append(cg)
 
 		replaceScene("../../events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn")
 		# Adds in_hevlib_menu to the CurrentGame script and preventing controls while it's true
@@ -169,16 +171,16 @@ func _ready():
 		f.close()
 		
 		var ring = load("res://HevLib/scenes/minerals/make_ring_modifications.gd")
-		ring.make_ring_modifications(pointers)
+		ring.make_ring_modifications(pointers,self)
 		
 		
 		
-		var tr = ResourceLoader.load(thering_path)
-		tr.new()
-		tr.take_over_path("res://TheRing.gd")
-		_savedObjects.append(tr)
+#		var tr = ResourceLoader.load(thering_path)
+#		tr.new()
+#		tr.take_over_path("res://TheRing.gd")
+#		_savedObjects.append(tr)
 		f.open(ringscene_path,File.WRITE)
-		f.store_string("[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"%s\" type=\"Script\" id=1]\n[ext_resource path=\"res://story/TheRing.tscn\" type=\"PackedScene\" id=2]\n\n[node name=\"TheRing\" instance=ExtResource( 2 )]\nscript = ExtResource( 1 )\n" % thering_path)
+		f.store_string("[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"%s\" type=\"Script\" id=1]\n[ext_resource path=\"res://story/TheRing.tscn\" type=\"PackedScene\" id=2]\n\n[node name=\"TheRing\" instance=ExtResource( 2 )]\nscript = ExtResource( 1 )\n" % ["res://TheRing.gd"])#thering_path)
 		f.close()
 		var rs := load(ringscene_path)
 		rs.take_over_path("res://story/TheRing.tscn")

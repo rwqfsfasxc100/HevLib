@@ -152,17 +152,17 @@ func compile_keymap():
 					ordered[e] = x
 				else:
 					disordered[e] = x
-			
+
 			for i in ordered:
 				var data = ordered[i]
 				var controls = data["controls"]
 				var opts = data["opts"]
-				
+
 				breakpoint
-			
+
 			breakpoint
 			
-			
+			pass
 			
 #		var factorial = pointers.DataFormat.__factorial(exclSize)
 #		var list = pointers.DataFormat.__get_unique_pairs(factorial)
