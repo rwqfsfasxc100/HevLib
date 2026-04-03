@@ -1170,7 +1170,7 @@ class _DataFormat:
 		return out
 	
 	var _savedScriptObjects := []
-	func __compile_and_override_script(source_code : String, params = [], script_storage_node = null, script_storage_array_name : String = "_savedObjects") -> void:
+	func __compile_and_override_script(source_code : String, params = [], script_storage_object = null, script_storage_array_name : String = "_savedObjects") -> void:
 		if not params is Array:
 			params = [params]
 		
@@ -1182,13 +1182,13 @@ class _DataFormat:
 		var parentPath:String = parentScript.resource_path
 		out.take_over_path(parentPath)
 		
-		if script_storage_node and script_storage_array_name:
-			var h = script_storage_node.get(script_storage_array_name)
+		if script_storage_object and script_storage_array_name:
+			var h = script_storage_object.get(script_storage_array_name)
 			h.append(out)
 		else:
 			_savedScriptObjects.append(out)
 	
-	func __compile_and_override_script_with_scene(source_code : String, params = [], script_storage_node = null, script_storage_array_name : String = "_savedObjects", scene_path : String = "") -> void:
+	func __compile_and_override_script_with_scene(source_code : String, params = [], script_storage_object = null, script_storage_array_name : String = "_savedObjects", scene_path : String = "") -> void:
 		if not params is Array:
 			params = [params]
 		
@@ -1200,8 +1200,8 @@ class _DataFormat:
 		var parentPath:String = parentScript.resource_path
 		out.take_over_path(parentPath)
 		
-		if script_storage_node and script_storage_array_name:
-			var h = script_storage_node.get(script_storage_array_name)
+		if script_storage_object and script_storage_array_name:
+			var h = script_storage_object.get(script_storage_array_name)
 			h.append(out)
 		else:
 			_savedScriptObjects.append(out)
@@ -5499,7 +5499,10 @@ class _Translations:
 			translationObject.locale = csvLine[i]
 			translations.append(translationObject)
 		while not tlFile.eof_reached():
-			csvLine = tlFile.get_csv_line(delim)
+			var line = tlFile.get_line()
+			if line.begins_with("#"):
+				continue
+			csvLine = line.split(delim)
 			var size = csvLine.size()
 			if size > 1:
 				if size > 2:
@@ -5639,6 +5642,8 @@ class _Translations:
 			var line = lines[index]
 			if line == "":
 				index += 1
+				continue
+			if line.begins_with("#"):
 				continue
 			var line_split = line.split(delimiter)
 			var split_size = line_split.size() - 1
