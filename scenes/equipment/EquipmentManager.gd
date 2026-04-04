@@ -586,12 +586,17 @@ func l(msg:String, ID:String = MODULE_IDENTIFIER, title:String = "HevLib"):
 	Debug.l("[%s %s]: %s" % [title, ID, msg])
 
 var slot_order_cache_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order.json"
+var slot_order_relative_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order_relative.json"
 func reorganize_slots():
 	var slot_names = []
 	var slot_types = {}
+	var slot_types_i = {}
 	var f = File.new()
 	f.open(slot_order_cache_file,File.READ)
 	var order = JSON.parse(f.get_as_text(true)).result
+	f.close()
+	f.open(slot_order_relative_file,File.READ)
+	var order2 = JSON.parse(f.get_as_text(true)).result
 	f.close()
 	var slotnames = []
 	for slot in get_children():
@@ -607,6 +612,7 @@ func reorganize_slots():
 				sys_slot = children[index].slot
 				index += 1
 		slot_types.merge({slot.name:sys_slot})
+		slot_types_i.merge({sys_slot:slot.name})
 	var sys_dict = {}
 	for slot in slot_types:
 		var sys = slot_types[slot].split(".")
@@ -628,4 +634,41 @@ func reorganize_slots():
 				index += 1
 		for item in ordering:
 			move_child(get_node(item),index - 1)
-	
+	for slot in order2:
+		if slot in slot_types:
+			var data = order2[slot]
+			var against = data.get("relative_to",null)
+			if against:
+				var nd = get_node(slot)
+				var name_or_config = data.get("use_node_name",true)
+				var targetNode = null
+				if name_or_config:
+					targetNode = get_node_or_null(against)
+				else:
+					targetNode = get_node_or_null(slot_types_i.get(against,""))
+				if targetNode:
+					var targetPos = targetNode.get_position_in_parent()
+					var entire_group = data.get("entire_group",true)
+					if data.get("order_below",true):
+						if entire_group:
+							var cf = against
+							if name_or_config:
+								cf = slot_types.get(against,null)
+							if cf:
+								targetPos += sys_dict.get(cf.split(".")[0]).size()
+							else:
+								targetPos += 1
+						else:
+							targetPos += 1
+					else:
+						if entire_group:
+							var cf = against
+							var cn = against
+							if name_or_config:
+								cf = slot_types.get(against,null)
+							else:
+								cn = slot_types_i.get(against,null)
+							if cf and cn:
+								var av = sys_dict.get(cf.split(".")[0])[0]
+								targetPos = get_node(av).get_position_in_parent()
+					move_child(nd,targetPos)

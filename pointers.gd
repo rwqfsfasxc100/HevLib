@@ -1667,8 +1667,8 @@ class _Equipment:
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_modify.json",
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_thruster_colors.json",
 			"user://cache/.HevLib_Cache/ShipDriver/",
-			
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/Driver_Store.json"
+			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/Driver_Store.json",
+			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order_relative.json",
 			
 		]
 		
@@ -1692,6 +1692,7 @@ class _Equipment:
 		var ship_thruster_color_file = FILE_PATHS[17]
 		var ship_driver_path = FILE_PATHS[18]
 		var storage_for_driver_store = FILE_PATHS[19]
+		var slot_order_relative_store = FILE_PATHS[20]
 		if is_onready:
 			
 			version = DataFormat.__get_vanilla_version()
@@ -1781,6 +1782,9 @@ class _Equipment:
 		file.open(storage_for_driver_store,File.WRITE)
 		file.store_string("{}")
 		file.close()
+		file.open(slot_order_relative_store,File.WRITE)
+		file.store_string("{}")
+		file.close()
 		
 		
 		
@@ -1808,6 +1812,7 @@ class _Equipment:
 			"SAVE_BUTTONS":[],
 			"ADD_SHIPS":[],
 			"REGISTER_SHIP_NUMERICS":{},
+			"SLOT_ORDER_RELATIVE":{},
 			
 		}
 		
@@ -2083,8 +2088,7 @@ class _Equipment:
 						file.open(slot_order_cache_file,File.READ)
 						var data = JSON.parse(file.get_as_text()).result
 						file.close()
-						
-						var orders = constants.get("SLOT_ORDER")
+						var orders = constants.get("SLOT_ORDER",[])
 						for order in orders:
 							if order in data:
 								pass
@@ -2095,6 +2099,18 @@ class _Equipment:
 						file.open(slot_order_cache_file,File.WRITE)
 						file.store_string(JSON.print(data))
 						file.close()
+						
+						file.open(slot_order_relative_store,File.READ)
+						var data2 = JSON.parse(file.get_as_text()).result
+						file.close()
+						var orders2 = constants.get("SLOT_ORDER_RELATIVE",{})
+						for order in orders2:
+							if not order in data2:
+								data2[order] = orders2[order]
+						file.open(slot_order_relative_store,File.WRITE)
+						file.store_string(JSON.print(data2))
+						file.close()
+						
 					"SLOT_TAGS.gd":
 						var ar = constants.get("SLOT_TAGS",{}).duplicate(true)
 						driver_store["SLOT_TAGS"].append(ar.duplicate(true))
