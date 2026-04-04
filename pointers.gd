@@ -2257,15 +2257,15 @@ class _Equipment:
 								if not n in ws_equipment_names:
 									ws_equipment_names.append(n)
 								var allow = true
-								if "config" in equipment:
-									var cf = equipment["config"]
-									var id = cf.get("id",null)
-									var section = cf.get("section",null)
-									var opt = cf.get("entry",null)
-									if id and section and opt:
-										var cv = ConfigDriver.__get_value(id,section,opt)
-										if typeof(cv) == TYPE_BOOL:
-											allow = cv
+#								if "config" in equipment:
+#									var cf = equipment["config"]
+#									var id = cf.get("id",null)
+#									var section = cf.get("section",null)
+#									var opt = cf.get("entry",null)
+#									if id and section and opt:
+#										var cv = ConfigDriver.__get_value(id,section,opt)
+#										if typeof(cv) == TYPE_BOOL:
+#											allow = cv
 								
 								var mr = "mod_requirements" in equipment
 								var mi = "mod_incompatabilities" in equipment
@@ -2861,6 +2861,7 @@ class _Equipment:
 				var aname = add.get("name","SYSTEM_ERROR")
 				var apath = add.get("path","")
 				var item_data = {}
+				var config = add.get("config",{})
 				for it in add.get("data",[]):
 					var ws_property_string = ""
 					var ws_property = it.get("property")
@@ -2894,7 +2895,7 @@ class _Equipment:
 				if apath == "":
 					ws_stuff_to_modify.append({"name":aname,"data":item_data})
 				else:
-					ws_stuff_to_add.append({"name":aname,"path":apath,"data":item_data})
+					ws_stuff_to_add.append({"name":aname,"path":apath,"data":item_data,"config":config})
 
 
 

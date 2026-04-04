@@ -172,6 +172,7 @@ func _ready():
 			this.name = iname
 			this.data = {}
 			this.path = item.get("path","")
+			this.config = item.get("config",{})
 			var f = item.get("data",{})
 			for n in f:
 				var d = f[n]
@@ -221,6 +222,27 @@ func loadPlaceholder():
 			system.slotName = t + "_" + system.systemName
 	else:
 		var path = this_addition.get("path",null)
+		if "config" in this_addition:
+			var how = true
+			var cfg = this_addition["config"]
+			var config_id = cfg.get("id","")
+			var config_section = cfg.get("section","")
+			var config_setting = cfg.get("entry","")
+			var invert_config = cfg.get("invert_config",false)
+			if config_id and config_section and config_setting:
+				var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+				var cfg_opt = pointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
+				if cfg_opt != null:
+					if invert_config:
+						if cfg_opt:
+							how = false
+					else:
+						if !cfg_opt:
+							how = false
+			if not how:
+				path = ""
+		
+		
 		if path and file.file_exists(path):
 			if directMount:
 				key = name + "_" + mounted
