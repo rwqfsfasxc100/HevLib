@@ -6,7 +6,7 @@
 2.2="* Menu lets you both import and export a file for the modpack."
 2.2.1="* Exporting only permits mods with a valid manifest, mod ID, and a link to it's github page"
 2.2.2="* You can toggle which mods are added to a modpack export"
-2.2.3="* Importing modpacks wil only download mods not currently installed"
+2.2.3="* Importing modpacks will only download mods not currently installed"
 2.2.4="* Dragging and dropping modpacks is permitted in the same way you can drag and drop mod zips"
 3="* Dropping files into the mod menu now will only copy zip files to the mods folder."
 4="* Popup windows now are supported by the library theme"
