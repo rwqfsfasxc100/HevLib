@@ -40,6 +40,7 @@ var add_systems = []
 
 func _enter_tree():
 	ismPointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+	ismPointers.ConfigDriver.__establish_connection("updateValues",self)
 	var file = File.new()
 	file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_mods.json",File.READ)
 	hevlib_config_data = JSON.parse(file.get_as_text()).result
@@ -443,8 +444,9 @@ func handleAmmoDelivery(delta):
 	
 var ismPointers
 #const ismCFGD = preload("res://HevLib/pointers/ConfigDriver.gd")
+var limitDroneOutput = true
 func drawDrones(kg, really = true):
-	if ismPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","limit_nanodrone_output"):
+	if limitDroneOutput:
 		if availableNanoToDrawNow < kg:
 			return 0
 		else:
@@ -492,9 +494,13 @@ func getCurrentlyActiveCrewNames():
 	return pf
 
 func _physics_process(delta):
-	if not dead and ismPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","limit_nanodrone_output"):
+	if not dead and limitDroneOutput:
 		handleNanoDelivery(delta)
 	
+func updateValues():
+	if ismPointers:
+		limitDroneOutput = ismPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","limit_nanodrone_output")
+
 
 #var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 
