@@ -143,11 +143,11 @@ HEVLIB_CONFIG_SECTION_DEBUG={
 		"type":"bool",
 		"default":false
 	},
-	"use_input_virtualization":{
+	"input_virtualization":{
 		"name":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION",
 		"description":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_TOOLTIP",
 		"type":"bool",
-		"default":false
+		"default":true
 	},
 	"input_virtualization_ignore_builtin":{
 		"name":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_OVERRIDE_BUILTIN",
