@@ -2240,6 +2240,8 @@ class _Equipment:
 									current[ship]["node"].merge(cd[ship]["node"],true)
 								if "recurse_to_variants" in cd[ship]:
 									current[ship]["recurse_to_variants"] = cd[ship]["recurse_to_variants"]
+								if "config" in cd[ship]:
+									current[ship]["config"] = cd[ship]["config"]
 								
 							file.open(ship_thruster_color_file,File.WRITE)
 							file.store_string(JSON.print(current))
