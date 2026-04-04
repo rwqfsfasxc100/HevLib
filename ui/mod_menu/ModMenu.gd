@@ -22,7 +22,12 @@ func _about_to_show():
 func _unhandled_input(event):
 	if visible and Input.is_action_just_pressed("ui_cancel"):
 		if $WAIT.visible:
-			Debug.l("Currently downloading a mod update for %s, not closing wait window.")
+			Debug.l("Currently downloading a mod update, not closing wait window.")
+		elif $ModpacksMenu/WAIT.visible:
+			Debug.l("Currently downloading a mod, not closing wait window.")
+		
+		
+		
 		elif $ModpacksMenu/OpenPack.visible:
 			$ModpacksMenu/OpenPack.hide()
 		elif $ModpacksMenu/SavePack.visible:

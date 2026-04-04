@@ -80,6 +80,8 @@ func _on_SavePack_file_selected(path):
 var handling = false
 func _on_OpenPack_file_selected(path):
 	if not handling:
+		if not root.visible:
+			root.show_menu()
 		handling = true
 		var directory = path.split(path.split("/")[path.split("/").size() - 1])[0]
 		pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","modpack_last_path",directory)

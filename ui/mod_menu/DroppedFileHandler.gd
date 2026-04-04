@@ -1,7 +1,6 @@
 extends Label
 
-export var modpacks_handle_path = NodePath("")
-onready var modpacks_handle = get_node_or_null(modpacks_handle_path)
+onready var modpacks_handle = get_node_or_null(NodePath("../../../../../../../ModpacksMenu/base/VBoxContainer/ApplicableMods"))
 
 var modPathPrefix = ""
 var pointers
