@@ -1056,7 +1056,7 @@ autowrap = true
 [node name="AnimateAppear" parent="." instance=ExtResource( 22 )]
 
 [node name="ModpacksMenu" parent="." instance=ExtResource( 24 )]
-restart_dialog_path = NodePath("../MMRestartDialog")
+restart_dialog_path = NodePath("base/VBoxContainer/ApplicableMods")
 
 [connection signal="about_to_show" from="." to="." method="_about_to_show"]
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
@@ -1084,3 +1084,5 @@ restart_dialog_path = NodePath("../MMRestartDialog")
 [connection signal="visibility_changed" from="URLPopup" to="URLPopup" method="_visibility_changed"]
 [connection signal="pressed" from="URLPopup/base/URLContainer/VBoxContainer/HBoxContainer/CloseButton" to="URLPopup" method="cancel"]
 [connection signal="confirmed" from="UpdateDialog" to="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList" method="updates_started"]
+
+[editable path="ModpacksMenu"]

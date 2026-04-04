@@ -19,14 +19,13 @@ func _ready():
 		var mod = mods[m]
 		if mod["manifest"]["has_manifest"]:
 			var manifest = mod["manifest"]["manifest_data"]
-			if "manifest_url" in manifest.get("manifest_definitions",{}) and "HEVLIB_GITHUB" in manifest.get("links",{}):
-				var url = manifest["manifest_definitions"]["manifest_url"]
+			if "HEVLIB_GITHUB" in manifest.get("links",{}):
 				var github = manifest["links"]["HEVLIB_GITHUB"].get("URL","")
-				if url and github:
+				if github:
 					var info = manifest["mod_information"]
 					var id = info["id"]
 					var mname = info["name"]
-					applicable_mods[id] = {"name":mname,"manifest_url":url,"github_url":github}
+					applicable_mods[id] = {"name":mname,"github_url":github}
 					exported_mods.append(id)
 	for mod in applicable_mods:
 		var m = applicable_mods[mod]
@@ -77,13 +76,18 @@ func _on_SavePack_file_selected(path):
 	file.open(path,File.WRITE)
 	file.store_string(data)
 	file.close()
+
+var handling = false
 func _on_OpenPack_file_selected(path):
-	var directory = path.split(path.split("/")[path.split("/").size() - 1])[0]
-	pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","modpack_last_path",directory)
-	file.open(path,File.READ)
-	var data = JSON.parse(file.get_as_text()).result
-	file.close()
-	start_downloads(data)
+	if not handling:
+		handling = true
+		var directory = path.split(path.split("/")[path.split("/").size() - 1])[0]
+		pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","modpack_last_path",directory)
+		file.open(path,File.READ)
+		var data = JSON.parse(file.get_as_text()).result
+		file.close()
+		start_downloads(data)
+		
 func _on_Import_pressed():
 	var directory = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","modpack_last_path")
 	if directory:
@@ -149,6 +153,7 @@ func _downloaded_zip(file, filepath):
 	else:
 		import_button.grab_focus()
 		wait_popup.hide()
+		handling = true
 
 var download_text = ""
 var current_mod_text = ""
