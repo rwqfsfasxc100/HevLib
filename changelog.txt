@@ -1,3 +1,29 @@
+[1.13.0]
+
+1="* Updated supporters list"
+2="* Added modpacks"
+2.1="* These are accessible from a new button added to the mod menu"
+2.2="* Menu lets you both import and export a file for the modpack."
+2.2.1="* Exporting only permits mods with a valid manifest, mod ID, and a link to it's github page"
+2.2.2="* You can toggle which mods are added to a modpack export"
+2.2.3="* Importing modpacks wil only download mods not currently installed"
+2.2.4="* Dragging and dropping modpacks is permitted in the same way you can drag and drop mod zips"
+3="* Dropping files into the mod menu now will only copy zip files to the mods folder."
+4="* Popup windows now are supported by the library theme"
+5="* Added ability to limit storage reduction from MODIFY_INTERNALS with storage multipliers"
+5.1="* minimum_ammo_utilization_for_reduction -> percentage of the maximum ammo storage that the magazine needs to take up before reduction takes place from a scale of 0.0 to 1.0. Defaults to 0.0"
+5.2="* minimum_nano_utilization_for_reduction  -> percentage of the maximum nanodrone storage that the drone components needs to take up before reduction takes place from a scale of 0.0 to 1.0. Defaults to 0.0"
+5.3="* minimum_propellant_utilization_for_reduction  -> percentage of the maximum propellant tank that the propellant needs to take up before reduction takes place from a scale of 0.0 to 1.0. Defaults to 0.0"
+6="* Added ability to invert the config logic for the comms modification node"
+7="* Toggling drone output limiter now no longer requires the ship to be reloaded"
+8="* Randomize minerals now defaults to false"
+9="* Improved efficiency of DLC list loading"
+10="* Slots, equipment, weaponslot equipment, thrusters, and aux units now no longer need to restart the game to check configs, and can now have the config logic inverted"
+10.1="* For reference, config dictionary formats as follows: {"id":"<config identifier>","section":"<config section>","entry":"<config entry>","invert_config":false}"
+11="* Added configs to SHIP_THRUSTER_COLORS.gd"
+12="* Added configs, mod_incompatabilities, and mod_requirements checks for SHIP_NODE_REGISTER"
+12.1="* Each is handled by a dictionary contained within each node being added."
+
 [1.12.15]
 
 1="* Updated spoiler achievement list in the Achievements pointer"
