@@ -75,7 +75,24 @@ func modify():
 			var sys = data.get("system","SYSTEM_NAME_MISSING")
 			if sys == currentInstall:
 				if "config" in data:
-					breakpoint
+					var how = true
+					var cfg = data["config"]
+					var config_id = cfg.get("id","")
+					var config_section = cfg.get("section","")
+					var config_setting = cfg.get("entry","")
+					var invert_config_logic = cfg.get("invert_config",false)
+					if config_id and config_section and config_setting:
+						var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+						var cfg_opt = pointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
+						if cfg_opt != null:
+							if invert_config_logic:
+								if cfg_opt:
+									how = false
+							else:
+								if !cfg_opt:
+									how = false
+					if not how:
+						return
 				var valid_scene = false
 				if aux_path != "":
 					var s = load(aux_path)
