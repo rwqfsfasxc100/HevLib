@@ -1,5 +1,8 @@
 extends Label
 
+export var modpacks_handle_path = NodePath("")
+onready var modpacks_handle = get_node_or_null(modpacks_handle_path)
+
 var modPathPrefix = ""
 var pointers
 func _ready():
@@ -21,4 +24,5 @@ func _files_dropped(files,screen):
 				if file.ends_with(".zip"):
 					pointers.FolderAccess.__copy_file(file,modPathPrefix)
 				elif file.ends_with(".dvmodpack"):
-					pass
+					if modpacks_handle:
+						modpacks_handle._on_OpenPack_file_selected(file)
