@@ -87,7 +87,7 @@ func cancel():
 	file.open(has_updated_store,File.READ)
 	var has = file.get_as_text()
 	file.close()
-	if has == "true":
+	if has == "1":
 		hide()
 		restart_dialog.popup_centered()
 	else:

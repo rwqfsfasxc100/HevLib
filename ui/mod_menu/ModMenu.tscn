@@ -1056,6 +1056,7 @@ autowrap = true
 [node name="AnimateAppear" parent="." instance=ExtResource( 22 )]
 
 [node name="ModpacksMenu" parent="." instance=ExtResource( 24 )]
+restart_dialog_path = NodePath("../MMRestartDialog")
 
 [connection signal="about_to_show" from="." to="." method="_about_to_show"]
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]

@@ -92,7 +92,7 @@ func _ready():
 		file.store_string("[]")
 		file.close()
 		file.open(has_updated_store,File.WRITE)
-		file.store_string("false")
+		file.store_string("0")
 		file.close()
 		file.open(update_store,File.WRITE)
 		file.store_string("{}")

@@ -82,12 +82,12 @@ func _downloaded_zip(file, filepath):
 	fi.open(update_store,File.WRITE)
 	fi.store_string(JSON.print(data))
 	fi.close()
-	fi.open(has_updated_store,File.WRITE)
-	fi.store_string("true")
-	fi.close()
 	repos()
 	if filepath and modPathPrefix:
 		pointers.FileAccess.__copy_file(filepath,modPathPrefix)
+		fi.open(has_updated_store,File.WRITE)
+		fi.store_string("1")
+		fi.close()
 	Tool.deferCallInPhysics(manager,"move_to_next_mod")
 	Tool.remove(self)
 

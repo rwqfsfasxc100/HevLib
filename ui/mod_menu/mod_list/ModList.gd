@@ -356,7 +356,7 @@ func _downloaded_zip(file, filepath):
 	fi.store_string(JSON.print(data))
 	fi.close()
 	fi.open(has_updated_store,File.WRITE)
-	fi.store_string("true")
+	fi.store_string("1")
 	fi.close()
 	var gameInstallDirectory = OS.get_executable_path().get_base_dir()
 	if OS.get_name() == "OSX":

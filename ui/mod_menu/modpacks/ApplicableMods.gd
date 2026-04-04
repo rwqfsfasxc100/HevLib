@@ -136,10 +136,14 @@ func handle_downloads():
 		var mdname = this_mod.get("name",id)
 		current_mod_text = TranslationServer.translate("HEVLIB_MODPACK_DOWNLOADING") % [current_mod,total_downloads,mdname,id,already_installed]
 		pointers.Github.__get_github_release(github,zip_folder,self,true,"zip")
-
+var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
+var f = File.new()
 func _downloaded_zip(file, filepath):
 	if filepath and modPathPrefix:
 		pointers.FileAccess.__copy_file(filepath,modPathPrefix)
+	f.open(has_updated_store,File.WRITE)
+	f.store_string("1")
+	f.close()
 	if mods_to_download:
 		Tool.deferCallInPhysics(self,"handle_downloads")
 	else:
