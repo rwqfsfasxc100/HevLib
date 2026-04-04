@@ -2178,9 +2178,10 @@ class _Equipment:
 						var pfdata = JSON.parse(file.get_as_text()).result
 						file.close()
 						for item in constants:
-							var xd = {item:constants.get(item)}
-							pfdata.merge(xd)
-							driver_store["NODE_DEFINITIONS"].append(xd.duplicate(true))
+							
+								var xd = {item:constants.get(item)}
+								pfdata.merge(xd)
+								driver_store["NODE_DEFINITIONS"].append(xd.duplicate(true))
 							
 						file.open(node_definitions_file,File.WRITE)
 						file.store_string(JSON.print(pfdata))
@@ -2190,9 +2191,9 @@ class _Equipment:
 						var pfdata = JSON.parse(file.get_as_text()).result
 						file.close()
 						for item in constants:
-							var xd = constants.get(item)
-							pfdata.append(xd)
-							driver_store["SHIP_NODE_REGISTER"].append(xd.duplicate(true))
+								var xd = constants.get(item)
+								pfdata.append(xd)
+								driver_store["SHIP_NODE_REGISTER"].append(xd.duplicate(true))
 							
 						file.open(ship_node_register_file,File.WRITE)
 						file.store_string(JSON.print(pfdata))

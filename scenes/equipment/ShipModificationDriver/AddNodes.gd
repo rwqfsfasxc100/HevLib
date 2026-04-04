@@ -73,6 +73,7 @@ func make_node_mods():
 	var selfpath = get_path()
 	var node_parent_path = get_path_to(self)
 	var thisNode = node_parent_path
+	var current_mod_ids = pointers.ManifestV2.__get_mod_ids()
 	for object in n_store:
 		var obj_data = n_store[object].duplicate(true)
 		var node_data = processed_node_definitions[object].duplicate(true)
@@ -81,6 +82,58 @@ func make_node_mods():
 		
 		var recurse_to_variants = node_data["recurse_to_variants"]
 		
+		if "config" in obj_data:
+			var how = true
+			var cfg = obj_data["config"]
+			var config_id = cfg.get("id","")
+			var config_section = cfg.get("section","")
+			var config_setting = cfg.get("entry","")
+			var invert_config = cfg.get("invert_config",false)
+			if config_id and config_section and config_setting:
+				var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+				var cfg_opt = pointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
+				if cfg_opt != null:
+					if invert_config:
+						if cfg_opt:
+							how = false
+					else:
+						if !cfg_opt:
+							how = false
+			if not how:
+				continue
+		
+		var allowFromMods = true
+		var mr = "mod_requirements" in obj_data
+		var mi = "mod_incompatabilities" in obj_data
+		if mr:
+			var needs = obj_data["mod_requirements"]
+			var can = 0
+			for i in needs:
+				for f in i:
+					var has = false
+					if f in current_mod_ids:
+						has = true
+					if has:
+						can += 1
+			allowFromMods = can == needs.size()
+		if mi:
+			var needs = obj_data["mod_incompatabilities"]
+			var can = 0
+			for i in needs:
+				var cv = false
+				for f in i:
+					var has = false
+					if f in current_mod_ids:
+						has = true
+					if has:
+						cv = true
+				if cv:
+					can += 1
+			allowFromMods = can != needs.size()
+		
+		if not allowFromMods:
+			continue
+		
 		if not recurse_to_variants:
 			var sh = processed_ship_register.get(shipName,{"node_definitions":{}})
 			var def = sh["node_definitions"]
@@ -88,6 +141,7 @@ func make_node_mods():
 				pass
 			else:
 				continue
+		
 		var ignorance = node_data["ships_to_ignore"]
 		if shipName in ignorance:
 			continue
