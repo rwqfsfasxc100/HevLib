@@ -131,7 +131,7 @@ var current_mod_text = ""
 var download_status = ""
 
 func move_to_next_mod():
-	if mods_to_download.size() >= 1:
+	if mods_to_download.size() > 0:
 		var current = mods_to_download.pop_front()
 		update_all_current += 1
 		current_mod_text = TranslationServer.translate("HEVLIB_WAIT_TO_UPDATE_ALL") % [update_all_current,update_all_count,current["name"],current["id"],current["version"]]

@@ -23,14 +23,3 @@ func refocus():
 		lastFocus.grab_focus()
 	else:
 		Debug.l("I have no focus to fall back to!")
-
-#func _on_resize():
-#	var size = Settings.getViewportSize()
-#	rect_size = size
-#	$ColorRect.rect_size = size
-#	$base.rect_min_size = size - offset
-#	$base.rect_position = offset/2
-
-#func _visibility_changed():
-#	_on_resize()
-

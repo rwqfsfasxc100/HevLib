@@ -9,6 +9,7 @@
 [ext_resource path="res://HevLib/ui/mod_menu/mod_info/ScrollWithKB.gd" type="Script" id=7]
 
 [node name="ModpacksMenu" type="Popup"]
+visible = true
 margin_right = 800.0
 margin_bottom = 450.0
 theme = ExtResource( 3 )
@@ -75,8 +76,14 @@ margin_right = 800.0
 margin_bottom = 42.0
 size_flags_horizontal = 3
 
-[node name="ApplicableMods" type="VBoxContainer" parent="base/VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="base/VBoxContainer"]
 margin_top = 88.0
+margin_right = 800.0
+margin_bottom = 98.0
+rect_min_size = Vector2( 0, 10 )
+
+[node name="ApplicableMods" type="VBoxContainer" parent="base/VBoxContainer"]
+margin_top = 102.0
 margin_right = 800.0
 margin_bottom = 404.0
 size_flags_vertical = 3
@@ -102,13 +109,13 @@ autowrap = true
 [node name="ScrollContainer" type="ScrollContainer" parent="base/VBoxContainer/ApplicableMods"]
 margin_top = 61.0
 margin_right = 800.0
-margin_bottom = 316.0
+margin_bottom = 302.0
 size_flags_vertical = 3
 script = ExtResource( 7 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="base/VBoxContainer/ApplicableMods/ScrollContainer"]
 margin_right = 800.0
-margin_bottom = 255.0
+margin_bottom = 241.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -148,7 +155,7 @@ margin_right = 700.0
 margin_bottom = 500.0
 rect_min_size = Vector2( 700, 500 )
 popup_exclusive = true
-window_title = "HEVLIB_OPEN_MODPACK"
+window_title = ""
 resizable = true
 mode_overrides_title = false
 mode = 0
@@ -160,11 +167,43 @@ margin_right = 700.0
 margin_bottom = 500.0
 rect_min_size = Vector2( 700, 500 )
 popup_exclusive = true
-window_title = "HEVLIB_SAVE_MODPACK"
+window_title = ""
 resizable = true
 mode_overrides_title = false
 access = 2
 filters = PoolStringArray( "*.dvmodpack ; DV Modpack" )
 
+[node name="WAIT" type="Popup" parent="."]
+margin_right = 460.0
+margin_bottom = 400.0
+rect_min_size = Vector2( 450, 450 )
+popup_exclusive = true
+
+[node name="PanelContainer" type="PanelContainer" parent="WAIT"]
+margin_right = 460.0
+margin_bottom = 400.0
+rect_min_size = Vector2( 450, 450 )
+
+[node name="Button" type="Button" parent="WAIT/PanelContainer"]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 455.0
+margin_bottom = 445.0
+rect_min_size = Vector2( 450, 440 )
+
+[node name="Label" type="Label" parent="WAIT/PanelContainer/Button"]
+margin_right = 450.0
+margin_bottom = 390.0
+rect_min_size = Vector2( 450, 440 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "HEVLIB_PLEASE_WAIT"
+align = 1
+autowrap = true
+
 [connection signal="about_to_show" from="." to="." method="_about_to_show"]
+[connection signal="pressed" from="base/VBoxContainer/Buttons/Import" to="base/VBoxContainer/ApplicableMods" method="_on_Import_pressed"]
+[connection signal="pressed" from="base/VBoxContainer/Buttons/Export" to="base/VBoxContainer/ApplicableMods" method="_on_Export_pressed"]
 [connection signal="pressed" from="base/VBoxContainer/Exit/Button" to="." method="cancel"]
+[connection signal="file_selected" from="OpenPack" to="base/VBoxContainer/ApplicableMods" method="_on_OpenPack_file_selected"]
+[connection signal="file_selected" from="SavePack" to="base/VBoxContainer/ApplicableMods" method="_on_SavePack_file_selected"]

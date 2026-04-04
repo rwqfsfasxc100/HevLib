@@ -509,3 +509,5 @@ HEVLIB_OPEN_MODPACK|Open Modpack
 HEVLIB_MODPACK_LIMITATIONS|Modpacks cannot include mods without a manifest formatted to at least MV2.2, and have both a link to the GitHub repository and manifest URL.
 
 HEVLIB_MODPACK_TOGGLE|Include this mod in the exported modpack?
+
+HEVLIB_MODPACK_DOWNLOADING|Please wait... \n\nDownloading mod %02d of %02d \n%s [%s]\n(%s mods skipped.)
