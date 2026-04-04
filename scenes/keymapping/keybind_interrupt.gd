@@ -44,7 +44,7 @@ func _ready():
 	pointers.FolderAccess.__check_folder_exists(keybind_folder)
 	self.pause_mode = Node.PAUSE_MODE_PROCESS
 	self.process_priority = -32768
-	INPUT_DRIVER_ACTIVE = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","use_input_virtualization")
+	INPUT_DRIVER_ACTIVE = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","input_virtualization")
 	if ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE:
 		var actions = InputMap.get_actions()
 		var sortedAv = pointers.Keymapping.__get_built_in_action_list()
