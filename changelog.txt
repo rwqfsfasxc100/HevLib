@@ -1,3 +1,14 @@
+[1.12.15]
+
+1="* Updated spoiler achievement list in the Achievements pointer"
+2="* Improved the control to organizing equipment slots through SLOT_ORDER.gd"
+2.1="* All sorting is done through a second constant: SLOT_ORDER_RELATIVE"
+2.2="* This constant is a dictionary with each entry being the node name of the slot containing a dictionary, with the following as the properties stored within these dictionaries:"
+2.2.1="* relative_to -> string containing the node that will be positioned relative to, either with it's node name or it's system slot"
+2.2.2="* use_node_name -> (optional) bool determining whether relative_to should look for node name or system slot. Defaults to true"
+2.2.3="* order_below -> (optional) bool determining whether the node should be positioned below or above the relative node. Defaults to true"
+2.2.4="* entire_group -> (optional) bool determining whether the node should be repositioned around the relative node's config group or not (i.e. relative node has system slot of cargo.equipment, which would position around all slots with a system slot beginning with cargo). Defaults to true"
+
 [1.12.14]
 
 1="* Added ability to check against a config for the comms script"
