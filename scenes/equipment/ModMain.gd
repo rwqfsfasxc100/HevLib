@@ -134,6 +134,7 @@ func _init(modLoader = ModLoader):
 		installScriptExtension("../scene_replacements/ship-ctrl.gd")
 
 		installScriptExtension("ThrusterSlot.gd")
+		installScriptExtension("SystemShipUpgradeUI.gd")
 		installScriptExtension("UpgradeGroup.gd")
 		installScriptExtension("hardpoints/EquipmentItemTemplate.gd")
 

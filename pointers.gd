@@ -1832,15 +1832,15 @@ class _Equipment:
 						for item in constants:
 							var equipment = constants.get(item).duplicate(true)
 							var allow = true
-							if "config" in equipment:
-								var cf = equipment["config"]
-								var id = cf.get("id",null)
-								var section = cf.get("section",null)
-								var opt = cf.get("entry",null)
-								if id and section and opt:
-									var cv = ConfigDriver.__get_value(id,section,opt)
-									if typeof(cv) == TYPE_BOOL:
-										allow = cv
+#							if "config" in equipment:
+#								var cf = equipment["config"]
+#								var id = cf.get("id",null)
+#								var section = cf.get("section",null)
+#								var opt = cf.get("entry",null)
+#								if id and section and opt:
+#									var cv = ConfigDriver.__get_value(id,section,opt)
+#									if typeof(cv) == TYPE_BOOL:
+#										allow = cv
 							
 							var mr = "mod_requirements" in equipment
 							var mi = "mod_incompatabilities" in equipment
@@ -2043,15 +2043,15 @@ class _Equipment:
 						for item in constants:
 							var equipment = constants.get(item).duplicate(true)
 							var allow = true
-							if "config" in equipment:
-								var cf = equipment["config"]
-								var id = cf.get("id",null)
-								var section = cf.get("section",null)
-								var opt = cf.get("entry",null)
-								if id and section and opt:
-									var cv = ConfigDriver.__get_value(id,section,opt)
-									if typeof(cv) == TYPE_BOOL:
-										allow = cv
+#							if "config" in equipment:
+#								var cf = equipment["config"]
+#								var id = cf.get("id",null)
+#								var section = cf.get("section",null)
+#								var opt = cf.get("entry",null)
+#								if id and section and opt:
+#									var cv = ConfigDriver.__get_value(id,section,opt)
+#									if typeof(cv) == TYPE_BOOL:
+#										allow = cv
 							var mr = "mod_requirements" in equipment
 							var mi = "mod_incompatabilities" in equipment
 							if mr:
@@ -2121,15 +2121,15 @@ class _Equipment:
 						for item in constants:
 							var equipment = constants.get(item).duplicate(true)
 							var allow = true
-							if "config" in equipment:
-								var cf = equipment["config"]
-								var id = cf.get("id",null)
-								var section = cf.get("section",null)
-								var opt = cf.get("entry",null)
-								if id and section and opt:
-									var cv = ConfigDriver.__get_value(id,section,opt)
-									if typeof(cv) == TYPE_BOOL:
-										allow = cv
+#							if "config" in equipment:
+#								var cf = equipment["config"]
+#								var id = cf.get("id",null)
+#								var section = cf.get("section",null)
+#								var opt = cf.get("entry",null)
+#								if id and section and opt:
+#									var cv = ConfigDriver.__get_value(id,section,opt)
+#									if typeof(cv) == TYPE_BOOL:
+#										allow = cv
 							
 							var mr = "mod_requirements" in equipment
 							var mi = "mod_incompatabilities" in equipment
@@ -3241,6 +3241,8 @@ class _Equipment:
 		var slot_type = equipment_data.get("slot_type","")
 		var restriction = equipment_data.get("restriction","")
 		
+		var cfg = equipment_data.get("config",{})
+		
 		var base = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s/VBoxContainer\" instance=ExtResource( 3 )]" % [system.to_upper(),slot_node_name]
 		if num_val != -1:
 			base = base + "\nnumVal = " + str(num_val)
@@ -3287,6 +3289,19 @@ class _Equipment:
 			base = base + "\ninstalledColor = " + str(Color(0.0, 1.0, 0.0, 1.0))
 		if disabled_color != Color(0.2, 0.2, 0.2, 1.0):
 			base = base + "\ndisabledColor = " + str(Color(0.2, 0.2, 0.2, 1.0))
+		
+		if cfg:
+			var cfg_id = cfg.get("id","")
+			var cfg_section = cfg.get("section","")
+			var cfg_setting = cfg.get("entry","")
+			var cfg_invert = cfg.get("invert_config",false)
+			base += "\nconfig_id = \"" + cfg_id + "\""
+			base += "\nconfig_section = \"" + cfg_section + "\""
+			base += "\nconfig_setting = \"" + cfg_setting + "\""
+			if cfg_invert:
+				base += "\ninvert_config = true"
+			else:
+				base += "\ninvert_config = false"
 		return base
 	
 	func __make_slot_for_scene(slot_data: Dictionary) -> Dictionary:
@@ -3308,6 +3323,8 @@ class _Equipment:
 		var override_subtractive = slot_data.get("override_subtractive",[])
 		var restrict_hold_type = slot_data.get("restrict_hold_type","")
 		
+		var cfg = slot_data.get("config",{})
+		
 		
 		var base = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\" instance=ExtResource( 2 )]" % slotNodeName
 		if systemSlot != "":
@@ -3320,6 +3337,20 @@ class _Equipment:
 			base = base + "\nopenByDefault = true"
 		else:
 			base = base + "\nopenByDefault = false"
+		if cfg:
+			var cfg_id = cfg.get("id","")
+			var cfg_section = cfg.get("section","")
+			var cfg_setting = cfg.get("entry","")
+			var cfg_invert = cfg.get("invert_config",false)
+			base += "\nconfig_id = \"" + cfg_id + "\""
+			base += "\nconfig_section = \"" + cfg_section + "\""
+			base += "\nconfig_setting = \"" + cfg_setting + "\""
+			if cfg_invert:
+				base += "\ninvert_config = true"
+			else:
+				base += "\ninvert_config = false"
+			
+			
 		if restrictType != "":
 			base = base + "\nslot = \"" + restrictType + "\""
 		if limitShips != []:

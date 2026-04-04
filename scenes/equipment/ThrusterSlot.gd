@@ -74,6 +74,8 @@ func modify():
 			var item
 			var sys = data.get("system","SYSTEM_NAME_MISSING")
 			if sys == currentInstall:
+				if "config" in data:
+					breakpoint
 				var valid_scene = false
 				if aux_path != "":
 					var s = load(aux_path)

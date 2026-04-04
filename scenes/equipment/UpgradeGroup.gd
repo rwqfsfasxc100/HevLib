@@ -18,6 +18,11 @@ export (Array) var override_additive = []
 export (Array) var override_subtractive = []
 export (String) var restrict_hold_type = ""
 
+export (String) var config_id = ""
+export (String) var config_section = ""
+export (String) var config_setting = ""
+export (bool) var invert_config = false
+
 # Internal variable used to more easily assign equipment
 # Should improve efficiency over the previous version, which calculated it on the fly
 var allowed_equipment := []
@@ -38,6 +43,16 @@ func reexamine():
 		else:
 			visible = true
 	.reexamine()
+	if config_id and config_section and config_setting:
+		var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+		var cv = pointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
+		if cv != null:
+			if invert_config:
+				if cv:
+					visible = false
+			else:
+				if !cv:
+					visible = false
 	if visible:
 		if restrict_hold_type != "":
 			if restrict_hold_type.to_upper() == ship.base_storage_type.to_upper():
