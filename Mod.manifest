@@ -111,7 +111,7 @@ HEVLIB_CONFIG_SECTION_DRIVERS={
 		"name":"HEVLIB_CONFIG_RANDOMIZE_MINERALS",
 		"description":"HEVLIB_CONFIG_RANDOMIZE_MINERALS_TOOLTIP",
 		"type":"bool",
-		"default":true
+		"default":false
 	},
 	"multiple_minerals_per_chunk":{
 		"name":"HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK",
