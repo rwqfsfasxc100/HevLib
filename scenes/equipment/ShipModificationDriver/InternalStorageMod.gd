@@ -48,7 +48,11 @@ func _enter_tree():
 	
 	for item in hevlib_config_data:
 		var listingSystemName = item.get("system","SYSTEM_MISSING_NAME")
-		var ls = {}
+		var ls = {
+			"minimum_ammo_utilization_for_reduction":item.get("minimum_ammo_utilization_for_reduction",0.0),
+			"minimum_nano_utilization_for_reduction":item.get("minimum_nano_utilization_for_reduction",0.0),
+			"minimum_propellant_utilization_for_reduction":item.get("minimum_propellant_utilization_for_reduction",0.0),
+		}
 		
 		for data in item:
 			match data:
@@ -166,6 +170,18 @@ func _ready():
 			var iddata = listings[item]
 			if iddata.get("show_modifier_system",true):
 				has_made_change = true
+			var minimum_ammo_utilization_for_reduction = iddata.get("minimum_ammo_utilization_for_reduction",0.0)
+			var minimum_nano_utilization_for_reduction = iddata.get("minimum_nano_utilization_for_reduction",0.0)
+			var minimum_propellant_utilization_for_reduction = iddata.get("minimum_propellant_utilization_for_reduction",0.0)
+			
+			var current_ammo_amt = massDriverAmmoMax
+			var current_nano_amt = dronePartsMax
+			var current_propellant_amt = reactiveMassMax
+			var ammo_limit = upgradeLimits["ammo.capacity"][1]
+			var nano_limit = upgradeLimits["drones.capacity"][1]
+			var propellant_limit = upgradeLimits["fuel.capacity"][1]
+			
+			
 			for key in iddata:
 				var val = iddata[key]
 				match key:
@@ -178,10 +194,9 @@ func _ready():
 					"storage_nano":
 						nano_add += val
 						total_added_capacity += val
-					"storage_multi":
-						multi *= float(val)
-					"ammo_multi":
-						ammo_multi *= float(val)
+					"storage_propellant":
+						propellant_add += val
+						total_added_capacity += val
 					"display_system":
 						var dname = val.get("name","")
 						var mv = val.get("can_display_multiple",false)
@@ -198,17 +213,27 @@ func _ready():
 							}
 							system_name_registers.append(dname)
 							add_systems.append(o)
+					"storage_multi":
+						multi *= float(max(val,0.001))
+					"ammo_multi":
+						if val < 1.0 and minimum_ammo_utilization_for_reduction > 0.0:
+							var ch = ((minimum_ammo_utilization_for_reduction * ammo_limit) - current_ammo_amt) / ammo_limit
+							val = clamp(val + ch,val,1.0)
+						ammo_multi *= float(max(val,0.001))
 					"nano_multi":
-						nano_multi *= float(val)
+						if val < 1.0 and minimum_nano_utilization_for_reduction > 0.0:
+							var ch = ((minimum_nano_utilization_for_reduction * nano_limit) - current_nano_amt) / nano_limit
+							val = clamp(val + ch,val,1.0)
+						nano_multi *= float(max(val,0.001))
 					"propellant_multi":
-						propellant_multi *= float(val)
+						if val < 1.0 and minimum_propellant_utilization_for_reduction > 0.0:
+							var ch = ((minimum_propellant_utilization_for_reduction * propellant_limit) - current_propellant_amt) / propellant_limit
+							val = clamp(val + ch,val,1.0)
+						propellant_multi *= float(max(val,0.001))
 					"emp_scale_multi":
-						emp_scale_multi *= float(val)
+						emp_scale_multi *= float(max(val,0.001))
 					"mass_multi":
-						mass_multi *= float(val)
-					"storage_propellant":
-						propellant_add += val
-						total_added_capacity += val
+						mass_multi *= float(max(val,0.001))
 					"force_type":
 						modifyable_type = val
 					"crew_count":
