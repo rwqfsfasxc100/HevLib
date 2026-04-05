@@ -14,9 +14,12 @@ var pointers
 #func registerCapability(key, system):
 #	nodeModify()
 #	.registerCapability(key, system)
+var current_mod_ids
 func _enter_tree():
 	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+	current_mod_ids = pointers.ManifestV2.__get_mod_ids()
 	make_node_mods()
+	
 
 #func _ready():
 #	make_node_mods()
@@ -73,7 +76,7 @@ func make_node_mods():
 	var selfpath = get_path()
 	var node_parent_path = get_path_to(self)
 	var thisNode = node_parent_path
-	var current_mod_ids = pointers.ManifestV2.__get_mod_ids()
+	
 	for object in n_store:
 		var obj_data = n_store[object].duplicate(true)
 		var node_data = processed_node_definitions[object].duplicate(true)
@@ -349,6 +352,38 @@ func nodeModify():
 									how = false
 					if not how:
 						continue
+						
+				var allowFromMods = true
+				var mr = "mod_requirements" in xd
+				var mi = "mod_incompatabilities" in xd
+				if mr:
+					var needs = xd["mod_requirements"]
+					var can = 0
+					for i in needs:
+						for f in i:
+							var has = false
+							if f in current_mod_ids:
+								has = true
+							if has:
+								can += 1
+					allowFromMods = can == needs.size()
+				if mi:
+					var needs = xd["mod_incompatabilities"]
+					var can = 0
+					for i in needs:
+						var cv = false
+						for f in i:
+							var has = false
+							if f in current_mod_ids:
+								has = true
+							if has:
+								cv = true
+						if cv:
+							can += 1
+					allowFromMods = can != needs.size()
+				
+				if not allowFromMods:
+					continue
 				if xd.get("recurse_to_variants",false):
 					var node = get_node_or_null(xd.get("path","."))
 					var value = xd.get("value",null)
