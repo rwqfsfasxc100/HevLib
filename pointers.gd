@@ -5581,7 +5581,7 @@ class _Translations:
 		var translationCount = 0
 		if fullLogging:
 			Debug.l("Adding translations as: %s" % str(path.hash()))
-		if "file" in path.keys():
+		if "file" in path:
 			var file_paths = path["file"]
 			for file in file_paths:
 				var delim = file_paths[file]
