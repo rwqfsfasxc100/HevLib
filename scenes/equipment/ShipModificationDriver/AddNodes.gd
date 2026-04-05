@@ -329,25 +329,63 @@ func nodeModify():
 	if shipName != baseShipName:
 		if baseShipName in modify_data:
 			var thisShipData = modify_data[baseShipName]
-			for i in thisShipData:
-				if i.get("recurse_to_variants",false):
-					var node = get_node_or_null(i.get("path","."))
-					var value = i.get("value",null)
-					var property = i.get("property","null_value_to_ensure_that_this_fails_when_absent_lol_hi")
+			for xd in thisShipData:
+				if "config" in xd:
+					var how = true
+					var cfg = xd["config"]
+					var config_id = cfg.get("id","")
+					var config_section = cfg.get("section","")
+					var config_setting = cfg.get("entry","")
+					var invert_config = cfg.get("invert_config",false)
+					if config_id and config_section and config_setting:
+						var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+						var cfg_opt = pointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
+						if cfg_opt != null:
+							if invert_config:
+								if cfg_opt:
+									how = false
+							else:
+								if !cfg_opt:
+									how = false
+					if not how:
+						continue
+				if xd.get("recurse_to_variants",false):
+					var node = get_node_or_null(xd.get("path","."))
+					var value = xd.get("value",null)
+					var property = xd.get("property","null_value_to_ensure_that_this_fails_when_absent_lol_hi")
 					if node and property in node:
-						if i.get("defer",false):
+						if xd.get("defer",false):
 							node.set_deferred(property,value)
 						else:
 							node.set(property,value)
 	
 	if shipName in modify_data:
 		var thisShipData = modify_data[shipName]
-		for i in thisShipData:
-			var node = get_node_or_null(i.get("path","."))
-			var value = i.get("value",null)
-			var property = i.get("property","null_value_to_ensure_that_this_fails_when_absent_lol_hi")
+		for xd in thisShipData:
+			if "config" in xd:
+				var how = true
+				var cfg = xd["config"]
+				var config_id = cfg.get("id","")
+				var config_section = cfg.get("section","")
+				var config_setting = cfg.get("entry","")
+				var invert_config = cfg.get("invert_config",false)
+				if config_id and config_section and config_setting:
+					var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+					var cfg_opt = pointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
+					if cfg_opt != null:
+						if invert_config:
+							if cfg_opt:
+								how = false
+						else:
+							if !cfg_opt:
+								how = false
+				if not how:
+					continue
+			var node = get_node_or_null(xd.get("path","."))
+			var value = xd.get("value",null)
+			var property = xd.get("property","null_value_to_ensure_that_this_fails_when_absent_lol_hi")
 			if node and property in node:
-				if i.get("defer",false):
+				if xd.get("defer",false):
 					node.set_deferred(property,value)
 				else:
 					node.set(property,value)
