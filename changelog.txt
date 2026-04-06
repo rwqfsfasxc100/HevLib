@@ -1,3 +1,9 @@
+[1.13.1]
+
+1="* Added configs, mod_requirements, and mod_incompatabilities for SHIP_NODE_MODIFY.gd drivers, courtesy of @WT"
+2="* Added translation version control and logging for driver-based translations (REPLACE_TRANSLATIONS.gd)"
+3="* Changed translations over to use REPLACE_TRANSLATIONS.gd for all translations going forward"
+
 [1.13.0]
 
 1="* Updated supporters list"
