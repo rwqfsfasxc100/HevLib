@@ -3,8 +3,6 @@ extends HTTPRequest
 var path = ""
 var modPath = ""
 
-var Globals = preload("res://HevLib/Functions.gd").new()
-
 var HevLibCache = "user://cache/.HevLib_Cache"
 var cacheExtension = ".hev"
 

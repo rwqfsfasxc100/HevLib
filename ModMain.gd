@@ -125,8 +125,9 @@ func _ready():
 					current.append([pm["name"],pm["manifest"]["manifest_data"]["mod_information"]["id"],pm["version_data"]["version_major"],pm["version_data"]["version_minor"],pm["version_data"]["version_bugfix"]])
 					file.store_string(JSON.print(current))
 					file.close()
-					http.name = str(item.hash())
-					http.connect("request_completed",self,"network_return")
+					var mh = str(hash(item))
+					http.name = mh
+					http.connect("request_completed",self,"network_return",[mh])
 					add_child(http)
 					http.timeout = 20
 
@@ -295,7 +296,7 @@ func l(msg:String, title:String = MOD_NAME, version:String = str(MOD_VERSION_MAJ
 	if not MOD_VERSION_METADATA == "":
 		version = version + "-" + MOD_VERSION_METADATA
 	Debug.l("[%s V%s]: %s" % [title, version, msg])
-func network_return(result, response_code,headers,body):
+func network_return(result, response_code,headers,body,mh):
 	if result == 0:
 #		var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
 #		var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
@@ -329,5 +330,6 @@ func network_return(result, response_code,headers,body):
 					updates.merge({item[1]:{"name":item[0],"id":item[1],"version":[item[2],item[3],item[4]],"new_version":[nv1,nv2,nv3],"github":manifest["links"].get("HEVLIB_GITHUB",{"URL":""}).get("URL",""),"nexus":manifest["links"].get("HEVLIB_NEXUS",{"URL":""}).get("URL",""),"display":item[0] + " (" + item[1] + ")"}})
 					file.store_string(JSON.print(updates))
 					file.close()
+	Tool.deferCallInPhysics(Tool,"remove",[get_node(mh)])
 
 
