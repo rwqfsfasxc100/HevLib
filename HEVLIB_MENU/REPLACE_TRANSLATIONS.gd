@@ -1,5 +1,10 @@
 extends Node
 
+# This translation file is generated automatically
+# Do not modify anything directly, as this can break things for those working on them
+# Please use Translation Tracker to modify these yourself, and contact the mod author to implement them
+# https://github.com/rwqfsfasxc100/TranslationTracker/releases/latest
+
 const TRANSLATIONS = {
 	"master_locale": "en",
 	"de": {
@@ -2000,6 +2005,14 @@ const TRANSLATIONS = {
 		"HEVLIB_MODPACK_DOWNLOADING": {
 			"string": "Please wait... \\n\\nDownloading mod %02d of %02d \\n%s [%s]\\n\\n(%s mods skipped.)",
 			"version_hash": 640450355
+		},
+		"HEVLIB_CONFIG_CARGO_SCANNER_DISPLAY_LIMIT": {
+			"string": "Cargo scanner mineral display limit",
+			"version_hash": 3554924120
+		},
+		"HEVLIB_CONFIG_CARGO_SCANNER_DISPLAY_LIMIT_TOOLTIP": {
+			"string": "How many mineral entries are allowed to appear in any raw mineral scanner list. This only includes minerals, and will skip empty space, equipment, and unidentified entries.",
+			"version_hash": 3868254435
 		}
 	},
 	"uk_UA": {

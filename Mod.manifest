@@ -65,6 +65,16 @@ HEVLIB_CONFIG_SECTION_EQUIPMENT={
 		"type":"bool",
 		"default":true,
 	},
+	"cargo_scanner_mineral_display_limit":{
+		"name":"HEVLIB_CONFIG_CARGO_SCANNER_DISPLAY_LIMIT",
+		"description":"HEVLIB_CONFIG_CARGO_SCANNER_DISPLAY_LIMIT_TOOLTIP",
+		"type":"int",
+        "style":"slider",
+        "min":10,
+        "max":50,
+        "step":1,
+		"default":15,
+	}
 }
 HEVLIB_CONFIG_SECTION_EVENTS={
 	"write_events":{
