@@ -15,7 +15,6 @@ var cargo_limit = 15
 
 func compare(a,b):
 	return smooth[a] > smooth[b]
-	pass
 
 func smoothValue(dict, s):
 	.smoothValue(dict,s)
@@ -29,15 +28,10 @@ func smoothValue(dict, s):
 				smooth.erase(top[a + cargo_limit])
 	return smooth
 
-func clear_non_minerals(arr):
-	if "" in arr:
-		arr.erase("")
-	if "cargo_space" in arr:
-		arr.erase("cargo_space")
-	if "_" in arr:
-		arr.erase("_")
-	if "SHIP" in arr:
-		arr.erase("SHIP")
-	if "CARGO_EQUIPMENT" in arr:
-		arr.erase("CARGO_EQUIPMENT")
+func clear_non_minerals(arr: Array):
+	arr.erase("")
+	arr.erase("cargo_space")
+	arr.erase("_")
+	arr.erase("SHIP")
+	arr.erase("CARGO_EQUIPMENT")
 	return arr
