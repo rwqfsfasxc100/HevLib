@@ -146,19 +146,44 @@ func compile_keymap():
 		if exclSize > 1:
 			var ordered = {}
 			var disordered = {}
+			var cKeys = {}
 			for e in exclusives:
 				var x = exclusives[e]
-				if x["opts"]["order_sensitive"]:
+				var o = x["opts"]
+				var k = x["controls"]
+				for f in k:
+					for f1 in f:
+						if not f1 in cKeys:
+							cKeys[f1] = []
+						if not e in cKeys[f1]:
+							cKeys[f1].append(e)
+				if o["order_sensitive"]:
 					ordered[e] = x
 				else:
 					disordered[e] = x
-
+			
+			for k in cKeys.keys():
+				var d = cKeys[k].size()
+				if d <= 1:
+					cKeys.erase(k)
+			
+			
 			for i in ordered:
 				var data = ordered[i]
 				var controls = data["controls"]
 				var opts = data["opts"]
-
-				breakpoint
+				for stack in controls:
+					
+					var single = true
+					for a in stack:
+						if a in cKeys:
+							single = false
+					if single:
+						breakpoint
+					else:
+						var stack_size = stack.size()
+						
+						breakpoint
 
 			breakpoint
 			
