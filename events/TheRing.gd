@@ -14,6 +14,16 @@ var all_oddities = []
 var mod_requested_events = []
 var mod_request_log = {}
 
+var base_playlist = []
+var disabled_events = []
+func updateValues():
+	if pointers:
+		disabled_events = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
+	playlist = []
+	for event in base_playlist:
+		if not event in base_playlist:
+			playlist.append(event)
+
 func request_event(oddity,event):
 	mod_requested_events.append(oddity)
 	Debug.l("HevLib Event Driver: event %s requested" % event)
@@ -80,14 +90,13 @@ func exitNearby(what, id):
 	logEvents()
 	.exitNearby(what,id)
 
+onready var dummy_event = load("res://HevLib/events/event_selector/DummyEvent.gd").new()
 func getNextOnPlaylist():
-	if playlist.size() > 0:
+	if playlist.size() < base_playlist.size():
 		var value = .getNextOnPlaylist()
-		var ev_name = value.name
-		
 		return value
 	else:
-		return null
+		return dummy_event
 
 var event_log_file = "user://cache/.HevLib_Cache/Event_Driver/event_log.json"
 var active_events_file = "user://cache/.HevLib_Cache/Event_Driver/active_events.txt"
@@ -128,6 +137,8 @@ func logEvents():
 	file.store_string(active_events)
 	file.close()
 
+
+
 func _ready():
 	connect("tree_exiting",self,"wipe_lists")
 	file.open(event_log_file,File.WRITE)
@@ -157,16 +168,7 @@ func _ready():
 		pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
 		disabled_events = []
 	var write_events = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","write_events")
-	playlist = []
-	for kid in get_children():
-		var kidName = kid.name
-		event_names.append(kidName)
-		if kidName in disabled_events:
-			Debug.l("%s is in disabled events list, not adding to playlist" % kidName)
-		else:
-			Debug.l("%s is not in disabled events list, adding to playlist" % kidName)
-			if kid.has_method("makeAt") and kid.has_method("canBeAt"):
-				playlist.append(kid)
+	base_playlist = playlist.duplicate(true)
 	if write_events:
 		var string = ""
 		for event in event_names:
@@ -179,6 +181,9 @@ func _ready():
 		file.open(cache_folder + "current_events.txt",File.WRITE)
 		file.store_string(string)
 		file.close()
+	
+	pointers.ConfigDriver.__establish_connection("updateValues",self)
+	updateValues()
 
 func wipe_lists():
 	group.clear()

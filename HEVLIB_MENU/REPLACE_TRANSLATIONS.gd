@@ -2013,6 +2013,18 @@ const TRANSLATIONS = {
 		"HEVLIB_CONFIG_CARGO_SCANNER_DISPLAY_LIMIT_TOOLTIP": {
 			"string": "How many mineral entries are allowed to appear in any raw mineral scanner list. This only includes minerals, and will skip empty space, equipment, and unidentified entries.",
 			"version_hash": 3868254435
+		},
+		"TAG_ADD_TRANSIT_TIPS": {
+			"string": "Adds transit tips",
+			"version_hash": 3276505670
+		},
+		"EVENTDRIVER_ENABLE_ALL": {
+			"string": "Enable all events",
+			"version_hash": 987521466
+		},
+		"EVENTDRIVER_DISABLE_ALL": {
+			"string": "Disable all events",
+			"version_hash": 1138158759
 		}
 	},
 	"uk_UA": {
