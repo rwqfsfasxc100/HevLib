@@ -74,6 +74,7 @@ __meta__ = {
 }
 
 [node name="EVENTDRIVER_MENU" type="Tabs" parent="NoMargins/TabHintContainer/TabsWithGamepadControl"]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 1.0
@@ -161,7 +162,6 @@ margin_bottom = 210.0
 text = "EVENTDRIVER_CLEAREVENT"
 
 [node name="EVENTDRIVER_EVENT_SELECTOR" type="Tabs" parent="NoMargins/TabHintContainer/TabsWithGamepadControl"]
-visible = false
 margin_right = 40.0
 margin_bottom = 49.0
 
@@ -182,7 +182,25 @@ margin_bottom = 822.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
+[node name="HBoxContainer" type="HBoxContainer" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_EVENT_SELECTOR/MarginContainer/VBoxContainer"]
+margin_right = 1078.0
+margin_bottom = 41.0
+
+[node name="EnableAll" type="Button" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_EVENT_SELECTOR/MarginContainer/VBoxContainer/HBoxContainer"]
+margin_right = 537.0
+margin_bottom = 41.0
+size_flags_horizontal = 3
+text = "EVENTDRIVER_ENABLE_ALL"
+
+[node name="DisableAll" type="Button" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_EVENT_SELECTOR/MarginContainer/VBoxContainer/HBoxContainer"]
+margin_left = 541.0
+margin_right = 1078.0
+margin_bottom = 41.0
+size_flags_horizontal = 3
+text = "EVENTDRIVER_DISABLE_ALL"
+
 [node name="Events" type="ScrollContainer" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_EVENT_SELECTOR/MarginContainer/VBoxContainer"]
+margin_top = 45.0
 margin_right = 1078.0
 margin_bottom = 806.0
 size_flags_horizontal = 3
