@@ -15,14 +15,39 @@ var mod_requested_events = []
 var mod_request_log = {}
 
 var base_playlist = []
-var disabled_events = []
+var disabled_events = null
+onready var dummy_event = load("res://HevLib/events/event_selector/DummyEvent.gd").new()
 func updateValues():
 	if pointers:
+		disabled_events = null
 		disabled_events = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
-	playlist = []
-	for event in base_playlist:
-		if not event in base_playlist:
-			playlist.append(event)
+		if disabled_events == null:
+			pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
+			disabled_events = []
+		
+		var write_events = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","write_events")
+		for i in playlist:
+			base_playlist.append(i.name)
+		if write_events:
+			var string = ""
+			for event in event_names:
+				if string == "":
+					string = event
+				else:
+					string = string + "\n" + event
+			pointers.FolderAccess.__check_folder_exists(cache_folder)
+			var file = File.new()
+			file.open(cache_folder + "current_events.txt",File.WRITE)
+			file.store_string(string)
+			file.close()
+		
+		playlist = []
+		if disabled_events.size() >= base_playlist.size():
+			playlist.append(dummy_event)
+		else:
+			for event in base_playlist:
+				if not event in base_playlist:
+					playlist.append(get_node(event))
 
 func request_event(oddity,event):
 	mod_requested_events.append(oddity)
@@ -90,9 +115,9 @@ func exitNearby(what, id):
 	logEvents()
 	.exitNearby(what,id)
 
-onready var dummy_event = load("res://HevLib/events/event_selector/DummyEvent.gd").new()
+var isDummy = false
 func getNextOnPlaylist():
-	if playlist.size() < base_playlist.size():
+	if playlist:
 		var value = .getNextOnPlaylist()
 		return value
 	else:
@@ -163,26 +188,12 @@ func _ready():
 #	var de = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
 #	if de == null:
 #		
-	var disabled_events = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
-	if disabled_events == null:
-		pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
-		disabled_events = []
-	var write_events = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","write_events")
-	base_playlist = playlist.duplicate(true)
-	if write_events:
-		var string = ""
-		for event in event_names:
-			if string == "":
-				string = event
-			else:
-				string = string + "\n" + event
-		pointers.FolderAccess.__check_folder_exists(cache_folder)
-		var file = File.new()
-		file.open(cache_folder + "current_events.txt",File.WRITE)
-		file.store_string(string)
-		file.close()
+	
+	
 	
 	pointers.ConfigDriver.__establish_connection("updateValues",self)
+	if not playlist:
+		yield(get_tree(),"idle_frame")
 	updateValues()
 
 func wipe_lists():
