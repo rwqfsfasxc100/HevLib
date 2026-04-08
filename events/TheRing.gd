@@ -127,7 +127,10 @@ var event_log_file = "user://cache/.HevLib_Cache/Event_Driver/event_log.json"
 var active_events_file = "user://cache/.HevLib_Cache/Event_Driver/active_events.txt"
 var latest_event_file = "user://cache/.HevLib_Cache/Event_Driver/latest_event.txt"
 var mod_request_file = "user://cache/.HevLib_Cache/Event_Driver/requested_events_from_mods.txt"
-
+func _exit_tree():
+	if current_event_log.size():
+		Debug.l("Ring exiting tree, active events log:\n\n%s\n" % [JSON.print(current_event_log,"\t")])
+	
 var file = File.new()
 func logEvents():
 	file.open(event_log_file,File.WRITE)
