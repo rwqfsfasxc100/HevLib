@@ -1,4 +1,4 @@
-[gd_scene load_steps=40 format=2]
+[gd_scene load_steps=41 format=2]
 
 [ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=1]
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=2]
@@ -24,6 +24,7 @@
 [ext_resource path="res://HevLib/ui/mod_menu/AnimateAppear.tscn" type="PackedScene" id=22]
 [ext_resource path="res://HevLib/ui/themes/fonts/courier_new/font-courierbolditalic.tres" type="DynamicFont" id=23]
 [ext_resource path="res://HevLib/ui/mod_menu/modpacks/ModpacksMenu.tscn" type="PackedScene" id=24]
+[ext_resource path="res://HevLib/ui/mod_menu/fetch_github/FetchGithub.tscn" type="PackedScene" id=25]
 
 [sub_resource type="StreamTexture" id=3]
 flags = 4
@@ -158,7 +159,6 @@ tracks/0/keys = {
 }
 
 [node name="ModMenu" type="Popup"]
-visible = true
 mouse_filter = 2
 theme = ExtResource( 2 )
 popup_exclusive = true
@@ -720,7 +720,7 @@ size_flags_vertical = 3
 script = ExtResource( 8 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer"]
-margin_right = 540.0
+margin_right = 550.0
 margin_bottom = 371.0
 mouse_filter = 2
 size_flags_horizontal = 3
@@ -1081,12 +1081,15 @@ autowrap = true
 [node name="ModpacksMenu" parent="." instance=ExtResource( 24 )]
 restart_dialog_path = NodePath("../MMRestartDialog")
 
+[node name="FetchGithub" parent="." instance=ExtResource( 25 )]
+
 [connection signal="about_to_show" from="." to="." method="_about_to_show"]
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
 [connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/FILTER" to="FilterPopup" method="_filter_pressed"]
 [connection signal="visibility_changed" from="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/FILTER" to="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/FILTER" method="_visibility_changed"]
 [connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/PROFILES" to="ProfilesMenu" method="show_menu"]
 [connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/MODPACKS" to="ModpacksMenu" method="show_menu"]
+[connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/DOWNLOAD" to="FetchGithub" method="show_menu"]
 [connection signal="visibility_changed" from="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList" to="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList" method="_visibility_changed"]
 [connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/SETTINGS" to="ModSettingsMenu" method="show_menu"]
 [connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/LINKBOX/LINKS" to="URLPopup" method="show_menu"]

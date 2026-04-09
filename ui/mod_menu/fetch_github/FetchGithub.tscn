@@ -1,0 +1,96 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://HevLib/ui/mod_menu/fetch_github/FetchGithub.gd" type="Script" id=1]
+[ext_resource path="res://HevLib/ui/mod_menu/AnimateAppear.tscn" type="PackedScene" id=2]
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=3]
+[ext_resource path="res://HevLib/ui/mod_menu/fetch_github/ListGithubMods.gd" type="Script" id=4]
+[ext_resource path="res://HevLib/ui/themes/fonts/courier_new/font-courierbold.tres" type="DynamicFont" id=5]
+[ext_resource path="res://enceladus/ScrollWithAnalog.gd" type="Script" id=6]
+
+[node name="FetchGithub" type="Popup"]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 1280, 720 )
+theme = ExtResource( 3 )
+script = ExtResource( 1 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 1280, 720 )
+color = Color( 0, 0, 0, 0.921569 )
+
+[node name="base" type="MarginContainer" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 1280, 720 )
+
+[node name="PanelContainer" type="PanelContainer" parent="base"]
+margin_right = 1280.0
+margin_bottom = 720.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="base"]
+margin_right = 1280.0
+margin_bottom = 720.0
+
+[node name="Content" type="HBoxContainer" parent="base/VBoxContainer"]
+margin_right = 1280.0
+margin_bottom = 720.0
+size_flags_vertical = 3
+
+[node name="ListGithubMods" type="VBoxContainer" parent="base/VBoxContainer/Content"]
+margin_right = 673.0
+margin_bottom = 720.0
+size_flags_horizontal = 3
+script = ExtResource( 4 )
+
+[node name="Header" type="HBoxContainer" parent="base/VBoxContainer/Content/ListGithubMods"]
+margin_right = 673.0
+margin_bottom = 38.0
+
+[node name="Header" type="Label" parent="base/VBoxContainer/Content/ListGithubMods/Header"]
+margin_right = 383.0
+margin_bottom = 38.0
+size_flags_horizontal = 3
+text = "HEVLIB_GITHUBMODS_TITLE"
+
+[node name="Count" type="Label" parent="base/VBoxContainer/Content/ListGithubMods/Header"]
+margin_left = 387.0
+margin_top = 4.0
+margin_right = 673.0
+margin_bottom = 33.0
+custom_fonts/font = ExtResource( 5 )
+text = "HEVLIB_GITHUBMODS_COUNT"
+
+[node name="Mods" type="VBoxContainer" parent="base/VBoxContainer/Content/ListGithubMods"]
+margin_top = 42.0
+margin_right = 673.0
+margin_bottom = 720.0
+size_flags_vertical = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="base/VBoxContainer/Content/ListGithubMods/Mods"]
+margin_right = 673.0
+margin_bottom = 678.0
+size_flags_vertical = 3
+script = ExtResource( 6 )
+
+[node name="ListMods" type="VBoxContainer" parent="base/VBoxContainer/Content/ListGithubMods/Mods/ScrollContainer"]
+margin_right = 673.0
+margin_bottom = 678.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VSeparator" type="VSeparator" parent="base/VBoxContainer/Content"]
+margin_left = 677.0
+margin_right = 681.0
+margin_bottom = 720.0
+
+[node name="Info" type="VBoxContainer" parent="base/VBoxContainer/Content"]
+margin_left = 685.0
+margin_right = 1280.0
+margin_bottom = 720.0
+size_flags_horizontal = 3
+
+[node name="AnimateAppear" parent="." instance=ExtResource( 2 )]
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]

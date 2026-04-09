@@ -1,0 +1,59 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://HevLib/ui/mod_menu/fetch_github/list_items/ModItem.gd" type="Script" id=1]
+[ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=2]
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=3]
+[ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=4]
+[ext_resource path="res://HevLib/ui/themes/fonts/courier_new/font-courierbold.tres" type="DynamicFont" id=5]
+
+[sub_resource type="StreamTexture" id=1]
+flags = 4
+load_path = "res://HevLib/ui/themes/icons/missing_icon.png.stex"
+
+[node name="ModItem" type="HBoxContainer"]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 600, 100 )
+size_flags_horizontal = 3
+theme = ExtResource( 3 )
+script = ExtResource( 1 )
+
+[node name="ICON" type="TextureRect" parent="."]
+margin_right = 100.0
+margin_bottom = 100.0
+rect_min_size = Vector2( 100, 100 )
+texture = SubResource( 1 )
+expand = true
+stretch_mode = 6
+
+[node name="MOD_BUTTON" type="Button" parent="."]
+margin_left = 104.0
+margin_right = 600.0
+margin_bottom = 100.0
+focus_neighbour_left = NodePath(".")
+size_flags_horizontal = 3
+
+[node name="SmoothScrollTo" parent="MOD_BUTTON" instance=ExtResource( 2 )]
+
+[node name="PlaySoundsOnTheseButtons" parent="MOD_BUTTON" instance=ExtResource( 4 )]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MOD_BUTTON"]
+margin_right = 496.0
+margin_bottom = 100.0
+
+[node name="NAME" type="Label" parent="MOD_BUTTON/VBoxContainer"]
+margin_right = 496.0
+margin_bottom = 67.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="AUTHOR" type="Label" parent="MOD_BUTTON/VBoxContainer"]
+self_modulate = Color( 0.54902, 0.54902, 0.54902, 1 )
+margin_top = 71.0
+margin_right = 496.0
+margin_bottom = 100.0
+custom_fonts/font = ExtResource( 5 )
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+
+[connection signal="request_completed" from="HTTPRequest" to="." method="_on_HTTPRequest_request_completed"]

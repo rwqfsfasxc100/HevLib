@@ -33,6 +33,9 @@ func _unhandled_input(event):
 		elif $ModpacksMenu/SavePack.visible:
 			$ModpacksMenu/SavePack.hide()
 		
+		
+		elif $FetchGithub.visible:
+			$FetchGithub.cancel()
 		elif $URLPopup.visible:
 			$URLPopup.cancel()
 		elif $FilterPopup.visible:

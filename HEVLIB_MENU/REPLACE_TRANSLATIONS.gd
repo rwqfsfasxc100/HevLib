@@ -2025,6 +2025,14 @@ const TRANSLATIONS = {
 		"EVENTDRIVER_DISABLE_ALL": {
 			"string": "Disable all events",
 			"version_hash": 1138158759
+		},
+		"HEVLIB_GITHUBMODS_TITLE": {
+			"string": "Available mods",
+			"version_hash": 2637865945
+		},
+		"HEVLIB_GITHUBMODS_COUNT": {
+			"string": "%d available",
+			"version_hash": 913247151
 		}
 	},
 	"uk_UA": {
