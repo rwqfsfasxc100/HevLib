@@ -53,6 +53,7 @@ margin_right = 383.0
 margin_bottom = 38.0
 size_flags_horizontal = 3
 text = "HEVLIB_GITHUBMODS_TITLE"
+align = 1
 
 [node name="Count" type="Label" parent="base/VBoxContainer/Content/ListGithubMods/Header"]
 margin_left = 387.0

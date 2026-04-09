@@ -54,7 +54,7 @@ var modManifestPath = ""
 var modManifestFile = ""
 var listOfFiles = []
 func sort_data(P):
-	var treeData = P.get("tree")
+	var treeData = P.get("tree",{})
 	for m in treeData:
 		if m.get("type") != "tree":
 			var filePath = m.get("path")

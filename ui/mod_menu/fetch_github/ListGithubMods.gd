@@ -33,4 +33,5 @@ func fill_in_mods(items : Array):
 		box.boot()
 
 func add_box(box):
+	box.connect("pressed",self,"_mod_selected")
 	list.add_child(box)
