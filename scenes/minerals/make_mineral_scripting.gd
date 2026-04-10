@@ -46,6 +46,7 @@ static func make_mineral_scripting(is_onready = false,pointers = null,modmain = 
 	installScriptExtension("res://HevLib/scenes/minerals/AstrogatorPanel.gd")
 	installScriptExtension("res://HevLib/scenes/minerals/OMS.gd")
 	installScriptExtension("res://HevLib/scenes/minerals/CargoScanner.gd")
+	installScriptExtension("res://HevLib/scenes/minerals/ProcessedCargoManifest.gd")
 	var current_game = handle_mineral_values_and_colors(mineral_data)
 #	f.open(current_game_script,File.WRITE)
 #	f.store_string(current_game)

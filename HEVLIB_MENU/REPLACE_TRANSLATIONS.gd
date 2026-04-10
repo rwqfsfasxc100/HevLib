@@ -2033,6 +2033,14 @@ const TRANSLATIONS = {
 		"HEVLIB_GITHUBMODS_COUNT": {
 			"string": "%d available",
 			"version_hash": 913247151
+		},
+		"HEVLIB_CONFIG_PROCESSED_MINERAL_DISPLAY_LIMIT": {
+			"string": "Processed cargo mineral display limit",
+			"version_hash": 2547578582
+		},
+		"HEVLIB_CONFIG_PROCESSED_MINERAL_DISPLAY_LIMIT_TOOLTIP": {
+			"string": "How many mineral entries are allowed to appear at any time within the processed ore list. This display cycles through 'pages' once the limit is exceeded so all minerals can be shown.",
+			"version_hash": 4133660626
 		}
 	},
 	"uk_UA": {

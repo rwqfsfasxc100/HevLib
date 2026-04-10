@@ -70,11 +70,21 @@ HEVLIB_CONFIG_SECTION_EQUIPMENT={
 		"description":"HEVLIB_CONFIG_CARGO_SCANNER_DISPLAY_LIMIT_TOOLTIP",
 		"type":"int",
         "style":"slider",
-        "min":10,
+        "min":6,
         "max":50,
         "step":1,
 		"default":15,
-	}
+	},
+	"processed_mineral_max_display_limit":{
+		"name":"HEVLIB_CONFIG_PROCESSED_MINERAL_DISPLAY_LIMIT",
+		"description":"HEVLIB_CONFIG_PROCESSED_MINERAL_DISPLAY_LIMIT_TOOLTIP",
+		"type":"int",
+        "style":"slider",
+        "min":6,
+        "max":50,
+        "step":1,
+		"default":15,
+	},
 }
 HEVLIB_CONFIG_SECTION_EVENTS={
 	"write_events":{
