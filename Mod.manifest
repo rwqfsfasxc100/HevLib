@@ -73,7 +73,7 @@ HEVLIB_CONFIG_SECTION_EQUIPMENT={
         "min":6,
         "max":50,
         "step":1,
-		"default":15,
+		"default":12,
 	},
 	"processed_mineral_max_display_limit":{
 		"name":"HEVLIB_CONFIG_PROCESSED_MINERAL_DISPLAY_LIMIT",
@@ -83,7 +83,7 @@ HEVLIB_CONFIG_SECTION_EQUIPMENT={
         "min":6,
         "max":50,
         "step":1,
-		"default":15,
+		"default":12,
 	},
 }
 HEVLIB_CONFIG_SECTION_EVENTS={
