@@ -20,7 +20,7 @@ signal task_checkbox_clicked(id, line, checked, task_string)
 
 ## The text to be displayed in Markdown format.[br][br]
 ## [i]Note: the [member RichTextLabel.text] property is overridden so modifying it through code has the same effect as modifying [member markdown_text].[/i]
-export var markdown_text: String = "" setget _set_markdown_text
+export (String, MULTILINE) var markdown_text: String = "" setget _set_markdown_text
 
 ## If enabled, links will be automatically handled by this node, without needing to manually connect them. Valid header anchors will make the label scroll to that header's position. Valid URLs and e-mails will be opened according to the user's default settings.
 export var automatic_links := true
@@ -79,7 +79,7 @@ func _init(markdown_text: String = "") -> void:
 	bbcode_enabled = true
 	self.markdown_text = markdown_text
 	if automatic_links:
-		.connect("meta_clicked",self,"_on_meta_clicked")
+		connect("meta_clicked",self,"_on_meta_clicked")
 
 func _ready() -> void:
 	h1.connect("changed",h1,"queue_update")
@@ -109,7 +109,6 @@ func _on_meta_clicked(meta) -> void:
 	if meta.begins_with("#") and meta in _header_anchor_paragraph:
 		breakpoint
 		self.scroll_to_line(_header_anchor_paragraph[meta])
-#		self.scroll_to_paragraph(_header_anchor_paragraph[meta])
 		return
 	var url_pattern := RegEx.new()
 	url_pattern.compile("^(ftp|http|https):\\/\\/[^\\s\\\"]+$")
@@ -160,7 +159,8 @@ func display_file(file_path: String, handle_frontmatter: bool = true):
 	if not content:
 		result = file.get_error()
 	if handle_frontmatter and result == OK:
-		var regex = RegEx.create_from_string(_FRONTMATTER_REGEX)
+		var regex = RegEx.new()
+		regex.compile(_FRONTMATTER_REGEX)
 		var regex_match = regex.search(content)
 		if regex_match:
 			_frontmatter = regex_match.get_string(1).strip_edges()
@@ -192,9 +192,9 @@ func _set_markdown_text(new_text: String) -> void:
 
 func _update() -> void:
 	_dirty = false
-	.clear()
-	var bbcode_text: String = _convert_markdown(TranslationServer.translate(markdown_text) as String if _can_auto_translate() else markdown_text)
-	.parse_bbcode(bbcode_text)
+	clear()
+	var b: String = _convert_markdown(TranslationServer.translate(markdown_text) as String if _can_auto_translate() else markdown_text)
+	parse_bbcode(b)
 
 func _can_auto_translate() -> bool:
 	return true
@@ -461,7 +461,8 @@ func _process_task_list_item(item: String) -> String:
 	return processed_item
 
 func _process_inline_code_syntax(line: String) -> String:
-	var regex = RegEx.create_from_string("(`+)(.+?)\\1")
+	var regex = RegEx.new()
+	regex.compile("(`+)(.+?)\\1")
 	var processed_line := line
 	while true:
 		var result = regex.search(processed_line)
@@ -580,7 +581,8 @@ func _process_link_syntax(line: String) -> String:
 func _process_text_formatting_syntax(line: String) -> String:
 	var processed_line := line
 	# Bold text
-	var regex = RegEx.create_from_string("(\\*\\*|\\_\\_)(.+?)\\1")
+	var regex = RegEx.new()
+	regex.compile("(\\*\\*|\\_\\_)(.+?)\\1")
 	while true:
 		var result = regex.search(processed_line)
 		if not result:
@@ -635,7 +637,8 @@ func _process_text_formatting_syntax(line: String) -> String:
 
 func _process_header_syntax(line: String) -> String:
 	var processed_line := line
-	var regex = RegEx.create_from_string("^#+\\s*[^\\s].*")
+	var regex = RegEx.new()
+	regex.compile("^#+\\s*[^\\s].*")
 	while true:
 		var result = regex.search(processed_line)
 		if not result:
@@ -653,7 +656,9 @@ func _process_header_syntax(line: String) -> String:
 		var header_format: Resource = _get_header_format(n)
 		var _start = result.get_start()
 		var opening_tags := _get_header_tags(header_format)
-		processed_line = processed_line.erase(_start, n + n_spaces).insert(_start, opening_tags)
+#		processed_line = processed_line.erase(_start, n + n_spaces).insert(_start, opening_tags)
+		processed_line.erase(_start, n + n_spaces)
+		processed_line = processed_line.insert(_start, opening_tags)
 		var _end = result.get_end()
 		processed_line = processed_line.insert(_end - (n + n_spaces) + opening_tags.length(), _get_header_tags(header_format, true))
 		_debug("... header level %d" % n)
@@ -693,7 +698,8 @@ func _denotes_fenced_code_block(line: String, character: String) -> bool:
 		return false
 
 func _process_escaped_characters(line: String) -> String:
-	var regex = RegEx.create_from_string("\\\\" + _ESCAPEABLE_CHARACTERS_REGEX)
+	var regex = RegEx.new()
+	regex.compile("\\\\" + _ESCAPEABLE_CHARACTERS_REGEX)
 	var processed_line = line
 	while true:
 		var result = regex.search(processed_line)
@@ -772,7 +778,11 @@ func _get_header_tags(header_format: Resource, closing := false) -> String:
 		if header_format.override_font_color and header_format.font_color:
 			tags += "[color=#%s]" % header_format.font_color.to_html()
 		if header_format.font_size:
-			tags += "[font_size=%d]" % int(header_format.font_size * self.theme.normal_font.get_height())
+			var fs = 16
+			var t = self.theme
+			if t:
+				fs = t.get_font("normal_font","RichTextLabel").get_height()
+			tags += "[font_size=%d]" % int(header_format.font_size * fs)
 		if header_format.is_bold:
 			tags += "[b]"
 		if header_format.is_italic:
@@ -805,28 +815,291 @@ func _on_checkbox_clicked(id: int, was_checked: bool) -> void:
 
 
 class H1Format:
-	func _init():
-		pass
+	extends Resource
+	var font_size: float = 2.285 setget _set_font_size
+	## Whether this header level is drawn as bold or not
+	export var is_bold := false setget _set_is_bold
+	## Whether this header level is drawn as italics or not
+	export var is_italic := false setget _set_is_italic
+	## Whether this header level is underlined or not
+	export var is_underlined := false setget _set_is_underlined
+	## When enabled, you can override the color of this header level with a custom color. If disabled, uses the same color as the rest of the text.
+	export var override_font_color: bool = false setget _set_override_font_color
+	## Custom font color to apply to this header level. Ignored if [code]override_font_color[/code] is disabled.
+	export var font_color: Color = Color.white setget _set_font_color
+	## When enabled, a horizontal rule will be drawn beneath all headers of this level (only in Godot 4.5+). Its height, width, and color will be defined by the MarkdownLabel's properties, but it will always be centered left.
+	export var draw_horizontal_rule: bool = false setget _set_draw_horizontal_rule
+
+	func _init() -> void:
+		resource_local_to_scene = true
+
+	func _set_font_size(new_font_size: float) -> void:
+		font_size = new_font_size
+		emit_changed()
+
+	func _set_override_font_color(enabled: bool) -> void:
+		override_font_color = enabled
+		emit_changed()
+
+	func _set_font_color(new_font_color: Color) -> void:
+		font_color = new_font_color
+		emit_changed()
+
+	func _set_is_bold(new_is_bold: bool) -> void:
+		is_bold = new_is_bold
+		emit_changed()
+
+	func _set_is_italic(new_is_italic: bool) -> void:
+		is_italic = new_is_italic
+		emit_changed()
+
+	func _set_is_underlined(new_is_underlined: bool) -> void:
+		is_underlined = new_is_underlined
+		emit_changed()
+
+	func _set_draw_horizontal_rule(new_draw_horizontal_rule: bool) -> void:
+		draw_horizontal_rule = new_draw_horizontal_rule
+		emit_changed()
 
 class H2Format:
-	func _init():
-		pass
+	extends Resource
+	## Relative font size of this header level (will be multiplied by [code]normal_font_size[/code])
+	export var font_size: float = 1.714 setget _set_font_size
+	## Whether this header level is drawn as bold or not
+	export var is_bold := false setget _set_is_bold
+	## Whether this header level is drawn as italics or not
+	export var is_italic := false setget _set_is_italic
+	## Whether this header level is underlined or not
+	export var is_underlined := false setget _set_is_underlined
+	## When enabled, you can override the color of this header level with a custom color. If disabled, uses the same color as the rest of the text.
+	export var override_font_color: bool = false setget _set_override_font_color
+	## Custom font color to apply to this header level. Ignored if [code]override_font_color[/code] is disabled.
+	export var font_color: Color = Color.white setget _set_font_color
+	## When enabled, a horizontal rule will be drawn beneath all headers of this level (only in Godot 4.5+). Its height, width, and color will be defined by the MarkdownLabel's properties, but it will always be centered left.
+	export var draw_horizontal_rule: bool = false setget _set_draw_horizontal_rule
+
+	func _init() -> void:
+		resource_local_to_scene = true
+
+	func _set_font_size(new_font_size: float) -> void:
+		font_size = new_font_size
+		emit_changed()
+
+	func _set_override_font_color(enabled: bool) -> void:
+		override_font_color = enabled
+		emit_changed()
+
+	func _set_font_color(new_font_color: Color) -> void:
+		font_color = new_font_color
+		emit_changed()
+
+	func _set_is_bold(new_is_bold: bool) -> void:
+		is_bold = new_is_bold
+		emit_changed()
+
+	func _set_is_italic(new_is_italic: bool) -> void:
+		is_italic = new_is_italic
+		emit_changed()
+
+	func _set_is_underlined(new_is_underlined: bool) -> void:
+		is_underlined = new_is_underlined
+		emit_changed()
+
+	func _set_draw_horizontal_rule(new_draw_horizontal_rule: bool) -> void:
+		draw_horizontal_rule = new_draw_horizontal_rule
+		emit_changed()
 
 class H3Format:
-	func _init():
-		pass
+	extends Resource
+	## Relative font size of this header level (will be multiplied by [code]normal_font_size[/code])
+	export var font_size: float = 1.428 setget _set_font_size
+	## Whether this header level is drawn as bold or not
+	export var is_bold := false setget _set_is_bold
+	## Whether this header level is drawn as italics or not
+	export var is_italic := false setget _set_is_italic
+	## Whether this header level is underlined or not
+	export var is_underlined := false setget _set_is_underlined
+	## When enabled, you can override the color of this header level with a custom color. If disabled, uses the same color as the rest of the text.
+	export var override_font_color: bool = false setget _set_override_font_color
+	## Custom font color to apply to this header level. Ignored if [code]override_font_color[/code] is disabled.
+	export var font_color: Color = Color.white setget _set_font_color
+	## When enabled, a horizontal rule will be drawn beneath all headers of this level (only in Godot 4.5+). Its height, width, and color will be defined by the MarkdownLabel's properties, but it will always be centered left.
+	export var draw_horizontal_rule: bool = false setget _set_draw_horizontal_rule
+
+	func _init() -> void:
+		resource_local_to_scene = true
+
+	func _set_font_size(new_font_size: float) -> void:
+		font_size = new_font_size
+		emit_changed()
+
+	func _set_override_font_color(enabled: bool) -> void:
+		override_font_color = enabled
+		emit_changed()
+
+	func _set_font_color(new_font_color: Color) -> void:
+		font_color = new_font_color
+		emit_changed()
+
+	func _set_is_bold(new_is_bold: bool) -> void:
+		is_bold = new_is_bold
+		emit_changed()
+
+	func _set_is_italic(new_is_italic: bool) -> void:
+		is_italic = new_is_italic
+		emit_changed()
+
+	func _set_is_underlined(new_is_underlined: bool) -> void:
+		is_underlined = new_is_underlined
+		emit_changed()
+
+	func _set_draw_horizontal_rule(new_draw_horizontal_rule: bool) -> void:
+		draw_horizontal_rule = new_draw_horizontal_rule
+		emit_changed()
 
 class H4Format:
-	func _init():
-		pass
+	extends Resource
+	## Relative font size of this header level (will be multiplied by [code]normal_font_size[/code])
+	export var font_size: float = 1.142 setget _set_font_size
+	## Whether this header level is drawn as bold or not
+	export var is_bold := false setget _set_is_bold
+	## Whether this header level is drawn as italics or not
+	export var is_italic := false setget _set_is_italic
+	## Whether this header level is underlined or not
+	export var is_underlined := false setget _set_is_underlined
+	## When enabled, you can override the color of this header level with a custom color. If disabled, uses the same color as the rest of the text.
+	export var override_font_color: bool = false setget _set_override_font_color
+	## Custom font color to apply to this header level. Ignored if [code]override_font_color[/code] is disabled.
+	export var font_color: Color = Color.white setget _set_font_color
+	## When enabled, a horizontal rule will be drawn beneath all headers of this level (only in Godot 4.5+). Its height, width, and color will be defined by the MarkdownLabel's properties, but it will always be centered left.
+	export var draw_horizontal_rule: bool = false setget _set_draw_horizontal_rule
+
+	func _init() -> void:
+		resource_local_to_scene = true
+
+	func _set_font_size(new_font_size: float) -> void:
+		font_size = new_font_size
+		emit_changed()
+
+	func _set_override_font_color(enabled: bool) -> void:
+		override_font_color = enabled
+		emit_changed()
+
+	func _set_font_color(new_font_color: Color) -> void:
+		font_color = new_font_color
+		emit_changed()
+
+	func _set_is_bold(new_is_bold: bool) -> void:
+		is_bold = new_is_bold
+		emit_changed()
+
+	func _set_is_italic(new_is_italic: bool) -> void:
+		is_italic = new_is_italic
+		emit_changed()
+
+	func _set_is_underlined(new_is_underlined: bool) -> void:
+		is_underlined = new_is_underlined
+		emit_changed()
+
+	func _set_draw_horizontal_rule(new_draw_horizontal_rule: bool) -> void:
+		draw_horizontal_rule = new_draw_horizontal_rule
+		emit_changed()
 
 class H5Format:
-	func _init():
-		pass
+	extends Resource
+	## Relative font size of this header level (will be multiplied by [code]normal_font_size[/code])
+	export var font_size: float = 1 setget _set_font_size
+	## Whether this header level is drawn as bold or not
+	export var is_bold := false setget _set_is_bold
+	## Whether this header level is drawn as italics or not
+	export var is_italic := false setget _set_is_italic
+	## Whether this header level is underlined or not
+	export var is_underlined := false setget _set_is_underlined
+	## When enabled, you can override the color of this header level with a custom color. If disabled, uses the same color as the rest of the text.
+	export var override_font_color: bool = false setget _set_override_font_color
+	## Custom font color to apply to this header level. Ignored if [code]override_font_color[/code] is disabled.
+	export var font_color: Color = Color.white setget _set_font_color
+	## When enabled, a horizontal rule will be drawn beneath all headers of this level (only in Godot 4.5+). Its height, width, and color will be defined by the MarkdownLabel's properties, but it will always be centered left.
+	export var draw_horizontal_rule: bool = false setget _set_draw_horizontal_rule
+
+	func _init() -> void:
+		resource_local_to_scene = true
+
+	func _set_font_size(new_font_size: float) -> void:
+		font_size = new_font_size
+		emit_changed()
+
+	func _set_override_font_color(enabled: bool) -> void:
+		override_font_color = enabled
+		emit_changed()
+
+	func _set_font_color(new_font_color: Color) -> void:
+		font_color = new_font_color
+		emit_changed()
+
+	func _set_is_bold(new_is_bold: bool) -> void:
+		is_bold = new_is_bold
+		emit_changed()
+
+	func _set_is_italic(new_is_italic: bool) -> void:
+		is_italic = new_is_italic
+		emit_changed()
+
+	func _set_is_underlined(new_is_underlined: bool) -> void:
+		is_underlined = new_is_underlined
+		emit_changed()
+
+	func _set_draw_horizontal_rule(new_draw_horizontal_rule: bool) -> void:
+		draw_horizontal_rule = new_draw_horizontal_rule
+		emit_changed()
 
 class H6Format:
-	func _init():
-		pass
+	extends Resource
+	## Relative font size of this header level (will be multiplied by [code]normal_font_size[/code])
+	export var font_size: float = 0.857 setget _set_font_size
+	## Whether this header level is drawn as bold or not
+	export var is_bold := false setget _set_is_bold
+	## Whether this header level is drawn as italics or not
+	export var is_italic := false setget _set_is_italic
+	## Whether this header level is underlined or not
+	export var is_underlined := false setget _set_is_underlined
+	## When enabled, you can override the color of this header level with a custom color. If disabled, uses the same color as the rest of the text.
+	export var override_font_color: bool = false setget _set_override_font_color
+	## Custom font color to apply to this header level. Ignored if [code]override_font_color[/code] is disabled.
+	export var font_color: Color = Color.white setget _set_font_color
+	## When enabled, a horizontal rule will be drawn beneath all headers of this level (only in Godot 4.5+). Its height, width, and color will be defined by the MarkdownLabel's properties, but it will always be centered left.
+	export var draw_horizontal_rule: bool = false setget _set_draw_horizontal_rule
+
+	func _init() -> void:
+		resource_local_to_scene = true
+
+	func _set_font_size(new_font_size: float) -> void:
+		font_size = new_font_size
+		emit_changed()
+
+	func _set_override_font_color(enabled: bool) -> void:
+		override_font_color = enabled
+		emit_changed()
+
+	func _set_font_color(new_font_color: Color) -> void:
+		font_color = new_font_color
+		emit_changed()
+
+	func _set_is_bold(new_is_bold: bool) -> void:
+		is_bold = new_is_bold
+		emit_changed()
+
+	func _set_is_italic(new_is_italic: bool) -> void:
+		is_italic = new_is_italic
+		emit_changed()
+
+	func _set_is_underlined(new_is_underlined: bool) -> void:
+		is_underlined = new_is_underlined
+		emit_changed()
+
+	func _set_draw_horizontal_rule(new_draw_horizontal_rule: bool) -> void:
+		draw_horizontal_rule = new_draw_horizontal_rule
+		emit_changed()
 
 
 
