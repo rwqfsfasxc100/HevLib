@@ -1,4 +1,3 @@
-tool
 extends RichTextLabel
 
 # https://github.com/daenvil/MarkdownLabel/blob/main/addons/markdownlabel/markdownlabel.gd
@@ -473,7 +472,8 @@ func _process_inline_code_syntax(line: String) -> String:
 		var unescaped_content := _reset_escaped_chars(result.get_string(2), true)
 		unescaped_content = _escape_bbcode(unescaped_content)
 		unescaped_content = _escape_chars(unescaped_content)
-		processed_line = processed_line.erase(_start, _end - _start).insert(_start, "[code]%s[/code]" % unescaped_content)
+		processed_line.erase(_start, _end - _start)
+		processed_line = processed_line.insert(_start, "[code]%s[/code]" % unescaped_content)
 		_debug("... in-line code: " + unescaped_content)
 	return processed_line
 
@@ -504,7 +504,8 @@ func _process_image_syntax(line: String) -> String:
 				title = title_result.get_string(1)
 				url = url.rstrip(" ").trim_suffix(title_result.get_string()).rstrip(" ")
 			url = _escape_chars(url)
-			processed_line = processed_line.erase(_start, _end - _start).insert(_start, "[img%s%s]%s[/img]" % [
+			processed_line.erase(_start, _end - _start)
+			processed_line = processed_line.insert(_start, "[img%s%s]%s[/img]" % [
 				" alt=\"%s\"" % alt_text if alt_text else "",
 				" tooltip=\"%s\"" % title if title_result and title else "",
 				url,
@@ -541,10 +542,11 @@ func _process_link_syntax(line: String) -> String:
 				title = title_result.get_string(1)
 				url = url.rstrip(" ").trim_suffix(title_result.get_string()).rstrip(" ")
 			url = _escape_chars(url)
-			processed_line = processed_line.erase(
+			processed_line.erase(
 				_start + _text.get_start(),
 				_end - _start - _text.get_start()
-			).insert(
+			)
+			processed_line = processed_line.insert(
 				_start + _text.get_start(),
 				"[url=%s]%s[/url]" % [url, _text.get_string(1)]
 			)
@@ -571,10 +573,12 @@ func _process_link_syntax(line: String) -> String:
 			url = mail.get_string(1)
 		url = _escape_chars(url)
 		if mail:
-			processed_line = processed_line.erase(_start, _end - _start).insert(_start, "[url=mailto:%s]%s[/url]" % [url, url])
+			processed_line.erase(_start, _end - _start)
+			processed_line = processed_line.insert(_start, "[url=mailto:%s]%s[/url]" % [url, url])
 			_debug("... mail link: " + result.get_string())
 		else:
-			processed_line = processed_line.erase(_start, _end - _start).insert(_start, "[url]%s[/url]" % url)
+			processed_line.erase(_start, _end - _start)
+			processed_line = processed_line.insert(_start, "[url]%s[/url]" % url)
 			_debug("... explicit link: " + result.get_string())
 	return processed_line
 
@@ -589,8 +593,10 @@ func _process_text_formatting_syntax(line: String) -> String:
 			break
 		var _start = result.get_start()
 		var _end = result.get_end()
-		processed_line = processed_line.erase(_start, 2).insert(_start, "[b]")
-		processed_line = processed_line.erase(_end - 1, 2).insert(_end - 1, "[/b]")
+		processed_line.erase(_start, 2)
+		processed_line = processed_line.insert(_start, "[b]")
+		processed_line.erase(_end - 1, 2)
+		processed_line = processed_line.insert(_end - 1, "[/b]")
 		_debug("... bold text: "+result.get_string(2))
 	
 	# Italic text
@@ -610,14 +616,20 @@ func _process_text_formatting_syntax(line: String) -> String:
 		elif result_string.ends_with("[/b]") and result_string.find("[b]") == -1:
 			close_b = true
 		if open_b:
-			processed_line = processed_line.erase(_start, 4).insert(_start, "[b][i]")
-			processed_line = processed_line.erase(_end - 2, 1).insert(_end - 2, "[/i]")
+			processed_line.erase(_start, 4)
+			processed_line = processed_line.insert(_start, "[b][i]")
+			processed_line.erase(_end - 2, 1)
+			processed_line = processed_line.insert(_end - 2, "[/i]")
 		elif close_b:
-			processed_line = processed_line.erase(_start, 1).insert(_start, "[i]")
-			processed_line = processed_line.erase(_end - 3, 5).insert(_end - 3, "[/i][/b]")
+			processed_line.erase(_start, 1)
+			processed_line = processed_line.insert(_start, "[i]")
+			processed_line.erase(_end - 3, 5)
+			processed_line = processed_line.insert(_end - 3, "[/i][/b]")
 		else:
-			processed_line = processed_line.erase(_start, 1).insert(_start, "[i]")
-			processed_line = processed_line.erase(_end + 1, 1).insert(_end + 1, "[/i]")
+			processed_line.erase(_start, 1)
+			processed_line = processed_line.insert(_start, "[i]")
+			processed_line.erase(_end + 1, 1)
+			processed_line = processed_line.insert(_end + 1, "[/i]")
 			
 		_debug("... italic text: "+result.get_string(2))
 	
@@ -628,9 +640,11 @@ func _process_text_formatting_syntax(line: String) -> String:
 		if not result:
 			break
 		var _start = result.get_start()
-		processed_line = processed_line.erase(_start, 2).insert(_start, "[s]")
+		processed_line.erase(_start, 2)
+		processed_line = processed_line.insert(_start, "[s]")
 		var _end = result.get_end()
-		processed_line = processed_line.erase(_end - 1, 2).insert(_end - 1, "[/s]")
+		processed_line.erase(_end - 1, 2)
+		processed_line = processed_line.insert(_end - 1, "[/s]")
 		_debug("... strike-through text: " + result.get_string(2))
 	
 	return processed_line
@@ -656,7 +670,6 @@ func _process_header_syntax(line: String) -> String:
 		var header_format: Resource = _get_header_format(n)
 		var _start = result.get_start()
 		var opening_tags := _get_header_tags(header_format)
-#		processed_line = processed_line.erase(_start, n + n_spaces).insert(_start, opening_tags)
 		processed_line.erase(_start, n + n_spaces)
 		processed_line = processed_line.insert(_start, opening_tags)
 		var _end = result.get_end()
@@ -709,7 +722,8 @@ func _process_escaped_characters(line: String) -> String:
 		var _escaped_char = result.get_string()[1]
 		if not _escaped_char in _escaped_characters_map:
 			_escaped_characters_map[_escaped_char] = _escaped_characters_map.size()
-		processed_line = processed_line.erase(_start, 2).insert(_start, _ESCAPE_PLACEHOLDER % _escaped_characters_map[_escaped_char])
+		processed_line.erase(_start, 2)
+		processed_line = processed_line.insert(_start, _ESCAPE_PLACEHOLDER % _escaped_characters_map[_escaped_char])
 	return processed_line
 
 func _process_table_syntax(line: String) -> String:
@@ -771,7 +785,10 @@ func _get_header_tags(header_format: Resource, closing := false) -> String:
 		if header_format.is_bold:
 			tags += "[/b]"
 		if header_format.font_size:
-			tags += "[/font_size]"
+			# Replacing header with bold due to no direct way to change font size in 3.x
+			# May replace with on-the-fly fonts, but later
+#			tags += "[/font_size]"
+			tags += "[/b]"
 		if header_format.override_font_color and header_format.font_color:
 			tags += "[/color]"
 	else:
@@ -782,7 +799,10 @@ func _get_header_tags(header_format: Resource, closing := false) -> String:
 			var t = self.theme
 			if t:
 				fs = t.get_font("normal_font","RichTextLabel").get_height()
-			tags += "[font_size=%d]" % int(header_format.font_size * fs)
+			# Replacing header with bold due to no direct way to change font size in 3.x
+			# May replace with on-the-fly fonts, but later
+#			tags += "[font_size=%d]" % int(header_format.font_size * fs)
+			tags += "[b]"# % int(header_format.font_size * fs)
 		if header_format.is_bold:
 			tags += "[b]"
 		if header_format.is_italic:
@@ -809,7 +829,8 @@ func _on_checkbox_clicked(id: int, was_checked: bool) -> void:
 	if i == -1:
 		push_error("Couldn't find the clicked task list checkbox (id=%d, line=%d)" % [id, iline]) # Shouldn't happen. Please report the bug if it happens.
 		return
-	lines[iline] = lines[iline].erase(i, old_string.length()).insert(i, new_string)
+	lines[iline].erase(i, old_string.length())
+	lines[iline] = lines[iline].insert(i, new_string)
 	_set("text", "\n".join(lines)) #calling [text] directly from this class does not use [_set()].
 	emit_signal("task_checkbox_clicked",id, iline, !was_checked, lines[iline].substr(i + 4))
 
