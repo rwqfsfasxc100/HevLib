@@ -19,6 +19,8 @@ onready var info = get_node_or_null(NodePath("../Info"))
 var mod_item = load("res://HevLib/ui/mod_menu/fetch_github/list_items/ModItem.tscn")
 
 signal icon_downloaded(uuid)
+
+onready var pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
 func _ready():
 	if prevent_load:
 		return
@@ -35,6 +37,7 @@ func request_complete(result, response_code, headers, body):
 		fill_in_mods(json.get("items",[]))
 
 func fill_in_mods(items : Array):
+	pointers.FolderAccess.__check_folder_exists(icon_folder_path)
 	for item in items:
 		var box = mod_item.instance()
 		box.DATA = item
