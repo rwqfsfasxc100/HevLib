@@ -1,8 +1,8 @@
 extends HBoxContainer
 
 var DATA = {}
-
-var formatted_data = {}
+var list
+var formatted_data = {"readme":""}
 
 signal done(box)
 signal pressed(data)
@@ -10,14 +10,10 @@ signal pressed(data)
 var pointers
 var dir = Directory.new()
 var unique_icon = ""
+var user_icon_uuid = ""
 func boot():
-	
-	# Until rate limit passed
-	# Maybe instead just use branch and fetch readme from there, bypassing extra api calls
-	
 	# Also rework fetch FS to use the following:
 	# https://api.github.com/repos/company/project/contents/
-	return
 	
 	var icon = get_node("ICON")
 	var button = get_node("MOD_BUTTON")
@@ -25,49 +21,51 @@ func boot():
 	var author_label = get_node("MOD_BUTTON/VBoxContainer/AUTHOR")
 	var http = get_node("HTTPRequest")
 	button.connect("pressed",self,"_pressed")
-#	http.connect()
 	var githubOwner = DATA.get("owner",{})
 	name_label.text = DATA.get("name","")
 	author_label.text = githubOwner.get("login","")
 	var avatar_path = githubOwner.get("avatar_url","")
-	unique_icon = filepath + githubOwner.get("node_id") + ".png"
+	user_icon_uuid = githubOwner.get("node_id")
+	unique_icon = filepath + user_icon_uuid + ".png"
 	pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	if not dir.file_exists(unique_icon):
-		http.download_file = unique_icon
-		if avatar_path:
-			make_request(avatar_path)
+		list.add_uuid_to_queue(user_icon_uuid,avatar_path)
 	else:
-		icon.texture = pointers.FileAccess.__load_png(unique_icon)
-	format(DATA.get("svn_url",""))
-#	breakpoint
+		set_icon_to(unique_icon)
+	
 	finished()
 
-func format(url:String):
-	
-	if url:
-		var fs = pointers.Github.__get_github_filesystem(url,self)
-
-func _github_filesystem_data(data):
-	
-	
-	breakpoint
-
 var filepath = "user://cache/.Mod_Menu_2_Cache/github_list/icon_cache/"
-func make_request(path):
-	if not dir.dir_exists(filepath):
-		pointers.FolderAccess.__check_folder_exists(filepath)
+var readmePath = ""
+func get_readme():
 	yield(CurrentGame.get_tree(),"idle_frame")
+	var branch = DATA.get("default_branch")
+	var pathName = DATA.get("full_name")
+	var path = "https://raw.githubusercontent.com/%s/refs/heads/%s/README.md" % [pathName,branch]
+	readmePath = path
 	get_node("HTTPRequest").request(path)
-
+	
+	
+	pass
 
 func finished():
 	emit_signal("done",self)
 func _pressed():
 	emit_signal("pressed",formatted_data)
 
+
+func icon_announcement(u):
+	if u == user_icon_uuid:
+		set_icon_to(unique_icon)
+func set_icon_to(path):
+	get_node("ICON").texture = pointers.FileAccess.__load_png(path)
+
+
 func _on_HTTPRequest_request_completed(result, response_code, headers, body):
-	get_node("ICON").texture = pointers.FileAccess.__load_png(unique_icon)
-	get_node("HTTPRequest").download_file = ""
-#	breakpoint
-	
-	
+	if result == HTTPRequest.RESULT_SUCCESS and response_code != 404:
+		var data = body.get_string_from_utf8()
+		formatted_data["readme"] = data
+
+
+func _tree_entered():
+	get_readme()

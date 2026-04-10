@@ -56,4 +56,5 @@ custom_fonts/font = ExtResource( 5 )
 
 [node name="HTTPRequest" type="HTTPRequest" parent="."]
 
+[connection signal="tree_entered" from="." to="." method="_tree_entered"]
 [connection signal="request_completed" from="HTTPRequest" to="." method="_on_HTTPRequest_request_completed"]
