@@ -6,7 +6,7 @@
 [ext_resource path="res://HevLib/ui/mod_menu/fetch_github/ListGithubMods.gd" type="Script" id=4]
 [ext_resource path="res://HevLib/ui/themes/fonts/courier_new/font-courierbold.tres" type="DynamicFont" id=5]
 [ext_resource path="res://enceladus/ScrollWithAnalog.gd" type="Script" id=6]
-[ext_resource path="res://HevLib/scripts/markdown/Markdown.tscn" type="PackedScene" id=7]
+[ext_resource path="res://HevLib/development_tools/markdown/Markdown.tscn" type="PackedScene" id=7]
 
 [node name="FetchGithub" type="Popup"]
 margin_right = 40.0
