@@ -1,5 +1,7 @@
 extends ScrollContainer
 
+# Horizontal equivalent to res://enceladus/ScrollWithAnalog.gd
+
 export  var minSpeed = 0.1
 export  var scrollSpeed = 800.0
 export  var smoothScrollSpeed = 5.0
