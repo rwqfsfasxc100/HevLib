@@ -10,10 +10,12 @@ var mscroll
 
 var operated = false
 
+var scroller_script_path = "res://HevLib/development_tools/control_and_ui/scrollbox_helpers/ScrollWithAnalogHorizontal.gd"
+
 func _ready():
 	geo = $MarginContainer/VBoxContainer/TabHintContainer/TabContainer/CREW_OCCUPATION_GEOLOGIST
 	scroll = ScrollContainer.new()
-	scroll.set_script(load("res://HevLib/scripts/ScrollWithAnalogHorizontal.gd"))
+	scroll.set_script(load(scroller_script_path))
 #	scroll.follow_focus = true
 	scroll.rect_size = geo.rect_size
 	scroll.size_flags_vertical = SIZE_EXPAND_FILL
@@ -54,7 +56,7 @@ func _ready():
 	var damageLabelResource = sysList.damageLabelResource.duplicate(true)
 #	var toggleButton = sysList.toggleButton.duplicate(true)
 	
-	mscroll.set_script(load("res://HevLib/scripts/ScrollWithAnalogHorizontal.gd"))
+	mscroll.set_script(load(scroller_script_path))
 	mscroll.rect_size = geo.rect_size
 	mscroll.size_flags_vertical = SIZE_EXPAND_FILL
 	mechanic.add_child(mscroll)
