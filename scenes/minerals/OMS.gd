@@ -4,6 +4,10 @@ var geo
 var mineral
 var scroll
 
+var mechanic
+var mlist
+var mscroll
+
 var operated = false
 
 func _ready():
@@ -41,7 +45,31 @@ func _ready():
 	hb.add_child(splitter)
 	hb.add_child(vb2)
 	
+	
+	mechanic = $MarginContainer/VBoxContainer/TabHintContainer/TabContainer/CREW_OCCUPATION_MECHANIC
+	mscroll = ScrollContainer.new()
+	
+	var sysList = mechanic.get_node("ScrollContainer/CenterContainer/OMS")
+	var cscd = sysList.cscd.duplicate(true)
+	var damageLabelResource = sysList.damageLabelResource.duplicate(true)
+#	var toggleButton = sysList.toggleButton.duplicate(true)
+	
+	mscroll.set_script(load("res://HevLib/scripts/ScrollWithAnalogHorizontal.gd"))
+	mscroll.rect_size = geo.rect_size
+	mscroll.size_flags_vertical = SIZE_EXPAND_FILL
+	mechanic.add_child(mscroll)
+	mlist = mechanic.get_node("ScrollContainer")
+	var mlistSize = mlist.rect_size
+	mechanic.remove_child(mlist)
+	mlist.size_flags_vertical = SIZE_FILL
+	mscroll.add_child(mlist)
+	mlist.rect_min_size = mlistSize - Vector2(0,5)
+	sysList.cscd = cscd.duplicate(true)
+	sysList.damageLabelResource = damageLabelResource.duplicate(true)
+#	sysList.toggleButton = toggleButton.duplicate(true)
+	
 	operated = true
 func _process(delta):
 	if operated:
 		scroll.rect_size.y = mineral.rect_size.y + 20
+		mscroll.rect_size.y = mlist.rect_size.y + 20
