@@ -14,7 +14,7 @@ func _ready():
 var focusObject
 
 const default_parameter_dict = {}
-func spawn_event(event,thering: Node,parameters : Dictionary = default_parameter_dict.duplicate(true)):
+func spawn_event(event,thering: Node,parameters : Dictionary = {}):
 	if thering == null:
 		Debug.l("No ring object specified, returning")
 		return
@@ -43,8 +43,8 @@ func spawn_event(event,thering: Node,parameters : Dictionary = default_parameter
 
 func getPos(params : Dictionary):
 	
-	var x_direction = params.get("x_direction",rand_range( - 1, 1))
-	var y_direction = params.get("y_direction",rand_range( - 1, 1))
+	var x_direction = clamp(params.get("x_direction",rand_range( - 1, 1)),-1,1)
+	var y_direction = clamp(params.get("y_direction",rand_range( - 1, 1)),-1,1)
 	
 	var spawnDirectionScale = params.get("spawn_direction_scale",0.75)
 	var odditySpawnRadiusMin = params.get("oddity_spawn_radius_min",24000)
@@ -58,12 +58,15 @@ func getPos(params : Dictionary):
 		
 		var cutscene = ("cutscene" in focusObject and focusObject.cutscene) and ("fastTravelDirection" in focusObject and focusObject.fastTravelDirection < 0)
 		var focusPoint = focusObject.global_position
-		var randomVector = Vector2(clamp(x_direction,-1,1),clamp(y_direction,-1,1)).normalized()
+		var randomVector = Vector2(x_direction,y_direction).normalized()
 		var directionVector = focusObject.linear_velocity.normalized() * spawnDirectionScale
 		var dirvec = (randomVector + directionVector).normalized()
 		if dirvec.length() < 0.9:
 			dirvec = randomVector
-		var oddityFocusOffset = dirvec * rand_range(odditySpawnRadiusMin if not cutscene else odditySpawnRadiusMinCutscene, lerp(odditySpawnRadiusMax, odditySpawnRadiusSafemax, clamp(float(odditySpawnFailures) / float(odditySpawnRadiusSafemaxSteps), 0, 1)))
+		var oRangeMin = odditySpawnRadiusMin if not cutscene else odditySpawnRadiusMinCutscene
+		var failBasedMax = clamp(float(odditySpawnFailures) / float(odditySpawnRadiusSafemaxSteps), 0, 1)
+		var oRangeMax = lerp(odditySpawnRadiusMax, odditySpawnRadiusSafemax, failBasedMax)
+		var oddityFocusOffset = dirvec * rand_range(oRangeMin, oRangeMax)
 		
 		var oddityPoint = focusPoint + oddityFocusOffset
 		Tool.release(focusObject)
