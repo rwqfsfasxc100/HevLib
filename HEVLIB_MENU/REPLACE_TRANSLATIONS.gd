@@ -2041,6 +2041,42 @@ const TRANSLATIONS = {
 		"HEVLIB_CONFIG_PROCESSED_MINERAL_DISPLAY_LIMIT_TOOLTIP": {
 			"string": "How many mineral entries are allowed to appear at any time within the processed ore list. This display cycles through 'pages' once the limit is exceeded so all minerals can be shown.",
 			"version_hash": 4133660626
+		},
+		"HEVLIB_TRANSIT_TIP_18": {
+			"string": "Want to see multiple ores in a single mineral chunk or configure other mineral settings? Check the Drivers tab within the HevLib config.",
+			"version_hash": 2874849155
+		},
+		"HEVLIB_TRANSIT_TIP_19": {
+			"string": "Want to configure how likely modded ships appear in the dealer? Check the Drivers tab within the HevLib config.",
+			"version_hash": 809628308
+		},
+		"HEVLIB_TRANSIT_TIP_20": {
+			"string": "Want to control certain equipment changes like slot sorting or mineral scanner limits? Check the Equipment section within the HevLib config.",
+			"version_hash": 186912265
+		},
+		"HEVLIB_TRANSIT_TIP_21": {
+			"string": "Having issues with the handling of a ship? Consider swapping out thrusters or the autopilot, and tune thrust output and autopilot parameters!",
+			"version_hash": 841163575
+		},
+		"HEVLIB_TRANSIT_TIP_22": {
+			"string": "Specific equipment may only work out-of-the-box on their intended vessels. If you're having issues with a specific equipment item, maybe try their intended ship?",
+			"version_hash": 2483296260
+		},
+		"HEVLIB_TRANSIT_TIP_23": {
+			"string": "You can sort the order of any mods displayed inside the DLC list within Drivers section within HevLib.",
+			"version_hash": 1367355062
+		},
+		"HEVLIB_TRANSIT_TIP_24": {
+			"string": "Sick of mining? There are numerous ways to make money through other means.",
+			"version_hash": 3573113157
+		},
+		"HEVLIB_TRANSIT_TIP_25": {
+			"string": "Mass driver magazines and nanodrone components are limited by their storage's delivery speed.",
+			"version_hash": 2903300490
+		},
+		"HEVLIB_TRANSIT_TIP_26": {
+			"string": "A scroll bar is provided by the Geologist tab to help with long equipment names and/or mineral lists.",
+			"version_hash": 1092699375
 		}
 	},
 	"uk_UA": {
