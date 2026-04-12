@@ -48,7 +48,14 @@ func _ready():
 	hb.add_child(vb2)
 	
 	
-#	mechanic = $MarginContainer/VBoxContainer/TabHintContainer/TabContainer/CREW_OCCUPATION_MECHANIC
+	mechanic = $MarginContainer/VBoxContainer/TabHintContainer/TabContainer/CREW_OCCUPATION_MECHANIC
+	mlist = mechanic.get_node("ScrollContainer")
+	mlist.set_script(load("res://HevLib/development_tools/control_and_ui/scrollbox_helpers/OmniScroll.gd"))
+	mlist.follow_focus = true
+	mlist.scrollWithGamepad = false
+	mlist.horizontalSmoothScrollSpeed = 25
+	mlist.verticalSmoothScrollSpeed = 25
+	mlist._ready()
 #	mscroll = ScrollContainer.new()
 #
 #	var sysList = mechanic.get_node("ScrollContainer/CenterContainer/OMS")
@@ -60,7 +67,6 @@ func _ready():
 #	mscroll.rect_size = geo.rect_size
 #	mscroll.size_flags_vertical = SIZE_EXPAND_FILL
 #	mechanic.add_child(mscroll)
-#	mlist = mechanic.get_node("ScrollContainer")
 #	var mlistSize = mlist.rect_size
 #	mechanic.remove_child(mlist)
 #	mlist.size_flags_vertical = SIZE_FILL
@@ -74,4 +80,4 @@ func _ready():
 func _process(delta):
 	if operated:
 		scroll.rect_size.y = mineral.rect_size.y + 20
-		mscroll.rect_size.y = mlist.rect_size.y + 20
+#		mscroll.rect_size.y = mlist.rect_size.y + 20
