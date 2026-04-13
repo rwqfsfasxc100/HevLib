@@ -1,4 +1,4 @@
-;MOD_ID|hev.LIBRARY
+;MOD_ID|hev.E
 ;MOD_NAME|HevLib
 
 [b]HevLib[/]
