@@ -50,36 +50,17 @@ func fill_in_mods(items : Array):
 		connect("icon_downloaded",box,"icon_announcement")
 		box.connect("done",self,"add_box")
 		box.boot()
-	yield(CurrentGame.get_tree(),"idle_frame")
-	process_icons()
 
 func add_box(box):
 	box.connect("pressed",self,"_mod_selected")
 	list.add_child(box)
 
 var icon_folder_path = "user://cache/.Mod_Menu_2_Cache/github_list/icon_cache/"
-var icons_to_fetch = {}
-func add_uuid_to_queue(uuid,path):
-	if not uuid in icons_to_fetch:
-		icons_to_fetch[uuid] = path
-
 var last_uuid = ""
-func process_icons():
-	if icons_to_fetch:
-		var i = icons_to_fetch.keys().pop_front()
-		var path = icons_to_fetch[i]
-		icons_to_fetch.erase(i)
-		last_uuid = i
-		downloader.download_file = icon_folder_path + i + ".png"
-		downloader.request(path)
 
 func download_complete(result, response_code, headers, body):
 	emit_signal("icon_downloaded",last_uuid)
-	if icons_to_fetch:
-		process_icons()
-	else:
-		downloader.download_file = ""
-		last_uuid = ""
+	
 
 func _mod_selected(mod):
 	var rich = info.get_node("RichTextLabel")

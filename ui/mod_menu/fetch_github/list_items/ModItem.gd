@@ -15,15 +15,9 @@ func boot():
 	# Also rework fetch FS to use the following:
 	# https://api.github.com/repos/company/project/contents/
 	visible = false
-	var githubOwner = DATA.get("owner",{})
-	var avatar_path = githubOwner.get("avatar_url","")
-	user_icon_uuid = githubOwner.get("node_id")
-	unique_icon = filepath + user_icon_uuid + ".png"
+	
 	pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
-	if not dir.file_exists(unique_icon):
-		list.add_uuid_to_queue(user_icon_uuid,avatar_path)
-	else:
-		set_icon_to(unique_icon)
+	
 	
 	finished()
 
@@ -38,8 +32,19 @@ func add_mod():
 	name_label.text = formatted_data["header_data"].get("MOD_NAME",DATA.get("name",""))
 	var githubOwner = DATA.get("owner",{})
 	author_label.text = githubOwner.get("login","")
-	
-	
+	var avatar_path = githubOwner.get("avatar_url","")
+	user_icon_uuid = githubOwner.get("node_id")
+	unique_icon = filepath + user_icon_uuid + ".png"
+	var icon_path = formatted_data["header_data"].get("MOD_ICON",avatar_path)
+	if icon_path != avatar_path:
+		unique_icon = filepath + "modicon_%s" % [hash(icon_path)] + ".png"
+	if not dir.file_exists(unique_icon):
+		http.download_file = unique_icon
+		http.request(icon_path)
+	else:
+		icon += 1
+		set_icon_to(unique_icon)
+
 	
 	list.add_mod_count()
 	visible = true
@@ -69,18 +74,25 @@ func icon_announcement(u):
 func set_icon_to(path):
 	get_node("ICON").texture = pointers.FileAccess.__load_png(path)
 
-
+var mode = 0
 func _on_HTTPRequest_request_completed(result, response_code, headers, body):
-	if result == HTTPRequest.RESULT_SUCCESS and response_code != 404:
-		var data = body.get_string_from_utf8()
-		format_description(data)
-		var id = formatted_data["header_data"].get("MOD_ID","")
-		if id in list.mod_ids:
-			Tool.remove(self)
-		else:
-			add_mod()
-	else:
-		Tool.remove(self)
+	match mode:
+		0:
+			if result == HTTPRequest.RESULT_SUCCESS and response_code != 404:
+				var data = body.get_string_from_utf8()
+				format_description(data)
+				var id = formatted_data["header_data"].get("MOD_ID","")
+				if id in list.mod_ids:
+					Tool.remove(self)
+				else:
+					add_mod()
+			else:
+				Tool.remove(self)
+		1:
+			if result == HTTPRequest.RESULT_SUCCESS and response_code != 404:
+				set_icon_to(unique_icon)
+				get_node("HTTPRequest").download_file = ""
+	mode += 1
 
 func format_description(data:String):
 	var headerData = {}
