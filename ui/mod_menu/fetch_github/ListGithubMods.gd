@@ -1,6 +1,6 @@
 extends VBoxContainer
 
-const prevent_load = true
+const prevent_load = false
 
 export var path_to_httprequest = NodePath("../../../../api_fetcher")
 export var path_to_downloader = NodePath("../../../../download_files")
@@ -33,7 +33,7 @@ var mod_count = 0
 func request_complete(result, response_code, headers, body):
 	var json = JSON.parse(body.get_string_from_utf8()).result
 	if json:
-		count.text = mod_count
+#		count.text = TranslationServer.translate("HEVLIB_GITHUBMODS_COUNT") % mod_count
 		fill_in_mods(json.get("items",[]))
 
 func add_mod_count():

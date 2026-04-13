@@ -1,1 +1,4 @@
+;MOD_ID|hev.LIBRARY
+;MOD_NAME|HevLib
+
 Example mod description!

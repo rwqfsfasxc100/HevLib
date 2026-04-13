@@ -74,6 +74,7 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 	if result == HTTPRequest.RESULT_SUCCESS and response_code != 404:
 		var data = body.get_string_from_utf8()
 		formatted_data["readme"] = data
+		add_mod()
 	else:
 		Tool.remove(self)
 
