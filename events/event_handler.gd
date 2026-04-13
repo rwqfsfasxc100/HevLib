@@ -12,24 +12,33 @@ func _ready():
 	timer.name = "Timer"
 	add_child(timer)
 var focusObject
-
 const default_parameter_dict = {}
 func spawn_event(event,thering: Node,parameters : Dictionary = {}):
-	if thering == null:
-		Debug.l("No ring object specified, returning")
-		return
-	ring = thering
-	focusObject = CurrentGame.getPlayerShip()
-	if focusObject.zone == "rings":
-		var tree = ring.get_tree()
-		var event_node = ring.get_node_or_null(event)
-		if event_node and event_node.has_method("canBeAt") and event_node.has_method("makeAt"):
-			var pos = getPos(parameters)
-			event_node.canBeAt(pos)
-			var oddity = event_node.makeAt(pos)
-			if oddity and ring.has_method("request_event"):
-				ring.request_event(oddity, event)
-		
+	if not busy:
+		busy = true
+		if thering == null:
+			Debug.l("EventDriver: No ring object specified, returning")
+			return
+		ring = thering
+		if parameters.get("legacy",false):
+			var counter = ring.oddityCounter
+			ring.oddityCounter = 0x0FFFFFFF
+			ring.testSpecificStoryElement = event
+			yield(ring.get_tree().create_timer(0.1),"timeout")
+			ring.testSpecificStoryElement = ""
+			ring.oddityCounter = counter
+		else:
+			focusObject = CurrentGame.getPlayerShip()
+			if focusObject.zone == "rings":
+				var tree = ring.get_tree()
+				var event_node = ring.get_node_or_null(event)
+				if event_node and event_node.has_method("canBeAt") and event_node.has_method("makeAt"):
+					var pos = getPos(parameters)
+					event_node.canBeAt(pos)
+					var oddity = event_node.makeAt(pos)
+					if oddity and ring.has_method("request_event"):
+						ring.request_event(oddity, event)
+		busy = false
 		
 		
 #		defaultOdditiesEvery = ring.odditiesEvery

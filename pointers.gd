@@ -3411,9 +3411,9 @@ class _Events:
 		preload("res://HevLib/events/clear_event.gd"),
 	]
 	
-	func __spawn_event(event, thering):
+	func __spawn_event(event, thering, parameters : Dictionary = {}):
 		var f = scripts[0].new()
-		f.spawn_event(event,thering)
+		f.spawn_event(event,thering,parameters)
 	
 	func __clear_event(event,ring):
 		var f = scripts[1].new()

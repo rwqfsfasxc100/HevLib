@@ -13,16 +13,18 @@ var busy = false
 
 var focusObject
 
+var use_legacy = false
+
 func _on_SpawnNow_pressed():
-	if busy == false:
-		if cnode == "none" or cnode == "":
-			cnode = ""
-			ring.testSpecificStoryElement = cnode
-			ring.odditiesEvery = 0.1
-			startEventTimerNode()
-		else:
-			pointers.Events.__spawn_event(cnode,ring)
-				
+	var ev = cnode
+	Debug.l("EventDriver: forcing spawn of %s; parameters: legacy [%s]" % [ev,str(use_legacy)])
+	if ev == "none" or ev == "":
+		ev = justEvents[randi() % justEvents.size()]
+		Debug.l("EventDriver: random event, selecting %s" % ev)
+	var params = {}
+	if use_legacy:
+		params["legacy"] = true
+	pointers.Events.__spawn_event(ev,ring,params)
 
 var spawnDirectionScale = 0.75
 var odditySpawnRadiusMin = 24000
@@ -105,3 +107,7 @@ onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 func _on_ClearEvent_pressed():
 	
 	pointers.Events.__clear_event(cnode,ring)
+
+
+func _toggle_legacy(how):
+	use_legacy = how

@@ -19,6 +19,7 @@ var disabled_events = null
 onready var dummy_event = load("res://HevLib/events/event_selector/DummyEvent.gd").new()
 func updateValues():
 	if pointers:
+		base_playlist = []
 		disabled_events = null
 		disabled_events = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
 		if disabled_events == null:
@@ -26,7 +27,7 @@ func updateValues():
 			disabled_events = []
 		
 		var write_events = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","write_events")
-		for i in playlist:
+		for i in get_children():
 			base_playlist.append(i.name)
 		if write_events:
 			var string = ""
@@ -46,7 +47,7 @@ func updateValues():
 			playlist.append(dummy_event)
 		else:
 			for event in base_playlist:
-				if not event in base_playlist:
+				if not event in disabled_events:
 					playlist.append(get_node(event))
 
 func request_event(oddity,event):

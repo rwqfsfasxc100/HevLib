@@ -2077,6 +2077,10 @@ const TRANSLATIONS = {
 		"HEVLIB_TRANSIT_TIP_26": {
 			"string": "A scroll bar is provided by the Geologist tab to help with long equipment names and/or mineral lists.",
 			"version_hash": 1092699375
+		},
+		"EVENTDRIVER_LEGACY": {
+			"string": "Use legacy spawn handler?",
+			"version_hash": 2630802733
 		}
 	},
 	"uk_UA": {
