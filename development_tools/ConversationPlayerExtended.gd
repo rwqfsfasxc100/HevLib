@@ -10,15 +10,25 @@ export (String) var spawnEvent = ""
 export (String) var config_ID = ""
 export (String) var config_section = ""
 export (String) var config_setting = ""
-# Whether the 
+# Whether the configuration should prevent the config when true
 export (bool) var invert_config_logic = false
 
-#const Events = preload("res://HevLib/pointers/Events.gd")
+
+export (String) var special_name = ""
+export (int) var special_price = 0
+
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 func execute():
 	.execute()
 	if spawnEvent and spawnEvent != "":
 		pointers.Events.__spawn_event(spawnEvent,get_tree().get_root().get_node_or_null("Game/TheRing"))
+	
+	if special_name and "specialName" in origin:
+		origin.specialName = special_name
+	if special_price and "specialPrice" in origin:
+		origin.specialPrice = special_price
+	
+	
 
 func canBeUsed(by) -> bool:
 	var how = .canBeUsed(by)
