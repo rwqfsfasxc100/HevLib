@@ -72,7 +72,7 @@ func set_icon_to(path):
 
 func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 	if result == HTTPRequest.RESULT_SUCCESS and response_code != 404:
-		var data = body.get_string_from_utf8().c_unescape()
+		var data = body.get_string_from_utf8()
 		format_description(data)
 		var id = formatted_data["header_data"].get("MOD_ID","")
 		if id in list.mod_ids:
