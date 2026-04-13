@@ -148,10 +148,22 @@ min_value = 1.0
 max_value = 1350.0
 value = 1.0
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
 margin_top = 122.0
 margin_right = 1078.0
-margin_bottom = 163.0
+margin_bottom = 126.0
+
+[node name="SpawnHeader" type="Label" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
+margin_top = 132.0
+margin_right = 1078.0
+margin_bottom = 171.0
+text = "EVENTDRIVER_SPAWNER_CONTROLS"
+align = 1
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
+margin_top = 177.0
+margin_right = 1078.0
+margin_bottom = 218.0
 
 [node name="SpawnNow" type="Button" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/HBoxContainer2"]
 margin_right = 1078.0
@@ -159,17 +171,55 @@ margin_bottom = 41.0
 size_flags_horizontal = 3
 text = "EVENTDRIVER_SPAWNNOW"
 
-[node name="Legacy" type="CheckButton" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
-margin_top = 169.0
+[node name="Toggles" type="HBoxContainer" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
+margin_top = 224.0
 margin_right = 1078.0
-margin_bottom = 210.0
+margin_bottom = 265.0
+
+[node name="Legacy" type="CheckButton" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Toggles"]
+margin_right = 537.0
+margin_bottom = 41.0
+size_flags_horizontal = 3
 text = "EVENTDRIVER_LEGACY"
 
-[node name="ClearEventOfType" type="Button" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
-margin_top = 216.0
+[node name="Inject" type="CheckButton" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Toggles"]
+margin_left = 541.0
 margin_right = 1078.0
-margin_bottom = 257.0
+margin_bottom = 41.0
+size_flags_horizontal = 3
+text = "EVENTDRIVER_INJECT"
+
+[node name="HSeparator2" type="HSeparator" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
+margin_top = 271.0
+margin_right = 1078.0
+margin_bottom = 275.0
+
+[node name="ClearHeader" type="Label" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
+margin_top = 281.0
+margin_right = 1078.0
+margin_bottom = 320.0
+text = "EVENTDRIVER_CLEARER_CONTROLS"
+align = 1
+
+[node name="ClearEventOfType" type="Button" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
+margin_top = 326.0
+margin_right = 1078.0
+margin_bottom = 367.0
 text = "EVENTDRIVER_CLEAREVENT"
+
+[node name="ClearOpts" type="HBoxContainer" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
+margin_top = 373.0
+margin_right = 1078.0
+margin_bottom = 414.0
+size_flags_horizontal = 3
+
+[node name="ClearPOI" type="CheckButton" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/ClearOpts"]
+margin_right = 1078.0
+margin_bottom = 41.0
+hint_tooltip = "EVENTDRIVER_CLEAR_RELATED_POI_TOOLTIP"
+size_flags_horizontal = 3
+pressed = true
+text = "EVENTDRIVER_CLEAR_RELATED_POI"
 
 [node name="EVENTDRIVER_EVENT_SELECTOR" type="Tabs" parent="NoMargins/TabHintContainer/TabsWithGamepadControl"]
 visible = false
@@ -225,7 +275,9 @@ script = ExtResource( 7 )
 [connection signal="timeout" from="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Events/Timer" to="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Events" method="_timer_complete"]
 [connection signal="value_changed" from="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/HSlider" to="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Events" method="_on_HSlider_value_changed"]
 [connection signal="pressed" from="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/HBoxContainer2/SpawnNow" to="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Events" method="_on_SpawnNow_pressed"]
-[connection signal="toggled" from="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Legacy" to="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Events" method="_toggle_legacy"]
+[connection signal="toggled" from="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Toggles/Legacy" to="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Events" method="_toggle_legacy"]
+[connection signal="toggled" from="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Toggles/Inject" to="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Events" method="_on_Inject_toggled"]
 [connection signal="pressed" from="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/ClearEventOfType" to="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Events" method="_on_ClearEvent_pressed"]
+[connection signal="toggled" from="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/ClearOpts/ClearPOI" to="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Events" method="_on_ClearPOI_toggled"]
 
 [editable path="NoMargins/TabHintContainer"]

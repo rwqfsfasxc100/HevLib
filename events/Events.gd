@@ -14,6 +14,9 @@ var busy = false
 var focusObject
 
 var use_legacy = false
+var use_inject = false
+
+var clear_related_poi = true
 
 func _on_SpawnNow_pressed():
 	var ev = cnode
@@ -24,6 +27,8 @@ func _on_SpawnNow_pressed():
 	var params = {}
 	if use_legacy:
 		params["legacy"] = true
+	if use_inject:
+		params["spawn_now"] = true
 	pointers.Events.__spawn_event(ev,ring,params)
 
 var spawnDirectionScale = 0.75
@@ -106,8 +111,23 @@ onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 #const Events = preload("res://HevLib/pointers/Events.gd")
 func _on_ClearEvent_pressed():
 	
-	pointers.Events.__clear_event(cnode,ring)
+	pointers.Events.__clear_event(cnode,ring,clear_related_poi)
 
-
+onready var legacy_button = get_node_or_null(NodePath("../Toggles/Legacy"))
+onready var inject_button = get_node_or_null(NodePath("../Toggles/Inject"))
 func _toggle_legacy(how):
 	use_legacy = how
+	if how:
+		inject_button.pressed = false
+		use_inject = false
+
+
+func _on_Inject_toggled(how):
+	use_inject = how
+	if how:
+		legacy_button.pressed = false
+		use_legacy = false
+
+
+func _on_ClearPOI_toggled(how):
+	clear_related_poi = how

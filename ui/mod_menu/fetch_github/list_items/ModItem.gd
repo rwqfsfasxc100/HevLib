@@ -35,15 +35,16 @@ func add_mod():
 	var avatar_path = githubOwner.get("avatar_url","")
 	user_icon_uuid = githubOwner.get("node_id")
 	unique_icon = filepath + user_icon_uuid + ".png"
-	var icon_path = formatted_data["header_data"].get("MOD_ICON",avatar_path)
+	var icon_path : String = formatted_data["header_data"].get("MOD_ICON",avatar_path)
 	if icon_path != avatar_path:
 		unique_icon = filepath + "modicon_%s" % [hash(icon_path)] + ".png"
-	if not dir.file_exists(unique_icon):
-		http.download_file = unique_icon
-		http.request(icon_path)
-	else:
-		icon += 1
-		set_icon_to(unique_icon)
+	if icon_path:
+		if not dir.file_exists(unique_icon):
+			http.download_file = unique_icon
+			http.request(icon_path)
+		else:
+			mode += 1
+			set_icon_to(unique_icon)
 
 	
 	list.add_mod_count()
@@ -97,9 +98,9 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 func format_description(data:String):
 	var headerData = {}
 	var textData = ""
-	for line in data.split("\n"):
+	for line in PoolStringArray(data.split("\n")):
 		if line.begins_with(";"):
-			var d = line.split(";")[1].split("|")
+			var d = PoolStringArray(line.lstrip(";").split("|"))
 			if d.size() == 2:
 				headerData[d[0]] = d[1].strip_escapes()
 		else:

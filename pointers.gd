@@ -3415,9 +3415,9 @@ class _Events:
 		var f = scripts[0].new()
 		f.spawn_event(event,thering,parameters)
 	
-	func __clear_event(event,ring):
+	func __clear_event(event,ring,clear_related_poi):
 		var f = scripts[1].new()
-		f.clear_event(event,ring)
+		f.clear_event(event,ring,clear_related_poi)
 	
 
 class _FileAccess:
