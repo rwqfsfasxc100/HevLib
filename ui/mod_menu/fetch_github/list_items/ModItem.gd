@@ -2,7 +2,7 @@ extends HBoxContainer
 
 var DATA = {}
 var list
-var formatted_data = {"readme":""}
+var formatted_data = {"readme":"","header_data":{}}
 
 signal done(box)
 signal pressed(data)
@@ -35,7 +35,7 @@ func add_mod():
 	var author_label = get_node("MOD_BUTTON/VBoxContainer/AUTHOR")
 	var http = get_node("HTTPRequest")
 	button.connect("pressed",self,"_pressed")
-	name_label.text = DATA.get("name","")
+	name_label.text = formatted_data["header_data"].get("MOD_NAME",DATA.get("name",""))
 	var githubOwner = DATA.get("owner",{})
 	author_label.text = githubOwner.get("login","")
 	
