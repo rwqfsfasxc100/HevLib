@@ -50,7 +50,7 @@ func get_readme():
 	yield(CurrentGame.get_tree(),"idle_frame")
 	var branch = DATA.get("default_branch")
 	var pathName = DATA.get("full_name")
-	var path = "https://raw.githubusercontent.com/%s/refs/heads/%s/MOD_DESCRIPTION.txt" % [pathName,branch]
+	var path = "https://raw.githubusercontent.com/%s/refs/heads/%s/MOD_DETAILS.txt" % [pathName,branch]
 	readmePath = path
 	get_node("HTTPRequest").request(path)
 	
@@ -74,8 +74,11 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 	if result == HTTPRequest.RESULT_SUCCESS and response_code != 404:
 		var data = body.get_string_from_utf8()
 		format_description(data)
-		
-		add_mod()
+		var id = formatted_data["header_data"].get("MOD_ID","")
+		if id in list.mod_ids:
+			Tool.remove(self)
+		else:
+			add_mod()
 	else:
 		Tool.remove(self)
 
@@ -86,13 +89,16 @@ func format_description(data:String):
 		if line.begins_with(";"):
 			var d = line.split(";")[1].split("|")
 			if d.size() == 2:
-				headerData[d[0]] = d[1]
+				headerData[d[0]] = d[1].strip_escapes()
 		else:
 			if textData:
 				textData += "\n" + line
+			else:
+				textData = line
 	
 	
 	formatted_data["readme"] = textData
+	formatted_data["header_data"] = headerData
 
 func _tree_entered():
 	get_readme()

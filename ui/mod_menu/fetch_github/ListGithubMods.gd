@@ -21,6 +21,7 @@ var mod_item = load("res://HevLib/ui/mod_menu/fetch_github/list_items/ModItem.ts
 signal icon_downloaded(uuid)
 
 onready var pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
+onready var mod_ids = pointers.ManifestV2.__get_mod_ids()
 func _ready():
 	if prevent_load:
 		return
