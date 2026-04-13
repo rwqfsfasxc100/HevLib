@@ -73,11 +73,26 @@ func set_icon_to(path):
 func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 	if result == HTTPRequest.RESULT_SUCCESS and response_code != 404:
 		var data = body.get_string_from_utf8()
-		formatted_data["readme"] = data
+		format_description(data)
+		
 		add_mod()
 	else:
 		Tool.remove(self)
 
+func format_description(data:String):
+	var headerData = {}
+	var textData = ""
+	for line in data.split("\n"):
+		if line.begins_with(";"):
+			var d = line.split(";")[1].split("|")
+			if d.size() == 2:
+				headerData[d[0]] = d[1]
+		else:
+			if textData:
+				textData += "\n" + line
+	
+	
+	formatted_data["readme"] = textData
 
 func _tree_entered():
 	get_readme()
