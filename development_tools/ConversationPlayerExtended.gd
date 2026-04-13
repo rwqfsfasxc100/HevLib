@@ -15,6 +15,7 @@ export (bool) var invert_config_logic = false
 
 
 export (String) var special_name = ""
+export (bool) var set_special_price = false
 export (int) var special_price = 0
 
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
@@ -25,7 +26,7 @@ func execute():
 	
 	if special_name and "specialName" in origin:
 		origin.specialName = special_name
-	if special_price and "specialPrice" in origin:
+	if set_special_price and "specialPrice" in origin:
 		origin.specialPrice = special_price
 	
 	

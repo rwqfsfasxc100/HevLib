@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://HevLib/ui/mod_menu/fetch_github/FetchGithub.gd" type="Script" id=1]
 [ext_resource path="res://HevLib/ui/mod_menu/AnimateAppear.tscn" type="PackedScene" id=2]
@@ -6,7 +6,6 @@
 [ext_resource path="res://HevLib/ui/mod_menu/fetch_github/ListGithubMods.gd" type="Script" id=4]
 [ext_resource path="res://HevLib/ui/themes/fonts/courier_new/font-courierbold.tres" type="DynamicFont" id=5]
 [ext_resource path="res://enceladus/ScrollWithAnalog.gd" type="Script" id=6]
-[ext_resource path="res://HevLib/development_tools/markdown/Markdown.tscn" type="PackedScene" id=7]
 
 [node name="FetchGithub" type="Popup"]
 margin_right = 40.0
@@ -93,7 +92,9 @@ margin_right = 1280.0
 margin_bottom = 720.0
 size_flags_horizontal = 3
 
-[node name="Markdown" parent="base/VBoxContainer/Content/Info" instance=ExtResource( 7 )]
+[node name="RichTextLabel" type="RichTextLabel" parent="base/VBoxContainer/Content/Info"]
+margin_right = 40.0
+margin_bottom = 40.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 

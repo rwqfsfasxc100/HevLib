@@ -29,12 +29,16 @@ func _ready():
 	downloader.connect("request_completed",self,"download_complete")
 	count.text = TranslationServer.translate("HEVLIB_GITHUBMODS_COUNT") % [0]
 
-
+var mod_count = 0
 func request_complete(result, response_code, headers, body):
 	var json = JSON.parse(body.get_string_from_utf8()).result
 	if json:
-		count.text = TranslationServer.translate("HEVLIB_GITHUBMODS_COUNT") % [json.get("total_count",0)]
+		count.text = mod_count
 		fill_in_mods(json.get("items",[]))
+
+func add_mod_count():
+	mod_count += 1
+	count.text = TranslationServer.translate("HEVLIB_GITHUBMODS_COUNT") % mod_count
 
 func fill_in_mods(items : Array):
 	pointers.FolderAccess.__check_folder_exists(icon_folder_path)
@@ -77,6 +81,7 @@ func download_complete(result, response_code, headers, body):
 		last_uuid = ""
 
 func _mod_selected(mod):
-	info.get_node("Markdown")._set_markdown_text(mod["readme"])
-	
+	var rich = info.get_node("RichTextLabel")
+	rich.clear()
+	rich.parse_bbcode(mod["readme"])
 	pass

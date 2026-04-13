@@ -14,16 +14,8 @@ var user_icon_uuid = ""
 func boot():
 	# Also rework fetch FS to use the following:
 	# https://api.github.com/repos/company/project/contents/
-	
-	var icon = get_node("ICON")
-	var button = get_node("MOD_BUTTON")
-	var name_label = get_node("MOD_BUTTON/VBoxContainer/NAME")
-	var author_label = get_node("MOD_BUTTON/VBoxContainer/AUTHOR")
-	var http = get_node("HTTPRequest")
-	button.connect("pressed",self,"_pressed")
+	visible = false
 	var githubOwner = DATA.get("owner",{})
-	name_label.text = DATA.get("name","")
-	author_label.text = githubOwner.get("login","")
 	var avatar_path = githubOwner.get("avatar_url","")
 	user_icon_uuid = githubOwner.get("node_id")
 	unique_icon = filepath + user_icon_uuid + ".png"
@@ -35,13 +27,30 @@ func boot():
 	
 	finished()
 
+func add_mod():
+	
+	var icon = get_node("ICON")
+	var button = get_node("MOD_BUTTON")
+	var name_label = get_node("MOD_BUTTON/VBoxContainer/NAME")
+	var author_label = get_node("MOD_BUTTON/VBoxContainer/AUTHOR")
+	var http = get_node("HTTPRequest")
+	button.connect("pressed",self,"_pressed")
+	name_label.text = DATA.get("name","")
+	var githubOwner = DATA.get("owner",{})
+	author_label.text = githubOwner.get("login","")
+	
+	
+	
+	list.add_mod_count()
+	visible = true
+
 var filepath = "user://cache/.Mod_Menu_2_Cache/github_list/icon_cache/"
 var readmePath = ""
 func get_readme():
 	yield(CurrentGame.get_tree(),"idle_frame")
 	var branch = DATA.get("default_branch")
 	var pathName = DATA.get("full_name")
-	var path = "https://raw.githubusercontent.com/%s/refs/heads/%s/README.md" % [pathName,branch]
+	var path = "https://raw.githubusercontent.com/%s/refs/heads/%s/MOD_DESCRIPTION.txt" % [pathName,branch]
 	readmePath = path
 	get_node("HTTPRequest").request(path)
 	
@@ -65,6 +74,8 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 	if result == HTTPRequest.RESULT_SUCCESS and response_code != 404:
 		var data = body.get_string_from_utf8()
 		formatted_data["readme"] = data
+	else:
+		Tool.remove(self)
 
 
 func _tree_entered():
