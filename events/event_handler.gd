@@ -51,7 +51,7 @@ func getPos(params : Dictionary):
 	var odditySpawnRadiusMinCutscene = params.get("oddity_spawn_radius_min_cutscene",6000)
 	var odditySpawnRadiusMax = params.get("oddity_spawn_radius_max",38000)
 	var odditySpawnRadiusSafemax = params.get("oddity_spawn_radius_safe_max",80000)
-	var odditySpawnFailures = params.get("oddity_spawn_failures",0)
+	var odditySpawnFailures = 0
 	var odditySpawnRadiusSafemaxSteps = params.get("oddity_spawn_radius_safe_max_steps",40)
 	
 	if Tool.claim(focusObject):

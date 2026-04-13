@@ -74,7 +74,6 @@ __meta__ = {
 }
 
 [node name="EVENTDRIVER_MENU" type="Tabs" parent="NoMargins/TabHintContainer/TabsWithGamepadControl"]
-visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 1.0
@@ -162,6 +161,7 @@ margin_bottom = 210.0
 text = "EVENTDRIVER_CLEAREVENT"
 
 [node name="EVENTDRIVER_EVENT_SELECTOR" type="Tabs" parent="NoMargins/TabHintContainer/TabsWithGamepadControl"]
+visible = false
 margin_right = 40.0
 margin_bottom = 49.0
 

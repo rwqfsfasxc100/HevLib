@@ -188,12 +188,6 @@ func _ready():
 	veinImage = veins.get_data()
 	veinSize = veinImage.get_size()
 	
-#	var de = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
-#	if de == null:
-#		
-	
-	
-	
 	pointers.ConfigDriver.__establish_connection("updateValues",self)
 	if not playlist:
 		yield(get_tree(),"idle_frame")
@@ -214,30 +208,3 @@ func wipe_lists():
 
 
 
-
-#func exitNearby(what, id):
-#	if id in potential_events:
-#		current_event_log[id].merge({"time_exited":Time.get_datetime_dict_from_system(true)})
-#		logEvents()
-#	.exitNearby(what, id)
-#
-#func enterNearby(what, id):
-#	if id in potential_events:
-#		var log_data = potential_events[id]
-#		log_data.merge({"time_added":Time.get_datetime_dict_from_system(true)})
-#		current_event_log.merge({id:log_data})
-#		logEvents()
-#		potential_events.clear()
-#	.enterNearby(what, id)
-#
-#var potential_events = {}
-#func getNextOnPlaylist():
-#	var o = .getNextOnPlaylist()
-#	var log_data = {}
-#	var id = hash(o)
-#	log_data.merge({"object":o})
-#	var n = o.name
-#	log_data.merge({"time_added":Time.get_datetime_dict_from_system(true)})
-#	potential_events.merge({id:log_data})
-##	logEvents()
-#	return o

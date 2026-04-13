@@ -11,9 +11,6 @@ var defaultTestSpecificStoryElement = ""
 
 var busy = false
 
-var sliderOdditiesEvery = 450
-var sliderValue = 0
-
 var focusObject
 
 func _on_SpawnNow_pressed():
@@ -59,7 +56,7 @@ func _ready():
 		var value = defaultOdditiesEvery
 		
 		get_parent().get_node("HBoxContainer/Timer").text = "%s s" % value
-		
+		get_parent().get_node("HSlider").value = value
 		
 		addEvents()
 var event_objects = {}
