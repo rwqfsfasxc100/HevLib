@@ -1,6 +1,6 @@
 ;MOD_ID|hev.E
 ;MOD_NAME|HevLib
 
-[b]HevLib[/]
+[b]HevLib[/b]
 
 Description
