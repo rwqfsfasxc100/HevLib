@@ -1,6 +1,6 @@
-;MOD_ID|hev.E
+;MOD_ID|hev.EXAMPLE
 ;MOD_NAME|HevLib
-;MOD_ICON|
+;MOD_ICON|https://raw.githubusercontent.com/rwqfsfasxc100/IndustriesOfEnceladusRewrite/refs/heads/main/icon.png
 
 [b]HevLib[/b]
 
