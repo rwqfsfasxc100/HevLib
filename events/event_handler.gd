@@ -7,10 +7,6 @@ var busy = false
 var defaultOdditiesEvery = 450
 var defaultTestSpecificStoryElement = ""
 
-func _ready():
-	var timer = load("res://HevLib/scenes/timer/Timer.tscn").instance()
-	timer.name = "Timer"
-	add_child(timer)
 var focusObject
 const default_parameter_dict = {}
 func spawn_event(event,thering: Node,parameters : Dictionary = {}):
@@ -27,7 +23,7 @@ func spawn_event(event,thering: Node,parameters : Dictionary = {}):
 			yield(ring.get_tree().create_timer(0.1),"timeout")
 			ring.testSpecificStoryElement = ""
 			ring.oddityCounter = counter
-		else:
+		elif parameters.get("inject",false):
 			focusObject = CurrentGame.getPlayerShip()
 			if focusObject.zone == "rings":
 				var tree = ring.get_tree()
@@ -38,6 +34,36 @@ func spawn_event(event,thering: Node,parameters : Dictionary = {}):
 					var oddity = event_node.makeAt(pos)
 					if oddity and ring.has_method("request_event"):
 						ring.request_event(oddity, event)
+		else:
+			focusObject = CurrentGame.getPlayerShip()
+			if focusObject.zone == "rings":
+				var tree = ring.get_tree()
+				var event_node = ring.get_node_or_null(event)
+				if event_node and event_node.has_method("canBeAt") and event_node.has_method("makeAt"):
+					var pos = getPos(parameters)
+					event_node.canBeAt(pos)
+					var oddity = event_node.makeAt(pos)
+					if ring.has_method("oddity_spawning"):
+						ring.oddity_spawning(event, oddity)
+					
+					var randomOddityKey = ""
+					if oddity:
+						ring.addNearbyOddity(event, oddity, pos)
+						if oddity is Array:
+							for o in oddity:
+								o.connect("tree_entered", ring, "forcedOddityConfirmed", [randomOddityKey])
+						else:
+							oddity.connect("tree_entered", ring, "forcedOddityConfirmed", [randomOddityKey])
+						ring.unspawnedOddities[randomOddityKey] = oddity
+						ring.unspawnedOdditiesLocation[randomOddityKey] = pos
+					
+#					if oddity and ring.has_method("requestOdditySpawn"):
+#						if oddity is Array:
+#							for o in oddity:
+#								ring.requestOdditySpawn(o)
+#						else:
+#							ring.requestOdditySpawn(oddity)
+		
 		busy = false
 		
 		
@@ -84,6 +110,10 @@ func getPos(params : Dictionary):
 
 
 
+func _ready():
+	var timer = load("res://HevLib/scenes/timer/Timer.tscn").instance()
+	timer.name = "Timer"
+	add_child(timer)
 
 func startEventTimerNode():
 	busy = true

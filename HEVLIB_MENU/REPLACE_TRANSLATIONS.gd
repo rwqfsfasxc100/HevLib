@@ -2081,6 +2081,26 @@ const TRANSLATIONS = {
 		"EVENTDRIVER_LEGACY": {
 			"string": "Use legacy spawn handler?",
 			"version_hash": 2630802733
+		},
+		"EVENTDRIVER_INJECT": {
+			"string": "Inject oddity?",
+			"version_hash": 548009294
+		},
+		"EVENTDRIVER_SPAWNER_CONTROLS": {
+			"string": "Spawn event controls",
+			"version_hash": 383031684
+		},
+		"EVENTDRIVER_CLEARER_CONTROLS": {
+			"string": "Clear event controls",
+			"version_hash": 3681275490
+		},
+		"EVENTDRIVER_CLEAR_RELATED_POI": {
+			"string": "Clear related POI",
+			"version_hash": 3673548405
+		},
+		"EVENTDRIVER_CLEAR_RELATED_POI_TOOLTIP": {
+			"string": "POI-based events create a location inside the astrogation cache, and will respawn when cleared normally. \n\nThis toggle will remove a POI for the event if it is nearby.",
+			"version_hash": 2980544907
 		}
 	},
 	"uk_UA": {

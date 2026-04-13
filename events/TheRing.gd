@@ -50,6 +50,11 @@ func updateValues():
 				if not event in disabled_events:
 					playlist.append(get_node(event))
 
+func forcedOddityConfirmed(which):
+	unspawnedOddities.erase(which)
+	unspawnedOdditiesLocation.erase(which)
+	Debug.l("forced oddity %s confirmed (somehow)" % [which])
+
 func request_event(oddity,event):
 	mod_requested_events.append(oddity)
 	Debug.l("HevLib Event Driver: event %s requested" % event)
@@ -81,6 +86,10 @@ func getOddityAt(pos: Vector2):
 	return .getOddityAt(pos)
 
 func addNearbyOddity(nearby, oddity, pos: Vector2):
+	oddity_spawning(nearby, oddity)
+	.addNearbyOddity(nearby, oddity, pos)
+
+func oddity_spawning(nearby, oddity):
 	if oddity is Array:
 		for o in oddity:
 			if not nearby in group:
@@ -92,8 +101,6 @@ func addNearbyOddity(nearby, oddity, pos: Vector2):
 			group[nearby] = []
 		group[nearby].append(oddity)
 		all_oddities.append(oddity)
-	.addNearbyOddity(nearby, oddity, pos)
-
 
 func enterNearby(what, id):
 	if not what in current_event_log:
