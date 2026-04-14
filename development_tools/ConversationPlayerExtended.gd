@@ -19,6 +19,9 @@ export (String) var special_name = ""
 export (bool) var set_special_price = false
 export (int) var special_price = 0
 
+# If set, only permits the conversation path if the current crew has a specific occupation
+export (String) var requires_occupation = ""
+
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 func execute():
 	.execute()
@@ -44,3 +47,19 @@ func canBeUsed(by) -> bool:
 				if !cfg_opt:
 					how = false
 	return how 
+
+func specificTest(ship) -> bool:
+	if requires_occupation and requires_occupation != "":
+		var member = getAgendaMember()
+		if member == null:
+			Debug.l("** Requires occupation %s, none on ship" % [requires_occupation])
+			return false
+		var mo = member.occupation
+		if mo != requires_occupation:
+			Debug.l("** Needs occupation %s, has %s" % [requires_occupation,mo])
+			return false
+	
+	
+	return .specificTest(ship)
+
+
