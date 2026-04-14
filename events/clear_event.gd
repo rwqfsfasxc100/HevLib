@@ -23,12 +23,12 @@ func clear_event(event: String, ring, clear_related_poi : bool = true):
 						Tool.remove(e)
 						
 
-func clear_poi_for(globalPos : Vector2,event: String):
+func clear_poi_for(globalPos : Vector2,this_event: String):
 #	var focus = CurrentGame.getPlayerShip()
 	
 	var nearby = CurrentGame.getEventNear(CurrentGame.globalCoords(globalPos))
 	
-	if nearby:
+	if nearby and nearby.event == this_event:
 		var astro = CurrentGame.state.astrogation
 		for event in astro:
 			var ev = astro[event]
