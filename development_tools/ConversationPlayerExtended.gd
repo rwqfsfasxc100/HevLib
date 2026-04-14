@@ -13,8 +13,9 @@ export (String) var config_setting = ""
 # Whether the configuration should prevent the config when true
 export (bool) var invert_config_logic = false
 
-
+# If set, used to define a special name given to the object at the dive summary screen
 export (String) var special_name = ""
+# Used to decide whether to set a special price and the value of that price at the dive summary screen
 export (bool) var set_special_price = false
 export (int) var special_price = 0
 
