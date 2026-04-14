@@ -367,13 +367,14 @@ func _downloaded_zip(file, filepath):
 	updates_button.visible = false
 var tween
 func _visibility_changed():
-	yield(CurrentGame.get_tree(),"idle_frame")
-	var count = 0.03125
-	for child in listContainer.get_children():
-		if "MOD_INFO" in child:
-			tween.interpolate_property(child,"modulate",Color(1,1,1,0),Color(1,1,1,1),0.25,Tween.TRANS_LINEAR,Tween.EASE_IN,count)
-			tween.start()
-			count += 0.03125
+	if visible:
+		yield(CurrentGame.get_tree(),"idle_frame")
+		var count = 0.03125
+		for child in listContainer.get_children():
+			if "MOD_INFO" in child:
+				tween.interpolate_property(child,"modulate",Color(1,1,1,0),Color(1,1,1,1),0.25,Tween.TRANS_LINEAR,Tween.EASE_IN,count)
+				tween.start()
+				count += 0.03125
 
 func hide_mods():
 	for child in listContainer.get_children():

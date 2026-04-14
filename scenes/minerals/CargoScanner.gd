@@ -3,7 +3,7 @@ extends "res://hud/CargoScanner.gd"
 var HevLib_pointers
 
 func _enter_tree():
-	HevLib_pointers = get_tree().get_root().get_node_or_null("HevLib~HevLib_pointers")
+	HevLib_pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	HevLib_pointers.ConfigDriver.__establish_connection("updateValues",self)
 	updateValues()
 
