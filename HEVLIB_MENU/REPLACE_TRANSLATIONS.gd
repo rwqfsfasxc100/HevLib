@@ -2094,13 +2094,45 @@ const TRANSLATIONS = {
 			"string": "Clear event controls",
 			"version_hash": 3681275490
 		},
-		"EVENTDRIVER_CLEAR_RELATED_POI": {
+		"EVENTDRIVER_CLEAR_POI": {
 			"string": "Clear related POI",
 			"version_hash": 3673548405
 		},
-		"EVENTDRIVER_CLEAR_RELATED_POI_TOOLTIP": {
+		"EVENTDRIVER_CLEAR_POI_TOOLTIP": {
 			"string": "POI-based events create a location inside the astrogation cache, and will respawn when cleared normally. \n\nThis toggle will remove a POI for the event if it is nearby.",
 			"version_hash": 2980544907
+		},
+		"EVENTDRIVER_CLEAR_CARGO": {
+			"string": "Clear in cargo?",
+			"version_hash": 3991202254
+		},
+		"EVENTDRIVER_EVENTS_TOOLTIP": {
+			"string": "The desired event to spawn/clear\n\"none\" - spawn random event / clear all events",
+			"version_hash": 2910940133
+		},
+		"EVENTDRIVER_TIMER_TOOLTIP": {
+			"string": "The time between event spawns in seconds",
+			"version_hash": 1166419779
+		},
+		"EVENTDRIVER_SPAWNNOW_TOOLTIP": {
+			"string": "Spawns the selected event.\nIf \"none\" selected, spawns random event",
+			"version_hash": 2314890076
+		},
+		"EVENTDRIVER_LEGACY_TOOLTIP": {
+			"string": "Use a very old system using testSpecificStoryElement to spawn the event",
+			"version_hash": 555589987
+		},
+		"EVENTDRIVER_INJECT_TOOLTIP": {
+			"string": "Have the event's objects placed directly into the ring. \nThis bypasses regular event spawning mechanics, and may cause irregularities",
+			"version_hash": 324336902
+		},
+		"EVENTDRIVER_CLEAREVENT_TOOLTIP": {
+			"string": "Clears all events of the selected type.\nIf \"none\" selected, clears all events",
+			"version_hash": 30519526
+		},
+		"EVENTDRIVER_CLEAR_CARGO_TOOLTIP": {
+			"string": "If selected, also clears all oddities directly spawned by an event that are inside your cargo bay.",
+			"version_hash": 917771176
 		}
 	},
 	"uk_UA": {

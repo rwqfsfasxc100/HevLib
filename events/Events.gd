@@ -17,6 +17,7 @@ var use_legacy = false
 var use_inject = false
 
 var clear_related_poi = true
+var clear_in_cargo = false
 
 func _on_SpawnNow_pressed():
 	var ev = cnode
@@ -111,7 +112,7 @@ onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 #const Events = preload("res://HevLib/pointers/Events.gd")
 func _on_ClearEvent_pressed():
 	
-	pointers.Events.__clear_event(cnode,ring,clear_related_poi)
+	pointers.Events.__clear_event(cnode,ring,clear_related_poi,clear_in_cargo)
 
 onready var legacy_button = get_node_or_null(NodePath("../Toggles/Legacy"))
 onready var inject_button = get_node_or_null(NodePath("../Toggles/Inject"))
@@ -131,3 +132,7 @@ func _on_Inject_toggled(how):
 
 func _on_ClearPOI_toggled(how):
 	clear_related_poi = how
+
+
+func _on_ClearInCargo_toggled(how):
+	clear_in_cargo = how

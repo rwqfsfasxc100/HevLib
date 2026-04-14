@@ -93,18 +93,19 @@ custom_constants/margin_bottom = 48
 
 [node name="MarginContainer" type="MarginContainer" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer"]
 margin_top = 16.0
-margin_right = 1078.0
+margin_right = 1109.0
 margin_bottom = 816.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer"]
-margin_right = 1078.0
+margin_right = 1109.0
 margin_bottom = 800.0
 rect_min_size = Vector2( 690, 800 )
 custom_constants/separation = 6
 
 [node name="Events" type="OptionButton" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
-margin_right = 1078.0
+margin_right = 1109.0
 margin_bottom = 41.0
+hint_tooltip = "EVENTDRIVER_EVENTS_TOOLTIP"
 align = 2
 script = ExtResource( 8 )
 
@@ -119,22 +120,22 @@ wait_time = 0.1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
 margin_top = 47.0
-margin_right = 1078.0
+margin_right = 1109.0
 margin_bottom = 86.0
 rect_min_size = Vector2( 1078, 0 )
 alignment = 2
 
 [node name="Label" type="Label" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/HBoxContainer"]
-margin_left = 367.0
-margin_right = 739.0
+margin_left = 398.0
+margin_right = 770.0
 margin_bottom = 39.0
 text = "EVENTDRIVER_TIMER"
 align = 1
 valign = 1
 
 [node name="Timer" type="Label" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/HBoxContainer"]
-margin_left = 743.0
-margin_right = 1078.0
+margin_left = 774.0
+margin_right = 1109.0
 margin_bottom = 39.0
 rect_min_size = Vector2( 335, 0 )
 text = "%s"
@@ -142,84 +143,97 @@ align = 2
 
 [node name="HSlider" type="HSlider" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
 margin_top = 92.0
-margin_right = 1078.0
+margin_right = 1109.0
 margin_bottom = 116.0
+hint_tooltip = "EVENTDRIVER_TIMER_TOOLTIP"
 min_value = 1.0
 max_value = 1350.0
 value = 1.0
 
 [node name="HSeparator" type="HSeparator" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
 margin_top = 122.0
-margin_right = 1078.0
+margin_right = 1109.0
 margin_bottom = 126.0
 
 [node name="SpawnHeader" type="Label" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
 margin_top = 132.0
-margin_right = 1078.0
+margin_right = 1109.0
 margin_bottom = 171.0
 text = "EVENTDRIVER_SPAWNER_CONTROLS"
 align = 1
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
 margin_top = 177.0
-margin_right = 1078.0
+margin_right = 1109.0
 margin_bottom = 218.0
 
 [node name="SpawnNow" type="Button" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/HBoxContainer2"]
-margin_right = 1078.0
+margin_right = 1109.0
 margin_bottom = 41.0
+hint_tooltip = "EVENTDRIVER_SPAWNNOW_TOOLTIP"
 size_flags_horizontal = 3
 text = "EVENTDRIVER_SPAWNNOW"
 
 [node name="Toggles" type="HBoxContainer" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
 margin_top = 224.0
-margin_right = 1078.0
+margin_right = 1109.0
 margin_bottom = 265.0
 
 [node name="Legacy" type="CheckButton" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Toggles"]
-margin_right = 537.0
+margin_right = 552.0
 margin_bottom = 41.0
+hint_tooltip = "EVENTDRIVER_LEGACY_TOOLTIP"
 size_flags_horizontal = 3
 text = "EVENTDRIVER_LEGACY"
 
 [node name="Inject" type="CheckButton" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Toggles"]
-margin_left = 541.0
-margin_right = 1078.0
+margin_left = 556.0
+margin_right = 1109.0
 margin_bottom = 41.0
+hint_tooltip = "EVENTDRIVER_INJECT_TOOLTIP"
 size_flags_horizontal = 3
 text = "EVENTDRIVER_INJECT"
 
 [node name="HSeparator2" type="HSeparator" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
 margin_top = 271.0
-margin_right = 1078.0
+margin_right = 1109.0
 margin_bottom = 275.0
 
 [node name="ClearHeader" type="Label" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
 margin_top = 281.0
-margin_right = 1078.0
+margin_right = 1109.0
 margin_bottom = 320.0
 text = "EVENTDRIVER_CLEARER_CONTROLS"
 align = 1
 
 [node name="ClearEventOfType" type="Button" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
 margin_top = 326.0
-margin_right = 1078.0
+margin_right = 1109.0
 margin_bottom = 367.0
+hint_tooltip = "EVENTDRIVER_CLEAREVENT_TOOLTIP"
 text = "EVENTDRIVER_CLEAREVENT"
 
 [node name="ClearOpts" type="HBoxContainer" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer"]
 margin_top = 373.0
-margin_right = 1078.0
+margin_right = 1109.0
 margin_bottom = 414.0
 size_flags_horizontal = 3
 
 [node name="ClearPOI" type="CheckButton" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/ClearOpts"]
-margin_right = 1078.0
+margin_right = 520.0
 margin_bottom = 41.0
-hint_tooltip = "EVENTDRIVER_CLEAR_RELATED_POI_TOOLTIP"
+hint_tooltip = "EVENTDRIVER_CLEAR_POI_TOOLTIP"
 size_flags_horizontal = 3
 pressed = true
-text = "EVENTDRIVER_CLEAR_RELATED_POI"
+text = "EVENTDRIVER_CLEAR_POI"
+
+[node name="ClearInCargo" type="CheckButton" parent="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/ClearOpts"]
+margin_left = 524.0
+margin_right = 1109.0
+margin_bottom = 41.0
+hint_tooltip = "EVENTDRIVER_CLEAR_CARGO_TOOLTIP"
+size_flags_horizontal = 3
+text = "EVENTDRIVER_CLEAR_CARGO"
 
 [node name="EVENTDRIVER_EVENT_SELECTOR" type="Tabs" parent="NoMargins/TabHintContainer/TabsWithGamepadControl"]
 visible = false
@@ -279,5 +293,6 @@ script = ExtResource( 7 )
 [connection signal="toggled" from="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Toggles/Inject" to="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Events" method="_on_Inject_toggled"]
 [connection signal="pressed" from="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/ClearEventOfType" to="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Events" method="_on_ClearEvent_pressed"]
 [connection signal="toggled" from="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/ClearOpts/ClearPOI" to="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Events" method="_on_ClearPOI_toggled"]
+[connection signal="toggled" from="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/ClearOpts/ClearInCargo" to="NoMargins/TabHintContainer/TabsWithGamepadControl/EVENTDRIVER_MENU/MarginContainer/MarginContainer/VBoxContainer/Events" method="_on_ClearInCargo_toggled"]
 
 [editable path="NoMargins/TabHintContainer"]
