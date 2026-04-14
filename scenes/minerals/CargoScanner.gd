@@ -1,15 +1,15 @@
 extends "res://hud/CargoScanner.gd"
 
-var pointers
+var HevLib_pointers
 
 func _enter_tree():
-	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-	pointers.ConfigDriver.__establish_connection("updateValues",self)
+	HevLib_pointers = get_tree().get_root().get_node_or_null("HevLib~HevLib_pointers")
+	HevLib_pointers.ConfigDriver.__establish_connection("updateValues",self)
 	updateValues()
 
 func updateValues():
-	if pointers:
-		cargo_limit = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","cargo_scanner_mineral_display_limit")
+	if HevLib_pointers:
+		cargo_limit = HevLib_pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","cargo_scanner_mineral_display_limit")
 
 var cargo_limit = 15
 
