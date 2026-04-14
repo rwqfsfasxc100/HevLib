@@ -25,7 +25,8 @@ func _unhandled_input(event):
 			Debug.l("Currently downloading a mod update, not closing wait window.")
 		elif $ModpacksMenu/WAIT.visible:
 			Debug.l("Currently downloading a mod, not closing wait window.")
-		
+		elif $FetchGithub/WAIT.visible:
+			Debug.l("Currently downloading a mod, not closing wait window.")
 		
 		
 		elif $ModpacksMenu/OpenPack.visible:

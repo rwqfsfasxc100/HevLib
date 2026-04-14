@@ -5,7 +5,9 @@ var list
 var formatted_data = {"readme":"","header_data":{}}
 
 signal done(box)
-signal pressed(data)
+signal pressed(data,box)
+
+var modPathPrefix = ""
 
 var pointers
 var dir = Directory.new()
@@ -18,7 +20,10 @@ func boot():
 	
 	pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	
-	
+	var gameInstallDirectory = OS.get_executable_path().get_base_dir()
+	if OS.get_name() == "OSX":
+		gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
+	modPathPrefix = gameInstallDirectory.plus_file("mods")
 	finished()
 
 func add_mod():
@@ -45,12 +50,15 @@ func add_mod():
 		else:
 			mode += 1
 			set_icon_to(unique_icon)
-
+	
+	get_downloads()
 	
 	list.add_mod_count()
 	visible = true
 
-var filepath = "user://cache/.Mod_Menu_2_Cache/github_list/icon_cache/"
+var base_folder_path = "user://cache/.Mod_Menu_2_Cache/github_list/"
+var filepath = base_folder_path + "icon_cache/"
+var zip_path = base_folder_path + "downloaded_zips/"
 var readmePath = ""
 func get_readme():
 	yield(CurrentGame.get_tree(),"idle_frame")
@@ -66,7 +74,7 @@ func get_readme():
 func finished():
 	emit_signal("done",self)
 func _pressed():
-	emit_signal("pressed",formatted_data)
+	emit_signal("pressed",formatted_data,self)
 
 
 func icon_announcement(u):
@@ -75,6 +83,9 @@ func icon_announcement(u):
 func set_icon_to(path):
 	get_node("ICON").texture = pointers.FileAccess.__load_png(path)
 
+var is_downloading = false
+var this_zip_filename = ""
+var this_zip_url = ""
 var mode = 0
 func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 	match mode:
@@ -93,7 +104,30 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 			if result == HTTPRequest.RESULT_SUCCESS and response_code != 404:
 				set_icon_to(unique_icon)
 				get_node("HTTPRequest").download_file = ""
+		2:
+			if result == HTTPRequest.RESULT_SUCCESS and response_code != 404:
+				var data = JSON.parse(body.get_string_from_utf8()).result[0]["assets"][0]
+				this_zip_filename = zip_path + data.get("name","temp.zip")
+				this_zip_url = data.get("browser_download_url")
+				list.btn_to_download.disabled = false
+				list.WAIT.hide()
+		3:
+			if result == HTTPRequest.RESULT_SUCCESS and response_code != 404:
+				var http = get_node("HTTPRequest")
+				pointers.FileAccess.__copy_file(this_zip_filename,modPathPrefix)
+				http.download_file = ""
+				this_zip_filename = ""
+				this_zip_url = ""
+				list.btn_to_download.grab_focus()
+				list.subtract_mod_count()
+				list.select_first_mod()
+				Tool.remove(self)
 	mode += 1
+
+var base_downloads_list = "https://api.github.com/repos/%s/releases"
+func get_downloads():
+	var downloads = base_downloads_list % [DATA.get("full_name")]
+	$HTTPRequest.request(downloads)
 
 func format_description(data:String):
 	var headerData = {}
@@ -112,6 +146,15 @@ func format_description(data:String):
 	
 	formatted_data["readme"] = textData
 	formatted_data["header_data"] = headerData
+
+func download_this_mod():
+	if not is_downloading and this_zip_filename and this_zip_url:
+		var http = get_node("HTTPRequest")
+		http.download_file = this_zip_filename
+		is_downloading = true
+		
+		http.request(this_zip_url)
+		list.btn_to_download.disabled = true
 
 func _tree_entered():
 	get_readme()

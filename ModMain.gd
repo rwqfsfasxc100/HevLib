@@ -78,11 +78,16 @@ func _ready():
 		pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/dependancies/")
 		pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/conflicts/")
 		pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/complementary/")
+		pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/github_list/icon_cache/")
+		pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/github_list/downloaded_zips/")
 		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Event_Driver/")
 		var zips = pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/",true,true)
+		var zips2 = pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/github_list/downloaded_zips/",true,true)
 		var manifests = pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/",true,true)
 		var d = Directory.new()
 		for f in zips:
+			d.remove(f)
+		for f in zips2:
 			d.remove(f)
 		for f in manifests:
 			d.remove(f)

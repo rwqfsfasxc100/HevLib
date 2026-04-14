@@ -2133,6 +2133,10 @@ const TRANSLATIONS = {
 		"EVENTDRIVER_CLEAR_CARGO_TOOLTIP": {
 			"string": "If selected, also clears all oddities directly spawned by an event that are inside your cargo bay.",
 			"version_hash": 917771176
+		},
+		"HEVLIB_DOWNLOAD_MOD": {
+			"string": "Download mod!",
+			"version_hash": 570592894
 		}
 	},
 	"uk_UA": {

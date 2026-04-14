@@ -5,9 +5,11 @@ const prevent_load = false
 export var path_to_httprequest = NodePath("../../../../api_fetcher")
 export var path_to_downloader = NodePath("../../../../download_files")
 export var path_to_root = NodePath("../../../..")
+export var path_to_download_btn = NodePath("../Info/HBoxContainer/DownloadMod")
 onready var http : HTTPRequest = get_node_or_null(path_to_httprequest)
 onready var downloader : HTTPRequest = get_node_or_null(path_to_downloader)
 onready var parent = get_node_or_null(path_to_root)
+onready var btn_to_download = get_node_or_null(path_to_download_btn)
 
 const topic_url_base = "https://api.github.com/search/repositories?q=topic:%s"
 const topic_dv = "delta-v-rings-of-saturn"
@@ -15,6 +17,9 @@ const topic_dv = "delta-v-rings-of-saturn"
 onready var count = $Header/Count
 onready var list = $Mods/ScrollContainer/ListMods
 onready var info = get_node_or_null(NodePath("../Info"))
+onready var rich = info.get_node("RichTextLabel")
+
+onready var WAIT = parent.get_node_or_null(NodePath("WAIT"))
 
 var mod_item = load("res://HevLib/ui/mod_menu/fetch_github/list_items/ModItem.tscn")
 
@@ -29,6 +34,9 @@ func _ready():
 	http.request(topic_url_base % [topic_dv])
 	downloader.connect("request_completed",self,"download_complete")
 	count.text = TranslationServer.translate("HEVLIB_GITHUBMODS_COUNT") % [0]
+	btn_to_download.disabled = true
+	
+	
 
 var mod_count = 0
 func request_complete(result, response_code, headers, body):
@@ -41,8 +49,11 @@ func add_mod_count():
 	mod_count += 1
 	count.text = TranslationServer.translate("HEVLIB_GITHUBMODS_COUNT") % mod_count
 
+func subtract_mod_count():
+	mod_count += 1
+	count.text = TranslationServer.translate("HEVLIB_GITHUBMODS_COUNT") % mod_count
+
 func fill_in_mods(items : Array):
-	pointers.FolderAccess.__check_folder_exists(icon_folder_path)
 	for item in items:
 		var box = mod_item.instance()
 		box.DATA = item
@@ -54,6 +65,7 @@ func fill_in_mods(items : Array):
 func add_box(box):
 	box.connect("pressed",self,"_mod_selected")
 	list.add_child(box)
+	select_first_mod()
 
 var icon_folder_path = "user://cache/.Mod_Menu_2_Cache/github_list/icon_cache/"
 var last_uuid = ""
@@ -62,8 +74,27 @@ func download_complete(result, response_code, headers, body):
 	emit_signal("icon_downloaded",last_uuid)
 	
 
-func _mod_selected(mod):
-	var rich = info.get_node("RichTextLabel")
+var current_button = null
+func _mod_selected(mod,btn):
 	rich.clear()
 	rich.parse_bbcode(mod["readme"])
-	pass
+	btn_to_download.disabled = true
+	current_button = btn
+
+func select_first_mod():
+	yield(CurrentGame.get_tree(),"physics_frame")
+	var v = list.get_children()
+	if list:
+		var first = v[0]
+		if first:
+			first._pressed()
+	else:
+		rich.clear()
+		btn_to_download.disabled = true
+		current_button = null
+	
+
+func _on_DownloadMod_pressed():
+	if current_button:
+		current_button.download_this_mod()
+		WAIT.show_menu()
