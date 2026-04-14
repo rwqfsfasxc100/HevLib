@@ -2138,791 +2138,1223 @@ const TRANSLATIONS = {
 	"uk_UA": {
 		"HEVLIB_MOD_BRIEF": {
 			"string": "Мод-бібліотека, що містить кілька загальних функцій, створених __hev",
-			"version_hash": 0
+			"version_hash": 504726156
 		},
 		"HEVLIB_MOD_DESCRIPTION": {
 			"string": "Бібліотека, що надає кілька функціональних частин:\\n\\n * Загальний функціонал через 'pointer' файли.\\n * Обробка файлів маніфесту модів через версіонування для створення єдиного середовища отримання інформації з них.\\n * EquipmentDriver - Додавання та управління предметами обладнання, слотами тощо...\\n * WeaponSlotDriver - Додавання та модифікація обладнання, що додається до кріплень корабля.\\n\\nЦя бібліотека також має на меті зберегти послідовний метод для полегшення створення модів. Сумісність з модами також є основним фокусом наданого функціоналу.\\n\\nДля отримання додаткової інформації, будь ласка, перевірте вікі цього мода. Якщо у вас є пропозиції чи ідеї, будь ласка, залиште їх у Discord або як issue на GitHub.",
-			"version_hash": 0
+			"version_hash": 1185923833
 		},
 		"HEVLIB_MOD_ERROR_HEADER": {
 			"string": "ПРОБЛЕМИ З МОДОМ %s",
-			"version_hash": 0
+			"version_hash": 3377428377
 		},
 		"HEVLIB_MOD_ERROR_DEPENDANCY_DIALOGUE_BOX": {
 			"string": "Наразі виявлено %s невиконаних залежностей модів. Будь ласка, задовольніть ці вимоги або видаліть моди, які їх потребують: %s",
-			"version_hash": 0
+			"version_hash": 368204025
 		},
 		"HEVLIB_GENERIC_ERROR_DIALOGUE_BOX": {
 			"string": "Щось пішло не так. Будь ласка, перезапустіть гру!",
-			"version_hash": 0
+			"version_hash": 605763982
 		},
 		"EVENTDRIVER_MENU": {
 			"string": "Меню налагодження EventDriver",
-			"version_hash": 0
+			"version_hash": 451113391
 		},
 		"EVENTDRIVER_EVENTS": {
 			"string": "Обрана подія",
-			"version_hash": 0
+			"version_hash": 3337649328
 		},
 		"EVENTDRIVER_TIMER": {
 			"string": "Таймер подій Storyteller",
-			"version_hash": 0
+			"version_hash": 3794017585
 		},
 		"EVENTDRIVER_SPAWNNOW": {
 			"string": "Примусовий спаун події з використанням обраної події",
-			"version_hash": 0
+			"version_hash": 2944227280
 		},
 		"EVENTDRIVER_EVENT_SELECTOR": {
 			"string": "Вибір події",
-			"version_hash": 0
+			"version_hash": 2551222664
 		},
 		"EVENTDRIVER_CLEAREVENT": {
 			"string": "Очистити обрану подію/події",
-			"version_hash": 0
+			"version_hash": 579909883
 		},
 		"HEVLIB_MISSING_DOCUMENTATION_1": {
 			"string": "!!!!! Для цієї функції не надано документації!",
-			"version_hash": 0
+			"version_hash": 3595625429
 		},
 		"HEVLIB_MISSING_DOCUMENTATION_2": {
 			"string": "!!!!! Будь ласка, повідомте мене (__hev) про це ЯКОМОГА ШВИДШЕ, оскільки документація є ключовою для таких бібліотек, як ця, для належної підтримки!",
-			"version_hash": 0
+			"version_hash": 3771196171
 		},
 		"HEVLIB_DESCRIPTION_PLACEHOLDER": {
 			"string": "Цей мод не має опису. \\n\\nБудь ласка, перевірте веб-сторінку або гілку форуму, де ви отримали цей мод, для інформації, або запитайте опис у автора.",
-			"version_hash": 0
+			"version_hash": 3310358705
 		},
 		"HEVLIB_SELF_CHECK_ERROR_MESSAGE": {
 			"string": "HevLib встановлено неправильно. Будь ласка, перевірте джерело завантаження та переконайтеся, що коренева папка виглядає наступним чином: HevLib.zip/HevLib/\\n\\nНатискання OK закриє гру та відкриє сторінку останнього релізу у вашому браузері.",
-			"version_hash": 0
+			"version_hash": 3685656617
 		},
 		"HEVLIB_SELF_CHECK_ERROR_HEADER": {
 			"string": "ПОМИЛКА ЗАВАНТАЖЕННЯ HEVLIB!",
-			"version_hash": 0
+			"version_hash": 1761231146
 		},
 		"HEVLIB_INCORRECT_SHIP": {
 			"string": "(ПОМИЛКА!) Відсутній тип судна: '%s'\\nЦе збереження не може бути відкрито, оскільки активне судно недоступне!\\nЩоб завантажити це збереження, будь ласка, перевстановіть мод, що містить цей тип судна!",
-			"version_hash": 0
+			"version_hash": 3862475614
 		},
 		"HEVLIB_SLOT": {
 			"string": "Слот",
-			"version_hash": 0
+			"version_hash": 2089577767
 		},
 		"HEVLIB_MOD_MENU": {
 			"string": "Меню модів",
-			"version_hash": 0
+			"version_hash": 3618868698
 		},
 		"HEVLIB_MISSING_MOD_NAME": {
 			"string": "Назва мода недоступна :(",
-			"version_hash": 0
+			"version_hash": 132557580
 		},
 		"HEVLIB_MISSING_DESCRIPTION": {
 			"string": "Цей мод не має опису :( \\n\\nБудь ласка, перевірте веб-сторінку або гілку форуму, де ви отримали цей мод, для інформації, або запитайте опис у автора.",
-			"version_hash": 0
+			"version_hash": 3469973573
 		},
 		"HEVLIB_AUTHOR": {
 			"string": "Автор:",
-			"version_hash": 0
+			"version_hash": 2829231346
 		},
 		"HEVLIB_CREDITS": {
 			"string": "Подяки:",
-			"version_hash": 0
+			"version_hash": 2336438541
 		},
 		"HEVLIB_UNKNOWN": {
 			"string": "Невідомо",
-			"version_hash": 0
+			"version_hash": 2604381749
 		},
 		"HEVLIB_MM_TOOLTIP_HEADER": {
 			"string": "Інформація про мод:",
-			"version_hash": 0
+			"version_hash": 2393777861
 		},
 		"HEVLIB_MM_TOOLTIP_ID": {
 			"string": "ID мода: %s",
-			"version_hash": 0
+			"version_hash": 2265364772
 		},
 		"HEVLIB_MM_TOOLTIP_MV": {
 			"string": "Версія маніфесту: %s",
-			"version_hash": 0
+			"version_hash": 2561429428
 		},
 		"HEVLIB_MM_TOOLTIP_ZIP": {
 			"string": "Zip-файл: %s",
-			"version_hash": 0
+			"version_hash": 3308902826
 		},
 		"HEVLIB_MM_TOOLTIP_LIBRARY": {
 			"string": "Бібліотека: %s \\ Завжди відображати: %s",
-			"version_hash": 0
+			"version_hash": 1617363745
 		},
 		"HEVLIB_MM_BUTTON_TOOLTIP_GITHUB": {
 			"string": "Сторінка мода на Github",
-			"version_hash": 0
+			"version_hash": 60488389
 		},
 		"HEVLIB_MM_BUTTON_TOOLTIP_DISCORD": {
 			"string": "Гілка мода в Discord",
-			"version_hash": 0
+			"version_hash": 87679173
 		},
 		"HEVLIB_MM_BUTTON_TOOLTIP_NEXUS": {
 			"string": "Сторінка Nexus mods",
-			"version_hash": 0
+			"version_hash": 3775372648
 		},
 		"HEVLIB_MM_BUTTON_TOOLTIP_DONATIONS": {
 			"string": "Пожертвувати проекту",
-			"version_hash": 0
+			"version_hash": 362649787
 		},
 		"HEVLIB_MM_BUTTON_TOOLTIP_WIKI": {
 			"string": "Вікі-сторінка мода",
-			"version_hash": 0
+			"version_hash": 1350544086
 		},
 		"HEVLIB_MM_BUTTON_TOOLTIP_BUGREPORTS": {
 			"string": "Повідомити про помилку",
-			"version_hash": 0
+			"version_hash": 1392941888
 		},
 		"HEVLIB_MM_BUTTON_TOOLTIP_CUSTOM": {
 			"string": "Більше...",
-			"version_hash": 0
+			"version_hash": 909612738
 		},
 		"HEVLIB_VANILLA_DESCRIPTION": {
 			"string": "Симулятор видобутку на основі фізики, дія якого відбувається в найгустішому полі уламків у Сонячній системі. Кожна дія має протидію, лазери невидимі без середовища, а ваша тяга є потужною зброєю. Знаходьте торгівлю, адаптуйте обладнання до свого стилю гри, наймайте екіпаж для допомоги. Розкривайте таємниці кілець або просто багатійте.",
-			"version_hash": 0
+			"version_hash": 3302886100
 		},
 		"HEVLIB_VANILLA_BRIEF": {
 			"string": "Оригінальна гра",
-			"version_hash": 0
+			"version_hash": 108259687
 		},
 		"HEVLIB_MODMENU_MODS": {
 			"string": "Моди",
-			"version_hash": 0
+			"version_hash": 2089365048
 		},
 		"HEVLIB_MODMENU_OK": {
 			"string": "Гаразд",
-			"version_hash": 0
+			"version_hash": 5862623
 		},
 		"HEVLIB_MODMENU_CLOSE": {
 			"string": "Закрити",
-			"version_hash": 0
+			"version_hash": 217614907
 		},
 		"HEVLIB_MODMENU_OPENFOLDER": {
 			"string": "Відкрити папку модів",
-			"version_hash": 0
+			"version_hash": 1431776550
 		},
 		"HEVLIB_MODMENU_MODS_VISIBLE": {
 			"string": "Відображається %d модів",
-			"version_hash": 0
+			"version_hash": 2827411840
 		},
 		"HEVLIB_DROP_FILES_TO_ADD_MODS": {
 			"string": "Перетягніть файли у це вікно, щоб додати моди.\\nФайли з однаковими назвами будуть перезаписані",
-			"version_hash": 0
+			"version_hash": 1054825256
 		},
 		"HEVLIB_MODMENU_VER_AND_PRIO": {
 			"string": "Версія: v%s / Пріоритет: %s",
-			"version_hash": 0
+			"version_hash": 2055836630
 		},
 		"HEVLIB_MODMENU_PRIO": {
 			"string": "Пріоритет: %s",
-			"version_hash": 0
+			"version_hash": 293290073
 		},
 		"HEVLIB_MODMENU_VERSION": {
 			"string": "Версія: v%s",
-			"version_hash": 0
+			"version_hash": 3570940819
 		},
 		"HEVLIB_MODMENU_PRIO_MID_HEADER": {
 			"string": "ID та пріоритет мода",
-			"version_hash": 0
+			"version_hash": 3551428199
 		},
 		"HEVLIB_GITHUB": {
 			"string": "GitHub",
-			"version_hash": 0
+			"version_hash": 3039441928
 		},
 		"HEVLIB_DISCORD": {
 			"string": "Discord",
-			"version_hash": 0
+			"version_hash": 1937677677
 		},
 		"HEVLIB_NEXUS": {
 			"string": "Nexusmods",
-			"version_hash": 0
+			"version_hash": 3566644875
 		},
 		"HEVLIB_DONATIONS": {
 			"string": "Зробити пожертву",
-			"version_hash": 0
+			"version_hash": 2458561600
 		},
 		"HEVLIB_WIKI": {
 			"string": "Вікі",
-			"version_hash": 0
+			"version_hash": 2089718105
 		},
 		"HEVLIB_BUGREPORTS": {
 			"string": "Повідомити про помилку",
-			"version_hash": 0
+			"version_hash": 1392941888
 		},
 		"HEVLIB_GITHUB_TOOLTIP": {
 			"string": "Репозиторій GitHub для цього проекту",
-			"version_hash": 0
+			"version_hash": 1410097863
 		},
 		"HEVLIB_DISCORD_TOOLTIP": {
 			"string": "Гілка/канал/сервер Discord для цього проекту",
-			"version_hash": 0
+			"version_hash": 281037778
 		},
 		"HEVLIB_NEXUS_TOOLTIP": {
 			"string": "Сторінка Nexusmods для цього проекту",
-			"version_hash": 0
+			"version_hash": 2831875367
 		},
 		"HEVLIB_DONATIONS_TOOLTIP": {
 			"string": "Пожертвувати цьому проекту",
-			"version_hash": 0
+			"version_hash": 362649787
 		},
 		"HEVLIB_WIKI_TOOLTIP": {
 			"string": "Вікі-сторінка(и) для цього проекту",
-			"version_hash": 0
+			"version_hash": 1482974745
 		},
 		"HEVLIB_BUGREPORTS_TOOLTIP": {
 			"string": "Повідомити про помилку через посилання проекту на звіти",
-			"version_hash": 0
+			"version_hash": 4054124463
 		},
 		"HEVLIB_FILTER_BY_TAGS": {
 			"string": "Фільтрувати моди за тегами",
-			"version_hash": 0
+			"version_hash": 464171496
 		},
 		"HEVLIB_SETTINGS_BUTTON_TOOLTIP": {
 			"string": "Відкрити меню налаштувань",
-			"version_hash": 0
+			"version_hash": 4289380645
 		},
 		"HEVLIB_LINKS_BUTTON": {
 			"string": "Посилання",
-			"version_hash": 0
+			"version_hash": 228179046
 		},
 		"HEVLIB_BUGREPORTS_BUTTON": {
 			"string": "Звіти про помилки",
-			"version_hash": 0
+			"version_hash": 3349318290
 		},
 		"HEVLIB_LINKS_TOOLTIP": {
 			"string": "Відобразити посилання проекту",
-			"version_hash": 0
+			"version_hash": 466114574
 		},
 		"TAG_ALLOW_ACHIEVEMENTS": {
 			"string": "Дозволяє досягнення",
-			"version_hash": 0
+			"version_hash": 1786747123
 		},
 		"TAG_QOL": {
 			"string": "QoL",
-			"version_hash": 0
+			"version_hash": 2157051683
 		},
 		"TAG_USING_HEVLIB_RESEARCH": {
 			"string": "Використовує дослідження HevLib",
-			"version_hash": 0
+			"version_hash": 3394429874
 		},
 		"TAG_VISUAL": {
-			"string": "Visual",
-			"version_hash": 0
+			"string": "Візуальні",
+			"version_hash": 3626485241
 		},
 		"TAG_FUN": {
-			"string": "Fun",
-			"version_hash": 0
+			"string": "Розважальні",
+			"version_hash": 193457198
 		},
 		"TAG_UI": {
 			"string": "Інтерфейс користувача (UI)",
-			"version_hash": 0
+			"version_hash": 1251064324
 		},
 		"TAG_ADDS_SHIPS": {
 			"string": "Додає нові кораблі",
-			"version_hash": 0
+			"version_hash": 10555442
 		},
 		"TAG_ADDS_EQUIPMENT": {
 			"string": "Додає нове обладнання",
-			"version_hash": 0
+			"version_hash": 153230275
 		},
 		"TAG_ADDS_GAMEPLAY_MECHANICS": {
 			"string": "Додає нові ігрові механіки",
-			"version_hash": 0
+			"version_hash": 1112044006
 		},
 		"TAG_ADDS_EVENTS": {
 			"string": "Додає нові події в кільцях",
-			"version_hash": 0
+			"version_hash": 1474324656
 		},
 		"TAG_HANDLE_EXTRA_CREW": {
 			"string": "Обробляє додатковий екіпаж",
-			"version_hash": 0
+			"version_hash": 1697697785
 		},
 		"HEVLIB_TAG_FILTER": {
 			"string": "Фільтрувати моди за тегом",
-			"version_hash": 0
+			"version_hash": 1706022613
 		},
 		"HEVLIB_VANILLA_STEAM_STORE": {
 			"string": "Steam",
-			"version_hash": 0
+			"version_hash": 236865663
 		},
 		"HEVLIB_VANILLA_STEAM_STORE_TOOLTIP": {
 			"string": "Відкриває сторінку гри в Steam",
-			"version_hash": 0
+			"version_hash": 3542265316
 		},
 		"HEVLIB_VANILLA_ITCH_STORE": {
 			"string": "itch.io",
-			"version_hash": 0
+			"version_hash": 2888975475
 		},
 		"HEVLIB_VANILLA_ITCH_STORE_TOOLTIP": {
 			"string": "Відкриває сторінку гри на itch.io",
-			"version_hash": 0
+			"version_hash": 2978883672
 		},
 		"HEVLIB_VANILLA_EPIC_STORE": {
 			"string": "Epic Games",
-			"version_hash": 0
+			"version_hash": 1050618451
 		},
 		"HEVLIB_VANILLA_EPIC_STORE_TOOLTIP": {
 			"string": "Відкриває сторінку гри в Epic Games",
-			"version_hash": 0
+			"version_hash": 2631198840
 		},
 		"HEVLIB_VANILLA_GOG_STORE": {
 			"string": "GOG",
-			"version_hash": 0
+			"version_hash": 193456994
 		},
 		"HEVLIB_VANILLA_GOG_STORE_TOOLTIP": {
 			"string": "Відкриває сторінку гри в GOG",
-			"version_hash": 0
+			"version_hash": 3604779527
 		},
 		"HEVLIB_CONFIG_SORT_BY_PRICE": {
 			"string": "Сортувати обладнання за ціною",
-			"version_hash": 0
+			"version_hash": 3049697875
 		},
 		"HEVLIB_CONFIG_SORT_BY_PRICE_TOOLTIP": {
 			"string": "Примусово сортує обладнання за ціною. Порушить сортування допоміжних (AUX) модулів за типом, але запобігає проблемам з модованим обладнанням.",
-			"version_hash": 0
+			"version_hash": 3695605117
 		},
 		"HEVLIB_CONFIG_SORT_SLOT_BY_TYPE": {
 			"string": "Сортувати слоти за типом",
-			"version_hash": 0
+			"version_hash": 2003290207
 		},
 		"HEVLIB_CONFIG_SORT_SLOT_BY_TYPE_TOOLTIP": {
 			"string": "Сортує слоти за подібністю. Запобігає довільному сортуванню модованих слотів.",
-			"version_hash": 0
+			"version_hash": 820864655
 		},
 		"HEVLIB_CONFIG_USE_LEGACY_EQUIPMENT_HANDLING": {
 			"string": "Використовувати застарілу обробку обладнання",
-			"version_hash": 0
+			"version_hash": 1321146980
 		},
 		"HEVLIB_CONFIG_USE_LEGACY_EQUIPMENT_HANDLING_TOOLTIP": {
 			"string": "Вмикає обробку обладнання як до версії 1.7. Використовуйте лише для старих модів, які не працюють з новою системою. Не очікуйте, що це спрацює для більшості модів.",
-			"version_hash": 0
+			"version_hash": 1725865707
 		},
 		"HEVLIB_CONFIG_WRITE_EVENTS": {
 			"string": "Записувати назви подій",
-			"version_hash": 0
+			"version_hash": 924663846
 		},
 		"HEVLIB_CONFIG_WRITE_EVENTS_TOOLTIP": {
 			"string": "Записує до кеш-файлу, розташованого в user://cache/.HevLib_Cache/current_events.txt, який містить усі події, завантажені грою на момент завантаження кілець.",
-			"version_hash": 0
+			"version_hash": 4263193676
 		},
 		"HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES": {
 			"string": "Показувати приховані бібліотеки",
-			"version_hash": 0
+			"version_hash": 342727087
 		},
 		"HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES_TOOLTIP": {
 			"string": "Робить видимою будь-яку бібліотеку без тегу always display.",
-			"version_hash": 0
+			"version_hash": 3751304199
 		},
 		"HEVLIB_CONFIG_INPUT_DEBUGGER": {
 			"string": "Налагоджувач вводу",
-			"version_hash": 0
+			"version_hash": 1682321818
 		},
 		"HEVLIB_CONFIG_INPUT_DEBUGGER_TOOLTIP": {
 			"string": "Відображає інформацію налагодження про поточний ввід.",
-			"version_hash": 0
+			"version_hash": 688163626
 		},
 		"HEVLIB_CONFIG_EVENT_DEBUGGER": {
 			"string": "Налагоджувач подій",
-			"version_hash": 0
+			"version_hash": 843030316
 		},
 		"HEVLIB_CONFIG_EVENT_DEBUGGER_TOOLTIP": {
 			"string": "Відкриває ключові події та відображає, активні вони чи неактивні.",
-			"version_hash": 0
+			"version_hash": 297150667
 		},
 		"HEVLIB_CONFIG_POSITION_DATA_DEBUGGER": {
 			"string": "Налагоджувач даних позиції",
-			"version_hash": 0
+			"version_hash": 710020793
 		},
 		"HEVLIB_CONFIG_POSITION_DATA_DEBUGGER_TOOLTIP": {
 			"string": "Відображає поточний хаос та приблизну кількість можливих подій під час занурення.",
-			"version_hash": 0
+			"version_hash": 3508993106
 		},
 		"HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS": {
 			"string": "Показувати точні події",
-			"version_hash": 0
+			"version_hash": 179893315
 		},
 		"HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS_TOOLTIP": {
 			"string": "Використовується разом з Налагоджувачем даних позиції. Відображає фактичну кількість подій у зоні. Через принцип роботи цього налаштування продуктивність знизиться на значну величину, і це генеруватиме тисячі логів за хвилину.\\n\\nВИКОРИСТАННЯ ЦЬОГО НАЛАШТУВАННЯ ПОВНІСТЮ НЕ ПІДТРИМУЄТЬСЯ І АНУЛЮЄ ВСІ ЗВІТИ ПРО ПОМИЛКИ! ВАС ПОПЕРЕДИЛИ!",
-			"version_hash": 0
+			"version_hash": 3996342359
 		},
 		"HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU": {
 			"string": "Меню налагодження подій",
-			"version_hash": 0
+			"version_hash": 1572595843
 		},
 		"HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU_TOOLTIP": {
 			"string": "Клавіші, що використовуються для відкриття меню налагодження подій.",
-			"version_hash": 0
+			"version_hash": 1644117010
 		},
 		"HEVLIB_CONFIG_OPEN_DEBUGGER": {
 			"string": "Перемкнути відображення налагодження",
-			"version_hash": 0
+			"version_hash": 3629985732
 		},
 		"HEVLIB_CONFIG_OPEN_DEBUGGER_TOOLTIP": {
 			"string": "Перемикає видимість консолі налагодження (--debug-console) без необхідності командного рядка.",
-			"version_hash": 0
+			"version_hash": 2762277725
 		},
 		"HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS": {
 			"string": "Меню налагодження HevLib",
-			"version_hash": 0
+			"version_hash": 2934186220
 		},
 		"HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS_TOOLTIP": {
 			"string": "Перемикає видимість налагоджувача вводу та налагоджувача подій, якщо вони увімкнені",
-			"version_hash": 0
+			"version_hash": 392008755
 		},
 		"HEVLIB_CONFIG_LINEEDIT_PLACEHOLDER": {
 			"string": "Вставте текст",
-			"version_hash": 0
+			"version_hash": 2446160991
 		},
 		"HEVLIB_CONFIG_SECTION_EQUIPMENT": {
 			"string": "Обладнання",
-			"version_hash": 0
+			"version_hash": 3425279869
 		},
 		"HEVLIB_CONFIG_SECTION_EVENTS": {
 			"string": "Події",
-			"version_hash": 0
+			"version_hash": 2976090426
 		},
 		"HEVLIB_CONFIG_SECTION_DRIVERS": {
 			"string": "Драйвери",
-			"version_hash": 0
+			"version_hash": 2278708932
 		},
 		"HEVLIB_CONFIG_SECTION_DEBUG": {
 			"string": "Налагодження",
-			"version_hash": 0
+			"version_hash": 218535180
 		},
 		"HEVLIB_CONFIG_SECTION_INPUT": {
 			"string": "Прив'язки",
-			"version_hash": 0
+			"version_hash": 216319605
 		},
 		"HEVLIB_NOTIFICATIONS": {
 			"string": "Сповіщення модів",
-			"version_hash": 0
+			"version_hash": 2627580863
 		},
 		"HEVLIB_UPDATE_COUNT": {
 			"string": "%s мод(ів) потребують оновлення!",
-			"version_hash": 0
+			"version_hash": 4074946392
 		},
 		"HEVLIB_DEPENDANCY_COUNT": {
 			"string": "%s мод(ів) мають відсутні залежності!",
-			"version_hash": 0
+			"version_hash": 4185942359
 		},
 		"HEVLIB_CONFLICT_COUNT": {
 			"string": "%s мод(ів) конфліктують!",
-			"version_hash": 0
+			"version_hash": 3441683171
 		},
 		"HEVLIB_UPDATE_INFO_HEADER": {
 			"string": "Цей мод має очікувані оновлення!",
-			"version_hash": 0
+			"version_hash": 189982677
 		},
 		"HEVLIB_DEPENDANCY_INFO_HEADER": {
 			"string": "Цей мод має відсутні залежності!",
-			"version_hash": 0
+			"version_hash": 4142743351
 		},
 		"HEVLIB_CONFLICT_INFO_HEADER": {
 			"string": "Цей мод наразі конфліктує!",
-			"version_hash": 0
+			"version_hash": 3275554923
 		},
 		"HEVLIB_UPDATE_INFO_BODY": {
 			"string": "Оновити цей мод з версії [%s] до версії [%s]?",
-			"version_hash": 0
+			"version_hash": 3420349538
 		},
 		"HEVLIB_DEPENDANCY_INFO_BODY": {
 			"string": "Цей мод вимагає наступних модів, які відсутні:\\n%s\\n\\n\\n\\nНе очікуйте, що цей мод працюватиме як задумано!",
-			"version_hash": 0
+			"version_hash": 3077768863
 		},
 		"HEVLIB_CONFLICT_INFO_BODY": {
 			"string": "Цей мод конфліктує з іншими встановленими модами. Будь ласка, встановіть сумісну версію наступних модів:\\n%s\\n\\n\\n\\nНе очікуйте, що цей мод працюватиме як задумано!",
-			"version_hash": 0
+			"version_hash": 2921644039
 		},
 		"HEVLIB_CONFIG_RANDOMIZE_MINERALS": {
 			"string": "Рандомізувати сід мінералів",
-			"version_hash": 0
+			"version_hash": 161105527
 		},
 		"HEVLIB_CONFIG_RANDOMIZE_MINERALS_TOOLTIP": {
 			"string": "Змінює сід (seed) генерації мінералів при кожному запуску гри. \\n\\nЯкщо вимкнено, використовує заздалегідь визначений масив констант для сідів мінералів",
-			"version_hash": 0
+			"version_hash": 2736477669
 		},
 		"HEVLIB_UPDATE_CENTER": {
 			"string": "Центр оновлення модів",
-			"version_hash": 0
+			"version_hash": 3293317673
 		},
 		"HEVLIB_UPDATE_CENTER_DESC": {
 			"string": "Наступні моди мають оновлення",
-			"version_hash": 0
+			"version_hash": 1583276900
 		},
 		"HEVLIB_UPDATE_ALL": {
 			"string": "Оновити всі моди",
-			"version_hash": 0
+			"version_hash": 3690503988
 		},
 		"HEVLIB_IGNORE_ALL": {
 			"string": "Ігнорувати всі моди",
-			"version_hash": 0
+			"version_hash": 3685319509
 		},
 		"HEVLIB_IGNORE_UPDATE": {
 			"string": "Ігнорувати оновлення",
-			"version_hash": 0
+			"version_hash": 2636390252
 		},
 		"HEVLIB_UPDATE_MOD": {
 			"string": "Оновити мод",
-			"version_hash": 0
+			"version_hash": 234302216
 		},
 		"HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD": {
-			"string": "Оновити обраний мод [%s] до версії [%s]? \\n\\nЦе може зайняти певний час, залежно від розміру мода.",
-			"version_hash": 0
+			"string": "Оновити обраний мод [%s v%s] до версії [%s]? \\n\\nЦе може зайняти певний час, залежно від розміру мода.",
+			"version_hash": 2751177169
 		},
 		"HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MOD_UPDATE": {
 			"string": "Ігнорувати оновлення для мода [%s] до версії [%s]? \\n\\nЦе рішення можна скинути в налаштуваннях меню модів.",
-			"version_hash": 0
+			"version_hash": 173309219
 		},
 		"HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MODS": {
 			"string": "Оновити всі моди, що відображаються в цьому меню? \\n\\nЦе може зайняти певний час, залежно від кількості та розміру модів.",
-			"version_hash": 0
+			"version_hash": 3399667694
 		},
 		"HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MODS": {
 			"string": "Ігнорувати всі оновлення модів, що відображаються в цьому меню? \\n\\nЦе рішення можна скинути в налаштуваннях меню модів.",
-			"version_hash": 0
+			"version_hash": 719742785
 		},
 		"HEVLIB_ICON_TOOLTIP_CONFLICT": {
 			"string": "Цей мод конфліктує з наступними модами:%s",
-			"version_hash": 0
+			"version_hash": 100480821
 		},
 		"HEVLIB_ICON_TOOLTIP_DEPENDANCIES": {
 			"string": "Цей мод не має наступних залежностей:%s",
-			"version_hash": 0
+			"version_hash": 1674753562
 		},
 		"HEVLIB_ICON_TOOLTIP_COMPLEMENTARY": {
 			"string": "Цей мод доповнює наступні моди:%s",
-			"version_hash": 0
+			"version_hash": 420583035
 		},
 		"HEVLIB_ICON_TOOLTIP_UPDATES": {
 			"string": "Цей мод має оновлення! \\nВерсія [%s] -> Версія [%s]",
-			"version_hash": 0
+			"version_hash": 2631682861
 		},
 		"HEVLIB_MODMENU_UPDATE_NOTIFIER": {
 			"string": "Є оновлення для ваших модів. \\n\\nБажаєте відкрити меню оновлень?",
-			"version_hash": 0
+			"version_hash": 3676459949
 		},
 		"HEVLIB_PLEASE_WAIT": {
 			"string": "Будь ласка, зачекайте...",
-			"version_hash": 0
+			"version_hash": 3842636830
 		},
 		"HEVLIB_RESTART": {
 			"string": "Перезапустити гру",
-			"version_hash": 0
+			"version_hash": 448851172
 		},
 		"HEVLIB_EXIT_INSTEAD": {
 			"string": "Вийти з гри натомість",
-			"version_hash": 0
+			"version_hash": 2376159649
 		},
 		"HEVLIB_RESTART_BECAUSE_NEW_MODS": {
 			"string": "Гру потрібно перезапустити, щоб застосувати зміни до модів. \\n\\nАбо ж ви можете закрити гру, або закрити це вікно, щоб продовжити гру та зберегтися.",
-			"version_hash": 0
+			"version_hash": 688430703
 		},
 		"HEVLIB_WAIT_TO_UPDATE_ALL": {
 			"string": "Будь ласка, зачекайте... \\n\\nЗавантаження мода %02d з %02d \\n%s [%s] версія [%s]",
-			"version_hash": 0
+			"version_hash": 4167406587
 		},
 		"HEVLIB_TITLE_IGNORE_MOD": {
 			"string": "Ігнорувати мод?",
-			"version_hash": 0
+			"version_hash": 1185318888
 		},
 		"HEVLIB_TITLE_UPDATE_MOD": {
 			"string": "Оновити мод?",
-			"version_hash": 0
+			"version_hash": 3437005895
 		},
 		"HEVLIB_TITLE_IGNORE_MODS": {
 			"string": "Ігнорувати моди?",
-			"version_hash": 0
+			"version_hash": 460819419
 		},
 		"HEVLIB_TITLE_UPDATE_MODS": {
 			"string": "Оновити моди?",
-			"version_hash": 0
+			"version_hash": 1752046618
 		},
 		"HEVLIB_DLCLIST_DLC_HEADER": {
 			"string": "------- DLC ------",
-			"version_hash": 0
+			"version_hash": 245182049
 		},
 		"HEVLIB_DLCLIST_MODS_HEADER": {
 			"string": "------ MODS ------",
-			"version_hash": 0
+			"version_hash": 1346064212
 		},
 		"HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST": {
-			"string": "Показувати бібліотеки \"завжди відображати\" у списку DLC",
-			"version_hash": 0
+			"string": "Показувати постійно видимі бібліотеки у списку DLC",
+			"version_hash": 2439027097
 		},
 		"HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST_TOOLTIP": {
 			"string": "Дозволяє бібліотекам з тегом 'always_display' (таким як HevLib) з'являтися в розділі модів списку DLC",
-			"version_hash": 0
+			"version_hash": 1519865726
 		},
 		"HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST": {
 			"string": "Показувати всі бібліотеки у списку DLC",
-			"version_hash": 0
+			"version_hash": 3753868258
 		},
 		"HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST_TOOLTIP": {
 			"string": "Дозволяє всім бібліотекам з'являтися в розділі модів списку DLC. Це може зробити список дуже великим через бібліотеки, які мають багато основних файлів модів для підпроцесів.",
-			"version_hash": 0
+			"version_hash": 2736147
 		},
 		"HEVLIB_CONFIG_DLCLIST_SORT_ORDER": {
 			"string": "Порядок сортування модів у списку DLC",
-			"version_hash": 0
+			"version_hash": 2104835928
 		},
 		"HEVLIB_CONFIG_DLCLIST_SORT_ORDER_TOOLTIP": {
 			"string": "Чи потрібно сортувати розділ модів у списку DLC і як саме.",
-			"version_hash": 0
+			"version_hash": 3524220335
 		},
 		"HEVLIB_RESEARCH": {
 			"string": "Дослідження",
-			"version_hash": 0
+			"version_hash": 2602532946
 		},
 		"HEVLIB_RESEARCH_CURRENT": {
 			"string": "Поточне дослідження",
-			"version_hash": 0
+			"version_hash": 1810057685
 		},
 		"HEVLIB_CURRENT_PROJECTS": {
 			"string": "Активні проекти досліджень",
-			"version_hash": 0
+			"version_hash": 2308505464
 		},
 		"HEVLIB_RESEARCH_STATS": {
 			"string": "Статистика всіх проектів",
-			"version_hash": 0
+			"version_hash": 3481155716
 		},
 		"HEVLIB_RESEARCH_AVAILABLE": {
 			"string": "Доступні проекти",
-			"version_hash": 0
+			"version_hash": 2078505552
 		},
 		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT": {
 			"string": "Прокрутка інтерфейсу вліво",
-			"version_hash": 0
+			"version_hash": 239484797
 		},
 		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT_TOOLTIP": {
 			"string": "Основний ввід прокрутки вліво для меню з лише горизонтальною прокруткою",
-			"version_hash": 0
+			"version_hash": 2459810666
 		},
 		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT": {
 			"string": "Прокрутка інтерфейсу вправо",
-			"version_hash": 0
+			"version_hash": 3615291088
 		},
 		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT_TOOLTIP": {
 			"string": "Основний ввід прокрутки вправо для меню з лише горизонтальною прокруткою",
-			"version_hash": 0
+			"version_hash": 1217894109
 		},
 		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2": {
 			"string": "Прокрутка інтерфейсу вліво (альт)",
-			"version_hash": 0
+			"version_hash": 2744720591
 		},
 		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2_TOOLTIP": {
 			"string": "Альтернативний ввід прокрутки вліво для меню з лише горизонтальною прокруткою",
-			"version_hash": 0
+			"version_hash": 4207006566
 		},
 		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2": {
 			"string": "Прокрутка інтерфейсу вправо (альт)",
-			"version_hash": 0
+			"version_hash": 3554592354
 		},
 		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2_TOOLTIP": {
 			"string": "Альтернативний ввід прокрутки вправо для меню з лише горизонтальною прокруткою",
-			"version_hash": 0
+			"version_hash": 3040783961
 		},
 		"SYSTEM_HEVLIB_INTERNALS_NODE": {
-			"string": "Мод обробки внутрішніх систем",
-			"version_hash": 0
+			"string": "Обробник внутрішніх систем мода",
+			"version_hash": 3379743283
 		},
 		"NOTIFICATION_NAME_PLACEHOLDER": {
 			"string": "{Тіло сповіщення відсутнє}",
-			"version_hash": 0
+			"version_hash": 1693706220
 		},
 		"NOTIFICATION_TITLE_PLACEHOLDER": {
 			"string": "{Назва сповіщення відсутня}",
-			"version_hash": 0
+			"version_hash": 3481814879
 		},
 		"HEVLIB_AVAILABLE_RESEARCH": {
 			"string": "Доступні проекти досліджень",
-			"version_hash": 0
+			"version_hash": 318053917
 		},
 		"HEVLIB_RESEARCH_TOTAL_TOOLTIP": {
 			"string": "Загальний прогрес у цьому проекті",
-			"version_hash": 0
+			"version_hash": 1598981297
 		},
 		"DLC_ANDROID": {
 			"string": "Пакет облич андроїдів",
-			"version_hash": 0
+			"version_hash": 3806021908
 		},
 		"HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT": {
 			"string": "Обмежити вихід нанодронів",
-			"version_hash": 0
+			"version_hash": 3207490862
 		},
 		"HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT_TOOLTIP": {
 			"string": "Запобігає використанню нанодронів, якщо швидкість споживання перевищує швидкість встановленого сховища. \\nПримітка: це, ймовірно, ніколи не буде досягнуто, крім дуже специфічних конфігурацій.",
-			"version_hash": 0
+			"version_hash": 3428239164
 		},
 		"HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING": {
 			"string": "Відображати кількість гравців",
-			"version_hash": 0
+			"version_hash": 507597972
 		},
 		"HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING_TOOLTIP": {
 			"string": "Чи відображати кількість одночасних гравців на клієнтах Steam.\\nЗауважте, що цифри для повної гри та демо-версії розділені.",
-			"version_hash": 0
+			"version_hash": 4192055013
 		},
 		"HEVLIB_CLEAR_LEADERBOARDS": {
 			"string": "Очистити статистику таблиці лідерів",
-			"version_hash": 0
+			"version_hash": 1094632464
 		},
 		"HEVLIB_CLEAR_LEADERBOARDS_TOOLTIP": {
 			"string": "Відкриває меню, яке дозволяє скинути окремі статистики таблиці лідерів.\\n\\nПРИМІТКА: Тільки для релізів Steam",
-			"version_hash": 0
+			"version_hash": 790679608
 		},
 		"HEVLIB_OPEN_MENU": {
 			"string": "Відкрити меню",
-			"version_hash": 0
+			"version_hash": 2736950124
 		},
 		"STEAMSTAT_best_haul": {
 			"string": "Найкращий улов (повний)",
-			"version_hash": 0
+			"version_hash": 1718163207
 		},
 		"STEAMSTAT_best_ore": {
 			"string": "Найкращий улов (руда)",
-			"version_hash": 0
+			"version_hash": 474342196
 		},
 		"STEAMSTAT_longest_dive": {
 			"string": "Найдовше занурення (включаючи астрогацію)",
-			"version_hash": 0
+			"version_hash": 2842100834
 		},
 		"STEAMSTAT_longest_dive_realtime": {
 			"string": "Найдовше занурення (час пілотування)",
-			"version_hash": 0
+			"version_hash": 2971453009
 		},
 		"STEAMSTAT_money_per_day": {
 			"string": "Середній дохід за день",
-			"version_hash": 0
+			"version_hash": 2616976832
 		},
 		"STEAMSTAT_time": {
 			"string": "Дні роботи в кільцях",
-			"version_hash": 0
+			"version_hash": 1752709682
 		},
 		"STEAMSTAT_total_money": {
 			"string": "Багатство",
-			"version_hash": 0
+			"version_hash": 3660220906
 		},
 		"STEAMSTAT_CLEAR_STAT": {
 			"string": "Очистити статистику",
-			"version_hash": 0
+			"version_hash": 3593190152
 		},
 		"HEVLIB_CONFIRM": {
 			"string": "Підтвердити дію",
-			"version_hash": 0
+			"version_hash": 2178666097
 		},
 		"HEVLIB_WIPE_STAT_ARE_YOU_SURE": {
 			"string": "Ви впевнені, що хочете очистити статистику %s?",
-			"version_hash": 0
+			"version_hash": 698846716
 		},
 		"HEVLIB_NOSTEAM": {
 			"string": "Це меню працює тільки на збірках Steam.",
-			"version_hash": 0
+			"version_hash": 3802738386
+		},
+		"HEVLIB_OPT_PROFILES": {
+			"string": "Профілі налаштувань",
+			"version_hash": 2144737018
+		},
+		"HEVLIB_PROFILE_SELECT": {
+			"string": "Оберіть профіль",
+			"version_hash": 3621498966
+		},
+		"HEVLIB_ADD_PROFILE": {
+			"string": "Додати профіль",
+			"version_hash": 610551423
+		},
+		"HEVLIB_RENAME_PROFILE": {
+			"string": "Перейменувати профіль",
+			"version_hash": 3715498190
+		},
+		"HEVLIB_DELETE_PROFILE": {
+			"string": "Видалити профіль",
+			"version_hash": 1875438633
+		},
+		"HEVLIB_PROFILENAME_ADD": {
+			"string": "Додати профіль",
+			"version_hash": 610551423
+		},
+		"HEVLIB_PROFILENAME_RENAME": {
+			"string": "Перейменувати профіль",
+			"version_hash": 3715498190
+		},
+		"HEVLIB_PROFILE_DELETE": {
+			"string": "Видалити профіль",
+			"version_hash": 1875438633
+		},
+		"HEVLIB_PROFILE_DELETE_ARE_YOU_SURE": {
+			"string": "Ви впевнені, що хочете видалити цей профіль?",
+			"version_hash": 3461730766
+		},
+		"HEVLIB_CHANGELOGS": {
+			"string": "Перелік змін",
+			"version_hash": 656124416
+		},
+		"HEVLIB_CHANGELOGS_NEW": {
+			"string": "Нові переліки змін",
+			"version_hash": 3365610410
+		},
+		"HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK": {
+			"string": "Кілька мінералів у шматку",
+			"version_hash": 3451211596
+		},
+		"HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK_TOOLTIP": {
+			"string": "Додає функціонал, що дозволяє кільком рудам існувати в одному шматку руди. \\n\\nАвтор: Za'krin (оригінальна реалізація, яку цей мод адаптує та вдосконалює).",
+			"version_hash": 3231012828
+		},
+		"HEVLIB_TRANSIT_TIP_1": {
+			"string": "|Наявність кількох членів екіпажу з однаковою професією дозволяє їм працювати в тандемі.",
+			"version_hash": 3778788784
+		},
+		"HEVLIB_TRANSIT_TIP_2": {
+			"string": "|На відміну від автопілота, ваші маневрові двигуни можуть працювати за допомогою ручного вводу без необхідності увімкнення комп'ютера чи HUD.",
+			"version_hash": 769325838
+		},
+		"HEVLIB_TRANSIT_TIP_3": {
+			"string": "Під час порятунку рятувальної капсули невикористаний маніпулятор дозволить надійно зафіксувати її, не захаращуючи вантажний відсік.",
+			"version_hash": 1685575029
+		},
+		"HEVLIB_TRANSIT_TIP_4": {
+			"string": "Заявка на ділянку розкопок привертає підвищену увагу до навколишньої території.",
+			"version_hash": 2111589941
+		},
+		"HEVLIB_TRANSIT_TIP_5": {
+			"string": "Ваш геолог може обмежити те, що бачить ваше обладнання. Суворіші фільтри допоможуть запобігти перевантаженню систем корабля.",
+			"version_hash": 46062683
+		},
+		"HEVLIB_TRANSIT_TIP_6": {
+			"string": "Якщо вам потрібно більше страховки, а виплати від Джеймсона недостатньо, шукайте пошуково-рятувальні судна в кільцях.",
+			"version_hash": 2741005409
+		},
+		"HEVLIB_TRANSIT_TIP_7": {
+			"string": "Задоволений екіпаж працюватиме трохи старанніше, а незадоволений — матиме менше мотивації до роботи.",
+			"version_hash": 294913161
+		},
+		"HEVLIB_TRANSIT_TIP_8": {
+			"string": "Якщо об'єкт обрано автопілотом, мікросейсмічні дрони скануватимуть цільовий об'єкт, інакше — те, що знаходиться под курсором.",
+			"version_hash": 4239360766
+		},
+		"HEVLIB_TRANSIT_TIP_9": {
+			"string": "Хабітати завжди платитимуть принаймні невелику націнку понад ринкову вартість мінералу.",
+			"version_hash": 1249715321
+		},
+		"HEVLIB_TRANSIT_TIP_10": {
+			"string": "Використовуєте занадто багато нанодронів на нікчемну руду? Налаштуйте фільтри геолога, щоб ловити тільки те, що вам потрібно, і заощаджуйте на дронах.",
+			"version_hash": 4012124347
+		},
+		"HEVLIB_TRANSIT_TIP_11": {
+			"string": "Маєте проблеми з модами? Надішліть звіт на сайті, де ви їх отримали, або приєднайтеся до Discord для підтримки в реальному часі.",
+			"version_hash": 3402302455
+		},
+		"HEVLIB_TRANSIT_TIP_12": {
+			"string": "Маєте пропозицію щодо мода? Приєднуйтесь до Discord і сміливо запитуйте.",
+			"version_hash": 3184450777
+		},
+		"HEVLIB_TRANSIT_TIP_13": {
+			"string": "Хочете знайти більше модів? Перегляньте повну колекцію на 'https://delta-v.kodera.pl/index.php/Mod_List'",
+			"version_hash": 3141819234
+		},
+		"HEVLIB_TRANSIT_TIP_14": {
+			"string": "Майте на увазі, що все, що здатне розбивати камені, може якимось чином пошкодити й інші кораблі.",
+			"version_hash": 635357464
+		},
+		"HEVLIB_TRANSIT_TIP_15": {
+			"string": "втономні системи працюють так, як задумано, проте вам може знадобитися терпіння, щоб дати їм час завершити роботу.",
+			"version_hash": 3043623550
+		},
+		"HEVLIB_TRANSIT_TIP_16": {
+			"string": "Подобаються моди, якими ви користуєтеся? Подумайте про те, щоб підтримати їхніх авторів!",
+			"version_hash": 79152977
+		},
+		"HEVLIB_TRANSIT_TIP_17": {
+			"string": "Моди поводяться трохи інакше після оновлення? Перевірте останні переліки змін або запитайте автора.",
+			"version_hash": 2422128719
 		},
 		"TAG_OVERHAUL": {
-			"string": "Overhaul",
-			"version_hash": 0
+			"string": "Глобальна переробка",
+			"version_hash": 3544097003
+		},
+		"HEVLIB_GITHUB_PROGRESS_WAITING_ON_RESPONSE": {
+			"string": "Очікування відповіді від сервера.",
+			"version_hash": 1988119143
+		},
+		"HEVLIB_GITHUB_PROGRESS_ZIP_FOUND_AND_REQUESTING": {
+			"string": "Відповідь отримана. Запит файлу.",
+			"version_hash": 1619856286
+		},
+		"HEVLIB_GITHUB_PROGRESS_DOWNLOADING": {
+			"string": "Завантаження файлу \\",
+			"version_hash": 2236301751
+		},
+		"HEVLIB_GITHUB_PROGRESS_DOWNLOADING_ONLY_BYTES": {
+			"string": "Завантаження файлу.\\n\\nЗавантажено %0.2f %s",
+			"version_hash": 2232387281
+		},
+		"HEVLIB_GITHUB_PROGRESS_DOWNLOADED_FILE": {
+			"string": "Завантаження завершено.",
+			"version_hash": 249088469
+		},
+		"HEVLIB_SIZE_LABEL_BYTES": {
+			"string": "байт",
+			"version_hash": 254850636
+		},
+		"HEVLIB_SIZE_LABEL_KILOBYTES": {
+			"string": "кілобайт",
+			"version_hash": 214961083
+		},
+		"HEVLIB_SIZE_LABEL_MEGABYTES": {
+			"string": "мегабайт",
+			"version_hash": 2738237862
+		},
+		"HEVLIB_CONFIG_SHOW_CHAOS_OVERLAY": {
+			"string": "Накладання хаосу на карту кілець",
+			"version_hash": 517498787
+		},
+		"HEVLIB_CONFIG_SHOW_CHAOS_OVERLAY_TOOLTIP": {
+			"string": "Накладає вказаний мінімальний рівень хаосу на карту кілець. Покриття обмежене 1 км^2, крок — 0.05 хаосу.",
+			"version_hash": 2730212789
+		},
+		"HEVLIB_CONFIG_CHAOS_OVERLAY_MIN_CHAOS": {
+			"string": "Мінімальний хаос для накладання",
+			"version_hash": 2119829887
+		},
+		"HEVLIB_CONFIG_CHAOS_OVERLAY_MIN_CHAOS_TOOLTIP": {
+			"string": "Мінімальний рівень хаосу для відображення накладання в конкретній зоні.",
+			"version_hash": 1923696559
+		},
+		"HEVLIB_CONFIG_TOGGLE_CHAOS_MAP_OVERLAY": {
+			"string": "Перемкнути накладання карти хаосу",
+			"version_hash": 2892037701
+		},
+		"HEVLIB_CONFIG_TOGGLE_CHAOS_MAP_OVERLAY_TOOLTIP": {
+			"string": "Перемикає накладання карти хаосу без необхідності заходити в меню модів.",
+			"version_hash": 1512297543
+		},
+		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_UP": {
+			"string": "Збільшити мінімальний хаос",
+			"version_hash": 3984603577
+		},
+		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_UP_TOOLTIP": {
+			"string": "Клавіша для збільшення мінімального хаосу для накладання карти за кроком 0.05",
+			"version_hash": 2328949513
+		},
+		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_DOWN": {
+			"string": "Зменшити мінімальний хаос",
+			"version_hash": 3601724939
+		},
+		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_DOWN_TOOLTIP": {
+			"string": "Клавіша для зменшення мінімального хаосу для накладання карти за кроком 0.05",
+			"version_hash": 777212123
+		},
+		"HEVLIB_CONFIG_CHAOS_OVERLAY_OPACITY": {
+			"string": "Прозорість накладання хаосу",
+			"version_hash": 1243370478
+		},
+		"HEVLIB_CONFIG_CHAOS_OVERLAY_OPACITY_TOOLTIP": {
+			"string": "Прозорість, з якою накладання хаосу відображається на карті кілець.",
+			"version_hash": 2535371048
+		},
+		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_UP": {
+			"string": "Збільшити прозорість накладання",
+			"version_hash": 1066781240
+		},
+		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_UP_TOOLTIP": {
+			"string": "Клавіша для збільшення прозорості накладання хаосу за кроком 5%.",
+			"version_hash": 747121790
+		},
+		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_DOWN": {
+			"string": "Прозорість накладання хаосу",
+			"version_hash": 3097213066
+		},
+		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_DOWN_TOOLTIP": {
+			"string": "Клавіша для зменшення прозорості накладання хаосу за кроком 5%.",
+			"version_hash": 2171739920
+		},
+		"HEVLIB_NO_DOWNLOAD_HEADER": {
+			"string": "ПОСИЛАННЯ НЕ НАДАНО!",
+			"version_hash": 3291089198
+		},
+		"HEVLIB_NO_DOWNLOAD_CONTENT": {
+			"string": "УВАГА: для мода [%s] не надано дійсного посилання для завантаження, тому його не було завантажено. \\n\\nБудь ласка, зверніться до джерела цього мода для оновлень та повідомте автора мода.",
+			"version_hash": 2446599643
+		},
+		"HEVLIB_SAVEOPT_FIX_CORRUPTED_CARGO": {
+			"string": "Виправити виліт через пошкоджений вантаж",
+			"version_hash": 802028065
+		},
+		"HEVLIB_SAVEOPT_FIX_CORRUPTED_CARGO_TOOLTIP": {
+			"string": "Використовуйте це, щоб виправити збереження, якщо воно не завантажується через недійсний вантаж, привезений під час попереднього завантаження. \\n\\nОзнакою цього є передостанній рядок файлу engine_log.txt: \\n'ERROR: No loader found for resource: res://.' після вильоту при поверненні з кілець або завантаженні збереження.",
+			"version_hash": 885117514
+		},
+		"HEVLIB_CONFIG_MAX_MODDED_DEALERSHIP_POOLS": {
+			"string": "Максимум модованих записів у дилері",
+			"version_hash": 1666179083
+		},
+		"HEVLIB_CONFIG_MAX_MODDED_DEALERSHIP_POOLS_TOOLTIP": {
+			"string": "Максимальна кількість модованих пулів кораблів, доданих до списку вживаних кораблів дилерського центру. \\nЦе стосується лише кораблів, доданих через ShipDriver; число не збільшуватиметься, якщо додано менше кораблів, ніж це значення.",
+			"version_hash": 338011646
+		},
+		"HEVLIB_SAVEOPT_CLEAR_SOLD_SHIPS": {
+			"string": "Очистити кеш проданих кораблів",
+			"version_hash": 4176761126
+		},
+		"HEVLIB_SAVEOPT_CLEAR_SOLD_SHIPS_TOOLTIP": {
+			"string": "Очищує будь-які дані про продані кораблі. Використовується для виправлення проблем, коли після продажу модованих кораблів у дилері назавжди залишається «корабель-привид».",
+			"version_hash": 713581652
+		},
+		"HEVLIB_CONFIG_INPUT_VIRTUALIZATION": {
+			"string": "Віртуалізація вводу (WIP)",
+			"version_hash": 1330041627
+		},
+		"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_TOOLTIP": {
+			"string": "Використовує програмну систему обробки вводу замість ігрової. Дозволяє використовувати комбінації клавіш для дій.",
+			"version_hash": 4158244573
+		},
+		"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_OVERRIDE_BUILTIN": {
+			"string": "Ігнорувати вбудовані прив'язки",
+			"version_hash": 1598156349
+		},
+		"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_OVERRIDE_BUILTIN_TOOLTIP": {
+			"string": "Чи повинна віртуалізація вводу обробляти вбудовані клавіші рушія, навіть ті, що не призначені для зміни.",
+			"version_hash": 4016249648
+		},
+		"HEVLIB_ANALYTICS_DISABLED": {
+			"string": "Аналітику вимкнено, отримання цих даних заборонено.",
+			"version_hash": 1949719479
+		},
+		"HEVLIB_OPT_MODPACKS": {
+			"string": "Збірки модів (Modpacks)",
+			"version_hash": 3714458839
+		},
+		"HEVLIB_MODPACKS IMPORT": {
+			"string": "Імпортувати збірки модів",
+			"version_hash": 126074482
+		},
+		"HEVLIB_MODPACKS EXPORT": {
+			"string": "Експортувати збірки модів",
+			"version_hash": 103317849
+		},
+		"HEVLIB_APPLICABLE_MODS": {
+			"string": "Моди, сумісні зі збіркою",
+			"version_hash": 476877116
+		},
+		"HEVLIB_SAVE_MODPACK": {
+			"string": "Зберегти збірку",
+			"version_hash": 1264474579
+		},
+		"HEVLIB_OPEN_MODPACK": {
+			"string": "Відкрити збірку",
+			"version_hash": 732682486
+		},
+		"HEVLIB_MODPACK_LIMITATIONS": {
+			"string": "Збірки не можуть включати моди без маніфесту версії принаймні MV2.2, посилання на репозиторій GitHub та URL-адреси маніфесту.",
+			"version_hash": 2148121562
+		},
+		"HEVLIB_MODPACK_TOGGLE": {
+			"string": "Включити цей мод до збірки для експорту?",
+			"version_hash": 909574562
+		},
+		"HEVLIB_MODPACK_DOWNLOADING": {
+			"string": "Будь ласка, зачекайте... \\n\\nЗавантаження мода %02d з %02d \\n%s [%s]\\n\\n(%s модів пропущено.)",
+			"version_hash": 640450355
+		},
+		"HEVLIB_CONFIG_CARGO_SCANNER_DISPLAY_LIMIT": {
+			"string": "Межа відображення мінералів у сканері вантажу",
+			"version_hash": 3554924120
+		},
+		"HEVLIB_CONFIG_CARGO_SCANNER_DISPLAY_LIMIT_TOOLTIP": {
+			"string": "Скільки записів мінералів може відображатися в будь-якому списку сканера сирих мінералів. Сюди входять лише мінерали; порожній простір, обладнання та неідентифіковані записи ігноруються.",
+			"version_hash": 3868254435
+		},
+		"TAG_ADD_TRANSIT_TIPS": {
+			"string": "Додає підказки під час транзиту",
+			"version_hash": 3276505670
+		},
+		"EVENTDRIVER_ENABLE_ALL": {
+			"string": "Увімкнути всі події",
+			"version_hash": 987521466
+		},
+		"EVENTDRIVER_DISABLE_ALL": {
+			"string": "Вимкнути всі події",
+			"version_hash": 1138158759
+		},
+		"HEVLIB_GITHUBMODS_TITLE": {
+			"string": "Доступні моди",
+			"version_hash": 2637865945
+		},
+		"HEVLIB_GITHUBMODS_COUNT": {
+			"string": "%d доступно",
+			"version_hash": 913247151
+		},
+		"HEVLIB_CONFIG_PROCESSED_MINERAL_DISPLAY_LIMIT": {
+			"string": "Межа відображення мінералів в обробленому вантажі",
+			"version_hash": 2547578582
+		},
+		"HEVLIB_CONFIG_PROCESSED_MINERAL_DISPLAY_LIMIT_TOOLTIP": {
+			"string": "Скільки записів мінералів може відображатися одночасно в списку обробленої руди. Коли ліміт перевищено, цей список перемикається між \"сторінками\", щоб можна було переглянути всі мінерали.",
+			"version_hash": 4133660626
+		},
+		"HEVLIB_TRANSIT_TIP_18": {
+			"string": "Бажаєте бачити кілька руд в одному шматку мінералу або налаштувати інші параметри мінералів? Перегляньте вкладку \"Драйвери\" у налаштуваннях HevLib.",
+			"version_hash": 2874849155
+		},
+		"HEVLIB_TRANSIT_TIP_19": {
+			"string": "Хочете налаштувати ймовірність появи модованих кораблів у дилера? Зазирніть у вкладку \"Драйвери\" у налаштуваннях HevLib.",
+			"version_hash": 809628308
+		},
+		"HEVLIB_TRANSIT_TIP_20": {
+			"string": "Бажаєте керувати певними змінами обладнання, як-от сортування слотів або межі сканера мінералів? Перегляньте розділ \"Обладнання\" у налаштуваннях HevLib.",
+			"version_hash": 186912265
+		},
+		"HEVLIB_TRANSIT_TIP_21": {
+			"string": "Маєте проблеми з керованістю кораблем? Спробуйте змінити маневрові двигуни або автопілот, а також налаштувати потужність тяги та параметри автопілота!",
+			"version_hash": 841163575
+		},
+		"HEVLIB_TRANSIT_TIP_22": {
+			"string": "Певне обладнання може справно працювати \"з коробки\" лише на спеціально призначених для нього суднах. Якщо у вас виникли проблеми з конкретним предметом обладнання, можливо, варто спробувати використати його на відповідному кораблі?",
+			"version_hash": 2483296260
+		},
+		"HEVLIB_TRANSIT_TIP_23": {
+			"string": "Ви можете налаштувати порядок сортування будь-яких модів у списку DLC у розділі \"Драйвери\" в налаштуваннях HevLib.",
+			"version_hash": 1367355062
+		},
+		"HEVLIB_TRANSIT_TIP_24": {
+			"string": "Набрид видобуток? Існує безліч інших способів заробити гроші.",
+			"version_hash": 3573113157
+		},
+		"HEVLIB_TRANSIT_TIP_25": {
+			"string": "Магазини електромагнітних гармат та компоненти нанодронів обмежені швидкістю подачі їхнього сховища.",
+			"version_hash": 2903300490
+		},
+		"HEVLIB_TRANSIT_TIP_26": {
+			"string": "Вкладка \"Геолог\" обладнана смужкою прокрутки, щоб полегшити читання довгих назв обладнання та списків мінералів.",
+			"version_hash": 1092699375
+		},
+		"EVENTDRIVER_LEGACY": {
+			"string": "Використовувати застарілий обробник спавну?",
+			"version_hash": 2630802733
+		},
+		"EVENTDRIVER_INJECT": {
+			"string": "Ін'єктувати дивність?",
+			"version_hash": 548009294
+		},
+		"EVENTDRIVER_SPAWNER_CONTROLS": {
+			"string": "Керування спавном подій",
+			"version_hash": 383031684
+		},
+		"EVENTDRIVER_CLEARER_CONTROLS": {
+			"string": "Керування очищенням подій",
+			"version_hash": 3681275490
+		},
+		"EVENTDRIVER_CLEAR_POI": {
+			"string": "Очистити пов'язану POI",
+			"version_hash": 3673548405
+		},
+		"EVENTDRIVER_CLEAR_POI_TOOLTIP": {
+			"string": "Події на основі POI створюють локацію в кеші астрогації та знову з'являться після звичайного очищення.\n\nЦей перемикач видалить POI для події, якщо вона знаходиться поруч.",
+			"version_hash": 2980544907
+		},
+		"EVENTDRIVER_CLEAR_CARGO": {
+			"string": "Очистити у вантажному відсіку?",
+			"version_hash": 3991202254
+		},
+		"EVENTDRIVER_EVENTS_TOOLTIP": {
+			"string": "Бажана подія для спавну/очищення\n\"none\" — спавнити випадкову подію / очистити всі події",
+			"version_hash": 2910940133
+		},
+		"EVENTDRIVER_TIMER_TOOLTIP": {
+			"string": "|Час між спавнами подій у секундах",
+			"version_hash": 1166419779
+		},
+		"EVENTDRIVER_SPAWNNOW_TOOLTIP": {
+			"string": "Спавнить обрану подію.\\nЯкщо обрано \"none\", спавнить випадкову подію",
+			"version_hash": 2314890076
+		},
+		"EVENTDRIVER_LEGACY_TOOLTIP": {
+			"string": "Використовувати дуже стару систему testSpecificStoryElement для спавну події",
+			"version_hash": 555589987
+		},
+		"EVENTDRIVER_INJECT_TOOLTIP": {
+			"string": "Розмістити об'єкти події безпосередньо в кільці.\nЦе обходить звичайні механізми спавну подій і може спричинити аномалії",
+			"version_hash": 324336902
+		},
+		"EVENTDRIVER_CLEAREVENT_TOOLTIP": {
+			"string": "Очищує всі події обраного типу.\\nЯкщо обрано \"none\", очищує всі події",
+			"version_hash": 30519526
+		},
+		"EVENTDRIVER_CLEAR_CARGO_TOOLTIP": {
+			"string": "Якщо вибрано, також очищає всі дивності (oddities), спавнені подією прямо у вашому вантажному відсіку.",
+			"version_hash": 917771176
 		}
 	}
 }
