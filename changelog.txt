@@ -52,6 +52,7 @@
 22.7="* __truncate_mod_id - formats an id as to how it would be stored within a config (i.e. removing spaces and forward slashes)"
 22.8="* __truncate_section - formats a config section as to how it would be stored within a config (i.e. removing forward slashes)"
 22.9="* __truncate_to_setting_entry - formats an id and a section to the raw section name for the config file"
+23="* Updated Ukranian translations"
 
 [1.13.1]
 
