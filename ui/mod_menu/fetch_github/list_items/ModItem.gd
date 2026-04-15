@@ -110,7 +110,6 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 				this_zip_filename = zip_path + data.get("name","temp.zip")
 				this_zip_url = data.get("browser_download_url")
 				list.btn_to_download.disabled = false
-				list.WAIT.hide()
 		3:
 			if result == HTTPRequest.RESULT_SUCCESS and response_code != 404:
 				var http = get_node("HTTPRequest")
@@ -118,6 +117,7 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 				http.download_file = ""
 				this_zip_filename = ""
 				this_zip_url = ""
+				list.WAIT.hide()
 				list.btn_to_download.grab_focus()
 				list.subtract_mod_count()
 				list.select_first_mod()

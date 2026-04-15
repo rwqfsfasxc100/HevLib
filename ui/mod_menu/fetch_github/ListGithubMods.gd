@@ -13,6 +13,7 @@ onready var btn_to_download = get_node_or_null(path_to_download_btn)
 
 const topic_url_base = "https://api.github.com/search/repositories?q=topic:%s"
 const topic_dv = "delta-v-rings-of-saturn"
+var icon_folder_path = "user://cache/.Mod_Menu_2_Cache/github_list/icon_cache/"
 
 onready var count = $Header/Count
 onready var list = $Mods/ScrollContainer/ListMods
@@ -22,19 +23,28 @@ onready var rich = info.get_node("RichTextLabel")
 onready var WAIT = parent.get_node_or_null(NodePath("WAIT"))
 
 var mod_item = load("res://HevLib/ui/mod_menu/fetch_github/list_items/ModItem.tscn")
-
+var file = File.new()
 signal icon_downloaded(uuid)
 
 onready var pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
 onready var mod_ids = pointers.ManifestV2.__get_mod_ids()
+
+var mod_list_cache = "user://cache/.Mod_Menu_2_Cache/github_list/list_cache.json"
 func _ready():
 	if prevent_load:
 		return
-	http.connect("request_completed",self,"request_complete")
-	http.request(topic_url_base % [topic_dv])
+	
 	downloader.connect("request_completed",self,"download_complete")
 	count.text = TranslationServer.translate("HEVLIB_GITHUBMODS_COUNT") % [0]
 	btn_to_download.disabled = true
+	http.connect("request_completed",self,"request_complete")
+	file.open(mod_list_cache,File.READ)
+	var dt = JSON.parse(file.get_as_text(true)).result
+	file.close()
+	if dt.size():
+		fill_in_mods(dt)
+	else:
+		http.request(topic_url_base % [topic_dv])
 	
 	
 
@@ -42,15 +52,18 @@ var mod_count = 0
 func request_complete(result, response_code, headers, body):
 	var json = JSON.parse(body.get_string_from_utf8()).result
 	if json:
-#		count.text = TranslationServer.translate("HEVLIB_GITHUBMODS_COUNT") % mod_count
-		fill_in_mods(json.get("items",[]))
+		var dt = json.get("items",[])
+		file.open(mod_list_cache,File.WRITE)
+		file.store_string(JSON.print(dt))
+		file.close()
+		fill_in_mods(dt)
 
 func add_mod_count():
 	mod_count += 1
 	count.text = TranslationServer.translate("HEVLIB_GITHUBMODS_COUNT") % mod_count
 
 func subtract_mod_count():
-	mod_count += 1
+	mod_count -= 1
 	count.text = TranslationServer.translate("HEVLIB_GITHUBMODS_COUNT") % mod_count
 
 func fill_in_mods(items : Array):
@@ -67,7 +80,6 @@ func add_box(box):
 	list.add_child(box)
 	select_first_mod()
 
-var icon_folder_path = "user://cache/.Mod_Menu_2_Cache/github_list/icon_cache/"
 var last_uuid = ""
 
 func download_complete(result, response_code, headers, body):
@@ -78,7 +90,7 @@ var current_button = null
 func _mod_selected(mod,btn):
 	rich.clear()
 	rich.parse_bbcode(mod["readme"])
-	btn_to_download.disabled = true
+	btn_to_download.disabled = (btn.this_zip_filename == "" or btn.this_zip_url == "")
 	current_button = btn
 
 func select_first_mod():
