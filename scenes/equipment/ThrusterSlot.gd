@@ -5,19 +5,12 @@ var exhaust_cache_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/po
 var color_cache_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_thruster_colors.json"
 var flare
 var file = File.new()
-var mpdg = load("res://ships/modules/AuxMpd.tscn")
-var smes = load("res://ships/modules/AuxSmes.tscn")
-var thruster = load("res://sfx/thruster.tscn")
-var exhaust = load("res://sfx/exhaust.tscn")
-var nozzle = load("res://ships/modules/nozzle-conventonal.tscn")
+var mpdg = "res://ships/modules/AuxMpd.tscn"
+var smes = "res://ships/modules/AuxSmes.tscn"
+var thruster = "res://sfx/thruster.tscn"
+var exhaust = "res://sfx/exhaust.tscn"
+var nozzle = "res://ships/modules/nozzle-conventonal.tscn"
 #const NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
-
-#func _exit_tree():
-#	mpdg = null
-#	smes = null
-#	thruster = null
-#	exhaust = null
-#	nozzle = null
 
 const torch_base_scale = [0.939,1.395]
 const rcs_base_scale = [0.2,0.2]
@@ -95,7 +88,7 @@ func modify():
 						return
 				var valid_scene = false
 				if aux_path != "":
-					var s = load(aux_path)
+					var s = ResourceLoader.load(aux_path,"",true)
 					if s:
 						valid_scene = true
 						item = s.instance()
@@ -103,11 +96,11 @@ func modify():
 				if not valid_scene:
 					match aux_type:
 						"MPDG":
-							item = mpdg.instance()
+							item = ResourceLoader.load(mpdg,"",true).instance()
 						"SMES":
-							item = smes.instance()
+							item = ResourceLoader.load(smes,"",true).instance()
 						"RCS","TORCH":
-							item = thruster.instance()
+							item = ResourceLoader.load(thruster,"",true).instance()
 				
 #				var sysn = name + "_" + sys
 				item.name = sys
@@ -216,7 +209,7 @@ func modify():
 							if file.file_exists(exhaustScene):
 								item.exhaust = load(exhaustScene)
 							else:
-								item.exhaust = exhaust
+								item.exhaust = ResourceLoader.load(exhaust,"",true)
 							
 							item.externalPower = data.get("external_power",false)
 							item.safetyMaxPower = data.get("safety_max_power",1)
@@ -305,20 +298,20 @@ func modify():
 							modify_nozzle(nozzleA,nd)
 							var noz_poz = nozzleA.get_position_in_parent()
 							for n in before_nozzles:
-								var thisNozzle = nozzle.instance()
+								var thisNozzle = ResourceLoader.load(nozzle,"",true).instance()
 								modify_nozzle(thisNozzle,n)
 								if thisNozzle:
 									item.add_child(thisNozzle)
 									item.move_child(thisNozzle,noz_poz - 1)
 							for n in after_nozzles:
-								var thisNozzle = nozzle.instance()
+								var thisNozzle = ResourceLoader.load(nozzle,"",true).instance()
 								modify_nozzle(thisNozzle,n)
 								if thisNozzle:
 									item.add_child(thisNozzle)
 							var extra_nodes = data.get("extra_nodes",[])
 							for node in extra_nodes:
 								if file.file_exists(node):
-									var scene = load(node)
+									var scene = ResourceLoader.load(node,"",true)
 									if scene:
 										item.add_child(scene.instance())
 						
