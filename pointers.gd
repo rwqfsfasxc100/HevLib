@@ -836,6 +836,15 @@ class _ConfigDriver:
 		else:
 			Debug.l("ConfigDriver: node %s does not have the method '%s'" % [str(object),method])
 	
+	func __disconnect_subscription(method: String,object: Object,id: String,section: String,setting: String):
+		var top = __truncate_to_setting_entry(id,section)
+		if top in subscriptions:
+			if setting in subscriptions[top]:
+				for item in subscriptions[top][setting]:
+					if item[0] == object:
+						if item[1] == method:
+							subscriptions[top][setting].erase(item)
+	
 	func __truncate_mod_id(mod_id:String) -> String:
 		mod_id = DataFormat.__array_to_string(mod_id.split("/"))
 		mod_id = DataFormat.__array_to_string(mod_id.split(" "))
