@@ -392,7 +392,7 @@ class _ConfigDriver:
 		__change_made()
 		
 	
-	func __establish_connection(method: String, node: Node, type: String = "config", input_method: String = "input_changed"): # Type accepts "config", "input", or "both"
+	func __establish_connection(method: String, node: Object, type: String = "config", input_method: String = "input_changed"): # Type accepts "config", "input", or "both"
 		match type.to_lower():
 			"config":
 				if node.has_method(method):
@@ -418,6 +418,37 @@ class _ConfigDriver:
 						Debug.l("ConfigDriver: node %s is already connected with the method '%s'" % [str(node),method])
 					if not is_connected("config_changed",node,method):
 						connect("config_changed",node,method)
+					else:
+						Debug.l("ConfigDriver: node %s is already connected with the method '%s'" % [str(node),method])
+				else:
+					Debug.l("ConfigDriver: node %s does not have the method '%s'" % [str(node),method])
+	
+	func __remove_connection(method: String, node: Object, type: String = "config", input_method: String = "input_changed"): # Type accepts "config", "input", or "both"
+		match type.to_lower():
+			"config":
+				if node.has_method(method):
+					if is_connected("config_changed",node,method):
+						disconnect("config_changed",node,method)
+					else:
+						Debug.l("ConfigDriver: node %s is already connected with the method '%s'" % [str(node),method])
+				else:
+					Debug.l("ConfigDriver: node %s does not have the method '%s'" % [str(node),method])
+			"input":
+				if node.has_method(method):
+					if is_connected("input_changed",node,method):
+						disconnect("input_changed",node,method)
+					else:
+						Debug.l("ConfigDriver: node %s is already connected with the method '%s'" % [str(node),method])
+				else:
+					Debug.l("ConfigDriver: node %s does not have the method '%s'" % [str(node),method])
+			"both":
+				if node.has_method(method):
+					if is_connected("input_changed",node,input_method):
+						disconnect("input_changed",node,input_method)
+					else:
+						Debug.l("ConfigDriver: node %s is already connected with the method '%s'" % [str(node),method])
+					if is_connected("config_changed",node,method):
+						disconnect("config_changed",node,method)
 					else:
 						Debug.l("ConfigDriver: node %s is already connected with the method '%s'" % [str(node),method])
 				else:
@@ -832,7 +863,13 @@ class _ConfigDriver:
 				subscriptions[top] = {}
 			if not setting in subscriptions[top]:
 				subscriptions[top][setting] = []
-			subscriptions[top][setting].append([object,method])
+			var do = true
+			for item in subscriptions[top][setting]:
+					if item[0] == object:
+						if item[1] == method:
+							do = false
+			if do:
+				subscriptions[top][setting].append([object,method])
 		else:
 			Debug.l("ConfigDriver: node %s does not have the method '%s'" % [str(object),method])
 	
