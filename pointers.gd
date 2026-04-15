@@ -25,12 +25,15 @@ var Translations : _Translations = _Translations.new(ConfigDriver)
 var WebTranslate : _WebTranslate = _WebTranslate.new(FolderAccess)
 
 var needs_cache_rebuild = false
-
+func _physics_process(delta):
+	if ConfigDriver.mk_c:
+		ConfigDriver.handle_change_made()
 func _ready():
 	ConfigDriver.ready()
 	Achievements.ready()
 	yield(get_tree(),"idle_frame")
 	get_parent().move_child(self,get_parent().get_child_count())
+	pause_mode = Node.PAUSE_MODE_PROCESS
 class _Achievements:
 	var scripts = [
 		
@@ -248,11 +251,13 @@ class _ConfigDriver:
 			cfg_dictionary.merge({section:data})
 		return cfg_dictionary
 	
+	var subscriptions = {}
+	var changes = {}
+	
 	func __store_config(configuration: Dictionary, mod_id: String, cfg_filename : String = "Mod_Configurations" + ".cfg"):
+		var made_change = false
 		var profiles_dir = "user://cfg/.profiles/"
 		var cfg_folder = "user://cfg/"
-		mod_id = DataFormat.__array_to_string(mod_id.split("/"))
-		mod_id = DataFormat.__array_to_string(mod_id.split(" "))
 		var tmpf = File.new()
 		var cfg_file = cfg_folder + cfg_filename
 		if not tmpf.file_exists(cfg_file):
@@ -267,57 +272,66 @@ class _ConfigDriver:
 		FileCFG.close()
 		var cfg_sections = cfg.get_sections()
 		var sections = configuration.keys()
-		
+		mod_id = __truncate_mod_id(mod_id)
 		for section in sections:
+			section = __truncate_section(section)
 			var sect_name = mod_id + "/" + section
 			var sect_data = configuration[section]
 			
 			if not sect_name in settings:
 				settings[sect_name] = {}
+				made_change = true
 			
 			for s in sect_data:
 				var sr = sect_data[s]
-				settings[sect_name][s] = sr
-				
-				cfg.set_value(sect_name,s,sr)
+				var current = settings[sect_name].get(s,null)
+				if current != sr:
+					settings[sect_name][s] = sr
+					made_change = true
+					if not sect_name in changes:
+						changes[sect_name] = []
+					changes[sect_name].append(s)
+					cfg.set_value(sect_name,s,sr)
 		
 		
 		
 		var profile = cfg.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","default")
 		cfg.save(cfg_file)
 		cfg.save(profiles_dir+profile + ".cfg")
-		
-		__change_made()
-		Loader.saved()
+		if made_change:
+			__change_made()
+			Loader.saved()
 	
 	func __store_value(mod_id, section, key, value, cfg_filename : String = "Mod_Configurations" + ".cfg"):
-		mod_id = DataFormat.__array_to_string(mod_id.split("/"))
-		mod_id = DataFormat.__array_to_string(mod_id.split(" "))
-		section = DataFormat.__array_to_string(section.split("/"))
+		var made_change = false
 		var cfg_folder = "user://cfg/"
 		var profiles_dir = "user://cfg/.profiles/"
 		var cfg = ConfigFile.new()
 		cfg.load(cfg_folder+cfg_filename)
-		var modSection = mod_id + "/" + section
+		var modSection = __truncate_to_setting_entry(mod_id,section)
 		cfg.set_value(modSection,key,value)
 		var profile = cfg.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","default")
 		
 		if not modSection in settings:
 			settings[modSection] = {}
-		settings[modSection][key] = value
-		
+			made_change = true
+		var current = settings[modSection].get(key,null)
+		if current != value:
+			settings[modSection][key] = value
+			made_change = true
 		cfg.save(cfg_folder+cfg_filename)
 		cfg.save(profiles_dir+profile + ".cfg")
-		
-		__change_made()
-		Loader.saved()
+		if made_change:
+			if not modSection in changes:
+				changes[modSection] = []
+			changes[modSection].append(key)
+			__change_made()
+			Loader.saved()
 	
 	func __get_config(mod_id, cfg_filename : String = "Mod_Configurations" + ".cfg") -> Dictionary:
-		mod_id = DataFormat.__array_to_string(mod_id.split("/"))
-		mod_id = DataFormat.__array_to_string(mod_id.split(" "))
 		var cfg_folder = "user://cfg/"
 		var dictionary = {}
-		
+		mod_id = __truncate_mod_id(mod_id)
 		if settingsHash:
 			for section in settings.keys():
 				var split = section.split("/")
@@ -344,11 +358,8 @@ class _ConfigDriver:
 		return dictionary
 	
 	func __get_value(mod_id: String, section: String, key: String, cfg_filename : String = "Mod_Configurations" + ".cfg"):
-		mod_id = DataFormat.__array_to_string(mod_id.split("/"))
-		mod_id = DataFormat.__array_to_string(mod_id.split(" "))
-		section = DataFormat.__array_to_string(section.split("/"))
 		var cfg_folder = "user://cfg/"
-		var full = mod_id+"/"+section
+		var full = __truncate_to_setting_entry(mod_id,section)
 		
 		if settingsHash:
 			if full in settings:
@@ -384,16 +395,33 @@ class _ConfigDriver:
 	func __establish_connection(method: String, node: Node, type: String = "config", input_method: String = "input_changed"): # Type accepts "config", "input", or "both"
 		match type.to_lower():
 			"config":
-				if not is_connected("config_changed",node,method):
-					connect("config_changed",node,method)
+				if node.has_method(method):
+					if not is_connected("config_changed",node,method):
+						connect("config_changed",node,method)
+					else:
+						Debug.l("ConfigDriver: node %s is already connected with the method '%s'" % [str(node),method])
+				else:
+					Debug.l("ConfigDriver: node %s does not have the method '%s'" % [str(node),method])
 			"input":
-				if not is_connected("input_changed",node,method):
-					connect("input_changed",node,method)
+				if node.has_method(method):
+					if not is_connected("input_changed",node,method):
+						connect("input_changed",node,method)
+					else:
+						Debug.l("ConfigDriver: node %s is already connected with the method '%s'" % [str(node),method])
+				else:
+					Debug.l("ConfigDriver: node %s does not have the method '%s'" % [str(node),method])
 			"both":
-				if not is_connected("input_changed",node,input_method):
-					connect("input_changed",node,input_method)
-				if not is_connected("config_changed",node,method):
-					connect("config_changed",node,method)
+				if node.has_method(method):
+					if not is_connected("input_changed",node,input_method):
+						connect("input_changed",node,input_method)
+					else:
+						Debug.l("ConfigDriver: node %s is already connected with the method '%s'" % [str(node),method])
+					if not is_connected("config_changed",node,method):
+						connect("config_changed",node,method)
+					else:
+						Debug.l("ConfigDriver: node %s is already connected with the method '%s'" % [str(node),method])
+				else:
+					Debug.l("ConfigDriver: node %s does not have the method '%s'" % [str(node),method])
 	
 	
 	func __load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
@@ -461,11 +489,10 @@ class _ConfigDriver:
 		Debug.l("ConfigDriver: config contains [%s] mods" % configs.size())
 		for mod in configs:
 			var data = configs[mod]
-			mod = DataFormat.__array_to_string(mod.split("/"))
-			mod = DataFormat.__array_to_string(mod.split(" "))
+			mod = __truncate_mod_id(mod)
 			for section in data:
 				var sectData = data[section]
-				var sect = mod + "/" + section
+				var sect = mod + "/" + __truncate_section(section)
 				if sect in current_config:
 					pass
 				else:
@@ -741,13 +768,34 @@ class _ConfigDriver:
 					check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("Label/LABELBUTTON"))
 				_:
 					breakpoint
-	
+	var mk_c = false
 	func __change_made():
+		mk_c = true
+	
+	func handle_change_made():
 		var shs = settings.hash()
 		if shs != settingsHash:
 			__input_change_made()
+			__subscribed_changes()
 			emit_signal("config_changed")
 			settingsHash = shs
+		mk_c = false
+	
+	func __subscribed_changes():
+		for i in changes:
+			if i in subscriptions:
+				var sub = subscriptions[i]
+				var s = i.split("/")
+				var entries = changes[i]
+				for entry in entries:
+					if entry in sub:
+						var val = __get_value(s[0],s[1],entry)
+						var out = sub[entry]
+						for o in out:
+							var obj = o[0]
+							if Tool.objectValid(obj):
+								obj.callv(o[1],[val])
+		changes.clear()
 	
 	func __input_change_made():
 		var ic = []
@@ -776,6 +824,29 @@ class _ConfigDriver:
 		if shs != settingsInputHash:
 			emit_signal("input_changed")
 			settingsInputHash = shs
+	
+	func __subscribe_to_setting_change(method: String,object: Object,id: String,section: String,setting: String):
+		if object.has_method(method):
+			var top = __truncate_to_setting_entry(id,section)
+			if not top in subscriptions:
+				subscriptions[top] = {}
+			if not setting in subscriptions[top]:
+				subscriptions[top][setting] = []
+			subscriptions[top][setting].append([object,method])
+		else:
+			Debug.l("ConfigDriver: node %s does not have the method '%s'" % [str(object),method])
+	
+	func __truncate_mod_id(mod_id:String) -> String:
+		mod_id = DataFormat.__array_to_string(mod_id.split("/"))
+		mod_id = DataFormat.__array_to_string(mod_id.split(" "))
+		return mod_id
+	
+	func __truncate_section(section:String) -> String:
+		return DataFormat.__array_to_string(section.split("/"))
+	
+	func __truncate_to_setting_entry(mod_id:String,section:String) -> String:
+		var sect_name = __truncate_mod_id(mod_id) + "/" + __truncate_section(section)
+		return sect_name
 	
 	
 
