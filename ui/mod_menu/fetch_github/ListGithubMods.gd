@@ -1,6 +1,6 @@
 extends VBoxContainer
 
-const prevent_load = false
+const prevent_load = true
 
 export var path_to_httprequest = NodePath("../../../../api_fetcher")
 export var path_to_downloader = NodePath("../../../../download_files")
