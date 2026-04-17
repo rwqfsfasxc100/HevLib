@@ -19,31 +19,26 @@ size_flags_horizontal = 3
 theme = ExtResource( 4 )
 script = ExtResource( 3 )
 
-[node name="button" type="HBoxContainer" parent="."]
-margin_right = 301.0
-margin_bottom = 50.0
-size_flags_horizontal = 3
-
-[node name="Label" type="Label" parent="button"]
+[node name="Label" type="Label" parent="."]
 margin_top = 6.0
 margin_right = 301.0
 margin_bottom = 44.0
 size_flags_horizontal = 3
 text = "BOOL_NAME_MISSING"
 
-[node name="LABELBUTTON" type="Button" parent="button/Label"]
+[node name="LABELBUTTON" type="Button" parent="Label"]
 margin_right = 10.0
 margin_bottom = 50.0
 focus_neighbour_right = NodePath("../../CheckButton")
 size_flags_horizontal = 3
 flat = true
 
-[node name="SmoothScrollTo" parent="button/Label/LABELBUTTON" instance=ExtResource( 1 )]
+[node name="SmoothScrollTo" parent="Label/LABELBUTTON" instance=ExtResource( 1 )]
 focusAt = NodePath("../..")
 
-[node name="PlaySoundsOnTheseButtons" parent="button/Label/LABELBUTTON" instance=ExtResource( 2 )]
+[node name="PlaySoundsOnTheseButtons" parent="Label/LABELBUTTON" instance=ExtResource( 2 )]
 
-[node name="reset" type="Button" parent="button"]
+[node name="reset" type="Button" parent="."]
 visible = false
 margin_left = 305.0
 margin_right = 355.0
@@ -51,17 +46,17 @@ margin_bottom = 50.0
 rect_min_size = Vector2( 50, 50 )
 flat = true
 
-[node name="TextureRect" type="TextureRect" parent="button/reset"]
+[node name="TextureRect" type="TextureRect" parent="reset"]
 margin_right = 40.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 50, 50 )
 texture = SubResource( 1 )
 expand = true
 
-[node name="SmoothScrollTo" parent="button/reset/TextureRect" instance=ExtResource( 1 )]
-focusAt = NodePath("../../../..")
+[node name="SmoothScrollTo" parent="reset/TextureRect" instance=ExtResource( 1 )]
+focusAt = NodePath("../../..")
 
-[node name="PlaySoundsOnTheseButtons" parent="button/reset/TextureRect" instance=ExtResource( 2 )]
+[node name="PlaySoundsOnTheseButtons" parent="reset/TextureRect" instance=ExtResource( 2 )]
 
 [node name="OptionButton" type="OptionButton" parent="."]
 margin_left = 305.0
@@ -88,5 +83,5 @@ margin_bottom = 50.0
 rect_min_size = Vector2( 15, 0 )
 
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
-[connection signal="pressed" from="button/reset" to="." method="_reset_pressed"]
+[connection signal="pressed" from="reset" to="." method="_reset_pressed"]
 [connection signal="item_selected" from="OptionButton" to="." method="_on_OptionButton_item_selected"]
