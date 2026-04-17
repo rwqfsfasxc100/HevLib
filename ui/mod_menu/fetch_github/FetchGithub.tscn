@@ -9,7 +9,6 @@
 [ext_resource path="res://HevLib/ui/mod_menu/fetch_github/WAIT.gd" type="Script" id=7]
 
 [node name="FetchGithub" type="Popup"]
-visible = true
 margin_right = 40.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 1280, 720 )
@@ -32,10 +31,8 @@ margin_right = 1280.0
 margin_bottom = 720.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="base"]
-margin_left = 5.0
-margin_top = 5.0
-margin_right = 1275.0
-margin_bottom = 715.0
+margin_right = 1280.0
+margin_bottom = 720.0
 
 [node name="Content" type="HBoxContainer" parent="base/VBoxContainer"]
 margin_right = 1270.0

@@ -6,10 +6,10 @@ var pointers
 
 func _init(p):
 	pointers = p
-	pointers.ConfigDriver.__establish_connection("updateValues",self)
-	updateValues()
+	pointers.ConfigDriver.__establish_connection("hl_shipinterruptupdate",self)
+	hl_shipinterruptupdate()
 
-func updateValues():
+func hl_shipinterruptupdate():
 	if pointers:
 		cargo_limit = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","processed_mineral_max_display_limit")
 

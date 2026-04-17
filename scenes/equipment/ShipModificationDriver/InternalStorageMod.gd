@@ -40,7 +40,7 @@ var add_systems = []
 
 func _enter_tree():
 	ismPointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-	ismPointers.ConfigDriver.__establish_connection("updateValues",self)
+	ismPointers.ConfigDriver.__establish_connection("hl_ism_UV",self)
 	var file = File.new()
 	file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_mods.json",File.READ)
 	hevlib_config_data = JSON.parse(file.get_as_text()).result
@@ -497,7 +497,7 @@ func _physics_process(delta):
 	if not dead and limitDroneOutput:
 		handleNanoDelivery(delta)
 	
-func updateValues():
+func hl_ism_UV():
 	if ismPointers:
 		limitDroneOutput = ismPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","limit_nanodrone_output")
 

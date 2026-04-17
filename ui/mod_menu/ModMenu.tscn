@@ -159,6 +159,7 @@ tracks/0/keys = {
 }
 
 [node name="ModMenu" type="Popup"]
+visible = true
 mouse_filter = 2
 theme = ExtResource( 2 )
 popup_exclusive = true
@@ -254,14 +255,14 @@ margin_right = 500.0
 margin_bottom = 176.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox"]
-margin_right = 110.0
+margin_right = 144.0
 margin_bottom = 65.0
 rect_min_size = Vector2( 50, 0 )
 size_flags_horizontal = 3
 
 [node name="FILTER" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox"]
-margin_left = 114.0
-margin_right = 179.0
+margin_left = 148.0
+margin_right = 213.0
 margin_bottom = 65.0
 rect_min_size = Vector2( 65, 65 )
 hint_tooltip = "HEVLIB_FILTER_BY_TAGS"
@@ -281,8 +282,8 @@ expand = true
 [node name="PlaySoundsOnTheseButtons" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/FILTER" instance=ExtResource( 1 )]
 
 [node name="PROFILES" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox"]
-margin_left = 183.0
-margin_right = 248.0
+margin_left = 217.0
+margin_right = 282.0
 margin_bottom = 65.0
 rect_min_size = Vector2( 65, 65 )
 hint_tooltip = "HEVLIB_OPT_PROFILES"
@@ -298,8 +299,8 @@ expand = true
 [node name="PlaySoundsOnTheseButtons" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/PROFILES" instance=ExtResource( 1 )]
 
 [node name="MODPACKS" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox"]
-margin_left = 252.0
-margin_right = 317.0
+margin_left = 286.0
+margin_right = 351.0
 margin_bottom = 65.0
 rect_min_size = Vector2( 65, 65 )
 hint_tooltip = "HEVLIB_OPT_MODPACKS"
@@ -333,7 +334,7 @@ expand = true
 [node name="PlaySoundsOnTheseButtons" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/DOWNLOAD" instance=ExtResource( 1 )]
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox"]
-margin_left = 390.0
+margin_left = 355.0
 margin_right = 500.0
 margin_bottom = 65.0
 rect_min_size = Vector2( 50, 0 )
@@ -721,7 +722,7 @@ size_flags_vertical = 3
 script = ExtResource( 8 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/DESC/ScrollContainer"]
-margin_right = 550.0
+margin_right = 540.0
 margin_bottom = 371.0
 mouse_filter = 2
 size_flags_horizontal = 3

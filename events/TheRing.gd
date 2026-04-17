@@ -17,7 +17,7 @@ var mod_request_log = {}
 var base_playlist = []
 var disabled_events = null
 onready var dummy_event = load("res://HevLib/events/event_selector/DummyEvent.gd").new()
-func updateValues():
+func hl_ring_UV():
 	if pointers:
 		base_playlist = []
 		disabled_events = null
@@ -196,10 +196,10 @@ func _ready():
 	veinImage = veins.get_data()
 	veinSize = veinImage.get_size()
 	
-	pointers.ConfigDriver.__establish_connection("updateValues",self)
+	pointers.ConfigDriver.__establish_connection("hl_ring_UV",self)
 	if not playlist:
 		yield(get_tree(),"idle_frame")
-	updateValues()
+	hl_ring_UV()
 
 func wipe_lists():
 	group.clear()

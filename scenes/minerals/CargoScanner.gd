@@ -4,10 +4,10 @@ var HevLib_pointers
 
 func _enter_tree():
 	HevLib_pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
-	HevLib_pointers.ConfigDriver.__establish_connection("updateValues",self)
-	updateValues()
+	HevLib_pointers.ConfigDriver.__establish_connection("hl_cargo_limiter_uv",self)
+	hl_cargo_limiter_uv()
 
-func updateValues():
+func hl_cargo_limiter_uv():
 	if HevLib_pointers:
 		cargo_limit = HevLib_pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","cargo_scanner_mineral_display_limit")
 
