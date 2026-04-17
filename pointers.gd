@@ -669,16 +669,8 @@ class _ConfigDriver:
 		var pos = button.get_position_in_parent()
 		var icon_button
 		var reset_button
-		match button.get_script().get_path():
-			"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/option_button.gd":
-				icon_button = button.get_node("button/Label/LABELBUTTON")
-				reset_button = button.get_node("button/reset")
-	#		"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/action.gd":
-	#			icon_button = button.get_node("Label/LABELBUTTON")
-	#			reset_button = Button.new()
-			_:
-				icon_button = button.get_node("Label/LABELBUTTON")
-				reset_button = button.get_node("reset")
+		icon_button = button.get_node("Label/LABELBUTTON")
+		reset_button = button.get_node("reset")
 		
 		if children.size() == 1:
 			icon_button.focus_neighbour_top = "."
@@ -693,13 +685,9 @@ class _ConfigDriver:
 			check_button.focus_neighbour_top = "."
 			var script_path = parent.get_child(pos+1).get_script().get_path()
 			
-			match parent.get_child(pos + 1).get_script().get_path():
-				"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/option_button.gd":
-					icon_button.focus_neighbour_bottom = icon_button.get_path_to(parent.get_child(pos + 1).get_node("button/Label/LABELBUTTON"))
-					reset_button.focus_neighbour_bottom = reset_button.get_path_to(parent.get_child(pos + 1).get_node("button/reset"))
-				_:
-					icon_button.focus_neighbour_bottom = icon_button.get_path_to(parent.get_child(pos + 1).get_node("Label/LABELBUTTON"))
-					reset_button.focus_neighbour_bottom = reset_button.get_path_to(parent.get_child(pos + 1).get_node("reset"))
+			
+			icon_button.focus_neighbour_bottom = icon_button.get_path_to(parent.get_child(pos + 1).get_node("Label/LABELBUTTON"))
+			reset_button.focus_neighbour_bottom = reset_button.get_path_to(parent.get_child(pos + 1).get_node("reset"))
 			
 			match script_path:
 				"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.gd":
@@ -725,13 +713,9 @@ class _ConfigDriver:
 
 			var script_path = parent.get_child(pos-1).get_script().get_path()
 			
-			match parent.get_child(pos - 1).get_script().get_path():
-				"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/option_button.gd":
-					icon_button.focus_neighbour_top = icon_button.get_path_to(parent.get_child(pos - 1).get_node("button/Label/LABELBUTTON"))
-					reset_button.focus_neighbour_top = reset_button.get_path_to(parent.get_child(pos - 1).get_node("button/reset"))
-				_:
-					icon_button.focus_neighbour_top = icon_button.get_path_to(parent.get_child(pos - 1).get_node("Label/LABELBUTTON"))
-					reset_button.focus_neighbour_top = reset_button.get_path_to(parent.get_child(pos - 1).get_node("reset"))
+			
+			icon_button.focus_neighbour_top = icon_button.get_path_to(parent.get_child(pos - 1).get_node("Label/LABELBUTTON"))
+			reset_button.focus_neighbour_top = reset_button.get_path_to(parent.get_child(pos - 1).get_node("reset"))
 			match script_path:
 				"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.gd":
 					check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("CheckButton"))
@@ -750,13 +734,9 @@ class _ConfigDriver:
 					breakpoint
 		else:
 			var script_path = parent.get_child(pos-1).get_script().get_path()
-			match parent.get_child(pos - 1).get_script().get_path():
-				"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/option_button.gd":
-					icon_button.focus_neighbour_top = icon_button.get_path_to(parent.get_child(pos - 1).get_node("button/Label/LABELBUTTON"))
-					reset_button.focus_neighbour_top = reset_button.get_path_to(parent.get_child(pos - 1).get_node("button/reset"))
-				_:
-					icon_button.focus_neighbour_top = icon_button.get_path_to(parent.get_child(pos - 1).get_node("Label/LABELBUTTON"))
-					reset_button.focus_neighbour_top = reset_button.get_path_to(parent.get_child(pos - 1).get_node("reset"))
+			
+			icon_button.focus_neighbour_top = icon_button.get_path_to(parent.get_child(pos - 1).get_node("Label/LABELBUTTON"))
+			reset_button.focus_neighbour_top = reset_button.get_path_to(parent.get_child(pos - 1).get_node("reset"))
 			match script_path:
 				"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.gd":
 					check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("CheckButton"))
@@ -776,13 +756,9 @@ class _ConfigDriver:
 
 			var script_path2 = parent.get_child(pos+1).get_script().get_path()
 			
-			match parent.get_child(pos + 1).get_script().get_path():
-				"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/option_button.gd":
-					icon_button.focus_neighbour_bottom = icon_button.get_path_to(parent.get_child(pos + 1).get_node("button/Label/LABELBUTTON"))
-					reset_button.focus_neighbour_bottom = reset_button.get_path_to(parent.get_child(pos + 1).get_node("button/reset"))
-				_:
-					icon_button.focus_neighbour_bottom = icon_button.get_path_to(parent.get_child(pos + 1).get_node("Label/LABELBUTTON"))
-					reset_button.focus_neighbour_bottom = reset_button.get_path_to(parent.get_child(pos + 1).get_node("reset"))
+		
+			icon_button.focus_neighbour_bottom = icon_button.get_path_to(parent.get_child(pos + 1).get_node("Label/LABELBUTTON"))
+			reset_button.focus_neighbour_bottom = reset_button.get_path_to(parent.get_child(pos + 1).get_node("reset"))
 			match script_path2:
 				"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.gd":
 					check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("CheckButton"))
@@ -3646,7 +3622,7 @@ class _FolderAccess:
 		return true
 	
 	func __fetch_folder_files(folder: String, showFolders: bool = false, returnFullPath: bool = false,globalizePath: bool = false):
-		var fileList = []
+		var fileList : PoolStringArray = PoolStringArray([])
 		if not folder.ends_with("/"):
 			folder += "/"
 		var dir = Directory.new()
@@ -3677,16 +3653,6 @@ class _FolderAccess:
 					fileList.append(ProjectSettings.globalize_path(fileName))
 				else:
 					fileList.append(fileName)
-	
-	
-	#	m = m.split(m.split("/")[0] + "/")[1].to_lower()
-		var dFiles = ""
-		for m in fileList:
-			if dFiles == "":
-				dFiles = m
-			else:
-				dFiles = dFiles + ", " + m
-	#	Debug.l("HevLib: fetch_folder_files returning as %s" % dFiles)
 		return fileList
 	
 	func __get_first_file(folder: String):
