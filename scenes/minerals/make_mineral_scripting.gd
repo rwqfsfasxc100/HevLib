@@ -63,6 +63,7 @@ static func make_mineral_scripting(is_onready = false,pointers = null,modmain = 
 
 
 static func handle_ore_scenes(mineral_data,pointers):
+	var file = File.new()
 	var mineral_list = {}
 	for mineral in mineral_data:
 		var mname = mineral["name"]
@@ -73,13 +74,29 @@ static func handle_ore_scenes(mineral_data,pointers):
 				"scenes":
 					var scenes = PoolStringArray([])
 					for i in range(0,7):
-						scenes.append(mineral.get("ore_%s" % (i + 1),""))
+						var specific = mineral.get("ore_%s" % (i + 1),"")
+						if typeof(specific) == TYPE_STRING and file.file_exists(specific):
+							scenes.append(specific)
 					var item = make_asteroid_spawner_section(mname,scenes)
 					mineral_list.merge({mname:item})
 					Debug.l("HevLib Mineral Manager: adding mineral %s using handler [scene]" % mname)
 				"recolor":
 					var base = "fe"
-					var color = mineral.get("color",Color(1,1,1,1))
+					var info = {}
+					if "color" in mineral:
+						info["color"] = mineral["color"]
+					if "filler" in mineral:
+						info["filler"] = mineral["filler"]
+					if "mass" in mineral:
+						info["mass"] = mineral["mass"]
+					if "min_scale" in mineral:
+						info["min_scale"] = mineral["min_scale"]
+					if "max_scale" in mineral:
+						info["max_scale"] = mineral["max_scale"]
+					if "purity" in mineral:
+						info["purity"] = mineral["purity"]
+					if "specific_ore_data" in mineral:
+						info["specific_ore_data"] = mineral["specific_ore_data"]
 					match mineral.get("base","fe").to_lower():
 						"fe","iron":
 							base = "fe"
@@ -93,10 +110,14 @@ static func handle_ore_scenes(mineral_data,pointers):
 							base = "pt"
 						"w","tungsten","wolfram":
 							base = "w"
-					var roc = make_custom_rocks(mname,color,base,pointers)
+					info["base"] = base
+					var roc = make_custom_rocks(mname,info,pointers)
 					var rt = make_asteroid_spawner_section(mname,roc)
 					mineral_list.merge({mname:rt})
 					Debug.l("HevLib Mineral Manager: adding mineral %s using handler [recolor]" % mname)
+				"none":
+					Debug.l("HevLib Mineral Manager: mineral %s registered but not adding to ring" % mineral)
+				
 				_:
 					
 					Debug.l("HevLib Mineral Manager: mineral %s using incorrect handler, set price to 0.0 or less to prevent being registered to exist in the ring or crashes may happen" % mineral)
@@ -116,18 +137,61 @@ const arr_checker = "\n\tif not \"%s\" in %s:\n\t\t%s.append("
 
 const folder_base = "user://cache/.HevLib_Cache/Minerals/mineral_store/%s-%s/"
 
-static func make_custom_rocks(mineral,color,base,pointers):
+static func make_custom_rocks(mineral,info:Dictionary,pointers):
 	var header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://HevLib/scenes/minerals/base_scenes/mineral-%s-%s.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"mineral\" instance=ExtResource( 1 )]"
-	var content = "\nmineral = \"%s\"\ncolor = Color( %s, %s, %s, 1 )" % [mineral,color.r,color.g,color.b]
+	var content = "\nmineral = \"%s\"" % [mineral]
+	var color = Color(1,1,1,1)
+	var mass = 20.0
+	var filler_mineral = "H2O"
+	var min_scale = 0.75
+	var max_scale = 1.0
+	var base = info.get("base")
+	if "color" in info:
+		color = info.get("color")
+	if "mass" in info:
+		mass = info["mass"]
+	if "filler" in info:
+		filler_mineral = info.get("filler","H2O")
+	if "min_scale" in info:
+		min_scale = info["min_scale"]
+	if "max_scale" in info:
+		max_scale = info["max_scale"]
+	
+	var purityInfo = info.get("purity",{})
 	var folder = folder_base % [mineral,str(int(color.r*255)) + str(int(color.g*255)) + str(int(color.b*255))]
 	var file = File.new()
 	
+	var specific_data = info.get("specific_ore_data",{})
 	var rt = []
-	for i in range(0,7):
+	for i in range(7):
 		var id = i + 1
+		var cl = color
+		var ms = mass
+		var fm = filler_mineral
+		var mns = min_scale
+		var mxs = max_scale
 		pointers.FolderAccess.__check_folder_exists(folder)
 		var fn = folder + "h%s.tscn" % id
 		var data = header % [base,id] + content
+		if id in specific_data:
+			var idx = specific_data[id]
+			if "color" in idx:
+				cl = idx["color"]
+			if "mass" in idx:
+				ms = idx["mass"]
+			if "filler" in idx:
+				fm = idx["filler"]
+			if "min_scale" in idx:
+				mns = idx["min_scale"]
+			if "max_scale" in idx:
+				mxs = idx["max_scale"]
+		data += "\ncolor = Color( %s, %s, %s, 1 )" % [cl.r,cl.g,cl.b]
+		data += "\nmass = %s" % [str(ms)]
+		data += "\nfiller = \"%s\"" % [fm]
+		data += "\nscaleMin = %s" % [str(mns)]
+		data += "\nscaleMax = %s" % [str(mxs)]
+		if id in purityInfo:
+			data += "\npurity = %s" % [str(purityInfo[id])]
 		file.open(fn,File.WRITE)
 		file.store_string(data)
 		file.close()
@@ -135,11 +199,12 @@ static func make_custom_rocks(mineral,color,base,pointers):
 	return rt
 
 static func make_asteroid_spawner_section(mineral : String,scenes : PoolStringArray):
-	if scenes.size() != 7:
+	if scenes.size() < 7:
 		return ""
 	var mh = "\n\t\"" + str(mineral) + "\":[\n"
-	for mineral in scenes:
-		mh = mh + "\t\tpreload(\"" + mineral + "\"),\n"
+	for i in range(7):
+		var mn = scenes[i]
+		mh = mh + "\t\tpreload(\"" + mn + "\"),\n"
 	mh = mh + "\t],\n"
 	return mh
 
@@ -163,7 +228,8 @@ static func handle_mineral_values_and_colors(mineral_data):
 		var color = mineral["color"]
 		if price > 0.0:
 			prices.merge({mname:price})
-			traces.append(mname)
+			if mineral.get("handle","none") != "none":
+				traces.append(mname)
 		colors.merge({mname:color})
 	var price_text = ""#price_header
 	for price in prices:
