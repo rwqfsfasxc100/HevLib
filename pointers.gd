@@ -5780,11 +5780,19 @@ class _Translations:
 			if line.begins_with("#"):
 				continue
 			var line_split = line.split(delimiter)
-			var split_size = line_split.size() - 1
-			if split_size + 1 == 1:
+			var split_size = line_split.size()
+			if split_size > 2:
+				var i = 0
+				while i < split_size:
+					if line_split[i].ends_with("\\") and i < split_size:
+						line_split[i] = line_split[i].rstrip("\\") + delimiter + line_split[i + 1]
+						line_split.remove(i + 1)
+						split_size -= 1
+					i += 1
+			if split_size == 1:
 				index += 1
 				continue
-			if split_size < languages.size():
+			if split_size - 1 < languages.size():
 				index += 1
 				continue
 			var translation_string = line_split[0]
