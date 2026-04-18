@@ -141,10 +141,11 @@ static func make_custom_rocks(mineral,info:Dictionary,pointers):
 	var header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://HevLib/scenes/minerals/base_scenes/mineral-%s-%s.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"mineral\" instance=ExtResource( 1 )]"
 	var content = "\nmineral = \"%s\"" % [mineral]
 	var color = Color(1,1,1,1)
-	var mass = 20.0
-	var filler_mineral = "H2O"
-	var min_scale = 0.75
-	var max_scale = 1.0
+	var mass = null
+	var filler_mineral = null
+	var min_scale = null
+	var max_scale = null
+	var ferrous = false
 	var base = info.get("base")
 	if "color" in info:
 		color = info.get("color")
@@ -156,7 +157,8 @@ static func make_custom_rocks(mineral,info:Dictionary,pointers):
 		min_scale = info["min_scale"]
 	if "max_scale" in info:
 		max_scale = info["max_scale"]
-	
+	if "ferrous" in info:
+		ferrous = info["ferrous"]
 	var purityInfo = info.get("purity",{})
 	var folder = folder_base % [mineral,str(int(color.r*255)) + str(int(color.g*255)) + str(int(color.b*255))]
 	var file = File.new()
@@ -170,6 +172,7 @@ static func make_custom_rocks(mineral,info:Dictionary,pointers):
 		var fm = filler_mineral
 		var mns = min_scale
 		var mxs = max_scale
+		var fr = ferrous
 		pointers.FolderAccess.__check_folder_exists(folder)
 		var fn = folder + "h%s.tscn" % id
 		var data = header % [base,id] + content
@@ -185,11 +188,19 @@ static func make_custom_rocks(mineral,info:Dictionary,pointers):
 				mns = idx["min_scale"]
 			if "max_scale" in idx:
 				mxs = idx["max_scale"]
+			if "ferrous" in idx:
+				fr = idx["ferrous"]
 		data += "\ncolor = Color( %s, %s, %s, 1 )" % [cl.r,cl.g,cl.b]
-		data += "\nmass = %s" % [str(ms)]
-		data += "\nfiller = \"%s\"" % [fm]
-		data += "\nscaleMin = %s" % [str(mns)]
-		data += "\nscaleMax = %s" % [str(mxs)]
+		if ms:
+			data += "\nmass = %s" % [str(ms)]
+		if fm:
+			data += "\nfiller = \"%s\"" % [fm]
+		if mns:
+			data += "\nscaleMin = %s" % [str(mns)]
+		if mxs:
+			data += "\nscaleMax = %s" % [str(mxs)]
+		if fr:
+			data += "\nferrous = true"
 		if id in purityInfo:
 			data += "\npurity = %s" % [str(purityInfo[id])]
 		file.open(fn,File.WRITE)

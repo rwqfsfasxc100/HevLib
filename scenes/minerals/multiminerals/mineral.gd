@@ -22,7 +22,8 @@ func calc_comp():
 		else:
 			#Remove the stray atoms
 			composition.erase(type)
-
+	if "fe" in composition:
+		set_collision_layer_bit(5,true)
 	#Set mineral content to zero so we can abuse the MPU code later
 #	mineralContent = 0.0
 
