@@ -1831,8 +1831,8 @@ const TRANSLATIONS = {
 			"version_hash": 1619856286
 		},
 		"HEVLIB_GITHUB_PROGRESS_DOWNLOADING": {
-			"string": "Downloading file \\",
-			"version_hash": 2236301751
+			"string": "Downloading file | %06.2f%%\\n\\n%0.2f %s downloaded of %0.2f %s",
+			"version_hash": 812004994
 		},
 		"HEVLIB_GITHUB_PROGRESS_DOWNLOADING_ONLY_BYTES": {
 			"string": "Downloading file.\\n\\n%0.2f %s downloaded",
