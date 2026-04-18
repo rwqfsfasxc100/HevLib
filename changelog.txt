@@ -1,3 +1,25 @@
+[1.13.3]
+
+1="* Made config updater functions use unique names to prevent conflicts with mods"
+2="* Fixed inconsistencies with OptionButton type config entries"
+3="* Fixed memory leak with FolderAccess.__fetch_folder_files when attempting to list a directory with a high number of files and/or folders"
+4="* Fixed crash with mod menu trying to list mods too early"
+5="* Fixed crash caused by procedural mineral objects created by MineralDriver not loading the overlay texture correctly"
+6="* Greatly improved MineralDriver, especially in the area of procedural minerals"
+6.1="* Setting a mineral price now no longer requires minerals to be created from scenes or procedurally"
+6.1.1="* This allows for minerals to be added, traded, and potentially obtained in the ring without being found as ore chunks"
+6.1.2="* This involves a change to the handle property, which now defaults to none and having it set as such will not require anything to add ore chunks"
+6.2="* Added the ability to modify a larger number of the properties used to spawn minerals to provide more control."
+6.2.1="* Any properties not set will use the default for the specific base mineral"
+6.2.2="* mass - (float) roughly the mass of the ore chunk. Value is divided by 5 before being calculated."
+6.2.3="* filler - (string) mineral used as the displayed filler mineral. Does not affect what the ore is processed into, and will still generate propellant as if it were water. Defaults to H2O"
+6.2.4="* min_scale - (float) minimum scale of the sprite and collider, used to linearly interpolate between this value and max_scale by the mineral content to get the actual scale"
+6.2.5="* max_scale - (float) maximum scale of the sprite and collider, used to linearly interpolate between min_scale and this value by the mineral content to get the actual scale"
+6.2.6="* ferrous - (bool) whether the ore chunk should be affected by magnetic fields"
+6.2.7="* purity - (dictionary) contains the purity value of each level of chunk (from 1 to 7) with the ore index being the key and a float between 0 and 1 as the value, i.e. "purity":{1:0.52,2:0.58} , used for calculating ore density for each level of ore"
+6.2.8="* specific_ore_data - (dictionary of dictionaries) contains ore-level specific data, similar to purity but instead each index holding a dictionary for specific non-purity values"
+7="* Multi-minerals enabled minerals with iron not the primary ore are now magnetic"
+
 [1.13.2]
 
 1="* Added more transit tips"
