@@ -5568,10 +5568,15 @@ class _NodeAccess:
 			
 			return save_file_path
 	
+	var var_hash = {}
+	
 	func __convert_var_from_string(string : String):
+		if string in var_hash:
+			return var_hash[string]
 		var header = "extends Reference\nconst VARIABLE = "
 		var script = DataFormat.__compile_script(header + string)
 		var variable = script.VARIABLE
+		var_hash[string] = variable
 		return variable
 	
 	func __remove_scripts(node):
