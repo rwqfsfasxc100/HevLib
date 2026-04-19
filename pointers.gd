@@ -1207,15 +1207,33 @@ class _DataFormat:
 				pairs.append(PoolIntArray([i, j]))
 		return pairs
 	
-	func __compile_script(source_code : String) -> Script:
+	var compiled_script_storage = {}
+	
+	func __compile_script(source_code : String,new_object = false) -> Script:
+		var shash = hash(source_code)
+		if not new_object and shash in compiled_script_storage:
+			return compiled_script_storage[shash]
+		
 		var out = GDScript.new()
 		out.set_source_code(source_code)
 		out.reload()
-		return out.new()
+		var obj = out.new()
+		compiled_script_storage[shash] = obj
+		return obj
 	
-	func __compile_to_script_object(source_code : String, params = []) -> Script:
+	var compiled_script_object_storage = {}
+	
+	func __compile_to_script_object(source_code : String, params = [],new_object = false) -> Script:
 		if not params is Array:
 			params = [params]
+		var shash = ""
+		if params.size() > 0:
+			var parStr = str(params)
+			shash = str(hash(source_code)) + "_" + str(hash(parStr))
+		else:
+			shash = str(hash(source_code))
+		if not new_object and shash in compiled_script_object_storage:
+			return compiled_script_object_storage[shash]
 		
 		var gd = GDScript.new()
 		gd.set_source_code(source_code)
@@ -1246,6 +1264,7 @@ class _DataFormat:
 			out = g.parse(f,params)
 		else:
 			out = gd.new()
+		compiled_script_object_storage[shash] = out
 		return out
 	
 	var _savedScriptObjects := []
@@ -1302,10 +1321,15 @@ class _DataFormat:
 		scene.take_over_path(scene_path)
 		_savedScriptObjects.append(scene)
 	
+	var var_hash = {}
+	
 	func __convert_var_from_string(string : String):
+		if string in var_hash:
+			return var_hash[string]
 		var header = "extends Reference\nconst VARIABLE = "
 		var script = __compile_script(header + string)
 		var variable = script.VARIABLE
+		var_hash[string] = variable
 		return variable
 	
 	
