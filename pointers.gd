@@ -1082,17 +1082,10 @@ class _DataFormat:
 		var pathway = __trim_scripts(script_path)
 		if pathway[2].size() == 0:
 			return {}
-		var file = File.new()
-		var dir = Directory.new()
-		var n = filepath + str(Time.get_ticks_usec()) + ".gd"
-		file.open(n,File.WRITE)
-		file.store_string(pathway[0])
-		file.close()
 		var dict = {}
-		var l = load(n).new().get_script().get_script_constant_map()
+		var l = __compile_to_script_object(pathway[0]).get_script().get_script_constant_map()
 		for i in pathway[2]:
 			dict[i] = l[i]
-		dir.remove(n)
 		return dict
 	
 	func __get_script_variables_without_load(script_path) -> Dictionary:
@@ -1100,17 +1093,10 @@ class _DataFormat:
 		var pathway = __trim_scripts(script_path)
 		if pathway[2].size() == 0:
 			return {}
-		var file = File.new()
-		var dir = Directory.new()
-		var n = filepath + str(Time.get_ticks_usec()) + ".gd"
-		file.open(n,File.WRITE)
-		file.store_string(pathway[0])
-		file.close()
 		var dict = {}
-		var l = load(n).new()
+		var l = __compile_to_script_object(pathway[0])
 		for i in pathway[1]:
 			dict[i] = l.get(i)
-		dir.remove(n)
 		return dict
 		
 	const function_prefixes = ["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func "]
