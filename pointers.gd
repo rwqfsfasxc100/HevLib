@@ -1249,9 +1249,7 @@ class _DataFormat:
 		return out
 	
 	var _savedScriptObjects := []
-	func __compile_and_override_script(source_code : String, params = [], script_storage_object = null, script_storage_array_name : String = "_savedObjects") -> void:
-		if not params is Array:
-			params = [params]
+	func __compile_and_override_script(source_code : String, script_storage_object = null, script_storage_array_name : String = "_savedObjects") -> void:
 		
 		var out = GDScript.new()
 		out.set_source_code(source_code)
@@ -1267,9 +1265,7 @@ class _DataFormat:
 		else:
 			_savedScriptObjects.append(out)
 	
-	func __compile_and_override_script_with_scene(source_code : String, params = [], script_storage_object = null, script_storage_array_name : String = "_savedObjects", scene_path : String = "") -> void:
-		if not params is Array:
-			params = [params]
+	func __compile_and_override_script_with_scene(source_code : String, script_storage_object = null, script_storage_array_name : String = "_savedObjects", scene_path : String = "") -> void:
 		
 		var out = GDScript.new()
 		out.set_source_code(source_code)

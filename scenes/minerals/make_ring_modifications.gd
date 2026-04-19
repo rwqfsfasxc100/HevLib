@@ -56,4 +56,4 @@ static func make_ring_modifications(pointers,modmain):
 	installScriptDirect(total,pointers,modmain,"res://story/TheRing.tscn")
 
 static func installScriptDirect(source:String,pointers,modmain,scene_path):
-	pointers.DataFormat.__compile_and_override_script_with_scene(source,[],modmain,"_savedObjects",scene_path)
+	pointers.DataFormat.__compile_and_override_script_with_scene(source,modmain,"_savedObjects",scene_path)

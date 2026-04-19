@@ -265,4 +265,4 @@ static func installScriptExtension(path:String):
 	var parentPath:String = parentScript.resource_path
 	childScript.take_over_path(parentPath)
 static func installScriptDirect(source:String,pointers,modmain):
-	pointers.DataFormat.__compile_and_override_script(source,[],modmain)
+	pointers.DataFormat.__compile_and_override_script(source,modmain)
