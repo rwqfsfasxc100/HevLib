@@ -114,3 +114,4 @@ jobs:
           draft: ${{ inputs.force_update == false }}
           generateReleaseNotes: ${{ inputs.force_update == false }}
           makeLatest: true
+          bodyFile: ".github/release_notes.md"
