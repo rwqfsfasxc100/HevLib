@@ -1,11 +1,13 @@
 extends "res://ships/ship-ctrl.gd"
 
 var ship_register_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_register.json"
-var ship_modify_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_modify.json"
+var ship_node_modify_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_modify.json"
 var node_definitons_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/node_definitions.json"
+var ship_modify_store = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_modify.json"
 
 var processed_node_definitions = {}
 var processed_ship_register = {}
+var processed_ship_modify = {}
 
 var pointers
 #var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
@@ -30,26 +32,53 @@ func make_node_mods():
 #	if has_modified:
 #		return
 #	has_modified = true
+	
+	processed_ship_modify = process_ship_modify()
 	processed_node_definitions = process_node_definitons()
 	processed_ship_register = process_ship_register()
 	
-	var ship_match = false
+#	var ship_match = false
 #	if "transponder" in fullConfig:
 #		ship_match = CurrentGame.state.ship.transponder == fullConfig.transponder
 	
 	
-	if ship_match:
-		Debug.l("HevLib Add Nodes: Getting config init")
-		if shipName in processed_ship_register:
-			Debug.l("HevLib Add Nodes: Planned base addition - \n\n%s" % JSON.print(processed_ship_register[shipName],"\t"))
-		if baseShipName in processed_ship_register and shipName != baseShipName:
-			Debug.l("HevLib Add Nodes: Planned base addition parent - \n\n%s" % JSON.print(processed_ship_register[baseShipName],"\t"))
-		var chld = get_children()
-		var child_names = []
-		for n in chld:
-			child_names.append(n.name)
-		Debug.l("HevLib Add Nodes: Ship nodes before addition: %s" % JSON.print(child_names,"\t"))
-		
+#	if ship_match:
+#		Debug.l("HevLib Add Nodes: Getting config init")
+#		if shipName in processed_ship_register:
+#			Debug.l("HevLib Add Nodes: Planned base addition - \n\n%s" % JSON.print(processed_ship_register[shipName],"\t"))
+#		if baseShipName in processed_ship_register and shipName != baseShipName:
+#			Debug.l("HevLib Add Nodes: Planned base addition parent - \n\n%s" % JSON.print(processed_ship_register[baseShipName],"\t"))
+#		var chld = get_children()
+#		var child_names = []
+#		for n in chld:
+#			child_names.append(n.name)
+#		Debug.l("HevLib Add Nodes: Ship nodes before addition: %s" % JSON.print(child_names,"\t"))
+	
+	
+	
+	if processed_ship_modify:
+		for addition in processed_ship_modify.get("add",[]):
+			
+			
+			breakpoint
+		for modification in processed_ship_modify.get("modify",[]):
+			var node_path = modification.get("path","")
+			if not node_path:
+				node_path = "."
+			var node = get_node_or_null(node_path)
+			if node:
+				var property = modification.get("property")
+				if property:
+					var vraw = modification.get("value","")
+					if vraw:
+						var value = pointers.NodeAccess.__convert_var_from_string(vraw)
+						set_index(node,property,value)
+						
+						
+#						breakpoint
+	
+	
+	
 	var n_store = {}
 	
 	var get_base_ship_fallback = true
@@ -313,19 +342,19 @@ func make_node_mods():
 #		call_deferred("add_child",node)
 		
 
-	if ship_match:
-		var chld = get_children()
-		var child_names = []
-		for n in chld:
-			child_names.append(n.name)
-		Debug.l("HevLib Add Nodes: Ship nodes after addition: %s" % JSON.print(child_names,"\t"))
+#	if ship_match:
+#		var chld = get_children()
+#		var child_names = []
+#		for n in chld:
+#			child_names.append(n.name)
+#		Debug.l("HevLib Add Nodes: Ship nodes after addition: %s" % JSON.print(child_names,"\t"))
 
 	nodeModify()
 
 
 func nodeModify():
 	var file = File.new()
-	file.open(ship_modify_file,File.READ)
+	file.open(ship_node_modify_file,File.READ)
 	var modify_data = JSON.parse(file.get_as_text()).result
 	file.close()
 	
@@ -657,4 +686,49 @@ func process_node_definitons():
 				pd.merge({module:{"node":node,"properties":properties,"position_data":pos_basic,"ships_to_ignore":ignore,"recurse_to_variants":recursive}})
 	
 	return pd
+
+func process_ship_modify():
+	var file = File.new()
+	var pd = {}
+	file.open(ship_modify_store,File.READ)
+	var data = JSON.parse(file.get_as_text()).result
+	file.close()
 	
+	if baseShipName in data and data[baseShipName]["recurse"]:
+		var shipData = data[baseShipName]
+		if "add" in shipData and shipData["add"]:
+			if not "add" in pd:
+				pd["add"] = []
+			pd["add"].append_array(shipData["add"])
+		if "modify" in shipData and shipData["modify"]:
+			if not "modify" in pd:
+				pd["modify"] = []
+			pd["modify"].append_array(shipData["modify"])
+	if shipName in data:
+		var shipData = data[shipName]
+		if "add" in shipData and shipData["add"]:
+			if not "add" in pd:
+				pd["add"] = []
+			pd["add"].append_array(shipData["add"])
+		if "modify" in shipData and shipData["modify"]:
+			if not "modify" in pd:
+				pd["modify"] = []
+			pd["modify"].append_array(shipData["modify"])
+	return pd
+
+
+func set_index(object,where,how):
+	var s = where.split("/")
+	if s[0] in object:
+		
+		var size = s.size()
+		if size > 1:
+			var prop = object[s[0]]
+			for i in range(size - 2):
+				prop = prop[s[i + 1]]
+			
+			prop[s[-1]] = how
+		else:
+			object[s[0]] = how
+		
+		pass

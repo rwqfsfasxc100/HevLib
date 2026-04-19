@@ -1322,6 +1322,12 @@ class _DataFormat:
 	
 	
 	
+	
+	
+	
+	
+	
+	
 
 class _DriverManagement:
 	var scripts = [
@@ -1762,6 +1768,7 @@ class _Equipment:
 			"user://cache/.HevLib_Cache/ShipDriver/",
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/Driver_Store.json",
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order_relative.json",
+			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_modify.json",
 			
 		]
 		
@@ -1786,6 +1793,7 @@ class _Equipment:
 		var ship_driver_path = FILE_PATHS[18]
 		var storage_for_driver_store = FILE_PATHS[19]
 		var slot_order_relative_store = FILE_PATHS[20]
+		var ship_modify_store = FILE_PATHS[21]
 		if is_onready:
 			
 			version = DataFormat.__get_vanilla_version()
@@ -1878,6 +1886,9 @@ class _Equipment:
 		file.open(slot_order_relative_store,File.WRITE)
 		file.store_string("{}")
 		file.close()
+		file.open(ship_modify_store,File.WRITE)
+		file.store_string("{}")
+		file.close()
 		
 		
 		
@@ -1906,6 +1917,7 @@ class _Equipment:
 			"ADD_SHIPS":[],
 			"REGISTER_SHIP_NUMERICS":{},
 			"SLOT_ORDER_RELATIVE":{},
+			"SHIP_MODIFY":[]
 			
 		}
 		
@@ -2312,6 +2324,23 @@ class _Equipment:
 									driver_store["SHIP_NODE_MODIFY"][ship].append(modification.duplicate(true))
 						
 						file.open(ship_node_modify_file,File.WRITE)
+						file.store_string(JSON.print(pfdata))
+						file.close()
+					"SHIP_MODIFY.gd":
+						file.open(ship_modify_store,File.READ)
+						var pfdata = JSON.parse(file.get_as_text()).result
+						file.close()
+						for item in constants:
+							var di = constants[item]
+							var ship = di.get("ship_name","")
+							if ship != "":
+								if not ship in pfdata:
+									pfdata[ship] = {"add":[],"modify":[],"recurse":di.get("recurse_to_variants",false)}
+								if "add" in di:
+									pfdata[ship]["add"].append_array(di["add"])
+								if "modify" in di:
+									pfdata[ship]["modify"].append_array(di["modify"])
+						file.open(ship_modify_store,File.WRITE)
 						file.store_string(JSON.print(pfdata))
 						file.close()
 					"SHIP_THRUSTER_COLORS.gd":
