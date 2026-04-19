@@ -1320,6 +1320,13 @@ class _DataFormat:
 		scene.take_over_path(scene_path)
 		_savedScriptObjects.append(scene)
 	
+	func __convert_var_from_string(string : String):
+		var header = "extends Reference\nconst VARIABLE = "
+		var script = __compile_script(header + string)
+		var variable = script.VARIABLE
+		return variable
+	
+	
 	
 	
 	
