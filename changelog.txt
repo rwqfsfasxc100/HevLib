@@ -1,3 +1,32 @@
+[1.13.4]
+
+1="* Fixed Translations.__translation_file_to_dictionary not conjoining delimiter lines escaped with a single backslash"
+2="* Fixed incorrectly formatted string within mod menu update downloading"
+3="* Ported NodeAccess.__convert_var_from_string to DataFormat"
+4="* __get_script_constant_map_without_load and __get_script_variables_without_load no longer save a file to the cache to get data"
+5="* Removed unused parameter input for __compile_and_override_script and __compile_and_override_script_with_scene"
+6="* __compile_script and __compile_to_script_object now cache their output script object, making subsequent copies just be fetched from the cache. since these are not new objects, an optional new_object bool is set true on the end if you want a new copy"
+7="* Added ConfigDriver.__validate_dictionary"
+7.1="* Checks an input dictionary to check whether it should be considered valid based on config and mod check parameters"
+7.2="* Used for ship node and modification registers"
+7.3="* data_dict -> input dictionary to be checked against"
+7.4="* check_config -> (optional) bool for whether a config entry within the dictionary should be checked against. Defaults to true"
+7.5="* if used, config dictionary contains:"
+7.5.1="* id -> string used for the config id"
+7.5.2="* section -> string used for the config section"
+7.5.3="* entry -> string used for the config entry"
+7.5.4="* invert_config -> (optional) bool for inverting the logic for this config, where a previously valid config would be invalidated and vice versa. Defaults to false"
+7.5.5="* Example: {"config":{"id":"HevLib","section":"HEVLIB_CONFIG_SECTION_EQUIPMENT","entry":"do_sort_equipment_by_price","invert_config":false}}"
+7.6="* check_requirements -> (optional) bool for whether a mod_requirements entry within the dictionary should be checked against, with the entry containing an array of arrays for mod ids that should be installed for it to be valid"
+7.7="* if used, mod_requirements array contains:"
+7.7.1="* Top level array: this contains arrays which each contain mod id(s), with all arrays must being considered valid for the check to pass."
+7.7.2="* Lower level arrays: these contain one or multiple mod ids, with only one needing to contain an id of a mod that's currently installed for the array to be considered valid"
+7.7.3="* Example: [["hev.VelocityPlus"],["wt.funnel_titan","hev.IndustriesOfEnceladus"]], with this being valid only with either funnel titan or industries of enceladus installed, and velocity plus always installed"
+7.8="* check_incompatabilities -> (optional) bool for whether a mod_incompatabilities entry within the dictionary should be checked against, with the entry containing an array of arrays for mod ids that should not be installed for it to be valid"
+7.9="* A mod_incompatabilities array entry uses the same formatting as mod_requirements, with the output being the inverse"
+8="* Reduced memory footprint of the equipment modmain"
+9="* Created a release patch notes template for all future releases"
+
 [1.13.3]
 
 1="* Made config updater functions use unique names to prevent conflicts with mods"
