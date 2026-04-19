@@ -8,6 +8,7 @@
 If you've never installed mods before, check out either:
 - [The ΔV Steam community guide](https://steamcommunity.com/sharedfiles/filedetails/?id=3406497378), or
 - [A repo with simpler, more platform-specific guides](https://github.com/rwqfsfasxc100/Delta-V-Useful-Files/tree/main/how%20to) 
+
 Mods must be in a folder named `mods` (all lower case) next to the game's executable, and must stay in `.zip` format
 
 ### Need more help?
