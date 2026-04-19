@@ -4,65 +4,41 @@ var ship_register_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/sh
 var ship_node_modify_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_modify.json"
 var node_definitons_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/node_definitions.json"
 var ship_modify_store = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_modify.json"
+var modify_ship_numerics_store = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/modify_ship_numerics.json"
 
 var processed_node_definitions = {}
 var processed_ship_register = {}
 var processed_ship_modify = {}
+var processed_ship_numerics_modifications = {}
+
+var file = File.new()
 
 var pointers
-#var NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
-#var DF = preload("res://HevLib/pointers/DataFormat.gd")
-
-#func registerCapability(key, system):
-#	nodeModify()
-#	.registerCapability(key, system)
-var current_mod_ids
 func _enter_tree():
 	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-	current_mod_ids = pointers.ManifestV2.__get_mod_ids()
 	make_node_mods()
 	
-
-#func _ready():
-#	make_node_mods()
-
-#var has_modified = false
-
 func make_node_mods():
-#	if has_modified:
-#		return
-#	has_modified = true
-	
+	processed_ship_numerics_modifications = process_modified_ship_numerics()
 	processed_ship_modify = process_ship_modify()
 	processed_node_definitions = process_node_definitons()
 	processed_ship_register = process_ship_register()
 	
-#	var ship_match = false
-#	if "transponder" in fullConfig:
-#		ship_match = CurrentGame.state.ship.transponder == fullConfig.transponder
-	
-	
-#	if ship_match:
-#		Debug.l("HevLib Add Nodes: Getting config init")
-#		if shipName in processed_ship_register:
-#			Debug.l("HevLib Add Nodes: Planned base addition - \n\n%s" % JSON.print(processed_ship_register[shipName],"\t"))
-#		if baseShipName in processed_ship_register and shipName != baseShipName:
-#			Debug.l("HevLib Add Nodes: Planned base addition parent - \n\n%s" % JSON.print(processed_ship_register[baseShipName],"\t"))
-#		var chld = get_children()
-#		var child_names = []
-#		for n in chld:
-#			child_names.append(n.name)
-#		Debug.l("HevLib Add Nodes: Ship nodes before addition: %s" % JSON.print(child_names,"\t"))
-	
-	
 	
 	if processed_ship_modify:
 		for addition in processed_ship_modify.get("add",[]):
-			
-			
-			breakpoint
+			var node_path = addition.get("node_path","")
+			if not node_path:
+				node_path = "."
+			var node = get_node_or_null(node_path)
+			if node:
+				var file_path = addition.get("file_path","")
+				if file_path and file.file_exists(file_path):
+					var scene = load(file_path).instance()
+					if scene:
+						node.add_child(scene)
 		for modification in processed_ship_modify.get("modify",[]):
-			var node_path = modification.get("path","")
+			var node_path = modification.get("node_path","")
 			if not node_path:
 				node_path = "."
 			var node = get_node_or_null(node_path)
@@ -72,11 +48,41 @@ func make_node_mods():
 					var vraw = modification.get("value","")
 					if vraw:
 						var value = pointers.NodeAccess.__convert_var_from_string(vraw)
-						set_index(node,property,value)
-						
-						
-#						breakpoint
-	
+						if property in node:
+							node.set(property,value)
+	if processed_ship_numerics_modifications:
+		for type in processed_ship_numerics_modifications:
+			match type:
+				"ammo":
+					if "min" in processed_ship_numerics_modifications[type]:
+						upgradeLimits["ammo.capacity"].x = processed_ship_numerics_modifications[type]["min"]
+					if "max" in processed_ship_numerics_modifications[type]:
+						upgradeLimits["ammo.capacity"].y = processed_ship_numerics_modifications[type]["max"]
+				"nano":
+					if "min" in processed_ship_numerics_modifications[type]:
+						upgradeLimits["drones.capacity"].x = processed_ship_numerics_modifications[type]["min"]
+					if "max" in processed_ship_numerics_modifications[type]:
+						upgradeLimits["drones.capacity"].y = processed_ship_numerics_modifications[type]["max"]
+				"propellant":
+					if "min" in processed_ship_numerics_modifications[type]:
+						upgradeLimits["fuel.capacity"].x = processed_ship_numerics_modifications[type]["min"]
+					if "max" in processed_ship_numerics_modifications[type]:
+						upgradeLimits["fuel.capacity"].y = processed_ship_numerics_modifications[type]["max"]
+				"reactor_core":
+					if "min" in processed_ship_numerics_modifications[type]:
+						upgradeLimits["reactor.power"].x = processed_ship_numerics_modifications[type]["min"]
+					if "max" in processed_ship_numerics_modifications[type]:
+						upgradeLimits["reactor.power"].y = processed_ship_numerics_modifications[type]["max"]
+				"ultracapacitor":
+					if "min" in processed_ship_numerics_modifications[type]:
+						upgradeLimits["capacitor.capacity"].x = processed_ship_numerics_modifications[type]["min"]
+					if "max" in processed_ship_numerics_modifications[type]:
+						upgradeLimits["capacitor.capacity"].y = processed_ship_numerics_modifications[type]["max"]
+				"turbine":
+					if "min" in processed_ship_numerics_modifications[type]:
+						upgradeLimits["turbine.power"].x = processed_ship_numerics_modifications[type]["min"]
+					if "max" in processed_ship_numerics_modifications[type]:
+						upgradeLimits["turbine.power"].y = processed_ship_numerics_modifications[type]["max"]
 	
 	
 	var n_store = {}
@@ -114,65 +120,14 @@ func make_node_mods():
 		
 		var recurse_to_variants = node_data["recurse_to_variants"]
 		
-		if "config" in obj_data:
-			var how = true
-			var cfg = obj_data["config"]
-			var config_id = cfg.get("id","")
-			var config_section = cfg.get("section","")
-			var config_setting = cfg.get("entry","")
-			var invert_config = cfg.get("invert_config",false)
-			if config_id and config_section and config_setting:
-				var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-				var cfg_opt = pointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
-				if cfg_opt != null:
-					if invert_config:
-						if cfg_opt:
-							how = false
-					else:
-						if !cfg_opt:
-							how = false
-			if not how:
-				continue
-		
-		var allowFromMods = true
-		var mr = "mod_requirements" in obj_data
-		var mi = "mod_incompatabilities" in obj_data
-		if mr:
-			var needs = obj_data["mod_requirements"]
-			var can = 0
-			for i in needs:
-				for f in i:
-					var has = false
-					if f in current_mod_ids:
-						has = true
-					if has:
-						can += 1
-			allowFromMods = can == needs.size()
-		if mi:
-			var needs = obj_data["mod_incompatabilities"]
-			var can = 0
-			for i in needs:
-				var cv = false
-				for f in i:
-					var has = false
-					if f in current_mod_ids:
-						has = true
-					if has:
-						cv = true
-				if cv:
-					can += 1
-			allowFromMods = can != needs.size()
-		
-		if not allowFromMods:
-			continue
-		
-		if not recurse_to_variants:
-			var sh = processed_ship_register.get(shipName,{"node_definitions":{}})
-			var def = sh["node_definitions"]
-			if object in def:
-				pass
-			else:
-				continue
+		if pointers.ConfigDriver.__validate_dictionary(obj_data):
+			if not recurse_to_variants:
+				var sh = processed_ship_register.get(shipName,{"node_definitions":{}})
+				var def = sh["node_definitions"]
+				if object in def:
+					pass
+				else:
+					continue
 		
 		var ignorance = node_data["ships_to_ignore"]
 		if shipName in ignorance:
@@ -338,22 +293,11 @@ func make_node_mods():
 		if str(get_path_to(p)) != str(thisNode) and "registerExternal" in node:
 			node.registerExternal = true
 		p.add_child(node)
-#		breakpoint
-#		call_deferred("add_child",node)
-		
-
-#	if ship_match:
-#		var chld = get_children()
-#		var child_names = []
-#		for n in chld:
-#			child_names.append(n.name)
-#		Debug.l("HevLib Add Nodes: Ship nodes after addition: %s" % JSON.print(child_names,"\t"))
-
 	nodeModify()
 
 
 func nodeModify():
-	var file = File.new()
+	
 	file.open(ship_node_modify_file,File.READ)
 	var modify_data = JSON.parse(file.get_as_text()).result
 	file.close()
@@ -362,102 +306,31 @@ func nodeModify():
 		if baseShipName in modify_data:
 			var thisShipData = modify_data[baseShipName]
 			for xd in thisShipData:
-				if "config" in xd:
-					var how = true
-					var cfg = xd["config"]
-					var config_id = cfg.get("id","")
-					var config_section = cfg.get("section","")
-					var config_setting = cfg.get("entry","")
-					var invert_config = cfg.get("invert_config",false)
-					if config_id and config_section and config_setting:
-						var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-						var cfg_opt = pointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
-						if cfg_opt != null:
-							if invert_config:
-								if cfg_opt:
-									how = false
+				if pointers.ConfigDriver.__validate_dictionary(xd):
+					if xd.get("recurse_to_variants",false):
+						var node = get_node_or_null(xd.get("path","."))
+						var value = xd.get("value",null)
+						var property = xd.get("property","null_value_to_ensure_that_this_fails_when_absent_lol_hi")
+						if node and property in node:
+							if xd.get("defer",false):
+								node.set_deferred(property,value)
 							else:
-								if !cfg_opt:
-									how = false
-					if not how:
-						continue
-						
-				var allowFromMods = true
-				var mr = "mod_requirements" in xd
-				var mi = "mod_incompatabilities" in xd
-				if mr:
-					var needs = xd["mod_requirements"]
-					var can = 0
-					for i in needs:
-						for f in i:
-							var has = false
-							if f in current_mod_ids:
-								has = true
-							if has:
-								can += 1
-					allowFromMods = can == needs.size()
-				if mi:
-					var needs = xd["mod_incompatabilities"]
-					var can = 0
-					for i in needs:
-						var cv = false
-						for f in i:
-							var has = false
-							if f in current_mod_ids:
-								has = true
-							if has:
-								cv = true
-						if cv:
-							can += 1
-					allowFromMods = can != needs.size()
-				
-				if not allowFromMods:
-					continue
-				if xd.get("recurse_to_variants",false):
-					var node = get_node_or_null(xd.get("path","."))
-					var value = xd.get("value",null)
-					var property = xd.get("property","null_value_to_ensure_that_this_fails_when_absent_lol_hi")
-					if node and property in node:
-						if xd.get("defer",false):
-							node.set_deferred(property,value)
-						else:
-							node.set(property,value)
+								node.set(property,value)
 	
 	if shipName in modify_data:
 		var thisShipData = modify_data[shipName]
 		for xd in thisShipData:
-			if "config" in xd:
-				var how = true
-				var cfg = xd["config"]
-				var config_id = cfg.get("id","")
-				var config_section = cfg.get("section","")
-				var config_setting = cfg.get("entry","")
-				var invert_config = cfg.get("invert_config",false)
-				if config_id and config_section and config_setting:
-					var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-					var cfg_opt = pointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
-					if cfg_opt != null:
-						if invert_config:
-							if cfg_opt:
-								how = false
-						else:
-							if !cfg_opt:
-								how = false
-				if not how:
-					continue
-			var node = get_node_or_null(xd.get("path","."))
-			var value = xd.get("value",null)
-			var property = xd.get("property","null_value_to_ensure_that_this_fails_when_absent_lol_hi")
-			if node and property in node:
-				if xd.get("defer",false):
-					node.set_deferred(property,value)
-				else:
-					node.set(property,value)
+			if pointers.ConfigDriver.__validate_dictionary(xd):
+				var node = get_node_or_null(xd.get("path","."))
+				var value = xd.get("value",null)
+				var property = xd.get("property","null_value_to_ensure_that_this_fails_when_absent_lol_hi")
+				if node and property in node:
+					if xd.get("defer",false):
+						node.set_deferred(property,value)
+					else:
+						node.set(property,value)
 	
 	
-
-#	if isPlayerControlled():
-#		CurrentGame.emit_signal("playerShipChanged")
 func format_properties(data,format,property,property_path,base_node,parent_path):
 	match format:
 		"copy":
@@ -694,41 +567,139 @@ func process_ship_modify():
 	var data = JSON.parse(file.get_as_text()).result
 	file.close()
 	
-	if baseShipName in data and data[baseShipName]["recurse"]:
+	if baseShipName in data:
 		var shipData = data[baseShipName]
 		if "add" in shipData and shipData["add"]:
 			if not "add" in pd:
 				pd["add"] = []
-			pd["add"].append_array(shipData["add"])
+			for i in shipData["add"]:
+				if i.get("recurse_to_variants",false):
+					if pointers.ConfigDriver.__validate_dictionary(i):
+						pd["add"].append(i)
 		if "modify" in shipData and shipData["modify"]:
 			if not "modify" in pd:
 				pd["modify"] = []
-			pd["modify"].append_array(shipData["modify"])
+			for i in shipData["modify"]:
+				if i.get("recurse_to_variants",false):
+					if pointers.ConfigDriver.__validate_dictionary(i):
+						pd["modify"].append(i)
 	if shipName in data:
 		var shipData = data[shipName]
 		if "add" in shipData and shipData["add"]:
 			if not "add" in pd:
 				pd["add"] = []
-			pd["add"].append_array(shipData["add"])
+			for i in shipData["add"]:
+				if pointers.ConfigDriver.__validate_dictionary(i):
+					pd["add"].append(i)
 		if "modify" in shipData and shipData["modify"]:
 			if not "modify" in pd:
 				pd["modify"] = []
-			pd["modify"].append_array(shipData["modify"])
+			for i in shipData["modify"]:
+				if pointers.ConfigDriver.__validate_dictionary(i):
+					pd["modify"].append(i)
+	return pd
+
+func process_modified_ship_numerics() -> Dictionary:
+	var file = File.new()
+	var pd = {}
+	file.open(modify_ship_numerics_store,File.READ)
+	var dt = JSON.parse(file.get_as_text()).result
+	file.close()
+	if baseShipName in dt:
+		for shipData in dt[baseShipName]:
+			if shipData.get("recurse_to_variants",false):
+				if pointers.ConfigDriver.__validate_dictionary(shipData):
+					for type in shipData:
+						match type:
+							"ammo","mass_driver_ammo","ammunition":
+								if not "ammo" in pd:
+									pd["ammo"] = {}
+								if "min" in shipData[type]:
+									pd["ammo"]["min"] = shipData[type]["min"]
+								if "max" in shipData[type]:
+									pd["ammo"]["max"] = shipData[type]["max"]
+							"nano","nanodrones","nanodrone_components":
+								if not "nano" in pd:
+									pd["nano"] = {}
+								if "min" in shipData[type]:
+									pd["nano"]["min"] = shipData[type]["min"]
+								if "max" in shipData[type]:
+									pd["nano"]["max"] = shipData[type]["max"]
+							"fuel","propellant","remass":
+								if not "propellant" in pd:
+									pd["propellant"] = {}
+								if "min" in shipData[type]:
+									pd["propellant"]["min"] = shipData[type]["min"]
+								if "max" in shipData[type]:
+									pd["propellant"]["max"] = shipData[type]["max"]
+							"reactor_core","reactor","core":
+								if not "reactor_core" in pd:
+									pd["reactor_core"] = {}
+								if "min" in shipData[type]:
+									pd["reactor_core"]["min"] = shipData[type]["min"]
+								if "max" in shipData[type]:
+									pd["reactor_core"]["max"] = shipData[type]["max"]
+							"ultracapacitor","capacitor":
+								if not "ultracapacitor" in pd:
+									pd["ultracapacitor"] = {}
+								if "min" in shipData[type]:
+									pd["ultracapacitor"]["min"] = shipData[type]["min"]
+								if "max" in shipData[type]:
+									pd["ultracapacitor"]["max"] = shipData[type]["max"]
+							"turbine":
+								if not "turbine" in pd:
+									pd["turbine"] = {}
+								if "min" in shipData[type]:
+									pd["turbine"]["min"] = shipData[type]["min"]
+								if "max" in shipData[type]:
+									pd["turbine"]["max"] = shipData[type]["max"]
+	if shipName in dt:
+		for shipData in dt[shipName]:
+			if pointers.ConfigDriver.__validate_dictionary(shipData):
+				for type in shipData:
+					match type:
+						"ammo","mass_driver_ammo","ammunition":
+							if not "ammo" in pd:
+								pd["ammo"] = {}
+							if "min" in shipData[type]:
+								pd["ammo"]["min"] = shipData[type]["min"]
+							if "max" in shipData[type]:
+								pd["ammo"]["max"] = shipData[type]["max"]
+						"nano","nanodrones","nanodrone_components":
+							if not "nano" in pd:
+								pd["nano"] = {}
+							if "min" in shipData[type]:
+								pd["nano"]["min"] = shipData[type]["min"]
+							if "max" in shipData[type]:
+								pd["nano"]["max"] = shipData[type]["max"]
+						"fuel","propellant","remass":
+							if not "propellant" in pd:
+								pd["propellant"] = {}
+							if "min" in shipData[type]:
+								pd["propellant"]["min"] = shipData[type]["min"]
+							if "max" in shipData[type]:
+								pd["propellant"]["max"] = shipData[type]["max"]
+						"reactor_core","reactor","core":
+							if not "reactor_core" in pd:
+								pd["reactor_core"] = {}
+							if "min" in shipData[type]:
+								pd["reactor_core"]["min"] = shipData[type]["min"]
+							if "max" in shipData[type]:
+								pd["reactor_core"]["max"] = shipData[type]["max"]
+						"ultracapacitor","capacitor":
+							if not "ultracapacitor" in pd:
+								pd["ultracapacitor"] = {}
+							if "min" in shipData[type]:
+								pd["ultracapacitor"]["min"] = shipData[type]["min"]
+							if "max" in shipData[type]:
+								pd["ultracapacitor"]["max"] = shipData[type]["max"]
+						"turbine":
+							if not "turbine" in pd:
+								pd["turbine"] = {}
+							if "min" in shipData[type]:
+								pd["turbine"]["min"] = shipData[type]["min"]
+							if "max" in shipData[type]:
+								pd["turbine"]["max"] = shipData[type]["max"]
 	return pd
 
 
-func set_index(object,where,how):
-	var s = where.split("/")
-	if s[0] in object:
-		
-		var size = s.size()
-		if size > 1:
-			var prop = object[s[0]]
-			for i in range(size - 2):
-				prop = prop[s[i + 1]]
-			
-			prop[s[-1]] = how
-		else:
-			object[s[0]] = how
-		
-		pass

@@ -870,7 +870,55 @@ class _ConfigDriver:
 		var sect_name = __truncate_mod_id(mod_id) + "/" + __truncate_section(section)
 		return sect_name
 	
-	
+	func __validate_dictionary(data_dict : Dictionary,check_config : bool = true, check_requirements : bool = true, check_incompatabilities : bool = true):
+		var how = true
+		if check_config and "config" in data_dict:
+			var cfg = data_dict["config"]
+			var config_id = cfg.get("id","")
+			var config_section = cfg.get("section","")
+			var config_setting = cfg.get("entry","")
+			var invert_config = cfg.get("invert_config",false)
+			if config_id and config_section and config_setting:
+				var cfg_opt = __get_value(config_id,config_section,config_setting)
+				if cfg_opt != null:
+					if invert_config:
+						if cfg_opt:
+							how = false
+					else:
+						if !cfg_opt:
+							how = false
+		if how:
+			var current_mod_ids = ManifestV2.__get_mod_ids()
+			var allowFromMods = true
+			if check_requirements and "mod_requirements" in data_dict:
+				var needs = data_dict["mod_requirements"]
+				var can = 0
+				for a in needs:
+					for f in a:
+						var has = false
+						if f in current_mod_ids:
+							has = true
+						if has:
+							can += 1
+				allowFromMods = can == needs.size()
+			if check_incompatabilities and "mod_incompatabilities" in data_dict:
+				var needs = data_dict["mod_incompatabilities"]
+				var can = 0
+				for a in needs:
+					var cv = false
+					for f in a:
+						var has = false
+						if f in current_mod_ids:
+							has = true
+						if has:
+							cv = true
+					if cv:
+						can += 1
+				allowFromMods = can != needs.size()
+			if allowFromMods:
+				return true
+			return false
+		return false
 
 class _DataFormat:
 	var scripts = [
@@ -1782,6 +1830,7 @@ class _Equipment:
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/Driver_Store.json",
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order_relative.json",
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_modify.json",
+			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/modify_ship_numerics.json",
 			
 		]
 		
@@ -1807,6 +1856,10 @@ class _Equipment:
 		var storage_for_driver_store = FILE_PATHS[19]
 		var slot_order_relative_store = FILE_PATHS[20]
 		var ship_modify_store = FILE_PATHS[21]
+		var modify_ship_numerics_store = FILE_PATHS[22]
+		
+		
+		
 		if is_onready:
 			
 			version = DataFormat.__get_vanilla_version()
@@ -1900,6 +1953,9 @@ class _Equipment:
 		file.store_string("{}")
 		file.close()
 		file.open(ship_modify_store,File.WRITE)
+		file.store_string("{}")
+		file.close()
+		file.open(modify_ship_numerics_store,File.WRITE)
 		file.store_string("{}")
 		file.close()
 		
@@ -2348,7 +2404,7 @@ class _Equipment:
 							var ship = di.get("ship_name","")
 							if ship != "":
 								if not ship in pfdata:
-									pfdata[ship] = {"add":[],"modify":[],"recurse":di.get("recurse_to_variants",false)}
+									pfdata[ship] = {"add":[],"modify":[]}
 								if "add" in di:
 									pfdata[ship]["add"].append_array(di["add"])
 								if "modify" in di:
@@ -2624,6 +2680,23 @@ class _Equipment:
 							var ac = constants[ar]
 							for v in ac:
 								driver_store["REGISTER_SHIP_NUMERICS"][ar].append({v:ac[v].duplicate(true)})
+					"MODIFY_SHIP_NUMERICS.gd":
+						file.open(modify_ship_numerics_store,File.READ)
+						var pfdata = JSON.parse(file.get_as_text()).result
+						file.close()
+						for item in constants:
+							var di = constants[item]
+							var ship = di.get("ship_name","")
+							if ship != "":
+								if not ship in pfdata:
+									pfdata[ship] = []
+								pfdata[ship].append(di)
+						file.open(modify_ship_numerics_store,File.WRITE)
+						file.store_string(JSON.print(pfdata))
+						file.close()
+					
+					
+					
 		
 		file.open(ship_driver_path + "driver_data.json",File.WRITE)
 		file.store_string(JSON.print(driver_store["ADD_SHIPS"]))
