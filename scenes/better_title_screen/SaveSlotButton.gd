@@ -112,7 +112,7 @@ func checkSave(force = false):
 					disabled = false
 				else:
 					$Foolish.visible = true
-					hint_tooltip = TranslationServer.translate(model_error) % meta.model
+					hint_tooltip = model_error % meta.model
 		#			foolish.hint_tooltip = model_error % meta.model
 					disabled = true
 		else:
