@@ -5,4 +5,4 @@
 
 [b]HevLib[/b]
 
-Description example text
+Library mod used by many mods. If you're seeing this in-game, something probably went wrong :)
