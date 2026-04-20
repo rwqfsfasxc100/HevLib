@@ -64,6 +64,7 @@ var event_log_file = "user://cache/.HevLib_Cache/Event_Driver/event_log.json"
 var active_events_file = "user://cache/.HevLib_Cache/Event_Driver/active_events.txt"
 var latest_event_file = "user://cache/.HevLib_Cache/Event_Driver/latest_event.txt"
 
+var releases_cache = "user://cache/.Mod_Menu_2_Cache/github_list/releases_cache.json"
 
 func _ready():
 	if correct:
@@ -94,6 +95,15 @@ func _ready():
 			d.remove(f)
 		if d.dir_exists(weaponslot_cache):
 			pointers.FolderAccess.__recursive_delete(weaponslot_cache)
+		if file.file_exists(releases_cache):
+			var age = OS.get_unix_time() - file.get_modified_time(releases_cache)
+			if age > 3600:
+				file.open(releases_cache,File.WRITE)
+				file.store_string("{}")
+				file.close()
+				Debug.l("Releases cache older than an hour (%s minutes old), clearing" % [floor(age/60)])
+			else:
+				Debug.l("Releases cache too new (%s minutes old), not clearing" % [floor(age/60)])
 		file.open(url_store,File.WRITE)
 		file.store_string("[]")
 		file.close()

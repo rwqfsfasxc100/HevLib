@@ -87,6 +87,6 @@ static func inject_translations(pointers):
 	file.open("user://cache/.HevLib_Cache/translation_check_data.json",File.WRITE)
 	file.store_string(JSON.print(ml_check_data,"\t"))
 	file.close()
-	pointers.Translations.__updateTL_from_dictionary(data.duplicate(true))
+	pointers.Translations.__updateTL_from_dictionary(data.duplicate(true),pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","full_logging"))
 	
 	

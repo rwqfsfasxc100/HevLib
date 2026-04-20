@@ -221,6 +221,12 @@ HEVLIB_CONFIG_SECTION_DEBUG={
 		"method":"_open",
 		"button_label":"HEVLIB_OPEN_MENU",
 	},
+	"full_logging":{
+		"name":"HEVLIB_CONFIG_FULL_LOGGING",
+		"description":"HEVLIB_CONFIG_FULL_LOGGING_TOOLTIP",
+		"type":"bool",
+		"default":false
+	},
 }
 HEVLIB_CONFIG_SECTION_INPUT={
 	"open_debug_event_menu":{
