@@ -3718,7 +3718,7 @@ class _FolderAccess:
 					fileList.append(ProjectSettings.globalize_path(fileName))
 				else:
 					fileList.append(fileName)
-		return fileList
+		return Array(fileList)
 	
 	func __get_first_file(folder: String):
 		var firstFile
