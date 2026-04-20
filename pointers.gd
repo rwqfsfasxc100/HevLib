@@ -1829,7 +1829,6 @@ class _Equipment:
 			"user://cache/.HevLib_Cache/ShipDriver/",
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/Driver_Store.json",
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order_relative.json",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_modify.json",
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/modify_ship_numerics.json",
 			
 		]
@@ -1855,8 +1854,7 @@ class _Equipment:
 		var ship_driver_path = FILE_PATHS[18]
 		var storage_for_driver_store = FILE_PATHS[19]
 		var slot_order_relative_store = FILE_PATHS[20]
-		var ship_modify_store = FILE_PATHS[21]
-		var modify_ship_numerics_store = FILE_PATHS[22]
+		var modify_ship_numerics_store = FILE_PATHS[21]
 		
 		
 		
@@ -1952,9 +1950,6 @@ class _Equipment:
 		file.open(slot_order_relative_store,File.WRITE)
 		file.store_string("{}")
 		file.close()
-		file.open(ship_modify_store,File.WRITE)
-		file.store_string("{}")
-		file.close()
 		file.open(modify_ship_numerics_store,File.WRITE)
 		file.store_string("{}")
 		file.close()
@@ -1986,7 +1981,6 @@ class _Equipment:
 			"ADD_SHIPS":[],
 			"REGISTER_SHIP_NUMERICS":{},
 			"SLOT_ORDER_RELATIVE":{},
-			"SHIP_MODIFY":[]
 			
 		}
 		
@@ -2217,15 +2211,6 @@ class _Equipment:
 						for item in constants:
 							var equipment = constants.get(item).duplicate(true)
 							var allow = true
-#							if "config" in equipment:
-#								var cf = equipment["config"]
-#								var id = cf.get("id",null)
-#								var section = cf.get("section",null)
-#								var opt = cf.get("entry",null)
-#								if id and section and opt:
-#									var cv = ConfigDriver.__get_value(id,section,opt)
-#									if typeof(cv) == TYPE_BOOL:
-#										allow = cv
 							var mr = "mod_requirements" in equipment
 							var mi = "mod_incompatabilities" in equipment
 							if mr:
@@ -2295,15 +2280,6 @@ class _Equipment:
 						for item in constants:
 							var equipment = constants.get(item).duplicate(true)
 							var allow = true
-#							if "config" in equipment:
-#								var cf = equipment["config"]
-#								var id = cf.get("id",null)
-#								var section = cf.get("section",null)
-#								var opt = cf.get("entry",null)
-#								if id and section and opt:
-#									var cv = ConfigDriver.__get_value(id,section,opt)
-#									if typeof(cv) == TYPE_BOOL:
-#										allow = cv
 							
 							var mr = "mod_requirements" in equipment
 							var mi = "mod_incompatabilities" in equipment
@@ -2395,23 +2371,6 @@ class _Equipment:
 						file.open(ship_node_modify_file,File.WRITE)
 						file.store_string(JSON.print(pfdata))
 						file.close()
-					"SHIP_MODIFY.gd":
-						file.open(ship_modify_store,File.READ)
-						var pfdata = JSON.parse(file.get_as_text()).result
-						file.close()
-						for item in constants:
-							var di = constants[item]
-							var ship = di.get("ship_name","")
-							if ship != "":
-								if not ship in pfdata:
-									pfdata[ship] = {"add":[],"modify":[]}
-								if "add" in di:
-									pfdata[ship]["add"].append_array(di["add"])
-								if "modify" in di:
-									pfdata[ship]["modify"].append_array(di["modify"])
-						file.open(ship_modify_store,File.WRITE)
-						file.store_string(JSON.print(pfdata))
-						file.close()
 					"SHIP_THRUSTER_COLORS.gd":
 						var cd = constants.get("SHIP_THRUSTER_COLORS",{})
 						if cd.keys().size() > 0:
@@ -2451,15 +2410,6 @@ class _Equipment:
 								if not n in ws_equipment_names:
 									ws_equipment_names.append(n)
 								var allow = true
-#								if "config" in equipment:
-#									var cf = equipment["config"]
-#									var id = cf.get("id",null)
-#									var section = cf.get("section",null)
-#									var opt = cf.get("entry",null)
-#									if id and section and opt:
-#										var cv = ConfigDriver.__get_value(id,section,opt)
-#										if typeof(cv) == TYPE_BOOL:
-#											allow = cv
 								
 								var mr = "mod_requirements" in equipment
 								var mi = "mod_incompatabilities" in equipment

@@ -3,7 +3,6 @@ extends "res://ships/ship-ctrl.gd"
 var ship_register_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_register.json"
 var ship_node_modify_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_modify.json"
 var node_definitons_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/node_definitions.json"
-var ship_modify_store = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_modify.json"
 var modify_ship_numerics_store = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/modify_ship_numerics.json"
 
 var processed_node_definitions = {}
@@ -20,36 +19,9 @@ func _enter_tree():
 	
 func make_node_mods():
 	processed_ship_numerics_modifications = process_modified_ship_numerics()
-	processed_ship_modify = process_ship_modify()
 	processed_node_definitions = process_node_definitons()
 	processed_ship_register = process_ship_register()
 	
-	
-	if processed_ship_modify:
-		for addition in processed_ship_modify.get("add",[]):
-			var node_path = addition.get("node_path","")
-			if not node_path:
-				node_path = "."
-			var node = get_node_or_null(node_path)
-			if node:
-				var file_path = addition.get("file_path","")
-				if file_path and file.file_exists(file_path):
-					var scene = load(file_path).instance()
-					if scene:
-						node.add_child(scene)
-		for modification in processed_ship_modify.get("modify",[]):
-			var node_path = modification.get("node_path","")
-			if not node_path:
-				node_path = "."
-			var node = get_node_or_null(node_path)
-			if node:
-				var property = modification.get("property")
-				if property:
-					var vraw = modification.get("value","")
-					if vraw:
-						var value = pointers.NodeAccess.__convert_var_from_string(vraw)
-						if property in node:
-							node.set(property,value)
 	if processed_ship_numerics_modifications:
 		for type in processed_ship_numerics_modifications:
 			match type:
@@ -558,45 +530,6 @@ func process_node_definitons():
 				var recursive = md.get("recurse_to_variants",true)
 				pd.merge({module:{"node":node,"properties":properties,"position_data":pos_basic,"ships_to_ignore":ignore,"recurse_to_variants":recursive}})
 	
-	return pd
-
-func process_ship_modify():
-	var file = File.new()
-	var pd = {}
-	file.open(ship_modify_store,File.READ)
-	var data = JSON.parse(file.get_as_text()).result
-	file.close()
-	
-	if baseShipName in data:
-		var shipData = data[baseShipName]
-		if "add" in shipData and shipData["add"]:
-			if not "add" in pd:
-				pd["add"] = []
-			for i in shipData["add"]:
-				if i.get("recurse_to_variants",false):
-					if pointers.ConfigDriver.__validate_dictionary(i):
-						pd["add"].append(i)
-		if "modify" in shipData and shipData["modify"]:
-			if not "modify" in pd:
-				pd["modify"] = []
-			for i in shipData["modify"]:
-				if i.get("recurse_to_variants",false):
-					if pointers.ConfigDriver.__validate_dictionary(i):
-						pd["modify"].append(i)
-	if shipName in data:
-		var shipData = data[shipName]
-		if "add" in shipData and shipData["add"]:
-			if not "add" in pd:
-				pd["add"] = []
-			for i in shipData["add"]:
-				if pointers.ConfigDriver.__validate_dictionary(i):
-					pd["add"].append(i)
-		if "modify" in shipData and shipData["modify"]:
-			if not "modify" in pd:
-				pd["modify"] = []
-			for i in shipData["modify"]:
-				if pointers.ConfigDriver.__validate_dictionary(i):
-					pd["modify"].append(i)
 	return pd
 
 func process_modified_ship_numerics() -> Dictionary:
