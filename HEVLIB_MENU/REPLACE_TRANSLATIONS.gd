@@ -2137,6 +2137,10 @@ const TRANSLATIONS = {
 		"HEVLIB_DOWNLOAD_MOD": {
 			"string": "Download mod!",
 			"version_hash": 570592894
+		},
+		"MODMENU_MOD_UNAVAILABLE": {
+			"string": "This mod is currently unavailable. This could be due to multiple reasons, including but not limited to:\n\n- GitHub has been rate limited (likely too many requests)\n- Internet connectivity problems\n- Mod does not have a proper download setup",
+			"version_hash": 3639564067
 		}
 	},
 	"uk_UA": {
