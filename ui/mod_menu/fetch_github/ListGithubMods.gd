@@ -1,15 +1,17 @@
 extends VBoxContainer
 
-const prevent_load = true
+const prevent_load = false
 
 export var path_to_httprequest = NodePath("../../../../api_fetcher")
 export var path_to_downloader = NodePath("../../../../download_files")
 export var path_to_root = NodePath("../../../..")
 export var path_to_download_btn = NodePath("../Info/HBoxContainer/DownloadMod")
+export var path_to_unavailablePopup = NodePath("../../../../Unavailable")
 onready var http : HTTPRequest = get_node_or_null(path_to_httprequest)
 onready var downloader : HTTPRequest = get_node_or_null(path_to_downloader)
 onready var parent = get_node_or_null(path_to_root)
 onready var btn_to_download = get_node_or_null(path_to_download_btn)
+onready var unavailable_diag = get_node_or_null(path_to_unavailablePopup)
 
 const topic_url_base = "https://api.github.com/search/repositories?q=topic:%s"
 const topic_dv = "delta-v-rings-of-saturn"
@@ -18,7 +20,7 @@ var icon_folder_path = "user://cache/.Mod_Menu_2_Cache/github_list/icon_cache/"
 onready var count = $Header/Count
 onready var list = $Mods/ScrollContainer/ListMods
 onready var info = get_node_or_null(NodePath("../Info"))
-onready var rich = info.get_node("RichTextLabel")
+onready var rich = info.get_node("ScrollContainer/VBoxContainer/RichTextLabel")
 
 onready var WAIT = parent.get_node_or_null(NodePath("WAIT"))
 
@@ -52,13 +54,19 @@ func _ready():
 
 var mod_count = 0
 func request_complete(result, response_code, headers, body):
-	var json = JSON.parse(body.get_string_from_utf8()).result
-	if json:
-		var dt = json.get("items",[])
-		file.open(mod_list_cache,File.WRITE)
-		file.store_string(JSON.print(dt))
+	if response_code != 200:
+		file.open(mod_list_cache,File.READ)
+		var dt = JSON.parse(file.get_as_text()).result
 		file.close()
 		fill_in_mods(dt)
+	else:
+		var json = JSON.parse(body.get_string_from_utf8()).result
+		if json:
+			var dt = json.get("items",[])
+			file.open(mod_list_cache,File.WRITE)
+			file.store_string(JSON.print(dt))
+			file.close()
+			fill_in_mods(dt)
 
 func add_mod_count():
 	mod_count += 1
@@ -96,9 +104,9 @@ func _mod_selected(mod,btn):
 	current_button = btn
 
 func select_first_mod():
-	yield(CurrentGame.get_tree(),"physics_frame")
+	yield(get_tree().create_timer(0.1),"timeout")
 	var v = list.get_children()
-	if list:
+	if v:
 		var first = v[0]
 		if first:
 			first._pressed()
@@ -106,9 +114,13 @@ func select_first_mod():
 		rich.clear()
 		btn_to_download.disabled = true
 		current_button = null
+		$Footer/Close.grab_focus()
 	
 
 func _on_DownloadMod_pressed():
 	if current_button:
 		current_button.download_this_mod()
 		WAIT.show_menu()
+
+func unavailable_mod():
+	unavailable_diag.popup_centered()

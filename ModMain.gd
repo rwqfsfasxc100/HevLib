@@ -63,7 +63,8 @@ var weaponslot_cache = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weap
 var event_log_file = "user://cache/.HevLib_Cache/Event_Driver/event_log.json"
 var active_events_file = "user://cache/.HevLib_Cache/Event_Driver/active_events.txt"
 var latest_event_file = "user://cache/.HevLib_Cache/Event_Driver/latest_event.txt"
-var github_fetch_list_cache = "user://cache/.Mod_Menu_2_Cache/github_list/list_cache.json"
+
+
 func _ready():
 	if correct:
 		l("Readying")
@@ -104,9 +105,6 @@ func _ready():
 		file.close()
 		file.open(event_log_file,File.WRITE)
 		file.store_string("{}")
-		file.close()
-		file.open(github_fetch_list_cache,File.WRITE)
-		file.store_string("[]")
 		file.close()
 		file.open(active_events_file,File.WRITE)
 		file.store_string("")

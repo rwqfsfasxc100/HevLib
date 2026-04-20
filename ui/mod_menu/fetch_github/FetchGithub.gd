@@ -22,8 +22,10 @@ func _ready():
 
 func _about_to_show():
 	lastFocus = get_focus_owner()
+	$base/VBoxContainer/Content/ListGithubMods.select_first_mod()
 
 func show_menu():
+#	get_parent().hide()
 	popup()
 
 func cancel():
@@ -31,6 +33,7 @@ func cancel():
 func hider():
 	hide()
 	refocus()
+#	get_parent().show_menu()
 
 var lastFocus = null
 func refocus():
@@ -49,3 +52,5 @@ func _on_resize():
 	$base.rect_min_size = size - offset
 	$base.rect_size = size - offset
 	$base.rect_position = offset/2
+	yield(CurrentGame.get_tree(),"idle_frame")
+#	$base/VBoxContainer/Content/Info/INFO/ScrollContainer.rect_size = $base/VBoxContainer/Content/Info/INFO.rect_size

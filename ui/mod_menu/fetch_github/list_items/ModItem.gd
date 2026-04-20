@@ -26,6 +26,7 @@ func boot():
 	modPathPrefix = gameInstallDirectory.plus_file("mods")
 	finished()
 
+var file = File.new()
 func add_mod():
 	
 	var icon = get_node("ICON")
@@ -59,6 +60,7 @@ func add_mod():
 var base_folder_path = "user://cache/.Mod_Menu_2_Cache/github_list/"
 var filepath = base_folder_path + "icon_cache/"
 var zip_path = base_folder_path + "downloaded_zips/"
+var releases_cache_path = base_folder_path + "releases_cache.json"
 var readmePath = ""
 func get_readme():
 	yield(CurrentGame.get_tree(),"idle_frame")
@@ -75,6 +77,9 @@ func finished():
 	emit_signal("done",self)
 func _pressed():
 	emit_signal("pressed",formatted_data,self)
+	yield(get_tree(),"idle_frame")
+	yield(get_tree(),"idle_frame")
+	$MOD_BUTTON.grab_focus()
 
 
 func icon_announcement(u):
@@ -90,7 +95,7 @@ var mode = 0
 func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 	match mode:
 		0:
-			if result == HTTPRequest.RESULT_SUCCESS and response_code != 404:
+			if result == HTTPRequest.RESULT_SUCCESS and response_code == 200:
 				var data = body.get_string_from_utf8()
 				format_description(data)
 				var id = formatted_data["header_data"].get("MOD_ID","")
@@ -101,18 +106,34 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 			else:
 				Tool.remove(self)
 		1:
-			if result == HTTPRequest.RESULT_SUCCESS and response_code != 404:
+			if result == HTTPRequest.RESULT_SUCCESS and response_code == 200:
 				set_icon_to(unique_icon)
 				get_node("HTTPRequest").download_file = ""
 		2:
-			if result == HTTPRequest.RESULT_SUCCESS and response_code != 404:
-				var data = JSON.parse(body.get_string_from_utf8()).result[0]["assets"][0]
+			var data = {}
+			if result == HTTPRequest.RESULT_SUCCESS and response_code == 200:
+				data = JSON.parse(body.get_string_from_utf8()).result[0]["assets"][0]
+				store_releases_cache(data)
+			else:
+				data = get_releases_cache()
+			if data:
 				this_zip_filename = zip_path + data.get("name","temp.zip")
 				this_zip_url = data.get("browser_download_url")
 				list.btn_to_download.disabled = false
+			else:
+				list.unavailable_mod()
+				Tool.remove(self)
+				list.btn_to_download.disabled = true
+
 		3:
-			if result == HTTPRequest.RESULT_SUCCESS and response_code != 404:
+			if result == HTTPRequest.RESULT_SUCCESS and response_code == 200:
 				var http = get_node("HTTPRequest")
+				if "header_data" in formatted_data and "MOD_ZIP_NAME" in formatted_data["header_data"]:
+					var folderPath = this_zip_filename.split(this_zip_filename.split("/")[this_zip_filename.split("/").size() - 1])[0]
+					var newZipName = folderPath + formatted_data["header_data"]["MOD_ZIP_NAME"]
+					dir.rename(this_zip_filename,newZipName)
+					this_zip_filename = newZipName
+					yield(get_tree(),"physics_frame")
 				pointers.FileAccess.__copy_file(this_zip_filename,modPathPrefix)
 				http.download_file = ""
 				this_zip_filename = ""
@@ -155,6 +176,27 @@ func download_this_mod():
 		
 		http.request(this_zip_url)
 		list.btn_to_download.disabled = true
+
+func store_releases_cache(data):
+	var dt = {}
+	if file.file_exists(releases_cache_path):
+		file.open(releases_cache_path,File.READ)
+		dt = JSON.parse(file.get_as_text()).result
+		file.close()
+	dt[DATA.get("full_name")] = data
+	file.open(releases_cache_path,File.WRITE)
+	file.store_string(JSON.print(dt))
+	file.close()
+
+func get_releases_cache():
+	var out = {}
+	file.open(releases_cache_path,File.READ)
+	var data = JSON.parse(file.get_as_text()).result
+	file.close()
+	var fn = DATA.get("full_name")
+	if fn in data:
+		out = data[fn]
+	return out
 
 func _tree_entered():
 	get_readme()
