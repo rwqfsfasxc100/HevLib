@@ -2141,6 +2141,14 @@ const TRANSLATIONS = {
 		"MODMENU_MOD_UNAVAILABLE": {
 			"string": "This mod is currently unavailable. This could be due to multiple reasons, including but not limited to:\n\n- GitHub has been rate limited (likely too many requests)\n- Internet connectivity problems\n- Mod does not have a proper download setup",
 			"version_hash": 3639564067
+		},
+		"HEVLIB_CONFIG_FULL_LOGGING": {
+			"string": "Full logging",
+			"version_hash": 2478639519
+		},
+		"HEVLIB_CONFIG_FULL_LOGGING_TOOLTIP": {
+			"string": "Whether any potentially verbose HevLib functions should produce extra logs",
+			"version_hash": 3570790396
 		}
 	},
 	"uk_UA": {
