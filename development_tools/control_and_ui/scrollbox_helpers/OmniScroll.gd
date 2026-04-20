@@ -29,6 +29,9 @@ var vspeed = 0
 onready var vscrollbar = get_v_scrollbar()
 onready var vscrollMax = vscrollbar.max_value
 
+export var left_stick_scroll_enabled = true
+export var right_stick_scroll_enabled = true
+
 var supressScroll = false
 var smoothScrollToHorizontal = null
 var smoothScrollToVertical = null
@@ -130,36 +133,52 @@ func _input(event):
 	if use_vertical:
 		if scrollWithGamepad:
 			if Settings.controlScheme == Settings.control.gamepad or Settings.controlScheme == Settings.control.auto:
-				var down = Input.get_action_strength("ui_scroll_down", true) + Input.get_action_strength("ui_scroll_down2", true)
-				var up = Input.get_action_strength("ui_scroll_up", true) + Input.get_action_strength("ui_scroll_up2", true)
-				hspeed = down - up
-				if abs(hspeed) > minHorizontalSpeed and is_visible_in_tree():
+				var down = 0.0
+				if left_stick_scroll_enabled:
+					down += Input.get_action_strength("ui_scroll_down", true) 
+				if right_stick_scroll_enabled:
+					down += Input.get_action_strength("ui_scroll_down2", true)
+				var up = 0.0
+				if left_stick_scroll_enabled:
+					up += Input.get_action_strength("ui_scroll_up", true) 
+				if right_stick_scroll_enabled:
+					up += Input.get_action_strength("ui_scroll_up2", true)
+				vspeed = down - up
+				if abs(vspeed) > minHorizontalSpeed and is_visible_in_tree():
 					set_process(true)
 					smoothScrollToVertical = null
 		if scrollWithKeyboard:
 			if Settings.controlScheme == Settings.control.keyMouse or Settings.controlScheme == Settings.control.auto:
 				var down = Input.get_action_strength("ui_down", true)
 				var up = Input.get_action_strength("ui_up", true)
-				hspeed = down - up
-				if abs(hspeed) > minHorizontalSpeed and is_visible_in_tree():
+				vspeed = down - up
+				if abs(vspeed) > minHorizontalSpeed and is_visible_in_tree():
 					set_process(true)
 					smoothScrollToVertical = null
 	# Horizontal
 	if use_horizontal:
 		if scrollWithGamepad:
 			if Settings.controlScheme == Settings.control.gamepad or Settings.controlScheme == Settings.control.auto:
-				var up = Input.get_action_strength("ui_scroll_left", true) + Input.get_action_strength("ui_scroll_left2", true)
-				var down = Input.get_action_strength("ui_scroll_right", true) + Input.get_action_strength("ui_scroll_right2", true)
-				vspeed = down - up
-				if abs(vspeed) > minVerticalSpeed and is_visible_in_tree():
+				var down = 0.0
+				if left_stick_scroll_enabled:
+					down += Input.get_action_strength("ui_scroll_left", true) 
+				if right_stick_scroll_enabled:
+					down += Input.get_action_strength("ui_scroll_left2", true)
+				var up = 0.0
+				if left_stick_scroll_enabled:
+					up += Input.get_action_strength("ui_scroll_right", true) 
+				if right_stick_scroll_enabled:
+					up += Input.get_action_strength("ui_scroll_right2", true)
+				hspeed = down - up
+				if abs(hspeed) > minVerticalSpeed and is_visible_in_tree():
 					set_process(true)
 					smoothScrollToHorizontal = null
 		if scrollWithKeyboard:
 			if Settings.controlScheme == Settings.control.keyMouse or Settings.controlScheme == Settings.control.auto:
 				var down = Input.get_action_strength("ui_left", true)
 				var up = Input.get_action_strength("ui_right", true)
-				vspeed = down - up
-				if abs(vspeed) > minVerticalSpeed and is_visible_in_tree():
+				hspeed = down - up
+				if abs(hspeed) > minVerticalSpeed and is_visible_in_tree():
 					set_process(true)
 					smoothScrollToHorizontal = null
 	if event is InputEventMouseButton:
