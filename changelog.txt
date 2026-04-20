@@ -1,3 +1,13 @@
+[1.13.6]
+
+1="* Added new GitHub downloads menu to the mod menu"
+1.1="* This will show any applicable mods that are available, and streamlines the download process"
+2="* Fixed omni scroll and added ability to disable left or right joystick"
+3="* __fetch_folder_files now converts it's output back into a regular array …from a PoolStringArray so regular array operations can be used"
+4="* Removed duplicated ScrollWithKB script"
+5="* Added reduced logging via config"
+6="* Fixed save slot buttons not focusing on boot"
+
 [1.13.5]
 
 1="* Added new MODIFY_SHIP_NUMERICS.gd driver"
