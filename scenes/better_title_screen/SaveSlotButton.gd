@@ -95,11 +95,6 @@ func checkSave(force = false):
 			else:
 				var demoLimit = CurrentGame.getGameStartTime() + 24 * 3600 * 30 * 256
 				text = "%s %s" % [meta.transponder, meta.name]
-				if first_time:
-					if CurrentGame.oldestSave < meta.time:
-						CurrentGame.oldestSave = meta.time
-						if is_visible_in_tree():
-							grab_focus()
 				if false and (CurrentGame.isDemo() and meta.gameTime > demoLimit):
 					disabled = true
 					slot_available = false
@@ -117,26 +112,33 @@ func checkSave(force = false):
 					disabled = false
 				else:
 					$Foolish.visible = true
-					hint_tooltip = model_error % meta.model
+					hint_tooltip = TranslationServer.translate(model_error) % meta.model
 		#			foolish.hint_tooltip = model_error % meta.model
 					disabled = true
 		else:
 			slot_available = false
 			delete_color = Color(1, 1, 1, 0.25)
 			text = newText
-			if first_time and first:
-				grab_focus()
 	if not has_save:
 		slot_available = false
 		delete_color = Color(1, 1, 1, 0.25)
 		text = newText
-		if first_time and first:
-			grab_focus()
+	if first_time:
+		check_focus()
 	first_time = false
-
+	
 	display_text = text
 	if display_text == "":
 		display_text = newText
+
+func check_focus():
+	yield(get_tree().create_timer(0.25),"timeout")
+	if first:
+		grab_focus()
+	if meta:
+		if CurrentGame.oldestSave < meta.time:
+			CurrentGame.oldestSave = meta.time
+			grab_focus()
 
 func newSave():
 	Debug.l("delete %s pressed" % saveSlotFile)
@@ -155,11 +157,11 @@ func _pressed():
 		CurrentGame.saveFile = saveSlotFile
 		get_node("../../../../../NoMargins/NewGamePlus").popup_centered()
 
-func _unhandled_input(event):
-	if first:
-		if event.is_action("ui_accept") or event.is_action("ui_cancel"):
-			if get_focus_owner() == null:
-				grab_focus()
+#func _unhandled_input(event):
+#	if first:
+#		if event.is_action("ui_accept") or event.is_action("ui_cancel"):
+#			if get_focus_owner() == null:
+#				grab_focus()
 
 func _new():
 	
