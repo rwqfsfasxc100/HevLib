@@ -319,6 +319,7 @@ margin_left = 321.0
 margin_right = 386.0
 margin_bottom = 65.0
 rect_min_size = Vector2( 65, 65 )
+hint_tooltip = "MODMENU_GET_NEW_MODS"
 
 [node name="TextureRect" type="TextureRect" parent="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/DOWNLOAD"]
 margin_left = 5.0

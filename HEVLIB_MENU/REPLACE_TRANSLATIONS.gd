@@ -2149,6 +2149,10 @@ const TRANSLATIONS = {
 		"HEVLIB_CONFIG_FULL_LOGGING_TOOLTIP": {
 			"string": "Whether any potentially verbose HevLib functions should produce extra logs",
 			"version_hash": 3570790396
+		},
+		"MODMENU_GET_NEW_MODS": {
+			"string": "Get new mods from GitHub",
+			"version_hash": 2573811993
 		}
 	},
 	"uk_UA": {
