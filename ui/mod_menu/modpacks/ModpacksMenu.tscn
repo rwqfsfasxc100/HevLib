@@ -6,7 +6,7 @@
 [ext_resource path="res://HevLib/ui/themes/fonts/courier_new/font-courierbold.tres" type="DynamicFont" id=4]
 [ext_resource path="res://HevLib/ui/mod_menu/modpacks/ApplicableMods.gd" type="Script" id=5]
 [ext_resource path="res://HevLib/ui/themes/fonts/courier_new/font-courierbold-small.tres" type="DynamicFont" id=6]
-[ext_resource path="res://HevLib/ui/mod_menu/mod_info/ScrollWithKB.gd" type="Script" id=7]
+[ext_resource path="res://HevLib/development_tools/control_and_ui/scrollbox_helpers/OmniScroll.gd" type="Script" id=7]
 
 [node name="ModpacksMenu" type="Popup"]
 margin_right = 800.0
@@ -111,6 +111,7 @@ margin_right = 800.0
 margin_bottom = 302.0
 size_flags_vertical = 3
 script = ExtResource( 7 )
+use_horizontal = false
 
 [node name="VBoxContainer" type="VBoxContainer" parent="base/VBoxContainer/ApplicableMods/ScrollContainer"]
 margin_right = 800.0
