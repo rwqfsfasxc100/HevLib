@@ -1,3 +1,17 @@
+[1.13.5]
+
+1="* Added new MODIFY_SHIP_NUMERICS.gd driver"
+1.1="* Used to modify the numerical equipment capabilities of a specific ship model in the upgradeLimits property"
+1.2="* Contains dictionaries for each ship's modifications, with the ability to have multiple modifications based on other criteria"
+1.3="* ship_name -> string used for the shipName identifier for a dictionary"
+1.4="* recurse_to_variants -> (optional) bool for whether the config should be used on ships with the ship_name as the baseShipName"
+1.5="* ammo -> (optional) dictionary containing modifications to ammunition magazine limits. min sets the minimum value, and max sets the maximum value. Also can use the aliases mass_driver_ammo and ammunition instead of ammo"
+1.6="* nano -> (optional) dictionary containing modifications to nanodrone storage limits. min sets the minimum value, and max sets the maximum value. Also can use the aliases nanodrones and nanodrone_components instead of nano"
+1.7="* propellant -> (optional) dictionary containing modifications to propellant tank limits. min sets the minimum value, and max sets the maximum value. Also can use the aliases fuel and remass instead of propellant"
+1.8="* reactor_core -> (optional) dictionary containing modifications to the reactor power limits. min sets the minimum value, and max sets the maximum value. Also can use the aliases reactor and core instead of reactor_core"
+1.9="* ultracapacitor -> (optional) dictionary containing modifications to ultracapacitor limits. min sets the minimum value, and max sets the maximum value. Also can use the alias capacitor instead of ultracapacitor"
+1.10="* turbine -> (optional) dictionary containing modifications to turbine limits. min sets the minimum value, and max sets the maximum value"
+
 [1.13.4]
 
 1="* Fixed Translations.__translation_file_to_dictionary not conjoining delimiter lines escaped with a single backslash"
