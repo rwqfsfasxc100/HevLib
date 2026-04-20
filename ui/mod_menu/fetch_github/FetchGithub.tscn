@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://HevLib/ui/mod_menu/fetch_github/FetchGithub.gd" type="Script" id=1]
 [ext_resource path="res://HevLib/ui/mod_menu/AnimateAppear.tscn" type="PackedScene" id=2]
@@ -7,8 +7,10 @@
 [ext_resource path="res://HevLib/ui/themes/fonts/courier_new/font-courierbold.tres" type="DynamicFont" id=5]
 [ext_resource path="res://HevLib/development_tools/control_and_ui/scrollbox_helpers/OmniScroll.gd" type="Script" id=6]
 [ext_resource path="res://HevLib/ui/mod_menu/fetch_github/WAIT.gd" type="Script" id=7]
+[ext_resource path="res://HevLib/ui/mod_menu/fetch_github/wait_label.gd" type="Script" id=8]
 
 [node name="FetchGithub" type="Popup"]
+visible = true
 margin_right = 40.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 1280, 720 )
@@ -35,20 +37,26 @@ margin_bottom = 720.0
 margin_right = 1280.0
 margin_bottom = 720.0
 
-[node name="Content" type="HBoxContainer" parent="base/VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="base/VBoxContainer"]
 margin_right = 1280.0
-margin_bottom = 720.0
+margin_bottom = 5.0
+rect_min_size = Vector2( 0, 5 )
+
+[node name="Content" type="HBoxContainer" parent="base/VBoxContainer"]
+margin_top = 9.0
+margin_right = 1280.0
+margin_bottom = 708.0
 size_flags_vertical = 3
 
 [node name="HBoxContainer" type="HBoxContainer" parent="base/VBoxContainer/Content"]
 margin_right = 5.0
-margin_bottom = 720.0
+margin_bottom = 699.0
 rect_min_size = Vector2( 5, 0 )
 
 [node name="ListGithubMods" type="VBoxContainer" parent="base/VBoxContainer/Content"]
 margin_left = 9.0
 margin_right = 682.0
-margin_bottom = 720.0
+margin_bottom = 699.0
 size_flags_horizontal = 3
 script = ExtResource( 4 )
 
@@ -74,12 +82,12 @@ text = "HEVLIB_GITHUBMODS_COUNT"
 [node name="Mods" type="VBoxContainer" parent="base/VBoxContainer/Content/ListGithubMods"]
 margin_top = 42.0
 margin_right = 673.0
-margin_bottom = 674.0
+margin_bottom = 653.0
 size_flags_vertical = 3
 
 [node name="ScrollContainer" type="ScrollContainer" parent="base/VBoxContainer/Content/ListGithubMods/Mods"]
 margin_right = 673.0
-margin_bottom = 632.0
+margin_bottom = 611.0
 size_flags_vertical = 3
 script = ExtResource( 6 )
 use_horizontal = false
@@ -87,14 +95,14 @@ right_stick_scroll_enabled = false
 
 [node name="ListMods" type="VBoxContainer" parent="base/VBoxContainer/Content/ListGithubMods/Mods/ScrollContainer"]
 margin_right = 673.0
-margin_bottom = 632.0
+margin_bottom = 611.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="Footer" type="HBoxContainer" parent="base/VBoxContainer/Content/ListGithubMods"]
-margin_top = 678.0
+margin_top = 657.0
 margin_right = 673.0
-margin_bottom = 720.0
+margin_bottom = 699.0
 alignment = 1
 
 [node name="Close" type="Button" parent="base/VBoxContainer/Content/ListGithubMods/Footer"]
@@ -107,17 +115,23 @@ text = "HEVLIB_MODMENU_CLOSE"
 [node name="VSeparator" type="VSeparator" parent="base/VBoxContainer/Content"]
 margin_left = 686.0
 margin_right = 690.0
-margin_bottom = 720.0
+margin_bottom = 699.0
 
 [node name="Info" type="VBoxContainer" parent="base/VBoxContainer/Content"]
 margin_left = 694.0
 margin_right = 1271.0
-margin_bottom = 720.0
+margin_bottom = 699.0
 size_flags_horizontal = 3
 
-[node name="ScrollContainer" type="ScrollContainer" parent="base/VBoxContainer/Content/Info"]
+[node name="VBoxContainer" type="VBoxContainer" parent="base/VBoxContainer/Content/Info"]
 margin_right = 577.0
-margin_bottom = 674.0
+margin_bottom = 10.0
+rect_min_size = Vector2( 0, 10 )
+
+[node name="ScrollContainer" type="ScrollContainer" parent="base/VBoxContainer/Content/Info"]
+margin_top = 14.0
+margin_right = 577.0
+margin_bottom = 639.0
 size_flags_vertical = 3
 script = ExtResource( 6 )
 use_horizontal = false
@@ -125,22 +139,28 @@ left_stick_scroll_enabled = false
 
 [node name="VBoxContainer" type="VBoxContainer" parent="base/VBoxContainer/Content/Info/ScrollContainer"]
 margin_right = 577.0
-margin_bottom = 674.0
+margin_bottom = 625.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="RichTextLabel" type="RichTextLabel" parent="base/VBoxContainer/Content/Info/ScrollContainer/VBoxContainer"]
 margin_right = 577.0
-margin_bottom = 674.0
+margin_bottom = 625.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 fit_content_height = true
 scroll_active = false
 
-[node name="HBoxContainer" type="HBoxContainer" parent="base/VBoxContainer/Content/Info"]
-margin_top = 678.0
+[node name="VBoxContainer2" type="VBoxContainer" parent="base/VBoxContainer/Content/Info"]
+margin_top = 643.0
 margin_right = 577.0
-margin_bottom = 720.0
+margin_bottom = 653.0
+rect_min_size = Vector2( 0, 10 )
+
+[node name="HBoxContainer" type="HBoxContainer" parent="base/VBoxContainer/Content/Info"]
+margin_top = 657.0
+margin_right = 577.0
+margin_bottom = 699.0
 alignment = 1
 
 [node name="DownloadMod" type="Button" parent="base/VBoxContainer/Content/Info/HBoxContainer"]
@@ -154,8 +174,14 @@ text = "HEVLIB_DOWNLOAD_MOD"
 [node name="HBoxContainer2" type="HBoxContainer" parent="base/VBoxContainer/Content"]
 margin_left = 1275.0
 margin_right = 1280.0
-margin_bottom = 720.0
+margin_bottom = 699.0
 rect_min_size = Vector2( 5, 0 )
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="base/VBoxContainer"]
+margin_top = 712.0
+margin_right = 1280.0
+margin_bottom = 720.0
+rect_min_size = Vector2( 0, 8 )
 
 [node name="AnimateAppear" parent="." instance=ExtResource( 2 )]
 
@@ -164,8 +190,10 @@ rect_min_size = Vector2( 5, 0 )
 [node name="download_files" type="HTTPRequest" parent="."]
 
 [node name="WAIT" type="Popup" parent="."]
+visible = true
 margin_right = 350.0
 margin_bottom = 50.0
+rect_min_size = Vector2( 460, 400 )
 popup_exclusive = true
 script = ExtResource( 7 )
 
@@ -174,19 +202,32 @@ margin_left = 5.0
 margin_top = 5.0
 margin_right = 345.0
 margin_bottom = 47.0
+rect_min_size = Vector2( 450, 390 )
 color = Color( 0, 0, 0, 0.921569 )
 
 [node name="PanelContainer" type="PanelContainer" parent="WAIT"]
 margin_right = 200.0
 margin_bottom = 50.0
-rect_min_size = Vector2( 350, 0 )
+rect_min_size = Vector2( 460, 400 )
 
 [node name="Button" type="Button" parent="WAIT/PanelContainer"]
 margin_left = 5.0
 margin_top = 5.0
-margin_right = 345.0
-margin_bottom = 47.0
+margin_right = 455.0
+margin_bottom = 395.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="WAIT/PanelContainer/Button"]
+margin_right = 40.0
+margin_bottom = 40.0
+
+[node name="wait_label" type="Label" parent="WAIT/PanelContainer/Button/VBoxContainer"]
+margin_right = 450.0
+margin_bottom = 390.0
+rect_min_size = Vector2( 450, 390 )
 text = "HEVLIB_PLEASE_WAIT"
+align = 1
+autowrap = true
+script = ExtResource( 8 )
 
 [node name="Unavailable" type="AcceptDialog" parent="."]
 margin_right = 118.0

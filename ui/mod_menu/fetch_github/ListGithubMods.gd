@@ -23,6 +23,7 @@ onready var info = get_node_or_null(NodePath("../Info"))
 onready var rich = info.get_node("ScrollContainer/VBoxContainer/RichTextLabel")
 
 onready var WAIT = parent.get_node_or_null(NodePath("WAIT"))
+onready var WAIT_LABEL = WAIT.get_node_or_null(NodePath("PanelContainer/Button/VBoxContainer/wait_label"))
 
 var mod_item = load("res://HevLib/ui/mod_menu/fetch_github/list_items/ModItem.tscn")
 var file = File.new()
@@ -42,9 +43,11 @@ func _ready():
 	count.text = TranslationServer.translate("HEVLIB_GITHUBMODS_COUNT") % [0]
 	btn_to_download.disabled = true
 	http.connect("request_completed",self,"request_complete")
-	file.open(mod_list_cache,File.READ)
-	var dt = JSON.parse(file.get_as_text(true)).result
-	file.close()
+	var dt = {}
+	if file.file_exists(mod_list_cache):
+		file.open(mod_list_cache,File.READ)
+		dt = JSON.parse(file.get_as_text(true)).result
+		file.close()
 	if dt.size():
 		fill_in_mods(dt)
 	else:

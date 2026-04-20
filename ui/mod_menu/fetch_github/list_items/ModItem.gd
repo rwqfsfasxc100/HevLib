@@ -9,6 +9,8 @@ signal pressed(data,box)
 
 var modPathPrefix = ""
 
+onready var http = get_node("HTTPRequest")
+
 var pointers
 var dir = Directory.new()
 var unique_icon = ""
@@ -33,7 +35,6 @@ func add_mod():
 	var button = get_node("MOD_BUTTON")
 	var name_label = get_node("MOD_BUTTON/VBoxContainer/NAME")
 	var author_label = get_node("MOD_BUTTON/VBoxContainer/AUTHOR")
-	var http = get_node("HTTPRequest")
 	button.connect("pressed",self,"_pressed")
 	name_label.text = formatted_data["header_data"].get("MOD_NAME",DATA.get("name",""))
 	var githubOwner = DATA.get("owner",{})
@@ -68,7 +69,7 @@ func get_readme():
 	var pathName = DATA.get("full_name")
 	var path = "https://raw.githubusercontent.com/%s/refs/heads/%s/MOD_DETAILS.txt" % [pathName,branch]
 	readmePath = path
-	get_node("HTTPRequest").request(path)
+	http.request(path)
 	
 	
 	pass
@@ -87,6 +88,8 @@ func icon_announcement(u):
 		set_icon_to(unique_icon)
 func set_icon_to(path):
 	get_node("ICON").texture = pointers.FileAccess.__load_png(path)
+
+var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 
 var is_downloading = false
 var this_zip_filename = ""
@@ -108,7 +111,7 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 		1:
 			if result == HTTPRequest.RESULT_SUCCESS and response_code == 200:
 				set_icon_to(unique_icon)
-				get_node("HTTPRequest").download_file = ""
+				http.download_file = ""
 		2:
 			var data = {}
 			if result == HTTPRequest.RESULT_SUCCESS and response_code == 200:
@@ -127,7 +130,7 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 
 		3:
 			if result == HTTPRequest.RESULT_SUCCESS and response_code == 200:
-				var http = get_node("HTTPRequest")
+				
 				if "header_data" in formatted_data and "MOD_ZIP_NAME" in formatted_data["header_data"]:
 					var folderPath = this_zip_filename.split(this_zip_filename.split("/")[this_zip_filename.split("/").size() - 1])[0]
 					var newZipName = folderPath + formatted_data["header_data"]["MOD_ZIP_NAME"]
@@ -138,7 +141,12 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 				http.download_file = ""
 				this_zip_filename = ""
 				this_zip_url = ""
+				file.open(has_updated_store,File.WRITE)
+				file.store_string("1")
+				file.close()
 				list.WAIT.hide()
+				list.WAIT_LABEL.clear()
+				is_downloading = false
 				list.btn_to_download.grab_focus()
 				list.subtract_mod_count()
 				list.select_first_mod()
@@ -147,8 +155,14 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 
 var base_downloads_list = "https://api.github.com/repos/%s/releases"
 func get_downloads():
-	var downloads = base_downloads_list % [DATA.get("full_name")]
-	$HTTPRequest.request(downloads)
+	var entry = DATA.get("full_name")
+	var downloads = base_downloads_list % [entry]
+	var c = get_releases_cache()
+	if entry in c:
+		mode += 1
+		_on_HTTPRequest_request_completed(0,0,0,0)
+	else:
+		http.request(downloads)
 
 func format_description(data:String):
 	var headerData = {}
@@ -170,12 +184,32 @@ func format_description(data:String):
 
 func download_this_mod():
 	if not is_downloading and this_zip_filename and this_zip_url:
-		var http = get_node("HTTPRequest")
 		http.download_file = this_zip_filename
 		is_downloading = true
-		
+		list.WAIT_LABEL.set_process(true)
 		http.request(this_zip_url)
 		list.btn_to_download.disabled = true
+
+var percent:float = 0
+var bytes_downloaded: int = 0
+var total_bytes: int = 0
+func _physics_process(delta):
+	if is_downloading:
+		total_bytes = http.get_body_size()
+		bytes_downloaded = http.get_downloaded_bytes()
+		var frac = float(bytes_downloaded)/float(total_bytes)
+		var f2 = frac * 100
+		percent = f2
+		print("HevLib GitHub Zip Downloader: Updating percent: %s%% | %s of %s" % [str(percent),bytes_downloaded,total_bytes])
+		if bytes_downloaded > 0.0:
+			if list.WAIT_LABEL.has_method("_get_github_progress"):
+				if total_bytes > 0:
+					list.WAIT_LABEL._get_github_progress("HEVLIB_GITHUB_PROGRESS_DOWNLOADING",percent,bytes_downloaded,total_bytes)
+				else:
+					list.WAIT_LABEL._get_github_progress("HEVLIB_GITHUB_PROGRESS_DOWNLOADING_ONLY_BYTES",percent,bytes_downloaded,total_bytes)
+			
+			
+			pass
 
 func store_releases_cache(data):
 	var dt = {}
@@ -190,12 +224,14 @@ func store_releases_cache(data):
 
 func get_releases_cache():
 	var out = {}
-	file.open(releases_cache_path,File.READ)
-	var data = JSON.parse(file.get_as_text()).result
-	file.close()
-	var fn = DATA.get("full_name")
-	if fn in data:
-		out = data[fn]
+	var data = {}
+	if file.file_exists(releases_cache_path):
+		file.open(releases_cache_path,File.READ)
+		data = JSON.parse(file.get_as_text()).result
+		file.close()
+		var fn = DATA.get("full_name")
+		if fn in data:
+			out = data[fn]
 	return out
 
 func _tree_entered():

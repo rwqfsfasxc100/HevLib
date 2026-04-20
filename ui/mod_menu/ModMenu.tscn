@@ -1086,6 +1086,7 @@ autowrap = true
 restart_dialog_path = NodePath("../MMRestartDialog")
 
 [node name="FetchGithub" parent="." instance=ExtResource( 25 )]
+restart_dialog_path = NodePath("../MMRestartDialog")
 
 [connection signal="about_to_show" from="." to="." method="_about_to_show"]
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
