@@ -4,6 +4,7 @@
 [ext_resource path="res://HevLib/ui/mod_menu/updates/UpdateNotifier.gd" type="Script" id=2]
 
 [node name="UpdateNotifier" type="Popup"]
+visible = true
 margin_right = 200.0
 margin_bottom = 70.0
 rect_min_size = Vector2( 500, 250 )
