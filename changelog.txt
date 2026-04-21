@@ -6,7 +6,7 @@
 1.1.2="* Index 1: first name, string for the first name"
 1.1.3="* Index 2: last name, string for the last name"
 1.1.4="* Index 3: Gender, float that determines what genders the names can be used for. Setting it to 0 makes it a male name, 1 makes it a female name, and anywhere inbetween (e.g. 0.5) can be used for both male and female"
-1.1.5="* Example: const CREW = [["usa","Abigail","Lister",0],["verbatim","Ryland","Grace",1],["usa","Jesse","Veil",0.5]]"
+1.1.5="* Example: const CREW = [["usa","Kristine","Kochanski",0],["verbatim","Ryland","Grace",1],["usa","Jesse","Veil",0.5]]"
 1.2="* Ships - added through a SHIPS constant, array of arrays containing 3 parts"
 1.2.1="* Index 0: name type, determines if the first and last names can be independent or not. Accepts en for independent, verbatim to require them to be paired"
 1.2.2="* Index 1: prefix, string for the name prefix"
