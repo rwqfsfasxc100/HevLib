@@ -1348,17 +1348,9 @@ class _DataFormat:
 		else:
 			_savedScriptObjects.append(out)
 		
-		var file = File.new()
-		file.open(scene_path,File.READ)
-		var txt = file.get_as_text(true)
-		file.close()
-		var root = ""
-		for line in txt.split("\n"):
-			if line.begins_with("[node "):
-				var split = line.split(" ")
-				if split.size() < 4:
-					root = split[1].split("\"")[1]
-					break
+		var txt = load(scene_path).instance()
+		var root = txt.name
+		Tool.remove(txt)
 		var scene_replacement = "user://cache/.HevLib_Cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec()
 		var p = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"%s\" type=\"PackedScene\" id=1]\n\n[node name=\"%s\" instance=ExtResource( 1 )]" % [scene_path,root]
 		FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
