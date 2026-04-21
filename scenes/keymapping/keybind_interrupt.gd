@@ -43,8 +43,9 @@ var input_handle = null
 func _ready():
 	pointers.FolderAccess.__check_folder_exists(keybind_folder)
 	self.pause_mode = Node.PAUSE_MODE_PROCESS
-	self.process_priority = -32768
+	self.process_priority = -INF
 	INPUT_DRIVER_ACTIVE = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","input_virtualization")
+	self.set_process_input(ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE)
 	if ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE:
 		var actions = InputMap.get_actions()
 		var sortedAv = pointers.Keymapping.__get_built_in_action_list()
@@ -107,7 +108,7 @@ func _physics_process(delta):
 func _input(event):
 #	if event.is_action("ACT1") and event.is_action("ACT2"):
 #		breakpoint
-	if ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE:
+#	if ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE:
 #		event.set_script(load("res://HevLib/scenes/keymapping/data/inject.gd"))
 		if handle_raw_inputs(event):
 #			event.checker = true
