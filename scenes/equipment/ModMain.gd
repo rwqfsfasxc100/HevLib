@@ -127,6 +127,7 @@ func _init(modLoader = ModLoader):
 		# Adds in_hevlib_menu to the CurrentGame script and preventing controls while it's true
 		installScriptExtension("../../events/controls/CurrentGame.gd")
 		installScriptExtension("../../events/controls/ship-ctrl.gd")
+		installScriptExtension("../../scripts/Namer.gd")
 
 #		installScriptExtension("check.gd")
 		installScriptExtension("../scene_replacements/blanks/MPU.gd")

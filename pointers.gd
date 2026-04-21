@@ -1830,6 +1830,7 @@ class _Equipment:
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/Driver_Store.json",
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order_relative.json",
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/modify_ship_numerics.json",
+			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/namer.json",
 			
 		]
 		
@@ -1855,7 +1856,7 @@ class _Equipment:
 		var storage_for_driver_store = FILE_PATHS[19]
 		var slot_order_relative_store = FILE_PATHS[20]
 		var modify_ship_numerics_store = FILE_PATHS[21]
-		
+		var namer_store = FILE_PATHS[22]
 		
 		
 		if is_onready:
@@ -1952,6 +1953,9 @@ class _Equipment:
 		file.close()
 		file.open(modify_ship_numerics_store,File.WRITE)
 		file.store_string("{}")
+		file.close()
+		file.open(namer_store,File.WRITE)
+		file.store_string("{\"crew\":[],\"ships\":[]}")
 		file.close()
 		
 		
@@ -2644,7 +2648,21 @@ class _Equipment:
 						file.open(modify_ship_numerics_store,File.WRITE)
 						file.store_string(JSON.print(pfdata))
 						file.close()
-					
+					"NAMER.gd":
+						file.open(namer_store,File.READ)
+						var pfdata = JSON.parse(file.get_as_text()).result
+						file.close()
+						if "CREW" in constants:
+							var d = constants["CREW"]
+							pfdata["crew"].append_array(d)
+						
+						if "SHIPS" in constants:
+							var d = constants["SHIPS"]
+							pfdata["ships"].append_array(d)
+						
+						file.open(namer_store,File.WRITE)
+						file.store_string(JSON.print(pfdata))
+						file.close()
 					
 					
 		
