@@ -1148,10 +1148,16 @@ class _DataFormat:
 		return dict
 		
 	const function_prefixes = ["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func "]
-	func __trim_scripts(file_path : String):
+	const all_prefixes = ["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func ","onready ","var ","signal ","const ","export ","extends "]
+	func __trim_scripts(file_path : String, get_detailed_operands: bool = false, trim_unnecessary_newlines: bool = false):
 		var concat : String = ""
 		var const_names = []
 		var var_names = []
+		var method_names = []
+		var signal_names = []
+		var method_values = []
+		var method_output_type = []
+		var signal_values = []
 		var file = File.new()
 		if file.open(file_path,File.READ) == OK:
 			var data = file.get_as_text(true)
@@ -1177,14 +1183,77 @@ class _DataFormat:
 					result += part
 				line = result
 				var has_prefix = false
+				var has_sig = false
 				for prefix in function_prefixes:
 					if line.begins_with(prefix):
 						has_prefix = true
+				if line.begins_with("signal "):
+					has_sig = true
 				if has_prefix:
 					if streaming:
 						concat = concat + this_stream.strip_edges() + "\n"
 						this_stream = ""
 						streaming = false
+					var av = line.split("func ")[1].split("(")
+					var mname = av[0]
+					if get_detailed_operands:
+						var operands : String = line.split(mname)[1].strip_edges()
+						var os = operands.split("->")
+						var outputType = ""
+						if os.size() > 1:
+							outputType = os[1].rstrip(":")
+							operands = os[0].strip_edges()
+						if operands.begins_with("("):
+							operands = operands.substr(1, operands.length())
+						if operands.ends_with(":"):
+							operands = operands.substr(0, operands.length() - 1)
+						if operands.ends_with(")"):
+							operands = operands.substr(0,operands.length() - 1)
+						var opnames = ""
+						var opvalues = []
+						var thisOpValue = ""
+						var colonDelim = false
+						var bracketDelim = false
+						for i in operands:
+							if not colonDelim and i == ":":
+								colonDelim = true
+							if colonDelim and i == ",":
+								colonDelim = false
+							if not bracketDelim and i == "(":
+								bracketDelim = true
+							if bracketDelim and i == ")":
+								bracketDelim = false
+							if not colonDelim and not bracketDelim:
+								opnames += i
+							
+							
+							if not bracketDelim and i == ",":
+								opvalues.append(thisOpValue.strip_edges())
+								thisOpValue = ""
+							else:
+								thisOpValue += i
+						if thisOpValue:
+							opvalues.append(thisOpValue.strip_edges())
+							thisOpValue = ""
+						method_values.append(opvalues)
+						method_output_type.append(outputType)
+					method_names.append(mname)
+				elif has_sig:
+					if streaming:
+						concat = concat + this_stream.strip_edges() + "\n"
+						this_stream = ""
+						streaming = false
+					var av = line.split("signal ")[1].split("(")
+					var sname = av[0]
+					if get_detailed_operands:
+						var op = []
+						if av.size() > 1:
+							var operands = av[1].rstrip(")")
+							if operands:
+								for o in operands.split(","):
+									op.append(o.strip_edges())
+						signal_values.append(op)
+					signal_names.append(sname)
 				elif line.begins_with("const "):
 					if streaming:
 						concat = concat + this_stream.strip_edges() + "\n"
@@ -1201,7 +1270,7 @@ class _DataFormat:
 					var vname = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
 					var_names.append(vname)
 					streaming = true
-				elif line.begins_with("export") and " var " in line:
+				elif line.begins_with("export ") and " var " in line:
 					if streaming:
 						concat = concat + this_stream.strip_edges() + "\n"
 						this_stream = ""
@@ -1209,7 +1278,7 @@ class _DataFormat:
 					var vname = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
 					var_names.append(vname)
 					streaming = true
-				elif line.begins_with("onready") and " var " in line:
+				elif line.begins_with("onready ") and " var " in line:
 					if streaming:
 						concat = concat + this_stream.strip_edges() + "\n"
 						this_stream = ""
@@ -1229,7 +1298,19 @@ class _DataFormat:
 				concat = concat + this_stream.strip_edges() + "\n"
 				this_stream = ""
 				streaming = false
-		return [concat if concat !="" else "extends Node",var_names,const_names]
+		if trim_unnecessary_newlines:
+			var reconcat = ""
+			for line in concat.split("\n"):
+				var newline = false
+				var ls = line.strip_edges()
+				for a in all_prefixes:
+					if ls.begins_with(a):
+						newline = true
+				if newline and reconcat:
+					ls = "\n" + ls
+				reconcat += ls
+			concat = reconcat
+		return [concat if concat !="" else "extends Node",var_names,const_names,signal_names,method_names,signal_values,method_values,method_output_type]
 	
 	func __factorial(n:int) -> int:
 		var holdvalue = 0
@@ -1363,10 +1444,14 @@ class _DataFormat:
 	
 	var var_hash = {}
 	
-	func __convert_var_from_string(string : String):
+	func __convert_var_from_string(string : String, constant = true):
 		if string in var_hash:
 			return var_hash[string]
-		var header = "extends Reference\nconst VARIABLE = "
+		var header
+		if constant:
+			header = "extends Reference\nconst VARIABLE = "
+		else:
+			header = "extends Reference\nvar VARIABLE = "
 		var script = __compile_script(header + string)
 		var variable = script.VARIABLE
 		var_hash[string] = variable
@@ -5530,10 +5615,14 @@ class _NodeAccess:
 	
 	var var_hash = {}
 	
-	func __convert_var_from_string(string : String):
+	func __convert_var_from_string(string : String, constant = true):
 		if string in var_hash:
 			return var_hash[string]
-		var header = "extends Reference\nconst VARIABLE = "
+		var header
+		if constant:
+			header = "extends Reference\nconst VARIABLE = "
+		else:
+			header = "extends Reference\nvar VARIABLE = "
 		var script = DataFormat.__compile_script(header + string)
 		var variable = script.VARIABLE
 		var_hash[string] = variable
