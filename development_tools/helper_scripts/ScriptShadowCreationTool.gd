@@ -1,6 +1,51 @@
 extends Node
 
-func __make_shadow_of_script(script_path: String,desired_methods:Array,desired_variables:Array,desired_signals:Array) -> String:
+# This is a script used to create shadow (man in the middle) scripts, or in other words,
+#  a means of changing the inputs and/or outputs of the communication between two
+#  scripts.
+# 
+# e.g. modify the communication between the ship and a _ready() method of an equipment
+#  item. Given that virtual methods cannot be overriden normally, this brings some 
+#  control back with what it receives being able to be modified
+# 
+# This script SHOULD NOT be used during runtime due to it being a very heavy operation
+# 
+# PARAMETERS:
+# 
+# script_path -> String used for the script that will be shadowed
+# 
+# desired_methods -> Array used to define all methods that will be shadowed, if they
+#  exist within the script. If blank, adds all methods defined within the script.
+#  To not shadow anything, add a singular invalid entry (e.g. [null])
+# 
+# desired_variables -> Array used to define all variables that will be shadowed, if they
+#  exist within the script. If blank, adds all variables defined within the script.
+#  To not shadow anything, add a singular invalid entry (e.g. [null])
+# 
+# desired_signals -> Array used to define all signals that will be shadowed, if they
+#  exist within the script. If blank, adds all signals stated within the script.
+#  To not shadow anything, add a singular invalid entry (e.g. [null])
+# 
+# use_class_variables -> Bool used to determine if the object type's variables should 
+#  be shadowed as well. Only works when variables are defined with desired_variables
+# 
+# use_class_signals -> Bool used to determine if the object type's variables should be
+#  shadowed as well. Only works when variables are defined with desired_methods, and
+#  methods not defined by the script WILL NOT have any method default properties due
+#  to scope limitations
+# 
+# use_class_signals -> Bool used to determine if the object type's signals should 
+#  be shadowed as well. Only works when signals are defined with desired_signals
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+
+func __make_shadow_of_script(script_path: String,desired_methods:Array,desired_variables:Array,desired_signals:Array,use_class_variables:bool = true,use_class_methods:bool = true,use_class_signals:bool = true) -> String:
 	var out = ""
 	var pointers = preload("res://HevLib/pointers.gd").new()
 	var data = pointers.DataFormat.__trim_scripts(script_path,true,true)
@@ -25,13 +70,58 @@ func __make_shadow_of_script(script_path: String,desired_methods:Array,desired_v
 			pv = load(script_type).new()
 		else:
 			pv = pointers.DataFormat.__convert_var_from_string(script_type + ".new()",false)
-		var pvt = pv.get_property_list()
-		for a in pvt:
-			var n = a.name
-			if n != "script":
-				var vt = regex.search(n)
-				if not vt and n.split(" ").size() == 1:
-					var_names.append(n)
+		if use_class_variables and desired_variables:
+			var pvt = pv.get_property_list()
+			for a in pvt:
+				var n = a.name
+				if n in desired_variables:
+					if n != "script":
+						var vt = regex.search(n)
+						if not vt and n.split(" ").size() == 1:
+							var_names.append(n)
+		if use_class_methods and desired_methods:
+			var pvr = pv.get_method_list()
+			for a in pvr:
+				var methodName = a.name
+				if methodName in desired_methods:
+					if methodName in PoolStringArray(["_init","set_script","get_script","emit_signal"]):
+						continue
+					var oArgs = []
+					var args = a.args
+					var argsSize = args.size()
+					for i in range(argsSize):
+						var arg = args[i]
+						var aout = arg.name
+						var ov = "_" + aout + "_"
+						var arc = arg["class_name"]
+						if arc:
+							ov += ": " + arc
+						oArgs.append(ov)
+					var rx = method_names.find(methodName)
+					if rx > -1:
+						method_operands[rx] = oArgs
+					else:
+						method_names.append(methodName)
+						method_type.append("")
+						method_operands.append(oArgs)
+		if use_class_signals and desired_signals:
+			var pva = pv.get_signal_list()
+			for a in pva:
+				var sig_name = a.name
+				if sig_name in desired_signals:
+					var oArgs = []
+					var args = a.args
+					var argsSize = args.size()
+					for i in range(argsSize):
+						var arg = args[i]
+						var aout = arg.name
+						oArgs.append("_" + aout + "_")
+					var rx = signal_names.find(sig_name)
+					if rx > -1:
+						signal_operands[rx] = oArgs
+					else:
+						signal_names.append(sig_name)
+						signal_operands.append(oArgs)
 		Tool.remove(pv)
 	
 	
