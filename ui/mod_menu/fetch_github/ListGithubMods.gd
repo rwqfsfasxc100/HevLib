@@ -107,7 +107,7 @@ func _mod_selected(mod,btn):
 	current_button = btn
 
 func select_first_mod():
-	yield(get_tree().create_timer(0.1),"timeout")
+	yield(CurrentGame.get_tree().create_timer(0.1),"timeout")
 	var v = list.get_children()
 	if v:
 		var first = v[0]
