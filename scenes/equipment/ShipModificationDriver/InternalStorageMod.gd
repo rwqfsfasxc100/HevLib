@@ -314,23 +314,11 @@ func _ready():
 			var change = ((float(processedCargoCapacity)/1000.0) * mass_per_processed_tonne)
 			mass_add += change
 		
-		l("Modifying consumables multiplicatively")
-		if ammo_multi != 1.0:
-			var val = 0
-			val = ((base_ammo_storage + ammo_add) * ammo_multi) - (base_ammo_storage + ammo_add)
-			ammo_add += val
-		if nano_multi != 1.0:
-			var val = 0
-			val = ((base_nano_storage + nano_add) * nano_multi) - (base_nano_storage + nano_add)
-			nano_add += val
-		if propellant_multi != 1.0:
-			var val = 0
-			val = ((base_propellant + propellant_add) * propellant_multi) - (base_propellant + propellant_add)
-			propellant_add += val
 		if mass_multi != 1.0:
 			var val = 0
 			val = ((mass * mass_add) * mass_multi) - (mass + mass_add)
 			mass_add += val
+		
 		
 		l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [ammo_add, nano_add, propellant_add])
 		var ammo_min = 0
@@ -403,6 +391,23 @@ func _ready():
 		
 		
 		yield(CurrentGame.get_tree(),"idle_frame")
+		l("Modifying consumables multiplicatively")
+		if ammo_multi != 1.0:
+			var val = 0
+			val = (massDriverAmmoMax * ammo_multi) - massDriverAmmoMax
+			addAmmoCapacity(val)
+		if nano_multi != 1.0:
+			var val = 0
+			val = (dronePartsMax * nano_multi) - dronePartsMax
+			addDronesCapacity(val)
+		if propellant_multi != 1.0:
+			var val = 0
+			val = (reactiveMassMax * propellant_multi) - reactiveMassMax
+			addPropellantCapacity(val)
+		
+		
+		
+		
 #		clampConsumables()
 		var cfg = shipConfig
 		var state = CurrentGame.state.ship.config
