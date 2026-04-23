@@ -132,7 +132,7 @@ func checkSave(force = false):
 		display_text = newText
 
 func check_focus():
-	yield(get_tree().create_timer(0.25),"timeout")
+	yield(CurrentGame.get_tree().create_timer(0.25),"timeout")
 	if first:
 		grab_focus()
 	if meta:
