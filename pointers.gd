@@ -1236,7 +1236,7 @@ class _DataFormat:
 							opvalues.append(thisOpValue.strip_edges())
 							thisOpValue = ""
 						method_values.append(opvalues)
-						method_output_type.append(outputType)
+						method_output_type.append(outputType.strip_edges())
 					method_names.append(mname)
 				elif has_sig:
 					if streaming:

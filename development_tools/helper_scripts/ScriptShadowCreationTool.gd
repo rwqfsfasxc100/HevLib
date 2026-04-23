@@ -26,6 +26,22 @@ extends Node
 #  exist within the script. If blank, adds all signals stated within the script.
 #  To not shadow anything, add a singular invalid entry (e.g. [null])
 # 
+# extend_mode -> String used to determine what the object extends from.
+#  Built-in modes are 
+#  -> "none" - uses no extention, which the engine converts to Object type (default)
+#  -> "shadow" - uses the type of the shadowed script
+#  Using any other string will convert that literally as a type
+#  make sure to double up quotes for script extensions, as this
+#  gets translated literally from text (i.e. "\"res://CurrentGame.gd\""
+# 
+# initialize_with_args -> bool used to decide where to add an _init call
+#  _init call will automatically set the object variable
+#  if false, that object needs to be set manually
+#  defaults to true
+# 
+# initialize_with_script_updaters -> bool used to decide whether scripts changing the
+#  object's script should be added. These likely will break, so disabled by default
+# 
 # use_class_variables -> Bool used to determine if the object type's variables should 
 #  be shadowed as well. Only works when variables are defined with desired_variables
 # 
@@ -45,7 +61,7 @@ extends Node
 # 
 # 
 
-func __make_shadow_of_script(script_path: String,desired_methods:Array,desired_variables:Array,desired_signals:Array,use_class_variables:bool = true,use_class_methods:bool = true,use_class_signals:bool = true) -> String:
+func __make_shadow_of_script(script_path: String,desired_methods:Array,desired_variables:Array,desired_signals:Array,extend_mode = "none",initialize_with_args = true,initialize_with_script_updaters = false,use_class_variables:bool = true,use_class_methods:bool = true,use_class_signals:bool = true) -> String:
 	var out = ""
 	var pointers = preload("res://HevLib/pointers.gd").new()
 	var data = pointers.DataFormat.__trim_scripts(script_path,true,true)
@@ -124,10 +140,13 @@ func __make_shadow_of_script(script_path: String,desired_methods:Array,desired_v
 						signal_operands.append(oArgs)
 		Tool.remove(pv)
 	
-	
-	var obj_ref = "var __shadowed_object_ref__ = null\nfunc _init(oref):\n\t__shadowed_object_ref__ = oref\n\t%s\n\n%s%s\n\n"
-	
-	var setGet_template = "var %s setget __set__%s_ , __get__%s_\nfunc __set__%s_(how):\n\t%s = how;__shadowed_object_ref__.%s = how;\nfunc __get__%s_():\n\tvar __thisObjVar__ = __shadowed_object_ref__.%s;%s = __thisObjVar__;return __thisObjVar__;\n\n"
+	var unique_shadow_obj_name = "__shadowed_object_ref_%s__" % [str(randi() + randi())]
+	var obj_ref = "var %s = null"  % [unique_shadow_obj_name]
+	if initialize_with_args:
+		obj_ref += "\nfunc _init(oref):\n\t%s" % [unique_shadow_obj_name] + " = oref\n\t%s\n\n%s%s\n\n"
+	else:
+		obj_ref += "\nfunc _init():\n\t%s\n\n%s%s\n\n"
+	var setGet_template = "var %s setget __set__%s_ , __get__%s_\nfunc __set__%s_(how):\n\t%s = how;" + "%s" % unique_shadow_obj_name + ".%s = how;\nfunc __get__%s_():\n\tvar __thisObjVar__ = " + "%s" % unique_shadow_obj_name + ".%s;%s = __thisObjVar__;return __thisObjVar__;\n\n"
 	
 	var variable_handles = ""
 	
@@ -141,7 +160,8 @@ func __make_shadow_of_script(script_path: String,desired_methods:Array,desired_v
 		if canadd:
 			variable_handles += setGet_template % [i,i,i,i,i,i,i,i,i]
 	
-	var function_template = "func %s(%s)%s:\n\tvar out = __shadowed_object_ref__.%s(%s)\n\t\n\treturn out\n\n"
+	var function_template = "func %s(%s)%s:\n\tvar out = " + "%s" % unique_shadow_obj_name + ".%s(%s)\n\t\n\treturn out\n\n"
+	var void_function_template = "func %s(%s)%s:\n\t\n\t" + "%s" % unique_shadow_obj_name + ".%s(%s)\n\n"
 	
 	var function_handles = ""
 	
@@ -159,7 +179,7 @@ func __make_shadow_of_script(script_path: String,desired_methods:Array,desired_v
 			var o3 = ""
 			
 			if type:
-				o3 = "-> " + type
+				o3 = " -> " + type
 			for o in operands:
 				var selfsplit = o.split("self")
 				var sspl = selfsplit.size()
@@ -177,9 +197,9 @@ func __make_shadow_of_script(script_path: String,desired_methods:Array,desired_v
 							do = true
 						if do:
 							if r == sspl - 2:
-								rejoin += part1 + "__shadowed_object_ref__" + part2
+								rejoin += part1 + "%s" % unique_shadow_obj_name + part2
 							else:
-								rejoin += part1 + "__shadowed_object_ref__"
+								rejoin += part1 + "%s" % unique_shadow_obj_name
 							
 						else:
 							if r == sspl - 2:
@@ -199,7 +219,11 @@ func __make_shadow_of_script(script_path: String,desired_methods:Array,desired_v
 					o2 += (", " + ovrt)
 				else:
 					o2 = ovrt
-			var ovr = function_template % [method,o1,o3,method,o2]
+			var ovr = ""
+			if type.to_lower() == "void":
+				ovr = void_function_template % [method,o1,o3,method,o2]
+			else:
+				ovr = function_template % [method,o1,o3,method,o2]
 			function_handles += ovr
 	var constant_handle = ""
 	for i in script_lines:
@@ -237,8 +261,16 @@ func __make_shadow_of_script(script_path: String,desired_methods:Array,desired_v
 			signal_emitters += signal_emit_template % [sig,oprs,cv]
 		
 	signal_handles += "\n"
+	match extend_mode:
+		"none":
+			pass
+		"shadow":
+			out += "extends %s\n\n" % [script_type]
+		_:
+			out += "extends %s\n\n" % [str(extend_mode)]
 	
-	
-	var scriptTemplate = "func set_script(script):\n\t__shadowed_object_ref__.set_script(script);\nfunc get_script():\n\treturn __shadowed_object_ref__.get_script();\n\n"
-	out = obj_ref % [signal_connectors,signal_handles,signal_emitters] + function_handles + variable_handles + constant_handle + scriptTemplate
+	var scriptTemplate = "func set_script(script):\n\t" + "%s" % unique_shadow_obj_name + ".set_script(script);\nfunc get_script():\n\treturn " + "%s" % unique_shadow_obj_name + ".get_script();\n\n"
+	out += obj_ref % [signal_connectors,signal_handles,signal_emitters] + function_handles + variable_handles + constant_handle
+	if initialize_with_script_updaters:
+		out += scriptTemplate
 	return out
