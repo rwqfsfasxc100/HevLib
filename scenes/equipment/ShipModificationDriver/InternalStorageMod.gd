@@ -354,11 +354,10 @@ func _ready():
 		
 		l("Making modificatins to crew. Crew count changed from %s to %s / crew morale changed from %s to %s" % [base_crew_count,modifyable_crew_count,base_crew_morale,modifyable_crew_morale])
 		
-		crew = clamp(modifyable_crew_count,0,INF)
+		crew = max(0,modifyable_crew_count)
 		crewMoraleBonus = clamp(modifyable_crew_morale,-0.5,0.5)
 		
-		var cfg = shipConfig
-		var state = CurrentGame.state.ship.config
+		
 		
 		
 		
@@ -401,11 +400,12 @@ func _ready():
 		for amnt in droneData:
 			nanoDeliveryPerSecond[int(amnt)] = droneData[amnt]
 		
-		clampConsumables()
+		
 		
 		yield(CurrentGame.get_tree(),"idle_frame")
-		
-		
+#		clampConsumables()
+		var cfg = shipConfig
+		var state = CurrentGame.state.ship.config
 		l("Ensuring crew correctness")
 		var chash = cfg.hash()
 		var shash = state.hash()
