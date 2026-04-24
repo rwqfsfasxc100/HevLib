@@ -2159,8 +2159,8 @@ const TRANSLATIONS = {
 			"version_hash": 1718567247
 		},
 		"HEVLIB_SUPPORTED_LANGUAGES": {
-			"string": "Supported languages / completion %",
-			"version_hash": 4165761840
+			"string": "Supported languages / completion %:",
+			"version_hash": 31187306
 		}
 	},
 	"uk_UA": {
