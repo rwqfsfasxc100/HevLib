@@ -1,3 +1,27 @@
+[1.13.8]
+
+1="* Fixed __compile_and_override_script_with_scene failing to work on release builds"
+2="* Made the processed cargo shadow object use a unique variable name"
+3="* Updated DataFormat.__trim_scripts to be able to extract methods and signals, with optiosn to get detailed operands and trim unnecessary newlines"
+3.1="* "
+4="* Added a script shadow helper tool to simplify the creation of shadow scripts"
+4.1="* Shadows can be used to intercept calls between a method and another object"
+4.2="* This is especially useful for modifying virtual methods that use a variable defined outside of the method (a common example is a reference to the ship), due to them being completely unable to be modified without replacing the entire script in Godot 3.x"
+4.3="* The script should only be used for generating the GDScript, as it is a very heavy process."
+4.4="* Instructions and property descriptions are included in the script itself, located at HevLib/scenes/development_tools/helper_scripts/ScriptShadowCreationTool.gd"
+5="* Fixed equipment adding drones or ammo being restricted before the consumables could be added to the ship"
+6="* Multiplicative consumable storages are now more intuitively calculated"
+7="* Updated pointers"
+7.1="* Removed ConfigDriver.__config_parse, using FileAccess.__config_parse as the preferred method"
+7.2="* Added FileAccess.__get_drivers_from_modmain_path - Used to get drivers relative to the provided mod main filepath"
+8="* Mods using driver based translations will now automatically have the manifest's language percentages based on the driver's content"
+8.1="* Calculated using the locale's number of translations divided by the total count of translation strings added"
+8.2="* If a locale's translation is not up-to-date with the master locale's equivalent, it will only be worth 75% of a usual translation for the percentage calculation."
+9="* Added drivers entry to ManifestV2.__get_mod_data outputs"
+10="* Improved load times due to the caching of driver data"
+11="* Added localization info to the mod description box in mod menu"
+12="* Fixed issue with the mod description box not clearing properly on a mod without a manifest"
+
 [1.13.7]
 
 1="* Added NameDriver"
@@ -453,7 +477,7 @@
 
 1="* Added tool accessible through the save options menu that is able to fix saves that crash due to the presence of invalid cargo obtained during the previous dive."
 2="* Save options can now have tooltips, added through a string parsed through a tooltip entry"
-3="* Added a developer tool that simplifies the modifying of a ship's cargo bay scanner coverage, located in res://HevLib/scenes\development_tools\CargoBayCoverageVisual.tscn"
+3="* Added a developer tool that simplifies the modifying of a ship's cargo bay scanner coverage, located in res://HevLib/scenes/development_tools/CargoBayCoverageVisual.tscn"
 4="* Fixed dive summary menu having a scrollbar visible when one wasn't necessary"
 5="* Updated handling of added ships through ADD_SHIPS.gd to allow the ship to appear in the dealer, as well as appearing as derelicts or NPC miners"
 5.1="* Each part is handled through additional dictionaries added to the ship's constant. The presence of it as an entry is what permits it to spawn, and can be empty to just use default values."
