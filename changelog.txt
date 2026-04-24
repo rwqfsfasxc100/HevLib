@@ -24,6 +24,7 @@
 8="* Mods using driver based translations will now automatically have the manifest's language percentages based on the driver's content"
 8.1="* Calculated using the locale's number of translations divided by the total count of translation strings added"
 8.2="* If a locale's translation is not up-to-date with the master locale's equivalent, it will only be worth 75% of a usual translation for the percentage calculation."
+8.3="* Mods not using `TranslationDriver` should still include a `languages` section within the manifest to provide this information."
 9="* Added drivers entry to ManifestV2.__get_mod_data outputs"
 10="* Improved load times due to the caching of driver data"
 11="* Added localization info to the mod description box in mod menu"
