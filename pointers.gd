@@ -1987,12 +1987,12 @@ class _Equipment:
 		var current_mod_ids = ManifestV2.__get_mod_ids()
 		
 		var drivers = []
-		for mod in ManifestV2.__get_mod_data()["mods"]:
-			
-			
-			
-			breakpoint
-		
+		var mods = ManifestV2.__get_mod_data()["mods"]
+		for md in mods:
+			var mod = mods[md] 
+			if mod.drivers:
+				drivers.append(mod.drivers.duplicate(true))
+		mods.clear()
 		
 		var driver_store = {
 			"ADD_EQUIPMENT_ITEMS":[],
