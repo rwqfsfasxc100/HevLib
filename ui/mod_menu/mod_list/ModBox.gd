@@ -40,6 +40,8 @@ var complementary = []
 var already_pressed = false
 
 func _pressed():
+	information_nodes["mod_list"].make_info_default_state()
+	
 	var has_update = false
 	var has_dep = false
 	var has_conf = false
@@ -124,6 +126,21 @@ func _pressed():
 			else:
 				information_nodes["info_links_button"].visible = true
 				has_links = true
+		
+		if "languages" in manifestData:
+			var langData = manifestData["languages"]
+			var languages = ""
+			for lang in langData:
+				var percent = langData[lang]
+				var ov = TranslationServer.translate("HEVLIB_MM_TOOLTIP_LANGUAGE_ENTRY") % [TranslationServer.get_locale_name(lang) + " / %s" % lang,percent]
+				if languages:
+					languages += "\n" + ov
+				else:
+					languages = ov
+			information_nodes["info_desc_languages"].parse_bbcode(languages)
+			information_nodes["info_desc_languages"].visible = true
+		else:
+			information_nodes["info_desc_languages"].visible = false
 		
 		if config_size == 0:
 			information_nodes["info_settings_button"].visible = false
@@ -376,10 +393,10 @@ func _draw():
 			visible = true
 		else:
 			visible = false
-	
-	
 	if is_library:
-		tooltip_text = tooltip_text + "\n" + TranslationServer.translate("HEVLIB_MM_TOOLTIP_LIBRARY") % [is_library,always_display]
+		tooltip_text += ("\n" + TranslationServer.translate("HEVLIB_MM_TOOLTIP_LIBRARY") % [is_library,always_display])
+	
+	
 	button.hint_tooltip = tooltip_text
 	
 	if is_visible_in_tree():
