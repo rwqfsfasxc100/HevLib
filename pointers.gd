@@ -6,12 +6,12 @@ var http = HTTPRequest.new()
 
 var Achievements : _Achievements = _Achievements.new(self,http)
 var FolderAccess : _FolderAccess = _FolderAccess.new()
-var FileAccess : _FileAccess = _FileAccess.new()
 var DataFormat : _DataFormat = _DataFormat.new(FolderAccess)
+var FileAccess : _FileAccess = _FileAccess.new(FolderAccess,DataFormat)
 var Keymapping : _Keymapping = _Keymapping.new(FolderAccess,FileAccess)
 var ManifestV2 : _ManifestV2 = _ManifestV2.new(DataFormat,FolderAccess,FileAccess)
-var ConfigDriver : _ConfigDriver = _ConfigDriver.new(DataFormat,ManifestV2,FolderAccess,self,Keymapping)
-var DriverManagement : _DriverManagement = _DriverManagement.new(FolderAccess,DataFormat,ManifestV2)
+var ConfigDriver : _ConfigDriver = _ConfigDriver.new(DataFormat,ManifestV2,FolderAccess,self,Keymapping,FileAccess)
+var DriverManagement : _DriverManagement = _DriverManagement.new(FolderAccess,DataFormat,ManifestV2,FileAccess)
 var Equipment : _Equipment = _Equipment.new(DataFormat,FolderAccess,DriverManagement,ConfigDriver,ManifestV2,self)
 var Events : _Events = _Events.new()
 var Github : _Github = _Github.new()
@@ -215,12 +215,14 @@ class _ConfigDriver:
 	var FolderAccess
 	var Parent
 	var Keymapping
-	func _init(d,m,f,p,k):
+	var FileAccess
+	func _init(d,m,f,p,k,fa):
 		DataFormat = d
 		ManifestV2 = m
 		FolderAccess = f
 		Parent = p
 		Keymapping = k
+		FileAccess = fa
 	func ready():
 		pushCFG()
 	
@@ -233,23 +235,6 @@ class _ConfigDriver:
 	var settings = {}
 	
 	var file = File.new()
-	
-	func __config_parse(file_path: String):
-		file.open(file_path,File.READ)
-		var txt = file.get_as_text()
-		file.close()
-		var cfg = ConfigFile.new()
-		cfg.parse(txt)
-		var cfg_sections = cfg.get_sections()
-		var cfg_dictionary = {}
-		for section in cfg_sections:
-			var data = {}
-			var keys = cfg.get_section_keys(section)
-			for key in keys:
-				var item = cfg.get_value(section,key)
-				data.merge({key:item})
-			cfg_dictionary.merge({section:data})
-		return cfg_dictionary
 	
 	var subscriptions = {}
 	var changes = {}
@@ -386,7 +371,7 @@ class _ConfigDriver:
 	
 	func pushCFG(cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var cfg_file = "user://cfg/" + cfg_filename
-		var current_config = __config_parse(cfg_file)
+		var current_config = FileAccess.__config_parse(cfg_file)
 		settings = current_config.duplicate(true)
 		settingsHash = settings.hash()
 		__change_made()
@@ -506,7 +491,7 @@ class _ConfigDriver:
 		var mod_entries = f["mods"]
 		Debug.l("ConfigDriver: [%s] mod entries found" % mod_entries.size())
 		var configs = {}
-		var current_config = __config_parse(cfg_file)
+		var current_config = FileAccess.__config_parse(cfg_file)
 		for mod in mod_entries:
 			var manifest = mod_entries[mod]["manifest"]
 			var has_manifest = manifest["has_manifest"]
@@ -1474,10 +1459,14 @@ class _DriverManagement:
 	var FolderAccess
 	var DataFormat
 	var ManifestV2
-	func _init(f,d,m):
+	var FileAccess
+	func _init(f,d,m,fa):
 		FolderAccess = f
 		DataFormat = d
 		ManifestV2 = m
+		FileAccess = fa
+	
+	var file = File.new()
 	
 	func __get_drivers(get_ids : Array = []) -> Array:
 		var is_onready = CurrentGame != null
@@ -1501,10 +1490,10 @@ class _DriverManagement:
 			for item in ps:
 				if item == "is_debugged":
 					running_in_debugged = true
-					var pf = File.new()
-					pf.open("res://ModLoader.gd",File.READ)
-					var fs = pf.get_as_text(true)
-					pf.close()
+					
+					file.open("res://ModLoader.gd",File.READ)
+					var fs = file.get_as_text(true)
+					file.close()
 					var lines = fs.split("\n")
 					var reading = false
 					var contents = []
@@ -1565,47 +1554,8 @@ class _DriverManagement:
 							mm_prio = modmain["MOD_PRIORITY"]
 						this_mod_data.merge({"priority":mm_prio})
 						
+						this_mod_data["drivers"] = DataFormat.__get_drivers_from_modmain_path(folder + modmain_path)
 						
-						if "HEVLIB_EQUIPMENT_DRIVER_TAGS/" in folderCheck:
-							var driverFolder = folder + "HEVLIB_EQUIPMENT_DRIVER_TAGS/"
-							for driver in FolderAccess.__fetch_folder_files(driverFolder):
-								if driver in this_mod_data["drivers"]:
-									pass
-								else:
-									this_mod_data["drivers"].merge({driver:{}})
-								var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
-								for i in consts:
-									this_mod_data["drivers"][driver].merge({i:consts[i]})
-						if "HEVLIB_MENU/" in folderCheck:
-							var driverFolder = folder + "HEVLIB_MENU/"
-							for driver in FolderAccess.__fetch_folder_files(driverFolder):
-								if driver in this_mod_data["drivers"]:
-									pass
-								else:
-									this_mod_data["drivers"].merge({driver:{}})
-								var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
-								for i in consts:
-									this_mod_data["drivers"][driver].merge({i:consts[i]})
-						if "HEVLIB_MINERAL_DRIVER_TAGS/" in folderCheck:
-							var driverFolder = folder + "HEVLIB_MINERAL_DRIVER_TAGS/"
-							for driver in FolderAccess.__fetch_folder_files(driverFolder):
-								if driver in this_mod_data["drivers"]:
-									pass
-								else:
-									this_mod_data["drivers"].merge({driver:{}})
-								var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
-								for i in consts:
-									this_mod_data["drivers"][driver].merge({i:consts[i]})
-						if "HEVLIB_DRIVERS/" in folderCheck:
-							var driverFolder = folder + "HEVLIB_DRIVERS/"
-							for driver in FolderAccess.__fetch_folder_files(driverFolder):
-								if driver in this_mod_data["drivers"]:
-									pass
-								else:
-									this_mod_data["drivers"].merge({driver:{}})
-								var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
-								for i in consts:
-									this_mod_data["drivers"][driver].merge({i:consts[i]})
 						this_mod_data.merge({"mod_directory":folder})
 						if this_mod_data["drivers"].size() > 0:
 							if (get_ids.size()) == 0 or (get_ids.size() > 0 and id in get_ids):
@@ -1623,9 +1573,6 @@ class _DriverManagement:
 					id = mod_data["manifest"]["manifest_data"]["mod_information"]["id"]
 				if id != "":
 					this_mod_data.merge({"id":id})
-				
-	#			var mp = mod_data["node"].get_script().get_path()
-				
 				var folder = mod.split(mod.split("/")[mod.split("/").size() - 1])[0]
 				var folderCheck = FolderAccess.__fetch_folder_files(folder,true)
 				
@@ -1690,6 +1637,8 @@ class _DriverManagement:
 			return aPath < bPath
 
 		return false
+	
+	
 	
 	
 	
@@ -3678,19 +3627,24 @@ class _FileAccess:
 		
 	]
 	
+	var FolderAccess
+	var DataFormat
+	func _init(f,d):
+		FolderAccess = f
+		DataFormat = d
+	
+	var _file = File.new()
 	func __get_file_content(file: String) -> String:
-		var n = File.new()
-		n.open(file, File.READ)
-		var s = n.get_as_text()
-		n.close()
+		_file.open(file, File.READ)
+		var s = _file.get_as_text()
+		_file.close()
 		return s
 	
 	func __config_parse(file: String) -> Dictionary:
 		var cfg = ConfigFile.new()
-		var f2 = File.new()
-		f2.open(file,File.READ)
-		var txt = f2.get_as_text()
-		f2.close()
+		_file.open(file,File.READ)
+		var txt = _file.get_as_text()
+		_file.close()
 		cfg.parse(txt)
 		var cfg_sections = cfg.get_sections()
 		var cfg_dictionary = {}
@@ -3720,15 +3674,55 @@ class _FileAccess:
 		dir.copy(prepfile,folder + "/" + fn)
 	
 	func __load_png(path) -> Texture:
-		var tex_file = File.new()
-		tex_file.open(path, File.READ)
-		var bytes = tex_file.get_buffer(tex_file.get_len())
+		_file.open(path, File.READ)
+		var bytes = _file.get_buffer(_file.get_len())
 		var img = Image.new()
 		var data = img.load_png_from_buffer(bytes)
 		var imgtex = ImageTexture.new()
 		imgtex.create_from_image(img)
-		tex_file.close()
+		_file.close()
 		return imgtex
+	
+	func __get_drivers_from_modmain_path(file_path: String):
+		var this_mod_data = {}
+		if not _file.file_exists(file_path):
+			return {}
+		var file_name = file_path.split("/")[file_path.split("/").size() - 1]
+		var folder_path = file_path.split(file_name)[0]
+		var folderCheck = FolderAccess.__fetch_folder_files(folder_path,true)
+		if "HEVLIB_EQUIPMENT_DRIVER_TAGS/" in folderCheck:
+			var driverFolder = folder_path + "HEVLIB_EQUIPMENT_DRIVER_TAGS/"
+			for driver in FolderAccess.__fetch_folder_files(driverFolder):
+				if not driver in this_mod_data:
+					this_mod_data.merge({driver:{}})
+				var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+				for i in consts:
+					this_mod_data[driver].merge({i:consts[i]})
+		if "HEVLIB_MENU/" in folderCheck:
+			var driverFolder = folder_path + "HEVLIB_MENU/"
+			for driver in FolderAccess.__fetch_folder_files(driverFolder):
+				if not driver in this_mod_data:
+					this_mod_data.merge({driver:{}})
+				var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+				for i in consts:
+					this_mod_data[driver].merge({i:consts[i]})
+		if "HEVLIB_MINERAL_DRIVER_TAGS/" in folderCheck:
+			var driverFolder = folder_path + "HEVLIB_MINERAL_DRIVER_TAGS/"
+			for driver in FolderAccess.__fetch_folder_files(driverFolder):
+				if not driver in this_mod_data:
+					this_mod_data.merge({driver:{}})
+				var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+				for i in consts:
+					this_mod_data[driver].merge({i:consts[i]})
+		if "HEVLIB_DRIVERS/" in folderCheck:
+			var driverFolder = folder_path + "HEVLIB_DRIVERS/"
+			for driver in FolderAccess.__fetch_folder_files(driverFolder):
+				if not driver in this_mod_data:
+					this_mod_data.merge({driver:{}})
+				var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+				for i in consts:
+					this_mod_data[driver].merge({i:consts[i]})
+		return this_mod_data
 	
 
 class _FolderAccess:
@@ -5480,6 +5474,14 @@ class _ManifestV2:
 	
 	func __get_manifest_cache() -> Dictionary:
 		return cached_manifests
+	
+	
+	
+	
+	
+	
+	
+	
 	
 
 class _NodeAccess:
