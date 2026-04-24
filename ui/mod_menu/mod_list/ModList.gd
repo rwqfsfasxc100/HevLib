@@ -16,6 +16,7 @@ export var info_desc = NodePath("")
 export var info_desc_text = NodePath("")
 export var info_desc_author = NodePath("")
 export var info_desc_credits = NodePath("")
+export var info_desc_languages = NodePath("")
 export var info_links_button = NodePath("")
 export var info_bugreports_button = NodePath("")
 export var info_changelog_button = NodePath("")
@@ -95,6 +96,7 @@ func _ready():
 		"info_desc_text":get_node(info_desc_text),
 		"info_desc_author":get_node(info_desc_author),
 		"info_desc_credits":get_node(info_desc_credits),
+		"info_desc_languages":get_node(info_desc_languages),
 		"info_links_button":get_node(info_links_button),
 		"info_bugreports_button":get_node(info_bugreports_button),
 		"info_changelog_button":get_node(info_changelog_button),
@@ -191,6 +193,22 @@ func _draw():
 
 var aligned_zero_focus = false
 
+func make_info_default_state():
+	get_node(info_name).text = ""
+	get_node(info_version).text = ""
+	get_node(info_priority).text = ""
+	get_node(info_mod_id).text = ""
+	get_node(info_author).clear()
+	get_node(info_desc_text).clear()
+	get_node(info_desc_author).clear()
+	get_node(info_desc_credits).clear()
+	get_node(info_desc_languages).clear()
+	get_node(info_icon).texture = null
+	get_node(info_settings_button).visible = false
+	get_node(info_links_button).visible = false
+	get_node(info_bugreports_button).visible = false
+	get_node(info_changelog_button).visible = false
+
 func _process(_delta):
 	
 	var dp_d_size = dp.get_parent().rect_size
@@ -199,19 +217,7 @@ func _process(_delta):
 	if count_label.count <= 1:
 		if not aligned_zero_focus:
 			get_node(info_desc).grab_focus()
-			get_node(info_name).text = ""
-			get_node(info_version).text = ""
-			get_node(info_priority).text = ""
-			get_node(info_mod_id).text = ""
-			get_node(info_author).bbcode_text = ""
-			get_node(info_desc_text).text = ""
-			get_node(info_desc_author).text = ""
-			get_node(info_desc_credits).text = ""
-			get_node(info_icon).texture = null
-			get_node(info_settings_button).visible = false
-			get_node(info_links_button).visible = false
-			get_node(info_bugreports_button).visible = false
-			get_node(info_changelog_button).visible = false
+			make_info_default_state()
 			aligned_zero_focus = true
 	else:
 		if aligned_zero_focus:
@@ -237,6 +243,8 @@ func _process(_delta):
 					else:
 						credits = c
 				get_node(info_desc_credits).parse_bbcode(credits)
+				var languages = ""
+				get_node(info_desc_languages).parse_bbcode(languages)
 				get_node(info_icon).texture = tex
 				get_node(info_settings_button).visible = true
 				get_node(info_links_button).visible = true

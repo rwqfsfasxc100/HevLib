@@ -2153,6 +2153,14 @@ const TRANSLATIONS = {
 		"MODMENU_GET_NEW_MODS": {
 			"string": "Get new mods from GitHub",
 			"version_hash": 2573811993
+		},
+		"HEVLIB_MM_TOOLTIP_LANGUAGE_ENTRY": {
+			"string": "%s: %s",
+			"version_hash": 1718567247
+		},
+		"HEVLIB_SUPPORTED_LANGUAGES": {
+			"string": "Supported languages / completion %",
+			"version_hash": 4165761840
 		}
 	},
 	"uk_UA": {
