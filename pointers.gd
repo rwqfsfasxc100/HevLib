@@ -12,7 +12,7 @@ var Keymapping : _Keymapping = _Keymapping.new(FolderAccess,FileAccess)
 var ManifestV2 : _ManifestV2 = _ManifestV2.new(DataFormat,FolderAccess,FileAccess)
 var ConfigDriver : _ConfigDriver = _ConfigDriver.new(DataFormat,ManifestV2,FolderAccess,self,Keymapping,FileAccess)
 var DriverManagement : _DriverManagement = _DriverManagement.new(FolderAccess,DataFormat,ManifestV2,FileAccess)
-var Equipment : _Equipment = _Equipment.new(DataFormat,FolderAccess,DriverManagement,ConfigDriver,ManifestV2,self)
+var Equipment : _Equipment = _Equipment.new(DataFormat,FolderAccess,ConfigDriver,ManifestV2,self)
 var Events : _Events = _Events.new()
 var Github : _Github = _Github.new()
 var HevLib : _HevLib = _HevLib.new(FolderAccess)
@@ -1554,7 +1554,7 @@ class _DriverManagement:
 							mm_prio = modmain["MOD_PRIORITY"]
 						this_mod_data.merge({"priority":mm_prio})
 						
-						this_mod_data["drivers"] = DataFormat.__get_drivers_from_modmain_path(folder + modmain_path)
+						this_mod_data["drivers"] = FileAccess.__get_drivers_from_modmain_path(folder + modmain_path)
 						
 						this_mod_data.merge({"mod_directory":folder})
 						if this_mod_data["drivers"].size() > 0:
@@ -1662,15 +1662,13 @@ class _Equipment:
 	
 	var DataFormat
 	var FolderAccess
-	var DriverManagement
 	var ConfigDriver
 	var ManifestV2
 	var Parent
 	
-	func _init(d,f,m,c,v,p):
+	func _init(d,f,c,v,p):
 		DataFormat = d
 		FolderAccess = f
-		DriverManagement = m
 		ConfigDriver = c
 		ManifestV2 = v
 		Parent = p
@@ -1986,9 +1984,15 @@ class _Equipment:
 		
 		
 		
-		var drivers = DriverManagement.__get_drivers()
-		
 		var current_mod_ids = ManifestV2.__get_mod_ids()
+		
+		var drivers = []
+		for mod in ManifestV2.__get_mod_data()["mods"]:
+			
+			
+			
+			breakpoint
+		
 		
 		var driver_store = {
 			"ADD_EQUIPMENT_ITEMS":[],
@@ -2022,8 +2026,8 @@ class _Equipment:
 		
 		
 		for cvh in drivers:
-			for last_bit in cvh.get("drivers"):
-				var constants = cvh["drivers"][last_bit]
+			for last_bit in cvh:
+				var constants = cvh[last_bit]
 				match last_bit:
 					"ADD_EQUIPMENT_ITEMS.gd":
 						var arr2 = []
@@ -3683,46 +3687,52 @@ class _FileAccess:
 		_file.close()
 		return imgtex
 	
-	func __get_drivers_from_modmain_path(file_path: String):
-		var this_mod_data = {}
-		if not _file.file_exists(file_path):
-			return {}
-		var file_name = file_path.split("/")[file_path.split("/").size() - 1]
-		var folder_path = file_path.split(file_name)[0]
-		var folderCheck = FolderAccess.__fetch_folder_files(folder_path,true)
-		if "HEVLIB_EQUIPMENT_DRIVER_TAGS/" in folderCheck:
-			var driverFolder = folder_path + "HEVLIB_EQUIPMENT_DRIVER_TAGS/"
-			for driver in FolderAccess.__fetch_folder_files(driverFolder):
-				if not driver in this_mod_data:
-					this_mod_data.merge({driver:{}})
-				var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
-				for i in consts:
-					this_mod_data[driver].merge({i:consts[i]})
-		if "HEVLIB_MENU/" in folderCheck:
-			var driverFolder = folder_path + "HEVLIB_MENU/"
-			for driver in FolderAccess.__fetch_folder_files(driverFolder):
-				if not driver in this_mod_data:
-					this_mod_data.merge({driver:{}})
-				var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
-				for i in consts:
-					this_mod_data[driver].merge({i:consts[i]})
-		if "HEVLIB_MINERAL_DRIVER_TAGS/" in folderCheck:
-			var driverFolder = folder_path + "HEVLIB_MINERAL_DRIVER_TAGS/"
-			for driver in FolderAccess.__fetch_folder_files(driverFolder):
-				if not driver in this_mod_data:
-					this_mod_data.merge({driver:{}})
-				var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
-				for i in consts:
-					this_mod_data[driver].merge({i:consts[i]})
-		if "HEVLIB_DRIVERS/" in folderCheck:
-			var driverFolder = folder_path + "HEVLIB_DRIVERS/"
-			for driver in FolderAccess.__fetch_folder_files(driverFolder):
-				if not driver in this_mod_data:
-					this_mod_data.merge({driver:{}})
-				var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
-				for i in consts:
-					this_mod_data[driver].merge({i:consts[i]})
-		return this_mod_data
+	var driver_get_cache = {}
+	
+	func __get_drivers_from_modmain_path(file_path: String, get_fresh_drivers: bool = false):
+		if not get_fresh_drivers and driver_get_cache.get(file_path):
+			return driver_get_cache[file_path].duplicate(true)
+		else:
+			var this_mod_data = {}
+			if not _file.file_exists(file_path):
+				return {}
+			var file_name = file_path.split("/")[file_path.split("/").size() - 1]
+			var folder_path = file_path.split(file_name)[0]
+			var folderCheck = FolderAccess.__fetch_folder_files(folder_path,true)
+			if "HEVLIB_EQUIPMENT_DRIVER_TAGS/" in folderCheck:
+				var driverFolder = folder_path + "HEVLIB_EQUIPMENT_DRIVER_TAGS/"
+				for driver in FolderAccess.__fetch_folder_files(driverFolder):
+					if not driver in this_mod_data:
+						this_mod_data.merge({driver:{}})
+					var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+					for i in consts:
+						this_mod_data[driver].merge({i:consts[i]})
+			if "HEVLIB_MENU/" in folderCheck:
+				var driverFolder = folder_path + "HEVLIB_MENU/"
+				for driver in FolderAccess.__fetch_folder_files(driverFolder):
+					if not driver in this_mod_data:
+						this_mod_data.merge({driver:{}})
+					var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+					for i in consts:
+						this_mod_data[driver].merge({i:consts[i]})
+			if "HEVLIB_MINERAL_DRIVER_TAGS/" in folderCheck:
+				var driverFolder = folder_path + "HEVLIB_MINERAL_DRIVER_TAGS/"
+				for driver in FolderAccess.__fetch_folder_files(driverFolder):
+					if not driver in this_mod_data:
+						this_mod_data.merge({driver:{}})
+					var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+					for i in consts:
+						this_mod_data[driver].merge({i:consts[i]})
+			if "HEVLIB_DRIVERS/" in folderCheck:
+				var driverFolder = folder_path + "HEVLIB_DRIVERS/"
+				for driver in FolderAccess.__fetch_folder_files(driverFolder):
+					if not driver in this_mod_data:
+						this_mod_data.merge({driver:{}})
+					var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+					for i in consts:
+						this_mod_data[driver].merge({i:consts[i]})
+			driver_get_cache[file_path] = this_mod_data.duplicate(true)
+			return this_mod_data
 	
 
 class _FolderAccess:
@@ -4643,7 +4653,46 @@ class _ManifestV2:
 					mod_version_array.append(mod_version_metadata)
 					mod_version_string = mod_version_string + "-" + str(mod_version_metadata)
 				var version_dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
-				var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"node":node,"manifest":manifestEntry}}
+				var drivers = FileAccess.__get_drivers_from_modmain_path(script_path)
+				if "REPLACE_TRANSLATIONS.gd" in drivers:
+					var tlData = drivers["REPLACE_TRANSLATIONS.gd"]["TRANSLATIONS"]
+					var ml = tlData.get("master_locale","en")
+					tlData.erase("master_locale")
+					tlData.erase("file")
+					var master_locale = tlData.get(ml,{})
+					var total = master_locale.size()
+					var counts = {ml:{"has":total,"missing":0,"not_updated":0}}
+					for lang in tlData:
+						if lang != ml:
+							var langData = tlData[lang]
+							var lc = langData.size()
+							var not_in_master = 0
+							var not_updated = 0
+							for l in langData:
+								if not l in master_locale:
+									not_in_master += 1
+								else:
+									if langData[l].get("version_hash",0) != hash(master_locale[l].get("string","")):
+										not_updated += 1
+							counts[lang] = {"has":lc,"missing":total - (lc - not_in_master),"not_updated":not_updated}
+							counts[ml]["missing"] += not_in_master
+					if manifestEntry["has_manifest"]:
+						var manifest_langs = {}
+						for lang in counts:
+							var hs = float(counts[lang]["has"])
+							var ms = float(counts[lang]["missing"])
+							var nu = float(counts[lang]["not_updated"])
+							var not_updated_factor = 25 * (1 - ((hs - nu) / hs))
+							var bucket = hs/(hs+ms)
+							var percent = bucket * 100
+							var adjusted = percent - not_updated_factor
+							manifest_langs[lang] = "%3.1f%%" % [adjusted]
+						
+						
+						manifestEntry["manifest_data"]["languages"] = manifest_langs
+				
+				
+				var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"node":node,"manifest":manifestEntry,"drivers":drivers}}
 				mod_dictionary.merge(mod_entry)
 				if is_library:
 					library_count += 1
