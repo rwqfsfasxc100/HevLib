@@ -1,9 +1,9 @@
 [gd_resource type="DynamicFont" load_steps=2 format=2]
 
-[ext_resource path="res://HevLib/ui/themes/fonts/courier_new/courier_new.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://HevLib/ui/themes/fonts/freefont/FreeSans.ttf" type="DynamicFontData" id=1]
 
 [resource]
-size = 15
+size = 25
 use_mipmaps = true
 use_filter = true
 font_data = ExtResource( 1 )

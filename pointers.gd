@@ -5779,6 +5779,8 @@ class _RingInfo:
 		return __get_pixel_at(pos).b
 	
 
+
+
 class _TimeAccess:
 	var scripts = [
 		
