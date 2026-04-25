@@ -1,9 +1,11 @@
 [gd_resource type="DynamicFont" load_steps=2 format=2]
 
-[ext_resource path="res://HevLib/ui/themes/fonts/verdana/verdana_bold.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://HevLib/ui/themes/fonts/verdana_ckj/verdana_bold.ttf" type="DynamicFontData" id=1]
 
 [resource]
 size = 20
 use_mipmaps = true
 use_filter = true
+extra_spacing_top = -6
+extra_spacing_bottom = -6
 font_data = ExtResource( 1 )

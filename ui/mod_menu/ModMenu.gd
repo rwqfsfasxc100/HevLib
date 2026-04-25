@@ -6,6 +6,8 @@ var cache_folder = "user://cache/.Mod_Menu_2_Cache/"
 var filter_cache_file = "menu_filter_cache.json"
 var file = File.new()
 func _about_to_show():
+	if not pointers:
+		pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	pointers.FolderAccess.__check_folder_exists(cache_folder)
 	file.open(cache_folder + filter_cache_file,File.WRITE)
 	file.store_string(JSON.print([]))
