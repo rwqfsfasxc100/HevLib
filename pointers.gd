@@ -363,7 +363,7 @@ class _ConfigDriver:
 	
 	func pushCFG(cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var cfg_file = "user://cfg/" + cfg_filename
-		var current_config = pointers.FileAccess.__config_parse(cfg_file)
+		var current_config = __config_parse(cfg_file)
 		settings = current_config.duplicate(true)
 		settingsHash = settings.hash()
 		__change_made()
@@ -483,7 +483,7 @@ class _ConfigDriver:
 		var mod_entries = f["mods"]
 		Debug.l("ConfigDriver: [%s] mod entries found" % mod_entries.size())
 		var configs = {}
-		var current_config = pointers.FileAccess.__config_parse(cfg_file)
+		var current_config = __config_parse(cfg_file)
 		for mod in mod_entries:
 			var manifest = mod_entries[mod]["manifest"]
 			var has_manifest = manifest["has_manifest"]
@@ -4048,9 +4048,9 @@ class _Keymapping:
 		var bound = {}
 		var current = {}
 		if file.file_exists(vanilla_binds_file):
-			current = pointers.FileAccess.__config_parse(vanilla_binds_file)
+			current = pointers.ConfigDriver.__config_parse(vanilla_binds_file)
 		if file.file_exists("user://settings.cfg"):
-			bound = pointers.FileAccess.__config_parse("user://settings.cfg").get("input",{})
+			bound = pointers.ConfigDriver.__config_parse("user://settings.cfg").get("input",{})
 		var vanilla_binds = __define_vanilla_binds()
 		var vopts = overrides["vanilla_bind_opts"]
 		var missing = ""
@@ -4078,7 +4078,7 @@ class _Keymapping:
 				output[ie] = sect
 		if missing:
 			printerr(missing)
-		pointers.FileAccess.__config_store(output,vanilla_binds_file)
+		pointers.ConfigDriver.__config_store(output,vanilla_binds_file)
 		return output
 	
 	func __event_to_string(event):
@@ -4793,7 +4793,7 @@ class _ManifestV2:
 			return cached_manifests[cachevar]
 		else:
 			var out = {}
-			var cfg = pointers.FileAccess.__config_parse(file_path)
+			var cfg = pointers.ConfigDriver.__config_parse(file_path)
 			var manifest_data : Dictionary = {}
 			var manifest_version = 1
 			if "manifest_definitions" in cfg:
