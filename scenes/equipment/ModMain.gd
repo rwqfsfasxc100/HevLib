@@ -40,10 +40,6 @@ var ship_driver_path = "user://cache/.HevLib_Cache/ShipDriver/"
 
 var checksum = "user://cache/.HevLib_Cache/checksums"
 
-#var Equipment = preload("res://HevLib/pointers/Equipment.gd")
-#var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
-#var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
-#var DriverManagement = preload("res://HevLib/pointers/DriverManagement.gd")
 var d = Directory.new()
 var correct = d.file_exists("res://HevLib/pointers.gd")
 var pointers = null
@@ -53,7 +49,6 @@ func _init(modLoader = ModLoader):
 		var variables_folder = "user://cache/.HevLib_Cache/Variable_Fetch/"
 		d.make_dir_recursive(variables_folder)
 		pointers = load("res://HevLib/pointers.gd").new()
-	
 		var scv = pointers.FolderAccess.__fetch_folder_files(variables_folder,false,true)
 		for s in scv:
 			d.remove(s)
@@ -151,7 +146,7 @@ func _init(modLoader = ModLoader):
 #		var ws = load(weaponslot_path)
 #		ws.take_over_path("res://weapons/WeaponSlot.tscn")
 #		_savedObjects.append(ws)
-	
+		
 	else:
 		l("Folder structure not correct, exiting HevLib load")
 	
@@ -301,3 +296,4 @@ func match_mod_path_to_zip(mod_main_path:String) -> String:
 			return item[1]
 #	Debug.l("HevLib ManifestV2: no matches found, is the mod installed or run via the Godot editor?.")
 	return ""
+
