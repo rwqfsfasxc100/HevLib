@@ -1540,7 +1540,7 @@ class _DriverManagement:
 							mm_prio = modmain["MOD_PRIORITY"]
 						this_mod_data.merge({"priority":mm_prio})
 						
-						this_mod_data["drivers"] = pointers.FileAccess.__get_drivers_from_modmain_path(folder + modmain_path)
+						this_mod_data["drivers"] = __get_drivers_from_modmain_path(folder + modmain_path)
 						
 						this_mod_data.merge({"mod_directory":folder})
 						if this_mod_data["drivers"].size() > 0:
@@ -1624,7 +1624,52 @@ class _DriverManagement:
 
 		return false
 	
+	var driver_get_cache = {}
 	
+	func __get_drivers_from_modmain_path(file_path: String, get_fresh_drivers: bool = false):
+		if not get_fresh_drivers and driver_get_cache.get(file_path):
+			return driver_get_cache[file_path].duplicate(true)
+		else:
+			var this_mod_data = {}
+			if not file.file_exists(file_path):
+				return {}
+			var file_name = file_path.split("/")[file_path.split("/").size() - 1]
+			var folder_path = file_path.split(file_name)[0]
+			var folderCheck = pointers.FolderAccess.__fetch_folder_files(folder_path,true)
+			if "HEVLIB_EQUIPMENT_DRIVER_TAGS/" in folderCheck:
+				var driverFolder = folder_path + "HEVLIB_EQUIPMENT_DRIVER_TAGS/"
+				for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
+					if not driver in this_mod_data:
+						this_mod_data.merge({driver:{}})
+					var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+					for i in consts:
+						this_mod_data[driver].merge({i:consts[i]})
+			if "HEVLIB_MENU/" in folderCheck:
+				var driverFolder = folder_path + "HEVLIB_MENU/"
+				for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
+					if not driver in this_mod_data:
+						this_mod_data.merge({driver:{}})
+					var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+					for i in consts:
+						this_mod_data[driver].merge({i:consts[i]})
+			if "HEVLIB_MINERAL_DRIVER_TAGS/" in folderCheck:
+				var driverFolder = folder_path + "HEVLIB_MINERAL_DRIVER_TAGS/"
+				for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
+					if not driver in this_mod_data:
+						this_mod_data.merge({driver:{}})
+					var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+					for i in consts:
+						this_mod_data[driver].merge({i:consts[i]})
+			if "HEVLIB_DRIVERS/" in folderCheck:
+				var driverFolder = folder_path + "HEVLIB_DRIVERS/"
+				for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
+					if not driver in this_mod_data:
+						this_mod_data.merge({driver:{}})
+					var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+					for i in consts:
+						this_mod_data[driver].merge({i:consts[i]})
+			driver_get_cache[file_path] = this_mod_data.duplicate(true)
+			return this_mod_data
 	
 	
 	
@@ -3663,52 +3708,9 @@ class _FileAccess:
 		_file.close()
 		return imgtex
 	
-	var driver_get_cache = {}
 	
-	func __get_drivers_from_modmain_path(file_path: String, get_fresh_drivers: bool = false):
-		if not get_fresh_drivers and driver_get_cache.get(file_path):
-			return driver_get_cache[file_path].duplicate(true)
-		else:
-			var this_mod_data = {}
-			if not _file.file_exists(file_path):
-				return {}
-			var file_name = file_path.split("/")[file_path.split("/").size() - 1]
-			var folder_path = file_path.split(file_name)[0]
-			var folderCheck = pointers.FolderAccess.__fetch_folder_files(folder_path,true)
-			if "HEVLIB_EQUIPMENT_DRIVER_TAGS/" in folderCheck:
-				var driverFolder = folder_path + "HEVLIB_EQUIPMENT_DRIVER_TAGS/"
-				for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
-					if not driver in this_mod_data:
-						this_mod_data.merge({driver:{}})
-					var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
-					for i in consts:
-						this_mod_data[driver].merge({i:consts[i]})
-			if "HEVLIB_MENU/" in folderCheck:
-				var driverFolder = folder_path + "HEVLIB_MENU/"
-				for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
-					if not driver in this_mod_data:
-						this_mod_data.merge({driver:{}})
-					var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
-					for i in consts:
-						this_mod_data[driver].merge({i:consts[i]})
-			if "HEVLIB_MINERAL_DRIVER_TAGS/" in folderCheck:
-				var driverFolder = folder_path + "HEVLIB_MINERAL_DRIVER_TAGS/"
-				for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
-					if not driver in this_mod_data:
-						this_mod_data.merge({driver:{}})
-					var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
-					for i in consts:
-						this_mod_data[driver].merge({i:consts[i]})
-			if "HEVLIB_DRIVERS/" in folderCheck:
-				var driverFolder = folder_path + "HEVLIB_DRIVERS/"
-				for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
-					if not driver in this_mod_data:
-						this_mod_data.merge({driver:{}})
-					var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
-					for i in consts:
-						this_mod_data[driver].merge({i:consts[i]})
-			driver_get_cache[file_path] = this_mod_data.duplicate(true)
-			return this_mod_data
+	
+	
 	
 
 class _FolderAccess:
@@ -4621,7 +4623,7 @@ class _ManifestV2:
 					mod_version_array.append(mod_version_metadata)
 					mod_version_string = mod_version_string + "-" + str(mod_version_metadata)
 				var version_dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
-				var drivers = pointers.FileAccess.__get_drivers_from_modmain_path(script_path)
+				var drivers = pointers.DriverManagement.__get_drivers_from_modmain_path(script_path)
 				if "REPLACE_TRANSLATIONS.gd" in drivers:
 					var tlData = drivers["REPLACE_TRANSLATIONS.gd"]["TRANSLATIONS"]
 					var ml = tlData.get("master_locale","en")
