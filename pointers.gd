@@ -1549,7 +1549,7 @@ class _DriverManagement:
 		else:
 			var mods = pointers.ManifestV2.__get_mod_data()["mods"]
 			for mod in mods:
-				var this_mod_data = {"drivers":{}}
+				var this_mod_data = {}
 				
 				var mod_data = mods[mod]
 				var prio = mod_data.get("priority",0)
@@ -1560,49 +1560,9 @@ class _DriverManagement:
 				if id != "":
 					this_mod_data.merge({"id":id})
 				var folder = mod.split(mod.split("/")[mod.split("/").size() - 1])[0]
-				var folderCheck = pointers.FolderAccess.__fetch_folder_files(folder,true)
 				
+				this_mod_data["drivers"] = __get_drivers_from_modmain_path(mod)
 				
-				if "HEVLIB_EQUIPMENT_DRIVER_TAGS/" in folderCheck:
-					var driverFolder = folder + "HEVLIB_EQUIPMENT_DRIVER_TAGS/"
-					for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
-						if driver in this_mod_data["drivers"]:
-							pass
-						else:
-							this_mod_data["drivers"].merge({driver:{}})
-						var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
-						for i in consts:
-							this_mod_data["drivers"][driver].merge({i:consts[i]})
-				if "HEVLIB_MENU/" in folderCheck:
-					var driverFolder = folder + "HEVLIB_MENU/"
-					for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
-						if driver in this_mod_data["drivers"]:
-							pass
-						else:
-							this_mod_data["drivers"].merge({driver:{}})
-						var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
-						for i in consts:
-							this_mod_data["drivers"][driver].merge({i:consts[i]})
-				if "HEVLIB_MINERAL_DRIVER_TAGS/" in folderCheck:
-					var driverFolder = folder + "HEVLIB_MINERAL_DRIVER_TAGS/"
-					for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
-						if driver in this_mod_data["drivers"]:
-							pass
-						else:
-							this_mod_data["drivers"].merge({driver:{}})
-						var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
-						for i in consts:
-							this_mod_data["drivers"][driver].merge({i:consts[i]})
-				if "HEVLIB_DRIVERS/" in folderCheck:
-					var driverFolder = folder + "HEVLIB_DRIVERS/"
-					for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
-						if driver in this_mod_data["drivers"]:
-							pass
-						else:
-							this_mod_data["drivers"].merge({driver:{}})
-						var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
-						for i in consts:
-							this_mod_data["drivers"][driver].merge({i:consts[i]})
 				this_mod_data.merge({"mod_directory":folder})
 				if this_mod_data["drivers"].size() > 0:
 					if (get_ids.size()) == 0 or (get_ids.size() > 0 and id in get_ids):
@@ -3904,9 +3864,9 @@ class _HevLib:
 		
 	]
 	
-	var FolderAccess
+	var pointers
 	func _init(f):
-		FolderAccess = f
+		pointers = f
 	
 	func __get_lib_variables():
 		var varNode = ModLoader.get_node("/root/HevLib~Variables")
@@ -3916,7 +3876,7 @@ class _HevLib:
 	
 	func __get_lib_pointers(return_as_full_path: bool = false) -> Array:
 		var path = "res://HevLib/pointers/"
-		var files = FolderAccess.__fetch_folder_files(path)
+		var files = pointers.FolderAccess.__fetch_folder_files(path)
 		if return_as_full_path:
 			var compileArray = []
 			for f in files:
@@ -3951,7 +3911,7 @@ class _HevLib:
 	func __get_library_functionality(return_JSON: bool = false) -> Dictionary:
 		var path = "res://HevLib/pointers/"
 		var functions = {}
-		var files = FolderAccess.__fetch_folder_files(path)
+		var files = pointers.FolderAccess.__fetch_folder_files(path)
 		for pointer in files:
 			var pSplit = pointer.split("/")
 			var actualPointer = path + pSplit[pSplit.size() - 1]
@@ -5803,9 +5763,9 @@ class _Translations:
 		
 	]
 	
-	var ConfigDriver
+	var pointers
 	func _init(c):
-		ConfigDriver = c
+		pointers = c
 	
 	func __updateTL(path:String, delim:String = ",", fullLogging:bool = true):
 		var fileName = path.split("/")[path.split("/").size() - 1]
@@ -5868,7 +5828,7 @@ class _Translations:
 						var section = delim.get("section","")
 						var setting = delim.get("setting","")
 						var invert = delim.get("invert",false)
-						var val = ConfigDriver.__get_value(mod,section,setting)
+						var val = pointers.ConfigDriver.__get_value(mod,section,setting)
 						var do = true
 						if typeof(val) == TYPE_BOOL:
 							do = val
@@ -5897,7 +5857,7 @@ class _Translations:
 						var section = data.get("section","")
 						var setting = data.get("setting","")
 						var invert = data.get("invert",false)
-						var val = ConfigDriver.__get_value(mod,section,setting)
+						var val = pointers.ConfigDriver.__get_value(mod,section,setting)
 						var do = true
 						if typeof(val) == TYPE_BOOL:
 							do = val
@@ -6003,9 +5963,9 @@ class _WebTranslate:
 		
 	]
 	
-	var FolderAccess
+	var pointers
 	func _init(f):
-		FolderAccess = f
+		pointers = f
 	
 	func __webtranslate(URL: String, fallback: Array = [], file_check: String = ""):
 		Debug.l("HevLib WebTranslate: Fetching translations from %s" % URL)
@@ -6043,7 +6003,7 @@ class _WebTranslate:
 		var folderConcat = user + "~_~" + repo
 		var folderToDelete = "user://cache/.HevLib_Cache/WebTranslate/" + folderConcat
 		Debug.l("HevLib WebTranslate: deleting cache folder @ %s" % folderToDelete)
-		var did = FolderAccess.__recursive_delete(folderToDelete)
+		var did = pointers.FolderAccess.__recursive_delete(folderToDelete)
 		if did:
 			return true
 		else:
@@ -6054,11 +6014,11 @@ class _WebTranslate:
 		var folder_to_delete = ""
 		var cache = "user://cache/.HevLib_Cache/WebTranslate/"
 		var dir = Directory.new()
-		var files = FolderAccess.__fetch_folder_files(cache, true, true)
+		var files = pointers.FolderAccess.__fetch_folder_files(cache, true, true)
 		for file in files:
 			if not file.ends_with("/"):
 				continue
-			var cFiles = FolderAccess.__fetch_folder_files(file, false, true)
+			var cFiles = pointers.FolderAccess.__fetch_folder_files(file, false, true)
 			for f in cFiles:
 				if not f.ends_with(".file_check_cache"):
 					continue
@@ -6071,7 +6031,7 @@ class _WebTranslate:
 				else:
 					continue
 		if not folder_to_delete == "":
-			did = FolderAccess.__recursive_delete(folder_to_delete)
+			did = pointers.FolderAccess.__recursive_delete(folder_to_delete)
 		return did
 	
 	func __webtranslate_timed(URL: String, MINUTES_DELAY: int, fallback: Array = [], file_check: String = ""):
