@@ -3776,12 +3776,6 @@ class _FolderAccess:
 		else:
 			return firstFile
 	
-	func __copy_file(file, folder):
-		var prepfile = ProjectSettings.localize_path(file)
-		var fn = prepfile.split("/")[prepfile.split("/").size() - 1]
-		
-		var dir = Directory.new()
-		dir.copy(prepfile,folder + "/" + fn)
 	
 	func __get_folder_structure(folder,store_file_content = false):
 		var file = File.new()

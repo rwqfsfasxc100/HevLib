@@ -21,7 +21,7 @@ func _files_dropped(files,screen):
 			pointers.FolderAccess.__check_folder_exists(modPathPrefix)
 			for file in files:
 				if file.ends_with(".zip"):
-					pointers.FolderAccess.__copy_file(file,modPathPrefix)
+					pointers.FileAccess.__copy_file(file,modPathPrefix)
 				elif file.ends_with(".dvmodpack"):
 					if modpacks_handle:
 						modpacks_handle._on_OpenPack_file_selected(file)
