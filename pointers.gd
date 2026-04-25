@@ -896,7 +896,37 @@ class _ConfigDriver:
 				return true
 			return false
 		return false
-
+	
+	var _file = File.new()
+	func __config_parse(file: String) -> Dictionary:
+		var cfg = ConfigFile.new()
+		_file.open(file,File.READ)
+		var txt = _file.get_as_text()
+		_file.close()
+		cfg.parse(txt)
+		var cfg_sections = cfg.get_sections()
+		var cfg_dictionary = {}
+		for section in cfg_sections:
+			var data = {}
+			var keys = cfg.get_section_keys(section)
+			for key in keys:
+				var item = cfg.get_value(section,key)
+				data.merge({key:item})
+			cfg_dictionary.merge({section:data})
+		return cfg_dictionary
+	
+	func __config_store(dict : Dictionary,filepath:String):
+		var cfg = ConfigFile.new()
+		for section in dict:
+			var data = {}
+			var keys = dict[section]
+			for key in keys:
+				cfg.set_value(section,key,keys[key])
+		cfg.save(filepath)
+	
+	
+	
+	
 class _DataFormat:
 	var scripts = [
 		
@@ -3625,31 +3655,7 @@ class _FileAccess:
 		_file.close()
 		return s
 	
-	func __config_parse(file: String) -> Dictionary:
-		var cfg = ConfigFile.new()
-		_file.open(file,File.READ)
-		var txt = _file.get_as_text()
-		_file.close()
-		cfg.parse(txt)
-		var cfg_sections = cfg.get_sections()
-		var cfg_dictionary = {}
-		for section in cfg_sections:
-			var data = {}
-			var keys = cfg.get_section_keys(section)
-			for key in keys:
-				var item = cfg.get_value(section,key)
-				data.merge({key:item})
-			cfg_dictionary.merge({section:data})
-		return cfg_dictionary
 	
-	func __config_store(dict : Dictionary,filepath:String):
-		var cfg = ConfigFile.new()
-		for section in dict:
-			var data = {}
-			var keys = dict[section]
-			for key in keys:
-				cfg.set_value(section,key,keys[key])
-		cfg.save(filepath)
 	
 	func __copy_file(file, folder):
 		var prepfile = ProjectSettings.localize_path(file)
