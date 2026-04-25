@@ -6,23 +6,23 @@ var http = HTTPRequest.new()
 
 var Achievements : _Achievements = _Achievements.new(self,http)
 var FolderAccess : _FolderAccess = _FolderAccess.new()
-var DataFormat : _DataFormat = _DataFormat.new(FolderAccess)
-var FileAccess : _FileAccess = _FileAccess.new(FolderAccess,DataFormat)
-var Keymapping : _Keymapping = _Keymapping.new(FolderAccess,FileAccess)
-var ManifestV2 : _ManifestV2 = _ManifestV2.new(DataFormat,FolderAccess,FileAccess)
-var ConfigDriver : _ConfigDriver = _ConfigDriver.new(DataFormat,ManifestV2,FolderAccess,self,Keymapping,FileAccess)
-var DriverManagement : _DriverManagement = _DriverManagement.new(FolderAccess,DataFormat,ManifestV2,FileAccess)
-var Equipment : _Equipment = _Equipment.new(DataFormat,FolderAccess,ConfigDriver,ManifestV2,self)
+var DataFormat : _DataFormat = _DataFormat.new(self)
+var FileAccess : _FileAccess = _FileAccess.new(self)
+var Keymapping : _Keymapping = _Keymapping.new(self)
+var ManifestV2 : _ManifestV2 = _ManifestV2.new(self)
+var ConfigDriver : _ConfigDriver = _ConfigDriver.new(self)
+var DriverManagement : _DriverManagement = _DriverManagement.new(self)
+var Equipment : _Equipment = _Equipment.new(self)
 var Events : _Events = _Events.new()
 var Github : _Github = _Github.new()
-var HevLib : _HevLib = _HevLib.new(FolderAccess)
+var HevLib : _HevLib = _HevLib.new(self)
 var Zip : _Zip = _Zip.new()
-var ManifestV1 : _ManifestV1 = _ManifestV1.new(DataFormat,Zip)
-var NodeAccess : _NodeAccess = _NodeAccess.new(FolderAccess,DataFormat)
+var ManifestV1 : _ManifestV1 = _ManifestV1.new(self)
+var NodeAccess : _NodeAccess = _NodeAccess.new(self)
 var RingInfo : _RingInfo = _RingInfo.new()
 var TimeAccess : _TimeAccess = _TimeAccess.new()
-var Translations : _Translations = _Translations.new(ConfigDriver)
-var WebTranslate : _WebTranslate = _WebTranslate.new(FolderAccess)
+var Translations : _Translations = _Translations.new(self)
+var WebTranslate : _WebTranslate = _WebTranslate.new(self)
 
 var needs_cache_rebuild = false
 func _physics_process(delta):
@@ -210,19 +210,11 @@ class _ConfigDriver:
 	var scripts = [
 		
 	]
-	var DataFormat
-	var ManifestV2
-	var FolderAccess
-	var Parent
-	var Keymapping
-	var FileAccess
-	func _init(d,m,f,p,k,fa):
-		DataFormat = d
-		ManifestV2 = m
-		FolderAccess = f
-		Parent = p
-		Keymapping = k
-		FileAccess = fa
+	var pointers
+	func _init(d):
+		pointers = d
+		
+	
 	func ready():
 		pushCFG()
 	
@@ -371,7 +363,7 @@ class _ConfigDriver:
 	
 	func pushCFG(cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var cfg_file = "user://cfg/" + cfg_filename
-		var current_config = FileAccess.__config_parse(cfg_file)
+		var current_config = pointers.FileAccess.__config_parse(cfg_file)
 		settings = current_config.duplicate(true)
 		settingsHash = settings.hash()
 		__change_made()
@@ -441,7 +433,7 @@ class _ConfigDriver:
 	
 	
 	func __load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
-		var default_binds = Keymapping.__get_formatted_vanilla_binds()
+		var default_binds = pointers.Keymapping.__get_formatted_vanilla_binds()
 		var dir = Directory.new()
 		var c = ConfigFile.new()
 		var keybinds_cache = "user://cache/.HevLib_Cache/Keybinds/"
@@ -474,7 +466,7 @@ class _ConfigDriver:
 		if current_profile != desired_profile:
 			profile_is_current = false
 			dir.remove(cfg_file)
-			for m in FolderAccess.__fetch_folder_files("user://cfg/.profiles/"):
+			for m in pointers.FolderAccess.__fetch_folder_files("user://cfg/.profiles/"):
 				if m != ".profiles.ini":
 					c.load(profiles_dir + m)
 					var this_profile = c.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name")
@@ -487,11 +479,11 @@ class _ConfigDriver:
 			c.set_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name",desired_profile)
 			c.save(cfg_file)
 		
-		var f = ManifestV2.__get_mod_data()
+		var f = pointers.ManifestV2.__get_mod_data()
 		var mod_entries = f["mods"]
 		Debug.l("ConfigDriver: [%s] mod entries found" % mod_entries.size())
 		var configs = {}
-		var current_config = FileAccess.__config_parse(cfg_file)
+		var current_config = pointers.FileAccess.__config_parse(cfg_file)
 		for mod in mod_entries:
 			var manifest = mod_entries[mod]["manifest"]
 			var has_manifest = manifest["has_manifest"]
@@ -581,7 +573,7 @@ class _ConfigDriver:
 						p = b
 						var deadzone = key_data.get("deadzone",0.5) # Control deadzone value
 						
-						var opts = Keymapping.__get_opts_from_key_data(key_data)
+						var opts = pointers.Keymapping.__get_opts_from_key_data(key_data)
 						if p == null:
 							p = default
 						var addAction = true
@@ -591,21 +583,21 @@ class _ConfigDriver:
 							actionList.append(key)
 						else:
 							Debug.l("ConfigDriver: Input key [%s] already exists, skipping" % key)
-						Keymapping.__load_input_data(key,p,opts)
+						pointers.Keymapping.__load_input_data(key,p,opts)
 		var checksum = "user://cache/.HevLib_Cache/checksums"
 		var current_check = 0
 		if file.file_exists(checksum):
 			file.open(checksum,File.READ)
 			current_check = int(file.get_as_text())
 			file.close()
-		var mdCache = ManifestV2.__get_mod_data()
-		var mvCache = ManifestV2.__get_manifest_cache()
+		var mdCache = pointers.ManifestV2.__get_mod_data()
+		var mvCache = pointers.ManifestV2.__get_manifest_cache()
 		var mvCheck = hash(mvCache) + hash(mdCache)
 		file.open(checksum,File.WRITE)
 		file.store_string(str(mvCheck))
 		file.close()
 		if mvCheck != current_check or OS.has_feature("editor"):
-			Parent.needs_cache_rebuild = true
+			pointers.needs_cache_rebuild = true
 			
 	
 	func __load_inputs_from_string_array(key:String, strings: Array):
@@ -791,7 +783,7 @@ class _ConfigDriver:
 	
 	func __input_change_made():
 		var ic = []
-		var ax = ManifestV2.__get_manifest_cache()
+		var ax = pointers.ManifestV2.__get_manifest_cache()
 		for sect in ax:
 			var dv = ax[sect]
 			var dl = dv.get("configs",{})
@@ -844,12 +836,12 @@ class _ConfigDriver:
 							subscriptions[top][setting].erase(item)
 	
 	func __truncate_mod_id(mod_id:String) -> String:
-		mod_id = DataFormat.__array_to_string(mod_id.split("/"))
-		mod_id = DataFormat.__array_to_string(mod_id.split(" "))
+		mod_id = pointers.DataFormat.__array_to_string(mod_id.split("/"))
+		mod_id = pointers.DataFormat.__array_to_string(mod_id.split(" "))
 		return mod_id
 	
 	func __truncate_section(section:String) -> String:
-		return DataFormat.__array_to_string(section.split("/"))
+		return pointers.DataFormat.__array_to_string(section.split("/"))
 	
 	func __truncate_to_setting_entry(mod_id:String,section:String) -> String:
 		var sect_name = __truncate_mod_id(mod_id) + "/" + __truncate_section(section)
@@ -873,7 +865,7 @@ class _ConfigDriver:
 						if !cfg_opt:
 							how = false
 		if how:
-			var current_mod_ids = ManifestV2.__get_mod_ids()
+			var current_mod_ids = pointers.ManifestV2.__get_mod_ids()
 			var allowFromMods = true
 			if check_requirements and "mod_requirements" in data_dict:
 				var needs = data_dict["mod_requirements"]
@@ -912,9 +904,9 @@ class _DataFormat:
 	
 	var file = File.new()
 	
-	var FolderAccess
+	var pointers
 	func _init(f):
-		FolderAccess = f
+		pointers = f
 	
 	func __array_to_string(arr: Array) -> String:
 		var s = ""
@@ -1419,7 +1411,7 @@ class _DataFormat:
 		Tool.remove(scn)
 		var scene_replacement = "user://cache/.HevLib_Cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec()
 		var p = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"%s\" type=\"PackedScene\" id=1]\n\n[node name=\"%s\" instance=ExtResource( 1 )]" % [scene_path,root]
-		FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
+		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
 		file.open(scene_replacement,File.WRITE)
 		file.store_string(p)
 		file.close()
@@ -1456,15 +1448,9 @@ class _DriverManagement:
 	var scripts = [
 		
 	]
-	var FolderAccess
-	var DataFormat
-	var ManifestV2
-	var FileAccess
-	func _init(f,d,m,fa):
-		FolderAccess = f
-		DataFormat = d
-		ManifestV2 = m
-		FileAccess = fa
+	var pointers
+	func _init(f):
+		pointers = f
 	
 	var file = File.new()
 	
@@ -1474,7 +1460,7 @@ class _DriverManagement:
 		var debugged_defined_mods = []
 		var onready_mod_paths = []
 		var onready_mod_folders = []
-		var folders = FolderAccess.__fetch_folder_files("res://", true, true)
+		var folders = pointers.FolderAccess.__fetch_folder_files("res://", true, true)
 		
 		var mod_drivers = []
 		
@@ -1486,7 +1472,7 @@ class _DriverManagement:
 				var split = path.split("/")
 				onready_mod_folders.append(split[2])
 		else:
-			var ps = DataFormat.__get_script_constant_map_without_load("res://ModLoader.gd")
+			var ps = pointers.DataFormat.__get_script_constant_map_without_load("res://ModLoader.gd")
 			for item in ps:
 				if item == "is_debugged":
 					running_in_debugged = true
@@ -1523,7 +1509,7 @@ class _DriverManagement:
 							var home = mod.split("/")[2]
 							if home == semi_root:
 									mods_to_avoid.append(home)
-					var folderCheck = FolderAccess.__fetch_folder_files(folder,true)
+					var folderCheck = pointers.FolderAccess.__fetch_folder_files(folder,true)
 					var has_mod = false
 					var has_manifest = false
 					var modmain_path = ""
@@ -1544,24 +1530,24 @@ class _DriverManagement:
 						var this_mod_data = {"drivers":{}}
 						var id = ""
 						if has_manifest:
-							var manifest = ManifestV2.__parse_file_as_manifest(folder + manifest_path)
+							var manifest = pointers.ManifestV2.__parse_file_as_manifest(folder + manifest_path)
 							id = manifest.get("mod_information",{}).get("id","")
 						if id != "":
 							this_mod_data.merge({"id":id})
 						var mm_prio = 0
-						var modmain = DataFormat.__get_script_constant_map_without_load(folder + modmain_path)
+						var modmain = pointers.DataFormat.__get_script_constant_map_without_load(folder + modmain_path)
 						if "MOD_PRIORITY" in modmain:
 							mm_prio = modmain["MOD_PRIORITY"]
 						this_mod_data.merge({"priority":mm_prio})
 						
-						this_mod_data["drivers"] = FileAccess.__get_drivers_from_modmain_path(folder + modmain_path)
+						this_mod_data["drivers"] = pointers.FileAccess.__get_drivers_from_modmain_path(folder + modmain_path)
 						
 						this_mod_data.merge({"mod_directory":folder})
 						if this_mod_data["drivers"].size() > 0:
 							if (get_ids.size()) == 0 or (get_ids.size() > 0 and id in get_ids):
 								mod_drivers.append(this_mod_data)
 		else:
-			var mods = ManifestV2.__get_mod_data()["mods"]
+			var mods = pointers.ManifestV2.__get_mod_data()["mods"]
 			for mod in mods:
 				var this_mod_data = {"drivers":{}}
 				
@@ -1574,47 +1560,47 @@ class _DriverManagement:
 				if id != "":
 					this_mod_data.merge({"id":id})
 				var folder = mod.split(mod.split("/")[mod.split("/").size() - 1])[0]
-				var folderCheck = FolderAccess.__fetch_folder_files(folder,true)
+				var folderCheck = pointers.FolderAccess.__fetch_folder_files(folder,true)
 				
 				
 				if "HEVLIB_EQUIPMENT_DRIVER_TAGS/" in folderCheck:
 					var driverFolder = folder + "HEVLIB_EQUIPMENT_DRIVER_TAGS/"
-					for driver in FolderAccess.__fetch_folder_files(driverFolder):
+					for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
 						if driver in this_mod_data["drivers"]:
 							pass
 						else:
 							this_mod_data["drivers"].merge({driver:{}})
-						var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+						var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
 						for i in consts:
 							this_mod_data["drivers"][driver].merge({i:consts[i]})
 				if "HEVLIB_MENU/" in folderCheck:
 					var driverFolder = folder + "HEVLIB_MENU/"
-					for driver in FolderAccess.__fetch_folder_files(driverFolder):
+					for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
 						if driver in this_mod_data["drivers"]:
 							pass
 						else:
 							this_mod_data["drivers"].merge({driver:{}})
-						var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+						var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
 						for i in consts:
 							this_mod_data["drivers"][driver].merge({i:consts[i]})
 				if "HEVLIB_MINERAL_DRIVER_TAGS/" in folderCheck:
 					var driverFolder = folder + "HEVLIB_MINERAL_DRIVER_TAGS/"
-					for driver in FolderAccess.__fetch_folder_files(driverFolder):
+					for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
 						if driver in this_mod_data["drivers"]:
 							pass
 						else:
 							this_mod_data["drivers"].merge({driver:{}})
-						var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+						var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
 						for i in consts:
 							this_mod_data["drivers"][driver].merge({i:consts[i]})
 				if "HEVLIB_DRIVERS/" in folderCheck:
 					var driverFolder = folder + "HEVLIB_DRIVERS/"
-					for driver in FolderAccess.__fetch_folder_files(driverFolder):
+					for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
 						if driver in this_mod_data["drivers"]:
 							pass
 						else:
 							this_mod_data["drivers"].merge({driver:{}})
-						var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+						var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
 						for i in consts:
 							this_mod_data["drivers"][driver].merge({i:consts[i]})
 				this_mod_data.merge({"mod_directory":folder})
@@ -1660,20 +1646,12 @@ class _Equipment:
 	var file = File.new()
 	
 	
-	var DataFormat
-	var FolderAccess
-	var ConfigDriver
-	var ManifestV2
-	var Parent
+	var pointers
 	
-	func _init(d,f,c,v,p):
-		DataFormat = d
-		FolderAccess = f
-		ConfigDriver = c
-		ManifestV2 = v
-		Parent = p
+	func _init(d):
+		pointers = d
 		
-		vanilla_equipment = DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd")
+		vanilla_equipment = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd")
 		hardpoint_types = vanilla_data.hardpoint_types.duplicate(true)
 		alignments = vanilla_data.alignments.duplicate(true)
 		equipment_types = vanilla_data.equipment_types.duplicate(true)
@@ -1800,7 +1778,7 @@ class _Equipment:
 			return result
 	
 	func __match_vanilla(type: String, align_to_match: String, desired_equipment: Array, list_of_alignments: Array):
-		var vanilla = DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd")
+		var vanilla = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd")
 		var matching = []
 		for item in vanilla:
 			var itemDict = vanilla.get(item)
@@ -1820,14 +1798,14 @@ class _Equipment:
 	var version = [1,0,0]
 	
 	func __make_upgrades_scene(is_onready: bool = true):
-		if Parent.needs_cache_rebuild == false:
+		if pointers.needs_cache_rebuild == false:
 			return
 		var SCENE_HEADER = "[gd_scene load_steps=4 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/unmodified/WeaponSlotUpgradeTemplate.tscn\" type=\"PackedScene\" id=2]\n[ext_resource path=\"res://enceladus/SystemShipUpgradeUI.tscn\" type=\"PackedScene\" id=3]\n\n[sub_resource type=\"ViewportTexture\" id=1]\nflags = 5\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain1/Viewport\")\n\n[sub_resource type=\"ViewportTexture\" id=2]\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain2/Control\")\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]\n\n[node name=\"TextureRect\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 2 )\n\n[node name=\"TextureRect2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 2 )"
 		
-		FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/")
-		FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/")
-		FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/")
-		FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/")
+		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/")
+		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/")
+		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/")
+		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/")
 		
 		# FILE PATHS
 		var FILE_PATHS = [
@@ -1885,7 +1863,7 @@ class _Equipment:
 		
 		if is_onready:
 			
-			version = DataFormat.__get_vanilla_version()
+			version = pointers.DataFormat.__get_vanilla_version()
 			var text = "HevLib make_upgrades_scene manager: observed game version of %s"  % str(version)
 			Debug.l(text)
 		var UpgradeMenu : Node = load("res://enceladus/Upgrades.tscn").instance()
@@ -1894,7 +1872,7 @@ class _Equipment:
 		var vanilla_slot_types = {}
 		
 		
-		FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/ship_data/")
+		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/ship_data/")
 
 		
 		for slot in nodes_parent.get_children():
@@ -1914,12 +1892,12 @@ class _Equipment:
 		var ws_equipment_names = []
 		
 		for item in FILE_PATHS:
-			FolderAccess.__check_folder_exists(item.split(item.split("/")[item.split("/").size() - 1])[0])
+			pointers.FolderAccess.__check_folder_exists(item.split(item.split("/")[item.split("/").size() - 1])[0])
 		
-		var ws_default_templates = DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
-		var ws_ship_templates = DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
-		var ws_ship_templates_2 = DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd").get_script_constant_map()
-		var ship_register = DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/equipment/ShipModificationDriver/ship_register_vanilla.gd") #load("res://HevLib/scenes/equipment/ShipModificationDriver/ship_register_vanilla.gd").get_script_constant_map()
+		var ws_default_templates = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
+		var ws_ship_templates = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
+		var ws_ship_templates_2 = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd").get_script_constant_map()
+		var ship_register = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/equipment/ShipModificationDriver/ship_register_vanilla.gd") #load("res://HevLib/scenes/equipment/ShipModificationDriver/ship_register_vanilla.gd").get_script_constant_map()
 		var register_default_ships = []
 		for item in ship_register:
 			register_default_ships.append(ship_register[item])
@@ -1984,10 +1962,10 @@ class _Equipment:
 		
 		
 		
-		var current_mod_ids = ManifestV2.__get_mod_ids()
+		var current_mod_ids = pointers.ManifestV2.__get_mod_ids()
 		
 		var drivers = []
-		var mods = ManifestV2.__get_mod_data()["mods"]
+		var mods = pointers.ManifestV2.__get_mod_data()["mods"]
 		for md in mods:
 			var mod = mods[md] 
 			if mod.drivers:
@@ -3241,7 +3219,7 @@ class _Equipment:
 					thruster_text = thruster_text + "\n\n[node name=\"CollisionShape2D\" parent=\".\" index=\"0\"]\nshape = SubResource( 1 )\n\n" + thruster_footer
 					thruster_text = thruster_text + "\nscale = Vector2(%s,%s)" % [sprite_scale[0],sprite_scale[1]]
 					
-					FolderAccess.__check_folder_exists(exhaust_cache_path + "/" + aux_type)
+					pointers.FolderAccess.__check_folder_exists(exhaust_cache_path + "/" + aux_type)
 					
 					file.open(exhaust_cache_path + "/" + aux_type + "/" + sys + ".tscn",File.WRITE)
 					file.store_string(thruster_text)
@@ -3631,11 +3609,9 @@ class _FileAccess:
 		
 	]
 	
-	var FolderAccess
-	var DataFormat
-	func _init(f,d):
-		FolderAccess = f
-		DataFormat = d
+	var pointers
+	func _init(f):
+		pointers = f
 	
 	var _file = File.new()
 	func __get_file_content(file: String) -> String:
@@ -3698,37 +3674,37 @@ class _FileAccess:
 				return {}
 			var file_name = file_path.split("/")[file_path.split("/").size() - 1]
 			var folder_path = file_path.split(file_name)[0]
-			var folderCheck = FolderAccess.__fetch_folder_files(folder_path,true)
+			var folderCheck = pointers.FolderAccess.__fetch_folder_files(folder_path,true)
 			if "HEVLIB_EQUIPMENT_DRIVER_TAGS/" in folderCheck:
 				var driverFolder = folder_path + "HEVLIB_EQUIPMENT_DRIVER_TAGS/"
-				for driver in FolderAccess.__fetch_folder_files(driverFolder):
+				for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
 					if not driver in this_mod_data:
 						this_mod_data.merge({driver:{}})
-					var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+					var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
 					for i in consts:
 						this_mod_data[driver].merge({i:consts[i]})
 			if "HEVLIB_MENU/" in folderCheck:
 				var driverFolder = folder_path + "HEVLIB_MENU/"
-				for driver in FolderAccess.__fetch_folder_files(driverFolder):
+				for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
 					if not driver in this_mod_data:
 						this_mod_data.merge({driver:{}})
-					var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+					var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
 					for i in consts:
 						this_mod_data[driver].merge({i:consts[i]})
 			if "HEVLIB_MINERAL_DRIVER_TAGS/" in folderCheck:
 				var driverFolder = folder_path + "HEVLIB_MINERAL_DRIVER_TAGS/"
-				for driver in FolderAccess.__fetch_folder_files(driverFolder):
+				for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
 					if not driver in this_mod_data:
 						this_mod_data.merge({driver:{}})
-					var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+					var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
 					for i in consts:
 						this_mod_data[driver].merge({i:consts[i]})
 			if "HEVLIB_DRIVERS/" in folderCheck:
 				var driverFolder = folder_path + "HEVLIB_DRIVERS/"
-				for driver in FolderAccess.__fetch_folder_files(driverFolder):
+				for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
 					if not driver in this_mod_data:
 						this_mod_data.merge({driver:{}})
-					var consts = DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+					var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
 					for i in consts:
 						this_mod_data[driver].merge({i:consts[i]})
 			driver_get_cache[file_path] = this_mod_data.duplicate(true)
@@ -4008,12 +3984,10 @@ class _Keymapping:
 		
 	]
 	
-	var FolderAccess
-	var FileAccess
+	var pointers
 	
-	func _init(f,a):
-		FolderAccess = f
-		FileAccess = a
+	func _init(f):
+		pointers = f
 	
 	
 	
@@ -4082,7 +4056,7 @@ class _Keymapping:
 	
 	func __define_vanilla_binds():
 		var recache = input_cache.empty()
-		FolderAccess.__check_folder_exists(keybind_folder)
+		pointers.FolderAccess.__check_folder_exists(keybind_folder)
 		var subm = {}
 		
 		
@@ -4106,9 +4080,9 @@ class _Keymapping:
 		var bound = {}
 		var current = {}
 		if file.file_exists(vanilla_binds_file):
-			current = FileAccess.__config_parse(vanilla_binds_file)
+			current = pointers.FileAccess.__config_parse(vanilla_binds_file)
 		if file.file_exists("user://settings.cfg"):
-			bound = FileAccess.__config_parse("user://settings.cfg").get("input",{})
+			bound = pointers.FileAccess.__config_parse("user://settings.cfg").get("input",{})
 		var vanilla_binds = __define_vanilla_binds()
 		var vopts = overrides["vanilla_bind_opts"]
 		var missing = ""
@@ -4136,7 +4110,7 @@ class _Keymapping:
 				output[ie] = sect
 		if missing:
 			printerr(missing)
-		FileAccess.__config_store(output,vanilla_binds_file)
+		pointers.FileAccess.__config_store(output,vanilla_binds_file)
 		return output
 	
 	func __event_to_string(event):
@@ -4331,11 +4305,9 @@ class _ManifestV1:
 		
 	]
 	
-	var DataFormat
-	var Zip
-	func _init(d,z):
-		DataFormat = d
-		Zip = z
+	var pointers
+	func _init(d):
+		pointers = d
 	
 	func __load_manifest_from_file(manifest):
 		var manifestConfig = {
@@ -4421,13 +4393,13 @@ class _ManifestV1:
 				var modNameCheck = l.split("const MOD_NAME = ")
 				var modNameCheckSize = modNameCheck.size()
 				if modNameCheckSize >= 2:
-					var splitName = DataFormat.__array_to_string(modNameCheck[1].split("\""))
+					var splitName = pointers.DataFormat.__array_to_string(modNameCheck[1].split("\""))
 					while splitName.begins_with(" "):
 						var beginningSpaceRemover = splitName.split(" ")
-						splitName = DataFormat.__array_to_string(beginningSpaceRemover[1])
+						splitName = pointers.DataFormat.__array_to_string(beginningSpaceRemover[1])
 					while splitName.ends_with(" "):
 						var endSpaceRemover = splitName.split(" ")
-						splitName = DataFormat.__array_to_string(endSpaceRemover[0])
+						splitName = pointers.DataFormat.__array_to_string(endSpaceRemover[0])
 					nameCheck = 1
 					modName = splitName
 			else:
@@ -4496,7 +4468,7 @@ class _ManifestV1:
 		var iconDir = ""
 		var modData
 		var modMainPath = ""
-		var filesInZip = Zip.__get_zip_content(file)
+		var filesInZip = pointers.Zip.__get_zip_content(file)
 		for m in filesInZip:
 			var modPath = "res://" + m
 			m = m.split(m.split("/")[0] + "/")[1].to_lower()
@@ -4527,13 +4499,9 @@ class _ManifestV2:
 		
 	]
 	
-	var DataFormat
-	var FolderAccess
-	var FileAccess
-	func _init(d,f,a):
-		DataFormat = d
-		FolderAccess = f
-		FileAccess = a
+	var pointers
+	func _init(d):
+		pointers = d
 	
 	var file = File.new()
 	
@@ -4571,18 +4539,18 @@ class _ManifestV2:
 				var running_in_debugged = false
 				var debugged_defined_mods = []
 				
-				var ps = DataFormat.__get_script_constant_map_without_load("res://ModLoader.gd")
+				var ps = pointers.DataFormat.__get_script_constant_map_without_load("res://ModLoader.gd")
 				for item in ps:
 					if item == "is_debugged":
 						Debug.l("ManifestV2: running in debugged")
 						running_in_debugged = true
 						
-						var tfs = DataFormat.__get_script_variables_without_load("res://ModLoader.gd")
+						var tfs = pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd")
 						debugged_defined_mods = tfs.get("addedMods",[]).duplicate(true)
 				
 				
 				
-				var folders = FolderAccess.__get_modmain_files()
+				var folders = pointers.FolderAccess.__get_modmain_files()
 				Debug.l("ManifestV2: found [%s] modmain files" % folders.size())
 				for item in folders:
 					var has_mod = true
@@ -4593,7 +4561,7 @@ class _ManifestV2:
 							has_mod = false
 					if has_mod:
 						Debug.l("ManifestV2: registering %s" % item)
-						var constants = DataFormat.__get_script_constant_map_without_load(item)
+						var constants = pointers.DataFormat.__get_script_constant_map_without_load(item)
 						modListArr.append({"constants":constants,"script_path":item,"node":null})
 			total_mod_count = modListArr.size()
 			print("ManifestV2: solved [%s] modmain files" % total_mod_count)
@@ -4614,7 +4582,7 @@ class _ManifestV2:
 				var mod_version_metadata = constants.get("MOD_VERSION_METADATA","")
 				var is_library = constants.get("MOD_IS_LIBRARY",false)
 				var always_display = constants.get("ALWAYS_DISPLAY",false)
-				var content = FolderAccess.__fetch_folder_files(folder_path)
+				var content = pointers.FolderAccess.__fetch_folder_files(folder_path)
 				var has_mod_manifest = false
 				var manifest_data = {}
 				var manifest_version = 1
@@ -4653,7 +4621,7 @@ class _ManifestV2:
 					mod_version_array.append(mod_version_metadata)
 					mod_version_string = mod_version_string + "-" + str(mod_version_metadata)
 				var version_dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
-				var drivers = FileAccess.__get_drivers_from_modmain_path(script_path)
+				var drivers = pointers.FileAccess.__get_drivers_from_modmain_path(script_path)
 				if "REPLACE_TRANSLATIONS.gd" in drivers:
 					var tlData = drivers["REPLACE_TRANSLATIONS.gd"]["TRANSLATIONS"]
 					var ml = tlData.get("master_locale","en")
@@ -4804,7 +4772,7 @@ class _ManifestV2:
 		return false
 	
 	func __get_mod_data_from_files(script_path:String) -> Dictionary:
-		var constants = DataFormat.__get_script_constant_map_without_load(script_path)
+		var constants = pointers.DataFormat.__get_script_constant_map_without_load(script_path)
 		var folder_path = str(script_path.split(script_path.split("/")[script_path.split("/").size() - 1])[0])
 		var mod_priority = constants.get("MOD_PRIORITY",0)
 		var mod_name = str(constants.get("MOD_NAME",script_path.split("/")[2]))
@@ -4817,7 +4785,7 @@ class _ManifestV2:
 		var mod_is_library = constants.get("MOD_IS_LIBRARY",false)
 		
 		var hide_library = constants.get("LIBRARY_HIDDEN_BY_DEFAULT",true)
-		var content = FolderAccess.__fetch_folder_files(folder_path)
+		var content = pointers.FolderAccess.__fetch_folder_files(folder_path)
 		var has_mod_manifest = false
 		var manifest_data = {}
 		var manifest_version = 1
@@ -4857,7 +4825,7 @@ class _ManifestV2:
 			return cached_manifests[cachevar]
 		else:
 			var out = {}
-			var cfg = FileAccess.__config_parse(file_path)
+			var cfg = pointers.FileAccess.__config_parse(file_path)
 			var manifest_data : Dictionary = {}
 			var manifest_version = 1
 			if "manifest_definitions" in cfg:
@@ -5397,7 +5365,7 @@ class _ManifestV2:
 		if last_seen_file.begins_with("/"):
 			last_seen_file.lstrip("/")
 		var all_mods = __get_mod_data()["mods"]
-		FolderAccess.__check_folder_exists(folder)
+		pointers.FolderAccess.__check_folder_exists(folder)
 		if not file.file_exists(folder + last_seen_file):
 			file.open(folder + last_seen_file,File.WRITE)
 			file.store_string("{}")
@@ -5453,7 +5421,7 @@ class _ManifestV2:
 				folder = folder + "/"
 			if last_seen_file.begins_with("/"):
 				last_seen_file.lstrip("/")
-			FolderAccess.__check_folder_exists(folder)
+			pointers.FolderAccess.__check_folder_exists(folder)
 			if file.file_exists(folder + this_seen_file):
 				file.open(folder + this_seen_file,File.READ)
 				var lastData = JSON.parse(file.get_as_text()).result
@@ -5538,11 +5506,9 @@ class _NodeAccess:
 		
 	]
 	
-	var FolderAccess
-	var DataFormat
-	func _init(f,d):
-		FolderAccess = f
-		DataFormat = d
+	var pointers
+	func _init(f):
+		pointers = f
 	
 	func __get_all_children(node, strip_supplied_node_from_array = false, return_only_paths = false, use_relative_paths = false):
 		var children = getAllChildren(node)
@@ -5601,7 +5567,7 @@ class _NodeAccess:
 		return false
 	
 	func __dynamic_crew_expander(folder_path: String = "user://cache/.HevLib_Cache/dynamic_crew_expander/", max_crew:int = 24) -> String:
-		FolderAccess.__check_folder_exists(folder_path)
+		pointers.FolderAccess.__check_folder_exists(folder_path)
 		var log_header = "TSCN Writer for dynamic crew handler: "
 		
 		var line_to_test = "DIALOG_DERELICT_SWITCH_CREW"
@@ -5656,7 +5622,7 @@ class _NodeAccess:
 			if not folder_path.ends_with("/"):
 				folder_path = folder_path + "/"
 			var save_file_path = folder_path + "dynamic_crew_x%s.tscn" % base
-			FolderAccess.__check_folder_exists(folder_path)
+			pointers.FolderAccess.__check_folder_exists(folder_path)
 			var file = File.new()
 			file.open(save_file_path,File.WRITE)
 			file.store_string(compacted_string)
@@ -5674,7 +5640,7 @@ class _NodeAccess:
 			header = "extends Reference\nconst VARIABLE = "
 		else:
 			header = "extends Reference\nvar VARIABLE = "
-		var script = DataFormat.__compile_script(header + string)
+		var script = pointers.DataFormat.__compile_script(header + string)
 		var variable = script.VARIABLE
 		var_hash[string] = variable
 		return variable
