@@ -3794,16 +3794,7 @@ class _FolderAccess:
 				folder_structure.merge({object:fd})
 		return folder_structure
 	
-	func siftFolderStructure(structure:Dictionary,path:String = "res://"):
-		var out = []
-		for i in structure:
-			if i.ends_with("/"):
-				out.append_array(siftFolderStructure(structure[i],path + i))
-			else:
-				var f = i.to_lower()
-				if f.begins_with("modmain") and f.ends_with(".gd"):
-					out.append(path + i)
-		return out
+	
 	
 
 class _Github:
@@ -5451,10 +5442,19 @@ class _ManifestV2:
 	
 	func __get_modmain_files() -> Array:
 		var structure = pointers.FolderAccess.__get_folder_structure("res://")
-		var dvs = pointers.FolderAccess.siftFolderStructure(structure)
+		var dvs = siftFolderStructure(structure)
 		return dvs
 	
-	
+	func siftFolderStructure(structure:Dictionary,path:String = "res://"):
+		var out = []
+		for i in structure:
+			if i.ends_with("/"):
+				out.append_array(siftFolderStructure(structure[i],path + i))
+			else:
+				var f = i.to_lower()
+				if f.begins_with("modmain") and f.ends_with(".gd"):
+					out.append(path + i)
+		return out
 	
 	
 	
