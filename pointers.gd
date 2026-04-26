@@ -1146,7 +1146,7 @@ class _DataFormat:
 	func __get_script_variables_without_load(script_path) -> Dictionary:
 		var filepath = "user://cache/.HevLib_Cache/Variable_Fetch/"
 		var pathway = __trim_scripts(script_path)
-		if pathway[2].size() == 0:
+		if pathway[1].size() == 0:
 			return {}
 		var dict = {}
 		var l = __compile_to_script_object(pathway[0])
