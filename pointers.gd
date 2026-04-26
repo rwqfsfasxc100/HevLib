@@ -3794,11 +3794,6 @@ class _FolderAccess:
 				folder_structure.merge({object:fd})
 		return folder_structure
 	
-	func __get_modmain_files() -> Array:
-		var structure = __get_folder_structure("res://")
-		var dvs = siftFolderStructure(structure)
-		return dvs
-	
 	func siftFolderStructure(structure:Dictionary,path:String = "res://"):
 		var out = []
 		for i in structure:
@@ -4512,7 +4507,7 @@ class _ManifestV2:
 				
 				
 				
-				var folders = pointers.FolderAccess.__get_modmain_files()
+				var folders = __get_modmain_files()
 				Debug.l("ManifestV2: found [%s] modmain files" % folders.size())
 				for item in folders:
 					var has_mod = true
@@ -5454,6 +5449,10 @@ class _ManifestV2:
 	func __get_manifest_cache() -> Dictionary:
 		return cached_manifests
 	
+	func __get_modmain_files() -> Array:
+		var structure = pointers.FolderAccess.__get_folder_structure("res://")
+		var dvs = pointers.FolderAccess.siftFolderStructure(structure)
+		return dvs
 	
 	
 	
