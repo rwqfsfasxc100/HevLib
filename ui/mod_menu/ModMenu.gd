@@ -101,6 +101,9 @@ func _on_resize():
 			if "ModButton" in names:
 				buttonnode.get_node("ModButton").grab_focus()
 
+func _ready():
+	get_tree().get_root().connect("size_changed", self, "_on_resize")
+
 func _visibility_changed():
 	_on_resize()
 

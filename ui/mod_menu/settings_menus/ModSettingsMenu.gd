@@ -25,6 +25,8 @@ func _about_to_show():
 	
 	_on_resize()
 
+func _ready():
+	get_tree().get_root().connect("size_changed", self, "_on_resize")
 func _visibility_changed():
 	_on_resize()
 
@@ -49,6 +51,7 @@ func _on_resize():
 		var size = Settings.getViewportSize()
 		rect_size = size
 		$ColorRect.rect_size = size
-		$base.rect_min_size = size - offset
+		$base.rect_size = size - offset
 		$base.rect_position = offset/2
+		$base/TabContainer.rect_size = size - offset
 	

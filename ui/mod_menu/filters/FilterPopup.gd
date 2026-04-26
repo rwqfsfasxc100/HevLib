@@ -5,7 +5,8 @@ var filter_offset = Vector2(300,450)
 func _filter_pressed():
 	show_menu()
 
-
+func _ready():
+	get_tree().get_root().connect("size_changed", self, "_on_resize")
 func _visibility_changed():
 	_on_resize()
 

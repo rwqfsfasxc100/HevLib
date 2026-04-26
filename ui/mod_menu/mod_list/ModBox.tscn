@@ -1,10 +1,11 @@
-[gd_scene load_steps=21 format=2]
+[gd_scene load_steps=22 format=2]
 
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=1]
 [ext_resource path="res://HevLib/ui/mod_menu/mod_list/ModBox.gd" type="Script" id=2]
 [ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=3]
 [ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=4]
 [ext_resource path="res://HevLib/ui/themes/fonts/courier_new/font-courierbold.tres" type="DynamicFont" id=5]
+[ext_resource path="res://HevLib/ui/themes/fonts/verdana/font-verdana.tres" type="DynamicFont" id=6]
 
 [sub_resource type="StreamTexture" id=1]
 flags = 4
@@ -281,6 +282,7 @@ expand = true
 stretch_mode = 6
 
 [node name="Children" type="TextureRect" parent="BaseModBox/ModButton/VBoxContainer/HBoxContainer/VBoxContainer"]
+self_modulate = Color( 0.588235, 0.588235, 0.588235, 0.784314 )
 margin_top = 49.0
 margin_right = 40.0
 margin_bottom = 94.0
@@ -290,13 +292,12 @@ expand = true
 stretch_mode = 6
 
 [node name="Count" type="Label" parent="BaseModBox/ModButton/VBoxContainer/HBoxContainer/VBoxContainer/Children"]
-margin_left = 5.0
-margin_top = 30.0
-margin_right = 45.0
-margin_bottom = 59.0
+self_modulate = Color( 1.25, 1.25, 1.25, 1 )
+margin_top = 10.0
+margin_right = 40.0
+margin_bottom = 48.0
 rect_min_size = Vector2( 40, 10 )
-rect_scale = Vector2( 0.75, 0.75 )
-custom_fonts/font = ExtResource( 5 )
+custom_fonts/font = ExtResource( 6 )
 text = "0"
 align = 1
 

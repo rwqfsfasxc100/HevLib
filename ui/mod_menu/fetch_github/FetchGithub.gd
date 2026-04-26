@@ -4,10 +4,7 @@ extends Popup
 func _ready():
 	connect("about_to_show",self,"_about_to_show")
 	connect("visibility_changed",self,"_on_resize")
-
-
-
-
+	get_tree().get_root().connect("size_changed", self, "_on_resize")
 
 
 
