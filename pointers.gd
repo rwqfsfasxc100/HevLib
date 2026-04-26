@@ -5591,20 +5591,6 @@ class _NodeAccess:
 			
 			return save_file_path
 	
-	var var_hash = {}
-	
-	func __convert_var_from_string(string : String, constant = true):
-		if string in var_hash:
-			return var_hash[string]
-		var header
-		if constant:
-			header = "extends Reference\nconst VARIABLE = "
-		else:
-			header = "extends Reference\nvar VARIABLE = "
-		var script = pointers.DataFormat.__compile_script(header + string)
-		var variable = script.VARIABLE
-		var_hash[string] = variable
-		return variable
 	
 	func __remove_scripts(node):
 		node.set_script(null)

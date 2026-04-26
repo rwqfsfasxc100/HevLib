@@ -162,8 +162,8 @@ func _ready():
 				var d = f[n]
 				this["data"][n] = []
 				for l in d:
-#					this_modification.append([l[0],pointers.NodeAccess.__convert_var_from_string(l[1])])
-					this["data"][n].append([l[0],pointers.NodeAccess.__convert_var_from_string(l[1])])
+#					this_modification.append([l[0],pointers.DataFormat.__convert_var_from_string(l[1])])
+					this["data"][n].append([l[0],pointers.DataFormat.__convert_var_from_string(l[1])])
 			this_modification.append(this)
 	for item in additions:
 		var iname = item.get("name")
@@ -178,13 +178,13 @@ func _ready():
 				var d = f[n]
 				this["data"][n] = []
 				for l in d:
-#					this_addition.append([l[0],pointers.NodeAccess.__convert_var_from_string(l[1])])
-					this["data"][n].append([l[0],pointers.NodeAccess.__convert_var_from_string(l[1])])
+#					this_addition.append([l[0],pointers.DataFormat.__convert_var_from_string(l[1])])
+					this["data"][n].append([l[0],pointers.DataFormat.__convert_var_from_string(l[1])])
 			this_addition = this
 	if c in equipment_templates:
 		var d = equipment_templates[c]
 		for i in d:
-			var s = [i,pointers.NodeAccess.__convert_var_from_string(d[i])]
+			var s = [i,pointers.DataFormat.__convert_var_from_string(d[i])]
 			this_template.append(s)
 	
 	
