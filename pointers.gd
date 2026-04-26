@@ -4695,7 +4695,8 @@ class _ManifestV2:
 	
 	func __compare_versions(checked_mod_data:Dictionary) -> bool:
 		var installed_mods = __get_mod_data()
-		var check_name = checked_mod_data[checked_mod_data.keys()[0]].get("name","")
+		var check_keys = checked_mod_data.keys()
+		var check_name = checked_mod_data[check_keys[0]].get("name","")
 		var installed_dict = {}
 		for installed_mod in installed_mods["mods"]:
 			var installed_mName = installed_mods["mods"][installed_mod].get("name","")
@@ -4703,13 +4704,13 @@ class _ManifestV2:
 				installed_dict = installed_mods["mods"][installed_mod].duplicate()
 		if installed_dict.keys().size() == 0:
 			return false
-		var checked_manifest_version = checked_mod_data[checked_mod_data.keys()[0]]["manifest"]["manifest_version"]
+		var checked_manifest_version = checked_mod_data[check_keys[0]]["manifest"]["manifest_version"]
 		var installed_manifest_version = installed_dict["manifest"]["manifest_version"]
 		if checked_manifest_version <= 1:
 			return false
 		if checked_manifest_version > installed_manifest_version:
 			return true
-		var checked_mod_version = checked_mod_data[checked_mod_data.keys()[0]]["version_data"]["full_version_array"]
+		var checked_mod_version = checked_mod_data[check_keys[0]]["version_data"]["full_version_array"]
 		var installed_mod_version = installed_dict["version_data"]["full_version_array"]
 		if checked_mod_version[0] > installed_mod_version[0]:
 			return true
@@ -4883,7 +4884,7 @@ class _ManifestV2:
 						
 					2.1:
 						# information
-						if "mod_information" in manifest_data.keys():
+						if "mod_information" in manifest_data:
 							dict_template["mod_information"]["id"] = String(manifest_data["mod_information"].get("id",null))
 							dict_template["mod_information"]["name"] = String(manifest_data["mod_information"].get("name",null))
 							dict_template["mod_information"]["description"] = String(manifest_data["mod_information"].get("description","HEVLIB_DESCRIPTION_PLACEHOLDER"))
@@ -4891,15 +4892,15 @@ class _ManifestV2:
 							dict_template["mod_information"]["credits"] = PoolStringArray(manifest_data["mod_information"].get("credits",[]))
 						
 						# versioning
-						if "version" in manifest_data.keys():
+						if "version" in manifest_data:
 							dict_template["version"]["version_major"] = int(manifest_data["version"].get("version_major",1))
 							dict_template["version"]["version_minor"] = int(manifest_data["version"].get("version_minor",0))
 							dict_template["version"]["version_bugfix"] = int(manifest_data["version"].get("version_bugfix",0))
 							dict_template["version"]["version_metadata"] = String(manifest_data["version"].get("version_metadata",""))
 						
 						# tags
-						if "tags" in manifest_data.keys():
-							var current_tags = manifest_data["tags"].keys()
+						if "tags" in manifest_data:
+							var current_tags = manifest_data["tags"]
 							if "allow_achievements" in current_tags:
 								dict_template["tags"].merge({"TAG_ALLOW_ACHIEVEMENTS":{"type":"boolean","value":manifest_data["tags"].get("allow_achievements")}})
 							if "quality_of_life" in current_tags:
@@ -4930,7 +4931,7 @@ class _ManifestV2:
 								dict_template["tags"].merge({"TAG_HANDLE_EXTRA_CREW":{"type":"integer","value":manifest_data["tags"].get("handle_extra_crew")}})
 							
 						# links
-						if "links" in manifest_data.keys():
+						if "links" in manifest_data:
 							if typeof(manifest_data["links"].get("github","")) == TYPE_DICTIONARY:
 								var url = manifest_data["links"]["github"]["link"]
 								if url != "":
@@ -4956,14 +4957,14 @@ class _ManifestV2:
 								dict_template["links"].merge({"HEVLIB_BUGREPORTS":{"URL":bugreportsURL}})
 						
 						# manifest definitions
-						if "manifest_definitions" in manifest_data.keys():
+						if "manifest_definitions" in manifest_data:
 							dict_template["manifest_definitions"]["manifest_version"] = float(manifest_data["manifest_definitions"].get("manifest_version",manifest_version))
 							dict_template["manifest_definitions"]["dependancy_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("dependancy_mod_ids",[]))
 							dict_template["manifest_definitions"]["conflicting_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("conflicting_mod_ids",[]))
 							dict_template["manifest_definitions"]["complementary_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("complementary_mod_ids",[]))
 					2.2:
 						
-						if "mod_information" in manifest_data.keys():
+						if "mod_information" in manifest_data:
 							dict_template["mod_information"]["id"] = String(manifest_data["mod_information"].get("id",null))
 							dict_template["mod_information"]["name"] = String(manifest_data["mod_information"].get("name",""))
 							dict_template["mod_information"]["description"] = String(manifest_data["mod_information"].get("description","HEVLIB_DESCRIPTION_PLACEHOLDER"))
@@ -4971,13 +4972,13 @@ class _ManifestV2:
 							dict_template["mod_information"]["author"] = String(manifest_data["mod_information"].get("author","Unknown"))
 							dict_template["mod_information"]["credits"] = PoolStringArray(manifest_data["mod_information"].get("credits",[]))
 						
-						if "version" in manifest_data.keys():
+						if "version" in manifest_data:
 							dict_template["version"]["version_major"] = int(manifest_data["version"].get("version_major",1))
 							dict_template["version"]["version_minor"] = int(manifest_data["version"].get("version_minor",0))
 							dict_template["version"]["version_bugfix"] = int(manifest_data["version"].get("version_bugfix",0))
 							dict_template["version"]["version_metadata"] = String(manifest_data["version"].get("version_metadata",""))
 						
-						if "manifest_definitions" in manifest_data.keys():
+						if "manifest_definitions" in manifest_data:
 							dict_template["manifest_definitions"]["manifest_version"] = float(manifest_data["manifest_definitions"].get("manifest_version",manifest_version))
 							dict_template["manifest_definitions"]["dependancy_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("dependancy_mod_ids",[]))
 							dict_template["manifest_definitions"]["conflicting_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("conflicting_mod_ids",[]))
@@ -4985,25 +4986,25 @@ class _ManifestV2:
 							dict_template["manifest_definitions"]["manifest_url"] = String(manifest_data["manifest_definitions"].get("manifest_url",""))
 							dict_template["manifest_definitions"]["changelog_path"] = String(manifest_data["manifest_definitions"].get("changelog_path",""))
 						
-						if "links" in manifest_data.keys():
+						if "links" in manifest_data:
 							var links = manifest_data["links"]
 							for link in links:
 								dict_template["links"].merge({link:links.get(link)})
-						if "tags" in manifest_data.keys():
+						if "tags" in manifest_data:
 							var tags = manifest_data["tags"]
 							for tag in tags:
 								dict_template["tags"].merge({tag:tags.get(tag)})
-						if "languages" in manifest_data.keys():
+						if "languages" in manifest_data:
 							var languages = manifest_data["languages"]
 							for language in languages:
 								dict_template["languages"].merge({language:languages.get(language)})
 						else:
 							dict_template["languages"].merge({"en":"100%"})
-						if "library" in manifest_data.keys():
+						if "library" in manifest_data:
 							dict_template["library"]["is_library"] = manifest_data["library"].get("is_library",false)
 							dict_template["library"]["always_display"] = manifest_data["library"].get("always_display",false)
 							
-						if "configs" in manifest_data.keys():
+						if "configs" in manifest_data:
 							var configs = manifest_data["configs"]
 							dict_template["configs"].merge(configs)
 						
@@ -5045,22 +5046,27 @@ class _ManifestV2:
 				return moddata
 		return {}
 	
+	var tag_data_cache = {}
+	
 	func __get_tags() -> Dictionary:
-		var tag_dict = {}
-		var mods = __get_mod_data()["mods"]
-		for mod in mods:
-			if mods[mod]["manifest"]["has_manifest"]:
-				var md = mods[mod]["manifest"]["manifest_data"]
-				var id = md["mod_information"].get("id",null)
-				if id and "tags" in md:
-					var tags = md["tags"]
-					for tag in tags:
-						if not tag in tag_dict:
-							tag_dict[tag] = {}
-						var td = tags[tag]
-						if typeof(td) == TYPE_DICTIONARY and "value" in td and "type" in td:
-							tag_dict[tag][id] = td["value"]
-		return tag_dict
+		if tag_data_cache:
+			return tag_data_cache.duplicate(true)
+		else:
+			var tag_dict = {}
+			var mods = __get_mod_data()["mods"]
+			for mod in mods:
+				if mods[mod]["manifest"]["has_manifest"]:
+					var md = mods[mod]["manifest"]["manifest_data"]
+					var id = md["mod_information"].get("id",null)
+					if id and "tags" in md:
+						var tags = md["tags"]
+						for tag in tags:
+							if not tag in tag_dict:
+								tag_dict[tag] = {}
+							var td = tags[tag]
+							if typeof(td) == TYPE_DICTIONARY and "value" in td and "type" in td:
+								tag_dict[tag][id] = td["value"]
+			return tag_dict
 	
 	func __get_mod_tags(mod_id: String) -> Dictionary:
 		var tag_dict = {}
@@ -5084,13 +5090,12 @@ class _ManifestV2:
 		var alldata = __get_tags()
 		var data = alldata.get(tag_name,{})
 		var ex_data = {}
-		if data.size() >=1:
+		if data.size() > 0:
 			for mod in data:
 				match tag_name:
 					"TAG_ADDS_EQUIPMENT","TAG_ADDS_EVENTS","TAG_ADDS_GAMEPLAY_MECHANICS","TAG_ADDS_SHIPS":
 						var k = data.get(mod,[])
-						var num = k.size()
-						if num >= 1:
+						if k:
 							var equip = []
 							for lang in k:
 								equip.append(lang)
@@ -5200,12 +5205,12 @@ class _ManifestV2:
 		var complimentaries = {}
 		for mod in tags:
 			var keys = tags[mod]
-			if keys.size() >= 1:
+			if keys:
 				var items = []
 				for item in keys:
 					if item in mods:
 						items.append(item)
-				if items.size() >= 1:
+				if items:
 					complimentaries.merge({mod:items})
 		return complimentaries
 	
@@ -5228,14 +5233,14 @@ class _ManifestV2:
 		var complimentaries = {}
 		for mod in tags:
 			var keys = tags[mod]
-			if keys.size() >= 1:
+			if keys:
 				var items = []
 				for item in keys:
 					if item in mods:
 						pass
 					else:
 						items.append(item)
-				if items.size() >= 1:
+				if items:
 					complimentaries.merge({mod:items})
 		return complimentaries
 	
@@ -5256,12 +5261,12 @@ class _ManifestV2:
 		var complimentaries = {}
 		for mod in tags:
 			var keys = tags[mod]
-			if keys.size() >= 1:
+			if keys:
 				var items = []
 				for item in keys:
 					if item in mods:
 						items.append(item)
-				if items.size() >= 1:
+				if items:
 					complimentaries.merge({mod:items})
 		return complimentaries
 	
@@ -5821,8 +5826,7 @@ class _Translations:
 			var translationObject := Translation.new()
 			translationObject.locale = lang
 			var translation_dict = path.get(lang)
-			var tKeys = translation_dict.keys()
-			for key in tKeys:
+			for key in translation_dict:
 				var data = translation_dict.get(key)
 				match typeof(data):
 					TYPE_STRING:
@@ -5868,10 +5872,8 @@ class _Translations:
 	
 	func __translation_file_to_dictionary(path : String, delimiter : String = "|") -> Dictionary:
 		var log_header = "HevLib Translations: "
-	#	Debug.l(log_header + "__translation_file_to_dictionary started for file at [%s] using CSV delimiter as [%s]" % [path, delimiter])
 		var exists = Directory.new().file_exists(path)
 		if not exists:
-	#		Debug.l(log_header + "file at [%s] does not exist, returning empty dictionary" % path)
 			return {}
 		var dictionary = {}
 		var file = File.new()
@@ -5882,10 +5884,8 @@ class _Translations:
 		var lang_data = lines[0]
 		var language_lines = lang_data.split(delimiter)
 		if not language_lines[0] == "locale":
-	#		Debug.l(log_header + "improper localization header for [%s], exiting with empty dictionary" % path)
 			return {}
 		if language_lines.size() <= 1:
-	#		Debug.l(log_header + "no languages specified at [%s], exiting with empty dictionary" % path)
 			return {}
 		var languages = []
 		var lsize = language_lines.size()
@@ -5931,7 +5931,6 @@ class _Translations:
 				tlindex += 1
 			index += 1
 			translation_count += 1
-	#	Debug.l(log_header + "fetched translations from [%s], which contains [%s] languages and [%s] translations" % [path,languages.size(),translation_count])
 		return dictionary
 	
 	
@@ -6034,6 +6033,7 @@ class _Zip:
 	var scripts = [
 		
 	]
+	var dir = Directory.new()
 	func __get_zip_content(path, stripFolder = false, lowerCase = false):
 		var listOfNames = []
 		var g = gdunzip.new()
@@ -6074,7 +6074,6 @@ class _Zip:
 		for f in listOfNames:
 			var string = cacheDir + f
 			if string.ends_with("/"):
-				var dir = Directory.new()
 				dir.make_dir_recursive(string)
 		var modFolder = listOfNames[0]
 		var savedFiles = []
