@@ -17,7 +17,7 @@
 8="* Improved efficiency of manifest fetching operations"
 9="* Fetching mod ids is now a cached operation"
 10="* Fetching tag information is now more efficient"
-11="* Fixed __get_script_variables_without_load"
+11="* Fixed __get_script_variables_without_load, which should now work on scripts without constants"
 12="* Fixed DataFormat.__get_vanilla_version not working on release builds"
 13="* Removed need for onready check for __make_upgrades_scene and mineral scripting"
 
