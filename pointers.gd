@@ -164,10 +164,7 @@ class _Achievements:
 		var lockedAchievements = []
 		var allAchievements = []
 		var stats = []
-		# Fetches data from the achievements file
 		var achievementData = Achivements.achivements
-		# gets the rarity dict
-		# This is used to compare the achievements file to, as the achievements file only contains unlocked achievements and stats that are above zero
 		var rarity = Achivements.achievementRarity
 		for m in achievementData:
 			if not str(m).begins_with("stat:"):
@@ -348,7 +345,7 @@ class _ConfigDriver:
 			var cfg = ConfigFile.new()
 			var error = cfg.load(cfg_folder+cfg_filename)
 			if error != OK:
-		#		Debug.l("HevLib Config File: Error loading settings %s" % error)
+				Debug.l("HevLib Config File: Error loading settings %s" % error)
 				return null
 			
 			if cfg.has_section(full):
@@ -501,9 +498,7 @@ class _ConfigDriver:
 			for section in data:
 				var sectData = data[section]
 				var sect = mod + "/" + __truncate_section(section)
-				if sect in current_config:
-					pass
-				else:
+				if not sect in current_config:
 					current_config.merge({sect:{}})
 				for key in sectData:
 					var key_data = sectData[key]
@@ -653,9 +648,6 @@ class _ConfigDriver:
 			icon_button.focus_neighbour_top = "."
 			reset_button.focus_neighbour_top = "."
 			check_button.focus_neighbour_top = "."
-	#		icon_button.focus_neighbour_bottom = "."
-	#		reset_button.focus_neighbour_bottom = "."
-	#		check_button.focus_neighbour_bottom = "."
 		elif pos == 0:
 			icon_button.focus_neighbour_top = "."
 			reset_button.focus_neighbour_top = "."
@@ -683,10 +675,6 @@ class _ConfigDriver:
 				_:
 					breakpoint
 		elif pos == children.size() - 1:
-			pass
-	#		icon_button.focus_neighbour_bottom = "."
-	#		reset_button.focus_neighbour_bottom = "."
-	#		check_button.focus_neighbour_bottom = "."
 
 			var script_path = parent.get_child(pos-1).get_script().get_path()
 			
