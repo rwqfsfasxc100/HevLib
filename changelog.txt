@@ -1,3 +1,26 @@
+[1.13.9]
+
+1="* Pointers script now no longer requires a hyper-specific component load order"
+1.1="* As a result, this has allowed for some methods to be moved to more appropriate classes, where it was previously unviable due to load order restrictions"
+1.2="* Moved __get_drivers_from_modmain_path from FileAccess to DriverManagement"
+1.3="* Moved __config_parse and __config_store from FileAccess to ConfigDriver"
+1.4="* Removed FolderAccess.__copy_file due to it already existing in FileAccess"
+1.5="* Moved __get_modmain_files from FolderAccess to ManifestV2"
+1.6="* Removed NodeAccess.__convert_var_from_string due to it already existing in DataFormat"
+2="* Added KB & Controller support for selecting submods within the mod menu"
+3="* Mods with three or more parts (split by a period) will be considered submods"
+3.1="* If no mod exists to hold a submod, will exist standalone"
+4="* Fixed mod menu not scaling properly after resizing the window"
+5="* Improved submod counter visibility on smaller screens"
+6="* Fixed some mods overflowing their mod list box when submods existed"
+7="* Improved the efficiency of Enceladus's slots"
+8="* Improved efficiency of manifest fetching operations"
+9="* Fetching mod ids is now a cached operation"
+10="* Fetching tag information is now more efficient"
+11="* Fixed __get_script_variables_without_load"
+12="* Fixed DataFormat.__get_vanilla_version not working on release builds"
+13="* Removed need for onready check for __make_upgrades_scene and mineral scripting"
+
 [1.13.8]
 
 1="* Fixed __compile_and_override_script_with_scene failing to work on release builds"
