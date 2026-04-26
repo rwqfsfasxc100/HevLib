@@ -2,7 +2,6 @@
 
 [ext_resource path="res://HevLib/ui/themes/fonts/courier_new/courier_bold.ttf" type="DynamicFontData" id=1]
 
-
 [resource]
 size = 15
 use_mipmaps = true

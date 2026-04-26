@@ -45,9 +45,10 @@ func refocus():
 		Debug.l("I have no focus to fall back to!")
 
 func _on_resize():
-	var size = Settings.getViewportSize()
-	rect_size = size
-	$ColorRect.rect_size = size
-	$base.rect_min_size = size - offset
-	$base.rect_position = offset/2
+	if is_visible_in_tree():
+		var size = Settings.getViewportSize()
+		rect_size = size
+		$ColorRect.rect_size = size
+		$base.rect_min_size = size - offset
+		$base.rect_position = offset/2
 	

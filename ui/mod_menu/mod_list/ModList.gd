@@ -405,7 +405,7 @@ func _downloaded_zip(file, filepath):
 	updates_button.visible = false
 var tween
 func _visibility_changed():
-	if visible:
+	if is_visible_in_tree():
 		yield(CurrentGame.get_tree(),"idle_frame")
 		var count = 0.03125
 		for child in listContainer.get_children():
