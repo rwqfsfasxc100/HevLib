@@ -142,7 +142,7 @@ func _init(modLoader = ModLoader):
 		installScriptExtension("../better_title_screen/SaveSlotButton.gd")
 #		replaceScene("../better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
 
-#		Equipment.__make_upgrades_scene(false)
+#		Equipment.__make_upgrades_scene()
 #		var ws = load(weaponslot_path)
 #		ws.take_over_path("res://weapons/WeaponSlot.tscn")
 #		_savedObjects.append(ws)
@@ -185,7 +185,7 @@ func _ready():
 		
 		
 		
-		pointers.Equipment.__make_upgrades_scene(true)
+		pointers.Equipment.__make_upgrades_scene()
 		var upgrades = load(upgrades_path)
 		upgrades.take_over_path("res://enceladus/Upgrades.tscn")
 		_savedObjects.append(upgrades)

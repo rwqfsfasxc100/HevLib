@@ -25,7 +25,7 @@ func _init():
 	vanilla_equipment_defaults_for_reference = vanilla_data.vanilla_equipment_defaults_for_reference.duplicate(true)
 
 var version = [1,0,0]
-func make_upgrades_scene(is_onready: bool = true):
+func make_upgrades_scene():
 	
 	
 	# FILE PATHS
@@ -71,11 +71,9 @@ func make_upgrades_scene(is_onready: bool = true):
 	var upgrades_slot_limits = FILE_PATHS[16]
 	var ship_node_modify_file = FILE_PATHS[17]
 	var ship_thruster_color_file = FILE_PATHS[18]
-	if is_onready:
-		
-		var version = DataFormat.__get_vanilla_version()
-		var text = "HevLib make_upgrades_scene manager: observed game version of %s"  % str(version)
-		Debug.l(text)
+	var version = DataFormat.__get_vanilla_version()
+	var text = "HevLib make_upgrades_scene manager: observed game version of %s"  % str(version)
+	Debug.l(text)
 	var Equipment = load("res://HevLib/pointers/Equipment.gd")
 	var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 	var UpgradeMenu : Node = load("res://enceladus/Upgrades.tscn").instance()

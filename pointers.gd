@@ -1783,7 +1783,7 @@ class _Equipment:
 	
 	var version = [1,0,0]
 	
-	func __make_upgrades_scene(is_onready: bool = true):
+	func __make_upgrades_scene():
 		if pointers.needs_cache_rebuild == false:
 			return
 		var SCENE_HEADER = "[gd_scene load_steps=4 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/unmodified/WeaponSlotUpgradeTemplate.tscn\" type=\"PackedScene\" id=2]\n[ext_resource path=\"res://enceladus/SystemShipUpgradeUI.tscn\" type=\"PackedScene\" id=3]\n\n[sub_resource type=\"ViewportTexture\" id=1]\nflags = 5\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain1/Viewport\")\n\n[sub_resource type=\"ViewportTexture\" id=2]\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain2/Control\")\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]\n\n[node name=\"TextureRect\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 2 )\n\n[node name=\"TextureRect2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 2 )"
@@ -1847,11 +1847,9 @@ class _Equipment:
 		var namer_store = FILE_PATHS[22]
 		
 		
-		if is_onready:
-			
-			version = pointers.DataFormat.__get_vanilla_version()
-			var text = "HevLib make_upgrades_scene manager: observed game version of %s"  % str(version)
-			Debug.l(text)
+		version = pointers.DataFormat.__get_vanilla_version()
+		var text = "HevLib make_upgrades_scene manager: observed game version of %s"  % str(version)
+		Debug.l(text)
 		var UpgradeMenu : Node = load("res://enceladus/Upgrades.tscn").instance()
 		var nodes_parent = UpgradeMenu.get_node("VB/MarginContainer/ScrollContainer/MarginContainer/Items")
 		var vanilla_slot_names = []
