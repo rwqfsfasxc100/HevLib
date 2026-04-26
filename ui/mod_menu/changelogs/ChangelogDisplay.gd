@@ -10,7 +10,6 @@ var pointers
 export (String,"singular","dynamic") var operation = "singular"
 
 func _ready():
-	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	if operation == "singular" and path != "":
 		rect_size = get_parent().rect_size
 		linecontainer.rect_min_size = rect_size - Vector2(0,6)
@@ -22,6 +21,9 @@ func _ready():
 var refs = []
 
 func parse():
+	if not pointers:
+		yield(get_tree(),"idle_frame")
+	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	var data = pointers.ManifestV2.__parse_changelogs(path)
 	var index = 1
 	for config in data:

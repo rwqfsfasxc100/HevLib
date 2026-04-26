@@ -38,6 +38,7 @@ var dependancies = []
 var complementary = []
 
 var already_pressed = false
+var submod_visibility = false
 
 func _pressed():
 	information_nodes["mod_list"].make_info_default_state()
@@ -171,10 +172,13 @@ func _pressed():
 		information_nodes["info_changelog_button"].visible = false
 		information_nodes["changelog_menu"].clear()
 	if already_pressed:
-		if get_child_count() >= 2:
+		if get_child_count() > 1:
 			for i in range(1,get_child_count()):
 				var node = get_child(i)
 				node.visible = !node.visible
+			submod_visibility = get_child(1).visible
+			yield_button_focus()
+			_refocus()
 	information_nodes["mod_list"].currently_selected_mod_id = ID
 	file.open(update_store,File.READ)
 	var update_data = JSON.parse(file.get_as_text()).result
@@ -467,18 +471,32 @@ func _refocus():
 	
 	var pos = get_position_in_parent()
 	var end_pos = get_parent().get_node("HEVLIB_NODE_SEPARATOR_IGNORE_PLS").get_position_in_parent()
-	
-	if pos == 0:
-#		button.focus_neighbour_top = mb
-		button.focus_neighbour_top = button.get_path_to(filter_button)
-		button.focus_neighbour_bottom = button.get_path_to(get_button(pos+1))
-	elif pos + 1 == end_pos:
-		button.focus_neighbour_top = button.get_path_to(get_button(pos-1))
-		button.focus_neighbour_bottom = button.get_path_to(get_node(openMods_button))
-		get_node(openMods_button).focus_neighbour_top = get_node(openMods_button).get_path_to(button)
+	if submod_visibility:
+		if pos == 0:
+			button.focus_neighbour_top = button.get_path_to(filter_button)
+			button.focus_neighbour_bottom = button.get_path_to(get_child(1).get_node("ModButton"))
+			get_button(pos+1).focus_neighbour_top = get_button(pos+1).get_path_to(get_child(get_child_count() - 1).get_node("ModButton"))
+		elif pos + 1 == end_pos:
+			button.focus_neighbour_top = button.get_path_to(get_button(pos-1))
+			button.focus_neighbour_bottom = button.get_path_to(get_child(1).get_node("ModButton"))
+			get_node(openMods_button).focus_neighbour_top = get_node(openMods_button).get_path_to(get_child(get_child_count() - 1).get_node("ModButton"))
+		else:
+			button.focus_neighbour_top = button.get_path_to(get_button(pos-1))
+			button.focus_neighbour_bottom = button.get_path_to(get_child(1).get_node("ModButton"))
+			get_button(pos+1).focus_neighbour_top = get_button(pos+1).get_path_to(get_child(get_child_count() - 1).get_node("ModButton"))
 	else:
-		button.focus_neighbour_top = button.get_path_to(get_button(pos-1))
-		button.focus_neighbour_bottom = button.get_path_to(get_button(pos+1))
+		if pos == 0:
+			button.focus_neighbour_top = button.get_path_to(filter_button)
+			button.focus_neighbour_bottom = button.get_path_to(get_button(pos+1))
+			get_button(pos+1).focus_neighbour_top = get_button(pos+1).get_path_to(button)
+		elif pos + 1 == end_pos:
+			button.focus_neighbour_top = button.get_path_to(get_button(pos-1))
+			button.focus_neighbour_bottom = button.get_path_to(get_node(openMods_button))
+			get_node(openMods_button).focus_neighbour_top = get_node(openMods_button).get_path_to(button)
+		else:
+			button.focus_neighbour_top = button.get_path_to(get_button(pos-1))
+			button.focus_neighbour_bottom = button.get_path_to(get_button(pos+1))
+			get_button(pos+1).focus_neighbour_top = get_button(pos+1).get_path_to(button)
 	
 	
 var isfocus = false
@@ -570,4 +588,7 @@ var all_tags
 func getPointers():
 	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	all_tags = pointers.ManifestV2.__get_tags()
-	pass
+
+func yield_button_focus():
+	yield(CurrentGame.get_tree(),"idle_frame")
+	button.grab_focus()
