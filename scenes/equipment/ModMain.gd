@@ -125,9 +125,9 @@ func _init(modLoader = ModLoader):
 		installScriptExtension("../../scripts/Namer.gd")
 
 #		installScriptExtension("check.gd")
-		installScriptExtension("../scene_replacements/blanks/MPU.gd")
-		installScriptExtension("../scene_replacements/blanks/Hud.gd")
-		installScriptExtension("../scene_replacements/ship-ctrl.gd")
+#		installScriptExtension("../scene_replacements/blanks/MPU.gd")
+#		installScriptExtension("../scene_replacements/blanks/Hud.gd")
+#		installScriptExtension("../scene_replacements/ship-ctrl.gd")
 
 		installScriptExtension("ThrusterSlot.gd")
 		installScriptExtension("SystemShipUpgradeUI.gd")

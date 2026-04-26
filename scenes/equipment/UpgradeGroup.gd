@@ -29,6 +29,17 @@ var allowed_equipment := []
 
 var data_dictionary = ""
 
+var pointers
+var cv = null
+func _ready():
+	connect("visibility_changed",self,"recheck_this_visibility")
+
+func recheck_this_visibility():
+	if not pointers:
+		pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+	if pointers:
+		cv = pointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
+
 func reexamine():	
 	var ship = CurrentGame.getPlayerShip()
 	var shipname = ship.shipName
@@ -44,8 +55,7 @@ func reexamine():
 			visible = true
 	.reexamine()
 	if config_id and config_section and config_setting:
-		var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-		var cv = pointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
+		
 		if cv != null:
 			if invert_config:
 				if cv:
