@@ -132,6 +132,10 @@ func _ready():
 	
 	mod_data.merge({"VANILLA":vd})
 	
+	var manifests = []
+	var manifestGroups = {}
+	var mainManifestMods = {}
+	
 	for mod in data:
 		var fname = mod.split("/")[2]
 		var info = data[mod]
@@ -139,25 +143,51 @@ func _ready():
 		info.merge({"zip":zipinfo})
 		if not fname in groups:
 			groups.merge({fname:{}})
+		if info["manifest"]["has_manifest"]:
+			var id = info["manifest"]["manifest_data"]["mod_information"]["id"]
+			if not id in manifests:
+				manifests.append(id)
 		groups[fname].merge({mod:info})
-	for mod in groups:
-		if groups[mod].keys().size() >= 2:
-			var main = ""
-			var minlength = INF
-			for item in groups[mod]:
-				var splitter = item.split(mod)[1]
-				var split = splitter.split("/").size()
-				if split < minlength:
-					main = item
-					minlength = split
+	for modClass in groups:
+		var groupID = ""
+		var group = groups[modClass]
+		var mainManifestMod = ""
+		for modpath in group:
+			var mod = group[modpath]
+			if mod["manifest"]["has_manifest"]:
+				var id = mod["manifest"]["manifest_data"]["mod_information"]["id"]
+				if groupID:
+					if id.split(".").size() <= groupID.split(".").size():
+						groupID = id
+						mainManifestMod = modpath
+				else:
+					groupID = id
+					mainManifestMod = modpath
+		var idSplit = groupID.split(".")
+		var baseID = groupID
+		
+		if groupID:
+			if idSplit.size() > 1:
+				baseID = idSplit[0] + "." + idSplit[1]
+			if not baseID in manifestGroups:
+				manifestGroups[baseID] = {}
+			manifestGroups[baseID].merge(group.duplicate(true))
+			mainManifestMods[groupID] = mainManifestMod
+		else:
+			for i in group:
+				manifestGroups[i] = {i:group[i].duplicate(true)}
+				mainManifestMods[i] = i
+	for mod in manifestGroups:
+		if manifestGroups[mod].size() >= 2:
+			var main = mainManifestMods[mod]
 			var mainmod = data[main].duplicate()
 			mainmod.merge({"children":{}})
-			for item in groups[mod]:
+			for item in manifestGroups[mod]:
 				if item != main:
-					mainmod["children"].merge({item:groups[mod][item]})
+					mainmod["children"].merge({item:manifestGroups[mod][item]})
 			mod_data[main] = mainmod
 		else:
-			var modgroup = groups[mod].keys()[0]
+			var modgroup = manifestGroups[mod].keys()[0]
 			mod_data[modgroup] = data[modgroup]
 	
 	for mod in mod_data:
@@ -194,7 +224,7 @@ func _draw():
 var aligned_zero_focus = false
 
 func make_info_default_state():
-	get_node(info_name).text = ""
+#	get_node(info_name).text = ""
 	get_node(info_version).text = ""
 	get_node(info_priority).text = ""
 	get_node(info_mod_id).text = ""
