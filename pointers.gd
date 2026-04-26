@@ -5059,9 +5059,7 @@ class _ManifestV2:
 							tag_dict[tag] = {}
 						var td = tags[tag]
 						if typeof(td) == TYPE_DICTIONARY and "value" in td and "type" in td:
-							tag_dict[tag][id] = td["value"] 
-						pass
-				pass
+							tag_dict[tag][id] = td["value"]
 		return tag_dict
 	
 	func __get_mod_tags(mod_id: String) -> Dictionary:
@@ -5073,24 +5071,21 @@ class _ManifestV2:
 				if not tag in tag_dict:
 					tag_dict[tag] = null
 				tag_dict[tag] = td[mod_id]
-				pass
 		return tag_dict
 	
 	func __get_mods_from_tag(tag_name: String) -> Array:
 		var alldata = __get_tags()
 		var data = alldata.get(tag_name,{})
-		var keys = data.keys()
-		if keys.size() >=1:
-			return keys
+		if data.size() >=1:
+			return data.keys()
 		return []
 	
 	func __get_mods_and_tags_from_tag(tag_name: String) -> Dictionary:
 		var alldata = __get_tags()
 		var data = alldata.get(tag_name,{})
 		var ex_data = {}
-		var keys = data.keys()
-		if keys.size() >=1:
-			for mod in keys:
+		if data.size() >=1:
+			for mod in data:
 				match tag_name:
 					"TAG_ADDS_EQUIPMENT","TAG_ADDS_EVENTS","TAG_ADDS_GAMEPLAY_MECHANICS","TAG_ADDS_SHIPS":
 						var k = data.get(mod,[])
@@ -5188,10 +5183,10 @@ class _ManifestV2:
 			var returning = []
 			for mod in mod_data:
 				var data = mod_data[mod]["manifest"]["manifest_data"]
-				if "mod_information" in data.keys():
+				if "mod_information" in data:
 					var minfo = data["mod_information"]["id"]
 					returning.append(minfo)
-			
+			caches_mod_ids = returning.duplicate(true)
 			return returning
 	
 	
