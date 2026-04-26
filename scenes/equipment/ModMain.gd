@@ -106,7 +106,7 @@ func _init(modLoader = ModLoader):
 
 		installScriptExtension("../better_title_screen/CurrentlyPlaying.gd")
 		var minerals = load("res://HevLib/scenes/minerals/make_mineral_scripting.gd")
-		minerals.make_mineral_scripting(false,pointers,self)
+		minerals.make_mineral_scripting(pointers,self)
 
 #		var asteroids = ResourceLoader.load(asteroid_path)
 #		asteroids.new()

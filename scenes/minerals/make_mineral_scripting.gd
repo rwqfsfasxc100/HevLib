@@ -6,7 +6,7 @@ extends Node
 
 const custom_mineral_path = "user://cache/.HevLib_Cache/Minerals/mineral_store/"
 
-static func make_mineral_scripting(is_onready = false,pointers = null,modmain = null):
+static func make_mineral_scripting(pointers = null,modmain = null):
 	
 	var FILE_PATHS = [
 		"user://cache/.HevLib_Cache/Minerals/mineral_cache.json",
@@ -27,12 +27,9 @@ static func make_mineral_scripting(is_onready = false,pointers = null,modmain = 
 	var current_game_script = FILE_PATHS[2]
 	var the_ring_script = FILE_PATHS[3]
 	
-	
-	if is_onready:
-		
-		var version = pointers.DataFormat.__get_vanilla_version()
-		var text = "HevLib Mineral Manager: observed game version of %s"  % str(version)
-		Debug.l(text)
+	var version = pointers.DataFormat.__get_vanilla_version()
+	var text = "HevLib Mineral Manager: observed game version of %s"  % str(version)
+	Debug.l(text)
 	
 	var f = File.new()
 	var drivers = pointers.DriverManagement.__get_drivers()
