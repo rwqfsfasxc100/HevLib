@@ -5110,92 +5110,90 @@ class _ManifestV2:
 		return ex_data
 	
 	func __get_manifest_section(section: String, mod_id: String = "") -> Dictionary:
-		var mod_data = {}
-		if not cached_mod_list.empty():
-			mod_data = cached_mod_list["mods"]
-		else:
-			mod_data = __get_mod_data()["mods"]
-		var mode = "all"
+		var manifest_data_cache = __get_manifest_cache()
+		var mode = 0
 		var return_data = {}
 		if mod_id != "":
-			mode = "specific"
+			mode = 1
 		match mode:
-			"all":
-				for mod in mod_data:
-					var manifest = mod_data[mod]["manifest"]["manifest_data"]
-					if section in manifest.keys():
+			0:
+				for mod in manifest_data_cache:
+					var manifest = manifest_data_cache[mod]
+					if section in manifest:
 						return_data[mod] = manifest[section]
 					
-			"specific":
-				for mod in mod_data:
+			1:
+				for mod in manifest_data_cache:
 					if mod_id in __get_mod_ids():
-						var manifest = mod_data[mod]["manifest"]["manifest_data"]
-						if "mod_information" in manifest.keys():
+						var manifest = manifest_data_cache[mod]
+						if "mod_information" in manifest:
 							if mod_id in manifest["mod_information"]["id"]:
-								if section in manifest.keys():
+								if section in manifest:
 									return_data = manifest[section]
 		
 		return return_data
 	
-	func __get_mod_ids() -> Array:
-		var mod_data = {}
-		if not cached_mod_list.empty():
-			mod_data = cached_mod_list["mods"]
-		else:
-			mod_data = __get_mod_data()["mods"]
-		var returning = []
-		for mod in mod_data:
-			var data = mod_data[mod]["manifest"]["manifest_data"]
-			if "mod_information" in data.keys():
-				var minfo = data["mod_information"]["id"]
-				returning.append(minfo)
-		
-		return returning
-	
 	func __get_manifest_entry(section: String, entry: String, mod_id: String = ""):
-		var mod_data = {}
-		if not cached_mod_list.empty():
-			mod_data = cached_mod_list["mods"]
-		else:
-			mod_data = __get_mod_data()["mods"]
-		var mode = "all"
+		var manifest_data_cache = __get_manifest_cache()
+		var mode = 0
 		var return_data = {}
 		if mod_id != "":
-			mode = "specific"
+			mode = 1
 		match mode:
-			"all":
-				for mod in mod_data:
-					var manifest = mod_data[mod]["manifest"]["manifest_data"]
-					if section in manifest.keys():
+			0:
+				for mod in manifest_data_cache:
+					var manifest = manifest_data_cache[mod]
+					if section in manifest:
 						return_data[mod] = manifest[section]
 					
-			"specific":
-				for mod in mod_data:
+			1:
+				for mod in manifest_data_cache:
 					if mod_id in __get_mod_ids():
-						var manifest = mod_data[mod]["manifest"]["manifest_data"]
-						if "mod_information" in manifest.keys():
+						var manifest = manifest_data_cache[mod]
+						if "mod_information" in manifest:
 							if mod_id in manifest["mod_information"]["id"]:
-								if section in manifest.keys():
+								if section in manifest:
 									return_data = manifest[section]
 		
 		var sec = return_data
 		
-		var nmode = "all"
+		var nmode = 0
 		if mod_id != "":
-			nmode = "specific"
+			nmode = 1
 		match nmode:
-			"all":
+			0:
 				var dict = {}
 				for mod in sec:
-					var id = mod_data[mod]["manifest"]["manifest_data"]["mod_information"]["id"]
-					if entry in sec[mod].keys():
-						var e = sec[mod][entry]#["value"]
+					var id = manifest_data_cache[mod]["mod_information"]["id"]
+					if entry in sec[mod]:
+						var e = sec[mod][entry]
 						dict.merge({id:e})
 				return dict
-			"specific":
+			1:
 				if entry in sec:
 					return sec[entry]
 		return {}
+	
+	var caches_mod_ids = []
+	
+	func __get_mod_ids() -> Array:
+		if caches_mod_ids:
+			return caches_mod_ids.duplicate(true)
+		else:
+			var mod_data = {}
+			if not cached_mod_list.empty():
+				mod_data = cached_mod_list["mods"]
+			else:
+				mod_data = __get_mod_data()["mods"]
+			var returning = []
+			for mod in mod_data:
+				var data = mod_data[mod]["manifest"]["manifest_data"]
+				if "mod_information" in data.keys():
+					var minfo = data["mod_information"]["id"]
+					returning.append(minfo)
+			
+			return returning
+	
 	
 	func __check_complementary():
 		var mods = {}
