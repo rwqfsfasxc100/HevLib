@@ -989,7 +989,7 @@ class _DataFormat:
 		var version = [1,0,0]
 		var lb = load("res://VersionLabel.tscn").instance()
 		var textData = lb.text
-		Tool.remove(lb)
+		lb.free()
 		if textData:
 			var data = textData.split(".")
 			version[0] = int(data[0])
