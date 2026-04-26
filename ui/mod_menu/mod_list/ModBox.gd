@@ -339,6 +339,7 @@ func _draw():
 	
 	
 	button_box.rect_size.x = button.rect_size.x - 4
+	button_box.rect_size.y = 94
 	
 	var mod_name = MOD_INFO["name"]
 	var prio = MOD_INFO["priority"]
@@ -446,6 +447,7 @@ onready var desc_box = ModContainer.get_node(descbox)
 #	if is_visible_in_tree():
 #		MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)
 #		button_box.rect_size.x = button.rect_size.x - 4
+#		button_box.rect_size.y = 94
 		
 		
 
@@ -455,6 +457,7 @@ func get_button(pos):
 func _refocus():
 	MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)
 	button_box.rect_size.x = button.rect_size.x - 4
+	button_box.rect_size.y = 94
 	var index = get_parent().get_position_in_parent()
 	var parent = get_parent()
 	var parent_count = parent.get_child_count()-1
@@ -557,10 +560,12 @@ func _process(_delta):
 	var btnResize = Vector2($BaseModBox.rect_size.x - $BaseModBox/ModButton.rect_position.x,$BaseModBox.rect_size.y)
 	$BaseModBox/ModButton.rect_size = btnResize
 	button_box.rect_size.x = button.rect_size.x - 4
+	button_box.rect_size.y = 94
 
 func _visibility_changed():
 	MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)
 	button_box.rect_size.x = button.rect_size.x - 4
+	button_box.rect_size.y = 94
 	_refocus()
 	handle_sub_mods()
 #	button.focus_neighbor_top = get_path_to(upper)

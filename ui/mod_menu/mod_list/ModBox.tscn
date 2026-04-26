@@ -310,7 +310,8 @@ size_flags_horizontal = 3
 
 [node name="NAME" type="Label" parent="BaseModBox/ModButton/VBoxContainer/HBoxContainer/LABELS"]
 margin_right = 168.0
-margin_bottom = 38.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 0, 40 )
 size_flags_horizontal = 3
 size_flags_vertical = 1
 text = "MOD_NAME"
@@ -319,10 +320,12 @@ max_lines_visible = 2
 
 [node name="BRIEF" type="Label" parent="BaseModBox/ModButton/VBoxContainer/HBoxContainer/LABELS"]
 modulate = Color( 0.54902, 0.54902, 0.54902, 1 )
-margin_top = 42.0
+margin_top = 44.0
 margin_right = 168.0
-margin_bottom = 71.0
+margin_bottom = 94.0
+rect_min_size = Vector2( 0, 50 )
 size_flags_horizontal = 3
+size_flags_vertical = 3
 custom_fonts/font = ExtResource( 5 )
 text = "MOD_BRIEF"
 autowrap = true
