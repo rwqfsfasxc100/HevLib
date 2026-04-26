@@ -3683,10 +3683,11 @@ class _FolderAccess:
 	var scripts = [
 		
 	]
+	var file = File.new()
+	var directory = Directory.new()
 	func __check_folder_exists(folder: String, status_array: bool = false):
 		var value = false
 		var exists = false
-		var directory = Directory.new()
 		if directory.dir_exists(folder):
 			value = true
 			exists = true
@@ -3704,8 +3705,7 @@ class _FolderAccess:
 			return value
 	
 	func __recursive_delete(path: String) -> bool:
-		var dTest = Directory.new()
-		if not dTest.open(path) == OK:
+		if not directory.open(path) == OK:
 			return false
 		if not path.ends_with("/"):
 			path = path + "/"
@@ -3719,41 +3719,38 @@ class _FolderAccess:
 				filesForDeletion.append(entry)
 		for f in filesForDeletion:
 			var splitFiles = str(f).split("/")[str(f).split("/").size()-1]
-			var dir = Directory.new()
-			dir.open(path)
-			dir.remove(splitFiles)
+			directory.open(path)
+			directory.remove(splitFiles)
 		for folder in foldersForDeletion:
 			__recursive_delete(folder)
-		var dm = Directory.new()
-		dm.open(path)
-		dm.remove(path)
+		directory.open(path)
+		directory.remove(path)
 		return true
 	
 	func __fetch_folder_files(folder: String, showFolders: bool = false, returnFullPath: bool = false,globalizePath: bool = false):
 		var fileList : PoolStringArray = PoolStringArray([])
 		if not folder.ends_with("/"):
 			folder += "/"
-		var dir = Directory.new()
-		var does = dir.dir_exists(folder)
+		var does = directory.dir_exists(folder)
 		if not does:
 			return []
-		dir.open(folder)
-		var dirName = dir.get_current_dir()
-		dir.list_dir_begin(true)
+		directory.open(folder)
+		var dirName = directory.get_current_dir()
+		directory.list_dir_begin(true)
 		while true:
-			var fileName = dir.get_next()
+			var fileName = directory.get_next()
 			var capture = true
 			if fileName.ends_with("/"):
 				capture = false
 			if fileName == "." or fileName == "..":
 				capture = false
 			if capture:
-				dirName = dir.get_current_dir()
+				dirName = directory.get_current_dir()
 				if fileName == "":
 					break
-				if dir.current_is_dir() and not showFolders:
+				if directory.current_is_dir() and not showFolders:
 					continue
-				elif dir.current_is_dir() and showFolders and not fileName.ends_with("/"):
+				elif directory.current_is_dir() and showFolders and not fileName.ends_with("/"):
 					fileName = fileName + "/"
 				if returnFullPath:
 					fileName = folder + fileName
@@ -3778,7 +3775,6 @@ class _FolderAccess:
 	
 	
 	func __get_folder_structure(folder,store_file_content = false):
-		var file = File.new()
 		var folder_structure = {}
 		var files = __fetch_folder_files(folder,true,false)
 		for object in files:
