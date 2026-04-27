@@ -141,6 +141,9 @@ func compile_keymap():
 	
 	var sorted_exclusives = {}
 	
+	# Exclusives check for true bools (i.e. E+CTRL+F: E & F is false but E+CTRL is true)
+	# Non-ordered check purely for base chars (i.e. E+CTRL+F: E & F is false, but CTRL is true)
+	
 	var exclSize = exclusives.size()
 	if exclSize > 0:
 		if exclSize > 1:
@@ -162,7 +165,7 @@ func compile_keymap():
 				else:
 					disordered[e] = x
 			
-			for k in cKeys.keys():
+			for k in cKeys:
 				var d = cKeys[k].size()
 				if d <= 1:
 					cKeys.erase(k)
