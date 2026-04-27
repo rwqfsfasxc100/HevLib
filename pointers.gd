@@ -307,12 +307,13 @@ class _ConfigDriver:
 		var dictionary = {}
 		mod_id = __truncate_mod_id(mod_id)
 		if settingsHash:
-			for section in settings.keys():
+			for section in settings:
 				var split = section.split("/")
 				if split[0] == mod_id:
 					var sub = {}
-					for key in settings[section]:
-						sub.merge({key:settings[section].duplicate(true)[key]})
+					var sec = settings[section].duplicate(true)
+					for key in sec:
+						sub.merge({key:sec[key]})
 					dictionary.merge({split[1]:sub})
 		else:
 			var cfg = ConfigFile.new()
@@ -338,7 +339,11 @@ class _ConfigDriver:
 		if settingsHash:
 			if full in settings:
 				if key in settings[full]:
-					return settings[full].duplicate(true)[key]
+					var out = settings[full][key]
+					var tout = typeof(out)
+					if tout == TYPE_ARRAY or tout == TYPE_DICTIONARY:
+						return out.duplicate(true)
+					return out
 				return null
 			return null
 		else:
@@ -353,10 +358,8 @@ class _ConfigDriver:
 				if key in keys:
 					var data = cfg.get_value(full,key)
 					return data
-				else:
-					return null
-			else:
 				return null
+			return null
 	
 	func pushCFG(cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var cfg_file = "user://cfg/" + cfg_filename
