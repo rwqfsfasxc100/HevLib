@@ -105,15 +105,16 @@ func _physics_process(delta):
 			scancode_order.clear()
 
 func _input(event):
+	if handle_raw_inputs(event):
+		Debug.l("Current Index: " + str(current_key_inputs))
+		input_handle.handle_input(current_key_inputs, event)
+
 #	if event.is_action("ACT1") and event.is_action("ACT2"):
 #		breakpoint
 #	if ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE:
 #		event.set_script(load("res://HevLib/scenes/keymapping/data/inject.gd"))
-		if handle_raw_inputs(event):
 #			event.checker = true
 #			get_tree().set_input_as_handled()
-			Debug.l("Current Index: " + str(current_key_inputs))
-			input_handle.handle_input(current_key_inputs, event)
 		
 #		if ("W" in current_key_inputs):
 #			if "Shift" in current_key_inputs:
