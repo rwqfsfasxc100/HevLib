@@ -56,7 +56,6 @@ func _ready():
 		
 		var ignore_builtin = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","input_virtualization_ignore_builtin")
 		
-#		print(str(actions),"\n\n",str(pointers.Keymapping.__get_vanilla_action_list()))
 		for action in actions:
 #			if ignore_builtin and action in sortedAv:
 #				continue
