@@ -190,7 +190,24 @@ func compile_keymap():
 						breakpoint
 
 			breakpoint
-			
+			for i in disordered:
+				var data = disordered[i]
+				var controls = data["controls"]
+				var opts = data["opts"]
+				for stack in controls:
+					
+					var single = true
+					for a in stack:
+						if a in cKeys:
+							single = false
+					if single:
+						breakpoint
+					else:
+						var stack_size = stack.size()
+						
+						breakpoint
+				
+				breakpoint
 			pass
 			
 		else:
