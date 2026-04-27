@@ -4,6 +4,12 @@
 
 ---
 
+## Additional packages:
+
+- [HevLib Language Font Pack 1](https://github.com/rwqfsfasxc100/HevLib-Language-Font-Pack-1) - Adds support for CKJ  (Chinese, Korean, Japanese) characters to the library's fonts
+
+---
+
 ## First time installing mods?
 If you've never installed mods before, check out either:
 - [The ΔV Steam community guide](https://steamcommunity.com/sharedfiles/filedetails/?id=3406497378), or
