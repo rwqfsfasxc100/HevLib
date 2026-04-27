@@ -7,7 +7,7 @@ var actionDict = {}
 
 var actionTypes = []
 
-var current_key_inputs = []
+var current_key_inputs = PoolIntArray([])
 var current_joy_strength = {}
 
 var is_active_window = true
