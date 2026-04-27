@@ -4177,7 +4177,33 @@ class _Keymapping:
 						ie.axis = s
 						InputMap.action_add_event(action,ie)
 			else:
-				breakpoint
+				var scans = []
+				for sc in ev:
+					scans.append(__string_to_scancode(sc,true))
+				for scan in scans:
+					match scan[1]:
+						0:
+							var ie = InputEventKey.new()
+							var s = scan[0]
+							ie.scancode = s
+							ie.physical_scancode = s
+							InputMap.action_add_event(action,ie)
+						1:
+							var ie = InputEventMouseButton.new()
+							var s = scan[0] - 10000
+							ie.button_index = s
+							InputMap.action_add_event(action,ie)
+						2:
+							var ie = InputEventJoypadButton.new()
+							var s = scan[0] - 11000
+							ie.button_index = s
+							InputMap.action_add_event(action,ie)
+						3:
+							var ie = InputEventJoypadMotion.new()
+							var s = scan[0] - (12000 * sign(scan[0]))
+							ie.axis = s
+							InputMap.action_add_event(action,ie)
+					breakpoint
 	
 	
 	
