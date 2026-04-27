@@ -1,3 +1,8 @@
+[1.13.10]
+
+1="* Improved efficiency of fetching config entries"
+2="* Github fetcher menu now only shows the github api call error when the menu is visible"
+
 [1.13.9]
 
 1="* Pointers script now no longer requires a hyper-specific component load order"
