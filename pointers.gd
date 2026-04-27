@@ -213,7 +213,9 @@ class _Bitwise:
 		return (bits & flag) != 0
 	
 	func __set_bit(bits:int,bit:int,how:bool) -> int:
-		return bits | int(how) << (bit - 1)
+		if how:
+			return bits | 1 << (bit - 1)
+		return bits & ~1 << (bit - 1)
 	
 	
 	
