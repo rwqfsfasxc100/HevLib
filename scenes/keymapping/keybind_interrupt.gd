@@ -72,11 +72,6 @@ func _input(event):
 
 var bit_index = 0
 
-func get_bit(bits:int,flag:int) -> bool:
-	return (bits & flag) != 0
-
-func set_bit(bits:int,bit:int,how:bool) -> int:
-	return bits | int(how) << bit
 
 func handle_raw_inputs(event):
 	var m = false
