@@ -99,7 +99,6 @@ func handle_raw_inputs(event):
 			current_key_inputs.erase(scancode)
 			bit_index = bit_index ^ scancode
 	
-	
 	if event is InputEventJoypadMotion:
 		m = true
 		var av = event.axis_value
