@@ -3,35 +3,18 @@ extends Node
 const ALLOW_KEYBIND_MODIFICATIONS = ! true
 var INPUT_DRIVER_ACTIVE = true
 
-var actionDict = {}
-
-var actionTypes = []
-
 var current_key_inputs = PoolIntArray([])
 var current_joy_strength = {}
 
 var is_active_window = true
 
-var single_input_actions = {}
-
-var deadzones = {}
-
-var key_codes = load("res://HevLib/scenes/keymapping/data/key_events.gd").get_script_constant_map()
-
 onready var vanilla_binds = Settings.cfg.input
-onready var key_events = key_codes["KEYS"]
-onready var mouse_button_events = key_codes["MOUSEBUTTONS"]
-onready var joy_button_events = key_codes["JOYBUTTONS"]
-onready var joy_axis_events = key_codes["JOYAXES"]
-onready var adjustments = key_codes["ADJUSTMENT"]
+onready var adjustments = load("res://HevLib/scenes/keymapping/data/key_adjustments.gd").ADJUSTMENT.duplicate(true)
 
-var overrides = load("res://HevLib/scenes/keymapping/data/overrides.gd").get_script_constant_map()
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 
 
 onready var compiler = preload("res://HevLib/scenes/keymapping/compile_keymap.gd").new(pointers)
-
-var old_actions = []
 
 var keybind_folder = "user://cache/.HevLib_Cache/Keybinds/"
 var vanilla_binds_file = "user://cfg/Vanilla_Binds.cfg"
@@ -69,27 +52,6 @@ func _ready():
 		compile()
 		pointers.ConfigDriver.__establish_connection("compile",self,"input")
 		
-#		var v = InputEventKey.new()
-#		v.scancode = OS.find_scancode_from_string("F10")
-#		InputMap.action_add_event("debugger",v)
-#	InputMap.add_action("ACT1")
-#	InputMap.add_action("ACT2")
-#	var v = InputEventKey.new()
-#	v.scancode = OS.find_scancode_from_string("F7")
-#	InputMap.action_add_event("ACT1",v)
-#	var v1 = InputEventKey.new()
-#	v1.scancode = OS.find_scancode_from_string("F7")
-#	InputMap.action_add_event("ACT2",v1)
-
-func compile_old():
-	var active_script = compiler.compile_keymap()
-	file.open(keybind_folder + "handle_input.gd",File.WRITE)
-	file.store_string(active_script)
-	file.close()
-	input_handle = null
-	
-	input_handle = ResourceLoader.load(keybind_folder + "handle_input.gd","",true).new(pointers)
-
 func compile():
 	var active_script = compiler.compile_keymap()
 	input_handle = null
@@ -102,59 +64,13 @@ func _physics_process(delta):
 		if not is_active_window:
 			current_key_inputs.clear()
 			bit_index = 0
-			scancode_order.clear()
 
 func _input(event):
 	if handle_raw_inputs(event):
 		Debug.l("Current Index: " + str(current_key_inputs))
 		input_handle.handle_input(current_key_inputs, event)
 
-#	if event.is_action("ACT1") and event.is_action("ACT2"):
-#		breakpoint
-#	if ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE:
-#		event.set_script(load("res://HevLib/scenes/keymapping/data/inject.gd"))
-#			event.checker = true
-#			get_tree().set_input_as_handled()
-		
-#		if ("W" in current_key_inputs):
-#			if "Shift" in current_key_inputs:
-#				Input.action_press("autopilot_up")
-#				if Input.is_action_pressed("ship_forward"):
-#					Input.action_release("ship_forward")
-#			else:
-#				Input.action_press("ship_forward")
-#				if Input.is_action_pressed("autopilot_up"):
-#					Input.action_release("autopilot_up")
-#		else:
-#			if Input.is_action_pressed("ship_forward"):
-#				Input.action_release("ship_forward")
-#			if Input.is_action_pressed("autopilot_up"):
-#				Input.action_release("autopilot_up")
-		
-		
-#		var t1 = OS.get_ticks_usec()
-#		bit_index = bit_index | 12
-#		var a = bit_index
-#		bit_index = bit_index | 16
-#		var b = bit_index
-#		var s = bit_index & 12 == 12
-#		var h = bit_index & 14 == 14
-#		bit_index = bit_index | 14
-#		var b2 = bit_index
-#		var h2 = bit_index & 14 == 14
-#
-#		bit_index = bit_index ^ 12
-#		var c = bit_index
-#		bit_index = bit_index ^ 16
-#		var d = bit_index
-#		var t2 = OS.get_ticks_usec()
-#		var time = t2-t1
-		
-		
-		
-
 var bit_index = 0
-var scancode_order = PoolIntArray([])
 
 func handle_raw_inputs(event):
 	var m = false
@@ -211,69 +127,3 @@ func handle_raw_inputs(event):
 			bit_index = bit_index ^ scancode
 	
 	return m
-
-func get_event_str(event):
-	var string = ""
-	if event is InputEventKey:
-		if event.scancode != 0:
-			string = OS.get_scancode_string(event.scancode)
-		elif event.physical_scancode != 0:
-			string = OS.get_scancode_string(event.physical_scancode)
-	if event is InputEventMouseButton:
-		string = "Mouse " + str(event.button_index)
-	
-	if event is InputEventJoypadMotion:
-		var av = event.axis_value
-		var sv = sign(av)
-		string = "JoyAxis " + str(event.axis * sv)
-	
-	if event is InputEventJoypadButton:
-		string = "JoyButton " + str(event.button_index)
-	return string
-
-func handle_string_inputs(event):
-	var t1 = OS.get_ticks_usec()
-	if event is InputEventKey:
-		var string = ""
-		if event.scancode != 0:
-			string = OS.get_scancode_string(event.scancode)
-		elif event.physical_scancode != 0:
-			string = OS.get_scancode_string(event.physical_scancode)
-		if !event.echo:
-			if event.pressed and not string in current_key_inputs:
-				current_key_inputs.append(string)
-			elif string in current_key_inputs:
-				current_key_inputs.erase(string)
-	
-	if event is InputEventMouseButton:
-		var string = "Mouse " + str(event.button_index)
-		if event.pressed and not string in current_key_inputs:
-			current_key_inputs.append(string)
-		elif string in current_key_inputs:
-			current_key_inputs.erase(string)
-	
-	
-	if event is InputEventJoypadMotion:
-		var av = event.axis_value
-		var sv = sign(av)
-		var string = "JoyAxis " + str(event.axis * sv)
-		var strength = stepify(av * sv,0.05)
-		if strength > 0.095 and (not string in current_key_inputs or (string in current_joy_strength and current_joy_strength[string] != strength)):
-			current_key_inputs.append(string)
-			current_joy_strength[string] = strength
-		elif string in current_key_inputs:
-			current_key_inputs.erase(string)
-			current_joy_strength.erase(string)
-	
-	if event is InputEventJoypadButton:
-		var string = "JoyButton " + str(event.button_index)
-		if event.pressed and not string in current_key_inputs:
-			current_key_inputs.append(string)
-		elif string in current_key_inputs:
-			current_key_inputs.erase(string)
-	
-	var t2 = OS.get_ticks_usec()
-	var diff = t2-t1
-	
-	Debug.l(str(current_key_inputs) + " in " + str(diff))
-
