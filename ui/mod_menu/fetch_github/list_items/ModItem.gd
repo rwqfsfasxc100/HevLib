@@ -124,7 +124,8 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 				this_zip_url = data.get("browser_download_url")
 				list.btn_to_download.disabled = false
 			else:
-				list.unavailable_mod()
+				if is_visible_in_tree():
+					list.unavailable_mod()
 				Tool.remove(self)
 				list.btn_to_download.disabled = true
 
