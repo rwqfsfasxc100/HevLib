@@ -13,7 +13,7 @@ var keybinds = keybind_folder + "defined_control_configs.json"
 var vanilla = keybind_folder + "vanilla_binds.json"
 
 # Code prefabs
-var script_header = "extends Reference\n\nfunc __get_bit(bits:int,flag:int) -> bool:\n\treturn (bits & flag) != 0\nfunc __set_bit(bits:int,bit:int,how:bool) -> int:\n\tif how:\n\t\treturn bits | 1 << (bit - 1)\n\treturn bits & ~1 << (bit - 1)\n\nfunc handle_input(bits: PoolIntArray, event):\n\tpass"
+var script_header = "extends Reference\n\nfunc handle_input(bits: PoolIntArray, event):\n\tpass"
 
 var bit_size_check = "(bits.size() == %s) and "
 
