@@ -139,8 +139,6 @@ func compile_keymap():
 						handler += orderspecific_checker_end % action
 						scripting += handler
 	
-	var sorted_exclusives = {}
-	
 	# Exclusives check for true bools (i.e. E+CTRL+F: E & F is false but E+CTRL is true)
 	# Non-ordered check purely for base chars (i.e. E+CTRL+F: E & F is false, but CTRL is true)
 	
