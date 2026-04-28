@@ -1,3 +1,10 @@
+[1.13.11]
+
+1="* Reordered pointer classes to be alphabetical"
+2="* Fixed crash caused by the changelogs menu"
+3="* Added support for .png files for mod icons"
+4="* Added mod icon"
+
 [1.13.10]
 
 1="* Improved efficiency of fetching config entries"
