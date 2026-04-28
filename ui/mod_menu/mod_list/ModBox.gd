@@ -41,6 +41,8 @@ var already_pressed = false
 var submod_visibility = false
 
 func _pressed():
+	if not pointers:
+		pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	information_nodes["mod_list"].make_info_default_state()
 	
 	var has_update = false
@@ -66,12 +68,20 @@ func _pressed():
 	var ver = MOD_INFO["version_data"]["full_version_string"]
 	information_nodes["info_version"].text = TranslationServer.translate("HEVLIB_MODMENU_VERSION") % ver
 	information_nodes["info_priority"].text = TranslationServer.translate("HEVLIB_MODMENU_PRIO") % prio
-	var tex = StreamTexture.new()
+	var iconTexture = null
 	if MOD_INFO["mod_icon"]["has_icon_file"]:
-		tex.load_path = MOD_INFO["mod_icon"]["icon_path"]
+		var icon_filepath = MOD_INFO["mod_icon"]["icon_path"]
+		if icon_filepath.ends_with(".stex"):
+			var tex = StreamTexture.new()
+			tex.load_path = icon_filepath
+			iconTexture = tex
+		elif icon_filepath.ends_with(".png"):
+			iconTexture = pointers.FileAccess.__load_png(icon_filepath)
 	else:
+		var tex = StreamTexture.new()
 		tex.load_path = "res://HevLib/ui/themes/icons/missing_icon.png.stex"
-	information_nodes["info_icon"].texture = tex
+		iconTexture = tex
+	information_nodes["info_icon"].texture = iconTexture
 	var id = ""
 	if manifestData:
 		id = manifestData["mod_information"]["id"]
@@ -261,10 +271,19 @@ func _ready():
 		var pdata = children[i]
 		var panel = SubModBox.instance()
 		var pname = pdata["name"]
+		var iconTexture = null
 		if pdata["mod_icon"]["has_icon_file"]:
+			var icon_filepath = pdata["mod_icon"]["icon_path"]
+			if icon_filepath.ends_with(".stex"):
+				var tex = StreamTexture.new()
+				tex.load_path = icon_filepath
+				iconTexture = tex
+			elif icon_filepath.ends_with(".png"):
+				iconTexture = pointers.FileAccess.__load_png(icon_filepath)
+		else:
 			var tex = StreamTexture.new()
-			tex.load_path = pdata["mod_icon"]["icon_path"]
-			panel.get_node("Icon").texture = tex
+			tex.load_path = "res://HevLib/ui/themes/icons/missing_icon.png.stex"
+			iconTexture = tex
 		panel.get_node("ModButton/VBoxContainer/HBoxContainer/LABELS/NAME").text = pname
 		if pdata["manifest"]["has_manifest"]:
 			panel.get_node("ModButton/VBoxContainer/HBoxContainer/LABELS/BRIEF").text = pdata["manifest"]["manifest_data"]["mod_information"]["brief"]
@@ -350,9 +369,19 @@ func _draw():
 			prio = "INF"
 	var version_arr = MOD_INFO["version_data"]["full_version_array"]
 	var version_print = MOD_INFO["version_data"]["full_version_string"]
-	var icon = ""
+	var iconTexture = null
 	if MOD_INFO["mod_icon"]["has_icon_file"]:
-		icon = MOD_INFO["mod_icon"]["icon_path"]
+		var icon_filepath = MOD_INFO["mod_icon"]["icon_path"]
+		if icon_filepath.ends_with(".stex"):
+			var tex = StreamTexture.new()
+			tex.load_path = icon_filepath
+			iconTexture = tex
+		elif icon_filepath.ends_with(".png"):
+			iconTexture = pointers.FileAccess.__load_png(icon_filepath)
+	else:
+		var tex = StreamTexture.new()
+		tex.load_path = "res://HevLib/ui/themes/icons/missing_icon.png.stex"
+		iconTexture = tex
 	var is_library = MOD_INFO["library_information"]["is_library"]
 	var always_display = false
 	if is_library:
@@ -361,10 +390,7 @@ func _draw():
 	if is_library:
 		button_lib_icon.visible = true
 	button_label.text = mod_name
-	if icon != "":
-		var tex = StreamTexture.new()
-		tex.load_path = icon
-		icon_node.texture = tex
+	icon_node.texture = iconTexture
 	var tooltip_text = TranslationServer.translate("HEVLIB_MM_TOOLTIP_HEADER")
 
 	var md = manifest["manifest_data"]

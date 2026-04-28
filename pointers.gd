@@ -4375,6 +4375,8 @@ class _ManifestV1:
 		var hasManifest = false
 		var manifestDir = ""
 		var hasIcon = false
+		var pngDir = ""
+		var stexDir = ""
 		var iconDir = ""
 		var modData
 		var modMainPath = ""
@@ -4385,11 +4387,19 @@ class _ManifestV1:
 			if m.begins_with("mod") and m.ends_with(".manifest"):
 				hasManifest = true
 				manifestDir = modPath
-			if m.begins_with("icon") and m.ends_with(".stex"):
-				hasIcon = true
-				iconDir = modPath
+			if m.begins_with("icon"):
+				if m.ends_with(".png"):
+					hasIcon = true
+					pngDir = modPath
+				if m.ends_with(".stex"):
+					hasIcon = true
+					stexDir = modPath
 			if m.begins_with("modmain") and m.ends_with(".gd"):
 				modMainPath = modPath
+		if stexDir:
+			iconDir = stexDir
+		elif pngDir:
+			iconDir = pngDir
 		modData = __load_file(modMainPath, file, hasManifest, manifestDir, hasIcon, iconDir)
 		if split_into_array:
 			modData = modData.split("\n")
@@ -4497,6 +4507,8 @@ class _ManifestV2:
 				var manifest_data = {}
 				var manifest_version = 1
 				var has_icon_file = false
+				var png_path = ""
+				var stex_path = ""
 				var icon_path = ""
 				for file in content:
 					if file.to_lower() == "mod.manifest":
@@ -4520,9 +4532,17 @@ class _ManifestV2:
 								else:
 									stat_tags.merge({tag:1})
 						
-					if file.to_lower().begins_with("icon") and file.to_lower().ends_with(".stex"):
-						has_icon_file = true
-						icon_path = folder_path + file
+					if file.to_lower().begins_with("icon"):
+						if file.to_lower().ends_with(".png"):
+							has_icon_file = true
+							png_path = folder_path + file
+						if file.to_lower().ends_with(".stex"):
+							has_icon_file = true
+							stex_path = folder_path + file
+				if stex_path:
+					icon_path = stex_path
+				elif png_path:
+					icon_path = png_path
 				var icon_dict = {"has_icon_file":has_icon_file,"icon_path":icon_path}
 				var manifestEntry = {"has_manifest":has_mod_manifest,"manifest_version":manifest_version,"manifest_data":manifest_data}
 				var mod_version_array = [mod_version_major,mod_version_minor,mod_version_bugfix]
@@ -4702,6 +4722,8 @@ class _ManifestV2:
 		var manifest_version = 1
 		var has_icon_file = false
 		var icon_path = ""
+		var png_path = ""
+		var stex_path = ""
 		for file in content:
 			if file.to_lower() == "mod.manifest":
 				has_mod_manifest = true
@@ -4714,9 +4736,17 @@ class _ManifestV2:
 				mod_version_metadata = manifest_data["version"].get("version_metadata",mod_version_metadata)
 				mod_is_library = manifest_data["tags"].get("is_library_mod",false)
 				hide_library = manifest_data["tags"].get("library_hidden_by_default",true)
-			if file.to_lower().begins_with("icon") and file.to_lower().ends_with(".stex"):
-				has_icon_file = true
-				icon_path = folder_path + file
+				if file.to_lower().begins_with("icon"):
+					if file.to_lower().ends_with(".png"):
+						has_icon_file = true
+						png_path = folder_path + file
+					if file.to_lower().ends_with(".stex"):
+						has_icon_file = true
+						stex_path = folder_path + file
+		if stex_path:
+			icon_path = stex_path
+		elif png_path:
+			icon_path = png_path
 		var icon_dict = {"has_icon_file":has_icon_file,"icon_path":icon_path}
 		var manifestEntry = {"has_manifest":has_mod_manifest,"manifest_version":manifest_version,"manifest_data":manifest_data}
 		var mod_version_array = [mod_version_major,mod_version_minor,mod_version_bugfix]

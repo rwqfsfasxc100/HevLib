@@ -254,10 +254,19 @@ func _process(_delta):
 			var node = get_visible_mods()
 			if node.size() >= 1:
 				var ar = node[0]
-				var tex = StreamTexture.new()
-				tex.load_path = "res://HevLib/ui/themes/icons/missing_icon.png.stex"
+				var iconTexture = null
 				if ar["mod_icon"]["has_icon_file"]:
-					tex.load_path = ar["mod_icon"]["icon_path"]
+					var icon_filepath = ar["mod_icon"]["icon_path"]
+					if icon_filepath.ends_with(".stex"):
+						var tex = StreamTexture.new()
+						tex.load_path = icon_filepath
+						iconTexture = tex
+					elif icon_filepath.ends_with(".png"):
+						iconTexture = pointers.FileAccess.__load_png(icon_filepath)
+				else:
+					var tex = StreamTexture.new()
+					tex.load_path = "res://HevLib/ui/themes/icons/missing_icon.png.stex"
+					iconTexture = tex
 				get_node(info_name).text = ar["name"]
 				get_node(info_version).text = ar["version_data"]["full_version_string"]
 				get_node(info_priority).text = str(ar["priority"])
@@ -275,7 +284,7 @@ func _process(_delta):
 				get_node(info_desc_credits).parse_bbcode(credits)
 				var languages = ""
 				get_node(info_desc_languages).parse_bbcode(languages)
-				get_node(info_icon).texture = tex
+				get_node(info_icon).texture = iconTexture
 				get_node(info_settings_button).visible = true
 				get_node(info_links_button).visible = true
 				get_node(info_bugreports_button).visible = true
