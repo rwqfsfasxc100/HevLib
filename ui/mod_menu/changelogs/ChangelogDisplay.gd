@@ -13,7 +13,7 @@ func _ready():
 	if operation == "singular" and path != "":
 		rect_size = get_parent().rect_size
 		linecontainer.rect_min_size = rect_size - Vector2(0,6)
-		yield(get_tree(),"idle_frame")
+		yield(CurrentGame.get_tree(),"idle_frame")
 		parse()
 		
 		pass
@@ -22,8 +22,8 @@ var refs = []
 
 func parse():
 	if not pointers:
-		yield(get_tree(),"idle_frame")
-	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+		yield(CurrentGame.get_tree(),"idle_frame")
+	pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	var data = pointers.ManifestV2.__parse_changelogs(path)
 	var index = 1
 	for config in data:

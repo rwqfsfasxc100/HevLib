@@ -287,7 +287,7 @@ func _ready():
 	
 func installScriptExtension(path:String):
 	var childPath:String = str(modPath + path)
-	var childScript:Script = ResourceLoader.load(childPath)
+	var childScript:Script = load(childPath)
 	childScript.new()
 	var parentScript:Script = childScript.get_base_script()
 	var parentPath:String = parentScript.resource_path

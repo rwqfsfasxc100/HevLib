@@ -217,7 +217,7 @@ func _ready():
 		l("HevLib Equipment Driver onready process cannot be carried out")
 func installScriptExtension(path:String):
 	var childPath:String = str(modPath + path)
-	var childScript:Script = ResourceLoader.load(childPath)
+	var childScript:Script = load(childPath)
 
 	childScript.new()
 
