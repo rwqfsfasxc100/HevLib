@@ -299,6 +299,8 @@ func _ready():
 var ID = null
 
 func _draw():
+	if not pointers:
+		pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)
 	
 	button_lib_icon.visible = false
