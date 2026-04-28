@@ -1,9 +1,9 @@
 extends Node
 
-const ALLOW_KEYBIND_MODIFICATIONS = ! true
+const ALLOW_KEYBIND_MODIFICATIONS =  true
 var INPUT_DRIVER_ACTIVE = true
 
-var current_key_inputs = PoolIntArray([])
+var current_key_inputs = []
 var current_joy_strength = {}
 
 var is_active_window = true
@@ -32,7 +32,7 @@ func _ready():
 	if ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE:
 		var actions = InputMap.get_actions()
 		var sortedAv = pointers.Keymapping.__get_built_in_action_list()
-		var vb = pointers.FileAccess.__config_parse(vanilla_binds_file)
+		var vb = pointers.ConfigDriver.__config_parse(vanilla_binds_file)
 		file.open(keybind_folder + "defined_control_configs.json",File.READ)
 		var mb = JSON.parse(file.get_as_text()).result
 		

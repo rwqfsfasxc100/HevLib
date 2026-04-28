@@ -6,6 +6,7 @@ func _init(p):
 	pointers = p
 
 
+var control_vars = {}
 # General variables
 var file = File.new()
 var keybind_folder = "user://cache/.HevLib_Cache/Keybinds/"
@@ -33,14 +34,14 @@ var ordernonspecific_expr_part = "p%d"
 # Exclusive handlers
 
 var exclusives_check_for_input = "event.is_action_pressed(\"%s\", true)"
-
+var exclusives_variable_statement = "\n\tvar charset_%s = true"
 
 func compile_keymap():
 	var p = {}
 	file.open(vanilla,File.READ)
 	var h = JSON.parse(file.get_as_text()).result
 	file.close()
-	
+	control_vars.clear()
 	for action in h:
 		var d = h[action]
 		if not action in p:
@@ -166,10 +167,9 @@ func compile_keymap():
 			
 			for k in cKeys:
 				var d = cKeys[k].size()
-				if d <= 1:
+				if d < 2:
 					cKeys.erase(k)
-			
-			
+			var checker_vars = PoolStringArray()
 			for i in ordered:
 				var data = ordered[i]
 				var controls = data["controls"]
@@ -180,34 +180,53 @@ func compile_keymap():
 					for a in stack:
 						if a in cKeys:
 							single = false
-					if single:
-						breakpoint
+					if not single:
+						var this_checker = ""
+						var checkArr = []
+						for a in stack:
+							if this_checker:
+								this_checker += "_" + a
+							else:
+								this_checker = a
+							if not this_checker in checkArr:
+								checkArr.append(this_checker)
+						for r in checkArr:
+							if not r in checker_vars:
+								checker_vars.append(r)
+						control_vars[i] = checkArr
 					else:
-						var stack_size = stack.size()
-						
-						breakpoint
-
-			breakpoint
+						pass
 			for i in disordered:
 				var data = disordered[i]
 				var controls = data["controls"]
 				var opts = data["opts"]
 				for stack in controls:
-					
 					var single = true
 					for a in stack:
 						if a in cKeys:
 							single = false
-					if single:
-						breakpoint
+					if not single:
+						var checkArr = []
+						for a in stack:
+							if not a in checkArr:
+								checkArr.append(a)
+						for r in checkArr:
+							if not r in checker_vars:
+								checker_vars.append(r)
+						control_vars[i] = checkArr
 					else:
-						var stack_size = stack.size()
-						
-						breakpoint
-				
-				breakpoint
-			pass
+						pass
+			var var_statement_list = ""
+			for control in checker_vars:
+				var_statement_list += exclusives_variable_statement % control
+			scripting += var_statement_list
+			var ordered_control_list = control_vars.keys()
+			ordered_control_list.sort_custom(self,"sort_this_dict")
 			
+			# Controls are now sorted in order of largest input count to shortest.
+			# From here, write code that checks for inputs then disables vars as they get used
+			
+			breakpoint
 		else:
 			
 			
@@ -215,3 +234,10 @@ func compile_keymap():
 		
 	
 	return scripting
+
+func sort_this_dict(a,b) -> bool:
+	var aData = control_vars[a]
+	var bData = control_vars[b]
+	if bData.size() > aData.size():
+		return false
+	return true
