@@ -138,15 +138,14 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 						file.open(update_check_path,File.WRITE)
 						file.store_string("{}")
 						file.close()
-					var doUpdate = true
+					var noUpdate = false
 					if url in currentUpdateCache and currentUpdateCache[url] == specificLine:
-						doUpdate = false
+						noUpdate = true
 					currentUpdateCache[url] = specificLine
 					file.open(update_check_path,File.WRITE)
 					file.store_string(JSON.print(currentUpdateCache))
 					file.close()
-					if doUpdate:
-						get_downloads()
+					get_downloads(noUpdate)
 		3:
 			var data = {}
 			if result == HTTPRequest.RESULT_SUCCESS and response_code == 200:
@@ -190,15 +189,19 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 	mode += 1
 
 var base_downloads_list = "https://api.github.com/repos/%s/releases"
-func get_downloads():
-	var entry = DATA.get("full_name")
-	var downloads = base_downloads_list % [entry]
-	var c = get_releases_cache()
-	if entry in c:
+func get_downloads(noUpdate = false):
+	if noUpdate:
 		mode += 1
 		_on_HTTPRequest_request_completed(0,0,0,0)
 	else:
-		http.request(downloads)
+		var entry = DATA.get("full_name")
+		var downloads = base_downloads_list % [entry]
+		var c = get_releases_cache()
+		if entry in c:
+			mode += 1
+			_on_HTTPRequest_request_completed(0,0,0,0)
+		else:
+			http.request(downloads)
 
 func format_description(data:String):
 	var headerData = {}
