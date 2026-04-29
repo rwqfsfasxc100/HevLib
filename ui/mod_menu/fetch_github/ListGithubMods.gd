@@ -45,8 +45,8 @@ func _ready():
 	http.connect("request_completed",self,"request_complete")
 	var dt = {}
 	if file.file_exists(mod_list_cache):
-#		var fileAge = Time.get_unix_time_from_system() - file.get_modified_time(mod_list_cache)
-#		if fileAge < 24 * 3600:
+		var fileAge = Time.get_unix_time_from_system() - file.get_modified_time(mod_list_cache)
+		if fileAge < 1 * 3600:
 			file.open(mod_list_cache,File.READ)
 			dt = JSON.parse(file.get_as_text(true)).result
 			file.close()

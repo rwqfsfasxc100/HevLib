@@ -37,8 +37,8 @@ func add_mod():
 	var author_label = get_node("MOD_BUTTON/VBoxContainer/AUTHOR")
 	button.connect("pressed",self,"_pressed")
 	name_label.text = formatted_data["header_data"].get("MOD_NAME",DATA.get("name",""))
-	var githubOwner = formatted_data["header_data"].get("AUTHOR",DATA.get("owner",{}))
-	author_label.text = githubOwner.get("login","")
+	var githubOwner = DATA.get("owner",{})
+	author_label.text = formatted_data["header_data"].get("AUTHOR",githubOwner.get("login",""))
 	var avatar_path = githubOwner.get("avatar_url","")
 	user_icon_uuid = githubOwner.get("node_id")
 	unique_icon = filepath + user_icon_uuid + ".png"
