@@ -80,65 +80,10 @@ func compile_keymap():
 	
 	for action in p:
 		var data = p[action]
-		var opts = data["opts"]
-		if opts["exclusive"]:
+		if data["opts"]["exclusive"]:
 			exclusives[action] = data
 		else:
-			var keys = data["controls"]
-			for key in keys:
-				if key.size() > 1:
-					if opts["order_sensitive"]:
-						var handler = orderspecific_checker_entry % action
-						var expression = ""
-						var map = {}
-						var mx = 214748364
-						var cb = 0
-						for kv in key:
-							var sc = pointers.Keymapping.__string_to_scancode(kv)
-							map[cb] = sc
-							handler += orderspecific_part_def % [cb,sc]
-							
-							if not expression:
-								var v = "(" + orderspecific_expr_part % [cb,cb,mx-cb]
-								expression += v
-							else:
-								var v = " < " + orderspecific_expr_part % [cb,cb,mx-cb]
-								expression += v
-							cb += 1
-						expression += ")"
-						
-						if not opts["allow_extra_keys"]:
-							expression = bit_size_check % key.size() + expression
-						
-						handler += orderspecific_other_buttons_pressed % [expression,action]
-						handler += orderspecific_checker_end % action
-						scripting += handler
-					else:
-						var handler = orderspecific_checker_entry % action
-						var expression = ""
-						var map = {}
-						var mx = 214748364
-						var cb = 0
-						for kv in key:
-							var sc = pointers.Keymapping.__string_to_scancode(kv)
-							map[cb] = sc
-							handler += ordernonspecific_part_def % [cb,sc]
-							
-							if not expression:
-								var v = "(" + ordernonspecific_expr_part % cb
-								expression += v
-							else:
-								var v = " and " + ordernonspecific_expr_part % cb
-								expression += v
-							cb += 1
-						expression += ")"
-						
-						if not opts["allow_extra_keys"]:
-							expression = bit_size_check % key.size() + expression
-						
-						handler += orderspecific_other_buttons_pressed % [expression,action]
-						handler += orderspecific_checker_end % action
-						scripting += handler
+			scripting += handle_regular_controls(data,action)
 	
 	# Exclusives check for true bools (i.e. E+CTRL+F: E & F is false but E+CTRL is true)
 	# Non-ordered check purely for base chars (i.e. E+CTRL+F: E & F is false, but CTRL is true)
@@ -228,11 +173,71 @@ func compile_keymap():
 			
 			breakpoint
 		else:
-			
-			
+			var action = exclusives.keys()[0]
+			scripting += handle_regular_controls(exclusives[action],action)
 			breakpoint
 		
 	
+	return scripting
+
+func handle_regular_controls(data:Dictionary,action: String):
+	var scripting = ""
+	var keys = data["controls"]
+	var opts = data["opts"]
+	for key in keys:
+		if key.size() > 1:
+			if opts["order_sensitive"]:
+				var handler = orderspecific_checker_entry % action
+				var expression = ""
+				var map = {}
+				var mx = 214748364
+				var cb = 0
+				for kv in key:
+					var sc = pointers.Keymapping.__string_to_scancode(kv)
+					map[cb] = sc
+					handler += orderspecific_part_def % [cb,sc]
+					
+					if not expression:
+						var v = "(" + orderspecific_expr_part % [cb,cb,mx-cb]
+						expression += v
+					else:
+						var v = " < " + orderspecific_expr_part % [cb,cb,mx-cb]
+						expression += v
+					cb += 1
+				expression += ")"
+				
+				if not opts["allow_extra_keys"]:
+					expression = bit_size_check % key.size() + expression
+				
+				handler += orderspecific_other_buttons_pressed % [expression,action]
+				handler += orderspecific_checker_end % action
+				scripting += handler
+			else:
+				var handler = orderspecific_checker_entry % action
+				var expression = ""
+				var map = {}
+				var mx = 214748364
+				var cb = 0
+				for kv in key:
+					var sc = pointers.Keymapping.__string_to_scancode(kv)
+					map[cb] = sc
+					handler += ordernonspecific_part_def % [cb,sc]
+					
+					if not expression:
+						var v = "(" + ordernonspecific_expr_part % cb
+						expression += v
+					else:
+						var v = " and " + ordernonspecific_expr_part % cb
+						expression += v
+					cb += 1
+				expression += ")"
+				
+				if not opts["allow_extra_keys"]:
+					expression = bit_size_check % key.size() + expression
+				
+				handler += orderspecific_other_buttons_pressed % [expression,action]
+				handler += orderspecific_checker_end % action
+				scripting += handler
 	return scripting
 
 func sort_this_dict(a,b) -> bool:
