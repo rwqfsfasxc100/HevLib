@@ -1,3 +1,12 @@
+[1.13.12]
+
+1="* Github mod fetcher menu will now only check for mods once every hour"
+2="* Mod fetcher will now only update the download links when a new release is detected."
+2.1="* This previously used to run every time the list would be refreshed, which could cause you to run out of API credits and be unable to install updates for mods"
+3="* Added an additional header block for MOD_DETAILS.txt: AUTHOR"
+3.1="* Allows you to override the github username with a string of your choosing"
+3.2="* E.g. ;AUTHOR|__hev"
+
 [1.13.11]
 
 1="* Reordered pointer classes to be alphabetical"
