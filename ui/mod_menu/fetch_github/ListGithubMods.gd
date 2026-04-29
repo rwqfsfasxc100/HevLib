@@ -45,9 +45,11 @@ func _ready():
 	http.connect("request_completed",self,"request_complete")
 	var dt = {}
 	if file.file_exists(mod_list_cache):
-		file.open(mod_list_cache,File.READ)
-		dt = JSON.parse(file.get_as_text(true)).result
-		file.close()
+#		var fileAge = Time.get_unix_time_from_system() - file.get_modified_time(mod_list_cache)
+#		if fileAge < 24 * 3600:
+			file.open(mod_list_cache,File.READ)
+			dt = JSON.parse(file.get_as_text(true)).result
+			file.close()
 	if dt.size():
 		fill_in_mods(dt)
 	else:
@@ -58,10 +60,11 @@ func _ready():
 var mod_count = 0
 func request_complete(result, response_code, headers, body):
 	if response_code != 200:
-		file.open(mod_list_cache,File.READ)
-		var dt = JSON.parse(file.get_as_text()).result
-		file.close()
-		fill_in_mods(dt)
+		if file.file_exists(mod_list_cache):
+			file.open(mod_list_cache,File.READ)
+			var dt = JSON.parse(file.get_as_text()).result
+			file.close()
+			fill_in_mods(dt)
 	else:
 		var json = JSON.parse(body.get_string_from_utf8()).result
 		if json:
