@@ -76,12 +76,12 @@ func handle_raw_inputs(event):
 	var m = false
 	if event is InputEventKey:
 		m = true
-		var scancode = 0
-		if event.scancode != 0:
-			scancode = event.scancode
-		elif event.physical_scancode != 0:
-			scancode = event.physical_scancode
 		if !event.echo:
+			var scancode = 0
+			if event.scancode != 0:
+				scancode = event.scancode
+			elif event.physical_scancode != 0:
+				scancode = event.physical_scancode
 			if event.pressed and not scancode in current_key_inputs:
 				current_key_inputs.append(scancode)
 				bit_index = bit_index | scancode
