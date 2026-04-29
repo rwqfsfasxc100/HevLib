@@ -37,7 +37,7 @@ func add_mod():
 	var author_label = get_node("MOD_BUTTON/VBoxContainer/AUTHOR")
 	button.connect("pressed",self,"_pressed")
 	name_label.text = formatted_data["header_data"].get("MOD_NAME",DATA.get("name",""))
-	var githubOwner = DATA.get("owner",{})
+	var githubOwner = formatted_data["header_data"].get("AUTHOR",DATA.get("owner",{}))
 	author_label.text = githubOwner.get("login","")
 	var avatar_path = githubOwner.get("avatar_url","")
 	user_icon_uuid = githubOwner.get("node_id")
@@ -52,8 +52,9 @@ func add_mod():
 		else:
 			mode += 1
 			set_icon_to(unique_icon)
+			check_if_needs_update()
 	
-	get_downloads()
+	
 	
 	list.add_mod_count()
 	visible = true
@@ -62,6 +63,7 @@ var base_folder_path = "user://cache/.Mod_Menu_2_Cache/github_list/"
 var filepath = base_folder_path + "icon_cache/"
 var zip_path = base_folder_path + "downloaded_zips/"
 var releases_cache_path = base_folder_path + "releases_cache.json"
+var update_check_path = base_folder_path + "update_check_cache.json"
 var readmePath = ""
 func get_readme():
 	yield(CurrentGame.get_tree(),"idle_frame")
@@ -73,6 +75,10 @@ func get_readme():
 	
 	
 	pass
+
+func check_if_needs_update():
+	var url = DATA["html_url"] + "/releases/latest"
+	http.request(url)
 
 func finished():
 	emit_signal("done",self)
@@ -112,7 +118,36 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 			if result == HTTPRequest.RESULT_SUCCESS and response_code == 200:
 				set_icon_to(unique_icon)
 				http.download_file = ""
+			check_if_needs_update()
 		2:
+			if result == HTTPRequest.RESULT_SUCCESS and response_code == 200:
+				var data = body.get_string_from_utf8()
+				var specificLine = 0
+				var url = DATA["html_url"] + "/latest"
+				for line in data.split("\n"):
+					if "<title>" in line:
+						specificLine = hash(line)
+						break
+				if specificLine:
+					var currentUpdateCache = {}
+					if file.file_exists(update_check_path):
+						file.open(update_check_path,File.READ)
+						currentUpdateCache = JSON.parse(file.get_as_text()).result
+						file.close()
+					else:
+						file.open(update_check_path,File.WRITE)
+						file.store_string("{}")
+						file.close()
+					var doUpdate = true
+					if url in currentUpdateCache and currentUpdateCache[url] == specificLine:
+						doUpdate = false
+					currentUpdateCache[url] = specificLine
+					file.open(update_check_path,File.WRITE)
+					file.store_string(JSON.print(currentUpdateCache))
+					file.close()
+					if doUpdate:
+						get_downloads()
+		3:
 			var data = {}
 			if result == HTTPRequest.RESULT_SUCCESS and response_code == 200:
 				data = JSON.parse(body.get_string_from_utf8()).result[0]["assets"][0]
@@ -129,7 +164,7 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 				Tool.remove(self)
 				list.btn_to_download.disabled = true
 
-		3:
+		4:
 			if result == HTTPRequest.RESULT_SUCCESS and response_code == 200:
 				
 				if "header_data" in formatted_data and "MOD_ZIP_NAME" in formatted_data["header_data"]:
@@ -228,11 +263,18 @@ func get_releases_cache():
 	var data = {}
 	if file.file_exists(releases_cache_path):
 		file.open(releases_cache_path,File.READ)
-		data = JSON.parse(file.get_as_text()).result
+		var text = file.get_as_text()
 		file.close()
-		var fn = DATA.get("full_name")
-		if fn in data:
-			out = data[fn]
+		if text:
+			data = JSON.parse(text).result
+			if data:
+				var fn = DATA.get("full_name")
+				if fn in data:
+					out = data[fn]
+			else:
+				file.open(releases_cache_path,File.WRITE)
+				file.store_string("{}")
+				file.close()
 	return out
 
 func _tree_entered():
