@@ -1,3 +1,7 @@
+[1.13.13]
+
+1="* Fixed issue where mods not already in the releases cache would trigger the API limit popup and prevent new mods from being downloaded at all"
+
 [1.13.12]
 
 1="* Github mod fetcher menu will now only check for mods once every hour"
