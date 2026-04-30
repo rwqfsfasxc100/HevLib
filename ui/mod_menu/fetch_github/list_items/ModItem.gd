@@ -139,8 +139,19 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 						file.store_string("{}")
 						file.close()
 					var noUpdate = false
-					if url in currentUpdateCache and currentUpdateCache[url] == specificLine:
-						noUpdate = true
+					var checkUpdate = true
+					var rcache = {}
+					if file.file_exists(releases_cache_path):
+						file.open(releases_cache_path,File.READ)
+						rcache = JSON.parse(file.get_as_text()).result
+						file.close()
+					else:
+						checkUpdate = false
+					if not DATA.get("full_name") in rcache:
+						checkUpdate = false
+					if checkUpdate:
+						if url in currentUpdateCache and currentUpdateCache[url] == specificLine:
+							noUpdate = true
 					currentUpdateCache[url] = specificLine
 					file.open(update_check_path,File.WRITE)
 					file.store_string(JSON.print(currentUpdateCache))

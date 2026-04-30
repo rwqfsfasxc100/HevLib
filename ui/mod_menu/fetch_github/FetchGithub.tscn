@@ -231,7 +231,7 @@ script = ExtResource( 8 )
 [node name="Unavailable" type="AcceptDialog" parent="."]
 margin_right = 118.0
 margin_bottom = 104.0
-rect_min_size = Vector2( 500, 500 )
+rect_min_size = Vector2( 500, 400 )
 dialog_text = "MODMENU_MOD_UNAVAILABLE"
 dialog_autowrap = true
 
