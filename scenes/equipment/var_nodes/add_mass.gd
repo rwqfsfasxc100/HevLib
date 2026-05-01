@@ -3,7 +3,7 @@ extends Node2D
 export  var systemName = "SYSTEM_HEVLIB_INTERNALS_NODE"
 export  var slot = ""
 export  var slotName = ""
-export (int) var mass = 0
+#export (int) var mass = 0
 
 var power = 0.0
 
