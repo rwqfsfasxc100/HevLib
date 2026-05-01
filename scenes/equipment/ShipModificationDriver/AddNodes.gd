@@ -10,7 +10,7 @@ var processed_ship_register = {}
 var processed_ship_modify = {}
 var processed_ship_numerics_modifications = {}
 
-var file = File.new()
+
 
 var pointers
 func _enter_tree():
@@ -269,7 +269,7 @@ func make_node_mods():
 
 
 func nodeModify():
-	
+	var file = File.new()
 	file.open(ship_node_modify_file,File.READ)
 	var modify_data = JSON.parse(file.get_as_text()).result
 	file.close()
