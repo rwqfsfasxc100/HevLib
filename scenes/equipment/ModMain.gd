@@ -59,39 +59,12 @@ func _init(modLoader = ModLoader):
 		var injector = load("res://HevLib/scripts/translations/inject_translations.gd")
 		injector.inject_translations(pointers)
 		
-#		var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
-#		var folder = pointers.FolderAccess.__fetch_folder_files(cache_dir,true,true)
-#		for dcv in folder:
-#			if dcv != checksum:
-#				pointers.FolderAccess.__recursive_delete(dcv)
 		d.make_dir_recursive(ship_driver_path)
 		var ml = MainLoop.new()
 		ml.set_script(load("res://HevLib/scripts/crash_handler.gd"))
 		_savedObjects.append(ml)
 		
 		
-#		var drivers = pointers.DriverManagement.__get_drivers()
-#		var ship_driver = {}
-#		var register_driver = {}
-#
-#		# move this handle to make upgrades scene
-#		for mod in drivers:
-#			var data = mod["drivers"]
-#			var id = mod.get("id",null)
-#			if id:
-#				if "ADD_SHIPS.gd" in data:
-#					var driver = data["ADD_SHIPS.gd"]
-#					ship_driver[id] = driver
-#				if "REGISTER_SHIP_NUMERICS.gd" in data:
-#					var driver = data["REGISTER_SHIP_NUMERICS.gd"]
-#					register_driver[id] = driver
-#		f.open(ship_driver_path + "driver_data.json",File.WRITE)
-#		f.store_string(JSON.print(ship_driver))
-#		f.close()
-#
-#		f.open(ship_driver_path + "register_data.json",File.WRITE)
-#		f.store_string(JSON.print(register_driver))
-#		f.close()
 		
 		installScriptExtension("../notification_driver/CurrentGame.gd")
 		if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk"):
@@ -108,26 +81,11 @@ func _init(modLoader = ModLoader):
 		var minerals = load("res://HevLib/scenes/minerals/make_mineral_scripting.gd")
 		minerals.make_mineral_scripting(pointers,self)
 
-#		var asteroids = ResourceLoader.load(asteroid_path)
-#		asteroids.new()
-#		asteroids.take_over_path("res://AsteroidSpawner.gd")
-#		_savedObjects.append(asteroids)
-#
-#		var cg = ResourceLoader.load(currentgame_path)
-#		cg.new()
-#		cg.take_over_path("res://CurrentGame.gd")
-#		_savedObjects.append(cg)
-
 		replaceScene("../../events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn")
 		# Adds in_hevlib_menu to the CurrentGame script and preventing controls while it's true
 		installScriptExtension("../../events/controls/CurrentGame.gd")
 		installScriptExtension("../../events/controls/ship-ctrl.gd")
 		installScriptExtension("../../scripts/Namer.gd")
-
-#		installScriptExtension("check.gd")
-#		installScriptExtension("../scene_replacements/blanks/MPU.gd")
-#		installScriptExtension("../scene_replacements/blanks/Hud.gd")
-#		installScriptExtension("../scene_replacements/ship-ctrl.gd")
 
 		installScriptExtension("ThrusterSlot.gd")
 		installScriptExtension("SystemShipUpgradeUI.gd")
@@ -136,16 +94,10 @@ func _init(modLoader = ModLoader):
 
 		installScriptExtension("../weaponslot/weapon_slot_handler.gd")
 
-		installScriptExtension("ShipModificationDriver/InternalStorageMod.gd")
 		installScriptExtension("ShipModificationDriver/AddNodes.gd")
+		installScriptExtension("ShipModificationDriver/InternalStorageMod.gd")
 
 		installScriptExtension("../better_title_screen/SaveSlotButton.gd")
-#		replaceScene("../better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
-
-#		Equipment.__make_upgrades_scene()
-#		var ws = load(weaponslot_path)
-#		ws.take_over_path("res://weapons/WeaponSlot.tscn")
-#		_savedObjects.append(ws)
 		
 	else:
 		l("Folder structure not correct, exiting HevLib load")

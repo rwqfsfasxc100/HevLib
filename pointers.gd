@@ -1810,6 +1810,7 @@ class _Equipment:
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order_relative.json",
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/modify_ship_numerics.json",
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/namer.json",
+			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_systems.json",
 			
 		]
 		
@@ -1836,6 +1837,7 @@ class _Equipment:
 		var slot_order_relative_store = FILE_PATHS[20]
 		var modify_ship_numerics_store = FILE_PATHS[21]
 		var namer_store = FILE_PATHS[22]
+		var processed_storage_systems_file = FILE_PATHS[23]
 		
 		
 		version = pointers.DataFormat.__get_vanilla_version()
@@ -1896,6 +1898,9 @@ class _Equipment:
 		file.store_string("[]")
 		file.close()
 		file.open(processed_storage_file,File.WRITE)
+		file.store_string("{}")
+		file.close()
+		file.open(processed_storage_systems_file,File.WRITE)
 		file.store_string("[]")
 		file.close()
 		file.open(node_definitions_file,File.WRITE)
@@ -1954,7 +1959,7 @@ class _Equipment:
 			"SLOT_ORDER":[],
 			"SLOT_TAGS":[],
 			"AUX_POWER_AND_THRUSTERS":[],
-			"MODIFY_INTERNALS":[],
+			"MODIFY_INTERNALS":{},
 			"NODE_DEFINITIONS":[],
 			"SHIP_NODE_REGISTER":[],
 			"SHIP_NODE_MODIFY":{},
@@ -1970,6 +1975,8 @@ class _Equipment:
 			"SLOT_ORDER_RELATIVE":{},
 			
 		}
+		
+		var nodemodify_system_name_registers = []
 		
 		var wsmtpls = ws_default_templates.get("TEMPLATES",{})
 		for i in wsmtpls:
@@ -2299,17 +2306,86 @@ class _Equipment:
 								driver_store["AUX_POWER_AND_THRUSTERS"].append(equipment.duplicate(true))
 
 					"MODIFY_INTERNALS.gd":
-						file.open(processed_storage_file,File.READ)
-						var pfdata = JSON.parse(file.get_as_text()).result
-						file.close()
 						if "MODIFY_INTERNALS" in constants:
-							
 							var pdata = constants.MODIFY_INTERNALS
-							pfdata.append_array(pdata)
-							driver_store["MODIFY_INTERNALS"].append_array(pdata.duplicate(true))
+							
+							file.open(processed_storage_file,File.READ)
+							var pfdata = JSON.parse(file.get_as_text()).result
+							file.close()
+							file.open(processed_storage_systems_file,File.READ)
+							var sysNames = JSON.parse(file.get_as_text()).result
+							file.close()
+							for item in pdata:
+								var listingSystemName = item.get("system","SYSTEM_MISSING_NAME")
+								if not listingSystemName in sysNames:
+									sysNames.append(listingSystemName)
+								if not listingSystemName in pfdata:
+									pfdata[listingSystemName] = {}
+								var ls = pfdata[listingSystemName] 
+								
+								ls["minimum_ammo_utilization_for_reduction"] = item.get("minimum_ammo_utilization_for_reduction",ls.get("minimum_ammo_utilization_for_reduction",0.0))
+								ls["minimum_nano_utilization_for_reduction"] = item.get("minimum_nano_utilization_for_reduction",ls.get("minimum_nano_utilization_for_reduction",0.0))
+								ls["minimum_propellant_utilization_for_reduction"] = item.get("minimum_propellant_utilization_for_reduction",ls.get("minimum_propellant_utilization_for_reduction",0.0))
+								
+								
+								for data in item:
+									match data:
+										"emp_shielding","nano_speed_add","ammo_speed_add","mass_per_tonne_storage_added","mass_per_tonne_total_storage_added","storage_flat","crew_morale","mass","mass_per_crew_member","mass_per_tonne_of_processed_ore":
+											ls[data] = item[data] + ls.get(data,0.0)
+										"storage_ammo","storage_ammunition":
+											ls["storage_ammo"] = item[data] + ls.get("storage_ammo",0.0)
+										"storage_nano","storage_nanodrones":
+											ls["storage_nano"] = item[data] + ls.get("storage_nano",0.0)
+										"storage_propellant","storage_prop":
+											ls["storage_propellant"] = item[data] + ls.get("storage_propellant",0.0)
+										"force_type":
+											ls["force_type"] = item["force_type"]
+										"crew_count":
+											ls[data] = item[data] + ls.get(data,0)
+										"display_system":
+											if not "display_system" in ls:
+												ls["display_system"] = {
+													"name":"",
+													"can_display_multiple":false,
+													"power":0.0,
+													"status":100.0,
+													"affect_inspection":false
+												}
+											var val = item["display_system"]
+											if "name" in val:
+												ls["display_system"]["name"] = val.get("name","")
+											if "can_display_multiple" in val:
+												ls["display_system"]["can_display_multiple"] = val.get("can_display_multiple",false)
+											if "status" in val:
+												ls["display_system"]["status"] = val.get("status",100.0)
+											if "power" in val:
+												ls["display_system"]["power"] = val.get("power",0.0)
+											if "affect_inspection" in val:
+												ls["display_system"]["affect_inspection"] = val.get("affect_inspection",false)
+								if "storage_multi_upper" in item or "storage_multi_lower" in item:
+									ls["storage_multi"] = float(item.get("storage_multi_upper",1.0))/float(item.get("storage_multi_lower",1.0)) * ls.get("storage_multi",1.0)
+								if "ammo_multi_upper" in item or "ammo_multi_lower" in item:
+									ls["ammo_multi"] = float(item.get("ammo_multi_upper",1.0))/float(item.get("ammo_multi_lower",1.0)) * ls.get("ammo_multi",1.0)
+								if "nano_multi_upper" in item or "nano_multi_lower" in item:
+									ls["nano_multi"] = float(item.get("nano_multi_upper",1.0))/float(item.get("nano_multi_lower",1.0)) * ls.get("nano_multi",1.0)
+								if "propellant_multi_upper" in item or "propellant_multi_lower" in item:
+									ls["propellant_multi"] = float(item.get("propellant_multi_upper",1.0))/float(item.get("propellant_multi_lower",1.0)) * ls.get("propellant_multi",1.0)
+								if "mass_multi_upper" in item or "mass_multi_lower" in item:
+									ls["mass_multi"] = float(item.get("mass_multi_upper",1.0))/float(item.get("mass_multi_lower",1.0)) * ls.get("mass_multi",1.0)
+								if "ammo_speed_multi_upper" in item or "ammo_speed_multi_lower" in item:
+									ls["ammo_speed_multi"] = float(item.get("ammo_speed_multi_upper",1.0))/float(item.get("ammo_speed_multi_lower",1.0)) * ls.get("ammo_speed_multi",1.0)
+								if "nano_speed_multi_upper" in item or "nano_speed_multi_lower" in item:
+									ls["nano_speed_multi"] = float(item.get("nano_speed_multi_upper",1.0))/float(item.get("nano_speed_multi_lower",1.0)) * ls.get("nano_speed_multi",1.0)
+								if "emp_scale_multi_upper" in item or "emp_scale_multi_lower" in item:
+									ls["emp_scale_multi"] = float(item.get("emp_scale_multi_upper",1.0))/float(item.get("emp_scale_multi_lower",1.0)) * ls.get("emp_scale_multi",1.0)
+								
+								driver_store["MODIFY_INTERNALS"][listingSystemName] = ls.duplicate(true)
 							file.open(processed_storage_file,File.WRITE)
 							file.store_string(JSON.print(pfdata))
-						file.close()
+							file.close()
+							file.open(processed_storage_systems_file,File.WRITE)
+							file.store_string(JSON.print(sysNames))
+							file.close()
 					"NODE_DEFINITIONS.gd":
 						file.open(node_definitions_file,File.READ)
 						var pfdata = JSON.parse(file.get_as_text()).result

@@ -1,3 +1,17 @@
+[1.13.14]
+
+1="* Changing ship mass through MODIFY_INTERNALS.gd now no longer requires specific ship setups to apply"
+1.1="* This change removes the need for the Internal System Mod Handle system"
+1.2="* Also removes the need for the show_modifier_system entry for MODIFY_INTERNALS to hide said system object"
+2="* Non-player ships can now make use of MODIFY_INTERNALS changes"
+3="* The ship information panel at Enceladus's equipment now will aknowledge MODIFY_INTERNALS changes"
+4="* mass_per_processed_tonne now will no longer add 1/6 and 6 times the expected mass for divided or amorphic/mono processed holds"
+5="* MODIFY_INTERNALS data is now compiled and cached at runtime. This not only makes the checks for non-player ships more efficient, but also speeds up regular loading of a ship"
+5.1="* Note: this may change the order of operations of the modifications. Check the processed ship systems json file in the cache to observe the compiled order"
+6="* Added mass_per_tonne_storage_added as a possible MODIFY_INTERNALS operand"
+6.1="* Similar to mass_per_tonne_total_storage_added, instead only based on storage modified by the same equipment object"
+7="* Adjusted the calculations for multiplicative operands for MODIFY_INTERNALS to improve their reliability"
+
 [1.13.13]
 
 1="* Fixed issue where mods not already in the releases cache would trigger the API limit popup and prevent new mods from being downloaded at all"
