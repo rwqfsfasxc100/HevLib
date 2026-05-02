@@ -888,12 +888,11 @@ class _ConfigDriver:
 			return false
 		return false
 	
-	var _file = File.new()
-	func __config_parse(file: String) -> Dictionary:
+	func __config_parse(file_path: String) -> Dictionary:
 		var cfg = ConfigFile.new()
-		_file.open(file,File.READ)
-		var txt = _file.get_as_text()
-		_file.close()
+		file.open(file_path,File.READ)
+		var txt = file.get_as_text()
+		file.close()
 		cfg.parse(txt)
 		var cfg_sections = cfg.get_sections()
 		var cfg_dictionary = {}
@@ -3664,31 +3663,77 @@ class _FileAccess:
 	func _init(f):
 		pointers = f
 	
-	var _file = File.new()
-	func __get_file_content(file: String) -> String:
-		_file.open(file, File.READ)
-		var s = _file.get_as_text()
-		_file.close()
+	var dir = Directory.new()
+	var file = File.new()
+	func __get_file_content(file_path: String) -> String:
+		file.open(file_path, File.READ)
+		var s = file.get_as_text()
+		file.close()
 		return s
 	
 	
 	
-	func __copy_file(file, folder):
-		var prepfile = ProjectSettings.localize_path(file)
+	func __copy_file(file_path, folder):
+		var prepfile = ProjectSettings.localize_path(file_path)
 		var fn = prepfile.split("/")[prepfile.split("/").size() - 1]
-		
-		var dir = Directory.new()
 		dir.copy(prepfile,folder + "/" + fn)
 	
 	func __load_png(path) -> Texture:
-		_file.open(path, File.READ)
-		var bytes = _file.get_buffer(_file.get_len())
+		file.open(path, File.READ)
+		var bytes = file.get_buffer(file.get_len())
 		var img = Image.new()
 		var data = img.load_png_from_buffer(bytes)
 		var imgtex = ImageTexture.new()
 		imgtex.create_from_image(img)
-		_file.close()
+		file.close()
 		return imgtex
+	
+	var updateCacheDir = "user://cache/.Mod_Menu_2_Cache/updates"
+	var updateCacheFile = updateCacheDir + "/mods_to_update.json"
+	var modCacheDir = updateCacheDir + "/zip_cache"
+	func __precache_mod_file(filepath:String):
+		filepath = ProjectSettings.localize_path(filepath)
+		pointers.FolderAccess.__check_folder_exists(modCacheDir)
+		var modDir = filepath.get_base_dir()
+		if modDir != modCacheDir:
+			__copy_file(filepath,modCacheDir)
+			filepath = modCacheDir + filepath.split(modDir)[1]
+		var cache = []
+		if file.file_exists(updateCacheFile):
+			file.open(updateCacheFile,File.READ)
+			cache = JSON.parse(file.get_as_text()).result
+			file.close()
+		if not filepath in cache:
+			cache.append(filepath)
+		file.open(updateCacheFile,File.WRITE)
+		file.store_string(JSON.print(cache))
+		file.close()
+	
+	func __load_precached_mods():
+		var gameInstallDirectory = OS.get_executable_path().get_base_dir()
+		if OS.get_name() == "OSX":
+			gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
+		var modPathPrefix = gameInstallDirectory.plus_file("mods")
+		if file.file_exists(updateCacheFile):
+			file.open(updateCacheFile,File.READ)
+			var files_to_copy = JSON.parse(file.get_as_text()).result
+			file.close()
+			var reboot = false
+			for mod in files_to_copy:
+				if file.file_exists(mod):
+					__copy_file(mod,modPathPrefix)
+					reboot = true
+			file.open(updateCacheFile,File.WRITE)
+			file.store_string("[]")
+			file.close()
+			if reboot:
+				var path = OS.get_executable_path()
+				var args = OS.get_cmdline_args()
+				var pid = OS.execute(path, args, false)
+				OS.kill(OS.get_process_id())
+	
+	
+	
 	
 	
 	
