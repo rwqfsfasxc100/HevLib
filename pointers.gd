@@ -3676,7 +3676,7 @@ class _FileAccess:
 	func __copy_file(file_path, folder):
 		var prepfile = ProjectSettings.localize_path(file_path)
 		var fn = prepfile.split("/")[prepfile.split("/").size() - 1]
-		dir.copy(prepfile,folder + "/" + fn)
+		return dir.copy(prepfile,folder + "/" + fn)
 	
 	func __load_png(path) -> Texture:
 		file.open(path, File.READ)
@@ -3691,23 +3691,28 @@ class _FileAccess:
 	var updateCacheDir = "user://cache/.Mod_Menu_2_Cache/updates"
 	var updateCacheFile = updateCacheDir + "/mods_to_update.json"
 	var modCacheDir = updateCacheDir + "/zip_cache"
+	var has_updated_store = updateCacheDir + "/has_updated.txt"
 	func __precache_mod_file(filepath:String):
 		filepath = ProjectSettings.localize_path(filepath)
 		pointers.FolderAccess.__check_folder_exists(modCacheDir)
-		var modDir = filepath.get_base_dir()
-		if modDir != modCacheDir:
-			__copy_file(filepath,modCacheDir)
-			filepath = modCacheDir + filepath.split(modDir)[1]
-		var cache = []
-		if file.file_exists(updateCacheFile):
-			file.open(updateCacheFile,File.READ)
-			cache = JSON.parse(file.get_as_text()).result
+		if file.file_exists(filepath):
+			var exists = OK
+			var modDir = filepath.get_base_dir()
+			if modDir != modCacheDir:
+				exists = __copy_file(filepath,modCacheDir)
+				filepath = modCacheDir + filepath.split(modDir)[1]
+			var cache = []
+			if file.file_exists(updateCacheFile):
+				cache = JSON.parse(__get_file_content(updateCacheFile)).result
+			if not filepath in cache:
+				cache.append(filepath)
+			file.open(updateCacheFile,File.WRITE)
+			file.store_string(JSON.print(cache))
 			file.close()
-		if not filepath in cache:
-			cache.append(filepath)
-		file.open(updateCacheFile,File.WRITE)
-		file.store_string(JSON.print(cache))
-		file.close()
+			if exists == OK:
+				file.open(has_updated_store,File.WRITE)
+				file.store_string("1")
+				file.close()
 	
 	func __load_precached_mods():
 		var gameInstallDirectory = OS.get_executable_path().get_base_dir()
@@ -3715,18 +3720,17 @@ class _FileAccess:
 			gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
 		var modPathPrefix = gameInstallDirectory.plus_file("mods")
 		if file.file_exists(updateCacheFile):
-			file.open(updateCacheFile,File.READ)
-			var files_to_copy = JSON.parse(file.get_as_text()).result
-			file.close()
-			var reboot = false
+			var files_to_copy = JSON.parse(__get_file_content(updateCacheFile)).result
+			var reboot = FAILED
 			for mod in files_to_copy:
 				if file.file_exists(mod):
-					__copy_file(mod,modPathPrefix)
-					reboot = true
+					var check = __copy_file(mod,modPathPrefix)
+					if check == OK:
+						reboot = OK
 			file.open(updateCacheFile,File.WRITE)
 			file.store_string("[]")
 			file.close()
-			if reboot:
+			if reboot == OK:
 				var path = OS.get_executable_path()
 				var args = OS.get_cmdline_args()
 				var pid = OS.execute(path, args, false)

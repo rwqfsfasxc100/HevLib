@@ -382,12 +382,6 @@ func updates_started():
 		OS.shell_open(nexus + "?tab=files")
 	
 	get_node("../../../../../../WAIT").popup_centered()
-var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
-
-
-
-
-
 
 #const FileAccess = preload("res://HevLib/pointers/FileAccess.gd")
 func _downloaded_zip(file, filepath):
@@ -401,9 +395,6 @@ func _downloaded_zip(file, filepath):
 		data.erase(currently_selected_mod_id)
 	fi.open(update_store,File.WRITE)
 	fi.store_string(JSON.print(data))
-	fi.close()
-	fi.open(has_updated_store,File.WRITE)
-	fi.store_string("1")
 	fi.close()
 	subroot.restart_menu.popup_centered()
 	pointers.FileAccess.__precache_mod_file(filepath)

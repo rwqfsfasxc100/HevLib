@@ -7,8 +7,7 @@ var mod_name = ""
 var current_version = ""
 var new_version = ""
 var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
-var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
-#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+
 var file = File.new()
 onready var manager = get_parent().get_parent().get_parent().get_parent().get_parent()
 func _ready():
@@ -80,9 +79,6 @@ func _downloaded_zip(file, filepath):
 	repos()
 	if filepath:
 		pointers.FileAccess.__precache_mod_file(filepath)
-		fi.open(has_updated_store,File.WRITE)
-		fi.store_string("1")
-		fi.close()
 	Tool.deferCallInPhysics(manager,"move_to_next_mod")
 	Tool.remove(self)
 

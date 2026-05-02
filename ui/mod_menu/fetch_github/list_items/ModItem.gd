@@ -89,8 +89,6 @@ func icon_announcement(u):
 func set_icon_to(path):
 	get_node("ICON").texture = pointers.FileAccess.__load_png(path)
 
-var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
-
 var is_downloading = false
 var this_zip_filename = ""
 var this_zip_url = ""
@@ -181,9 +179,6 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 				http.download_file = ""
 				this_zip_filename = ""
 				this_zip_url = ""
-				file.open(has_updated_store,File.WRITE)
-				file.store_string("1")
-				file.close()
 				list.WAIT.hide()
 				list.WAIT_LABEL.clear()
 				is_downloading = false
