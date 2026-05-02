@@ -49,6 +49,9 @@ func _init(modLoader = ModLoader):
 		var variables_folder = "user://cache/.HevLib_Cache/Variable_Fetch/"
 		d.make_dir_recursive(variables_folder)
 		pointers = load("res://HevLib/pointers.gd").new()
+		pointers.FileAccess.__load_precached_mods()
+		
+		
 		var scv = pointers.FolderAccess.__fetch_folder_files(variables_folder,false,true)
 		for s in scv:
 			d.remove(s)

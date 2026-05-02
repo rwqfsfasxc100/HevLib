@@ -405,12 +405,8 @@ func _downloaded_zip(file, filepath):
 	fi.open(has_updated_store,File.WRITE)
 	fi.store_string("1")
 	fi.close()
-	var gameInstallDirectory = OS.get_executable_path().get_base_dir()
-	if OS.get_name() == "OSX":
-		gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
-	var modPathPrefix = gameInstallDirectory.plus_file("mods")
 	subroot.restart_menu.popup_centered()
-	pointers.FileAccess.__copy_file(filepath,modPathPrefix)
+	pointers.FileAccess.__precache_mod_file(filepath)
 	updates_button.visible = false
 var tween
 func _visibility_changed():

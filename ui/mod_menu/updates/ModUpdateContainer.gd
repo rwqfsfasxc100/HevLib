@@ -14,10 +14,6 @@ onready var manager = get_parent().get_parent().get_parent().get_parent().get_pa
 func _ready():
 	$Popups/IgnorePopup.dialog_text = TranslationServer.translate("HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MOD_UPDATE") % [mod_name,new_version]
 	$Popups/UpdatePopup.dialog_text = TranslationServer.translate("HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD") % [mod_name,current_version,new_version]
-	var gameInstallDirectory = OS.get_executable_path().get_base_dir()
-	if OS.get_name() == "OSX":
-		gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
-	modPathPrefix = gameInstallDirectory.plus_file("mods")
 
 func _Ignore_pressed():
 	$Popups/IgnorePopup.popup_centered()
@@ -68,8 +64,7 @@ func _update_confirmed():
 		nod.call_deferred("popup_centered")
 	if display_wait_popup:
 		$Popups/WAIT.popup_centered()
-var modPathPrefix = ""
-#const FileAccess = preload("res://HevLib/pointers/FileAccess.gd")
+
 func _downloaded_zip(file, filepath):
 	$Popups/WAIT.hide()
 	var fi = File.new()
@@ -83,8 +78,8 @@ func _downloaded_zip(file, filepath):
 	fi.store_string(JSON.print(data))
 	fi.close()
 	repos()
-	if filepath and modPathPrefix:
-		pointers.FileAccess.__copy_file(filepath,modPathPrefix)
+	if filepath:
+		pointers.FileAccess.__precache_mod_file(filepath)
 		fi.open(has_updated_store,File.WRITE)
 		fi.store_string("1")
 		fi.close()

@@ -2,14 +2,9 @@ extends Label
 
 onready var modpacks_handle = get_node_or_null(NodePath("../../../../../../../ModpacksMenu/base/VBoxContainer/ApplicableMods"))
 
-var modPathPrefix = ""
 var pointers
 func _ready():
 	get_tree().connect("files_dropped",self,"_files_dropped")
-	var gameInstallDirectory = OS.get_executable_path().get_base_dir()
-	if OS.get_name() == "OSX":
-		gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
-	modPathPrefix = gameInstallDirectory.plus_file("mods")
 	
 
 #var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
@@ -18,10 +13,9 @@ func _files_dropped(files,screen):
 		if not pointers:
 			pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 		if pointers:
-			pointers.FolderAccess.__check_folder_exists(modPathPrefix)
 			for file in files:
 				if file.ends_with(".zip"):
-					pointers.FileAccess.__copy_file(file,modPathPrefix)
+					pointers.FileAccess.__precache_mod_file(file)
 				elif file.ends_with(".dvmodpack"):
 					if modpacks_handle:
 						modpacks_handle._on_OpenPack_file_selected(file)

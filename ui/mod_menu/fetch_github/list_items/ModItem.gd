@@ -7,8 +7,6 @@ var formatted_data = {"readme":"","header_data":{}}
 signal done(box)
 signal pressed(data,box)
 
-var modPathPrefix = ""
-
 onready var http = get_node("HTTPRequest")
 
 var pointers
@@ -22,10 +20,6 @@ func boot():
 	
 	pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	
-	var gameInstallDirectory = OS.get_executable_path().get_base_dir()
-	if OS.get_name() == "OSX":
-		gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
-	modPathPrefix = gameInstallDirectory.plus_file("mods")
 	finished()
 
 var file = File.new()
@@ -183,7 +177,7 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 					dir.rename(this_zip_filename,newZipName)
 					this_zip_filename = newZipName
 					yield(get_tree(),"physics_frame")
-				pointers.FileAccess.__copy_file(this_zip_filename,modPathPrefix)
+				pointers.FileAccess.__precache_mod_file(this_zip_filename)
 				http.download_file = ""
 				this_zip_filename = ""
 				this_zip_url = ""

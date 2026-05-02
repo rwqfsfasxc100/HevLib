@@ -146,8 +146,8 @@ func handle_downloads():
 var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 var f = File.new()
 func _downloaded_zip(file, filepath):
-	if filepath and modPathPrefix:
-		pointers.FileAccess.__copy_file(filepath,modPathPrefix)
+	if filepath:
+		pointers.FileAccess.__precache_mod_file(filepath)
 	f.open(has_updated_store,File.WRITE)
 	f.store_string("1")
 	f.close()
