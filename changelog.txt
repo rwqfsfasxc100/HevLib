@@ -11,6 +11,13 @@
 6="* Added mass_per_tonne_storage_added as a possible MODIFY_INTERNALS operand"
 6.1="* Similar to mass_per_tonne_total_storage_added, instead only based on storage modified by the same equipment object"
 7="* Adjusted the calculations for multiplicative operands for MODIFY_INTERNALS to improve their reliability"
+8="* Copying of new/updated mods now is deferred to after rebooting the game"
+8.1="* This is done to prevent crashes caused by overwriting mods for updates and continuing to play the game"
+8.2="* Reboot is instead done very shortly into the next time the game is booted, from the requested reboot or not"
+8.3="* NOTE: This will cause some issues with the use of engine arguments, considering that they're unable to be detected to be set for the rebooted game instance"
+9="* Added methods to FileAccess"
+9.1="* __precache_mod_file - Registers a file (provided by a file_path string as an input argument) to be installed to the game on the next boot. Will register mod as having been changed, causing reboot popups to appear from mod menus."
+9.2="* __load_precached_mods - Internal method that installs any mods registered by __precache_mod_file. WARNING: Will reboot the game if mods are detected."
 
 [1.13.13]
 
