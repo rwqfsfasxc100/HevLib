@@ -7,10 +7,10 @@ var flare
 var file = File.new()
 var mpdg = "res://ships/modules/AuxMpd.tscn"
 var smes = "res://ships/modules/AuxSmes.tscn"
+var aux_hybrid = "res://HevLib/scenes/equipment/custom_equipment/AuxHybrid.tscn"
 var thruster = "res://sfx/thruster.tscn"
 var exhaust = "res://sfx/exhaust.tscn"
 var nozzle = "res://ships/modules/nozzle-conventonal.tscn"
-#const NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
 
 const torch_base_scale = [0.939,1.395]
 const rcs_base_scale = [0.2,0.2]
@@ -64,31 +64,18 @@ func modify():
 					aux_type = "RCS"
 				"MAIN_PROPULSION":
 					aux_type = "TORCH"
+				"HYBRID":
+					aux_type = "AUX_HYBRID"
 			var item
 			var sys = data.get("system","SYSTEM_NAME_MISSING")
 			if sys == currentInstall:
-				if "config" in data:
-					var how = true
-					var cfg = data["config"]
-					var config_id = cfg.get("id","")
-					var config_section = cfg.get("section","")
-					var config_setting = cfg.get("entry","")
-					var invert_config = cfg.get("invert_config",false)
-					if config_id and config_section and config_setting:
-						var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-						var cfg_opt = pointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
-						if cfg_opt != null:
-							if invert_config:
-								if cfg_opt:
-									how = false
-							else:
-								if !cfg_opt:
-									how = false
-					if not how:
+				var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+				if pointers:
+					if not pointers.ConfigDriver.__validate_dictionary(data):
 						return
 				var valid_scene = false
 				if aux_path != "":
-					var s = ResourceLoader.load(aux_path,"",true)
+					var s = load(aux_path)
 					if s:
 						valid_scene = true
 						item = s.instance()
@@ -99,6 +86,8 @@ func modify():
 							item = ResourceLoader.load(mpdg,"",true).instance()
 						"SMES":
 							item = ResourceLoader.load(smes,"",true).instance()
+						"AUX_HYBRID":
+							item = ResourceLoader.load(aux_hybrid,"",true).instance()
 						"RCS","TORCH":
 							item = ResourceLoader.load(thruster,"",true).instance()
 				
@@ -108,24 +97,22 @@ func modify():
 				
 #				item.name = sys\
 				if not valid_scene:
-					item.repairReplacementPrice = data.get("price",30000)
-					item.repairReplacementTime = data.get("repair_time",1)
-					item.repairFixPrice = data.get("fix_price",5000)
-					item.repairFixTime = data.get("fix_time",4)
+					
 					item.command = data.get("command","m" if aux_type == "TORCH" else "")
-					item.powerDraw = data.get("power_draw",50000.0)
 					item.systemName = sys
 					item.mass = data.get("mass",0)
 					
-					
 					match aux_type:
 						"MPDG":
-							
+							item.repairReplacementPrice = data.get("price",30000)
+							item.repairReplacementTime = data.get("repair_time",1)
+							item.repairFixPrice = data.get("fix_price",5000)
+							item.repairFixTime = data.get("fix_time",4)
 							item.thermal = data.get("thermal",500000.0)
 							item.windupTime = data.get("windup_time",2)
 							
 							item.powerSupply = data.get("power_supply",350000.0)
-							
+							item.powerDraw = data.get("power_draw",50000.0)
 						"SMES":
 							
 							item.capacitorRatio = data.get("capacitor_ratio",0.9)
@@ -133,12 +120,28 @@ func modify():
 							item.switchTime = data.get("switch_time",2)
 							
 							item.powerSupply = data.get("power_supply",200000.0)
+							item.powerDraw = data.get("power_draw",50000.0)
 							item.repairReplacementPrice = data.get("price",40000)
 							item.repairReplacementTime = data.get("repair_time",1)
 							item.repairFixPrice = data.get("fix_price",25000)
 							item.repairFixTime = data.get("fix_time",4)
-
 							
+						"AUX_HYBRID":
+							item.repairReplacementPrice = data.get("price",30000)
+							item.repairReplacementTime = data.get("repair_time",1)
+							item.repairFixPrice = data.get("fix_price",5000)
+							item.repairFixTime = data.get("fix_time",4)
+							
+							item.smesPowerSupply = data.get("smes_power_supply",200000.0)
+							item.smesPowerDraw = data.get("smes_power_draw",50000.0)
+							item.smesCapacitorRatio = data.get("smes_capacitor_ratio",0.9)
+							item.smesCapacity = data.get("smes_capacity",600000.0)
+							item.smesSwitchTime = data.get("smes_switch_time",2)
+							
+							item.mpdgThermal = data.get("mpdg_thermal",500000.0)
+							item.mpdgWindupTime = data.get("mpdg_windup_time",2)
+							item.mpdgPowerSupply = data.get("mpdg_power_supply",350000.0)
+							item.mpdgPowerDraw = data.get("mpdg_power_draw",50000.0)
 						"RCS","TORCH":
 							
 							item.priorityOffset = data.get("priority_offset",1 if aux_type == "RCS" else 8)
@@ -148,8 +151,8 @@ func modify():
 							item.repairReplacementTime = data.get("repair_time",1 if aux_type == "RCS" else 4)
 							item.repairFixPrice = data.get("fix_price",500 if aux_type == "RCS" else 1000)
 							item.repairFixTime = data.get("fix_time",4 if aux_type == "RCS" else 12)
-
 							
+							item.powerDraw = data.get("power_draw",50000.0)
 							item.exhaustEmitOffset = data.get("exhaust_emit_offset",8)
 							item.scaleOffsetWithPower = data.get("scale_offset_with_power",false)
 							item.distanceScale = data.get("distance_scale",5)
