@@ -136,7 +136,7 @@ func modify():
 							item.smesPowerDraw = data.get("smes_power_draw",50000.0)
 							item.smesCapacitorRatio = data.get("smes_capacitor_ratio",0.9)
 							item.smesCapacity = data.get("smes_capacity",600000.0)
-							item.smesSwitchTime = data.get("smes_switch_time",2)
+							item.smesSwitchTime = data.get("smes_switch_time",0.1)
 							
 							item.mpdgThermal = data.get("mpdg_thermal",500000.0)
 							item.mpdgWindupTime = data.get("mpdg_windup_time",2)
