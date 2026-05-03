@@ -1,3 +1,25 @@
+[1.13.15]
+
+1="* Added support for hybrid aux units for AuxPowerDriver"
+1.1="* Current operands:"
+1.1.1="* price - Equipment's sell value. Defaults to 30000"
+1.1.2="* repair_time - Unused unless given a damage model. Defaults to 1"
+1.1.3="* fix_price - Unused unless given a damage model. Defaults to 5000"
+1.1.4="* fix_time - Unused unless given a damage model. Defaults to 4"
+1.1.5="* smes_power_supply - SMES discharge delivery power, measured in kilowatts. Defaults to 200000.0"
+1.1.6="* smes_power_draw - SMES recharge power draw, measured in kilowatts. Defaults to 50000.0"
+1.1.7="* smes_capacitor_ratio - Maximum ultracapacitor charge percentage for the SMES to start discharging. Defaults to 0.9"
+1.1.8="* smes_capacity - SMES charge capacity, measured in kilojoules. Defaults to 600000.0"
+1.1.9="* smes_switch_time - Time taken for the SMES to start charging or discharging, measured in seconds. Defaults to 0.1"
+1.1.10="* mpdg_thermal - Thermal power draw of the MPDG, measured in kilowatts. Defaults to 500000.0"
+1.1.11="* mpdg_windup_time - Time taken for the MPDG to reach full power production, measured in seconds. Defaults to 2"
+1.1.12="* mpdg_power_supply - Power provided by the MPDG at full production, measured in kilowatts. Defaults to 350000.0"
+1.1.13="* mpdg_power_draw - Power consumed by the MPDG, measured in kilowatts. Defaults to 50000.0"
+2="* Improved efficiency of AuxPowerDriver"
+3="* Delayed addition of the additon of flat consumable amounts from MODIFY_INTERNALS due to it being overriden by the ship's own config."
+4="* Changing crew amounts by installing or uninstalling equipment now properly tells the crew to update their arrangements"
+5="* Consumable storages with a minimum utilization grace will now properly scale past that limit"
+
 [1.13.14]
 
 1="* Changing ship mass through MODIFY_INTERNALS.gd now no longer requires specific ship setups to apply"
