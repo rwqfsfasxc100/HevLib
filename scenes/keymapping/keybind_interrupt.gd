@@ -55,7 +55,11 @@ func _ready():
 func compile():
 	var active_script = compiler.compile_keymap()
 	input_handle = null
-	var gd = pointers.DataFormat.__compile_to_script_object(active_script)
+	file.open("user://cache/.HevLib_Cache/Keybinds/test_input.gd",File.WRITE)
+	file.store_string(active_script)
+	file.close()
+	var gd = load("user://cache/.HevLib_Cache/Keybinds/test_input.gd").new()
+#	var gd = pointers.DataFormat.__compile_to_script_object(active_script)
 	input_handle = gd
 
 func _physics_process(delta):
