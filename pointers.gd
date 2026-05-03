@@ -4163,8 +4163,14 @@ class _Keymapping:
 			return out
 		else:
 			if event.begins_with("JoyAxis "):
-				var ac = int(event.split("JoyAxis ")[1])
-				var additive = (12000 * sign(ac))
+				var raw = event.split("JoyAxis ")[1]
+				var ac = int(raw)
+				var sn = sign(ac)
+				if raw.begins_with("-"):
+					sn = -1
+				if sn == 0:
+					sn = 1
+				var additive = (12000 * sn)
 				var joyAxisString = ac + additive
 				return joyAxisString
 			elif event.begins_with("JoyButton "):

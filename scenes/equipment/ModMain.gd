@@ -76,6 +76,13 @@ func _init(modLoader = ModLoader):
 			installScriptExtension("../minerals/multiminerals/AsteroidSpawner.gd")
 		
 		
+		# Bind button display modifications
+		installScriptExtension("../keymapping/bind_displays/AnalogAxisDisplay.gd")
+		installScriptExtension("../keymapping/bind_displays/GamepadKeybindDisplay.gd")
+		installScriptExtension("../keymapping/bind_displays/KeybindDisplay.gd")
+		installScriptExtension("../keymapping/bind_displays/MousebindDisplay.gd")
+		
+		
 		installScriptExtension("../../ui/ExtensionPopup.gd")
 		installScriptExtension("../scene_replacements/DLClist.gd")
 		replaceScene("../scene_replacements/DLClist.tscn","res://tools/DLClist.tscn")
