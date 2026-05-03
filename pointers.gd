@@ -4304,8 +4304,17 @@ class _Keymapping:
 						InputMap.action_add_event(action,ie)
 					3:
 						var ie = InputEventJoypadMotion.new()
-						var s = scan[0] - (12000 * sign(scan[0]))
+						var so = scan[0]
+						var sig = sign(so)
+						var s = 0
+						if sig >= 0:
+							var negoffset = (12000 * sig)
+							s = so - negoffset
+						else:
+							var negoffset = (12000 * sig)
+							s = -so + negoffset
 						ie.axis = s
+						ie.axis_value = sig
 						InputMap.action_add_event(action,ie)
 			else:
 				var scans = []
@@ -4331,8 +4340,17 @@ class _Keymapping:
 							InputMap.action_add_event(action,ie)
 						3:
 							var ie = InputEventJoypadMotion.new()
-							var s = scan[0] - (12000 * sign(scan[0]))
+							var so = scan[0]
+							var sig = sign(so)
+							var s = 0
+							if sig >= 0:
+								var negoffset = (12000 * sig)
+								s = so - negoffset
+							else:
+								var negoffset = (12000 * sig)
+								s = -so + negoffset
 							ie.axis = s
+							ie.axis_value = sig
 							InputMap.action_add_event(action,ie)
 					breakpoint
 	

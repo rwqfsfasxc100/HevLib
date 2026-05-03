@@ -1,6 +1,6 @@
 extends Node
 
-const ALLOW_KEYBIND_MODIFICATIONS = ! true
+const ALLOW_KEYBIND_MODIFICATIONS =  true
 var INPUT_DRIVER_ACTIVE = true
 
 var current_key_inputs = []
@@ -108,8 +108,6 @@ func handle_raw_inputs(event):
 		var av = event.axis_value
 		var scancode = event.axis + adjustments["JOYAXES"]
 		var strength = stepify(av,0.05)
-		if event.is_action_pressed("ui_scroll_up") or event.is_action_pressed("ui_scroll_up2"):
-			breakpoint
 		if abs(strength) > 0.095 and (not scancode in current_key_inputs or (scancode in current_joy_strength and current_joy_strength[scancode] != strength)):
 			if not scancode in current_key_inputs:
 				current_key_inputs.append(scancode * sign(strength))
