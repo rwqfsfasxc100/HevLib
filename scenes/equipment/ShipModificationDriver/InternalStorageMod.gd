@@ -93,9 +93,9 @@ func _enter_tree():
 		var minimum_nano_utilization_for_reduction = iddata.get("minimum_nano_utilization_for_reduction",0.0)
 		var minimum_propellant_utilization_for_reduction = iddata.get("minimum_propellant_utilization_for_reduction",0.0)
 		
-		var current_ammo_amt = massDriverAmmoMax
-		var current_nano_amt = dronePartsMax
-		var current_propellant_amt = reactiveMassMax
+		var current_ammo_amt = base_ammo_storage
+		var current_nano_amt = base_nano_storage
+		var current_propellant_amt = base_propellant
 		var ammo_limit = upgradeLimits["ammo.capacity"][1]
 		var nano_limit = upgradeLimits["drones.capacity"][1]
 		var propellant_limit = upgradeLimits["fuel.capacity"][1]
@@ -144,22 +144,34 @@ func _enter_tree():
 					this_storage_multi *= val
 				"ammo_multi":
 					if val < 1.0 and minimum_ammo_utilization_for_reduction > 0.0:
-						var ch = ((minimum_ammo_utilization_for_reduction * ammo_limit) - current_ammo_amt) / ammo_limit
-						val = clamp(val + ch,val,1.0)
+						var diff = 1.0 - val
+						var curr = ((minimum_ammo_utilization_for_reduction * nano_limit) - current_nano_amt) / nano_limit
+						if curr >= 0:
+							val += diff
+						else:
+							val = clamp(val + (diff + curr),val,1.0)
 					val = float(max(val,0.001))
 					ammo_multi *= val
 					this_ammo_multi *= val
 				"nano_multi":
 					if val < 1.0 and minimum_nano_utilization_for_reduction > 0.0:
-						var ch = ((minimum_nano_utilization_for_reduction * nano_limit) - current_nano_amt) / nano_limit
-						val = clamp(val + ch,val,1.0)
+						var diff = 1.0 - val
+						var curr = ((minimum_nano_utilization_for_reduction * nano_limit) - current_nano_amt) / nano_limit
+						if curr >= 0:
+							val += diff
+						else:
+							val = clamp(val + (diff + curr),val,1.0)
 					val = float(max(val,0.001))
 					nano_multi *= val
 					this_nano_multi *= val
 				"propellant_multi":
 					if val < 1.0 and minimum_propellant_utilization_for_reduction > 0.0:
-						var ch = ((minimum_propellant_utilization_for_reduction * propellant_limit) - current_propellant_amt) / propellant_limit
-						val = clamp(val + ch,val,1.0)
+						var diff = 1.0 - val
+						var curr = ((minimum_propellant_utilization_for_reduction * nano_limit) - current_nano_amt) / nano_limit
+						if curr >= 0:
+							val += diff
+						else:
+							val = clamp(val + (diff + curr),val,1.0)
 					val = float(max(val,0.001))
 					propellant_multi *= val
 					this_propellant_multi *= val
@@ -335,7 +347,7 @@ func _ready():
 	
 	
 	yield(CurrentGame.get_tree(),"physics_frame")
-#	clampConsumables()
+	clampConsumables()
 	if isPlayerControlled():
 		var cfg = shipConfig
 		var state = CurrentGame.state.ship.config
@@ -431,7 +443,6 @@ func hl_ism_UV():
 		limitDroneOutput = ismPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","limit_nanodrone_output")
 
 
-#var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 
 func l(text):
 	if isPlayerControlled():
