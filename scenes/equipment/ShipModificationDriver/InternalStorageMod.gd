@@ -259,19 +259,7 @@ func _enter_tree():
 		mass_add += val
 	
 	
-	l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [ammo_add, nano_add, propellant_add])
-	var ammo_min = 0
-	var nano_min = 0
-	if massDriverAmmoMax:
-		ammo_min = 100
-	if dronePartsMax:
-		nano_min = 100
-	if propellant_add != 0:
-		addPropellantCapacity(propellant_add)
-	if ammo_add != 0:
-		addAmmoCapacity(ammo_add)
-	if nano_add != 0:
-		addDronesCapacity(nano_add)
+	
 	
 	if mass_per_tonne_total_storage_added != 0:
 		l("Changing mass by %s kg for every tonne of total storage changed by" % total_added_capacity)
@@ -321,7 +309,15 @@ func _enter_tree():
 	for amnt in droneData:
 		nanoDeliveryPerSecond[int(amnt)] = droneData[amnt]
 	
-	yield(CurrentGame.get_tree(),"physics_frame")
+#	yield(CurrentGame.get_tree(),"physics_frame")
+func _ready():
+	l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [ammo_add, nano_add, propellant_add])
+	if propellant_add != 0:
+		addPropellantCapacity(propellant_add)
+	if ammo_add != 0:
+		addAmmoCapacity(ammo_add)
+	if nano_add != 0:
+		addDronesCapacity(nano_add)
 	l("Modifying consumables multiplicatively")
 	if ammo_multi != 1.0:
 		var val = 0
@@ -338,7 +334,7 @@ func _enter_tree():
 	
 	
 	
-	
+	yield(CurrentGame.get_tree(),"physics_frame")
 #	clampConsumables()
 	if isPlayerControlled():
 		var cfg = shipConfig
@@ -352,7 +348,7 @@ func _enter_tree():
 					CurrentGame.state.ship.config["preferredCrew"].resize(crew)
 		
 		
-			var active = getCurrentlyActiveCrewNames()
+			var active = CurrentGame.getCurrentlyActiveCrewNames()
 			if active.size() > crew:
 				deactivateCrew(crew)
 func temporaryCargoMass() -> float:
@@ -398,14 +394,14 @@ var massNodeName = "InternalStorageMod_MassModifier"
 
 func deactivateCrew(maximum):
 	var count = 0
-	for m in CurrentGame.state.crew:
+	for m in CurrentGame.getCurrentlyActiveCrewNames():
 		if count < maximum:
 			if CurrentGame.state.crew[m].get("active", true):
 				count += 1
 		else:
 			if CurrentGame.state.crew[m].get("active", true):
 				CurrentGame.state.crew[m]["active"] = false
-
+	CurrentGame.emit_signal("employmentChanged")
 func addAmmoCapacity(kg: float):
 	var change = massDriverAmmoMax + kg
 	if change < 0:
@@ -425,14 +421,6 @@ func addPropellantCapacity(kg: float):
 	reactiveMassMax += kg
 	if reactiveMass == 0:
 		reactiveMass += kg
-
-
-func getCurrentlyActiveCrewNames():
-	var pf = []
-	for m in CurrentGame.state.crew:
-		if CurrentGame.state.crew[m].get("active", true):
-			pf.append(m)
-	return pf
 
 func _physics_process(delta):
 	if not dead and limitDroneOutput:
