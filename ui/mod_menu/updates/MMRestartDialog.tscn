@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=1]
 [ext_resource path="res://HevLib/ui/mod_menu/updates/MMRestartDialog.gd" type="Script" id=2]
+[ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=3]
 
 [node name="MMRestartDialog" type="Popup"]
 margin_left = 390.0
@@ -58,6 +59,8 @@ margin_right = 232.0
 margin_bottom = 42.0
 text = "HEVLIB_RESTART"
 
+[node name="PlaySoundsOnTheseButtons" parent="PanelContainer/VBoxContainer/HBoxContainer/Restart/Button" instance=ExtResource( 3 )]
+
 [node name="Exit" type="HBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer"]
 margin_left = 236.0
 margin_right = 545.0
@@ -69,6 +72,8 @@ alignment = 1
 margin_right = 309.0
 margin_bottom = 42.0
 text = "HEVLIB_EXIT_INSTEAD"
+
+[node name="PlaySoundsOnTheseButtons" parent="PanelContainer/VBoxContainer/HBoxContainer/Exit/Button" instance=ExtResource( 3 )]
 
 [node name="Cancel" type="HBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer"]
 margin_left = 549.0
