@@ -3,6 +3,9 @@ extends Popup
 var SELECTED_MOD = ""
 var SELECTED_MOD_ID = ""
 
+export (NodePath) var restart_diag
+onready var restart_menu = get_node_or_null(restart_diag)
+
 onready var container = $base/TabContainer
 
 var offset = Vector2(12,12)
@@ -33,11 +36,20 @@ func _visibility_changed():
 func show_menu():
 	popup()
 
+var file = File.new()
+var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 func cancel():
 	$AnimateAppear.play("hider")
 func hider():
-	hide()
-	refocus()
+	file.open(has_updated_store,File.READ)
+	var has = file.get_as_text()
+	file.close()
+	if has == "1":
+		hide()
+		restart_menu.popup_centered()
+	else:
+		hide()
+		refocus()
 
 var lastFocus = null
 func refocus():

@@ -1,7 +1,7 @@
 extends Popup
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 var offset = Vector2(12,12)
-#var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+
 var cache_folder = "user://cache/.Mod_Menu_2_Cache/"
 var filter_cache_file = "menu_filter_cache.json"
 var file = File.new()
