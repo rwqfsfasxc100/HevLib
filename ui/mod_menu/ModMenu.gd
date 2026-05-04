@@ -67,9 +67,18 @@ func show_menu():
 func cancel():
 	$AnimateAppear.play("hider")
 
+onready var restart_menu = $MMRestartDialog
+var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 func hider():
-	hide()
-	refocus()
+	file.open(has_updated_store,File.READ)
+	var has = file.get_as_text()
+	file.close()
+	if has == "1":
+		hide()
+		restart_menu.popup_centered()
+	else:
+		hide()
+		refocus()
 
 var lastFocus = null
 func refocus():
@@ -78,7 +87,6 @@ func refocus():
 	else:
 		Debug.l("I have no focus to fall back to!")
 
-onready var restart_menu = $MMRestartDialog
 
 func _on_resize():
 	var size = Settings.getViewportSize()

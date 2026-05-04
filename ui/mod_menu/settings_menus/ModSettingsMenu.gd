@@ -36,10 +36,10 @@ func _visibility_changed():
 func show_menu():
 	popup()
 
-var file = File.new()
-var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 func cancel():
 	$AnimateAppear.play("hider")
+var file = File.new()
+var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 func hider():
 	file.open(has_updated_store,File.READ)
 	var has = file.get_as_text()
