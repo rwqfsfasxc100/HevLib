@@ -117,7 +117,7 @@ func ieDebug():
 	if Input.is_action_pressed("toggle_debug_menus"):
 		InputEventDebugPanel.visible = !InputEventDebugPanel.visible
 	for evnt in action_dict:
-			if Input.is_action_just_pressed(evnt):
+			if Input.is_action_pressed(evnt):
 				action_dict[evnt] = true
 			else:
 				action_dict[evnt] = false

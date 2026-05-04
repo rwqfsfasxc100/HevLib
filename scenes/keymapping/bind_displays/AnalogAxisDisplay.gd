@@ -75,6 +75,10 @@ func _enter_tree():
 					directionalSprite.rect_position = Vector2(alignPos,nearPos)
 					directionalSprite.rect_rotation = 0
 				get_node_or_null("Sprite").add_child(directionalSprite)
+			6:
+				pass
+			7:
+				pass
 			_:
 				breakpoint
 		

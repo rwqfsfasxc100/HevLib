@@ -1,6 +1,6 @@
 extends Node
 
-const ALLOW_KEYBIND_MODIFICATIONS =  true
+const ALLOW_KEYBIND_MODIFICATIONS = ! true
 var INPUT_DRIVER_ACTIVE = true
 
 var current_key_inputs = []
@@ -35,8 +35,7 @@ func _ready():
 		var vb = pointers.ConfigDriver.__config_parse(vanilla_binds_file)
 		file.open(keybind_folder + "defined_control_configs.json",File.READ)
 		var mb = JSON.parse(file.get_as_text()).result
-		
-		
+		file.close()
 		var ignore_builtin = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_KEYMAPPING","input_virtualization_ignore_builtin")
 		
 		for action in actions:
@@ -55,11 +54,11 @@ func _ready():
 func compile():
 	var active_script = compiler.compile_keymap()
 	input_handle = null
-	file.open("user://cache/.HevLib_Cache/Keybinds/test_input.gd",File.WRITE)
-	file.store_string(active_script)
-	file.close()
-	var gd = load("user://cache/.HevLib_Cache/Keybinds/test_input.gd").new()
-#	var gd = pointers.DataFormat.__compile_to_script_object(active_script)
+#	file.open("user://cache/.HevLib_Cache/Keybinds/test_input.gd",File.WRITE)
+#	file.store_string(active_script)
+#	file.close()
+#	var gd = load("user://cache/.HevLib_Cache/Keybinds/test_input.gd").new()
+	var gd = pointers.DataFormat.__compile_to_script_object(active_script)
 	input_handle = gd
 
 func _physics_process(delta):
