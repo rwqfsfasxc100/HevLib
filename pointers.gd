@@ -222,7 +222,6 @@ class _ConfigDriver:
 	var settingsInputHash = 0
 	var has_loaded = false
 	var settings = {}
-	
 	var file = File.new()
 	
 	var subscriptions = {}
@@ -492,7 +491,7 @@ class _ConfigDriver:
 				var manifest_version = manifest["manifest_version"]
 				if manifest_version >= 2.1:
 					var cfg = manifest["manifest_data"]["configs"]
-					if not cfg.hash() == {}.hash():
+					if not hash(cfg) == hash({}):
 						configs.merge({mod_name:cfg})
 		Debug.l("ConfigDriver: config contains [%s] mods" % configs.size())
 		for mod in configs:
