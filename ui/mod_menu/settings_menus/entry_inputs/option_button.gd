@@ -9,11 +9,12 @@ var CONFIG_SECTION = ""
 
 var CONFIG_MOD = ""
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 
 export (String,"string","int") var store_method = "int"
 
 var options = []
+
+var volatile = false
 
 func _ready():
 	var value = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
@@ -27,6 +28,7 @@ func _ready():
 	
 	$OptionButton.selected = find_int(value)
 	$Label/LABELBUTTON.hint_tooltip = CONFIG_DATA.get("description","")
+	volatile = CONFIG_DATA.get("require_restart",false)
 	add_to_group("hevlib_settings_tab",true)
 
 
@@ -90,13 +92,18 @@ func recheck_availability():
 		$OptionButton.disabled = false
 
 func _reset_pressed():
+	var defaultVal = CONFIG_DATA.get("default",find_int(0))
+	if volatile:
+		var old_val = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
+		if old_val != defaultVal:
+			triggerVolatile()
 	match store_method:
 		"int":
-			$OptionButton.selected = CONFIG_DATA.get("default",false)
+			$OptionButton.selected = defaultVal
 		"string":
-			var index = find_int(CONFIG_DATA.get("default",false))
+			var index = find_int(defaultVal)
 			$OptionButton.selected = index
-	pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,CONFIG_DATA.get("default",false))
+	pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,defaultVal)
 	$OptionButton.grab_focus()
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 
@@ -106,8 +113,6 @@ func _draw():
 
 func refocus():
 	$Label/LABELBUTTON.rect_size = $Label.rect_size
-#	get_tree().call_group("hevlib_settings_tab","recheck_availability")
-	
 	pointers.ConfigDriver.__set_button_focus(self,get_node("OptionButton"))
 	
 
@@ -118,12 +123,19 @@ func _visibility_changed():
 
 
 func _on_OptionButton_item_selected(index):
-	
 	match store_method:
 		"int":
+			if volatile:
+				var old_val = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
+				if old_val != index:
+					triggerVolatile()
 			pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,index)
 		"string":
 			var o = options[index]
+			if volatile:
+				var old_val = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
+				if old_val != o:
+					triggerVolatile()
 			pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,o)
 	
 	
@@ -143,3 +155,10 @@ func find_int(value):
 			else:
 				i = value
 	return i
+
+var updateCacheDir = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
+func triggerVolatile():
+	var file = File.new()
+	file.open(updateCacheDir,File.WRITE)
+	file.store_string("1")
+	file.close()
