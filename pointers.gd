@@ -1105,10 +1105,9 @@ class _DataFormat:
 		var method_values = []
 		var method_output_type = []
 		var signal_values = []
-		var file = File.new()
-		if file.open(file_path,File.READ) == OK:
-			var data = file.get_as_text(true)
-			file.close()
+		var scriptsource = load(file_path)
+		if scriptsource:
+			var data = scriptsource.get_source_code()
 			var streaming = false
 			var this_stream : String = ""
 			var lines = data.split("\n")
@@ -1447,9 +1446,8 @@ class _DriverManagement:
 				if item == "is_debugged":
 					running_in_debugged = true
 					
-					file.open("res://ModLoader.gd",File.READ)
-					var fs = file.get_as_text(true)
-					file.close()
+					var ml = load("res://ModLoader.gd")
+					var fs = ml.get_source_code()
 					var lines = fs.split("\n")
 					var reading = false
 					var contents = []
