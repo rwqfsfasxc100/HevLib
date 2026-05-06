@@ -1990,47 +1990,7 @@ class _Equipment:
 						var arr2 = []
 						for item in constants:
 							var equipment = constants.get(item).duplicate(true)
-							var allow = true
-#							if "config" in equipment:
-#								var cf = equipment["config"]
-#								var id = cf.get("id",null)
-#								var section = cf.get("section",null)
-#								var opt = cf.get("entry",null)
-#								if id and section and opt:
-#									var cv = ConfigDriver.__get_value(id,section,opt)
-#									if typeof(cv) == TYPE_BOOL:
-#										allow = cv
-							
-							var mr = "mod_requirements" in equipment
-							var mi = "mod_incompatabilities" in equipment
-							if mr:
-								var needs = equipment["mod_requirements"]
-								var can = 0
-								for i in needs:
-									for f in i:
-										var has = false
-										if f in current_mod_ids:
-											has = true
-										if has:
-											can += 1
-								allow = can == needs.size()
-							if mi:
-								var needs = equipment["mod_incompatabilities"]
-								var can = 0
-								for i in needs:
-									var cv = false
-									for f in i:
-										var has = false
-										if f in current_mod_ids:
-											has = true
-										if has:
-											cv = true
-									if cv:
-										can += 1
-								allow = can != needs.size()
-							
-							if allow:
-								
+							if pointers.ConfigDriver.__validate_dictionary(equipment):
 								match equipment.get("slot_type","HARDPOINT"):
 									"HARDPOINT":
 										if "weapon_slot" in equipment:
@@ -2201,35 +2161,7 @@ class _Equipment:
 						var arr2 = []
 						for item in constants:
 							var equipment = constants.get(item).duplicate(true)
-							var allow = true
-							var mr = "mod_requirements" in equipment
-							var mi = "mod_incompatabilities" in equipment
-							if mr:
-								var needs = equipment["mod_requirements"]
-								var can = 0
-								for i in needs:
-									for f in i:
-										var has = false
-										if f in current_mod_ids:
-											has = true
-										if has:
-											can += 1
-								allow = can == needs.size()
-							if mi:
-								var needs = equipment["mod_incompatabilities"]
-								var can = 0
-								for i in needs:
-									var cv = false
-									for f in i:
-										var has = false
-										if f in current_mod_ids:
-											has = true
-										if has:
-											cv = true
-									if cv:
-										can += 1
-								allow = can != needs.size()
-							if allow:
+							if pointers.ConfigDriver.__validate_dictionary(equipment):
 								driver_store["ADD_EQUIPMENT_SLOTS"].append(equipment.duplicate(true))
 					"EQUIPMENT_TAGS.gd":
 						var ar = constants.get("EQUIPMENT_TAGS",{}).duplicate(true)
@@ -2270,36 +2202,8 @@ class _Equipment:
 						var arr2 = []
 						for item in constants:
 							var equipment = constants.get(item).duplicate(true)
-							var allow = true
 							
-							var mr = "mod_requirements" in equipment
-							var mi = "mod_incompatabilities" in equipment
-							if mr:
-								var needs = equipment["mod_requirements"]
-								var can = 0
-								for i in needs:
-									for f in i:
-										var has = false
-										if f in current_mod_ids:
-											has = true
-										if has:
-											can += 1
-								allow = can == needs.size()
-							if mi:
-								var needs = equipment["mod_incompatabilities"]
-								var can = 0
-								for i in needs:
-									var cv = false
-									for f in i:
-										var has = false
-										if f in current_mod_ids:
-											has = true
-										if has:
-											cv = true
-									if cv:
-										can += 1
-								allow = can != needs.size()
-							if allow:
+							if pointers.ConfigDriver.__validate_dictionary(equipment):
 								driver_store["AUX_POWER_AND_THRUSTERS"].append(equipment.duplicate(true))
 
 					"MODIFY_INTERNALS.gd":
@@ -2469,36 +2373,7 @@ class _Equipment:
 							if n:
 								if not n in ws_equipment_names:
 									ws_equipment_names.append(n)
-								var allow = true
-								
-								var mr = "mod_requirements" in equipment
-								var mi = "mod_incompatabilities" in equipment
-								if mr:
-									var needs = equipment["mod_requirements"]
-									var can = 0
-									for i in needs:
-										for f in i:
-											var has = false
-											if f in current_mod_ids:
-												has = true
-											if has:
-												can += 1
-									allow = can == needs.size()
-								if mi:
-									var needs = equipment["mod_incompatabilities"]
-									var can = 0
-									for i in needs:
-										var cv = false
-										for f in i:
-											var has = false
-											if f in current_mod_ids:
-												has = true
-											if has:
-												cv = true
-										if cv:
-											can += 1
-									allow = can != needs.size()
-								if allow:
+								if pointers.ConfigDriver.__validate_dictionary(equipment):
 									driver_store["WEAPONSLOT_ADD"].append(equipment.duplicate(true))
 					"WEAPONSLOT_MODIFY_TEMPLATES.gd":
 						var ar = constants.get("WEAPONSLOT_MODIFY_TEMPLATES",{}).duplicate(true)
@@ -3063,36 +2938,7 @@ class _Equipment:
 		var ws_stuff_to_modify = []
 		
 		for add in driver_store["WEAPONSLOT_ADD"]:
-			var allow = true
-			var mr = "mod_requirements" in add
-			var mi = "mod_incompatabilities" in add
-			if mr:
-				var needs = add["mod_requirements"]
-				var can = 0
-				for i in needs:
-					for f in i:
-						var has = false
-						if f in current_mod_ids:
-							has = true
-						if has:
-							can += 1
-				allow = can == needs.size()
-			if mi:
-				var needs = add["mod_incompatabilities"]
-				var can = 0
-				for i in needs:
-					var cv = false
-					for f in i:
-						var has = false
-						if f in current_mod_ids:
-							has = true
-						if has:
-							cv = true
-					if cv:
-						can += 1
-				allow = can != needs.size()
-			
-			if allow:
+			if pointers.ConfigDriver.__validate_dictionary(add):
 				var aname = add.get("name","SYSTEM_ERROR")
 				var apath = add.get("path","")
 				var item_data = {}
