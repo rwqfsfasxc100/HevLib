@@ -1990,7 +1990,7 @@ class _Equipment:
 						var arr2 = []
 						for item in constants:
 							var equipment = constants.get(item).duplicate(true)
-							if pointers.ConfigDriver.__validate_dictionary(equipment):
+							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								match equipment.get("slot_type","HARDPOINT"):
 									"HARDPOINT":
 										if "weapon_slot" in equipment:
@@ -2161,7 +2161,7 @@ class _Equipment:
 						var arr2 = []
 						for item in constants:
 							var equipment = constants.get(item).duplicate(true)
-							if pointers.ConfigDriver.__validate_dictionary(equipment):
+							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								driver_store["ADD_EQUIPMENT_SLOTS"].append(equipment.duplicate(true))
 					"EQUIPMENT_TAGS.gd":
 						var ar = constants.get("EQUIPMENT_TAGS",{}).duplicate(true)
@@ -2203,7 +2203,7 @@ class _Equipment:
 						for item in constants:
 							var equipment = constants.get(item).duplicate(true)
 							
-							if pointers.ConfigDriver.__validate_dictionary(equipment):
+							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								driver_store["AUX_POWER_AND_THRUSTERS"].append(equipment.duplicate(true))
 
 					"MODIFY_INTERNALS.gd":
@@ -2373,7 +2373,7 @@ class _Equipment:
 							if n:
 								if not n in ws_equipment_names:
 									ws_equipment_names.append(n)
-								if pointers.ConfigDriver.__validate_dictionary(equipment):
+								if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 									driver_store["WEAPONSLOT_ADD"].append(equipment.duplicate(true))
 					"WEAPONSLOT_MODIFY_TEMPLATES.gd":
 						var ar = constants.get("WEAPONSLOT_MODIFY_TEMPLATES",{}).duplicate(true)
@@ -2938,7 +2938,7 @@ class _Equipment:
 		var ws_stuff_to_modify = []
 		
 		for add in driver_store["WEAPONSLOT_ADD"]:
-			if pointers.ConfigDriver.__validate_dictionary(add):
+			if pointers.ConfigDriver.__validate_dictionary(add,false):
 				var aname = add.get("name","SYSTEM_ERROR")
 				var apath = add.get("path","")
 				var item_data = {}
