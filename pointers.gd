@@ -868,23 +868,24 @@ class _ConfigDriver:
 						if has:
 							can += 1
 				allowFromMods = can == needs.size()
-			if check_incompatabilities and "mod_incompatabilities" in data_dict:
-				var needs = data_dict["mod_incompatabilities"]
-				var can = 0
-				for a in needs:
-					var cv = false
-					for f in a:
-						var has = false
-						if f in current_mod_ids:
-							has = true
-						if has:
-							cv = true
-					if cv:
-						can += 1
-				allowFromMods = can != needs.size()
 			if allowFromMods:
-				return true
-			return false
+				var allowFromMods2 = true
+				if check_incompatabilities and "mod_incompatabilities" in data_dict:
+					var needs = data_dict["mod_incompatabilities"]
+					var can = 0
+					for a in needs:
+						var cv = false
+						for f in a:
+							var has = false
+							if f in current_mod_ids:
+								has = true
+							if has:
+								cv = true
+						if cv:
+							can += 1
+					allowFromMods2 = can != needs.size()
+				if allowFromMods2:
+					return true
 		return false
 	
 	func __config_parse(file_path: String) -> Dictionary:
