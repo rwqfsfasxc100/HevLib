@@ -190,54 +190,7 @@ func _ready():
 		var cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/"
 		replaceScene("scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
 #		var CRoot = get_tree().get_root()
-		if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","use_legacy_equipment_handler"):
-			var conv := []
-			var paths = []
-			pointers.FolderAccess.__check_folder_exists(cache_folder)
-			var mods = ModLoader.get_children()
-			l("Scanning installed mods for applicable mods")
-			for mod in mods:
-				var variants = mod.get_property_list()
-				var dict = {}
-				var does = false
-				for it in variants:
-					var iname = it.get("name")
-					match iname:
-						"ADD_EQUIPMENT_SLOTS":
-							does = true
-							var arr = mod.ADD_EQUIPMENT_SLOTS
-							var arr2 = []
-							for item in arr:
-								arr2.append(item.duplicate(7))
-							dict.merge({"ADD_EQUIPMENT_SLOTS":arr2})
-						"ADD_EQUIPMENT_ITEMS":
-							does = true
-							var arr = mod.ADD_EQUIPMENT_ITEMS
-							var arr2 = []
-							for item in arr:
-								arr2.append(item.duplicate(7))
-							dict.merge({"ADD_EQUIPMENT_ITEMS":arr2})
-						"EQUIPMENT_TAGS":
-							does = true
-							var item = mod.EQUIPMENT_TAGS
-							dict.merge({"EQUIPMENT_TAGS":item.duplicate(true)})
-							pass
-						"SLOT_TAGS":
-							does = true
-							var item = mod.SLOT_TAGS
-							dict.merge({"SLOT_TAGS":item.duplicate(true)})
-							pass
-				if does:
-					var mPath = mod.get_script().get_path()
-					var mHash = mPath.hash()
-					conv.append([dict,mPath,mHash,mod.name])
-					paths.append(mPath)
-					l("Found mod at %s, labelling as %s" % [mPath, str(mHash)])
-			var vNode = load("res://HevLib/scenes/equipment/var_nodes/EquipmentDriver.tscn").instance()
-			vNode.conv = conv
-			vNode.paths = paths
-			vNode.name = "EquipmentDriver"
-			CRoot.call_deferred("add_child",vNode)
+		
 		installScriptExtension("scenes/research/overhead_handle/Enceladus.gd")
 		installScriptExtension("scenes/research/overhead_handle/AsteroidSpawner.gd")
 		var nNode = load("res://HevLib/scenes/research/overhead_handle/ResearchOverheadHandle.tscn").instance()
