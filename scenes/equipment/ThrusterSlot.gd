@@ -238,18 +238,10 @@ func modify():
 							
 							var md = data.get("modulate","")
 							var sm = data.get("self_modulate","")
-							var tmd = typeof(md)
-							var tsm = typeof(sm)
-							if tmd == TYPE_STRING:
-								if md != "":
-									item.modulate = Color(md)
-							elif tmd == TYPE_COLOR:
-								item.modulate = md
-							if tsm == TYPE_STRING:
-								if sm != "":
-									item.self_modulate = Color(sm)
-							elif tsm == TYPE_COLOR:
-								item.self_modulate = sm
+							if md != "":
+								item.modulate = Color(md)
+							if sm != "":
+								item.self_modulate = Color(sm)
 							
 							
 							var pt = "res://sfx/thrusters.png"
@@ -291,40 +283,39 @@ func modify():
 							
 							flare = item.get_node_or_null("Flare")
 							if flare:
-								flare.set_deferred("essentiality",data.get("flare_essentiality",0.5 if aux_type == "RCS" else 0.8))
-								flare.set_deferred("offsetByCamera", data.get("flare_offset_by_camera",false))
+								flare.set("essentiality",data.get("flare_essentiality",0.5 if aux_type == "RCS" else 0.8))
+								flare.set("offsetByCamera", data.get("flare_offset_by_camera",false))
+#								flare.set_deferred("essentiality",data.get("flare_essentiality",0.5 if aux_type == "RCS" else 0.8))
+#								flare.set_deferred("offsetByCamera", data.get("flare_offset_by_camera",false))
 								
 								var ft = "res://lights/plume.png"
 								var flareTex = data.get("flare_texture","res://lights/plume.png")
 								
 								if file.file_exists(flareTex):
 									ft = flareTex
-								flare.set_deferred("texture", load(ft))
-								flare.set_deferred("energy",data.get("flare_energy",5))
-								flare.set_deferred("range_height",data.get("flare_range_height",-15))
+								flare.set("texture", load(ft))
+								flare.set("energy",data.get("flare_energy",5))
+								flare.set("range_height",data.get("flare_range_height",-15))
+#								flare.set_deferred("texture", load(ft))
+#								flare.set_deferred("energy",data.get("flare_energy",5))
+#								flare.set_deferred("range_height",data.get("flare_range_height",-15))
 								var fo = data.get("flare_offset",[0,0])
 								if fo.size() >= 2:
-									flare.set_deferred("offset", Vector2(fo[0],fo[1]))
-								flare.set_deferred("texture_scale", data.get("flare_texture_scale",6))
-								flare.set_deferred("rotation",deg2rad(data.get("flare_rotation",0)))
+									flare.set("offset", Vector2(fo[0],fo[1]))
+#									flare.set_deferred("offset", Vector2(fo[0],fo[1]))
+								flare.set("texture_scale", data.get("flare_texture_scale",6))
+								flare.set("rotation",deg2rad(data.get("flare_rotation",0)))
+#								flare.set_deferred("texture_scale", data.get("flare_texture_scale",6))
+#								flare.set_deferred("rotation",deg2rad(data.get("flare_rotation",0)))
 								var fp = data.get("flare_position",[0,0])
 								if fp.size() >= 2:
 									flare.position = Vector2(fp[0],fp[1])
 								var fnc = data.get("flare_color","3bafff")
-								var tfnc = typeof(fnc)
-								if tfnc == TYPE_STRING:
-									if fnc != "":
-										flare.color = Color(fnc)
-								elif tfnc == TYPE_COLOR:
-									flare.color = fnc
+								if fnc != "":
+									flare.color = Color(fnc)
 								var color_override = data.get("flare_override_color","")
-								var tco = typeof(color_override)
-								if tco == TYPE_STRING:
-									if color_override != "":
-										fco = Color(color_override)
-										make_timer()
-								elif tco == TYPE_COLOR:
-									fco = color_override
+								if color_override != "":
+									fco = Color(color_override)
 									make_timer()
 							var after_nozzles = []
 							var before_nozzles = []
@@ -461,7 +452,8 @@ func modify_nozzle(nozzleA,nd):
 			var rp = nd.heat_position
 			if rp.size() >= 2:
 				heat.position = Vector2(rp[0],rp[1])
-			heat.set_deferred("rotation",deg2rad(nd.heat_rotation))
+			heat.set("rotation",deg2rad(nd.heat_rotation))
+#			heat.set_deferred("rotation",deg2rad(nd.heat_rotation))
 			var rs = nd.heat_scale
 			if rs.size() >= 2:
 				heat.scale = Vector2(rs[0],rs[1])
@@ -474,7 +466,8 @@ func modify_nozzle(nozzleA,nd):
 		var rp = nd.position
 		if rp.size() >= 2:
 			nozzleA.position = Vector2(rp[0],rp[1])
-		nozzleA.set_deferred("rotation",deg2rad(nd.rotation))
+		nozzleA.set("rotation",deg2rad(nd.rotation))
+#		nozzleA.set_deferred("rotation",deg2rad(nd.rotation))
 		var rs = nd.scale
 		if rs.size() >= 2:
 			nozzleA.scale = Vector2(rs[0],rs[1])
