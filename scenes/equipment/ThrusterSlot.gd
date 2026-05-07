@@ -228,6 +228,7 @@ func modify():
 							item.tuneThrustMin = data.get("tune_thrust_min",0.5)
 							item.tuneThrustMax = data.get("tune_thrust_max",1.5)
 							item.sweepHostilityFactor = data.get("sweep_hostility_factor",0.2)
+							item.damageHostilityScale = data.get("damage_hostility_scale",40000000)
 							
 							item.maxVolume = data.get("max_volume",-20)
 							item.rangeOverride = data.get("range_override",0)
