@@ -154,6 +154,8 @@ func _ready():
 	for item in modifications:
 		var iname = item.get("name")
 		if iname == c:
+			if not pointers.ConfigDriver.__validate_dictionary(item):
+				return
 			var this = {}
 			this.name = iname
 			this.data = {}
@@ -168,6 +170,8 @@ func _ready():
 	for item in additions:
 		var iname = item.get("name")
 		if iname == c:
+			if not pointers.ConfigDriver.__validate_dictionary(item):
+				return
 			var this = {}
 			this.name = iname
 			this.data = {}
