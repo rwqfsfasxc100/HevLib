@@ -10,6 +10,7 @@ var smes = "res://ships/modules/AuxSmes.tscn"
 var aux_hybrid = "res://HevLib/scenes/equipment/custom_equipment/AuxHybrid.tscn"
 var thruster = "res://sfx/thruster.tscn"
 var exhaust = "res://sfx/exhaust.tscn"
+var exhaust_fusion = "res://sfx/exhaust-fusion.tscn"
 var nozzle = "res://ships/modules/nozzle-conventonal.tscn"
 
 const torch_base_scale = [0.939,1.395]
@@ -85,13 +86,13 @@ func modify():
 				if not valid_scene:
 					match aux_type:
 						"MPDG":
-							item = ResourceLoader.load(mpdg,"",true).instance()
+							item = load(mpdg).instance()
 						"SMES":
-							item = ResourceLoader.load(smes,"",true).instance()
+							item = load(smes).instance()
 						"AUX_HYBRID":
-							item = ResourceLoader.load(aux_hybrid,"",true).instance()
+							item = load(aux_hybrid).instance()
 						"RCS","TORCH":
-							item = ResourceLoader.load(thruster,"",true).instance()
+							item = load(thruster).instance()
 				
 #				var sysn = name + "_" + sys
 				item.name = sys
@@ -154,14 +155,13 @@ func modify():
 							item.repairFixPrice = data.get("fix_price",500 if aux_type == "RCS" else 1000)
 							item.repairFixTime = data.get("fix_time",4 if aux_type == "RCS" else 12)
 							
-							item.powerDraw = data.get("power_draw",50000.0)
 							item.exhaustEmitOffset = data.get("exhaust_emit_offset",8)
 							item.scaleOffsetWithPower = data.get("scale_offset_with_power",false)
 							item.distanceScale = data.get("distance_scale",5)
 							item.plumesFromSettings = data.get("plumes_from_settings",true)
 							item.angularDegreedRange = data.get("angular_degree_range",30)
-							item.rotationRange = data.get("rotation_range",3.142)
-							item.consumeCargo = data.get("consume_cargo",PoolStringArray([]))
+							item.rotationRange = data.get("rotation_range",PI)
+							item.consumeCargo = data.get("consume_cargo",PoolStringArray())
 							item.canFizzle = data.get("can_fizzle",true)
 							item.wearPowerMaxChance = data.get("wear_power_max_chance",0.95) 
 							item.wearChance = data.get("wear_chance",0.01)
@@ -170,7 +170,7 @@ func modify():
 							item.accelerationFailScale = data.get("acceleration_fail_scale",200)
 							item.lightLagChance = data.get("light_lag_chance",0.5)
 							item.startJolt = data.get("start_jolt",0)
-							item.thrust = data.get("thrust",1 if aux_type == "RCS" else 7500)
+							item.thrust = data.get("thrust",1000 if aux_type == "RCS" else 7500)
 							item.particleChance = data.get("particle_chance",0.5 if aux_type == "RCS" else 1.0)
 							item.chokeParticleAdjust = data.get("choke_particle_adjust",1)
 							item.fadeSeconds = data.get("fade_seconds",0.2 if aux_type == "RCS" else 0.4)
@@ -192,6 +192,7 @@ func modify():
 							item.maxMissalignment = data.get("max_misalignment",0.262 if aux_type == "RCS" else 0.02)
 							item.bendWearRatio = data.get("bend_wear_ratio",0.025)
 							item.specificImpulse = data.get("specific_impulse",65 if aux_type == "RCS" else 15)
+							item.powerDraw = data.get("power_draw",50000.0)
 							item.thermalFactor = data.get("thermal_factor",40)
 							item.powerDraw = data.get("power_draw",5000 if aux_type == "RCS" else 100000)
 							item.gimbalPowerDraw = data.get("gimbal_power_draw",100)
@@ -209,12 +210,17 @@ func modify():
 							
 							item.pulsePerSecond = data.get("pulse_per_second",10 if aux_type == "RCS" else 4)
 							item.pulseEngine = data.get("pulse_engine",true)
-							
-							var exhaustScene = exhaust_cache_path + "/" + aux_type + "/" + sys
-							if file.file_exists(exhaustScene):
-								item.exhaust = load(exhaustScene)
-							else:
-								item.exhaust = ResourceLoader.load(exhaust,"",true)
+							match data.get("exhaust_type","regular"):
+								"regular":
+									item.exhaust = load(exhaust)
+								"fusion":
+									item.exhaust = load(exhaust_fusion)
+								_:
+									var exhaustScene = exhaust_cache_path + "/" + aux_type + "/" + sys + ".tscn"
+									if file.file_exists(exhaustScene):
+										item.exhaust = load(exhaustScene)
+									else:
+										item.exhaust = load(exhaust)
 							
 							item.externalPower = data.get("external_power",false)
 							item.safetyMaxPower = data.get("safety_max_power",1)
@@ -303,20 +309,20 @@ func modify():
 							modify_nozzle(nozzleA,nd)
 							var noz_poz = nozzleA.get_position_in_parent()
 							for n in before_nozzles:
-								var thisNozzle = ResourceLoader.load(nozzle,"",true).instance()
+								var thisNozzle = load(nozzle).instance()
 								modify_nozzle(thisNozzle,n)
 								if thisNozzle:
 									item.add_child(thisNozzle)
 									item.move_child(thisNozzle,noz_poz - 1)
 							for n in after_nozzles:
-								var thisNozzle = ResourceLoader.load(nozzle,"",true).instance()
+								var thisNozzle = load(nozzle).instance()
 								modify_nozzle(thisNozzle,n)
 								if thisNozzle:
 									item.add_child(thisNozzle)
 							var extra_nodes = data.get("extra_nodes",[])
 							for node in extra_nodes:
 								if file.file_exists(node):
-									var scene = ResourceLoader.load(node,"",true)
+									var scene = load(node)
 									if scene:
 										item.add_child(scene.instance())
 						
@@ -342,6 +348,11 @@ func modify():
 				
 				
 				if item:
+#					var savepath = "user://thrusterTest.tscn"
+#					var pc = PackedScene.new()
+#					pc.pack(item)
+#					ResourceSaver.save(savepath,pc)
+#					breakpoint
 #					add_child(item)
 
 					key = name + "_" + mounted

@@ -256,7 +256,7 @@ static func handle_mineral_values_and_colors(mineral_data):
 	return collective_text
 
 static func installScriptExtension(path:String):
-	var childScript:Script = ResourceLoader.load(path)
+	var childScript:Script = load(path)
 	childScript.new()
 	var parentScript:Script = childScript.get_base_script()
 	var parentPath:String = parentScript.resource_path

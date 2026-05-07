@@ -136,7 +136,7 @@ func _ready():
 func resetter_timeout():
 	for ship in ships:
 		var path = ships[ship].resource_path
-		var replacement = ResourceLoader.load(path,"",true)
+		var replacement = load(path)
 		var sc = ships[ship]
 		Tool.remove(sc)
 		ships[ship] = null
