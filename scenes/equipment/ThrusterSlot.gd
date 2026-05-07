@@ -311,11 +311,20 @@ func modify():
 								if fp.size() >= 2:
 									flare.position = Vector2(fp[0],fp[1])
 								var fnc = data.get("flare_color","3bafff")
-								if fnc != "":
-									flare.color = Color(fnc)
+								var tfnc = typeof(fnc)
+								if tfnc == TYPE_STRING:
+									if fnc != "":
+										flare.color = Color(fnc)
+								elif tfnc == TYPE_COLOR:
+									flare.color = fnc
 								var color_override = data.get("flare_override_color","")
-								if color_override != "":
-									fco = Color(color_override)
+								var tco = typeof(color_override)
+								if tco == TYPE_STRING:
+									if color_override != "":
+										fco = Color(color_override)
+										make_timer()
+								elif tco == TYPE_COLOR:
+									fco = color_override
 									make_timer()
 							var after_nozzles = []
 							var before_nozzles = []
