@@ -243,6 +243,16 @@ func modify():
 							if sm != "":
 								item.self_modulate = Color(sm)
 							
+							if data.get("plume_has_material",true):
+								var matpath = data.get("plume_material_path","res://sfx/AddOnly.material")
+								if file.file_exists(matpath):
+									material = load(matpath)
+								else:
+									material = load("res://sfx/AddOnly.material")
+							else:
+								material = null
+							
+							
 							
 							var pt = "res://sfx/thrusters.png"
 							var plumeTex = data.get("plume_texture","res://sfx/thrusters.png")
@@ -281,10 +291,13 @@ func modify():
 							if ts.size() >= 2:
 								item.scale = Vector2(ts[0],ts[1])
 							
+							
+							
+							
 							flare = item.get_node_or_null("Flare")
 							if flare:
-								flare.set("essentiality",data.get("flare_essentiality",0.5 if aux_type == "RCS" else 0.8))
-								flare.set("offsetByCamera", data.get("flare_offset_by_camera",false))
+								flare.essentiality = data.get("flare_essentiality",0.5 if aux_type == "RCS" else 0.8)
+								flare.offsetByCamera = data.get("flare_offset_by_camera",false)
 #								flare.set_deferred("essentiality",data.get("flare_essentiality",0.5 if aux_type == "RCS" else 0.8))
 #								flare.set_deferred("offsetByCamera", data.get("flare_offset_by_camera",false))
 								
@@ -293,9 +306,13 @@ func modify():
 								
 								if file.file_exists(flareTex):
 									ft = flareTex
-								flare.set("texture", load(ft))
-								flare.set("energy",data.get("flare_energy",5))
-								flare.set("range_height",data.get("flare_range_height",-15))
+								flare.texture = load(ft)
+								flare.energy = data.get("flare_energy",5)
+								flare.range_height = data.get("flare_range_height",-15)
+								flare.range_z_min = data.get("flare_range_z_min",-4096)
+								flare.range_z_max = data.get("flare_range_z_max",4096)
+								flare.range_layer_min = data.get("flare_range_layer_min",-1)
+								flare.range_layer_max = data.get("flare_range_layer_max",1)
 #								flare.set_deferred("texture", load(ft))
 #								flare.set_deferred("energy",data.get("flare_energy",5))
 #								flare.set_deferred("range_height",data.get("flare_range_height",-15))
@@ -303,8 +320,8 @@ func modify():
 								if fo.size() >= 2:
 									flare.set("offset", Vector2(fo[0],fo[1]))
 #									flare.set_deferred("offset", Vector2(fo[0],fo[1]))
-								flare.set("texture_scale", data.get("flare_texture_scale",6))
-								flare.set("rotation",deg2rad(data.get("flare_rotation",0)))
+								flare.texture_scale = data.get("flare_texture_scale",6)
+								flare.rotation = deg2rad(data.get("flare_rotation",0))
 #								flare.set_deferred("texture_scale", data.get("flare_texture_scale",6))
 #								flare.set_deferred("rotation",deg2rad(data.get("flare_rotation",0)))
 								var fp = data.get("flare_position",[0,0])
@@ -317,6 +334,10 @@ func modify():
 								if color_override != "":
 									fco = Color(color_override)
 									make_timer()
+							
+							
+							
+							
 							var after_nozzles = []
 							var before_nozzles = []
 							var noz = data.get("nozzle",{})
