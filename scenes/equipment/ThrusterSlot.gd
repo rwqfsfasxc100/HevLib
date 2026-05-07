@@ -210,7 +210,7 @@ func modify():
 							
 							item.pulsePerSecond = data.get("pulse_per_second",10 if aux_type == "RCS" else 4)
 							item.pulseEngine = data.get("pulse_engine",true)
-							match data.get("exhaust_type","regular"):
+							match data.get("exhaust_type",""):
 								"regular":
 									item.exhaust = load(exhaust)
 								"fusion":
