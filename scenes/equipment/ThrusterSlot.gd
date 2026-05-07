@@ -250,14 +250,26 @@ func modify():
 								pt = plumeTex
 							item.texture = load(pt)
 							var po = data.get("plume_offset",[-32,-16])
-							if po.size() >= 2:
+							if po.size() > 1:
 								item.offset = Vector2(po[0],po[1])
 							item.centered = data.get("plume_centered",false)
 							item.flip_h = data.get("plume_flip_h",false)
 							item.flip_v = data.get("plume_flip_v",false)
 							
+							item.hframes = data.get("plume_horizontal_frames",8)
+							item.vframes = data.get("plume_vertical_frames",1)
+							item.frame = data.get("plume_frame",1)
+							var plumeFrameCoords = data.get("plume_frame_coords",[1,0])
+							if plumeFrameCoords.size() > 1:
+								item.frame_coords = Vector2(plumeFrameCoords[0],plumeFrameCoords[1])
+							item.region_enabled = data.get("plume_region_enabled",false)
+							var plRect = data.get("plume_region_rect",[0,0,0,0])
+							if plRect.size() > 3:
+								item.region_rect = Rect2(plRect[0],plRect[1],plRect[2],plRect[3])
+							item.region_filter_clip = data.get("plume_region_filter_clip",false)
+							
 							var tp = data.get("position",thruster_base_pos)
-							if tp.size() >= 2:
+							if tp.size() > 1:
 								item.position = Vector2(tp[0],tp[1])
 							var def_scale = rcs_base_scale
 							
