@@ -238,10 +238,18 @@ func modify():
 							
 							var md = data.get("modulate","")
 							var sm = data.get("self_modulate","")
-							if md != "":
-								item.modulate = Color(md)
-							if sm != "":
-								item.self_modulate = Color(sm)
+							var tmd = typeof(md)
+							var tsm = typeof(sm)
+							if tmd == TYPE_STRING:
+								if md != "":
+									item.modulate = Color(md)
+							elif tmd == TYPE_COLOR:
+								item.modulate = md
+							if tsm == TYPE_STRING:
+								if sm != "":
+									item.self_modulate = Color(sm)
+							elif tsm == TYPE_COLOR:
+								item.self_modulate = sm
 							
 							
 							var pt = "res://sfx/thrusters.png"
