@@ -1,6 +1,6 @@
 extends Node
 
-const ALLOW_KEYBIND_MODIFICATIONS = ! true
+const ALLOW_KEYBIND_MODIFICATIONS =  true
 var INPUT_DRIVER_ACTIVE = true
 
 var current_key_inputs = []
@@ -27,7 +27,7 @@ func _ready():
 	pointers.FolderAccess.__check_folder_exists(keybind_folder)
 	self.pause_mode = Node.PAUSE_MODE_PROCESS
 	self.process_priority = -INF
-	INPUT_DRIVER_ACTIVE = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","input_virtualization")
+	INPUT_DRIVER_ACTIVE = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_KEYMAPPING","input_virtualization")
 	self.set_process_input(ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE)
 	if ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE:
 		var actions = InputMap.get_actions()
@@ -35,13 +35,12 @@ func _ready():
 		var vb = pointers.ConfigDriver.__config_parse(vanilla_binds_file)
 		file.open(keybind_folder + "defined_control_configs.json",File.READ)
 		var mb = JSON.parse(file.get_as_text()).result
-		
-		
-		var ignore_builtin = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","input_virtualization_ignore_builtin")
+		file.close()
+		var ignore_builtin = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_KEYMAPPING","input_virtualization_ignore_builtin")
 		
 		for action in actions:
-#			if ignore_builtin and action in sortedAv:
-#				continue
+			if ignore_builtin and action in sortedAv:
+				continue
 			var act = InputMap.get_action_list(action)
 			for active in act:
 				InputMap.action_erase_event(action, active)
@@ -55,11 +54,11 @@ func _ready():
 func compile():
 	var active_script = compiler.compile_keymap()
 	input_handle = null
-	file.open("user://cache/.HevLib_Cache/Keybinds/test_input.gd",File.WRITE)
-	file.store_string(active_script)
-	file.close()
-	var gd = load("user://cache/.HevLib_Cache/Keybinds/test_input.gd").new()
-#	var gd = pointers.DataFormat.__compile_to_script_object(active_script)
+#	file.open("user://cache/.HevLib_Cache/Keybinds/test_input.gd",File.WRITE)
+#	file.store_string(active_script)
+#	file.close()
+#	var gd = load("user://cache/.HevLib_Cache/Keybinds/test_input.gd").new()
+	var gd = pointers.DataFormat.__compile_to_script_object(active_script)
 	input_handle = gd
 
 func _physics_process(delta):
@@ -107,11 +106,10 @@ func handle_raw_inputs(event):
 		m = true
 		var av = event.axis_value
 		var scancode = event.axis + adjustments["JOYAXES"]
-		var offset = adjustments["JOYAXES"]
 		var strength = stepify(av,0.05)
 		if abs(strength) > 0.095 and (not scancode in current_key_inputs or (scancode in current_joy_strength and current_joy_strength[scancode] != strength)):
 			if not scancode in current_key_inputs:
-				current_key_inputs.append(scancode)
+				current_key_inputs.append(scancode * sign(strength))
 				bit_index = bit_index | scancode
 			current_joy_strength[scancode] = strength
 		elif scancode in current_key_inputs:

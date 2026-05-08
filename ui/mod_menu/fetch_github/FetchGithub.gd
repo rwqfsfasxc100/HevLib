@@ -12,10 +12,8 @@ func _ready():
 
 
 
-export var restart_dialog_path = NodePath("")
-onready var restart_dialog = get_node(restart_dialog_path)
-var file = File.new()
-var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
+export var modmenu = NodePath("")
+onready var mod_menu = get_node(modmenu)
 
 
 
@@ -29,17 +27,11 @@ func show_menu():
 
 func cancel():
 	$AnimateAppear.play("hider")
+
 func hider():
-	file.open(has_updated_store,File.READ)
-	var has = file.get_as_text()
-	file.close()
-	if has == "1":
-		hide()
-		restart_dialog.popup_centered()
-	else:
-		hide()
-		refocus()
-#	get_parent().show_menu()
+	hide()
+	refocus()
+	mod_menu.show_restart_menu()
 
 var lastFocus = null
 func refocus():

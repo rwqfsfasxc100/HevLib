@@ -2161,6 +2161,14 @@ const TRANSLATIONS = {
 		"HEVLIB_SUPPORTED_LANGUAGES": {
 			"string": "Supported languages / completion %:",
 			"version_hash": 31187306
+		},
+		"HEVLIB_CONFIG_SECTION_KEYMAPPING": {
+			"string": "Keymapping",
+			"version_hash": 3052849914
+		},
+		"HEVLIB_MODMENU_CANNOT_RESTART": {
+			"string": "Currently in-rings.\nPlease restart manually.",
+			"version_hash": 3242006044
 		}
 	},
 	"uk_UA": {

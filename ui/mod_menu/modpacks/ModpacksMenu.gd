@@ -2,8 +2,8 @@ extends Popup
 
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 
-export var restart_dialog_path = NodePath("")
-onready var restart_dialog = get_node(restart_dialog_path)
+export var modmenu = NodePath("")
+onready var mod_menu = get_node(modmenu)
 var offset = Vector2(600,500)
 
 func _about_to_show():
@@ -14,18 +14,11 @@ func show_menu():
 
 func cancel():
 	$AnimateAppear.play("hider")
-var file = File.new()
-var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
+
 func hider():
-	file.open(has_updated_store,File.READ)
-	var has = file.get_as_text()
-	file.close()
-	if has == "1":
-		hide()
-		restart_dialog.popup_centered()
-	else:
-		hide()
-		refocus()
+	hide()
+	refocus()
+	mod_menu.show_restart_menu()
 
 var lastFocus = null
 func refocus():

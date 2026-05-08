@@ -43,7 +43,7 @@ func _ready():
 	if not actionArray:
 		actionArray.append(action)
 	defaultModulate = modulate
-	redisplay()
+#	redisplay()
 	Settings.connect("controlSchemeChaged", self, "redisplay")
 	connect("resized", self, "center")
 	
@@ -54,6 +54,8 @@ func center():
 	rect_pivot_offset = rect_size / 2
 
 func redisplay():
+	recheck_availability()
+	return
 	if not is_visible_in_tree() or is_queued_for_deletion():
 		return
 	for c in keys.get_children():
@@ -141,55 +143,26 @@ func _visibility_changed():
 		keyHint = cfg_dta["hint"]
 
 func recheck_availability():
+	if not is_inside_tree() or not is_visible_in_tree() or is_queued_for_deletion():
+		return
 	for key in keys.get_children():
 		key.visible = false
 		Tool.remove(key)
-	var m = get_parent().get_parent().mod
-	var s = get_parent().get_parent().section
-	var a = get_parent().get_parent().action
+	var pv = get_parent().get_parent()
+	var m = pv.mod
+	var s = pv.section
+	var a = pv.action
 	var info = pointers.ConfigDriver.__get_value(m,s,a)
-#	var scheme = forceScheme
-#	if scheme == Settings.control.auto:
-#		scheme = Settings.controlScheme
-#	var f = []
-#	var binds = InputMap.get_action_list(a)
-#	for bind in binds:
-#		match scheme:
-#			Settings.control.keyMouse:
-#				if bind is InputEventMouseButton:
-#					var key = mouseButtonDisplay.instance()
-#					key.key = bind.button_index
-#					if key.rect_size.x > 0:
-#						f.append(key)
-#
-#				if bind is InputEventKey and bind.scancode:
-#					var key = keybindDisplay.instance()
-#					key.text = bind.as_text()
-#					key.showExceptions = exceptions
-#					if key.rect_size.x > 0:
-#						f.append(key)
-#			control.key:
-#				if bind is InputEventKey:
-#					var key = keybindDisplay.instance()
-#					key.text = bind.as_text()
-#					key.showExceptions = exceptions
-#					if key.rect_size.x > 0:
-#						f.append(key)
-#			Settings.control.gamepad:
-#				if bind is InputEventJoypadButton:
-#					var key = gamepadKeyDisplay.instance()
-#					key.key = bind.button_index
-#					if key.rect_size.x > 0:
-#						f.append(key)
-#				if bind is InputEventJoypadMotion:
-#					var key = analogAxisDisplay.instance()
-#					key.key = bind.axis
-#					if key.rect_size.x > 0:
-#						f.append(key)
-	for ref in info:
+	var infosize = info.size()
+	for rfs in range(infosize):
+		if rfs:
+			var sep = separator.instance()
+			keys.add_child(sep)
+		var ref = info[rfs]
 		if typeof(ref) == TYPE_STRING:
 			ref = [ref]
-		for iv in range(ref.size()):
+		var refsize = ref.size()
+		for iv in range(refsize):
 			
 			var i = ref[iv]
 			var type = OS.find_scancode_from_string(i)
@@ -198,26 +171,24 @@ func recheck_availability():
 				d.key = int(i.split("Mouse ")[1])
 				d.name = i
 				keys.add_child(d)
-	#			breakpoint
 			elif i.begins_with("JoyButton "):
 				var d = gamepadKeyDisplay.instance()
 				d.key = int(i.split("JoyButton ")[1])
 				d.name = i
 				keys.add_child(d)
-	#			breakpoint
 			elif i.begins_with("JoyAxis "):
 				var d = analogAxisDisplay.instance()
-				d.key = abs(int(i.split("JoyAxis ")[1]))
+				var raw = i.split("JoyAxis ")[1]
+				d.key = float(raw)
+				d.raw = raw
+				d.display_direction = true
 				d.name = i
 				keys.add_child(d)
-	#			breakpoint
-			
 			else:
 				var d = keybindDisplay.instance()
 				d.text = i
 				d.name = i
 				keys.add_child(d)
-			
 			if iv != ref.size() - 1:
 				var splitLabel = Label.new()
 				splitLabel.set_theme(load("res://hud/TNTRL-theme.tres"))
@@ -226,9 +197,5 @@ func recheck_availability():
 				splitLabel.rect_size = Vector2(15,14)
 				splitLabel.text = "+"
 				keys.add_child(splitLabel)
-				pass
-#			breakpoint
 		
 		
-#		keys.add_child(i)
-#	breakpoint

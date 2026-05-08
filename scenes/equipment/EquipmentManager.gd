@@ -43,54 +43,12 @@ func _init():
 func _tree_entered():
 	var sTime = OS.get_system_time_msecs()
 	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","use_legacy_equipment_handler"):
-		l("Legacy equipment handler is enabled; started checking and modifying equipment")
-		pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_equipment_by_price",has)
-		var does = 1 if has else 0
-		var CRoot = get_tree().get_root().get_node("EquipmentDriver")
-		slots = CRoot.conv
-		var paths = CRoot.paths
-		l("Finished scanning mods. %s mods are using HevLib Equipment Driver." % slots.size())
-		l("Checking hash")
-		var installed_hash = str(str(paths).hash() + str(load("res://HevLib/ModMain.gd").MOD_VERSION_MAJOR).hash() + str(load("res://HevLib/ModMain.gd").MOD_VERSION_MINOR).hash() + str(load("res://HevLib/ModMain.gd").MOD_VERSION_BUGFIX).hash() + str(load("res://HevLib/ModMain.gd").MOD_VERSION_METADATA).hash())
-		var ddFile = cache_folder + "driver_index"
-		var dir = Directory.new()
-		dir.open(cache_folder)
-		var de2 = dir.file_exists(ddFile)
-		if not de2:
-			var f03 = File.new()
-			f03.open(ddFile,File.WRITE)
-			f03.store_string("")
-			f03.close()
-		var hFile = File.new()
-		hFile.open(ddFile, File.READ)
-		var hData = hFile.get_as_text()
-		hFile.close()
-		var de = pointers.DataFormat.__compare_with_byte_array(installed_hash, str(hData))
-		if not de:
-			NEW_INSTALL = !de
-			pointers.FolderAccess.__recursive_delete(cache_folder)
-			pointers.FolderAccess.__check_folder_exists(cache_folder)
-			l("Attempting to clear EquipmentDriver cache. Check later logs for success from other processes")
-		var f2 = File.new()
-		f2.open(ddFile, File.WRITE)
-		f2.store_string(installed_hash)
-		f2.close()
-		l("Handled cache, starting to operate on mods.")
-		
-		get_tags()
-		add_slots()
-		add_slot_tags()
-		add_equipment()
-	else:
-		l("Skipping equipment addition phase; dynamic equipment handler is being used and all equipment has been added during mod ready setup.")
-#func start_processing():
-		l("Performing slot sort check. Will slots be sorted? [%s]" % has)
-		if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_equipment_by_price"):
-			for slot in display_slots():
-				sort_slot(slot)
-		if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_slots_by_type"):
-			reorganize_slots()
+	l("Performing slot sort check. Will slots be sorted? [%s]" % has)
+	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_equipment_by_price"):
+		for slot in display_slots():
+			sort_slot(slot)
+	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_slots_by_type"):
+		reorganize_slots()
 	var finish_time = OS.get_system_time_msecs()
 	var total_time = str(float(finish_time - sTime)/1000)
 	var spl = total_time.split(".")

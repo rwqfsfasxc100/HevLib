@@ -10,6 +10,7 @@ var smes = "res://ships/modules/AuxSmes.tscn"
 var aux_hybrid = "res://HevLib/scenes/equipment/custom_equipment/AuxHybrid.tscn"
 var thruster = "res://sfx/thruster.tscn"
 var exhaust = "res://sfx/exhaust.tscn"
+var exhaust_fusion = "res://sfx/exhaust-fusion.tscn"
 var nozzle = "res://ships/modules/nozzle-conventonal.tscn"
 
 const torch_base_scale = [0.939,1.395]
@@ -21,6 +22,8 @@ var fco
 
 var shipName
 var baseShipName
+
+var pointers
 
 const nozzle_template = {
 	"cool_time":4,
@@ -44,6 +47,7 @@ const nozzle_template = {
 }
 var aux_type
 func loadPlaceholder():
+	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	modify()
 	.loadPlaceholder()
 #	yield(get_tree(),"idle_frame")
@@ -69,7 +73,6 @@ func modify():
 			var item
 			var sys = data.get("system","SYSTEM_NAME_MISSING")
 			if sys == currentInstall:
-				var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 				if pointers:
 					if not pointers.ConfigDriver.__validate_dictionary(data):
 						return
@@ -83,13 +86,13 @@ func modify():
 				if not valid_scene:
 					match aux_type:
 						"MPDG":
-							item = ResourceLoader.load(mpdg,"",true).instance()
+							item = load(mpdg).instance()
 						"SMES":
-							item = ResourceLoader.load(smes,"",true).instance()
+							item = load(smes).instance()
 						"AUX_HYBRID":
-							item = ResourceLoader.load(aux_hybrid,"",true).instance()
+							item = load(aux_hybrid).instance()
 						"RCS","TORCH":
-							item = ResourceLoader.load(thruster,"",true).instance()
+							item = load(thruster).instance()
 				
 #				var sysn = name + "_" + sys
 				item.name = sys
@@ -152,14 +155,13 @@ func modify():
 							item.repairFixPrice = data.get("fix_price",500 if aux_type == "RCS" else 1000)
 							item.repairFixTime = data.get("fix_time",4 if aux_type == "RCS" else 12)
 							
-							item.powerDraw = data.get("power_draw",50000.0)
 							item.exhaustEmitOffset = data.get("exhaust_emit_offset",8)
 							item.scaleOffsetWithPower = data.get("scale_offset_with_power",false)
 							item.distanceScale = data.get("distance_scale",5)
 							item.plumesFromSettings = data.get("plumes_from_settings",true)
 							item.angularDegreedRange = data.get("angular_degree_range",30)
-							item.rotationRange = data.get("rotation_range",3.142)
-							item.consumeCargo = data.get("consume_cargo",PoolStringArray([]))
+							item.rotationRange = data.get("rotation_range",PI)
+							item.consumeCargo = data.get("consume_cargo",PoolStringArray())
 							item.canFizzle = data.get("can_fizzle",true)
 							item.wearPowerMaxChance = data.get("wear_power_max_chance",0.95) 
 							item.wearChance = data.get("wear_chance",0.01)
@@ -168,7 +170,7 @@ func modify():
 							item.accelerationFailScale = data.get("acceleration_fail_scale",200)
 							item.lightLagChance = data.get("light_lag_chance",0.5)
 							item.startJolt = data.get("start_jolt",0)
-							item.thrust = data.get("thrust",1 if aux_type == "RCS" else 7500)
+							item.thrust = data.get("thrust",1000 if aux_type == "RCS" else 7500)
 							item.particleChance = data.get("particle_chance",0.5 if aux_type == "RCS" else 1.0)
 							item.chokeParticleAdjust = data.get("choke_particle_adjust",1)
 							item.fadeSeconds = data.get("fade_seconds",0.2 if aux_type == "RCS" else 0.4)
@@ -190,6 +192,7 @@ func modify():
 							item.maxMissalignment = data.get("max_misalignment",0.262 if aux_type == "RCS" else 0.02)
 							item.bendWearRatio = data.get("bend_wear_ratio",0.025)
 							item.specificImpulse = data.get("specific_impulse",65 if aux_type == "RCS" else 15)
+							item.powerDraw = data.get("power_draw",50000.0)
 							item.thermalFactor = data.get("thermal_factor",40)
 							item.powerDraw = data.get("power_draw",5000 if aux_type == "RCS" else 100000)
 							item.gimbalPowerDraw = data.get("gimbal_power_draw",100)
@@ -207,12 +210,17 @@ func modify():
 							
 							item.pulsePerSecond = data.get("pulse_per_second",10 if aux_type == "RCS" else 4)
 							item.pulseEngine = data.get("pulse_engine",true)
-							
-							var exhaustScene = exhaust_cache_path + "/" + aux_type + "/" + sys
-							if file.file_exists(exhaustScene):
-								item.exhaust = load(exhaustScene)
-							else:
-								item.exhaust = ResourceLoader.load(exhaust,"",true)
+							match data.get("exhaust_type",""):
+								"regular":
+									item.exhaust = load(exhaust)
+								"fusion":
+									item.exhaust = load(exhaust_fusion)
+								_:
+									var exhaustScene = exhaust_cache_path + "/" + aux_type + "/" + sys + "_exhaust.tscn"
+									if file.file_exists(exhaustScene):
+										item.exhaust = load(exhaustScene)
+									else:
+										item.exhaust = load(exhaust)
 							
 							item.externalPower = data.get("external_power",false)
 							item.safetyMaxPower = data.get("safety_max_power",1)
@@ -220,6 +228,7 @@ func modify():
 							item.tuneThrustMin = data.get("tune_thrust_min",0.5)
 							item.tuneThrustMax = data.get("tune_thrust_max",1.5)
 							item.sweepHostilityFactor = data.get("sweep_hostility_factor",0.2)
+							item.damageHostilityScale = data.get("damage_hostility_scale",40000000)
 							
 							item.maxVolume = data.get("max_volume",-20)
 							item.rangeOverride = data.get("range_override",0)
@@ -234,6 +243,16 @@ func modify():
 							if sm != "":
 								item.self_modulate = Color(sm)
 							
+							if data.get("plume_has_material",true):
+								var matpath = data.get("plume_material_path","res://sfx/AddOnly.material")
+								if file.file_exists(matpath):
+									material = load(matpath)
+								else:
+									material = load("res://sfx/AddOnly.material")
+							else:
+								material = null
+							
+							
 							
 							var pt = "res://sfx/thrusters.png"
 							var plumeTex = data.get("plume_texture","res://sfx/thrusters.png")
@@ -241,14 +260,26 @@ func modify():
 								pt = plumeTex
 							item.texture = load(pt)
 							var po = data.get("plume_offset",[-32,-16])
-							if po.size() >= 2:
+							if po.size() > 1:
 								item.offset = Vector2(po[0],po[1])
 							item.centered = data.get("plume_centered",false)
 							item.flip_h = data.get("plume_flip_h",false)
 							item.flip_v = data.get("plume_flip_v",false)
 							
+							item.hframes = data.get("plume_horizontal_frames",8)
+							item.vframes = data.get("plume_vertical_frames",1)
+							item.frame = data.get("plume_frame",1)
+							var plumeFrameCoords = data.get("plume_frame_coords",[1,0])
+							if plumeFrameCoords.size() > 1:
+								item.frame_coords = Vector2(plumeFrameCoords[0],plumeFrameCoords[1])
+							item.region_enabled = data.get("plume_region_enabled",false)
+							var plRect = data.get("plume_region_rect",[0,0,0,0])
+							if plRect.size() > 3:
+								item.region_rect = Rect2(plRect[0],plRect[1],plRect[2],plRect[3])
+							item.region_filter_clip = data.get("plume_region_filter_clip",false)
+							
 							var tp = data.get("position",thruster_base_pos)
-							if tp.size() >= 2:
+							if tp.size() > 1:
 								item.position = Vector2(tp[0],tp[1])
 							var def_scale = rcs_base_scale
 							
@@ -260,24 +291,39 @@ func modify():
 							if ts.size() >= 2:
 								item.scale = Vector2(ts[0],ts[1])
 							
+							
+							
+							
 							flare = item.get_node_or_null("Flare")
 							if flare:
-								flare.set_deferred("essentiality",data.get("flare_essentiality",0.5 if aux_type == "RCS" else 0.8))
-								flare.set_deferred("offsetByCamera", data.get("flare_offset_by_camera",false))
+								flare.essentiality = data.get("flare_essentiality",0.5 if aux_type == "RCS" else 0.8)
+								flare.offsetByCamera = data.get("flare_offset_by_camera",false)
+#								flare.set_deferred("essentiality",data.get("flare_essentiality",0.5 if aux_type == "RCS" else 0.8))
+#								flare.set_deferred("offsetByCamera", data.get("flare_offset_by_camera",false))
 								
 								var ft = "res://lights/plume.png"
 								var flareTex = data.get("flare_texture","res://lights/plume.png")
 								
 								if file.file_exists(flareTex):
 									ft = flareTex
-								flare.set_deferred("texture", load(ft))
-								flare.set_deferred("energy",data.get("flare_energy",5))
-								flare.set_deferred("range_height",data.get("flare_range_height",-15))
+								flare.texture = load(ft)
+								flare.energy = data.get("flare_energy",5)
+								flare.range_height = data.get("flare_range_height",-15)
+								flare.range_z_min = data.get("flare_range_z_min",-4096)
+								flare.range_z_max = data.get("flare_range_z_max",4096)
+								flare.range_layer_min = data.get("flare_range_layer_min",-1)
+								flare.range_layer_max = data.get("flare_range_layer_max",1)
+#								flare.set_deferred("texture", load(ft))
+#								flare.set_deferred("energy",data.get("flare_energy",5))
+#								flare.set_deferred("range_height",data.get("flare_range_height",-15))
 								var fo = data.get("flare_offset",[0,0])
 								if fo.size() >= 2:
-									flare.set_deferred("offset", Vector2(fo[0],fo[1]))
-								flare.set_deferred("texture_scale", data.get("flare_texture_scale",6))
-								flare.set_deferred("rotation",deg2rad(data.get("flare_rotation",0)))
+									flare.set("offset", Vector2(fo[0],fo[1]))
+#									flare.set_deferred("offset", Vector2(fo[0],fo[1]))
+								flare.texture_scale = data.get("flare_texture_scale",6)
+								flare.rotation = deg2rad(data.get("flare_rotation",0))
+#								flare.set_deferred("texture_scale", data.get("flare_texture_scale",6))
+#								flare.set_deferred("rotation",deg2rad(data.get("flare_rotation",0)))
 								var fp = data.get("flare_position",[0,0])
 								if fp.size() >= 2:
 									flare.position = Vector2(fp[0],fp[1])
@@ -288,6 +334,10 @@ func modify():
 								if color_override != "":
 									fco = Color(color_override)
 									make_timer()
+							
+							
+							
+							
 							var after_nozzles = []
 							var before_nozzles = []
 							var noz = data.get("nozzle",{})
@@ -301,20 +351,20 @@ func modify():
 							modify_nozzle(nozzleA,nd)
 							var noz_poz = nozzleA.get_position_in_parent()
 							for n in before_nozzles:
-								var thisNozzle = ResourceLoader.load(nozzle,"",true).instance()
+								var thisNozzle = load(nozzle).instance()
 								modify_nozzle(thisNozzle,n)
 								if thisNozzle:
 									item.add_child(thisNozzle)
 									item.move_child(thisNozzle,noz_poz - 1)
 							for n in after_nozzles:
-								var thisNozzle = ResourceLoader.load(nozzle,"",true).instance()
+								var thisNozzle = load(nozzle).instance()
 								modify_nozzle(thisNozzle,n)
 								if thisNozzle:
 									item.add_child(thisNozzle)
 							var extra_nodes = data.get("extra_nodes",[])
 							for node in extra_nodes:
 								if file.file_exists(node):
-									var scene = ResourceLoader.load(node,"",true)
+									var scene = load(node)
 									if scene:
 										item.add_child(scene.instance())
 						
@@ -340,6 +390,11 @@ func modify():
 				
 				
 				if item:
+#					var savepath = "user://thrusterTest.tscn"
+#					var pc = PackedScene.new()
+#					pc.pack(item)
+#					ResourceSaver.save(savepath,pc)
+#					breakpoint
 #					add_child(item)
 
 					key = name + "_" + mounted
@@ -418,7 +473,8 @@ func modify_nozzle(nozzleA,nd):
 			var rp = nd.heat_position
 			if rp.size() >= 2:
 				heat.position = Vector2(rp[0],rp[1])
-			heat.set_deferred("rotation",deg2rad(nd.heat_rotation))
+			heat.set("rotation",deg2rad(nd.heat_rotation))
+#			heat.set_deferred("rotation",deg2rad(nd.heat_rotation))
 			var rs = nd.heat_scale
 			if rs.size() >= 2:
 				heat.scale = Vector2(rs[0],rs[1])
@@ -431,7 +487,8 @@ func modify_nozzle(nozzleA,nd):
 		var rp = nd.position
 		if rp.size() >= 2:
 			nozzleA.position = Vector2(rp[0],rp[1])
-		nozzleA.set_deferred("rotation",deg2rad(nd.rotation))
+		nozzleA.set("rotation",deg2rad(nd.rotation))
+#		nozzleA.set_deferred("rotation",deg2rad(nd.rotation))
 		var rs = nd.scale
 		if rs.size() >= 2:
 			nozzleA.scale = Vector2(rs[0],rs[1])
@@ -443,25 +500,8 @@ func get_colors():
 	
 	for i in color_data:
 		var d = color_data[i]
-		if "config" in d:
-			var how = true
-			var cfg = d["config"]
-			var config_id = cfg.get("id","")
-			var config_section = cfg.get("section","")
-			var config_setting = cfg.get("entry","")
-			var invert_config = cfg.get("invert_config",false)
-			if config_id and config_section and config_setting:
-				var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-				var cfg_opt = pointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
-				if cfg_opt != null:
-					if invert_config:
-						if cfg_opt:
-							how = false
-					else:
-						if !cfg_opt:
-							how = false
-			if not how:
-				continue
+		if not pointers.ConfigDriver.__validate_dictionary(d):
+			continue
 		
 		if i == shipName:
 			modify_colors(d)

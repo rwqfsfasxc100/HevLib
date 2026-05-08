@@ -44,7 +44,7 @@ func add_mod():
 			http.download_file = unique_icon
 			http.request(icon_path)
 		else:
-			mode += 1
+			set_mode_from("icon")
 			set_icon_to(unique_icon)
 			check_if_needs_update()
 	
@@ -103,6 +103,7 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 				if id in list.mod_ids:
 					Tool.remove(self)
 				else:
+					set_mode_from("mod_header")
 					add_mod()
 			else:
 				Tool.remove(self)
@@ -111,6 +112,7 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 				set_icon_to(unique_icon)
 				http.download_file = ""
 			check_if_needs_update()
+			set_mode_from("icon")
 		2:
 			if result == HTTPRequest.RESULT_SUCCESS and response_code == 200:
 				var data = body.get_string_from_utf8()
@@ -148,6 +150,7 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 					file.open(update_check_path,File.WRITE)
 					file.store_string(JSON.print(currentUpdateCache))
 					file.close()
+					set_mode_from("can_update")
 					get_downloads(noUpdate)
 		3:
 			var data = {}
@@ -159,12 +162,14 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 			if data:
 				this_zip_filename = zip_path + data.get("name","temp.zip")
 				this_zip_url = data.get("browser_download_url")
-				list.btn_to_download.disabled = false
+				set_mode_from("has_release")
+				
 			else:
 				if is_visible_in_tree():
 					list.unavailable_mod()
 				Tool.remove(self)
 				list.btn_to_download.disabled = true
+			
 
 		4:
 			if result == HTTPRequest.RESULT_SUCCESS and response_code == 200:
@@ -181,25 +186,25 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 				this_zip_url = ""
 				list.WAIT.hide()
 				list.WAIT_LABEL.clear()
+				list.btn_to_download.disabled = false
 				is_downloading = false
 				list.btn_to_download.grab_focus()
 				list.subtract_mod_count()
 				list.select_first_mod()
 				Tool.remove(self)
-	mode += 1
 
 var base_downloads_list = "https://api.github.com/repos/%s/releases"
 func get_downloads(noUpdate = false):
 	if noUpdate:
-		mode += 1
 		_on_HTTPRequest_request_completed(0,0,0,0)
+		set_mode_from("has_release")
 	else:
 		var entry = DATA.get("full_name")
 		var downloads = base_downloads_list % [entry]
 		var c = get_releases_cache()
 		if entry in c:
-			mode += 1
 			_on_HTTPRequest_request_completed(0,0,0,0)
+			set_mode_from("has_release")
 		else:
 			http.request(downloads)
 
@@ -282,3 +287,19 @@ func get_releases_cache():
 
 func _tree_entered():
 	get_readme()
+
+func set_mode_from(part:String):
+	var oldmode = mode
+	match part:
+		"mod_header":
+			mode = 1
+		"icon":
+			mode = 2
+		"can_update":
+			mode = 3
+		"has_release":
+			mode = 4
+			list.btn_to_download.disabled = false
+		_:
+			mode = 0
+	Debug.l("Mod Menu 2 Github Fetcher: Changing mode for mod \"%s\" to %s [%s -> %s]" % [DATA["full_name"],part,str(oldmode),str(mode)])

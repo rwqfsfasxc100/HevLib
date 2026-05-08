@@ -8,7 +8,8 @@ var CONFIG_SECTION = ""
 
 var CONFIG_MOD = ""
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+
+var volatile = false
 
 func _ready():
 	var value = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
@@ -17,9 +18,14 @@ func _ready():
 	$Label.text = CONFIG_DATA.get("name","BOOL_MISSING_NAME")
 	$CheckButton.pressed = value
 	$Label/LABELBUTTON.hint_tooltip = CONFIG_DATA.get("description","")
+	volatile = CONFIG_DATA.get("require_restart",false)
 	add_to_group("hevlib_settings_tab",true)
 
 func _toggled(button_pressed):
+	if volatile:
+		var old_val = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
+		if old_val != button_pressed:
+			triggerVolatile()
 	pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,button_pressed)
 	var tex = StreamTexture.new()
 	if button_pressed:
@@ -83,8 +89,13 @@ func recheck_availability():
 		$CheckButton.disabled = false
 
 func _reset_pressed():
-	$CheckButton.pressed = CONFIG_DATA.get("default",false)
-	pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,CONFIG_DATA.get("default",false))
+	var defaultVal = CONFIG_DATA.get("default",false)
+	if volatile:
+		var old_val = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
+		if old_val != defaultVal:
+			triggerVolatile()
+	$CheckButton.pressed = defaultVal
+	pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,defaultVal)
 	$CheckButton.grab_focus()
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 
@@ -94,8 +105,6 @@ func _draw():
 
 func refocus():
 	$Label/LABELBUTTON.rect_size = $Label.rect_size
-#	get_tree().call_group("hevlib_settings_tab","recheck_availability")
-	
 	pointers.ConfigDriver.__set_button_focus(self,get_node("CheckButton"))
 	
 
@@ -104,3 +113,9 @@ func _visibility_changed():
 		$Label/LABELBUTTON.grab_focus()
 	refocus()
 
+var updateCacheDir = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
+func triggerVolatile():
+	var file = File.new()
+	file.open(updateCacheDir,File.WRITE)
+	file.store_string("1")
+	file.close()

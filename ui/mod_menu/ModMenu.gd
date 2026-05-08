@@ -1,7 +1,7 @@
 extends Popup
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 var offset = Vector2(12,12)
-#var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+
 var cache_folder = "user://cache/.Mod_Menu_2_Cache/"
 var filter_cache_file = "menu_filter_cache.json"
 var file = File.new()
@@ -30,6 +30,9 @@ func _unhandled_input(event):
 		elif $FetchGithub/WAIT.visible:
 			Debug.l("Currently downloading a mod, not closing wait window.")
 		
+		
+		elif $MMRestartDialog.visible:
+			$MMRestartDialog.hide()
 		
 		elif $ModpacksMenu/OpenPack.visible:
 			$ModpacksMenu/OpenPack.hide()
@@ -67,9 +70,33 @@ func show_menu():
 func cancel():
 	$AnimateAppear.play("hider")
 
+onready var restart_menu = $MMRestartDialog
+var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
+
+func show_restart_menu():
+	var valid = true
+	var ps = CurrentGame.getPlayerShip()
+	if ps and ps.zone == "rings":
+		valid = false
+	restart_menu.let_restart(valid)
+	file.open(has_updated_store,File.READ)
+	var has = file.get_as_text()
+	file.close()
+	if has == "1":
+		restart_menu.show()
+		return true
+	return false
+
 func hider():
-	hide()
-	refocus()
+	if restart_menu.can_restart:
+		if not show_restart_menu():
+			hide()
+			refocus()
+		else:
+			hide()
+	else:
+		hide()
+		refocus()
 
 var lastFocus = null
 func refocus():
@@ -78,7 +105,6 @@ func refocus():
 	else:
 		Debug.l("I have no focus to fall back to!")
 
-onready var restart_menu = $MMRestartDialog
 
 func _on_resize():
 	var size = Settings.getViewportSize()

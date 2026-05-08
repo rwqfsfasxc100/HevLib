@@ -42,6 +42,7 @@ var exclusives_variable_obj = "charset_%s"
 var exclusives_variable_falsify = "\n\t\t\t\tcharset_%s = false"
 var exclusives_expression_check = "if not %s:\n\t\t\t\t"
 var exclusives_exit_this_expression = "if not %s:\n\t\t\t\t\tCurrentGame.get_tree().set_input_as_handled()\n\t\t\t\t\tInput.action_release(\"%s\")\n\t\t\telse:%s"
+var exclusives_exit_this_expression_noexbr = "CurrentGame.get_tree().set_input_as_handled()\n\t\t\t\tInput.action_release(\"%s\")\n\t\t\telse:%s"
 var exclusives_exit_from_no_keys = "\n\t\telse:\n\t\t\tCurrentGame.get_tree().set_input_as_handled()\n\t\t\tInput.action_release(\"%s\")"
 var exclusives_checker_expression_part = "%s in bits"
 
@@ -258,16 +259,27 @@ func compile_keymap():
 					for kcheck in bindgroup:
 						if not kcheck in used_keys:
 							unexited_keys.append(kcheck)
-				if unexited_keys:
-					
-					# Use the unexited_keys array to prevent scancodes inside it from triggering any
-					# bind cancelling
-					
-					breakpoint
 				
-				if not other_bind_check_expression:
-					other_bind_check_expression = "false"
-				state += exclusives_expression_check % expression + exclusives_exit_this_expression % [other_bind_check_expression,ct,falsifiers] + exclusives_exit_from_no_keys % ct + orderspecific_checker_end % [extxpr,ct]
+				# Use the unexited_keys array to prevent scancodes inside it from triggering any
+				# bind cancelling
+				
+				var exbr = ""
+				
+				if unexited_keys:
+					for kv in unexited_keys:
+						var sc = pointers.Keymapping.__string_to_scancode(kv)
+						if other_bind_check_expression:
+							other_bind_check_expression += " or " + exclusives_checker_expression_part % str(sc)
+						else:
+							other_bind_check_expression = exclusives_checker_expression_part % str(sc)
+				
+				
+				if other_bind_check_expression:
+					exbr = exclusives_exit_this_expression % [other_bind_check_expression,ct,falsifiers]
+				else:
+					exbr = exclusives_exit_this_expression_noexbr % [ct,falsifiers]
+#					exbr = exclusives_exit_this_expression % ["false",ct,falsifiers]
+				state += exclusives_expression_check % expression + exbr + exclusives_exit_from_no_keys % ct + orderspecific_checker_end % [extxpr,ct]
 				scripting += state
 				
 		else:

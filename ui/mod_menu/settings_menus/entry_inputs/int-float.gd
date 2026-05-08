@@ -8,8 +8,6 @@ var CONFIG_SECTION = ""
 
 var CONFIG_MOD = ""
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
-
 export (String,"slider","spinbox") var style = "slider"
 
 export (String,"int","float") var val_type = "int"
@@ -18,6 +16,8 @@ onready var slider = $slider
 onready var label = $Label
 onready var spinbox = $spinbox
 onready var SliderLabel = $SliderLabel
+
+var volatile = false
 
 func _ready():
 	var value = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
@@ -58,10 +58,15 @@ func _ready():
 	spinbox.value = value
 	SliderLabel.text = str(value)
 	$Label/LABELBUTTON.hint_tooltip = CONFIG_DATA.get("description","")
+	volatile = CONFIG_DATA.get("require_restart",false)
 	add_to_group("hevlib_settings_tab",true)
 
 func _reset_pressed():
 	var val = CONFIG_DATA.get("default",10.0)
+	if volatile:
+		var old_val = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
+		if old_val != val:
+			triggerVolatile()
 	slider.value = val
 	spinbox.value = val
 	SliderLabel.text = str(val)
@@ -86,10 +91,12 @@ func refocus():
 		slider.visible = false
 		SliderLabel.visible = false
 	pointers.ConfigDriver.__set_button_focus(self,get_node(style))
-#	get_tree().call_group("hevlib_settings_tab","recheck_availability")
-	
 
 func _value_changed(value):
+	if volatile:
+		var old_val = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
+		if old_val != value:
+			triggerVolatile()
 	pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,value)
 	SliderLabel.text = str(value)
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
@@ -214,3 +221,9 @@ func _input(event):
 func _timeout():
 	slider.grab_focus()
 
+var updateCacheDir = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
+func triggerVolatile():
+	var file = File.new()
+	file.open(updateCacheDir,File.WRITE)
+	file.store_string("1")
+	file.close()

@@ -222,7 +222,6 @@ class _ConfigDriver:
 	var settingsInputHash = 0
 	var has_loaded = false
 	var settings = {}
-	
 	var file = File.new()
 	
 	var subscriptions = {}
@@ -492,7 +491,7 @@ class _ConfigDriver:
 				var manifest_version = manifest["manifest_version"]
 				if manifest_version >= 2.1:
 					var cfg = manifest["manifest_data"]["configs"]
-					if not cfg.hash() == {}.hash():
+					if not hash(cfg) == hash({}):
 						configs.merge({mod_name:cfg})
 		Debug.l("ConfigDriver: config contains [%s] mods" % configs.size())
 		for mod in configs:
@@ -842,10 +841,10 @@ class _ConfigDriver:
 		var how = true
 		if check_config and "config" in data_dict:
 			var cfg = data_dict["config"]
-			var config_id = cfg.get("id","")
+			var config_id = cfg.get("id",cfg.get("mod",cfg.get("mod_id","")))
 			var config_section = cfg.get("section","")
-			var config_setting = cfg.get("entry","")
-			var invert_config = cfg.get("invert_config",false)
+			var config_setting = cfg.get("entry",cfg.get("setting",cfg.get("key",cfg.get("value",cfg.get("opt","")))))
+			var invert_config = cfg.get("invert_config",cfg.get("invert",false))
 			if config_id and config_section and config_setting:
 				var cfg_opt = __get_value(config_id,config_section,config_setting)
 				if cfg_opt != null:
@@ -869,23 +868,24 @@ class _ConfigDriver:
 						if has:
 							can += 1
 				allowFromMods = can == needs.size()
-			if check_incompatabilities and "mod_incompatabilities" in data_dict:
-				var needs = data_dict["mod_incompatabilities"]
-				var can = 0
-				for a in needs:
-					var cv = false
-					for f in a:
-						var has = false
-						if f in current_mod_ids:
-							has = true
-						if has:
-							cv = true
-					if cv:
-						can += 1
-				allowFromMods = can != needs.size()
 			if allowFromMods:
-				return true
-			return false
+				var allowFromMods2 = true
+				if check_incompatabilities and "mod_incompatabilities" in data_dict:
+					var needs = data_dict["mod_incompatabilities"]
+					var can = 0
+					for a in needs:
+						var cv = false
+						for f in a:
+							var has = false
+							if f in current_mod_ids:
+								has = true
+							if has:
+								cv = true
+						if cv:
+							can += 1
+					allowFromMods2 = can != needs.size()
+				if allowFromMods2:
+					return true
 		return false
 	
 	func __config_parse(file_path: String) -> Dictionary:
@@ -1106,10 +1106,9 @@ class _DataFormat:
 		var method_values = []
 		var method_output_type = []
 		var signal_values = []
-		var file = File.new()
-		if file.open(file_path,File.READ) == OK:
-			var data = file.get_as_text(true)
-			file.close()
+		var scriptsource = load(file_path)
+		if scriptsource:
+			var data = scriptsource.get_source_code()
 			var streaming = false
 			var this_stream : String = ""
 			var lines = data.split("\n")
@@ -1448,9 +1447,8 @@ class _DriverManagement:
 				if item == "is_debugged":
 					running_in_debugged = true
 					
-					file.open("res://ModLoader.gd",File.READ)
-					var fs = file.get_as_text(true)
-					file.close()
+					var ml = load("res://ModLoader.gd")
+					var fs = ml.get_source_code()
 					var lines = fs.split("\n")
 					var reading = false
 					var contents = []
@@ -1992,47 +1990,7 @@ class _Equipment:
 						var arr2 = []
 						for item in constants:
 							var equipment = constants.get(item).duplicate(true)
-							var allow = true
-#							if "config" in equipment:
-#								var cf = equipment["config"]
-#								var id = cf.get("id",null)
-#								var section = cf.get("section",null)
-#								var opt = cf.get("entry",null)
-#								if id and section and opt:
-#									var cv = ConfigDriver.__get_value(id,section,opt)
-#									if typeof(cv) == TYPE_BOOL:
-#										allow = cv
-							
-							var mr = "mod_requirements" in equipment
-							var mi = "mod_incompatabilities" in equipment
-							if mr:
-								var needs = equipment["mod_requirements"]
-								var can = 0
-								for i in needs:
-									for f in i:
-										var has = false
-										if f in current_mod_ids:
-											has = true
-										if has:
-											can += 1
-								allow = can == needs.size()
-							if mi:
-								var needs = equipment["mod_incompatabilities"]
-								var can = 0
-								for i in needs:
-									var cv = false
-									for f in i:
-										var has = false
-										if f in current_mod_ids:
-											has = true
-										if has:
-											cv = true
-									if cv:
-										can += 1
-								allow = can != needs.size()
-							
-							if allow:
-								
+							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								match equipment.get("slot_type","HARDPOINT"):
 									"HARDPOINT":
 										if "weapon_slot" in equipment:
@@ -2203,35 +2161,7 @@ class _Equipment:
 						var arr2 = []
 						for item in constants:
 							var equipment = constants.get(item).duplicate(true)
-							var allow = true
-							var mr = "mod_requirements" in equipment
-							var mi = "mod_incompatabilities" in equipment
-							if mr:
-								var needs = equipment["mod_requirements"]
-								var can = 0
-								for i in needs:
-									for f in i:
-										var has = false
-										if f in current_mod_ids:
-											has = true
-										if has:
-											can += 1
-								allow = can == needs.size()
-							if mi:
-								var needs = equipment["mod_incompatabilities"]
-								var can = 0
-								for i in needs:
-									var cv = false
-									for f in i:
-										var has = false
-										if f in current_mod_ids:
-											has = true
-										if has:
-											cv = true
-									if cv:
-										can += 1
-								allow = can != needs.size()
-							if allow:
+							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								driver_store["ADD_EQUIPMENT_SLOTS"].append(equipment.duplicate(true))
 					"EQUIPMENT_TAGS.gd":
 						var ar = constants.get("EQUIPMENT_TAGS",{}).duplicate(true)
@@ -2272,36 +2202,8 @@ class _Equipment:
 						var arr2 = []
 						for item in constants:
 							var equipment = constants.get(item).duplicate(true)
-							var allow = true
 							
-							var mr = "mod_requirements" in equipment
-							var mi = "mod_incompatabilities" in equipment
-							if mr:
-								var needs = equipment["mod_requirements"]
-								var can = 0
-								for i in needs:
-									for f in i:
-										var has = false
-										if f in current_mod_ids:
-											has = true
-										if has:
-											can += 1
-								allow = can == needs.size()
-							if mi:
-								var needs = equipment["mod_incompatabilities"]
-								var can = 0
-								for i in needs:
-									var cv = false
-									for f in i:
-										var has = false
-										if f in current_mod_ids:
-											has = true
-										if has:
-											cv = true
-									if cv:
-										can += 1
-								allow = can != needs.size()
-							if allow:
+							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								driver_store["AUX_POWER_AND_THRUSTERS"].append(equipment.duplicate(true))
 
 					"MODIFY_INTERNALS.gd":
@@ -2390,10 +2292,9 @@ class _Equipment:
 						var pfdata = JSON.parse(file.get_as_text()).result
 						file.close()
 						for item in constants:
-							
-								var xd = {item:constants.get(item)}
-								pfdata.merge(xd)
-								driver_store["NODE_DEFINITIONS"].append(xd.duplicate(true))
+							var xd = {item:constants.get(item)}
+							pfdata.merge(xd)
+							driver_store["NODE_DEFINITIONS"].append(xd.duplicate(true))
 							
 						file.open(node_definitions_file,File.WRITE)
 						file.store_string(JSON.print(pfdata))
@@ -2403,9 +2304,9 @@ class _Equipment:
 						var pfdata = JSON.parse(file.get_as_text()).result
 						file.close()
 						for item in constants:
-								var xd = constants.get(item)
-								pfdata.append(xd)
-								driver_store["SHIP_NODE_REGISTER"].append(xd.duplicate(true))
+							var xd = constants.get(item)
+							pfdata.append(xd)
+							driver_store["SHIP_NODE_REGISTER"].append(xd.duplicate(true))
 							
 						file.open(ship_node_register_file,File.WRITE)
 						file.store_string(JSON.print(pfdata))
@@ -2471,36 +2372,7 @@ class _Equipment:
 							if n:
 								if not n in ws_equipment_names:
 									ws_equipment_names.append(n)
-								var allow = true
-								
-								var mr = "mod_requirements" in equipment
-								var mi = "mod_incompatabilities" in equipment
-								if mr:
-									var needs = equipment["mod_requirements"]
-									var can = 0
-									for i in needs:
-										for f in i:
-											var has = false
-											if f in current_mod_ids:
-												has = true
-											if has:
-												can += 1
-									allow = can == needs.size()
-								if mi:
-									var needs = equipment["mod_incompatabilities"]
-									var can = 0
-									for i in needs:
-										var cv = false
-										for f in i:
-											var has = false
-											if f in current_mod_ids:
-												has = true
-											if has:
-												cv = true
-										if cv:
-											can += 1
-									allow = can != needs.size()
-								if allow:
+								if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 									driver_store["WEAPONSLOT_ADD"].append(equipment.duplicate(true))
 					"WEAPONSLOT_MODIFY_TEMPLATES.gd":
 						var ar = constants.get("WEAPONSLOT_MODIFY_TEMPLATES",{}).duplicate(true)
@@ -3065,36 +2937,7 @@ class _Equipment:
 		var ws_stuff_to_modify = []
 		
 		for add in driver_store["WEAPONSLOT_ADD"]:
-			var allow = true
-			var mr = "mod_requirements" in add
-			var mi = "mod_incompatabilities" in add
-			if mr:
-				var needs = add["mod_requirements"]
-				var can = 0
-				for i in needs:
-					for f in i:
-						var has = false
-						if f in current_mod_ids:
-							has = true
-						if has:
-							can += 1
-				allow = can == needs.size()
-			if mi:
-				var needs = add["mod_incompatabilities"]
-				var can = 0
-				for i in needs:
-					var cv = false
-					for f in i:
-						var has = false
-						if f in current_mod_ids:
-							has = true
-						if has:
-							cv = true
-					if cv:
-						can += 1
-				allow = can != needs.size()
-			
-			if allow:
+			if pointers.ConfigDriver.__validate_dictionary(add,false):
 				var aname = add.get("name","SYSTEM_ERROR")
 				var apath = add.get("path","")
 				var item_data = {}
@@ -3198,9 +3041,11 @@ class _Equipment:
 		
 		var aux_power_string = aux_power_header
 		
-		var thruster_header = "[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://sfx/exhaust.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"%s\" type=\"%s\" id=2]\n\n[sub_resource type=\"CircleShape2D\" id=1]\nradius = %s\n\n[node name=\"exhaust\" instance=ExtResource( 1 )]"
-		var thruster_footer = "[node name=\"Sprite\" parent=\".\" index=\"1\"]\ntexture = ExtResource( 2 )"
+		var exhaust_header = "[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://sfx/exhaust.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"%s\" type=\"%s\" id=2]\n\n[sub_resource type=\"CircleShape2D\" id=1]\nradius = %s\n\n[node name=\"exhaust\" instance=ExtResource( 1 )]"
+		var exhaust_footer = "[node name=\"Sprite\" parent=\".\" index=\"1\"]\ntexture = ExtResource( 2 )"
 		
+		var thruster_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://sfx/thruster.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"thruster\" instance=ExtResource( 1 )]"
+		var thruster_footer = "[editable path=\"nozzle\"]"
 		
 		
 		var property = "%s = %s"
@@ -3254,28 +3099,28 @@ class _Equipment:
 						tex_type = "Texture"
 						sprite = "res://sfx/ball-of-flame.png"
 					
-					var thruster_text = thruster_header % [sprite,tex_type,str(radius)]
+					var exhaust_text = exhaust_header % [sprite,tex_type,str(radius)]
 					
-					thruster_text = thruster_text + "\nmass = %s" % mass
-					thruster_text = thruster_text + "\nlightLagChance = %s" % light_lag_chance
-					thruster_text = thruster_text + "\nbaseLifetime = %s" % base_lifetime
-					thruster_text = thruster_text + "\nlifetime = %s" % lifetime
-					thruster_text = thruster_text + "\nendScale = %s" % end_scale
+					exhaust_text += "\nmass = %s" % mass
+					exhaust_text += "\nlightLagChance = %s" % light_lag_chance
+					exhaust_text += "\nbaseLifetime = %s" % base_lifetime
+					exhaust_text += "\nlifetime = %s" % lifetime
+					exhaust_text += "\nendScale = %s" % end_scale
 					if self_remove:
-						thruster_text = thruster_text + "\nselfRemove = true"
+						exhaust_text += "\nselfRemove = true"
 					else:
-						thruster_text = thruster_text + "\nselfRemove = false"
+						exhaust_text += "\nselfRemove = false"
 					
-					thruster_text = thruster_text + "\n\n[node name=\"CollisionShape2D\" parent=\".\" index=\"0\"]\nshape = SubResource( 1 )\n\n" + thruster_footer
-					thruster_text = thruster_text + "\nscale = Vector2(%s,%s)" % [sprite_scale[0],sprite_scale[1]]
-					
-					pointers.FolderAccess.__check_folder_exists(exhaust_cache_path + "/" + aux_type)
-					
-					file.open(exhaust_cache_path + "/" + aux_type + "/" + sys + ".tscn",File.WRITE)
-					file.store_string(thruster_text)
+					exhaust_text += "\n\n[node name=\"CollisionShape2D\" parent=\".\" index=\"0\"]\nshape = SubResource( 1 )\n\n" + exhaust_footer
+					exhaust_text += "\nscale = Vector2(%s,%s)" % [sprite_scale[0],sprite_scale[1]]
+					var auxTypePath = exhaust_cache_path + "/" + aux_type
+					pointers.FolderAccess.__check_folder_exists(auxTypePath)
+					var this_exhaust_path = auxTypePath + "/" + sys + "_exhaust.tscn"
+					file.open(this_exhaust_path,File.WRITE)
+					file.store_string(exhaust_text)
 					file.close()
-								
-								
+					
+					
 		var lim_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]"
 		var lim_item = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\"]"
 		ship_limitation_string = lim_header
@@ -4163,8 +4008,14 @@ class _Keymapping:
 			return out
 		else:
 			if event.begins_with("JoyAxis "):
-				var ac = int(event.split("JoyAxis ")[1])
-				var additive = (12000 * sign(ac))
+				var raw = event.split("JoyAxis ")[1]
+				var ac = int(raw)
+				var sn = sign(ac)
+				if raw.begins_with("-"):
+					sn = -1
+				if sn == 0:
+					sn = 1
+				var additive = (12000 * sn)
 				var joyAxisString = ac + additive
 				return joyAxisString
 			elif event.begins_with("JoyButton "):
@@ -4298,8 +4149,17 @@ class _Keymapping:
 						InputMap.action_add_event(action,ie)
 					3:
 						var ie = InputEventJoypadMotion.new()
-						var s = scan[0] - (12000 * sign(scan[0]))
+						var so = scan[0]
+						var sig = sign(so)
+						var s = 0
+						if sig >= 0:
+							var negoffset = (12000 * sig)
+							s = so - negoffset
+						else:
+							var negoffset = (12000 * sig)
+							s = -so + negoffset
 						ie.axis = s
+						ie.axis_value = sig
 						InputMap.action_add_event(action,ie)
 			else:
 				var scans = []
@@ -4325,8 +4185,17 @@ class _Keymapping:
 							InputMap.action_add_event(action,ie)
 						3:
 							var ie = InputEventJoypadMotion.new()
-							var s = scan[0] - (12000 * sign(scan[0]))
+							var so = scan[0]
+							var sig = sign(so)
+							var s = 0
+							if sig >= 0:
+								var negoffset = (12000 * sig)
+								s = so - negoffset
+							else:
+								var negoffset = (12000 * sig)
+								s = -so + negoffset
 							ie.axis = s
+							ie.axis_value = sig
 							InputMap.action_add_event(action,ie)
 					breakpoint
 	
