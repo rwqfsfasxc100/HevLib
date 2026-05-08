@@ -386,14 +386,18 @@ func handleNanoDelivery(delta):
 	availableNanoToDrawNow += nano_speed_add
 
 func handleAmmoDelivery(delta):
-	.handleAmmoDelivery(delta)
-	if ammo_speed_multi != 1.0:
-		availableAmmoToDrawNow *= ammo_speed_multi
-	availableAmmoToDrawNow += ammo_speed_add
+	if unrestrictedAmmoOutput:
+		availableAmmoToDrawNow = 90000000000
+	else:
+		.handleAmmoDelivery(delta)
+		if ammo_speed_multi != 1.0:
+			availableAmmoToDrawNow *= ammo_speed_multi
+		availableAmmoToDrawNow += ammo_speed_add
 	
 var ismPointers
 #const ismCFGD = preload("res://HevLib/pointers/ConfigDriver.gd")
 var limitDroneOutput = true
+var unrestrictedAmmoOutput = false
 func drawDrones(kg, really = true):
 	if limitDroneOutput:
 		if availableNanoToDrawNow < kg:
@@ -441,6 +445,7 @@ func _physics_process(delta):
 func hl_ism_UV():
 	if ismPointers:
 		limitDroneOutput = ismPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","limit_nanodrone_output")
+		unrestrictedAmmoOutput = ismPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","unrestricted_ammo_output")
 
 
 
