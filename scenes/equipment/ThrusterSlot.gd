@@ -216,7 +216,7 @@ func modify():
 								"fusion":
 									item.exhaust = load(exhaust_fusion)
 								_:
-									var exhaustScene = exhaust_cache_path + "/" + aux_type + "/" + sys + ".tscn"
+									var exhaustScene = exhaust_cache_path + "/" + aux_type + "/" + sys + "_exhaust.tscn"
 									if file.file_exists(exhaustScene):
 										item.exhaust = load(exhaustScene)
 									else:

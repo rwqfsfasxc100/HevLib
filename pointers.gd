@@ -3041,9 +3041,11 @@ class _Equipment:
 		
 		var aux_power_string = aux_power_header
 		
-		var thruster_header = "[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://sfx/exhaust.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"%s\" type=\"%s\" id=2]\n\n[sub_resource type=\"CircleShape2D\" id=1]\nradius = %s\n\n[node name=\"exhaust\" instance=ExtResource( 1 )]"
-		var thruster_footer = "[node name=\"Sprite\" parent=\".\" index=\"1\"]\ntexture = ExtResource( 2 )"
+		var exhaust_header = "[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://sfx/exhaust.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"%s\" type=\"%s\" id=2]\n\n[sub_resource type=\"CircleShape2D\" id=1]\nradius = %s\n\n[node name=\"exhaust\" instance=ExtResource( 1 )]"
+		var exhaust_footer = "[node name=\"Sprite\" parent=\".\" index=\"1\"]\ntexture = ExtResource( 2 )"
 		
+		var thruster_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://sfx/thruster.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"thruster\" instance=ExtResource( 1 )]"
+		var thruster_footer = "[editable path=\"nozzle\"]"
 		
 		
 		var property = "%s = %s"
@@ -3097,28 +3099,28 @@ class _Equipment:
 						tex_type = "Texture"
 						sprite = "res://sfx/ball-of-flame.png"
 					
-					var thruster_text = thruster_header % [sprite,tex_type,str(radius)]
+					var exhaust_text = exhaust_header % [sprite,tex_type,str(radius)]
 					
-					thruster_text = thruster_text + "\nmass = %s" % mass
-					thruster_text = thruster_text + "\nlightLagChance = %s" % light_lag_chance
-					thruster_text = thruster_text + "\nbaseLifetime = %s" % base_lifetime
-					thruster_text = thruster_text + "\nlifetime = %s" % lifetime
-					thruster_text = thruster_text + "\nendScale = %s" % end_scale
+					exhaust_text += "\nmass = %s" % mass
+					exhaust_text += "\nlightLagChance = %s" % light_lag_chance
+					exhaust_text += "\nbaseLifetime = %s" % base_lifetime
+					exhaust_text += "\nlifetime = %s" % lifetime
+					exhaust_text += "\nendScale = %s" % end_scale
 					if self_remove:
-						thruster_text = thruster_text + "\nselfRemove = true"
+						exhaust_text += "\nselfRemove = true"
 					else:
-						thruster_text = thruster_text + "\nselfRemove = false"
+						exhaust_text += "\nselfRemove = false"
 					
-					thruster_text = thruster_text + "\n\n[node name=\"CollisionShape2D\" parent=\".\" index=\"0\"]\nshape = SubResource( 1 )\n\n" + thruster_footer
-					thruster_text = thruster_text + "\nscale = Vector2(%s,%s)" % [sprite_scale[0],sprite_scale[1]]
-					
-					pointers.FolderAccess.__check_folder_exists(exhaust_cache_path + "/" + aux_type)
-					
-					file.open(exhaust_cache_path + "/" + aux_type + "/" + sys + ".tscn",File.WRITE)
-					file.store_string(thruster_text)
+					exhaust_text += "\n\n[node name=\"CollisionShape2D\" parent=\".\" index=\"0\"]\nshape = SubResource( 1 )\n\n" + exhaust_footer
+					exhaust_text += "\nscale = Vector2(%s,%s)" % [sprite_scale[0],sprite_scale[1]]
+					var auxTypePath = exhaust_cache_path + "/" + aux_type
+					pointers.FolderAccess.__check_folder_exists(auxTypePath)
+					var this_exhaust_path = auxTypePath + "/" + sys + "_exhaust.tscn"
+					file.open(this_exhaust_path,File.WRITE)
+					file.store_string(exhaust_text)
 					file.close()
-								
-								
+					
+					
 		var lim_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]"
 		var lim_item = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\"]"
 		ship_limitation_string = lim_header
