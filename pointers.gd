@@ -3041,13 +3041,6 @@ class _Equipment:
 		
 		var aux_power_string = aux_power_header
 		
-		var exhaust_header = "[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://sfx/exhaust.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"%s\" type=\"%s\" id=2]\n\n[sub_resource type=\"CircleShape2D\" id=1]\nradius = %s\n\n[node name=\"exhaust\" instance=ExtResource( 1 )]"
-		var exhaust_footer = "[node name=\"Sprite\" parent=\".\" index=\"1\"]\ntexture = ExtResource( 2 )"
-		
-		var thruster_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://sfx/thruster.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"thruster\" instance=ExtResource( 1 )]"
-		var thruster_footer = "[editable path=\"nozzle\"]"
-		
-		
 		var property = "%s = %s"
 		
 		file.open(weaponslot_additions,File.WRITE)
@@ -3079,48 +3072,30 @@ class _Equipment:
 			var aux_type = data.get("type","MPDG").to_upper()
 			match aux_type:
 				"THRUSTER","RCS","TORCH","MAIN_PROPULSION":
+					match aux_type:
+						"THRUSTER":
+							aux_type = "RCS"
+						"MAIN_PROPULSION":
+							aux_type = "TORCH"
 					var sys = data.get("system","SYSTEM_NAME_MISSING")
-					var light_lag_chance = data.get("exhaust_light_lag_chance",0)
-					var base_lifetime = data.get("exhaust_base_lifetime",0.25)
-					var lifetime = data.get("exhaust_lifetime",0.25)
-					var end_scale = data.get("exhaust_end_scale",0.02)
-					var self_remove = data.get("exhaust_self_remove",0.02)
-					var mass = data.get("exhaust_mass",0.1)
-					var sprite = data.get("exhaust_sprite","res://sfx/ball-of-flame.png")
-					var sprite_scale = data.get("exhaust_sprite_scale",[0.5,0.5])
-					var radius = data.get("exhaust_collider_radius",2.87)
-					
-					var tex_type = ""
-					if sprite.ends_with(".png"):
-						tex_type = "Texture"
-					elif sprite.ends_with(".stex"):
-						tex_type = "StreamTexture"
-					else:
-						tex_type = "Texture"
-						sprite = "res://sfx/ball-of-flame.png"
-					
-					var exhaust_text = exhaust_header % [sprite,tex_type,str(radius)]
-					
-					exhaust_text += "\nmass = %s" % mass
-					exhaust_text += "\nlightLagChance = %s" % light_lag_chance
-					exhaust_text += "\nbaseLifetime = %s" % base_lifetime
-					exhaust_text += "\nlifetime = %s" % lifetime
-					exhaust_text += "\nendScale = %s" % end_scale
-					if self_remove:
-						exhaust_text += "\nselfRemove = true"
-					else:
-						exhaust_text += "\nselfRemove = false"
-					
-					exhaust_text += "\n\n[node name=\"CollisionShape2D\" parent=\".\" index=\"0\"]\nshape = SubResource( 1 )\n\n" + exhaust_footer
-					exhaust_text += "\nscale = Vector2(%s,%s)" % [sprite_scale[0],sprite_scale[1]]
 					var auxTypePath = exhaust_cache_path + "/" + aux_type
+					
 					pointers.FolderAccess.__check_folder_exists(auxTypePath)
+					
+					var exhaust_text = make_exhaust_scene(data,sys)
+					
 					var this_exhaust_path = auxTypePath + "/" + sys + "_exhaust.tscn"
 					file.open(this_exhaust_path,File.WRITE)
 					file.store_string(exhaust_text)
 					file.close()
 					
+					var thruster_scene = make_thruster_scene(data,sys,aux_type,exhaust_cache_path)
+					var this_thruster_path = auxTypePath + "/" + sys + "_thruster.tscn"
+					file.open(this_thruster_path,File.WRITE)
+					file.store_string(thruster_scene)
+					file.close()
 					
+#					breakpoint
 		var lim_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]"
 		var lim_item = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\"]"
 		ship_limitation_string = lim_header
@@ -3177,6 +3152,640 @@ class _Equipment:
 		Debug.l("[%s %s]: %s" % [title, ID, msg])
 
 	const SLOT_HEADER = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\" instance=ExtResource( 2 )]"
+	
+	func make_thruster_scene(data,sys,aux_type,exhaust_cache_path) -> String:
+		var this_sys_path = exhaust_cache_path + "/" + aux_type + "/" + sys
+		
+		var cached_exhaust_path = this_sys_path + "_exhaust.tscn"
+		var cached_thruster_path = this_sys_path + "_thruster.tscn"
+		var cached_tex_path = this_sys_path + "_texture_%s.tex"
+		
+		var thruster_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://sfx/thruster.tscn\" type=\"PackedScene\" id=1]"
+		var nozzle_footer = "[editable path=\"nozzle\"]"
+		var extra_nozzle_footer = "[editable path=\"%s\"]"
+		
+		var thruster_node_header = "\n\n[node name=\"thruster\" instance=ExtResource( 1 )]"
+		var this_nozzle_header = "\n\n[node name=\"%s\" parent=\".\" index=\"%d\" instance=ExtResource( %d )]"
+		var audio_loop_header = "\n\n[node name=\"AudioLoop\" parent=\".\" index=\"0\"]"
+		var audio_start_header = "\n\n[node name=\"AudioStart\" parent=\".\" index=\"1\"]"
+		var flare_header = "\n\n[node name=\"Flare\" parent=\".\" index=\"2\"]"
+		var nozzle_header = "\n\n[node name=\"nozzle\" parent=\".\" index=\"%d\"]"
+		var base_nozzle_index = 3
+		
+		var ext_path_counter = 1
+		var ext_path_entry = "[ext_resource path=\"%s\" type=\"%s\" id=%d]"
+		
+		var ext_entries = []
+		
+		
+		var thruster_vars = thruster_node_header
+		# Base thruster programming
+		
+		var mass = data.get("mass",0)
+		thruster_vars += "\n" + "mass = %d" % mass
+		var systemName = sys
+		thruster_vars += "\n" + "systemName = \"%s\"" % systemName
+		var priorityOffset = data.get("priority_offset",1.0 if aux_type == "RCS" else 8.0)
+		thruster_vars += "\n" + "priorityOffset = %f" % priorityOffset
+		var mainBrightRatio = data.get("main_bright_ratio",0.01)
+		thruster_vars += "\n" + "mainBrightRatio = %f" % mainBrightRatio
+		var repairReplacementPrice = data.get("price",3000 if aux_type == "RCS" else 15000)
+		thruster_vars += "\n" + "repairReplacementPrice = %d" % repairReplacementPrice
+		var repairReplacementTime = data.get("repair_time",1 if aux_type == "RCS" else 4)
+		thruster_vars += "\n" + "repairReplacementTime = %d" % repairReplacementTime
+		var repairFixPrice = data.get("fix_price",500 if aux_type == "RCS" else 1000)
+		thruster_vars += "\n" + "repairFixPrice = %d" % repairFixPrice
+		var repairFixTime = data.get("fix_time",4 if aux_type == "RCS" else 12)
+		thruster_vars += "\n" + "repairFixTime = %d" % repairFixTime
+		var exhaustEmitOffset = data.get("exhaust_emit_offset",8)
+		thruster_vars += "\n" + "exhaustEmitOffset = %f" % exhaustEmitOffset
+		var scaleOffsetWithPower = data.get("scale_offset_with_power",false)
+		thruster_vars += "\n" + "scaleOffsetWithPower = %s" % ("true" if scaleOffsetWithPower else "false")
+		var distanceScale = data.get("distance_scale",5)
+		thruster_vars += "\n" + "distanceScale = %f" % distanceScale
+		var plumesFromSettings = data.get("plumes_from_settings",true)
+		thruster_vars += "\n" + "plumesFromSettings = %s" % "true" if plumesFromSettings else "false"
+		var angularDegreedRange = data.get("angular_degree_range",30)
+		thruster_vars += "\n" + "angularDegreedRange = %f" % angularDegreedRange
+		var rotationRange = data.get("rotation_range",PI)
+		thruster_vars += "\n" + "rotationRange = %f" % rotationRange
+		var consumeCargo = data.get("consume_cargo",PoolStringArray())
+		var cc = Array(PoolStringArray(consumeCargo))
+		thruster_vars += "\n" + "consumeCargo = PoolStringArray(%s)" % (String(cc) if cc.size() else "")
+		var canFizzle = data.get("can_fizzle",true)
+		thruster_vars += "\n" + "canFizzle = %s" % "true" if canFizzle else "false"
+		var wearPowerMaxChance = data.get("wear_power_max_chance",0.95)
+		thruster_vars += "\n" + "wearPowerMaxChance = %f" % wearPowerMaxChance
+		var wearChance = data.get("wear_chance",0.01)
+		thruster_vars += "\n" + "wearChance = %f" % wearChance
+		var accelerationFailLimit = data.get("acceleration_fail_limit",400)
+		thruster_vars += "\n" + "accelerationFailLimit = %f" % accelerationFailLimit
+		var accelerationFailScale = data.get("acceleration_fail_scale",200)
+		thruster_vars += "\n" + "accelerationFailScale = %f" % accelerationFailScale
+		var lightLagChance = data.get("light_lag_chance",0.5)
+		thruster_vars += "\n" + "lightLagChance = %f" % lightLagChance
+		var startJolt = data.get("start_jolt",0)
+		thruster_vars += "\n" + "startJolt = %f" % startJolt
+		var thrust = data.get("thrust",1000 if aux_type == "RCS" else 7500)
+		thruster_vars += "\n" + "thrust = %f" % thrust
+		var command = data.get("command","m" if aux_type == "TORCH" else "")
+		thruster_vars += "\n" + "command = \"%s\"" % command
+		var particleChance = data.get("particle_chance",0.5 if aux_type == "RCS" else 1.0)
+		thruster_vars += "\n" + "particleChance = %f" % particleChance
+		var chokeParticleAdjust = data.get("choke_particle_adjust",1)
+		thruster_vars += "\n" + "chokeParticleAdjust = %f" % chokeParticleAdjust
+		var fadeSeconds = data.get("fade_seconds",0.2 if aux_type == "RCS" else 0.4)
+		thruster_vars += "\n" + "fadeSeconds = %f" % fadeSeconds
+		var windUpSeconds = data.get("wind_up_seconds",0.017)
+		thruster_vars += "\n" + "windUpSeconds = %f" % windUpSeconds
+		var particleScale = data.get("particle_scale",5)
+		thruster_vars += "\n" + "particleScale = %f" % particleScale
+		var randomness = data.get("randomness",0.5)
+		thruster_vars += "\n" + "randomness = %f" % randomness
+		var heatCone = data.get("heat_cone",0.5)
+		thruster_vars += "\n" + "heatCone = %f" % heatCone
+		var minPower = data.get("min_power",0.2 if aux_type == "RCS" else 0.8)
+		thruster_vars += "\n" + "minPower = %f" % minPower
+		var damageWearCapacity = data.get("damage_wear_capacity",3600)
+		thruster_vars += "\n" + "damageWearCapacity = %f" % damageWearCapacity
+		var damageBentCapacity = data.get("damage_bent_capacity",3000)
+		thruster_vars += "\n" + "damageBentCapacity = %f" % damageBentCapacity
+		var damageBentThreshold = data.get("damage_bent_threshold",200)
+		thruster_vars += "\n" + "damageBentThreshold = %f" % damageBentThreshold
+		var damageChokeCapacity = data.get("damage_choke_capacity",6000)
+		thruster_vars += "\n" + "damageChokeCapacity = %f" % damageChokeCapacity
+		var damageChokeThreshold = data.get("damage_choke_threshold",400)
+		thruster_vars += "\n" + "damageChokeThreshold = %f" % damageChokeThreshold
+		var specialFuelLimit = data.get("special_fuel_limit",0)
+		thruster_vars += "\n" + "specialFuelLimit = %f" % specialFuelLimit
+		var heatFireThreshold = data.get("heat_fire_threshold",200)
+		thruster_vars += "\n" + "heatFireThreshold = %f" % heatFireThreshold
+		var heatFireScale = data.get("heat_fire_scale",8000)
+		thruster_vars += "\n" + "heatFireScale = %f" % heatFireScale
+		var heatFireMax = data.get("heat_fire_max",0.5)
+		thruster_vars += "\n" + "heatFireMax = %f" % heatFireMax
+		var maxMissalignment = data.get("max_misalignment",0.262 if aux_type == "RCS" else 0.02)
+		thruster_vars += "\n" + "maxMissalignment = %f" % maxMissalignment
+		var bendWearRatio = data.get("bend_wear_ratio",0.025)
+		thruster_vars += "\n" + "bendWearRatio = %f" % bendWearRatio
+		var specificImpulse = data.get("specific_impulse",65 if aux_type == "RCS" else 15)
+		thruster_vars += "\n" + "specificImpulse = %f" % specificImpulse
+		var thermalFactor = data.get("thermal_factor",40)
+		thruster_vars += "\n" + "thermalFactor = %f" % thermalFactor
+		var powerDraw = data.get("power_draw",5000 if aux_type == "RCS" else 100000)
+		thruster_vars += "\n" + "powerDraw = %f" % powerDraw
+		var gimbalPowerDraw = data.get("gimbal_power_draw",100)
+		thruster_vars += "\n" + "gimbalPowerDraw = %f" % gimbalPowerDraw
+		var thermalHitFactor = data.get("thermal_hit_factor",1)
+		thruster_vars += "\n" + "thermalHitFactor = %f" % thermalHitFactor
+		var inspection = data.get("inspection",true)
+		thruster_vars += "\n" + "inspection = %s" % "true" if inspection else "false"
+		var gimbal = deg2rad(data.get("gimbal",0))
+		thruster_vars += "\n" + "gimbal = %f" % gimbal
+		var safetyProtocol = data.get("safety_protocol",true)
+		thruster_vars += "\n" + "safetyProtocol = %s" % "true" if safetyProtocol else "false"
+		var safetyGimbalClear = data.get("safety_gimbal_clear",0.419)
+		thruster_vars += "\n" + "safetyGimbalClear = %f" % safetyGimbalClear
+		var ignitionsPerSecond = data.get("ignitions_per_second",10)
+		thruster_vars += "\n" + "ignitionsPerSecond = %f" % ignitionsPerSecond
+		var gimbalAccurancy = data.get("gimbal_accuracy",0.262)
+		thruster_vars += "\n" + "gimbalAccurancy = %f" % gimbalAccurancy
+		var gimbalPerSecond = data.get("gimbal_per_second",3.14)
+		thruster_vars += "\n" + "gimbalPerSecond = %f" % gimbalPerSecond
+		var gimbalRestAngle = data.get("gimbal_rest_angle",0)
+		thruster_vars += "\n" + "gimbalRestAngle = %f" % gimbalRestAngle
+		var gimbalVectoredThrust = data.get("gimbal_vectored_thrust",false)
+		thruster_vars += "\n" + "gimbalVectoredThrust = %s" % ("true" if gimbalVectoredThrust else "false")
+		var pulsePerSecond = data.get("pulse_per_second",10 if aux_type == "RCS" else 4)
+		thruster_vars += "\n" + "pulsePerSecond = %f" % pulsePerSecond
+		var pulseEngine = data.get("pulse_engine",true)
+		thruster_vars += "\n" + "pulseEngine = %s" % ("true" if pulseEngine else "false")
+		var externalPower = data.get("external_power",false)
+		thruster_vars += "\n" + "externalPower = %s" % ("true" if externalPower else "false")
+		var safetyMaxPower = data.get("safety_max_power",1)
+		thruster_vars += "\n" + "safetyMaxPower = %f" % safetyMaxPower
+		var safetyExtraMargin = data.get("safety_extra_margin",1)
+		thruster_vars += "\n" + "safetyExtraMargin = %f" % safetyExtraMargin
+		var tuneThrustMin = data.get("tune_thrust_min",0.5)
+		thruster_vars += "\n" + "tuneThrustMin = %f" % tuneThrustMin
+		var tuneThrustMax = data.get("tune_thrust_max",1.5)
+		thruster_vars += "\n" + "tuneThrustMax = %f" % tuneThrustMax
+		var sweepHostilityFactor = data.get("sweep_hostility_factor",0.2)
+		thruster_vars += "\n" + "sweepHostilityFactor = %f" % sweepHostilityFactor
+		var damageHostilityScale = data.get("damage_hostility_scale",40000000)
+		thruster_vars += "\n" + "damageHostilityScale = %f" % damageHostilityScale
+		var maxVolume = data.get("max_volume",-20)
+		thruster_vars += "\n" + "maxVolume = %f" % maxVolume
+		var rangeOverride = data.get("range_override",0)
+		thruster_vars += "\n" + "rangeOverride = %f" % rangeOverride
+		var boresightAngleoverride = data.get("boresight_angle_override",0)
+		thruster_vars += "\n" + "boresightAngleoverride = %f" % boresightAngleoverride
+		var pitchOverride = data.get("pitch_override",0)
+		thruster_vars += "\n" + "pitchOverride = %f" % pitchOverride
+		var minChoke = data.get("min_choke",0.25)
+		thruster_vars += "\n" + "minChoke = %f" % minChoke
+		var modulate = Color(data.get("modulate",Color(1,1,1,1)))
+		thruster_vars += "\n" + "modulate = Color( %f , %f , %f , %f )" % [modulate.r,modulate.g,modulate.b,modulate.a]
+		var self_modulate = Color(data.get("self_modulate",Color(1,1,1,0)))
+		thruster_vars += "\n" + "self_modulate = Color( %f , %f , %f , %f )" % [self_modulate.r,self_modulate.g,self_modulate.b,self_modulate.a]
+		var offset = Vector2(-32,-16)
+		var po = data.get("plume_offset",[-32,-16])
+		if (po is Vector2) or (po is Array and po.size() > 1):
+			offset[0] = po[0]
+			offset[1] = po[1]
+		thruster_vars += "\n" + "offset = Vector2( %f , %f )" % [offset.x,offset.y]
+		var centered = data.get("plume_centered",false)
+		thruster_vars += "\n" + "centered = %s" % ("true" if centered else "false")
+		var flip_h = data.get("plume_flip_h",false)
+		thruster_vars += "\n" + "flip_h = %s" % ("true" if flip_h else "false")
+		var flip_v = data.get("plume_flip_v",false)
+		thruster_vars += "\n" + "flip_v = %s" % ("true" if flip_v else "false")
+		var hframes = data.get("plume_horizontal_frames",8)
+		thruster_vars += "\n" + "hframes = %f" % hframes
+		var vframes = data.get("plume_vertical_frames",1)
+		thruster_vars += "\n" + "vframes = %f" % vframes
+		var frame = data.get("plume_frame",1)
+		thruster_vars += "\n" + "frame = %f" % frame
+		var frame_coords = Vector2(1,0)
+		var plumeFrameCoords = data.get("plume_frame_coords",frame_coords)
+		if (plumeFrameCoords is Vector2) or (plumeFrameCoords is Array and plumeFrameCoords.size() > 1):
+			frame_coords[0] = plumeFrameCoords[0]
+			frame_coords[1] = plumeFrameCoords[1]
+		thruster_vars += "\n" + "frame_coords = Vector2( %f , %f )" % [frame_coords.x,frame_coords.y]
+		var region_enabled = data.get("plume_region_enabled",false)
+		thruster_vars += "\n" + "region_enabled = %s" % ("true" if region_enabled else "false")
+		var region_rect = Rect2(0,0,0,0)
+		var plRect = data.get("plume_region_rect",Rect2(0,0,0,0))
+		if plRect is Array and plRect.size() > 3:
+			region_rect = Rect2(plRect[0],plRect[1],plRect[2],plRect[3])
+		elif plRect is Rect2:
+			region_rect = plRect
+		thruster_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [region_rect.position.x,region_rect.position.y,region_rect.size.x,region_rect.size.y]
+		var region_filter_clip = data.get("plume_region_filter_clip",false)
+		thruster_vars += "\n" + "region_filter_clip = %s" % ("true" if region_filter_clip else "false")
+		var position = Vector2(0,-3)
+		var tp = data.get("position",position)
+		if tp is Vector2 or (tp is Array and tp.size() > 1):
+			position[0] = tp[0]
+			position[1] = tp[1]
+		thruster_vars += "\n" + "position = Vector2( %f , %f )" % [position.x,position.y]
+		var rotation = deg2rad(data.get("rotation",0))
+		thruster_vars += "\n" + "rotation = %f" % rotation
+		var scale = Vector2(0.2,0.2) if aux_type == "RCS" else Vector2(0.939,1.395)
+		var ts = data.get("scale",scale)
+		if ts is Vector2 or (ts is Array and ts.size() > 1):
+			scale[0] = ts[0]
+			scale[1] = ts[1]
+		thruster_vars += "\n" + "scale = Vector2( %f , %f )" % [scale.x,scale.y]
+		
+		# Audio loop programming, for when it gets implemented
+		var audio_loop_vars = audio_loop_header
+		
+		# Audio start programming, for when it gets implemented
+		var audio_start_vars = audio_start_header
+		
+		var flare_vars = flare_header
+		# Flare programming
+		var flare_essentiality = data.get("flare_essentiality",0.5 if aux_type == "RCS" else 0.8)
+		flare_vars += "\n" + "essentiality = %f" % flare_essentiality
+		var flare_offsetByCamera = data.get("flare_offset_by_camera",false)
+		flare_vars += "\n" + "offsetByCamera = %s" % ("true" if flare_offsetByCamera else "false")
+		var flare_energy = data.get("flare_energy",5)
+		flare_vars += "\n" + "energy = %f" % flare_energy
+		var flare_range_height = data.get("flare_range_height",-15)
+		flare_vars += "\n" + "range_height = %f" % flare_range_height
+		var flare_range_z_min = data.get("flare_range_z_min",-4096)
+		flare_vars += "\n" + "range_z_min = %f" % flare_range_z_min
+		var flare_range_z_max = data.get("flare_range_z_max",4096)
+		flare_vars += "\n" + "range_z_max = %f" % flare_range_z_max
+		var flare_range_layer_min = data.get("flare_range_layer_min",-1)
+		flare_vars += "\n" + "range_layer_min = %f" % flare_range_layer_min
+		var flare_range_layer_max = data.get("flare_range_layer_max",1)
+		flare_vars += "\n" + "range_layer_max = %f" % flare_range_layer_max
+		var flare_offset = Vector2.ZERO
+		var fo = data.get("flare_offset",flare_offset)
+		if fo is Vector2 or (fo is Array and fo.size() > 1):
+			flare_offset[0] = fo[0]
+			flare_offset[1] = fo[1]
+		flare_vars += "\n" + "offset = Vector2( %f , %f )" % [flare_offset.x,flare_offset.y]
+		var flare_texture_scale = data.get("flare_texture_scale",6)
+		flare_vars += "\n" + "texture_scale = %f" % flare_texture_scale
+		var flare_rotation = deg2rad(data.get("flare_rotation",0))
+		flare_vars += "\n" + "rotation = %f" % flare_rotation
+		var flare_position = Vector2.ZERO
+		var fp = data.get("flare_position",[0,0])
+		if fp is Vector2 or (fp is Array and fp.size() > 1):
+			flare_position[0] = fp[0]
+			flare_position[1] = fp[1]
+		var flare_scale = Vector2(1,1)
+		var fs = data.get("flare_scale",[1,1])
+		if fs is Vector2 or (fs is Array and fs.size() > 1):
+			flare_scale[0] = fs[0]
+			flare_scale[1] = fs[1]
+		flare_vars += "\n" + "scale = Vector2( %f , %f )" % [flare_scale.x,flare_scale.y]
+		var flare_color = Color(data.get("flare_color","3bafff"))
+		flare_vars += "\n" + "color = Color( %f , %f , %f , %f )" % [flare_color.r, flare_color.g, flare_color.b, flare_color.a]
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		# Exhaust scene
+		var exhaust_path = "res://sfx/exhaust.tscn"
+		match data.get("exhaust_type",""):
+			"regular":
+				exhaust_path = "res://sfx/exhaust.tscn"
+			"fusion":
+				exhaust_path = "res://sfx/exhaust-fusion.tscn"
+			_:
+				if file.file_exists(cached_exhaust_path):
+					exhaust_path = cached_exhaust_path
+				else:
+					exhaust_path = "res://sfx/exhaust.tscn"
+		ext_path_counter += 1
+		var exhaust_ext = ext_path_entry % [exhaust_path,"PackedScene",ext_path_counter]
+		ext_entries.append(exhaust_ext)
+		thruster_vars += "\n" + "exhaust = ExtResource( %d )" % ext_path_counter
+		
+		# Material
+		var material = "res://sfx/AddOnly.material"
+		if data.get("plume_has_material",true):
+			var matpath = data.get("plume_material_path",material)
+			if file.file_exists(matpath):
+				material = matpath
+		else:
+			material = null
+		if material:
+			ext_path_counter += 1
+			var material_ext = ext_path_entry % [material,"Material",ext_path_counter]
+			ext_entries.append(material_ext)
+			thruster_vars += "\n" + "material = ExtResource( %d )" % ext_path_counter
+		else:
+			thruster_vars += "\n" + "material = null"
+		
+		# Plume texture
+		var plume_texture = "res://sfx/thrusters.png"
+		var plumeTex = data.get("plume_texture",plume_texture)
+		if file.file_exists(plumeTex):
+			plume_texture = plumeTex
+		var plumepath = cached_tex_path % "plume"
+		var plumeTexture = pointers.FileAccess.__load_png(plume_texture)
+		ResourceSaver.save(plumepath,plumeTexture)
+		ext_path_counter += 1
+		var plume_ext = ext_path_entry % [plumepath,"Texture",ext_path_counter]
+		ext_entries.append(plume_ext)
+		thruster_vars += "\n" + "texture = ExtResource( %d )" % ext_path_counter
+		
+		# Flare texture
+		var flare_texture = "res://lights/plume.png"
+		var flareTex = data.get("flare_texture",flare_texture)
+		if file.file_exists(flareTex):
+			flare_texture = flareTex
+		var flarepath = cached_tex_path % "flare"
+		var flareTexture = pointers.FileAccess.__load_png(flare_texture)
+		ResourceSaver.save(flarepath,flareTexture)
+		ext_path_counter += 1
+		var flare_ext = ext_path_entry % [flarepath,"Texture",ext_path_counter]
+		ext_entries.append(flare_ext)
+		flare_vars += "\n" + "texture = ExtResource( %d )" % ext_path_counter
+		
+		
+		# Nozzle handles
+		var after_nozzles = []
+		var before_nozzles = []
+		var nd = convert_to_nozzle(data.get("nozzle",{}))
+		for i in data.get("extra_nozzles",[]):
+			if i.get("order","after") == "before":
+				before_nozzles.append(convert_to_nozzle(i))
+			else:
+				after_nozzles.append(convert_to_nozzle(i))
+		base_nozzle_index += before_nozzles.size()
+		var nozzle_groups = PoolStringArray()
+		var footer_groups = PoolStringArray()
+		var node_index = 2
+		
+		var nozzle_scene_path = "res://ships/modules/nozzle-conventonal.tscn"
+		var nozzle_scene_ext = 0
+		if before_nozzles.size() or after_nozzles.size():
+			ext_path_counter += 1
+			nozzle_scene_ext = ext_path_counter
+			var nozzle_s_ext = ext_path_entry % [nozzle_scene_path,"PackedScene",nozzle_scene_ext]
+			ext_entries.append(nozzle_s_ext)
+		for n in before_nozzles:
+			node_index += 1
+			var nozzlename = "nozzle_%d" % node_index
+			var header = this_nozzle_header % [nozzlename,node_index,nozzle_scene_ext]
+			var nz = format_nozzle(n,header,nozzlename,ext_path_counter,cached_tex_path,ext_path_entry)
+			ext_path_counter = nz[1]
+			ext_entries.append_array(nz[2])
+			nozzle_groups.append(nz[0])
+			footer_groups.append(extra_nozzle_footer % [nozzlename])
+		node_index += 1
+		var basenozzlename = "nozzle"
+		var baseheader = nozzle_header % [node_index]
+		var basenz = format_nozzle(nd,baseheader,basenozzlename,ext_path_counter,cached_tex_path,ext_path_entry)
+		ext_path_counter = basenz[1]
+		ext_entries.append_array(basenz[2])
+		nozzle_groups.append(basenz[0])
+		footer_groups.append(nozzle_footer)
+		for n in after_nozzles:
+			node_index += 1
+			var nozzlename = "nozzle_%d" % node_index
+			var header = this_nozzle_header % [nozzlename,node_index,nozzle_scene_ext]
+			var nz = format_nozzle(n,header,nozzlename,ext_path_counter,cached_tex_path,ext_path_entry)
+			ext_path_counter = nz[1]
+			ext_entries.append_array(nz[2])
+			nozzle_groups.append(nz[0])
+			footer_groups.append(extra_nozzle_footer % [nozzlename])
+		
+		var nodes_to_add = PoolStringArray()
+		
+		# Extra nodes
+		var extra_nodes = data.get("extra_nodes",[])
+		for node in extra_nodes:
+			if file.file_exists(node):
+				var vm = load(node).instance()
+				var nodename = vm.name
+				Tool.remove(vm)
+				ext_path_counter += 1
+				node_index += 1
+				var nodeExt = ext_path_entry % [node,"PackedScene",ext_path_counter]
+				var nodeId = this_nozzle_header % [nodename,node_index,ext_path_counter]
+				ext_entries.append(nodeExt)
+				nodes_to_add.append(nodeId)
+		
+		var header_compile = thruster_header
+		for i in ext_entries:
+			header_compile += "\n" + i
+		
+		var nozzle_compile = ""
+		for i in nozzle_groups:
+			nozzle_compile += "\n" + i
+		
+		var extra_node_compile = ""
+		for i in nodes_to_add:
+			extra_node_compile += "\n" + i
+		
+		var footer = "\n\n"
+		for i in footer_groups:
+			footer += "\n" + i
+		
+		var thruster_text = header_compile + thruster_vars + audio_loop_vars + audio_start_vars + flare_vars + nozzle_compile + extra_node_compile + footer
+		
+		return thruster_text
+	
+	func format_nozzle(nd,header,nozzlename,current_ext,cached_tex_path,ext_path_entry) -> Array:
+		var ext_entries = []
+		var nozzle_vars = header
+		var coolTime = nd.cool_time
+		var heatTime = nd.heat_time
+		var texture = "res://ships/modules/nozzle-cd.png"
+		var normal = "res://ships/modules/nozzle-n.png"
+		var tx = nd.texture
+		if file.file_exists(tx):
+			texture = tx
+		var nx = nd.normal
+		if file.file_exists(nx):
+			normal = nx
+		
+		var texturepath = cached_tex_path % "nozzle_texture"
+		var spriteTexture = pointers.FileAccess.__load_png(texture)
+		ResourceSaver.save(texturepath,spriteTexture)
+		current_ext += 1
+		var sprite_ext = ext_path_entry % [texturepath,"Texture",current_ext]
+		ext_entries.append(sprite_ext)
+		nozzle_vars += "\n" + "texture = ExtResource( %d )" % current_ext
+		
+		var normalpath = cached_tex_path % "nozzle_normal"
+		var normalTexture = pointers.FileAccess.__load_png(normal)
+		ResourceSaver.save(normalpath,normalTexture)
+		current_ext += 1
+		var normal_ext = ext_path_entry % [normalpath,"Texture",current_ext]
+		ext_entries.append(normal_ext)
+		nozzle_vars += "\n" + "normal_map = ExtResource( %d )" % current_ext
+		
+		
+		var offset = nd.offset
+		nozzle_vars += "\n" + "offset = Vector2( %f , %f )" % [offset[0],offset[1]]
+		var centered = nd.centered
+		nozzle_vars += "\n" + "centered = %s" % ("true" if centered else "false")
+		var flip_h = nd.flip_h
+		nozzle_vars += "\n" + "flip_h = %s" % ("true" if flip_h else "false")
+		var flip_v = nd.flip_v
+		nozzle_vars += "\n" + "flip_v = %s" % ("true" if flip_v else "false")
+		var hframes = nd.horizontal_frames
+		nozzle_vars += "\n" + "hframes = %f" % hframes
+		var vframes = nd.vertical_frames
+		nozzle_vars += "\n" + "vframes = %f" % vframes
+		var frame = nd.frame
+		nozzle_vars += "\n" + "frame = %f" % frame
+		var frame_coords = nd.frame_coords
+		nozzle_vars += "\n" + "frame_coords = Vector2( %f , %f )" % [frame_coords[0],frame_coords[1]]
+		var region_enabled = nd.region_enabled
+		nozzle_vars += "\n" + "region_enabled = %s" % ("true" if region_enabled else "false")
+		var region_rect = nd.region_rect
+		nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [region_rect[0],region_rect[1],region_rect[2],region_rect[3]]
+		var region_filter_clip = nd.region_filter_clip
+		nozzle_vars += "\n" + "region_filter_clip = %s" % ("true" if region_filter_clip else "false")
+		var position = nd.position
+		nozzle_vars += "\n" + "position = Vector2( %f , %f )" % [position[0],position[1]]
+		var rotation = deg2rad(nd.rotation)
+		nozzle_vars += "\n" + "rotation = %f" % rotation
+		var scale = nd.scale
+		nozzle_vars += "\n" + "scale = Vector2( %f , %f )" % [scale[0],scale[1]]
+		
+		nozzle_vars += "\n\n[node name=\"heat\" parent=\"%s\" index=\"0\"]" % nozzlename
+		
+		var heat = "res://ships/modules/nozzle-cl.png"
+		var heat_normal = ""
+		var hx = nd.heat
+		if file.file_exists(hx):
+			heat = hx
+		var hn = nd.heat_normal
+		if file.file_exists(hx):
+			heat_normal = hx
+		
+		var heattexturepath = cached_tex_path % "nozzle_heat"
+		var heatspriteTexture = pointers.FileAccess.__load_png(heat)
+		ResourceSaver.save(heattexturepath,heatspriteTexture)
+		current_ext += 1
+		var heat_sprite_ext = ext_path_entry % [heattexturepath,"Texture",current_ext]
+		ext_entries.append(heat_sprite_ext)
+		nozzle_vars += "\n" + "texture = ExtResource( %d )" % current_ext
+		if heat_normal:
+			var heatnormalpath = cached_tex_path % "nozzle_heat_normal"
+			var heatnormalTexture = pointers.FileAccess.__load_png(heat_normal)
+			ResourceSaver.save(heatnormalpath,heatnormalTexture)
+			current_ext += 1
+			var heatnormal_ext = ext_path_entry % [heatnormalpath,"Texture",current_ext]
+			ext_entries.append(heatnormal_ext)
+			nozzle_vars += "\n" + "normal_map = ExtResource( %d )" % current_ext
+		
+		
+		var heat_offset = nd.offset
+		nozzle_vars += "\n" + "offset = Vector2( %f , %f )" % [heat_offset[0],heat_offset[1]]
+		var heat_centered = nd.heat_centered
+		nozzle_vars += "\n" + "centered = %s" % ("true" if heat_centered else "false")
+		var heat_flip_h = nd.heat_flip_h
+		nozzle_vars += "\n" + "flip_h = %s" % ("true" if heat_flip_h else "false")
+		var heat_flip_v = nd.heat_flip_v
+		nozzle_vars += "\n" + "flip_v = %s" % ("true" if heat_flip_v else "false")
+		var heat_hframes = nd.heat_horizontal_frames
+		nozzle_vars += "\n" + "hframes = %f" % heat_hframes
+		var heat_vframes = nd.heat_vertical_frames
+		nozzle_vars += "\n" + "vframes = %f" % heat_vframes
+		var heat_frame = nd.heat_frame
+		nozzle_vars += "\n" + "frame = %f" % heat_frame
+		var heat_frame_coords = nd.heat_frame_coords
+		nozzle_vars += "\n" + "frame_coords = Vector2( %f , %f )" % [heat_frame_coords[0],heat_frame_coords[1]]
+		var heat_region_enabled = nd.heat_region_enabled
+		nozzle_vars += "\n" + "region_enabled = %s" % ("true" if heat_region_enabled else "false")
+		var heat_region_rect = nd.heat_region_rect
+		nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [heat_region_rect[0],heat_region_rect[1],heat_region_rect[2],heat_region_rect[3]]
+		var heat_region_filter_clip = nd.heat_region_filter_clip
+		nozzle_vars += "\n" + "region_filter_clip = %s" % ("true" if heat_region_filter_clip else "false")
+		var heat_position = nd.heat_position
+		nozzle_vars += "\n" + "position = Vector2( %f , %f )" % [heat_position[0],heat_position[1]]
+		var heat_rotation = deg2rad(nd.heat_rotation)
+		nozzle_vars += "\n" + "rotation = %f" % heat_rotation
+		var heat_scale = nd.heat_scale
+		nozzle_vars += "\n" + "scale = Vector2( %f , %f )" % [heat_scale[0],heat_scale[1]]
+		
+		var out = [nozzle_vars,current_ext,ext_entries]
+		return out
+	
+	const nozzle_template = {
+		"cool_time":4,
+		"heat_time":0.25,
+		"texture":"res://ships/modules/nozzle-cd.png",
+		"normal":"res://ships/modules/nozzle-n.png",
+		"heat":"res://ships/modules/nozzle-cl.png",
+		"heat_normal":null,
+		"centered":true,
+		"offset":[0,0],
+		"flip_h":false,
+		"flip_v":false,
+		"horizontal_frames":1,
+		"vertical_frames":1,
+		"frame":0,
+		"frame_coords":[0,0],
+		"region_enabled":false,
+		"region_rect":[0,0,0,0],
+		"region_filter_clip":false,
+		"position":[0,0],
+		"rotation":0,
+		"scale":[1,1],
+		"heat_centered":true,
+		"heat_offset":[0,0],
+		"heat_flip_h":false,
+		"heat_flip_v":false,
+		"heat_horizontal_frames":1,
+		"heat_vertical_frames":1,
+		"heat_frame":0,
+		"heat_frame_coords":[0,0],
+		"heat_region_enabled":false,
+		"heat_region_rect":[0,0,0,0],
+		"heat_region_filter_clip":false,
+		"heat_position":[0,0],
+		"heat_rotation":0,
+		"heat_scale":[1,1],
+	}
+	
+	func convert_to_nozzle(noz):
+		var nozzle = nozzle_template.duplicate(true)
+		for i in nozzle:
+			if i in noz and typeof(nozzle[i]) == typeof(noz[i]):
+				nozzle[i] = noz[i]
+		return nozzle
+	
+	
+	func make_exhaust_scene(data:Dictionary,sys:String) -> String:
+		var exhaust_header = "[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://sfx/exhaust.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"%s\" type=\"%s\" id=2]\n\n[sub_resource type=\"CircleShape2D\" id=1]\nradius = %s\n\n[node name=\"exhaust\" instance=ExtResource( 1 )]"
+		var exhaust_footer = "[node name=\"Sprite\" parent=\".\" index=\"1\"]\ntexture = ExtResource( 2 )"
+		
+		var light_lag_chance = data.get("exhaust_light_lag_chance",0)
+		var base_lifetime = data.get("exhaust_base_lifetime",0.25)
+		var lifetime = data.get("exhaust_lifetime",0.25)
+		var end_scale = data.get("exhaust_end_scale",0.02)
+		var self_remove = data.get("exhaust_self_remove",0.02)
+		var mass = data.get("exhaust_mass",0.1)
+		var sprite = data.get("exhaust_sprite","res://sfx/ball-of-flame.png")
+		var sprite_scale = data.get("exhaust_sprite_scale",[0.5,0.5])
+		var radius = data.get("exhaust_collider_radius",2.87)
+		
+		var tex_type = ""
+		if sprite.ends_with(".png"):
+			tex_type = "Texture"
+		elif sprite.ends_with(".stex"):
+			tex_type = "StreamTexture"
+		else:
+			tex_type = "Texture"
+			sprite = "res://sfx/ball-of-flame.png"
+		
+		var exhaust_text = exhaust_header % [sprite,tex_type,str(radius)]
+		
+		exhaust_text += "\nmass = %s" % mass
+		exhaust_text += "\nlightLagChance = %s" % light_lag_chance
+		exhaust_text += "\nbaseLifetime = %s" % base_lifetime
+		exhaust_text += "\nlifetime = %s" % lifetime
+		exhaust_text += "\nendScale = %s" % end_scale
+		if self_remove:
+			exhaust_text += "\nselfRemove = true"
+		else:
+			exhaust_text += "\nselfRemove = false"
+		
+		exhaust_text += "\n\n[node name=\"CollisionShape2D\" parent=\".\" index=\"0\"]\nshape = SubResource( 1 )\n\n" + exhaust_footer
+		exhaust_text += "\nscale = Vector2(%s,%s)" % [sprite_scale[0],sprite_scale[1]]
+		return exhaust_text
 
 	func tag_vanilla_slots(vanilla_equipment_defaults_for_reference):
 		
