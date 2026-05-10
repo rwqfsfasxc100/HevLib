@@ -3153,6 +3153,8 @@ class _Equipment:
 
 	const SLOT_HEADER = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\" instance=ExtResource( 2 )]"
 	
+	var generated_tex = {}
+	
 	func make_thruster_scene(data,sys,aux_type,exhaust_cache_path) -> String:
 		var this_sys_path = exhaust_cache_path + "/" + aux_type + "/" + sys
 		
@@ -3477,9 +3479,14 @@ class _Equipment:
 		var plumeTex = data.get("plume_texture",plume_texture)
 		if file.file_exists(plumeTex):
 			plume_texture = plumeTex
-		var plumepath = cached_tex_path % "plume"
-		var plumeTexture = pointers.FileAccess.__load_png(plume_texture)
-		ResourceSaver.save(plumepath,plumeTexture)
+		var plumepath = ""
+		if plume_texture in generated_tex:
+			plumepath = generated_tex[plume_texture]
+		else:
+			plumepath = cached_tex_path % "plume"
+			generated_tex[plume_texture] = plumepath
+			var plumeTexture = pointers.FileAccess.__load_png(plume_texture)
+			ResourceSaver.save(plumepath,plumeTexture)
 		ext_path_counter += 1
 		var plume_ext = ext_path_entry % [plumepath,"Texture",ext_path_counter]
 		ext_entries.append(plume_ext)
@@ -3490,9 +3497,14 @@ class _Equipment:
 		var flareTex = data.get("flare_texture",flare_texture)
 		if file.file_exists(flareTex):
 			flare_texture = flareTex
-		var flarepath = cached_tex_path % "flare"
-		var flareTexture = pointers.FileAccess.__load_png(flare_texture)
-		ResourceSaver.save(flarepath,flareTexture)
+		var flarepath = ""
+		if flare_texture in generated_tex:
+			flarepath = generated_tex[flare_texture]
+		else:
+			flarepath = cached_tex_path % "flare"
+			generated_tex[flare_texture] = flarepath
+			var flareTexture = pointers.FileAccess.__load_png(flare_texture)
+			ResourceSaver.save(flarepath,flareTexture)
 		ext_path_counter += 1
 		var flare_ext = ext_path_entry % [flarepath,"Texture",ext_path_counter]
 		ext_entries.append(flare_ext)
@@ -3597,17 +3609,27 @@ class _Equipment:
 		if file.file_exists(nx):
 			normal = nx
 		
-		var texturepath = cached_tex_path % "nozzle_texture"
-		var spriteTexture = pointers.FileAccess.__load_png(texture)
-		ResourceSaver.save(texturepath,spriteTexture)
+		var texturepath = ""
+		if texture in generated_tex:
+			texturepath = generated_tex[texture]
+		else:
+			texturepath = cached_tex_path % "nozzle_texture"
+			generated_tex[texture] = texturepath
+			var spriteTexture = pointers.FileAccess.__load_png(texture)
+			ResourceSaver.save(texturepath,spriteTexture)
 		current_ext += 1
 		var sprite_ext = ext_path_entry % [texturepath,"Texture",current_ext]
 		ext_entries.append(sprite_ext)
 		nozzle_vars += "\n" + "texture = ExtResource( %d )" % current_ext
 		
-		var normalpath = cached_tex_path % "nozzle_normal"
-		var normalTexture = pointers.FileAccess.__load_png(normal)
-		ResourceSaver.save(normalpath,normalTexture)
+		var normalpath = ""
+		if normal in generated_tex:
+			normalpath = generated_tex[normal]
+		else:
+			normalpath = cached_tex_path % "nozzle_normal"
+			generated_tex[normal] = normalpath
+			var normalTexture = pointers.FileAccess.__load_png(normal)
+			ResourceSaver.save(normalpath,normalTexture)
 		current_ext += 1
 		var normal_ext = ext_path_entry % [normalpath,"Texture",current_ext]
 		ext_entries.append(normal_ext)
@@ -3654,17 +3676,27 @@ class _Equipment:
 		if file.file_exists(hx):
 			heat_normal = hx
 		
-		var heattexturepath = cached_tex_path % "nozzle_heat"
-		var heatspriteTexture = pointers.FileAccess.__load_png(heat)
-		ResourceSaver.save(heattexturepath,heatspriteTexture)
+		var heattexturepath = ""
+		if heat in generated_tex:
+			heattexturepath = generated_tex[heat]
+		else:
+			heattexturepath = cached_tex_path % "nozzle_heat"
+			generated_tex[heat] = heattexturepath
+			var heatspriteTexture = pointers.FileAccess.__load_png(heat)
+			ResourceSaver.save(heattexturepath,heatspriteTexture)
 		current_ext += 1
 		var heat_sprite_ext = ext_path_entry % [heattexturepath,"Texture",current_ext]
 		ext_entries.append(heat_sprite_ext)
 		nozzle_vars += "\n" + "texture = ExtResource( %d )" % current_ext
 		if heat_normal:
-			var heatnormalpath = cached_tex_path % "nozzle_heat_normal"
-			var heatnormalTexture = pointers.FileAccess.__load_png(heat_normal)
-			ResourceSaver.save(heatnormalpath,heatnormalTexture)
+			var heatnormalpath = ""
+			if heat_normal in generated_tex:
+				heatnormalpath = generated_tex[heat_normal]
+			else:
+				heatnormalpath = cached_tex_path % "nozzle_heat_normal"
+				generated_tex[heat_normal] = heatnormalpath
+				var heatnormalTexture = pointers.FileAccess.__load_png(heat_normal)
+				ResourceSaver.save(heatnormalpath,heatnormalTexture)
 			current_ext += 1
 			var heatnormal_ext = ext_path_entry % [heatnormalpath,"Texture",current_ext]
 			ext_entries.append(heatnormal_ext)
