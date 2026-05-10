@@ -2169,6 +2169,14 @@ const TRANSLATIONS = {
 		"HEVLIB_MODMENU_CANNOT_RESTART": {
 			"string": "Currently in-rings.\nPlease restart manually.",
 			"version_hash": 3242006044
+		},
+		"HEVLIB_CONFIG_UNRESTRICTED_AMMO_OUTPUT": {
+			"string": "Remove ammunition delivery limits",
+			"version_hash": 537716554
+		},
+		"HEVLIB_CONFIG_UNRESTRICTED_AMMO_OUTPUT_TOOLTIP": {
+			"string": "Reverts ammunition magazine behaviour to prior to 1.64.14, with no restrictions to how fast ammunition could be delivered to equipment.",
+			"version_hash": 1753521849
 		}
 	},
 	"uk_UA": {
