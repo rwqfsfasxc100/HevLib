@@ -56,9 +56,15 @@ func _ready():
 		$Label/LABELBUTTON.focus_neighbour_right = get_path_to($spinbox)
 	slider.value = value
 	spinbox.value = value
-	SliderLabel.text = str(value)
-	$Label/LABELBUTTON.hint_tooltip = CONFIG_DATA.get("description","")
 	volatile = CONFIG_DATA.get("require_restart",false)
+	SliderLabel.text = str(value)
+	var desc = str(CONFIG_DATA.get("description",""))
+	if volatile:
+		if desc != "":
+			desc = TranslationServer.translate(desc) + "\n\n" + TranslationServer.translate("HEVLIB_SETTING_REQUIRES_RESTART")
+		else:
+			desc = "HEVLIB_SETTING_REQUIRES_RESTART"
+	$Label/LABELBUTTON.hint_tooltip = desc
 	add_to_group("hevlib_settings_tab",true)
 
 func _reset_pressed():

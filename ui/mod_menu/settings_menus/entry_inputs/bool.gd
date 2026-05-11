@@ -15,10 +15,16 @@ func _ready():
 	var value = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	if value == null:
 		Tool.remove(self)
+	volatile = CONFIG_DATA.get("require_restart",false)
 	$Label.text = CONFIG_DATA.get("name","BOOL_MISSING_NAME")
 	$CheckButton.pressed = value
-	$Label/LABELBUTTON.hint_tooltip = CONFIG_DATA.get("description","")
-	volatile = CONFIG_DATA.get("require_restart",false)
+	var desc = str(CONFIG_DATA.get("description",""))
+	if volatile:
+		if desc != "":
+			desc = TranslationServer.translate(desc) + "\n\n" + TranslationServer.translate("HEVLIB_SETTING_REQUIRES_RESTART")
+		else:
+			desc = "HEVLIB_SETTING_REQUIRES_RESTART"
+	$Label/LABELBUTTON.hint_tooltip = desc
 	add_to_group("hevlib_settings_tab",true)
 
 func _toggled(button_pressed):

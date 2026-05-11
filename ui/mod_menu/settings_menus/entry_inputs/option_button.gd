@@ -20,15 +20,20 @@ func _ready():
 	var value = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	if value == null:
 		Tool.remove(self)
+	volatile = CONFIG_DATA.get("require_restart",false)
 	store_method = CONFIG_DATA.get("store_method","int")
 	$Label.text = CONFIG_DATA.get("name","OPTION_MISSING_NAME")
 	for opt in CONFIG_DATA.get("options",[]):
 		$OptionButton.add_item(opt,options.size())
 		options.append(opt)
-	
+	var desc = str(CONFIG_DATA.get("description",""))
+	if volatile:
+		if desc != "":
+			desc = TranslationServer.translate(desc) + "\n\n" + TranslationServer.translate("HEVLIB_SETTING_REQUIRES_RESTART")
+		else:
+			desc = "HEVLIB_SETTING_REQUIRES_RESTART"
 	$OptionButton.selected = find_int(value)
-	$Label/LABELBUTTON.hint_tooltip = CONFIG_DATA.get("description","")
-	volatile = CONFIG_DATA.get("require_restart",false)
+	$Label/LABELBUTTON.hint_tooltip = desc
 	add_to_group("hevlib_settings_tab",true)
 
 

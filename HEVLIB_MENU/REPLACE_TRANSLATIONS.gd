@@ -2177,6 +2177,10 @@ const TRANSLATIONS = {
 		"HEVLIB_CONFIG_UNRESTRICTED_AMMO_OUTPUT_TOOLTIP": {
 			"string": "Reverts ammunition magazine behaviour to prior to 1.64.14, with no restrictions to how fast ammunition could be delivered to equipment.",
 			"version_hash": 1753521849
+		},
+		"HEVLIB_SETTING_REQUIRES_RESTART": {
+			"string": "NOTICE: This setting requires a restart after changing it.",
+			"version_hash": 1236302953
 		}
 	},
 	"uk_UA": {

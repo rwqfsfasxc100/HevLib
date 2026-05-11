@@ -17,12 +17,18 @@ func _ready():
 		Tool.remove(self)
 	$Label.text = CONFIG_DATA.get("name","STRING_MISSING_NAME")
 	$LineEdit.text = value
+	volatile = CONFIG_DATA.get("require_restart",false)
 	$LineEdit.max_length = CONFIG_DATA.get("max_length",0)
 	$LineEdit.secret = CONFIG_DATA.get("secret",false)
 	$LineEdit.clear_button_enabled = CONFIG_DATA.get("clear_button",false)
 	$LineEdit.placeholder_text = CONFIG_DATA.get("placeholder","HEVLIB_CONFIG_LINEEDIT_PLACEHOLDER")
-	$Label/LABELBUTTON.hint_tooltip = CONFIG_DATA.get("description","")
-	volatile = CONFIG_DATA.get("require_restart",false)
+	var desc = str(CONFIG_DATA.get("description",""))
+	if volatile:
+		if desc != "":
+			desc = TranslationServer.translate(desc) + "\n\n" + TranslationServer.translate("HEVLIB_SETTING_REQUIRES_RESTART")
+		else:
+			desc = "HEVLIB_SETTING_REQUIRES_RESTART"
+	$Label/LABELBUTTON.hint_tooltip = desc
 	add_to_group("hevlib_settings_tab",true)
 
 
