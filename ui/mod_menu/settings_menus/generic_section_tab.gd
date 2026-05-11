@@ -73,6 +73,11 @@ func _ready():
 				$MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer.add_child(input)
 		
 		yield(get_tree(),"idle_frame")
+	var hb = HBoxContainer.new()
+	hb.name = "BottomSeparatorForToolTipsPlsIgnore"
+	hb.set_script(load("res://HevLib/ui/mod_menu/mod_list/BottomSeparator.gd"))
+	hb.connect("visibility_changed",hb,"_visibility_changed")
+	$MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer.add_child(hb)
 #	breakpoint
 
 
