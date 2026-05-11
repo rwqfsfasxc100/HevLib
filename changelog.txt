@@ -12,7 +12,7 @@
 6="* Fixed issues with downloading mods from github outside of the title screen on the first boot"
 7="* Removed legacy equipment handling."
 7.1="* All existing mods capable of making use of this functionality no longer work due to other changes in the library"
-8="* Axpanded acceptable naming conventions for configs for ConfigDriver.__validate_dictionary"
+8="* Expanded acceptable naming conventions for configs for ConfigDriver.__validate_dictionary"
 8.1="* id can now be substituted with: mod, mod_id"
 8.2="* entry can now be substituted with: setting, key, value, opt"
 8.3="* invert_config can now be substituted with: invert"
