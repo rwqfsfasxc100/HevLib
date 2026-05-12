@@ -1288,8 +1288,19 @@ class _DataFormat:
 		return pairs
 	
 	var compiled_script_storage = {}
+	var compiled_scripts = {}
 	
-	func __compile_script(source_code : String,new_object = false) -> Script:
+	func __compile_script(source_code : String) -> Script:
+		var shash = hash(source_code)
+		if shash in compiled_scripts:
+			return compiled_scripts[shash]
+		var out = GDScript.new()
+		out.set_source_code(source_code)
+		out.reload()
+		compiled_scripts[shash] = out
+		return out
+	
+	func __compile_script_object(source_code : String,new_object = false) -> Script:
 		var shash = hash(source_code)
 		if not new_object and shash in compiled_script_storage:
 			return compiled_script_storage[shash]
@@ -1403,7 +1414,7 @@ class _DataFormat:
 			header = "extends Reference\nconst VARIABLE = "
 		else:
 			header = "extends Reference\nvar VARIABLE = "
-		var script = __compile_script(header + string)
+		var script = __compile_script_object(header + string)
 		var variable = script.VARIABLE
 		var_hash[string] = variable
 		return variable
