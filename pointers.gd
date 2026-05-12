@@ -841,10 +841,10 @@ class _ConfigDriver:
 		var sect_name = __truncate_mod_id(mod_id) + "/" + __truncate_section(section)
 		return sect_name
 	
-	func __validate_dictionary(data_dict : Dictionary,check_config : bool = true, check_requirements : bool = true, check_incompatabilities : bool = true):
+	func __validate_dictionary(data_dict : Dictionary,check_config : bool = true, check_requirements : bool = true, check_incompatabilities : bool = true, config_entry_override : String = "config", mod_requirements_entry_override : String = "mod_requirements", mod_incompatabilities_entry_override : String = "mod_incompatabilities"):
 		var how = true
-		if check_config and "config" in data_dict:
-			var cfg = data_dict["config"]
+		if check_config and config_entry_override in data_dict:
+			var cfg = data_dict[config_entry_override]
 			var config_id = cfg.get("id",cfg.get("mod",cfg.get("mod_id","")))
 			var config_section = cfg.get("section","")
 			var config_setting = cfg.get("entry",cfg.get("setting",cfg.get("key",cfg.get("value",cfg.get("opt","")))))
@@ -861,8 +861,8 @@ class _ConfigDriver:
 		if how:
 			var current_mod_ids = pointers.ManifestV2.__get_mod_ids()
 			var allowFromMods = true
-			if check_requirements and "mod_requirements" in data_dict:
-				var needs = data_dict["mod_requirements"]
+			if check_requirements and mod_requirements_entry_override in data_dict:
+				var needs = data_dict[mod_requirements_entry_override]
 				var can = 0
 				for a in needs:
 					for f in a:
@@ -874,8 +874,8 @@ class _ConfigDriver:
 				allowFromMods = can == needs.size()
 			if allowFromMods:
 				var allowFromMods2 = true
-				if check_incompatabilities and "mod_incompatabilities" in data_dict:
-					var needs = data_dict["mod_incompatabilities"]
+				if check_incompatabilities and mod_incompatabilities_entry_override in data_dict:
+					var needs = data_dict[mod_incompatabilities_entry_override]
 					var can = 0
 					for a in needs:
 						var cv = false
