@@ -24,7 +24,6 @@ var Translations : _Translations = _Translations.new(self)
 var WebTranslate : _WebTranslate = _WebTranslate.new(self)
 var Zip : _Zip = _Zip.new()
 
-var needs_cache_rebuild = false
 func _physics_process(delta):
 	if ConfigDriver.mk_c:
 		ConfigDriver.handle_change_made()
@@ -581,21 +580,7 @@ class _ConfigDriver:
 						else:
 							Debug.l("ConfigDriver: Input key [%s] already exists, skipping" % key)
 						pointers.Keymapping.__load_input_data(key,p,opts)
-		var checksum = "user://cache/.HevLib_Cache/checksums"
-		var current_check = 0
-		if file.file_exists(checksum):
-			file.open(checksum,File.READ)
-			current_check = int(file.get_as_text())
-			file.close()
-		var mdCache = pointers.ManifestV2.__get_mod_data()
-		var mvCache = pointers.ManifestV2.__get_manifest_cache()
-		var mvCheck = hash(mvCache) + hash(mdCache)
-		file.open(checksum,File.WRITE)
-		file.store_string(str(mvCheck))
-		file.close()
-		if mvCheck != current_check or OS.has_feature("editor"):
-			pointers.needs_cache_rebuild = true
-			
+		
 	
 	func __load_inputs_from_string_array(key:String, strings: Array):
 		for i in strings:
@@ -1787,8 +1772,6 @@ class _Equipment:
 	var version = [1,0,0]
 	
 	func __make_upgrades_scene():
-		if pointers.needs_cache_rebuild == false:
-			return
 		var SCENE_HEADER = "[gd_scene load_steps=4 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/unmodified/WeaponSlotUpgradeTemplate.tscn\" type=\"PackedScene\" id=2]\n[ext_resource path=\"res://enceladus/SystemShipUpgradeUI.tscn\" type=\"PackedScene\" id=3]\n\n[sub_resource type=\"ViewportTexture\" id=1]\nflags = 5\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain1/Viewport\")\n\n[sub_resource type=\"ViewportTexture\" id=2]\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain2/Control\")\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]\n\n[node name=\"TextureRect\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 2 )\n\n[node name=\"TextureRect2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 2 )"
 		
 		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/")
@@ -1850,7 +1833,6 @@ class _Equipment:
 		var modify_ship_numerics_store = FILE_PATHS[21]
 		var namer_store = FILE_PATHS[22]
 		var processed_storage_systems_file = FILE_PATHS[23]
-		
 		
 		version = pointers.DataFormat.__get_vanilla_version()
 		var text = "HevLib make_upgrades_scene manager: observed game version of %s"  % str(version)
@@ -3092,6 +3074,8 @@ class _Equipment:
 							aux_type = "RCS"
 						"MAIN_PROPULSION":
 							aux_type = "TORCH"
+					if aux_path != "":
+						continue
 					var sys = data.get("system","SYSTEM_NAME_MISSING")
 					var auxTypePath = exhaust_cache_path + "/" + aux_type
 					
@@ -3103,13 +3087,22 @@ class _Equipment:
 					file.open(this_exhaust_path,File.WRITE)
 					file.store_string(exhaust_text)
 					file.close()
+					var exhaust_scn = load(this_exhaust_path).instance()
+					var exhaust_pck = PackedScene.new()
+					exhaust_pck.pack(exhaust_scn)
+					ResourceSaver.save(this_exhaust_path,exhaust_pck)
+					exhaust_scn.free()
 					
 					var thruster_scene = make_thruster_scene(data,sys,aux_type,exhaust_cache_path)
 					var this_thruster_path = auxTypePath + "/" + sys + "_thruster.tscn"
 					file.open(this_thruster_path,File.WRITE)
 					file.store_string(thruster_scene)
 					file.close()
-					
+					var thruster_scn = load(this_thruster_path).instance()
+					var thruster_pck = PackedScene.new()
+					thruster_pck.pack(thruster_scn)
+					ResourceSaver.save(this_thruster_path,thruster_pck)
+					thruster_scn.free()
 #					breakpoint
 		var lim_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]"
 		var lim_item = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\"]"
@@ -3170,12 +3163,32 @@ class _Equipment:
 	
 	var generated_tex = {}
 	
+	func create_compiled_tex(texturepath:String, cached_tex_path:String, save_type:String):
+		return texturepath
+		var filepath = ""
+		if texturepath in generated_tex:
+			filepath = generated_tex[texturepath]
+		else:
+			filepath = cached_tex_path % save_type
+			generated_tex[texturepath] = filepath
+			var flareTexture
+			if texturepath.ends_with(".png"):
+				flareTexture = pointers.FileAccess.__load_png(texturepath)
+			elif texturepath.ends_with(".stex"):
+				var st = StreamTexture.new()
+				st.load_path = texturepath
+				flareTexture = st
+			ResourceSaver.save(filepath,flareTexture)
+		
+		return filepath
+	
+	
 	func make_thruster_scene(data,sys,aux_type,exhaust_cache_path) -> String:
 		var this_sys_path = exhaust_cache_path + "/" + aux_type + "/" + sys
 		
 		var cached_exhaust_path = this_sys_path + "_exhaust.tscn"
 		var cached_thruster_path = this_sys_path + "_thruster.tscn"
-		var cached_tex_path = this_sys_path + "_texture_%s.tex"
+		var cached_tex_path = this_sys_path + "_texture_%s.res"
 		
 		var thruster_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://sfx/thruster.tscn\" type=\"PackedScene\" id=1]"
 		var nozzle_footer = "[editable path=\"nozzle\"]"
@@ -3454,8 +3467,6 @@ class _Equipment:
 		
 		
 		
-		
-		
 		# Exhaust scene
 		var exhaust_path = "res://sfx/exhaust.tscn"
 		match data.get("exhaust_type",""):
@@ -3492,36 +3503,24 @@ class _Equipment:
 		# Plume texture
 		var plume_texture = "res://sfx/thrusters.png"
 		var plumeTex = data.get("plume_texture",plume_texture)
-		if file.file_exists(plumeTex):
+		if ResourceLoader.exists(plumeTex):
 			plume_texture = plumeTex
-		var plumepath = ""
-		if plume_texture in generated_tex:
-			plumepath = generated_tex[plume_texture]
-		else:
-			plumepath = cached_tex_path % "plume"
-			generated_tex[plume_texture] = plumepath
-			var plumeTexture = pointers.FileAccess.__load_png(plume_texture)
-			ResourceSaver.save(plumepath,plumeTexture)
+		var plumepath = create_compiled_tex(plume_texture,cached_tex_path,"plume")
+		
 		ext_path_counter += 1
-		var plume_ext = ext_path_entry % [plumepath,"Texture",ext_path_counter]
+		var plume_ext = ext_path_entry % [plumepath,"StreamTexture" if plumepath.ends_with(".stex") else "Texture",ext_path_counter]
 		ext_entries.append(plume_ext)
 		thruster_vars += "\n" + "texture = ExtResource( %d )" % ext_path_counter
 		
 		# Flare texture
 		var flare_texture = "res://lights/plume.png"
 		var flareTex = data.get("flare_texture",flare_texture)
-		if file.file_exists(flareTex):
+		if ResourceLoader.exists(flareTex):
 			flare_texture = flareTex
-		var flarepath = ""
-		if flare_texture in generated_tex:
-			flarepath = generated_tex[flare_texture]
-		else:
-			flarepath = cached_tex_path % "flare"
-			generated_tex[flare_texture] = flarepath
-			var flareTexture = pointers.FileAccess.__load_png(flare_texture)
-			ResourceSaver.save(flarepath,flareTexture)
+		var flarepath = create_compiled_tex(flare_texture,cached_tex_path,"flare")
+		
 		ext_path_counter += 1
-		var flare_ext = ext_path_entry % [flarepath,"Texture",ext_path_counter]
+		var flare_ext = ext_path_entry % [flarepath,"StreamTexture" if flarepath.ends_with(".stex") else "Texture",ext_path_counter]
 		ext_entries.append(flare_ext)
 		flare_vars += "\n" + "texture = ExtResource( %d )" % ext_path_counter
 		
@@ -3556,6 +3555,7 @@ class _Equipment:
 			ext_entries.append_array(nz[2])
 			nozzle_groups.append(nz[0])
 			footer_groups.append(extra_nozzle_footer % [nozzlename])
+			
 		node_index += 1
 		var basenozzlename = "nozzle"
 		var baseheader = nozzle_header % [node_index]
@@ -3564,6 +3564,7 @@ class _Equipment:
 		ext_entries.append_array(basenz[2])
 		nozzle_groups.append(basenz[0])
 		footer_groups.append(nozzle_footer)
+		
 		for n in after_nozzles:
 			node_index += 1
 			var nozzlename = "nozzle_%d" % node_index
@@ -3573,13 +3574,14 @@ class _Equipment:
 			ext_entries.append_array(nz[2])
 			nozzle_groups.append(nz[0])
 			footer_groups.append(extra_nozzle_footer % [nozzlename])
+			
 		
 		var nodes_to_add = PoolStringArray()
 		
 		# Extra nodes
 		var extra_nodes = data.get("extra_nodes",[])
 		for node in extra_nodes:
-			if file.file_exists(node):
+			if ResourceLoader.exists(node):
 				var vm = load(node).instance()
 				var nodename = vm.name
 				Tool.remove(vm)
@@ -3608,6 +3610,7 @@ class _Equipment:
 		
 		var thruster_text = header_compile + thruster_vars + audio_loop_vars + audio_start_vars + flare_vars + nozzle_compile + extra_node_compile + footer
 		
+		
 		return thruster_text
 	
 	func format_nozzle(nd,header,nozzlename,current_ext,cached_tex_path,ext_path_entry) -> Array:
@@ -3618,35 +3621,22 @@ class _Equipment:
 		var texture = "res://ships/modules/nozzle-cd.png"
 		var normal = "res://ships/modules/nozzle-n.png"
 		var tx = nd.texture
-		if file.file_exists(tx):
+		if ResourceLoader.exists(tx):
 			texture = tx
 		var nx = nd.normal
-		if file.file_exists(nx):
+		if ResourceLoader.exists(nx):
 			normal = nx
+		var texturepath = create_compiled_tex(texture,cached_tex_path,"nozzle_texture")
 		
-		var texturepath = ""
-		if texture in generated_tex:
-			texturepath = generated_tex[texture]
-		else:
-			texturepath = cached_tex_path % "nozzle_texture"
-			generated_tex[texture] = texturepath
-			var spriteTexture = pointers.FileAccess.__load_png(texture)
-			ResourceSaver.save(texturepath,spriteTexture)
 		current_ext += 1
-		var sprite_ext = ext_path_entry % [texturepath,"Texture",current_ext]
+		var sprite_ext = ext_path_entry % [texturepath,"StreamTexture" if texturepath.ends_with(".stex") else "Texture",current_ext]
 		ext_entries.append(sprite_ext)
 		nozzle_vars += "\n" + "texture = ExtResource( %d )" % current_ext
 		
-		var normalpath = ""
-		if normal in generated_tex:
-			normalpath = generated_tex[normal]
-		else:
-			normalpath = cached_tex_path % "nozzle_normal"
-			generated_tex[normal] = normalpath
-			var normalTexture = pointers.FileAccess.__load_png(normal)
-			ResourceSaver.save(normalpath,normalTexture)
+		var normalpath = create_compiled_tex(normal,cached_tex_path,"nozzle_normal")
+		
 		current_ext += 1
-		var normal_ext = ext_path_entry % [normalpath,"Texture",current_ext]
+		var normal_ext = ext_path_entry % [normalpath,"StreamTexture" if normalpath.ends_with(".stex") else "Texture",current_ext]
 		ext_entries.append(normal_ext)
 		nozzle_vars += "\n" + "normal_map = ExtResource( %d )" % current_ext
 		
@@ -3685,35 +3675,23 @@ class _Equipment:
 		var heat = "res://ships/modules/nozzle-cl.png"
 		var heat_normal = ""
 		var hx = nd.heat
-		if file.file_exists(hx):
+		if ResourceLoader.exists(hx):
 			heat = hx
 		var hn = nd.heat_normal
-		if file.file_exists(hx):
+		if ResourceLoader.exists(hx):
 			heat_normal = hx
 		
-		var heattexturepath = ""
-		if heat in generated_tex:
-			heattexturepath = generated_tex[heat]
-		else:
-			heattexturepath = cached_tex_path % "nozzle_heat"
-			generated_tex[heat] = heattexturepath
-			var heatspriteTexture = pointers.FileAccess.__load_png(heat)
-			ResourceSaver.save(heattexturepath,heatspriteTexture)
+		var heattexturepath = create_compiled_tex(heat,cached_tex_path,"nozzle_heat")
+		
 		current_ext += 1
-		var heat_sprite_ext = ext_path_entry % [heattexturepath,"Texture",current_ext]
+		var heat_sprite_ext = ext_path_entry % [heattexturepath,"StreamTexture" if heattexturepath.ends_with(".stex") else "Texture",current_ext]
 		ext_entries.append(heat_sprite_ext)
 		nozzle_vars += "\n" + "texture = ExtResource( %d )" % current_ext
 		if heat_normal:
-			var heatnormalpath = ""
-			if heat_normal in generated_tex:
-				heatnormalpath = generated_tex[heat_normal]
-			else:
-				heatnormalpath = cached_tex_path % "nozzle_heat_normal"
-				generated_tex[heat_normal] = heatnormalpath
-				var heatnormalTexture = pointers.FileAccess.__load_png(heat_normal)
-				ResourceSaver.save(heatnormalpath,heatnormalTexture)
+			var heatnormalpath = create_compiled_tex(heat_normal,cached_tex_path,"nozzle_heat_normal")
+			
 			current_ext += 1
-			var heatnormal_ext = ext_path_entry % [heatnormalpath,"Texture",current_ext]
+			var heatnormal_ext = ext_path_entry % [heatnormalpath,"StreamTexture" if heatnormalpath.ends_with(".stex") else "Texture",current_ext]
 			ext_entries.append(heatnormal_ext)
 			nozzle_vars += "\n" + "normal_map = ExtResource( %d )" % current_ext
 		
