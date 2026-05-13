@@ -2,7 +2,7 @@
 
 1="* Added extra scroll space at the bottom of config menus to prevent multiline tooltips from being cutoff immediately"
 2="* Added entry overrides for ConfigDriver.__validate_dictionary"
-2.1="* Used to override the dictionary entries searched for config and mod compatability data, if the default entries used would be incompatible"
+2.1="* Used to override the dictionary entries searched for config and mod compatibility data, if the default entries used would be incompatible"
 2.2="* config_entry_override -> (optional) string used for the configuration override. Defaults to config"
 2.3="* mod_requirements_entry_override -> (optional) string used for the mod requirement override. Defaults to mod_requirements"
 2.4="* mod_incompatabilities_entry_override -> (optional) string used for the mod incompatability override. Defaults to mod_incompatabilities"
