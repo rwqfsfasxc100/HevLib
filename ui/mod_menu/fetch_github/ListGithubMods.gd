@@ -94,7 +94,7 @@ func fill_in_mods(items : Array):
 func add_box(box):
 	box.connect("pressed",self,"_mod_selected")
 	list.add_child(box)
-	select_first_mod()
+	
 
 var last_uuid = ""
 
