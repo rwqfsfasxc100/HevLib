@@ -380,18 +380,22 @@ var nanoDeliveryPerSecond = {
 var availableNanoToDrawNow = 0.0
 func handleNanoDelivery(delta):
 	var ps = nanoDeliveryPerSecond.get(nanodroneMagazine, nanoDeliveryPerSecond[0.0])
+	var current = availableNanoToDrawNow
 	availableNanoToDrawNow = clamp(availableNanoToDrawNow + delta * ps, 0, ps)
+	var diff = availableNanoToDrawNow - current
 	if nano_speed_multi != 1.0:
-		availableNanoToDrawNow *= nano_speed_multi
+		availableNanoToDrawNow += diff * (nano_speed_multi - 1.0)
 	availableNanoToDrawNow += nano_speed_add
 
 func handleAmmoDelivery(delta):
 	if unrestrictedAmmoOutput:
 		availableAmmoToDrawNow = 90000000000
 	else:
+		var currentDraw = availableAmmoToDrawNow
 		.handleAmmoDelivery(delta)
+		var diff = availableAmmoToDrawNow - currentDraw
 		if ammo_speed_multi != 1.0:
-			availableAmmoToDrawNow *= ammo_speed_multi
+			availableAmmoToDrawNow += diff * (ammo_speed_multi - 1.0)
 		availableAmmoToDrawNow += ammo_speed_add
 	
 var ismPointers
