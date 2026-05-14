@@ -1,3 +1,8 @@
+[1.13.18]
+
+1="* Fixed incorrect consumable speed scaling with nonzero speed adjustments"
+2="* Fixed save slots not being properly focused to the correct save when loading into the title screen"
+
 [1.13.17]
 
 1="* Added extra scroll space at the bottom of config menus to prevent multiline tooltips from being cutoff immediately"
