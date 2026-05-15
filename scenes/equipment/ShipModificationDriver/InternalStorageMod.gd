@@ -70,7 +70,7 @@ func _enter_tree():
 	init_vars()
 	base_mass = mass * 1000
 #	base_mass = currentMass
-	nanodroneMagazine = getConfig("drones.capacity")
+	
 #	CurrentGame.setStory("dd.story.interplanetary",10)
 	l("Readying ship. Base storage of %s proc / %s ammo / %s nanodrones on storage type of %s" % [base_proc_storage, base_ammo_storage, base_nano_storage, base_storage_type])
 	
@@ -319,7 +319,7 @@ func _enter_tree():
 	var droneData = JSON.parse(file.get_as_text()).result
 	file.close()
 	for amnt in droneData:
-		nanoDeliveryPerSecond[float(amnt)] = float(droneData[amnt])
+		nanoDeliveryPerSecond[float(amnt)] = droneData[amnt]
 	
 #	yield(CurrentGame.get_tree(),"physics_frame")
 func _ready():
@@ -343,8 +343,8 @@ func _ready():
 		var val = 0
 		val = (reactiveMassMax * propellant_multi) - reactiveMassMax
 		addPropellantCapacity(val)
-	
-	
+	nanodroneMagazine = float(getConfig("drones.capacity",0.0))
+	massDriverMagazine = float(getConfig("ammo.capacity", 0.0))
 	
 	yield(CurrentGame.get_tree(),"physics_frame")
 	clampConsumables()
