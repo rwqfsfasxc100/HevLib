@@ -4498,47 +4498,51 @@ class _Keymapping:
 		file.store_string(JSON.print(current))
 		file.close()
 		for revis in controls:
-			if typeof(revis) == TYPE_STRING:
-				revis = [revis]
-			if revis.size() > 0:
-				var i = revis[0]
-				if i.begins_with("Mouse "):
-					var event = InputEventMouseButton.new()
-					event.button_index = int(i.split("Mouse ")[1])
-					if not InputMap.action_has_event(key,event):
-						Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
-						InputMap.action_add_event(key, event)
-					else:
-						Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
-				elif i.begins_with("JoyButton "):
-					var event = InputEventJoypadButton.new()
-					event.button_index = int(i.split("JoyButton ")[1])
-					if not InputMap.action_has_event(key,event):
-						Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
-						InputMap.action_add_event(key, event)
-					else:
-						Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
-				elif i.begins_with("JoyAxis "):
-					var event = InputEventJoypadMotion.new()
-					event.axis = abs(int(i.split("JoyAxis ")[1]))
-					if i.split("JoyAxis ")[1].begins_with("-"):
-						event.axis_value = -1.0
-					else:
-						event.axis_value = 1.0
-					if not InputMap.action_has_event(key,event):
-						Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
-						InputMap.action_add_event(key, event)
-					else:
-						Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+			__add_inputs_to_inputmap(key,revis)
+	
+	func __add_inputs_to_inputmap(key,controls):
+		if typeof(controls) == TYPE_STRING:
+			controls = [controls]
+		if not controls:
+			return
+		var i = controls[0]
+		if i.begins_with("Mouse "):
+			var event = InputEventMouseButton.new()
+			event.button_index = int(i.split("Mouse ")[1])
+			if not InputMap.action_has_event(key,event):
+				Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
+				InputMap.action_add_event(key, event)
+			else:
+				Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+		elif i.begins_with("JoyButton "):
+			var event = InputEventJoypadButton.new()
+			event.button_index = int(i.split("JoyButton ")[1])
+			if not InputMap.action_has_event(key,event):
+				Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
+				InputMap.action_add_event(key, event)
+			else:
+				Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+		elif i.begins_with("JoyAxis "):
+			var event = InputEventJoypadMotion.new()
+			event.axis = abs(int(i.split("JoyAxis ")[1]))
+			if i.split("JoyAxis ")[1].begins_with("-"):
+				event.axis_value = -1.0
+			else:
+				event.axis_value = 1.0
+			if not InputMap.action_has_event(key,event):
+				Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
+				InputMap.action_add_event(key, event)
+			else:
+				Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
 
-				else:
-					var event = InputEventKey.new()
-					event.scancode = OS.find_scancode_from_string(i)
-					if not InputMap.action_has_event(key,event):
-						Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
-						InputMap.action_add_event(key, event)
-					else:
-						Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+		else:
+			var event = InputEventKey.new()
+			event.scancode = OS.find_scancode_from_string(i)
+			if not InputMap.action_has_event(key,event):
+				Debug.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
+				InputMap.action_add_event(key, event)
+			else:
+				Debug.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
 	
 	var input_cache = {}
 	
