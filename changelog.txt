@@ -1,3 +1,7 @@
+[1.13.19]
+
+1="* Nanodrone delivery speeds from storages added by mods no longer get affected by floating point errors, which should now prevent them from occasionally reverting back to 20 kg/s"
+
 [1.13.18]
 
 1="* Fixed incorrect consumable speed scaling with nonzero speed adjustments"
