@@ -40,7 +40,7 @@ var add_systems = []
 
 var cfgs_to_ignore = ["currentCargo","currentCargoBy","currentCargoComposition","damage","juryRig","preferredCrew","processedCargo","remoteCargo","tuning"]
 
-var current = []
+var currentInstalledEquipmentWithChanges = []
 var installed = []
 
 
@@ -60,9 +60,9 @@ func _enter_tree():
 	var sysNames = JSON.parse(file.get_as_text()).result
 	file.close()
 	configMutex.lock()
-	current = ismPointers.DataFormat.__sift_ship_config(shipConfig.duplicate(true),sysNames,cfgs_to_ignore)
+	currentInstalledEquipmentWithChanges = ismPointers.DataFormat.__sift_ship_config(shipConfig.duplicate(true),sysNames,cfgs_to_ignore)
 	configMutex.unlock()
-	for i in current:
+	for i in currentInstalledEquipmentWithChanges:
 		installed.append(i.split(".")[i.split(".").size() - 1])
 	
 	
@@ -319,7 +319,7 @@ func _enter_tree():
 	var droneData = JSON.parse(file.get_as_text()).result
 	file.close()
 	for amnt in droneData:
-		nanoDeliveryPerSecond[int(amnt)] = droneData[amnt]
+		nanoDeliveryPerSecond[float(amnt)] = float(droneData[amnt])
 	
 #	yield(CurrentGame.get_tree(),"physics_frame")
 func _ready():
