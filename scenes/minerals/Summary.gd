@@ -10,7 +10,7 @@ func loadOutput(outputData, processed = {}, rem = {}) -> bool:
 		hb.add_child(new_scroll_bar)
 		var sc = ScrollContainer.new()
 		sc.size_flags_horizontal = SIZE_EXPAND_FILL
-		sc.set_script(load("res://HevLib/ui/mod_menu/mod_info/ScrollWithKB.gd"))
+		sc.set_script(load("res://HevLib/development_tools/control_and_ui/scrollbox_helpers/ScrollWithKB.gd"))
 		sc.scrollWithKeyboard = true
 		var current_scroll = sc.get_v_scrollbar()
 		current_scroll.rect_scale.x = 0
