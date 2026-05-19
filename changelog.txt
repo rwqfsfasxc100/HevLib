@@ -1,3 +1,7 @@
+[1.13.21]
+
+1="* Fixed crash caused by the dive summary display"
+
 [1.13.20]
 
 1="* Further fixes for modded consumable storage delivery speeds"
