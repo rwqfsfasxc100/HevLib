@@ -252,7 +252,7 @@ static func handle_mineral_values_and_colors(mineral_data):
 #		trace_text = trace_text + "\t\t\"" + str(trace) + "\",\n"
 		trace_text = trace_text + arr_checker % [trace,"traceMinerals","traceMinerals"] + "\"" + str(trace) + "\")"
 #	trace_text = trace_text + "\t])"
-	collective_text = collective_text + "\n\n" + price_text + "\n\n" + color_text + "\n\n" + trace_text
+	collective_text = collective_text + "\n\n" + price_text + "\n\n" + color_text + "\n\n" + trace_text + "\n\nfunc isDemo():\n\treturn false"
 	return collective_text
 
 static func installScriptExtension(path:String):
