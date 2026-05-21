@@ -1258,9 +1258,7 @@ class _DataFormat:
 		var ysa = y*sin(angle)
 		var yca = y*cos(angle)
 		var xsa = x*sin(angle)
-		var p2 = Vector2(0,yca+xsa)
-		p2.x = xca-ysa
-		return p2
+		return Vector2(xca-ysa,yca+xsa)
 	
 	func __get_vanilla_version() -> Array:
 		var version = [1,0,0]
