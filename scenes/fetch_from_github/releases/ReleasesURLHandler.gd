@@ -1,6 +1,5 @@
 extends HTTPRequest
 
-#var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd").new()
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 var folder = ""
 var get_pre_releases = false
@@ -12,7 +11,6 @@ var urlToFetch = []
 func _on_release_request_completed(result, response_code, headers, body):
 	var json = JSON.parse(body.get_string_from_utf8())
 	var releasesContent
-#	var TimeAccess = preload("res://HevLib/pointers/TimeAccess.gd").new()
 	var assetURLs = []
 	if not json.result == null:
 		releasesContent = json.result

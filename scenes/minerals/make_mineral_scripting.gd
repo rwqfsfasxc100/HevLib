@@ -1,9 +1,5 @@
 extends Node
 
-#const DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
-#const FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
-#const DriverManagement = preload("res://HevLib/pointers/DriverManagement.gd")
-
 const custom_mineral_path = "user://cache/.HevLib_Cache/Minerals/mineral_store/"
 
 static func make_mineral_scripting(pointers = null,modmain = null):

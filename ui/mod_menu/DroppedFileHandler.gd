@@ -5,9 +5,7 @@ onready var modpacks_handle = get_node_or_null(NodePath("../../../../../../../Mo
 var pointers
 func _ready():
 	get_tree().connect("files_dropped",self,"_files_dropped")
-	
 
-#var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 func _files_dropped(files,screen):
 	if is_visible_in_tree():
 		if not pointers:

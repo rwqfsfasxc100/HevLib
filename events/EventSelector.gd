@@ -3,7 +3,7 @@ extends ScrollContainer
 onready var ring = get_node("/root/Game/TheRing")
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 var all_events = {}
-#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+
 #func _process(delta):
 #	get_parent().get_parent().get_parent().get_parent().get_parent().get_parent().get_parent().selected_events = all_events
 onready var list = $VBoxContainer

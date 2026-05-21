@@ -9,8 +9,6 @@ onready var no_download_popup = $NoDownload
 
 var file = File.new()
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-#const ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
-#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 const update_container = preload("res://HevLib/ui/mod_menu/updates/ModUpdateContainer.tscn")
 var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 

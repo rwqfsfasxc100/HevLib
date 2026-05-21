@@ -1,7 +1,7 @@
 extends VBoxContainer
 
 var path = ""
-#const MV2 = preload("res://HevLib/pointers/ManifestV2.gd")
+
 const header_label = preload("res://HevLib/ui/mod_menu/changelogs/labels/version_label.tscn")
 const entry_label = preload("res://HevLib/ui/mod_menu/changelogs/labels/changelog_entry.tscn")
 const rich_entry_label = preload("res://HevLib/ui/mod_menu/changelogs/labels/rich_changelog_entry.tscn")

@@ -1,6 +1,5 @@
 extends PanelContainer
 
-#var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 var pointers
 var filter_box_nd = preload("res://HevLib/ui/mod_menu/filters/FilterBox.tscn")
 

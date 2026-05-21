@@ -1,8 +1,7 @@
 extends "res://tools/DLClist.gd"
 
 var pointers
-#var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
-#var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+
 func _ready():
 	grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	if get_child_count() >= 1:

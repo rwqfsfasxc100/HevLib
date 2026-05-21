@@ -399,7 +399,7 @@ func handleAmmoDelivery(delta):
 		availableAmmoToDrawNow += ammo_speed_add
 	
 var ismPointers
-#const ismCFGD = preload("res://HevLib/pointers/ConfigDriver.gd")
+
 var limitDroneOutput = true
 var unrestrictedAmmoOutput = false
 func drawDrones(kg, really = true):

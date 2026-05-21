@@ -74,7 +74,6 @@ func _ready():
 			var translation = ResourceLoader.load(i,"",true)
 			TranslationServer.add_translation(translation)
 		
-#		var FolderAccess = load("res://HevLib/pointers/FolderAccess.gd")
 		pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/")
 		pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/")
 		pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/dependancies/")
@@ -122,7 +121,6 @@ func _ready():
 		file.open(latest_event_file,File.WRITE)
 		file.store_string("")
 		file.close()
-#		var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
 		var mod_data = pointers.ManifestV2.__get_mod_data(true)
 		var md = pointers.ManifestV2.__get_mod_data()
 		
@@ -164,7 +162,6 @@ func _ready():
 		file.store_string(JSON.print(complementary))
 		file.close()
 		
-#		var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
 #		replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
 #		if OS.has_feature("editor"):
 #			replaceScene("scenes/scene_replacements/TitleScreen.tscn", "res://TitleScreen.tscn")
@@ -179,7 +176,7 @@ func _ready():
 		dir.make_dir_recursive("user://cache/.HevLib_Cache/")
 		var file = File.new()
 		file.open("user://cache/.HevLib_Cache/library_documentation.json", File.WRITE)
-	#	var HevLib = load("res://HevLib/pointers/HevLib.gd")
+		
 		var functionality = pointers.HevLib.__get_library_functionality(true)
 		file.store_string(functionality)
 		file.close()
@@ -205,7 +202,6 @@ func _ready():
 			var data = ncrew[mod]
 			if data > count:
 				count = data
-#		var NodeAccess = load("res://HevLib/pointers/NodeAccess.gd")
 		var crew = pointers.NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",count)
 		if not crew == "":
 			var escene := load(crew)
@@ -267,8 +263,6 @@ func l(msg:String, title:String = MOD_NAME, version:String = str(MOD_VERSION_MAJ
 	Debug.l("[%s V%s]: %s" % [title, version, msg])
 func network_return(result, response_code,headers,body,mh):
 	if result == 0:
-#		var ManifestV2 = load("res://HevLib/pointers/ManifestV2.gd")
-#		var ConfigDriver = load("res://HevLib/pointers/ConfigDriver.gd")
 		var p = body.get_string_from_utf8()
 		var path = "user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/network_manifest_%s.cfg"
 		var path2 = "user://cache/.Mod_Menu_2_Cache/updates/network_manifest.json"
@@ -286,7 +280,7 @@ func network_return(result, response_code,headers,body,mh):
 #		file.store_string(JSON.print(data))
 #		file.close()
 		var manifest = pointers.ManifestV2.__parse_file_as_manifest(path % id,true)
-#		var DataFormat = load("res://HevLib/pointers/DataFormat.gd")
+		
 		for item in current:
 			if item[1] in update_urls:
 				var nv1 = manifest["version"]["version_major"]

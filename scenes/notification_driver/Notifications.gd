@@ -121,8 +121,6 @@ func _notification_start(data):
 	
 	
 
-#const NodeAccess = preload("res://HevLib/pointers/NodeAccess.gd")
-
 func add_vp():
 	pass
 

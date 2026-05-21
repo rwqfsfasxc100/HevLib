@@ -15,7 +15,7 @@ var pointers
 func hl_shipzone_uv():
 	if pointers:
 		visibility = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_position_data_debugger")
-#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+
 func _ready():
 	yield(get_tree(),"idle_frame")
 	image = map.get_data()

@@ -16,8 +16,6 @@ onready var mod = hbttn.get_parent().get_parent().CONFIG_MOD
 onready var section = hbttn.get_parent().get_parent().CONFIG_SECTION
 onready var action = hbttn.get_parent().get_parent().CONFIG_ENTRY
 
-#var ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
-
 func _exit_tree():
 	deleteButton = null
 	

@@ -1,7 +1,7 @@
 extends "res://codex/TransitTip.gd"
 
 var list = []
-#const MV2 = preload("res://HevLib/pointers/ManifestV2.gd")
+
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 func _ready():
 	for i in range(tips):

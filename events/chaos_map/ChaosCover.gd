@@ -6,7 +6,6 @@ func _ready():
 	visible = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_chaos_map_overlay")
 	
 
-#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 var oldColor = "00ff19"
 

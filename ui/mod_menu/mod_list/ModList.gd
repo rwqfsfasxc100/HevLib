@@ -1,6 +1,5 @@
 extends HBoxContainer
 
-#var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 var pointers
 export var mod_box = preload("res://HevLib/ui/mod_menu/mod_list/ModBox.tscn")
 
@@ -57,8 +56,6 @@ func about_to_show():
 		nodes[0]._pressed()
 	filter_btn.current_text = ""
 	filter_btn.keys_pressed = ""
-
-#var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
 
 export var subroot_path = NodePath("")
 onready var subroot = get_node(subroot_path)
@@ -363,7 +360,6 @@ func _open_updates():
 	
 
 var zip_folder = "user://cache/.Mod_Menu_2_Cache/updates/zip_cache/"
-#const Github = preload("res://HevLib/pointers/Github.gd")
 func updates_started():
 	file.open(update_store,File.READ)
 	var data = JSON.parse(file.get_as_text()).result
@@ -383,7 +379,6 @@ func updates_started():
 	
 	get_node("../../../../../../WAIT").popup_centered()
 
-#const FileAccess = preload("res://HevLib/pointers/FileAccess.gd")
 func _downloaded_zip(file, filepath):
 	get_node("../../../../../../WAIT").hide()
 	var fi = File.new()

@@ -59,8 +59,6 @@ func _ready():
 		get_research_data()
 
 
-#const ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
-
 func _input(event):
 	if visible and (Input.is_action_just_pressed("ui_cancel") or Input.is_action_just_pressed("pause")):
 		get_tree().set_input_as_handled()

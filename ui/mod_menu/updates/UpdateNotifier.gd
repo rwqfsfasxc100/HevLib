@@ -6,7 +6,7 @@ onready var update_menu = get_node(update_menu_path)
 var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 var file = File.new()
-#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+
 func _ready():
 	file.open(update_store,File.READ)
 	var updates = JSON.parse(file.get_as_text()).result

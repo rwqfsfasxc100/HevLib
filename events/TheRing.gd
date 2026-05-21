@@ -2,8 +2,7 @@ extends "res://TheRing.gd"
 
 var event_names = []
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-#var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
-#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+
 var cache_folder = "user://cache/.HevLib_Cache/"
 
 var current_event_log = {}

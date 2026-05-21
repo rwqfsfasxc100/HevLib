@@ -28,7 +28,6 @@ var MAX_SIZE = Vector2(0,0)
 
 var information_nodes = {}
 
-#var ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 var pointers
 var file = File.new()
 
@@ -255,12 +254,6 @@ var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
 var dependancies_store = "user://cache/.Mod_Menu_2_Cache/dependancies/dependancies.json"
 var conflicts_store = "user://cache/.Mod_Menu_2_Cache/conflicts/conflicts.json"
 var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/complementary.json"
-
-
-
-
-#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
-
 
 var children = {}
 func _ready():

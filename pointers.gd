@@ -24,6 +24,28 @@ var Translations : _Translations = _Translations.new(self)
 var WebTranslate : _WebTranslate = _WebTranslate.new(self)
 var Zip : _Zip = _Zip.new()
 
+var Classes = [
+	Achievements,
+	ConfigDriver,
+	DataFormat,
+	DriverManagement,
+	Equipment,
+	Events,
+	FileAccess,
+	FolderAccess,
+	Github,
+	HevLib,
+	Keymapping,
+	ManifestV1,
+	ManifestV2,
+	NodeAccess,
+	RingInfo,
+	TimeAccess,
+	Translations,
+	WebTranslate,
+	Zip,
+]
+
 func _physics_process(delta):
 	if ConfigDriver.mk_c:
 		ConfigDriver.handle_change_made()
@@ -37,6 +59,59 @@ class _Achievements:
 	var scripts = [
 		
 	]
+	
+	var class_documentation = {
+		"description":"Helper functions to fetch achievement and stat data",
+		"methods":{
+			"__get_achievement_data":{
+				"description":"Fetches information regarding a specific achievement",
+				"args":[
+					"achievementID -> (String) achievement ID to fetch the data of."
+				],
+				"return":[
+					"Dictionary with the following formatting:",
+					" name (String) -> the achievement name. Identical to the achievementID arg.",
+					" isUnlocked (bool) -> whether the achievement is registered as unlocked.",
+					" stat (String/null) -> if the achievement has a respective stat. Will be null if it does not.",
+					" limit (int/float/null) -> if the achievement has a stat, will be the required value of the stat for the achievement to be earned. Will be null if it doesn't have a stat",
+					" data (Array/null) -> if the achievement has additional information, will be provided through an array. currently only used by playtime achievements to list the required ships/equipment to earn the achievement, and if not will be null",
+					" rare (bool) -> whether the achievement is considered to be rare by the game",
+					" spoiler (bool) -> whether the achievement is spoilered on Steam",
+				],
+			},
+			"__get_stat_data":{
+				"description":"Fetches information regarding a specific stat.",
+				"args":[
+					"STAT (String) -> The stat to fetch. If it does not start with 'stat:', it will be added to make sure that it can be fetched."
+				],
+				"return":[
+					"Integer or float for the value of the stat"
+				]
+			},
+			"__get_achievement_percentage":{
+				"description":"Provides your current achievement completion percentage",
+				"return":[
+					"Float for the completion percentage out of 100"
+				]
+			},
+			"__get_current_achievements":{
+				"description":"Provides a dictionary containing all achievement and stat data",
+				"return":[
+					"Dictionary containing all achievement-adjacent information",
+					" allAchievements (Array) -> the names of all achievements currently registered by the game",
+					" unlockedAchievements (Array) -> the names of all currently achieved achievements",
+					" lockedAchievements (Array) -> the names of all locked achievements",
+					" stats (Array) -> the names of all stats currently with earned values. Not all stats may be registered",
+				]
+			},
+			"__get_steam_achievement_percentages":{
+				"description":"Provides a dictionary containing every achievement with the Steam unlock percentage as it's key",
+				"return":[
+					"Dictionary containing every achievement with the Steam unlock percentage as it's key"
+				]
+			},
+		}
+	}
 	
 	var achievementsFile = "user://achievements.dv"
 	var password = "b0ngadabonga"
@@ -53,79 +128,104 @@ class _Achievements:
 	func ready():
 		get_current_achievements()
 		requestSteamStats()
+		
 #		yield(http,"request_completed")
 #		http.request("https://publicactiontrigger.azurewebsites.net/api/dispatches/rwqfsfasxc100/dv-database",[],true,HTTPClient.METHOD_POST,JSON.print({}))
+	
+	var annoyingAsFuckAchievements = { # These achievements aren't marked as needing stats in the achievement file, but need them anyway
+		"DIVER_10":10,
+		"DIVER_50":50,
+		"DIVER_ENCKE":3000,
+		"DIVER_DRAGONS":3005,
+		"LEAF_2":2000,
+		"LEAF_5":5000,
+		"LEAF_20":20000,
+		"PLAYSTYLE_MANUAL":900
+	}
+	var spoiler_achievements = [
+		# The following URL is to a profile with little enough playtime to provide a good idea of spoilered achievements: https://steamcommunity.com/profiles/76561198067601574/stats/846030/?tab=achievements
+		# This is ordered in SteamDB order, to help with double checking
+		"DISCOVER_MOONLET",
+		"DISCOVER_PHAGE",
+		"DISCOVER_URANIUM",
+		"ESCAPE_VELOCITY",
+		"DISCOVER_ANARCHY",
+		"SHIP_CAT",
+		"LEAF_20",
+		"TOUCH_SINGULARITY",
+		"DISCOVER_DESTROYED_HABITAT",
+		"LEVEL_TOP",
+		"STORY_TESLA",
+		"DISCOVER_FROZEN_BODY",
+		"STORY_G4A_DESTROYED",
+		"STORY_BBW_DESTROYED",
+		"PLAYSTYLE_B8BACK",
+		"PLAYSTYLE_CRAZYIVAN",
+		"STORY_LOTR_DESTROYED",
+		"STORY_INFILTRATE"
+	]
+	
+	
+	var completionCache = {}
+	var currentAchievementCache = {}
+	var cached_playtime_ach_and_data = []
+	
 	
 	func __get_achievement_data(achievementID: String) -> Dictionary:
 		var currentAchievements = Achivements.achivements
 		var playtimeStats = Achivements.playtimeStats
 		var playtimeAchievements = Achivements.playtimeAchievements
-		# each entry in this variable should be [achievement name, stat name, stat limit, other associated data]
-		var playtimeAchAndData = []
 		
-		for p in playtimeAchievements:
-			for o in playtimeStats:
-				if p[0] == o[0]:
-					playtimeAchAndData.append([p[2],o[1],p[1],p[0]])
+		var stat = null
+		var limit = null
+		var additional_stat_data = null
 		
 		var statsWithAchievements = Achivements.statsWithAchievements
-		for a in statsWithAchievements:
-			var stat = a
-			var ps = statsWithAchievements.get(a)
-			for s in ps:
-				var limit = s
-				var achievement = ps.get(s)
-				playtimeAchAndData.append([achievement,stat,limit])
 		
-		var annoyingAsFuckAchievements = {"DIVER_10":10,"DIVER_50":50,"DIVER_ENCKE":3000,"DIVER_DRAGONS":3005,"LEAF_2":2000,"LEAF_5":5000,"LEAF_20":20000,"PLAYSTYLE_MANUAL":900}
-		for each in annoyingAsFuckAchievements:
-			var prefix = each.split("_")[0]
-			var limit = annoyingAsFuckAchievements.get(each)
-			var stat = ""
-			match prefix:
-				"DIVER":
-					stat = "maxDepth"
-				"LEAF":
-					stat = "leaf"
-				"PLAYSTYLE":
-					stat = "manual"
-			playtimeAchAndData.append([each,stat,limit])
+		for p in playtimeAchievements:
+			if p[2] == achievementID:
+				for o in playtimeStats:
+					if p[0] == o[0]:
+						stat = o[1]
+						limit = p[1]
+						additional_stat_data = p[0]
 		
-		var isUnlocked = false
-		for ach in currentAchievements:
-			if ach == achievementID:
-				isUnlocked = true
-		var statAssociation = []
-		var currentStatData = []
-		for each in playtimeAchAndData:
-			if each[0] == achievementID:
-				currentStatData = each
-		if currentStatData.size() == 0:
-			currentStatData = [achievementID,null,null,null]
-		elif currentStatData.size() == 3:
-			currentStatData = [currentStatData[0],currentStatData[1],currentStatData[2],null]
-		var isRareVal = 0
-		var rarity = Achivements.achievementRarity
-		for r in rarity:
-			if achievementID == r:
-				isRareVal = rarity.get(r)
-		var isRare = false
-		if isRareVal == 1:
-			isRare = true
+		if not stat:
+			for a in statsWithAchievements:
+				var ps = statsWithAchievements[a]
+				for s in ps:
+					var ac = ps[s]
+					if ac == achievementID:
+						stat = a
+						limit = s
 		
-		var hasSpoiler = false
-		var spoiler = ["DISCOVER_PHAGE","DISCOVER_MOONLET","DISCOVER_FROZEN_BODY","DISCOVER_DESTROYED_HABITAT","DISCOVER_URANIUM","ESCAPE_VELOCITY","DISCOVER_ANARCHY","LEAF_20","PLAYSTYLE_B8BACK","STORY_TESLA","SHIP_CAT","TOUCH_SINGULARITY","PLAYSTYLE_CRAZYIVAN","LEVEL_TOP","STORY_BBW_DESTROYED","STORY_G4A_DESTROYED","STORY_LOTR_DESTROYED","STORY_INFILTRATE"]
-		for m in spoiler:
-			if m == achievementID:
-				hasSpoiler = true
+		if not stat:
+			if achievementID in annoyingAsFuckAchievements:
+				var prefix = achievementID.split("_")[0]
+				limit = annoyingAsFuckAchievements[achievementID]
+				match prefix:
+					"DIVER":
+						stat = "maxDepth"
+					"LEAF":
+						stat = "leaf"
+					"PLAYSTYLE":
+						stat = "manual"
 		
-		var returnData = {"name":currentStatData[0],"isUnlocked":isUnlocked,"stat":currentStatData[1],"limit":currentStatData[2],"data":currentStatData[3],"rare":isRare,"spoiler":hasSpoiler}
+		var returnData = {
+			"name":achievementID,
+			"isUnlocked":achievementID in currentAchievementCache.get("unlockedAchievements",[]),
+			"stat":stat,
+			"limit":limit,
+			"data":additional_stat_data,
+			"rare":Achivements.achievementRarity.get(achievementID,0) > 0,
+			"spoiler":achievementID in spoiler_achievements
+		}
 		return returnData
 	
-	func __get_stat_data(STAT: String) -> int:
-		var achievements = Achivements.achivements
-		var stat = achievements.get(STAT)
-		return stat
+	func __get_stat_data(STAT: String) -> float:
+		if not STAT.begins_with("stat:"):
+			STAT = "stat:" + STAT
+		return Achivements.achivements.get(STAT,0.0)
 	
 	func __get_achievement_percentage() -> float:
 		var percent = 0.0
@@ -157,7 +257,6 @@ class _Achievements:
 	func __get_steam_achievement_percentages() -> Dictionary:
 		return completionCache
 	
-	var currentAchievementCache = {}
 	func get_current_achievements():
 		var unlockedAchievements = []
 		var lockedAchievements = []
@@ -170,7 +269,7 @@ class _Achievements:
 				unlockedAchievements.append(m)
 			else:
 				stats.append(m)
-		for m in rarity.keys():
+		for m in rarity:
 			allAchievements.append(m)
 		if unlockedAchievements.size() != allAchievements.size():
 			for f in allAchievements:
@@ -178,8 +277,6 @@ class _Achievements:
 					lockedAchievements.append(f)
 		var ccDictionary = {"allAchievements":allAchievements,"unlockedAchievements":unlockedAchievements,"lockedAchievements":lockedAchievements,"stats":stats}
 		currentAchievementCache = ccDictionary.duplicate(true)
-	
-	var completionCache = {}
 	
 	func requestSteamStats():
 		
@@ -206,6 +303,13 @@ class _ConfigDriver:
 	var scripts = [
 		
 	]
+	
+	var class_documentation = {
+		"description":"",
+		"methods":{}
+	}
+	
+	
 	var pointers
 	func _init(d):
 		pointers = d
@@ -911,6 +1015,11 @@ class _DataFormat:
 		
 	]
 	
+	var class_documentation = {
+		"description":"",
+		"methods":{}
+	}
+	
 	var file = File.new()
 	
 	var pointers
@@ -1418,6 +1527,13 @@ class _DriverManagement:
 	var scripts = [
 		
 	]
+	
+	var class_documentation = {
+		"description":"",
+		"methods":{}
+	}
+	
+	
 	var pointers
 	func _init(f):
 		pointers = f
@@ -1607,6 +1723,11 @@ class _Equipment:
 	var scripts = [
 		
 	]
+	
+	var class_documentation = {
+		"description":"",
+		"methods":{}
+	}
 	
 	var vanilla_equipment = {}
 	var vanilla_data = preload("res://HevLib/scenes/equipment/vanilla_defaults/slot_tagging.gd")
@@ -4124,6 +4245,11 @@ class _Events:
 		preload("res://HevLib/events/clear_event.gd"),
 	]
 	
+	var class_documentation = {
+		"description":"",
+		"methods":{}
+	}
+	
 	func __spawn_event(event, thering, parameters : Dictionary = {}):
 		var f = scripts[0].new()
 		f.spawn_event(event,thering,parameters)
@@ -4137,6 +4263,11 @@ class _FileAccess:
 	var scripts = [
 		
 	]
+	
+	var class_documentation = {
+		"description":"",
+		"methods":{}
+	}
 	
 	var pointers
 	func _init(f):
@@ -4227,6 +4358,13 @@ class _FolderAccess:
 	var scripts = [
 		
 	]
+	
+	var class_documentation = {
+		"description":"",
+		"methods":{}
+	}
+	
+	
 	var file = File.new()
 	var directory = Directory.new()
 	func __check_folder_exists(folder: String, status_array: bool = false):
@@ -4342,6 +4480,11 @@ class _Github:
 		
 	]
 	
+	var class_documentation = {
+		"description":"",
+		"methods":{}
+	}
+	
 	func __get_github_filesystem(URL: String, node_to_return_to: Node, behaviour: String = "normal", special_behaviour_data = ""):
 		var rng = RandomNumberGenerator.new()
 		rng.randomize()
@@ -4389,6 +4532,11 @@ class _HevLib:
 	var scripts = [
 		
 	]
+	
+	var class_documentation = {
+		"description":"",
+		"methods":{}
+	}
 	
 	var pointers
 	func _init(f):
@@ -4471,6 +4619,11 @@ class _Keymapping:
 	var scripts = [
 		
 	]
+	
+	var class_documentation = {
+		"description":"",
+		"methods":{}
+	}
 	
 	var pointers
 	
@@ -4847,6 +5000,11 @@ class _ManifestV1:
 		
 	]
 	
+	var class_documentation = {
+		"description":"",
+		"methods":{}
+	}
+	
 	var pointers
 	func _init(d):
 		pointers = d
@@ -5050,6 +5208,11 @@ class _ManifestV2:
 	var scripts = [
 		
 	]
+	
+	var class_documentation = {
+		"description":"",
+		"methods":{}
+	}
 	
 	var pointers
 	func _init(d):
@@ -6089,6 +6252,11 @@ class _NodeAccess:
 		
 	]
 	
+	var class_documentation = {
+		"description":"",
+		"methods":{}
+	}
+	
 	var pointers
 	func _init(f):
 		pointers = f
@@ -6229,6 +6397,11 @@ class _RingInfo:
 		
 	]
 	
+	var class_documentation = {
+		"description":"",
+		"methods":{}
+	}
+	
 	const pixelToKm = 10000
 	const map = preload("res://ring/ring-map.png")
 	const veins = preload("res://ring/ring-veins.png")
@@ -6321,6 +6494,11 @@ class _TimeAccess:
 		
 	]
 	
+	var class_documentation = {
+		"description":"",
+		"methods":{}
+	}
+	
 	func __compare_dates(date, compare_to_this_date):
 		var isDifferent = false
 		var difference = "newer"
@@ -6369,6 +6547,11 @@ class _Translations:
 	var scripts = [
 		
 	]
+	
+	var class_documentation = {
+		"description":"",
+		"methods":{}
+	}
 	
 	var pointers
 	func _init(c):
@@ -6564,6 +6747,11 @@ class _WebTranslate:
 		
 	]
 	
+	var class_documentation = {
+		"description":"",
+		"methods":{}
+	}
+	
 	var pointers
 	func _init(f):
 		pointers = f
@@ -6657,6 +6845,13 @@ class _Zip:
 	var scripts = [
 		
 	]
+	
+	var class_documentation = {
+		"description":"",
+		"methods":{}
+	}
+	
+	
 	var dir = Directory.new()
 	func __get_zip_content(path, stripFolder = false, lowerCase = false):
 		var listOfNames = []

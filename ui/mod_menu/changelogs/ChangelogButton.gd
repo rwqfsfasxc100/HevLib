@@ -2,7 +2,7 @@ extends Button
 
 export var changelog_menu = NodePath("")
 onready var menu = get_node_or_null(changelog_menu)
-#const MV2 = preload("res://HevLib/pointers/ManifestV2.gd")
+
 var pointers
 func _ready():
 	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")

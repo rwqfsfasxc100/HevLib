@@ -57,7 +57,6 @@ func _input(event):
 	if inputDebug:
 		iDebug(event)
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 
 var count = 0
 func _physics_process(delta):

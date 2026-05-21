@@ -1,9 +1,5 @@
 extends Node
 
-#const DriverManagement = preload("res://HevLib/pointers/DriverManagement.gd")
-#const Translations = preload("res://HevLib/pointers/Translations.gd")
-#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
-
 static func inject_translations(pointers):
 	var file = File.new()
 	var p = ProjectSettings.get_setting("locale/translations")

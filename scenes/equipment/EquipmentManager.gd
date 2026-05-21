@@ -1,10 +1,6 @@
 extends VBoxContainer
 
 # Stating HevLib pointers
-#var Equipment = preload("res://HevLib/pointers/Equipment.gd")
-#var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
-#var DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
-#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
 var cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/"
 var pointers
 var NEW_INSTALL = false

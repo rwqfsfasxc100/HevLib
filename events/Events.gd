@@ -109,7 +109,7 @@ func _timer_complete():
 	ring.odditiesEvery = defaultOdditiesEvery
 	busy = false
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-#const Events = preload("res://HevLib/pointers/Events.gd")
+
 func _on_ClearEvent_pressed():
 	
 	pointers.Events.__clear_event(cnode,ring,clear_related_poi,clear_in_cargo)

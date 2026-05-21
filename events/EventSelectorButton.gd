@@ -4,7 +4,7 @@ var event = ""
 
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 var isEnabled = true
-#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+
 onready var is_ready = true
 func _toggled(button_pressed):
 	if is_ready:

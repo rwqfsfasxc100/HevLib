@@ -33,7 +33,6 @@ func _ignore_confirmed():
 	repos()
 	Tool.remove(self)
 var zip_folder = "user://cache/.Mod_Menu_2_Cache/updates/zip_cache/"
-#const Github = preload("res://HevLib/pointers/Github.gd")
 
 func _do_update():
 	var dv = {"name":mod_name,"id":mod_id,"version":new_version,"container":self}

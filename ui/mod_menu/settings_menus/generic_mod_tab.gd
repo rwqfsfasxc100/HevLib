@@ -3,8 +3,6 @@ extends Tabs
 export var mod = ""
 export var mod_id = ""
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
-#const ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
 
 const tab_base = preload("res://HevLib/ui/mod_menu/settings_menus/generic_section_tab.tscn")
 

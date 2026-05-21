@@ -12,7 +12,7 @@ enum control{
 	key
 }
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-#const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+
 export (PackedScene) var keybindDisplay
 export (PackedScene) var gamepadKeyDisplay
 export (PackedScene) var mouseButtonDisplay

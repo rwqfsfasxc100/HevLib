@@ -1,6 +1,5 @@
 extends Popup
 
-#const FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 var profiles = []
 var display = []
