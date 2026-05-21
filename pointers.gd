@@ -60,58 +60,59 @@ class _Achievements:
 		
 	]
 	
-	var class_documentation = {
-		"description":"Helper functions to fetch achievement and stat data",
-		"methods":{
-			"__get_achievement_data":{
-				"description":"Fetches information regarding a specific achievement",
-				"args":[
-					"achievementID -> (String) achievement ID to fetch the data of."
-				],
-				"return":[
-					"Dictionary with the following formatting:",
-					" name (String) -> the achievement name. Identical to the achievementID arg.",
-					" isUnlocked (bool) -> whether the achievement is registered as unlocked.",
-					" stat (String/null) -> if the achievement has a respective stat. Will be null if it does not.",
-					" limit (int/float/null) -> if the achievement has a stat, will be the required value of the stat for the achievement to be earned. Will be null if it doesn't have a stat",
-					" data (Array/null) -> if the achievement has additional information, will be provided through an array. currently only used by playtime achievements to list the required ships/equipment to earn the achievement, and if not will be null",
-					" rare (bool) -> whether the achievement is considered to be rare by the game",
-					" spoiler (bool) -> whether the achievement is spoilered on Steam",
-				],
-			},
-			"__get_stat_data":{
-				"description":"Fetches information regarding a specific stat.",
-				"args":[
-					"STAT (String) -> The stat to fetch. If it does not start with 'stat:', it will be added to make sure that it can be fetched."
-				],
-				"return":[
-					"Integer or float for the value of the stat"
-				]
-			},
-			"__get_achievement_percentage":{
-				"description":"Provides your current achievement completion percentage",
-				"return":[
-					"Float for the completion percentage out of 100"
-				]
-			},
-			"__get_current_achievements":{
-				"description":"Provides a dictionary containing all achievement and stat data",
-				"return":[
-					"Dictionary containing all achievement-adjacent information",
-					" allAchievements (Array) -> the names of all achievements currently registered by the game",
-					" unlockedAchievements (Array) -> the names of all currently achieved achievements",
-					" lockedAchievements (Array) -> the names of all locked achievements",
-					" stats (Array) -> the names of all stats currently with earned values. Not all stats may be registered",
-				]
-			},
-			"__get_steam_achievement_percentages":{
-				"description":"Provides a dictionary containing every achievement with the Steam unlock percentage as it's key",
-				"return":[
-					"Dictionary containing every achievement with the Steam unlock percentage as it's key"
-				]
-			},
+	func get_class_documentation():
+		return {
+			"description":"Helper functions to fetch achievement and stat data",
+			"methods":{
+				"__get_achievement_data":{
+					"description":"Fetches information regarding a specific achievement",
+					"args":[
+						"achievementID -> (String) achievement ID to fetch the data of."
+					],
+					"return":[
+						"Dictionary with the following formatting:",
+						" name (String) -> the achievement name. Identical to the achievementID arg.",
+						" isUnlocked (bool) -> whether the achievement is registered as unlocked.",
+						" stat (String/null) -> if the achievement has a respective stat. Will be null if it does not.",
+						" limit (int/float/null) -> if the achievement has a stat, will be the required value of the stat for the achievement to be earned. Will be null if it doesn't have a stat",
+						" data (Array/null) -> if the achievement has additional information, will be provided through an array. currently only used by playtime achievements to list the required ships/equipment to earn the achievement, and if not will be null",
+						" rare (bool) -> whether the achievement is considered to be rare by the game",
+						" spoiler (bool) -> whether the achievement is spoilered on Steam",
+					],
+				},
+				"__get_stat_data":{
+					"description":"Fetches information regarding a specific stat.",
+					"args":[
+						"STAT (String) -> The stat to fetch. If it does not start with 'stat:', it will be added to make sure that it can be fetched."
+					],
+					"return":[
+						"Integer or float for the value of the stat"
+					]
+				},
+				"__get_achievement_percentage":{
+					"description":"Provides your current achievement completion percentage",
+					"return":[
+						"Float for the completion percentage out of 100"
+					]
+				},
+				"__get_current_achievements":{
+					"description":"Provides a dictionary containing all achievement and stat data",
+					"return":[
+						"Dictionary containing all achievement-adjacent information",
+						" allAchievements (Array) -> the names of all achievements currently registered by the game",
+						" unlockedAchievements (Array) -> the names of all currently achieved achievements",
+						" lockedAchievements (Array) -> the names of all locked achievements",
+						" stats (Array) -> the names of all stats currently with earned values. Not all stats may be registered",
+					]
+				},
+				"__get_steam_achievement_percentages":{
+					"description":"Provides a dictionary containing every achievement with the Steam unlock percentage as it's key",
+					"return":[
+						"Dictionary containing every achievement with the Steam unlock percentage as it's key"
+					]
+				},
+			}
 		}
-	}
 	
 	var achievementsFile = "user://achievements.dv"
 	var password = "b0ngadabonga"
@@ -304,10 +305,182 @@ class _ConfigDriver:
 		
 	]
 	
-	var class_documentation = {
-		"description":"",
-		"methods":{}
-	}
+	func get_class_documentation():
+		return {
+			"description":"Provides functions that unify and handle a configuration system for mods",
+			"methods":{
+				"__store_config":{
+					"description":"Stores an entire dictionary's worth of data inside a config. Will override settings if they already exist, otherwise will be added to the config.",
+					"args":[
+						"configuration -> (Dictionary) providing the configs. Must be at least three levels deep to cover sections, keys, and their values (i.e. {'section':{'setting_1':true,'setting_2':false}})",
+						"mod_id -> (String) providing the mod/identifier to store the config behind. Cannot contain forward slashes (/) or spaces ( ), and these will be removed when being processed.",
+						"cfg_filename (optional) -> (String) used for the file this config is stored in within the 'user://cfg/' folder. Defaults to 'Mod_Configurations.cfg'"
+					],
+				},
+				"__store_value":{
+					"description":"Stores an individual setting to the config.",
+					"args":[
+						"mod_id -> (String) providing the mod/identifier to store the config to. Cannot contain forward slashes (/) or spaces ( ), and these will be removed when being processed.",
+						"section -> (String) for the config's section to store under",
+						"key -> (String) for the setting value to store.",
+						"value -> The value being stored to the config.",
+						"cfg_filename (optional) -> (String) used for the file this config is stored in within the 'user://cfg/' folder. Defaults to 'Mod_Configurations.cfg'"
+					],
+				},
+				"__get_config":{
+					"description":"Fetches the entire config dictionary for a given mod/identifier",
+					"args":[
+						"mod_id -> (String) providing the mod/identifier to fetch the config from. Cannot contain forward slashes (/) or spaces ( ), and these will be removed when being processed.",
+						"cfg_filename (optional) -> (String) used for the file this config is stored in within the 'user://cfg/' folder. Defaults to 'Mod_Configurations.cfg'"
+					],
+					"return":[
+						"Dictionary containing the entire config."
+					]
+				},
+				"__get_value":{
+					"description":"Fetches an individual setting and returns it's value",
+					"args":[
+						"mod_id -> (String) providing the mod/identifier to fetch the config from. Cannot contain forward slashes (/) or spaces ( ), and these will be removed when being processed.",
+						"section -> (String) for the config's section to fetch from.",
+						"key -> (String) for the setting value to get.",
+						"cfg_filename (optional) -> (String) used for the file this config is stored in within the 'user://cfg/' folder. Defaults to 'Mod_Configurations.cfg'"
+					],
+					"return":[
+						"Variant from the setting. Indeterminable from a documentation standpoint."
+					]
+				},
+				"__establish_connection":{
+					"description":"Connects a method within an object to be called whenever the config changes",
+					"args":[
+						"method -> (String) method name to be called when the config changes",
+						"node -> (Object) the object that will be receiving the method call",
+						"type (optional) -> (String) for the connection mode. Accepts the following: config -> will update whenever the config changes; input -> will update only whenever an input-type config changes; both -> connects with both type, but has to use a separate method to connect the input type due to technical limitations",
+						"input_method (optional) -> (String) for the method name the input change uses when `type` is set to `both`. Defaults to 'input_changed'",
+					],
+				},
+				"__remove_connection":{
+					"description":"Disconnects any connections made by __establish_connection, using the same operands",
+					"args":[
+						"method -> (String) method name that the object has been connected to",
+						"node -> (Object) the object that would have been receiving the method call",
+						"type (optional) -> (String) for the connection mode. Accepts the following: config -> will update whenever the config changes; input -> will update only whenever an input-type config changes; both -> connects with both type, but has to use a separate method to connect the input type due to technical limitations",
+						"input_method (optional) -> (String) for the method name the input change used when connected to the `both` type, and needs to be used if `both` was ever used to connect. Defaults to 'input_changed'",
+					],
+				},
+				"__load_configs":{
+					"description":"Internal method used to initialize a configuration file. Only use if you know what you're doing",
+					"args":[
+						"cfg_filename (optional) -> (String) used for the file this config is stored in within the 'user://cfg/' folder. Defaults to 'Mod_Configurations.cfg'"
+					],
+				},
+				"__load_inputs_from_string_array":{
+					"description":"Creates input action events for a specific action based on an array of strings for key names",
+					"args":[
+						"key -> (String) used for the action event name to add the events behind",
+						"strings -> (Array) used for the input events. Mouse events are prefixed with `Mouse X`; joy button events are prefixed with `JoyButton X`, and joy axis events are prefixed with `JoyAxis X`. Joy axis events can have their number be negative to trigger it in the opposite direction. Anything not using those prefixes will be handled as keyboard inputs.",
+					],
+				},
+				"__change_made":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__subscribed_changes":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__input_change_made":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__subscribe_to_setting_change":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__disconnect_subscription":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__truncate_mod_id":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__truncate_section":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__truncate_to_setting_entry":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__validate_dictionary":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__config_parse":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__config_store":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
 	
 	
 	var pointers
@@ -378,7 +551,7 @@ class _ConfigDriver:
 			__change_made()
 			Loader.saved()
 	
-	func __store_value(mod_id, section, key, value, cfg_filename : String = "Mod_Configurations" + ".cfg"):
+	func __store_value(mod_id:String, section:String, key:String, value, cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var made_change = false
 		var cfg_folder = "user://cfg/"
 		var profiles_dir = "user://cfg/.profiles/"
@@ -726,7 +899,7 @@ class _ConfigDriver:
 				else:
 					Debug.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
 	
-	func __set_button_focus(button,check_button):
+	func set_button_focus(button,check_button):
 		var parent = button.get_parent()
 		var children = parent.get_children()
 		var pos = button.get_position_in_parent()
@@ -901,9 +1074,9 @@ class _ConfigDriver:
 				subscriptions[top][setting] = []
 			var do = true
 			for item in subscriptions[top][setting]:
-					if item[0] == object:
-						if item[1] == method:
-							do = false
+				if item[0] == object:
+					if item[1] == method:
+						do = false
 			if do:
 				subscriptions[top][setting].append([object,method])
 		else:
@@ -1015,10 +1188,21 @@ class _DataFormat:
 		
 	]
 	
-	var class_documentation = {
-		"description":"",
-		"methods":{}
-	}
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
 	
 	var file = File.new()
 	
@@ -1440,7 +1624,7 @@ class _DataFormat:
 					pd += "\n\tvar %s = arr[%d]" % [pv,i]
 				else:
 					pd = "\n\tvar %s = arr[%d]" % [pv,i]
-			var sv = "static func parse(ref,arr):%s\n\treturn ref.call_func(%s)" % [pd,pb] 
+			var sv = "static func parse(ref,arr):%s\n\treturn ref.call_func(%s)" % [pd,pb]
 			
 			var g = GDScript.new()
 			g.set_source_code(sv)
@@ -1593,7 +1777,7 @@ class _DriverManagement:
 						for mod in debugged_defined_mods:
 							var home = mod.split("/")[2]
 							if home == semi_root:
-									mods_to_avoid.append(home)
+								mods_to_avoid.append(home)
 					var folderCheck = pointers.FolderAccess.__fetch_folder_files(folder,true)
 					var has_mod = false
 					var has_manifest = false
@@ -2062,7 +2246,7 @@ class _Equipment:
 		var drivers = []
 		var mods = pointers.ManifestV2.__get_mod_data()["mods"]
 		for md in mods:
-			var mod = mods[md] 
+			var mod = mods[md]
 			if mod.drivers:
 				drivers.append(mod.drivers.duplicate(true))
 		mods.clear()
@@ -2340,7 +2524,7 @@ class _Equipment:
 									sysNames.append(listingSystemName)
 								if not listingSystemName in pfdata:
 									pfdata[listingSystemName] = {}
-								var ls = pfdata[listingSystemName] 
+								var ls = pfdata[listingSystemName]
 								
 								ls["minimum_ammo_utilization_for_reduction"] = item.get("minimum_ammo_utilization_for_reduction",ls.get("minimum_ammo_utilization_for_reduction",0.0))
 								ls["minimum_nano_utilization_for_reduction"] = item.get("minimum_nano_utilization_for_reduction",ls.get("minimum_nano_utilization_for_reduction",0.0))
