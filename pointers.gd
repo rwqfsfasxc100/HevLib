@@ -381,31 +381,13 @@ class _ConfigDriver:
 					],
 				},
 				"__change_made":{
-					"description":"",
-					"args":[
-						
-					],
-					"return":[
-						
-					]
+					"description":"Marks the config as needing to be saved on the next physics frame.",
 				},
 				"__subscribed_changes":{
-					"description":"",
-					"args":[
-						
-					],
-					"return":[
-						
-					]
+					"description":"Internal method used to process any changes for objects subscribed to a setting change",
 				},
 				"__input_change_made":{
-					"description":"",
-					"args":[
-						
-					],
-					"return":[
-						
-					]
+					"description":"Internal method used to process any changes made specifically to input type configs",
 				},
 				"__subscribe_to_setting_change":{
 					"description":"",
@@ -1037,29 +1019,46 @@ class _ConfigDriver:
 								obj.callv(o[1],[val])
 		changes.clear()
 	
+	var cached_input_config_names = {}
+	
 	func __input_change_made():
 		var ic = []
-		var ax = pointers.ManifestV2.__get_manifest_cache()
-		for sect in ax:
-			var dv = ax[sect]
-			var dl = dv.get("configs",{})
-			for sec in dl:
-				var sv = dl[sec]
-				for setting in sv:
-					var data = sv[setting]
-					if data.get("type").to_lower() == "input":
-						var n = dv["mod_information"]["name"]
-						var vf = __get_value(n,sec,setting)
-						var out = []
-						var resave = false
-						for a in vf:
-							if typeof(a) == TYPE_STRING:
-								a = [a]
-								resave = true
-							out.append(a)
-						if resave:
-							__store_value(n,sec,setting,out)
-						ic.append(str(n)+str(sec)+str(setting)+str(out))
+		var inputnames = {}
+		if cached_input_config_names:
+			inputnames = cached_input_config_names
+		else:
+			var ax = pointers.ManifestV2.__get_manifest_cache()
+			for sect in ax:
+				var dv = ax[sect]
+				var dl = dv.get("configs",{})
+				for sec in dl:
+					var sv = dl[sec]
+					for setting in sv:
+						var data = sv[setting]
+						if data.get("type").to_lower() == "input":
+							var n = __truncate_mod_id(dv["mod_information"]["name"])
+							if not n in cached_input_config_names:
+								cached_input_config_names[n] = {}
+							if not sec in cached_input_config_names[n]:
+								cached_input_config_names[n][sec] = []
+							cached_input_config_names[n][sec].append(setting)
+			inputnames = cached_input_config_names
+		for n in inputnames:
+			var nd = inputnames[n]
+			for sec in nd:
+				var sc = nd[sec]
+				for setting in sc:
+					var vf = __get_value(n,sec,setting)
+					var out = []
+					var resave = false
+					for a in vf:
+						if typeof(a) == TYPE_STRING:
+							a = [a]
+							resave = true
+						out.append(a)
+					if resave:
+						__store_value(n,sec,setting,out)
+					ic.append(str(n)+str(sec)+str(setting)+str(out))
 		var shs = ic.hash()
 		if shs != settingsInputHash:
 			emit_signal("input_changed")
