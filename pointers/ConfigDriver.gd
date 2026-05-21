@@ -45,9 +45,6 @@ var developer_hint = {
 		"Must be run on ready as mod data won't be available before then",
 		"cfg_filename -> (optional) string for the filename for the config file stored in the user://cfg/ folder. Defaults to Mod_Configurations.cfg",
 	],
-	"__set_button_focus":[
-		"Internal function used for the focusing of buttons"
-	],
 	"__load_inputs_from_string_array":[
 		"Adds inputs for an input action from an array of input keys",
 		"key -> string used as the input action to register the input events for",
@@ -81,7 +78,7 @@ const lc = preload("res://HevLib/scripts/configs/load_configs.gd")
 static func __load_configs(cfg_filename : String = config_name + ".cfg"):
 	lc.load_configs(cfg_filename,ManifestV2,FolderAccess)
 const sbf = preload("res://HevLib/scripts/configs/set_button_focus.gd")
-static func __set_button_focus(button,check_button):
+static func set_button_focus(button,check_button):
 	sbf.set_button_focus(button,check_button)
 
 static func __load_inputs_from_string_array(key:String, strings: Array):

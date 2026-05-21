@@ -111,7 +111,7 @@ func _draw():
 
 func refocus():
 	$Label/LABELBUTTON.rect_size = $Label.rect_size
-	pointers.ConfigDriver.__set_button_focus(self,get_node("CheckButton"))
+	pointers.ConfigDriver.set_button_focus(self,get_node("CheckButton"))
 	
 
 func _visibility_changed():
