@@ -390,76 +390,83 @@ class _ConfigDriver:
 					"description":"Internal method used to process any changes made specifically to input type configs",
 				},
 				"__subscribe_to_setting_change":{
-					"description":"",
+					"description":"Connects an object to call a method when a specific setting has been changed",
 					"args":[
-						
-					],
-					"return":[
-						
+						"method -> (String) for the method to connect to",
+						"object -> (Object) to connect to for the method call",
+						"id -> (String) mod/identifier for the config to check",
+						"section -> (String) the config section to get the setting from",
+						"setting -> (String) the specific setting to check against"
 					]
 				},
 				"__disconnect_subscription":{
-					"description":"",
+					"description":"Disconnects any established subscriptions made for a setting",
 					"args":[
-						
-					],
-					"return":[
-						
+						"method -> (String) for the method to connect to",
+						"object -> (Object) to connect to for the method call",
+						"id -> (String) mod/identifier for the config to check",
+						"section -> (String) the config section to get the setting from",
+						"setting -> (String) the specific setting to check against"
 					]
 				},
 				"__truncate_mod_id":{
-					"description":"",
+					"description":"Formats a string as if it were being handled as a config mod/identifier, stripping out all spaces and forward slashes",
 					"args":[
-						
+						"mod_id -> (String) used for the formatted mod/identifier"
 					],
 					"return":[
-						
+						"String formatted to a mod id"
 					]
 				},
 				"__truncate_section":{
-					"description":"",
+					"description":"Formats a string for sections by stripping out forward slashes",
 					"args":[
-						
+						"section -> (String) used for formatting"
 					],
 					"return":[
-						
+						"String formatted to a section name"
 					]
 				},
 				"__truncate_to_setting_entry":{
-					"description":"",
+					"description":"Converts a mod/identifier and section to fetch the config by it's internal name. Formatting is handled by the method, so inputs do not need to be sanitized",
 					"args":[
-						
+						"mod_id -> (String) used for the formatted mod/identifier",
+						"section -> (String) used for formatting"
 					],
 					"return":[
-						
+						"String formatted by mod_id/section, with all other parts cut out."
 					]
 				},
 				"__validate_dictionary":{
-					"description":"",
+					"description":"Checks a dictionary for any config and mod limitations to see if it would be permitted",
 					"args":[
-						
+						"data_dict -> (Dictionary) input data dictionary for checking.",
+						"check_config (optional) -> (bool) whether configs should be checked. Defaults to `true`", 
+						"check_requirements (optional) -> (bool) whether mod requirements should be checked. Defaults to `true`", 
+						"check_incompatibilities (optional) -> (bool) whether mod incompatibilities should be checked. Defaults to `true`", 
+						"config_entry_override (optional) -> (String) the entry name that is checked against the dictionary for what it uses to store config data. Defaults to 'config'", 
+						"mod_requirements_entry_override (optional) -> (String) the entry name that is checked against the dictionary for what it uses to store mod requirements data. Defaults to 'mod_requirements'", 
+						"mod_incompatibilities_entry_override (optional) -> (String) the entry name that is checked against the dictionary for what it uses to store mod incompatibility data. Defaults to 'mod_incompatibilities'"
 					],
 					"return":[
-						
+						"bool for whether the dictionary is valid for processing"
 					]
 				},
 				"__config_parse":{
-					"description":"",
+					"description":"Opens a config file and converts it to a dictionary",
 					"args":[
-						
+						"file_path -> (String) filepath for the config file to open"
 					],
 					"return":[
-						
+						"Dictionary containing the config's data"
 					]
 				},
 				"__config_store":{
-					"description":"",
+					"description":"Stores a dictionary as a raw config as literally as possible",
 					"args":[
-						
+						"dictionary -> (Dictionary) the data being stored",
+						"file_path -> (String) filepath storing the config to"
 					],
-					"return":[
-						
-					]
 				},
 			}
 		}
@@ -1102,7 +1109,7 @@ class _ConfigDriver:
 		var sect_name = __truncate_mod_id(mod_id) + "/" + __truncate_section(section)
 		return sect_name
 	
-	func __validate_dictionary(data_dict : Dictionary,check_config : bool = true, check_requirements : bool = true, check_incompatabilities : bool = true, config_entry_override : String = "config", mod_requirements_entry_override : String = "mod_requirements", mod_incompatabilities_entry_override : String = "mod_incompatabilities"):
+	func __validate_dictionary(data_dict : Dictionary,check_config : bool = true, check_requirements : bool = true, check_incompatibilities : bool = true, config_entry_override : String = "config", mod_requirements_entry_override : String = "mod_requirements", mod_incompatibilities_entry_override : String = "mod_incompatibilities"):
 		var how = true
 		if check_config and config_entry_override in data_dict:
 			var cfg = data_dict[config_entry_override]
@@ -1135,8 +1142,8 @@ class _ConfigDriver:
 				allowFromMods = can == needs.size()
 			if allowFromMods:
 				var allowFromMods2 = true
-				if check_incompatabilities and mod_incompatabilities_entry_override in data_dict:
-					var needs = data_dict[mod_incompatabilities_entry_override]
+				if check_incompatibilities and mod_incompatibilities_entry_override in data_dict:
+					var needs = data_dict[mod_incompatibilities_entry_override]
 					var can = 0
 					for a in needs:
 						var cv = false
