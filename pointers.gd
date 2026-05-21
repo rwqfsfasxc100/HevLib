@@ -176,12 +176,11 @@ class _Achievements:
 		var currentAchievements = Achivements.achivements
 		var playtimeStats = Achivements.playtimeStats
 		var playtimeAchievements = Achivements.playtimeAchievements
+		var statsWithAchievements = Achivements.statsWithAchievements
 		
 		var stat = null
 		var limit = null
 		var additional_stat_data = null
-		
-		var statsWithAchievements = Achivements.statsWithAchievements
 		
 		for p in playtimeAchievements:
 			if p[2] == achievementID:
