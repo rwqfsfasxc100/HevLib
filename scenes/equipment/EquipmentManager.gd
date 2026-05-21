@@ -130,7 +130,7 @@ func add_slots():
 				var slot_file_data = file.get_as_text()
 				file.close()
 				var slot_data_dictionary = str(spt.data_dictionary)
-				var comp = pointers.DataFormat.__compare_with_byte_array(slot_data_dictionary, slot_file_data)
+				var comp = slot_data_dictionary == slot_file_data
 				if comp and not NEW_INSTALL:
 					slots_with_cache.append(mod_hash + ":" + slot_name)
 					add_child(spt)
@@ -202,7 +202,7 @@ func add_equipment():
 				var slot_file_data = file.get_as_text()
 				file.close()
 				var slot_data_dictionary = str(equip)
-				var comp = pointers.DataFormat.__compare_with_byte_array(str(slot_data_dictionary), str(slot_file_data))
+				var comp = str(slot_data_dictionary) == str(slot_file_data)
 				if comp and not NEW_INSTALL:
 					var slot_appendages = []
 					var indexFile = slot_folder + "index"
