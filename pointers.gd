@@ -1717,10 +1717,21 @@ class _DriverManagement:
 		
 	]
 	
-	var class_documentation = {
-		"description":"",
-		"methods":{}
-	}
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
 	
 	
 	var pointers
@@ -1913,10 +1924,21 @@ class _Equipment:
 		
 	]
 	
-	var class_documentation = {
-		"description":"",
-		"methods":{}
-	}
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
 	
 	var vanilla_equipment = {}
 	var vanilla_data = preload("res://HevLib/scenes/equipment/vanilla_defaults/slot_tagging.gd")
@@ -4434,10 +4456,21 @@ class _Events:
 		preload("res://HevLib/events/clear_event.gd"),
 	]
 	
-	var class_documentation = {
-		"description":"",
-		"methods":{}
-	}
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
 	
 	func __spawn_event(event, thering, parameters : Dictionary = {}):
 		var f = scripts[0].new()
@@ -4453,10 +4486,21 @@ class _FileAccess:
 		
 	]
 	
-	var class_documentation = {
-		"description":"",
-		"methods":{}
-	}
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
 	
 	var pointers
 	func _init(f):
@@ -4548,10 +4592,21 @@ class _FolderAccess:
 		
 	]
 	
-	var class_documentation = {
-		"description":"",
-		"methods":{}
-	}
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
 	
 	
 	var file = File.new()
@@ -4669,10 +4724,21 @@ class _Github:
 		
 	]
 	
-	var class_documentation = {
-		"description":"",
-		"methods":{}
-	}
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
 	
 	func __get_github_filesystem(URL: String, node_to_return_to: Node, behaviour: String = "normal", special_behaviour_data = ""):
 		var rng = RandomNumberGenerator.new()
@@ -4722,10 +4788,21 @@ class _HevLib:
 		
 	]
 	
-	var class_documentation = {
-		"description":"",
-		"methods":{}
-	}
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
 	
 	var pointers
 	func _init(f):
@@ -4809,10 +4886,21 @@ class _Keymapping:
 		
 	]
 	
-	var class_documentation = {
-		"description":"",
-		"methods":{}
-	}
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
 	
 	var pointers
 	
@@ -5189,10 +5277,21 @@ class _ManifestV1:
 		
 	]
 	
-	var class_documentation = {
-		"description":"",
-		"methods":{}
-	}
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
 	
 	var pointers
 	func _init(d):
@@ -5398,10 +5497,21 @@ class _ManifestV2:
 		
 	]
 	
-	var class_documentation = {
-		"description":"",
-		"methods":{}
-	}
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
 	
 	var pointers
 	func _init(d):
@@ -6441,10 +6551,21 @@ class _NodeAccess:
 		
 	]
 	
-	var class_documentation = {
-		"description":"",
-		"methods":{}
-	}
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
 	
 	var pointers
 	func _init(f):
@@ -6586,10 +6707,21 @@ class _RingInfo:
 		
 	]
 	
-	var class_documentation = {
-		"description":"",
-		"methods":{}
-	}
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
 	
 	const pixelToKm = 10000
 	const map = preload("res://ring/ring-map.png")
@@ -6683,10 +6815,21 @@ class _TimeAccess:
 		
 	]
 	
-	var class_documentation = {
-		"description":"",
-		"methods":{}
-	}
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
 	
 	func __compare_dates(date, compare_to_this_date):
 		var isDifferent = false
@@ -6737,10 +6880,21 @@ class _Translations:
 		
 	]
 	
-	var class_documentation = {
-		"description":"",
-		"methods":{}
-	}
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
 	
 	var pointers
 	func _init(c):
@@ -6936,10 +7090,21 @@ class _WebTranslate:
 		
 	]
 	
-	var class_documentation = {
-		"description":"",
-		"methods":{}
-	}
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
 	
 	var pointers
 	func _init(f):
@@ -7035,10 +7200,21 @@ class _Zip:
 		
 	]
 	
-	var class_documentation = {
-		"description":"",
-		"methods":{}
-	}
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
 	
 	
 	var dir = Directory.new()
