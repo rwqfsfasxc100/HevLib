@@ -1197,7 +1197,142 @@ class _DataFormat:
 		return {
 			"description":"",
 			"methods":{
-				"":{
+				"__array_to_string":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__format_for_large_numbers":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__rotate_point":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__get_vanilla_version":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__sift_dictionary":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__convert_arr_to_vec2arr":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__compare_versions":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__sift_ship_config":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__get_script_constant_map_without_load":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__get_script_variables_without_load":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__trim_scripts":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__factorial":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__get_unique_pairs":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__compile_script":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__compile_script_object":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__compile_to_script_object":{
 					"description":"",
 					"args":[
 						
@@ -1352,7 +1487,7 @@ class _DataFormat:
 		if pathway[2].size() == 0:
 			return {}
 		var dict = {}
-		var l = __compile_to_script_object(pathway[0]).get_script().get_script_constant_map()
+		var l = __compile_script_object(pathway[0]).get_script().get_script_constant_map()
 		for i in pathway[2]:
 			dict[i] = l[i]
 		return dict
@@ -1363,7 +1498,7 @@ class _DataFormat:
 		if pathway[1].size() == 0:
 			return {}
 		var dict = {}
-		var l = __compile_to_script_object(pathway[0])
+		var l = __compile_script_object(pathway[0])
 		for i in pathway[1]:
 			dict[i] = l.get(i)
 		return dict
@@ -1556,8 +1691,8 @@ class _DataFormat:
 				pairs.append(PoolIntArray([i, j]))
 		return pairs
 	
-	var compiled_script_storage = {}
 	var compiled_scripts = {}
+	var compiled_script_object_storage = {}
 	
 	func __compile_script(source_code : String) -> Script:
 		var shash = hash(source_code)
@@ -1569,25 +1704,12 @@ class _DataFormat:
 		compiled_scripts[shash] = out
 		return out
 	
-	func __compile_script_object(source_code : String,new_object = false) -> Script:
-		var shash = hash(source_code)
-		if not new_object and shash in compiled_script_storage:
-			return compiled_script_storage[shash]
-		
-		var out = GDScript.new()
-		out.set_source_code(source_code)
-		out.reload()
-		var obj = out.new()
-		compiled_script_storage[shash] = obj
-		return obj
 	
-	var compiled_script_object_storage = {}
-	
-	func __compile_to_script_object(source_code : String, params = [],new_object = false) -> Script:
+	func __compile_script_object(source_code : String, params = [],new_object = false) -> Script:
 		if not params is Array:
 			params = [params]
 		var shash = ""
-		if params.size() > 0:
+		if params:
 			var parStr = str(params)
 			shash = str(hash(source_code)) + "_" + str(hash(parStr))
 		else:
