@@ -1332,7 +1332,25 @@ class _DataFormat:
 						
 					]
 				},
-				"__compile_to_script_object":{
+				"__compile_and_override_script":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__compile_and_override_script_with_scene":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+				"__convert_var_from_string":{
 					"description":"",
 					"args":[
 						
@@ -1768,32 +1786,21 @@ class _DataFormat:
 	
 	func __compile_and_override_script_with_scene(source_code : String, script_storage_object = null, script_storage_array_name : String = "_savedObjects", scene_path : String = "") -> void:
 		
-		var out = GDScript.new()
-		out.set_source_code(source_code)
-		out.reload()
+		__compile_and_override_script(source_code,script_storage_object,script_storage_array_name)
 		
-		var parentScript:Script = out.get_base_script()
-		var parentPath:String = parentScript.resource_path
-		out.take_over_path(parentPath)
-		
-		if script_storage_object and script_storage_array_name:
-			var h = script_storage_object.get(script_storage_array_name)
-			h.append(out)
-		else:
-			_savedScriptObjects.append(out)
-		
-		var scn = load(scene_path).instance()
-		var root = scn.name
-		Tool.remove(scn)
-		var scene_replacement = "user://cache/.HevLib_Cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec()
-		var p = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"%s\" type=\"PackedScene\" id=1]\n\n[node name=\"%s\" instance=ExtResource( 1 )]" % [scene_path,root]
-		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
-		file.open(scene_replacement,File.WRITE)
-		file.store_string(p)
-		file.close()
-		var scene := load(scene_replacement)
-		scene.take_over_path(scene_path)
-		_savedScriptObjects.append(scene)
+		if ResourceLoader.exists(scene_path):
+			var scn = load(scene_path).instance()
+			var root = scn.name
+			Tool.remove(scn)
+			var scene_replacement = "user://cache/.HevLib_Cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec()
+			var p = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"%s\" type=\"PackedScene\" id=1]\n\n[node name=\"%s\" instance=ExtResource( 1 )]" % [scene_path,root]
+			pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
+			file.open(scene_replacement,File.WRITE)
+			file.store_string(p)
+			file.close()
+			var scene := load(scene_replacement)
+			scene.take_over_path(scene_path)
+			_savedScriptObjects.append(scene)
 	
 	var var_hash = {}
 	
