@@ -1198,12 +1198,12 @@ class _DataFormat:
 			"description":"",
 			"methods":{
 				"__array_to_string":{
-					"description":"",
+					"description":"Converts an array into a string. Unlike String.join(), accepts any array type and will convert components to a string as best as possible.",
 					"args":[
-						
+						"arr -> (Array) input array to be concatenated into a string"
 					],
 					"return":[
-						
+						"String containing the concatenated array"
 					]
 				},
 				"__format_for_large_numbers":{
