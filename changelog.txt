@@ -1,3 +1,16 @@
+[1.13.22]
+
+1="* Decluttered files by clearing references to the old pointer system from methods no longer making use of them"
+2="* Changed ConfigDriver.__set_button_focus to set_button_focus to prevent it from being used, considering that it's an internal-only function"
+3="* ConfigDriver.__input_change_made is now a cached operation"
+4="* Fixed typo when checking mod incompatibilities. now uses the correct spelling instead of 'incompatabilities'"
+5="* Achievement fetching methods are now considerably more efficient and are now cached operations"
+6="* Removed DataFormat.__compare_with_byte_array due to it being significantly slower than a standard string comparison"
+7="* Merged DataFormat.__compile_to_script_object into __compile_script_object. Arguments now use those of the old __compile_to_script_object"
+8="* DataFormat.__compile_and_override_script_with_scene now uses __compile_and_override_script for the overriding of the script to allow for a shared cache, and now checks for the updated scene existing before executing"
+9="* Removed DataFormat.__format_for_large_numbers due to it being redundant due to the existence of CurrentGame.formatThousands and CurrentGame.formatThousandsWithDecimals"
+10="* Improved efficiency of DataFormat.__compare_versions"
+
 [1.13.21]
 
 1="* Fixed crash caused by the dive summary display"
