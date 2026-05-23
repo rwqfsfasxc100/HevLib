@@ -1244,12 +1244,17 @@ class _DataFormat:
 					]
 				},
 				"__compare_versions":{
-					"description":"",
+					"description":"Compares two semantically formatted versions. Primary version must be equal or newer than the checked version to return true, otherwise returns false.",
 					"args":[
-						
+						"primary_major -> (int) major version number of the primary version",
+						"primary_minor -> (int) minor version number of the primary version",
+						"primary_bugfix -> (int) bugfix version number of the primary version", 
+						"compare_major -> (int) major version number of the compared version", 
+						"compare_minor -> (int) minor version number of the compared version", 
+						"compare_bugfix -> (int) bugfix version number of the compared version",
 					],
 					"return":[
-						
+						"Bool that's true only when the primary version is equal or higher than the compared version"
 					]
 				},
 				"__sift_ship_config":{
