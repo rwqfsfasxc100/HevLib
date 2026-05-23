@@ -1206,15 +1206,6 @@ class _DataFormat:
 						"String containing the concatenated array"
 					]
 				},
-				"__format_for_large_numbers":{
-					"description":"",
-					"args":[
-						
-					],
-					"return":[
-						
-					]
-				},
 				"__rotate_point":{
 					"description":"",
 					"args":[
@@ -1375,31 +1366,6 @@ class _DataFormat:
 		for i in arr:
 			s += String(i)
 		return s
-	
-	func __format_for_large_numbers(num) -> String:
-		var length = num.length()
-		if length > 3:
-			var concat = []
-			var times = length/3
-			var offset = length % 3
-			var count = 0
-			if offset > 0:
-				var spl = str(num).substr(0, offset)
-				concat.append(spl)
-			while times > 0:
-				var spl = str(num).substr(offset + (count * 3), 3)
-				concat.append(spl)
-				count += 1
-				times -= 1
-			var total = ""
-			for m in concat:
-				if total == "":
-					total = m
-				else:
-					total = total + TranslationServer.translate("SEPARATOR_THOUSAND") + m
-			return total
-		else:
-			return str(num)
 	
 	func __rotate_point(point: Vector2, angle: float, degrees:bool = true) -> Vector2:
 		if degrees:
