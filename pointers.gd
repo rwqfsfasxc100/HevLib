@@ -1207,39 +1207,40 @@ class _DataFormat:
 					]
 				},
 				"__rotate_point":{
-					"description":"",
+					"description":"Provides a Vector2 point after being rotated around (0,0)",
 					"args":[
-						
+						"point -> (Vector2) point that is being rotated around (0,0)",
+						"angle -> (float) angles to rotate by", 
+						"degrees (optional) -> (bool) for whether 'angle' should be treated as degree angles, and uses radians if not. Defaults to `true`"
 					],
 					"return":[
-						
+						"Vector2 for the rotated point"
 					]
 				},
 				"__get_vanilla_version":{
-					"description":"",
-					"args":[
-						
-					],
+					"description":"Fetches the game's current version. May break if any mods change the version label.",
 					"return":[
-						
+						"Array containing the major, minor, and bugfix versions"
 					]
 				},
 				"__sift_dictionary":{
-					"description":"",
+					"description":"Checks a dictionary for any keys matching within an array.",
 					"args":[
-						
+						"dictionary -> (Dictionary) the dictionary checked for keys",
+						"search_keys -> (Array) containing all keys that are being looked for. Note that values for keys will also be checked as well"
 					],
 					"return":[
-						
+						"Array containing all found keys and values matching the searched keys array"
 					]
 				},
 				"__convert_arr_to_vec2arr":{
-					"description":"",
+					"description":"Converts an array containing integers and/or floats into a PoolVector2Array",
 					"args":[
-						
+						"array -> (Array) for the data being converted into a PoolVector2Arr."
 					],
 					"return":[
-						
+						"PoolVector2Array for the output variables.",
+						"NOTE: If the input array has an odd length, or contains any variables that are not of int/float type, the returning PoolVector2Array will be empty."
 					]
 				},
 				"__compare_versions":{
@@ -1367,7 +1368,7 @@ class _DataFormat:
 			s += String(i)
 		return s
 	
-	func __rotate_point(point: Vector2, angle: float, degrees:bool = true) -> Vector2:
+	func __rotate_point(point : Vector2, angle : float, degrees : bool = true) -> Vector2:
 		if degrees:
 			angle = deg2rad(angle)
 		angle = -angle
@@ -1435,16 +1436,15 @@ class _DataFormat:
 		return converted
 	
 	func __compare_versions(primary_major : int,primary_minor : int,primary_bugfix : int, compare_major : int, compare_minor : int, compare_bugfix : int) -> bool:
-		var mod_exists = true
 		if primary_major < compare_major:
-			mod_exists = false
+			return false
 		elif primary_major == compare_major:
 			if primary_minor < compare_minor:
-				mod_exists = false
+				return false
 			elif primary_minor == compare_minor:
 				if primary_bugfix < compare_bugfix:
-					mod_exists = false
-		return mod_exists
+					return false
+		return true
 	
 	func __sift_ship_config(dictionary: Dictionary,search_keys: Array,cfgs_to_ignore:Array,parent = "") -> Array:
 		for i in cfgs_to_ignore:
