@@ -51,7 +51,7 @@ func _init(modLoader = ModLoader):
 		pointers = load("res://HevLib/pointers.gd").new()
 		pointers.FileAccess.__load_precached_mods()
 		
-		
+		copy_fonts(pointers)
 		var scv = pointers.FolderAccess.__fetch_folder_files(variables_folder,false,true)
 		for s in scv:
 			d.remove(s)
@@ -258,4 +258,33 @@ func match_mod_path_to_zip(mod_main_path:String) -> String:
 			return item[1]
 #	Debug.l("HevLib ManifestV2: no matches found, is the mod installed or run via the Godot editor?.")
 	return ""
+
+func copy_fonts(pointers):
+	var font_cache_dir = "user://cache/.HevLib_Cache/fonts/"
+	var courier_cache_dir = font_cache_dir + "courier_new/"
+	var verdana_cache_dir = font_cache_dir + "verdana/"
+	
+	pointers.FolderAccess.__check_folder_exists(courier_cache_dir)
+	pointers.FolderAccess.__check_folder_exists(verdana_cache_dir)
+	
+	if ResourceLoader.exists("res://HevLib Language Font Pack 1/font_overrides/courier_bold.ttf"):
+		pointers.FileAccess.__copy_file("res://HevLib Language Font Pack 1/font_overrides/courier_bold.ttf",courier_cache_dir)
+	else:
+		pointers.FileAccess.__copy_file("res://HevLib/ui/themes/fonts/courier_new/courier_bold.ttf",courier_cache_dir)
+	if ResourceLoader.exists("res://HevLib Language Font Pack 1/font_overrides/courier_new.ttf"):
+		pointers.FileAccess.__copy_file("res://HevLib Language Font Pack 1/font_overrides/courier_new.ttf",courier_cache_dir)
+	else:
+		pointers.FileAccess.__copy_file("res://HevLib/ui/themes/fonts/courier_new/courier_new.ttf",courier_cache_dir)
+	if ResourceLoader.exists("res://HevLib Language Font Pack 1/font_overrides/verdana.ttf"):
+		pointers.FileAccess.__copy_file("res://HevLib Language Font Pack 1/font_overrides/verdana.ttf",verdana_cache_dir)
+	else:
+		pointers.FileAccess.__copy_file("res://HevLib/ui/themes/fonts/verdana/verdana.ttf",verdana_cache_dir)
+	if ResourceLoader.exists("res://HevLib Language Font Pack 1/font_overrides/verdana_bold.ttf"):
+		pointers.FileAccess.__copy_file("res://HevLib Language Font Pack 1/font_overrides/verdana_bold.ttf",verdana_cache_dir)
+	else:
+		pointers.FileAccess.__copy_file("res://HevLib/ui/themes/fonts/verdana/verdana_bold.ttf",verdana_cache_dir)
+	
+	
+	
+	
 
