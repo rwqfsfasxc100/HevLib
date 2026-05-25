@@ -1,7 +1,7 @@
-[gd_resource type="DynamicFont" load_steps=2 format=2]
+[gd_resource type="DynamicFont" load_steps=3 format=2]
 
 [ext_resource path="res://HevLib/ui/themes/fonts/courier_new/courier_bold_italic.ttf" type="DynamicFontData" id=1]
-[ext_resource path="user://cache/.HevLib_Cache/fonts/courier_new/courier_bold.ttf" type="DynamicFontData" id=2]
+[ext_resource path="res://HevLib Language Font Pack 1/font_overrides/courier_bold.ttf" type="DynamicFontData" id=2]
 
 [resource]
 size = 20
