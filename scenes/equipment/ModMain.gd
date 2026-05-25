@@ -51,7 +51,6 @@ func _init(modLoader = ModLoader):
 		pointers = load("res://HevLib/pointers.gd").new()
 		pointers.FileAccess.__load_precached_mods()
 		
-		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/fonts/")
 		var scv = pointers.FolderAccess.__fetch_folder_files(variables_folder,false,true)
 		for s in scv:
 			d.remove(s)
