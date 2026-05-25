@@ -1,3 +1,7 @@
+[1.13.24]
+
+1="* Fixed LFP1 fonts not being properly copied"
+
 [1.13.23]
 
 1="* Fixed some instances where Courier fonts were using the wrong line thickness and/or not being italicised"
