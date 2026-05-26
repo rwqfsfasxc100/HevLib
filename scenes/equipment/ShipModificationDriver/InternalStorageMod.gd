@@ -34,19 +34,19 @@ var emp_scale_multi = 1.0
 var nanodroneMagazine = 0
 var listings = {}
 
-var system_name_registers = []
-var add_systems = []
+var hl_ism_system_name_registers = []
+var hl_ism_add_systems = []
 
 
-var cfgs_to_ignore = ["currentCargo","currentCargoBy","currentCargoComposition","damage","juryRig","preferredCrew","processedCargo","remoteCargo","tuning"]
+var hl_ism_cfgs_to_ignore = ["currentCargo","currentCargoBy","currentCargoComposition","damage","juryRig","preferredCrew","processedCargo","remoteCargo","tuning"]
 
 var currentInstalledEquipmentWithChanges = []
-var installed = []
+var hl_ism_installedequipment = []
 
 
 
 
-var mineral_trace_length = 6
+var hl_ism_mineral_trace_length = 6
 
 func _enter_tree():
 	var file = File.new()
@@ -60,10 +60,10 @@ func _enter_tree():
 	var sysNames = JSON.parse(file.get_as_text()).result
 	file.close()
 	configMutex.lock()
-	currentInstalledEquipmentWithChanges = ismPointers.DataFormat.__sift_ship_config(shipConfig.duplicate(true),sysNames,cfgs_to_ignore)
+	currentInstalledEquipmentWithChanges = ismPointers.DataFormat.__sift_ship_config(shipConfig.duplicate(true),sysNames,hl_ism_cfgs_to_ignore)
 	configMutex.unlock()
 	for i in currentInstalledEquipmentWithChanges:
-		installed.append(i.split(".")[i.split(".").size() - 1])
+		hl_ism_installedequipment.append(i.split(".")[i.split(".").size() - 1])
 	
 	
 	
@@ -87,7 +87,7 @@ func _enter_tree():
 	
 	var individual_capacity_changes = []
 	
-	for item in installed:
+	for item in hl_ism_installedequipment:
 		var iddata = listings[item]
 		var minimum_ammo_utilization_for_reduction = iddata.get("minimum_ammo_utilization_for_reduction",0.0)
 		var minimum_nano_utilization_for_reduction = iddata.get("minimum_nano_utilization_for_reduction",0.0)
@@ -125,7 +125,7 @@ func _enter_tree():
 				"display_system":
 					var dname = val.get("name","")
 					var mv = val.get("can_display_multiple",false)
-					if (dname and dname != "") and ((not dname in system_name_registers) or mv):
+					if (dname and dname != "") and ((not dname in hl_ism_system_name_registers) or mv):
 						var status = val.get("status",100.0)
 						var power = val.get("power",0.0)
 						var inspect = val.get("affect_inspection",false)
@@ -136,8 +136,8 @@ func _enter_tree():
 							"status":status,
 							"affect_inspection":inspect
 						}
-						system_name_registers.append(dname)
-						add_systems.append(o)
+						hl_ism_system_name_registers.append(dname)
+						hl_ism_add_systems.append(o)
 				"storage_multi":
 					val = float(max(val,0.001))
 					storage_multi *= val
@@ -227,18 +227,18 @@ func _enter_tree():
 	if modifyable_type != base_storage_type:
 		l("Transforming hold type from %s to %s" % [base_storage_type, modifyable_type])
 		if modifyable_type != "divided":
-			modifyable_capacity = base_proc_storage * mineral_trace_length
+			modifyable_capacity = base_proc_storage * hl_ism_mineral_trace_length
 		else:
-			modifyable_capacity = base_proc_storage / mineral_trace_length
+			modifyable_capacity = base_proc_storage / hl_ism_mineral_trace_length
 		processedCargoStorageType = modifyable_type
 		l("Hold transformation resulted in storage capacity changing from %s to %s" % [base_proc_storage, modifyable_capacity])
 	else:
 		l("Hold type isn't changed (is this equipment in the right slot?)")
 	if modifyable_type != "divided":
-		storage_add = storage_add * mineral_trace_length
+		storage_add = storage_add * hl_ism_mineral_trace_length
 		l("Hold type isn't divided, multiplying addition of %s by 6 to new addition of %s" % [storage_add,storage_add])
 	else:
-		mass_per_processed_tonne = mass_per_processed_tonne * mineral_trace_length
+		mass_per_processed_tonne = mass_per_processed_tonne * hl_ism_mineral_trace_length
 		l("Hold type is divided, additional mass per tonne is scaled for the new mineral size")
 	
 	processedCargoCapacity = int(float(modifyable_capacity) * storage_multi)
@@ -298,8 +298,8 @@ func _enter_tree():
 	
 	empShield += emp_shielding
 	
-	for a in range(add_systems.size()):
-		var i = add_systems[a]
+	for a in range(hl_ism_add_systems.size()):
+		var i = hl_ism_add_systems[a]
 		var dname = i.get("name","")
 		var power = i.get("power",0.0)
 		var status = i.get("status",100.0)

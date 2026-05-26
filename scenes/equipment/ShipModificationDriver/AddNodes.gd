@@ -12,9 +12,9 @@ var processed_ship_numerics_modifications = {}
 
 
 
-var pointers
+var pointers_hl_addnodes
 func _enter_tree():
-	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+	pointers_hl_addnodes = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	hl_add_nodes_make_node_mods()
 	
 func hl_add_nodes_make_node_mods():
@@ -92,7 +92,7 @@ func hl_add_nodes_make_node_mods():
 		
 		var recurse_to_variants = node_data["recurse_to_variants"]
 		
-		if pointers.ConfigDriver.__validate_dictionary(obj_data):
+		if pointers_hl_addnodes.ConfigDriver.__validate_dictionary(obj_data):
 			if not recurse_to_variants:
 				var sh = processed_ship_register.get(shipName,{"node_definitions":{}})
 				var def = sh["node_definitions"]
@@ -161,7 +161,7 @@ func hl_add_nodes_make_node_mods():
 						new_pos = npos[0]
 						node.set_deferred("position",new_pos)
 				TYPE_ARRAY, TYPE_INT_ARRAY, TYPE_REAL_ARRAY:
-					var scan = pointers.DataFormat.__convert_arr_to_vec2arr(npos)
+					var scan = pointers_hl_addnodes.DataFormat.__convert_arr_to_vec2arr(npos)
 					if scan.size() >= 1:
 						new_pos = scan[0]
 						node.set_deferred("position",new_pos)
@@ -278,7 +278,7 @@ func hl_add_nodes_node_modify():
 		if baseShipName in modify_data:
 			var thisShipData = modify_data[baseShipName]
 			for xd in thisShipData:
-				if pointers.ConfigDriver.__validate_dictionary(xd):
+				if pointers_hl_addnodes.ConfigDriver.__validate_dictionary(xd):
 					if xd.get("recurse_to_variants",false):
 						var node = get_node_or_null(xd.get("path","."))
 						var value = xd.get("value",null)
@@ -292,7 +292,7 @@ func hl_add_nodes_node_modify():
 	if shipName in modify_data:
 		var thisShipData = modify_data[shipName]
 		for xd in thisShipData:
-			if pointers.ConfigDriver.__validate_dictionary(xd):
+			if pointers_hl_addnodes.ConfigDriver.__validate_dictionary(xd):
 				var node = get_node_or_null(xd.get("path","."))
 				var value = xd.get("value",null)
 				var property = xd.get("property","null_value_to_ensure_that_this_fails_when_absent_lol_hi")
@@ -317,7 +317,7 @@ func hl_add_nodes_format_properties(data,format,property,property_path,base_node
 func hl_add_nodes_format_data(data, format):
 	match format:
 		"arr2vec2arr":
-			return pointers.DataFormat.__convert_arr_to_vec2arr(data)
+			return pointers_hl_addnodes.DataFormat.__convert_arr_to_vec2arr(data)
 		"arr2vec2":
 			return hl_add_nodes_convert_arr_to_vec2(data)
 		_:
@@ -509,7 +509,7 @@ func hl_add_nodes_process_modified_ship_numerics() -> Dictionary:
 	if baseShipName in dt:
 		for shipData in dt[baseShipName]:
 			if shipData.get("recurse_to_variants",false):
-				if pointers.ConfigDriver.__validate_dictionary(shipData):
+				if pointers_hl_addnodes.ConfigDriver.__validate_dictionary(shipData):
 					for type in shipData:
 						match type:
 							"ammo","mass_driver_ammo","ammunition":
@@ -556,7 +556,7 @@ func hl_add_nodes_process_modified_ship_numerics() -> Dictionary:
 									pd["turbine"]["max"] = shipData[type]["max"]
 	if shipName in dt:
 		for shipData in dt[shipName]:
-			if pointers.ConfigDriver.__validate_dictionary(shipData):
+			if pointers_hl_addnodes.ConfigDriver.__validate_dictionary(shipData):
 				for type in shipData:
 					match type:
 						"ammo","mass_driver_ammo","ammunition":

@@ -1551,6 +1551,8 @@ class _DataFormat:
 					concat += base_data[0]
 					if concat.find("extends ") > -1:
 						extend_this = false
+					if not concat.ends_with("\n"):
+						concat += "\n"
 					for i in base_data[1]:
 						if not i in var_names:
 							var_names.append(i)
