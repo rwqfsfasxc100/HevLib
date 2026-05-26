@@ -13,22 +13,22 @@ func hl_cargo_limiter_uv():
 
 var cargo_limit = 15
 
-func compare(a,b):
+func hl_cs_compare_for_order(a,b):
 	return smooth[a] > smooth[b]
 
 func smoothValue(dict, s):
 	.smoothValue(dict,s)
 	var sms = smooth.size()
 	if sms > 10:
-		var top = clear_non_minerals(smooth.keys())
+		var top = hl_cs_clear_non_minerals(smooth.keys())
 		sms = top.size()
-		top.sort_custom(self,"compare")
+		top.sort_custom(self,"hl_cs_compare_for_order")
 		if sms > cargo_limit:
 			for a in range(sms - cargo_limit):
 				smooth.erase(top[a + cargo_limit])
 	return smooth
 
-func clear_non_minerals(arr: Array):
+func hl_cs_clear_non_minerals(arr: Array):
 	arr.erase("")
 	arr.erase("cargo_space")
 	arr.erase("_")

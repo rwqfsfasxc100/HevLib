@@ -61,23 +61,23 @@ func spawnAsteroidByClass(oc, spot, chaos, spawnPointRandomness = 0.0, initialLi
 					var mergeDict = {m:q}
 					#Add it to the roid
 					i.composition.merge(mergeDict)
-		if i.has_method("update_mass"):
-			i.update_mass()
+		if i.has_method("hl_multiminerals_update_mass"):
+			i.hl_multiminerals_update_mass()
 		else:
-			printerr("Mineral [",i,"] lacks update_mass() method")
-			var ps = update_mass(i)
+			printerr("Mineral [",i,"] lacks hl_multiminerals_update_mass() method")
+			var ps = hl_multiminerals_update_mass(i)
 			i = ps
 		
 	return i
 #Update the roid's mass incase something went fucky
-func update_mass(i):
-	calc_comp(i)
+func hl_multiminerals_update_mass(i):
+	hl_multiminerals_calc_comp(i)
 	i.mass = comp_val
 	return i
 
 #Sum of all components of the roid
 var comp_val = 0.0
-func calc_comp(i):
+func hl_multiminerals_calc_comp(i):
 #	print(composition)
 	comp_val = 0.0
 	#For every material in the roid

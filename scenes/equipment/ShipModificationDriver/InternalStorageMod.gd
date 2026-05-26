@@ -67,7 +67,7 @@ func _enter_tree():
 	
 	
 	
-	init_vars()
+	hl_ism_init_vars()
 	base_mass = mass * 1000
 #	base_mass = currentMass
 	
@@ -325,7 +325,7 @@ func _enter_tree():
 func _ready():
 	l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [ammo_add, nano_add, propellant_add])
 	if propellant_add != 0:
-		addPropellantCapacity(propellant_add)
+		hl_ism_addPropellantCapacity(propellant_add)
 	if ammo_add != 0:
 		addAmmoCapacity(ammo_add)
 	if nano_add != 0:
@@ -342,7 +342,7 @@ func _ready():
 	if propellant_multi != 1.0:
 		var val = 0
 		val = (reactiveMassMax * propellant_multi) - reactiveMassMax
-		addPropellantCapacity(val)
+		hl_ism_addPropellantCapacity(val)
 	nanodroneMagazine = float(getConfig("drones.capacity",0.0))
 	massDriverMagazine = float(getConfig("ammo.capacity", 0.0))
 	
@@ -362,7 +362,7 @@ func _ready():
 		
 			var active = CurrentGame.getCurrentlyActiveCrewNames()
 			if active.size() > crew:
-				deactivateCrew(crew)
+				hl_ism_deactivateCrew(crew)
 func temporaryCargoMass() -> float:
 	var out = .temporaryCargoMass()
 	out += mass_add
@@ -378,7 +378,7 @@ var nanoDeliveryPerSecond = {
 }
 
 var availableNanoToDrawNow = 0.0
-func handleNanoDelivery(delta):
+func hl_ism_handleNanoDelivery(delta):
 	var ps = nanoDeliveryPerSecond.get(nanodroneMagazine, nanoDeliveryPerSecond[0.0])
 	var current = availableNanoToDrawNow
 	availableNanoToDrawNow = clamp(availableNanoToDrawNow + delta * ps, 0, ps)
@@ -412,7 +412,7 @@ func drawDrones(kg, really = true):
 	return .drawDrones(kg, really)
 var massNodeName = "InternalStorageMod_MassModifier"
 
-func deactivateCrew(maximum):
+func hl_ism_deactivateCrew(maximum):
 	var count = 0
 	for m in CurrentGame.getCurrentlyActiveCrewNames():
 		if count < maximum:
@@ -434,7 +434,7 @@ func addDronesCapacity(kg: float):
 		kg += change
 	.addDronesCapacity(kg)
 
-func addPropellantCapacity(kg: float):
+func hl_ism_addPropellantCapacity(kg: float):
 	var change = reactiveMassMax + kg
 	if change < 0:
 		kg += change
@@ -444,7 +444,7 @@ func addPropellantCapacity(kg: float):
 
 func _physics_process(delta):
 	if not dead and limitDroneOutput:
-		handleNanoDelivery(delta)
+		hl_ism_handleNanoDelivery(delta)
 	
 func hl_ism_UV():
 	if ismPointers:
@@ -457,7 +457,7 @@ func l(text):
 	if isPlayerControlled():
 		Debug.l("HevLib Ship Modification: " + text)
 
-func init_vars():
+func hl_ism_init_vars():
 	base_storage_type = processedCargoStorageType
 	base_proc_storage = processedCargoCapacity
 	base_crew_count = crew

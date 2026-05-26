@@ -32,9 +32,9 @@ var data_dictionary = ""
 var pointers
 var cv = null
 func _ready():
-	connect("visibility_changed",self,"recheck_this_visibility")
+	connect("visibility_changed",self,"hl_ug_recheck_this_visibility")
 
-func recheck_this_visibility():
+func hl_ug_recheck_this_visibility():
 	if not pointers:
 		pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	if pointers:

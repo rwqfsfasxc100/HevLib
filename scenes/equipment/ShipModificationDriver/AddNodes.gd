@@ -15,12 +15,12 @@ var processed_ship_numerics_modifications = {}
 var pointers
 func _enter_tree():
 	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-	make_node_mods()
+	hl_add_nodes_make_node_mods()
 	
-func make_node_mods():
-	processed_ship_numerics_modifications = process_modified_ship_numerics()
-	processed_node_definitions = process_node_definitons()
-	processed_ship_register = process_ship_register()
+func hl_add_nodes_make_node_mods():
+	processed_ship_numerics_modifications = hl_add_nodes_process_modified_ship_numerics()
+	processed_node_definitions = hl_add_nodes_process_node_definitons()
+	processed_ship_register = hl_add_nodes_process_ship_register()
 	
 	if processed_ship_numerics_modifications:
 		for type in processed_ship_numerics_modifications:
@@ -207,7 +207,7 @@ func make_node_mods():
 					var split = prop.split("/")
 					if split.size() == 1:
 						if prop in pointer:
-							var setter = format_properties(data,data.get("method",""),prop,"",node,node_parent_path)
+							var setter = hl_add_nodes_format_properties(data,data.get("method",""),prop,"",node,node_parent_path)
 							if data.get("defer",false):
 								pointer.set_deferred(prop,setter)
 							else:
@@ -223,7 +223,7 @@ func make_node_mods():
 						if pointer == null:
 							continue
 						if nprop in pointer:
-							var setter = format_properties(data,data.get("method",""),nprop,npath,node,node_parent_path)
+							var setter = hl_add_nodes_format_properties(data,data.get("method",""),nprop,npath,node,node_parent_path)
 							if data.get("defer",false):
 								pointer.set_deferred(nprop,setter)
 							else:
@@ -236,7 +236,7 @@ func make_node_mods():
 					var split = prop.split("/")
 					if split.size() == 1:
 						if prop in pointer:
-							var setter = format_properties(data,data.get("method",""),prop,"",node,node_parent_path)
+							var setter = hl_add_nodes_format_properties(data,data.get("method",""),prop,"",node,node_parent_path)
 							if data.get("defer",false):
 								pointer.set_deferred(prop,setter)
 							else:
@@ -252,7 +252,7 @@ func make_node_mods():
 						if pointer == null:
 							continue
 						if nprop in pointer:
-							var setter = format_properties(data,data.get("method",""),nprop,npath,node,node_parent_path)
+							var setter = hl_add_nodes_format_properties(data,data.get("method",""),nprop,npath,node,node_parent_path)
 							if data.get("defer",false):
 								pointer.set_deferred(nprop,setter)
 							else:
@@ -265,10 +265,10 @@ func make_node_mods():
 		if str(get_path_to(p)) != str(thisNode) and "registerExternal" in node:
 			node.registerExternal = true
 		p.add_child(node)
-	nodeModify()
+	hl_add_nodes_node_modify()
 
 
-func nodeModify():
+func hl_add_nodes_node_modify():
 	var file = File.new()
 	file.open(ship_node_modify_file,File.READ)
 	var modify_data = JSON.parse(file.get_as_text()).result
@@ -303,27 +303,27 @@ func nodeModify():
 						node.set(property,value)
 	
 	
-func format_properties(data,format,property,property_path,base_node,parent_path):
+func hl_add_nodes_format_properties(data,format,property,property_path,base_node,parent_path):
 	match format:
 		"copy":
-			return copy_property(data.get("node_path",""),data.get("property",property),data.get("format",""))
+			return hl_add_nodes_copy_property(data.get("node_path",""),data.get("property",property),data.get("format",""))
 		"center_to_ship":
-			return center_to_ship(property_path,base_node,data.get("ignore_scaling",false),parent_path)
+			return hl_add_nodes_center_to_ship(property_path,base_node,data.get("ignore_scaling",false),parent_path)
 		"invert_scaling":
-			return invert_scaling(property_path,base_node)
+			return hl_add_nodes_invert_scaling(property_path,base_node)
 		_:
-			return format_data(data.get("value",null),format)
+			return hl_add_nodes_format_data(data.get("value",null),format)
 
-func format_data(data, format):
+func hl_add_nodes_format_data(data, format):
 	match format:
 		"arr2vec2arr":
-			return convert_arr_to_vec2arr(data)
+			return pointers.DataFormat.__convert_arr_to_vec2arr(data)
 		"arr2vec2":
-			return convert_arr_to_vec2(data)
+			return hl_add_nodes_convert_arr_to_vec2(data)
 		_:
 			return data
 
-func convert_arr_to_vec2(array:Array) -> Vector2:
+func hl_add_nodes_convert_arr_to_vec2(array:Array) -> Vector2:
 	var new_scale = Vector2(0,0)
 	if array.size() >=2:
 		new_scale = Vector2(float(array[0]),float(array[1]))
@@ -331,50 +331,18 @@ func convert_arr_to_vec2(array:Array) -> Vector2:
 		new_scale = Vector2(float(array[0]),float(array[0]))
 	return new_scale
 
-func convert_arr_to_vec2arr(array:Array) -> PoolVector2Array:
-	var converted = PoolVector2Array([])
-	var size = array.size()
-	if size % 2 == 1:
-		Debug.l("Cannot convert array to PoolVector2Array with an odd number of entries")
-		return PoolVector2Array([])
-	var index = 0
-	while index < size:
-		var a = array[index]
-		var b = array[index + 1]
-		var atype = typeof(a)
-		var btype = typeof(b)
-		if atype == TYPE_INT:
-			pass
-		elif atype == TYPE_REAL:
-			pass
-		else:
-			Debug.l("Cannot convert type %s for PoolVector2Array" % atype)
-			return PoolVector2Array([])
-		if btype == TYPE_INT:
-			pass
-		elif btype == TYPE_REAL:
-			pass
-		else:
-			Debug.l("Cannot convert type %s for PoolVector2Array" % btype)
-			return PoolVector2Array([])
-		var pooling = Vector2(a,b)
-		converted.append(pooling)
-		index += 2
-#	breakpoint
-	return converted
-
-func copy_property(path: String,property: String,method: String = ""):
+func hl_add_nodes_copy_property(path: String,property: String,method: String = ""):
 	var node = self
 	var p = property.split("/")[property.split("/").size() - 1]
 	if path:
 		node = get_node_or_null(path)
 	if node and p in node:
 		var v = node.get(p)
-		var data = format_data(v, method)
+		var data = hl_add_nodes_format_data(v, method)
 		return data
 	return
 
-func center_to_ship(property,base_node,ignore_scaling = false,parent_path = "."):
+func hl_add_nodes_center_to_ship(property,base_node,ignore_scaling = false,parent_path = "."):
 	var node_to_get = property
 	if base_node.get_node_or_null(node_to_get) == null:
 		return
@@ -423,7 +391,7 @@ func center_to_ship(property,base_node,ignore_scaling = false,parent_path = ".")
 	
 	return Vector2(true_position.x,true_position.y)
 
-func invert_scaling(node_path,base_node):
+func hl_add_nodes_invert_scaling(node_path,base_node):
 	var scalings = {}
 	
 	var x_mod = 1.0
@@ -467,7 +435,7 @@ func invert_scaling(node_path,base_node):
 
 
 
-func process_ship_register():
+func hl_add_nodes_process_ship_register():
 	var file = File.new()
 	var pd = {}
 	file.open(ship_register_file,File.READ)
@@ -507,7 +475,7 @@ func process_ship_register():
 
 
 
-func process_node_definitons():
+func hl_add_nodes_process_node_definitons():
 	var file = File.new()
 	var pd = {}
 	file.open(node_definitons_file,File.READ)
@@ -532,7 +500,7 @@ func process_node_definitons():
 	
 	return pd
 
-func process_modified_ship_numerics() -> Dictionary:
+func hl_add_nodes_process_modified_ship_numerics() -> Dictionary:
 	var file = File.new()
 	var pd = {}
 	file.open(modify_ship_numerics_store,File.READ)

@@ -5,7 +5,7 @@ var ship_driver_path = "user://cache/.HevLib_Cache/ShipDriver/"
 func _ready():
 	var file = File.new()
 	yield(get_tree(),"idle_frame")
-	resetter_timeout()
+	hl_shipdriver_resetter_timeout()
 	
 	# Ship driver
 	file.open(ship_driver_path + "driver_data.json",File.READ)
@@ -133,7 +133,7 @@ func _ready():
 	file.close()
 	pass
 
-func resetter_timeout():
+func hl_shipdriver_resetter_timeout():
 	for ship in ships:
 		var path = ships[ship].resource_path
 		var replacement = load(path)

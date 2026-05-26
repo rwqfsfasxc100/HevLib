@@ -2,14 +2,14 @@ extends "res://asteroids/mineral.gd"
 
 
 #Update the roid's mass incase something went fucky
-func update_mass():
-	calc_comp()
+func hl_multiminerals_update_mass():
+	hl_multiminerals_calc_comp()
 	mass = comp_val
 
 
 #Sum of all components of the roid
 var comp_val = 0.0
-func calc_comp():
+func hl_multiminerals_calc_comp():
 #	print(composition)
 	comp_val = 0.0
 	#For every material in the roid

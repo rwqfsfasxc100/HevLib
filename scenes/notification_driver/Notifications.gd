@@ -59,7 +59,7 @@ func _notification_start(data):
 	if animation.is_playing():
 		yield(animation, "animation_finished")
 	animation.play("generic")
-	clear_vp()
+	hl_notif_clear_vp()
 	animations.Show.play("show")
 	animations.Sound.play("Sound")
 	boxes.Title.text = title
@@ -121,10 +121,10 @@ func _notification_start(data):
 	
 	
 
-func add_vp():
+func hl_notif_add_vp():
 	pass
 
-func clear_vp():
+func hl_notif_clear_vp():
 	
 	for child in vp_objects:
 		Tool.remove(child)

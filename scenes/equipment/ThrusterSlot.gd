@@ -48,10 +48,10 @@ const nozzle_template = {
 var aux_type
 func loadPlaceholder():
 	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-	modify()
+	hl_thrusterslot_modify()
 	.loadPlaceholder()
 #	yield(get_tree(),"idle_frame")
-func modify():
+func hl_thrusterslot_modify():
 	file.open(auxslot_save_path,File.READ)
 	var datastore = JSON.parse(file.get_as_text()).result
 	file.close()
@@ -159,7 +159,7 @@ func modify():
 							var color_override = data.get("flare_override_color","")
 							if color_override:
 								fco = Color(color_override)
-								make_timer()
+								hl_thrusterslot_make_timer()
 				
 				
 				
@@ -190,26 +190,26 @@ func modify():
 					repairReplacementPrice = _repairReplacementPrice()
 					repairReplacementTime = _repairReplacementTime()
 					mass = _getMass()
-	get_colors()
+	hl_thrusterslot_get_colors()
 
 
-func make_timer():
+func hl_thrusterslot_make_timer():
 	if timerObject == null:
 		timerObject = Timer.new()
 		timerObject.wait_time = 0.5
 		timerObject.one_shot = true
-		timerObject.connect("timeout",self,"recolor")
+		timerObject.connect("timeout",self,"hl_thrusterslot_recolor")
 		CurrentGame.get_tree().get_root().add_child(timerObject)
 		timerObject.call_deferred("start")
 
-func convert_to_nozzle(noz):
+func hl_thrusterslot_convert_to_nozzle(noz):
 	var nozzle = nozzle_template.duplicate(true)
 	for i in nozzle:
 		if i in noz and typeof(nozzle[i]) == typeof(noz[i]):
 			nozzle[i] = noz[i]
 	return nozzle
 
-func recolor():
+func hl_thrusterslot_recolor():
 	if not flare:
 		for node in get_children():
 			if node.name.begins_with(name + "_"):
@@ -218,7 +218,7 @@ func recolor():
 		flare.color = fco
 	Tool.remove(timerObject)
 
-func modify_nozzle(nozzleA,nd):
+func hl_thrusterslot_modify_nozzle(nozzleA,nd):
 	if nozzleA:
 		if aux_type != "NOT_A_THRUSTER":
 			nozzleA.coolTime = nd.cool_time
@@ -277,7 +277,7 @@ func modify_nozzle(nozzleA,nd):
 		if rs.size() >= 2:
 			nozzleA.scale = Vector2(rs[0],rs[1])
 
-func get_colors():
+func hl_thrusterslot_get_colors():
 	file.open(color_cache_path,File.READ)
 	var color_data = JSON.parse(file.get_as_text()).result
 	file.close()
@@ -288,12 +288,12 @@ func get_colors():
 			continue
 		
 		if i == shipName:
-			modify_colors(d)
+			hl_thrusterslot_modify_colors(d)
 		if i == baseShipName and d.get("recurse_to_variants",false):
-			modify_colors(d)
+			hl_thrusterslot_modify_colors(d)
 		
 
-func modify_colors(data):
+func hl_thrusterslot_modify_colors(data):
 	var change = false
 	if "type" in data:
 		var c = data["type"]
@@ -308,4 +308,4 @@ func modify_colors(data):
 			fco = color
 			change = true
 	if change:
-		make_timer()
+		hl_thrusterslot_make_timer()
