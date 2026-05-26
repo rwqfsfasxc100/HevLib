@@ -1258,39 +1258,72 @@ class _DataFormat:
 					]
 				},
 				"__sift_ship_config":{
-					"description":"",
+					"description":"Similar to __sift_dictionary, however assumes the dictionary is a ship config and returns the entries in a ship config-like format (i.e. cargo.equipment.SYSTEM_CARGO_MPU_BULK)",
 					"args":[
-						
+						"dictionary -> (Dictionary) the ship config to sort through",
+						"search_keys -> (Array) list of string entries to search for",
+						"cfgs_to_ignore -> (Array) any keys within the config to remove from the search. Due to the way this works, it's highly recommended to do a deep duplication of the dictionary before searching."
 					],
 					"return":[
-						
+						"Array of systems that exist within the dictionary, with the config directory attached."
 					]
 				},
 				"__get_script_constant_map_without_load":{
-					"description":"",
+					"description":"Similar to the Script.get_script_constant_map() method, however does not load the script and unlike that method is deterministic in the order of constants.",
 					"args":[
-						
+						"script_path -> (String) for the file path to open"
 					],
 					"return":[
-						
+						"Dictionary containing each constant and it's value"
 					]
 				},
 				"__get_script_variables_without_load":{
-					"description":"",
+					"description":"Fetches the initial values of a script without loading it. NOTE: There may be issues with some variables that set their value on initialization.",
 					"args":[
-						
+						"script_path -> (String) for the file path to open"
 					],
 					"return":[
-						
+						"Dictionary containing each variable and it's value"
 					]
 				},
 				"__trim_scripts":{
-					"description":"",
+					"description":"Opens a script and fetches information regarding variables and nodes without loading it.",
 					"args":[
-						
+						"file_path -> (String) filepath of the script",
+						"get_detailed_operands (optional) -> (bool) Whether any arguments and return types for methods or signals should be checked. Only use if you need it, as it slows down the process a lot. Defaults to `false`", 
+						"trim_unnecessary_newlines (optional) -> (bool) Whether the returned script should have any multiline variables (i.e. Arrays, Dictionaries, etc.) concatenated into a single line. Defaults to `false`",
+						"recurse_through_base_scripts (optional) -> (bool) If the script extends from another script, this allows it to recurse through the extended script(s) to fetch information from those. NOTE: Scripts extended by mods do affect this. Defaults to `true`",
 					],
 					"return":[
-						
+						"Array containing several constituent parts for specific data types",
+						" script -> (String) containing source code for the fetched script only containing variables, and constants from the script",
+						" variables -> (Array) containing the names of all variables within the script",
+						" constants -> (Array) containing the names of all constants within the script",
+						" signals -> (Array) containing the names of all signals within the script",
+						" methods -> (Array) containing the names of all methods within the script",
+						" signal args -> (Array) of arrays containing the names of all arguments for the respective signal. The index of each array is respective of the index of the signal's name, and will be empty if the signal has no arguments",
+						" method args -> (Array) of arrays containing the names and types for the respective method. The index of each array is respective of the index of the method's name, and will be empty if the method has no arguments. If an argument uses a specific type, will be formatted as `<arg name>: <arg type>`",
+						" method return type -> (Array) of strings for the type that the method will return as. If not specified, will be blank. NOTE: If the method explicitely returns void, then it will state a void return type.",
+					]
+				},
+				"__trim_script_object":{
+					"description":"Identical to __trim_scripts, however file_path is replaced by script_source and uses a script object.",
+					"args":[
+						"script_source -> (Script) script object to be trimmed",
+						"get_detailed_operands (optional) -> (bool) Whether any arguments and return types for methods or signals should be checked. Only use if you need it, as it slows down the process a lot. Defaults to `false`", 
+						"trim_unnecessary_newlines (optional) -> (bool) Whether the returned script should have any multiline variables (i.e. Arrays, Dictionaries, etc.) concatenated into a single line. Defaults to `false`",
+						"recurse_through_base_scripts (optional) -> (bool) If the script extends from another script, this allows it to recurse through the extended script(s) to fetch information from those. NOTE: Scripts extended by mods do affect this. Defaults to `true`",
+					],
+					"return":[
+						"Array containing several constituent parts for specific data types",
+						" script -> (String) containing source code for the fetched script only containing variables, and constants from the script",
+						" variables -> (Array) containing the names of all variables within the script",
+						" constants -> (Array) containing the names of all constants within the script",
+						" signals -> (Array) containing the names of all signals within the script",
+						" methods -> (Array) containing the names of all methods within the script",
+						" signal args -> (Array) of arrays containing the names of all arguments for the respective signal. The index of each array is respective of the index of the signal's name, and will be empty if the signal has no arguments",
+						" method args -> (Array) of arrays containing the names and types for the respective method. The index of each array is respective of the index of the method's name, and will be empty if the method has no arguments. If an argument uses a specific type, will be formatted as `<arg name>: <arg type>`",
+						" method return type -> (Array) of strings for the type that the method will return as. If not specified, will be blank. NOTE: If the method explicitely returns void, then it will state a void return type.",
 					]
 				},
 				"__factorial":{
@@ -1470,7 +1503,7 @@ class _DataFormat:
 					arr.append_array(__sift_ship_config(kdata,search_keys,[],p))
 		return arr
 	
-	func __get_script_constant_map_without_load(script_path) -> Dictionary:
+	func __get_script_constant_map_without_load(script_path : String) -> Dictionary:
 		var filepath = "user://cache/.HevLib_Cache/Variable_Fetch/"
 		var pathway = __trim_scripts(script_path)
 		if pathway[2].size() == 0:
@@ -1481,7 +1514,7 @@ class _DataFormat:
 			dict[i] = l[i]
 		return dict
 	
-	func __get_script_variables_without_load(script_path) -> Dictionary:
+	func __get_script_variables_without_load(script_path : String) -> Dictionary:
 		var filepath = "user://cache/.HevLib_Cache/Variable_Fetch/"
 		var pathway = __trim_scripts(script_path)
 		if pathway[1].size() == 0:
@@ -1494,18 +1527,49 @@ class _DataFormat:
 		
 	const function_prefixes = ["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func "]
 	const all_prefixes = ["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func ","onready ","var ","signal ","const ","export ","extends "]
-	func __trim_scripts(file_path : String, get_detailed_operands: bool = false, trim_unnecessary_newlines: bool = false):
+	func __trim_scripts(file_path : String, get_detailed_operands : bool = false, trim_unnecessary_newlines : bool = false, recurse_through_base_scripts : bool = true):
+		var script_source = load(file_path)
+		if script_source:
+			return __trim_script_object(script_source,get_detailed_operands,trim_unnecessary_newlines,recurse_through_base_scripts)
+		return ["extends Node",[],[],[],[],[],[],[]]
+	
+	func __trim_script_object(script_source : Script, get_detailed_operands : bool = false, trim_unnecessary_newlines : bool = false, recurse_through_base_scripts : bool = true):
 		var concat : String = ""
-		var const_names = []
 		var var_names = []
+		var const_names = []
 		var method_names = []
 		var signal_names = []
 		var method_values = []
 		var method_output_type = []
 		var signal_values = []
-		var scriptsource = load(file_path)
-		if scriptsource:
-			var data = scriptsource.get_source_code()
+		if script_source:
+			var extend_this = true
+			if recurse_through_base_scripts:
+				var base_script = script_source.get_base_script()
+				if base_script:
+					var base_data = __trim_script_object(base_script,get_detailed_operands,trim_unnecessary_newlines,recurse_through_base_scripts)
+					concat += base_data[0]
+					if concat.find("extends ") > -1:
+						extend_this = false
+					for i in base_data[1]:
+						if not i in var_names:
+							var_names.append(i)
+					for i in base_data[2]:
+						if not i in const_names:
+							const_names.append(i)
+					for f in range(base_data[3].size()):
+						var i = base_data[3][f]
+						if not i in signal_names:
+							signal_names.append(i)
+							signal_values.append(base_data[5][f])
+					for f in range(base_data[4].size()):
+						var i = base_data[4][f]
+						if not i in method_names:
+							method_names.append(i)
+							method_values.append(base_data[6][f])
+							method_output_type.append(base_data[7][f])
+#					breakpoint
+			var data = script_source.get_source_code()
 			var streaming = false
 			var this_stream : String = ""
 			var lines = data.split("\n")
@@ -1635,7 +1699,8 @@ class _DataFormat:
 						concat = concat + this_stream.strip_edges() + "\n"
 						this_stream = ""
 						streaming = false
-					streaming = true
+					if extend_this:
+						streaming = true
 				if streaming:
 					this_stream = this_stream + "\n" + line
 			if streaming:
