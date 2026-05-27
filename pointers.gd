@@ -1832,18 +1832,25 @@ class _DataFormat:
 		if not scene_path is Array:
 			scene_path = PoolStringArray([scene_path])
 		for sc in scene_path:
-			if sc and sc is String and ResourceLoader.exists(sc):
-				var scn = load(sc).instance()
-				var root = scn.name
-				Tool.remove(scn)
-				var scene_replacement = "user://cache/.HevLib_Cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec()
-				var p = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"%s\" type=\"PackedScene\" id=1]\n\n[node name=\"%s\" instance=ExtResource( 1 )]" % [scene_path,root]
-				pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
-				file.open(scene_replacement,File.WRITE)
-				file.store_string(p)
-				file.close()
-				var scene := load(scene_replacement)
-				scene.take_over_path(sc)
+			__reload_scene(sc, script_storage_object, script_storage_array_name)
+	
+	func __reload_scene(scene_path : String, script_storage_object = null, script_storage_array_name : String = "_savedObjects"):
+		if scene_path and scene_path is String and ResourceLoader.exists(scene_path):
+			var scn = load(scene_path).instance()
+			var root = scn.name
+			Tool.remove(scn)
+			var scene_replacement = "user://cache/.HevLib_Cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec()
+			var p = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"%s\" type=\"PackedScene\" id=1]\n\n[node name=\"%s\" instance=ExtResource( 1 )]" % [scene_path,root]
+			pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
+			file.open(scene_replacement,File.WRITE)
+			file.store_string(p)
+			file.close()
+			var scene := load(scene_replacement)
+			scene.take_over_path(scene_path)
+			if script_storage_object and script_storage_array_name and (script_storage_array_name in script_storage_object):
+				var h = script_storage_object.get(script_storage_array_name)
+				h.append(scene)
+			else:
 				_savedScriptObjects.append(scene)
 	
 	var var_hash = {}
