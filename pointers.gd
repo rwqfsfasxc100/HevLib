@@ -1390,12 +1390,13 @@ class _DataFormat:
 					],
 				},
 				"__convert_var_from_string":{
-					"description":"",
+					"description":"Converts a string containing a variable in the literal sense (as if it were written in a script) into it's variant form. NOTE: Strings need to have their quotes inside the string quotes to be considered valid. E.g. `\"\"this is a string\"\"`, \"Vector2(1,2)\"",
 					"args":[
-						
+						"string -> (String) the variable written in the literal sense as a string", 
+						"constant (optional) -> Whether the variable should use a constant or variant definition for it. Setting this to false can be useful if the desired output cannot be stored as a constant when in a script. Defaults to `true`",
 					],
 					"return":[
-						
+						"Variant from the literal conversion"
 					]
 				},
 			}
