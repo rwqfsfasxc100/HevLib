@@ -1327,49 +1327,50 @@ class _DataFormat:
 					]
 				},
 				"__factorial":{
-					"description":"",
+					"description":"Calculates the factorial of the provided integer",
 					"args":[
-						
+						"n -> (int) the number to be set to it's factorial"
 					],
 					"return":[
-						
+						"int for the output factorial"
 					]
 				},
 				"__get_unique_pairs":{
-					"description":"",
+					"description":"Provides an array of PoolIntArrays of all pairs of numbers in a range from zero to the provided integer (not inclusive). E.g. 3 = [[0,1],[0,2],[1,2]]",
 					"args":[
-						
+						"max_value -> (int) the range of the pairs, non-inclusive"
 					],
 					"return":[
-						
+						"Array of PoolIntArrays for each pair."
 					]
 				},
 				"__compile_script":{
-					"description":"",
+					"description":"Compiles provided source code into a new script object",
 					"args":[
-						
+						"source_code -> (String) the source code for the script"
 					],
 					"return":[
-						
+						"Script object using the provided source"
 					]
 				},
 				"__compile_script_object":{
-					"description":"",
+					"description":"Compiles provided source code into a new script and creates a new object from it. NOTE: This is a cached operation, and the provided object will be the same if generated from previous code unless set to use a new object.",
 					"args":[
-						
+						"source_code -> (String) the source code for the script.", 
+						"params (optional) -> Any parameters for the object if needed by it's `_init` method. Multiple arguments can be passed by using an array. Defaults to `[]`",
+						"new_object (optional) -> (bool) whether to create a new object instead of fetching the old one from the cache. Defaults to `false`",
 					],
 					"return":[
-						
+						"Object with the new script set as it's script"
 					]
 				},
 				"__compile_and_override_script":{
-					"description":"",
+					"description":"Compiles a script and overrides it. Similar to the installScriptExtension method used in ModMain scripts",
 					"args":[
-						
+						"source_code -> (String) source code for the script override.", 
+						"script_storage_object (optional) -> (object) A persistent object used to keep the script override available in memory. Heavily recommended to use this to ensure proper functionality, such as using a mod's script object from the ModLoader children. If not provided, uses the current pointer object, which may be freed depending on the operation. Defaults to `null`", 
+						"script_storage_array_name (optional) -> (String) The array name that the persistent object uses to store objects. Defaults to `'_savedObjects'` as it is a standard name in ModMain scripts.",
 					],
-					"return":[
-						
-					]
 				},
 				"__compile_and_override_script_with_scene":{
 					"description":"",
@@ -1509,7 +1510,7 @@ class _DataFormat:
 		if pathway[2].size() == 0:
 			return {}
 		var dict = {}
-		var l = __compile_script_object(pathway[0]).get_script().get_script_constant_map()
+		var l = __compile_script(pathway[0]).get_script_constant_map()
 		for i in pathway[2]:
 			dict[i] = l[i]
 		return dict
@@ -1761,7 +1762,7 @@ class _DataFormat:
 		return out
 	
 	
-	func __compile_script_object(source_code : String, params = [],new_object = false) -> Script:
+	func __compile_script_object(source_code : String, params = [],new_object : bool = false) -> Script:
 		if not params is Array:
 			params = [params]
 		var shash = ""
@@ -1816,7 +1817,7 @@ class _DataFormat:
 		var parentPath:String = parentScript.resource_path
 		out.take_over_path(parentPath)
 		
-		if script_storage_object and script_storage_array_name:
+		if script_storage_object and script_storage_array_name and (script_storage_array_name in script_storage_object):
 			var h = script_storage_object.get(script_storage_array_name)
 			h.append(out)
 		else:
