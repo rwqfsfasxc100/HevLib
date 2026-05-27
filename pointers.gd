@@ -1373,9 +1373,12 @@ class _DataFormat:
 					],
 				},
 				"__compile_and_override_script_with_scene":{
-					"description":"",
+					"description":"Similar to __compile_and_override_script, additionally creates and updates one or more scenes after overriding the script in case script needs to have scenes reloaded to apply the update.",
 					"args":[
-						
+						"source_code -> (String) source code for the script override.", 
+						"script_storage_object (optional) -> (object) A persistent object used to keep the script override available in memory. Heavily recommended to use this to ensure proper functionality, such as using a mod's script object from the ModLoader children. If not provided, uses the current pointer object, which may be freed depending on the operation. Defaults to `null`", 
+						"script_storage_array_name (optional) -> (String) The array name that the persistent object uses to store objects. Defaults to `'_savedObjects'` as it is a standard name in ModMain scripts.",
+						"scene_path (optional) -> (String/PoolStringArray) String or PoolStringArray containing the file path or paths to scenes to be updated. Using array of paths will have them update in order. Defaults to `PoolStringArray()`"
 					],
 					"return":[
 						
@@ -1823,23 +1826,25 @@ class _DataFormat:
 		else:
 			_savedScriptObjects.append(out)
 	
-	func __compile_and_override_script_with_scene(source_code : String, script_storage_object = null, script_storage_array_name : String = "_savedObjects", scene_path : String = "") -> void:
+	func __compile_and_override_script_with_scene(source_code : String, script_storage_object = null, script_storage_array_name : String = "_savedObjects", scene_path = []) -> void:
 		
 		__compile_and_override_script(source_code,script_storage_object,script_storage_array_name)
-		
-		if ResourceLoader.exists(scene_path):
-			var scn = load(scene_path).instance()
-			var root = scn.name
-			Tool.remove(scn)
-			var scene_replacement = "user://cache/.HevLib_Cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec()
-			var p = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"%s\" type=\"PackedScene\" id=1]\n\n[node name=\"%s\" instance=ExtResource( 1 )]" % [scene_path,root]
-			pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
-			file.open(scene_replacement,File.WRITE)
-			file.store_string(p)
-			file.close()
-			var scene := load(scene_replacement)
-			scene.take_over_path(scene_path)
-			_savedScriptObjects.append(scene)
+		if not scene_path is Array:
+			scene_path = PoolStringArray([scene_path])
+		for sc in scene_path:
+			if sc and sc is String and ResourceLoader.exists(sc):
+				var scn = load(sc).instance()
+				var root = scn.name
+				Tool.remove(scn)
+				var scene_replacement = "user://cache/.HevLib_Cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec()
+				var p = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"%s\" type=\"PackedScene\" id=1]\n\n[node name=\"%s\" instance=ExtResource( 1 )]" % [scene_path,root]
+				pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
+				file.open(scene_replacement,File.WRITE)
+				file.store_string(p)
+				file.close()
+				var scene := load(scene_replacement)
+				scene.take_over_path(sc)
+				_savedScriptObjects.append(scene)
 	
 	var var_hash = {}
 	
