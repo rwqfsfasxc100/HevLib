@@ -43,11 +43,11 @@ func spawn_event(event : String,thering : Node,parameters : Dictionary = {}):
 					var pos = getPos(parameters)
 					event_node.canBeAt(pos)
 					var oddity = event_node.makeAt(pos)
-					if ring.has_method("oddity_spawning"):
-						ring.oddity_spawning(event, oddity)
 					
 					var randomOddityKey = ""
 					if oddity:
+						if ring.has_method("oddity_spawning"):
+							ring.oddity_spawning(event, oddity)
 						ring.addNearbyOddity(event, oddity, pos)
 						if oddity is Array:
 							for o in oddity:
@@ -98,10 +98,9 @@ func getPos(params : Dictionary):
 		var dirvec = (randomVector + directionVector).normalized()
 		if dirvec.length() < 0.9:
 			dirvec = randomVector
-		var oRangeMin = odditySpawnRadiusMin if not cutscene else odditySpawnRadiusMinCutscene
 		var failBasedMax = clamp(float(odditySpawnFailures) / float(odditySpawnRadiusSafemaxSteps), 0, 1)
 		var oRangeMax = lerp(odditySpawnRadiusMax, odditySpawnRadiusSafemax, failBasedMax)
-		var oddityFocusOffset = dirvec * rand_range(oRangeMin, oRangeMax)
+		var oddityFocusOffset = dirvec * rand_range(odditySpawnRadiusMin if not cutscene else odditySpawnRadiusMinCutscene, lerp(odditySpawnRadiusMax, odditySpawnRadiusSafemax, clamp(float(odditySpawnFailures) / float(odditySpawnRadiusSafemaxSteps), 0, 1)))
 		
 		var oddityPoint = focusPoint + oddityFocusOffset
 		Tool.release(focusObject)

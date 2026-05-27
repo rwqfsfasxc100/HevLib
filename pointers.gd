@@ -4526,15 +4526,28 @@ class _Events:
 			"description":"Contains methods to help spawn or clear events in the ring",
 			"methods":{
 				"__spawn_event":{
-					"description":"",
+					"description":"Spawns an event in the rings",
 					"args":[
-						
+						"event -> (String) the event name to be spawned",
+						"thering -> TheRing node. Must be present to work.",
+						"parameters -> (Dictionary) Any parameters used for spawning events. Defaults to `{}`. Currently supports:",
+						"	legacy -> (bool) whether it should use a very old hacky method of hijacking the testSpecificStoryElement property to spawn the event. Has to wait at least 0.1 seconds inbetween spawns. Defaults to `false`",
+						"	inject -> (bool) whether the event should be placed directly in the ring, bypassing any event handling methods. Has issues with POI-based events. Defaults to `false`",
+						"	x_direction -> (float) horizontal direction which the event will be spawned in. Will be clamped if it exceeds -1 or 1. Defaults to a random range between -1 and 1.",
+						"	y_direction -> (float) vertical direction which the event will be spawned in. Will be clamped if it exceeds -1 or 1. Defaults to a random range between -1 and 1.",
+						"	spawn_direction_scale -> (float) how much your ship's velocity will be scaled by when calculating the offset added by your velocity. Defaults to 0.75",
+						"	oddity_spawn_radius_min -> (int) minimum distance the event will spawn under normal conditions. NOTE: 1 unit represents 100 cm. Defaults to 24000",
+						"	oddity_spawn_radius_min_cutscene -> (int) minimum distance the event will spawn while in a cutscene (which only happens during astrogation in the vanilla game to make POI events close to the ship when travelling). NOTE: 1 unit represents 100 cm. Defaults to 6000",
+						"	oddity_spawn_radius_max -> (int) maximum distance the event is allowed to spawn at under normal conditions",
 					],
 				},
 				"__clear_event":{
-					"description":"",
+					"description":"Clears all objects related to a defined event from the ring",
 					"args":[
-						
+						"event -> (String) the event name to be removed",
+						"ring -> TheRing node. Must be present to work.",
+						"clear_related_poi -> (bool) Whether any POI with the same event name near deleted objects should be deleted as well. Defaults to `true`",
+						"clear_in_cargo -> (bool) Whether to remove any event-related oddities considered inside the cargo bay of or attached to other ships. Defaults to `false`"
 					],
 				},
 			}
@@ -4556,16 +4569,44 @@ class _FileAccess:
 	
 	func get_class_documentation():
 		return {
-			"description":"",
+			"description":"Methods to aide with file interactions",
 			"methods":{
-				"":{
-					"description":"",
+				"__get_file_content":{
+					"description":"Method that simplifies the usual process of File.get_as_text()",
 					"args":[
-						
+						"file_path -> (String) the file path to be read"
 					],
 					"return":[
-						
+						"String with the contents of the file"
 					]
+				},
+				"__copy_file":{
+					"description":"Copies a file to a folder, overriding files without warning. Automatically handles conversion of file path formatting.",
+					"args":[
+						"file_path -> (String) the path to the file to be copied",
+						"folder -> (String) the directory to copy the file to",
+					],
+					"return":[
+						"Error code for the copy operation"
+					]
+				},
+				"__load_png":{
+					"description":"Reads and parses a PNG file during runtime, without the need to precompile to STEX",
+					"args":[
+						"filepath -> (String) the file path to the PNG file"
+					],
+					"return":[
+						"ImageTexture for the png"
+					]
+				},
+				"__precache_mod_file":{
+					"description":"Prepares a file to be copied to the mod folder. This will mark the game for needing a restart, which Mod Menu 2 will start requesting upon opening it.",
+					"args":[
+						"filepath -> (String) the file path to the mod."
+					],
+				},
+				"__load_precached_mods":{
+					"description":"Copies any prepared mods to the mod folder, and reboots if there are mods to copy. Normally this is done on game boot to provide a reliable experience for players. NOTE: Rebooting will happen at all cases with mods existing, even if it's safe to copy. Double check 'user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt', which will have a `1` stored if there are mods to copy, and `0` otherwise.",
 				},
 			}
 		}
@@ -4578,13 +4619,13 @@ class _FileAccess:
 	var file = File.new()
 	func __get_file_content(file_path: String) -> String:
 		file.open(file_path, File.READ)
-		var s = file.get_as_text()
+		var s = file.get_as_text(true)
 		file.close()
 		return s
 	
 	
 	
-	func __copy_file(file_path, folder):
+	func __copy_file(file_path : String, folder : String):
 		var prepfile = ProjectSettings.localize_path(file_path)
 		var fn = prepfile.split("/")[prepfile.split("/").size() - 1]
 		return dir.copy(prepfile,folder + "/" + fn)
@@ -4662,15 +4703,57 @@ class _FolderAccess:
 	
 	func get_class_documentation():
 		return {
-			"description":"",
+			"description":"Methods used to help with directory management",
 			"methods":{
-				"":{
-					"description":"",
+				"__check_folder_exists":{
+					"description":"Checks whether a directory exists, and creates it if it doesn't.",
 					"args":[
-						
+						"folder -> (String) the path to the directory",
+						"status_array -> (bool) Whether the output value should be an array containing more verbose information. Defaults to `false`"
 					],
 					"return":[
-						
+						"Bool for whether the directory exists after running this method",
+						"If status_array is true, instead returns an array containing two values. First value is whether the directory exists after running the method, and the second is whether it existed before running the method."
+					]
+				},
+				"__recursive_delete":{
+					"description":"Removes a folder and all of it's contents if it's not empty.",
+					"args":[
+						"path -> (String) path to the folder to be deleted"
+					],
+					"return":[
+						"Bool whether the base directory could be accessed."
+					]
+				},
+				"__fetch_folder_files":{
+					"description":"Fetches a folder's contents",
+					"args":[
+						"folder -> (String) path to the directory to fetch the contents of",
+						"showFolders -> (bool) Whether to display any subdirectories, which will have a forward slash at the end of the name to differentiate them. Defaults to `false`",
+						"returnFullPath -> (bool) Whether to show the full directory path of the file/folder, instead of just the name. Defaults to `false`",
+						"globalizePath -> (bool) Whether to globalize the path with ProjectSettings.globalize_path() Defaults to `false`"
+					],
+					"return":[
+						"Array containing strings for the names of all files and/or folders within the provided directory."
+					]
+				},
+				"__get_first_file":{
+					"description":"Fetches the first file within a directory.",
+					"args":[
+						"folder -> (String) the path to the directory"
+					],
+					"return":[
+						"String for the first file. If no files exist, string will be empty."
+					]
+				},
+				"__get_folder_structure":{
+					"description":"Fetches the folder structure of a given directory as a dictionary.",
+					"args":[
+						"folder -> (String)",
+						"store_file_content (optional) -> (bool) Whether to store the file content as the value of a file's entry instead of just 'FILE'. Defaults to `false`"
+					],
+					"return":[
+						"Dictionary containing the entire directory's structure"
 					]
 				},
 			}
@@ -4688,11 +4771,7 @@ class _FolderAccess:
 		else:
 			exists = false
 			var error_code = directory.make_dir_recursive(folder)
-			if error_code != OK:
-				value = false
-			else:
-				value = true
-	#			Debug.l("HevLib: Folder created @%s" % folder)
+			value = error_code == OK
 		if status_array:
 			return [value,exists]
 		else:
@@ -4721,8 +4800,8 @@ class _FolderAccess:
 		directory.remove(path)
 		return true
 	
-	func __fetch_folder_files(folder: String, showFolders: bool = false, returnFullPath: bool = false,globalizePath: bool = false):
-		var fileList : PoolStringArray = PoolStringArray([])
+	func __fetch_folder_files(folder: String, showFolders: bool = false, returnFullPath: bool = false,globalizePath: bool = false) -> Array:
+		var fileList : PoolStringArray = PoolStringArray()
 		if not folder.ends_with("/"):
 			folder += "/"
 		var does = directory.dir_exists(folder)
@@ -4742,10 +4821,11 @@ class _FolderAccess:
 				dirName = directory.get_current_dir()
 				if fileName == "":
 					break
-				if directory.current_is_dir() and not showFolders:
-					continue
-				elif directory.current_is_dir() and showFolders and not fileName.ends_with("/"):
-					fileName = fileName + "/"
+				if directory.current_is_dir():
+					if not showFolders:
+						continue
+					if not fileName.ends_with("/"):
+						fileName = fileName + "/"
 				if returnFullPath:
 					fileName = folder + fileName
 				if globalizePath:
@@ -4763,12 +4843,12 @@ class _FolderAccess:
 				firstFile = file
 				fileNo = 1
 		if firstFile == null:
-			return false
+			return ""
 		else:
 			return firstFile
 	
 	
-	func __get_folder_structure(folder,store_file_content = false):
+	func __get_folder_structure(folder : String,store_file_content : bool = false):
 		var folder_structure = {}
 		var files = __fetch_folder_files(folder,true,false)
 		for object in files:
