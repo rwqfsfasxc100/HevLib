@@ -9,7 +9,7 @@ var defaultTestSpecificStoryElement = ""
 
 var focusObject
 const default_parameter_dict = {}
-func spawn_event(event,thering: Node,parameters : Dictionary = {}):
+func spawn_event(event : String,thering : Node,parameters : Dictionary = {}):
 	if not busy:
 		busy = true
 		if thering == null:

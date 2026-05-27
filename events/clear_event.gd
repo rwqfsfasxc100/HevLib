@@ -1,6 +1,6 @@
 extends Node
 
-func clear_event(event: String, ring, clear_related_poi : bool = true,clear_in_cargo = false):
+func clear_event(event : String, ring, clear_related_poi : bool = true,clear_in_cargo : bool = false):
 	if event == "" or event == "none":
 		var events = ring.all_oddities
 		for e in events:

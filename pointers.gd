@@ -2115,13 +2115,27 @@ class _Equipment:
 		return {
 			"description":"Contains internal methods used for creating equipment scenes. Use at your own discretion",
 			"methods":{
-				"":{
-					"description":"",
+				"__make_upgrades_scene":{
+					"description":"Internal method that initializes and creates multiple scene and script handles, as well as data caches, all used by equipment-adjacent processes.",
+				},
+				"__make_equipment_for_scene":{
+					"description":"Internal method for creating a scene string for an equipment item to be added to an Upgrades.tscn scene package.",
 					"args":[
-						
+						"equipment_data -> (Dictionary) the dictionary containing equipment item data",
+						"slot_node_name -> (String) the node name for the slot the equipment is being added to",
+						"system_slot -> (String) the ship slot the equipment is being added to"
 					],
 					"return":[
-						
+						"String containing a full equipment item"
+					]
+				},
+				"__make_slot_for_scene":{
+					"description":"Internal method for creating a scene string for a slot to be added to an Upgrades.tscn scene package.",
+					"args":[
+						"slot_data -> (Dictionary) dictionary containing slot data"
+					],
+					"return":[
+						"String containing a full slot item"
 					]
 				},
 			}
@@ -4503,31 +4517,34 @@ class _Equipment:
 
 class _Events:
 	var scripts = [
-		preload("res://HevLib/events/event_handler.gd"),
-		preload("res://HevLib/events/clear_event.gd"),
+		load("res://HevLib/events/event_handler.gd"),
+		load("res://HevLib/events/clear_event.gd"),
 	]
 	
 	func get_class_documentation():
 		return {
-			"description":"",
+			"description":"Contains methods to help spawn or clear events in the ring",
 			"methods":{
-				"":{
+				"__spawn_event":{
 					"description":"",
 					"args":[
 						
 					],
-					"return":[
+				},
+				"__clear_event":{
+					"description":"",
+					"args":[
 						
-					]
+					],
 				},
 			}
 		}
 	
-	func __spawn_event(event, thering, parameters : Dictionary = {}):
+	func __spawn_event(event : String, thering, parameters : Dictionary = {}):
 		var f = scripts[0].new()
 		f.spawn_event(event,thering,parameters)
 	
-	func __clear_event(event,ring,clear_related_poi,clear_in_cargo):
+	func __clear_event(event : String,ring,clear_related_poi : bool = true,clear_in_cargo : bool = false):
 		var f = scripts[1].new()
 		f.clear_event(event,ring,clear_related_poi,clear_in_cargo)
 	
