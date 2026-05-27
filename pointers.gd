@@ -1894,7 +1894,20 @@ class _DriverManagement:
 		return {
 			"description":"",
 			"methods":{
-				"":{
+				"__get_drivers":{
+					"description":"Fetches driver data from the filesystem",
+					"args":[
+						"get_ids (optional) -> (Array) mod IDs to fetch specific drivers from. If left empty, fetches all drivers. Defaults to `[]`"
+					],
+					"return":[
+						"Array of dictionaries for each mod's drivers, with each dictionary being formatted as such:",
+						" drivers -> dictionary containing all drivers for the specific mod, with each entry formatted as such: {<driver name (String, e.g. ADD_EQUIPMENT_ITEMS.gd)>:<driver contents (Dictionary)>}",
+						" id -> (String) ID of this mod. Not present if the mod doesn't have an ID.",
+						" priority -> (int) mod's priority. Will be zero if not defined in the mod main.",
+						" mod_directory -> (String) the path to the mod's directory, or where the ModMain.gd file exists in",
+					]
+				},
+				"__get_drivers_from_modmain_path":{
 					"description":"",
 					"args":[
 						
@@ -2025,10 +2038,10 @@ class _DriverManagement:
 				if this_mod_data["drivers"].size() > 0:
 					if (get_ids.size()) == 0 or (get_ids.size() > 0 and id in get_ids):
 						mod_drivers.append(this_mod_data)
-		mod_drivers.sort_custom(self,"__compare_driver_dictionaries")
+		mod_drivers.sort_custom(self,"compare_driver_dictionaries")
 		return mod_drivers
 	
-	func __compare_driver_dictionaries(a, b):
+	func compare_driver_dictionaries(a, b):
 		var aPrio = a.get("priority",0)
 		var bPrio = b.get("priority",0)
 		if aPrio != bPrio:
