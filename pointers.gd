@@ -1380,9 +1380,14 @@ class _DataFormat:
 						"script_storage_array_name (optional) -> (String) The array name that the persistent object uses to store objects. Defaults to `'_savedObjects'` as it is a standard name in ModMain scripts.",
 						"scene_path (optional) -> (String/PoolStringArray) String or PoolStringArray containing the file path or paths to scenes to be updated. Using array of paths will have them update in order. Defaults to `PoolStringArray()`"
 					],
-					"return":[
-						
-					]
+				},
+				"__reload_scene":{
+					"description":"Recreates and updates a scene to load changed sub-resources",
+					"args":[
+						"scene_path -> (String) the file path to the scene to be updated.",
+						"script_storage_object (optional) -> (object) A persistent object used to keep the script override available in memory. Heavily recommended to use this to ensure proper functionality, such as using a mod's script object from the ModLoader children. If not provided, uses the current pointer object, which may be freed depending on the operation. Defaults to `null`", 
+						"script_storage_array_name (optional) -> (String) The array name that the persistent object uses to store objects. Defaults to `'_savedObjects'` as it is a standard name in ModMain scripts.",
+					],
 				},
 				"__convert_var_from_string":{
 					"description":"",
@@ -1856,8 +1861,9 @@ class _DataFormat:
 	var var_hash = {}
 	
 	func __convert_var_from_string(string : String, constant = true):
-		if string in var_hash:
-			return var_hash[string]
+		var shash = hash(string + str(constant))
+		if shash in var_hash:
+			return var_hash[shash]
 		var header
 		if constant:
 			header = "extends Reference\nconst VARIABLE = "
@@ -1865,7 +1871,7 @@ class _DataFormat:
 			header = "extends Reference\nvar VARIABLE = "
 		var script = __compile_script_object(header + string)
 		var variable = script.VARIABLE
-		var_hash[string] = variable
+		var_hash[shash] = variable
 		return variable
 	
 	
