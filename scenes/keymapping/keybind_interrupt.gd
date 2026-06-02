@@ -30,28 +30,29 @@ func _ready():
 	INPUT_DRIVER_ACTIVE = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_KEYMAPPING","input_virtualization")
 	self.set_process_input(ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE)
 	if ALLOW_KEYBIND_MODIFICATIONS and INPUT_DRIVER_ACTIVE:
-		var actions = InputMap.get_actions()
-		var sortedAv = pointers.Keymapping.__get_built_in_action_list()
-		var vb = pointers.ConfigDriver.__config_parse(vanilla_binds_file)
-		file.open(keybind_folder + "defined_control_configs.json",File.READ)
-		var mb = JSON.parse(file.get_as_text()).result
-		file.close()
-		var ignore_builtin = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_KEYMAPPING","input_virtualization_ignore_builtin")
-		
-		for action in actions:
-			if ignore_builtin and action in sortedAv:
-				continue
-			var act = InputMap.get_action_list(action)
-			for active in act:
-				InputMap.action_erase_event(action, active)
-			if action in vb:
-				pointers.Keymapping.__create_input_event(action,vb[action]["inputs"],vb[action]["opts"])
-			if action in mb:
-				pointers.Keymapping.__create_input_event(action,mb[action]["controls"],mb[action]["opts"])
 		compile()
 		pointers.ConfigDriver.__establish_connection("compile",self,"input")
 		
 func compile():
+	var actions = InputMap.get_actions()
+	var sortedAv = pointers.Keymapping.__get_built_in_action_list()
+	var vb = pointers.ConfigDriver.__config_parse(vanilla_binds_file)
+	file.open(keybind_folder + "defined_control_configs.json",File.READ)
+	var mb = JSON.parse(file.get_as_text()).result
+	file.close()
+	var ignore_builtin = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_KEYMAPPING","input_virtualization_ignore_builtin")
+	
+	for action in actions:
+		if ignore_builtin and action in sortedAv:
+			continue
+		var act = InputMap.get_action_list(action)
+		for active in act:
+			InputMap.action_erase_event(action, active)
+		if action in vb:
+			pointers.Keymapping.__create_input_event(action,vb[action]["inputs"],vb[action]["opts"])
+		if action in mb:
+			pointers.Keymapping.__create_input_event(action,mb[action]["controls"],mb[action]["opts"])
+	
 	var active_script = compiler.compile_keymap()
 	input_handle = null
 #	file.open("user://cache/.HevLib_Cache/Keybinds/test_input.gd",File.WRITE)
