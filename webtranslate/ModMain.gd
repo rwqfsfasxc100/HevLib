@@ -164,6 +164,9 @@ func get_device_info() -> String:
 	out += "\nExecutable path: %s" % OS.get_executable_path()
 	out += "\nUser directory: %s" % OS.get_user_data_dir()
 	
+	if Engine.has_singleton("Steam"):
+		out += "\nSteam initialized with [%s]" % Engine.get_singleton("Steam").current_steam_id
+	
 	out += "\nCMD args: %s" % str(OS.get_cmdline_args())
 	
 	return out
