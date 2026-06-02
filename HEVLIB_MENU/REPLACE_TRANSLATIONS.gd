@@ -1447,8 +1447,8 @@ const TRANSLATIONS = {
 			"version_hash": 234302216
 		},
 		"HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD": {
-			"string": "Update the selected mod [%s v%s] to version [%s]? \\n\\nThis may take a while, depending on the size of the mod.",
-			"version_hash": 2751177169
+			"string": "Update the selected mod [%s] from version [%s] to version [%s]? \n\nThis may take a while, depending on the size of the mod.",
+			"version_hash": 3712115181
 		},
 		"HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MOD_UPDATE": {
 			"string": "Ignore the update for mod [%s] to version [%s]? \\n\\nThis decision can be reset in the mod menu config.",
