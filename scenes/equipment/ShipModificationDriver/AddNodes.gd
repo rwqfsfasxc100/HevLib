@@ -486,9 +486,8 @@ func hl_add_nodes_process_node_definitons():
 		var md = data[module]
 		if "path" in md:
 			var filepath = md["path"]
-			var exists = file.file_exists(filepath)
-			if exists:
-				var node = load(filepath)
+			if pointers_hl_addnodes.DataFormat.__load_if_can(filepath):
+				var node = pointers_hl_addnodes.DataFormat.__get_load()
 				var properties = md.get("properties",{})
 				var pos = md.get("position",[0,0])
 				var scl = md.get("scale",[1])

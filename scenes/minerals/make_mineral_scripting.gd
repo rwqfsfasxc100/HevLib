@@ -208,7 +208,7 @@ static func make_asteroid_spawner_section(mineral : String,scenes : PoolStringAr
 	var mh = "\n\t\"" + str(mineral) + "\":[\n"
 	for i in range(7):
 		var mn = scenes[i]
-		mh = mh + "\t\tpreload(\"" + mn + "\"),\n"
+		mh = mh + "\t\tload(\"" + mn + "\"),\n"
 	mh = mh + "\t],\n"
 	return mh
 

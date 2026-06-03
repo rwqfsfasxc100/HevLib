@@ -230,12 +230,12 @@ func loadPlaceholder():
 			path = ""
 		
 		
-		if path and file.file_exists(path):
+		if pointers.DataFormat.__load_if_can(path):
+			var pv = pointers.DataFormat.__get_load().instance()
 			if directMount:
 				key = name + "_" + mounted
 			else:
 				key = t + "_" + mounted
-			var pv = load(path).instance()
 			var data = this_addition.get("data",{})
 			for nodepath in data:
 				var o = data[nodepath]

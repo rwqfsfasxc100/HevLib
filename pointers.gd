@@ -1914,6 +1914,8 @@ class _DataFormat:
 	var last_load = null
 	
 	func __load_if_can(filepath : String, override_cache : bool = false, type_hint : String = ""):
+		if not filepath:
+			return false
 		if ResourceLoader.exists(filepath):
 			var obj = ResourceLoader.load(filepath,type_hint,override_cache)
 			if obj:

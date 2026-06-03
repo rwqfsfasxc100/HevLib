@@ -78,10 +78,9 @@ func hl_thrusterslot_modify():
 						return
 				var valid_scene = false
 				if aux_path != "":
-					var s = load(aux_path)
-					if s:
+					if pointers.DataFormat.__load_if_can(aux_path):
 						valid_scene = true
-						item = s.instance()
+						item = pointers.DataFormat.__get_load().instance()
 				
 				if not valid_scene:
 					match aux_type:
@@ -93,8 +92,8 @@ func hl_thrusterslot_modify():
 							item = load(aux_hybrid).instance()
 						"RCS","TORCH":
 							var thrusterScene = exhaust_cache_path + "/" + aux_type + "/" + sys + "_thruster.tscn"
-							if file.file_exists(thrusterScene):
-								item = load(thrusterScene).instance()
+							if pointers.DataFormat.__load_if_can(thrusterScene):
+								item = pointers.DataFormat.__get_load().instance()
 							else:
 								item = load(thruster).instance()
 				
@@ -223,29 +222,29 @@ func hl_thrusterslot_modify_nozzle(nozzleA,nd):
 		if aux_type != "NOT_A_THRUSTER":
 			nozzleA.coolTime = nd.cool_time
 			nozzleA.heatTime = nd.heat_time
-		var t = "res://ships/modules/nozzle-cd.png"
-		if file.file_exists(nd.texture):
-			t = nd.texture
-		var tr = load(t)
+		var tr
+		if pointers.DataFormat.__load_if_can(nd.texture):
+			tr = pointers.DataFormat.__get_load()
+		else:
+			tr = load("res://ships/modules/nozzle-cd.png")
 		nozzleA.texture = tr
-		var l = "res://ships/modules/nozzle-n.png"
-		if file.file_exists(nd.normal):
-			l = nd.normal
-		var tl = load(l)
+		var tl
+		if pointers.DataFormat.__load_if_can(nd.normal):
+			tr = pointers.DataFormat.__get_load()
+		else:
+			tl = load("res://ships/modules/nozzle-n.png")
 		nozzleA.normal_map = tl
-		var h = "res://ships/modules/nozzle-cl.png"
-		if file.file_exists(nd.heat):
-			h = nd.heat
-		var th = load(h)
 		var heat = nozzleA.get_node_or_null("heat")
-		var hn = null
-		if nd.heat_normal and file.file_exists(nd.heat_normal):
-			hn = nd.heat_normal
-		var thn = null
-		if hn:
-			thn = load(hn)
 		if heat:
-			heat.texture = th
+			var h
+			if pointers.DataFormat.__load_if_can(nd.heat):
+				h = pointers.DataFormat.__get_load()
+			else:
+				h = load("res://ships/modules/nozzle-cl.png")
+			heat.texture = h
+			var thn = null
+			if pointers.DataFormat.__load_if_can(nd.heat_normal):
+				thn = pointers.DataFormat.__get_load()
 			if thn:
 				heat.normal_map = thn
 			heat.region_enabled = nd.heat_region_enabled
