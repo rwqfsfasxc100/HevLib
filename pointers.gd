@@ -178,6 +178,7 @@ class _Achievements:
 		var playtimeStats = Achivements.playtimeStats
 		var playtimeAchievements = Achivements.playtimeAchievements
 		var statsWithAchievements = Achivements.statsWithAchievements
+		var storyAchievements = Achivements.storyAchievements
 		
 		var stat = null
 		var limit = null
@@ -199,6 +200,11 @@ class _Achievements:
 					if ac == achievementID:
 						stat = a
 						limit = s
+		
+		if not stat:
+			for a in storyAchievements:
+				if a[1] == achievementID:
+					additional_stat_data = a[0]
 		
 		if not stat:
 			if achievementID in annoyingAsFuckAchievements:
