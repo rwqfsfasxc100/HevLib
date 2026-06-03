@@ -455,11 +455,11 @@ class _ConfigDriver:
 					"description":"Checks a dictionary for any config and mod limitations to see if it would be permitted",
 					"args":[
 						"data_dict -> (Dictionary) input data dictionary for checking.",
-						"check_config (optional) -> (bool) whether configs should be checked. Defaults to `true`", 
-						"check_requirements (optional) -> (bool) whether mod requirements should be checked. Defaults to `true`", 
-						"check_incompatibilities (optional) -> (bool) whether mod incompatibilities should be checked. Defaults to `true`", 
-						"config_entry_override (optional) -> (String) the entry name that is checked against the dictionary for what it uses to store config data. Defaults to 'config'", 
-						"mod_requirements_entry_override (optional) -> (String) the entry name that is checked against the dictionary for what it uses to store mod requirements data. Defaults to 'mod_requirements'", 
+						"check_config (optional) -> (bool) whether configs should be checked. Defaults to `true`",
+						"check_requirements (optional) -> (bool) whether mod requirements should be checked. Defaults to `true`",
+						"check_incompatibilities (optional) -> (bool) whether mod incompatibilities should be checked. Defaults to `true`",
+						"config_entry_override (optional) -> (String) the entry name that is checked against the dictionary for what it uses to store config data. Defaults to 'config'",
+						"mod_requirements_entry_override (optional) -> (String) the entry name that is checked against the dictionary for what it uses to store mod requirements data. Defaults to 'mod_requirements'",
 						"mod_incompatibilities_entry_override (optional) -> (String) the entry name that is checked against the dictionary for what it uses to store mod incompatibility data. Defaults to 'mod_incompatibilities'"
 					],
 					"return":[
@@ -1210,7 +1210,7 @@ class _DataFormat:
 	
 	func get_class_documentation():
 		return {
-			"description":"",
+			"description":"Methods used to assist with the manipulation and loading of data",
 			"methods":{
 				"__array_to_string":{
 					"description":"Converts an array into a string. Unlike String.join(), accepts any array type and will convert components to a string as best as possible.",
@@ -1225,7 +1225,7 @@ class _DataFormat:
 					"description":"Provides a Vector2 point after being rotated around (0,0)",
 					"args":[
 						"point -> (Vector2) point that is being rotated around (0,0)",
-						"angle -> (float) angles to rotate by", 
+						"angle -> (float) angles to rotate by",
 						"degrees (optional) -> (bool) for whether 'angle' should be treated as degree angles, and uses radians if not. Defaults to `true`"
 					],
 					"return":[
@@ -1263,9 +1263,9 @@ class _DataFormat:
 					"args":[
 						"primary_major -> (int) major version number of the primary version",
 						"primary_minor -> (int) minor version number of the primary version",
-						"primary_bugfix -> (int) bugfix version number of the primary version", 
-						"compare_major -> (int) major version number of the compared version", 
-						"compare_minor -> (int) minor version number of the compared version", 
+						"primary_bugfix -> (int) bugfix version number of the primary version",
+						"compare_major -> (int) major version number of the compared version",
+						"compare_minor -> (int) minor version number of the compared version",
 						"compare_bugfix -> (int) bugfix version number of the compared version",
 					],
 					"return":[
@@ -1305,7 +1305,7 @@ class _DataFormat:
 					"description":"Opens a script and fetches information regarding variables and nodes without loading it.",
 					"args":[
 						"file_path -> (String) filepath of the script",
-						"get_detailed_operands (optional) -> (bool) Whether any arguments and return types for methods or signals should be checked. Only use if you need it, as it slows down the process a lot. Defaults to `false`", 
+						"get_detailed_operands (optional) -> (bool) Whether any arguments and return types for methods or signals should be checked. Only use if you need it, as it slows down the process a lot. Defaults to `false`",
 						"trim_unnecessary_newlines (optional) -> (bool) Whether the returned script should have any multiline variables (i.e. Arrays, Dictionaries, etc.) concatenated into a single line. Defaults to `false`",
 						"recurse_through_base_scripts (optional) -> (bool) If the script extends from another script, this allows it to recurse through the extended script(s) to fetch information from those. NOTE: Scripts extended by mods do affect this. Defaults to `true`",
 					],
@@ -1325,7 +1325,7 @@ class _DataFormat:
 					"description":"Identical to __trim_scripts, however file_path is replaced by script_source and uses a script object.",
 					"args":[
 						"script_source -> (Script) script object to be trimmed",
-						"get_detailed_operands (optional) -> (bool) Whether any arguments and return types for methods or signals should be checked. Only use if you need it, as it slows down the process a lot. Defaults to `false`", 
+						"get_detailed_operands (optional) -> (bool) Whether any arguments and return types for methods or signals should be checked. Only use if you need it, as it slows down the process a lot. Defaults to `false`",
 						"trim_unnecessary_newlines (optional) -> (bool) Whether the returned script should have any multiline variables (i.e. Arrays, Dictionaries, etc.) concatenated into a single line. Defaults to `false`",
 						"recurse_through_base_scripts (optional) -> (bool) If the script extends from another script, this allows it to recurse through the extended script(s) to fetch information from those. NOTE: Scripts extended by mods do affect this. Defaults to `true`",
 					],
@@ -1371,7 +1371,7 @@ class _DataFormat:
 				"__compile_script_object":{
 					"description":"Compiles provided source code into a new script and creates a new object from it. NOTE: This is a cached operation, and the provided object will be the same if generated from previous code unless set to use a new object.",
 					"args":[
-						"source_code -> (String) the source code for the script.", 
+						"source_code -> (String) the source code for the script.",
 						"params (optional) -> Any parameters for the object if needed by it's `_init` method. Multiple arguments can be passed by using an array. Defaults to `[]`",
 						"new_object (optional) -> (bool) whether to create a new object instead of fetching the old one from the cache. Defaults to `false`",
 					],
@@ -1382,16 +1382,16 @@ class _DataFormat:
 				"__compile_and_override_script":{
 					"description":"Compiles a script and overrides it. Similar to the installScriptExtension method used in ModMain scripts",
 					"args":[
-						"source_code -> (String) source code for the script override.", 
-						"script_storage_object (optional) -> (object) A persistent object used to keep the script override available in memory. Heavily recommended to use this to ensure proper functionality, such as using a mod's script object from the ModLoader children. If not provided, uses the current pointer object, which may be freed depending on the operation. Defaults to `null`", 
+						"source_code -> (String) source code for the script override.",
+						"script_storage_object (optional) -> (object) A persistent object used to keep the script override available in memory. Heavily recommended to use this to ensure proper functionality, such as using a mod's script object from the ModLoader children. If not provided, uses the current pointer object, which may be freed depending on the operation. Defaults to `null`",
 						"script_storage_array_name (optional) -> (String) The array name that the persistent object uses to store objects. Defaults to `'_savedObjects'` as it is a standard name in ModMain scripts.",
 					],
 				},
 				"__compile_and_override_script_with_scene":{
 					"description":"Similar to __compile_and_override_script, additionally creates and updates one or more scenes after overriding the script in case script needs to have scenes reloaded to apply the update.",
 					"args":[
-						"source_code -> (String) source code for the script override.", 
-						"script_storage_object (optional) -> (object) A persistent object used to keep the script override available in memory. Heavily recommended to use this to ensure proper functionality, such as using a mod's script object from the ModLoader children. If not provided, uses the current pointer object, which may be freed depending on the operation. Defaults to `null`", 
+						"source_code -> (String) source code for the script override.",
+						"script_storage_object (optional) -> (object) A persistent object used to keep the script override available in memory. Heavily recommended to use this to ensure proper functionality, such as using a mod's script object from the ModLoader children. If not provided, uses the current pointer object, which may be freed depending on the operation. Defaults to `null`",
 						"script_storage_array_name (optional) -> (String) The array name that the persistent object uses to store objects. Defaults to `'_savedObjects'` as it is a standard name in ModMain scripts.",
 						"scene_path (optional) -> (String/PoolStringArray) String or PoolStringArray containing the file path or paths to scenes to be updated. Using array of paths will have them update in order. Defaults to `PoolStringArray()`"
 					],
@@ -1400,18 +1400,38 @@ class _DataFormat:
 					"description":"Recreates and updates a scene to load changed sub-resources",
 					"args":[
 						"scene_path -> (String) the file path to the scene to be updated.",
-						"script_storage_object (optional) -> (object) A persistent object used to keep the script override available in memory. Heavily recommended to use this to ensure proper functionality, such as using a mod's script object from the ModLoader children. If not provided, uses the current pointer object, which may be freed depending on the operation. Defaults to `null`", 
+						"script_storage_object (optional) -> (object) A persistent object used to keep the script override available in memory. Heavily recommended to use this to ensure proper functionality, such as using a mod's script object from the ModLoader children. If not provided, uses the current pointer object, which may be freed depending on the operation. Defaults to `null`",
 						"script_storage_array_name (optional) -> (String) The array name that the persistent object uses to store objects. Defaults to `'_savedObjects'` as it is a standard name in ModMain scripts.",
 					],
 				},
 				"__convert_var_from_string":{
 					"description":"Converts a string containing a variable in the literal sense (as if it were written in a script) into it's variant form. NOTE: Strings need to have their quotes inside the string quotes to be considered valid. E.g. `\"\"this is a string\"\"`, \"Vector2(1,2)\"",
 					"args":[
-						"string -> (String) the variable written in the literal sense as a string", 
+						"string -> (String) the variable written in the literal sense as a string",
 						"constant (optional) -> Whether the variable should use a constant or variant definition for it. Setting this to false can be useful if the desired output cannot be stored as a constant when in a script. Defaults to `true`",
 					],
 					"return":[
 						"Variant from the literal conversion"
+					]
+				},
+				"__load_if_can":{
+					"description":"Loads a resource at the provided filepath and stores it, acting as a boolean to check if it exists or not. Stored objects will be initialized as null, and if the output of this method would be null, will be reflected by the last load.",
+					"args":[
+						"filepath -> (String) the file path to the desired resource to load",
+						"override_cache (optional) -> (bool) whether to load the resource anew, ignoring the cache. Equivalent to the similar property for ResourceLoader.load(). NOTE: Setting this true can be problematic with extended scripts. Defaults to false",
+						"type_hint (optional) -> (String) whether to define a specific resource type that this object has to be. Equivalent to the similar property for ResourceLoader.load(). Defaults to \"\"",
+					],
+					"return":[
+						"Bool for whether the object was loaded or not."
+					]
+				},
+				"__get_load":{
+					"description":"Fetches the last object loaded by __load_if_can. Note that failed loads will null the object, so make sure to use that method to confirm a load before trying to fetch the object.",
+					"args":[
+						"get_last_successful (optional) -> (bool) whether to get the last successfully loaded object by __load_if_can. Since this initializes as null, __load_if_can needs to have been successful at least once. Defaults to false",
+					],
+					"return":[
+						"Bool for whether the object was loaded or not."
 					]
 				},
 			}
@@ -1890,9 +1910,29 @@ class _DataFormat:
 		var_hash[shash] = variable
 		return variable
 	
+	var last_successful_object = null
+	var last_load = null
 	
+	func __load_if_can(filepath : String, override_cache : bool = false, type_hint : String = ""):
+		if ResourceLoader.exists(filepath):
+			var obj = ResourceLoader.load(filepath,type_hint,override_cache)
+			if obj:
+				last_load = obj
+				last_successful_object = obj
+				return true
+		if file.file_exists(filepath):
+			var obj = ResourceLoader.load(filepath,type_hint,override_cache)
+			if obj:
+				last_load = obj
+				last_successful_object = obj
+				return true
+		last_load = null
+		return false
 	
-	
+	func __get_load(get_last_successful : bool = false):
+		if get_last_successful:
+			return last_successful_object
+		return last_load
 	
 	
 	
