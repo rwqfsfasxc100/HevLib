@@ -7446,19 +7446,14 @@ class _Zip:
 		return listOfNames
 	func __fetch_file_from_zip(path, cacheDir, desiredFiles):
 		var listOfNames = []
-		var uncompressed = {}
-		var zip = path.split("/")
-		var splitSize = zip.size()
-		var zipName = zip[splitSize - 1]
 		var g = gdunzip.new()
 		g.load(path)
 		var fileList = g.files
 		for m in fileList.keys():
-			listOfNames.append(m)
-		for f in listOfNames:
-			var string = cacheDir + f
+			var string = cacheDir + m
 			if string.ends_with("/"):
 				dir.make_dir_recursive(string)
+			listOfNames.append(m)
 		var modFolder = listOfNames[0]
 		var savedFiles = []
 		for d in desiredFiles:
