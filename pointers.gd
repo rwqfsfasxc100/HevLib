@@ -1426,7 +1426,7 @@ class _DataFormat:
 					]
 				},
 				"__get_load":{
-					"description":"Fetches the last object loaded by __load_if_can. Note that if the load failed or if the object was invalidated, it will null the object, so make sure to use that method to confirm a load before trying to fetch the object.",
+					"description":"Fetches the last object loaded by __load_if_can. Note that if the load failed or if the object is invalid, it will null the object, so make sure to use that method to confirm a load before trying to fetch the object.",
 					"args":[
 						"get_last_successful (optional) -> (bool) whether to get the last successfully loaded object by __load_if_can. Since this initializes as null, __load_if_can needs to have been successful at least once. Defaults to false",
 					],
