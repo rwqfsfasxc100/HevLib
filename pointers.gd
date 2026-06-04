@@ -7443,20 +7443,8 @@ class _Zip:
 			if lowerCase:
 				m = m.to_lower()
 			listOfNames.append(m)
-		var dFiles = ""
-		for m in listOfNames:
-			if dFiles == "":
-				dFiles = m
-			else:
-				dFiles = dFiles + ", " + m
 		return listOfNames
 	func __fetch_file_from_zip(path, cacheDir, desiredFiles):
-		var dFiles = ""
-		for m in desiredFiles:
-			if dFiles == "":
-				dFiles = m
-			else:
-				dFiles = dFiles + ", " + m
 		var listOfNames = []
 		var uncompressed = {}
 		var zip = path.split("/")
@@ -7488,12 +7476,6 @@ class _Zip:
 						savedFiles.append(saveDir)
 					else:
 						savedFiles.append("")
-		var mFiles = ""
-		for m in savedFiles:
-			if mFiles == "":
-				mFiles = m
-			else:
-				mFiles = mFiles + ", " + m
 		return savedFiles
 
 
