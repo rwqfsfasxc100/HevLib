@@ -112,6 +112,28 @@ func load(path):
 	# Fill in self.files with all the file data
 	return self._get_files()
 
+# Loads a zip file from a buffer PoolByteArray
+func load_buffer(buffer : PoolByteArray):
+	
+	self.path = null
+	self.pos = 0
+	
+	if buffer.size() < 4:
+		return false
+	
+	if buffer[0] != 0x04 or buffer[1] != 0x03 or buffer[2] != 0x4B or buffer[3] != 0x50:
+		return false
+	
+	self.buffer = buffer
+	self.buffer_size = self.buffer.size()
+	
+	if self.buffer_size < 22:
+		# Definitely not a valid zip file
+		return false
+	
+	# Fill in self.files with all the file data
+	return self._get_files()
+
 # Uncompress the given file. Returns false if uncompressing fails, or when the
 # file isn't available in the currently loaded zip file.
 func uncompress(file_name):
