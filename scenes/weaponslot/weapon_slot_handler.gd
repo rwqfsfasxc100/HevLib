@@ -225,7 +225,7 @@ func loadPlaceholder():
 		if "slotName" in system:
 			system.slotName = t + "_" + system.systemName
 	else:
-		var path = this_addition.get("path",null)
+		var path = this_addition.get("path","")
 		if not pointers.ConfigDriver.__validate_dictionary(this_addition):
 			path = ""
 		
