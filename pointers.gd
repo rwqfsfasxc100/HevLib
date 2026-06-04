@@ -1426,7 +1426,7 @@ class _DataFormat:
 					]
 				},
 				"__get_load":{
-					"description":"Fetches the last object loaded by __load_if_can. Note that failed loads will null the object, so make sure to use that method to confirm a load before trying to fetch the object.",
+					"description":"Fetches the last object loaded by __load_if_can. Note that if the load failed or if the object was invalidated, it will null the object, so make sure to use that method to confirm a load before trying to fetch the object.",
 					"args":[
 						"get_last_successful (optional) -> (bool) whether to get the last successfully loaded object by __load_if_can. Since this initializes as null, __load_if_can needs to have been successful at least once. Defaults to false",
 					],
@@ -1933,7 +1933,11 @@ class _DataFormat:
 	
 	func __get_load(get_last_successful : bool = false):
 		if get_last_successful:
+			if not Tool.ov(last_successful_object):
+				last_successful_object = null
 			return last_successful_object
+		if not Tool.ov(last_load):
+			last_load = null
 		return last_load
 	
 	
