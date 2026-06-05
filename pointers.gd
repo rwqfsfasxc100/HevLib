@@ -1573,9 +1573,10 @@ class _DataFormat:
 	const function_prefixes = ["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func "]
 	const all_prefixes = ["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func ","onready ","var ","signal ","const ","export ","extends "]
 	func __trim_scripts(file_path : String, get_detailed_operands : bool = false, trim_unnecessary_newlines : bool = false, recurse_through_base_scripts : bool = true):
-		var script_source = load(file_path)
-		if script_source:
-			return __trim_script_object(script_source,get_detailed_operands,trim_unnecessary_newlines,recurse_through_base_scripts)
+		if __load_if_can(file_path):
+			var script_source = __get_load()
+			if script_source:
+				return __trim_script_object(script_source,get_detailed_operands,trim_unnecessary_newlines,recurse_through_base_scripts)
 		return ["extends Node",[],[],[],[],[],[],[]]
 	
 	func __trim_script_object(script_source : Script, get_detailed_operands : bool = false, trim_unnecessary_newlines : bool = false, recurse_through_base_scripts : bool = true):
@@ -1933,10 +1934,10 @@ class _DataFormat:
 	
 	func __get_load(get_last_successful : bool = false):
 		if get_last_successful:
-			if not Tool.ov(last_successful_object):
+			if not Tool.ovnolock(last_successful_object):
 				last_successful_object = null
 			return last_successful_object
-		if not Tool.ov(last_load):
+		if not Tool.ovnolock(last_load):
 			last_load = null
 		return last_load
 	
@@ -1989,117 +1990,38 @@ class _DriverManagement:
 	var file = File.new()
 	
 	func __get_drivers(get_ids : Array = []) -> Array:
-		var is_onready = CurrentGame != null
-		var running_in_debugged = false
-		var debugged_defined_mods = []
-		var onready_mod_paths = []
-		var onready_mod_folders = []
-		var folders = pointers.FolderAccess.__fetch_folder_files("res://", true, true)
-		
 		var mod_drivers = []
 		
-		if is_onready:
-			var mods = ModLoader.get_children()
-			for mod in mods:
-				var path = mod.get_script().get_path()
-				onready_mod_paths.append(path)
-				var split = path.split("/")
-				onready_mod_folders.append(split[2])
-		else:
-			var ps = pointers.DataFormat.__get_script_constant_map_without_load("res://ModLoader.gd")
-			for item in ps:
-				if item == "is_debugged":
-					running_in_debugged = true
-					
-					var ml = load("res://ModLoader.gd")
-					var fs = ml.get_source_code()
-					var lines = fs.split("\n")
-					var reading = false
-					var contents = []
-					for line in lines:
-
-						if line.begins_with("var addedMods"):
-							reading = true
-						if reading:
-							var split = line.split("\"")
-							if split.size() > 1 and split.size() == 3:
-								if split[0].begins_with("#"):
-									contents.append(split[1])
-
-					debugged_defined_mods = contents.duplicate(true)
+		for modmain_path in pointers.ManifestV2.__get_modmain_files():
+			var has_manifest = false
+			var manifest_path = ""
+			var modFolder = modmain_path.get_base_dir() + "/"
+			for item in pointers.FolderAccess.__fetch_folder_files(modFolder,false,true):
+				var modEntryName = item.to_lower()
+				if modEntryName.begins_with("mod") and modEntryName.ends_with("manifest"):
+					has_manifest = true
+					manifest_path = item
+			
+			var this_mod_data = {"drivers":{}}
+			var id = ""
+			if has_manifest:
+				var manifest = pointers.ManifestV2.__parse_file_as_manifest(manifest_path)
+				id = manifest.get("mod_information",{}).get("id","")
+			if id != "":
+				this_mod_data.merge({"id":id})
+			var mm_prio = 0
+			var modmain = pointers.DataFormat.__get_script_constant_map_without_load(modmain_path)
+			if "MOD_PRIORITY" in modmain:
+				mm_prio = modmain["MOD_PRIORITY"]
+			this_mod_data.merge({"priority":mm_prio})
+			
+			this_mod_data["drivers"] = __get_drivers_from_modmain_path(modmain_path)
+			
+			this_mod_data.merge({"mod_directory":modFolder})
+			if this_mod_data["drivers"].size() > 0:
+				if (get_ids.size()) == 0 or (get_ids.size() > 0 and id in get_ids):
+					mod_drivers.append(this_mod_data)
 		
-		if not is_onready and onready_mod_folders.size() == 0:
-			var mods_to_avoid = []
-			for folder in folders:
-				var semi_root = folder.split("/")[2]
-				if semi_root.begins_with("."):
-					continue
-							
-				if folder.ends_with("/"):
-					
-					if running_in_debugged:
-						for mod in debugged_defined_mods:
-							var home = mod.split("/")[2]
-							if home == semi_root:
-								mods_to_avoid.append(home)
-					var folderCheck = pointers.FolderAccess.__fetch_folder_files(folder,true)
-					var has_mod = false
-					var has_manifest = false
-					var modmain_path = ""
-					var manifest_path = ""
-					for item in folderCheck:
-						var modEntryName = item.to_lower()
-						if modEntryName.begins_with("modmain") and modEntryName.ends_with(".gd"):
-							if (folder + item) in debugged_defined_mods:
-								has_mod = false
-							else:
-								has_mod = true
-							modmain_path = item
-						if modEntryName.begins_with("mod") and modEntryName.ends_with("manifest"):
-							has_manifest = true
-							manifest_path = item
-						
-					if has_mod:
-						var this_mod_data = {"drivers":{}}
-						var id = ""
-						if has_manifest:
-							var manifest = pointers.ManifestV2.__parse_file_as_manifest(folder + manifest_path)
-							id = manifest.get("mod_information",{}).get("id","")
-						if id != "":
-							this_mod_data.merge({"id":id})
-						var mm_prio = 0
-						var modmain = pointers.DataFormat.__get_script_constant_map_without_load(folder + modmain_path)
-						if "MOD_PRIORITY" in modmain:
-							mm_prio = modmain["MOD_PRIORITY"]
-						this_mod_data.merge({"priority":mm_prio})
-						
-						this_mod_data["drivers"] = __get_drivers_from_modmain_path(folder + modmain_path)
-						
-						this_mod_data.merge({"mod_directory":folder})
-						if this_mod_data["drivers"].size() > 0:
-							if (get_ids.size()) == 0 or (get_ids.size() > 0 and id in get_ids):
-								mod_drivers.append(this_mod_data)
-		else:
-			var mods = pointers.ManifestV2.__get_mod_data()["mods"]
-			for mod in mods:
-				var this_mod_data = {}
-				
-				var mod_data = mods[mod]
-				var prio = mod_data.get("priority",0)
-				this_mod_data.merge({"priority":prio})
-				var id = ""
-				if mod_data["manifest"]["has_manifest"]:
-					id = mod_data["manifest"]["manifest_data"]["mod_information"]["id"]
-				if id != "":
-					this_mod_data.merge({"id":id})
-				var folder = mod.split(mod.split("/")[mod.split("/").size() - 1])[0]
-				
-				this_mod_data["drivers"] = __get_drivers_from_modmain_path(mod)
-				
-				this_mod_data.merge({"mod_directory":folder})
-				if this_mod_data["drivers"].size() > 0:
-					if (get_ids.size()) == 0 or (get_ids.size() > 0 and id in get_ids):
-						mod_drivers.append(this_mod_data)
 		mod_drivers.sort_custom(self,"compare_driver_dictionaries")
 		return mod_drivers
 	
@@ -5748,44 +5670,20 @@ class _ManifestV2:
 			var stat_tags = {}
 			
 			var modListArr = []
-			var is_onready = CurrentGame != null
-			if is_onready:
-				Debug.l("ManifestV2: is onready, getting mods from ModLoader children")
-				var mods = ModLoader.get_children()
-				for mod in mods:
-					var constants = mod.get_script().get_script_constant_map()
-					var script_path = mod.get_script().get_path()
-					modListArr.append({"constants":constants,"script_path":script_path,"node":mod})
 			
-			else:
-				Debug.l("ManifestV2: is not onready, getting mods from filesystem")
-				var running_in_debugged = false
-				var debugged_defined_mods = []
-				
-				var ps = pointers.DataFormat.__get_script_constant_map_without_load("res://ModLoader.gd")
-				for item in ps:
-					if item == "is_debugged":
-						Debug.l("ManifestV2: running in debugged")
-						running_in_debugged = true
-						
-						var tfs = pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd")
-						debugged_defined_mods = tfs.get("addedMods",[]).duplicate(true)
-				
-				
-				
-				var folders = __get_modmain_files()
-				Debug.l("ManifestV2: found [%s] modmain files" % folders.size())
-				for item in folders:
-					var has_mod = true
-					if running_in_debugged:
-						if item in debugged_defined_mods:
-							has_mod = true
-						else:
-							has_mod = false
-					if has_mod:
-						Debug.l("ManifestV2: registering %s" % item)
-						var constants = pointers.DataFormat.__get_script_constant_map_without_load(item)
-						modListArr.append({"constants":constants,"script_path":item,"node":null})
+			var is_onready = ModLoader != null
+			var modNodes = {}
+			
+			if is_onready:
+				for child in ModLoader.get_children():
+					modNodes[child.get_script().get_path()] = child
+			
+			var folders = __get_modmain_files()
+			Debug.l("ManifestV2: found [%s] modmain files" % folders.size())
+			for item in folders:
+				Debug.l("ManifestV2: registering %s" % item)
+				var constants = pointers.DataFormat.__get_script_constant_map_without_load(item)
+				modListArr.append({"constants":constants,"script_path":item,"node":(modNodes[item]) if is_onready else (null)})
 			total_mod_count = modListArr.size()
 			print("ManifestV2: solved [%s] modmain files" % total_mod_count)
 			modListArr.sort_custom(self,"sortModList")
@@ -6733,16 +6631,25 @@ class _ManifestV2:
 	func __get_manifest_cache() -> Dictionary:
 		return cached_manifests
 	
+	var modmain_file_list = []
+	
 	func __get_modmain_files() -> Array:
+		if modmain_file_list:
+			return modmain_file_list.duplicate(true)
 		var structure = pointers.FolderAccess.__get_folder_structure("res://")
-		var dvs = siftFolderStructure(structure)
+		var dvs = []
+		if OS.has_feature("editor"):
+			dvs = pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[])
+		else:
+			dvs = siftFolderStructureForModMains(structure)
+		modmain_file_list = dvs
 		return dvs
 	
-	func siftFolderStructure(structure:Dictionary,path:String = "res://"):
+	func siftFolderStructureForModMains(structure:Dictionary,path:String = "res://"):
 		var out = []
 		for i in structure:
 			if i.ends_with("/"):
-				out.append_array(siftFolderStructure(structure[i],path + i))
+				out.append_array(siftFolderStructureForModMains(structure[i],path + i))
 			else:
 				var f = i.to_lower()
 				if f.begins_with("modmain") and f.ends_with(".gd"):

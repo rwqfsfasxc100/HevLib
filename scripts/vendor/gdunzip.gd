@@ -121,7 +121,7 @@ func load_buffer(buffer : PoolByteArray):
 	if buffer.size() < 4:
 		return false
 	
-	if buffer[0] != 0x04 or buffer[1] != 0x03 or buffer[2] != 0x4B or buffer[3] != 0x50:
+	if buffer[3] != 0x04 or buffer[2] != 0x03 or buffer[1] != 0x4B or buffer[0] != 0x50:
 		return false
 	
 	self.buffer = buffer
