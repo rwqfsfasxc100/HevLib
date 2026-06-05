@@ -384,6 +384,7 @@ class _ConfigDriver:
 				"__load_configs":{
 					"description":"Internal method used to initialize a configuration file. Only use if you know what you're doing",
 					"args":[
+						"modLoader -> (ModLoader) used to handle Modlet interactions",
 						"cfg_filename (optional) -> (String) used for the file this config is stored in within the 'user://cfg/' folder. Defaults to 'Mod_Configurations.cfg'"
 					],
 				},
@@ -710,7 +711,7 @@ class _ConfigDriver:
 					Debug.l("ConfigDriver: node %s does not have the method '%s'" % [str(node),method])
 	
 	
-	func __load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
+	func __load_configs(modLoader : ModLoader,cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var default_binds = pointers.Keymapping.__get_formatted_vanilla_binds()
 		var dir = Directory.new()
 		var c = ConfigFile.new()

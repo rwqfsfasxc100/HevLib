@@ -43,7 +43,7 @@ var checksum = "user://cache/.HevLib_Cache/checksums"
 var d = Directory.new()
 var correct = d.file_exists("res://HevLib/pointers.gd")
 var pointers = null
-func _init(modLoader = ModLoader):
+func _init(modLoader : ModLoader = ModLoader):
 	if correct:
 		l("Initializing Equipment Driver")
 		var variables_folder = "user://cache/.HevLib_Cache/Variable_Fetch/"
@@ -57,7 +57,7 @@ func _init(modLoader = ModLoader):
 		var fstr_old = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/file_caches"
 		if d.dir_exists(fstr_old):
 			pointers.FolderAccess.__recursive_delete(fstr_old)
-		pointers.ConfigDriver.__load_configs()
+		pointers.ConfigDriver.__load_configs(modLoader)
 		var injector = load("res://HevLib/scripts/translations/inject_translations.gd")
 		injector.inject_translations(pointers)
 		
