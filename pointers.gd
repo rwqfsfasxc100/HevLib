@@ -384,7 +384,6 @@ class _ConfigDriver:
 				"__load_configs":{
 					"description":"Internal method used to initialize a configuration file. Only use if you know what you're doing",
 					"args":[
-						"modLoader -> (ModLoader) used to handle Modlet interactions",
 						"cfg_filename (optional) -> (String) used for the file this config is stored in within the 'user://cfg/' folder. Defaults to 'Mod_Configurations.cfg'"
 					],
 				},
@@ -553,7 +552,8 @@ class _ConfigDriver:
 		cfg.save(profiles_dir+profile + ".cfg")
 		if made_change:
 			__change_made()
-			Loader.saved()
+			if Loader:
+				Loader.saved()
 	
 	func __store_value(mod_id:String, section:String, key:String, value, cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var made_change = false
@@ -579,7 +579,8 @@ class _ConfigDriver:
 				changes[modSection] = []
 			changes[modSection].append(key)
 			__change_made()
-			Loader.saved()
+			if Loader:
+				Loader.saved()
 	
 	func __get_config(mod_id, cfg_filename : String = "Mod_Configurations" + ".cfg") -> Dictionary:
 		var cfg_folder = "user://cfg/"
@@ -711,7 +712,7 @@ class _ConfigDriver:
 					Debug.l("ConfigDriver: node %s does not have the method '%s'" % [str(node),method])
 	
 	
-	func __load_configs(modLoader : ModLoader,cfg_filename : String = "Mod_Configurations" + ".cfg"):
+	func __load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var default_binds = pointers.Keymapping.__get_formatted_vanilla_binds()
 		var dir = Directory.new()
 		var c = ConfigFile.new()
@@ -5684,7 +5685,7 @@ class _ManifestV2:
 			for item in folders:
 				Debug.l("ManifestV2: registering %s" % item)
 				var constants = pointers.DataFormat.__get_script_constant_map_without_load(item)
-				modListArr.append({"constants":constants,"script_path":item,"node":(modNodes[item]) if is_onready else (null)})
+				modListArr.append({"constants":constants,"script_path":item,"node":(modNodes[item]) if (is_onready or item in modNodes) else (null)})
 			total_mod_count = modListArr.size()
 			print("ManifestV2: solved [%s] modmain files" % total_mod_count)
 			modListArr.sort_custom(self,"sortModList")
@@ -5694,7 +5695,7 @@ class _ManifestV2:
 				var script_path = mod.get("script_path")
 				var node = mod.get("node")
 				
-				var folder_path = str(script_path.split(script_path.split("/")[script_path.split("/").size() - 1])[0])
+				var folder_path = script_path.get_base_dir() + "/"
 				var mod_priority = constants.get("MOD_PRIORITY",0)
 				var mod_name = str(constants.get("MOD_NAME",script_path.split("/")[2]))
 				var legacy_mod_version = constants.get("MOD_VERSION","1.0.0")
@@ -5704,7 +5705,7 @@ class _ManifestV2:
 				var mod_version_metadata = constants.get("MOD_VERSION_METADATA","")
 				var is_library = constants.get("MOD_IS_LIBRARY",false)
 				var always_display = constants.get("ALWAYS_DISPLAY",false)
-				var content = pointers.FolderAccess.__fetch_folder_files(folder_path)
+				var content = __get_manifest_files()
 				var has_mod_manifest = false
 				var manifest_data = {}
 				var manifest_version = 1
@@ -5713,7 +5714,7 @@ class _ManifestV2:
 				var stex_path = ""
 				var icon_path = ""
 				for file in content:
-					if file.to_lower() == "mod.manifest":
+					if file.to_lower() == folder_path.to_lower() + "mod.manifest":
 						has_mod_manifest = true
 						manifest_count += 1
 						manifest_data = __parse_file_as_manifest(folder_path + file)
@@ -5906,7 +5907,7 @@ class _ManifestV2:
 	
 	func __get_mod_data_from_files(script_path:String) -> Dictionary:
 		var constants = pointers.DataFormat.__get_script_constant_map_without_load(script_path)
-		var folder_path = str(script_path.split(script_path.split("/")[script_path.split("/").size() - 1])[0])
+		var folder_path = script_path.get_base_dir() + "/"
 		var mod_priority = constants.get("MOD_PRIORITY",0)
 		var mod_name = str(constants.get("MOD_NAME",script_path.split("/")[2]))
 		var legacy_mod_version = constants.get("MOD_VERSION","1.0.0")
@@ -5918,7 +5919,7 @@ class _ManifestV2:
 		var mod_is_library = constants.get("MOD_IS_LIBRARY",false)
 		
 		var hide_library = constants.get("LIBRARY_HIDDEN_BY_DEFAULT",true)
-		var content = pointers.FolderAccess.__fetch_folder_files(folder_path)
+		var content = __get_manifest_files()
 		var has_mod_manifest = false
 		var manifest_data = {}
 		var manifest_version = 1
@@ -5927,7 +5928,7 @@ class _ManifestV2:
 		var png_path = ""
 		var stex_path = ""
 		for file in content:
-			if file.to_lower() == "mod.manifest":
+			if file.to_lower() == folder_path.to_lower() + "mod.manifest":
 				has_mod_manifest = true
 				manifest_data = __parse_file_as_manifest(folder_path + file, true)
 				mod_name = manifest_data["mod_information"].get("name",mod_name)
@@ -6636,28 +6637,93 @@ class _ManifestV2:
 	
 	func __get_modmain_files() -> Array:
 		if modmain_file_list:
-			return modmain_file_list.duplicate(true)
+			return modmain_file_list.duplicate()
 		var structure = pointers.FolderAccess.__get_folder_structure("res://")
 		var dvs = []
 		if OS.has_feature("editor"):
 			dvs = pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[])
 		else:
-			dvs = siftFolderStructureForModMains(structure)
+			var ov = []
+			for r in __get_mod_files():
+				var i : String = r.get_file().to_lower()
+				if i.begins_with("modmain") and i.ends_with(".gd"):
+					ov.append(r)
+		dvs += __get_modlet_files()
 		modmain_file_list = dvs
-		return dvs
+		return dvs.duplicate()
 	
-	func siftFolderStructureForModMains(structure:Dictionary,path:String = "res://"):
+	var active_modlet_file_list = []
+	var all_modlet_file_list = []
+	var all_modlet_definitions = {}
+	
+	func __get_all_modlets(only_show_installed : bool = true) -> Dictionary:
+		if not all_modlet_file_list:
+			var ov = []
+			for r in __get_mod_files():
+				var i : String = r.get_file().to_lower()
+				if i.begins_with("modlet") and i.ends_with(".gd"):
+					ov.append(r)
+			all_modlet_file_list = ov
+		var modlets = all_modlet_file_list.duplicate()
+		var allowed_modlets = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets")
+		if allowed_modlets == null:
+			pointers.ConfigDriver.__store_value("HevLib","modlets","seen_modlets",{})
+			allowed_modlets = {}
+		active_modlet_file_list = []
+		for mod in modlets:
+			if not mod in allowed_modlets:
+				allowed_modlets[mod] = true
+			if allowed_modlets[mod]:
+				active_modlet_file_list.append(mod)
+		pointers.ConfigDriver.__store_value("HevLib","modlets","seen_modlets",allowed_modlets)
+		var out = allowed_modlets.duplicate(true)
+		if only_show_installed:
+			for mod in allowed_modlets:
+				if not mod in active_modlet_file_list:
+					out.erase(mod)
+		return out
+	
+	func __get_modlet_files() -> Array:
+		__get_all_modlets()
+		return active_modlet_file_list.duplicate()
+	
+	var cached_mod_files = []
+	
+	func __get_mod_files():
+		if cached_mod_files:
+			return cached_mod_files.duplicate(true)
+		var dict = siftFolderStructureForModFiles(pointers.FolderAccess.__get_folder_structure("res://"))
+		cached_mod_files = dict
+		return cached_mod_files.duplicate(true)
+	
+	func siftFolderStructureForModFiles(structure:Dictionary,path:String = "res://"):
 		var out = []
 		for i in structure:
 			if i.ends_with("/"):
-				out.append_array(siftFolderStructureForModMains(structure[i],path + i))
+				out.append_array(siftFolderStructureForModFiles(structure[i],path + i))
 			else:
-				var f = i.to_lower()
-				if f.begins_with("modmain") and f.ends_with(".gd"):
+				var f : String = i.to_lower()
+				if ((f.begins_with("modlet") or f.begins_with("modmain")) and f.ends_with(".gd") or (f.begins_with("mod") and f.ends_with(".manifest"))):
 					out.append(path + i)
 		return out
 	
+	var cached_manifest_files = []
 	
+	func __get_manifest_files():
+		if cached_manifest_files:
+			return cached_manifest_files.duplicate()
+		var ov = []
+		for r in __get_mod_files():
+			var i : String = r.get_file().to_lower()
+			if i.begins_with("mod") and i.ends_with(".manifest"):
+				ov.append(r)
+		cached_manifest_files = ov
+		return cached_manifest_files.duplicate()
+	
+	func __load_modlets(modloader):
+		
+		
+		pass
 	
 	
 	
