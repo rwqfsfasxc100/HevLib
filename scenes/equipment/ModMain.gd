@@ -57,7 +57,8 @@ func _init(modLoader : ModLoader = ModLoader):
 		var fstr_old = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/file_caches"
 		if d.dir_exists(fstr_old):
 			pointers.FolderAccess.__recursive_delete(fstr_old)
-		pointers.ConfigDriver.__load_configs(modLoader)
+		pointers.ManifestV2.__load_modlets(modLoader)
+		pointers.ConfigDriver.__load_configs()
 		var injector = load("res://HevLib/scripts/translations/inject_translations.gd")
 		injector.inject_translations(pointers)
 		

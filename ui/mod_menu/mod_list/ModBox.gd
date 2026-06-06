@@ -161,7 +161,7 @@ func _pressed():
 			information_nodes["settings_menu"].SELECTED_MOD_ID = id
 		var changelog = manifestData["manifest_definitions"].get("changelog_path","")
 		if changelog != "":
-			var path = MOD_INFO["node"].get_script().get_path()
+			var path = MOD_INFO["file_path"]
 			var modpath = path.split(path.split("/")[path.split("/").size() - 1])[0]
 			var c = modpath + changelog
 			if file.file_exists(c):
