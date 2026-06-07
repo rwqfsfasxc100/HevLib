@@ -20,7 +20,7 @@ const VANILLA = {
 		"is_library":false,
 		"always_display":true
 	},
-	"node":null,
+	"file_path":"",
 	"manifest":{
 		"has_manifest":true,
 		"manifest_version":2.2,

@@ -257,6 +257,9 @@ var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/compleme
 
 var children = {}
 func _ready():
+	if not pointers:
+		pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
+	
 	if "children" in MOD_INFO.keys():
 		children = MOD_INFO["children"]
 	
@@ -293,7 +296,7 @@ var ID = null
 
 func _draw():
 	if not pointers:
-		pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+		pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)
 	
 	button_lib_icon.visible = false

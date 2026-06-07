@@ -5685,15 +5685,19 @@ class _ManifestV2:
 			for item in folders:
 				Debug.l("ManifestV2: registering %s" % item)
 				var constants = pointers.DataFormat.__get_script_constant_map_without_load(item)
-				modListArr.append({"constants":constants,"script_path":item,"node":(modNodes[item]) if (is_onready or item in modNodes) else (null)})
+				modListArr.append({"constants":constants,"script_path":item})
+#				modListArr.append({"constants":constants,"script_path":item,"node":(modNodes[item]) if (is_onready or item in modNodes) else (null)})
 			total_mod_count = modListArr.size()
 			print("ManifestV2: solved [%s] modmain files" % total_mod_count)
 			modListArr.sort_custom(self,"sortModList")
+			
+			var content = __get_manifest_files() + __get_icon_files()
+			
 			for mod in modListArr:
 				
 				var constants = mod.get("constants")
 				var script_path = mod.get("script_path")
-				var node = mod.get("node")
+#				var node = mod.get("node")
 				
 				var folder_path = script_path.get_base_dir() + "/"
 				var mod_priority = constants.get("MOD_PRIORITY",0)
@@ -5705,7 +5709,7 @@ class _ManifestV2:
 				var mod_version_metadata = constants.get("MOD_VERSION_METADATA","")
 				var is_library = constants.get("MOD_IS_LIBRARY",false)
 				var always_display = constants.get("ALWAYS_DISPLAY",false)
-				var content = __get_manifest_files()
+				
 				var has_mod_manifest = false
 				var manifest_data = {}
 				var manifest_version = 1
@@ -5713,35 +5717,37 @@ class _ManifestV2:
 				var png_path = ""
 				var stex_path = ""
 				var icon_path = ""
-				for file in content:
-					if file.to_lower() == folder_path.to_lower() + "mod.manifest":
-						has_mod_manifest = true
-						manifest_count += 1
-						manifest_data = __parse_file_as_manifest(folder_path + file)
-						mod_name = manifest_data["mod_information"].get("name",mod_name)
-						legacy_mod_version = manifest_data["version"].get("version_string",legacy_mod_version)
-						mod_version_major = manifest_data["version"].get("version_major",mod_version_major)
-						mod_version_minor = manifest_data["version"].get("version_minor",mod_version_minor)
-						mod_version_bugfix = manifest_data["version"].get("version_bugfix",mod_version_bugfix)
-						mod_version_metadata = manifest_data["version"].get("version_metadata",mod_version_metadata)
-						is_library = manifest_data["library"].get("is_library",false)
-						always_display = manifest_data["library"].get("always_display",false)
-						manifest_version = manifest_data["manifest_definitions"].get("manifest_version",1)
-						
-						if "tags" in manifest_data.keys():
-							for tag in manifest_data["tags"]:
-								if tag in stat_tags:
-									stat_tags[tag] += 1
-								else:
-									stat_tags.merge({tag:1})
-						
-					if file.to_lower().begins_with("icon"):
-						if file.to_lower().ends_with(".png"):
-							has_icon_file = true
-							png_path = folder_path + file
-						if file.to_lower().ends_with(".stex"):
-							has_icon_file = true
-							stex_path = folder_path + file
+				for content_file in content:
+					if content_file.begins_with(folder_path):
+						var ft = content_file.split(folder_path)[1]
+						if ft.to_lower() == "mod.manifest":
+							has_mod_manifest = true
+							manifest_count += 1
+							manifest_data = __parse_file_as_manifest(content_file)
+							mod_name = manifest_data["mod_information"].get("name",mod_name)
+							legacy_mod_version = manifest_data["version"].get("version_string",legacy_mod_version)
+							mod_version_major = manifest_data["version"].get("version_major",mod_version_major)
+							mod_version_minor = manifest_data["version"].get("version_minor",mod_version_minor)
+							mod_version_bugfix = manifest_data["version"].get("version_bugfix",mod_version_bugfix)
+							mod_version_metadata = manifest_data["version"].get("version_metadata",mod_version_metadata)
+							is_library = manifest_data["library"].get("is_library",false)
+							always_display = manifest_data["library"].get("always_display",false)
+							manifest_version = manifest_data["manifest_definitions"].get("manifest_version",1)
+							
+							if "tags" in manifest_data.keys():
+								for tag in manifest_data["tags"]:
+									if tag in stat_tags:
+										stat_tags[tag] += 1
+									else:
+										stat_tags.merge({tag:1})
+							
+						if ft.to_lower().begins_with("icon"):
+							if ft.to_lower().ends_with(".png"):
+								has_icon_file = true
+								png_path = content_file
+							if ft.to_lower().ends_with(".stex"):
+								has_icon_file = true
+								stex_path = content_file
 				if stex_path:
 					icon_path = stex_path
 				elif png_path:
@@ -5793,7 +5799,8 @@ class _ManifestV2:
 						manifestEntry["manifest_data"]["languages"] = manifest_langs
 				
 				
-				var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"node":node,"manifest":manifestEntry,"drivers":drivers}}
+				var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"file_path":script_path,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"manifest":manifestEntry,"drivers":drivers}}
+#				var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"node":node,"manifest":manifestEntry,"drivers":drivers}}
 				mod_dictionary.merge(mod_entry)
 				if is_library:
 					library_count += 1
@@ -6518,7 +6525,7 @@ class _ManifestV2:
 				var manifest = data["manifest"]["manifest_data"]
 				var info = manifest["mod_information"]
 				var version = manifest["version"]
-				mods[info["id"]] = {"name":info["name"],"version":{"major":version["version_major"],"minor":version["version_minor"],"bugfix":version["version_bugfix"]},"path":data["node"].get_script().get_path(),"changelog":manifest["manifest_definitions"]["changelog_path"]}
+				mods[info["id"]] = {"name":info["name"],"version":{"major":version["version_major"],"minor":version["version_minor"],"bugfix":version["version_bugfix"]},"path":data["file_path"],"changelog":manifest["manifest_definitions"]["changelog_path"]}
 		var last = {}
 		if file.file_exists(folder + last_seen_file):
 			file.open(folder + last_seen_file,File.READ)
@@ -6703,7 +6710,25 @@ class _ManifestV2:
 				out.append_array(siftFolderStructureForModFiles(structure[i],path + i))
 			else:
 				var f : String = i.to_lower()
-				if ((f.begins_with("modlet") or f.begins_with("modmain")) and f.ends_with(".gd") or (f.begins_with("mod") and f.ends_with(".manifest"))):
+				if (
+					(
+						(f.begins_with("modlet") or f.begins_with("modmain"))
+						and 
+						f.ends_with(".gd")
+					)
+					or 
+					(
+						f.begins_with("mod") 
+						and 
+						f.ends_with(".manifest")
+					)
+					or 
+					(
+						f.begins_with("icon")
+						and
+						(f.ends_with(".stex") or f.ends_with(".png"))
+					)
+				):
 					out.append(path + i)
 		return out
 	
@@ -6719,6 +6744,19 @@ class _ManifestV2:
 				ov.append(r)
 		cached_manifest_files = ov
 		return cached_manifest_files.duplicate()
+	
+	var cached_icon_files = []
+	
+	func __get_icon_files():
+		if cached_icon_files:
+			return cached_icon_files.duplicate()
+		var ov = []
+		for r in __get_mod_files():
+			var i : String = r.get_file().to_lower()
+			if i.begins_with("icon") and (i.ends_with(".stex") or i.ends_with(".png")):
+				ov.append(r)
+		cached_icon_files = ov
+		return cached_icon_files.duplicate()
 	
 	func __load_modlets(modloader):
 		
