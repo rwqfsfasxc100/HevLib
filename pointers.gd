@@ -1408,6 +1408,15 @@ class _DataFormat:
 						"script_storage_array_name (optional) -> (String) The array name that the persistent object uses to store objects if script_storage_object is set. Defaults to `'_savedObjects'` as it is a standard name in ModMain scripts.",
 					],
 				},
+				"__replace_resource":{
+					"description":"Sets the path for a resource to a specific path, equivalent to the replaceScene methods from modmains.",
+					"args":[
+						"resource_path -> (String) the file path of the scene or resource to be used to update the resource..",
+						"original_path -> (String) the original file path of the scene to be updated.",
+						"script_storage_object (optional) -> (object) A persistent object used to keep the script override available in memory. Heavily recommended to use this to ensure proper functionality, such as using a mod's script object from the ModLoader children. If not provided and the ModLoader autoload isn't available, uses the current pointer object, which may be freed depending on the operation. Defaults to `null`",
+						"script_storage_array_name (optional) -> (String) The array name that the persistent object uses to store objects if script_storage_object is set. Defaults to `'_savedObjects'` as it is a standard name in ModMain scripts.",
+					],
+				},
 				"__convert_var_from_string":{
 					"description":"Converts a string containing a variable in the literal sense (as if it were written in a script) into it's variant form. NOTE: Strings need to have their quotes inside the string quotes to be considered valid. E.g. `\"\"this is a string\"\"`, \"Vector2(1,2)\"",
 					"args":[
@@ -1901,11 +1910,11 @@ class _DataFormat:
 			else:
 				_savedScriptObjects.append(scene)
 	
-	func __replace_scene(newPath:String, oldPath:String, script_storage_object = null, script_storage_array_name : String = "_savedObjects"):
-		if not ResourceLoader.exists(newPath) or not ResourceLoader.exists(oldPath):
+	func __replace_resource(resource_path:String, original_path:String, script_storage_object = null, script_storage_array_name : String = "_savedObjects"):
+		if not ResourceLoader.exists(resource_path) or not ResourceLoader.exists(original_path):
 			return
-		var scene := load(newPath)
-		scene.take_over_path(oldPath)
+		var scene := load(resource_path)
+		scene.take_over_path(original_path)
 		
 		if script_storage_object and script_storage_array_name and (script_storage_array_name in script_storage_object):
 			script_storage_object[script_storage_array_name].append(scene)
