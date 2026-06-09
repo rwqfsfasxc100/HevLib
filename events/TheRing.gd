@@ -1,6 +1,5 @@
 extends "res://TheRing.gd"
 
-var event_names = []
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 
 var cache_folder = "user://cache/.HevLib_Cache/"
@@ -29,16 +28,13 @@ func hl_ring_UV():
 		for i in get_children():
 			base_playlist.append(i.name)
 		if write_events:
-			var string = ""
-			for event in event_names:
-				if string == "":
-					string = event
-				else:
-					string = string + "\n" + event
+			var string = {}
+			for event in base_playlist:
+				string[event] = not event in disabled_events
 			pointers.FolderAccess.__check_folder_exists(cache_folder)
 			var file = File.new()
 			file.open(cache_folder + "current_events.txt",File.WRITE)
-			file.store_string(string)
+			file.store_string(JSON.print(string,"\t"))
 			file.close()
 		
 		playlist = []
