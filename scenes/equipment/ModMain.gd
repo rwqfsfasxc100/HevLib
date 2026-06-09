@@ -51,6 +51,8 @@ func _init(modLoader : ModLoader = ModLoader):
 		pointers = load("res://HevLib/pointers.gd").new()
 		pointers.FileAccess.__load_precached_mods()
 		
+#		testing(pointers)
+		
 		var scv = pointers.FolderAccess.__fetch_folder_files(variables_folder,false,true)
 		for s in scv:
 			d.remove(s)
@@ -89,7 +91,7 @@ func _init(modLoader : ModLoader = ModLoader):
 
 		installScriptExtension("../better_title_screen/CurrentlyPlaying.gd")
 		var minerals = load("res://HevLib/scenes/minerals/make_mineral_scripting.gd")
-		minerals.make_mineral_scripting(pointers,self)
+		minerals.make_mineral_scripting(pointers,modLoader)
 
 		replaceScene("../../events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn")
 		# Adds in_hevlib_menu to the CurrentGame script and preventing controls while it's true
@@ -130,7 +132,7 @@ func _ready():
 		f.close()
 		
 		var ring = load("res://HevLib/scenes/minerals/make_ring_modifications.gd")
-		ring.make_ring_modifications(pointers,self)
+		ring.make_ring_modifications(pointers,ModLoader)
 		
 		
 		
@@ -259,3 +261,9 @@ func match_mod_path_to_zip(mod_main_path:String) -> String:
 #	Debug.l("HevLib ManifestV2: no matches found, is the mod installed or run via the Godot editor?.")
 	return ""
 
+
+func testing(pointers):
+	var time = (OS.get_unix_time_from_datetime({"day": 16, "hour": 11, "minute": 50, "month": 9, "second": 0, "year": 2273})) / (168.0 * 3600.0)
+	var t2 = time - floor(time)
+	var t3 = abs((t2*7) - 7)
+	pass
