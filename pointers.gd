@@ -1901,7 +1901,7 @@ class _DataFormat:
 			else:
 				_savedScriptObjects.append(scene)
 	
-	func __replace_scene(newPath:String, oldPath:String = "", script_storage_object = null, script_storage_array_name : String = "_savedObjects"):
+	func __replace_scene(newPath:String, oldPath:String, script_storage_object = null, script_storage_array_name : String = "_savedObjects"):
 		if not ResourceLoader.exists(newPath) or not ResourceLoader.exists(oldPath):
 			return
 		var scene := load(newPath)
