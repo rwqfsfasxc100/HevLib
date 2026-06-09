@@ -1177,6 +1177,8 @@ class _ConfigDriver:
 		return false
 	
 	func __config_parse(file_path: String) -> Dictionary:
+		if not file.file_exists(file_path) and not ResourceLoader.exists(file_path):
+			return {}
 		var cfg = ConfigFile.new()
 		file.open(file_path,File.READ)
 		var txt = file.get_as_text()
@@ -1899,6 +1901,19 @@ class _DataFormat:
 			else:
 				_savedScriptObjects.append(scene)
 	
+	func __replace_scene(newPath:String, oldPath:String = "", script_storage_object = null, script_storage_array_name : String = "_savedObjects"):
+		if not ResourceLoader.exists(newPath) or not ResourceLoader.exists(oldPath):
+			return
+		var scene := load(newPath)
+		scene.take_over_path(oldPath)
+		
+		if script_storage_object and script_storage_array_name and (script_storage_array_name in script_storage_object):
+			script_storage_object[script_storage_array_name].append(scene)
+		elif ModLoader != null:
+			ModLoader._savedObjects.append(scene)
+		else:
+			_savedScriptObjects.append(scene)
+	
 	var var_hash = {}
 	
 	func __convert_var_from_string(string : String, constant = true):
@@ -1995,28 +2010,37 @@ class _DriverManagement:
 	
 	func __get_drivers(get_ids : Array = []) -> Array:
 		var mod_drivers = []
-		
-		for modmain_path in pointers.ManifestV2.__get_modmain_files():
+		var mms = pointers.ManifestV2.__get_modmain_files() + pointers.ManifestV2.__get_modlet_files()
+		for modmain_path in mms:
 			var has_manifest = false
 			var manifest_path = ""
 			var modFolder = modmain_path.get_base_dir() + "/"
-			for item in pointers.FolderAccess.__fetch_folder_files(modFolder,false,true):
-				var modEntryName = item.to_lower()
-				if modEntryName.begins_with("mod") and modEntryName.ends_with("manifest"):
-					has_manifest = true
-					manifest_path = item
+			var modFile = modmain_path.get_file().to_lower()
+			if modFile.begins_with("mod") and modFile.ends_with(".manifest"):
+				has_manifest = true
+				manifest_path = modmain_path
+			else:
+				for item in pointers.FolderAccess.__fetch_folder_files(modFolder,false,true):
+					var modEntryName = item.get_file().to_lower()
+					if modEntryName.begins_with("mod") and modEntryName.ends_with(".manifest"):
+						has_manifest = true
+						manifest_path = item
 			
 			var this_mod_data = {"drivers":{}}
 			var id = ""
+			var manifest = {}
 			if has_manifest:
-				var manifest = pointers.ManifestV2.__parse_file_as_manifest(manifest_path)
+				manifest = pointers.ManifestV2.__parse_file_as_manifest(manifest_path)
 				id = manifest.get("mod_information",{}).get("id","")
 			if id != "":
 				this_mod_data.merge({"id":id})
 			var mm_prio = 0
-			var modmain = pointers.DataFormat.__get_script_constant_map_without_load(modmain_path)
-			if "MOD_PRIORITY" in modmain:
-				mm_prio = modmain["MOD_PRIORITY"]
+			if modFile.begins_with("mod") and modFile.ends_with(".manifest"):
+				manifest.get("manifest_definitions",{}).get("modlet_priority",0)
+			else:
+				var modmain = pointers.DataFormat.__get_script_constant_map_without_load(modmain_path)
+				if "MOD_PRIORITY" in modmain:
+					mm_prio = modmain["MOD_PRIORITY"]
 			this_mod_data.merge({"priority":mm_prio})
 			
 			this_mod_data["drivers"] = __get_drivers_from_modmain_path(modmain_path)
@@ -2052,8 +2076,8 @@ class _DriverManagement:
 			var this_mod_data = {}
 			if not file.file_exists(file_path):
 				return {}
-			var file_name = file_path.split("/")[file_path.split("/").size() - 1]
-			var folder_path = file_path.split(file_name)[0]
+			var file_name = file_path.get_file()
+			var folder_path = file_path.get_base_dir() + "/"
 			var folderCheck = pointers.FolderAccess.__fetch_folder_files(folder_path,true)
 			if "HEVLIB_EQUIPMENT_DRIVER_TAGS/" in folderCheck:
 				var driverFolder = folder_path + "HEVLIB_EQUIPMENT_DRIVER_TAGS/"
@@ -6029,6 +6053,7 @@ class _ManifestV2:
 						"complementary_mod_ids":PoolStringArray([]),
 						"manifest_url":"", # EXAMPLE: https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest
 						"changelog_path":"", # This is relative to the ModMain.gd file. EXAMPLE: for a file at 'res://Example Mod/data/folder/changelogs.txt', you would put 'data/folder/changelogs.txt'
+						"modlet_priority":0, # SPECIFIC TO MODLETS! The order at which the modlet would be loaded. Most modlets load before other mods, but this will affect load order within the list of installed modlets
 					}
 				}
 				match manifest_version:
@@ -6189,6 +6214,7 @@ class _ManifestV2:
 							dict_template["manifest_definitions"]["complementary_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("complementary_mod_ids",[]))
 							dict_template["manifest_definitions"]["manifest_url"] = String(manifest_data["manifest_definitions"].get("manifest_url",""))
 							dict_template["manifest_definitions"]["changelog_path"] = String(manifest_data["manifest_definitions"].get("changelog_path",""))
+							dict_template["manifest_definitions"]["modlet_priority"] = int(manifest_data["manifest_definitions"].get("modlet_priority",0))
 						
 						if "links" in manifest_data:
 							var links = manifest_data["links"]
@@ -6657,7 +6683,6 @@ class _ManifestV2:
 				var i : String = r.get_file().to_lower()
 				if i.begins_with("modmain") and i.ends_with(".gd"):
 					ov.append(r)
-		dvs += __get_modlet_files()
 		modmain_file_list = dvs
 		return dvs.duplicate()
 	
@@ -6667,12 +6692,24 @@ class _ManifestV2:
 	
 	func __get_all_modlets(only_show_installed : bool = true) -> Dictionary:
 		if not all_modlet_file_list:
-			var ov = []
-			for r in __get_mod_files():
+			var manifests = __get_manifest_files()
+			var manifest_checks = []
+			for i in manifests:
+				manifest_checks.append(i.to_lower())
+			var allModFiles = __get_mod_files()
+			for r in allModFiles:
 				var i : String = r.get_file().to_lower()
-				if i.begins_with("modlet") and i.ends_with(".gd"):
-					ov.append(r)
+				if (i.begins_with("modmain") and i.ends_with(".gd")):
+					var mr = r.get_base_dir().to_lower() + "/mod.manifest"
+					if mr in manifest_checks:
+						manifest_checks.erase(mr)
+			var ov = []
+			for i in manifests:
+				if i.to_lower() in manifest_checks:
+					ov.append(i)
+			ov.sort_custom(self,"sort_modlet_files")
 			all_modlet_file_list = ov
+		
 		var modlets = all_modlet_file_list.duplicate()
 		var allowed_modlets = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets")
 		if allowed_modlets == null:
@@ -6692,6 +6729,15 @@ class _ManifestV2:
 					out.erase(mod)
 		return out
 	
+	func sort_modlet_files(a:String,b:String):
+		var aPrio = __parse_file_as_manifest(a)["manifest_definitions"]["modlet_priority"]
+		var bPrio = __parse_file_as_manifest(b)["manifest_definitions"]["modlet_priority"]
+		if aPrio != bPrio:
+			return aPrio < bPrio
+		if a != b:
+			return a < b
+		return false
+	
 	func __get_modlet_files() -> Array:
 		__get_all_modlets()
 		return active_modlet_file_list.duplicate()
@@ -6701,20 +6747,34 @@ class _ManifestV2:
 	func __get_mod_files():
 		if cached_mod_files:
 			return cached_mod_files.duplicate(true)
-		var dict = siftFolderStructureForModFiles(pointers.FolderAccess.__get_folder_structure("res://"))
+		var restrict_to_modmains = []
+		if OS.has_feature("editor"):
+			var dvs = pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[])
+			for a in dvs:
+				restrict_to_modmains.append(a.get_base_dir() + "/")
+#			breakpoint
+		var dict = siftFolderStructureForModFiles(pointers.FolderAccess.__get_folder_structure("res://"),"res://",restrict_to_modmains)
 		cached_mod_files = dict
 		return cached_mod_files.duplicate(true)
 	
-	func siftFolderStructureForModFiles(structure:Dictionary,path:String = "res://"):
+	func siftFolderStructureForModFiles(structure:Dictionary,path:String = "res://",restricted_to_modmains : Array = []):
 		var out = []
+		if restricted_to_modmains:
+			var ev = structure.keys()
+			for i in range(ev.size()):
+				ev[i] = ev[i].to_lower()
+			for f in ev:
+				if f.begins_with("modmain") and f.ends_with(".gd"):
+					if not path in restricted_to_modmains:
+						return []
 		for i in structure:
 			if i.ends_with("/"):
-				out.append_array(siftFolderStructureForModFiles(structure[i],path + i))
+				out.append_array(siftFolderStructureForModFiles(structure[i],path + i,restricted_to_modmains))
 			else:
 				var f : String = i.to_lower()
 				if (
 					(
-						(f.begins_with("modlet") or f.begins_with("modmain"))
+						f.begins_with("modmain")
 						and 
 						f.ends_with(".gd")
 					)
@@ -6761,9 +6821,16 @@ class _ManifestV2:
 		return cached_icon_files.duplicate()
 	
 	func __load_modlets(modloader):
-		
-		
-		pass
+		var modlet_manifests = __get_modlet_files()
+		for modlet in modlet_manifests:
+			var drivers = pointers.DriverManagement.__get_drivers_from_modmain_path(modlet)
+			if "LOAD_RESOURCES.gd" in drivers:
+				var resources = drivers["LOAD_RESOURCES.gd"].get("LOAD_RESOURCES",{})
+				if resources and typeof(resources) == TYPE_DICTIONARY:
+					for resource in resources:
+						var load_type = resources[resource]
+						var path = resource if resource.begins_with("res://") else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
+						pass
 	
 	
 	
