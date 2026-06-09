@@ -1385,16 +1385,16 @@ class _DataFormat:
 					"description":"Compiles a script and overrides it. Similar to the installScriptExtension method used in ModMain scripts",
 					"args":[
 						"source_code -> (String) source code for the script override.",
-						"script_storage_object (optional) -> (object) A persistent object used to keep the script override available in memory. Heavily recommended to use this to ensure proper functionality, such as using a mod's script object from the ModLoader children. If not provided, uses the current pointer object, which may be freed depending on the operation. Defaults to `null`",
-						"script_storage_array_name (optional) -> (String) The array name that the persistent object uses to store objects. Defaults to `'_savedObjects'` as it is a standard name in ModMain scripts.",
+						"script_storage_object (optional) -> (object) A persistent object used to keep the script override available in memory. Heavily recommended to use this to ensure proper functionality, such as using a mod's script object from the ModLoader children. If not provided and the ModLoader autoload isn't available, uses the current pointer object, which may be freed depending on the operation. Defaults to `null`",
+						"script_storage_array_name (optional) -> (String) The array name that the persistent object uses to store objects if script_storage_object is set. Defaults to `'_savedObjects'` as it is a standard name in ModMain scripts.",
 					],
 				},
 				"__compile_and_override_script_with_scene":{
 					"description":"Similar to __compile_and_override_script, additionally creates and updates one or more scenes after overriding the script in case script needs to have scenes reloaded to apply the update.",
 					"args":[
 						"source_code -> (String) source code for the script override.",
-						"script_storage_object (optional) -> (object) A persistent object used to keep the script override available in memory. Heavily recommended to use this to ensure proper functionality, such as using a mod's script object from the ModLoader children. If not provided, uses the current pointer object, which may be freed depending on the operation. Defaults to `null`",
-						"script_storage_array_name (optional) -> (String) The array name that the persistent object uses to store objects. Defaults to `'_savedObjects'` as it is a standard name in ModMain scripts.",
+						"script_storage_object (optional) -> (object) A persistent object used to keep the script override available in memory. Heavily recommended to use this to ensure proper functionality, such as using a mod's script object from the ModLoader children. If not provided and the ModLoader autoload isn't available, uses the current pointer object, which may be freed depending on the operation. Defaults to `null`",
+						"script_storage_array_name (optional) -> (String) The array name that the persistent object uses to store objects if script_storage_object is set. Defaults to `'_savedObjects'` as it is a standard name in ModMain scripts.",
 						"scene_path (optional) -> (String/PoolStringArray) String or PoolStringArray containing the file path or paths to scenes to be updated. Using array of paths will have them update in order. Defaults to `PoolStringArray()`"
 					],
 				},
@@ -1402,8 +1402,8 @@ class _DataFormat:
 					"description":"Recreates and updates a scene to load changed sub-resources",
 					"args":[
 						"scene_path -> (String) the file path to the scene to be updated.",
-						"script_storage_object (optional) -> (object) A persistent object used to keep the script override available in memory. Heavily recommended to use this to ensure proper functionality, such as using a mod's script object from the ModLoader children. If not provided, uses the current pointer object, which may be freed depending on the operation. Defaults to `null`",
-						"script_storage_array_name (optional) -> (String) The array name that the persistent object uses to store objects. Defaults to `'_savedObjects'` as it is a standard name in ModMain scripts.",
+						"script_storage_object (optional) -> (object) A persistent object used to keep the script override available in memory. Heavily recommended to use this to ensure proper functionality, such as using a mod's script object from the ModLoader children. If not provided and the ModLoader autoload isn't available, uses the current pointer object, which may be freed depending on the operation. Defaults to `null`",
+						"script_storage_array_name (optional) -> (String) The array name that the persistent object uses to store objects if script_storage_object is set. Defaults to `'_savedObjects'` as it is a standard name in ModMain scripts.",
 					],
 				},
 				"__convert_var_from_string":{
@@ -1865,8 +1865,9 @@ class _DataFormat:
 		out.take_over_path(parentPath)
 		
 		if script_storage_object and script_storage_array_name and (script_storage_array_name in script_storage_object):
-			var h = script_storage_object.get(script_storage_array_name)
-			h.append(out)
+			script_storage_object[script_storage_array_name].append(out)
+		elif ModLoader != null:
+			ModLoader._savedObjects.append(out)
 		else:
 			_savedScriptObjects.append(out)
 	
@@ -1892,8 +1893,9 @@ class _DataFormat:
 			var scene := load(scene_replacement)
 			scene.take_over_path(scene_path)
 			if script_storage_object and script_storage_array_name and (script_storage_array_name in script_storage_object):
-				var h = script_storage_object.get(script_storage_array_name)
-				h.append(scene)
+				script_storage_object[script_storage_array_name].append(scene)
+			elif ModLoader != null:
+				ModLoader._savedObjects.append(scene)
 			else:
 				_savedScriptObjects.append(scene)
 	
@@ -5673,12 +5675,12 @@ class _ManifestV2:
 			
 			var modListArr = []
 			
-			var is_onready = ModLoader != null
-			var modNodes = {}
 			
-			if is_onready:
-				for child in ModLoader.get_children():
-					modNodes[child.get_script().get_path()] = child
+#			var modNodes = {}
+#			var is_onready = ModLoader != null
+#			if is_onready:
+#				for child in ModLoader.get_children():
+#					modNodes[child.get_script().get_path()] = child
 			
 			var folders = __get_modmain_files()
 			Debug.l("ManifestV2: found [%s] modmain files" % folders.size())
