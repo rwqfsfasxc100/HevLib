@@ -5724,142 +5724,33 @@ class _ManifestV2:
 			Debug.l("ManifestV2: found [%s] modmain files" % modmain_files.size())
 			for item in modmain_files:
 				Debug.l("ManifestV2: registering ModMain %s" % item)
-				var constants = pointers.DataFormat.__get_script_constant_map_without_load(item)
-				modListArr.append({"constants":constants,"script_path":item})
+				modListArr.append(__concat_mod_info(item))
 #				modListArr.append({"constants":constants,"script_path":item,"node":(modNodes[item]) if (is_onready or item in modNodes) else (null)})
 			var modlet_files = __get_modlet_files()
 			Debug.l("ManifestV2: found [%s] modlet files" % modlet_files.size())
 			for item in modlet_files:
 				Debug.l("ManifestV2: registering Modlet %s" % item)
-				var manifestData = __parse_file_as_manifest(item)
-				var constants = {
-					"MOD_PRIORITY":manifestData["manifest_definitions"].get("modlet_priority",0),
-					"MOD_NAME":manifestData["mod_information"].get("name",item.split("/")[2]),
-					"MOD_VERSION":manifestData["version"].get("version_string","1.0.0"),
-					"MOD_VERSION_MAJOR":manifestData["version"].get("version_major","1"),
-					"MOD_VERSION_MINOR":manifestData["version"].get("version_minor","0"),
-					"MOD_VERSION_BUGFIX":manifestData["version"].get("version_bugfix","0"),
-					"MOD_VERSION_METADATA":manifestData["version"].get("version_metadata",""),
-					"MOD_IS_LIBRARY":manifestData["library"].get("is_library",false),
-					"ALWAYS_DISPLAY":manifestData["library"].get("always_display",false),
-				}
-				modListArr.append({"constants":constants,"script_path":item})
+				modListArr.append(__concat_mod_info(item))
 			total_mod_count = modListArr.size()
 			print("ManifestV2: solved [%s] modmain files" % total_mod_count)
 			modListArr.sort_custom(self,"sortModList")
 			
-			var content = __get_manifest_files() + __get_icon_files()
-			
 			for mod in modListArr:
 				
-				var constants = mod.get("constants")
-				var script_path = mod.get("script_path")
-#				var node = mod.get("node")
-				
-				var folder_path = script_path.get_base_dir() + "/"
-				var mod_priority = constants.get("MOD_PRIORITY",0)
-				var mod_name = str(constants.get("MOD_NAME",script_path.split("/")[2]))
-				var legacy_mod_version = constants.get("MOD_VERSION","1.0.0")
-				var mod_version_major = constants.get("MOD_VERSION_MAJOR",1)
-				var mod_version_minor = constants.get("MOD_VERSION_MINOR",0)
-				var mod_version_bugfix = constants.get("MOD_VERSION_BUGFIX",0)
-				var mod_version_metadata = constants.get("MOD_VERSION_METADATA","")
-				var is_library = constants.get("MOD_IS_LIBRARY",false)
-				var always_display = constants.get("ALWAYS_DISPLAY",false)
-				
-				var has_mod_manifest = false
-				var manifest_data = {}
-				var manifest_version = 1
-				var has_icon_file = false
-				var png_path = ""
-				var stex_path = ""
-				var icon_path = ""
-				for content_file in content:
-					if content_file.begins_with(folder_path):
-						var ft = content_file.split(folder_path)[1]
-						if ft.to_lower() == "mod.manifest":
-							has_mod_manifest = true
-							manifest_count += 1
-							manifest_data = __parse_file_as_manifest(content_file)
-							mod_name = manifest_data["mod_information"].get("name",mod_name)
-							legacy_mod_version = manifest_data["version"].get("version_string",legacy_mod_version)
-							mod_version_major = manifest_data["version"].get("version_major",mod_version_major)
-							mod_version_minor = manifest_data["version"].get("version_minor",mod_version_minor)
-							mod_version_bugfix = manifest_data["version"].get("version_bugfix",mod_version_bugfix)
-							mod_version_metadata = manifest_data["version"].get("version_metadata",mod_version_metadata)
-							is_library = manifest_data["library"].get("is_library",false)
-							always_display = manifest_data["library"].get("always_display",false)
-							manifest_version = manifest_data["manifest_definitions"].get("manifest_version",1)
-							
-							if "tags" in manifest_data.keys():
-								for tag in manifest_data["tags"]:
-									if tag in stat_tags:
-										stat_tags[tag] += 1
-									else:
-										stat_tags.merge({tag:1})
-							
-						if ft.to_lower().begins_with("icon"):
-							if ft.to_lower().ends_with(".png"):
-								has_icon_file = true
-								png_path = content_file
-							if ft.to_lower().ends_with(".stex"):
-								has_icon_file = true
-								stex_path = content_file
-				if stex_path:
-					icon_path = stex_path
-				elif png_path:
-					icon_path = png_path
-				var icon_dict = {"has_icon_file":has_icon_file,"icon_path":icon_path}
-				var manifestEntry = {"has_manifest":has_mod_manifest,"manifest_version":manifest_version,"manifest_data":manifest_data}
-				var mod_version_array = [mod_version_major,mod_version_minor,mod_version_bugfix]
-				var mod_version_string = str(mod_version_major) + "." + str(mod_version_minor) + "." + str(mod_version_bugfix)
-				if not str(mod_version_metadata) == "":
-					mod_version_array.append(mod_version_metadata)
-					mod_version_string = mod_version_string + "-" + str(mod_version_metadata)
-				var version_dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
-				var drivers = pointers.DriverManagement.__get_drivers_from_modmain_path(script_path)
-				if "REPLACE_TRANSLATIONS.gd" in drivers:
-					var tlData = drivers["REPLACE_TRANSLATIONS.gd"]["TRANSLATIONS"]
-					var ml = tlData.get("master_locale","en")
-					tlData.erase("master_locale")
-					tlData.erase("file")
-					var master_locale = tlData.get(ml,{})
-					var total = master_locale.size()
-					var counts = {ml:{"has":total,"missing":0,"not_updated":0}}
-					for lang in tlData:
-						if lang != ml:
-							var langData = tlData[lang]
-							var lc = langData.size()
-							var not_in_master = 0
-							var not_updated = 0
-							for l in langData:
-								if not l in master_locale:
-									not_in_master += 1
-								else:
-									if langData[l].get("version_hash",0) != hash(master_locale[l].get("string","")):
-										not_updated += 1
-							counts[lang] = {"has":lc,"missing":total - (lc - not_in_master),"not_updated":not_updated}
-							counts[ml]["missing"] += not_in_master
-					if manifestEntry["has_manifest"]:
-						var manifest_langs = {}
-						for lang in counts:
-							var hs = float(counts[lang]["has"])
-							var ms = float(counts[lang]["missing"])
-							var nu = float(counts[lang]["not_updated"])
-							var not_updated_factor = 25 * (1 - ((hs - nu) / hs))
-							var bucket = hs/(hs+ms)
-							var percent = bucket * 100
-							var adjusted = percent - not_updated_factor
-							manifest_langs[lang] = "%3.1f%%" % [adjusted]
-						
-						
-						manifestEntry["manifest_data"]["languages"] = manifest_langs
-				
-				
-				var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"file_path":script_path,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"manifest":manifestEntry,"drivers":drivers}}
+				var mod_entry = __make_mod_entry(mod)
+				var manifest_data = mod_entry["manifest"]["manifest_data"]
+				if mod_entry["manifest"]["has_manifest"]:
+					manifest_count += 1
+				if "tags" in manifest_data:
+					for tag in manifest_data["tags"]:
+						if tag in stat_tags:
+							stat_tags[tag] += 1
+						else:
+							stat_tags.merge({tag:1})
 #				var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"node":node,"manifest":manifestEntry,"drivers":drivers}}
-				mod_dictionary.merge(mod_entry)
-				if is_library:
+				mod_dictionary.merge({mod.get("script_path",""):mod_entry})
+				
+				if mod_entry["library_information"]["is_library"]:
 					library_count += 1
 				else:
 					non_library_count += 1
@@ -5874,6 +5765,135 @@ class _ManifestV2:
 				return psj
 			else:
 				return cached_mod_list.duplicate(true)
+	
+	func __concat_mod_info(mod_path:String) -> Dictionary:
+		var cv = mod_path.get_file().to_lower()
+		if cv.begins_with("modmain") and cv.ends_with(".gd"):
+			var constants = pointers.DataFormat.__get_script_constant_map_without_load(mod_path)
+			return {"constants":constants,"script_path":mod_path,"mod_type":"mod"}
+		elif cv.begins_with("mod") and cv.ends_with(".manifest"):
+			var manifestData = __parse_file_as_manifest(mod_path)
+			var constants = {
+				"MOD_PRIORITY":manifestData["manifest_definitions"].get("modlet_priority",0),
+				"MOD_NAME":manifestData["mod_information"].get("name",mod_path.split("/")[2]),
+				"MOD_VERSION":manifestData["version"].get("version_string","1.0.0"),
+				"MOD_VERSION_MAJOR":manifestData["version"].get("version_major","1"),
+				"MOD_VERSION_MINOR":manifestData["version"].get("version_minor","0"),
+				"MOD_VERSION_BUGFIX":manifestData["version"].get("version_bugfix","0"),
+				"MOD_VERSION_METADATA":manifestData["version"].get("version_metadata",""),
+				"MOD_IS_LIBRARY":manifestData["library"].get("is_library",false),
+				"ALWAYS_DISPLAY":manifestData["library"].get("always_display",false),
+			}
+			return {"constants":constants,"script_path":mod_path,"mod_type":"modlet"}
+		return {}
+	
+	func __make_mod_entry(mod: Dictionary):
+		var constants : Dictionary = mod.get("constants")
+		var script_path : String = mod.get("script_path")
+		var folder_path : String = script_path.get_base_dir() + "/"
+		var mod_priority : int = constants.get("MOD_PRIORITY",0)
+		var mod_name : String = str(constants.get("MOD_NAME",script_path.split("/")[2]))
+		var legacy_mod_version : String = constants.get("MOD_VERSION","1.0.0")
+		var mod_version_major : int = constants.get("MOD_VERSION_MAJOR",1)
+		var mod_version_minor : int = constants.get("MOD_VERSION_MINOR",0)
+		var mod_version_bugfix : int = constants.get("MOD_VERSION_BUGFIX",0)
+		var mod_version_metadata : String = constants.get("MOD_VERSION_METADATA","")
+		var is_library : bool = constants.get("MOD_IS_LIBRARY",false)
+		var always_display : bool = constants.get("ALWAYS_DISPLAY",false)
+		
+		var has_mod_manifest := false
+		var manifest_data := {}
+		var manifest_version := 1
+		var has_icon_file := false
+		var png_path := ""
+		var stex_path := ""
+		var icon_path := ""
+		var content : Array = __get_manifest_files() + __get_icon_files()
+		
+		var mod_enabled := true
+		var script_filename : String = script_path.get_file().to_lower()
+		
+		if script_filename.begins_with("mod") and script_filename.ends_with(".manifest"):
+			var current = __get_modlet_files()
+			if not script_path in current:
+				mod_enabled = false
+		
+		for content_file in content:
+			if content_file.begins_with(folder_path):
+				var ft = content_file.split(folder_path)[1]
+				if ft.to_lower() == "mod.manifest":
+					has_mod_manifest = true
+					
+					manifest_data = __parse_file_as_manifest(content_file)
+					mod_name = manifest_data["mod_information"].get("name",mod_name)
+					legacy_mod_version = manifest_data["version"].get("version_string",legacy_mod_version)
+					mod_version_major = manifest_data["version"].get("version_major",mod_version_major)
+					mod_version_minor = manifest_data["version"].get("version_minor",mod_version_minor)
+					mod_version_bugfix = manifest_data["version"].get("version_bugfix",mod_version_bugfix)
+					mod_version_metadata = manifest_data["version"].get("version_metadata",mod_version_metadata)
+					is_library = manifest_data["library"].get("is_library",false)
+					always_display = manifest_data["library"].get("always_display",false)
+					manifest_version = manifest_data["manifest_definitions"].get("manifest_version",1)
+					
+					
+					
+				if ft.to_lower().begins_with("icon"):
+					if ft.to_lower().ends_with(".png"):
+						has_icon_file = true
+						png_path = content_file
+					if ft.to_lower().ends_with(".stex"):
+						has_icon_file = true
+						stex_path = content_file
+		if stex_path:
+			icon_path = stex_path
+		elif png_path:
+			icon_path = png_path
+		var icon_dict : Dictionary = {"has_icon_file":has_icon_file,"icon_path":icon_path}
+		var manifestEntry : Dictionary = {"has_manifest":has_mod_manifest,"manifest_version":manifest_version,"manifest_data":manifest_data}
+		var mod_version_array : Array = [mod_version_major,mod_version_minor,mod_version_bugfix]
+		var mod_version_string : String = str(mod_version_major) + "." + str(mod_version_minor) + "." + str(mod_version_bugfix)
+		if not str(mod_version_metadata) == "":
+			mod_version_array.append(mod_version_metadata)
+			mod_version_string = mod_version_string + "-" + str(mod_version_metadata)
+		var version_dictionary : Dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
+		var drivers : Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(script_path)
+		if "REPLACE_TRANSLATIONS.gd" in drivers:
+			var tlData : Dictionary = drivers["REPLACE_TRANSLATIONS.gd"]["TRANSLATIONS"]
+			var ml : String = tlData.get("master_locale","en")
+			tlData.erase("master_locale")
+			tlData.erase("file")
+			var master_locale : Dictionary = tlData.get(ml,{})
+			var total : int = master_locale.size()
+			var counts : Dictionary = {ml:{"has":total,"missing":0,"not_updated":0}}
+			for lang in tlData:
+				if lang != ml:
+					var langData : Dictionary = tlData[lang]
+					var lc : int = langData.size()
+					var not_in_master := 0
+					var not_updated := 0
+					for l in langData:
+						if not l in master_locale:
+							not_in_master += 1
+						else:
+							if langData[l].get("version_hash",0) != hash(master_locale[l].get("string","")):
+								not_updated += 1
+					counts[lang] = {"has":lc,"missing":total - (lc - not_in_master),"not_updated":not_updated}
+					counts[ml]["missing"] += not_in_master
+			if manifestEntry["has_manifest"]:
+				var manifest_langs = {}
+				for lang in counts:
+					var hs : float = float(counts[lang]["has"])
+					var ms : float = float(counts[lang]["missing"])
+					var nu : float = float(counts[lang]["not_updated"])
+					var not_updated_factor : float = 25 * (1 - ((hs - nu) / hs))
+					var bucket : float = hs/(hs+ms)
+					var percent : float = bucket * 100
+					var adjusted : float = percent - not_updated_factor
+					manifest_langs[lang] = "%3.1f%%" % [adjusted]
+				
+				
+				manifestEntry["manifest_data"]["languages"] = manifest_langs
+		return {"name":mod_name,"priority":mod_priority,"file_path":script_path,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"manifest":manifestEntry,"drivers":drivers,"mod_type":mod["mod_type"],"enabled":mod_enabled}
 	
 	static func sortModList(a,b):
 		var c1 = a.get("constants",{}).get("MOD_PRIORITY",0)
@@ -6721,44 +6741,51 @@ class _ManifestV2:
 	var all_modlet_file_list = []
 	var all_modlet_definitions = {}
 	
-	func __get_all_modlets(only_show_installed : bool = true) -> Dictionary:
-		if not all_modlet_file_list:
-			var manifests = __get_manifest_files()
-			var manifest_checks = []
-			for i in manifests:
-				manifest_checks.append(i.to_lower())
-			var allModFiles = __get_mod_files()
-			for r in allModFiles:
-				var i : String = r.get_file().to_lower()
-				if (i.begins_with("modmain") and i.ends_with(".gd")):
-					var mr = r.get_base_dir().to_lower() + "/mod.manifest"
-					if mr in manifest_checks:
-						manifest_checks.erase(mr)
-			var ov = []
-			for i in manifests:
-				if i.to_lower() in manifest_checks:
-					ov.append(i)
-			ov.sort_custom(self,"sort_modlet_files")
-			all_modlet_file_list = ov
-		
-		var modlets = all_modlet_file_list.duplicate()
-		var allowed_modlets = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets")
-		if allowed_modlets == null:
-			pointers.ConfigDriver.__store_value("HevLib","modlets","seen_modlets",{})
-			allowed_modlets = {}
-		active_modlet_file_list = []
-		for mod in modlets:
-			if not mod in allowed_modlets:
-				allowed_modlets[mod] = true
-			if allowed_modlets[mod]:
-				active_modlet_file_list.append(mod)
-		pointers.ConfigDriver.__store_value("HevLib","modlets","seen_modlets",allowed_modlets)
-		var out = allowed_modlets.duplicate(true)
+	var cached_modlets = {}
+	
+	func __get_all_modlets(only_show_installed : bool = true,recache : bool = false) -> Dictionary:
+		if not cached_modlets or recache:
+			if not all_modlet_file_list:
+				var manifests = __get_manifest_files()
+				var manifest_checks = []
+				for i in manifests:
+					manifest_checks.append(i.to_lower())
+				var allModFiles = __get_mod_files()
+				for r in allModFiles:
+					var i : String = r.get_file().to_lower()
+					if (i.begins_with("modmain") and i.ends_with(".gd")):
+						var mr = r.get_base_dir().to_lower() + "/mod.manifest"
+						if mr in manifest_checks:
+							manifest_checks.erase(mr)
+				var ov = []
+				for i in manifests:
+					if i.to_lower() in manifest_checks:
+						ov.append(i)
+				ov.sort_custom(self,"sort_modlet_files")
+				all_modlet_file_list = ov
+				pointers.ConfigDriver.__subscribe_to_setting_change("recache_modlets",self,"HevLib","modlets","seen_modlets")
+			var modlets = all_modlet_file_list.duplicate()
+			var allowed_modlets = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets")
+			if allowed_modlets == null:
+				pointers.ConfigDriver.__store_value("HevLib","modlets","seen_modlets",{})
+				allowed_modlets = {}
+			active_modlet_file_list = []
+			for mod in modlets:
+				if not mod in allowed_modlets:
+					allowed_modlets[mod] = true
+				if allowed_modlets[mod]:
+					active_modlet_file_list.append(mod)
+			pointers.ConfigDriver.__store_value("HevLib","modlets","seen_modlets",allowed_modlets)
+			cached_modlets = allowed_modlets
+		var out = cached_modlets.duplicate(true)
 		if only_show_installed:
-			for mod in allowed_modlets:
+			for mod in cached_modlets:
 				if not mod in active_modlet_file_list:
 					out.erase(mod)
 		return out
+	
+	func recache_modlets():
+		__get_all_modlets(false,true)
 	
 	func sort_modlet_files(a:String,b:String):
 		var aPrio = __parse_file_as_manifest(a)["manifest_definitions"]["modlet_priority"]
