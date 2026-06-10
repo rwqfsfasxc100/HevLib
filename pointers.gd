@@ -1891,8 +1891,8 @@ class _DataFormat:
 			__reload_scene(sc, script_storage_object, script_storage_array_name)
 	
 	func __reload_scene(scene_path : String, script_storage_object = null, script_storage_array_name : String = "_savedObjects"):
-		if scene_path and scene_path is String and ResourceLoader.exists(scene_path):
-			var scn = load(scene_path).instance()
+		if __load_if_can(scene_path):
+			var scn = __get_load().instance()
 			var root = scn.name
 			Tool.remove(scn)
 			var scene_replacement = "user://cache/.HevLib_Cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec()
@@ -1909,6 +1909,11 @@ class _DataFormat:
 				ModLoader._savedObjects.append(scene)
 			else:
 				_savedScriptObjects.append(scene)
+	
+	func __override_script(file_path : String, script_storage_object = null, script_storage_array_name : String = "_savedObjects"):
+		if __load_if_can(file_path):
+			var sc = __get_load().get_source_code()
+			__compile_and_override_script(sc,script_storage_object,script_storage_array_name)
 	
 	func __replace_resource(resource_path:String, original_path:String, script_storage_object = null, script_storage_array_name : String = "_savedObjects"):
 		if not ResourceLoader.exists(resource_path) or not ResourceLoader.exists(original_path):
@@ -5715,13 +5720,30 @@ class _ManifestV2:
 #				for child in ModLoader.get_children():
 #					modNodes[child.get_script().get_path()] = child
 			
-			var folders = __get_modmain_files()
-			Debug.l("ManifestV2: found [%s] modmain files" % folders.size())
-			for item in folders:
-				Debug.l("ManifestV2: registering %s" % item)
+			var modmain_files = __get_modmain_files()
+			Debug.l("ManifestV2: found [%s] modmain files" % modmain_files.size())
+			for item in modmain_files:
+				Debug.l("ManifestV2: registering ModMain %s" % item)
 				var constants = pointers.DataFormat.__get_script_constant_map_without_load(item)
 				modListArr.append({"constants":constants,"script_path":item})
 #				modListArr.append({"constants":constants,"script_path":item,"node":(modNodes[item]) if (is_onready or item in modNodes) else (null)})
+			var modlet_files = __get_modlet_files()
+			Debug.l("ManifestV2: found [%s] modlet files" % modlet_files.size())
+			for item in modlet_files:
+				Debug.l("ManifestV2: registering Modlet %s" % item)
+				var manifestData = __parse_file_as_manifest(item)
+				var constants = {
+					"MOD_PRIORITY":manifestData["manifest_definitions"].get("modlet_priority",0),
+					"MOD_NAME":manifestData["mod_information"].get("name",item.split("/")[2]),
+					"MOD_VERSION":manifestData["version"].get("version_string","1.0.0"),
+					"MOD_VERSION_MAJOR":manifestData["version"].get("version_major","1"),
+					"MOD_VERSION_MINOR":manifestData["version"].get("version_minor","0"),
+					"MOD_VERSION_BUGFIX":manifestData["version"].get("version_bugfix","0"),
+					"MOD_VERSION_METADATA":manifestData["version"].get("version_metadata",""),
+					"MOD_IS_LIBRARY":manifestData["library"].get("is_library",false),
+					"ALWAYS_DISPLAY":manifestData["library"].get("always_display",false),
+				}
+				modListArr.append({"constants":constants,"script_path":item})
 			total_mod_count = modListArr.size()
 			print("ManifestV2: solved [%s] modmain files" % total_mod_count)
 			modListArr.sort_custom(self,"sortModList")
@@ -6837,9 +6859,20 @@ class _ManifestV2:
 				var resources = drivers["LOAD_RESOURCES.gd"].get("LOAD_RESOURCES",{})
 				if resources and typeof(resources) == TYPE_DICTIONARY:
 					for resource in resources:
-						var load_type = resources[resource]
-						var path = resource if resource.begins_with("res://") else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
-						pass
+						var subdata = resources[resource]
+						var load_type = subdata.get("load_type","").to_lower()
+						var is_relative = resource.begins_with("res://")
+						
+						match load_type:
+							"script":
+								var path = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
+								pointers.DataFormat.__override_script(path,modloader)
+							"scene","resource":
+								var path = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
+								var old = subdata.get("original_path","")
+								var old_relative = old.begins_with("res://")
+								var old_path = old if old_relative else (modlet.get_base_dir() + ("" if old.begins_with("/") else "/") + old)
+								pointers.DataFormat.__replace_resource(path,old_path,modloader)
 	
 	
 	
