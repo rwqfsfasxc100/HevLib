@@ -1,4 +1,4 @@
-[gd_scene load_steps=41 format=2]
+[gd_scene load_steps=43 format=2]
 
 [ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=1]
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=2]
@@ -25,6 +25,8 @@
 [ext_resource path="res://HevLib/ui/themes/fonts/courier_new/font-courierbolditalic.tres" type="DynamicFont" id=23]
 [ext_resource path="res://HevLib/ui/mod_menu/modpacks/ModpacksMenu.tscn" type="PackedScene" id=24]
 [ext_resource path="res://HevLib/ui/mod_menu/fetch_github/FetchGithub.tscn" type="PackedScene" id=25]
+[ext_resource path="res://HevLib/ui/themes/fonts/verdana/font-verdana-small.tres" type="DynamicFont" id=26]
+[ext_resource path="res://HevLib/ui/mod_menu/ToggleModlet.gd" type="Script" id=27]
 
 [sub_resource type="StreamTexture" id=3]
 flags = 4
@@ -365,8 +367,8 @@ info_version = NodePath("../../ModInfo/Header/TEXT/NUMBERS/VERSION")
 info_priority = NodePath("../../ModInfo/DESC/ScrollContainer/VBoxContainer/PDIVIDE/PRIO")
 info_mod_id = NodePath("../../ModInfo/DESC/ScrollContainer/VBoxContainer/PDIVIDE/MID")
 info_author = NodePath("../../ModInfo/Header/TEXT/PRIO & NAMES/AUTHOR")
-info_settings_button = NodePath("../../ModInfo/Header/SETTINGS")
-info_settings_icon = NodePath("../../ModInfo/Header/SETTINGS/SETTINGSICON")
+info_settings_button = NodePath("../../ModInfo/Header/SETTINGS/SETTINGS")
+info_settings_icon = NodePath("../../ModInfo/Header/SETTINGS/SETTINGS/SETTINGSICON")
 info_desc = NodePath("../../ModInfo/DESC")
 info_desc_text = NodePath("../../ModInfo/DESC/ScrollContainer/VBoxContainer/DESCRIPTION")
 info_desc_author = NodePath("../../ModInfo/DESC/ScrollContainer/VBoxContainer/AUTHOR")
@@ -383,6 +385,8 @@ changelogs_menu_path = NodePath("../../../../../../MMChangelogMenu")
 conflict_button_path = NodePath("../../ModInfo/WarningButtons/CFB")
 dependancies_button_path = NodePath("../../ModInfo/WarningButtons/DB")
 updates_button_path = NodePath("../../ModInfo/WarningButtons/UB")
+toggle_modlet_box = NodePath("../../ModInfo/Header/MODLET_TOGGLE")
+toggle_modlet_button = NodePath("../../ModInfo/Header/MODLET_TOGGLE/TOGGLE_MODLET")
 subroot_path = NodePath("../../../../../..")
 desc_scroll_box = NodePath("../../ModInfo/DESC/ScrollContainer")
 conflict_menu_path = NodePath("../../../../../../ConflictMenu")
@@ -454,13 +458,13 @@ expand = true
 
 [node name="TEXT" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header"]
 margin_left = 104.0
-margin_right = 692.0
+margin_right = 398.0
 margin_bottom = 100.0
 mouse_filter = 2
 size_flags_horizontal = 3
 
 [node name="NAME" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/TEXT"]
-margin_right = 588.0
+margin_right = 294.0
 margin_bottom = 29.0
 size_flags_horizontal = 3
 custom_fonts/font = ExtResource( 3 )
@@ -471,11 +475,11 @@ uppercase = true
 [node name="NUMBERS" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/TEXT"]
 modulate = Color( 0.54902, 0.54902, 0.54902, 1 )
 margin_top = 33.0
-margin_right = 588.0
+margin_right = 294.0
 margin_bottom = 62.0
 
 [node name="VERSION" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/TEXT/NUMBERS"]
-margin_right = 588.0
+margin_right = 294.0
 margin_bottom = 29.0
 size_flags_horizontal = 3
 size_flags_vertical = 1
@@ -486,11 +490,11 @@ clip_text = true
 [node name="PRIO & NAMES" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/TEXT"]
 modulate = Color( 0.54902, 0.54902, 0.54902, 1 )
 margin_top = 66.0
-margin_right = 588.0
+margin_right = 294.0
 margin_bottom = 95.0
 
 [node name="AUTHOR" type="RichTextLabel" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/TEXT/PRIO & NAMES"]
-margin_right = 588.0
+margin_right = 294.0
 margin_bottom = 29.0
 rect_min_size = Vector2( 0, 29 )
 size_flags_horizontal = 3
@@ -504,22 +508,53 @@ bbcode_text = "MOD_AUTHOR"
 text = "MOD_AUTHOR"
 scroll_active = false
 
-[node name="SETTINGS" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header"]
+[node name="MODLET_TOGGLE" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header"]
+margin_left = 402.0
+margin_right = 692.0
+margin_bottom = 100.0
+alignment = 1
+
+[node name="Label" type="Label" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/MODLET_TOGGLE"]
+margin_top = 11.0
+margin_right = 290.0
+margin_bottom = 43.0
+custom_fonts/font = ExtResource( 26 )
+text = "HEVLIB_MODLET_ENABLED"
+
+[node name="TOGGLE_MODLET" type="CheckButton" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/MODLET_TOGGLE"]
+margin_top = 47.0
+margin_right = 290.0
+margin_bottom = 89.0
+focus_neighbour_left = NodePath("../../../../SPLIT/ListHeader/OptionButtonBox/DOWNLOAD")
+focus_neighbour_top = NodePath(".")
+focus_neighbour_right = NodePath("../../SETTINGS/SETTINGS")
+focus_neighbour_bottom = NodePath("../../../LINKBOX/BUGREPORTS")
+focus_next = NodePath("../../SETTINGS/SETTINGS")
+focus_previous = NodePath("../../../../SPLIT/ListHeader/OptionButtonBox/DOWNLOAD")
+script = ExtResource( 27 )
+
+[node name="SETTINGS" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header"]
 margin_left = 696.0
 margin_right = 758.0
-margin_bottom = 62.0
+margin_bottom = 100.0
+alignment = 1
+
+[node name="SETTINGS" type="Button" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/SETTINGS"]
+margin_top = 19.0
+margin_right = 62.0
+margin_bottom = 81.0
 rect_min_size = Vector2( 62, 62 )
 hint_tooltip = "HEVLIB_SETTINGS_BUTTON_TOOLTIP"
-focus_neighbour_left = NodePath("../../../SPLIT/ListHeader/OptionButtonBox/FILTER")
+focus_neighbour_left = NodePath("../../MODLET_TOGGLE/TOGGLE_MODLET")
 focus_neighbour_top = NodePath(".")
 focus_neighbour_right = NodePath(".")
-focus_neighbour_bottom = NodePath("../../LINKBOX/BUGREPORTS")
-focus_next = NodePath("../../LINKBOX/LINKS")
-focus_previous = NodePath("../../../SPLIT/ListHeader/OptionButtonBox/FILTER")
+focus_neighbour_bottom = NodePath("../../../LINKBOX/BUGREPORTS")
+focus_next = NodePath("../../../LINKBOX/LINKS")
+focus_previous = NodePath("../../MODLET_TOGGLE/TOGGLE_MODLET")
 size_flags_horizontal = 0
 size_flags_vertical = 0
 
-[node name="SETTINGSICON" type="TextureRect" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/SETTINGS"]
+[node name="SETTINGSICON" type="TextureRect" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/SETTINGS/SETTINGS"]
 margin_right = 40.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 62, 62 )
@@ -527,7 +562,7 @@ mouse_filter = 2
 texture = SubResource( 2 )
 expand = true
 
-[node name="PlaySoundsOnTheseButtons" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/SETTINGS" instance=ExtResource( 1 )]
+[node name="PlaySoundsOnTheseButtons" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/SETTINGS/SETTINGS" instance=ExtResource( 1 )]
 
 [node name="LINKBOX" type="HBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo"]
 margin_top = 183.0
@@ -542,9 +577,9 @@ margin_right = 238.0
 margin_bottom = 33.0
 rect_min_size = Vector2( 150, 0 )
 hint_tooltip = "HEVLIB_LINKS_TOOLTIP"
-focus_neighbour_top = NodePath("../../Header/SETTINGS")
+focus_neighbour_top = NodePath("../../Header/SETTINGS/SETTINGS")
 focus_neighbour_bottom = NodePath("../../DESC")
-focus_previous = NodePath("../../Header/SETTINGS")
+focus_previous = NodePath("../../Header/SETTINGS/SETTINGS")
 custom_fonts/font = ExtResource( 3 )
 text = "HEVLIB_LINKS_BUTTON"
 
@@ -577,9 +612,9 @@ margin_right = 540.0
 margin_bottom = 33.0
 rect_min_size = Vector2( 150, 0 )
 hint_tooltip = "HEVLIB_BUGREPORTS_TOOLTIP"
-focus_neighbour_top = NodePath("../../Header/SETTINGS")
+focus_neighbour_top = NodePath("../../Header/SETTINGS/SETTINGS")
 focus_neighbour_bottom = NodePath("../../DESC")
-focus_previous = NodePath("../../Header/SETTINGS")
+focus_previous = NodePath("../../Header/SETTINGS/SETTINGS")
 custom_fonts/font = ExtResource( 3 )
 text = "HEVLIB_BUGREPORTS_BUTTON"
 script = ExtResource( 17 )
@@ -1121,7 +1156,7 @@ modmenu = NodePath("..")
 [connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/MODPACKS" to="ModpacksMenu" method="show_menu"]
 [connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ListHeader/OptionButtonBox/DOWNLOAD" to="FetchGithub" method="show_menu"]
 [connection signal="visibility_changed" from="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList" to="base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList" method="_visibility_changed"]
-[connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/SETTINGS" to="ModSettingsMenu" method="show_menu"]
+[connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/SETTINGS/SETTINGS" to="ModSettingsMenu" method="show_menu"]
 [connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/LINKBOX/LINKS" to="URLPopup" method="show_menu"]
 [connection signal="visibility_changed" from="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/LINKBOX/LINKS/LabelContainer" to="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/LINKBOX/LINKS/LabelContainer" method="_visibility_changed"]
 [connection signal="pressed" from="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/LINKBOX/BUGREPORTS" to="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/LINKBOX/BUGREPORTS" method="_pressed"]

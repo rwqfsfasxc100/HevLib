@@ -3,44 +3,47 @@ extends HBoxContainer
 var pointers
 export var mod_box = preload("res://HevLib/ui/mod_menu/mod_list/mod_box/ModBox.tscn")
 
-export var info_icon = NodePath("")
-export var info_name = NodePath("")
-export var info_version = NodePath("")
-export var info_priority = NodePath("")
-export var info_mod_id = NodePath("")
-export var info_author = NodePath("")
-export var info_settings_button = NodePath("")
-export var info_settings_icon = NodePath("")
-export var info_desc = NodePath("")
-export var info_desc_text = NodePath("")
-export var info_desc_author = NodePath("")
-export var info_desc_credits = NodePath("")
-export var info_desc_languages = NodePath("")
-export var info_links_button = NodePath("")
-export var info_bugreports_button = NodePath("")
-export var info_changelog_button = NodePath("")
+export (NodePath) var info_icon = NodePath("")
+export (NodePath) var info_name = NodePath("")
+export (NodePath) var info_version = NodePath("")
+export (NodePath) var info_priority = NodePath("")
+export (NodePath) var info_mod_id = NodePath("")
+export (NodePath) var info_author = NodePath("")
+export (NodePath) var info_settings_button = NodePath("")
+export (NodePath) var info_settings_icon = NodePath("")
+export (NodePath) var info_desc = NodePath("")
+export (NodePath) var info_desc_text = NodePath("")
+export (NodePath) var info_desc_author = NodePath("")
+export (NodePath) var info_desc_credits = NodePath("")
+export (NodePath) var info_desc_languages = NodePath("")
+export (NodePath) var info_links_button = NodePath("")
+export (NodePath) var info_bugreports_button = NodePath("")
+export (NodePath) var info_changelog_button = NodePath("")
 
-export var count_label_path = NodePath("")
+export (NodePath) var count_label_path = NodePath("")
 onready var count_label = get_node(count_label_path)
-export var filter_btn_path = NodePath("")
+export (NodePath) var filter_btn_path = NodePath("")
 onready var filter_btn = get_node(filter_btn_path)
 
-export var links_menu_path = NodePath("")
+export (NodePath) var links_menu_path = NodePath("")
 onready var links_menu = get_node(links_menu_path)
-export var settings_menu_path = NodePath("")
+export (NodePath) var settings_menu_path = NodePath("")
 onready var settings_menu = get_node(settings_menu_path)
-export var changelogs_menu_path = NodePath("")
+export (NodePath) var changelogs_menu_path = NodePath("")
 onready var changelogs_menu = get_node(changelogs_menu_path)
 
 onready var listContainer = $ScrollContainer/VBoxContainer
 
-export var conflict_button_path = NodePath("")
-export var dependancies_button_path = NodePath("")
-export var updates_button_path = NodePath("")
+export (NodePath) var conflict_button_path = NodePath("")
+export (NodePath) var dependancies_button_path = NodePath("")
+export (NodePath) var updates_button_path = NodePath("")
 
 onready var conflict_button = get_node(conflict_button_path)
 onready var dependancies_button = get_node(dependancies_button_path)
 onready var updates_button = get_node(updates_button_path)
+
+export (NodePath) var toggle_modlet_box = NodePath("")
+export (NodePath) var toggle_modlet_button = NodePath("")
 
 var yet_to_connect = true
 
@@ -105,6 +108,8 @@ func _ready():
 		"conflict_button":get_node(conflict_button_path),
 		"dependancies_button":get_node(dependancies_button_path),
 		"updates_button":get_node(updates_button_path),
+		"toggle_modlet_box":get_node(toggle_modlet_box),
+		"toggle_modlet_button":get_node(toggle_modlet_button),
 	}
 	var data = pointers.ManifestV2.__get_mod_data()["mods"]
 	var groups = {}
@@ -127,11 +132,21 @@ func _ready():
 	vd["version_data"]["full_version_string"] = verstr
 	vd["version_data"]["legacy_mod_version"] = verstr
 	
+	vd["drivers"] = {}
+	vd["mod_type"] = "mod"
+	vd["enabled"] = true
+	
 	mod_data.merge({"VANILLA":vd})
 	
 	var manifests = []
 	var manifestGroups = {}
 	var mainManifestMods = {}
+	
+	var all_modlets = pointers.ManifestV2.__get_all_modlets(false)
+	for modlet in all_modlets:
+		if not all_modlets[modlet]:
+			var dict = pointers.ManifestV2.__make_mod_entry(pointers.ManifestV2.__concat_mod_info(modlet))
+			data[modlet] = dict
 	
 	for mod in data:
 		var fname = mod.split("/")[2]
@@ -190,6 +205,7 @@ func _ready():
 	for mod in mod_data:
 		var info = mod_data[mod]
 		var button = mod_box.instance()
+		
 		button.MOD_INFO = info
 		button.name = info["name"]
 		button.ModContainer = get_parent()
@@ -235,6 +251,8 @@ func make_info_default_state():
 	get_node(info_links_button).visible = false
 	get_node(info_bugreports_button).visible = false
 	get_node(info_changelog_button).visible = false
+	get_node(toggle_modlet_box).visible = false
+
 
 func _process(_delta):
 	

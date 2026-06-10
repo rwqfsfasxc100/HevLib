@@ -65,6 +65,7 @@ var active_events_file = "user://cache/.HevLib_Cache/Event_Driver/active_events.
 var latest_event_file = "user://cache/.HevLib_Cache/Event_Driver/latest_event.txt"
 
 var releases_cache = "user://cache/.Mod_Menu_2_Cache/github_list/releases_cache.json"
+var modlet_toggle_restart_path = "user://cache/.Mod_Menu_2_Cache/updates/modlet_restart_requests.json"
 
 func _ready():
 	if correct:
@@ -120,6 +121,9 @@ func _ready():
 		file.close()
 		file.open(latest_event_file,File.WRITE)
 		file.store_string("")
+		file.close()
+		file.open(modlet_toggle_restart_path,File.WRITE)
+		file.store_string("[]")
 		file.close()
 		var mod_data = pointers.ManifestV2.__get_mod_data(true)
 		var md = pointers.ManifestV2.__get_mod_data()

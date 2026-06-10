@@ -39,18 +39,30 @@ var complementary = []
 var already_pressed = false
 var submod_visibility = false
 
+var has_update = false
+var has_dep = false
+var has_conf = false
+var has_links = false
+var has_bugreports = false
+var has_settings = false
+
+var is_modlet = false
+var needs_restart_from_toggling = false
+var modlet_toggle_restart_path = "user://cache/.Mod_Menu_2_Cache/updates/modlet_restart_requests.json"
+
 func _pressed():
 	if not pointers:
 		pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	information_nodes["mod_list"].make_info_default_state()
 	
-	var has_update = false
-	var has_dep = false
-	var has_conf = false
-	var has_links = false
-	var has_bugreports = false
-	var has_settings = false
+	var mod_path = MOD_INFO["file_path"]
+	var mod_dir = mod_path.get_base_dir() + "/"
 	
+	file.open(modlet_toggle_restart_path,File.READ)
+	var restarting_modlets = JSON.parse(file.get_as_text()).result
+	file.close()
+	if mod_path in restarting_modlets:
+		needs_restart_from_toggling = true
 	
 	var manifestData = MOD_INFO["manifest"]["manifest_data"]
 	already_pressed = false
@@ -161,9 +173,7 @@ func _pressed():
 			information_nodes["settings_menu"].SELECTED_MOD_ID = id
 		var changelog = manifestData["manifest_definitions"].get("changelog_path","")
 		if changelog != "":
-			var path = MOD_INFO["file_path"]
-			var modpath = path.split(path.split("/")[path.split("/").size() - 1])[0]
-			var c = modpath + changelog
+			var c = mod_dir + changelog
 			if file.file_exists(c):
 				information_nodes["info_changelog_button"].visible = true
 				information_nodes["changelog_menu"].update_this(c)
@@ -219,7 +229,7 @@ func _pressed():
 		has_dep = true
 	else:
 		information_nodes["dependancies_button"].visible = false
-		
+	
 	if id in conflict_data:
 		information_nodes["conflict_button"].visible = true
 		var cd = ""
@@ -230,23 +240,15 @@ func _pressed():
 		has_conf = true
 	else:
 		information_nodes["conflict_button"].visible = false
-	if has_links:
-		information_nodes["info_desc"].focus_neighbour_top = NodePath("../LINKBOX/LINKS")
-	elif has_bugreports:
-		information_nodes["info_desc"].focus_neighbour_top = NodePath("../LINKBOX/BUGREPORTS")
-	elif has_settings:
-		information_nodes["info_desc"].focus_neighbour_top = NodePath("../Header/SETTINGS")
-	else:
-		information_nodes["info_desc"].focus_neighbour_top = NodePath("../../SPLIT/ListHeader/SearchBox/FILTER")
-		
-#	information_nodes["info_desc"].focus_neighbour_top = NodePath("")
 	
-	if has_update:
-		information_nodes["info_desc"].focus_neighbour_top = NodePath("../WarningButtons/UB")
-	elif has_dep:
-		information_nodes["info_desc"].focus_neighbour_top = NodePath("../WarningButtons/DB")
-	elif has_conf:
-		information_nodes["info_desc"].focus_neighbour_top = NodePath("../WarningButtons/CFB")
+	is_modlet = MOD_INFO["mod_type"] == "modlet"
+	if is_modlet:
+		information_nodes["toggle_modlet_button"].change_modlet_to(self,mod_path)
+	information_nodes["toggle_modlet_box"].visible = is_modlet
+	
+	
+	focus_button_neighbours(true)
+	
 	
 	
 
@@ -293,6 +295,7 @@ func _ready():
 
 
 var ID = null
+
 
 func _draw():
 	if not pointers:
@@ -358,7 +361,19 @@ func _draw():
 	button_box.rect_size.x = button.rect_size.x - 4
 	button_box.rect_size.y = 94
 	
-	var mod_name = MOD_INFO["name"]
+	var disabled_text : String = ""
+	var is_disabled := false
+	if is_modlet:
+		if not MOD_INFO["enabled"]:
+			is_disabled = true
+			if needs_restart_from_toggling:
+				disabled_text = TranslationServer.translate("HEVLIB_MODMENU_MODNAME_DISABLED_NEEDS_RESTART") + " "
+			else:
+				disabled_text = TranslationServer.translate("HEVLIB_MODMENU_MODNAME_DISABLED") + " "
+		elif needs_restart_from_toggling:
+			disabled_text = TranslationServer.translate("HEVLIB_MODMENU_MODNAME_ENABLED_NEEDS_RESTART") + " "
+	
+	var mod_name = disabled_text + MOD_INFO["name"]
 	var prio = MOD_INFO["priority"]
 	if str(prio).ends_with("INF"):
 		if str(prio).begins_with("-"):
@@ -388,6 +403,10 @@ func _draw():
 	if is_library:
 		button_lib_icon.visible = true
 	button_label.text = mod_name
+	if is_disabled:
+		get_child(0).modulate = Color(0.5,0.5,0.5,1)
+	else:
+		get_child(0).modulate = Color(1,1,1,1)
 	icon_node.texture = iconTexture
 	var tooltip_text = TranslationServer.translate("HEVLIB_MM_TOOLTIP_HEADER")
 
@@ -441,22 +460,6 @@ func _draw():
 		handle_sub_mods()
 	
 	
-	
-	
-	
-#	conflicts = ManifestV2.__check_mod_conflicts(ID)
-#	dependancies = ManifestV2.__check_mod_dependancies(ID)
-#	complementary = ManifestV2.__check_mod_complementary(ID)
-#	if conflicts:
-#		$Icon/Control/Conflicts.visible = true
-#	if dependancies:
-#		$Icon/Control/Dependancies.visible = true
-#	if complementary:
-#		$Icon/Control/Complementary.visible = true
-	
-	
-	
-#	_refocus()
 var descbox = "../ModInfo/DESC"
 func _input(event):
 	if Input.is_action_just_pressed("ui_focus_next") or Input.is_action_just_pressed("ui_focus_prev"):
@@ -467,13 +470,6 @@ func _input(event):
 			get_viewport().set_input_as_handled()
 
 onready var desc_box = ModContainer.get_node(descbox)
-#func _process(_delta):
-#	if is_visible_in_tree():
-#		MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)
-#		button_box.rect_size.x = button.rect_size.x - 4
-#		button_box.rect_size.y = 94
-		
-		
 
 func get_button(pos):
 	return get_parent().get_child(pos).get_node("BaseModBox/ModButton")
@@ -485,10 +481,9 @@ func _refocus():
 	var index = get_parent().get_position_in_parent()
 	var parent = get_parent()
 	var parent_count = parent.get_child_count()-1
-	
-	
-	var upper = null
-	var lower = null
+	focus_button_neighbours(false)
+
+func focus_button_neighbours(on_press : bool):
 	var mb = button.get_path_to(button)
 	button.focus_neighbour_left = mb
 	button.focus_neighbour_right = button.get_path_to(desc_box)
@@ -526,6 +521,32 @@ func _refocus():
 			get_button(pos+1).focus_neighbour_top = get_button(pos+1).get_path_to(button)
 	
 	
+	if on_press:
+		if has_links:
+			information_nodes["info_desc"].focus_neighbour_top = NodePath("../LINKBOX/LINKS")
+		elif has_bugreports:
+			information_nodes["info_desc"].focus_neighbour_top = NodePath("../LINKBOX/BUGREPORTS")
+		elif is_modlet:
+			information_nodes["info_desc"].focus_neighbour_top = NodePath("../Header/MODLET_TOGGLE/TOGGLE_MODLET")
+		elif has_settings:
+			information_nodes["info_desc"].focus_neighbour_top = NodePath("../Header/SETTINGS/SETTINGS")
+		else:
+			information_nodes["info_desc"].focus_neighbour_top = NodePath("../../SPLIT/ListHeader/OptionButtonBox/DOWNLOAD")
+		if has_update:
+			information_nodes["info_desc"].focus_neighbour_top = NodePath("../WarningButtons/UB")
+		elif has_dep:
+			information_nodes["info_desc"].focus_neighbour_top = NodePath("../WarningButtons/DB")
+		elif has_conf:
+			information_nodes["info_desc"].focus_neighbour_top = NodePath("../WarningButtons/CFB")
+		if has_settings:
+			if is_modlet:
+				information_nodes["info_settings_button"].focus_neighbour_left = NodePath("../../MODLET_TOGGLE/TOGGLE_MODLET")
+				information_nodes["info_settings_button"].focus_previous = NodePath("../../MODLET_TOGGLE/TOGGLE_MODLET")
+			else:
+				information_nodes["info_settings_button"].focus_neighbour_left = NodePath("../../../../SPLIT/ListHeader/OptionButtonBox/DOWNLOAD")
+				information_nodes["info_settings_button"].focus_previous = NodePath("../../../../SPLIT/ListHeader/OptionButtonBox/DOWNLOAD")
+
+
 var isfocus = false
 
 

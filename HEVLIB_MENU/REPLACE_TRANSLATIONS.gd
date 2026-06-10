@@ -2181,6 +2181,22 @@ const TRANSLATIONS = {
 		"HEVLIB_SETTING_REQUIRES_RESTART": {
 			"string": "NOTICE: This setting requires a restart after changing it.",
 			"version_hash": 1236302953
+		},
+		"HEVLIB_MODMENU_MODNAME_DISABLED": {
+			"string": "(disabled)",
+			"version_hash": 3167290830
+		},
+		"HEVLIB_MODLET_ENABLED": {
+			"string": "Enabled?",
+			"version_hash": 644251567
+		},
+		"HEVLIB_MODMENU_MODNAME_ENABLED_NEEDS_RESTART": {
+			"string": "(enabled, needs restart)",
+			"version_hash": 1899921857
+		},
+		"HEVLIB_MODMENU_MODNAME_DISABLED_NEEDS_RESTART": {
+			"string": "(disabled, needs restart)",
+			"version_hash": 2601371502
 		}
 	},
 	"uk_UA": {
