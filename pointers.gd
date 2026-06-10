@@ -748,12 +748,14 @@ class _ConfigDriver:
 			dir.remove(cfg_file)
 			for m in pointers.FolderAccess.__fetch_folder_files("user://cfg/.profiles/"):
 				if m != ".profiles.ini":
+					c.clear()
 					c.load(profiles_dir + m)
 					var this_profile = c.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name")
 					if this_profile == desired_profile:
 						dir.copy(profiles_dir + m,cfg_file)
 						profile_is_current = true
 					c.clear()
+					c.load(cfg_file)
 		if not profile_is_current:
 			c.clear()
 			c.set_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name",desired_profile)
@@ -769,7 +771,7 @@ class _ConfigDriver:
 			var has_manifest = manifest["has_manifest"]
 			if has_manifest:
 				var mod_name = mod_entries[mod]["name"]
-				var manifest_version = manifest["manifest_version"]
+				var manifest_version = float(manifest["manifest_version"])
 				if manifest_version >= 2.1:
 					var cfg = manifest["manifest_data"]["configs"]
 					if not hash(cfg) == hash({}):
@@ -1038,7 +1040,7 @@ class _ConfigDriver:
 						var out = sub[entry]
 						for o in out:
 							var obj = o[0]
-							if Tool.objectValid(obj):
+							if Tool.ov(obj):
 								obj.callv(o[1],[val])
 		changes.clear()
 	
@@ -1894,7 +1896,11 @@ class _DataFormat:
 		if __load_if_can(scene_path):
 			var scn = __get_load().instance()
 			var root = scn.name
-			Tool.remove(scn)
+			if Tool.validex != null:
+				Tool.remove(scn)
+			else:
+				if is_instance_valid(scn) and not scn.is_queued_for_deletion():
+					scn.free()
 			var scene_replacement = "user://cache/.HevLib_Cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec()
 			var p = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"%s\" type=\"PackedScene\" id=1]\n\n[node name=\"%s\" instance=ExtResource( 1 )]" % [scene_path,root]
 			pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
@@ -1918,15 +1924,16 @@ class _DataFormat:
 	func __replace_resource(resource_path:String, original_path:String, script_storage_object = null, script_storage_array_name : String = "_savedObjects"):
 		if not ResourceLoader.exists(resource_path) or not ResourceLoader.exists(original_path):
 			return
-		var scene := load(resource_path)
-		scene.take_over_path(original_path)
-		
-		if script_storage_object and script_storage_array_name and (script_storage_array_name in script_storage_object):
-			script_storage_object[script_storage_array_name].append(scene)
-		elif ModLoader != null:
-			ModLoader._savedObjects.append(scene)
-		else:
-			_savedScriptObjects.append(scene)
+		if __load_if_can(resource_path):
+			var scene = __get_load()
+			scene.take_over_path(original_path)
+			
+			if script_storage_object and script_storage_array_name and (script_storage_array_name in script_storage_object):
+				script_storage_object[script_storage_array_name].append(scene)
+			elif ModLoader != null:
+				ModLoader._savedObjects.append(scene)
+			else:
+				_savedScriptObjects.append(scene)
 	
 	var var_hash = {}
 	
@@ -1973,7 +1980,6 @@ class _DataFormat:
 		if not Tool.ovnolock(last_load):
 			last_load = null
 		return last_load
-	
 	
 	
 	
@@ -5801,10 +5807,10 @@ class _ManifestV2:
 		var is_library : bool = constants.get("MOD_IS_LIBRARY",false)
 		var always_display : bool = constants.get("ALWAYS_DISPLAY",false)
 		
-		var has_mod_manifest := false
-		var manifest_data := {}
-		var manifest_version := 1
-		var has_icon_file := false
+		var has_mod_manifest : bool = false
+		var manifest_data : Dictionary = {}
+		var manifest_version : float = 1.0
+		var has_icon_file : bool = false
 		var png_path := ""
 		var stex_path := ""
 		var icon_path := ""
@@ -6050,12 +6056,12 @@ class _ManifestV2:
 	func __parse_file_as_manifest(file_path: String, format_to_manifest_version: bool = true) -> Dictionary:
 		var cachevar = file_path + ":" + str(format_to_manifest_version)
 		if cachevar in cached_manifests:
-			return cached_manifests[cachevar]
+			return cached_manifests[cachevar].duplicate(true)
 		else:
 			var out = {}
 			var cfg = pointers.ConfigDriver.__config_parse(file_path)
 			var manifest_data : Dictionary = {}
-			var manifest_version = 1
+			var manifest_version = 1.0
 			if "manifest_definitions" in cfg:
 				manifest_version = cfg["manifest_definitions"].get("manifest_version",manifest_version)
 				var tpf = typeof(manifest_version)
@@ -6098,7 +6104,7 @@ class _ManifestV2:
 						"always_display":false,
 					},
 					"manifest_definitions":{
-						"manifest_version":1,
+						"manifest_version":1.0,
 						"dependancy_mod_ids":PoolStringArray([]),
 						"conflicting_mod_ids":PoolStringArray([]),
 						"complementary_mod_ids":PoolStringArray([]),
@@ -6744,6 +6750,11 @@ class _ManifestV2:
 	var cached_modlets = {}
 	
 	func __get_all_modlets(only_show_installed : bool = true,recache : bool = false) -> Dictionary:
+		if cached_modlets:
+			var modletCheck = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets")
+			for modlet in modletCheck:
+				if modletCheck[modlet] != cached_modlets[modlet]:
+					recache = true
 		if not cached_modlets or recache:
 			if not all_modlet_file_list:
 				var manifests = __get_manifest_files()
@@ -6763,7 +6774,6 @@ class _ManifestV2:
 						ov.append(i)
 				ov.sort_custom(self,"sort_modlet_files")
 				all_modlet_file_list = ov
-				pointers.ConfigDriver.__subscribe_to_setting_change("recache_modlets",self,"HevLib","modlets","seen_modlets")
 			var modlets = all_modlet_file_list.duplicate()
 			var allowed_modlets = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets")
 			if allowed_modlets == null:
@@ -6783,9 +6793,6 @@ class _ManifestV2:
 				if not mod in active_modlet_file_list:
 					out.erase(mod)
 		return out
-	
-	func recache_modlets():
-		__get_all_modlets(false,true)
 	
 	func sort_modlet_files(a:String,b:String):
 		var aPrio = __parse_file_as_manifest(a)["manifest_definitions"]["modlet_priority"]
@@ -6878,8 +6885,9 @@ class _ManifestV2:
 		cached_icon_files = ov
 		return cached_icon_files.duplicate()
 	
-	func __load_modlets(modloader):
+	func __load_modlets(modloader,is_onready : bool):
 		var modlet_manifests = __get_modlet_files()
+		var scenes_to_reload = []
 		for modlet in modlet_manifests:
 			var drivers = pointers.DriverManagement.__get_drivers_from_modmain_path(modlet)
 			if "LOAD_RESOURCES.gd" in drivers:
@@ -6889,17 +6897,20 @@ class _ManifestV2:
 						var subdata = resources[resource]
 						var load_type = subdata.get("load_type","").to_lower()
 						var is_relative = resource.begins_with("res://")
-						
-						match load_type:
-							"script":
-								var path = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
-								pointers.DataFormat.__override_script(path,modloader)
-							"scene","resource":
-								var path = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
-								var old = subdata.get("original_path","")
-								var old_relative = old.begins_with("res://")
-								var old_path = old if old_relative else (modlet.get_base_dir() + ("" if old.begins_with("/") else "/") + old)
-								pointers.DataFormat.__replace_resource(path,old_path,modloader)
+						if is_onready == subdata.get("onready",false):
+							match load_type:
+								"script":
+									var path = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
+									pointers.DataFormat.__override_script(path,modloader)
+								"scene","resource":
+									var path = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
+									var old = subdata.get("original_path","")
+									var old_relative = old.begins_with("res://")
+									var old_path = old if old_relative else ("res://" + ("" if old.begins_with("/") else "/") + old)
+									pointers.DataFormat.__replace_resource(path,old_path,modloader)
+									if not old_path in scenes_to_reload:
+										scenes_to_reload.append(old_path)
+		return scenes_to_reload
 	
 	
 	
