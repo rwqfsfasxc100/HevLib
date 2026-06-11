@@ -2,7 +2,7 @@ extends Node
 
 const not_random_seeds = PoolIntArray([1861,-2531,1337,1776,2014,1384,2684,842,2802,1597,2116,755,1596,2661,1928,-1861,-2531,-1337,-1776,-2014,-1384,-2684,-842,-2802,-1597,-2116,-755,-1596,-2661,-1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928])
 
-static func make_ring_modifications(pointers,modmain):
+static func make_ring_modifications(pointers):
 	
 	var p = CurrentGame.traceMinerals
 	var s = p.size()
@@ -51,7 +51,7 @@ static func make_ring_modifications(pointers,modmain):
 #	f.store_string(total)
 #	f.close()
 	
-	installScriptDirect(total,pointers,modmain,"res://story/TheRing.tscn")
+	installScriptDirect(total,pointers,"res://story/TheRing.tscn")
 
-static func installScriptDirect(source:String,pointers,modmain,scene_path):
-	pointers.DataFormat.__compile_and_override_script_with_scene(source,modmain,"_savedObjects",scene_path)
+static func installScriptDirect(source:String,pointers,scene_path):
+	pointers.DataFormat.__compile_and_override_script_with_scene(source,scene_path)

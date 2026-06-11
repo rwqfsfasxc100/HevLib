@@ -2,7 +2,7 @@ extends Node
 
 const custom_mineral_path = "user://cache/.HevLib_Cache/Minerals/mineral_store/"
 
-static func make_mineral_scripting(pointers = null,modmain = null):
+static func make_mineral_scripting(pointers = null):
 	
 	var FILE_PATHS = [
 		"user://cache/.HevLib_Cache/Minerals/mineral_cache.json",
@@ -49,8 +49,8 @@ static func make_mineral_scripting(pointers = null,modmain = null):
 #	f.store_string(asteroid_spawner)
 #	f.close()
 	
-	installScriptDirect(current_game,pointers,modmain)
-	installScriptDirect(asteroid_spawner,pointers,modmain)
+	installScriptDirect(current_game,pointers)
+	installScriptDirect(asteroid_spawner,pointers)
 	
 
 
@@ -257,5 +257,5 @@ static func installScriptExtension(path:String):
 	var parentScript:Script = childScript.get_base_script()
 	var parentPath:String = parentScript.resource_path
 	childScript.take_over_path(parentPath)
-static func installScriptDirect(source:String,pointers,modmain):
-	pointers.DataFormat.__compile_and_override_script(source,modmain)
+static func installScriptDirect(source:String,pointers):
+	pointers.DataFormat.__compile_and_override_script(source)

@@ -1391,16 +1391,12 @@ class _DataFormat:
 					"description":"Compiles a script and overrides it. Similar to the installScriptExtension method used in ModMain scripts",
 					"args":[
 						"source_code -> (String) source code for the script override.",
-						"script_storage_object (optional) -> (object) A persistent object used to keep the script override available in memory. Heavily recommended to use this to ensure proper functionality, such as using a mod's script object from the ModLoader children. If not provided and the ModLoader autoload isn't available, uses the current pointer object, which may be freed depending on the operation. Defaults to `null`",
-						"script_storage_array_name (optional) -> (String) The array name that the persistent object uses to store objects if script_storage_object is set. Defaults to `'_savedObjects'` as it is a standard name in ModMain scripts.",
 					],
 				},
 				"__compile_and_override_script_with_scene":{
 					"description":"Similar to __compile_and_override_script, additionally creates and updates one or more scenes after overriding the script in case script needs to have scenes reloaded to apply the update.",
 					"args":[
 						"source_code -> (String) source code for the script override.",
-						"script_storage_object (optional) -> (object) A persistent object used to keep the script override available in memory. Heavily recommended to use this to ensure proper functionality, such as using a mod's script object from the ModLoader children. If not provided and the ModLoader autoload isn't available, uses the current pointer object, which may be freed depending on the operation. Defaults to `null`",
-						"script_storage_array_name (optional) -> (String) The array name that the persistent object uses to store objects if script_storage_object is set. Defaults to `'_savedObjects'` as it is a standard name in ModMain scripts.",
 						"scene_path (optional) -> (String/PoolStringArray) String or PoolStringArray containing the file path or paths to scenes to be updated. Using array of paths will have them update in order. Defaults to `PoolStringArray()`"
 					],
 				},
@@ -1408,8 +1404,6 @@ class _DataFormat:
 					"description":"Recreates and updates a scene to load changed sub-resources",
 					"args":[
 						"scene_path -> (String) the file path to the scene to be updated.",
-						"script_storage_object (optional) -> (object) A persistent object used to keep the script override available in memory. Heavily recommended to use this to ensure proper functionality, such as using a mod's script object from the ModLoader children. If not provided and the ModLoader autoload isn't available, uses the current pointer object, which may be freed depending on the operation. Defaults to `null`",
-						"script_storage_array_name (optional) -> (String) The array name that the persistent object uses to store objects if script_storage_object is set. Defaults to `'_savedObjects'` as it is a standard name in ModMain scripts.",
 					],
 				},
 				"__replace_resource":{
@@ -1417,8 +1411,6 @@ class _DataFormat:
 					"args":[
 						"resource_path -> (String) the file path of the scene or resource to be used to update the resource..",
 						"original_path -> (String) the original file path of the scene to be updated.",
-						"script_storage_object (optional) -> (object) A persistent object used to keep the script override available in memory. Heavily recommended to use this to ensure proper functionality, such as using a mod's script object from the ModLoader children. If not provided and the ModLoader autoload isn't available, uses the current pointer object, which may be freed depending on the operation. Defaults to `null`",
-						"script_storage_array_name (optional) -> (String) The array name that the persistent object uses to store objects if script_storage_object is set. Defaults to `'_savedObjects'` as it is a standard name in ModMain scripts.",
 					],
 				},
 				"__convert_var_from_string":{
@@ -1895,7 +1887,7 @@ class _DataFormat:
 			file.open(scene_replacement,File.WRITE)
 			file.store_string(p)
 			file.close()
-			pointers.equipment_modmain.replaceScene(scene_replacement,scene_path)
+			pointers.equipment_modmain.replaceSceneLiteral(scene_replacement,scene_path)
 #			var scene := load(scene_replacement)
 #			scene.take_over_path(scene_path)
 			
@@ -1908,7 +1900,7 @@ class _DataFormat:
 	func __replace_resource(resource_path:String, original_path:String):
 		if not ResourceLoader.exists(resource_path) or not ResourceLoader.exists(original_path):
 			return
-		pointers.equipment_modmain.replaceScene(resource_path,original_path)
+		pointers.equipment_modmain.replaceSceneLiteral(resource_path,original_path)
 #		if __load_if_can(resource_path):
 #			var scene = __get_load()
 #			scene.take_over_path(original_path)
@@ -6885,7 +6877,7 @@ class _ManifestV2:
 									var path = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
 									var old = subdata.get("original_path","")
 									var old_relative = old.begins_with("res://")
-									var old_path = old if old_relative else ("res://" + ("" if old.begins_with("/") else "/") + old)
+									var old_path = old if old_relative else ("res:/" + ("" if old.begins_with("/") else "/") + old)
 									pointers.DataFormat.__replace_resource(path,old_path)
 									if not old_path in scenes_to_reload:
 										scenes_to_reload.append(old_path)

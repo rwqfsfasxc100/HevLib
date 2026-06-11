@@ -101,7 +101,7 @@ func _init(modLoader : ModLoader = ModLoader):
 
 		installScriptExtension("../better_title_screen/CurrentlyPlaying.gd")
 		var minerals = load("res://HevLib/scenes/minerals/make_mineral_scripting.gd")
-		minerals.make_mineral_scripting(pointers,modLoader)
+		minerals.make_mineral_scripting(pointers)
 
 		replaceScene("../../events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn")
 		# Adds in_hevlib_menu to the CurrentGame script and preventing controls while it's true
@@ -133,9 +133,9 @@ func _ready():
 		f.store_string("{}")
 		f.close()
 		
-		var for_reload = pointers.ManifestV2.__load_modlets(self,true)
+		var for_reload = pointers.ManifestV2.__load_modlets(true)
 		for old_path in for_reload:
-			pointers.DataFormat.__reload_scene(old_path,self)
+			pointers.DataFormat.__reload_scene(old_path)
 		
 		
 		var modzips = {}
@@ -147,7 +147,7 @@ func _ready():
 		f.close()
 		
 		var ring = load("res://HevLib/scenes/minerals/make_ring_modifications.gd")
-		ring.make_ring_modifications(pointers,ModLoader)
+		ring.make_ring_modifications(pointers)
 		
 		
 		
@@ -232,6 +232,13 @@ func replaceScene(newPath:String, oldPath:String = ""):
 	scene.take_over_path(oldPath)
 	_savedObjects.append(scene)
 	l("Finished updating: %s" % oldPath)
+func replaceSceneLiteral(newPath:String, oldPath:String):
+	l("Updating scene literal: %s" % newPath)
+
+	var scene := load(newPath)
+	scene.take_over_path(oldPath)
+	_savedObjects.append(scene)
+	l("Finished updating literal: %s" % oldPath)
 
 # Func to print messages to the logs
 func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
