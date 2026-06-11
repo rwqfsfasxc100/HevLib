@@ -6881,6 +6881,9 @@ class _ManifestV2:
 									pointers.DataFormat.__replace_resource(path,old_path)
 									if not old_path in scenes_to_reload:
 										scenes_to_reload.append(old_path)
+								"reload":
+									var path = resource if is_relative else ("res:/" + ("" if resource.begins_with("/") else "/") + resource)
+									pointers.DataFormat.__reload_scene(path)
 		return scenes_to_reload
 	
 	
