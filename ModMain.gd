@@ -16,12 +16,12 @@ var enable_research = false
 var pointers
 
 var file = File.new()
-var correct = file.file_exists("res://HevLib/pointers.gd")
+var correct = ResourceLoader.exists("res://HevLib/pointers.gd")
 var HevLibModMain = true
 func _init(modLoader = ModLoader):
 	if correct:
 		l("Initializing HevLib")
-		pointers = load("res://HevLib/pointers.gd").new()
+		pointers = modLoader._savedObjects[0]
 		l("Initializing DLC")
 		loadDLC()
 		

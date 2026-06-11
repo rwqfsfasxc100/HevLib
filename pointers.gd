@@ -6864,7 +6864,7 @@ class _ManifestV2:
 		cached_icon_files = ov
 		return cached_icon_files.duplicate()
 	
-	func __load_modlets(modloader,is_onready : bool):
+	func __load_modlets(is_onready : bool):
 		var modlet_manifests = __get_modlet_files()
 		var scenes_to_reload = []
 		for modlet in modlet_manifests:
@@ -6880,13 +6880,13 @@ class _ManifestV2:
 							match load_type:
 								"script":
 									var path = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
-									pointers.DataFormat.__override_script(path,modloader)
+									pointers.DataFormat.__override_script(path)
 								"scene","resource":
 									var path = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
 									var old = subdata.get("original_path","")
 									var old_relative = old.begins_with("res://")
 									var old_path = old if old_relative else ("res://" + ("" if old.begins_with("/") else "/") + old)
-									pointers.DataFormat.__replace_resource(path,old_path,modloader)
+									pointers.DataFormat.__replace_resource(path,old_path)
 									if not old_path in scenes_to_reload:
 										scenes_to_reload.append(old_path)
 		return scenes_to_reload

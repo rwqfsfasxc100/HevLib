@@ -49,6 +49,14 @@ func _init(modLoader : ModLoader = ModLoader):
 		var variables_folder = "user://cache/.HevLib_Cache/Variable_Fetch/"
 		d.make_dir_recursive(variables_folder)
 		pointers = load("res://HevLib/pointers.gd").new()
+		if modLoader._savedObjects:
+			var new_objects = [pointers]
+			for i in modLoader._savedObjects:
+				new_objects.append(i)
+			modLoader._savedObjects = new_objects
+		else:
+			modLoader._savedObjects.append(pointers)
+		pointers.equipment_modmain = self
 		pointers.FileAccess.__load_precached_mods()
 		
 #		testing(pointers)
@@ -59,8 +67,10 @@ func _init(modLoader : ModLoader = ModLoader):
 		var fstr_old = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/file_caches"
 		if d.dir_exists(fstr_old):
 			pointers.FolderAccess.__recursive_delete(fstr_old)
-		pointers.ManifestV2.__load_modlets(modLoader)
 		pointers.ConfigDriver.__load_configs()
+		var for_reload = pointers.ManifestV2.__load_modlets(false)
+		for old_path in for_reload:
+			pointers.DataFormat.__reload_scene(old_path)
 		var injector = load("res://HevLib/scripts/translations/inject_translations.gd")
 		injector.inject_translations(pointers)
 		
@@ -122,6 +132,11 @@ func _ready():
 		f.open(zip_ref_store,File.WRITE)
 		f.store_string("{}")
 		f.close()
+		
+		var for_reload = pointers.ManifestV2.__load_modlets(self,true)
+		for old_path in for_reload:
+			pointers.DataFormat.__reload_scene(old_path,self)
+		
 		
 		var modzips = {}
 		for mod in pointers.ManifestV2.__get_mod_data()["mods"]:
@@ -191,6 +206,15 @@ func installScriptExtension(path:String):
 	l("Installing script extension: %s <- %s" % [parentPath, childPath])
 
 	childScript.take_over_path(parentPath)
+func installScriptExtensionFromSource(source_code:String):
+	var out = GDScript.new()
+	out.set_source_code(source_code)
+	out.reload()
+	
+	var parentScript:Script = out.get_base_script()
+	var parentPath:String = parentScript.resource_path
+	l("Installing script extension from source to: %s" % [parentPath])
+	out.take_over_path(parentPath)
 
 
 # Helper function to replace scenes
