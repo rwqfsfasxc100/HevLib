@@ -6706,11 +6706,10 @@ class _ManifestV2:
 		if OS.has_feature("editor"):
 			dvs = pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[])
 		else:
-			var ov = []
 			for r in __get_mod_files():
 				var i : String = r.get_file().to_lower()
 				if i.begins_with("modmain") and i.ends_with(".gd"):
-					ov.append(r)
+					dvs.append(r)
 		modmain_file_list = dvs
 		return dvs.duplicate()
 	
