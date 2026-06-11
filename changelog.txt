@@ -26,7 +26,7 @@
 9="* DataFormat.__compile_and_override_script_with_scene now can accept an Array/PoolStringArray of filepaths for the scene_path argument to update multiple scenes sequentially if needed"
 10="* Updated DataFormat.__convert_var_from_string to hash differences between using a constant or a variable to fetch the value"
 11="* DriverManagement.__compare_driver_dictionaries is now no longer defined as a public method."
-12="* Removed depreciated __make_equipment, __make_slot. __add_vanilla_equipment, and __match_vanilla methods from the Equipment class"
+12="* Removed depreciated __make_equipment, __make_slot, __add_vanilla_equipment, and __match_vanilla methods from the Equipment class"
 13="* JoyAxis 0 (Left stick horizontal) when used for configs now properly ensures that a positive direction (right) will be used. This should not have any difference with how it's handled, but makes it easier to read."
 14="* Added NodeAccess.__exit()"
 14.1="* Simplifies the action of force closing or restarting the game"
@@ -54,7 +54,7 @@
 23.1="* Equivalent to replaceScene() methods for modmains, however renamed as such due to it working on other resources as well as scenes"
 23.2="* resource_path -> (String) the file path of the scene or resource to be used to update the resource. Unlike replaceScene(), needs to be a literal path instead of relative."
 23.3="* original_path -> (String) the original file path of the scene to be updated. Unlike replaceScene(), needs to be a literal path instead of relative."
-24="* added __concat_mod_info and __make_mod_entry to the ManifestV2 class to help abstract mod additions"
+24="* Added __concat_mod_info and __make_mod_entry to the ManifestV2 class to help abstract mod additions"
 25="* ModMenu2 translations are now stored within HevLib"
 26="* __compile_and_override_script, __compile_and_override_script_with_scene, __reload_scene, and __override_script methods from the DataFormat class now no longer need to provide an object to store resources in, as this is now done by the library's equipment modmain"
 
