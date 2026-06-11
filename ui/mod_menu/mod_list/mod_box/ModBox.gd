@@ -49,13 +49,14 @@ var has_settings = false
 var is_modlet = false
 var needs_restart_from_toggling = false
 var modlet_toggle_restart_path = "user://cache/.Mod_Menu_2_Cache/updates/modlet_restart_requests.json"
+var mod_path = ""
 
 func _pressed():
 	if not pointers:
 		pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	information_nodes["mod_list"].make_info_default_state()
 	
-	var mod_path = MOD_INFO["file_path"]
+	mod_path = MOD_INFO["file_path"]
 	var mod_dir = mod_path.get_base_dir() + "/"
 	
 	file.open(modlet_toggle_restart_path,File.READ)
@@ -309,6 +310,13 @@ func _draw():
 	icon_dependancies.visible = false
 	icon_updates.visible = false
 	
+	mod_path = MOD_INFO["file_path"]
+	is_modlet = MOD_INFO["mod_type"] == "modlet"
+	file.open(modlet_toggle_restart_path,File.READ)
+	var restarting_modlets = JSON.parse(file.get_as_text()).result
+	file.close()
+	if mod_path in restarting_modlets:
+		needs_restart_from_toggling = true
 	
 	file.open(update_store,File.READ)
 	var updt = JSON.parse(file.get_as_text()).result

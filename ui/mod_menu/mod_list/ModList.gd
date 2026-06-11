@@ -237,7 +237,6 @@ func _draw():
 var aligned_zero_focus = false
 
 func make_info_default_state():
-#	get_node(info_name).text = ""
 	get_node(info_version).text = ""
 	get_node(info_priority).text = ""
 	get_node(info_mod_id).text = ""
@@ -252,6 +251,7 @@ func make_info_default_state():
 	get_node(info_bugreports_button).visible = false
 	get_node(info_changelog_button).visible = false
 	get_node(toggle_modlet_box).visible = false
+	get_node(toggle_modlet_button).change_modlet_to(null,"")
 
 
 func _process(_delta):
