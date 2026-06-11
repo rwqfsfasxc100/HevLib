@@ -1842,6 +1842,30 @@ const TRANSLATIONS = {
 			"string": "Mods behaving slightly differently after an update? Check any recent changelogs or ask the author.",
 			"version_hash": 2422128719
 		},
+		"MODMENU2_MOD_DESCRIPTION": {
+			"string": "An advanced mod menu that allows almost complete control over how you view your mods.\\n\\nFeatures:\\n\\n* Basic mod viewing - will display any mod installed, whether it has modern manifest information or is a basic mod, as well as displaying info for the vanilla game.\\n* Config modifications - allows the user to customise any mods that provide a set of configs in the manifest.\\n* Update checking - any mod that supplies appropriate updater information will have any updates scanned at launch. Updates can be downloaded individually, as a group, or ignored for the version.\\n* Conflict and dependancy checks - any mod that provides mod IDs for mods that are required or don't work with will show a warning on the title screen. NOTE: This only works for mods with manifests.\\n* Tag & search filters - lets you filter the displayed mods by keyword or mod ID, or choose from a set of tags contained with mods to display only mods using a specific set of tags",
+			"version_hash": 3441621910
+		},
+		"MODMENU2_MOD_BRIEF": {
+			"string": "An advanced mod menu",
+			"version_hash": 175259935
+		},
+		"MODMENU2_CONFIG_GENERAL": {
+			"string": "General",
+			"version_hash": 1354717699
+		},
+		"MODMENU2_CLEAR_IGNORED_UPDATES": {
+			"string": "Clear ignored updates",
+			"version_hash": 22297130
+		},
+		"MODMENU2_CLEAR_IGNORED_UPDATES_TOOLTIP": {
+			"string": "Clears the list of updates which you chose to ignore",
+			"version_hash": 3834391056
+		},
+		"MODMENU2_CLEAR_IGNORED_UPDATES_BUTTON": {
+			"string": "Clear",
+			"version_hash": 217603436
+		},
 		"TAG_OVERHAUL": {
 			"string": "Overhaul",
 			"version_hash": 3544097003
@@ -2222,30 +2246,6 @@ const TRANSLATIONS = {
 			"string": "(disabled, needs restart)",
 			"version_hash": 2601371502
 		},
-		"MODMENU2_MOD_DESCRIPTION": {
-			"string": "An advanced mod menu that allows almost complete control over how you view your mods.\\n\\nFeatures:\\n\\n* Basic mod viewing - will display any mod installed, whether it has modern manifest information or is a basic mod, as well as displaying info for the vanilla game.\\n* Config modifications - allows the user to customise any mods that provide a set of configs in the manifest.\\n* Update checking - any mod that supplies appropriate updater information will have any updates scanned at launch. Updates can be downloaded individually, as a group, or ignored for the version.\\n* Conflict and dependancy checks - any mod that provides mod IDs for mods that are required or don't work with will show a warning on the title screen. NOTE: This only works for mods with manifests.\\n* Tag & search filters - lets you filter the displayed mods by keyword or mod ID, or choose from a set of tags contained with mods to display only mods using a specific set of tags",
-			"version_hash": 3441621910
-		},
-		"MODMENU2_MOD_BRIEF": {
-			"string": "An advanced mod menu",
-			"version_hash": 175259935
-		},
-		"MODMENU2_CONFIG_GENERAL": {
-			"string": "General",
-			"version_hash": 1354717699
-		},
-		"MODMENU2_CLEAR_IGNORED_UPDATES": {
-			"string": "Clear ignored updates",
-			"version_hash": 22297130
-		},
-		"MODMENU2_CLEAR_IGNORED_UPDATES_TOOLTIP": {
-			"string": "Clears the list of updates which you chose to ignore",
-			"version_hash": 3834391056
-		},
-		"MODMENU2_CLEAR_IGNORED_UPDATES_BUTTON": {
-			"string": "Clear",
-			"version_hash": 217603436
-		},
 		"MODMENU2_TRANSIT_TIP_1": {
 			"string": "Modpacks can make sharing mods easy! Create or import them within the Mod Menu.",
 			"version_hash": 2128454254
@@ -2257,6 +2257,14 @@ const TRANSLATIONS = {
 		"MODMENU2_TRANSIT_TIP_3": {
 			"string": "Want some new mods and don't want to search online? Check the GitHub downloader menu!",
 			"version_hash": 2668803293
+		},
+		"HEVLIB_MODMENU_MODLET_TOGGLE_TOOLTIP": {
+			"string": "Toggles whether this modlet is enabled.\n\n(requires game restart)",
+			"version_hash": 3820371863
+		},
+		"HEVLIB_MODMENU_MODLET_TOGGLE_MM2FALLBACK": {
+			"string": "Cannot toggle ModMenu2.\n\nZip has to be manually removed or\ntoggled in the config file directly.",
+			"version_hash": 915722318
 		}
 	},
 	"uk_UA": {

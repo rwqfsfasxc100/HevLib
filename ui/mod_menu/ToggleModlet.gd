@@ -38,6 +38,12 @@ func change_modlet_to(modlet,modlet_path:String):
 	current_modlet = modlet
 	current_modlet_path = modlet_path
 	if modlet and modlet_path:
+		if modlet_path == "res://ModMenu2/Mod.manifest":
+			disabled = true
+			hint_tooltip = "HEVLIB_MODMENU_MODLET_TOGGLE_MM2FALLBACK"
+		else:
+			disabled = false
+			hint_tooltip = "HEVLIB_MODMENU_MODLET_TOGGLE_TOOLTIP"
 		var all_modlets = pointers.ManifestV2.__get_all_modlets(false)
 		var enabled = all_modlets[modlet_path]
 		pressed = enabled

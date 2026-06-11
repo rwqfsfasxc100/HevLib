@@ -190,7 +190,6 @@ func _ready():
 
 		replaceScene("../minerals/multiminerals/AsteroidField.tscn","res://AsteroidField.tscn")
 		
-		Tool.remove(pointers)
 		l("Ready")
 	else:
 		l("HevLib Equipment Driver onready process cannot be carried out")

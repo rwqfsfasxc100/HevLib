@@ -525,6 +525,7 @@ text = "HEVLIB_MODLET_ENABLED"
 margin_top = 47.0
 margin_right = 290.0
 margin_bottom = 89.0
+hint_tooltip = "HEVLIB_MODMENU_MODLET_TOGGLE_TOOLTIP"
 focus_neighbour_left = NodePath("../../../../SPLIT/ListHeader/OptionButtonBox/DOWNLOAD")
 focus_neighbour_top = NodePath(".")
 focus_neighbour_right = NodePath("../../SETTINGS/SETTINGS")
@@ -532,6 +533,8 @@ focus_neighbour_bottom = NodePath("../../../LINKBOX/BUGREPORTS")
 focus_next = NodePath("../../SETTINGS/SETTINGS")
 focus_previous = NodePath("../../../../SPLIT/ListHeader/OptionButtonBox/DOWNLOAD")
 script = ExtResource( 27 )
+
+[node name="PlaySoundsOnTheseButtons" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header/MODLET_TOGGLE/TOGGLE_MODLET" instance=ExtResource( 1 )]
 
 [node name="SETTINGS" type="VBoxContainer" parent="base/PanelContainer/VBoxContainer/ModContainer/ModInfo/Header"]
 margin_left = 696.0
