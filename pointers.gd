@@ -4,6 +4,8 @@ const gdunzip = preload("res://HevLib/scripts/vendor/gdunzip.gd")
 
 var http = HTTPRequest.new()
 
+var equipment_modmain
+
 var Achievements : _Achievements = _Achievements.new(self,http)
 var ConfigDriver : _ConfigDriver = _ConfigDriver.new(self)
 var DataFormat : _DataFormat = _DataFormat.new(self)
@@ -1867,32 +1869,18 @@ class _DataFormat:
 		return out
 	
 	var _savedScriptObjects := []
-	func __compile_and_override_script(source_code : String, script_storage_object = null, script_storage_array_name : String = "_savedObjects") -> void:
-		
-		var out = GDScript.new()
-		out.set_source_code(source_code)
-		out.reload()
-		
-		var parentScript:Script = out.get_base_script()
-		var parentPath:String = parentScript.resource_path
-		out.take_over_path(parentPath)
-		
-		if script_storage_object and script_storage_array_name and (script_storage_array_name in script_storage_object):
-			script_storage_object[script_storage_array_name].append(out)
-		elif ModLoader != null:
-			ModLoader._savedObjects.append(out)
-		else:
-			_savedScriptObjects.append(out)
+	func __compile_and_override_script(source_code : String) -> void:
+		pointers.equipment_modmain.installScriptExtensionFromSource(source_code)
 	
-	func __compile_and_override_script_with_scene(source_code : String, script_storage_object = null, script_storage_array_name : String = "_savedObjects", scene_path = []) -> void:
+	func __compile_and_override_script_with_scene(source_code : String, scene_path = []) -> void:
 		
-		__compile_and_override_script(source_code,script_storage_object,script_storage_array_name)
+		__compile_and_override_script(source_code)
 		if not scene_path is Array:
 			scene_path = PoolStringArray([scene_path])
 		for sc in scene_path:
-			__reload_scene(sc, script_storage_object, script_storage_array_name)
+			__reload_scene(sc)
 	
-	func __reload_scene(scene_path : String, script_storage_object = null, script_storage_array_name : String = "_savedObjects"):
+	func __reload_scene(scene_path : String):
 		if __load_if_can(scene_path):
 			var scn = __get_load().instance()
 			var root = scn.name
@@ -1907,33 +1895,24 @@ class _DataFormat:
 			file.open(scene_replacement,File.WRITE)
 			file.store_string(p)
 			file.close()
-			var scene := load(scene_replacement)
-			scene.take_over_path(scene_path)
-			if script_storage_object and script_storage_array_name and (script_storage_array_name in script_storage_object):
-				script_storage_object[script_storage_array_name].append(scene)
-			elif ModLoader != null:
-				ModLoader._savedObjects.append(scene)
-			else:
-				_savedScriptObjects.append(scene)
+			pointers.equipment_modmain.replaceScene(scene_replacement,scene_path)
+#			var scene := load(scene_replacement)
+#			scene.take_over_path(scene_path)
+			
 	
-	func __override_script(file_path : String, script_storage_object = null, script_storage_array_name : String = "_savedObjects"):
+	func __override_script(file_path : String):
 		if __load_if_can(file_path):
 			var sc = __get_load().get_source_code()
-			__compile_and_override_script(sc,script_storage_object,script_storage_array_name)
+			__compile_and_override_script(sc)
 	
-	func __replace_resource(resource_path:String, original_path:String, script_storage_object = null, script_storage_array_name : String = "_savedObjects"):
+	func __replace_resource(resource_path:String, original_path:String):
 		if not ResourceLoader.exists(resource_path) or not ResourceLoader.exists(original_path):
 			return
-		if __load_if_can(resource_path):
-			var scene = __get_load()
-			scene.take_over_path(original_path)
+		pointers.equipment_modmain.replaceScene(resource_path,original_path)
+#		if __load_if_can(resource_path):
+#			var scene = __get_load()
+#			scene.take_over_path(original_path)
 			
-			if script_storage_object and script_storage_array_name and (script_storage_array_name in script_storage_object):
-				script_storage_object[script_storage_array_name].append(scene)
-			elif ModLoader != null:
-				ModLoader._savedObjects.append(scene)
-			else:
-				_savedScriptObjects.append(scene)
 	
 	var var_hash = {}
 	
