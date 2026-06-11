@@ -1409,7 +1409,7 @@ class _DataFormat:
 				"__replace_resource":{
 					"description":"Sets the path for a resource to a specific path, equivalent to the replaceScene methods from modmains.",
 					"args":[
-						"resource_path -> (String) the file path of the scene or resource to be used to update the resource..",
+						"resource_path -> (String) the file path of the scene or resource to be used to update the resource.",
 						"original_path -> (String) the original file path of the scene to be updated.",
 					],
 				},
@@ -6875,7 +6875,8 @@ class _ManifestV2:
 									pointers.DataFormat.__override_script(path)
 								"scene","resource":
 									var path = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
-									var old = subdata.get("original_path","")
+									var orig_test = path.split(modlet.get_base_dir())[1]
+									var old = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[0])
 									var old_relative = old.begins_with("res://")
 									var old_path = old if old_relative else ("res:/" + ("" if old.begins_with("/") else "/") + old)
 									pointers.DataFormat.__replace_resource(path,old_path)

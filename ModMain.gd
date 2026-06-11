@@ -246,6 +246,7 @@ func installScriptExtension(path:String):
 	var parentPath:String = parentScript.resource_path
 	l("Installing script extension: %s <- %s" % [parentPath, childPath])
 	childScript.take_over_path(parentPath)
+	_savedObjects.append(childScript)
 func replaceScene(newPath:String, oldPath:String = ""):
 	l("Updating scene: %s" % newPath)
 	if oldPath.empty():

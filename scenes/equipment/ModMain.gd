@@ -68,9 +68,6 @@ func _init(modLoader : ModLoader = ModLoader):
 		if d.dir_exists(fstr_old):
 			pointers.FolderAccess.__recursive_delete(fstr_old)
 		pointers.ConfigDriver.__load_configs()
-		var for_reload = pointers.ManifestV2.__load_modlets(false)
-		for old_path in for_reload:
-			pointers.DataFormat.__reload_scene(old_path)
 		var injector = load("res://HevLib/scripts/translations/inject_translations.gd")
 		injector.inject_translations(pointers)
 		
@@ -121,6 +118,9 @@ func _init(modLoader : ModLoader = ModLoader):
 
 		installScriptExtension("../better_title_screen/SaveSlotButton.gd")
 		
+		var for_reload = pointers.ManifestV2.__load_modlets(false)
+		for old_path in for_reload:
+			pointers.DataFormat.__reload_scene(old_path)
 	else:
 		l("Folder structure not correct, exiting HevLib load")
 	
@@ -133,9 +133,6 @@ func _ready():
 		f.store_string("{}")
 		f.close()
 		
-		var for_reload = pointers.ManifestV2.__load_modlets(true)
-		for old_path in for_reload:
-			pointers.DataFormat.__reload_scene(old_path)
 		
 		
 		var modzips = {}
@@ -190,6 +187,9 @@ func _ready():
 
 		replaceScene("../minerals/multiminerals/AsteroidField.tscn","res://AsteroidField.tscn")
 		
+		var for_reload = pointers.ManifestV2.__load_modlets(true)
+		for old_path in for_reload:
+			pointers.DataFormat.__reload_scene(old_path)
 		l("Ready")
 	else:
 		l("HevLib Equipment Driver onready process cannot be carried out")
@@ -205,6 +205,7 @@ func installScriptExtension(path:String):
 	l("Installing script extension: %s <- %s" % [parentPath, childPath])
 
 	childScript.take_over_path(parentPath)
+	_savedObjects.append(childScript)
 func installScriptExtensionFromSource(source_code:String):
 	var out = GDScript.new()
 	out.set_source_code(source_code)
@@ -214,6 +215,7 @@ func installScriptExtensionFromSource(source_code:String):
 	var parentPath:String = parentScript.resource_path
 	l("Installing script extension from source to: %s" % [parentPath])
 	out.take_over_path(parentPath)
+	_savedObjects.append(out)
 
 
 # Helper function to replace scenes
