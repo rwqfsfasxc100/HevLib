@@ -267,7 +267,7 @@ func l(msg:String, title:String = MOD_NAME, version:String = str(MOD_VERSION_MAJ
 		version = version + "-" + MOD_VERSION_METADATA
 	Debug.l("[%s V%s]: %s" % [title, version, msg])
 func network_return(result, response_code,headers,body,mh):
-	if result == 0:
+	if result == 0 and response_code == 200:
 		var p = body.get_string_from_utf8()
 		var path = "user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/network_manifest_%s.cfg"
 		var path2 = "user://cache/.Mod_Menu_2_Cache/updates/network_manifest.json"
