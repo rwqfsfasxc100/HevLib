@@ -1,3 +1,10 @@
+[1.14.2]
+
+1="* Fixed issue with the GitHub downloader menu only being able to see the 30 highest starred repositories in the DV topic."
+1.1="* Increased the page size to 100"
+1.2="* Added handling for exceeding the max page size. NOTE: Once the repository count exceeds 100, this will require more API credit usage and may cause other issues elsewhere."
+2="* GitHub downloader now fetches new mod information every 3 days instead of every day."
+
 [1.14.1]
 
 1="* Fixed issue with mods not being registered"
