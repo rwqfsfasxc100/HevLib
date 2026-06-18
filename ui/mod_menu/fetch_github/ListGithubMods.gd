@@ -47,7 +47,7 @@ func _ready():
 	var dt = {}
 	if file.file_exists(mod_list_cache):
 		var fileAge = Time.get_unix_time_from_system() - file.get_modified_time(mod_list_cache)
-		if fileAge < 1 * 3600:
+		if fileAge < 3 * 3600:
 			file.open(mod_list_cache,File.READ)
 			dt = JSON.parse(file.get_as_text(true)).result
 			file.close()
