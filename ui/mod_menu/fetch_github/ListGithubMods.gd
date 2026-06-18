@@ -13,8 +13,9 @@ onready var parent = get_node_or_null(path_to_root)
 onready var btn_to_download = get_node_or_null(path_to_download_btn)
 onready var unavailable_diag = get_node_or_null(path_to_unavailablePopup)
 
-const topic_url_base = "https://api.github.com/search/repositories?q=topic:%s"
-const topic_dv = "delta-v-rings-of-saturn"
+const topic_url_base = "https://api.github.com/search/repositories?q=topic:delta-v-rings-of-saturn&per_page=%d&page=%d"
+const page_size = 100
+var current_page = 1
 var icon_folder_path = "user://cache/.Mod_Menu_2_Cache/github_list/icon_cache/"
 
 onready var count = $Header/Count
@@ -53,11 +54,14 @@ func _ready():
 	if dt.size():
 		fill_in_mods(dt)
 	else:
-		http.request(topic_url_base % [topic_dv])
+		http.request(topic_url_base % [page_size,current_page])
 	
 	
 
 var mod_count = 0
+
+var needed_pages = 0
+var mods_found_from_api = 0
 func request_complete(result, response_code, headers, body):
 	if response_code != 200:
 		if file.file_exists(mod_list_cache):
@@ -68,11 +72,29 @@ func request_complete(result, response_code, headers, body):
 	else:
 		var json = JSON.parse(body.get_string_from_utf8()).result
 		if json:
+			mods_found_from_api = json.get("total_count",0)
+			needed_pages = ceil(float(mods_found_from_api) / float(page_size))
 			var dt = json.get("items",[])
-			file.open(mod_list_cache,File.WRITE)
-			file.store_string(JSON.print(dt))
-			file.close()
-			fill_in_mods(dt)
+			if needed_pages > 1:
+				if current_page > 1:
+					file.open(mod_list_cache,File.READ)
+					var curr = JSON.parse(file.get_as_text()).result
+					file.close()
+					curr.append_array(dt)
+					dt = curr
+				file.open(mod_list_cache,File.WRITE)
+				file.store_string(JSON.print(dt))
+				file.close()
+				if current_page < needed_pages:
+					current_page += 1
+					http.request(topic_url_base % [page_size,current_page])
+				else:
+					fill_in_mods(dt)
+			else:
+				file.open(mod_list_cache,File.WRITE)
+				file.store_string(JSON.print(dt))
+				file.close()
+				fill_in_mods(dt)
 
 func add_mod_count():
 	mod_count += 1
