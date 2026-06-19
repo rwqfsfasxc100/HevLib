@@ -1443,6 +1443,15 @@ class _DataFormat:
 						"Bool for whether the object was loaded or not."
 					]
 				},
+				"__file_exists":{
+					"description":"An all-encompassing method to determine if a file exists in the filesystem, without the need to query File and ResourceLoader directly",
+					"args":[
+						"file_path -> (String) the file path to the desired resource to check. Can be both relative, global, or OS-global",
+					],
+					"return":[
+						"Bool for whether the file at file_path exists or not."
+					]
+				},
 			}
 		}
 	
@@ -1947,6 +1956,7 @@ class _DataFormat:
 		return last_load
 	
 	func __file_exists(file_path:String) -> bool:
+		file_path = ProjectSettings.localize_path(file_path)
 		if ResourceLoader.exists(file_path) or file.file_exists(file_path):
 			return true
 		return false
