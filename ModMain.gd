@@ -39,10 +39,6 @@ func _init(modLoader = ModLoader):
 		var self_directory = self_path.split(self_path.split("/")[self_path.split("/").size() - 1])[0]
 		var self_check = load(self_directory + "self_check.tscn").instance()
 		add_child(self_check)
-		
-		
-#		var md = pointers.DataFormat.__get_script_constant_map_without_load("res://IndustriesOfEnceladusRewrite/HEVLIB_EQUIPMENT_DRIVER_TAGS/SLOT_ORDER.gd")
-		
 	else:
 		l("Folder structure not correct, exiting HevLib load")
 	
