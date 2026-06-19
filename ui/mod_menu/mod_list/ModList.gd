@@ -144,7 +144,7 @@ func _ready():
 	
 	var all_modlets = pointers.ManifestV2.__get_all_modlets(false)
 	for modlet in all_modlets:
-		if not all_modlets[modlet]:
+		if not all_modlets[modlet] and pointers.DataFormat.__file_exists(modlet):
 			var dict = pointers.ManifestV2.__make_mod_entry(pointers.ManifestV2.__concat_mod_info(modlet))
 			data[modlet] = dict
 	

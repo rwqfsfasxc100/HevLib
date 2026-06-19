@@ -5751,6 +5751,8 @@ class _ManifestV2:
 				return cached_mod_list.duplicate(true)
 	
 	func __concat_mod_info(mod_path:String) -> Dictionary:
+		if not pointers.DataFormat.__file_exists(mod_path):
+			return {}
 		var cv = mod_path.get_file().to_lower()
 		if cv.begins_with("modmain") and cv.ends_with(".gd"):
 			var constants = pointers.DataFormat.__get_script_constant_map_without_load(mod_path)
