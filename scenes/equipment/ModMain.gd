@@ -268,7 +268,6 @@ func match_mod_path_to_zip():
 	var mods = pointers.ManifestV2.__get_mod_data()["mods"]
 	for mod in mods:
 		modFiles.append(mod.to_lower())
-#	breakpoint
 	for modFSPath in _modZipFiles:
 		var gdunzip = gd.new()
 		gdunzip.load(modFSPath)
