@@ -67,7 +67,7 @@ func _pressed():
 	
 	var manifestData = MOD_INFO["manifest"]["manifest_data"]
 	already_pressed = false
-	var mod_name = MOD_INFO["name"]
+	var mod_name = translateIfCan(MOD_INFO["name"])
 	if information_nodes["info_name"].text == mod_name:
 		already_pressed = true
 	information_nodes["info_name"].text = mod_name
@@ -78,8 +78,8 @@ func _pressed():
 		else:
 			prio = "INF"
 	var ver = MOD_INFO["version_data"]["full_version_string"]
-	information_nodes["info_version"].text = TranslationServer.translate("HEVLIB_MODMENU_VERSION") % ver
-	information_nodes["info_priority"].text = TranslationServer.translate("HEVLIB_MODMENU_PRIO") % prio
+	information_nodes["info_version"].text = translateIfCan("HEVLIB_MODMENU_VERSION") % ver
+	information_nodes["info_priority"].text = translateIfCan("HEVLIB_MODMENU_PRIO") % prio
 	var iconTexture = null
 	if MOD_INFO["mod_icon"]["has_icon_file"]:
 		var icon_filepath = MOD_INFO["mod_icon"]["icon_path"]
@@ -101,16 +101,16 @@ func _pressed():
 	var author = ""
 	if manifestData:
 		author = manifestData["mod_information"]["author"]
-	information_nodes["info_author"].parse_bbcode(TranslationServer.translate(author))
+	information_nodes["info_author"].parse_bbcode(translateIfCan(author))
 	if author != "":
-		information_nodes["info_desc_author"].parse_bbcode(TranslationServer.translate(author))
+		information_nodes["info_desc_author"].parse_bbcode(translateIfCan(author))
 		information_nodes["info_desc_author"].visible = true
 	else:
 		information_nodes["info_desc_author"].visible = true
 	var description = ""
 	if manifestData:
 		description = manifestData["mod_information"]["description"]
-	information_nodes["info_desc_text"].parse_bbcode(TranslationServer.translate(description))
+	information_nodes["info_desc_text"].parse_bbcode(translateIfCan(description))
 	var creditText = ""
 	if manifestData:
 		for item in manifestData["mod_information"]["credits"]:
@@ -119,7 +119,7 @@ func _pressed():
 			else:
 				creditText = creditText + "\n" + item
 	if creditText != "":
-		information_nodes["info_desc_credits"].parse_bbcode(TranslationServer.translate(creditText))
+		information_nodes["info_desc_credits"].parse_bbcode(translateIfCan(creditText))
 		information_nodes["info_desc_credits"].visible = true
 	else:
 		information_nodes["info_desc_credits"].visible = false
@@ -155,7 +155,7 @@ func _pressed():
 			var languages = ""
 			for lang in langData:
 				var percent = langData[lang]
-				var ov = TranslationServer.translate("HEVLIB_MM_TOOLTIP_LANGUAGE_ENTRY") % [TranslationServer.get_locale_name(lang) + " / %s" % lang,percent]
+				var ov = translateIfCan("HEVLIB_MM_TOOLTIP_LANGUAGE_ENTRY") % [TranslationServer.get_locale_name(lang) + " / %s" % lang,percent]
 				if languages:
 					languages += "\n" + ov
 				else:
@@ -214,7 +214,7 @@ func _pressed():
 	
 	if id in update_data:
 		information_nodes["updates_button"].visible = true
-		information_nodes["updates_button"].hint_tooltip = TranslationServer.translate("HEVLIB_ICON_TOOLTIP_UPDATES") % [str(update_data[ID]["version"][0])+"."+str(update_data[ID]["version"][1])+"."+str(update_data[ID]["version"][2]),str(update_data[ID]["new_version"][0])+"."+str(update_data[ID]["new_version"][1])+"."+str(update_data[ID]["new_version"][2])]
+		information_nodes["updates_button"].hint_tooltip = translateIfCan("HEVLIB_ICON_TOOLTIP_UPDATES") % [str(update_data[ID]["version"][0])+"."+str(update_data[ID]["version"][1])+"."+str(update_data[ID]["version"][2]),str(update_data[ID]["new_version"][0])+"."+str(update_data[ID]["new_version"][1])+"."+str(update_data[ID]["new_version"][2])]
 		has_update = true
 	else:
 		information_nodes["updates_button"].visible = false
@@ -226,7 +226,7 @@ func _pressed():
 		for i in dependancy_data[id]:
 			var mname = pointers.ManifestV2.__get_mod_by_id(i)["name"]
 			cd = cd + "\n" + mname
-		information_nodes["dependancies_button"].hint_tooltip = TranslationServer.translate("HEVLIB_ICON_TOOLTIP_DEPENDANCIES") % cd
+		information_nodes["dependancies_button"].hint_tooltip = translateIfCan("HEVLIB_ICON_TOOLTIP_DEPENDANCIES") % cd
 		has_dep = true
 	else:
 		information_nodes["dependancies_button"].visible = false
@@ -237,7 +237,7 @@ func _pressed():
 		for i in conflict_data[id]:
 			var mname = pointers.ManifestV2.__get_mod_by_id(i)["name"]
 			cd = cd + "\n" + mname
-		information_nodes["conflict_button"].hint_tooltip = TranslationServer.translate("HEVLIB_ICON_TOOLTIP_CONFLICT") % cd
+		information_nodes["conflict_button"].hint_tooltip = translateIfCan("HEVLIB_ICON_TOOLTIP_CONFLICT") % cd
 		has_conf = true
 	else:
 		information_nodes["conflict_button"].visible = false
@@ -283,9 +283,9 @@ func _ready():
 			var tex = StreamTexture.new()
 			tex.load_path = "res://HevLib/ui/themes/icons/missing_icon.png.stex"
 			iconTexture = tex
-		panel.get_node("ModButton/VBoxContainer/HBoxContainer/LABELS/NAME").text = pname
+		panel.get_node("ModButton/VBoxContainer/HBoxContainer/LABELS/NAME").text = translateIfCan(pname)
 		if pdata["manifest"]["has_manifest"]:
-			panel.get_node("ModButton/VBoxContainer/HBoxContainer/LABELS/BRIEF").text = pdata["manifest"]["manifest_data"]["mod_information"]["brief"]
+			panel.get_node("ModButton/VBoxContainer/HBoxContainer/LABELS/BRIEF").text = translateIfCan(pdata["manifest"]["manifest_data"]["mod_information"]["brief"])
 		else:
 			panel.get_node("ModButton/VBoxContainer/HBoxContainer/LABELS/BRIEF").text = ""
 		panel.name = pname
@@ -334,7 +334,7 @@ func _draw():
 	
 	if ID in updt:
 		icon_updates.visible = true
-		icon_updates.hint_tooltip = TranslationServer.translate("HEVLIB_ICON_TOOLTIP_UPDATES") % [str(updt[ID]["version"][0])+"."+str(updt[ID]["version"][1])+"."+str(updt[ID]["version"][2]),str(updt[ID]["new_version"][0])+"."+str(updt[ID]["new_version"][1])+"."+str(updt[ID]["new_version"][2])]
+		icon_updates.hint_tooltip = translateIfCan("HEVLIB_ICON_TOOLTIP_UPDATES") % [str(updt[ID]["version"][0])+"."+str(updt[ID]["version"][1])+"."+str(updt[ID]["version"][2]),str(updt[ID]["new_version"][0])+"."+str(updt[ID]["new_version"][1])+"."+str(updt[ID]["new_version"][2])]
 	else:
 		icon_updates.visible = false
 	if ID in conf:
@@ -343,7 +343,7 @@ func _draw():
 		for i in conf[ID]:
 			var mname = pointers.ManifestV2.__get_mod_by_id(i)["name"]
 			cd = cd + "\n" + mname
-		icon_conflicts.hint_tooltip = TranslationServer.translate("HEVLIB_ICON_TOOLTIP_CONFLICT") % cd
+		icon_conflicts.hint_tooltip = translateIfCan("HEVLIB_ICON_TOOLTIP_CONFLICT") % cd
 	else:
 		icon_conflicts.visible = false
 	if ID in dep:
@@ -352,7 +352,7 @@ func _draw():
 		for i in dep[ID]:
 			var mname = pointers.ManifestV2.__get_mod_by_id(i)["name"]
 			cd = cd + "\n" + mname
-		icon_dependancies.hint_tooltip = TranslationServer.translate("HEVLIB_ICON_TOOLTIP_DEPENDANCIES") % cd
+		icon_dependancies.hint_tooltip = translateIfCan("HEVLIB_ICON_TOOLTIP_DEPENDANCIES") % cd
 	else:
 		icon_dependancies.visible = false
 	if ID in comp:
@@ -361,7 +361,7 @@ func _draw():
 		for i in comp[ID]:
 			var mname = pointers.ManifestV2.__get_mod_by_id(i)["name"]
 			cd = cd + "\n" + mname
-		icon_complementary.hint_tooltip = TranslationServer.translate("HEVLIB_ICON_TOOLTIP_COMPLEMENTARY") % cd
+		icon_complementary.hint_tooltip = translateIfCan("HEVLIB_ICON_TOOLTIP_COMPLEMENTARY") % cd
 	else:
 		icon_complementary.visible = false
 	
@@ -375,11 +375,11 @@ func _draw():
 		if not MOD_INFO["enabled"]:
 			is_disabled = true
 			if needs_restart_from_toggling:
-				disabled_text = TranslationServer.translate("HEVLIB_MODMENU_MODNAME_DISABLED_NEEDS_RESTART") + " "
+				disabled_text = translateIfCan("HEVLIB_MODMENU_MODNAME_DISABLED_NEEDS_RESTART") + " "
 			else:
-				disabled_text = TranslationServer.translate("HEVLIB_MODMENU_MODNAME_DISABLED") + " "
+				disabled_text = translateIfCan("HEVLIB_MODMENU_MODNAME_DISABLED") + " "
 		elif needs_restart_from_toggling:
-			disabled_text = TranslationServer.translate("HEVLIB_MODMENU_MODNAME_ENABLED_NEEDS_RESTART") + " "
+			disabled_text = translateIfCan("HEVLIB_MODMENU_MODNAME_ENABLED_NEEDS_RESTART") + " "
 	
 	var mod_name = disabled_text + MOD_INFO["name"]
 	var prio = MOD_INFO["priority"]
@@ -416,15 +416,15 @@ func _draw():
 	else:
 		get_child(0).modulate = Color(1,1,1,1)
 	icon_node.texture = iconTexture
-	var tooltip_text = TranslationServer.translate("HEVLIB_MM_TOOLTIP_HEADER")
+	var tooltip_text = translateIfCan("HEVLIB_MM_TOOLTIP_HEADER")
 
 	var md = manifest["manifest_data"]
 	if md:
 		ID = md["mod_information"]["id"]
 		
-	tooltip_text = tooltip_text + "\n" + TranslationServer.translate("HEVLIB_MM_TOOLTIP_MV") % manifest["manifest_version"]
+	tooltip_text = tooltip_text + "\n" + translateIfCan("HEVLIB_MM_TOOLTIP_MV") % manifest["manifest_version"]
 	if ID:
-		tooltip_text = tooltip_text + "\n" + TranslationServer.translate("HEVLIB_MM_TOOLTIP_ID") % ID
+		tooltip_text = tooltip_text + "\n" + translateIfCan("HEVLIB_MM_TOOLTIP_ID") % ID
 		if ID == "kodera.vanilla":
 			var tex = StreamTexture.new()
 			tex.load_path = "res://HevLib/ui/mod_menu/vanilla/kodera.stex"
@@ -433,12 +433,12 @@ func _draw():
 			button_lib_icon.visible = true
 	var zip = MOD_INFO["zip"]
 	if zip:
-		tooltip_text = tooltip_text + "\n" + TranslationServer.translate("HEVLIB_MM_TOOLTIP_ZIP") % zip
+		tooltip_text = tooltip_text + "\n" + translateIfCan("HEVLIB_MM_TOOLTIP_ZIP") % zip
 	
 	var manifestData = MOD_INFO["manifest"]["manifest_data"]
 	var brief = ""
 	if manifestData:
-		brief = manifestData["mod_information"]["brief"]
+		brief = translateIfCan(manifestData["mod_information"]["brief"])
 	button_brief.text = brief
 	getPointers()
 	
@@ -450,7 +450,7 @@ func _draw():
 		else:
 			visible = false
 	if is_library:
-		tooltip_text += ("\n" + TranslationServer.translate("HEVLIB_MM_TOOLTIP_LIBRARY") % [is_library,always_display])
+		tooltip_text += ("\n" + translateIfCan("HEVLIB_MM_TOOLTIP_LIBRARY") % [is_library,always_display])
 	
 	
 	button.hint_tooltip = tooltip_text
@@ -650,3 +650,32 @@ func getPointers():
 func yield_button_focus():
 	yield(CurrentGame.get_tree(),"idle_frame")
 	button.grab_focus()
+
+var modTranslations = {}
+var fetchedModTranslations = false
+
+var tlCache = {}
+func translateIfCan(translation : String):
+	if translation:
+		if translation in tlCache:
+			return tlCache[translation]
+		else:
+			var newTL = TranslationServer.translate(translation)
+			if newTL == translation:
+				var current_locale = Settings.cfg.locale.language
+				var master_locale = MOD_INFO["master_locale"]
+				if not fetchedModTranslations:
+					if "REPLACE_TRANSLATIONS.gd" in MOD_INFO["drivers"]:
+						modTranslations = MOD_INFO["drivers"]["REPLACE_TRANSLATIONS.gd"].get("TRANSLATIONS",{})
+					fetchedModTranslations = true
+				if current_locale in modTranslations:
+					var tlData = modTranslations[current_locale]
+					if translation in tlData:
+						newTL = tlData[translation].get("string",newTL)
+				if current_locale != master_locale and master_locale in modTranslations:
+					var tlData = modTranslations[master_locale]
+					if translation in tlData:
+						newTL = tlData[translation].get("string",newTL)
+			tlCache[translation] = newTL
+			return newTL
+	return ""
