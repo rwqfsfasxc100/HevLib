@@ -2039,7 +2039,7 @@ class _DriverManagement:
 					mod_drivers.append(this_mod_data)
 		
 		mod_drivers.sort_custom(self,"compare_driver_dictionaries")
-		return mod_drivers
+		return mod_drivers.duplicate(true)
 	
 	func compare_driver_dictionaries(a, b):
 		var aPrio = a.get("priority",0)
@@ -2100,7 +2100,7 @@ class _DriverManagement:
 					for i in consts:
 						this_mod_data[driver].merge({i:consts[i]})
 			driver_get_cache[file_path] = this_mod_data.duplicate(true)
-			return this_mod_data
+			return this_mod_data.duplicate(true)
 	
 	
 	
@@ -5831,9 +5831,10 @@ class _ManifestV2:
 			mod_version_string = mod_version_string + "-" + str(mod_version_metadata)
 		var version_dictionary : Dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
 		var drivers : Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(script_path)
+		var ml : String = "en"
 		if "REPLACE_TRANSLATIONS.gd" in drivers:
 			var tlData : Dictionary = drivers["REPLACE_TRANSLATIONS.gd"]["TRANSLATIONS"]
-			var ml : String = tlData.get("master_locale","en")
+			ml = tlData.get("master_locale","en")
 			tlData.erase("master_locale")
 			tlData.erase("file")
 			var master_locale : Dictionary = tlData.get(ml,{})
@@ -5867,7 +5868,7 @@ class _ManifestV2:
 				
 				
 				manifestEntry["manifest_data"]["languages"] = manifest_langs
-		return {"name":mod_name,"priority":mod_priority,"file_path":script_path,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"manifest":manifestEntry,"drivers":drivers,"mod_type":mod["mod_type"],"enabled":mod_enabled}
+		return {"name":mod_name,"priority":mod_priority,"file_path":script_path,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"manifest":manifestEntry,"drivers":drivers,"mod_type":mod["mod_type"],"enabled":mod_enabled,"master_locale":ml}
 	
 	static func sortModList(a,b):
 		var c1 = a.get("constants",{}).get("MOD_PRIORITY",0)
