@@ -1,3 +1,17 @@
+[1.14.3]
+
+1="* Fixed disabled modlets not having their information translated"
+2="* Greatly improved efficiency of modmenu item translations"
+3="* Increased number of places where translations occur in the mod menu"
+4="* Mod zip information is now fetched earlier in the load cycle"
+4.1="* Also no longer loads the zip to the filesystem, preventing any issues that could have potentially been caused by it"
+5="* Mod zip fetching can now see modlets"
+6="* Added __file_exists to the DataFormat class"
+6.1="* An all-encompassing method to determine if a file exists in the filesystem, without the need to query File and ResourceLoader directly"
+6.2="* file_path -> (String) path for the file to check"
+7="* Sped up __load_if_can as it no longer needs to do two checks for a file existing"
+8="* Mod info dictionaries now stores the mod's master locale, and defaults to 'en' if one isn't set"
+
 [1.14.2]
 
 1="* Fixed issue with the GitHub downloader menu only being able to see the 30 highest starred repositories in the DV topic."
