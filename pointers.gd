@@ -4506,8 +4506,9 @@ class _FileAccess:
 	func __load_png(path) -> Texture:
 		file.open(path, File.READ)
 		var bytes:PoolByteArray = file.get_buffer(file.get_len())
-		var img:Image = Image.new()
-		var imgtex:ImageTexture = ImageTexture.new()
+		var img = Image.new()
+		var data = img.load_png_from_buffer(bytes)
+		var imgtex = ImageTexture.new()
 		imgtex.create_from_image(img)
 		file.close()
 		return imgtex
@@ -5765,24 +5766,24 @@ class _ManifestV2:
 			return return_val
 	
 	func __compare_versions(checked_mod_data:Dictionary) -> bool:
-		var installed_mods = __get_mod_data()
-		var check_keys = checked_mod_data.keys()
-		var check_name = checked_mod_data[check_keys[0]].get("name","")
-		var installed_dict = {}
+		var installed_mods : Dictionary = __get_mod_data()
+		var check_keys : Array = checked_mod_data.keys()
+		var check_name : String = checked_mod_data[check_keys[0]].get("name","")
+		var installed_dict : Dictionary = {}
 		for installed_mod in installed_mods["mods"]:
-			var installed_mName = installed_mods["mods"][installed_mod].get("name","")
+			var installed_mName : String = installed_mods["mods"][installed_mod].get("name","")
 			if installed_mName == check_name:
 				installed_dict = installed_mods["mods"][installed_mod].duplicate()
 		if installed_dict.keys().size() == 0:
 			return false
-		var checked_manifest_version = checked_mod_data[check_keys[0]]["manifest"]["manifest_version"]
-		var installed_manifest_version = installed_dict["manifest"]["manifest_version"]
+		var checked_manifest_version:float = checked_mod_data[check_keys[0]]["manifest"]["manifest_version"]
+		var installed_manifest_version:float = installed_dict["manifest"]["manifest_version"]
 		if checked_manifest_version <= 1:
 			return false
 		if checked_manifest_version > installed_manifest_version:
 			return true
-		var checked_mod_version = checked_mod_data[check_keys[0]]["version_data"]["full_version_array"]
-		var installed_mod_version = installed_dict["version_data"]["full_version_array"]
+		var checked_mod_version : Array = checked_mod_data[check_keys[0]]["version_data"]["full_version_array"]
+		var installed_mod_version : Array = installed_dict["version_data"]["full_version_array"]
 		if checked_mod_version[0] > installed_mod_version[0]:
 			return true
 		if checked_mod_version[1] > installed_mod_version[1]:
@@ -5792,27 +5793,27 @@ class _ManifestV2:
 		return false
 	
 	func __get_mod_data_from_files(script_path:String) -> Dictionary:
-		var constants = pointers.DataFormat.__get_script_constant_map_without_load(script_path)
-		var folder_path = script_path.get_base_dir() + "/"
-		var mod_priority = constants.get("MOD_PRIORITY",0)
-		var mod_name = str(constants.get("MOD_NAME",script_path.split("/")[2]))
-		var legacy_mod_version = constants.get("MOD_VERSION","1.0.0")
-		var mod_version_major = constants.get("MOD_VERSION_MAJOR",1)
-		var mod_version_minor = constants.get("MOD_VERSION_MINOR",0)
-		var mod_version_bugfix = constants.get("MOD_VERSION_BUGFIX",0)
-		var mod_version_metadata = constants.get("MOD_VERSION_METADATA","")
+		var constants : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(script_path)
+		var folder_path : String = script_path.get_base_dir() + "/"
+		var mod_priority:int = constants.get("MOD_PRIORITY",0)
+		var mod_name : String = str(constants.get("MOD_NAME",script_path.split("/")[2]))
+		var legacy_mod_version : String = constants.get("MOD_VERSION","1.0.0")
+		var mod_version_major:int = constants.get("MOD_VERSION_MAJOR",1)
+		var mod_version_minor:int = constants.get("MOD_VERSION_MINOR",0)
+		var mod_version_bugfix:int = constants.get("MOD_VERSION_BUGFIX",0)
+		var mod_version_metadata : String = constants.get("MOD_VERSION_METADATA","")
 		
-		var mod_is_library = constants.get("MOD_IS_LIBRARY",false)
+		var mod_is_library:bool = constants.get("MOD_IS_LIBRARY",false)
 		
-		var hide_library = constants.get("LIBRARY_HIDDEN_BY_DEFAULT",true)
-		var content = __get_manifest_files()
-		var has_mod_manifest = false
-		var manifest_data = {}
-		var manifest_version = 1
-		var has_icon_file = false
-		var icon_path = ""
-		var png_path = ""
-		var stex_path = ""
+		var hide_library:bool = constants.get("LIBRARY_HIDDEN_BY_DEFAULT",true)
+		var content : Array = __get_manifest_files()
+		var has_mod_manifest:bool = false
+		var manifest_data : Dictionary = {}
+		var manifest_version:float = 1.0
+		var has_icon_file:bool = false
+		var icon_path : String = ""
+		var png_path : String = ""
+		var stex_path : String = ""
 		for file in content:
 			if file.to_lower() == folder_path.to_lower() + "mod.manifest":
 				has_mod_manifest = true
@@ -5836,41 +5837,39 @@ class _ManifestV2:
 			icon_path = stex_path
 		elif png_path:
 			icon_path = png_path
-		var icon_dict = {"has_icon_file":has_icon_file,"icon_path":icon_path}
-		var manifestEntry = {"has_manifest":has_mod_manifest,"manifest_version":manifest_version,"manifest_data":manifest_data}
-		var mod_version_array = [mod_version_major,mod_version_minor,mod_version_bugfix]
-		var mod_version_string = str(mod_version_major) + "." + str(mod_version_minor) + "." + str(mod_version_bugfix)
+		var icon_dict : Dictionary = {"has_icon_file":has_icon_file,"icon_path":icon_path}
+		var manifestEntry : Dictionary = {"has_manifest":has_mod_manifest,"manifest_version":manifest_version,"manifest_data":manifest_data}
+		var mod_version_array : Array = [mod_version_major,mod_version_minor,mod_version_bugfix]
+		var mod_version_string : String = str(mod_version_major) + "." + str(mod_version_minor) + "." + str(mod_version_bugfix)
 		if not str(mod_version_metadata) == "":
 			mod_version_array.append(mod_version_metadata)
 			mod_version_string = mod_version_string + "-" + str(mod_version_metadata)
-		var version_dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
-		var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":mod_is_library,"keep_library_hidden":hide_library},"manifest":manifestEntry}}
+		var version_dictionary : Dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
+		var mod_entry : Dictionary = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":mod_is_library,"keep_library_hidden":hide_library},"manifest":manifestEntry}}
 		return(mod_entry)
 	
-	var cached_manifests = {}
+	var cached_manifests : Dictionary = {}
 	
 	func __parse_file_as_manifest(file_path: String, format_to_manifest_version: bool = true) -> Dictionary:
-		var cachevar = file_path + ":" + str(format_to_manifest_version)
+		var cachevar : String = file_path + ":" + str(format_to_manifest_version)
 		if cachevar in cached_manifests:
 			return cached_manifests[cachevar].duplicate(true)
 		else:
-			var out = {}
-			var cfg = pointers.ConfigDriver.__config_parse(file_path)
+			var out : Dictionary = {}
+			var cfg : Dictionary = pointers.ConfigDriver.__config_parse(file_path)
 			var manifest_data : Dictionary = {}
-			var manifest_version = 1.0
+			var manifest_version:float = 1.0
 			if "manifest_definitions" in cfg:
 				manifest_version = cfg["manifest_definitions"].get("manifest_version",manifest_version)
-				var tpf = typeof(manifest_version)
-				if tpf == TYPE_INT or tpf == TYPE_REAL:
-					pass
-				else:
-					manifest_version = 1
+				var tpf:int = typeof(manifest_version)
+				if not (tpf == TYPE_INT or tpf == TYPE_REAL):
+					manifest_version = 1.0
 			manifest_data = cfg
 			if format_to_manifest_version:
-				var dict_template = {
+				var dict_template : Dictionary = {
 					"mod_information":{
-						"name":null,
-						"id":null,
+						"name":"",
+						"id":"",
 						"description":"",
 						"brief":"",
 						"author":"",
@@ -5910,9 +5909,9 @@ class _ManifestV2:
 					}
 				}
 				match manifest_version:
-					1, 1.0:
-						dict_template["mod_information"]["id"] = manifest_data["package"].get("id",null)
-						dict_template["mod_information"]["name"] = manifest_data["package"].get("name",null)
+					1.0:
+						dict_template["mod_information"]["id"] = manifest_data["package"].get("id","")
+						dict_template["mod_information"]["name"] = manifest_data["package"].get("name","")
 						var version = manifest_data["package"].get("version","unknown")
 						dict_template["mod_information"]["description"] = manifest_data["package"].get("description","MODMENU_DESCRIPTION_PLACEHOLDER")
 						
@@ -5933,9 +5932,9 @@ class _ManifestV2:
 						if wikiURL != "":
 							dict_template["links"].merge({"HEVLIB_WIKI":{"URL":wikiURL}})
 						
-					2, 2.0:
-						dict_template["mod_information"]["id"] = manifest_data["package"].get("id",null)
-						dict_template["mod_information"]["name"] = manifest_data["package"].get("name",null)
+					2.0:
+						dict_template["mod_information"]["id"] = manifest_data["package"].get("id","")
+						dict_template["mod_information"]["name"] = manifest_data["package"].get("name","")
 						dict_template["version"]["version_major"] = manifest_data["package"].get("version_major",1)
 						dict_template["version"]["version_minor"] = manifest_data["package"].get("version_minor",0)
 						dict_template["version"]["version_bugfix"] = manifest_data["package"].get("version_bugfix",0)
@@ -5967,8 +5966,8 @@ class _ManifestV2:
 					2.1:
 						# information
 						if "mod_information" in manifest_data:
-							dict_template["mod_information"]["id"] = String(manifest_data["mod_information"].get("id",null))
-							dict_template["mod_information"]["name"] = String(manifest_data["mod_information"].get("name",null))
+							dict_template["mod_information"]["id"] = String(manifest_data["mod_information"].get("id",""))
+							dict_template["mod_information"]["name"] = String(manifest_data["mod_information"].get("name",""))
 							dict_template["mod_information"]["description"] = String(manifest_data["mod_information"].get("description","HEVLIB_DESCRIPTION_PLACEHOLDER"))
 							dict_template["mod_information"]["author"] = String(manifest_data["mod_information"].get("author","Unknown"))
 							dict_template["mod_information"]["credits"] = PoolStringArray(manifest_data["mod_information"].get("credits",[]))
@@ -6047,7 +6046,7 @@ class _ManifestV2:
 					2.2:
 						
 						if "mod_information" in manifest_data:
-							dict_template["mod_information"]["id"] = String(manifest_data["mod_information"].get("id",null))
+							dict_template["mod_information"]["id"] = String(manifest_data["mod_information"].get("id",""))
 							dict_template["mod_information"]["name"] = String(manifest_data["mod_information"].get("name",""))
 							dict_template["mod_information"]["description"] = String(manifest_data["mod_information"].get("description","HEVLIB_DESCRIPTION_PLACEHOLDER"))
 							dict_template["mod_information"]["brief"] = String(manifest_data["mod_information"].get("brief",""))
@@ -6092,8 +6091,8 @@ class _ManifestV2:
 							dict_template["configs"].merge(configs)
 						
 						
-				var version_metadata = dict_template["version"]["version_metadata"]
-				var version_string = str(dict_template["version"]["version_major"]) + "." + str(dict_template["version"]["version_minor"]) + "." + str(dict_template["version"]["version_bugfix"])
+				var version_metadata : String = dict_template["version"]["version_metadata"]
+				var version_string : String = str(dict_template["version"]["version_major"]) + "." + str(dict_template["version"]["version_minor"]) + "." + str(dict_template["version"]["version_bugfix"])
 				if not version_metadata == "":
 					version_string = version_string + "-" + version_metadata
 				dict_template["version"]["version_string"] = version_string
@@ -6104,21 +6103,20 @@ class _ManifestV2:
 			return out
 	
 	func __get_mod_by_id(id:String, case_sensitive: bool = true) -> Dictionary:
-		var mods = {}
+		var mods : Dictionary = {}
 		if not cached_mod_list.empty():
 			mods = cached_mod_list["mods"]
 		else:
-			var data = __get_mod_data()
+			var data : Dictionary = __get_mod_data()
 			mods = data["mods"]
 		for mod in mods:
-			var ID = ""
-			var moddata = mods.get(mod)
-			var manifest = moddata["manifest"]["manifest_data"]
-			var keys = manifest.keys()
-			if keys.size() > 0:
-				if "mod_information" in keys:
+			var ID : String = ""
+			var moddata : Dictionary = mods.get(mod)
+			var manifest : Dictionary = moddata["manifest"]["manifest_data"]
+			if manifest:
+				if "mod_information" in manifest:
 					ID = manifest["mod_information"].get("id","")
-			var matches = false
+			var matches:bool = false
 			if case_sensitive:
 				if id.to_upper() == ID.to_upper():
 					matches = true
@@ -6135,27 +6133,27 @@ class _ManifestV2:
 		if tag_data_cache:
 			return tag_data_cache.duplicate(true)
 		else:
-			var tag_dict = {}
-			var mods = __get_mod_data()["mods"]
+			var tag_dict : Dictionary = {}
+			var mods : Dictionary = __get_mod_data()["mods"]
 			for mod in mods:
 				if mods[mod]["manifest"]["has_manifest"]:
-					var md = mods[mod]["manifest"]["manifest_data"]
-					var id = md["mod_information"].get("id",null)
+					var md : Dictionary = mods[mod]["manifest"]["manifest_data"]
+					var id : String = md["mod_information"].get("id","")
 					if id and "tags" in md:
-						var tags = md["tags"]
+						var tags : Dictionary = md["tags"]
 						for tag in tags:
 							if not tag in tag_dict:
 								tag_dict[tag] = {}
-							var td = tags[tag]
+							var td : Dictionary = tags[tag]
 							if typeof(td) == TYPE_DICTIONARY and "value" in td and "type" in td:
 								tag_dict[tag][id] = td["value"]
 			return tag_dict
 	
 	func __get_mod_tags(mod_id: String) -> Dictionary:
-		var tag_dict = {}
-		var tags = __get_tags()
+		var tag_dict : Dictionary = {}
+		var tags : Dictionary = __get_tags()
 		for tag in tags:
-			var td = tags[tag]
+			var td : Dictionary = tags[tag]
 			if mod_id in td:
 				if not tag in tag_dict:
 					tag_dict[tag] = null
@@ -6163,52 +6161,51 @@ class _ManifestV2:
 		return tag_dict
 	
 	func __get_mods_from_tag(tag_name: String) -> Array:
-		var alldata = __get_tags()
-		var data = alldata.get(tag_name,{})
-		if data.size() >=1:
-			return data.keys()
-		return []
+		return __get_tags().get(tag_name,{}).keys()
 	
 	func __get_mods_and_tags_from_tag(tag_name: String) -> Dictionary:
-		var alldata = __get_tags()
-		var data = alldata.get(tag_name,{})
-		var ex_data = {}
-		if data.size() > 0:
+		
+		# REFACTOR TO USE __parse_tags
+		
+		var alldata : Dictionary = __get_tags()
+		var data : Dictionary = alldata.get(tag_name,{})
+		var ex_data : Dictionary = {}
+		if data:
 			for mod in data:
 				match tag_name:
 					"TAG_ADDS_EQUIPMENT","TAG_ADDS_EVENTS","TAG_ADDS_GAMEPLAY_MECHANICS","TAG_ADDS_SHIPS":
-						var k = data.get(mod,[])
+						var k : Array = data.get(mod,[])
 						if k:
-							var equip = []
+							var equip : Array = []
 							for lang in k:
 								equip.append(lang)
 							ex_data[mod] = equip
 					"TAG_HANDLE_EXTRA_CREW":
-						var k = data.get(mod,24)
-						if k >= 25:
+						var k:int = data.get(mod,24)
+						if k > 24:
 							ex_data[mod] = k
 					_:
-						var k = data.get(mod,false)
+						var k:bool = data.get(mod,false)
 						ex_data[mod] = k
 		return ex_data
 	
 	func __get_manifest_section(section: String, mod_id: String = "") -> Dictionary:
-		var manifest_data_cache = __get_manifest_cache()
-		var mode = 0
-		var return_data = {}
+		var manifest_data_cache : Dictionary = __get_manifest_cache()
+		var mode:int = 0
+		var return_data : Dictionary = {}
 		if mod_id != "":
 			mode = 1
 		match mode:
 			0:
 				for mod in manifest_data_cache:
-					var manifest = manifest_data_cache[mod]
+					var manifest : Dictionary = manifest_data_cache[mod]
 					if section in manifest:
 						return_data[mod] = manifest[section]
 					
 			1:
 				for mod in manifest_data_cache:
 					if mod_id in __get_mod_ids():
-						var manifest = manifest_data_cache[mod]
+						var manifest : Dictionary = manifest_data_cache[mod]
 						if "mod_information" in manifest:
 							if mod_id in manifest["mod_information"]["id"]:
 								if section in manifest:
@@ -6217,22 +6214,22 @@ class _ManifestV2:
 		return return_data
 	
 	func __get_manifest_entry(section: String, entry: String, mod_id: String = ""):
-		var manifest_data_cache = __get_manifest_cache()
-		var mode = 0
-		var return_data = {}
+		var manifest_data_cache : Dictionary = __get_manifest_cache()
+		var mode:int = 0
+		var return_data : Dictionary = {}
 		if mod_id != "":
 			mode = 1
 		match mode:
 			0:
 				for mod in manifest_data_cache:
-					var manifest = manifest_data_cache[mod]
+					var manifest : Dictionary = manifest_data_cache[mod]
 					if section in manifest:
 						return_data[mod] = manifest[section]
 					
 			1:
 				for mod in manifest_data_cache:
 					if mod_id in __get_mod_ids():
-						var manifest = manifest_data_cache[mod]
+						var manifest : Dictionary = manifest_data_cache[mod]
 						if "mod_information" in manifest:
 							if mod_id in manifest["mod_information"]["id"]:
 								if section in manifest:
@@ -6240,14 +6237,14 @@ class _ManifestV2:
 		
 		var sec = return_data
 		
-		var nmode = 0
+		var nmode:int = 0
 		if mod_id != "":
 			nmode = 1
 		match nmode:
 			0:
-				var dict = {}
+				var dict : Dictionary = {}
 				for mod in sec:
-					var id = manifest_data_cache[mod]["mod_information"]["id"]
+					var id : String = manifest_data_cache[mod]["mod_information"]["id"]
 					if entry in sec[mod]:
 						var e = sec[mod][entry]
 						dict.merge({id:e})
@@ -6257,39 +6254,39 @@ class _ManifestV2:
 					return sec[entry]
 		return {}
 	
-	var caches_mod_ids = []
+	var caches_mod_ids : Array = []
 	
 	func __get_mod_ids() -> Array:
 		if caches_mod_ids:
 			return caches_mod_ids.duplicate(true)
 		else:
-			var mod_data = {}
+			var mod_data : Dictionary = {}
 			if not cached_mod_list.empty():
 				mod_data = cached_mod_list["mods"]
 			else:
 				mod_data = __get_mod_data()["mods"]
-			var returning = []
+			var returning : Array = []
 			for mod in mod_data:
-				var data = mod_data[mod]["manifest"]["manifest_data"]
+				var data : Dictionary = mod_data[mod]["manifest"]["manifest_data"]
 				if "mod_information" in data:
-					var minfo = data["mod_information"]["id"]
+					var minfo : String = data["mod_information"]["id"]
 					returning.append(minfo)
 			caches_mod_ids = returning.duplicate(true)
 			return returning
 	
 	
 	func __check_complementary():
-		var mods = {}
+		var mods : Dictionary = {}
 		if not cached_mod_list.empty():
 			mods = cached_mod_list["mods"]
 		else:
 			mods = __get_mod_data()["mods"]
-		var tags = __get_manifest_entry("manifest_definitions","complementary_mod_ids")
-		var complimentaries = {}
+		var tags : Dictionary = __get_manifest_entry("manifest_definitions","complementary_mod_ids")
+		var complimentaries : Dictionary = {}
 		for mod in tags:
 			var keys = tags[mod]
 			if keys:
-				var items = []
+				var items : Array = []
 				for item in keys:
 					if item in mods:
 						items.append(item)
@@ -6298,54 +6295,50 @@ class _ManifestV2:
 		return complimentaries
 	
 	func __check_mod_complementary(mod_id):
-		var mods = {}
+		var mods : Dictionary = {}
 		if not cached_mod_list.empty():
 			mods = cached_mod_list["mods"]
 		else:
 			mods = __get_mod_data()["mods"]
-		var tags = __get_manifest_entry("manifest_definitions","complementary_mod_ids",mod_id)
-		var complimentaries = []
+		var tags : Dictionary = __get_manifest_entry("manifest_definitions","complementary_mod_ids",mod_id)
+		var complimentaries : Array = []
 		for mod in tags:
 			if mod in mods:
 				complimentaries.append(mod)
 		return complimentaries
 	
 	func __check_dependancies():
-		var mods = __get_mod_ids()
-		var tags = __get_manifest_entry("manifest_definitions","dependancy_mod_ids")
-		var complimentaries = {}
+		var mods : Array = __get_mod_ids()
+		var tags : Dictionary = __get_manifest_entry("manifest_definitions","dependancy_mod_ids")
+		var complimentaries : Dictionary = {}
 		for mod in tags:
 			var keys = tags[mod]
 			if keys:
-				var items = []
+				var items : Array = []
 				for item in keys:
-					if item in mods:
-						pass
-					else:
+					if not item in mods:
 						items.append(item)
 				if items:
 					complimentaries.merge({mod:items})
 		return complimentaries
 	
 	func __check_mod_dependancies(mod_id):
-		var mods = __get_mod_ids()
-		var tags = __get_manifest_entry("manifest_definitions","dependancy_mod_ids",mod_id)
-		var complimentaries = []
+		var mods : Array = __get_mod_ids()
+		var tags : Dictionary = __get_manifest_entry("manifest_definitions","dependancy_mod_ids",mod_id)
+		var complimentaries : Array = []
 		for mod in tags:
-			if mod in mods:
-				pass
-			else:
+			if not mod in mods:
 				complimentaries.append(mod)
 		return complimentaries
 	
 	func __check_conflicts():
-		var mods = __get_mod_ids()
-		var tags = __get_manifest_entry("manifest_definitions","conflicting_mod_ids")
-		var complimentaries = {}
+		var mods : Array = __get_mod_ids()
+		var tags : Dictionary = __get_manifest_entry("manifest_definitions","conflicting_mod_ids")
+		var complimentaries : Dictionary = {}
 		for mod in tags:
 			var keys = tags[mod]
 			if keys:
-				var items = []
+				var items : Array = []
 				for item in keys:
 					if item in mods:
 						items.append(item)
@@ -6354,34 +6347,34 @@ class _ManifestV2:
 		return complimentaries
 	
 	func __check_mod_conflicts(mod_id):
-		var mods = __get_mod_ids()
-		var tags = __get_manifest_entry("manifest_definitions","conflicting_mod_ids",mod_id)
-		var complimentaries = []
+		var mods : Array = __get_mod_ids()
+		var tags : Dictionary = __get_manifest_entry("manifest_definitions","conflicting_mod_ids",mod_id)
+		var complimentaries : Array = []
 		for mod in tags:
 			if mod in mods:
 				complimentaries.append(mod)
 		return complimentaries
 	
 	func __parse_tags(tag_data) -> Dictionary:
-		var tag_dict = {}
+		var tag_dict : Dictionary = {}
 		for entry in tag_data:
-			var type = typeof(tag_data[entry])
+			var type:int = typeof(tag_data[entry])
 			if type != TYPE_DICTIONARY:
 				return tag_dict
-			var tag_type = tag_data[entry].get("type","NULL_TYPE")
+			var tag_type : String = tag_data[entry].get("type","NULL_TYPE")
 			tag_type = tag_type.to_lower()
 			match tag_type:
 				"boolean","bool":
-					var val = bool(tag_data[entry].get("value"))
+					var val:bool = bool(tag_data[entry].get("value"))
 					tag_dict.merge({entry:val})
 				"string","str":
-					var val = str(tag_data[entry].get("value"))
+					var val : String = str(tag_data[entry].get("value"))
 					tag_dict.merge({entry:val})
 				"integer","int":
-					var val = int(tag_data[entry].get("value"))
+					var val:int = int(tag_data[entry].get("value"))
 					tag_dict.merge({entry:val})
 				"array","arr":
-					var val = Array(tag_data[entry].get("value"))
+					var val : Array = Array(tag_data[entry].get("value"))
 					tag_dict.merge({entry:val})
 				_:
 					var val = tag_data[entry].get("value")
@@ -6393,29 +6386,29 @@ class _ManifestV2:
 			folder = folder + "/"
 		if last_seen_file.begins_with("/"):
 			last_seen_file.lstrip("/")
-		var all_mods = __get_mod_data()["mods"]
+		var all_mods : Dictionary = __get_mod_data()["mods"]
 		pointers.FolderAccess.__check_folder_exists(folder)
 		if not file.file_exists(folder + last_seen_file):
 			file.open(folder + last_seen_file,File.WRITE)
 			file.store_string("{}")
 			file.close()
-		var mods = {}
+		var mods : Dictionary = {}
 		for mod in all_mods:
-			var data = all_mods[mod]
+			var data : Dictionary = all_mods[mod]
 			if data["manifest"]["has_manifest"] and data["manifest"]["manifest_version"] >= 2.0:
-				var manifest = data["manifest"]["manifest_data"]
-				var info = manifest["mod_information"]
-				var version = manifest["version"]
+				var manifest : Dictionary = data["manifest"]["manifest_data"]
+				var info : Dictionary = manifest["mod_information"]
+				var version : Dictionary = manifest["version"]
 				mods[info["id"]] = {"name":info["name"],"version":{"major":version["version_major"],"minor":version["version_minor"],"bugfix":version["version_bugfix"]},"path":data["file_path"],"changelog":manifest["manifest_definitions"]["changelog_path"]}
-		var last = {}
+		var last : Dictionary = {}
 		if file.file_exists(folder + last_seen_file):
 			file.open(folder + last_seen_file,File.READ)
 			last = JSON.parse(file.get_as_text()).result
 			file.close()
-		var changes = {}
+		var changes : Dictionary = {}
 		for mod in mods:
-			var has_changed = false
-			var data = mods[mod]
+			var has_changed:bool = false
+			var data : Dictionary = mods[mod]
 			if mod in last:
 				if data["version"]["major"] != last[mod]["version"]["major"]:
 					has_changed = true
@@ -6427,23 +6420,21 @@ class _ManifestV2:
 				has_changed = true
 			if has_changed:
 				changes.merge({mod:data})
-		pass
-		
 		return changes
 	
 	func __get_mod_versions(store = false,folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",last_seen_file = "mods_from_last_launch.json",this_seen_file = "mods_from_this_launch.json") -> Dictionary:
-		var mods = {}
-		var all_mods = {}
+		var mods : Dictionary = {}
+		var all_mods : Dictionary = {}
 		if not cached_mod_list.empty():
 			all_mods = cached_mod_list["mods"]
 		else:
 			all_mods = __get_mod_data()["mods"]
 		for mod in all_mods:
-			var data = all_mods[mod]
+			var data : Dictionary = all_mods[mod]
 			if data["manifest"]["has_manifest"] and data["manifest"]["manifest_version"] >= 2.0:
-				var manifest = data["manifest"]["manifest_data"]
-				var info = manifest["mod_information"]
-				var version = manifest["version"]
+				var manifest : Dictionary = data["manifest"]["manifest_data"]
+				var info : Dictionary = manifest["mod_information"]
+				var version : Dictionary = manifest["version"]
 				mods[info["id"]] = {"name":info["name"],"version":{"major":version["version_major"],"minor":version["version_minor"],"bugfix":version["version_bugfix"]}}
 		if store:
 			if not folder.ends_with("/"):
@@ -6453,7 +6444,7 @@ class _ManifestV2:
 			pointers.FolderAccess.__check_folder_exists(folder)
 			if file.file_exists(folder + this_seen_file):
 				file.open(folder + this_seen_file,File.READ)
-				var lastData = JSON.parse(file.get_as_text()).result
+				var lastData : Dictionary = JSON.parse(file.get_as_text()).result
 				file.close()
 				file.open(folder + last_seen_file,File.WRITE)
 				file.store_string(JSON.print(lastData))
@@ -6464,37 +6455,38 @@ class _ManifestV2:
 		return mods
 	
 	func __parse_changelogs(file_path):
-		var c = ConfigFile.new()
-		var changelog = {}
+		var c:ConfigFile = ConfigFile.new()
+		var changelog : Dictionary = {}
 		c.load(file_path)
-		var versions = c.get_sections()
-		var spacing = "  "
+		var versions : Array = c.get_sections()
+		var spacing : String = "  "
 		for version in versions:
 			changelog.merge({version:[]})
-			var keys = c.get_section_keys(version)
-			var current_key = 1
+			var keys : Array = c.get_section_keys(version)
+			keys.sort_custom(self,"keySorter")
+			var current_key:int = 1
 			while current_key > 0:
-				var key = str(current_key)
+				var key : String = str(current_key)
 				if key in keys:
 					var entry = c.get_value(version,key)
 					changelog[version].append(entry)
-					var current_subkey = 1
+					var current_subkey:int = 1
 					while current_subkey > 0:
-						var subkey = key + "." + str(current_subkey)
+						var subkey : String = key + "." + str(current_subkey)
 						if subkey in keys:
 							var entry2 = c.get_value(version,subkey)
 							entry2 = spacing + entry2
 							changelog[version].append(entry2)
-							var current_subkey2 = 1
+							var current_subkey2:int = 1
 							while current_subkey2 > 0:
-								var subkey2 = subkey + "." + str(current_subkey2)
+								var subkey2 : String = subkey + "." + str(current_subkey2)
 								if subkey2 in keys:
 									var entry3 = c.get_value(version,subkey2)
 									entry3 = spacing + spacing + entry3
 									changelog[version].append(entry3)
 									var current_subkey3 = 1
 									while current_subkey3 > 0:
-										var subkey3 = subkey2 + "." + str(current_subkey3)
+										var subkey3 : String = subkey2 + "." + str(current_subkey3)
 										if subkey3 in keys:
 											var entry4 = c.get_value(version,subkey3)
 											entry4 = spacing + spacing + spacing + entry4
@@ -6514,9 +6506,20 @@ class _ManifestV2:
 					current_key += 1
 				else:
 					current_key = 0
-			
-			pass
 		return changelog
+	
+	func keySorter(al:String,bl:String) -> bool:
+		var aList = al.split(".")
+		var bList = bl.split(".")
+		var aSize = aList.size()
+		var bSize = bList.size()
+		var counter = aSize if aSize < bSize else bSize
+		for i in range(counter):
+			var a = aList[i]
+			var b = bList[i]
+			if a != b:
+				return a < b
+		return aSize < bSize
 	
 	func __get_manifest_cache() -> Dictionary:
 		return cached_manifests
