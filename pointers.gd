@@ -2,7 +2,7 @@ extends Node
 
 const gdunzip = preload("res://HevLib/scripts/vendor/gdunzip.gd")
 
-var http = HTTPRequest.new()
+var http:HTTPRequest = HTTPRequest.new()
 
 var equipment_modmain
 
@@ -48,7 +48,7 @@ var Classes = [
 	Zip,
 ]
 
-func _physics_process(delta):
+func _physics_process(delta:float):
 	if ConfigDriver.mk_c:
 		ConfigDriver.handle_change_made()
 func _ready():
@@ -58,7 +58,7 @@ func _ready():
 	get_parent().move_child(self,get_parent().get_child_count())
 	pause_mode = Node.PAUSE_MODE_PROCESS
 class _Achievements:
-	var scripts = [
+	var scripts : Array = [
 		
 	]
 	
@@ -116,10 +116,10 @@ class _Achievements:
 			}
 		}
 	
-	var achievementsFile = "user://achievements.dv"
-	var password = "b0ngadabonga"
-	var file = File.new()
-	var http
+	var achievementsFile : String  = "user://achievements.dv"
+	var password : String  = "b0ngadabonga"
+	var file:File = File.new()
+	var http:HTTPRequest
 	
 	var pointers
 	
@@ -136,7 +136,7 @@ class _Achievements:
 	
 	var steam_node = null
 	var steam_singleton = null
-	var annoyingAsFuckAchievements = { # These achievements aren't marked as needing stats in the achievement file, but need them anyway
+	var annoyingAsFuckAchievements : Dictionary = { # These achievements aren't marked as needing stats in the achievement file, but need them anyway
 		"DIVER_10":10,
 		"DIVER_50":50,
 		"DIVER_ENCKE":3000,
@@ -146,7 +146,7 @@ class _Achievements:
 		"LEAF_20":20000,
 		"PLAYSTYLE_MANUAL":900
 	}
-	var spoiler_achievements = [
+	var spoiler_achievements : Array = [
 		# The following URL is to a profile with little enough playtime to provide a good idea of spoilered achievements: https://steamcommunity.com/profiles/76561198067601574/stats/846030/?tab=achievements
 		# This is ordered in SteamDB order, to help with double checking
 		"DISCOVER_MOONLET",
@@ -170,9 +170,9 @@ class _Achievements:
 	]
 	
 	
-	var completionCache = {}
-	var currentAchievementCache = {}
-	var cached_playtime_ach_and_data = []
+	var completionCache : Dictionary = {}
+	var currentAchievementCache : Dictionary = {}
+	var cached_playtime_ach_and_data : Array = []
 	
 	
 	func __get_achievement_data(achievementID: String) -> Dictionary:
@@ -220,7 +220,7 @@ class _Achievements:
 					"PLAYSTYLE":
 						stat = "manual"
 		
-		var returnData = {
+		var returnData : Dictionary = {
 			"name":achievementID,
 			"isUnlocked":achievementID in currentAchievementCache.get("unlockedAchievements",[]),
 			"stat":stat,
@@ -237,19 +237,19 @@ class _Achievements:
 		return Achivements.achivements.get(STAT,0.0)
 	
 	func __get_achievement_percentage() -> float:
-		var percent = 0.0
+		var percent : float = 0.0
 		var ach = Achivements.achievementRarity
 		var size = float(Achivements.achievementRarity.size())
-		var achivements = {}
+		var achivements : Dictionary = {}
 		if file.file_exists(achievementsFile):
 			if file.open_encrypted_with_pass(achievementsFile, File.READ, password) == OK:
-				var sg = file.get_line()
+				var sg : String = file.get_line()
 				achivements = parse_json(sg)
 			else:
 				Debug.l("Error loading achievements file")
 		file.close()
 		
-		var count = 0.0
+		var count : float = 0.0
 		
 		for i in ach:
 			if i in achivements and achivements[i]:
@@ -267,10 +267,10 @@ class _Achievements:
 		return completionCache
 	
 	func get_current_achievements():
-		var unlockedAchievements = []
-		var lockedAchievements = []
-		var allAchievements = []
-		var stats = []
+		var unlockedAchievements : Array = []
+		var lockedAchievements : Array = []
+		var allAchievements : Array = []
+		var stats : Array = []
 		var achievementData = Achivements.achivements
 		var rarity = Achivements.achievementRarity
 		for m in achievementData:
@@ -284,7 +284,7 @@ class _Achievements:
 			for f in allAchievements:
 				if not unlockedAchievements.has(f):
 					lockedAchievements.append(f)
-		var ccDictionary = {"allAchievements":allAchievements,"unlockedAchievements":unlockedAchievements,"lockedAchievements":lockedAchievements,"stats":stats}
+		var ccDictionary : Dictionary = {"allAchievements":allAchievements,"unlockedAchievements":unlockedAchievements,"lockedAchievements":lockedAchievements,"stats":stats}
 		currentAchievementCache = ccDictionary.duplicate(true)
 	
 	func getSteamNode():
@@ -306,10 +306,10 @@ class _Achievements:
 			return
 		
 		var d = JSON.parse(body.get_string_from_utf8()).result
-		var data = {}
+		var data : Array = []
 		if d:
 			data = d.get("achievementpercentages").get("achievements")
-		var aData = {}
+		var aData : Dictionary = {}
 		if not data == null:
 			for dic in data:
 				aData.merge({dic.get("name"):dic.get("percent")})
@@ -317,7 +317,7 @@ class _Achievements:
 	
 
 class _ConfigDriver:
-	var scripts = [
+	var scripts : Array = [
 		
 	]
 	
@@ -499,37 +499,36 @@ class _ConfigDriver:
 	signal config_changed()
 	signal input_changed()
 	
-	var settingsHash = 0
-	var settingsInputHash = 0
-	var has_loaded = false
-	var settings = {}
-	var file = File.new()
+	var settingsHash : int = 0
+	var settingsInputHash : int = 0
+	var has_loaded : bool = false
+	var settings : Dictionary = {}
+	var file : File = File.new()
 	
-	var subscriptions = {}
-	var changes = {}
+	var subscriptions : Dictionary = {}
+	var changes : Dictionary = {}
 	
 	func __store_config(configuration: Dictionary, mod_id: String, cfg_filename : String = "Mod_Configurations" + ".cfg"):
-		var made_change = false
-		var profiles_dir = "user://cfg/.profiles/"
-		var cfg_folder = "user://cfg/"
-		var tmpf = File.new()
-		var cfg_file = cfg_folder + cfg_filename
+		var made_change : bool = false
+		var profiles_dir : String = "user://cfg/.profiles/"
+		var cfg_folder : String = "user://cfg/"
+		var tmpf : File = File.new()
+		var cfg_file : String = cfg_folder + cfg_filename
 		if not tmpf.file_exists(cfg_file):
 			tmpf.open(cfg_folder+cfg_file,File.WRITE)
 			tmpf.store_string("")
 			tmpf.close()
-		var FileCFG = File.new()
+		var FileCFG : File = File.new()
 		FileCFG.open(cfg_file,File.READ)
-		var cfg = ConfigFile.new()
-		var txt = FileCFG.get_as_text(true)
+		var cfg : ConfigFile = ConfigFile.new()
+		var txt : String = FileCFG.get_as_text(true)
 		cfg.parse(txt)
 		FileCFG.close()
-		var cfg_sections = cfg.get_sections()
-		var sections = configuration.keys()
+		var cfg_sections : Array = cfg.get_sections()
 		mod_id = __truncate_mod_id(mod_id)
-		for section in sections:
+		for section in configuration:
 			section = __truncate_section(section)
-			var sect_name = mod_id + "/" + section
+			var sect_name : String = mod_id + "/" + section
 			var sect_data = configuration[section]
 			
 			if not sect_name in settings:
@@ -558,14 +557,14 @@ class _ConfigDriver:
 				Loader.saved()
 	
 	func __store_value(mod_id:String, section:String, key:String, value, cfg_filename : String = "Mod_Configurations" + ".cfg"):
-		var made_change = false
-		var cfg_folder = "user://cfg/"
-		var profiles_dir = "user://cfg/.profiles/"
-		var cfg = ConfigFile.new()
+		var made_change : bool = false
+		var cfg_folder : String  = "user://cfg/"
+		var profiles_dir : String  = "user://cfg/.profiles/"
+		var cfg : ConfigFile = ConfigFile.new()
 		cfg.load(cfg_folder+cfg_filename)
-		var modSection = __truncate_to_setting_entry(mod_id,section)
+		var modSection : String = __truncate_to_setting_entry(mod_id,section)
 		cfg.set_value(modSection,key,value)
-		var profile = cfg.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","default")
+		var profile= cfg.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","default")
 		
 		if not modSection in settings:
 			settings[modSection] = {}
@@ -585,29 +584,29 @@ class _ConfigDriver:
 				Loader.saved()
 	
 	func __get_config(mod_id, cfg_filename : String = "Mod_Configurations" + ".cfg") -> Dictionary:
-		var cfg_folder = "user://cfg/"
-		var dictionary = {}
+		var cfg_folder : String  = "user://cfg/"
+		var dictionary : Dictionary = {}
 		mod_id = __truncate_mod_id(mod_id)
 		if settingsHash:
 			for section in settings:
-				var split = section.split("/")
+				var split : PoolStringArray = section.split("/")
 				if split[0] == mod_id:
-					var sub = {}
+					var sub : Dictionary = {}
 					var sec = settings[section].duplicate(true)
 					for key in sec:
 						sub.merge({key:sec[key]})
 					dictionary.merge({split[1]:sub})
 		else:
-			var cfg = ConfigFile.new()
-			var error = cfg.load(cfg_folder+cfg_filename)
+			var cfg:ConfigFile = ConfigFile.new()
+			var error:int = cfg.load(cfg_folder+cfg_filename)
 			if error != OK:
 				return {}
 			var config_sections = cfg.get_sections()
 			for section in config_sections:
-				var split = section.split("/")
+				var split:PoolStringArray = section.split("/")
 				if split[0] == mod_id:
-					var sub = {}
-					var keys = cfg.get_section_keys(section)
+					var sub : Dictionary = {}
+					var keys:Array = cfg.get_section_keys(section)
 					for key in keys:
 						var value = cfg.get_value(section, key)
 						sub.merge({key:value})
@@ -615,28 +614,28 @@ class _ConfigDriver:
 		return dictionary
 	
 	func __get_value(mod_id: String, section: String, key: String, cfg_filename : String = "Mod_Configurations" + ".cfg"):
-		var cfg_folder = "user://cfg/"
-		var full = __truncate_to_setting_entry(mod_id,section)
+		var cfg_folder : String  = "user://cfg/"
+		var full : String  = __truncate_to_setting_entry(mod_id,section)
 		
 		if settingsHash:
 			if full in settings:
 				if key in settings[full]:
 					var out = settings[full][key]
-					var tout = typeof(out)
+					var tout:int = typeof(out)
 					if tout == TYPE_ARRAY or tout == TYPE_DICTIONARY:
 						return out.duplicate(true)
 					return out
 				return null
 			return null
 		else:
-			var cfg = ConfigFile.new()
-			var error = cfg.load(cfg_folder+cfg_filename)
+			var cfg:ConfigFile = ConfigFile.new()
+			var error:int = cfg.load(cfg_folder+cfg_filename)
 			if error != OK:
 				Debug.l("HevLib Config File: Error loading settings %s" % error)
 				return null
 			
 			if cfg.has_section(full):
-				var keys = cfg.get_section_keys(full)
+				var keys : Array = cfg.get_section_keys(full)
 				if key in keys:
 					var data = cfg.get_value(full,key)
 					return data
@@ -644,8 +643,8 @@ class _ConfigDriver:
 			return null
 	
 	func pushCFG(cfg_filename : String = "Mod_Configurations" + ".cfg"):
-		var cfg_file = "user://cfg/" + cfg_filename
-		var current_config = __config_parse(cfg_file)
+		var cfg_file : String  = "user://cfg/" + cfg_filename
+		var current_config : Dictionary = __config_parse(cfg_file)
 		settings = current_config.duplicate(true)
 		settingsHash = settings.hash()
 		__change_made()
@@ -715,13 +714,13 @@ class _ConfigDriver:
 	
 	
 	func __load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
-		var default_binds = pointers.Keymapping.__get_formatted_vanilla_binds()
-		var dir = Directory.new()
-		var c = ConfigFile.new()
-		var keybinds_cache = "user://cache/.HevLib_Cache/Keybinds/"
-		var cfg_file = "user://cfg/" + cfg_filename
-		var profiles_dir = "user://cfg/.profiles/"
-		var profiles_setter = ".profiles.ini"
+		var default_binds : Dictionary = pointers.Keymapping.__get_formatted_vanilla_binds()
+		var dir:Directory = Directory.new()
+		var c:ConfigFile = ConfigFile.new()
+		var keybinds_cache : String  = "user://cache/.HevLib_Cache/Keybinds/"
+		var cfg_file : String  = "user://cfg/" + cfg_filename
+		var profiles_dir : String  = "user://cfg/.profiles/"
+		var profiles_setter : String  = ".profiles.ini"
 		dir.make_dir_recursive(profiles_dir)
 		dir.make_dir_recursive(keybinds_cache)
 		file.open(keybinds_cache + "vanilla_binds.json",File.WRITE)
@@ -744,7 +743,7 @@ class _ConfigDriver:
 		c.clear()
 		c.load(cfg_file)
 		var current_profile = c.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","Default")
-		var profile_is_current = true
+		var profile_is_current:bool = true
 		if current_profile != desired_profile:
 			profile_is_current = false
 			dir.remove(cfg_file)
@@ -763,42 +762,42 @@ class _ConfigDriver:
 			c.set_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name",desired_profile)
 			c.save(cfg_file)
 		
-		var f = pointers.ManifestV2.__get_mod_data()
-		var mod_entries = f["mods"]
+		var f : Dictionary = pointers.ManifestV2.__get_mod_data()
+		var mod_entries : Dictionary = f["mods"]
 		Debug.l("ConfigDriver: [%s] mod entries found" % mod_entries.size())
-		var configs = {}
-		var current_config = __config_parse(cfg_file)
+		var configs : Dictionary = {}
+		var current_config : Dictionary = __config_parse(cfg_file)
 		for mod in mod_entries:
-			var manifest = mod_entries[mod]["manifest"]
-			var has_manifest = manifest["has_manifest"]
+			var manifest : Dictionary = mod_entries[mod]["manifest"]
+			var has_manifest:bool = manifest["has_manifest"]
 			if has_manifest:
-				var mod_name = mod_entries[mod]["name"]
-				var manifest_version = float(manifest["manifest_version"])
+				var mod_name : String  = mod_entries[mod]["name"]
+				var manifest_version : float = float(manifest["manifest_version"])
 				if manifest_version >= 2.1:
-					var cfg = manifest["manifest_data"]["configs"]
+					var cfg : Dictionary = manifest["manifest_data"]["configs"]
 					if not hash(cfg) == hash({}):
 						configs.merge({mod_name:cfg})
 		Debug.l("ConfigDriver: config contains [%s] mods" % configs.size())
 		for mod in configs:
-			var data = configs[mod]
+			var data : Dictionary = configs[mod]
 			mod = __truncate_mod_id(mod)
 			for section in data:
-				var sectData = data[section]
-				var sect = mod + "/" + __truncate_section(section)
+				var sectData : Dictionary = data[section]
+				var sect : String  = mod + "/" + __truncate_section(section)
 				if not sect in current_config:
 					current_config.merge({sect:{}})
 				for key in sectData:
-					var key_data = sectData[key]
+					var key_data : Dictionary = sectData[key]
 					if typeof(key_data) == TYPE_DICTIONARY:
-						var type = key_data.get("type",null)
+						var type : String  = key_data.get("type","")
 						if not type:
 							continue
 						type = type.to_lower()
 						if key in current_config[sect]:
 							if type == "input":
-								var val = current_config[sect]
+								var val : Dictionary = current_config[sect]
 								for b in val:
-									var out = []
+									var out : Array = []
 									for a in val[b]:
 										if typeof(a) == TYPE_STRING:
 											a = [a]
@@ -809,8 +808,8 @@ class _ConfigDriver:
 								"action":
 									current_config[sect].merge({key:key_data.get("method","_pressed")})
 								"input":
-									var df = key_data["default"]
-									var out = []
+									var df : Array = key_data["default"]
+									var out : Array = []
 									for a in df:
 										if typeof(a) == TYPE_STRING:
 											a = [a]
@@ -831,7 +830,7 @@ class _ConfigDriver:
 		c.save(cfg_file)
 		c.save(profiles_dir + current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",{}).get("profile_name","Default") + ".cfg")
 		Debug.l("ConfigDriver: loaded [%s] mod configurations" % configs.size())
-		var actionList = InputMap.get_actions()
+		var actionList : Array = InputMap.get_actions()
 		for mod in configs:
 			Debug.l("ConfigDriver: inspecting [%s]" % mod)
 			var data = __get_config(mod)
@@ -871,7 +870,7 @@ class _ConfigDriver:
 	func __load_inputs_from_string_array(key:String, strings: Array):
 		for i in strings:
 			if i.begins_with("Mouse "):
-				var event = InputEventMouseButton.new()
+				var event:InputEventMouseButton = InputEventMouseButton.new()
 				event.button_index = int(i.split("Mouse ")[1])
 				if not InputMap.action_has_event(key,event):
 					Debug.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
@@ -879,7 +878,7 @@ class _ConfigDriver:
 				else:
 					Debug.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
 			if i.begins_with("JoyButton "):
-				var event = InputEventJoypadButton.new()
+				var event:InputEventJoypadButton = InputEventJoypadButton.new()
 				event.button_index = int(i.split("JoyButton ")[1])
 				if not InputMap.action_has_event(key,event):
 					Debug.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
@@ -887,7 +886,7 @@ class _ConfigDriver:
 				else:
 					Debug.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
 			if i.begins_with("JoyAxis "):
-				var event = InputEventJoypadMotion.new()
+				var event:InputEventJoypadMotion = InputEventJoypadMotion.new()
 				event.axis = abs(int(i.split("JoyAxis ")[1]))
 				if i.split("JoyAxis ")[1].begins_with("-"):
 					event.axis_value = -1.0
@@ -900,7 +899,7 @@ class _ConfigDriver:
 					Debug.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
 				
 			else:
-				var event = InputEventKey.new()
+				var event:InputEventKey = InputEventKey.new()
 				event.scancode = OS.find_scancode_from_string(i)
 				if not InputMap.action_has_event(key,event):
 					Debug.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
@@ -927,7 +926,7 @@ class _ConfigDriver:
 			check_button.focus_neighbour_top = "."
 			var p1 = parent.get_child(pos+1)
 			if p1.name != "BottomSeparatorForToolTipsPlsIgnore":
-				var script_path = p1.get_script().get_path()
+				var script_path : String  = p1.get_script().get_path()
 				
 				
 				icon_button.focus_neighbour_bottom = icon_button.get_path_to(parent.get_child(pos + 1).get_node("Label/LABELBUTTON"))
@@ -951,7 +950,7 @@ class _ConfigDriver:
 						breakpoint
 		elif pos == children.size() - 1:
 
-			var script_path = parent.get_child(pos-1).get_script().get_path()
+			var script_path : String  = parent.get_child(pos-1).get_script().get_path()
 			
 			
 			icon_button.focus_neighbour_top = icon_button.get_path_to(parent.get_child(pos - 1).get_node("Label/LABELBUTTON"))
@@ -973,7 +972,7 @@ class _ConfigDriver:
 				_:
 					breakpoint
 		else:
-			var script_path = parent.get_child(pos-1).get_script().get_path()
+			var script_path : String  = parent.get_child(pos-1).get_script().get_path()
 			
 			icon_button.focus_neighbour_top = icon_button.get_path_to(parent.get_child(pos - 1).get_node("Label/LABELBUTTON"))
 			reset_button.focus_neighbour_top = reset_button.get_path_to(parent.get_child(pos - 1).get_node("reset"))
@@ -1017,12 +1016,12 @@ class _ConfigDriver:
 						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("Label/LABELBUTTON"))
 					_:
 						breakpoint
-	var mk_c = false
+	var mk_c : bool = false
 	func __change_made():
 		mk_c = true
 	
 	func handle_change_made():
-		var shs = settings.hash()
+		var shs:int = settings.hash()
 		if shs != settingsHash:
 			__input_change_made()
 			__subscribed_changes()
@@ -1046,24 +1045,24 @@ class _ConfigDriver:
 								obj.callv(o[1],[val])
 		changes.clear()
 	
-	var cached_input_config_names = {}
+	var cached_input_config_names : Dictionary = {}
 	
 	func __input_change_made():
-		var ic = []
-		var inputnames = {}
+		var ic : Array = []
+		var inputnames : Dictionary = {}
 		if cached_input_config_names:
 			inputnames = cached_input_config_names
 		else:
-			var ax = pointers.ManifestV2.__get_manifest_cache()
+			var ax : Dictionary = pointers.ManifestV2.__get_manifest_cache()
 			for sect in ax:
-				var dv = ax[sect]
-				var dl = dv.get("configs",{})
+				var dv : Dictionary = ax[sect]
+				var dl : Dictionary = dv.get("configs",{})
 				for sec in dl:
-					var sv = dl[sec]
+					var sv : Dictionary = dl[sec]
 					for setting in sv:
-						var data = sv[setting]
+						var data : Dictionary = sv[setting]
 						if data.get("type").to_lower() == "input":
-							var n = __truncate_mod_id(dv["mod_information"]["name"])
+							var n : String  = __truncate_mod_id(dv["mod_information"]["name"])
 							if not n in cached_input_config_names:
 								cached_input_config_names[n] = {}
 							if not sec in cached_input_config_names[n]:
@@ -1071,13 +1070,13 @@ class _ConfigDriver:
 							cached_input_config_names[n][sec].append(setting)
 			inputnames = cached_input_config_names
 		for n in inputnames:
-			var nd = inputnames[n]
+			var nd : Dictionary = inputnames[n]
 			for sec in nd:
-				var sc = nd[sec]
+				var sc : Array = nd[sec]
 				for setting in sc:
-					var vf = __get_value(n,sec,setting)
-					var out = []
-					var resave = false
+					var vf : Array = __get_value(n,sec,setting)
+					var out : Array = []
+					var resave:bool = false
 					for a in vf:
 						if typeof(a) == TYPE_STRING:
 							a = [a]
@@ -1086,19 +1085,19 @@ class _ConfigDriver:
 					if resave:
 						__store_value(n,sec,setting,out)
 					ic.append(str(n)+str(sec)+str(setting)+str(out))
-		var shs = ic.hash()
+		var shs:int = ic.hash()
 		if shs != settingsInputHash:
 			emit_signal("input_changed")
 			settingsInputHash = shs
 	
 	func __subscribe_to_setting_change(method: String,object: Object,id: String,section: String,setting: String):
 		if object.has_method(method):
-			var top = __truncate_to_setting_entry(id,section)
+			var top : String  = __truncate_to_setting_entry(id,section)
 			if not top in subscriptions:
 				subscriptions[top] = {}
 			if not setting in subscriptions[top]:
 				subscriptions[top][setting] = []
-			var do = true
+			var do:bool = true
 			for item in subscriptions[top][setting]:
 				if item[0] == object:
 					if item[1] == method:
@@ -1109,7 +1108,7 @@ class _ConfigDriver:
 			Debug.l("ConfigDriver: node %s does not have the method '%s'" % [str(object),method])
 	
 	func __disconnect_subscription(method: String,object: Object,id: String,section: String,setting: String):
-		var top = __truncate_to_setting_entry(id,section)
+		var top : String  = __truncate_to_setting_entry(id,section)
 		if top in subscriptions:
 			if setting in subscriptions[top]:
 				for item in subscriptions[top][setting]:
@@ -1126,17 +1125,17 @@ class _ConfigDriver:
 		return pointers.DataFormat.__array_to_string(section.split("/"))
 	
 	func __truncate_to_setting_entry(mod_id:String,section:String) -> String:
-		var sect_name = __truncate_mod_id(mod_id) + "/" + __truncate_section(section)
+		var sect_name : String  = __truncate_mod_id(mod_id) + "/" + __truncate_section(section)
 		return sect_name
 	
 	func __validate_dictionary(data_dict : Dictionary,check_config : bool = true, check_requirements : bool = true, check_incompatibilities : bool = true, config_entry_override : String = "config", mod_requirements_entry_override : String = "mod_requirements", mod_incompatibilities_entry_override : String = "mod_incompatibilities"):
-		var how = true
-		if check_config and config_entry_override in data_dict:
-			var cfg = data_dict[config_entry_override]
-			var config_id = cfg.get("id",cfg.get("mod",cfg.get("mod_id","")))
-			var config_section = cfg.get("section","")
-			var config_setting = cfg.get("entry",cfg.get("setting",cfg.get("key",cfg.get("value",cfg.get("opt","")))))
-			var invert_config = cfg.get("invert_config",cfg.get("invert",false))
+		var how:bool = true
+		if check_config and config_entry_override in data_dict and data_dict[config_entry_override] is Dictionary:
+			var cfg : Dictionary = data_dict[config_entry_override]
+			var config_id : String  = cfg.get("id",cfg.get("mod",cfg.get("mod_id","")))
+			var config_section : String  = cfg.get("section","")
+			var config_setting : String  = cfg.get("entry",cfg.get("setting",cfg.get("key",cfg.get("value",cfg.get("opt","")))))
+			var invert_config:bool = cfg.get("invert_config",cfg.get("invert",false))
 			if config_id and config_section and config_setting:
 				var cfg_opt = __get_value(config_id,config_section,config_setting)
 				if cfg_opt != null:
@@ -1147,14 +1146,14 @@ class _ConfigDriver:
 						if !cfg_opt:
 							how = false
 		if how:
-			var current_mod_ids = pointers.ManifestV2.__get_mod_ids()
-			var allowFromMods = true
-			if check_requirements and mod_requirements_entry_override in data_dict:
-				var needs = data_dict[mod_requirements_entry_override]
-				var can = 0
+			var current_mod_ids : Array = pointers.ManifestV2.__get_mod_ids()
+			var allowFromMods:bool = true
+			if check_requirements and mod_requirements_entry_override in data_dict and data_dict[mod_requirements_entry_override] is Array:
+				var needs : Array = data_dict[mod_requirements_entry_override]
+				var can:int = 0
 				for a in needs:
 					for f in a:
-						var has = false
+						var has:bool = false
 						if f in current_mod_ids:
 							has = true
 						if has:
@@ -1162,11 +1161,11 @@ class _ConfigDriver:
 				allowFromMods = can == needs.size()
 			if allowFromMods:
 				var allowFromMods2 = true
-				if check_incompatibilities and mod_incompatibilities_entry_override in data_dict:
-					var needs = data_dict[mod_incompatibilities_entry_override]
-					var can = 0
+				if check_incompatibilities and mod_incompatibilities_entry_override in data_dict and data_dict[mod_incompatibilities_entry_override] is Array:
+					var needs : Array = data_dict[mod_incompatibilities_entry_override]
+					var can:int = 0
 					for a in needs:
-						var cv = false
+						var cv:bool = false
 						for f in a:
 							var has = false
 							if f in current_mod_ids:
@@ -1183,16 +1182,16 @@ class _ConfigDriver:
 	func __config_parse(file_path: String) -> Dictionary:
 		if not file.file_exists(file_path) and not ResourceLoader.exists(file_path):
 			return {}
-		var cfg = ConfigFile.new()
+		var cfg:ConfigFile = ConfigFile.new()
 		file.open(file_path,File.READ)
-		var txt = file.get_as_text()
+		var txt : String  = file.get_as_text()
 		file.close()
 		cfg.parse(txt)
-		var cfg_sections = cfg.get_sections()
-		var cfg_dictionary = {}
+		var cfg_sections : Array = cfg.get_sections()
+		var cfg_dictionary : Dictionary = {}
 		for section in cfg_sections:
-			var data = {}
-			var keys = cfg.get_section_keys(section)
+			var data : Dictionary = {}
+			var keys : Array = cfg.get_section_keys(section)
 			for key in keys:
 				var item = cfg.get_value(section,key)
 				data.merge({key:item})
@@ -1200,9 +1199,9 @@ class _ConfigDriver:
 		return cfg_dictionary
 	
 	func __config_store(dict : Dictionary,filepath:String):
-		var cfg = ConfigFile.new()
+		var cfg:ConfigFile = ConfigFile.new()
 		for section in dict:
-			var data = {}
+			var data : Dictionary = {}
 			var keys = dict[section]
 			for key in keys:
 				cfg.set_value(section,key,keys[key])
@@ -1212,7 +1211,7 @@ class _ConfigDriver:
 	
 	
 class _DataFormat:
-	var scripts = [
+	var scripts : Array = [
 		
 	]
 	
@@ -1464,7 +1463,7 @@ class _DataFormat:
 			}
 		}
 	
-	var file = File.new()
+	var file:File = File.new()
 	
 	var pointers
 	func _init(f):
@@ -1472,7 +1471,7 @@ class _DataFormat:
 		urlRegex.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,63}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
 	
 	func __array_to_string(arr: Array) -> String:
-		var s = ""
+		var s : String  = ""
 		for i in arr:
 			s += String(i)
 		return s
@@ -1481,28 +1480,28 @@ class _DataFormat:
 		if degrees:
 			angle = deg2rad(angle)
 		angle = -angle
-		var x = point[0]
-		var y = point[1]
-		var xca = x*cos(angle)
-		var ysa = y*sin(angle)
-		var yca = y*cos(angle)
-		var xsa = x*sin(angle)
+		var x:float = point[0]
+		var y:float = point[1]
+		var xca:float = x*cos(angle)
+		var ysa:float = y*sin(angle)
+		var yca:float = y*cos(angle)
+		var xsa:float = x*sin(angle)
 		return Vector2(xca-ysa,yca+xsa)
 	
 	func __get_vanilla_version() -> Array:
-		var version = [1,0,0]
-		var lb = load("res://VersionLabel.tscn").instance()
-		var textData = lb.text
+		var version : Array = [1,0,0]
+		var lb : Node = load("res://VersionLabel.tscn").instance()
+		var textData : String  = lb.text
 		lb.free()
 		if textData:
-			var data = textData.split(".")
+			var data:PoolStringArray = textData.split(".")
 			version[0] = int(data[0])
 			version[1] = int(data[1])
 			version[2] = int(data[2])
 		return version
 	
 	func __sift_dictionary(dictionary: Dictionary,search_keys: Array) -> Array:
-		var returning_keys = []
+		var returning_keys : Array = []
 		for key in dictionary:
 			if key in search_keys:
 				returning_keys.append(key)
@@ -1514,32 +1513,22 @@ class _DataFormat:
 		return returning_keys
 	
 	func __convert_arr_to_vec2arr(array: Array) -> PoolVector2Array:
-		var converted = PoolVector2Array([])
+		var converted:PoolVector2Array = PoolVector2Array([])
 		var size = array.size()
 		if size % 2 == 1:
 			Debug.l("Cannot convert array to PoolVector2Array with an odd number of entries")
 			return PoolVector2Array([])
-		var index = 0
+		var index:int = 0
 		while index < size:
-			var a = array[index]
-			var b = array[index + 1]
-			var atype = typeof(a)
-			var btype = typeof(b)
-			if atype == TYPE_INT:
-				pass
-			elif atype == TYPE_REAL:
-				pass
-			else:
-				Debug.l("Cannot convert type %s for PoolVector2Array" % atype)
+			var a:float = float(array[index])
+			var b:float = float(array[index + 1])
+			if not a:
+				Debug.l("Cannot convert type %s for PoolVector2Array" % array[index])
 				return PoolVector2Array([])
-			if btype == TYPE_INT:
-				pass
-			elif btype == TYPE_REAL:
-				pass
-			else:
-				Debug.l("Cannot convert type %s for PoolVector2Array" % btype)
+			if not b:
+				Debug.l("Cannot convert type %s for PoolVector2Array" % array[index + 1])
 				return PoolVector2Array([])
-			var pooling = Vector2(a,b)
+			var pooling:Vector2 = Vector2(a,b)
 			converted.append(pooling)
 			index += 2
 		return converted
@@ -1558,14 +1547,14 @@ class _DataFormat:
 	func __sift_ship_config(dictionary: Dictionary,search_keys: Array,cfgs_to_ignore:Array,parent = "") -> Array:
 		for i in cfgs_to_ignore:
 			dictionary.erase(i)
-		var arr = []
-		var splitter = "."
-		var prefab = ""
+		var arr : Array = []
+		var splitter : String  = "."
+		var prefab : String  = ""
 		if parent != "":
 			prefab = parent + splitter
 		for key in dictionary:
 			var kdata = dictionary[key]
-			var p = prefab + key
+			var p : String  = prefab + key
 			match typeof(kdata):
 				TYPE_STRING:
 					if kdata in search_keys:
@@ -1575,22 +1564,22 @@ class _DataFormat:
 		return arr
 	
 	func __get_script_constant_map_without_load(script_path : String) -> Dictionary:
-		var filepath = "user://cache/.HevLib_Cache/Variable_Fetch/"
-		var pathway = __trim_scripts(script_path)
+		var filepath : String  = "user://cache/.HevLib_Cache/Variable_Fetch/"
+		var pathway : Array = __trim_scripts(script_path)
 		if pathway[2].size() == 0:
 			return {}
-		var dict = {}
-		var l = __compile_script(pathway[0]).get_script_constant_map()
+		var dict : Dictionary = {}
+		var l : Dictionary = __compile_script(pathway[0]).get_script_constant_map()
 		for i in pathway[2]:
 			dict[i] = l[i]
 		return dict
 	
 	func __get_script_variables_without_load(script_path : String) -> Dictionary:
-		var filepath = "user://cache/.HevLib_Cache/Variable_Fetch/"
-		var pathway = __trim_scripts(script_path)
+		var filepath : String  = "user://cache/.HevLib_Cache/Variable_Fetch/"
+		var pathway : Array = __trim_scripts(script_path)
 		if pathway[1].size() == 0:
 			return {}
-		var dict = {}
+		var dict : Dictionary = {}
 		var l = __compile_script_object(pathway[0])
 		for i in pathway[1]:
 			dict[i] = l.get(i)
@@ -1607,19 +1596,19 @@ class _DataFormat:
 	
 	func __trim_script_object(script_source : Script, get_detailed_operands : bool = false, trim_unnecessary_newlines : bool = false, recurse_through_base_scripts : bool = true):
 		var concat : String = ""
-		var var_names = []
-		var const_names = []
-		var method_names = []
-		var signal_names = []
-		var method_values = []
-		var method_output_type = []
-		var signal_values = []
+		var var_names : Array = []
+		var const_names : Array = []
+		var method_names : Array = []
+		var signal_names : Array = []
+		var method_values : Array = []
+		var method_output_type : Array = []
+		var signal_values : Array = []
 		if script_source:
-			var extend_this = true
+			var extend_this:bool = true
 			if recurse_through_base_scripts:
 				var base_script = script_source.get_base_script()
 				if base_script:
-					var base_data = __trim_script_object(base_script,get_detailed_operands,trim_unnecessary_newlines,recurse_through_base_scripts)
+					var base_data : Array = __trim_script_object(base_script,get_detailed_operands,trim_unnecessary_newlines,recurse_through_base_scripts)
 					concat += base_data[0]
 					if concat.find("extends ") > -1:
 						extend_this = false
@@ -1643,14 +1632,14 @@ class _DataFormat:
 							method_values.append(base_data[6][f])
 							method_output_type.append(base_data[7][f])
 #					breakpoint
-			var data = script_source.get_source_code()
-			var streaming = false
+			var data : String  = script_source.get_source_code()
+			var streaming:bool = false
 			var this_stream : String = ""
-			var lines = data.split("\n")
+			var lines:PoolStringArray = data.split("\n")
 			for line in lines:
 				var result : String = ""
-				var is_part_of_string = false
-				var prev_char_escape = false
+				var is_part_of_string:bool = false
+				var prev_char_escape:bool = false
 				while line != "":
 					var part:String = line.substr(0,1)
 					if part == "\\":
@@ -1664,8 +1653,8 @@ class _DataFormat:
 					line.erase(0,1)
 					result += part
 				line = result
-				var has_prefix = false
-				var has_sig = false
+				var has_prefix:bool = false
+				var has_sig:bool = false
 				for prefix in function_prefixes:
 					if line.begins_with(prefix):
 						has_prefix = true
@@ -1676,12 +1665,12 @@ class _DataFormat:
 						concat = concat + this_stream.strip_edges() + "\n"
 						this_stream = ""
 						streaming = false
-					var av = line.split("func ")[1].split("(")
-					var mname = av[0]
+					var av:PoolStringArray = line.split("func ")[1].split("(")
+					var mname : String  = av[0]
 					if get_detailed_operands:
 						var operands : String = line.split(mname)[1].strip_edges()
-						var os = operands.split("->")
-						var outputType = ""
+						var os:PoolStringArray = operands.split("->")
+						var outputType : String = ""
 						if os.size() > 1:
 							outputType = os[1].rstrip(":")
 							operands = os[0].strip_edges()
@@ -1691,11 +1680,11 @@ class _DataFormat:
 							operands = operands.substr(0, operands.length() - 1)
 						if operands.ends_with(")"):
 							operands = operands.substr(0,operands.length() - 1)
-						var opnames = ""
-						var opvalues = []
-						var thisOpValue = ""
-						var colonDelim = false
-						var bracketDelim = false
+						var opnames : String  = ""
+						var opvalues : Array = []
+						var thisOpValue : String  = ""
+						var colonDelim:bool = false
+						var bracketDelim:bool = false
 						for i in operands:
 							if not colonDelim and i == ":":
 								colonDelim = true
@@ -1707,8 +1696,6 @@ class _DataFormat:
 								bracketDelim = false
 							if not colonDelim and not bracketDelim:
 								opnames += i
-							
-							
 							if not bracketDelim and i == ",":
 								opvalues.append(thisOpValue.strip_edges())
 								thisOpValue = ""
@@ -1725,12 +1712,12 @@ class _DataFormat:
 						concat = concat + this_stream.strip_edges() + "\n"
 						this_stream = ""
 						streaming = false
-					var av = line.split("signal ")[1].split("(")
-					var sname = av[0]
+					var av:PoolStringArray = line.split("signal ")[1].split("(")
+					var sname : String  = av[0]
 					if get_detailed_operands:
 						var op = []
 						if av.size() > 1:
-							var operands = av[1].rstrip(")")
+							var operands : String  = av[1].rstrip(")")
 							if operands:
 								for o in operands.split(","):
 									op.append(o.strip_edges())
@@ -1741,7 +1728,7 @@ class _DataFormat:
 						concat = concat + this_stream.strip_edges() + "\n"
 						this_stream = ""
 						streaming = false
-					var cname = line.split("=",false)[0].strip_edges().split("const ",true)[1].strip_edges().split(":",false)[0].strip_edges()
+					var cname : String  = line.split("=",false)[0].strip_edges().split("const ",true)[1].strip_edges().split(":",false)[0].strip_edges()
 					const_names.append(cname)
 					streaming = true
 				elif line.begins_with("var "):
@@ -1749,7 +1736,7 @@ class _DataFormat:
 						concat = concat + this_stream.strip_edges() + "\n"
 						this_stream = ""
 						streaming = false
-					var vname = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
+					var vname : String  = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
 					var_names.append(vname)
 					streaming = true
 				elif line.begins_with("export ") and " var " in line:
@@ -1757,7 +1744,7 @@ class _DataFormat:
 						concat = concat + this_stream.strip_edges() + "\n"
 						this_stream = ""
 						streaming = false
-					var vname = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
+					var vname : String  = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
 					var_names.append(vname)
 					streaming = true
 				elif line.begins_with("onready ") and " var " in line:
@@ -1765,7 +1752,7 @@ class _DataFormat:
 						concat = concat + this_stream.strip_edges() + "\n"
 						this_stream = ""
 						streaming = false
-					var vname = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
+					var vname : String  = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
 					var_names.append(vname)
 					streaming = true
 				elif line.begins_with("extends "):
@@ -1782,10 +1769,10 @@ class _DataFormat:
 				this_stream = ""
 				streaming = false
 		if trim_unnecessary_newlines:
-			var reconcat = ""
+			var reconcat : String  = ""
 			for line in concat.split("\n"):
-				var newline = false
-				var ls = line.strip_edges()
+				var newline:bool = false
+				var ls : String  = line.strip_edges()
 				for a in all_prefixes:
 					if ls.begins_with(a):
 						newline = true
@@ -1796,9 +1783,9 @@ class _DataFormat:
 		return [concat if concat !="" else "extends Node",var_names,const_names,signal_names,method_names,signal_values,method_values,method_output_type]
 	
 	func __factorial(n:int) -> int:
-		var holdvalue = 0
-		var boolis = true
-		var s = sign(n)
+		var holdvalue:int = 0
+		var boolis:bool = true
+		var s:int = sign(n)
 		n = abs(n)
 		if n == 0 or n == 1:
 			holdvalue = 1
@@ -1813,20 +1800,20 @@ class _DataFormat:
 		return (holdvalue * s)
 	
 	func __get_unique_pairs(max_value: int) -> Array:
-		var pairs := []
+		var pairs : Array = []
 		for i in range(max_value + 1):
 			for j in range(i + 1, max_value):
 				pairs.append(PoolIntArray([i, j]))
 		return pairs
 	
-	var compiled_scripts = {}
-	var compiled_script_object_storage = {}
+	var compiled_scripts : Dictionary = {}
+	var compiled_script_object_storage : Dictionary = {}
 	
 	func __compile_script(source_code : String) -> Script:
-		var shash = hash(source_code)
+		var shash:int = hash(source_code)
 		if shash in compiled_scripts:
 			return compiled_scripts[shash]
-		var out = GDScript.new()
+		var out:GDScript = GDScript.new()
 		out.set_source_code(source_code)
 		out.reload()
 		compiled_scripts[shash] = out
@@ -1836,16 +1823,16 @@ class _DataFormat:
 	func __compile_script_object(source_code : String, params = [],new_object : bool = false) -> Script:
 		if not params is Array:
 			params = [params]
-		var shash = ""
+		var shash : String  = ""
 		if params:
-			var parStr = str(params)
+			var parStr : String  = str(params)
 			shash = str(hash(source_code)) + "_" + str(hash(parStr))
 		else:
 			shash = str(hash(source_code))
 		if not new_object and shash in compiled_script_object_storage:
 			return compiled_script_object_storage[shash]
 		
-		var gd = GDScript.new()
+		var gd:GDScript = GDScript.new()
 		gd.set_source_code(source_code)
 		gd.reload()
 		var out
@@ -1867,7 +1854,7 @@ class _DataFormat:
 					pd = "\n\tvar %s = arr[%d]" % [pv,i]
 			var sv = "static func parse(ref,arr):%s\n\treturn ref.call_func(%s)" % [pd,pb]
 			
-			var g = GDScript.new()
+			var g:GDScript = GDScript.new()
 			g.set_source_code(sv)
 			g.reload()
 			g.new()
@@ -1877,7 +1864,7 @@ class _DataFormat:
 		compiled_script_object_storage[shash] = out
 		return out
 	
-	var _savedScriptObjects := []
+	var _savedScriptObjects : Array = []
 	func __compile_and_override_script(source_code : String) -> void:
 		pointers.equipment_modmain.installScriptExtensionFromSource(source_code)
 	
@@ -1892,22 +1879,19 @@ class _DataFormat:
 	func __reload_scene(scene_path : String):
 		if __load_if_can(scene_path):
 			var scn = __get_load().instance()
-			var root = scn.name
+			var root : String  = scn.name
 			if Tool.validex != null:
 				Tool.remove(scn)
 			else:
 				if is_instance_valid(scn) and not scn.is_queued_for_deletion():
 					scn.free()
-			var scene_replacement = "user://cache/.HevLib_Cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec()
-			var p = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"%s\" type=\"PackedScene\" id=1]\n\n[node name=\"%s\" instance=ExtResource( 1 )]" % [scene_path,root]
+			var scene_replacement : String  = "user://cache/.HevLib_Cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec()
+			var p : String  = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"%s\" type=\"PackedScene\" id=1]\n\n[node name=\"%s\" instance=ExtResource( 1 )]" % [scene_path,root]
 			pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
 			file.open(scene_replacement,File.WRITE)
 			file.store_string(p)
 			file.close()
 			pointers.equipment_modmain.replaceSceneLiteral(scene_replacement,scene_path)
-#			var scene := load(scene_replacement)
-#			scene.take_over_path(scene_path)
-			
 	
 	func __override_script(file_path : String):
 		if __load_if_can(file_path):
@@ -1918,18 +1902,14 @@ class _DataFormat:
 		if not ResourceLoader.exists(resource_path) or not ResourceLoader.exists(original_path):
 			return
 		pointers.equipment_modmain.replaceSceneLiteral(resource_path,original_path)
-#		if __load_if_can(resource_path):
-#			var scene = __get_load()
-#			scene.take_over_path(original_path)
-			
 	
-	var var_hash = {}
+	var var_hash : Dictionary = {}
 	
 	func __convert_var_from_string(string : String, constant = true):
-		var shash = hash(string + str(constant))
+		var shash:int = hash(string + str(constant))
 		if shash in var_hash:
 			return var_hash[shash]
-		var header
+		var header : String 
 		if constant:
 			header = "extends Reference\nconst VARIABLE = "
 		else:
@@ -1978,7 +1958,7 @@ class _DataFormat:
 	
 
 class _DriverManagement:
-	var scripts = [
+	var scripts : Array = [
 		
 	]
 	
@@ -2017,16 +1997,16 @@ class _DriverManagement:
 	func _init(f):
 		pointers = f
 	
-	var file = File.new()
+	var file:File = File.new()
 	
 	func __get_drivers(get_ids : Array = []) -> Array:
-		var mod_drivers = []
-		var mms = pointers.ManifestV2.__get_modmain_files() + pointers.ManifestV2.__get_modlet_files()
+		var mod_drivers : Array = []
+		var mms : Array = pointers.ManifestV2.__get_modmain_files() + pointers.ManifestV2.__get_modlet_files()
 		for modmain_path in mms:
-			var has_manifest = false
-			var manifest_path = ""
-			var modFolder = modmain_path.get_base_dir() + "/"
-			var modFile = modmain_path.get_file().to_lower()
+			var has_manifest:bool = false
+			var manifest_path : String  = ""
+			var modFolder : String  = modmain_path.get_base_dir() + "/"
+			var modFile : String  = modmain_path.get_file().to_lower()
 			if modFile.begins_with("mod") and modFile.ends_with(".manifest"):
 				has_manifest = true
 				manifest_path = modmain_path
@@ -2037,19 +2017,19 @@ class _DriverManagement:
 						has_manifest = true
 						manifest_path = item
 			
-			var this_mod_data = {"drivers":{}}
-			var id = ""
-			var manifest = {}
+			var this_mod_data : Dictionary = {"drivers":{}}
+			var id : String  = ""
+			var manifest : Dictionary = {}
 			if has_manifest:
 				manifest = pointers.ManifestV2.__parse_file_as_manifest(manifest_path)
 				id = manifest.get("mod_information",{}).get("id","")
 			if id != "":
 				this_mod_data.merge({"id":id})
-			var mm_prio = 0
+			var mm_prio:int = 0
 			if modFile.begins_with("mod") and modFile.ends_with(".manifest"):
 				manifest.get("manifest_definitions",{}).get("modlet_priority",0)
 			else:
-				var modmain = pointers.DataFormat.__get_script_constant_map_without_load(modmain_path)
+				var modmain : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(modmain_path)
 				if "MOD_PRIORITY" in modmain:
 					mm_prio = modmain["MOD_PRIORITY"]
 			this_mod_data.merge({"priority":mm_prio})
@@ -2065,61 +2045,61 @@ class _DriverManagement:
 		return mod_drivers.duplicate(true)
 	
 	func compare_driver_dictionaries(a, b):
-		var aPrio = a.get("priority",0)
-		var bPrio = b.get("priority",0)
+		var aPrio:int = a.get("priority",0)
+		var bPrio:int = b.get("priority",0)
 		if aPrio != bPrio:
 			return aPrio < bPrio
 
 		
-		var aPath = a.get("mod_directory")
-		var bPath = b.get("mod_directory")
+		var aPath : String  = a.get("mod_directory","")
+		var bPath : String  = b.get("mod_directory","")
 		if aPath != bPath:
 			return aPath < bPath
 
 		return false
 	
-	var driver_get_cache = {}
+	var driver_get_cache : Dictionary = {}
 	
 	func __get_drivers_from_modmain_path(file_path: String, get_fresh_drivers: bool = false):
 		if not get_fresh_drivers and driver_get_cache.get(file_path):
 			return driver_get_cache[file_path].duplicate(true)
 		else:
-			var this_mod_data = {}
+			var this_mod_data : Dictionary = {}
 			if not file.file_exists(file_path):
 				return {}
-			var file_name = file_path.get_file()
-			var folder_path = file_path.get_base_dir() + "/"
-			var folderCheck = pointers.FolderAccess.__fetch_folder_files(folder_path,true)
+			var file_name : String  = file_path.get_file()
+			var folder_path : String  = file_path.get_base_dir() + "/"
+			var folderCheck : Array = pointers.FolderAccess.__fetch_folder_files(folder_path,true)
 			if "HEVLIB_EQUIPMENT_DRIVER_TAGS/" in folderCheck:
-				var driverFolder = folder_path + "HEVLIB_EQUIPMENT_DRIVER_TAGS/"
+				var driverFolder : String  = folder_path + "HEVLIB_EQUIPMENT_DRIVER_TAGS/"
 				for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
 					if not driver in this_mod_data:
 						this_mod_data.merge({driver:{}})
-					var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+					var consts : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
 					for i in consts:
 						this_mod_data[driver].merge({i:consts[i]})
 			if "HEVLIB_MENU/" in folderCheck:
-				var driverFolder = folder_path + "HEVLIB_MENU/"
+				var driverFolder : String  = folder_path + "HEVLIB_MENU/"
 				for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
 					if not driver in this_mod_data:
 						this_mod_data.merge({driver:{}})
-					var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+					var consts : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
 					for i in consts:
 						this_mod_data[driver].merge({i:consts[i]})
 			if "HEVLIB_MINERAL_DRIVER_TAGS/" in folderCheck:
-				var driverFolder = folder_path + "HEVLIB_MINERAL_DRIVER_TAGS/"
+				var driverFolder : String  = folder_path + "HEVLIB_MINERAL_DRIVER_TAGS/"
 				for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
 					if not driver in this_mod_data:
 						this_mod_data.merge({driver:{}})
-					var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+					var consts : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
 					for i in consts:
 						this_mod_data[driver].merge({i:consts[i]})
 			if "HEVLIB_DRIVERS/" in folderCheck:
-				var driverFolder = folder_path + "HEVLIB_DRIVERS/"
+				var driverFolder : String  = folder_path + "HEVLIB_DRIVERS/"
 				for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
 					if not driver in this_mod_data:
 						this_mod_data.merge({driver:{}})
-					var consts = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+					var consts : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
 					for i in consts:
 						this_mod_data[driver].merge({i:consts[i]})
 			driver_get_cache[file_path] = this_mod_data.duplicate(true)
@@ -2129,7 +2109,7 @@ class _DriverManagement:
 	
 
 class _Equipment:
-	var scripts = [
+	var scripts : Array = [
 		
 	]
 	
@@ -2163,16 +2143,16 @@ class _Equipment:
 			}
 		}
 	
-	var vanilla_equipment = {}
+	var vanilla_equipment : Dictionary = {}
 	var vanilla_data = preload("res://HevLib/scenes/equipment/vanilla_defaults/slot_tagging.gd")
-	var hardpoint_types
-	var alignments
-	var equipment_types
-	var slot_types
-	var slot_defaults
-	var vanilla_equipment_defaults_for_reference
+	var hardpoint_types : Array
+	var alignments : Array
+	var equipment_types : Array
+	var slot_types : Array
+	var slot_defaults : Dictionary
+	var vanilla_equipment_defaults_for_reference : Dictionary
 
-	var file = File.new()
+	var file:File = File.new()
 	
 	
 	var pointers
@@ -2188,7 +2168,7 @@ class _Equipment:
 		slot_defaults = vanilla_data.slot_defaults.duplicate(true)
 		vanilla_equipment_defaults_for_reference = vanilla_data.vanilla_equipment_defaults_for_reference.duplicate(true)
 	
-	var version = [1,0,0]
+	var version : Array = [1,0,0]
 	
 	func __make_upgrades_scene():
 		var SCENE_HEADER = "[gd_scene load_steps=4 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/unmodified/WeaponSlotUpgradeTemplate.tscn\" type=\"PackedScene\" id=2]\n[ext_resource path=\"res://enceladus/SystemShipUpgradeUI.tscn\" type=\"PackedScene\" id=3]\n\n[sub_resource type=\"ViewportTexture\" id=1]\nflags = 5\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain1/Viewport\")\n\n[sub_resource type=\"ViewportTexture\" id=2]\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain2/Control\")\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]\n\n[node name=\"TextureRect\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 2 )\n\n[node name=\"TextureRect2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 2 )"
@@ -2199,7 +2179,7 @@ class _Equipment:
 		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/")
 		
 		# FILE PATHS
-		var FILE_PATHS = [
+		var FILE_PATHS : Array = [
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn",
 			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/Exhaust_Cache",
 			
@@ -2230,48 +2210,48 @@ class _Equipment:
 		
 		var file_save_path : String = FILE_PATHS[0]
 		var exhaust_cache_path : String = FILE_PATHS[1]
-		var weaponslot_modify_templates_file = FILE_PATHS[2]
-		var weaponslot_modify_standalone_file = FILE_PATHS[3]
-		var slot_order_cache_file = FILE_PATHS[4]
-		var weaponslot_ship_templates_file = FILE_PATHS[5]
-		var weaponslot_ship_standalone_file = FILE_PATHS[6]
-		var save_menu_file = FILE_PATHS[7]
-		var processed_storage_file = FILE_PATHS[8]
-		var node_definitions_file = FILE_PATHS[9]
-		var ship_node_register_file = FILE_PATHS[10]
-		var auxslot_data_path = FILE_PATHS[11]
-		var weaponslot_additions = FILE_PATHS[12]
-		var weaponslot_modifications = FILE_PATHS[13]
-		var weaponslot_modify_equipment_names = FILE_PATHS[14]
-		var upgrades_slot_limits = FILE_PATHS[15]
-		var ship_node_modify_file = FILE_PATHS[16]
-		var ship_thruster_color_file = FILE_PATHS[17]
-		var ship_driver_path = FILE_PATHS[18]
-		var storage_for_driver_store = FILE_PATHS[19]
-		var slot_order_relative_store = FILE_PATHS[20]
-		var modify_ship_numerics_store = FILE_PATHS[21]
-		var namer_store = FILE_PATHS[22]
-		var processed_storage_systems_file = FILE_PATHS[23]
+		var weaponslot_modify_templates_file : String  = FILE_PATHS[2]
+		var weaponslot_modify_standalone_file : String  = FILE_PATHS[3]
+		var slot_order_cache_file : String  = FILE_PATHS[4]
+		var weaponslot_ship_templates_file : String  = FILE_PATHS[5]
+		var weaponslot_ship_standalone_file : String  = FILE_PATHS[6]
+		var save_menu_file : String  = FILE_PATHS[7]
+		var processed_storage_file : String  = FILE_PATHS[8]
+		var node_definitions_file : String  = FILE_PATHS[9]
+		var ship_node_register_file : String  = FILE_PATHS[10]
+		var auxslot_data_path : String  = FILE_PATHS[11]
+		var weaponslot_additions : String  = FILE_PATHS[12]
+		var weaponslot_modifications : String  = FILE_PATHS[13]
+		var weaponslot_modify_equipment_names : String  = FILE_PATHS[14]
+		var upgrades_slot_limits : String  = FILE_PATHS[15]
+		var ship_node_modify_file : String  = FILE_PATHS[16]
+		var ship_thruster_color_file : String  = FILE_PATHS[17]
+		var ship_driver_path : String  = FILE_PATHS[18]
+		var storage_for_driver_store : String  = FILE_PATHS[19]
+		var slot_order_relative_store : String  = FILE_PATHS[20]
+		var modify_ship_numerics_store : String  = FILE_PATHS[21]
+		var namer_store : String  = FILE_PATHS[22]
+		var processed_storage_systems_file : String  = FILE_PATHS[23]
 		
 		version = pointers.DataFormat.__get_vanilla_version()
-		var text = "HevLib make_upgrades_scene manager: observed game version of %s"  % str(version)
+		var text : String  = "HevLib make_upgrades_scene manager: observed game version of %s"  % str(version)
 		Debug.l(text)
 		var UpgradeMenu : Node = load("res://enceladus/Upgrades.tscn").instance()
-		var nodes_parent = UpgradeMenu.get_node("VB/MarginContainer/ScrollContainer/MarginContainer/Items")
-		var vanilla_slot_names = []
-		var vanilla_slot_types = {}
+		var nodes_parent:Node = UpgradeMenu.get_node("VB/MarginContainer/ScrollContainer/MarginContainer/Items")
+		var vanilla_slot_names : Array = []
+		var vanilla_slot_types : Dictionary = {}
 		
 		
 		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/ship_data/")
 
 		
 		for slot in nodes_parent.get_children():
-			var children = slot.get_node("VBoxContainer").get_children()
+			var children : Array = slot.get_node("VBoxContainer").get_children()
 			if children.size() <= 1:
 				continue
 			vanilla_slot_names.append(slot.name)
-			var sys_slot = slot.slot
-			var index = 1
+			var sys_slot : String  = slot.slot
+			var index:int = 1
 			if sys_slot == "":
 				while not sys_slot:
 					sys_slot = children[index].slot
@@ -2279,16 +2259,16 @@ class _Equipment:
 			vanilla_slot_types.merge({slot.name:sys_slot})
 		
 		
-		var ws_equipment_names = []
+		var ws_equipment_names : Array = []
 		
 		for item in FILE_PATHS:
 			pointers.FolderAccess.__check_folder_exists(item.split(item.split("/")[item.split("/").size() - 1])[0])
 		
-		var ws_default_templates = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
-		var ws_ship_templates = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
-		var ws_ship_templates_2 = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd").get_script_constant_map()
-		var ship_register = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/equipment/ShipModificationDriver/ship_register_vanilla.gd") #load("res://HevLib/scenes/equipment/ShipModificationDriver/ship_register_vanilla.gd").get_script_constant_map()
-		var register_default_ships = []
+		var ws_default_templates : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
+		var ws_ship_templates : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
+		var ws_ship_templates_2 : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd").get_script_constant_map()
+		var ship_register : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/equipment/ShipModificationDriver/ship_register_vanilla.gd") #load("res://HevLib/scenes/equipment/ShipModificationDriver/ship_register_vanilla.gd").get_script_constant_map()
+		var register_default_ships : Array = []
 		for item in ship_register:
 			register_default_ships.append(ship_register[item])
 		
@@ -2355,17 +2335,17 @@ class _Equipment:
 		
 		
 		
-		var current_mod_ids = pointers.ManifestV2.__get_mod_ids()
+		var current_mod_ids : Array = pointers.ManifestV2.__get_mod_ids()
 		
-		var drivers = []
-		var mods = pointers.ManifestV2.__get_mod_data()["mods"]
+		var drivers : Array = []
+		var mods : Dictionary = pointers.ManifestV2.__get_mod_data()["mods"]
 		for md in mods:
 			var mod = mods[md]
 			if mod.drivers:
 				drivers.append(mod.drivers.duplicate(true))
 		mods.clear()
 		
-		var driver_store = {
+		var driver_store : Dictionary = {
 			"ADD_EQUIPMENT_ITEMS":[],
 			"ADD_EQUIPMENT_SLOTS":[],
 			"EQUIPMENT_TAGS":[],
@@ -2389,9 +2369,9 @@ class _Equipment:
 			
 		}
 		
-		var nodemodify_system_name_registers = []
+		var nodemodify_system_name_registers : Array = []
 		
-		var wsmtpls = ws_default_templates.get("TEMPLATES",{})
+		var wsmtpls : Dictionary = ws_default_templates.get("TEMPLATES",{})
 		for i in wsmtpls:
 			var d = wsmtpls[i].duplicate(true)
 			driver_store["WEAPONSLOT_MODIFY_TEMPLATES"].append({i:d})
@@ -2400,23 +2380,23 @@ class _Equipment:
 		
 		for cvh in drivers:
 			for last_bit in cvh:
-				var constants = cvh[last_bit]
+				var constants : Dictionary = cvh[last_bit]
 				match last_bit:
 					"ADD_EQUIPMENT_ITEMS.gd":
-						var arr2 = []
+						var arr2 : Array = []
 						for item in constants:
 							var equipment = constants.get(item).duplicate(true)
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								match equipment.get("slot_type","HARDPOINT"):
 									"HARDPOINT":
 										if "weapon_slot" in equipment:
-											var obj = equipment.get("weapon_slot").duplicate(true)
-											var wname = equipment.get("system","")
-											var wprice = equipment.get("price",0)
-											var objdata = obj.get("data",[])
-											var has_price = false
-											var has_invis = false
-											var price_string = str(wprice)
+											var obj : Dictionary = equipment.get("weapon_slot").duplicate(true)
+											var wname : String  = equipment.get("system","")
+											var wprice:int = equipment.get("price",0)
+											var objdata : Array = obj.get("data",[])
+											var has_price:bool = false
+											var has_invis:bool = false
+											var price_string : String  = str(wprice)
 											if not "name" in obj:
 												obj.merge({"name":wname})
 											for d in objdata:
@@ -2432,13 +2412,13 @@ class _Equipment:
 											obj["data"] = objdata.duplicate(true)
 											driver_store["WEAPONSLOT_ADD"].append(obj)
 										if "WEAPONSLOT_ADD" in equipment:
-											var obj = equipment.get("WEAPONSLOT_ADD").duplicate(true)
-											var wname = equipment.get("system","")
-											var wprice = equipment.get("price",0)
-											var objdata = obj.get("data",[])
-											var has_price = false
-											var has_invis = false
-											var price_string = str(wprice)
+											var obj : Dictionary = equipment.get("WEAPONSLOT_ADD").duplicate(true)
+											var wname : String  = equipment.get("system","")
+											var wprice:int = equipment.get("price",0)
+											var objdata : Array = obj.get("data",[])
+											var has_price:bool = false
+											var has_invis:bool = false
+											var price_string : String  = str(wprice)
 											if not "name" in obj:
 												obj.merge({"name":wname})
 											for d in objdata:
@@ -2457,37 +2437,37 @@ class _Equipment:
 										if "REGISTER_AMMO" in equipment:
 											if not "REGISTER_AMMO" in driver_store["REGISTER_SHIP_NUMERICS"]:
 												driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_AMMO"] = []
-											var bp = equipment["REGISTER_AMMO"].duplicate(true)
+											var bp : Dictionary = equipment["REGISTER_AMMO"].duplicate(true)
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
-											var dc = {equipment.get("num_val",0):bp}
+											var dc : Dictionary = {equipment.get("num_val",0):bp}
 											driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_AMMO"].append(dc)
 									"NANODRONE_STORAGE":
 										if "REGISTER_NANO" in equipment:
 											if not "REGISTER_NANO" in driver_store["REGISTER_SHIP_NUMERICS"]:
 												driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_NANO"] = []
-											var bp = equipment["REGISTER_NANO"].duplicate(true)
+											var bp : Dictionary = equipment["REGISTER_NANO"].duplicate(true)
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
-											var dc = {equipment.get("num_val",0):bp}
+											var dc : Dictionary = {equipment.get("num_val",0):bp}
 											driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_NANO"].append(dc)
 									"STANDARD_REACTION_CONTROL_THRUSTERS":
 										if "AUX_POWER_SLOT" in equipment:
-											var bp = equipment["AUX_POWER_SLOT"].duplicate(true)
+											var bp : Dictionary = equipment["AUX_POWER_SLOT"].duplicate(true)
 											if not "system" in bp:
 												bp["system"] = equipment["system"]
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
 											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
 										if "THRUSTERS" in equipment:
-											var bp = equipment["THRUSTERS"].duplicate(true)
+											var bp : Dictionary = equipment["THRUSTERS"].duplicate(true)
 											if not "system" in bp:
 												bp["system"] = equipment["system"]
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
 											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
 										if "AUX_POWER_AND_THRUSTERS" in equipment:
-											var bp = equipment["AUX_POWER_AND_THRUSTERS"].duplicate(true)
+											var bp : Dictionary = equipment["AUX_POWER_AND_THRUSTERS"].duplicate(true)
 											if not "system" in bp:
 												bp["system"] = equipment["system"]
 											if not "price" in bp:
@@ -2495,21 +2475,21 @@ class _Equipment:
 											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
 									"STANDARD_MAIN_ENGINE":
 										if "AUX_POWER_SLOT" in equipment:
-											var bp = equipment["AUX_POWER_SLOT"].duplicate(true)
+											var bp : Dictionary = equipment["AUX_POWER_SLOT"].duplicate(true)
 											if not "system" in bp:
 												bp["system"] = equipment["system"]
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
 											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
 										if "THRUSTERS" in equipment:
-											var bp = equipment["THRUSTERS"].duplicate(true)
+											var bp : Dictionary = equipment["THRUSTERS"].duplicate(true)
 											if not "system" in bp:
 												bp["system"] = equipment["system"]
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
 											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
 										if "AUX_POWER_AND_THRUSTERS" in equipment:
-											var bp = equipment["AUX_POWER_AND_THRUSTERS"].duplicate(true)
+											var bp : Dictionary = equipment["AUX_POWER_AND_THRUSTERS"].duplicate(true)
 											if not "system" in bp:
 												bp["system"] = equipment["system"]
 											if not "price" in bp:
@@ -2519,53 +2499,53 @@ class _Equipment:
 										if "REGISTER_REACTOR_RODS" in equipment:
 											if not "REGISTER_REACTOR_RODS" in driver_store["REGISTER_SHIP_NUMERICS"]:
 												driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_REACTOR_RODS"] = []
-											var bp = equipment["REGISTER_REACTOR_RODS"].duplicate(true)
+											var bp : Dictionary = equipment["REGISTER_REACTOR_RODS"].duplicate(true)
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
-											var dc = {equipment.get("num_val",0):bp}
+											var dc : Dictionary = {equipment.get("num_val",0):bp}
 											driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_REACTOR_RODS"].append(dc)
 									"ULTRACAPACITOR":
 										if "REGISTER_ULTRACAPACITORS" in equipment:
 											if not "REGISTER_ULTRACAPACITORS" in driver_store["REGISTER_SHIP_NUMERICS"]:
 												driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_ULTRACAPACITORS"] = []
-											var bp = equipment["REGISTER_ULTRACAPACITORS"].duplicate(true)
+											var bp : Dictionary = equipment["REGISTER_ULTRACAPACITORS"].duplicate(true)
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
-											var dc = {equipment.get("num_val",0):bp}
+											var dc : Dictionary = {equipment.get("num_val",0):bp}
 											driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_ULTRACAPACITORS"].append(dc)
 									"FISSION_TURBINE":
 										if "REGISTER_TURBINES" in equipment:
 											if not "REGISTER_TURBINES" in driver_store["REGISTER_SHIP_NUMERICS"]:
 												driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_TURBINES"] = []
-											var bp = equipment["REGISTER_TURBINES"].duplicate(true)
+											var bp : Dictionary = equipment["REGISTER_TURBINES"].duplicate(true)
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
-											var dc = {equipment.get("num_val",0):bp}
+											var dc : Dictionary = {equipment.get("num_val",0):bp}
 											driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_TURBINES"].append(dc)
 									"AUX_POWER_SLOT":
 										if "auxiliary_power_unit" in equipment:
-											var bp = equipment["auxiliary_power_unit"].duplicate(true)
+											var bp : Dictionary = equipment["auxiliary_power_unit"].duplicate(true)
 											if not "system" in bp:
 												bp["system"] = equipment["system"]
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
 											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
 										if "AUX_POWER_SLOT" in equipment:
-											var bp = equipment["AUX_POWER_SLOT"].duplicate(true)
+											var bp : Dictionary = equipment["AUX_POWER_SLOT"].duplicate(true)
 											if not "system" in bp:
 												bp["system"] = equipment["system"]
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
 											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
 										if "THRUSTERS" in equipment:
-											var bp = equipment["THRUSTERS"].duplicate(true)
+											var bp : Dictionary = equipment["THRUSTERS"].duplicate(true)
 											if not "system" in bp:
 												bp["system"] = equipment["system"]
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
 											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
 										if "AUX_POWER_AND_THRUSTERS" in equipment:
-											var bp = equipment["AUX_POWER_AND_THRUSTERS"].duplicate(true)
+											var bp : Dictionary = equipment["AUX_POWER_AND_THRUSTERS"].duplicate(true)
 											if not "system" in bp:
 												bp["system"] = equipment["system"]
 											if not "price" in bp:
@@ -2574,19 +2554,19 @@ class _Equipment:
 								
 								driver_store["ADD_EQUIPMENT_ITEMS"].append(equipment.duplicate(true))
 					"ADD_EQUIPMENT_SLOTS.gd":
-						var arr2 = []
+						var arr2 : Array = []
 						for item in constants:
 							var equipment = constants.get(item).duplicate(true)
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								driver_store["ADD_EQUIPMENT_SLOTS"].append(equipment.duplicate(true))
 					"EQUIPMENT_TAGS.gd":
-						var ar = constants.get("EQUIPMENT_TAGS",{}).duplicate(true)
+						var ar : Dictionary = constants.get("EQUIPMENT_TAGS",{}).duplicate(true)
 						driver_store["EQUIPMENT_TAGS"].append(ar.duplicate(true))
 					"SLOT_ORDER.gd":
 						file.open(slot_order_cache_file,File.READ)
-						var data = JSON.parse(file.get_as_text()).result
+						var data : Array = JSON.parse(file.get_as_text()).result
 						file.close()
-						var orders = constants.get("SLOT_ORDER",[])
+						var orders : Array = constants.get("SLOT_ORDER",[])
 						for order in orders:
 							if order in data:
 								pass
@@ -2599,9 +2579,9 @@ class _Equipment:
 						file.close()
 						
 						file.open(slot_order_relative_store,File.READ)
-						var data2 = JSON.parse(file.get_as_text()).result
+						var data2 : Dictionary = JSON.parse(file.get_as_text()).result
 						file.close()
-						var orders2 = constants.get("SLOT_ORDER_RELATIVE",{})
+						var orders2 : Dictionary = constants.get("SLOT_ORDER_RELATIVE",{})
 						for order in orders2:
 							if not order in data2:
 								data2[order] = orders2[order]
@@ -2610,35 +2590,35 @@ class _Equipment:
 						file.close()
 						
 					"SLOT_TAGS.gd":
-						var ar = constants.get("SLOT_TAGS",{}).duplicate(true)
+						var ar : Dictionary = constants.get("SLOT_TAGS",{}).duplicate(true)
 						driver_store["SLOT_TAGS"].append(ar.duplicate(true))
 
 
 					"AUX_POWER_SLOT.gd","THRUSTERS.gd","AUX_POWER_AND_THRUSTERS.gd":
-						var arr2 = []
+						var arr2 : Array = []
 						for item in constants:
-							var equipment = constants.get(item).duplicate(true)
+							var equipment : Dictionary = constants.get(item).duplicate(true)
 							
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								driver_store["AUX_POWER_AND_THRUSTERS"].append(equipment.duplicate(true))
 
 					"MODIFY_INTERNALS.gd":
 						if "MODIFY_INTERNALS" in constants:
-							var pdata = constants.MODIFY_INTERNALS
+							var pdata : Array = constants.MODIFY_INTERNALS
 							
 							file.open(processed_storage_file,File.READ)
-							var pfdata = JSON.parse(file.get_as_text()).result
+							var pfdata : Dictionary = JSON.parse(file.get_as_text()).result
 							file.close()
 							file.open(processed_storage_systems_file,File.READ)
-							var sysNames = JSON.parse(file.get_as_text()).result
+							var sysNames : Array = JSON.parse(file.get_as_text()).result
 							file.close()
 							for item in pdata:
-								var listingSystemName = item.get("system","SYSTEM_MISSING_NAME")
+								var listingSystemName : String  = item.get("system","SYSTEM_MISSING_NAME")
 								if not listingSystemName in sysNames:
 									sysNames.append(listingSystemName)
 								if not listingSystemName in pfdata:
 									pfdata[listingSystemName] = {}
-								var ls = pfdata[listingSystemName]
+								var ls : Dictionary = pfdata[listingSystemName]
 								
 								ls["minimum_ammo_utilization_for_reduction"] = item.get("minimum_ammo_utilization_for_reduction",ls.get("minimum_ammo_utilization_for_reduction",0.0))
 								ls["minimum_nano_utilization_for_reduction"] = item.get("minimum_nano_utilization_for_reduction",ls.get("minimum_nano_utilization_for_reduction",0.0))
@@ -2668,7 +2648,7 @@ class _Equipment:
 													"status":100.0,
 													"affect_inspection":false
 												}
-											var val = item["display_system"]
+											var val : Dictionary = item["display_system"]
 											if "name" in val:
 												ls["display_system"]["name"] = val.get("name","")
 											if "can_display_multiple" in val:
@@ -2705,10 +2685,10 @@ class _Equipment:
 							file.close()
 					"NODE_DEFINITIONS.gd":
 						file.open(node_definitions_file,File.READ)
-						var pfdata = JSON.parse(file.get_as_text()).result
+						var pfdata : Dictionary = JSON.parse(file.get_as_text()).result
 						file.close()
 						for item in constants:
-							var xd = {item:constants.get(item)}
+							var xd : Dictionary = {item:constants.get(item)}
 							pfdata.merge(xd)
 							driver_store["NODE_DEFINITIONS"].append(xd.duplicate(true))
 							
@@ -2717,7 +2697,7 @@ class _Equipment:
 						file.close()
 					"SHIP_NODE_REGISTER.gd":
 						file.open(ship_node_register_file,File.READ)
-						var pfdata = JSON.parse(file.get_as_text()).result
+						var pfdata : Array = JSON.parse(file.get_as_text()).result
 						file.close()
 						for item in constants:
 							var xd = constants.get(item)
@@ -2729,21 +2709,16 @@ class _Equipment:
 						file.close()
 					"SHIP_NODE_MODIFY.gd":
 						file.open(ship_node_modify_file,File.READ)
-						var pfdata = JSON.parse(file.get_as_text()).result
+						var pfdata : Dictionary = JSON.parse(file.get_as_text()).result
 						file.close()
 						for item in constants:
-							var ship = constants[item].get("ship_name","")
+							var ship : String  = constants[item].get("ship_name","")
 							if ship != "":
-								if ship in pfdata:
-									pass
-								else:
+								if not ship in pfdata:
 									pfdata[ship] = []
-								if ship in driver_store["SHIP_NODE_MODIFY"]:
-									pass
-								else:
+								if not ship in driver_store["SHIP_NODE_MODIFY"]:
 									driver_store["SHIP_NODE_MODIFY"][ship] = []
 								for modification in constants[item].get("modifications",[]):
-									
 									pfdata[ship].append(modification)
 									driver_store["SHIP_NODE_MODIFY"][ship].append(modification.duplicate(true))
 						
@@ -2751,17 +2726,15 @@ class _Equipment:
 						file.store_string(JSON.print(pfdata))
 						file.close()
 					"SHIP_THRUSTER_COLORS.gd":
-						var cd = constants.get("SHIP_THRUSTER_COLORS",{})
-						if cd.keys().size() > 0:
+						var cd : Dictionary = constants.get("SHIP_THRUSTER_COLORS",{})
+						if cd.size() > 0:
 							file.open(ship_thruster_color_file,File.READ)
-							var current = JSON.parse(file.get_as_text()).result
+							var current : Dictionary = JSON.parse(file.get_as_text()).result
 							file.close()
 							for ship in cd:
 								if not ship in driver_store["SHIP_THRUSTER_COLORS"]:
 									driver_store["SHIP_THRUSTER_COLORS"][ship] = []
-								if ship in current:
-									pass
-								else:
+								if not ship in current:
 									current.merge({ship:{"node":{},"type":{}}})
 								driver_store["SHIP_THRUSTER_COLORS"][ship].append(cd[ship].duplicate(true))
 								if "type" in cd[ship]:
@@ -2776,27 +2749,22 @@ class _Equipment:
 							file.open(ship_thruster_color_file,File.WRITE)
 							file.store_string(JSON.print(current))
 							file.close()
-							
-						
-						pass
 
 					"WEAPONSLOT_ADD.gd":
-						var arr2 = []
+						var arr2 : Array = []
 						for item in constants:
-							var equipment = constants.get(item).duplicate(true)
-							var n = equipment.get("name",null)
+							var equipment : Dictionary = constants.get(item).duplicate(true)
+							var n : String = equipment.get("name","")
 							if n:
 								if not n in ws_equipment_names:
 									ws_equipment_names.append(n)
 								if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 									driver_store["WEAPONSLOT_ADD"].append(equipment.duplicate(true))
 					"WEAPONSLOT_MODIFY_TEMPLATES.gd":
-						var ar = constants.get("WEAPONSLOT_MODIFY_TEMPLATES",{}).duplicate(true)
+						var ar : Dictionary = constants.get("WEAPONSLOT_MODIFY_TEMPLATES",{}).duplicate(true)
 						file.open(weaponslot_modify_templates_file,File.READ)
-						var filedata = file.get_as_text(true)
+						var founddata : Dictionary = JSON.parse(file.get_as_text(true)).result
 						file.close()
-						var sort = JSON.parse(filedata)
-						var founddata : Dictionary = sort.result
 						for template in ar:
 							if template in founddata.keys():
 								for datapoint in ar[template]:
@@ -2810,11 +2778,11 @@ class _Equipment:
 												else:
 													founddata[template][datapoint].append(item)
 										"data":
-											var data_formatted = {}
+											var data_formatted : Dictionary = {}
 											for item in ar[template][datapoint]:
 												data_formatted.merge({item.get("property"):item.get("value")})
 											for key in data_formatted.keys():
-												var is_in_dict = false
+												var is_in_dict:bool = false
 												for lps in founddata[template][datapoint]:
 													if lps.get("property") == key:
 														is_in_dict = true
@@ -2832,28 +2800,28 @@ class _Equipment:
 					"WEAPONSLOT_MODIFY.gd":
 						var ar = constants.get("WEAPONSLOT_MODIFY",{}).duplicate(true)
 						file.open(weaponslot_modify_standalone_file,File.READ)
-						var filedata = file.get_as_text(true)
+						var founddata : Dictionary = JSON.parse(file.get_as_text(true)).result
 						file.close()
-						var sort = JSON.parse(filedata)
-						var founddata : Dictionary = sort.result
 						for item in ar:
 							if not item in ws_equipment_names:
 								ws_equipment_names.append(item)
 							if item in founddata:
-								var new_dict = {}
+								var new_dict : Dictionary = {}
 								for c in ar.get(item):
-									var prop = c.get("property")
-									var val = c.get("value")
-									new_dict.merge({prop:val})
-								var old_dict = {}
-								var current_item_data = founddata.get(item)
+									var prop : String = c.get("property","")
+									var val : String = c.get("value","")
+									if prop and val:
+										new_dict.merge({prop:val})
+								var old_dict : Dictionary = {}
+								var current_item_data : Dictionary = founddata.get(item)
 								for c in current_item_data:
-									var prop = c.get("property")
-									var val = c.get("value")
-									old_dict.merge({prop:val})
+									var prop : String = c.get("property","")
+									var val : String = c.get("value","")
+									if prop and val:
+										old_dict.merge({prop:val})
 								for op in new_dict:
 									old_dict[op] = new_dict[op]
-								var processed = []
+								var processed : Array = []
 								for u in old_dict:
 									processed.append({"property":u,"value":old_dict.get(u)})
 								founddata.merge({item:processed},true)
@@ -2865,24 +2833,21 @@ class _Equipment:
 						file.store_string(JSON.print(founddata))
 						file.close()
 					"WEAPONSLOT_SHIP_TEMPLATES.gd":
-						var ar = constants.get("WEAPONSLOT_SHIP_TEMPLATES",{}).duplicate(true)
+						var ar : Dictionary = constants.get("WEAPONSLOT_SHIP_TEMPLATES",{}).duplicate(true)
 						file.open(weaponslot_ship_templates_file,File.READ)
-						var filedata = file.get_as_text(true)
+						var founddata : Dictionary = JSON.parse(file.get_as_text(true)).result
 						file.close()
-						var sort = JSON.parse(filedata)
-						var founddata : Dictionary = sort.result
-						
 						for ship in ar:
 							if not ship in driver_store["WEAPONSLOT_SHIP_TEMPLATES"]:
 								driver_store["WEAPONSLOT_SHIP_TEMPLATES"][ship] = []
 							driver_store["WEAPONSLOT_SHIP_TEMPLATES"][ship].append({ship:ar[ship].duplicate(true)})
 							if ship in founddata.keys():
-								var shipdata = ar.get(ship)
+								var shipdata : Dictionary = ar.get(ship)
 								for slot in shipdata:
 									if slot in founddata[ship]:
-										var compile = {}
-										var current_dict = {}
-										var new_dict = {}
+										var compile : Dictionary = {}
+										var current_dict : Dictionary = {}
+										var new_dict : Dictionary = {}
 										for type in founddata[ship][slot]:
 											compile.merge({type:[]},true)
 											current_dict.merge({type:{}},true)
@@ -2908,30 +2873,26 @@ class _Equipment:
 					"WEAPONSLOT_SHIP_MODIFY.gd":
 						var ar = constants.get("WEAPONSLOT_SHIP_MODIFY",{}).duplicate(true)
 						file.open(weaponslot_ship_standalone_file,File.READ)
-						var filedata = file.get_as_text(true)
+						var founddata : Dictionary = JSON.parse(file.get_as_text(true)).result
 						file.close()
-						var sort = JSON.parse(filedata)
-						var founddata : Dictionary = sort.result
-						
-						
 						for ship in ar:
 							if not ship in driver_store["WEAPONSLOT_SHIP_MODIFY"]:
 								driver_store["WEAPONSLOT_SHIP_MODIFY"][ship] = []
 							driver_store["WEAPONSLOT_SHIP_MODIFY"][ship].append({ship:ar[ship].duplicate(true)})
-							var slots = ar[ship]
+							var slots : Dictionary = ar[ship]
 							for slot in slots:
 								var equipment = slots[slot]
 								for item in equipment:
 									if not item in ws_equipment_names:
 										ws_equipment_names.append(item)
 							
-							if ship in founddata.keys():
-								var shipdata = ar.get(ship)
+							if ship in founddata:
+								var shipdata : Dictionary = ar.get(ship)
 								for slot in shipdata:
 									if slot in founddata[ship]:
-										var compile = {}
-										var current_dict = {}
-										var new_dict = {}
+										var compile : Dictionary = {}
+										var current_dict : Dictionary = {}
+										var new_dict : Dictionary = {}
 										for type in founddata[ship][slot]:
 											compile.merge({type:[]},true)
 											current_dict.merge({type:{}},true)
@@ -2955,13 +2916,10 @@ class _Equipment:
 						file.store_string(JSON.print(founddata))
 						file.close()
 					"SAVE_BUTTONS.gd":
-						var ar = constants.get("SAVE_BUTTONS",[]).duplicate(true)
+						var ar : Array = constants.get("SAVE_BUTTONS",[]).duplicate(true)
 						file.open(save_menu_file,File.READ)
-						var filedata = file.get_as_text(true)
+						var founddata : Array = JSON.parse(file.get_as_text(true)).result
 						file.close()
-						var sort = JSON.parse(filedata)
-						var founddata = sort.result
-						
 						for button in ar:
 							founddata.append(button)
 							driver_store["SAVE_BUTTONS"].append(button.duplicate(true))
@@ -2971,7 +2929,7 @@ class _Equipment:
 						file.close()
 					"ADD_SHIPS.gd":
 						for ar in constants:
-							var ac = constants[ar]
+							var ac : Dictionary = constants[ar]
 							driver_store["ADD_SHIPS"].append(ac.duplicate(true))
 					"REGISTER_SHIP_NUMERICS.gd":
 						for ar in constants:
@@ -2982,11 +2940,11 @@ class _Equipment:
 								driver_store["REGISTER_SHIP_NUMERICS"][ar].append({v:ac[v].duplicate(true)})
 					"MODIFY_SHIP_NUMERICS.gd":
 						file.open(modify_ship_numerics_store,File.READ)
-						var pfdata = JSON.parse(file.get_as_text()).result
+						var pfdata : Dictionary = JSON.parse(file.get_as_text()).result
 						file.close()
 						for item in constants:
-							var di = constants[item]
-							var ship = di.get("ship_name","")
+							var di : Dictionary = constants[item]
+							var ship : String  = di.get("ship_name","")
 							if ship != "":
 								if not ship in pfdata:
 									pfdata[ship] = []
@@ -2996,14 +2954,14 @@ class _Equipment:
 						file.close()
 					"NAMER.gd":
 						file.open(namer_store,File.READ)
-						var pfdata = JSON.parse(file.get_as_text()).result
+						var pfdata : Dictionary = JSON.parse(file.get_as_text()).result
 						file.close()
 						if "CREW" in constants:
-							var d = constants["CREW"]
+							var d : Array = constants["CREW"]
 							pfdata["crew"].append_array(d)
 						
 						if "SHIPS" in constants:
-							var d = constants["SHIPS"]
+							var d : Array = constants["SHIPS"]
 							pfdata["ships"].append_array(d)
 						
 						file.open(namer_store,File.WRITE)
@@ -3028,25 +2986,25 @@ class _Equipment:
 		file.store_string(JSON.print(ws_equipment_names))
 		file.close()
 		
-		var all_slot_node_names = []
+		var all_slot_node_names : Array = []
 		all_slot_node_names.append_array(vanilla_slot_names)
-		var slots_for_adding = []
-		var slots_for_adding_dict = {}
-		var tag_modifications = []
+		var slots_for_adding : Array = []
+		var slots_for_adding_dict : Dictionary = {}
+		var tag_modifications : Array = []
 		
-		var ship_limitations = {}
-		var ship_limitation_string = ""
+		var ship_limitations : Dictionary = {}
+		var ship_limitation_string : String  = ""
 		
-		var equipment_for_adding = []
+		var equipment_for_adding : Array = []
 		
 		for nodes in driver_store["EQUIPMENT_TAGS"]:
-			if nodes.keys().size() >= 1:
-				var slotTypes = nodes.get("slot_types",[])
-				var equipmentItems = nodes.get("equipment_types",[])
-				var align = nodes.get("alignments",[])
-				var hardpointTypes = nodes.get("hardpoint_types",[])
-				var slotDefaults = nodes.get("slot_defaults",{})
-				if slotTypes.size() > 0:
+			if nodes:
+				var slotTypes : Array = nodes.get("slot_types",[])
+				var equipmentItems : Array = nodes.get("equipment_types",[])
+				var align : Array = nodes.get("alignments",[])
+				var hardpointTypes : Array = nodes.get("hardpoint_types",[])
+				var slotDefaults : Dictionary = nodes.get("slot_defaults",{})
+				if slotTypes:
 					for st in slotTypes:
 						if not st in slot_types:
 							slot_types.append(st)
@@ -3054,35 +3012,31 @@ class _Equipment:
 					for st in equipmentItems:
 						if not st in equipment_types:
 							equipment_types.append(st)
-				if align.size() > 0:
+				if align:
 					for st in align:
 						if not st in alignments:
 							alignments.append(st)
-				if hardpointTypes.size() > 0:
+				if hardpointTypes:
 					for st in hardpointTypes:
 						if not st in hardpoint_types:
 							hardpoint_types.append(st)
-				if slotDefaults.keys().size() > 0:
+				if slotDefaults:
 					for st in slotDefaults:
-						if st in slot_defaults.keys():
+						if st in slot_defaults:
 							for item in slotDefaults.get(st):
-								if item in slot_defaults.get(st):
-									pass
-								else:
+								if not item in slot_defaults.get(st):
 									slot_defaults[st].append(item)
 						else:
 							slot_defaults.merge({st:slotDefaults.get(st)})
 		for slotDict in driver_store["ADD_EQUIPMENT_SLOTS"]:
-			var snn = slotDict.get("slot_node_name","")
-			var spp = ship_limitations.get(snn,{})
+			var snn : String  = slotDict.get("slot_node_name","")
+			var spp : Dictionary = ship_limitations.get(snn,{})
 			if "limit_ships" in slotDict:
-				var val = slotDict["limit_ships"].duplicate()
+				var val : Array = slotDict["limit_ships"].duplicate()
 				if snn in ship_limitations:
 					if "limit_ships" in spp:
 						for i in val:
-							if i in spp:
-								pass
-							else:
+							if not i in spp:
 								ship_limitations[snn]["limit_ships"] = i
 					else:
 						ship_limitations[snn]["limit_ships"] = spp["limit_ships"]
@@ -3090,13 +3044,11 @@ class _Equipment:
 					ship_limitations.merge({snn:{}})
 					ship_limitations[snn]["limit_ships"] = val
 			if "prevent_ships" in slotDict:
-				var val = slotDict["prevent_ships"].duplicate()
+				var val : Array = slotDict["prevent_ships"].duplicate()
 				if snn in ship_limitations:
 					if "prevent_ships" in spp:
 						for i in val:
-							if i in spp:
-								pass
-							else:
+							if not i in spp:
 								ship_limitations[snn]["prevent_ships"] = i
 					else:
 						ship_limitations[snn]["prevent_ships"] = spp["prevent_ships"]
@@ -3107,20 +3059,17 @@ class _Equipment:
 			slots_for_adding_dict.merge({slotDict.get("slot_node_name",""):slotDict})
 			all_slot_node_names.append(slotDict.get("slot_node_name",""))
 		for node in driver_store["SLOT_TAGS"]:
-			if node.keys().size() >= 1:
+			if node:
 				tag_modifications.append(node)
-				for i in node:
-					var data = node[i]
-					var snn = i
-					var spp = ship_limitations.get(snn,{})
+				for snn in node:
+					var data : Dictionary = node[snn]
+					var spp : Dictionary = ship_limitations.get(snn,{})
 					if "limit_ships" in data:
-						var val = data["limit_ships"].duplicate()
+						var val : Array = data["limit_ships"].duplicate()
 						if snn in ship_limitations:
 							if "limit_ships" in spp:
 								for f in val:
-									if f in spp:
-										pass
-									else:
+									if not f in spp:
 										ship_limitations[snn]["limit_ships"] = f
 							else:
 								ship_limitations[snn]["limit_ships"] = spp["limit_ships"]
@@ -3128,13 +3077,11 @@ class _Equipment:
 							ship_limitations.merge({snn:{}})
 							ship_limitations[snn]["limit_ships"] = val.duplicate()
 					if "prevent_ships" in data:
-						var val = data["prevent_ships"].duplicate()
+						var val : Array = data["prevent_ships"].duplicate()
 						if snn in ship_limitations:
 							if "prevent_ships" in spp:
 								for f in val:
-									if f in spp:
-										pass
-									else:
+									if not f in spp:
 										ship_limitations[snn]["prevent_ships"] = f
 							else:
 								ship_limitations[snn]["prevent_ships"] = spp["prevent_ships"]
@@ -3142,7 +3089,7 @@ class _Equipment:
 							ship_limitations.merge({snn:{}})
 							ship_limitations[snn]["prevent_ships"] = val.duplicate()
 		for ns in driver_store["ADD_EQUIPMENT_ITEMS"]:
-			if ns.size() >= 1:
+			if ns:
 				equipment_for_adding.append(ns)
 		
 		var slots_full : Array = []
@@ -3156,10 +3103,12 @@ class _Equipment:
 		var slot_allowed_equipment : Dictionary = {}
 		
 		for slot in slots_for_adding:
-			var m = slot.get("slot_node_name","")
-			var format = __make_slot_for_scene(slot)
+			var m : String  = slot.get("slot_node_name","")
+			var format : Dictionary = __make_slot_for_scene(slot)
+			
+			# FUTURE ME: Write a mod that tag modifies a modded slot, need to double check functionality of this code + define types
 			for data in tag_modifications:
-				if m in data.keys():
+				if m in data:
 					for check in format:
 						if check.keys()[0] == m:
 							var slot_override_additive = check[m][2]["override_additive"]
@@ -3167,41 +3116,33 @@ class _Equipment:
 							var override_additive = data[m].get("override_additive",[])
 							var override_subtractive = data[m].get("override_subtractive",[])
 							for over in override_additive:
-								if over in slot_override_additive:
-									pass
-								else:
+								if not over in slot_override_additive:
 									slot_override_additive.append(over)
 							for over in override_subtractive:
-								if over in slot_override_subtractive:
-									pass
-								else:
+								if not over in slot_override_subtractive:
 									slot_override_subtractive.append(over)
 							slot_eligibility.append({m:[[],slot_override_additive,slot_override_subtractive]})
 			slots_format.append(format.get(m)[0])
 			editable_paths.append(format.get(m)[1])
 			slots_full.append(format)
 		for slot in vanilla_equipment_defaults_for_reference:
-			var vslot_data = vanilla_equipment_defaults_for_reference[slot]
-			var vslot_additives = vslot_data.get("override_additive",[])
-			var vslot_subtractives = vslot_data.get("override_subtractive",[])
+			var vslot_data : Dictionary = vanilla_equipment_defaults_for_reference[slot]
+			var vslot_additives : Array = vslot_data.get("override_additive",[])
+			var vslot_subtractives : Array = vslot_data.get("override_subtractive",[])
 			for dict in tag_modifications:
-				if slot in dict.keys():
-					var tag_data = dict[slot]
-					var tag_add = tag_data.get("override_additive",[])
-					var tag_sub = tag_data.get("override_subtractive",[])
+				if slot in dict:
+					var tag_data : Dictionary = dict[slot]
+					var tag_add : Array = tag_data.get("override_additive",[])
+					var tag_sub : Array = tag_data.get("override_subtractive",[])
 					if vslot_additives != []:
 						for add in tag_add:
-							if add in vslot_additives:
-								pass
-							else:
+							if not add in vslot_additives:
 								vslot_additives.append(add)
 					else:
 						vslot_additives = tag_add.duplicate()
 					if vslot_subtractives != []:
 						for sub in tag_sub:
-							if sub in vslot_subtractives:
-								pass
-							else:
+							if not sub in vslot_subtractives:
 								vslot_subtractives.append(sub)
 					else:
 						vslot_subtractives = tag_sub.duplicate()
@@ -3213,74 +3154,62 @@ class _Equipment:
 			
 			
 		for slot in all_slot_node_names:
-			if slot in vanilla_equipment_defaults_for_reference.keys():
-				var data = vanilla_equipment_defaults_for_reference[slot]
-				var slot_type = data.get("slot_type","HARDPOINT").to_upper()
+			if slot in vanilla_equipment_defaults_for_reference:
+				var data : Dictionary = vanilla_equipment_defaults_for_reference[slot]
+				var slot_type : String  = data.get("slot_type","HARDPOINT").to_upper()
 				if slot_type == "HARDPOINT":
-					var hardpoint = data.get("hardpoint_type", "")
-					var yk = slot_defaults.get(hardpoint,[]).duplicate(true)
-					var items = yk.duplicate(true)
-					var additives = data.get("override_additive",[])
-					var subtractives = data.get("override_subtractive",[])
+					var hardpoint : String  = data.get("hardpoint_type", "")
+					var yk : Array = slot_defaults.get(hardpoint,[]).duplicate(true)
+					var items : Array = yk.duplicate(true)
+					var additives : Array = data.get("override_additive",[])
+					var subtractives : Array = data.get("override_subtractive",[])
 					for item in additives:
-						if item in items:
-							pass
-						else:
+						if not item in items:
 							items.append(item)
 					for item in subtractives:
-						var tmp = []
+						var tmp : Array = []
 						for i in items:
-							if i in subtractives:
-								pass
-							else:
+							if not i in subtractives:
 								tmp.append(i)
 						items = tmp.duplicate(true)
 					
 					slot_allowed_equipment.merge({slot:items})
 				else:
-					var items = slot_defaults.get(slot_type,[])
-					var additives = data.get("override_additive",[])
-					var subtractives = data.get("override_subtractive",[])
+					var items : Array = slot_defaults.get(slot_type,[])
+					var additives : Array = data.get("override_additive",[])
+					var subtractives : Array = data.get("override_subtractive",[])
 					for item in additives:
-						if item in items:
-							pass
-						else:
+						if not item in items:
 							items.append(item)
 					for item in subtractives:
-						var tmp = []
+						var tmp : Array = []
 						for i in items:
-							if i in subtractives:
-								pass
-							else:
+							if not i in subtractives:
 								tmp.append(i)
 						items = tmp.duplicate(true)
 					slot_allowed_equipment.merge({slot:items})
 			elif slot in slots_for_adding_dict.keys():
-				var data = slots_for_adding_dict[slot]
-				var slot_type = data.get("slot_type","HARDPOINT").to_upper()
+				var data : Dictionary = slots_for_adding_dict[slot]
+				var slot_type : String  = data.get("slot_type","HARDPOINT").to_upper()
 				if slot_type == "HARDPOINT":
-					var hardpoint = data.get("hardpoint_type", "")
-					var yk = slot_defaults.get(hardpoint,[]).duplicate(true)
-					var items = yk.duplicate(true)
-					var additives = data.get("override_additive",[])
-					var subtractives = data.get("override_subtractive",[])
+					var hardpoint : String  = data.get("hardpoint_type", "")
+					var yk : Array = slot_defaults.get(hardpoint,[]).duplicate(true)
+					var items : Array = yk.duplicate(true)
+					var additives : Array = data.get("override_additive",[])
+					var subtractives : Array = data.get("override_subtractive",[])
 					for item in additives:
-						if item in items:
-							pass
-						else:
+						if not item in items:
 							items.append(item)
 					for item in subtractives:
-						var tmp = []
+						var tmp : Array = []
 						for i in items:
-							if i in subtractives:
-								pass
-							else:
+							if not i in subtractives:
 								tmp.append(i)
 						items = tmp.duplicate(true)
 					
 					slot_allowed_equipment.merge({slot:items})
 				else:
-					var items = slot_defaults.get(slot_type,[])
+					var items : Array = slot_defaults.get(slot_type,[])
 					slot_allowed_equipment.merge({slot:items})
 			
 			
@@ -3289,24 +3218,24 @@ class _Equipment:
 		for slot in slots_for_adding:
 			if slot.get("add_vanilla_equipment",true):
 				for equip in vanilla_equipment:
-					var item = vanilla_equipment[equip]
-					var allowed_equipment = slot_allowed_equipment.get(slot.get("slot_node_name",""),[]).duplicate(true)
+					var item : Dictionary = vanilla_equipment[equip]
+					var allowed_equipment : Array = slot_allowed_equipment.get(slot.get("slot_node_name",""),[]).duplicate(true)
 					
-					var does = confirm_equipment(vanilla_equipment[equip], slot.get("slot_type",""), slot.get("alignment",""), slot.get("restriction",""), allowed_equipment)
+					var does:bool = confirm_equipment(vanilla_equipment[equip], slot.get("slot_type",""), slot.get("alignment",""), slot.get("restriction",""), allowed_equipment)
 					if does:
-						var system_slot = slot.get("system_slot","")
-						var string = __make_equipment_for_scene(item, slot.get("slot_node_name",""), system_slot)
+						var system_slot : String  = slot.get("system_slot","")
+						var string : String  = __make_equipment_for_scene(item, slot.get("slot_node_name",""), system_slot)
 						if system_slot == "":
 							pass
 						equipment_format.append(string)
 		for slot in all_slot_node_names:
-			if slot in slot_allowed_equipment.keys():
+			if slot in slot_allowed_equipment:
 				for item in equipment_for_adding:
-					var allowed_equipment = slot_allowed_equipment.get(slot,[]).duplicate(true)
-					var slot_type = ""
-					var alignment = ""
-					var restriction = ""
-					var system_slot = ""
+					var allowed_equipment : Array = slot_allowed_equipment.get(slot,[]).duplicate(true)
+					var slot_type : String  = ""
+					var alignment : String  = ""
+					var restriction : String  = ""
+					var system_slot : String  = ""
 					if slot in vanilla_equipment_defaults_for_reference.keys():
 						slot_type = vanilla_equipment_defaults_for_reference[slot].get("slot_type","")
 						alignment = vanilla_equipment_defaults_for_reference[slot].get("alignment","")
@@ -3317,17 +3246,15 @@ class _Equipment:
 						alignment = slots_for_adding_dict[slot].get("alignment","")
 						restriction = slots_for_adding_dict[slot].get("restriction","")
 						system_slot = slots_for_adding_dict[slot].get("system_slot","")
-					var does = confirm_equipment(item, slot_type, alignment, restriction, allowed_equipment)
+					var does:bool = confirm_equipment(item, slot_type, alignment, restriction, allowed_equipment)
 					if does:
-						var string = __make_equipment_for_scene(item, slot, system_slot)
+						var string : String  = __make_equipment_for_scene(item, slot, system_slot)
 						if system_slot == "":
 							pass
-						if string in equipment_format:
-							pass
-						else:
+						if not string in equipment_format:
 							equipment_format.append(string)
 			
-		var concat = ""
+		var concat : String  = ""
 		concat = SCENE_HEADER
 		for ref in slots_format:
 			concat = concat + "\n\n" + ref
@@ -3338,54 +3265,48 @@ class _Equipment:
 		
 		
 		
-		var ws_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://weapons/WeaponSlot.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"WeaponSlot\" instance=ExtResource( 1 )]"
+		var ws_header : String  = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://weapons/WeaponSlot.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"WeaponSlot\" instance=ExtResource( 1 )]"
 		
-		var equipment_header = "[node name=\"%s\" parent=\"%s\" instance_placeholder=\"%s\"]"
-		var equipment_header_noref = "[node name=\"%s\" parent=\"%s\"]"
-		var equipment_editable_path_base = "[editable path=\"%s\"]"
+		var equipment_header : String  = "[node name=\"%s\" parent=\"%s\" instance_placeholder=\"%s\"]"
+		var equipment_header_noref : String  = "[node name=\"%s\" parent=\"%s\"]"
+		var equipment_editable_path_base : String  = "[editable path=\"%s\"]"
 		
 		
-		var weaponslot_string = ws_header
-		var ws_editable_paths = ""
-		var weaponslot_properties = {}
+		var weaponslot_string : String  = ws_header
+		var ws_editable_paths : String  = ""
+		var weaponslot_properties : Dictionary = {}
 		
-		var ws_stuff_to_add = []
-		var ws_stuff_to_modify = []
+		var ws_stuff_to_add : Array = []
+		var ws_stuff_to_modify : Array = []
 		
 		for add in driver_store["WEAPONSLOT_ADD"]:
 			if pointers.ConfigDriver.__validate_dictionary(add,false):
-				var aname = add.get("name","SYSTEM_ERROR")
-				var apath = add.get("path","")
-				var item_data = {}
-				var config = add.get("config",{})
+				var aname : String  = add.get("name","SYSTEM_ERROR")
+				var apath : String  = add.get("path","")
+				var item_data : Dictionary = {}
+				var config : Dictionary = add.get("config",{})
 				for it in add.get("data",[]):
-					var ws_property_string = ""
-					var ws_property = it.get("property")
+					var ws_property_string : String  = ""
+					var ws_property : String  = it.get("property")
 					var ws_value = it.get("value")
-					var split = ws_property.split("/")
-					var property = split[split.size() - 1]
+					var split:PoolStringArray = ws_property.split("/")
+					var property : String  = split[split.size() - 1]
 					if split.size() >= 3:
-						var node = split[split.size() - 2]
-						var nonode = ws_property.split(node)
+						var node : String  = split[split.size() - 2]
+						var nonode:PoolStringArray = ws_property.split(node)
 						if nonode[0].ends_with("/"):
 							nonode[0] = nonode[0].rstrip("/")
 						if nonode[1].begins_with("/"):
 							nonode[1] = nonode[1].lstrip("/")
-						if nonode[0] in item_data:
-							pass
-						else:
+						if not nonode[0] in item_data:
 							item_data.merge({nonode[0]:[]})
 						item_data[nonode[0]].append([nonode[1],ws_value])
 					elif split.size() == 2:
-						if split[0] in item_data:
-							pass
-						else:
+						if not split[0] in item_data:
 							item_data.merge({split[0]:[]})
 						item_data[split[0]].append([split[1],ws_value])
 					else:
-						if "." in item_data:
-							pass
-						else:
+						if not "." in item_data:
 							item_data.merge({".":[]})
 						item_data["."].append([ws_property,ws_value])
 				if apath == "":
@@ -3394,70 +3315,48 @@ class _Equipment:
 					ws_stuff_to_add.append({"name":aname,"path":apath,"data":item_data,"config":config})
 
 
-
-
-#						for add in additions:
-			var aname = add.get("name","SYSTEM_ERROR")
-			var apath = add.get("path","")
-			var add_header = ""
-			if apath == "":
-				add_header = equipment_header_noref % [aname,"."]
-			else:
-				add_header = equipment_header % [aname,".",apath]
+			var aname : String = add.get("name","SYSTEM_ERROR")
+			var apath : String = add.get("path","")
+			var add_header : String = (equipment_header % [aname,".",apath]) if apath else (equipment_header_noref % [aname,"."])
 			weaponslot_properties.merge({add_header:[]})
-			if ws_editable_paths == "":
-				ws_editable_paths = equipment_editable_path_base % aname
-			else:
+			if ws_editable_paths:
 				ws_editable_paths = ws_editable_paths + "\n" + equipment_editable_path_base % aname
+			else:
+				ws_editable_paths = equipment_editable_path_base % aname
 			
 			for it in add.get("data",[]):
-				var ws_property_string = ""
-				var ws_property = it.get("property")
-				var ws_value = it.get("value")
-				var split = ws_property.split("/")
-				var property = split[split.size() - 1]
-				var parent_path = "."
+				var ws_property_string : String  = ""
+				var ws_property : String  = it.get("property")
+				var ws_value : String  = it.get("value")
+				var split:PoolStringArray = ws_property.split("/")
+				var property : String  = split[split.size() - 1]
+				var parent_path : String  = "."
 				if split.size() >= 3:
-					var node = split[split.size() - 2]
-					var nonode = ws_property.split(node)
+					var node : String  = split[split.size() - 2]
+					var nonode:PoolStringArray = ws_property.split(node)
 					if nonode[0].ends_with("/"):
 						nonode[0] = nonode[0].rstrip("/")
 					if nonode[1].begins_with("/"):
 						nonode[1] = nonode[1].lstrip("/")
-					var prop_header = equipment_header_noref % [node,aname + "/" + nonode[0]]
-					if prop_header in weaponslot_properties.keys():
-						pass
-					else:
+					var prop_header : String  = equipment_header_noref % [node,aname + "/" + nonode[0]]
+					if not prop_header in weaponslot_properties:
 						weaponslot_properties.merge({prop_header:[]})
 					weaponslot_properties[prop_header].append([nonode[1],ws_value])
 				elif split.size() == 2:
-					var prop_header = equipment_header_noref % [split[0],aname]
-					if prop_header in weaponslot_properties.keys():
-						pass
-					else:
+					var prop_header : String  = equipment_header_noref % [split[0],aname]
+					if not prop_header in weaponslot_properties:
 						weaponslot_properties.merge({prop_header:[]})
 					weaponslot_properties[prop_header].append([split[1],ws_value])
 				else:
-					if add_header in weaponslot_properties.keys():
-						pass
-					else:
+					if not add_header in weaponslot_properties:
 						weaponslot_properties.merge({add_header:[]})
 					weaponslot_properties[add_header].append([ws_property,ws_value])
 		
 		for property in weaponslot_properties:
 			weaponslot_string = weaponslot_string + "\n\n" + property
-			var data = weaponslot_properties.get(property)
+			var data : Array = weaponslot_properties.get(property)
 			for dp in data:
 				weaponslot_string = weaponslot_string + "\n" + dp[0] + " = " + dp[1]
-		
-		var aux_power_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://ships/modules/AuxSlot.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"AuxSlot\" instance=ExtResource( 1 )]"
-		
-		var MPDG_header = "[node name=\"%s\" parent=\".\" instance_placeholder=\"res://ships/modules/AuxMpd.tscn\"]"
-		var SMES_header = "[node name=\"%s\" parent=\".\" instance_placeholder=\"res://ships/modules/AuxSmes.tscn\"]"
-		
-		var aux_power_string = aux_power_header
-		
-		var property = "%s = %s"
 		
 		file.open(weaponslot_additions,File.WRITE)
 		file.store_string(JSON.print(ws_stuff_to_add))
@@ -3470,22 +3369,20 @@ class _Equipment:
 		
 		for data in driver_store["AUX_POWER_AND_THRUSTERS"]:
 			file.open(auxslot_data_path,File.READ)
-			var a = JSON.parse(file.get_as_text()).result
+			var a : Dictionary = JSON.parse(file.get_as_text()).result
 			file.close()
-			var equipSlots = data.get("slots",[])
+			var equipSlots : Array = data.get("slots",[])
 			for slot in equipSlots:
 				slot = slot.split(".")[0]
-				if slot in a:
-					pass
-				else:
+				if not slot in a:
 					a.merge({slot:[]})
 				a[slot].append(data)
 			
 			file.open(auxslot_data_path,File.WRITE)
 			file.store_string(JSON.print(a))
 			file.close()
-			var aux_path = data.get("path","")
-			var aux_type = data.get("type","MPDG").to_upper()
+			var aux_path : String  = data.get("path","")
+			var aux_type : String  = data.get("type","MPDG").to_upper()
 			match aux_type:
 				"THRUSTER","RCS","TORCH","MAIN_PROPULSION":
 					match aux_type:
@@ -3495,14 +3392,14 @@ class _Equipment:
 							aux_type = "TORCH"
 					if aux_path != "":
 						continue
-					var sys = data.get("system","SYSTEM_NAME_MISSING")
-					var auxTypePath = exhaust_cache_path + "/" + aux_type
+					var sys : String = data.get("system","SYSTEM_NAME_MISSING")
+					var auxTypePath : String = exhaust_cache_path + "/" + aux_type
 					
 					pointers.FolderAccess.__check_folder_exists(auxTypePath)
 					
-					var exhaust_text = make_exhaust_scene(data,sys)
+					var exhaust_text : String = make_exhaust_scene(data,sys)
 					
-					var this_exhaust_path = auxTypePath + "/" + sys + "_exhaust.tscn"
+					var this_exhaust_path : String = auxTypePath + "/" + sys + "_exhaust.tscn"
 					file.open(this_exhaust_path,File.WRITE)
 					file.store_string(exhaust_text)
 					file.close()
@@ -3512,8 +3409,8 @@ class _Equipment:
 					ResourceSaver.save(this_exhaust_path,exhaust_pck)
 					exhaust_scn.free()
 					
-					var thruster_scene = make_thruster_scene(data,sys,aux_type,exhaust_cache_path)
-					var this_thruster_path = auxTypePath + "/" + sys + "_thruster.tscn"
+					var thruster_scene : String = make_thruster_scene(data,sys,aux_type,exhaust_cache_path)
+					var this_thruster_path : String = auxTypePath + "/" + sys + "_thruster.tscn"
 					file.open(this_thruster_path,File.WRITE)
 					file.store_string(thruster_scene)
 					file.close()
@@ -3522,15 +3419,14 @@ class _Equipment:
 					thruster_pck.pack(thruster_scn)
 					ResourceSaver.save(this_thruster_path,thruster_pck)
 					thruster_scn.free()
-#					breakpoint
-		var lim_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]"
-		var lim_item = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\"]"
+		var lim_header : String  = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]"
+		var lim_item : String  = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\"]"
 		ship_limitation_string = lim_header
 		for i in ship_limitations:
-			var cc = "\n\n" + lim_item % i
-			var data = ship_limitations[i]
+			var cc : String = "\n\n" + lim_item % i
+			var data : Dictionary = ship_limitations[i]
 			if "limit_ships" in data:
-				var sl = "limit_ships = [ "
+				var sl : String = "limit_ships = [ "
 				if typeof(data["limit_ships"]) == TYPE_STRING:
 					data["limit_ships"] = [data["limit_ships"]]
 				for f in range(0,data["limit_ships"].size()):
@@ -3540,7 +3436,7 @@ class _Equipment:
 						sl = sl + "\"" + data["limit_ships"][f] + "\" ]"
 				cc = cc + "\n" + sl
 			if "prevent_ships" in data:
-				var sl = "prevent_ships = [ "
+				var sl : String = "prevent_ships = [ "
 				if typeof(data["prevent_ships"]) == TYPE_STRING:
 					data["prevent_ships"] = [data["prevent_ships"]]
 				for f in range(0,data["prevent_ships"].size()):
@@ -3561,10 +3457,6 @@ class _Equipment:
 		file.store_string(concat)
 		file.close()
 		
-#		file.open(auxslot_save_path,File.WRITE)
-#		file.store_string(aux_power_string)
-#		file.close()
-		
 		file.open(upgrades_slot_limits,File.WRITE)
 		file.store_string(ship_limitation_string)
 		file.close()
@@ -3572,29 +3464,29 @@ class _Equipment:
 		
 		UpgradeMenu.free()
 
-	var tagged_vanilla_slots = PoolStringArray()
+	var tagged_vanilla_slots : PoolStringArray = PoolStringArray()
 
-	var MODULE_IDENTIFIER = "Equipment Driver"
+	var MODULE_IDENTIFIER : String = "Equipment Driver"
 	func l(msg:String, ID:String = MODULE_IDENTIFIER, title:String = "HevLib"):
 		Debug.l("[%s %s]: %s" % [title, ID, msg])
 
 	const SLOT_HEADER = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\" instance=ExtResource( 2 )]"
 	
-	var generated_tex = {}
+	var generated_tex : Dictionary = {}
 	
 	func create_compiled_tex(texturepath:String, cached_tex_path:String, save_type:String):
 		return texturepath
-		var filepath = ""
+		var filepath : String = ""
 		if texturepath in generated_tex:
 			filepath = generated_tex[texturepath]
 		else:
 			filepath = cached_tex_path % save_type
 			generated_tex[texturepath] = filepath
-			var flareTexture
+			var flareTexture:Texture
 			if texturepath.ends_with(".png"):
 				flareTexture = pointers.FileAccess.__load_png(texturepath)
 			elif texturepath.ends_with(".stex"):
-				var st = StreamTexture.new()
+				var st:StreamTexture = StreamTexture.new()
 				st.load_path = texturepath
 				flareTexture = st
 			ResourceSaver.save(filepath,flareTexture)
@@ -3603,224 +3495,224 @@ class _Equipment:
 	
 	
 	func make_thruster_scene(data,sys,aux_type,exhaust_cache_path) -> String:
-		var this_sys_path = exhaust_cache_path + "/" + aux_type + "/" + sys
+		var this_sys_path : String = exhaust_cache_path + "/" + aux_type + "/" + sys
 		
-		var cached_exhaust_path = this_sys_path + "_exhaust.tscn"
-		var cached_thruster_path = this_sys_path + "_thruster.tscn"
-		var cached_tex_path = this_sys_path + "_texture_%s.res"
+		var cached_exhaust_path : String = this_sys_path + "_exhaust.tscn"
+		var cached_thruster_path : String = this_sys_path + "_thruster.tscn"
+		var cached_tex_path : String = this_sys_path + "_texture_%s.res"
 		
-		var thruster_header = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://sfx/thruster.tscn\" type=\"PackedScene\" id=1]"
-		var nozzle_footer = "[editable path=\"nozzle\"]"
-		var extra_nozzle_footer = "[editable path=\"%s\"]"
+		var thruster_header : String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://sfx/thruster.tscn\" type=\"PackedScene\" id=1]"
+		var nozzle_footer : String = "[editable path=\"nozzle\"]"
+		var extra_nozzle_footer : String = "[editable path=\"%s\"]"
 		
-		var thruster_node_header = "\n\n[node name=\"thruster\" instance=ExtResource( 1 )]"
-		var this_nozzle_header = "\n\n[node name=\"%s\" parent=\".\" index=\"%d\" instance=ExtResource( %d )]"
-		var audio_loop_header = "\n\n[node name=\"AudioLoop\" parent=\".\" index=\"0\"]"
-		var audio_start_header = "\n\n[node name=\"AudioStart\" parent=\".\" index=\"1\"]"
-		var flare_header = "\n\n[node name=\"Flare\" parent=\".\" index=\"2\"]"
-		var nozzle_header = "\n\n[node name=\"nozzle\" parent=\".\" index=\"%d\"]"
-		var base_nozzle_index = 3
+		var thruster_node_header : String = "\n\n[node name=\"thruster\" instance=ExtResource( 1 )]"
+		var this_nozzle_header : String = "\n\n[node name=\"%s\" parent=\".\" index=\"%d\" instance=ExtResource( %d )]"
+		var audio_loop_header : String = "\n\n[node name=\"AudioLoop\" parent=\".\" index=\"0\"]"
+		var audio_start_header : String = "\n\n[node name=\"AudioStart\" parent=\".\" index=\"1\"]"
+		var flare_header : String = "\n\n[node name=\"Flare\" parent=\".\" index=\"2\"]"
+		var nozzle_header : String = "\n\n[node name=\"nozzle\" parent=\".\" index=\"%d\"]"
+		var base_nozzle_index:int = 3
 		
-		var ext_path_counter = 1
-		var ext_path_entry = "[ext_resource path=\"%s\" type=\"%s\" id=%d]"
+		var ext_path_counter:int = 1
+		var ext_path_entry : String = "[ext_resource path=\"%s\" type=\"%s\" id=%d]"
 		
-		var ext_entries = []
+		var ext_entries : Array = []
 		
 		
-		var thruster_vars = thruster_node_header
+		var thruster_vars : String = thruster_node_header
 		# Base thruster programming
 		
-		var mass = data.get("mass",0)
+		var mass:float = data.get("mass",0)
 		thruster_vars += "\n" + "mass = %d" % mass
-		var systemName = sys
+		var systemName : String = sys
 		thruster_vars += "\n" + "systemName = \"%s\"" % systemName
-		var priorityOffset = data.get("priority_offset",1.0 if aux_type == "RCS" else 8.0)
+		var priorityOffset:float = data.get("priority_offset",1.0 if aux_type == "RCS" else 8.0)
 		thruster_vars += "\n" + "priorityOffset = %f" % priorityOffset
-		var mainBrightRatio = data.get("main_bright_ratio",0.01)
+		var mainBrightRatio:float = data.get("main_bright_ratio",0.01)
 		thruster_vars += "\n" + "mainBrightRatio = %f" % mainBrightRatio
-		var repairReplacementPrice = data.get("price",3000 if aux_type == "RCS" else 15000)
+		var repairReplacementPrice:int = data.get("price",3000 if aux_type == "RCS" else 15000)
 		thruster_vars += "\n" + "repairReplacementPrice = %d" % repairReplacementPrice
-		var repairReplacementTime = data.get("repair_time",1 if aux_type == "RCS" else 4)
+		var repairReplacementTime:float = data.get("repair_time",1 if aux_type == "RCS" else 4)
 		thruster_vars += "\n" + "repairReplacementTime = %d" % repairReplacementTime
-		var repairFixPrice = data.get("fix_price",500 if aux_type == "RCS" else 1000)
+		var repairFixPrice:int = data.get("fix_price",500 if aux_type == "RCS" else 1000)
 		thruster_vars += "\n" + "repairFixPrice = %d" % repairFixPrice
-		var repairFixTime = data.get("fix_time",4 if aux_type == "RCS" else 12)
+		var repairFixTime:float = data.get("fix_time",4 if aux_type == "RCS" else 12)
 		thruster_vars += "\n" + "repairFixTime = %d" % repairFixTime
-		var exhaustEmitOffset = data.get("exhaust_emit_offset",8)
+		var exhaustEmitOffset:float = data.get("exhaust_emit_offset",8)
 		thruster_vars += "\n" + "exhaustEmitOffset = %f" % exhaustEmitOffset
-		var scaleOffsetWithPower = data.get("scale_offset_with_power",false)
+		var scaleOffsetWithPower:bool = data.get("scale_offset_with_power",false)
 		thruster_vars += "\n" + "scaleOffsetWithPower = %s" % ("true" if scaleOffsetWithPower else "false")
-		var distanceScale = data.get("distance_scale",5)
+		var distanceScale:float = data.get("distance_scale",5)
 		thruster_vars += "\n" + "distanceScale = %f" % distanceScale
-		var plumesFromSettings = data.get("plumes_from_settings",true)
+		var plumesFromSettings:bool = data.get("plumes_from_settings",true)
 		thruster_vars += "\n" + "plumesFromSettings = %s" % "true" if plumesFromSettings else "false"
-		var angularDegreedRange = data.get("angular_degree_range",30)
+		var angularDegreedRange:float = data.get("angular_degree_range",30)
 		thruster_vars += "\n" + "angularDegreedRange = %f" % angularDegreedRange
-		var rotationRange = data.get("rotation_range",PI)
+		var rotationRange:float = data.get("rotation_range",PI)
 		thruster_vars += "\n" + "rotationRange = %f" % rotationRange
-		var consumeCargo = data.get("consume_cargo",PoolStringArray())
-		var cc = Array(PoolStringArray(consumeCargo))
+		var consumeCargo:PoolStringArray = data.get("consume_cargo",PoolStringArray())
+		var cc : Array = Array(PoolStringArray(consumeCargo))
 		thruster_vars += "\n" + "consumeCargo = PoolStringArray(%s)" % (String(cc) if cc.size() else "")
-		var canFizzle = data.get("can_fizzle",true)
+		var canFizzle:bool = data.get("can_fizzle",true)
 		thruster_vars += "\n" + "canFizzle = %s" % "true" if canFizzle else "false"
-		var wearPowerMaxChance = data.get("wear_power_max_chance",0.95)
+		var wearPowerMaxChance:float = data.get("wear_power_max_chance",0.95)
 		thruster_vars += "\n" + "wearPowerMaxChance = %f" % wearPowerMaxChance
-		var wearChance = data.get("wear_chance",0.01)
+		var wearChance:float = data.get("wear_chance",0.01)
 		thruster_vars += "\n" + "wearChance = %f" % wearChance
-		var accelerationFailLimit = data.get("acceleration_fail_limit",400)
+		var accelerationFailLimit:float = data.get("acceleration_fail_limit",400)
 		thruster_vars += "\n" + "accelerationFailLimit = %f" % accelerationFailLimit
-		var accelerationFailScale = data.get("acceleration_fail_scale",200)
+		var accelerationFailScale:float = data.get("acceleration_fail_scale",200)
 		thruster_vars += "\n" + "accelerationFailScale = %f" % accelerationFailScale
-		var lightLagChance = data.get("light_lag_chance",0.5)
+		var lightLagChance:float = data.get("light_lag_chance",0.5)
 		thruster_vars += "\n" + "lightLagChance = %f" % lightLagChance
-		var startJolt = data.get("start_jolt",0)
+		var startJolt:float = data.get("start_jolt",0)
 		thruster_vars += "\n" + "startJolt = %f" % startJolt
-		var thrust = data.get("thrust",1000 if aux_type == "RCS" else 7500)
+		var thrust:float = data.get("thrust",1000 if aux_type == "RCS" else 7500)
 		thruster_vars += "\n" + "thrust = %f" % thrust
-		var command = data.get("command","m" if aux_type == "TORCH" else "")
+		var command : String = data.get("command","m" if aux_type == "TORCH" else "")
 		thruster_vars += "\n" + "command = \"%s\"" % command
-		var particleChance = data.get("particle_chance",0.5 if aux_type == "RCS" else 1.0)
+		var particleChance:float = data.get("particle_chance",0.5 if aux_type == "RCS" else 1.0)
 		thruster_vars += "\n" + "particleChance = %f" % particleChance
-		var chokeParticleAdjust = data.get("choke_particle_adjust",1)
+		var chokeParticleAdjust:float = data.get("choke_particle_adjust",1)
 		thruster_vars += "\n" + "chokeParticleAdjust = %f" % chokeParticleAdjust
-		var fadeSeconds = data.get("fade_seconds",0.2 if aux_type == "RCS" else 0.4)
+		var fadeSeconds:float = data.get("fade_seconds",0.2 if aux_type == "RCS" else 0.4)
 		thruster_vars += "\n" + "fadeSeconds = %f" % fadeSeconds
-		var windUpSeconds = data.get("wind_up_seconds",0.017)
+		var windUpSeconds:float = data.get("wind_up_seconds",0.017)
 		thruster_vars += "\n" + "windUpSeconds = %f" % windUpSeconds
-		var particleScale = data.get("particle_scale",5)
+		var particleScale:float = data.get("particle_scale",5)
 		thruster_vars += "\n" + "particleScale = %f" % particleScale
-		var randomness = data.get("randomness",0.5)
+		var randomness:float = data.get("randomness",0.5)
 		thruster_vars += "\n" + "randomness = %f" % randomness
-		var heatCone = data.get("heat_cone",0.5)
+		var heatCone:float = data.get("heat_cone",0.5)
 		thruster_vars += "\n" + "heatCone = %f" % heatCone
-		var minPower = data.get("min_power",0.2 if aux_type == "RCS" else 0.8)
+		var minPower:float = data.get("min_power",0.2 if aux_type == "RCS" else 0.8)
 		thruster_vars += "\n" + "minPower = %f" % minPower
-		var damageWearCapacity = data.get("damage_wear_capacity",3600)
+		var damageWearCapacity:float = data.get("damage_wear_capacity",3600)
 		thruster_vars += "\n" + "damageWearCapacity = %f" % damageWearCapacity
-		var damageBentCapacity = data.get("damage_bent_capacity",3000)
+		var damageBentCapacity:float = data.get("damage_bent_capacity",3000)
 		thruster_vars += "\n" + "damageBentCapacity = %f" % damageBentCapacity
-		var damageBentThreshold = data.get("damage_bent_threshold",200)
+		var damageBentThreshold:float = data.get("damage_bent_threshold",200)
 		thruster_vars += "\n" + "damageBentThreshold = %f" % damageBentThreshold
-		var damageChokeCapacity = data.get("damage_choke_capacity",6000)
+		var damageChokeCapacity:float = data.get("damage_choke_capacity",6000)
 		thruster_vars += "\n" + "damageChokeCapacity = %f" % damageChokeCapacity
-		var damageChokeThreshold = data.get("damage_choke_threshold",400)
+		var damageChokeThreshold:float = data.get("damage_choke_threshold",400)
 		thruster_vars += "\n" + "damageChokeThreshold = %f" % damageChokeThreshold
-		var specialFuelLimit = data.get("special_fuel_limit",0)
+		var specialFuelLimit:float = data.get("special_fuel_limit",0)
 		thruster_vars += "\n" + "specialFuelLimit = %f" % specialFuelLimit
-		var heatFireThreshold = data.get("heat_fire_threshold",200)
+		var heatFireThreshold:float = data.get("heat_fire_threshold",200)
 		thruster_vars += "\n" + "heatFireThreshold = %f" % heatFireThreshold
-		var heatFireScale = data.get("heat_fire_scale",8000)
+		var heatFireScale:float = data.get("heat_fire_scale",8000)
 		thruster_vars += "\n" + "heatFireScale = %f" % heatFireScale
-		var heatFireMax = data.get("heat_fire_max",0.5)
+		var heatFireMax:float = data.get("heat_fire_max",0.5)
 		thruster_vars += "\n" + "heatFireMax = %f" % heatFireMax
-		var maxMissalignment = data.get("max_misalignment",0.262 if aux_type == "RCS" else 0.02)
+		var maxMissalignment:float = data.get("max_misalignment",0.262 if aux_type == "RCS" else 0.02)
 		thruster_vars += "\n" + "maxMissalignment = %f" % maxMissalignment
-		var bendWearRatio = data.get("bend_wear_ratio",0.025)
+		var bendWearRatio:float = data.get("bend_wear_ratio",0.025)
 		thruster_vars += "\n" + "bendWearRatio = %f" % bendWearRatio
-		var specificImpulse = data.get("specific_impulse",65 if aux_type == "RCS" else 15)
+		var specificImpulse:float = data.get("specific_impulse",65 if aux_type == "RCS" else 15)
 		thruster_vars += "\n" + "specificImpulse = %f" % specificImpulse
-		var thermalFactor = data.get("thermal_factor",40)
+		var thermalFactor:float = data.get("thermal_factor",40)
 		thruster_vars += "\n" + "thermalFactor = %f" % thermalFactor
-		var powerDraw = data.get("power_draw",5000 if aux_type == "RCS" else 100000)
+		var powerDraw:float = data.get("power_draw",5000 if aux_type == "RCS" else 100000)
 		thruster_vars += "\n" + "powerDraw = %f" % powerDraw
-		var gimbalPowerDraw = data.get("gimbal_power_draw",100)
+		var gimbalPowerDraw:float = data.get("gimbal_power_draw",100)
 		thruster_vars += "\n" + "gimbalPowerDraw = %f" % gimbalPowerDraw
-		var thermalHitFactor = data.get("thermal_hit_factor",1)
+		var thermalHitFactor:float = data.get("thermal_hit_factor",1)
 		thruster_vars += "\n" + "thermalHitFactor = %f" % thermalHitFactor
-		var inspection = data.get("inspection",true)
+		var inspection:bool = data.get("inspection",true)
 		thruster_vars += "\n" + "inspection = %s" % "true" if inspection else "false"
-		var gimbal = deg2rad(data.get("gimbal",0))
+		var gimbal:float = deg2rad(data.get("gimbal",0))
 		thruster_vars += "\n" + "gimbal = %f" % gimbal
-		var safetyProtocol = data.get("safety_protocol",true)
+		var safetyProtocol:bool = data.get("safety_protocol",true)
 		thruster_vars += "\n" + "safetyProtocol = %s" % "true" if safetyProtocol else "false"
-		var safetyGimbalClear = data.get("safety_gimbal_clear",0.419)
+		var safetyGimbalClear:float = data.get("safety_gimbal_clear",0.419)
 		thruster_vars += "\n" + "safetyGimbalClear = %f" % safetyGimbalClear
-		var ignitionsPerSecond = data.get("ignitions_per_second",10)
+		var ignitionsPerSecond:float = data.get("ignitions_per_second",10)
 		thruster_vars += "\n" + "ignitionsPerSecond = %f" % ignitionsPerSecond
-		var gimbalAccurancy = data.get("gimbal_accuracy",0.262)
+		var gimbalAccurancy:float = data.get("gimbal_accuracy",0.262)
 		thruster_vars += "\n" + "gimbalAccurancy = %f" % gimbalAccurancy
-		var gimbalPerSecond = data.get("gimbal_per_second",3.14)
+		var gimbalPerSecond:float = data.get("gimbal_per_second",3.14)
 		thruster_vars += "\n" + "gimbalPerSecond = %f" % gimbalPerSecond
-		var gimbalRestAngle = data.get("gimbal_rest_angle",0)
+		var gimbalRestAngle:float = data.get("gimbal_rest_angle",0)
 		thruster_vars += "\n" + "gimbalRestAngle = %f" % gimbalRestAngle
-		var gimbalVectoredThrust = data.get("gimbal_vectored_thrust",false)
+		var gimbalVectoredThrust:bool = data.get("gimbal_vectored_thrust",false)
 		thruster_vars += "\n" + "gimbalVectoredThrust = %s" % ("true" if gimbalVectoredThrust else "false")
-		var pulsePerSecond = data.get("pulse_per_second",10 if aux_type == "RCS" else 4)
+		var pulsePerSecond:float = data.get("pulse_per_second",10 if aux_type == "RCS" else 4)
 		thruster_vars += "\n" + "pulsePerSecond = %f" % pulsePerSecond
-		var pulseEngine = data.get("pulse_engine",true)
+		var pulseEngine:bool = data.get("pulse_engine",true)
 		thruster_vars += "\n" + "pulseEngine = %s" % ("true" if pulseEngine else "false")
-		var externalPower = data.get("external_power",false)
+		var externalPower:bool = data.get("external_power",false)
 		thruster_vars += "\n" + "externalPower = %s" % ("true" if externalPower else "false")
-		var safetyMaxPower = data.get("safety_max_power",1)
+		var safetyMaxPower:float = data.get("safety_max_power",1)
 		thruster_vars += "\n" + "safetyMaxPower = %f" % safetyMaxPower
-		var safetyExtraMargin = data.get("safety_extra_margin",1)
+		var safetyExtraMargin:float = data.get("safety_extra_margin",1)
 		thruster_vars += "\n" + "safetyExtraMargin = %f" % safetyExtraMargin
-		var tuneThrustMin = data.get("tune_thrust_min",0.5)
+		var tuneThrustMin:float = data.get("tune_thrust_min",0.5)
 		thruster_vars += "\n" + "tuneThrustMin = %f" % tuneThrustMin
-		var tuneThrustMax = data.get("tune_thrust_max",1.5)
+		var tuneThrustMax:float = data.get("tune_thrust_max",1.5)
 		thruster_vars += "\n" + "tuneThrustMax = %f" % tuneThrustMax
-		var sweepHostilityFactor = data.get("sweep_hostility_factor",0.2)
+		var sweepHostilityFactor:float = data.get("sweep_hostility_factor",0.2)
 		thruster_vars += "\n" + "sweepHostilityFactor = %f" % sweepHostilityFactor
-		var damageHostilityScale = data.get("damage_hostility_scale",40000000)
+		var damageHostilityScale:int = data.get("damage_hostility_scale",40000000)
 		thruster_vars += "\n" + "damageHostilityScale = %f" % damageHostilityScale
-		var maxVolume = data.get("max_volume",-20)
+		var maxVolume:float = data.get("max_volume",-20)
 		thruster_vars += "\n" + "maxVolume = %f" % maxVolume
-		var rangeOverride = data.get("range_override",0)
+		var rangeOverride:float = data.get("range_override",0)
 		thruster_vars += "\n" + "rangeOverride = %f" % rangeOverride
-		var boresightAngleoverride = data.get("boresight_angle_override",0)
+		var boresightAngleoverride:float = data.get("boresight_angle_override",0)
 		thruster_vars += "\n" + "boresightAngleoverride = %f" % boresightAngleoverride
-		var pitchOverride = data.get("pitch_override",0)
+		var pitchOverride:float = data.get("pitch_override",0)
 		thruster_vars += "\n" + "pitchOverride = %f" % pitchOverride
-		var minChoke = data.get("min_choke",0.25)
+		var minChoke:float = data.get("min_choke",0.25)
 		thruster_vars += "\n" + "minChoke = %f" % minChoke
-		var modulate = Color(data.get("modulate",Color(1,1,1,1)))
+		var modulate:Color = Color(data.get("modulate",Color(1,1,1,1)))
 		thruster_vars += "\n" + "modulate = Color( %f , %f , %f , %f )" % [modulate.r,modulate.g,modulate.b,modulate.a]
-		var self_modulate = Color(data.get("self_modulate",Color(1,1,1,0)))
+		var self_modulate:Color = Color(data.get("self_modulate",Color(1,1,1,0)))
 		thruster_vars += "\n" + "self_modulate = Color( %f , %f , %f , %f )" % [self_modulate.r,self_modulate.g,self_modulate.b,self_modulate.a]
-		var offset = Vector2(-32,-16)
+		var offset:Vector2 = Vector2(-32,-16)
 		var po = data.get("plume_offset",[-32,-16])
 		if (po is Vector2) or (po is Array and po.size() > 1):
 			offset[0] = po[0]
 			offset[1] = po[1]
 		thruster_vars += "\n" + "offset = Vector2( %f , %f )" % [offset.x,offset.y]
-		var centered = data.get("plume_centered",false)
+		var centered:bool = data.get("plume_centered",false)
 		thruster_vars += "\n" + "centered = %s" % ("true" if centered else "false")
-		var flip_h = data.get("plume_flip_h",false)
+		var flip_h:bool = data.get("plume_flip_h",false)
 		thruster_vars += "\n" + "flip_h = %s" % ("true" if flip_h else "false")
-		var flip_v = data.get("plume_flip_v",false)
+		var flip_v:bool = data.get("plume_flip_v",false)
 		thruster_vars += "\n" + "flip_v = %s" % ("true" if flip_v else "false")
-		var hframes = data.get("plume_horizontal_frames",8)
+		var hframes:int = data.get("plume_horizontal_frames",8)
 		thruster_vars += "\n" + "hframes = %f" % hframes
-		var vframes = data.get("plume_vertical_frames",1)
+		var vframes:int = data.get("plume_vertical_frames",1)
 		thruster_vars += "\n" + "vframes = %f" % vframes
-		var frame = data.get("plume_frame",1)
+		var frame:int = data.get("plume_frame",1)
 		thruster_vars += "\n" + "frame = %f" % frame
-		var frame_coords = Vector2(1,0)
+		var frame_coords:Vector2 = Vector2(1,0)
 		var plumeFrameCoords = data.get("plume_frame_coords",frame_coords)
 		if (plumeFrameCoords is Vector2) or (plumeFrameCoords is Array and plumeFrameCoords.size() > 1):
 			frame_coords[0] = plumeFrameCoords[0]
 			frame_coords[1] = plumeFrameCoords[1]
 		thruster_vars += "\n" + "frame_coords = Vector2( %f , %f )" % [frame_coords.x,frame_coords.y]
-		var region_enabled = data.get("plume_region_enabled",false)
+		var region_enabled:bool = data.get("plume_region_enabled",false)
 		thruster_vars += "\n" + "region_enabled = %s" % ("true" if region_enabled else "false")
-		var region_rect = Rect2(0,0,0,0)
+		var region_rect:Rect2 = Rect2(0,0,0,0)
 		var plRect = data.get("plume_region_rect",Rect2(0,0,0,0))
 		if plRect is Array and plRect.size() > 3:
 			region_rect = Rect2(plRect[0],plRect[1],plRect[2],plRect[3])
 		elif plRect is Rect2:
 			region_rect = plRect
 		thruster_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [region_rect.position.x,region_rect.position.y,region_rect.size.x,region_rect.size.y]
-		var region_filter_clip = data.get("plume_region_filter_clip",false)
+		var region_filter_clip:float = data.get("plume_region_filter_clip",false)
 		thruster_vars += "\n" + "region_filter_clip = %s" % ("true" if region_filter_clip else "false")
-		var position = Vector2(0,-3)
+		var position:Vector2 = Vector2(0,-3)
 		var tp = data.get("position",position)
 		if tp is Vector2 or (tp is Array and tp.size() > 1):
 			position[0] = tp[0]
 			position[1] = tp[1]
 		thruster_vars += "\n" + "position = Vector2( %f , %f )" % [position.x,position.y]
-		var rotation = deg2rad(data.get("rotation",0))
+		var rotation:float = deg2rad(data.get("rotation",0))
 		thruster_vars += "\n" + "rotation = %f" % rotation
-		var scale = Vector2(0.2,0.2) if aux_type == "RCS" else Vector2(0.939,1.395)
+		var scale:Vector2 = Vector2(0.2,0.2) if aux_type == "RCS" else Vector2(0.939,1.395)
 		var ts = data.get("scale",scale)
 		if ts is Vector2 or (ts is Array and ts.size() > 1):
 			scale[0] = ts[0]
@@ -3828,51 +3720,51 @@ class _Equipment:
 		thruster_vars += "\n" + "scale = Vector2( %f , %f )" % [scale.x,scale.y]
 		
 		# Audio loop programming, for when it gets implemented
-		var audio_loop_vars = audio_loop_header
+		var audio_loop_vars : String = audio_loop_header
 		
 		# Audio start programming, for when it gets implemented
-		var audio_start_vars = audio_start_header
+		var audio_start_vars : String = audio_start_header
 		
-		var flare_vars = flare_header
+		var flare_vars : String = flare_header
 		# Flare programming
-		var flare_essentiality = data.get("flare_essentiality",0.5 if aux_type == "RCS" else 0.8)
+		var flare_essentiality:float = data.get("flare_essentiality",0.5 if aux_type == "RCS" else 0.8)
 		flare_vars += "\n" + "essentiality = %f" % flare_essentiality
-		var flare_offsetByCamera = data.get("flare_offset_by_camera",false)
+		var flare_offsetByCamera:bool = data.get("flare_offset_by_camera",false)
 		flare_vars += "\n" + "offsetByCamera = %s" % ("true" if flare_offsetByCamera else "false")
-		var flare_energy = data.get("flare_energy",5)
+		var flare_energy:float = data.get("flare_energy",5)
 		flare_vars += "\n" + "energy = %f" % flare_energy
-		var flare_range_height = data.get("flare_range_height",-15)
+		var flare_range_height:float = data.get("flare_range_height",-15)
 		flare_vars += "\n" + "range_height = %f" % flare_range_height
-		var flare_range_z_min = data.get("flare_range_z_min",-4096)
+		var flare_range_z_min:float = data.get("flare_range_z_min",-4096)
 		flare_vars += "\n" + "range_z_min = %f" % flare_range_z_min
-		var flare_range_z_max = data.get("flare_range_z_max",4096)
+		var flare_range_z_max:float = data.get("flare_range_z_max",4096)
 		flare_vars += "\n" + "range_z_max = %f" % flare_range_z_max
-		var flare_range_layer_min = data.get("flare_range_layer_min",-1)
+		var flare_range_layer_min:float = data.get("flare_range_layer_min",-1)
 		flare_vars += "\n" + "range_layer_min = %f" % flare_range_layer_min
-		var flare_range_layer_max = data.get("flare_range_layer_max",1)
+		var flare_range_layer_max:float = data.get("flare_range_layer_max",1)
 		flare_vars += "\n" + "range_layer_max = %f" % flare_range_layer_max
-		var flare_offset = Vector2.ZERO
+		var flare_offset:Vector2 = Vector2.ZERO
 		var fo = data.get("flare_offset",flare_offset)
 		if fo is Vector2 or (fo is Array and fo.size() > 1):
 			flare_offset[0] = fo[0]
 			flare_offset[1] = fo[1]
 		flare_vars += "\n" + "offset = Vector2( %f , %f )" % [flare_offset.x,flare_offset.y]
-		var flare_texture_scale = data.get("flare_texture_scale",6)
+		var flare_texture_scale:float = data.get("flare_texture_scale",6)
 		flare_vars += "\n" + "texture_scale = %f" % flare_texture_scale
-		var flare_rotation = deg2rad(data.get("flare_rotation",0))
+		var flare_rotation:float = deg2rad(data.get("flare_rotation",0))
 		flare_vars += "\n" + "rotation = %f" % flare_rotation
-		var flare_position = Vector2.ZERO
+		var flare_position:Vector2 = Vector2.ZERO
 		var fp = data.get("flare_position",[0,0])
 		if fp is Vector2 or (fp is Array and fp.size() > 1):
 			flare_position[0] = fp[0]
 			flare_position[1] = fp[1]
-		var flare_scale = Vector2(1,1)
+		var flare_scale:Vector2 = Vector2(1,1)
 		var fs = data.get("flare_scale",[1,1])
 		if fs is Vector2 or (fs is Array and fs.size() > 1):
 			flare_scale[0] = fs[0]
 			flare_scale[1] = fs[1]
 		flare_vars += "\n" + "scale = Vector2( %f , %f )" % [flare_scale.x,flare_scale.y]
-		var flare_color = Color(data.get("flare_color","3bafff"))
+		var flare_color:Color = Color(data.get("flare_color","3bafff"))
 		flare_vars += "\n" + "color = Color( %f , %f , %f , %f )" % [flare_color.r, flare_color.g, flare_color.b, flare_color.a]
 		
 		
@@ -3887,7 +3779,7 @@ class _Equipment:
 		
 		
 		# Exhaust scene
-		var exhaust_path = "res://sfx/exhaust.tscn"
+		var exhaust_path : String = "res://sfx/exhaust.tscn"
 		match data.get("exhaust_type",""):
 			"regular":
 				exhaust_path = "res://sfx/exhaust.tscn"
@@ -3899,18 +3791,18 @@ class _Equipment:
 				else:
 					exhaust_path = "res://sfx/exhaust.tscn"
 		ext_path_counter += 1
-		var exhaust_ext = ext_path_entry % [exhaust_path,"PackedScene",ext_path_counter]
+		var exhaust_ext : String = ext_path_entry % [exhaust_path,"PackedScene",ext_path_counter]
 		ext_entries.append(exhaust_ext)
 		thruster_vars += "\n" + "exhaust = ExtResource( %d )" % ext_path_counter
 		
 		# Material
-		var material = "res://sfx/AddOnly.material"
+		var material : String = "res://sfx/AddOnly.material"
 		if data.get("plume_has_material",true):
-			var matpath = data.get("plume_material_path",material)
+			var matpath : String = data.get("plume_material_path",material)
 			if file.file_exists(matpath):
 				material = matpath
 		else:
-			material = null
+			material = ""
 		if material:
 			ext_path_counter += 1
 			var material_ext = ext_path_entry % [material,"Material",ext_path_counter]
@@ -3920,65 +3812,65 @@ class _Equipment:
 			thruster_vars += "\n" + "material = null"
 		
 		# Plume texture
-		var plume_texture = "res://sfx/thrusters.png"
-		var plumeTex = data.get("plume_texture",plume_texture)
+		var plume_texture : String = "res://sfx/thrusters.png"
+		var plumeTex : String = data.get("plume_texture",plume_texture)
 		if ResourceLoader.exists(plumeTex):
 			plume_texture = plumeTex
-		var plumepath = create_compiled_tex(plume_texture,cached_tex_path,"plume")
+		var plumepath : String = create_compiled_tex(plume_texture,cached_tex_path,"plume")
 		
 		ext_path_counter += 1
-		var plume_ext = ext_path_entry % [plumepath,"StreamTexture" if plumepath.ends_with(".stex") else "Texture",ext_path_counter]
+		var plume_ext : String = ext_path_entry % [plumepath,"StreamTexture" if plumepath.ends_with(".stex") else "Texture",ext_path_counter]
 		ext_entries.append(plume_ext)
 		thruster_vars += "\n" + "texture = ExtResource( %d )" % ext_path_counter
 		
 		# Flare texture
-		var flare_texture = "res://lights/plume.png"
-		var flareTex = data.get("flare_texture",flare_texture)
+		var flare_texture : String = "res://lights/plume.png"
+		var flareTex : String = data.get("flare_texture",flare_texture)
 		if ResourceLoader.exists(flareTex):
 			flare_texture = flareTex
-		var flarepath = create_compiled_tex(flare_texture,cached_tex_path,"flare")
+		var flarepath : String = create_compiled_tex(flare_texture,cached_tex_path,"flare")
 		
 		ext_path_counter += 1
-		var flare_ext = ext_path_entry % [flarepath,"StreamTexture" if flarepath.ends_with(".stex") else "Texture",ext_path_counter]
+		var flare_ext : String = ext_path_entry % [flarepath,"StreamTexture" if flarepath.ends_with(".stex") else "Texture",ext_path_counter]
 		ext_entries.append(flare_ext)
 		flare_vars += "\n" + "texture = ExtResource( %d )" % ext_path_counter
 		
 		
 		# Nozzle handles
-		var after_nozzles = []
-		var before_nozzles = []
-		var nd = convert_to_nozzle(data.get("nozzle",{}))
+		var after_nozzles : Array = []
+		var before_nozzles : Array = []
+		var nd : Dictionary = convert_to_nozzle(data.get("nozzle",{}))
 		for i in data.get("extra_nozzles",[]):
 			if i.get("order","after") == "before":
 				before_nozzles.append(convert_to_nozzle(i))
 			else:
 				after_nozzles.append(convert_to_nozzle(i))
 		base_nozzle_index += before_nozzles.size()
-		var nozzle_groups = PoolStringArray()
-		var footer_groups = PoolStringArray()
-		var node_index = 2
+		var nozzle_groups:PoolStringArray = PoolStringArray()
+		var footer_groups:PoolStringArray = PoolStringArray()
+		var node_index:int = 2
 		
-		var nozzle_scene_path = "res://ships/modules/nozzle-conventonal.tscn"
-		var nozzle_scene_ext = 0
+		var nozzle_scene_path : String = "res://ships/modules/nozzle-conventonal.tscn"
+		var nozzle_scene_ext:int = 0
 		if before_nozzles.size() or after_nozzles.size():
 			ext_path_counter += 1
 			nozzle_scene_ext = ext_path_counter
-			var nozzle_s_ext = ext_path_entry % [nozzle_scene_path,"PackedScene",nozzle_scene_ext]
+			var nozzle_s_ext : String = ext_path_entry % [nozzle_scene_path,"PackedScene",nozzle_scene_ext]
 			ext_entries.append(nozzle_s_ext)
 		for n in before_nozzles:
 			node_index += 1
-			var nozzlename = "nozzle_%d" % node_index
-			var header = this_nozzle_header % [nozzlename,node_index,nozzle_scene_ext]
-			var nz = format_nozzle(n,header,nozzlename,ext_path_counter,cached_tex_path,ext_path_entry)
+			var nozzlename : String = "nozzle_%d" % node_index
+			var header : String = this_nozzle_header % [nozzlename,node_index,nozzle_scene_ext]
+			var nz : Array = format_nozzle(n,header,nozzlename,ext_path_counter,cached_tex_path,ext_path_entry)
 			ext_path_counter = nz[1]
 			ext_entries.append_array(nz[2])
 			nozzle_groups.append(nz[0])
 			footer_groups.append(extra_nozzle_footer % [nozzlename])
 			
 		node_index += 1
-		var basenozzlename = "nozzle"
-		var baseheader = nozzle_header % [node_index]
-		var basenz = format_nozzle(nd,baseheader,basenozzlename,ext_path_counter,cached_tex_path,ext_path_entry)
+		var basenozzlename : String = "nozzle"
+		var baseheader : String = nozzle_header % [node_index]
+		var basenz : Array = format_nozzle(nd,baseheader,basenozzlename,ext_path_counter,cached_tex_path,ext_path_entry)
 		ext_path_counter = basenz[1]
 		ext_entries.append_array(basenz[2])
 		nozzle_groups.append(basenz[0])
@@ -3986,165 +3878,165 @@ class _Equipment:
 		
 		for n in after_nozzles:
 			node_index += 1
-			var nozzlename = "nozzle_%d" % node_index
-			var header = this_nozzle_header % [nozzlename,node_index,nozzle_scene_ext]
-			var nz = format_nozzle(n,header,nozzlename,ext_path_counter,cached_tex_path,ext_path_entry)
+			var nozzlename : String = "nozzle_%d" % node_index
+			var header : String = this_nozzle_header % [nozzlename,node_index,nozzle_scene_ext]
+			var nz : Array = format_nozzle(n,header,nozzlename,ext_path_counter,cached_tex_path,ext_path_entry)
 			ext_path_counter = nz[1]
 			ext_entries.append_array(nz[2])
 			nozzle_groups.append(nz[0])
 			footer_groups.append(extra_nozzle_footer % [nozzlename])
 			
 		
-		var nodes_to_add = PoolStringArray()
+		var nodes_to_add:PoolStringArray = PoolStringArray()
 		
 		# Extra nodes
-		var extra_nodes = data.get("extra_nodes",[])
+		var extra_nodes : Array = data.get("extra_nodes",[])
 		for node in extra_nodes:
 			if ResourceLoader.exists(node):
 				var vm = load(node).instance()
-				var nodename = vm.name
+				var nodename : String = vm.name
 				Tool.remove(vm)
 				ext_path_counter += 1
 				node_index += 1
-				var nodeExt = ext_path_entry % [node,"PackedScene",ext_path_counter]
-				var nodeId = this_nozzle_header % [nodename,node_index,ext_path_counter]
+				var nodeExt : String = ext_path_entry % [node,"PackedScene",ext_path_counter]
+				var nodeId : String = this_nozzle_header % [nodename,node_index,ext_path_counter]
 				ext_entries.append(nodeExt)
 				nodes_to_add.append(nodeId)
 		
-		var header_compile = thruster_header
+		var header_compile : String = thruster_header
 		for i in ext_entries:
 			header_compile += "\n" + i
 		
-		var nozzle_compile = ""
+		var nozzle_compile : String = ""
 		for i in nozzle_groups:
 			nozzle_compile += "\n" + i
 		
-		var extra_node_compile = ""
+		var extra_node_compile : String = ""
 		for i in nodes_to_add:
 			extra_node_compile += "\n" + i
 		
-		var footer = "\n\n"
+		var footer : String = "\n\n"
 		for i in footer_groups:
 			footer += "\n" + i
 		
-		var thruster_text = header_compile + thruster_vars + audio_loop_vars + audio_start_vars + flare_vars + nozzle_compile + extra_node_compile + footer
+		var thruster_text : String = header_compile + thruster_vars + audio_loop_vars + audio_start_vars + flare_vars + nozzle_compile + extra_node_compile + footer
 		
 		
 		return thruster_text
 	
-	func format_nozzle(nd,header,nozzlename,current_ext,cached_tex_path,ext_path_entry) -> Array:
-		var ext_entries = []
-		var nozzle_vars = header
-		var coolTime = nd.cool_time
-		var heatTime = nd.heat_time
-		var texture = "res://ships/modules/nozzle-cd.png"
-		var normal = "res://ships/modules/nozzle-n.png"
-		var tx = nd.texture
+	func format_nozzle(nd:Dictionary,header:String,nozzlename:String,current_ext:int,cached_tex_path:String,ext_path_entry:String) -> Array:
+		var ext_entries : Array = []
+		var nozzle_vars : String = header
+		var coolTime:float = nd.cool_time
+		var heatTime:float = nd.heat_time
+		var texture : String = "res://ships/modules/nozzle-cd.png"
+		var normal : String = "res://ships/modules/nozzle-n.png"
+		var tx : String = nd.texture
 		if ResourceLoader.exists(tx):
 			texture = tx
-		var nx = nd.normal
+		var nx : String = nd.normal
 		if ResourceLoader.exists(nx):
 			normal = nx
-		var texturepath = create_compiled_tex(texture,cached_tex_path,"nozzle_texture")
+		var texturepath : String = create_compiled_tex(texture,cached_tex_path,"nozzle_texture")
 		
 		current_ext += 1
-		var sprite_ext = ext_path_entry % [texturepath,"StreamTexture" if texturepath.ends_with(".stex") else "Texture",current_ext]
+		var sprite_ext : String = ext_path_entry % [texturepath,"StreamTexture" if texturepath.ends_with(".stex") else "Texture",current_ext]
 		ext_entries.append(sprite_ext)
 		nozzle_vars += "\n" + "texture = ExtResource( %d )" % current_ext
 		
-		var normalpath = create_compiled_tex(normal,cached_tex_path,"nozzle_normal")
+		var normalpath : String = create_compiled_tex(normal,cached_tex_path,"nozzle_normal")
 		
 		current_ext += 1
-		var normal_ext = ext_path_entry % [normalpath,"StreamTexture" if normalpath.ends_with(".stex") else "Texture",current_ext]
+		var normal_ext : String = ext_path_entry % [normalpath,"StreamTexture" if normalpath.ends_with(".stex") else "Texture",current_ext]
 		ext_entries.append(normal_ext)
 		nozzle_vars += "\n" + "normal_map = ExtResource( %d )" % current_ext
 		
 		
-		var offset = nd.offset
+		var offset : Array = nd.offset
 		nozzle_vars += "\n" + "offset = Vector2( %f , %f )" % [offset[0],offset[1]]
-		var centered = nd.centered
+		var centered:bool = nd.centered
 		nozzle_vars += "\n" + "centered = %s" % ("true" if centered else "false")
-		var flip_h = nd.flip_h
+		var flip_h:bool = nd.flip_h
 		nozzle_vars += "\n" + "flip_h = %s" % ("true" if flip_h else "false")
-		var flip_v = nd.flip_v
+		var flip_v:bool = nd.flip_v
 		nozzle_vars += "\n" + "flip_v = %s" % ("true" if flip_v else "false")
-		var hframes = nd.horizontal_frames
+		var hframes:int = nd.horizontal_frames
 		nozzle_vars += "\n" + "hframes = %f" % hframes
-		var vframes = nd.vertical_frames
+		var vframes:int = nd.vertical_frames
 		nozzle_vars += "\n" + "vframes = %f" % vframes
-		var frame = nd.frame
+		var frame:int = nd.frame
 		nozzle_vars += "\n" + "frame = %f" % frame
-		var frame_coords = nd.frame_coords
+		var frame_coords : Array = nd.frame_coords
 		nozzle_vars += "\n" + "frame_coords = Vector2( %f , %f )" % [frame_coords[0],frame_coords[1]]
-		var region_enabled = nd.region_enabled
+		var region_enabled:bool = nd.region_enabled
 		nozzle_vars += "\n" + "region_enabled = %s" % ("true" if region_enabled else "false")
-		var region_rect = nd.region_rect
+		var region_rect : Array = nd.region_rect
 		nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [region_rect[0],region_rect[1],region_rect[2],region_rect[3]]
-		var region_filter_clip = nd.region_filter_clip
+		var region_filter_clip:bool = nd.region_filter_clip
 		nozzle_vars += "\n" + "region_filter_clip = %s" % ("true" if region_filter_clip else "false")
-		var position = nd.position
+		var position : Array = nd.position
 		nozzle_vars += "\n" + "position = Vector2( %f , %f )" % [position[0],position[1]]
-		var rotation = deg2rad(nd.rotation)
+		var rotation:float = deg2rad(nd.rotation)
 		nozzle_vars += "\n" + "rotation = %f" % rotation
-		var scale = nd.scale
+		var scale : Array = nd.scale
 		nozzle_vars += "\n" + "scale = Vector2( %f , %f )" % [scale[0],scale[1]]
 		
 		nozzle_vars += "\n\n[node name=\"heat\" parent=\"%s\" index=\"0\"]" % nozzlename
 		
-		var heat = "res://ships/modules/nozzle-cl.png"
-		var heat_normal = ""
-		var hx = nd.heat
+		var heat : String = "res://ships/modules/nozzle-cl.png"
+		var heat_normal : String = ""
+		var hx : String = nd.heat
 		if ResourceLoader.exists(hx):
 			heat = hx
-		var hn = nd.heat_normal
+		var hn : String = nd.heat_normal
 		if ResourceLoader.exists(hx):
 			heat_normal = hx
 		
-		var heattexturepath = create_compiled_tex(heat,cached_tex_path,"nozzle_heat")
+		var heattexturepath : String = create_compiled_tex(heat,cached_tex_path,"nozzle_heat")
 		
 		current_ext += 1
-		var heat_sprite_ext = ext_path_entry % [heattexturepath,"StreamTexture" if heattexturepath.ends_with(".stex") else "Texture",current_ext]
+		var heat_sprite_ext : String = ext_path_entry % [heattexturepath,"StreamTexture" if heattexturepath.ends_with(".stex") else "Texture",current_ext]
 		ext_entries.append(heat_sprite_ext)
 		nozzle_vars += "\n" + "texture = ExtResource( %d )" % current_ext
 		if heat_normal:
-			var heatnormalpath = create_compiled_tex(heat_normal,cached_tex_path,"nozzle_heat_normal")
+			var heatnormalpath : String = create_compiled_tex(heat_normal,cached_tex_path,"nozzle_heat_normal")
 			
 			current_ext += 1
-			var heatnormal_ext = ext_path_entry % [heatnormalpath,"StreamTexture" if heatnormalpath.ends_with(".stex") else "Texture",current_ext]
+			var heatnormal_ext : String = ext_path_entry % [heatnormalpath,"StreamTexture" if heatnormalpath.ends_with(".stex") else "Texture",current_ext]
 			ext_entries.append(heatnormal_ext)
 			nozzle_vars += "\n" + "normal_map = ExtResource( %d )" % current_ext
 		
 		
-		var heat_offset = nd.offset
+		var heat_offset : Array = nd.offset
 		nozzle_vars += "\n" + "offset = Vector2( %f , %f )" % [heat_offset[0],heat_offset[1]]
-		var heat_centered = nd.heat_centered
+		var heat_centered:bool = nd.heat_centered
 		nozzle_vars += "\n" + "centered = %s" % ("true" if heat_centered else "false")
-		var heat_flip_h = nd.heat_flip_h
+		var heat_flip_h:bool = nd.heat_flip_h
 		nozzle_vars += "\n" + "flip_h = %s" % ("true" if heat_flip_h else "false")
-		var heat_flip_v = nd.heat_flip_v
+		var heat_flip_v:bool = nd.heat_flip_v
 		nozzle_vars += "\n" + "flip_v = %s" % ("true" if heat_flip_v else "false")
-		var heat_hframes = nd.heat_horizontal_frames
+		var heat_hframes:int = nd.heat_horizontal_frames
 		nozzle_vars += "\n" + "hframes = %f" % heat_hframes
-		var heat_vframes = nd.heat_vertical_frames
+		var heat_vframes:int = nd.heat_vertical_frames
 		nozzle_vars += "\n" + "vframes = %f" % heat_vframes
-		var heat_frame = nd.heat_frame
+		var heat_frame:int = nd.heat_frame
 		nozzle_vars += "\n" + "frame = %f" % heat_frame
-		var heat_frame_coords = nd.heat_frame_coords
+		var heat_frame_coords : Array = nd.heat_frame_coords
 		nozzle_vars += "\n" + "frame_coords = Vector2( %f , %f )" % [heat_frame_coords[0],heat_frame_coords[1]]
-		var heat_region_enabled = nd.heat_region_enabled
+		var heat_region_enabled:bool = nd.heat_region_enabled
 		nozzle_vars += "\n" + "region_enabled = %s" % ("true" if heat_region_enabled else "false")
-		var heat_region_rect = nd.heat_region_rect
+		var heat_region_rect : Array = nd.heat_region_rect
 		nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [heat_region_rect[0],heat_region_rect[1],heat_region_rect[2],heat_region_rect[3]]
-		var heat_region_filter_clip = nd.heat_region_filter_clip
+		var heat_region_filter_clip:bool = nd.heat_region_filter_clip
 		nozzle_vars += "\n" + "region_filter_clip = %s" % ("true" if heat_region_filter_clip else "false")
-		var heat_position = nd.heat_position
+		var heat_position : Array = nd.heat_position
 		nozzle_vars += "\n" + "position = Vector2( %f , %f )" % [heat_position[0],heat_position[1]]
-		var heat_rotation = deg2rad(nd.heat_rotation)
+		var heat_rotation:float = deg2rad(nd.heat_rotation)
 		nozzle_vars += "\n" + "rotation = %f" % heat_rotation
-		var heat_scale = nd.heat_scale
+		var heat_scale : Array = nd.heat_scale
 		nozzle_vars += "\n" + "scale = Vector2( %f , %f )" % [heat_scale[0],heat_scale[1]]
 		
-		var out = [nozzle_vars,current_ext,ext_entries]
+		var out : Array = [nozzle_vars,current_ext,ext_entries]
 		return out
 	
 	const nozzle_template = {
@@ -4153,7 +4045,7 @@ class _Equipment:
 		"texture":"res://ships/modules/nozzle-cd.png",
 		"normal":"res://ships/modules/nozzle-n.png",
 		"heat":"res://ships/modules/nozzle-cl.png",
-		"heat_normal":null,
+		"heat_normal":"",
 		"centered":true,
 		"offset":[0,0],
 		"flip_h":false,
@@ -4185,7 +4077,7 @@ class _Equipment:
 	}
 	
 	func convert_to_nozzle(noz):
-		var nozzle = nozzle_template.duplicate(true)
+		var nozzle:Dictionary = nozzle_template.duplicate(true)
 		for i in nozzle:
 			if i in noz and typeof(nozzle[i]) == typeof(noz[i]):
 				nozzle[i] = noz[i]
@@ -4193,20 +4085,20 @@ class _Equipment:
 	
 	
 	func make_exhaust_scene(data:Dictionary,sys:String) -> String:
-		var exhaust_header = "[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://sfx/exhaust.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"%s\" type=\"%s\" id=2]\n\n[sub_resource type=\"CircleShape2D\" id=1]\nradius = %s\n\n[node name=\"exhaust\" instance=ExtResource( 1 )]"
-		var exhaust_footer = "[node name=\"Sprite\" parent=\".\" index=\"1\"]\ntexture = ExtResource( 2 )"
+		var exhaust_header : String = "[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://sfx/exhaust.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"%s\" type=\"%s\" id=2]\n\n[sub_resource type=\"CircleShape2D\" id=1]\nradius = %s\n\n[node name=\"exhaust\" instance=ExtResource( 1 )]"
+		var exhaust_footer : String = "[node name=\"Sprite\" parent=\".\" index=\"1\"]\ntexture = ExtResource( 2 )"
 		
-		var light_lag_chance = data.get("exhaust_light_lag_chance",0)
-		var base_lifetime = data.get("exhaust_base_lifetime",0.25)
-		var lifetime = data.get("exhaust_lifetime",0.25)
-		var end_scale = data.get("exhaust_end_scale",0.02)
-		var self_remove = data.get("exhaust_self_remove",0.02)
-		var mass = data.get("exhaust_mass",0.1)
-		var sprite = data.get("exhaust_sprite","res://sfx/ball-of-flame.png")
-		var sprite_scale = data.get("exhaust_sprite_scale",[0.5,0.5])
-		var radius = data.get("exhaust_collider_radius",2.87)
+		var light_lag_chance:float = data.get("exhaust_light_lag_chance",0)
+		var base_lifetime:float = data.get("exhaust_base_lifetime",0.25)
+		var lifetime:float = data.get("exhaust_lifetime",0.25)
+		var end_scale:float = data.get("exhaust_end_scale",0.02)
+		var self_remove:float = data.get("exhaust_self_remove",0.02)
+		var mass:float = data.get("exhaust_mass",0.1)
+		var sprite : String = data.get("exhaust_sprite","res://sfx/ball-of-flame.png")
+		var sprite_scale : Array = data.get("exhaust_sprite_scale",[0.5,0.5])
+		var radius:float = data.get("exhaust_collider_radius",2.87)
 		
-		var tex_type = ""
+		var tex_type : String = ""
 		if sprite.ends_with(".png"):
 			tex_type = "Texture"
 		elif sprite.ends_with(".stex"):
@@ -4215,7 +4107,7 @@ class _Equipment:
 			tex_type = "Texture"
 			sprite = "res://sfx/ball-of-flame.png"
 		
-		var exhaust_text = exhaust_header % [sprite,tex_type,str(radius)]
+		var exhaust_text : String = exhaust_header % [sprite,tex_type,str(radius)]
 		
 		exhaust_text += "\nmass = %s" % mass
 		exhaust_text += "\nlightLagChance = %s" % light_lag_chance
@@ -4231,52 +4123,14 @@ class _Equipment:
 		exhaust_text += "\nscale = Vector2(%s,%s)" % [sprite_scale[0],sprite_scale[1]]
 		return exhaust_text
 
-	func tag_vanilla_slots(vanilla_equipment_defaults_for_reference):
-		
-		for item in vanilla_equipment_defaults_for_reference:
-			var data = vanilla_equipment_defaults_for_reference.get(item)
-			
-			var string : String = ""
-			
-			string = SLOT_HEADER % item
-			for tag in data:
-				var content = data.get(tag)
-				match tag:
-					"limit_ships", "prevent_ships", "override_subtractive", "override_additive":
-						string = format_for_arrays(string, tag, content)
-					"add_vanilla_equipment":
-						string = format_for_bools(string, tag, content)
-					"slot_type", "hardpoint_type", "alignment", "restriction":
-						string = format_for_strings(string, tag, content)
-			tagged_vanilla_slots.append(string)
-
-	func format_for_arrays(string, tag, content) -> String:
-		var initial = string + "\n" + tag + " = ["
-		var one = false
-		for item in content:
-			if one == false:
-				one = true
-			else:
-				initial = initial + ", "
-			initial = initial + "\"" + item + "\""
-		initial = initial + "]"
-		return initial
-
-	func format_for_strings(string, tag, content) -> String:
-		return string + "\n" + tag + " = \"" + str(content) + "\""
-
-	func format_for_bools(string, tag, content) -> String:
-		return string + "\n" + tag + " = " + str(content)
-
-
 	func confirm_equipment(equipment_node, slot_type, slot_alignment, slot_restriction, slot_allowed_equipment) -> bool:
-		var e_slot_type = equipment_node.get("slot_type","")
-		var e_equipment = equipment_node.get("equipment_type","")
-		var e_alignment = equipment_node.get("alignment","")
-		var e_restriction = equipment_node.get("restriction","")
+		var e_slot_type : String = equipment_node.get("slot_type","")
+		var e_equipment : String = equipment_node.get("equipment_type","")
+		var e_alignment : String = equipment_node.get("alignment","")
+		var e_restriction : String = equipment_node.get("restriction","")
 		if equipment_node.get("system","") in vanilla_data.min_version:
-			var data = vanilla_data.min_version.get(equipment_node.system)
-			var failtext = "Equipment %s not adding due to old game version. Needed min version: %s ; observed game version: %s" % [str(equipment_node.get("system","")), str(data), str(version)]
+			var data : Array = vanilla_data.min_version.get(equipment_node.system)
+			var failtext : String = "Equipment %s not adding due to old game version. Needed min version: %s ; observed game version: %s" % [str(equipment_node.get("system","")), str(data), str(version)]
 			if data[0] < version[0]:
 				pass
 			elif data[0] == version[0]:
@@ -4296,9 +4150,9 @@ class _Equipment:
 				return false
 			
 		if e_slot_type == slot_type:
-			var passes_slot_check = false
+			var passes_slot_check:bool = false
 			if e_equipment in slot_allowed_equipment:
-				var tp = typeof(slot_type)
+				var tp:int = typeof(slot_type)
 				if tp == TYPE_STRING:
 					if slot_type == "HARDPOINT":
 						if slot_alignment in alignments:
@@ -4351,35 +4205,35 @@ class _Equipment:
 		return false
 	
 	func __make_equipment_for_scene(equipment_data: Dictionary, slot_node_name : String, system_slot: String) -> String:
-		var num_val = equipment_data.get("num_val", -1)
-		var system = equipment_data.get("system", "")
-		var capability_lock = equipment_data.get("capability_lock", false)
-		var name_override = equipment_data.get("name_override", "")
-		var description = equipment_data.get("description", "")
-		var manual = equipment_data.get("manual", "")
-		var specs = equipment_data.get("specs", "")
-		var price = equipment_data.get("price", 0)
-		var test_protocol = equipment_data.get("test_protocol", "fire")
-		var default = equipment_data.get("default", false)
-		var control = equipment_data.get("control", "")
-		var story_flag = equipment_data.get("story_flag", "")
-		var story_flag_min = equipment_data.get("story_flag_min", -1)
-		var story_flag_max = equipment_data.get("story_flag_max", -1)
-		var warn_if_thermal_below = equipment_data.get("warn_if_thermal_below", 0)
-		var warn_if_electric_below = equipment_data.get("warn_if_electric_below", 0)
-		var sticker_price_format = equipment_data.get("sticker_price_format", "%s E$")
-		var sticker_price_multi_format = equipment_data.get("sticker_price_multi_format", "%s E$ (x%d)")
-		var installed_color = equipment_data.get("installed_color", Color(0.0, 1.0, 0.0, 1.0))
-		var disabled_color = equipment_data.get("disabled_color", Color(0.2, 0.2, 0.2, 1.0))
-		var slots = equipment_data.get("slots",[])
-		var alignment = equipment_data.get("alignment","")
-		var equipment_type = equipment_data.get("equipment_type","")
-		var slot_type = equipment_data.get("slot_type","")
-		var restriction = equipment_data.get("restriction","")
+		var num_val:int = equipment_data.get("num_val", -1)
+		var system : String = equipment_data.get("system", "")
+		var capability_lock:bool = equipment_data.get("capability_lock", false)
+		var name_override : String = equipment_data.get("name_override", "")
+		var description : String = equipment_data.get("description", "")
+		var manual : String = equipment_data.get("manual", "")
+		var specs : String = equipment_data.get("specs", "")
+		var price:int = equipment_data.get("price", 0)
+		var test_protocol : String = equipment_data.get("test_protocol", "fire")
+		var default:bool = equipment_data.get("default", false)
+		var control : String = equipment_data.get("control", "")
+		var story_flag : String = equipment_data.get("story_flag", "")
+		var story_flag_min:int = equipment_data.get("story_flag_min", -1)
+		var story_flag_max:int = equipment_data.get("story_flag_max", -1)
+		var warn_if_thermal_below:float = equipment_data.get("warn_if_thermal_below", 0)
+		var warn_if_electric_below:float = equipment_data.get("warn_if_electric_below", 0)
+		var sticker_price_format : String = equipment_data.get("sticker_price_format", "%s E$")
+		var sticker_price_multi_format : String = equipment_data.get("sticker_price_multi_format", "%s E$ (x%d)")
+		var installed_color:Color = equipment_data.get("installed_color", Color(0.0, 1.0, 0.0, 1.0))
+		var disabled_color:Color = equipment_data.get("disabled_color", Color(0.2, 0.2, 0.2, 1.0))
+		var slots : Array = equipment_data.get("slots",[])
+		var alignment : String = equipment_data.get("alignment","")
+		var equipment_type : String = equipment_data.get("equipment_type","")
+		var slot_type : String = equipment_data.get("slot_type","")
+		var restriction : String = equipment_data.get("restriction","")
 		
-		var cfg = equipment_data.get("config",{})
+		var cfg : Dictionary = equipment_data.get("config",{})
 		
-		var base = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s/VBoxContainer\" instance=ExtResource( 3 )]" % [system.to_upper(),slot_node_name]
+		var base : String = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s/VBoxContainer\" instance=ExtResource( 3 )]" % [system.to_upper(),slot_node_name]
 		if num_val != -1:
 			base = base + "\nnumVal = " + str(num_val)
 		base = base + "\nslot = \"" + system_slot + "\""
@@ -4427,10 +4281,10 @@ class _Equipment:
 			base = base + "\ndisabledColor = " + str(Color(0.2, 0.2, 0.2, 1.0))
 		
 		if cfg:
-			var cfg_id = cfg.get("id","")
-			var cfg_section = cfg.get("section","")
-			var cfg_setting = cfg.get("entry","")
-			var cfg_invert = cfg.get("invert_config",false)
+			var cfg_id : String = cfg.get("id","")
+			var cfg_section : String = cfg.get("section","")
+			var cfg_setting : String = cfg.get("entry","")
+			var cfg_invert:bool = cfg.get("invert_config",false)
 			base += "\nconfig_id = \"" + cfg_id + "\""
 			base += "\nconfig_section = \"" + cfg_section + "\""
 			base += "\nconfig_setting = \"" + cfg_setting + "\""
@@ -4441,28 +4295,28 @@ class _Equipment:
 		return base
 	
 	func __make_slot_for_scene(slot_data: Dictionary) -> Dictionary:
-		var systemSlot = slot_data.get("system_slot", "")
-		var slotNodeName = slot_data.get("slot_node_name", "MISSING_SLOT_NAME")
-		var slotDisplayName = slot_data.get("slot_display_name", "SLOT_MISSING_DATA")
-		var hasNone = slot_data.get("has_none", true)
-		var alwaysDisplay = slot_data.get("always_display", true)
-		var restrictType = slot_data.get("restrict_type", "")
-		var openByDefault = slot_data.get("open_by_default", false)
-		var limitShips = slot_data.get("limit_ships", [])
-		var preventShips = slot_data.get("prevent_ships", [])
-		var add_vanilla_equipment = slot_data.get("add_vanilla_equipment", true)
-		var slot_type = slot_data.get("slot_type","HARDPOINT")
-		var hardpoint_type = slot_data.get("hardpoint_type","")
-		var alignment = slot_data.get("alignment","")
-		var restriction = slot_data.get("restriction","")
-		var override_additive = slot_data.get("override_additive",[])
-		var override_subtractive = slot_data.get("override_subtractive",[])
-		var restrict_hold_type = slot_data.get("restrict_hold_type","")
+		var systemSlot : String = slot_data.get("system_slot", "")
+		var slotNodeName : String = slot_data.get("slot_node_name", "MISSING_SLOT_NAME")
+		var slotDisplayName : String = slot_data.get("slot_display_name", "SLOT_MISSING_DATA")
+		var hasNone:bool = slot_data.get("has_none", true)
+		var alwaysDisplay:bool = slot_data.get("always_display", true)
+		var restrictType : String = slot_data.get("restrict_type", "")
+		var openByDefault:bool = slot_data.get("open_by_default", false)
+		var limitShips : Array = slot_data.get("limit_ships", [])
+		var preventShips : Array = slot_data.get("prevent_ships", [])
+		var add_vanilla_equipment:bool = slot_data.get("add_vanilla_equipment", true)
+		var slot_type : String = slot_data.get("slot_type","HARDPOINT")
+		var hardpoint_type : String = slot_data.get("hardpoint_type","")
+		var alignment : String = slot_data.get("alignment","")
+		var restriction : String = slot_data.get("restriction","")
+		var override_additive : Array = slot_data.get("override_additive",[])
+		var override_subtractive : Array = slot_data.get("override_subtractive",[])
+		var restrict_hold_type : String = slot_data.get("restrict_hold_type","")
 		
-		var cfg = slot_data.get("config",{})
+		var cfg : Dictionary = slot_data.get("config",{})
 		
 		
-		var base = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\" instance=ExtResource( 2 )]" % slotNodeName
+		var base : String = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\" instance=ExtResource( 2 )]" % slotNodeName
 		if systemSlot != "":
 			base = base + "\nslot = \"" + systemSlot + "\""
 		if alwaysDisplay:
@@ -4474,10 +4328,10 @@ class _Equipment:
 		else:
 			base = base + "\nopenByDefault = false"
 		if cfg:
-			var cfg_id = cfg.get("id","")
-			var cfg_section = cfg.get("section","")
-			var cfg_setting = cfg.get("entry","")
-			var cfg_invert = cfg.get("invert_config",false)
+			var cfg_id : String = cfg.get("id","")
+			var cfg_section : String = cfg.get("section","")
+			var cfg_setting : String = cfg.get("entry","")
+			var cfg_invert:bool = cfg.get("invert_config",false)
 			base += "\nconfig_id = \"" + cfg_id + "\""
 			base += "\nconfig_section = \"" + cfg_section + "\""
 			base += "\nconfig_setting = \"" + cfg_setting + "\""
@@ -4490,8 +4344,8 @@ class _Equipment:
 		if restrictType != "":
 			base = base + "\nslot = \"" + restrictType + "\""
 		if limitShips != []:
-			var initial = base + "\nlimit_ships = ["
-			var one = false
+			var initial : String = base + "\nlimit_ships = ["
+			var one:bool = false
 			for item in limitShips:
 				if one == false:
 					one = true
@@ -4501,8 +4355,8 @@ class _Equipment:
 			initial = initial + "]"
 			base = initial
 		if preventShips != []:
-			var initial = base + "\nprevent_ships = ["
-			var one = false
+			var initial : String = base + "\nprevent_ships = ["
+			var one:bool = false
 			for item in preventShips:
 				if one == false:
 					one = true
@@ -4516,13 +4370,11 @@ class _Equipment:
 		base = base + "\n\n[node name=\"CheckButton\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s/VBoxContainer/HBoxContainer\"]\ntext = \"%s\"" % [slotNodeName,slotDisplayName]
 		
 		if hasNone:
-			var dta = __make_equipment_for_scene({"system":"SYSTEM_NONE","default":true,"name":"None"}, slotNodeName, systemSlot)
+			var dta : String = __make_equipment_for_scene({"system":"SYSTEM_NONE","default":true,"name":"None"}, slotNodeName, systemSlot)
 			base = base + "\n\n" + dta
-		var editable_path = "[editable path=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s\"]" % slotNodeName
+		var editable_path : String = "[editable path=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s\"]" % slotNodeName
 		
-		var dict = {}
-		dict.merge(
-			{
+		var dict : Dictionary = {
 				"add_vanilla_equipment":add_vanilla_equipment,
 				"hardpoint_type":hardpoint_type,
 				"alignment":alignment,
@@ -4530,7 +4382,6 @@ class _Equipment:
 				"override_additive":override_additive,
 				"override_subtractive":override_subtractive,
 			}
-		)
 		
 		return {slotNodeName:[base, editable_path, dict]}
 	
@@ -4538,7 +4389,7 @@ class _Equipment:
 	
 
 class _Events:
-	var scripts = [
+	var scripts : Array = [
 		load("res://HevLib/events/event_handler.gd"),
 		load("res://HevLib/events/clear_event.gd"),
 	]
@@ -4585,7 +4436,7 @@ class _Events:
 	
 
 class _FileAccess:
-	var scripts = [
+	var scripts : Array = [
 		
 	]
 	
@@ -4637,27 +4488,26 @@ class _FileAccess:
 	func _init(f):
 		pointers = f
 	
-	var dir = Directory.new()
-	var file = File.new()
+	var dir:Directory = Directory.new()
+	var file:File = File.new()
 	func __get_file_content(file_path: String) -> String:
 		file.open(file_path, File.READ)
-		var s = file.get_as_text(true)
+		var s : String = file.get_as_text(true)
 		file.close()
 		return s
 	
 	
 	
 	func __copy_file(file_path : String, folder : String):
-		var prepfile = ProjectSettings.localize_path(file_path)
-		var fn = prepfile.split("/")[prepfile.split("/").size() - 1]
+		var prepfile : String = ProjectSettings.localize_path(file_path)
+		var fn : String = prepfile.split("/")[prepfile.split("/").size() - 1]
 		return dir.copy(prepfile,folder + "/" + fn)
 	
 	func __load_png(path) -> Texture:
 		file.open(path, File.READ)
-		var bytes = file.get_buffer(file.get_len())
-		var img = Image.new()
-		var data = img.load_png_from_buffer(bytes)
-		var imgtex = ImageTexture.new()
+		var bytes:PoolByteArray = file.get_buffer(file.get_len())
+		var img:Image = Image.new()
+		var imgtex:ImageTexture = ImageTexture.new()
 		imgtex.create_from_image(img)
 		file.close()
 		return imgtex
@@ -4719,7 +4569,7 @@ class _FileAccess:
 	
 
 class _FolderAccess:
-	var scripts = [
+	var scripts : Array = [
 		
 	]
 	
@@ -4890,7 +4740,7 @@ class _FolderAccess:
 	
 
 class _Github:
-	var scripts = [
+	var scripts : Array = [
 		
 	]
 	
@@ -4954,7 +4804,7 @@ class _Github:
 	
 
 class _HevLib:
-	var scripts = [
+	var scripts : Array = [
 		
 	]
 	
@@ -5052,7 +4902,7 @@ class _HevLib:
 	
 
 class _Keymapping:
-	var scripts = [
+	var scripts : Array = [
 		
 	]
 	
@@ -5166,7 +5016,7 @@ class _Keymapping:
 		
 		return subm
 	
-	func __get_formatted_vanilla_binds():
+	func __get_formatted_vanilla_binds() -> Dictionary:
 		
 		var output = {}
 		var bound = {}
@@ -5443,7 +5293,7 @@ class _Keymapping:
 	
 
 class _ManifestV1:
-	var scripts = [
+	var scripts : Array = [
 		
 	]
 	
@@ -5663,7 +5513,7 @@ class _ManifestV1:
 	
 
 class _ManifestV2:
-	var scripts = [
+	var scripts : Array = [
 		
 	]
 	
@@ -6914,7 +6764,7 @@ class _ManifestV2:
 	
 
 class _NodeAccess:
-	var scripts = [
+	var scripts : Array = [
 		
 	]
 	
@@ -7073,7 +6923,7 @@ class _NodeAccess:
 	
 
 class _RingInfo:
-	var scripts = [
+	var scripts : Array = [
 		
 	]
 	
@@ -7181,7 +7031,7 @@ class _RingInfo:
 
 
 class _TimeAccess:
-	var scripts = [
+	var scripts : Array = [
 		
 	]
 	
@@ -7246,7 +7096,7 @@ class _TimeAccess:
 	
 
 class _Translations:
-	var scripts = [
+	var scripts : Array = [
 		
 	]
 	
@@ -7456,7 +7306,7 @@ class _Translations:
 	
 
 class _WebTranslate:
-	var scripts = [
+	var scripts : Array = [
 		
 	]
 	
@@ -7566,7 +7416,7 @@ class _WebTranslate:
 	
 
 class _Zip:
-	var scripts = [
+	var scripts : Array = [
 		
 	]
 	
