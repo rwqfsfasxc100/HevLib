@@ -6463,7 +6463,7 @@ class _ManifestV2:
 		for version in versions:
 			changelog.merge({version:[]})
 			var keys : Array = c.get_section_keys(version)
-			keys.sort_custom(self,"keySorter")
+			keys.sort_custom(self,"changelogKeySorter")
 			var current_key:int = 1
 			while current_key > 0:
 				var key : String = str(current_key)
@@ -6508,7 +6508,7 @@ class _ManifestV2:
 					current_key = 0
 		return changelog
 	
-	func keySorter(al:String,bl:String) -> bool:
+	func changelogKeySorter(al:String,bl:String) -> bool:
 		var aList = al.split(".")
 		var bList = bl.split(".")
 		var aSize = aList.size()
