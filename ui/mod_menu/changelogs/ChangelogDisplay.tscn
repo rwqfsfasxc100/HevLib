@@ -1,15 +1,60 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://HevLib/development_tools/control_and_ui/scrollbox_helpers/OmniScroll.gd" type="Script" id=1]
 [ext_resource path="res://HevLib/ui/mod_menu/changelogs/ChangelogDisplay.gd" type="Script" id=2]
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=3]
 
 [node name="ChangelogDisplay" type="VBoxContainer"]
 margin_right = 40.0
 margin_bottom = 40.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource( 3 )
 script = ExtResource( 2 )
 
+[node name="PAGES" type="HBoxContainer" parent="."]
+margin_right = 150.0
+margin_bottom = 42.0
+size_flags_horizontal = 3
+
+[node name="LBORDER" type="HBoxContainer" parent="PAGES"]
+margin_right = 20.0
+margin_bottom = 42.0
+rect_min_size = Vector2( 20, 42 )
+
+[node name="LEFT" type="Button" parent="PAGES"]
+margin_left = 24.0
+margin_right = 66.0
+margin_bottom = 42.0
+rect_min_size = Vector2( 42, 42 )
+text = "<"
+
+[node name="Label" type="Label" parent="PAGES"]
+margin_left = 70.0
+margin_top = 2.0
+margin_right = 80.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+
+[node name="RIGHT" type="Button" parent="PAGES"]
+margin_left = 84.0
+margin_right = 126.0
+margin_bottom = 42.0
+rect_min_size = Vector2( 42, 42 )
+text = ">"
+
+[node name="RBORDER" type="HBoxContainer" parent="PAGES"]
+margin_left = 130.0
+margin_right = 150.0
+margin_bottom = 42.0
+rect_min_size = Vector2( 20, 42 )
+
 [node name="ScrollContainer" type="ScrollContainer" parent="."]
-margin_right = 40.0
+margin_top = 46.0
+margin_right = 150.0
+margin_bottom = 46.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
 script = ExtResource( 1 )
 use_horizontal = false
 scrollWithKeyboard = true
