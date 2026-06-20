@@ -27,6 +27,7 @@ margin_left = 24.0
 margin_right = 66.0
 margin_bottom = 42.0
 rect_min_size = Vector2( 42, 42 )
+focus_neighbour_right = NodePath("../RIGHT")
 text = "<"
 
 [node name="Label" type="Label" parent="PAGES"]
@@ -41,6 +42,7 @@ margin_left = 84.0
 margin_right = 126.0
 margin_bottom = 42.0
 rect_min_size = Vector2( 42, 42 )
+focus_neighbour_left = NodePath("../LEFT")
 text = ">"
 
 [node name="RBORDER" type="HBoxContainer" parent="PAGES"]

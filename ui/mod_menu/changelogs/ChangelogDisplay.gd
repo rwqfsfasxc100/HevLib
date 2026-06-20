@@ -33,8 +33,10 @@ func _left_pressed():
 		antispam = false
 		current_page -= 1
 		clear()
+		if clearing:
+			yield(self,"cleared")
 		parse()
-		yield(get_tree().create_timer(0.25),"timeout")
+		yield(get_tree().create_timer(0.15),"timeout")
 		antispam = true
 
 func _right_pressed():
@@ -42,9 +44,13 @@ func _right_pressed():
 		antispam = false
 		current_page += 1
 		clear()
+		if clearing:
+			yield(self,"cleared")
 		parse()
-		yield(get_tree().create_timer(0.25),"timeout")
+		yield(get_tree().create_timer(0.15),"timeout")
 		antispam = true
+
+var clearing = false
 
 export var page_size = 15
 var current_page = 0
@@ -68,16 +74,21 @@ func parse():
 		var lines = data[config]
 		var header = header_label.instance()
 		header.text = config
-		refs.append(header)
+		if clearing:
+			break
+		else:
+			refs.append(header)
 		linecontainer.add_child(header)
 		for l in lines:
 			var label = entry_label.instance()
 			var tex = TranslationServer.translate(l)
 			label.text = tex
-			refs.append(label)
+			if clearing:
+				break
+			else:
+				refs.append(label)
 			linecontainer.add_child(label)
 			yield(CurrentGame.get_tree(),"idle_frame")
-			
 		yield(CurrentGame.get_tree(),"idle_frame")
 
 func _visibility_changed():
@@ -88,13 +99,21 @@ func _visibility_changed():
 		$ScrollContainer.rect_min_size = rect_size - Vector2(12,6) - Vector2(0,pageBox.rect_size.y)
 		linecontainer.rect_min_size = rect_size - Vector2(12,12) - Vector2(0,pageBox.rect_size.y)
 	
-
+signal cleared()
 func clear_and_update(new):
 	clear()
+	if clearing:
+		yield(self,"cleared")
 	path = new
 	
 	parse()
 
 func clear():
-	for i in refs:
-		Tool.remove(i)
+	if refs:
+		clearing = true
+		yield(CurrentGame.get_tree().create_timer(0.1),"timeout")
+		for i in refs:
+			Tool.remove(i)
+		yield(CurrentGame.get_tree(),"idle_frame")
+	clearing = false
+	emit_signal("cleared")
