@@ -24,6 +24,7 @@ func _ready():
 
 func _about_to_show():
 	lastFocus = get_focus_owner()
+	$base/PanelContainer/VBoxContainer/FooterButtons/Close.grab_focus()
 
 func show_menu():
 	popup()
@@ -45,12 +46,16 @@ func _unhandled_input(event):
 		get_tree().set_input_as_handled()
 
 func _on_resize():
-	var size = Settings.getViewportSize()
-	rect_size = size
-	$ColorRect.rect_min_size = size
-	$ColorRect.rect_size = size
-	$base.rect_min_size = size - offset
-	$base.rect_size = size - offset
-	$base/PanelContainer.rect_min_size = size - offset
-	$base/PanelContainer.rect_size = size - offset
-	$base.rect_position = offset/2
+	if is_visible_in_tree():
+		var size = Settings.getViewportSize()
+		var offsetSize = size - offset
+		var vbsize = offsetSize - Vector2(10,10)
+		rect_size = size
+#		$ColorRect.rect_min_size = size
+		$ColorRect.rect_size = size
+#		$base.rect_min_size = offsetSize
+		$base.rect_size = offsetSize
+		$base.rect_position = offset/2
+		$base/PanelContainer.rect_size = offsetSize
+		$base/PanelContainer/VBoxContainer.rect_position = Vector2(5,5)
+		$base/PanelContainer/VBoxContainer.rect_size = vbsize

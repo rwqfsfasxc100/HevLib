@@ -41,7 +41,7 @@ size_flags_vertical = 3
 
 [node name="TabContainer" type="TabContainer" parent="base/PanelContainer/VBoxContainer/VBoxContainer"]
 margin_right = 1270.0
-margin_bottom = 88.0
+margin_bottom = 648.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource( 3 )
