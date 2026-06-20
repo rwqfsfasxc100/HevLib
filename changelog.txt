@@ -1,3 +1,20 @@
+[1.14.5]
+
+1=* Changelogs now use a new formatter for handling changelogs
+1.1=* This fixes issues with changelogs not being properly formatted
+1.2=* Now reads changelogs from the text file in a literal sense, after the first '=' character (but still will strip out double quotes if the entry has one at the beginning and end of the entry)
+1.3=* Entries are now sorted before displaying, ensuring that the information order is preserved
+2=* Added changelog paging
+2.1=* This reduces lag severely when selecting mods with a large changelog list
+2.2=* Now limits to 15 updates displayed per page
+3=* Reintroduced custom changelog spacing
+4=* Removed ManifestV2.__old_match_mod_path_to_zip due to recent changes to __match_mod_path_to_zip covering all advantages it had
+5=* FolderAccess.__get_folder_structure now caches directories, and added a recache variable to allow it to be fetched again, which is enabled by default
+6=* Made pointers more efficient on CPU and memory by enforcing static typing on most variables
+7=* Added __is_valid_url to the DataFormat class
+7.1=* Used to check if a string contains a valid HTTP(S) URL
+8=* Fixed issue with link buttons provided with a blank URL still appearing and trying to open whatever it contained
+
 [1.14.4]
 
 1="* Fixed crash caused by mod menu attempting to load a modlet that had been completely uninstalled"
