@@ -9,7 +9,14 @@ onready var linecontainer = $ScrollContainer/VBoxContainer
 var pointers
 export (String,"singular","dynamic") var operation = "singular"
 
+onready var LEFT = $PAGES/LEFT
+onready var RIGHT = $PAGES/RIGHT
+
+onready var pageBox = $PAGES
+
 func _ready():
+	LEFT.connect("pressed",self,"_left_pressed")
+	RIGHT.connect("pressed",self,"_right_pressed")
 	if operation == "singular" and path != "":
 		rect_size = get_parent().rect_size
 		linecontainer.rect_min_size = rect_size - Vector2(0,6)
@@ -20,13 +27,44 @@ func _ready():
 
 var refs = []
 
+var antispam = true
+func _left_pressed():
+	if antispam and current_page > 0:
+		antispam = false
+		current_page -= 1
+		clear()
+		parse()
+		yield(get_tree().create_timer(0.25),"timeout")
+		antispam = true
+
+func _right_pressed():
+	if antispam:
+		antispam = false
+		current_page += 1
+		clear()
+		parse()
+		yield(get_tree().create_timer(0.25),"timeout")
+		antispam = true
+
+export var page_size = 15
+var current_page = 0
 func parse():
+	if not is_visible_in_tree():
+		current_page = 0
 	if not pointers:
 		yield(CurrentGame.get_tree(),"idle_frame")
 	pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
-	var data = pointers.ManifestV2.__parse_changelogs(path)
-	var index = 1
-	for config in data:
+	
+	var data:Dictionary = pointers.ManifestV2.__parse_changelogs(path)
+	
+	var size = data.size()
+	var offset = (current_page * page_size)
+	var max_pages = int(ceil(float(size)/float(page_size))) - 1
+	var keys = data.keys()
+	LEFT.disabled = current_page < 1
+	RIGHT.disabled = current_page > max_pages - 1
+	for iv in range(clamp(size - offset,0,page_size)):
+		var config = keys[iv + offset]
 		var lines = data[config]
 		var header = header_label.instance()
 		header.text = config
@@ -44,9 +82,12 @@ func parse():
 
 func _visibility_changed():
 	yield(CurrentGame.get_tree(),"idle_frame")
-	rect_size = get_parent().rect_size
-	$ScrollContainer.rect_min_size = rect_size
-	linecontainer.rect_min_size = rect_size - Vector2(0,6)
+	if is_visible_in_tree():
+		var size = get_parent().rect_size
+		rect_size = size
+		$ScrollContainer.rect_min_size = rect_size - Vector2(12,6) - Vector2(0,pageBox.rect_size.y)
+		linecontainer.rect_min_size = rect_size - Vector2(12,12) - Vector2(0,pageBox.rect_size.y)
+	
 
 func clear_and_update(new):
 	clear()
