@@ -6455,64 +6455,64 @@ class _ManifestV2:
 		return mods
 	
 	func __parse_changelogs(file_path):
-		var c:ConfigFile = ConfigFile.new()
+#		var c:ConfigFile = ConfigFile.new()
+#		c.load(file_path)
+		
+		file.open(file_path,File.READ)
+		var text = file.get_as_text(true)
+		file.close()
+		var cv = {}
+		
+		var lastVer:String = ""
+		for line in text.split("\n"):
+			var noedge:String = line.strip_edges()
+			if noedge.begins_with(";"):
+				continue
+			if noedge.begins_with("[") and noedge.ends_with("]"):
+				var version = noedge.substr(1,noedge.length() - 2)
+				if not version in cv:
+					lastVer = version
+					cv[version] = {}
+				else:
+					lastVer = ""
+				continue
+			if lastVer and noedge:
+				var index:String = noedge.split("=")[0]
+				var entry:String = noedge.substr(index.length() + 1)
+				if entry.begins_with("\""):
+					entry = entry.substr(1)
+					if entry.ends_with("\""):
+						entry = entry.substr(0,entry.length() - 1)
+				cv[lastVer][index] = entry
+		
+		
 		var changelog : Dictionary = {}
-		c.load(file_path)
-		var versions : Array = c.get_sections()
+#		var versions : Array = c.get_sections()
+		var versions : Array = cv.keys()
+#		versions.resize(clamp(versions.size(),0,10))
 		var spacing : String = "  "
+		var spc = pointers.ConfigDriver.__get_value("ModMenu2","MODMENU2_CONFIG_GENERAL","changelog_spacing_size")
+		if spc != "" or spc != null:
+			spacing = spc
 		for version in versions:
 			changelog.merge({version:[]})
-			var keys : Array = c.get_section_keys(version)
+			var keys : Array = cv[version].keys()
 			keys.sort_custom(self,"changelogKeySorter")
-			var current_key:int = 1
-			while current_key > 0:
-				var key : String = str(current_key)
-				if key in keys:
-					var entry = c.get_value(version,key)
-					changelog[version].append(entry)
-					var current_subkey:int = 1
-					while current_subkey > 0:
-						var subkey : String = key + "." + str(current_subkey)
-						if subkey in keys:
-							var entry2 = c.get_value(version,subkey)
-							entry2 = spacing + entry2
-							changelog[version].append(entry2)
-							var current_subkey2:int = 1
-							while current_subkey2 > 0:
-								var subkey2 : String = subkey + "." + str(current_subkey2)
-								if subkey2 in keys:
-									var entry3 = c.get_value(version,subkey2)
-									entry3 = spacing + spacing + entry3
-									changelog[version].append(entry3)
-									var current_subkey3 = 1
-									while current_subkey3 > 0:
-										var subkey3 : String = subkey2 + "." + str(current_subkey3)
-										if subkey3 in keys:
-											var entry4 = c.get_value(version,subkey3)
-											entry4 = spacing + spacing + spacing + entry4
-											changelog[version].append(entry4)
-											current_subkey3 += 1
-										else:
-											current_subkey3 = 0
-									current_subkey2 += 1
-								else:
-									current_subkey2 = 0
-							current_subkey += 1
-						else:
-							current_subkey = 0
-						
-						pass
-					
-					current_key += 1
-				else:
-					current_key = 0
+			keys = filterChangelogs(keys)
+			
+			for key in keys:
+				var entry = str(cv[version][key])
+				var spacer:String = ""
+				for i in range(key.split(".").size() - 1):
+					spacer += spacing
+				changelog[version].append(spacer + entry)
 		return changelog
 	
 	func changelogKeySorter(al:String,bl:String) -> bool:
-		var aList = al.split(".")
-		var bList = bl.split(".")
-		var aSize = aList.size()
-		var bSize = bList.size()
+		var aList:PoolStringArray = al.split(".")
+		var bList:PoolStringArray = bl.split(".")
+		var aSize:int = aList.size()
+		var bSize:int = bList.size()
 		var counter = aSize if aSize < bSize else bSize
 		for i in range(counter):
 			var a = aList[i]
@@ -6521,16 +6521,36 @@ class _ManifestV2:
 				return a < b
 		return aSize < bSize
 	
+	func filterChangelogs(keys:Array) -> Array:
+		if keys.size() > 1:
+			var counter:int = 0
+			var total:int = keys.size() - 1
+			while counter < total:
+				var al:String = keys[counter]
+				var bl:String = keys[counter+1]
+				var aList:PoolStringArray = al.split(".")
+				var bList:PoolStringArray = bl.split(".")
+				var aSize:int = aList.size()
+				var bSize:int = bList.size()
+				if (aSize == bSize):
+					var aItem:String = aList[aSize - 1]
+					var bItem:String = bList[bSize - 1]
+					if int(bItem) > (int(aItem) + 1):
+						keys.remove(counter + 1)
+						total -= 1
+				counter += 1
+		return keys
+	
 	func __get_manifest_cache() -> Dictionary:
 		return cached_manifests
 	
-	var modmain_file_list = []
+	var modmain_file_list : Array = []
 	
 	func __get_modmain_files() -> Array:
 		if modmain_file_list:
 			return modmain_file_list.duplicate()
-		var structure = pointers.FolderAccess.__get_folder_structure("res://",false,false)
-		var dvs = []
+		var structure : Dictionary = pointers.FolderAccess.__get_folder_structure("res://",false,false)
+		var dvs : Array = []
 		if OS.has_feature("editor"):
 			dvs = pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[])
 		else:
@@ -6541,11 +6561,11 @@ class _ManifestV2:
 		modmain_file_list = dvs
 		return dvs.duplicate()
 	
-	var active_modlet_file_list = []
-	var all_modlet_file_list = []
-	var all_modlet_definitions = {}
+	var active_modlet_file_list : Array = []
+	var all_modlet_file_list : Array = []
+	var all_modlet_definitions : Dictionary = {}
 	
-	var cached_modlets = {}
+	var cached_modlets : Dictionary = {}
 	
 	func __get_all_modlets(only_show_installed : bool = true,recache : bool = false) -> Dictionary:
 		if cached_modlets:
@@ -6556,23 +6576,23 @@ class _ManifestV2:
 		if not cached_modlets or recache:
 			if not all_modlet_file_list:
 				var manifests = __get_manifest_files()
-				var manifest_checks = []
+				var manifest_checks : Array = []
 				for i in manifests:
 					manifest_checks.append(i.to_lower())
-				var allModFiles = __get_mod_files()
+				var allModFiles : Array = __get_mod_files()
 				for r in allModFiles:
 					var i : String = r.get_file().to_lower()
 					if (i.begins_with("modmain") and i.ends_with(".gd")):
-						var mr = r.get_base_dir().to_lower() + "/mod.manifest"
+						var mr : String = r.get_base_dir().to_lower() + "/mod.manifest"
 						if mr in manifest_checks:
 							manifest_checks.erase(mr)
-				var ov = []
+				var ov : Array = []
 				for i in manifests:
 					if i.to_lower() in manifest_checks:
 						ov.append(i)
 				ov.sort_custom(self,"sort_modlet_files")
 				all_modlet_file_list = ov
-			var modlets = all_modlet_file_list.duplicate()
+			var modlets : Array = all_modlet_file_list.duplicate()
 			var allowed_modlets = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets")
 			if allowed_modlets == null:
 				pointers.ConfigDriver.__store_value("HevLib","modlets","seen_modlets",{})
@@ -6585,7 +6605,7 @@ class _ManifestV2:
 					active_modlet_file_list.append(mod)
 			pointers.ConfigDriver.__store_value("HevLib","modlets","seen_modlets",allowed_modlets)
 			cached_modlets = allowed_modlets
-		var out = cached_modlets.duplicate(true)
+		var out : Dictionary = cached_modlets.duplicate(true)
 		if only_show_installed:
 			for mod in cached_modlets:
 				if not mod in active_modlet_file_list:
@@ -6593,8 +6613,8 @@ class _ManifestV2:
 		return out
 	
 	func sort_modlet_files(a:String,b:String):
-		var aPrio = __parse_file_as_manifest(a)["manifest_definitions"]["modlet_priority"]
-		var bPrio = __parse_file_as_manifest(b)["manifest_definitions"]["modlet_priority"]
+		var aPrio:int = __parse_file_as_manifest(a)["manifest_definitions"]["modlet_priority"]
+		var bPrio:int = __parse_file_as_manifest(b)["manifest_definitions"]["modlet_priority"]
 		if aPrio != bPrio:
 			return aPrio < bPrio
 		if a != b:
@@ -6605,24 +6625,24 @@ class _ManifestV2:
 		__get_all_modlets()
 		return active_modlet_file_list.duplicate()
 	
-	var cached_mod_files = []
+	var cached_mod_files : Array = []
 	
 	func __get_mod_files():
 		if cached_mod_files:
 			return cached_mod_files.duplicate(true)
-		var restrict_to_modmains = []
+		var restrict_to_modmains : Array = []
 		if OS.has_feature("editor"):
-			var dvs = pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[])
+			var dvs : Array = pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[])
 			for a in dvs:
 				restrict_to_modmains.append(a.get_base_dir() + "/")
-		var dict = siftFolderStructureForModFiles(pointers.FolderAccess.__get_folder_structure("res://",false,false),"res://",restrict_to_modmains)
+		var dict : Array = siftFolderStructureForModFiles(pointers.FolderAccess.__get_folder_structure("res://",false,false),"res://",restrict_to_modmains)
 		cached_mod_files = dict
 		return cached_mod_files.duplicate(true)
 	
 	func siftFolderStructureForModFiles(structure:Dictionary,path:String = "res://",restricted_to_modmains : Array = []):
-		var out = []
+		var out : Array = []
 		if restricted_to_modmains:
-			var ev = structure.keys()
+			var ev : Array = structure.keys()
 			for i in range(ev.size()):
 				ev[i] = ev[i].to_lower()
 			for f in ev:
@@ -6656,12 +6676,12 @@ class _ManifestV2:
 					out.append(path + i)
 		return out
 	
-	var cached_manifest_files = []
+	var cached_manifest_files : Array = []
 	
 	func __get_manifest_files():
 		if cached_manifest_files:
 			return cached_manifest_files.duplicate()
-		var ov = []
+		var ov : Array = []
 		for r in __get_mod_files():
 			var i : String = r.get_file().to_lower()
 			if i.begins_with("mod") and i.ends_with(".manifest"):
@@ -6669,12 +6689,12 @@ class _ManifestV2:
 		cached_manifest_files = ov
 		return cached_manifest_files.duplicate()
 	
-	var cached_icon_files = []
+	var cached_icon_files : Array = []
 	
 	func __get_icon_files():
 		if cached_icon_files:
 			return cached_icon_files.duplicate()
-		var ov = []
+		var ov : Array = []
 		for r in __get_mod_files():
 			var i : String = r.get_file().to_lower()
 			if i.begins_with("icon") and (i.ends_with(".stex") or i.ends_with(".png")):
@@ -6684,32 +6704,32 @@ class _ManifestV2:
 	
 	func __load_modlets(is_onready : bool):
 		var modlet_manifests = __get_modlet_files()
-		var scenes_to_reload = []
+		var scenes_to_reload : Array = []
 		for modlet in modlet_manifests:
 			var drivers = pointers.DriverManagement.__get_drivers_from_modmain_path(modlet)
 			if "LOAD_RESOURCES.gd" in drivers:
-				var resources = drivers["LOAD_RESOURCES.gd"].get("LOAD_RESOURCES",{})
+				var resources : Dictionary = drivers["LOAD_RESOURCES.gd"].get("LOAD_RESOURCES",{})
 				if resources and typeof(resources) == TYPE_DICTIONARY:
 					for resource in resources:
-						var subdata = resources[resource]
-						var load_type = subdata.get("load_type","").to_lower()
-						var is_relative = resource.begins_with("res://")
+						var subdata : Dictionary = resources[resource]
+						var load_type : String = subdata.get("load_type","").to_lower()
+						var is_relative:bool = resource.begins_with("res://")
 						if is_onready == subdata.get("onready",false):
 							match load_type:
 								"script":
-									var path = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
+									var path : String = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
 									pointers.DataFormat.__override_script(path)
 								"scene","resource":
-									var path = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
-									var orig_test = path.split(modlet.get_base_dir())[1]
-									var old = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[0])
-									var old_relative = old.begins_with("res://")
-									var old_path = old if old_relative else ("res:/" + ("" if old.begins_with("/") else "/") + old)
+									var path : String = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
+									var orig_test : String = path.split(modlet.get_base_dir())[1]
+									var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[0])
+									var old_relative:bool = old.begins_with("res://")
+									var old_path : String = old if old_relative else ("res:/" + ("" if old.begins_with("/") else "/") + old)
 									pointers.DataFormat.__replace_resource(path,old_path)
 									if not old_path in scenes_to_reload:
 										scenes_to_reload.append(old_path)
 								"reload":
-									var path = resource if is_relative else ("res:/" + ("" if resource.begins_with("/") else "/") + resource)
+									var path : String = resource if is_relative else ("res:/" + ("" if resource.begins_with("/") else "/") + resource)
 									pointers.DataFormat.__reload_scene(path)
 		return scenes_to_reload
 	
@@ -6742,53 +6762,53 @@ class _NodeAccess:
 	func _init(f):
 		pointers = f
 	
-	func __get_all_children(node, strip_supplied_node_from_array = false, return_only_paths = false, use_relative_paths = false):
-		var children = getAllChildren(node)
+	func __get_all_children(node:Node, strip_supplied_node_from_array = false, return_only_paths = false, use_relative_paths = false):
+		var children : Array = getAllChildren(node)
 		if strip_supplied_node_from_array:
 			children = strip_node(node, children)
 		if return_only_paths:
 			children = returnPaths(children, use_relative_paths, node)
 		return children
 
-	func getAllChildren(in_node,arr:=[]):
+	func getAllChildren(in_node:Node,arr : Array = []):
 		arr.push_back(in_node)
 		for child in in_node.get_children():
 			arr = getAllChildren(child,arr)
 		return arr
 
 	func strip_node(in_node, arr):
-		var paths = []
+		var paths : Array = []
 		for m in arr:
-			var selfPath = in_node.get_path()
-			var modify = str(m.get_path()).split(selfPath)
+			var selfPath : String = in_node.get_path()
+			var modify:PoolStringArray = str(m.get_path()).split(selfPath)
 			if modify[1] != "":
 				paths.append(m)
 		return paths
 
 	func returnPaths(arr, relative, in_node):
-		var parentPath = str(in_node.get_path())
-		var paths = []
+		var parentPath : String = str(in_node.get_path())
+		var paths : Array = []
 		for m in arr:
-			var path = m.get_path()
+			var path : String = m.get_path()
 			paths.append(path)
 		if relative:
-			var rel = []
+			var rel : Array = []
 			for i in paths:
-				var ps = str(i).split(parentPath)[1]
-				var tsu = str(ps).lstrip("/")
+				var ps : String = str(str(i).split(parentPath)[1])
+				var tsu : String = ps.lstrip("/")
 				rel.append(tsu)
 			paths = rel
 		return paths
 	
 	func __claim_child_ownership(node: Node):
-		var children = node.get_children()
+		var children : Array = node.get_children()
 		for child in children:
 			setOwnership(child, node)
 
 	func setOwnership(current_node: Node,set_owner_node: Node):
 		current_node.set_owner(set_owner_node)
 		if current_node.get_child_count() >= 1:
-			var children = current_node.get_children()
+			var children : Array = current_node.get_children()
 			for child in children:
 				if not __is_instanced_from_scene(child.get_parent()):
 					setOwnership(child, set_owner_node)
@@ -6800,38 +6820,38 @@ class _NodeAccess:
 	
 	func __dynamic_crew_expander(folder_path: String = "user://cache/.HevLib_Cache/dynamic_crew_expander/", max_crew:int = 24) -> String:
 		pointers.FolderAccess.__check_folder_exists(folder_path)
-		var log_header = "TSCN Writer for dynamic crew handler: "
+		var log_header : String = "TSCN Writer for dynamic crew handler: "
 		
-		var line_to_test = "DIALOG_DERELICT_SWITCH_CREW"
+		var line_to_test : String = "DIALOG_DERELICT_SWITCH_CREW"
 		
-		var base = 24
+		var base:int = 24
 		
-		var static_line_1 = "[gd_scene load_steps=3 format=2]"
-		var static_line_3 = "[ext_resource path=\"res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn\" type=\"PackedScene\" id=1]"
-		var static_line_4 = "[ext_resource path=\"res://comms/ConversationPlayer.gd\" type=\"Script\" id=2]"
-		var static_line_6 = "[node name=\"DIALOG_DERELICT_RANDOM_1\" instance=ExtResource( 1 )]"
+		var static_line_1 : String = "[gd_scene load_steps=3 format=2]"
+		var static_line_3 : String = "[ext_resource path=\"res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn\" type=\"PackedScene\" id=1]"
+		var static_line_4 : String = "[ext_resource path=\"res://comms/ConversationPlayer.gd\" type=\"Script\" id=2]"
+		var static_line_6 : String = "[node name=\"DIALOG_DERELICT_RANDOM_1\" instance=ExtResource( 1 )]"
 
-		var dynamic_line_1 = "[node name=\"DIALOG_DERELICT_SWITCH_CREW|%s\" type=\"Node\" parent=\".\" index=\"%s\"]"
-		var dynamic_line_2 = "script = ExtResource( 2 )"
-		var dynamic_line_3 = "myLine = false"
-		var dynamic_line_4 = "faceless = true"
-		var dynamic_line_5 = "importChildren = NodePath(\"../DIALOG_DERELICT_GO_AND_BRING_IT\")"
-		var dynamic_line_6 = "agenda = \"CREW/%s\""
-		var dynamic_line_7 = "agendaNotSame = true"
+		var dynamic_line_1 : String = "[node name=\"DIALOG_DERELICT_SWITCH_CREW|%s\" type=\"Node\" parent=\".\" index=\"%s\"]"
+		var dynamic_line_2 : String = "script = ExtResource( 2 )"
+		var dynamic_line_3 : String = "myLine = false"
+		var dynamic_line_4 : String = "faceless = true"
+		var dynamic_line_5 : String = "importChildren = NodePath(\"../DIALOG_DERELICT_GO_AND_BRING_IT\")"
+		var dynamic_line_6 : String = "agenda = \"CREW/%s\""
+		var dynamic_line_7 : String = "agendaNotSame = true"
 		
 		
 		var test = load("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn").instance()
-		var children = test.get_children()
-		var names = []
+		var children : Array = test.get_children()
+		var names : Array = []
 		for child in children:
 			names.append(child.name)
-		var maximum = 0
+		var maximum:int = 0
 		for line in names:
 			if line.begins_with(line_to_test):
-				var spl = line.split("|")
+				var spl:PoolStringArray = line.split("|")
 				if int(spl[1]) > maximum:
 					maximum = int(spl[1])
-		var tester = maximum + 1
+		var tester:int = maximum + 1
 		if tester > base:
 			base = tester
 		
@@ -6840,22 +6860,22 @@ class _NodeAccess:
 			Debug.l(log_header + "desired expansion to [%s] is less than or equal to the currently expanded number of [%s]" % [max_crew,base])
 			return ""
 		else:
-			var header = static_line_1 + "\n\n" + static_line_3 + "\n" + static_line_4 + "\n\n" + static_line_6 + "\n\n"
+			var header : String = static_line_1 + "\n\n" + static_line_3 + "\n" + static_line_4 + "\n\n" + static_line_6 + "\n\n"
 			
-			var compacted_string = header
+			var compacted_string : String = header
 			
 			while max_crew > base:
 				
-				var compact = dynamic_line_1 % [base,base + 4] + "\n" + dynamic_line_2 + "\n" + dynamic_line_3 + "\n" + dynamic_line_4 + "\n" + dynamic_line_5 + "\n" + dynamic_line_6 % base + "\n" + dynamic_line_7 + "\n\n"
+				var compact : String = dynamic_line_1 % [base,base + 4] + "\n" + dynamic_line_2 + "\n" + dynamic_line_3 + "\n" + dynamic_line_4 + "\n" + dynamic_line_5 + "\n" + dynamic_line_6 % base + "\n" + dynamic_line_7 + "\n\n"
 				
 				compacted_string = compacted_string + compact
 				
 				base += 1
 			if not folder_path.ends_with("/"):
 				folder_path = folder_path + "/"
-			var save_file_path = folder_path + "dynamic_crew_x%s.tscn" % base
+			var save_file_path : String = folder_path + "dynamic_crew_x%s.tscn" % base
 			pointers.FolderAccess.__check_folder_exists(folder_path)
-			var file = File.new()
+			var file:File = File.new()
 			file.open(save_file_path,File.WRITE)
 			file.store_string(compacted_string)
 			file.close()
@@ -7006,17 +7026,17 @@ class _TimeAccess:
 		}
 	
 	func __compare_dates(date, compare_to_this_date):
-		var isDifferent = false
-		var difference = "newer"
-		var splitOne = date.split("T")
-		var splitTwo = compare_to_this_date.split("T")
-		var dateOne = splitOne[0].split("-")
-		var dateTwo = splitTwo[0].split("-")
-		var timeOne = splitOne[1].split(":")
-		var timeTwo = splitTwo[1].split(":")
-		var concatOne = [dateOne[0],dateOne[1],dateOne[2],timeOne[0],timeOne[1],timeOne[2]]
-		var concatTwo = [dateTwo[0],dateTwo[1],dateTwo[2],timeTwo[0],timeTwo[1],timeTwo[2]]
-		var index = 0
+		var isDifferent:bool = false
+		var difference : String = "newer"
+		var splitOne:PoolStringArray = date.split("T")
+		var splitTwo:PoolStringArray = compare_to_this_date.split("T")
+		var dateOne:PoolStringArray = splitOne[0].split("-")
+		var dateTwo:PoolStringArray = splitTwo[0].split("-")
+		var timeOne:PoolStringArray = splitOne[1].split(":")
+		var timeTwo:PoolStringArray = splitTwo[1].split(":")
+		var concatOne : Array = [dateOne[0],dateOne[1],dateOne[2],timeOne[0],timeOne[1],timeOne[2]]
+		var concatTwo : Array = [dateTwo[0],dateTwo[1],dateTwo[2],timeTwo[0],timeTwo[1],timeTwo[2]]
+		var index:int = 0
 		while index < 6:
 			var compare1 = concatOne[index]
 			var compare2 = concatTwo[index]
@@ -7075,14 +7095,14 @@ class _Translations:
 		pointers = c
 	
 	func __updateTL(path:String, delim:String = ",", fullLogging:bool = true):
-		var fileName = path.split("/")[path.split("/").size() - 1]
-		var folderName = path.split(fileName)[0]
+		var fileName : String = path.split("/")[path.split("/").size() - 1]
+		var folderName : String = path.split(fileName)[0]
 		Debug.l("Adding translations from [%s] in [%s]" % [fileName, folderName])
 		var tlFile:File = File.new()
 		tlFile.open(path, File.READ)
-		var translations := []
-		var translationCount = 0
-		var csvLine := tlFile.get_line().split(delim)
+		var translations : Array = []
+		var translationCount:int = 0
+		var csvLine : PoolStringArray = tlFile.get_line().split(delim)
 		if fullLogging:
 			Debug.l("Adding translations as: %s" % csvLine)
 		for i in range(1, csvLine.size()):
@@ -7094,17 +7114,17 @@ class _Translations:
 			if line.begins_with("#"):
 				continue
 			csvLine = line.split(delim)
-			var size = csvLine.size()
+			var size:int = csvLine.size()
 			if size > 1:
 				if size > 2:
-					var i = 0
+					var i:int = 0
 					while i < size:
 						if csvLine[i].ends_with("\\") and i < size:
 							csvLine[i] = csvLine[i].rstrip("\\") + delim + csvLine[i + 1]
 							csvLine.remove(i + 1)
 							size -= 1
 						i += 1
-				var translationID := csvLine[0]
+				var translationID : String = csvLine[0]
 				for i in range(1, size):
 					translations[i - 1].add_message(translationID, csvLine[i].c_unescape())
 				if fullLogging:
@@ -7117,24 +7137,24 @@ class _Translations:
 	
 	func __updateTL_from_dictionary(path:Dictionary, fullLogging:bool = true):
 		Debug.l("Adding translations from dictionary")
-		var translations := []
-		var translationCount = 0
+		var translations : Array = []
+		var translationCount:int = 0
 		if fullLogging:
 			Debug.l("Adding translations as: %s" % str(path.hash()))
 		if "file" in path:
-			var file_paths = path["file"]
+			var file_paths : String = path["file"]
 			for file in file_paths:
 				var delim = file_paths[file]
 				match typeof(delim):
 					TYPE_STRING:
-						var dict = __translation_file_to_dictionary(file,delim)
+						var dict : Dictionary = __translation_file_to_dictionary(file,delim)
 						__updateTL_from_dictionary(dict,fullLogging)
 					TYPE_DICTIONARY:
-						var string = delim.get("string","")
-						var mod = delim.get("mod","")
-						var section = delim.get("section","")
-						var setting = delim.get("setting","")
-						var invert = delim.get("invert",false)
+						var string : String = delim.get("string","")
+						var mod : String = delim.get("mod","")
+						var section : String = delim.get("section","")
+						var setting : String = delim.get("setting","")
+						var invert:bool = delim.get("invert",false)
 						var val = pointers.ConfigDriver.__get_value(mod,section,setting)
 						var do = true
 						if typeof(val) == TYPE_BOOL:
@@ -7142,7 +7162,7 @@ class _Translations:
 						if invert:
 							do = !do
 						if do and string != "":
-							var dict = __translation_file_to_dictionary(file,string)
+							var dict : Dictionary = __translation_file_to_dictionary(file,string)
 							__updateTL_from_dictionary(dict,fullLogging)
 						
 			path.erase("file")
@@ -7182,7 +7202,7 @@ class _Translations:
 		Debug.l("%s Translations Updated" % [translationCount])
 	
 	func __fetch_all_translation_objects(index) -> Array:
-		var translations = []
+		var translations : Array = []
 		while index >= 1:
 			var obj = instance_from_id(index)
 			index -= 1

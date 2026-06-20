@@ -780,7 +780,7 @@
 
 1="* Added res://HevLib/pointers.gd to replace the current pointer system"
 2="* Configurations are now initialized and updated at the start of the modloading phase, so all mods should be able to access updated configs during the initialization phase"
-3="* Added developer tool for configuring a ship's cargo bay scanner areas, located at res://HevLib/scenes\development_tools\CargoBayCoverageVisual.tscn"
+3="* Added developer tool for configuring a ship's cargo bay scanner areas, located at res://HevLib/scenes/development_tools/CargoBayCoverageVisual.tscn"
 4="* Fixed DataFormat.format_for_large_numbers not respecting locale-specific separators"
 5="* Fixed crash when attempting to fetch github releases subsequent times after providing either no node or a node without a '_downloaded_zip' method available"
 6="* Removed unused this_file operator from ManifestV2.__have_mods_updated()"
