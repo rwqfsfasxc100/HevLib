@@ -1452,6 +1452,15 @@ class _DataFormat:
 						"Bool for whether the file at file_path exists or not."
 					]
 				},
+				"__is_valid_url":{
+					"description":"Checks a provided URL to see if it's valid.",
+					"args":[
+						"URL -> (String) the URL to be checked",
+					],
+					"return":[
+						"Bool for whether the URL is valid."
+					]
+				},
 			}
 		}
 	
@@ -1460,8 +1469,7 @@ class _DataFormat:
 	var pointers
 	func _init(f):
 		pointers = f
-		
-		
+		urlRegex.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,63}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
 	
 	func __array_to_string(arr: Array) -> String:
 		var s = ""
@@ -1961,6 +1969,11 @@ class _DataFormat:
 			return true
 		return false
 	
+	var urlRegex = RegEx.new()
+	func __is_valid_url(URL:String) -> bool:
+		var vt = urlRegex.search(URL)
+		if vt: return true
+		return false
 	
 	
 
