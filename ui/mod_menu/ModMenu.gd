@@ -2,17 +2,17 @@ extends Popup
 onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 var offset = Vector2(12,12)
 
-var cache_folder = "user://cache/.Mod_Menu_2_Cache/"
-var filter_cache_file = "menu_filter_cache.json"
-var file = File.new()
+var cache_folder : String = "user://cache/.Mod_Menu_2_Cache/"
+var filter_cache_file : String = "menu_filter_cache.json"
+var file : File = File.new()
 func _about_to_show():
 	if not pointers:
 		pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	pointers.FolderAccess.__check_folder_exists(cache_folder)
 	file.open(cache_folder + filter_cache_file,File.WRITE)
-	file.store_string(JSON.print([]))
+	file.store_string("[]")
 	file.close()
-	var nodes = $FilterPopup/base/FilterContainer/VBoxContainer/ScrollContainer/VBoxContainer.get_children()
+	var nodes : Array = $FilterPopup/base/FilterContainer/VBoxContainer/ScrollContainer/VBoxContainer.get_children()
 	for node in nodes:
 		var c = node.get_node("CheckButton")
 		c.pressed = true
@@ -70,8 +70,8 @@ func show_menu():
 func cancel():
 	$AnimateAppear.play("hider")
 
-onready var restart_menu = $MMRestartDialog
-var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
+onready var restart_menu : Node = $MMRestartDialog
+var has_updated_store : String = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 
 func show_restart_menu():
 	var valid = true
@@ -80,7 +80,7 @@ func show_restart_menu():
 		valid = false
 	restart_menu.let_restart(valid)
 	file.open(has_updated_store,File.READ)
-	var has = file.get_as_text()
+	var has : String = file.get_as_text()
 	file.close()
 	if has == "1":
 		restart_menu.show()
@@ -107,7 +107,7 @@ func refocus():
 
 
 func _on_resize():
-	var size = Settings.getViewportSize()
+	var size: Vector2 = Settings.getViewportSize()
 	rect_size = size
 	$ColorRect.rect_min_size = size
 	$ColorRect.rect_size = size
@@ -116,12 +116,12 @@ func _on_resize():
 	$base.rect_position = offset/2
 	
 	
-	var bn = $base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList/ScrollContainer/VBoxContainer
+	var bn : Node = $base/PanelContainer/VBoxContainer/ModContainer/SPLIT/ModList/ScrollContainer/VBoxContainer
 	if bn:
 		if bn.get_children().size() >= 1:
-			var buttonnode = bn.get_child(0)
-			var children = buttonnode.get_children()
-			var names = []
+			var buttonnode : Node = bn.get_child(0)
+			var children : Array = buttonnode.get_children()
+			var names : Array = []
 			for child in children:
 				names.append(child.name)
 			if "ModButton" in names:

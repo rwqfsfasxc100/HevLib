@@ -1,6 +1,6 @@
 [gd_resource type="Theme" load_steps=48 format=2]
 
-[ext_resource path="res://HevLib/ui/themes/fonts/verdana/font-verdanabolditalic.tres" type="DynamicFont" id=1]
+[ext_resource path="res://HevLib/ui/fonts/verdana/font-verdanabolditalic.tres" type="DynamicFont" id=1]
 [ext_resource path="res://HevLib/ui/themes/styles/focus_and_hover_flat.tres" type="StyleBox" id=2]
 [ext_resource path="res://HevLib/ui/themes/styles/disabled_flat.tres" type="StyleBox" id=3]
 [ext_resource path="res://HevLib/ui/themes/styles/normal_flat.tres" type="StyleBox" id=4]
@@ -28,10 +28,10 @@
 [ext_resource path="res://HevLib/ui/themes/styles/slider/slider_vertical_flat.tres" type="StyleBox" id=26]
 [ext_resource path="res://HevLib/ui/themes/styles/tooltip/panel.tres" type="StyleBox" id=27]
 [ext_resource path="res://HevLib/ui/themes/styles/panel/panel_container_background_flat.tres" type="StyleBox" id=28]
-[ext_resource path="res://HevLib/ui/themes/fonts/verdana/font-verdanaitalic.tres" type="DynamicFont" id=29]
-[ext_resource path="res://HevLib/ui/themes/fonts/verdana/font-verdanabold.tres" type="DynamicFont" id=30]
-[ext_resource path="res://HevLib/ui/themes/fonts/verdana/font-verdana.tres" type="DynamicFont" id=31]
-[ext_resource path="res://HevLib/ui/themes/fonts/courier_new/font-courierbold.tres" type="DynamicFont" id=32]
+[ext_resource path="res://HevLib/ui/fonts/verdana/font-verdanaitalic.tres" type="DynamicFont" id=29]
+[ext_resource path="res://HevLib/ui/fonts/verdana/font-verdanabold.tres" type="DynamicFont" id=30]
+[ext_resource path="res://HevLib/ui/fonts/verdana/font-verdana.tres" type="DynamicFont" id=31]
+[ext_resource path="res://HevLib/ui/fonts/courier_new/font-courierbold.tres" type="DynamicFont" id=32]
 
 [sub_resource type="StreamTexture" id=13]
 flags = 4

@@ -1,9 +1,9 @@
 [gd_scene load_steps=5 format=2]
 
-[ext_resource path="res://HevLib/ui/themes/fonts/verdana/font-verdanabolditalic-small.tres" type="DynamicFont" id=1]
-[ext_resource path="res://HevLib/ui/themes/fonts/verdana/font-verdanabold-small.tres" type="DynamicFont" id=2]
-[ext_resource path="res://HevLib/ui/themes/fonts/verdana/font-verdanaitalic-small.tres" type="DynamicFont" id=3]
-[ext_resource path="res://HevLib/ui/themes/fonts/verdana/font-verdana-small.tres" type="DynamicFont" id=4]
+[ext_resource path="res://HevLib/ui/fonts/verdana/font-verdanabolditalic-small.tres" type="DynamicFont" id=1]
+[ext_resource path="res://HevLib/ui/fonts/verdana/font-verdanabold-small.tres" type="DynamicFont" id=2]
+[ext_resource path="res://HevLib/ui/fonts/verdana/font-verdanaitalic-small.tres" type="DynamicFont" id=3]
+[ext_resource path="res://HevLib/ui/fonts/verdana/font-verdana-small.tres" type="DynamicFont" id=4]
 
 [node name="ConsoleRichText" type="RichTextLabel"]
 margin_right = 1280.0

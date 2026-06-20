@@ -21,7 +21,7 @@ func refocus():
 #		get_tree().set_input_as_handled()
 
 func _on_resize():
-	var size = Settings.getViewportSize()
+	var size : Vector2 = Settings.getViewportSize()
 	rect_size = size
 	$ColorRect.rect_size = size
 #	rect_position = filter_offset/2
