@@ -2265,6 +2265,14 @@ const TRANSLATIONS = {
 		"HEVLIB_MODMENU_MODLET_TOGGLE_MM2FALLBACK": {
 			"string": "Cannot toggle ModMenu2.\n\nZip has to be manually removed or\ntoggled in the config file directly.",
 			"version_hash": 915722318
+		},
+		"MODMENU2_CHANGELOG_SPACING_SIZE": {
+			"string": "Changelog spacing size",
+			"version_hash": 3748345741
+		},
+		"MODMENU2_CHANGELOG_SPACING_SIZE_TOOLTIP": {
+			"string": "Spaces placed as each indent for a changelog's subsection",
+			"version_hash": 1698732061
 		}
 	},
 	"uk_UA": {
