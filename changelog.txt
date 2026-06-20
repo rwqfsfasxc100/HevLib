@@ -1,3 +1,7 @@
+[1.14.6]
+
+1=* Added missing translation strings for changelog spacing
+
 [1.14.5]
 
 1=* Changelogs now use a new formatter for handling changelogs
