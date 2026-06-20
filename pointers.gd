@@ -4622,7 +4622,8 @@ class _FolderAccess:
 					"description":"Fetches the folder structure of a given directory as a dictionary.",
 					"args":[
 						"folder -> (String)",
-						"store_file_content (optional) -> (bool) Whether to store the file content as the value of a file's entry instead of just 'FILE'. Defaults to `false`"
+						"store_file_content (optional) -> (bool) Whether to store the file content as the value of a file's entry instead of just 'FILE'. Defaults to `false`",
+						"recache (optional) -> (bool) whether the directory cache should be re-fetched. Defaults to true"
 					],
 					"return":[
 						"Dictionary containing the entire directory's structure"
@@ -4719,7 +4720,7 @@ class _FolderAccess:
 	
 	var folderStructureCache : Dictionary = {}
 	
-	func __get_folder_structure(folder : String,store_file_content : bool = false, recache : bool = false):
+	func __get_folder_structure(folder : String,store_file_content : bool = false, recache : bool = true):
 		if (not folder in folderStructureCache) or recache:
 			var folder_structure : Dictionary = {}
 			var files : Array = __fetch_folder_files(folder,true,false)
@@ -4762,10 +4763,10 @@ class _Github:
 		}
 	
 	func __get_github_filesystem(URL: String, node_to_return_to: Node, behaviour: String = "normal", special_behaviour_data = ""):
-		var rng = RandomNumberGenerator.new()
+		var rng:RandomNumberGenerator = RandomNumberGenerator.new()
 		rng.randomize()
 		var CRoot = Tool.get_tree().get_root()
-		var gitHubFS = preload("res://HevLib/scenes/fetch_from_github/fs/FetchGithubData.tscn").instance()
+		var gitHubFS := preload("res://HevLib/scenes/fetch_from_github/fs/FetchGithubData.tscn").instance()
 		gitHubFS.URL = URL
 		gitHubFS.ActOnModData = behaviour
 		gitHubFS.mod_version = special_behaviour_data
@@ -4774,25 +4775,25 @@ class _Github:
 		CRoot.call_deferred("add_child",gitHubFS)
 	
 	func __get_github_release(URL: String, folder: String, node_to_return_to: Node, get_pre_releases: bool = false, file_preference: String = "any", file_to_download: String = "first"):
-		var cancel = false
+		var cancel:bool = false
 		if node_to_return_to == null or (not node_to_return_to is Node):
 			cancel = true
-			var e = "HevLib Github Release Downloader: ERROR! Provided node [%s] either does not exist or is not of [Node] type." % str(node_to_return_to)
+			var e : String = "HevLib Github Release Downloader: ERROR! Provided node [%s] either does not exist or is not of [Node] type." % str(node_to_return_to)
 			Debug.l(e)
 			printerr(e)
 		if not node_to_return_to.has_method("_downloaded_zip"):
 			cancel = true
-			var e = "HevLib Github Release Downloader: ERROR! Provided node [%s] does not have the method [_downloaded_zip]" % str(node_to_return_to)
+			var e : String = "HevLib Github Release Downloader: ERROR! Provided node [%s] does not have the method [_downloaded_zip]" % str(node_to_return_to)
 			Debug.l(e)
 			printerr(e)
 		if cancel:
 			return
 		var CRoot = Tool.get_tree().get_root()
-		var gitHubFS = preload("res://HevLib/scenes/fetch_from_github/releases/NetHandles.tscn").instance()
+		var gitHubFS := preload("res://HevLib/scenes/fetch_from_github/releases/NetHandles.tscn").instance()
 		if not node_to_return_to.has_method("_get_github_progress"):
 			gitHubFS.state_progress = false
 			Debug.l("HevLib Github Release Downloader: NOTICE! Provided node [%s] does not have the method [_get_github_progress]. No download progress will be reported." % str(node_to_return_to))
-		var rng = RandomNumberGenerator.new()
+		var rng:RandomNumberGenerator = RandomNumberGenerator.new()
 		rng.randomize()
 		gitHubFS.releases_URL = URL
 		gitHubFS.folder = folder
@@ -5538,11 +5539,11 @@ class _ManifestV2:
 	func _init(d):
 		pointers = d
 	
-	var file = File.new()
+	var file:File = File.new()
 	
 	var cached_mod_list : Dictionary = {}
 	
-	func __get_mod_data(print_json: bool = false) -> Dictionary:
+	func __get_mod_data(print_json: bool = false):
 		if not cached_mod_list.empty():
 			if print_json:
 				var psj = JSON.print(cached_mod_list, "\t")
@@ -5551,30 +5552,22 @@ class _ManifestV2:
 				return cached_mod_list.duplicate(true)
 		else:
 			Debug.l("ManifestV2: Fetching mods from file")
-			var mod_dictionary = {}
-			var manifest_count = 0
-			var library_count = 0
-			var non_library_count = 0
-			var total_mod_count = 0
+			var mod_dictionary : Dictionary = {}
+			var manifest_count:int = 0
+			var library_count:int = 0
+			var non_library_count:int = 0
+			var total_mod_count:int = 0
 			# FUTURE ME: FIX THIS TO USE PARSE TAGS
-			var stat_tags = {}
+			var stat_tags : Dictionary = {}
 			
-			var modListArr = []
-			
-			
-#			var modNodes = {}
-#			var is_onready = ModLoader != null
-#			if is_onready:
-#				for child in ModLoader.get_children():
-#					modNodes[child.get_script().get_path()] = child
-			
-			var modmain_files = __get_modmain_files()
+			var modListArr : Array = []
+			var modmain_files : Array = __get_modmain_files()
 			Debug.l("ManifestV2: found [%s] modmain files" % modmain_files.size())
 			for item in modmain_files:
 				Debug.l("ManifestV2: registering ModMain %s" % item)
 				modListArr.append(__concat_mod_info(item))
 #				modListArr.append({"constants":constants,"script_path":item,"node":(modNodes[item]) if (is_onready or item in modNodes) else (null)})
-			var modlet_files = __get_modlet_files()
+			var modlet_files : Array = __get_modlet_files()
 			Debug.l("ManifestV2: found [%s] modlet files" % modlet_files.size())
 			for item in modlet_files:
 				Debug.l("ManifestV2: registering Modlet %s" % item)
@@ -5585,8 +5578,8 @@ class _ManifestV2:
 			
 			for mod in modListArr:
 				
-				var mod_entry = __make_mod_entry(mod)
-				var manifest_data = mod_entry["manifest"]["manifest_data"]
+				var mod_entry : Dictionary = __make_mod_entry(mod)
+				var manifest_data : Dictionary = mod_entry["manifest"]["manifest_data"]
 				if mod_entry["manifest"]["has_manifest"]:
 					manifest_count += 1
 				if "tags" in manifest_data:
@@ -5595,7 +5588,6 @@ class _ManifestV2:
 							stat_tags[tag] += 1
 						else:
 							stat_tags.merge({tag:1})
-#				var mod_entry = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"node":node,"manifest":manifestEntry,"drivers":drivers}}
 				mod_dictionary.merge({mod.get("script_path",""):mod_entry})
 				
 				if mod_entry["library_information"]["is_library"]:
@@ -5604,12 +5596,12 @@ class _ManifestV2:
 					non_library_count += 1
 			
 			
-			var stat_count = {"total_mod_count":total_mod_count,"mods_using_manifests":manifest_count,"mods":non_library_count,"libraries":library_count}
-			var statistics = {"counts":stat_count,"tags":stat_tags}
-			var returnValues = {"mods":mod_dictionary,"statistics":statistics}
+			var stat_count : Dictionary = {"total_mod_count":total_mod_count,"mods_using_manifests":manifest_count,"mods":non_library_count,"libraries":library_count}
+			var statistics : Dictionary = {"counts":stat_count,"tags":stat_tags}
+			var returnValues : Dictionary = {"mods":mod_dictionary,"statistics":statistics}
 			cached_mod_list = returnValues.duplicate(true)
 			if print_json:
-				var psj = JSON.print(cached_mod_list, "\t")
+				var psj : String = JSON.print(cached_mod_list, "\t")
 				return psj
 			else:
 				return cached_mod_list.duplicate(true)
@@ -5617,12 +5609,12 @@ class _ManifestV2:
 	func __concat_mod_info(mod_path:String) -> Dictionary:
 		if not pointers.DataFormat.__file_exists(mod_path):
 			return {}
-		var cv = mod_path.get_file().to_lower()
+		var cv : String = mod_path.get_file().to_lower()
 		if cv.begins_with("modmain") and cv.ends_with(".gd"):
-			var constants = pointers.DataFormat.__get_script_constant_map_without_load(mod_path)
+			var constants : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(mod_path)
 			return {"constants":constants,"script_path":mod_path,"mod_type":"mod"}
 		elif cv.begins_with("mod") and cv.ends_with(".manifest"):
-			var manifestData = __parse_file_as_manifest(mod_path)
+			var manifestData : Dictionary = __parse_file_as_manifest(mod_path)
 			var constants = {
 				"MOD_PRIORITY":manifestData["manifest_definitions"].get("modlet_priority",0),
 				"MOD_NAME":manifestData["mod_information"].get("name",mod_path.split("/")[2]),
@@ -5664,13 +5656,13 @@ class _ManifestV2:
 		var script_filename : String = script_path.get_file().to_lower()
 		
 		if script_filename.begins_with("mod") and script_filename.ends_with(".manifest"):
-			var current = __get_modlet_files()
+			var current : Array = __get_modlet_files()
 			if not script_path in current:
 				mod_enabled = false
 		
 		for content_file in content:
 			if content_file.begins_with(folder_path):
-				var ft = content_file.split(folder_path)[1]
+				var ft : String = content_file.split(folder_path)[1]
 				if ft.to_lower() == "mod.manifest":
 					has_mod_manifest = true
 					
@@ -5720,8 +5712,8 @@ class _ManifestV2:
 				if lang != ml:
 					var langData : Dictionary = tlData[lang]
 					var lc : int = langData.size()
-					var not_in_master := 0
-					var not_updated := 0
+					var not_in_master:int = 0
+					var not_updated:int = 0
 					for l in langData:
 						if not l in master_locale:
 							not_in_master += 1
@@ -5747,71 +5739,30 @@ class _ManifestV2:
 		return {"name":mod_name,"priority":mod_priority,"file_path":script_path,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"manifest":manifestEntry,"drivers":drivers,"mod_type":mod["mod_type"],"enabled":mod_enabled,"master_locale":ml}
 	
 	static func sortModList(a,b):
-		var c1 = a.get("constants",{}).get("MOD_PRIORITY",0)
-		var c2 = b.get("constants",{}).get("MOD_PRIORITY",0)
+		var c1:int = a.get("constants",{}).get("MOD_PRIORITY",0)
+		var c2:int = b.get("constants",{}).get("MOD_PRIORITY",0)
 		if c1 != c2:
 			return c1 < c2
-		var b1 = a.get("mod_path","").to_ascii()#.split("/")
-		var b2 = b.get("mod_path","").to_ascii()#.split("/")
+		var b1:PoolByteArray = a.get("mod_path","").to_ascii()#.split("/")
+		var b2:PoolByteArray = b.get("mod_path","").to_ascii()#.split("/")
 		if b1 != b2:
 			return b1 < b2
 		return false
 	
-	var cached_zip_refs = {}
+	var cached_zip_refs : Dictionary = {}
 	
 	func __match_mod_path_to_zip(mod_main_path:String) -> String:
 		if mod_main_path in cached_zip_refs:
 			return cached_zip_refs[mod_main_path]
 		else:
-			var zip_ref_store = "user://cache/.HevLib_Cache/zip_ref_store.json"
-			var file = File.new()
+			var zip_ref_store : String = "user://cache/.HevLib_Cache/zip_ref_store.json"
+			var file:File = File.new()
 			file.open(zip_ref_store,File.READ)
-			var data = JSON.parse(file.get_as_text()).result
+			var data : Dictionary = JSON.parse(file.get_as_text()).result
 			file.close()
-			var return_val = data.get(mod_main_path,"")
+			var return_val : String = data.get(mod_main_path,"")
 			cached_zip_refs[mod_main_path] = return_val
 			return return_val
-	
-	func __old_match_mod_path_to_zip(mod_main_path:String) -> String:
-		var _modZipFiles = []
-		var gameInstallDirectory = OS.get_executable_path().get_base_dir()
-		if OS.get_name() == "OSX":
-			gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
-		var modPathPrefix = gameInstallDirectory.plus_file("mods")
-
-		var dir = Directory.new()
-		if dir.open(modPathPrefix) != OK:
-			return ""
-		if dir.list_dir_begin() != OK:
-			return ""
-
-		while true:
-			var fileName = dir.get_next()
-			if fileName == "":
-				break
-			if dir.current_is_dir():
-				continue
-			var modFSPath = modPathPrefix.plus_file(fileName)
-			var modGlobalPath = ProjectSettings.globalize_path(modFSPath)
-			if not ProjectSettings.load_resource_pack(modGlobalPath, true):
-				continue
-			_modZipFiles.append(modFSPath)
-		dir.list_dir_end()
-		
-		var initScripts = []
-		for modFSPath in _modZipFiles:
-			var gd = gdunzip.new()
-			gd.load(modFSPath)
-			for modEntryPath in gd.files:
-				var modEntryName = modEntryPath.get_file().to_lower()
-				if modEntryName.begins_with("modmain") and modEntryName.ends_with(".gd"):
-					var modGlobalPath = "res://" + modEntryPath
-					var zipName = modFSPath.split("/")[modFSPath.split("/").size() - 1]
-					initScripts.append([modGlobalPath,zipName])
-		for item in initScripts:
-			if item[0] == mod_main_path:
-				return item[1]
-		return ""
 	
 	func __compare_versions(checked_mod_data:Dictionary) -> bool:
 		var installed_mods = __get_mod_data()
@@ -6575,7 +6526,7 @@ class _ManifestV2:
 	func __get_modmain_files() -> Array:
 		if modmain_file_list:
 			return modmain_file_list.duplicate()
-		var structure = pointers.FolderAccess.__get_folder_structure("res://")
+		var structure = pointers.FolderAccess.__get_folder_structure("res://",false,false)
 		var dvs = []
 		if OS.has_feature("editor"):
 			dvs = pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[])
@@ -6661,8 +6612,7 @@ class _ManifestV2:
 			var dvs = pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[])
 			for a in dvs:
 				restrict_to_modmains.append(a.get_base_dir() + "/")
-#			breakpoint
-		var dict = siftFolderStructureForModFiles(pointers.FolderAccess.__get_folder_structure("res://"),"res://",restrict_to_modmains)
+		var dict = siftFolderStructureForModFiles(pointers.FolderAccess.__get_folder_structure("res://",false,false),"res://",restrict_to_modmains)
 		cached_mod_files = dict
 		return cached_mod_files.duplicate(true)
 	
