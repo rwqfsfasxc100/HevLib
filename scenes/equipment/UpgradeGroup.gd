@@ -56,7 +56,7 @@ func reexamine():
 	.reexamine()
 	if config_id and config_section and config_setting:
 		
-		if cv != null:
+		if cv != null and cv is bool:
 			if invert_config:
 				if cv:
 					visible = false
