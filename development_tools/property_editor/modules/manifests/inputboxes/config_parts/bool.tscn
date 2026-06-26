@@ -1,0 +1,249 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://modules/manifests/inputboxes/config_parts/bool.gd" type="Script" id=1]
+[ext_resource path="res://property_editor/icons/edit.svg" type="Texture" id=2]
+[ext_resource path="res://property_editor/property_editor.tscn" type="PackedScene" id=3]
+[ext_resource path="res://DescriptionLabel.tscn" type="PackedScene" id=4]
+
+[sub_resource type="StreamTexture" id=1]
+flags = 4
+load_path = "res://HevLib/ui/themes/icons/dropdown_arrow.stex"
+
+[node name="bool" type="VBoxContainer"]
+size_flags_horizontal = 3
+script = ExtResource( 1 )
+
+[node name="Box" type="HBoxContainer" parent="."]
+margin_right = 253.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+
+[node name="Padding1" type="HBoxContainer" parent="Box"]
+margin_right = 5.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 5, 0 )
+
+[node name="Padding3" type="VSeparator" parent="Box"]
+margin_left = 9.0
+margin_right = 13.0
+margin_bottom = 40.0
+
+[node name="MarginContainer" type="MarginContainer" parent="Box"]
+margin_left = 17.0
+margin_right = 124.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+
+[node name="TOOLTIP" type="Button" parent="Box/MarginContainer"]
+margin_right = 107.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+
+[node name="LABELS" type="HBoxContainer" parent="Box/MarginContainer"]
+margin_right = 107.0
+margin_bottom = 40.0
+mouse_filter = 2
+size_flags_horizontal = 3
+
+[node name="NAME" type="Label" parent="Box/MarginContainer/LABELS"]
+margin_right = 51.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+valign = 1
+
+[node name="TYPE" type="Label" parent="Box/MarginContainer/LABELS"]
+margin_left = 55.0
+margin_right = 107.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+align = 2
+valign = 1
+
+[node name="EDIT" type="Button" parent="Box"]
+margin_left = 128.0
+margin_right = 168.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 40, 40 )
+hint_tooltip = "Edit link name"
+icon = ExtResource( 2 )
+expand_icon = true
+
+[node name="TextureRect" type="TextureRect" parent="Box"]
+margin_left = 172.0
+margin_right = 212.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 0, 40 )
+rect_pivot_offset = Vector2( 20, 20 )
+texture = SubResource( 1 )
+
+[node name="DELETE" type="Button" parent="Box"]
+self_modulate = Color( 1, 0, 0, 1 )
+margin_left = 216.0
+margin_right = 236.0
+margin_bottom = 40.0
+text = "X"
+
+[node name="Padding4" type="VSeparator" parent="Box"]
+margin_left = 240.0
+margin_right = 244.0
+margin_bottom = 40.0
+
+[node name="Padding2" type="HBoxContainer" parent="Box"]
+margin_left = 248.0
+margin_right = 253.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 5, 0 )
+
+[node name="EditDiag" type="ConfirmationDialog" parent="Box"]
+margin_left = 118.0
+margin_right = 568.0
+margin_bottom = 100.0
+rect_min_size = Vector2( 450, 100 )
+popup_exclusive = true
+window_title = ""
+
+[node name="LineEdit" type="LineEdit" parent="Box/EditDiag"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 442.0
+margin_bottom = 64.0
+
+[node name="Collapsible" type="VBoxContainer" parent="."]
+margin_top = 44.0
+margin_right = 253.0
+margin_bottom = 280.0
+
+[node name="name" type="HBoxContainer" parent="Collapsible"]
+margin_right = 253.0
+margin_bottom = 36.0
+
+[node name="DescriptionLabel" parent="Collapsible/name" instance=ExtResource( 4 )]
+margin_right = 124.0
+margin_bottom = 36.0
+hint_tooltip = "The display name for the config.
+Can be a translation string."
+text = "name"
+tooltip = "The display name for the config.
+Can be a translation string."
+
+[node name="name" parent="Collapsible/name" instance=ExtResource( 3 )]
+margin_left = 128.0
+margin_right = 253.0
+margin_bottom = 36.0
+can_edit_type = false
+property_type = "string"
+
+[node name="description" type="HBoxContainer" parent="Collapsible"]
+margin_top = 40.0
+margin_right = 253.0
+margin_bottom = 76.0
+
+[node name="DescriptionLabel" parent="Collapsible/description" instance=ExtResource( 4 )]
+margin_right = 124.0
+margin_bottom = 36.0
+hint_tooltip = "The description tooltip for the config.
+Can be a translation string."
+text = "description"
+tooltip = "The description tooltip for the config.
+Can be a translation string."
+
+[node name="description" parent="Collapsible/description" instance=ExtResource( 3 )]
+margin_left = 128.0
+margin_right = 253.0
+margin_bottom = 36.0
+can_edit_type = false
+property_type = "string"
+
+[node name="default" type="HBoxContainer" parent="Collapsible"]
+margin_top = 80.0
+margin_right = 253.0
+margin_bottom = 116.0
+
+[node name="DescriptionLabel" parent="Collapsible/default" instance=ExtResource( 4 )]
+margin_right = 124.0
+margin_bottom = 36.0
+hint_tooltip = "The default value for the config."
+text = "default"
+tooltip = "The default value for the config."
+
+[node name="default" parent="Collapsible/default" instance=ExtResource( 3 )]
+margin_left = 128.0
+margin_right = 253.0
+margin_bottom = 36.0
+can_edit_type = false
+property_type = "bool"
+
+[node name="requires_bools" type="HBoxContainer" parent="Collapsible"]
+margin_top = 120.0
+margin_right = 253.0
+margin_bottom = 156.0
+
+[node name="DescriptionLabel" parent="Collapsible/requires_bools" instance=ExtResource( 4 )]
+margin_right = 124.0
+margin_bottom = 36.0
+hint_tooltip = "Config paths to boolean configs required for this config to be editable. 
+If a config is not a bool, it is ignored, and all configs must be true.
+
+Configs follow the format of \"Identifier/Section/Config\", 
+i.e. \"VelocityPlus/VP_ENCELADUS/enable_achievements\"
+
+Config names cannot have spaces or forward slashes, 
+use ConfigDriver.__truncate_to_setting_entry to help format."
+text = "requires_bools"
+tooltip = "Config paths to boolean configs required for this config to be editable. 
+If a config is not a bool, it is ignored, and all configs must be true.
+
+Configs follow the format of \"Identifier/Section/Config\", 
+i.e. \"VelocityPlus/VP_ENCELADUS/enable_achievements\"
+
+Config names cannot have spaces or forward slashes, 
+use ConfigDriver.__truncate_to_setting_entry to help format."
+
+[node name="requires_bools" parent="Collapsible/requires_bools" instance=ExtResource( 3 )]
+margin_left = 128.0
+margin_right = 253.0
+margin_bottom = 36.0
+can_edit_type = false
+property_type = "PoolStringArray"
+
+[node name="invert_bool_requirement" type="HBoxContainer" parent="Collapsible"]
+margin_top = 160.0
+margin_right = 253.0
+margin_bottom = 196.0
+
+[node name="DescriptionLabel" parent="Collapsible/invert_bool_requirement" instance=ExtResource( 4 )]
+margin_right = 169.0
+margin_bottom = 36.0
+hint_tooltip = "All configs listed in requires_bools now need to be false to make this editable."
+text = "invert_bool_requirement"
+tooltip = "All configs listed in requires_bools now need to be false to make this editable."
+
+[node name="invert_bool_requirement" parent="Collapsible/invert_bool_requirement" instance=ExtResource( 3 )]
+margin_left = 173.0
+margin_right = 253.0
+margin_bottom = 36.0
+can_edit_type = false
+property_type = "bool"
+
+[node name="require_restart" type="HBoxContainer" parent="Collapsible"]
+margin_top = 200.0
+margin_right = 253.0
+margin_bottom = 236.0
+
+[node name="DescriptionLabel" parent="Collapsible/require_restart" instance=ExtResource( 4 )]
+margin_right = 124.0
+margin_bottom = 36.0
+hint_tooltip = "Whether changing the config will require and 
+start prompting the user for a game restart."
+text = "require_restart"
+tooltip = "Whether changing the config will require and 
+start prompting the user for a game restart."
+
+[node name="require_restart" parent="Collapsible/require_restart" instance=ExtResource( 3 )]
+margin_left = 128.0
+margin_right = 253.0
+margin_bottom = 36.0
+can_edit_type = false
+property_type = "bool"

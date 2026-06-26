@@ -1,0 +1,56 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://property_editor/property_containers/color.gd" type="Script" id=1]
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=2]
+
+[node name="color" type="HBoxContainer"]
+margin_right = 58.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 0, 46 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource( 2 )
+script = ExtResource( 1 )
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+margin_right = 58.0
+margin_bottom = 46.0
+size_flags_horizontal = 3
+
+[node name="Button" type="Button" parent="PanelContainer"]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 53.0
+margin_bottom = 41.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ColorRect" type="ColorRect" parent="PanelContainer"]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 53.0
+margin_bottom = 41.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color( 0, 0, 0, 1 )
+
+[node name="AcceptDialog" type="AcceptDialog" parent="."]
+margin_left = 24.0
+margin_right = 493.0
+margin_bottom = 666.0
+
+[node name="PanelContainer" type="PanelContainer" parent="AcceptDialog"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 461.0
+margin_bottom = 614.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ColorPicker" type="ColorPicker" parent="AcceptDialog/PanelContainer"]
+margin_left = 21.0
+margin_top = 21.0
+margin_right = 464.0
+margin_bottom = 617.0
+color = Color( 0, 0, 0, 1 )

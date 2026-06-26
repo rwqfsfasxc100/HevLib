@@ -1,0 +1,66 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://HevLib/development_tools/property_editor/property_editor.gd" type="Script" id=1]
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=3]
+
+[sub_resource type="StreamTexture" id=2]
+flags = 4
+load_path = "res://HevLib/development_tools/property_editor/icons/edit.stex"
+
+[sub_resource type="StreamTexture" id=1]
+flags = 4
+load_path = "res://HevLib/ui/themes/icons/reset.stex"
+
+[node name="property_editor" type="VBoxContainer"]
+size_flags_horizontal = 3
+theme = ExtResource( 3 )
+script = ExtResource( 1 )
+
+[node name="box_alignment" type="HBoxContainer" parent="."]
+margin_right = 80.0
+margin_bottom = 42.0
+size_flags_horizontal = 3
+
+[node name="property" type="VBoxContainer" parent="box_alignment"]
+margin_bottom = 42.0
+size_flags_horizontal = 3
+
+[node name="EDIT" type="Button" parent="box_alignment"]
+margin_left = 4.0
+margin_right = 40.0
+margin_bottom = 42.0
+rect_min_size = Vector2( 36, 0 )
+hint_tooltip = "Change property type"
+icon = SubResource( 2 )
+flat = true
+expand_icon = true
+
+[node name="RESET" type="Button" parent="box_alignment"]
+margin_left = 44.0
+margin_right = 80.0
+margin_bottom = 42.0
+rect_min_size = Vector2( 36, 0 )
+hint_tooltip = "Reset to property default"
+icon = SubResource( 1 )
+flat = true
+expand_icon = true
+
+[node name="TypeSelect" type="ConfirmationDialog" parent="."]
+margin_top = 40.0
+margin_right = 450.0
+margin_bottom = 152.0
+rect_min_size = Vector2( 450, 70 )
+
+[node name="PanelContainer" type="PanelContainer" parent="TypeSelect"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 442.0
+margin_bottom = 54.0
+
+[node name="OptionButton" type="OptionButton" parent="TypeSelect/PanelContainer"]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 429.0
+margin_bottom = 47.0
+size_flags_horizontal = 3
+size_flags_vertical = 3

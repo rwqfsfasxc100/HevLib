@@ -1,0 +1,314 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://modules/ADD_EQUIPMENT_ITEMS/ItemTab.gd" type="Script" id=1]
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=2]
+[ext_resource path="res://property_editor/property_editor.tscn" type="PackedScene" id=3]
+[ext_resource path="res://DescriptionLabel.tscn" type="PackedScene" id=4]
+
+[node name="ADD_EQUIPMENT_ITEMS" type="Tabs"]
+margin_right = 1260.0
+margin_bottom = 644.0
+theme = ExtResource( 2 )
+script = ExtResource( 1 )
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+margin_right = 1260.0
+margin_bottom = 644.0
+size_flags_horizontal = 3
+
+[node name="Selector" type="VBoxContainer" parent="HBoxContainer"]
+margin_right = 275.0
+margin_bottom = 644.0
+rect_min_size = Vector2( 275, 0 )
+
+[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer"]
+margin_left = 279.0
+margin_right = 1260.0
+margin_bottom = 644.0
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/ScrollContainer"]
+margin_right = 981.0
+margin_bottom = 644.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="system_slot" type="HBoxContainer" parent="HBoxContainer/ScrollContainer/VBoxContainer"]
+margin_right = 981.0
+margin_bottom = 36.0
+size_flags_horizontal = 3
+
+[node name="DescriptionLabel" parent="HBoxContainer/ScrollContainer/VBoxContainer/system_slot" instance=ExtResource( 4 )]
+margin_right = 488.0
+margin_bottom = 36.0
+text = "system_slot"
+
+[node name="property_editor" parent="HBoxContainer/ScrollContainer/VBoxContainer/system_slot" instance=ExtResource( 3 )]
+margin_left = 492.0
+margin_right = 981.0
+margin_bottom = 36.0
+can_edit_type = false
+property_type = "string"
+
+[node name="slot_node_name" type="HBoxContainer" parent="HBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 40.0
+margin_right = 981.0
+margin_bottom = 76.0
+
+[node name="DescriptionLabel" parent="HBoxContainer/ScrollContainer/VBoxContainer/slot_node_name" instance=ExtResource( 4 )]
+margin_right = 488.0
+margin_bottom = 36.0
+text = "system_slot2"
+
+[node name="property_editor" parent="HBoxContainer/ScrollContainer/VBoxContainer/slot_node_name" instance=ExtResource( 3 )]
+margin_left = 492.0
+margin_right = 981.0
+margin_bottom = 36.0
+can_edit_type = false
+property_type = "string"
+defaults_for_type = {
+"Array": [  ],
+"Color": Color( 0, 0, 0, 1 ),
+"Dictionary": {
+},
+"PoolByteArray": PoolByteArray(  ),
+"PoolColorArray": PoolColorArray(  ),
+"PoolIntArray": PoolIntArray(  ),
+"PoolRealArray": PoolRealArray(  ),
+"PoolStringArray": PoolStringArray(  ),
+"PoolVector2Array": PoolVector2Array(  ),
+"PoolVector3Array": PoolVector3Array(  ),
+"Rect2": Rect2( 0, 0, 0, 0 ),
+"Transform2D": Transform2D( 1, 0, 0, 1, 0, 0 ),
+"Vector2": Vector2( 0, 0 ),
+"Vector3": Vector3( 0, 0, 0 ),
+"bool": false,
+"float": 0.0,
+"int": 0,
+"null": null,
+"string": "MISSING_SLOT_NAME"
+}
+
+[node name="slot_display_name" type="HBoxContainer" parent="HBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 80.0
+margin_right = 981.0
+margin_bottom = 116.0
+
+[node name="DescriptionLabel" parent="HBoxContainer/ScrollContainer/VBoxContainer/slot_display_name" instance=ExtResource( 4 )]
+margin_right = 488.0
+margin_bottom = 36.0
+text = "slot_node_name2"
+
+[node name="property_editor" parent="HBoxContainer/ScrollContainer/VBoxContainer/slot_display_name" instance=ExtResource( 3 )]
+margin_left = 492.0
+margin_right = 981.0
+margin_bottom = 36.0
+can_edit_type = false
+property_type = "string"
+defaults_for_type = {
+"Array": [  ],
+"Color": Color( 0, 0, 0, 1 ),
+"Dictionary": {
+},
+"PoolByteArray": PoolByteArray(  ),
+"PoolColorArray": PoolColorArray(  ),
+"PoolIntArray": PoolIntArray(  ),
+"PoolRealArray": PoolRealArray(  ),
+"PoolStringArray": PoolStringArray(  ),
+"PoolVector2Array": PoolVector2Array(  ),
+"PoolVector3Array": PoolVector3Array(  ),
+"Rect2": Rect2( 0, 0, 0, 0 ),
+"Transform2D": Transform2D( 1, 0, 0, 1, 0, 0 ),
+"Vector2": Vector2( 0, 0 ),
+"Vector3": Vector3( 0, 0, 0 ),
+"bool": false,
+"float": 0.0,
+"int": 0,
+"null": null,
+"string": "SLOT_MISSING_DATA"
+}
+
+[node name="has_none" type="HBoxContainer" parent="HBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 120.0
+margin_right = 981.0
+margin_bottom = 156.0
+
+[node name="DescriptionLabel" parent="HBoxContainer/ScrollContainer/VBoxContainer/has_none" instance=ExtResource( 4 )]
+margin_right = 488.0
+margin_bottom = 36.0
+text = "slot_display_name2"
+
+[node name="property_editor" parent="HBoxContainer/ScrollContainer/VBoxContainer/has_none" instance=ExtResource( 3 )]
+margin_left = 492.0
+margin_right = 981.0
+margin_bottom = 36.0
+can_edit_type = false
+property_type = "bool"
+defaults_for_type = {
+"Array": [  ],
+"Color": Color( 0, 0, 0, 1 ),
+"Dictionary": {
+},
+"PoolByteArray": PoolByteArray(  ),
+"PoolColorArray": PoolColorArray(  ),
+"PoolIntArray": PoolIntArray(  ),
+"PoolRealArray": PoolRealArray(  ),
+"PoolStringArray": PoolStringArray(  ),
+"PoolVector2Array": PoolVector2Array(  ),
+"PoolVector3Array": PoolVector3Array(  ),
+"Rect2": Rect2( 0, 0, 0, 0 ),
+"Transform2D": Transform2D( 1, 0, 0, 1, 0, 0 ),
+"Vector2": Vector2( 0, 0 ),
+"Vector3": Vector3( 0, 0, 0 ),
+"bool": true,
+"float": 0.0,
+"int": 0,
+"null": null,
+"string": ""
+}
+
+[node name="always_display" type="HBoxContainer" parent="HBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 160.0
+margin_right = 981.0
+margin_bottom = 196.0
+
+[node name="DescriptionLabel" parent="HBoxContainer/ScrollContainer/VBoxContainer/always_display" instance=ExtResource( 4 )]
+margin_right = 488.0
+margin_bottom = 36.0
+text = "has_none2"
+
+[node name="property_editor" parent="HBoxContainer/ScrollContainer/VBoxContainer/always_display" instance=ExtResource( 3 )]
+margin_left = 492.0
+margin_right = 981.0
+margin_bottom = 36.0
+can_edit_type = false
+property_type = "bool"
+defaults_for_type = {
+"Array": [  ],
+"Color": Color( 0, 0, 0, 1 ),
+"Dictionary": {
+},
+"PoolByteArray": PoolByteArray(  ),
+"PoolColorArray": PoolColorArray(  ),
+"PoolIntArray": PoolIntArray(  ),
+"PoolRealArray": PoolRealArray(  ),
+"PoolStringArray": PoolStringArray(  ),
+"PoolVector2Array": PoolVector2Array(  ),
+"PoolVector3Array": PoolVector3Array(  ),
+"Rect2": Rect2( 0, 0, 0, 0 ),
+"Transform2D": Transform2D( 1, 0, 0, 1, 0, 0 ),
+"Vector2": Vector2( 0, 0 ),
+"Vector3": Vector3( 0, 0, 0 ),
+"bool": true,
+"float": 0.0,
+"int": 0,
+"null": null,
+"string": ""
+}
+
+[node name="restrict_type" type="HBoxContainer" parent="HBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 200.0
+margin_right = 981.0
+margin_bottom = 236.0
+
+[node name="DescriptionLabel" parent="HBoxContainer/ScrollContainer/VBoxContainer/restrict_type" instance=ExtResource( 4 )]
+margin_right = 488.0
+margin_bottom = 36.0
+text = "always_display2"
+
+[node name="property_editor" parent="HBoxContainer/ScrollContainer/VBoxContainer/restrict_type" instance=ExtResource( 3 )]
+margin_left = 492.0
+margin_right = 981.0
+margin_bottom = 36.0
+can_edit_type = false
+property_type = "string"
+
+[node name="open_by_default" type="HBoxContainer" parent="HBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 240.0
+margin_right = 981.0
+margin_bottom = 276.0
+
+[node name="DescriptionLabel" parent="HBoxContainer/ScrollContainer/VBoxContainer/open_by_default" instance=ExtResource( 4 )]
+margin_right = 488.0
+margin_bottom = 36.0
+text = "restrict_type2"
+
+[node name="property_editor" parent="HBoxContainer/ScrollContainer/VBoxContainer/open_by_default" instance=ExtResource( 3 )]
+margin_left = 492.0
+margin_right = 981.0
+margin_bottom = 36.0
+can_edit_type = false
+property_type = "bool"
+
+[node name="limit_ships" type="HBoxContainer" parent="HBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 280.0
+margin_right = 981.0
+margin_bottom = 316.0
+
+[node name="DescriptionLabel" parent="HBoxContainer/ScrollContainer/VBoxContainer/limit_ships" instance=ExtResource( 4 )]
+margin_right = 488.0
+margin_bottom = 36.0
+text = "open_by_default2"
+
+[node name="property_editor" parent="HBoxContainer/ScrollContainer/VBoxContainer/limit_ships" instance=ExtResource( 3 )]
+margin_left = 492.0
+margin_right = 981.0
+margin_bottom = 36.0
+can_edit_type = false
+property_type = "PoolStringArray"
+
+[node name="prevent_ships" type="HBoxContainer" parent="HBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 320.0
+margin_right = 981.0
+margin_bottom = 356.0
+
+[node name="DescriptionLabel" parent="HBoxContainer/ScrollContainer/VBoxContainer/prevent_ships" instance=ExtResource( 4 )]
+margin_right = 488.0
+margin_bottom = 36.0
+text = "limit_ships2"
+
+[node name="property_editor" parent="HBoxContainer/ScrollContainer/VBoxContainer/prevent_ships" instance=ExtResource( 3 )]
+margin_left = 492.0
+margin_right = 981.0
+margin_bottom = 36.0
+can_edit_type = false
+property_type = "PoolStringArray"
+
+[node name="add_vanilla_equipment" type="HBoxContainer" parent="HBoxContainer/ScrollContainer/VBoxContainer"]
+margin_top = 360.0
+margin_right = 981.0
+margin_bottom = 396.0
+
+[node name="DescriptionLabel" parent="HBoxContainer/ScrollContainer/VBoxContainer/add_vanilla_equipment" instance=ExtResource( 4 )]
+margin_right = 488.0
+margin_bottom = 36.0
+text = "prevent_ships2"
+
+[node name="property_editor" parent="HBoxContainer/ScrollContainer/VBoxContainer/add_vanilla_equipment" instance=ExtResource( 3 )]
+margin_left = 492.0
+margin_right = 981.0
+margin_bottom = 36.0
+can_edit_type = false
+property_type = "bool"
+defaults_for_type = {
+"Array": [  ],
+"Color": Color( 0, 0, 0, 1 ),
+"Dictionary": {
+},
+"PoolByteArray": PoolByteArray(  ),
+"PoolColorArray": PoolColorArray(  ),
+"PoolIntArray": PoolIntArray(  ),
+"PoolRealArray": PoolRealArray(  ),
+"PoolStringArray": PoolStringArray(  ),
+"PoolVector2Array": PoolVector2Array(  ),
+"PoolVector3Array": PoolVector3Array(  ),
+"Rect2": Rect2( 0, 0, 0, 0 ),
+"Transform2D": Transform2D( 1, 0, 0, 1, 0, 0 ),
+"Vector2": Vector2( 0, 0 ),
+"Vector3": Vector3( 0, 0, 0 ),
+"bool": true,
+"float": 0.0,
+"int": 0,
+"null": null,
+"string": ""
+}

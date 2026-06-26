@@ -1,0 +1,98 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://modules/manifests/inputboxes/ConfigBoxes.gd" type="Script" id=1]
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=2]
+
+[sub_resource type="StreamTexture" id=1]
+flags = 4
+load_path = "res://HevLib/ui/themes/icons/dropdown_arrow.stex"
+
+[node name="ConfigBoxes" type="VBoxContainer"]
+margin_right = 1014.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+theme = ExtResource( 2 )
+script = ExtResource( 1 )
+property_display_name = "Configs"
+property_description = "Any configuration options that would be loaded on boot and exposed
+to ModMenu2's configuration menu for the mod"
+section_name = "configs"
+
+[node name="Box" type="HBoxContainer" parent="."]
+margin_right = 1014.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+
+[node name="TOOLTIP" type="Button" parent="Box"]
+margin_right = 483.0
+margin_bottom = 40.0
+hint_tooltip = "
+
+"
+size_flags_horizontal = 3
+flat = true
+
+[node name="Label" type="Label" parent="Box/TOOLTIP"]
+margin_left = 16.0
+margin_top = 13.0
+margin_right = 491.0
+margin_bottom = 27.0
+size_flags_horizontal = 3
+clip_text = true
+
+[node name="Button" type="Button" parent="Box"]
+margin_left = 487.0
+margin_right = 970.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+text = "Config sections: 0"
+
+[node name="TextureRect" type="TextureRect" parent="Box"]
+margin_left = 974.0
+margin_right = 1014.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 0, 40 )
+rect_pivot_offset = Vector2( 20, 20 )
+texture = SubResource( 1 )
+
+[node name="AddDiag" type="ConfirmationDialog" parent="Box"]
+margin_left = 598.0
+margin_right = 1014.0
+margin_bottom = 125.0
+rect_min_size = Vector2( 400, 100 )
+popup_exclusive = true
+window_title = "Add item"
+resizable = true
+dialog_hide_on_ok = false
+dialog_autowrap = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Box/AddDiag"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 408.0
+margin_bottom = 73.0
+rect_min_size = Vector2( 400, 65 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="LineEdit" type="LineEdit" parent="Box/AddDiag/VBoxContainer"]
+margin_right = 400.0
+margin_bottom = 65.0
+rect_min_size = Vector2( 390, 65 )
+placeholder_text = "Config section name"
+caret_blink = true
+caret_blink_speed = 0.5
+
+[node name="List" type="VBoxContainer" parent="."]
+visible = false
+margin_top = 44.0
+margin_right = 1014.0
+margin_bottom = 80.0
+size_flags_horizontal = 3
+
+[node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
+margin_left = 157.0
+margin_right = 357.0
+margin_bottom = 98.0
+window_title = ""
+dialog_text = "Delete section?"
