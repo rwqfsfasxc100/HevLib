@@ -14,7 +14,7 @@ func _ready():
 	var value = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	if value == null:
 		Tool.remove(self)
-	$Label.text = CONFIG_DATA.get("name","BOOL_MISSING_NAME")
+	$Label.text = CONFIG_DATA.get("name","INPUT_MISSING_NAME")
 	$Label/LABELBUTTON.hint_tooltip = CONFIG_DATA.get("description","")
 	var ab = CONFIG_DATA.get("always_binds",[])
 	if ab.size() > 0:

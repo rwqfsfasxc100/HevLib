@@ -23,7 +23,7 @@ func _ready():
 	var value = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	if value == null:
 		Tool.remove(self)
-	label.text = CONFIG_DATA.get("name","BOOL_MISSING_NAME")
+	label.text = CONFIG_DATA.get("name","INTFLOAT_MISSING_NAME")
 	
 	style = CONFIG_DATA.get("style","slider")
 	var minimum = float(CONFIG_DATA.get("min",0.0))

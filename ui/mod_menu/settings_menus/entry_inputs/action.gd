@@ -12,7 +12,7 @@ onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 var script_path = ""
 
 func _ready():
-	$Label.text = CONFIG_DATA.get("name","BOOL_MISSING_NAME")
+	$Label.text = CONFIG_DATA.get("name","ACTION_MISSING_NAME")
 	$Label/LABELBUTTON.hint_tooltip = CONFIG_DATA.get("description","")
 	script_path = CONFIG_DATA.get("script_path","")
 	$ActionNode.set_script(load(script_path))
