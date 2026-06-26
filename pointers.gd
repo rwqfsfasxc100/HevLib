@@ -1201,7 +1201,6 @@ class _ConfigDriver:
 	func __config_store(dict : Dictionary,filepath:String):
 		var cfg:ConfigFile = ConfigFile.new()
 		for section in dict:
-			var data : Dictionary = {}
 			var keys = dict[section]
 			for key in keys:
 				cfg.set_value(section,key,keys[key])
