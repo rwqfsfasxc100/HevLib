@@ -44,7 +44,7 @@ func recheck_availability():
 	var val = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	
 	$OptionButton.selected = find_int(val)
-	var def = find_int(CONFIG_DATA.get("default",false))
+	var def = find_int(CONFIG_DATA.get("default",find_int(0)))
 	
 	if $OptionButton.selected != def:
 		$reset.visible = true
