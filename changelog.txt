@@ -1,3 +1,15 @@
+[1.14.7]
+
+1=* Fixed Array2Vector2Array conversions returning a blank array if a vector was along an axis
+2=* Added Godot Editor theme and DroidSans font files (no dynamic font support within the library currently)
+3=* Unified setting name fallback to specify the type properly for inputs, actions, ints, and floats
+4=* Fixed crash caused by no default being specified for the option button
+5=* Added support for PNG icons for link button icon paths
+6=* Improved config checks for equipment items and groups to now require boolean configs
+7=* Heavily reduced memory footprint of the equipment sorting manager
+8=* Added property editor tool from the DV Tools application, which allows for manual property setting without custom UI
+9=* Added SpinBoxNoScroll script to the development tools folder, which remove the ability to scroll to change values on spinboxes
+
 [1.14.6]
 
 1=* Added missing translation strings for changelog spacing
