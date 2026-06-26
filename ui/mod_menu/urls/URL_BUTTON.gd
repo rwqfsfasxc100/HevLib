@@ -7,8 +7,14 @@ var icon_path = "res://HevLib/ui/themes/icons/alias.stex"
 
 func _ready():
 	$Button/Label.text = text
-	var tex = StreamTexture.new()
-	tex.load_path = icon_path
+	var tex
+	var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+	match icon_path.get_extension():
+		"stex":
+			tex = StreamTexture.new()
+			tex.load_path = icon_path
+		"png":
+			tex = pointers.DataFormat.__load_png(icon_path)
 	$Control/TextureRect.texture = tex
 	$Button.hint_tooltip = tooltip
 #	breakpoint
