@@ -96,9 +96,7 @@ func hl_add_nodes_make_node_mods():
 			if not recurse_to_variants:
 				var sh = processed_ship_register.get(shipName,{"node_definitions":{}})
 				var def = sh["node_definitions"]
-				if object in def:
-					pass
-				else:
+				if not object in def:
 					continue
 		
 		var ignorance = node_data["ships_to_ignore"]
@@ -123,9 +121,7 @@ func hl_add_nodes_make_node_mods():
 					dv.merge({"property":p})
 					properties.append(dv)
 		for p in obj_data.get("position_data",{}):
-			if p in position_data:
-				pass
-			else:
+			if not p in position_data:
 				position_data.merge({p:obj_data["position_data"][p]})
 		var node_prop = node_data.get("properties",{})
 		match typeof(node_prop):
@@ -137,9 +133,7 @@ func hl_add_nodes_make_node_mods():
 					dv.merge({"property":p})
 					properties.append(dv)
 		for p in node_data.get("position_data",{}):
-			if p in position_data:
-				pass
-			else:
+			if not p in position_data:
 				position_data.merge({p:node_data["position_data"][p]})
 		
 		var nodeset = node_data["node"]

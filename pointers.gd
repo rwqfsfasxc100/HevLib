@@ -1519,14 +1519,16 @@ class _DataFormat:
 			return PoolVector2Array([])
 		var index:int = 0
 		while index < size:
-			var a:float = float(array[index])
-			var b:float = float(array[index + 1])
-			if not a:
-				Debug.l("Cannot convert type %s for PoolVector2Array" % array[index])
+			var aRaw = array[index]
+			var bRaw = array[index + 1]
+			if not (aRaw is float or aRaw is int or aRaw is String):
+				Debug.l("Cannot convert type %s for PoolVector2Array" % aRaw)
 				return PoolVector2Array([])
-			if not b:
-				Debug.l("Cannot convert type %s for PoolVector2Array" % array[index + 1])
+			if not (bRaw is float or bRaw is int or bRaw is String):
+				Debug.l("Cannot convert type %s for PoolVector2Array" % bRaw)
 				return PoolVector2Array([])
+			var a:float = float(aRaw)
+			var b:float = float(bRaw)
 			var pooling:Vector2 = Vector2(a,b)
 			converted.append(pooling)
 			index += 2
