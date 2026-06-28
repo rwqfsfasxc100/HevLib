@@ -1,3 +1,14 @@
+[1.14.8]
+
+1=* All configs can now have a `disabled` property, which disables the specific config entry from being parsed
+2=* Parsed configs now no longer keep empty sections or an empty config
+3=* Added ManifestV2.__get_disabled_modlets()
+3.1=* This returns a dictionary of all disabled modlets in the mods folder
+3.2=* Each entry is of the modlet's file path and it's respective mod ID
+3.3=* Does not store whether it's being re-enabled, and only if the current instance did not load in the current game instance.
+4=* Fixed github downloader list allowing disabled modlets to be displayed in the list, despite technically already being installed
+5=* HevLib's disabled Keymapping configs now use the disabled tag instead of being commented out, preventing potential issues with future tools
+
 [1.14.7]
 
 1=* Fixed Array2Vector2Array conversions returning a blank array if a vector was along an axis
