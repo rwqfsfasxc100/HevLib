@@ -765,6 +765,11 @@ class _ConfigDriver:
 		var f : Dictionary = pointers.ManifestV2.__get_mod_data()
 		var mod_entries : Dictionary = f["mods"]
 		Debug.l("ConfigDriver: [%s] mod entries found" % mod_entries.size())
+		var disabled_modlets:Dictionary = pointers.ManifestV2.__get_disabled_modlets()
+		var DMIDs:PoolStringArray = PoolStringArray()
+		for i in disabled_modlets:
+			DMIDs.append(disabled_modlets[i])
+		Debug.l("ConfigDriver: [%s] disabled modlets found: [%s]" % [disabled_modlets.size(),",".join(DMIDs)])
 		var configs : Dictionary = {}
 		var current_config : Dictionary = __config_parse(cfg_file)
 		for mod in mod_entries:
@@ -6745,7 +6750,18 @@ class _ManifestV2:
 									pointers.DataFormat.__reload_scene(path)
 		return scenes_to_reload
 	
+	var disabledModletCache:Dictionary = {}
 	
+	func __get_disabled_modlets() -> Dictionary:
+		if not disabledModletCache:
+			var disabled:Dictionary = {}
+			var all_modlets:Dictionary = __get_all_modlets(false)
+			for modlet in all_modlets:
+				if not all_modlets[modlet] and pointers.DataFormat.__file_exists(modlet):
+					var mv:Dictionary = __parse_file_as_manifest(modlet)
+					disabled.merge({modlet:mv.get("mod_information",{}).get("id","%s_MISSING_ID" % modlet)})
+			disabledModletCache = disabled
+		return disabledModletCache.duplicate(true)
 	
 	
 
