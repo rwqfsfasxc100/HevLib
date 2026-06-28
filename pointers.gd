@@ -773,7 +773,7 @@ class _ConfigDriver:
 			if has_manifest:
 				var mod_name : String  = mod_entries[mod]["name"]
 				var manifest_version : float = float(manifest["manifest_version"])
-				if manifest_version >= 2.1:
+				if manifest_version > 2.0:
 					var cfg : Dictionary = manifest["manifest_data"]["configs"]
 					if not hash(cfg) == hash({}):
 						configs.merge({mod_name:cfg})
@@ -6089,7 +6089,18 @@ class _ManifestV2:
 							
 						if "configs" in manifest_data:
 							var configs = manifest_data["configs"]
-							dict_template["configs"].merge(configs)
+							var ovConfigs = {}
+							for section in configs:
+								var sec_data = configs[section]
+								for cfname in sec_data:
+									var cfdata = sec_data[cfname]
+									if not cfdata.get("disabled",false):
+										if not section in ovConfigs:
+											ovConfigs[section] = {}
+										ovConfigs[section][cfname] = cfdata
+							if ovConfigs:
+								Debug.l("Parsed configs for %s, has disabled configs: [%s]" % [file_path,str(hash(configs) != hash(ovConfigs))])
+								dict_template["configs"].merge(ovConfigs)
 						
 						
 				var version_metadata : String = dict_template["version"]["version_metadata"]
