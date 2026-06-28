@@ -6104,7 +6104,7 @@ class _ManifestV2:
 											ovConfigs[section] = {}
 										ovConfigs[section][cfname] = cfdata
 							if ovConfigs:
-								Debug.l("Parsed configs for %s, has disabled configs: [%s]" % [file_path,str(hash(configs) != hash(ovConfigs))])
+								Debug.l("ManifestV2: Parsed configs for %s, has disabled configs: [%s]" % [file_path,str(hash(configs) != hash(ovConfigs))])
 								dict_template["configs"].merge(ovConfigs)
 						
 						

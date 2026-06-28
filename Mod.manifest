@@ -94,22 +94,24 @@ HEVLIB_CONFIG_SECTION_EVENTS={
 		"default":true
 	},
 }
-;HEVLIB_CONFIG_SECTION_KEYMAPPING={
-;	"input_virtualization":{
-;		"name":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION",
-;		"description":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_TOOLTIP",
-;		"type":"bool",
-;		"require_restart":true,
-;		"default":true
-;	},
-;	"input_virtualization_ignore_builtin":{
-;		"name":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_OVERRIDE_BUILTIN",
-;		"description":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_OVERRIDE_BUILTIN_TOOLTIP",
-;		"type":"bool",
-;		"require_restart":true,
-;		"default":false
-;	},
-;}
+HEVLIB_CONFIG_SECTION_KEYMAPPING={
+	"input_virtualization":{
+		"name":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION",
+		"description":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_TOOLTIP",
+		"type":"bool",
+		"require_restart":true,
+		"default":true,
+		"disabled":true,
+	},
+	"input_virtualization_ignore_builtin":{
+		"name":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_OVERRIDE_BUILTIN",
+		"description":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_OVERRIDE_BUILTIN_TOOLTIP",
+		"type":"bool",
+		"require_restart":true,
+		"default":false,
+		"disabled":true,
+	},
+}
 HEVLIB_CONFIG_SECTION_DRIVERS={
 	"show_hidden_libraries":{
 		"name":"HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES",
