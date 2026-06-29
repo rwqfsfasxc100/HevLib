@@ -26,6 +26,7 @@ func _ready():
 	# WebTranslate.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]], "res://HevLib/webtranslate/ModMain.gd")
 	
 #	loadTranslationsFromCache()
+	yield(Debug.get_tree(),"idle_frame")
 	Debug.l("Device Information: [\n%s\n]" % get_device_info())
 
 var cache_extension = ".file_check_cache"
