@@ -1,3 +1,13 @@
+[1.14.9]
+
+1=* Removed a very large portion of old script files that got migrated to the pointer node.
+1.1=* All pointers in the res://HevLib/pointers/ directory now create a new pointers node for every call to these functions, which unfortunately does mean they use a decent amount of additional memory.
+1.2=* Scripts previously used for the pointer scripts have now been deleted, clearing out a lot of clutter in the filesystem.
+1.3=* Due to the fact that the pointer files still see use in a handful of mods, they will be kept until no longer needed.
+2=* Removed res://HevLib/Functions.gd
+2.1=* This is a very old set of code and got superceded by the pointer system. All methods still using it for whatever reason have been migrated to pointers.
+2.2=* This file was originally kept for backwards-compatibility, however the only mod using it has been unavailable to download for nearly a year.
+
 [1.14.8]
 
 1=* All configs can now have a `disabled` property, which disables the specific config entry from being parsed
