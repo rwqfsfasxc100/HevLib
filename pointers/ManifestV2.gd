@@ -120,99 +120,51 @@ var developer_hint = {
 	]
 }
 
-const FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
-const FileAccess = preload("res://HevLib/pointers/FileAccess.gd")
-const DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
+const pointers = preload("res://HevLib/pointers.gd")
 
-const gmd = preload("res://HevLib/scripts/manifest_v2/get_mod_data.gd")
 static func __get_mod_data(print_json: bool = false) -> Dictionary:
-	var s = gmd.get_mod_data(print_json,FolderAccess,DataFormat)
-	return s
-const mmptz = preload("res://HevLib/scripts/manifest_v2/match_mod_path_to_zip.gd")
+	return pointers.new().ManifestV2.__get_mod_data(print_json)
 static func __match_mod_path_to_zip(mod_main_path:String) -> String:
-	var s = mmptz.match_mod_path_to_zip(mod_main_path)
-	return s
-const cv = preload("res://HevLib/scripts/manifest_v2/compare_versions.gd")
+	return pointers.new().ManifestV2.__match_mod_path_to_zip(mod_main_path)
 static func __compare_versions(checked_mod_data:Dictionary) -> bool:
-	var s = cv.compare_versions(checked_mod_data)
-	return s
-const gmdff = preload("res://HevLib/scripts/manifest_v2/get_mod_data_from_files.gd")
+	return pointers.new().ManifestV2.__compare_versions(checked_mod_data)
 static func __get_mod_data_from_files(script_path:String, format_to_manifest_version: bool = true) -> Dictionary: # NOT UPDATED YET
-	var s = gmdff.get_mod_data_from_files(script_path,format_to_manifest_version)
-	return s
-const pfam = preload("res://HevLib/scripts/manifest_v2/parse_file_as_manifest.gd")
+	return pointers.new().ManifestV2.__get_mod_data_from_files(script_path)
 static func __parse_file_as_manifest(file_path: String, format_to_manifest_version: bool = true) -> Dictionary:
-	var s = pfam.parse_file_as_manifest(file_path, format_to_manifest_version,FileAccess)
-	return s
-const gmbi = preload("res://HevLib/scripts/manifest_v2/get_mod_by_id.gd")
+	return pointers.new().ManifestV2.__parse_file_as_manifest(file_path,format_to_manifest_version)
 static func __get_mod_by_id(id: String, case_sensitive: bool = true) -> Dictionary:
-	var s = gmbi.get_mod_by_id(id, case_sensitive)
-	return s
-const gt = preload("res://HevLib/scripts/manifest_v2/get_tags.gd")
+	return pointers.new().ManifestV2.__get_mod_by_id(id,case_sensitive)
 static func __get_tags() -> Dictionary:
-	var s = gt.get_tags(FolderAccess,DataFormat)
-	return s
-const gmt = preload("res://HevLib/scripts/manifest_v2/get_mod_tags.gd")
+	return pointers.new().ManifestV2.__get_tags()
 static func __get_mod_tags(mod_id: String) -> Dictionary:
-	var s = gmt.get_mod_tags(mod_id,FolderAccess,DataFormat)
-	return s
-const gmft = preload("res://HevLib/scripts/manifest_v2/get_mods_from_tag.gd")
+	return pointers.new().ManifestV2.__get_mod_tags(mod_id)
 static func __get_mods_from_tag(tag_name: String) -> Array:
-	var s = gmft.get_mods_from_tag(tag_name)
-	return s
-const gmatft = preload("res://HevLib/scripts/manifest_v2/get_mods_and_tags_from_tag.gd")
+	return pointers.new().ManifestV2.__get_mods_from_tag(tag_name)
 static func __get_mods_and_tags_from_tag(tag_name: String) -> Dictionary:
-	var s = gmatft.get_mods_and_tags_from_tag(tag_name)
-	return s
-const gms = preload("res://HevLib/scripts/manifest_v2/get_manifest_section.gd")
+	return pointers.new().ManifestV2.__get_mods_and_tags_from_tag(tag_name)
 static func __get_manifest_section(section: String, mod_id: String = "") -> Dictionary:
-	var s = gms.get_manifest_section(section, mod_id)
-	return s
-const gmi = preload("res://HevLib/scripts/manifest_v2/get_mod_ids.gd")
+	return pointers.new().ManifestV2.__get_manifest_section(section,mod_id)
 static func __get_mod_ids() -> Array:
-	var s = gmi.get_mod_ids()
-	return s
-const gme = preload("res://HevLib/scripts/manifest_v2/get_manifest_entry.gd")
+	return pointers.new().ManifestV2.__get_mod_ids()
 static func __get_manifest_entry(section: String, entry: String, mod_id: String = ""):
-	var s = gme.get_manifest_entry(section, entry, mod_id)
-	return s
-const cc = preload("res://HevLib/scripts/manifest_v2/mod_checking/check_complementary.gd")
+	return pointers.new().ManifestV2.__get_manifest_entry(section,entry,mod_id)
 static func __check_complementary() -> Array:
-	var s = cc.check_complementary()
-	return s
-const cmc = preload("res://HevLib/scripts/manifest_v2/mod_checking/check_mod_complementary.gd")
+	return pointers.new().ManifestV2.__check_complementary()
 static func __check_mod_complementary(mod_id) -> Array:
-	var s = cmc.check_mod_complementary(mod_id)
-	return s
-const cd = preload("res://HevLib/scripts/manifest_v2/mod_checking/check_dependancies.gd")
+	return pointers.new().ManifestV2.__check_mod_complementary(mod_id)
 static func __check_dependancies() -> Array:
-	var s = cd.check_dependancies()
-	return s
-const cmd = preload("res://HevLib/scripts/manifest_v2/mod_checking/check_mod_dependancies.gd")
+	return pointers.new().ManifestV2.__check_dependancies()
 static func __check_mod_dependancies(mod_id) -> Array:
-	var s = cmd.check_mod_dependancies(mod_id)
-	return s
-const cco = preload("res://HevLib/scripts/manifest_v2/mod_checking/check_conflicts.gd")
+	return pointers.new().ManifestV2.__check_mod_dependancies(mod_id)
 static func __check_conflicts() -> Array:
-	var s = cco.check_conflicts()
-	return s
-const cmco = preload("res://HevLib/scripts/manifest_v2/mod_checking/check_mod_conflicts.gd")
+	return pointers.new().ManifestV2.__check_conflicts()
 static func __check_mod_conflicts(mod_id) -> Array:
-	var s = cmco.check_mod_conflicts(mod_id)
-	return s
-const pt = preload("res://HevLib/scripts/manifest_v2/parse_tags.gd")
+	return pointers.new().ManifestV2.__check_mod_conflicts(mod_id)
 static func __parse_tags(tag_data) -> Dictionary:
-	var s = pt.parse_tags(tag_data)
-	return s
-const hmu = preload("res://HevLib/scripts/manifest_v2/have_mods_updated.gd")
+	return pointers.new().ManifestV2.__parse_tags(tag_data)
 static func __have_mods_updated(folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",previous_file = "mods_from_last_launch.json"):
-	var s = hmu.have_mods_updated(folder,previous_file,FolderAccess)
-	return s
-const gmv = preload("res://HevLib/scripts/manifest_v2/get_mod_versions.gd")
+	return pointers.new().ManifestV2.__have_mods_updated(folder,previous_file)
 static func __get_mod_versions(store = false,folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",previous_file = "mods_from_last_launch.json",this_file = "mods_from_this_launch.json"):
-	var s = gmv.get_mod_versions(store,folder,previous_file,this_file,FolderAccess)
-	return s
-const pc = preload("res://HevLib/scripts/manifest_v2/parse_changelogs.gd")
+	return pointers.new().ManifestV2.__get_mod_versions(store,folder,previous_file,this_file)
 static func __parse_changelog(file_path):
-	var s = pc.parse_changelogs(file_path)
-	return s
+	return pointers.new().ManifestV2.__parse_changelogs(file_path)

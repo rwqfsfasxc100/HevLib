@@ -61,51 +61,29 @@ var developer_hint = {
 	]
 }
 
-const ats = preload("res://HevLib/globals/array_to_string.gd")
+const pointers = preload("res://HevLib/pointers.gd")
+
 static func __array_to_string(arr: Array) -> String:
-	var s = ats.array_to_string(arr)
-	return s
-const ffln = preload("res://HevLib/globals/format_for_large_numbers.gd")
+	return pointers.new().DataFormat.__array_to_string(arr)
 static func __format_for_large_numbers(num: int) -> String:
-	var s = ffln.format_for_large_numbers(num)
-	return s
-const cwba = preload("res://HevLib/scripts/compare_with_byte_array.gd")
+	return CurrentGame.formatThousands(num)
 static func __compare_with_byte_array(input_string: String, comparison_string: String) -> bool:
-	var s = cwba.compare_with_byte_array(input_string, comparison_string)
-	return s
-const rp = preload("res://HevLib/scripts/rotate_point.gd")
+	return input_string == comparison_string
 static func __rotate_point(point: Vector2, angle: float, degrees:bool = true) -> Vector2:
-	var s = rp.rotate_point(point, angle, degrees)
-	return s
-const gvv = preload("res://HevLib/scripts/get_vanilla_version.gd")
+	return pointers.new().DataFormat.__rotate_point(point,angle,degrees)
 static func __get_vanilla_version(get_from_files: bool = false) -> Array:
-	var s = gvv.get_vanilla_version(get_from_files)
-	return s
-const sd = preload("res://HevLib/scripts/sift_dictionary.gd")
+	return pointers.new().DataFormat.__get_vanilla_version()
 static func __sift_dictionary(dictionary: Dictionary,search_keys: Array) -> Array:
-	var s = sd.sift_dictionary(dictionary,search_keys)
-	return s
-const catv = preload("res://HevLib/scripts/convert_arr_to_vec2arr.gd")
+	return pointers.new().DataFormat.__sift_dictionary(dictionary,search_keys)
 static func __convert_arr_to_vec2arr(array: Array) -> PoolVector2Array:
-	var s = catv.convert_arr_to_vec2arr(array)
-	return s
-const cv = preload("res://HevLib/scripts/compare_versions.gd")
+	return pointers.new().DataFormat.__convert_arr_to_vec2arr(array)
 static func __compare_versions(primary_major : int,primary_minor : int,primary_bugfix : int, compare_major : int, compare_minor : int, compare_bugfix : int) -> bool:
-	var s = cv.compare_versions(primary_major ,primary_minor ,primary_bugfix , compare_major , compare_minor , compare_bugfix )
-	return s
-const ssc = preload("res://HevLib/scripts/sift_ship_config.gd")
+	return pointers.new().DataFormat.__compare_versions(primary_major,primary_minor,primary_bugfix,compare_major,compare_minor,compare_bugfix)
 static func __sift_ship_config(dictionary: Dictionary,search_keys: Array, cfgs_to_ignore:Array) -> Array:
-	var s = ssc.sift_ship_config(dictionary,search_keys,cfgs_to_ignore)
-	return s
-const gscmwl = preload("res://HevLib/scripts/get_script_constant_map_without_load.gd")
+	return pointers.new().DataFormat.__sift_ship_config(dictionary,search_keys,cfgs_to_ignore)
 static func __get_script_constant_map_without_load(script_path : String) -> Dictionary:
-	var s = gscmwl.get_script_constant_map_without_load(script_path,ts)
-	return s
-const ts = preload("res://HevLib/scripts/trim_scripts.gd")
+	return pointers.new().DataFormat.__get_script_constant_map_without_load(script_path)
 static func __trim_scripts(file_path: String) -> Array:
-	var s = ts.trim_scripts(file_path)
-	return s
-const gsvwl = preload("res://HevLib/scripts/get_script_variables_without_load.gd")
+	return pointers.new().DataFormat.__trim_scripts(file_path)
 static func __get_script_variables_without_load(script_path : String) -> Dictionary:
-	var s = gsvwl.get_script_variables_without_load(script_path,ts)
-	return s
+	return pointers.new().DataFormat.__get_script_variables_without_load(script_path)

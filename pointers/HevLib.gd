@@ -22,74 +22,18 @@ var developer_hint = {
 		"Optional 'return_JSON' boolean returns a JSON-formatted string instead of a dictionary"
 	]
 }
-const glv = preload("res://HevLib/globals/get_lib_variables.gd")
+
+const pointers = preload("res://HevLib/pointers.gd")
+
 static func __get_lib_variables() -> Object:
-	var f = glv.new()
-	var s = f.get_lib_variables()
-	return s
-const Globals = preload("res://HevLib/Functions.gd")
+	return pointers.new().HevLib.__get_lib_variables()
+
 static func __get_lib_pointers(return_as_full_path: bool = false) -> Array:
-	
-	var path = "res://HevLib/pointers/"
-	var files = Globals.__fetch_folder_files(path)
-	if return_as_full_path:
-		var compileArray = []
-		for f in files:
-			compileArray.append(path + f)
-		return compileArray
-	else:
-		return files
+	return pointers.new().HevLib.__get_lib_pointers(return_as_full_path)
 
 static func __get_pointer_functions(pointer: String, return_JSON: bool = false) -> Dictionary:
-	var path = "res://HevLib/pointers/"
-	var pSplit = pointer.split("/")
-	var actualPointer = path + pSplit[pSplit.size() - 1]
-	var pointerLoad = load(actualPointer).new()
-	var pFuncs = pointerLoad.get_method_list()
-	var methods = {}
-	for pFunc in pFuncs:
-		var pFuncName = pFunc.name
-		if pFuncName.begins_with("__"):
-			var data = pointerLoad.get_property_list()
-			var devHint = {}
-			for item in data:
-				if item.get("name") == "developer_hint":
-					devHint = pointerLoad.developer_hint
-			var desc = devHint.get(pFuncName, [TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_1"),TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_2")])
-			methods.merge({pFuncName:desc})
-	if return_JSON:
-		var psj = JSON.print(methods, "\t")
-		return psj
-	else:
-		return methods
+	return pointers.new().HevLib.__get_pointer_functions(pointer,return_JSON)
 
 
 static func __get_library_functionality(return_JSON: bool = false) -> Dictionary:
-	var Globals = preload("res://HevLib/pointers/FolderAccess.gd").new()
-	var path = "res://HevLib/pointers/"
-	var functions = {}
-	var files = Globals.__fetch_folder_files(path)
-	for pointer in files:
-		var pSplit = pointer.split("/")
-		var actualPointer = path + pSplit[pSplit.size() - 1]
-		var pl = load(actualPointer)
-		var pointerLoad = pl.new()
-		var pFuncs = pointerLoad.get_method_list()
-		var methods = {}
-		for pFunc in pFuncs:
-			var pFuncName = pFunc.name
-			if pFuncName.begins_with("__"):
-				var data = pointerLoad.get_property_list()
-				var devHint = {}
-				for item in data:
-					if item.get("name") == "developer_hint":
-						devHint = pointerLoad.developer_hint
-				var desc = devHint.get(pFuncName, [TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_1"),TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_2")])
-				methods.merge({pFuncName:desc})
-		var concat = {pointer:methods}
-		functions.merge(concat)
-	if return_JSON:
-		var psj = JSON.print(functions, "\t")
-		return psj
-	else:
-		return functions
+	return pointers.new().HevLib.__get_library_functionality(return_JSON)

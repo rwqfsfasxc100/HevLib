@@ -1,8 +1,5 @@
 extends Node
 
-var Globals = preload("res://HevLib/Functions.gd").new()
-
-
 var cacheExtension = ".hevlibucache"
 var slatedForUpdateCacheFolder = "user://cache/.HevLib_Cache/updatecache/current_mod_caches/"
 var githubDataCache = "user://cache/.HevLib_Cache/updatecache/github_cache/"
@@ -16,16 +13,18 @@ var childData = {}
 var dataDictionary = {}
 var updateMods = []
 
+var pointers = ModLoader._savedObjects[0]
+
 func handleZips():
 	
-	var zipList = Globals.__fetch_folder_files(zipStore)
+	var zipList = pointers.FolderAccess.__fetch_folder_files(zipStore)
 	for zip in zipList:
 		var dataStore
 		var zipCacheFilename = zip + cacheExtension
 		var zipCacheStore = zipCache + zip + "/"
-		Globals.__check_folder_exists(zipCacheStore)
-		var fetchedManifest = Globals.__fetch_file_from_zip(zipStore + zip, zipCacheStore, ["mod.manifest"])
-		var manifestData = Globals.__load_manifest_from_file(Globals.__array_to_string(fetchedManifest))["package"]
+		pointers.FolderAccess.__check_folder_exists(zipCacheStore)
+		var fetchedManifest = pointers.Zip.__fetch_file_from_zip(zipStore + zip, zipCacheStore, ["mod.manifest"])
+		var manifestData = pointers.ManifestV1.__load_manifest_from_file(pointers.DataFormat.__array_to_string(fetchedManifest))["package"]
 		dataStore = {
 			manifestData["id"]:
 				[manifestData["name"], manifestData["version"],zip]

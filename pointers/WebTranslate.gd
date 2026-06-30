@@ -27,18 +27,14 @@ var developer_hint = {
 		"file_check -> string used as the file check. If found in the cache, resets translations for it"
 	]
 }
-const wt = preload("res://HevLib/webtranslate/webtranslate.gd")
+
+const pointers = preload("res://HevLib/pointers.gd")
+
 static func __webtranslate(URL: String, fallback: Array = [], file_check: String = ""):
-	wt.webtranslate(URL, fallback, file_check)
-const wtrbu = preload("res://HevLib/webtranslate/webtranslate_reset.gd")
+	pointers.new().WebTranslate.__webtranslate(URL,fallback,file_check)
 static func __webtranslate_reset_by_URL(URL: String) -> bool:
-	var s = wtrbu.webtranslate_reset(URL)
-	return s
-const wtrbfc = preload("res://HevLib/webtranslate/webtranslate_reset_by_file_check.gd")
+	return pointers.new().WebTranslate.__webtranslate_reset(URL)
 static func __webtranslate_reset_by_file_check(file_check: String) -> bool:
-	var s = wtrbfc.webtranslate_reset_by_file_check(file_check)
-	return s
-const wtt = preload("res://HevLib/webtranslate/webtranslate_timed.gd")
+	return pointers.new().WebTranslate.__webtranslate_reset_by_file_check(file_check)
 static func __webtranslate_timed(URL: String, MINUTES_DELAY: int = 30, fallback: Array = [], file_check: String = ""):
-	var f = wtt.new()
-	var s = f.webtranslate_timed(URL, MINUTES_DELAY, fallback, file_check)
+	pointers.new().WebTranslate.__webtranslate_timed(URL,MINUTES_DELAY,fallback,file_check)

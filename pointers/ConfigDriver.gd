@@ -52,86 +52,23 @@ var developer_hint = {
 	]
 }
 
-const DataFormat = preload("res://HevLib/pointers/DataFormat.gd")
-const ManifestV2 = preload("res://HevLib/pointers/ManifestV2.gd")
-const FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
+const pointers = preload("res://HevLib/pointers.gd")
 
-const cfp = preload("res://HevLib/scripts/configs/config_parse.gd")
 static func __config_parse(file: String) -> Dictionary:
-	var s = cfp.config_parse(file)
-	return s
-const sc = preload("res://HevLib/scripts/configs/store_config.gd")
+	return pointers.new().ConfigDriver.__config_parse(file)
 static func __store_config(id: String, configuration: Dictionary, cfg_filename : String = config_name + ".cfg"):
-	sc.store_config(configuration,id,cfg_filename,DataFormat)
-const sv = preload("res://HevLib/scripts/configs/store_value.gd")
+	pointers.new().ConfigDriver.__store_config(configuration,id,cfg_filename)
 static func __store_value(id: String, section: String, key: String, value, cfg_filename : String = config_name + ".cfg"):
-	sv.store_value(id, section, key, value,cfg_filename)
-const gc = preload("res://HevLib/scripts/configs/get_config.gd")
+	pointers.new().ConfigDriver.__store_value(id,section,key,value,cfg_filename)
 static func __get_config(id: String, cfg_filename : String = config_name + ".cfg") -> Dictionary:
-	var s = gc.get_config(id,cfg_filename)
-	return s
-const gv = preload("res://HevLib/scripts/configs/get_value.gd")
+	return pointers.new().ConfigDriver.__get_config(id,cfg_filename)
 static func __get_value(id: String, section: String, key: String, cfg_filename : String = config_name + ".cfg"):
-	var s = gv.get_value(id, section, key, cfg_filename,DataFormat)
-	return s
-const lc = preload("res://HevLib/scripts/configs/load_configs.gd")
+	return pointers.new().ConfigDriver.__get_value(id,section,key,cfg_filename)
 static func __load_configs(cfg_filename : String = config_name + ".cfg"):
-	lc.load_configs(cfg_filename,ManifestV2,FolderAccess)
-const sbf = preload("res://HevLib/scripts/configs/set_button_focus.gd")
+	pointers.new().ConfigDriver.__load_configs(cfg_filename)
 static func set_button_focus(button,check_button):
-	sbf.set_button_focus(button,check_button)
+	pointers.new().ConfigDriver.set_button_focus(button,check_button)
 
 static func __load_inputs_from_string_array(key:String, strings: Array):
-	for i in strings:
-		if i.begins_with("Mouse "):
-			var event = InputEventMouseButton.new()
-			event.button_index = int(i.split("Mouse ")[1])
-			if not InputMap.action_has_event(key,event):
-				Debug.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
-				InputMap.action_add_event(key, event)
-			else:
-				Debug.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
-		if i.begins_with("JoyButton "):
-			var event = InputEventJoypadButton.new()
-			event.button_index = int(i.split("JoyButton ")[1])
-			if not InputMap.action_has_event(key,event):
-				Debug.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
-				InputMap.action_add_event(key, event)
-			else:
-				Debug.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
-		if i.begins_with("JoyAxis "):
-			var event = InputEventJoypadMotion.new()
-			event.axis = abs(int(i.split("JoyAxis ")[1]))
-			if i.split("JoyAxis ")[1].begins_with("-"):
-				event.axis_value = -1.0
-			else:
-				event.axis_value = 1.0
-			if not InputMap.action_has_event(key,event):
-				Debug.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
-				InputMap.action_add_event(key, event)
-			else:
-				Debug.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
-			
-		else:
-			var event = InputEventKey.new()
-			event.scancode = OS.find_scancode_from_string(i)
-			if not InputMap.action_has_event(key,event):
-				Debug.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
-				InputMap.action_add_event(key, event)
-			else:
-				Debug.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
+	pointers.new().ConfigDriver.__load_inputs_from_string_array(key,strings)
 
-
-#	Config types - this explains formatting for config types for manifests
-#	
-#	BOOL:
-#	{
-#	"name":"" - string used to provide a name for the entry
-#	"description":"" - string used to provide the description tooltip
-#	"type":"bool" - string used to define type, in this case a bool. can be bool or boolean, not case sensitive
-#	"default":true - bool used for default value. false if absent
-#	"requires_bools":[] - array of strings for bool settings used to enable this option. as long as there is one valid entry that's true, this option will be enabled. formatted like "Mod/section/entry" (e.g. HevLib/equipment/do_sort_equipment_by_price)
-#	"invert_bool_requirement":false - bool used to decide that this option will instead be enabled until there is one true setting in the array
-#	}
-#	
-#	

@@ -15,24 +15,16 @@ var developer_hint = {
 			"folder -> string for the path to the folder, can be global or local path"
 		]
 	}
-const gfc = preload("res://HevLib/globals/get_file_content.gd")
+
+const pointers = preload("res://HevLib/pointers.gd")
+
 static func __get_file_content(file: String) -> String:
-	var s = gfc.get_file_content(file)
-	return s
-const cfg = preload("res://HevLib/scripts/configs/config_parse.gd")
+	return pointers.new().FileAccess.__get_file_content(file)
 static func __config_parse(file: String) -> Dictionary:
-	var s = cfg.config_parse(file)
-	return s
+	return pointers.new().ConfigDriver.__config_parse(file)
 
 static func __copy_file(file, folder):
-	var prepfile = ProjectSettings.localize_path(file)
-#	var current_mods = FolderAccess.__fetch_folder_files(folder)
-	var fn = prepfile.split("/")[prepfile.split("/").size() - 1]
-	
-	var dir = Directory.new()
-	dir.copy(prepfile,folder + "/" + fn)
+	pointers.new().FileAccess.__copy_file(file,folder)
 
-const lp = preload("res://HevLib/scripts/load_png.gd")
 static func __load_png(path) -> Texture:
-	var s = lp.load_png(path)
-	return s
+	return pointers.new().FileAccess.__load_png(path)

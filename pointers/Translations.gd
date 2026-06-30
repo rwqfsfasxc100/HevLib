@@ -24,19 +24,13 @@ var developer_hint = {
 	]
 }
 
-const ConfigDriver = preload("res://HevLib/pointers/ConfigDriver.gd")
+const pointers = preload("res://HevLib/pointers.gd")
 
-const utl = preload("res://HevLib/scripts/translations/updateTL.gd")
 static func __updateTL(path:String, delim:String = ",", fullLogging:bool = true):
-	utl.updateTL(path, delim, fullLogging)
-const utlfd = preload("res://HevLib/scripts/translations/updateTL_from_dictionary.gd")
+	pointers.new().Translations.__updateTL(path,delim,fullLogging)
 static func __updateTL_from_dictionary(dictionary:Dictionary, fullLogging:bool = true):
-	utlfd.updateTL_from_dictionary(dictionary, fullLogging, ConfigDriver)
-const fato = preload("res://HevLib/scripts/translations/fetch_all_translation_objects.gd")
+	pointers.new().Translations.__updateTL_from_dictionary(dictionary,fullLogging)
 static func __fetch_all_translation_objects(number_of_objects_to_iterate_through: int = 100000) -> Array:
-	var s = fato.fetch_all_translation_objects(number_of_objects_to_iterate_through)
-	return s
-const tftd = preload("res://HevLib/scripts/translations/translation_file_to_dictionary.gd")
+	return pointers.new().Translations.__fetch_all_translation_objects(number_of_objects_to_iterate_through)
 static func __translation_file_to_dictionary(path: String, delimiter : String = "|") -> Dictionary:
-	var s = tftd.translation_file_to_dictionary(path,delimiter)
-	return s
+	return pointers.new().Translations.__translation_file_to_dictionary(path,delimiter)
