@@ -5,7 +5,7 @@
 1.2=* Scripts previously used for the pointer scripts have now been deleted, clearing out a lot of clutter in the filesystem.
 1.3=* Due to the fact that the pointer files still see use in a handful of mods, they will be kept until no longer needed.
 2=* Removed res://HevLib/Functions.gd
-2.1=* This is a very old set of code and got superceded by the pointer system. All methods still using it for whatever reason have been migrated to pointers.
+2.1=* This is a very old set of code and got superseded by the pointer system. All methods still using it for whatever reason have been migrated to pointers.
 2.2=* This file was originally kept for backwards-compatibility, however the only mod using it has been unavailable to download for nearly a year.
 
 [1.14.8]
