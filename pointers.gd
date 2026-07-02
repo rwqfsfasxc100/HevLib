@@ -2269,8 +2269,7 @@ class _Equipment:
 		var processed_storage_systems_file : String  = FILE_PATHS[23]
 		
 		version = pointers.DataFormat.__get_vanilla_version()
-		var text : String  = "HevLib make_upgrades_scene manager: observed game version of %s"  % str(version)
-		Debug.l(text)
+		pointers.l("observed game version of %s" % str(version),"pointers.Equipment")
 		var UpgradeMenu : Node = load("res://enceladus/Upgrades.tscn").instance()
 		var nodes_parent:Node = UpgradeMenu.get_node("VB/MarginContainer/ScrollContainer/MarginContainer/Items")
 		var vanilla_slot_names : Array = []
@@ -3496,7 +3495,7 @@ class _Equipment:
 		file.store_string(ship_limitation_string)
 		file.close()
 		
-		
+		pointers.storeLogCache()
 		UpgradeMenu.free()
 
 	var tagged_vanilla_slots : PoolStringArray = PoolStringArray()
@@ -4171,13 +4170,13 @@ class _Equipment:
 					if data[2] <= version[2]:
 						pass
 					else:
-						Debug.l(failtext)
+						pointers.l(failtext)
 						return false
 				else:
-					Debug.l(failtext)
+					pointers.l(failtext)
 					return false
 			else:
-				Debug.l(failtext)
+				pointers.l(failtext)
 				return false
 			
 		if e_slot_type == slot_type:
@@ -5612,7 +5611,9 @@ class _ManifestV2:
 				pointers.l("registering Modlet %s" % item,"pointers.ManifestV2")
 				modListArr.append(__concat_mod_info(item))
 			total_mod_count = modListArr.size()
-			print("solved [%s] modmain files" % total_mod_count,"pointers.ManifestV2")
+			var totalSTDOUT = "solved [%s] mod-definition files [%s ModMains / %s Modlets]" % [total_mod_count,modmain_files.size(),modlet_files.size()]
+			print(totalSTDOUT)
+			pointers.l(totalSTDOUT,"pointers.ManifestV2")
 			modListArr.sort_custom(self,"sortModList")
 			
 			for mod in modListArr:
@@ -6934,7 +6935,8 @@ class _NodeAccess:
 		
 		
 		if max_crew <= base:
-			Debug.l(log_header + "desired expansion to [%s] is less than or equal to the currently expanded number of [%s]" % [max_crew,base])
+			pointers.l(log_header + "desired expansion to [%s] is less than or equal to the currently expanded number of [%s]" % [max_crew,base],"pointers.NodeAccess")
+			pointers.storeLogCache()
 			return ""
 		else:
 			var header : String = static_line_1 + "\n\n" + static_line_3 + "\n" + static_line_4 + "\n\n" + static_line_6 + "\n\n"

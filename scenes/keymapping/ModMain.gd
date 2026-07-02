@@ -11,8 +11,11 @@ const MOD_IS_LIBRARY = true
 
 var file = File.new()
 var correct = file.file_exists("res://HevLib/pointers.gd")
+var pointers
 func _init(modLoader = ModLoader):
-	l("Initializing Keymapping & Variable nodes")
+	if correct:
+		Debug.l("Initializing Keymapping & Variable nodes")
+		pointers = modLoader._savedObjects[0]
 func _ready():
 	if correct:
 		l("Readying")
@@ -28,8 +31,10 @@ func _ready():
 		CRoot.call_deferred("add_child",keybind_interrupt)
 		
 		l("Ready")
+		pointers.storeLogCache()
 	else:
-		l("HevLib Keymapping onready process cannot be carried out")
+		Debug.l("HevLib Keymapping onready process cannot be carried out")
 
 func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
-	Debug.l("[%s V%s]: %s" % [title, version, msg])
+	var line = "[%s V%s]" % [title, version]
+	pointers.l(msg,line)

@@ -47,6 +47,15 @@ var pointers = null
 
 func _init(modLoader : ModLoader = ModLoader):
 	if correct:
+		pointers = load("res://HevLib/pointers.gd").new()
+		pointers.name = "HevLib~Pointers"
+		if modLoader._savedObjects:
+			var new_objects = [pointers]
+			for i in modLoader._savedObjects:
+				new_objects.append(i)
+			modLoader._savedObjects = new_objects
+		else:
+			modLoader._savedObjects.append(pointers)
 		l("Initializing Equipment Driver")
 		var variables_folder = "user://cache/.HevLib_Cache/Variable_Fetch/"
 		d.make_dir_recursive(variables_folder)
@@ -55,14 +64,6 @@ func _init(modLoader : ModLoader = ModLoader):
 		f.open(deviceinfocache,File.WRITE)
 		f.store_string("")
 		f.close()
-		pointers = load("res://HevLib/pointers.gd").new()
-		if modLoader._savedObjects:
-			var new_objects = [pointers]
-			for i in modLoader._savedObjects:
-				new_objects.append(i)
-			modLoader._savedObjects = new_objects
-		else:
-			modLoader._savedObjects.append(pointers)
 		pointers.equipment_modmain = self
 		pointers.FileAccess.__load_precached_mods()
 		
@@ -129,9 +130,9 @@ func _init(modLoader : ModLoader = ModLoader):
 		var for_reload = pointers.ManifestV2.__load_modlets(false)
 		for old_path in for_reload:
 			pointers.DataFormat.__reload_scene(old_path)
-		storeLogCache()
+		pointers.storeLogCache()
 	else:
-		l("Folder structure not correct, exiting HevLib load")
+		Debug.l("Folder structure not correct, exiting HevLib load")
 	
 func _ready():
 	if correct:
@@ -185,9 +186,9 @@ func _ready():
 		for old_path in for_reload:
 			pointers.DataFormat.__reload_scene(old_path)
 		l("Ready")
-		storeLogCache()
+		pointers.storeLogCache()
 	else:
-		l("HevLib Equipment Driver onready process cannot be carried out")
+		Debug.l("HevLib Equipment Driver onready process cannot be carried out")
 func installScriptExtension(path:String):
 	var childPath:String = str(modPath + path)
 	var childScript:Script = load(childPath)
@@ -237,25 +238,12 @@ func replaceSceneLiteral(newPath:String, oldPath:String):
 	l("Finished updating literal: %s" % oldPath)
 
 # Func to print messages to the logs
-var logCache = ""
 func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
-	var line = "[%s V%s]: %s" % [title, version, msg]
-	Debug.l(line)
-	logCache += line + "\n"
+	var line = "[%s V%s]" % [title, version]
+	pointers.l(msg,line)
 
 var deviceinfostore:String = "user://cache/.Mod_Menu_2_Cache/EssentialsLogCache/"
 var deviceinfocache:String = deviceinfostore + "DeviceInfoCache"
-
-func storeLogCache():
-	f.open(deviceinfocache,File.READ)
-	var ov = f.get_as_text(true)
-	f.close()
-	ov += logCache
-	f.open(deviceinfocache,File.WRITE)
-	f.store_string(ov)
-	f.close()
-	logCache = ""
-
 func match_mod_path_to_zip():
 	var zip_ref_store = "user://cache/.HevLib_Cache/zip_ref_store.json"
 	f.open(zip_ref_store,File.WRITE)

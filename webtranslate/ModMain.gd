@@ -14,10 +14,11 @@ const MOD_IS_LIBRARY = true
 
 var file = File.new()
 var correct = file.file_exists("res://HevLib/pointers.gd")
+var pointers
 func _init(modLoader = ModLoader):
 #	l("Initializing WebTranslate")
 	if correct:
-		pass
+		pointers = modLoader._savedObjects[0]
 var modPath:String = get_script().resource_path.get_base_dir() + "/"
 func _ready():
 #	l("Readying")
@@ -26,9 +27,10 @@ func _ready():
 	# WebTranslate.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]], "res://HevLib/webtranslate/ModMain.gd")
 	
 #	loadTranslationsFromCache()
-	yield(Debug.get_tree(),"idle_frame")
-	l2("Device Information: [\n%s\n]" % get_device_info())
-	storeLogCache()
+	if correct:
+		yield(Debug.get_tree(),"idle_frame")
+		l("Device Information: [\n%s\n]" % get_device_info())
+		pointers.storeLogCache()
 var cache_extension = ".file_check_cache"
 
 func loadTranslationsFromCache():
@@ -139,27 +141,9 @@ func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, full
 
 
 # Func to print messages to the logs
-var logCache = ""
 func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
-	var line = "[%s V%s]: %s" % [title, version, msg]
-	Debug.l(line)
-	logCache += line + "\n"
-func l2(msg:String):
-	Debug.l(msg)
-	logCache += msg + "\n"
+	pointers.l(msg,"%s V%s" % [title,version])
 
-var deviceinfostore:String = "user://cache/.Mod_Menu_2_Cache/EssentialsLogCache/"
-var deviceinfocache:String = deviceinfostore + "DeviceInfoCache"
-
-func storeLogCache():
-	file.open(deviceinfocache,File.READ)
-	var ov = file.get_as_text(true)
-	file.close()
-	ov += logCache
-	file.open(deviceinfocache,File.WRITE)
-	file.store_string(ov)
-	file.close()
-	logCache = ""
 
 func get_device_info() -> String:
 	var out = ""
