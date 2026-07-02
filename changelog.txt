@@ -1,3 +1,12 @@
+[1.14.13]
+
+1=* All logging from pointers now provides the class as a header in the format of "pointers.<ClassName>"
+1.1=* Added to help differentiate logs from those of other mods or the vanilla game
+2=* All modmains now use pointer logging
+2.1=* This is to keep it unified and to help reduce clutter and filesize
+3=* Pointers node added to the scene tree is now the pointers stored inside the ModLoader._savedObjects array instead of creating anew. 
+3.1=* This should improve boot times and reduce total memory footprint by a decent amount, but if anything weird happens, please report any issues.
+
 [1.14.12]
 
 1=* Added checks to prevent ManifestV2.__get_mod_files() from finding and exposing mod files related to nonfunctional modmain files.
