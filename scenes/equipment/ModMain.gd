@@ -310,6 +310,11 @@ func testing(pointers):
 #	var t2 = time - floor(time)
 #	var t3 = abs((t2*7) - 7)
 #	var v : Array = PoolStringArray([])
+#	var can : Script = load("res://AymursEquipmentSuite/ModMain.gd").can_instance()
+#	var can : Script = load("res://HevLib/ModMain.gd")
+#	var prop = can.can_instance()
 	
 	
-	pass
+	
+	
+	breakpoint
