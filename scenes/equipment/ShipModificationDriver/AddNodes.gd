@@ -499,101 +499,63 @@ func hl_add_nodes_process_modified_ship_numerics() -> Dictionary:
 	file.open(modify_ship_numerics_store,File.READ)
 	var dt = JSON.parse(file.get_as_text()).result
 	file.close()
+	if "ALL" in dt:
+		for shipData in dt["ALL"]:
+			if pointers_hl_addnodes.ConfigDriver.__validate_dictionary(shipData):
+				ship_numeric_modifier(shipData,pd)
 	if baseShipName in dt:
 		for shipData in dt[baseShipName]:
 			if shipData.get("recurse_to_variants",false):
 				if pointers_hl_addnodes.ConfigDriver.__validate_dictionary(shipData):
-					for type in shipData:
-						match type:
-							"ammo","mass_driver_ammo","ammunition":
-								if not "ammo" in pd:
-									pd["ammo"] = {}
-								if "min" in shipData[type]:
-									pd["ammo"]["min"] = shipData[type]["min"]
-								if "max" in shipData[type]:
-									pd["ammo"]["max"] = shipData[type]["max"]
-							"nano","nanodrones","nanodrone_components":
-								if not "nano" in pd:
-									pd["nano"] = {}
-								if "min" in shipData[type]:
-									pd["nano"]["min"] = shipData[type]["min"]
-								if "max" in shipData[type]:
-									pd["nano"]["max"] = shipData[type]["max"]
-							"fuel","propellant","remass":
-								if not "propellant" in pd:
-									pd["propellant"] = {}
-								if "min" in shipData[type]:
-									pd["propellant"]["min"] = shipData[type]["min"]
-								if "max" in shipData[type]:
-									pd["propellant"]["max"] = shipData[type]["max"]
-							"reactor_core","reactor","core":
-								if not "reactor_core" in pd:
-									pd["reactor_core"] = {}
-								if "min" in shipData[type]:
-									pd["reactor_core"]["min"] = shipData[type]["min"]
-								if "max" in shipData[type]:
-									pd["reactor_core"]["max"] = shipData[type]["max"]
-							"ultracapacitor","capacitor":
-								if not "ultracapacitor" in pd:
-									pd["ultracapacitor"] = {}
-								if "min" in shipData[type]:
-									pd["ultracapacitor"]["min"] = shipData[type]["min"]
-								if "max" in shipData[type]:
-									pd["ultracapacitor"]["max"] = shipData[type]["max"]
-							"turbine":
-								if not "turbine" in pd:
-									pd["turbine"] = {}
-								if "min" in shipData[type]:
-									pd["turbine"]["min"] = shipData[type]["min"]
-								if "max" in shipData[type]:
-									pd["turbine"]["max"] = shipData[type]["max"]
+					ship_numeric_modifier(shipData,pd)
 	if shipName in dt:
 		for shipData in dt[shipName]:
 			if pointers_hl_addnodes.ConfigDriver.__validate_dictionary(shipData):
-				for type in shipData:
-					match type:
-						"ammo","mass_driver_ammo","ammunition":
-							if not "ammo" in pd:
-								pd["ammo"] = {}
-							if "min" in shipData[type]:
-								pd["ammo"]["min"] = shipData[type]["min"]
-							if "max" in shipData[type]:
-								pd["ammo"]["max"] = shipData[type]["max"]
-						"nano","nanodrones","nanodrone_components":
-							if not "nano" in pd:
-								pd["nano"] = {}
-							if "min" in shipData[type]:
-								pd["nano"]["min"] = shipData[type]["min"]
-							if "max" in shipData[type]:
-								pd["nano"]["max"] = shipData[type]["max"]
-						"fuel","propellant","remass":
-							if not "propellant" in pd:
-								pd["propellant"] = {}
-							if "min" in shipData[type]:
-								pd["propellant"]["min"] = shipData[type]["min"]
-							if "max" in shipData[type]:
-								pd["propellant"]["max"] = shipData[type]["max"]
-						"reactor_core","reactor","core":
-							if not "reactor_core" in pd:
-								pd["reactor_core"] = {}
-							if "min" in shipData[type]:
-								pd["reactor_core"]["min"] = shipData[type]["min"]
-							if "max" in shipData[type]:
-								pd["reactor_core"]["max"] = shipData[type]["max"]
-						"ultracapacitor","capacitor":
-							if not "ultracapacitor" in pd:
-								pd["ultracapacitor"] = {}
-							if "min" in shipData[type]:
-								pd["ultracapacitor"]["min"] = shipData[type]["min"]
-							if "max" in shipData[type]:
-								pd["ultracapacitor"]["max"] = shipData[type]["max"]
-						"turbine":
-							if not "turbine" in pd:
-								pd["turbine"] = {}
-							if "min" in shipData[type]:
-								pd["turbine"]["min"] = shipData[type]["min"]
-							if "max" in shipData[type]:
-								pd["turbine"]["max"] = shipData[type]["max"]
+				ship_numeric_modifier(shipData,pd)
 	return pd
 
-
+func ship_numeric_modifier(shipData:Dictionary,pd:Dictionary):
+	for type in shipData:
+		match type:
+			"ammo","mass_driver_ammo","ammunition":
+				if not "ammo" in pd:
+					pd["ammo"] = {}
+				if "min" in shipData[type]:
+					pd["ammo"]["min"] = shipData[type]["min"]
+				if "max" in shipData[type]:
+					pd["ammo"]["max"] = shipData[type]["max"]
+			"nano","nanodrones","nanodrone_components":
+				if not "nano" in pd:
+					pd["nano"] = {}
+				if "min" in shipData[type]:
+					pd["nano"]["min"] = shipData[type]["min"]
+				if "max" in shipData[type]:
+					pd["nano"]["max"] = shipData[type]["max"]
+			"fuel","propellant","remass":
+				if not "propellant" in pd:
+					pd["propellant"] = {}
+				if "min" in shipData[type]:
+					pd["propellant"]["min"] = shipData[type]["min"]
+				if "max" in shipData[type]:
+					pd["propellant"]["max"] = shipData[type]["max"]
+			"reactor_core","reactor","core":
+				if not "reactor_core" in pd:
+					pd["reactor_core"] = {}
+				if "min" in shipData[type]:
+					pd["reactor_core"]["min"] = shipData[type]["min"]
+				if "max" in shipData[type]:
+					pd["reactor_core"]["max"] = shipData[type]["max"]
+			"ultracapacitor","capacitor":
+				if not "ultracapacitor" in pd:
+					pd["ultracapacitor"] = {}
+				if "min" in shipData[type]:
+					pd["ultracapacitor"]["min"] = shipData[type]["min"]
+				if "max" in shipData[type]:
+					pd["ultracapacitor"]["max"] = shipData[type]["max"]
+			"turbine":
+				if not "turbine" in pd:
+					pd["turbine"] = {}
+				if "min" in shipData[type]:
+					pd["turbine"]["min"] = shipData[type]["min"]
+				if "max" in shipData[type]:
+					pd["turbine"]["max"] = shipData[type]["max"]
