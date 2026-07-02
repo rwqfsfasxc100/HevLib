@@ -163,10 +163,6 @@ func _ready():
 		file.store_string(JSON.print(complementary))
 		file.close()
 		
-#		replaceScene("scenes/scene_replacements/MouseLayer.tscn", "res://menu/MouseLayer.tscn")
-#		if OS.has_feature("editor"):
-#			replaceScene("scenes/scene_replacements/TitleScreen.tscn", "res://TitleScreen.tscn")
-#		var mouse = load("res://HevLib/scenes/scene_replacements/MouseLayer.tscn").instance()
 		var CRoot = get_tree().get_root()
 #		CRoot.call_deferred("add_child",mouse)
 		
@@ -195,7 +191,6 @@ func _ready():
 		CRoot.call_deferred("add_child",nNode)
 		var scene = load("res://HevLib/scenes/better_title_screen/TitleScreen.tscn")
 		
-#		replaceScene("scenes/equipment/Enceladus.tscn","res://enceladus/Enceladus.tscn")
 		pointers.ManifestV2.__get_mod_versions(true)
 		var ncrew = pointers.ManifestV2.__get_manifest_entry("tags","TAG_HANDLE_EXTRA_CREW")
 		var count = 24

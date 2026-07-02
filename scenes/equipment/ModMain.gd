@@ -178,7 +178,6 @@ func _ready():
 		
 		replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")
 #		replaceScene("Enceladus.tscn","res://enceladus/Enceladus.tscn")
-#		installScriptExtension("../scene_replacements/Shipyard.gd")
 
 		replaceScene("../minerals/multiminerals/AsteroidField.tscn","res://AsteroidField.tscn")
 		

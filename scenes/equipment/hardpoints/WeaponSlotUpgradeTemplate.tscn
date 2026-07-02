@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=2]
 
-[ext_resource path="res://HevLib/scenes/equipment/UpgradeGroup.gd" type="Script" id=1]
+[ext_resource path="res://enceladus/UpgradeGroup.gd" type="Script" id=1]
 [ext_resource path="res://menu/MenuUpgrades.tres" type="Theme" id=3]
 [ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=4]
 [ext_resource path="res://menu/sfx/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=5]
