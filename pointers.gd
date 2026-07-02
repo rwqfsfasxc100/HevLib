@@ -268,7 +268,7 @@ class _Achievements:
 				var sg : String = file.get_line()
 				achivements = parse_json(sg)
 			else:
-				pointers.l("Error loading achievements file")
+				pointers.l("Error loading achievements file","pointers.Achievements")
 				pointers.storeLogCache()
 		file.close()
 		
@@ -655,7 +655,7 @@ class _ConfigDriver:
 			var cfg:ConfigFile = ConfigFile.new()
 			var error:int = cfg.load(cfg_folder+cfg_filename)
 			if error != OK:
-				pointers.l("HevLib Config File: Error loading settings %s" % error)
+				pointers.l("HevLib Config File: Error loading settings %s" % error,"pointers.ConfigDriver")
 				pointers.storeLogCache()
 				return null
 			
@@ -682,29 +682,29 @@ class _ConfigDriver:
 					if not is_connected("config_changed",node,method):
 						connect("config_changed",node,method)
 					else:
-						pointers.l("ConfigDriver: node %s is already connected with the method '%s'" % [str(node),method])
+						pointers.l("node %s is already connected with the method '%s'" % [str(node),method],"pointers.ConfigDriver")
 				else:
-					pointers.l("ConfigDriver: node %s does not have the method '%s'" % [str(node),method])
+					pointers.l("node %s does not have the method '%s'" % [str(node),method],"pointers.ConfigDriver")
 			"input":
 				if node.has_method(method):
 					if not is_connected("input_changed",node,method):
 						connect("input_changed",node,method)
 					else:
-						pointers.l("ConfigDriver: node %s is already connected with the method '%s'" % [str(node),method])
+						pointers.l("node %s is already connected with the method '%s'" % [str(node),method],"pointers.ConfigDriver")
 				else:
-					pointers.l("ConfigDriver: node %s does not have the method '%s'" % [str(node),method])
+					pointers.l("node %s does not have the method '%s'" % [str(node),method],"pointers.ConfigDriver")
 			"both":
 				if node.has_method(method):
 					if not is_connected("input_changed",node,input_method):
 						connect("input_changed",node,input_method)
 					else:
-						pointers.l("ConfigDriver: node %s is already connected with the method '%s'" % [str(node),method])
+						pointers.l("node %s is already connected with the method '%s'" % [str(node),method],"pointers.ConfigDriver")
 					if not is_connected("config_changed",node,method):
 						connect("config_changed",node,method)
 					else:
-						pointers.l("ConfigDriver: node %s is already connected with the method '%s'" % [str(node),method])
+						pointers.l("node %s is already connected with the method '%s'" % [str(node),method],"pointers.ConfigDriver")
 				else:
-					pointers.l("ConfigDriver: node %s does not have the method '%s'" % [str(node),method])
+					pointers.l("node %s does not have the method '%s'" % [str(node),method],"pointers.ConfigDriver")
 		pointers.storeLogCache()
 	func __remove_connection(method: String, node: Object, type: String = "config", input_method: String = "input_changed"): # Type accepts "config", "input", or "both"
 		match type.to_lower():
@@ -713,29 +713,29 @@ class _ConfigDriver:
 					if is_connected("config_changed",node,method):
 						disconnect("config_changed",node,method)
 					else:
-						pointers.l("ConfigDriver: node %s is already connected with the method '%s'" % [str(node),method])
+						pointers.l("node %s is already connected with the method '%s'" % [str(node),method],"pointers.ConfigDriver")
 				else:
-					pointers.l("ConfigDriver: node %s does not have the method '%s'" % [str(node),method])
+					pointers.l("node %s does not have the method '%s'" % [str(node),method],"pointers.ConfigDriver")
 			"input":
 				if node.has_method(method):
 					if is_connected("input_changed",node,method):
 						disconnect("input_changed",node,method)
 					else:
-						pointers.l("ConfigDriver: node %s is already connected with the method '%s'" % [str(node),method])
+						pointers.l("node %s is already connected with the method '%s'" % [str(node),method],"pointers.ConfigDriver")
 				else:
-					pointers.l("ConfigDriver: node %s does not have the method '%s'" % [str(node),method])
+					pointers.l("node %s does not have the method '%s'" % [str(node),method],"pointers.ConfigDriver")
 			"both":
 				if node.has_method(method):
 					if is_connected("input_changed",node,input_method):
 						disconnect("input_changed",node,input_method)
 					else:
-						pointers.l("ConfigDriver: node %s is already connected with the method '%s'" % [str(node),method])
+						pointers.l("node %s is already connected with the method '%s'" % [str(node),method],"pointers.ConfigDriver")
 					if is_connected("config_changed",node,method):
 						disconnect("config_changed",node,method)
 					else:
-						pointers.l("ConfigDriver: node %s is already connected with the method '%s'" % [str(node),method])
+						pointers.l("node %s is already connected with the method '%s'" % [str(node),method],"pointers.ConfigDriver")
 				else:
-					pointers.l("ConfigDriver: node %s does not have the method '%s'" % [str(node),method])
+					pointers.l("node %s does not have the method '%s'" % [str(node),method],"pointers.ConfigDriver")
 		pointers.storeLogCache()
 	
 	func __load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
@@ -789,12 +789,12 @@ class _ConfigDriver:
 		
 		var f : Dictionary = pointers.ManifestV2.__get_mod_data()
 		var mod_entries : Dictionary = f["mods"]
-		pointers.l("ConfigDriver: [%s] mod entries found" % mod_entries.size())
+		pointers.l("[%s] mod entries found" % mod_entries.size(),"pointers.ConfigDriver")
 		var disabled_modlets:Dictionary = pointers.ManifestV2.__get_disabled_modlets()
 		var DMIDs:PoolStringArray = PoolStringArray()
 		for i in disabled_modlets:
 			DMIDs.append(disabled_modlets[i])
-		pointers.l("ConfigDriver: [%s] disabled modlets found: [%s]" % [disabled_modlets.size(),",".join(DMIDs)])
+		pointers.l("[%s] disabled modlets found: [%s]" % [disabled_modlets.size(),",".join(DMIDs)],"pointers.ConfigDriver")
 		var configs : Dictionary = {}
 		var current_config : Dictionary = __config_parse(cfg_file)
 		for mod in mod_entries:
@@ -807,7 +807,7 @@ class _ConfigDriver:
 					var cfg : Dictionary = manifest["manifest_data"]["configs"]
 					if not hash(cfg) == hash({}):
 						configs.merge({mod_name:cfg})
-		pointers.l("ConfigDriver: config contains [%s] mods" % configs.size())
+		pointers.l("config contains [%s] mods" % configs.size(),"pointers.ConfigDriver")
 		for mod in configs:
 			var data : Dictionary = configs[mod]
 			mod = __truncate_mod_id(mod)
@@ -859,23 +859,23 @@ class _ConfigDriver:
 		__change_made()
 		c.save(cfg_file)
 		c.save(profiles_dir + current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",{}).get("profile_name","Default") + ".cfg")
-		pointers.l("ConfigDriver: loaded [%s] mod configurations" % configs.size())
+		pointers.l("loaded [%s] mod configurations" % configs.size(),"pointers.ConfigDriver")
 		var actionList : Array = InputMap.get_actions()
 		for mod in configs:
-			pointers.l("ConfigDriver: inspecting [%s]" % mod)
+			pointers.l("inspecting [%s]" % mod,"pointers.ConfigDriver")
 			var data = __get_config(mod)
-			pointers.l("ConfigDriver: found [%s] sections" % data.size())
+			pointers.l("found [%s] sections" % data.size(),"pointers.ConfigDriver")
 			for section in configs[mod]:
-				pointers.l("ConfigDriver: inspecting section [%s]" % section)
+				pointers.l("inspecting section [%s]" % section,"pointers.ConfigDriver")
 				var sectData = configs[mod][section]
 				for key in sectData:
 					var key_data = sectData[key]
-					pointers.l("ConfigDriver: found entry [%s] of type [%s] with a default of [%s]" % [key,key_data["type"],key_data.get("default","Null")])
+					pointers.l("found entry [%s] of type [%s] with a default of [%s]" % [key,key_data["type"],key_data.get("default","Null")],"pointers.ConfigDriver")
 					if key_data["type"].to_lower() == "input":
 						var p = __get_value(mod,section,key)
-						pointers.l("ConfigDriver: value of [%s] is [%s]" % [key,p])
+						pointers.l("value of [%s] is [%s]" % [key,p],"pointers.ConfigDriver")
 						var default = key_data.get("default",[])
-						pointers.l("ConfigDriver: [%s] default is [%s]" % [key,default])
+						pointers.l("[%s] default is [%s]" % [key,default],"pointers.ConfigDriver")
 						var b = []
 						for h in p:
 							if typeof(h) == TYPE_STRING:
@@ -889,11 +889,11 @@ class _ConfigDriver:
 							p = default
 						var addAction = true
 						if not key in actionList:
-							pointers.l("ConfigDriver: Adding input key [%s]" % key)
+							pointers.l("Adding input key [%s]" % key,"pointers.ConfigDriver")
 							InputMap.add_action(key,deadzone)
 							actionList.append(key)
 						else:
-							pointers.l("ConfigDriver: Input key [%s] already exists, skipping" % key)
+							pointers.l("Input key [%s] already exists, skipping" % key,"pointers.ConfigDriver")
 						pointers.Keymapping.__load_input_data(key,p,opts)
 		pointers.storeLogCache()
 	
@@ -903,18 +903,18 @@ class _ConfigDriver:
 				var event:InputEventMouseButton = InputEventMouseButton.new()
 				event.button_index = int(i.split("Mouse ")[1])
 				if not InputMap.action_has_event(key,event):
-					pointers.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
+					pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.ConfigDriver")
 					InputMap.action_add_event(key, event)
 				else:
-					pointers.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
+					pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.ConfigDriver")
 			if i.begins_with("JoyButton "):
 				var event:InputEventJoypadButton = InputEventJoypadButton.new()
 				event.button_index = int(i.split("JoyButton ")[1])
 				if not InputMap.action_has_event(key,event):
-					pointers.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
+					pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.ConfigDriver")
 					InputMap.action_add_event(key, event)
 				else:
-					pointers.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
+					pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.ConfigDriver")
 			if i.begins_with("JoyAxis "):
 				var event:InputEventJoypadMotion = InputEventJoypadMotion.new()
 				event.axis = abs(int(i.split("JoyAxis ")[1]))
@@ -923,19 +923,19 @@ class _ConfigDriver:
 				else:
 					event.axis_value = 1.0
 				if not InputMap.action_has_event(key,event):
-					pointers.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
+					pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.ConfigDriver")
 					InputMap.action_add_event(key, event)
 				else:
-					pointers.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
+					pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.ConfigDriver")
 				
 			else:
 				var event:InputEventKey = InputEventKey.new()
 				event.scancode = OS.find_scancode_from_string(i)
 				if not InputMap.action_has_event(key,event):
-					pointers.l("ConfigDriver: Adding input event [%s] for [%s]" % [i,key])
+					pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.ConfigDriver")
 					InputMap.action_add_event(key, event)
 				else:
-					pointers.l("ConfigDriver: Input event [%s] for [%s] already exists, skipping" % [i,key])
+					pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.ConfigDriver")
 		pointers.storeLogCache()
 	func set_button_focus(button,check_button):
 		var parent = button.get_parent()
@@ -1135,7 +1135,7 @@ class _ConfigDriver:
 			if do:
 				subscriptions[top][setting].append([object,method])
 		else:
-			pointers.l("ConfigDriver: node %s does not have the method '%s'" % [str(object),method])
+			pointers.l("node %s does not have the method '%s'" % [str(object),method],"pointers.ConfigDriver")
 			pointers.storeLogCache()
 	
 	func __disconnect_subscription(method: String,object: Object,id: String,section: String,setting: String):
@@ -1546,7 +1546,7 @@ class _DataFormat:
 		var converted:PoolVector2Array = PoolVector2Array([])
 		var size = array.size()
 		if size % 2 == 1:
-			pointers.l("Cannot convert array to PoolVector2Array with an odd number of entries")
+			pointers.l("Cannot convert array to PoolVector2Array with an odd number of entries","pointers.DataFormat")
 			pointers.storeLogCache()
 			return PoolVector2Array([])
 		var index:int = 0
@@ -1554,11 +1554,11 @@ class _DataFormat:
 			var aRaw = array[index]
 			var bRaw = array[index + 1]
 			if not (aRaw is float or aRaw is int or aRaw is String):
-				pointers.l("Cannot convert type %s for PoolVector2Array" % aRaw)
+				pointers.l("Cannot convert type %s for PoolVector2Array" % aRaw,"pointers.DataFormat")
 				pointers.storeLogCache()
 				return PoolVector2Array([])
 			if not (bRaw is float or bRaw is int or bRaw is String):
-				pointers.l("Cannot convert type %s for PoolVector2Array" % bRaw)
+				pointers.l("Cannot convert type %s for PoolVector2Array" % bRaw,"pointers.DataFormat")
 				pointers.storeLogCache()
 				return PoolVector2Array([])
 			var a:float = float(aRaw)
@@ -4818,13 +4818,13 @@ class _Github:
 		var cancel:bool = false
 		if node_to_return_to == null or (not node_to_return_to is Node):
 			cancel = true
-			var e : String = "HevLib Github Release Downloader: ERROR! Provided node [%s] either does not exist or is not of [Node] type." % str(node_to_return_to)
-			Debug.l(e)
+			var e : String = "Release Downloader ERROR! Provided node [%s] either does not exist or is not of [Node] type." % str(node_to_return_to)
+			pointers.l(e,"pointers.Github")
 			printerr(e)
 		if not node_to_return_to.has_method("_downloaded_zip"):
 			cancel = true
-			var e : String = "HevLib Github Release Downloader: ERROR! Provided node [%s] does not have the method [_downloaded_zip]" % str(node_to_return_to)
-			Debug.l(e)
+			var e : String = "Release Downloader ERROR! Provided node [%s] does not have the method [_downloaded_zip]" % str(node_to_return_to)
+			pointers.l(e,"pointers.Github")
 			printerr(e)
 		if cancel:
 			return
@@ -4832,7 +4832,7 @@ class _Github:
 		var gitHubFS := preload("res://HevLib/scenes/fetch_from_github/releases/NetHandles.tscn").instance()
 		if not node_to_return_to.has_method("_get_github_progress"):
 			gitHubFS.state_progress = false
-			pointers.l("HevLib Github Release Downloader: NOTICE! Provided node [%s] does not have the method [_get_github_progress]. No download progress will be reported." % str(node_to_return_to))
+			pointers.l("Release Downloader NOTICE! Provided node [%s] does not have the method [_get_github_progress]. No download progress will be reported." % str(node_to_return_to),"pointers.Github")
 			pointers.storeLogCache()
 		var rng:RandomNumberGenerator = RandomNumberGenerator.new()
 		rng.randomize()
@@ -5003,18 +5003,18 @@ class _Keymapping:
 			var event = InputEventMouseButton.new()
 			event.button_index = int(i.split("Mouse ")[1])
 			if not InputMap.action_has_event(key,event):
-				pointers.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
+				pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.Keymapping")
 				InputMap.action_add_event(key, event)
 			else:
-				pointers.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+				pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.Keymapping")
 		elif i.begins_with("JoyButton "):
 			var event = InputEventJoypadButton.new()
 			event.button_index = int(i.split("JoyButton ")[1])
 			if not InputMap.action_has_event(key,event):
-				pointers.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
+				pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.Keymapping")
 				InputMap.action_add_event(key, event)
 			else:
-				pointers.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+				pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.Keymapping")
 		elif i.begins_with("JoyAxis "):
 			var event = InputEventJoypadMotion.new()
 			event.axis = abs(int(i.split("JoyAxis ")[1]))
@@ -5023,19 +5023,19 @@ class _Keymapping:
 			else:
 				event.axis_value = 1.0
 			if not InputMap.action_has_event(key,event):
-				pointers.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
+				pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.Keymapping")
 				InputMap.action_add_event(key, event)
 			else:
-				pointers.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+				pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.Keymapping")
 
 		else:
 			var event = InputEventKey.new()
 			event.scancode = OS.find_scancode_from_string(i)
 			if not InputMap.action_has_event(key,event):
-				pointers.l("Keymapping: Adding input event [%s] for [%s]" % [i,key])
+				pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.Keymapping")
 				InputMap.action_add_event(key, event)
 			else:
-				pointers.l("Keymapping: Input event [%s] for [%s] already exists, skipping" % [i,key])
+				pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.Keymapping")
 		pointers.storeLogCache()
 	var input_cache = {}
 	
@@ -5424,7 +5424,6 @@ class _ManifestV1:
 			custom_link = manifestData["package"]["custom_link"]
 			custom_link_name = manifestData["package"]["custom_link_name"]
 			f.close()
-	#	pointers.l("HevLib: load_file attempting to reload file @%s" % modDir)
 		f.open(modDir, File.READ)
 		var modFolderSplit = modDir.split("/ModMain.gd")
 		var modFolderCount = modFolderSplit.size()
@@ -5509,7 +5508,6 @@ class _ManifestV1:
 		else:
 			iconDir = "empty"
 		var compiledData = modName + "\n" + fallbackDir + "\n" + prioStr + "\n" + modFolder + "\n" + verData + "\n" + manifestDescription + "\n" + github_homepage + "\n" + github_releases + "\n" + discord_thread + "\n" + nexus_page + "\n" + donations_page + "\n" + wiki_page + "\n" + custom_link + "\n" + custom_link_name + "\n" + iconDir + "\n" + manifestId
-	#	pointers.l("HevLib: load_file returning as %s" % compiledData)
 		return compiledData
 	
 	func __get_mod_main(file, split_into_array = false):
@@ -5592,7 +5590,7 @@ class _ManifestV2:
 			else:
 				return cached_mod_list.duplicate(true)
 		else:
-			pointers.l("ManifestV2: Fetching mods from file")
+			pointers.l("Fetching mods from file","pointers.ManifestV2")
 			var mod_dictionary : Dictionary = {}
 			var manifest_count:int = 0
 			var library_count:int = 0
@@ -5603,18 +5601,18 @@ class _ManifestV2:
 			
 			var modListArr : Array = []
 			var modmain_files : Array = __get_modmain_files()
-			pointers.l("ManifestV2: found [%s] modmain files" % modmain_files.size())
+			pointers.l("found [%s] modmain files" % modmain_files.size(),"pointers.ManifestV2")
 			for item in modmain_files:
-				pointers.l("ManifestV2: registering ModMain %s" % item)
+				pointers.l("registering ModMain %s" % item,"pointers.ManifestV2")
 				modListArr.append(__concat_mod_info(item))
 #				modListArr.append({"constants":constants,"script_path":item,"node":(modNodes[item]) if (is_onready or item in modNodes) else (null)})
 			var modlet_files : Array = __get_modlet_files()
-			pointers.l("ManifestV2: found [%s] modlet files" % modlet_files.size())
+			pointers.l("found [%s] modlet files" % modlet_files.size(),"pointers.ManifestV2")
 			for item in modlet_files:
-				pointers.l("ManifestV2: registering Modlet %s" % item)
+				pointers.l("registering Modlet %s" % item,"pointers.ManifestV2")
 				modListArr.append(__concat_mod_info(item))
 			total_mod_count = modListArr.size()
-			print("ManifestV2: solved [%s] modmain files" % total_mod_count)
+			print("solved [%s] modmain files" % total_mod_count,"pointers.ManifestV2")
 			modListArr.sort_custom(self,"sortModList")
 			
 			for mod in modListArr:
@@ -6139,7 +6137,7 @@ class _ManifestV2:
 											ovConfigs[section] = {}
 										ovConfigs[section][cfname] = cfdata
 							if ovConfigs:
-								pointers.l("ManifestV2: Parsed configs for %s, has disabled configs: [%s]" % [file_path,str(hash(configs) != hash(ovConfigs))])
+								pointers.l("Parsed configs for %s, has disabled configs: [%s]" % [file_path,str(hash(configs) != hash(ovConfigs))],"pointers.ManifestV2")
 								pointers.storeLogCache()
 								dict_template["configs"].merge(ovConfigs)
 						
@@ -6695,12 +6693,15 @@ class _ManifestV2:
 			if r.begins_with("modmain") and r.ends_with(".gd"):
 				var can : Script = load(i)
 				if not can.can_instance():
-					excludeDirs.append(i.get_base_dir().to_lower())
+					var vdir:String = i.get_base_dir()
+					excludeDirs.append(vdir.to_lower())
+					pointers.l("Excluding mod directoy %s due to malformatted mod main" % vdir,"pointers.ManifestV2")
 		var arr2:Array = []
 		for file in arr1:
 			var vr:String = file.get_base_dir().to_lower()
 			if not vr in excludeDirs:
 				arr2.append(file)
+		pointers.storeLogCache()
 		cached_mod_files = arr2
 		return cached_mod_files.duplicate(true)
 	
@@ -7181,14 +7182,14 @@ class _Translations:
 	func __updateTL(path:String, delim:String = ",", fullLogging:bool = true):
 		var fileName : String = path.split("/")[path.split("/").size() - 1]
 		var folderName : String = path.split(fileName)[0]
-		pointers.l("Adding translations from [%s] in [%s]" % [fileName, folderName])
+		pointers.l("Adding translations from [%s] in [%s]" % [fileName, folderName],"pointers.Translations")
 		var tlFile:File = File.new()
 		tlFile.open(path, File.READ)
 		var translations : Array = []
 		var translationCount:int = 0
 		var csvLine : PoolStringArray = tlFile.get_line().split(delim)
 		if fullLogging:
-			pointers.l("Adding translations as: %s" % csvLine)
+			pointers.l("Adding translations as: %s" % csvLine,"pointers.Translations")
 		for i in range(1, csvLine.size()):
 			var translationObject := Translation.new()
 			translationObject.locale = csvLine[i]
@@ -7212,20 +7213,20 @@ class _Translations:
 				for i in range(1, size):
 					translations[i - 1].add_message(translationID, csvLine[i].c_unescape())
 				if fullLogging:
-					pointers.l("Added translation: %s" % csvLine)
+					pointers.l("Added translation: %s" % csvLine,"pointers.Translations")
 				translationCount += 1
 		tlFile.close()
 		for translationObject in translations:
 			TranslationServer.add_translation(translationObject)
-		pointers.l("%s Translations Updated from @ [%s]" % [translationCount, fileName])
+		pointers.l("%s Translations Updated from @ [%s]" % [translationCount, fileName],"pointers.Translations")
 		pointers.storeLogCache()
 	
 	func __updateTL_from_dictionary(path:Dictionary, fullLogging:bool = true):
-		pointers.l("Adding translations from dictionary")
+		pointers.l("Adding translations from dictionary","pointers.Translations")
 		var translations : Array = []
 		var translationCount:int = 0
 		if fullLogging:
-			pointers.l("Adding translations as: %s" % str(path.hash()))
+			pointers.l("Adding translations as: %s" % str(path.hash()),"pointers.Translations")
 		if "file" in path:
 			var file_paths : String = path["file"]
 			for file in file_paths:
@@ -7261,7 +7262,7 @@ class _Translations:
 					TYPE_STRING:
 						translationObject.add_message(key,data.c_unescape())
 						if fullLogging:
-							pointers.l("Added translation: %s" % key)
+							pointers.l("Added translation: %s" % key,"pointers.Translations")
 					TYPE_DICTIONARY:
 						var string = data.get("string","")
 						var mod = data.get("mod","")
@@ -7277,14 +7278,14 @@ class _Translations:
 						if do and string != "":
 							translationObject.add_message(key,string.c_unescape())
 						if fullLogging:
-							pointers.l("Added translation: %s" % key)
+							pointers.l("Added translation: %s" % key,"pointers.Translations")
 						pass
 			translationCount += 1
 			
 			translations.append(translationObject)
 		for translationObject in translations:
 			TranslationServer.add_translation(translationObject)
-		pointers.l("%s Translations Updated" % [translationCount])
+		pointers.l("%s Translations Updated" % [translationCount],"pointers.Translations")
 		pointers.storeLogCache()
 	func __fetch_all_translation_objects(index) -> Array:
 		var translations : Array = []
@@ -7300,46 +7301,44 @@ class _Translations:
 		return translations
 	
 	func __translation_file_to_dictionary(path : String, delimiter : String = "|") -> Dictionary:
-		var log_header = "HevLib Translations: "
-		var exists = Directory.new().file_exists(path)
-		if not exists:
+		if not Directory.new().file_exists(path):
 			return {}
-		var dictionary = {}
-		var file = File.new()
+		var dictionary:Dictionary = {}
+		var file:File = File.new()
 		file.open(path,File.READ)
-		var lines = file.get_as_text(true).split("\n")
+		var lines:PoolStringArray = file.get_as_text(true).split("\n")
 		file.close()
 		
-		var lang_data = lines[0]
-		var language_lines = lang_data.split(delimiter)
+		var lang_data:String = lines[0]
+		var language_lines:PoolStringArray = lang_data.split(delimiter)
 		if not language_lines[0] == "locale":
 			return {}
 		if language_lines.size() <= 1:
 			return {}
-		var languages = []
-		var lsize = language_lines.size()
-		var lindex = 1
+		var languages:Array = []
+		var lsize:int = language_lines.size()
+		var lindex:int = 1
 		while lindex < lsize:
 			languages.append(language_lines[lindex])
 			lindex += 1
 		
 		for lang in languages:
-			var smdc = {lang:{}}
+			var smdc:Dictionary = {lang:{}}
 			dictionary.merge(smdc)
-		var translation_count = 0
-		var size = lines.size()
-		var index = 1
+		var translation_count:int = 0
+		var size:int = lines.size()
+		var index:int = 1
 		while index < size:
-			var line = lines[index]
+			var line:String = lines[index]
 			if line == "":
 				index += 1
 				continue
 			if line.begins_with("#"):
 				continue
-			var line_split = line.split(delimiter)
-			var split_size = line_split.size()
+			var line_split:PoolStringArray = line.split(delimiter)
+			var split_size:int = line_split.size()
 			if split_size > 2:
-				var i = 0
+				var i:int = 0
 				while i < split_size:
 					if line_split[i].ends_with("\\") and i < split_size:
 						line_split[i] = line_split[i].rstrip("\\") + delimiter + line_split[i + 1]
@@ -7352,10 +7351,10 @@ class _Translations:
 			if split_size - 1 < languages.size():
 				index += 1
 				continue
-			var translation_string = line_split[0]
-			var tlindex = 0
+			var translation_string:String = line_split[0]
+			var tlindex:int = 0
 			while tlindex < languages.size():
-				var lang = languages[tlindex]
+				var lang:String = languages[tlindex]
 				dictionary[lang].merge({translation_string:line_split[tlindex + 1]})
 				tlindex += 1
 			index += 1
@@ -7390,7 +7389,7 @@ class _WebTranslate:
 		pointers = f
 	
 	func __webtranslate(URL: String, fallback: Array = [], file_check: String = ""):
-		pointers.l("HevLib WebTranslate: Fetching translations from %s" % URL)
+		pointers.l("Fetching translations from %s" % URL,"pointers.WebTranslate")
 		var HevLib = preload("res://HevLib/webtranslate/FetchGithubData.tscn").instance()
 		var pms = Debug.get_node("/root")
 		var tstamp = Time.get_datetime_string_from_system()
@@ -7408,7 +7407,7 @@ class _WebTranslate:
 		var nSize = names.size()
 		
 		
-		pointers.l("HevLib WebTranslate: attaching node @ FetchGithubData%s~%s" % [timestamp,str(nSize)])
+		pointers.l("attaching node @ FetchGithubData%s~%s" % [timestamp,str(nSize)],"pointers.WebTranslate")
 		HevLib.name = "FetchGithubData" + timestamp + "~" + str(nSize)
 		HevLib.URLFullStopReformat = URL
 		HevLib.fallbackFiles = fallback
@@ -7424,7 +7423,7 @@ class _WebTranslate:
 		var repo = dataSplit[1]
 		var folderConcat = user + "~_~" + repo
 		var folderToDelete = "user://cache/.HevLib_Cache/WebTranslate/" + folderConcat
-		pointers.l("HevLib WebTranslate: deleting cache folder @ %s" % folderToDelete)
+		pointers.l("deleting cache folder @ %s" % folderToDelete,"pointers.WebTranslate")
 		var did = pointers.FolderAccess.__recursive_delete(folderToDelete)
 		pointers.storeLogCache()
 		if did:
@@ -7458,7 +7457,7 @@ class _WebTranslate:
 		return did
 	
 	func __webtranslate_timed(URL: String, MINUTES_DELAY: int, fallback: Array = [], file_check: String = ""):
-		pointers.l("HevLib WebTranslate: function 'webtranslate_timed' initiated, starting constant translation of [%s] with a delay of [%s] minutes" % [URL,MINUTES_DELAY])
+		pointers.l("function 'webtranslate_timed' initiated, starting constant translation of [%s] with a delay of [%s] minutes" % [URL,MINUTES_DELAY],"pointers.WebTranslate")
 		var variableNode = ModLoader.get_tree().get_root().get_node("/root/HevLib~Variables")
 		var handleNode = preload("res://HevLib/webtranslate/WebtranslateTimerHandler.tscn").instance()
 		handleNode.name = URL + Time.get_time_string_from_system()
