@@ -135,6 +135,7 @@ func _ready():
 	vd["drivers"] = {}
 	vd["mod_type"] = "mod"
 	vd["enabled"] = true
+	vd["master_locale"] = TranslationServer.get_locale()
 	
 	mod_data.merge({"VANILLA":vd})
 	
