@@ -6110,18 +6110,33 @@ class _ManifestV2:
 						
 						if "links" in manifest_data:
 							var links = manifest_data["links"]
+							var ovLinks = {}
 							for link in links:
-								dict_template["links"].merge({link:links.get(link)})
+								var ld = links[link]
+								if typeof(ld) == TYPE_DICTIONARY:
+									if "URL" in ld and typeof(ld) == TYPE_STRING:
+										ovLinks[link] = ld
+							if ovLinks:
+								dict_template["links"] = ovLinks
 						if "tags" in manifest_data:
 							var tags = manifest_data["tags"]
+							var ovTags = {}
 							for tag in tags:
-								dict_template["tags"].merge({tag:tags.get(tag)})
+								var td = tags[tag]
+								if typeof(td) == TYPE_DICTIONARY:
+									if "type" in td and "value" in td and typeof(td.type) == TYPE_STRING:
+										ovTags[tag] = td
+							if ovTags:
+								dict_template["tags"] = ovTags
 						if "languages" in manifest_data:
 							var languages = manifest_data["languages"]
 							for language in languages:
-								dict_template["languages"].merge({language:languages.get(language)})
-						else:
-							dict_template["languages"].merge({"en":"100%"})
+								var ld = languages[language]
+								var tld = typeof(ld)
+								if tld == TYPE_STRING:
+									dict_template["languages"][language] = ld
+								elif tld == TYPE_INT or tld == TYPE_REAL:
+									dict_template["languages"][language] = str(ld) + "%"
 						if "library" in manifest_data:
 							dict_template["library"]["is_library"] = manifest_data["library"].get("is_library",false)
 							dict_template["library"]["always_display"] = manifest_data["library"].get("always_display",false)
@@ -6140,7 +6155,7 @@ class _ManifestV2:
 							if ovConfigs:
 								pointers.l("Parsed configs for %s, has disabled configs: [%s]" % [file_path,str(hash(configs) != hash(ovConfigs))],"pointers.ManifestV2")
 								pointers.storeLogCache()
-								dict_template["configs"].merge(ovConfigs)
+								dict_template["configs"] = ovConfigs
 						
 						
 				var version_metadata : String = dict_template["version"]["version_metadata"]
@@ -6196,9 +6211,10 @@ class _ManifestV2:
 						for tag in tags:
 							if not tag in tag_dict:
 								tag_dict[tag] = {}
-							var td : Dictionary = tags[tag]
-							if typeof(td) == TYPE_DICTIONARY and "value" in td and "type" in td:
-								tag_dict[tag][id] = td["value"]
+							if typeof(tags[tag]) == TYPE_DICTIONARY:
+								var td : Dictionary = tags[tag]
+								if "value" in td and "type" in td and typeof(td.type) == TYPE_STRING:
+									tag_dict[tag][id] = td["value"]
 			return tag_dict
 	
 	func __get_mod_tags(mod_id: String) -> Dictionary:
