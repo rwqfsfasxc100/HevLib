@@ -1,3 +1,7 @@
+[1.14.10]
+
+1=* Fixed crash when selecting the "Vanilla" option of the mod menu mod list
+
 [1.14.9]
 
 1=* Removed a very large portion of old script files that got migrated to the pointer node.
