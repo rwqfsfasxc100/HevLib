@@ -32,5 +32,22 @@ func check_validity():
 		process = true
 	
 	
+var logCache = ""
 func l(msg:String, title:String = "HevLib Research Overhead"):
-	Debug.l("[%s V%s]: %s" % [title, msg])
+	var line = "[%s]: %s" % [title, msg]
+	Debug.l(line)
+	logCache += line + "\n"
+
+var deviceinfostore:String = "user://cache/.Mod_Menu_2_Cache/EssentialsLogCache/"
+var deviceinfocache:String = deviceinfostore + "DeviceInfoCache"
+
+func storeLogCache():
+	var file = File.new()
+	file.open(deviceinfocache,File.READ)
+	var ov = file.get_as_text(true)
+	file.close()
+	ov += logCache
+	file.open(deviceinfocache,File.WRITE)
+	file.store_string(ov)
+	file.close()
+	logCache = ""

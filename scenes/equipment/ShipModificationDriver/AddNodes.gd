@@ -502,16 +502,16 @@ func hl_add_nodes_process_modified_ship_numerics() -> Dictionary:
 	if "ALL" in dt:
 		for shipData in dt["ALL"]:
 			if pointers_hl_addnodes.ConfigDriver.__validate_dictionary(shipData):
-				ship_numeric_modifier(shipData,pd)
+				pd = ship_numeric_modifier(shipData,pd)
 	if baseShipName in dt:
 		for shipData in dt[baseShipName]:
 			if shipData.get("recurse_to_variants",false):
 				if pointers_hl_addnodes.ConfigDriver.__validate_dictionary(shipData):
-					ship_numeric_modifier(shipData,pd)
+					pd = ship_numeric_modifier(shipData,pd)
 	if shipName in dt:
 		for shipData in dt[shipName]:
 			if pointers_hl_addnodes.ConfigDriver.__validate_dictionary(shipData):
-				ship_numeric_modifier(shipData,pd)
+				pd = ship_numeric_modifier(shipData,pd)
 	return pd
 
 func ship_numeric_modifier(shipData:Dictionary,pd:Dictionary):
@@ -559,3 +559,4 @@ func ship_numeric_modifier(shipData:Dictionary,pd:Dictionary):
 					pd["turbine"]["min"] = shipData[type]["min"]
 				if "max" in shipData[type]:
 					pd["turbine"]["max"] = shipData[type]["max"]
+	return pd

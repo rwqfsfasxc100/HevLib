@@ -39,6 +39,7 @@ func _init(modLoader = ModLoader):
 		var self_directory = self_path.split(self_path.split("/")[self_path.split("/").size() - 1])[0]
 		var self_check = load(self_directory + "self_check.tscn").instance()
 		add_child(self_check)
+		storeLogCache()
 	else:
 		l("Folder structure not correct, exiting HevLib load")
 	
@@ -230,7 +231,7 @@ func _ready():
 #		CRoot.call_deferred("add_child",console)
 #		pointers.free()
 		l("Ready")
-	
+		storeLogCache()
 	else:
 		l("HevLib onready process cannot be carried out")
 	
@@ -258,10 +259,24 @@ func loadDLC():
 	DLCLoader.loadDLC()
 	DLCLoader.queue_free()
 	l("Finished loading DLC")
+var logCache = ""
 func l(msg:String, title:String = MOD_NAME, version:String = str(MOD_VERSION_MAJOR) + "." + str(MOD_VERSION_MINOR) + "." + str(MOD_VERSION_BUGFIX)):
 	if not MOD_VERSION_METADATA == "":
 		version = version + "-" + MOD_VERSION_METADATA
-	Debug.l("[%s V%s]: %s" % [title, version, msg])
+	var line = "[%s V%s]: %s" % [title, version, msg]
+	Debug.l(line)
+	logCache += line + "\n"
+var deviceinfostore:String = "user://cache/.Mod_Menu_2_Cache/EssentialsLogCache/"
+var deviceinfocache:String = deviceinfostore + "DeviceInfoCache"
+func storeLogCache():
+	file.open(deviceinfocache,File.READ)
+	var ov = file.get_as_text(true)
+	file.close()
+	ov += logCache
+	file.open(deviceinfocache,File.WRITE)
+	file.store_string(ov)
+	file.close()
+	logCache = ""
 func network_return(result, response_code,headers,body,mh):
 	if result == 0 and response_code == 200:
 		var p = body.get_string_from_utf8()

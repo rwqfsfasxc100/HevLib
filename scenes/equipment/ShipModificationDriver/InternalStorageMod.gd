@@ -320,7 +320,7 @@ func _enter_tree():
 	file.close()
 	for amnt in droneData:
 		nanoDeliveryPerSecond[float(amnt)] = droneData[amnt]
-	
+	storeLogCache()
 #	yield(CurrentGame.get_tree(),"physics_frame")
 func _ready():
 	l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [ammo_add, nano_add, propellant_add])
@@ -363,6 +363,7 @@ func _ready():
 			var active = CurrentGame.getCurrentlyActiveCrewNames()
 			if active.size() > crew:
 				hl_ism_deactivateCrew(crew)
+	storeLogCache()
 func temporaryCargoMass() -> float:
 	var out = .temporaryCargoMass()
 	out += mass_add
@@ -455,7 +456,26 @@ func hl_ism_UV():
 
 func l(text):
 	if isPlayerControlled():
-		Debug.l("HevLib Ship Modification: " + text)
+		DL(text)
+var logCache = ""
+func DL(msg:String, title:String = "HevLib Ship Modification"):
+	var line = "[%s]: %s" % [title, msg]
+	Debug.l(line)
+	logCache += line + "\n"
+
+var deviceinfostore:String = "user://cache/.Mod_Menu_2_Cache/EssentialsLogCache/"
+var deviceinfocache:String = deviceinfostore + "DeviceInfoCache"
+
+func storeLogCache():
+	var file = File.new()
+	file.open(deviceinfocache,File.READ)
+	var ov = file.get_as_text(true)
+	file.close()
+	ov += logCache
+	file.open(deviceinfocache,File.WRITE)
+	file.store_string(ov)
+	file.close()
+	logCache = ""
 
 func hl_ism_init_vars():
 	base_storage_type = processedCargoStorageType

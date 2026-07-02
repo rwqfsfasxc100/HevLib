@@ -27,8 +27,8 @@ func _ready():
 	
 #	loadTranslationsFromCache()
 	yield(Debug.get_tree(),"idle_frame")
-	Debug.l("Device Information: [\n%s\n]" % get_device_info())
-
+	l2("Device Information: [\n%s\n]" % get_device_info())
+	storeLogCache()
 var cache_extension = ".file_check_cache"
 
 func loadTranslationsFromCache():
@@ -139,8 +139,27 @@ func updateTL(path:String, delim:String = ",", useRelativePath:bool = true, full
 
 
 # Func to print messages to the logs
+var logCache = ""
 func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
-	Debug.l("[%s V%s]: %s" % [title, version, msg])
+	var line = "[%s V%s]: %s" % [title, version, msg]
+	Debug.l(line)
+	logCache += line + "\n"
+func l2(msg:String):
+	Debug.l(msg)
+	logCache += msg + "\n"
+
+var deviceinfostore:String = "user://cache/.Mod_Menu_2_Cache/EssentialsLogCache/"
+var deviceinfocache:String = deviceinfostore + "DeviceInfoCache"
+
+func storeLogCache():
+	file.open(deviceinfocache,File.READ)
+	var ov = file.get_as_text(true)
+	file.close()
+	ov += logCache
+	file.open(deviceinfocache,File.WRITE)
+	file.store_string(ov)
+	file.close()
+	logCache = ""
 
 func get_device_info() -> String:
 	var out = ""
