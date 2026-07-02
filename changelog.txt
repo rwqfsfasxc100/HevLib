@@ -1,3 +1,18 @@
+[1.14.12]
+
+1=* Added checks to prevent ManifestV2.__get_mod_files() from finding and exposing mod files related to nonfunctional modmain files.
+1.1=* Normally this shouldn't be an issue, however this is a failsafe to prevent mods with incorrect file paths from causing crashes from loading resources down the line.
+1.2=* This has the added benefit of making it considerably more obvious that something has gone wrong.
+1.3=* This also recursively affects all methods directly fetching from this method, including:
+1.3.1=* ManifestV2.__get_modmain_files()
+1.3.2=* ManifestV2.__get_all_modlets()
+1.3.3=* ManifestV2.__get_manifest_files()
+1.3.4=* ManifestV2.__get_icon_files()
+1.3.5=* And any other methods making use of those.
+2=* Removed a large number of unused files
+2.1=* Majority come from very old EquipmentDriver processes and never got removed when upgrading how it worked.
+2.2=* However, some such as Variables.gd did get superseded by the pointers node, especially after being made available from the ModLoader's _savedObjects array.
+
 [1.14.11]
 
 1=* Added option to specify "ALL" for the ship_name property for MODIFY_SHIP_NUMERICS.gd entry to have the change recursive across all vessels
