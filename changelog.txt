@@ -1,3 +1,12 @@
+[1.14.11]
+
+1=* Added option to specify "ALL" for the ship_name property for MODIFY_SHIP_NUMERICS.gd entry to have the change recursive across all vessels
+1.1=* Any changes defined by this operation are performed before ship-specific operations, and therefore is still safe for those changes to not be affected
+2=* Added safer logging routines provided through pointers.l() method.
+2.1=* Accepts a string for the input, and can additionally provide a title as a second argument string to add a source identifier (i.e. [Test Module]: Message)
+2.2=* To reduce file writes and to save performance, this is only written to cache through a pointers.storeLogCache() call
+2.3=* This still writes to the game log, but provides an additional means to read boot logs if logs are likely to be overwritten
+
 [1.14.10]
 
 1=* Fixed crash when selecting the "Vanilla" option of the mod menu mod list
