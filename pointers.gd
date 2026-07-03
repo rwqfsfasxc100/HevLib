@@ -1545,6 +1545,9 @@ class _DataFormat:
 						"Bool for whether the URL is valid."
 					]
 				},
+				"__loadDLC":{
+					"description":"Clears cache as a fix for issues with loading DLC."
+				},
 			}
 		}
 	
@@ -2067,7 +2070,12 @@ class _DataFormat:
 		if vt: return true
 		return false
 	
-	
+	func __loadDLC():
+		pointers.l("Preloading DLC as workaround","pointers.DataFormat")
+		var DLCLoader:Settings = preload("res://Settings.gd").new()
+		DLCLoader.loadDLC()
+		DLCLoader.queue_free()
+		pointers.l("Finished loading DLC","pointers.DataFormat")
 
 class _DriverManagement:
 	var scripts : Array = [
@@ -6866,6 +6874,7 @@ class _ManifestV2:
 		for modlet in modlet_manifests:
 			var drivers = pointers.DriverManagement.__get_drivers_from_modmain_path(modlet)
 			if "LOAD_RESOURCES.gd" in drivers:
+				pointers.DataFormat.__loadDLC()
 				var resources : Dictionary = drivers["LOAD_RESOURCES.gd"].get("LOAD_RESOURCES",{})
 				if resources and typeof(resources) == TYPE_DICTIONARY:
 					for resource in resources:
