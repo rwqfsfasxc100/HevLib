@@ -31,7 +31,6 @@ func _ready():
 		CRoot.call_deferred("add_child",keybind_interrupt)
 		
 		l("Ready")
-		pointers.storeLogCache()
 	else:
 		Debug.l("HevLib Keymapping onready process cannot be carried out")
 

@@ -17,11 +17,10 @@ func _tree_entered():
 	var msecs = str(spl[1])
 	while msecs.begins_with("0"):
 		msecs = msecs.substr(1)
-	l("Finished adding equipment. Process took a total time of %s seconds, %s milliseconds" % [secs,msecs])
-	storeLogCache()
+	pointers.l("Finished adding equipment. Process took a total time of %s seconds, %s milliseconds" % [secs,msecs])
 
 func sort_slot(slot):
-	l("Sorting equipment for slot %s" % slot.name)
+	pointers.l("Sorting equipment for slot %s" % slot.name)
 	var items = slot.get_node("VBoxContainer").get_children()
 	var nodePositions = []
 	for item in items:
@@ -43,7 +42,6 @@ func sort_slot(slot):
 			noFail = false
 		else:
 			noFail = true
-	storeLogCache()
 
 func display_slots() -> Array:
 	var children = self.get_children()
@@ -52,26 +50,6 @@ func display_slots() -> Array:
 		if child.get_parent() == self:
 			list.append(child)
 	return list
-
-var logCache = ""
-func l(msg:String, title:String = "HevLib Equipment Driver"):
-	var line = "[%s]: %s" % [title, msg]
-	Debug.l(line)
-	logCache += line + "\n"
-
-var deviceinfostore:String = "user://cache/.Mod_Menu_2_Cache/EssentialsLogCache/"
-var deviceinfocache:String = deviceinfostore + "DeviceInfoCache"
-
-func storeLogCache():
-	var file = File.new()
-	file.open(deviceinfocache,File.READ)
-	var ov = file.get_as_text(true)
-	file.close()
-	ov += logCache
-	file.open(deviceinfocache,File.WRITE)
-	file.store_string(ov)
-	file.close()
-	logCache = ""
 
 var slot_order_cache_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order.json"
 var slot_order_relative_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order_relative.json"

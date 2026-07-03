@@ -31,23 +31,3 @@ func check_validity():
 	else:
 		process = true
 	
-	
-var logCache = ""
-func l(msg:String, title:String = "HevLib Research Overhead"):
-	var line = "[%s]: %s" % [title, msg]
-	Debug.l(line)
-	logCache += line + "\n"
-
-var deviceinfostore:String = "user://cache/.Mod_Menu_2_Cache/EssentialsLogCache/"
-var deviceinfocache:String = deviceinfostore + "DeviceInfoCache"
-
-func storeLogCache():
-	var file = File.new()
-	file.open(deviceinfocache,File.READ)
-	var ov = file.get_as_text(true)
-	file.close()
-	ov += logCache
-	file.open(deviceinfocache,File.WRITE)
-	file.store_string(ov)
-	file.close()
-	logCache = ""

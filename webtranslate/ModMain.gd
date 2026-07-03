@@ -30,7 +30,6 @@ func _ready():
 	if correct:
 		yield(Debug.get_tree(),"idle_frame")
 		l("Device Information: [\n%s\n]" % get_device_info())
-		pointers.storeLogCache()
 var cache_extension = ".file_check_cache"
 
 func loadTranslationsFromCache():
