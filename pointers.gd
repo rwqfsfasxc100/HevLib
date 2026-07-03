@@ -97,7 +97,7 @@ func storeLogCache():
 		file.open(deviceinfocache,File.WRITE)
 		file.store_string(ov)
 		file.close()
-		logCache = ""
+		logCache.clear()
 
 class _Achievements:
 	var scripts : Array = [
@@ -1999,7 +1999,7 @@ class _DataFormat:
 	
 	func __replace_scene(scene_data:String,override_path:String = "",scene_file_path:String = "",cache_scene:bool = true) -> PackedScene:
 		var scene_replacement : String  = (scene_file_path) if scene_file_path else ("user://cache/.HevLib_Cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec())
-		pointers.l("__replace scene called with [override: %s / store path: %s / force cache: %s]" % [scene_data,override_path,scene_replacement,str(cache_scene)],"pointers.DataFormat")
+		pointers.l("__replace scene called with [override: %s / store path: %s / force cache: %s]" % [override_path,scene_replacement,str(cache_scene)],"pointers.DataFormat")
 		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
 		file.open(scene_replacement,File.WRITE)
 		file.store_string(scene_data)
@@ -5687,7 +5687,7 @@ class _ManifestV2:
 				modListArr.append(__concat_mod_info(item))
 			total_mod_count = modListArr.size()
 			var totalSTDOUT = "solved [%s] mod-definition files [%s ModMains / %s Modlets]" % [total_mod_count,modmain_files.size(),modlet_files.size()]
-			print("[pointers.ManifestV2]: ]" + totalSTDOUT)
+			print("[pointers.ManifestV2]: " + totalSTDOUT)
 			pointers.l(totalSTDOUT,"pointers.ManifestV2")
 			modListArr.sort_custom(self,"sortModList")
 			
