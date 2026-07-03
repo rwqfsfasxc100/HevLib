@@ -130,7 +130,6 @@ func _init(modLoader : ModLoader = ModLoader):
 		var for_reload = pointers.ManifestV2.__load_modlets(false)
 		for old_path in for_reload:
 			pointers.DataFormat.__reload_scene(old_path)
-		pointers.storeLogCache()
 	else:
 		Debug.l("Folder structure not correct, exiting HevLib load")
 	
@@ -186,7 +185,6 @@ func _ready():
 		for old_path in for_reload:
 			pointers.DataFormat.__reload_scene(old_path)
 		l("Ready")
-		pointers.storeLogCache()
 	else:
 		Debug.l("HevLib Equipment Driver onready process cannot be carried out")
 func installScriptExtension(path:String):
@@ -233,9 +231,10 @@ func replaceSceneLiteral(newPath:String, oldPath:String):
 	l("Updating scene literal: %s" % newPath)
 
 	var scene := load(newPath)
-	scene.take_over_path(oldPath)
-	_savedObjects.append(scene)
-	l("Finished updating literal: %s" % oldPath)
+	if scene and scene.can_instance():
+		scene.take_over_path(oldPath)
+		_savedObjects.append(scene)
+		l("Finished updating literal: %s" % oldPath)
 
 # Func to print messages to the logs
 func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
