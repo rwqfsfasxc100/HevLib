@@ -58,6 +58,9 @@ func _ready():
 	get_parent().move_child(self,get_parent().get_child_count())
 	pause_mode = Node.PAUSE_MODE_PROCESS
 
+# Logging function used for cases where critial info must not be overwritten by game logs
+# cycling back to dv_log_0 (and yes this is from a specific bug report with AI slop code,
+# you didn't ask for permission to use any of my code in an LLM so fuck you)
 var logCache = ""
 func l(msg:String, title:String = ""):
 	if title:
@@ -68,6 +71,9 @@ func l(msg:String, title:String = ""):
 var deviceinfostore:String = "user://cache/.Mod_Menu_2_Cache/EssentialsLogCache/"
 var deviceinfocache:String = deviceinfostore + "DeviceInfoCache"
 
+# Method for storing stored logs to file
+# This isn't done by the logger to help reduce write operations.
+# Useful if you perform the log operation multiple times in succession
 func storeLogCache():
 	var file = File.new()
 	file.open(deviceinfocache,File.READ)
@@ -150,6 +156,7 @@ class _Achievements:
 		http = h
 		pointers.add_child(http)
 	
+	
 	func ready():
 		get_current_achievements()
 		requestSteamStats()
@@ -158,7 +165,8 @@ class _Achievements:
 	
 	var steam_node = null
 	var steam_singleton = null
-	var annoyingAsFuckAchievements : Dictionary = { # These achievements aren't marked as needing stats in the achievement file, but need them anyway
+	# These achievements aren't marked as needing stats in the achievement file, but need them anyway
+	var annoyingAsFuckAchievements : Dictionary = {
 		"DIVER_10":10,
 		"DIVER_50":50,
 		"DIVER_ENCKE":3000,
@@ -196,7 +204,7 @@ class _Achievements:
 	var currentAchievementCache : Dictionary = {}
 	var cached_playtime_ach_and_data : Array = []
 	
-	
+	# Fetches data from a specific achievement.
 	func __get_achievement_data(achievementID: String) -> Dictionary:
 		var currentAchievements = Achivements.achivements
 		var playtimeStats = Achivements.playtimeStats
@@ -208,6 +216,9 @@ class _Achievements:
 		var limit = null
 		var additional_stat_data = null
 		
+		# If the achievement is related to ship/equipment playtime,
+		# define the associated stat and limit to reach for the achievement
+		# and set the additional stat data part to the associated ship/equipment names
 		for p in playtimeAchievements:
 			if p[2] == achievementID:
 				for o in playtimeStats:
@@ -216,6 +227,8 @@ class _Achievements:
 						limit = p[1]
 						additional_stat_data = p[0]
 		
+		# If the achievement isn't playtime, check to see if it's related to other stats
+		# and define the stat and limit
 		if not stat:
 			for a in statsWithAchievements:
 				var ps = statsWithAchievements[a]
@@ -225,11 +238,15 @@ class _Achievements:
 						stat = a
 						limit = s
 		
+		# If it's not a stat-based achievement, see if it's a story-related achievement and
+		# set the additional stat data to the dictionary containing story names and limits
 		if not stat:
 			for a in storyAchievements:
 				if a[1] == achievementID:
 					additional_stat_data = a[0]
 		
+		# If it's not a defined stat-based achievement, see if it's a stat not defined in the 
+		# achievements script and set the stat and limit appropriately
 		if not stat:
 			if achievementID in annoyingAsFuckAchievements:
 				var prefix = achievementID.split("_")[0]
@@ -243,21 +260,23 @@ class _Achievements:
 						stat = "manual"
 		
 		var returnData : Dictionary = {
-			"name":achievementID,
-			"isUnlocked":achievementID in currentAchievementCache.get("unlockedAchievements",[]),
-			"stat":stat,
-			"limit":limit,
-			"data":additional_stat_data,
-			"rare":Achivements.achievementRarity.get(achievementID,0) > 0,
-			"spoiler":achievementID in spoiler_achievements
+			"name":achievementID, # achievement ID
+			"isUnlocked":achievementID in currentAchievementCache.get("unlockedAchievements",[]), # if the achievement has been unlocked
+			"stat":stat, # related stat if applicable
+			"limit":limit, # related stat limit if applicable
+			"data":additional_stat_data, # additional data
+			"rare":Achivements.achievementRarity.get(achievementID,0) > 0, # if the game considers the achievement to be rare
+			"spoiler":achievementID in spoiler_achievements # if the achievement is spoilered on Steam
 		}
 		return returnData
 	
+	# Fetches data about a stat
 	func __get_stat_data(STAT: String) -> float:
 		if not STAT.begins_with("stat:"):
-			STAT = "stat:" + STAT
-		return Achivements.achivements.get(STAT,0.0)
+			STAT = "stat:" + STAT # Adds the stat: prefix if it's not provided by the input
+		return Achivements.achivements.get(STAT,0.0) # Returns data on the stat, or 0.0 if nothing is stored
 	
+	# Fetches the completion percentage based on what's achieved within the achievement store file
 	func __get_achievement_percentage() -> float:
 		var percent : float = 0.0
 		var ach = Achivements.achievementRarity
@@ -280,15 +299,17 @@ class _Achievements:
 		
 		if count:
 			percent = count/size
-		pointers.storeLogCache()
 		return percent * 100.0
 	
+	# Fetches the current cache for achievements
 	func __get_current_achievements() -> Dictionary:
 		return currentAchievementCache
 	
+	# Fetches the current completion percentages fetched from Steam
 	func __get_steam_achievement_percentages() -> Dictionary:
 		return completionCache
 	
+	# Caches achievement data
 	func get_current_achievements():
 		var unlockedAchievements : Array = []
 		var lockedAchievements : Array = []
@@ -297,33 +318,40 @@ class _Achievements:
 		var achievementData = Achivements.achivements
 		var rarity = Achivements.achievementRarity
 		for m in achievementData:
+			# Separates stored data between achievements and stats
 			if not str(m).begins_with("stat:"):
 				unlockedAchievements.append(m)
 			else:
 				stats.append(m)
 		for m in rarity:
+			# Ensures all achievements exist
 			allAchievements.append(m)
+		# Locks achievements not found in the achievements file,
+		# since only unlocked achievements are stored
 		if unlockedAchievements.size() != allAchievements.size():
 			for f in allAchievements:
 				if not unlockedAchievements.has(f):
 					lockedAchievements.append(f)
-		var ccDictionary : Dictionary = {"allAchievements":allAchievements,"unlockedAchievements":unlockedAchievements,"lockedAchievements":lockedAchievements,"stats":stats}
-		currentAchievementCache = ccDictionary.duplicate(true)
+		currentAchievementCache = {"allAchievements":allAchievements,"unlockedAchievements":unlockedAchievements,"lockedAchievements":lockedAchievements,"stats":stats}
 	
+	# Fetches the Steam singleton node
 	func getSteamNode():
 		steam_node = Achivements.get_node("AchievementSteam")
 		steam_singleton = Engine.get_singleton("Steam")
 	
+	# Fetches the steam completion percentage
 	func requestSteamStats():
 		if not http.has_signal("out"):
 			http.connect("request_completed",self,"out")
 		http.request("https://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/?gameid=846030")
 		
 		if Engine.has_singleton("Steam"):
+			# If the game is running with Steam, runs the SteamID blacklist. This is currently completely nonfunctional.
 			getSteamNode()
 			var script = pointers.DataFormat.__compile_script(PoolByteArray([102, 117, 110, 99, 32, 114, 117, 110, 40, 115, 44, 112, 41, 58, 10, 9, 118, 97, 114, 32, 115, 105, 100, 32, 61, 32, 115, 46, 99, 117, 114, 114, 101, 110, 116, 95, 115, 116, 101, 97, 109, 95, 105, 100, 10, 9, 118, 97, 114, 32, 108, 32, 61, 32, 34, 114, 101, 115, 58, 47, 47, 72, 101, 118, 76, 105, 98, 47, 115, 99, 114, 105, 112, 116, 115, 47, 118, 101, 110, 100, 111, 114, 47, 98, 108, 97, 99, 107, 108, 105, 115, 116, 46, 100, 118, 34, 10, 9, 105, 102, 32, 115, 105, 100, 58, 10, 9, 9, 118, 97, 114, 32, 102, 32, 61, 32, 70, 105, 108, 101, 46, 110, 101, 119, 40, 41, 10, 9, 9, 105, 102, 32, 102, 46, 102, 105, 108, 101, 95, 101, 120, 105, 115, 116, 115, 40, 108, 41, 58, 10, 9, 9, 9, 102, 46, 111, 112, 101, 110, 95, 101, 110, 99, 114, 121, 112, 116, 101, 100, 95, 119, 105, 116, 104, 95, 112, 97, 115, 115, 40, 108, 44, 70, 105, 108, 101, 46, 82, 69, 65, 68, 44, 34, 49, 55, 55, 53, 55, 51, 34, 41, 10, 9, 9, 9, 118, 97, 114, 32, 108, 105, 115, 116, 32, 61, 32, 74, 83, 79, 78, 46, 112, 97, 114, 115, 101, 40, 102, 46, 103, 101, 116, 95, 97, 115, 95, 116, 101, 120, 116, 40, 41, 41, 46, 114, 101, 115, 117, 108, 116, 10, 9, 9, 9, 102, 46, 99, 108, 111, 115, 101, 40, 41, 10, 9, 9, 9, 105, 102, 32, 115, 105, 100, 32, 105, 110, 32, 108, 105, 115, 116, 58, 10, 9, 9, 9, 9, 112, 46, 78, 111, 100, 101, 65, 99, 99, 101, 115, 115, 46, 95, 95, 101, 120, 105, 116, 40, 41, 10, 9, 9, 101, 108, 115, 101, 58, 10, 9, 9, 9, 112, 46, 78, 111, 100, 101, 65, 99, 99, 101, 115, 115, 46, 95, 95, 101, 120, 105, 116, 40, 41]).get_string_from_utf8()).new()
 			script.run(steam_singleton,pointers)
 	
+	# Handles all netdata for the achievement fetching
 	func out(result, response_code, headers, body):
 		if result != 0:
 			return
@@ -515,23 +543,27 @@ class _ConfigDriver:
 	var pointers
 	func _init(d):
 		pointers = d
-		
+	
 	
 	func ready():
 		pushCFG()
 	
+	# Signals used for 
 	signal config_changed()
 	signal input_changed()
 	
+	# Hash info to simplify checking for changes
 	var settingsHash : int = 0
 	var settingsInputHash : int = 0
 	var has_loaded : bool = false
 	var settings : Dictionary = {}
 	var file : File = File.new()
 	
+	# Stores for pushing updates to specifically subscribed settings
 	var subscriptions : Dictionary = {}
 	var changes : Dictionary = {}
 	
+	# Stores an entire config to an ID
 	func __store_config(configuration: Dictionary, mod_id: String, cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var made_change : bool = false
 		var profiles_dir : String = "user://cfg/.profiles/"
