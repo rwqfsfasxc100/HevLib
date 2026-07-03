@@ -1,3 +1,7 @@
+[1.14.15]
+
+1=* Fixed critical issue where links would not be fetched from manifests, preventing automatic updates.
+
 [1.14.14]
 
 1=* Added ability to add new salvage events to SRO through `ADD_SHIPS.gd`.

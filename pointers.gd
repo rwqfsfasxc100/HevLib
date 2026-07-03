@@ -6196,7 +6196,7 @@ class _ManifestV2:
 							for link in links:
 								var ld = links[link]
 								if typeof(ld) == TYPE_DICTIONARY:
-									if "URL" in ld and typeof(ld) == TYPE_STRING:
+									if "URL" in ld and typeof(ld.URL) == TYPE_STRING:
 										ovLinks[link] = ld
 							if ovLinks:
 								dict_template["links"] = ovLinks
