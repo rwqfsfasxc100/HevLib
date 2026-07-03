@@ -39,7 +39,6 @@ func _init(modLoader = ModLoader):
 		var self_directory = self_path.split(self_path.split("/")[self_path.split("/").size() - 1])[0]
 		var self_check = load(self_directory + "self_check.tscn").instance()
 		add_child(self_check)
-		pointers.storeLogCache()
 	else:
 		Debug.l("Folder structure not correct, exiting HevLib load")
 	
@@ -174,12 +173,13 @@ func _ready():
 		var file = File.new()
 		file.open("user://cache/.HevLib_Cache/library_documentation.json", File.WRITE)
 		
-		var functionality = pointers.HevLib.__get_library_functionality(true)
-		file.store_string(functionality)
-		file.close()
-		file.open("user://cache/.HevLib_Cache/currently_installed_mods.json", File.WRITE)
-		file.store_string(str(mod_data))
-		file.close()
+		# Fix this later and update the HevLib class once documentation is finished.
+#		var functionality = pointers.HevLib.__get_library_functionality(true)
+#		file.store_string(functionality)
+#		file.close()
+#		file.open("user://cache/.HevLib_Cache/currently_installed_mods.json", File.WRITE)
+#		file.store_string(str(mod_data))
+#		file.close()
 		
 		var cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/"
 		replaceScene("scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
@@ -199,9 +199,7 @@ func _ready():
 			if data > count:
 				count = data
 		var crew = pointers.NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",count)
-		if not crew == "":
-			var escene := load(crew)
-			escene.take_over_path("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
+		
 		if enable_research:
 			replaceScene("scenes/research/Enceladus.tscn","res://enceladus/Enceladus.tscn")
 		
@@ -226,7 +224,6 @@ func _ready():
 #		CRoot.call_deferred("add_child",console)
 #		pointers.free()
 		l("Ready")
-		pointers.storeLogCache()
 	else:
 		Debug.l("HevLib onready process cannot be carried out")
 	
