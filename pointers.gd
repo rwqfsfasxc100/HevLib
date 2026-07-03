@@ -6714,10 +6714,13 @@ class _ManifestV2:
 					excludeDirs.append(vdir.to_lower())
 					pointers.l("Excluding mod directoy %s due to malformatted mod main" % vdir,"pointers.ManifestV2")
 		var arr2:Array = []
-		for file in arr1:
-			var vr:String = file.get_base_dir().to_lower()
-			if not vr in excludeDirs:
-				arr2.append(file)
+		if excludeDirs:
+			for file in arr1:
+				var vr:String = file.get_base_dir().to_lower()
+				if not vr in excludeDirs:
+					arr2.append(file)
+		else:
+			arr2 = arr1
 		pointers.storeLogCache()
 		cached_mod_files = arr2
 		return cached_mod_files.duplicate(true)
