@@ -1641,7 +1641,7 @@ class _DataFormat:
 		if script_source:
 			var extend_this:bool = true
 			if recurse_through_base_scripts:
-				var base_script = script_source.get_base_script()
+				var base_script:Script = script_source.get_base_script()
 				if base_script:
 					var base_data : Array = __trim_script_object(base_script,get_detailed_operands,trim_unnecessary_newlines,recurse_through_base_scripts)
 					concat += base_data[0]
