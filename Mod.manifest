@@ -235,6 +235,16 @@ HEVLIB_CONFIG_SECTION_DEBUG={
 		"type":"bool",
 		"default":false
 	},
+	"pointer_logging_frame_interval":{
+		"name":"HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL",
+		"description":"HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL_TOOLTIP",
+		"type":"int",
+        "style":"slider",
+        "min":1,
+        "max":60,
+        "step":1,
+		"default":2,
+	}
 }
 HEVLIB_CONFIG_SECTION_INPUT={
 	"open_debug_event_menu":{
