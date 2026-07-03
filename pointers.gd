@@ -1666,7 +1666,6 @@ class _DataFormat:
 							method_names.append(i)
 							method_values.append(base_data[6][f])
 							method_output_type.append(base_data[7][f])
-#					breakpoint
 			var data : String  = script_source.get_source_code()
 			var streaming:bool = false
 			var this_stream : String = ""
