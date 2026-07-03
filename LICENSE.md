@@ -13,7 +13,7 @@ in the documentation and/or other materials provided with the distribution.
 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products
 derived from this software without specific prior written permission.
 
-4. The source code and the binary form, and any modifications made to them may not be used for the purpose of training or improving machine learning algorithms,
+4. The source code and the binary form, and any modifications made to them may not be used for the purpose of input data, the training of, or improvment of machine learning algorithms,
 including but not limited to artificial intelligence, natural language processing, or data mining. This condition applies to any derivatives,
 modifications, or updates based on the Software code. Any usage of the source code or the binary form in an AI-training dataset is considered a breach of this License.
 

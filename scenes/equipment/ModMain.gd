@@ -239,7 +239,7 @@ func replaceSceneLiteral(newPath:String, oldPath:String):
 
 # Func to print messages to the logs
 func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
-	var line = "[%s V%s]" % [title, version]
+	var line = "%s V%s" % [title, version]
 	pointers.l(msg,line)
 
 var deviceinfostore:String = "user://cache/.Mod_Menu_2_Cache/EssentialsLogCache/"

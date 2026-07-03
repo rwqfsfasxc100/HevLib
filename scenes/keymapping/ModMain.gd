@@ -36,5 +36,5 @@ func _ready():
 		Debug.l("HevLib Keymapping onready process cannot be carried out")
 
 func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
-	var line = "[%s V%s]" % [title, version]
+	var line = "%s V%s" % [title, version]
 	pointers.l(msg,line)

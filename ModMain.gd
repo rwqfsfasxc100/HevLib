@@ -257,7 +257,7 @@ func loadDLC():
 func l(msg:String, title:String = MOD_NAME, version:String = str(MOD_VERSION_MAJOR) + "." + str(MOD_VERSION_MINOR) + "." + str(MOD_VERSION_BUGFIX)):
 	if not MOD_VERSION_METADATA == "":
 		version = version + "-" + MOD_VERSION_METADATA
-	var line = "[%s V%s]" % [title, version]
+	var line = "%s V%s" % [title, version]
 	pointers.l(msg,line)
 func network_return(result, response_code,headers,body,mh):
 	if result == 0 and response_code == 200:
