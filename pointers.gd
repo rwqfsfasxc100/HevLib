@@ -48,10 +48,20 @@ var Classes = [
 	Zip,
 ]
 
+var logging_frame_interval = 0
+var logging_current_frame_timer = 0
 func _physics_process(delta:float):
 	if ConfigDriver.mk_c:
 		ConfigDriver.handle_change_made()
+	logging_current_frame_timer += 1
+	if logging_frame_interval and logging_current_frame_timer > logging_frame_interval:
+		storeLogCache()
+
 func _ready():
+	var dir:Directory = Directory.new()
+	if not dir.dir_exists(deviceinfostore):
+		dir.make_dir_recursive(deviceinfostore)
+	logging_frame_interval = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","pointer_logging_frame_interval")
 	ConfigDriver.ready()
 	Achievements.ready()
 	yield(get_tree(),"idle_frame")
@@ -61,29 +71,33 @@ func _ready():
 # Logging function used for cases where critial info must not be overwritten by game logs
 # cycling back to dv_log_0 (and yes this is from a specific bug report with AI slop code,
 # you didn't ask for permission to use any of my code in an LLM so fuck you)
-var logCache = ""
+var logCache = PoolStringArray()
 func l(msg:String, title:String = ""):
 	if title:
 		msg = "[%s]: %s"  % [title, msg]
 	Debug.l(msg)
-	logCache += msg + "\n"
+	if logCache == null:
+		logCache = PoolStringArray()
+	logCache.append(msg)
 
-var deviceinfostore:String = "user://cache/.Mod_Menu_2_Cache/EssentialsLogCache/"
-var deviceinfocache:String = deviceinfostore + "DeviceInfoCache"
+var deviceinfostore:String = "user://cache/.HevLib_Cache/logs/"
+var deviceinfocache:String = deviceinfostore + "pointer_logs.txt"
 
 # Method for storing stored logs to file
 # This isn't done by the logger to help reduce write operations.
 # Useful if you perform the log operation multiple times in succession
 func storeLogCache():
-	var file = File.new()
-	file.open(deviceinfocache,File.READ)
-	var ov = file.get_as_text(true)
-	file.close()
-	ov += logCache
-	file.open(deviceinfocache,File.WRITE)
-	file.store_string(ov)
-	file.close()
-	logCache = ""
+	if logCache:
+		var file = File.new()
+		file.open(deviceinfocache,File.READ)
+		var ov = file.get_as_text(true)
+		file.close()
+		for line in logCache:
+			ov += line + "\n"
+		file.open(deviceinfocache,File.WRITE)
+		file.store_string(ov)
+		file.close()
+		logCache = ""
 
 class _Achievements:
 	var scripts : Array = [
@@ -288,7 +302,6 @@ class _Achievements:
 				achivements = parse_json(sg)
 			else:
 				pointers.l("Error loading achievements file","pointers.Achievements")
-				pointers.storeLogCache()
 		file.close()
 		
 		var count : float = 0.0
@@ -688,7 +701,6 @@ class _ConfigDriver:
 			var error:int = cfg.load(cfg_folder+cfg_filename)
 			if error != OK:
 				pointers.l("HevLib Config File: Error loading settings %s" % error,"pointers.ConfigDriver")
-				pointers.storeLogCache()
 				return null
 			
 			if cfg.has_section(full):
@@ -737,7 +749,6 @@ class _ConfigDriver:
 						pointers.l("node %s is already connected with the method '%s'" % [str(node),method],"pointers.ConfigDriver")
 				else:
 					pointers.l("node %s does not have the method '%s'" % [str(node),method],"pointers.ConfigDriver")
-		pointers.storeLogCache()
 	func __remove_connection(method: String, node: Object, type: String = "config", input_method: String = "input_changed"): # Type accepts "config", "input", or "both"
 		match type.to_lower():
 			"config":
@@ -768,7 +779,7 @@ class _ConfigDriver:
 						pointers.l("node %s is already connected with the method '%s'" % [str(node),method],"pointers.ConfigDriver")
 				else:
 					pointers.l("node %s does not have the method '%s'" % [str(node),method],"pointers.ConfigDriver")
-		pointers.storeLogCache()
+		
 	
 	func __load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var default_binds : Dictionary = pointers.Keymapping.__get_formatted_vanilla_binds()
@@ -927,7 +938,7 @@ class _ConfigDriver:
 						else:
 							pointers.l("Input key [%s] already exists, skipping" % key,"pointers.ConfigDriver")
 						pointers.Keymapping.__load_input_data(key,p,opts)
-		pointers.storeLogCache()
+		
 	
 	func __load_inputs_from_string_array(key:String, strings: Array):
 		for i in strings:
@@ -968,7 +979,7 @@ class _ConfigDriver:
 					InputMap.action_add_event(key, event)
 				else:
 					pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.ConfigDriver")
-		pointers.storeLogCache()
+		
 	func set_button_focus(button,check_button):
 		var parent = button.get_parent()
 		var children = parent.get_children()
@@ -1168,7 +1179,7 @@ class _ConfigDriver:
 				subscriptions[top][setting].append([object,method])
 		else:
 			pointers.l("node %s does not have the method '%s'" % [str(object),method],"pointers.ConfigDriver")
-			pointers.storeLogCache()
+			
 	
 	func __disconnect_subscription(method: String,object: Object,id: String,section: String,setting: String):
 		var top : String  = __truncate_to_setting_entry(id,section)
@@ -1467,6 +1478,18 @@ class _DataFormat:
 						"scene_path -> (String) the file path to the scene to be updated.",
 					],
 				},
+				"__replace_scene":{
+					"description":"Compiles a scene, updates it's instance if an override path is provided, and returns it.",
+					"args":[
+						"scene_data -> (String) data for the scene stored as a string. This must be a valid scene structure for this operation to work.",
+						"override_path (optional) -> (String) if provided, the file path to update a pre-existing scene with. Scene must be visible to the engine to be replaced. Defaults to ''",
+						"scene_file_path (optional) -> (String) if set, defines a specific path to save the scene to. If left blank, instead stores it in the Variable_Fetch cache with a random name. Defaults to ''",
+						"cache_scene (optional) -> (bool) whether to cache the file to prevent it from being garbage collected. Caching automatically happens if updating a file at override_path. Defaults to true."
+					],
+					"return":[
+						"If the scene data was valid, a PackedScene as the compiled scene, otherwise null."
+					]
+				},
 				"__replace_resource":{
 					"description":"Sets the path for a resource to a specific path, equivalent to the replaceScene methods from modmains.",
 					"args":[
@@ -1579,7 +1602,6 @@ class _DataFormat:
 		var size = array.size()
 		if size % 2 == 1:
 			pointers.l("Cannot convert array to PoolVector2Array with an odd number of entries","pointers.DataFormat")
-			pointers.storeLogCache()
 			return PoolVector2Array([])
 		var index:int = 0
 		while index < size:
@@ -1587,11 +1609,9 @@ class _DataFormat:
 			var bRaw = array[index + 1]
 			if not (aRaw is float or aRaw is int or aRaw is String):
 				pointers.l("Cannot convert type %s for PoolVector2Array" % aRaw,"pointers.DataFormat")
-				pointers.storeLogCache()
 				return PoolVector2Array([])
 			if not (bRaw is float or bRaw is int or bRaw is String):
 				pointers.l("Cannot convert type %s for PoolVector2Array" % bRaw,"pointers.DataFormat")
-				pointers.storeLogCache()
 				return PoolVector2Array([])
 			var a:float = float(aRaw)
 			var b:float = float(bRaw)
@@ -1877,7 +1897,9 @@ class _DataFormat:
 	
 	func __compile_script(source_code : String) -> Script:
 		var shash:int = hash(source_code)
+		pointers.l("Compiling script resource [%d]" % shash,"pointers.DataFormat")
 		if shash in compiled_scripts:
+			pointers.l("Fetching from cache","pointers.DataFormat")
 			return compiled_scripts[shash]
 		var out:GDScript = GDScript.new()
 		out.set_source_code(source_code)
@@ -1895,7 +1917,9 @@ class _DataFormat:
 			shash = str(hash(source_code)) + "_" + str(hash(parStr))
 		else:
 			shash = str(hash(source_code))
+		pointers.l("Compiling script as object @ [%s]; parameters: %s, new object: %s" % [shash,str(params),str(new_object)],"pointers.DataFormat")
 		if not new_object and shash in compiled_script_object_storage:
+			pointers.l("Fetching from cache","pointers.DataFormat")
 			return compiled_script_object_storage[shash]
 		
 		var gd:GDScript = GDScript.new()
@@ -1932,17 +1956,21 @@ class _DataFormat:
 	
 	var _savedScriptObjects : Array = []
 	func __compile_and_override_script(source_code : String) -> void:
+		pointers.l("Compiling script of length %s" % str(source_code.length()),"pointers.DataFormat")
 		pointers.equipment_modmain.installScriptExtensionFromSource(source_code)
 	
 	func __compile_and_override_script_with_scene(source_code : String, scene_path = []) -> void:
-		
-		__compile_and_override_script(source_code)
-		if not scene_path is Array:
+		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
-		for sc in scene_path:
+		pointers.l("Attempting to compile and override script (with override) with script of length [%s], [%s] scene path(s) to reload" % [source_code.length(),scene_path.size()],"pointers.DataFormat")
+		__compile_and_override_script(source_code)
+		for i in range(scene_path.size()):
+			var sc:String = scene_path[i]
+			pointers.l("Passing scene replacement %s/%s to reloader: %s" % [i,scene_path.size(),sc],"pointers.DataFormat")
 			__reload_scene(sc)
 	
 	func __reload_scene(scene_path : String):
+		pointers.l("Attempting to reload scene at [%s]" % scene_path,"pointers.DataFormat")
 		if __load_if_can(scene_path):
 			var scn = __get_load().instance()
 			var root : String  = scn.name
@@ -1951,23 +1979,41 @@ class _DataFormat:
 			else:
 				if is_instance_valid(scn) and not scn.is_queued_for_deletion():
 					scn.free()
-			var scene_replacement : String  = "user://cache/.HevLib_Cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec()
 			var p : String  = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"%s\" type=\"PackedScene\" id=1]\n\n[node name=\"%s\" instance=ExtResource( 1 )]" % [scene_path,root]
-			pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
-			file.open(scene_replacement,File.WRITE)
-			file.store_string(p)
-			file.close()
-			pointers.equipment_modmain.replaceSceneLiteral(scene_replacement,scene_path)
+			pointers.l("Successfully found data for reloading scene with root [%s], passing to scene replacer" % root,"pointers.DataFormat")
+			__replace_scene(p,scene_path)
 	
 	func __override_script(file_path : String):
+		pointers.l("Attempting to install script override at [%s]" % file_path,"pointers.DataFormat")
 		if __load_if_can(file_path):
-			var sc = __get_load().get_source_code()
+			var sc:String = __get_load().get_source_code()
+			pointers.l("Script override successful with length of %s, passing to compiler" % str(sc.length()),"pointers.DataFormat")
 			__compile_and_override_script(sc)
 	
 	func __replace_resource(resource_path:String, original_path:String):
 		if not ResourceLoader.exists(resource_path) or not ResourceLoader.exists(original_path):
+			pointers.l("Cannot replace resource at [%s] as it either does not exist or is not visible to the engine" % resource_path,"pointers.DataFormat")
 			return
+		pointers.l("Replacing resource at [%s] with [%s], passing to ModMain" % [original_path,resource_path],"pointers.DataFormat")
 		pointers.equipment_modmain.replaceSceneLiteral(resource_path,original_path)
+	
+	func __replace_scene(scene_data:String,override_path:String = "",scene_file_path:String = "",cache_scene:bool = true) -> PackedScene:
+		var scene_replacement : String  = (scene_file_path) if scene_file_path else ("user://cache/.HevLib_Cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec())
+		pointers.l("__replace scene called with [override: %s / store path: %s / force cache: %s]" % [scene_data,override_path,scene_replacement,str(cache_scene)],"pointers.DataFormat")
+		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
+		file.open(scene_replacement,File.WRITE)
+		file.store_string(scene_data)
+		file.close()
+		if override_path and ResourceLoader.exists(override_path):
+			pointers.equipment_modmain.replaceSceneLiteral(scene_replacement,override_path)
+		var scene : PackedScene = load(scene_replacement)
+		if cache_scene and not scene in pointers.equipment_modmain._savedObjects:
+			pointers.equipment_modmain._savedObjects.append(scene)
+		if scene and scene.can_instance():
+			pointers.l("Successfully created scene","pointers.DataFormat")
+			return scene
+		pointers.l("Scene creation failed","pointers.DataFormat")
+		return null
 	
 	var var_hash : Dictionary = {}
 	
@@ -3526,7 +3572,6 @@ class _Equipment:
 		file.store_string(ship_limitation_string)
 		file.close()
 		
-		pointers.storeLogCache()
 		UpgradeMenu.free()
 
 	var tagged_vanilla_slots : PoolStringArray = PoolStringArray()
@@ -4863,7 +4908,6 @@ class _Github:
 		if not node_to_return_to.has_method("_get_github_progress"):
 			gitHubFS.state_progress = false
 			pointers.l("Release Downloader NOTICE! Provided node [%s] does not have the method [_get_github_progress]. No download progress will be reported." % str(node_to_return_to),"pointers.Github")
-			pointers.storeLogCache()
 		var rng:RandomNumberGenerator = RandomNumberGenerator.new()
 		rng.randomize()
 		gitHubFS.releases_URL = URL
@@ -5066,7 +5110,7 @@ class _Keymapping:
 				InputMap.action_add_event(key, event)
 			else:
 				pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.Keymapping")
-		pointers.storeLogCache()
+	
 	var input_cache = {}
 	
 	func __define_vanilla_binds():
@@ -5643,7 +5687,7 @@ class _ManifestV2:
 				modListArr.append(__concat_mod_info(item))
 			total_mod_count = modListArr.size()
 			var totalSTDOUT = "solved [%s] mod-definition files [%s ModMains / %s Modlets]" % [total_mod_count,modmain_files.size(),modlet_files.size()]
-			print(totalSTDOUT)
+			print("[pointers.ManifestV2]: ]" + totalSTDOUT)
 			pointers.l(totalSTDOUT,"pointers.ManifestV2")
 			modListArr.sort_custom(self,"sortModList")
 			
@@ -5671,7 +5715,6 @@ class _ManifestV2:
 			var statistics : Dictionary = {"counts":stat_count,"tags":stat_tags}
 			var returnValues : Dictionary = {"mods":mod_dictionary,"statistics":statistics}
 			cached_mod_list = returnValues.duplicate(true)
-			pointers.storeLogCache()
 			if print_json:
 				var psj : String = JSON.print(cached_mod_list, "\t")
 				return psj
@@ -6185,7 +6228,6 @@ class _ManifestV2:
 										ovConfigs[section][cfname] = cfdata
 							if ovConfigs:
 								pointers.l("Parsed configs for %s, has disabled configs: [%s]" % [file_path,str(hash(configs) != hash(ovConfigs))],"pointers.ManifestV2")
-								pointers.storeLogCache()
 								dict_template["configs"] = ovConfigs
 						
 						
@@ -6752,7 +6794,6 @@ class _ManifestV2:
 					arr2.append(file)
 		else:
 			arr2 = arr1
-		pointers.storeLogCache()
 		cached_mod_files = arr2
 		return cached_mod_files.duplicate(true)
 	
@@ -6986,7 +7027,6 @@ class _NodeAccess:
 		
 		if max_crew <= base:
 			pointers.l(log_header + "desired expansion to [%s] is less than or equal to the currently expanded number of [%s]" % [max_crew,base],"pointers.NodeAccess")
-			pointers.storeLogCache()
 			return ""
 		else:
 			var header : String = static_line_1 + "\n\n" + static_line_3 + "\n" + static_line_4 + "\n\n" + static_line_6 + "\n\n"
@@ -7003,11 +7043,7 @@ class _NodeAccess:
 			if not folder_path.ends_with("/"):
 				folder_path = folder_path + "/"
 			var save_file_path : String = folder_path + "dynamic_crew_x%s.tscn" % base
-			pointers.FolderAccess.__check_folder_exists(folder_path)
-			var file:File = File.new()
-			file.open(save_file_path,File.WRITE)
-			file.store_string(compacted_string)
-			file.close()
+			pointers.DataFormat.__replace_scene(compacted_string,"res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn",save_file_path)
 			
 			return save_file_path
 	
@@ -7271,7 +7307,6 @@ class _Translations:
 		for translationObject in translations:
 			TranslationServer.add_translation(translationObject)
 		pointers.l("%s Translations Updated from @ [%s]" % [translationCount, fileName],"pointers.Translations")
-		pointers.storeLogCache()
 	
 	func __updateTL_from_dictionary(path:Dictionary, fullLogging:bool = true):
 		pointers.l("Adding translations from dictionary","pointers.Translations")
@@ -7331,14 +7366,12 @@ class _Translations:
 							translationObject.add_message(key,string.c_unescape())
 						if fullLogging:
 							pointers.l("Added translation: %s" % key,"pointers.Translations")
-						pass
 			translationCount += 1
 			
 			translations.append(translationObject)
 		for translationObject in translations:
 			TranslationServer.add_translation(translationObject)
 		pointers.l("%s Translations Updated" % [translationCount],"pointers.Translations")
-		pointers.storeLogCache()
 	func __fetch_all_translation_objects(index) -> Array:
 		var translations : Array = []
 		while index >= 1:
@@ -7465,7 +7498,6 @@ class _WebTranslate:
 		HevLib.fallbackFiles = fallback
 		
 		HevLib.file_check = file_check
-		pointers.storeLogCache()
 		pms.call_deferred("add_child",HevLib)
 	
 	func __webtranslate_reset(URL: String) -> bool:
@@ -7477,7 +7509,6 @@ class _WebTranslate:
 		var folderToDelete = "user://cache/.HevLib_Cache/WebTranslate/" + folderConcat
 		pointers.l("deleting cache folder @ %s" % folderToDelete,"pointers.WebTranslate")
 		var did = pointers.FolderAccess.__recursive_delete(folderToDelete)
-		pointers.storeLogCache()
 		if did:
 			return true
 		else:
@@ -7518,7 +7549,6 @@ class _WebTranslate:
 		handleNode.fallback = fallback
 		handleNode.file_check = file_check
 		variableNode.add_child(handleNode)
-		pointers.storeLogCache()
 	
 	
 	
