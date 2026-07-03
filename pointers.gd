@@ -6785,21 +6785,24 @@ class _ManifestV2:
 			for a in dvs:
 				restrict_to_modmains.append(a.get_base_dir() + "/")
 		var arr1 : Array = siftFolderStructureForModFiles(pointers.FolderAccess.__get_folder_structure("res://",false,false),"res://",restrict_to_modmains)
-		var excludeDirs:Array = []
-		for i in arr1:
-			var r:String = i.get_file().to_lower()
-			if r.begins_with("modmain") and r.ends_with(".gd"):
-				var can : Script = load(i)
-				if not can.can_instance():
-					var vdir:String = i.get_base_dir()
-					excludeDirs.append(vdir.to_lower())
-					pointers.l("Excluding mod directoy %s due to malformatted mod main" % vdir,"pointers.ManifestV2")
 		var arr2:Array = []
-		if excludeDirs:
-			for file in arr1:
-				var vr:String = file.get_base_dir().to_lower()
-				if not vr in excludeDirs:
-					arr2.append(file)
+		if OS.has_feature("editor"):
+			var excludeDirs:Array = []
+			for i in arr1:
+				var r:String = i.get_file().to_lower()
+				if r.begins_with("modmain") and r.ends_with(".gd"):
+					var can : Script = load(i)
+					if not can.can_instance():
+						var vdir:String = i.get_base_dir()
+						excludeDirs.append(vdir.to_lower())
+						pointers.l("Excluding mod directoy %s due to malformatted mod main" % vdir,"pointers.ManifestV2")
+			if excludeDirs:
+				for file in arr1:
+					var vr:String = file.get_base_dir().to_lower()
+					if not vr in excludeDirs:
+						arr2.append(file)
+			else:
+				arr2 = arr1
 		else:
 			arr2 = arr1
 		cached_mod_files = arr2
@@ -6898,6 +6901,7 @@ class _ManifestV2:
 								"reload":
 									var path : String = resource if is_relative else ("res:/" + ("" if resource.begins_with("/") else "/") + resource)
 									pointers.DataFormat.__reload_scene(path)
+				pointers.DataFormat.__loadDLC()
 		return scenes_to_reload
 	
 	var disabledModletCache:Dictionary = {}
