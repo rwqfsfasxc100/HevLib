@@ -1,3 +1,32 @@
+[1.14.14]
+
+1=* Added ability to add new salvage events to SRO through `ADD_SHIPS.gd`.
+1.1=* Added through a `salvage_broadcast` entry, which can be an Array, PoolStringArray, or a Dictionary.
+1.2=* Array/PoolStringArray entries is just a list of strings used for dialogue for the ship.
+1.3=* Dictionary stores the dialogue strings as the keys, with each string containing a dictionary to store any additional modifications.
+1.3.1=* Currently only supports `poi_name`, which lets you change the string used for the POI. NOTE: may cause issue if not providing formatting for the ship name.
+2=* Made manifest formatting for links, tags, languages, and configs more strict, and removed default language data.
+3=* Added `DataFormat`.`__loadDLC()`
+3.1=* Equivalent to method used in modmains.
+3.2=* Used within the loading of modlets.
+4=* Added `DataFormat`.`__replace_scene()`
+4.1=* This creates and saves a scene from raw text with the option to install it as a script extension.
+4.2=* `scene_data` -> (String) data for the scene stored as a string. This must be a valid scene structure for this operation to work.
+4.3=* `override_path` (optional) -> (String) if provided, the file path to update a pre-existing scene with. Scene must be visible to the engine to be replaced. Defaults to `""`.
+4.4=* `scene_file_path` (optional) -> (String) if set, defines a specific path to save the scene to. If left blank, instead stores it in the `Variable_Fetch` cache with a random name. Defaults to `""`.
+4.5=* `cache_scene` (optional) -> (bool) whether to cache the file to prevent it from being garbage collected. Caching automatically happens if updating a file at override_path. Defaults to `true`.
+5=* Improved scene compilation within the modmain loaders to now ensure that the scene actually compiled properly before loading.
+6=* Improved logging of script and resource compilers.
+7=* Updated dynamic crew expander to better compile the scene
+7.1=* Now only loads if extending past 24 crew
+7.2=* Removed the unused old script
+8=* Changed pointer logging to now no longer need to manually call `pointers.storeLogCache()`
+8.1=* This is now done on a regular interval.
+8.2=* Interval can be changed in the config at HevLib/Debug/Pointer logging interval (phys frames)
+9=* Checks for nonfunctional modmains now only happens in-editor, as it appears that release builds do not care about nonfunctional code and push through.
+10=* Removed `property_editor` tool due to it being currently unfit for use
+11=* Added 3-Clause BSD NON-AI license. This covers the entire codebase and is intended to prevent the use of this codebase within LLMs.
+
 [1.14.13]
 
 1=* All logging from pointers now provides the class as a header in the format of "pointers.<ClassName>"
