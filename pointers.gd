@@ -52,20 +52,30 @@ var logging_frame_interval = 0
 var logging_current_frame_timer = 0
 func _physics_process(delta:float):
 	if ConfigDriver.mk_c:
+		# If a config was changed in the loaded profile, handle
+		# it and make sure connections get the updated values
 		ConfigDriver.handle_change_made()
 	logging_current_frame_timer += 1
 	if logging_frame_interval and logging_current_frame_timer > logging_frame_interval:
+		# Handle storing logs to file.
+		# This won't run until the interval is fetched after being onready
+		logging_current_frame_timer = 0
 		storeLogCache()
 
 func _ready():
+	# Ensure the log directory exists, and create it if it doesn't
 	var dir:Directory = Directory.new()
 	if not dir.dir_exists(deviceinfostore):
 		dir.make_dir_recursive(deviceinfostore)
+	# Set the logging interval
 	logging_frame_interval = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","pointer_logging_frame_interval")
+	# Initialize Configs and Achievements
 	ConfigDriver.ready()
 	Achievements.ready()
 	yield(get_tree(),"idle_frame")
+	# Ensures that this node is lower in the scene tree
 	get_parent().move_child(self,get_parent().get_child_count())
+	# This node cannot be paused
 	pause_mode = Node.PAUSE_MODE_PROCESS
 
 # Logging function used for cases where critial info must not be overwritten by game logs
@@ -436,7 +446,7 @@ class _ConfigDriver:
 						"method -> (String) method name to be called when the config changes",
 						"node -> (Object) the object that will be receiving the method call",
 						"type (optional) -> (String) for the connection mode. Accepts the following: config -> will update whenever the config changes; input -> will update only whenever an input-type config changes; both -> connects with both type, but has to use a separate method to connect the input type due to technical limitations",
-						"input_method (optional) -> (String) for the method name the input change uses when `type` is set to `both`. Defaults to 'input_changed'",
+						"input_method (optional) -> (String) for the method name the input change uses when `type` is set to `both`. Even if using the default method name, this should at least be defined when calling this to help readability. Defaults to 'input_changed'.",
 					],
 				},
 				"__remove_connection":{
@@ -584,6 +594,8 @@ class _ConfigDriver:
 		var tmpf : File = File.new()
 		var cfg_file : String = cfg_folder + cfg_filename
 		if not tmpf.file_exists(cfg_file):
+			# Writes a blank config file if it doesn't exist
+			# Ensures that later parts run cleanly even on fresh installs
 			tmpf.open(cfg_folder+cfg_file,File.WRITE)
 			tmpf.store_string("")
 			tmpf.close()
@@ -594,20 +606,32 @@ class _ConfigDriver:
 		cfg.parse(txt)
 		FileCFG.close()
 		var cfg_sections : Array = cfg.get_sections()
+		# Formats the mod_id to be valid for configs.
+		# This removes forward slashes and spaces
 		mod_id = __truncate_mod_id(mod_id)
+		# Iterates through the sections in the provided config
 		for section in configuration:
+			# Similar process to format the section
+			# Also concatenates it with the mod id to form
+			# an identifier that fits in ini configs
 			section = __truncate_section(section)
 			var sect_name : String = mod_id + "/" + section
+			# Gets the data within this specific configuration
 			var sect_data = configuration[section]
 			
 			if not sect_name in settings:
+				# Implies a new section is being added,
+				# automatically marks for an update 
 				settings[sect_name] = {}
 				made_change = true
-			
+			# Iterates through the section entries
 			for s in sect_data:
+				# Entry data
 				var sr = sect_data[s]
 				var current = settings[sect_name].get(s,null)
 				if current != sr:
+					# Sets data and marks as a change made if the
+					# value is different to what's already in the file
 					settings[sect_name][s] = sr
 					made_change = true
 					if not sect_name in changes:
@@ -616,26 +640,32 @@ class _ConfigDriver:
 					cfg.set_value(sect_name,s,sr)
 		
 		
-		
+		# The profile name for the config
 		var profile = cfg.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","default")
+		# Saves file and saves a copy to the profiles directory as backup
 		cfg.save(cfg_file)
 		cfg.save(profiles_dir+profile + ".cfg")
 		if made_change:
+			# If changes were made, emit signals and show the save icon
 			__change_made()
 			if Loader:
 				Loader.saved()
 	
+	# Stores a value under an ID's section and entry
 	func __store_value(mod_id:String, section:String, key:String, value, cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var made_change : bool = false
 		var cfg_folder : String  = "user://cfg/"
 		var profiles_dir : String  = "user://cfg/.profiles/"
 		var cfg : ConfigFile = ConfigFile.new()
 		cfg.load(cfg_folder+cfg_filename)
+		# Automatically converts the ID and section into what
+		# can be fetched from the config file
 		var modSection : String = __truncate_to_setting_entry(mod_id,section)
 		cfg.set_value(modSection,key,value)
 		var profile= cfg.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","default")
 		
 		if not modSection in settings:
+			# Automatically mark as a new change if new parts have to be added
 			settings[modSection] = {}
 			made_change = true
 		var current = settings[modSection].get(key,null)
@@ -645,20 +675,28 @@ class _ConfigDriver:
 		cfg.save(cfg_folder+cfg_filename)
 		cfg.save(profiles_dir+profile + ".cfg")
 		if made_change:
+			# If changes were made, add them to the changes list to have them updated
 			if not modSection in changes:
 				changes[modSection] = []
 			changes[modSection].append(key)
+			# emit signals and show save icon
 			__change_made()
 			if Loader:
 				Loader.saved()
 	
+	# Fetches a config as a dictionary
 	func __get_config(mod_id, cfg_filename : String = "Mod_Configurations" + ".cfg") -> Dictionary:
 		var cfg_folder : String  = "user://cfg/"
 		var dictionary : Dictionary = {}
+		# Formats the mod_id to be valid for configs.
+		# This removes forward slashes and spaces 
 		mod_id = __truncate_mod_id(mod_id)
 		if settingsHash:
+			# Hash usually means the data is already cached
 			for section in settings:
 				var split : PoolStringArray = section.split("/")
+				# Checks if the first part of the section matches the ID
+				# If they match, recurse through the section to add configs to the output
 				if split[0] == mod_id:
 					var sub : Dictionary = {}
 					var sec = settings[section].duplicate(true)
@@ -666,13 +704,18 @@ class _ConfigDriver:
 						sub.merge({key:sec[key]})
 					dictionary.merge({split[1]:sub})
 		else:
+			# No hash means it has to be fetched from the file directly
 			var cfg:ConfigFile = ConfigFile.new()
 			var error:int = cfg.load(cfg_folder+cfg_filename)
 			if error != OK:
+				# File probably doesn't exist, aborting
+				pointers.l("HevLib Config File: Error loading settings %s" % error,"pointers.ConfigDriver")
 				return {}
 			var config_sections = cfg.get_sections()
 			for section in config_sections:
 				var split:PoolStringArray = section.split("/")
+				# Checks if the first part of the section matches the ID
+				# If they match, recurse through the section to add configs to the output
 				if split[0] == mod_id:
 					var sub : Dictionary = {}
 					var keys:Array = cfg.get_section_keys(section)
@@ -682,24 +725,30 @@ class _ConfigDriver:
 					dictionary.merge({split[1]:sub})
 		return dictionary
 	
+	# Fetches a specific value from the config
+	# Will return null if it does not exist
 	func __get_value(mod_id: String, section: String, key: String, cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var cfg_folder : String  = "user://cfg/"
 		var full : String  = __truncate_to_setting_entry(mod_id,section)
-		
+		# Truncate to get the section directly
 		if settingsHash:
+			# Config is cached, may as well fetch from there
 			if full in settings:
 				if key in settings[full]:
 					var out = settings[full][key]
 					var tout:int = typeof(out)
+					# Hard duplicating array or dictionary types to ensure no reference weirdness
 					if tout == TYPE_ARRAY or tout == TYPE_DICTIONARY:
 						return out.duplicate(true)
 					return out
 				return null
 			return null
 		else:
+			# Not cached, fetch from file instead
 			var cfg:ConfigFile = ConfigFile.new()
 			var error:int = cfg.load(cfg_folder+cfg_filename)
 			if error != OK:
+				# File probably doesn't exist, aborting
 				pointers.l("HevLib Config File: Error loading settings %s" % error,"pointers.ConfigDriver")
 				return null
 			
@@ -711,44 +760,55 @@ class _ConfigDriver:
 				return null
 			return null
 	
+	# Method called onready to prepare the config and hashes, and push any connections
 	func pushCFG(cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var cfg_file : String  = "user://cfg/" + cfg_filename
 		var current_config : Dictionary = __config_parse(cfg_file)
 		settings = current_config.duplicate(true)
 		settingsHash = settings.hash()
 		__change_made()
-		
 	
+	# All-encompassing handler to connect a method to handle any changes to configs
 	func __establish_connection(method: String, node: Object, type: String = "config", input_method: String = "input_changed"): # Type accepts "config", "input", or "both"
 		match type.to_lower():
+			# Emitted when any config changes
 			"config":
 				if node.has_method(method):
 					if not is_connected("config_changed",node,method):
 						connect("config_changed",node,method)
 					else:
-						pointers.l("node %s is already connected with the method '%s'" % [str(node),method],"pointers.ConfigDriver")
+						pointers.l("node %s already connected with the method '%s', connect failed" % [str(node),method],"pointers.ConfigDriver")
 				else:
-					pointers.l("node %s does not have the method '%s'" % [str(node),method],"pointers.ConfigDriver")
+					pointers.l("node %s does not have the method '%s', cannot connect" % [str(node),method],"pointers.ConfigDriver")
+			# Emitted only when configs of input type change
 			"input":
 				if node.has_method(method):
 					if not is_connected("input_changed",node,method):
 						connect("input_changed",node,method)
 					else:
-						pointers.l("node %s is already connected with the method '%s'" % [str(node),method],"pointers.ConfigDriver")
+						pointers.l("node %s already connected with the method '%s', connect failed" % [str(node),method],"pointers.ConfigDriver")
 				else:
-					pointers.l("node %s does not have the method '%s'" % [str(node),method],"pointers.ConfigDriver")
+					pointers.l("node %s does not have the method '%s', cannot connect" % [str(node),method],"pointers.ConfigDriver")
+			# Connects two methods within the object to the 'config' and 'input' types respectively
+			# 'input_method' should at least be defined when calling this to help readability
 			"both":
-				if node.has_method(method):
+				if node.has_method(input_method):
 					if not is_connected("input_changed",node,input_method):
 						connect("input_changed",node,input_method)
 					else:
-						pointers.l("node %s is already connected with the method '%s'" % [str(node),method],"pointers.ConfigDriver")
+						pointers.l("node %s already connected with the method '%s', connect failed" % [str(node),method],"pointers.ConfigDriver")
+				else:
+					pointers.l("node %s does not have the method '%s', cannot connect" % [str(node),input_method],"pointers.ConfigDriver")
+				if node.has_method(method):
 					if not is_connected("config_changed",node,method):
 						connect("config_changed",node,method)
 					else:
-						pointers.l("node %s is already connected with the method '%s'" % [str(node),method],"pointers.ConfigDriver")
+						pointers.l("node %s already connected with the method '%s', connect failed" % [str(node),method],"pointers.ConfigDriver")
 				else:
-					pointers.l("node %s does not have the method '%s'" % [str(node),method],"pointers.ConfigDriver")
+					pointers.l("node %s does not have the method '%s', cannot connect" % [str(node),method],"pointers.ConfigDriver")
+	
+	# Inverse method to __establish connection
+	# See that method for comments, as this just disconnects those connections
 	func __remove_connection(method: String, node: Object, type: String = "config", input_method: String = "input_changed"): # Type accepts "config", "input", or "both"
 		match type.to_lower():
 			"config":
@@ -756,41 +816,52 @@ class _ConfigDriver:
 					if is_connected("config_changed",node,method):
 						disconnect("config_changed",node,method)
 					else:
-						pointers.l("node %s is already connected with the method '%s'" % [str(node),method],"pointers.ConfigDriver")
+						pointers.l("node %s not connected with the method '%s', disconnect failed" % [str(node),method],"pointers.ConfigDriver")
 				else:
-					pointers.l("node %s does not have the method '%s'" % [str(node),method],"pointers.ConfigDriver")
+					pointers.l("node %s does not have the method '%s', cannot disconnect" % [str(node),method],"pointers.ConfigDriver")
 			"input":
 				if node.has_method(method):
 					if is_connected("input_changed",node,method):
 						disconnect("input_changed",node,method)
 					else:
-						pointers.l("node %s is already connected with the method '%s'" % [str(node),method],"pointers.ConfigDriver")
+						pointers.l("node %s not connected with the method '%s', disconnect failed" % [str(node),method],"pointers.ConfigDriver")
 				else:
-					pointers.l("node %s does not have the method '%s'" % [str(node),method],"pointers.ConfigDriver")
+					pointers.l("node %s does not have the method '%s', cannot disconnect" % [str(node),method],"pointers.ConfigDriver")
 			"both":
-				if node.has_method(method):
+				if node.has_method(input_method):
 					if is_connected("input_changed",node,input_method):
 						disconnect("input_changed",node,input_method)
 					else:
-						pointers.l("node %s is already connected with the method '%s'" % [str(node),method],"pointers.ConfigDriver")
+						pointers.l("node %s not connected with the method '%s', disconnect failed" % [str(node),method],"pointers.ConfigDriver")
+				else:
+					pointers.l("node %s does not have the method '%s', cannot disconnect" % [str(node),input_method],"pointers.ConfigDriver")
+				if node.has_method(method):
 					if is_connected("config_changed",node,method):
 						disconnect("config_changed",node,method)
 					else:
-						pointers.l("node %s is already connected with the method '%s'" % [str(node),method],"pointers.ConfigDriver")
+						pointers.l("node %s not connected with the method '%s', disconnect failed" % [str(node),method],"pointers.ConfigDriver")
 				else:
-					pointers.l("node %s does not have the method '%s'" % [str(node),method],"pointers.ConfigDriver")
-		
+					pointers.l("node %s does not have the method '%s', cannot disconnect" % [str(node),method],"pointers.ConfigDriver")
 	
+	# Called from the EquipmentDriver ModMain and initializes configs
 	func __load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
+		# Fetches game default configs, including those in the config file
+		# Config-based inputs are defined as such
+		# Inputs added in future updates throw errors, and let me know to update it
 		var default_binds : Dictionary = pointers.Keymapping.__get_formatted_vanilla_binds()
 		var dir:Directory = Directory.new()
 		var c:ConfigFile = ConfigFile.new()
+		# Directory and file definitions
 		var keybinds_cache : String  = "user://cache/.HevLib_Cache/Keybinds/"
 		var cfg_file : String  = "user://cfg/" + cfg_filename
 		var profiles_dir : String  = "user://cfg/.profiles/"
 		var profiles_setter : String  = ".profiles.ini"
+		# Initializes profiles and keybind cache directories
 		dir.make_dir_recursive(profiles_dir)
 		dir.make_dir_recursive(keybinds_cache)
+		# Stores default binds
+		# I don't remember why I cache this, although since the MultiBinds
+		# project is on hold, might be for something I never wrote down 
 		file.open(keybinds_cache + "vanilla_binds.json",File.WRITE)
 		file.store_string(JSON.print(default_binds))
 		file.close()
@@ -798,46 +869,64 @@ class _ConfigDriver:
 		file.store_string("{}")
 		file.close()
 		if not file.file_exists(profiles_dir + profiles_setter):
+			# If no profile ini file exists, initializes it and sets 'Default' as the profile
 			c.clear()
 			c.set_value("profiles","selected","Default")
 			c.save(profiles_dir + profiles_setter)
 			c.clear()
 		if not file.file_exists(cfg_file):
+			# Creates the config file if it doesn't exist
+			# Will be blank to prevent issues and make sure
+			# defaults are loaded from manifests
 			file.open(cfg_file,File.WRITE)
 			file.store_string("")
 			file.close()
 		c.load(profiles_dir + profiles_setter)
+		# Fetches the currently desired profile
 		var desired_profile = c.get_value("profiles","selected","Default")
 		c.clear()
 		c.load(cfg_file)
+		# Gets the current profile name
 		var current_profile = c.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","Default")
 		var profile_is_current:bool = true
+		# If current is not desired profile, search profiles directory
 		if current_profile != desired_profile:
+			# Copies this into the profiles directory to ensure it doesn't get overwritten
+			dir.copy(cfg_file,profiles_dir + current_profile + ".cfg")
 			profile_is_current = false
 			dir.remove(cfg_file)
+			# Recurses over files in the profiles directory
 			for m in pointers.FolderAccess.__fetch_folder_files("user://cfg/.profiles/"):
+				# File is not the profiles ini
 				if m != ".profiles.ini":
 					c.clear()
 					c.load(profiles_dir + m)
+					# Gets this file's profile
 					var this_profile = c.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name")
 					if this_profile == desired_profile:
+						# Copies the currently open config if it matches the desired profile 
 						dir.copy(profiles_dir + m,cfg_file)
 						profile_is_current = true
 					c.clear()
 					c.load(cfg_file)
+		# Config not found, falling back and creating anew
 		if not profile_is_current:
 			c.clear()
 			c.set_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name",desired_profile)
 			c.save(cfg_file)
 		
-		var f : Dictionary = pointers.ManifestV2.__get_mod_data()
-		var mod_entries : Dictionary = f["mods"]
+		# Gets all mod data
+		var mod_entries : Dictionary = pointers.ManifestV2.__get_mod_data()["mods"]
 		pointers.l("[%s] mod entries found" % mod_entries.size(),"pointers.ConfigDriver")
+		# Fetches disabled modlets
+		# This is not used here, but lets me log
+		# what it finds and ensure the cache exists
 		var disabled_modlets:Dictionary = pointers.ManifestV2.__get_disabled_modlets()
 		var DMIDs:PoolStringArray = PoolStringArray()
 		for i in disabled_modlets:
 			DMIDs.append(disabled_modlets[i])
 		pointers.l("[%s] disabled modlets found: [%s]" % [disabled_modlets.size(),",".join(DMIDs)],"pointers.ConfigDriver")
+		# Store for the raw config information
 		var configs : Dictionary = {}
 		var current_config : Dictionary = __config_parse(cfg_file)
 		for mod in mod_entries:
