@@ -163,9 +163,6 @@ func _ready():
 		file.close()
 		
 		var CRoot = get_tree().get_root()
-#		CRoot.call_deferred("add_child",mouse)
-		
-		
 		
 		replaceScene("scenes/scene_replacements/Game.tscn", "res://Game.tscn")
 		var dir = Directory.new()

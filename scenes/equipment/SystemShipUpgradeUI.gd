@@ -4,12 +4,12 @@ export (String) var config_id = ""
 export (String) var config_section = ""
 export (String) var config_setting = ""
 export (bool) var invert_config = false
-var ssuuPointers = ModLoader._savedObjects[0]
+var ssuuPointers
 var cv = null
 func visibilityChanged():
 	.visibilityChanged()
 	if is_visible_in_tree():
-		
+		ssuuPointers = ModLoader._savedObjects[0]
 		if ssuuPointers:
 			cv = ssuuPointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
 

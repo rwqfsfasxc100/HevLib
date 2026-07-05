@@ -1,8 +1,9 @@
 extends "res://tools/DLClist.gd"
 
-var pointers = ModLoader._savedObjects[0]
+var pointers
 
 func _ready():
+	pointers = ModLoader._savedObjects[0]
 	grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	if get_child_count() >= 1:
 		var p = hl_dlc_make_label("HEVLIB_DLCLIST_DLC_HEADER")

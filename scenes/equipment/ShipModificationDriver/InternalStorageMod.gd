@@ -49,6 +49,7 @@ var hl_ism_installedequipment = []
 var hl_ism_mineral_trace_length = 6
 
 func _enter_tree():
+	ismPointers = ModLoader._savedObjects[0]
 	var file = File.new()
 	ismPointers.ConfigDriver.__establish_connection("hl_ism_UV",self)
 	file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_mods.json",File.READ)
@@ -396,7 +397,7 @@ func handleAmmoDelivery(delta):
 			availableAmmoToDrawNow += diff * (ammo_speed_multi - 1.0)
 		availableAmmoToDrawNow += ammo_speed_add
 	
-var ismPointers = ModLoader._savedObjects[0]
+var ismPointers
 
 
 var limitDroneOutput = true

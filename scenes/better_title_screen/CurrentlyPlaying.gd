@@ -6,8 +6,9 @@ func _ready():
 	if mod_menu:
 		mod_menu.connect("visibility_changed", self , "display")
 
-var pointers = ModLoader._savedObjects[0]
+var pointers
 func display():
+	pointers = ModLoader._savedObjects[0]
 	var mod_menu = get_tree().get_root().find_node("ModMenu", true, false)
 	if mod_menu and mod_menu.visible:
 		visible = false

@@ -1,7 +1,6 @@
 extends "res://TheRing.gd"
 
-var pointers = ModLoader._savedObjects[0]
-
+var pointers
 
 var cache_folder = "user://cache/.HevLib_Cache/"
 
@@ -172,6 +171,7 @@ func logEvents():
 
 
 func _ready():
+	pointers = ModLoader._savedObjects[0]
 	connect("tree_exiting",self,"wipe_lists")
 	file.open(event_log_file,File.WRITE)
 	file.store_string("{}")

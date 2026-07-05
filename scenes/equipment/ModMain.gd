@@ -77,15 +77,7 @@ func _init(modLoader : ModLoader = ModLoader):
 		if d.dir_exists(fstr_old):
 			pointers.FolderAccess.__recursive_delete(fstr_old)
 		pointers.ConfigDriver.__load_configs()
-		var injector = load("res://HevLib/scripts/translations/inject_translations.gd")
-		injector.inject_translations(pointers)
-		
-		d.make_dir_recursive(ship_driver_path)
-		var ml = MainLoop.new()
-		ml.set_script(load("res://HevLib/scripts/crash_handler.gd"))
-		_savedObjects.append(ml)
-		
-		
+		pointers.Translations.__inject_translations()
 		
 		installScriptExtension("../notification_driver/CurrentGame.gd")
 		if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk"):

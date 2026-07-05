@@ -5,7 +5,7 @@ var eqt_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/
 var ws_add = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_additions.json"
 var ws_modify = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_modifications.json"
 
-var pointers = ModLoader._savedObjects[0]
+var pointers
 
 var shipName = ""
 var baseShipName = ""
@@ -21,7 +21,7 @@ var c
 var file = File.new()
 
 func _ready():
-	
+	pointers = ModLoader._savedObjects[0]
 	
 	shipName=ship.shipName
 	baseShipName=ship.baseShipName

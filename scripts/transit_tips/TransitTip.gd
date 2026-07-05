@@ -2,8 +2,9 @@ extends "res://codex/TransitTip.gd"
 
 var list = []
 
-var pointers = ModLoader._savedObjects[0]
+var pointers
 func _ready():
+	pointers = ModLoader._savedObjects[0]
 	for i in range(tips):
 		list.append(base % (i + 1))
 	var tags = pointers.ManifestV2.__get_tags()

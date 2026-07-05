@@ -1,8 +1,9 @@
 extends "res://hud/CargoScanner.gd"
 
-var HevLib_pointers = ModLoader._savedObjects[0]
+var HevLib_pointers
 
 func _enter_tree():
+	HevLib_pointers = ModLoader._savedObjects[0]
 	HevLib_pointers.ConfigDriver.__establish_connection("hl_cargo_limiter_uv",self)
 	hl_cargo_limiter_uv()
 

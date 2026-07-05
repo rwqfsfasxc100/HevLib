@@ -2,9 +2,10 @@ extends "res://ships/Shipyard.gd"
 
 var ship_driver_path = "user://cache/.HevLib_Cache/ShipDriver/"
 
-var pointers = ModLoader._savedObjects[0]
+var pointers
 
 func _ready():
+	pointers = ModLoader._savedObjects[0]
 	var file = File.new()
 	yield(get_tree(),"idle_frame")
 	hl_shipdriver_resetter_timeout()

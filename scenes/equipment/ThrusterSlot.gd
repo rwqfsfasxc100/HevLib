@@ -23,7 +23,7 @@ var fco
 var shipName
 var baseShipName
 
-var itsPointers = ModLoader._savedObjects[0]
+var itsPointers
 
 const nozzle_template = {
 	"cool_time":4,
@@ -47,6 +47,7 @@ const nozzle_template = {
 }
 var aux_type
 func loadPlaceholder():
+	itsPointers = ModLoader._savedObjects[0]
 	hl_thrusterslot_modify()
 	.loadPlaceholder()
 #	yield(get_tree(),"idle_frame")

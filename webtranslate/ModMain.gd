@@ -30,6 +30,10 @@ func _ready():
 	if correct:
 		yield(Debug.get_tree(),"idle_frame")
 		l("Device Information: [\n%s\n]" % get_device_info())
+		var rgx = RegEx.new()
+		rgx.compile("[a-z1-9]")
+		var found = rgx.search(TranslationServer.translate("SYSTEM_AMMO_10000_DESC"))
+		breakpoint
 var cache_extension = ".file_check_cache"
 
 func loadTranslationsFromCache():

@@ -3,10 +3,11 @@ extends TextureRect
 var count = 0.0
 
 func _ready():
+	pointers = ModLoader._savedObjects[0]
 	visible = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_chaos_map_overlay")
 	
 
-var pointers = ModLoader._savedObjects[0]
+var pointers
 
 var oldColor = "00ff19"
 

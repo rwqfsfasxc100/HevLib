@@ -29,9 +29,10 @@ var allowed_equipment := []
 
 var data_dictionary = ""
 
-var pointers = ModLoader._savedObjects[0]
+var pointers
 var cv = null
 func _ready():
+	pointers = ModLoader._savedObjects[0]
 	connect("visibility_changed",self,"hl_ug_recheck_this_visibility")
 
 func hl_ug_recheck_this_visibility():
