@@ -6,8 +6,8 @@
 
 [node name="Game" instance=ExtResource( 1 )]
 
-[node name="EventMenu" parent="." index="11" instance=ExtResource( 2 )]
-layer = 27
+[node name="EventMenu" parent="." index="3" instance=ExtResource( 2 )]
+layer = 8
 
 [node name="_HevLib_Ringspace_Canvas" parent="." index="12" instance=ExtResource( 3 )]
 
