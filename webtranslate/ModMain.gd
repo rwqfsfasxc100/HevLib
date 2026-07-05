@@ -39,7 +39,6 @@ func _ready():
 			l("Translations did not get initialized, exiting to preserve report-ready state")
 			pointers.storeLogCache()
 			pointers.NodeAccess.__exit()
-		breakpoint
 var cache_extension = ".file_check_cache"
 
 func loadTranslationsFromCache():
