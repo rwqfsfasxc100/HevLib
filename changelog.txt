@@ -1,3 +1,17 @@
+[1.14.16]
+
+1=* Fixed ConfigDriver connection errors all producing the same log, which made figuring out what was causing problems with the connection difficult
+2=* Using the "both" mode for establishing a config connection now properly ensures both methods exist
+3=* When configs are initialized, now ensures the selected config is backed up when the current and desired config profile names didn't match
+4=* Improved pointer fetching, and should improve the efficiency of the library overall
+5=* Currently playing label now no longer displays above the mod menu
+6=* Software cursor is now no longer hidden by the EventDriver menu
+7=* Moved translation injections to the pointers file
+8=* Removed references to variables node
+9=* Reduced memory usage and file size of the equipment manager
+10=* `DataFormat`.`__convert_arr_to_vec2arr` now can process odd-sized arrays, and instead truncates the last point instead of throwing an error and returning a blank array
+11=* Reduced processing time that was spent unnecessarily converting empty arrays into Pools
+
 [1.14.15]
 
 1=* Fixed critical issue where links would not be fetched from manifests, preventing automatic updates.
