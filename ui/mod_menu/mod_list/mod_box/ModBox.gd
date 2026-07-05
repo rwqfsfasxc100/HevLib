@@ -28,7 +28,7 @@ var MAX_SIZE = Vector2(0,0)
 
 var information_nodes = {}
 
-var pointers
+var pointers = ModLoader._savedObjects[0]
 var file = File.new()
 
 
@@ -52,8 +52,6 @@ var modlet_toggle_restart_path = "user://cache/.Mod_Menu_2_Cache/updates/modlet_
 var mod_path = ""
 
 func _pressed():
-	if not pointers:
-		pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	information_nodes["mod_list"].make_info_default_state()
 	
 	mod_path = MOD_INFO["file_path"]
@@ -260,8 +258,6 @@ var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/compleme
 
 var children = {}
 func _ready():
-	if not pointers:
-		pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	
 	if "children" in MOD_INFO.keys():
 		children = MOD_INFO["children"]
@@ -299,8 +295,6 @@ var ID = null
 
 
 func _draw():
-	if not pointers:
-		pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	MAX_SIZE = Vector2(get_parent().rect_size.x,130) - Vector2(4,0)
 	
 	button_lib_icon.visible = false
@@ -440,7 +434,7 @@ func _draw():
 	if manifestData:
 		brief = translateIfCan(manifestData["mod_information"]["brief"])
 	button_brief.text = brief
-	getPointers()
+	
 	
 	
 	var showHidden = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_hidden_libraries")
@@ -580,9 +574,7 @@ func _process(_delta):
 		if manifestData:
 			id_against = manifestData["mod_information"]["id"].to_upper()
 		var current_selection = filter_button.keys_pressed
-		if pointers == null:
-			getPointers()
-			
+		
 		if all_tags:
 			file.open(cache_folder + filter_cache_file,File.READ)
 			var filter_data = JSON.parse(file.get_as_text()).result
@@ -595,8 +587,6 @@ func _process(_delta):
 						for md in tag_mods:
 							if md.to_upper() == id_against:
 								tag_visible = true
-	#					breakpoint
-	#			breakpoint
 				visible = tag_visible
 			else:
 				visible = true
@@ -642,10 +632,7 @@ func handle_sub_mods():
 				panel.get_node("ModButton/VBoxContainer").rect_size.x = panel.get_node("ModButton").rect_size.x - 4
 #				breakpoint
 	
-var all_tags
-func getPointers():
-	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-	all_tags = pointers.ManifestV2.__get_tags()
+var all_tags = pointers.ManifestV2.__get_tags()
 
 func yield_button_focus():
 	yield(CurrentGame.get_tree(),"idle_frame")

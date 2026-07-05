@@ -9,7 +9,7 @@ var available = false
 var accurate_event_counter = false
 var visibility = false
 
-var pointers
+var pointers = ModLoader._savedObjects[0]
 
 
 func hl_shipzone_uv():
@@ -20,7 +20,6 @@ func _ready():
 	yield(get_tree(),"idle_frame")
 	image = map.get_data()
 	size = image.get_size()
-	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	pointers.ConfigDriver.__establish_connection("hl_shipzone_uv",self)
 	
 	hl_shipzone_uv()

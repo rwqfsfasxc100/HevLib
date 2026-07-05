@@ -28,13 +28,11 @@ var developer_hint = {
 	]
 }
 
-const pointers = preload("res://HevLib/pointers.gd")
-
 static func __webtranslate(URL: String, fallback: Array = [], file_check: String = ""):
-	pointers.new().WebTranslate.__webtranslate(URL,fallback,file_check)
+	ModLoader._savedObjects[0].WebTranslate.__webtranslate(URL,fallback,file_check)
 static func __webtranslate_reset_by_URL(URL: String) -> bool:
-	return pointers.new().WebTranslate.__webtranslate_reset(URL)
+	return ModLoader._savedObjects[0].WebTranslate.__webtranslate_reset(URL)
 static func __webtranslate_reset_by_file_check(file_check: String) -> bool:
-	return pointers.new().WebTranslate.__webtranslate_reset_by_file_check(file_check)
+	return ModLoader._savedObjects[0].WebTranslate.__webtranslate_reset_by_file_check(file_check)
 static func __webtranslate_timed(URL: String, MINUTES_DELAY: int = 30, fallback: Array = [], file_check: String = ""):
-	pointers.new().WebTranslate.__webtranslate_timed(URL,MINUTES_DELAY,fallback,file_check)
+	ModLoader._savedObjects[0].WebTranslate.__webtranslate_timed(URL,MINUTES_DELAY,fallback,file_check)

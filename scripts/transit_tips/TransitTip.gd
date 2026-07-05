@@ -2,7 +2,7 @@ extends "res://codex/TransitTip.gd"
 
 var list = []
 
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+var pointers = ModLoader._savedObjects[0]
 func _ready():
 	for i in range(tips):
 		list.append(base % (i + 1))

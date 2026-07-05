@@ -36,7 +36,7 @@ func _ready():
 	
 
 var vp_objects = []
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+var pointers = ModLoader._savedObjects[0]
 var tween
 func _notification_start(data):
 	var title = data.get("title",{}).get("text","NOTIFICATION_TITLE_PLACEHOLDER")

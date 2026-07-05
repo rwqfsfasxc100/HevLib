@@ -41,7 +41,7 @@ func hide():
 	$Shower.play("hide")
 	if lastFocus:
 		lastFocus.grab_focus()
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+var pointers = ModLoader._savedObjects[0]
 func _ready():
 	visible = false
 	get_parent().connect("hidefoka", self, "hide")

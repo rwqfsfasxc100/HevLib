@@ -5,7 +5,7 @@ var eqt_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/
 var ws_add = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_additions.json"
 var ws_modify = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_modifications.json"
 
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+var pointers = ModLoader._savedObjects[0]
 
 var shipName = ""
 var baseShipName = ""

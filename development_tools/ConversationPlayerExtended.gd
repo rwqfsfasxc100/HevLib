@@ -22,7 +22,8 @@ export (int) var special_price = 0
 # If set, only permits the conversation path if the current crew has a specific occupation
 export (String) var requires_occupation = ""
 
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+var pointers = ModLoader._savedObjects[0]
+
 func execute():
 	.execute()
 	if spawnEvent and spawnEvent != "":

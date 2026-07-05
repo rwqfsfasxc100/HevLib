@@ -61,29 +61,27 @@ var developer_hint = {
 	]
 }
 
-const pointers = preload("res://HevLib/pointers.gd")
-
 static func __array_to_string(arr: Array) -> String:
-	return pointers.new().DataFormat.__array_to_string(arr)
+	return ModLoader._savedObjects[0].DataFormat.__array_to_string(arr)
 static func __format_for_large_numbers(num: int) -> String:
 	return CurrentGame.formatThousands(num)
 static func __compare_with_byte_array(input_string: String, comparison_string: String) -> bool:
 	return input_string == comparison_string
 static func __rotate_point(point: Vector2, angle: float, degrees:bool = true) -> Vector2:
-	return pointers.new().DataFormat.__rotate_point(point,angle,degrees)
+	return ModLoader._savedObjects[0].DataFormat.__rotate_point(point,angle,degrees)
 static func __get_vanilla_version(get_from_files: bool = false) -> Array:
-	return pointers.new().DataFormat.__get_vanilla_version()
+	return ModLoader._savedObjects[0].DataFormat.__get_vanilla_version()
 static func __sift_dictionary(dictionary: Dictionary,search_keys: Array) -> Array:
-	return pointers.new().DataFormat.__sift_dictionary(dictionary,search_keys)
+	return ModLoader._savedObjects[0].DataFormat.__sift_dictionary(dictionary,search_keys)
 static func __convert_arr_to_vec2arr(array: Array) -> PoolVector2Array:
-	return pointers.new().DataFormat.__convert_arr_to_vec2arr(array)
+	return ModLoader._savedObjects[0].DataFormat.__convert_arr_to_vec2arr(array)
 static func __compare_versions(primary_major : int,primary_minor : int,primary_bugfix : int, compare_major : int, compare_minor : int, compare_bugfix : int) -> bool:
-	return pointers.new().DataFormat.__compare_versions(primary_major,primary_minor,primary_bugfix,compare_major,compare_minor,compare_bugfix)
+	return ModLoader._savedObjects[0].DataFormat.__compare_versions(primary_major,primary_minor,primary_bugfix,compare_major,compare_minor,compare_bugfix)
 static func __sift_ship_config(dictionary: Dictionary,search_keys: Array, cfgs_to_ignore:Array) -> Array:
-	return pointers.new().DataFormat.__sift_ship_config(dictionary,search_keys,cfgs_to_ignore)
+	return ModLoader._savedObjects[0].DataFormat.__sift_ship_config(dictionary,search_keys,cfgs_to_ignore)
 static func __get_script_constant_map_without_load(script_path : String) -> Dictionary:
-	return pointers.new().DataFormat.__get_script_constant_map_without_load(script_path)
+	return ModLoader._savedObjects[0].DataFormat.__get_script_constant_map_without_load(script_path)
 static func __trim_scripts(file_path: String) -> Array:
-	return pointers.new().DataFormat.__trim_scripts(file_path)
+	return ModLoader._savedObjects[0].DataFormat.__trim_scripts(file_path)
 static func __get_script_variables_without_load(script_path : String) -> Dictionary:
-	return pointers.new().DataFormat.__get_script_variables_without_load(script_path)
+	return ModLoader._savedObjects[0].DataFormat.__get_script_variables_without_load(script_path)

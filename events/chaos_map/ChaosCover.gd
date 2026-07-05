@@ -6,7 +6,8 @@ func _ready():
 	visible = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_chaos_map_overlay")
 	
 
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+var pointers = ModLoader._savedObjects[0]
+
 var oldColor = "00ff19"
 
 func _physics_process(delta):

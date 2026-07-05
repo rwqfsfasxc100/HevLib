@@ -29,14 +29,12 @@ var allowed_equipment := []
 
 var data_dictionary = ""
 
-var pointers
+var pointers = ModLoader._savedObjects[0]
 var cv = null
 func _ready():
 	connect("visibility_changed",self,"hl_ug_recheck_this_visibility")
 
 func hl_ug_recheck_this_visibility():
-	if not pointers:
-		pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	if pointers:
 		cv = pointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
 

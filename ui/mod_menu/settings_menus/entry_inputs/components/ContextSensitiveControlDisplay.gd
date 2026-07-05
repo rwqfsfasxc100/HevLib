@@ -11,7 +11,7 @@ enum control{
 	auto, 
 	key
 }
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+var pointers = ModLoader._savedObjects[0]
 
 export (PackedScene) var keybindDisplay
 export (PackedScene) var gamepadKeyDisplay

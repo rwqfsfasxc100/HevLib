@@ -11,7 +11,7 @@ var is_active_window = true
 onready var vanilla_binds = Settings.cfg.input
 onready var adjustments = load("res://HevLib/scenes/keymapping/data/key_adjustments.gd").ADJUSTMENT.duplicate(true)
 
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+var pointers = ModLoader._savedObjects[0]
 
 
 onready var compiler = preload("res://HevLib/scenes/keymapping/compile_keymap.gd").new(pointers)

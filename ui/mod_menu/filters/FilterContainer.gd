@@ -1,9 +1,9 @@
 extends PanelContainer
 
-var pointers
+var pointers = ModLoader._savedObjects[0]
 var filter_box_nd = preload("res://HevLib/ui/mod_menu/filters/FilterBox.tscn")
 
-var tags = {}
+var tags = pointers.ManifestV2.__get_tags()
 
 var tag_visibility = {}
 
@@ -12,11 +12,6 @@ var mod_visibility = []
 var filtering = false
 
 func _ready():
-	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-	if pointers == null:
-		yield(get_tree(),"idle_frame")
-		pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-	tags = pointers.ManifestV2.__get_tags()
 	for tag in tags:
 		var node = filter_box_nd.instance()
 		node.name = tag

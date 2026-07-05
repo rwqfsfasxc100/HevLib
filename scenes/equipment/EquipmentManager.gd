@@ -1,10 +1,9 @@
 extends VBoxContainer
 
-var pointers
+var pointers = ModLoader._savedObjects[0]
 
 func _tree_entered():
 	var sTime = OS.get_system_time_msecs()
-	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_equipment_by_price"):
 		for slot in display_slots():
 			sort_slot(slot)

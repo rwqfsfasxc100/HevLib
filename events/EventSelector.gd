@@ -1,7 +1,8 @@
 extends ScrollContainer
 
 onready var ring = get_node("/root/Game/TheRing")
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+var pointers = ModLoader._savedObjects[0]
+
 var all_events = {}
 
 #func _process(delta):

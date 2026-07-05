@@ -24,13 +24,11 @@ var developer_hint = {
 	]
 }
 
-const pointers = preload("res://HevLib/pointers.gd")
-
 static func __updateTL(path:String, delim:String = ",", fullLogging:bool = true):
-	pointers.new().Translations.__updateTL(path,delim,fullLogging)
+	ModLoader._savedObjects[0].Translations.__updateTL(path,delim,fullLogging)
 static func __updateTL_from_dictionary(dictionary:Dictionary, fullLogging:bool = true):
-	pointers.new().Translations.__updateTL_from_dictionary(dictionary,fullLogging)
+	ModLoader._savedObjects[0].Translations.__updateTL_from_dictionary(dictionary,fullLogging)
 static func __fetch_all_translation_objects(number_of_objects_to_iterate_through: int = 100000) -> Array:
-	return pointers.new().Translations.__fetch_all_translation_objects(number_of_objects_to_iterate_through)
+	return ModLoader._savedObjects[0].Translations.__fetch_all_translation_objects(number_of_objects_to_iterate_through)
 static func __translation_file_to_dictionary(path: String, delimiter : String = "|") -> Dictionary:
-	return pointers.new().Translations.__translation_file_to_dictionary(path,delimiter)
+	return ModLoader._savedObjects[0].Translations.__translation_file_to_dictionary(path,delimiter)

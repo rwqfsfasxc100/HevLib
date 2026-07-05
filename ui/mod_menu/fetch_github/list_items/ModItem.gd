@@ -9,7 +9,7 @@ signal pressed(data,box)
 
 onready var http = get_node("HTTPRequest")
 
-var pointers
+var pointers = ModLoader._savedObjects[0]
 var dir = Directory.new()
 var unique_icon = ""
 var user_icon_uuid = ""
@@ -17,8 +17,6 @@ func boot():
 	# Also rework fetch FS to use the following:
 	# https://api.github.com/repos/company/project/contents/
 	visible = false
-	
-	pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	
 	finished()
 

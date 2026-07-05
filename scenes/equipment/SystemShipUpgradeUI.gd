@@ -4,15 +4,14 @@ export (String) var config_id = ""
 export (String) var config_section = ""
 export (String) var config_setting = ""
 export (bool) var invert_config = false
-var pointers
+var ssuuPointers = ModLoader._savedObjects[0]
 var cv = null
 func visibilityChanged():
 	.visibilityChanged()
 	if is_visible_in_tree():
-		if not pointers:
-			pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-		if pointers:
-			cv = pointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
+		
+		if ssuuPointers:
+			cv = ssuuPointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
 
 func isAvailable():
 	var how = .isAvailable()

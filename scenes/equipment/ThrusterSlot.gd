@@ -23,7 +23,7 @@ var fco
 var shipName
 var baseShipName
 
-var pointers
+var itsPointers = ModLoader._savedObjects[0]
 
 const nozzle_template = {
 	"cool_time":4,
@@ -47,7 +47,6 @@ const nozzle_template = {
 }
 var aux_type
 func loadPlaceholder():
-	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	hl_thrusterslot_modify()
 	.loadPlaceholder()
 #	yield(get_tree(),"idle_frame")
@@ -73,14 +72,14 @@ func hl_thrusterslot_modify():
 			var item
 			var sys = data.get("system","SYSTEM_NAME_MISSING")
 			if sys == currentInstall:
-				if pointers:
-					if not pointers.ConfigDriver.__validate_dictionary(data):
+				if itsPointers:
+					if not itsPointers.ConfigDriver.__validate_dictionary(data):
 						return
 				var valid_scene = false
 				if aux_path != "":
-					if pointers.DataFormat.__load_if_can(aux_path):
+					if itsPointers.DataFormat.__load_if_can(aux_path):
 						valid_scene = true
-						item = pointers.DataFormat.__get_load().instance()
+						item = itsPointers.DataFormat.__get_load().instance()
 				
 				if not valid_scene:
 					match aux_type:
@@ -92,8 +91,8 @@ func hl_thrusterslot_modify():
 							item = load(aux_hybrid).instance()
 						"RCS","TORCH":
 							var thrusterScene = exhaust_cache_path + "/" + aux_type + "/" + sys + "_thruster.tscn"
-							if pointers.DataFormat.__load_if_can(thrusterScene):
-								item = pointers.DataFormat.__get_load().instance()
+							if itsPointers.DataFormat.__load_if_can(thrusterScene):
+								item = itsPointers.DataFormat.__get_load().instance()
 							else:
 								item = load(thruster).instance()
 				
@@ -223,28 +222,28 @@ func hl_thrusterslot_modify_nozzle(nozzleA,nd):
 			nozzleA.coolTime = nd.cool_time
 			nozzleA.heatTime = nd.heat_time
 		var tr
-		if pointers.DataFormat.__load_if_can(nd.texture):
-			tr = pointers.DataFormat.__get_load()
+		if itsPointers.DataFormat.__load_if_can(nd.texture):
+			tr = itsPointers.DataFormat.__get_load()
 		else:
 			tr = load("res://ships/modules/nozzle-cd.png")
 		nozzleA.texture = tr
 		var tl
-		if pointers.DataFormat.__load_if_can(nd.normal):
-			tr = pointers.DataFormat.__get_load()
+		if itsPointers.DataFormat.__load_if_can(nd.normal):
+			tr = itsPointers.DataFormat.__get_load()
 		else:
 			tl = load("res://ships/modules/nozzle-n.png")
 		nozzleA.normal_map = tl
 		var heat = nozzleA.get_node_or_null("heat")
 		if heat:
 			var h
-			if pointers.DataFormat.__load_if_can(nd.heat):
-				h = pointers.DataFormat.__get_load()
+			if itsPointers.DataFormat.__load_if_can(nd.heat):
+				h = itsPointers.DataFormat.__get_load()
 			else:
 				h = load("res://ships/modules/nozzle-cl.png")
 			heat.texture = h
 			var thn = null
-			if pointers.DataFormat.__load_if_can(nd.heat_normal):
-				thn = pointers.DataFormat.__get_load()
+			if itsPointers.DataFormat.__load_if_can(nd.heat_normal):
+				thn = itsPointers.DataFormat.__get_load()
 			if thn:
 				heat.normal_map = thn
 			heat.region_enabled = nd.heat_region_enabled
@@ -283,7 +282,7 @@ func hl_thrusterslot_get_colors():
 	
 	for i in color_data:
 		var d = color_data[i]
-		if not pointers.ConfigDriver.__validate_dictionary(d):
+		if not itsPointers.ConfigDriver.__validate_dictionary(d):
 			continue
 		
 		if i == shipName:

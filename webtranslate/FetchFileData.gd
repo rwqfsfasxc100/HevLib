@@ -5,7 +5,7 @@ var cacheExtension = ".hev"
 
 var file_check = ""
 
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+var pointers = ModLoader._savedObjects[0]
 
 func _ready():
 	connect("request_completed",self,"_on_request_complete")

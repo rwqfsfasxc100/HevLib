@@ -2,20 +2,13 @@ extends "res://ships/Shipyard.gd"
 
 var ship_driver_path = "user://cache/.HevLib_Cache/ShipDriver/"
 
-var pointers
+var pointers = ModLoader._savedObjects[0]
 
 func _ready():
 	var file = File.new()
 	yield(get_tree(),"idle_frame")
 	hl_shipdriver_resetter_timeout()
-	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	
-	var pointercounter = 0
-	while pointercounter < 20 and not pointers:
-		yield(get_tree(),"physics_frame")
-		pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-		pointercounter += 1
-	pointercounter = 0
 	# Ship driver
 	file.open(ship_driver_path + "driver_data.json",File.READ)
 	var drivers = JSON.parse(file.get_as_text()).result

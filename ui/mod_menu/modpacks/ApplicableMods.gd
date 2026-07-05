@@ -10,11 +10,9 @@ onready var root = get_node_or_null("../../..")
 var applicable_mods = {}
 var exported_mods = []
 
-var pointers
+var pointers = ModLoader._savedObjects[0]
 var modPathPrefix = ""
 func _ready():
-	yield(CurrentGame.get_tree(),"idle_frame")
-	pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	var mods = pointers.ManifestV2.__get_mod_data()["mods"]
 	for m in mods:
 		var mod = mods[m]

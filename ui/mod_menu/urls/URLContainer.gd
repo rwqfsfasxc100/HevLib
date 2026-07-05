@@ -4,7 +4,7 @@ var link_button = preload("res://HevLib/ui/mod_menu/urls/URL_BUTTON.tscn")
 
 var MOD_INFO : Dictionary = {}
 
-var pointers
+var pointers = ModLoader._savedObjects[0]
 
 func update():
 	var b : Node = $VBoxContainer/ScrollContainer/VBoxContainer
@@ -17,8 +17,7 @@ func update():
 	var nodes : Array = []
 	if links:
 		for link in links:
-			if not pointers:
-				pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+			
 			var URL : String = links[link].get("URL","")
 			if URL and pointers.DataFormat.__is_valid_url(URL):
 				var node : Object = link_button.instance()

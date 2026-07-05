@@ -1,6 +1,6 @@
 extends CheckButton
 
-var pointers
+var pointers = ModLoader._savedObjects[0]
 
 var current_modlet = null
 var current_modlet_path : String = ""
@@ -32,8 +32,6 @@ func _toggled(button_pressed):
 		current_modlet.update()
 
 func change_modlet_to(modlet,modlet_path:String):
-	if not pointers:
-		pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	can_toggle = false
 	current_modlet = modlet
 	current_modlet_path = modlet_path

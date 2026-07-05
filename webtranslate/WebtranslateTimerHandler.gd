@@ -1,6 +1,6 @@
 extends Node
 
-onready var pointers = ModLoader._savedObjects[0]
+var pointers = ModLoader._savedObjects[0]
 
 export var URL = ""
 export var MINUTES = 30

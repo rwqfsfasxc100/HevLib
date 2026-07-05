@@ -49,7 +49,7 @@ func _ready():
 func _process(delta):
 	if is_visible_in_tree():
 		set_progress()
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+var pointers = ModLoader._savedObjects[0]
 
 func handle_time(datetime_dict : Dictionary):
 	var new_time = Time.get_datetime_dict_from_unix_time(CurrentGame.state.time + pointers.TimeAccess.__get_time_in_seconds(datetime_dict))

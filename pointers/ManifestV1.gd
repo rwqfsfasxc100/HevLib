@@ -23,11 +23,9 @@ var developer_hint = {
 	]
 }
 
-const pointers = preload("res://HevLib/pointers.gd")
-
 static func __load_manifest_from_file(manifest: String) -> Dictionary:
-	return pointers.new().ManifestV1.__load_manifest_from_file(manifest)
+	return ModLoader._savedObjects[0].ManifestV1.__load_manifest_from_file(manifest)
 static func __load_file(modDir: String, zipDir: String, hasManifest: bool, manifestDirectory: String, hasIcon: bool, iconDir: String) -> String:
-	return pointers.new().ManifestV1.__load_file(modDir,zipDir,hasManifest,manifestDirectory,hasIcon,iconDir)
+	return ModLoader._savedObjects[0].ManifestV1.__load_file(modDir,zipDir,hasManifest,manifestDirectory,hasIcon,iconDir)
 static func __get_mod_main(file: String, split_into_array: bool = false) -> String:
-	return pointers.new().ManifestV1.__get_mod_main(file,split_into_array)
+	return ModLoader._savedObjects[0].ManifestV1.__get_mod_main(file,split_into_array)

@@ -2,7 +2,7 @@ extends Tabs
 
 export var mod = ""
 export var mod_id = ""
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+var pointers = ModLoader._savedObjects[0]
 
 const tab_base = preload("res://HevLib/ui/mod_menu/settings_menus/generic_section_tab.tscn")
 

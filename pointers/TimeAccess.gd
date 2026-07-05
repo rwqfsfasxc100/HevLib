@@ -17,11 +17,9 @@ var developer_hint = {
 	]
 }
 
-const pointers = preload("res://HevLib/pointers.gd")
-
 
 static func __compare_dates(date, compare_to_this_date):
-	return pointers.new().TimeAccess.__compare_dates(date,compare_to_this_date)
+	return ModLoader._savedObjects[0].TimeAccess.__compare_dates(date,compare_to_this_date)
 
 static func __get_time_in_seconds(datetime_dict : Dictionary):
-	return pointers.new().TimeAccess.__get_time_in_seconds(datetime_dict)
+	return ModLoader._savedObjects[0].TimeAccess.__get_time_in_seconds(datetime_dict)

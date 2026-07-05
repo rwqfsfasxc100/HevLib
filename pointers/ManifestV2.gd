@@ -120,51 +120,49 @@ var developer_hint = {
 	]
 }
 
-const pointers = preload("res://HevLib/pointers.gd")
-
 static func __get_mod_data(print_json: bool = false) -> Dictionary:
-	return pointers.new().ManifestV2.__get_mod_data(print_json)
+	return ModLoader._savedObjects[0].ManifestV2.__get_mod_data(print_json)
 static func __match_mod_path_to_zip(mod_main_path:String) -> String:
-	return pointers.new().ManifestV2.__match_mod_path_to_zip(mod_main_path)
+	return ModLoader._savedObjects[0].ManifestV2.__match_mod_path_to_zip(mod_main_path)
 static func __compare_versions(checked_mod_data:Dictionary) -> bool:
-	return pointers.new().ManifestV2.__compare_versions(checked_mod_data)
+	return ModLoader._savedObjects[0].ManifestV2.__compare_versions(checked_mod_data)
 static func __get_mod_data_from_files(script_path:String, format_to_manifest_version: bool = true) -> Dictionary: # NOT UPDATED YET
-	return pointers.new().ManifestV2.__get_mod_data_from_files(script_path)
+	return ModLoader._savedObjects[0].ManifestV2.__get_mod_data_from_files(script_path)
 static func __parse_file_as_manifest(file_path: String, format_to_manifest_version: bool = true) -> Dictionary:
-	return pointers.new().ManifestV2.__parse_file_as_manifest(file_path,format_to_manifest_version)
+	return ModLoader._savedObjects[0].ManifestV2.__parse_file_as_manifest(file_path,format_to_manifest_version)
 static func __get_mod_by_id(id: String, case_sensitive: bool = true) -> Dictionary:
-	return pointers.new().ManifestV2.__get_mod_by_id(id,case_sensitive)
+	return ModLoader._savedObjects[0].ManifestV2.__get_mod_by_id(id,case_sensitive)
 static func __get_tags() -> Dictionary:
-	return pointers.new().ManifestV2.__get_tags()
+	return ModLoader._savedObjects[0].ManifestV2.__get_tags()
 static func __get_mod_tags(mod_id: String) -> Dictionary:
-	return pointers.new().ManifestV2.__get_mod_tags(mod_id)
+	return ModLoader._savedObjects[0].ManifestV2.__get_mod_tags(mod_id)
 static func __get_mods_from_tag(tag_name: String) -> Array:
-	return pointers.new().ManifestV2.__get_mods_from_tag(tag_name)
+	return ModLoader._savedObjects[0].ManifestV2.__get_mods_from_tag(tag_name)
 static func __get_mods_and_tags_from_tag(tag_name: String) -> Dictionary:
-	return pointers.new().ManifestV2.__get_mods_and_tags_from_tag(tag_name)
+	return ModLoader._savedObjects[0].ManifestV2.__get_mods_and_tags_from_tag(tag_name)
 static func __get_manifest_section(section: String, mod_id: String = "") -> Dictionary:
-	return pointers.new().ManifestV2.__get_manifest_section(section,mod_id)
+	return ModLoader._savedObjects[0].ManifestV2.__get_manifest_section(section,mod_id)
 static func __get_mod_ids() -> Array:
-	return pointers.new().ManifestV2.__get_mod_ids()
+	return ModLoader._savedObjects[0].ManifestV2.__get_mod_ids()
 static func __get_manifest_entry(section: String, entry: String, mod_id: String = ""):
-	return pointers.new().ManifestV2.__get_manifest_entry(section,entry,mod_id)
+	return ModLoader._savedObjects[0].ManifestV2.__get_manifest_entry(section,entry,mod_id)
 static func __check_complementary() -> Array:
-	return pointers.new().ManifestV2.__check_complementary()
+	return ModLoader._savedObjects[0].ManifestV2.__check_complementary()
 static func __check_mod_complementary(mod_id) -> Array:
-	return pointers.new().ManifestV2.__check_mod_complementary(mod_id)
+	return ModLoader._savedObjects[0].ManifestV2.__check_mod_complementary(mod_id)
 static func __check_dependancies() -> Array:
-	return pointers.new().ManifestV2.__check_dependancies()
+	return ModLoader._savedObjects[0].ManifestV2.__check_dependancies()
 static func __check_mod_dependancies(mod_id) -> Array:
-	return pointers.new().ManifestV2.__check_mod_dependancies(mod_id)
+	return ModLoader._savedObjects[0].ManifestV2.__check_mod_dependancies(mod_id)
 static func __check_conflicts() -> Array:
-	return pointers.new().ManifestV2.__check_conflicts()
+	return ModLoader._savedObjects[0].ManifestV2.__check_conflicts()
 static func __check_mod_conflicts(mod_id) -> Array:
-	return pointers.new().ManifestV2.__check_mod_conflicts(mod_id)
+	return ModLoader._savedObjects[0].ManifestV2.__check_mod_conflicts(mod_id)
 static func __parse_tags(tag_data) -> Dictionary:
-	return pointers.new().ManifestV2.__parse_tags(tag_data)
+	return ModLoader._savedObjects[0].ManifestV2.__parse_tags(tag_data)
 static func __have_mods_updated(folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",previous_file = "mods_from_last_launch.json"):
-	return pointers.new().ManifestV2.__have_mods_updated(folder,previous_file)
+	return ModLoader._savedObjects[0].ManifestV2.__have_mods_updated(folder,previous_file)
 static func __get_mod_versions(store = false,folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",previous_file = "mods_from_last_launch.json",this_file = "mods_from_this_launch.json"):
-	return pointers.new().ManifestV2.__get_mod_versions(store,folder,previous_file,this_file)
+	return ModLoader._savedObjects[0].ManifestV2.__get_mod_versions(store,folder,previous_file,this_file)
 static func __parse_changelog(file_path):
-	return pointers.new().ManifestV2.__parse_changelogs(file_path)
+	return ModLoader._savedObjects[0].ManifestV2.__parse_changelogs(file_path)

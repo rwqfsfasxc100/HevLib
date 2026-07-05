@@ -1,6 +1,6 @@
 extends HBoxContainer
 
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+var pointers = ModLoader._savedObjects[0]
 
 var mod_id = ""
 var mod_name = ""

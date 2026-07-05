@@ -11,10 +11,9 @@ var developer_hint = {
 		"Equivalent to sorting algorithm used in ModLoader.gd"
 	]
 }
-const pointers = preload("res://HevLib/pointers.gd")
 
 static func __get_drivers(get_ids : Array = []) -> Array:
-	return pointers.new().DriverManagement.__get_drivers(get_ids)
+	return ModLoader._savedObjects[0].DriverManagement.__get_drivers(get_ids)
 
 static func __compare_driver_dictionaries(a,b) -> bool:
-	return pointers.new().DriverManagement.compare_driver_dictionaries(a,b)
+	return ModLoader._savedObjects[0].DriverManagement.compare_driver_dictionaries(a,b)

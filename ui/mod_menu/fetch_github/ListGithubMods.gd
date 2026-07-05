@@ -30,16 +30,13 @@ var mod_item = load("res://HevLib/ui/mod_menu/fetch_github/list_items/ModItem.ts
 var file = File.new()
 signal icon_downloaded(uuid)
 
-var pointers
-var mod_ids:Array
+var pointers = ModLoader._savedObjects[0]
+var mod_ids:Array = pointers.ManifestV2.__get_mod_ids()
 
 var mod_list_cache = "user://cache/.Mod_Menu_2_Cache/github_list/list_cache.json"
 func _ready():
 	if prevent_load:
 		return
-	yield(CurrentGame.get_tree(),"physics_frame")
-	pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
-	mod_ids = pointers.ManifestV2.__get_mod_ids()
 	var disabledModlets:Dictionary = pointers.ManifestV2.__get_disabled_modlets()
 	for i in disabledModlets:
 		mod_ids.append(disabledModlets[i])

@@ -50,7 +50,6 @@ var hl_ism_mineral_trace_length = 6
 
 func _enter_tree():
 	var file = File.new()
-	ismPointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	ismPointers.ConfigDriver.__establish_connection("hl_ism_UV",self)
 	file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_mods.json",File.READ)
 	listings = JSON.parse(file.get_as_text()).result
@@ -397,7 +396,8 @@ func handleAmmoDelivery(delta):
 			availableAmmoToDrawNow += diff * (ammo_speed_multi - 1.0)
 		availableAmmoToDrawNow += ammo_speed_add
 	
-var ismPointers
+var ismPointers = ModLoader._savedObjects[0]
+
 
 var limitDroneOutput = true
 var unrestrictedAmmoOutput = false

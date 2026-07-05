@@ -8,7 +8,7 @@ var CONFIG_ENTRY = ""
 var CONFIG_SECTION = ""
 
 var CONFIG_MOD = ""
-onready var pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+var pointers = ModLoader._savedObjects[0]
 
 func _ready():
 	var value = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)

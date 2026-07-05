@@ -34,7 +34,7 @@ var cache_extension = ".file_check_cache"
 
 func loadTranslationsFromCache():
 	var accepted = false
-	var pointers = load("res://HevLib/pointers.gd").new()
+	var pointers = ModLoader._savedObjects[0]
 	var WebTranslateCache = "user://cache/.HevLib_Cache/WebTranslate/"
 	pointers.FolderAccess.__check_folder_exists(WebTranslateCache)
 	var cacheContent = pointers.FolderAccess.__fetch_folder_files(WebTranslateCache, true)

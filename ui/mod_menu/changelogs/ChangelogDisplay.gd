@@ -6,7 +6,7 @@ const header_label = preload("res://HevLib/ui/mod_menu/changelogs/labels/version
 const entry_label = preload("res://HevLib/ui/mod_menu/changelogs/labels/changelog_entry.tscn")
 const rich_entry_label = preload("res://HevLib/ui/mod_menu/changelogs/labels/rich_changelog_entry.tscn")
 onready var linecontainer = $ScrollContainer/VBoxContainer
-var pointers
+var pointers = ModLoader._savedObjects[0]
 export (String,"singular","dynamic") var operation = "singular"
 
 onready var LEFT = $PAGES/LEFT
@@ -22,8 +22,6 @@ func _ready():
 		linecontainer.rect_min_size = rect_size - Vector2(0,6)
 		yield(CurrentGame.get_tree(),"idle_frame")
 		parse()
-		
-		pass
 
 var refs = []
 
@@ -57,9 +55,6 @@ var current_page = 0
 func parse():
 	if not is_visible_in_tree():
 		current_page = 0
-	if not pointers:
-		yield(CurrentGame.get_tree(),"idle_frame")
-	pointers = CurrentGame.get_tree().get_root().get_node_or_null("HevLib~Pointers")
 	
 	var data:Dictionary = pointers.ManifestV2.__parse_changelogs(path)
 	
@@ -74,18 +69,14 @@ func parse():
 		var lines = data[config]
 		var header = header_label.instance()
 		header.text = config
-		if clearing:
-			break
-		else:
+		if not clearing:
 			refs.append(header)
 		linecontainer.add_child(header)
 		for l in lines:
 			var label = entry_label.instance()
 			var tex = TranslationServer.translate(l)
 			label.text = tex
-			if clearing:
-				break
-			else:
+			if not clearing:
 				refs.append(label)
 			linecontainer.add_child(label)
 			yield(CurrentGame.get_tree(),"idle_frame")

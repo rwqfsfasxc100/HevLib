@@ -52,23 +52,21 @@ var developer_hint = {
 	]
 }
 
-const pointers = preload("res://HevLib/pointers.gd")
-
 static func __config_parse(file: String) -> Dictionary:
-	return pointers.new().ConfigDriver.__config_parse(file)
+	return ModLoader._savedObjects[0].ConfigDriver.__config_parse(file)
 static func __store_config(id: String, configuration: Dictionary, cfg_filename : String = config_name + ".cfg"):
-	pointers.new().ConfigDriver.__store_config(configuration,id,cfg_filename)
+	ModLoader._savedObjects[0].ConfigDriver.__store_config(configuration,id,cfg_filename)
 static func __store_value(id: String, section: String, key: String, value, cfg_filename : String = config_name + ".cfg"):
-	pointers.new().ConfigDriver.__store_value(id,section,key,value,cfg_filename)
+	ModLoader._savedObjects[0].ConfigDriver.__store_value(id,section,key,value,cfg_filename)
 static func __get_config(id: String, cfg_filename : String = config_name + ".cfg") -> Dictionary:
-	return pointers.new().ConfigDriver.__get_config(id,cfg_filename)
+	return ModLoader._savedObjects[0].ConfigDriver.__get_config(id,cfg_filename)
 static func __get_value(id: String, section: String, key: String, cfg_filename : String = config_name + ".cfg"):
-	return pointers.new().ConfigDriver.__get_value(id,section,key,cfg_filename)
+	return ModLoader._savedObjects[0].ConfigDriver.__get_value(id,section,key,cfg_filename)
 static func __load_configs(cfg_filename : String = config_name + ".cfg"):
-	pointers.new().ConfigDriver.__load_configs(cfg_filename)
+	ModLoader._savedObjects[0].ConfigDriver.__load_configs(cfg_filename)
 static func set_button_focus(button,check_button):
-	pointers.new().ConfigDriver.set_button_focus(button,check_button)
+	ModLoader._savedObjects[0].ConfigDriver.set_button_focus(button,check_button)
 
 static func __load_inputs_from_string_array(key:String, strings: Array):
-	pointers.new().ConfigDriver.__load_inputs_from_string_array(key,strings)
+	ModLoader._savedObjects[0].ConfigDriver.__load_inputs_from_string_array(key,strings)
 

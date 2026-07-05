@@ -48,9 +48,7 @@ var developer_hint = {
 	]
 }
 
-const pointers = preload("res://HevLib/pointers.gd")
-
 static func __make_equipment_for_scene(equipment_data: Dictionary, slot_node_name : String, system_slot: String) -> String:
-	return pointers.new().Equipment.__make_equipment_for_scene(equipment_data,slot_node_name,system_slot)
+	return ModLoader._savedObjects[0].Equipment.__make_equipment_for_scene(equipment_data,slot_node_name,system_slot)
 static func __make_slot_for_scene(slot_data: Dictionary) -> Dictionary:
-	return pointers.new().Equipment.__make_slot_for_scene(slot_data)
+	return ModLoader._savedObjects[0].Equipment.__make_slot_for_scene(slot_data)

@@ -23,17 +23,15 @@ var developer_hint = {
 	]
 }
 
-const pointers = preload("res://HevLib/pointers.gd")
-
 static func __get_lib_variables() -> Object:
-	return pointers.new().HevLib.__get_lib_variables()
+	return ModLoader._savedObjects[0].HevLib.__get_lib_variables()
 
 static func __get_lib_pointers(return_as_full_path: bool = false) -> Array:
-	return pointers.new().HevLib.__get_lib_pointers(return_as_full_path)
+	return ModLoader._savedObjects[0].HevLib.__get_lib_pointers(return_as_full_path)
 
 static func __get_pointer_functions(pointer: String, return_JSON: bool = false) -> Dictionary:
-	return pointers.new().HevLib.__get_pointer_functions(pointer,return_JSON)
+	return ModLoader._savedObjects[0].HevLib.__get_pointer_functions(pointer,return_JSON)
 
 
 static func __get_library_functionality(return_JSON: bool = false) -> Dictionary:
-	return pointers.new().HevLib.__get_library_functionality(return_JSON)
+	return ModLoader._savedObjects[0].HevLib.__get_library_functionality(return_JSON)

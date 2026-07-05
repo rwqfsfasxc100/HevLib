@@ -18,10 +18,9 @@ var developer_hint = {
 		"Gets the numerical value of the provided stat"
 		]
 }
-const pointers = preload("res://HevLib/pointers.gd")
 
 static func __get_achievement_data(achievementID: String) -> Dictionary:
-	return pointers.new().Achievements.__get_achievement_data(achievementID)
+	return ModLoader._savedObjects[0].Achievements.__get_achievement_data(achievementID)
 
 static func __get_stat_data(stat: String) -> float:
-	return pointers.new().Achievements.__get_stat_data(stat)
+	return ModLoader._savedObjects[0].Achievements.__get_stat_data(stat)

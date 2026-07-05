@@ -1,6 +1,6 @@
 extends HBoxContainer
 
-var pointers
+var pointers = ModLoader._savedObjects[0]
 export var mod_box = preload("res://HevLib/ui/mod_menu/mod_list/mod_box/ModBox.tscn")
 
 export (NodePath) var info_icon = NodePath("")
@@ -75,10 +75,7 @@ func restart_cancel():
 
 var ptnull = false
 func _ready():
-	pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
-	if pointers == null:
-		yield(get_tree(),"idle_frame")
-		pointers = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+	
 	tween = Tween.new()
 	add_child(tween)
 	
