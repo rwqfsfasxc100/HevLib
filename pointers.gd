@@ -1693,8 +1693,7 @@ class _DataFormat:
 		var converted:PoolVector2Array = PoolVector2Array([])
 		var size = array.size()
 		if size % 2 == 1:
-			pointers.l("Cannot convert array to PoolVector2Array with an odd number of entries","pointers.DataFormat")
-			return PoolVector2Array([])
+			array.resize(size - 1)
 		var index:int = 0
 		while index < size:
 			var aRaw = array[index]
@@ -7664,10 +7663,7 @@ class _WebTranslate:
 		var folderToDelete = "user://cache/.HevLib_Cache/WebTranslate/" + folderConcat
 		pointers.l("deleting cache folder @ %s" % folderToDelete,"pointers.WebTranslate")
 		var did = pointers.FolderAccess.__recursive_delete(folderToDelete)
-		if did:
-			return true
-		else:
-			return false
+		return did
 	
 	func __webtranslate_reset_by_file_check(file_check: String) -> bool:
 		var did = false
