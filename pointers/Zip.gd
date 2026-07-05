@@ -21,7 +21,7 @@ var developer_hint = {
 
 
 static func __get_zip_content(path: String, Strip_Parent_Folder: bool = false, To_Lower_Case: bool = false) -> Array:
-	return ModLoader._savedObjects[0].Zip.__get_zip_content(path,Strip_Parent_Folder,To_Lower_Case)
+	return preload("res://HevLib/pointers.gd").new().Zip.__get_zip_content(path,Strip_Parent_Folder,To_Lower_Case)
 
 static func __fetch_file_from_zip(path: String, Destination_Folder_Path: String, Desired_File_Paths: Array) -> Array:
-	return ModLoader._savedObjects[0].Zip.__fetch_file_from_zip(path, Destination_Folder_Path, Desired_File_Paths)
+	return preload("res://HevLib/pointers.gd").new().Zip.__fetch_file_from_zip(path, Destination_Folder_Path, Desired_File_Paths)

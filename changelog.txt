@@ -1,3 +1,7 @@
+[1.14.17]
+
+1=* Reverted change to all pointer scripts in the `res://HevLib/pointers/` directory as they would crash when used on initialization from mods that still made use of them.
+
 [1.14.16]
 
 1=* Fixed ConfigDriver connection errors all producing the same log, which made figuring out what was causing problems with the connection difficult

@@ -53,20 +53,20 @@ var developer_hint = {
 }
 
 static func __config_parse(file: String) -> Dictionary:
-	return ModLoader._savedObjects[0].ConfigDriver.__config_parse(file)
+	return preload("res://HevLib/pointers.gd").new().ConfigDriver.__config_parse(file)
 static func __store_config(id: String, configuration: Dictionary, cfg_filename : String = config_name + ".cfg"):
-	ModLoader._savedObjects[0].ConfigDriver.__store_config(configuration,id,cfg_filename)
+	preload("res://HevLib/pointers.gd").new().ConfigDriver.__store_config(configuration,id,cfg_filename)
 static func __store_value(id: String, section: String, key: String, value, cfg_filename : String = config_name + ".cfg"):
-	ModLoader._savedObjects[0].ConfigDriver.__store_value(id,section,key,value,cfg_filename)
+	preload("res://HevLib/pointers.gd").new().ConfigDriver.__store_value(id,section,key,value,cfg_filename)
 static func __get_config(id: String, cfg_filename : String = config_name + ".cfg") -> Dictionary:
-	return ModLoader._savedObjects[0].ConfigDriver.__get_config(id,cfg_filename)
+	return preload("res://HevLib/pointers.gd").new().ConfigDriver.__get_config(id,cfg_filename)
 static func __get_value(id: String, section: String, key: String, cfg_filename : String = config_name + ".cfg"):
-	return ModLoader._savedObjects[0].ConfigDriver.__get_value(id,section,key,cfg_filename)
+	return preload("res://HevLib/pointers.gd").new().ConfigDriver.__get_value(id,section,key,cfg_filename)
 static func __load_configs(cfg_filename : String = config_name + ".cfg"):
-	ModLoader._savedObjects[0].ConfigDriver.__load_configs(cfg_filename)
+	preload("res://HevLib/pointers.gd").new().ConfigDriver.__load_configs(cfg_filename)
 static func set_button_focus(button,check_button):
-	ModLoader._savedObjects[0].ConfigDriver.set_button_focus(button,check_button)
+	preload("res://HevLib/pointers.gd").new().ConfigDriver.set_button_focus(button,check_button)
 
 static func __load_inputs_from_string_array(key:String, strings: Array):
-	ModLoader._savedObjects[0].ConfigDriver.__load_inputs_from_string_array(key,strings)
+	preload("res://HevLib/pointers.gd").new().ConfigDriver.__load_inputs_from_string_array(key,strings)
 

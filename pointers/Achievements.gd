@@ -20,7 +20,7 @@ var developer_hint = {
 }
 
 static func __get_achievement_data(achievementID: String) -> Dictionary:
-	return ModLoader._savedObjects[0].Achievements.__get_achievement_data(achievementID)
+	return preload("res://HevLib/pointers.gd").new().Achievements.__get_achievement_data(achievementID)
 
 static func __get_stat_data(stat: String) -> float:
-	return ModLoader._savedObjects[0].Achievements.__get_stat_data(stat)
+	return preload("res://HevLib/pointers.gd").new().Achievements.__get_stat_data(stat)

@@ -33,18 +33,18 @@ var developer_hint = {
 }
 
 static func __check_folder_exists(folder: String, status_array: bool = false) -> bool:
-	return ModLoader._savedObjects[0].FolderAccess.__check_folder_exists(folder,status_array)
+	return preload("res://HevLib/pointers.gd").new().FolderAccess.__check_folder_exists(folder,status_array)
 static func __recursive_delete(path: String):
-	return ModLoader._savedObjects[0].FolderAccess.__recursive_delete(path)
+	return preload("res://HevLib/pointers.gd").new().FolderAccess.__recursive_delete(path)
 static func __get_first_file(folder: String) -> String:
-	return ModLoader._savedObjects[0].FolderAccess.__get_first_file(folder)
+	return preload("res://HevLib/pointers.gd").new().FolderAccess.__get_first_file(folder)
 static func __fetch_folder_files(folder: String, showFolders: bool = false, returnFullPath: bool = false,globalizePath: bool = false) -> Array:
-	return ModLoader._savedObjects[0].FolderAccess.__fetch_folder_files(folder,showFolders,returnFullPath,globalizePath)
+	return preload("res://HevLib/pointers.gd").new().FolderAccess.__fetch_folder_files(folder,showFolders,returnFullPath,globalizePath)
 
 static func __copy_file(file, folder):
-	ModLoader._savedObjects[0].FileAccess.__copy_file(file,folder)
+	preload("res://HevLib/pointers.gd").new().FileAccess.__copy_file(file,folder)
 static func __get_folder_structure(folder,store_file_content = false):
-	return ModLoader._savedObjects[0].FolderAccess.__get_folder_structure(folder,store_file_content)
+	return preload("res://HevLib/pointers.gd").new().FolderAccess.__get_folder_structure(folder,store_file_content)
 
 static func __get_modmain_files() -> Array:
-	return ModLoader._savedObjects[0].ManifestV2.__get_modmain_files()
+	return preload("res://HevLib/pointers.gd").new().ManifestV2.__get_modmain_files()

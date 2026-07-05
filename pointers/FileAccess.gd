@@ -17,12 +17,12 @@ var developer_hint = {
 	}
 
 static func __get_file_content(file: String) -> String:
-	return ModLoader._savedObjects[0].FileAccess.__get_file_content(file)
+	return preload("res://HevLib/pointers.gd").new().FileAccess.__get_file_content(file)
 static func __config_parse(file: String) -> Dictionary:
-	return ModLoader._savedObjects[0].ConfigDriver.__config_parse(file)
+	return preload("res://HevLib/pointers.gd").new().ConfigDriver.__config_parse(file)
 
 static func __copy_file(file, folder):
-	ModLoader._savedObjects[0].FileAccess.__copy_file(file,folder)
+	preload("res://HevLib/pointers.gd").new().FileAccess.__copy_file(file,folder)
 
 static func __load_png(path) -> Texture:
-	return ModLoader._savedObjects[0].FileAccess.__load_png(path)
+	return preload("res://HevLib/pointers.gd").new().FileAccess.__load_png(path)

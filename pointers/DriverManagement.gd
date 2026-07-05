@@ -13,7 +13,7 @@ var developer_hint = {
 }
 
 static func __get_drivers(get_ids : Array = []) -> Array:
-	return ModLoader._savedObjects[0].DriverManagement.__get_drivers(get_ids)
+	return preload("res://HevLib/pointers.gd").new().DriverManagement.__get_drivers(get_ids)
 
 static func __compare_driver_dictionaries(a,b) -> bool:
-	return ModLoader._savedObjects[0].DriverManagement.compare_driver_dictionaries(a,b)
+	return preload("res://HevLib/pointers.gd").new().DriverManagement.compare_driver_dictionaries(a,b)

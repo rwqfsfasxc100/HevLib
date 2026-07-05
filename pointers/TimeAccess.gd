@@ -19,7 +19,7 @@ var developer_hint = {
 
 
 static func __compare_dates(date, compare_to_this_date):
-	return ModLoader._savedObjects[0].TimeAccess.__compare_dates(date,compare_to_this_date)
+	return preload("res://HevLib/pointers.gd").new().TimeAccess.__compare_dates(date,compare_to_this_date)
 
 static func __get_time_in_seconds(datetime_dict : Dictionary):
-	return ModLoader._savedObjects[0].TimeAccess.__get_time_in_seconds(datetime_dict)
+	return preload("res://HevLib/pointers.gd").new().TimeAccess.__get_time_in_seconds(datetime_dict)

@@ -24,8 +24,8 @@ var developer_hint = {
 }
 
 static func __load_manifest_from_file(manifest: String) -> Dictionary:
-	return ModLoader._savedObjects[0].ManifestV1.__load_manifest_from_file(manifest)
+	return preload("res://HevLib/pointers.gd").new().ManifestV1.__load_manifest_from_file(manifest)
 static func __load_file(modDir: String, zipDir: String, hasManifest: bool, manifestDirectory: String, hasIcon: bool, iconDir: String) -> String:
-	return ModLoader._savedObjects[0].ManifestV1.__load_file(modDir,zipDir,hasManifest,manifestDirectory,hasIcon,iconDir)
+	return preload("res://HevLib/pointers.gd").new().ManifestV1.__load_file(modDir,zipDir,hasManifest,manifestDirectory,hasIcon,iconDir)
 static func __get_mod_main(file: String, split_into_array: bool = false) -> String:
-	return ModLoader._savedObjects[0].ManifestV1.__get_mod_main(file,split_into_array)
+	return preload("res://HevLib/pointers.gd").new().ManifestV1.__get_mod_main(file,split_into_array)

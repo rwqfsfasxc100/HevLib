@@ -29,10 +29,10 @@ var developer_hint = {
 }
 
 static func __webtranslate(URL: String, fallback: Array = [], file_check: String = ""):
-	ModLoader._savedObjects[0].WebTranslate.__webtranslate(URL,fallback,file_check)
+	preload("res://HevLib/pointers.gd").new().WebTranslate.__webtranslate(URL,fallback,file_check)
 static func __webtranslate_reset_by_URL(URL: String) -> bool:
-	return ModLoader._savedObjects[0].WebTranslate.__webtranslate_reset(URL)
+	return preload("res://HevLib/pointers.gd").new().WebTranslate.__webtranslate_reset(URL)
 static func __webtranslate_reset_by_file_check(file_check: String) -> bool:
-	return ModLoader._savedObjects[0].WebTranslate.__webtranslate_reset_by_file_check(file_check)
+	return preload("res://HevLib/pointers.gd").new().WebTranslate.__webtranslate_reset_by_file_check(file_check)
 static func __webtranslate_timed(URL: String, MINUTES_DELAY: int = 30, fallback: Array = [], file_check: String = ""):
-	ModLoader._savedObjects[0].WebTranslate.__webtranslate_timed(URL,MINUTES_DELAY,fallback,file_check)
+	preload("res://HevLib/pointers.gd").new().WebTranslate.__webtranslate_timed(URL,MINUTES_DELAY,fallback,file_check)

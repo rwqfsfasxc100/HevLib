@@ -24,14 +24,14 @@ var developer_hint = {
 }
 
 static func __get_lib_variables() -> Object:
-	return ModLoader._savedObjects[0].HevLib.__get_lib_variables()
+	return preload("res://HevLib/pointers.gd").new().HevLib.__get_lib_variables()
 
 static func __get_lib_pointers(return_as_full_path: bool = false) -> Array:
-	return ModLoader._savedObjects[0].HevLib.__get_lib_pointers(return_as_full_path)
+	return preload("res://HevLib/pointers.gd").new().HevLib.__get_lib_pointers(return_as_full_path)
 
 static func __get_pointer_functions(pointer: String, return_JSON: bool = false) -> Dictionary:
-	return ModLoader._savedObjects[0].HevLib.__get_pointer_functions(pointer,return_JSON)
+	return preload("res://HevLib/pointers.gd").new().HevLib.__get_pointer_functions(pointer,return_JSON)
 
 
 static func __get_library_functionality(return_JSON: bool = false) -> Dictionary:
-	return ModLoader._savedObjects[0].HevLib.__get_library_functionality(return_JSON)
+	return preload("res://HevLib/pointers.gd").new().HevLib.__get_library_functionality(return_JSON)

@@ -38,16 +38,16 @@ var developer_hint = {
 }
 
 static func __get_all_children(node, strip_supplied_node_from_array = false, return_only_paths = false, use_relative_paths = false):
-	return ModLoader._savedObjects[0].NodeAccess.__get_all_children(node,strip_supplied_node_from_array,return_only_paths,use_relative_paths)
+	return preload("res://HevLib/pointers.gd").new().NodeAccess.__get_all_children(node,strip_supplied_node_from_array,return_only_paths,use_relative_paths)
 static func __claim_child_ownership(node:Node):
-	ModLoader._savedObjects[0].NodeAccess.__claim_child_ownership(node)
+	preload("res://HevLib/pointers.gd").new().NodeAccess.__claim_child_ownership(node)
 static func __is_instanced_from_scene(p_node):
-	return ModLoader._savedObjects[0].NodeAccess.__is_instanced_from_scene(p_node)
+	return preload("res://HevLib/pointers.gd").new().NodeAccess.__is_instanced_from_scene(p_node)
 static func __dynamic_crew_expander(folder_path: String, max_crew:int = 24) -> String:
-	return ModLoader._savedObjects[0].NodeAccess.__dynamic_crew_expander(folder_path,max_crew)
+	return preload("res://HevLib/pointers.gd").new().NodeAccess.__dynamic_crew_expander(folder_path,max_crew)
 static func __convert_var_from_string(string : String, folder : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/file_caches"):
-	return ModLoader._savedObjects[0].DataFormat.__convert_var_from_string(string,folder)
+	return preload("res://HevLib/pointers.gd").new().DataFormat.__convert_var_from_string(string,folder)
 
 static func __remove_scripts(node):
-	ModLoader._savedObjects[0].NodeAccess.__remove_scripts(node)
+	preload("res://HevLib/pointers.gd").new().NodeAccess.__remove_scripts(node)
 
