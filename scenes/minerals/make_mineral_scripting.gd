@@ -65,7 +65,7 @@ static func handle_ore_scenes(mineral_data,pointers):
 		if price > 0.0:
 			match handle:
 				"scenes":
-					var scenes = PoolStringArray([])
+					var scenes = PoolStringArray()
 					for i in range(0,7):
 						var specific = mineral.get("ore_%s" % (i + 1),"")
 						if typeof(specific) == TYPE_STRING and file.file_exists(specific):

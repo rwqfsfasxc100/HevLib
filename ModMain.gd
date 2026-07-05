@@ -45,7 +45,7 @@ func _init(modLoader = ModLoader):
 	
 	
 
-var update_urls = PoolStringArray([])
+var update_urls = PoolStringArray()
 var url_store = "user://cache/.Mod_Menu_2_Cache/updates/url_refs.json"
 var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
 var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
