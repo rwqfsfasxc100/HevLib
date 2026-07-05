@@ -5043,10 +5043,7 @@ class _HevLib:
 		pointers = f
 	
 	func __get_lib_variables():
-		var varNode = ModLoader.get_node("/root/HevLib~Variables")
-		var aData = varNode.AchievementData
-		var aPercentData = varNode.AchievementPercentageStats
-		return {"AchievementData":aData,"AchievementPercentageStats":aPercentData}
+		return {"AchievementData":{},"AchievementPercentageStats":{}}
 	
 	func __get_lib_pointers(return_as_full_path: bool = false) -> Array:
 		var path = "res://HevLib/pointers/"
@@ -7726,14 +7723,13 @@ class _WebTranslate:
 	
 	func __webtranslate_timed(URL: String, MINUTES_DELAY: int, fallback: Array = [], file_check: String = ""):
 		pointers.l("function 'webtranslate_timed' initiated, starting constant translation of [%s] with a delay of [%s] minutes" % [URL,MINUTES_DELAY],"pointers.WebTranslate")
-		var variableNode = ModLoader.get_tree().get_root().get_node("/root/HevLib~Variables")
 		var handleNode = preload("res://HevLib/webtranslate/WebtranslateTimerHandler.tscn").instance()
 		handleNode.name = URL + Time.get_time_string_from_system()
 		handleNode.URL = URL
 		handleNode.MINUTES = MINUTES_DELAY
 		handleNode.fallback = fallback
 		handleNode.file_check = file_check
-		variableNode.add_child(handleNode)
+		pointers.add_child(handleNode)
 	
 	
 	

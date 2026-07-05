@@ -7,8 +7,7 @@ var ship_driver_path = "user://cache/.HevLib_Cache/ShipDriver/"
 var added_modded_ships = false
 
 func _ready():
-	yield(get_tree(),"idle_frame")
-	pointersShipDriver = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+	pointersShipDriver = ModLoader._savedObjects[0]
 	pointersShipDriver.ConfigDriver.__establish_connection("hl_shipdriver_init_ships_to_dealer",self)
 	var file = File.new()
 	file.open(ship_driver_path + "driver_data.json",File.READ)

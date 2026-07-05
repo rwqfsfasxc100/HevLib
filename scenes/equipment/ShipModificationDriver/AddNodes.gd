@@ -14,7 +14,7 @@ var processed_ship_numerics_modifications = {}
 
 var pointers_hl_addnodes
 func _enter_tree():
-	pointers_hl_addnodes = get_tree().get_root().get_node_or_null("HevLib~Pointers")
+	pointers_hl_addnodes = ModLoader._savedObjects[0]
 	hl_add_nodes_make_node_mods()
 	
 func hl_add_nodes_make_node_mods():

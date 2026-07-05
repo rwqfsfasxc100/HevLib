@@ -2,10 +2,10 @@ extends "res://ships/Shipyard.gd"
 
 var ship_driver_path = "user://cache/.HevLib_Cache/ShipDriver/"
 
-var pointers
+var syPointers
 
 func _ready():
-	pointers = ModLoader._savedObjects[0]
+	syPointers = ModLoader._savedObjects[0]
 	var file = File.new()
 	yield(get_tree(),"idle_frame")
 	hl_shipdriver_resetter_timeout()
@@ -30,8 +30,8 @@ func _ready():
 			alternates.merge({ship_name:alts})
 		
 		if ship_name:
-			if pointers.DataFormat.__load_if_can(path):
-				ships[ship_name] = pointers.DataFormat.__get_load()
+			if syPointers.DataFormat.__load_if_can(path):
+				ships[ship_name] = syPointers.DataFormat.__get_load()
 			if alias != ship_name:
 				configAlias[ship_name] = alias
 			if config:
