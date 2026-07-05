@@ -2387,60 +2387,36 @@ class _Equipment:
 		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/")
 		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/")
 		
-		# FILE PATHS
-		var FILE_PATHS : Array = [
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/Exhaust_Cache",
-			
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_TEMPLATES.json",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_STANDALONE.json",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order.json",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_SHIP_TEMPLATES.json",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_SHIP_STANDALONE.json",
-			"user://cache/.HevLib_Cache/MenuDriver/save_buttons.json",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_mods.json",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/node_definitions.json",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_register.json",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/AuxSlot.json",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_additions.json",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_modifications.json",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFIED_NAMES.json",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Slot_Limits.tscn",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_modify.json",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_thruster_colors.json",
-			"user://cache/.HevLib_Cache/ShipDriver/",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/Driver_Store.json",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order_relative.json",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/modify_ship_numerics.json",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/namer.json",
-			"user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_systems.json",
-			
-		]
+		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/")
+		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/")
+		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/")
+		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/Exhaust_Cache/")
+		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/ShipDriver/")
 		
-		var file_save_path : String = FILE_PATHS[0]
-		var exhaust_cache_path : String = FILE_PATHS[1]
-		var weaponslot_modify_templates_file : String  = FILE_PATHS[2]
-		var weaponslot_modify_standalone_file : String  = FILE_PATHS[3]
-		var slot_order_cache_file : String  = FILE_PATHS[4]
-		var weaponslot_ship_templates_file : String  = FILE_PATHS[5]
-		var weaponslot_ship_standalone_file : String  = FILE_PATHS[6]
-		var save_menu_file : String  = FILE_PATHS[7]
-		var processed_storage_file : String  = FILE_PATHS[8]
-		var node_definitions_file : String  = FILE_PATHS[9]
-		var ship_node_register_file : String  = FILE_PATHS[10]
-		var auxslot_data_path : String  = FILE_PATHS[11]
-		var weaponslot_additions : String  = FILE_PATHS[12]
-		var weaponslot_modifications : String  = FILE_PATHS[13]
-		var weaponslot_modify_equipment_names : String  = FILE_PATHS[14]
-		var upgrades_slot_limits : String  = FILE_PATHS[15]
-		var ship_node_modify_file : String  = FILE_PATHS[16]
-		var ship_thruster_color_file : String  = FILE_PATHS[17]
-		var ship_driver_path : String  = FILE_PATHS[18]
-		var storage_for_driver_store : String  = FILE_PATHS[19]
-		var slot_order_relative_store : String  = FILE_PATHS[20]
-		var modify_ship_numerics_store : String  = FILE_PATHS[21]
-		var namer_store : String  = FILE_PATHS[22]
-		var processed_storage_systems_file : String  = FILE_PATHS[23]
+		var file_save_path : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn"
+		var exhaust_cache_path : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/Exhaust_Cache"
+		var weaponslot_modify_templates_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_TEMPLATES.json"
+		var weaponslot_modify_standalone_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_STANDALONE.json"
+		var slot_order_cache_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order.json"
+		var weaponslot_ship_templates_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_SHIP_TEMPLATES.json"
+		var weaponslot_ship_standalone_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_SHIP_STANDALONE.json"
+		var save_menu_file : String  = "user://cache/.HevLib_Cache/MenuDriver/save_buttons.json"
+		var processed_storage_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_mods.json"
+		var node_definitions_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/node_definitions.json"
+		var ship_node_register_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_register.json"
+		var auxslot_data_path : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/AuxSlot.json"
+		var weaponslot_additions : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_additions.json"
+		var weaponslot_modifications : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_modifications.json"
+		var weaponslot_modify_equipment_names : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFIED_NAMES.json"
+		var upgrades_slot_limits : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Slot_Limits.tscn"
+		var ship_node_modify_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_modify.json"
+		var ship_thruster_color_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_thruster_colors.json"
+		var ship_driver_path : String  = "user://cache/.HevLib_Cache/ShipDriver/"
+		var storage_for_driver_store : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/Driver_Store.json"
+		var slot_order_relative_store : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order_relative.json"
+		var modify_ship_numerics_store : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/modify_ship_numerics.json"
+		var namer_store : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/namer.json"
+		var processed_storage_systems_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_systems.json"
 		
 		version = pointers.DataFormat.__get_vanilla_version()
 		pointers.l("observed game version of %s" % str(version),"pointers.Equipment")
@@ -2468,9 +2444,6 @@ class _Equipment:
 		
 		
 		var ws_equipment_names : Array = []
-		
-		for item in FILE_PATHS:
-			pointers.FolderAccess.__check_folder_exists(item.split(item.split("/")[item.split("/").size() - 1])[0])
 		
 		var ws_default_templates : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
 		var ws_ship_templates : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
