@@ -31,8 +31,14 @@ func _ready():
 		yield(Debug.get_tree(),"idle_frame")
 		l("Device Information: [\n%s\n]" % get_device_info())
 		var rgx = RegEx.new()
-		rgx.compile("[a-z1-9]")
-		var found = rgx.search(TranslationServer.translate("SYSTEM_AMMO_10000_DESC"))
+		rgx.compile("\\p{Ll}")
+#		rgx.compile("[a-z1-9]")
+		var base = TranslationServer.translate("SYSTEM_AMMO_10000_DESC")
+		var found = rgx.search(base)
+		if not found:
+			l("Translations did not get initialized, exiting to preserve report-ready state")
+			pointers.storeLogCache()
+			pointers.NodeAccess.__exit()
 		breakpoint
 var cache_extension = ".file_check_cache"
 
