@@ -1690,9 +1690,10 @@ class _DataFormat:
 		return returning_keys
 	
 	func __convert_arr_to_vec2arr(array: Array) -> PoolVector2Array:
-		var converted:PoolVector2Array = PoolVector2Array([])
+		var converted:PoolVector2Array = PoolVector2Array()
 		var size = array.size()
 		if size % 2 == 1:
+			pointers.l("Cannot convert array to PoolVector2Array with an odd number of entries, truncating the last point","pointers.DataFormat")
 			array.resize(size - 1)
 		var index:int = 0
 		while index < size:
@@ -1700,10 +1701,10 @@ class _DataFormat:
 			var bRaw = array[index + 1]
 			if not (aRaw is float or aRaw is int or aRaw is String):
 				pointers.l("Cannot convert type %s for PoolVector2Array" % aRaw,"pointers.DataFormat")
-				return PoolVector2Array([])
+				return PoolVector2Array()
 			if not (bRaw is float or bRaw is int or bRaw is String):
 				pointers.l("Cannot convert type %s for PoolVector2Array" % bRaw,"pointers.DataFormat")
-				return PoolVector2Array([])
+				return PoolVector2Array()
 			var a:float = float(aRaw)
 			var b:float = float(bRaw)
 			var pooling:Vector2 = Vector2(a,b)
