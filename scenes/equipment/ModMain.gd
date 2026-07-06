@@ -134,47 +134,13 @@ func _ready():
 	if correct:
 		l("Readying")
 		
-		
-		var ring = load("res://HevLib/scenes/minerals/make_ring_modifications.gd")
-		ring.make_ring_modifications(pointers)
-		
-		
-		
-#		var tr = ResourceLoader.load(thering_path)
-#		tr.new()
-#		tr.take_over_path("res://TheRing.gd")
-#		_savedObjects.append(tr)
-		f.open(ringscene_path,File.WRITE)
-		f.store_string("[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"%s\" type=\"Script\" id=1]\n[ext_resource path=\"res://story/TheRing.tscn\" type=\"PackedScene\" id=2]\n\n[node name=\"TheRing\" instance=ExtResource( 2 )]\nscript = ExtResource( 1 )\n" % ["res://TheRing.gd"])#thering_path)
-		f.close()
-		var rs := load(ringscene_path)
-		rs.take_over_path("res://story/TheRing.tscn")
-		_savedObjects.append(rs)
-		
-		
+		pointers.Scripting.make_ring_modifications()
 		
 		pointers.Equipment.__make_upgrades_scene()
-		var upgrades = load(upgrades_path)
-		upgrades.take_over_path("res://enceladus/Upgrades.tscn")
-		_savedObjects.append(upgrades)
-		
-		var slot_limits = load(slot_limits_path)
-		slot_limits.take_over_path("res://enceladus/Upgrades.tscn")
-		_savedObjects.append(slot_limits)
-		
-#		var aux = load(aux_path)
-#		aux.take_over_path("res://ships/modules/AuxSlot.tscn")
-#		_savedObjects.append(aux)
-
-#		var ws = load(weaponslot_path)
-#		ws.take_over_path("res://weapons/WeaponSlot.tscn")
-#		_savedObjects.append(ws)
 		
 		installScriptExtension("../minerals/Summary.gd")
-#		replaceScene("../minerals/DiveSummary.tscn","res://enceladus/DiveSummary.tscn")
 		
 		replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")
-#		replaceScene("Enceladus.tscn","res://enceladus/Enceladus.tscn")
 
 		replaceScene("../minerals/multiminerals/AsteroidField.tscn","res://AsteroidField.tscn")
 		
@@ -238,8 +204,8 @@ func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
 	var line = "%s V%s" % [title, version]
 	pointers.l(msg,line)
 
-var deviceinfostore:String = "user://cache/.Mod_Menu_2_Cache/EssentialsLogCache/"
-var deviceinfocache:String = deviceinfostore + "DeviceInfoCache"
+var deviceinfostore:String = "user://cache/.HevLib_Cache/logs/"
+var deviceinfocache:String = deviceinfostore + "pointer_logs.txt"
 func match_mod_path_to_zip():
 	var zip_ref_store = "user://cache/.HevLib_Cache/zip_ref_store.json"
 	f.open(zip_ref_store,File.WRITE)
