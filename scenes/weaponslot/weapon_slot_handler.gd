@@ -1,10 +1,5 @@
 extends "res://ships/WeaponSlot.gd"
 
-var eqt_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/ship_data/%s/internal_equipment_templates_-_%s.json"
-
-var ws_add = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_additions.json"
-var ws_modify = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_modifications.json"
-
 var pointers
 
 var shipName = ""
@@ -26,31 +21,18 @@ func _ready():
 	shipName=ship.shipName
 	baseShipName=ship.baseShipName
 	
-	pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/ship_data/%s/" % shipName)
-
-	this_file = eqt_file % [shipName,slot]
+	var equipment_templates = pointers.Equipment.ship_equipment_template_internals
+	if not shipName in equipment_templates:
+		equipment_templates[shipName] = {}
+	equipment_templates = equipment_templates[shipName]
 	
-	var equipment_templates = {}
-	
-	if not file.file_exists(this_file):
-		file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_TEMPLATES.json",File.READ)
+	if equipment_templates:
 		
-		var generic_modify_templates = JSON.parse(file.get_as_text(true)).result
-		file.close()
-		file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_STANDALONE.json",File.READ)
-		var generic_modify_standalone = JSON.parse(file.get_as_text(true)).result
-		file.close()
-		file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_SHIP_TEMPLATES.json",File.READ)
-		var ship_modify_templates = JSON.parse(file.get_as_text(true)).result
-		file.close()
-		file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_SHIP_STANDALONE.json",File.READ)
-		var ship_modify_standalone = JSON.parse(file.get_as_text(true)).result
-		file.close()
-		file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFIED_NAMES.json",File.READ)
-		var eqnames = JSON.parse(file.get_as_text(true)).result
-		file.close()
-		
-		
+		var generic_modify_templates = pointers.Equipment.weaponslot_modify_templates
+		var generic_modify_standalone = pointers.Equipment.weaponslot_modify_standalone
+		var ship_modify_templates = pointers.Equipment.weaponslot_ship_templates
+		var ship_modify_standalone = pointers.Equipment.weaponslot_ship_standalone
+		var eqnames = pointers.Equipment.ws_equipment_names
 		
 		var node_names = []
 		var children = self.get_children()
@@ -134,24 +116,11 @@ func _ready():
 										if not item in equipment_templates:
 											equipment_templates[item] = {}
 										equipment_templates[item][property.get("property")] = property.get("value")
-		file.open(this_file,File.WRITE)
-		file.store_string(JSON.print(equipment_templates))
-		file.close()
-	else:
-		file.open(this_file,File.READ)
-		equipment_templates = JSON.parse(file.get_as_text(true)).result
-		file.close()
-	
-	file.open(ws_add,File.READ)
-	var additions = JSON.parse(file.get_as_text()).result
-	file.close()
-	file.open(ws_modify,File.READ)
-	var modifications = JSON.parse(file.get_as_text()).result
-	file.close()
+
 	var sysname = "weaponSlot.%s.type" % slot
 	c = ship.getConfig(sysname)
 	
-	for item in modifications:
+	for item in pointers.Equipment.ws_stuff_to_modify:
 		var iname = item.get("name")
 		if iname == c:
 			if not pointers.ConfigDriver.__validate_dictionary(item):
@@ -164,10 +133,9 @@ func _ready():
 				var d = f[n]
 				this["data"][n] = []
 				for l in d:
-#					this_modification.append([l[0],pointers.DataFormat.__convert_var_from_string(l[1])])
 					this["data"][n].append([l[0],pointers.DataFormat.__convert_var_from_string(l[1])])
 			this_modification.append(this)
-	for item in additions:
+	for item in pointers.Equipment.ws_stuff_to_add:
 		var iname = item.get("name")
 		if iname == c:
 			if not pointers.ConfigDriver.__validate_dictionary(item):
@@ -182,7 +150,6 @@ func _ready():
 				var d = f[n]
 				this["data"][n] = []
 				for l in d:
-#					this_addition.append([l[0],pointers.DataFormat.__convert_var_from_string(l[1])])
 					this["data"][n].append([l[0],pointers.DataFormat.__convert_var_from_string(l[1])])
 			this_addition = this
 	if c in equipment_templates:
