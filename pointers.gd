@@ -7762,6 +7762,8 @@ class _Scripting:
 	func _init(p):
 		pointers = p
 	
+	var file:File = File.new()
+	
 	func make_mineral_scripting():
 		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Minerals/mineral_store/")
 		for f in pointers.FolderAccess.__fetch_folder_files("user://cache/.HevLib_Cache/Minerals/mineral_store/",true,true):
@@ -7891,7 +7893,7 @@ class _Scripting:
 							ferrous = info["ferrous"]
 						var purityInfo:Dictionary = info.get("purity",{})
 						var folder:String = "user://cache/.HevLib_Cache/Minerals/mineral_store/%s-%s/" % [mname,str(int(color.r*255)) + str(int(color.g*255)) + str(int(color.b*255))]
-						var file:File = File.new()
+						
 						
 						var specific_data:Dictionary = info.get("specific_ore_data",{})
 						var roc:Array = []

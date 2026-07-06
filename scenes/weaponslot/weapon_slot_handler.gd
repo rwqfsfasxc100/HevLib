@@ -26,7 +26,7 @@ func _ready():
 		equipment_templates[shipName] = {}
 	equipment_templates = equipment_templates[shipName]
 	
-	if equipment_templates:
+	if not equipment_templates:
 		
 		var generic_modify_templates = pointers.Equipment.weaponslot_modify_templates
 		var generic_modify_standalone = pointers.Equipment.weaponslot_modify_standalone
