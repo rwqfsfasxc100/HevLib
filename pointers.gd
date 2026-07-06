@@ -1841,7 +1841,7 @@ class _DataFormat:
 					has_sig = true
 				if has_prefix:
 					if streaming:
-						concat = concat + this_stream.strip_edges() + "\n"
+						concat += this_stream.strip_edges() + "\n"
 						this_stream = ""
 						streaming = false
 					var av:PoolStringArray = line.split("func ")[1].split("(")
@@ -1888,7 +1888,7 @@ class _DataFormat:
 					method_names.append(mname)
 				elif has_sig:
 					if streaming:
-						concat = concat + this_stream.strip_edges() + "\n"
+						concat += this_stream.strip_edges() + "\n"
 						this_stream = ""
 						streaming = false
 					var av:PoolStringArray = line.split("signal ")[1].split("(")
@@ -1904,7 +1904,7 @@ class _DataFormat:
 					signal_names.append(sname)
 				elif line.begins_with("const "):
 					if streaming:
-						concat = concat + this_stream.strip_edges() + "\n"
+						concat += this_stream.strip_edges() + "\n"
 						this_stream = ""
 						streaming = false
 					var cname : String  = line.split("=",false)[0].strip_edges().split("const ",true)[1].strip_edges().split(":",false)[0].strip_edges()
@@ -1912,7 +1912,7 @@ class _DataFormat:
 					streaming = true
 				elif line.begins_with("var "):
 					if streaming:
-						concat = concat + this_stream.strip_edges() + "\n"
+						concat += this_stream.strip_edges() + "\n"
 						this_stream = ""
 						streaming = false
 					var vname : String  = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
@@ -1920,7 +1920,7 @@ class _DataFormat:
 					streaming = true
 				elif line.begins_with("export ") and " var " in line:
 					if streaming:
-						concat = concat + this_stream.strip_edges() + "\n"
+						concat += this_stream.strip_edges() + "\n"
 						this_stream = ""
 						streaming = false
 					var vname : String  = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
@@ -1928,7 +1928,7 @@ class _DataFormat:
 					streaming = true
 				elif line.begins_with("onready ") and " var " in line:
 					if streaming:
-						concat = concat + this_stream.strip_edges() + "\n"
+						concat += this_stream.strip_edges() + "\n"
 						this_stream = ""
 						streaming = false
 					var vname : String  = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
@@ -1936,7 +1936,7 @@ class _DataFormat:
 					streaming = true
 				elif line.begins_with("extends "):
 					if streaming:
-						concat = concat + this_stream.strip_edges() + "\n"
+						concat += this_stream.strip_edges() + "\n"
 						this_stream = ""
 						streaming = false
 					if extend_this:
@@ -1944,7 +1944,7 @@ class _DataFormat:
 				if streaming:
 					this_stream = this_stream + "\n" + line
 			if streaming:
-				concat = concat + this_stream.strip_edges() + "\n"
+				concat += this_stream.strip_edges() + "\n"
 				this_stream = ""
 				streaming = false
 		if trim_unnecessary_newlines:
@@ -3403,8 +3403,7 @@ class _Equipment:
 						if not string in equipment_format:
 							equipment_format.append(string)
 			
-		var concat : String  = ""
-		concat = SCENE_HEADER
+		var concat : String = SCENE_HEADER
 		for ref in slots_format:
 			concat = concat + "\n\n" + ref
 		for equip in equipment_format:
@@ -3602,13 +3601,9 @@ class _Equipment:
 		if not ws_editable_paths == "":
 			weaponslot_string = weaponslot_string + "\n\n" + ws_editable_paths
 		
-		file.open(file_save_path,File.WRITE)
-		file.store_string(concat)
-		file.close()
 		
-		file.open(upgrades_slot_limits,File.WRITE)
-		file.store_string(ship_limitation_string)
-		file.close()
+		pointers.DataFormat.__replace_scene(concat,"res://enceladus/Upgrades.tscn")
+		pointers.DataFormat.__replace_scene(ship_limitation_string,"res://enceladus/Upgrades.tscn")
 		
 		UpgradeMenu.free()
 
@@ -7823,6 +7818,7 @@ class _Scripting:
 			if price > 0.0:
 				match handle:
 					"scenes":
+						# Handle for providing a list of premade scene filepaths to use for the ores
 						var scenes:PoolStringArray = PoolStringArray()
 						for i in range(0,7):
 							var specific:String = mineral.get("ore_%s" % (i + 1),"")
@@ -7830,6 +7826,7 @@ class _Scripting:
 								scenes.append(specific)
 						var item:String = ""
 						if scenes.size() < 7:
+							# Makes sure that no ores are added if it can't provide for the 7 required ores
 							item = ""
 						else:
 							var mh = "\n\t\"" + str(mname) + "\":[\n"
@@ -7940,17 +7937,12 @@ class _Scripting:
 							file.store_string(data)
 							file.close()
 							roc.append(fn)
-						var rt:String = ""
-						if roc.size() < 7:
-							rt = ""
-						else:
-							var mh = "\n\t\"" + str(mname) + "\":[\n"
-							for i in range(7):
-								var mn = roc[i]
-								mh += "\t\tload(\"" + mn + "\"),\n"
-							mh += "\t],\n"
-							rt = mh
-						mineral_list.merge({mname:rt})
+						var mh = "\n\t\"" + str(mname) + "\":[\n"
+						for i in range(7):
+							var mn = roc[i]
+							mh += "\t\tload(\"" + mn + "\"),\n"
+						mh += "\t],\n"
+						mineral_list.merge({mname:mh})
 						pointers.l("adding mineral %s using handler [recolor]" % mname,"pointers.Scripting")
 					"none":
 						pointers.l("mineral %s registered but not adding to ring" % mineral,"pointers.Scripting")
@@ -7964,17 +7956,56 @@ class _Scripting:
 		
 		# Installs the AsteroidSpawner.gd script to add new ore scenes
 		pointers.DataFormat.__compile_and_override_script(content)
+	
+	const not_random_seeds = PoolIntArray([1861,-2531,1337,1776,2014,1384,2684,842,2802,1597,2116,755,1596,2661,1928,-1861,-2531,-1337,-1776,-2014,-1384,-2684,-842,-2802,-1597,-2116,-755,-1596,-2661,-1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928])
+	
+	func make_ring_modifications():
+		var p:Array = CurrentGame.traceMinerals
+		var s:float = float(p.size())
+		var m:int = int(floor((s / 4))) + 1
+		var do_randomize:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","randomize_minerals")
+		
+		var seeds:Array = []
+		
+		if do_randomize:
+			seeds.append(not_random_seeds[0])
+			seeds.append(not_random_seeds[1])
+			for i in m - 2:
+				var num:int = ((randi() % 2250) + 750) * sign(randf() - 0.5)
+				seeds.append(num)
+		
+		else:
+			for i in range(0,m):
+				if i >= not_random_seeds.size():
+					var f:int = i%not_random_seeds.size()
+					seeds.append(not_random_seeds[f])
+				else:
+					seeds.append(not_random_seeds[i])
 		
 		
+		var neg_var:bool = false
+		var variable_statements:String = "extends \"res://TheRing.gd\"\n\nfunc getVeinAt(pos)->String:\n\n"
+		for i in range(seeds.size()):
+			var sd:int = seeds[i]
+			if neg_var:
+				sd = -sd
+			neg_var = !neg_var
+			variable_statements += "\tvar p%s = getVeinPixelAt(pos / %s.0)\n" % [i + 1,sd]
 		
+		var v_arr:Array = []
+		for i in range(seeds.size()):
+			var item:String = "p%s" % (i+1)
+			v_arr.append_array([item + ".r",item + ".g",item + ".b",item + ".a"])
+		variable_statements = variable_statements + "\n\n\tvar values = " + str(v_arr) + "\n\n"
 		
+		pointers.DataFormat.__compile_and_override_script_with_scene(variable_statements + "\tvar total = 0\n\tfor n in range(CurrentGame.traceMinerals.size()):\n\t\tvar tm = CurrentGame.traceMinerals[n]\n\t\tvalues[n] = pow(values[n] / pow(CurrentGame.mineralPrices.get(tm, 1), 0.2), 4)\n\t\ttotal += values[n]\n\tvar rnd = randf() * total\n\tvar nr = 0\n\tfor n in values:\n\t\trnd -= n\n\t\tif rnd < 0:\n\t\t\treturn CurrentGame.traceMinerals[nr]\n\t\tnr += 1\n\n\treturn CurrentGame.traceMinerals[0]",["res://story/TheRing.tscn"])
 		
-		
-		
-		
-		
-		
-		
+		pointers.DataFormat.__replace_scene("[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://TheRing.gd\" type=\"Script\" id=1]\n[ext_resource path=\"res://story/TheRing.tscn\" type=\"PackedScene\" id=2]\n\n[node name=\"TheRing\" instance=ExtResource( 2 )]\nscript = ExtResource( 1 )\n","res://story/TheRing.tscn")
+	
+	
+	
+	
+	
 	
 	
 	

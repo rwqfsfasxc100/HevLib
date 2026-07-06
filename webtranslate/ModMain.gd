@@ -30,12 +30,8 @@ func _ready():
 	if correct:
 		yield(Debug.get_tree(),"idle_frame")
 		l("Device Information: [\n%s\n]" % get_device_info())
-		var rgx = RegEx.new()
-		rgx.compile("\\p{Ll}")
-#		rgx.compile("[a-z1-9]")
 		var base = TranslationServer.translate("SYSTEM_AMMO_10000_DESC")
-		var found = rgx.search(base)
-		if not found:
+		if base == "SYSTEM_AMMO_10000_DESC":
 			l("Translations did not get initialized, exiting to preserve report-ready state")
 			pointers.storeLogCache()
 			pointers.NodeAccess.__exit()
@@ -63,7 +59,7 @@ func loadTranslationsFromCache():
 				var dir = Directory.new()
 				var does = dir.file_exists(txt)
 				if does:
-					Debug.l("WebTranslate: available translations from cache at %s" % ffile)
+					l("WebTranslate: available translations from cache at %s" % ffile)
 					accepted = true
 				
 			else:
