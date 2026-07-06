@@ -1,3 +1,7 @@
+[1.14.19]
+
+1=* Fixed a missing not statement preventing ships with modified properties regarding equipment placement from changing from the defaults.
+
 [1.14.18]
 
 1=* Due to the recent accessibility of the pointers node, several drivers are now cached to the pointers node instead of to disc
