@@ -1,12 +1,7 @@
 extends "res://TheRing.gd"
 
-var ship_driver_path = "user://cache/.HevLib_Cache/ShipDriver/"
 func _ready():
-	var file = File.new()
-	file.open(ship_driver_path + "driver_data.json",File.READ)
-	var data = JSON.parse(file.get_as_text()).result
-	file.close()
-	
+	var data = ModLoader._savedObjects[0].Equipment.add_ships_store
 	var ro = load("res://story/RescueOperation.gd")
 	for i in range(data.size()):
 		var ship = data[i]

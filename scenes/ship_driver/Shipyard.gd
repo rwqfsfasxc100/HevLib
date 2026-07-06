@@ -11,11 +11,8 @@ func _ready():
 	hl_shipdriver_resetter_timeout()
 	
 	# Ship driver
-	file.open(ship_driver_path + "driver_data.json",File.READ)
-	var drivers = JSON.parse(file.get_as_text()).result
-	file.close()
 	var alternates = {}
-	for sd in drivers:
+	for sd in syPointers.Equipment.add_ships_store:
 		var ship_name = sd.get("name","")
 		var path = sd.get("path","")
 		var alias = sd.get("alias",ship_name)
@@ -80,14 +77,12 @@ func _ready():
 			usedShipConfigs[ship_name].append(cfg)
 	
 	# Ship numerics handler
-	file.open(ship_driver_path + "register_data.json",File.READ)
-	var drivers2 = JSON.parse(file.get_as_text()).result
-	file.close()
+	var register_ship_numerics = syPointers.Equipment.register_ship_numerics_store
 	var nano_delivery = {}
-	for data in drivers2:
+	for data in register_ship_numerics:
 		match data:
 			"REGISTER_AMMO":
-				for v in drivers2[data]:
+				for v in register_ship_numerics[data]:
 					for value in v:
 						var entries = v[value]
 						value = float(value)
@@ -96,7 +91,7 @@ func _ready():
 						if "delivery_speed" in entries:
 							ammoDeliveryPerSeocond[value] = float(entries["delivery_speed"])
 			"REGISTER_NANO":
-				for v in drivers2[data]:
+				for v in register_ship_numerics[data]:
 					for value in v:
 						var entries = v[value]
 						value = float(value)
@@ -105,7 +100,7 @@ func _ready():
 						if "delivery_speed" in entries:
 							nano_delivery[value] = float(entries["delivery_speed"])
 			"REGISTER_REACTOR_RODS":
-				for v in drivers2[data]:
+				for v in register_ship_numerics[data]:
 					for value in v:
 						var entries = v[value]
 						value = float(value)
@@ -114,7 +109,7 @@ func _ready():
 						if "mass" in entries:
 							rodsMass[value] = float(entries["mass"])
 			"REGISTER_ULTRACAPACITORS":
-				for v in drivers2[data]:
+				for v in register_ship_numerics[data]:
 					for value in v:
 						var entries = v[value]
 						value = float(value)
@@ -123,7 +118,7 @@ func _ready():
 						if "mass" in entries:
 							capacitorMass[value] = float(entries["mass"])
 			"REGISTER_TURBINES":
-				for v in drivers2[data]:
+				for v in register_ship_numerics[data]:
 					for value in v:
 						var entries = v[value]
 						value = float(value)

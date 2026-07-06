@@ -9,11 +9,8 @@ var added_modded_ships = false
 func _ready():
 	pointersShipDriver = ModLoader._savedObjects[0]
 	pointersShipDriver.ConfigDriver.__establish_connection("hl_shipdriver_init_ships_to_dealer",self)
-	var file = File.new()
-	file.open(ship_driver_path + "driver_data.json",File.READ)
-	var data = JSON.parse(file.get_as_text()).result
-	file.close()
-	for fd in data:
+	var add_ship_store = pointersShipDriver.Equipment.add_ships_store
+	for fd in add_ship_store:
 		if "dealer" in fd:
 			var shipName = fd["name"]
 			var age = fd["dealer"].get("age",200)
@@ -21,7 +18,7 @@ func _ready():
 			for i in range(max(0,fd["dealer"].get("weight",1))):
 				modded_ship_list.append(dict)
 	hl_shipdriver_init_ships_to_dealer()
-	initialize_scrapwright(data)
+	initialize_scrapwright(add_ship_store)
 
 func createShipInstanceWithCache(nv, age, sd, stock = false):
 	if nv.begins_with("HevLibShipyardEntry") and age == 0:

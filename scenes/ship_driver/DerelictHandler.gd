@@ -37,22 +37,14 @@ func _exit_tree():
 
 var prevent = false
 
+var pointers
 var ship_pool = {}
-var ship_driver_path = "user://cache/.HevLib_Cache/ShipDriver/"
 func _ready():
-	var file = File.new()
-	file.open(ship_driver_path + "driver_data.json",File.READ)
-	var data = JSON.parse(file.get_as_text()).result
-	file.close()
+	pointers = ModLoader._savedObjects[0]
+	var data = pointers.Equipment.add_ships_store
 	randomize()
 	data.shuffle()
 	for fd in data:
-#		var md = data[mod]
-#		var ir = md.keys()
-#		randomize()
-#		ir.shuffle()
-#		for ship in ir:
-#		var fd = md[ship]
 		if mode in fd and "name" in fd and "path" in fd:
 			var shipName = fd["name"]
 			var event = fd[mode]
