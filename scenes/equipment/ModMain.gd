@@ -98,8 +98,13 @@ func _init(modLoader : ModLoader = ModLoader):
 		replaceScene("../scene_replacements/DLClist.tscn","res://tools/DLClist.tscn")
 
 		installScriptExtension("../better_title_screen/CurrentlyPlaying.gd")
-		var minerals = load("res://HevLib/scenes/minerals/make_mineral_scripting.gd")
-		minerals.make_mineral_scripting(pointers)
+		
+		installScriptExtension("../minerals/AstrogatorPanel.gd")
+		installScriptExtension("../minerals/OMS.gd")
+		installScriptExtension("../minerals/CargoScanner.gd")
+		installScriptExtension("../minerals/ProcessedCargoManifest.gd")
+		
+		pointers.Scripting.make_mineral_scripting()
 
 		replaceScene("../../events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn")
 		# Adds in_hevlib_menu to the CurrentGame script and preventing controls while it's true

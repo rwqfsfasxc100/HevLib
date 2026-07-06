@@ -21,6 +21,7 @@ var ManifestV1 : _ManifestV1 = _ManifestV1.new(self)
 var ManifestV2 : _ManifestV2 = _ManifestV2.new(self)
 var NodeAccess : _NodeAccess = _NodeAccess.new(self)
 var RingInfo : _RingInfo = _RingInfo.new(self)
+var Scripting : _Scripting = _Scripting.new(self)
 var TimeAccess : _TimeAccess = _TimeAccess.new(self)
 var Translations : _Translations = _Translations.new(self)
 var WebTranslate : _WebTranslate = _WebTranslate.new(self)
@@ -2363,7 +2364,6 @@ class _Equipment:
 
 	var file:File = File.new()
 	
-	
 	var pointers
 	
 	func _init(d):
@@ -2377,6 +2377,31 @@ class _Equipment:
 		slot_defaults = vanilla_data.slot_defaults.duplicate(true)
 		vanilla_equipment_defaults_for_reference = vanilla_data.vanilla_equipment_defaults_for_reference.duplicate(true)
 	
+	# DATA SERIALIZATION STORAGE
+	var ship_equipment_template_internals : Dictionary = {}
+	var ws_additions : Dictionary = {}
+	var ws_stuff_to_add : Array = []
+	var ws_stuff_to_modify : Array = []
+	var add_ships_store : Array = []
+	var register_ship_numerics_store : Dictionary = {}
+	var weaponslot_modify_templates:Dictionary = {}
+	var weaponslot_modify_standalone:Dictionary = {}
+	var weaponslot_ship_templates:Dictionary = {}
+	var weaponslot_ship_standalone:Dictionary = {}
+	var ws_equipment_names:Array = []
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	# END OF DATA STORAGE
+	
 	var version : Array = [1,0,0]
 	
 	func __make_upgrades_scene():
@@ -2387,27 +2412,20 @@ class _Equipment:
 		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/")
 		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/")
 		
-		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/")
 		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/")
 		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/")
 		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/Exhaust_Cache/")
 		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/ShipDriver/")
+		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/MenuDriver/")
 		
 		var file_save_path : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn"
 		var exhaust_cache_path : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/Exhaust_Cache"
-		var weaponslot_modify_templates_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_TEMPLATES.json"
-		var weaponslot_modify_standalone_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFY_STANDALONE.json"
 		var slot_order_cache_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order.json"
-		var weaponslot_ship_templates_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_SHIP_TEMPLATES.json"
-		var weaponslot_ship_standalone_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_SHIP_STANDALONE.json"
 		var save_menu_file : String  = "user://cache/.HevLib_Cache/MenuDriver/save_buttons.json"
 		var processed_storage_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_mods.json"
 		var node_definitions_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/node_definitions.json"
 		var ship_node_register_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_register.json"
 		var auxslot_data_path : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/AuxSlot.json"
-		var weaponslot_additions : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_additions.json"
-		var weaponslot_modifications : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot_modifications.json"
-		var weaponslot_modify_equipment_names : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WSLT_MODIFIED_NAMES.json"
 		var upgrades_slot_limits : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Slot_Limits.tscn"
 		var ship_node_modify_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_modify.json"
 		var ship_thruster_color_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_thruster_colors.json"
@@ -2442,9 +2460,6 @@ class _Equipment:
 					index += 1
 			vanilla_slot_types.merge({slot.name:sys_slot})
 		
-		
-		var ws_equipment_names : Array = []
-		
 		var ws_default_templates : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
 		var ws_ship_templates : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
 		var ws_ship_templates_2 : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd").get_script_constant_map()
@@ -2453,18 +2468,12 @@ class _Equipment:
 		for item in ship_register:
 			register_default_ships.append(ship_register[item])
 		
-		file.open(weaponslot_modify_templates_file,File.WRITE)
-		file.store_string(JSON.print(ws_default_templates.get("TEMPLATES",{})))
-		file.close()
-		file.open(weaponslot_modify_standalone_file,File.WRITE)
-		file.store_string("{}")
-		file.close()
-		file.open(weaponslot_ship_standalone_file,File.WRITE)
-		file.store_string(JSON.print(ws_ship_templates.get("SHIP_MODIFY",{})))
-		file.close()
-		file.open(weaponslot_ship_templates_file,File.WRITE)
-		file.store_string(JSON.print(ws_ship_templates_2.get("SHIP_TEMPLATES",{})))
-		file.close()
+		weaponslot_modify_templates = ws_default_templates.get("TEMPLATES", {})
+		weaponslot_ship_templates = ws_ship_templates_2.get("SHIP_TEMPLATES",{})
+		weaponslot_ship_standalone = ws_ship_templates.get("SHIP_MODIFY",{})
+		
+		
+		
 		file.open(slot_order_cache_file,File.WRITE)
 		file.store_string("[]")
 		file.close()
@@ -2486,20 +2495,11 @@ class _Equipment:
 		file.open(auxslot_data_path,File.WRITE)
 		file.store_string("{}")
 		file.close()
-		file.open(weaponslot_modify_equipment_names,File.WRITE)
-		file.store_string("[]")
-		file.close()
 		file.open(ship_node_register_file,File.WRITE)
 		file.store_string(JSON.print(register_default_ships))
 		file.close()
 		file.open(ship_node_modify_file,File.WRITE)
 		file.store_string("{}")
-		file.close()
-		file.open(weaponslot_additions,File.WRITE)
-		file.store_string("[]")
-		file.close()
-		file.open(weaponslot_modifications,File.WRITE)
-		file.store_string("[]")
 		file.close()
 		file.open(storage_for_driver_store,File.WRITE)
 		file.store_string("{}")
@@ -2943,58 +2943,49 @@ class _Equipment:
 									driver_store["WEAPONSLOT_ADD"].append(equipment.duplicate(true))
 					"WEAPONSLOT_MODIFY_TEMPLATES.gd":
 						var ar : Dictionary = constants.get("WEAPONSLOT_MODIFY_TEMPLATES",{}).duplicate(true)
-						file.open(weaponslot_modify_templates_file,File.READ)
-						var founddata : Dictionary = JSON.parse(file.get_as_text(true)).result
-						file.close()
 						for template in ar:
-							if template in founddata.keys():
+							if template in weaponslot_modify_templates:
 								for datapoint in ar[template]:
 									match datapoint:
 										"equipment":
 											for item in ar[template][datapoint]:
 												if not item in ws_equipment_names:
 													ws_equipment_names.append(item)
-												if item in founddata[template][datapoint]:
-													pass
-												else:
-													founddata[template][datapoint].append(item)
+												if not item in weaponslot_modify_templates[template][datapoint]:
+													weaponslot_modify_templates[template][datapoint].append(item)
 										"data":
 											var data_formatted : Dictionary = {}
 											for item in ar[template][datapoint]:
 												data_formatted.merge({item.get("property"):item.get("value")})
 											for key in data_formatted.keys():
 												var is_in_dict:bool = false
-												for lps in founddata[template][datapoint]:
+												for lps in weaponslot_modify_templates[template][datapoint]:
 													if lps.get("property") == key:
 														is_in_dict = true
 														lps["value"] = data_formatted[key]
 												if not is_in_dict:
-													founddata[template][datapoint].append({"property":key,"value":data_formatted.get(key)})
+													weaponslot_modify_templates[template][datapoint].append({"property":key,"value":data_formatted.get(key)})
 							else:
-								founddata[template] = ar.get(template).duplicate(true)
+								weaponslot_modify_templates[template] = ar.get(template).duplicate(true)
 						for i in ar:
 							var d = ar[i].duplicate(true)
 							driver_store["WEAPONSLOT_MODIFY_TEMPLATES"].append({i:d})
-						file.open(weaponslot_modify_templates_file,File.WRITE)
-						file.store_string(JSON.print(founddata))
-						file.close()
+						
 					"WEAPONSLOT_MODIFY.gd":
 						var ar = constants.get("WEAPONSLOT_MODIFY",{}).duplicate(true)
-						file.open(weaponslot_modify_standalone_file,File.READ)
-						var founddata : Dictionary = JSON.parse(file.get_as_text(true)).result
-						file.close()
+						
 						for item in ar:
 							if not item in ws_equipment_names:
 								ws_equipment_names.append(item)
-							if item in founddata:
+							if item in weaponslot_modify_standalone:
 								var new_dict : Dictionary = {}
-								for c in ar.get(item):
+								for c in ar[item]:
 									var prop : String = c.get("property","")
 									var val : String = c.get("value","")
 									if prop and val:
 										new_dict.merge({prop:val})
 								var old_dict : Dictionary = {}
-								var current_item_data : Dictionary = founddata.get(item)
+								var current_item_data : Dictionary = weaponslot_modify_standalone[item]
 								for c in current_item_data:
 									var prop : String = c.get("property","")
 									var val : String = c.get("value","")
@@ -3004,35 +2995,29 @@ class _Equipment:
 									old_dict[op] = new_dict[op]
 								var processed : Array = []
 								for u in old_dict:
-									processed.append({"property":u,"value":old_dict.get(u)})
-								founddata.merge({item:processed},true)
+									processed.append({"property":u,"value":old_dict[u]})
+								weaponslot_modify_standalone.merge({item:processed},true)
 							else:
-								founddata.merge({item:ar.get(item)})
-							driver_store["WEAPONSLOT_MODIFY"].append({item:ar.get(item).duplicate(true)})
+								weaponslot_modify_standalone.merge({item:ar[item]})
+							driver_store["WEAPONSLOT_MODIFY"].append({item:ar[item].duplicate(true)})
 						
-						file.open(weaponslot_modify_standalone_file,File.WRITE)
-						file.store_string(JSON.print(founddata))
-						file.close()
 					"WEAPONSLOT_SHIP_TEMPLATES.gd":
 						var ar : Dictionary = constants.get("WEAPONSLOT_SHIP_TEMPLATES",{}).duplicate(true)
-						file.open(weaponslot_ship_templates_file,File.READ)
-						var founddata : Dictionary = JSON.parse(file.get_as_text(true)).result
-						file.close()
 						for ship in ar:
 							if not ship in driver_store["WEAPONSLOT_SHIP_TEMPLATES"]:
 								driver_store["WEAPONSLOT_SHIP_TEMPLATES"][ship] = []
 							driver_store["WEAPONSLOT_SHIP_TEMPLATES"][ship].append({ship:ar[ship].duplicate(true)})
-							if ship in founddata.keys():
+							if ship in weaponslot_ship_templates:
 								var shipdata : Dictionary = ar.get(ship)
 								for slot in shipdata:
-									if slot in founddata[ship]:
+									if slot in weaponslot_ship_templates[ship]:
 										var compile : Dictionary = {}
 										var current_dict : Dictionary = {}
 										var new_dict : Dictionary = {}
-										for type in founddata[ship][slot]:
+										for type in weaponslot_ship_templates[ship][slot]:
 											compile.merge({type:[]},true)
 											current_dict.merge({type:{}},true)
-											for equip in founddata[ship][slot][type]:
+											for equip in weaponslot_ship_templates[ship][slot][type]:
 												current_dict[type].merge({equip.get("property"):equip.get("value")})
 										for type in shipdata[slot]:
 											compile.merge({type:[]},true)
@@ -3043,19 +3028,14 @@ class _Equipment:
 										for item in current_dict:
 											for equip in current_dict[item]:
 												compile[item].append({"property":equip,"value":current_dict[item].get(equip)})
-										founddata[ship][slot] = compile.duplicate(true)
+										weaponslot_ship_templates[ship][slot] = compile.duplicate(true)
 									else:
-										founddata[ship][slot] = shipdata.get(slot).duplicate(true)
+										weaponslot_ship_templates[ship][slot] = shipdata.get(slot).duplicate(true)
 							else:
-								founddata.merge(ar)
-						file.open(weaponslot_ship_templates_file,File.WRITE)
-						file.store_string(JSON.print(founddata))
-						file.close()
+								weaponslot_ship_templates.merge(ar)
+						
 					"WEAPONSLOT_SHIP_MODIFY.gd":
 						var ar = constants.get("WEAPONSLOT_SHIP_MODIFY",{}).duplicate(true)
-						file.open(weaponslot_ship_standalone_file,File.READ)
-						var founddata : Dictionary = JSON.parse(file.get_as_text(true)).result
-						file.close()
 						for ship in ar:
 							if not ship in driver_store["WEAPONSLOT_SHIP_MODIFY"]:
 								driver_store["WEAPONSLOT_SHIP_MODIFY"][ship] = []
@@ -3067,17 +3047,17 @@ class _Equipment:
 									if not item in ws_equipment_names:
 										ws_equipment_names.append(item)
 							
-							if ship in founddata:
+							if ship in weaponslot_ship_standalone:
 								var shipdata : Dictionary = ar.get(ship)
 								for slot in shipdata:
-									if slot in founddata[ship]:
+									if slot in weaponslot_ship_standalone[ship]:
 										var compile : Dictionary = {}
 										var current_dict : Dictionary = {}
 										var new_dict : Dictionary = {}
-										for type in founddata[ship][slot]:
+										for type in weaponslot_ship_standalone[ship][slot]:
 											compile.merge({type:[]},true)
 											current_dict.merge({type:{}},true)
-											for equip in founddata[ship][slot][type]:
+											for equip in weaponslot_ship_standalone[ship][slot][type]:
 												current_dict[type].merge({equip.get("property"):equip.get("value")})
 										for type in shipdata[slot]:
 											compile.merge({type:[]},true)
@@ -3088,14 +3068,12 @@ class _Equipment:
 										for item in current_dict:
 											for equip in current_dict[item]:
 												compile[item].append({"property":equip,"value":current_dict[item].get(equip)})
-										founddata[ship][slot] = compile.duplicate(true)
+										weaponslot_ship_standalone[ship][slot] = compile.duplicate(true)
 									else:
-										founddata[ship][slot] = shipdata.get(slot).duplicate(true)
+										weaponslot_ship_standalone[ship][slot] = shipdata.get(slot).duplicate(true)
 							else:
-								founddata.merge(ar)
-						file.open(weaponslot_ship_standalone_file,File.WRITE)
-						file.store_string(JSON.print(founddata))
-						file.close()
+								weaponslot_ship_standalone.merge(ar)
+						
 					"SAVE_BUTTONS.gd":
 						var ar : Array = constants.get("SAVE_BUTTONS",[]).duplicate(true)
 						file.open(save_menu_file,File.READ)
@@ -3150,21 +3128,11 @@ class _Equipment:
 						file.close()
 					
 					
-		
-		file.open(ship_driver_path + "driver_data.json",File.WRITE)
-		file.store_string(JSON.print(driver_store["ADD_SHIPS"]))
-		file.close()
-		
-		file.open(ship_driver_path + "register_data.json",File.WRITE)
-		file.store_string(JSON.print(driver_store["REGISTER_SHIP_NUMERICS"]))
-		file.close()
+		add_ships_store = driver_store["ADD_SHIPS"]
+		register_ship_numerics_store = driver_store["REGISTER_SHIP_NUMERICS"]
 		
 		file.open(storage_for_driver_store,File.WRITE)
 		file.store_string(JSON.print(driver_store))
-		file.close()
-		
-		file.open(weaponslot_modify_equipment_names,File.WRITE)
-		file.store_string(JSON.print(ws_equipment_names))
 		file.close()
 		
 		var all_slot_node_names : Array = []
@@ -3457,8 +3425,8 @@ class _Equipment:
 		var ws_editable_paths : String  = ""
 		var weaponslot_properties : Dictionary = {}
 		
-		var ws_stuff_to_add : Array = []
-		var ws_stuff_to_modify : Array = []
+		
+		
 		
 		for add in driver_store["WEAPONSLOT_ADD"]:
 			if pointers.ConfigDriver.__validate_dictionary(add,false):
@@ -3539,12 +3507,12 @@ class _Equipment:
 			for dp in data:
 				weaponslot_string = weaponslot_string + "\n" + dp[0] + " = " + dp[1]
 		
-		file.open(weaponslot_additions,File.WRITE)
-		file.store_string(JSON.print(ws_stuff_to_add))
-		file.close()
-		file.open(weaponslot_modifications,File.WRITE)
-		file.store_string(JSON.print(ws_stuff_to_modify))
-		file.close()
+#		file.open(weaponslot_additions,File.WRITE)
+#		file.store_string(JSON.print(ws_stuff_to_add))
+#		file.close()
+#		file.open(weaponslot_modifications,File.WRITE)
+#		file.store_string(JSON.print(ws_stuff_to_modify))
+#		file.close()
 		
 		
 		
@@ -7244,7 +7212,6 @@ class _RingInfo:
 	
 
 
-
 class _TimeAccess:
 	var scripts : Array = [
 		
@@ -7774,7 +7741,243 @@ class _Zip:
 		return savedFiles
 
 
-
+class _Scripting:
+	var scripts : Array = [
+		
+	]
+	
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
+	
+	var pointers
+	
+	func _init(p):
+		pointers = p
+	
+	func make_mineral_scripting():
+		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Minerals/mineral_store/")
+		for f in pointers.FolderAccess.__fetch_folder_files("user://cache/.HevLib_Cache/Minerals/mineral_store/",true,true):
+			pointers.FolderAccess.__recursive_delete(f)
+		var version = pointers.DataFormat.__get_vanilla_version()
+		pointers.l("observed game version of %s.%s.%s" % [version[0],version[1],version[2]],"pointers.Scripting")
+		
+		var drivers:Array = pointers.DriverManagement.__get_drivers()
+		var mineral_data:Array = []
+		for driver in drivers:
+			var dv:Dictionary = driver["drivers"]
+			if "ADD_MINERALS.gd" in dv:
+				var mineral_dict:Dictionary = dv["ADD_MINERALS.gd"]
+				for mineral in mineral_dict:
+					mineral_data.append(mineral_dict[mineral])
+		
+		# Initialize info for mineral names, colours, and value
+		var prices = {}
+		var colors = {}
+		var traces = []
+		for mineral in mineral_data:
+			var mname = mineral["name"]
+			var price = mineral["price"]
+			var color = mineral["color"]
+			# Only adds minerals to the ring if they have a value.
+			# Useful if you only want to reference a mineral by name
+			# and a colour without it showing in the market, i.e. getScan()
+			if price > 0.0:
+				prices.merge({mname:price})
+				if mineral.get("handle","none") != "none":
+					traces.append(mname)
+			# Colours will always be available
+			colors.merge({mname:color})
+		var price_text = ""
+		for price in prices:
+			price_text += "\n\tif not \"%s\" in %s:\n\t\t%s.merge({" % [price,"mineralPrices","mineralPrices"] + "\"" + str(price) + "\" : " + str(prices[price]) + "})"
+		var color_text = ""
+		for color in colors:
+			color_text += "\n\tif not \"%s\" in %s:\n\t\t%s.merge({" % [color,"specificMineralColors","specificMineralColors"] + "\"" + str(color) + "\" : Color(" + str(colors[color]) + ")})"
+		var trace_text = ""
+		for trace in traces:
+			trace_text += "\n\tif not \"%s\" in %s:\n\t\t%s.append(" % [trace,"traceMinerals","traceMinerals"] + "\"" + str(trace) + "\")"
+		
+		# Compiles and extends the CurrentGame.gd script
+		pointers.DataFormat.__compile_and_override_script("extends \"res://CurrentGame.gd\"\nfunc _init():\n\tpass" + price_text + color_text + trace_text + "\nfunc isDemo():\n\treturn false")
+		
+		
+		# Initialize and create ore chunk additions
+		var mineral_list:Dictionary = {}
+		for mineral in mineral_data:
+			var mname:String = mineral["name"]
+			var handle:String = mineral.get("handle","none")
+			var price:float = mineral.get("price",0.0)
+			if price > 0.0:
+				match handle:
+					"scenes":
+						var scenes:PoolStringArray = PoolStringArray()
+						for i in range(0,7):
+							var specific:String = mineral.get("ore_%s" % (i + 1),"")
+							if typeof(specific) == TYPE_STRING and pointers.DataFormat.__file_exists(specific):
+								scenes.append(specific)
+						var item:String = ""
+						if scenes.size() < 7:
+							item = ""
+						else:
+							var mh = "\n\t\"" + str(mname) + "\":[\n"
+							for i in range(7):
+								var mn:String = scenes[i]
+								mh += "\t\tload(\"" + mn + "\"),\n"
+							mh += "\t],\n"
+							item = mh
+						mineral_list.merge({mname:item})
+						pointers.l("adding mineral %s using handler [scene]" % mname,"pointers.Scripting")
+					"recolor":
+						var base:String = "fe"
+						var info:Dictionary = {}
+						if "color" in mineral:
+							info["color"] = mineral["color"]
+						if "filler" in mineral:
+							info["filler"] = mineral["filler"]
+						if "mass" in mineral:
+							info["mass"] = mineral["mass"]
+						if "min_scale" in mineral:
+							info["min_scale"] = mineral["min_scale"]
+						if "max_scale" in mineral:
+							info["max_scale"] = mineral["max_scale"]
+						if "purity" in mineral:
+							info["purity"] = mineral["purity"]
+						if "specific_ore_data" in mineral:
+							info["specific_ore_data"] = mineral["specific_ore_data"]
+						match mineral.get("base","fe").to_lower():
+							"fe","iron":
+								base = "fe"
+							"v","vanadium":
+								base = "v"
+							"be","beryllium":
+								base = "be"
+							"pd","palladium":
+								base = "pd"
+							"pt","platinum":
+								base = "pt"
+							"w","tungsten","wolfram":
+								base = "w"
+						info["base"] = base
+						var header:String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://HevLib/scenes/minerals/base_scenes/mineral-%s-%s.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"mineral\" instance=ExtResource( 1 )]"
+						var content:String = "\nmineral = \"%s\"" % [mname]
+						var color:Color = Color(1,1,1,1)
+						var mass = null
+						var filler_mineral = null
+						var min_scale = null
+						var max_scale = null
+						var ferrous:bool = false
+						var baseScene:String = info["base"]
+						if "color" in info:
+							color = info.get("color")
+						if "mass" in info:
+							mass = info["mass"]
+						if "filler" in info:
+							filler_mineral = info.get("filler","H2O")
+						if "min_scale" in info:
+							min_scale = info["min_scale"]
+						if "max_scale" in info:
+							max_scale = info["max_scale"]
+						if "ferrous" in info:
+							ferrous = info["ferrous"]
+						var purityInfo:Dictionary = info.get("purity",{})
+						var folder:String = "user://cache/.HevLib_Cache/Minerals/mineral_store/%s-%s/" % [mname,str(int(color.r*255)) + str(int(color.g*255)) + str(int(color.b*255))]
+						var file:File = File.new()
+						
+						var specific_data:Dictionary = info.get("specific_ore_data",{})
+						var roc:Array = []
+						for i in range(7):
+							var id:int = i + 1
+							var cl:Color = color
+							var ms = mass
+							var fm = filler_mineral
+							var mns = min_scale
+							var mxs = max_scale
+							var fr:bool = ferrous
+							pointers.FolderAccess.__check_folder_exists(folder)
+							var fn:String = folder + "h%s.tscn" % id
+							var data:String = header % [baseScene,id] + content
+							if id in specific_data:
+								var idx = specific_data[id]
+								if "color" in idx:
+									cl = idx["color"]
+								if "mass" in idx:
+									ms = idx["mass"]
+								if "filler" in idx:
+									fm = idx["filler"]
+								if "min_scale" in idx:
+									mns = idx["min_scale"]
+								if "max_scale" in idx:
+									mxs = idx["max_scale"]
+								if "ferrous" in idx:
+									fr = idx["ferrous"]
+							data += "\ncolor = Color( %s, %s, %s, 1 )" % [cl.r,cl.g,cl.b]
+							if ms:
+								data += "\nmass = %s" % [str(ms)]
+							if fm:
+								data += "\nfiller = \"%s\"" % [fm]
+							if mns:
+								data += "\nscaleMin = %s" % [str(mns)]
+							if mxs:
+								data += "\nscaleMax = %s" % [str(mxs)]
+							if fr:
+								data += "\nferrous = true"
+							if id in purityInfo:
+								data += "\npurity = %s" % [str(purityInfo[id])]
+							file.open(fn,File.WRITE)
+							file.store_string(data)
+							file.close()
+							roc.append(fn)
+						var rt:String = ""
+						if roc.size() < 7:
+							rt = ""
+						else:
+							var mh = "\n\t\"" + str(mname) + "\":[\n"
+							for i in range(7):
+								var mn = roc[i]
+								mh += "\t\tload(\"" + mn + "\"),\n"
+							mh += "\t],\n"
+							rt = mh
+						mineral_list.merge({mname:rt})
+						pointers.l("adding mineral %s using handler [recolor]" % mname,"pointers.Scripting")
+					"none":
+						pointers.l("mineral %s registered but not adding to ring" % mineral,"pointers.Scripting")
+					_:
+						pointers.l("mineral %s using incorrect handler, set price to 0.0 or less to prevent being registered to exist in the ring or crashes may happen" % mineral,"pointers.Scripting")
+			else:
+				pointers.l("adding only color references for mineral %s, value set to zero or below" % mineral,"pointers.Scripting")
+		var content = "extends \"res://AsteroidSpawner.gd\"\n\nfunc _init():\n\tpass"
+		for m in mineral_list:
+			content += "\n\tif not \"%s\" in %s:\n\t\t%s.merge({" % [m,"objectClass[objectClass.size() - 1]","objectClass[objectClass.size() - 1]"] + mineral_list[m] + "})"
+		
+		# Installs the AsteroidSpawner.gd script to add new ore scenes
+		pointers.DataFormat.__compile_and_override_script(content)
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	
+	
+	
 
 
 
