@@ -2310,6 +2310,14 @@ const TRANSLATIONS = {
 		"HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL_TOOLTIP": {
 			"string": "The number of physics frames between automatic writes to the pointer log (i.e. information logged specifically by mods to the cache)\n\nThis is dependant on your current physics framerate.",
 			"version_hash": 2000819806
+		},
+		"HEVLIB_CONFIG_EXTEND_DIVIDED_STORAGE_MULTIPLIER": {
+			"string": "Extend storage multiplier of divided holds",
+			"version_hash": 3830358193
+		},
+		"HEVLIB_CONFIG_EXTEND_DIVIDED_STORAGE_MULTIPLIER_TOOLTIP": {
+			"string": "Whether the processed storage added by equipment using the MODIFY_INTERNALS driver should\ndynamically adjust based on the number of minerals that can be found in the ring.\n\nIf disabled, defaults to use just Vanilla's 6 ores",
+			"version_hash": 2335117499
 		}
 	},
 	"uk_UA": {

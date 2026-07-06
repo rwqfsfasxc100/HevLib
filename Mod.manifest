@@ -85,6 +85,12 @@ HEVLIB_CONFIG_SECTION_EQUIPMENT={
         "step":1,
 		"default":12,
 	},
+	"extend_divided_storage_multiplier":{
+		"name":"HEVLIB_CONFIG_EXTEND_DIVIDED_STORAGE_MULTIPLIER",
+		"description":"HEVLIB_CONFIG_EXTEND_DIVIDED_STORAGE_MULTIPLIER_TOOLTIP",
+		"type":"bool",
+		"default":false,
+	},
 }
 HEVLIB_CONFIG_SECTION_EVENTS={
 	"write_events":{
