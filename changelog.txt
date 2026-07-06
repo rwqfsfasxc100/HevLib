@@ -1,3 +1,15 @@
+[1.14.18]
+
+1=* Due to the recent accessibility of the pointers node, several drivers are now cached to the pointers node instead of to disc
+1.1=* Currently affects all ShipDriver, RegisterShipNumericsDriver, and WeaponSlot caches
+1.2=* This severely improves the load time of a ship, especially if it's the first time it has been loaded in a session
+1.3=* Overall improves on efficiency and also saves a lot of read/write operations to the disk as previous versions (primarily WeaponSlotDriver) accessed and processed data in the cache directory a lot
+2=* Moved all mineral, ring, and equipment menu scripting to the pointers node
+3=* Fixed issue that would cause the translation verification step to unnecessarily cause a premature exit when encountering translated strings it couldn't parse with the regex
+4=* Added option to scale the processed storage addition based on minerals that can be found trace in the rings
+4.1=* Disabled by default due to a likely perceived issue with balance considering some mods can add a large number of minerals
+5=* Removed unused locale information from the manifest
+
 [1.14.17]
 
 1=* Reverted change to all pointer scripts in the `res://HevLib/pointers/` directory as they would crash when used on initialization from mods that still made use of them.

@@ -11,7 +11,7 @@ credits=["   --- Contributors ---   ","Za'krin - Mod Main design, original imple
 
 version_major=1
 version_minor=14
-version_bugfix=17
+version_bugfix=18
 
 [tags]
 
@@ -26,12 +26,6 @@ HEVLIB_NEXUS={"URL":"https://www.nexusmods.com/dvringsofsaturn/mods/16"}
 HEVLIB_DONATIONS={"URL":"https://ko-fi.com/00hev"}
 HEVLIB_WIKI={"URL":"https://github.com/rwqfsfasxc100/HevLib/wiki"}
 HEVLIB_BUGREPORTS={"URL":"https://forms.gle/RmC4Zgonp6frFgnK7"}
-
-[languages]
-
-en="100%"
-uk_UA="90%"
-de="100%"
 
 [library]
 
