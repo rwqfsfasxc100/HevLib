@@ -1,6 +1,6 @@
 [1.14.20]
 
-1=* WeaponSlots now no longer decide to copy their equipment properties from first WeaponSlot to load on a ship.
+1=* WeaponSlots now no longer are lazy and decide to copy their equipment properties from first WeaponSlot to load on a ship.
 
 [1.14.19]
 
