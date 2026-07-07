@@ -7024,10 +7024,6 @@ class _NodeAccess:
 	
 	func __dynamic_crew_expander(folder_path: String = "user://cache/.HevLib_Cache/dynamic_crew_expander/", max_crew:int = 24) -> String:
 		pointers.FolderAccess.__check_folder_exists(folder_path)
-		var log_header : String = "TSCN Writer for dynamic crew handler: "
-		
-		var line_to_test : String = "DIALOG_DERELICT_SWITCH_CREW"
-		
 		var base:int = 24
 
 		var test = load("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn").instance()
@@ -7037,7 +7033,7 @@ class _NodeAccess:
 			names.append(child.name)
 		var maximum:int = 0
 		for line in names:
-			if line.begins_with(line_to_test):
+			if line.begins_with("DIALOG_DERELICT_SWITCH_CREW"):
 				var spl:PoolStringArray = line.split("|")
 				if int(spl[1]) > maximum:
 					maximum = int(spl[1])
@@ -7047,7 +7043,7 @@ class _NodeAccess:
 		
 		
 		if not max_crew > base:
-			pointers.l(log_header + "desired expansion to [%s] is less than or equal to the currently expanded number of [%s]" % [max_crew,base],"pointers.NodeAccess")
+			pointers.l("TSCN Writer for dynamic crew handler: desired expansion to [%s] is less than or equal to the currently expanded number of [%s]" % [max_crew,base],"pointers.NodeAccess")
 			return ""
 		
 		var compacted_string : String = "[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://comms/ConversationPlayer.gd\" type=\"Script\" id=2]\n\n[node name=\"DIALOG_DERELICT_RANDOM_1\" instance=ExtResource( 1 )]\n\n"
