@@ -79,30 +79,6 @@ func _ready():
 	get_parent().move_child(self,get_parent().get_child_count())
 	# This node cannot be paused
 	pause_mode = Node.PAUSE_MODE_PROCESS
-	yield(get_tree(),"idle_frame")
-	# Pre-caching WeaponSlot data
-	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","precache_weaponslots_on_boot"):
-		var ships = Shipyard.ships
-		for ship in ships:
-			yield(get_tree(),"idle_frame")
-			# Iterating over ships
-			var shipNode = ships[ship].instance()
-			l("precaching ship %s/%s" % [shipNode,shipNode.shipName],"pointers")
-			var children = NodeAccess.__get_all_children(shipNode)
-			for obj in children:
-				# If the node is an instance, load it and set properties to be able to cache data
-				if obj is InstancePlaceholder:
-					var values = obj.get_stored_values()
-					obj = load(obj.get_instance_path()).instance()
-					for property in values:
-						obj.set(property,values[property])
-				# If the slot is a weaponslot, call ready on it
-				if obj.has_method("_getType") and (obj._getType().begins_with("weaponSlot")):
-					l("caching for weaponslot %s on %s" % [obj.slot,shipNode.shipName],"pointers")
-					obj.ship = shipNode
-					obj._ready()
-			# Removes the ship once we're done with it
-			Tool.remove(shipNode)
 
 # Logging function used for cases where critial info must not be overwritten by game logs
 # cycling back to dv_log_0 (and yes this is from a specific bug report with AI slop code,

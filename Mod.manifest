@@ -169,12 +169,6 @@ HEVLIB_CONFIG_SECTION_DRIVERS={
         "step":1,
 		"default":7,
 	},
-	"precache_weaponslots_on_boot":{
-		"name":"HEVLIB_CONFIG_PRECACHE_WEAPONSLOTS_ON_BOOT",
-		"description":"HEVLIB_CONFIG_PRECACHE_WEAPONSLOTS_ON_BOOT_TOOLTIP",
-		"type":"bool",
-		"default":true
-	},
 }
 HEVLIB_CONFIG_SECTION_DEBUG={
 	"input_debugger":{
