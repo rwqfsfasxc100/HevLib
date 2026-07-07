@@ -84,12 +84,10 @@ func _ready():
 # you didn't ask for permission to use any of my code in an LLM so fuck you)
 var logCache = PoolStringArray()
 func l(msg:String, title:String = ""):
-	if title:
-		msg = "[%s]: %s"  % [title, msg]
-	Debug.l(msg)
+	Debug.l(("[%s]: %s" % [title, msg]) if title else msg)
 	if logCache == null:
 		logCache = PoolStringArray()
-	logCache.append(msg)
+	logCache.append("[%s]: %s" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg])
 
 var deviceinfostore:String = "user://cache/.HevLib_Cache/logs/"
 var deviceinfocache:String = deviceinfostore + "pointer_logs.txt"
@@ -7051,6 +7049,7 @@ class _NodeAccess:
 		if restart:
 			var pid = OS.execute(OS.get_executable_path(), OS.get_cmdline_args(), false)
 		Debug.batchWrite()
+		pointers.storeLogCache()
 		OS.kill(OS.get_process_id())
 	
 	
