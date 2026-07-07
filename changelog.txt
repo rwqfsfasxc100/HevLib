@@ -1,6 +1,6 @@
 [1.14.20]
 
-1=* WeaponSlots now no longer are lazy and decide to copy their equipment properties from first WeaponSlot to load on a ship.
+1=* WeaponSlots now no longer are lazy and copy their homework (equipment properties) from the first WeaponSlot to load on a ship, and now actually make sure the properties are for their own slot.
 
 [1.14.19]
 
