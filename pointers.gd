@@ -2405,7 +2405,6 @@ class _Equipment:
 	var version : Array = [1,0,0]
 	
 	func __make_upgrades_scene():
-		var SCENE_HEADER = "[gd_scene load_steps=4 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/WeaponSlotUpgradeTemplate.tscn\" type=\"PackedScene\" id=2]\n[ext_resource path=\"res://enceladus/SystemShipUpgradeUI.tscn\" type=\"PackedScene\" id=3]\n\n[sub_resource type=\"ViewportTexture\" id=1]\nflags = 5\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain1/Viewport\")\n\n[sub_resource type=\"ViewportTexture\" id=2]\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain2/Control\")\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]\n\n[node name=\"TextureRect\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 2 )\n\n[node name=\"TextureRect2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 2 )"
 		
 		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/")
 		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/")
@@ -2449,12 +2448,12 @@ class _Equipment:
 		
 		for slot in nodes_parent.get_children():
 			var children : Array = slot.get_node("VBoxContainer").get_children()
-			if children.size() <= 1:
+			if not children:
 				continue
 			vanilla_slot_names.append(slot.name)
 			var sys_slot : String  = slot.slot
 			var index:int = 1
-			if sys_slot == "":
+			if not sys_slot:
 				while not sys_slot:
 					sys_slot = children[index].slot
 					index += 1
@@ -3370,11 +3369,10 @@ class _Equipment:
 					var item : Dictionary = vanilla_equipment[equip]
 					var allowed_equipment : Array = slot_allowed_equipment.get(slot.get("slot_node_name",""),[]).duplicate(true)
 					
-					var does:bool = confirm_equipment(vanilla_equipment[equip], slot.get("slot_type",""), slot.get("alignment",""), slot.get("restriction",""), allowed_equipment)
-					if does:
+					if confirm_equipment(vanilla_equipment[equip], slot.get("slot_type",""), slot.get("alignment",""), slot.get("restriction",""), allowed_equipment):
 						var system_slot : String  = slot.get("system_slot","")
 						var string : String  = __make_equipment_for_scene(item, slot.get("slot_node_name",""), system_slot)
-						if system_slot == "":
+						if not system_slot:
 							pass
 						equipment_format.append(string)
 		for slot in all_slot_node_names:
@@ -3395,21 +3393,20 @@ class _Equipment:
 						alignment = slots_for_adding_dict[slot].get("alignment","")
 						restriction = slots_for_adding_dict[slot].get("restriction","")
 						system_slot = slots_for_adding_dict[slot].get("system_slot","")
-					var does:bool = confirm_equipment(item, slot_type, alignment, restriction, allowed_equipment)
-					if does:
+					if confirm_equipment(item, slot_type, alignment, restriction, allowed_equipment):
 						var string : String  = __make_equipment_for_scene(item, slot, system_slot)
-						if system_slot == "":
+						if not system_slot:
 							pass
 						if not string in equipment_format:
 							equipment_format.append(string)
 			
-		var concat : String = SCENE_HEADER
+		var concat : String = "[gd_scene load_steps=4 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/WeaponSlotUpgradeTemplate.tscn\" type=\"PackedScene\" id=2]\n[ext_resource path=\"res://enceladus/SystemShipUpgradeUI.tscn\" type=\"PackedScene\" id=3]\n\n[sub_resource type=\"ViewportTexture\" id=1]\nflags = 5\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain1/Viewport\")\n\n[sub_resource type=\"ViewportTexture\" id=2]\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain2/Control\")\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]\n\n[node name=\"TextureRect\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 2 )\n\n[node name=\"TextureRect2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 2 )"
 		for ref in slots_format:
-			concat = concat + "\n\n" + ref
+			concat += "\n\n" + ref
 		for equip in equipment_format:
-			concat = concat + "\n\n" + equip
+			concat += "\n\n" + equip
 		for path in editable_paths:
-			concat = concat + "\n\n" + path
+			concat += "\n\n" + path
 		
 		
 		
@@ -3457,10 +3454,11 @@ class _Equipment:
 						if not "." in item_data:
 							item_data.merge({".":[]})
 						item_data["."].append([ws_property,ws_value])
-				if apath == "":
-					ws_stuff_to_modify.append({"name":aname,"data":item_data})
-				else:
+				if apath:
 					ws_stuff_to_add.append({"name":aname,"path":apath,"data":item_data,"config":config})
+				else:
+					ws_stuff_to_modify.append({"name":aname,"data":item_data})
+					
 
 
 			var aname : String = add.get("name","SYSTEM_ERROR")
@@ -3468,7 +3466,7 @@ class _Equipment:
 			var add_header : String = (equipment_header % [aname,".",apath]) if apath else (equipment_header_noref % [aname,"."])
 			weaponslot_properties.merge({add_header:[]})
 			if ws_editable_paths:
-				ws_editable_paths = ws_editable_paths + "\n" + equipment_editable_path_base % aname
+				ws_editable_paths += "\n" + equipment_editable_path_base % aname
 			else:
 				ws_editable_paths = equipment_editable_path_base % aname
 			
@@ -3505,15 +3503,6 @@ class _Equipment:
 			var data : Array = weaponslot_properties.get(property)
 			for dp in data:
 				weaponslot_string = weaponslot_string + "\n" + dp[0] + " = " + dp[1]
-		
-#		file.open(weaponslot_additions,File.WRITE)
-#		file.store_string(JSON.print(ws_stuff_to_add))
-#		file.close()
-#		file.open(weaponslot_modifications,File.WRITE)
-#		file.store_string(JSON.print(ws_stuff_to_modify))
-#		file.close()
-		
-		
 		
 		for data in driver_store["AUX_POWER_AND_THRUSTERS"]:
 			file.open(auxslot_data_path,File.READ)
@@ -3579,21 +3568,21 @@ class _Equipment:
 					data["limit_ships"] = [data["limit_ships"]]
 				for f in range(0,data["limit_ships"].size()):
 					if f < data["limit_ships"].size() - 1:
-						sl = sl + "\"" + data["limit_ships"][f] + "\", "
+						sl += "\"" + data["limit_ships"][f] + "\", "
 					else:
-						sl = sl + "\"" + data["limit_ships"][f] + "\" ]"
-				cc = cc + "\n" + sl
+						sl += "\"" + data["limit_ships"][f] + "\" ]"
+				cc += "\n" + sl
 			if "prevent_ships" in data:
 				var sl : String = "prevent_ships = [ "
 				if typeof(data["prevent_ships"]) == TYPE_STRING:
 					data["prevent_ships"] = [data["prevent_ships"]]
 				for f in range(0,data["prevent_ships"].size()):
 					if f < data["prevent_ships"].size() - 1:
-						sl = sl + "\"" + data["prevent_ships"][f] + "\", "
+						sl += "\"" + data["prevent_ships"][f] + "\", "
 					else:
-						sl = sl + "\"" + data["prevent_ships"][f] + "\" ]"
-				cc = cc + "\n" + sl
-			ship_limitation_string = ship_limitation_string + cc
+						sl += "\"" + data["prevent_ships"][f] + "\" ]"
+				cc += "\n" + sl
+			ship_limitation_string += cc
 
 
 
@@ -7062,6 +7051,7 @@ class _NodeAccess:
 	func __exit(restart : bool = false):
 		if restart:
 			var pid = OS.execute(OS.get_executable_path(), OS.get_cmdline_args(), false)
+		Debug.batchWrite()
 		OS.kill(OS.get_process_id())
 	
 	
