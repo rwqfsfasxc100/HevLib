@@ -174,10 +174,6 @@ func _ready():
 #		file.store_string(functionality)
 #		file.close()
 		
-		file.open("user://cache/.HevLib_Cache/currently_installed_mods.json", File.WRITE)
-		file.store_string(pointers.ManifestV2.__get_mod_data(true))
-		file.close()
-		
 		var cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/"
 		replaceScene("scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
 #		var CRoot = get_tree().get_root()
@@ -288,4 +284,8 @@ func network_return(result, response_code,headers,body,mh):
 					file.close()
 	Tool.deferCallInPhysics(Tool,"remove",[get_node(mh)])
 
-
+func _notification(what):
+	if what == NOTIFICATION_CRASH:
+		file.open("user://cache/.HevLib_Cache/currently_installed_mods.json", File.WRITE)
+		file.store_string(pointers.ManifestV2.__get_mod_data(true))
+		file.close()
