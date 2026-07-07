@@ -30,7 +30,7 @@ func _ready():
 	equipment_templates = equipment_templates[slot]
 	
 	if not equipment_templates:
-		
+		Debug.n("HevLib WeaponSlotDriver: building equipment state for %s/%s" % [shipName,slot])
 		var generic_modify_templates = pointers.Equipment.weaponslot_modify_templates
 		var generic_modify_standalone = pointers.Equipment.weaponslot_modify_standalone
 		var ship_modify_templates = pointers.Equipment.weaponslot_ship_templates
@@ -119,49 +119,75 @@ func _ready():
 										if not item in equipment_templates:
 											equipment_templates[item] = {}
 										equipment_templates[item][property.get("property")] = property.get("value")
+		
 
 	var sysname = "weaponSlot.%s.type" % slot
 	c = ship.getConfig(sysname)
 	
-	for item in pointers.Equipment.ws_stuff_to_modify:
-		var iname = item.get("name")
-		if iname == c:
-			if not pointers.ConfigDriver.__validate_dictionary(item):
-				return
-			var this = {}
-			this.name = iname
-			this.data = {}
-			var f = item.get("data",{})
-			for n in f:
-				var d = f[n]
-				this["data"][n] = []
-				for l in d:
-					this["data"][n].append([l[0],pointers.DataFormat.__convert_var_from_string(l[1])])
-			this_modification.append(this)
-	for item in pointers.Equipment.ws_stuff_to_add:
-		var iname = item.get("name")
-		if iname == c:
-			if not pointers.ConfigDriver.__validate_dictionary(item):
-				return
-			var this = {}
-			this.name = iname
-			this.data = {}
-			this.path = item.get("path","")
-			this.config = item.get("config",{})
-			var f = item.get("data",{})
-			for n in f:
-				var d = f[n]
-				this["data"][n] = []
-				for l in d:
-					this["data"][n].append([l[0],pointers.DataFormat.__convert_var_from_string(l[1])])
-			this_addition = this
-	if c in equipment_templates:
-		var d = equipment_templates[c]
-		for i in d:
-			var s = [i,pointers.DataFormat.__convert_var_from_string(d[i])]
-			this_template.append(s)
+	var modStore = pointers.Equipment.ship_equipment_modification_internals
+	var completed = pointers.Equipment.ship_equipment_modification_internals_completed
+	if not shipName in modStore:
+		modStore[shipName] = {}
+		completed[shipName] = {}
+	modStore = modStore[shipName]
+	if not slot in modStore:
+		modStore[slot] = {}
+		completed[shipName][slot] = {}
+	modStore = modStore[slot]
+	if not c in modStore:
+		modStore[c] = {"modification":[],"addition":{},"template":[]}
+		completed[shipName][slot][c] = {"modification":false,"addition":false,"template":false}
+	modStore = modStore[c]
+	completed = completed[shipName][slot][c]
 	
-	
+	if not completed["modification"]:
+		for item in pointers.Equipment.ws_stuff_to_modify:
+			var iname = item.get("name")
+			if iname == c:
+				if not pointers.ConfigDriver.__validate_dictionary(item):
+					break
+				var this = {}
+				this.name = iname
+				this.data = {}
+				var f = item.get("data",{})
+				for n in f:
+					var d = f[n]
+					this["data"][n] = []
+					for l in d:
+						this["data"][n].append([l[0],pointers.DataFormat.__convert_var_from_string(l[1])])
+				modStore["modification"].append(this)
+				break
+		completed["modification"] = true
+	this_modification = modStore["modification"]
+	if not completed["addition"]:
+		for item in pointers.Equipment.ws_stuff_to_add:
+			var iname = item.get("name")
+			if iname == c:
+				if not pointers.ConfigDriver.__validate_dictionary(item):
+					break
+				var this = {}
+				this.name = iname
+				this.data = {}
+				this.path = item.get("path","")
+				this.config = item.get("config",{})
+				var f = item.get("data",{})
+				for n in f:
+					var d = f[n]
+					this["data"][n] = []
+					for l in d:
+						this["data"][n].append([l[0],pointers.DataFormat.__convert_var_from_string(l[1])])
+				modStore["addition"] = this
+				break
+		completed["addition"] = true
+	this_addition = modStore["addition"]
+	if not completed["template"]:
+		if c in equipment_templates:
+			var d = equipment_templates[c]
+			for i in d:
+				var s = [i,pointers.DataFormat.__convert_var_from_string(d[i])]
+				modStore["template"].append(s)
+		completed["template"] = true
+	this_template = modStore["template"]
 
 func loadPlaceholder():
 	var t = "weaponSlot.%s.type" % slot
@@ -172,7 +198,6 @@ func loadPlaceholder():
 		else:
 			key = t + "_" + mounted
 		if placeholder.has_method("replace_by_instance"):
-			var current = placeholder.get_stored_values(true)
 			for i in this_template:
 				var d = i[0]
 				var g = i[1]
@@ -187,7 +212,6 @@ func loadPlaceholder():
 							var d = i[0]
 							var g = i[1]
 							np[d] = g
-			var now = placeholder.get_stored_values(true)
 			placeholder.replace_by_instance()
 		system = get_node_or_null(mounted)
 		system.name = name + "_" + system.name

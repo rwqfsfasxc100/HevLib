@@ -34,6 +34,7 @@ func spawn_event(event : String,thering : Node,parameters : Dictionary = {}):
 					var oddity = event_node.makeAt(pos)
 					if oddity and ring.has_method("request_event"):
 						ring.request_event(oddity, event)
+						Debug.n("HevLib EventDriver: injecting oddity %s" % event)
 		else:
 			focusObject = CurrentGame.getPlayerShip()
 			if focusObject.zone == "rings":
@@ -56,6 +57,7 @@ func spawn_event(event : String,thering : Node,parameters : Dictionary = {}):
 							oddity.connect("tree_entered", ring, "forcedOddityConfirmed", [randomOddityKey])
 						ring.unspawnedOddities[randomOddityKey] = oddity
 						ring.unspawnedOdditiesLocation[randomOddityKey] = pos
+						Debug.n("HevLib EventDriver: force spawning oddity %s" % event)
 					
 #					if oddity and ring.has_method("requestOdditySpawn"):
 #						if oddity is Array:

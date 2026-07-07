@@ -1,6 +1,7 @@
 extends Node
 
 func clear_event(event : String, ring, clear_related_poi : bool = true,clear_in_cargo : bool = false):
+	Debug.n("HevLib EventDriver: clearing oddities %s" % event)
 	if event == "" or event == "none":
 		var events = ring.all_oddities
 		for e in events:

@@ -2379,6 +2379,8 @@ class _Equipment:
 	
 	# DATA SERIALIZATION STORAGE
 	var ship_equipment_template_internals : Dictionary = {}
+	var ship_equipment_modification_internals : Dictionary = {}
+	var ship_equipment_modification_internals_completed : Dictionary = {}
 	var ws_additions : Dictionary = {}
 	var ws_stuff_to_add : Array = []
 	var ws_stuff_to_modify : Array = []
@@ -2448,7 +2450,7 @@ class _Equipment:
 		
 		for slot in nodes_parent.get_children():
 			var children : Array = slot.get_node("VBoxContainer").get_children()
-			if not children:
+			if children.size() < 2:
 				continue
 			vanilla_slot_names.append(slot.name)
 			var sys_slot : String  = slot.slot
