@@ -121,7 +121,6 @@ func _ready():
 		file.open(modlet_toggle_restart_path,File.WRITE)
 		file.store_string("[]")
 		file.close()
-		var mod_data = pointers.ManifestV2.__get_mod_data(true)
 		var md = pointers.ManifestV2.__get_mod_data()
 		
 		replaceScene("scenes/better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
@@ -168,15 +167,16 @@ func _ready():
 		var dir = Directory.new()
 		dir.make_dir_recursive("user://cache/.HevLib_Cache/")
 		var file = File.new()
-		file.open("user://cache/.HevLib_Cache/library_documentation.json", File.WRITE)
 		
 		# Fix this later and update the HevLib class once documentation is finished.
+#		file.open("user://cache/.HevLib_Cache/library_documentation.json", File.WRITE)
 #		var functionality = pointers.HevLib.__get_library_functionality(true)
 #		file.store_string(functionality)
 #		file.close()
-#		file.open("user://cache/.HevLib_Cache/currently_installed_mods.json", File.WRITE)
-#		file.store_string(str(mod_data))
-#		file.close()
+		
+		file.open("user://cache/.HevLib_Cache/currently_installed_mods.json", File.WRITE)
+		file.store_string(pointers.ManifestV2.__get_mod_data(true))
+		file.close()
 		
 		var cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/"
 		replaceScene("scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
@@ -201,15 +201,16 @@ func _ready():
 			replaceScene("scenes/research/Enceladus.tscn","res://enceladus/Enceladus.tscn")
 		
 		
-		var gameFiles = pointers.FolderAccess.__get_folder_structure("res://",false)
-		file.open("user://cache/.HevLib_Cache/filesys.json",File.WRITE)
-		if gameFiles.size() == 0:
+#		var gameFiles = pointers.FolderAccess.__get_folder_structure("res://",false)
+#		file.open("user://cache/.HevLib_Cache/filesys.json",File.WRITE)
+#		if gameFiles.size() == 0:
+		if OS.has_feature("editor") and not file.file_exists("res://VersionLabel.tscn"):
 			printerr("FAILED TO FETCH FILE SYSTEM")
 			l("ERROR! FAILED TO FETCH FILE SYSTEM")
-		var sys = JSON.print(gameFiles,"\t")
-		file.store_string(sys)
-		file.close()
-		
+#		var sys = JSON.print(gameFiles,"\t")
+#		file.store_string(sys)
+#		file.close()
+#
 		
 #		var PointerNode = ResourceLoader.load("res://HevLib/pointers.gd","",true).new()
 #		var PointerNode = Node.new()
