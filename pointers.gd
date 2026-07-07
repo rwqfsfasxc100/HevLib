@@ -1649,10 +1649,7 @@ class _DataFormat:
 		urlRegex.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,63}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
 	
 	func __array_to_string(arr: Array) -> String:
-		var s : String  = ""
-		for i in arr:
-			s += String(i)
-		return s
+		return "".join(PoolStringArray(arr))
 	
 	func __rotate_point(point : Vector2, angle : float, degrees : bool = true) -> Vector2:
 		if degrees:
