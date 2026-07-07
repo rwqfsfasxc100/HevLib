@@ -12,8 +12,32 @@ func _draw():
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 
 func _ready():
+	var ordered_section_info:Dictionary = {}
+	var orderof = {}
+	var reorder = []
 	for entry in section_info:
-		var entry_info = section_info[entry]
+		var secentry = section_info[entry]
+		if "display_order_position" in secentry:
+			var pos = secentry.display_order_position
+			while pos in orderof:
+				pos += 1
+			orderof[pos] = [entry,secentry]
+		else:
+			reorder.append([entry,secentry])
+	var ctr = 0
+	for i in orderof:
+		if i > ctr:
+			ctr = i
+	for i in reorder:
+		ctr += 1
+		orderof[ctr] = i
+	var orderKeys = orderof.keys()
+	orderKeys.sort()
+	for r in orderKeys:
+		var i = orderof[r]
+		ordered_section_info[i[0]] = i[1]
+	for entry in ordered_section_info:
+		var entry_info = ordered_section_info[entry]
 		var entry_values = section_values[entry]
 		
 		var type = entry_info["type"].to_lower()
