@@ -1,3 +1,11 @@
+[1.14.21]
+
+1=* Added sorting algorithm to mod menu's configuration display to implement `display_order_position` for manifests created using DVTools.
+2=* Concatenated crew extender to reduce file size and processing time.
+3=* `DataFormat`.`__exit` now flushes the game logs to ensure the write buffer is written to disc.
+4=* Added performance log notes for EventDriver spawning/despawning and building a ship type's WeaponSlotDriver state.
+5=* Further cached WeaponSlot data. This covers three `for` loops that would be ran on the load of a WeaponSlot node and compile the required scene and modifications for that specific slot and tool.
+
 [1.14.20]
 
 1=* WeaponSlots now no longer are lazy and copy their homework (equipment properties) from the first WeaponSlot to load on a ship, and now actually make sure the properties are for their own slot.
