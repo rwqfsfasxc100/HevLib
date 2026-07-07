@@ -31,10 +31,13 @@ func _ready():
 		yield(Debug.get_tree(),"idle_frame")
 		l("Device Information: [\n%s\n]" % get_device_info())
 		var base = TranslationServer.translate("SYSTEM_AMMO_10000_DESC")
-		if base == "SYSTEM_AMMO_10000_DESC":
-			l("Translations did not get initialized, exiting to preserve report-ready state")
-			pointers.storeLogCache()
-			pointers.NodeAccess.__exit()
+		var rgx = RegEx.new()
+		rgx.compile("[a-z1-9]")
+		var found = rgx.search(TranslationServer.translate("SYSTEM_AMMO_10000_DESC"))
+		if not found:
+			l("Translations did not get initialized, queued exit for 200 seconds to preserve report-ready state")
+			var timer = Tool.makeTimer(2000, pointers)
+			timer.connect("timeout",pointers.NodeAccess,"__exit")
 var cache_extension = ".file_check_cache"
 
 func loadTranslationsFromCache():
