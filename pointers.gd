@@ -7027,21 +7027,16 @@ class _NodeAccess:
 		var base:int = 24
 
 		var test = load("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn").instance()
-		var children : Array = test.get_children()
-		var names : Array = []
-		for child in children:
-			names.append(child.name)
 		var maximum:int = 0
-		for line in names:
+		for child in test.get_children():
+			var line:String = child.name
 			if line.begins_with("DIALOG_DERELICT_SWITCH_CREW"):
 				var spl:PoolStringArray = line.split("|")
 				if int(spl[1]) > maximum:
 					maximum = int(spl[1])
-		var tester:int = maximum + 1
-		if tester > base:
-			base = tester
-		
-		
+		maximum += 1
+		if maximum > base:
+			base = maximum
 		if not max_crew > base:
 			pointers.l("TSCN Writer for dynamic crew handler: desired expansion to [%s] is less than or equal to the currently expanded number of [%s]" % [max_crew,base],"pointers.NodeAccess")
 			return ""
