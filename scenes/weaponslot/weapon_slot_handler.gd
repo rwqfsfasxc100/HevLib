@@ -25,6 +25,9 @@ func _ready():
 	if not shipName in equipment_templates:
 		equipment_templates[shipName] = {}
 	equipment_templates = equipment_templates[shipName]
+	if not slot in equipment_templates:
+		equipment_templates[slot] = {}
+	equipment_templates = equipment_templates[slot]
 	
 	if not equipment_templates:
 		
