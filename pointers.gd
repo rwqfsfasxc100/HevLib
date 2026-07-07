@@ -2430,6 +2430,14 @@ class _Equipment:
 	var namer_store:Dictionary = {"crew":[],"ships":[]}
 	var processed_storage_systems:Array = []
 	var drone_delivery_speed:Dictionary = {}
+	
+	var ADD_EQUIPMENT_ITEMS:Array = []
+	var ADD_EQUIPMENT_SLOTS:Array = []
+	var EQUIPMENT_TAGS:Array = []
+	var SLOT_TAGS:Array = []
+	var AUX_POWER_AND_THRUSTERS:Array = []
+	var MODIFY_INTERNALS:Dictionary = {}
+	var WEAPONSLOT_ADD:Array = []
 	# END OF DATA STORAGE
 	
 	var version : Array = [1,0,0]
@@ -2481,38 +2489,8 @@ class _Equipment:
 				drivers.append(mod.drivers.duplicate(true))
 		mods.clear()
 		
-		var driver_store : Dictionary = {
-			"ADD_EQUIPMENT_ITEMS":[],
-			"ADD_EQUIPMENT_SLOTS":[],
-			"EQUIPMENT_TAGS":[],
-			"SLOT_ORDER":[],
-			"SLOT_TAGS":[],
-			"AUX_POWER_AND_THRUSTERS":[],
-			"MODIFY_INTERNALS":{},
-			"NODE_DEFINITIONS":[],
-			"SHIP_NODE_REGISTER":[],
-			"SHIP_NODE_MODIFY":{},
-			"SHIP_THRUSTER_COLORS":{},
-			"WEAPONSLOT_ADD":[],
-			"WEAPONSLOT_MODIFY_TEMPLATES":[],
-			"WEAPONSLOT_MODIFY":[],
-			"WEAPONSLOT_SHIP_TEMPLATES":{},
-			"WEAPONSLOT_SHIP_MODIFY":{},
-			"SAVE_BUTTONS":[],
-			"ADD_SHIPS":[],
-			"REGISTER_SHIP_NUMERICS":{},
-			"SLOT_ORDER_RELATIVE":{},
-			
-		}
 		
 		var nodemodify_system_name_registers : Array = []
-		
-		var wsmtpls : Dictionary = ws_default_templates.get("TEMPLATES",{})
-		for i in wsmtpls:
-			var d = wsmtpls[i].duplicate(true)
-			driver_store["WEAPONSLOT_MODIFY_TEMPLATES"].append({i:d})
-		
-		
 		
 		for cvh in drivers:
 			for last_bit in cvh:
@@ -2546,7 +2524,7 @@ class _Equipment:
 											if not has_invis:
 												objdata.append({"property":"visible","value":"false"})
 											obj["data"] = objdata.duplicate(true)
-											driver_store["WEAPONSLOT_ADD"].append(obj)
+											WEAPONSLOT_ADD.append(obj)
 										if "WEAPONSLOT_ADD" in equipment:
 											var obj : Dictionary = equipment.get("WEAPONSLOT_ADD").duplicate(true)
 											var wname : String  = equipment.get("system","")
@@ -2568,25 +2546,25 @@ class _Equipment:
 											if not has_invis:
 												objdata.append({"property":"visible","value":"false"})
 											obj["data"] = objdata.duplicate(true)
-											driver_store["WEAPONSLOT_ADD"].append(obj)
+											WEAPONSLOT_ADD.append(obj)
 									"MASS_DRIVER_AMMUNITION":
 										if "REGISTER_AMMO" in equipment:
-											if not "REGISTER_AMMO" in driver_store["REGISTER_SHIP_NUMERICS"]:
-												driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_AMMO"] = []
+											if not "REGISTER_AMMO" in register_ship_numerics_store:
+												register_ship_numerics_store["REGISTER_AMMO"] = []
 											var bp : Dictionary = equipment["REGISTER_AMMO"].duplicate(true)
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
 											var dc : Dictionary = {equipment.get("num_val",0):bp}
-											driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_AMMO"].append(dc)
+											register_ship_numerics_store["REGISTER_AMMO"].append(dc)
 									"NANODRONE_STORAGE":
 										if "REGISTER_NANO" in equipment:
-											if not "REGISTER_NANO" in driver_store["REGISTER_SHIP_NUMERICS"]:
-												driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_NANO"] = []
+											if not "REGISTER_NANO" in register_ship_numerics_store:
+												register_ship_numerics_store["REGISTER_NANO"] = []
 											var bp : Dictionary = equipment["REGISTER_NANO"].duplicate(true)
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
 											var dc : Dictionary = {equipment.get("num_val",0):bp}
-											driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_NANO"].append(dc)
+											register_ship_numerics_store["REGISTER_NANO"].append(dc)
 									"STANDARD_REACTION_CONTROL_THRUSTERS":
 										if "AUX_POWER_SLOT" in equipment:
 											var bp : Dictionary = equipment["AUX_POWER_SLOT"].duplicate(true)
@@ -2594,21 +2572,21 @@ class _Equipment:
 												bp["system"] = equipment["system"]
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
-											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
+											AUX_POWER_AND_THRUSTERS.append(bp)
 										if "THRUSTERS" in equipment:
 											var bp : Dictionary = equipment["THRUSTERS"].duplicate(true)
 											if not "system" in bp:
 												bp["system"] = equipment["system"]
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
-											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
+											AUX_POWER_AND_THRUSTERS.append(bp)
 										if "AUX_POWER_AND_THRUSTERS" in equipment:
 											var bp : Dictionary = equipment["AUX_POWER_AND_THRUSTERS"].duplicate(true)
 											if not "system" in bp:
 												bp["system"] = equipment["system"]
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
-											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
+											AUX_POWER_AND_THRUSTERS.append(bp)
 									"STANDARD_MAIN_ENGINE":
 										if "AUX_POWER_SLOT" in equipment:
 											var bp : Dictionary = equipment["AUX_POWER_SLOT"].duplicate(true)
@@ -2616,48 +2594,48 @@ class _Equipment:
 												bp["system"] = equipment["system"]
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
-											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
+											AUX_POWER_AND_THRUSTERS.append(bp)
 										if "THRUSTERS" in equipment:
 											var bp : Dictionary = equipment["THRUSTERS"].duplicate(true)
 											if not "system" in bp:
 												bp["system"] = equipment["system"]
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
-											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
+											AUX_POWER_AND_THRUSTERS.append(bp)
 										if "AUX_POWER_AND_THRUSTERS" in equipment:
 											var bp : Dictionary = equipment["AUX_POWER_AND_THRUSTERS"].duplicate(true)
 											if not "system" in bp:
 												bp["system"] = equipment["system"]
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
-											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
+											AUX_POWER_AND_THRUSTERS.append(bp)
 									"FISSION_RODS":
 										if "REGISTER_REACTOR_RODS" in equipment:
-											if not "REGISTER_REACTOR_RODS" in driver_store["REGISTER_SHIP_NUMERICS"]:
-												driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_REACTOR_RODS"] = []
+											if not "REGISTER_REACTOR_RODS" in register_ship_numerics_store:
+												register_ship_numerics_store["REGISTER_REACTOR_RODS"] = []
 											var bp : Dictionary = equipment["REGISTER_REACTOR_RODS"].duplicate(true)
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
 											var dc : Dictionary = {equipment.get("num_val",0):bp}
-											driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_REACTOR_RODS"].append(dc)
+											register_ship_numerics_store["REGISTER_REACTOR_RODS"].append(dc)
 									"ULTRACAPACITOR":
 										if "REGISTER_ULTRACAPACITORS" in equipment:
-											if not "REGISTER_ULTRACAPACITORS" in driver_store["REGISTER_SHIP_NUMERICS"]:
-												driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_ULTRACAPACITORS"] = []
+											if not "REGISTER_ULTRACAPACITORS" in register_ship_numerics_store:
+												register_ship_numerics_store["REGISTER_ULTRACAPACITORS"] = []
 											var bp : Dictionary = equipment["REGISTER_ULTRACAPACITORS"].duplicate(true)
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
 											var dc : Dictionary = {equipment.get("num_val",0):bp}
-											driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_ULTRACAPACITORS"].append(dc)
+											register_ship_numerics_store["REGISTER_ULTRACAPACITORS"].append(dc)
 									"FISSION_TURBINE":
 										if "REGISTER_TURBINES" in equipment:
-											if not "REGISTER_TURBINES" in driver_store["REGISTER_SHIP_NUMERICS"]:
-												driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_TURBINES"] = []
+											if not "REGISTER_TURBINES" in register_ship_numerics_store:
+												register_ship_numerics_store["REGISTER_TURBINES"] = []
 											var bp : Dictionary = equipment["REGISTER_TURBINES"].duplicate(true)
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
 											var dc : Dictionary = {equipment.get("num_val",0):bp}
-											driver_store["REGISTER_SHIP_NUMERICS"]["REGISTER_TURBINES"].append(dc)
+											register_ship_numerics_store["REGISTER_TURBINES"].append(dc)
 									"AUX_POWER_SLOT":
 										if "auxiliary_power_unit" in equipment:
 											var bp : Dictionary = equipment["auxiliary_power_unit"].duplicate(true)
@@ -2665,46 +2643,44 @@ class _Equipment:
 												bp["system"] = equipment["system"]
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
-											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
+											AUX_POWER_AND_THRUSTERS.append(bp)
 										if "AUX_POWER_SLOT" in equipment:
 											var bp : Dictionary = equipment["AUX_POWER_SLOT"].duplicate(true)
 											if not "system" in bp:
 												bp["system"] = equipment["system"]
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
-											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
+											AUX_POWER_AND_THRUSTERS.append(bp)
 										if "THRUSTERS" in equipment:
 											var bp : Dictionary = equipment["THRUSTERS"].duplicate(true)
 											if not "system" in bp:
 												bp["system"] = equipment["system"]
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
-											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
+											AUX_POWER_AND_THRUSTERS.append(bp)
 										if "AUX_POWER_AND_THRUSTERS" in equipment:
 											var bp : Dictionary = equipment["AUX_POWER_AND_THRUSTERS"].duplicate(true)
 											if not "system" in bp:
 												bp["system"] = equipment["system"]
 											if not "price" in bp:
 												bp["price"] = equipment["price"]
-											driver_store["AUX_POWER_AND_THRUSTERS"].append(bp)
+											AUX_POWER_AND_THRUSTERS.append(bp)
 								
-								driver_store["ADD_EQUIPMENT_ITEMS"].append(equipment.duplicate(true))
+								ADD_EQUIPMENT_ITEMS.append(equipment.duplicate(true))
 					"ADD_EQUIPMENT_SLOTS.gd":
 						var arr2 : Array = []
 						for item in constants:
 							var equipment = constants.get(item).duplicate(true)
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
-								driver_store["ADD_EQUIPMENT_SLOTS"].append(equipment.duplicate(true))
+								ADD_EQUIPMENT_SLOTS.append(equipment.duplicate(true))
 					"EQUIPMENT_TAGS.gd":
 						var ar : Dictionary = constants.get("EQUIPMENT_TAGS",{}).duplicate(true)
-						driver_store["EQUIPMENT_TAGS"].append(ar.duplicate(true))
+						EQUIPMENT_TAGS.append(ar.duplicate(true))
 					"SLOT_ORDER.gd":
 						var orders : Array = constants.get("SLOT_ORDER",[])
 						for order in orders:
 							if not order in equipment_slot_order:
 								equipment_slot_order.append(order)
-							if not order in driver_store["SLOT_ORDER"]:
-								driver_store["SLOT_ORDER"].append(order)
 						
 						var orders2 : Dictionary = constants.get("SLOT_ORDER_RELATIVE",{})
 						for order in orders2:
@@ -2713,7 +2689,7 @@ class _Equipment:
 						
 					"SLOT_TAGS.gd":
 						var ar : Dictionary = constants.get("SLOT_TAGS",{}).duplicate(true)
-						driver_store["SLOT_TAGS"].append(ar.duplicate(true))
+						SLOT_TAGS.append(ar.duplicate(true))
 
 
 					"AUX_POWER_SLOT.gd","THRUSTERS.gd","AUX_POWER_AND_THRUSTERS.gd":
@@ -2722,7 +2698,7 @@ class _Equipment:
 							var equipment : Dictionary = constants.get(item).duplicate(true)
 							
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
-								driver_store["AUX_POWER_AND_THRUSTERS"].append(equipment.duplicate(true))
+								AUX_POWER_AND_THRUSTERS.append(equipment.duplicate(true))
 
 					"MODIFY_INTERNALS.gd":
 						if "MODIFY_INTERNALS" in constants:
@@ -2792,20 +2768,18 @@ class _Equipment:
 								if "emp_scale_multi_upper" in item or "emp_scale_multi_lower" in item:
 									ls["emp_scale_multi"] = float(item.get("emp_scale_multi_upper",1.0))/float(item.get("emp_scale_multi_lower",1.0)) * ls.get("emp_scale_multi",1.0)
 								
-								driver_store["MODIFY_INTERNALS"][listingSystemName] = ls.duplicate(true)
+								MODIFY_INTERNALS[listingSystemName] = ls.duplicate(true)
 							
 					"NODE_DEFINITIONS.gd":
 						
 						for item in constants:
 							var xd : Dictionary = {item:constants.get(item)}
 							node_definitions_cache.merge(xd)
-							driver_store["NODE_DEFINITIONS"].append(xd.duplicate(true))
 							
 					"SHIP_NODE_REGISTER.gd":
 						for item in constants:
 							var xd = constants.get(item)
 							ship_node_register.append(xd)
-							driver_store["SHIP_NODE_REGISTER"].append(xd.duplicate(true))
 					"SHIP_NODE_MODIFY.gd":
 						
 						for item in constants:
@@ -2813,22 +2787,16 @@ class _Equipment:
 							if ship != "":
 								if not ship in ship_node_modify:
 									ship_node_modify[ship] = []
-								if not ship in driver_store["SHIP_NODE_MODIFY"]:
-									driver_store["SHIP_NODE_MODIFY"][ship] = []
 								for modification in constants[item].get("modifications",[]):
 									ship_node_modify[ship].append(modification)
-									driver_store["SHIP_NODE_MODIFY"][ship].append(modification.duplicate(true))
 						
 					"SHIP_THRUSTER_COLORS.gd":
 						var cd : Dictionary = constants.get("SHIP_THRUSTER_COLORS",{})
 						if cd.size() > 0:
 							
 							for ship in cd:
-								if not ship in driver_store["SHIP_THRUSTER_COLORS"]:
-									driver_store["SHIP_THRUSTER_COLORS"][ship] = []
 								if not ship in ship_thruster_colors:
 									ship_thruster_colors.merge({ship:{"node":{},"type":{}}})
-								driver_store["SHIP_THRUSTER_COLORS"][ship].append(cd[ship].duplicate(true))
 								if "type" in cd[ship]:
 									ship_thruster_colors[ship]["type"].merge(cd[ship]["type"],true)
 								if "node" in cd[ship]:
@@ -2848,7 +2816,7 @@ class _Equipment:
 								if not n in ws_equipment_names:
 									ws_equipment_names.append(n)
 								if pointers.ConfigDriver.__validate_dictionary(equipment,false):
-									driver_store["WEAPONSLOT_ADD"].append(equipment.duplicate(true))
+									WEAPONSLOT_ADD.append(equipment.duplicate(true))
 					"WEAPONSLOT_MODIFY_TEMPLATES.gd":
 						var ar : Dictionary = constants.get("WEAPONSLOT_MODIFY_TEMPLATES",{}).duplicate(true)
 						for template in ar:
@@ -2875,9 +2843,6 @@ class _Equipment:
 													weaponslot_modify_templates[template][datapoint].append({"property":key,"value":data_formatted.get(key)})
 							else:
 								weaponslot_modify_templates[template] = ar.get(template).duplicate(true)
-						for i in ar:
-							var d = ar[i].duplicate(true)
-							driver_store["WEAPONSLOT_MODIFY_TEMPLATES"].append({i:d})
 						
 					"WEAPONSLOT_MODIFY.gd":
 						var ar = constants.get("WEAPONSLOT_MODIFY",{}).duplicate(true)
@@ -2907,14 +2872,11 @@ class _Equipment:
 								weaponslot_modify_standalone.merge({item:processed},true)
 							else:
 								weaponslot_modify_standalone.merge({item:ar[item]})
-							driver_store["WEAPONSLOT_MODIFY"].append({item:ar[item].duplicate(true)})
+							
 						
 					"WEAPONSLOT_SHIP_TEMPLATES.gd":
 						var ar : Dictionary = constants.get("WEAPONSLOT_SHIP_TEMPLATES",{}).duplicate(true)
 						for ship in ar:
-							if not ship in driver_store["WEAPONSLOT_SHIP_TEMPLATES"]:
-								driver_store["WEAPONSLOT_SHIP_TEMPLATES"][ship] = []
-							driver_store["WEAPONSLOT_SHIP_TEMPLATES"][ship].append({ship:ar[ship].duplicate(true)})
 							if ship in weaponslot_ship_templates:
 								var shipdata : Dictionary = ar.get(ship)
 								for slot in shipdata:
@@ -2945,9 +2907,6 @@ class _Equipment:
 					"WEAPONSLOT_SHIP_MODIFY.gd":
 						var ar = constants.get("WEAPONSLOT_SHIP_MODIFY",{}).duplicate(true)
 						for ship in ar:
-							if not ship in driver_store["WEAPONSLOT_SHIP_MODIFY"]:
-								driver_store["WEAPONSLOT_SHIP_MODIFY"][ship] = []
-							driver_store["WEAPONSLOT_SHIP_MODIFY"][ship].append({ship:ar[ship].duplicate(true)})
 							var slots : Dictionary = ar[ship]
 							for slot in slots:
 								var equipment = slots[slot]
@@ -2984,22 +2943,19 @@ class _Equipment:
 						
 					"SAVE_BUTTONS.gd":
 						var ar : Array = constants.get("SAVE_BUTTONS",[]).duplicate(true)
-						
 						for button in ar:
 							save_button_cache.append(button)
-							driver_store["SAVE_BUTTONS"].append(button.duplicate(true))
-						
 					"ADD_SHIPS.gd":
 						for ar in constants:
 							var ac : Dictionary = constants[ar]
-							driver_store["ADD_SHIPS"].append(ac.duplicate(true))
+							add_ships_store.append(ac.duplicate(true))
 					"REGISTER_SHIP_NUMERICS.gd":
 						for ar in constants:
-							if not ar in driver_store["REGISTER_SHIP_NUMERICS"]:
-								driver_store["REGISTER_SHIP_NUMERICS"][ar] = []
+							if not ar in register_ship_numerics_store:
+								register_ship_numerics_store[ar] = []
 							var ac = constants[ar]
 							for v in ac:
-								driver_store["REGISTER_SHIP_NUMERICS"][ar].append({v:ac[v].duplicate(true)})
+								register_ship_numerics_store[ar].append({v:ac[v].duplicate(true)})
 					"MODIFY_SHIP_NUMERICS.gd":
 						for item in constants:
 							var di : Dictionary = constants[item]
@@ -3017,14 +2973,6 @@ class _Equipment:
 						if "SHIPS" in constants:
 							var d : Array = constants["SHIPS"]
 							namer_store["ships"].append_array(d)
-						
-						
-		add_ships_store = driver_store["ADD_SHIPS"]
-		register_ship_numerics_store = driver_store["REGISTER_SHIP_NUMERICS"]
-		
-		file.open("user://cache/.HevLib_Cache/Driver_Store.json",File.WRITE)
-		file.store_string(JSON.print(driver_store))
-		file.close()
 		
 		var all_slot_node_names : Array = []
 		all_slot_node_names.append_array(vanilla_slot_names)
@@ -3035,9 +2983,7 @@ class _Equipment:
 		var ship_limitations : Dictionary = {}
 		var ship_limitation_string : String  = ""
 		
-		var equipment_for_adding : Array = []
-		
-		for nodes in driver_store["EQUIPMENT_TAGS"]:
+		for nodes in EQUIPMENT_TAGS:
 			if nodes:
 				var slotTypes : Array = nodes.get("slot_types",[])
 				var equipmentItems : Array = nodes.get("equipment_types",[])
@@ -3068,7 +3014,7 @@ class _Equipment:
 									slot_defaults[st].append(item)
 						else:
 							slot_defaults.merge({st:slotDefaults.get(st)})
-		for slotDict in driver_store["ADD_EQUIPMENT_SLOTS"]:
+		for slotDict in ADD_EQUIPMENT_SLOTS:
 			var snn : String  = slotDict.get("slot_node_name","")
 			var spp : Dictionary = ship_limitations.get(snn,{})
 			if "limit_ships" in slotDict:
@@ -3098,7 +3044,7 @@ class _Equipment:
 			slots_for_adding.append(slotDict)
 			slots_for_adding_dict.merge({slotDict.get("slot_node_name",""):slotDict})
 			all_slot_node_names.append(slotDict.get("slot_node_name",""))
-		for node in driver_store["SLOT_TAGS"]:
+		for node in SLOT_TAGS:
 			if node:
 				tag_modifications.append(node)
 				for snn in node:
@@ -3128,9 +3074,6 @@ class _Equipment:
 						else:
 							ship_limitations.merge({snn:{}})
 							ship_limitations[snn]["prevent_ships"] = val.duplicate()
-		for ns in driver_store["ADD_EQUIPMENT_ITEMS"]:
-			if ns:
-				equipment_for_adding.append(ns)
 		
 		var slots_full : Array = []
 		var slots_format : PoolStringArray = []
@@ -3269,7 +3212,7 @@ class _Equipment:
 						equipment_format.append(string)
 		for slot in all_slot_node_names:
 			if slot in slot_allowed_equipment:
-				for item in equipment_for_adding:
+				for item in ADD_EQUIPMENT_ITEMS:
 					var allowed_equipment : Array = slot_allowed_equipment.get(slot,[]).duplicate(true)
 					var slot_type : String  = ""
 					var alignment : String  = ""
@@ -3316,7 +3259,7 @@ class _Equipment:
 		
 		
 		
-		for add in driver_store["WEAPONSLOT_ADD"]:
+		for add in WEAPONSLOT_ADD:
 			if pointers.ConfigDriver.__validate_dictionary(add,false):
 				var aname : String  = add.get("name","SYSTEM_ERROR")
 				var apath : String  = add.get("path","")
@@ -3396,7 +3339,7 @@ class _Equipment:
 			for dp in data:
 				weaponslot_string = weaponslot_string + "\n" + dp[0] + " = " + dp[1]
 		
-		for data in driver_store["AUX_POWER_AND_THRUSTERS"]:
+		for data in AUX_POWER_AND_THRUSTERS:
 			
 			var equipSlots : Array = data.get("slots",[])
 			for slot in equipSlots:
