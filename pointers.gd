@@ -7029,21 +7029,7 @@ class _NodeAccess:
 		var line_to_test : String = "DIALOG_DERELICT_SWITCH_CREW"
 		
 		var base:int = 24
-		
-		var static_line_1 : String = "[gd_scene load_steps=3 format=2]"
-		var static_line_3 : String = "[ext_resource path=\"res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn\" type=\"PackedScene\" id=1]"
-		var static_line_4 : String = "[ext_resource path=\"res://comms/ConversationPlayer.gd\" type=\"Script\" id=2]"
-		var static_line_6 : String = "[node name=\"DIALOG_DERELICT_RANDOM_1\" instance=ExtResource( 1 )]"
 
-		var dynamic_line_1 : String = "[node name=\"DIALOG_DERELICT_SWITCH_CREW|%s\" type=\"Node\" parent=\".\" index=\"%s\"]"
-		var dynamic_line_2 : String = "script = ExtResource( 2 )"
-		var dynamic_line_3 : String = "myLine = false"
-		var dynamic_line_4 : String = "faceless = true"
-		var dynamic_line_5 : String = "importChildren = NodePath(\"../DIALOG_DERELICT_GO_AND_BRING_IT\")"
-		var dynamic_line_6 : String = "agenda = \"CREW/%s\""
-		var dynamic_line_7 : String = "agendaNotSame = true"
-		
-		
 		var test = load("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn").instance()
 		var children : Array = test.get_children()
 		var names : Array = []
@@ -7060,27 +7046,21 @@ class _NodeAccess:
 			base = tester
 		
 		
-		if max_crew <= base:
+		if not max_crew > base:
 			pointers.l(log_header + "desired expansion to [%s] is less than or equal to the currently expanded number of [%s]" % [max_crew,base],"pointers.NodeAccess")
 			return ""
-		else:
-			var header : String = static_line_1 + "\n\n" + static_line_3 + "\n" + static_line_4 + "\n\n" + static_line_6 + "\n\n"
-			
-			var compacted_string : String = header
-			
-			while max_crew > base:
-				
-				var compact : String = dynamic_line_1 % [base,base + 4] + "\n" + dynamic_line_2 + "\n" + dynamic_line_3 + "\n" + dynamic_line_4 + "\n" + dynamic_line_5 + "\n" + dynamic_line_6 % base + "\n" + dynamic_line_7 + "\n\n"
-				
-				compacted_string = compacted_string + compact
-				
-				base += 1
-			if not folder_path.ends_with("/"):
-				folder_path = folder_path + "/"
-			var save_file_path : String = folder_path + "dynamic_crew_x%s.tscn" % base
-			pointers.DataFormat.__replace_scene(compacted_string,"res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn",save_file_path)
-			
-			return save_file_path
+		
+		var compacted_string : String = "[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://comms/ConversationPlayer.gd\" type=\"Script\" id=2]\n\n[node name=\"DIALOG_DERELICT_RANDOM_1\" instance=ExtResource( 1 )]\n\n"
+		while max_crew > base:
+			var compact : String = "[node name=\"DIALOG_DERELICT_SWITCH_CREW|%s\" type=\"Node\" parent=\".\" index=\"%s\"]\nscript = ExtResource( 2 )\nmyLine = false\nfaceless = true\nimportChildren = NodePath(\"../DIALOG_DERELICT_GO_AND_BRING_IT\")\nagenda = \"CREW/%s\"\nagendaNotSame = true\n\n" % [base,base + 4]
+			compacted_string += compact
+			base += 1
+		if not folder_path.ends_with("/"):
+			folder_path = folder_path + "/"
+		var save_file_path : String = folder_path + "dynamic_crew_x%s.tscn" % base
+		pointers.DataFormat.__replace_scene(compacted_string,"res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn",save_file_path)
+		
+		return save_file_path
 	
 	
 	func __remove_scripts(node):
@@ -7406,9 +7386,9 @@ class _Translations:
 		for translationObject in translations:
 			TranslationServer.add_translation(translationObject)
 		pointers.l("%s Translations Updated" % [translationCount],"pointers.Translations")
-	func __fetch_all_translation_objects(index) -> Array:
+	func __fetch_all_translation_objects(index:int) -> Array:
 		var translations : Array = []
-		while index >= 1:
+		while index > 0:
 			var obj = instance_from_id(index)
 			index -= 1
 			if obj == null:
@@ -7556,6 +7536,7 @@ class _Translations:
 									data[lp] = {}
 								for translation in dict[lp]:
 									data[lp].merge({translation:dict[lp][translation]},true)
+		# April Fool's alcohol!
 		var date = Time.get_date_dict_from_system()
 		if date.month == 4 and date.day == 1:
 			data["en"].merge({"H2O": "C2H6O"},true)
