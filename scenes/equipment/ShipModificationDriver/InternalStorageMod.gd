@@ -52,15 +52,10 @@ func _enter_tree():
 	ismPointers = ModLoader._savedObjects[0]
 	if ismPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","extend_divided_storage_multiplier"):
 		hl_ism_mineral_trace_length = CurrentGame.traceMinerals.size()
-	var file = File.new()
 	ismPointers.ConfigDriver.__establish_connection("hl_ism_UV",self)
-	file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_mods.json",File.READ)
-	listings = JSON.parse(file.get_as_text()).result
-	file.close()
+	listings = ismPointers.Equipment.processed_storage_mods
 	
-	file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_systems.json",File.READ)
-	var sysNames = JSON.parse(file.get_as_text()).result
-	file.close()
+	var sysNames = ismPointers.Equipment.processed_storage_systems
 	configMutex.lock()
 	currentInstalledEquipmentWithChanges = ismPointers.DataFormat.__sift_ship_config(shipConfig.duplicate(true),sysNames,hl_ism_cfgs_to_ignore)
 	configMutex.unlock()
@@ -317,12 +312,10 @@ func _enter_tree():
 		add_child(sys)
 		call_deferred("move_child",sys,get_child_count())
 	
-	file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/drone_delivery_speed.json",File.READ)
-	var droneData = JSON.parse(file.get_as_text()).result
-	file.close()
+	
+	var droneData = ismPointers.Equipment.drone_delivery_speed
 	for amnt in droneData:
 		nanoDeliveryPerSecond[float(amnt)] = droneData[amnt]
-#	yield(CurrentGame.get_tree(),"physics_frame")
 func _ready():
 	l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [ammo_add, nano_add, propellant_add])
 	if propellant_add != 0:

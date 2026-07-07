@@ -1,12 +1,7 @@
 extends "res://namer/Namer.gd"
 
-var namer_store = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/namer.json"
-var file = File.new()
-
 func _ready():
-	file.open(namer_store,File.READ)
-	var data = JSON.parse(file.get_as_text()).result
-	file.close()
+	var data = ModLoader._savedObjects[0].Equipment.namer_store
 	
 	# Hardcoded
 	data["crew"].append(["usa","Celine","Nguyen",0])

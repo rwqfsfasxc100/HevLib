@@ -1,7 +1,5 @@
 extends "res://ships/Shipyard.gd"
 
-var ship_driver_path = "user://cache/.HevLib_Cache/ShipDriver/"
-
 var syPointers
 
 func _ready():
@@ -126,10 +124,7 @@ func _ready():
 							turbineValue[value] = float(entries["price"])
 						if "mass" in entries:
 							turbineMass[value] = float(entries["mass"])
-	file.open("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/drone_delivery_speed.json",File.WRITE)
-	file.store_string(JSON.print(nano_delivery))
-	file.close()
-	pass
+	syPointers.Equipment.drone_delivery_speed = nano_delivery
 
 func hl_shipdriver_resetter_timeout():
 	for ship in ships:

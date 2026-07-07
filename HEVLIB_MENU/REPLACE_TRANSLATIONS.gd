@@ -2318,6 +2318,14 @@ const TRANSLATIONS = {
 		"HEVLIB_CONFIG_EXTEND_DIVIDED_STORAGE_MULTIPLIER_TOOLTIP": {
 			"string": "Whether the processed storage added by equipment using the MODIFY_INTERNALS driver should\ndynamically adjust based on the number of minerals that can be found in the ring.\n\nIf disabled, defaults to use just Vanilla's 6 ores",
 			"version_hash": 2335117499
+		},
+		"HEVLIB_CONFIG_PRECACHE_WEAPONSLOTS_ON_BOOT": {
+			"string": "Pre-cache WeaponSlot drivers on boot",
+			"version_hash": 454952745
+		},
+		"HEVLIB_CONFIG_PRECACHE_WEAPONSLOTS_ON_BOOT_TOOLTIP": {
+			"string": "Whether the game should attempt to initialize the base cache for each vessel type.\n\nThis will cause a slightly longer load of the Title Screen on lower end devices, but should not be too noticable.",
+			"version_hash": 2192600408
 		}
 	},
 	"uk_UA": {

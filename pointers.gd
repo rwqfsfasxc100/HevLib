@@ -63,9 +63,10 @@ func _physics_process(delta:float):
 		logging_current_frame_timer = 0
 		storeLogCache()
 
+var dir:Directory = Directory.new()
+var file:File = File.new()
 func _ready():
 	# Ensure the log directory exists, and create it if it doesn't
-	var dir:Directory = Directory.new()
 	if not dir.dir_exists(deviceinfostore):
 		dir.make_dir_recursive(deviceinfostore)
 	# Set the logging interval
@@ -78,11 +79,37 @@ func _ready():
 	get_parent().move_child(self,get_parent().get_child_count())
 	# This node cannot be paused
 	pause_mode = Node.PAUSE_MODE_PROCESS
+	yield(get_tree(),"idle_frame")
+	# Pre-caching WeaponSlot data
+	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","precache_weaponslots_on_boot"):
+		var ships = Shipyard.ships
+		for ship in ships:
+			yield(get_tree(),"idle_frame")
+			# Iterating over ships
+			var shipNode = ships[ship].instance()
+			l("precaching ship %s/%s" % [shipNode,shipNode.shipName],"pointers")
+			var children = NodeAccess.__get_all_children(shipNode)
+			for obj in children:
+				# If the node is an instance, load it and set properties to be able to cache data
+				if obj is InstancePlaceholder:
+					var values = obj.get_stored_values()
+					obj = load(obj.get_instance_path()).instance()
+					for property in values:
+						obj.set(property,values[property])
+				# If the slot is a weaponslot, call ready on it
+				if obj.has_method("_getType") and (obj._getType().begins_with("weaponSlot")):
+					l("caching for weaponslot %s on %s" % [obj.slot,shipNode.shipName],"pointers")
+					obj.ship = shipNode
+					obj._ready()
+			# Removes the ship once we're done with it
+			Tool.remove(shipNode)
 
 # Logging function used for cases where critial info must not be overwritten by game logs
 # cycling back to dv_log_0 (and yes this is from a specific bug report with AI slop code,
 # you didn't ask for permission to use any of my code in an LLM so fuck you)
 var logCache = PoolStringArray()
+var messageNr = 0
+var messagesPerFile = 1000
 func l(msg:String, title:String = ""):
 	Debug.l(("[%s]: %s" % [title, msg]) if title else msg)
 	if logCache == null:
@@ -90,20 +117,24 @@ func l(msg:String, title:String = ""):
 	logCache.append("[%s]: %s" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg])
 
 var deviceinfostore:String = "user://cache/.HevLib_Cache/logs/"
-var deviceinfocache:String = deviceinfostore + "pointer_logs.txt"
+var deviceinfocache:String = deviceinfostore + "pointer_logs_%d.txt"
 
 # Method for storing stored logs to file
 # This isn't done by the logger to help reduce write operations.
 # Useful if you perform the log operation multiple times in succession
 func storeLogCache():
-	if logCache:
-		var file = File.new()
-		file.open(deviceinfocache,File.READ)
+	if logCache and dir.dir_exists(deviceinfostore):
+		messageNr += 1
+		var logFileName = deviceinfocache % [int(messageNr / messagesPerFile)]
+		if not file.file_exists(logFileName):
+			file.open(logFileName,File.WRITE)
+			file.close()
+		file.open(logFileName,File.READ)
 		var ov = file.get_as_text(true)
 		file.close()
 		for line in logCache:
 			ov += line + "\n"
-		file.open(deviceinfocache,File.WRITE)
+		file.open(logFileName,File.WRITE)
 		file.store_string(ov)
 		file.close()
 		logCache.clear()
@@ -2386,51 +2417,27 @@ class _Equipment:
 	var weaponslot_ship_templates:Dictionary = {}
 	var weaponslot_ship_standalone:Dictionary = {}
 	var ws_equipment_names:Array = []
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	var equipment_slot_order:Array = []
+	var relative_equipment_slot_order:Dictionary = {}
+	var save_button_cache:Array = []
+	var processed_storage_mods:Dictionary = {}
+	var node_definitions_cache:Dictionary = {}
+	var ship_node_register:Array = []
+	var auxslot_data:Dictionary = {}
+	var ship_node_modify:Dictionary = {}
+	var ship_thruster_colors:Dictionary = {}
+	var modify_ship_numerics:Dictionary = {}
+	var namer_store:Dictionary = {"crew":[],"ships":[]}
+	var processed_storage_systems:Array = []
+	var drone_delivery_speed:Dictionary = {}
 	# END OF DATA STORAGE
 	
 	var version : Array = [1,0,0]
 	
 	func __make_upgrades_scene():
 		
-		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/")
-		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/")
-		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/")
-		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/")
-		
-		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/")
-		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/")
-		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/Exhaust_Cache/")
-		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/ShipDriver/")
-		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/MenuDriver/")
-		
-		var file_save_path : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn"
-		var exhaust_cache_path : String = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/Exhaust_Cache"
-		var slot_order_cache_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order.json"
-		var save_menu_file : String  = "user://cache/.HevLib_Cache/MenuDriver/save_buttons.json"
-		var processed_storage_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_mods.json"
-		var node_definitions_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/node_definitions.json"
-		var ship_node_register_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_register.json"
-		var auxslot_data_path : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/AuxSlot.json"
-		var upgrades_slot_limits : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Slot_Limits.tscn"
-		var ship_node_modify_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_node_modify.json"
-		var ship_thruster_color_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_thruster_colors.json"
-		var ship_driver_path : String  = "user://cache/.HevLib_Cache/ShipDriver/"
-		var storage_for_driver_store : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/Driver_Store.json"
-		var slot_order_relative_store : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order_relative.json"
-		var modify_ship_numerics_store : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/modify_ship_numerics.json"
-		var namer_store : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/namer.json"
-		var processed_storage_systems_file : String  = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/processed_storage_systems.json"
+		var exhaust_cache_path : String = "user://cache/.HevLib_Cache/AuxAndThrusterDriver/"
+		pointers.FolderAccess.__check_folder_exists(exhaust_cache_path)
 		
 		version = pointers.DataFormat.__get_vanilla_version()
 		pointers.l("observed game version of %s" % str(version),"pointers.Equipment")
@@ -2438,9 +2445,6 @@ class _Equipment:
 		var nodes_parent:Node = UpgradeMenu.get_node("VB/MarginContainer/ScrollContainer/MarginContainer/Items")
 		var vanilla_slot_names : Array = []
 		var vanilla_slot_types : Dictionary = {}
-		
-		
-		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/ship_data/")
 
 		
 		for slot in nodes_parent.get_children():
@@ -2460,57 +2464,12 @@ class _Equipment:
 		var ws_ship_templates : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
 		var ws_ship_templates_2 : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd").get_script_constant_map()
 		var ship_register : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/equipment/ShipModificationDriver/ship_register_vanilla.gd") #load("res://HevLib/scenes/equipment/ShipModificationDriver/ship_register_vanilla.gd").get_script_constant_map()
-		var register_default_ships : Array = []
 		for item in ship_register:
-			register_default_ships.append(ship_register[item])
+			ship_node_register.append(ship_register[item])
 		
 		weaponslot_modify_templates = ws_default_templates.get("TEMPLATES", {})
 		weaponslot_ship_templates = ws_ship_templates_2.get("SHIP_TEMPLATES",{})
 		weaponslot_ship_standalone = ws_ship_templates.get("SHIP_MODIFY",{})
-		
-		
-		
-		file.open(slot_order_cache_file,File.WRITE)
-		file.store_string("[]")
-		file.close()
-		file.open(save_menu_file,File.WRITE)
-		file.store_string("[]")
-		file.close()
-		file.open(processed_storage_file,File.WRITE)
-		file.store_string("{}")
-		file.close()
-		file.open(processed_storage_systems_file,File.WRITE)
-		file.store_string("[]")
-		file.close()
-		file.open(node_definitions_file,File.WRITE)
-		file.store_string("{}")
-		file.close()
-		file.open(ship_thruster_color_file,File.WRITE)
-		file.store_string("{}")
-		file.close()
-		file.open(auxslot_data_path,File.WRITE)
-		file.store_string("{}")
-		file.close()
-		file.open(ship_node_register_file,File.WRITE)
-		file.store_string(JSON.print(register_default_ships))
-		file.close()
-		file.open(ship_node_modify_file,File.WRITE)
-		file.store_string("{}")
-		file.close()
-		file.open(storage_for_driver_store,File.WRITE)
-		file.store_string("{}")
-		file.close()
-		file.open(slot_order_relative_store,File.WRITE)
-		file.store_string("{}")
-		file.close()
-		file.open(modify_ship_numerics_store,File.WRITE)
-		file.store_string("{}")
-		file.close()
-		file.open(namer_store,File.WRITE)
-		file.store_string("{\"crew\":[],\"ships\":[]}")
-		file.close()
-		
-		
 		
 		var current_mod_ids : Array = pointers.ManifestV2.__get_mod_ids()
 		
@@ -2740,31 +2699,17 @@ class _Equipment:
 						var ar : Dictionary = constants.get("EQUIPMENT_TAGS",{}).duplicate(true)
 						driver_store["EQUIPMENT_TAGS"].append(ar.duplicate(true))
 					"SLOT_ORDER.gd":
-						file.open(slot_order_cache_file,File.READ)
-						var data : Array = JSON.parse(file.get_as_text()).result
-						file.close()
 						var orders : Array = constants.get("SLOT_ORDER",[])
 						for order in orders:
-							if order in data:
-								pass
-							else:
-								data.append(order)
+							if not order in equipment_slot_order:
+								equipment_slot_order.append(order)
 							if not order in driver_store["SLOT_ORDER"]:
 								driver_store["SLOT_ORDER"].append(order)
-						file.open(slot_order_cache_file,File.WRITE)
-						file.store_string(JSON.print(data))
-						file.close()
 						
-						file.open(slot_order_relative_store,File.READ)
-						var data2 : Dictionary = JSON.parse(file.get_as_text()).result
-						file.close()
 						var orders2 : Dictionary = constants.get("SLOT_ORDER_RELATIVE",{})
 						for order in orders2:
-							if not order in data2:
-								data2[order] = orders2[order]
-						file.open(slot_order_relative_store,File.WRITE)
-						file.store_string(JSON.print(data2))
-						file.close()
+							if not order in relative_equipment_slot_order:
+								relative_equipment_slot_order[order] = orders2[order]
 						
 					"SLOT_TAGS.gd":
 						var ar : Dictionary = constants.get("SLOT_TAGS",{}).duplicate(true)
@@ -2783,19 +2728,13 @@ class _Equipment:
 						if "MODIFY_INTERNALS" in constants:
 							var pdata : Array = constants.MODIFY_INTERNALS
 							
-							file.open(processed_storage_file,File.READ)
-							var pfdata : Dictionary = JSON.parse(file.get_as_text()).result
-							file.close()
-							file.open(processed_storage_systems_file,File.READ)
-							var sysNames : Array = JSON.parse(file.get_as_text()).result
-							file.close()
 							for item in pdata:
 								var listingSystemName : String  = item.get("system","SYSTEM_MISSING_NAME")
-								if not listingSystemName in sysNames:
-									sysNames.append(listingSystemName)
-								if not listingSystemName in pfdata:
-									pfdata[listingSystemName] = {}
-								var ls : Dictionary = pfdata[listingSystemName]
+								if not listingSystemName in processed_storage_systems:
+									processed_storage_systems.append(listingSystemName)
+								if not listingSystemName in processed_storage_mods:
+									processed_storage_mods[listingSystemName] = {}
+								var ls : Dictionary = processed_storage_mods[listingSystemName]
 								
 								ls["minimum_ammo_utilization_for_reduction"] = item.get("minimum_ammo_utilization_for_reduction",ls.get("minimum_ammo_utilization_for_reduction",0.0))
 								ls["minimum_nano_utilization_for_reduction"] = item.get("minimum_nano_utilization_for_reduction",ls.get("minimum_nano_utilization_for_reduction",0.0))
@@ -2854,78 +2793,51 @@ class _Equipment:
 									ls["emp_scale_multi"] = float(item.get("emp_scale_multi_upper",1.0))/float(item.get("emp_scale_multi_lower",1.0)) * ls.get("emp_scale_multi",1.0)
 								
 								driver_store["MODIFY_INTERNALS"][listingSystemName] = ls.duplicate(true)
-							file.open(processed_storage_file,File.WRITE)
-							file.store_string(JSON.print(pfdata))
-							file.close()
-							file.open(processed_storage_systems_file,File.WRITE)
-							file.store_string(JSON.print(sysNames))
-							file.close()
+							
 					"NODE_DEFINITIONS.gd":
-						file.open(node_definitions_file,File.READ)
-						var pfdata : Dictionary = JSON.parse(file.get_as_text()).result
-						file.close()
+						
 						for item in constants:
 							var xd : Dictionary = {item:constants.get(item)}
-							pfdata.merge(xd)
+							node_definitions_cache.merge(xd)
 							driver_store["NODE_DEFINITIONS"].append(xd.duplicate(true))
 							
-						file.open(node_definitions_file,File.WRITE)
-						file.store_string(JSON.print(pfdata))
-						file.close()
 					"SHIP_NODE_REGISTER.gd":
-						file.open(ship_node_register_file,File.READ)
-						var pfdata : Array = JSON.parse(file.get_as_text()).result
-						file.close()
 						for item in constants:
 							var xd = constants.get(item)
-							pfdata.append(xd)
+							ship_node_register.append(xd)
 							driver_store["SHIP_NODE_REGISTER"].append(xd.duplicate(true))
-							
-						file.open(ship_node_register_file,File.WRITE)
-						file.store_string(JSON.print(pfdata))
-						file.close()
 					"SHIP_NODE_MODIFY.gd":
-						file.open(ship_node_modify_file,File.READ)
-						var pfdata : Dictionary = JSON.parse(file.get_as_text()).result
-						file.close()
+						
 						for item in constants:
 							var ship : String  = constants[item].get("ship_name","")
 							if ship != "":
-								if not ship in pfdata:
-									pfdata[ship] = []
+								if not ship in ship_node_modify:
+									ship_node_modify[ship] = []
 								if not ship in driver_store["SHIP_NODE_MODIFY"]:
 									driver_store["SHIP_NODE_MODIFY"][ship] = []
 								for modification in constants[item].get("modifications",[]):
-									pfdata[ship].append(modification)
+									ship_node_modify[ship].append(modification)
 									driver_store["SHIP_NODE_MODIFY"][ship].append(modification.duplicate(true))
 						
-						file.open(ship_node_modify_file,File.WRITE)
-						file.store_string(JSON.print(pfdata))
-						file.close()
 					"SHIP_THRUSTER_COLORS.gd":
 						var cd : Dictionary = constants.get("SHIP_THRUSTER_COLORS",{})
 						if cd.size() > 0:
-							file.open(ship_thruster_color_file,File.READ)
-							var current : Dictionary = JSON.parse(file.get_as_text()).result
-							file.close()
+							
 							for ship in cd:
 								if not ship in driver_store["SHIP_THRUSTER_COLORS"]:
 									driver_store["SHIP_THRUSTER_COLORS"][ship] = []
-								if not ship in current:
-									current.merge({ship:{"node":{},"type":{}}})
+								if not ship in ship_thruster_colors:
+									ship_thruster_colors.merge({ship:{"node":{},"type":{}}})
 								driver_store["SHIP_THRUSTER_COLORS"][ship].append(cd[ship].duplicate(true))
 								if "type" in cd[ship]:
-									current[ship]["type"].merge(cd[ship]["type"],true)
+									ship_thruster_colors[ship]["type"].merge(cd[ship]["type"],true)
 								if "node" in cd[ship]:
-									current[ship]["node"].merge(cd[ship]["node"],true)
+									ship_thruster_colors[ship]["node"].merge(cd[ship]["node"],true)
 								if "recurse_to_variants" in cd[ship]:
-									current[ship]["recurse_to_variants"] = cd[ship]["recurse_to_variants"]
+									ship_thruster_colors[ship]["recurse_to_variants"] = cd[ship]["recurse_to_variants"]
 								if "config" in cd[ship]:
-									current[ship]["config"] = cd[ship]["config"]
+									ship_thruster_colors[ship]["config"] = cd[ship]["config"]
 								
-							file.open(ship_thruster_color_file,File.WRITE)
-							file.store_string(JSON.print(current))
-							file.close()
 
 					"WEAPONSLOT_ADD.gd":
 						var arr2 : Array = []
@@ -3072,16 +2984,11 @@ class _Equipment:
 						
 					"SAVE_BUTTONS.gd":
 						var ar : Array = constants.get("SAVE_BUTTONS",[]).duplicate(true)
-						file.open(save_menu_file,File.READ)
-						var founddata : Array = JSON.parse(file.get_as_text(true)).result
-						file.close()
+						
 						for button in ar:
-							founddata.append(button)
+							save_button_cache.append(button)
 							driver_store["SAVE_BUTTONS"].append(button.duplicate(true))
 						
-						file.open(save_menu_file,File.WRITE)
-						file.store_string(JSON.print(founddata))
-						file.close()
 					"ADD_SHIPS.gd":
 						for ar in constants:
 							var ac : Dictionary = constants[ar]
@@ -3094,40 +3001,28 @@ class _Equipment:
 							for v in ac:
 								driver_store["REGISTER_SHIP_NUMERICS"][ar].append({v:ac[v].duplicate(true)})
 					"MODIFY_SHIP_NUMERICS.gd":
-						file.open(modify_ship_numerics_store,File.READ)
-						var pfdata : Dictionary = JSON.parse(file.get_as_text()).result
-						file.close()
 						for item in constants:
 							var di : Dictionary = constants[item]
 							var ship : String  = di.get("ship_name","")
 							if ship != "":
-								if not ship in pfdata:
-									pfdata[ship] = []
-								pfdata[ship].append(di)
-						file.open(modify_ship_numerics_store,File.WRITE)
-						file.store_string(JSON.print(pfdata))
-						file.close()
+								if not ship in modify_ship_numerics:
+									modify_ship_numerics[ship] = []
+								modify_ship_numerics[ship].append(di)
 					"NAMER.gd":
-						file.open(namer_store,File.READ)
-						var pfdata : Dictionary = JSON.parse(file.get_as_text()).result
-						file.close()
+						
 						if "CREW" in constants:
 							var d : Array = constants["CREW"]
-							pfdata["crew"].append_array(d)
+							namer_store["crew"].append_array(d)
 						
 						if "SHIPS" in constants:
 							var d : Array = constants["SHIPS"]
-							pfdata["ships"].append_array(d)
+							namer_store["ships"].append_array(d)
 						
-						file.open(namer_store,File.WRITE)
-						file.store_string(JSON.print(pfdata))
-						file.close()
-					
-					
+						
 		add_ships_store = driver_store["ADD_SHIPS"]
 		register_ship_numerics_store = driver_store["REGISTER_SHIP_NUMERICS"]
 		
-		file.open(storage_for_driver_store,File.WRITE)
+		file.open("user://cache/.HevLib_Cache/Driver_Store.json",File.WRITE)
 		file.store_string(JSON.print(driver_store))
 		file.close()
 		
@@ -3502,19 +3397,15 @@ class _Equipment:
 				weaponslot_string = weaponslot_string + "\n" + dp[0] + " = " + dp[1]
 		
 		for data in driver_store["AUX_POWER_AND_THRUSTERS"]:
-			file.open(auxslot_data_path,File.READ)
-			var a : Dictionary = JSON.parse(file.get_as_text()).result
-			file.close()
+			
 			var equipSlots : Array = data.get("slots",[])
 			for slot in equipSlots:
 				slot = slot.split(".")[0]
-				if not slot in a:
-					a.merge({slot:[]})
-				a[slot].append(data)
+				if not slot in auxslot_data:
+					auxslot_data.merge({slot:[]})
+				auxslot_data[slot].append(data)
 			
-			file.open(auxslot_data_path,File.WRITE)
-			file.store_string(JSON.print(a))
-			file.close()
+			
 			var aux_path : String  = data.get("path","")
 			var aux_type : String  = data.get("type","MPDG").to_upper()
 			match aux_type:
@@ -3527,7 +3418,7 @@ class _Equipment:
 					if aux_path != "":
 						continue
 					var sys : String = data.get("system","SYSTEM_NAME_MISSING")
-					var auxTypePath : String = exhaust_cache_path + "/" + aux_type
+					var auxTypePath : String = exhaust_cache_path + aux_type
 					
 					pointers.FolderAccess.__check_folder_exists(auxTypePath)
 					
@@ -3620,7 +3511,7 @@ class _Equipment:
 	
 	
 	func make_thruster_scene(data,sys,aux_type,exhaust_cache_path) -> String:
-		var this_sys_path : String = exhaust_cache_path + "/" + aux_type + "/" + sys
+		var this_sys_path : String = exhaust_cache_path + aux_type + "/" + sys
 		
 		var cached_exhaust_path : String = this_sys_path + "_exhaust.tscn"
 		var cached_thruster_path : String = this_sys_path + "_thruster.tscn"
@@ -5670,6 +5561,7 @@ class _ManifestV2:
 	
 	var file:File = File.new()
 	
+	var zip_ref_store : Dictionary = {}
 	var cached_mod_list : Dictionary = {}
 	
 	func __get_mod_data(print_json: bool = false):
@@ -5886,12 +5778,7 @@ class _ManifestV2:
 		if mod_main_path in cached_zip_refs:
 			return cached_zip_refs[mod_main_path]
 		else:
-			var zip_ref_store : String = "user://cache/.HevLib_Cache/zip_ref_store.json"
-			var file:File = File.new()
-			file.open(zip_ref_store,File.READ)
-			var data : Dictionary = JSON.parse(file.get_as_text()).result
-			file.close()
-			var return_val : String = data.get(mod_main_path,"")
+			var return_val : String = zip_ref_store.get(mod_main_path,"")
 			cached_zip_refs[mod_main_path] = return_val
 			return return_val
 	
@@ -7725,8 +7612,8 @@ class _Scripting:
 	var file:File = File.new()
 	
 	func make_mineral_scripting():
-		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Minerals/mineral_store/")
-		for f in pointers.FolderAccess.__fetch_folder_files("user://cache/.HevLib_Cache/Minerals/mineral_store/",true,true):
+		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Minerals/")
+		for f in pointers.FolderAccess.__fetch_folder_files("user://cache/.HevLib_Cache/Minerals/",true,true):
 			pointers.FolderAccess.__recursive_delete(f)
 		var version = pointers.DataFormat.__get_vanilla_version()
 		pointers.l("observed game version of %s.%s.%s" % [version[0],version[1],version[2]],"pointers.Scripting")
@@ -7852,7 +7739,7 @@ class _Scripting:
 						if "ferrous" in info:
 							ferrous = info["ferrous"]
 						var purityInfo:Dictionary = info.get("purity",{})
-						var folder:String = "user://cache/.HevLib_Cache/Minerals/mineral_store/%s-%s/" % [mname,str(int(color.r*255)) + str(int(color.g*255)) + str(int(color.b*255))]
+						var folder:String = "user://cache/.HevLib_Cache/Minerals/%s-%s/" % [mname,str(int(color.r*255)) + str(int(color.g*255)) + str(int(color.b*255))]
 						
 						
 						var specific_data:Dictionary = info.get("specific_ore_data",{})

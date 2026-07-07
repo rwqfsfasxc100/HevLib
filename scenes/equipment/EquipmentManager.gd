@@ -50,19 +50,12 @@ func display_slots() -> Array:
 			list.append(child)
 	return list
 
-var slot_order_cache_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order.json"
-var slot_order_relative_file = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/slot_order_relative.json"
 func reorganize_slots():
 	var slot_names = []
 	var slot_types = {}
 	var slot_types_i = {}
-	var f = File.new()
-	f.open(slot_order_cache_file,File.READ)
-	var order = JSON.parse(f.get_as_text(true)).result
-	f.close()
-	f.open(slot_order_relative_file,File.READ)
-	var order2 = JSON.parse(f.get_as_text(true)).result
-	f.close()
+	var order = pointers.Equipment.equipment_slot_order
+	var order2 = pointers.Equipment.relative_equipment_slot_order
 	var slotnames = []
 	for slot in get_children():
 		slotnames.append(slot.name)

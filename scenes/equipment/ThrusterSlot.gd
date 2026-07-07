@@ -1,10 +1,7 @@
 extends "res://ships/modules/ThrusterSlot.gd"
 
-var auxslot_save_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/AuxSlot.json"
-var exhaust_cache_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/Exhaust_Cache"
-var color_cache_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/ships/ship_thruster_colors.json"
+var exhaust_cache_path = "user://cache/.HevLib_Cache/AuxAndThrusterDriver/"
 var flare
-var file = File.new()
 var mpdg = "res://ships/modules/AuxMpd.tscn"
 var smes = "res://ships/modules/AuxSmes.tscn"
 var aux_hybrid = "res://HevLib/scenes/equipment/custom_equipment/AuxHybrid.tscn"
@@ -52,9 +49,7 @@ func loadPlaceholder():
 	.loadPlaceholder()
 #	yield(get_tree(),"idle_frame")
 func hl_thrusterslot_modify():
-	file.open(auxslot_save_path,File.READ)
-	var datastore = JSON.parse(file.get_as_text()).result
-	file.close()
+	var datastore = itsPointers.Equipment.auxslot_data
 	shipName = ship.shipName
 	baseShipName = ship.baseShipName
 	var slotType = type.split(".")[0]
@@ -91,7 +86,7 @@ func hl_thrusterslot_modify():
 						"AUX_HYBRID":
 							item = load(aux_hybrid).instance()
 						"RCS","TORCH":
-							var thrusterScene = exhaust_cache_path + "/" + aux_type + "/" + sys + "_thruster.tscn"
+							var thrusterScene = exhaust_cache_path + aux_type + "/" + sys + "_thruster.tscn"
 							if itsPointers.DataFormat.__load_if_can(thrusterScene):
 								item = itsPointers.DataFormat.__get_load().instance()
 							else:
@@ -277,9 +272,8 @@ func hl_thrusterslot_modify_nozzle(nozzleA,nd):
 			nozzleA.scale = Vector2(rs[0],rs[1])
 
 func hl_thrusterslot_get_colors():
-	file.open(color_cache_path,File.READ)
-	var color_data = JSON.parse(file.get_as_text()).result
-	file.close()
+	
+	var color_data = ModLoader._savedObjects[0].Equipment.ship_thruster_colors
 	
 	for i in color_data:
 		var d = color_data[i]

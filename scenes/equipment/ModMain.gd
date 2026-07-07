@@ -36,8 +36,6 @@ var ringscene_path = "user://cache/.HevLib_Cache/Minerals/TheRing.tscn"
 
 var cache_dir = "user://cache/.HevLib_Cache"
 
-var ship_driver_path = "user://cache/.HevLib_Cache/ShipDriver/"
-
 var checksum = "user://cache/.HevLib_Cache/checksums"
 
 var f = File.new()
@@ -57,13 +55,9 @@ func _init(modLoader : ModLoader = ModLoader):
 		else:
 			modLoader._savedObjects.append(pointers)
 		l("Initializing Equipment Driver")
+		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/")
 		var variables_folder = "user://cache/.HevLib_Cache/Variable_Fetch/"
 		d.make_dir_recursive(variables_folder)
-		if not d.dir_exists(deviceinfostore):
-			d.make_dir_recursive(deviceinfostore)
-		f.open(deviceinfocache,File.WRITE)
-		f.store_string("")
-		f.close()
 		pointers.equipment_modmain = self
 		pointers.FileAccess.__load_precached_mods()
 		
@@ -204,13 +198,7 @@ func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
 	var line = "%s V%s" % [title, version]
 	pointers.l(msg,line)
 
-var deviceinfostore:String = "user://cache/.HevLib_Cache/logs/"
-var deviceinfocache:String = deviceinfostore + "pointer_logs.txt"
 func match_mod_path_to_zip():
-	var zip_ref_store = "user://cache/.HevLib_Cache/zip_ref_store.json"
-	f.open(zip_ref_store,File.WRITE)
-	f.store_string("{}")
-	f.close()
 	var _modZipFiles = []
 	var zipModMainCache = {}
 	var gameInstallDirectory = OS.get_executable_path().get_base_dir()
@@ -248,9 +236,7 @@ func match_mod_path_to_zip():
 			if modGlobalPath.to_lower() in modFiles:
 				var zipName = modFSPath.split("/")[modFSPath.split("/").size() - 1]
 				zipModMainCache[modGlobalPath] = modFSPath
-	f.open(zip_ref_store,File.WRITE)
-	f.store_string(JSON.print(zipModMainCache))
-	f.close()
+	pointers.ManifestV2.zip_ref_store = zipModMainCache
 	
 
 

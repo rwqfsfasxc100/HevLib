@@ -18,20 +18,6 @@ var registered_text = "TEMPLATE"
 
 onready var popup_container = get_parent().get_parent()
 
-#var can_draw
-
-#func _ready():
-#	yield(get_tree(),"idle_frame")
-#	var screen = get_viewport().size
-#
-#	var size = $NoMargins.rect_size
-#
-#	var x = (screen.x - size.x)/2
-#	var y = (screen.y - size.y)/2
-#	var pos = Vector2(x,y)
-##	breakpoint
-#	$NoMargins.rect_position = pos - self.rect_position
-
 func _process(delta):
 	var screen = get_viewport().size
 
@@ -40,7 +26,6 @@ func _process(delta):
 	var x = (screen.x - size.x)/2
 	var y = (screen.y - size.y)/2
 	var pos = Vector2(x,y)
-#	breakpoint
 	$NoMargins.rect_position = pos - self.rect_position
 	
 
@@ -57,8 +42,7 @@ var connections = {
 }
 
 var tt_label = preload("res://menu/sfx/PlaySoundsOnTheseButtons.tscn")
-var menu_folder = "user://cache/.HevLib_Cache/MenuDriver/"
-var save_menu_file = menu_folder + "save_buttons.json"
+
 func create():
 	var buttons = [{
 		"display_name":"CONFIRM_OVERRIDE_GAME",
@@ -67,11 +51,7 @@ func create():
 		"connect_method":"_on_DELETE_SAVE_pressed",
 		"enable_on_save":true,
 	}]
-	var file = File.new()
-	file.open(save_menu_file,File.READ)
-	buttons.append_array(JSON.parse(file.get_as_text(true)).result)
-	file.close()
-#	breakpoint
+	buttons.append_array(ModLoader._savedObjects[0].Equipment.save_button_cache)
 	for button in buttons:
 		var BUTTON = Button.new()
 		var displayname = button.get("display_name","MISSING_BUTTON_NAME")
@@ -105,9 +85,6 @@ func create():
 			enable_on_save_buttons.append(displayname)
 		BUTTON.connect("pressed",self,"cancel")
 		get_node("NoMargins/CenterContainer/TabHintContainer/TabsWithGamepadControl/HEVLIB_SAVE_OPTIONS/MarginContainer/MarginContainer/ScrollContainer/VBoxContainer").add_child(BUTTON)
-		
-		
-#	breakpoint
 
 func _about_to_show():
 	if first_time:
@@ -121,8 +98,6 @@ func _about_to_show():
 	var button_container = get_node("NoMargins/CenterContainer/TabHintContainer/TabsWithGamepadControl/" + registered_text + "/MarginContainer/MarginContainer/ScrollContainer/VBoxContainer")
 	for button in enable_on_save_buttons:
 		var slot = button_container.get_node(button)
-		
-#	var slot = /DELETE_SAVE")
 		slot.disabled = !slot_available
 		slot.modulate = delete_color
 

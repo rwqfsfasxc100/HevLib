@@ -2,7 +2,6 @@ extends "res://CurrentGame.gd"
 
 var pointersShipDriver
 var modded_ship_list = []
-var ship_driver_path = "user://cache/.HevLib_Cache/ShipDriver/"
 
 var added_modded_ships = false
 
@@ -72,4 +71,4 @@ func initialize_scrapwright(arr:Array):
 							var id = salv[i]
 							scrap_concat += scrap_entry % [i,id.get("poi_name","POI_SALVAGE"),dname]
 	if scrap_concat:
-		pointersShipDriver.DataFormat.__replace_scene(scrap_header + scrap_concat,"res://comms/conversation/SalvageBanter.tscn",ship_driver_path + "salvage_banter_extension.tscn")
+		pointersShipDriver.DataFormat.__replace_scene(scrap_header + scrap_concat,"res://comms/conversation/SalvageBanter.tscn")

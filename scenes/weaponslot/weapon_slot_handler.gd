@@ -5,11 +5,9 @@ var pointers
 var shipName = ""
 var baseShipName = ""
 
-var this_file = ""
-
-var this_modification = []
-var this_addition = {}
-var this_template = []
+var hl_weaponslot_modification = []
+var hl_weaponslot_addition = {}
+var hl_weaponslot_template = []
 
 var c
 
@@ -158,7 +156,7 @@ func _ready():
 				modStore["modification"].append(this)
 				break
 		completed["modification"] = true
-	this_modification = modStore["modification"]
+	hl_weaponslot_modification = modStore["modification"]
 	if not completed["addition"]:
 		for item in pointers.Equipment.ws_stuff_to_add:
 			var iname = item.get("name")
@@ -179,7 +177,7 @@ func _ready():
 				modStore["addition"] = this
 				break
 		completed["addition"] = true
-	this_addition = modStore["addition"]
+	hl_weaponslot_addition = modStore["addition"]
 	if not completed["template"]:
 		if c in equipment_templates:
 			var d = equipment_templates[c]
@@ -187,7 +185,7 @@ func _ready():
 				var s = [i,pointers.DataFormat.__convert_var_from_string(d[i])]
 				modStore["template"].append(s)
 		completed["template"] = true
-	this_template = modStore["template"]
+	hl_weaponslot_template = modStore["template"]
 
 func loadPlaceholder():
 	var t = "weaponSlot.%s.type" % slot
@@ -198,11 +196,11 @@ func loadPlaceholder():
 		else:
 			key = t + "_" + mounted
 		if placeholder.has_method("replace_by_instance"):
-			for i in this_template:
+			for i in hl_weaponslot_template:
 				var d = i[0]
 				var g = i[1]
 				placeholder[d] = g
-			for f in this_modification:
+			for f in hl_weaponslot_modification:
 				var data = f.get("data",{})
 				for nodepath in data:
 					var o = data[nodepath]
@@ -219,8 +217,8 @@ func loadPlaceholder():
 		if "slotName" in system:
 			system.slotName = t + "_" + system.systemName
 	else:
-		var path = this_addition.get("path","")
-		if not pointers.ConfigDriver.__validate_dictionary(this_addition):
+		var path = hl_weaponslot_addition.get("path","")
+		if not pointers.ConfigDriver.__validate_dictionary(hl_weaponslot_addition):
 			path = ""
 		
 		
@@ -230,7 +228,7 @@ func loadPlaceholder():
 				key = name + "_" + mounted
 			else:
 				key = t + "_" + mounted
-			var data = this_addition.get("data",{})
+			var data = hl_weaponslot_addition.get("data",{})
 			for nodepath in data:
 				var o = data[nodepath]
 				var np = pv.get_node_or_null(nodepath)
@@ -239,11 +237,11 @@ func loadPlaceholder():
 						var d = i[0]
 						var g = i[1]
 						np[d] = g
-			for i in this_template:
+			for i in hl_weaponslot_template:
 				var d = i[0]
 				var g = i[1]
 				pv[d] = g
-			for f in this_modification:
+			for f in hl_weaponslot_modification:
 				var db = f.get("data",{})
 				for nodepath in db:
 					var o = db[nodepath]
