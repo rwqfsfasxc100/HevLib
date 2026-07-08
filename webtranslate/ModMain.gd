@@ -30,11 +30,7 @@ func _ready():
 	if correct:
 		yield(Debug.get_tree(),"idle_frame")
 		l("Device Information: [\n%s\n]" % get_device_info())
-		var base = TranslationServer.translate("SYSTEM_AMMO_10000_DESC")
-		var rgx = RegEx.new()
-		rgx.compile("[a-z1-9]")
-		var found = rgx.search(TranslationServer.translate("SYSTEM_AMMO_10000_DESC"))
-		if not found:
+		if TranslationServer.translate("SYSTEM_AMMO_10000_DESC") == "SYSTEM_AMMO_10000_DESC":
 			l("Translations did not get initialized, queued exit for 200 seconds to preserve report-ready state")
 			var timer = Tool.makeTimer(2000, pointers)
 			timer.connect("timeout",pointers.NodeAccess,"__exit")
