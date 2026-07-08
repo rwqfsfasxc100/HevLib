@@ -76,7 +76,7 @@ func request_event(oddity,event):
 	file.close()
 
 func getOddityAt(pos: Vector2):
-	if mod_requested_events.size() > 0:
+	if mod_requested_events:
 		return mod_requested_events.pop_front()
 	return .getOddityAt(pos)
 
@@ -89,13 +89,17 @@ func oddity_spawning(nearby, oddity):
 		for o in oddity:
 			if not nearby in group:
 				group[nearby] = []
-			group[nearby].append(o)
-			all_oddities.append(o)
+			if not oddity in group[nearby]:
+				group[nearby].append(oddity)
+			if not oddity in all_oddities:
+				all_oddities.append(oddity)
 	else:
 		if not nearby in group:
 			group[nearby] = []
-		group[nearby].append(oddity)
-		all_oddities.append(oddity)
+		if not oddity in group[nearby]:
+			group[nearby].append(oddity)
+		if not oddity in all_oddities:
+			all_oddities.append(oddity)
 
 func enterNearby(what, id):
 	if not what in current_event_log:
