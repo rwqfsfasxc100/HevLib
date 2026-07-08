@@ -4617,7 +4617,6 @@ class _FolderAccess:
 		if not directory.dir_exists(folder):
 			return []
 		directory.open(folder)
-		var dirName : String = directory.get_current_dir()
 		directory.list_dir_begin(true)
 		while true:
 			var fileName : String = directory.get_next()
@@ -4627,8 +4626,7 @@ class _FolderAccess:
 			if fileName == "." or fileName == "..":
 				capture = false
 			if capture:
-				dirName = directory.get_current_dir()
-				if fileName == "":
+				if not fileName:
 					break
 				if directory.current_is_dir():
 					if not showFolders:
