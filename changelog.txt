@@ -1,3 +1,10 @@
+[1.14.24]
+
+1=* Improved the cleanliness of the code handling save slot buttons
+2=* The save options menu should now load a little faster when using some buttons with a heavier amount of data being processed
+3=* Added missing support for the Obonto LRPR
+4=* Removed old code for modifications to the menu tooltips
+
 [1.14.23]
 
 1=* Having the EventDriver menu open now completely freezes the ship's camera in place
