@@ -5479,6 +5479,10 @@ class _ManifestV2:
 	var zip_ref_store : Dictionary = {}
 	var cached_mod_list : Dictionary = {}
 	
+	var haveModsChanged:bool = false
+	var currentModHash:int = 0
+	var lastModHash:int = 0
+	
 	func __get_mod_data(print_json: bool = false):
 		if not cached_mod_list.empty():
 			if print_json:
@@ -5538,6 +5542,19 @@ class _ManifestV2:
 			var statistics : Dictionary = {"counts":stat_count,"tags":stat_tags}
 			var returnValues : Dictionary = {"mods":mod_dictionary,"statistics":statistics}
 			cached_mod_list = returnValues.duplicate(true)
+			if not currentModHash:
+				file.open("user://cache/.Mod_Menu_2_Cache/updates/current_hash.txt",File.READ)
+				lastModHash = int(file.get_as_text())
+				file.close()
+				currentModHash = hash(cached_mod_list)
+				file.open("user://cache/.Mod_Menu_2_Cache/updates/current_hash.txt",File.WRITE)
+				file.store_string(str(currentModHash))
+				file.close()
+				file.open("user://cache/.Mod_Menu_2_Cache/updates/last_hash.txt",File.WRITE)
+				file.store_string(str(lastModHash))
+				file.close()
+				if currentModHash != lastModHash:
+					haveModsChanged = true
 			if print_json:
 				var psj : String = JSON.print(cached_mod_list, "\t")
 				return psj
@@ -6341,6 +6358,8 @@ class _ManifestV2:
 		return tag_dict
 	
 	func __have_mods_updated(folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",last_seen_file = "mods_from_last_launch.json") -> Dictionary:
+		if not haveModsChanged:
+			return {}
 		if not folder.ends_with("/"):
 			folder = folder + "/"
 		if last_seen_file.begins_with("/"):
