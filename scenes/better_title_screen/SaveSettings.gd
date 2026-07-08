@@ -1,40 +1,36 @@
 extends Popup
 
-var first_time = true
+var first_time:bool = true
 
-var save_slot_file = "user://savegame.dv"
+var save_slot_file:String = "user://savegame.dv"
 
-var delete_color = Color(1,1,1,1)
+var delete_color:Color = Color(1,1,1,1)
 
-var slot_available = true
+var slot_available:bool = true
 
 var sender
 
-var display_text = "TEMPLATE"
+var display_text:String = "TEMPLATE"
 
-var index = 0
+var index:int = 0
 
-var registered_text = "TEMPLATE"
+var registered_text:String = "TEMPLATE"
 
 onready var popup_container = get_parent().get_parent()
 
 func _process(delta):
-	var screen = get_viewport().size
-
-	var size = $NoMargins.rect_size
-
-	var x = (screen.x - size.x)/2
-	var y = (screen.y - size.y)/2
-	var pos = Vector2(x,y)
+	var screen:Vector2 = get_viewport().size
+	var size:Vector2 = $NoMargins.rect_size
+	var pos:Vector2 = Vector2((screen.x - size.x)/2,(screen.y - size.y)/2)
 	$NoMargins.rect_position = pos - self.rect_position
 	
 
 func cancel():
 	hide()
 
-var enable_on_save_buttons = []
+var enable_on_save_buttons:Array = []
 
-var connections = {
+var connections:Dictionary = {
 	"POPUP_ROOT":[],
 	"SAVE_BUTTON":[],
 	"ADDITIONAL":[],
@@ -44,7 +40,7 @@ var connections = {
 var tt_label = preload("res://menu/sfx/PlaySoundsOnTheseButtons.tscn")
 
 func create():
-	var buttons = [{
+	var buttons:Array = [{
 		"display_name":"CONFIRM_OVERRIDE_GAME",
 		"popup_path":null,
 		"popup_override":"POPUP_ROOT", # "POPUP_ROOT" for menu root node, "SAVE_BUTTON" for obv save button
@@ -53,17 +49,17 @@ func create():
 	}]
 	buttons.append_array(ModLoader._savedObjects[0].Equipment.save_button_cache)
 	for button in buttons:
-		var BUTTON = Button.new()
-		var displayname = button.get("display_name","MISSING_BUTTON_NAME")
-		var tooltip = button.get("tooltip","")
+		var BUTTON:Button = Button.new()
+		var displayname:String = button.get("display_name","MISSING_BUTTON_NAME")
+		var tooltip:String = button.get("tooltip","")
 		BUTTON.name = displayname
 		BUTTON.text = displayname
 		if tooltip:
 			BUTTON.hint_tooltip = tooltip
 			BUTTON.add_child(tt_label.instance())
-		var popup_path = button.get("popup_path")
-		var method = button.get("connect_method","_on_save_option_button_pressed")
-		if popup_path == "" or popup_path == null:
+		var popup_path:String = button.get("popup_path")
+		var method:String = button.get("connect_method","_on_save_option_button_pressed")
+		if not popup_path:
 			match button.get("popup_override"):
 				"POPUP_ROOT":
 					BUTTON.connect("pressed",self,method)
@@ -80,8 +76,7 @@ func create():
 				BUTTON.connect("pressed",popup,method)
 				connections["GENERIC"].append({BUTTON:["pressed",popup,method]})
 			popup_container.call_deferred("add_child",popup)
-		var enable_on_save = button.get("enable_on_save",false)
-		if enable_on_save:
+		if button.get("enable_on_save",false):
 			enable_on_save_buttons.append(displayname)
 		BUTTON.connect("pressed",self,"cancel")
 		get_node("NoMargins/CenterContainer/TabHintContainer/TabsWithGamepadControl/HEVLIB_SAVE_OPTIONS/MarginContainer/MarginContainer/ScrollContainer/VBoxContainer").add_child(BUTTON)
@@ -92,8 +87,8 @@ func _about_to_show():
 		first_time = false
 	else:
 		reconnect()
-	var alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","1","2","3","4","5","6","7","8","9","10"]
-	registered_text = TranslationServer.translate(display_text) + " - " + TranslationServer.translate("HEVLIB_SLOT") + " " + alphabet[index/2]
+	var alphabet = PoolStringArray(["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","1","2","3","4","5","6","7","8","9","10"])
+	registered_text = TranslationServer.translate(display_text) + " - " + TranslationServer.translate("HEVLIB_SLOT") + " " + alphabet[float(index)/2]
 	$NoMargins/CenterContainer/TabHintContainer/TabsWithGamepadControl.get_child(0).name = registered_text
 	var button_container = get_node("NoMargins/CenterContainer/TabHintContainer/TabsWithGamepadControl/" + registered_text + "/MarginContainer/MarginContainer/ScrollContainer/VBoxContainer")
 	for button in enable_on_save_buttons:
