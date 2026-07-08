@@ -1,3 +1,17 @@
+[1.14.23]
+
+1=* Having the EventDriver menu open now completely freezes the ship's camera in place
+2=* EventDriver opening/closing can now be observed with a `eventDriverVisibilityChanged` connection to CurrentGame, which reduces the amount of per-frame processing
+3=* Made EventDriver ring handling statically typed where possible, which should improve it's performance
+4=* Removed old EventDriver code that is no longer used for spawning and cleaned up code within the ring script
+5=* Events spawned through EventDriver now no longer double register for spawning
+6=* Clearing events with the EventDriver menu now properly ensure any related POIs are cleared, if that option is enabled.
+7=* Improved efficiency of FolderAccess.__fetch_folder_files
+8=* Timer to close the game from a failed translation check was an order of magnitude longer than it was supposed to be. Now only takes 2 and a half minutes instead of 33.
+9=* Fixed regression of the translation checker system that could cause a crash
+10=* Removed final parts to the old custom UI handles
+10.1=* It wasn't something worth using over Godot's scene system, and it's code has been untouched in well over a year
+
 [1.14.22]
 
 1=* Saving of the current installed mods cache now only happens if a crash is detected
