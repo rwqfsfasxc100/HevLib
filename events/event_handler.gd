@@ -47,8 +47,8 @@ func spawn_event(event : String,thering : Node,parameters : Dictionary = {}):
 					
 					var randomOddityKey = ""
 					if oddity:
-						if ring.has_method("oddity_spawning"):
-							ring.oddity_spawning(event, oddity)
+#						if ring.has_method("oddity_spawning"):
+#							ring.oddity_spawning(event, oddity)
 						ring.addNearbyOddity(event, oddity, pos)
 						if oddity is Array:
 							for o in oddity:
