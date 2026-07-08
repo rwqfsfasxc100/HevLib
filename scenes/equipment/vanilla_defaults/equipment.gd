@@ -1132,3 +1132,10 @@ const RECON_GUIDING = {
 	"slot_type":"RECON_DRONE",
 	"equipment_type":"SENSOR_RECON_DRONE"
 }
+const SYSTEM_LIDAR_RADAR_CONE = {
+	"system":"SYSTEM_LIDAR_RADAR_CONE",
+	"price":37500,
+	"test_protocol":"lidar",
+	"slot_type":"LIDAR",
+	"equipment_type":"SENSOR_LIDAR"
+}
