@@ -6,32 +6,32 @@ onready var menu_path = popup_path.get_node("Popups/SaveSettings")
 
 onready var delete_path = popup_path.get_node("Popups/Override")
 
-var password = "FTWOMG"
+var password:String = "FTWOMG"
 
 var foolish
 
-var val = 0.0
+var val:float = 0.0
 
-var first_time = true
+var first_time:bool = true
 
-var delete_color = Color(1,1,1,1)
+var delete_color:Color = Color(1,1,1,1)
 
-var slot_available = true
+var slot_available:bool = true
 
-var display_text = ""
+var display_text:String = ""
 
-var index = 0
+var index:int = 0
 
 func _ready():
 	var foolish = load("res://menu/Foolish.tscn").instance()
 	foolish.name = "Foolish"
 	add_child(foolish)
-	var box = HBoxContainer.new()
+	var box:HBoxContainer = HBoxContainer.new()
 	box.alignment = BoxContainer.ALIGN_CENTER
 	box.rect_size = Vector2(64,41)
 	box.name = "HBoxContainer"
-	var texture = TextureRect.new()
-	var stream = StreamTexture.new()
+	var texture:TextureRect = TextureRect.new()
+	var stream:StreamTexture = StreamTexture.new()
 	stream.load_path = "res://HevLib/ui/themes/icons/config_icon.stex"
 	stream.flags = 4
 	texture.texture = stream
@@ -64,22 +64,18 @@ func _physics_process(delta):
 		val = 0.0
 		if is_visible_in_tree():
 			checkSave()
-#		breakpoint
 
-var standHash = 0
+var standHash:int = 0
 
-var has_save = false
+var has_save:bool = false
 
-var file = File.new()
+var file:File = File.new()
 func checkSave(force = false):
-#	var mpm = getDataFromSave(saveSlotFile)
-	var does = false
-	
-	var check = file.file_exists(saveSlotFile)
-	if check:
+	var does:bool = false
+	if file.file_exists(saveSlotFile):
 		has_save = true
 		file.open_encrypted_with_pass(saveSlotFile,File.READ,password)
-		var _hash = file.get_as_text(true).hash()
+		var _hash:int = hash(file.get_as_text(true))
 		file.close()
 		if _hash != standHash:
 			does = true
@@ -90,9 +86,7 @@ func checkSave(force = false):
 	if does or force:
 		if has_save:
 			meta = getMetaFromSave(saveSlotFile)
-			if meta == null:
-				pass
-			else:
+			if meta != null:
 				var demoLimit = CurrentGame.getGameStartTime() + 24 * 3600 * 30 * 256
 				text = "%s %s" % [meta.transponder, meta.name]
 				if false and (CurrentGame.isDemo() and meta.gameTime > demoLimit):
@@ -104,16 +98,13 @@ func checkSave(force = false):
 				else:
 					slot_available = true
 					delete_color = Color(1, 1, 1, 1)
-				var model_error = TranslationServer.translate("HEVLIB_INCORRECT_SHIP")
-				if meta.model in Shipyard.ships.keys():
+				if meta.model in Shipyard.ships:
 					$Foolish.visible = false
 					hint_tooltip = ""
-		#			foolish.hint_tooltip = ""
 					disabled = false
 				else:
 					$Foolish.visible = true
-					hint_tooltip = model_error % meta.model
-		#			foolish.hint_tooltip = model_error % meta.model
+					hint_tooltip = TranslationServer.translate("HEVLIB_INCORRECT_SHIP") % meta.model
 					disabled = true
 		else:
 			slot_available = false
@@ -128,7 +119,7 @@ func checkSave(force = false):
 	first_time = false
 	
 	display_text = text
-	if display_text == "":
+	if not display_text:
 		display_text = newText
 
 func check_focus():
@@ -146,8 +137,7 @@ func newSave():
 	
 
 func _pressed():
-	var exists = file.file_exists(saveSlotFile)
-	if exists:
+	if file.file_exists(saveSlotFile):
 		Debug.l("pressed %s" % saveSlotFile)
 		CurrentGame.saveFile = saveSlotFile
 		emit_signal("continueGame")
@@ -156,14 +146,7 @@ func _pressed():
 		CurrentGame.saveFile = saveSlotFile
 		get_node("../../../../../NoMargins/NewGamePlus").popup_centered()
 
-#func _unhandled_input(event):
-#	if first:
-#		if event.is_action("ui_accept") or event.is_action("ui_cancel"):
-#			if get_focus_owner() == null:
-#				grab_focus()
-
 func _new():
-	
 	menu_path.save_slot_file = saveSlotFile
 	menu_path.delete_color = delete_color
 	menu_path.slot_available = slot_available
@@ -175,22 +158,21 @@ func _new():
 
 
 
-func getMetaFromSave(file):
-	var f = File.new()
-	if f.file_exists(file):
-		f.open_encrypted_with_pass(file, File.READ, password)
-		var sg = f.get_line()
-		var savedState = parse_json(sg)
-		f.close()
-		var transponder = savedState.ship.transponder
+func getMetaFromSave(file_name):
+	if file.file_exists(file_name):
+		file.open_encrypted_with_pass(file_name, File.READ, password)
+		var sg:String = file.get_line()
+		var savedState:Dictionary = parse_json(sg)
+		file.close()
+		var transponder:String = savedState.ship.transponder
 		if "shipNames" in savedState:
-			var shipName = savedState.shipNames[transponder]
-			var model = savedState.ship.model
+			var shipName:String = savedState.shipNames[transponder]
+			var model:String = savedState.ship.model
 			return {
 				"transponder": transponder, 
 				"name": shipName, 
 				"gameTime": savedState.time, 
-				"time": f.get_modified_time(file),
+				"time": file.get_modified_time(file_name),
 				"model": model
 			}
 		else:
@@ -198,12 +180,11 @@ func getMetaFromSave(file):
 	else:
 		return null
 
-func getDataFromSave(file):
-	var f = File.new()
-	if f.file_exists(file):
-		f.open_encrypted_with_pass(file, File.READ, password)
-		var sg = f.get_line()
-		var savedState = parse_json(sg)
-		f.close()
+func getDataFromSave(file_name):
+	if file.file_exists(file_name):
+		file.open_encrypted_with_pass(file_name, File.READ, password)
+		var sg:String = file.get_line()
+		var savedState:Dictionary = parse_json(sg)
+		file.close()
 		return savedState
 	return {}
