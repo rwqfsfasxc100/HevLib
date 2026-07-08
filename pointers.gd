@@ -190,8 +190,6 @@ class _Achievements:
 	func ready():
 		get_current_achievements()
 		requestSteamStats()
-#		yield(http,"request_completed")
-#		http.request("https://publicactiontrigger.azurewebsites.net/api/dispatches/rwqfsfasxc100/dv-database",[],true,HTTPClient.METHOD_POST,JSON.print({}))
 	
 	var steam_node = null
 	var steam_singleton = null
