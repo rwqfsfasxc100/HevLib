@@ -36,9 +36,10 @@ func clear_poi_for(globalPos : Vector2,this_event: String):
 	
 	var nearby = CurrentGame.getEventNear(CurrentGame.globalCoords(globalPos))
 	
-	if nearby and nearby.event == this_event:
+	while nearby and nearby.event == this_event:
 		var astro = CurrentGame.state.astrogation
 		for event in astro:
 			var ev = astro[event]
 			if ev.event == nearby.event and Vector2(ev.vector.x,ev.vector.y).distance_to(nearby.vector) < 2000:
 				CurrentGame.forgetPoi(event)
+		nearby = CurrentGame.getEventNear(CurrentGame.globalCoords(globalPos))
