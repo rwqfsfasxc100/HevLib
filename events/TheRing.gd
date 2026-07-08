@@ -2,37 +2,36 @@ extends "res://TheRing.gd"
 
 var pointers
 
-var cache_folder = "user://cache/.HevLib_Cache/"
+var cache_folder : String = "user://cache/.HevLib_Cache/"
 
-var current_event_log = {}
+var current_event_log : Dictionary = {}
 
-var group = {}
-var all_oddities = []
+var group : Dictionary = {}
+var all_oddities : Array = []
 
-var mod_requested_events = []
-var mod_request_log = {}
+var mod_requested_events : Array = []
+var mod_request_log : Dictionary = {}
 
-var base_playlist = []
-var disabled_events = null
+var base_playlist : Array = []
+var disabled_events : Array = []
 onready var dummy_event = load("res://HevLib/events/event_selector/DummyEvent.gd").new()
 func hl_ring_UV():
 	if pointers:
 		base_playlist = []
-		disabled_events = null
+		disabled_events.clear()
 		disabled_events = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
-		if disabled_events == null:
+		if not disabled_events:
 			pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
 			disabled_events = []
 		
-		var write_events = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","write_events")
+		var write_events:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","write_events")
 		for i in get_children():
 			base_playlist.append(i.name)
 		if write_events:
-			var string = {}
+			var string : Dictionary = {}
 			for event in base_playlist:
 				string[event] = not event in disabled_events
 			pointers.FolderAccess.__check_folder_exists(cache_folder)
-			var file = File.new()
 			file.open(cache_folder + "current_events.txt",File.WRITE)
 			file.store_string(JSON.print(string,"\t"))
 			file.close()
@@ -64,10 +63,10 @@ func request_event(oddity,event):
 			group[event] = []
 		group[event].append(oddity)
 		all_oddities.append(oddity)
-	var id = hash(oddity)
+	var id:int = hash(oddity)
 	if not event in mod_request_log:
 		mod_request_log.merge({event:{}})
-	var ctime = Time.get_datetime_string_from_system(true)
+	var ctime : String = Time.get_datetime_string_from_system(true)
 	if not id in mod_request_log[event]:
 		mod_request_log[event].merge({id:{}})
 	mod_request_log[event][id]["enter_time"] = ctime
@@ -104,7 +103,7 @@ func oddity_spawning(nearby, oddity):
 func enterNearby(what, id):
 	if not what in current_event_log:
 		current_event_log.merge({what:{}})
-	var ctime = Time.get_datetime_string_from_system(true)
+	var ctime : String = Time.get_datetime_string_from_system(true)
 	if not id in current_event_log[what]:
 		current_event_log[what].merge({id:{}})
 	current_event_log[what][id]["enter_time"] = ctime
@@ -116,7 +115,7 @@ func enterNearby(what, id):
 	.enterNearby(what,id)
 
 func exitNearby(what, id):
-	var ctime = Time.get_datetime_string_from_system(true)
+	var ctime : String = Time.get_datetime_string_from_system(true)
 	current_event_log[what][id]["exit_time"] = ctime
 	
 	logEvents()
@@ -130,37 +129,37 @@ func getNextOnPlaylist():
 	else:
 		return dummy_event
 
-var event_log_file = "user://cache/.HevLib_Cache/Event_Driver/event_log.json"
-var active_events_file = "user://cache/.HevLib_Cache/Event_Driver/active_events.txt"
-var latest_event_file = "user://cache/.HevLib_Cache/Event_Driver/latest_event.txt"
-var mod_request_file = "user://cache/.HevLib_Cache/Event_Driver/requested_events_from_mods.txt"
+var event_log_file : String = "user://cache/.HevLib_Cache/Event_Driver/event_log.json"
+var active_events_file : String = "user://cache/.HevLib_Cache/Event_Driver/active_events.txt"
+var latest_event_file : String = "user://cache/.HevLib_Cache/Event_Driver/latest_event.txt"
+var mod_request_file : String = "user://cache/.HevLib_Cache/Event_Driver/requested_events_from_mods.txt"
 func _exit_tree():
-	if current_event_log.size():
+	if current_event_log:
 		Debug.l("Ring exiting tree, active events log:\n\n%s\n" % [JSON.print(current_event_log,"\t")])
 	
-var file = File.new()
+var file:File = File.new()
 func logEvents():
 	file.open(event_log_file,File.WRITE)
 	file.store_string(JSON.print(current_event_log,"\t"))
 	file.close()
-	var current_events = []
-	var active_events = ""
-	var latest_event = ""
-	var latest_event_time = 0
+	var current_events : Array = []
+	var active_events : String = ""
+	var latest_event : String = ""
+	var latest_event_time:int = 0
 	for eventType in current_event_log:
-		var evt = current_event_log[eventType]
+		var evt : Dictionary = current_event_log[eventType]
 		for id in evt:
 			var entries = evt[id]
 			if not "exit_time" in entries and not eventType in current_events:
 				current_events.append(eventType)
-				var time = entries.get("enter_time",null)
+				var time : String = entries.get("enter_time","")
 				if time:
-					var actualTime = Time.get_unix_time_from_datetime_string(time)
+					var actualTime:int = Time.get_unix_time_from_datetime_string(time)
 					if actualTime > latest_event_time:
 						latest_event_time = actualTime
 						latest_event = eventType
 	file.open(latest_event_file,File.READ)
-	var currentLatest = file.get_as_text()
+	var currentLatest : String = file.get_as_text()
 	file.close()
 	if latest_event != currentLatest:
 		file.open(latest_event_file,File.WRITE)
@@ -204,15 +203,3 @@ func _ready():
 func wipe_lists():
 	group.clear()
 	all_oddities.clear()
-
-
-
-
-
-
-
-
-
-
-
-
