@@ -58,8 +58,6 @@ func spawn_event(event : String,thering : Node,parameters : Dictionary = {}):
 						ring.unspawnedOddities[randomOddityKey] = oddity
 						ring.unspawnedOdditiesLocation[randomOddityKey] = pos
 						Debug.n("HevLib EventDriver: force spawning oddity %s" % event)
-					
-		
 		busy = false
 		
 
