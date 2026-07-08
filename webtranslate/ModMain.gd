@@ -32,7 +32,7 @@ func _ready():
 		l("Device Information: [\n%s\n]" % get_device_info())
 		if TranslationServer.translate("SYSTEM_AMMO_10000_DESC") == "SYSTEM_AMMO_10000_DESC":
 			l("Translations did not get initialized, queued exit for 200 seconds to preserve report-ready state")
-			var timer = Tool.makeTimer(2000, pointers)
+			var timer = Tool.makeTimer(200, pointers)
 			timer.connect("timeout",pointers.NodeAccess,"__exit")
 var cache_extension = ".file_check_cache"
 
