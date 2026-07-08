@@ -1,3 +1,16 @@
+[1.14.22]
+
+1=* Saving of the current installed mods cache now only happens if a crash is detected
+2=* Stopped iterating through and storing information regarding the filesystem
+2.1=* This is only needed for running in-editor, which now uses a different check for filesystem access
+3=* Improved equipment caching
+3.1=* Moves nearly all caching from the `user://cache/` directory outside of scenes and a few other cases
+4=* If vanilla translations failed to load, added a ~2.5 minute window to open the bug reports link and/or update mods. 
+4.1=* MM2 translations should still be available.
+5=* Pointer logging now has a timestamp
+6=* Pointer logging now splits between multiple files, creating a new file every thousand write operations
+7=* Updated DataFormat.__array_to_string to use string concatenation instead of appending in a for loop
+
 [1.14.21]
 
 1=* Added sorting algorithm to mod menu's configuration display to implement `display_order_position` for manifests created using DVTools.
