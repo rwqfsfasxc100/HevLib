@@ -59,24 +59,9 @@ func spawn_event(event : String,thering : Node,parameters : Dictionary = {}):
 						ring.unspawnedOdditiesLocation[randomOddityKey] = pos
 						Debug.n("HevLib EventDriver: force spawning oddity %s" % event)
 					
-#					if oddity and ring.has_method("requestOdditySpawn"):
-#						if oddity is Array:
-#							for o in oddity:
-#								ring.requestOdditySpawn(o)
-#						else:
-#							ring.requestOdditySpawn(oddity)
 		
 		busy = false
 		
-		
-#		defaultOdditiesEvery = ring.odditiesEvery
-#		defaultTestSpecificStoryElement = ring.testSpecificStoryElement
-#		ring.odditiesEvery = 0.08
-#		ring.testSpecificStoryElement = event
-#		startEventTimerNode()
-
-
-
 
 func getPos(params : Dictionary):
 	
