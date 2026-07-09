@@ -5551,9 +5551,6 @@ class _ManifestV2:
 				file.open("user://cache/.Mod_Menu_2_Cache/updates/current_hash.txt",File.WRITE)
 				file.store_string(str(currentModHash))
 				file.close()
-				file.open("user://cache/.Mod_Menu_2_Cache/updates/last_hash.txt",File.WRITE)
-				file.store_string(str(lastModHash))
-				file.close()
 				if currentModHash != lastModHash:
 					haveModsChanged = true
 			if print_json:
