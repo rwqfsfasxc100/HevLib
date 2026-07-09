@@ -1,3 +1,12 @@
+[1.14.25]
+
+1=* Mod menu now hides displays for any information sections not used (i.e. author, credits, languages)
+2=* Added extra spacing for the supporters section within HevLib's credits
+3=* Re-added the property editor tool to the `development_tools` directory
+4=* MM2's title screen changelogs menu is now more reliable at displaying the correct information
+5=* Improved the efficiency of `ManifestV2`.`__have_mods_updated` to now only perform the full check when mods have actually changed
+6=* Added `ManifestV2`.`haveModsChanged` bool to provide an easy way to check if mods have changed, plus two hash variables (`currentModHash` & `lastModHash`) which can tell you if the changes have yet to be loaded
+
 [1.14.24]
 
 1=* Improved the cleanliness of the code handling save slot buttons
