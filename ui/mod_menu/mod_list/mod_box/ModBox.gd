@@ -103,8 +103,12 @@ func _pressed():
 	if author != "":
 		information_nodes["info_desc_author"].parse_bbcode(translateIfCan(author))
 		information_nodes["info_desc_author"].visible = true
+		information_nodes["author_header"].visible = true
+		information_nodes["author_splitter"].visible = true
 	else:
 		information_nodes["info_desc_author"].visible = true
+		information_nodes["author_header"].visible = true
+		information_nodes["author_splitter"].visible = true
 	var description = ""
 	if manifestData:
 		description = manifestData["mod_information"]["description"]
@@ -119,9 +123,12 @@ func _pressed():
 	if creditText != "":
 		information_nodes["info_desc_credits"].parse_bbcode(translateIfCan(creditText))
 		information_nodes["info_desc_credits"].visible = true
+		information_nodes["credits_header"].visible = true
+		information_nodes["credits_splitter"].visible = true
 	else:
 		information_nodes["info_desc_credits"].visible = false
-		
+		information_nodes["credits_header"].visible = false
+		information_nodes["credits_splitter"].visible = false
 	var default_URL_icon = "res://HevLib/ui/themes/icons/alias.stex"
 	information_nodes["links_menu_path"].MOD_INFO = MOD_INFO
 	information_nodes["links_menu_path"].update()
@@ -158,10 +165,19 @@ func _pressed():
 					languages += "\n" + ov
 				else:
 					languages = ov
-			information_nodes["info_desc_languages"].parse_bbcode(languages)
-			information_nodes["info_desc_languages"].visible = true
+			if languages:
+				information_nodes["info_desc_languages"].parse_bbcode(languages)
+				information_nodes["info_desc_languages"].visible = true
+				information_nodes["languages_header"].visible = true
+				information_nodes["languages_splitter"].visible = true
+			else:
+				information_nodes["info_desc_languages"].visible = false
+				information_nodes["languages_header"].visible = false
+				information_nodes["languages_splitter"].visible = false
 		else:
 			information_nodes["info_desc_languages"].visible = false
+			information_nodes["languages_header"].visible = false
+			information_nodes["languages_splitter"].visible = false
 		
 		if config_size == 0:
 			information_nodes["info_settings_button"].visible = false
@@ -188,6 +204,8 @@ func _pressed():
 		information_nodes["info_links_button"].visible = false
 		information_nodes["info_bugreports_button"].visible = false
 		information_nodes["info_changelog_button"].visible = false
+		information_nodes["languages_header"].visible = false
+		information_nodes["languages_splitter"].visible = false
 		information_nodes["changelog_menu"].clear()
 	if already_pressed:
 		if get_child_count() > 1:

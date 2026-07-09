@@ -47,6 +47,14 @@ export (NodePath) var toggle_modlet_button = NodePath("")
 
 var yet_to_connect = true
 
+export (NodePath) var author_header = NodePath("")
+export (NodePath) var author_splitter = NodePath("")
+export (NodePath) var credits_header = NodePath("")
+export (NodePath) var credits_splitter = NodePath("")
+export (NodePath) var languages_header = NodePath("")
+export (NodePath) var languages_splitter = NodePath("")
+
+
 func about_to_show():
 #	if yet_to_connect:
 #		yet_to_connect = false
@@ -107,6 +115,12 @@ func _ready():
 		"updates_button":get_node(updates_button_path),
 		"toggle_modlet_box":get_node(toggle_modlet_box),
 		"toggle_modlet_button":get_node(toggle_modlet_button),
+		"author_header":get_node(author_header),
+		"credits_header":get_node(credits_header),
+		"languages_header":get_node(languages_header),
+		"author_splitter":get_node(author_splitter),
+		"credits_splitter":get_node(credits_splitter),
+		"languages_splitter":get_node(languages_splitter),
 	}
 	var data = pointers.ManifestV2.__get_mod_data()["mods"]
 	var groups = {}

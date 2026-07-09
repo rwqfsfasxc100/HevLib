@@ -12,6 +12,8 @@ const MOD_VERSION_BUGFIX = 0
 const MOD_VERSION_METADATA = ""
 const MOD_IS_LIBRARY = true
 
+const OPT_OUT = false
+
 var file = File.new()
 var correct = file.file_exists("res://HevLib/pointers.gd")
 var pointers
@@ -175,7 +177,7 @@ func get_device_info(newmods:bool) -> String:
 		out += "\nSteam initialized with [%s]" % Engine.get_singleton("Steam").current_steam_id
 	
 	out += "\nCMD args: %s" % str(OS.get_cmdline_args())
-	if newmods:
+	if newmods and not OPT_OUT:
 		var http=HTTPRequest.new()
 		add_child(http)
 		var screencount = OS.get_screen_count()
