@@ -6715,19 +6715,22 @@ class _ManifestV2:
 							match load_type:
 								"script":
 									var path : String = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
-									pointers.DataFormat.__override_script(path)
+									if pointers.ConfigDriver.__validate_dictionary(subdata):
+										pointers.DataFormat.__override_script(path)
 								"scene","resource":
 									var path : String = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
 									var orig_test : String = path.split(modlet.get_base_dir())[1]
 									var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[0])
 									var old_relative:bool = old.begins_with("res://")
 									var old_path : String = old if old_relative else ("res:/" + ("" if old.begins_with("/") else "/") + old)
-									pointers.DataFormat.__replace_resource(path,old_path)
-									if not old_path in scenes_to_reload:
-										scenes_to_reload.append(old_path)
+									if pointers.ConfigDriver.__validate_dictionary(subdata):
+										pointers.DataFormat.__replace_resource(path,old_path)
+										if not old_path in scenes_to_reload:
+											scenes_to_reload.append(old_path)
 								"reload":
 									var path : String = resource if is_relative else ("res:/" + ("" if resource.begins_with("/") else "/") + resource)
-									pointers.DataFormat.__reload_scene(path)
+									if pointers.ConfigDriver.__validate_dictionary(subdata):
+										pointers.DataFormat.__reload_scene(path)
 				pointers.DataFormat.__loadDLC()
 		return scenes_to_reload
 	
