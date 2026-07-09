@@ -1,0 +1,159 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://HevLib/development_tools/property_editor/property_containers/dict.gd" type="Script" id=1]
+[ext_resource path="res://HevLib/development_tools/property_editor/property_editor.tscn" type="PackedScene" id=3]
+[ext_resource path="res://HevLib/development_tools/resource_handling/SpinBoxNoScroll.gd" type="Script" id=5]
+
+[sub_resource type="StreamTexture" id=1]
+flags = 4
+load_path = "res://HevLib/development_tools/property_editor/icons/collapsed.stex"
+
+[node name="dict" type="VBoxContainer"]
+margin_right = 40.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 1 )
+
+[node name="Toggle" type="HBoxContainer" parent="."]
+margin_right = 145.0
+margin_bottom = 22.0
+size_flags_horizontal = 3
+
+[node name="Button" type="Button" parent="Toggle"]
+margin_right = 145.0
+margin_bottom = 22.0
+size_flags_horizontal = 3
+toggle_mode = true
+text = "Dictionary (size 0)"
+icon = SubResource( 1 )
+icon_align = 2
+
+[node name="Collapsable" type="VBoxContainer" parent="."]
+visible = false
+margin_top = 26.0
+margin_right = 244.0
+margin_bottom = 154.0
+
+[node name="Info" type="MarginContainer" parent="Collapsable"]
+margin_right = 244.0
+margin_bottom = 52.0
+size_flags_horizontal = 3
+
+[node name="Panel" type="Panel" parent="Collapsable/Info"]
+margin_right = 244.0
+margin_bottom = 52.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Collapsable/Info"]
+margin_right = 244.0
+margin_bottom = 52.0
+size_flags_horizontal = 3
+
+[node name="SIZE" type="SpinBox" parent="Collapsable/Info/VBoxContainer"]
+margin_right = 244.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+align = 2
+script = ExtResource( 5 )
+
+[node name="Label" type="Label" parent="Collapsable/Info/VBoxContainer/SIZE"]
+margin_right = 10.0
+margin_bottom = 38.0
+rect_min_size = Vector2( 85, 0 )
+text = "Size:"
+
+[node name="PAGE" type="SpinBox" parent="Collapsable/Info/VBoxContainer"]
+margin_top = 28.0
+margin_right = 244.0
+margin_bottom = 52.0
+size_flags_horizontal = 3
+align = 2
+script = ExtResource( 5 )
+
+[node name="Label" type="Label" parent="Collapsable/Info/VBoxContainer/PAGE"]
+margin_right = 85.0
+margin_bottom = 38.0
+rect_min_size = Vector2( 85, 0 )
+text = "Page:"
+
+[node name="List" type="VBoxContainer" parent="Collapsable"]
+margin_top = 56.0
+margin_right = 244.0
+margin_bottom = 56.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="NEW" type="MarginContainer" parent="Collapsable"]
+margin_top = 60.0
+margin_right = 244.0
+margin_bottom = 128.0
+size_flags_horizontal = 3
+
+[node name="Panel" type="Panel" parent="Collapsable/NEW"]
+margin_right = 302.0
+margin_bottom = 76.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Collapsable/NEW"]
+margin_right = 302.0
+margin_bottom = 76.0
+size_flags_horizontal = 3
+
+[node name="Key" type="HBoxContainer" parent="Collapsable/NEW/VBoxContainer"]
+margin_right = 244.0
+margin_bottom = 20.0
+
+[node name="Label" type="Label" parent="Collapsable/NEW/VBoxContainer/Key"]
+margin_top = 3.0
+margin_right = 160.0
+margin_bottom = 17.0
+rect_min_size = Vector2( 160, 0 )
+text = "New Key:"
+
+[node name="property_editor" parent="Collapsable/NEW/VBoxContainer/Key" instance=ExtResource( 3 )]
+margin_left = 164.0
+margin_right = 244.0
+margin_bottom = 20.0
+
+[node name="Value" type="HBoxContainer" parent="Collapsable/NEW/VBoxContainer"]
+margin_top = 24.0
+margin_right = 244.0
+margin_bottom = 44.0
+
+[node name="Label" type="Label" parent="Collapsable/NEW/VBoxContainer/Value"]
+margin_top = 3.0
+margin_right = 160.0
+margin_bottom = 17.0
+rect_min_size = Vector2( 160, 0 )
+text = "New Value:"
+
+[node name="property_editor" parent="Collapsable/NEW/VBoxContainer/Value" instance=ExtResource( 3 )]
+margin_left = 164.0
+margin_right = 244.0
+margin_bottom = 20.0
+
+[node name="H" type="HBoxContainer" parent="Collapsable/NEW/VBoxContainer"]
+margin_top = 48.0
+margin_right = 244.0
+margin_bottom = 68.0
+
+[node name="L" type="HBoxContainer" parent="Collapsable/NEW/VBoxContainer/H"]
+margin_right = 5.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 5, 0 )
+
+[node name="Add" type="Button" parent="Collapsable/NEW/VBoxContainer/H"]
+margin_left = 9.0
+margin_right = 235.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+text = "Add Key/Value Pair"
+
+[node name="R" type="HBoxContainer" parent="Collapsable/NEW/VBoxContainer/H"]
+margin_left = 239.0
+margin_right = 244.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 5, 0 )

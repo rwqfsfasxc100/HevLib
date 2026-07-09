@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://HevLib/development_tools/property_editor/property_containers/int.gd" type="Script" id=1]
+[ext_resource path="res://HevLib/development_tools/control_and_ui/spinbox_helpers/SpinBoxNoScroll.gd" type="Script" id=3]
+
+[node name="int" type="MarginContainer"]
+margin_right = 58.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+script = ExtResource( 1 )
+
+[node name="Panel" type="Panel" parent="."]
+margin_right = 74.0
+margin_bottom = 24.0
+
+[node name="SpinBox" type="SpinBox" parent="."]
+margin_right = 74.0
+margin_bottom = 24.0
+max_value = 255.0
+rounded = true
+allow_greater = true
+allow_lesser = true
+script = ExtResource( 3 )

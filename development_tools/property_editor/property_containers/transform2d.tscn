@@ -1,0 +1,61 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://HevLib/development_tools/property_editor/property_containers/transform2d.gd" type="Script" id=1]
+[ext_resource path="res://HevLib/development_tools/property_editor/property_containers/vec2.tscn" type="PackedScene" id=2]
+
+[node name="transform2d" type="VBoxContainer"]
+margin_right = 58.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 1 )
+
+[node name="X" type="HBoxContainer" parent="."]
+margin_right = 247.0
+margin_bottom = 24.0
+
+[node name="Label" type="Label" parent="X"]
+margin_top = 5.0
+margin_right = 100.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 100, 0 )
+text = "X:"
+align = 2
+
+[node name="vec2" parent="X" instance=ExtResource( 2 )]
+margin_left = 104.0
+margin_right = 247.0
+
+[node name="Y" type="HBoxContainer" parent="."]
+margin_top = 28.0
+margin_right = 247.0
+margin_bottom = 52.0
+
+[node name="Label" type="Label" parent="Y"]
+margin_top = 5.0
+margin_right = 100.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 100, 0 )
+text = "Y:"
+align = 2
+
+[node name="vec2" parent="Y" instance=ExtResource( 2 )]
+margin_left = 104.0
+margin_right = 247.0
+
+[node name="ORIGIN" type="HBoxContainer" parent="."]
+margin_top = 56.0
+margin_right = 247.0
+margin_bottom = 80.0
+
+[node name="Label" type="Label" parent="ORIGIN"]
+margin_top = 5.0
+margin_right = 100.0
+margin_bottom = 19.0
+rect_min_size = Vector2( 100, 0 )
+text = "Origin:"
+align = 2
+
+[node name="vec2" parent="ORIGIN" instance=ExtResource( 2 )]
+margin_left = 104.0
+margin_right = 247.0

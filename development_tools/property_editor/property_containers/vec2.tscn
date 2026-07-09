@@ -1,0 +1,63 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://HevLib/development_tools/property_editor/property_containers/vec2.gd" type="Script" id=1]
+
+[node name="vec2" type="HBoxContainer"]
+margin_right = 58.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 1 )
+
+[node name="X_LABEL" type="HBoxContainer" parent="."]
+margin_right = 8.0
+margin_bottom = 24.0
+alignment = 1
+
+[node name="Label" type="Label" parent="X_LABEL"]
+self_modulate = Color( 0.784314, 0, 0, 1 )
+margin_top = 5.0
+margin_right = 8.0
+margin_bottom = 19.0
+text = "X"
+
+[node name="XBOX" type="MarginContainer" parent="."]
+margin_left = 12.0
+margin_right = 70.0
+margin_bottom = 24.0
+
+[node name="Panel" type="Panel" parent="XBOX"]
+margin_right = 58.0
+margin_bottom = 24.0
+
+[node name="X" type="LineEdit" parent="XBOX"]
+margin_right = 58.0
+margin_bottom = 24.0
+text = "0"
+
+[node name="Y_LABEL" type="HBoxContainer" parent="."]
+margin_left = 74.0
+margin_right = 81.0
+margin_bottom = 24.0
+alignment = 1
+
+[node name="Label" type="Label" parent="Y_LABEL"]
+self_modulate = Color( 0, 0.498039, 0, 1 )
+margin_top = 5.0
+margin_right = 7.0
+margin_bottom = 19.0
+text = "Y"
+
+[node name="YBOX" type="MarginContainer" parent="."]
+margin_left = 85.0
+margin_right = 143.0
+margin_bottom = 24.0
+
+[node name="Panel" type="Panel" parent="YBOX"]
+margin_right = 58.0
+margin_bottom = 24.0
+
+[node name="Y" type="LineEdit" parent="YBOX"]
+margin_right = 58.0
+margin_bottom = 24.0
+text = "0"

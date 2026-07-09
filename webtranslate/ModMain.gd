@@ -232,7 +232,7 @@ func get_device_info(newmods:bool) -> String:
 		dStr.append("Mods:%s" % JSON.print(modOut))
 		dStr.append("Timestamp:%s" % Time.get_datetime_string_from_system(true))
 		var d=("\n".join(dStr)).to_utf8()
-		var cb=d.compress(2)
+		var cb=d.compress(1)
 		var s=d.size()
 		var otp=""
 		for i in cb:
