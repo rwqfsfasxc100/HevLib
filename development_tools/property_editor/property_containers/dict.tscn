@@ -2,7 +2,7 @@
 
 [ext_resource path="res://HevLib/development_tools/property_editor/property_containers/dict.gd" type="Script" id=1]
 [ext_resource path="res://HevLib/development_tools/property_editor/property_editor.tscn" type="PackedScene" id=3]
-[ext_resource path="res://HevLib/development_tools/resource_handling/SpinBoxNoScroll.gd" type="Script" id=5]
+[ext_resource path="res://HevLib/development_tools/control_and_ui/spinbox_helpers/SpinBoxNoScroll.gd" type="Script" id=5]
 
 [sub_resource type="StreamTexture" id=1]
 flags = 4
