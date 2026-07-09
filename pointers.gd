@@ -5543,9 +5543,10 @@ class _ManifestV2:
 			var returnValues : Dictionary = {"mods":mod_dictionary,"statistics":statistics}
 			cached_mod_list = returnValues.duplicate(true)
 			if not currentModHash:
-				file.open("user://cache/.Mod_Menu_2_Cache/updates/current_hash.txt",File.READ)
-				lastModHash = int(file.get_as_text())
-				file.close()
+				if file.file_exists("user://cache/.Mod_Menu_2_Cache/updates/current_hash.txt"):
+					file.open("user://cache/.Mod_Menu_2_Cache/updates/current_hash.txt",File.READ)
+					lastModHash = int(file.get_as_text())
+					file.close()
 				currentModHash = hash(cached_mod_list)
 				file.open("user://cache/.Mod_Menu_2_Cache/updates/current_hash.txt",File.WRITE)
 				file.store_string(str(currentModHash))
