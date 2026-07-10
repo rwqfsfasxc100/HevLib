@@ -2941,7 +2941,8 @@ class _Equipment:
 					"ADD_SHIPS.gd":
 						for ar in constants:
 							var ac : Dictionary = constants[ar]
-							add_ships_store.append(ac.duplicate(true))
+							if pointers.ConfigDriver.__validate_dictionary(ac,false):
+								add_ships_store.append(ac.duplicate(true))
 					"REGISTER_SHIP_NUMERICS.gd":
 						for ar in constants:
 							if not ar in register_ship_numerics_store:

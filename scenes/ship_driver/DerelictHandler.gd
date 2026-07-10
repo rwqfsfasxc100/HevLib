@@ -45,7 +45,7 @@ func _ready():
 	randomize()
 	data.shuffle()
 	for fd in data:
-		if mode in fd and "name" in fd and "path" in fd:
+		if pointers.ConfigDriver.__validate_dictionary(fd,true,true,true,"settings_config") and mode in fd and "name" in fd and "path" in fd:
 			var shipName = fd["name"]
 			var event = fd[mode]
 			ship_pool.merge({shipName:event})

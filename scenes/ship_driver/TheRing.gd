@@ -1,7 +1,8 @@
 extends "res://TheRing.gd"
 
 func _ready():
-	var data = ModLoader._savedObjects[0].Equipment.add_ships_store
+	var pointers = ModLoader._savedObjects[0]
+	var data = pointers.Equipment.add_ships_store
 	var ro = load("res://story/RescueOperation.gd")
 	for i in range(data.size()):
 		var ship = data[i]
