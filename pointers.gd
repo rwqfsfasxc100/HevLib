@@ -2479,166 +2479,183 @@ class _Equipment:
 									"HARDPOINT":
 										if "weapon_slot" in equipment:
 											var obj : Dictionary = equipment.get("weapon_slot").duplicate(true)
-											var wname : String  = equipment.get("system","")
-											var wprice:int = equipment.get("price",0)
-											var objdata : Array = obj.get("data",[])
-											var has_price:bool = false
-											var has_invis:bool = false
-											var price_string : String  = str(wprice)
-											if not "name" in obj:
-												obj.merge({"name":wname})
-											for d in objdata:
-												if d.get("property","") == "repairReplacementPrice":
-													d["value"] = price_string
-													has_price = true
-												if d.get("property","") == "visible":
-													has_invis = true
-											if not has_price:
-												objdata.append({"property":"repairReplacementPrice","value":price_string})
-											if not has_invis:
-												objdata.append({"property":"visible","value":"false"})
-											obj["data"] = objdata.duplicate(true)
-											WEAPONSLOT_ADD.append(obj)
+											if pointers.ConfigDriver.__validate_dictionary(obj,false):
+												var wname : String  = equipment.get("system","")
+												var wprice:int = equipment.get("price",0)
+												var objdata : Array = obj.get("data",[])
+												var has_price:bool = false
+												var has_invis:bool = false
+												var price_string : String  = str(wprice)
+												if not "name" in obj:
+													obj.merge({"name":wname})
+												for d in objdata:
+													if d.get("property","") == "repairReplacementPrice":
+														d["value"] = price_string
+														has_price = true
+													if d.get("property","") == "visible":
+														has_invis = true
+												if not has_price:
+													objdata.append({"property":"repairReplacementPrice","value":price_string})
+												if not has_invis:
+													objdata.append({"property":"visible","value":"false"})
+												obj["data"] = objdata.duplicate(true)
+												WEAPONSLOT_ADD.append(obj)
 										if "WEAPONSLOT_ADD" in equipment:
 											var obj : Dictionary = equipment.get("WEAPONSLOT_ADD").duplicate(true)
-											var wname : String  = equipment.get("system","")
-											var wprice:int = equipment.get("price",0)
-											var objdata : Array = obj.get("data",[])
-											var has_price:bool = false
-											var has_invis:bool = false
-											var price_string : String  = str(wprice)
-											if not "name" in obj:
-												obj.merge({"name":wname})
-											for d in objdata:
-												if d.get("property","") == "repairReplacementPrice":
-													d["value"] = price_string
-													has_price = true
-												if d.get("property","") == "visible":
-													has_invis = true
-											if not has_price:
-												objdata.append({"property":"repairReplacementPrice","value":price_string})
-											if not has_invis:
-												objdata.append({"property":"visible","value":"false"})
-											obj["data"] = objdata.duplicate(true)
-											WEAPONSLOT_ADD.append(obj)
+											if pointers.ConfigDriver.__validate_dictionary(obj,false):
+												var wname : String  = equipment.get("system","")
+												var wprice:int = equipment.get("price",0)
+												var objdata : Array = obj.get("data",[])
+												var has_price:bool = false
+												var has_invis:bool = false
+												var price_string : String  = str(wprice)
+												if not "name" in obj:
+													obj.merge({"name":wname})
+												for d in objdata:
+													if d.get("property","") == "repairReplacementPrice":
+														d["value"] = price_string
+														has_price = true
+													if d.get("property","") == "visible":
+														has_invis = true
+												if not has_price:
+													objdata.append({"property":"repairReplacementPrice","value":price_string})
+												if not has_invis:
+													objdata.append({"property":"visible","value":"false"})
+												obj["data"] = objdata.duplicate(true)
+												WEAPONSLOT_ADD.append(obj)
 									"MASS_DRIVER_AMMUNITION":
 										if "REGISTER_AMMO" in equipment:
 											if not "REGISTER_AMMO" in register_ship_numerics_store:
 												register_ship_numerics_store["REGISTER_AMMO"] = []
 											var bp : Dictionary = equipment["REGISTER_AMMO"].duplicate(true)
-											if not "price" in bp:
-												bp["price"] = equipment["price"]
-											var dc : Dictionary = {equipment.get("num_val",0):bp}
-											register_ship_numerics_store["REGISTER_AMMO"].append(dc)
+											if pointers.ConfigDriver.__validate_dictionary(bp,false):
+												if not "price" in bp:
+													bp["price"] = equipment["price"]
+												var dc : Dictionary = {equipment.get("num_val",0):bp}
+												register_ship_numerics_store["REGISTER_AMMO"].append(dc)
 									"NANODRONE_STORAGE":
 										if "REGISTER_NANO" in equipment:
 											if not "REGISTER_NANO" in register_ship_numerics_store:
 												register_ship_numerics_store["REGISTER_NANO"] = []
 											var bp : Dictionary = equipment["REGISTER_NANO"].duplicate(true)
-											if not "price" in bp:
-												bp["price"] = equipment["price"]
-											var dc : Dictionary = {equipment.get("num_val",0):bp}
-											register_ship_numerics_store["REGISTER_NANO"].append(dc)
+											if pointers.ConfigDriver.__validate_dictionary(bp,false):
+												if not "price" in bp:
+													bp["price"] = equipment["price"]
+												var dc : Dictionary = {equipment.get("num_val",0):bp}
+												register_ship_numerics_store["REGISTER_NANO"].append(dc)
 									"STANDARD_REACTION_CONTROL_THRUSTERS":
 										if "AUX_POWER_SLOT" in equipment:
 											var bp : Dictionary = equipment["AUX_POWER_SLOT"].duplicate(true)
-											if not "system" in bp:
-												bp["system"] = equipment["system"]
-											if not "price" in bp:
-												bp["price"] = equipment["price"]
-											AUX_POWER_AND_THRUSTERS.append(bp)
+											if pointers.ConfigDriver.__validate_dictionary(bp,false):
+												if not "system" in bp:
+													bp["system"] = equipment["system"]
+												if not "price" in bp:
+													bp["price"] = equipment["price"]
+												AUX_POWER_AND_THRUSTERS.append(bp)
 										if "THRUSTERS" in equipment:
 											var bp : Dictionary = equipment["THRUSTERS"].duplicate(true)
-											if not "system" in bp:
-												bp["system"] = equipment["system"]
-											if not "price" in bp:
-												bp["price"] = equipment["price"]
-											AUX_POWER_AND_THRUSTERS.append(bp)
+											if pointers.ConfigDriver.__validate_dictionary(bp,false):
+												if not "system" in bp:
+													bp["system"] = equipment["system"]
+												if not "price" in bp:
+													bp["price"] = equipment["price"]
+												AUX_POWER_AND_THRUSTERS.append(bp)
 										if "AUX_POWER_AND_THRUSTERS" in equipment:
 											var bp : Dictionary = equipment["AUX_POWER_AND_THRUSTERS"].duplicate(true)
-											if not "system" in bp:
-												bp["system"] = equipment["system"]
-											if not "price" in bp:
-												bp["price"] = equipment["price"]
-											AUX_POWER_AND_THRUSTERS.append(bp)
+											if pointers.ConfigDriver.__validate_dictionary(bp,false):
+												if not "system" in bp:
+													bp["system"] = equipment["system"]
+												if not "price" in bp:
+													bp["price"] = equipment["price"]
+												AUX_POWER_AND_THRUSTERS.append(bp)
 									"STANDARD_MAIN_ENGINE":
 										if "AUX_POWER_SLOT" in equipment:
 											var bp : Dictionary = equipment["AUX_POWER_SLOT"].duplicate(true)
-											if not "system" in bp:
-												bp["system"] = equipment["system"]
-											if not "price" in bp:
-												bp["price"] = equipment["price"]
-											AUX_POWER_AND_THRUSTERS.append(bp)
+											if pointers.ConfigDriver.__validate_dictionary(bp,false):
+												if not "system" in bp:
+													bp["system"] = equipment["system"]
+												if not "price" in bp:
+													bp["price"] = equipment["price"]
+												AUX_POWER_AND_THRUSTERS.append(bp)
 										if "THRUSTERS" in equipment:
 											var bp : Dictionary = equipment["THRUSTERS"].duplicate(true)
-											if not "system" in bp:
-												bp["system"] = equipment["system"]
-											if not "price" in bp:
-												bp["price"] = equipment["price"]
-											AUX_POWER_AND_THRUSTERS.append(bp)
+											if pointers.ConfigDriver.__validate_dictionary(bp,false):
+												if not "system" in bp:
+													bp["system"] = equipment["system"]
+												if not "price" in bp:
+													bp["price"] = equipment["price"]
+												AUX_POWER_AND_THRUSTERS.append(bp)
 										if "AUX_POWER_AND_THRUSTERS" in equipment:
 											var bp : Dictionary = equipment["AUX_POWER_AND_THRUSTERS"].duplicate(true)
-											if not "system" in bp:
-												bp["system"] = equipment["system"]
-											if not "price" in bp:
-												bp["price"] = equipment["price"]
-											AUX_POWER_AND_THRUSTERS.append(bp)
+											if pointers.ConfigDriver.__validate_dictionary(bp,false):
+												if not "system" in bp:
+													bp["system"] = equipment["system"]
+												if not "price" in bp:
+													bp["price"] = equipment["price"]
+												AUX_POWER_AND_THRUSTERS.append(bp)
 									"FISSION_RODS":
 										if "REGISTER_REACTOR_RODS" in equipment:
 											if not "REGISTER_REACTOR_RODS" in register_ship_numerics_store:
 												register_ship_numerics_store["REGISTER_REACTOR_RODS"] = []
 											var bp : Dictionary = equipment["REGISTER_REACTOR_RODS"].duplicate(true)
-											if not "price" in bp:
-												bp["price"] = equipment["price"]
-											var dc : Dictionary = {equipment.get("num_val",0):bp}
-											register_ship_numerics_store["REGISTER_REACTOR_RODS"].append(dc)
+											if pointers.ConfigDriver.__validate_dictionary(bp,false):
+												if not "price" in bp:
+													bp["price"] = equipment["price"]
+												var dc : Dictionary = {equipment.get("num_val",0):bp}
+												register_ship_numerics_store["REGISTER_REACTOR_RODS"].append(dc)
 									"ULTRACAPACITOR":
 										if "REGISTER_ULTRACAPACITORS" in equipment:
 											if not "REGISTER_ULTRACAPACITORS" in register_ship_numerics_store:
 												register_ship_numerics_store["REGISTER_ULTRACAPACITORS"] = []
 											var bp : Dictionary = equipment["REGISTER_ULTRACAPACITORS"].duplicate(true)
-											if not "price" in bp:
-												bp["price"] = equipment["price"]
-											var dc : Dictionary = {equipment.get("num_val",0):bp}
-											register_ship_numerics_store["REGISTER_ULTRACAPACITORS"].append(dc)
+											if pointers.ConfigDriver.__validate_dictionary(bp,false):
+												if not "price" in bp:
+													bp["price"] = equipment["price"]
+												var dc : Dictionary = {equipment.get("num_val",0):bp}
+												register_ship_numerics_store["REGISTER_ULTRACAPACITORS"].append(dc)
 									"FISSION_TURBINE":
 										if "REGISTER_TURBINES" in equipment:
 											if not "REGISTER_TURBINES" in register_ship_numerics_store:
 												register_ship_numerics_store["REGISTER_TURBINES"] = []
 											var bp : Dictionary = equipment["REGISTER_TURBINES"].duplicate(true)
-											if not "price" in bp:
-												bp["price"] = equipment["price"]
-											var dc : Dictionary = {equipment.get("num_val",0):bp}
-											register_ship_numerics_store["REGISTER_TURBINES"].append(dc)
+											if pointers.ConfigDriver.__validate_dictionary(bp,false):
+												if not "price" in bp:
+													bp["price"] = equipment["price"]
+												var dc : Dictionary = {equipment.get("num_val",0):bp}
+												register_ship_numerics_store["REGISTER_TURBINES"].append(dc)
 									"AUX_POWER_SLOT":
 										if "auxiliary_power_unit" in equipment:
 											var bp : Dictionary = equipment["auxiliary_power_unit"].duplicate(true)
-											if not "system" in bp:
-												bp["system"] = equipment["system"]
-											if not "price" in bp:
-												bp["price"] = equipment["price"]
-											AUX_POWER_AND_THRUSTERS.append(bp)
+											if pointers.ConfigDriver.__validate_dictionary(bp,false):
+												if not "system" in bp:
+													bp["system"] = equipment["system"]
+												if not "price" in bp:
+													bp["price"] = equipment["price"]
+												AUX_POWER_AND_THRUSTERS.append(bp)
 										if "AUX_POWER_SLOT" in equipment:
 											var bp : Dictionary = equipment["AUX_POWER_SLOT"].duplicate(true)
-											if not "system" in bp:
-												bp["system"] = equipment["system"]
-											if not "price" in bp:
-												bp["price"] = equipment["price"]
-											AUX_POWER_AND_THRUSTERS.append(bp)
+											if pointers.ConfigDriver.__validate_dictionary(bp,false):
+												if not "system" in bp:
+													bp["system"] = equipment["system"]
+												if not "price" in bp:
+													bp["price"] = equipment["price"]
+												AUX_POWER_AND_THRUSTERS.append(bp)
 										if "THRUSTERS" in equipment:
 											var bp : Dictionary = equipment["THRUSTERS"].duplicate(true)
-											if not "system" in bp:
-												bp["system"] = equipment["system"]
-											if not "price" in bp:
-												bp["price"] = equipment["price"]
-											AUX_POWER_AND_THRUSTERS.append(bp)
+											if pointers.ConfigDriver.__validate_dictionary(bp,false):
+												if not "system" in bp:
+													bp["system"] = equipment["system"]
+												if not "price" in bp:
+													bp["price"] = equipment["price"]
+												AUX_POWER_AND_THRUSTERS.append(bp)
 										if "AUX_POWER_AND_THRUSTERS" in equipment:
 											var bp : Dictionary = equipment["AUX_POWER_AND_THRUSTERS"].duplicate(true)
-											if not "system" in bp:
-												bp["system"] = equipment["system"]
-											if not "price" in bp:
-												bp["price"] = equipment["price"]
-											AUX_POWER_AND_THRUSTERS.append(bp)
+											if pointers.ConfigDriver.__validate_dictionary(bp,false):
+												if not "system" in bp:
+													bp["system"] = equipment["system"]
+												if not "price" in bp:
+													bp["price"] = equipment["price"]
+												AUX_POWER_AND_THRUSTERS.append(bp)
 								
 								ADD_EQUIPMENT_ITEMS.append(equipment.duplicate(true))
 					"ADD_EQUIPMENT_SLOTS.gd":
