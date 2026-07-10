@@ -2936,7 +2936,8 @@ class _Equipment:
 					"SAVE_BUTTONS.gd":
 						var ar : Array = constants.get("SAVE_BUTTONS",[]).duplicate(true)
 						for button in ar:
-							save_button_cache.append(button)
+							if pointers.ConfigDriver.__validate_dictionary(ar,false):
+								save_button_cache.append(button)
 					"ADD_SHIPS.gd":
 						for ar in constants:
 							var ac : Dictionary = constants[ar]
