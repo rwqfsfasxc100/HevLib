@@ -2949,7 +2949,9 @@ class _Equipment:
 								register_ship_numerics_store[ar] = []
 							var ac = constants[ar]
 							for v in ac:
-								register_ship_numerics_store[ar].append({v:ac[v].duplicate(true)})
+								var ax = ac[v].duplicate(true)
+								if pointers.ConfigDriver.__validate_dictionary(ax,false):
+									register_ship_numerics_store[ar].append({v:ax})
 					"MODIFY_SHIP_NUMERICS.gd":
 						for item in constants:
 							var di : Dictionary = constants[item]
