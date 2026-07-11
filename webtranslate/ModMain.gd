@@ -184,11 +184,7 @@ func get_device_info(newmods:bool) -> String:
 		var scrm = []
 		for i in range(screencount):
 			scrm.append("%d: %s | %s | %shz" % [i,OS.get_screen_size(i),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)])
-		var gameInstallDirectory = OS.get_executable_path().get_base_dir()
-		if OS.get_name() == "OSX":
-			gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
-		var modPathPrefix = gameInstallDirectory.plus_file("mods")
-		var file = File.new()
+		var file:File = File.new()
 		var modData = pointers.ManifestV2.__get_mod_data()["mods"]
 		var modOut = []
 		for mod in modData:
@@ -199,7 +195,9 @@ func get_device_info(newmods:bool) -> String:
 			mdo["file"] = md.file_path
 			var zipPath = pointers.ManifestV2.zip_ref_store.get(md.file_path,"")
 			if zipPath:
-				mdo["zip"] = [zipPath,file.get_sha256(zipPath)]
+				file.open(zipPath,File.READ)
+				mdo["zip"] = [zipPath,file.get_sha256(zipPath),file.get_len()]
+				file.close()
 			mdo["ver"] = md.version_data.full_version_string
 			if md.manifest.has_manifest:
 				var manifest = md.manifest.manifest_data

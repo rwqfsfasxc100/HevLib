@@ -61,7 +61,7 @@ func _init(modLoader : ModLoader = ModLoader):
 		pointers.equipment_modmain = self
 		pointers.FileAccess.__load_precached_mods()
 		
-#		testing(pointers)
+#		testing()
 		
 		match_mod_path_to_zip()
 		var scv = pointers.FolderAccess.__fetch_folder_files(variables_folder,false,true)
@@ -242,7 +242,7 @@ func match_mod_path_to_zip():
 	
 
 
-func testing(pointers):
+func testing():
 #	var time = (OS.get_unix_time_from_datetime({"day": 16, "hour": 11, "minute": 50, "month": 9, "second": 0, "year": 2273})) / (168.0 * 3600.0)
 #	var t2 = time - floor(time)
 #	var t3 = abs((t2*7) - 7)
@@ -250,6 +250,5 @@ func testing(pointers):
 #	var can : Script = load("res://AymursEquipmentSuite/ModMain.gd").can_instance()
 #	var can : Script = load("res://HevLib/ModMain.gd")
 #	var prop = can.can_instance()
-	
 	
 	breakpoint
