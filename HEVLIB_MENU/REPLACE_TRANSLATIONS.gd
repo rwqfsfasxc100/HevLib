@@ -2334,6 +2334,42 @@ const TRANSLATIONS = {
 		"HEVLIB_CONFIG_DEALERSHIP_MODIFICATION_ROLL_CHANCE_SCALE_TOOLTIP": {
 			"string": "Scale for how likely a ship will have modifications to it's config, with the chance being for each modification.",
 			"version_hash": 758756226
+		},
+		"HEVLIB_CREDITS_CONTRIBUTORS_HEADER": {
+			"string": "   --- Contributors ---   ",
+			"version_hash": 3641455841
+		},
+		"HEVLIB_CREDITS_CONTRIBUTORS_ZAKRIN": {
+			"string": "Za'krin - Mod Main design, original implementation of updateTL",
+			"version_hash": 3828627238
+		},
+		"HEVLIB_CREDITS_CONTRIBUTORS_SPDX": {
+			"string": "spaceDOTexe - Manifest design, UpgradeGroup ship limiting logic",
+			"version_hash": 4113957048
+		},
+		"HEVLIB_CREDITS_CONTRIBUTORS_1WT1": {
+			"string": "WT - Ukranian translations, configs for SHIP_NODE_MODIFY",
+			"version_hash": 1793258836
+		},
+		"HEVLIB_CREDITS_CONTRIBUTORS_HEDRAUTA": {
+			"string": "Hedrauta - German translations",
+			"version_hash": 1012571612
+		},
+		"HEVLIB_CREDITS_SUPPORTERS_HEADER": {
+			"string": "   --- Supporters ---   ",
+			"version_hash": 1704348250
+		},
+		"HEVLIB_CREDITS_SUPPORTERS_KOFI_GAZI": {
+			"string": "GAZI - supporter (ko-fi)",
+			"version_hash": 4085861848
+		},
+		"HEVLIB_CREDITS_SUPPORTERS_KOFI_BAGGERDUDE": {
+			"string": "Bagger dude - supporter (ko-fi)",
+			"version_hash": 2887391095
+		},
+		"HEVLIB_CREDITS_SUPPORTERS_KOFI_1WT1": {
+			"string": "WT - supporter (ko-fi)",
+			"version_hash": 3531547864
 		}
 	},
 	"uk_UA": {

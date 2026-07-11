@@ -5,7 +5,7 @@ name="HevLib"
 description="HEVLIB_MOD_DESCRIPTION"
 brief="HEVLIB_MOD_BRIEF"
 author="__hev"
-credits=["   --- Contributors ---   ","Za'krin - Mod Main design, original implementation of updateTL","spaceDOTexe - Manifest design, UpgradeGroup ship limiting logic","WT - Ukranian translations, configs for SHIP_NODE_MODIFY","Hedrauta - German translations","","   --- Supporters ---   ","GAZI - supporter (ko-fi)","Bagger dude - supporter (ko-fi)","WT - supporter (ko-fi)"]
+credits=["HEVLIB_CREDITS_CONTRIBUTORS_HEADER","HEVLIB_CREDITS_CONTRIBUTORS_ZAKRIN","HEVLIB_CREDITS_CONTRIBUTORS_SPDX","HEVLIB_CREDITS_CONTRIBUTORS_1WT1","HEVLIB_CREDITS_CONTRIBUTORS_HEDRAUTA","","HEVLIB_CREDITS_SUPPORTERS_HEADER","HEVLIB_CREDITS_SUPPORTERS_KOFI_GAZI","HEVLIB_CREDITS_SUPPORTERS_KOFI_BAGGERDUDE","HEVLIB_CREDITS_SUPPORTERS_KOFI_1WT1"]
 
 [version]
 
