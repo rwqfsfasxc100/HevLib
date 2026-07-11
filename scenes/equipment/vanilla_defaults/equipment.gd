@@ -1079,7 +1079,7 @@ const LIDAR_IRL360 = {
 	"price":15000,
 	"test_protocol":"lidar",
 	"slot_type":"LIDAR",
-	"equipment_type":""
+	"equipment_type":"SENSOR_LIDAR"
 }
 const LIDAR_IRL30 = {
 	"system":"SYSTEM_LIDAR_DOPPLER_CONE",
