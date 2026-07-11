@@ -7506,7 +7506,8 @@ class _Translations:
 					if not language in data:
 						data.merge({language:{}})
 					if master_locale and language != master_locale:
-						ml_check_data[language] = {"needs_updating":[],"needs_updating_size":0,"not_in_master":[],"not_in_master_size":0,"missing_translations":[],"missing_translations_size":0}
+						if not language in ml_check_data:
+							ml_check_data[language] = {"needs_updating":[],"needs_updating_size":0,"not_in_master":[],"not_in_master_size":0,"missing_translations":[],"missing_translations_size":0}
 						check_ml = true
 						mlt = translations[master_locale]
 						if lang.size() < mlt.size():

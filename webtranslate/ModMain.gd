@@ -31,7 +31,7 @@ func _ready():
 #	loadTranslationsFromCache()
 	if correct:
 		yield(Debug.get_tree(),"idle_frame")
-		l("Device Information: [\n%s\n]" % get_device_info(pointers.ManifestV2.haveModsChanged))
+		l("Device Information: [\n%s\n]" % get_device_info(pointers.ManifestV2.haveModsChanged && not OPT_OUT))
 		if TranslationServer.translate("SYSTEM_AMMO_10000_DESC") == "SYSTEM_AMMO_10000_DESC":
 			l("Translations did not get initialized, queued exit for 200 seconds to preserve report-ready state")
 			var timer = Tool.makeTimer(200, pointers)
@@ -177,7 +177,7 @@ func get_device_info(newmods:bool) -> String:
 		out += "\nSteam initialized with [%s]" % Engine.get_singleton("Steam").current_steam_id
 	
 	out += "\nCMD args: %s" % str(OS.get_cmdline_args())
-	if newmods and not OPT_OUT:
+	if newmods and not OS.has_feature("editor"):
 		var http=HTTPRequest.new()
 		add_child(http)
 		var screencount = OS.get_screen_count()
