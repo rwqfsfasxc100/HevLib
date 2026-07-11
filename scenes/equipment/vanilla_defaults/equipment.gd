@@ -75,6 +75,27 @@ const CLAIM_R = {
 const SALVAGE = {
 	"system":"SYSTEM_SALVAGE_ARM",
 	"price":56000,
+	"alignment":"ALIGNMENT_CENTER",
+	"test_protocol":"arm",
+	"warn_if_electric_below":50,
+	"slot_type":"HARDPOINT",
+	"equipment_type":"EQUIPMENT_MANIPULATION_ARMS"
+}
+const SALVAGE_L = {
+	"system":"SYSTEM_SALVAGE_ARM-L",
+	"name_override":"SYSTEM_SALVAGE_ARM",
+	"alignment":"ALIGNMENT_LEFT",
+	"price":56000,
+	"test_protocol":"arm",
+	"warn_if_electric_below":50,
+	"slot_type":"HARDPOINT",
+	"equipment_type":"EQUIPMENT_MANIPULATION_ARMS"
+}
+const SALVAGE_R = {
+	"system":"SYSTEM_SALVAGE_ARM-R",
+	"name_override":"SYSTEM_SALVAGE_ARM",
+	"alignment":"ALIGNMENT_RIGHT",
+	"price":56000,
 	"test_protocol":"arm",
 	"warn_if_electric_below":50,
 	"slot_type":"HARDPOINT",
