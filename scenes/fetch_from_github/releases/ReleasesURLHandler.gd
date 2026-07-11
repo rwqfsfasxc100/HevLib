@@ -9,53 +9,56 @@ var file_to_download = "first" # Accepts "first", "all" or "latest"
 var urlToFetch = []
 
 func _on_release_request_completed(result, response_code, headers, body):
-	var json = JSON.parse(body.get_string_from_utf8())
-	var releasesContent
-	var assetURLs = []
-	if not json.result == null:
-		releasesContent = json.result
-	var cycle = 0
-	if not releasesContent == null:
-		for n in releasesContent:
-			if cycle == 0:
-				if not checkIfAcceptable(n):
-					pass
-				else:
-					for asset in n["assets"]:
-						var assetURL = asset["browser_download_url"]
-						var releaseDate = asset["updated_at"].split("Z")[0]
-					
-						assetURLs.append([assetURL, releaseDate])
-					var githubTag = n["tag_name"]
-					cycle += 1
-		for item in assetURLs:
-			var acceptable = true
-			if file_preference == "zip":
-				if not item[0].ends_with(".zip"):
-					acceptable = false
-			if file_to_download == "latest":
-				var isLatest = true
-				for item2 in assetURLs:
-					var date = item2[1]
-					var comparison = pointers.TimeAccess.__compare_dates(item[1],date)
-					if comparison == "older":
-						isLatest = false
-				if not isLatest:
-					acceptable = false
-			if file_to_download == "all":
-				Debug.l("HevLib Github Release Downloader: ERROR! IMPLEMENT HANDLING FOR \"ALL\" TAG")
-				breakpoint  # IMPLEMENT HANDLING FOR "ALL" TAG
-			if acceptable:
-				urlToFetch.append(item[0])
-				break
-		
-		if urlToFetch.size() == 1:
-			downloadZip(urlToFetch[0], folder)
-		elif urlToFetch.size() >= 2:
-			Debug.l("HevLib Github Release Downloader: ERROR! IMPLEMENT HANDLING FOR \"ALL\" TAG")
+	if response_code == 200:
+		var json = JSON.parse(body.get_string_from_utf8())
+		var releasesContent
+		var assetURLs = []
+		if not json.result == null:
+			releasesContent = json.result
+		var cycle = 0
+		if not releasesContent == null:
+			for n in releasesContent:
+				if cycle == 0:
+					if not checkIfAcceptable(n):
+						pass
+					else:
+						for asset in n["assets"]:
+							var assetURL = asset["browser_download_url"]
+							var releaseDate = asset["updated_at"].split("Z")[0]
+						
+							assetURLs.append([assetURL, releaseDate])
+						var githubTag = n["tag_name"]
+						cycle += 1
+			for item in assetURLs:
+				var acceptable = true
+				if file_preference == "zip":
+					if not item[0].ends_with(".zip"):
+						acceptable = false
+				if file_to_download == "latest":
+					var isLatest = true
+					for item2 in assetURLs:
+						var date = item2[1]
+						var comparison = pointers.TimeAccess.__compare_dates(item[1],date)
+						if comparison == "older":
+							isLatest = false
+					if not isLatest:
+						acceptable = false
+				if file_to_download == "all":
+					Debug.l("HevLib Github Release Downloader: ERROR! IMPLEMENT HANDLING FOR \"ALL\" TAG")
+					breakpoint  # IMPLEMENT HANDLING FOR "ALL" TAG
+				if acceptable:
+					urlToFetch.append(item[0])
+					break
 			
-			breakpoint # IMPLEMENT HANDLING FOR "ALL" TAG
-
+			if urlToFetch.size() == 1:
+				downloadZip(urlToFetch[0], folder)
+			elif urlToFetch.size() >= 2:
+				Debug.l("HevLib Github Release Downloader: ERROR! IMPLEMENT HANDLING FOR \"ALL\" TAG")
+				
+				breakpoint # IMPLEMENT HANDLING FOR "ALL" TAG
+	else:
+		var outNode = get_parent().nodeToReturnTo
+		outNode._downloaded_zip("","")
 func checkIfAcceptable(n):
 	if n["draft"]:
 		return false

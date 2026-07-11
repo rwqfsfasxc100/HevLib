@@ -21,19 +21,21 @@ func request(url,custom_headers:PoolStringArray = [],ssl_validate_domain: bool =
 	.request(url,custom_headers,ssl_validate_domain,method,request_data)
 
 func _on_zip_request_completed(result, response_code, headers, body):
-	var downloadedFile = ""
-	var headerSplitter = "Content-Disposition: attachment; filename="
-	for m in headers:
-		if m.begins_with(headerSplitter):
-			downloadedFile = m.split(headerSplitter)[1]
-	if not filePath.ends_with("/"):
-		filePath = filePath + "/"
-	filePath = filePath + downloadedFile
-	if state_progress:
-		is_updating(false)
-		nodeToReturnTo._get_github_progress("HEVLIB_GITHUB_PROGRESS_DOWNLOADED_FILE",0,0,0)
-	nodeToReturnTo._downloaded_zip(downloadedFile, filePath)
-	
+	if response_code == 200:
+		var downloadedFile = ""
+		var headerSplitter = "Content-Disposition: attachment; filename="
+		for m in headers:
+			if m.begins_with(headerSplitter):
+				downloadedFile = m.split(headerSplitter)[1]
+		if not filePath.ends_with("/"):
+			filePath = filePath + "/"
+		filePath = filePath + downloadedFile
+		if state_progress:
+			is_updating(false)
+			nodeToReturnTo._get_github_progress("HEVLIB_GITHUB_PROGRESS_DOWNLOADED_FILE",0,0,0)
+		nodeToReturnTo._downloaded_zip(downloadedFile, filePath)
+	else:
+		nodeToReturnTo._downloaded_zip("","")
 	
 #	Tool.deferCallInPhysics(self,"is_updating",[false])
 	

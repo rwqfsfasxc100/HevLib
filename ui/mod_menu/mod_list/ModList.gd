@@ -420,7 +420,8 @@ func _downloaded_zip(file, filepath):
 	fi.store_string(JSON.print(data))
 	fi.close()
 	subroot.restart_menu.popup_centered()
-	pointers.FileAccess.__precache_mod_file(filepath)
+	if filepath:
+		pointers.FileAccess.__precache_mod_file(filepath)
 	updates_button.visible = false
 var tween
 func _visibility_changed():
