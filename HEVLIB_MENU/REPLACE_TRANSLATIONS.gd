@@ -2318,6 +2318,22 @@ const TRANSLATIONS = {
 		"HEVLIB_CONFIG_EXTEND_DIVIDED_STORAGE_MULTIPLIER_TOOLTIP": {
 			"string": "Whether the processed storage added by equipment using the MODIFY_INTERNALS driver should\ndynamically adjust based on the number of minerals that can be found in the ring.\n\nIf disabled, defaults to use just Vanilla's 6 ores",
 			"version_hash": 2335117499
+		},
+		"HEVLIB_CONFIG_MAX_DEALERSHIP_MODIFICATION_ROLLS": {
+			"string": "Maximum rolls for new ship loadout adjustments",
+			"version_hash": 3469313118
+		},
+		"HEVLIB_CONFIG_MAX_DEALERSHIP_MODIFICATION_ROLLS_TOOLTIP": {
+			"string": "The number of times a new ship may have modifications to it's base loadout made.\n\nThe maximum will depend on the number added by other mods with MODIFY_SHIP_BUILDS.gd.",
+			"version_hash": 2944029967
+		},
+		"HEVLIB_CONFIG_DEALERSHIP_MODIFICATION_ROLL_CHANCE_SCALE": {
+			"string": "Ship modification chance adjustment",
+			"version_hash": 2832891408
+		},
+		"HEVLIB_CONFIG_DEALERSHIP_MODIFICATION_ROLL_CHANCE_SCALE_TOOLTIP": {
+			"string": "Scale for how likely a ship will have modifications to it's config, with the chance being for each modification.",
+			"version_hash": 758756226
 		}
 	},
 	"uk_UA": {

@@ -6,6 +6,8 @@ var inverseShipAliases = {}
 
 func _ready():
 	syPointers = ModLoader._savedObjects[0]
+	syPointers.ConfigDriver.__establish_connection("hl_shipyard_shipdriver_update",self)
+	hl_shipyard_shipdriver_update()
 	var file = File.new()
 	yield(get_tree(),"idle_frame")
 	hl_shipdriver_resetter_timeout()
@@ -167,7 +169,12 @@ func _ready():
 					cfg_mod_refs[aliasOf] = []
 				cfg_mod_refs[aliasOf].append(entry.duplicate(true))
 
+var maxRolls = 10
+var modChanceScale = 1.0
 
+func hl_shipyard_shipdriver_update():
+	maxRolls = syPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","max_dealership_modification_rolls")
+	modChanceScale = syPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","dealership_modification_roll_chance_scale")
 
 
 func hl_shipdriver_resetter_timeout():
@@ -187,69 +194,80 @@ var cfg_mod_refs:Dictionary = {}
 
 func getBuildsFor(s: String):
 	var out = .getBuildsFor(s)
+	var now = CurrentGame.getInGameTimestamp()
+	var day = int(floor(now / (24 * 3600)))
 	if s in cfg_mod_refs:
-		for config in cfg_mod_refs[s]:
+		var scfgs = cfg_mod_refs[s].size()
+		for cfgi in range(maxRolls):
+			var cfrRand = CurrentGame.srai(day + cfgi, 1)[0]
+			var config = cfg_mod_refs[s][cfrRand % scfgs]
 			if syPointers.ConfigDriver.__validate_dictionary(config,true,false,false):
 				var cfgHash = hash(config)
-				var now = CurrentGame.getInGameTimestamp()
-				var day = int(floor(now / (24 * 3600)))
-				var rand = CurrentGame.sraf(day + cfgHash)
-				if config.get("chance",0.1) >= rand:
-						match config.get("mode",null):
-							"if_equipment_in_slot":
-								for dict in out:
-									if numerics_check(config,dict):
-										if conditional_system_check(config,dict,"do_add_if") and not conditional_system_check(config,dict,"dont_add_if"):
-											for thisSlot in config.get("slot","").split("&&",false):
-												setConfigHevLib(thisSlot.strip_edges(),dict,config.get("system"))
-							"if_tag_in_slot":
-								for dict in out:
-									if numerics_check(config,dict):
-										if conditional_tag_check(config,dict,"do_add_if") and not conditional_tag_check(config,dict,"dont_add_if"):
-											for thisSlot in config.get("slot","").split("&&",false):
-												setConfigHevLib(thisSlot.strip_edges(),dict,config.get("system"))
-							"if_equipment":
-								for dict in out:
-									if numerics_check(config,dict):
-										var doAdd = config.get("do_add_if",[])
-										var dontAdd = config.get("dont_add_if",[])
-										var wantedSystems = doAdd + dontAdd
-										var systems = syPointers.DataFormat.__sift_ship_config(dict.duplicate(true),wantedSystems,["currentCargo","currentCargoBy","currentCargoComposition","damage","juryRig","preferredCrew","processedCargo","remoteCargo","tuning"],true)
-										if systems:
-											var add = true
-											for r in systems:
-												if r in dontAdd:
-													add = false
-											if add:
-												for thisSlot in config.get("slot","").split("&&",false):
-													setConfigHevLib(thisSlot.strip_edges(),dict,config.get("system"))
-							"if_tag":
-								for dict in out:
-									if numerics_check(config,dict):
-										var doAdd = config.get("do_add_if",[])
-										var dontAdd = config.get("dont_add_if",[])
-										var doSystems = []
-										var dontSystems = []
-										for i in inverted_sys_slot_refs:
-											if i in doAdd:
-												doSystems.append_array(inverted_sys_slot_refs[i])
-											if i in dontAdd:
-												dontSystems.append_array(inverted_sys_slot_refs[i])
-										var wantedSystems = doSystems + dontSystems
-										var systems = syPointers.DataFormat.__sift_ship_config(dict.duplicate(true),wantedSystems,["currentCargo","currentCargoBy","currentCargoComposition","damage","juryRig","preferredCrew","processedCargo","remoteCargo","tuning"],true)
-										if systems:
-											var add = true
-											for r in systems:
-												if r in dontSystems:
-													add = false
-											if add:
-												for thisSlot in config.get("slot","").split("&&",false):
-													setConfigHevLib(thisSlot.strip_edges(),dict,config.get("system"))
-							"random":
-								for dict in out:
-									if numerics_check(config,dict):
+				match config.get("mode",null):
+					"if_equipment_in_slot":
+						for dict in out:
+							var rand = CurrentGame.sraf(cfrRand + cfgHash + hash(dict)) * 1.33
+							if (clamp(config.get("chance",0.1),0.0,1.0) * modChanceScale) > rand:
+								if numerics_check(config,dict):
+									if conditional_system_check(config,dict,"do_add_if") and not conditional_system_check(config,dict,"dont_add_if"):
 										for thisSlot in config.get("slot","").split("&&",false):
 											setConfigHevLib(thisSlot.strip_edges(),dict,config.get("system"))
+					"if_tag_in_slot":
+						for dict in out:
+							var rand = CurrentGame.sraf(cfrRand + cfgHash + hash(dict)) * 1.33
+							if (clamp(config.get("chance",0.1),0.0,1.0) * modChanceScale) > rand:
+								if numerics_check(config,dict):
+									if conditional_tag_check(config,dict,"do_add_if") and not conditional_tag_check(config,dict,"dont_add_if"):
+										for thisSlot in config.get("slot","").split("&&",false):
+											setConfigHevLib(thisSlot.strip_edges(),dict,config.get("system"))
+					"if_equipment":
+						for dict in out:
+							var rand = CurrentGame.sraf(cfrRand + cfgHash + hash(dict)) * 1.33
+							if (clamp(config.get("chance",0.1),0.0,1.0) * modChanceScale) > rand:
+								if numerics_check(config,dict):
+									var doAdd = config.get("do_add_if",[])
+									var dontAdd = config.get("dont_add_if",[])
+									var wantedSystems = doAdd + dontAdd
+									var systems = syPointers.DataFormat.__sift_ship_config(dict.duplicate(true),wantedSystems,["currentCargo","currentCargoBy","currentCargoComposition","damage","juryRig","preferredCrew","processedCargo","remoteCargo","tuning"],true)
+									if systems:
+										var add = true
+										for r in systems:
+											if r in dontAdd:
+												add = false
+										if add:
+											for thisSlot in config.get("slot","").split("&&",false):
+												setConfigHevLib(thisSlot.strip_edges(),dict,config.get("system"))
+					"if_tag":
+						for dict in out:
+							var rand = CurrentGame.sraf(cfrRand + cfgHash + hash(dict)) * 1.33
+							if (clamp(config.get("chance",0.1),0.0,1.0) * modChanceScale) > rand:
+								if numerics_check(config,dict):
+									var doAdd = config.get("do_add_if",[])
+									var dontAdd = config.get("dont_add_if",[])
+									var doSystems = []
+									var dontSystems = []
+									for i in inverted_sys_slot_refs:
+										if i in doAdd:
+											doSystems.append_array(inverted_sys_slot_refs[i])
+										if i in dontAdd:
+											dontSystems.append_array(inverted_sys_slot_refs[i])
+									var wantedSystems = doSystems + dontSystems
+									var systems = syPointers.DataFormat.__sift_ship_config(dict.duplicate(true),wantedSystems,["currentCargo","currentCargoBy","currentCargoComposition","damage","juryRig","preferredCrew","processedCargo","remoteCargo","tuning"],true)
+									if systems:
+										var add = true
+										for r in systems:
+											if r in dontSystems:
+												add = false
+										if add:
+											for thisSlot in config.get("slot","").split("&&",false):
+												setConfigHevLib(thisSlot.strip_edges(),dict,config.get("system"))
+					"random":
+						for dict in out:
+							var rand = CurrentGame.sraf(cfrRand + cfgHash + hash(dict)) * 1.33
+							if (clamp(config.get("chance",0.1),0.0,1.0) * modChanceScale) > rand:
+								if numerics_check(config,dict):
+									for thisSlot in config.get("slot","").split("&&",false):
+										setConfigHevLib(thisSlot.strip_edges(),dict,config.get("system"))
 	return out
 
 func conditional_system_check(config,dict,op:String):
@@ -317,7 +335,7 @@ func numerics_check(config,dict):
 						val = float(val)
 				_:
 					continue
-			var inSlot = getConfigHevLib(slot,dict)
+			var inSlot = getConfigHevLib(slot,dict,0.0)
 			var isnt = true
 			if op.begins_with("!"):
 				isnt = false

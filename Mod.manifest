@@ -85,6 +85,26 @@ HEVLIB_CONFIG_SECTION_EQUIPMENT={
 		"type":"bool",
 		"default":false,
 	},
+	"max_dealership_modification_rolls":{
+		"name":"HEVLIB_CONFIG_MAX_DEALERSHIP_MODIFICATION_ROLLS",
+		"description":"HEVLIB_CONFIG_MAX_DEALERSHIP_MODIFICATION_ROLLS_TOOLTIP",
+		"type":"int",
+        "style":"slider",
+        "min":0,
+        "max":100,
+        "step":1,
+		"default":10,
+	},
+	"dealership_modification_roll_chance_scale":{
+		"name":"HEVLIB_CONFIG_DEALERSHIP_MODIFICATION_ROLL_CHANCE_SCALE",
+		"description":"HEVLIB_CONFIG_DEALERSHIP_MODIFICATION_ROLL_CHANCE_SCALE_TOOLTIP",
+		"type":"float",
+        "style":"slider",
+        "min":0.25,
+        "max":2.0,
+        "step":0.05,
+		"default":1.0,
+	},
 }
 HEVLIB_CONFIG_SECTION_EVENTS={
 	"write_events":{
