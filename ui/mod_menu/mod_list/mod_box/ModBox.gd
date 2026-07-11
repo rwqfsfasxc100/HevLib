@@ -117,11 +117,11 @@ func _pressed():
 	if manifestData:
 		for item in manifestData["mod_information"]["credits"]:
 			if creditText == "":
-				creditText = item
+				creditText = translateIfCan(item)
 			else:
-				creditText = creditText + "\n" + item
+				creditText = creditText + "\n" + translateIfCan(item)
 	if creditText != "":
-		information_nodes["info_desc_credits"].parse_bbcode(translateIfCan(creditText))
+		information_nodes["info_desc_credits"].parse_bbcode(creditText)
 		information_nodes["info_desc_credits"].visible = true
 		information_nodes["credits_header"].visible = true
 		information_nodes["credits_splitter"].visible = true
