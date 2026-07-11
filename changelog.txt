@@ -1,3 +1,25 @@
+[1.15.0]
+
+1=* Added ModifyShipBuild driver
+1.1=* Lets you modify the configs of new ships based on a number of parameters
+1.2=* Added through `MODIFY_SHIP_BUILDS.gd` in the drivers folder.
+1.3=* Defined through a series of configs. Each config can refer to a ship or series of ships, and it's encouraged to use multiple to help with more ship-specific configs
+1.4=* Example explaination would be too long for a changelog, however a fully-documented example exists in IoER: https://github.com/rwqfsfasxc100/IndustriesOfEnceladusRewrite/blob/main/HEVLIB_EQUIPMENT_DRIVER_TAGS/MODIFY_SHIP_BUILDS.gd
+1.5=* Two configs have been added to the equipment section that let you adjust the base chance and number of rolls permitted.
+1.6=* Any specific part for the 5 modification types can undergo config validation
+2=* Added additional argument to DataFormat.__sift_ship_config:
+2.1=* `return_only_system_names` - determines if the output array should contain just equipment names or the full config path. 
+2.2=* Defaults to `false`
+3=* Fixed missing equipment tags for the IRL-360
+4=* `REGISTER_SHIP_NUMERICS.gd` now validates on current mods
+5=* `ShipDriver` can now toggle ship availability in the dealer on-demand.
+5.1=* Uses a dictionary key of `settings_config` instead of the usual `config` for validation dictionaries due to `config` already being used for ship data
+6=* SAVE_BUTTONS.gd can now be prevented from adding a button based on mod availability
+7=* MODIFY_INTERNALS.gd now can be disabled with config or mod availability
+8=* Drivers instanced through subdriver process within an ADD_EQUIPMENT_ITEMS.gd entry now go through dictionary validation to be added
+9=* LOAD_CONFIGS.gd entries can now add `config`, `mod_requirements`, or `mod_incompatibilities` entries to limit loading of certain parts of a modlet
+10=* No longer saving a 'last hash' file to cache since it does not serve any functional purpose
+
 [1.14.25]
 
 1=* Mod menu now hides displays for any information sections not used (i.e. author, credits, languages)
