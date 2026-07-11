@@ -110,6 +110,7 @@ func _init(modLoader : ModLoader = ModLoader):
 
 		installScriptExtension("ThrusterSlot.gd")
 		installScriptExtension("SystemShipUpgradeUI.gd")
+		installScriptExtension("SystemBuyUI.gd")
 		installScriptExtension("UpgradeGroup.gd")
 		installScriptExtension("hardpoints/EquipmentItemTemplate.gd")
 

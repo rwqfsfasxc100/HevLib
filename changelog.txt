@@ -1,3 +1,7 @@
+[1.15.1]
+
+1=* Fixed issue where sold ships would have a duplicate ghost ship permanently at the top of the dealership.
+
 [1.15.0]
 
 1=* Added ModifyShipBuild driver
