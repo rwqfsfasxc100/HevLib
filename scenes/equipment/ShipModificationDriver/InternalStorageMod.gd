@@ -37,9 +37,6 @@ var listings = {}
 var hl_ism_system_name_registers = []
 var hl_ism_add_systems = []
 
-
-var hl_ism_cfgs_to_ignore = ["currentCargo","currentCargoBy","currentCargoComposition","damage","juryRig","preferredCrew","processedCargo","remoteCargo","tuning"]
-
 var currentInstalledEquipmentWithChanges = []
 var hl_ism_installedequipment = []
 
@@ -57,7 +54,7 @@ func _enter_tree():
 	
 	var sysNames = ismPointers.Equipment.processed_storage_systems
 	configMutex.lock()
-	currentInstalledEquipmentWithChanges = ismPointers.DataFormat.__sift_ship_config(shipConfig.duplicate(true),sysNames,hl_ism_cfgs_to_ignore)
+	currentInstalledEquipmentWithChanges = ismPointers.DataFormat.__sift_ship_config(shipConfig.duplicate(true),sysNames,["currentCargo","currentCargoBy","currentCargoComposition","damage","juryRig","preferredCrew","processedCargo","remoteCargo","tuning"])
 	configMutex.unlock()
 	for i in currentInstalledEquipmentWithChanges:
 		hl_ism_installedequipment.append(i.split(".")[i.split(".").size() - 1])
