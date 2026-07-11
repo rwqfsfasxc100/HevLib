@@ -200,12 +200,14 @@ func getBuildsFor(s: String):
 								for dict in out:
 									if numerics_check(config,dict):
 										if conditional_system_check(config,dict,"do_add_if") and not conditional_system_check(config,dict,"dont_add_if"):
-											setConfigHevLib(config.get("slot"),dict,config.get("system"))
+											for thisSlot in config.get("slot","").split("&&",false):
+												setConfigHevLib(thisSlot.strip_edges(),dict,config.get("system"))
 							"if_tag_in_slot":
 								for dict in out:
 									if numerics_check(config,dict):
 										if conditional_tag_check(config,dict,"do_add_if") and not conditional_tag_check(config,dict,"dont_add_if"):
-											setConfigHevLib(config.get("slot"),dict,config.get("system"))
+											for thisSlot in config.get("slot","").split("&&",false):
+												setConfigHevLib(thisSlot.strip_edges(),dict,config.get("system"))
 							"if_equipment":
 								for dict in out:
 									if numerics_check(config,dict):
@@ -219,7 +221,8 @@ func getBuildsFor(s: String):
 												if r in dontAdd:
 													add = false
 											if add:
-												setConfigHevLib(config.get("slot"),dict,config.get("system"))
+												for thisSlot in config.get("slot","").split("&&",false):
+													setConfigHevLib(thisSlot.strip_edges(),dict,config.get("system"))
 							"if_tag":
 								for dict in out:
 									if numerics_check(config,dict):
@@ -240,11 +243,13 @@ func getBuildsFor(s: String):
 												if r in dontSystems:
 													add = false
 											if add:
-												setConfigHevLib(config.get("slot"),dict,config.get("system"))
+												for thisSlot in config.get("slot","").split("&&",false):
+													setConfigHevLib(thisSlot.strip_edges(),dict,config.get("system"))
 							"random":
 								for dict in out:
 									if numerics_check(config,dict):
-										setConfigHevLib(config.get("slot"),dict,config.get("system"))
+										for thisSlot in config.get("slot","").split("&&",false):
+											setConfigHevLib(thisSlot.strip_edges(),dict,config.get("system"))
 	return out
 
 func conditional_system_check(config,dict,op:String):
@@ -256,10 +261,10 @@ func conditional_system_check(config,dict,op:String):
 			var orChecks:PoolStringArray = slot.split("||",false)
 			var orPassed = false
 			for o in orChecks:
-				var andChecks:PoolStringArray = o.split("&&",false)
+				var andChecks:PoolStringArray = o.strip_edges().split("&&",false)
 				var andPassed = true
 				for a in andChecks:
-					var inSlot = getConfigHevLib(a,dict)
+					var inSlot = getConfigHevLib(a.strip_edges(),dict)
 					if not inSlot in slotcheck:
 						andPassed = false
 				if andPassed:
@@ -278,10 +283,10 @@ func conditional_tag_check(config,dict,op:String):
 			var orChecks:PoolStringArray = slot.split("||",false)
 			var orPassed = false
 			for o in orChecks:
-				var andChecks:PoolStringArray = o.split("&&",false)
+				var andChecks:PoolStringArray = o.strip_edges().split("&&",false)
 				var andPassed = true
 				for a in andChecks:
-					var inSlot = getConfigHevLib(a,dict)
+					var inSlot = getConfigHevLib(a.strip_edges(),dict)
 					if not inSlot in sys_slot_refs:
 						andPassed = false
 					else:
