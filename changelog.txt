@@ -1,3 +1,11 @@
+[1.15.2]
+
+1=* Improved netcode that handles updates for mods
+2=* Added failsafe to prevent mod downloads from getting stuck when API calls are limited
+3=* Fixed credits not being translated if there were more than one entry within the credits array
+4=* Converted contributor entries to translations
+5=* Fixed translation check only showing information regarding the last updated mod, which should be able to help translators figure out missing or incorrect translations.
+
 [1.15.1]
 
 1=* Fixed issue where sold ships would have a duplicate ghost ship permanently at the top of the dealership.
