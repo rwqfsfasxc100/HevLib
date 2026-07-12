@@ -3102,7 +3102,7 @@ class _Equipment:
 						for ar in constants:
 							var sorting = {}
 							var dict : Dictionary = constants[ar]
-							if pointers.ConfigDriver.__validate_dictionary(dict,false):
+							if pointers.ConfigDriver.__validate_dictionary(dict):
 								var shipNames = dict.get("ship_name",[])
 								var doAdd = true
 								match typeof(shipNames):
@@ -3144,9 +3144,9 @@ class _Equipment:
 														i["mode"] = entry
 														i["recurse_for_alias"] = recurse
 														for shipName in shipNames:
-															var ir = i.duplicate(true)
-															ir["ship_name"] = shipName
-															sorting[prio].append(ir)
+															i["ship_name"] = shipName
+															for r in range(i.get("weight",1)):
+																sorting[prio].append(i.duplicate(true))
 										
 										
 							var sKeys = sorting.keys()
