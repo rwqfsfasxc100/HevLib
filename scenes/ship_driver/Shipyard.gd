@@ -211,7 +211,12 @@ func getBuildsFor(s: String):
 								if numerics_check(config,dict):
 									if conditional_system_check(config,dict,"do_add_if") and not conditional_system_check(config,dict,"dont_add_if"):
 										for thisSlot in config.get("slot","").split("&&",false):
-											setConfigHevLib(thisSlot.strip_edges(),dict,config.get("system"))
+											var sys = config.get("system")
+											match typeof(sys):
+												TYPE_ARRAY,TYPE_STRING_ARRAY:
+													setConfigHevLib(thisSlot.strip_edges(),dict,sys[cfrRand % sys.size()])
+												_:
+													setConfigHevLib(thisSlot.strip_edges(),dict,sys)
 					"if_tag_in_slot":
 						for dict in out:
 							var rand = CurrentGame.sraf(cfrRand + cfgHash + hash(dict)) * 1.33
@@ -219,7 +224,12 @@ func getBuildsFor(s: String):
 								if numerics_check(config,dict):
 									if conditional_tag_check(config,dict,"do_add_if") and not conditional_tag_check(config,dict,"dont_add_if"):
 										for thisSlot in config.get("slot","").split("&&",false):
-											setConfigHevLib(thisSlot.strip_edges(),dict,config.get("system"))
+											var sys = config.get("system")
+											match typeof(sys):
+												TYPE_ARRAY,TYPE_STRING_ARRAY:
+													setConfigHevLib(thisSlot.strip_edges(),dict,sys[cfrRand % sys.size()])
+												_:
+													setConfigHevLib(thisSlot.strip_edges(),dict,sys)
 					"if_equipment":
 						for dict in out:
 							var rand = CurrentGame.sraf(cfrRand + cfgHash + hash(dict)) * 1.33
@@ -236,7 +246,12 @@ func getBuildsFor(s: String):
 												add = false
 										if add:
 											for thisSlot in config.get("slot","").split("&&",false):
-												setConfigHevLib(thisSlot.strip_edges(),dict,config.get("system"))
+												var sys = config.get("system")
+												match typeof(sys):
+													TYPE_ARRAY,TYPE_STRING_ARRAY:
+														setConfigHevLib(thisSlot.strip_edges(),dict,sys[cfrRand % sys.size()])
+													_:
+														setConfigHevLib(thisSlot.strip_edges(),dict,sys)
 					"if_tag":
 						for dict in out:
 							var rand = CurrentGame.sraf(cfrRand + cfgHash + hash(dict)) * 1.33
@@ -260,14 +275,24 @@ func getBuildsFor(s: String):
 												add = false
 										if add:
 											for thisSlot in config.get("slot","").split("&&",false):
-												setConfigHevLib(thisSlot.strip_edges(),dict,config.get("system"))
+												var sys = config.get("system")
+												match typeof(sys):
+													TYPE_ARRAY,TYPE_STRING_ARRAY:
+														setConfigHevLib(thisSlot.strip_edges(),dict,sys[cfrRand % sys.size()])
+													_:
+														setConfigHevLib(thisSlot.strip_edges(),dict,sys)
 					"random":
 						for dict in out:
 							var rand = CurrentGame.sraf(cfrRand + cfgHash + hash(dict)) * 1.33
 							if (clamp(config.get("chance",0.1),0.0,1.0) * modChanceScale) > rand:
 								if numerics_check(config,dict):
 									for thisSlot in config.get("slot","").split("&&",false):
-										setConfigHevLib(thisSlot.strip_edges(),dict,config.get("system"))
+										var sys = config.get("system")
+										match typeof(sys):
+											TYPE_ARRAY,TYPE_STRING_ARRAY:
+												setConfigHevLib(thisSlot.strip_edges(),dict,sys[cfrRand % sys.size()])
+											_:
+												setConfigHevLib(thisSlot.strip_edges(),dict,sys)
 	return out
 
 func conditional_system_check(config,dict,op:String):
