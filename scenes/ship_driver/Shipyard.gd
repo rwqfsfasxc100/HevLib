@@ -199,7 +199,7 @@ func getBuildsFor(s: String):
 	if out and s in cfg_mod_refs:
 		var scfgs = cfg_mod_refs[s].size()
 		for cfgi in range(maxRolls):
-			var cfrRand = CurrentGame.srai(day + cfgi, 1)[0]
+			var cfrRand = CurrentGame.srai(day + hash(s) - cfgi, 1)[0]
 			var config = cfg_mod_refs[s][cfrRand % scfgs]
 			if syPointers.ConfigDriver.__validate_dictionary(config,true,false,false):
 				var cfgHash = hash(config)
