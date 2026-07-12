@@ -1,3 +1,12 @@
+[1.15.3]
+
+1=* `MODIFY_SHIP_BUILDS.gd` entries can now use arrays of strings or PoolStringArrays for the `ship_name` property to have the same entry cover multiple ships (or ship types when recursive)
+2=* `MODIFY_SHIP_BUILDS.gd` entries can now use an Array/PoolStringArray in place of the system property to use a random system for a single config entry.
+3=* Fixed crash caused by trying to modify builds for a ship that didn't have any alternate configs (such as the EIME)
+4=* Added the ability to set weights for specific entries within a `MODIFY_SHIP_BUILDS.gd` constant.
+5=* Improved logging for cases where the game has to exit or reboot
+6=* Changed the way that `MODIFY_SHIP_BUILDS.gd` randomizes the equipment it's adding
+
 [1.15.2]
 
 1=* Improved netcode that handles updates for mods
