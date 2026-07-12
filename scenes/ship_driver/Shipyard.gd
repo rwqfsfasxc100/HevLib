@@ -192,22 +192,32 @@ var sys_slot_refs:Dictionary = {}
 var inverted_sys_slot_refs:Dictionary = {}
 var cfg_mod_refs:Dictionary = {}
 
-var rehash_rand:Array = []
+var rehash_rand:Dictionary = {}
 
 func getBuildsFor(s: String):
 	var wraparound = 0x0000FFFFFFFFFFFF
 	var out = .getBuildsFor(s)
 	var now = CurrentGame.getInGameTimestamp()
 	var day = int(floor(now / (24 * 3600)))
+	for i in rehash_rand:
+		if i < day - 5:
+			rehash_rand.erase(i)
+	if not day in rehash_rand:
+		rehash_rand[day] = {}
 	if out and s in cfg_mod_refs:
 		var scfgs = cfg_mod_refs[s].size()
 		var useTheseConfigs = []
-		var outHash = hash(out)
+		var outHash = hash(out) + hash(s)
 		var cfrRand = (CurrentGame.srai(day + outHash + scfgs, 1)[0]) % wraparound
+		if not s in rehash_rand[day]:
+			rehash_rand[day][s] = []
+		while cfrRand in rehash_rand[day][s]:
+			cfrRand = (CurrentGame.srai(cfrRand,1)[0]) % wraparound
 		for i in range(min(maxRolls,scfgs)):
-			useTheseConfigs.append(cfg_mod_refs[s][(cfrRand + hash(s) + day % (i + 0xFF)) % scfgs])
-		for config in useTheseConfigs:
-			var rand = CurrentGame.sraf((cfrRand + hash(config)) % wraparound) * 1.33
+			useTheseConfigs.append(cfg_mod_refs[s][(cfrRand % ((2 * i) + 0xFF)) % scfgs])
+		for cnum in range(useTheseConfigs.size()):
+			var config = useTheseConfigs[cnum]
+			var rand = CurrentGame.sraf(cfrRand % (cnum + 0xFF))# * 1.33
 			if syPointers.ConfigDriver.__validate_dictionary(config,true,false,false):
 				if (clamp(config.get("chance",0.1),0.0,1.0) * modChanceScale) > (rand):
 					match config.get("mode",null):
