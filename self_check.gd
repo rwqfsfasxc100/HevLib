@@ -89,7 +89,9 @@ func _confirmed_pressed():
 func _popup_hide():
 	if not mod_exists and crash_if_not_found:
 		Debug.l("HevLib Self Verification: mod %s not found at proper location, exiting game" % mod_name)
-		ModLoader._savedObjects[0].DataFormat.__exit(true)
+		Debug.batchWrite()
+		var pid = OS.execute(OS.get_executable_path(), OS.get_cmdline_args(), false)
+		OS.kill(OS.get_process_id())
 
 func _tree_exited():
 	self.window_title = dialogue_box_title

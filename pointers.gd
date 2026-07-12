@@ -4722,8 +4722,7 @@ class _FileAccess:
 			if reboot == OK:
 				var exitMsg = "new and/or updated mods detected, rebooting game"
 				print(exitMsg)
-				pointers.l(exitMsg,"pointers.FileAccess")
-				pointers.DataFormat.__exit(true)
+				pointers.DataFormat.__exit(true,exitMsg,"pointers.FileAccess")
 	
 	
 	
@@ -7094,11 +7093,11 @@ class _NodeAccess:
 		for obj in node.get_children():
 			__remove_scripts(obj)
 	
-	func __exit(restart : bool = false):
+	func __exit(restart : bool = false, exit_message : String = "", exit_header : String = ""):
 		if restart:
-			pointers.l("exiting with restart","pointers.DataFormat")
+			pointers.l(("restarting with message: %s" % exit_message) if exit_message else "exiting with restart",(exit_header) if (exit_header) else ("pointers.DataFormat"))
 			var pid = OS.execute(OS.get_executable_path(), OS.get_cmdline_args(), false)
-		else: pointers.l("exiting","pointers.DataFormat")
+		else: pointers.l(("exiting with message: %s" % exit_message) if exit_message else "exiting",(exit_header) if (exit_header) else ("pointers.DataFormat"))
 		Debug.batchWrite()
 		pointers.storeLogCache()
 		OS.kill(OS.get_process_id())
