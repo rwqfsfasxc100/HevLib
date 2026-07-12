@@ -196,7 +196,7 @@ func getBuildsFor(s: String):
 	var out = .getBuildsFor(s)
 	var now = CurrentGame.getInGameTimestamp()
 	var day = int(floor(now / (24 * 3600)))
-	if s in cfg_mod_refs:
+	if out and s in cfg_mod_refs:
 		var scfgs = cfg_mod_refs[s].size()
 		for cfgi in range(maxRolls):
 			var cfrRand = CurrentGame.srai(day + cfgi, 1)[0]
