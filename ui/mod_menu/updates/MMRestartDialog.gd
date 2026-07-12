@@ -22,13 +22,10 @@ func let_restart(how):
 	$PanelContainer/VBoxContainer/HBoxContainer/Exit/Button.disabled = !how
 
 func _restart():
-	var path = OS.get_executable_path()
-	var args = OS.get_cmdline_args()
-	var pid = OS.execute(path, args, false)
-	OS.kill(OS.get_process_id())
+	ModLoader._savedObjects[0].DataFormat.__exit(true)
 
 func _exit():
-	OS.kill(OS.get_process_id())
+	ModLoader._savedObjects[0].DataFormat.__exit()
 
 func _input(event):
 	if is_visible_in_tree() and Input.is_action_just_pressed("ui_cancel"):

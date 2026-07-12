@@ -148,7 +148,7 @@ func _confirmed():
 
 
 func _custom_action():
-	OS.kill(OS.get_process_id())
+	pointers.DataFormat.__exit()
 
 
 func _ignore_all_pressed():

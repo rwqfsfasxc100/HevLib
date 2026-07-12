@@ -75,7 +75,7 @@ func _restart():
 	Settings.restartGame()
 
 func _exit():
-	OS.kill(OS.get_process_id())
+	pointers.DataFormat.__exit()
 
 func restart_cancel():
 	subroot.restart_menu.hide()

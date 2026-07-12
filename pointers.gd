@@ -4720,10 +4720,10 @@ class _FileAccess:
 			file.store_string("[]")
 			file.close()
 			if reboot == OK:
-				var path = OS.get_executable_path()
-				var args = OS.get_cmdline_args()
-				var pid = OS.execute(path, args, false)
-				OS.kill(OS.get_process_id())
+				var exitMsg = "new and/or updated mods detected, rebooting game"
+				print(exitMsg)
+				pointers.l(exitMsg,"pointers.FileAccess")
+				pointers.DataFormat.__exit(true)
 	
 	
 	
@@ -7096,7 +7096,9 @@ class _NodeAccess:
 	
 	func __exit(restart : bool = false):
 		if restart:
+			pointers.l("exiting with restart","pointers.DataFormat")
 			var pid = OS.execute(OS.get_executable_path(), OS.get_cmdline_args(), false)
+		else: pointers.l("exiting","pointers.DataFormat")
 		Debug.batchWrite()
 		pointers.storeLogCache()
 		OS.kill(OS.get_process_id())
