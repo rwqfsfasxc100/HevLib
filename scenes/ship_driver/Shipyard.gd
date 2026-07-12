@@ -192,22 +192,27 @@ var sys_slot_refs:Dictionary = {}
 var inverted_sys_slot_refs:Dictionary = {}
 var cfg_mod_refs:Dictionary = {}
 
+var rehash_rand:Array = []
+
 func getBuildsFor(s: String):
+	var wraparound = 0x0000FFFFFFFFFFFF
 	var out = .getBuildsFor(s)
 	var now = CurrentGame.getInGameTimestamp()
 	var day = int(floor(now / (24 * 3600)))
 	if out and s in cfg_mod_refs:
 		var scfgs = cfg_mod_refs[s].size()
-		for cfgi in range(maxRolls):
-			var cfrRand = CurrentGame.srai(day + hash(s) - cfgi, 1)[0]
-			var config = cfg_mod_refs[s][cfrRand % scfgs]
+		var useTheseConfigs = []
+		var outHash = hash(out)
+		var cfrRand = (CurrentGame.srai(day + outHash + scfgs, 1)[0]) % wraparound
+		for i in range(min(maxRolls,scfgs)):
+			useTheseConfigs.append(cfg_mod_refs[s][(cfrRand + hash(s) + day % (i + 0xFF)) % scfgs])
+		for config in useTheseConfigs:
+			var rand = CurrentGame.sraf((cfrRand + hash(config)) % wraparound) * 1.33
 			if syPointers.ConfigDriver.__validate_dictionary(config,true,false,false):
-				var cfgHash = hash(config)
-				match config.get("mode",null):
-					"if_equipment_in_slot":
-						for dict in out:
-							var rand = CurrentGame.sraf(cfrRand + cfgHash + hash(dict)) * 1.33
-							if (clamp(config.get("chance",0.1),0.0,1.0) * modChanceScale) > rand:
+				if (clamp(config.get("chance",0.1),0.0,1.0) * modChanceScale) > (rand):
+					match config.get("mode",null):
+						"if_equipment_in_slot":
+							for dict in out:
 								if numerics_check(config,dict):
 									if conditional_system_check(config,dict,"do_add_if") and not conditional_system_check(config,dict,"dont_add_if"):
 										for thisSlot in config.get("slot","").split("&&",false):
@@ -217,10 +222,8 @@ func getBuildsFor(s: String):
 													setConfigHevLib(thisSlot.strip_edges(),dict,sys[cfrRand % sys.size()])
 												_:
 													setConfigHevLib(thisSlot.strip_edges(),dict,sys)
-					"if_tag_in_slot":
-						for dict in out:
-							var rand = CurrentGame.sraf(cfrRand + cfgHash + hash(dict)) * 1.33
-							if (clamp(config.get("chance",0.1),0.0,1.0) * modChanceScale) > rand:
+						"if_tag_in_slot":
+							for dict in out:
 								if numerics_check(config,dict):
 									if conditional_tag_check(config,dict,"do_add_if") and not conditional_tag_check(config,dict,"dont_add_if"):
 										for thisSlot in config.get("slot","").split("&&",false):
@@ -230,10 +233,8 @@ func getBuildsFor(s: String):
 													setConfigHevLib(thisSlot.strip_edges(),dict,sys[cfrRand % sys.size()])
 												_:
 													setConfigHevLib(thisSlot.strip_edges(),dict,sys)
-					"if_equipment":
-						for dict in out:
-							var rand = CurrentGame.sraf(cfrRand + cfgHash + hash(dict)) * 1.33
-							if (clamp(config.get("chance",0.1),0.0,1.0) * modChanceScale) > rand:
+						"if_equipment":
+							for dict in out:
 								if numerics_check(config,dict):
 									var doAdd = config.get("do_add_if",[])
 									var dontAdd = config.get("dont_add_if",[])
@@ -252,10 +253,8 @@ func getBuildsFor(s: String):
 														setConfigHevLib(thisSlot.strip_edges(),dict,sys[cfrRand % sys.size()])
 													_:
 														setConfigHevLib(thisSlot.strip_edges(),dict,sys)
-					"if_tag":
-						for dict in out:
-							var rand = CurrentGame.sraf(cfrRand + cfgHash + hash(dict)) * 1.33
-							if (clamp(config.get("chance",0.1),0.0,1.0) * modChanceScale) > rand:
+						"if_tag":
+							for dict in out:
 								if numerics_check(config,dict):
 									var doAdd = config.get("do_add_if",[])
 									var dontAdd = config.get("dont_add_if",[])
@@ -281,10 +280,8 @@ func getBuildsFor(s: String):
 														setConfigHevLib(thisSlot.strip_edges(),dict,sys[cfrRand % sys.size()])
 													_:
 														setConfigHevLib(thisSlot.strip_edges(),dict,sys)
-					"random":
-						for dict in out:
-							var rand = CurrentGame.sraf(cfrRand + cfgHash + hash(dict)) * 1.33
-							if (clamp(config.get("chance",0.1),0.0,1.0) * modChanceScale) > rand:
+						"random":
+							for dict in out:
 								if numerics_check(config,dict):
 									for thisSlot in config.get("slot","").split("&&",false):
 										var sys = config.get("system")
