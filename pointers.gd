@@ -3103,36 +3103,49 @@ class _Equipment:
 							var sorting = {}
 							var dict : Dictionary = constants[ar]
 							if pointers.ConfigDriver.__validate_dictionary(dict,false):
-								var shipName:String = dict.get("ship_name","")
-								
-								if shipName:
-									var recurse = dict.get("recurse_for_alias",false)
-									for entry in dict:
-										match entry:
-											"if_equipment_in_slot","if_tag_in_slot","random","if_equipment","if_tag","check_numerics","config":
-												for i in dict[entry]:
-													if "do_add_if" in i:
-														for st in i["do_add_if"]:
-															if not st:
-																i["do_add_if"].erase(st)
-															for r in st:
-																if not r:
-																	st.erase(r)
-													if "dont_add_if" in i:
-														for st in i["dont_add_if"]:
-															if not st:
-																i["dont_add_if"].erase(st)
-															for r in st:
-																if not r:
-																	st.erase(r)
-													if i.get("slot",null) and i.get("system",null):
-														var prio = i.get("priority",0)
-														i["ship_name"] = shipName
-														i["mode"] = entry
-														i["recurse_for_alias"] = recurse
-														if not prio in sorting:
-															sorting[prio] = []
-														sorting[prio].append(i)
+								var shipNames = dict.get("ship_name",[])
+								var doAdd = true
+								match typeof(shipNames):
+									TYPE_STRING:
+										shipNames = PoolStringArray([shipNames])
+									TYPE_ARRAY:
+										var ovr = PoolStringArray()
+										for i in shipNames:
+											if typeof(i) == TYPE_STRING:
+												ovr.append(i)
+										shipNames = ovr
+									TYPE_STRING_ARRAY:
+										pass
+									_: doAdd = false
+								if doAdd:
+									for shipName in shipNames:
+										var recurse = dict.get("recurse_for_alias",false)
+										for entry in dict:
+											match entry:
+												"if_equipment_in_slot","if_tag_in_slot","random","if_equipment","if_tag","check_numerics","config":
+													for i in dict[entry]:
+														if "do_add_if" in i:
+															for st in i["do_add_if"]:
+																if not st:
+																	i["do_add_if"].erase(st)
+																for r in st:
+																	if not r:
+																		st.erase(r)
+														if "dont_add_if" in i:
+															for st in i["dont_add_if"]:
+																if not st:
+																	i["dont_add_if"].erase(st)
+																for r in st:
+																	if not r:
+																		st.erase(r)
+														if i.get("slot",null) and i.get("system",null):
+															var prio = i.get("priority",0)
+															i["ship_name"] = shipName
+															i["mode"] = entry
+															i["recurse_for_alias"] = recurse
+															if not prio in sorting:
+																sorting[prio] = []
+															sorting[prio].append(i)
 							var sKeys = sorting.keys()
 							sKeys.sort()
 							for o in sKeys:
