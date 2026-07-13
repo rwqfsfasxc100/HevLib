@@ -5843,9 +5843,9 @@ class _ManifestV2:
 		var manifest_data : Dictionary = {}
 		var manifest_version : float = 1.0
 		var has_icon_file : bool = false
-		var png_path := ""
-		var stex_path := ""
-		var icon_path := ""
+		var png_path : String = ""
+		var stex_path : String = ""
+		var icon_path : String = ""
 		var content : Array = __get_manifest_files() + __get_icon_files()
 		
 		var mod_enabled := true
@@ -5968,7 +5968,7 @@ class _ManifestV2:
 			return false
 		var checked_manifest_version:float = checked_mod_data[check_keys[0]]["manifest"]["manifest_version"]
 		var installed_manifest_version:float = installed_dict["manifest"]["manifest_version"]
-		if checked_manifest_version <= 1:
+		if checked_manifest_version < 2:
 			return false
 		if checked_manifest_version > installed_manifest_version:
 			return true
