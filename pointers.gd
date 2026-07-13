@@ -411,14 +411,22 @@ class _Achievements:
 		
 		http.disconnect("request_completed",self,"out2")
 		var d = JSON.parse(body.get_string_from_utf8()).result
-		var mdf = {}
 		if d:
+			var mdf = {}
+			var mdds = pointers.ManifestV2.__get_mod_data()
 			for mod in pointers.ManifestV2.zip_ref_store:
-				var md5 = file.get_md5(mod)
-				if md5 in d:
-					mdf[mod] = [md5,d[md5]]
-		if mdf:
-			initFetch(mdf)
+				var mdr = mdds[mod]
+				if mdr.manifest.has_manifest:
+					var mid = mdr.manifest.manifest_data
+					if "mod_information" in mid and "id" in mid["mod_information"]:
+						var md5 = mod["mod_information"]["id"].md5_text()
+						if md5 in d:
+							var pd = d[md5]
+							if pd[1] != file.get_md5(mod):
+								pd[0] = 0
+							mdf[mod] = [md5,pd[0]]
+			if mdf:
+				initFetch(mdf)
 	var fetchData = {}
 	var fetchTimer = Timer.new()
 	func initFetch(data):
@@ -4726,16 +4734,16 @@ class _FileAccess:
 		var modPathPrefix = gameInstallDirectory.plus_file("mods")
 		if file.file_exists(updateCacheFile):
 			var files_to_copy : Array = JSON.parse(__get_file_content(updateCacheFile)).result
-			var reboot:int = FAILED
+			var reboot:bool = false
 			for mod in files_to_copy:
 				if file.file_exists(mod):
 					var check:int = __copy_file(mod,modPathPrefix)
 					if check == OK:
-						reboot = OK
+						reboot = true
 			file.open(updateCacheFile,File.WRITE)
 			file.store_string("[]")
 			file.close()
-			if reboot == OK:
+			if reboot:
 				var exitMsg = "new and/or updated mods detected, rebooting game"
 				print(exitMsg)
 				pointers.DataFormat.__exit(true,exitMsg,"pointers.FileAccess")
@@ -7555,7 +7563,7 @@ class _Translations:
 				var delim = dv[t]
 				match typeof(delim):
 					TYPE_STRING:
-						var dict = pointers.Translations.__translation_file_to_dictionary(t,delim)
+						var dict = __translation_file_to_dictionary(t,delim)
 						for lp in dict:
 							if not lp in data:
 								data[lp] = {}
@@ -7576,7 +7584,7 @@ class _Translations:
 						if invert:
 							do = !do
 						if do and string != "":
-							var dict = pointers.Translations.__translation_file_to_dictionary(t,string)
+							var dict = __translation_file_to_dictionary(t,string)
 							for lp in dict:
 								if not lp in data:
 									data[lp] = {}
@@ -7590,7 +7598,7 @@ class _Translations:
 		file.open("user://cache/.HevLib_Cache/translation_check_data.json",File.WRITE)
 		file.store_string(JSON.print(ml_check_data,"\t"))
 		file.close()
-		pointers.Translations.__updateTL_from_dictionary(data.duplicate(true),pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","full_logging"))
+		__updateTL_from_dictionary(data.duplicate(true),pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","full_logging"))
 
 class _WebTranslate:
 	var scripts : Array = [
