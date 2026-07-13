@@ -2388,7 +2388,7 @@ class _DriverManagement:
 			if has_manifest:
 				manifest = pointers.ManifestV2.__parse_file_as_manifest(manifest_path)
 				id = manifest.get("mod_information",{}).get("id","")
-			if id != "":
+			if id:
 				this_mod_data.merge({"id":id})
 			var mm_prio:int = 0
 			if modFile.begins_with("mod") and modFile.ends_with(".manifest"):
@@ -2402,8 +2402,8 @@ class _DriverManagement:
 			this_mod_data["drivers"] = __get_drivers_from_modmain_path(modmain_path)
 			
 			this_mod_data.merge({"mod_directory":modFolder})
-			if this_mod_data["drivers"].size() > 0:
-				if (get_ids.size()) == 0 or (get_ids.size() > 0 and id in get_ids):
+			if this_mod_data["drivers"]:
+				if (not get_ids) or (get_ids and id in get_ids):
 					mod_drivers.append(this_mod_data)
 		
 		mod_drivers.sort_custom(self,"compare_driver_dictionaries")
@@ -4891,18 +4891,12 @@ class _FolderAccess:
 					fileList.append(fileName)
 		return Array(fileList)
 	
-	func __get_first_file(folder: String):
-		var firstFile
-		var fileNo = 0
+	func __get_first_file(folder: String) -> String:
 		var fileList : Array = __fetch_folder_files(folder)
-		for file in fileList:
-			if fileNo == 0:
-				firstFile = file
-				fileNo = 1
-		if firstFile == null:
-			return ""
+		if fileList:
+			return fileList[0]
 		else:
-			return firstFile
+			return ""
 	
 	var folderStructureCache : Dictionary = {}
 	
