@@ -6413,31 +6413,26 @@ class _ManifestV2:
 		return ex_data
 	
 	func __get_manifest_section(section: String, mod_id: String = "") -> Dictionary:
-		var manifest_data_cache : Dictionary = __get_manifest_cache()
-		var mode:int = 0
 		var return_data : Dictionary = {}
-		if mod_id != "":
-			mode = 1
-		match mode:
-			0:
-				for mod in manifest_data_cache:
+		var manifest_data_cache : Dictionary = __get_manifest_cache()
+		if mod_id:
+			for mod in manifest_data_cache:
+				if mod_id in __get_mod_ids():
 					var manifest : Dictionary = manifest_data_cache[mod]
-					if section in manifest:
-						return_data[mod] = manifest[section]
-					
-			1:
-				for mod in manifest_data_cache:
-					if mod_id in __get_mod_ids():
-						var manifest : Dictionary = manifest_data_cache[mod]
-						if "mod_information" in manifest:
-							if mod_id in manifest["mod_information"]["id"]:
-								if section in manifest:
-									return_data = manifest[section]
-		
+					if "mod_information" in manifest:
+						if mod_id in manifest["mod_information"]["id"]:
+							if section in manifest:
+								return_data = manifest[section]
+		else:
+			for mod in manifest_data_cache:
+				var manifest : Dictionary = manifest_data_cache[mod]
+				if section in manifest:
+					return_data[mod] = manifest[section]
 		return return_data
 	
 	func __get_manifest_entry(section: String, entry: String, mod_id: String = ""):
 		var manifest_data_cache : Dictionary = __get_manifest_cache()
+		var return_data = null
 		if mod_id:
 			for mod in manifest_data_cache:
 				if mod_id in __get_mod_ids():
@@ -6447,7 +6442,7 @@ class _ManifestV2:
 							if section in manifest:
 								var sec : Dictionary = manifest[section]
 								if entry in sec:
-									return sec[entry]
+									return_data = sec[entry]
 		else:
 			var dict : Dictionary = {}
 			for mod in manifest_data_cache:
@@ -6457,7 +6452,8 @@ class _ManifestV2:
 					var id : String = manifest_data_cache[mod]["mod_information"]["id"]
 					if entry in sec[mod]:
 						dict.merge({id:sec[mod][entry]})
-			return dict
+			return_data = dict
+		return return_data
 		
 	
 	var caches_mod_ids : Array = []
