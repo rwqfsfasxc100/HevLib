@@ -5756,7 +5756,6 @@ class _ManifestV2:
 			for item in modmain_files:
 				pointers.l("registering ModMain %s" % item,"pointers.ManifestV2")
 				modListArr.append(__concat_mod_info(item))
-#				modListArr.append({"constants":constants,"script_path":item,"node":(modNodes[item]) if (is_onready or item in modNodes) else (null)})
 			var modlet_files : Array = __get_modlet_files()
 			pointers.l("found [%s] modlet files" % modlet_files.size(),"pointers.ManifestV2")
 			for item in modlet_files:
@@ -5946,8 +5945,8 @@ class _ManifestV2:
 		var c2:int = b.get("constants",{}).get("MOD_PRIORITY",0)
 		if c1 != c2:
 			return c1 < c2
-		var b1:PoolByteArray = a.get("mod_path","").to_ascii()#.split("/")
-		var b2:PoolByteArray = b.get("mod_path","").to_ascii()#.split("/")
+		var b1:PoolByteArray = a.get("mod_path","").to_ascii()
+		var b2:PoolByteArray = b.get("mod_path","").to_ascii()
 		if b1 != b2:
 			return b1 < b2
 		return false
@@ -6439,44 +6438,27 @@ class _ManifestV2:
 	
 	func __get_manifest_entry(section: String, entry: String, mod_id: String = ""):
 		var manifest_data_cache : Dictionary = __get_manifest_cache()
-		var mode:int = 0
-		var return_data : Dictionary = {}
-		if mod_id != "":
-			mode = 1
-		match mode:
-			0:
-				for mod in manifest_data_cache:
+		if mod_id:
+			for mod in manifest_data_cache:
+				if mod_id in __get_mod_ids():
 					var manifest : Dictionary = manifest_data_cache[mod]
-					if section in manifest:
-						return_data[mod] = manifest[section]
-					
-			1:
-				for mod in manifest_data_cache:
-					if mod_id in __get_mod_ids():
-						var manifest : Dictionary = manifest_data_cache[mod]
-						if "mod_information" in manifest:
-							if mod_id in manifest["mod_information"]["id"]:
-								if section in manifest:
-									return_data = manifest[section]
-		
-		var sec = return_data
-		
-		var nmode:int = 0
-		if mod_id != "":
-			nmode = 1
-		match nmode:
-			0:
-				var dict : Dictionary = {}
-				for mod in sec:
+					if "mod_information" in manifest:
+						if mod_id in manifest["mod_information"]["id"]:
+							if section in manifest:
+								var sec : Dictionary = manifest[section]
+								if entry in sec:
+									return sec[entry]
+		else:
+			var dict : Dictionary = {}
+			for mod in manifest_data_cache:
+				var manifest : Dictionary = manifest_data_cache[mod]
+				if section in manifest:
+					var sec : Dictionary = manifest[section]
 					var id : String = manifest_data_cache[mod]["mod_information"]["id"]
 					if entry in sec[mod]:
-						var e = sec[mod][entry]
-						dict.merge({id:e})
-				return dict
-			1:
-				if entry in sec:
-					return sec[entry]
-		return {}
+						dict.merge({id:sec[mod][entry]})
+			return dict
+		
 	
 	var caches_mod_ids : Array = []
 	
