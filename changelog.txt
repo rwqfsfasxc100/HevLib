@@ -1,3 +1,21 @@
+[1.15.4]
+
+1=* Changed GitHub listing, mod updates, and downloads to now use update DB
+1.1=* This now uses a repository to store data regarding mod updates, which can be found at `https://github.com/rwqfsfasxc100/dv_update_database`
+1.2=* This is now where all updates, github lists, and DV topic data is fetched from by this library, which should avoid any issues with GitHub rate limits regarding updates and downloads.
+1.3=* Mods not found on this will have their information sent to the database to ensure it's there in future
+1.3.1=* NOTE: This does not happen on editor builds, at least without enabling the `Send new mod info on Editor builds` option and restarting.
+1.4=* This may cause some weirdness with updates due to the fact that this is a very big change. Please report any problems you may encounter
+2=* Fixed MODIFY_INTERNALS not working on passing a dictionary validation
+3=* Fixed crash with save settings menu
+4=* Added true density display to the positional data debug display
+5=* Improved performance of `FolderAccess`.`__get_first_file`
+6=* Loading translations no longer needs to reference it's own pointer since it's not using a unique script anymore
+7=* Mod developers: updated mods are now no longer automatically detected for regular players. You need to manually tell the database that you're pushing an update.
+7.1=* A button and popup are now displayed on the title screen of editor builds to let you do this.
+7.2=* The database is supposed to check every hour, however due to inconsistencies with GitHub actions scheduling, it usually doesn't, which is why this is in place (but is a backup if you forget)
+7.3=* I'm aware that this makes updates a lot more inconvenient, however it gives an opportunity to ensure that the game can be booted to the title screen to perform updates.
+
 [1.15.3]
 
 1=* `MODIFY_SHIP_BUILDS.gd` entries can now use arrays of strings or PoolStringArrays for the `ship_name` property to have the same entry cover multiple ships (or ship types when recursive)

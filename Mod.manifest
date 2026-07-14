@@ -11,7 +11,7 @@ credits=["HEVLIB_CREDITS_CONTRIBUTORS_HEADER","HEVLIB_CREDITS_CONTRIBUTORS_ZAKRI
 
 version_major=1
 version_minor=15
-version_bugfix=3
+version_bugfix=4
 
 [tags]
 
@@ -264,6 +264,12 @@ HEVLIB_CONFIG_SECTION_DEBUG={
         "max":60,
         "step":1,
 		"default":2,
+	},
+	"always_send_new_mods":{
+		"name":"HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS",
+		"description":"HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS_TOOLTIP",
+		"type":"bool",
+		"default":false
 	}
 }
 HEVLIB_CONFIG_SECTION_INPUT={

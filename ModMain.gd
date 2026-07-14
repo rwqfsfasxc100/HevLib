@@ -4,7 +4,7 @@ const MOD_PRIORITY = INF
 const MOD_NAME = "HevLib"
 const MOD_VERSION_MAJOR = 1
 const MOD_VERSION_MINOR = 15
-const MOD_VERSION_BUGFIX = 3
+const MOD_VERSION_BUGFIX = 4
 const MOD_VERSION_METADATA = ""
 const MOD_IS_LIBRARY = true
 const LIBRARY_HIDDEN_BY_DEFAULT = false
@@ -266,33 +266,34 @@ func updatelist_return(result, response_code,headers,body,mh):
 					updates.merge({ID:{"name":mod_name,"id":ID,"version":[current_version["version_major"],current_version["version_minor"],current_version["version_bugfix"]],"new_version":newVer,"github":fetchURL,"file_name":file_name,"display":mod_name + " (" + ID + ")"}})
 					file.store_string(JSON.print(updates))
 					file.close()
-		var md = pointers.ManifestV2.__get_mod_data()["mods"]
-		var api_url = "https://publicactiontrigger.azurewebsites.net/api/dispatches/rwqfsfasxc100/dv_update_database"
-		for mod in md:
-			var mod_data = md[mod]
-			if mod_data["manifest"]["has_manifest"]:
-				var manifest = mod_data["manifest"]["manifest_data"]
-				if "mod_information" in manifest:
-					var mid = manifest["mod_information"].get("id","")
-					if mid and not mid in p:
-						var mURL = ""
-						var gURL = ""
-						if "manifest_definitions" in manifest:
-							mURL = manifest["manifest_definitions"].get("manifest_url","")
-						if "links" in manifest:
-							if "HEVLIB_GITHUB" in manifest["links"]:
-								gURL = manifest["links"]["HEVLIB_GITHUB"].get("URL","")
-						if mURL and gURL:
-							var pld = {
-								"id":mid,
-								"manifest_url":mURL,
-								"github_url":gURL
-							}
-							var payload = {"event_type":"add_mod_entry","client_payload":{"data":JSON.print(pld)}}
-							var tHTTP = HTTPRequest.new()
-							add_child(tHTTP)
-							tHTTP.request(api_url,[],true,HTTPClient.METHOD_POST,JSON.print(payload))
-							Tool.deferCallInPhysics(Tool,"remove",[tHTTP])
+		if not OS.has_feature("editor") or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","always_send_new_mods"):
+			var md = pointers.ManifestV2.__get_mod_data()["mods"]
+			var api_url = "https://publicactiontrigger.azurewebsites.net/api/dispatches/rwqfsfasxc100/dv_update_database"
+			for mod in md:
+				var mod_data = md[mod]
+				if mod_data["manifest"]["has_manifest"]:
+					var manifest = mod_data["manifest"]["manifest_data"]
+					if "mod_information" in manifest:
+						var mid = manifest["mod_information"].get("id","")
+						if mid and not mid in p:
+							var mURL = ""
+							var gURL = ""
+							if "manifest_definitions" in manifest:
+								mURL = manifest["manifest_definitions"].get("manifest_url","")
+							if "links" in manifest:
+								if "HEVLIB_GITHUB" in manifest["links"]:
+									gURL = manifest["links"]["HEVLIB_GITHUB"].get("URL","")
+							if mURL and gURL:
+								var pld = {
+									"id":mid,
+									"manifest_url":mURL,
+									"github_url":gURL
+								}
+								var payload = {"event_type":"add_mod_entry","client_payload":{"data":JSON.print(pld)}}
+								var tHTTP = HTTPRequest.new()
+								add_child(tHTTP)
+								tHTTP.request(api_url,[],true,HTTPClient.METHOD_POST,JSON.print(payload))
+								Tool.deferCallInPhysics(Tool,"remove",[tHTTP])
 	Tool.deferCallInPhysics(Tool,"remove",[mh])
 
 func network_send():

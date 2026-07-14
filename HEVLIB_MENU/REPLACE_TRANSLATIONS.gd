@@ -2378,6 +2378,14 @@ const TRANSLATIONS = {
 		"HEVLIB_DEV_PUSH_CONFIRM": {
 			"string": "Are you sure that you want to push updates for your mods?",
 			"version_hash": 3051814466
+		},
+		"HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS": {
+			"string": "Send new mod info on Editor builds",
+			"version_hash": 3525213644
+		},
+		"HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS_TOOLTIP": {
+			"string": "Whether the UpdateDB should receive info on mods it's not aware of on editor builds.\n\nThis option is intended for mod developers. It does nothing on release builds of the game.",
+			"version_hash": 113417870
 		}
 	},
 	"uk_UA": {
