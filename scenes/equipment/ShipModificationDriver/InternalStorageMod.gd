@@ -83,7 +83,7 @@ func _enter_tree():
 	
 	for item in hl_ism_installedequipment:
 		var iddata = listings[item]
-		if ismPointers.ConfigDriver.__validate_dictionary(iddata):
+		if not ismPointers.ConfigDriver.__validate_dictionary(iddata):
 			continue
 		var minimum_ammo_utilization_for_reduction = iddata.get("minimum_ammo_utilization_for_reduction",0.0)
 		var minimum_nano_utilization_for_reduction = iddata.get("minimum_nano_utilization_for_reduction",0.0)
