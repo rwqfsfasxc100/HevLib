@@ -204,22 +204,25 @@ func getBuildsFor(s: String):
 			rehash_rand.erase(i)
 	if not day in rehash_rand:
 		rehash_rand[day] = {}
+	seed(hash(CurrentGame.state.time) + hash(CurrentGame.state.soldShips))
 	if out and s in cfg_mod_refs:
 		var scfgs = cfg_mod_refs[s].size()
 		var useTheseConfigs = []
 		var outHash = hash(out) + hash(s)
-		var cfrRand = (CurrentGame.srai(day + outHash + scfgs, 1)[0]) % wraparound
+		var cfrRand = ((CurrentGame.srai(day + outHash + scfgs, 1)[0]) % wraparound) + randi()
 		if not s in rehash_rand[day]:
 			rehash_rand[day][s] = []
-		while cfrRand in rehash_rand[day][s]:
-			cfrRand = (CurrentGame.srai(cfrRand,1)[0]) % wraparound
+		seed(cfrRand)
+		var tcfgs = cfg_mod_refs[s].duplicate(true)
+		tcfgs.shuffle()
 		for i in range(min(maxRolls,scfgs)):
-			useTheseConfigs.append(cfg_mod_refs[s][(cfrRand % ((2 * i) + 0xFF)) % scfgs])
+			useTheseConfigs.append(tcfgs[(randi() % ((2 * i) + 0xFF)) % scfgs])
+		cfrRand = (cfrRand + randi()) % wraparound
 		for cnum in range(useTheseConfigs.size()):
 			var config = useTheseConfigs[cnum]
 			var rand = CurrentGame.sraf(cfrRand % (cnum + 0xFF))# * 1.33
 			if syPointers.ConfigDriver.__validate_dictionary(config,true,false,false):
-				if (clamp(config.get("chance",0.1),0.0,1.0) * modChanceScale) > (rand):
+				if (clamp(config.get("chance",0.1),0.0,1.0) * modChanceScale) > (rand * 1.33):
 					match config.get("mode",null):
 						"if_equipment_in_slot":
 							for dict in out:
@@ -229,7 +232,7 @@ func getBuildsFor(s: String):
 											var sys = config.get("system")
 											match typeof(sys):
 												TYPE_ARRAY,TYPE_STRING_ARRAY:
-													setConfigHevLib(thisSlot.strip_edges(),dict,sys[cfrRand % sys.size()])
+													setConfigHevLib(thisSlot.strip_edges(),dict,sys[(hash(tcfgs) + randi()) % sys.size()])
 												_:
 													setConfigHevLib(thisSlot.strip_edges(),dict,sys)
 						"if_tag_in_slot":
@@ -240,7 +243,7 @@ func getBuildsFor(s: String):
 											var sys = config.get("system")
 											match typeof(sys):
 												TYPE_ARRAY,TYPE_STRING_ARRAY:
-													setConfigHevLib(thisSlot.strip_edges(),dict,sys[cfrRand % sys.size()])
+													setConfigHevLib(thisSlot.strip_edges(),dict,sys[(hash(tcfgs) + randi()) % sys.size()])
 												_:
 													setConfigHevLib(thisSlot.strip_edges(),dict,sys)
 						"if_equipment":
@@ -260,7 +263,7 @@ func getBuildsFor(s: String):
 												var sys = config.get("system")
 												match typeof(sys):
 													TYPE_ARRAY,TYPE_STRING_ARRAY:
-														setConfigHevLib(thisSlot.strip_edges(),dict,sys[cfrRand % sys.size()])
+														setConfigHevLib(thisSlot.strip_edges(),dict,sys[(hash(tcfgs) + randi()) % sys.size()])
 													_:
 														setConfigHevLib(thisSlot.strip_edges(),dict,sys)
 						"if_tag":
@@ -287,7 +290,7 @@ func getBuildsFor(s: String):
 												var sys = config.get("system")
 												match typeof(sys):
 													TYPE_ARRAY,TYPE_STRING_ARRAY:
-														setConfigHevLib(thisSlot.strip_edges(),dict,sys[cfrRand % sys.size()])
+														setConfigHevLib(thisSlot.strip_edges(),dict,sys[(hash(tcfgs) + randi()) % sys.size()])
 													_:
 														setConfigHevLib(thisSlot.strip_edges(),dict,sys)
 						"random":
@@ -297,7 +300,7 @@ func getBuildsFor(s: String):
 										var sys = config.get("system")
 										match typeof(sys):
 											TYPE_ARRAY,TYPE_STRING_ARRAY:
-												setConfigHevLib(thisSlot.strip_edges(),dict,sys[cfrRand % sys.size()])
+												setConfigHevLib(thisSlot.strip_edges(),dict,sys[(hash(tcfgs) + randi()) % sys.size()])
 											_:
 												setConfigHevLib(thisSlot.strip_edges(),dict,sys)
 	return out

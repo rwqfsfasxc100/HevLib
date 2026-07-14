@@ -3160,6 +3160,8 @@ class _Equipment:
 							var sKeys = sorting.keys()
 							sKeys.sort()
 							for o in sKeys:
+								seed(hash(sorting))
+								sorting[o].shuffle()
 								for i in sorting[o]:
 									ship_build_mod_store.append(i)
 					"REGISTER_SHIP_NUMERICS.gd":

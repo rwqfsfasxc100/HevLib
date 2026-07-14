@@ -14,7 +14,7 @@
 7=* Mod developers: updated mods are now no longer automatically detected for regular players. You need to manually tell the database that you're pushing an update.
 7.1=* A button and popup are now displayed on the title screen of editor builds to let you do this.
 7.2=* The database is supposed to check every hour, however due to inconsistencies with GitHub actions scheduling, it usually doesn't, which is why this is in place (but is a backup if you forget)
-7.3=* I'm aware that this makes updates a lot more inconvenient, however it gives an opportunity to ensure that the game can be booted to the title screen to perform updates.
+7.3=* I'm aware that this makes updates a lot more inconvenient, however it gives an opportunity to ensure that the game can be booted to the title screen to perform updates, as well as making sure players don't receive an update notification before the release is ready.
 
 [1.15.3]
 
