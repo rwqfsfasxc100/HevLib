@@ -14,6 +14,7 @@ onready var btn_to_download = get_node_or_null(path_to_download_btn)
 onready var unavailable_diag = get_node_or_null(path_to_unavailablePopup)
 
 const topic_url_base = "https://api.github.com/search/repositories?q=topic:delta-v-rings-of-saturn&per_page=%d&page=%d"
+const topic_url_database = "https://raw.githubusercontent.com/rwqfsfasxc100/dv_update_database/refs/heads/main/topic_store/topic_page_%d.json"
 const page_size = 100
 var current_page = 1
 var icon_folder_path = "user://cache/.Mod_Menu_2_Cache/github_list/icon_cache/"
@@ -47,14 +48,15 @@ func _ready():
 	var dt = {}
 	if file.file_exists(mod_list_cache):
 		var fileAge = Time.get_unix_time_from_system() - file.get_modified_time(mod_list_cache)
-		if fileAge < 3 * 3600:
+		if fileAge < int(floor(0.5 * 3600)):
 			file.open(mod_list_cache,File.READ)
 			dt = JSON.parse(file.get_as_text(true)).result
 			file.close()
 	if dt.size():
 		fill_in_mods(dt)
 	else:
-		http.request(topic_url_base % [page_size,current_page])
+		http.request(topic_url_database % [current_page])
+#		http.request(topic_url_base % [page_size,current_page])
 	
 	
 
@@ -87,7 +89,8 @@ func request_complete(result, response_code, headers, body):
 				file.close()
 				if current_page < needed_pages:
 					current_page += 1
-					http.request(topic_url_base % [page_size,current_page])
+					http.request(topic_url_database % [current_page])
+#					http.request(topic_url_base % [page_size,current_page])
 				else:
 					fill_in_mods(dt)
 			else:
