@@ -56,12 +56,14 @@ func _process(delta):
 		var tex = "null"
 		var ZonePrefix = "Zone: "
 		var ChaosPrefix = "Chaos: "
-		var DensityPrefix = "Density: "
+		var DensityPrefix = "RawDensity: "
+		var DensityArrPrefix = "Density: "
 		var EventNoPrefix = "Currently Possible Events (predicted): "
 		var ActualEventPrefix = "Currently Possible Events (actual): "
 		var EventNo = 0
 		var chaos = 0
 		var density = 0
+		var realDensity = []
 		var actualEventNo = 0
 		var isInGame = false
 		if "Game" in nodeNames:
@@ -83,6 +85,7 @@ func _process(delta):
 				var currentPos = CurrentGame.globalCoords(ship.global_position)
 				chaos = getChaosAt(currentPos)
 				density = getRawDensityAt(currentPos)
+				realDensity = getTargetDensityAt(currentPos)
 #				var ring = load("res://story/TheRing.tscn").instance()
 				nodes = ring.get_children()
 				var chaosNums = []
@@ -115,15 +118,16 @@ func _process(delta):
 			ZonePrefix = ""
 			ChaosPrefix = ""
 			DensityPrefix = ""
+			DensityArrPrefix = ""
 			EventNoPrefix = ""
 			EventNo = ""
 			ActualEventPrefix = ""
 			actualEventNo = ""
-			if tex == "" and chaos == "" and density == "" and EventNo == "" and actualEventNo == "":
+			if tex == "" and chaos == "" and density == "" and EventNo == "" and actualEventNo == "" and realDensity.size() == 0:
 				visible = false
 			else:
 				visible = true
-		var textToDisplay = ZonePrefix + tex + "\n" + ChaosPrefix + str(chaos) + "\n" + DensityPrefix + str(density) + "\n" + EventNoPrefix + str(EventNo)
+		var textToDisplay = ZonePrefix + tex + "\n" + ChaosPrefix + str(chaos) + "\n" + DensityPrefix + str(density) + "\n" + DensityArrPrefix + str(realDensity) + "\n" + EventNoPrefix + str(EventNo)
 		if accurate_event_counter:
 			textToDisplay = textToDisplay + "\n" + ActualEventPrefix + str(actualEventNo)
 		text = textToDisplay
@@ -132,6 +136,31 @@ func getChaosAt(pos):
 	return getPixelAt(pos).r
 func getRawDensityAt(pos):
 	return getPixelAt(pos).b
+func getTargetDensityAt(pos):
+	var pixel = getPixelAt(pos)
+	var ships = 1
+	var shipAdjust = max(0, ships - 3) * 4
+	
+	var initialMass = pixel.b * 1024
+	var totalMass = initialMass
+	var sizeBias = pixel.g
+	
+	var density = [0, 0, 0, 0, 0]
+	var classess = float(density.size() - 1)
+	
+	for ac in [0, 1, 2, 3, 4]:
+		var mc = pow(5 - ac, 2)
+		var cfv = float(classess - ac) / classess
+		var d = 1 - abs(cfv - sizeBias)
+		var pick = totalMass * pow(d, 3)
+		density[ac] = clamp(int(pick / mc), 0, maxDensity[ac] + shipAdjust)
+		totalMass = max(0, (totalMass - density[ac] * mc))
+	
+		
+	
+	return density
+
+const maxDensity = [64, 96, 128, 160, 192]
 
 func getPixelAt(pos):
 	var x = int(clamp(floor(pos.x / pixelToKm), 0, size.x - 1))
