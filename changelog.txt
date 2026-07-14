@@ -1,3 +1,7 @@
+[1.15.5]
+
+1=* Fixed update push menu being overlayed above everything else in the title screen
+
 [1.15.4]
 
 1=* Changed GitHub listing, mod updates, and downloads to now use update DB
