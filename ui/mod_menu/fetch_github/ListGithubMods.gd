@@ -14,7 +14,7 @@ onready var btn_to_download = get_node_or_null(path_to_download_btn)
 onready var unavailable_diag = get_node_or_null(path_to_unavailablePopup)
 
 const topic_url_base = "https://api.github.com/search/repositories?q=topic:delta-v-rings-of-saturn&per_page=%d&page=%d"
-const topic_url_database = "https://raw.githubusercontent.com/rwqfsfasxc100/dv_update_database/refs/heads/main/topic_store/topic_page_%d.json"
+const topic_url_database = "https://raw.githubusercontent.com/rwqfsfasxc100/dv_update_database/refs/heads/main/github_fetcher_store/compiled_topic_store.json"
 const page_size = 100
 var current_page = 1
 var icon_folder_path = "user://cache/.Mod_Menu_2_Cache/github_list/icon_cache/"
@@ -52,10 +52,12 @@ func _ready():
 			file.open(mod_list_cache,File.READ)
 			dt = JSON.parse(file.get_as_text(true)).result
 			file.close()
+			if typeof(dt) != TYPE_DICTIONARY:
+				dt = {}
 	if dt.size():
 		fill_in_mods(dt)
 	else:
-		http.request(topic_url_database % [current_page])
+		http.request(topic_url_database)
 #		http.request(topic_url_base % [page_size,current_page])
 	
 	
@@ -70,35 +72,18 @@ func request_complete(result, response_code, headers, body):
 			file.open(mod_list_cache,File.READ)
 			var dt = JSON.parse(file.get_as_text()).result
 			file.close()
+			if typeof(dt) != TYPE_DICTIONARY:
+				dt = {}
 			fill_in_mods(dt)
 	else:
-		var json = JSON.parse(body.get_string_from_utf8()).result
+		var string = body.get_string_from_utf8()
+		var json = JSON.parse(string).result
 		if json:
-			mods_found_from_api = json.get("total_count",0)
-			needed_pages = ceil(float(mods_found_from_api) / float(page_size))
-			var dt = json.get("items",[])
-			if needed_pages > 1:
-				if current_page > 1:
-					file.open(mod_list_cache,File.READ)
-					var curr = JSON.parse(file.get_as_text()).result
-					file.close()
-					curr.append_array(dt)
-					dt = curr
-				file.open(mod_list_cache,File.WRITE)
-				file.store_string(JSON.print(dt))
-				file.close()
-				if current_page < needed_pages:
-					current_page += 1
-					http.request(topic_url_database % [current_page])
-#					http.request(topic_url_base % [page_size,current_page])
-				else:
-					fill_in_mods(dt)
-			else:
-				file.open(mod_list_cache,File.WRITE)
-				file.store_string(JSON.print(dt))
-				file.close()
-				fill_in_mods(dt)
-
+			file.open(mod_list_cache,File.WRITE)
+			file.store_string(JSON.print(json))
+			file.close()
+			fill_in_mods(json)
+			
 func add_mod_count():
 	mod_count += 1
 	count.text = TranslationServer.translate("HEVLIB_GITHUBMODS_COUNT") % mod_count
@@ -107,14 +92,17 @@ func subtract_mod_count():
 	mod_count -= 1
 	count.text = TranslationServer.translate("HEVLIB_GITHUBMODS_COUNT") % mod_count
 
-func fill_in_mods(items : Array):
-	for item in items:
-		var box = mod_item.instance()
-		box.DATA = item
-		box.list = self
-		connect("icon_downloaded",box,"icon_announcement")
-		box.connect("done",self,"add_box")
-		box.boot()
+func fill_in_mods(items : Dictionary):
+	var current_ids = pointers.ManifestV2.__get_mod_ids()
+	for mod_id in items:
+		if mod_id and not mod_id in current_ids:
+			var item = items[mod_id]
+			var box = mod_item.instance()
+			box.DATA = item
+			box.list = self
+			connect("icon_downloaded",box,"icon_announcement")
+			box.connect("done",self,"add_box")
+			box.boot()
 
 func add_box(box):
 	box.connect("pressed",self,"_mod_selected")
@@ -130,7 +118,7 @@ func download_complete(result, response_code, headers, body):
 var current_button = null
 func _mod_selected(mod,btn):
 	rich.clear()
-	rich.parse_bbcode(mod["readme"])
+	rich.parse_bbcode(mod)
 	btn_to_download.disabled = (btn.this_zip_filename == "" or btn.this_zip_url == "")
 	current_button = btn
 

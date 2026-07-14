@@ -161,6 +161,7 @@ mode_overrides_title = false
 mode = 0
 access = 2
 filters = PoolStringArray( "*.dvmodpack ; DV Modpack" )
+show_hidden_files = true
 
 [node name="SavePack" type="FileDialog" parent="."]
 margin_right = 700.0
@@ -172,6 +173,7 @@ resizable = true
 mode_overrides_title = false
 access = 2
 filters = PoolStringArray( "*.dvmodpack ; DV Modpack" )
+show_hidden_files = true
 
 [node name="WAIT" type="Popup" parent="."]
 margin_right = 460.0

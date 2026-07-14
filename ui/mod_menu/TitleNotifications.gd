@@ -17,14 +17,13 @@ func check():
 	var update_data = JSON.parse(file.get_as_text()).result
 	file.close()
 	var height = 50
-	if update_data.keys().size() == 0:
-		$NotificationBox/VBoxContainer/Updates.visible = false
-	else:
+	if update_data:
 		visibility = true
 		height += 50
 		$NotificationBox/VBoxContainer/Updates.visible = true
-		$NotificationBox/VBoxContainer/Updates/Label.text = TranslationServer.translate("HEVLIB_UPDATE_COUNT") % update_data.keys().size()
-	
+		$NotificationBox/VBoxContainer/Updates/Label.text = TranslationServer.translate("HEVLIB_UPDATE_COUNT") % update_data.size()
+	else:
+		$NotificationBox/VBoxContainer/Updates.visible = false
 	file.open(conflicts_store,File.READ)
 	var conflicts = JSON.parse(file.get_as_text()).result
 	file.close()

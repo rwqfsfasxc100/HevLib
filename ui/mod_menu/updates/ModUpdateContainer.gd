@@ -9,8 +9,11 @@ var new_version = ""
 var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
 
 var file = File.new()
+var http = HTTPRequest.new()
 onready var manager = get_parent().get_parent().get_parent().get_parent().get_parent()
 func _ready():
+	add_child(http)
+	http.connect("request_completed",self,"update_return")
 	$Popups/IgnorePopup.dialog_text = TranslationServer.translate("HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MOD_UPDATE") % [mod_name,new_version]
 	$Popups/UpdatePopup.dialog_text = TranslationServer.translate("HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD") % [mod_name,current_version,new_version]
 
@@ -43,18 +46,16 @@ func _update_confirmed():
 	file.open(update_store,File.READ)
 	var data = JSON.parse(file.get_as_text()).result
 	file.close()
-	var github = data[mod_id]["github"]
-	var nexus = data[mod_id]["nexus"]
+	var github = data[mod_id].get("github","")
 	if github:
-		if github.ends_with("/"):
-			github.rstrip("/")
-		if not github.ends_with("/releases"):
-			github = github + "/releases"
-		pointers.Github.__get_github_release(github,zip_folder,self,true,"zip")
-	elif nexus:
-		if nexus.ends_with("/"):
-			nexus.rstrip("/")
-		OS.shell_open(nexus + "?tab=files")
+		http.download_file = zip_folder + data[mod_id]["file_name"]
+		http.request(github)
+		updating_percent = true
+#		if github.ends_with("/"):
+#			github.rstrip("/")
+#		if not github.ends_with("/releases"):
+#			github = github + "/releases"
+#		pointers.Github.__get_github_release(github,zip_folder,self,true,"zip")
 	else:
 		var nod = manager.no_download_popup
 		nod.dialog_text = TranslationServer.translate("HEVLIB_NO_DOWNLOAD_CONTENT") % mod_name
@@ -63,18 +64,23 @@ func _update_confirmed():
 	if display_wait_popup:
 		$Popups/WAIT.popup_centered()
 
-func _downloaded_zip(file, filepath):
+func update_return(result, response_code,headers,body):
+	var fp = http.download_file
+	http.download_file = ""
+	updating_percent = false
+	_downloaded_zip(fp)
+
+func _downloaded_zip(filepath):
 	$Popups/WAIT.hide()
-	var fi = File.new()
-	fi.open(update_store,File.READ)
-	var data = JSON.parse(fi.get_as_text()).result
-	fi.close()
+	file.open(update_store,File.READ)
+	var data = JSON.parse(file.get_as_text()).result
+	file.close()
 	
 	if mod_id in data:
 		data.erase(mod_id)
-	fi.open(update_store,File.WRITE)
-	fi.store_string(JSON.print(data))
-	fi.close()
+	file.open(update_store,File.WRITE)
+	file.store_string(JSON.print(data))
+	file.close()
 	repos()
 	if filepath:
 		pointers.FileAccess.__precache_mod_file(filepath)
@@ -100,6 +106,28 @@ func repos():
 var frameCounter = 0
 
 var download_text = ""
+
+var updating_percent = false
+var percent:float = 0
+var bytes_downloaded: int = 0
+var total_bytes: int = 0
+
+func _physics_process(delta):
+	if updating_percent:
+		total_bytes = http.get_body_size()
+		bytes_downloaded = http.get_downloaded_bytes()
+		var frac = float(bytes_downloaded)/float(total_bytes)
+		var f2 = frac * 100
+		percent = f2
+		print("HevLib GitHub Zip Downloader: Updating percent: %s%% | %s of %s" % [str(percent),bytes_downloaded,total_bytes])
+		if bytes_downloaded > 0.0:
+			_handle_downloaded_percent()
+
+func _handle_downloaded_percent():
+	if total_bytes > 0:
+		_get_github_progress("HEVLIB_GITHUB_PROGRESS_DOWNLOADING",percent,bytes_downloaded,total_bytes)
+	else:
+		_get_github_progress("HEVLIB_GITHUB_PROGRESS_DOWNLOADING_ONLY_BYTES",percent,bytes_downloaded,total_bytes)
 
 func _get_github_progress(response:String,percent:float,bytes_downloaded:int,total_bytes:int):
 	var txt = ""

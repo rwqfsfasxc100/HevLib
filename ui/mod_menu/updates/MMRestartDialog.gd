@@ -22,10 +22,10 @@ func let_restart(how):
 	$PanelContainer/VBoxContainer/HBoxContainer/Exit/Button.disabled = !how
 
 func _restart():
-	ModLoader._savedObjects[0].DataFormat.__exit(true,"","ModMenu2")
+	ModLoader._savedObjects[0].NodeAccess.__exit(true,"","ModMenu2")
 
 func _exit():
-	ModLoader._savedObjects[0].DataFormat.__exit(false,"","ModMenu2")
+	ModLoader._savedObjects[0].NodeAccess.__exit(false,"","ModMenu2")
 
 func _input(event):
 	if is_visible_in_tree() and Input.is_action_just_pressed("ui_cancel"):

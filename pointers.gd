@@ -4746,7 +4746,7 @@ class _FileAccess:
 			if reboot:
 				var exitMsg = "new and/or updated mods detected, rebooting game"
 				print(exitMsg)
-				pointers.DataFormat.__exit(true,exitMsg,"pointers.FileAccess")
+				pointers.NodeAccess.__exit(true,exitMsg,"pointers.FileAccess")
 	
 	
 	

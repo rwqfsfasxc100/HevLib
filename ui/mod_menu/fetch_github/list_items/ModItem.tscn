@@ -58,5 +58,7 @@ custom_fonts/font = ExtResource( 5 )
 [node name="HTTPRequest" type="HTTPRequest" parent="."]
 pause_mode = 2
 
+[node name="iconrequest" type="HTTPRequest" parent="."]
+pause_mode = 2
+
 [connection signal="tree_entered" from="." to="." method="_tree_entered"]
-[connection signal="request_completed" from="HTTPRequest" to="." method="_on_HTTPRequest_request_completed"]

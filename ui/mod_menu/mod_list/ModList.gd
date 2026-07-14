@@ -75,14 +75,17 @@ func _restart():
 	Settings.restartGame()
 
 func _exit():
-	pointers.DataFormat.__exit()
+	pointers.NodeAccess.__exit()
 
 func restart_cancel():
 	subroot.restart_menu.hide()
 
 
+var http = HTTPRequest.new()
 var ptnull = false
 func _ready():
+	add_child(http)
+	http.connect("request_completed",self,"update_return")
 	
 	tween = Tween.new()
 	add_child(tween)
@@ -392,33 +395,41 @@ func updates_started():
 	file.open(update_store,File.READ)
 	var data = JSON.parse(file.get_as_text()).result
 	file.close()
-	var github = data[currently_selected_mod_id]["github"]
-	var nexus = data[currently_selected_mod_id]["nexus"]
+	var github = data[currently_selected_mod_id].get("github","")
 	if github:
-		if github.ends_with("/"):
-			github.rstrip("/")
-		if not github.ends_with("/releases"):
-			github = github + "/releases"
-		pointers.Github.__get_github_release(github,zip_folder,self,true,"zip")
-	elif nexus:
-		if nexus.ends_with("/"):
-			nexus.rstrip("/")
-		OS.shell_open(nexus + "?tab=files")
+		http.download_file = zip_folder + data[currently_selected_mod_id]["file_name"]
+		http.request(github)
+		updating_percent = true
+#		if github.ends_with("/"):
+#			github.rstrip("/")
+#		if not github.ends_with("/releases"):
+#			github = github + "/releases"
+#		pointers.Github.__get_github_release(github,zip_folder,self,true,"zip")
 	
 	get_node("../../../../../../WAIT").popup_centered()
 
-func _downloaded_zip(file, filepath):
+func update_return(result, response_code,headers,body):
+	var fp = http.download_file
+	http.download_file = ""
+	updating_percent = false
+	_downloaded_zip(fp)
+
+var updating_percent = false
+var percent:float = 0
+var bytes_downloaded: int = 0
+var total_bytes: int = 0
+
+func _downloaded_zip(filepath):
 	get_node("../../../../../../WAIT").hide()
-	var fi = File.new()
-	fi.open(update_store,File.READ)
-	var data = JSON.parse(fi.get_as_text()).result
-	fi.close()
+	file.open(update_store,File.READ)
+	var data = JSON.parse(file.get_as_text()).result
+	file.close()
 	
 	if currently_selected_mod_id in data:
 		data.erase(currently_selected_mod_id)
-	fi.open(update_store,File.WRITE)
-	fi.store_string(JSON.print(data))
-	fi.close()
+	file.open(update_store,File.WRITE)
+	file.store_string(JSON.print(data))
+	file.close()
 	subroot.restart_menu.popup_centered()
 	if filepath:
 		pointers.FileAccess.__precache_mod_file(filepath)

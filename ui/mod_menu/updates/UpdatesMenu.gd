@@ -148,7 +148,7 @@ func _confirmed():
 
 
 func _custom_action():
-	pointers.DataFormat.__exit(false,"","")
+	pointers.NodeAccess.__exit(false,"","")
 
 
 func _ignore_all_pressed():
