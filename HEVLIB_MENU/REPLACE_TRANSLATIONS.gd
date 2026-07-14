@@ -2370,6 +2370,14 @@ const TRANSLATIONS = {
 		"HEVLIB_CREDITS_SUPPORTERS_KOFI_1WT1": {
 			"string": "WT - supporter (ko-fi)",
 			"version_hash": 3531547864
+		},
+		"HEVLIB_DEV_PUSH": {
+			"string": "Push mod updates",
+			"version_hash": 4122676635
+		},
+		"HEVLIB_DEV_PUSH_CONFIRM": {
+			"string": "Are you sure that you want to push updates for your mods?",
+			"version_hash": 3051814466
 		}
 	},
 	"uk_UA": {

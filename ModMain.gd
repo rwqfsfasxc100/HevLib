@@ -121,32 +121,14 @@ func _ready():
 		file.open(modlet_toggle_restart_path,File.WRITE)
 		file.store_string("[]")
 		file.close()
-		var md = pointers.ManifestV2.__get_mod_data()
-		
+		if OS.has_feature("editor"):
+			replaceScene("ui/mod_menu/editor_titlescreen/TitleScreen.tscn","res://TitleScreen.tscn")
 		replaceScene("scenes/better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
 		
+		initiate_mod_update_fetch()
+#		network_send()
 		
-		for item in md["mods"]:
-			var data = md["mods"][item]["manifest"]
-			if data["has_manifest"]:
-				var url = data["manifest_data"]["manifest_definitions"]["manifest_url"]
-				if url != "":
-					var http = HTTPRequest.new()
-					var pm = md["mods"][item]
-					file.open(url_store,File.READ_WRITE)
-					var current = JSON.parse(file.get_as_text()).result
-					current.append([pm["name"],pm["manifest"]["manifest_data"]["mod_information"]["id"],pm["version_data"]["version_major"],pm["version_data"]["version_minor"],pm["version_data"]["version_bugfix"]])
-					file.store_string(JSON.print(current))
-					file.close()
-					var mh = str(hash(item))
-					http.name = mh
-					http.connect("request_completed",self,"network_return",[mh])
-					add_child(http)
-					http.timeout = 20
-
-					http.request(url)
-					update_urls.append(pm["manifest"]["manifest_data"]["mod_information"]["id"])
-
+		
 		var conflicts = pointers.ManifestV2.__check_conflicts()
 		var dependancies = pointers.ManifestV2.__check_dependancies()
 		var complementary = pointers.ManifestV2.__check_complementary()
@@ -250,6 +232,91 @@ func l(msg:String, title:String = MOD_NAME, version:String = str(MOD_VERSION_MAJ
 		version = version + "-" + MOD_VERSION_METADATA
 	var line = "%s V%s" % [title, version]
 	pointers.l(msg,line)
+
+func initiate_mod_update_fetch():
+	var http = HTTPRequest.new()
+	http.connect("request_completed",self,"updatelist_return",[http])
+	http.timeout = 20
+	add_child(http)
+	http.request("https://raw.githubusercontent.com/rwqfsfasxc100/dv_update_database/refs/heads/main/manifest_path_store.json")
+
+func updatelist_return(result, response_code,headers,body,mh):
+	if result == 0 and response_code == 200:
+		var p = JSON.parse(body.get_string_from_utf8()).result
+		var ids = pointers.ManifestV2.__get_mod_ids()
+		for ID in p:
+			if ID in ids:
+				var fetchData = p[ID]
+				var modData = pointers.ManifestV2.__get_mod_by_id(ID)
+				var current_version = modData["version_data"]
+				var doUpdate = false
+				var newVer = [fetchData["major"],fetchData["minor"],fetchData["bugfix"]]
+				if newVer[0] > current_version["version_major"]:
+					doUpdate = true
+				elif newVer[1] > current_version["version_minor"]:
+					doUpdate = true
+				elif newVer[2] > current_version["version_bugfix"]:
+					doUpdate = true
+				if doUpdate:
+					var file_name = fetchData.get("file_name","file.zip")
+					var fetchURL = "https://github.com/rwqfsfasxc100/dv_update_database/raw/refs/heads/main/zip_store/%s/%d.%d.%d/%s" % [ID,newVer[0],newVer[1],newVer[2],file_name]
+					var mod_name = modData.get("name","")
+					file.open(update_store,File.READ_WRITE)
+					var updates = JSON.parse(file.get_as_text()).result
+					updates.merge({ID:{"name":mod_name,"id":ID,"version":[current_version["version_major"],current_version["version_minor"],current_version["version_bugfix"]],"new_version":newVer,"github":fetchURL,"file_name":file_name,"display":mod_name + " (" + ID + ")"}})
+					file.store_string(JSON.print(updates))
+					file.close()
+		var md = pointers.ManifestV2.__get_mod_data()["mods"]
+		var api_url = "https://publicactiontrigger.azurewebsites.net/api/dispatches/rwqfsfasxc100/dv_update_database"
+		for mod in md:
+			var mod_data = md[mod]
+			if mod_data["manifest"]["has_manifest"]:
+				var manifest = mod_data["manifest"]["manifest_data"]
+				if "mod_information" in manifest:
+					var mid = manifest["mod_information"].get("id","")
+					if mid and not mid in p:
+						var mURL = ""
+						var gURL = ""
+						if "manifest_definitions" in manifest:
+							mURL = manifest["manifest_definitions"].get("manifest_url","")
+						if "links" in manifest:
+							if "HEVLIB_GITHUB" in manifest["links"]:
+								gURL = manifest["links"]["HEVLIB_GITHUB"].get("URL","")
+						if mURL and gURL:
+							var pld = {
+								"id":mid,
+								"manifest_url":mURL,
+								"github_url":gURL
+							}
+							var payload = {"event_type":"add_mod_entry","client_payload":{"data":JSON.print(pld)}}
+							var tHTTP = HTTPRequest.new()
+							add_child(tHTTP)
+							tHTTP.request(api_url,[],true,HTTPClient.METHOD_POST,JSON.print(payload))
+							Tool.deferCallInPhysics(Tool,"remove",[tHTTP])
+	Tool.deferCallInPhysics(Tool,"remove",[mh])
+
+func network_send():
+	var md = pointers.ManifestV2.__get_mod_data()["mods"]
+	for item in md:
+		var data = md[item]["manifest"]
+		if data["has_manifest"]:
+			var url = data["manifest_data"]["manifest_definitions"]["manifest_url"]
+			if url != "":
+				var http = HTTPRequest.new()
+				var pm = md[item]
+				file.open(url_store,File.READ_WRITE)
+				var current = JSON.parse(file.get_as_text()).result
+				current.append([pm["name"],pm["manifest"]["manifest_data"]["mod_information"]["id"],pm["version_data"]["version_major"],pm["version_data"]["version_minor"],pm["version_data"]["version_bugfix"]])
+				file.store_string(JSON.print(current))
+				file.close()
+				var mh = str(hash(item))
+				http.name = mh
+				http.connect("request_completed",self,"network_return",[mh])
+				add_child(http)
+				http.timeout = 20
+				http.request(url)
+				update_urls.append(pm["manifest"]["manifest_data"]["mod_information"]["id"])
+
 func network_return(result, response_code,headers,body,mh):
 	if result == 0 and response_code == 200:
 		var p = body.get_string_from_utf8()
@@ -264,10 +331,6 @@ func network_return(result, response_code,headers,body,mh):
 		file.open(url_store,File.READ)
 		var current = JSON.parse(file.get_as_text(true)).result
 		file.close()
-#		var data = ConfigDriver.config_parse(path)
-#		file.open(path2,File.WRITE)
-#		file.store_string(JSON.print(data))
-#		file.close()
 		var manifest = pointers.ManifestV2.__parse_file_as_manifest(path % id,true)
 		
 		for item in current:
