@@ -6444,8 +6444,8 @@ class _ManifestV2:
 				if section in manifest:
 					var sec : Dictionary = manifest[section]
 					var id : String = manifest_data_cache[mod]["mod_information"]["id"]
-					if entry in sec[mod]:
-						dict.merge({id:sec[mod][entry]})
+					if entry in sec:
+						dict.merge({id:sec[entry]})
 			return_data = dict
 		return return_data
 		

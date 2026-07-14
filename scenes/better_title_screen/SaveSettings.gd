@@ -57,7 +57,7 @@ func create():
 		if tooltip:
 			BUTTON.hint_tooltip = tooltip
 			BUTTON.add_child(tt_label.instance())
-		var popup_path:String = button.get("popup_path")
+		var popup_path = button.get("popup_path")
 		var method:String = button.get("connect_method","_on_save_option_button_pressed")
 		if not popup_path:
 			match button.get("popup_override"):
