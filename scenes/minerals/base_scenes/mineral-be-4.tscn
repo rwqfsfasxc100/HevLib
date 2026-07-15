@@ -2,7 +2,7 @@
 
 [ext_resource path="res://HevLib/scenes/minerals/mineral.gd" type="Script" id=0]
 [ext_resource path="res://asteroids/mineral.material" type="Material" id=1]
-[ext_resource path="res://HevLib/scenes/minerals/icons/minerals-c-nocolor.stex" type="Texture" id=2]
+[ext_resource path="res://HevLib/scenes/minerals/icons/minerals-c-nocolor.stex" type="StreamTexture" id=2]
 [ext_resource path="res://asteroids/minerals-n.png" type="Texture" id=3]
 [ext_resource path="res://lights/distant-proxy.png" type="Texture" id=4]
 
@@ -40,7 +40,6 @@ energy = 5.0
 range_height = -100.0
 
 [node name="Collision" type="CollisionShape2D" parent="."]
-visible = false
 light_mask = 0
 z_index = 20
 shape = SubResource( 1 )
