@@ -40,6 +40,7 @@ energy = 5.0
 range_height = -100.0
 
 [node name="Collision" type="CollisionShape2D" parent="."]
+visible = false
 light_mask = 0
 position = Vector2( -0.397217, 0.397213 )
 z_index = 20
