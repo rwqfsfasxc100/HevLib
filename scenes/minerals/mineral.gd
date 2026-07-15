@@ -15,6 +15,7 @@ func _ready():
 #	stream3.load_path = "res://HevLib/scenes/minerals/icons/minerals-m-overlay.stex"
 #	o.material.set_shader_param("map",stream3)
 	o.region_rect = sprite.region_rect
+	o.scale = sprite.scale
 	o.region_enabled = true
 	o.name = "Overlay"
 	add_child(o)
