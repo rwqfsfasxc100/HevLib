@@ -7906,6 +7906,7 @@ class _Scripting:
 						
 						var specific_data:Dictionary = info.get("specific_ore_data",{})
 						var roc:Array = []
+						pointers.FolderAccess.__check_folder_exists(folder)
 						for i in range(7):
 							var id:int = i + 1
 							var cl:Color = color
@@ -7914,7 +7915,6 @@ class _Scripting:
 							var mns = min_scale
 							var mxs = max_scale
 							var fr:bool = ferrous
-							pointers.FolderAccess.__check_folder_exists(folder)
 							var fn:String = folder + "h%s.tscn" % id
 							var data:String = header % [baseScene,id] + content
 							if id in specific_data:
