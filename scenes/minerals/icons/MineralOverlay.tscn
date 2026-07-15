@@ -1,9 +1,19 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://HevLib/scenes/minerals/base_scenes/mineral.material" type="Material" id=1]
 
-[node name="Sprite2" type="Sprite"]
+[sub_resource type="StreamTexture" id=1]
+flags = 4
+load_path = "res://HevLib/scenes/minerals/icons/minerals-c-overlay.stex"
+
+[sub_resource type="StreamTexture" id=2]
+flags = 4
+load_path = "res://HevLib/scenes/minerals/icons/minerals-n-overlay.stex"
+
+[node name="Overlay" type="Sprite"]
 material = ExtResource( 1 )
 scale = Vector2( 0.25, 0.25 )
+texture = SubResource( 1 )
+normal_map = SubResource( 2 )
 region_enabled = true
 region_rect = Rect2( 730, 1242, 146, 146 )
