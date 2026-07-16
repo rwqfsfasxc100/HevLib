@@ -4,7 +4,6 @@
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=2]
 [ext_resource path="res://HevLib/ui/mod_menu/TitleNotifications.gd" type="Script" id=3]
 
-
 [sub_resource type="StreamTexture" id=1]
 flags = 4
 load_path = "res://.import/warning-overlay.png-be42a86fade8ccba15678c65ff71dde5.stex"

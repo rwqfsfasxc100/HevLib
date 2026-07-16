@@ -273,6 +273,7 @@ func updatelist_return(result, response_code,headers,body,mh):
 	if result == 0 and response_code == 200:
 		var p = JSON.parse(body.get_string_from_utf8()).result
 		var ids = pointers.ManifestV2.__get_mod_ids()
+		var updates = {}
 		for ID in p:
 			if ID in ids:
 				var fetchData = p[ID]
@@ -290,11 +291,10 @@ func updatelist_return(result, response_code,headers,body,mh):
 					var file_name = fetchData.get("file_name","file.zip")
 					var fetchURL = "https://github.com/rwqfsfasxc100/dv_update_database/raw/refs/heads/main/zip_store/%s/%d.%d.%d/%s" % [ID,newVer[0],newVer[1],newVer[2],file_name]
 					var mod_name = modData.get("name","")
-					file.open(update_store,File.READ_WRITE)
-					var updates = JSON.parse(file.get_as_text()).result
-					updates.merge({ID:{"name":mod_name,"id":ID,"version":[current_version["version_major"],current_version["version_minor"],current_version["version_bugfix"]],"new_version":newVer,"github":fetchURL,"file_name":file_name,"display":mod_name + " (" + ID + ")"}})
-					file.store_string(JSON.print(updates))
-					file.close()
+					updates[ID] = {"name":mod_name,"id":ID,"version":[current_version["version_major"],current_version["version_minor"],current_version["version_bugfix"]],"new_version":newVer,"github":fetchURL,"file_name":file_name,"display":mod_name + " (" + ID + ")"}
+		file.open(update_store,File.WRITE)
+		file.store_string(JSON.print(updates))
+		file.close()
 		if not OS.has_feature("editor") or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","always_send_new_mods"):
 			var md = pointers.ManifestV2.__get_mod_data()["mods"]
 			var api_url = "https://publicactiontrigger.azurewebsites.net/api/dispatches/rwqfsfasxc100/dv_update_database"

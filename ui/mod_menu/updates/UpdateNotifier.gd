@@ -36,22 +36,29 @@ var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
 var pointers = ModLoader._savedObjects[0]
 var file = File.new()
 
+var max_check = 10
+var check_ctr = 0
 func _ready():
+	check()
+	
+func check():
+	check_ctr += 1
 	file.open(update_store,File.READ)
 	var updates = JSON.parse(file.get_as_text()).result
 	file.close()
-	var currently_ignored = pointers.ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
-	if currently_ignored == null:
-		currently_ignored = {}
-	for u in currently_ignored:
-		if u in updates:
-			if currently_ignored[u] == str(updates[u]["new_version"][0]) + "." + str(updates[u]["new_version"][1]) + "." + str(updates[u]["new_version"][2]):
-				updates.erase(u)
-			else:
-				currently_ignored.erase(u)
-	if updates.size() >= 1:
+	if updates:
+		var currently_ignored = pointers.ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
+		if currently_ignored == null:
+			currently_ignored = {}
+		for u in currently_ignored:
+			if u in updates:
+				if currently_ignored[u] == str(updates[u]["new_version"][0]) + "." + str(updates[u]["new_version"][1]) + "." + str(updates[u]["new_version"][2]):
+					updates.erase(u)
+				else:
+					currently_ignored.erase(u)
 		$Timer.start()
-	
+	elif not check_ctr > max_check:
+		$ReTimer.start()
 
 func show_menu():
 	
