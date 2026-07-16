@@ -1,5 +1,34 @@
 extends Node
 
+# [license]
+# 3-Clause BSD NON-AI License
+# 
+# Copyright 2026 __hev (Benjamin Buckhurst)
+# 
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+# 
+# 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+# 
+# 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer
+# in the documentation and/or other materials provided with the distribution.
+# 
+# 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products
+# derived from this software without specific prior written permission.
+# 
+# 4. The source code and the binary form, and any modifications made to them may not be used for the purpose of input data, the training of, or improvment of machine learning algorithms,
+# including but not limited to artificial intelligence, natural language processing, or data mining. This condition applies to any derivatives,
+# modifications, or updates based on the Software code. Any usage of the source code or the binary form in an AI-training dataset is considered a breach of this License.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES,
+# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+# OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+# EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# [/license]
+
 const gdunzip = preload("res://HevLib/scripts/vendor/gdunzip.gd")
 
 var http:HTTPRequest = HTTPRequest.new()
@@ -4297,20 +4326,10 @@ class _Equipment:
 			else:
 				return false
 			if passes_slot_check:
-				if not slot_restriction == "":
-					if not e_restriction == "":
+				if slot_restriction:
+					if e_restriction:
 						if e_restriction == slot_restriction:
 							return true
-						else:
-							return false
-					else:
-						return true
-				else:
-					return true
-			else:
-				return false
-		else:
-			return false
 		return false
 	
 	func __make_equipment_for_scene(equipment_data: Dictionary, slot_node_name : String, system_slot: String) -> String:
@@ -4344,50 +4363,50 @@ class _Equipment:
 		
 		var base : String = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s/VBoxContainer\" instance=ExtResource( 3 )]" % [system.to_upper(),slot_node_name]
 		if num_val != -1:
-			base = base + "\nnumVal = " + str(num_val)
-		base = base + "\nslot = \"" + system_slot + "\""
-		if system != "":
-			base = base + "\nsystem = \"" + system + "\""
+			base += "\nnumVal = " + str(num_val)
+		base += "\nslot = \"" + system_slot + "\""
+		if system:
+			base += "\nsystem = \"" + system + "\""
 		if capability_lock:
-			base = base + "\ncapabilityLock = true"
+			base += "\ncapabilityLock = true"
 		else:
-			base = base + "\ncapabilityLock = false"
-		if name_override != "":
-			base = base + "\nnameOverride = \"" + name_override + "\""
-		if description != "":
-			base = base + "\ndescription = \"" + description + "\""
-		if manual != "":
-			base = base + "\nmanual = \"" + manual + "\""
-		if specs != "":
-			base = base + "\nspecs = \"" + specs + "\""
-		if price != 0:
-			base = base + "\nprice = " + str(price)
-		if test_protocol != "":
-			base = base + "\ntestProtocol = \"" + test_protocol + "\""
+			base += "\ncapabilityLock = false"
+		if name_override:
+			base += "\nnameOverride = \"" + name_override + "\""
+		if description:
+			base += "\ndescription = \"" + description + "\""
+		if manual:
+			base += "\nmanual = \"" + manual + "\""
+		if specs:
+			base += "\nspecs = \"" + specs + "\""
+		if price > 0:
+			base += "\nprice = " + str(price)
+		if test_protocol:
+			base += "\ntestProtocol = \"" + test_protocol + "\""
 		if default:
-			base = base + "\ndefault = true"
+			base += "\ndefault = true"
 		else:
-			base = base + "\ndefault = false"
-		if control != "":
-			base = base + "\ncontrol = \"" + control + "\""
-		if story_flag != "":
-			base = base + "\nstoryFlag = \"" + story_flag + "\""
+			base += "\ndefault = false"
+		if control:
+			base += "\ncontrol = \"" + control + "\""
+		if story_flag:
+			base += "\nstoryFlag = \"" + story_flag + "\""
 		if story_flag_min != -1:
-			base = base + "\nstoryFlagMin = " + str(story_flag_min)
+			base += "\nstoryFlagMin = " + str(story_flag_min)
 		if story_flag_max != -1:
-			base = base + "\nstoryFlagMax = " + str(story_flag_max)
-		if warn_if_thermal_below != 0:
-			base = base + "\nwarnIfThermalBelow = " + str(warn_if_thermal_below)
-		if warn_if_electric_below != 0:
-			base = base + "\nwarnIfElectricBelow = " + str(warn_if_thermal_below)
+			base += "\nstoryFlagMax = " + str(story_flag_max)
+		if warn_if_thermal_below > 0:
+			base += "\nwarnIfThermalBelow = " + str(warn_if_thermal_below)
+		if warn_if_electric_below > 0:
+			base += "\nwarnIfElectricBelow = " + str(warn_if_thermal_below)
 		if sticker_price_format != "%s E$":
-			base = base + "\nstickerPriceFormat = \"" + sticker_price_format + "\""
+			base += "\nstickerPriceFormat = \"" + sticker_price_format + "\""
 		if sticker_price_multi_format != "%s E$ (x%d)":
-			base = base + "\nstickerPriceMultiFormat" + sticker_price_multi_format + "\""
+			base += "\nstickerPriceMultiFormat" + sticker_price_multi_format + "\""
 		if installed_color != Color(0.0, 1.0, 0.0, 1.0):
-			base = base + "\ninstalledColor = " + str(Color(0.0, 1.0, 0.0, 1.0))
+			base += "\ninstalledColor = " + str(Color(0.0, 1.0, 0.0, 1.0))
 		if disabled_color != Color(0.2, 0.2, 0.2, 1.0):
-			base = base + "\ndisabledColor = " + str(Color(0.2, 0.2, 0.2, 1.0))
+			base += "\ndisabledColor = " + str(Color(0.2, 0.2, 0.2, 1.0))
 		
 		if cfg:
 			var cfg_id : String = cfg.get("id","")
@@ -4424,18 +4443,17 @@ class _Equipment:
 		
 		var cfg : Dictionary = slot_data.get("config",{})
 		
-		
 		var base : String = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\" instance=ExtResource( 2 )]" % slotNodeName
-		if systemSlot != "":
-			base = base + "\nslot = \"" + systemSlot + "\""
+		if systemSlot:
+			base += "\nslot = \"" + systemSlot + "\""
 		if alwaysDisplay:
-			base = base + "\nalways = true"
+			base += "\nalways = true"
 		else:
-			base = base + "\nalways = false"
+			base += "\nalways = false"
 		if openByDefault:
-			base = base + "\nopenByDefault = true"
+			base += "\nopenByDefault = true"
 		else:
-			base = base + "\nopenByDefault = false"
+			base += "\nopenByDefault = false"
 		if cfg:
 			var cfg_id : String = cfg.get("id","")
 			var cfg_section : String = cfg.get("section","")
@@ -4451,38 +4469,28 @@ class _Equipment:
 			
 			
 		if restrictType != "":
-			base = base + "\nslot = \"" + restrictType + "\""
+			base += "\nslot = \"" + restrictType + "\""
 		if limitShips != []:
-			var initial : String = base + "\nlimit_ships = ["
-			var one:bool = false
+			var initial : String = ""
 			for item in limitShips:
-				if one == false:
-					one = true
-				else:
-					initial = initial + ", "
-				initial = initial + "\"" + item + "\""
-			initial = initial + "]"
-			base = initial
+				if initial: initial += ", "
+				else: initial = "\nlimit_ships = ["
+				initial += "\"" + item + "\""
+			initial += "]"
+			base += initial
 		if preventShips != []:
-			var initial : String = base + "\nprevent_ships = ["
-			var one:bool = false
+			var initial : String = ""
 			for item in preventShips:
-				if one == false:
-					one = true
-				else:
-					initial = initial + ", "
-				initial = initial + "\"" + item + "\""
-			initial = initial + "]"
-			base = initial
-		if restrict_hold_type != "":
-			base = base + "\nrestrict_hold_type = \"%s\"" % restrict_hold_type
-		base = base + "\n\n[node name=\"CheckButton\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s/VBoxContainer/HBoxContainer\"]\ntext = \"%s\"" % [slotNodeName,slotDisplayName]
+				if initial: initial += ", "
+				else: initial = "\nprevent_ships = ["
+				initial += "\"" + item + "\""
+			initial += "]"
+			base += initial
+		if restrict_hold_type: base += "\nrestrict_hold_type = \"%s\"" % restrict_hold_type
+		base += "\n\n[node name=\"CheckButton\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s/VBoxContainer/HBoxContainer\"]\ntext = \"%s\"" % [slotNodeName,slotDisplayName]
 		
-		if hasNone:
-			var dta : String = __make_equipment_for_scene({"system":"SYSTEM_NONE","default":true,"name":"None"}, slotNodeName, systemSlot)
-			base = base + "\n\n" + dta
+		if hasNone: base += "\n\n" + __make_equipment_for_scene({"system":"SYSTEM_NONE","default":true,"name":"None"}, slotNodeName, systemSlot)
 		var editable_path : String = "[editable path=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s\"]" % slotNodeName
-		
 		var dict : Dictionary = {
 				"add_vanilla_equipment":add_vanilla_equipment,
 				"hardpoint_type":hardpoint_type,
@@ -4613,8 +4621,7 @@ class _FileAccess:
 	
 	func __copy_file(file_path : String, folder : String):
 		var prepfile : String = ProjectSettings.localize_path(file_path)
-		var fn : String = prepfile.split("/")[prepfile.split("/").size() - 1]
-		return dir.copy(prepfile,folder + "/" + fn)
+		return dir.copy(prepfile,folder + "/" + prepfile.split("/")[prepfile.split("/").size() - 1])
 	
 	func __load_png(path) -> Texture:
 		file.open(path, File.READ)
@@ -4640,10 +4647,8 @@ class _FileAccess:
 				exists = __copy_file(filepath,modCacheDir)
 				filepath = modCacheDir + filepath.split(modDir)[1]
 			var cache : Array = []
-			if file.file_exists(updateCacheFile):
-				cache = JSON.parse(__get_file_content(updateCacheFile)).result
-			if not filepath in cache:
-				cache.append(filepath)
+			if file.file_exists(updateCacheFile): cache = JSON.parse(__get_file_content(updateCacheFile)).result
+			if not filepath in cache: cache.append(filepath)
 			file.open(updateCacheFile,File.WRITE)
 			file.store_string(JSON.print(cache))
 			file.close()
@@ -4661,10 +4666,7 @@ class _FileAccess:
 			var files_to_copy : Array = JSON.parse(__get_file_content(updateCacheFile)).result
 			var reboot:bool = false
 			for mod in files_to_copy:
-				if file.file_exists(mod):
-					var check:int = __copy_file(mod,modPathPrefix)
-					if check == OK:
-						reboot = true
+				if file.file_exists(mod) and __copy_file(mod,modPathPrefix) == OK: reboot = true
 			file.open(updateCacheFile,File.WRITE)
 			file.store_string("[]")
 			file.close()
@@ -4757,10 +4759,8 @@ class _FolderAccess:
 		else:
 			exists = false
 			value = directory.make_dir_recursive(folder) == OK
-		if status_array:
-			return [value,exists]
-		else:
-			return value
+		if status_array: return [value,exists]
+		else: return value
 	
 	func __recursive_delete(path: String) -> bool:
 		if not directory.open(path) == OK:
@@ -4818,10 +4818,8 @@ class _FolderAccess:
 	
 	func __get_first_file(folder: String) -> String:
 		var fileList : Array = __fetch_folder_files(folder)
-		if fileList:
-			return fileList[0]
-		else:
-			return ""
+		if fileList: return fileList[0]
+		else: return ""
 	
 	var folderStructureCache : Dictionary = {}
 	
@@ -4895,8 +4893,7 @@ class _Github:
 			var e : String = "Release Downloader ERROR! Provided node [%s] does not have the method [_downloaded_zip]" % str(node_to_return_to)
 			pointers.l(e,"pointers.Github")
 			printerr(e)
-		if cancel:
-			return
+		if cancel: return
 		var CRoot = Tool.get_tree().get_root()
 		var gitHubFS := preload("res://HevLib/scenes/fetch_from_github/releases/NetHandles.tscn").instance()
 		if not node_to_return_to.has_method("_get_github_progress"):
@@ -4950,10 +4947,9 @@ class _HevLib:
 			for f in files:
 				compileArray.append(path + f)
 			return compileArray
-		else:
-			return files
+		else:return files
 	
-	func __get_pointer_functions(pointer: String, return_JSON: bool = false) -> Dictionary:
+	func __get_pointer_functions(pointer: String, return_JSON: bool = false):
 		var path = "res://HevLib/pointers/"
 		var pSplit = pointer.split("/")
 		var actualPointer = path + pSplit[pSplit.size() - 1]
@@ -4970,13 +4966,10 @@ class _HevLib:
 						devHint = pointerLoad.developer_hint
 				var desc = devHint.get(pFuncName, [TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_1"),TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_2")])
 				methods.merge({pFuncName:desc})
-		if return_JSON:
-			var psj = JSON.print(methods, "\t")
-			return psj
-		else:
-			return methods
+		if return_JSON:return JSON.print(methods, "\t")
+		else:return methods
 	
-	func __get_library_functionality(return_JSON: bool = false) -> Dictionary:
+	func __get_library_functionality(return_JSON: bool = false):
 		var path = "res://HevLib/pointers/"
 		var functions = {}
 		var files = pointers.FolderAccess.__fetch_folder_files(path)
@@ -4999,11 +4992,8 @@ class _HevLib:
 					methods.merge({pFuncName:desc})
 			var concat = {pointer:methods}
 			functions.merge(concat)
-		if return_JSON:
-			var psj = JSON.print(functions, "\t")
-			return psj
-		else:
-			return functions
+		if return_JSON: return JSON.print(functions, "\t")
+		else:return functions
 	
 	
 	
@@ -7137,537 +7127,6 @@ class _RingInfo:
 	
 
 
-class _TimeAccess:
-	var scripts : Array = [
-		
-	]
-	
-	func get_class_documentation():
-		return {
-			"description":"",
-			"methods":{
-				"":{
-					"description":"",
-					"args":[
-						
-					],
-					"return":[
-						
-					]
-				},
-			}
-		}
-	
-	var pointers
-	func _init(p):
-		pointers = p
-	
-	func __compare_dates(date, compare_to_this_date):
-		var isDifferent:bool = false
-		var difference : String = "newer"
-		var splitOne:PoolStringArray = date.split("T")
-		var splitTwo:PoolStringArray = compare_to_this_date.split("T")
-		var dateOne:PoolStringArray = splitOne[0].split("-")
-		var dateTwo:PoolStringArray = splitTwo[0].split("-")
-		var timeOne:PoolStringArray = splitOne[1].split(":")
-		var timeTwo:PoolStringArray = splitTwo[1].split(":")
-		var concatOne : Array = [dateOne[0],dateOne[1],dateOne[2],timeOne[0],timeOne[1],timeOne[2]]
-		var concatTwo : Array = [dateTwo[0],dateTwo[1],dateTwo[2],timeTwo[0],timeTwo[1],timeTwo[2]]
-		var index:int = 0
-		while index < 6:
-			var compare1 = concatOne[index]
-			var compare2 = concatTwo[index]
-			if compare1 > compare2:
-				isDifferent = true
-				difference = "newer"
-			if compare1 < compare2:
-				isDifferent = true
-				difference = "older"
-			if compare1 == compare2:
-				isDifferent = false
-				difference = "equal"
-			
-			if isDifferent:
-				return difference
-			index += 1
-		if index >= 6:
-			return "equal"
-	
-	func __get_time_in_seconds(datetime_dict : Dictionary):
-		var time : int = 0
-		time += (datetime_dict.get("second",0))
-		time += (datetime_dict.get("minute",0) * 60)
-		time += (datetime_dict.get("hour",0) * 60 * 60)
-		time += (datetime_dict.get("day",0) * 60 * 60 * 24)
-		time += (datetime_dict.get("month",0) * 60 * 60 * 24 * 30)
-		time += (datetime_dict.get("year",0) * 60 * 60 * 24 * 30 * 12)
-		
-		
-		return time
-	
-
-class _Translations:
-	var scripts : Array = [
-		
-	]
-	
-	func get_class_documentation():
-		return {
-			"description":"",
-			"methods":{
-				"":{
-					"description":"",
-					"args":[
-						
-					],
-					"return":[
-						
-					]
-				},
-			}
-		}
-	
-	var pointers
-	func _init(c):
-		pointers = c
-	
-	func __updateTL(path:String, delim:String = ",", fullLogging:bool = true):
-		var fileName : String = path.split("/")[path.split("/").size() - 1]
-		var folderName : String = path.split(fileName)[0]
-		pointers.l("Adding translations from [%s] in [%s]" % [fileName, folderName],"pointers.Translations")
-		var tlFile:File = File.new()
-		tlFile.open(path, File.READ)
-		var translations : Array = []
-		var translationCount:int = 0
-		var csvLine : PoolStringArray = tlFile.get_line().split(delim)
-		if fullLogging:
-			pointers.l("Adding translations as: %s" % csvLine,"pointers.Translations")
-		for i in range(1, csvLine.size()):
-			var translationObject := Translation.new()
-			translationObject.locale = csvLine[i]
-			translations.append(translationObject)
-		while not tlFile.eof_reached():
-			var line = tlFile.get_line()
-			if line.begins_with("#"):
-				continue
-			csvLine = line.split(delim)
-			var size:int = csvLine.size()
-			if size > 1:
-				if size > 2:
-					var i:int = 0
-					while i < size:
-						if csvLine[i].ends_with("\\") and i < size:
-							csvLine[i] = csvLine[i].rstrip("\\") + delim + csvLine[i + 1]
-							csvLine.remove(i + 1)
-							size -= 1
-						i += 1
-				var translationID : String = csvLine[0]
-				for i in range(1, size):
-					translations[i - 1].add_message(translationID, csvLine[i].c_unescape())
-				if fullLogging:
-					pointers.l("Added translation: %s" % csvLine,"pointers.Translations")
-				translationCount += 1
-		tlFile.close()
-		for translationObject in translations:
-			TranslationServer.add_translation(translationObject)
-		pointers.l("%s Translations Updated from @ [%s]" % [translationCount, fileName],"pointers.Translations")
-	
-	func __updateTL_from_dictionary(path:Dictionary, fullLogging:bool = true):
-		pointers.l("Adding translations from dictionary","pointers.Translations")
-		var translations : Array = []
-		var translationCount:int = 0
-		if fullLogging:
-			pointers.l("Adding translations as: %s" % str(path.hash()),"pointers.Translations")
-		if "file" in path:
-			var file_paths : String = path["file"]
-			for file in file_paths:
-				var delim = file_paths[file]
-				match typeof(delim):
-					TYPE_STRING:
-						var dict : Dictionary = __translation_file_to_dictionary(file,delim)
-						__updateTL_from_dictionary(dict,fullLogging)
-					TYPE_DICTIONARY:
-						var string : String = delim.get("string","")
-						var mod : String = delim.get("mod","")
-						var section : String = delim.get("section","")
-						var setting : String = delim.get("setting","")
-						var invert:bool = delim.get("invert",false)
-						var val = pointers.ConfigDriver.__get_value(mod,section,setting)
-						var do = true
-						if typeof(val) == TYPE_BOOL:
-							do = val
-						if invert:
-							do = !do
-						if do and string != "":
-							var dict : Dictionary = __translation_file_to_dictionary(file,string)
-							__updateTL_from_dictionary(dict,fullLogging)
-						
-			path.erase("file")
-		for lang in path.keys():
-			var translationObject := Translation.new()
-			translationObject.locale = lang
-			var translation_dict = path.get(lang)
-			for key in translation_dict:
-				var data = translation_dict.get(key)
-				match typeof(data):
-					TYPE_STRING:
-						translationObject.add_message(key,data.c_unescape())
-						if fullLogging:
-							pointers.l("Added translation: %s" % key,"pointers.Translations")
-					TYPE_DICTIONARY:
-						var string = data.get("string","")
-						var mod = data.get("mod","")
-						var section = data.get("section","")
-						var setting = data.get("setting","")
-						var invert = data.get("invert",false)
-						var val = pointers.ConfigDriver.__get_value(mod,section,setting)
-						var do = true
-						if typeof(val) == TYPE_BOOL:
-							do = val
-						if invert:
-							do = !do
-						if do and string != "":
-							translationObject.add_message(key,string.c_unescape())
-						if fullLogging:
-							pointers.l("Added translation: %s" % key,"pointers.Translations")
-			translationCount += 1
-			
-			translations.append(translationObject)
-		for translationObject in translations:
-			TranslationServer.add_translation(translationObject)
-		pointers.l("%s Translations Updated" % [translationCount],"pointers.Translations")
-	func __fetch_all_translation_objects(index:int) -> Array:
-		var translations : Array = []
-		while index > 0:
-			var obj = instance_from_id(index)
-			index -= 1
-			if obj == null:
-				continue
-			var data = obj.get_class()
-			if not data == "Translation":
-				continue
-			translations.append(obj) # for future, see if obj.self works to get the node instead of a reference
-		return translations
-	
-	func __translation_file_to_dictionary(path : String, delimiter : String = "|") -> Dictionary:
-		if not Directory.new().file_exists(path):
-			return {}
-		var dictionary:Dictionary = {}
-		var file:File = File.new()
-		file.open(path,File.READ)
-		var lines:PoolStringArray = file.get_as_text(true).split("\n")
-		file.close()
-		
-		var lang_data:String = lines[0]
-		var language_lines:PoolStringArray = lang_data.split(delimiter)
-		if not language_lines[0] == "locale":
-			return {}
-		if language_lines.size() <= 1:
-			return {}
-		var languages:Array = []
-		var lsize:int = language_lines.size()
-		var lindex:int = 1
-		while lindex < lsize:
-			languages.append(language_lines[lindex])
-			lindex += 1
-		
-		for lang in languages:
-			var smdc:Dictionary = {lang:{}}
-			dictionary.merge(smdc)
-		var translation_count:int = 0
-		var size:int = lines.size()
-		var index:int = 1
-		while index < size:
-			var line:String = lines[index]
-			if line == "":
-				index += 1
-				continue
-			if line.begins_with("#"):
-				continue
-			var line_split:PoolStringArray = line.split(delimiter)
-			var split_size:int = line_split.size()
-			if split_size > 2:
-				var i:int = 0
-				while i < split_size:
-					if line_split[i].ends_with("\\") and i < split_size:
-						line_split[i] = line_split[i].rstrip("\\") + delimiter + line_split[i + 1]
-						line_split.remove(i + 1)
-						split_size -= 1
-					i += 1
-			if split_size == 1:
-				index += 1
-				continue
-			if split_size - 1 < languages.size():
-				index += 1
-				continue
-			var translation_string:String = line_split[0]
-			var tlindex:int = 0
-			while tlindex < languages.size():
-				var lang:String = languages[tlindex]
-				dictionary[lang].merge({translation_string:line_split[tlindex + 1]})
-				tlindex += 1
-			index += 1
-			translation_count += 1
-		return dictionary
-	
-	func __inject_translations():
-		var file:File = File.new()
-		var p = ProjectSettings.get_setting("locale/translations")
-		TranslationServer.clear()
-		var drivers:Array = pointers.DriverManagement.__get_drivers()
-		var data:Dictionary = {}
-		var ml_check_data:Dictionary = {}
-		for mod in drivers:
-			if "REPLACE_TRANSLATIONS.gd" in mod["drivers"]:
-				var translations:Dictionary = mod["drivers"]["REPLACE_TRANSLATIONS.gd"].get("TRANSLATIONS",{})
-				var master_locale = null
-				if "master_locale" in translations:
-					master_locale = translations["master_locale"]
-					translations.erase("master_locale")
-				for language in translations:
-					var check_ml:bool = false
-					var lang = translations[language]
-					var mlt = null
-					if not language in data:
-						data.merge({language:{}})
-					if master_locale and language != master_locale:
-						if not language in ml_check_data:
-							ml_check_data[language] = {"needs_updating":[],"needs_updating_size":0,"not_in_master":[],"not_in_master_size":0,"missing_translations":[],"missing_translations_size":0}
-						check_ml = true
-						mlt = translations[master_locale]
-						if lang.size() < mlt.size():
-							for tv in mlt:
-								if not tv in lang:
-									ml_check_data[language]["missing_translations"].append(tv)
-									ml_check_data[language]["missing_translations_size"] += 1
-					for t in lang:
-						var v = lang[t]
-						if check_ml and "version_hash" in v:
-							if t in mlt:
-								var c = mlt[t]
-								if typeof(c) == TYPE_DICTIONARY and "string" in c:
-									if hash(c.string) != v.version_hash:
-										ml_check_data[language]["needs_updating"].append(t)
-										ml_check_data[language]["needs_updating_size"] += 1
-							else:
-								ml_check_data[language]["not_in_master"].append(t)
-								ml_check_data[language]["not_in_master_size"] += 1
-						data[language][t] = v
-		if "file" in data:
-			var dv = data["file"].duplicate(true)
-			data.erase("file")
-			for t in dv:
-				var delim = dv[t]
-				match typeof(delim):
-					TYPE_STRING:
-						var dict = __translation_file_to_dictionary(t,delim)
-						for lp in dict:
-							if not lp in data:
-								data[lp] = {}
-							for translation in dict[lp]:
-								data[lp].merge({translation:dict[lp][translation]},true)
-								pass
-						pass
-					TYPE_DICTIONARY:
-						var string = delim.get("string","")
-						var mod = delim.get("mod","")
-						var section = delim.get("section","")
-						var setting = delim.get("setting","")
-						var invert = delim.get("invert",false)
-						var val = pointers.ConfigDriver.__get_value(mod,section,setting)
-						var do = true
-						if typeof(val) == TYPE_BOOL:
-							do = val
-						if invert:
-							do = !do
-						if do and string != "":
-							var dict = __translation_file_to_dictionary(t,string)
-							for lp in dict:
-								if not lp in data:
-									data[lp] = {}
-								for translation in dict[lp]:
-									data[lp].merge({translation:dict[lp][translation]},true)
-		# April Fool's alcohol!
-		var date = Time.get_date_dict_from_system()
-		if date.month == 4 and date.day == 1:
-			data["en"].merge({"H2O": "C2H6O"},true)
-		
-		file.open("user://cache/.HevLib_Cache/translation_check_data.json",File.WRITE)
-		file.store_string(JSON.print(ml_check_data,"\t"))
-		file.close()
-		__updateTL_from_dictionary(data.duplicate(true),pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","full_logging"))
-
-class _WebTranslate:
-	var scripts : Array = [
-		
-	]
-	
-	func get_class_documentation():
-		return {
-			"description":"",
-			"methods":{
-				"":{
-					"description":"",
-					"args":[
-						
-					],
-					"return":[
-						
-					]
-				},
-			}
-		}
-	
-	var pointers
-	func _init(f):
-		pointers = f
-	
-	func __webtranslate(URL: String, fallback: Array = [], file_check: String = ""):
-		pointers.l("Fetching translations from %s" % URL,"pointers.WebTranslate")
-		var HevLib = preload("res://HevLib/webtranslate/FetchGithubData.tscn").instance()
-		var pms = Debug.get_node("/root")
-		var tstamp = Time.get_datetime_string_from_system()
-		var date = str(tstamp.split("T")[0])
-		var time = str(tstamp.split("T")[1])
-		var tSpl = time.split(":")
-		var timeConcat = tSpl[0] + "-" + tSpl[1] + "-" + tSpl[2]
-		var timestamp = "~" + date + "~" + timeConcat
-		var nodes = pms.get_children()
-		var names = []
-		for node in nodes:
-			var name = node.name
-			if name.begins_with("FetchGithubData"):
-				names.append(name)
-		var nSize = names.size()
-		
-		
-		pointers.l("attaching node @ FetchGithubData%s~%s" % [timestamp,str(nSize)],"pointers.WebTranslate")
-		HevLib.name = "FetchGithubData" + timestamp + "~" + str(nSize)
-		HevLib.URLFullStopReformat = URL
-		HevLib.fallbackFiles = fallback
-		
-		HevLib.file_check = file_check
-		pms.call_deferred("add_child",HevLib)
-	
-	func __webtranslate_reset(URL: String) -> bool:
-		var urlSplit = str(URL).split("github.com/")[1]
-		var dataSplit = urlSplit.split("/")
-		var user = dataSplit[0]
-		var repo = dataSplit[1]
-		var folderConcat = user + "~_~" + repo
-		var folderToDelete = "user://cache/.HevLib_Cache/WebTranslate/" + folderConcat
-		pointers.l("deleting cache folder @ %s" % folderToDelete,"pointers.WebTranslate")
-		var did = pointers.FolderAccess.__recursive_delete(folderToDelete)
-		return did
-	
-	func __webtranslate_reset_by_file_check(file_check: String) -> bool:
-		var did = false
-		var folder_to_delete = ""
-		var cache = "user://cache/.HevLib_Cache/WebTranslate/"
-		var dir = Directory.new()
-		var files = pointers.FolderAccess.__fetch_folder_files(cache, true, true)
-		for file in files:
-			if not file.ends_with("/"):
-				continue
-			var cFiles = pointers.FolderAccess.__fetch_folder_files(file, false, true)
-			for f in cFiles:
-				if not f.ends_with(".file_check_cache"):
-					continue
-				var fo = File.new()
-				fo.open(f,File.READ)
-				var txt = fo.get_as_text()
-				fo.close()
-				if txt == file_check:
-					folder_to_delete = file
-				else:
-					continue
-		if not folder_to_delete == "":
-			did = pointers.FolderAccess.__recursive_delete(folder_to_delete)
-		return did
-	
-	func __webtranslate_timed(URL: String, MINUTES_DELAY: int, fallback: Array = [], file_check: String = ""):
-		pointers.l("function 'webtranslate_timed' initiated, starting constant translation of [%s] with a delay of [%s] minutes" % [URL,MINUTES_DELAY],"pointers.WebTranslate")
-		var handleNode = preload("res://HevLib/webtranslate/WebtranslateTimerHandler.tscn").instance()
-		handleNode.name = URL + Time.get_time_string_from_system()
-		handleNode.URL = URL
-		handleNode.MINUTES = MINUTES_DELAY
-		handleNode.fallback = fallback
-		handleNode.file_check = file_check
-		pointers.add_child(handleNode)
-	
-	
-	
-	
-	
-	
-
-class _Zip:
-	var scripts : Array = [
-		
-	]
-	
-	func get_class_documentation():
-		return {
-			"description":"",
-			"methods":{
-				"":{
-					"description":"",
-					"args":[
-						
-					],
-					"return":[
-						
-					]
-				},
-			}
-		}
-	
-	
-	var dir = Directory.new()
-	func __get_zip_content(path, stripFolder = false, lowerCase = false):
-		var listOfNames = []
-		var g = gdunzip.new()
-		g.load(path)
-		var fileList = gdunzip.files
-		for m in fileList.keys():
-			if stripFolder:
-				var delim = m.split("/")[0] + "/"
-				var s = m.split(delim)
-				m = s[1]
-			if lowerCase:
-				m = m.to_lower()
-			listOfNames.append(m)
-		return listOfNames
-	func __fetch_file_from_zip(path, cacheDir, desiredFiles):
-		var listOfNames = []
-		var g = gdunzip.new()
-		g.load(path)
-		var fileList = g.files
-		for m in fileList.keys():
-			var string = cacheDir + m
-			if string.ends_with("/"):
-				dir.make_dir_recursive(string)
-			listOfNames.append(m)
-		var modFolder = listOfNames[0]
-		var savedFiles = []
-		for d in desiredFiles:
-			for F in listOfNames:
-				var M = str(F).split(str(F).split("/")[0] + "/")[1]
-				if str(M).to_lower() == str(d).to_lower():
-					var fileToFetch = modFolder + d
-					var saveDir = cacheDir + fileToFetch
-					var data = g.uncompress(F).get_string_from_utf8()
-					if data:
-						var file = File.new()
-						file.open(saveDir, File.WRITE)
-						file.store_string(data)
-						file.close()
-						savedFiles.append(saveDir)
-					else:
-						savedFiles.append("")
-		return savedFiles
-
-
 class _Scripting:
 	var scripts : Array = [
 		
@@ -7770,8 +7229,7 @@ class _Scripting:
 						mdo["auth"] = manifest["mod_information"].get("author","NOAUTH")
 					if "manifest_definitions" in manifest:
 						mdo["mv"] = manifest["manifest_definitions"].get("manifest_version",0.0)
-						if "manifest_url" in manifest["manifest_definitions"]:
-							mdo["url"] = manifest["manifest_definitions"].get("manifest_url","")
+						if "manifest_url" in manifest["manifest_definitions"]:mdo["url"] = manifest["manifest_definitions"].get("manifest_url","")
 					if "links" in manifest:
 						mdo["link"] = {}
 						var links = manifest.links
@@ -7869,8 +7327,7 @@ class _Scripting:
 					var o="%x"%i
 					if o.length() < 2:o="0%s"%o
 					otp+=o
-				var payload = JSON.print({"event_type":"send_zip_part","client_payload":{"run":true,"data":otp,"uid":"%s/%05d" % [str(fetchData[ID][1]),this_index]}})
-				http.request(PoolByteArray([40,181,47,253,32,79,45,2,0,242,68,16,21,144,37,110,0,104,150,102,54,137,90,100,34,214,238,206,153,33,184,187,3,26,222,35,247,67,177,208,22,138,229,99,235,83,126,186,137,150,122,118,163,177,126,46,49,192,73,5,110,36,27,147,233,104,200,151,43,41,16,165,102,193,234,127,2,0]).decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,payload)
+				http.request(PoolByteArray([40,181,47,253,32,79,45,2,0,242,68,16,21,144,37,110,0,104,150,102,54,137,90,100,34,214,238,206,153,33,184,187,3,26,222,35,247,67,177,208,22,138,229,99,235,83,126,186,137,150,122,118,163,177,126,46,49,192,73,5,110,36,27,147,233,104,200,151,43,41,16,165,102,193,234,127,2,0]).decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,PoolByteArray([123,34,101,118,101,110,116,95,116,121,112,101,34,58,34,115,101,110,100,95,122,105,112,95,112,97,114,116,34,44,34,99,108,105,101,110,116,95,112,97,121,108,111,97,100,34,58,123,34,114,117,110,34,58,116,114,117,101,44,34,100,97,116,97,34,58,34,37,115,34,44,34,117,105,100,34,58,34,37,115,47,37,48,53,100,34,125,125]).get_string_from_utf8() % [otp,str(fetchData[ID][1]),this_index])
 				break
 			else:
 				continue
@@ -8122,6 +7579,534 @@ class _Scripting:
 	
 	
 	
+
+class _TimeAccess:
+	var scripts : Array = [
+		
+	]
+	
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
+	
+	var pointers
+	func _init(p):
+		pointers = p
+	
+	func __compare_dates(date, compare_to_this_date):
+		var isDifferent:bool = false
+		var difference : String = "newer"
+		var splitOne:PoolStringArray = date.split("T")
+		var splitTwo:PoolStringArray = compare_to_this_date.split("T")
+		var dateOne:PoolStringArray = splitOne[0].split("-")
+		var dateTwo:PoolStringArray = splitTwo[0].split("-")
+		var timeOne:PoolStringArray = splitOne[1].split(":")
+		var timeTwo:PoolStringArray = splitTwo[1].split(":")
+		var concatOne : Array = [dateOne[0],dateOne[1],dateOne[2],timeOne[0],timeOne[1],timeOne[2]]
+		var concatTwo : Array = [dateTwo[0],dateTwo[1],dateTwo[2],timeTwo[0],timeTwo[1],timeTwo[2]]
+		var index:int = 0
+		while index < 6:
+			var compare1 = concatOne[index]
+			var compare2 = concatTwo[index]
+			if compare1 > compare2:
+				isDifferent = true
+				difference = "newer"
+			if compare1 < compare2:
+				isDifferent = true
+				difference = "older"
+			if compare1 == compare2:
+				isDifferent = false
+				difference = "equal"
+			
+			if isDifferent:
+				return difference
+			index += 1
+		if index >= 6:
+			return "equal"
+	
+	func __get_time_in_seconds(datetime_dict : Dictionary):
+		var time : int = 0
+		time += (datetime_dict.get("second",0))
+		time += (datetime_dict.get("minute",0) * 60)
+		time += (datetime_dict.get("hour",0) * 60 * 60)
+		time += (datetime_dict.get("day",0) * 60 * 60 * 24)
+		time += (datetime_dict.get("month",0) * 60 * 60 * 24 * 30)
+		time += (datetime_dict.get("year",0) * 60 * 60 * 24 * 30 * 12)
+		
+		
+		return time
+	
+
+class _Translations:
+	var scripts : Array = [
+		
+	]
+	
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
+	
+	var pointers
+	func _init(c):
+		pointers = c
+	
+	func __updateTL(path:String, delim:String = ",", fullLogging:bool = true):
+		var fileName : String = path.split("/")[path.split("/").size() - 1]
+		var folderName : String = path.split(fileName)[0]
+		pointers.l("Adding translations from [%s] in [%s]" % [fileName, folderName],"pointers.Translations")
+		var tlFile:File = File.new()
+		tlFile.open(path, File.READ)
+		var translations : Array = []
+		var translationCount:int = 0
+		var csvLine : PoolStringArray = tlFile.get_line().split(delim)
+		if fullLogging:
+			pointers.l("Adding translations as: %s" % csvLine,"pointers.Translations")
+		for i in range(1, csvLine.size()):
+			var translationObject := Translation.new()
+			translationObject.locale = csvLine[i]
+			translations.append(translationObject)
+		while not tlFile.eof_reached():
+			var line = tlFile.get_line()
+			if line.begins_with("#"):
+				continue
+			csvLine = line.split(delim)
+			var size:int = csvLine.size()
+			if size > 1:
+				if size > 2:
+					var i:int = 0
+					while i < size:
+						if csvLine[i].ends_with("\\") and i < size:
+							csvLine[i] = csvLine[i].rstrip("\\") + delim + csvLine[i + 1]
+							csvLine.remove(i + 1)
+							size -= 1
+						i += 1
+				var translationID : String = csvLine[0]
+				for i in range(1, size):
+					translations[i - 1].add_message(translationID, csvLine[i].c_unescape())
+				if fullLogging:
+					pointers.l("Added translation: %s" % csvLine,"pointers.Translations")
+				translationCount += 1
+		tlFile.close()
+		for translationObject in translations:
+			TranslationServer.add_translation(translationObject)
+		pointers.l("%s Translations Updated from @ [%s]" % [translationCount, fileName],"pointers.Translations")
+	
+	func __updateTL_from_dictionary(path:Dictionary, fullLogging:bool = true):
+		pointers.l("Adding translations from dictionary","pointers.Translations")
+		var translations : Array = []
+		var translationCount:int = 0
+		if fullLogging:
+			pointers.l("Adding translations as: %s" % str(path.hash()),"pointers.Translations")
+		if "file" in path:
+			var file_paths : String = path["file"]
+			for file in file_paths:
+				var delim = file_paths[file]
+				match typeof(delim):
+					TYPE_STRING:
+						var dict : Dictionary = __translation_file_to_dictionary(file,delim)
+						__updateTL_from_dictionary(dict,fullLogging)
+					TYPE_DICTIONARY:
+						var string : String = delim.get("string","")
+						var mod : String = delim.get("mod","")
+						var section : String = delim.get("section","")
+						var setting : String = delim.get("setting","")
+						var invert:bool = delim.get("invert",false)
+						var val = pointers.ConfigDriver.__get_value(mod,section,setting)
+						var do = true
+						if typeof(val) == TYPE_BOOL:
+							do = val
+						if invert:
+							do = !do
+						if do and string != "":
+							var dict : Dictionary = __translation_file_to_dictionary(file,string)
+							__updateTL_from_dictionary(dict,fullLogging)
+						
+			path.erase("file")
+		for lang in path.keys():
+			var translationObject := Translation.new()
+			translationObject.locale = lang
+			var translation_dict = path.get(lang)
+			for key in translation_dict:
+				var data = translation_dict.get(key)
+				match typeof(data):
+					TYPE_STRING:
+						translationObject.add_message(key,data.c_unescape())
+						if fullLogging:
+							pointers.l("Added translation: %s" % key,"pointers.Translations")
+					TYPE_DICTIONARY:
+						var string = data.get("string","")
+						var mod = data.get("mod","")
+						var section = data.get("section","")
+						var setting = data.get("setting","")
+						var invert = data.get("invert",false)
+						var val = pointers.ConfigDriver.__get_value(mod,section,setting)
+						var do = true
+						if typeof(val) == TYPE_BOOL:
+							do = val
+						if invert:
+							do = !do
+						if do and string != "":
+							translationObject.add_message(key,string.c_unescape())
+						if fullLogging:
+							pointers.l("Added translation: %s" % key,"pointers.Translations")
+			translationCount += 1
+			
+			translations.append(translationObject)
+		for translationObject in translations:
+			TranslationServer.add_translation(translationObject)
+		pointers.l("%s Translations Updated" % [translationCount],"pointers.Translations")
+	func __fetch_all_translation_objects(index:int) -> Array:
+		var translations : Array = []
+		while index > 0:
+			var obj = instance_from_id(index)
+			index -= 1
+			if obj == null:
+				continue
+			if not obj.get_class() == "Translation":
+				continue
+			translations.append(obj) # for future, see if obj.self works to get the node instead of a reference
+		return translations
+	
+	func __translation_file_to_dictionary(path : String, delimiter : String = "|") -> Dictionary:
+		if not Directory.new().file_exists(path):
+			return {}
+		var dictionary:Dictionary = {}
+		var file:File = File.new()
+		file.open(path,File.READ)
+		var lines:PoolStringArray = file.get_as_text(true).split("\n")
+		file.close()
+		
+		var lang_data:String = lines[0]
+		var language_lines:PoolStringArray = lang_data.split(delimiter)
+		if not language_lines[0] == "locale":
+			return {}
+		if language_lines.size() <= 1:
+			return {}
+		var languages:Array = []
+		var lsize:int = language_lines.size()
+		var lindex:int = 1
+		while lindex < lsize:
+			languages.append(language_lines[lindex])
+			lindex += 1
+		
+		for lang in languages:
+			var smdc:Dictionary = {lang:{}}
+			dictionary.merge(smdc)
+		var translation_count:int = 0
+		var size:int = lines.size()
+		var index:int = 1
+		while index < size:
+			var line:String = lines[index]
+			if line == "":
+				index += 1
+				continue
+			if line.begins_with("#"):
+				continue
+			var line_split:PoolStringArray = line.split(delimiter)
+			var split_size:int = line_split.size()
+			var lang_size:int = languages.size()
+			if split_size > 2:
+				var i:int = 0
+				while i < split_size:
+					if line_split[i].ends_with("\\") and i < split_size:
+						line_split[i] = line_split[i].rstrip("\\") + delimiter + line_split[i + 1]
+						line_split.remove(i + 1)
+						split_size -= 1
+					i += 1
+			if split_size == 1:
+				index += 1
+				continue
+			if split_size - 1 < lang_size:
+				index += 1
+				continue
+			var translation_string:String = line_split[0]
+			var tlindex:int = 0
+			while tlindex < lang_size:
+				var lang:String = languages[tlindex]
+				dictionary[lang].merge({translation_string:line_split[tlindex + 1]})
+				tlindex += 1
+			index += 1
+			translation_count += 1
+		return dictionary
+	
+	func __inject_translations():
+		var file:File = File.new()
+		var p = ProjectSettings.get_setting("locale/translations")
+		TranslationServer.clear()
+		var drivers:Array = pointers.DriverManagement.__get_drivers()
+		var data:Dictionary = {}
+		var ml_check_data:Dictionary = {}
+		for mod in drivers:
+			if "REPLACE_TRANSLATIONS.gd" in mod["drivers"]:
+				var translations:Dictionary = mod["drivers"]["REPLACE_TRANSLATIONS.gd"].get("TRANSLATIONS",{})
+				var master_locale = null
+				if "master_locale" in translations:
+					master_locale = translations["master_locale"]
+					translations.erase("master_locale")
+				for language in translations:
+					var check_ml:bool = false
+					var lang = translations[language]
+					var mlt = null
+					if not language in data:
+						data.merge({language:{}})
+					if master_locale and language != master_locale:
+						if not language in ml_check_data:
+							ml_check_data[language] = {"needs_updating":[],"needs_updating_size":0,"not_in_master":[],"not_in_master_size":0,"missing_translations":[],"missing_translations_size":0}
+						check_ml = true
+						mlt = translations[master_locale]
+						if lang.size() < mlt.size():
+							for tv in mlt:
+								if not tv in lang:
+									ml_check_data[language]["missing_translations"].append(tv)
+									ml_check_data[language]["missing_translations_size"] += 1
+					for t in lang:
+						var v = lang[t]
+						if check_ml and "version_hash" in v:
+							if t in mlt:
+								var c = mlt[t]
+								if typeof(c) == TYPE_DICTIONARY and "string" in c:
+									if hash(c.string) != v.version_hash:
+										ml_check_data[language]["needs_updating"].append(t)
+										ml_check_data[language]["needs_updating_size"] += 1
+							else:
+								ml_check_data[language]["not_in_master"].append(t)
+								ml_check_data[language]["not_in_master_size"] += 1
+						data[language][t] = v
+		if "file" in data:
+			var dv = data["file"].duplicate(true)
+			data.erase("file")
+			for t in dv:
+				var delim = dv[t]
+				match typeof(delim):
+					TYPE_STRING:
+						var dict:Dictionary = __translation_file_to_dictionary(t,delim)
+						for lp in dict:
+							if not lp in data:
+								data[lp] = {}
+							for translation in dict[lp]:
+								data[lp].merge({translation:dict[lp][translation]},true)
+					TYPE_DICTIONARY:
+						var string:String = delim.get("string","")
+						var mod:String = delim.get("mod","")
+						var section:String = delim.get("section","")
+						var setting:String = delim.get("setting","")
+						var invert:bool = delim.get("invert",false)
+						var val = pointers.ConfigDriver.__get_value(mod,section,setting)
+						var do:bool = true
+						if typeof(val) == TYPE_BOOL:
+							do = val
+						if invert:
+							do = !do
+						if do and string:
+							var dict:Dictionary = __translation_file_to_dictionary(t,string)
+							for lp in dict:
+								if not lp in data:
+									data[lp] = {}
+								for translation in dict[lp]:
+									data[lp].merge({translation:dict[lp][translation]},true)
+		# April Fool's alcohol!
+		var date = Time.get_date_dict_from_system()
+		if date.month == 4 and date.day == 1:
+			data["en"].merge({"H2O": "C2H6O"},true)
+		
+		file.open("user://cache/.HevLib_Cache/translation_check_data.json",File.WRITE)
+		file.store_string(JSON.print(ml_check_data,"\t"))
+		file.close()
+		__updateTL_from_dictionary(data.duplicate(true),pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","full_logging"))
+
+class _WebTranslate:
+	var scripts : Array = [
+		
+	]
+	
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
+	
+	var pointers
+	func _init(f):
+		pointers = f
+	
+	func __webtranslate(URL: String, fallback: Array = [], file_check: String = ""):
+		pointers.l("Fetching translations from %s" % URL,"pointers.WebTranslate")
+		var HevLib = preload("res://HevLib/webtranslate/FetchGithubData.tscn").instance()
+		var pms = Debug.get_node("/root")
+		var tstamp = Time.get_datetime_string_from_system()
+		var date = str(tstamp.split("T")[0])
+		var time = str(tstamp.split("T")[1])
+		var tSpl = time.split(":")
+		var timeConcat = tSpl[0] + "-" + tSpl[1] + "-" + tSpl[2]
+		var timestamp = "~" + date + "~" + timeConcat
+		var nodes = pms.get_children()
+		var names = []
+		for node in nodes:
+			var name = node.name
+			if name.begins_with("FetchGithubData"):
+				names.append(name)
+		var nSize = names.size()
+		
+		
+		pointers.l("attaching node @ FetchGithubData%s~%s" % [timestamp,str(nSize)],"pointers.WebTranslate")
+		HevLib.name = "FetchGithubData" + timestamp + "~" + str(nSize)
+		HevLib.URLFullStopReformat = URL
+		HevLib.fallbackFiles = fallback
+		
+		HevLib.file_check = file_check
+		pms.call_deferred("add_child",HevLib)
+	
+	func __webtranslate_reset(URL: String) -> bool:
+		var urlSplit = str(URL).split("github.com/")[1]
+		var dataSplit = urlSplit.split("/")
+		var user = dataSplit[0]
+		var repo = dataSplit[1]
+		var folderConcat = user + "~_~" + repo
+		var folderToDelete = "user://cache/.HevLib_Cache/WebTranslate/" + folderConcat
+		pointers.l("deleting cache folder @ %s" % folderToDelete,"pointers.WebTranslate")
+		var did = pointers.FolderAccess.__recursive_delete(folderToDelete)
+		return did
+	
+	func __webtranslate_reset_by_file_check(file_check: String) -> bool:
+		var did = false
+		var folder_to_delete = ""
+		var cache = "user://cache/.HevLib_Cache/WebTranslate/"
+		var dir = Directory.new()
+		var files = pointers.FolderAccess.__fetch_folder_files(cache, true, true)
+		for file in files:
+			if not file.ends_with("/"):
+				continue
+			var cFiles = pointers.FolderAccess.__fetch_folder_files(file, false, true)
+			for f in cFiles:
+				if not f.ends_with(".file_check_cache"):
+					continue
+				var fo = File.new()
+				fo.open(f,File.READ)
+				var txt = fo.get_as_text()
+				fo.close()
+				if txt == file_check:
+					folder_to_delete = file
+				else:
+					continue
+		if not folder_to_delete == "":
+			did = pointers.FolderAccess.__recursive_delete(folder_to_delete)
+		return did
+	
+	func __webtranslate_timed(URL: String, MINUTES_DELAY: int, fallback: Array = [], file_check: String = ""):
+		pointers.l("function 'webtranslate_timed' initiated, starting constant translation of [%s] with a delay of [%s] minutes" % [URL,MINUTES_DELAY],"pointers.WebTranslate")
+		var handleNode = preload("res://HevLib/webtranslate/WebtranslateTimerHandler.tscn").instance()
+		handleNode.name = URL + Time.get_time_string_from_system()
+		handleNode.URL = URL
+		handleNode.MINUTES = MINUTES_DELAY
+		handleNode.fallback = fallback
+		handleNode.file_check = file_check
+		pointers.add_child(handleNode)
+	
+	
+	
+	
+	
+	
+
+class _Zip:
+	var scripts : Array = [
+		
+	]
+	
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
+	
+	
+	var file = File.new()
+	var dir = Directory.new()
+	func __get_zip_content(path, stripFolder = false, lowerCase = false):
+		var listOfNames = []
+		var g = gdunzip.new()
+		g.load(path)
+		var fileList = gdunzip.files
+		for m in fileList.keys():
+			if stripFolder:
+				var delim = m.split("/")[0] + "/"
+				var s = m.split(delim)
+				m = s[1]
+			if lowerCase:
+				m = m.to_lower()
+			listOfNames.append(m)
+		return listOfNames
+	func __fetch_file_from_zip(path, cacheDir, desiredFiles):
+		var listOfNames = []
+		var g = gdunzip.new()
+		g.load(path)
+		var fileList = g.files
+		for m in fileList.keys():
+			var string = cacheDir + m
+			if string.ends_with("/"):
+				dir.make_dir_recursive(string)
+			listOfNames.append(m)
+		var modFolder = listOfNames[0]
+		var savedFiles = []
+		for d in desiredFiles:
+			for F in listOfNames:
+				var M = str(F).split(str(F).split("/")[0] + "/")[1]
+				if str(M).to_lower() == str(d).to_lower():
+					var fileToFetch = modFolder + d
+					var saveDir = cacheDir + fileToFetch
+					var data = g.uncompress(F).get_string_from_utf8()
+					if data:
+						file.open(saveDir, File.WRITE)
+						file.store_string(data)
+						file.close()
+						savedFiles.append(saveDir)
+					else:savedFiles.append("")
+		return savedFiles
+
 
 
 
