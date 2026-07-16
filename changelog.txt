@@ -1,3 +1,9 @@
+[1.15.8]
+
+1=* Added `DataFormat`.`__compile_and_override_script_with_script`
+1.1=* Overrides a script using an already-loaded script object
+2=* Modlet script loading now uses `DataFormat`.`__compile_and_override_script_with_script` to override the script to improve load times and prevent errors in the logs
+
 [1.15.7]
 
 1=* Fixed procedural overlay not correctly being offset for specific mineral bases
