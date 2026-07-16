@@ -74,7 +74,7 @@ func reexamine():
 	if limit_ships:
 		visible = (shipname in limit_ships)
 	if prevent_ships:
-		visible = (shipname in prevent_ships)
+		visible = not (shipname in prevent_ships)
 	.reexamine()
 	if config_id and config_section and config_setting:
 		if cv != null and cv is bool:
