@@ -2094,6 +2094,10 @@ class _DataFormat:
 		pointers.l("Compiling script of length %s" % str(source_code.length()),"pointers.DataFormat")
 		pointers.equipment_modmain.installScriptExtensionFromSource(source_code)
 	
+	func __compile_and_override_script_with_script(script : Script) -> void:
+		pointers.l("Installing script extension with script %s" % str(script),"pointers.DataFormat")
+		pointers.equipment_modmain.installScriptExtensionFromScript(script)
+	
 	func __compile_and_override_script_with_scene(source_code : String, scene_path = []) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
@@ -2121,9 +2125,9 @@ class _DataFormat:
 	func __override_script(file_path : String):
 		pointers.l("Attempting to install script override at [%s]" % file_path,"pointers.DataFormat")
 		if __load_if_can(file_path):
-			var sc:String = __get_load().get_source_code()
-			pointers.l("Script override successful with length of %s, passing to compiler" % str(sc.length()),"pointers.DataFormat")
-			__compile_and_override_script(sc)
+			var sc:Script = __get_load()
+			pointers.l("Script override successful with length of %s, passing to compiler" % str(sc.get_source_code().length()),"pointers.DataFormat")
+			__compile_and_override_script_with_script(sc)
 	
 	func __replace_resource(resource_path:String, original_path:String):
 		if not ResourceLoader.exists(resource_path) or not ResourceLoader.exists(original_path):
@@ -6857,8 +6861,8 @@ class _ManifestV2:
 								"scene","resource":
 									var path : String = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
 									var orig_test : String = path.split(modlet.get_base_dir())[1]
-									var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[0])
-									var old_relative:bool = old.begins_with("res://")
+									var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[1])
+									var old_relative:bool = old.begins_with("res:/")
 									var old_path : String = old if old_relative else ("res:/" + ("" if old.begins_with("/") else "/") + old)
 									if pointers.ConfigDriver.__validate_dictionary(subdata):
 										pointers.DataFormat.__replace_resource(path,old_path)
