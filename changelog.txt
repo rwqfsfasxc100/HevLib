@@ -1,3 +1,7 @@
+[1.15.10]
+
+1=* Fixed some slots incorrectly hiding when using a ship that they're not permitted to be installed to
+
 [1.15.9]
 
 1=* Fixed issue that would prevent equipment from being added to slots
