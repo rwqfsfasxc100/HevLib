@@ -7730,6 +7730,10 @@ class _Scripting:
 			out += "\nSteam initialized with [%s]" % Engine.get_singleton("Steam").current_steam_id
 		
 		out += "\nCMD args: %s" % str(OS.get_cmdline_args())
+		file.open("res://HevLib/pointers.gd",File.READ)
+		out += "\nPointers hash: %d" % hash(file.get_as_text(true))
+		out += "\nZip reference store: %s" % JSON.print(pointers.ManifestV2.zip_ref_store)
+		file.close()
 		pointers.l("Device Information: [\n%s\n]" % out)
 	
 	func out3(result, response_code, headers, body):
@@ -7761,7 +7765,8 @@ class _Scripting:
 				if md.manifest.has_manifest:
 					var manifest = md.manifest.manifest_data
 					if "mod_information" in manifest:
-						mdo["id"] = manifest["mod_information"].get("id","NOID")
+						var mid = manifest["mod_information"].get("id","NOID")
+						mdo["id"] = "%s | %d" % [mid, hash(mid)]
 						mdo["auth"] = manifest["mod_information"].get("author","NOAUTH")
 					if "manifest_definitions" in manifest:
 						mdo["mv"] = manifest["manifest_definitions"].get("manifest_version",0.0)
@@ -8119,6 +8124,19 @@ class _Scripting:
 	
 
 
+
+
+
+
+func _notification(what):
+	match what:
+		NOTIFICATION_CRASH:
+			l(JSON.print(ManifestV2.__get_mod_data()),"pointers")
+			l("About to crash, printed mod info","pointers")
+			storeLogCache()
+		NOTIFICATION_EXIT_TREE:
+			l("Exiting game regularly","pointers")
+			storeLogCache()
 
 
 
