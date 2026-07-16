@@ -1,3 +1,10 @@
+[1.15.7]
+
+1=* Fixed procedural overlay not correctly being offset for specific mineral bases
+2=* Procedural mineral overlay now stores sprites within the scene itself, lowering load times
+3=* Logging of essential data is now handled from within the pointers node
+4=* Improved efficiency of some scene writing tools
+
 [1.15.6]
 
 1=* Fixed several issues with procedural minerals
