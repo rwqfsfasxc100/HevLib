@@ -199,6 +199,12 @@ func installScriptExtensionFromSource(source_code:String):
 	l("Installing script extension from source to: %s" % [parentPath])
 	out.take_over_path(parentPath)
 	_savedObjects.append(out)
+func installScriptExtensionFromScript(out:Script):
+	var parentScript:Script = out.get_base_script()
+	var parentPath:String = parentScript.resource_path
+	l("Installing script extension from source to: %s" % [parentPath])
+	out.take_over_path(parentPath)
+	_savedObjects.append(out)
 
 
 # Helper function to replace scenes
