@@ -4334,16 +4334,10 @@ class _Equipment:
 					if e_restriction:
 						if e_restriction == slot_restriction:
 							return true
-						else:
-							return false
 					else:
 						return true
 				else:
 					return true
-			else:
-				return false
-		else:
-			return false
 		return false
 	
 	func __make_equipment_for_scene(equipment_data: Dictionary, slot_node_name : String, system_slot: String) -> String:

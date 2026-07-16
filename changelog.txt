@@ -1,3 +1,7 @@
+[1.15.9]
+
+1=* Fixed issue that would prevent equipment from being added to slots
+
 [1.15.8]
 
 1=* Added `DataFormat`.`__compile_and_override_script_with_script`
