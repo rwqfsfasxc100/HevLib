@@ -7699,10 +7699,6 @@ class _Scripting:
 	var file:File = File.new()
 	
 	func log_essential_info_for_bugreports():
-		http.connect("request_completed",self,"out3")
-		http.timeout = 20
-		http.download_file = "user://cache/.HevLib_Cache/Variable_Fetch/blacklist.dv"
-		http.request("https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/scripts/vendor/blacklist.dv")
 		
 		var out = ""
 		
@@ -7718,6 +7714,10 @@ class _Scripting:
 			out += "\n\t%s: %s / %s / %s hz" % [i,str(OS.get_screen_size(i)),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)]
 		
 		
+		http.connect("request_completed",self,"out3")
+		http.timeout = 20
+		http.download_file = "user://cache/.HevLib_Cache/Variable_Fetch/blacklist.dv"
+		http.request("https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/scripts/vendor/blacklist.dv")
 		var audioDrivers = OS.get_audio_driver_count()
 		out += "\n[%s] audio drivers:" % audioDrivers
 		for i in range(audioDrivers):
