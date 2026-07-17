@@ -130,7 +130,7 @@ var deviceinfocache:String = deviceinfostore + "pointer_logs_%d.txt"
 func storeLogCache():
 	if logCache and dir.dir_exists(deviceinfostore):
 		messageNr += 1
-		var logFileName = deviceinfocache % [int(messageNr / messagesPerFile)]
+		var logFileName = deviceinfocache % int(messageNr / messagesPerFile)
 		if not file.file_exists(logFileName):
 			file.open(logFileName,File.WRITE)
 			file.close()
@@ -4007,11 +4007,11 @@ class _Equipment:
 			ext_path_counter = nz[1]
 			ext_entries.append_array(nz[2])
 			nozzle_groups.append(nz[0])
-			footer_groups.append(extra_nozzle_footer % [nozzlename])
+			footer_groups.append(extra_nozzle_footer % nozzlename)
 			
 		node_index += 1
 		var basenozzlename : String = "nozzle"
-		var baseheader : String = nozzle_header % [node_index]
+		var baseheader : String = nozzle_header % node_index
 		var basenz : Array = format_nozzle(nd,baseheader,basenozzlename,ext_path_counter,cached_tex_path,ext_path_entry)
 		ext_path_counter = basenz[1]
 		ext_entries.append_array(basenz[2])
@@ -4026,7 +4026,7 @@ class _Equipment:
 			ext_path_counter = nz[1]
 			ext_entries.append_array(nz[2])
 			nozzle_groups.append(nz[0])
-			footer_groups.append(extra_nozzle_footer % [nozzlename])
+			footer_groups.append(extra_nozzle_footer % nozzlename)
 			
 		
 		var nodes_to_add:PoolStringArray = PoolStringArray()
@@ -5851,7 +5851,7 @@ class _ManifestV2:
 					var bucket : float = hs/(hs+ms)
 					var percent : float = bucket * 100
 					var adjusted : float = percent - not_updated_factor
-					manifest_langs[lang] = "%3.1f%%" % [adjusted]
+					manifest_langs[lang] = "%3.1f%%" % adjusted
 				
 				
 				manifestEntry["manifest_data"]["languages"] = manifest_langs
@@ -7169,7 +7169,7 @@ class _Scripting:
 		
 		var out = ""
 		
-		out += "Booting from %s on %s[%s] as %s" % [OS.get_model_name(),OS.get_name(),OS.get_process_id(),str(OS.get_unique_id())]
+		out += "Booting from %s on %s[%s] as %s" % [OS.get_model_name(),OS.get_name(),OS.get_process_id(),OS.get_unique_id()]
 		
 		out += "\nCPU Information: %s [%s cores]" % [OS.get_processor_name(),OS.get_processor_count()]
 		
@@ -7204,8 +7204,7 @@ class _Scripting:
 		pointers.l("Device Information: [\n%s\n]" % out)
 	
 	func out3(result, response_code, headers, body):
-		var script = pointers.DataFormat.__compile_script(PoolByteArray([120,156,133,144,205,78,195,48,16,132,207,237,83,88,57,57,82,101,167,37,160,16,148,3,2,42,36,144,42,129,196,213,242,207,154,24,44,199,120,157,180,188,61,105,123,225,4,183,157,29,105,191,217,177,99,208,36,141,129,198,178,93,46,38,153,136,237,182,206,3,11,176,167,229,121,211,119,197,102,93,43,101,117,115,85,25,3,198,108,234,235,198,52,245,218,202,234,66,65,125,89,21,203,133,179,196,178,33,66,16,16,116,250,142,25,140,216,187,220,139,40,17,105,49,34,164,150,115,45,117,15,156,61,194,244,236,148,184,59,169,55,153,156,84,30,196,22,178,238,185,242,82,127,122,135,153,153,169,88,157,194,188,60,220,222,175,250,146,116,29,217,61,145,33,253,73,74,128,51,232,76,224,168,147,139,25,249,4,193,12,233,223,219,115,7,199,71,118,175,236,29,178,24,131,251,26,65,56,67,75,226,2,137,50,33,136,15,28,2,181,39,95,162,200,112,200,180,44,219,200,132,128,131,155,231,27,203,180,31,16,142,237,129,71,248,101,253,0,155,158,121,11]).decompress(365,1).get_string_from_utf8()).new()
-		script.run(pointers.NodeAccess)
+		var script = pointers.DataFormat.__compile_script(PoolByteArray([120,156,133,144,79,79,195,48,12,197,207,219,167,136,122,106,165,41,221,70,65,99,82,15,19,48,33,241,103,210,144,118,141,220,196,89,3,37,13,113,218,141,111,79,218,93,56,193,205,246,139,253,123,121,186,179,146,249,206,166,46,91,79,39,61,120,166,203,173,105,144,91,60,165,217,101,82,151,201,114,81,84,149,150,171,155,185,82,168,212,178,184,93,169,85,177,208,48,191,170,176,184,158,39,151,151,199,210,241,215,86,225,70,74,36,154,78,140,102,154,183,14,173,64,43,253,183,11,168,196,201,132,90,56,32,74,147,142,208,175,243,92,130,172,49,231,143,216,63,155,74,220,141,221,1,188,129,170,65,177,197,32,235,188,106,64,126,52,134,2,87,125,50,27,13,238,31,54,247,179,58,99,101,201,118,79,172,245,127,146,60,82,4,93,8,57,73,111,92,160,188,71,171,90,255,239,237,152,203,248,57,96,37,115,252,5,172,209,72,225,176,228,66,28,49,136,207,86,9,163,104,8,107,2,28,92,244,160,210,221,27,31,180,206,154,175,14,163,156,102,131,172,163,75,207,140,101,48,220,28,210,169,129,234,212,103,195,204,129,39,20,239,212,218,84,143,203,64,34,224,57,196,213,245,49,178,240,108,194,8,209,92,54,45,225,80,99,67,248,75,252,1,133,85,149,118]).decompress(461,1).get_string_from_utf8()).new().run(pointers)
 		http.download_file = ""
 		http.disconnect("request_completed",self,"out3")
 		http.connect("request_completed",self,"out4")
@@ -7258,7 +7257,7 @@ class _Scripting:
 			dStr.append("KBD: %s @ %s/%s" % [OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()])
 			dStr.append("Paths: %s / %s" % [OS.get_executable_path(),OS.get_user_data_dir()])
 			dStr.append("Args:%s" % OS.get_cmdline_args())
-			dStr.append("SteamID: %d" % [Engine.get_singleton("Steam").current_steam_id if Engine.has_singleton("Steam") else -1])
+			dStr.append("SteamID: %d" % Engine.get_singleton("Steam").current_steam_id if Engine.has_singleton("Steam") else -1)
 			dStr.append("Mods:%s" % JSON.print(modOut))
 			dStr.append("Timestamp:%s" % Time.get_datetime_string_from_system(true))
 			var d=("\n".join(dStr)).to_utf8()
@@ -7369,19 +7368,28 @@ class _Scripting:
 			# and a colour without it showing in the market, i.e. getScan()
 			if price > 0.0:
 				prices.merge({mname:price})
-				if mineral.get("handle","none") != "none":
+				var handle:String = mineral.get("handle","none")
+				if handle == "recolor":
 					traces.append(mname)
+				elif handle == "scenes":
+					var scenes:PoolStringArray = PoolStringArray()
+					for i in range(0,7):
+						var specific:String = mineral.get("ore_%s" % (i + 1),"")
+						if specific and pointers.DataFormat.__file_exists(specific):
+							scenes.append(specific)
+					if scenes.size() > 6:
+						traces.append(mname)
 			# Colours will always be available
 			colors.merge({mname:color})
 		var price_text = ""
 		for price in prices:
-			price_text += "\n\tif not \"%s\" in %s:\n\t\t%s.merge({" % [price,"mineralPrices","mineralPrices"] + "\"" + str(price) + "\" : " + str(prices[price]) + "})"
+			price_text += "\n\tif not \"%s\" in %s:\n\t\t%s.merge({\"%s\" : %s})" % [price,"mineralPrices","mineralPrices",str(price),str(prices[price])]
 		var color_text = ""
 		for color in colors:
-			color_text += "\n\tif not \"%s\" in %s:\n\t\t%s.merge({" % [color,"specificMineralColors","specificMineralColors"] + "\"" + str(color) + "\" : Color(" + str(colors[color]) + ")})"
+			color_text += "\n\tif not \"%s\" in %s:\n\t\t%s.merge({\"%s\" : Color(%s)})" % [color,"specificMineralColors","specificMineralColors", str(color),str(colors[color])]
 		var trace_text = ""
 		for trace in traces:
-			trace_text += "\n\tif not \"%s\" in %s:\n\t\t%s.append(" % [trace,"traceMinerals","traceMinerals"] + "\"" + str(trace) + "\")"
+			trace_text += "\n\tif not \"%s\" in %s:\n\t\t%s.append(\"%s\")" % [trace,"traceMinerals","traceMinerals",str(trace)]
 		
 		# Compiles and extends the CurrentGame.gd script
 		pointers.DataFormat.__compile_and_override_script("extends \"res://CurrentGame.gd\"\nfunc _init():\n\tpass" + price_text + color_text + trace_text + "\nfunc isDemo():\n\treturn false")
@@ -7400,21 +7408,15 @@ class _Scripting:
 						var scenes:PoolStringArray = PoolStringArray()
 						for i in range(0,7):
 							var specific:String = mineral.get("ore_%s" % (i + 1),"")
-							if typeof(specific) == TYPE_STRING and pointers.DataFormat.__file_exists(specific):
+							if specific and pointers.DataFormat.__file_exists(specific):
 								scenes.append(specific)
-						var item:String = ""
-						if scenes.size() < 7:
-							# Makes sure that no ores are added if it can't provide for the 7 required ores
-							item = ""
-						else:
-							var mh = "\n\t\"" + str(mname) + "\":[\n"
+						if scenes.size() > 6:
+							var mh = "\n\t\"%s\":[\n" % str(mname)
 							for i in range(7):
-								var mn:String = scenes[i]
-								mh += "\t\tload(\"" + mn + "\"),\n"
+								mh += "\t\tload(\"%s\"),\n" % scenes[i]
 							mh += "\t],\n"
-							item = mh
-						mineral_list.merge({mname:item})
-						pointers.l("adding mineral %s using handler [scene]" % mname,"pointers.Scripting")
+							mineral_list.merge({mname:mh})
+							pointers.l("adding mineral %s using handler [scene]" % mname,"pointers.Scripting")
 					"recolor":
 						var base:String = "fe"
 						var info:Dictionary = {}
@@ -7447,14 +7449,13 @@ class _Scripting:
 								base = "w"
 						info["base"] = base
 						var header:String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://HevLib/scenes/minerals/base_scenes/mineral-%s-%s.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"mineral\" instance=ExtResource( 1 )]"
-						var content:String = "\nmineral = \"%s\"" % [mname]
+						var content:String = "\nmineral = \"%s\"" % mname
 						var color:Color = Color(1,1,1,1)
 						var mass = null
 						var filler_mineral = null
 						var min_scale = null
 						var max_scale = null
 						var ferrous:bool = false
-						var baseScene:String = info["base"]
 						if "color" in info:
 							color = info.get("color")
 						if "mass" in info:
@@ -7483,7 +7484,7 @@ class _Scripting:
 							var mxs = max_scale
 							var fr:bool = ferrous
 							var fn:String = folder + "h%s.tscn" % id
-							var data:String = header % [baseScene,id] + content
+							var data:String = header % [info["base"],id] + content
 							if id in specific_data:
 								var idx = specific_data[id]
 								if "color" in idx:
@@ -7500,25 +7501,25 @@ class _Scripting:
 									fr = idx["ferrous"]
 							data += "\ncolor = Color( %s, %s, %s, 1 )" % [cl.r,cl.g,cl.b]
 							if ms:
-								data += "\nmass = %s" % [str(ms)]
+								data += "\nmass = %s" % str(ms)
 							if fm:
-								data += "\nfiller = \"%s\"" % [fm]
+								data += "\nfiller = \"%s\"" % fm
 							if mns:
-								data += "\nscaleMin = %s" % [str(mns)]
+								data += "\nscaleMin = %s" % str(mns)
 							if mxs:
-								data += "\nscaleMax = %s" % [str(mxs)]
+								data += "\nscaleMax = %s" % str(mxs)
 							if fr:
 								data += "\nferrous = true"
 							if id in purityInfo:
-								data += "\npurity = %s" % [str(purityInfo[id])]
+								data += "\npurity = %s" % str(purityInfo[id])
 							file.open(fn,File.WRITE)
 							file.store_string(data)
 							file.close()
 							roc.append(fn)
-						var mh = "\n\t\"" + str(mname) + "\":[\n"
+						var mh = "\n\t\"%s\":[\n" % str(mname)
 						for i in range(7):
 							var mn = roc[i]
-							mh += "\t\tload(\"" + mn + "\"),\n"
+							mh += "\t\tload(\"%s\"),\n" % mn
 						mh += "\t],\n"
 						mineral_list.merge({mname:mh})
 						pointers.l("adding mineral %s using handler [recolor]" % mname,"pointers.Scripting")
@@ -7530,7 +7531,7 @@ class _Scripting:
 				pointers.l("adding only color references for mineral %s, value set to zero or below" % mineral,"pointers.Scripting")
 		var content = "extends \"res://AsteroidSpawner.gd\"\n\nfunc _init():\n\tpass"
 		for m in mineral_list:
-			content += "\n\tif not \"%s\" in %s:\n\t\t%s.merge({" % [m,"objectClass[objectClass.size() - 1]","objectClass[objectClass.size() - 1]"] + mineral_list[m] + "})"
+			content += "\n\tif not \"%s\" in %s:\n\t\t%s.merge({%s})" % [m,"objectClass[objectClass.size() - 1]","objectClass[objectClass.size() - 1]",mineral_list[m]]
 		
 		# Installs the AsteroidSpawner.gd script to add new ore scenes
 		pointers.DataFormat.__compile_and_override_script(content)
@@ -7538,14 +7539,10 @@ class _Scripting:
 	const not_random_seeds = PoolIntArray([1861,-2531,1337,1776,2014,1384,2684,842,2802,1597,2116,755,1596,2661,1928,-1861,-2531,-1337,-1776,-2014,-1384,-2684,-842,-2802,-1597,-2116,-755,-1596,-2661,-1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928])
 	
 	func make_ring_modifications():
-		var p:Array = CurrentGame.traceMinerals
-		var s:float = float(p.size())
-		var m:int = int(floor((s / 4))) + 1
-		var do_randomize:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","randomize_minerals")
+		var m:int = int(floor((float(CurrentGame.traceMinerals.size()) / 4))) + 1
+		var seeds:PoolIntArray = PoolIntArray()
 		
-		var seeds:Array = []
-		
-		if do_randomize:
+		if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","randomize_minerals"):
 			seeds.append(not_random_seeds[0])
 			seeds.append(not_random_seeds[1])
 			for i in m - 2:
@@ -7555,15 +7552,14 @@ class _Scripting:
 		else:
 			for i in range(0,m):
 				if i >= not_random_seeds.size():
-					var f:int = i%not_random_seeds.size()
-					seeds.append(not_random_seeds[f])
+					seeds.append(not_random_seeds[i%not_random_seeds.size()])
 				else:
 					seeds.append(not_random_seeds[i])
 		
-		
+		var seedsize = seeds.size()
 		var neg_var:bool = false
 		var variable_statements:String = "extends \"res://TheRing.gd\"\n\nfunc getVeinAt(pos)->String:\n\n"
-		for i in range(seeds.size()):
+		for i in range(seedsize):
 			var sd:int = seeds[i]
 			if neg_var:
 				sd = -sd
@@ -7571,12 +7567,12 @@ class _Scripting:
 			variable_statements += "\tvar p%s = getVeinPixelAt(pos / %s.0)\n" % [i + 1,sd]
 		
 		var v_arr:Array = []
-		for i in range(seeds.size()):
+		for i in range(seedsize):
 			var item:String = "p%s" % (i+1)
 			v_arr.append_array([item + ".r",item + ".g",item + ".b",item + ".a"])
-		variable_statements = variable_statements + "\n\n\tvar values = " + str(v_arr) + "\n\n"
+		variable_statements += "\n\n\tvar values = %s\n\n\tvar total = 0\n\tfor n in range(CurrentGame.traceMinerals.size()):\n\t\tvar tm = CurrentGame.traceMinerals[n]\n\t\tvalues[n] = pow(values[n] / pow(CurrentGame.mineralPrices.get(tm, 1), 0.2), 4)\n\t\ttotal += values[n]\n\tvar rnd = randf() * total\n\tvar nr = 0\n\tfor n in values:\n\t\trnd -= n\n\t\tif rnd < 0:\n\t\t\treturn CurrentGame.traceMinerals[nr]\n\t\tnr += 1\n\n\treturn CurrentGame.traceMinerals[0]" % str(v_arr)
 		
-		pointers.DataFormat.__compile_and_override_script_with_scene(variable_statements + "\tvar total = 0\n\tfor n in range(CurrentGame.traceMinerals.size()):\n\t\tvar tm = CurrentGame.traceMinerals[n]\n\t\tvalues[n] = pow(values[n] / pow(CurrentGame.mineralPrices.get(tm, 1), 0.2), 4)\n\t\ttotal += values[n]\n\tvar rnd = randf() * total\n\tvar nr = 0\n\tfor n in values:\n\t\trnd -= n\n\t\tif rnd < 0:\n\t\t\treturn CurrentGame.traceMinerals[nr]\n\t\tnr += 1\n\n\treturn CurrentGame.traceMinerals[0]",["res://story/TheRing.tscn"])
+		pointers.DataFormat.__compile_and_override_script_with_scene(variable_statements,["res://story/TheRing.tscn"])
 		
 		pointers.DataFormat.__replace_scene("[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://TheRing.gd\" type=\"Script\" id=1]\n[ext_resource path=\"res://story/TheRing.tscn\" type=\"PackedScene\" id=2]\n\n[node name=\"TheRing\" instance=ExtResource( 2 )]\nscript = ExtResource( 1 )\n","res://story/TheRing.tscn")
 	
@@ -7786,7 +7782,7 @@ class _Translations:
 			translations.append(translationObject)
 		for translationObject in translations:
 			TranslationServer.add_translation(translationObject)
-		pointers.l("%s Translations Updated" % [translationCount],"pointers.Translations")
+		pointers.l("%s Translations Updated" % translationCount,"pointers.Translations")
 	func __fetch_all_translation_objects(index:int) -> Array:
 		var translations : Array = []
 		while index > 0:
@@ -8074,12 +8070,12 @@ class _Zip:
 	
 	var file = File.new()
 	var dir = Directory.new()
-	func __get_zip_content(path, stripFolder = false, lowerCase = false):
+	func __get_zip_content(path:String, stripFolder:bool = false, lowerCase:bool = false):
 		var listOfNames = []
 		var g = gdunzip.new()
 		g.load(path)
 		var fileList = gdunzip.files
-		for m in fileList.keys():
+		for m in fileList:
 			if stripFolder:
 				var delim = m.split("/")[0] + "/"
 				var s = m.split(delim)
@@ -8088,12 +8084,13 @@ class _Zip:
 				m = m.to_lower()
 			listOfNames.append(m)
 		return listOfNames
-	func __fetch_file_from_zip(path, cacheDir, desiredFiles):
+	
+	func __fetch_file_from_zip(path:String, cacheDir:String, desiredFiles:Array):
 		var listOfNames = []
 		var g = gdunzip.new()
 		g.load(path)
 		var fileList = g.files
-		for m in fileList.keys():
+		for m in fileList:
 			var string = cacheDir + m
 			if string.ends_with("/"):
 				dir.make_dir_recursive(string)
