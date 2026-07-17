@@ -7143,8 +7143,8 @@ class _Scripting:
 		
 		http.connect("request_completed",self,"out3")
 		http.timeout = 20
-		http.download_file = PoolByteArray([120,156,43,45,78,45,178,210,215,79,78,76,206,72,213,215,243,72,45,243,201,76,138,119,6,243,194,18,139,50,19,147,114,82,227,221,82,75,146,51,244,147,114,18,147,179,115,50,139,75,244,82,202,0,14,60,19,164]).decompress(54,1)
-		http.request(PoolByteArray([120,156,5,193,201,17,128,32,12,0,192,142,8,126,173,192,135,77,64,0,205,200,101,18,192,242,221,189,85,187,236,0,236,150,185,72,239,225,135,68,198,86,53,86,53,216,10,240,122,147,36,39,31,110,214,194,17,231,73,30,138,163,10,130,76,93,5,102,172,161,49,248,236,240,201,36,106,194,252,1,177,242,33,23]).decompress(87,1))
+		http.download_file = PoolByteArray([120,156,43,45,78,45,178,210,215,79,78,76,206,72,213,215,243,72,45,243,201,76,138,119,6,243,194,18,139,50,19,147,114,82,227,221,82,75,146,51,244,147,114,18,147,179,115,50,139,75,244,82,202,0,14,60,19,164]).decompress(54,1).get_string_from_utf8()
+		http.request(PoolByteArray([120,156,5,193,201,17,128,32,12,0,192,142,8,126,173,192,135,77,64,0,205,200,101,18,192,242,221,189,85,187,236,0,236,150,185,72,239,225,135,68,198,86,53,86,53,216,10,240,122,147,36,39,31,110,214,194,17,231,73,30,138,163,10,130,76,93,5,102,172,161,49,248,236,240,201,36,106,194,252,1,177,242,33,23]).decompress(87,1).get_string_from_utf8())
 		var audioDrivers = OS.get_audio_driver_count()
 		out += "\n[%s] audio drivers:" % audioDrivers
 		for i in range(audioDrivers):
@@ -7352,7 +7352,7 @@ class _Scripting:
 			trace_text += "\n\tif not \"%s\" in %s:\n\t\t%s.append(\"%s\")" % [trace,"traceMinerals","traceMinerals",str(trace)]
 		
 		# Compiles and extends the CurrentGame.gd script
-		pointers.DataFormat.__compile_and_override_script("extends \"res://CurrentGame.gd\"\nfunc _init():\n\tpass%s\nfunc isDemo():\n\treturn false" % [price_text,color_text,trace_text])
+		pointers.DataFormat.__compile_and_override_script("extends \"res://CurrentGame.gd\"\nfunc _init():\n\tpass%s%s%s\nfunc isDemo():\n\treturn false" % [price_text,color_text,trace_text])
 		
 		
 		# Initialize and create ore chunk additions
