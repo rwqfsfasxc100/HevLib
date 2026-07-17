@@ -4331,11 +4331,6 @@ class _Equipment:
 		var sticker_price_multi_format : String = equipment_data.get("sticker_price_multi_format", "%s E$ (x%d)")
 		var installed_color:Color = equipment_data.get("installed_color", Color(0.0, 1.0, 0.0, 1.0))
 		var disabled_color:Color = equipment_data.get("disabled_color", Color(0.2, 0.2, 0.2, 1.0))
-		var slots : Array = equipment_data.get("slots",[])
-		var alignment : String = equipment_data.get("alignment","")
-		var equipment_type : String = equipment_data.get("equipment_type","")
-		var slot_type : String = equipment_data.get("slot_type","")
-		var restriction : String = equipment_data.get("restriction","")
 		
 		var cfg : Dictionary = equipment_data.get("config",{})
 		
@@ -4411,7 +4406,6 @@ class _Equipment:
 		var limitShips : Array = slot_data.get("limit_ships", [])
 		var preventShips : Array = slot_data.get("prevent_ships", [])
 		var add_vanilla_equipment:bool = slot_data.get("add_vanilla_equipment", true)
-		var slot_type : String = slot_data.get("slot_type","HARDPOINT")
 		var hardpoint_type : String = slot_data.get("hardpoint_type","")
 		var alignment : String = slot_data.get("alignment","")
 		var restriction : String = slot_data.get("restriction","")
@@ -4605,7 +4599,7 @@ class _FileAccess:
 		file.open(path, File.READ)
 		var bytes:PoolByteArray = file.get_buffer(file.get_len())
 		var img = Image.new()
-		var data = img.load_png_from_buffer(bytes)
+		img.load_png_from_buffer(bytes)
 		var imgtex = ImageTexture.new()
 		imgtex.create_from_image(img)
 		file.close()
@@ -5416,7 +5410,6 @@ class _ManifestV1:
 		if error != OK:
 			return
 		for section in manifestConfig:
-			var currentManifest = Array(manifestFile.get_section_keys(section))
 			for key in manifestFile.get_section_keys(section):
 				manifestConfig[section][key] = manifestFile.get_value(section, key)
 		return manifestConfig
@@ -5995,7 +5988,6 @@ class _ManifestV2:
 					1.0:
 						dict_template["mod_information"]["id"] = manifest_data["package"].get("id","")
 						dict_template["mod_information"]["name"] = manifest_data["package"].get("name","")
-						var version = manifest_data["package"].get("version","unknown")
 						dict_template["mod_information"]["description"] = manifest_data["package"].get("description","MODMENU_DESCRIPTION_PLACEHOLDER")
 						
 						if typeof(manifest_data["package"].get("github_homepage","")) == TYPE_STRING:
@@ -6594,7 +6586,7 @@ class _ManifestV2:
 			for key in keys:
 				var entry = str(cv[version][key])
 				var spacer:String = ""
-				for i in range(key.split(".").size() - 1):
+				for _i in range(key.split(".").size() - 1):
 					spacer += spacing
 				changelog[version].append(spacer + entry)
 		return changelog
@@ -6640,7 +6632,7 @@ class _ManifestV2:
 	func __get_modmain_files() -> Array:
 		if modmain_file_list:
 			return modmain_file_list.duplicate()
-		var structure : Dictionary = pointers.FolderAccess.__get_folder_structure("res://",false,false)
+		pointers.FolderAccess.__get_folder_structure("res://",false,false)
 		var dvs : Array = []
 		if OS.has_feature("editor"):
 			dvs = pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[])
@@ -6834,7 +6826,6 @@ class _ManifestV2:
 										pointers.DataFormat.__override_script(path)
 								"scene","resource":
 									var path : String = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
-									var orig_test : String = path.split(modlet.get_base_dir())[1]
 									var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[1])
 									var old_relative:bool = old.begins_with("res:/")
 									var old_path : String = old if old_relative else ("res:/" + ("" if old.begins_with("/") else "/") + old)
@@ -6984,7 +6975,7 @@ class _NodeAccess:
 	func __exit(restart : bool = false, exit_message : String = "", exit_header : String = ""):
 		if restart:
 			pointers.l(("restarting with message: %s" % exit_message) if exit_message else "exiting with restart",(exit_header) if (exit_header) else ("pointers.DataFormat"))
-			var pid = OS.execute(OS.get_executable_path(), OS.get_cmdline_args(), false)
+			OS.execute(OS.get_executable_path(), OS.get_cmdline_args(), false)
 		else: pointers.l(("exiting with message: %s" % exit_message) if exit_message else "exiting",(exit_header) if (exit_header) else ("pointers.DataFormat"))
 		Debug.batchWrite()
 		pointers.storeLogCache()
@@ -7751,7 +7742,8 @@ class _Translations:
 			translations.append(translationObject)
 		for translationObject in translations:
 			TranslationServer.add_translation(translationObject)
-		pointers.l("%s Translations Updated" % translationCount,"pointers.Translations")
+		if fullLogging:
+			pointers.l("%s Translations Updated" % translationCount,"pointers.Translations")
 	func __fetch_all_translation_objects(index:int) -> Array:
 		var translations : Array = []
 		while index > 0:
@@ -7764,7 +7756,7 @@ class _Translations:
 			translations.append(obj) # for future, see if obj.self works to get the node instead of a reference
 		return translations
 	
-	func __translation_file_to_dictionary(path : String, delimiter : String = "|") -> Dictionary:
+	func __translation_file_to_dictionary(path : String, delimiter : String = "|", fullLogging : bool = true) -> Dictionary:
 		if not Directory.new().file_exists(path):
 			return {}
 		var dictionary:Dictionary = {}
@@ -7824,11 +7816,13 @@ class _Translations:
 				tlindex += 1
 			index += 1
 			translation_count += 1
+		if fullLogging:
+			pointers.l("%s Translations converted from translation file %s" % [translation_count,path],"pointers.Translations")
 		return dictionary
 	
 	func __inject_translations():
+		var fullLogging:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","full_logging")
 		var file:File = File.new()
-		var p = ProjectSettings.get_setting("locale/translations")
 		TranslationServer.clear()
 		var drivers:Array = pointers.DriverManagement.__get_drivers()
 		var data:Dictionary = {}
@@ -7909,7 +7903,7 @@ class _Translations:
 		file.open("user://cache/.HevLib_Cache/translation_check_data.json",File.WRITE)
 		file.store_string(JSON.print(ml_check_data,"\t"))
 		file.close()
-		__updateTL_from_dictionary(data.duplicate(true),pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","full_logging"))
+		__updateTL_from_dictionary(data.duplicate(true),fullLogging)
 
 class _WebTranslate:
 	var scripts : Array = [
@@ -7978,7 +7972,6 @@ class _WebTranslate:
 		var did = false
 		var folder_to_delete = ""
 		var cache = "user://cache/.HevLib_Cache/WebTranslate/"
-		var dir = Directory.new()
 		var files = pointers.FolderAccess.__fetch_folder_files(cache, true, true)
 		for file in files:
 			if not file.ends_with("/"):
