@@ -7958,21 +7958,17 @@ class _WebTranslate:
 		pms.call_deferred("add_child",HevLib)
 	
 	func __webtranslate_reset(URL: String) -> bool:
-		var urlSplit = str(URL).split("github.com/")[1]
-		var dataSplit = urlSplit.split("/")
+		var dataSplit = str(URL).split("github.com/")[1].split("/")
 		var user = dataSplit[0]
 		var repo = dataSplit[1]
-		var folderConcat = user + "~_~" + repo
-		var folderToDelete = "user://cache/.HevLib_Cache/WebTranslate/" + folderConcat
+		var folderToDelete = "user://cache/.HevLib_Cache/WebTranslate/" + user + "~_~" + repo
 		pointers.l("deleting cache folder @ %s" % folderToDelete,"pointers.WebTranslate")
-		var did = pointers.FolderAccess.__recursive_delete(folderToDelete)
-		return did
+		return pointers.FolderAccess.__recursive_delete(folderToDelete)
 	
 	func __webtranslate_reset_by_file_check(file_check: String) -> bool:
 		var did = false
 		var folder_to_delete = ""
-		var cache = "user://cache/.HevLib_Cache/WebTranslate/"
-		var files = pointers.FolderAccess.__fetch_folder_files(cache, true, true)
+		var files = pointers.FolderAccess.__fetch_folder_files("user://cache/.HevLib_Cache/WebTranslate/", true, true)
 		for file in files:
 			if not file.ends_with("/"):
 				continue
@@ -7988,7 +7984,7 @@ class _WebTranslate:
 					folder_to_delete = file
 				else:
 					continue
-		if not folder_to_delete == "":
+		if folder_to_delete:
 			did = pointers.FolderAccess.__recursive_delete(folder_to_delete)
 		return did
 	
