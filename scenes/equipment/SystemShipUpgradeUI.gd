@@ -34,18 +34,14 @@ export (String) var config_section = ""
 export (String) var config_setting = ""
 export (bool) var invert_config = false
 var ssuuPointers
-var cv = null
-func visibilityChanged():
-	.visibilityChanged()
-	if is_visible_in_tree():
-		ssuuPointers = ModLoader._savedObjects[0]
-		if ssuuPointers:
-			cv = ssuuPointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
+func _ready():
+	ssuuPointers = ModLoader._savedObjects[0]
 
 func isAvailable():
 	var how = .isAvailable()
 	if how:
 		if config_id and config_section and config_setting:
+			var cv = ssuuPointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
 			if cv != null and cv is bool:
 				if invert_config:
 					visible = cv
