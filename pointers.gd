@@ -6964,16 +6964,14 @@ class _NodeAccess:
 
 	func setOwnership(current_node: Node,set_owner_node: Node):
 		current_node.set_owner(set_owner_node)
-		if current_node.get_child_count() >= 1:
+		if current_node.get_child_count():
 			var children : Array = current_node.get_children()
 			for child in children:
 				if not __is_instanced_from_scene(child.get_parent()):
 					setOwnership(child, set_owner_node)
 
 	func __is_instanced_from_scene(p_node):
-		if not p_node.filename.empty():
-			return true
-		return false
+		return not p_node.filename.empty()
 	
 	func __dynamic_crew_expander(folder_path: String = "user://cache/.HevLib_Cache/dynamic_crew_expander/", max_crew:int = 24) -> String:
 		pointers.FolderAccess.__check_folder_exists(folder_path)
@@ -6987,6 +6985,7 @@ class _NodeAccess:
 				var spl:PoolStringArray = line.split("|")
 				if int(spl[1]) > maximum:
 					maximum = int(spl[1])
+		Tool.remove(test)
 		maximum += 1
 		if maximum > base:
 			base = maximum
@@ -7315,8 +7314,8 @@ class _Scripting:
 			var bsize = bt.size()
 			fetchData[base_output_filename] = [bytes,bsize,dr[1]]
 		startFetch()
-	var currentFetch = {}
-	var byteSplitBy = 32000
+	var currentFetch:Dictionary = {}
+	var byteSplitBy:int = 32000
 	func startFetch():
 		for ID in fetchData:
 			var this_index = fetchData[ID][2]
@@ -7356,9 +7355,9 @@ class _Scripting:
 					mineral_data.append(mineral_dict[mineral])
 		
 		# Initialize info for mineral names, colours, and value
-		var prices = {}
-		var colors = {}
-		var traces = []
+		var prices:Dictionary = {}
+		var colors:Dictionary = {}
+		var traces:Array = []
 		for mineral in mineral_data:
 			var mname:String = mineral.get("name","")
 			var price:float = float(mineral.get("price",0.0))
@@ -7382,18 +7381,18 @@ class _Scripting:
 							traces.append(mname)
 				# Colours will always be available
 				colors.merge({mname:color})
-		var price_text = ""
+		var price_text:String = ""
 		for price in prices:
 			price_text += "\n\tif not \"%s\" in %s:\n\t\t%s.merge({\"%s\" : %s})" % [price,"mineralPrices","mineralPrices",str(price),str(prices[price])]
-		var color_text = ""
+		var color_text:String = ""
 		for color in colors:
 			color_text += "\n\tif not \"%s\" in %s:\n\t\t%s.merge({\"%s\" : Color(%s)})" % [color,"specificMineralColors","specificMineralColors", str(color),str(colors[color])]
-		var trace_text = ""
+		var trace_text:String = ""
 		for trace in traces:
 			trace_text += "\n\tif not \"%s\" in %s:\n\t\t%s.append(\"%s\")" % [trace,"traceMinerals","traceMinerals",str(trace)]
 		
 		# Compiles and extends the CurrentGame.gd script
-		pointers.DataFormat.__compile_and_override_script("extends \"res://CurrentGame.gd\"\nfunc _init():\n\tpass" + price_text + color_text + trace_text + "\nfunc isDemo():\n\treturn false")
+		pointers.DataFormat.__compile_and_override_script("extends \"res://CurrentGame.gd\"\nfunc _init():\n\tpass%s\nfunc isDemo():\n\treturn false" % [price_text,color_text,trace_text])
 		
 		
 		# Initialize and create ore chunk additions
