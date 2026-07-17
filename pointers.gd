@@ -7360,27 +7360,28 @@ class _Scripting:
 		var colors = {}
 		var traces = []
 		for mineral in mineral_data:
-			var mname = mineral["name"]
-			var price = mineral["price"]
-			var color = mineral["color"]
+			var mname:String = mineral.get("name","")
+			var price:float = float(mineral.get("price",0.0))
+			var color:Color = mineral.get("color",Color.white)
 			# Only adds minerals to the ring if they have a value.
 			# Useful if you only want to reference a mineral by name
 			# and a colour without it showing in the market, i.e. getScan()
-			if price > 0.0:
-				prices.merge({mname:price})
-				var handle:String = mineral.get("handle","none")
-				if handle == "recolor":
-					traces.append(mname)
-				elif handle == "scenes":
-					var scenes:PoolStringArray = PoolStringArray()
-					for i in range(0,7):
-						var specific:String = mineral.get("ore_%s" % (i + 1),"")
-						if specific and pointers.DataFormat.__file_exists(specific):
-							scenes.append(specific)
-					if scenes.size() > 6:
+			if mname:
+				if price > 0.0:
+					prices.merge({mname:price})
+					var handle:String = mineral.get("handle","none")
+					if handle == "recolor":
 						traces.append(mname)
-			# Colours will always be available
-			colors.merge({mname:color})
+					elif handle == "scenes":
+						var scenes:PoolStringArray = PoolStringArray()
+						for i in range(0,7):
+							var specific:String = mineral.get("ore_%s" % (i + 1),"")
+							if specific and pointers.DataFormat.__file_exists(specific):
+								scenes.append(specific)
+						if scenes.size() > 6:
+							traces.append(mname)
+				# Colours will always be available
+				colors.merge({mname:color})
 		var price_text = ""
 		for price in prices:
 			price_text += "\n\tif not \"%s\" in %s:\n\t\t%s.merge({\"%s\" : %s})" % [price,"mineralPrices","mineralPrices",str(price),str(prices[price])]
