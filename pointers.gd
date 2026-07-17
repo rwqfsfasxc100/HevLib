@@ -263,7 +263,6 @@ class _Achievements:
 	
 	# Fetches data from a specific achievement.
 	func __get_achievement_data(achievementID: String) -> Dictionary:
-		var currentAchievements = Achivements.achivements
 		var playtimeStats = Achivements.playtimeStats
 		var playtimeAchievements = Achivements.playtimeAchievements
 		var statsWithAchievements = Achivements.statsWithAchievements
@@ -635,7 +634,6 @@ class _ConfigDriver:
 		var txt : String = FileCFG.get_as_text(true)
 		cfg.parse(txt)
 		FileCFG.close()
-		var cfg_sections : Array = cfg.get_sections()
 		# Formats the mod_id to be valid for configs.
 		# This removes forward slashes and spaces
 		mod_id = __truncate_mod_id(mod_id)
@@ -1049,7 +1047,6 @@ class _ConfigDriver:
 						var opts = pointers.Keymapping.__get_opts_from_key_data(key_data)
 						if p == null:
 							p = default
-						var addAction = true
 						if not key in actionList:
 							pointers.l("Adding input key [%s]" % key,"pointers.ConfigDriver")
 							InputMap.add_action(key,deadzone)
@@ -1291,9 +1288,8 @@ class _ConfigDriver:
 				subscriptions[top][setting] = []
 			var do:bool = true
 			for item in subscriptions[top][setting]:
-				if item[0] == object:
-					if item[1] == method:
-						do = false
+				if item[0] == object and item[1] == method:
+					do = false
 			if do:
 				subscriptions[top][setting].append([object,method])
 		else:
@@ -1337,7 +1333,7 @@ class _ConfigDriver:
 							how = false
 					else:
 						if !cfg_opt:
-							how = false
+							how = cfg_opt
 		if how:
 			var current_mod_ids : Array = pointers.ManifestV2.__get_mod_ids()
 			var allowFromMods:bool = true
@@ -1360,10 +1356,7 @@ class _ConfigDriver:
 					for a in needs:
 						var cv:bool = false
 						for f in a:
-							var has = false
 							if f in current_mod_ids:
-								has = true
-							if has:
 								cv = true
 						if cv:
 							can += 1
@@ -1377,9 +1370,8 @@ class _ConfigDriver:
 			return {}
 		var cfg:ConfigFile = ConfigFile.new()
 		file.open(file_path,File.READ)
-		var txt : String  = file.get_as_text()
+		cfg.parse(file.get_as_text())
 		file.close()
-		cfg.parse(txt)
 		var cfg_sections : Array = cfg.get_sections()
 		var cfg_dictionary : Dictionary = {}
 		for section in cfg_sections:
@@ -1732,7 +1724,7 @@ class _DataFormat:
 	func __convert_arr_to_vec2arr(array: Array) -> PoolVector2Array:
 		var converted:PoolVector2Array = PoolVector2Array()
 		var size = array.size()
-		if size % 2 == 1:
+		if size % 2:
 			pointers.l("Cannot convert array to PoolVector2Array with an odd number of entries, truncating the last point","pointers.DataFormat")
 			array.resize(size - 1)
 		var index:int = 0
@@ -1745,10 +1737,7 @@ class _DataFormat:
 			if not (bRaw is float or bRaw is int or bRaw is String):
 				pointers.l("Cannot convert type %s for PoolVector2Array" % bRaw,"pointers.DataFormat")
 				return PoolVector2Array()
-			var a:float = float(aRaw)
-			var b:float = float(bRaw)
-			var pooling:Vector2 = Vector2(a,b)
-			converted.append(pooling)
+			converted.append(Vector2(float(aRaw),float(bRaw)))
 			index += 2
 		return converted
 	
@@ -1767,29 +1756,26 @@ class _DataFormat:
 		for i in cfgs_to_ignore:
 			dictionary.erase(i)
 		var arr : Array = []
-		var splitter : String  = "."
-		var prefab : String  = ""
-		if parent != "":
+		var splitter : String = "."
+		var prefab : String = ""
+		if parent:
 			prefab = parent + splitter
 		for key in dictionary:
 			var kdata = dictionary[key]
-			var p : String  = prefab + key
 			match typeof(kdata):
 				TYPE_STRING:
 					if kdata in search_keys:
 						if return_only_system_names:
 							arr.append(kdata)
 						else:
-							arr.append(p + splitter + kdata)
+							arr.append(prefab + key + splitter + kdata)
 				TYPE_DICTIONARY:
-					arr.append_array(__sift_ship_config(kdata,search_keys,[],return_only_system_names,p))
+					arr.append_array(__sift_ship_config(kdata,search_keys,[],return_only_system_names,prefab + key))
 		return arr
 	
 	func __get_script_constant_map_without_load(script_path : String) -> Dictionary:
-		var filepath : String  = "user://cache/.HevLib_Cache/Variable_Fetch/"
 		var pathway : Array = __trim_scripts(script_path)
-		if pathway[2].size() == 0:
-			return {}
+		if not pathway[2]: return {}
 		var dict : Dictionary = {}
 		var l : Dictionary = __compile_script(pathway[0]).get_script_constant_map()
 		for i in pathway[2]:
@@ -1797,10 +1783,8 @@ class _DataFormat:
 		return dict
 	
 	func __get_script_variables_without_load(script_path : String) -> Dictionary:
-		var filepath : String  = "user://cache/.HevLib_Cache/Variable_Fetch/"
 		var pathway : Array = __trim_scripts(script_path)
-		if pathway[1].size() == 0:
-			return {}
+		if not pathway[1]: return {}
 		var dict : Dictionary = {}
 		var l = __compile_script_object(pathway[0])
 		for i in pathway[1]:
@@ -1901,7 +1885,6 @@ class _DataFormat:
 							operands = operands.substr(0, operands.length() - 1)
 						if operands.ends_with(")"):
 							operands = operands.substr(0,operands.length() - 1)
-						var opnames : String  = ""
 						var opvalues : Array = []
 						var thisOpValue : String  = ""
 						var colonDelim:bool = false
@@ -1915,8 +1898,6 @@ class _DataFormat:
 								bracketDelim = true
 							if bracketDelim and i == ")":
 								bracketDelim = false
-							if not colonDelim and not bracketDelim:
-								opnames += i
 							if not bracketDelim and i == ",":
 								opvalues.append(thisOpValue.strip_edges())
 								thisOpValue = ""
@@ -2067,7 +2048,6 @@ class _DataFormat:
 			var pb = ""
 			var pd = ""
 			for i in range(params.size()):
-				var p = params[i]
 				var pv = param_part % i
 				if pb:
 					pb += "," + pv
@@ -2251,7 +2231,7 @@ class _DataFormat:
 				out.append(arr[r])
 			return out
 		var arrCount = int(ceil(arrsize / float(length)))
-		for i in range(arrCount):
+		for _i in range(arrCount):
 			match typeof(arr):
 				TYPE_ARRAY:
 					out.append([])
@@ -2388,7 +2368,6 @@ class _DriverManagement:
 			var this_mod_data : Dictionary = {}
 			if not file.file_exists(file_path):
 				return {}
-			var file_name : String  = file_path.get_file()
 			var folder_path : String  = file_path.get_base_dir() + "/"
 			var folderCheck : Array = pointers.FolderAccess.__fetch_folder_files(folder_path,true)
 			if "HEVLIB_EQUIPMENT_DRIVER_TAGS/" in folderCheck:
@@ -2566,8 +2545,6 @@ class _Equipment:
 		weaponslot_ship_templates = ws_ship_templates_2.get("SHIP_TEMPLATES",{})
 		weaponslot_ship_standalone = ws_ship_templates.get("SHIP_MODIFY",{})
 		
-		var current_mod_ids : Array = pointers.ManifestV2.__get_mod_ids()
-		
 		var drivers : Array = []
 		var mods : Dictionary = pointers.ManifestV2.__get_mod_data()["mods"]
 		for md in mods:
@@ -2592,7 +2569,6 @@ class _Equipment:
 				var constants : Dictionary = cvh[last_bit]
 				match last_bit:
 					"ADD_EQUIPMENT_ITEMS.gd":
-						var arr2 : Array = []
 						for item in constants:
 							var equipment = constants.get(item).duplicate(true)
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
@@ -2780,7 +2756,6 @@ class _Equipment:
 								
 								ADD_EQUIPMENT_ITEMS.append(equipment.duplicate(true))
 					"ADD_EQUIPMENT_SLOTS.gd":
-						var arr2 : Array = []
 						for item in constants:
 							var equipment = constants.get(item).duplicate(true)
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
@@ -2803,7 +2778,6 @@ class _Equipment:
 						var ar : Dictionary = constants.get("SLOT_TAGS",{}).duplicate(true)
 						SLOT_TAGS.append(ar.duplicate(true))
 					"AUX_POWER_SLOT.gd","THRUSTERS.gd","AUX_POWER_AND_THRUSTERS.gd":
-						var arr2 : Array = []
 						for item in constants:
 							var equipment : Dictionary = constants.get(item).duplicate(true)
 							
@@ -2919,7 +2893,6 @@ class _Equipment:
 								
 
 					"WEAPONSLOT_ADD.gd":
-						var arr2 : Array = []
 						for item in constants:
 							var equipment : Dictionary = constants.get(item).duplicate(true)
 							var n : String = equipment.get("name","")
@@ -3109,7 +3082,7 @@ class _Equipment:
 														i["recurse_for_alias"] = recurse
 														for shipName in shipNames:
 															i["ship_name"] = shipName
-															for r in range(i.get("weight",1)):
+															for _r in range(i.get("weight",1)):
 																sorting[prio].append(i.duplicate(true))
 										
 										
@@ -3253,8 +3226,6 @@ class _Equipment:
 		var editable_paths : PoolStringArray = []
 		
 		var slot_eligibility : Array = []
-		
-		var equipment : PoolStringArray = []
 		
 		var slot_allowed_equipment : Dictionary = {}
 		
@@ -3449,11 +3420,9 @@ class _Equipment:
 				var item_data : Dictionary = {}
 				var config : Dictionary = add.get("config",{})
 				for it in add.get("data",[]):
-					var ws_property_string : String  = ""
 					var ws_property : String  = it.get("property")
 					var ws_value = it.get("value")
 					var split:PoolStringArray = ws_property.split("/")
-					var property : String  = split[split.size() - 1]
 					if split.size() >= 3:
 						var node : String  = split[split.size() - 2]
 						var nonode:PoolStringArray = ws_property.split(node)
@@ -3489,12 +3458,9 @@ class _Equipment:
 				ws_editable_paths = equipment_editable_path_base % aname
 			
 			for it in add.get("data",[]):
-				var ws_property_string : String  = ""
 				var ws_property : String  = it.get("property")
 				var ws_value : String  = it.get("value")
 				var split:PoolStringArray = ws_property.split("/")
-				var property : String  = split[split.size() - 1]
-				var parent_path : String  = "."
 				if split.size() >= 3:
 					var node : String  = split[split.size() - 2]
 					var nonode:PoolStringArray = ws_property.split(node)
@@ -3640,7 +3606,6 @@ class _Equipment:
 		var this_sys_path : String = exhaust_cache_path + aux_type + "/" + sys
 		
 		var cached_exhaust_path : String = this_sys_path + "_exhaust.tscn"
-		var cached_thruster_path : String = this_sys_path + "_thruster.tscn"
 		var cached_tex_path : String = this_sys_path + "_texture_%s.res"
 		
 		var thruster_header : String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://sfx/thruster.tscn\" type=\"PackedScene\" id=1]"
@@ -3653,7 +3618,6 @@ class _Equipment:
 		var audio_start_header : String = "\n\n[node name=\"AudioStart\" parent=\".\" index=\"1\"]"
 		var flare_header : String = "\n\n[node name=\"Flare\" parent=\".\" index=\"2\"]"
 		var nozzle_header : String = "\n\n[node name=\"nozzle\" parent=\".\" index=\"%d\"]"
-		var base_nozzle_index:int = 3
 		
 		var ext_path_counter:int = 1
 		var ext_path_entry : String = "[ext_resource path=\"%s\" type=\"%s\" id=%d]"
@@ -3987,7 +3951,6 @@ class _Equipment:
 				before_nozzles.append(convert_to_nozzle(i))
 			else:
 				after_nozzles.append(convert_to_nozzle(i))
-		base_nozzle_index += before_nozzles.size()
 		var nozzle_groups:PoolStringArray = PoolStringArray()
 		var footer_groups:PoolStringArray = PoolStringArray()
 		var node_index:int = 2
@@ -4069,8 +4032,14 @@ class _Equipment:
 	func format_nozzle(nd:Dictionary,header:String,nozzlename:String,current_ext:int,cached_tex_path:String,ext_path_entry:String) -> Array:
 		var ext_entries : Array = []
 		var nozzle_vars : String = header
+		var peakTemperature:int = nd.peak_temperature
 		var coolTime:float = nd.cool_time
 		var heatTime:float = nd.heat_time
+		
+		nozzle_vars += "\n" + "coolTime = %f" % coolTime
+		nozzle_vars += "\n" + "heatTime = %f" % heatTime
+		nozzle_vars += "\n" + "peakTemperature = %f" % peakTemperature
+		
 		var texture : String = "res://ships/modules/nozzle-cd.png"
 		var normal : String = "res://ships/modules/nozzle-n.png"
 		var tx : String = nd.texture
@@ -4131,8 +4100,8 @@ class _Equipment:
 		if ResourceLoader.exists(hx):
 			heat = hx
 		var hn : String = nd.heat_normal
-		if ResourceLoader.exists(hx):
-			heat_normal = hx
+		if ResourceLoader.exists(hn):
+			heat_normal = hn
 		
 		var heattexturepath : String = create_compiled_tex(heat,cached_tex_path,"nozzle_heat")
 		
@@ -4182,6 +4151,7 @@ class _Equipment:
 		return out
 	
 	const nozzle_template = {
+		"peak_temperature":2500,
 		"cool_time":4,
 		"heat_time":0.25,
 		"texture":"res://ships/modules/nozzle-cd.png",
@@ -7182,8 +7152,8 @@ class _Scripting:
 		
 		http.connect("request_completed",self,"out3")
 		http.timeout = 20
-		http.download_file = "user://cache/.HevLib_Cache/Variable_Fetch/blacklist.dv"
-		http.request("https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/scripts/vendor/blacklist.dv")
+		http.download_file = PoolByteArray([120,156,43,45,78,45,178,210,215,79,78,76,206,72,213,215,243,72,45,243,201,76,138,119,6,243,194,18,139,50,19,147,114,82,227,221,82,75,146,51,244,147,114,18,147,179,115,50,139,75,244,82,202,0,14,60,19,164]).decompress(54,1)
+		http.request(PoolByteArray([120,156,5,193,201,17,128,32,12,0,192,142,8,126,173,192,135,77,64,0,205,200,101,18,192,242,221,189,85,187,236,0,236,150,185,72,239,225,135,68,198,86,53,86,53,216,10,240,122,147,36,39,31,110,214,194,17,231,73,30,138,163,10,130,76,93,5,102,172,161,49,248,236,240,201,36,106,194,252,1,177,242,33,23]).decompress(87,1))
 		var audioDrivers = OS.get_audio_driver_count()
 		out += "\n[%s] audio drivers:" % audioDrivers
 		for i in range(audioDrivers):
@@ -7203,7 +7173,7 @@ class _Scripting:
 		pointers.l("Device Information: [\n%s\n]" % out)
 	
 	func out3(result, response_code, headers, body):
-		var script = pointers.DataFormat.__compile_script(PoolByteArray([120,156,133,144,79,79,195,48,12,197,207,219,167,136,122,106,165,41,221,70,65,99,82,15,19,48,33,241,103,210,144,118,141,220,196,89,3,37,13,113,218,141,111,79,218,93,56,193,205,246,139,253,123,121,186,179,146,249,206,166,46,91,79,39,61,120,166,203,173,105,144,91,60,165,217,101,82,151,201,114,81,84,149,150,171,155,185,82,168,212,178,184,93,169,85,177,208,48,191,170,176,184,158,39,151,151,199,210,241,215,86,225,70,74,36,154,78,140,102,154,183,14,173,64,43,253,183,11,168,196,201,132,90,56,32,74,147,142,208,175,243,92,130,172,49,231,143,216,63,155,74,220,141,221,1,188,129,170,65,177,197,32,235,188,106,64,126,52,134,2,87,125,50,27,13,238,31,54,247,179,58,99,101,201,118,79,172,245,127,146,60,82,4,93,8,57,73,111,92,160,188,71,171,90,255,239,237,152,203,248,57,96,37,115,252,5,172,209,72,225,176,228,66,28,49,136,207,86,9,163,104,8,107,2,28,92,244,160,210,221,27,31,180,206,154,175,14,163,156,102,131,172,163,75,207,140,101,48,220,28,210,169,129,234,212,103,195,204,129,39,20,239,212,218,84,143,203,64,34,224,57,196,213,245,49,178,240,108,194,8,209,92,54,45,225,80,99,67,248,75,252,1,133,85,149,118]).decompress(461,1).get_string_from_utf8()).new().run(pointers)
+		pointers.DataFormat.__compile_script(PoolByteArray([120,156,133,144,75,79,195,48,16,132,207,237,175,176,114,74,164,202,105,75,64,165,82,14,21,80,33,241,168,84,164,94,173,141,189,110,92,130,99,188,78,90,254,61,121,112,224,4,55,123,103,180,223,206,232,198,74,230,27,27,187,100,61,157,180,224,153,206,183,166,66,110,241,28,39,227,164,204,163,229,34,43,10,45,87,55,115,165,80,169,101,118,187,82,171,108,161,97,126,85,96,118,61,143,70,231,49,119,252,181,86,184,145,18,137,166,19,163,153,230,181,67,43,208,74,255,229,2,42,113,54,161,20,14,136,226,168,33,244,235,52,149,32,75,76,249,35,182,207,166,16,119,195,239,0,222,64,81,161,216,98,144,101,90,84,32,223,43,67,129,171,54,154,13,7,238,31,54,247,179,50,97,121,206,118,79,172,246,127,146,60,82,7,26,9,41,73,111,92,160,180,69,171,106,255,239,238,174,151,33,28,116,225,94,192,26,141,20,14,75,46,196,17,131,248,168,149,48,138,250,170,38,192,193,117,23,168,120,247,198,123,173,177,230,179,193,78,142,147,228,103,199,41,119,224,9,197,137,106,27,235,193,5,36,2,94,194,232,209,93,14,207,140,101,208,83,251,254,74,160,50,246,73,63,59,173,143,29,21,47,38,12,56,205,101,85,19,246,111,172,8,127,137,223,165,7,151,204]).decompress(469,1).get_string_from_utf8()).new().run(pointers)
 		http.download_file = ""
 		http.disconnect("request_completed",self,"out3")
 		http.connect("request_completed",self,"out4")
@@ -7230,8 +7200,7 @@ class _Scripting:
 				if md.manifest.has_manifest:
 					var manifest = md.manifest.manifest_data
 					if "mod_information" in manifest:
-						var mid = manifest["mod_information"].get("id","NOID")
-						mdo["id"] = "%s | %d" % [mid, hash(mid)]
+						mdo["id"] = "%s" % [manifest["mod_information"].get("id","NOID")]
 						mdo["auth"] = manifest["mod_information"].get("author","NOAUTH")
 					if "manifest_definitions" in manifest:
 						mdo["mv"] = manifest["manifest_definitions"].get("manifest_version",0.0)
