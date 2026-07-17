@@ -1,3 +1,13 @@
+[1.15.11]
+
+1=* Adding ores to the rings are now much more strict as to what constitutes a valid mineral
+2=* Fixed rare crash caused by procedural minerals
+3=* Improved efficiency of equipment item availability checks
+4=* Fixed procedural thruster nozzles not making use of the `cool_time`, `heat_time`, and `peak_temperature` properties
+5=* Fixed nozzle heat normal map not being set properly on procedural thrusters
+6=* Fixed logging for translation operations
+7=* Reduced memory footprint of scene writing methods
+
 [1.15.10]
 
 1=* Fixed some slots incorrectly hiding when using a ship that they're not permitted to be installed to
