@@ -11,7 +11,7 @@ credits=["HEVLIB_CREDITS_CONTRIBUTORS_HEADER","HEVLIB_CREDITS_CONTRIBUTORS_ZAKRI
 
 version_major=1
 version_minor=15
-version_bugfix=11
+version_bugfix=12
 
 [tags]
 

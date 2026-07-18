@@ -1,3 +1,9 @@
+[1.15.12]
+
+1=* Equipment items can now have their regular text colour changed with the `normal_color` property
+2=* Fixed installed color and disabled colors not being set for equipment items
+3=* Reduced memory footprint of all scripts used purely for data storage
+
 [1.15.11]
 
 1=* Adding ores to the rings are now much more strict as to what constitutes a valid mineral
