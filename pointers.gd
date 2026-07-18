@@ -4331,6 +4331,7 @@ class _Equipment:
 		var sticker_price_multi_format : String = equipment_data.get("sticker_price_multi_format", "%s E$ (x%d)")
 		var installed_color:Color = equipment_data.get("installed_color", Color(0.0, 1.0, 0.0, 1.0))
 		var disabled_color:Color = equipment_data.get("disabled_color", Color(0.2, 0.2, 0.2, 1.0))
+		var normal_color:Color = equipment_data.get("normal_color", Color(1.0, 1.0, 1.0, 1.0))
 		
 		var cfg : Dictionary = equipment_data.get("config",{})
 		
@@ -4377,9 +4378,9 @@ class _Equipment:
 		if sticker_price_multi_format != "%s E$ (x%d)":
 			base += "\nstickerPriceMultiFormat" + sticker_price_multi_format + "\""
 		if installed_color != Color(0.0, 1.0, 0.0, 1.0):
-			base += "\ninstalledColor = " + str(Color(0.0, 1.0, 0.0, 1.0))
+			base += "\ninstalledColor = Color( %s, %s, %s, %s )" % [installed_color.r,installed_color.g,installed_color.b,installed_color.a]
 		if disabled_color != Color(0.2, 0.2, 0.2, 1.0):
-			base += "\ndisabledColor = " + str(Color(0.2, 0.2, 0.2, 1.0))
+			base += "\ndisabledColor = Color( %s, %s, %s, %s )" % [disabled_color.r,disabled_color.g,disabled_color.b,disabled_color.a]
 		
 		if cfg:
 			var cfg_id : String = cfg.get("id","")
@@ -4393,6 +4394,8 @@ class _Equipment:
 				base += "\ninvert_config = true"
 			else:
 				base += "\ninvert_config = false"
+		if normal_color != Color(1.0, 1.0, 1.0, 1.0):
+			base += "[node name=\"System\" parent=\"HBox\" index=\"0\"]\nmodulate = Color( %s, %s, %s, %s )" % [normal_color.r,normal_color.g,normal_color.b,normal_color.a]
 		return base
 	
 	func __make_slot_for_scene(slot_data: Dictionary) -> Dictionary:
