@@ -27,6 +27,8 @@
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
 
+extends Node
+
 var ring = null
 var busy = false
 
