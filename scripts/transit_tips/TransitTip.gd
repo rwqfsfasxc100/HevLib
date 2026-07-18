@@ -29,7 +29,7 @@
 
 extends "res://codex/TransitTip.gd"
 
-var list = []
+var list:PoolStringArray = PoolStringArray()
 
 var pointers
 func _ready():
