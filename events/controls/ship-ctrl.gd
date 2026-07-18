@@ -1,5 +1,3 @@
-extends "res://ships/ship-ctrl.gd"
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -28,6 +26,8 @@ extends "res://ships/ship-ctrl.gd"
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+extends "res://ships/ship-ctrl.gd"
 
 func _ready():
 	CurrentGame.connect("eventDriverVisibilityChanged",self,"_eventdriver_visibility_changed")

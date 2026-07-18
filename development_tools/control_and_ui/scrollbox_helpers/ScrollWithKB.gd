@@ -1,5 +1,3 @@
-extends "res://enceladus/ScrollWithAnalog.gd"
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -29,8 +27,9 @@ extends "res://enceladus/ScrollWithAnalog.gd"
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
 
+extends "res://enceladus/ScrollWithAnalog.gd"
+
 # "res://enceladus/ScrollWithAnalog.gd" with the additional ability to scroll with Keyboard
-# Remove "res://HevLib/ui/mod_menu/mod_info/ScrollWithKB.gd" after next VP update
 
 export var scrollWithKeyboard = false
 

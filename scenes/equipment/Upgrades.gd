@@ -1,5 +1,3 @@
-extends "res://enceladus/Upgrades.gd"
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -28,6 +26,8 @@ extends "res://enceladus/Upgrades.gd"
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+extends "res://enceladus/Upgrades.gd"
 
 func _ready():
 	Debug.l("HevLib: Upgrades loaded to ready")

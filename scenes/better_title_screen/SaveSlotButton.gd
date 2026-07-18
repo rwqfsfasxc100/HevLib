@@ -1,5 +1,3 @@
-extends "res://SaveSlotButton.gd"
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -28,6 +26,8 @@ extends "res://SaveSlotButton.gd"
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+extends "res://SaveSlotButton.gd"
 
 onready var popup_path = get_parent().get_parent().get_parent().get_parent().get_parent().get_node("NoMargins")
 

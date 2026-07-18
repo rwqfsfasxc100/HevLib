@@ -1,5 +1,3 @@
-extends "res://ships/camera.gd"
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -28,6 +26,8 @@ extends "res://ships/camera.gd"
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+extends "res://ships/camera.gd"
 
 onready var EventDriverBaseMouseSpeed:float = mouseSpeed
 onready var EventDriverBaseSpeed:float = speed

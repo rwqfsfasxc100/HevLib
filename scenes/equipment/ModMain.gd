@@ -1,5 +1,3 @@
-extends Node
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -28,6 +26,8 @@ extends Node
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+extends Node
 
 # Set mod priority if you want it to load before/after other mods
 # Mods are loaded from lowest to highest priority, default is 0

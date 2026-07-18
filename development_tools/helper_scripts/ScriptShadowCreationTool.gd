@@ -1,5 +1,3 @@
-extends Node
-
 # This is a script used to create shadow (man in the middle) scripts, or in other words,
 #  a means of changing the inputs and/or outputs of the communication between two
 #  scripts.

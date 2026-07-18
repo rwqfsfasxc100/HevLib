@@ -1,5 +1,3 @@
-extends PanelContainer
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -28,6 +26,8 @@ extends PanelContainer
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+extends PanelContainer
 
 var link_button = preload("res://HevLib/ui/mod_menu/urls/URL_BUTTON.tscn")
 

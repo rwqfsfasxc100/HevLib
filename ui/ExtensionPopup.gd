@@ -1,5 +1,3 @@
-extends "res://menu/ExtensionPopup.gd"
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -28,6 +26,8 @@ extends "res://menu/ExtensionPopup.gd"
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+extends "res://menu/ExtensionPopup.gd"
 
 func _on_Extensions_pressed():
 	var size = Settings.getViewportSize()

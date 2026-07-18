@@ -1,5 +1,3 @@
-extends CenterContainer
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -28,6 +26,8 @@ extends CenterContainer
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+extends CenterContainer
 
 func _on_CenterContainer_visibility_changed():
 #	var windowRes = OS.window_size

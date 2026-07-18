@@ -1,5 +1,3 @@
-extends HBoxContainer
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -28,6 +26,8 @@ extends HBoxContainer
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+extends HBoxContainer
 
 var pointers = ModLoader._savedObjects[0]
 export var mod_box = preload("res://HevLib/ui/mod_menu/mod_list/mod_box/ModBox.tscn")

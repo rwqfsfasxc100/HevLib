@@ -1,5 +1,3 @@
-extends "res://ships/modules/ThrusterSlot.gd"
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -28,6 +26,8 @@ extends "res://ships/modules/ThrusterSlot.gd"
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+extends "res://ships/modules/ThrusterSlot.gd"
 
 var exhaust_cache_path = "user://cache/.HevLib_Cache/AuxAndThrusterDriver/"
 var flare

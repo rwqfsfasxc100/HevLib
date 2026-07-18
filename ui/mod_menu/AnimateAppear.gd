@@ -1,5 +1,3 @@
-extends AnimationPlayer
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -28,6 +26,8 @@ extends AnimationPlayer
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+extends AnimationPlayer
 
 export (String, "bloom","flat","empty") var mode = "bloom"
 export (float,0.25,4.0,0.05) var speed = 1.0

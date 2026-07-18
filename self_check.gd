@@ -1,5 +1,3 @@
-extends AcceptDialog
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -28,6 +26,8 @@ extends AcceptDialog
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+extends AcceptDialog
 
 var mod_name : String = "HevLib"
 var this_mod_name : String = "Example Mod"

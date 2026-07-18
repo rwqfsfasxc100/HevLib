@@ -1,6 +1,3 @@
-tool
-extends HBoxContainer
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -29,6 +26,9 @@ extends HBoxContainer
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+tool
+extends HBoxContainer
 
 func get_property_value():
 	var key = $key.get_property_value()

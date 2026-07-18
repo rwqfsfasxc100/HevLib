@@ -1,6 +1,3 @@
-# This script should be used for modified comms nodes and adds extra functionality.
-extends "res://comms/ConversationPlayer.gd"
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -29,6 +26,9 @@ extends "res://comms/ConversationPlayer.gd"
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+# This script should be used for modified comms nodes and adds extra functionality.
+extends "res://comms/ConversationPlayer.gd"
 
 # Used to spawn an event when the conversation is run
 export (String) var spawnEvent = ""

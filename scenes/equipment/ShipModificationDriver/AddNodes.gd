@@ -1,5 +1,3 @@
-extends "res://ships/ship-ctrl.gd"
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -29,12 +27,12 @@ extends "res://ships/ship-ctrl.gd"
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
 
+extends "res://ships/ship-ctrl.gd"
+
 var processed_node_definitions = {}
 var processed_ship_register = {}
 var processed_ship_modify = {}
 var processed_ship_numerics_modifications = {}
-
-
 
 var pointers_hl_addnodes
 func _enter_tree():

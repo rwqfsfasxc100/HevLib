@@ -1,5 +1,3 @@
-extends "res://ships/modules/MineralProcessingUnit.gd"
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -28,6 +26,8 @@ extends "res://ships/modules/MineralProcessingUnit.gd"
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+extends "res://ships/modules/MineralProcessingUnit.gd"
 
 #This is such hot garbage
 func _physics_process(delta):

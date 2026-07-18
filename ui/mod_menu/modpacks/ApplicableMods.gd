@@ -1,5 +1,3 @@
-extends VBoxContainer
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -28,6 +26,8 @@ extends VBoxContainer
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+extends VBoxContainer
 
 onready var wait_popup = get_node_or_null(NodePath("../../../WAIT"))
 onready var wait_label = get_node_or_null(NodePath("../../../WAIT/PanelContainer/Button/Label"))

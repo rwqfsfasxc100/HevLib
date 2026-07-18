@@ -1,5 +1,3 @@
-extends "res://hud/trtl/ProcessedCargoManifest.gd"
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -28,6 +26,8 @@ extends "res://hud/trtl/ProcessedCargoManifest.gd"
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+extends "res://hud/trtl/ProcessedCargoManifest.gd"
 
 var processed_cargo_limiter_obj
 

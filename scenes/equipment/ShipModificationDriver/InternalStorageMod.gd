@@ -1,5 +1,3 @@
-extends "res://ships/ship-ctrl.gd"
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -28,6 +26,8 @@ extends "res://ships/ship-ctrl.gd"
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+extends "res://ships/ship-ctrl.gd"
 
 var base_proc_storage = 0
 var base_ammo_storage = 0

@@ -1,5 +1,3 @@
-extends Timer
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -28,6 +26,8 @@ extends Timer
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+extends Timer
 
 func start_timer(MINUTES, useSecondsInstead = false):
 	Debug.l("Timer started for %s minutes" % MINUTES)

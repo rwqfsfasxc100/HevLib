@@ -1,5 +1,3 @@
-extends Node2D
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -28,6 +26,8 @@ extends Node2D
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+extends Node2D
 
 export  var systemName = "SYSTEM_HEVLIB_INTERNALS_NODE"
 export  var slot = ""

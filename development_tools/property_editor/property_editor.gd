@@ -1,6 +1,3 @@
-tool
-extends VBoxContainer
-
 # This tool is to provide an editor-like property editor available from in-game UI
 # It's relatively limited, but should work for the most part
 # Properties can be set or fetched with the set_property_value(property) and get_property_value() methods respectively.
@@ -33,6 +30,9 @@ extends VBoxContainer
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+tool
+extends VBoxContainer
 
 # If enabled, allows the user to change the property type
 export (bool) var can_edit_type = true

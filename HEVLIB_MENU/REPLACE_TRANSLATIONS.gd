@@ -1,5 +1,3 @@
-extends Node
-
 # This translation file is generated automatically
 # Do not modify anything directly, as this can break things for those working on them
 # Please use Translation Tracker to modify these yourself, and contact the mod author to implement them

@@ -1,5 +1,3 @@
-extends ScrollContainer
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -28,6 +26,8 @@ extends ScrollContainer
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
+
+extends ScrollContainer
 
 onready var ring = get_node("/root/Game/TheRing")
 var pointers = ModLoader._savedObjects[0]

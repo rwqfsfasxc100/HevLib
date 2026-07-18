@@ -1,5 +1,3 @@
-extends Node
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 

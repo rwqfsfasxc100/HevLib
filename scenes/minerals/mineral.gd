@@ -1,5 +1,3 @@
-extends "res://asteroids/mineral.gd"
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -29,7 +27,9 @@ extends "res://asteroids/mineral.gd"
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
 
-export var color = Color(1,1,1)
+extends "res://asteroids/mineral.gd"
+
+export var color = Color(1,1,1,1)
 export var ferrous = false
 
 func _ready():

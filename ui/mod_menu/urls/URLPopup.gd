@@ -1,5 +1,3 @@
-extends Popup
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -29,8 +27,9 @@ extends Popup
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
 
-var filter_offset = Vector2(200,200)
+extends Popup
 
+var filter_offset = Vector2(200,200)
 
 func _visibility_changed():
 	_on_resize()

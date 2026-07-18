@@ -1,5 +1,3 @@
-extends MarginContainer
-
 # [license]
 # 3-Clause BSD NON-AI License
 # 
@@ -29,7 +27,9 @@ extends MarginContainer
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
 
-const research_item = preload("res://HevLib/scenes/research/research_item_box/ResearchItem.tscn")
+extends MarginContainer
+
+onready var research_item = load("res://HevLib/scenes/research/research_item_box/ResearchItem.tscn")
 var research_state = {}
 
 var current_mod_ids = []
