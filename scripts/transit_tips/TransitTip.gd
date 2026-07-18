@@ -40,7 +40,8 @@ func _ready():
 	if "TAG_ADD_TRANSIT_TIPS" in tags:
 		for mod in tags["TAG_ADD_TRANSIT_TIPS"]:
 			var data = tags["TAG_ADD_TRANSIT_TIPS"][mod]
-			if typeof(data) == TYPE_ARRAY:
+			var td = typeof(data)
+			if td == TYPE_ARRAY or td == TYPE_STRING_ARRAY:
 				list.append_array(data)
 			elif typeof(data) == TYPE_STRING:
 				list.append(data)
