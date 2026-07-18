@@ -1574,3 +1574,467 @@
 4.2="* point - The given point to rotate around the origin with"
 4.3="* angle - The desired angle that the point's new position should be rotated to. NOTE the provided point parameter is equivalent to a 0 angle"
 4.4="* degrees (optional) - Whether to have the input angle as degrees or radians. Set to true by default"
+
+[1.7.2]
+
+1=* Removed `WeaponSlot.gd` pointer as its functionality is no longer needed
+2=* Fixed a critical issue that prevented SaveMenu from loading
+3=* Saves can now be created without issue
+4=* Added InputEventDebugger ui to display all input events and when they get triggered
+
+[1.7.1]
+
+1=* Removed a large majority of logs for pointers to make debugging easier
+1.1=* May be replaced in future if necessary, instead using a custom log file
+2=* Fixed save button not opening the ship name and seed selector menu
+3=* Ensured EventDriver properly picks up events to disable them
+
+[1.7.0]
+
+1=* Removed the WeaponSlot ModMain.gd file at res://HevLib/scenes/weaponslot/ModMain.gd, it has been merged with the EquipmentDriver ModMain at res://HevLib/scenes/equipment/ModMain.gd
+1.1=* Anyone developing mods in the editor will have to remove the line from the ModLoader.gd script before continuing
+2=* Fixed some documentation
+3=* Removed unnecessary delim variable from __updateTL_from_dictionary()
+4=* Fixed sorting of equipment at enceladus. They should now sort by price when enabled again
+4.1=* This change also now allows mods that modify Upgrades.gd to work as intended
+5=* Changed location of dynamic equipment handling cache
+6=* Improved compatability with mods that add ships incapable of using the vanilla RCS slot
+7=* Slots are now grouped together. Similar slots will be moved to each other to make it look less weird when all new slots are at the bottom. Do note that slots added through ADD_EQUIPMENT_SLOTS.gd will still be arbritrarily random by default due to the way constants are loaded. 
+7.1=* To combat this, a new file has been added to the equipment driver tags folder: SLOT_ORDER.gd. This file contains a single constant named SLOT_ORDER, which is a PoolStringArray containing strings for the node names of all slots added by the mod. The previous grouping by similar type will still apply, however the order in this array will define the order that slots added will appear in. See IoE's or Thrusterhaul's methods for reference.
+8=* Added methods to modify weaponslots outside of them being added to the scene via WEAPONSLOT_ADD or ADD_EQUIPMENT_ITEMS: 
+8.1=* WEAPONSLOT_MODIFY_TEMPLATES.gd: Used to modify data in groups. These templates are later reused for WEAPONSLOT_SHIP_TEMPLATES.gd, so make sure to state them here first. The equipment array contains strings of the equipment system names for any applicable to the template; adding new names will append them to the list, and they cannot be removed. The data array contains dictionaries containing properties in the WeaponSlot format; any new properties will be added to the template, while ones already in the template will be overwritten by the new data. 
+8.1.1=* An example of this can be found here, while the default provided templates and values can be seen here. The provided templates also have several groups where no modifications are made. These can be used to group equipment later down the line, for instance during ship template operations.
+8.2=* WEAPONSLOT_MODIFY.gd: Used to modify individual equipment items in a similar manner to WEAPONSLOT_MODIFY_TEMPLATES, however is performed after the template modification to alter individual equipment without needing to mess with templates.
+8.3=* WEAPONSLOT_SHIP_MODIFY.gd: Works in a similar manner to WEAPONSLOT_MODIFY, however works on a per-ship and per-equipment basis. This allows equipment to be positioned in a way that can make it more viable on a ship where the default position would have caused issues. This is especially useful for equipment that physically collide with the in-game world, for instance cargo containers. This file can get pretty big pretty quick, especially when you're working with a lot of ships and/or hardpoints, so it will seem tedious, however it does make it faster to implement than modifying it directly onto the ship itself. It's also highly recommended to set the baseShipName variable when making variants to vanilla ships, as modifications will be made by the ship type here before modifying them based on the shipName variable. 
+8.3.1=* The heirarchy works as follows: shipName -> slot -> equipment -> property(ies)
+8.4=* WEAPONSLOT_SHIP_TEMPLATES.gd: Works in a similar manner to WEAPONSLOT_MODIFY_TEMPLATES, however will operate on a per-ship basis for modification. Templates here have to be defined in WEAPONSLOT_MODIFY_TEMPLATES, or using a pre-defined type by the library, or else it won't do anything. 
+8.4.1=* The heirarchy works as follows: shipName -> slot -> template -> property(ies)
+9=* Translations for this library are now statically applied instead of using WebTranslate. This was done for consistent loading of TitleScreen modifications and translations
+10=* The title screen now refreshes the save list every 5 seconds, which allows for saves to be copied/moved around without needing to reload it by restarting the game or entering and exiting another save.
+11=* Replaced the delete save buttons with save options menus. These menus allow for multiple mods to add action buttons about a save, without the risk of causing issues with the title screen's layout. 
+11.1=* Can be added to via dictionaries made to a file in res://<mod folder>/HEVLIB_MENU/SAVE_OPTIONS.gd
+11.2=* Not much in the way of configurability yet, however can send all the info needed for a save (slot file path and save button node), which everything else you'd need can be extrapolated from.
+12=* Save slots now disable and show a warning icon and tooltip if the active ship on a save is not in any installed mods.
+13=* Added __convert_var_from_string to NodeAccess.gd
+13.1=* This func allows for the conversion of a variant stored literally as a string to said variant
+13.2=* E.G. "Vector2(4,3)" converts to Vector2(4,3), and ""ABCDEF"" converts to String(ABCDEF)
+14=* Added __get_mod_by_id to ManifestV2.gd
+14.1=* Allows fetching of a specific mod's data by it's ID
+14.2=* Optional case_sensitive parameter lets you decide whether to care about capitalization. Enabled by default
+14.3=* Returns a dictionary containing data. If the mod doesn't exist, returns an empty dictionary.
+
+[1.6.9]
+
+1=* Added WeaponSlotDriver
+1.1=* Instanced through HEVLIB_EQUIPMENT_DRIVER_TAGS/WEAPONSLOT_ADD.gd, or through a new weapon_slot tag added to equipment in HEVLIB_EQUIPMENT_DRIVER_TAGS/ADD_EQUIPMENT_ITEMS.gd
+1.2=* Pre-existing & vanilla weaponslot nodes can be modified by setting the name parameter to the node's name, and leaving the path parameter blank. This is only available when working through the WEAPONSLOT_ADD.gd file
+1.3=* An example of the WEAPONSLOT_ADD.gd format can be seen in IoE's setup. Note the PDTL modifying vanilla nodes instead of adding
+1.4=* An example of a modification to ADD_EQUIPMENT_ITEMS.gd can be seen in DerelictDelight's setup.
+
+[1.6.8]
+
+1=* Reintroduced automatic generation of library documentation
+2=* Added __parse_file_as_manifest to get manifest data from a file 
+2.1=* This was added to reduce clutter within other MV2 functions, as well as allowing other files to be parsed this way as well
+3=* Patchup fix for crash for WebTranslate due to the sheer number of API calls that are sent during each operation call to it. 
+3.1=* A future patch will add better failsafes and will cache data properly to only require large calls to the API every few days or weeks
+4=* The number of crewmembers that can board a derelict has been increased to 24 to account for modded ships
+5=* Added __dynamic_crew_expander to NodeAccess.gd
+5.1=* Creates a scene file in the provided folder that can be used as a valid extension to the derelict conversation scene at res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn
+5.2=* Second max_crew variable used to control the desired number of crew that the generated scene provides. If 24 or less, it fails due to this library already providing support for that many crew members.
+5.3=* Returns the file path to the generated scene to allow the mod to do what it likes with it. If the function failed, returns an empty string instead
+6=* Added easter egg. Completely useless, but it's just there.
+7=* Refactored EquipmentDriver to a more dynamic system: 
+7.1=* Fixes several issues with some equipment (namely consumables, MPUs, and RCS) breaking when being added via this system
+7.2=* The legacy system can still be used, however it requires enabling use_legacy_equipment_handler in the config file
+7.3=* The legacy system does not fix the issue with prior equipment, however if it sees enough use, I am willing to make the fix if necessary
+7.4=* This change requires modders to update their mods to take into account the different method and time which data is loaded
+7.5=* Mods now need a folder in the root of their mod folder named HEVLIB_EQUIPMENT_DRIVER_TAGS (for example, res://VelocityPlus/HEVLIB_EQUIPMENT_DRIVER_TAGS). This folder will be looked into for files containing data stored in constants. 
+7.5.1=* Data for equipment is stored in a script file named ADD_EQUIPMENT_SLOTS.gd, each equipment item is it's own constant variable. The name of the constant doesn't matter, however the formatting for each constant should be the same as a standard entry with the legacy system
+7.5.2=* Data for slots is stored in a very similar manner, only difference is it being stored in a script named ADD_EQUIPMENT_ITEMS.gd. Same goes for constant names not mattering.
+7.5.3=* Data for equipment tags is stored in a script named EQUIPMENT_TAGS.gd. This time the constant name does matter, and should start as const EQUIPMENT_TAGS = {.... The content of this constant is the usual dictionary format.
+7.5.4=* Data for slot tags is likewise similar, being stored in a script named SLOT_TAGS.gd, and also having a constant of the same name (const SLOT_TAGS = {...). Again, content of this constant is in the usual dictionary format.
+8=* Added multiple functions to Equipment.gd to aide with the new dynamic equipment driver system
+
+[1.6.7]
+
+1=* Created new formatting for translations using dictionaries. This is currently used by updateTL_from_dictionary and __inject_translations, however may be utilized in the future 
+2=* It is by no means efficient, however it is significantly more readable, and therefore easier to use and debug.
+3=* Performed major maintenance on all WebTranslate functions 
+3.1=* Fallback arrays now perform as intended, rather than not operating at all
+3.2=* An optional file_check variable has been added to WebTranslate and WebTranslateTimed that takes a file path input. If the file exists in the supplied file system, then the WebTranslate operation will save and load the translations from cache; otherwise, it relies upon fallback or the response from the server.
+3.3=* __webtranslate_reset has been renamed to __webtranslate_reset_by_URL. it is functionally identical, however, now enforces the idea that it clears a cache based on URL.
+3.4=* Added __webtranslate_reset_by_file_check to perform a similar operation to the previous reset protocol, however, instead by the file_check variable instead
+3.5=* Cached translations are now no longer automatically loaded unless the requested file is available
+4=* Added __fetch_all_translation_objects() function to the Translations.gd pointer 
+4.1=* Exposes all translation objects in an array to allow you to temporarily remove them to inject new translations
+4.2=* Optional number_of_objects_to_iterate_through integer to select how the range of object IDs that will be searched through. Defaults to 100,000
+5=* Added __updateTL_from_dictionary to the Translations.gd pointer 
+5.1=* Same functionality as the standard updateTL, however, uses the translation dictionary format instead of opening from a file
+6=* Added __inject_translations to the Translations.gd pointer 
+6.1=* Scans currently loaded nodes for translation objects, and temporarily removes them to modify translations already installed into the server
+6.2=* translation_data variable is a Dictionary using translation dictionary format and is required
+6.3=* Optional number_of_objects_to_iterate_through variable used to define the number of nodes to attempt to iterate over. Defaults to 100,000
+6.4=* NOTE: This has to be run during the initialisation phase of mods for any text string that is loaded by a preloaded scene, otherwise it will just be ignored. This will only be a select few things; however, it does include ships.
+7=* Temporarily removed library documentation generation due to being broken
+
+[1.6.6]
+
+1=* A text file is now written in the cache folder whenever a dive is started, with a list of all events the game can spawn 
+1.1=* This can be disabled in the config file by setting write_events in the events section to false
+2=* Added two example scripts in the examples folder that can be used to test whether this library is installed, one for the mere existence of the library, a second checks for a minimum version of the library
+
+[1.6.5]
+
+1=* __compare_versions now correctly returns false if the mod you are comparing with is not in the installed mods
+2=* ManifestV2 now accepts author and credits tags, allowing for individuals who worked on the mod to be appropriately credited. 
+2.1=* author is a string allowing the creator of the mod to be directly credited. When formatting to manifest version, it will always be provided, and defaults to "Unknown" if none is provided.
+2.2=* credits is an array of strings that provides more information on the author, any additional people who aided with development, licenses, or otherwise, to be noted alongside the author. More optional than credits, as when formatting to manifest version, it is omitted by default.
+3=* Added said author and credits tags to the manifest
+
+[1.6.4]
+
+1=* Added icon info to the __get_mod_data function 
+1.1=* Adds a new mod_icon key to each mod entry.
+1.2=* Contains two keys: has_icon_file and icon_path
+1.3=* has_icon_file is a boolean for whether an icon file exists in the same directory as the mod main.
+1.4=* icon_path is a string for the full path to the icon. If has_icon_file is false, it will be an empty string
+1.5=* An icon file is a file whose name starts with icon and ends with .stex. It is not case sensitive, and if multiple files fit the entry, it will choose the last one in the list.
+1.6=* The STEX format is used as it is automatically generated by the engine in the .import folder at the root, regardless of image format, and is the most universally accepted by any nodes that use images
+2=* Added function __match_mod_path_to_zip to the ManifestV2.gd pointer 
+2.1=* This will perform a (somewhat resource-heavy) operation where it will go through each mod zip in the mods folder, and compare a mod main file path to them. If a match is found, it will return the name of the zip.
+2.2=* mod_main_path parameter is a required string for the mod main you are trying to search for, and should be formatted in a res:// filesystem manner
+2.3=* If for whatever reason there is no associated zip file for the mod (which should only happen if the mod is run directly through a modloader patch), it will return an empty string instead. It is heavily recommended to have handling for these cases due to the ease of working in the editor
+2.4=* This code is a minor modification of the modloader code as a whole, so credit for this goes completely to Koder
+3=* Added function __get_mod_data_from_files to the ManifestV2.gd pointer 
+3.1=* Equivalent to an individual call of a mod from the __get_mod_data method, however provides purely data for that mod and relies on providing a file path
+3.2=* Icon and manifest files must be in the same relative position to the mod main file as would be done normally. The same naming conventions also apply
+4=* Added function __compare_versions to the ManifestV2.gd pointer 
+4.1=* checked_mod_data input is a dictionary generated by __get_mod_data_from_files, as it allows for a unified way to collect the required info from mods.
+4.2=* Returns a boolean for whether the provided mod data is a newer version of a mod currently installed to the game.
+4.3=* Requires ManifestV2 for actual comparisons to work due to the enforcement of semantic versioning within it. 
+4.3.1=* Any mod using ManifestV1 will be treated as the lesser version
+4.3.2=* If both the provided and installed mod use MV1, it will always return false
+4.4=* If no equivalent mod is installed, returns false
+
+[1.6.3]
+
+1=* Defined mod manifest version 2 with changes to how versions, github links, groups, and custom links are handled 
+1.1=* Manifest version 1 is now defined as the standards used by Mod Menu
+1.2=* The version tag from MV1 is now split into four tags based around semantic versioning: 
+1.2.1=* version_major is the first version integer. Required.
+1.2.2=* version_minor is the second version integer. Required.
+1.2.3=* version_bugfix is the third version integer. Required.
+1.2.4=* version_metadata is a string appended to the end of the version. Optional.
+1.2.5=* For more info, see https://semver.org/
+1.3=* The group tag from MV1 has been renamed to groups and is now an array of strings instead of a singular string. This allows for multiple tags to be assigned
+1.4=* The github_homepage tag from MV1 has been renamed to github. Functionally identical, just to make it easier to type out.
+1.5=* The github_releases tag from MV1 has been renamed to link_github_releases, and is now a boolean, which defaults to false. When true, it works equivalent to the old method, however requires the github tag to be set, as this appends /releases to the tag to provide the string rather than outright stating it.
+1.6=* The custom_link and custom_link_name tags from MV1 have been merged into the tag custom_data, and is now treated as an array. There is no defined method to how this is used, and instead can be defined on a per-mod basis and can be defined however.
+2=* Added optional parameter for __get_mod_data: format_to_manifest_version
+2.1=* If set to true, formats any manifest data to conform to how it would be parsed.
+2.2=* If the manifest_version tag isn't set in the manifest_definitions section, then it defaults to formatting to MV1.
+2.3=* Defaults to false
+3=* Added extra stats to the output of __get_mod_data. 
+3.1=* This includes a total of standard mods and library mods, as well as a count of mods with manifests
+4=* Updated manifest to ManifestV2. Some values still exist from V1 to keep compatibility with mod menu
+
+[1.6.2]
+
+1=* Added optional boolean to __get_mod_data: return_json
+1.1=* If set to true, will return a formatted string of the dictionary in JSON format.
+1.2=* Defaults to false
+2=* A file is generated in the cache stating the information about mods loaded at runtime 
+2.1=* This is provided to help give an explanation as to how information from the ManifestV2 pointer is used
+
+[1.6.1]
+
+1=* Added new function to the FileAccess.gd: __config_parse
+1.1=* Parses data from a file saved using the ConfigFile function as a dictionary.
+1.2=* Inputs a string for the file path of the desired file
+2=* Added new pointer ManifestV2
+2.1=* Currently only has one function: __get_mod_data, which returns a dictionary containing information regarding all mods currently installed
+2.2=* This pointer aims to be an improvement over the ManifestV1 set of functions, and already made a severe improvement over similar functionality that could be achieved through ManifestV1 equivalents.
+3=* Added a new tag to the mod manifest: manifest_definitions
+3.1=* These options are used to help provide context for any mods scanning through manifests
+3.2=* Currently only has one option: manifest_version this is used to set up how information is expected from the manifest. Defaults to 1, which is the general manifest format used currently
+
+[1.6.0]
+
+1=* Fixed a critical issue that caused any slots added by mods not to appear at Enceladus Prime if the station had been unloaded at any point and required a game restart to have them appear again.
+2=* Changed the way the EquipmentDriver processes equipment items and slots. It now does not need to be processed by the Equipment.gd pointer. 
+2.1=* This change must be reflected in any ModMains that use this feature, or else no equipment will not show up. Check this library's wiki for an updated method
+3=* EquipmentDriver data is now stored in a node at the root level, which means it's easier for other mods to check or modify it if necessary.
+4=* Improved integrity of the event suppressor
+5=* Stopped the game engine from screaming at anyone poking through the logs that a folder didn't exist when not using any mods that used the EventDriver module. It has been put in time out for the time being.
+
+[1.5.12]
+
+1=* Fixed flickering of the cursor when using hardware mouse
+
+[1.5.11]
+
+1=* Added logging for whenever the EquipmentDriver cache had been wiped
+
+[1.5.10]
+
+1=* Patched leftover code from mod menu
+2=* Whenever a new valid mod configuration is detected, the EventDriver cache now gets wiped to refresh it
+
+[1.5.9]
+
+1=* Fixed log errors that happened when fetching github data returned as null during WebTranslate processes
+2=* HevLib's mod version is now a factor for deciding when to perform the caching process again. It will now always happen on the first time a save is loaded after an update to the library
+3=* Increased stability of loading to cache. This should reduce the number of engine errors as well as to ensure that data gets cached more reliably.
+
+[1.5.8]
+
+1=* Fixed issue where __fetch_folder_files returned files as if acted on the res:// folder if the supplied folder did not exist
+2=* Reverted change to tagging in the same cycle as adding equipment. This caused vanilla equipment to not show in modded slots.
+3=* Fixed vanilla equipment from being properly added to modded slots
+
+[1.5.7]
+
+1=* Split initialisation processes between different ModMains
+2=* WebTranslate now no longer overrides translations done on ready
+3=* Improved verbosity of logging
+4=* Increased the efficiency of loading cached data by roughly 15 times
+
+[1.5.6]
+
+1=* Fixed crash which happened when the folder the installed mod hash cache was intended to be was not properly made
+
+[1.5.5]
+
+1=* Added a fourth line to the event debugger that displays the actual number of currently possible events 
+1.1=* This number will fluctuate a little, and will always be a little below the full number due to the way that partial chance events (currently derelicts) register as a possible event
+1.2=* Can be toggled through a second option in the mod's config file. Disabled by default.
+1.3=* WARNING: This setting will create a moderate to significant performance drop due to the way it is implemented, as well as creating thousands of logs per minute. USAGE OF THIS SETTING WILL INVALIDATE ALL BUG REPORTS, REGARDLESS OF WHETHER THEY ARE RELATED OR NOT.
+2=* Added __claim_child_ownership to the NodeAccess.gd pointer 
+2.1=* This provides a way to set the ownership of all recursive children of a node to itself
+2.2=* Useful for packaging scenes
+3=* Added __is_instanced_from_scene to the NodeAccess.gd pointer 
+3.1=* Returns a boolean whether the provided node is instanced
+4=* Added second optional parameter to __check_folder_exists: status_array
+4.1=* If set to true, returns an array of two booleans. The first value is the original, unchanged return status of __check_folder_exists, the second is a boolean that states if the folder already existed or not
+4.2=* Defaults to false
+5=* Improved efficiency of slot tagging, slot sorting and vanilla equipment adder processes. They now perform in the same cycle as adding modded equipment to save three cycles of scanning equipment slots
+6=* Added __compare_with_byte_array to the DataFormat pointer. This provides a slightly more processor-efficient way of comparing strings.
+7=* Equipment data is now cached. This helps speed up the loading of a save by about 25%, which isn't much as it can take between 10-15 seconds on mods which add a lot via this library. However, the benefit is not insignificant.
+
+[1.5.4]
+
+1=* Decreased the memory usage of adding equipment. Node duplicates that fail to be added to a slot will now be deleted and freed from memory.
+2=* Adjusted load order of TheRing.tscn to be more compatible with dialogue trees changed by other mods on _init()
+
+[1.5.3]
+
+1=* Changed the way that slot and equipment templates are loaded 
+1.1=* This is an attempt to fix a reported crash caused by an improper loading order of scenes.
+
+[1.5.2]
+
+1=* Improved efficiency of the mod main 
+1.1=* The examples it had previously are no longer necessary, given that a more verbose documentation is provided with the mod anyway
+2=* Reversed the load polarity of the library 
+2.1=* This is required to be able to work with other mods that make modifications to the Upgrades.tscn and UpgradeGroup.gd files while on the initialisation of the mods
+2.2=* As a consequence, any mods that load translations when on ready now can be overwritten by mods that use WebTranslate, assuming that the repository it is fetching translations from has the same string
+
+[1.5.1]
+
+1=* Added an additional handle for event selector
+1.1=* This should hopefully fix the issue where the event selector did not disable events when asked
+
+[1.5.0]
+
+1=* Completely refactored the way equipment is handled (again). This should be considerably more stable and reliable when working on tags, especially for non-hardpoint equipment. (keyword should, this is what I said on the last refactor and it still broke) 
+1.1=* I would heavily recommend rewriting any and all tags within your mods. This update involves some heavy changes to the way things are done. Nothing from the previous systems will work 100% with this new system, however equipment and slot additions will require the fewest changes (outside of the camel case -> snake case changes, which are relatively minimal in comparison) as they were considerably more robust than the rest of the system to begin with. I've added a Powerpoint slideshow with the mod that should properly explain how the system works in much more thorough detail than any of the current documentation.
+2=* Fixed inconsistencies with how equipment tags are stored. From now on, camel case (e.g. nameOverride) is entirely depreciated, and snake case will be used in all cases (e.g. name_override)
+3=* Added a folder for documentation. This is to parallel the wiki for more realtime info. This info usually will be worked on as new features get developed, so is more streamlined with the data's correctness and examples
+
+[1.4.5]
+
+1=* Added optional slot_types tag for equipment dictionaries that allows you to choose a specific slot to add to. Leaving it blank results in the previous behaviour
+2=* Fixed numerous bugs that occurred while processing the addition of new slot tags. They should now function properly
+3=* Added new tag for adding slots: add_vanilla_equipment. This is a boolean that will add any applicable vanilla equipment to slots that allow it. Defaults to true if not provided
+4=* Added extra examples in the ModMain. It is still rather incomplete, and an example mod will be made at some point in the future to cover all functionality of the equipment tagging system
+
+[1.4.4]
+
+1=* Equipment slots are now sorted by price to solve any issues with bizarre placement of equipment caused by multiple mods 
+1.1=* This does break slots where out-of-price-order equipment is intentional, and as a result, this can also be disabled in the config file if you desire
+
+[1.4.3]
+
+1=* Added an extra failsafe for WebTranslate in the event that the data received is corrupted. This should never happen, as it should be caught by the main failsafe, but it is just to ensure smooth performance
+2=* Added new debug option that displays info about the last input from multiple sources
+2.1=* Disabled by default, has to be enabled in the config file
+3=* Added new theme elements for future use. Currently only used in debug menus
+4=* Temporarily removed the __reparent function from the NodeAccess.gd pointer. It had the ability to cause significant memory leaks if no precautions were taken to properly clear old nodes, which the function did not have the capability built-in
+5=* Slot alignments now actually support additional alignments
+6=* Added ring position debugger which provides info on your current position in the rings
+7=* Added new tag for slots: system_slot. This provides the default system type to be assigned to equipment when being added to the slot via this library 
+7.1=* This fixes an issue with slots that didn't have a default system assigned not functioning properly, which included all non-hardpoint vanilla slots
+8=* The slots tag for equipment now accepts strings for a single slot, and now nulls out when the data type is not an array or string
+
+[1.4.2]
+
+1=* Adding equipment no longer tries to add the same node to multiple hardpoints
+2=* Completely refactored the slot tagging system. It now requires a lot less data to achieve the intended results, however now makes it a lot more specific 
+2.1=* The wiki will be updated as soon as, this release made a large change to it so any info relating to tags is out-of-date
+3=* Added the ability to register new tags
+4=* Added the ability to append tags to equipment slots, preexisting or new
+
+[1.4.1]
+
+1=* Fixed typo with the default multi-slot format for __make_equipment
+2=* Improved efficiency of updateTL
+
+[1.4.0]
+
+1=* Added __reparent function from Godot 4.0 to the NodeAccess pointer
+2=* Improved logging for __updateTL in the Translations.gd pointer 
+2.1=* WebTranslate logging has been updated in the process, both on initialisation and when updating from the web
+3=* Improved handling of multiple character delimiters for WebTranslate, as each character is now properly separated in the filename for consistency 
+3.1=* This slightly adjusts the file naming in the cache, so a check has been put in place to remove any files which extension ends with a ], which should only be the old formatting of files, however is a heads up anyway
+4=* Improved verbosity of fetching pointer info, as any functions with missing developer hints on their functionality will now state it in the resulting dictionary instead of skipping it
+5=* Added optional return_JSON booleans to __get_pointer_functions and __get_library_functionality to return the data as a JSON-formatted string instead of a dictionary
+6=* The library now automatically creates a JSON file containing the results of a __get_library_functionality call
+7=* Fixed WebTranslate trying to operate even when the request failed
+8=* Added a folder containing all achievement icons to the achievements folder - both locked and unlocked icons for the current 90 achievements
+9=* Optimised mod main to use purely FolderAccess commands instead of using the larger legacy functions file
+10=* Added event selector tab to the EventDriver menu, which now lets you disable events at will 
+10.1=* Does require the dive to be restarted for the changes to take effect
+11=* Added a new pointer Equipment.gd
+11.1=* Adds two new functions to add equipment and equipment slots using __make_equipment and __make_slot respectively
+11.2=* No direct documentation yet, however is provided in the JSON file
+
+[1.3.6]
+
+1=* Fixed bug that referenced a nonexistent mod, and required it to be loaded to the filesystem to open the event spawner menu
+2=* Added a new pointer: Events.gd: 
+2.1=* Currently only has __spawn_event, but more will come later as necessary
+
+[1.3.5]
+
+1=* Fixed issue where keybinds would only work as their default binding while this mod was installed
+
+[1.3.4]
+
+1=* Fixed typos in the mod main
+2=* Removed references to an old pointer in the WebTranslate code
+
+[1.3.3]
+
+1=* Added Translations pointer
+1.1=* Currently only holds a modification of Za'krin's updateTL function
+2=* Updated WebTranslate's fallback to accept an arrays within the array to specify a delimiter character 
+2.1=* This does not interfere with previous functionality, and if a string is used in place of an array, the | character is used as a default still
+3=* HevLib now uses WebTranslate as a base for its translations, and can be a template for it's new usage
+
+[1.3.2]
+
+1=* WebTranslate now catches timeouts throughout the entire process, instead of just at the first call to the github. 
+1.1=* Branch data fetching now times out after 15 seconds
+1.2=* Indexing of the translation folder now times out after 30 seconds
+1.3=* Downloading of translation files now time out after 2 minutes per file
+1.4=* These timeouts cannot be adjusted just yet
+1.5=* Do note that a timeout event will invalidate the rest of the webtranslate operation, and use the fallback translations instead if provided
+2=* Slightly adjusted the way __get_github_filesystem() handles data to be able to handle any extra control commands, if any do get added in future
+3=* Added EventDriver debug menu 
+3.1=* This is a hidden menu that can be opened during a dive.
+3.2=* Allows the spawning of any event at any time, as well as being able to adjust the event spawner timer between 1 second and 1800 seconds (30 minutes)
+3.3=* Is compatible with other mods that add events, assuming they're properly setup to be compatible with event mods (TheRing.tscn loaded on init, Game.tscn loaded on ready)
+3.4=* This change also marks that any mod using this library no longer needs to update Game.tscn, as the library will handle it directly
+3.5=* Requires a keybind to be set in the user://cfg/HevLib config file
+3.6=* Prelude to a soon-to-come event handling system callable via a pointer
+4=* Improved handling when several github fetching nodes are active at the same time
+5=* Added new function to the Github.gd pointer: __get_github_release
+5.1=* Downloads the latest release from a github
+5.2=* 3 required variant inputs, and 3 other optional variants
+5.2.1=* URL - The repository's URL to fetch release data from
+5.2.2=* folder - the folder to save the files to
+5.2.3=* node_to_return_to - node that receives the _downloaded_zip(file, filepath) signal, which returns two variants - file being the filename, and filepath being the file's full path
+5.2.4=* Optional get_pre_releases - bool to decide whether it should consider pre-releases as viable releases to download from
+5.2.5=* Optional file_preference - string that lets you selectively choose the downloaded file type, currently supports 'any' for all filetypes, or 'zip' to only consider zip downloads
+5.2.6=* Optional file_to_download - string that decides what order to choose the file, currently supports 'first' to get the first file in the list, or 'latest' to get the latest uploaded file
+
+[1.3.1]
+
+1=* Adds new pointer for github data handling Github.gd
+1.1=* Currently only features one subcommand:
+1.2=* __get_github_filesystem() - Used to fetch data about a repository's filesystem, or perform special operations on it
+2=* Removed test button from the main menu that was leftover from debugging
+
+[1.3.0]
+
+1=* Changed the way functions are located for all future functions 
+1.1=* Split the functions into multiple files by similar functionality
+1.2=* Located in the res://HevLib/pointers/ folder
+1.3=* Functions.gd file still exists for backwards compatability
+2=* Added HevLib.gd pointer to provide help and info on the library 
+2.1=* __get_lib_variables() - Only pre-existing function in this pointer. Fetches all variables from the mod's variable node.
+2.2=* __get_lib_pointers(return_as_full_path: bool = false) - Fetches the filenames of pointers. Optional return_as_full_path boolean to convert the filenames to res:// paths to the pointers
+2.3=* __get_pointer_functions(pointer: String) - Returns the functions of a pointer. Can use any path to the pointer, just the filename must be correct
+2.4=* __get_library_functionality() - Returns a dictionary containing info on all pointers.
+3=* Fixed WebTranslate not loading translations on node initialization
+4=* Added second entry to __webtranslate commands (third to __webtranslate_timed) that allows you to set a fallback translation set in the event that Github is inaccessible. 
+4.1=* This uses a 5 second timeout, which may seem fast, however it is fetching roughly 6 kb of data, which should complete within a second even on some of the slower internet speeds by today's standards
+
+[1.2.4]
+
+1=* Added __get_all_children
+1.1=* Provides data on subsidiary nodes from a provided node
+2=* Added __get_stat_data
+2.1=* Acts similarly to __get_achievement_data, however provides only the value of the stat itself
+
+[1.2.3]
+
+1=* Moved the cache folder to the user://cache/ folder
+
+[1.2.2]
+
+1=* Added a new node that gets set to the root that stores library variables
+2=* Added __get_lib_variables()
+2.1=* Fetches all variables from the library variable node
+2.2=* Some will not be available instantly, as they require internet access and cannot be as instant
+3=* Added __webtranslate_timed(URL: String, MINUTES_DELAY: int = 30)
+3.1=* Equivalent to __webtranslate(URL), however is repetitive with a delay of X minutes
+3.2=* Optional MINUTES_DELAY integer is the number of minutes in between the calls of WebTranslate, if left blank defaults to 30 minutes
+4=* Removed __get_current_achievements()
+4.1=* Replaced by the equivalent stored in the library variables node
+
+[1.2.1]
+
+1=* Added achievement data fetching
+1.1=* Added __get_current_achievements()
+1.1.1=* Fetches data surrounding the achievements file and returns a dictionary of 4 arrays
+1.1.2=* allAchievements is an array of names of all achievements currently in-game
+1.1.3=* unlockedAchievements is an array of names of all achievements currently unlocked in the achievements file
+1.1.4=* lockedAchievements is the inverse, listing the names of all locked achievements
+1.1.5=* stats are the names of all the current stats tracked, all with the stat: prefix
+1.2=* Added __get_achievement_data(achievementID: String)
+1.2.1=* Fetches the data of a provided achievement name and returns a dictionary of 7 keysname = the achievement's ID for convenience
+1.2.2=* isUnlocked = boolean for whether the achievement is unlocked or not
+1.2.3=* stat = associated stat name, w/o the stat: prefix
+1.2.4=* limit = the stat's unlocking threshold
+1.2.5=* data = any additional data that might be useful to provide. 
+1.2.5.1=* currently only provides the ship/equipment names of playtime achievements in untranslated form
+1.2.6=* rare = based on whether the game considers an achievement rare
+1.2.7=* spoiler = whether the achievement is considered a spoilered achievement on steam. 
+1.2.7.1=* manually inputted data, so may be missing data in the days following an update that adds achievements
+
+[1.2.0]
+
+1=* Added functionality to fetch translations from Github and store them within the cache.
+2=* Added functions __webtranslate and __webtranslate_reset to handle translations from Github 
+2.1=* A lot of documentation for this is still to come, as it's a rather delicate process that requires specific conditions to be met
+
+[1.1.1]
+
+1=* Added __format_for_large_numbers
+2=* Changed group to library
+
+[1.1.0]
+
+1=* Initial release
