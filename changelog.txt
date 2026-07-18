@@ -1,3 +1,10 @@
+[1.15.13]
+
+1=* Fixed changelog display bugging out and displaying the wrong labels when switching pages too quickly
+1.1=* Also improved the efficiency at which they're loaded
+2=* Fixed transit tips not working with PoolStringArrays
+3=* Added missing changelogs from prior to 1.7.3
+
 [1.15.12]
 
 1=* Equipment items can now have their regular text colour changed with the `normal_color` property
