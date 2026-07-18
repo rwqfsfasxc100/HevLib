@@ -43,7 +43,7 @@ func _ready():
 			var td = typeof(data)
 			if td == TYPE_ARRAY or td == TYPE_STRING_ARRAY:
 				list.append_array(data)
-			elif typeof(data) == TYPE_STRING:
+			elif td == TYPE_STRING:
 				list.append(data)
 
 func _on_TransitTip_visibility_changed():
