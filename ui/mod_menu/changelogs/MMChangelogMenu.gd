@@ -34,7 +34,10 @@ export var offset = Vector2(12,12)
 func clear():
 	$base/PanelContainer/VBoxContainer/VBoxContainer/ChangelogDisplay.clear()
 
-func update_this(path):
+var current_path:String = ""
+
+func update_this(path:String):
+	current_path = path
 	$base/PanelContainer/VBoxContainer/VBoxContainer/ChangelogDisplay.clear_and_update(path)
 
 func _ready():
@@ -44,6 +47,8 @@ func _ready():
 func _about_to_show():
 	lastFocus = get_focus_owner()
 	$base/PanelContainer/VBoxContainer/FooterButtons/Close.grab_focus()
+	if current_path:
+		update_this(current_path)
 
 func show_menu():
 	popup()
@@ -80,5 +85,7 @@ func _on_resize():
 		$base/PanelContainer.rect_size = offsetSize
 		$base/PanelContainer/VBoxContainer.rect_position = Vector2(5,5)
 		$base/PanelContainer/VBoxContainer.rect_size = vbsize
-		
+	else:
+		$base/PanelContainer/VBoxContainer/VBoxContainer/ChangelogDisplay.current_page = 0
+		clear()
 	
