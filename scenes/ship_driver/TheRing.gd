@@ -96,16 +96,29 @@ func _ready():
 							node.derelictConversation = load("res://comms/conversation/AgendaDerelictConversation.tscn")
 						node.extraKinetic = event.get("extra_kinetic_damage",100000.0)				# Scale for kinetic damage to deal to the ship when extra_damage is enabled
 						node.extraEmp = event.get("extra_emp_damage",100000.0)						# Scale for emp damage to deal to the ship when extra_damage is enabled
-						node.extraRadius = event.get("extra_damage_radius",100)						# Base radius of the circle where the point extra damage is inflicted can occur within. Measured 1 unit is 10cm
+						node.extraRadius = event.get("extra_damage_radius",100)						# Base radius of the circle where the point extra damage is inflicted can occur within. Measured 1 unit is 100cm
 						node.gauss = event.get("gauss",2)											# Power the random value generated for the extra damage and damage radius is multiplied by. i.e. pow(randf(), gauss)
 						node.empty = event.get("empty",false)										# Drains the ship of all propellant
 						node.damageDerelict = event.get("damage_derelict",false)					# Whether the ship should be damaged based on the age of the hull.
 						node.imperative = event.get("imperative",10)								# The AI mode that the ship would boot with. Uses the AI enumeration in res://ships/ship-ctrl.gd
 						node.imperativeStrength = event.get("imperative_strength",20)				# The threshhold needed to meet for the ship AI to change AI mode.
-						node.chaosLimit = clamp(event.get("chaos",0),0,1)							# If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
+						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 					"aiming_asteroid":
-						
-						pass
+						node.number = event.get("number",1)											# The number of class 1 ringroids to spawn. Class 1 are the largest sized ringroids
+						node.angular = event.get("angular",1.0)										# The scale of the random angular velocity that the ringroid(s) are given.
+						node.aim = event.get("aim",true)											# Whether the ringroid(s) should target the player's current trajectory.
+						node.velocity = event.get("velocity",250)									# The velocity of the ringroids, measured in 1 unit = 100 cm
+						node.clump = event.get("clump",false)										# Whether the ringroid(s) should instead target the event's origin point. This overrides `aim`
+						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
+						var maxDensity = event.get("maxDensity",PoolIntArray([1000, 1000, 1000, 1000, 1000])) # The maximum perceived density of the ring at the event's spawn point, taking into account other ship events in the area. I recommend using the position display debug tool to get a feel as to how this array works.
+						var md:PoolIntArray = PoolIntArray([1000, 1000, 1000, 1000, 1000])
+						var mdSize = maxDensity.size() - 1
+						for i in range(5):
+							if i > mdSize:
+								md[i] = 1000
+							else:
+								md[i] = int(maxDensity[i])
+						node.maxDensity = md
 					
 					
 			
