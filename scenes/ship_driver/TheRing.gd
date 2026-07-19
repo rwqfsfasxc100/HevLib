@@ -94,17 +94,17 @@ func _ready():
 							node.derelictConversation = load(derelictConversation)
 						else:
 							node.derelictConversation = load("res://comms/conversation/AgendaDerelictConversation.tscn")
-						node.extraKinetic = event.get("extra_kinetic_damage",100000.0)				# Scale for kinetic damage to deal to the ship when extra_damage is enabled.
-						node.extraEmp = event.get("extra_emp_damage",100000.0)						# Scale for emp damage to deal to the ship when extra_damage is enabled.
-						node.extraRadius = event.get("extra_damage_radius",100)						# Base radius of the circle where the point extra damage is inflicted can occur within. Measured with 1 unit = 100cm.
+						node.extraKinetic = max(event.get("extra_kinetic_damage",100000.0),0)		# Scale for kinetic damage to deal to the ship when extra_damage is enabled.
+						node.extraEmp = max(event.get("extra_emp_damage",100000.0),0)				# Scale for emp damage to deal to the ship when extra_damage is enabled.
+						node.extraRadius = max(event.get("extra_damage_radius",100),0)				# Base radius of the circle where the point extra damage is inflicted can occur within. Measured with 1 unit = 100cm.
 						node.gauss = event.get("gauss",2)											# Power the random value generated for the extra damage and damage radius is multiplied by. i.e. pow(randf(), gauss).
 						node.empty = event.get("empty",false)										# Drains the ship of all propellant.
 						node.damageDerelict = event.get("damage_derelict",false)					# Whether the ship should be damaged based on the age of the hull.
-						node.imperative = event.get("imperative",10)								# The AI mode that the ship would boot with. Uses the AI enumeration in res://ships/ship-ctrl.gd.
-						node.imperativeStrength = event.get("imperative_strength",20)				# The threshhold needed to meet for the ship AI to change AI mode.
+						node.imperative = max(event.get("imperative",10),0)							# The AI mode that the ship would boot with. Uses the AI enumeration in res://ships/ship-ctrl.gd.
+						node.imperativeStrength = max(event.get("imperative_strength",20),0)		# The threshhold needed to meet for the ship AI to change AI mode.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 					"aiming_asteroid":
-						node.number = event.get("number",1)											# The number of class 1 ringroids to spawn. Class 1 are the largest sized ringroids.
+						node.number = max(event.get("number",1),0)									# The number of class 1 ringroids to spawn. Class 1 are the largest sized ringroids.
 						node.angular = event.get("angular",1.0)										# The scale of the random amount of angular velocity that the ringroid(s) are given.
 						node.aim = event.get("aim",true)											# Whether the ringroid(s) should target the player's current trajectory.
 						node.velocity = event.get("velocity",250)									# The velocity of the ringroids, measured with 1 unit = 100 cm.
@@ -120,7 +120,7 @@ func _ready():
 								md[i] = int(maxDensity[i])
 						node.maxDensity = md
 					"aiming_asteroid_shower":
-						node.number = event.get("number",20)										# The number of class 5 ringroids to spawn. Class 5 are the smallest suzed rubgriuds.
+						node.number = max(event.get("number",20),0)									# The number of class 5 ringroids to spawn. Class 5 are the smallest suzed rubgriuds.
 						node.velocity = event.get("velocity",2000)									# Base velocity for the ringroids, measured with 1 unit = 100 cm.
 						node.randomVelocity = event.get("random_velocity",100)						# Additional randomness added or subtracted from the velocity, measured with 1 unit = 100 cm.
 						node.angular = event.get("angular",5.0)										# The scale of the random amount of angular velocity that the ringroids are given.
@@ -138,7 +138,7 @@ func _ready():
 						else:
 							node.alreadyClaimed = load("res://story/DummyBeacon.tscn")
 						node.immediateEvent = event.get("spawn_evemt",true)							# Whether the beacon should force an event to spawn.
-						node.eventDelay = event.get("event_delay",30)								# Delay between the beacon event spawning and the storyteller spawning a new event.
+						node.eventDelay = max(event.get("event_delay",30),1)						# Delay between the beacon event spawning and the storyteller spawning a new event.
 						node.singleEvent = event.get("single_event",true)							# If this specific beacon event should only permit one event spawn per dive.
 						node.postfix = event.get("postfix","")										# String used to randomize the beacon event for setting the transponder code's suffix number. Vanilla beacons typically use the beacon event's number, but can be any string.
 						node.transponderFormat = event.get("transponder_format","%s-CB%d")			# The format the beacon's transponder will use. MUST contain both a `%s` and `%d` once each for the code and suffix respectively.
@@ -156,8 +156,8 @@ func _ready():
 						node.customTransponder = event.get("custom_transponder","")					# A custom transponder ID for the NPC.
 						node.customName = event.get("customName","")								# A custom ship name for the NPC.
 						node.lockOutStory = event.get("lock_out_story","")							# If set, a story flag that when reached prevents this event from ever spawning.
-						node.lockOutLimit = event.get("lock_out_limit",1)							# Minimum value for the story flag to prevent the event from spawning.
-						node.awayRadius = event.get("away_radius",10000)							# Radius which the event checks for any POI, which if any exist, prevents the event from being chosen by the storyteller.
+						node.lockOutLimit = max(event.get("lock_out_limit",1),0)					# Minimum value for the story flag to prevent the event from spawning.
+						node.awayRadius = max(event.get("away_radius",10000),0)						# Radius which the event checks for any POI, which if any exist, prevents the event from being chosen by the storyteller.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"dead_body":
 						var beacon = event.get("claim_beacon","res://story/DeadTalkingBeacon.tscn") # The scene for the comms beacon used by the event. 
@@ -182,8 +182,8 @@ func _ready():
 							if pointers.DataFormat.__file_exists(body):
 								bd.append(load(body))
 						node.bodies = bd
-						node.nrMin = event.get("minimum_count")										# Minimum number of bodies that can be found.
-						node.nrMax = event.get("maximum_count")										# Maximum number of bodies that can be found.
+						node.nrMin = max(event.get("minimum_count",2),0)							# Minimum number of bodies that can be found.
+						node.nrMax = max(event.get("maximum_count",10),0)							# Maximum number of bodies that can be found.
 						var times = event.get("times",PoolVector2Array([							# Array of Arrays/Vector2s that dictate the IRL dates where the event will always pass the storyteller check and not need to meet the chaos to spawn.
 							Vector2(10, 25), 
 							Vector2(10, 26), 
@@ -202,34 +202,100 @@ func _ready():
 								TYPE_VECTOR2:
 									otimes.append(i)
 						node.times = otimes
-						node.rotationVelocity = event.get("rotation_velocity")						# Scale for the random amount of rotational velocity each body is given.
-						node.commonRandomVectorVelocity = event.get("common_random_vector_velocity")# Maximum random velocity that the bodies are given, measured with 1 unit = 100 cm.
+						node.rotationVelocity = event.get("rotation_velocity",0.2)					# Scale for the random amount of rotational velocity each body is given.
+						node.commonRandomVectorVelocity = event.get("common_random_vector_velocity",30.0) # Maximum random velocity that the bodies are given, measured with 1 unit = 100 cm.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"flight_for_rescue":
 						node.time = max(event.get("time",180),0)
 						node.maxLinear = event.get("maximum_velocity",100)							# Maximum random velocity that the bodies are given, measured with 1 unit = 100 cm.
 						node.maxAngular = event.get("angular_velocity_scale",2)						# Scale the random angular velocity is set to.
-						node.gauss = event.get("gauss",6)											# Power the random value used to set random linear and angular velocities to. Used as pow(randf(), gauss).
+						node.gauss = max(event.get("gauss",6),0)									# Power the random value used to set random linear and angular velocities to. Used as pow(randf(), gauss).
 						var derelictConversation = event.get("derelict_conversation","res://comms/conversation/DerelictConversation.tscn") # The scene for the derelict K37's comms node.
 						if pointers.DataFormat.__file_exists(derelictConversation):
 							node.derelictConversation = load(derelictConversation)
 						else:
 							node.derelictConversation = load("res://comms/conversation/DerelictConversation.tscn")
 					"humongous_hollow_rock":
-						var rock = event.get("rock_scene","res://story/Moonlet.tscn")				# The rock scene for the derelict K37's comms node.
+						var rock = event.get("rock_scene","res://story/Moonlet.tscn")				# The rock scene spawned by this event.
 						if pointers.DataFormat.__file_exists(rock):
 							node.rock = load(rock)
 						else:
 							node.rock = load("res://story/Moonlet.tscn")
 						node.pirateChance = clamp(event.get("pirate_chance",0.5),0,1)				# The rock scene's base chance for a pirate encounter
 						node.crystalChance = clamp(event.get("crystal_chance",0.5),0,1)				# The rock scene's base chance for crystals to spawn
-						node.angular = event.get("angular",0.0025)									# Base angular velocity scale for the rock.
-						node.locationOffsetStability = event.get("location_offset_stability",100000)# Grid cell size (both x & y) to determine the POI's unique identifier, measured with 1 unit = 100 cm. 
-						node.awayRadius = event.get("away_radius",100000)							# Radius which the event checks for any POI, which if any exist, prevents the event from being chosen by the storyteller.
+						node.angular = max(event.get("angular",0.0025),0)							# Base angular velocity scale for the rock.
+						node.locationOffsetStability = max(event.get("location_offset_stability",100000),0) # Grid cell size (both x & y) to determine the POI's unique identifier, measured with 1 unit = 100 cm. 
+						node.awayRadius = max(event.get("away_radius",100000),0)					# Radius which the event checks for any POI, which if any exist, prevents the event from being chosen by the storyteller.
 						node.lockOutMyEvent = event.get("lock_out_event",false)						# Whether the event won't spawn if you have another of the same event in your POI list.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
-					
-					
+					"hybrid_hunter":
+						node.minCapacity = clamp(event.get("minCapacity",0.6),0,1)					# If on Balanced difficulty, the minimum status percentage that must be met for the event to spawn. This value is equivalent to the status percentage shown on the EIME and OCP HUDs.
+						node.minMoney = max(event.get("minMoney",30000),0)							# If on Balanced difficulty, the minimum amount of money that the player must have in the bank for the event to spawn.
+						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
+					"instance_with_chance":
+						var rock = event.get("rock_scene","res://story/Moonlet.tscn")				# The rock scene spawned by this event.
+						if pointers.DataFormat.__file_exists(rock):
+							node.rock = load(rock)
+						else:
+							node.rock = load("res://story/Moonlet.tscn")
+						var knownRock = event.get("known_rock_scene","")							# The rock scene spawned by this event, either it's not a singular event and the POI has not expired within the astrogation list, or it's a singular event and you've encountered it before.
+						if pointers.DataFormat.__file_exists(knownRock):
+							node.knownRock = load(knownRock)
+						else:
+							node.knownRock = load("res://story/Moonlet.tscn")
+						var maxDensity = event.get("maxDensity",PoolIntArray([1000, 1000, 1000, 1000, 1000])) # The maximum perceived density of the ring at the event's spawn point, taking into account other ship events in the area. I recommend using the position display debug tool to get a feel as to how this array works.
+						var md:PoolIntArray = PoolIntArray([1000, 1000, 1000, 1000, 1000])
+						var mdSize = maxDensity.size() - 1
+						for i in range(5):
+							if i > mdSize:
+								md[i] = 1000
+							else:
+								md[i] = max(int(maxDensity[i]),0)
+						node.maxDensity = md
+						node.poi = event.get("poi_name","")											# The name used for the POI if the rock/known rock is a discoverable object, and for any checks performed to determine whether the rock or known rock objects are spawned
+						node.transponder = event.get("transponder","")								# If set, and the rock/known rock object has the transponder property, sets the transponder of the object.
+						node.customName = event.get("custom_name","")								# If set, and the rock/known rock has the 'setShipName' method, sets the custom name of the object.
+						node.single = event.get("single",false)										# Used to determine if the rock or known rock object is spawned. See description for known_rock to see what this does.
+						node.awayRadius = max(event.get("away_radius",100000),0)					# Radius which the event checks for any POI, which if any exist, prevents the event from being chosen by the storyteller.
+						node.lockOutStory = event.get("lock_out_story","")							# If set, a story flag that when reached prevents this event from ever spawning.
+						node.lockOutLimit = max(event.get("lock_out_limit",1),0)					# Minimum value for the story flag to prevent the event from spawning.
+						node.lockoutPoi = event.get("lock_out_from_poi","")							# If set, prevents the Storyteller from spawning this event if another POI uses this name
+						node.lockOutEvent = event.get("lock_out_from_event","")						# If set, prevents the Storyteller from spawning this event if another POI uses the same event as this
+						node.lockOutMyEvent = event.get("lock_out_event",false)						# Whether the event won't spawn if you have another of the same event in your POI list.
+						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
+					"inter_crew_banter":
+						var beacon = event.get("beacon","res://story/TighbeamBeacon.tscn")			# The scene for the comms beacon used by the event. 
+						if pointers.DataFormat.__file_exists(beacon):
+							node.beacon = load(beacon)
+						else:
+							node.beacon = load("res://story/TighbeamBeacon.tscn")
+						node.awayRadius = max(event.get("away_radius",0),0)							# If set above zero, radius which the event checks for any POI, which if any exist, prevents the event from being chosen by the storyteller.
+						node.serviceCooldown = event.get("service_cooldown","")						# If set, checks for the provided service. If the service is not on cooldown (i.e. unable to be purchased), the event cannot spawn.
+						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
+					"lifepod_is_floating":
+						var lifepod = event.get("lifepod","res://ships/Lifepod.tscn")				# The ship scene spawned by this event.
+						if pointers.DataFormat.__file_exists(lifepod):
+							node.lifepod = load(lifepod)
+						else:
+							node.lifepod = load("res://ships/Lifepod.tscn")
+						node.processedCargo = event.get("processed_cargo",false)					# If the ship node should have a random amount of processed cargo added to it.
+						node.processedCargoMax = clamp(event.get("processed_cargo_max",1),0,1)		# The maximum fill percentage which all processed holds can be filled to
+						node.processedCargoMin = clamp(event.get("processed_cargo_min",0),0,1)		# The minimum fill percentage which all processed holds can be filled to
+					"locust_swarm":
+						var beacon = event.get("beacon","res://story/Locust.tscn")					# The scene for the comms beacon used by the event. 
+						if pointers.DataFormat.__file_exists(beacon):
+							node.beacon = load(beacon)
+						else:
+							node.beacon = load("res://story/Locust.tscn")
+						node.number = max(event.get("number",10),0)									# The number of beacons that would be spawned.
+						node.lockOutStory = event.get("lock_out_story","")							# If set, a story flag that when reached prevents this event from ever spawning.
+						node.lockOutLimit = max(event.get("lock_out_limit",1),0)					# Minimum value for the lock out story flag to prevent the event from spawning.
+						node.requireStory = event.get("require_story","")							# If set, a required story flag that must be reached to let the Storyteller to spawn this event.
+						node.requireMin = max(event.get("require_limit",1),0)						# Minimum value for the required story flag to be reached to permit the event to spawn.
+						node.awayRadius = max(event.get("away_radius",0),0)							# If set above zero, radius which the event checks for any POI, which if any exist, prevents the event from being chosen by the storyteller.
+						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
+					"minefield":
+						pass
 					
 					
 					
