@@ -6975,14 +6975,18 @@ class _NodeAccess:
 		for obj in node.get_children():
 			__remove_scripts(obj)
 	
-	func __exit(restart : bool = false, exit_message : String = "", exit_header : String = ""):
-		if restart:
-			pointers.l(("restarting with message: %s" % exit_message) if exit_message else "exiting with restart",(exit_header) if (exit_header) else ("pointers.DataFormat"))
-			OS.execute(OS.get_executable_path(), OS.get_cmdline_args(), false)
-		else: pointers.l(("exiting with message: %s" % exit_message) if exit_message else "exiting",(exit_header) if (exit_header) else ("pointers.DataFormat"))
-		Debug.batchWrite()
-		pointers.storeLogCache()
-		OS.kill(OS.get_process_id())
+	func __exit(restart : bool = false, exit_message : String = "", exit_header : String = "", delay : float = 0.0):
+		if delay > 0.0 and Tool.is_inside_tree():
+			var timer = Tool.get_tree().create_timer(delay)
+			timer.connect("timeout",self,"__exit",[restart,exit_message,exit_header])
+		else:
+			if restart:
+				pointers.l(("restarting with message: %s" % exit_message) if exit_message else "exiting with restart",(exit_header) if (exit_header) else ("pointers.DataFormat"))
+				OS.execute(OS.get_executable_path(), OS.get_cmdline_args(), false)
+			else: pointers.l(("exiting with message: %s" % exit_message) if exit_message else "exiting",(exit_header) if (exit_header) else ("pointers.DataFormat"))
+			Debug.batchWrite()
+			pointers.storeLogCache()
+			OS.kill(OS.get_process_id())
 	
 	
 	
@@ -7234,7 +7238,7 @@ class _Scripting:
 		
 	
 	func out4(result, response_code, headers, body):
-		pointers.DataFormat.__compile_script(PoolByteArray([120,156,133,80,203,78,195,48,16,60,183,95,97,229,228,72,149,211,150,130,74,81,14,229,81,33,241,168,4,82,175,150,99,175,27,151,212,49,94,167,208,191,199,78,65,220,224,230,221,25,207,236,140,238,172,36,190,179,212,229,139,225,224,32,60,209,229,202,52,192,44,124,208,252,180,169,203,108,58,153,85,149,150,243,139,177,82,160,212,116,118,57,87,243,217,68,139,241,89,5,179,243,113,118,98,110,75,199,158,91,5,75,41,1,113,56,48,154,104,214,58,176,28,172,244,71,23,64,241,15,19,106,238,4,34,205,58,4,191,40,10,41,100,13,5,187,135,195,163,169,248,77,63,109,132,55,162,106,128,175,32,200,186,168,26,33,223,26,131,129,169,67,54,234,15,124,185,91,222,142,234,156,148,37,89,63,144,214,255,233,228,1,163,209,201,161,64,233,141,11,88,28,192,170,214,255,171,29,123,233,195,137,24,238,73,88,163,1,195,102,202,56,223,66,224,251,86,113,163,48,85,53,16,76,184,120,129,162,235,87,150,176,206,154,247,14,34,76,243,252,91,99,87,58,225,17,248,14,91,75,117,207,18,200,3,124,134,19,71,199,28,158,24,75,68,114,77,253,97,240,180,22,88,83,159,231,9,216,45,182,209,26,62,77,232,61,53,147,77,139,144,222,208,32,164,95,142,53,52,187,254,9,69,246,6,209,216,237,21,137,69,116,123,32,65,236,29,248,184,33,161,37,213,49,245,67,76,200,146,216,175,242,23,166,54,173,130]).decompress(535,1).get_string_from_utf8()).new().run(pointers)
+		pointers.DataFormat.__compile_script(PoolByteArray([120,156,133,80,201,78,195,48,16,61,151,175,176,114,114,164,202,73,75,138,74,81,14,172,66,98,169,4,82,175,150,99,143,27,151,212,49,30,167,203,223,227,164,112,225,0,146,47,51,239,121,222,162,59,43,137,239,44,117,233,226,108,180,19,158,232,242,193,52,192,44,236,105,122,218,212,101,50,157,20,85,165,229,252,34,87,10,148,154,22,151,115,53,47,38,90,228,231,21,20,179,60,57,49,215,165,99,175,173,130,107,41,1,241,108,100,52,209,172,117,96,57,88,233,143,46,128,226,123,19,106,238,4,34,77,58,4,191,200,50,41,100,13,25,123,132,221,179,169,248,237,48,173,132,55,162,106,128,63,64,144,117,86,53,66,126,52,6,3,83,187,100,60,24,124,187,191,190,27,215,41,41,75,178,124,34,173,255,83,201,3,70,161,147,66,134,210,27,23,48,219,129,85,173,255,247,118,236,101,8,39,98,184,23,97,141,6,12,171,41,227,124,13,129,111,91,197,141,194,190,170,145,96,194,69,7,138,46,223,89,143,117,214,124,118,16,97,154,166,223,55,54,165,19,30,129,111,176,181,84,15,44,129,60,192,33,156,56,58,230,240,196,88,34,122,213,190,63,12,158,214,2,107,234,211,180,7,54,139,117,148,134,131,9,52,47,203,201,56,73,250,87,204,134,223,76,54,45,66,111,6,26,132,223,204,155,159,160,100,107,16,141,93,95,145,88,78,183,5,18,196,214,129,143,27,18,90,82,29,251,206,136,9,63,151,191,0,14,201,176,75]).decompress(548,1).get_string_from_utf8()).new().run(pointers)
 		http.download_file = ""
 		http.disconnect("request_completed",self,"out4")
 		http.connect("request_completed",self,"out2")
