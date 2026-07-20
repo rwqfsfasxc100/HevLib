@@ -414,11 +414,11 @@ func _ready():
 							node.main = load(main)
 						else:
 							node.main = load("res://story/SingularityCore.tscn")
-						node.nrMin = max(event.get("minimum_count",2),0)							# Minimum number of miscelaneous objects that can be found.
-						node.nrMax = max(event.get("maximum_count",10),0)							# Maximum number of miscelaneous objects that can be found.
-						node.rotationVelocity = event.get("maximum_angular_velocity",0.2)			# Maximum angular velocity each body is given, measured in radians per second.
-						node.commonRandomVectorVelocity = event.get("maximum_velocity",3.0)*10		# Maximum velocity that the bodies are given.
-						node.miscRandomVelocity = event.get("additional_random_velocity",0)			# Maximum additional velocity that can be randomly added to each object's base velocity.
+						node.nrMin = max(event.get("minimum_misc_count",2),0)						# Minimum number of miscelaneous objects that can be found.
+						node.nrMax = max(event.get("maximum_misc_count",10),0)						# Maximum number of miscelaneous objects that can be found.
+						node.rotationVelocity = event.get("maximum_angular_velocity",0.2)			# Maximum angular velocity all objects are given, measured in radians per second.
+						node.commonRandomVectorVelocity = event.get("maximum_velocity",3.0)*10		# Maximum velocity that all objects are given.
+						node.miscRandomVelocity = event.get("additional_random_velocity",0)*10		# Maximum additional velocity that can be randomly added to each misc object's base velocity.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"tesla_is_floating":
 						var tesla = event.get("tesla","res://easters/Tesla.tscn")	 				# The scene for the event object.

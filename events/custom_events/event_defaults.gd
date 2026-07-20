@@ -360,33 +360,95 @@ const rescue_operation = {
 const ring_race = {
 	"event_name":"RingRaceInGap",
 	"event_type":"ring_race",
-	
+	"minimum_depth_in_km":0,
+	"maximum_depth_in_km":10000,
+	"ship_model":"PROSPECTOR-BALD",
+	"ship_faction":"racer",
+	"ship_number":1,
+	"drone_model":"DRONE",
+	"drone_faction":"racedrone",
+	"drone_number":0,
+	"stock_chance":0.2
 }
 
 # 
 const singularity = {
 	"event_name":"Singularity",
 	"event_type":"singularity",
-	
+	"misc":PoolStringArray([
+		"res://asteroids/mineral-fe-1.tscn",
+		"res://asteroids/mineral-fe-2.tscn", 
+		"res://asteroids/mineral-fe-3.tscn", 
+		"res://asteroids/mineral-fe-4.tscn", 
+		"res://asteroids/mineral-fe-5.tscn", 
+		"res://asteroids/mineral-fe-6.tscn", 
+		"res://asteroids/mineral-fe-7.tscn", 
+	]),
+	"main":"res://story/SingularityCore.tscn",
+	"minimum_misc_count":2,
+	"maximum_misc_count":10,
+	"maximum_angular_velocity":0.2,
+	"maximum_velocity":3.0,
+	"additional_random_velocity":0,
+	"chaos":0.0
 }
 
 # 
 const tesla_is_floating = {
 	"event_name":"TeslaIsFloating",
 	"event_type":"tesla_is_floating",
-	
+	"tesla":"res://easters/Tesla.tscn",
+	"event_story_flag":"easters.tesla"
 }
 
 # 
 const timed_event = {
 	"event_name":"Helloroid",
 	"event_type":"timed_event",
-	
+	"rock_scene":"res://easters/Helloroid.tscn",
+	"maximum_angular_velocity":0.05,
+	"times":PoolVector2Array([
+		Vector2(10, 25), 
+		Vector2(10, 26), 
+		Vector2(10, 27), 
+		Vector2(10, 28), 
+		Vector2(10, 29), 
+		Vector2(10, 31), 
+		Vector2(11, 1)
+	]),
+	"away_radius":10000,
+	"chaos":0.0
 }
 
 # 
 const vilcy = {
 	"event_name":"VilcyPatrol",
 	"event_type":"vilcy",
-	
+	"minimum_depth_in_km":0,
+	"maximum_depth_in_km":10000,
+	"vilcy_patroler":0,
+	"vilcy_disabler":0,
+	"vilcy_burner":0,
+	"vilcy_lone":0,
+	"pirate_abductors":0,
+	"pirate":0,
+	"pirate_revenger":0,
+	"vilcy_revenger":0,
+	"initial_pirates":0,
+	"later_pirates":0,
+	"later_vilcy":0,
+	"later_ship_timer":60,
+	"away_radius":10000,
+	"stock_chance":0.5,
+	"bounty":"res://ships/LifepodPirate.tscn",
+	"pirate_station":"res://story/pirates/Pistacja.tscn",
+	"station_event_name":"PirateStation",
+	"flee_to_station_timer":600,
+	"minimum_capacity":0.25,
+	"minimum_money":0,
+	"lock_out_story":"g4a.destroyed",
+	"lock_out_limit":1,
+	"require_story":"",
+	"require_limit":0,
+	"chaos":0.0
 }
