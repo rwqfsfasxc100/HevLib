@@ -67,7 +67,7 @@ func _ready():
 							node.derelictConversation = load("res://comms/conversation/AgendaDerelictConversation.tscn")
 						node.extraKinetic = max(event.get("extra_kinetic_damage",100000.0),0)		# Scale for kinetic damage to deal to the ship when extra_damage is enabled.
 						node.extraEmp = max(event.get("extra_emp_damage",100000.0),0)				# Scale for emp damage to deal to the ship when extra_damage is enabled.
-						node.extraRadius = max(event.get("extra_damage_radius",100),0)				# Base radius of the circle where the point extra damage is inflicted can occur within. Measured with 1 unit = 100cm.
+						node.extraRadius = max(event.get("extra_damage_radius",10.0),0)*10			# Base radius of the circle where the point extra damage is inflicted can occur within.
 						node.gauss = event.get("gauss",2)											# Power the random value generated for the extra damage and damage radius is multiplied by. i.e. pow(randf(), gauss).
 						node.empty = event.get("empty",false)										# Drains the ship of all propellant.
 						node.damageDerelict = event.get("damage_derelict",false)					# Whether the ship should be damaged based on the age of the hull.
@@ -78,9 +78,8 @@ func _ready():
 						node.number = max(event.get("number",1),0)									# The number of class 1 ringroids to spawn. Class 1 are the largest sized ringroids.
 						node.angular = event.get("maximum_angular_velocity",1.0)					# Maximum angular velocity that the ringroid(s) can be given, measured in radians per second.
 						node.aim = event.get("aim",true)											# Whether the ringroid(s) should target the player's current trajectory.
-						node.velocity = event.get("maximum_velocity",250)							# The velocity of the ringroids, measured with 1 unit = 100 cm.
+						node.velocity = event.get("maximum_velocity",25.0)*10						# The velocity of the ringroids.
 						node.clump = event.get("clump",false)										# Whether the ringroid(s) should instead target the event's origin point. This overrides `aim`.
-						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 						var maxDensity = event.get("maxDensity",PoolIntArray([1000, 1000, 1000, 1000, 1000])) # The maximum perceived density of the ring at the event's spawn point, taking into account other ship events in the area. I recommend using the position display debug tool to get a feel as to how this array works.
 						var md:PoolIntArray = PoolIntArray([1000, 1000, 1000, 1000, 1000])
 						var mdSize = maxDensity.size() - 1
@@ -90,13 +89,14 @@ func _ready():
 							else:
 								md[i] = int(maxDensity[i])
 						node.maxDensity = md
+						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"aiming_asteroid_shower":
 						node.number = max(event.get("number",20),0)									# The number of class 5 ringroids to spawn. Class 5 are the smallest suzed rubgriuds.
-						node.velocity = event.get("maximum_velocity",2000)							# Base maximum velocity for the ringroids, measured with 1 unit = 100 cm.
-						node.randomVelocity = event.get("random_velocity",100)						# Additional randomness added or subtracted from the velocity, measured with 1 unit = 100 cm.
+						node.velocity = event.get("maximum_velocity",200.0)*10						# Base maximum velocity for the ringroids.
+						node.randomVelocity = event.get("random_velocity",10.0)*10					# Additional randomness added or subtracted from the velocity.
 						node.angular = event.get("maximum_angular_velocity",5.0)					# Maximum angular velocity that the ringroids can be given, measured in radians per second.
-						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 						node.densityLimit = clamp(event.get("density_limit",0.2),0,1)				# The maximum raw density of the rings to permit the event to spawn, i.e. the density as would be described from the visfeed.
+						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"claim_beacon":
 						var claim = event.get("claim_beacon","res://ships/drone/ClaimBeacon.tscn")	# The scene for the claim beacon. NOTE: If using as actual claim beacons, these scenes must be unique to provide the beacon-specific dialogue trees.
 						if pointers.DataFormat.__file_exists(claim):
@@ -125,13 +125,13 @@ func _ready():
 						node.postfix = event.get("postfix","")										# String used to randomize the beacon event for setting the transponder code's suffix number. Vanilla beacons typically use the beacon event's number, but can be any string.
 						node.transponderFormat = event.get("transponder_format","%s-CB%d")			# The format the beacon's transponder will use. MUST contain both a `%s` and `%d` once each for the code and suffix respectively.
 						node.customTransponder = event.get("custom_transponder","")					# A custom transponder ID for the NPC.
-						node.customName = event.get("customName","")								# A custom ship name for the NPC.
+						node.customName = event.get("custom_name","")								# A custom ship name for the NPC.
 						node.lockOutStory = event.get("lock_out_story","")							# If set, a story flag that when reached prevents this event from ever spawning.
 						node.lockOutLimit = max(event.get("lock_out_limit",1),0)					# Minimum value for the story flag to prevent the event from spawning.
 						node.awayRadius = max(event.get("away_radius",10000),0)						# Radius which the event checks for any POI, which if any exist, prevents the event from being chosen by the storyteller.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"dead_body":
-						var beacon = event.get("claim_beacon","res://story/DeadTalkingBeacon.tscn") # The scene for the comms beacon used by the event. 
+						var beacon = event.get("beacon","res://story/DeadTalkingBeacon.tscn") # The scene for the comms beacon used by the event. 
 						if pointers.DataFormat.__file_exists(beacon):
 							node.beacon = load(beacon)
 						else:
@@ -174,11 +174,11 @@ func _ready():
 									otimes.append(i)
 						node.times = otimes
 						node.rotationVelocity = event.get("maximum_angular_velocity",0.2)			# Maximum angular velocity each body is given, measured in radians per second.
-						node.commonRandomVectorVelocity = event.get("maximum_velocity",30.0)		# Maximum velocity that the bodies are given, measured with 1 unit = 100 cm.
+						node.commonRandomVectorVelocity = event.get("maximum_velocity",3.0)*10		# Maximum velocity that the bodies are given.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"flight_for_rescue":
 						node.time = max(event.get("time",180),0)
-						node.maxLinear = event.get("maximum_velocity",100)							# Maximum random velocity that the bodies are given, measured with 1 unit = 100 cm.
+						node.maxLinear = event.get("maximum_velocity",10.0)*10						# Maximum random velocity that the bodies are given.
 						node.maxAngular = event.get("maximum_angular_velocity",2)					# Maximum angular velocity that the ship can be set to, measured in radians per second.
 						node.gauss = max(event.get("gauss",6),0)									# Power the random value used to set random linear and angular velocities to. Used as pow(randf(), gauss).
 						var derelictConversation = event.get("derelict_conversation","res://comms/conversation/DerelictConversation.tscn") # The scene for the derelict K37's comms node.
@@ -195,7 +195,7 @@ func _ready():
 						node.pirateChance = clamp(event.get("pirate_chance",0.5),0,1)				# The rock scene's base chance for a pirate encounter
 						node.crystalChance = clamp(event.get("crystal_chance",0.5),0,1)				# The rock scene's base chance for crystals to spawn
 						node.angular = max(event.get("maximum_angular_velocity",0.0025),0)			# Maximum angular velocity scale for the rock, measured in radians per second.
-						node.locationOffsetStability = max(event.get("location_offset_stability",100000),0) # Grid cell size (both x & y) to determine the POI's unique identifier, measured with 1 unit = 100 cm. 
+						node.locationOffsetStability = max(event.get("location_offset_stability",10000.0),0)*10 # Grid cell size (both x & y) to determine the POI's unique identifier.
 						node.awayRadius = max(event.get("away_radius",100000),0)					# Radius which the event checks for any POI, which if any exist, prevents the event from being chosen by the storyteller.
 						node.lockOutMyEvent = event.get("lock_out_event",false)						# Whether the event won't spawn if you have another of the same event in your POI list.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
@@ -214,7 +214,7 @@ func _ready():
 							node.knownRock = load(knownRock)
 						else:
 							node.knownRock = load("res://story/Moonlet.tscn")
-						var maxDensity = event.get("maxDensity",PoolIntArray([1000, 1000, 1000, 1000, 1000])) # The maximum perceived density of the ring at the event's spawn point, taking into account other ship events in the area. I recommend using the position display debug tool to get a feel as to how this array works.
+						var maxDensity = event.get("max_density",PoolIntArray([1000, 1000, 1000, 1000, 1000])) # The maximum perceived density of the ring at the event's spawn point, taking into account other ship events in the area. I recommend using the position display debug tool to get a feel as to how this array works.
 						var md:PoolIntArray = PoolIntArray([1000, 1000, 1000, 1000, 1000])
 						var mdSize = maxDensity.size() - 1
 						for i in range(5):
@@ -280,7 +280,7 @@ func _ready():
 						node.ship = event.get("ship_model","TRTL")									# The model for the NPC ship.
 						node.faction = event.get("ship_faction","civilian")							# The faction used by the NPC ship.
 						node.customTransponder = event.get("custom_transponder","")					# A custom transponder ID for the NPC.
-						node.customName = event.get("customName","")								# A custom ship name for the NPC.
+						node.customName = event.get("custom_name","")								# A custom ship name for the NPC.
 						node.lockoutPoi = event.get("lock_out_if_poi","")							# If set, prevents the Storyteller from spawning this event if another POI uses this name
 						node.lockOutStory = event.get("lock_out_story","")							# If set, a story flag that when reached prevents this event from ever spawning.
 						node.lockOutLimit = max(event.get("lock_out_limit",1),0)					# Minimum value for the story flag to prevent the event from spawning.
@@ -328,7 +328,7 @@ func _ready():
 						node.minimumChance = clamp(event.get("minimum_chance",1.0),0,1)				# The absolute minimum chance that the event will spawn, even with infinite cash.
 						node.moneyCeiling = max(event.get("money_ceiling",10000000.0),100000.0)		# Divisor for the total cash in bank when used to scale the random chance. Lower values means that the minimum chance is reached with lower amounts of cash in the bank.
 						node.reEncouterChance = clamp(1.0 - event.get("stock_chance",0.2),0,1)		# Chance that the derelict, and if applicable, pirate will be in pristine condition.
-						node.maxLinear = event.get("maximum_velocity",500.0)						# Maximum velocity for the derelict, measured with 1 unit = 100 cm.
+						node.maxLinear = event.get("maximum_velocity",50.0)*10						# Maximum velocity for the derelict.
 						node.maxAngular = event.get("maximum_angular_velocity",0.5)					# Maximum angular velocity for the derelict, measured in radians per second.
 						node.gauss = max(event.get("gauss",2),0)									# Power the random value used to set random linear and angular velocities to. Used as pow(randf(), gauss).
 						node.damageDerelict = event.get("damage_derelict",true)						# Whether the derelict should be damaged based on the age of the hull.
@@ -336,7 +336,7 @@ func _ready():
 						node.extraDamage = event.get("extra_damage",true)
 						node.extraKinetic = max(event.get("extra_kinetic_damage",100000.0),0)		# Scale for kinetic damage to deal to the derelict when extra_damage is enabled.
 						node.extraEmp = max(event.get("extra_emp_damage",100000.0),0)				# Scale for emp damage to deal to the derelict when extra_damage is enabled.
-						node.extraRadius = max(event.get("extra_damage_radius",100),0)				# Base radius of the circle where the point extra damage is inflicted can occur within. Measured with 1 unit = 100cm.
+						node.extraRadius = max(event.get("extra_damage_radius",10.0),0)*10			# Base radius of the circle where the point extra damage is inflicted can occur within.
 						node.specificShipName = event.get("specific_ship_name","")					# Sets a specific name for the derelict. Typically only used for POIs with params, such as SRO broadcasts.
 						node.wreck = event.get("derelict",true)										# Whether this event spawns a derelict.
 						node.rescue = event.get("rescue",true)										# Whether this event spawns a SAR CERF.
@@ -348,7 +348,7 @@ func _ready():
 						node.denseClusterChance = clamp(event.get("ringroid_cluster_chance",0.3),0,1) # The chance that the event spawns inside of a cluster of Class 1 and Class 2 ringroids.
 						node.denseClusterNumber = max(event.get("ringroid_cluster_number",33),0)	# The number of ringroids that are spawned if the event is set to spawn with any.
 						node.clump = event.get("clump_objects",false)								# Whether all the event's objects should instead clump towards the event origin.
-						node.clumpVelocity = event.get("clump_velocity",250)						# If clumping, the velocity at which all objects clump, measured with 1 unit = 100 cm.
+						node.clumpVelocity = event.get("clump_velocity",25.0)*10					# If clumping, the velocity at which all objects clump.
 						node.stormChance = clamp(event.get("storm_chance",0.3),0,1)					# The chance that the event will have a ringstorm occur.
 						node.pirateChance = clamp(event.get("pirate_chance",0.3),0,1)				# The chance that the event will have a pirate CERF spawn.
 						var stormBeacon = event.get("storm_beacon","res://story/StormBeacon.tscn") 	# The storm beacon node. Used to handle the ringstorm if it happens.
@@ -395,7 +395,7 @@ func _ready():
 						node.nrMin = max(event.get("minimum_count",2),0)							# Minimum number of miscelaneous objects that can be found.
 						node.nrMax = max(event.get("maximum_count",10),0)							# Maximum number of miscelaneous objects that can be found.
 						node.rotationVelocity = event.get("maximum_angular_velocity",0.2)			# Maximum angular velocity each body is given, measured in radians per second.
-						node.commonRandomVectorVelocity = event.get("maximum_velocity",30.0)		# Maximum velocity that the bodies are given, measured with 1 unit = 100 cm.
+						node.commonRandomVectorVelocity = event.get("maximum_velocity",3.0)*10		# Maximum velocity that the bodies are given.
 						node.miscRandomVelocity = event.get("additional_random_velocity",0)			# Maximum additional velocity that can be randomly added to each object's base velocity.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"tesla_is_floating":

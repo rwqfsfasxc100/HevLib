@@ -31,7 +31,8 @@
 # This file contains constants that match all vanilla event scripts that are currently supported by EVENT_DRIVER.gd
 # All values are their defaults. Each event also gets a basic usage blurb and mentions all events related to the
 # specific event mechanic type.
-# NOTE: All events use an `event_name` and `event_type` to define the node name and event handle respectively
+# NOTE: All events use an `event_name` and `event_type` to define the node name and event handle respectively, with
+# each event described here using the name of a vanilla event using this, but without it's specific properties.
 # All events can also make use of a `custom_property_modifications` dictionary, which gives the ability to arbritrarily
 # modify any property, useful for modifying properties not exposed through an event type's regular properties, or for 
 # modifying any properties added to an event via a mod. It is also the only way to modify properties for a custom event.
@@ -50,161 +51,302 @@ const CUSTOM_EVENT = {
 
 # 
 const agenda_specific_derelict = {
-	"event_name":"",
-	"event_type":"",
-	
+	"event_name":"DerelictSisterShip",
+	"event_type":"agenda_specific_derelict",
+	"ship_model":"AT225-R",
+	"booted_up":false,
+	"extra_damage":false,
+	"event_only":true,
+	"crew_agenda":"AGENDA_LOOKING_FOR_SIBLING",
+	"agenda_ship_name":"{agenda/ship/0/shipname}",
+	"derelict_conversation":"res://comms/conversation/AgendaDerelictConversation.tscn",
+	"extra_kinetic_damage":100000.0,
+	"extra_damage_radius":100,
+	"gauss":2,
+	"empty":false,
+	"damage_derelict":false,
+	"imperative":10,
+	"imperative_strength":20,
+	"chaos":0.0
 }
 
 # 
 const aiming_asteroid = {
-	"event_name":"",
-	"event_type":"",
-	
+	"event_name":"AsteroidCluster",
+	"event_type":"aiming_asteroid",
+	"number":1,
+	"maximum_angular_velocity":1.0,
+	"aim":true,
+	"maximum_velocity":25.0,
+	"clump":false,
+	"maxDensity":PoolIntArray([1000, 1000, 1000, 1000, 1000]),
+	"chaos":0.0
 }
 
 # 
 const aiming_asteroid_shower = {
-	"event_name":"",
-	"event_type":"",
-	
+	"event_name":"AimingAsteroidShower",
+	"event_type":"aiming_asteroid_shower",
+	"number":20,
+	"maximum_velocity":200.0,
+	"random_velocity":10.0,
+	"maximum_angular_velocity":5.0,
+	"density_limit":0.2,
+	"chaos":0.0
 }
 
 # 
 const claim_beacon = {
-	"event_name":"",
-	"event_type":"",
-	
+	"event_name":"ClaimBeacon-1",
+	"event_type":"claim_beacon",
+	"claim_beacon":"res://ships/drone/ClaimBeacon.tscn",
+	"already_claimed":"res://story/DummyBeacon.tscn",
+	"spawn_evemt":true,
+	"event_delay":30,
+	"single_event":true,
+	"postfix":"",
+	"transponder_format":"%s-CB%d"
 }
 
 # 
 const claim_beacon_foreign = {
-	"event_name":"",
-	"event_type":"",
-	
+	"event_name":"ClaimBeaconForeign",
+	"event_type":"claim_beacon_foreign",
+	"claim_beacon":"res://ships/drone/ClaimBeaconForeign.tscn",
+	"owner_ship_model":"TRTL",
+	"owner_ship_faction":"civilian",
+	"claim_beacon_faction":"civilianclaim",
+	"postfix":"",
+	"transponder_format":"%s-CB%d",
+	"custom_transponder":"",
+	"custom_name":"",
+	"lock_out_story":"",
+	"lock_out_limit":1,
+	"away_radius":10000,
+	"chaos":0.0
 }
 
 # 
 const dead_body = {
-	"event_name":"",
-	"event_type":"",
-	
+	"event_name":"DeadBody",
+	"event_type":"dead_body",
+	"beacon":"res://story/DeadTalkingBeacon.tscn",
+	"bodies":PoolStringArray([
+		"res://story/body1.tscn",
+		"res://story/body2.tscn", 
+		"res://story/body3.tscn", 
+		"res://story/body4.tscn", 
+		"res://story/body5.tscn", 
+		"res://story/body6.tscn", 
+		"res://story/body7.tscn", 
+		"res://story/body8.tscn", 
+		"res://story/body9.tscn", 
+		"res://story/body10.tscn"
+	]),
+	"minimum_count":2,
+	"maximum_count":10,
+	"times":PoolVector2Array([
+		Vector2(10, 25), 
+		Vector2(10, 26), 
+		Vector2(10, 27), 
+		Vector2(10, 28), 
+		Vector2(10, 29), 
+		Vector2(10, 31), 
+		Vector2(11, 1)
+	]),
+	"maximum_angular_velocity":0.2,
+	"maximum_velocity":3.0,
+	"chaos":0.0
 }
 
 # 
 const flight_for_rescue = {
-	"event_name":"",
-	"event_type":"",
-	
+	"event_name":"FlightForRescue",
+	"event_type":"flight_for_rescue",
+	"time":180,
+	"maximum_velocity":10.0,
+	"maximum_angular_velocity":2,
+	"gauss":6,
+	"derelict_conversation":"res://comms/conversation/DerelictConversation.tscn"
 }
 
 # 
 const humongous_hollow_rock = {
-	"event_name":"",
-	"event_type":"",
-	
+	"event_name":"Humongus",
+	"event_type":"humongous_hollow_rock",
+	"rock_scene":"res://story/Moonlet.tscn",
+	"pirate_chance":0.5,
+	"crystal_chance":0.5,
+	"maximum_angular_velocity":0.0025,
+	"location_offset_stability":10000.0,
+	"away_radius":100000,
+	"lock_out_event":false,
+	"chaos":0.0
 }
 
 # 
 const hybrid_hunter = {
-	"event_name":"",
-	"event_type":"",
-	
+	"event_name":"HybridHunterHuntingPlayer",
+	"event_type":"hybrid_hunter",
+	"minimum_capacity":0.6,
+	"minimum_money":30000,
+	"chaos":0.0
 }
 
 # 
 const instance_with_chance = {
-	"event_name":"",
-	"event_type":"",
-	
+	"event_name":"Habitat03",
+	"event_type":"instance_with_chance",
+	"rock_scene":"res://story/Moonlet.tscn",
+	"known_rock_scene":"",
+	"max_density":PoolIntArray([1000, 1000, 1000, 1000, 1000]),
+	"poi_name":"",
+	"transponder":"",
+	"custom_name":"",
+	"single":false,
+	"away_radius":100000,
+	"lock_out_story":"",
+	"lock_out_limit":1,
+	"lock_out_if_poi":"",
+	"lock_out_if_event":"",
+	"lock_out_event":false,
+	"chaos":0.0
 }
 
 # 
 const inter_crew_banter = {
-	"event_name":"",
-	"event_type":"",
-	
+	"event_name":"SalvageCall2",
+	"event_type":"inter_crew_banter",
+	"beacon":"res://story/TighbeamBeacon.tscn",
+	"away_radius":0,
+	"service_cooldown":"",
+	"chaos":0.0
 }
 
 # 
 const lifepod_is_floating = {
-	"event_name":"",
-	"event_type":"",
-	
+	"event_name":"LifepodIsFloating",
+	"event_type":"lifepod_is_floating",
+	"lifepod":"res://ships/Lifepod.tscn",
+	"processed_cargo":false,
+	"processed_cargo_max":1,
+	"processed_cargo_min":0
 }
 
 # 
 const locust_swarm = {
-	"event_name":"",
-	"event_type":"",
-	
+	"event_name":"LocustSwarm",
+	"event_type":"locust_swarm",
+	"beacon":"res://story/Locust.tscn",
+	"number":10,
+	"lock_out_story":"",
+	"lock_out_limit":1,
+	"require_story":"",
+	"require_limit":1,
+	"away_radius":0,
+	"chaos":0.0
 }
 
 # 
 const minefield = {
-	"event_name":"",
-	"event_type":"",
-	
+	"event_name":"Companions",
+	"event_type":"minefield",
+	"mine":"res://ships/drone/DroneMine.tscn",
+	"ship_limit":4,
+	"hostile":false,
+	"minimum_capacity":0.8,
+	"minimum_money":10000,
+	"chaos":0.0
 }
 
 # 
 const miner_mining = {
-	"event_name":"",
-	"event_type":"",
-	
+	"event_name":"AncientMinerMining",
+	"event_type":"miner_mining",
+	"ship_model":"TRTL",
+	"ship_faction":"civilian",
+	"custom_transponder":"",
+	"custom_name":"",
+	"lock_out_if_poi":"",
+	"lock_out_story":"",
+	"lock_out_limit":1,
+	"away_radius":10000,
+	"override_course":false,
+	"course":Vector2(0,0),
+	"chaos":0.0
 }
 
 # 
 const pirate_combat = {
-	"event_name":"",
-	"event_type":"",
-	
+	"event_name":"PirateCombat",
+	"event_type":"pirate_combat",
+	"minimum_depth_in_km":30,
+	"maximum_depth_in_km":2970,
+	"minimum_ores":0,
+	"maximum_ores":20,
+	"has_civilian":true,
+	"has_pirate":true,
+	"bounty":"res://ships/LifepodPirate.tscn",
+	"minimum_capacity":0.8,
+	"minimum_money":10000,
+	"lock_out_story":"g4a.destroyed",
+	"lock_out_limit":1,
+	"chaos":0.0
 }
 
 # 
 const pirate_trap = {
-	"event_name":"",
-	"event_type":"",
-	
+	"event_name":"PirateTrap",
+	"event_type":"pirate_trap",
+	"minimum_depth_in_km":30,
+	"maximum_depth_in_km":2970,
+	"bounty":"res://ships/LifepodPirate.tscn",
+	"lifepod":"res://ships/Lifepod.tscn",
+	"minimum_money":10000,
+	"lock_out_story":"g4a.destroyed",
+	"lock_out_limit":1,
+	"away_radius":10000,
+	"chaos":0.0
 }
 
 # 
 const rescue_operation = {
-	"event_name":"",
-	"event_type":"",
+	"event_name":"Derelict",
+	"event_type":"rescue_operation",
 	
 }
 
 # 
 const ring_race = {
-	"event_name":"",
-	"event_type":"",
+	"event_name":"RingRaceInGap",
+	"event_type":"ring_race",
 	
 }
 
 # 
 const singularity = {
-	"event_name":"",
-	"event_type":"",
+	"event_name":"Singularity",
+	"event_type":"singularity",
 	
 }
 
 # 
 const tesla_is_floating = {
-	"event_name":"",
-	"event_type":"",
+	"event_name":"TeslaIsFloating",
+	"event_type":"tesla_is_floating",
 	
 }
 
 # 
 const timed_event = {
-	"event_name":"",
-	"event_type":"",
+	"event_name":"Helloroid",
+	"event_type":"timed_event",
 	
 }
 
 # 
 const vilcy = {
-	"event_name":"",
-	"event_type":"",
+	"event_name":"VilcyPatrol",
+	"event_type":"vilcy",
 	
 }
