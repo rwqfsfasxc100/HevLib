@@ -34,9 +34,29 @@ func _ready():
 	var add_events = pointers.Equipment.event_driver_event_entries
 	for event in add_events:
 		var event_name:String = event.get("event_name","")
-		if event_name:
+		var event_type:String = event.get("event_type","")
+		if event_type == "event_delay":
+			var time = event.get("delay_time",null)
+			var tpv = typeof(time)
+			if (tpv == TYPE_INT or tpv == TYPE_REAL):
+				time = float(time)
+				match event.get("operation","set"):
+					"set":
+						odditiesEvery = max(1,time)
+					"add":
+						var newtime = odditiesEvery + time
+						odditiesEvery = max(1,newtime)
+					"subtract":
+						var newtime = odditiesEvery - time
+						odditiesEvery = max(1,newtime)
+					"multiply":
+						var newtime = odditiesEvery * time
+						odditiesEvery = max(1,newtime)
+					"divide":
+						var newtime = odditiesEvery / time
+						odditiesEvery = max(1,newtime)
+		elif event_name:
 			var do_add = true
-			var event_type:String = event.get("event_type","")
 			var node = Node.new()
 			node.name = event_name
 			if event_type == "script":
@@ -51,6 +71,8 @@ func _ready():
 					node.set_script(load(script_path))
 				else:
 					do_add = false
+			else:
+				do_add = false
 			if do_add and event_type in script_references:
 				match event_type:
 					"agenda_specific_derelict":
@@ -325,7 +347,7 @@ func _ready():
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"rescue_operation":
 						node.randomChance = clamp(event.get("random_chance",1.0),0,1)				# Base chance that the event will spawn, scaled at 0 E$
-						node.minimumChance = clamp(event.get("minimum_chance",1.0),0,1)				# The absolute minimum chance that the event will spawn, even with infinite cash.
+						node.minimumChance = clamp(event.get("minimum_chance",0.1),0,1)				# The absolute minimum chance that the event will spawn, even with infinite cash.
 						node.moneyCeiling = max(event.get("money_ceiling",10000000.0),100000.0)		# Divisor for the total cash in bank when used to scale the random chance. Lower values means that the minimum chance is reached with lower amounts of cash in the bank.
 						node.reEncouterChance = clamp(1.0 - event.get("stock_chance",0.2),0,1)		# Chance that the derelict, and if applicable, pirate will be in pristine condition.
 						node.maxLinear = event.get("maximum_velocity",50.0)*10						# Maximum velocity for the derelict.

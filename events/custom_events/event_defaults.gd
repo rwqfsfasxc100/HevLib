@@ -38,7 +38,7 @@
 # modifying any properties added to an event via a mod. It is also the only way to modify properties for a custom event.
 
 
-# If you want to add a custom event, use the following code.
+# If you want to add a custom event, use the following code using `script` as the event type.
 # Custom events make use of a `script_path` property to define the event's script.
 const CUSTOM_EVENT = {
 	"event_name":"CustomEvent",
@@ -47,6 +47,21 @@ const CUSTOM_EVENT = {
 	"custom_property_modifications":{
 		"randomChance":0.5
 	}
+}
+
+# If you want to change the timer for events, use the `event_delay` type. No event name is needed here.
+# `operation` dictates how the timer is changed.
+#   `set` uses the provided delay
+#   `add` adds the provided delay
+#   `subtract` removed the provided delay
+#   `multiply` multiplies the current time by the provided delay
+#   `divide` divides the current time by the provided delay
+#   Defaults to `set`
+# `delay_time` is the time to change the timer with, based on the operation.
+const EVENT_DELAY = {
+	"event_type":"event_delay",
+	"operation":"set",
+	"delay_time":450
 }
 
 # 
@@ -313,7 +328,32 @@ const pirate_trap = {
 const rescue_operation = {
 	"event_name":"Derelict",
 	"event_type":"rescue_operation",
-	
+	"random_chance":1.0,
+	"minimum_chance":0.1,
+	"money_ceiling":10000000.0,
+	"stock_chance":0.2,
+	"maximum_velocity":50.0,
+	"maximum_angular_velocity":0.5,
+	"gauss":2,
+	"damage_derelict":true,
+	"ship_model":"TRTL",
+	"extra_damage":true,
+	"extra_kinetic_damage":100000.0,
+	"extra_emp_damage":100000.0,
+	"extra_damage_radius":10.0,
+	"specific_ship_name":"",
+	"derelict":true,
+	"rescue":true,
+	"derelict_conversation":"res://comms/conversation/DerelictConversation.tscn",
+	"ringroid_cluster_chance":0.3,
+	"ringroid_cluster_number":33,
+	"clump_objects":false,
+	"clump_velocity":25.0,
+	"storm_chance":0.3,
+	"pirate_chance":0.3,
+	"storm_beacon":"res://story/StormBeacon.tscn",
+	"bounty":"res://ships/LifepodPirate.tscn",
+	"chaos":0.0
 }
 
 # 
