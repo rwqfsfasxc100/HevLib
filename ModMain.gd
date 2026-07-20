@@ -61,6 +61,7 @@ func _init(modLoader = ModLoader):
 		
 		
 		installScriptExtension("events/TheRing.gd")
+		installScriptExtension("events/custom_events/TheRing.gd")
 		replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
 		replaceScene("scenes/notification_driver/Notifications.tscn","res://achievement/Notifications.tscn")
 		installScriptExtension("scripts/transit_tips/TransitTip.gd")
