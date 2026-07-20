@@ -65,7 +65,6 @@ func _ready():
 		if event_name:
 			var do_add = true
 			var event_type:String = event.get("event_type","")
-			var custom_property_modifications:Dictionary = event.get("custom_property_modifications",{})
 			var node = Node.new()
 			node.name = event_name
 			if event_type == "script":
@@ -427,11 +426,57 @@ func _ready():
 						node.commonRandomVectorVelocity = event.get("maximum_velocity",30.0)		# Maximum velocity that the bodies are given, measured with 1 unit = 100 cm.
 						node.miscRandomVelocity = event.get("additional_random_velocity",0)			# Maximum additional velocity that can be randomly added to each object's base velocity.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
-					
-					
-					
+					"tesla_is_floating":
+						var tesla = event.get("tesla","res://easters/Tesla.tscn")	 				# The scene for the event object.
+						if pointers.DataFormat.__file_exists(tesla):
+							node.tesla = load(tesla)
+						else:
+							node.tesla = load("res://easters/Tesla.tscn")
+						node.myLine = event.get("event_story_flag","easters.tesla")					# Unique story for this event. This flag must be zero for the event to spawn, and once the event object is considered inside cargo bay, this flag is set to one.
+					"timed_event":
+						var rock = event.get("rock_scene","res://easters/Helloroid.tscn")			# The rock scene spawned by this event.
+						if pointers.DataFormat.__file_exists(rock):
+							node.rock = load(rock)
+						else:
+							node.rock = load("res://easters/Helloroid.tscn")
+						node.angularVelocity = event.get("maximum_angular_velocity",0.05)			# Maximum angular velocity for the derelict, measured in radians per second.
+						var times = event.get("times",PoolVector2Array([							# Array of Arrays/Vector2s that dictate the IRL dates where the event will always pass the storyteller check and not need to meet the chaos to spawn.
+							Vector2(10, 25), 
+							Vector2(10, 26), 
+							Vector2(10, 27), 
+							Vector2(10, 28), 
+							Vector2(10, 29), 
+							Vector2(10, 31), 
+							Vector2(11, 1)
+						]))
+						var otimes = PoolVector2Array()
+						for i in times:
+							match typeof(i):
+								TYPE_ARRAY:
+									if i.size() > 1:
+										otimes.append(Vector2(float(i[0]),float(i[1])))
+								TYPE_VECTOR2:
+									otimes.append(i)
+						node.times = otimes
+						node.awayRadius = max(event.get("away_radius",10000),0)						# Radius which the event checks for any POI, which if any exist, prevents the event from being chosen by the storyteller.
+						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
+					"vilcy":
+						node.depthMinKm = max(event.get("minimum_depth_in_km",0),0)					# Minimum depth that the event is permitted to spawn at, in kilometers.
+						node.depthMaxKm = max(event.get("maximum_depth_in_km",10000),0)				# Maximum depth that the event is permitted to spawn at, in kilometers.
+						node.vilcyPatroler = max(event.get("vilcyPatroler",0),0)					# 
+						node.vilcyDisabler = max(event.get("vilcyDisabler",0),0)					# 
+						node.vilcyBurner = max(event.get("vilcyBurner",0),0)						# 
+						node.vilcyLone = max(event.get("vilcyLone",0),0)							# 
+						node.initialPirates = max(event.get("initialPirates",0),0)					# 
+						node.laterPirates = max(event.get("laterPirates",0),0)						# 
+						node.pirateAbductors = max(event.get("pirateAbductors",0),0)				# 
+						node.pirateg4a = max(event.get("pirateg4a",0),0)							# 
+						node.pirateRevenger = max(event.get("pirateRevenger",0),0)					# 
+						node.vilcyRevenger = max(event.get("vilcyRevenger",0),0)					# 
+						node.loneSupport = max(event.get("loneSupport",0),0)						# 
 			
 			if do_add:
+				var custom_property_modifications:Dictionary = event.get("custom_property_modifications",{})
 				for i in custom_property_modifications:
 					if i in node:
 						node.set(i,custom_property_modifications[i])
