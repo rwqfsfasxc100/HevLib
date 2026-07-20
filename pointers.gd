@@ -6993,6 +6993,7 @@ class _NodeAccess:
 			else: pointers.l(("exiting with message: %s" % exit_message) if exit_message else "exiting",(exit_header) if (exit_header) else ("pointers.DataFormat"))
 			Debug.batchWrite()
 			pointers.storeLogCache()
+			yield(Tool.get_tree(),"idle_frame")
 			OS.kill(OS.get_process_id())
 	
 	
