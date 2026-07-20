@@ -40,3 +40,7 @@ func _ready():
 	var modpath = path.split(path.split("/")[path.split("/").size() - 1])[0]
 	menu.path = modpath + changelog
 	add_child(menu)
+	yield(get_tree(),"idle_frame")
+
+func show():
+	get_child(0).parse()

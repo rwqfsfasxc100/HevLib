@@ -54,6 +54,9 @@ func _ready():
 func _about_to_show():
 	lastFocus = get_focus_owner()
 	$base/PanelContainer/VBoxContainer/FooterButtons/Close.grab_focus()
+	yield(get_tree().create_timer(0.1),"timeout")
+	for i in tabs.get_children():
+		i.show()
 
 func show_menu():
 	popup()

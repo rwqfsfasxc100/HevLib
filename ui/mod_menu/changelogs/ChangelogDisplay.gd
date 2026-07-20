@@ -51,8 +51,8 @@ func _ready():
 	RIGHT.connect("pressed",self,"_right_pressed")
 	if operation == "singular" and path != "":
 		rect_size = get_parent().rect_size
-		yield(CurrentGame.get_tree(),"idle_frame")
-		parse()
+#		yield(CurrentGame.get_tree(),"idle_frame")
+#		parse()
 
 var refs = []
 var panelRefs = []
@@ -87,9 +87,9 @@ func parse():
 #	yield(CurrentGame.get_tree(),"idle_frame")
 	
 	if path:
-		clear()
-		if clearing:
-			yield(self,"cleared")
+#		clear()
+#		if clearing:
+#			yield(self,"cleared")
 		var panel = changelog_container.instance()
 		panelRefs.append(panel)
 		panel.rect_min_size = rect_size - Vector2(12,6)
