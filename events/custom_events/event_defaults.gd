@@ -64,7 +64,26 @@ const EVENT_DELAY = {
 	"delay_time":450
 }
 
-# 
+# Event spawning a derelict related to a specific agenda.
+# Used by the following vanilla events:
+# - DerelictSisterShip
+# Parameters:
+# - ship_model - The ship to be used for the derelict.
+# - booted_up - Whether the derelict's reactor would be online when the event is spawned.
+# - extra_damage - Whether the derelict should undergo additional, artificial damage.
+# - event_only - Whether this event should be POI only. Setting this false permits the Storyteller to randomly select it.
+# - crew_agenda - Agenda that MUST be present within your crew for the event to spawn.
+# - agenda_ship_name - Name given to the ship from translated dictionary. Hint: for a completely random name, use `{random/ship/0/shipname}`. For more information, see Tool.getTranslationDictionary().
+# - derelict_conversation - The conversation player node to use for the derelict.
+# - extra_kinetic_damage - Scale for kinetic damage to deal to the derelict when extra_damage is enabled.
+# - extra_emp_damage - Scale for emp damage to deal to the derelict when extra_damage is enabled.
+# - extra_damage_radius - Base radius of the circle where the point extra damage is inflicted can occur within.
+# - gauss - Power the random value generated for the extra damage and damage radius is multiplied by. i.e. pow(randf(), gauss).
+# - empty - Drains the derelict of all propellant.
+# - damage_derelict - Whether the derelict should be damaged based on the age of the hull.
+# - imperative - The AI mode that the derelict would boot with. Uses the AI enumeration in res://ships/ship-ctrl.gd.
+# - imperative_strength - The threshhold needed to meet for the derelict AI to change AI mode if it were to be booted.
+# - chaos - If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 const agenda_specific_derelict = {
 	"event_name":"DerelictSisterShip",
 	"event_type":"agenda_specific_derelict",
@@ -76,16 +95,29 @@ const agenda_specific_derelict = {
 	"agenda_ship_name":"{agenda/ship/0/shipname}",
 	"derelict_conversation":"res://comms/conversation/AgendaDerelictConversation.tscn",
 	"extra_kinetic_damage":100000.0,
+	"extra_emp_damage":100000.0,
 	"extra_damage_radius":100,
 	"gauss":2,
 	"empty":false,
 	"damage_derelict":false,
-	"imperative":10,
+	"imperative":15,
 	"imperative_strength":20,
 	"chaos":0.0
 }
 
 # 
+# Used by the following vanilla events:
+# - AimingAsteroid
+# - AsteroidCluster
+# - AsteroidCollision
+# Parameters:
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
 const aiming_asteroid = {
 	"event_name":"AsteroidCluster",
 	"event_type":"aiming_asteroid",
@@ -99,6 +131,15 @@ const aiming_asteroid = {
 }
 
 # 
+# Used by the following vanilla events:
+# - AimingAsteroidShower
+# Parameters:
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
 const aiming_asteroid_shower = {
 	"event_name":"AimingAsteroidShower",
 	"event_type":"aiming_asteroid_shower",
@@ -111,6 +152,17 @@ const aiming_asteroid_shower = {
 }
 
 # 
+# Used by the following vanilla events:
+# - ClaimBeacon-1
+# - ClaimBeacon-2
+# Parameters:
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
 const claim_beacon = {
 	"event_name":"ClaimBeacon-1",
 	"event_type":"claim_beacon",
@@ -124,6 +176,21 @@ const claim_beacon = {
 }
 
 # 
+# Used by the following vanilla events:
+# - ClaimBeaconForeign
+# Parameters:
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
 const claim_beacon_foreign = {
 	"event_name":"ClaimBeaconForeign",
 	"event_type":"claim_beacon_foreign",
@@ -142,6 +209,17 @@ const claim_beacon_foreign = {
 }
 
 # 
+# Used by the following vanilla events:
+# - DeadBody
+# Parameters:
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
 const dead_body = {
 	"event_name":"DeadBody",
 	"event_type":"dead_body",
@@ -175,6 +253,14 @@ const dead_body = {
 }
 
 # 
+# Used by the following vanilla events:
+# - FlightForRescue
+# Parameters:
+# - 
+# - 
+# - 
+# - 
+# - 
 const flight_for_rescue = {
 	"event_name":"FlightForRescue",
 	"event_type":"flight_for_rescue",
@@ -186,6 +272,23 @@ const flight_for_rescue = {
 }
 
 # 
+# Used by the following vanilla events:
+# - Humongus
+# - Moonlet
+# - Addlet
+# - BigMoonlet
+# - BigMoonletCaves
+# - BiggerMoonletSpelunker
+# - BiggerMoonletLocust
+# Parameters:
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
 const humongous_hollow_rock = {
 	"event_name":"Humongus",
 	"event_type":"humongous_hollow_rock",
@@ -200,6 +303,12 @@ const humongous_hollow_rock = {
 }
 
 # 
+# Used by the following vanilla events:
+# - HybridHunterHuntingPlayer
+# Parameters:
+# - 
+# - 
+# - 
 const hybrid_hunter = {
 	"event_name":"HybridHunterHuntingPlayer",
 	"event_type":"hybrid_hunter",
@@ -209,6 +318,36 @@ const hybrid_hunter = {
 }
 
 # 
+# Used by the following vanilla events:
+# - InRingRefuelling
+# - InRingRefuelling2
+# - InRingRefuelling3
+# - PhageInTransit
+# - DestroyedHabitat
+# - Habitat02
+# - Habitat03
+# - Habitat04
+# - Habitat05
+# - Habitat06
+# - Habitat07
+# - PirateStation
+# - SpaceBar
+# - Thrusteroid
+# Parameters:
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
 const instance_with_chance = {
 	"event_name":"Habitat03",
 	"event_type":"instance_with_chance",
@@ -229,6 +368,22 @@ const instance_with_chance = {
 }
 
 # 
+# Used by the following vanilla events:
+# - InterCrewBanter
+# - InterCrewBanter2
+# - InterCrewBanter3
+# - InterCrewBanter4
+# - InterCrewBanter5
+# - SalvageCall
+# - SalvageCall2
+# - SalvageCall3
+# - RingStorm
+# - XaserBurn
+# Parameters:
+# - 
+# - 
+# - 
+# - 
 const inter_crew_banter = {
 	"event_name":"SalvageCall2",
 	"event_type":"inter_crew_banter",
@@ -239,6 +394,14 @@ const inter_crew_banter = {
 }
 
 # 
+# Used by the following vanilla events:
+# - LifepodIsFloating
+# - StoragePod
+# Parameters:
+# - 
+# - 
+# - 
+# - 
 const lifepod_is_floating = {
 	"event_name":"LifepodIsFloating",
 	"event_type":"lifepod_is_floating",
@@ -249,6 +412,17 @@ const lifepod_is_floating = {
 }
 
 # 
+# Used by the following vanilla events:
+# - LocustSwarm
+# Parameters:
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
 const locust_swarm = {
 	"event_name":"LocustSwarm",
 	"event_type":"locust_swarm",
@@ -263,6 +437,17 @@ const locust_swarm = {
 }
 
 # 
+# Used by the following vanilla events:
+# - Minefield
+# - Mikefield
+# - Companions
+# Parameters:
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
 const minefield = {
 	"event_name":"Companions",
 	"event_type":"minefield",
@@ -275,6 +460,25 @@ const minefield = {
 }
 
 # 
+# Used by the following vanilla events:
+# - MinerMining
+# - AncientMinerMining
+# - AdvancedMiner
+# - AdvancedMiner2
+# - BigBadWolf
+# - BigBadWolfPatrol
+# Parameters:
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
 const miner_mining = {
 	"event_name":"AncientMinerMining",
 	"event_type":"miner_mining",
@@ -292,6 +496,23 @@ const miner_mining = {
 }
 
 # 
+# Used by the following vanilla events:
+# - PirateCombat
+# - Loot
+# Parameters:
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
 const pirate_combat = {
 	"event_name":"PirateCombat",
 	"event_type":"pirate_combat",
@@ -310,6 +531,19 @@ const pirate_combat = {
 }
 
 # 
+# Used by the following vanilla events:
+# - PirateTrap
+# Parameters:
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
 const pirate_trap = {
 	"event_name":"PirateTrap",
 	"event_type":"pirate_trap",
@@ -325,6 +559,53 @@ const pirate_trap = {
 }
 
 # 
+# Used by the following vanilla events:
+# - RescueOperation
+# - Derelict
+# - Derelict-TRTL-LCB
+# - Derelict-TRTL-R
+# - Derelict-TRTL-T
+# - Derelict44
+# - DerelictEime
+# - DerelictTitan
+# - DerelictTitan-AT225-B
+# - DerelictKitsune
+# - DerelictOCP
+# - DerelictProspector
+# - DerelictProspector-PROSPECTOR-LUX
+# - DerelictProspector-PROSPECTOR-VP
+# - DerelictProspector-PROSPECTOR-FAT
+# - DerelictCothon
+# - DerelictCothon-COTHON-CHK
+# - DerelictCothon-COTHON-LND
+# - DerelictCothon-COTHON-V
+# Parameters:
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
 const rescue_operation = {
 	"event_name":"Derelict",
 	"event_type":"rescue_operation",
@@ -357,6 +638,22 @@ const rescue_operation = {
 }
 
 # 
+# Used by the following vanilla events:
+# - RingRaceInGapCenter
+# - AtlasRandom
+# - RingRaceWithDrone
+# - RingRaceNoDrone
+# - RingRaceInGap
+# Parameters:
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
 const ring_race = {
 	"event_name":"RingRaceInGap",
 	"event_type":"ring_race",
@@ -372,6 +669,17 @@ const ring_race = {
 }
 
 # 
+# Used by the following vanilla events:
+# - Singularity
+# Parameters:
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
 const singularity = {
 	"event_name":"Singularity",
 	"event_type":"singularity",
@@ -394,6 +702,11 @@ const singularity = {
 }
 
 # 
+# Used by the following vanilla events:
+# - TeslaIsFloating
+# Parameters:
+# - 
+# - 
 const tesla_is_floating = {
 	"event_name":"TeslaIsFloating",
 	"event_type":"tesla_is_floating",
@@ -402,6 +715,15 @@ const tesla_is_floating = {
 }
 
 # 
+# Used by the following vanilla events:
+# - Skull
+# - Helloroid
+# Parameters:
+# - 
+# - 
+# - 
+# - 
+# - 
 const timed_event = {
 	"event_name":"Helloroid",
 	"event_type":"timed_event",
@@ -421,6 +743,47 @@ const timed_event = {
 }
 
 # 
+# Used by the following vanilla events:
+# - VilcyPatrol
+# - VilcyLone
+# - VilcyStrike
+# - VilcyDisabler
+# - VilcyCombat
+# - VilcyAmbush
+# - PirateG4A
+# - PirateAbductor
+# - PirateAbductorWithSupport
+# - PirateRevenger
+# - VilcyRevenger
+# - PirateRevengerTeam
+# Parameters:
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
+# - 
 const vilcy = {
 	"event_name":"VilcyPatrol",
 	"event_type":"vilcy",
