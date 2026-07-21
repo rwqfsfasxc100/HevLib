@@ -76,25 +76,25 @@ func _ready():
 			if do_add and event_type in script_references:
 				match event_type:
 					"agenda_specific_derelict":
-						node.model = event.get("ship_model","AT225-R")								# Ship model used for this event.
-						node.bootedUp = event.get("booted_up",false)								# Whether the ship would be booted up when the event is spawned.
-						node.extraDamage = event.get("extra_damage",false)							# Whether the ship should undergo additional, artificial damage.
+						node.model = event.get("ship_model","AT225-R")								# Ship model used for the derelict.
+						node.bootedUp = event.get("booted_up",false)								# Whether the derelict's reactor would be online when the event is spawned.
+						node.extraDamage = event.get("extra_damage",false)							# Whether the derelict should undergo additional, artificial damage.
 						node.eventOnly = event.get("event_only",true)								# Whether this event should be POI only. Setting this false permits the Storyteller to randomly select it.
 						node.agenda = event.get("crew_agenda","AGENDA_LOOKING_FOR_SIBLING")			# Agenda that MUST be present within your crew for the event to spawn.
 						node.shipNameAgenda = event.get("agenda_ship_name","{agenda/ship/0/shipname}") # Ship name that would be consistently given based on the specific crew agenda.
-						var derelictConversation = event.get("derelict_conversation","res://comms/conversation/AgendaDerelictConversation.tscn") # The conversation player node to use. Defaults to the missing sibling conversation.
+						var derelictConversation = event.get("derelict_conversation","res://comms/conversation/AgendaDerelictConversation.tscn") # The conversation player node to use for the derelict. Defaults to the missing sibling conversation.
 						if pointers.DataFormat.__file_exists(derelictConversation):
 							node.derelictConversation = load(derelictConversation)
 						else:
 							node.derelictConversation = load("res://comms/conversation/AgendaDerelictConversation.tscn")
-						node.extraKinetic = max(event.get("extra_kinetic_damage",100000.0),0)		# Scale for kinetic damage to deal to the ship when extra_damage is enabled.
-						node.extraEmp = max(event.get("extra_emp_damage",100000.0),0)				# Scale for emp damage to deal to the ship when extra_damage is enabled.
+						node.extraKinetic = max(event.get("extra_kinetic_damage",100000.0),0)		# Scale for kinetic damage to deal to the derelict when extra_damage is enabled.
+						node.extraEmp = max(event.get("extra_emp_damage",100000.0),0)				# Scale for emp damage to deal to the derelict when extra_damage is enabled.
 						node.extraRadius = max(event.get("extra_damage_radius",10.0),0)*10			# Base radius of the circle where the point extra damage is inflicted can occur within.
 						node.gauss = event.get("gauss",2)											# Power the random value generated for the extra damage and damage radius is multiplied by. i.e. pow(randf(), gauss).
-						node.empty = event.get("empty",false)										# Drains the ship of all propellant.
-						node.damageDerelict = event.get("damage_derelict",false)					# Whether the ship should be damaged based on the age of the hull.
-						node.imperative = max(event.get("imperative",10),0)							# The AI mode that the ship would boot with. Uses the AI enumeration in res://ships/ship-ctrl.gd.
-						node.imperativeStrength = max(event.get("imperative_strength",20),0)		# The threshhold needed to meet for the ship AI to change AI mode.
+						node.empty = event.get("empty",false)										# Drains the derelict of all propellant.
+						node.damageDerelict = event.get("damage_derelict",false)					# Whether the derelict should be damaged based on the age of the hull.
+						node.imperative = max(event.get("imperative",10),0)							# The AI mode that the derelict would boot with. Uses the AI enumeration in res://ships/ship-ctrl.gd.
+						node.imperativeStrength = max(event.get("imperative_strength",20),0)		# The threshhold needed to meet for the derelict AI to change AI mode if it were to be booted.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 					"aiming_asteroid":
 						node.number = max(event.get("number",1),0)									# The number of class 1 ringroids to spawn. Class 1 are the largest sized ringroids.
