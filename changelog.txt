@@ -15,7 +15,7 @@
 1.3.2.3=* `subtract` - Removes the time defined with `delay_time`.
 1.3.2.4=* `multiply` - Multiplies the current timer time by the value defined with `delay_time`.
 1.3.2.5=* `divide` - Divides the current timer time by the value defined with `delay_time`.
-1.4=* Since there are over 20 unique vanilla events, and many have a large number of properties, so the individual properties won't be explained here.
+1.4=* Since there are over 20 unique vanilla events, and many have a large number of properties, the individual properties won't be explained here.
 1.4.1=* A script contains examples and documentation for all events, including examples of other parts.
 1.4.2=* `res://HevLib/events/custom_events/event_defaults.gd`
 2=* Fixed title screen changelog menu having oversized spacing between labels
