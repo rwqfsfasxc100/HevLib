@@ -28,15 +28,15 @@
 # [/license]
 
 
-# This file contains constants that match all vanilla event scripts that are currently supported by EVENT_DRIVER.gd
+# This file contains constants that match all Vanilla event scripts that are currently supported by EVENT_DRIVER.gd
 # All values are their defaults. Each event also gets a basic usage blurb and mentions all events related to the
 # specific event mechanic type.
 # NOTE: All events use an `event_name` and `event_type` to define the node name and event handle respectively, with
-# each event described here using the name of a vanilla event using this, but without it's specific properties.
+# each event described here using the name of a Vanilla event using this, but without it's specific properties.
 # All events can also make use of a `custom_property_modifications` dictionary, which gives the ability to arbritrarily
 # modify any property, useful for modifying properties not exposed through an event type's regular properties, or for 
 # modifying any properties added to an event via a mod. It is also the only way to modify properties for a custom event.
-
+# Each dictionary can be validated with a `config`, `mod_requirements`, and/or `mod_incompatibilities` entry.
 
 # If you want to add a custom event, use the following code using `script` as the event type.
 # Custom events make use of a `script_path` property to define the event's script.
@@ -46,7 +46,19 @@ const CUSTOM_EVENT = {
 	"script_path":"res://HevLib/events/custom_events/custom_event.gd",
 	"custom_property_modifications":{
 		"randomChance":0.5
-	}
+	},
+	"config":{
+		"mod":"VelocityPlus",
+		"section":"VP_RING",
+		"entry":"broadcast_variations",
+		"invert":false
+	},
+	"mod_requirements":[
+		"hev.LIBRARY"
+	],
+	"mod_incompatibilities":[
+		"hev.IndustriesOfEnceladus"
+	]
 }
 
 # If you want to change the timer for events, use the `event_delay` type. No event name is needed here.
@@ -65,7 +77,7 @@ const EVENT_DELAY = {
 }
 
 # Event spawning a derelict related to a specific agenda.
-# Used by the following vanilla events:
+# Used by the following Vanilla events:
 # - DerelictSisterShip
 # Parameters:
 # - ship_model - The ship to be used for the derelict.
@@ -105,19 +117,19 @@ const agenda_specific_derelict = {
 	"chaos":0.0
 }
 
-# 
-# Used by the following vanilla events:
+# Event spawning a number of Class 1 (largest size) ringroids.
+# Used by the following Vanilla events:
 # - AimingAsteroid
 # - AsteroidCluster
 # - AsteroidCollision
 # Parameters:
-# - 
-# - 
-# - 
-# - 
-# - 
-# - 
-# - 
+# - number - The number of ringroids to spawn
+# - maximum_angular_velocity - Maximum angular velocity that the ringroid(s) can be given, measured in radians per second.
+# - aim - Whether the ringroid(s) should target the player's current trajectory.
+# - maximum_velocity - The velocity of the ringroids.
+# - clump - Whether the ringroid(s) should instead target the event's origin point. This overrides `aim`.
+# - max_density - The maximum perceived density of the ring at the event's spawn point, taking into account other ship events in the area. This is not inherently obvious, which I recommend using the position display debug tool to get a feel as to how this array works.
+# - chaos - If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 const aiming_asteroid = {
 	"event_name":"AsteroidCluster",
 	"event_type":"aiming_asteroid",
@@ -126,20 +138,20 @@ const aiming_asteroid = {
 	"aim":true,
 	"maximum_velocity":25.0,
 	"clump":false,
-	"maxDensity":PoolIntArray([1000, 1000, 1000, 1000, 1000]),
+	"max_density":PoolIntArray([1000, 1000, 1000, 1000, 1000]),
 	"chaos":0.0
 }
 
-# 
-# Used by the following vanilla events:
+# Event spawning a number of Class 5 (smallest size) ringroids.
+# Used by the following Vanilla events:
 # - AimingAsteroidShower
 # Parameters:
-# - 
-# - 
-# - 
-# - 
-# - 
-# - 
+# - number - The number of ringroids to spawn.
+# - maximum_velocity - Base maximum velocity for the ringroids.
+# - random_velocity - Additional randomness added or subtracted from the velocity.
+# - maximum_angular_velocity - Maximum angular velocity that the ringroids can be given, measured in radians per second.
+# - density_limit - The maximum raw density of the rings to permit the event to spawn, i.e. the density as would be described from the visfeed.
+# - chaos - If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 const aiming_asteroid_shower = {
 	"event_name":"AimingAsteroidShower",
 	"event_type":"aiming_asteroid_shower",
@@ -151,18 +163,18 @@ const aiming_asteroid_shower = {
 	"chaos":0.0
 }
 
-# 
-# Used by the following vanilla events:
+# Event used to handle beacons that can spawn an additional random event. These events cannot spawn naturally.
+# Used by the following Vanilla events:
 # - ClaimBeacon-1
 # - ClaimBeacon-2
 # Parameters:
-# - 
-# - 
-# - 
-# - 
-# - 
-# - 
-# - 
+# - claim_beacon - The scene for the claim beacon. NOTE: If using as actual claim beacons, these scenes must be unique to provide the beacon-specific dialogue trees.
+# - already_claimed - Fallback scene if the transponder for the event's claim beacon transponder is already an active transponder for whatever reason. The default scene should be sufficient for a fallback, but useful to override for additional handling.
+# - spawn_evemt - Whether the beacon should force an event to spawn.
+# - event_delay - Delay between the beacon event spawning and the storyteller spawning a new event.
+# - single_event - If this specific beacon event should only permit one event spawn per dive.
+# - postfix - String used to randomize the beacon event for setting the transponder code's suffix number. Vanilla beacons typically use the beacon's specific event number, but can be any string.
+# - transponder_format - The format the beacon's transponder will use. MUST contain both a `%s` and `%d` once each for the code and suffix respectively.
 const claim_beacon = {
 	"event_name":"ClaimBeacon-1",
 	"event_type":"claim_beacon",
@@ -175,8 +187,8 @@ const claim_beacon = {
 	"transponder_format":"%s-CB%d"
 }
 
-# 
-# Used by the following vanilla events:
+# Spawns a 
+# Used by the following Vanilla events:
 # - ClaimBeaconForeign
 # Parameters:
 # - 
@@ -190,7 +202,7 @@ const claim_beacon = {
 # - 
 # - 
 # - 
-# - 
+# - chaos - If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 const claim_beacon_foreign = {
 	"event_name":"ClaimBeaconForeign",
 	"event_type":"claim_beacon_foreign",
@@ -209,7 +221,7 @@ const claim_beacon_foreign = {
 }
 
 # 
-# Used by the following vanilla events:
+# Used by the following Vanilla events:
 # - DeadBody
 # Parameters:
 # - 
@@ -219,7 +231,7 @@ const claim_beacon_foreign = {
 # - 
 # - 
 # - 
-# - 
+# - chaos - If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 const dead_body = {
 	"event_name":"DeadBody",
 	"event_type":"dead_body",
@@ -253,7 +265,7 @@ const dead_body = {
 }
 
 # 
-# Used by the following vanilla events:
+# Used by the following Vanilla events:
 # - FlightForRescue
 # Parameters:
 # - 
@@ -272,7 +284,7 @@ const flight_for_rescue = {
 }
 
 # 
-# Used by the following vanilla events:
+# Used by the following Vanilla events:
 # - Humongus
 # - Moonlet
 # - Addlet
@@ -288,7 +300,7 @@ const flight_for_rescue = {
 # - 
 # - 
 # - 
-# - 
+# - chaos - If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 const humongous_hollow_rock = {
 	"event_name":"Humongus",
 	"event_type":"humongous_hollow_rock",
@@ -303,12 +315,12 @@ const humongous_hollow_rock = {
 }
 
 # 
-# Used by the following vanilla events:
+# Used by the following Vanilla events:
 # - HybridHunterHuntingPlayer
 # Parameters:
 # - 
 # - 
-# - 
+# - chaos - If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 const hybrid_hunter = {
 	"event_name":"HybridHunterHuntingPlayer",
 	"event_type":"hybrid_hunter",
@@ -318,7 +330,7 @@ const hybrid_hunter = {
 }
 
 # 
-# Used by the following vanilla events:
+# Used by the following Vanilla events:
 # - InRingRefuelling
 # - InRingRefuelling2
 # - InRingRefuelling3
@@ -347,7 +359,7 @@ const hybrid_hunter = {
 # - 
 # - 
 # - 
-# - 
+# - chaos - If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 const instance_with_chance = {
 	"event_name":"Habitat03",
 	"event_type":"instance_with_chance",
@@ -368,7 +380,7 @@ const instance_with_chance = {
 }
 
 # 
-# Used by the following vanilla events:
+# Used by the following Vanilla events:
 # - InterCrewBanter
 # - InterCrewBanter2
 # - InterCrewBanter3
@@ -383,7 +395,7 @@ const instance_with_chance = {
 # - 
 # - 
 # - 
-# - 
+# - chaos - If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 const inter_crew_banter = {
 	"event_name":"SalvageCall2",
 	"event_type":"inter_crew_banter",
@@ -394,7 +406,7 @@ const inter_crew_banter = {
 }
 
 # 
-# Used by the following vanilla events:
+# Used by the following Vanilla events:
 # - LifepodIsFloating
 # - StoragePod
 # Parameters:
@@ -412,7 +424,7 @@ const lifepod_is_floating = {
 }
 
 # 
-# Used by the following vanilla events:
+# Used by the following Vanilla events:
 # - LocustSwarm
 # Parameters:
 # - 
@@ -422,7 +434,7 @@ const lifepod_is_floating = {
 # - 
 # - 
 # - 
-# - 
+# - chaos - If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 const locust_swarm = {
 	"event_name":"LocustSwarm",
 	"event_type":"locust_swarm",
@@ -437,7 +449,7 @@ const locust_swarm = {
 }
 
 # 
-# Used by the following vanilla events:
+# Used by the following Vanilla events:
 # - Minefield
 # - Mikefield
 # - Companions
@@ -447,7 +459,7 @@ const locust_swarm = {
 # - 
 # - 
 # - 
-# - 
+# - chaos - If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 const minefield = {
 	"event_name":"Companions",
 	"event_type":"minefield",
@@ -460,7 +472,7 @@ const minefield = {
 }
 
 # 
-# Used by the following vanilla events:
+# Used by the following Vanilla events:
 # - MinerMining
 # - AncientMinerMining
 # - AdvancedMiner
@@ -478,7 +490,7 @@ const minefield = {
 # - 
 # - 
 # - 
-# - 
+# - chaos - If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 const miner_mining = {
 	"event_name":"AncientMinerMining",
 	"event_type":"miner_mining",
@@ -496,7 +508,7 @@ const miner_mining = {
 }
 
 # 
-# Used by the following vanilla events:
+# Used by the following Vanilla events:
 # - PirateCombat
 # - Loot
 # Parameters:
@@ -512,7 +524,7 @@ const miner_mining = {
 # - 
 # - 
 # - 
-# - 
+# - chaos - If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 const pirate_combat = {
 	"event_name":"PirateCombat",
 	"event_type":"pirate_combat",
@@ -531,7 +543,7 @@ const pirate_combat = {
 }
 
 # 
-# Used by the following vanilla events:
+# Used by the following Vanilla events:
 # - PirateTrap
 # Parameters:
 # - 
@@ -543,7 +555,7 @@ const pirate_combat = {
 # - 
 # - 
 # - 
-# - 
+# - chaos - If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 const pirate_trap = {
 	"event_name":"PirateTrap",
 	"event_type":"pirate_trap",
@@ -559,7 +571,7 @@ const pirate_trap = {
 }
 
 # 
-# Used by the following vanilla events:
+# Used by the following Vanilla events:
 # - RescueOperation
 # - Derelict
 # - Derelict-TRTL-LCB
@@ -605,7 +617,7 @@ const pirate_trap = {
 # - 
 # - 
 # - 
-# - 
+# - chaos - If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 const rescue_operation = {
 	"event_name":"Derelict",
 	"event_type":"rescue_operation",
@@ -638,7 +650,7 @@ const rescue_operation = {
 }
 
 # 
-# Used by the following vanilla events:
+# Used by the following Vanilla events:
 # - RingRaceInGapCenter
 # - AtlasRandom
 # - RingRaceWithDrone
@@ -669,7 +681,7 @@ const ring_race = {
 }
 
 # 
-# Used by the following vanilla events:
+# Used by the following Vanilla events:
 # - Singularity
 # Parameters:
 # - 
@@ -679,7 +691,7 @@ const ring_race = {
 # - 
 # - 
 # - 
-# - 
+# - chaos - If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 const singularity = {
 	"event_name":"Singularity",
 	"event_type":"singularity",
@@ -702,7 +714,7 @@ const singularity = {
 }
 
 # 
-# Used by the following vanilla events:
+# Used by the following Vanilla events:
 # - TeslaIsFloating
 # Parameters:
 # - 
@@ -715,7 +727,7 @@ const tesla_is_floating = {
 }
 
 # 
-# Used by the following vanilla events:
+# Used by the following Vanilla events:
 # - Skull
 # - Helloroid
 # Parameters:
@@ -723,7 +735,7 @@ const tesla_is_floating = {
 # - 
 # - 
 # - 
-# - 
+# - chaos - If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 const timed_event = {
 	"event_name":"Helloroid",
 	"event_type":"timed_event",
@@ -743,7 +755,7 @@ const timed_event = {
 }
 
 # 
-# Used by the following vanilla events:
+# Used by the following Vanilla events:
 # - VilcyPatrol
 # - VilcyLone
 # - VilcyStrike
@@ -783,7 +795,7 @@ const timed_event = {
 # - 
 # - 
 # - 
-# - 
+# - chaos - If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 const vilcy = {
 	"event_name":"VilcyPatrol",
 	"event_type":"vilcy",

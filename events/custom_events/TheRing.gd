@@ -104,7 +104,7 @@ func _ready():
 						node.aim = event.get("aim",true)											# Whether the ringroid(s) should target the player's current trajectory.
 						node.velocity = event.get("maximum_velocity",25.0)*10						# The velocity of the ringroids.
 						node.clump = event.get("clump",false)										# Whether the ringroid(s) should instead target the event's origin point. This overrides `aim`.
-						var maxDensity = event.get("maxDensity",PoolIntArray([1000, 1000, 1000, 1000, 1000])) # The maximum perceived density of the ring at the event's spawn point, taking into account other ship events in the area. I recommend using the position display debug tool to get a feel as to how this array works.
+						var maxDensity = event.get("max_density",PoolIntArray([1000, 1000, 1000, 1000, 1000])) # The maximum perceived density of the ring at the event's spawn point, taking into account other ship events in the area. I recommend using the position display debug tool to get a feel as to how this array works.
 						var md:PoolIntArray = PoolIntArray([1000, 1000, 1000, 1000, 1000])
 						var mdSize = maxDensity.size() - 1
 						for i in range(5):
@@ -238,7 +238,7 @@ func _ready():
 							node.knownRock = load(knownRock)
 						else:
 							node.knownRock = load("res://story/Moonlet.tscn")
-						var maxDensity = event.get("max_density",PoolIntArray([1000, 1000, 1000, 1000, 1000])) # The maximum perceived density of the ring at the event's spawn point, taking into account other ship events in the area. I recommend using the position display debug tool to get a feel as to how this array works.
+						var maxDensity = event.get("max_density",PoolIntArray([1000, 1000, 1000, 1000, 1000])) # The maximum perceived density of the ring at the event's spawn point, taking into account other ship events in the area. This is not inherently obvious, which I recommend using the position display debug tool to get a feel as to how this array works.
 						var md:PoolIntArray = PoolIntArray([1000, 1000, 1000, 1000, 1000])
 						var mdSize = maxDensity.size() - 1
 						for i in range(5):

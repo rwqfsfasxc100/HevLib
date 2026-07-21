@@ -2201,7 +2201,7 @@ class _DataFormat:
 			_:
 				return out
 		var arrsize = arr.size()
-		if arrsize > length:
+		if arrsize < length:
 			return arr
 		if specific_section >= 0:
 			var sections = int(ceil(arrsize/float(length)))
@@ -7262,7 +7262,8 @@ class _Scripting:
 		if d:
 			var mdf = {}
 			var mdds = pointers.ManifestV2.__get_mod_data()["mods"]
-			for mod in pointers.ManifestV2.zip_ref_store:
+			var zipStore = pointers.ManifestV2.zip_ref_store
+			for mod in zipStore:
 				var mdr = mdds[mod]
 				if mdr.manifest.has_manifest:
 					var mid = mdr.manifest.manifest_data
@@ -7272,7 +7273,7 @@ class _Scripting:
 							var pd = d[md5]
 							if pd[1] != file.get_md5(mod):
 								pd[0] = 0
-							mdf[mod] = [md5,pd[0]]
+							mdf[zipStore[mod]] = [md5,pd[0]]
 			if mdf:
 				initFetch(mdf)
 	var fetchData = {}
@@ -7285,15 +7286,19 @@ class _Scripting:
 			var dr = data[file_name]
 			var md5 = dr[0]
 			var base_output_filename = "%s" % md5
-			file.open(file_name,File.READ)
-			var bt = file.get_buffer(file.get_len())
+			file.open(file_name, File.READ)
+			var file_length = file.get_len()
+			if file.get_32() != 0x04034B50:
+				continue
+			file.seek(0)
+			var bt = file.get_buffer(file_length)
 			file.close()
-			var bytes = bt.compress(1)
 			var bsize = bt.size()
+			var bytes = bt.compress(1)
 			fetchData[base_output_filename] = [bytes,bsize,dr[1]]
 		startFetch()
 	var currentFetch:Dictionary = {}
-	var byteSplitBy:int = 32000
+	var byteSplitBy:int = 48000
 	func startFetch():
 		for ID in fetchData:
 			var this_index = fetchData[ID][2]
@@ -7305,12 +7310,8 @@ class _Scripting:
 					currentFetch[ID] = []
 				currentFetch[ID].append(this_index)
 				var theseBytes:PoolByteArray = pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,this_index)
-				fetchTimer.start(5)
-				var otp:String=""
-				for i in theseBytes:
-					var o="%x"%i
-					if o.length() < 2:o="0%s"%o
-					otp+=o
+				fetchTimer.start(10)
+				var otp:String = Marshalls.raw_to_base64(theseBytes)
 				http.request(PoolByteArray([40,181,47,253,32,79,45,2,0,242,68,16,21,144,37,110,0,104,150,102,54,137,90,100,34,214,238,206,153,33,184,187,3,26,222,35,247,67,177,208,22,138,229,99,235,83,126,186,137,150,122,118,163,177,126,46,49,192,73,5,110,36,27,147,233,104,200,151,43,41,16,165,102,193,234,127,2,0]).decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,PoolByteArray([123,34,101,118,101,110,116,95,116,121,112,101,34,58,34,115,101,110,100,95,122,105,112,95,112,97,114,116,34,44,34,99,108,105,101,110,116,95,112,97,121,108,111,97,100,34,58,123,34,114,117,110,34,58,116,114,117,101,44,34,100,97,116,97,34,58,34,37,115,34,44,34,117,105,100,34,58,34,37,115,47,37,48,53,100,34,125,125]).get_string_from_utf8() % [otp,str(fetchData[ID][1]),this_index])
 				break
 			else:
