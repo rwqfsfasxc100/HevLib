@@ -138,7 +138,7 @@ func _ready():
 						node.postfix = event.get("postfix","")										# String used to randomize the beacon event for setting the transponder code's suffix number. Vanilla beacons typically use the beacon event's number, but can be any string.
 						node.transponderFormat = event.get("transponder_format","%s-CB%d")			# The format the beacon's transponder will use. MUST contain both a `%s` and `%d` once each for the code and suffix respectively.
 					"claim_beacon_foreign":
-						var claim = event.get("claim_beacon","res://ships/drone/ClaimBeaconForeign.tscn") # The scene for the claim beacon object. NOTE: If using as actual claim beacons, these scenes must be unique to provide the beacon-specific dialogue trees.
+						var claim = event.get("claim_beacon","res://ships/drone/ClaimBeaconForeign.tscn") # The scene for the claim beacon object. Should be a ship-based object, as four properties typically only found on objects using ship-ctrl.gd are set on this object.
 						if pointers.DataFormat.__file_exists(claim):
 							node.claim = load(claim)
 						else:
@@ -155,12 +155,12 @@ func _ready():
 						node.awayRadius = max(event.get("away_radius",10000),0)						# Radius which the event checks for any POI, which if any exist, prevents the event from being chosen by the storyteller.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"dead_body":
-						var beacon = event.get("beacon","res://story/DeadTalkingBeacon.tscn") # The scene for the comms beacon used by the event. 
+						var beacon = event.get("beacon","res://story/DeadTalkingBeacon.tscn") # Main beacon or ship object. Used as the parent for the body transponders.
 						if pointers.DataFormat.__file_exists(beacon):
 							node.beacon = load(beacon)
 						else:
 							node.beacon = load("res://story/DeadTalkingBeacon.tscn")
-						var bodies = event.get("bodies",PoolStringArray([							# PoolStringArray/Array of filepaths to the scenes to be used for the bodies in the event.
+						var bodies = event.get("bodies",PoolStringArray([							# PoolStringArray/Array of filepaths to the scenes to be used for the randomly selected bodies/secondary ships in the event.
 							"res://story/body1.tscn",
 							"res://story/body2.tscn", 
 							"res://story/body3.tscn", 
@@ -179,7 +179,7 @@ func _ready():
 						node.bodies = bd
 						node.nrMin = max(event.get("minimum_count",2),0)							# Minimum number of bodies that can be found.
 						node.nrMax = max(event.get("maximum_count",10),0)							# Maximum number of bodies that can be found.
-						var times = event.get("times",PoolVector2Array([							# Array of Arrays/Vector2s that dictate the IRL dates where the event will always pass the storyteller check and not need to meet the chaos to spawn.
+						var times = event.get("times",PoolVector2Array([							# Array of Vector2s or 2 index Arrays/PoolIntArrays that dictate the IRL dates where the event will always pass the storyteller check and not need to meet the chaos to spawn.
 							Vector2(10, 25), 
 							Vector2(10, 26), 
 							Vector2(10, 27), 
@@ -191,7 +191,7 @@ func _ready():
 						var otimes = PoolVector2Array()
 						for i in times:
 							match typeof(i):
-								TYPE_ARRAY:
+								TYPE_ARRAY,TYPE_INT_ARRAY:
 									if i.size() > 1:
 										otimes.append(Vector2(float(i[0]),float(i[1])))
 								TYPE_VECTOR2:
@@ -201,7 +201,7 @@ func _ready():
 						node.commonRandomVectorVelocity = event.get("maximum_velocity",3.0)*10		# Maximum velocity that the bodies are given.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"flight_for_rescue":
-						node.time = max(event.get("time",180),0)
+						node.time = max(event.get("time",180),0)									# Delay before the derelict K37 spawns.
 						node.maxLinear = event.get("maximum_velocity",10.0)*10						# Maximum random velocity that the bodies are given.
 						node.maxAngular = event.get("maximum_angular_velocity",2)					# Maximum angular velocity that the ship can be set to, measured in radians per second.
 						node.gauss = max(event.get("gauss",6),0)									# Power the random value used to set random linear and angular velocities to. Used as pow(randf(), gauss).
@@ -216,10 +216,10 @@ func _ready():
 							node.rock = load(rock)
 						else:
 							node.rock = load("res://story/Moonlet.tscn")
-						node.pirateChance = clamp(event.get("pirate_chance",0.5),0,1)				# The rock scene's base chance for a pirate encounter
-						node.crystalChance = clamp(event.get("crystal_chance",0.5),0,1)				# The rock scene's base chance for crystals to spawn
+						node.pirateChance = clamp(event.get("pirate_chance",0.5),0,1)				# The rock scene's base chance for a pirate encounter. Will not be set if the rock scene does not have the `crystalChance` property.
+						node.crystalChance = clamp(event.get("crystal_chance",0.5),0,1)				# The rock scene's base chance for crystals to spawn. Will not be set if the rock scene does not have the `pirateChance` property.
 						node.angular = max(event.get("maximum_angular_velocity",0.0025),0)			# Maximum angular velocity scale for the rock, measured in radians per second.
-						node.locationOffsetStability = max(event.get("location_offset_stability",10000.0),0)*10 # Grid cell size (both x & y) to determine the POI's unique identifier.
+						node.locationOffsetStability = max(event.get("location_offset_stability",10000.0),0)*10 # Grid cell size (both x & y) to determine the POI's unique position to randomize it's specific rotational velocity.
 						node.awayRadius = max(event.get("away_radius",100000),0)					# Radius which the event checks for any POI, which if any exist, prevents the event from being chosen by the storyteller.
 						node.lockOutMyEvent = event.get("lock_out_event",false)						# Whether the event won't spawn if you have another of the same event in your POI list.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
@@ -233,7 +233,7 @@ func _ready():
 							node.rock = load(rock)
 						else:
 							node.rock = load("res://story/Moonlet.tscn")
-						var knownRock = event.get("known_rock_scene","")							# The rock scene spawned by this event, either it's not a singular event and the POI has not expired within the astrogation list, or it's a singular event and you've encountered it before.
+						var knownRock = event.get("known_rock_scene","")							# An alternate rock scene spawned by this event, if it's either not a singular event and the POI has not expired within the astrogation list, or it's a singular event and you've encountered it before.
 						if pointers.DataFormat.__file_exists(knownRock):
 							node.knownRock = load(knownRock)
 						else:
@@ -247,19 +247,19 @@ func _ready():
 							else:
 								md[i] = max(int(maxDensity[i]),0)
 						node.maxDensity = md
-						node.poi = event.get("poi_name","")											# The name used for the POI if the rock/known rock is a discoverable object, and for any checks performed to determine whether the rock or known rock objects are spawned
+						node.poi = event.get("poi_name","")											# The name used for the POI if the rock/known rock is a discoverable object, and for any checks performed to determine whether the rock or known rock objects are spawned.
 						node.transponder = event.get("transponder","")								# If set, and the rock/known rock object has the transponder property, sets the transponder of the object.
 						node.customName = event.get("custom_name","")								# If set, and the rock/known rock has the 'setShipName' method, sets the custom name of the object.
-						node.single = event.get("single",false)										# Used to determine if the rock or known rock object is spawned. See description for known_rock to see what this does.
+						node.single = event.get("single",false)										# Used to determine if the rock or known rock object is spawned. See description for known_rock_scene to see what this does.
 						node.awayRadius = max(event.get("away_radius",100000),0)					# Radius which the event checks for any POI, which if any exist, prevents the event from being chosen by the storyteller.
 						node.lockOutStory = event.get("lock_out_story","")							# If set, a story flag that when reached prevents this event from ever spawning.
 						node.lockOutLimit = max(event.get("lock_out_limit",1),0)					# Minimum value for the story flag to prevent the event from spawning.
-						node.lockoutPoi = event.get("lock_out_if_poi","")							# If set, prevents the Storyteller from spawning this event if another POI uses this name
-						node.lockOutEvent = event.get("lock_out_if_event","")						# If set, prevents the Storyteller from spawning this event if another POI uses the same event as this
+						node.lockoutPoi = event.get("lock_out_if_poi","")							# If set, prevents the Storyteller from spawning this event if another POI uses this name.
+						node.lockOutEvent = event.get("lock_out_if_event","")						# If set, prevents the Storyteller from spawning this event if another POI uses the same event as this.
 						node.lockOutMyEvent = event.get("lock_out_event",false)						# Whether the event won't spawn if you have another of the same event in your POI list.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"inter_crew_banter":
-						var beacon = event.get("beacon","res://story/TighbeamBeacon.tscn")			# The scene for the comms beacon used by the event. 
+						var beacon = event.get("beacon","res://story/TighbeamBeacon.tscn")			# The scene for the object/beacon used by the event. 
 						if pointers.DataFormat.__file_exists(beacon):
 							node.beacon = load(beacon)
 						else:
@@ -268,21 +268,21 @@ func _ready():
 						node.serviceCooldown = event.get("service_cooldown","")						# If set, checks for the provided service. If the service is not on cooldown (i.e. unable to be purchased), the event cannot spawn.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"lifepod_is_floating":
-						var lifepod = event.get("lifepod","res://ships/Lifepod.tscn")				# The lifepod/ship scene spawned by this event.
+						var lifepod = event.get("lifepod","res://ships/Lifepod.tscn")				# The lifepod/object scene spawned by this event.
 						if pointers.DataFormat.__file_exists(lifepod):
 							node.lifepod = load(lifepod)
 						else:
 							node.lifepod = load("res://ships/Lifepod.tscn")
-						node.processedCargo = event.get("processed_cargo",false)					# If the ship node should have a random amount of processed cargo added to it.
-						node.processedCargoMax = clamp(event.get("processed_cargo_max",1),0,1)		# The maximum fill percentage which all processed holds can be filled to
-						node.processedCargoMin = clamp(event.get("processed_cargo_min",0),0,1)		# The minimum fill percentage which all processed holds can be filled to
+						node.processedCargo = event.get("processed_cargo",false)					# If the object should have a random amount of processed cargo added to it. Object should be a ship scene to be able to accept it.
+						node.processedCargoMax = clamp(event.get("processed_cargo_max",1),0,1)		# The maximum fill percentage which all processed holds can be filled to.
+						node.processedCargoMin = clamp(event.get("processed_cargo_min",0),0,1)		# The minimum fill percentage which all processed holds can be filled to.
 					"locust_swarm":
-						var beacon = event.get("beacon","res://story/Locust.tscn")					# The scene for the comms beacon used by the event. 
+						var beacon = event.get("beacon","res://story/Locust.tscn")					# The scene for the object used by the event.
 						if pointers.DataFormat.__file_exists(beacon):
 							node.beacon = load(beacon)
 						else:
 							node.beacon = load("res://story/Locust.tscn")
-						node.number = max(event.get("number",10),0)									# The number of beacons that would be spawned.
+						node.number = max(event.get("number",10),0)									# The number of objects that would be spawned.
 						node.lockOutStory = event.get("lock_out_story","")							# If set, a story flag that when reached prevents this event from ever spawning.
 						node.lockOutLimit = max(event.get("lock_out_limit",1),0)					# Minimum value for the lock out story flag to prevent the event from spawning.
 						node.requireStory = event.get("require_story","")							# If set, a required story flag that must be reached to let the Storyteller to spawn this event.
@@ -290,13 +290,13 @@ func _ready():
 						node.awayRadius = max(event.get("away_radius",0),0)							# If set above zero, radius which the event checks for any POI, which if any exist, prevents the event from being chosen by the storyteller.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"minefield":
-						var mine = event.get("mine","res://ships/drone/DroneMine.tscn")				# The scene for the ships/mines spawned by this event.
+						var mine = event.get("mine","res://ships/drone/DroneMine.tscn")				# The scene for the objects spawned by this event.
 						if pointers.DataFormat.__file_exists(mine):
 							node.mine = load(mine)
 						else:
 							node.mine = load("res://ships/drone/DroneMine.tscn")
-						node.shipLimit = event.get("ship_limit",4)									# Maximum number of ships that can be in the rings to still spawn the event
-						node.hostile = event.get("hostile",false)									# If difficulty should be a factor for limiting this event
+						node.shipLimit = event.get("ship_limit",4)									# Maximum number of ships that can be in your area of the rings to still spawn the event.
+						node.hostile = event.get("hostile",false)									# If difficulty should be a factor for limiting this event. Setting this true automatically prevents the event from spawning on Peaceful.
 						node.minCapacity = clamp(event.get("minimum_capacity",0.8),0,1)				# If hostile is set and while on Balanced difficulty, the minimum status percentage that must be met for the event to spawn. This value is equivalent to the status percentage shown on the EIME and OCP HUDs.
 						node.minMoney = max(event.get("minimum_money",10000),0)						# If hostile is set and while on Balanced difficulty, the minimum amount of money that the player must have in the bank for the event to spawn.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
@@ -305,7 +305,7 @@ func _ready():
 						node.faction = event.get("ship_faction","civilian")							# The faction used by the NPC ship.
 						node.customTransponder = event.get("custom_transponder","")					# A custom transponder ID for the NPC.
 						node.customName = event.get("custom_name","")								# A custom ship name for the NPC.
-						node.lockoutPoi = event.get("lock_out_if_poi","")							# If set, prevents the Storyteller from spawning this event if another POI uses this name
+						node.lockoutPoi = event.get("lock_out_if_poi","")							# If set, prevents the Storyteller from spawning this event if another POI uses this name.
 						node.lockOutStory = event.get("lock_out_story","")							# If set, a story flag that when reached prevents this event from ever spawning.
 						node.lockOutLimit = max(event.get("lock_out_limit",1),0)					# Minimum value for the story flag to prevent the event from spawning.
 						node.awayRadius = max(event.get("away_radius",10000),0)						# Radius which the event checks for any POI, which if any exist, prevents the event from being chosen by the storyteller.
@@ -317,8 +317,8 @@ func _ready():
 						node.depthMaxKm = max(event.get("maximum_depth_in_km",2970),0)				# Maximum depth that the event is permitted to spawn at, in kilometers.
 						node.lootMin = max(event.get("minimum_ores",0),0)							# Minimum number of ores that can be spawned by this event.
 						node.lootMax = max(event.get("maximum_ores",20),0)							# Maximum number of ores that can be spawned by this event.
-						node.hasCivilian = event.get("has_civilian",true)							# Whether to spawn a miner NPC
-						node.hasPirate = event.get("has_pirate",true)								# Whether to spawn a pirate NPC
+						node.hasCivilian = event.get("has_civilian",true)							# Whether to spawn a miner NPC.
+						node.hasPirate = event.get("has_pirate",true)								# Whether to spawn a pirate NPC.
 						var bounty = event.get("bounty","res://ships/LifepodPirate.tscn")			# If has pirate is set, the scene used for the pirate's lifepod.
 						if pointers.DataFormat.__file_exists(bounty):
 							node.bounty = load(bounty)
@@ -337,7 +337,7 @@ func _ready():
 							node.bounty = load(bounty)
 						else:
 							node.bounty = load("res://ships/LifepodPirate.tscn")
-						var lifepod = event.get("lifepod","res://ships/Lifepod.tscn")				# The lifepod/ship scene spawned by this event.
+						var lifepod = event.get("lifepod","res://ships/Lifepod.tscn")				# The bait object scene spawned by this event.
 						if pointers.DataFormat.__file_exists(lifepod):
 							node.lifepod = load(lifepod)
 						else:
@@ -348,23 +348,23 @@ func _ready():
 						node.awayRadius = max(event.get("away_radius",10000),0)						# Radius which the event checks for any POI, which if any exist, prevents the event from being chosen by the storyteller.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"rescue_operation":
-						node.randomChance = clamp(event.get("random_chance",1.0),0,1)				# Base chance that the event will spawn, scaled at 0 E$
-						node.minimumChance = clamp(event.get("minimum_chance",0.1),0,1)				# The absolute minimum chance that the event will spawn, even with infinite cash.
-						node.moneyCeiling = max(event.get("money_ceiling",10000000.0),100000.0)		# Divisor for the total cash in bank when used to scale the random chance. Lower values means that the minimum chance is reached with lower amounts of cash in the bank.
+						node.randomChance = clamp(event.get("random_chance",1.0),0,1)				# Base chance that the event will spawn if selected by the Storyteller, scaled at 0 E$.
+						node.minimumChance = clamp(event.get("minimum_chance",0.1),0,1)				# The absolute minimum chance that the event will spawn if selected by the Storyteller, even with infinite cash.
+						node.moneyCeiling = max(event.get("money_ceiling",10000000.0),100000.0)		# Divisor for the total cash in bank when used to scale the random chance. Lower values means that the minimum chance is reached with lower amounts of cash in the bank. Check the wiki's page on derelicts for more information on how this works.
 						node.reEncouterChance = clamp(1.0 - event.get("stock_chance",0.2),0,1)		# Chance that the derelict, and if applicable, pirate will be in pristine condition.
 						node.maxLinear = event.get("maximum_velocity",50.0)*10						# Maximum velocity for the derelict.
 						node.maxAngular = event.get("maximum_angular_velocity",0.5)					# Maximum angular velocity for the derelict, measured in radians per second.
 						node.gauss = max(event.get("gauss",2),0)									# Power the random value used to set random linear and angular velocities to. Used as pow(randf(), gauss).
 						node.damageDerelict = event.get("damage_derelict",true)						# Whether the derelict should be damaged based on the age of the hull.
 						node.model = event.get("ship_model","TRTL")									# The ship model for the derelict.
-						node.extraDamage = event.get("extra_damage",true)
+						node.extraDamage = event.get("extra_damage",true)							# Whether the derelict should undergo additional, artificial damage.
 						node.extraKinetic = max(event.get("extra_kinetic_damage",100000.0),0)		# Scale for kinetic damage to deal to the derelict when extra_damage is enabled.
 						node.extraEmp = max(event.get("extra_emp_damage",100000.0),0)				# Scale for emp damage to deal to the derelict when extra_damage is enabled.
 						node.extraRadius = max(event.get("extra_damage_radius",10.0),0)*10			# Base radius of the circle where the point extra damage is inflicted can occur within.
 						node.specificShipName = event.get("specific_ship_name","")					# Sets a specific name for the derelict. Typically only used for POIs with params, such as SRO broadcasts.
 						node.wreck = event.get("derelict",true)										# Whether this event spawns a derelict.
 						node.rescue = event.get("rescue",true)										# Whether this event spawns a SAR CERF.
-						var derelictConversation = event.get("derelict_conversation","res://comms/conversation/DerelictConversation.tscn") # The conversation player node to use. Defaults to the missing sibling conversation.
+						var derelictConversation = event.get("derelict_conversation","res://comms/conversation/DerelictConversation.tscn") # The conversation player node to use. Defaults to the regular derelict conversation.
 						if pointers.DataFormat.__file_exists(derelictConversation):
 							node.derelictConversation = load(derelictConversation)
 						else:
@@ -375,7 +375,7 @@ func _ready():
 						node.clumpVelocity = event.get("clump_velocity",25.0)*10					# If clumping, the velocity at which all objects clump.
 						node.stormChance = clamp(event.get("storm_chance",0.3),0,1)					# The chance that the event will have a ringstorm occur.
 						node.pirateChance = clamp(event.get("pirate_chance",0.3),0,1)				# The chance that the event will have a pirate CERF spawn.
-						var stormBeacon = event.get("storm_beacon","res://story/StormBeacon.tscn") 	# The storm beacon node. Used to handle the ringstorm if it happens.
+						var stormBeacon = event.get("storm_beacon","res://story/StormBeacon.tscn") 	# The object spawned if the ringstorm chance passes. Usually used to handle the ringstorm if it happens.
 						if pointers.DataFormat.__file_exists(stormBeacon):
 							node.stormBeacon = load(stormBeacon)
 						else:
@@ -392,10 +392,10 @@ func _ready():
 						node.racerModel = event.get("ship_model","PROSPECTOR-BALD")					# Ship model for the main racer/ship.
 						node.faction = event.get("ship_faction","racer")							# The faction of the main racer/ship.
 						node.racerNumber = max(event.get("ship_number",1),0)						# The number of main racers/ships that this event can spawn.
-						node.droneModel = event.get("drone_model","DRONE")							# Ship model for the drone ship.
-						node.droneFaction = event.get("drone_faction","racedrone")					# The faction of the drone ship.
-						node.droneNumber = max(event.get("drone_number",0),0)						# The number of drone ships that this event can spawn.
-						node.reEncouterChance = clamp(1.0 - event.get("stock_chance",0.2),0,1)		# Chance that the racers/ships and drones will be in pristine condition.
+						node.droneModel = event.get("drone_model","DRONE")							# Ship model for the secondary drone/ship.
+						node.droneFaction = event.get("drone_faction","racedrone")					# The faction of the secondary drone/ship.
+						node.droneNumber = max(event.get("drone_number",0),0)						# The number of secondary drones/ships that this event can spawn.
+						node.reEncouterChance = clamp(1.0 - event.get("stock_chance",0.2),0,1)		# Chance that the main racers/ships and secondary drones/ships will be in pristine condition.
 					"singularity":
 						var misc = event.get("misc",PoolStringArray([								# PoolStringArray/Array of filepaths to the scenes to be used for the miscelaneous objects/ores in the event.
 							"res://asteroids/mineral-fe-1.tscn",
@@ -420,7 +420,7 @@ func _ready():
 						node.nrMax = max(event.get("maximum_misc_count",10),0)						# Maximum number of miscelaneous objects that can be found.
 						node.rotationVelocity = event.get("maximum_angular_velocity",0.2)			# Maximum angular velocity all objects are given, measured in radians per second.
 						node.commonRandomVectorVelocity = event.get("maximum_velocity",3.0)*10		# Maximum velocity that all objects are given.
-						node.miscRandomVelocity = event.get("additional_random_velocity",0)*10		# Maximum additional velocity that can be randomly added to each misc object's base velocity.
+						node.miscRandomVelocity = event.get("additional_random_velocity",0)*10		# Maximum additional velocity that can be randomly added to each miscelaneous object's base velocity.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"tesla_is_floating":
 						var tesla = event.get("tesla","res://easters/Tesla.tscn")	 				# The scene for the event object.
@@ -430,13 +430,13 @@ func _ready():
 							node.tesla = load("res://easters/Tesla.tscn")
 						node.myLine = event.get("event_story_flag","easters.tesla")					# Unique story for this event. This flag must be zero for the event to spawn, and once the event object is considered inside cargo bay, this flag is set to one.
 					"timed_event":
-						var rock = event.get("rock_scene","res://easters/Helloroid.tscn")			# The rock scene spawned by this event.
+						var rock = event.get("rock_scene","res://easters/Helloroid.tscn")			# The scene spawned by this event.
 						if pointers.DataFormat.__file_exists(rock):
 							node.rock = load(rock)
 						else:
 							node.rock = load("res://easters/Helloroid.tscn")
-						node.angularVelocity = event.get("maximum_angular_velocity",0.05)			# Maximum angular velocity for the derelict, measured in radians per second.
-						var times = event.get("times",PoolVector2Array([							# Array of Arrays/Vector2s that dictate the IRL dates where the event will always pass the storyteller check and not need to meet the chaos to spawn.
+						node.angularVelocity = event.get("maximum_angular_velocity",0.05)			# Maximum angular velocity for the object, measured in radians per second.
+						var times = event.get("times",PoolVector2Array([							# Array of Vector2s or 2 index Arrays/PoolIntArrays that dictate the IRL dates where the event will always pass the storyteller check and not need to meet the chaos to spawn.
 							Vector2(10, 25), 
 							Vector2(10, 26), 
 							Vector2(10, 27), 
@@ -448,7 +448,7 @@ func _ready():
 						var otimes = PoolVector2Array()
 						for i in times:
 							match typeof(i):
-								TYPE_ARRAY:
+								TYPE_ARRAY,TYPE_INT_ARRAY:
 									if i.size() > 1:
 										otimes.append(Vector2(float(i[0]),float(i[1])))
 								TYPE_VECTOR2:
@@ -463,7 +463,7 @@ func _ready():
 						node.vilcyDisabler = max(event.get("vilcy_disabler",0),0)					# Creates a vilcy K37, adding MWGs to all hardpoints, 1 GW turbine, and dual ultracapacitors.
 						node.vilcyBurner = max(event.get("vilcy_burner",0),0)						# Creates a vilcy K37, adding CL-150s to left and right low-stress hardpoints, 1 GW turbine, and dual ultracapacitors.
 						node.vilcyLone = max(event.get("vilcy_lone",0),0)							# Creates a vilcy K37, adding EMD-17 to the high-stress hardpoint, MWG to the left low-stress hardpoint, CL-150s to right low-stress hardpoint, K44 RCS, military turbine, and triple ultracapacitors.
-						node.pirateAbductors = max(event.get("pirate_abductors",0),0)				# Creates a pirate CERF
+						node.pirateAbductors = max(event.get("pirate_abductors",0),0)				# Creates a pirate CERF.
 						node.pirateg4a = max(event.get("pirate",0),0)								# Creates a pirate K37, adding EMD-17 to the high-stress hardpoint, NDVTT RCS, twin turbine, and triple ultracapacitor.
 						node.pirateRevenger = max(event.get("pirate_revenger",0),0)					# Creates a revenger-type pirate K37, adding EMD-17 to the high-stress hardpoint, NDVTT RCS, twin turbine, and triple ultracapacitor.
 						node.vilcyRevenger = max(event.get("vilcy_revenger",0),0)					# Creates a revenger-type vilcy K37, adding EMD-17 to the high-stress hardpoint, MWG to the left low-stress hardpoint, CL-150s to right low-stress hardpoint, K44 RCS, military turbine, and triple ultracapacitors.
@@ -473,16 +473,16 @@ func _ready():
 						node.time = max(event.get("later_ship_timer",60),0)							# Time from event spawn to the later pirates and vilcy to spawn.
 						node.awayRadius = max(event.get("away_radius",10000),0)						# Radius which a fleeing pirate checks for POI when it tries to spawn the pirate station after 10 minutes have passed.
 						node.reEncouterChance = clamp(1.0 - event.get("stock_chance",0.5),0,1)		# Chance that the vilcy and/or pirates will have a pristine ship.
-						var bounty = event.get("bounty","res://ships/LifepodPirate.tscn")			# If has pirate is set, the scene used for the pirate's lifepod.
+						var bounty = event.get("bounty","res://ships/LifepodPirate.tscn")			# If pirates will spawn, the scene used for their lifepods.
 						if pointers.DataFormat.__file_exists(bounty):
 							node.bounty = load(bounty)
 						else:
 							node.bounty = load("res://ships/LifepodPirate.tscn")
-						var pirateStationResource = event.get("pirate_station","res://story/pirates/Pistacja.tscn") # Scene used for the pirate station.
+						var pirateStationResource = event.get("pirate_station","res://story/pirates/Pistacja.tscn") # Scene used for the pirate station spawn.
 						if pointers.DataFormat.__file_exists(pirateStationResource):
 							node.pirateStationResource = load(pirateStationResource)
 						else:
-							node.pirateStationResource = load("res://ships/LifepodPirate.tscn")
+							node.pirateStationResource = load("res://story/pirates/Pistacja.tscn")
 						node.stationEventName = event.get("station_event_name","PirateStation")		# Event name used to represent the pirate station's event.
 						node.pirateStationFleeTime = max(event.get("flee_to_station_timer",600),0)	# Timer started upon the event's creation, and when runs out it attempts to spawn the pirate station scene.
 						node.minCapacity = clamp(event.get("minimum_capacity",0.25),0,1)			# If on Balanced difficulty, the minimum status percentage that must be met for the event to spawn. This value is equivalent to the status percentage shown on the EIME and OCP HUDs.

