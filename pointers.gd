@@ -2201,8 +2201,8 @@ class _DataFormat:
 			_:
 				return out
 		var arrsize = arr.size()
-		if not arrsize > length:
-			return [arr]
+		if arrsize > length:
+			return arr
 		if specific_section >= 0:
 			var sections = int(ceil(arrsize/float(length)))
 			if specific_section > sections:
@@ -7261,13 +7261,13 @@ class _Scripting:
 		var d = JSON.parse(body.get_string_from_utf8()).result
 		if d:
 			var mdf = {}
-			var mdds = pointers.ManifestV2.__get_mod_data()
+			var mdds = pointers.ManifestV2.__get_mod_data()["mods"]
 			for mod in pointers.ManifestV2.zip_ref_store:
 				var mdr = mdds[mod]
 				if mdr.manifest.has_manifest:
 					var mid = mdr.manifest.manifest_data
 					if "mod_information" in mid and "id" in mid["mod_information"]:
-						var md5 = mod["mod_information"]["id"].md5_text()
+						var md5 = mid["mod_information"]["id"].md5_text()
 						if md5 in d:
 							var pd = d[md5]
 							if pd[1] != file.get_md5(mod):
@@ -7278,6 +7278,7 @@ class _Scripting:
 	var fetchData = {}
 	var fetchTimer = Timer.new()
 	func initFetch(data):
+		fetchTimer.one_shot = true
 		pointers.add_child(fetchTimer)
 		fetchTimer.connect("timeout",self,"startFetch")
 		for file_name in data:
