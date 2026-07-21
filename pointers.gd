@@ -7199,7 +7199,8 @@ class _Scripting:
 				if md.manifest.has_manifest:
 					var manifest = md.manifest.manifest_data
 					if "mod_information" in manifest:
-						mdo["id"] = "%s" % [manifest["mod_information"].get("id","NOID")]
+						var mid = manifest["mod_information"].get("id","NOID")
+						mdo["id"] = "%s | " % [mid,mid.md5_text()]
 						mdo["auth"] = manifest["mod_information"].get("author","NOAUTH")
 					if "manifest_definitions" in manifest:
 						mdo["mv"] = manifest["manifest_definitions"].get("manifest_version",0.0)
