@@ -93,7 +93,7 @@ func _ready():
 						node.gauss = event.get("gauss",2)											# Power the random value generated for the extra damage and damage radius is multiplied by. i.e. pow(randf(), gauss).
 						node.empty = event.get("empty",false)										# Drains the derelict of all propellant.
 						node.damageDerelict = event.get("damage_derelict",false)					# Whether the derelict should be damaged based on the age of the hull.
-						node.imperative = max(event.get("imperative",10),0)							# The AI mode that the derelict would boot with. Uses the AI enumeration in res://ships/ship-ctrl.gd.
+						node.imperative = max(event.get("imperative",15),0)							# The AI mode that the derelict would boot with. Uses the AI enumeration in res://ships/ship-ctrl.gd.
 						node.imperativeStrength = max(event.get("imperative_strength",20),0)		# The threshhold needed to meet for the derelict AI to change AI mode if it were to be booted.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# If available to spawn through the Storyteller, the minimum chaos needed to spawn the event.
 					"aiming_asteroid":
