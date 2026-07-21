@@ -33,6 +33,8 @@ func _ready():
 	var pointers = ModLoader._savedObjects[0]
 	var add_events = pointers.Equipment.event_driver_event_entries
 	for event in add_events:
+		if not pointers.ConfigDriver.__validate_dictionary(event):
+			continue
 		var event_name:String = event.get("event_name","")
 		var event_type:String = event.get("event_type","")
 		if event_type == "event_delay":
