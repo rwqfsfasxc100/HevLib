@@ -5796,7 +5796,22 @@ class _ManifestV2:
 			var tlData : Dictionary = drivers["REPLACE_TRANSLATIONS.gd"]["TRANSLATIONS"]
 			ml = tlData.get("master_locale","en")
 			tlData.erase("master_locale")
-			tlData.erase("file")
+			if "file" in tlData:
+				var tlFiles = tlData["file"]
+				for tl in tlFiles:
+					var d = tlFiles[tl]
+					var delim = "|"
+					match typeof(d):
+						TYPE_STRING:
+							delim = d
+						TYPE_DICTIONARY:
+							delim = d.get("string",delim)
+					var dict = pointers.Translations.__translation_file_to_dictionary(tl,delim)
+					for ln in dict:
+						if not ln in tlData:
+							tlData[ln] = {}
+						tlData[ln].merge(dict[ln])
+				tlData.erase("file")
 			var master_locale : Dictionary = tlData.get(ml,{})
 			var total : int = master_locale.size()
 			var counts : Dictionary = {ml:{"has":total,"missing":0,"not_updated":0}}
@@ -7858,6 +7873,26 @@ class _Translations:
 				if "master_locale" in translations:
 					master_locale = translations["master_locale"]
 					translations.erase("master_locale")
+				if "file" in translations:
+					var tlFiles = translations["file"]
+					for tl in tlFiles:
+						var d = tlFiles[tl]
+						var delim:String = "|"
+						var operate:bool = true
+						match typeof(d):
+							TYPE_STRING:
+								delim = d
+							TYPE_DICTIONARY:
+								delim = d.get("string",delim)
+								if not pointers.ConfigDriver.__validate_dictionary(d):
+									operate = false
+						if operate:
+							var dict:Dictionary = __translation_file_to_dictionary(tl,delim)
+							for lang in dict:
+								if not lang in translations:
+									translations[lang] = {}
+								translations[lang].merge(dict[lang])
+					translations.erase("file")
 				for language in translations:
 					var check_ml:bool = false
 					var lang = translations[language]
@@ -7887,38 +7922,7 @@ class _Translations:
 								ml_check_data[language]["not_in_master"].append(t)
 								ml_check_data[language]["not_in_master_size"] += 1
 						data[language][t] = v
-		if "file" in data:
-			var dv = data["file"].duplicate(true)
-			data.erase("file")
-			for t in dv:
-				var delim = dv[t]
-				match typeof(delim):
-					TYPE_STRING:
-						var dict:Dictionary = __translation_file_to_dictionary(t,delim)
-						for lp in dict:
-							if not lp in data:
-								data[lp] = {}
-							for translation in dict[lp]:
-								data[lp].merge({translation:dict[lp][translation]},true)
-					TYPE_DICTIONARY:
-						var string:String = delim.get("string","")
-						var mod:String = delim.get("mod","")
-						var section:String = delim.get("section","")
-						var setting:String = delim.get("setting","")
-						var invert:bool = delim.get("invert",false)
-						var val = pointers.ConfigDriver.__get_value(mod,section,setting)
-						var do:bool = true
-						if typeof(val) == TYPE_BOOL:
-							do = val
-						if invert:
-							do = !do
-						if do and string:
-							var dict:Dictionary = __translation_file_to_dictionary(t,string)
-							for lp in dict:
-								if not lp in data:
-									data[lp] = {}
-								for translation in dict[lp]:
-									data[lp].merge({translation:dict[lp][translation]},true)
+		
 		# April Fool's alcohol!
 		var date = Time.get_date_dict_from_system()
 		if date.month == 4 and date.day == 1:
