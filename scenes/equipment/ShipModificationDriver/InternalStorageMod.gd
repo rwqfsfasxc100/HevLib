@@ -345,26 +345,27 @@ func _enter_tree():
 	for amnt in droneData:
 		nanoDeliveryPerSecond[float(amnt)] = droneData[amnt]
 func _ready():
-	l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [ammo_add, nano_add, propellant_add])
-	if propellant_add != 0:
-		hl_ism_addPropellantCapacity(propellant_add)
-	if ammo_add != 0:
-		addAmmoCapacity(ammo_add)
-	if nano_add != 0:
-		addDronesCapacity(nano_add)
-	l("Modifying consumables multiplicatively")
-	if ammo_multi != 1.0:
-		var val = 0
-		val = (massDriverAmmoMax * ammo_multi) - massDriverAmmoMax
-		addAmmoCapacity(val)
-	if nano_multi != 1.0:
-		var val = 0
-		val = (dronePartsMax * nano_multi) - dronePartsMax
-		addDronesCapacity(val)
-	if propellant_multi != 1.0:
-		var val = 0
-		val = (reactiveMassMax * propellant_multi) - reactiveMassMax
-		hl_ism_addPropellantCapacity(val)
+	if initialize:
+		l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [ammo_add, nano_add, propellant_add])
+		if propellant_add != 0:
+			addPropellantCapacity(propellant_add)
+		if ammo_add != 0:
+			addAmmoCapacity(ammo_add)
+		if nano_add != 0:
+			addDronesCapacity(nano_add)
+		l("Modifying consumables multiplicatively")
+		if ammo_multi != 1.0:
+			var val = 0
+			val = (massDriverAmmoMax * ammo_multi) - massDriverAmmoMax
+			addAmmoCapacity(val)
+		if nano_multi != 1.0:
+			var val = 0
+			val = (dronePartsMax * nano_multi) - dronePartsMax
+			addDronesCapacity(val)
+		if propellant_multi != 1.0:
+			var val = 0
+			val = (reactiveMassMax * propellant_multi) - reactiveMassMax
+			addPropellantCapacity(val)
 	nanodroneMagazine = float(getConfig("drones.capacity",0.0))
 	massDriverMagazine = float(getConfig("ammo.capacity", 0.0))
 	
@@ -457,7 +458,7 @@ func addDronesCapacity(kg: float):
 		kg += change
 	.addDronesCapacity(kg)
 
-func hl_ism_addPropellantCapacity(kg: float):
+func addPropellantCapacity(kg: float):
 	var change = reactiveMassMax + kg
 	if change < 0:
 		kg += change
