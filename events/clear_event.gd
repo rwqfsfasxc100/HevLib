@@ -40,7 +40,7 @@ func clear_event(event : String, ring, clear_related_poi : bool = true,clear_in_
 					
 	elif event in ring.group:
 		var events = ring.group[event]
-		if events.size():
+		if events:
 			for e in events:
 				if Tool.claim(e):
 					if e.is_node_ready() and clear_if_cargo(e,clear_in_cargo):

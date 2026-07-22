@@ -118,9 +118,9 @@ func oddity_spawning(nearby, oddity):
 			if not nearby in group:
 				group[nearby] = []
 			if not oddity in group[nearby]:
-				group[nearby].append(oddity)
+				group[nearby].append(o)
 			if not oddity in all_oddities:
-				all_oddities.append(oddity)
+				all_oddities.append(o)
 	else:
 		if not nearby in group:
 			group[nearby] = []

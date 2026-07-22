@@ -1,3 +1,7 @@
+[1.15.16]
+
+1=* Fixed issue where several events could not be cleared through the EventDriver menu.
+
 [1.15.15]
 
 1=* Fixed crash caused by drag-dropping modpacks.
