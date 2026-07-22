@@ -1,7 +1,7 @@
 [1.15.17]
 
 1=* Fixed issue where ammo, drones, and propellant from equipment adding it with `MODIFY_INTERNALS.gd` was installed, even if a ship was set to not initialize.
-1.1=* This was especially noticable with derelicts, as the propellant given would let the ship boot up with a ghost crew, even despite what any crew sent over would say otherwise.
+1.1=* This was especially noticeable with derelicts, as the propellant given would let the ship boot up with a ghost crew, even despite what any crew sent over would say otherwise.
 
 [1.15.16]
 
