@@ -1,3 +1,7 @@
+[1.15.18]
+
+1=* Fixed crash caused by `file` type translation dictionaries not being properly parsed for modlet entries.
+
 [1.15.17]
 
 1=* Fixed issue where ammo, drones, and propellant from equipment adding it with `MODIFY_INTERNALS.gd` was installed, even if a ship was set to not initialize.
