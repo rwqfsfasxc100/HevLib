@@ -42,10 +42,10 @@ func get_property_value():
 
 func set_property_value(property):
 	if property is Color:
-		var cr = $PanelContainer/ColorRect
-		var cp = $AcceptDialog/PanelContainer/ColorPicker
-		cr.color = Color(property.r,property.g,property.b,property.a)
-		cp.color = Color(property.r,property.g,property.b,property.a)
+		var col = Color(property.r,property.g,property.b,property.a)
+		value = col
+		$PanelContainer/ColorRect.color = col
+		$AcceptDialog/PanelContainer/ColorPicker.color = col
 		
 
 func _ready():

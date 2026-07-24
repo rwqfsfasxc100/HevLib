@@ -36,6 +36,7 @@ color = Color( 0, 0, 0, 1 )
 margin_left = 24.0
 margin_right = 493.0
 margin_bottom = 666.0
+window_title = "Change color..."
 
 [node name="PanelContainer" type="PanelContainer" parent="AcceptDialog"]
 margin_left = 8.0
@@ -46,8 +47,8 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="ColorPicker" type="ColorPicker" parent="AcceptDialog/PanelContainer"]
-margin_left = 25.0
-margin_top = 25.0
-margin_right = 468.0
-margin_bottom = 621.0
+margin_left = 33.0
+margin_top = 33.0
+margin_right = 476.0
+margin_bottom = 629.0
 color = Color( 0, 0, 0, 1 )
