@@ -2078,7 +2078,7 @@ class _DataFormat:
 		pointers.l("Installing script extension with script %s" % str(script),"pointers.DataFormat")
 		pointers.equipment_modmain.installScriptExtensionFromScript(script)
 	
-	func __compile_and_override_script_with_scene(source_code : String, scene_path = []) -> void:
+	func __compile_and_override_script_with_scene(source_code : String, scene_path = [], override : bool = false) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
 		pointers.l("Attempting to compile and override script (with override) with script of length [%s], [%s] scene path(s) to reload" % [source_code.length(),scene_path.size()],"pointers.DataFormat")
@@ -2086,11 +2086,11 @@ class _DataFormat:
 		for i in range(scene_path.size()):
 			var sc:String = scene_path[i]
 			pointers.l("Passing scene replacement %s/%s to reloader: %s" % [i,scene_path.size(),sc],"pointers.DataFormat")
-			__reload_scene(sc)
+			__reload_scene(sc,override)
 	
-	func __reload_scene(scene_path : String):
+	func __reload_scene(scene_path : String, override : bool = false):
 		pointers.l("Attempting to reload scene at [%s]" % scene_path,"pointers.DataFormat")
-		if __load_if_can(scene_path):
+		if __load_if_can(scene_path,override):
 			var scn = __get_load().instance()
 			var root : String  = scn.name
 			if Tool.validex != null:
@@ -6861,7 +6861,7 @@ class _ManifestV2:
 								"reload":
 									var path : String = resource if is_relative else ("res:/" + ("" if resource.begins_with("/") else "/") + resource)
 									if pointers.ConfigDriver.__validate_dictionary(subdata):
-										pointers.DataFormat.__reload_scene(path)
+										pointers.DataFormat.__reload_scene(path,subdata.get("complete_reload",false))
 				pointers.DataFormat.__loadDLC()
 		return scenes_to_reload
 	
