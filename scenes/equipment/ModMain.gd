@@ -279,6 +279,7 @@ func match_mod_path_to_zip():
 
 
 func testing():
+	var shadow_tool = load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
 #	var time = (OS.get_unix_time_from_datetime({"day": 16, "hour": 11, "minute": 50, "month": 9, "second": 0, "year": 2273})) / (168.0 * 3600.0)
 #	var t2 = time - floor(time)
 #	var t3 = abs((t2*7) - 7)
@@ -286,8 +287,8 @@ func testing():
 #	var can : Script = load("res://AymursEquipmentSuite/ModMain.gd").can_instance()
 #	var can : Script = load("res://HevLib/ModMain.gd")
 #	var prop = can.can_instance()
-	
-	
+	var spath = "res://asteroids/asteroid.gd"
+	var out = shadow_tool.__make_shadow_of_script(spath,[],[],[])
 	
 	breakpoint
 

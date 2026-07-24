@@ -160,7 +160,7 @@ func __make_shadow_of_script(script_path: String,desired_methods:Array,desired_v
 					else:
 						signal_names.append(sig_name)
 						signal_operands.append(oArgs)
-		Tool.remove(pv)
+		pv.free()
 	
 	var unique_shadow_obj_name = "__shadowed_object_ref_%s__" % [str(randi() + randi())]
 	var obj_ref = "var %s = null"  % [unique_shadow_obj_name]
