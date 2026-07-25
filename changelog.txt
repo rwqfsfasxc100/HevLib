@@ -4,8 +4,8 @@
 2=* Added `complete_reload` boolean to the `reload` load type for `LOAD_RESOURCES.gd`
 3=* Fixed issue with the script shadow creation tool having issues when ran before the onready phase
 4=* Fixed colour property type not showing the selected color when editing it with the property editor tool
-5=* Fixed missing REGISTER_PROPELLANT entry for `REGISTER_SHIP_NUMERICS.gd`, which lets you set a sell price for added propellant tanks
-6=* Added REGISTER_PROPELLANT subdriver for equipment entries with the slot type `PROPELLANT_TANK` for `ADD_EQUIPMENT_ITEMS.gd`
+5=* Fixed missing `REGISTER_PROPELLANT` entry for `REGISTER_SHIP_NUMERICS.gd`, which lets you set a sell price for added propellant tanks
+6=* Added `REGISTER_PROPELLANT` subdriver for equipment entries with the slot type `PROPELLANT_TANK` for `ADD_EQUIPMENT_ITEMS.gd`
 
 [1.15.18]
 
