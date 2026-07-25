@@ -174,6 +174,12 @@ func _ready():
 							turbineValue[value] = float(entries["price"])
 						if "mass" in entries:
 							turbineMass[value] = float(entries["mass"])
+			"REGISTER_PROPELLANT":
+				for v in register_ship_numerics[data]:
+					for value in v:
+						var entries = v[value]
+						if "price" in entries:
+							turbineValue[float(value)] = float(entries["price"])
 	syPointers.Equipment.drone_delivery_speed = nano_delivery
 	
 	# Modify ship builds
