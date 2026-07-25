@@ -2754,7 +2754,16 @@ class _Equipment:
 												if not "price" in bp:
 													bp["price"] = equipment["price"]
 												AUX_POWER_AND_THRUSTERS.append(bp)
-								
+									"PROPELLANT_TANK":
+										if "REGISTER_PROPELLANT" in equipment:
+											if not "REGISTER_PROPELLANT" in register_ship_numerics_store:
+												register_ship_numerics_store["REGISTER_PROPELLANT"] = []
+											var bp : Dictionary = equipment["REGISTER_PROPELLANT"].duplicate(true)
+											if pointers.ConfigDriver.__validate_dictionary(bp,false):
+												if not "price" in bp:
+													bp["price"] = equipment["price"]
+												var dc : Dictionary = {equipment.get("num_val",0):bp}
+												register_ship_numerics_store["REGISTER_PROPELLANT"].append(dc)
 								ADD_EQUIPMENT_ITEMS.append(equipment.duplicate(true))
 					"ADD_EQUIPMENT_SLOTS.gd":
 						for item in constants:
