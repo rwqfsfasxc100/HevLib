@@ -101,6 +101,7 @@ func _add_entry():
 	var cv = dict_container.instance()
 	cv.set_property_value(key,val)
 	cv.parent_container = self
+	cv.emit_update_signal = emit_update_signal
 	$Collapsable/List.add_child(cv)
 	$Collapsable/NEW/VBoxContainer/Key/property_editor.set_property_value(null)
 	$Collapsable/NEW/VBoxContainer/Value/property_editor.set_property_value(null)

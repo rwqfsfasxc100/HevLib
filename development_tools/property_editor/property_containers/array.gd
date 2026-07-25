@@ -137,6 +137,7 @@ func _add_entry(property = null):
 	if property != null:
 		ac.set_property_value(property)
 	$Collapsable/List.add_child(ac)
+	ac.emit_update_signal = emit_update_signal
 	_on_changed()
 
 const page_size = 20

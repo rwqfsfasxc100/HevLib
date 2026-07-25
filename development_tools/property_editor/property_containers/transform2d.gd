@@ -30,7 +30,14 @@
 tool
 extends VBoxContainer
 
-export (bool) var emit_update_signal = false
+var emit_update_signal = false setget set_update_signal
+
+func set_update_signal(how):
+	$X/vec2.emit_update_signal = how
+	$Y/vec2.emit_update_signal = how
+	$ORIGIN/vec2.emit_update_signal = how
+	emit_update_signal = how
+
 
 signal changed()
 

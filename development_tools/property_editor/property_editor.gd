@@ -63,6 +63,9 @@ export (Dictionary) var defaults_for_type = {
 	"PoolColorArray":PoolColorArray(),
 }
 
+# Whether the box should emit signals from property updates
+export (bool) var emit_update_signal = false
+
 signal changed()
 
 var init_variable = null
@@ -130,11 +133,14 @@ func _change_property_to(idx : int = -1):
 			i.queue_free()
 		node.set_property_value(defaults_for_type[property_type])
 		$box_alignment/property.add_child(node)
+	if property_box:
+		property_box.emit_update_signal = emit_update_signal
 	_on_changed()
 
 func _on_changed():
-	pass
-#	emit_signal("changed")
+	if emit_update_signal:
+		emit_signal("changed")
+
 
 func match_property_to_typestring(property) -> String:
 	var to = typeof(property)

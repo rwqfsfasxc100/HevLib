@@ -9,6 +9,7 @@ margin_bottom = 24.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource( 1 )
+emit_update_signal = false
 
 [node name="X" type="HBoxContainer" parent="."]
 margin_right = 247.0

@@ -30,6 +30,14 @@
 tool
 extends HBoxContainer
 
+var emit_update_signal = false setget set_update_signal
+
+func set_update_signal(how):
+	$key.emit_update_signal = how
+	$value.emit_update_signal = how
+	emit_update_signal = how
+
+
 func get_property_value():
 	var key = $key.get_property_value()
 	var value = $value.get_property_value()

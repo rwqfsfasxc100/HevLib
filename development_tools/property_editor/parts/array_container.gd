@@ -32,6 +32,12 @@ extends HBoxContainer
 
 signal changed()
 
+var emit_update_signal = false setget set_update_signal
+
+func set_update_signal(how):
+	$value.emit_update_signal = how
+	emit_update_signal = how
+
 func get_property_value():
 	return $value.get_property_value()
 
@@ -58,8 +64,8 @@ func _enter_tree():
 		v.property_type = initialize_type
 
 func _on_changed():
-	pass
-#	emit_signal("changed")
+	if emit_update_signal:
+		emit_signal("changed")
 
 func _ready():
 	if not $DELETE.is_connected("pressed",self,"_on_delete"):
