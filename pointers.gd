@@ -1661,17 +1661,28 @@ class _DataFormat:
 					"description":"Clears cache as a fix for issues with loading DLC."
 				},
 				"__split_array_by_length":{
-					"description":"splits a provided array (or array of any Pool type) into an array containing arrays of the input's type by the splitting ammount. Also lets you return one of these specific sections instead."
-				},
-				"args":[
-					"arr -> (Array/PoolArray) input array for ",
-					"length -> (int) the size of each section to be split into. If the array does not split evenly by this ammount, the last array will be the remainder",
-					"specific_section (optional) -> (int) the index of the specific section to be fetched. If this value is out of bounds of the indeces of the usual output array, it will return an empty array. This can be useful to get specific parts of a very large array without needing to hang the game trying to fetch all at once. Defaults to `-1`",
-				],
-				"return":[
-					"Array containing the arrays/pools for each section split by length",
-					"If specific_section is set and in bounds of the usual output, will instead return the corresponding array/pool."
-				]
+					"description":"splits a provided array (or array of any Pool type) into an array containing arrays of the input's type by the splitting ammount. Also lets you return one of these specific sections instead.",
+					"args":[
+						"arr -> (Array/PoolArray) input array for ",
+						"length -> (int) the size of each section to be split into. If the array does not split evenly by this ammount, the last array will be the remainder",
+						"specific_section (optional) -> (int) the index of the specific section to be fetched. If this value is out of bounds of the indeces of the usual output array, it will return an empty array. This can be useful to get specific parts of a very large array without needing to hang the game trying to fetch all at once. Defaults to `-1`",
+					],
+					"return":[
+						"Array containing the arrays/pools for each section split by length",
+						"If specific_section is set and in bounds of the usual output, will instead return the corresponding array/pool."
+					]
+				},# __stringify_property(property,depth:int = 0,stringify:bool = true)
+				"__stringify_property":{
+					"description":"Converts a property into a string literal that can be used inside a script file.",
+					"args":[
+						"property -> (Variant) the property to be converted into a string literal.",
+						"depth (optional) -> (int) for any array-like or dictionary properties, the base tab depth for the properties. If not doing anything clever, best leaving at default. Defaults to '0'.",
+						"stringify (optional) -> (bool) whether the output should be encased in double quotes and ready to be inserted into a script file. Should only be disabled if the returned string is being added to another output. Defaults to 'true'.",
+					],
+					"return":[
+						"String containing the property as could be inserted into a script file. Will still need property identifiers (var, const, etc.)"
+					]
+				}
 			}
 		}
 	
@@ -2255,6 +2266,108 @@ class _DataFormat:
 			var ipart = out[current_part]
 			ipart.append(i)
 			out[current_part] = ipart
+		return out
+	
+	func __stringify_property(property,depth:int = 0,stringify:bool = true):
+		var out = ""
+		var type = typeof(property)
+		match type:
+			TYPE_NIL:
+				out = "null"
+			TYPE_ARRAY,TYPE_COLOR_ARRAY,TYPE_INT_ARRAY,TYPE_RAW_ARRAY,TYPE_REAL_ARRAY,TYPE_STRING_ARRAY,TYPE_VECTOR2_ARRAY,TYPE_VECTOR3_ARRAY:
+				var l = ""
+				match type:
+					TYPE_ARRAY:
+						l = "%s"
+					TYPE_COLOR_ARRAY:
+						l = "PoolColorArray(%s)"
+					TYPE_INT_ARRAY:
+						l = "PoolIntArray(%s)"
+					TYPE_RAW_ARRAY:
+						l = "PoolByteArray(%s)"
+					TYPE_REAL_ARRAY:
+						l = "PoolRealArray(%s)"
+					TYPE_STRING_ARRAY:
+						l = "PoolStringArray(%s)"
+					TYPE_VECTOR2_ARRAY:
+						l = "PoolVector2Array(%s)"
+					TYPE_VECTOR3_ARRAY:
+						l = "PoolVector3Array(%s)"
+					
+				if property.empty():
+					if type == TYPE_ARRAY:
+						out = "[]"
+					else:
+						out = l % ""
+				else:
+					l = l % "[%s\n%s]"
+					var combine = ""
+					var nd = depth + 1
+					var tabs = ""
+					var etabs = ""
+					for i in range(depth):
+						etabs += "\t"
+					for i in range(nd):
+						tabs += "\t"
+					for i in property:
+						var r = __stringify_property(i,nd,false)
+						var p = tabs + r
+						if combine:
+							combine += ","
+						combine += "\n%s" % p
+					out = l % [combine,etabs]
+			TYPE_BOOL:
+				out = ("true") if property else ("false")
+			TYPE_COLOR:
+				out = "Color( %s, %s, %s, %s )" % [property.r,property.g,property.b,property.a]
+			TYPE_DICTIONARY:
+				if property.empty():
+					out = "{}"
+				else:
+					var l = "{%s\n%s}"
+					var st = ""
+					var nd = depth + 1
+					var tabs = ""
+					var etabs = ""
+					for i in range(depth):
+						etabs += "\t"
+					for i in range(nd):
+						tabs += "\t"
+					for key in property:
+						var item = "%s:%s" % [__stringify_property(key,depth,false),__stringify_property(property[key],nd,false)]
+						var p = tabs + item
+						if st:
+							st += ","
+						st += "\n%s" % p
+					out = l % [st,etabs]
+			TYPE_INT,TYPE_REAL:
+				out = str(property)
+			TYPE_NODE_PATH:
+				out = "NodePath( %s )" % str(property)
+			TYPE_RECT2:
+				out = "Rect2( %s, %s, %s, %s )" % [property.position.x,property.position.y,property.size.x,property.size.y]
+			TYPE_STRING:
+				out = "\"%s\"" % property
+			TYPE_TRANSFORM2D:
+				out = "Transform2D( %s, %s, %s )" % [__stringify_property(property.x,depth,false),__stringify_property(property.y,depth,false),__stringify_property(property.origin,depth,false)]
+			TYPE_VECTOR2:
+				out = "Vector2( %s, %s )" % [property.x,property.y]
+			TYPE_VECTOR3:
+				out = "Vector3( %s, %s, %s )" % [property.x,property.y,property.z]
+			TYPE_AABB:
+				out = "AABB( %s, %s )" % [__stringify_property(property.position,depth,false),__stringify_property(property.size,depth,false)]
+			TYPE_BASIS:
+				out = "Basis( %s, %s, %s )" % [__stringify_property(property.x,depth,false),__stringify_property(property.y,depth,false),__stringify_property(property.z,depth,false)]
+			TYPE_PLANE:
+				out = "Plane( %s, %s )" % [__stringify_property(property.normal,depth,false),property.d]
+			TYPE_QUAT:
+				out = "Quat( %s, %s, %s, %s )" % [property.x,property.y,property.z,property.w]
+			TYPE_TRANSFORM:
+				out = "Transform( %s, %s )" % [__stringify_property(property.basis,depth,false),__stringify_property(property.origin,depth,false)]
+			_:
+				printerr("Property ",property," uses type not currently supported")
+		if stringify:
+			out = "\"%s\"" % out
 		return out
 	
 
