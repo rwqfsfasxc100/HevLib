@@ -1671,7 +1671,7 @@ class _DataFormat:
 						"Array containing the arrays/pools for each section split by length",
 						"If specific_section is set and in bounds of the usual output, will instead return the corresponding array/pool."
 					]
-				},# __stringify_property(property,depth:int = 0,stringify:bool = true)
+				},
 				"__stringify_property":{
 					"description":"Converts a property into a string literal that can be used inside a script file.",
 					"args":[
