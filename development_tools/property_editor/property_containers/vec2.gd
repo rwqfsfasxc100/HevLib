@@ -59,21 +59,27 @@ func _ready():
 	if not $YBOX/Y.is_connected("focus_exited",self,"_Y_lost_focus"):
 		$YBOX/Y.connect("focus_exited",self,"_Y_lost_focus")
 
+var last_x = 0.0
 func _X_text_changed(text:String):
 	var ft = float(text)
-	$XBOX/X.text = str(ft)
-	Xvalue = ft
-	_on_changed()
+	if ft != last_x:
+		last_x = ft
+		$XBOX/X.text = str(ft)
+		Xvalue = ft
+		_on_changed()
 
 func _X_lost_focus():
 	var txt = $XBOX/X.text
 	_X_text_changed(txt)
 
+var last_y = 0.0
 func _Y_text_changed(text:String):
 	var ft = float(text)
-	$YBOX/Y.text = str(ft)
-	Yvalue = ft
-	_on_changed()
+	if ft != last_y:
+		last_y = ft
+		$YBOX/Y.text = str(ft)
+		Yvalue = ft
+		_on_changed()
 
 func _Y_lost_focus():
 	var txt = $YBOX/Y.text

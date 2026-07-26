@@ -75,41 +75,53 @@ func _ready():
 	if not $HBOX/H.is_connected("focus_exited",self,"_H_lost_focus"):
 		$HBOX/H.connect("focus_exited",self,"_H_lost_focus")
 
+var last_x = 0.0
 func _X_text_changed(text:String):
 	var ft = float(text)
-	$XBOX/X.text = str(ft)
-	Xvalue = ft
-	_on_changed()
+	if ft != last_x:
+		last_x = ft
+		$XBOX/X.text = str(ft)
+		Xvalue = ft
+		_on_changed()
 
 func _X_lost_focus():
 	var txt = $XBOX/X.text
 	_X_text_changed(txt)
 
+var last_y = 0.0
 func _Y_text_changed(text:String):
 	var ft = float(text)
-	$YBOX/Y.text = str(ft)
-	Yvalue = ft
-	_on_changed()
+	if ft != last_y:
+		last_y = ft
+		$YBOX/Y.text = str(ft)
+		Yvalue = ft
+		_on_changed()
 
 func _Y_lost_focus():
 	var txt = $YBOX/Y.text
 	_Y_text_changed(txt)
 
+var last_w = 0.0
 func _W_text_changed(text:String):
 	var ft = float(text)
-	$WBOX/W.text = str(ft)
-	Wvalue = ft
-	_on_changed()
+	if ft != last_w:
+		last_w = ft
+		$WBOX/W.text = str(ft)
+		Wvalue = ft
+		_on_changed()
 
 func _W_lost_focus():
 	var txt = $WBOX/W.text
 	_W_text_changed(txt)
 
+var last_h = 0.0
 func _H_text_changed(text:String):
 	var ft = float(text)
-	$HBOX/H.text = str(ft)
-	Hvalue = ft
-	_on_changed()
+	if ft != last_h:
+		last_h = ft
+		$HBOX/H.text = str(ft)
+		Hvalue = ft
+		_on_changed()
 
 func _H_lost_focus():
 	var txt = $HBOX/H.text

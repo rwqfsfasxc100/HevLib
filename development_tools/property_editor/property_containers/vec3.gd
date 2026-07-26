@@ -67,31 +67,40 @@ func _ready():
 	if not $ZBOX/X.is_connected("focus_exited",self,"_Z_lost_focus"):
 		$ZBOX/X.connect("focus_exited",self,"_Z_lost_focus")
 
+var last_x = 0.0
 func _X_text_changed(text:String):
 	var ft = float(text)
-	$XBOX/X.text = str(ft)
-	Xvalue = ft
-	_on_changed()
+	if ft != last_x:
+		last_x = ft
+		$XBOX/X.text = str(ft)
+		Xvalue = ft
+		_on_changed()
 
 func _X_lost_focus():
 	var txt = $XBOX/X.text
 	_X_text_changed(txt)
 
+var last_y = 0.0
 func _Y_text_changed(text:String):
 	var ft = float(text)
-	$YBOX/X.text = str(ft)
-	Yvalue = ft
-	_on_changed()
+	if ft != last_y:
+		last_y = ft
+		$YBOX/X.text = str(ft)
+		Yvalue = ft
+		_on_changed()
 
 func _Y_lost_focus():
 	var txt = $YBOX/X.text
 	_Y_text_changed(txt)
 
+var last_z = 0.0
 func _Z_text_changed(text:String):
 	var ft = float(text)
-	$ZBOX/X.text = str(ft)
-	Zvalue = ft
-	_on_changed()
+	if ft != last_z:
+		last_z = ft
+		$ZBOX/X.text = str(ft)
+		Zvalue = ft
+		_on_changed()
 
 func _Z_lost_focus():
 	var txt = $ZBOX/X.text
