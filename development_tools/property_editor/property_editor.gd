@@ -79,12 +79,16 @@ func get_property_value():
 		return property_box.get_property_value()
 
 func set_property_value(property):
-	_change_property_to(supported_property_types.find(match_property_to_typestring(property)))
+	if can_edit_type:
+		_change_property_to(supported_property_types.find(match_property_to_typestring(property)))
 	if property_box:
 		property_box.set_property_value(property)
 
 func clear():
-	_change_property_to(supported_property_types.find("null"))
+	if can_edit_type:
+		_change_property_to(supported_property_types.find("null"))
+	else:
+		reset()
 
 
 func initialize(how):
