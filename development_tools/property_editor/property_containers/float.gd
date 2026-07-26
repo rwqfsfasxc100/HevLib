@@ -50,11 +50,14 @@ func _ready():
 	if not $LineEdit.is_connected("focus_exited",self,"_lost_focus"):
 		$LineEdit.connect("focus_exited",self,"_lost_focus")
 
+var last_val = 0.0
 func _LE_text_changed(text:String):
 	var ft = float(text)
-	$LineEdit.text = str(ft)
-	value = ft
-	_on_changed()
+	if ft != last_val:
+		last_val = ft
+		$LineEdit.text = str(ft)
+		value = ft
+		_on_changed()
 
 func _lost_focus():
 	var txt = $LineEdit.text
