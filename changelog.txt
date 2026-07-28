@@ -1,3 +1,18 @@
+[1.15.22]
+
+1=* Added `color` type configs
+1.1=* `name` - (String) Display name for the config.
+1.2=* `description` - (String) Description tooltip for the config.
+1.3=* `default` - (Color) Default color for the config.
+1.4=* `edit_alpha` - (bool) Whether the alpha channel is editable and used for the config. If false, alpha will always be set to 1.
+1.5=* `requires_bools` - (Array/PoolStringArray) Array/PoolStringArray of strings for configs to check if this should be able to be edited.
+1.6=* `invert_bool_requirement` - (bool) Whether the output of `requires_bools` should be inverted.
+1.7=* `require_restart` - (bool) Whether changing this config requires a restart.
+1.8=* `disabled` - (bool) Whether this config is disabled and won't be registered.
+2=* Improved slot formatting
+3=* Fixed `sticker_price_multi_format` not being set correctly for equipment items
+4=* Improved `DataFormat`.`__get_vanilla_version`
+
 [1.15.21]
 
 1=* Fixed crash caused by mods incorrectly fetching translations when falling back to another locale if the string was missing from a given locale
