@@ -1369,9 +1369,7 @@ class _ConfigDriver:
 		if not file.file_exists(file_path) and not ResourceLoader.exists(file_path):
 			return {}
 		var cfg:ConfigFile = ConfigFile.new()
-		file.open(file_path,File.READ)
-		cfg.parse(file.get_as_text())
-		file.close()
+		cfg.load(file_path)
 		var cfg_sections : Array = cfg.get_sections()
 		var cfg_dictionary : Dictionary = {}
 		for section in cfg_sections:
