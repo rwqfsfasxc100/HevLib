@@ -30,8 +30,8 @@
 extends "res://menu/CurrentlyPlaying.gd"
 
 func _ready():
-	yield (get_tree(), "idle_frame")
-	var mod_menu = get_tree().get_root().find_node("ModMenu", true, false)
+	yield(get_tree(), "idle_frame")
+	var mod_menu = CurrentGame.get_tree().get_root().find_node("ModMenu", true, false)
 	if mod_menu:
 		mod_menu.connect("visibility_changed", self , "display")
 

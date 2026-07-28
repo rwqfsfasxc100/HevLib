@@ -1115,13 +1115,13 @@ class _ConfigDriver:
 			check_button.focus_neighbour_top = "."
 			var p1 = parent.get_child(pos+1)
 			var script : Script  = p1.get_script()
-			if script != null:
+			if script != null and parent.get_child(pos+1).name != "BottomSeparatorForToolTipsPlsIgnore":
 				var path = script.get_path()
 				icon_button.focus_neighbour_bottom = icon_button.get_path_to(parent.get_child(pos + 1).get_node("Label/LABELBUTTON"))
 				reset_button.focus_neighbour_bottom = reset_button.get_path_to(parent.get_child(pos + 1).get_node("reset"))
 				
 				match path:
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.gd":
+					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.gd","res://HevLib/ui/mod_menu/settings_menus/entry_inputs/color.gd":
 						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("CheckButton"))
 					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/action.gd":
 						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("Button"))
@@ -1138,12 +1138,12 @@ class _ConfigDriver:
 						breakpoint
 		elif pos == children.size() - 1:
 			var script : Script  = parent.get_child(pos-1).get_script()
-			if script != null:
+			if script != null and parent.get_child(pos-1).name != "BottomSeparatorForToolTipsPlsIgnore":
 				var path:String = script.get_path()
 				icon_button.focus_neighbour_top = icon_button.get_path_to(parent.get_child(pos - 1).get_node("Label/LABELBUTTON"))
 				reset_button.focus_neighbour_top = reset_button.get_path_to(parent.get_child(pos - 1).get_node("reset"))
 				match path:
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.gd":
+					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.gd","res://HevLib/ui/mod_menu/settings_menus/entry_inputs/color.gd":
 						check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("CheckButton"))
 					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/action.gd":
 						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos - 1).get_node("Button"))
@@ -1160,12 +1160,12 @@ class _ConfigDriver:
 						breakpoint
 		else:
 			var script1 : Script  = parent.get_child(pos-1).get_script()
-			if script1 != null:
+			if script1 != null and parent.get_child(pos-1).name != "BottomSeparatorForToolTipsPlsIgnore":
 				var path:String = script1.get_path()
 				icon_button.focus_neighbour_top = icon_button.get_path_to(parent.get_child(pos - 1).get_node("Label/LABELBUTTON"))
 				reset_button.focus_neighbour_top = reset_button.get_path_to(parent.get_child(pos - 1).get_node("reset"))
 				match path:
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.gd":
+					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.gd","res://HevLib/ui/mod_menu/settings_menus/entry_inputs/color.gd":
 						check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("CheckButton"))
 					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/action.gd":
 						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos - 1).get_node("Button"))
@@ -1183,12 +1183,12 @@ class _ConfigDriver:
 			
 			var p2 = parent.get_child(pos+1)
 			var script2:Script = p2.get_script()
-			if script2 != null:
+			if script2 != null and parent.get_child(pos+1).name != "BottomSeparatorForToolTipsPlsIgnore":
 				var path:String = script2.get_path()
 				icon_button.focus_neighbour_bottom = icon_button.get_path_to(parent.get_child(pos + 1).get_node("Label/LABELBUTTON"))
 				reset_button.focus_neighbour_bottom = reset_button.get_path_to(parent.get_child(pos + 1).get_node("reset"))
 				match path:
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.gd":
+					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.gd","res://HevLib/ui/mod_menu/settings_menus/entry_inputs/color.gd":
 						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("CheckButton"))
 					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/action.gd":
 						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("Button"))
