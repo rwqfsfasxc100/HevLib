@@ -52,10 +52,10 @@ func _about_to_show():
 		container.add_child(tab)
 	
 	lastFocus = get_focus_owner()
-	
-	get_node("base/TabContainer").get_child(0).get_node("MarginContainer/TabContainer").get_child(0).get_node("MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer").get_child(0).get_node("Label/LABELBUTTON").call_deferred("grab_focus")
-	
 	_on_resize()
+	
+	yield(get_tree().create_timer(0.1),"timeout")
+	get_node("base/TabContainer").get_child(0).get_node("MarginContainer/TabContainer").get_child(0).get_node("MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer").get_child(0).get_node("Label/LABELBUTTON").call_deferred("grab_focus")
 
 func _ready():
 	get_tree().get_root().connect("size_changed", self, "_on_resize")

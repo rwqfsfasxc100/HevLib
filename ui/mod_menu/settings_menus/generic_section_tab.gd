@@ -79,6 +79,14 @@ func _ready():
 				input.CONFIG_SECTION = name
 				input.CONFIG_MOD = mod
 				$MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer.add_child(input)
+			"color","colour":
+				var input = COLOR.instance()
+				input.name = entry
+				input.CONFIG_DATA = entry_info
+				input.CONFIG_ENTRY = entry
+				input.CONFIG_SECTION = name
+				input.CONFIG_MOD = mod
+				$MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer.add_child(input)
 			"float","int","integer","real":
 				var input = INT_FLOAT.instance()
 				input.name = entry
@@ -135,13 +143,13 @@ func _ready():
 
 
 
-const BOOL = preload("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.tscn")
-const INT_FLOAT = preload("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/int-float.tscn")
-const STRING = preload("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/string.tscn")
-const OPTION = preload("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/option_button.tscn")
-const INPUT = preload("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/input.tscn")
-const ACTION = preload("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/action.tscn")
-
+var BOOL = load("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.tscn")
+var INT_FLOAT = load("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/int-float.tscn")
+var STRING = load("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/string.tscn")
+var OPTION = load("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/option_button.tscn")
+var INPUT = load("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/input.tscn")
+var ACTION = load("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/action.tscn")
+var COLOR = load("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/color.tscn")
 
 func cancel():
 	get_parent().get_parent().get_parent().get_parent().get_parent().get_parent().cancel()
