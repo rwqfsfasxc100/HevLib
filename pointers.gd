@@ -3293,7 +3293,7 @@ class _Equipment:
 			var snn : String  = slotDict.get("slot_node_name","")
 			var spp : Dictionary = ship_limitations.get(snn,{})
 			if "limit_ships" in slotDict:
-				var val : Array = slotDict["limit_ships"].duplicate()
+				var val : Array = Array(slotDict["limit_ships"]).duplicate()
 				if snn in ship_limitations:
 					if "limit_ships" in spp:
 						for i in val:
@@ -3305,7 +3305,7 @@ class _Equipment:
 					ship_limitations.merge({snn:{}})
 					ship_limitations[snn]["limit_ships"] = val
 			if "prevent_ships" in slotDict:
-				var val : Array = slotDict["prevent_ships"].duplicate()
+				var val : Array = Array(slotDict["prevent_ships"]).duplicate()
 				if snn in ship_limitations:
 					if "prevent_ships" in spp:
 						for i in val:
@@ -3326,7 +3326,7 @@ class _Equipment:
 					var data : Dictionary = node[snn]
 					var spp : Dictionary = ship_limitations.get(snn,{})
 					if "limit_ships" in data:
-						var val : Array = data["limit_ships"].duplicate()
+						var val : Array = Array(data["limit_ships"]).duplicate()
 						if snn in ship_limitations:
 							if "limit_ships" in spp:
 								for f in val:
@@ -3336,9 +3336,9 @@ class _Equipment:
 								ship_limitations[snn]["limit_ships"] = spp["limit_ships"]
 						else:
 							ship_limitations.merge({snn:{}})
-							ship_limitations[snn]["limit_ships"] = val.duplicate()
+							ship_limitations[snn]["limit_ships"] = val
 					if "prevent_ships" in data:
-						var val : Array = data["prevent_ships"].duplicate()
+						var val : Array = Array(data["prevent_ships"]).duplicate()
 						if snn in ship_limitations:
 							if "prevent_ships" in spp:
 								for f in val:
@@ -3348,7 +3348,7 @@ class _Equipment:
 								ship_limitations[snn]["prevent_ships"] = spp["prevent_ships"]
 						else:
 							ship_limitations.merge({snn:{}})
-							ship_limitations[snn]["prevent_ships"] = val.duplicate()
+							ship_limitations[snn]["prevent_ships"] = val
 		
 		var slots_format : PoolStringArray = []
 		var editable_paths : PoolStringArray = []
@@ -3385,18 +3385,12 @@ class _Equipment:
 					var tag_data : Dictionary = dict[slot]
 					var tag_add : Array = tag_data.get("override_additive",[])
 					var tag_sub : Array = tag_data.get("override_subtractive",[])
-					if vslot_additives != []:
-						for add in tag_add:
-							if not add in vslot_additives:
-								vslot_additives.append(add)
-					else:
-						vslot_additives = tag_add.duplicate()
-					if vslot_subtractives != []:
-						for sub in tag_sub:
-							if not sub in vslot_subtractives:
-								vslot_subtractives.append(sub)
-					else:
-						vslot_subtractives = tag_sub.duplicate()
+					for add in tag_add:
+						if not add in vslot_additives:
+							vslot_additives.append(add)
+					for sub in tag_sub:
+						if not sub in vslot_subtractives:
+							vslot_subtractives.append(sub)
 			if vslot_additives != []:
 				vslot_data["override_additive"] = vslot_additives
 			if vslot_subtractives != []:
