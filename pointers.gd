@@ -3317,8 +3317,8 @@ class _Equipment:
 					ship_limitations.merge({snn:{}})
 					ship_limitations[snn]["prevent_ships"] = val
 			slots_for_adding.append(slotDict)
-			slots_for_adding_dict.merge({slotDict.get("slot_node_name",""):slotDict})
-			all_slot_node_names.append(slotDict.get("slot_node_name",""))
+			slots_for_adding_dict.merge({snn:slotDict})
+			all_slot_node_names.append(snn)
 		for node in SLOT_TAGS:
 			if node:
 				tag_modifications.append(node)
@@ -3350,11 +3350,8 @@ class _Equipment:
 							ship_limitations.merge({snn:{}})
 							ship_limitations[snn]["prevent_ships"] = val.duplicate()
 		
-		var slots_full : Array = []
 		var slots_format : PoolStringArray = []
 		var editable_paths : PoolStringArray = []
-		
-		var slot_eligibility : Array = []
 		
 		var slot_allowed_equipment : Dictionary = {}
 		
@@ -3377,10 +3374,8 @@ class _Equipment:
 							for over in override_subtractive:
 								if not over in slot_override_subtractive:
 									slot_override_subtractive.append(over)
-							slot_eligibility.append({m:[[],slot_override_additive,slot_override_subtractive]})
 			slots_format.append(format.get(m)[0])
 			editable_paths.append(format.get(m)[1])
-			slots_full.append(format)
 		for slot in vanilla_equipment_defaults_for_reference:
 			var vslot_data : Dictionary = vanilla_equipment_defaults_for_reference[slot]
 			var vslot_additives : Array = vslot_data.get("override_additive",[])
@@ -4573,7 +4568,7 @@ class _Equipment:
 			
 			
 		if restrictType != "":
-			base += "\nslot = \"" + restrictType + "\""
+			base += "\nrestrictType = \"" + restrictType + "\""
 		if limitShips != []:
 			var initial : String = ""
 			for item in limitShips:
