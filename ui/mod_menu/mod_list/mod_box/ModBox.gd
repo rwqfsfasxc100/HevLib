@@ -705,11 +705,21 @@ func translateIfCan(translation : String):
 				if current_locale in modTranslations:
 					var tlData = modTranslations[current_locale]
 					if translation in tlData:
-						newTL = tlData[translation].get("string",newTL)
+						var rt = tlData[translation]
+						match typeof(rt):
+							TYPE_DICTIONARY:
+								newTL = rt.get("string",newTL)
+							TYPE_STRING:
+								newTL = rt
 				if current_locale != master_locale and master_locale in modTranslations:
 					var tlData = modTranslations[master_locale]
 					if translation in tlData:
-						newTL = tlData[translation].get("string",newTL)
+						var rt = tlData[translation]
+						match typeof(rt):
+							TYPE_DICTIONARY:
+								newTL = rt.get("string",newTL)
+							TYPE_STRING:
+								newTL = rt
 			tlCache[translation] = newTL
 			return newTL
 	return ""
