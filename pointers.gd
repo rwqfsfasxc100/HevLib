@@ -4515,7 +4515,7 @@ class _Equipment:
 		
 		var base : String = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\" instance=ExtResource( 2 )]" % slotNodeName
 		if systemSlot:
-			base += "\nslot = \"" + systemSlot + "\""
+			base += "\nslot = \"%s\"" % systemSlot
 		if alwaysDisplay:
 			base += "\nalways = true"
 		else:
@@ -4529,34 +4529,33 @@ class _Equipment:
 			var cfg_section : String = cfg.get("section","")
 			var cfg_setting : String = cfg.get("entry","")
 			var cfg_invert:bool = cfg.get("invert_config",false)
-			base += "\nconfig_id = \"" + cfg_id + "\""
-			base += "\nconfig_section = \"" + cfg_section + "\""
-			base += "\nconfig_setting = \"" + cfg_setting + "\""
+			base += "\nconfig_id = \"%s\"" % cfg_id
+			base += "\nconfig_section = \"%s\"" % cfg_section
+			base += "\nconfig_setting = \"%s\"" % cfg_setting
 			if cfg_invert:
 				base += "\ninvert_config = true"
 			else:
 				base += "\ninvert_config = false"
-			
-			
 		if restrictType != "":
-			base += "\nrestrictType = \"" + restrictType + "\""
-		if limitShips != []:
+			base += "\nrestrictType = \"%s\"" % restrictType
+		if not limitShips.empty():
 			var initial : String = ""
 			for item in limitShips:
 				if initial: initial += ", "
 				else: initial = "\nlimit_ships = ["
-				initial += "\"" + item + "\""
+				initial += "\"%s\"" % item
 			initial += "]"
 			base += initial
-		if preventShips != []:
+		if not preventShips.empty():
 			var initial : String = ""
 			for item in preventShips:
 				if initial: initial += ", "
 				else: initial = "\nprevent_ships = ["
-				initial += "\"" + item + "\""
+				initial += "\"%s\"" % item
 			initial += "]"
 			base += initial
-		if restrict_hold_type: base += "\nrestrict_hold_type = \"%s\"" % restrict_hold_type
+		if restrict_hold_type:
+			base += "\nrestrict_hold_type = \"%s\"" % restrict_hold_type
 		base += "\n\n[node name=\"CheckButton\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s/VBoxContainer/HBoxContainer\"]\ntext = \"%s\"" % [slotNodeName,slotDisplayName]
 		
 		if hasNone: base += "\n\n" + __make_equipment_for_scene({"system":"SYSTEM_NONE","default":true,"name":"None"}, slotNodeName, systemSlot)
