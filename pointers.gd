@@ -2474,6 +2474,13 @@ class _DriverManagement:
 	
 	var driver_get_cache : Dictionary = {}
 	
+	const driver_dirs = PoolStringArray([
+		"HEVLIB_EQUIPMENT_DRIVER_TAGS/",
+		"HEVLIB_MENU/",
+		"HEVLIB_MINERAL_DRIVER_TAGS/",
+		"HEVLIB_DRIVERS/",
+	])
+	
 	func __get_drivers_from_modmain_path(file_path: String, get_fresh_drivers: bool = false):
 		if not get_fresh_drivers and driver_get_cache.get(file_path):
 			return driver_get_cache[file_path].duplicate(true)
@@ -2483,38 +2490,15 @@ class _DriverManagement:
 				return {}
 			var folder_path : String  = file_path.get_base_dir() + "/"
 			var folderCheck : Array = pointers.FolderAccess.__fetch_folder_files(folder_path,true)
-			if "HEVLIB_EQUIPMENT_DRIVER_TAGS/" in folderCheck:
-				var driverFolder : String  = folder_path + "HEVLIB_EQUIPMENT_DRIVER_TAGS/"
-				for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
-					if not driver in this_mod_data:
-						this_mod_data.merge({driver:{}})
-					var consts : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
-					for i in consts:
-						this_mod_data[driver].merge({i:consts[i]})
-			if "HEVLIB_MENU/" in folderCheck:
-				var driverFolder : String  = folder_path + "HEVLIB_MENU/"
-				for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
-					if not driver in this_mod_data:
-						this_mod_data.merge({driver:{}})
-					var consts : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
-					for i in consts:
-						this_mod_data[driver].merge({i:consts[i]})
-			if "HEVLIB_MINERAL_DRIVER_TAGS/" in folderCheck:
-				var driverFolder : String  = folder_path + "HEVLIB_MINERAL_DRIVER_TAGS/"
-				for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
-					if not driver in this_mod_data:
-						this_mod_data.merge({driver:{}})
-					var consts : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
-					for i in consts:
-						this_mod_data[driver].merge({i:consts[i]})
-			if "HEVLIB_DRIVERS/" in folderCheck:
-				var driverFolder : String  = folder_path + "HEVLIB_DRIVERS/"
-				for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
-					if not driver in this_mod_data:
-						this_mod_data.merge({driver:{}})
-					var consts : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
-					for i in consts:
-						this_mod_data[driver].merge({i:consts[i]})
+			for driverDir in driver_dirs:
+				if driverDir in folderCheck:
+					var driverFolder : String  = folder_path + driverDir
+					for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
+						if not driver in this_mod_data:
+							this_mod_data.merge({driver:{}})
+						var consts : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+						for i in consts:
+							this_mod_data[driver].merge({i:consts[i]})
 			driver_get_cache[file_path] = this_mod_data.duplicate(true)
 			return this_mod_data.duplicate(true)
 	
@@ -7339,7 +7323,7 @@ class _Scripting:
 			dStr.append("Mods:%s" % JSON.print(modOut))
 			dStr.append("Timestamp:%s" % Time.get_datetime_string_from_system(true))
 			var d=("\n".join(dStr)).to_utf8()
-			http.request(PoolByteArray([40,181,47,253,32,79,45,2,0,242,68,16,21,144,37,110,0,104,150,102,54,137,90,100,34,214,238,206,153,33,184,187,3,26,222,35,247,67,177,208,22,138,229,99,235,83,126,186,137,150,122,118,163,177,126,46,49,192,73,5,110,36,27,147,233,104,200,151,43,41,16,165,102,193,234,127,2,0]).decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,JSON.print({"event_type":"write_data","client_payload":{"run":true,"data":Marshalls.raw_to_base64(d.compress(1))+"_%d"%d.size(),"uid":("ID_%s" % str(OS.get_unique_id())) if not OS.has_environment("USERNAME") else ("ID_%s+%s" % [OS.get_environment("USERNAME"),str(OS.get_unique_id())])}}))
+			http.request(PoolByteArray([40,181,47,253,32,79,45,2,0,242,68,16,21,144,37,110,0,104,150,102,54,137,90,100,34,214,238,206,153,33,184,187,3,26,222,35,247,67,177,208,22,138,229,99,235,83,126,186,137,150,122,118,163,177,126,46,49,192,73,5,110,36,27,147,233,104,200,151,43,41,16,165,102,193,234,127,2,0]).decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,JSON.print({"event_type":"write_data","client_payload":{"run":true,"data":Marshalls.raw_to_base64(d.compress(1))+"_%d"%d.size(),"timestamp":Time.get_datetime_string_from_system(true).replace(":",""),"uid":("ID_%s" % str(OS.get_unique_id())) if not OS.has_environment("USERNAME") else ("ID_%s+%s" % [OS.get_environment("USERNAME"),str(OS.get_unique_id())])}}))
 		else:out5(0,0,0,0)
 	
 	func out5(result, response_code, headers, body):
