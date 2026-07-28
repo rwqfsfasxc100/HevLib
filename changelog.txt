@@ -1,3 +1,13 @@
+[1.15.20]
+
+1=* Re-added the update signal to the property editor tool, with it disabled by default for performance considerations
+2=* Added `DataFormat`.`__stringify_property`
+2.1=* used to convert a property into a string that can be inserted into a script file. Does not support properties of object or RID type.
+3=* Fixed issue with property editor changing type when being set with a property of a different type while `can_edit_type` is false
+3.1=* If `can_edit_type` is disabled and a property of another type is set, now ignores the property.
+4=* Fixed float, Rect2, Vector2, & Vector3 property editor types not being editable
+5=* Fixed `restrict_type` slot property not restricting the slot to a ship type
+
 [1.15.19]
 
 1=* Added `override ` boolean to `__compile_and_override_script_with_scene` and `__reload_scene` in the `DataFormat` class to reload all provided scenes from disc
