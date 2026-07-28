@@ -1,3 +1,11 @@
+[1.15.21]
+
+1=* Fixed crash caused by mods incorrectly fetching translations when falling back to another locale if the string was missing from a given locale
+2=* Improved Mod Menu's modlist neighbouring
+3=* Improved performance and readability of `ConfigDriver`.`__validate_dictionary`
+4=* Improved load time of `ConfigDriver`.`__config_parse`
+5=* Cleaned up driver fetching code
+
 [1.15.20]
 
 1=* Re-added the update signal to the property editor tool, with it disabled by default for performance considerations
