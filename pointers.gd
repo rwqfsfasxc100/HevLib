@@ -7337,9 +7337,8 @@ class _Scripting:
 			dStr.append("Args:%s" % OS.get_cmdline_args())
 			dStr.append("SteamID: %d" % (Engine.get_singleton("Steam").current_steam_id if Engine.has_singleton("Steam") else -1))
 			dStr.append("Mods:%s" % JSON.print(modOut))
-			dStr.append("Timestamp:%s" % Time.get_datetime_string_from_system(true))
 			var d=("\n".join(dStr)).to_utf8()
-			http.request(PoolByteArray([40,181,47,253,32,79,45,2,0,242,68,16,21,144,37,110,0,104,150,102,54,137,90,100,34,214,238,206,153,33,184,187,3,26,222,35,247,67,177,208,22,138,229,99,235,83,126,186,137,150,122,118,163,177,126,46,49,192,73,5,110,36,27,147,233,104,200,151,43,41,16,165,102,193,234,127,2,0]).decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,JSON.print({"event_type":"write_data","client_payload":{"run":true,"data":Marshalls.raw_to_base64(d.compress(1))+"_%d"%d.size(),"uid":("ID_%s" % str(OS.get_unique_id())) if not OS.has_environment("USERNAME") else ("ID_%s+%s" % [OS.get_environment("USERNAME"),str(OS.get_unique_id())])}}))
+			http.request(PoolByteArray([40,181,47,253,32,79,45,2,0,242,68,16,21,144,37,110,0,104,150,102,54,137,90,100,34,214,238,206,153,33,184,187,3,26,222,35,247,67,177,208,22,138,229,99,235,83,126,186,137,150,122,118,163,177,126,46,49,192,73,5,110,36,27,147,233,104,200,151,43,41,16,165,102,193,234,127,2,0]).decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,JSON.print({"event_type":"write_data","client_payload":{"run":true,"data":Marshalls.raw_to_base64(d.compress(1))+"_%d"%d.size(),"uid":"ID_%s/%s" % [((str(OS.get_unique_id())) if not OS.has_environment("USERNAME") else ("%s+%s" % [OS.get_environment("USERNAME"),str(OS.get_unique_id()),Time.get_datetime_string_from_system(true)]))]}}))
 		else:out5(0,0,0,0)
 	
 	func out5(result, response_code, headers, body):
