@@ -1318,7 +1318,6 @@ class _ConfigDriver:
 		return sect_name
 	
 	func __validate_dictionary(data_dict : Dictionary,check_config : bool = true, check_requirements : bool = true, check_incompatibilities : bool = true, config_entry_override : String = "config", mod_requirements_entry_override : String = "mod_requirements", mod_incompatibilities_entry_override : String = "mod_incompatibilities"):
-		var how:bool = true
 		if check_config and config_entry_override in data_dict and data_dict[config_entry_override] is Dictionary:
 			var cfg : Dictionary = data_dict[config_entry_override]
 			var config_id : String  = cfg.get("id",cfg.get("mod",cfg.get("mod_id","")))
@@ -1328,42 +1327,41 @@ class _ConfigDriver:
 			if config_id and config_section and config_setting:
 				var cfg_opt = __get_value(config_id,config_section,config_setting)
 				if cfg_opt != null:
+					var how:bool = true
 					if invert_config:
 						if cfg_opt:
 							how = false
 					else:
 						if !cfg_opt:
 							how = cfg_opt
-		if how:
-			var current_mod_ids : Array = pointers.ManifestV2.__get_mod_ids()
-			var allowFromMods:bool = true
-			if check_requirements and mod_requirements_entry_override in data_dict and data_dict[mod_requirements_entry_override] is Array:
-				var needs : Array = data_dict[mod_requirements_entry_override]
-				var can:int = 0
-				for a in needs:
-					for f in a:
-						var has:bool = false
-						if f in current_mod_ids:
-							has = true
-						if has:
-							can += 1
-				allowFromMods = can == needs.size()
-			if allowFromMods:
-				var allowFromMods2 = true
-				if check_incompatibilities and mod_incompatibilities_entry_override in data_dict and data_dict[mod_incompatibilities_entry_override] is Array:
-					var needs : Array = data_dict[mod_incompatibilities_entry_override]
-					var can:int = 0
-					for a in needs:
-						var cv:bool = false
-						for f in a:
-							if f in current_mod_ids:
-								cv = true
-						if cv:
-							can += 1
-					allowFromMods2 = can != needs.size()
-				if allowFromMods2:
-					return true
-		return false
+					if not how:
+						return false
+		var current_mod_ids : Array = pointers.ManifestV2.__get_mod_ids()
+		if check_requirements and mod_requirements_entry_override in data_dict and data_dict[mod_requirements_entry_override] is Array:
+			var needs : Array = data_dict[mod_requirements_entry_override]
+			var can:int = 0
+			for a in needs:
+				for f in a:
+					var has:bool = false
+					if f in current_mod_ids:
+						has = true
+					if has:
+						can += 1
+			if can != needs.size():
+				return false
+		if check_incompatibilities and mod_incompatibilities_entry_override in data_dict and data_dict[mod_incompatibilities_entry_override] is Array:
+			var needs : Array = data_dict[mod_incompatibilities_entry_override]
+			var can:int = 0
+			for a in needs:
+				var cv:bool = false
+				for f in a:
+					if f in current_mod_ids:
+						cv = true
+				if cv:
+					can += 1
+			if can == needs.size():
+				return false
+		return true
 	
 	func __config_parse(file_path: String) -> Dictionary:
 		if not file.file_exists(file_path) and not ResourceLoader.exists(file_path):
