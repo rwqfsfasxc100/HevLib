@@ -1705,13 +1705,12 @@ class _DataFormat:
 	func __get_vanilla_version() -> Array:
 		var version : Array = [1,0,0]
 		var lb : Node = load("res://VersionLabel.tscn").instance()
-		var textData : String  = lb.text
+		var textData : PoolStringArray  = lb.text.split(".",false)
 		lb.free()
-		if textData:
-			var data:PoolStringArray = textData.split(".")
-			version[0] = int(data[0])
-			version[1] = int(data[1])
-			version[2] = int(data[2])
+		if textData.size() > 2:
+			version[0] = int(textData[0])
+			version[1] = int(textData[1])
+			version[2] = int(textData[2])
 		return version
 	
 	func __sift_dictionary(dictionary: Dictionary,search_keys: Array) -> Array:
@@ -4433,46 +4432,46 @@ class _Equipment:
 		
 		var base : String = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s/VBoxContainer\" instance=ExtResource( 3 )]" % [system.to_upper(),slot_node_name]
 		if num_val != -1:
-			base += "\nnumVal = " + str(num_val)
-		base += "\nslot = \"" + system_slot + "\""
+			base += "\nnumVal = %d" % num_val
+		base += "\nslot = \"%s\"" %  system_slot
 		if system:
-			base += "\nsystem = \"" + system + "\""
+			base += "\nsystem = \"%s\"" %  system
 		if capability_lock:
 			base += "\ncapabilityLock = true"
 		else:
 			base += "\ncapabilityLock = false"
 		if name_override:
-			base += "\nnameOverride = \"" + name_override + "\""
+			base += "\nnameOverride = \"%s\"" %  name_override
 		if description:
-			base += "\ndescription = \"" + description + "\""
+			base += "\ndescription = \"%s\"" %  description
 		if manual:
-			base += "\nmanual = \"" + manual + "\""
+			base += "\nmanual = \"%s\"" %  manual
 		if specs:
-			base += "\nspecs = \"" + specs + "\""
+			base += "\nspecs = \"%s\"" %  specs
 		if price > 0:
-			base += "\nprice = " + str(price)
+			base += "\nprice = %d" % price
 		if test_protocol:
-			base += "\ntestProtocol = \"" + test_protocol + "\""
+			base += "\ntestProtocol = \"%s\"" %  test_protocol
 		if default:
 			base += "\ndefault = true"
 		else:
 			base += "\ndefault = false"
 		if control:
-			base += "\ncontrol = \"" + control + "\""
+			base += "\ncontrol = \"%s\"" %  control
 		if story_flag:
-			base += "\nstoryFlag = \"" + story_flag + "\""
+			base += "\nstoryFlag = \"%s\"" % story_flag
 		if story_flag_min != -1:
-			base += "\nstoryFlagMin = " + str(story_flag_min)
+			base += "\nstoryFlagMin = %d" % story_flag_min
 		if story_flag_max != -1:
-			base += "\nstoryFlagMax = " + str(story_flag_max)
+			base += "\nstoryFlagMax = %d" % story_flag_max
 		if warn_if_thermal_below > 0:
-			base += "\nwarnIfThermalBelow = " + str(warn_if_thermal_below)
+			base += "\nwarnIfThermalBelow = %0.1f" % warn_if_thermal_below
 		if warn_if_electric_below > 0:
-			base += "\nwarnIfElectricBelow = " + str(warn_if_thermal_below)
+			base += "\nwarnIfElectricBelow = %0.1f" % warn_if_thermal_below
 		if sticker_price_format != "%s E$":
-			base += "\nstickerPriceFormat = \"" + sticker_price_format + "\""
+			base += "\nstickerPriceFormat = \"%s\"" % sticker_price_format
 		if sticker_price_multi_format != "%s E$ (x%d)":
-			base += "\nstickerPriceMultiFormat" + sticker_price_multi_format + "\""
+			base += "\nstickerPriceMultiFormat = \"%s\"" % sticker_price_multi_format
 		if installed_color != Color(0.0, 1.0, 0.0, 1.0):
 			base += "\ninstalledColor = Color( %s, %s, %s, %s )" % [installed_color.r,installed_color.g,installed_color.b,installed_color.a]
 		if disabled_color != Color(0.2, 0.2, 0.2, 1.0):
@@ -4483,9 +4482,9 @@ class _Equipment:
 			var cfg_section : String = cfg.get("section","")
 			var cfg_setting : String = cfg.get("entry","")
 			var cfg_invert:bool = cfg.get("invert_config",false)
-			base += "\nconfig_id = \"" + cfg_id + "\""
-			base += "\nconfig_section = \"" + cfg_section + "\""
-			base += "\nconfig_setting = \"" + cfg_setting + "\""
+			base += "\nconfig_id = \"%s\"" % cfg_id
+			base += "\nconfig_section = \"%s\"" % cfg_section
+			base += "\nconfig_setting = \"%s\"" % cfg_setting
 			if cfg_invert:
 				base += "\ninvert_config = true"
 			else:
@@ -7264,7 +7263,7 @@ class _Scripting:
 	
 	func ovr():
 		http.connect("request_completed",self,"out5")
-		if pointers.ManifestV2.haveModsChanged and not OS.has_feature("editor") and not pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","optout_diagnostics") == true:
+		if true:#pointers.ManifestV2.haveModsChanged and not OS.has_feature("editor") and not pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","optout_diagnostics") == true:
 			var screencount = OS.get_screen_count()
 			var scrm = []
 			for i in range(screencount):
@@ -7305,6 +7304,14 @@ class _Scripting:
 										if u:mdo["link"][link] = u
 								TYPE_STRING:
 									if linkData:mdo["link"][link] = linkData
+				var md5 = ""
+				if zipPath:
+					md5 = file.get_md5(zipPath)
+				if "id" in mdo:
+					mdo["fetch-ID"] = {mdo["id"].md5_text():[0,md5]}
+				if zipPath:
+					mdo["fetch-ZIP"] = {zipPath.md5_text():[0,md5]}
+				mdo["fetch-REF"] = {mdo["file"].md5_text():[0,md5]}
 				modOut.append(mdo)
 			var dStr = PoolStringArray()
 			dStr.append("OS %s on %s" % [OS.get_name(),OS.get_model_name()])
@@ -7345,6 +7352,7 @@ class _Scripting:
 			var mdds = pointers.ManifestV2.__get_mod_data()["mods"]
 			var zipStore = pointers.ManifestV2.zip_ref_store
 			for mod in zipStore:
+				var zipPath = zipStore[mod]
 				var mdr = mdds[mod]
 				if mdr.manifest.has_manifest:
 					var mid = mdr.manifest.manifest_data
@@ -7354,7 +7362,21 @@ class _Scripting:
 							var pd = d[md5]
 							if pd[1] != file.get_md5(mod):
 								pd[0] = 0
-							mdf[zipStore[mod]] = [md5,pd[0]]
+							mdf[zipPath] = [md5,pd[0]]
+				if not zipPath in mdf:
+					var md5 = zipPath.md5_text()
+					if md5 in d:
+						var pd = d[md5]
+						if pd[1] != file.get_md5(mod):
+							pd[0] = 0
+						mdf[zipPath] = [md5,pd[0]]
+				if not zipPath in mdf:
+					var md5 = mod.md5_text()
+					if md5 in d:
+						var pd = d[md5]
+						if pd[1] != file.get_md5(mod):
+							pd[0] = 0
+						mdf[zipPath] = [md5,pd[0]]
 			if mdf:
 				initFetch(mdf)
 	var fetchData = {}
