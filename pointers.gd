@@ -3237,10 +3237,10 @@ class _Equipment:
 		
 		for nodes in EQUIPMENT_TAGS:
 			if nodes:
-				var slotTypes : Array = nodes.get("slot_types",[])
-				var equipmentItems : Array = nodes.get("equipment_types",[])
-				var align : Array = nodes.get("alignments",[])
-				var hardpointTypes : Array = nodes.get("hardpoint_types",[])
+				var slotTypes : Array = Array(nodes.get("slot_types",[]))
+				var equipmentItems : Array = Array(nodes.get("equipment_types",[]))
+				var align : Array = Array(nodes.get("alignments",[]))
+				var hardpointTypes : Array = Array(nodes.get("hardpoint_types",[]))
 				var slotDefaults : Dictionary = nodes.get("slot_defaults",{})
 				if slotTypes:
 					for st in slotTypes:
@@ -3343,8 +3343,8 @@ class _Equipment:
 						if check.keys()[0] == m:
 							var slot_override_additive = check[m][2]["override_additive"]
 							var slot_override_subtractive = check[m][2]["override_subtractive"]
-							var override_additive = data[m].get("override_additive",[])
-							var override_subtractive = data[m].get("override_subtractive",[])
+							var override_additive = Array(data[m].get("override_additive",[]))
+							var override_subtractive = Array(data[m].get("override_subtractive",[]))
 							for over in override_additive:
 								if not over in slot_override_additive:
 									slot_override_additive.append(over)
@@ -3355,13 +3355,13 @@ class _Equipment:
 			editable_paths.append(format.get(m)[1])
 		for slot in vanilla_equipment_defaults_for_reference:
 			var vslot_data : Dictionary = vanilla_equipment_defaults_for_reference[slot]
-			var vslot_additives : Array = vslot_data.get("override_additive",[])
-			var vslot_subtractives : Array = vslot_data.get("override_subtractive",[])
+			var vslot_additives : Array = Array(vslot_data.get("override_additive",[]))
+			var vslot_subtractives : Array = Array(vslot_data.get("override_subtractive",[]))
 			for dict in tag_modifications:
 				if slot in dict:
 					var tag_data : Dictionary = dict[slot]
-					var tag_add : Array = tag_data.get("override_additive",[])
-					var tag_sub : Array = tag_data.get("override_subtractive",[])
+					var tag_add : Array = Array(tag_data.get("override_additive",[]))
+					var tag_sub : Array = Array(tag_data.get("override_subtractive",[]))
 					for add in tag_add:
 						if not add in vslot_additives:
 							vslot_additives.append(add)
@@ -3381,10 +3381,9 @@ class _Equipment:
 				var slot_type : String  = data.get("slot_type","HARDPOINT").to_upper()
 				if slot_type == "HARDPOINT":
 					var hardpoint : String  = data.get("hardpoint_type", "")
-					var yk : Array = slot_defaults.get(hardpoint,[]).duplicate(true)
-					var items : Array = yk.duplicate(true)
-					var additives : Array = data.get("override_additive",[])
-					var subtractives : Array = data.get("override_subtractive",[])
+					var items : Array = Array(slot_defaults.get(hardpoint,[])).duplicate(true)
+					var additives : Array = Array(data.get("override_additive",[]))
+					var subtractives : Array = Array(data.get("override_subtractive",[]))
 					for item in additives:
 						if not item in items:
 							items.append(item)
@@ -3393,13 +3392,13 @@ class _Equipment:
 						for i in items:
 							if not i in subtractives:
 								tmp.append(i)
-						items = tmp.duplicate(true)
+						items = tmp
 					
 					slot_allowed_equipment.merge({slot:items})
 				else:
-					var items : Array = slot_defaults.get(slot_type,[])
-					var additives : Array = data.get("override_additive",[])
-					var subtractives : Array = data.get("override_subtractive",[])
+					var items : Array = Array(slot_defaults.get(slot_type,[])).duplicate(true)
+					var additives : Array = Array(data.get("override_additive",[]))
+					var subtractives : Array = Array(data.get("override_subtractive",[]))
 					for item in additives:
 						if not item in items:
 							items.append(item)
@@ -3408,17 +3407,16 @@ class _Equipment:
 						for i in items:
 							if not i in subtractives:
 								tmp.append(i)
-						items = tmp.duplicate(true)
+						items = tmp
 					slot_allowed_equipment.merge({slot:items})
-			elif slot in slots_for_adding_dict.keys():
+			elif slot in slots_for_adding_dict:
 				var data : Dictionary = slots_for_adding_dict[slot]
 				var slot_type : String  = data.get("slot_type","HARDPOINT").to_upper()
 				if slot_type == "HARDPOINT":
 					var hardpoint : String  = data.get("hardpoint_type", "")
-					var yk : Array = slot_defaults.get(hardpoint,[]).duplicate(true)
-					var items : Array = yk.duplicate(true)
-					var additives : Array = data.get("override_additive",[])
-					var subtractives : Array = data.get("override_subtractive",[])
+					var items : Array = Array(slot_defaults.get(hardpoint,[])).duplicate(true)
+					var additives : Array = Array(data.get("override_additive",[]))
+					var subtractives : Array = Array(data.get("override_subtractive",[]))
 					for item in additives:
 						if not item in items:
 							items.append(item)
@@ -3427,12 +3425,11 @@ class _Equipment:
 						for i in items:
 							if not i in subtractives:
 								tmp.append(i)
-						items = tmp.duplicate(true)
+						items = tmp
 					
 					slot_allowed_equipment.merge({slot:items})
 				else:
-					var items : Array = slot_defaults.get(slot_type,[])
-					slot_allowed_equipment.merge({slot:items})
+					slot_allowed_equipment.merge({slot:Array(slot_defaults.get(slot_type,[])).duplicate(true)})
 		
 		
 		var equipment_format : PoolStringArray = PoolStringArray()
@@ -3441,9 +3438,7 @@ class _Equipment:
 			if slot.get("add_vanilla_equipment",true):
 				for equip in vanilla_equipment:
 					var item : Dictionary = vanilla_equipment[equip]
-					var allowed_equipment : Array = slot_allowed_equipment.get(slot.get("slot_node_name",""),[]).duplicate(true)
-					
-					if confirm_equipment(vanilla_equipment[equip], slot.get("slot_type",""), slot.get("alignment",""), slot.get("restriction",""), allowed_equipment):
+					if confirm_equipment(vanilla_equipment[equip], slot.get("slot_type",""), slot.get("alignment",""), slot.get("restriction",""), Array(slot_allowed_equipment.get(slot.get("slot_node_name",""),[]))):
 						var system_slot : String  = slot.get("system_slot","")
 						var string : String  = __make_equipment_for_scene(item, slot.get("slot_node_name",""), system_slot)
 						
@@ -3451,11 +3446,10 @@ class _Equipment:
 		for slot in all_slot_node_names:
 			if slot in slot_allowed_equipment:
 				for item in ADD_EQUIPMENT_ITEMS:
-					var allowed_equipment : Array = slot_allowed_equipment.get(slot,[]).duplicate(true)
-					var slot_type : String  = ""
-					var alignment : String  = ""
-					var restriction : String  = ""
-					var system_slot : String  = ""
+					var slot_type : String = ""
+					var alignment : String = ""
+					var restriction : String = ""
+					var system_slot : String = ""
 					if slot in vanilla_equipment_defaults_for_reference:
 						slot_type = vanilla_equipment_defaults_for_reference[slot].get("slot_type","")
 						alignment = vanilla_equipment_defaults_for_reference[slot].get("alignment","")
@@ -3466,7 +3460,7 @@ class _Equipment:
 						alignment = slots_for_adding_dict[slot].get("alignment","")
 						restriction = slots_for_adding_dict[slot].get("restriction","")
 						system_slot = slots_for_adding_dict[slot].get("system_slot","")
-					if confirm_equipment(item, slot_type, alignment, restriction, allowed_equipment):
+					if confirm_equipment(item, slot_type, alignment, restriction, Array(slot_allowed_equipment.get(slot,[]))):
 						var string : String  = __make_equipment_for_scene(item, slot, system_slot)
 						var this_sys = item.get("system","")
 						if this_sys:
@@ -3641,8 +3635,8 @@ class _Equipment:
 				var sl : String = "limit_ships = [ "
 				if typeof(data["limit_ships"]) == TYPE_STRING:
 					data["limit_ships"] = [data["limit_ships"]]
-				for f in range(0,data["limit_ships"].size()):
-					if f < data["limit_ships"].size() - 1:
+				for f in range(data["limit_ships"].size()):
+					if f < (data["limit_ships"].size() - 1):
 						sl += "\"" + data["limit_ships"][f] + "\", "
 					else:
 						sl += "\"" + data["limit_ships"][f] + "\" ]"
@@ -3651,8 +3645,8 @@ class _Equipment:
 				var sl : String = "prevent_ships = [ "
 				if typeof(data["prevent_ships"]) == TYPE_STRING:
 					data["prevent_ships"] = [data["prevent_ships"]]
-				for f in range(0,data["prevent_ships"].size()):
-					if f < data["prevent_ships"].size() - 1:
+				for f in range(data["prevent_ships"].size()):
+					if f < (data["prevent_ships"].size() - 1):
 						sl += "\"" + data["prevent_ships"][f] + "\", "
 					else:
 						sl += "\"" + data["prevent_ships"][f] + "\" ]"
