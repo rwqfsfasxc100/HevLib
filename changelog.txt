@@ -1,3 +1,7 @@
+[1.15.23]
+
+1=* Fixed crash caused by slot limiters not being able to properly handle PoolStringArrays
+
 [1.15.22]
 
 1=* Added `color` type configs
