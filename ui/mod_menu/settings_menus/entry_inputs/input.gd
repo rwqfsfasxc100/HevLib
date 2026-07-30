@@ -137,4 +137,12 @@ func _visibility_changed():
 	if get_position_in_parent() == 0:
 		$Label/LABELBUTTON.grab_focus()
 	refocus()
-	
+
+func get_focusable(direction = 0):
+	return get_label(direction)
+
+func get_label(direction = 0):
+	return get_node("Label/LABELBUTTON")
+
+func get_reset(direction = 0):
+	return get_node("reset")

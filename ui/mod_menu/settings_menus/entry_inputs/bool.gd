@@ -154,3 +154,12 @@ func triggerVolatile():
 	file.open(updateCacheDir,File.WRITE)
 	file.store_string("1")
 	file.close()
+
+func get_focusable(direction = 0):
+	return get_node("CheckButton")
+
+func get_label(direction = 0):
+	return get_node("Label/LABELBUTTON")
+
+func get_reset(direction = 0):
+	return get_node("reset")

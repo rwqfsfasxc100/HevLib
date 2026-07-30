@@ -261,3 +261,11 @@ func _physics_process(delta):
 		else:
 			aslider.value = clamp(current + scale,0,255)
 
+func get_focusable(direction = 0):
+	return get_node("CheckButton")
+
+func get_label(direction = 0):
+	return get_node("Label/LABELBUTTON")
+
+func get_reset(direction = 0):
+	return get_node("reset")
