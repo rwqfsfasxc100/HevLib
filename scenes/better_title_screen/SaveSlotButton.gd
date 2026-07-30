@@ -88,10 +88,10 @@ func _ready():
 	checkSave(true)
 
 func _physics_process(delta):
-	val = val + delta
-	if val >= 5.0:
-		val = 0.0
-		if is_visible_in_tree():
+	if is_visible_in_tree():
+		val = val + delta
+		if val > 5:
+			val = 0.0
 			checkSave()
 
 var standHash:int = 0
@@ -151,14 +151,19 @@ func checkSave(force = false):
 	if not display_text:
 		display_text = newText
 
+var focuscheck_ctr = 0
 func check_focus():
-	if first:
-		grab_focus()
-	if meta:
-		if CurrentGame.oldestSave < meta.time:
-			CurrentGame.oldestSave = meta.time
+	if is_inside_tree():
+		if first:
 			grab_focus()
-
+		if meta:
+			if CurrentGame.oldestSave < meta.time:
+				CurrentGame.oldestSave = meta.time
+				grab_focus()
+	elif focuscheck_ctr < 10:
+		focuscheck_ctr += 1
+		yield(CurrentGame.get_tree(),"idle_frame")
+		check_focus()
 func newSave():
 	Debug.l("delete %s pressed" % saveSlotFile)
 	CurrentGame.saveFile = saveSlotFile
