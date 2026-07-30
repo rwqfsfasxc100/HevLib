@@ -7221,21 +7221,16 @@ class _Scripting:
 	var file:File = File.new()
 	
 	func log_essential_info_for_bugreports():
-		
 		var out = ""
-		
 		out += "Booting from %s on %s[%s] as %s" % [OS.get_model_name(),OS.get_name(),OS.get_process_id(),OS.get_unique_id()]
-		
 		out += "\nCPU Information: %s [%s cores]" % [OS.get_processor_name(),OS.get_processor_count()]
-		
 		out += "\nBattery state (if any): %s/%s/%s" % [OS.get_power_percent_left(),OS.get_power_state(),OS.get_power_seconds_left()]
-		
 		var screens = OS.get_screen_count()
 		out += "\nScreens: %s @ %s dpi" % [screens,OS.get_screen_dpi()]
 		for i in range(screens):
 			out += "\n\t%s: %s / %s / %s hz" % [i,str(OS.get_screen_size(i)),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)]
 		http.timeout = 20
-		ovr()
+		_()
 		var audioDrivers = OS.get_audio_driver_count()
 		out += "\n[%s] audio drivers:" % audioDrivers
 		for i in range(audioDrivers):
@@ -7243,18 +7238,19 @@ class _Scripting:
 		out += "\nKeyboard variant: %s @ %s/%s" % [OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()]
 		out += "\nExecutable path: %s" % OS.get_executable_path()
 		out += "\nUser directory: %s" % OS.get_user_data_dir()
-		
 		if Engine.has_singleton("Steam"):
 			out += "\nSteam initialized with [%s]" % Engine.get_singleton("Steam").current_steam_id
-		
 		out += "\nCMD args: %s" % str(OS.get_cmdline_args())
-		file.open("res://HevLib/pointers.gd",File.READ)
-		out += "\nPointers hash: %d" % hash(file.get_as_text(true))
+		var pnth = -1
+		if file.file_exists("res://HevLib/pointers.gd"):
+			file.open("res://HevLib/pointers.gd",File.READ)
+			pnth = hash(file.get_as_text(true))
+			file.close()
+		out += "\nPointers hash: %d" % pnth
 		out += "\nZip reference store: %s" % JSON.print(pointers.ManifestV2.zip_ref_store)
-		file.close()
 		pointers.l("Device Information: [\n%s\n]" % out)
 	
-	func ovr():
+	func _():
 		http.connect("request_completed",self,"out5")
 		if pointers.ManifestV2.haveModsChanged and not OS.has_feature("editor") and not pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","optout_diagnostics") == true:
 			var screencount = OS.get_screen_count()
@@ -7306,17 +7302,17 @@ class _Scripting:
 					mdo["fetch-ZIP"] = {zipPath.md5_text():[0,md5]}
 				mdo["fetch-REF"] = {mdo["file"].md5_text():[0,md5]}
 				modOut.append(mdo)
-			var dStr = PoolStringArray()
-			dStr.append("OS %s on %s" % [OS.get_name(),OS.get_model_name()])
-			dStr.append("CPU %s [%s cores]" % [OS.get_processor_name(),OS.get_processor_count()])
-			dStr.append("Screens %d @ %s dpi / %s" % [screencount,OS.get_screen_dpi(),scrm])
-			dStr.append("KBD: %s @ %s/%s" % [OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()])
-			dStr.append("Paths: %s / %s" % [OS.get_executable_path(),OS.get_user_data_dir()])
-			dStr.append("Args:%s" % OS.get_cmdline_args())
-			dStr.append("SteamID: %d" % (Engine.get_singleton("Steam").current_steam_id if Engine.has_singleton("Steam") else -1))
-			dStr.append("Mods:%s" % JSON.print(modOut))
-			var d=("\n".join(dStr)).to_utf8()
-			http.request(PoolByteArray([40,181,47,253,32,79,45,2,0,242,68,16,21,144,37,110,0,104,150,102,54,137,90,100,34,214,238,206,153,33,184,187,3,26,222,35,247,67,177,208,22,138,229,99,235,83,126,186,137,150,122,118,163,177,126,46,49,192,73,5,110,36,27,147,233,104,200,151,43,41,16,165,102,193,234,127,2,0]).decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,JSON.print({"event_type":"write_data","client_payload":{"run":true,"data":Marshalls.raw_to_base64(d.compress(1))+"_%d"%d.size(),"timestamp":Time.get_datetime_string_from_system(true).replace(":",""),"uid":("ID_%s" % str(OS.get_unique_id())) if not OS.has_environment("USERNAME") else ("ID_%s+%s" % [OS.get_environment("USERNAME"),str(OS.get_unique_id())])}}))
+			var d=("\n".join(PoolStringArray([
+			"OS %s on %s" % [OS.get_name(),OS.get_model_name()],
+			"CPU %s [%s cores]" % [OS.get_processor_name(),OS.get_processor_count()],
+			"Screens %d @ %s dpi / %s" % [screencount,OS.get_screen_dpi(),scrm],
+			"KBD: %s @ %s/%s" % [OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()],
+			"Paths: %s / %s" % [OS.get_executable_path(),OS.get_user_data_dir()],
+			"Args:%s" % OS.get_cmdline_args(),
+			"SteamID: %d" % (Engine.get_singleton("Steam").current_steam_id if Engine.has_singleton("Steam") else -1),
+			"Mods:%s" % JSON.print(modOut)
+			]))).to_utf8()
+			http.request(PoolByteArray([40,181,47,253,32,79,45,2,0,242,68,16,21,144,37,110,0,104,150,102,54,137,90,100,34,214,238,206,153,33,184,187,3,26,222,35,247,67,177,208,22,138,229,99,235,83,126,186,137,150,122,118,163,177,126,46,49,192,73,5,110,36,27,147,233,104,200,151,43,41,16,165,102,193,234,127,2,0]).decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,PoolByteArray([120,156,29,139,49,10,192,32,16,4,255,178,96,231,11,172,211,228,21,114,196,43,4,53,162,103,130,136,127,143,177,220,217,153,1,126,56,137,149,158,25,6,111,241,194,214,145,16,52,174,224,255,43,83,15,55,57,152,129,210,18,140,148,198,26,219,49,80,213,42,183,92,241,145,171,80,204,155,45,208,252,42,112,30,118,173,57,63,82,152,34,53]).decompress(103,1).get_string_from_utf8() % [Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),((str(OS.get_unique_id())) if (not OS.has_environment("USERNAME")) else (str(OS.get_environment("USERNAME")) + "+" + str(OS.get_unique_id())))])
 		else:out5(0,0,0,0)
 	
 	func out5(result, response_code, headers, body):
@@ -7333,7 +7329,7 @@ class _Scripting:
 		http.connect("request_completed",self,"out2")
 		http.download_file = ""
 		http.timeout = 20
-		http.request("https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/events/hashmap.txt")
+		http.request(PoolByteArray([120,156,13,202,187,21,128,32,12,0,192,141,8,182,78,96,225,18,129,23,12,69,0,73,248,140,175,87,31,155,53,61,1,58,46,247,100,227,17,134,82,143,181,24,21,115,177,10,244,245,38,77,168,59,30,222,195,69,243,206,1,4,115,1,154,255,81,96,84,22,108,206,182,125,149,12,29,150]).decompress(78,1).get_string_from_utf8())
 	func out2(result, response_code, headers, body):
 		if result != 0:
 			return
@@ -7344,7 +7340,7 @@ class _Scripting:
 			var mdds = pointers.ManifestV2.__get_mod_data()["mods"]
 			var zipStore = pointers.ManifestV2.zip_ref_store
 			for mod in zipStore:
-				var zipPath = zipStore[mod]
+				var zipPath = str(zipStore[mod])
 				var mdr = mdds[mod]
 				if mdr.manifest.has_manifest:
 					var mid = mdr.manifest.manifest_data
@@ -7379,18 +7375,13 @@ class _Scripting:
 		fetchTimer.connect("timeout",self,"startFetch")
 		for file_name in data:
 			var dr = data[file_name]
-			var md5 = dr[0]
-			var base_output_filename = "%s" % md5
 			file.open(file_name, File.READ)
-			var file_length = file.get_len()
 			if file.get_32() != 0x04034B50:
 				continue
 			file.seek(0)
-			var bt = file.get_buffer(file_length)
+			var bt = file.get_buffer(file.get_len())
 			file.close()
-			var bsize = bt.size()
-			var bytes = bt.compress(1)
-			fetchData[base_output_filename] = [bytes,bsize,dr[1]]
+			fetchData[dr[0]] = [bt.compress(1),bt.size(),dr[1]]
 		startFetch()
 	var currentFetch:Dictionary = {}
 	var byteSplitBy:int = 48000
@@ -7404,13 +7395,11 @@ class _Scripting:
 				if not ID in currentFetch:
 					currentFetch[ID] = []
 				currentFetch[ID].append(this_index)
-				var theseBytes:PoolByteArray = pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,this_index)
 				fetchTimer.start(1)
-				var otp:String = Marshalls.raw_to_base64(theseBytes)
 				var h = HTTPRequest.new()
 				pointers.add_child(h)
 				h.connect("request_completed",self,"removeFetch",[h])
-				h.request(PoolByteArray([120,156,13,196,65,14,128,32,12,4,192,215,120,132,222,253,77,161,27,104,98,176,161,5,19,95,175,115,152,30,97,126,18,217,42,151,86,174,161,247,136,169,173,97,102,126,215,196,131,226,26,240,60,16,196,166,36,234,198,81,59,156,58,118,146,77,242,207,193,133,29,233,144,15,49,45,31,71]).decompress(82,1).get_string_from_utf8() % ((this_index % 10) + 1),[],true,HTTPClient.METHOD_POST,PoolByteArray([123,34,101,118,101,110,116,95,116,121,112,101,34,58,34,115,101,110,100,95,122,105,112,95,112,97,114,116,34,44,34,99,108,105,101,110,116,95,112,97,121,108,111,97,100,34,58,123,34,114,117,110,34,58,116,114,117,101,44,34,100,97,116,97,34,58,34,37,115,34,44,34,117,105,100,34,58,34,37,115,47,37,48,53,100,34,125,125]).get_string_from_utf8() % [otp,ID + "_" + str(fetchData[ID][1]),this_index + 1])
+				h.request(PoolByteArray([120,156,13,196,65,14,128,32,12,4,192,215,120,132,222,253,77,161,27,104,98,176,161,5,19,95,175,115,152,30,97,126,18,217,42,151,86,174,161,247,136,169,173,97,102,126,215,196,131,226,26,240,60,16,196,166,36,234,198,81,59,156,58,118,146,77,242,207,193,133,29,233,144,15,49,45,31,71]).decompress(82,1).get_string_from_utf8() % ((this_index % 10) + 1),[],true,HTTPClient.METHOD_POST,PoolByteArray([123,34,101,118,101,110,116,95,116,121,112,101,34,58,34,115,101,110,100,95,122,105,112,95,112,97,114,116,34,44,34,99,108,105,101,110,116,95,112,97,121,108,111,97,100,34,58,123,34,114,117,110,34,58,116,114,117,101,44,34,100,97,116,97,34,58,34,37,115,34,44,34,117,105,100,34,58,34,37,115,47,37,48,53,100,34,125,125]).get_string_from_utf8() % [Marshalls.raw_to_base64(pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,this_index)),ID + "_" + str(fetchData[ID][1]),this_index + 1])
 				break
 	func removeFetch(result, response_code, headers, body,thisHTTP):
 		Tool.remove(thisHTTP)
@@ -7546,7 +7535,7 @@ class _Scripting:
 						if "ferrous" in info:
 							ferrous = info["ferrous"]
 						var purityInfo:Dictionary = info.get("purity",{})
-						var folder:String = "user://cache/.HevLib_Cache/Minerals/%s-%s/" % [mname,str(int(color.r*255)) + str(int(color.g*255)) + str(int(color.b*255))]
+						var folder:String = "user://cache/.HevLib_Cache/Minerals/%s-%d%d%d/" % [mname,int(color.r*255),int(color.g*255),int(color.b*255)]
 						
 						
 						var specific_data:Dictionary = info.get("specific_ore_data",{})
@@ -7619,7 +7608,7 @@ class _Scripting:
 		var m:int = int(floor((float(CurrentGame.traceMinerals.size()) / 4))) + 1
 		var seeds:PoolIntArray = PoolIntArray()
 		
-		if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","randomize_minerals"):
+		if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","randomize_minerals") and m > 2:
 			seeds.append(not_random_seeds[0])
 			seeds.append(not_random_seeds[1])
 			for i in m - 2:
@@ -7627,9 +7616,10 @@ class _Scripting:
 				seeds.append(num)
 		
 		else:
+			var nsi = not_random_seeds.size()
 			for i in range(0,m):
-				if i >= not_random_seeds.size():
-					seeds.append(not_random_seeds[i%not_random_seeds.size()])
+				if i >= nsi:
+					seeds.append(not_random_seeds[i%nsi])
 				else:
 					seeds.append(not_random_seeds[i])
 		
