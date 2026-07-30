@@ -996,9 +996,8 @@ class _ConfigDriver:
 						else:
 							match type:
 								"input":
-									var df : Array = key_data["default"]
 									var out : Array = []
-									for a in df:
+									for a in key_data.get("default",[]):
 										if typeof(a) == TYPE_STRING:
 											a = [a]
 										out.append(a)
@@ -1100,8 +1099,12 @@ class _ConfigDriver:
 		var pos = button.get_position_in_parent()
 		var icon_button
 		var reset_button
-		icon_button = button.get_node("Label/LABELBUTTON")
-		reset_button = button.get_node("reset")
+		if button.has_method("get_label"):
+			icon_button = button.get_label()
+		else: breakpoint
+		if button.has_method("get_reset"):
+			reset_button = button.get_reset()
+		else: breakpoint
 		
 		if children.size() == 1:
 			icon_button.focus_neighbour_top = "."
@@ -1111,96 +1114,64 @@ class _ConfigDriver:
 			icon_button.focus_neighbour_top = "."
 			reset_button.focus_neighbour_top = "."
 			check_button.focus_neighbour_top = "."
-			var p1 = parent.get_child(pos+1)
-			var script : Script  = p1.get_script()
-			if script != null and parent.get_child(pos+1).name != "BottomSeparatorForToolTipsPlsIgnore":
-				var path = script.get_path()
-				icon_button.focus_neighbour_bottom = icon_button.get_path_to(parent.get_child(pos + 1).get_node("Label/LABELBUTTON"))
-				reset_button.focus_neighbour_bottom = reset_button.get_path_to(parent.get_child(pos + 1).get_node("reset"))
-				
-				match path:
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.gd","res://HevLib/ui/mod_menu/settings_menus/entry_inputs/color.gd":
-						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("CheckButton"))
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/action.gd":
-						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("Button"))
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/int-float.gd":
-						var style = parent.get_child(pos+1).style
-						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node_or_null(style))
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/string.gd":
-						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("LineEdit"))
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/option_button.gd":
-						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("OptionButton"))
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/input.gd":
-						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("Label/LABELBUTTON"))
-					_:
-						breakpoint
+			var direction = 1
+			var neighbour = parent.get_child(pos + direction)
+			var script : Script = neighbour.get_script()
+			if script != null and script.get_path() != "res://HevLib/ui/mod_menu/mod_list/BottomSeparator.gd":
+				if neighbour:
+					if neighbour.has_method("get_label"):
+						icon_button.focus_neighbour_bottom = icon_button.get_path_to(neighbour.get_label(direction))
+					else: breakpoint
+					if neighbour.has_method("get_reset"):
+						reset_button.focus_neighbour_bottom = reset_button.get_path_to(neighbour.get_reset(direction))
+					else: breakpoint
+					if neighbour.has_method("get_focusable"):
+						check_button.focus_neighbour_bottom = check_button.get_path_to(neighbour.get_focusable(direction))
+					else: breakpoint
 		elif pos == children.size() - 1:
-			var script : Script  = parent.get_child(pos-1).get_script()
-			if script != null and parent.get_child(pos-1).name != "BottomSeparatorForToolTipsPlsIgnore":
-				var path:String = script.get_path()
-				icon_button.focus_neighbour_top = icon_button.get_path_to(parent.get_child(pos - 1).get_node("Label/LABELBUTTON"))
-				reset_button.focus_neighbour_top = reset_button.get_path_to(parent.get_child(pos - 1).get_node("reset"))
-				match path:
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.gd","res://HevLib/ui/mod_menu/settings_menus/entry_inputs/color.gd":
-						check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("CheckButton"))
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/action.gd":
-						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos - 1).get_node("Button"))
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/int-float.gd":
-						var style = parent.get_child(pos-1).style
-						check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node_or_null(style))
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/string.gd":
-						check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("LineEdit"))
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/option_button.gd":
-						check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("OptionButton"))
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/input.gd":
-						check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("Label/LABELBUTTON"))
-					_:
-						breakpoint
+			var direction = -1
+			var neighbour = parent.get_child(pos + direction)
+			var script : Script = neighbour.get_script()
+			if script != null and script.get_path() != "res://HevLib/ui/mod_menu/mod_list/BottomSeparator.gd":
+				if neighbour:
+					if neighbour.has_method("get_label"):
+						icon_button.focus_neighbour_top = icon_button.get_path_to(neighbour.get_label(direction))
+					else: breakpoint
+					if neighbour.has_method("get_reset"):
+						reset_button.focus_neighbour_top = reset_button.get_path_to(neighbour.get_reset(direction))
+					else: breakpoint
+					if neighbour.has_method("get_focusable"):
+						check_button.focus_neighbour_top = check_button.get_path_to(neighbour.get_focusable(direction))
+					else: breakpoint
 		else:
-			var script1 : Script  = parent.get_child(pos-1).get_script()
-			if script1 != null and parent.get_child(pos-1).name != "BottomSeparatorForToolTipsPlsIgnore":
-				var path:String = script1.get_path()
-				icon_button.focus_neighbour_top = icon_button.get_path_to(parent.get_child(pos - 1).get_node("Label/LABELBUTTON"))
-				reset_button.focus_neighbour_top = reset_button.get_path_to(parent.get_child(pos - 1).get_node("reset"))
-				match path:
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.gd","res://HevLib/ui/mod_menu/settings_menus/entry_inputs/color.gd":
-						check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("CheckButton"))
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/action.gd":
-						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos - 1).get_node("Button"))
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/int-float.gd":
-						var style = parent.get_child(pos-1).style
-						check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node_or_null(style))
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/string.gd":
-						check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("LineEdit"))
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/option_button.gd":
-						check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("OptionButton"))
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/input.gd":
-						check_button.focus_neighbour_top = check_button.get_path_to(parent.get_child(pos - 1).get_node("Label/LABELBUTTON"))
-					_:
-						breakpoint
-			
-			var p2 = parent.get_child(pos+1)
-			var script2:Script = p2.get_script()
-			if script2 != null and parent.get_child(pos+1).name != "BottomSeparatorForToolTipsPlsIgnore":
-				var path:String = script2.get_path()
-				icon_button.focus_neighbour_bottom = icon_button.get_path_to(parent.get_child(pos + 1).get_node("Label/LABELBUTTON"))
-				reset_button.focus_neighbour_bottom = reset_button.get_path_to(parent.get_child(pos + 1).get_node("reset"))
-				match path:
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/bool.gd","res://HevLib/ui/mod_menu/settings_menus/entry_inputs/color.gd":
-						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("CheckButton"))
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/action.gd":
-						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("Button"))
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/int-float.gd":
-						var style = parent.get_child(pos+1).style
-						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node_or_null(style))
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/string.gd":
-						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("LineEdit"))
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/option_button.gd":
-						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("OptionButton"))
-					"res://HevLib/ui/mod_menu/settings_menus/entry_inputs/input.gd":
-						check_button.focus_neighbour_bottom = check_button.get_path_to(parent.get_child(pos + 1).get_node("Label/LABELBUTTON"))
-					_:
-						breakpoint
+			var direction1 = -1
+			var neighbour1 = parent.get_child(pos + direction1)
+			var script1 : Script = neighbour1.get_script()
+			if script1 != null and script1.get_path() != "res://HevLib/ui/mod_menu/mod_list/BottomSeparator.gd":
+				if neighbour1:
+					if neighbour1.has_method("get_label"):
+						icon_button.focus_neighbour_top = icon_button.get_path_to(neighbour1.get_label(direction1))
+					else: breakpoint
+					if neighbour1.has_method("get_reset"):
+						reset_button.focus_neighbour_top = reset_button.get_path_to(neighbour1.get_reset(direction1))
+					else: breakpoint
+					if neighbour1.has_method("get_focusable"):
+						check_button.focus_neighbour_top = check_button.get_path_to(neighbour1.get_focusable(direction1))
+					else: breakpoint
+			var direction2 = 1
+			var neighbour2 = parent.get_child(pos + direction2)
+			var script : Script  = neighbour2.get_script()
+			if script != null and script.get_path() != "res://HevLib/ui/mod_menu/mod_list/BottomSeparator.gd":
+				if neighbour2:
+					if neighbour2.has_method("get_label"):
+						icon_button.focus_neighbour_bottom = icon_button.get_path_to(neighbour2.get_label(direction2))
+					else: breakpoint
+					if neighbour2.has_method("get_reset"):
+						reset_button.focus_neighbour_bottom = reset_button.get_path_to(neighbour2.get_reset(direction2))
+					else: breakpoint
+					if neighbour2.has_method("get_focusable"):
+						check_button.focus_neighbour_bottom = check_button.get_path_to(neighbour2.get_focusable(direction2))
+					else: breakpoint
 	var mk_c : bool = false
 	func __change_made():
 		mk_c = true
@@ -6287,7 +6258,14 @@ class _ManifestV2:
 								var sec_data = configs[section]
 								for cfname in sec_data:
 									var cfdata = sec_data[cfname]
-									if not cfdata.get("disabled",false):
+									var type = cfdata.get("type",null)
+									if cfdata.get("disabled",false):
+										pointers.l("Config %s/%s is disabled, skipping" % [section,cfname],"pointers.ConfigDriver")
+									elif typeof(type) != TYPE_STRING or not type:
+										var err = "Config %s @ %s does not define a type, skipping" % [cfname,section]
+										printerr(err)
+										pointers.l(err,"pointers.ConfigDriver")
+									else:
 										if not section in ovConfigs:
 											ovConfigs[section] = {}
 										ovConfigs[section][cfname] = cfdata
