@@ -65,10 +65,19 @@ focusAt = NodePath("../../..")
 
 [node name="PlaySoundsOnTheseButtons" parent="reset/TextureRect" instance=ExtResource( 3 )]
 
+[node name="SliderLabel" type="Label" parent="."]
+margin_left = 381.0
+margin_right = 481.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 100, 50 )
+size_flags_horizontal = 4
+align = 2
+valign = 1
+
 [node name="spinbox" type="SpinBox" parent="."]
 visible = false
-margin_left = 367.0
-margin_right = 517.0
+margin_left = 485.0
+margin_right = 1035.0
 margin_bottom = 50.0
 rect_min_size = Vector2( 550, 50 )
 max_value = 10.0
@@ -83,15 +92,6 @@ rect_min_size = Vector2( 0, 50 )
 focusAt = NodePath("../../..")
 
 [node name="PlaySoundsOnTheseButtons" parent="spinbox/Label" instance=ExtResource( 3 )]
-
-[node name="SliderLabel" type="Label" parent="."]
-margin_left = 381.0
-margin_right = 481.0
-margin_bottom = 50.0
-rect_min_size = Vector2( 100, 50 )
-size_flags_horizontal = 4
-align = 2
-valign = 1
 
 [node name="slider" type="HSlider" parent="."]
 margin_left = 485.0

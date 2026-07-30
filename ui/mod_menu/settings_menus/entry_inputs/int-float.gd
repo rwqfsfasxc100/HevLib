@@ -77,12 +77,12 @@ func _ready():
 		spinbox.visible = false
 		slider.visible = true
 		SliderLabel.visible = true
-		$Label/LABELBUTTON.focus_neighbour_right = get_path_to($slider)
+		$Label/LABELBUTTON.focus_neighbour_right = get_path_to(slider)
 	elif style == "spinbox":
 		spinbox.visible = true
 		slider.visible = false
 		SliderLabel.visible = false
-		$Label/LABELBUTTON.focus_neighbour_right = get_path_to($spinbox)
+		$Label/LABELBUTTON.focus_neighbour_right = get_path_to(spinbox)
 	slider.value = value
 	spinbox.value = value
 	volatile = CONFIG_DATA.get("require_restart",false)
@@ -155,13 +155,20 @@ func recheck_availability():
 	if v != CONFIG_DATA.get("default",10.0):
 		$reset.visible = true
 		$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($reset)
+		match style:
+			"slider":
+				slider.focus_neighbour_left = slider.get_path_to($reset)
+			"spinbox":
+				spinbox.focus_neighbour_left = spinbox.get_path_to($reset)
 	else:
 		$reset.visible = false
 		match style:
 			"slider":
-				$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($slider)
+				$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to(slider)
+				slider.focus_neighbour_left = slider.get_path_to($Label/LABELBUTTON)
 			"spinbox":
-				$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($spinbox)
+				$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to(spinbox)
+				spinbox.focus_neighbour_left = spinbox.get_path_to($Label/LABELBUTTON)
 	var requirements = PoolStringArray(CONFIG_DATA.get("requires_bools",[]))
 	if requirements.size() >= 1:
 		var show = true
@@ -224,35 +231,42 @@ func recheck_availability():
 func _input(event):
 	if slider.has_focus():
 		var action_passed = false
-		var val = 0
-		var step = 0
-		match val_type:
-			"int":
-				val = round(slider.value)
-				step = round(slider.step)
-			"float":
-				val = float(slider.value)
-				step = float(slider.step)
-		if event.is_action_pressed("ui_left"):
-			if not slider.allow_lesser:
-				if val > slider.min_value:
+		if Input.is_action_just_pressed("ui_cancel") or Input.is_action_just_pressed("ui_accept"):
+			if $reset.visible:
+				$reset.grab_focus()
+			else:
+				$Label/LABELBUTTON.grab_focus()
+			get_viewport().set_input_as_handled()
+		else:
+			var val = 0
+			var step = 0
+			match val_type:
+				"int":
+					val = round(slider.value)
+					step = round(slider.step)
+				"float":
+					val = float(slider.value)
+					step = float(slider.step)
+			if event.is_action_pressed("ui_left"):
+				if not slider.allow_lesser:
+					if val > slider.min_value:
+						slider.value = val - step
+						action_passed = true
+				else:
 					slider.value = val - step
 					action_passed = true
-			else:
-				slider.value = val - step
-				action_passed = true
-		if event.is_action_pressed("ui_right"):
-			if not slider.allow_greater:
-				if val < slider.max_value:
+			if event.is_action_pressed("ui_right"):
+				if not slider.allow_greater:
+					if val < slider.max_value:
+						slider.value = val + step
+						action_passed = true
+				else:
 					slider.value = val + step
 					action_passed = true
-			else:
-				slider.value = val + step
-				action_passed = true
-		if action_passed:
-			get_viewport().set_input_as_handled()
-			get_tree().call_group("hevlib_settings_tab","recheck_availability")
-			$Timer.start()
+			if action_passed:
+				get_viewport().set_input_as_handled()
+				get_tree().call_group("hevlib_settings_tab","recheck_availability")
+				$Timer.start()
 
 
 func _timeout():

@@ -48,7 +48,6 @@ func _ready():
 			loaded_scene = scene.instance()
 			if "display_container" in loaded_scene:
 				loaded_scene.display_container = self
-			
 			$MarginContainer.add_child(loaded_scene)
 		else:
 			var logErr = "ERROR: Display panel cannot instance scene from file [%]" % path
