@@ -995,8 +995,6 @@ class _ConfigDriver:
 									current_config[sect][b] = out
 						else:
 							match type:
-								"action":
-									current_config[sect].merge({key:key_data.get("method","_pressed")})
 								"input":
 									var df : Array = key_data["default"]
 									var out : Array = []
@@ -6382,9 +6380,9 @@ class _ManifestV2:
 			for mod in data:
 				match tag_name:
 					"TAG_ADDS_EQUIPMENT","TAG_ADDS_EVENTS","TAG_ADDS_GAMEPLAY_MECHANICS","TAG_ADDS_SHIPS":
-						var k : Array = data.get(mod,[])
+						var k : Array = Array(data.get(mod,[]))
 						if k:
-							var equip : Array = []
+							var equip : Array = Array()
 							for lang in k:
 								equip.append(lang)
 							ex_data[mod] = equip

@@ -67,8 +67,6 @@ func _ready():
 		ordered_section_info[i[0]] = i[1]
 	for entry in ordered_section_info:
 		var entry_info = ordered_section_info[entry]
-		var entry_values = section_values[entry]
-		
 		var type = entry_info["type"].to_lower()
 		match type:
 			"bool","boolean":
