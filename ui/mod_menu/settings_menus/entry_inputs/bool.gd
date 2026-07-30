@@ -140,7 +140,9 @@ func _draw():
 
 func refocus():
 	$Label/LABELBUTTON.rect_size = $Label.rect_size
-	pointers.ConfigDriver.set_button_focus(self,get_node("CheckButton"))
+	if is_visible_in_tree():
+		yield(get_tree(),"idle_frame")
+		pointers.ConfigDriver.set_button_focus(self,get_node("CheckButton"))
 	
 
 func _visibility_changed():

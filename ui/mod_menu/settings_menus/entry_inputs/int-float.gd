@@ -125,7 +125,9 @@ func refocus():
 		spinbox.visible = true
 		slider.visible = false
 		SliderLabel.visible = false
-	pointers.ConfigDriver.set_button_focus(self,get_node(style))
+	if is_visible_in_tree():
+		yield(get_tree(),"idle_frame")
+		pointers.ConfigDriver.set_button_focus(self,get_node(style))
 
 func _value_changed(value):
 	if volatile:

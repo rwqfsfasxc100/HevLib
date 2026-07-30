@@ -1106,10 +1106,15 @@ class _ConfigDriver:
 			reset_button = button.get_reset()
 		else: breakpoint
 		
+		icon_button.focus_neighbour_top = "."
+		reset_button.focus_neighbour_top = "."
+		check_button.focus_neighbour_top = "."
+		icon_button.focus_neighbour_bottom = "."
+		reset_button.focus_neighbour_bottom = "."
+		check_button.focus_neighbour_bottom = "."
+		
 		if children.size() == 1:
-			icon_button.focus_neighbour_top = "."
-			reset_button.focus_neighbour_top = "."
-			check_button.focus_neighbour_top = "."
+			return
 		elif pos == 0:
 			icon_button.focus_neighbour_top = "."
 			reset_button.focus_neighbour_top = "."
@@ -1120,13 +1125,19 @@ class _ConfigDriver:
 			if script != null and script.get_path() != "res://HevLib/ui/mod_menu/mod_list/BottomSeparator.gd":
 				if neighbour:
 					if neighbour.has_method("get_label"):
-						icon_button.focus_neighbour_bottom = icon_button.get_path_to(neighbour.get_label(direction))
+						var label = neighbour.get_label(direction)
+						if label:
+							icon_button.focus_neighbour_bottom = icon_button.get_path_to(label)
 					else: breakpoint
 					if neighbour.has_method("get_reset"):
-						reset_button.focus_neighbour_bottom = reset_button.get_path_to(neighbour.get_reset(direction))
+						var reset = neighbour.get_reset(direction)
+						if reset:
+							reset_button.focus_neighbour_bottom = reset_button.get_path_to(reset)
 					else: breakpoint
 					if neighbour.has_method("get_focusable"):
-						check_button.focus_neighbour_bottom = check_button.get_path_to(neighbour.get_focusable(direction))
+						var focusable = neighbour.get_focusable(direction)
+						if focusable:
+							check_button.focus_neighbour_bottom = check_button.get_path_to(focusable)
 					else: breakpoint
 		elif pos == children.size() - 1:
 			var direction = -1
@@ -1135,13 +1146,19 @@ class _ConfigDriver:
 			if script != null and script.get_path() != "res://HevLib/ui/mod_menu/mod_list/BottomSeparator.gd":
 				if neighbour:
 					if neighbour.has_method("get_label"):
-						icon_button.focus_neighbour_top = icon_button.get_path_to(neighbour.get_label(direction))
+						var label = neighbour.get_label(direction)
+						if label:
+							icon_button.focus_neighbour_top = icon_button.get_path_to(label)
 					else: breakpoint
 					if neighbour.has_method("get_reset"):
-						reset_button.focus_neighbour_top = reset_button.get_path_to(neighbour.get_reset(direction))
+						var reset = neighbour.get_reset(direction)
+						if reset:
+							reset_button.focus_neighbour_top = reset_button.get_path_to(reset)
 					else: breakpoint
 					if neighbour.has_method("get_focusable"):
-						check_button.focus_neighbour_top = check_button.get_path_to(neighbour.get_focusable(direction))
+						var focusable = neighbour.get_focusable(direction)
+						if focusable:
+							check_button.focus_neighbour_top = check_button.get_path_to(focusable)
 					else: breakpoint
 		else:
 			var direction1 = -1
@@ -1150,13 +1167,19 @@ class _ConfigDriver:
 			if script1 != null and script1.get_path() != "res://HevLib/ui/mod_menu/mod_list/BottomSeparator.gd":
 				if neighbour1:
 					if neighbour1.has_method("get_label"):
-						icon_button.focus_neighbour_top = icon_button.get_path_to(neighbour1.get_label(direction1))
+						var label = neighbour1.get_label(direction1)
+						if label:
+							icon_button.focus_neighbour_top = icon_button.get_path_to(label)
 					else: breakpoint
 					if neighbour1.has_method("get_reset"):
-						reset_button.focus_neighbour_top = reset_button.get_path_to(neighbour1.get_reset(direction1))
+						var reset = neighbour1.get_reset(direction1)
+						if reset:
+							reset_button.focus_neighbour_top = reset_button.get_path_to(reset)
 					else: breakpoint
 					if neighbour1.has_method("get_focusable"):
-						check_button.focus_neighbour_top = check_button.get_path_to(neighbour1.get_focusable(direction1))
+						var focusable = neighbour1.get_focusable(direction1)
+						if focusable:
+							check_button.focus_neighbour_top = check_button.get_path_to(focusable)
 					else: breakpoint
 			var direction2 = 1
 			var neighbour2 = parent.get_child(pos + direction2)
@@ -1164,13 +1187,19 @@ class _ConfigDriver:
 			if script != null and script.get_path() != "res://HevLib/ui/mod_menu/mod_list/BottomSeparator.gd":
 				if neighbour2:
 					if neighbour2.has_method("get_label"):
-						icon_button.focus_neighbour_bottom = icon_button.get_path_to(neighbour2.get_label(direction2))
+						var label = neighbour2.get_label(direction2)
+						if label:
+							icon_button.focus_neighbour_bottom = icon_button.get_path_to(label)
 					else: breakpoint
 					if neighbour2.has_method("get_reset"):
-						reset_button.focus_neighbour_bottom = reset_button.get_path_to(neighbour2.get_reset(direction2))
+						var reset = neighbour2.get_reset(direction2)
+						if reset:
+							reset_button.focus_neighbour_bottom = reset_button.get_path_to(reset)
 					else: breakpoint
 					if neighbour2.has_method("get_focusable"):
-						check_button.focus_neighbour_bottom = check_button.get_path_to(neighbour2.get_focusable(direction2))
+						var focusable = neighbour2.get_focusable(direction2)
+						if focusable:
+							check_button.focus_neighbour_bottom = check_button.get_path_to(focusable)
 					else: breakpoint
 	var mk_c : bool = false
 	func __change_made():

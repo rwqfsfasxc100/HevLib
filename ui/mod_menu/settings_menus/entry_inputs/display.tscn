@@ -16,7 +16,7 @@ script = ExtResource( 4 )
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 margin_right = 50.0
 margin_bottom = 50.0
-rect_min_size = Vector2( 50, 0 )
+rect_min_size = Vector2( 50, 50 )
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 margin_left = 54.0

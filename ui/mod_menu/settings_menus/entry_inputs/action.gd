@@ -88,14 +88,13 @@ func recheck_availability():
 		$Button.disabled = false
 
 func _draw():
-	
 	refocus()
 
 func refocus():
 	$Label/LABELBUTTON.rect_size = $Label.rect_size
-#	get_tree().call_group("hevlib_settings_tab","recheck_availability")
-	
-	pointers.ConfigDriver.set_button_focus(self,get_node("Button"))
+	if is_visible_in_tree():
+		yield(get_tree(),"idle_frame")
+		pointers.ConfigDriver.set_button_focus(self,get_node("Button"))
 
 func get_focusable(direction = 0):
 	return get_node("Button")

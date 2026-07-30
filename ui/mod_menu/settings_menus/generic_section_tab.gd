@@ -68,6 +68,7 @@ func _ready():
 	for entry in ordered_section_info:
 		var entry_info = ordered_section_info[entry]
 		var type = entry_info["type"].to_lower()
+		var wait = true
 		match type:
 			"bool","boolean":
 				var input = BOOL.instance()
@@ -130,8 +131,17 @@ func _ready():
 				input.CONFIG_SECTION = name
 				input.CONFIG_MOD = mod
 				$MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer.add_child(input)
-		
-		yield(get_tree(),"idle_frame")
+			"display":
+				var input = DISPLAY.instance()
+				input.name = entry
+				input.CONFIG_DATA = entry_info
+				input.CONFIG_ENTRY = entry
+				input.CONFIG_SECTION = name
+				input.CONFIG_MOD = mod
+				wait = false
+				$MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer.add_child(input)
+		if wait:
+			yield(get_tree(),"idle_frame")
 	var hb = HBoxContainer.new()
 	hb.name = "BottomSeparatorForToolTipsPlsIgnore"
 	hb.set_script(load("res://HevLib/ui/mod_menu/mod_list/BottomSeparator.gd"))
@@ -148,6 +158,7 @@ var OPTION = load("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/option_b
 var INPUT = load("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/input.tscn")
 var ACTION = load("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/action.tscn")
 var COLOR = load("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/color.tscn")
+var DISPLAY = load("res://HevLib/ui/mod_menu/settings_menus/entry_inputs/display.tscn")
 
 func cancel():
 	get_parent().get_parent().get_parent().get_parent().get_parent().get_parent().cancel()

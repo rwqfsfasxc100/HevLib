@@ -46,36 +46,47 @@ func _ready():
 		var scene:PackedScene = pointers.DataFormat.__get_load()
 		if scene and scene.can_instance():
 			loaded_scene = scene.instance()
+			if "display_container" in loaded_scene:
+				loaded_scene.display_container = self
+			
 			$MarginContainer.add_child(loaded_scene)
 		else:
 			var logErr = "ERROR: Display panel cannot instance scene from file [%]" % path
 			printerr(logErr)
 			pointers.l(logErr,"Mod Menu 2 Settings Panel")
+			get_parent().remove_child(self)
+			Tool.remove(self)
 	add_to_group("hevlib_settings_tab",true)
 
 func get_focusable(direction = 0):
+	if loaded_scene and loaded_scene.has_method("get_focusable"):
+		return loaded_scene.get_focusable(direction)
 	if direction == 0:
 		printerr("Focusable fetch direction for [%s] is zero, and it shouldn't be" % ("%s|%s" % [str(self),get_path()]))
 	else:
 		var change = get_parent().get_child(get_position_in_parent() + direction)
-		if change.has_method("get_focusable"):
+		if change and change.has_method("get_focusable"):
 			return change.get_focusable(direction)
 	return
 
 func get_label(direction = 0):
+	if loaded_scene and loaded_scene.has_method("get_label"):
+		return loaded_scene.get_label(direction)
 	if direction == 0:
 		printerr("Label fetch direction for [%s] is zero, and it shouldn't be" % ("%s|%s" % [str(self),get_path()]))
 	else:
 		var change = get_parent().get_child(get_position_in_parent() + direction)
-		if change.has_method("get_label"):
+		if change and change.has_method("get_label"):
 			return change.get_label(direction)
 	return
 
 func get_reset(direction = 0):
+	if loaded_scene and loaded_scene.has_method("get_reset"):
+		return loaded_scene.get_reset(direction)
 	if direction == 0:
 		printerr("Reset fetch direction for [%s] is zero, and it shouldn't be" % ("%s|%s" % [str(self),get_path()]))
 	else:
 		var change = get_parent().get_child(get_position_in_parent() + direction)
-		if change.has_method("get_label"):
-			return change.get_label(direction)
+		if change and change.has_method("get_reset"):
+			return change.get_reset(direction)
 	return
