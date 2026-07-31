@@ -77,9 +77,11 @@ func recheck_availability():
 	if $OptionButton.selected != def:
 		$reset.visible = true
 		$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($reset)
+		$OptionButton.focus_neighbour_left = $OptionButton.get_path_to($reset)
 	else:
 		$reset.visible = false
 		$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($OptionButton)
+		$OptionButton.focus_neighbour_left = $OptionButton.get_path_to($Label/LABELBUTTON)
 	var requirements = PoolStringArray(CONFIG_DATA.get("requires_bools",[]))
 	if requirements.size() >= 1:
 		var show = true

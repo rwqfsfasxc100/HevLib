@@ -40,6 +40,11 @@ var pointers = ModLoader._savedObjects[0]
 
 var volatile = false
 
+onready var label_button = $Label/LABELBUTTON
+onready var name_label = $Label
+onready var color_button = $CheckButton
+onready var reset_button = $reset
+
 func _ready():
 	var value = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	if value == null:
@@ -48,16 +53,16 @@ func _ready():
 	var edit_alpha = CONFIG_DATA.get("edit_alpha",true)
 	if not edit_alpha:
 		value.a = 1
-	$Label.text = CONFIG_DATA.get("name","COLOR_MISSING_NAME")
-	$CheckButton.color = value
-	$CheckButton.edit_alpha = edit_alpha
+	name_label.text = CONFIG_DATA.get("name","COLOR_MISSING_NAME")
+	color_button.color = value
+	color_button.edit_alpha = edit_alpha
 	var desc = str(CONFIG_DATA.get("description",""))
 	if volatile:
 		if desc != "":
 			desc = TranslationServer.translate(desc) + "\n\n" + TranslationServer.translate("HEVLIB_SETTING_REQUIRES_RESTART")
 		else:
 			desc = "HEVLIB_SETTING_REQUIRES_RESTART"
-	$Label/LABELBUTTON.hint_tooltip = desc
+	label_button.hint_tooltip = desc
 	add_to_group("hevlib_settings_tab",true)
 
 func _toggled(color):
@@ -72,13 +77,15 @@ func recheck_availability():
 	var col = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	if not CONFIG_DATA.get("edit_alpha",true):
 		col.a = 1
-	$CheckButton.color = col
-	if $CheckButton.color != CONFIG_DATA.get("default",Color(1,1,1,1)):
-		$reset.visible = true
-		$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($reset)
+	color_button.color = col
+	if color_button.color != CONFIG_DATA.get("default",Color(1,1,1,1)):
+		reset_button.visible = true
+		label_button.focus_neighbour_right = label_button.get_path_to(reset_button)
+		color_button.focus_neighbour_left = label_button.get_path_to(reset_button)
 	else:
-		$reset.visible = false
-		$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($CheckButton)
+		reset_button.visible = false
+		label_button.focus_neighbour_right = label_button.get_path_to(color_button)
+		color_button.focus_neighbour_left = label_button.get_path_to(label_button)
 	var requirements = PoolStringArray(CONFIG_DATA.get("requires_bools",[]))
 	if requirements.size() >= 1:
 		var show = true
@@ -97,31 +104,31 @@ func recheck_availability():
 		if valid_options >= 1:
 			if flip:
 				if true_valids >= 1:
-					$reset.modulate = Color(0.6,0.6,0.6,1)
-					$reset.disabled = true
-					$CheckButton.modulate = Color(0.6,0.6,0.6,1)
-					$CheckButton.disabled = true
+					reset_button.modulate = Color(0.6,0.6,0.6,1)
+					reset_button.disabled = true
+					color_button.modulate = Color(0.6,0.6,0.6,1)
+					color_button.disabled = true
 				else:
-					$reset.modulate = Color(1,1,1,1)
-					$reset.disabled = false
-					$CheckButton.modulate = Color(1,1,1,1)
-					$CheckButton.disabled = false
+					reset_button.modulate = Color(1,1,1,1)
+					reset_button.disabled = false
+					color_button.modulate = Color(1,1,1,1)
+					color_button.disabled = false
 			else:
 				if true_valids >= 1:
-					$reset.modulate = Color(1,1,1,1)
-					$reset.disabled = false
-					$CheckButton.modulate = Color(1,1,1,1)
-					$CheckButton.disabled = false
+					reset_button.modulate = Color(1,1,1,1)
+					reset_button.disabled = false
+					color_button.modulate = Color(1,1,1,1)
+					color_button.disabled = false
 				else:
-					$reset.modulate = Color(0.6,0.6,0.6,1)
-					$reset.disabled = true
-					$CheckButton.modulate = Color(0.6,0.6,0.6,1)
-					$CheckButton.disabled = true
+					reset_button.modulate = Color(0.6,0.6,0.6,1)
+					reset_button.disabled = true
+					color_button.modulate = Color(0.6,0.6,0.6,1)
+					color_button.disabled = true
 	else:
-		$reset.modulate = Color(1,1,1,1)
-		$reset.disabled = false
-		$CheckButton.modulate = Color(1,1,1,1)
-		$CheckButton.disabled = false
+		reset_button.modulate = Color(1,1,1,1)
+		reset_button.disabled = false
+		color_button.modulate = Color(1,1,1,1)
+		color_button.disabled = false
 
 func _reset_pressed():
 	var defaultVal = CONFIG_DATA.get("default",Color(1,1,1,1))
@@ -131,9 +138,9 @@ func _reset_pressed():
 		var old_val = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 		if old_val != defaultVal:
 			triggerVolatile()
-	$CheckButton.color = defaultVal
+	color_button.color = defaultVal
 	pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,defaultVal)
-	$CheckButton.grab_focus()
+	color_button.grab_focus()
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 
 func _draw():
@@ -141,15 +148,15 @@ func _draw():
 	refocus()
 
 func refocus():
-	$Label/LABELBUTTON.rect_size = $Label.rect_size
+	label_button.rect_size = name_label.rect_size
 	if is_visible_in_tree():
 		yield(get_tree(),"idle_frame")
-		pointers.ConfigDriver.set_button_focus(self,get_node("CheckButton"))
+		pointers.ConfigDriver.set_button_focus(self,color_button)
 	
 
 func _visibility_changed():
 	if get_position_in_parent() == 0:
-		$Label/LABELBUTTON.grab_focus()
+		label_button.grab_focus()
 	refocus()
 
 var updateCacheDir = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
@@ -176,7 +183,7 @@ var rawtoggle
 var hexlabel
 var hexlineedit
 func _picker_created():
-	picker = $CheckButton.get_picker()
+	picker = color_button.get_picker()
 	picker.presets_enabled = false
 	picker.presets_visible = false
 	picker.rect_min_size = picker.rect_size
@@ -225,7 +232,7 @@ func picker_showing(pc:ColorPicker):
 		yield(get_tree(),"idle_frame")
 		pc.get_child(4).get_child(0).get_child(1).grab_focus()
 	else:
-		$CheckButton.grab_focus()
+		color_button.grab_focus()
 
 func _input(event):
 	if picker and picker.is_visible_in_tree() and event is InputEventJoypadMotion:
@@ -264,10 +271,10 @@ func _physics_process(delta):
 			aslider.value = clamp(current + scale,0,255)
 
 func get_focusable(direction = 0):
-	return get_node("CheckButton")
+	return color_button
 
 func get_label(direction = 0):
-	return get_node("Label/LABELBUTTON")
+	return label_button
 
 func get_reset(direction = 0):
-	return get_node("reset")
+	return reset_button

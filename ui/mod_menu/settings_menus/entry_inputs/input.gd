@@ -38,16 +38,22 @@ var CONFIG_SECTION = ""
 var CONFIG_MOD = ""
 var pointers = ModLoader._savedObjects[0]
 
+onready var label_button = $Label/LABELBUTTON
+onready var key_diag = $Label/LABELBUTTON/CanvasLayer/CaptureKeyDialog
+onready var reset_button = $reset
+onready var name_label = $Label
+
+
 func _ready():
 	var value = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	if value == null:
 		Tool.remove(self)
 	value = Array(value)
 	$Label.text = CONFIG_DATA.get("name","INPUT_MISSING_NAME")
-	$Label/LABELBUTTON.hint_tooltip = CONFIG_DATA.get("description","")
+	label_button.hint_tooltip = CONFIG_DATA.get("description","")
 	var ab = Array(CONFIG_DATA.get("always_binds",[]))
 	if ab:
-		$Label/LABELBUTTON.always_binds = ab
+		label_button.always_binds = ab
 	add_to_group("hevlib_settings_tab",true)
 
 func recheck_availability():
@@ -68,11 +74,11 @@ func recheck_availability():
 			if hash(i) != hash(a):
 				reset = true
 	if reset:
-		$reset.visible = true
-		$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($reset)
+		reset_button.visible = true
+		label_button.focus_neighbour_right = label_button.get_path_to(reset_button)
 	else:
-		$reset.visible = false
-		$Label/LABELBUTTON.focus_neighbour_right = "."
+		reset_button.visible = false
+		label_button.focus_neighbour_right = "."
 	var requirements = PoolStringArray(CONFIG_DATA.get("requires_bools",[]))
 	if requirements.size() >= 1:
 		var show = true
@@ -91,36 +97,36 @@ func recheck_availability():
 		if valid_options >= 1:
 			if flip:
 				if true_valids >= 1:
-					$reset.modulate = Color(0.6,0.6,0.6,1)
-					$reset.disabled = true
-					$Label/LABELBUTTON.modulate = Color(0.6,0.6,0.6,1)
-					$Label/LABELBUTTON.disabled = true
+					reset_button.modulate = Color(0.6,0.6,0.6,1)
+					reset_button.disabled = true
+					label_button.modulate = Color(0.6,0.6,0.6,1)
+					label_button.disabled = true
 				else:
-					$reset.modulate = Color(1,1,1,1)
-					$reset.disabled = false
-					$Label/LABELBUTTON.modulate = Color(1,1,1,1)
-					$Label/LABELBUTTON.disabled = false
+					reset_button.modulate = Color(1,1,1,1)
+					reset_button.disabled = false
+					label_button.modulate = Color(1,1,1,1)
+					label_button.disabled = false
 			else:
 				if true_valids >= 1:
-					$reset.modulate = Color(1,1,1,1)
-					$reset.disabled = false
-					$Label/LABELBUTTON.modulate = Color(1,1,1,1)
-					$Label/LABELBUTTON.disabled = false
+					reset_button.modulate = Color(1,1,1,1)
+					reset_button.disabled = false
+					label_button.modulate = Color(1,1,1,1)
+					label_button.disabled = false
 				else:
-					$reset.modulate = Color(0.6,0.6,0.6,1)
-					$reset.disabled = true
-					$Label/LABELBUTTON.modulate = Color(0.6,0.6,0.6,1)
-					$Label/LABELBUTTON.disabled = true
+					reset_button.modulate = Color(0.6,0.6,0.6,1)
+					reset_button.disabled = true
+					label_button.modulate = Color(0.6,0.6,0.6,1)
+					label_button.disabled = true
 	else:
-		$reset.modulate = Color(1,1,1,1)
-		$reset.disabled = false
-		$Label/LABELBUTTON.modulate = Color(1,1,1,1)
-		$Label/LABELBUTTON.disabled = false
+		reset_button.modulate = Color(1,1,1,1)
+		reset_button.disabled = false
+		label_button.modulate = Color(1,1,1,1)
+		label_button.disabled = false
 
 func _reset_pressed():
 	pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,Array(CONFIG_DATA.get("default",[])))
-	$Label/LABELBUTTON.grab_focus()
-	$Label/LABELBUTTON/CanvasLayer/CaptureKeyDialog.applySettings()
+	label_button.grab_focus()
+	key_diag.applySettings()
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 
 func _draw():
@@ -128,24 +134,24 @@ func _draw():
 	refocus()
 
 func refocus():
-	$Label/LABELBUTTON.rect_size = $Label.rect_size
+	label_button.rect_size = name_label.rect_size
 #	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 	
 	if is_visible_in_tree():
 		yield(get_tree(),"idle_frame")
-		pointers.ConfigDriver.set_button_focus(self,get_node("Label/LABELBUTTON"))
+		pointers.ConfigDriver.set_button_focus(self,label_button)
 	
 
 func _visibility_changed():
 	if get_position_in_parent() == 0:
-		$Label/LABELBUTTON.grab_focus()
+		label_button.grab_focus()
 	refocus()
 
 func get_focusable(direction = 0):
-	return get_label(direction)
+	return label_button
 
 func get_label(direction = 0):
-	return get_node("Label/LABELBUTTON")
+	return label_button
 
 func get_reset(direction = 0):
-	return get_node("reset")
+	return reset_button

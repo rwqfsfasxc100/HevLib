@@ -66,9 +66,11 @@ func recheck_availability():
 	if $LineEdit.text != CONFIG_DATA.get("default",""):
 		$reset.visible = true
 		$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($reset)
+		$LineEdit.focus_neighbour_left = $LineEdit.get_path_to($reset)
 	else:
 		$reset.visible = false
 		$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($LineEdit)
+		$LineEdit.focus_neighbour_left = $LineEdit.get_path_to($Label/LABELBUTTON)
 	var requirements = PoolStringArray(CONFIG_DATA.get("requires_bools",[]))
 	if requirements.size() >= 1:
 		var show = true
