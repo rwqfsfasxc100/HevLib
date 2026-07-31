@@ -1,3 +1,7 @@
+[1.15.26]
+
+1=* Fixed int and float config entries eating all UI cancel inputs (KB: escape; Joy: B / menu) if their slider was focused.
+
 [1.15.25]
 
 1=* Int and float config entries now no longer will change their value if the mouse passed over their boxes while scrolling.
