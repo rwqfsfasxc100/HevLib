@@ -1,3 +1,34 @@
+[1.15.24]
+
+1=* Added `display` type setting for manifest configs
+1.1=* This lets you add an arbitrary scene file to the settings menu.
+1.2=* Properties:
+1.2.1=* `scene_path` - (String) the file path to the scene to be added. As this is stored within a margin container, make sure you properly size this scene with code, rect_size/rect_min)_size, or through size flags to avoid any potential display issues.
+1.2.2=* `left_margin` - (int/float) gap between the left side of the config menu and the left side of the scene.
+1.2.3=* `right_margin` - (int/float) gap between the right side of the config menu and the right side of the scene. A gap should be desired at the very least, as if the scroll bar is made visible it can cover the handful of pixels on the right of the scene.
+1.2.4=* `disabled` - (bool) Whether this config item is skipped over during game boot. Defaults to `false`
+1.3=* If you need Control focus to your scene, or want some extra handling for the display, you will need to add the following to the scene root's script:
+1.3.1=* `display_container` - (property) if provided as a variable, will be set to the main control for the Display container. This is equivalent to performing `get_node(NodePath("../.."))`.
+1.3.2=* `get_label(direction = 0)` - Method used to provide the name button for an adjacent config to use for focusing. If not included, focusing this display is skipped for name buttons.
+1.3.2.1=* `direction` - (int) indicates which adjacent config is asking for the name button, whether the config below (-1) or above (1). All configs have this method, and this should never be zero if called correctly.
+1.3.3=* `get_focusable(direction = 0)` - Method used to provide the property content node for an adjacent config to use for focusing. If not included, focusing this display is skipped for property content nodes.
+1.3.3.1=* `direction` - (int) indicates which adjacent config is asking for the property content node, whether the config below (-1) or above (1). All configs have this method, and this should never be zero if called correctly.
+1.3.4=* `get_reset(direction = 0)` - Method used to provide the reset button for an adjacent config to use for focusing. If not included, focusing this display is skipped for reset buttons.
+1.3.5.1=* `direction` - (int) indicates which adjacent config is asking for the reset button, whether the config below (-1) or above (1). All configs have this method, and this should never be zero if called correctly.
+2=* Improved config handling for KB and controller users.
+2.1=* The focusing between buttons is now more consistent.
+2.2=* Spinbox style int/float configs now support KB and controller inputs. Focus on the spinbox node now also has a visible highlight.
+2.3=* Slider/spinbox type config entries now holds focus outside of the slider/spinbox node to let focus travel left.
+2.3.1=* This change mimics vanilla slider handling by requiring you to enter focus of the slider/spingbox by pressing the UI accept (KB: return / space; Joy: A) input
+2.3.2=* Exiting slider/spinbox focus to handoff focus to the holder happens with a UI accept (KB: return / space; Joy: A) input, UI cancel (KB: escape; Joy: B / menu) input, or by trying to move up/down (KB: Up / Down; Joy: Dpad Up / Dpad Down) or next/previous (KB: Tab / Shift + Tab; Joy: N/A).
+2.4=* Holding down left/dpad left or right/dpad right on a slider/spinbox config entry will have the value recursively increment/decrement in the respective direction after half a second
+3=* Changed mod config focusing to handle it through each entry's script.
+4=* Config displays that don't correlate to actual configs now no longer are required store an entry in the config file.
+5=* Configs without a defined type are skipped and an error is thrown.
+6=* Improved save slot focusing if you were to enter the title screen on frame 1.
+7=* Fixed color config type using the wrong placeholder nameplate.
+8=* Improved array casting for input type.
+
 [1.15.23]
 
 1=* Fixed crash caused by slot limiters not being able to properly handle PoolStringArrays
