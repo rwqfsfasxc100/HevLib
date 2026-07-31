@@ -208,8 +208,8 @@ var maxRolls = 10
 var modChanceScale = 1.0
 
 func hl_shipyard_shipdriver_update():
-	maxRolls = syPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","max_dealership_modification_rolls")
-	modChanceScale = syPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","dealership_modification_roll_chance_scale")
+	maxRolls = syPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","max_dealership_modification_rolls")
+	modChanceScale = syPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","dealership_modification_roll_chance_scale")
 
 
 func hl_shipdriver_resetter_timeout():
