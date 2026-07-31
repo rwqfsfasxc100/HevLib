@@ -8277,9 +8277,7 @@ class _Zip:
 		var actual = PoolStringArray()
 		if OS.has_feature("editor"):
 			actual = pointers.FolderAccess.__get_files_with_extensions("res://",PoolStringArray(["gd","tscn"]))
-#		if true:
 		else:
-#			var gameInstallDirectory = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\dV Rings of Saturn\\Delta-V.pck"
 			var gameInstallDirectory = OS.get_executable_path().get_basename() + ".pck"
 			if file.file_exists(gameInstallDirectory):
 				var out = __load_pck(gameInstallDirectory,true)
