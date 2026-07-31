@@ -14,7 +14,7 @@
 1.3.3=* `get_focusable(direction = 0)` - Method used to provide the property content node for an adjacent config to use for focusing. If not included, focusing this display is skipped for property content nodes.
 1.3.3.1=* `direction` - (int) indicates which adjacent config is asking for the property content node, whether the config below (-1) or above (1). All configs have this method, and this should never be zero if called correctly.
 1.3.4=* `get_reset(direction = 0)` - Method used to provide the reset button for an adjacent config to use for focusing. If not included, focusing this display is skipped for reset buttons.
-1.3.5.1=* `direction` - (int) indicates which adjacent config is asking for the reset button, whether the config below (-1) or above (1). All configs have this method, and this should never be zero if called correctly.
+1.3.4.1=* `direction` - (int) indicates which adjacent config is asking for the reset button, whether the config below (-1) or above (1). All configs have this method, and this should never be zero if called correctly.
 2=* Improved config handling for KB and controller users.
 2.1=* The focusing between buttons is now more consistent.
 2.2=* Spinbox style int/float configs now support KB and controller inputs. Focus on the spinbox node now also has a visible highlight.
