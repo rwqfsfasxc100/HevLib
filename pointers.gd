@@ -42,7 +42,7 @@ var DriverManagement : _DriverManagement = _DriverManagement.new(self)
 var Equipment : _Equipment = _Equipment.new(self)
 var Events : _Events = _Events.new(self)
 var FileAccess : _FileAccess = _FileAccess.new(self)
-var FolderAccess : _FolderAccess = _FolderAccess.new()
+var FolderAccess : _FolderAccess = _FolderAccess.new(self)
 var Github : _Github = _Github.new(self)
 var HevLib : _HevLib = _HevLib.new(self)
 var Keymapping : _Keymapping = _Keymapping.new(self)
@@ -4805,9 +4805,29 @@ class _FolderAccess:
 						"Dictionary containing the entire directory's structure"
 					]
 				},
+				"__get_files_with_extensions":{
+					"description":"Fetches all files within the provided subfolder with an extension that matches one of the contents of the extensions PoolStringArray",
+					"args":[
+						"folder -> (String) directory path to fetch the files from.",
+						"extensions -> (PoolStringArray) extensions to skip. Must not include the period prefix.",
+						"recurse_depth (optional) -> (int) how far this operation will search into subfolders. -1 will search indefinitely, and 0 will stick to the provided directory only."
+					],
+					"return":[
+						"Array containing all valid file paths that match the extensions criteria."
+					]
+				},
+				"__get_vanilla_script_and_scenes":{
+					"description":"Fetches all vanilla scripts and scenes from the PCK file. NOTE: does not work correctly on editor builds since no PCK file exists, it just fetches all scenes and scripts available to the filesystem. To get PCK data in-editor, use Zip.__load_pck.",
+					"return":[
+						"Array containing all valid scripts and scenes"
+					]
+				}
 			}
 		}
 	
+	var pointers
+	func _init(p):
+		pointers = p
 	
 	var file:File = File.new()
 	var directory:Directory = Directory.new()
@@ -4903,20 +4923,32 @@ class _FolderAccess:
 			return folder_structure
 		return folderStructureCache[folder].duplicate(true)
 	
-	func __get_files_with_extensions(folder:String,extensions:PoolStringArray) -> PoolStringArray:
+	func __get_files_with_extensions(folder:String,extensions:PoolStringArray,recurse_depth:int = -1) -> Array:
 		if not directory.dir_exists(folder):
-			return PoolStringArray()
+			return Array()
 		var out = PoolStringArray()
 		var dir = __fetch_folder_files(folder,true,true)
 		for f in dir:
-			if f.ends_with("/"):
-				out.append_array(__get_files_with_extensions(f,extensions))
+			if recurse_depth != 0 and f.ends_with("/"):
+				out.append_array(__get_files_with_extensions(f,extensions,recurse_depth - 1))
 			else:
 				var ext = f.get_extension()
 				if ext in extensions:
 					out.append(f)
-		return out
+		return Array(out)
 	
+	func __get_vanilla_script_and_scenes() -> Array:
+		var actual = PoolStringArray()
+		if OS.has_feature("editor"):
+			actual = __get_files_with_extensions("res://",PoolStringArray(["gd","tscn"]))
+		else:
+			var gameInstallDirectory = OS.get_executable_path().get_basename() + ".pck"
+			if file.file_exists(gameInstallDirectory):
+				var out = pointers.Zip.__load_pck(gameInstallDirectory,true)
+				for fp in out:
+					if fp.get_extension() == "remap":
+						actual.append(fp.get_basename())
+		return Array(actual)
 
 class _Github:
 	var scripts : Array = [
@@ -8273,18 +8305,7 @@ class _Zip:
 			return Files
 		return Contents
 	
-	func __get_vanilla_script_and_scenes() -> PoolStringArray:
-		var actual = PoolStringArray()
-		if OS.has_feature("editor"):
-			actual = pointers.FolderAccess.__get_files_with_extensions("res://",PoolStringArray(["gd","tscn"]))
-		else:
-			var gameInstallDirectory = OS.get_executable_path().get_basename() + ".pck"
-			if file.file_exists(gameInstallDirectory):
-				var out = __load_pck(gameInstallDirectory,true)
-				for fp in out:
-					if fp.get_extension() == "remap":
-						actual.append(fp.get_basename())
-		return actual
+	
 	
 
 
