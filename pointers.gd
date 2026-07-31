@@ -1122,7 +1122,7 @@ class _ConfigDriver:
 			var direction = 1
 			var neighbour = parent.get_child(pos + direction)
 			var script : Script = neighbour.get_script()
-			if script != null and script.get_path() != "res://HevLib/ui/mod_menu/mod_list/BottomSeparator.gd":
+			if script != null:
 				if neighbour:
 					if neighbour.has_method("get_label"):
 						var label = neighbour.get_label(direction)
@@ -1143,7 +1143,7 @@ class _ConfigDriver:
 			var direction = -1
 			var neighbour = parent.get_child(pos + direction)
 			var script : Script = neighbour.get_script()
-			if script != null and script.get_path() != "res://HevLib/ui/mod_menu/mod_list/BottomSeparator.gd":
+			if script != null:
 				if neighbour:
 					if neighbour.has_method("get_label"):
 						var label = neighbour.get_label(direction)
@@ -1164,7 +1164,7 @@ class _ConfigDriver:
 			var direction1 = -1
 			var neighbour1 = parent.get_child(pos + direction1)
 			var script1 : Script = neighbour1.get_script()
-			if script1 != null and script1.get_path() != "res://HevLib/ui/mod_menu/mod_list/BottomSeparator.gd":
+			if script1 != null:
 				if neighbour1:
 					if neighbour1.has_method("get_label"):
 						var label = neighbour1.get_label(direction1)
@@ -1184,7 +1184,7 @@ class _ConfigDriver:
 			var direction2 = 1
 			var neighbour2 = parent.get_child(pos + direction2)
 			var script : Script  = neighbour2.get_script()
-			if script != null and script.get_path() != "res://HevLib/ui/mod_menu/mod_list/BottomSeparator.gd":
+			if script != null:
 				if neighbour2:
 					if neighbour2.has_method("get_label"):
 						var label = neighbour2.get_label(direction2)

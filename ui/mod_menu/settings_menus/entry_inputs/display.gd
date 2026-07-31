@@ -65,9 +65,16 @@ func get_focusable(direction = 0):
 	if direction == 0:
 		printerr("Focusable fetch direction for [%s] is zero, and it shouldn't be" % ("%s|%s" % [str(self),get_path()]))
 	else:
-		var change = get_parent().get_child(get_position_in_parent() + direction)
-		if change and change.has_method("get_focusable"):
-			return change.get_focusable(direction)
+		var pos = get_position_in_parent()
+		var repos = clamp(pos + direction,0,get_parent().get_child_count() - 1)
+		if repos == 0:
+			var change = get_parent().get_child(clamp(pos - direction,0,get_parent().get_child_count() - 1))
+			if change and not change == self and change.has_method("get_focusable"):
+				return change.get_focusable(direction)
+		else:
+			var change = get_parent().get_child(repos)
+			if change and not change == self and change.has_method("get_focusable"):
+				return change.get_focusable(direction)
 	return
 
 func get_label(direction = 0):
@@ -76,9 +83,16 @@ func get_label(direction = 0):
 	if direction == 0:
 		printerr("Label fetch direction for [%s] is zero, and it shouldn't be" % ("%s|%s" % [str(self),get_path()]))
 	else:
-		var change = get_parent().get_child(get_position_in_parent() + direction)
-		if change and change.has_method("get_label"):
-			return change.get_label(direction)
+		var pos = get_position_in_parent()
+		var repos = clamp(pos + direction,0,get_parent().get_child_count() - 1)
+		if repos == 0:
+			var change = get_parent().get_child(clamp(pos - direction,0,get_parent().get_child_count() - 1))
+			if change and not change == self and change.has_method("get_label"):
+				return change.get_label(direction)
+		else:
+			var change = get_parent().get_child(repos)
+			if change and not change == self and change.has_method("get_label"):
+				return change.get_label(direction)
 	return
 
 func get_reset(direction = 0):
@@ -87,7 +101,14 @@ func get_reset(direction = 0):
 	if direction == 0:
 		printerr("Reset fetch direction for [%s] is zero, and it shouldn't be" % ("%s|%s" % [str(self),get_path()]))
 	else:
-		var change = get_parent().get_child(get_position_in_parent() + direction)
-		if change and change.has_method("get_reset"):
-			return change.get_reset(direction)
+		var pos = get_position_in_parent()
+		var repos = clamp(pos + direction,0,get_parent().get_child_count() - 1)
+		if repos == 0:
+			var change = get_parent().get_child(clamp(pos - direction,0,get_parent().get_child_count() - 1))
+			if change and not change == self and change.has_method("get_reset"):
+				return change.get_reset(direction)
+		else:
+			var change = get_parent().get_child(repos)
+			if change and not change == self and change.has_method("get_reset"):
+				return change.get_reset(direction)
 	return
