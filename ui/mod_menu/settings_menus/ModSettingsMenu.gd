@@ -75,6 +75,8 @@ func hider():
 	hide()
 	refocus()
 	mod_menu.show_restart_menu()
+	for child in container.get_children():
+		Tool.remove(child)
 
 var lastFocus = null
 func refocus():
