@@ -41,6 +41,7 @@ func _draw():
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 
 func _ready():
+	var close_button = $MarginContainer/VBoxContainer/HBoxContainer/CloseButton
 	var ordered_section_info:Dictionary = {}
 	var orderof = {}
 	var reorder = []
@@ -145,6 +146,7 @@ func _ready():
 	var hb = HBoxContainer.new()
 	hb.name = "BottomSeparatorForToolTipsPlsIgnore"
 	hb.set_script(load("res://HevLib/ui/mod_menu/mod_list/BottomSeparator.gd"))
+	hb.close_button = close_button
 	hb.connect("visibility_changed",hb,"_visibility_changed")
 	$MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer.add_child(hb)
 #	breakpoint

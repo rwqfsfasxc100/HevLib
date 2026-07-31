@@ -55,7 +55,10 @@ func _about_to_show():
 	_on_resize()
 	
 	yield(get_tree().create_timer(0.1),"timeout")
-	get_node("base/TabContainer").get_child(0).get_node("MarginContainer/TabContainer").get_child(0).get_node("MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer").get_child(0).get_node("Label/LABELBUTTON").call_deferred("grab_focus")
+	for child in get_node("base/TabContainer").get_child(0).get_node("MarginContainer/TabContainer").get_child(0).get_node("MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer").get_children():
+		if "label_button" in child:
+			child.label_button.call_deferred("grab_focus")
+			break
 
 func _ready():
 	get_tree().get_root().connect("size_changed", self, "_on_resize")

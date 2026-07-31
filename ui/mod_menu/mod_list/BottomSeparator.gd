@@ -29,6 +29,8 @@
 
 extends HBoxContainer
 
+var close_button = null
+
 func _ready():
 	modify()
 
@@ -39,3 +41,21 @@ func modify():
 	rect_min_size.y = 200
 	var pos = get_parent().get_child_count()
 	get_parent().call_deferred("move_child",self,pos)
+	if close_button:
+		var stPos = get_position_in_parent()
+		var posr = range(stPos)
+		posr.invert()
+		for i in posr:
+			var node = get_parent().get_child(i)
+			if node.has_method("get_focusable"):
+				var foc = node.get_focusable()
+				if foc:
+					close_button.focus_neighbour_top = close_button.get_path_to(foc)
+					break
+
+func get_label(dir):
+	return close_button
+func get_reset(dir):
+	return close_button
+func get_focusable(dir):
+	return close_button
