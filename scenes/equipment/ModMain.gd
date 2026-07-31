@@ -90,7 +90,7 @@ func _init(modLoader : ModLoader = ModLoader):
 		pointers.equipment_modmain = self
 		pointers.FileAccess.__load_precached_mods()
 		
-#		testing()
+		testing()
 		
 		match_mod_path_to_zip()
 		var scv = pointers.FolderAccess.__fetch_folder_files(variables_folder,false,true)
@@ -289,7 +289,7 @@ func testing():
 #	var prop = can.can_instance()
 #	var spath = "res://asteroids/asteroid.gd"
 #	var out = shadow_tool.__make_shadow_of_script(spath,[],[],[])
-	
+	var out = pointers.Zip.__get_vanilla_script_and_scenes()
 	
 	breakpoint
 

@@ -54,7 +54,7 @@ var Scripting : _Scripting = _Scripting.new(self,http)
 var TimeAccess : _TimeAccess = _TimeAccess.new(self)
 var Translations : _Translations = _Translations.new(self)
 var WebTranslate : _WebTranslate = _WebTranslate.new(self)
-var Zip : _Zip = _Zip.new()
+var Zip : _Zip = _Zip.new(self)
 
 var Classes = [
 	Achievements,
@@ -4903,6 +4903,19 @@ class _FolderAccess:
 			return folder_structure
 		return folderStructureCache[folder].duplicate(true)
 	
+	func __get_files_with_extensions(folder:String,extensions:PoolStringArray) -> PoolStringArray:
+		if not directory.dir_exists(folder):
+			return PoolStringArray()
+		var out = PoolStringArray()
+		var dir = __fetch_folder_files(folder,true,true)
+		for f in dir:
+			if f.ends_with("/"):
+				out.append_array(__get_files_with_extensions(f,extensions))
+			else:
+				var ext = f.get_extension()
+				if ext in extensions:
+					out.append(f)
+		return out
 	
 
 class _Github:
@@ -8126,6 +8139,9 @@ class _Zip:
 			}
 		}
 	
+	var pointers
+	func _init(p):
+		pointers = p
 	
 	var file = File.new()
 	var dir = Directory.new()
@@ -8257,6 +8273,20 @@ class _Zip:
 			return Files
 		return Contents
 	
+	func __get_vanilla_script_and_scenes() -> PoolStringArray:
+		var actual = PoolStringArray()
+		if OS.has_feature("editor"):
+			actual = pointers.FolderAccess.__get_files_with_extensions("res://",PoolStringArray(["gd","tscn"]))
+#		if true:
+		else:
+#			var gameInstallDirectory = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\dV Rings of Saturn\\Delta-V.pck"
+			var gameInstallDirectory = OS.get_executable_path().get_basename() + ".pck"
+			if file.file_exists(gameInstallDirectory):
+				var out = __load_pck(gameInstallDirectory,true)
+				for fp in out:
+					if fp.get_extension() == "remap":
+						actual.append(fp.get_basename())
+		return actual
 	
 
 
