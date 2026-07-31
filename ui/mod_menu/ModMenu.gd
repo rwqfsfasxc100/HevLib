@@ -104,8 +104,10 @@ var has_updated_store : String = "user://cache/.Mod_Menu_2_Cache/updates/has_upd
 func show_restart_menu():
 	var valid = true
 	var ps = CurrentGame.getPlayerShip()
-	if ps and ps.zone == "rings":
-		valid = false
+	if Tool.claim(ps):
+		if ps.zone == "rings":
+			valid = false
+		Tool.release(ps)
 	restart_menu.let_restart(valid)
 	file.open(has_updated_store,File.READ)
 	var has : String = file.get_as_text()
