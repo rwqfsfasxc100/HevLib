@@ -48,7 +48,7 @@ func _ready():
 	var edit_alpha = CONFIG_DATA.get("edit_alpha",true)
 	if not edit_alpha:
 		value.a = 1
-	$Label.text = CONFIG_DATA.get("name","BOOL_MISSING_NAME")
+	$Label.text = CONFIG_DATA.get("name","COLOR_MISSING_NAME")
 	$CheckButton.color = value
 	$CheckButton.edit_alpha = edit_alpha
 	var desc = str(CONFIG_DATA.get("description",""))
