@@ -232,10 +232,6 @@ func _input(event):
 		if Input.is_action_just_pressed("ui_accept"):
 			_timeout()
 			get_viewport().set_input_as_handled()
-#		elif Input.is_action_just_pressed("ui_cancel"):
-#
-#			focus_button.grab_focus()
-#			get_viewport().set_input_as_handled()
 	elif boxfocus:
 		var action_passed = false
 		if Input.is_action_just_pressed("ui_cancel") or Input.is_action_just_pressed("ui_accept"):
