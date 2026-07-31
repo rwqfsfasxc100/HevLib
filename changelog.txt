@@ -1,6 +1,6 @@
 [1.15.25]
 
-1=* Int and float config entries now no longer will be changed if scrolled.
+1=* Int and float config entries now no longer will change their value if the mouse passed over their boxes while scrolling.
 2=* Fixed focus neighbouring issue if a display config was the first or last entry in a config section
 3=* Config screen now will skip to the first focusable entry when changing config tabs instead of throwing a fit if the first entry couldn't be focused
 4=* The close button can once again be reached with KB/controller
