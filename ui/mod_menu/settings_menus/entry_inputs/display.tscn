@@ -13,22 +13,22 @@ size_flags_horizontal = 3
 theme = ExtResource( 2 )
 script = ExtResource( 4 )
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
-margin_right = 50.0
+[node name="LMARGIN" type="HBoxContainer" parent="."]
+margin_right = 15.0
 margin_bottom = 50.0
-rect_min_size = Vector2( 50, 50 )
+rect_min_size = Vector2( 15, 50 )
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
-margin_left = 54.0
-margin_right = 246.0
+margin_left = 19.0
+margin_right = 281.0
 margin_bottom = 50.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="."]
-margin_left = 250.0
+[node name="RMARGIN" type="HBoxContainer" parent="."]
+margin_left = 285.0
 margin_right = 300.0
 margin_bottom = 50.0
-rect_min_size = Vector2( 50, 0 )
+rect_min_size = Vector2( 15, 0 )
 
 [node name="AnimateAppear" parent="." instance=ExtResource( 5 )]
