@@ -40,13 +40,19 @@ var pointers = ModLoader._savedObjects[0]
 
 var script_path = ""
 
+onready var name_label = $Label
+onready var label_button = $Label/LABELBUTTON
+onready var action_node = $ActionNode
+onready var action_button = $Button
+onready var reset_button = $reset
+
 func _ready():
-	$Label.text = CONFIG_DATA.get("name","ACTION_MISSING_NAME")
-	$Label/LABELBUTTON.hint_tooltip = CONFIG_DATA.get("description","")
+	name_label.text = CONFIG_DATA.get("name","ACTION_MISSING_NAME")
+	label_button.hint_tooltip = CONFIG_DATA.get("description","")
 	script_path = CONFIG_DATA.get("script_path","")
-	$ActionNode.set_script(load(script_path))
-	$Button.text = CONFIG_DATA.get("button_label","")
-	$Button.connect("pressed",$ActionNode,CONFIG_DATA.get("method","_pressed"))
+	action_node.set_script(load(script_path))
+	action_button.text = CONFIG_DATA.get("button_label","")
+	action_button.connect("pressed",action_node,CONFIG_DATA.get("method","_pressed"))
 	add_to_group("hevlib_settings_tab",true)
 
 func _pressed():
@@ -71,36 +77,36 @@ func recheck_availability():
 		if valid_options >= 1:
 			if flip:
 				if true_valids >= 1:
-					$Button.modulate = Color(0.6,0.6,0.6,1)
-					$Button.disabled = true
+					action_button.modulate = Color(0.6,0.6,0.6,1)
+					action_button.disabled = true
 				else:
-					$Button.modulate = Color(1,1,1,1)
-					$Button.disabled = false
+					action_button.modulate = Color(1,1,1,1)
+					action_button.disabled = false
 			else:
 				if true_valids >= 1:
-					$Button.modulate = Color(1,1,1,1)
-					$Button.disabled = false
+					action_button.modulate = Color(1,1,1,1)
+					action_button.disabled = false
 				else:
-					$Button.modulate = Color(0.6,0.6,0.6,1)
-					$Button.disabled = true
+					action_button.modulate = Color(0.6,0.6,0.6,1)
+					action_button.disabled = true
 	else:
-		$Button.modulate = Color(1,1,1,1)
-		$Button.disabled = false
+		action_button.modulate = Color(1,1,1,1)
+		action_button.disabled = false
 
 func _draw():
 	refocus()
 
 func refocus():
-	$Label/LABELBUTTON.rect_size = $Label.rect_size
+	label_button.rect_size = name_label.rect_size
 	if is_visible_in_tree():
 		yield(get_tree(),"idle_frame")
-		pointers.ConfigDriver.set_button_focus(self,get_node("Button"))
+		pointers.ConfigDriver.set_button_focus(self,action_button)
 
 func get_focusable(direction = 0):
-	return get_node("Button")
+	return action_button
 
 func get_label(direction = 0):
-	return get_node("Label/LABELBUTTON")
+	return label_button
 
 func get_reset(direction = 0):
-	return get_node("reset")
+	return reset_button

@@ -40,37 +40,41 @@ var pointers = ModLoader._savedObjects[0]
 
 var volatile = false
 
+onready var name_label = $Label
+onready var label_button = $Label/LABELBUTTON
+onready var line_edit = $LineEdit
+onready var reset_button = $reset
 func _ready():
 	var value = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	if value == null:
 		Tool.remove(self)
-	$Label.text = CONFIG_DATA.get("name","STRING_MISSING_NAME")
-	$LineEdit.text = value
+	name_label.text = CONFIG_DATA.get("name","STRING_MISSING_NAME")
+	line_edit.text = value
 	volatile = CONFIG_DATA.get("require_restart",false)
-	$LineEdit.max_length = CONFIG_DATA.get("max_length",0)
-	$LineEdit.secret = CONFIG_DATA.get("secret",false)
-	$LineEdit.clear_button_enabled = CONFIG_DATA.get("clear_button",false)
-	$LineEdit.placeholder_text = CONFIG_DATA.get("placeholder","HEVLIB_CONFIG_LINEEDIT_PLACEHOLDER")
+	line_edit.max_length = CONFIG_DATA.get("max_length",0)
+	line_edit.secret = CONFIG_DATA.get("secret",false)
+	line_edit.clear_button_enabled = CONFIG_DATA.get("clear_button",false)
+	line_edit.placeholder_text = CONFIG_DATA.get("placeholder","HEVLIB_CONFIG_LINEEDIT_PLACEHOLDER")
 	var desc = str(CONFIG_DATA.get("description",""))
 	if volatile:
 		if desc != "":
 			desc = TranslationServer.translate(desc) + "\n\n" + TranslationServer.translate("HEVLIB_SETTING_REQUIRES_RESTART")
 		else:
 			desc = "HEVLIB_SETTING_REQUIRES_RESTART"
-	$Label/LABELBUTTON.hint_tooltip = desc
+	label_button.hint_tooltip = desc
 	add_to_group("hevlib_settings_tab",true)
 
 
 func recheck_availability():
-	$LineEdit.text = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
-	if $LineEdit.text != CONFIG_DATA.get("default",""):
-		$reset.visible = true
-		$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($reset)
-		$LineEdit.focus_neighbour_left = $LineEdit.get_path_to($reset)
+	line_edit.text = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
+	if line_edit.text != CONFIG_DATA.get("default",""):
+		reset_button.visible = true
+		label_button.focus_neighbour_right = label_button.get_path_to(reset_button)
+		line_edit.focus_neighbour_left = line_edit.get_path_to(reset_button)
 	else:
-		$reset.visible = false
-		$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($LineEdit)
-		$LineEdit.focus_neighbour_left = $LineEdit.get_path_to($Label/LABELBUTTON)
+		reset_button.visible = false
+		label_button.focus_neighbour_right = label_button.get_path_to(line_edit)
+		line_edit.focus_neighbour_left = line_edit.get_path_to(label_button)
 	var requirements = PoolStringArray(CONFIG_DATA.get("requires_bools",[]))
 	if requirements.size() >= 1:
 		var show = true
@@ -89,60 +93,60 @@ func recheck_availability():
 		if valid_options >= 1:
 			if flip:
 				if true_valids >= 1:
-					$reset.modulate = Color(0.6,0.6,0.6,1)
-					$reset.disabled = true
-					$LineEdit.modulate = Color(0.6,0.6,0.6,1)
-					$LineEdit.editable = false
+					reset_button.modulate = Color(0.6,0.6,0.6,1)
+					reset_button.disabled = true
+					line_edit.modulate = Color(0.6,0.6,0.6,1)
+					line_edit.editable = false
 				else:
-					$reset.modulate = Color(1,1,1,1)
-					$reset.disabled = false
-					$LineEdit.modulate = Color(1,1,1,1)
-					$LineEdit.editable = true
+					reset_button.modulate = Color(1,1,1,1)
+					reset_button.disabled = false
+					line_edit.modulate = Color(1,1,1,1)
+					line_edit.editable = true
 			else:
 				if true_valids >= 1:
-					$reset.modulate = Color(1,1,1,1)
-					$reset.disabled = false
-					$LineEdit.modulate = Color(1,1,1,1)
-					$LineEdit.editable = true
+					reset_button.modulate = Color(1,1,1,1)
+					reset_button.disabled = false
+					line_edit.modulate = Color(1,1,1,1)
+					line_edit.editable = true
 				else:
-					$reset.modulate = Color(0.6,0.6,0.6,1)
-					$reset.disabled = true
-					$LineEdit.modulate = Color(0.6,0.6,0.6,1)
-					$LineEdit.editable = false
+					reset_button.modulate = Color(0.6,0.6,0.6,1)
+					reset_button.disabled = true
+					line_edit.modulate = Color(0.6,0.6,0.6,1)
+					line_edit.editable = false
 	else:
-		$reset.modulate = Color(1,1,1,1)
-		$reset.disabled = false
-		$LineEdit.modulate = Color(1,1,1,1)
-		$LineEdit.editable = true
+		reset_button.modulate = Color(1,1,1,1)
+		reset_button.disabled = false
+		line_edit.modulate = Color(1,1,1,1)
+		line_edit.editable = true
 
 
 func _reset_pressed():
 	var defaultVal = CONFIG_DATA.get("default","")
-	$LineEdit.text = defaultVal
+	line_edit.text = defaultVal
 	if volatile:
 		var old_val = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 		if old_val != defaultVal:
 			triggerVolatile()
 	pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,defaultVal)
-	$LineEdit.grab_focus()
-	$reset.visible = false
+	line_edit.grab_focus()
+	reset_button.visible = false
 func _draw():
 	refocus()
 
 func refocus():
-	$Label/LABELBUTTON.rect_size = $Label.rect_size
-	pointers.ConfigDriver.set_button_focus(self,get_node("LineEdit"))
+	label_button.rect_size = name_label.rect_size
+	pointers.ConfigDriver.set_button_focus(self,line_edit)
 	
 
 func _visibility_changed():
 	refocus()
 	if get_position_in_parent() == 0:
-		$Label/LABELBUTTON.grab_focus()
+		label_button.grab_focus()
 var caret_pos = 0
 
 func _on_LineEdit_text_entered(new_text):
-	caret_pos = $LineEdit.caret_position
-	$LineEdit.text = new_text
+	caret_pos = line_edit.caret_position
+	line_edit.text = new_text
 	if volatile:
 		var old_val = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 		if old_val != new_text:
@@ -151,11 +155,11 @@ func _on_LineEdit_text_entered(new_text):
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 
 func _process(delta):
-	caret_pos = $LineEdit.text.length()
-	$LineEdit.caret_position = caret_pos
+	caret_pos = line_edit.text.length()
+	line_edit.caret_position = caret_pos
 
 func _timeout():
-	$LineEdit.grab_focus()
+	line_edit.grab_focus()
 
 var updateCacheDir = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 func triggerVolatile():
@@ -165,10 +169,10 @@ func triggerVolatile():
 	file.close()
 
 func get_focusable(direction = 0):
-	return get_node("LineEdit")
+	return line_edit
 
 func get_label(direction = 0):
-	return get_node("Label/LABELBUTTON")
+	return label_button
 
 func get_reset(direction = 0):
-	return get_node("reset")
+	return reset_button

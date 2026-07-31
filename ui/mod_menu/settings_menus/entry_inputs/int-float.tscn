@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=1]
 [ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=2]
 [ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=3]
 [ext_resource path="res://HevLib/ui/mod_menu/settings_menus/entry_inputs/int-float.gd" type="Script" id=4]
 [ext_resource path="res://HevLib/ui/mod_menu/AnimateAppear.tscn" type="PackedScene" id=5]
+[ext_resource path="res://HevLib/development_tools/control_and_ui/spinbox_helpers/SpinBoxNoScroll.gd" type="Script" id=6]
 
 [sub_resource type="StreamTexture" id=1]
 flags = 4
@@ -99,6 +100,7 @@ focus_previous = NodePath("../Focus")
 focus_mode = 2
 max_value = 10.0
 align = 2
+script = ExtResource( 6 )
 
 [node name="Label" type="Label" parent="MarginContainer/spinbox"]
 margin_right = 10.0
@@ -127,6 +129,7 @@ focus_neighbour_bottom = NodePath("../Focus")
 focus_next = NodePath("../Focus")
 focus_previous = NodePath("../Focus")
 max_value = 10.0
+scrollable = false
 
 [node name="Label" type="Label" parent="MarginContainer/slider"]
 margin_right = 10.0

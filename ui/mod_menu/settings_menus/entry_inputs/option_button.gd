@@ -44,15 +44,20 @@ var options = []
 
 var volatile = false
 
+onready var label_button = $Label/LABELBUTTON
+onready var name_label = $Label
+onready var option_button = $OptionButton
+onready var reset_button = $reset
+
 func _ready():
 	var value = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	if value == null:
 		Tool.remove(self)
 	volatile = CONFIG_DATA.get("require_restart",false)
 	store_method = CONFIG_DATA.get("store_method","int")
-	$Label.text = CONFIG_DATA.get("name","OPTION_MISSING_NAME")
+	name_label.text = CONFIG_DATA.get("name","OPTION_MISSING_NAME")
 	for opt in CONFIG_DATA.get("options",[]):
-		$OptionButton.add_item(opt,options.size())
+		option_button.add_item(opt,options.size())
 		options.append(opt)
 	var desc = str(CONFIG_DATA.get("description",""))
 	if volatile:
@@ -60,8 +65,8 @@ func _ready():
 			desc = TranslationServer.translate(desc) + "\n\n" + TranslationServer.translate("HEVLIB_SETTING_REQUIRES_RESTART")
 		else:
 			desc = "HEVLIB_SETTING_REQUIRES_RESTART"
-	$OptionButton.selected = find_int(value)
-	$Label/LABELBUTTON.hint_tooltip = desc
+	option_button.selected = find_int(value)
+	label_button.hint_tooltip = desc
 	add_to_group("hevlib_settings_tab",true)
 
 
@@ -71,17 +76,17 @@ func _ready():
 func recheck_availability():
 	var val = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	
-	$OptionButton.selected = find_int(val)
+	option_button.selected = find_int(val)
 	var def = find_int(CONFIG_DATA.get("default",find_int(0)))
 	
-	if $OptionButton.selected != def:
-		$reset.visible = true
-		$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($reset)
-		$OptionButton.focus_neighbour_left = $OptionButton.get_path_to($reset)
+	if option_button.selected != def:
+		reset_button.visible = true
+		label_button.focus_neighbour_right = label_button.get_path_to(reset_button)
+		option_button.focus_neighbour_left = option_button.get_path_to(reset_button)
 	else:
-		$reset.visible = false
-		$Label/LABELBUTTON.focus_neighbour_right = $Label/LABELBUTTON.get_path_to($OptionButton)
-		$OptionButton.focus_neighbour_left = $OptionButton.get_path_to($Label/LABELBUTTON)
+		reset_button.visible = false
+		label_button.focus_neighbour_right = label_button.get_path_to(option_button)
+		option_button.focus_neighbour_left = option_button.get_path_to(label_button)
 	var requirements = PoolStringArray(CONFIG_DATA.get("requires_bools",[]))
 	if requirements.size() >= 1:
 		var show = true
@@ -100,31 +105,31 @@ func recheck_availability():
 		if valid_options >= 1:
 			if flip:
 				if true_valids >= 1:
-					$reset.modulate = Color(0.6,0.6,0.6,1)
-					$reset.disabled = true
-					$OptionButton.modulate = Color(0.6,0.6,0.6,1)
-					$OptionButton.disabled = true
+					reset_button.modulate = Color(0.6,0.6,0.6,1)
+					reset_button.disabled = true
+					option_button.modulate = Color(0.6,0.6,0.6,1)
+					option_button.disabled = true
 				else:
-					$reset.modulate = Color(1,1,1,1)
-					$reset.disabled = false
-					$OptionButton.modulate = Color(1,1,1,1)
-					$OptionButton.disabled = false
+					reset_button.modulate = Color(1,1,1,1)
+					reset_button.disabled = false
+					option_button.modulate = Color(1,1,1,1)
+					option_button.disabled = false
 			else:
 				if true_valids >= 1:
-					$reset.modulate = Color(1,1,1,1)
-					$reset.disabled = false
-					$OptionButton.modulate = Color(1,1,1,1)
-					$OptionButton.disabled = false
+					reset_button.modulate = Color(1,1,1,1)
+					reset_button.disabled = false
+					option_button.modulate = Color(1,1,1,1)
+					option_button.disabled = false
 				else:
-					$reset.modulate = Color(0.6,0.6,0.6,1)
-					$reset.disabled = true
-					$OptionButton.modulate = Color(0.6,0.6,0.6,1)
-					$OptionButton.disabled = true
+					reset_button.modulate = Color(0.6,0.6,0.6,1)
+					reset_button.disabled = true
+					option_button.modulate = Color(0.6,0.6,0.6,1)
+					option_button.disabled = true
 	else:
-		$reset.modulate = Color(1,1,1,1)
-		$reset.disabled = false
-		$OptionButton.modulate = Color(1,1,1,1)
-		$OptionButton.disabled = false
+		reset_button.modulate = Color(1,1,1,1)
+		reset_button.disabled = false
+		option_button.modulate = Color(1,1,1,1)
+		option_button.disabled = false
 
 func _reset_pressed():
 	var defaultVal = CONFIG_DATA.get("default",find_int(0))
@@ -134,12 +139,12 @@ func _reset_pressed():
 			triggerVolatile()
 	match store_method:
 		"int":
-			$OptionButton.selected = defaultVal
+			option_button.selected = defaultVal
 		"string":
 			var index = find_int(defaultVal)
-			$OptionButton.selected = index
+			option_button.selected = index
 	pointers.ConfigDriver.__store_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY,defaultVal)
-	$OptionButton.grab_focus()
+	option_button.grab_focus()
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 
 func _draw():
@@ -147,15 +152,15 @@ func _draw():
 	refocus()
 
 func refocus():
-	$Label/LABELBUTTON.rect_size = $Label.rect_size
+	label_button.rect_size = name_label.rect_size
 	if is_visible_in_tree():
 		yield(get_tree(),"idle_frame")
-		pointers.ConfigDriver.set_button_focus(self,get_node("OptionButton"))
+		pointers.ConfigDriver.set_button_focus(self,option_button)
 	
 
 func _visibility_changed():
 	if get_position_in_parent() == 0:
-		$Label/LABELBUTTON.grab_focus()
+		label_button.grab_focus()
 	refocus()
 
 
@@ -201,10 +206,10 @@ func triggerVolatile():
 	file.close()
 
 func get_focusable(direction = 0):
-	return get_node("OptionButton")
+	return option_button
 
 func get_label(direction = 0):
-	return get_node("Label/LABELBUTTON")
+	return label_button
 
 func get_reset(direction = 0):
-	return get_node("reset")
+	return reset_button
