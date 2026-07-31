@@ -4663,6 +4663,14 @@ class _FileAccess:
 				"__load_precached_mods":{
 					"description":"Copies any prepared mods to the mod folder, and reboots if there are mods to copy. Normally this is done on game boot to provide a reliable experience for players. NOTE: Rebooting will happen at all cases with mods existing, even if it's safe to copy. Double check 'user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt', which will have a `1` stored if there are mods to copy, and `0` otherwise.",
 				},
+				"__save_stex(image:Image, file_path:String, flags:int=0)":{
+					"description":"Saves a provided image resource as a .stex file",
+					"args":[
+						"image -> (Image) the image data to be saved.",
+						"file_path -> (String) the file path to save the .stex file to. Note that this always changes the extension to .stex",
+						"flags (optional) -> (int) the texture flags for the image. Check the Texture.Flags enum for reference."
+					]
+				}
 			}
 		}
 	
@@ -4736,6 +4744,40 @@ class _FileAccess:
 				print(exitMsg)
 				pointers.NodeAccess.__exit(true,exitMsg,"pointers.FileAccess")
 	
+	# Code sourced from lifelike's Godot Animator Import plugin
+	# https://github.com/lifelike/godot-animator-import
+	func __save_stex(image:Image, file_path:String, flags:int=0):
+		var out_path = "%s.stex" % file_path.get_extension()
+		var tmppng = "%s-tmp.png" % file_path
+		image.save_png(tmppng)
+		var pngf = File.new()
+		pngf.open(tmppng, File.READ)
+		var pnglen = pngf.get_len()
+		var pngdata = pngf.get_buffer(pnglen)
+		pngf.close()
+		Directory.new().remove(tmppng)
+		var file = File.new()
+		file.open(out_path, File.WRITE)
+		if file.is_open():
+			file.store_8(0x47) # G
+			file.store_8(0x44) # D
+			file.store_8(0x53) # S
+			file.store_8(0x54) # T
+			file.store_32(image.get_width())
+			file.store_32(image.get_height())
+			file.store_32(flags)
+			file.store_32(0x07100000) # data format
+			file.store_32(1) # nr mipmaps
+			file.store_32(pnglen + 6)
+			file.store_8(0x50) # P
+			file.store_8(0x4e) # N
+			file.store_8(0x47) # G
+			file.store_8(0x20) # space
+			file.store_buffer(pngdata)
+			file.close()
+			return out_path
+		else:
+			return ""
 	
 	
 	
