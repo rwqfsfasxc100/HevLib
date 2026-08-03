@@ -156,7 +156,10 @@ const vanilla_equipment_defaults_for_reference = {
 	"ReconDrone":{"slot_type":"RECON_DRONE"},
 }
 
+# Prevents equipment currently in the experimental branch from being processed as 
+# vanilla equipment while your game's version is below what's set for it.
+# e.g. "SYSTEM_HUD_CERF":[1,81,0]
 const min_version = {
-	"SYSTEM_HUD_CERF":[1,81,0]
+	
 }
 
