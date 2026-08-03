@@ -2525,7 +2525,7 @@ class _Equipment:
 						"slot_data -> (Dictionary) dictionary containing slot data"
 					],
 					"return":[
-						"String containing a full slot item"
+						"Array containing a full slot item"
 					]
 				},
 			}
@@ -3332,25 +3332,23 @@ class _Equipment:
 		
 		for slot in slots_for_adding:
 			var m : String  = slot.get("slot_node_name","")
-			var format : Dictionary = __make_slot_for_scene(slot)
+			var format : Array = __make_slot_for_scene(slot)
 			
 			# FUTURE ME: Write a mod that tag modifies a modded slot, need to double check functionality of this code + define types
 			for data in tag_modifications:
 				if m in data:
-					for check in format:
-						if check.keys()[0] == m:
-							var slot_override_additive = check[m][2]["override_additive"]
-							var slot_override_subtractive = check[m][2]["override_subtractive"]
-							var override_additive = Array(data[m].get("override_additive",[]))
-							var override_subtractive = Array(data[m].get("override_subtractive",[]))
-							for over in override_additive:
-								if not over in slot_override_additive:
-									slot_override_additive.append(over)
-							for over in override_subtractive:
-								if not over in slot_override_subtractive:
-									slot_override_subtractive.append(over)
-			slots_format.append(format.get(m)[0])
-			editable_paths.append(format.get(m)[1])
+					var slot_override_additive = format[2]["override_additive"]
+					var slot_override_subtractive = format[2]["override_subtractive"]
+					var override_additive = Array(data[m].get("override_additive",[]))
+					var override_subtractive = Array(data[m].get("override_subtractive",[]))
+					for over in override_additive:
+						if not over in slot_override_additive:
+							slot_override_additive.append(over)
+					for over in override_subtractive:
+						if not over in slot_override_subtractive:
+							slot_override_subtractive.append(over)
+			slots_format.append(format[0])
+			editable_paths.append(format[1])
 		for slot in vanilla_equipment_defaults_for_reference:
 			var vslot_data : Dictionary = vanilla_equipment_defaults_for_reference[slot]
 			var vslot_additives : Array = Array(vslot_data.get("override_additive",[]))
@@ -4485,7 +4483,7 @@ class _Equipment:
 			base += "[node name=\"System\" parent=\"HBox\" index=\"0\"]\nmodulate = Color( %s, %s, %s, %s )" % [normal_color.r,normal_color.g,normal_color.b,normal_color.a]
 		return base
 	
-	func __make_slot_for_scene(slot_data: Dictionary) -> Dictionary:
+	func __make_slot_for_scene(slot_data: Dictionary) -> Array:
 		var systemSlot : String = slot_data.get("system_slot", "")
 		var slotNodeName : String = slot_data.get("slot_node_name", "MISSING_SLOT_NAME")
 		var slotDisplayName : String = slot_data.get("slot_display_name", "SLOT_MISSING_DATA")
@@ -4561,7 +4559,7 @@ class _Equipment:
 				"override_subtractive":override_subtractive,
 			}
 		
-		return {slotNodeName:[base, editable_path, dict]}
+		return [base, editable_path, dict]
 	
 	
 	
