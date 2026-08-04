@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Report issues with HevLib
-title: "[BUG]"
+title: "[BUG] "
 labels: bug
 assignees: rwqfsfasxc100
 
