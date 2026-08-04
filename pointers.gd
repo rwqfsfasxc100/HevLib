@@ -7511,7 +7511,7 @@ class _Scripting:
 						traces.append(mname)
 					elif handle == "scenes":
 						var scenes:PoolStringArray = PoolStringArray()
-						for i in range(0,7):
+						for i in range(7):
 							var specific:String = mineral.get("ore_%s" % (i + 1),"")
 							if specific and pointers.DataFormat.__file_exists(specific):
 								scenes.append(specific)
@@ -7544,7 +7544,7 @@ class _Scripting:
 					"scenes":
 						# Handle for providing a list of premade scene filepaths to use for the ores
 						var scenes:PoolStringArray = PoolStringArray()
-						for i in range(0,7):
+						for i in range(7):
 							var specific:String = mineral.get("ore_%s" % (i + 1),"")
 							if specific and pointers.DataFormat.__file_exists(specific):
 								scenes.append(specific)
@@ -7689,7 +7689,7 @@ class _Scripting:
 		
 		else:
 			var nsi = not_random_seeds.size()
-			for i in range(0,m):
+			for i in range(m):
 				if i >= nsi:
 					seeds.append(not_random_seeds[i%nsi])
 				else:
@@ -7776,8 +7776,7 @@ class _TimeAccess:
 			if isDifferent:
 				return difference
 			index += 1
-		if index >= 6:
-			return "equal"
+		return "equal"
 	
 	func __get_time_in_seconds(datetime_dict : Dictionary):
 		var time : int = 0
