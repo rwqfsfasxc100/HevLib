@@ -6953,25 +6953,7 @@ class _ManifestV2:
 				out.append_array(siftFolderStructureForModFiles(structure[i],path + i,restricted_to_modmains))
 			else:
 				var f : String = i.to_lower()
-				if (
-					(
-						f.begins_with("modmain")
-						and 
-						f.ends_with(".gd")
-					)
-					or 
-					(
-						f.begins_with("mod") 
-						and 
-						f.ends_with(".manifest")
-					)
-					or 
-					(
-						f.begins_with("icon")
-						and
-						(f.ends_with(".stex") or f.ends_with(".png"))
-					)
-				):
+				if ((f.begins_with("modmain") and f.ends_with(".gd")) or (f.begins_with("mod") and f.ends_with(".manifest")) or (f.begins_with("icon") and (f.ends_with(".stex") or f.ends_with(".png")))):
 					out.append(path + i)
 		return out
 	
@@ -7221,7 +7203,7 @@ class _RingInfo:
 		var sy = int(size.y)
 		var y = ((int(floor(pos.y / pixelToKm)) %sy) + sy) %sy
 		var x1 = int(clamp(x + 1, 0, size.x - 1))
-		var y1 = (y + 1) %int(size.y)
+		var y1 = (y + 1) % int(size.y)
 		
 		if x <= 0:
 			return Color(0, 0, 0, 0)
@@ -7590,7 +7572,7 @@ class _Scripting:
 							info["purity"] = mineral["purity"]
 						if "specific_ore_data" in mineral:
 							info["specific_ore_data"] = mineral["specific_ore_data"]
-						match mineral.get("base","fe").to_lower():
+						match mineral.get("base",base).to_lower():
 							"fe","iron":
 								base = "fe"
 							"v","vanadium":
