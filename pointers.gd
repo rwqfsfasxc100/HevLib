@@ -7748,8 +7748,7 @@ class _TimeAccess:
 	func _init(p):
 		pointers = p
 	
-	func __compare_dates(date, compare_to_this_date):
-		var isDifferent:bool = false
+	func __compare_dates(date:String, compare_to_this_date:String):
 		var difference : String = "newer"
 		var splitOne:PoolStringArray = date.split("T")
 		var splitTwo:PoolStringArray = compare_to_this_date.split("T")
@@ -7764,17 +7763,9 @@ class _TimeAccess:
 			var compare1 = concatOne[index]
 			var compare2 = concatTwo[index]
 			if compare1 > compare2:
-				isDifferent = true
-				difference = "newer"
-			if compare1 < compare2:
-				isDifferent = true
-				difference = "older"
-			if compare1 == compare2:
-				isDifferent = false
-				difference = "equal"
-			
-			if isDifferent:
-				return difference
+				return "newer"
+			elif compare1 < compare2:
+				return "older"
 			index += 1
 		return "equal"
 	
