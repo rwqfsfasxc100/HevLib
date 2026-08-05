@@ -3,7 +3,7 @@
 [ext_resource path="res://HevLib/events/chaos_map/test/ring pix.tres" type="Material" id=1]
 [ext_resource path="res://ring/ring-map.png" type="Texture" id=2]
 
-[node name="RingTelescopeView" type="TextureRect"]
+[node name="RingCoverOverlay" type="TextureRect"]
 material = ExtResource( 1 )
 margin_right = 600.0
 margin_bottom = 600.0

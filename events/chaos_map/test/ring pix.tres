@@ -5,6 +5,7 @@
 
 [resource]
 shader = ExtResource( 2 )
-shader_param/mode = 2
-shader_param/raw = false
+shader_param/heatmap = true
+shader_param/clamp_heatmap = false
+shader_param/mode = 0
 shader_param/ring_map = ExtResource( 1 )
