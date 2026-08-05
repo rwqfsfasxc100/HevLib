@@ -18,6 +18,16 @@ uniform bool clamp_heatmap = false;
 // mode 8 : Most prevalent ringroid size. Further along the heatmap, the larger class of ringroid
 uniform int mode : hint_range(0, 8) = 0;
 
+// Opacity of the display
+uniform float opacity : hint_range(0.0, 1.0,0.05) = 1.0;
+
+// Minimum and maximum values that a pixel must have to not be darkened
+uniform float min_val : hint_range(0.0, 1.0, 0.05) = 0.0;
+uniform float max_val : hint_range(0.0, 1.0, 0.05) = 1.0;
+
+// Multiplier used for all pixels with values outside of the minimum and maximum values
+uniform float darken_factor : hint_range(0.0, 1.0) = 0.0;
+
 // Ring map texture
 // Use res://ring/ring-map.png
 uniform sampler2D ring_map: hint_black;
@@ -27,7 +37,7 @@ vec3 hue2rgb(float r) {
 		int ctr = 0;
 		while (r > 0.0) {
 			ctr++;
-			r-= 0.05
+			r -= 0.05;
 		}
 		r = 0.05 * float(ctr);
 	}
@@ -48,7 +58,9 @@ void fragment() {
 	float x1 = (clamp(float(x + 1.0), 0.0, size.x - 1.0));
 	float y1 = float(int(y + 1.0) % int(size.y));
 	
-	vec4 out_color = vec4(0.0,0.0,0.0,0.0);
+	vec3 out_color = vec3(0.0,0.0,0.0);
+	
+	float this_opacity = opacity;
 	
 	if (x > 0.0) {
 		vec2 tpx = TEXTURE_PIXEL_SIZE;
@@ -63,29 +75,41 @@ void fragment() {
 		vec4 pu = (p00 * (1.0 - cx) + p10 * (cx));
 		vec4 pd = (p01 * (1.0 - cx) + p11 * (cx));
 		
-		out_color = pu * (1.0 - cy) + pd * (cy);
+		out_color = vec4(pu * (1.0 - cy) + pd * (cy)).rgb;
 		if (mode == 0) {
+			float val = out_color.r;
+			if (val < min_val || val > max_val) {
+				this_opacity *= darken_factor
+			}
 			if (heatmap) {
-				out_color = vec4(hue2rgb(out_color.r),1.0)
+				out_color = hue2rgb(val)
 			}
 			else {
-				out_color = vec4(out_color.r,0.0,0.0,1.0)
+				out_color = vec3(val,0.0,0.0)
 			}
 		}
 		else if (mode == 1) {
+			float val = out_color.g;
+			if (val < min_val || val > max_val) {
+				this_opacity *= darken_factor
+			}
 			if (heatmap) {
-				out_color = vec4(hue2rgb(out_color.g),1.0)
+				out_color = hue2rgb(val)
 			}
 			else {
-				out_color = vec4(0.0,out_color.g,0.0,1.0);
+				out_color = vec3(0.0,val,0.0);
 			}
 		}
 		else if (mode == 2) {
+			float val = out_color.b;
+			if (val < min_val || val > max_val) {
+				this_opacity *= darken_factor
+			}
 			if (heatmap) {
-				out_color = vec4(hue2rgb(out_color.b),1.0)
+				out_color = hue2rgb(val)
 			}
 			else {
-				out_color = vec4(0.0,0.0,out_color.b,1.0);
+				out_color = vec3(0.0,0.0,val);
 			}
 		}
 		else if (mode > 2 && mode < 9) {
@@ -150,11 +174,14 @@ void fragment() {
 				else if (mode == 7) {
 					ov = (e / 192.0)// * 2.0;
 				}
+				if (ov < min_val || ov > max_val) {
+					this_opacity *= darken_factor
+				}
 				if (heatmap) {
-					out_color = vec4(hue2rgb(ov),1.0);
+					out_color = hue2rgb(ov);
 				}
 				else {
-					out_color = vec4(0.0,0.0,ov,1.0);
+					out_color = vec3(0.0,0.0,ov);
 				}
 			}
 			else if (mode == 8) {
@@ -180,14 +207,17 @@ void fragment() {
 					ctr = e;
 					blue = 0.2;
 				}
+				if (blue < min_val || blue > max_val) {
+					this_opacity *= darken_factor
+				}
 				if (heatmap) {
-					out_color = vec4(hue2rgb(blue * 0.75),1.0);
+					out_color = hue2rgb(blue * 0.75);
 				}
 				else {
-					out_color = vec4(0.0,0.0,blue,1.0);
+					out_color = vec3(0.0,0.0,blue);
 				}
 			}
 		}
 	}
-	COLOR = out_color;
+	COLOR = vec4(out_color,this_opacity);
 }
