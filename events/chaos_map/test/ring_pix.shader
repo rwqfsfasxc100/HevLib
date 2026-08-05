@@ -15,7 +15,7 @@ uniform bool clamp_heatmap = false;
 // mode 5 : Class 3 ringroid density heatmap (getTargetDensityAt() index 2)
 // mode 6 : Class 4 ringroid density heatmap (getTargetDensityAt() index 3)
 // mode 7 : Class 5 (smallest) ringroid density heatmap (getTargetDensityAt() index 4)
-// mode 8 : Most prevalent ringroid size. Further along the heatmap, the larger class of ringroid
+// mode 8 : Most prevalent ringroid size. Further along the heatmap, the larger class of ringroid is the most common for it's target density
 uniform int mode : hint_range(0, 8) = 0;
 
 // Opacity of the display
