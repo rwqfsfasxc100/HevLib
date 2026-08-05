@@ -26,7 +26,7 @@ uniform float min_val : hint_range(0.0, 1.0, 0.05) = 0.0;
 uniform float max_val : hint_range(0.0, 1.0, 0.05) = 1.0;
 
 // Multiplier used for all pixels with values outside of the minimum and maximum values
-uniform float darken_factor : hint_range(0.0, 1.0) = 0.0;
+uniform float darken_factor : hint_range(0.0, 1.0,0.01) = 0.0;
 
 // Ring map texture
 // Use res://ring/ring-map.png
