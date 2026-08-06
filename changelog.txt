@@ -1,3 +1,38 @@
+[1.15.27]
+
+1=* Changed the chaos map debug overlay to cover a larger number of procedural values.
+1.1=* Now can cover 'roid bias, raw density, specific ringroid density, and most prevalent ringroid coverage
+1.2=* Now uses a shader to calculate values instead of a pre-rendered image.
+1.3=* The shader now has hard borders between the pixels, making the difference between separate 10 km^2 areas more obvious.
+1.4=* Added extra settings to the ring map overlay:
+1.4.1=* Display mode - lets you specify which value is currently displayed
+1.4.2=* Heatmap - toggles the use of an HSV heatmap or displaying the raw value
+1.4.3=* Heatmap Stepify - toggles whether the heatmap is locked to the lowest 1/20th
+1.4.4=* Max value - limits the maximum value of the display
+1.4.5=* Out of bounds opacity - adjusts the opacity of values outside of the min/max values
+1.5=* Added binds to adjust all of the new settings
+1.6=* NOTE: This uses different configs than the old chaos map, so the old settings won't transfer
+2=* Mod config screens now properly get cleared after closing the menu instead of waiting for it to be requested again to clear
+3=* Adjusted input config naming schemes for most input configs
+3.1=* This will require them to be rebound
+4=* CERF HUD now no longer is registered for version limitation
+5=* Reduced processing time and memory footprint of slot creation
+6=* Fixed crash when modifying settings after backing out to the title screen
+7=* Moved ship loadout modification configs to the drivers tab. This will revert any changes made to the config
+8=* Added `FileAccess`.`__save_stex`
+8.1=* This lets you save an `Image` object to a .stex file
+8.2=* NOTE: The current implementation forces the extension to be *.stex, overriding whatever the lowest extension for the output path was set to
+9=* Added `Zip`.`__load_pck`
+9.1=* Provides either a dictionary containing the entire data of a PCK file, or just an array of all file paths
+10=* Added `FolderAccess`.`__get_vanilla_script_and_scenes`
+10.1=* This sifts the game's PCK file (if running from release builds) for all vanilla-sourced scripts and scenes.
+10.2=* Useful for determining sources programatically
+10.3=* NOTE: does not work correctly on editor builds since no PCK file exists, it instead fetches all files that are specifically scenes (`tscn` files) and scripts (`gd` files) available to the filesystem. To get PCK data in-editor, use `Zip`.`__load_pck`.
+11=* Added `FolderAccess`.`__get_files_with_extensions`
+11.1=* All extensions provided must not have a preceding period
+11.2=* Will not work in release builds when targeting anything within the `res://` directory.
+12=* Ensured all setting tooltips work on the Steam Deck
+
 [1.15.26]
 
 1=* Fixed int and float config entries eating all UI cancel inputs (KB: escape; Joy: B / menu) if their slider was focused.
