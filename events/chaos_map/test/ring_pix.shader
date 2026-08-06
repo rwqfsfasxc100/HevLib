@@ -48,6 +48,8 @@ vec3 hue2rgb(float r) {
 }
 
 void fragment() {
+	vec3 out_color = vec3(0.0,0.0,0.0);
+	float this_opacity = opacity;
 	if (opacity > 0.0) {
 		float pixelToKm = 10000.0;
 		vec2 u = UV;
@@ -58,10 +60,6 @@ void fragment() {
 		float y = float(((int(floor(pos.y)) % sy) + sy) % sy);
 		float x1 = (clamp(float(x + 1.0), 0.0, size.x - 1.0));
 		float y1 = float(int(y + 1.0) % int(size.y));
-		
-		vec3 out_color = vec3(0.0,0.0,0.0);
-		
-		float this_opacity = opacity;
 		
 		if (x > 0.0) {
 			vec2 tpx = TEXTURE_PIXEL_SIZE;
@@ -145,22 +143,22 @@ void fragment() {
 				float ov = 0.0;
 				if (mode > 2 && mode < 8) {
 					if (mode == 3) {
-						ov = (a / 64.0)// * 32.0;
+						ov = (a / 64.0);
 					}
 					else if (mode == 4) {
-						ov = (b / 96.0)// * 16.0;
+						ov = (b / 96.0);
 					}
 					else if (mode == 5) {
-						ov = (c / 128.0)// * 8.0;
+						ov = (c / 128.0);
 					}
 					else if (mode == 6) {
-						ov = (d / 160.0)// * 4.0;
+						ov = (d / 160.0);
 					}
 					else if (mode == 7) {
-						ov = (e / 192.0)// * 2.0;
+						ov = (e / 192.0);
 					}
 					if (ov < min_val || ov > max_val) {
-						this_opacity *= darken_factor
+						this_opacity *= darken_factor;
 					}
 					if (heatmap) {
 						out_color = hue2rgb(ov);
@@ -193,7 +191,7 @@ void fragment() {
 						blue = 0.2;
 					}
 					if (blue < min_val || blue > max_val) {
-						this_opacity *= darken_factor
+						this_opacity *= darken_factor;
 					}
 					if (heatmap) {
 						out_color = hue2rgb(blue * 0.75);
@@ -204,6 +202,6 @@ void fragment() {
 				}
 			}
 		}
-		COLOR = vec4(out_color,this_opacity);
 	}
+	COLOR = vec4(out_color,this_opacity);
 }
