@@ -216,14 +216,34 @@ HEVLIB_CONFIG_SECTION_DEBUG={
 		"default":false
 	},
 	"ring_map_overlay":{
-		"name":"HEVLIB_CONFIG_SHOW_CHAOS_OVERLAY",
-		"description":"HEVLIB_CONFIG_SHOW_CHAOS_OVERLAY_TOOLTIP",
+		"name":"HEVLIB_CONFIG_SHOW_RINGMAP_OVERLAY",
+		"description":"HEVLIB_CONFIG_SHOW_RINGMAP_OVERLAY_TOOLTIP",
+		"type":"bool",
+		"default":false
+	},
+	"ring_map_display_mode":{
+		"name":"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE",
+		"description":"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_TOOLTIP",
+		"type":"option",
+		"store_method":"int",
+		"options":["HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_CHAOS","HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_BIAS","HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_RAWDENSITY","HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C1","HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C2","HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C3","HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C4","HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C5","HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_MOST_PREVALENT"],
+		"default":0,
+	},
+	"ring_map_use_heatmap":{
+		"name":"HEVLIB_CONFIG_RINGMAP_HEATMAP",
+		"description":"HEVLIB_CONFIG_RINGMAP_HEATMAP_TOOLTIP",
+		"type":"bool",
+		"default":true
+	},
+	"ring_map_heatmap_clamp":{
+		"name":"HEVLIB_CONFIG_RINGMAP_HEATMAP_CLAMP",
+		"description":"HEVLIB_CONFIG_RINGMAP_HEATMAP_CLAMP_TOOLTIP",
 		"type":"bool",
 		"default":false
 	},
 	"ring_map_min_value":{
-		"name":"HEVLIB_CONFIG_CHAOS_OVERLAY_MIN_CHAOS",
-		"description":"HEVLIB_CONFIG_CHAOS_OVERLAY_MIN_CHAOS_TOOLTIP",
+		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE",
+		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_TOOLTIP",
 		"type":"float",
         "style":"slider",
         "min":0.0,
@@ -231,15 +251,35 @@ HEVLIB_CONFIG_SECTION_DEBUG={
         "step":0.05,
 		"default":0.65,
 	},
+	"ring_map_max_value":{
+		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE",
+		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_TOOLTIP",
+		"type":"float",
+        "style":"slider",
+        "min":0.0,
+        "max":1.0,
+        "step":0.05,
+		"default":1.0,
+	},
 	"ring_map_opacity":{
-		"name":"HEVLIB_CONFIG_CHAOS_OVERLAY_OPACITY",
-		"description":"HEVLIB_CONFIG_CHAOS_OVERLAY_OPACITY_TOOLTIP",
+		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY",
+		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_TOOLTIP",
 		"type":"float",
         "style":"slider",
         "min":0.0,
         "max":1.0,
         "step":0.05,
 		"default":0.35,
+	},
+	"ring_map_oob_opacity":{
+		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY",
+		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_TOOLTIP",
+		"type":"float",
+        "style":"slider",
+        "min":0.0,
+        "max":1.0,
+        "step":0.05,
+		"default":0.0,
 	},
 	"clear_leaderboards":{
 		"name":"HEVLIB_CLEAR_LEADERBOARDS",
@@ -287,36 +327,84 @@ HEVLIB_CONFIG_SECTION_INPUT={
 		"default":[  ]
 	},
 	"hl_toggle_ring_map_overlay":{
-		"name":"HEVLIB_CONFIG_TOGGLE_CHAOS_MAP_OVERLAY",
-		"description":"HEVLIB_CONFIG_TOGGLE_CHAOS_MAP_OVERLAY_TOOLTIP",
+		"name":"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY",
+		"description":"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_TOOLTIP",
+		"type":"Input",
+		"hint":"",
+		"default":[  ]
+	},
+	"hl_toggle_ring_map_use_heatmap":{
+		"name":"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_HEATMAP",
+		"description":"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_HEATMAP_TOOLTIP",
+		"type":"Input",
+		"hint":"",
+		"default":[  ]
+	},
+	"hl_toggle_ring_map_heatmap_clamp":{
+		"name":"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_HEATMAP_CLAMP",
+		"description":"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_HEATMAP_CLAMP_TOOLTIP",
+		"type":"Input",
+		"hint":"",
+		"default":[  ]
+	},
+	"hl_cycle_ring_map_mode":{
+		"name":"HEVLIB_CONFIG_CYCLE_RINGMAP_OVERLAY_MODE",
+		"description":"HEVLIB_CONFIG_CYCLE_RINGMAP_OVERLAY_MODE_TOOLTIP",
 		"type":"Input",
 		"hint":"",
 		"default":[  ]
 	},
 	"hl_ring_map_overlay_min_value_up":{
-		"name":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_UP",
-		"description":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_UP_TOOLTIP",
+		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_UP",
+		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_UP_TOOLTIP",
 		"type":"Input",
 		"hint":"",
 		"default":[  ]
 	},
 	"hl_ring_map_overlay_min_value_down":{
-		"name":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_DOWN",
-		"description":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_DOWN_TOOLTIP",
+		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_DOWN",
+		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_DOWN_TOOLTIP",
+		"type":"Input",
+		"hint":"",
+		"default":[  ]
+	},
+	"hl_ring_map_overlay_max_value_up":{
+		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_UP",
+		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_UP_TOOLTIP",
+		"type":"Input",
+		"hint":"",
+		"default":[  ]
+	},
+	"hl_ring_map_overlay_max_value_down":{
+		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_DOWN",
+		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_DOWN_TOOLTIP",
 		"type":"Input",
 		"hint":"",
 		"default":[  ]
 	},
 	"hl_ring_map_overlay_opacity_up":{
-		"name":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_UP",
-		"description":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_UP_TOOLTIP",
+		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_UP",
+		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_UP_TOOLTIP",
 		"type":"Input",
 		"hint":"",
 		"default":[  ]
 	},
 	"hl_ring_map_overlay_opacity_down":{
-		"name":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_DOWN",
-		"description":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_DOWN_TOOLTIP",
+		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_DOWN",
+		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_DOWN_TOOLTIP",
+		"type":"Input",
+		"default":[  ]
+	},
+	"hl_ring_map_overlay_oob_opacity_up":{
+		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_UP",
+		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_UP_TOOLTIP",
+		"type":"Input",
+		"hint":"",
+		"default":[  ]
+	},
+	"hl_ring_map_overlay_oob_opacity_down":{
+		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_DOWN",
+		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_DOWN_TOOLTIP",
 		"type":"Input",
 		"default":[  ]
 	},

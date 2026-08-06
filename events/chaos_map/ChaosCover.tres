@@ -9,7 +9,7 @@ load_path = "res://HevLib/events/chaos_map/chaos_border.stex"
 [resource]
 shader = ExtResource( 1 )
 shader_param/darken_factor = 0.0
-shader_param/min_chaos = 0.65
+shader_param/min_chaos = 0.0
 shader_param/max_chaos = 1.0
-shader_param/opacity = 0.35
+shader_param/opacity = 0.5
 shader_param/chaos_map = SubResource( 3 )

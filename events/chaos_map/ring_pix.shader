@@ -22,7 +22,7 @@ uniform int mode : hint_range(0, 8) = 0;
 uniform float opacity : hint_range(0.0, 1.0,0.05) = 1.0;
 
 // Minimum and maximum values that a pixel must have to not be darkened
-uniform float min_val : hint_range(0.0, 1.0, 0.05) = 0.0;
+uniform float min_val : hint_range(0.0, 1.0, 0.05) = 0.65;
 uniform float max_val : hint_range(0.0, 1.0, 0.05) = 1.0;
 
 // Multiplier used for all pixels with values outside of the minimum and maximum values
@@ -77,7 +77,10 @@ void fragment() {
 			out_color = vec4(pu * (1.0 - cy) + pd * (cy)).rgb;
 			if (mode == 0) {
 				float val = out_color.r;
-				if (val < min_val || val > max_val) {
+				if (val < min_val) {
+					this_opacity *= darken_factor;
+				}
+				else if (val > max_val) {
 					this_opacity *= darken_factor;
 				}
 				if (heatmap) {
@@ -89,7 +92,10 @@ void fragment() {
 			}
 			else if (mode == 1) {
 				float val = out_color.g;
-				if (val < min_val || val > max_val) {
+				if (val < min_val) {
+					this_opacity *= darken_factor;
+				}
+				else if (val > max_val) {
 					this_opacity *= darken_factor;
 				}
 				if (heatmap) {
@@ -101,7 +107,10 @@ void fragment() {
 			}
 			else if (mode == 2) {
 				float val = out_color.b;
-				if (val < min_val || val > max_val) {
+				if (val < min_val) {
+					this_opacity *= darken_factor;
+				}
+				else if (val > max_val) {
 					this_opacity *= darken_factor;
 				}
 				if (heatmap) {
@@ -157,7 +166,10 @@ void fragment() {
 					else if (mode == 7) {
 						ov = (e / 192.0);
 					}
-					if (ov < min_val || ov > max_val) {
+					if (ov < min_val) {
+						this_opacity *= darken_factor;
+					}
+					else if (ov > max_val) {
 						this_opacity *= darken_factor;
 					}
 					if (heatmap) {
@@ -190,7 +202,10 @@ void fragment() {
 						ctr = e;
 						blue = 0.2;
 					}
-					if (blue < min_val || blue > max_val) {
+					if (blue < min_val) {
+						this_opacity *= darken_factor;
+					}
+					else if (blue > max_val) {
 						this_opacity *= darken_factor;
 					}
 					if (heatmap) {

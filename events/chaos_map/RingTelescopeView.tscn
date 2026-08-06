@@ -1,16 +1,33 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://hud/components/RingTelescopeView.tscn" type="PackedScene" id=1]
 [ext_resource path="res://HevLib/events/chaos_map/RingCoverOverlay.tscn" type="PackedScene" id=2]
+[ext_resource path="res://ring/ring-map.png" type="Texture" id=3]
+[ext_resource path="res://HevLib/events/chaos_map/ring_pix.shader" type="Shader" id=4]
+
+[sub_resource type="ShaderMaterial" id=1]
+resource_local_to_scene = true
+shader = ExtResource( 4 )
+shader_param/heatmap = true
+shader_param/clamp_heatmap = false
+shader_param/mode = 0
+shader_param/opacity = 1.0
+shader_param/min_val = 0.0
+shader_param/max_val = 1.0
+shader_param/darken_factor = 0.0
+shader_param/ring_map = ExtResource( 3 )
 
 [node name="RingTelescopeView" instance=ExtResource( 1 )]
 
 [node name="RingCoverOverlay" parent="." index="0" instance=ExtResource( 2 )]
+material = SubResource( 1 )
 
 [node name="RingCoverOverlay2" parent="." index="1" instance=ExtResource( 2 )]
+material = SubResource( 1 )
 margin_top = 600.0
 margin_bottom = 1200.0
 
 [node name="RingCoverOverlay3" parent="." index="2" instance=ExtResource( 2 )]
+material = SubResource( 1 )
 margin_top = 1200.0
 margin_bottom = 1800.0

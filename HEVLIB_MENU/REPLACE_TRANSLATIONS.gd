@@ -1,5 +1,5 @@
 # This translation file is generated automatically
-# Do not modify anything directly, as this can break things for those working on them
+# Do not modify anything directly, as this will break things for translators
 # Please use Translation Tracker to modify these yourself, and contact the mod author to implement them
 # https://github.com/rwqfsfasxc100/TranslationTracker/releases/latest
 
@@ -1310,8 +1310,8 @@ const TRANSLATIONS = {
 			"version_hash": 3049697875
 		},
 		"HEVLIB_CONFIG_SORT_BY_PRICE_TOOLTIP": {
-			"string": "Forces equipment to be sorted by price. Will break AUX unit sorting by type, but prevents issues with modded equipment.",
-			"version_hash": 3695605117
+			"string": "Forces equipment to be sorted by price. Will break AUX unit sorting by type, but\nprevents issues with modded equipment.",
+			"version_hash": 825779431
 		},
 		"HEVLIB_CONFIG_SORT_SLOT_BY_TYPE": {
 			"string": "Sort slots by type",
@@ -1334,8 +1334,8 @@ const TRANSLATIONS = {
 			"version_hash": 924663846
 		},
 		"HEVLIB_CONFIG_WRITE_EVENTS_TOOLTIP": {
-			"string": "Writes to a cache file located in user://cache/.HevLib_Cache/current_events.txt that contains all events loaded by the game at the time the rings are loaded.",
-			"version_hash": 4263193676
+			"string": "Writes events to a cache file located at 'user://cache/.HevLib_Cache/current_events.txt'\n\nThis contains all events loaded by the game at the time the rings are loaded.",
+			"version_hash": 2763919336
 		},
 		"HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES": {
 			"string": "Show hidden libraries",
@@ -1374,8 +1374,8 @@ const TRANSLATIONS = {
 			"version_hash": 179893315
 		},
 		"HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS_TOOLTIP": {
-			"string": "Used in conjunction with Position data debugger. Displays an actual count of events in the area. Due to the way this setting works, it will decrease performance by a significant enough amount, and will generate thousands of logs per minute.\\n\\nUSE OF THIS SETTING IS COMPLETELY UNSUPPORTED AND WILL INVALIDATE ALL BUG REPORTS! YOU HAVE BEEN WARNED!",
-			"version_hash": 3996342359
+			"string": "Used in conjunction with Position data debugger. Displays an actual count of events in the area.\nDue to the way this setting works, it will decrease performance by a significant enough amount,\nand will generate thousands of logs per minute.\n\nUSE OF THIS SETTING IS COMPLETELY UNSUPPORTED AND WILL INVALIDATE ALL BUG REPORTS!\nYOU HAVE BEEN WARNED!",
+			"version_hash": 1287925013
 		},
 		"HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU": {
 			"string": "Debug event menu",
@@ -1582,16 +1582,16 @@ const TRANSLATIONS = {
 			"version_hash": 2439027097
 		},
 		"HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST_TOOLTIP": {
-			"string": "Allows libraries with the 'always_display' tag (such as HevLib) to appear in the DLC list mods section",
-			"version_hash": 1519865726
+			"string": "Allows libraries with the 'always_display' tag (such as HevLib) to appear\nin the DLC list mods section",
+			"version_hash": 4096856680
 		},
 		"HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST": {
 			"string": "Show all libraries in DLC list",
 			"version_hash": 3753868258
 		},
 		"HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST_TOOLTIP": {
-			"string": "Allows all libraries to appear in the DLC list mods section. This can cause the list to get very large with libraries that have a lot of mod main files for sub processes.",
-			"version_hash": 2736147
+			"string": "Allows all libraries to appear in the DLC list mods section. This can cause the list\nto get very large with libraries that have a lot of mod main files\nfor sub processes.",
+			"version_hash": 691199143
 		},
 		"HEVLIB_CONFIG_DLCLIST_SORT_ORDER": {
 			"string": "DLC list mod sort order",
@@ -1682,8 +1682,8 @@ const TRANSLATIONS = {
 			"version_hash": 3207490862
 		},
 		"HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT_TOOLTIP": {
-			"string": "Prevents nanodrones from being used if the consumption rate exceeds that of the installed storage medium. \\nNote: this likely will never be met outside of very specific configurations.",
-			"version_hash": 3428239164
+			"string": "Prevents nanodrones from being used if the consumption rate exceeds that of\nthe installed storage medium. \n\nNote: this likely will never be met with vanilla equipment outside of\nvery specific configurations.",
+			"version_hash": 4102208437
 		},
 		"HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING": {
 			"string": "Display current player count",
@@ -1929,70 +1929,6 @@ const TRANSLATIONS = {
 			"string": "megabytes",
 			"version_hash": 2738237862
 		},
-		"HEVLIB_CONFIG_SHOW_CHAOS_OVERLAY": {
-			"string": "Ring map chaos overlay",
-			"version_hash": 517498787
-		},
-		"HEVLIB_CONFIG_SHOW_CHAOS_OVERLAY_TOOLTIP": {
-			"string": "Overlays the specified minimum ring chaos against the Ring map. Overlay is limited to 1km^2 coverage, and steps at 0.05 chaos.",
-			"version_hash": 2730212789
-		},
-		"HEVLIB_CONFIG_CHAOS_OVERLAY_MIN_CHAOS": {
-			"string": "Chaos overlay minimum chaos",
-			"version_hash": 2119829887
-		},
-		"HEVLIB_CONFIG_CHAOS_OVERLAY_MIN_CHAOS_TOOLTIP": {
-			"string": "The minimum chaos to show the chaos overlay over a specific area.",
-			"version_hash": 1923696559
-		},
-		"HEVLIB_CONFIG_TOGGLE_CHAOS_MAP_OVERLAY": {
-			"string": "Toggle ring map chaos overlay",
-			"version_hash": 2892037701
-		},
-		"HEVLIB_CONFIG_TOGGLE_CHAOS_MAP_OVERLAY_TOOLTIP": {
-			"string": "Toggles the chaos map overlay without needing to go through the Mod Menu",
-			"version_hash": 1512297543
-		},
-		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_UP": {
-			"string": "Increase minimum chaos",
-			"version_hash": 3984603577
-		},
-		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_UP_TOOLTIP": {
-			"string": "Keybind used to increase the minimum chaos for ring map chaos overlay, done in steps of 0.05",
-			"version_hash": 2328949513
-		},
-		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_DOWN": {
-			"string": "Decrease minimum chaos",
-			"version_hash": 3601724939
-		},
-		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_DOWN_TOOLTIP": {
-			"string": "Keybind used to decrease the minimum chaos for ring map chaos overlay, done in steps of 0.05",
-			"version_hash": 777212123
-		},
-		"HEVLIB_CONFIG_CHAOS_OVERLAY_OPACITY": {
-			"string": "Chaos overlay opacity",
-			"version_hash": 1243370478
-		},
-		"HEVLIB_CONFIG_CHAOS_OVERLAY_OPACITY_TOOLTIP": {
-			"string": "The opacity at which the chaos overlay appears against the ring map.",
-			"version_hash": 2535371048
-		},
-		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_UP": {
-			"string": "Increase chaos overlay opacity",
-			"version_hash": 1066781240
-		},
-		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_UP_TOOLTIP": {
-			"string": "Keybind used to increase the opacity of the ring map chaos overlay, done in steps of 5%",
-			"version_hash": 747121790
-		},
-		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_DOWN": {
-			"string": "Decrease chaos overlay opacity",
-			"version_hash": 3097213066
-		},
-		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_DOWN_TOOLTIP": {
-			"string": "Keybind used to decrease the opacity of the ring map chaos overlay, done in steps of 5%",
-			"version_hash": 2171739920
-		},
 		"HEVLIB_NO_DOWNLOAD_HEADER": {
 			"string": "NO PROVIDED LINK!",
 			"version_hash": 3291089198
@@ -2014,8 +1950,8 @@ const TRANSLATIONS = {
 			"version_hash": 1666179083
 		},
 		"HEVLIB_CONFIG_MAX_MODDED_DEALERSHIP_POOLS_TOOLTIP": {
-			"string": "The maximum number of modded ship pools added to the dealership's used ship list. \\nThis only handles ships added through ShipDriver, with the number not increasing if there are fewer ships added than this number.",
-			"version_hash": 338011646
+			"string": "The maximum number of modded ship pools added to the dealership's used ship list.\n\nThis only handles ships added through ShipDriver, with the number not\nincreasing if there are fewer ships added than this number.",
+			"version_hash": 3536264146
 		},
 		"HEVLIB_SAVEOPT_CLEAR_SOLD_SHIPS": {
 			"string": "Clear sold ship cache",
@@ -2086,8 +2022,8 @@ const TRANSLATIONS = {
 			"version_hash": 3554924120
 		},
 		"HEVLIB_CONFIG_CARGO_SCANNER_DISPLAY_LIMIT_TOOLTIP": {
-			"string": "How many mineral entries are allowed to appear in any raw mineral scanner list. This only includes minerals, and will skip empty space, equipment, and unidentified entries.",
-			"version_hash": 3868254435
+			"string": "How many mineral entries are allowed to appear in any raw mineral scanner list.\nThis only includes minerals, and will skip empty space, equipment,\nand unidentified entries.",
+			"version_hash": 886148855
 		},
 		"TAG_ADD_TRANSIT_TIPS": {
 			"string": "Adds transit tips",
@@ -2114,8 +2050,8 @@ const TRANSLATIONS = {
 			"version_hash": 2547578582
 		},
 		"HEVLIB_CONFIG_PROCESSED_MINERAL_DISPLAY_LIMIT_TOOLTIP": {
-			"string": "How many mineral entries are allowed to appear at any time within the processed ore list. This display cycles through 'pages' once the limit is exceeded so all minerals can be shown.",
-			"version_hash": 4133660626
+			"string": "How many mineral entries are allowed to appear at any time within the processed ore list.\nThis display cycles through 'pages' once the limit is exceeded so all minerals can be shown.",
+			"version_hash": 1369356988
 		},
 		"HEVLIB_TRANSIT_TIP_18": {
 			"string": "Want to see multiple ores in a single mineral chunk or configure other mineral settings? Check the Drivers tab within the HevLib config.",
@@ -2250,8 +2186,8 @@ const TRANSLATIONS = {
 			"version_hash": 537716554
 		},
 		"HEVLIB_CONFIG_UNRESTRICTED_AMMO_OUTPUT_TOOLTIP": {
-			"string": "Reverts ammunition magazine behaviour to prior to 1.64.14, with no restrictions to how fast ammunition could be delivered to equipment.",
-			"version_hash": 1753521849
+			"string": "Reverts ammunition magazine behaviour to prior to 1.64.14,\nwith no restrictions to how fast ammunition could be delivered\nto equipment.",
+			"version_hash": 1708599757
 		},
 		"HEVLIB_SETTING_REQUIRES_RESTART": {
 			"string": "NOTICE: This setting requires a restart after changing it.",
@@ -2306,16 +2242,16 @@ const TRANSLATIONS = {
 			"version_hash": 346203813
 		},
 		"HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL_TOOLTIP": {
-			"string": "The number of physics frames between automatic writes to the pointer log (i.e. information logged specifically by mods to the cache)\n\nThis is dependant on your current physics framerate.",
-			"version_hash": 2000819806
+			"string": "The number of physics frames between automatic writes to the pointer log\n(i.e. information logged specifically by mods to the cache)\n\nThis is dependant on your current physics framerate.",
+			"version_hash": 515481480
 		},
 		"HEVLIB_CONFIG_EXTEND_DIVIDED_STORAGE_MULTIPLIER": {
 			"string": "Extend storage multiplier of divided holds",
 			"version_hash": 3830358193
 		},
 		"HEVLIB_CONFIG_EXTEND_DIVIDED_STORAGE_MULTIPLIER_TOOLTIP": {
-			"string": "Whether the processed storage added by equipment using the MODIFY_INTERNALS driver should\ndynamically adjust based on the number of minerals that can be found in the ring.\n\nIf disabled, defaults to use just Vanilla's 6 ores",
-			"version_hash": 2335117499
+			"string": "Whether the processed storage added by equipment using the MODIFY_INTERNALS\ndriver should dynamically adjust based on the number of minerals that can\nbe found in the ring.\n\nIf disabled, defaults to use just Vanilla's 6 ores.",
+			"version_hash": 759404083
 		},
 		"HEVLIB_CONFIG_MAX_DEALERSHIP_MODIFICATION_ROLLS": {
 			"string": "Maximum rolls for new ship loadout adjustments",
@@ -2330,8 +2266,8 @@ const TRANSLATIONS = {
 			"version_hash": 2832891408
 		},
 		"HEVLIB_CONFIG_DEALERSHIP_MODIFICATION_ROLL_CHANCE_SCALE_TOOLTIP": {
-			"string": "Scale for how likely a ship will have modifications to it's config, with the chance being for each modification.",
-			"version_hash": 758756226
+			"string": "Scale for how likely a ship will have modifications to it's config, with\nthe chance being for each modification.",
+			"version_hash": 543789100
 		},
 		"HEVLIB_CREDITS_CONTRIBUTORS_HEADER": {
 			"string": "   --- Contributors ---   ",
@@ -2384,6 +2320,202 @@ const TRANSLATIONS = {
 		"HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS_TOOLTIP": {
 			"string": "Whether the UpdateDB should receive info on mods it's not aware of on editor builds.\n\nThis option is intended for mod developers. It does nothing on release builds of the game.",
 			"version_hash": 113417870
+		},
+		"HEVLIB_CONFIG_SHOW_RINGMAP_OVERLAY": {
+			"string": "Show ring map overlay",
+			"version_hash": 2186846390
+		},
+		"HEVLIB_CONFIG_SHOW_RINGMAP_OVERLAY_TOOLTIP": {
+			"string": "Toggles the visibility of the ring map overlay.",
+			"version_hash": 1321643511
+		},
+		"HEVLIB_CONFIG_RINGMAP_HEATMAP": {
+			"string": "Convert ring map overlay data to heatmap",
+			"version_hash": 2108586739
+		},
+		"HEVLIB_CONFIG_RINGMAP_HEATMAP_TOOLTIP": {
+			"string": "Whether the ring map overlay should use an HSV heatmap instead of\ndisplaying the raw pixel data.\n\nRaw data contains the specific channel/index for the respective\ngetPixelAt() or getTargetDensityAt() method.",
+			"version_hash": 3398779976
+		},
+		"HEVLIB_CONFIG_RINGMAP_HEATMAP_CLAMP": {
+			"string": "Stepify ring map overlay colouring",
+			"version_hash": 4564075
+		},
+		"HEVLIB_CONFIG_RINGMAP_HEATMAP_CLAMP_TOOLTIP": {
+			"string": "Whether to clamp the output colour of the ring map to steps of 1/20, rounding down.\n\nThis happens specifically to the raw value before visualizing, and is best used for knowing\nwhen specific values have been reached.",
+			"version_hash": 3469990629
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE": {
+			"string": "Minimum ring map value",
+			"version_hash": 2811375820
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_TOOLTIP": {
+			"string": "The minimum value that must be reached to show the display in full brightness.\n\nAreas that fail this check have the out of bounds opacity multiplied to it's current opacity.",
+			"version_hash": 3861393134
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE": {
+			"string": "Maximum ring map value",
+			"version_hash": 414329998
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_TOOLTIP": {
+			"string": "The maximum value that must be reached to show the display in full brightness.\n\nAreas that fail this check have the out of bounds opacity multiplied to it's current opacity.",
+			"version_hash": 2602012528
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY": {
+			"string": "Ring map opacity",
+			"version_hash": 1582996684
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_TOOLTIP": {
+			"string": "Base opacity of the ring map overlay.",
+			"version_hash": 4040631661
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY": {
+			"string": "Ring map out of bounds opacity",
+			"version_hash": 2317746276
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_TOOLTIP": {
+			"string": "Opacity multiplier for any values on the overlay that are outside the set\nminimum and maximum value.",
+			"version_hash": 1226795897
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE": {
+			"string": "Ring map overlay display mode",
+			"version_hash": 2985551792
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_TOOLTIP": {
+			"string": "Which visualizer the ring map is using currently.\n\n* Chaos - displays the ring chaos value. (getPixelAt() red channel)\n* Size bias - displays the ringroid size bias value. (getPixelAt() green channel)\n* Raw density - displays the raw density value. (getPixelAt() blue channel)\n* Class 1 density - displays the density of C1 (largest) ringroids. (getTargetDensityAt() index 0)\n* Class 2 density - displays the density of C2 ringroids. (getTargetDensityAt() index 1)\n* Class 3 density - displays the density of C3 ringroids. (getTargetDensityAt() index 2)\n* Class 4 density - displays the density of C4 ringroids. (getTargetDensityAt() index 3)\n* Class 5 density - displays the density of C6 (smallest) ringroids. (getTargetDensityAt() index 4)\n* Most prevalent ringroid size - displays the most prevalent ringroid size of an area.\n   The brighter the area, the larger the 'roid prevalence.",
+			"version_hash": 869282124
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_CHAOS": {
+			"string": "Chaos",
+			"version_hash": 217455795
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_BIAS": {
+			"string": "Size bias",
+			"version_hash": 986321567
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_RAWDENSITY": {
+			"string": "Raw density",
+			"version_hash": 3733987279
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C1": {
+			"string": "Class 1 density",
+			"version_hash": 2812853740
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C2": {
+			"string": "Class 2 density",
+			"version_hash": 472198893
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C3": {
+			"string": "Class 3 density",
+			"version_hash": 2426511342
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C4": {
+			"string": "Class 4 density",
+			"version_hash": 85856495
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C5": {
+			"string": "Class 5 density",
+			"version_hash": 2040168944
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_MOST_PREVALENT": {
+			"string": "Most prevalent ringroid size",
+			"version_hash": 609523250
+		},
+		"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY": {
+			"string": "Toggle ring map overlay",
+			"version_hash": 2000092087
+		},
+		"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_TOOLTIP": {
+			"string": "Keys used to toggle the ring map overlay.",
+			"version_hash": 4280819030
+		},
+		"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_HEATMAP": {
+			"string": "Toggle show ring map heatmap",
+			"version_hash": 2570144278
+		},
+		"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_HEATMAP_TOOLTIP": {
+			"string": "Keys used to toggle whether the ring map uses a heatmap.",
+			"version_hash": 3603998316
+		},
+		"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_HEATMAP_CLAMP": {
+			"string": "Toggle ring map heatmap value stepping",
+			"version_hash": 459047484
+		},
+		"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_HEATMAP_CLAMP_TOOLTIP": {
+			"string": "Keys used to toggle whether the ring map heatmap has clamped values.",
+			"version_hash": 2375962285
+		},
+		"HEVLIB_CONFIG_CYCLE_RINGMAP_OVERLAY_MODE": {
+			"string": "Cycle ring map overlay mode",
+			"version_hash": 3781027242
+		},
+		"HEVLIB_CONFIG_CYCLE_RINGMAP_OVERLAY_MODE_TOOLTIP": {
+			"string": "Keys used to cycle through the ring map overlay modes.\n\nCheck Debug/Ring map overlay display mode for which modes do what.",
+			"version_hash": 2873646839
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_UP": {
+			"string": "Increase ring map overlay minimum value",
+			"version_hash": 2310825944
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_UP_TOOLTIP": {
+			"string": "Keys used to increase the minimum value for the ring map overlay.",
+			"version_hash": 1532744479
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_DOWN": {
+			"string": "Decrease ring map overlay minimum value",
+			"version_hash": 380670570
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_DOWN_TOOLTIP": {
+			"string": "Keys used to decrease the minimum value for the ring map overlay.",
+			"version_hash": 2833586929
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_UP": {
+			"string": "Increase ring map overlay maximum value",
+			"version_hash": 935367002
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_UP_TOOLTIP": {
+			"string": "Keys used to increase the maximum value for the ring map overlay.",
+			"version_hash": 781650721
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_DOWN": {
+			"string": "Decrease ring map overlay maximum value",
+			"version_hash": 3300178924
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_DOWN_TOOLTIP": {
+			"string": "Keys used to decrease the maximum value for the ring map overlay.",
+			"version_hash": 2082493171
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_UP": {
+			"string": "Increase ring map opacity",
+			"version_hash": 1968471254
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_UP_TOOLTIP": {
+			"string": "Keys used to increase the opacity of the ring map overlay.",
+			"version_hash": 1962015821
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_DOWN": {
+			"string": "Decrease ring map opacity",
+			"version_hash": 3534073832
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_DOWN_TOOLTIP": {
+			"string": "Keys used to decrease the opacity of the ring map overlay.",
+			"version_hash": 3717483615
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_UP": {
+			"string": "Increase ring map out of bounds opacity",
+			"version_hash": 3249678830
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_UP_TOOLTIP": {
+			"string": "Keys used to increase the out of bounds opacity of the ring map overlay.",
+			"version_hash": 15580581
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_DOWN": {
+			"string": "Decrease ring map out of bounds opacity",
+			"version_hash": 1319523456
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_DOWN_TOOLTIP": {
+			"string": "Keys used to decrease the out of bounds opacity of the ring map overlay.",
+			"version_hash": 2858534199
 		}
 	},
 	"uk_UA": {
@@ -3350,70 +3482,6 @@ const TRANSLATIONS = {
 		"HEVLIB_SIZE_LABEL_MEGABYTES": {
 			"string": "мегабайт",
 			"version_hash": 2738237862
-		},
-		"HEVLIB_CONFIG_SHOW_CHAOS_OVERLAY": {
-			"string": "Накладання хаосу на карту кілець",
-			"version_hash": 517498787
-		},
-		"HEVLIB_CONFIG_SHOW_CHAOS_OVERLAY_TOOLTIP": {
-			"string": "Накладає вказаний мінімальний рівень хаосу на карту кілець. Покриття обмежене 1 км^2, крок — 0.05 хаосу.",
-			"version_hash": 2730212789
-		},
-		"HEVLIB_CONFIG_CHAOS_OVERLAY_MIN_CHAOS": {
-			"string": "Мінімальний хаос для накладання",
-			"version_hash": 2119829887
-		},
-		"HEVLIB_CONFIG_CHAOS_OVERLAY_MIN_CHAOS_TOOLTIP": {
-			"string": "Мінімальний рівень хаосу для відображення накладання в конкретній зоні.",
-			"version_hash": 1923696559
-		},
-		"HEVLIB_CONFIG_TOGGLE_CHAOS_MAP_OVERLAY": {
-			"string": "Перемкнути накладання карти хаосу",
-			"version_hash": 2892037701
-		},
-		"HEVLIB_CONFIG_TOGGLE_CHAOS_MAP_OVERLAY_TOOLTIP": {
-			"string": "Перемикає накладання карти хаосу без необхідності заходити в меню модів.",
-			"version_hash": 1512297543
-		},
-		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_UP": {
-			"string": "Збільшити мінімальний хаос",
-			"version_hash": 3984603577
-		},
-		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_UP_TOOLTIP": {
-			"string": "Клавіша для збільшення мінімального хаосу для накладання карти за кроком 0.05",
-			"version_hash": 2328949513
-		},
-		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_DOWN": {
-			"string": "Зменшити мінімальний хаос",
-			"version_hash": 3601724939
-		},
-		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_DOWN_TOOLTIP": {
-			"string": "Клавіша для зменшення мінімального хаосу для накладання карти за кроком 0.05",
-			"version_hash": 777212123
-		},
-		"HEVLIB_CONFIG_CHAOS_OVERLAY_OPACITY": {
-			"string": "Прозорість накладання хаосу",
-			"version_hash": 1243370478
-		},
-		"HEVLIB_CONFIG_CHAOS_OVERLAY_OPACITY_TOOLTIP": {
-			"string": "Прозорість, з якою накладання хаосу відображається на карті кілець.",
-			"version_hash": 2535371048
-		},
-		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_UP": {
-			"string": "Збільшити прозорість накладання",
-			"version_hash": 1066781240
-		},
-		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_UP_TOOLTIP": {
-			"string": "Клавіша для збільшення прозорості накладання хаосу за кроком 5%.",
-			"version_hash": 747121790
-		},
-		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_DOWN": {
-			"string": "Прозорість накладання хаосу",
-			"version_hash": 3097213066
-		},
-		"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_DOWN_TOOLTIP": {
-			"string": "Клавіша для зменшення прозорості накладання хаосу за кроком 5%.",
-			"version_hash": 2171739920
 		},
 		"HEVLIB_NO_DOWNLOAD_HEADER": {
 			"string": "ПОСИЛАННЯ НЕ НАДАНО!",
