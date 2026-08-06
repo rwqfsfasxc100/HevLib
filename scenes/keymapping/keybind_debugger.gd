@@ -142,7 +142,7 @@ func match_event_type(event):
 		return eventType
 	
 func ieDebug():
-	if Input.is_action_pressed("toggle_debug_menus"):
+	if Input.is_action_pressed("hl_toggle_debug_menus"):
 		InputEventDebugPanel.visible = !InputEventDebugPanel.visible
 	for evnt in action_dict:
 			if Input.is_action_pressed(evnt):
@@ -151,7 +151,7 @@ func ieDebug():
 				action_dict[evnt] = false
 
 func iDebug(event):
-	if Input.is_action_pressed("toggle_debug_menus"):
+	if Input.is_action_pressed("hl_toggle_debug_menus"):
 		InputDebugPanel.visible = !InputDebugPanel.visible
 	if not event is InputEventAction:
 		var eventAction

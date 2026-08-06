@@ -89,8 +89,8 @@ func _process(delta):
 func _input(event):
 	if scrollWithGamepad:
 		if Settings.controlScheme == Settings.control.gamepad or Settings.controlScheme == Settings.control.auto:
-			var up = Input.get_action_strength("ui_scroll_left", true) + Input.get_action_strength("ui_scroll_left2", true)
-			var down = Input.get_action_strength("ui_scroll_right", true) + Input.get_action_strength("ui_scroll_right2", true)
+			var up = Input.get_action_strength("hl_ui_scroll_left", true) + Input.get_action_strength("hl_ui_scroll_left2", true)
+			var down = Input.get_action_strength("hl_ui_scroll_right", true) + Input.get_action_strength("hl_ui_scroll_right2", true)
 			speed = down - up
 			if abs(speed) > minSpeed and is_visible_in_tree():
 				set_process(true)

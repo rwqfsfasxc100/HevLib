@@ -215,13 +215,13 @@ HEVLIB_CONFIG_SECTION_DEBUG={
 		"type":"bool",
 		"default":false
 	},
-	"ring_chaos_map_overlay":{
+	"ring_map_overlay":{
 		"name":"HEVLIB_CONFIG_SHOW_CHAOS_OVERLAY",
 		"description":"HEVLIB_CONFIG_SHOW_CHAOS_OVERLAY_TOOLTIP",
 		"type":"bool",
 		"default":false
 	},
-	"ring_chaos_map_min_chaos":{
+	"ring_map_min_value":{
 		"name":"HEVLIB_CONFIG_CHAOS_OVERLAY_MIN_CHAOS",
 		"description":"HEVLIB_CONFIG_CHAOS_OVERLAY_MIN_CHAOS_TOOLTIP",
 		"type":"float",
@@ -231,7 +231,7 @@ HEVLIB_CONFIG_SECTION_DEBUG={
         "step":0.05,
 		"default":0.65,
 	},
-	"ring_chaos_map_opacity":{
+	"ring_map_opacity":{
 		"name":"HEVLIB_CONFIG_CHAOS_OVERLAY_OPACITY",
 		"description":"HEVLIB_CONFIG_CHAOS_OVERLAY_OPACITY_TOOLTIP",
 		"type":"float",
@@ -273,7 +273,7 @@ HEVLIB_CONFIG_SECTION_DEBUG={
 	}
 }
 HEVLIB_CONFIG_SECTION_INPUT={
-	"open_debug_event_menu":{
+	"hl_open_debug_event_menu":{
 		"name":"HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU",
 		"description":"HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU_TOOLTIP",
 		"activation":"press",
@@ -286,35 +286,35 @@ HEVLIB_CONFIG_SECTION_INPUT={
 		"type":"Input",
 		"default":[  ]
 	},
-	"toggle_chaos_map_overlay":{
+	"hl_toggle_ring_map_overlay":{
 		"name":"HEVLIB_CONFIG_TOGGLE_CHAOS_MAP_OVERLAY",
 		"description":"HEVLIB_CONFIG_TOGGLE_CHAOS_MAP_OVERLAY_TOOLTIP",
 		"type":"Input",
 		"hint":"",
 		"default":[  ]
 	},
-	"chaos_map_overlay_step_up":{
+	"hl_ring_map_overlay_min_value_up":{
 		"name":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_UP",
 		"description":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_UP_TOOLTIP",
 		"type":"Input",
 		"hint":"",
 		"default":[  ]
 	},
-	"chaos_map_overlay_step_down":{
+	"hl_ring_map_overlay_min_value_down":{
 		"name":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_DOWN",
 		"description":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_STEP_DOWN_TOOLTIP",
 		"type":"Input",
 		"hint":"",
 		"default":[  ]
 	},
-	"chaos_map_overlay_opacity_up":{
+	"hl_ring_map_overlay_opacity_up":{
 		"name":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_UP",
 		"description":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_UP_TOOLTIP",
 		"type":"Input",
 		"hint":"",
 		"default":[  ]
 	},
-	"chaos_map_overlay_opacity_down":{
+	"hl_ring_map_overlay_opacity_down":{
 		"name":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_DOWN",
 		"description":"HEVLIB_CONFIG_CHAOS_MAP_OVERLAY_OVERLAY_DOWN_TOOLTIP",
 		"type":"Input",
@@ -327,35 +327,35 @@ HEVLIB_CONFIG_SECTION_INPUT={
 		"always_binds":[ "QuoteLeft" ],
 		"default":[ "F10" ]
 	},
-	"toggle_debug_menus":{
+	"hl_toggle_debug_menus":{
 		"name":"HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS",
 		"description":"HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS_TOOLTIP",
 		"type":"Input",
 		"hint":"",
 		"default":[ "F9" ]
 	},
-	"ui_scroll_left":{
+	"hl_ui_scroll_left":{
 		"name":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT",
 		"description":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT_TOOLTIP",
 		"type":"Input",
 		"hint":"",
 		"default":[ "JoyAxis -0" ]
 	},
-	"ui_scroll_right":{
+	"hl_ui_scroll_right":{
 		"name":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT",
 		"description":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT_TOOLTIP",
 		"type":"Input",
 		"hint":"",
 		"default":[ "JoyAxis 0" ]
 	},
-	"ui_scroll_left2":{
+	"hl_ui_scroll_left2":{
 		"name":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2",
 		"description":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2_TOOLTIP",
 		"type":"Input",
 		"hint":"",
 		"default":[ "JoyAxis -2" ]
 	},
-	"ui_scroll_right2":{
+	"hl_ui_scroll_right2":{
 		"name":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2",
 		"description":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2_TOOLTIP",
 		"type":"Input",

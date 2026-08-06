@@ -190,14 +190,14 @@ func _input(event):
 			if Settings.controlScheme == Settings.control.gamepad or Settings.controlScheme == Settings.control.auto:
 				var down = 0.0
 				if left_stick_scroll_enabled:
-					down += Input.get_action_strength("ui_scroll_left", true) 
+					down += Input.get_action_strength("hl_ui_scroll_left", true) 
 				if right_stick_scroll_enabled:
-					down += Input.get_action_strength("ui_scroll_left2", true)
+					down += Input.get_action_strength("hl_ui_scroll_left2", true)
 				var up = 0.0
 				if left_stick_scroll_enabled:
-					up += Input.get_action_strength("ui_scroll_right", true) 
+					up += Input.get_action_strength("hl_ui_scroll_right", true) 
 				if right_stick_scroll_enabled:
-					up += Input.get_action_strength("ui_scroll_right2", true)
+					up += Input.get_action_strength("hl_ui_scroll_right2", true)
 				hspeed = down - up
 				if abs(hspeed) > minVerticalSpeed and is_visible_in_tree():
 					set_process(true)

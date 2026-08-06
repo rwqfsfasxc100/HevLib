@@ -47,7 +47,7 @@ func _ready():
 	
 
 func _input(event):
-	if event.is_action_pressed("open_debug_event_menu"):
+	if event.is_action_pressed("hl_open_debug_event_menu"):
 		visible = not visible
 		CurrentGame.in_hevlib_menu = visible
 	if visible: 

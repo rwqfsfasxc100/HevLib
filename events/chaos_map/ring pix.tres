@@ -1,0 +1,15 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=2]
+
+[ext_resource path="res://ring/ring-map.png" type="Texture" id=1]
+[ext_resource path="res://HevLib/events/chaos_map/ring_pix.shader" type="Shader" id=2]
+
+[resource]
+shader = ExtResource( 2 )
+shader_param/heatmap = true
+shader_param/clamp_heatmap = false
+shader_param/mode = 0
+shader_param/opacity = 1.0
+shader_param/min_val = 0.0
+shader_param/max_val = 1.0
+shader_param/darken_factor = 0.0
+shader_param/ring_map = ExtResource( 1 )

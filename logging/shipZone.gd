@@ -59,7 +59,7 @@ func _ready():
 	visible = visibility
 	
 func _input(event):
-	if visibility and Input.is_action_just_pressed("toggle_debug_menus"):
+	if visibility and Input.is_action_just_pressed("hl_toggle_debug_menus"):
 		self.visible = !self.visible
 
 func _process(delta):
