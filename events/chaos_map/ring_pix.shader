@@ -22,7 +22,7 @@ uniform int mode : hint_range(0, 8) = 0;
 uniform float opacity : hint_range(0.0, 1.0,0.05) = 1.0;
 
 // Minimum and maximum values that a pixel must have to not be darkened
-uniform float min_val : hint_range(0.0, 1.0, 0.05) = 0.65;
+uniform float min_val : hint_range(0.0, 1.0, 0.05) = 0.0;
 uniform float max_val : hint_range(0.0, 1.0, 0.05) = 1.0;
 
 // Multiplier used for all pixels with values outside of the minimum and maximum values
@@ -32,6 +32,7 @@ uniform float darken_factor : hint_range(0.0, 1.0,0.01) = 0.0;
 // Use res://ring/ring-map.png
 uniform sampler2D ring_map: hint_black;
 
+// Creates an HSV colour using a value for the Hue
 vec3 hue2rgb(float r) {
 	if (clamp_heatmap) {
 		int ctr = 0;
@@ -47,13 +48,15 @@ vec3 hue2rgb(float r) {
 	return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
+// Fragment shader to mimic the behaviour of the getPixelAt() / getTargetDensityAt() methods from res://TheRing.gd
 void fragment() {
 	vec3 out_color = vec3(0.0,0.0,0.0);
 	float this_opacity = opacity;
+	// Only processes when opacity is above zero, for efficiency
 	if (this_opacity > 0.0) {
+		// Gets pixel data and clamps to nearest neighbour
 		float pixelToKm = 10000.0;
-		vec2 u = UV;
-		vec2 pos = (u / (TEXTURE_PIXEL_SIZE));
+		vec2 pos = (UV / TEXTURE_PIXEL_SIZE);
 		vec2 size = vec2(textureSize(ring_map,0));
 		float x = (floor(clamp(floor(pos.x), 0.0, size.x - 1.0)));
 		int sy = int(floor(size.y));
@@ -61,12 +64,12 @@ void fragment() {
 		float x1 = (clamp(float(x + 1.0), 0.0, size.x - 1.0));
 		float y1 = float(int(y + 1.0) % int(size.y));
 		
+		// Only process if x is above zero. Means left most pixel is always transparent.
 		if (x > 0.0) {
-			vec2 tpx = TEXTURE_PIXEL_SIZE;
-			vec4 p00 = texture(ring_map, vec2(x,y) * tpx);
-			vec4 p01 = texture(ring_map, vec2(x1,y) * tpx);
-			vec4 p11 = texture(ring_map, vec2(x1,y1) * tpx);
-			vec4 p10 = texture(ring_map, vec2(x,y1) * tpx);
+			vec4 p00 = texture(ring_map, vec2(x,y) * TEXTURE_PIXEL_SIZE);
+			vec4 p01 = texture(ring_map, vec2(x1,y) * TEXTURE_PIXEL_SIZE);
+			vec4 p11 = texture(ring_map, vec2(x1,y1) * TEXTURE_PIXEL_SIZE);
+			vec4 p10 = texture(ring_map, vec2(x,y1) * TEXTURE_PIXEL_SIZE);
 			
 			float cx = (pos.x - floor(pos.x / pixelToKm) * pixelToKm) / pixelToKm;
 			float cy = (pos.y - floor(pos.y / pixelToKm) * pixelToKm) / pixelToKm;
@@ -74,8 +77,12 @@ void fragment() {
 			vec4 pu = (p00 * (1.0 - cx) + p10 * (cx));
 			vec4 pd = (p01 * (1.0 - cx) + p11 * (cx));
 			
+			// Usual output of getPixelAt()
 			out_color = vec4(pu * (1.0 - cy) + pd * (cy)).rgb;
+			
+			// Processing modes, used for transforming of pixel data
 			if (mode == 0) {
+				// Display chaos (red channel)
 				float val = out_color.r;
 				if (val < min_val) {
 					this_opacity *= darken_factor;
@@ -91,6 +98,7 @@ void fragment() {
 				}
 			}
 			else if (mode == 1) {
+				// Display size bias (green channel)
 				float val = out_color.g;
 				if (val < min_val) {
 					this_opacity *= darken_factor;
@@ -106,6 +114,7 @@ void fragment() {
 				}
 			}
 			else if (mode == 2) {
+				// Display raw density (blue channel)
 				float val = out_color.b;
 				if (val < min_val) {
 					this_opacity *= darken_factor;
@@ -121,6 +130,7 @@ void fragment() {
 				}
 			}
 			else if (mode > 2 && mode < 9) {
+				// Format to getTargetDensityAt() output
 				float a = 0.0;
 				float b = 0.0;
 				float c = 0.0;
@@ -147,23 +157,27 @@ void fragment() {
 				total_mass = max(0,(total_mass - (d * mc3)));
 				
 				e = float(clamp(int(total_mass * pow(1.0 - abs(0.0 - size_bias),3.0) / float(pow(float(1), 2.0))), 0, 192));
-	//				vec4 ov = vec4(mix(mix(a/64.0,b/96.0,0.5),mix(b/96.0,c/128.0,0.5),0.5),mix(mix(b/96.0,c/128.0,0.5),mix(c/128.0,d/160.0,0.5),0.5),mix(mix(c/128.0,d/160.0,0.5),mix(d/160.0,e/192.0,0.5),0.5),1.0);
-	//				out_color = ov;
 				float ov = 0.0;
+				
 				if (mode > 2 && mode < 8) {
 					if (mode == 3) {
+						// Display class 1 ringroids (getTargetDensityAt() index 0)
 						ov = (a / 64.0);
 					}
 					else if (mode == 4) {
+						// Display class 2 ringroids (getTargetDensityAt() index 1)
 						ov = (b / 96.0);
 					}
 					else if (mode == 5) {
+						// Display class 3 ringroids (getTargetDensityAt() index 2)
 						ov = (c / 128.0);
 					}
 					else if (mode == 6) {
+						// Display class 4 ringroids (getTargetDensityAt() index 3)
 						ov = (d / 160.0);
 					}
 					else if (mode == 7) {
+						// Display class 5 ringroids (getTargetDensityAt() index 4)
 						ov = (e / 192.0);
 					}
 					if (ov < min_val) {
@@ -180,6 +194,7 @@ void fragment() {
 					}
 				}
 				else if (mode == 8) {
+					// Display the most prevalent ringroid size (highest value within getTargetDensityAt() output)
 					float blue = 0.0;
 					float ctr = 0.0;
 					if (a > 0.0) {
@@ -218,5 +233,6 @@ void fragment() {
 			}
 		}
 	}
+	// Change colour to output
 	COLOR = vec4(out_color,this_opacity);
 }
