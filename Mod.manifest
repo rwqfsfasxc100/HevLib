@@ -191,30 +191,6 @@ HEVLIB_CONFIG_SECTION_DRIVERS={
 	},
 }
 HEVLIB_CONFIG_SECTION_DEBUG={
-	"input_debugger":{
-		"name":"HEVLIB_CONFIG_INPUT_DEBUGGER",
-		"description":"HEVLIB_CONFIG_INPUT_DEBUGGER_TOOLTIP",
-		"type":"bool",
-		"default":false
-	},
-	"input_event_debugger":{
-		"name":"HEVLIB_CONFIG_EVENT_DEBUGGER",
-		"description":"HEVLIB_CONFIG_EVENT_DEBUGGER_TOOLTIP",
-		"type":"bool",
-		"default":false
-	},
-	"ring_position_data_debugger":{
-		"name":"HEVLIB_CONFIG_POSITION_DATA_DEBUGGER",
-		"description":"HEVLIB_CONFIG_POSITION_DATA_DEBUGGER_TOOLTIP",
-		"type":"bool",
-		"default":false
-	},
-	"ring_position_accurate_events":{
-		"name":"HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS",
-		"description":"HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS_TOOLTIP",
-		"type":"bool",
-		"default":false
-	},
 	"ring_map_overlay":{
 		"name":"HEVLIB_CONFIG_SHOW_RINGMAP_OVERLAY",
 		"description":"HEVLIB_CONFIG_SHOW_RINGMAP_OVERLAY_TOOLTIP",
@@ -310,7 +286,31 @@ HEVLIB_CONFIG_SECTION_DEBUG={
 		"description":"HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS_TOOLTIP",
 		"type":"bool",
 		"default":false
-	}
+	},
+	"input_debugger":{
+		"name":"HEVLIB_CONFIG_INPUT_DEBUGGER",
+		"description":"HEVLIB_CONFIG_INPUT_DEBUGGER_TOOLTIP",
+		"type":"bool",
+		"default":false
+	},
+	"input_event_debugger":{
+		"name":"HEVLIB_CONFIG_EVENT_DEBUGGER",
+		"description":"HEVLIB_CONFIG_EVENT_DEBUGGER_TOOLTIP",
+		"type":"bool",
+		"default":false
+	},
+	"ring_position_data_debugger":{
+		"name":"HEVLIB_CONFIG_POSITION_DATA_DEBUGGER",
+		"description":"HEVLIB_CONFIG_POSITION_DATA_DEBUGGER_TOOLTIP",
+		"type":"bool",
+		"default":false
+	},
+	"ring_position_accurate_events":{
+		"name":"HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS",
+		"description":"HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS_TOOLTIP",
+		"type":"bool",
+		"default":false
+	},
 }
 HEVLIB_CONFIG_SECTION_INPUT={
 	"hl_open_debug_event_menu":{
