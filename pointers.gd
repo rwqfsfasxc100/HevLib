@@ -4857,7 +4857,7 @@ class _FolderAccess:
 					]
 				},
 				"__get_vanilla_script_and_scenes":{
-					"description":"Fetches all vanilla scripts and scenes from the PCK file. NOTE: does not work correctly on editor builds since no PCK file exists, it just fetches all scenes and scripts available to the filesystem. To get PCK data in-editor, use Zip.__load_pck.",
+					"description":"Fetches all vanilla scripts and scenes from the PCK file. NOTE: does not work correctly on editor builds since no PCK file exists, it instead fetches all files that are specifically scenes (tscn files) and scripts (gd files) available to the filesystem. To get PCK data in-editor, use Zip.__load_pck.",
 					"return":[
 						"Array containing all valid scripts and scenes"
 					]
