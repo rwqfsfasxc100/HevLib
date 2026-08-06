@@ -30,7 +30,6 @@
 10.3=* NOTE: does not work correctly on editor builds since no PCK file exists, it instead fetches all files that are specifically scenes (`tscn` files) and scripts (`gd` files) available to the filesystem. To get PCK data in-editor, use `Zip`.`__load_pck`.
 11=* Added `FolderAccess`.`__get_files_with_extensions`
 11.1=* All extensions provided must not have a preceding period
-11.2=* Will not work in release builds when targeting anything within the `res://` directory.
 12=* Ensured all setting tooltips work on the Steam Deck
 
 [1.15.26]
