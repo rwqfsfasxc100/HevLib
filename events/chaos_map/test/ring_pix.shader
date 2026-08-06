@@ -50,7 +50,7 @@ vec3 hue2rgb(float r) {
 void fragment() {
 	vec3 out_color = vec3(0.0,0.0,0.0);
 	float this_opacity = opacity;
-	if (opacity > 0.0) {
+	if (this_opacity > 0.0) {
 		float pixelToKm = 10000.0;
 		vec2 u = UV;
 		vec2 pos = (u / (TEXTURE_PIXEL_SIZE));
