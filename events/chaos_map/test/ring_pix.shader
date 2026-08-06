@@ -79,22 +79,22 @@ void fragment() {
 		if (mode == 0) {
 			float val = out_color.r;
 			if (val < min_val || val > max_val) {
-				this_opacity *= darken_factor
+				this_opacity *= darken_factor;
 			}
 			if (heatmap) {
-				out_color = hue2rgb(val)
+				out_color = hue2rgb(val);
 			}
 			else {
-				out_color = vec3(val,0.0,0.0)
+				out_color = vec3(val,0.0,0.0);
 			}
 		}
 		else if (mode == 1) {
 			float val = out_color.g;
 			if (val < min_val || val > max_val) {
-				this_opacity *= darken_factor
+				this_opacity *= darken_factor;
 			}
 			if (heatmap) {
-				out_color = hue2rgb(val)
+				out_color = hue2rgb(val);
 			}
 			else {
 				out_color = vec3(0.0,val,0.0);
@@ -103,10 +103,10 @@ void fragment() {
 		else if (mode == 2) {
 			float val = out_color.b;
 			if (val < min_val || val > max_val) {
-				this_opacity *= darken_factor
+				this_opacity *= darken_factor;
 			}
 			if (heatmap) {
-				out_color = hue2rgb(val)
+				out_color = hue2rgb(val);
 			}
 			else {
 				out_color = vec3(0.0,0.0,val);
@@ -122,39 +122,23 @@ void fragment() {
 			float total_mass = initial_mass;
 			float size_bias = out_color.g;
 			
-			int mc = int(pow(float(5), 2.0));
-			float cfv = float(4) / 4.0;
-			float dr = 1.0 - abs(cfv - size_bias);
-			float pick = total_mass * pow(dr,3.0);
-			a = float(clamp(int(pick / float(mc)), 0, 64));
-			total_mass = max(0,(total_mass - (a * float(mc))));
+			float mc = pow(5.0, 2.0);
+			a = float(clamp(int(total_mass * pow(1.0 - abs(1.0 - size_bias),3.0) / mc), 0, 64));
+			total_mass = max(0,(total_mass - (a * mc)));
 			
-			int mc1 = int(pow(float(4), 2.0));
-			float cfv1 = float(3) / 4.0;
-			float dr1 = 1.0 - abs(cfv1 - size_bias);
-			float pick1 = total_mass * pow(dr1,3.0);
-			b = float(clamp(int(pick1 / float(mc1)), 0, 96));
-			total_mass = max(0,(total_mass - (b * float(mc1))));
+			float mc1 = pow(4.0, 2.0);
+			b = float(clamp(int(total_mass * pow(1.0 - abs(0.75 - size_bias),3.0) / mc1), 0, 96));
+			total_mass = max(0,(total_mass - (b * mc1)));
 			
-			int mc2 = int(pow(float(3), 2.0));
-			float cfv2 = float(2) / 4.0;
-			float dr2 = 1.0 - abs(cfv2 - size_bias);
-			float pick2 = total_mass * pow(dr2,3.0);
-			c = float(clamp(int(pick2 / float(mc2)), 0, 128));
-			total_mass = max(0,(total_mass - (c * float(mc2))));
+			float mc2 = pow(3.0, 2.0);
+			c = float(clamp(int(total_mass * pow(1.0 - abs(0.5 - size_bias),3.0) / mc2), 0, 128));
+			total_mass = max(0,(total_mass - (c * mc2)));
 			
-			int mc3 = int(pow(float(2), 2.0));
-			float cfv3 = float(1) / 4.0;
-			float dr3 = 1.0 - abs(cfv3 - size_bias);
-			float pick3 = total_mass * pow(dr3,3.0);
-			d = float(clamp(int(pick3 / float(mc3)), 0, 160));
-			total_mass = max(0,(total_mass - (d * float(mc3))));
+			float mc3 = pow(2.0, 2.0);
+			d = float(clamp(int(total_mass * pow(1.0 - abs(0.25 - size_bias),3.0) / mc3), 0, 160));
+			total_mass = max(0,(total_mass - (d * mc3)));
 			
-			int mc4 = int(pow(float(1), 2.0));
-			float cfv4 = float(0) / 4.0;
-			float dr4 = 1.0 - abs(cfv4 - size_bias);
-			float pick4 = total_mass * pow(dr4,3.0);
-			e = float(clamp(int(pick4 / float(mc4)), 0, 192));
+			e = float(clamp(int(total_mass * pow(1.0 - abs(0.0 - size_bias),3.0) / float(pow(float(1), 2.0))), 0, 192));
 //				vec4 ov = vec4(mix(mix(a/64.0,b/96.0,0.5),mix(b/96.0,c/128.0,0.5),0.5),mix(mix(b/96.0,c/128.0,0.5),mix(c/128.0,d/160.0,0.5),0.5),mix(mix(c/128.0,d/160.0,0.5),mix(d/160.0,e/192.0,0.5),0.5),1.0);
 //				out_color = ov;
 			float ov = 0.0;
