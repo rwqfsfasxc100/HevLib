@@ -7227,7 +7227,7 @@ class _NodeAccess:
 			pointers.storeLogCache()
 			if exit_url and pointers.DataFormat.__is_valid_url(exit_url):
 				OS.shell_open(exit_url)
-			yield(__create_timer(0.05),"timeout")
+			yield(__create_timer(0.016667),"timeout")
 			OS.kill(OS.get_process_id())
 	
 	
