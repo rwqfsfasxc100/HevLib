@@ -5793,6 +5793,9 @@ class _ManifestV2:
 	var currentModStateHash:int = 0
 	var lastModStateHash:int = 0
 	
+	var mod_hash_file:String = "user://cache/.Mod_Menu_2_Cache/updates/current_mod_state.txt"
+	var mod_state_hash_file:String = "user://cache/.Mod_Menu_2_Cache/updates/current_mod_state.txt"
+	
 	var fetchZips:bool = true
 	func __get_mod_data(print_json: bool = false):
 		if not cached_mod_list.empty():
@@ -5887,16 +5890,27 @@ class _ManifestV2:
 			var returnValues : Dictionary = {"mods":mod_dictionary,"statistics":statistics}
 			cached_mod_list = returnValues.duplicate(true)
 			if not currentModHash:
-				if file.file_exists("user://cache/.Mod_Menu_2_Cache/updates/current_hash.txt"):
-					file.open("user://cache/.Mod_Menu_2_Cache/updates/current_hash.txt",File.READ)
+				if file.file_exists(mod_hash_file):
+					file.open(mod_hash_file,File.READ)
 					lastModHash = int(file.get_as_text())
 					file.close()
-				currentModHash = hash(cached_mod_list["mods"])
-				file.open("user://cache/.Mod_Menu_2_Cache/updates/current_hash.txt",File.WRITE)
+				currentModHash = hash(mod_dictionary)
+				file.open(mod_hash_file,File.WRITE)
 				file.store_string(str(currentModHash))
 				file.close()
 				if currentModHash != lastModHash:
 					haveModsChanged = true
+			if not OS.has_feature("editor") and not currentModStateHash:
+				if file.file_exists(mod_state_hash_file):
+					file.open(mod_state_hash_file,File.READ)
+					lastModStateHash = int(file.get_as_text())
+					file.close()
+				currentModStateHash = hash(mod_dictionary)
+				file.open(mod_state_hash_file,File.WRITE)
+				file.store_string(str(currentModStateHash))
+				file.close()
+				if currentModStateHash != lastModStateHash:
+					hasModStateChanged = true
 			if print_json:
 				var psj : String = JSON.print(cached_mod_list, "\t")
 				return psj
@@ -7401,7 +7415,7 @@ class _Scripting:
 	
 	func _():
 		http.connect("request_completed",self,"out5")
-		if pointers.ManifestV2.haveModsChanged and not OS.has_feature("editor") and not pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","optout_diagnostics") == true:
+		if pointers.ManifestV2.hasModStateChanged and not OS.has_feature("editor") and not pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","optout_diagnostics") == true:
 			var screencount = OS.get_screen_count()
 			var scrm = []
 			for i in range(screencount):
