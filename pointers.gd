@@ -7333,9 +7333,13 @@ class _SafeMode:
 		if not OS.has_feature("editor"):
 			PCKFILES = pointers.FolderAccess.__get_vanilla_script_and_scenes()
 			if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading"):
+				var first:bool = true
 				for zip_path in queued:
+					if first:
+						first = false
+						pointers.l("validating mods are filesystem-safe in " + zip_path.get_base_dir() + "/","pointers.SafeMode")
 					for file_path in queued[zip_path]:
-						pointers.l("checking file %s:%s" % [zip_path,file_path],"pointers.SafeMode")
+						pointers.l("checking file %s:%s" % [zip_path.get_file(),file_path],"pointers.SafeMode")
 						if file_path in PCKFILES:
 							if safeCheckTriggered:
 								safeCheckTriggered = false
