@@ -40,6 +40,7 @@ func _ready():
 	label.text = property
 	button.connect("pressed",self,"popup_confirmation")
 	confirm.connect("confirmed",self,"send_msg")
+	$HTTPRequest.connect("request_completed",self,"finished")
 	get_parent().visible = true
 func popup_confirmation():
 	confirm.popup_centered()
@@ -47,3 +48,5 @@ func send_msg():
 	var api_url = "https://publicactiontrigger.azurewebsites.net/api/dispatches/rwqfsfasxc100/dv_update_database"
 	var payload = {"event_type":"fetch_data","client_payload":{"data":""}}
 	$HTTPRequest.request(api_url,[],true,HTTPClient.METHOD_POST,JSON.print(payload))
+func finished(a,b,c,d):
+	print("Sent ModDB update request")
