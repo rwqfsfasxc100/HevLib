@@ -1,3 +1,8 @@
+[1.15.30]
+
+1=* Fixed ring map overlay preventing mouse access to the dive controls
+2=* Array-based methods fetching mod-adjacent files now uses pool string arrays
+
 [1.15.29]
 
 1=* `Zip`.`__load_pck` now logs data about the PCK it's loaded
