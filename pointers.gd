@@ -8305,6 +8305,7 @@ class _Zip:
 			if lowerCase:
 				m = m.to_lower()
 			listOfNames.append(m)
+		g = null
 		return listOfNames
 	
 	func __fetch_file_from_zip(path:String, cacheDir:String, desiredFiles:Array):
@@ -8332,6 +8333,7 @@ class _Zip:
 						file.close()
 						savedFiles.append(saveDir)
 					else:savedFiles.append("")
+		g = null
 		return savedFiles
 	
 	# Port of the `load` method from hhyyrylainen's GodotPckTool
@@ -8422,7 +8424,9 @@ class _Zip:
 		if (excluded > 0):
 			print("%s files excluded by filters: %d" % [file_path,excluded])
 		if Files:
+			pointers.l("Finished fetching PCK data, found %d files" % Files.size())
 			return Files
+		pointers.l("Finished fetching PCK data, fetched %d files" % Contents.size())
 		return Contents
 	
 	

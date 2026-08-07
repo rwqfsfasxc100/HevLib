@@ -1,3 +1,9 @@
+[1.15.29]
+
+1=* `Zip`.`__load_pck` now logs data about the PCK it's loaded
+2=* GDUNZIP instances are now properly freed after being used
+3=* Zip check hash now actually changes only with the zips changing
+
 [1.15.28]
 
 1=* Added `SafeMode` class to pointers node
