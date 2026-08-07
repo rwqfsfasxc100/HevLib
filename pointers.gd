@@ -8375,32 +8375,37 @@ class _Zip:
 		for i in range(fileCount):
 			var pathLength:int = file.get_32()
 			var path:String = file.get_buffer(pathLength).get_string_from_utf8().trim_suffix(char(0))
-			var entry:Dictionary = {
-				"Path":path,
-				"Offset":FileOffsetBase + file.get_64(),
-				"Size":file.get_64(),
-				"Md5":file.get_buffer(16)
-			}
-			if (FormatVersion >= 2):
-				entry["Flags"] = file.get_32()
-				entry["Salt"] = Salt
-				if ((entry.Flags & PckFileEncrypted) != 0):
-					print("WARNING: pck file %s is marked as encrypted, decoding the encryption is not implemented" % entry.Path)
-				if ((entry.Flags & PckFileDeleted) != 0):
-					print("Pck file is marked as removed (but still processing it): %s" % entry.Path)
-			var oldPos:int = file.get_position()
-			file.seek(entry.Offset)
-			var read:PoolByteArray = file.get_buffer(entry.Size)
-			if read.size() != entry.Size:
-				printerr("reading file entry content failed (specified offset or data length is too large, pck may be corrupt or malformed)")
-			entry["GetData"] = read
-			file.seek(oldPos)
-			if (!IncludeFilter.empty() && ! entry in IncludeFilter):
-				excluded += 1
-				continue
 			if only_filenames:
 				Files.append(path)
+				file.get_64()
+				file.get_64()
+				file.get_buffer(16)
+				if (FormatVersion >= 2):file.get_32()
 			else:
+				var entry:Dictionary = {
+					"Path":path,
+					"Offset":FileOffsetBase + file.get_64(),
+					"Size":file.get_64(),
+					"Md5":file.get_buffer(16)
+				}
+				if (FormatVersion >= 2):
+					entry["Flags"] = file.get_32()
+					entry["Salt"] = Salt
+					if ((entry.Flags & PckFileEncrypted) != 0):
+						print("WARNING: pck file %s is marked as encrypted, decoding the encryption is not implemented" % entry.Path)
+					if ((entry.Flags & PckFileDeleted) != 0):
+						print("Pck file is marked as removed (but still processing it): %s" % entry.Path)
+				var oldPos:int = file.get_position()
+				file.seek(entry.Offset)
+				var read:PoolByteArray = file.get_buffer(entry.Size)
+				if read.size() != entry.Size:
+					printerr("reading file entry content failed (specified offset or data length is too large, pck may be corrupt or malformed)")
+				entry["GetData"] = read
+				file.seek(oldPos)
+				if (!IncludeFilter.empty() && ! entry in IncludeFilter):
+					excluded += 1
+					continue
+				
 				Contents[entry.Path] = entry
 		if (excluded > 0):
 			print("%s files excluded by filters: %d" % [file_path,excluded])
