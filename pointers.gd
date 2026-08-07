@@ -5787,6 +5787,10 @@ class _ManifestV2:
 	var currentModHash:int = 0
 	var lastModHash:int = 0
 	
+	var hasModStateChanged:bool = false
+	var currentModStateHash:int = 0
+	var lastModStateHash:int = 0
+	
 	func __get_mod_data(print_json: bool = false):
 		if not cached_mod_list.empty():
 			if print_json:
@@ -5816,9 +5820,7 @@ class _ManifestV2:
 				pointers.l("registering Modlet %s" % item,"pointers.ManifestV2")
 				modListArr.append(__concat_mod_info(item))
 			total_mod_count = modListArr.size()
-			var totalSTDOUT = "solved [%s] mod-definition files [%s ModMains / %s Modlets]" % [total_mod_count,modmain_files.size(),modlet_files.size()]
-			print("[pointers.ManifestV2]: " + totalSTDOUT)
-			pointers.l(totalSTDOUT,"pointers.ManifestV2")
+			pointers.l("solved [%s] mod-definition files [%s ModMains / %s Modlets]" % [total_mod_count,modmain_files.size(),modlet_files.size()],"pointers.ManifestV2")
 			modListArr.sort_custom(self,"sortModList")
 			
 			for mod in modListArr:
@@ -5850,7 +5852,7 @@ class _ManifestV2:
 					file.open("user://cache/.Mod_Menu_2_Cache/updates/current_hash.txt",File.READ)
 					lastModHash = int(file.get_as_text())
 					file.close()
-				currentModHash = hash(cached_mod_list)
+				currentModHash = hash(cached_mod_list["mods"])
 				file.open("user://cache/.Mod_Menu_2_Cache/updates/current_hash.txt",File.WRITE)
 				file.store_string(str(currentModHash))
 				file.close()
@@ -6007,7 +6009,7 @@ class _ManifestV2:
 				
 				
 				manifestEntry["manifest_data"]["languages"] = manifest_langs
-		return {"name":mod_name,"priority":mod_priority,"file_path":script_path,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"manifest":manifestEntry,"drivers":drivers,"mod_type":mod["mod_type"],"enabled":mod_enabled,"master_locale":ml}
+		return {"name":mod_name,"priority":mod_priority,"file_path":script_path,"zip_path":__match_mod_path_to_zip(script_path),"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"manifest":manifestEntry,"drivers":drivers,"mod_type":mod["mod_type"],"enabled":mod_enabled,"master_locale":ml}
 	
 	static func sortModList(a,b):
 		var c1:int = a.get("constants",{}).get("MOD_PRIORITY",0)
@@ -6020,15 +6022,48 @@ class _ManifestV2:
 			return b1 < b2
 		return false
 	
-	var cached_zip_refs : Dictionary = {}
-	
+	var fetchZips:bool = true
 	func __match_mod_path_to_zip(mod_main_path:String) -> String:
-		if mod_main_path in cached_zip_refs:
-			return cached_zip_refs[mod_main_path]
-		else:
-			var return_val : String = zip_ref_store.get(mod_main_path,"")
-			cached_zip_refs[mod_main_path] = return_val
-			return return_val
+		if fetchZips:
+			var _modZipFiles = []
+			var zipModMainCache = {}
+			var gameInstallDirectory = OS.get_executable_path().get_base_dir()
+			if OS.get_name() == "OSX":
+				gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
+			var modPathPrefix = gameInstallDirectory.plus_file("mods")
+			var dir = Directory.new()
+			if dir.open(modPathPrefix) != OK:
+				return ""
+			if dir.list_dir_begin() != OK:
+				return ""
+
+			while true:
+				var fileName = dir.get_next()
+				if fileName == "":
+					break
+				if dir.current_is_dir():
+					continue
+				var modFSPath = modPathPrefix.plus_file(fileName)
+				var modGlobalPath = ProjectSettings.globalize_path(modFSPath)
+				if pointers.DataFormat.__file_exists(modFSPath):
+					_modZipFiles.append(modFSPath)
+			dir.list_dir_end()
+			var modFiles = []
+			var mods = pointers.ManifestV2.__get_mod_data()["mods"]
+			for mod in mods:
+				modFiles.append(mod.to_lower())
+			for modFSPath in _modZipFiles:
+				var gdunzip = pointers.gdunzip.new()
+				gdunzip.load(modFSPath)
+				for modEntryPath in gdunzip.files:
+					var modEntryName = modEntryPath.get_file().to_lower()
+					var modGlobalPath = "res://" + modEntryPath
+					if modGlobalPath.to_lower() in modFiles:
+						var zipName = modFSPath.split("/")[modFSPath.split("/").size() - 1]
+						zipModMainCache[modGlobalPath] = modFSPath
+			zip_ref_store = zipModMainCache
+			fetchZips = false
+		return zip_ref_store.get(mod_main_path,"")
 	
 	func __compare_versions(checked_mod_data:Dictionary) -> bool:
 		var installed_mods : Dictionary = __get_mod_data()

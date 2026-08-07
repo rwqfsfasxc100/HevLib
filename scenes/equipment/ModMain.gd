@@ -92,7 +92,6 @@ func _init(modLoader : ModLoader = ModLoader):
 		
 #		testing()
 		
-		match_mod_path_to_zip()
 		var scv = pointers.FolderAccess.__fetch_folder_files(variables_folder,false,true)
 		for s in scv:
 			d.remove(s)
@@ -235,48 +234,6 @@ func replaceSceneLiteral(newPath:String, oldPath:String):
 func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
 	var line = "%s V%s" % [title, version]
 	pointers.l(msg,line)
-
-func match_mod_path_to_zip():
-	var _modZipFiles = []
-	var zipModMainCache = {}
-	var gameInstallDirectory = OS.get_executable_path().get_base_dir()
-	if OS.get_name() == "OSX":
-		gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
-	var modPathPrefix = gameInstallDirectory.plus_file("mods")
-	var gd = load("res://HevLib/scripts/vendor/gdunzip.gd")
-	var dir = Directory.new()
-	if dir.open(modPathPrefix) != OK:
-		return ""
-	if dir.list_dir_begin() != OK:
-		return ""
-
-	while true:
-		var fileName = dir.get_next()
-		if fileName == "":
-			break
-		if dir.current_is_dir():
-			continue
-		var modFSPath = modPathPrefix.plus_file(fileName)
-		var modGlobalPath = ProjectSettings.globalize_path(modFSPath)
-		if pointers.DataFormat.__file_exists(modFSPath):
-			_modZipFiles.append(modFSPath)
-	dir.list_dir_end()
-	var modFiles = []
-	var mods = pointers.ManifestV2.__get_mod_data()["mods"]
-	for mod in mods:
-		modFiles.append(mod.to_lower())
-	for modFSPath in _modZipFiles:
-		var gdunzip = gd.new()
-		gdunzip.load(modFSPath)
-		for modEntryPath in gdunzip.files:
-			var modEntryName = modEntryPath.get_file().to_lower()
-			var modGlobalPath = "res://" + modEntryPath
-			if modGlobalPath.to_lower() in modFiles:
-				var zipName = modFSPath.split("/")[modFSPath.split("/").size() - 1]
-				zipModMainCache[modGlobalPath] = modFSPath
-	pointers.ManifestV2.zip_ref_store = zipModMainCache
-	
-
 
 func testing():
 #	var shadow_tool = load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
