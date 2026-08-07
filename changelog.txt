@@ -1,3 +1,20 @@
+[1.15.28]
+
+1=* Added `SafeMode` class to pointers node
+1.1=* Used for ensuring that mods load without issue.
+1.2=* Can be disabled through the Debug section of the config if absolutely necessary.
+1.3=* Currently contains only one method (`__check_file`)
+1.3.1=* Used to check if a file exists in the vanilla PCK.
+1.3.2=* `file_path` -> (String) `res://` file path for the file to check.
+1.3.3=* `zip_path` -> (String) used for the source zip file for logging purposes
+1.3.4=* `crash` (optional) -> (bool) whether the game will crash if the provided file path exists in the game's PCK file.
+2=* Mod zip information is now fetched when first getting mod information, instead of directly after the check for loading new mods
+3=* Improved self check to not completely crash and burn with an incorrect installation of HevLib
+3.1=* Now is stricter if HevLib was likely to not have been installed correctly.
+4=* Improved efficiency of getting file names from a PCK file with `Zip`.`__load_pck`
+5=* Added check hash for when mod zips change
+6=* Better documented ring map shader
+
 [1.15.27]
 
 1=* Changed the chaos map debug overlay to cover a larger number of procedural values.

@@ -7334,6 +7334,23 @@ class _SafeMode:
 	var scripts : Array = [
 		
 	]
+	
+	func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
+	
 	var PCKFILES:PoolStringArray = PoolStringArray()
 	var safeCheck:bool = false
 	var safeCheckTriggered:bool = true
@@ -7352,12 +7369,12 @@ class _SafeMode:
 		else:
 			pointers.l("Running from the editor, safe mode disabled by default as this cannot fail","pointers.SafeMode")
 	
-	func __check_file(file_path:String,zip_path:String):
+	func __check_file(file_path:String,zip_path:String,crash:bool = true):
 		if safeCheck:
 			pointers.l("checking file %s:%s" % [zip_path.get_file(),file_path],"pointers.SafeMode")
 			if file_path in PCKFILES:
 				pointers.l("File %s @ %s tripped safe mode" % [file_path,zip_path],"pointers.SafeMode")
-				if safeCheckTriggered:
+				if crash and safeCheckTriggered:
 					safeCheckTriggered = false
 					pointers.NodeAccess.__exit(false,"Safe mode tripped, exiting. Check logs for details.","pointers.SafeMode",2.0)
 	
