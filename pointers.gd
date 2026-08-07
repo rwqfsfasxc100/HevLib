@@ -5865,6 +5865,7 @@ class _ManifestV2:
 							pointers.SafeMode.__check_file(modGlobalPath,modFSPath)
 							if modGlobalPath.to_lower() in modFiles:
 								zip_ref_store[modGlobalPath] = modFSPath
+					gdunzip = null
 				if not OS.has_feature("editor") and (not ResourceLoader.exists("res://HevLib/pointers.gd") or zip_ref_store.get("res://HevLib/ModMain.gd","").get_file() != "HevLib.zip"):
 					pointers.NodeAccess.__exit(false,"HevLib was not installed correctly, assuming incorrect file downloaded (didn't download from releases page?). Crashing & opening releases page for a potential help.","pointers.FileAccess",0.0,"https://github.com/rwqfsfasxc100/HevLib/releases/latest")
 			for mod in modListArr:
@@ -5906,7 +5907,7 @@ class _ManifestV2:
 					file.open(mod_state_hash_file,File.READ)
 					lastModStateHash = int(file.get_as_text())
 					file.close()
-				currentModStateHash = hash(mod_dictionary)
+				currentModStateHash = hash(zip_ref_store)
 				file.open(mod_state_hash_file,File.WRITE)
 				file.store_string(str(currentModStateHash))
 				file.close()
@@ -7373,10 +7374,10 @@ class _SafeMode:
 		if safeCheck:
 			pointers.l("checking file %s:%s" % [zip_path.get_file(),file_path],"pointers.SafeMode")
 			if file_path in PCKFILES:
-				pointers.l("File %s @ %s tripped safe mode" % [file_path,zip_path],"pointers.SafeMode")
+				pointers.l("File %s @ %s tripped safe mode" % [file_path,zip_path.get_file()],"pointers.SafeMode")
 				if crash and safeCheckTriggered:
 					safeCheckTriggered = false
-					pointers.NodeAccess.__exit(false,"Safe mode tripped, exiting. Check logs for details.","pointers.SafeMode",2.0)
+					pointers.NodeAccess.__exit(false,"Safe mode tripped, exiting. Check logs for details.","pointers.SafeMode")
 	
 	
 
@@ -8343,6 +8344,7 @@ class _Zip:
 	const PckFileSparseBundle = 1 << 2
 	const MaxSupportedPckVersionLoad = 4
 	func __load_pck(file_path:String,only_filenames:bool = false):
+		pointers.l("Loading PCK @ %s, fetching only filenames? [%s]" % [file_path,str(only_filenames)],"pointers.Zip")
 		var Contents:Dictionary = {}
 		var Files:PoolStringArray = PoolStringArray()
 		file.open(file_path,File.READ)
@@ -8416,7 +8418,6 @@ class _Zip:
 				if (!IncludeFilter.empty() && ! entry in IncludeFilter):
 					excluded += 1
 					continue
-				
 				Contents[entry.Path] = entry
 		if (excluded > 0):
 			print("%s files excluded by filters: %d" % [file_path,excluded])
