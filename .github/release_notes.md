@@ -10,6 +10,11 @@
 
 ---
 
+## Download Instructions
+
+- Download the file named `HevLib.zip` at the bottom of this release panel.
+- Place downloaded zip file into your mods folder.
+
 ## First time installing mods?
 If you've never installed mods before, check out either:
 - [The ΔV Steam community guide](https://steamcommunity.com/sharedfiles/filedetails/?id=3406497378), or
