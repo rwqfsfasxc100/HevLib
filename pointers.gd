@@ -4727,7 +4727,7 @@ class _FileAccess:
 	func __load_precached_mods():
 		if pointers.ManifestV2.fetchZips:
 			if not OS.has_feature("editor") and (not ResourceLoader.exists("res://HevLib/pointers.gd") or pointers.ManifestV2.__match_mod_path_to_zip("res://HevLib/ModMain.gd").get_file() != "HevLib.zip"):
-				pointers.NodeAccess.__exit(false,"zip filename does not match, assuming incorrect file downloaded (didn't download from releases page?)","pointers.FileAccess",30.0)
+				pointers.NodeAccess.__exit(false,"HevLib was not installed correctly, assuming incorrect file downloaded (didn't download from releases page?). Crashing & opening releases page for a potential help.","pointers.FileAccess",0.0,"https://github.com/rwqfsfasxc100/HevLib/releases/latest")
 		var gameInstallDirectory = OS.get_executable_path().get_base_dir()
 		if OS.get_name() == "OSX":
 			gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
@@ -7186,7 +7186,7 @@ class _NodeAccess:
 		for obj in node.get_children():
 			__remove_scripts(obj)
 	
-	func __exit(restart : bool = false, exit_message : String = "", exit_header : String = "", delay : float = 0.0):
+	func __exit(restart : bool = false, exit_message : String = "", exit_header : String = "", delay : float = 0.0,exit_url : String = ""):
 		if delay > 0.0 and Tool.is_inside_tree():
 			var timer = Tool.get_tree().create_timer(delay)
 			timer.connect("timeout",self,"__exit",[restart,exit_message,exit_header,0.0])
@@ -7197,7 +7197,8 @@ class _NodeAccess:
 			else: pointers.l(("exiting with message: %s" % exit_message) if exit_message else "exiting",(exit_header) if (exit_header) else ("pointers.DataFormat"))
 			Debug.batchWrite()
 			pointers.storeLogCache()
-			yield(Tool.get_tree(),"idle_frame")
+			if exit_url and pointers.DataFormat.__is_valid_url(exit_url):
+				OS.shell_open(exit_url)
 			OS.kill(OS.get_process_id())
 	
 	
