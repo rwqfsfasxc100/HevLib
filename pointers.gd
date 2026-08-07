@@ -104,6 +104,7 @@ func _ready():
 	# Initialize Configs and Achievements
 	ConfigDriver.ready()
 	Achievements.ready()
+	SafeMode.ready()
 	yield(get_tree(),"idle_frame")
 	# Ensures that this node is lower in the scene tree
 	get_parent().move_child(self,get_parent().get_child_count())
@@ -5859,9 +5860,10 @@ class _ManifestV2:
 					var zipFiles = gdunzip.files
 					for modEntryPath in zipFiles:
 						var modGlobalPath:String = "res://" + modEntryPath
-						pointers.SafeMode.__check_file(modGlobalPath,modFSPath)
-						if modGlobalPath.to_lower() in modFiles:
-							zip_ref_store[modGlobalPath] = modFSPath
+						if not modGlobalPath.ends_with("/"):
+							pointers.SafeMode.__check_file(modGlobalPath,modFSPath)
+							if modGlobalPath.to_lower() in modFiles:
+								zip_ref_store[modGlobalPath] = modFSPath
 			for mod in modListArr:
 				var mod_entry : Dictionary = __make_mod_entry(mod)
 				var manifest_data : Dictionary = mod_entry["manifest"]["manifest_data"]
@@ -7325,20 +7327,28 @@ class _SafeMode:
 	var pointers
 	func _init(p):
 		pointers = p
-		if OS.has_feature("editor"):
+	
+	var queued:Dictionary = {}
+	
+	func ready():
+		if not OS.has_feature("editor"):
 			PCKFILES = pointers.FolderAccess.__get_vanilla_script_and_scenes()
-			pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading")
+			if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading"):
+				for zip_path in queued:
+					for file_path in queued[zip_path]:
+						pointers.l("checking file %s:%s" % [zip_path,file_path],"pointers.SafeMode")
+						if file_path in PCKFILES:
+							if safeCheckTriggered:
+								safeCheckTriggered = false
+								pointers.NodeAccess.__exit(false,"Safe mode tripped, exiting. Check logs for details.","pointers.SafeMode",2.0)
+							pointers.l("File %s @ %s tripped safe mode" % [file_path,zip_path],"pointers.SafeMode")
 			pointers.l("Safe mode enabled? [%s]" % str(safeCheck))
+			
 	
 	func __check_file(file_path:String,zip_path:String):
-		if safeCheck:
-			pointers.l("checking file %s:%s" % [zip_path,file_path],"pointers.SafeMode")
-			if file_path in PCKFILES:
-				if safeCheckTriggered:
-					safeCheckTriggered = false
-					pointers.NodeAccess.__exit(false,"Safe mode tripped, exiting. Check logs for details.","pointers.SafeMode",2.0)
-				pointers.l("File %s @ %s tripped safe mode" % [file_path,zip_path],"pointers.SafeMode")
-	
+		if not zip_path in queued:
+			queued[zip_path] = []
+		queued[zip_path].append(file_path)
 	
 	
 

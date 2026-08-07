@@ -225,7 +225,8 @@ func testing():
 #	var prop = can.can_instance()
 #	var spath = "res://asteroids/asteroid.gd"
 #	var out = shadow_tool.__make_shadow_of_script(spath,[],[],[])
-	
+#	yield(pointers.Zip.__load_pck("C:\\Program Files (x86)\\Steam\\steamapps\\common\\dV Rings of Saturn\\Delta-V.pck",true,true,100),"completed")
+#	var F = pointers.Zip.Files
 	
 	breakpoint
 
