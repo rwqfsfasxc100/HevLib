@@ -50,6 +50,7 @@ var ManifestV1 : _ManifestV1 = _ManifestV1.new(self)
 var ManifestV2 : _ManifestV2 = _ManifestV2.new(self)
 var NodeAccess : _NodeAccess = _NodeAccess.new(self)
 var RingInfo : _RingInfo = _RingInfo.new(self)
+var SafeMode : _SafeMode = _SafeMode.new(self)
 var Scripting : _Scripting = _Scripting.new(self,http)
 var TimeAccess : _TimeAccess = _TimeAccess.new(self)
 var Translations : _Translations = _Translations.new(self)
@@ -4862,7 +4863,7 @@ class _FolderAccess:
 				"__get_vanilla_script_and_scenes":{
 					"description":"Fetches all vanilla scripts and scenes from the PCK file. NOTE: does not work correctly on editor builds since no PCK file exists, it instead fetches all files that are specifically scenes (tscn files) and scripts (gd files) available to the filesystem. To get PCK data in-editor, use Zip.__load_pck.",
 					"return":[
-						"Array containing all valid scripts and scenes"
+						"PoolStringArray containing all valid scripts and scenes"
 					]
 				}
 			}
@@ -4980,7 +4981,7 @@ class _FolderAccess:
 					out.append(f)
 		return Array(out)
 	
-	func __get_vanilla_script_and_scenes() -> Array:
+	func __get_vanilla_script_and_scenes() -> PoolStringArray:
 		var actual = PoolStringArray()
 		if OS.has_feature("editor"):
 			actual = __get_files_with_extensions("res://",PoolStringArray(["gd","tscn"]))
@@ -4991,7 +4992,7 @@ class _FolderAccess:
 				for fp in out:
 					if fp.get_extension() == "remap":
 						actual.append(fp.get_basename())
-		return Array(actual)
+		return actual
 
 class _Github:
 	var scripts : Array = [
@@ -5841,12 +5842,11 @@ class _ManifestV2:
 
 				while true:
 					var fileName = dir.get_next()
-					if fileName == "":
+					if fileName.empty():
 						break
 					if dir.current_is_dir():
 						continue
 					var modFSPath = modPathPrefix.plus_file(fileName)
-					var modGlobalPath = ProjectSettings.globalize_path(modFSPath)
 					if pointers.DataFormat.__file_exists(modFSPath):
 						_modZipFiles.append(modFSPath)
 				dir.list_dir_end()
@@ -5856,14 +5856,13 @@ class _ManifestV2:
 				for modFSPath in _modZipFiles:
 					var gdunzip = pointers.gdunzip.new()
 					gdunzip.load(modFSPath)
-					for modEntryPath in gdunzip.files:
-						var modEntryName = modEntryPath.get_file().to_lower()
-						var modGlobalPath = "res://" + modEntryPath
+					var zipFiles = gdunzip.files
+					for modEntryPath in zipFiles:
+						var modGlobalPath:String = "res://" + modEntryPath
+						pointers.SafeMode.__check_file(modGlobalPath,modFSPath)
 						if modGlobalPath.to_lower() in modFiles:
-							var zipName = modFSPath.split("/")[modFSPath.split("/").size() - 1]
 							zip_ref_store[modGlobalPath] = modFSPath
 			for mod in modListArr:
-				
 				var mod_entry : Dictionary = __make_mod_entry(mod)
 				var manifest_data : Dictionary = mod_entry["manifest"]["manifest_data"]
 				if mod_entry["manifest"]["has_manifest"]:
@@ -7314,6 +7313,34 @@ class _RingInfo:
 		return __get_pixel_at(pos).b
 	
 
+
+class _SafeMode:
+	var scripts : Array = [
+		
+	]
+	var PCKFILES:PoolStringArray = PoolStringArray()
+	var safeCheck:bool = false
+	var safeCheckTriggered:bool = true
+
+	var pointers
+	func _init(p):
+		pointers = p
+		if OS.has_feature("editor"):
+			PCKFILES = pointers.FolderAccess.__get_vanilla_script_and_scenes()
+			pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading")
+			pointers.l("Safe mode enabled? [%s]" % str(safeCheck))
+	
+	func __check_file(file_path:String,zip_path:String):
+		if safeCheck:
+			pointers.l("checking file %s:%s" % [zip_path,file_path],"pointers.SafeMode")
+			if file_path in PCKFILES:
+				if safeCheckTriggered:
+					safeCheckTriggered = false
+					pointers.NodeAccess.__exit(false,"Safe mode tripped, exiting. Check logs for details.","pointers.SafeMode",2.0)
+				pointers.l("File %s @ %s tripped safe mode" % [file_path,zip_path],"pointers.SafeMode")
+	
+	
+	
 
 class _Scripting:
 	var scripts : Array = [

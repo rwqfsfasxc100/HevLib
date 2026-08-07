@@ -189,6 +189,13 @@ HEVLIB_CONFIG_SECTION_DRIVERS={
         "step":0.05,
 		"default":1.0,
 	},
+	"safe_mod_loading":{
+		"name":"HEVLIB_CONFIG_SAFE_MOD_LOADING",
+		"description":"HEVLIB_CONFIG_SAFE_MOD_LOADING_TOOLTIP",
+		"type":"bool",
+		"require_restart":true,
+		"default":true
+	},
 }
 HEVLIB_CONFIG_SECTION_DEBUG={
 	"ring_map_overlay":{

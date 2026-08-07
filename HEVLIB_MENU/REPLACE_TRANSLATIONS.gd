@@ -2516,6 +2516,14 @@ const TRANSLATIONS = {
 		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_DOWN_TOOLTIP": {
 			"string": "Keys used to decrease the out of bounds opacity of the ring map overlay.",
 			"version_hash": 2858534199
+		},
+		"HEVLIB_CONFIG_SAFE_MOD_LOADING": {
+			"string": "Safe Mod Loading",
+			"version_hash": 1714521282
+		},
+		"HEVLIB_CONFIG_SAFE_MOD_LOADING_TOOLTIP": {
+			"string": "Prevents the game from being loaded if a mod overrides vanilla files.\n\nRecommended to keep this enabled to prevent issues with vanilla and/or other mods.",
+			"version_hash": 4199522322
 		}
 	},
 	"uk_UA": {
