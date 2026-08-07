@@ -7201,9 +7201,22 @@ class _NodeAccess:
 		for obj in node.get_children():
 			__remove_scripts(obj)
 	
+	var timerObjectPersist = []
+	func __create_timer(seconds:float) -> Timer:
+		var timerObj:Timer = Timer.new()
+		timerObj.one_shot = true
+		timerObj.start(max(seconds,0.0))
+		timerObjectPersist.append(timerObj)
+		timerObj.connect("timeout",self,"clear_timer",[timerObj])
+		return timerObj
+	
+	func clear_timer(timerObj:Timer):
+		timerObjectPersist.erase(timerObj)
+		timerObj.free()
+	
 	func __exit(restart : bool = false, exit_message : String = "", exit_header : String = "", delay : float = 0.0,exit_url : String = ""):
-		if delay > 0.0 and Tool.is_inside_tree():
-			var timer = Tool.get_tree().create_timer(delay)
+		if delay > 0.0:
+			var timer = __create_timer(delay)
 			timer.connect("timeout",self,"__exit",[restart,exit_message,exit_header,0.0])
 		else:
 			if restart:
@@ -7214,20 +7227,9 @@ class _NodeAccess:
 			pointers.storeLogCache()
 			if exit_url and pointers.DataFormat.__is_valid_url(exit_url):
 				OS.shell_open(exit_url)
+			yield(__create_timer(0.05),"timeout")
 			OS.kill(OS.get_process_id())
 	
-	var timerObjectPersist = []
-	func __create_timer(seconds:float):
-		var timerObj = Timer.new()
-		timerObj.one_shot = true
-		timerObj.start(max(seconds,0.0))
-		timerObjectPersist.append(timerObj)
-		timerObj.connect("timeout",self,"clear_timer",[timerObj])
-		return timerObj
-	
-	func clear_timer(timerObj:Timer):
-		timerObjectPersist.erase(timerObj)
-		timerObj.free()
 	
 
 class _RingInfo:
