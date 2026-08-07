@@ -1334,7 +1334,7 @@ class _ConfigDriver:
 							how = cfg_opt
 					if not how:
 						return false
-		var current_mod_ids : Array = pointers.ManifestV2.__get_mod_ids()
+		var current_mod_ids : PoolStringArray = pointers.ManifestV2.__get_mod_ids()
 		if check_requirements and mod_requirements_entry_override in data_dict and data_dict[mod_requirements_entry_override] is Array:
 			var needs : Array = data_dict[mod_requirements_entry_override]
 			var can:int = 0
@@ -2408,7 +2408,7 @@ class _DriverManagement:
 	
 	func __get_drivers(get_ids : Array = []) -> Array:
 		var mod_drivers : Array = []
-		var mms : Array = pointers.ManifestV2.__get_modmain_files() + pointers.ManifestV2.__get_modlet_files()
+		var mms : PoolStringArray = pointers.ManifestV2.__get_modmain_files() + pointers.ManifestV2.__get_modlet_files()
 		for modmain_path in mms:
 			var has_manifest:bool = false
 			var manifest_path : String  = ""
@@ -5815,12 +5815,12 @@ class _ManifestV2:
 			var stat_tags : Dictionary = {}
 			
 			var modListArr : Array = []
-			var modmain_files : Array = __get_modmain_files()
+			var modmain_files : PoolStringArray = __get_modmain_files()
 			pointers.l("found [%s] modmain files" % modmain_files.size(),"pointers.ManifestV2")
 			for item in modmain_files:
 				pointers.l("registering ModMain %s" % item,"pointers.ManifestV2")
 				modListArr.append(__concat_mod_info(item))
-			var modlet_files : Array = __get_modlet_files()
+			var modlet_files : PoolStringArray = __get_modlet_files()
 			pointers.l("found [%s] modlet files" % modlet_files.size(),"pointers.ManifestV2")
 			for item in modlet_files:
 				pointers.l("registering Modlet %s" % item,"pointers.ManifestV2")
@@ -5966,13 +5966,13 @@ class _ManifestV2:
 		var png_path : String = ""
 		var stex_path : String = ""
 		var icon_path : String = ""
-		var content : Array = __get_manifest_files() + __get_icon_files()
+		var content : PoolStringArray = __get_manifest_files() + __get_icon_files()
 		
 		var mod_enabled := true
 		var script_filename : String = script_path.get_file().to_lower()
 		
 		if script_filename.begins_with("mod") and script_filename.ends_with(".manifest"):
-			var current : Array = __get_modlet_files()
+			var current : PoolStringArray = __get_modlet_files()
 			if not script_path in current:
 				mod_enabled = false
 		
@@ -6123,7 +6123,7 @@ class _ManifestV2:
 		var mod_is_library:bool = constants.get("MOD_IS_LIBRARY",false)
 		
 		var hide_library:bool = constants.get("LIBRARY_HIDDEN_BY_DEFAULT",true)
-		var content : Array = __get_manifest_files()
+		var content : PoolStringArray = __get_manifest_files()
 		var has_mod_manifest:bool = false
 		var manifest_data : Dictionary = {}
 		var manifest_version:float = 1.0
@@ -6583,26 +6583,18 @@ class _ManifestV2:
 		return return_data
 		
 	
-	var caches_mod_ids : Array = []
-	
-	func __get_mod_ids() -> Array:
-		if caches_mod_ids:
-			return caches_mod_ids.duplicate(true)
-		else:
-			var mod_data : Dictionary = {}
-			if not cached_mod_list.empty():
-				mod_data = cached_mod_list["mods"]
-			else:
-				mod_data = __get_mod_data()["mods"]
-			var returning : Array = []
+	var caches_mod_ids : PoolStringArray = PoolStringArray()
+	var needs_mod_id_cache:bool = true
+	func __get_mod_ids() -> PoolStringArray:
+		if needs_mod_id_cache:
+			needs_mod_id_cache = false
+			var mod_data : Dictionary = __get_mod_data()["mods"]
 			for mod in mod_data:
 				var data : Dictionary = mod_data[mod]["manifest"]["manifest_data"]
 				if "mod_information" in data:
 					var minfo : String = data["mod_information"]["id"]
-					returning.append(minfo)
-			caches_mod_ids = returning.duplicate(true)
-			return returning
-	
+					caches_mod_ids.append(minfo)
+		return caches_mod_ids
 	
 	func __check_complementary():
 		var mods : Dictionary = {}
@@ -6637,7 +6629,7 @@ class _ManifestV2:
 		return complimentaries
 	
 	func __check_dependancies():
-		var mods : Array = __get_mod_ids()
+		var mods : PoolStringArray = __get_mod_ids()
 		var tags : Dictionary = __get_manifest_entry("manifest_definitions","dependancy_mod_ids")
 		var complimentaries : Dictionary = {}
 		for mod in tags:
@@ -6652,7 +6644,7 @@ class _ManifestV2:
 		return complimentaries
 	
 	func __check_mod_dependancies(mod_id):
-		var mods : Array = __get_mod_ids()
+		var mods : PoolStringArray = __get_mod_ids()
 		var tags : Dictionary = __get_manifest_entry("manifest_definitions","dependancy_mod_ids",mod_id)
 		var complimentaries : Array = []
 		for mod in tags:
@@ -6661,7 +6653,7 @@ class _ManifestV2:
 		return complimentaries
 	
 	func __check_conflicts():
-		var mods : Array = __get_mod_ids()
+		var mods : PoolStringArray = __get_mod_ids()
 		var tags : Dictionary = __get_manifest_entry("manifest_definitions","conflicting_mod_ids")
 		var complimentaries : Dictionary = {}
 		for mod in tags:
@@ -6676,7 +6668,7 @@ class _ManifestV2:
 		return complimentaries
 	
 	func __check_mod_conflicts(mod_id):
-		var mods : Array = __get_mod_ids()
+		var mods : PoolStringArray = __get_mod_ids()
 		var tags : Dictionary = __get_manifest_entry("manifest_definitions","conflicting_mod_ids",mod_id)
 		var complimentaries : Array = []
 		for mod in tags:
@@ -6875,25 +6867,25 @@ class _ManifestV2:
 	func __get_manifest_cache() -> Dictionary:
 		return cached_manifests
 	
-	var modmain_file_list : Array = []
+	var need_modmain_file_cache:bool = true
+	var modmain_file_list : PoolStringArray = PoolStringArray()
+	func __get_modmain_files() -> PoolStringArray:
+		if need_modmain_file_cache:
+			need_modmain_file_cache = false
+			pointers.FolderAccess.__get_folder_structure("res://",false,false)
+			var dvs : Array = []
+			if OS.has_feature("editor"):
+				dvs = pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[])
+			else:
+				for r in __get_mod_files():
+					var i : String = r.get_file().to_lower()
+					if i.begins_with("modmain") and i.ends_with(".gd"):
+						dvs.append(r)
+			modmain_file_list = PoolStringArray(dvs)
+		return modmain_file_list
 	
-	func __get_modmain_files() -> Array:
-		if modmain_file_list:
-			return modmain_file_list.duplicate()
-		pointers.FolderAccess.__get_folder_structure("res://",false,false)
-		var dvs : Array = []
-		if OS.has_feature("editor"):
-			dvs = pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[])
-		else:
-			for r in __get_mod_files():
-				var i : String = r.get_file().to_lower()
-				if i.begins_with("modmain") and i.ends_with(".gd"):
-					dvs.append(r)
-		modmain_file_list = dvs
-		return dvs.duplicate()
-	
-	var active_modlet_file_list : Array = []
-	var all_modlet_file_list : Array = []
+	var active_modlet_file_list : PoolStringArray = PoolStringArray()
+	var all_modlet_file_list : PoolStringArray = PoolStringArray()
 	var all_modlet_definitions : Dictionary = {}
 	
 	var cached_modlets : Dictionary = {}
@@ -6906,11 +6898,11 @@ class _ManifestV2:
 					recache = true
 		if not cached_modlets or recache:
 			if not all_modlet_file_list:
-				var manifests = __get_manifest_files()
+				var manifests:PoolStringArray = __get_manifest_files()
 				var manifest_checks : Array = []
 				for i in manifests:
 					manifest_checks.append(i.to_lower())
-				var allModFiles : Array = __get_mod_files()
+				var allModFiles : PoolStringArray = __get_mod_files()
 				for r in allModFiles:
 					var i : String = r.get_file().to_lower()
 					if (i.begins_with("modmain") and i.ends_with(".gd")):
@@ -6922,14 +6914,13 @@ class _ManifestV2:
 					if i.to_lower() in manifest_checks:
 						ov.append(i)
 				ov.sort_custom(self,"sort_modlet_files")
-				all_modlet_file_list = ov
-			var modlets : Array = all_modlet_file_list.duplicate()
+				all_modlet_file_list = PoolStringArray(ov)
 			var allowed_modlets = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets")
 			if allowed_modlets == null:
 				pointers.ConfigDriver.__store_value("HevLib","modlets","seen_modlets",{})
 				allowed_modlets = {}
 			active_modlet_file_list = []
-			for mod in modlets:
+			for mod in all_modlet_file_list:
 				if not mod in allowed_modlets:
 					allowed_modlets[mod] = true
 				if allowed_modlets[mod]:
@@ -6952,46 +6943,46 @@ class _ManifestV2:
 			return a < b
 		return false
 	
-	func __get_modlet_files() -> Array:
+	func __get_modlet_files() -> PoolStringArray:
 		__get_all_modlets()
-		return active_modlet_file_list.duplicate()
+		return active_modlet_file_list
 	
-	var cached_mod_files : Array = []
-	
+	var need_mod_file_cache:bool = true
+	var cached_mod_files : PoolStringArray = PoolStringArray()
 	func __get_mod_files():
-		if cached_mod_files:
-			return cached_mod_files.duplicate(true)
-		var restrict_to_modmains : Array = []
-		if OS.has_feature("editor"):
-			var dvs : Array = pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[])
-			for a in dvs:
-				restrict_to_modmains.append(a.get_base_dir() + "/")
-		var arr1 : Array = siftFolderStructureForModFiles(pointers.FolderAccess.__get_folder_structure("res://",false,false),"res://",restrict_to_modmains)
-		var arr2:Array = []
-		if OS.has_feature("editor"):
-			var excludeDirs:Array = []
-			for i in arr1:
-				var r:String = i.get_file().to_lower()
-				if r.begins_with("modmain") and r.ends_with(".gd"):
-					var can : Script = load(i)
-					if not can.can_instance():
-						var vdir:String = i.get_base_dir()
-						excludeDirs.append(vdir.to_lower())
-						pointers.l("Excluding mod directoy %s due to malformatted mod main" % vdir,"pointers.ManifestV2")
-			if excludeDirs:
-				for file in arr1:
-					var vr:String = file.get_base_dir().to_lower()
-					if not vr in excludeDirs:
-						arr2.append(file)
+		if need_mod_file_cache:
+			need_mod_file_cache = false
+			var restrict_to_modmains : PoolStringArray = PoolStringArray()
+			if OS.has_feature("editor"):
+				var dvs : PoolStringArray = pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[])
+				for a in dvs:
+					restrict_to_modmains.append(a.get_base_dir() + "/")
+			var arr1 : PoolStringArray = siftFolderStructureForModFiles(pointers.FolderAccess.__get_folder_structure("res://",false,false),"res://",restrict_to_modmains)
+			var arr2 : PoolStringArray = PoolStringArray()
+			if OS.has_feature("editor"):
+				var excludeDirs:PoolStringArray = PoolStringArray()
+				for i in arr1:
+					var r:String = i.get_file().to_lower()
+					if r.begins_with("modmain") and r.ends_with(".gd"):
+						var can : Script = load(i)
+						if not can.can_instance():
+							var vdir:String = i.get_base_dir()
+							excludeDirs.append(vdir.to_lower())
+							pointers.l("Excluding mod directoy %s due to malformatted mod main" % vdir,"pointers.ManifestV2")
+				if excludeDirs:
+					for file in arr1:
+						var vr:String = file.get_base_dir().to_lower()
+						if not vr in excludeDirs:
+							arr2.append(file)
+				else:
+					arr2 = arr1
 			else:
 				arr2 = arr1
-		else:
-			arr2 = arr1
-		cached_mod_files = arr2
-		return cached_mod_files.duplicate(true)
+			cached_mod_files = arr2
+		return cached_mod_files
 	
-	func siftFolderStructureForModFiles(structure:Dictionary,path:String = "res://",restricted_to_modmains : Array = []):
-		var out : Array = []
+	func siftFolderStructureForModFiles(structure:Dictionary,path:String = "res://",restricted_to_modmains : PoolStringArray = PoolStringArray()) -> PoolStringArray:
+		var out : PoolStringArray = PoolStringArray()
 		if restricted_to_modmains:
 			var ev : Array = structure.keys()
 			for i in range(ev.size()):
@@ -6999,7 +6990,7 @@ class _ManifestV2:
 			for f in ev:
 				if f.begins_with("modmain") and f.ends_with(".gd"):
 					if not path in restricted_to_modmains:
-						return []
+						return PoolStringArray()
 		for i in structure:
 			if i.ends_with("/"):
 				out.append_array(siftFolderStructureForModFiles(structure[i],path + i,restricted_to_modmains))
@@ -7009,36 +7000,31 @@ class _ManifestV2:
 					out.append(path + i)
 		return out
 	
-	var cached_manifest_files : Array = []
+	var need_manifest_cache:bool = true
+	var cached_manifest_files : PoolStringArray = PoolStringArray()
+	func __get_manifest_files() -> PoolStringArray:
+		if need_manifest_cache:
+			need_manifest_cache = false
+			for r in __get_mod_files():
+				var i : String = r.get_file().to_lower()
+				if i.begins_with("mod") and i.ends_with(".manifest"):
+					cached_manifest_files.append(r)
+		return cached_manifest_files
 	
-	func __get_manifest_files():
-		if cached_manifest_files:
-			return cached_manifest_files.duplicate()
-		var ov : Array = []
-		for r in __get_mod_files():
-			var i : String = r.get_file().to_lower()
-			if i.begins_with("mod") and i.ends_with(".manifest"):
-				ov.append(r)
-		cached_manifest_files = ov
-		return cached_manifest_files.duplicate()
-	
-	var cached_icon_files : Array = []
-	
+	var need_icon_cache:bool = true
+	var cached_icon_files : PoolStringArray = PoolStringArray()
 	func __get_icon_files():
-		if cached_icon_files:
-			return cached_icon_files.duplicate()
-		var ov : Array = []
-		for r in __get_mod_files():
-			var i : String = r.get_file().to_lower()
-			if i.begins_with("icon") and (i.ends_with(".stex") or i.ends_with(".png")):
-				ov.append(r)
-		cached_icon_files = ov
-		return cached_icon_files.duplicate()
+		if need_icon_cache:
+			need_icon_cache = false
+			for r in __get_mod_files():
+				var i : String = r.get_file().to_lower()
+				if i.begins_with("icon") and (i.ends_with(".stex") or i.ends_with(".png")):
+					cached_icon_files.append(r)
+		return cached_icon_files
 	
-	func __load_modlets(is_onready : bool):
-		var modlet_manifests = __get_modlet_files()
-		var scenes_to_reload : Array = []
-		for modlet in modlet_manifests:
+	func __load_modlets(is_onready : bool) -> PoolStringArray:
+		var scenes_to_reload : PoolStringArray = PoolStringArray()
+		for modlet in __get_modlet_files():
 			var drivers = pointers.DriverManagement.__get_drivers_from_modmain_path(modlet)
 			if "LOAD_RESOURCES.gd" in drivers:
 				pointers.DataFormat.__loadDLC()
@@ -7359,8 +7345,6 @@ class _SafeMode:
 	var pointers
 	func _init(p):
 		pointers = p
-	
-	var queued:Dictionary = {}
 	
 	func ready():
 		if not OS.has_feature("editor"):

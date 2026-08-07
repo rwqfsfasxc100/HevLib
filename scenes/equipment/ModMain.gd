@@ -128,8 +128,7 @@ func _init(modLoader : ModLoader = ModLoader):
 
 		installScriptExtension("../better_title_screen/SaveSlotButton.gd")
 		
-		var for_reload = pointers.ManifestV2.__load_modlets(false)
-		for old_path in for_reload:
+		for old_path in pointers.ManifestV2.__load_modlets(false):
 			pointers.DataFormat.__reload_scene(old_path)
 	else:
 		Debug.l("Folder structure not correct, exiting HevLib load")
@@ -148,8 +147,7 @@ func _ready():
 
 		replaceScene("../minerals/multiminerals/AsteroidField.tscn","res://AsteroidField.tscn")
 		
-		var for_reload = pointers.ManifestV2.__load_modlets(true)
-		for old_path in for_reload:
+		for old_path in pointers.ManifestV2.__load_modlets(true):
 			pointers.DataFormat.__reload_scene(old_path)
 		l("Ready")
 	else:
