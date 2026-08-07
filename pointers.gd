@@ -4727,9 +4727,6 @@ class _FileAccess:
 				file.close()
 	
 	func __load_precached_mods():
-		if pointers.ManifestV2.fetchZips:
-			if not OS.has_feature("editor") and (not ResourceLoader.exists("res://HevLib/pointers.gd") or pointers.ManifestV2.__match_mod_path_to_zip("res://HevLib/ModMain.gd").get_file() != "HevLib.zip"):
-				pointers.NodeAccess.__exit(false,"HevLib was not installed correctly, assuming incorrect file downloaded (didn't download from releases page?). Crashing & opening releases page for a potential help.","pointers.FileAccess",0.0,"https://github.com/rwqfsfasxc100/HevLib/releases/latest")
 		var gameInstallDirectory = OS.get_executable_path().get_base_dir()
 		if OS.get_name() == "OSX":
 			gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
@@ -5864,6 +5861,8 @@ class _ManifestV2:
 							pointers.SafeMode.__check_file(modGlobalPath,modFSPath)
 							if modGlobalPath.to_lower() in modFiles:
 								zip_ref_store[modGlobalPath] = modFSPath
+				if not OS.has_feature("editor") and (not ResourceLoader.exists("res://HevLib/pointers.gd") or zip_ref_store.get("res://HevLib/ModMain.gd","").get_file() != "HevLib.zip"):
+					pointers.NodeAccess.__exit(false,"HevLib was not installed correctly, assuming incorrect file downloaded (didn't download from releases page?). Crashing & opening releases page for a potential help.","pointers.FileAccess",0.0,"https://github.com/rwqfsfasxc100/HevLib/releases/latest")
 			for mod in modListArr:
 				var mod_entry : Dictionary = __make_mod_entry(mod)
 				var manifest_data : Dictionary = mod_entry["manifest"]["manifest_data"]
