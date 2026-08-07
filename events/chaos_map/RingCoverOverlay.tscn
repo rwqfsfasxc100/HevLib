@@ -8,6 +8,7 @@
 material = ExtResource( 1 )
 margin_right = 600.0
 margin_bottom = 600.0
+mouse_filter = 2
 texture = ExtResource( 2 )
 expand = true
 script = ExtResource( 3 )
