@@ -38,9 +38,10 @@ const MOD_VERSION_BUGFIX = 0
 const MOD_VERSION_METADATA = ""
 const MOD_IS_LIBRARY = true
 
-var file = File.new()
-var correct = file.file_exists("res://HevLib/pointers.gd")
-var pointers
+var file:File = File.new()
+var pointerDir:String = get_script().resource_path.get_base_dir().get_base_dir().get_base_dir().get_base_dir() + "/pointers.gd"
+var correct:bool = ResourceLoader.exists(pointerDir)
+var pointers = null
 func _init(modLoader = ModLoader):
 	if correct:
 		Debug.l("Initializing Keymapping & Variable nodes")

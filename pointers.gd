@@ -4725,6 +4725,9 @@ class _FileAccess:
 				file.close()
 	
 	func __load_precached_mods():
+		if pointers.ManifestV2.fetchZips:
+			if not OS.has_feature("editor") and (not ResourceLoader.exists("res://HevLib/pointers.gd") or pointers.ManifestV2.__match_mod_path_to_zip("res://HevLib/ModMain.gd").get_file() != "HevLib.zip"):
+				pointers.NodeAccess.__exit(false,"zip filename does not match, assuming incorrect file downloaded (didn't download from releases page?)","pointers.FileAccess",30.0)
 		var gameInstallDirectory = OS.get_executable_path().get_base_dir()
 		if OS.get_name() == "OSX":
 			gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
@@ -5791,6 +5794,7 @@ class _ManifestV2:
 	var currentModStateHash:int = 0
 	var lastModStateHash:int = 0
 	
+	var fetchZips:bool = true
 	func __get_mod_data(print_json: bool = false):
 		if not cached_mod_list.empty():
 			if print_json:
@@ -5822,7 +5826,42 @@ class _ManifestV2:
 			total_mod_count = modListArr.size()
 			pointers.l("solved [%s] mod-definition files [%s ModMains / %s Modlets]" % [total_mod_count,modmain_files.size(),modlet_files.size()],"pointers.ManifestV2")
 			modListArr.sort_custom(self,"sortModList")
-			
+			if fetchZips:
+				fetchZips = false
+				var _modZipFiles = []
+				var gameInstallDirectory = OS.get_executable_path().get_base_dir()
+				if OS.get_name() == "OSX":
+					gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
+				var modPathPrefix = gameInstallDirectory.plus_file("mods")
+				var dir = Directory.new()
+				if dir.open(modPathPrefix) != OK:
+					return ""
+				if dir.list_dir_begin() != OK:
+					return ""
+
+				while true:
+					var fileName = dir.get_next()
+					if fileName == "":
+						break
+					if dir.current_is_dir():
+						continue
+					var modFSPath = modPathPrefix.plus_file(fileName)
+					var modGlobalPath = ProjectSettings.globalize_path(modFSPath)
+					if pointers.DataFormat.__file_exists(modFSPath):
+						_modZipFiles.append(modFSPath)
+				dir.list_dir_end()
+				var modFiles = []
+				for mod in modListArr:
+					modFiles.append(mod.script_path.to_lower())
+				for modFSPath in _modZipFiles:
+					var gdunzip = pointers.gdunzip.new()
+					gdunzip.load(modFSPath)
+					for modEntryPath in gdunzip.files:
+						var modEntryName = modEntryPath.get_file().to_lower()
+						var modGlobalPath = "res://" + modEntryPath
+						if modGlobalPath.to_lower() in modFiles:
+							var zipName = modFSPath.split("/")[modFSPath.split("/").size() - 1]
+							zip_ref_store[modGlobalPath] = modFSPath
 			for mod in modListArr:
 				
 				var mod_entry : Dictionary = __make_mod_entry(mod)
@@ -5863,6 +5902,9 @@ class _ManifestV2:
 				return psj
 			else:
 				return cached_mod_list.duplicate(true)
+	
+	func __match_mod_path_to_zip(mod_main_path:String) -> String:
+		return zip_ref_store.get(mod_main_path,"")
 	
 	func __concat_mod_info(mod_path:String) -> Dictionary:
 		if not pointers.DataFormat.__file_exists(mod_path):
@@ -6022,48 +6064,7 @@ class _ManifestV2:
 			return b1 < b2
 		return false
 	
-	var fetchZips:bool = true
-	func __match_mod_path_to_zip(mod_main_path:String) -> String:
-		if fetchZips:
-			var _modZipFiles = []
-			var zipModMainCache = {}
-			var gameInstallDirectory = OS.get_executable_path().get_base_dir()
-			if OS.get_name() == "OSX":
-				gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
-			var modPathPrefix = gameInstallDirectory.plus_file("mods")
-			var dir = Directory.new()
-			if dir.open(modPathPrefix) != OK:
-				return ""
-			if dir.list_dir_begin() != OK:
-				return ""
-
-			while true:
-				var fileName = dir.get_next()
-				if fileName == "":
-					break
-				if dir.current_is_dir():
-					continue
-				var modFSPath = modPathPrefix.plus_file(fileName)
-				var modGlobalPath = ProjectSettings.globalize_path(modFSPath)
-				if pointers.DataFormat.__file_exists(modFSPath):
-					_modZipFiles.append(modFSPath)
-			dir.list_dir_end()
-			var modFiles = []
-			var mods = pointers.ManifestV2.__get_mod_data()["mods"]
-			for mod in mods:
-				modFiles.append(mod.to_lower())
-			for modFSPath in _modZipFiles:
-				var gdunzip = pointers.gdunzip.new()
-				gdunzip.load(modFSPath)
-				for modEntryPath in gdunzip.files:
-					var modEntryName = modEntryPath.get_file().to_lower()
-					var modGlobalPath = "res://" + modEntryPath
-					if modGlobalPath.to_lower() in modFiles:
-						var zipName = modFSPath.split("/")[modFSPath.split("/").size() - 1]
-						zipModMainCache[modGlobalPath] = modFSPath
-			zip_ref_store = zipModMainCache
-			fetchZips = false
-		return zip_ref_store.get(mod_main_path,"")
+	
 	
 	func __compare_versions(checked_mod_data:Dictionary) -> bool:
 		var installed_mods : Dictionary = __get_mod_data()
@@ -7188,7 +7189,7 @@ class _NodeAccess:
 	func __exit(restart : bool = false, exit_message : String = "", exit_header : String = "", delay : float = 0.0):
 		if delay > 0.0 and Tool.is_inside_tree():
 			var timer = Tool.get_tree().create_timer(delay)
-			timer.connect("timeout",self,"__exit",[restart,exit_message,exit_header])
+			timer.connect("timeout",self,"__exit",[restart,exit_message,exit_header,0.0])
 		else:
 			if restart:
 				pointers.l(("restarting with message: %s" % exit_message) if exit_message else "exiting with restart",(exit_header) if (exit_header) else ("pointers.DataFormat"))

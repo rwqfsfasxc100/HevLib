@@ -45,7 +45,8 @@ var enable_research = false
 var pointers
 
 var file = File.new()
-var correct = ResourceLoader.exists("res://HevLib/pointers.gd")
+var pointerDir:String = modPath + "pointers.gd"
+var correct = ResourceLoader.exists(pointerDir)
 var HevLibModMain = true
 func _init(modLoader = ModLoader):
 	if correct:

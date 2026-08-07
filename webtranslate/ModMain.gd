@@ -41,14 +41,14 @@ const MOD_VERSION_BUGFIX = 0
 const MOD_VERSION_METADATA = ""
 const MOD_IS_LIBRARY = true
 
-var file = File.new()
-var correct = file.file_exists("res://HevLib/pointers.gd")
-var pointers
+var modPath:String = get_script().resource_path.get_base_dir() + "/"
+var file:File = File.new()
+var pointerDir:String = modPath.get_base_dir().get_base_dir() + "/pointers.gd"
+var correct:bool = ResourceLoader.exists(pointerDir)
+var pointers = null
 func _init(modLoader = ModLoader):
-#	l("Initializing WebTranslate")
 	if correct:
 		pointers = modLoader._savedObjects[0]
-var modPath:String = get_script().resource_path.get_base_dir() + "/"
 func _ready():
 #	l("Readying")
 	
@@ -60,9 +60,8 @@ func _ready():
 		yield(Debug.get_tree(),"idle_frame")
 		if TranslationServer.translate("SYSTEM_AMMO_10000_DESC") == "SYSTEM_AMMO_10000_DESC":
 			l("Translations did not get initialized, queued exit for 200 seconds to preserve report-ready state")
-			var timer = Tool.makeTimer(200, pointers)
-			timer.connect("timeout",pointers.NodeAccess,"__exit")
-var cache_extension = ".file_check_cache"
+			pointers.NodeAccess.__exit(false,"Exiting due to a non-initialized TranslationServer","HevLib Library WebTranslate Module",200)
+var cache_extension:String = ".file_check_cache"
 
 func loadTranslationsFromCache():
 	var accepted = false

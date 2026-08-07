@@ -29,10 +29,8 @@
 
 extends Node
 
-# Set mod priority if you want it to load before/after other mods
-# Mods are loaded from lowest to highest priority, default is 0
 const MOD_PRIORITY = -INF
-# Name of the mod, used for writing to the logs
+
 const MOD_NAME = "HevLib Library Equipment Driver Module"
 const MOD_VERSION = "1.0.0"
 const MOD_VERSION_MAJOR = 1
@@ -40,41 +38,22 @@ const MOD_VERSION_MINOR = 0
 const MOD_VERSION_BUGFIX = 0
 const MOD_VERSION_METADATA = ""
 const MOD_IS_LIBRARY = true
-# Path of the mod folder, automatically generated on runtime
+
 var modPath:String = get_script().resource_path.get_base_dir() + "/"
-# Required var for the replaceScene() func to work
+
 var _savedObjects := []
 
-#Initializes the configuration variable. Used by loadSettings.
+var cache_dir:String = "user://cache/.HevLib_Cache"
 
-# Initialize the mod
-# This function is executed before the majority of the game is loaded
-# Only the Tool and Debug AutoLoads are available
-# Script and scene replacements should be done here, before the originals are loaded
-#var exhaust_cache_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/Exhaust_Cache"
-
-var upgrades_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Upgrades.tscn"
-var weaponslot_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/WeaponSlot.tscn"
-var aux_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/power/AuxSlot.tscn"
-var slot_limits_path = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/upgrades/Slot_Limits.tscn"
-
-var asteroid_path = "user://cache/.HevLib_Cache/Minerals/AsteroidSpawner.gd"
-var currentgame_path = "user://cache/.HevLib_Cache/Minerals/CurrentGame.gd"
-var thering_path = "user://cache/.HevLib_Cache/Minerals/TheRing.gd"
-var ringscene_path = "user://cache/.HevLib_Cache/Minerals/TheRing.tscn"
-
-var cache_dir = "user://cache/.HevLib_Cache"
-
-var checksum = "user://cache/.HevLib_Cache/checksums"
-
-var f = File.new()
-var d = Directory.new()
-var correct = d.file_exists("res://HevLib/pointers.gd")
+var f:File = File.new()
+var d:Directory = Directory.new()
+var pointerDir:String = modPath.get_base_dir().get_base_dir().get_base_dir() + "/pointers.gd"
+var correct:bool = ResourceLoader.exists(pointerDir)
 var pointers = null
 
 func _init(modLoader : ModLoader = ModLoader):
 	if correct:
-		pointers = load("res://HevLib/pointers.gd").new()
+		pointers = load(pointerDir).new()
 		pointers.name = "HevLib~Pointers"
 		if modLoader._savedObjects:
 			var new_objects = [pointers]
