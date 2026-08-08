@@ -36,13 +36,11 @@ var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
 var pointers = ModLoader._savedObjects[0]
 var file = File.new()
 
-var max_check = 10
-var check_ctr = 0
 func _ready():
 	check()
-	
+	pointers.equipment_modmain.connect("updates_fetched",self,"check")
+
 func check():
-	check_ctr += 1
 	file.open(update_store,File.READ)
 	var updates = JSON.parse(file.get_as_text()).result
 	file.close()
@@ -56,12 +54,10 @@ func check():
 					updates.erase(u)
 				else:
 					currently_ignored.erase(u)
-		$Timer.start()
-	elif not check_ctr > max_check:
-		$ReTimer.start()
+		show_menu()
 
 func show_menu():
-	
+	yield(get_tree(),"idle_frame")
 	popup_centered()
 	yield(get_tree().create_timer(0.25),"timeout")
 	$PanelContainer/VBoxContainer/HBoxContainer/OK/Button.grab_focus()

@@ -11,14 +11,6 @@ theme = ExtResource( 1 )
 popup_exclusive = true
 script = ExtResource( 2 )
 
-[node name="Timer" type="Timer" parent="."]
-wait_time = 0.25
-one_shot = true
-
-[node name="ReTimer" type="Timer" parent="."]
-wait_time = 2.0
-one_shot = true
-
 [node name="PanelContainer" type="PanelContainer" parent="."]
 margin_right = 10.0
 margin_bottom = 10.0
@@ -76,7 +68,5 @@ margin_bottom = 42.0
 text = "HEVLIB_MODMENU_CLOSE"
 
 [connection signal="about_to_show" from="." to="." method="_about_to_show"]
-[connection signal="timeout" from="Timer" to="." method="show_menu"]
-[connection signal="timeout" from="ReTimer" to="." method="check"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/OK/Button" to="." method="_confirmed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/HBoxContainer/Cancel/Button" to="." method="cancel"]

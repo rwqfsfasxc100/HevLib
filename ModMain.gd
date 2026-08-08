@@ -152,7 +152,7 @@ func _ready():
 			replaceScene("ui/mod_menu/editor_titlescreen/TitleScreen.tscn","res://TitleScreen.tscn")
 		replaceScene("scenes/better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
 		
-		initiate_mod_update_fetch()
+#		initiate_mod_update_fetch()
 #		network_send()
 		
 		
@@ -260,68 +260,6 @@ func l(msg:String, title:String = MOD_NAME, version:String = str(MOD_VERSION_MAJ
 	var line = "%s V%s" % [title, version]
 	pointers.l(msg,line)
 
-func initiate_mod_update_fetch():
-	var http = HTTPRequest.new()
-	http.connect("request_completed",self,"updatelist_return",[http])
-	http.timeout = 20
-	add_child(http)
-	http.request("https://raw.githubusercontent.com/rwqfsfasxc100/dv_update_database/refs/heads/main/manifest_path_store.json")
-
-func updatelist_return(result, response_code,headers,body,mh):
-	if result == 0 and response_code == 200:
-		var p = JSON.parse(body.get_string_from_utf8()).result
-		var ids = pointers.ManifestV2.__get_mod_ids()
-		var updates = {}
-		for ID in p:
-			if ID in ids:
-				var fetchData = p[ID]
-				var modData = pointers.ManifestV2.__get_mod_by_id(ID)
-				var current_version = modData["version_data"]
-				var doUpdate = false
-				var newVer = [fetchData["major"],fetchData["minor"],fetchData["bugfix"]]
-				if newVer[0] > current_version["version_major"]:
-					doUpdate = true
-				elif newVer[1] > current_version["version_minor"]:
-					doUpdate = true
-				elif newVer[2] > current_version["version_bugfix"]:
-					doUpdate = true
-				if doUpdate:
-					var file_name = fetchData.get("file_name","file.zip")
-					var fetchURL = "https://github.com/rwqfsfasxc100/dv_update_database/raw/refs/heads/main/zip_store/%s/%d.%d.%d/%s" % [ID,newVer[0],newVer[1],newVer[2],file_name]
-					var mod_name = modData.get("name","")
-					updates[ID] = {"name":mod_name,"id":ID,"version":[current_version["version_major"],current_version["version_minor"],current_version["version_bugfix"]],"new_version":newVer,"github":fetchURL,"file_name":file_name,"display":mod_name + " (" + ID + ")"}
-		file.open(update_store,File.WRITE)
-		file.store_string(JSON.print(updates))
-		file.close()
-		if not OS.has_feature("editor") or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","always_send_new_mods"):
-			var md = pointers.ManifestV2.__get_mod_data()["mods"]
-			var api_url = "https://publicactiontrigger.azurewebsites.net/api/dispatches/rwqfsfasxc100/dv_update_database"
-			for mod in md:
-				var mod_data = md[mod]
-				if mod_data["manifest"]["has_manifest"]:
-					var manifest = mod_data["manifest"]["manifest_data"]
-					if "mod_information" in manifest:
-						var mid = manifest["mod_information"].get("id","")
-						if mid and not mid in p:
-							var mURL = ""
-							var gURL = ""
-							if "manifest_definitions" in manifest:
-								mURL = manifest["manifest_definitions"].get("manifest_url","")
-							if "links" in manifest:
-								if "HEVLIB_GITHUB" in manifest["links"]:
-									gURL = manifest["links"]["HEVLIB_GITHUB"].get("URL","")
-							if mURL and gURL:
-								var pld = {
-									"id":mid,
-									"manifest_url":mURL,
-									"github_url":gURL
-								}
-								var payload = {"event_type":"add_mod_entry","client_payload":{"data":JSON.print(pld)}}
-								var tHTTP = HTTPRequest.new()
-								add_child(tHTTP)
-								tHTTP.request(api_url,[],true,HTTPClient.METHOD_POST,JSON.print(payload))
-								Tool.deferCallInPhysics(Tool,"remove",[tHTTP])
-	Tool.deferCallInPhysics(Tool,"remove",[mh])
 
 func network_send():
 	var md = pointers.ManifestV2.__get_mod_data()["mods"]

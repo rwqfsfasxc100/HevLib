@@ -45,8 +45,8 @@ var _savedObjects := []
 
 var cache_dir:String = "user://cache/.HevLib_Cache"
 
-var f:File = File.new()
-var d:Directory = Directory.new()
+var file:File = File.new()
+var directory:Directory = Directory.new()
 var pointerDir:String = modPath.get_base_dir().get_base_dir().get_base_dir() + "/pointers.gd"
 var correct:bool = ResourceLoader.exists(pointerDir)
 var pointers = null
@@ -54,6 +54,7 @@ var pointers = null
 func _init(modLoader : ModLoader = ModLoader):
 	if correct:
 		pointers = load(pointerDir).new()
+		pointers.equipment_modmain = self
 		pointers.name = "HevLib~Pointers"
 		if modLoader._savedObjects:
 			var new_objects = [pointers]
@@ -65,17 +66,16 @@ func _init(modLoader : ModLoader = ModLoader):
 		l("Initializing Equipment Driver")
 		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/")
 		var variables_folder = "user://cache/.HevLib_Cache/Variable_Fetch/"
-		d.make_dir_recursive(variables_folder)
-		pointers.equipment_modmain = self
+		directory.make_dir_recursive(variables_folder)
 		pointers.FileAccess.__load_precached_mods()
 		
 #		testing()
 		
 		var scv = pointers.FolderAccess.__fetch_folder_files(variables_folder,false,true)
 		for s in scv:
-			d.remove(s)
+			directory.remove(s)
 		var fstr_old = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/file_caches"
-		if d.dir_exists(fstr_old):
+		if directory.dir_exists(fstr_old):
 			pointers.FolderAccess.__recursive_delete(fstr_old)
 		pointers.ConfigDriver.__load_configs()
 		pointers.Translations.__inject_translations()
@@ -137,6 +137,8 @@ func _ready():
 	if correct:
 		l("Readying")
 		
+		initiate_mod_update_fetch()
+		
 		pointers.Scripting.make_ring_modifications()
 		
 		pointers.Equipment.__make_upgrades_scene()
@@ -152,6 +154,74 @@ func _ready():
 		l("Ready")
 	else:
 		Debug.l("HevLib Equipment Driver onready process cannot be carried out")
+
+# Mod update checking
+signal updates_fetched
+var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
+func initiate_mod_update_fetch():
+	var http = HTTPRequest.new()
+	http.connect("request_completed",self,"updatelist_return",[http])
+	http.timeout = 20
+	add_child(http)
+	http.request("https://raw.githubusercontent.com/rwqfsfasxc100/dv_update_database/refs/heads/main/manifest_path_store.json")
+
+func updatelist_return(result, response_code,headers,body,mh):
+	if result == 0 and response_code == 200:
+		var p = JSON.parse(body.get_string_from_utf8()).result
+		var ids = pointers.ManifestV2.__get_mod_ids()
+		var updates = {}
+		for ID in p:
+			if ID in ids:
+				var fetchData = p[ID]
+				var modData = pointers.ManifestV2.__get_mod_by_id(ID)
+				var current_version = modData["version_data"]
+				var doUpdate = false
+				var newVer = [fetchData["major"],fetchData["minor"],fetchData["bugfix"]]
+				if newVer[0] > current_version["version_major"]:
+					doUpdate = true
+				elif newVer[1] > current_version["version_minor"]:
+					doUpdate = true
+				elif newVer[2] > current_version["version_bugfix"]:
+					doUpdate = true
+				if doUpdate:
+					var file_name = fetchData.get("file_name","file.zip")
+					var fetchURL = "https://github.com/rwqfsfasxc100/dv_update_database/raw/refs/heads/main/zip_store/%s/%d.%d.%d/%s" % [ID,newVer[0],newVer[1],newVer[2],file_name]
+					var mod_name = modData.get("name","")
+					updates[ID] = {"name":mod_name,"id":ID,"version":[current_version["version_major"],current_version["version_minor"],current_version["version_bugfix"]],"new_version":newVer,"github":fetchURL,"file_name":file_name,"display":mod_name + " (" + ID + ")"}
+		file.open(update_store,File.WRITE)
+		file.store_string(JSON.print(updates))
+		file.close()
+		emit_signal("updates_fetched")
+		if not OS.has_feature("editor") or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","always_send_new_mods"):
+			var md = pointers.ManifestV2.__get_mod_data()["mods"]
+			var api_url = "https://publicactiontrigger.azurewebsites.net/api/dispatches/rwqfsfasxc100/dv_update_database"
+			for mod in md:
+				var mod_data = md[mod]
+				if mod_data["manifest"]["has_manifest"]:
+					var manifest = mod_data["manifest"]["manifest_data"]
+					if "mod_information" in manifest:
+						var mid = manifest["mod_information"].get("id","")
+						if mid and not mid in p:
+							var mURL = ""
+							var gURL = ""
+							if "manifest_definitions" in manifest:
+								mURL = manifest["manifest_definitions"].get("manifest_url","")
+							if "links" in manifest:
+								if "HEVLIB_GITHUB" in manifest["links"]:
+									gURL = manifest["links"]["HEVLIB_GITHUB"].get("URL","")
+							if mURL and gURL:
+								var pld = {
+									"id":mid,
+									"manifest_url":mURL,
+									"github_url":gURL
+								}
+								var payload = {"event_type":"add_mod_entry","client_payload":{"data":JSON.print(pld)}}
+								var tHTTP = HTTPRequest.new()
+								add_child(tHTTP)
+								tHTTP.request(api_url,[],true,HTTPClient.METHOD_POST,JSON.print(payload))
+								Tool.deferCallInPhysics(Tool,"remove",[tHTTP])
+	Tool.deferCallInPhysics(Tool,"remove",[mh])
+
 func installScriptExtension(path:String):
 	var childPath:String = str(modPath + path)
 	var childScript:Script = load(childPath)
