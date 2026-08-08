@@ -1,3 +1,8 @@
+[1.15.31]
+
+1=* SafeMode now completes the mod check before closing to prevent it from prematurely exiting before finding all issues
+2=* SafeMode now mentions specific issues in the logs instead of being vague
+
 [1.15.30]
 
 1=* Fixed ring map overlay preventing mouse access to the dive controls
