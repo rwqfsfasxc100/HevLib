@@ -5866,8 +5866,10 @@ class _ManifestV2:
 							if modGlobalPath.to_lower() in modFiles:
 								zip_ref_store[modGlobalPath] = modFSPath
 					gdunzip = null
+				if zip_ref_store.get("res://HevLib/ModMain.gd","").get_file() != "HevLib.zip":
+					pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.")
 				pointers.SafeMode.__handle_exit_for_file_checks()
-				if not OS.has_feature("editor") and (not ResourceLoader.exists("res://HevLib/pointers.gd") or zip_ref_store.get("res://HevLib/ModMain.gd","").get_file() != "HevLib.zip"):
+				if not OS.has_feature("editor") and not ResourceLoader.exists("res://HevLib/pointers.gd"):
 					pointers.NodeAccess.__exit(false,"HevLib was not installed correctly, assuming incorrect file downloaded (didn't download from releases page?). Crashing & opening releases page for a potential help.","pointers.FileAccess",0.0,"https://github.com/rwqfsfasxc100/HevLib/releases/latest")
 			for mod in modListArr:
 				var mod_entry : Dictionary = __make_mod_entry(mod)
