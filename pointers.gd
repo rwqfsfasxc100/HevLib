@@ -5793,8 +5793,8 @@ class _ManifestV2:
 	var currentModStateHash:int = 0
 	var lastModStateHash:int = 0
 	
-	var mod_hash_file:String = "user://cache/.Mod_Menu_2_Cache/updates/current_mod_state.txt"
-	var mod_state_hash_file:String = "user://cache/.Mod_Menu_2_Cache/updates/current_mod_state.txt"
+	var mod_hash_file:String = "user://cache/.Mod_Menu_2_Cache/updates/mod_data_hash.txt"
+	var mod_state_hash_file:String = "user://cache/.Mod_Menu_2_Cache/updates/mod_zip_hash.txt"
 	
 	var fetchZips:bool = true
 	func __get_mod_data(print_json: bool = false):
@@ -5811,9 +5811,6 @@ class _ManifestV2:
 			var library_count:int = 0
 			var non_library_count:int = 0
 			var total_mod_count:int = 0
-			# FUTURE ME: FIX THIS TO USE PARSE TAGS
-			var stat_tags : Dictionary = {}
-			
 			var modListArr : Array = []
 			var modmain_files : PoolStringArray = __get_modmain_files()
 			pointers.l("found [%s] modmain files" % modmain_files.size(),"pointers.ManifestV2")
@@ -5840,7 +5837,6 @@ class _ManifestV2:
 					return ""
 				if dir.list_dir_begin() != OK:
 					return ""
-
 				while true:
 					var fileName = dir.get_next()
 					if fileName.empty():
@@ -5871,19 +5867,19 @@ class _ManifestV2:
 				pointers.SafeMode.__handle_exit_for_file_checks()
 				if not OS.has_feature("editor") and not ResourceLoader.exists("res://HevLib/pointers.gd"):
 					pointers.NodeAccess.__exit(false,"HevLib was not installed correctly, assuming incorrect file downloaded (didn't download from releases page?). Crashing & opening releases page for a potential help.","pointers.FileAccess",0.0,"https://github.com/rwqfsfasxc100/HevLib/releases/latest")
+			var stat_tags : Dictionary = {}
 			for mod in modListArr:
 				var mod_entry : Dictionary = __make_mod_entry(mod)
-				var manifest_data : Dictionary = mod_entry["manifest"]["manifest_data"]
+				mod_dictionary.merge({mod.get("script_path",""):mod_entry})
 				if mod_entry["manifest"]["has_manifest"]:
 					manifest_count += 1
-				if "tags" in manifest_data:
-					for tag in manifest_data["tags"]:
-						if tag in stat_tags:
-							stat_tags[tag] += 1
-						else:
-							stat_tags.merge({tag:1})
-				mod_dictionary.merge({mod.get("script_path",""):mod_entry})
-				
+					var md : Dictionary = mod_entry["manifest"]["manifest_data"]
+					if md["mod_information"].get("id","") and "tags" in md:
+						for tag in md["tags"]:
+							if tag in stat_tags:
+								stat_tags[tag] += 1
+							else:
+								stat_tags[tag] = 1
 				if mod_entry["library_information"]["is_library"]:
 					library_count += 1
 				else:
@@ -8106,7 +8102,7 @@ class _Translations:
 		for mod in drivers:
 			if "REPLACE_TRANSLATIONS.gd" in mod["drivers"]:
 				var translations:Dictionary = mod["drivers"]["REPLACE_TRANSLATIONS.gd"].get("TRANSLATIONS",{})
-				var master_locale = null
+				var master_locale:String = ""
 				if "master_locale" in translations:
 					master_locale = translations["master_locale"]
 					translations.erase("master_locale")
