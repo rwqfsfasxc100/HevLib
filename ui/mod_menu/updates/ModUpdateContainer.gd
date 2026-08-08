@@ -120,11 +120,13 @@ func _downloaded_zip(filepath):
 func repos():
 	var mods = get_parent().get_child_count()
 	var pos = get_position_in_parent()
-	if mods >= 2:
+	if mods > 2:
+		get_parent().get_parent().get_parent().get_node("ButtonContainer/UpdateAll/Button").grab_focus()
+	elif mods > 1:
 		if pos != 0:
-			get_parent().get_child(0).get_node("Buttons/Ignore").grab_focus()
+			get_parent().get_child(0).get_node("Buttons/Update").grab_focus()
 		else:
-			get_parent().get_child(1).get_node("Buttons/Ignore").grab_focus()
+			get_parent().get_child(1).get_node("Buttons/Update").grab_focus()
 	else:
 		get_parent().get_parent().get_parent().get_node("ButtonContainer/Cancel/Button").grab_focus()
 		get_parent().get_parent().get_parent().get_node("ButtonContainer/UpdateAll/Button").disabled = true

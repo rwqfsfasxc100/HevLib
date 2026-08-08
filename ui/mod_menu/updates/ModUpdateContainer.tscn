@@ -26,16 +26,16 @@ margin_left = 460.0
 margin_right = 1096.0
 margin_bottom = 60.0
 
-[node name="Ignore" type="Button" parent="Buttons"]
-margin_right = 337.0
-margin_bottom = 60.0
-text = "HEVLIB_IGNORE_UPDATE"
-
 [node name="Update" type="Button" parent="Buttons"]
-margin_left = 341.0
-margin_right = 636.0
+margin_right = 295.0
 margin_bottom = 60.0
 text = "HEVLIB_UPDATE_MOD"
+
+[node name="Ignore" type="Button" parent="Buttons"]
+margin_left = 299.0
+margin_right = 636.0
+margin_bottom = 60.0
+text = "HEVLIB_IGNORE_UPDATE"
 
 [node name="Popups" type="Control" parent="."]
 margin_left = 1100.0
@@ -88,7 +88,7 @@ text = "HEVLIB_PLEASE_WAIT"
 align = 1
 autowrap = true
 
-[connection signal="pressed" from="Buttons/Ignore" to="." method="_Ignore_pressed"]
 [connection signal="pressed" from="Buttons/Update" to="." method="_Update_pressed"]
+[connection signal="pressed" from="Buttons/Ignore" to="." method="_Ignore_pressed"]
 [connection signal="confirmed" from="Popups/IgnorePopup" to="." method="_ignore_confirmed"]
 [connection signal="confirmed" from="Popups/UpdatePopup" to="." method="_do_update"]
