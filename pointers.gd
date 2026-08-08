@@ -5866,6 +5866,7 @@ class _ManifestV2:
 							if modGlobalPath.to_lower() in modFiles:
 								zip_ref_store[modGlobalPath] = modFSPath
 					gdunzip = null
+				pointers.SafeMode.__handle_exit_for_file_checks()
 				if not OS.has_feature("editor") and (not ResourceLoader.exists("res://HevLib/pointers.gd") or zip_ref_store.get("res://HevLib/ModMain.gd","").get_file() != "HevLib.zip"):
 					pointers.NodeAccess.__exit(false,"HevLib was not installed correctly, assuming incorrect file downloaded (didn't download from releases page?). Crashing & opening releases page for a potential help.","pointers.FileAccess",0.0,"https://github.com/rwqfsfasxc100/HevLib/releases/latest")
 			for mod in modListArr:
@@ -7340,8 +7341,10 @@ class _SafeMode:
 	
 	var PCKFILES:PoolStringArray = PoolStringArray()
 	var safeCheck:bool = false
-	var safeCheckTriggered:bool = true
-
+	var safeCheckTriggered:bool = false
+	var offendingFiles:Dictionary = {}
+	var offendingFileCount:int = 0
+	
 	var pointers
 	func _init(p):
 		pointers = p
@@ -7352,16 +7355,31 @@ class _SafeMode:
 			safeCheck = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading")
 			pointers.l("Safe mode enabled? [%s]" % str(safeCheck),"pointers.SafeMode")
 		else:
-			pointers.l("Running from the editor, safe mode disabled by default as this cannot fail","pointers.SafeMode")
+			pointers.l("Running from the editor, safe mode disabled by default as it cannot fail","pointers.SafeMode")
 	
 	func __check_file(file_path:String,zip_path:String,crash:bool = true):
 		if safeCheck:
 			pointers.l("checking file %s:%s" % [zip_path.get_file(),file_path],"pointers.SafeMode")
 			if file_path in PCKFILES:
-				pointers.l("File %s @ %s tripped safe mode" % [file_path,zip_path.get_file()],"pointers.SafeMode")
-				if crash and safeCheckTriggered:
-					safeCheckTriggered = false
-					pointers.NodeAccess.__exit(false,"Safe mode tripped, exiting. Check logs for details.","pointers.SafeMode")
+				pointers.l("WARNING: file %s @ %s overwrites Vanilla resource." % [file_path,zip_path.get_file()],"pointers.SafeMode")
+				pointers.l(" -> File should use a uniqure directory as to ensure the Vanilla file can be accessed at all times.","pointers.SafeMode")
+				pointers.l(" -> If you need to completely overwrite a script, use DataFormat.__override_script","pointers.SafeMode")
+				if not zip_path.get_file() in offendingFiles:
+					offendingFiles[zip_path.get_file()] = []
+				offendingFiles[zip_path.get_file()].append(file_path)
+				offendingFileCount += 1
+				if crash:
+					safeCheckTriggered = true
+	
+	func __handle_exit_for_file_checks():
+		pointers.l("Found %d offending files loaded between %d mods." % [offendingFileCount,offendingFiles.size()],"pointers.SafeMode")
+		for zip_path in offendingFiles:
+			var zip_files = offendingFiles[zip_path]
+			pointers.l("[%d] offending files for mod [%s]:" % [zip_files.size(),zip_path],"pointers.SafeMode")
+			for i in zip_files:
+				pointers.l(" -> [%s]" % i,"pointers.SafeMode")
+		if safeCheck and safeCheckTriggered:
+			pointers.NodeAccess.__exit(false,"Safe mode tripped. Check previous logs for details regarding offending mods.","pointers.SafeMode")
 	
 	
 
