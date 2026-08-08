@@ -1,3 +1,10 @@
+[1.15.32]
+
+1=* Title screen update notifier panel now no longer has a long pause before displaying if the splash screen was skipped too quickly
+1.1=* Now shows as soon as the library sees that updates are available
+2=* Fixed crash caused when HevLib's zip filename wasn't in standard format
+3=* Refactored tag stat fetching for __get_mod_data
+
 [1.15.31]
 
 1=* SafeMode now completes the mod check before closing to prevent it from prematurely exiting before finding all issues
