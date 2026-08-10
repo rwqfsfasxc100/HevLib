@@ -175,10 +175,6 @@ window_title = "HEVLIB_NO_DOWNLOAD_HEADER"
 dialog_text = "HEVLIB_NO_DOWNLOAD_CONTENT"
 script = ExtResource( 5 )
 
-[node name="Timer" type="Timer" parent="."]
-wait_time = 0.05
-one_shot = true
-
 [connection signal="about_to_show" from="." to="." method="_about_to_show"]
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
 [connection signal="pressed" from="base/VBoxContainer/ButtonContainer/UpdateAll/Button" to="." method="_update_all_desired"]
@@ -187,4 +183,3 @@ one_shot = true
 [connection signal="confirmed" from="IgnorePopup" to="." method="_ignore_all_pressed"]
 [connection signal="confirmed" from="UpdatePopup" to="." method="_update_all_pressed"]
 [connection signal="confirmed" from="NoDownload" to="NoDownload" method="_on_NoDownload_confirmed"]
-[connection signal="timeout" from="Timer" to="." method="_timeout"]

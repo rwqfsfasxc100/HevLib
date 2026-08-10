@@ -78,16 +78,18 @@ func _about_to_show():
 		c.new_version = str(new_version[0]) + "." + str(new_version[1]) + "." + str(new_version[2])
 		container.add_child(c)
 	
-	if update_data.size() == 0:
-		
-		$base/VBoxContainer/ButtonContainer/UpdateAll/Button.disabled = true
-		$base/VBoxContainer/ButtonContainer/UpdateAll/Button.modulate = Color(0.7,0.7,0.7,1)
-		$base/VBoxContainer/ButtonContainer/IgnoreAll/Button.disabled = true
-		$base/VBoxContainer/ButtonContainer/IgnoreAll/Button.modulate = Color(0.7,0.7,0.7,1)
-	
+	match update_data.size():
+		0:
+			$base/VBoxContainer/ButtonContainer/UpdateAll/Button.disabled = true
+			$base/VBoxContainer/ButtonContainer/UpdateAll/Button.modulate = Color(0.7,0.7,0.7,1)
+			$base/VBoxContainer/ButtonContainer/IgnoreAll/Button.disabled = true
+			$base/VBoxContainer/ButtonContainer/IgnoreAll/Button.modulate = Color(0.7,0.7,0.7,1)
+		1:
+			container.get_child(0).repos()
+		_:
+			container.get_child(1).repos()
 	lastFocus = get_focus_owner()
 	_on_resize()
-	$Timer.start()
 
 func _visibility_changed():
 	_on_resize()
@@ -218,10 +220,3 @@ func notifications_pressed():
 				currently_ignored.erase(u)
 	if updates.size() >= 1:
 		popup()
-
-
-func _timeout():
-	if container.get_child_count() >= 1:
-		container.get_child(0).get_node("Buttons/Ignore").grab_focus()
-	else:
-		$base/VBoxContainer/ButtonContainer/Cancel/Button.grab_focus()
