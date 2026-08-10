@@ -959,6 +959,7 @@ class _ConfigDriver:
 		# Store for the raw config information
 		var configs : Dictionary = {}
 		var current_config : Dictionary = __config_parse(cfg_file)
+		var incorrect_paths : Array = Array()
 		for mod in mod_entries:
 			var manifest : Dictionary = mod_entries[mod]["manifest"]
 			var has_manifest:bool = manifest["has_manifest"]
@@ -969,6 +970,16 @@ class _ConfigDriver:
 					var cfg : Dictionary = manifest["manifest_data"]["configs"]
 					if not hash(cfg) == hash({}):
 						configs.merge({mod_name:cfg})
+				var expected_path:String = manifest["manifest_data"]["manifest_definitions"]["expected_manifest_path"]
+				var actual_path:String = manifest["manifest_file_path"]
+				if expected_path != actual_path:
+					incorrect_paths.append([mod_name,expected_path,actual_path])
+		if incorrect_paths:
+			var error_text = "The following mod(s) expect a specific file path, however are located at a different resource path than what it expects:\n\n%s\nPlease make sure you have downloaded the mod(s) correctly, and restart the game."
+			var path_concat = ""
+			for i in incorrect_paths:
+				path_concat += "%s: expects to be at [%s], is actually at [%s]\n" % [i[0],i[1],i[2]]
+			pointers.NodeAccess.__exit(false,path_concat,"pointers.ConfigDriver")
 		pointers.l("config contains [%s] mods" % configs.size(),"pointers.ConfigDriver")
 		for mod in configs:
 			var data : Dictionary = configs[mod]
@@ -6007,6 +6018,7 @@ class _ManifestV2:
 		var always_display : bool = constants.get("ALWAYS_DISPLAY",false)
 		
 		var has_mod_manifest : bool = false
+		var manifest_filepath : String = ""
 		var manifest_data : Dictionary = {}
 		var manifest_version : float = 1.0
 		var has_icon_file : bool = false
@@ -6026,9 +6038,9 @@ class _ManifestV2:
 		for content_file in content:
 			if content_file.begins_with(folder_path):
 				var ft : String = content_file.split(folder_path)[1]
-				if ft.to_lower() == "mod.manifest":
+				if not has_mod_manifest and ft.to_lower() == "mod.manifest":
 					has_mod_manifest = true
-					
+					manifest_filepath = content_file
 					manifest_data = __parse_file_as_manifest(content_file)
 					mod_name = manifest_data["mod_information"].get("name",mod_name)
 					legacy_mod_version = manifest_data["version"].get("version_string",legacy_mod_version)
@@ -6054,7 +6066,7 @@ class _ManifestV2:
 		elif png_path:
 			icon_path = png_path
 		var icon_dict : Dictionary = {"has_icon_file":has_icon_file,"icon_path":icon_path}
-		var manifestEntry : Dictionary = {"has_manifest":has_mod_manifest,"manifest_version":manifest_version,"manifest_data":manifest_data}
+		var manifestEntry : Dictionary = {"has_manifest":has_mod_manifest,"manifest_version":manifest_version,"manifest_file_path":manifest_filepath,"manifest_data":manifest_data}
 		var mod_version_array : Array = [mod_version_major,mod_version_minor,mod_version_bugfix]
 		var mod_version_string : String = str(mod_version_major) + "." + str(mod_version_minor) + "." + str(mod_version_bugfix)
 		if not str(mod_version_metadata) == "":
@@ -6263,8 +6275,7 @@ class _ManifestV2:
 						"manifest_url":"", # EXAMPLE: https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest
 						"changelog_path":"", # This is relative to the ModMain.gd file. EXAMPLE: for a file at 'res://Example Mod/data/folder/changelogs.txt', you would put 'data/folder/changelogs.txt'
 						"modlet_priority":0, # SPECIFIC TO MODLETS! The order at which the modlet would be loaded. Most modlets load before other mods, but this will affect load order within the list of installed modlets
-						"expected_manifest_path":"", # If set and used for a mod's manifest, the filepath the manifest is expected to be at. If it isn't, prevents the mod from loading and closes the game.
-						
+						"expected_manifest_path":"", # If set and used for a mod's manifest, the res:// filepath the manifest is expected to be at. If it isn't, prevents the mod from loading and closes the game.
 					}
 				}
 				match manifest_version:
@@ -6419,13 +6430,14 @@ class _ManifestV2:
 						
 						if "manifest_definitions" in manifest_data:
 							dict_template["manifest_definitions"]["manifest_version"] = float(manifest_data["manifest_definitions"].get("manifest_version",manifest_version))
-							dict_template["manifest_definitions"]["dependancy_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("dependancy_mod_ids",[]))
-							dict_template["manifest_definitions"]["conflicting_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("conflicting_mod_ids",[]))
-							dict_template["manifest_definitions"]["complementary_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("complementary_mod_ids",[]))
+							dict_template["manifest_definitions"]["dependancy_mod_ids"] = Array(manifest_data["manifest_definitions"].get("dependancy_mod_ids",[]))
+							dict_template["manifest_definitions"]["conflicting_mod_ids"] = Array(manifest_data["manifest_definitions"].get("conflicting_mod_ids",[]))
+							dict_template["manifest_definitions"]["complementary_mod_ids"] = Array(manifest_data["manifest_definitions"].get("complementary_mod_ids",[]))
 							dict_template["manifest_definitions"]["manifest_url"] = String(manifest_data["manifest_definitions"].get("manifest_url",""))
 							dict_template["manifest_definitions"]["changelog_path"] = String(manifest_data["manifest_definitions"].get("changelog_path",""))
 							dict_template["manifest_definitions"]["modlet_priority"] = int(manifest_data["manifest_definitions"].get("modlet_priority",0))
-						
+							dict_template["manifest_definitions"]["expected_manifest_path"] = String(manifest_data["manifest_definitions"].get("expected_manifest_path",""))
+							
 						if "links" in manifest_data:
 							var links = manifest_data["links"]
 							var ovLinks = {}
@@ -7220,10 +7232,12 @@ class _NodeAccess:
 		for obj in node.get_children():
 			__remove_scripts(obj)
 	
-	func __exit(restart : bool = false, exit_message : String = "", exit_header : String = "", delay : float = 0.0,exit_url : String = ""):
+	func __exit(restart : bool = false, exit_message : String = "", exit_header : String = "", delay : float = 0.0,exit_url : String = "",use_os_error_message : bool = false):
 		if delay > 0.0 and pointers.is_inside_tree():
-			pointers.get_tree().create_timer(delay).connect("timeout",self,"__exit",[restart,exit_message,exit_header,0.0])
+			pointers.get_tree().create_timer(delay).connect("timeout",self,"__exit",[restart,exit_message,exit_header,0.0,exit_url,use_os_error_message])
 		else:
+			if use_os_error_message and exit_message:
+				OS.alert(exit_message,exit_header)
 			if restart:
 				pointers.l(("restarting with message: %s" % exit_message) if exit_message else "exiting with restart",(exit_header) if (exit_header) else ("pointers.DataFormat"))
 				OS.execute(OS.get_executable_path(), OS.get_cmdline_args(), false)
