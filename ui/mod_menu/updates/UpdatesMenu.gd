@@ -77,7 +77,7 @@ func _about_to_show():
 		c.current_version = str(old_version[0]) + "." + str(old_version[1]) + "." + str(old_version[2])
 		c.new_version = str(new_version[0]) + "." + str(new_version[1]) + "." + str(new_version[2])
 		container.add_child(c)
-	
+	yield(get_tree(),"physics_frame")
 	match update_data.size():
 		0:
 			$base/VBoxContainer/ButtonContainer/UpdateAll/Button.disabled = true
