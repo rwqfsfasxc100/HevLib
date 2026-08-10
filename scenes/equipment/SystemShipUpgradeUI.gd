@@ -44,7 +44,7 @@ func isAvailable():
 			var cv = ssuuPointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
 			if cv != null and cv is bool:
 				if invert_config:
-					visible = cv
-				else:
 					visible = !cv
+				else:
+					visible = cv
 	return how

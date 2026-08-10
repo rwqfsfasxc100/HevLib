@@ -63,6 +63,8 @@ var cv = null
 func _ready():
 	pointers = ModLoader._savedObjects[0]
 	connect("visibility_changed",self,"hl_ug_recheck_this_visibility")
+#	yield(get_tree(),"idle_frame")
+#	openClose(openByDefault)
 
 func hl_ug_recheck_this_visibility():
 	if pointers:
@@ -79,9 +81,9 @@ func reexamine():
 	if config_id and config_section and config_setting:
 		if cv != null and cv is bool:
 			if invert_config:
-				visible = cv
-			else:
 				visible = !cv
+			else:
+				visible = cv
 	if visible:
 		if restrict_hold_type:
 			visible = (restrict_hold_type.to_upper() == ship.base_storage_type.to_upper())
