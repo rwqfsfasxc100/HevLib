@@ -63,13 +63,9 @@ var cv = null
 func _ready():
 	pointers = ModLoader._savedObjects[0]
 	connect("visibility_changed",self,"hl_ug_recheck_this_visibility")
-	yield(get_tree().create_timer(0.1),"timeout")
-	for i in visibility:
-		i.visible = false
-	openClose(openByDefault)
 
 func hl_ug_recheck_this_visibility():
-	if pointers:
+	if pointers and config_id and config_section and config_setting:
 		cv = pointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
 
 func reexamine():	
@@ -80,12 +76,9 @@ func reexamine():
 	if prevent_ships:
 		visible = not (shipname in prevent_ships)
 	.reexamine()
-	if config_id and config_section and config_setting:
-		if cv != null and cv is bool:
-			if invert_config:
-				visible = !cv
-			else:
-				visible = cv
-	if visible:
-		if restrict_hold_type:
-			visible = (restrict_hold_type.to_upper() == ship.base_storage_type.to_upper())
+	if cv is bool:
+		if invert_config:
+			cv = !cv
+		visible = cv
+	if visible and restrict_hold_type:
+		visible = (restrict_hold_type.to_upper() == ship.base_storage_type.to_upper())

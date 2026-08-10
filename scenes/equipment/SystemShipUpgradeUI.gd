@@ -38,13 +38,12 @@ func _ready():
 	ssuuPointers = ModLoader._savedObjects[0]
 
 func isAvailable():
-	var how = .isAvailable()
-	if how:
+	if .isAvailable():
 		if config_id and config_section and config_setting:
 			var cv = ssuuPointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
-			if cv != null and cv is bool:
+			if cv is bool:
 				if invert_config:
-					visible = !cv
-				else:
-					visible = cv
-	return how
+					cv = !cv
+				return cv
+		return true
+	return false

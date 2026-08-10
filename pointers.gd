@@ -6412,9 +6412,9 @@ class _ManifestV2:
 						# manifest definitions
 						if "manifest_definitions" in manifest_data:
 							dict_template["manifest_definitions"]["manifest_version"] = float(manifest_data["manifest_definitions"].get("manifest_version",manifest_version))
-							dict_template["manifest_definitions"]["dependancy_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("dependancy_mod_ids",[]))
-							dict_template["manifest_definitions"]["conflicting_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("conflicting_mod_ids",[]))
-							dict_template["manifest_definitions"]["complementary_mod_ids"] = PoolStringArray(manifest_data["manifest_definitions"].get("complementary_mod_ids",[]))
+							dict_template["manifest_definitions"]["dependancy_mod_ids"] = Array(manifest_data["manifest_definitions"].get("dependancy_mod_ids",[]))
+							dict_template["manifest_definitions"]["conflicting_mod_ids"] = Array(manifest_data["manifest_definitions"].get("conflicting_mod_ids",[]))
+							dict_template["manifest_definitions"]["complementary_mod_ids"] = Array(manifest_data["manifest_definitions"].get("complementary_mod_ids",[]))
 					2.2:
 						
 						if "mod_information" in manifest_data:
