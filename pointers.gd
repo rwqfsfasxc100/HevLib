@@ -1339,24 +1339,72 @@ class _ConfigDriver:
 			var needs : Array = data_dict[mod_requirements_entry_override]
 			var can:int = 0
 			for a in needs:
-				for f in a:
-					var has:bool = false
-					if f in current_mod_ids:
-						has = true
-					if has:
-						can += 1
+				var tx = typeof(a)
+				if tx == TYPE_ARRAY or tx == TYPE_STRING_ARRAY:
+					for f in a:
+						var has:bool = false
+						match typeof(f):
+							TYPE_STRING:
+								if f in current_mod_ids:
+									has = true
+							TYPE_ARRAY:
+								if f:
+									var MID = f[0]
+									if MID in current_mod_ids:
+										var fs = f.size()
+										if fs > 3:
+											var moddata = pointers.ManifestV2.__get_mod_by_id(MID)
+											if moddata:
+												var ver_info = moddata["version_data"]["full_version_array"]
+												var t1 = true
+												for i in range(3):
+													if t1 and ver_info[i] < f[i + 1]:
+														t1 = false
+												if t1 and fs > 6:
+													for i in range(3):
+														if t1 and ver_info[i] > f[i + 4]:
+															t1 = false
+												has = t1
+										else:
+											has = true
+						if has:
+							can += 1
 			if can != needs.size():
 				return false
 		if check_incompatibilities and mod_incompatibilities_entry_override in data_dict and data_dict[mod_incompatibilities_entry_override] is Array:
 			var needs : Array = data_dict[mod_incompatibilities_entry_override]
 			var can:int = 0
 			for a in needs:
-				var cv:bool = false
-				for f in a:
-					if f in current_mod_ids:
-						cv = true
-				if cv:
-					can += 1
+				var tx = typeof(a)
+				if tx == TYPE_ARRAY or tx == TYPE_STRING_ARRAY:
+					for f in a:
+						var has:bool = false
+						match typeof(f):
+							TYPE_STRING:
+								if f in current_mod_ids:
+									has = true
+							TYPE_ARRAY:
+								if f:
+									var MID = f[0]
+									if MID in current_mod_ids:
+										var fs = f.size()
+										if fs > 3:
+											var moddata = pointers.ManifestV2.__get_mod_by_id(MID)
+											if moddata:
+												var ver_info = moddata["version_data"]["full_version_array"]
+												var t1 = true
+												for i in range(3):
+													if t1 and ver_info[i] < f[i + 1]:
+														t1 = false
+												if t1 and fs > 6:
+													for i in range(3):
+														if t1 and ver_info[i] > f[i + 4]:
+															t1 = false
+												has = t1
+										else:
+											has = true
+						if has:
+							can += 1
 			if can == needs.size():
 				return false
 		return true
@@ -6056,15 +6104,8 @@ class _ManifestV2:
 				var manifest_langs = {}
 				for lang in counts:
 					var hs : float = float(counts[lang]["has"])
-					var ms : float = float(counts[lang]["missing"])
-					var nu : float = float(counts[lang]["not_updated"])
-					var not_updated_factor : float = 25 * (1 - ((hs - nu) / hs))
-					var bucket : float = hs/(hs+ms)
-					var percent : float = bucket * 100
-					var adjusted : float = percent - not_updated_factor
-					manifest_langs[lang] = "%3.1f%%" % adjusted
-				
-				
+					var bucket : float = hs/(hs+float(counts[lang]["missing"]))
+					manifest_langs[lang] = "%3.1f%%" % ((bucket * 100) - (25 * (1 - ((hs - float(counts[lang]["not_updated"])) / hs))))
 				manifestEntry["manifest_data"]["languages"] = manifest_langs
 		return {"name":mod_name,"priority":mod_priority,"file_path":script_path,"zip_path":__match_mod_path_to_zip(script_path),"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"manifest":manifestEntry,"drivers":drivers,"mod_type":mod["mod_type"],"enabled":mod_enabled,"master_locale":ml}
 	
@@ -6216,12 +6257,14 @@ class _ManifestV2:
 					},
 					"manifest_definitions":{
 						"manifest_version":1.0,
-						"dependancy_mod_ids":PoolStringArray(),
-						"conflicting_mod_ids":PoolStringArray(),
-						"complementary_mod_ids":PoolStringArray(),
+						"dependancy_mod_ids":Array(),
+						"conflicting_mod_ids":Array(),
+						"complementary_mod_ids":Array(),
 						"manifest_url":"", # EXAMPLE: https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest
 						"changelog_path":"", # This is relative to the ModMain.gd file. EXAMPLE: for a file at 'res://Example Mod/data/folder/changelogs.txt', you would put 'data/folder/changelogs.txt'
 						"modlet_priority":0, # SPECIFIC TO MODLETS! The order at which the modlet would be loaded. Most modlets load before other mods, but this will affect load order within the list of installed modlets
+						"expected_manifest_path":"", # If set and used for a mod's manifest, the filepath the manifest is expected to be at. If it isn't, prevents the mod from loading and closes the game.
+						
 					}
 				}
 				match manifest_version:
@@ -6451,28 +6494,18 @@ class _ManifestV2:
 			return out
 	
 	func __get_mod_by_id(id:String, case_sensitive: bool = true) -> Dictionary:
-		var mods : Dictionary = {}
-		if not cached_mod_list.empty():
-			mods = cached_mod_list["mods"]
-		else:
-			var data : Dictionary = __get_mod_data()
-			mods = data["mods"]
+		var mods : Dictionary = __get_mod_data()["mods"]
 		for mod in mods:
-			var ID : String = ""
 			var moddata : Dictionary = mods.get(mod)
 			var manifest : Dictionary = moddata["manifest"]["manifest_data"]
-			if manifest:
-				if "mod_information" in manifest:
-					ID = manifest["mod_information"].get("id","")
-			var matches:bool = false
-			if case_sensitive:
-				if id.to_upper() == ID.to_upper():
-					matches = true
-			else:
-				if id == ID:
-					matches = true
-			if matches:
-				return moddata
+			if manifest and "mod_information" in manifest:
+				var ID : String = manifest["mod_information"].get("id","")
+				if case_sensitive:
+					if id.to_upper() == ID.to_upper():
+						return moddata
+				else:
+					if id == ID:
+						return moddata
 		return {}
 	
 	var tag_data_cache = {}
