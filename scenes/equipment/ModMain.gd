@@ -295,6 +295,11 @@ func testing():
 #	var out = shadow_tool.__make_shadow_of_script(spath,[],[],[])
 #	yield(pointers.Zip.__load_pck("C:\\Program Files (x86)\\Steam\\steamapps\\common\\dV Rings of Saturn\\Delta-V.pck",true,true,100),"completed")
 #	var F = pointers.Zip.Files
+#	var can = pointers.ConfigDriver.__validate_dictionary({"mod_requirements":[[["hev.LIBRARY",1,0,0,1,16,0]]]})
+	
+	
+	
+	
 	
 	breakpoint
 
