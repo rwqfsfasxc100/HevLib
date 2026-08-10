@@ -1372,11 +1372,11 @@ class _ConfigDriver:
 												var ver_info = moddata["version_data"]["full_version_array"]
 												var t1 = true
 												for i in range(3):
-													if t1 and ver_info[i] < f[i + 1]:
+													if t1 and ver_info[i] < int(f[i + 1]):
 														t1 = false
 												if t1 and fs > 6:
 													for i in range(3):
-														if t1 and ver_info[i] > f[i + 4]:
+														if t1 and ver_info[i] > int(f[i + 4]):
 															t1 = false
 												has = t1
 										else:

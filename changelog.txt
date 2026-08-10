@@ -1,3 +1,20 @@
+[1.15.33]
+
+1=* Fixed issue with added equipment and slots that used a config inverting the visibility output
+2=* Added `expected_manifest_path` entry to the `manifest_definitions` section of a mod manifest
+2.1=* Used to define a filepath that the manifest file must be located at.
+2.2=* If it's not at the provided path, opens an alert box informing the user of the issue and closes the game after confirmation.
+2.3=* Filepath is not case sensitive
+3=* Mod update menu now by default focuses the update button, or the update all button if multiple mods are available to update.
+4=* `NodeAccess`.`__exit` can now request the OS alert dialog box. Note: this is a blocking action, and nothing will be processed while it's open
+5=* If SafeMode was triggered, an OS alert box is now displayed to inform the user about what has happened and to check logs
+6=* Added ability to use arrays to dictate if a `mod_requirements` or `mod_incompatibilities` array checks for a mod's version instead of just it's presence
+6.1=* Index 0 is the mod ID.
+6.2=* Index 1-3 handle the minimum desired version, in order of major, minor, and bugfix respectively.
+6.3=* Index 4-6 handle the maximum desired version, in order of major, minor, and bugfix respectively.
+6.4=* If fewer than 3 indeces exist, only checks for the mod ID and behaves as if a string was used instead
+6.5=* e.g. `{"mod_requirements":[[["hev.LIBRARY",1,0,0,1,16,0],"hev.VelocityPlus"],[["hev.IndustriesOfEnceladus",2,9,11,3,0,0]]]}`
+
 [1.15.32]
 
 1=* Title screen update notifier panel now no longer has a long pause before displaying if the splash screen was skipped too quickly
