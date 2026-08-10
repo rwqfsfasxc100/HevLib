@@ -63,8 +63,10 @@ var cv = null
 func _ready():
 	pointers = ModLoader._savedObjects[0]
 	connect("visibility_changed",self,"hl_ug_recheck_this_visibility")
-#	yield(get_tree(),"idle_frame")
-#	openClose(openByDefault)
+	yield(get_tree().create_timer(0.1),"timeout")
+	for i in visibility:
+		i.visible = false
+	openClose(openByDefault)
 
 func hl_ug_recheck_this_visibility():
 	if pointers:
