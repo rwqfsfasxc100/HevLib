@@ -1,3 +1,7 @@
+[1.15.34]
+
+1=* Fixed equipment validation checks
+
 [1.15.33]
 
 1=* Fixed issue with added equipment and slots that used a config inverting the visibility output
