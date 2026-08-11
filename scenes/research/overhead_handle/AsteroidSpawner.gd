@@ -31,7 +31,11 @@ extends "res://AsteroidSpawner.gd"
 
 var research_overhead = null
 
+var hl_researchfieldhandler_uinit : bool = false
 func _ready():
+	if hl_researchfieldhandler_uinit:
+		OS.kill(OS.get_process_id())
+	hl_researchfieldhandler_uinit = true
 	research_overhead = get_tree().get_root().get_node("ResearchOverheadHandle")
 	
 	

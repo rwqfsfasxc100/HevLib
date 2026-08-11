@@ -60,7 +60,11 @@ var data_dictionary = ""
 
 var pointers
 var cv = null
+var hl_eqdrupggrp_uinit : bool = false
 func _ready():
+	if hl_eqdrupggrp_uinit:
+		OS.kill(OS.get_process_id())
+	hl_eqdrupggrp_uinit = true
 	pointers = ModLoader._savedObjects[0]
 	connect("visibility_changed",self,"hl_ug_recheck_this_visibility")
 

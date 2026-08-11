@@ -33,3 +33,9 @@ signal generic_notification(dictionary)
 
 func send_notification(data:Dictionary):
 	emit_signal("generic_notification",data)
+
+var hl_notificationdriversignalparser_uinit : bool = false
+func _ready():
+	if hl_notificationdriversignalparser_uinit:
+		OS.kill(OS.get_process_id())
+	hl_notificationdriversignalparser_uinit = true

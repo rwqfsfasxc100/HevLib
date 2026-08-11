@@ -41,7 +41,11 @@ var operated = false
 
 var scroller_script_path = "res://HevLib/development_tools/control_and_ui/scrollbox_helpers/ScrollWithAnalogHorizontal.gd"
 
+var hl_omswidthsliderhandle_uinit : bool = false
 func _ready():
+	if hl_omswidthsliderhandle_uinit:
+		OS.kill(OS.get_process_id())
+	hl_omswidthsliderhandle_uinit = true
 	geo = $MarginContainer/VBoxContainer/TabHintContainer/TabContainer/CREW_OCCUPATION_GEOLOGIST
 	scroll = ScrollContainer.new()
 	scroll.set_script(load(scroller_script_path))

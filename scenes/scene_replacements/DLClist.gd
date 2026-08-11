@@ -31,7 +31,11 @@ extends "res://tools/DLClist.gd"
 
 var pointers
 
+var hl_modmenu2dlclistdriver_uinit : bool = false
 func _ready():
+	if hl_modmenu2dlclistdriver_uinit:
+		OS.kill(OS.get_process_id())
+	hl_modmenu2dlclistdriver_uinit = true
 	pointers = ModLoader._savedObjects[0]
 	grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	if get_child_count() >= 1:

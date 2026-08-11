@@ -29,7 +29,11 @@
 
 extends "res://menu/CurrentlyPlaying.gd"
 
+var hl_currhider_uinit : bool = false
 func _ready():
+	if hl_currhider_uinit:
+		OS.kill(OS.get_process_id())
+	hl_currhider_uinit = true
 	yield(get_tree(), "idle_frame")
 	var mod_menu = CurrentGame.get_tree().get_root().find_node("ModMenu", true, false)
 	if mod_menu:

@@ -32,7 +32,11 @@ extends "res://codex/TransitTip.gd"
 var list:PoolStringArray = PoolStringArray()
 
 var pointers
+var hl_modmenu2transittiphandler_uinit : bool = false
 func _ready():
+	if hl_modmenu2transittiphandler_uinit:
+		OS.kill(OS.get_process_id())
+	hl_modmenu2transittiphandler_uinit = true
 	pointers = ModLoader._savedObjects[0]
 	for i in range(tips):
 		list.append(base % (i + 1))

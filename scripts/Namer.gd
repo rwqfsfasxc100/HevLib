@@ -29,7 +29,11 @@
 
 extends "res://namer/Namer.gd"
 
+var hl_namerdriverhandler_uinit : bool = false
 func _ready():
+	if hl_namerdriverhandler_uinit:
+		OS.kill(OS.get_process_id())
+	hl_namerdriverhandler_uinit = true
 	var data = ModLoader._savedObjects[0].Equipment.namer_store
 	
 	# Hardcoded

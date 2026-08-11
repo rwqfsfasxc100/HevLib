@@ -42,7 +42,11 @@ var c
 
 var file = File.new()
 
+var hl_weaponslotdriverdatafetcher_uinit : bool = false
 func _ready():
+	if hl_weaponslotdriverdatafetcher_uinit:
+		OS.kill(OS.get_process_id())
+	hl_weaponslotdriverdatafetcher_uinit = true
 	pointers = ModLoader._savedObjects[0]
 	
 	shipName=ship.shipName

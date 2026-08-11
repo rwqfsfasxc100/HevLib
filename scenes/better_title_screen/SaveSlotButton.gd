@@ -51,7 +51,11 @@ var display_text:String = ""
 
 var index:int = 0
 
+var hl_btrssbtn_uinit : bool = false
 func _ready():
+	if hl_btrssbtn_uinit:
+		OS.kill(OS.get_process_id())
+	hl_btrssbtn_uinit = true
 	var foolish = load("res://menu/Foolish.tscn").instance()
 	foolish.name = "Foolish"
 	add_child(foolish)

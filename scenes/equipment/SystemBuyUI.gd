@@ -31,7 +31,11 @@ extends "res://enceladus/SystemBuyUI.gd"
 
 var dealer
 
+var hl_eqdrbuyui_uinit : bool = false
 func _ready():
+	if hl_eqdrbuyui_uinit:
+		OS.kill(OS.get_process_id())
+	hl_eqdrbuyui_uinit = true
 	dealer = get_parent()
 	for i in range(6):
 		if not "systemGoodColor" in dealer:

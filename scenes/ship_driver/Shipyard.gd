@@ -33,7 +33,11 @@ var syPointers
 
 var inverseShipAliases = {}
 
+var hl_shipdrivershipyardhandler_uinit : bool = false
 func _ready():
+	if hl_shipdrivershipyardhandler_uinit:
+		OS.kill(OS.get_process_id())
+	hl_shipdrivershipyardhandler_uinit = true
 	syPointers = ModLoader._savedObjects[0]
 	syPointers.ConfigDriver.__establish_connection("hl_shipyard_shipdriver_update",self)
 	hl_shipyard_shipdriver_update()

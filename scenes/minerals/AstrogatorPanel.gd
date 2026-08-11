@@ -29,7 +29,11 @@
 
 extends "res://hud/AstrogatorPanel.gd"
 
+var hl_mineraldriverastropanel_uinit : bool = false
 func _ready():
+	if hl_mineraldriverastropanel_uinit:
+		OS.kill(OS.get_process_id())
+	hl_mineraldriverastropanel_uinit = true
 #	var scroll = ScrollContainer.new()
 #	scroll.set_script(load("res://enceladus/ScrollWithAnalog.gd"))
 #	scroll.rect_min_size = Vector2(32,226)

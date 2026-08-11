@@ -201,8 +201,11 @@ func logEvents():
 	file.close()
 
 
-
+var hl_eventdriverintegrate_uinit : bool = false
 func _ready():
+	if hl_eventdriverintegrate_uinit:
+		OS.kill(OS.get_process_id())
+	hl_eventdriverintegrate_uinit = true
 	pointers = ModLoader._savedObjects[0]
 	connect("tree_exiting",self,"wipe_lists")
 	file.open(event_log_file,File.WRITE)

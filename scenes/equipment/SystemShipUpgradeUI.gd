@@ -34,7 +34,11 @@ export (String) var config_section = ""
 export (String) var config_setting = ""
 export (bool) var invert_config = false
 var ssuuPointers
+var hl_eqdrssui_uinit : bool = false
 func _ready():
+	if hl_eqdrssui_uinit:
+		OS.kill(OS.get_process_id())
+	hl_eqdrssui_uinit = true
 	ssuuPointers = ModLoader._savedObjects[0]
 
 func isAvailable():

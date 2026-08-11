@@ -344,7 +344,11 @@ func _enter_tree():
 	var droneData = ismPointers.Equipment.drone_delivery_speed
 	for amnt in droneData:
 		nanoDeliveryPerSecond[float(amnt)] = droneData[amnt]
+var hl_smdism_uinit : bool = false
 func _ready():
+	if hl_smdism_uinit:
+		OS.kill(OS.get_process_id())
+	hl_smdism_uinit = true
 	if initialize:
 		l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [ammo_add, nano_add, propellant_add])
 		if propellant_add != 0:

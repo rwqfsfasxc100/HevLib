@@ -31,7 +31,11 @@ extends "res://enceladus/Enceladus.gd"
 
 var research_overhead = null
 
+var hl_researchenceladushandler_uinit : bool = false
 func _ready():
+	if hl_researchenceladushandler_uinit:
+		OS.kill(OS.get_process_id())
+	hl_researchenceladushandler_uinit = true
 	research_overhead = get_tree().get_root().get_node("ResearchOverheadHandle")
 	
 	

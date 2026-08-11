@@ -58,7 +58,11 @@ onready var boxes = {
 	"To":$PC/Generic/H/C/To,
 }
 
+var hl_notificationdriverhandler_uinit : bool = false
 func _ready():
+	if hl_notificationdriverhandler_uinit:
+		OS.kill(OS.get_process_id())
+	hl_notificationdriverhandler_uinit = true
 	CurrentGame.connect("generic_notification",self,"_notification_start")
 	tween = Tween.new()
 	add_child(tween)

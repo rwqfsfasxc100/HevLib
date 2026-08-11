@@ -29,5 +29,9 @@
 
 extends "res://enceladus/Upgrades.gd"
 
+var hl_eqdrupgradestab_uinit : bool = false
 func _ready():
+	if hl_eqdrupgradestab_uinit:
+		OS.kill(OS.get_process_id())
+	hl_eqdrupgradestab_uinit = true
 	Debug.l("HevLib: Upgrades loaded to ready")
