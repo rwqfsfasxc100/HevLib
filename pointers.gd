@@ -574,6 +574,19 @@ class _ConfigDriver:
 						"bool for whether the dictionary is valid for processing"
 					]
 				},
+				"__mod_exists":{
+					"description":"Checks if a mod exists based on mod ID, with optional version check parameters.",
+					"args":[
+						"check_data -> (Variant) the data used to check if the mod exists. See the following lines for acceptable inputs:",
+						" -> (String) mod ID for the mod to check for. Performs no version checking, and will return purely if a mod with the ID exists.",
+						" -> (Array) contains mod ID (index 0), minimum version (indeces 1-3), or maximum version (indeces 4-6). Only needs index 0 to perform the check, and all 3 indeces for a minimum/maximum version must exist to perform the respective check.",
+						" -> (Dictionary) must contain `mod_id` for the mod ID, and can have either minimum_version or min_version represent the minimum version, and  either maximum_version or max_version represent the maximum version.",
+						"    -> min/max version entries can either be an Array/PoolIntArray with 3 indeces for the major, minor, and bugfix versions, a Vector3 with the versions in each respective index, or a dictionary with `major`, `minor`, and `bugfix` keys containing each respective version.",
+					],
+					"return":[
+						"bool for whether the mod exists based on the provided criteria"
+					]
+				},
 				"__config_parse":{
 					"description":"Opens a config file and converts it to a dictionary",
 					"args":[
@@ -1348,7 +1361,6 @@ class _ConfigDriver:
 							how = cfg_opt
 					if not how:
 						return false
-		var current_mod_ids : PoolStringArray = pointers.ManifestV2.__get_mod_ids()
 		if check_requirements and mod_requirements_entry_override in data_dict and data_dict[mod_requirements_entry_override] is Array:
 			var needs : Array = data_dict[mod_requirements_entry_override]
 			var can:int = 0
@@ -1356,32 +1368,7 @@ class _ConfigDriver:
 				var tx = typeof(a)
 				if tx == TYPE_ARRAY or tx == TYPE_STRING_ARRAY:
 					for f in a:
-						var has:bool = false
-						match typeof(f):
-							TYPE_STRING:
-								if f in current_mod_ids:
-									has = true
-							TYPE_ARRAY:
-								if f:
-									var MID = f[0]
-									if MID in current_mod_ids:
-										var fs = f.size()
-										if fs > 3:
-											var moddata = pointers.ManifestV2.__get_mod_by_id(MID)
-											if moddata:
-												var ver_info = moddata["version_data"]["full_version_array"]
-												var t1 = true
-												for i in range(3):
-													if t1 and ver_info[i] < int(f[i + 1]):
-														t1 = false
-												if t1 and fs > 6:
-													for i in range(3):
-														if t1 and ver_info[i] > int(f[i + 4]):
-															t1 = false
-												has = t1
-										else:
-											has = true
-						if has:
+						if __mod_exists(f):
 							can += 1
 			if can != needs.size():
 				return false
@@ -1392,36 +1379,85 @@ class _ConfigDriver:
 				var tx = typeof(a)
 				if tx == TYPE_ARRAY or tx == TYPE_STRING_ARRAY:
 					for f in a:
-						var has:bool = false
-						match typeof(f):
-							TYPE_STRING:
-								if f in current_mod_ids:
-									has = true
-							TYPE_ARRAY:
-								if f:
-									var MID = f[0]
-									if MID in current_mod_ids:
-										var fs = f.size()
-										if fs > 3:
-											var moddata = pointers.ManifestV2.__get_mod_by_id(MID)
-											if moddata:
-												var ver_info = moddata["version_data"]["full_version_array"]
-												var t1 = true
-												for i in range(3):
-													if t1 and ver_info[i] < f[i + 1]:
-														t1 = false
-												if t1 and fs > 6:
-													for i in range(3):
-														if t1 and ver_info[i] > f[i + 4]:
-															t1 = false
-												has = t1
-										else:
-											has = true
-						if has:
+						if __mod_exists(f):
 							can += 1
 			if can == needs.size():
 				return false
 		return true
+	
+	func __mod_exists(check_data) -> bool:
+		var has:bool = false
+		var current_mod_ids:PoolStringArray = pointers.ManifestV2.__get_mod_ids()
+		match typeof(check_data):
+			TYPE_STRING:
+				if check_data in current_mod_ids:
+					has = true
+			TYPE_ARRAY:
+				if check_data:
+					var MID = str(check_data[0])
+					if MID in current_mod_ids:
+						var fs = check_data.size()
+						if fs > 3:
+							var moddata = pointers.ManifestV2.__get_mod_by_id(MID)
+							if moddata:
+								var ver_info = moddata["version_data"]["full_version_array"]
+								var t1 = true
+								for i in range(3):
+									if t1 and ver_info[i] < int(check_data[i + 1]):
+										t1 = false
+								if t1 and fs > 6:
+									for i in range(3):
+										if t1 and ver_info[i] > int(check_data[i + 4]):
+											t1 = false
+								has = t1
+						else:
+							has = true
+			TYPE_DICTIONARY:
+				var MID = str(check_data.get("mod_id",""))
+				var moddata = pointers.ManifestV2.__get_mod_by_id(MID)
+				if check_data and MID and moddata:
+					var t1 = true
+					var ver_info = moddata["version_data"]["full_version_array"]
+					if ("minimum_version" in check_data or "min_version" in check_data):
+						var minimum = check_data.get("minimum_version",check_data.get("min_version",[0,0,0]))
+						var mnm = null
+						match typeof(minimum):
+							TYPE_ARRAY,TYPE_INT_ARRAY:
+								if minimum.size() > 2:
+									mnm = minimum
+							TYPE_VECTOR3:
+								mnm = minimum
+							TYPE_DICTIONARY:
+								var minarr = Vector3.ZERO
+								minarr[0] = int(minimum.get("major",0))
+								minarr[1] = int(minimum.get("minor",0))
+								minarr[2] = int(minimum.get("bugfix",0))
+								mnm = minarr
+						if mnm != null:
+							for i in range(3):
+								if t1 and ver_info[i] < int(mnm[i]):
+									t1 = false
+					if t1 and ("maximum_version" in check_data or "max_version" in check_data):
+						var minimum = check_data.get("maximum_version",check_data.get("max_version",[0,0,0]))
+						var mnm = null
+						match typeof(minimum):
+							TYPE_ARRAY,TYPE_INT_ARRAY:
+								if minimum.size() > 2:
+									mnm = minimum
+							TYPE_VECTOR3:
+								mnm = minimum
+							TYPE_DICTIONARY:
+								var minarr = Vector3.ZERO
+								minarr[0] = int(minimum.get("major",0))
+								minarr[1] = int(minimum.get("minor",0))
+								minarr[2] = int(minimum.get("bugfix",0))
+								mnm = minarr
+						if mnm != null:
+							for i in range(3):
+								if t1 and ver_info[i] > int(mnm[i]):
+									t1 = false
+					has = t1
+		return has
 	
 	func __config_parse(file_path: String) -> Dictionary:
 		if not file.file_exists(file_path) and not ResourceLoader.exists(file_path):
