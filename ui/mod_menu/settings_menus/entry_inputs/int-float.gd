@@ -104,7 +104,7 @@ func _reset_pressed():
 	var val = CONFIG_DATA.get("default",10.0)
 	if volatile:
 		var old_val = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
-		if old_val != val:
+		if not is_equal_approx(val,old_val):
 			triggerVolatile()
 	slider.value = val
 	spinbox.value = val
@@ -153,7 +153,7 @@ func recheck_availability():
 	slider.set("value" , float(v))
 	SliderLabel.text = str(v)
 	spinbox.set("value" , float(v))
-	if v != CONFIG_DATA.get("default",10.0):
+	if not is_equal_approx(v,CONFIG_DATA.get("default",10.0)):
 		reset_button.visible = true
 		label_button.focus_neighbour_right = label_button.get_path_to(reset_button)
 		reset_button.focus_neighbour_left = reset_button.get_path_to(label_button)
