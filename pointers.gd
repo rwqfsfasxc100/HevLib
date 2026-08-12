@@ -579,7 +579,6 @@ class _ConfigDriver:
 					"args":[
 						"check_data -> (Variant) the data used to check if the mod exists. See the following lines for acceptable inputs:",
 						" -> (String) mod ID for the mod to check for. Performs no version checking, and will return purely if a mod with the ID exists.",
-						" -> (Array) contains mod ID (index 0), minimum version (indeces 1-3), or maximum version (indeces 4-6). Only needs index 0 to perform the check, and all 3 indeces for a minimum/maximum version must exist to perform the respective check.",
 						" -> (Dictionary) must contain `mod_id` for the mod ID, and can have either minimum_version or min_version represent the minimum version, and  either maximum_version or max_version represent the maximum version.",
 						"    -> min/max version entries can either be an Array/PoolIntArray with 3 indeces for the major, minor, and bugfix versions, a Vector3 with the versions in each respective index, or a dictionary with `major`, `minor`, and `bugfix` keys containing each respective version.",
 					],
@@ -1154,7 +1153,7 @@ class _ConfigDriver:
 			var minVer = null
 			var maxVer = null
 			if ("minimum_version" in requirement or "min_version" in requirement):
-				var minimum = requirement.get("minimum_version",requirement.get("min_version",[0,0,0]))
+				var minimum = requirement.get("minimum_version",requirement.get("min_version",null))
 				match typeof(minimum):
 					TYPE_ARRAY,TYPE_INT_ARRAY:
 						if minimum.size() > 2:
@@ -1168,7 +1167,7 @@ class _ConfigDriver:
 						minarr[2] = int(minimum.get("bugfix",0))
 						minVer = minarr
 			if ("maximum_version" in requirement or "max_version" in requirement):
-				var minimum = requirement.get("maximum_version",requirement.get("max_version",[0,0,0]))
+				var minimum = requirement.get("maximum_version",requirement.get("max_version",null))
 				match typeof(minimum):
 					TYPE_ARRAY,TYPE_INT_ARRAY:
 						if minimum.size() > 2:
@@ -1505,23 +1504,8 @@ class _ConfigDriver:
 					has = true
 			TYPE_ARRAY:
 				if check_data:
-					var MID = str(check_data[0])
-					if MID in current_mod_ids:
-						var fs = check_data.size()
-						if fs > 3:
-							var moddata = pointers.ManifestV2.__get_mod_by_id(MID)
-							if moddata:
-								var ver_info = moddata["version_data"]["full_version_array"]
-								var t1 = true
-								for i in range(3):
-									if t1 and ver_info[i] < int(check_data[i + 1]):
-										t1 = false
-								if t1 and fs > 6:
-									for i in range(3):
-										if t1 and ver_info[i] > int(check_data[i + 4]):
-											t1 = false
-								has = t1
-						else:
+					for i in check_data:
+						if __mod_exists(i):
 							has = true
 			TYPE_DICTIONARY:
 				var MID = str(check_data.get("mod_id",""))
@@ -6802,11 +6786,7 @@ class _ManifestV2:
 		return caches_mod_ids
 	
 	func __check_complementary():
-		var mods : Dictionary = {}
-		if not cached_mod_list.empty():
-			mods = cached_mod_list["mods"]
-		else:
-			mods = __get_mod_data()["mods"]
+		var mods : Dictionary = __get_mod_data()["mods"]
 		var tags : Dictionary = __get_manifest_entry("manifest_definitions","complementary_mod_ids")
 		var complimentaries : Dictionary = {}
 		for mod in tags:
@@ -6821,11 +6801,7 @@ class _ManifestV2:
 		return complimentaries
 	
 	func __check_mod_complementary(mod_id):
-		var mods : Dictionary = {}
-		if not cached_mod_list.empty():
-			mods = cached_mod_list["mods"]
-		else:
-			mods = __get_mod_data()["mods"]
+		var mods : Dictionary = __get_mod_data()["mods"]
 		var tags : Dictionary = __get_manifest_entry("manifest_definitions","complementary_mod_ids",mod_id)
 		var complimentaries : Array = []
 		for mod in tags:
@@ -6834,7 +6810,6 @@ class _ManifestV2:
 		return complimentaries
 	
 	func __check_dependancies():
-		var mods : PoolStringArray = __get_mod_ids()
 		var tags : Dictionary = __get_manifest_entry("manifest_definitions","dependancy_mod_ids")
 		var complimentaries : Dictionary = {}
 		for mod in tags:
@@ -6842,23 +6817,21 @@ class _ManifestV2:
 			if keys:
 				var items : Array = []
 				for item in keys:
-					if not item in mods:
+					if not pointers.ConfigDriver.__mod_exists(item):
 						items.append(item)
 				if items:
 					complimentaries.merge({mod:items})
 		return complimentaries
 	
 	func __check_mod_dependancies(mod_id):
-		var mods : PoolStringArray = __get_mod_ids()
 		var tags : Dictionary = __get_manifest_entry("manifest_definitions","dependancy_mod_ids",mod_id)
 		var complimentaries : Array = []
 		for mod in tags:
-			if not mod in mods:
+			if not pointers.ConfigDriver.__mod_exists(mod):
 				complimentaries.append(mod)
 		return complimentaries
 	
 	func __check_conflicts():
-		var mods : PoolStringArray = __get_mod_ids()
 		var tags : Dictionary = __get_manifest_entry("manifest_definitions","conflicting_mod_ids")
 		var complimentaries : Dictionary = {}
 		for mod in tags:
@@ -6866,18 +6839,17 @@ class _ManifestV2:
 			if keys:
 				var items : Array = []
 				for item in keys:
-					if item in mods:
+					if pointers.ConfigDriver.__mod_exists(item):
 						items.append(item)
 				if items:
 					complimentaries.merge({mod:items})
 		return complimentaries
 	
 	func __check_mod_conflicts(mod_id):
-		var mods : PoolStringArray = __get_mod_ids()
 		var tags : Dictionary = __get_manifest_entry("manifest_definitions","conflicting_mod_ids",mod_id)
 		var complimentaries : Array = []
 		for mod in tags:
-			if mod in mods:
+			if pointers.ConfigDriver.__mod_exists(mod):
 				complimentaries.append(mod)
 		return complimentaries
 	
