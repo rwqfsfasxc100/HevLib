@@ -973,10 +973,13 @@ class _ConfigDriver:
 		var configs : Dictionary = {}
 		var current_config : Dictionary = __config_parse(cfg_file)
 		var incorrect_paths : Array = Array()
+		var problematic_mods : Dictionary = {}
 		for mod in mod_entries:
 			var manifest : Dictionary = mod_entries[mod]["manifest"]
 			var has_manifest:bool = manifest["has_manifest"]
 			if has_manifest:
+				var missing_requirements : Array = Array()
+				var incompatible_mods : Array = Array()
 				var mod_name : String  = mod_entries[mod]["name"]
 				var manifest_version : float = float(manifest["manifest_version"])
 				if manifest_version > 2.0:
@@ -988,14 +991,77 @@ class _ConfigDriver:
 				var actual_path:String = manifest["manifest_file_path"]
 				if expected_path and expected_path.to_lower() != actual_path.to_lower():
 					incorrect_paths.append([manifest["manifest_data"]["mod_information"]["id"],expected_path,actual_path])
+				for requirement in manifest["manifest_data"]["manifest_definitions"]["dependancy_mod_ids"]:
+					match typeof(requirement):
+						TYPE_ARRAY:
+							var doesHaveAny = false
+							var needsEitherOf = PoolStringArray()
+							for i in requirement:
+								if typeof(i) == TYPE_DICTIONARY and i.get("blocking",false) and not __mod_exists(i):
+									var ov = __get_minmax_string_from_dict(i)
+									if ov:
+										needsEitherOf.append(ov)
+								else:
+									doesHaveAny = true
+							if not doesHaveAny:
+								missing_requirements.append(" OR ".join(needsEitherOf))
+						TYPE_DICTIONARY:
+							if requirement.get("blocking",false) and not __mod_exists(requirement):
+								var ov = __get_minmax_string_from_dict(requirement)
+								if ov:
+									missing_requirements.append(ov)
+				for incompat in manifest["manifest_data"]["manifest_definitions"]["conflicting_mod_ids"]:
+					match typeof(incompat):
+						TYPE_ARRAY:
+							var doesHaveAny = false
+							var needsEitherOf = PoolStringArray()
+							for i in incompat:
+								if typeof(i) == TYPE_DICTIONARY and i.get("blocking",false) and __mod_exists(i):
+									var ov = __get_minmax_string_from_dict(i)
+									if ov:
+										needsEitherOf.append(ov)
+										doesHaveAny = true
+							if doesHaveAny:
+								incompatible_mods.append(" OR ".join(needsEitherOf))
+						TYPE_DICTIONARY:
+							if incompat.get("blocking",false) and __mod_exists(incompat):
+								var ov = __get_minmax_string_from_dict(incompat)
+								if ov:
+									incompatible_mods.append(ov)
+				if missing_requirements or incompatible_mods:
+					problematic_mods[mod_name] = {}
+					if missing_requirements:
+						problematic_mods[mod_name]["missing_requirements"] = missing_requirements
+					if incompatible_mods:
+						problematic_mods[mod_name]["incompatible_mods"] = incompatible_mods
 		# If incorrectly placed mods are found
 		if incorrect_paths:
-			var error_text = "The following mod(s) expect a specific file path, however are located at a different resource path than what it expects:\n\n%s\nPlease make sure you have downloaded the mod(s) correctly, and restart the game."
+			var error_text = "The following mod(s) expect a specific file path, however are located at a different resource path than what it expects:\n\n%s\n\nPlease make sure you have downloaded the mod(s) correctly, and restart the game. If you have any further issues, please ask in the ∆V Discord [https://discord.gg/dv]"
 			var path_concat = ""
 			for i in incorrect_paths:
-				path_concat += "%s: expects to be at [%s], is actually at [%s]\n" % [i[0],i[1],i[2]]
+				if path_concat:
+					path_concat += "\n\n%s: Expected manifest path: [%s]; actual manifest path: [%s]" % [i[0],i[1],i[2]]
+				else:
+					path_concat = "%s: Expected manifest path: [%s]; actual manifest path: [%s]" % [i[0],i[1],i[2]]
 			# Throws an error box and exits the game to let the user know that their mod(s) are broken.
 			pointers.NodeAccess.__exit(false,error_text % path_concat,"pointers.ConfigDriver",0.0,"",true)
+		# If any blocking conflicts or missing requirements exist
+		if problematic_mods:
+			var mod_error_text:String = "The following mods have issues with the currently installed mods and are unable to run as a result. This can be due to incorrect/out-of-date mod versions, missing mods, or mods that aren't compatible.\n%s\nPlease ensure all requirements are met before being able to launch the game."
+			var mod_concat:String = ""
+			for mod_name in problematic_mods:
+				mod_concat += "\n%s\n" % mod_name
+				var missing_requirements = problematic_mods[mod_name].get("missing_requirements",PoolStringArray())
+				var incompatible_mods = problematic_mods[mod_name].get("incompatible_mods",PoolStringArray())
+				if missing_requirements:
+					mod_concat += "    Missing requirements:"
+					for i in missing_requirements:
+						mod_concat += "        %s\n" % i
+				if incompatible_mods:
+					mod_concat += "    Incompatible mods:\n"
+					for i in incompatible_mods:
+						mod_concat += "        %s\n" % i
+			pointers.NodeAccess.__exit(false,mod_error_text % mod_concat,"pointers.ConfigDriver",0.0,"",true)
 		pointers.l("config contains [%s] mods" % configs.size(),"pointers.ConfigDriver")
 		for mod in configs:
 			var data : Dictionary = configs[mod]
@@ -1082,6 +1148,51 @@ class _ConfigDriver:
 						pointers.Keymapping.__load_input_data(key,p,opts)
 		
 	
+	func __get_minmax_string_from_dict(requirement:Dictionary) -> String:
+		var MID = requirement.get("mod_id","")
+		if typeof(MID) == TYPE_STRING and MID:
+			var minVer = null
+			var maxVer = null
+			if ("minimum_version" in requirement or "min_version" in requirement):
+				var minimum = requirement.get("minimum_version",requirement.get("min_version",[0,0,0]))
+				match typeof(minimum):
+					TYPE_ARRAY,TYPE_INT_ARRAY:
+						if minimum.size() > 2:
+							minVer = minimum
+					TYPE_VECTOR3:
+						minVer = minimum
+					TYPE_DICTIONARY:
+						var minarr = Vector3.ZERO
+						minarr[0] = int(minimum.get("major",0))
+						minarr[1] = int(minimum.get("minor",0))
+						minarr[2] = int(minimum.get("bugfix",0))
+						minVer = minarr
+			if ("maximum_version" in requirement or "max_version" in requirement):
+				var minimum = requirement.get("maximum_version",requirement.get("max_version",[0,0,0]))
+				match typeof(minimum):
+					TYPE_ARRAY,TYPE_INT_ARRAY:
+						if minimum.size() > 2:
+							maxVer = minimum
+					TYPE_VECTOR3:
+						maxVer = minimum
+					TYPE_DICTIONARY:
+						var minarr = Vector3.ZERO
+						minarr[0] = int(minimum.get("major",0))
+						minarr[1] = int(minimum.get("minor",0))
+						minarr[2] = int(minimum.get("bugfix",0))
+						maxVer = minarr
+			var mdOut = MID
+			var additional = ""
+			if minVer != null:
+				additional = "min ver %d.%d.%d" % [minVer[0],minVer[1],minVer[2]]
+			if maxVer:
+				if additional:
+					additional += " through "
+				additional += "max ver %d.%d.%d" % [maxVer[0],maxVer[1],maxVer[2]]
+			if additional:
+				mdOut += " (%s)" % additional
+			return mdOut
+		return ""
 	func __load_inputs_from_string_array(key:String, strings: Array):
 		for i in strings:
 			if i.begins_with("Mouse "):
@@ -1435,8 +1546,13 @@ class _ConfigDriver:
 								mnm = minarr
 						if mnm != null:
 							for i in range(3):
-								if t1 and ver_info[i] < int(mnm[i]):
-									t1 = false
+								if t1:
+									var a = int(ver_info[i])
+									var b = int(mnm[i])
+									if a < b:
+										t1 = false
+									elif a > b:
+										break
 					if t1 and ("maximum_version" in check_data or "max_version" in check_data):
 						var minimum = check_data.get("maximum_version",check_data.get("max_version",[0,0,0]))
 						var mnm = null
@@ -1454,8 +1570,14 @@ class _ConfigDriver:
 								mnm = minarr
 						if mnm != null:
 							for i in range(3):
-								if t1 and ver_info[i] > int(mnm[i]):
-									t1 = false
+								if t1:
+									var a = int(ver_info[i])
+									var b = int(mnm[i])
+									if a > b:
+										t1 = false
+									elif a < b:
+										break
+								
 					has = t1
 		return has
 	
