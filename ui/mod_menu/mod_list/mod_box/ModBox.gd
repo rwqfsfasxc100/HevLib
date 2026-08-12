@@ -323,7 +323,7 @@ func get_mod_data(data):
 							else:
 								names = r
 					TYPE_DICTIONARY:
-						var rn = r.get("mod_id","")
+						var rn = r.get("mod_id",r.get("mod_main",""))
 						var minVer = null
 						var maxVer = null
 						if ("minimum_version" in r or "min_version" in r):
@@ -366,7 +366,7 @@ func get_mod_data(data):
 								names = rn
 			mname = names
 		TYPE_DICTIONARY:
-			var rn = data.get("mod_id","")
+			var rn = data.get("mod_id",data.get("mod_main",""))
 			var minVer = null
 			var maxVer = null
 			if ("minimum_version" in data or "min_version" in data):
