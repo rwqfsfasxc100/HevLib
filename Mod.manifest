@@ -1,11 +1,11 @@
 [mod_information]
 
-id="hev.LIBRARY"
 name="HevLib"
+id="hev.LIBRARY"
 description="HEVLIB_MOD_DESCRIPTION"
 brief="HEVLIB_MOD_BRIEF"
 author="__hev"
-credits=["HEVLIB_CREDITS_CONTRIBUTORS_HEADER","HEVLIB_CREDITS_CONTRIBUTORS_ZAKRIN","HEVLIB_CREDITS_CONTRIBUTORS_SPDX","HEVLIB_CREDITS_CONTRIBUTORS_1WT1","HEVLIB_CREDITS_CONTRIBUTORS_HEDRAUTA","","HEVLIB_CREDITS_SUPPORTERS_HEADER","HEVLIB_CREDITS_SUPPORTERS_KOFI_GAZI","HEVLIB_CREDITS_SUPPORTERS_KOFI_BAGGERDUDE","HEVLIB_CREDITS_SUPPORTERS_KOFI_1WT1"]
+credits=PoolStringArray( "HEVLIB_CREDITS_CONTRIBUTORS_HEADER", "HEVLIB_CREDITS_CONTRIBUTORS_ZAKRIN", "HEVLIB_CREDITS_CONTRIBUTORS_SPDX", "HEVLIB_CREDITS_CONTRIBUTORS_1WT1", "HEVLIB_CREDITS_CONTRIBUTORS_HEDRAUTA", "", "HEVLIB_CREDITS_SUPPORTERS_HEADER", "HEVLIB_CREDITS_SUPPORTERS_KOFI_GAZI", "HEVLIB_CREDITS_SUPPORTERS_KOFI_BAGGERDUDE", "HEVLIB_CREDITS_SUPPORTERS_KOFI_1WT1" )
 
 [version]
 
@@ -15,449 +15,493 @@ version_bugfix=34
 
 [tags]
 
-TAG_ALLOW_ACHIEVEMENTS={"type":"bool","value":true}
-TAG_ADD_TRANSIT_TIPS={"type":"array","value":["HEVLIB_TRANSIT_TIP_1","HEVLIB_TRANSIT_TIP_2","HEVLIB_TRANSIT_TIP_3","HEVLIB_TRANSIT_TIP_4","HEVLIB_TRANSIT_TIP_5","HEVLIB_TRANSIT_TIP_6","HEVLIB_TRANSIT_TIP_7","HEVLIB_TRANSIT_TIP_8","HEVLIB_TRANSIT_TIP_9","HEVLIB_TRANSIT_TIP_10","HEVLIB_TRANSIT_TIP_11","HEVLIB_TRANSIT_TIP_12","HEVLIB_TRANSIT_TIP_13","HEVLIB_TRANSIT_TIP_14","HEVLIB_TRANSIT_TIP_15","HEVLIB_TRANSIT_TIP_16","HEVLIB_TRANSIT_TIP_17","HEVLIB_TRANSIT_TIP_18","HEVLIB_TRANSIT_TIP_19","HEVLIB_TRANSIT_TIP_20","HEVLIB_TRANSIT_TIP_21","HEVLIB_TRANSIT_TIP_22","HEVLIB_TRANSIT_TIP_23","HEVLIB_TRANSIT_TIP_24","HEVLIB_TRANSIT_TIP_25","HEVLIB_TRANSIT_TIP_26"]}
+TAG_ALLOW_ACHIEVEMENTS={
+"type": "bool",
+"value": true
+}
+TAG_ADD_TRANSIT_TIPS={
+"type": "array",
+"value": [ "HEVLIB_TRANSIT_TIP_1", "HEVLIB_TRANSIT_TIP_2", "HEVLIB_TRANSIT_TIP_3", "HEVLIB_TRANSIT_TIP_4", "HEVLIB_TRANSIT_TIP_5", "HEVLIB_TRANSIT_TIP_6", "HEVLIB_TRANSIT_TIP_7", "HEVLIB_TRANSIT_TIP_8", "HEVLIB_TRANSIT_TIP_9", "HEVLIB_TRANSIT_TIP_10", "HEVLIB_TRANSIT_TIP_11", "HEVLIB_TRANSIT_TIP_12", "HEVLIB_TRANSIT_TIP_13", "HEVLIB_TRANSIT_TIP_14", "HEVLIB_TRANSIT_TIP_15", "HEVLIB_TRANSIT_TIP_16", "HEVLIB_TRANSIT_TIP_17", "HEVLIB_TRANSIT_TIP_18", "HEVLIB_TRANSIT_TIP_19", "HEVLIB_TRANSIT_TIP_20", "HEVLIB_TRANSIT_TIP_21", "HEVLIB_TRANSIT_TIP_22", "HEVLIB_TRANSIT_TIP_23", "HEVLIB_TRANSIT_TIP_24", "HEVLIB_TRANSIT_TIP_25", "HEVLIB_TRANSIT_TIP_26" ]
+}
 
 [links]
 
-HEVLIB_GITHUB={"URL":"https://github.com/rwqfsfasxc100/HevLib"}
-HEVLIB_DISCORD={"URL":"https://discord.com/channels/426287934870781952/1354537481197850655"}
-HEVLIB_NEXUS={"URL":"https://www.nexusmods.com/dvringsofsaturn/mods/16"}
-HEVLIB_DONATIONS={"URL":"https://ko-fi.com/00hev"}
-HEVLIB_WIKI={"URL":"https://github.com/rwqfsfasxc100/HevLib/wiki"}
-HEVLIB_BUGREPORTS={"URL":"https://forms.gle/RmC4Zgonp6frFgnK7"}
+HEVLIB_GITHUB={
+"URL": "https://github.com/rwqfsfasxc100/HevLib"
+}
+HEVLIB_DISCORD={
+"URL": "https://discord.com/channels/426287934870781952/1354537481197850655"
+}
+HEVLIB_DONATIONS={
+"URL": "https://ko-fi.com/00hev"
+}
+HEVLIB_WIKI={
+"URL": "https://github.com/rwqfsfasxc100/HevLib/wiki"
+}
+HEVLIB_BUGREPORTS={
+"URL": "https://forms.gle/RmC4Zgonp6frFgnK7"
+}
+
+[configs]
+
+HEVLIB_CONFIG_SECTION_EQUIPMENT={
+"cargo_scanner_mineral_display_limit": {
+"default": 12.0,
+"description": "HEVLIB_CONFIG_CARGO_SCANNER_DISPLAY_LIMIT_TOOLTIP",
+"display_order_position": 4,
+"max": 50.0,
+"min": 6.0,
+"name": "HEVLIB_CONFIG_CARGO_SCANNER_DISPLAY_LIMIT",
+"step": 1.0,
+"style": "slider",
+"type": "int"
+},
+"do_sort_equipment_by_price": {
+"default": true,
+"description": "HEVLIB_CONFIG_SORT_BY_PRICE_TOOLTIP",
+"display_order_position": 0,
+"name": "HEVLIB_CONFIG_SORT_BY_PRICE",
+"type": "bool"
+},
+"do_sort_slots_by_type": {
+"default": true,
+"description": "HEVLIB_CONFIG_SORT_SLOT_BY_TYPE_TOOLTIP",
+"display_order_position": 1,
+"name": "HEVLIB_CONFIG_SORT_SLOT_BY_TYPE",
+"type": "bool"
+},
+"extend_divided_storage_multiplier": {
+"default": false,
+"description": "HEVLIB_CONFIG_EXTEND_DIVIDED_STORAGE_MULTIPLIER_TOOLTIP",
+"display_order_position": 6,
+"name": "HEVLIB_CONFIG_EXTEND_DIVIDED_STORAGE_MULTIPLIER",
+"type": "bool"
+},
+"limit_nanodrone_output": {
+"default": true,
+"description": "HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT_TOOLTIP",
+"display_order_position": 2,
+"name": "HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT",
+"type": "bool"
+},
+"processed_mineral_max_display_limit": {
+"default": 12.0,
+"description": "HEVLIB_CONFIG_PROCESSED_MINERAL_DISPLAY_LIMIT_TOOLTIP",
+"display_order_position": 5,
+"max": 50.0,
+"min": 6.0,
+"name": "HEVLIB_CONFIG_PROCESSED_MINERAL_DISPLAY_LIMIT",
+"step": 1.0,
+"style": "slider",
+"type": "int"
+},
+"unrestricted_ammo_output": {
+"default": false,
+"description": "HEVLIB_CONFIG_UNRESTRICTED_AMMO_OUTPUT_TOOLTIP",
+"display_order_position": 3,
+"name": "HEVLIB_CONFIG_UNRESTRICTED_AMMO_OUTPUT",
+"type": "bool"
+}
+}
+HEVLIB_CONFIG_SECTION_EVENTS={
+"write_events": {
+"default": true,
+"description": "HEVLIB_CONFIG_WRITE_EVENTS_TOOLTIP",
+"display_order_position": 0,
+"name": "HEVLIB_CONFIG_WRITE_EVENTS",
+"type": "bool"
+}
+}
+HEVLIB_CONFIG_SECTION_KEYMAPPING={
+"input_virtualization": {
+"default": true,
+"description": "HEVLIB_CONFIG_INPUT_VIRTUALIZATION_TOOLTIP",
+"disabled": true,
+"display_order_position": 0,
+"name": "HEVLIB_CONFIG_INPUT_VIRTUALIZATION",
+"require_restart": true,
+"type": "bool"
+},
+"input_virtualization_ignore_builtin": {
+"default": false,
+"description": "HEVLIB_CONFIG_INPUT_VIRTUALIZATION_OVERRIDE_BUILTIN_TOOLTIP",
+"disabled": true,
+"display_order_position": 1,
+"name": "HEVLIB_CONFIG_INPUT_VIRTUALIZATION_OVERRIDE_BUILTIN",
+"require_restart": true,
+"type": "bool"
+}
+}
+HEVLIB_CONFIG_SECTION_DRIVERS={
+"dealership_modification_roll_chance_scale": {
+"default": 1.0,
+"description": "HEVLIB_CONFIG_DEALERSHIP_MODIFICATION_ROLL_CHANCE_SCALE_TOOLTIP",
+"display_order_position": 9,
+"max": 2.0,
+"min": 0.25,
+"name": "HEVLIB_CONFIG_DEALERSHIP_MODIFICATION_ROLL_CHANCE_SCALE",
+"step": 0.05,
+"style": "slider",
+"type": "float"
+},
+"dlc_mod_list_sort_order": {
+"default": "none",
+"description": "HEVLIB_CONFIG_DLCLIST_SORT_ORDER_TOOLTIP",
+"display_order_position": 3,
+"name": "HEVLIB_CONFIG_DLCLIST_SORT_ORDER",
+"options": [ "none", "alphabetical_ascending", "alphabetical_descending", "length_ascending", "length_descending" ],
+"store_method": "string",
+"type": "optionbutton"
+},
+"max_dealership_modification_rolls": {
+"default": 10.0,
+"description": "HEVLIB_CONFIG_MAX_DEALERSHIP_MODIFICATION_ROLLS_TOOLTIP",
+"display_order_position": 8,
+"max": 100.0,
+"name": "HEVLIB_CONFIG_MAX_DEALERSHIP_MODIFICATION_ROLLS",
+"step": 1.0,
+"style": "slider",
+"type": "int"
+},
+"max_modded_dealership_pools": {
+"default": 7.0,
+"description": "HEVLIB_CONFIG_MAX_MODDED_DEALERSHIP_POOLS_TOOLTIP",
+"display_order_position": 7,
+"max": 50.0,
+"min": 1.0,
+"name": "HEVLIB_CONFIG_MAX_MODDED_DEALERSHIP_POOLS",
+"step": 1.0,
+"style": "slider",
+"type": "int"
+},
+"multiple_minerals_per_chunk": {
+"default": false,
+"description": "HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK_TOOLTIP",
+"display_order_position": 6,
+"name": "HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK",
+"require_restart": true,
+"type": "bool"
+},
+"randomize_minerals": {
+"default": false,
+"description": "HEVLIB_CONFIG_RANDOMIZE_MINERALS_TOOLTIP",
+"display_order_position": 5,
+"name": "HEVLIB_CONFIG_RANDOMIZE_MINERALS",
+"require_restart": true,
+"type": "bool"
+},
+"safe_mod_loading": {
+"default": true,
+"description": "HEVLIB_CONFIG_SAFE_MOD_LOADING_TOOLTIP",
+"display_order_position": 10,
+"name": "HEVLIB_CONFIG_SAFE_MOD_LOADING",
+"require_restart": true,
+"type": "bool"
+},
+"show_all_libraries_in_dlclist": {
+"default": false,
+"description": "HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST_TOOLTIP",
+"display_order_position": 2,
+"name": "HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST",
+"type": "bool"
+},
+"show_always_display_libraries_in_dlclist": {
+"default": true,
+"description": "HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST_TOOLTIP",
+"display_order_position": 1,
+"name": "HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST",
+"type": "bool"
+},
+"show_currently_playing": {
+"default": true,
+"description": "HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING_TOOLTIP",
+"display_order_position": 4,
+"name": "HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING",
+"type": "bool"
+},
+"show_hidden_libraries": {
+"default": false,
+"description": "HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES_TOOLTIP",
+"display_order_position": 0,
+"name": "HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES",
+"type": "bool"
+}
+}
+HEVLIB_CONFIG_SECTION_DEBUG={
+"always_send_new_mods": {
+"default": false,
+"description": "HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS_TOOLTIP",
+"display_order_position": 11,
+"name": "HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS",
+"type": "bool"
+},
+"clear_leaderboards": {
+"button_label": "HEVLIB_OPEN_MENU",
+"description": "HEVLIB_CLEAR_LEADERBOARDS_TOOLTIP",
+"display_order_position": 8,
+"method": "_open",
+"name": "HEVLIB_CLEAR_LEADERBOARDS",
+"script_path": "res://HevLib/achievements/OpenClearLeaderboards.gd",
+"type": "action"
+},
+"full_logging": {
+"default": false,
+"description": "HEVLIB_CONFIG_FULL_LOGGING_TOOLTIP",
+"display_order_position": 9,
+"name": "HEVLIB_CONFIG_FULL_LOGGING",
+"type": "bool"
+},
+"input_debugger": {
+"default": false,
+"description": "HEVLIB_CONFIG_INPUT_DEBUGGER_TOOLTIP",
+"display_order_position": 12,
+"name": "HEVLIB_CONFIG_INPUT_DEBUGGER",
+"type": "bool"
+},
+"input_event_debugger": {
+"default": false,
+"description": "HEVLIB_CONFIG_EVENT_DEBUGGER_TOOLTIP",
+"display_order_position": 13,
+"name": "HEVLIB_CONFIG_EVENT_DEBUGGER",
+"type": "bool"
+},
+"pointer_logging_frame_interval": {
+"default": 2.0,
+"description": "HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL_TOOLTIP",
+"display_order_position": 10,
+"max": 60.0,
+"min": 1.0,
+"name": "HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL",
+"step": 1.0,
+"style": "slider",
+"type": "int"
+},
+"ring_map_display_mode": {
+"default": 0,
+"description": "HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_TOOLTIP",
+"display_order_position": 1,
+"name": "HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE",
+"options": [ "HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_CHAOS", "HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_BIAS", "HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_RAWDENSITY", "HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C1", "HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C2", "HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C3", "HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C4", "HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C5", "HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_MOST_PREVALENT" ],
+"store_method": "int",
+"type": "optionbutton"
+},
+"ring_map_heatmap_clamp": {
+"default": false,
+"description": "HEVLIB_CONFIG_RINGMAP_HEATMAP_CLAMP_TOOLTIP",
+"display_order_position": 3,
+"name": "HEVLIB_CONFIG_RINGMAP_HEATMAP_CLAMP",
+"type": "bool"
+},
+"ring_map_max_value": {
+"default": 1.0,
+"description": "HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_TOOLTIP",
+"display_order_position": 5,
+"max": 1.0,
+"name": "HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE",
+"step": 0.05,
+"style": "slider",
+"type": "float"
+},
+"ring_map_min_value": {
+"default": 0.65,
+"description": "HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_TOOLTIP",
+"display_order_position": 4,
+"max": 1.0,
+"name": "HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE",
+"step": 0.05,
+"style": "slider",
+"type": "float"
+},
+"ring_map_oob_opacity": {
+"default": 0.0,
+"description": "HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_TOOLTIP",
+"display_order_position": 7,
+"max": 1.0,
+"name": "HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY",
+"step": 0.05,
+"style": "slider",
+"type": "float"
+},
+"ring_map_opacity": {
+"default": 0.35,
+"description": "HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_TOOLTIP",
+"display_order_position": 6,
+"max": 1.0,
+"name": "HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY",
+"step": 0.05,
+"style": "slider",
+"type": "float"
+},
+"ring_map_overlay": {
+"default": false,
+"description": "HEVLIB_CONFIG_SHOW_RINGMAP_OVERLAY_TOOLTIP",
+"display_order_position": 0,
+"name": "HEVLIB_CONFIG_SHOW_RINGMAP_OVERLAY",
+"type": "bool"
+},
+"ring_map_use_heatmap": {
+"default": true,
+"description": "HEVLIB_CONFIG_RINGMAP_HEATMAP_TOOLTIP",
+"display_order_position": 2,
+"name": "HEVLIB_CONFIG_RINGMAP_HEATMAP",
+"type": "bool"
+},
+"ring_position_accurate_events": {
+"default": false,
+"description": "HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS_TOOLTIP",
+"display_order_position": 15,
+"name": "HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS",
+"type": "bool"
+},
+"ring_position_data_debugger": {
+"default": false,
+"description": "HEVLIB_CONFIG_POSITION_DATA_DEBUGGER_TOOLTIP",
+"display_order_position": 14,
+"name": "HEVLIB_CONFIG_POSITION_DATA_DEBUGGER",
+"type": "bool"
+}
+}
+HEVLIB_CONFIG_SECTION_INPUT={
+"debugger": {
+"always_binds": [ "QuoteLeft" ],
+"default": [ "F10" ],
+"description": "HEVLIB_CONFIG_OPEN_DEBUGGER_TOOLTIP",
+"display_order_position": 13,
+"name": "HEVLIB_CONFIG_OPEN_DEBUGGER",
+"type": "input"
+},
+"hl_cycle_ring_map_mode": {
+"default": [  ],
+"description": "HEVLIB_CONFIG_CYCLE_RINGMAP_OVERLAY_MODE_TOOLTIP",
+"display_order_position": 4,
+"name": "HEVLIB_CONFIG_CYCLE_RINGMAP_OVERLAY_MODE",
+"type": "input"
+},
+"hl_open_debug_event_menu": {
+"default": [  ],
+"description": "HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU_TOOLTIP",
+"display_order_position": 0,
+"name": "HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU",
+"type": "input"
+},
+"hl_ring_map_overlay_max_value_down": {
+"default": [  ],
+"description": "HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_DOWN_TOOLTIP",
+"display_order_position": 8,
+"name": "HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_DOWN",
+"type": "input"
+},
+"hl_ring_map_overlay_max_value_up": {
+"default": [  ],
+"description": "HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_UP_TOOLTIP",
+"display_order_position": 7,
+"name": "HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_UP",
+"type": "input"
+},
+"hl_ring_map_overlay_min_value_down": {
+"default": [  ],
+"description": "HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_DOWN_TOOLTIP",
+"display_order_position": 6,
+"name": "HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_DOWN",
+"type": "input"
+},
+"hl_ring_map_overlay_min_value_up": {
+"default": [  ],
+"description": "HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_UP_TOOLTIP",
+"display_order_position": 5,
+"name": "HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_UP",
+"type": "input"
+},
+"hl_ring_map_overlay_oob_opacity_down": {
+"default": [  ],
+"description": "HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_DOWN_TOOLTIP",
+"display_order_position": 12,
+"name": "HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_DOWN",
+"type": "input"
+},
+"hl_ring_map_overlay_oob_opacity_up": {
+"default": [  ],
+"description": "HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_UP_TOOLTIP",
+"display_order_position": 11,
+"name": "HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_UP",
+"type": "input"
+},
+"hl_ring_map_overlay_opacity_down": {
+"default": [  ],
+"description": "HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_DOWN_TOOLTIP",
+"display_order_position": 10,
+"name": "HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_DOWN",
+"type": "input"
+},
+"hl_ring_map_overlay_opacity_up": {
+"default": [  ],
+"description": "HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_UP_TOOLTIP",
+"display_order_position": 9,
+"name": "HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_UP",
+"type": "input"
+},
+"hl_toggle_debug_menus": {
+"default": [ "F9" ],
+"description": "HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS_TOOLTIP",
+"display_order_position": 14,
+"name": "HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS",
+"type": "input"
+},
+"hl_toggle_ring_map_heatmap_clamp": {
+"default": [  ],
+"description": "HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_HEATMAP_CLAMP_TOOLTIP",
+"display_order_position": 3,
+"name": "HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_HEATMAP_CLAMP",
+"type": "input"
+},
+"hl_toggle_ring_map_overlay": {
+"default": [  ],
+"description": "HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_TOOLTIP",
+"display_order_position": 1,
+"name": "HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY",
+"type": "input"
+},
+"hl_toggle_ring_map_use_heatmap": {
+"default": [  ],
+"description": "HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_HEATMAP_TOOLTIP",
+"display_order_position": 2,
+"name": "HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_HEATMAP",
+"type": "input"
+},
+"hl_ui_scroll_left": {
+"default": [ "JoyAxis -0" ],
+"description": "HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT_TOOLTIP",
+"display_order_position": 15,
+"name": "HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT",
+"type": "input"
+},
+"hl_ui_scroll_left2": {
+"default": [ "JoyAxis -2" ],
+"description": "HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2_TOOLTIP",
+"display_order_position": 17,
+"name": "HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2",
+"type": "input"
+},
+"hl_ui_scroll_right": {
+"default": [ "JoyAxis 0" ],
+"description": "HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT_TOOLTIP",
+"display_order_position": 16,
+"name": "HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT",
+"type": "input"
+},
+"hl_ui_scroll_right2": {
+"default": [ "JoyAxis 2" ],
+"description": "HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2_TOOLTIP",
+"display_order_position": 18,
+"name": "HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2",
+"type": "input"
+}
+}
 
 [library]
 
 is_library=true
 always_display=true
-
-[configs]
-
-HEVLIB_CONFIG_SECTION_EQUIPMENT={
-	"do_sort_equipment_by_price":{
-		"name":"HEVLIB_CONFIG_SORT_BY_PRICE",
-		"description":"HEVLIB_CONFIG_SORT_BY_PRICE_TOOLTIP",
-		"type":"bool",
-		"default":true
-	},
-	"do_sort_slots_by_type":{
-		"name":"HEVLIB_CONFIG_SORT_SLOT_BY_TYPE",
-		"description":"HEVLIB_CONFIG_SORT_SLOT_BY_TYPE_TOOLTIP",
-		"type":"bool",
-		"default":true
-	},
-	"limit_nanodrone_output":{
-		"name":"HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT",
-		"description":"HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT_TOOLTIP",
-		"type":"bool",
-		"default":true,
-	},
-	"unrestricted_ammo_output":{
-		"name":"HEVLIB_CONFIG_UNRESTRICTED_AMMO_OUTPUT",
-		"description":"HEVLIB_CONFIG_UNRESTRICTED_AMMO_OUTPUT_TOOLTIP",
-		"type":"bool",
-		"default":false,
-	},
-	"cargo_scanner_mineral_display_limit":{
-		"name":"HEVLIB_CONFIG_CARGO_SCANNER_DISPLAY_LIMIT",
-		"description":"HEVLIB_CONFIG_CARGO_SCANNER_DISPLAY_LIMIT_TOOLTIP",
-		"type":"int",
-        "style":"slider",
-        "min":6,
-        "max":50,
-        "step":1,
-		"default":12,
-	},
-	"processed_mineral_max_display_limit":{
-		"name":"HEVLIB_CONFIG_PROCESSED_MINERAL_DISPLAY_LIMIT",
-		"description":"HEVLIB_CONFIG_PROCESSED_MINERAL_DISPLAY_LIMIT_TOOLTIP",
-		"type":"int",
-        "style":"slider",
-        "min":6,
-        "max":50,
-        "step":1,
-		"default":12,
-	},
-	"extend_divided_storage_multiplier":{
-		"name":"HEVLIB_CONFIG_EXTEND_DIVIDED_STORAGE_MULTIPLIER",
-		"description":"HEVLIB_CONFIG_EXTEND_DIVIDED_STORAGE_MULTIPLIER_TOOLTIP",
-		"type":"bool",
-		"default":false,
-	},
-}
-HEVLIB_CONFIG_SECTION_EVENTS={
-	"write_events":{
-		"name":"HEVLIB_CONFIG_WRITE_EVENTS",
-		"description":"HEVLIB_CONFIG_WRITE_EVENTS_TOOLTIP",
-		"type":"bool",
-		"default":true
-	},
-}
-HEVLIB_CONFIG_SECTION_KEYMAPPING={
-	"input_virtualization":{
-		"name":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION",
-		"description":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_TOOLTIP",
-		"type":"bool",
-		"require_restart":true,
-		"default":true,
-		"disabled":true,
-	},
-	"input_virtualization_ignore_builtin":{
-		"name":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_OVERRIDE_BUILTIN",
-		"description":"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_OVERRIDE_BUILTIN_TOOLTIP",
-		"type":"bool",
-		"require_restart":true,
-		"default":false,
-		"disabled":true,
-	},
-}
-HEVLIB_CONFIG_SECTION_DRIVERS={
-	"show_hidden_libraries":{
-		"name":"HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES",
-		"description":"HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES_TOOLTIP",
-		"type":"bool",
-		"default":false
-	},
-	"show_always_display_libraries_in_dlclist":{
-		"name":"HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST",
-		"description":"HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST_TOOLTIP",
-		"type":"bool",
-		"default":true
-	},
-	"show_all_libraries_in_dlclist":{
-		"name":"HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST",
-		"description":"HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST_TOOLTIP",
-		"type":"bool",
-		"default":false
-	},
-	"dlc_mod_list_sort_order":{
-		"name":"HEVLIB_CONFIG_DLCLIST_SORT_ORDER",
-		"description":"HEVLIB_CONFIG_DLCLIST_SORT_ORDER_TOOLTIP",
-		"type":"option",
-		"store_method":"string",
-		"options":["none","alphabetical_ascending","alphabetical_descending","length_ascending","length_descending"],
-		"default":"none",
-	},
-	"show_currently_playing":{
-		"name":"HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING",
-		"description":"HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING_TOOLTIP",
-		"type":"bool",
-		"default":true,
-	},
-	"randomize_minerals":{
-		"name":"HEVLIB_CONFIG_RANDOMIZE_MINERALS",
-		"description":"HEVLIB_CONFIG_RANDOMIZE_MINERALS_TOOLTIP",
-		"type":"bool",
-		"require_restart":true,
-		"default":false
-	},
-	"multiple_minerals_per_chunk":{
-		"name":"HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK",
-		"description":"HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK_TOOLTIP",
-		"type":"bool",
-		"require_restart":true,
-		"default":false
-	},
-	"max_modded_dealership_pools":{
-		"name":"HEVLIB_CONFIG_MAX_MODDED_DEALERSHIP_POOLS",
-		"description":"HEVLIB_CONFIG_MAX_MODDED_DEALERSHIP_POOLS_TOOLTIP",
-		"type":"int",
-        "style":"slider",
-        "min":1,
-        "max":50,
-        "step":1,
-		"default":7,
-	},
-	"max_dealership_modification_rolls":{
-		"name":"HEVLIB_CONFIG_MAX_DEALERSHIP_MODIFICATION_ROLLS",
-		"description":"HEVLIB_CONFIG_MAX_DEALERSHIP_MODIFICATION_ROLLS_TOOLTIP",
-		"type":"int",
-        "style":"slider",
-        "min":0,
-        "max":100,
-        "step":1,
-		"default":10,
-	},
-	"dealership_modification_roll_chance_scale":{
-		"name":"HEVLIB_CONFIG_DEALERSHIP_MODIFICATION_ROLL_CHANCE_SCALE",
-		"description":"HEVLIB_CONFIG_DEALERSHIP_MODIFICATION_ROLL_CHANCE_SCALE_TOOLTIP",
-		"type":"float",
-        "style":"slider",
-        "min":0.25,
-        "max":2.0,
-        "step":0.05,
-		"default":1.0,
-	},
-	"safe_mod_loading":{
-		"name":"HEVLIB_CONFIG_SAFE_MOD_LOADING",
-		"description":"HEVLIB_CONFIG_SAFE_MOD_LOADING_TOOLTIP",
-		"type":"bool",
-		"require_restart":true,
-		"default":true
-	},
-}
-HEVLIB_CONFIG_SECTION_DEBUG={
-	"ring_map_overlay":{
-		"name":"HEVLIB_CONFIG_SHOW_RINGMAP_OVERLAY",
-		"description":"HEVLIB_CONFIG_SHOW_RINGMAP_OVERLAY_TOOLTIP",
-		"type":"bool",
-		"default":false
-	},
-	"ring_map_display_mode":{
-		"name":"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE",
-		"description":"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_TOOLTIP",
-		"type":"option",
-		"store_method":"int",
-		"options":["HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_CHAOS","HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_BIAS","HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_RAWDENSITY","HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C1","HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C2","HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C3","HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C4","HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C5","HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_MOST_PREVALENT"],
-		"default":0,
-	},
-	"ring_map_use_heatmap":{
-		"name":"HEVLIB_CONFIG_RINGMAP_HEATMAP",
-		"description":"HEVLIB_CONFIG_RINGMAP_HEATMAP_TOOLTIP",
-		"type":"bool",
-		"default":true
-	},
-	"ring_map_heatmap_clamp":{
-		"name":"HEVLIB_CONFIG_RINGMAP_HEATMAP_CLAMP",
-		"description":"HEVLIB_CONFIG_RINGMAP_HEATMAP_CLAMP_TOOLTIP",
-		"type":"bool",
-		"default":false
-	},
-	"ring_map_min_value":{
-		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE",
-		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_TOOLTIP",
-		"type":"float",
-        "style":"slider",
-        "min":0.0,
-        "max":1.0,
-        "step":0.05,
-		"default":0.65,
-	},
-	"ring_map_max_value":{
-		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE",
-		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_TOOLTIP",
-		"type":"float",
-        "style":"slider",
-        "min":0.0,
-        "max":1.0,
-        "step":0.05,
-		"default":1.0,
-	},
-	"ring_map_opacity":{
-		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY",
-		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_TOOLTIP",
-		"type":"float",
-        "style":"slider",
-        "min":0.0,
-        "max":1.0,
-        "step":0.05,
-		"default":0.35,
-	},
-	"ring_map_oob_opacity":{
-		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY",
-		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_TOOLTIP",
-		"type":"float",
-        "style":"slider",
-        "min":0.0,
-        "max":1.0,
-        "step":0.05,
-		"default":0.0,
-	},
-	"clear_leaderboards":{
-		"name":"HEVLIB_CLEAR_LEADERBOARDS",
-		"description":"HEVLIB_CLEAR_LEADERBOARDS_TOOLTIP",
-		"type":"action",
-		"script_path":"res://HevLib/achievements/OpenClearLeaderboards.gd",
-		"method":"_open",
-		"button_label":"HEVLIB_OPEN_MENU",
-	},
-	"full_logging":{
-		"name":"HEVLIB_CONFIG_FULL_LOGGING",
-		"description":"HEVLIB_CONFIG_FULL_LOGGING_TOOLTIP",
-		"type":"bool",
-		"default":false
-	},
-	"pointer_logging_frame_interval":{
-		"name":"HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL",
-		"description":"HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL_TOOLTIP",
-		"type":"int",
-        "style":"slider",
-        "min":1,
-        "max":60,
-        "step":1,
-		"default":2,
-	},
-	"always_send_new_mods":{
-		"name":"HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS",
-		"description":"HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS_TOOLTIP",
-		"type":"bool",
-		"default":false
-	},
-	"input_debugger":{
-		"name":"HEVLIB_CONFIG_INPUT_DEBUGGER",
-		"description":"HEVLIB_CONFIG_INPUT_DEBUGGER_TOOLTIP",
-		"type":"bool",
-		"default":false
-	},
-	"input_event_debugger":{
-		"name":"HEVLIB_CONFIG_EVENT_DEBUGGER",
-		"description":"HEVLIB_CONFIG_EVENT_DEBUGGER_TOOLTIP",
-		"type":"bool",
-		"default":false
-	},
-	"ring_position_data_debugger":{
-		"name":"HEVLIB_CONFIG_POSITION_DATA_DEBUGGER",
-		"description":"HEVLIB_CONFIG_POSITION_DATA_DEBUGGER_TOOLTIP",
-		"type":"bool",
-		"default":false
-	},
-	"ring_position_accurate_events":{
-		"name":"HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS",
-		"description":"HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS_TOOLTIP",
-		"type":"bool",
-		"default":false
-	},
-}
-HEVLIB_CONFIG_SECTION_INPUT={
-	"hl_open_debug_event_menu":{
-		"name":"HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU",
-		"description":"HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU_TOOLTIP",
-		"activation":"press",
-		"context":"in_game",
-		"allow_empty_bind":false,
-		"allow_extra_keys":true,
-		"order_sensitive":true,
-		"exclusive":false,
-		"deadzone":0.5,
-		"type":"Input",
-		"default":[  ]
-	},
-	"hl_toggle_ring_map_overlay":{
-		"name":"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY",
-		"description":"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_TOOLTIP",
-		"type":"Input",
-		"hint":"",
-		"default":[  ]
-	},
-	"hl_toggle_ring_map_use_heatmap":{
-		"name":"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_HEATMAP",
-		"description":"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_HEATMAP_TOOLTIP",
-		"type":"Input",
-		"hint":"",
-		"default":[  ]
-	},
-	"hl_toggle_ring_map_heatmap_clamp":{
-		"name":"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_HEATMAP_CLAMP",
-		"description":"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_HEATMAP_CLAMP_TOOLTIP",
-		"type":"Input",
-		"hint":"",
-		"default":[  ]
-	},
-	"hl_cycle_ring_map_mode":{
-		"name":"HEVLIB_CONFIG_CYCLE_RINGMAP_OVERLAY_MODE",
-		"description":"HEVLIB_CONFIG_CYCLE_RINGMAP_OVERLAY_MODE_TOOLTIP",
-		"type":"Input",
-		"hint":"",
-		"default":[  ]
-	},
-	"hl_ring_map_overlay_min_value_up":{
-		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_UP",
-		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_UP_TOOLTIP",
-		"type":"Input",
-		"hint":"",
-		"default":[  ]
-	},
-	"hl_ring_map_overlay_min_value_down":{
-		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_DOWN",
-		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_DOWN_TOOLTIP",
-		"type":"Input",
-		"hint":"",
-		"default":[  ]
-	},
-	"hl_ring_map_overlay_max_value_up":{
-		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_UP",
-		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_UP_TOOLTIP",
-		"type":"Input",
-		"hint":"",
-		"default":[  ]
-	},
-	"hl_ring_map_overlay_max_value_down":{
-		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_DOWN",
-		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_DOWN_TOOLTIP",
-		"type":"Input",
-		"hint":"",
-		"default":[  ]
-	},
-	"hl_ring_map_overlay_opacity_up":{
-		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_UP",
-		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_UP_TOOLTIP",
-		"type":"Input",
-		"hint":"",
-		"default":[  ]
-	},
-	"hl_ring_map_overlay_opacity_down":{
-		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_DOWN",
-		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_DOWN_TOOLTIP",
-		"type":"Input",
-		"default":[  ]
-	},
-	"hl_ring_map_overlay_oob_opacity_up":{
-		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_UP",
-		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_UP_TOOLTIP",
-		"type":"Input",
-		"hint":"",
-		"default":[  ]
-	},
-	"hl_ring_map_overlay_oob_opacity_down":{
-		"name":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_DOWN",
-		"description":"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_DOWN_TOOLTIP",
-		"type":"Input",
-		"default":[  ]
-	},
-	"debugger":{
-		"name":"HEVLIB_CONFIG_OPEN_DEBUGGER",
-		"description":"HEVLIB_CONFIG_OPEN_DEBUGGER_TOOLTIP",
-		"type":"Input",
-		"always_binds":[ "QuoteLeft" ],
-		"default":[ "F10" ]
-	},
-	"hl_toggle_debug_menus":{
-		"name":"HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS",
-		"description":"HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS_TOOLTIP",
-		"type":"Input",
-		"hint":"",
-		"default":[ "F9" ]
-	},
-	"hl_ui_scroll_left":{
-		"name":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT",
-		"description":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT_TOOLTIP",
-		"type":"Input",
-		"hint":"",
-		"default":[ "JoyAxis -0" ]
-	},
-	"hl_ui_scroll_right":{
-		"name":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT",
-		"description":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT_TOOLTIP",
-		"type":"Input",
-		"hint":"",
-		"default":[ "JoyAxis 0" ]
-	},
-	"hl_ui_scroll_left2":{
-		"name":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2",
-		"description":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2_TOOLTIP",
-		"type":"Input",
-		"hint":"",
-		"default":[ "JoyAxis -2" ]
-	},
-	"hl_ui_scroll_right2":{
-		"name":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2",
-		"description":"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2_TOOLTIP",
-		"type":"Input",
-		"hint":"",
-		"default":[ "JoyAxis 2" ]
-	},
-}
 
 [manifest_definitions]
 

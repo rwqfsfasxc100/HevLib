@@ -1055,11 +1055,11 @@ class _ConfigDriver:
 				if missing_requirements:
 					mod_concat += "    Missing requirements:"
 					for i in missing_requirements:
-						mod_concat += "        %s\n" % i
+						mod_concat += "     -> %s\n" % i
 				if incompatible_mods:
 					mod_concat += "    Incompatible mods:\n"
 					for i in incompatible_mods:
-						mod_concat += "        %s\n" % i
+						mod_concat += "     -> %s\n" % i
 			pointers.NodeAccess.__exit(false,mod_error_text % mod_concat,"pointers.ConfigDriver",0.0,"",true)
 		pointers.l("config contains [%s] mods" % configs.size(),"pointers.ConfigDriver")
 		for mod in configs:

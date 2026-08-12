@@ -269,8 +269,9 @@ func _pressed():
 		information_nodes["dependancies_button"].visible = true
 		var cd = ""
 		for i in dependancy_data[id]:
-			var mname = pointers.ManifestV2.__get_mod_by_id(i)["name"]
-			cd = cd + "\n" + mname
+			var mname = get_mod_data(i)
+			if mname:
+				cd = cd + "\n\t" + mname
 		information_nodes["dependancies_button"].hint_tooltip = translateIfCan("HEVLIB_ICON_TOOLTIP_DEPENDANCIES") % cd
 		has_dep = true
 	else:
@@ -280,8 +281,18 @@ func _pressed():
 		information_nodes["conflict_button"].visible = true
 		var cd = ""
 		for i in conflict_data[id]:
-			var mname = pointers.ManifestV2.__get_mod_by_id(i)["name"]
-			cd = cd + "\n" + mname
+			var mod_id = ""
+			match typeof(i):
+				TYPE_STRING:
+					mod_id = i
+				TYPE_ARRAY:
+					if i:
+						mod_id = str(i[0])
+				TYPE_DICTIONARY:
+					mod_id = str(i.get("mod_id",""))
+			if mod_id:
+				var mname = get_mod_data(i)
+				cd = cd + "\n" + mname
 		information_nodes["conflict_button"].hint_tooltip = translateIfCan("HEVLIB_ICON_TOOLTIP_CONFLICT") % cd
 		has_conf = true
 	else:
@@ -294,9 +305,110 @@ func _pressed():
 	
 	
 	focus_button_neighbours(true)
-	
-	
-	
+
+func get_mod_data(data):
+	var mname:String = ""
+	match typeof(data):
+		TYPE_STRING:
+			if data:
+				mname = data
+		TYPE_ARRAY:
+			var names = ""
+			for r in data:
+				match typeof(r):
+					TYPE_STRING:
+						if r:
+							if names:
+								names += " OR %s" % r
+							else:
+								names = r
+					TYPE_DICTIONARY:
+						var rn = r.get("mod_id","")
+						var minVer = null
+						var maxVer = null
+						if ("minimum_version" in r or "min_version" in r):
+							var minimum = r.get("minimum_version",r.get("min_version",null))
+							match typeof(minimum):
+								TYPE_ARRAY,TYPE_INT_ARRAY:
+									if minimum.size() > 2:
+										minVer = minimum
+								TYPE_DICTIONARY:
+									var minarr = Vector3.ZERO
+									minarr[0] = int(minimum.get("major",0))
+									minarr[1] = int(minimum.get("minor",0))
+									minarr[2] = int(minimum.get("bugfix",0))
+									minVer = minarr
+						if ("maximum_version" in r or "max_version" in r):
+							var minimum = r.get("maximum_version",r.get("max_version",null))
+							match typeof(minimum):
+								TYPE_ARRAY,TYPE_INT_ARRAY:
+									if minimum.size() > 2:
+										maxVer = minimum
+								TYPE_DICTIONARY:
+									var minarr = Vector3.ZERO
+									minarr[0] = int(minimum.get("major",0))
+									minarr[1] = int(minimum.get("minor",0))
+									minarr[2] = int(minimum.get("bugfix",0))
+									maxVer = minarr
+						var additional = ""
+						if minVer != null:
+							additional = "min ver %d.%d.%d" % [minVer[0],minVer[1],minVer[2]]
+						if maxVer:
+							if additional:
+								additional += " through "
+							additional += "max ver %d.%d.%d" % [maxVer[0],maxVer[1],maxVer[2]]
+						if additional:
+							rn += " (%s)" % additional
+						if rn:
+							if names:
+								names += " OR %s" % rn
+							else:
+								names = rn
+			mname = names
+		TYPE_DICTIONARY:
+			var rn = data.get("mod_id","")
+			var minVer = null
+			var maxVer = null
+			if ("minimum_version" in data or "min_version" in data):
+				var minimum = data.get("minimum_version",data.get("min_version",null))
+				match typeof(minimum):
+					TYPE_ARRAY,TYPE_INT_ARRAY:
+						if minimum.size() > 2:
+							minVer = minimum
+					TYPE_VECTOR3:
+						minVer = minimum
+					TYPE_DICTIONARY:
+						var minarr = Vector3.ZERO
+						minarr[0] = int(minimum.get("major",0))
+						minarr[1] = int(minimum.get("minor",0))
+						minarr[2] = int(minimum.get("bugfix",0))
+						minVer = minarr
+			if ("maximum_version" in data or "max_version" in data):
+				var minimum = data.get("maximum_version",data.get("max_version",null))
+				match typeof(minimum):
+					TYPE_ARRAY,TYPE_INT_ARRAY:
+						if minimum.size() > 2:
+							maxVer = minimum
+					TYPE_VECTOR3:
+						maxVer = minimum
+					TYPE_DICTIONARY:
+						var minarr = Vector3.ZERO
+						minarr[0] = int(minimum.get("major",0))
+						minarr[1] = int(minimum.get("minor",0))
+						minarr[2] = int(minimum.get("bugfix",0))
+						maxVer = minarr
+			var additional = ""
+			if minVer != null:
+				additional = "min ver %d.%d.%d" % [minVer[0],minVer[1],minVer[2]]
+			if maxVer:
+				if additional:
+					additional += " through "
+				additional += "max ver %d.%d.%d" % [maxVer[0],maxVer[1],maxVer[2]]
+			if additional:
+				rn += " (%s)" % additional
+			if rn:
+				mname = rn
+	return mname
 
 var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
 var dependancies_store = "user://cache/.Mod_Menu_2_Cache/dependancies/dependancies.json"
@@ -382,7 +494,7 @@ func _draw():
 		icon_conflicts.visible = true
 		var cd = ""
 		for i in conf[ID]:
-			var mname = pointers.ManifestV2.__get_mod_by_id(i)["name"]
+			var mname = get_mod_data(i)
 			cd = cd + "\n" + mname
 		icon_conflicts.hint_tooltip = translateIfCan("HEVLIB_ICON_TOOLTIP_CONFLICT") % cd
 	else:
@@ -391,7 +503,7 @@ func _draw():
 		icon_dependancies.visible = true
 		var cd = ""
 		for i in dep[ID]:
-			var mname = pointers.ManifestV2.__get_mod_by_id(i)["name"]
+			var mname = get_mod_data(i)
 			cd = cd + "\n" + mname
 		icon_dependancies.hint_tooltip = translateIfCan("HEVLIB_ICON_TOOLTIP_DEPENDANCIES") % cd
 	else:
@@ -531,6 +643,9 @@ func _refocus():
 	var parent = get_parent()
 	var parent_count = parent.get_child_count()-1
 	focus_button_neighbours(false)
+	yield(CurrentGame.get_tree(),"idle_frame")
+	if is_visible_in_tree():
+		update()
 
 func focus_button_neighbours(on_press : bool):
 	var mb = button.get_path_to(button)
