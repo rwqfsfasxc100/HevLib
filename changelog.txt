@@ -24,7 +24,7 @@
 3=* Added `__get_minmax_string_from_dict` to the `ConfigDriver` class
 3.1=* Creates a string displaying the mod ID, as well as provided version data.
 3.2=* Uses the same formatting as the Dictionary input type for `__mod_exists`
-3.3=* If using the `mod_main` check, instead uses the zip filename instead of using the mod's top folder for the modname.
+3.3=* If using the `mod_main` check, instead uses the zip filename instead of using the mod's top folder for the modname if possible.
 4=* Fixed update menu focusing
 5=* Vanilla script extensions running code onready now perform checks to make sure they're not double-initialized
 6=* Float-type configs now no longer are subject to floating point precision errors when deciding to display the reset button
