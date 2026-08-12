@@ -531,6 +531,15 @@ class _ConfigDriver:
 						"setting -> (String) the specific setting to check against"
 					]
 				},
+				"__get_minmax_string_from_dict":{
+					"description":"Creates a string for a mod from a dictionary, with possible versions shown if provided",
+					"args":[
+						"requirement -> (Dictionary) containing the mod data. MUST have `mod_id` for the mod ID string, can also have `minimum_version`/`min_version` for the minimum mod version, or `maximum_version`/`max_version` for the maximum mod version"
+					],
+					"return":[
+						"String containing the mod's data"
+					]
+				},
 				"__truncate_mod_id":{
 					"description":"Formats a string as if it were being handled as a config mod/identifier, stripping out all spaces and forward slashes",
 					"args":[
@@ -579,6 +588,7 @@ class _ConfigDriver:
 					"args":[
 						"check_data -> (Variant) the data used to check if the mod exists. See the following lines for acceptable inputs:",
 						" -> (String) mod ID for the mod to check for. Performs no version checking, and will return purely if a mod with the ID exists.",
+						" -> (Array) assumes it contains multiple entries to check. If any one of these entries exist, the entire check passes",
 						" -> (Dictionary) must contain `mod_id` for the mod ID, and can have either minimum_version or min_version represent the minimum version, and  either maximum_version or max_version represent the maximum version.",
 						"    -> min/max version entries can either be an Array/PoolIntArray with 3 indeces for the major, minor, and bugfix versions, a Vector3 with the versions in each respective index, or a dictionary with `major`, `minor`, and `bugfix` keys containing each respective version.",
 					],
@@ -1148,7 +1158,8 @@ class _ConfigDriver:
 		
 	
 	func __get_minmax_string_from_dict(requirement:Dictionary) -> String:
-		var MID = requirement.get("mod_id","")
+		var MID = str(requirement.get("mod_id",""))
+		var MDM = str(requirement.get("mod_main",""))
 		if typeof(MID) == TYPE_STRING and MID:
 			var minVer = null
 			var maxVer = null
@@ -1191,7 +1202,14 @@ class _ConfigDriver:
 			if additional:
 				mdOut += " (%s)" % additional
 			return mdOut
+		elif typeof(MDM) == TYPE_STRING and MDM and MDM in pointers.ManifestV2.cached_mod_list.get("mods",{}):
+			var zip = pointers.ManifestV2.__match_mod_path_to_zip(MDM)
+			if zip:
+				return zip.get_file()
+			else:
+				return MDM.split("/",false)[1]
 		return ""
+	
 	func __load_inputs_from_string_array(key:String, strings: Array):
 		for i in strings:
 			if i.begins_with("Mouse "):
@@ -1502,67 +1520,74 @@ class _ConfigDriver:
 			TYPE_STRING:
 				if check_data in current_mod_ids:
 					has = true
+				elif check_data in pointers.ManifestV2.cached_mod_list.get("mods",{}):
+					has = true
 			TYPE_ARRAY:
 				if check_data:
 					for i in check_data:
 						if __mod_exists(i):
 							has = true
+							break
 			TYPE_DICTIONARY:
 				var MID = str(check_data.get("mod_id",""))
-				var moddata = pointers.ManifestV2.__get_mod_by_id(MID)
-				if check_data and MID and moddata:
-					var t1 = true
-					var ver_info = moddata["version_data"]["full_version_array"]
-					if ("minimum_version" in check_data or "min_version" in check_data):
-						var minimum = check_data.get("minimum_version",check_data.get("min_version",[0,0,0]))
-						var mnm = null
-						match typeof(minimum):
-							TYPE_ARRAY,TYPE_INT_ARRAY:
-								if minimum.size() > 2:
+				var MDM = str(check_data.get("mod_main",""))
+				if check_data and MID:
+					var moddata = pointers.ManifestV2.__get_mod_by_id(MID)
+					if moddata:
+						var t1 = true
+						var ver_info = moddata["version_data"]["full_version_array"]
+						if ("minimum_version" in check_data or "min_version" in check_data):
+							var minimum = check_data.get("minimum_version",check_data.get("min_version",[0,0,0]))
+							var mnm = null
+							match typeof(minimum):
+								TYPE_ARRAY,TYPE_INT_ARRAY:
+									if minimum.size() > 2:
+										mnm = minimum
+								TYPE_VECTOR3:
 									mnm = minimum
-							TYPE_VECTOR3:
-								mnm = minimum
-							TYPE_DICTIONARY:
-								var minarr = Vector3.ZERO
-								minarr[0] = int(minimum.get("major",0))
-								minarr[1] = int(minimum.get("minor",0))
-								minarr[2] = int(minimum.get("bugfix",0))
-								mnm = minarr
-						if mnm != null:
-							for i in range(3):
-								if t1:
-									var a = int(ver_info[i])
-									var b = int(mnm[i])
-									if a < b:
-										t1 = false
-									elif a > b:
-										break
-					if t1 and ("maximum_version" in check_data or "max_version" in check_data):
-						var minimum = check_data.get("maximum_version",check_data.get("max_version",[0,0,0]))
-						var mnm = null
-						match typeof(minimum):
-							TYPE_ARRAY,TYPE_INT_ARRAY:
-								if minimum.size() > 2:
+								TYPE_DICTIONARY:
+									var minarr = Vector3.ZERO
+									minarr[0] = int(minimum.get("major",0))
+									minarr[1] = int(minimum.get("minor",0))
+									minarr[2] = int(minimum.get("bugfix",0))
+									mnm = minarr
+							if mnm != null:
+								for i in range(3):
+									if t1:
+										var a = int(ver_info[i])
+										var b = int(mnm[i])
+										if a < b:
+											t1 = false
+										elif a > b:
+											break
+						if t1 and ("maximum_version" in check_data or "max_version" in check_data):
+							var minimum = check_data.get("maximum_version",check_data.get("max_version",[0,0,0]))
+							var mnm = null
+							match typeof(minimum):
+								TYPE_ARRAY,TYPE_INT_ARRAY:
+									if minimum.size() > 2:
+										mnm = minimum
+								TYPE_VECTOR3:
 									mnm = minimum
-							TYPE_VECTOR3:
-								mnm = minimum
-							TYPE_DICTIONARY:
-								var minarr = Vector3.ZERO
-								minarr[0] = int(minimum.get("major",0))
-								minarr[1] = int(minimum.get("minor",0))
-								minarr[2] = int(minimum.get("bugfix",0))
-								mnm = minarr
-						if mnm != null:
-							for i in range(3):
-								if t1:
-									var a = int(ver_info[i])
-									var b = int(mnm[i])
-									if a > b:
-										t1 = false
-									elif a < b:
-										break
-								
-					has = t1
+								TYPE_DICTIONARY:
+									var minarr = Vector3.ZERO
+									minarr[0] = int(minimum.get("major",0))
+									minarr[1] = int(minimum.get("minor",0))
+									minarr[2] = int(minimum.get("bugfix",0))
+									mnm = minarr
+							if mnm != null:
+								for i in range(3):
+									if t1:
+										var a = int(ver_info[i])
+										var b = int(mnm[i])
+										if a > b:
+											t1 = false
+										elif a < b:
+											break
+									
+						has = t1
+				elif typeof(MDM) == TYPE_STRING and MDM and MDM in pointers.ManifestV2.cached_mod_list.get("mods",{}):
+					has = true
 		return has
 	
 	func __config_parse(file_path: String) -> Dictionary:

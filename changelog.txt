@@ -1,3 +1,35 @@
+[1.15.35]
+
+1=* Improved mod validation both in manifests and cases involving `__validate_dictionary`
+1.1=* Manifests can now use array of arrays to allow multiple mods to satisfy the same requirement/conflict
+1.2=* Added support for dictionaries to have more control. More data is provided in the `__mod_exists` entry.
+1.3=* Now can check for modmain paths if desired.
+1.4=* Fixed displaying of conflicts/requirements in the mod menu
+1.5=* Updated methods used to fetch conflicts/requirements
+1.6=* Removed ability to use arrays for mod version checks added in 1.15.33, as these broke certain version check semantics
+2=* Improved dictionary validation by adding `__mod_exists` to the `ConfigDriver` class
+2.1=* Accepts input data regarding a mod's ID and potential version checks.
+2.2=* If using a string for input, checks it against the current mod ID list
+2.3=* If using an array, assumes it contains several mods of either 3 variable types, with any being able to satisfy the check if they exist
+2.4=* If using a dictionary, must have the following parameters to perform a check:
+2.4.1=* `mod_id` -> (String) used for the mod ID. Must exist to perform the check.
+2.4.2=* `mod_main` -> (String) used to check against a mod main script if the mod being checked does not have a manifest ID. No version checks happen with this, and it can be unreliable due to assumptions with the filepath.
+2.4.3=* `minimum_version` OR `min_version` (optional) -> Stores information regarding the minimum version that can exist for this mod ID, based on the following types:
+2.4.3.1=* Array/PoolIntArray -> Uses the first three indeces for the major, minor, and bugfix version numbers respectively. Must have a size of at least 3 to perfomr the check.
+2.4.3.2=* Vector3 -> Stores the version numbers inside a 3-point vector. DOES NOT WORK in manifests with the `dependancy_mod_ids` or `conflicting_mod_ids` arrays.
+2.4.3.3=* Dictionary -> Stores the major, minor, and bugfix values inside `major`, `minor`, and `bugfix` keys respectively. Missing values are substituted with zero.
+2.4.4=* `maximum_version` OR `max_version` (optional) -> Stores information regarding the maximum version that can exist for this mod ID. Uses the same criteria as minimum version handling.
+2.4.5=* `blocking` (optional) -> (bool) used purely for manifest checks to ensure that certain mod checks must be met. If true, this specific entry must be valid (either exists with the correct version for `dependancy_mod_ids`, or does not exist at all within the bounds set for versions for `conflicting_mod_ids`) or else the user will be prompted with a popup explaining the conflict/missing requirement and the game will be closed.
+2.5=* Returns a boolean for whether the mod exists based on provided criteria.
+3=* Added `__get_minmax_string_from_dict` to the `ConfigDriver` class
+3.1=* Creates a string displaying the mod ID, as well as provided version data.
+3.2=* Uses the same formatting as the Dictionary input type for `__mod_exists`
+3.3=* If using the `mod_main` check, instead uses the zip filename instead of using the mod's top folder for the modname.
+4=* Fixed update menu focusing
+5=* Vanilla script extensions running code onready now perform checks to make sure they're not double-initialized
+6=* Float-type configs now no longer are subject to floating point precision errors when deciding to display the reset button
+7=* ModMenu2 now no longer requests updates if the mod has a higher major or minor version number compared to what is in the UpdateDB
+
 [1.15.34]
 
 1=* Fixed equipment validation checks
