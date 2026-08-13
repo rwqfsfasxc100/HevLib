@@ -89,7 +89,9 @@ func _ready():
 	foolish.hint_tooltip = ""
 	index = get_index()
 	yield(get_tree(),"idle_frame")
-	checkSave(true)
+	force = true
+	checkSave()
+	force = false
 
 func _physics_process(delta):
 	if is_visible_in_tree():
@@ -103,7 +105,8 @@ var standHash:int = 0
 var has_save:bool = false
 
 var file:File = File.new()
-func checkSave(force = false):
+var force = false
+func checkSave():
 	var does:bool = false
 	if file.file_exists(saveSlotFile):
 		has_save = true
