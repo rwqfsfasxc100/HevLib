@@ -152,8 +152,6 @@ func _ready():
 			replaceScene("ui/mod_menu/editor_titlescreen/TitleScreen.tscn","res://TitleScreen.tscn")
 		replaceScene("scenes/better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
 		
-#		initiate_mod_update_fetch()
-#		network_send()
 		
 		
 		var conflicts = pointers.ManifestV2.__check_conflicts()
@@ -175,7 +173,6 @@ func _ready():
 		replaceScene("scenes/scene_replacements/Game.tscn", "res://Game.tscn")
 		var dir = Directory.new()
 		dir.make_dir_recursive("user://cache/.HevLib_Cache/")
-		var file = File.new()
 		
 		# Fix this later and update the HevLib class once documentation is finished.
 #		file.open("user://cache/.HevLib_Cache/library_documentation.json", File.WRITE)
@@ -183,15 +180,12 @@ func _ready():
 #		file.store_string(functionality)
 #		file.close()
 		
-		var cache_folder = "user://cache/.HevLib_Cache/Equipment_Driver/"
 		replaceScene("scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
-#		var CRoot = get_tree().get_root()
 		
 		installScriptExtension("scenes/research/overhead_handle/Enceladus.gd")
 		installScriptExtension("scenes/research/overhead_handle/AsteroidSpawner.gd")
 		var nNode = load("res://HevLib/scenes/research/overhead_handle/ResearchOverheadHandle.tscn").instance()
 		CRoot.call_deferred("add_child",nNode)
-		var scene = load("res://HevLib/scenes/better_title_screen/TitleScreen.tscn")
 		
 		pointers.ManifestV2.__get_mod_versions(true)
 		var ncrew = pointers.ManifestV2.__get_manifest_entry("tags","TAG_HANDLE_EXTRA_CREW")
@@ -200,29 +194,16 @@ func _ready():
 			var data = ncrew[mod]
 			if data > count:
 				count = data
-		var crew = pointers.NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",count)
+		pointers.NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",count)
 		
 		if enable_research:
 			replaceScene("scenes/research/Enceladus.tscn","res://enceladus/Enceladus.tscn")
 		
-		
-#		var gameFiles = pointers.FolderAccess.__get_folder_structure("res://",false)
-#		file.open("user://cache/.HevLib_Cache/filesys.json",File.WRITE)
-#		if gameFiles.size() == 0:
 		if OS.has_feature("editor") and not file.file_exists("res://VersionLabel.tscn"):
 			printerr("FAILED TO FETCH FILE SYSTEM")
 			l("ERROR! FAILED TO FETCH FILE SYSTEM")
-#		var sys = JSON.print(gameFiles,"\t")
-#		file.store_string(sys)
-#		file.close()
-#
-		
-#		var PointerNode = ResourceLoader.load("res://HevLib/pointers.gd","",true).new()
-#		var PointerNode = Node.new()
-#		PointerNode.set_script(load("res://HevLib/pointers.gd").new())
-#		PointerNode.name = "HevLib~Pointers"
 		CRoot.call_deferred("add_child",pointers)
-
+		
 #		var console = ResourceLoader.load("res://HevLib/logging/Console.tscn").instance()
 #		CRoot.call_deferred("add_child",console)
 #		pointers.free()
@@ -260,28 +241,6 @@ func l(msg:String, title:String = MOD_NAME, version:String = str(MOD_VERSION_MAJ
 	var line = "%s V%s" % [title, version]
 	pointers.l(msg,line)
 
-
-func network_send():
-	var md = pointers.ManifestV2.__get_mod_data()["mods"]
-	for item in md:
-		var data = md[item]["manifest"]
-		if data["has_manifest"]:
-			var url = data["manifest_data"]["manifest_definitions"]["manifest_url"]
-			if url != "":
-				var http = HTTPRequest.new()
-				var pm = md[item]
-				file.open(url_store,File.READ_WRITE)
-				var current = JSON.parse(file.get_as_text()).result
-				current.append([pm["name"],pm["manifest"]["manifest_data"]["mod_information"]["id"],pm["version_data"]["version_major"],pm["version_data"]["version_minor"],pm["version_data"]["version_bugfix"]])
-				file.store_string(JSON.print(current))
-				file.close()
-				var mh = str(hash(item))
-				http.name = mh
-				http.connect("request_completed",self,"network_return",[mh])
-				add_child(http)
-				http.timeout = 20
-				http.request(url)
-				update_urls.append(pm["manifest"]["manifest_data"]["mod_information"]["id"])
 
 func network_return(result, response_code,headers,body,mh):
 	if result == 0 and response_code == 200:
