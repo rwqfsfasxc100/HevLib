@@ -51,12 +51,10 @@ export (int) var special_price = 0
 # If set, only permits the conversation path if the current crew has a specific occupation
 export (String) var requires_occupation = ""
 
-var pointers = ModLoader._savedObjects[0]
-
 func execute():
 	.execute()
 	if spawnEvent and spawnEvent != "":
-		pointers.Events.__spawn_event(spawnEvent,get_tree().get_root().get_node_or_null("Game/TheRing"))
+		ModLoader._savedObjects[0].Events.__spawn_event(spawnEvent,get_tree().get_root().get_node_or_null("Game/TheRing"))
 	
 	if special_name and "specialName" in origin:
 		origin.specialName = special_name
@@ -68,7 +66,7 @@ func execute():
 func canBeUsed(by) -> bool:
 	var how = .canBeUsed(by)
 	if how and config_ID and config_section and config_setting:
-		var cfg_opt = pointers.ConfigDriver.__get_value(config_ID,config_section,config_setting)
+		var cfg_opt = ModLoader._savedObjects[0].ConfigDriver.__get_value(config_ID,config_section,config_setting)
 		if cfg_opt != null:
 			if invert_config_logic:
 				if cfg_opt:
