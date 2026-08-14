@@ -51,10 +51,14 @@ export (int) var special_price = 0
 # If set, only permits the conversation path if the current crew has a specific occupation
 export (String) var requires_occupation = ""
 
+var pointers
+
 func execute():
 	.execute()
 	if spawnEvent and spawnEvent != "":
-		ModLoader._savedObjects[0].Events.__spawn_event(spawnEvent,get_tree().get_root().get_node_or_null("Game/TheRing"))
+		if not pointers:
+			pointers = ModLoader._savedObjects[0]
+		pointers.Events.__spawn_event(spawnEvent,get_tree().get_root().get_node_or_null("Game/TheRing"))
 	
 	if special_name and "specialName" in origin:
 		origin.specialName = special_name
@@ -66,7 +70,9 @@ func execute():
 func canBeUsed(by) -> bool:
 	var how = .canBeUsed(by)
 	if how and config_ID and config_section and config_setting:
-		var cfg_opt = ModLoader._savedObjects[0].ConfigDriver.__get_value(config_ID,config_section,config_setting)
+		if not pointers:
+			pointers = ModLoader._savedObjects[0]
+		var cfg_opt = pointers.ConfigDriver.__get_value(config_ID,config_section,config_setting)
 		if cfg_opt != null:
 			if invert_config_logic:
 				if cfg_opt:
@@ -77,7 +83,8 @@ func canBeUsed(by) -> bool:
 	return how 
 
 func specificTest(ship) -> bool:
-	if requires_occupation and requires_occupation != "":
+	var orig = .specificTest(ship)
+	if orig and requires_occupation and requires_occupation != "":
 		var member = getAgendaMember()
 		if member == null:
 			Debug.l("** Requires occupation %s, none on ship" % [requires_occupation])
@@ -86,8 +93,6 @@ func specificTest(ship) -> bool:
 		if mo != requires_occupation:
 			Debug.l("** Needs occupation %s, has %s" % [requires_occupation,mo])
 			return false
-	
-	
-	return .specificTest(ship)
+	return orig
 
 
