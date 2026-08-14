@@ -58,6 +58,11 @@ func _init(modLoader : ModLoader = ModLoader):
 		pointers.name = "HevLib~Pointers"
 		if modLoader._savedObjects:
 			var new_objects = [pointers]
+			var firstItemCheck = modLoader._savedObjects[0]
+			if firstItemCheck is Resource:
+				var RP = firstItemCheck.resource_path
+				if RP == "res://HevLib/pointers.gd" or RP == pointerDir:
+					OS.alert("HevLib is double-loaded. Please remove any extra zip files and restart the game.")
 			for i in modLoader._savedObjects:
 				new_objects.append(i)
 			modLoader._savedObjects = new_objects
