@@ -31,7 +31,9 @@
 extends "res://comms/ConversationPlayer.gd"
 
 # Used to spawn an event when the conversation is run
-export (String) var spawnEvent = ""
+export (String) var spawn_event = ""
+export (String) var spawnEvent = "" # Depreciated, removed once abandoned tech updates
+export (float,0.0,1000.0) var event_delay = 0.0
 
 # Used to check against a config for any succeeding option
 # Config must be valid (i.e. not returns null when checked), 
@@ -55,10 +57,14 @@ var pointers
 
 func execute():
 	.execute()
-	if spawnEvent and spawnEvent != "":
+	if spawn_event and spawn_event != "":
 		if not pointers:
 			pointers = ModLoader._savedObjects[0]
-		pointers.Events.__spawn_event(spawnEvent,get_tree().get_root().get_node_or_null("Game/TheRing"))
+		pointers.Events.__spawn_event(spawn_event,get_tree().get_root().get_node_or_null("Game/TheRing"),{},event_delay)
+	elif spawnEvent and spawnEvent != "":
+		if not pointers:
+			pointers = ModLoader._savedObjects[0]
+		pointers.Events.__spawn_event(spawnEvent,get_tree().get_root().get_node_or_null("Game/TheRing"),{},event_delay)
 	
 	if special_name and "specialName" in origin:
 		origin.specialName = special_name

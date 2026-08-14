@@ -30,6 +30,7 @@
 extends VBoxContainer
 
 var pointers = ModLoader._savedObjects[0]
+var file:File = File.new()
 
 func _tree_entered():
 	var sTime = OS.get_system_time_msecs()

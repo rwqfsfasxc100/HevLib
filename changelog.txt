@@ -1,3 +1,19 @@
+[1.15.36]
+
+1=* EventDriver methods are now completely self-contained within the pointers node
+1.1=* Removed old scripts that used to handle this as they are now no longer needed
+2=* Added `delay_seconds` to both `__spawn_event` and `__clear_event` in the `Events` class
+2.1=* Sets a delay in seconds before the desired event is spawned or cleared.
+3=* Added `pointers`.`n` - acting similarly to the Debug.n method with additional logging to the library logs
+4=* Improved the handling of the extended conversation player script
+4.1=* Added `event_delay` float, letting you define a delay before the defined event spawns
+4.2=* Changed `spawnEvent` to `spawn_event`. The original name will be removed soon.
+5=* `ConfigDriver`.`__validate_dictionary` now accepts an array of dictionaries
+5.1=* This lets you define multiple bool configs that must be validated for the entire dictionary to pass, including inverted bools
+5.2=* Now requires that the config is of dictionary type to prevent issues with malformatted dictionaries
+6=* Added check to prevent issues caused by multiple HevLib zips existing in the mod directory
+7=* Changed title screen code to prevent crashes caused by other mods attempting to extend the `res://SaveSlotButton.gd` script
+
 [1.15.35]
 
 1=* Improved mod validation both in manifests and cases involving `__validate_dictionary`
