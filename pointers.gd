@@ -123,6 +123,13 @@ func l(msg:String, title:String = ""):
 		logCache = PoolStringArray()
 	logCache.append("[%s]: %s" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg])
 
+# Notetaking function used to mark an important event in the game's performance logs
+func n(msg:String, title:String = ""):
+	Debug.n(("[%s]: %s" % [title, msg]) if title else msg)
+	if logCache == null:
+		logCache = PoolStringArray()
+	logCache.append("[%s]: %s" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg])
+
 var deviceinfostore:String = "user://cache/.HevLib_Cache/logs/"
 var deviceinfocache:String = deviceinfostore + "pointer_logs_%d.txt"
 
@@ -4818,8 +4825,7 @@ class _Equipment:
 
 class _Events:
 	var scripts : Array = [
-		load("res://HevLib/events/event_handler.gd"),
-		load("res://HevLib/events/clear_event.gd"),
+		
 	]
 	
 	func get_class_documentation():
@@ -4830,8 +4836,8 @@ class _Events:
 					"description":"Spawns an event in the rings",
 					"args":[
 						"event -> (String) the event name to be spawned",
-						"thering -> TheRing node. Must be present to work.",
-						"parameters -> (Dictionary) Any parameters used for spawning events. Defaults to `{}`. Currently supports:",
+						"ring -> TheRing node. Must be present to work.",
+						"parameters (optional) -> (Dictionary) Any parameters used for spawning events. Defaults to `{}`. Currently supports:",
 						"	legacy -> (bool) whether it should use a very old hacky method of hijacking the testSpecificStoryElement property to spawn the event. Has to wait at least 0.1 seconds inbetween spawns. Defaults to `false`",
 						"	inject -> (bool) whether the event should be placed directly in the ring, bypassing any event handling methods. Has issues with POI-based events. Defaults to `false`",
 #						"	x_direction -> (float) horizontal direction which the event will be spawned in. Will be clamped if it exceeds -1 or 1. Defaults to a random range between -1 and 1.",
@@ -4840,6 +4846,7 @@ class _Events:
 #						"	oddity_spawn_radius_min -> (int) minimum distance the event will spawn under normal conditions. NOTE: 1 unit represents 100 cm. Defaults to 24000",
 #						"	oddity_spawn_radius_min_cutscene -> (int) minimum distance the event will spawn while in a cutscene (which only happens during astrogation in the vanilla game to make POI events close to the ship when travelling). NOTE: 1 unit represents 100 cm. Defaults to 6000",
 #						"	oddity_spawn_radius_max -> (int) maximum distance the event is allowed to spawn at under normal conditions",
+						"delay_seconds (optional) -> (float) if set above zero, the number of seconds before the event is spawned",
 					],
 				},
 				"__clear_event":{
@@ -4858,13 +4865,133 @@ class _Events:
 	func _init(p):
 		pointers = p
 	
-	func __spawn_event(event : String, thering, parameters : Dictionary = {}):
-		var f = scripts[0].new()
-		f.spawn_event(event,thering,parameters)
+	var busy = false
+	var focusObject
+	func __spawn_event(event : String,ring : Node,parameters : Dictionary = {},delay_seconds = 0.0):
+		if not busy:
+			if (not ring) or (not ring.has_method("hl_ring_UV")):
+				pointers.l("No ring object specified, returning","pointers.EventDriver")
+				return
+			if delay_seconds > 0.0:
+				pointers.l("Delaying event spawn by %0.1f seconds" % delay_seconds,"pointers.EventDriver")
+				yield(CurrentGame.get_tree().create_timer(delay_seconds),"timeout")
+			if parameters.get("legacy",false):
+				busy = true
+				var counter = ring.oddityCounter
+				ring.oddityCounter = 0x0FFFFFFF
+				ring.testSpecificStoryElement = event
+				yield(ring.get_tree(),"idle_frame")
+				yield(ring.get_tree(),"idle_frame")
+				ring.testSpecificStoryElement = ""
+				ring.oddityCounter = counter
+			elif parameters.get("inject",false):
+				focusObject = CurrentGame.getPlayerShip()
+				if focusObject and focusObject.zone == "rings":
+					var tree = ring.get_tree()
+					var event_node = ring.get_node_or_null(event)
+					if event_node and event_node.has_method("canBeAt") and event_node.has_method("makeAt"):
+						var pos = getPos(parameters)
+						event_node.canBeAt(pos)
+						var oddity = event_node.makeAt(pos)
+						if oddity and ring.has_method("request_event"):
+							ring.request_event(oddity, event)
+							pointers.n("injecting oddity %s" % event,"pointers.EventDriver")
+			else:
+				focusObject = CurrentGame.getPlayerShip()
+				if focusObject and focusObject.zone == "rings":
+					var tree = ring.get_tree()
+					var event_node = ring.get_node_or_null(event)
+					if event_node and event_node.has_method("canBeAt") and event_node.has_method("makeAt"):
+						var pos = getPos(parameters)
+						event_node.canBeAt(pos)
+						var oddity = event_node.makeAt(pos)
+						
+						var randomOddityKey = ""
+						if oddity:
+							ring.addNearbyOddity(event, oddity, pos)
+							if oddity is Array:
+								for o in oddity:
+									o.connect("tree_entered", ring, "forcedOddityConfirmed", [randomOddityKey])
+							else:
+								oddity.connect("tree_entered", ring, "forcedOddityConfirmed", [randomOddityKey])
+							ring.unspawnedOddities[randomOddityKey] = oddity
+							ring.unspawnedOdditiesLocation[randomOddityKey] = pos
+							pointers.n("force spawning oddity %s" % event,"pointers.EventDriver")
+			busy = false
 	
-	func __clear_event(event : String,ring,clear_related_poi : bool = true,clear_in_cargo : bool = false):
-		var f = scripts[1].new()
-		f.clear_event(event,ring,clear_related_poi,clear_in_cargo)
+	func __clear_event(event : String, ring, clear_related_poi : bool = true,clear_in_cargo : bool = false,delay_seconds : float = 0.0):
+		pointers.n("clearing oddities %s" % event,"pointers.EventDriver")
+		if (not ring) or (not ring.has_method("hl_ring_UV")):
+			pointers.l("No ring object specified, returning","pointers.EventDriver")
+			return
+		if delay_seconds > 0.0:
+			pointers.l("Delaying event clear by %0.1f seconds" % delay_seconds,"pointers.EventDriver")
+			yield(CurrentGame.get_tree().create_timer(delay_seconds),"timeout")
+		if event == "" or event == "none":
+			var events = ring.all_oddities
+			for e in events:
+				if Tool.claim(e):
+					if e.is_node_ready() and clear_if_cargo(e,clear_in_cargo):
+						ring.all_oddities.erase(e)
+						Tool.release(e)
+						Tool.remove(e)
+						
+		elif event in ring.group:
+			var events = ring.group[event]
+			if events:
+				for e in events:
+					if Tool.claim(e):
+						if e.is_node_ready() and clear_if_cargo(e,clear_in_cargo):
+							if clear_related_poi:
+								clear_poi_for(e.global_position,event)
+							ring.group[event].erase(e)
+							Tool.release(e)
+							Tool.remove(e)
+	
+	func getPos(params : Dictionary):
+		var x_direction = clamp(params.get("x_direction",rand_range( - 1, 1)),-1,1)
+		var y_direction = clamp(params.get("y_direction",rand_range( - 1, 1)),-1,1)
+		
+		var spawnDirectionScale = params.get("spawn_direction_scale",0.75)
+		var odditySpawnRadiusMin = params.get("oddity_spawn_radius_min",24000)
+		var odditySpawnRadiusMinCutscene = params.get("oddity_spawn_radius_min_cutscene",6000)
+		var odditySpawnRadiusMax = params.get("oddity_spawn_radius_max",38000)
+		var odditySpawnRadiusSafemax = params.get("oddity_spawn_radius_safe_max",80000)
+		var odditySpawnFailures = params.get("oddity_spawn_failures",0)
+		var odditySpawnRadiusSafemaxSteps = params.get("oddity_spawn_radius_safe_max_steps",40)
+		
+		if Tool.claim(focusObject):
+			
+			var cutscene = ("cutscene" in focusObject and focusObject.cutscene) and ("fastTravelDirection" in focusObject and focusObject.fastTravelDirection < 0)
+			var focusPoint = focusObject.global_position
+			var randomVector = Vector2(x_direction,y_direction).normalized()
+			var directionVector = focusObject.linear_velocity.normalized() * spawnDirectionScale
+			var dirvec = (randomVector + directionVector).normalized()
+			if dirvec.length() < 0.9:
+				dirvec = randomVector
+			var failBasedMax = clamp(float(odditySpawnFailures) / float(odditySpawnRadiusSafemaxSteps), 0, 1)
+			var oRangeMax = lerp(odditySpawnRadiusMax, odditySpawnRadiusSafemax, failBasedMax)
+			var oddityFocusOffset = dirvec * rand_range(odditySpawnRadiusMin if not cutscene else odditySpawnRadiusMinCutscene, lerp(odditySpawnRadiusMax, odditySpawnRadiusSafemax, clamp(float(odditySpawnFailures) / float(odditySpawnRadiusSafemaxSteps), 0, 1)))
+			
+			var oddityPoint = focusPoint + oddityFocusOffset
+			Tool.release(focusObject)
+			return CurrentGame.globalCoords(oddityPoint)
+	
+	func clear_if_cargo(object,do):
+		if not do:
+			var focus = CurrentGame.getPlayerShip()
+			if object in focus.cargo:
+				return false
+		return true
+	func clear_poi_for(globalPos : Vector2,this_event: String):
+		var nearby = CurrentGame.getEventNear(CurrentGame.globalCoords(globalPos))
+		while nearby and nearby.event == this_event:
+			var astro = CurrentGame.state.astrogation
+			for event in astro:
+				var ev = astro[event]
+				if ev.event == nearby.event and Vector2(ev.vector.x,ev.vector.y).distance_to(nearby.vector) < 2000:
+					CurrentGame.forgetPoi(event)
+			nearby = CurrentGame.getEventNear(CurrentGame.globalCoords(globalPos))
 	
 
 class _FileAccess:
