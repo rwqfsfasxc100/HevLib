@@ -6283,7 +6283,12 @@ class _ManifestV2:
 					file.open(mod_state_hash_file,File.READ)
 					lastModStateHash = int(file.get_as_text())
 					file.close()
-				currentModStateHash = hash(zip_ref_store)
+				var zrs = {}
+				var zk = zip_ref_store.keys()
+				zk.sort()
+				for i in zk:
+					zrs[i] = zip_ref_store[i]
+				currentModStateHash = hash(zrs)
 				file.open(mod_state_hash_file,File.WRITE)
 				file.store_string(str(currentModStateHash))
 				file.close()
