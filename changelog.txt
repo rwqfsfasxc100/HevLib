@@ -1,3 +1,10 @@
+[1.15.37]
+
+1=* Improved `ADD_SHIPS.gd` processing to permit the addition of new configs to pre-existing ships without nuking the default configuration.
+2=* `ADD_SHIPS.gd` entries without a filepath now no longer create a static derelict event.
+3=* Fixed typo that caused a crash when attempting to create a `vilcy` event type using `EVENT_DRIVER.gd`
+4=* Updated credits
+
 [1.15.36]
 
 1=* EventDriver methods are now completely self-contained within the pointers node

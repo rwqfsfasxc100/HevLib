@@ -14,7 +14,7 @@
 # 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products
 # derived from this software without specific prior written permission.
 # 
-# 4. The source code and the binary form, and any modifications made to them may not be used for the purpose of input data, the training of, or improvment of machine learning algorithms,
+# 4. The source code and the binary form, and any modifications made to them may not be used for the purpose of input data, the training of, or improvement of machine learning algorithms,
 # including but not limited to artificial intelligence, natural language processing, or data mining. This condition applies to any derivatives,
 # modifications, or updates based on the Software code. Any usage of the source code or the binary form in an AI-training dataset is considered a breach of this License.
 # 
@@ -458,7 +458,7 @@ func _ready():
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"vilcy":
 						node.depthMinKm = max(event.get("minimum_depth_in_km",0),0)					# Minimum depth that the event is permitted to spawn at, in kilometers.
-						node.depthMaxKm = max(event.get("maximum_depth_in_km",10000),0)				# Maximum depth that the event is permitted to spawn at, in kilometers.
+						node.depthMaxKm = max(event.get(" ",10000),0)				# Maximum depth that the event is permitted to spawn at, in kilometers.
 						node.vilcyPatroler = max(event.get("vilcy_patroler",0),0)					# Creates a vilcy K37, adding EMD-14s to left and right low-stress hardpoints, 1 GW turbine, and dual ultracapacitors.
 						node.vilcyDisabler = max(event.get("vilcy_disabler",0),0)					# Creates a vilcy K37, adding MWGs to all hardpoints, 1 GW turbine, and dual ultracapacitors.
 						node.vilcyBurner = max(event.get("vilcy_burner",0),0)						# Creates a vilcy K37, adding CL-150s to left and right low-stress hardpoints, 1 GW turbine, and dual ultracapacitors.
@@ -472,7 +472,7 @@ func _ready():
 						node.loneSupport = max(event.get("later_vilcy",0),0)						# For every ship initially spawned by this event, spawns X number of vilcy after the later ship timer has run out.
 						node.time = max(event.get("later_ship_timer",60),0)							# Time from event spawn to the later pirates and vilcy to spawn.
 						node.awayRadius = max(event.get("away_radius",10000),0)						# Radius which a fleeing pirate checks for POI when it tries to spawn the pirate station after 10 minutes have passed.
-						node.reEncouterChance = clamp(1.0 - event.get("stock_chance",0.5),0,1)		# Chance that the vilcy and/or pirates will have a pristine ship.
+						node.reEncounterChance = clamp(1.0 - event.get("stock_chance",0.5),0,1)		# Chance that the vilcy and/or pirates will have a pristine ship.
 						var bounty = event.get("bounty","res://ships/LifepodPirate.tscn")			# If pirates will spawn, the scene used for their lifepods.
 						if pointers.DataFormat.__file_exists(bounty):
 							node.bounty = load(bounty)

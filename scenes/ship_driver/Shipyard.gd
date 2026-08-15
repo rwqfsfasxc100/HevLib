@@ -14,7 +14,7 @@
 # 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products
 # derived from this software without specific prior written permission.
 # 
-# 4. The source code and the binary form, and any modifications made to them may not be used for the purpose of input data, the training of, or improvment of machine learning algorithms,
+# 4. The source code and the binary form, and any modifications made to them may not be used for the purpose of input data, the training of, or improvement of machine learning algorithms,
 # including but not limited to artificial intelligence, natural language processing, or data mining. This condition applies to any derivatives,
 # modifications, or updates based on the Software code. Any usage of the source code or the binary form in an AI-training dataset is considered a breach of this License.
 # 
@@ -77,8 +77,11 @@ func _ready():
 				ships[ship_name] = syPointers.DataFormat.__get_load()
 			if alias != ship_name:
 				configAlias[ship_name] = alias
-			if config:
-				defaultShipConfig[ship_name] = config
+			if config.config:
+				if ship_name in defaultShipConfig:
+					defaultShipConfig[ship_name]["config"].merge(config.config,true)
+				else:
+					defaultShipConfig[ship_name] = config
 			for cfg in usedConfigs:
 				if not ship_name in usedShipConfigs:
 					usedShipConfigs[ship_name] = []
@@ -91,6 +94,7 @@ func _ready():
 		var usedConfigs = []
 		match typeof(alts):
 			TYPE_STRING:
+				var cfgalias = getShipAlias(alts)
 				if alts in defaultShipConfig:
 					var cf = defaultShipConfig[alts]
 					if "config" in cf:
@@ -101,9 +105,20 @@ func _ready():
 				if alts in usedShipConfigs:
 					var cf = usedShipConfigs[alts].duplicate(true)
 					usedConfigs.append_array(cf)
+				if cfgalias in defaultShipConfig:
+					var cf = defaultShipConfig[cfgalias]
+					if "config" in cf:
+						cf = cf["config"].duplicate(true)
+					else:
+						cf = cf.duplicate(true)
+					usedConfigs.append(cf)
+				if cfgalias in usedShipConfigs:
+					var cf = usedShipConfigs[cfgalias].duplicate(true)
+					usedConfigs.append_array(cf)
 				
 			TYPE_ARRAY:
 				for a in alts:
+					var cfgalias = getShipAlias(a)
 					if a in defaultShipConfig:
 						var cf = defaultShipConfig[a]
 						if "config" in cf:
@@ -114,6 +129,16 @@ func _ready():
 					if a in usedShipConfigs:
 						var cf = usedShipConfigs[a].duplicate(true)
 						usedConfigs.append_array(cf)
+					if cfgalias in defaultShipConfig:
+						var cf = defaultShipConfig[cfgalias]
+						if "config" in cf:
+							cf = cf["config"].duplicate(true)
+						else:
+							cf = cf.duplicate(true)
+						usedConfigs.append(cf)
+					if cfgalias in usedShipConfigs:
+						var cf = usedShipConfigs[cfgalias].duplicate(true)
+						usedConfigs.append_array(cf)
 		for cfg in usedConfigs:
 			if not ship_name in usedShipConfigs:
 				usedShipConfigs[ship_name] = []
@@ -121,6 +146,9 @@ func _ready():
 				var nv = cfg["config"].duplicate(true)
 				cfg = nv
 			usedShipConfigs[ship_name].append(cfg)
+			var cfgalias = getShipAlias(ship_name)
+			if cfgalias != ship_name:
+				usedShipConfigs[cfgalias].append(cfg)
 	
 	for ship in configAlias:
 		var baseShip = configAlias[ship]

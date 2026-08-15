@@ -19,7 +19,7 @@
 # 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products
 # derived from this software without specific prior written permission.
 # 
-# 4. The source code and the binary form, and any modifications made to them may not be used for the purpose of input data, the training of, or improvment of machine learning algorithms,
+# 4. The source code and the binary form, and any modifications made to them may not be used for the purpose of input data, the training of, or improvement of machine learning algorithms,
 # including but not limited to artificial intelligence, natural language processing, or data mining. This condition applies to any derivatives,
 # modifications, or updates based on the Software code. Any usage of the source code or the binary form in an AI-training dataset is considered a breach of this License.
 # 
@@ -2524,6 +2524,10 @@ const TRANSLATIONS = {
 		"HEVLIB_CONFIG_SAFE_MOD_LOADING_TOOLTIP": {
 			"string": "Prevents the game from being loaded if a mod overrides vanilla files.\n\nRecommended to keep this enabled to prevent issues with vanilla and/or other mods.",
 			"version_hash": 4199522322
+		},
+		"HEVLIB_CREDITS_SUPPORTERS_KOFI_TESSIER": {
+			"string": "Tessier-Ashpool S.A. - supporter (ko-fi)",
+			"version_hash": 2705946943
 		}
 	},
 	"uk_UA": {

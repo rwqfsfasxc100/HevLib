@@ -14,7 +14,7 @@
 # 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products
 # derived from this software without specific prior written permission.
 # 
-# 4. The source code and the binary form, and any modifications made to them may not be used for the purpose of input data, the training of, or improvment of machine learning algorithms,
+# 4. The source code and the binary form, and any modifications made to them may not be used for the purpose of input data, the training of, or improvement of machine learning algorithms,
 # including but not limited to artificial intelligence, natural language processing, or data mining. This condition applies to any derivatives,
 # modifications, or updates based on the Software code. Any usage of the source code or the binary form in an AI-training dataset is considered a breach of this License.
 # 
@@ -38,7 +38,7 @@ func _ready():
 	var data = pointers.Equipment.add_ships_store
 	var ro = load("res://story/RescueOperation.gd")
 	for ship in data:
-		if "name" in ship:
+		if "name" in ship and ship.name and "path" in ship and ship.path and pointers.DataFormat.__file_exists(ship.path):
 			var derelict_data = ship.get("derelict",{})
 			var model = ship.get("name","TRTL")
 			var dname = ship.get("specific_derelict_name","ModdedDerelict_" + model)

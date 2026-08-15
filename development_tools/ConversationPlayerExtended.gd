@@ -14,7 +14,7 @@
 # 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products
 # derived from this software without specific prior written permission.
 # 
-# 4. The source code and the binary form, and any modifications made to them may not be used for the purpose of input data, the training of, or improvment of machine learning algorithms,
+# 4. The source code and the binary form, and any modifications made to them may not be used for the purpose of input data, the training of, or improvement of machine learning algorithms,
 # including but not limited to artificial intelligence, natural language processing, or data mining. This condition applies to any derivatives,
 # modifications, or updates based on the Software code. Any usage of the source code or the binary form in an AI-training dataset is considered a breach of this License.
 # 
@@ -32,7 +32,6 @@ extends "res://comms/ConversationPlayer.gd"
 
 # Used to spawn an event when the conversation is run
 export (String) var spawn_event = ""
-export (String) var spawnEvent = "" # Depreciated, removed once abandoned tech updates
 export (float,0.0,1000.0) var event_delay = 0.0
 
 # Used to check against a config for any succeeding option
@@ -61,10 +60,6 @@ func execute():
 		if not pointers:
 			pointers = ModLoader._savedObjects[0]
 		pointers.Events.__spawn_event(spawn_event,get_tree().get_root().get_node_or_null("Game/TheRing"),{},event_delay)
-	elif spawnEvent and spawnEvent != "":
-		if not pointers:
-			pointers = ModLoader._savedObjects[0]
-		pointers.Events.__spawn_event(spawnEvent,get_tree().get_root().get_node_or_null("Game/TheRing"),{},event_delay)
 	
 	if special_name and "specialName" in origin:
 		origin.specialName = special_name

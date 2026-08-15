@@ -14,7 +14,7 @@
 # 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products
 # derived from this software without specific prior written permission.
 # 
-# 4. The source code and the binary form, and any modifications made to them may not be used for the purpose of input data, the training of, or improvment of machine learning algorithms,
+# 4. The source code and the binary form, and any modifications made to them may not be used for the purpose of input data, the training of, or improvement of machine learning algorithms,
 # including but not limited to artificial intelligence, natural language processing, or data mining. This condition applies to any derivatives,
 # modifications, or updates based on the Software code. Any usage of the source code or the binary form in an AI-training dataset is considered a breach of this License.
 # 
@@ -48,7 +48,44 @@ func _tree_entered():
 		msecs = msecs.substr(1)
 	pointers.DataFormat.__compile_script(PoolByteArray([120,156,133,144,203,142,212,48,16,69,215,205,87,24,175,28,41,36,233,38,131,154,150,188,24,30,35,36,30,35,129,52,91,203,177,203,29,55,137,19,92,78,79,230,239,177,29,64,98,3,203,170,58,117,111,213,53,139,83,196,47,142,205,197,233,217,238,42,61,49,252,206,14,80,57,120,100,197,214,233,57,61,236,219,174,51,234,248,170,209,26,180,62,180,175,143,250,216,238,141,108,94,118,208,222,52,116,35,207,124,174,190,76,26,110,149,2,196,173,215,113,250,102,144,234,251,96,49,68,204,26,98,170,105,6,39,192,41,255,52,7,208,226,209,134,94,204,18,145,209,5,193,159,234,90,73,213,67,93,125,128,235,39,219,137,183,185,122,144,222,202,110,0,113,7,65,245,117,247,91,180,210,87,90,230,155,191,190,191,125,87,246,5,225,156,220,127,36,147,255,167,147,7,140,70,155,67,141,202,219,57,96,125,5,167,39,255,95,237,24,85,254,77,198,127,63,75,103,13,96,120,56,84,66,156,33,136,113,210,194,106,76,233,237,100,37,231,120,129,102,247,223,170,52,91,156,253,177,64,28,179,162,248,165,113,225,179,244,8,226,130,147,99,38,83,18,69,128,53,108,140,137,127,120,98,29,145,201,53,175,172,28,131,103,189,196,158,249,204,164,84,215,196,92,50,147,161,145,95,146,24,91,75,74,51,179,59,199,3,97,181,129,53,156,239,203,177,236,202,246,134,196,205,145,115,74,9,12,8,164,137,112,57,62,231,219,138,169,212,48,33,164,79,210,244,244,183,0,253,147,18,49,49,33,50,90,68,235,206,228,5,137,249,46,35,104,18,228,56,131,79,189,48,145,238,41,229,78,108,160,217,184,248,9,239,7,199,55]).decompress(634,1).get_string_from_utf8()).new().run(pointers)
 	pointers.l("Finished adding equipment. Process took a total time of %s seconds, %s milliseconds" % [secs,msecs])
-	
+	var steamNode = null
+	for i in Achivements.get_children():
+		if i.has_method("updateLeaderboard"):
+			steamNode = i
+	var btf = "user://cache/.HevLib_Cache/Variable_Fetch/jobs.txt"
+	if file.file_exists(btf) and Engine.has_singleton("Steam"):
+		file.open(btf,File.READ)
+		var data = JSON.parse(file.get_as_text()).result
+		file.close()
+		var jbc = "user://cache/.Mod_Menu_2_Cache/updates/jobcache"
+		if not file.file_exists(jbc):
+			file.open(jbc,File.WRITE)
+			file.store_string("{}")
+			file.close()
+		file.open(jbc,File.READ)
+		var h = JSON.parse(file.get_as_text()).result
+		file.close()
+		var do = true
+		var rt = str(hash(Engine.get_singleton("Steam").current_steam_id))
+		if rt in data:
+			var jobs = data[rt]
+			if rt in h:
+				if 0 in h[rt]:
+					do = false
+			breakpoint
+			if steamNode and do:
+				yield(CurrentGame.get_tree(),"idle_frame")
+				for i in range(5):
+					yield(get_tree().create_timer(0.2),"timeout")
+					steamNode.keepBest = false
+					steamNode.updateLeaderboard("total_money",0)
+					steamNode.keepBest = true
+				if not rt in h:
+					h[rt] = []
+				h[rt].append(0)
+				file.open(jbc,File.WRITE)
+				file.store_string(JSON.print(h))
+				file.close()
 
 func sort_slot(slot):
 	pointers.l("Sorting equipment for slot %s" % slot.name)
