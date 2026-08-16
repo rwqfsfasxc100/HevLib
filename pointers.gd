@@ -5292,7 +5292,12 @@ class _FolderAccess:
 	func __fetch_folder_files(folder: String, showFolders: bool = false, returnFullPath: bool = false,globalizePath: bool = false) -> Array:
 		var fileList : PoolStringArray = PoolStringArray()
 		if directory.file_exists(folder):
-			fileList.append(folder)
+			if not returnFullPath:
+				folder = folder.get_file()
+			if globalizePath:
+				return [ProjectSettings.globalize_path(folder)]
+			else:
+				return [folder]
 		else:
 			if not folder.ends_with("/"):
 				folder += "/"
@@ -5321,7 +5326,7 @@ class _FolderAccess:
 						fileList.append(ProjectSettings.globalize_path(fileName))
 					else:
 						fileList.append(fileName)
-		return Array(fileList)
+			return Array(fileList)
 	
 	func __get_first_file(folder: String) -> String:
 		var fileList : Array = __fetch_folder_files(folder)
@@ -5332,9 +5337,8 @@ class _FolderAccess:
 	
 	func __get_folder_structure(folder : String,store_file_content : bool = false, recache : bool = true):
 		if (not folder in folderStructureCache) or recache:
-			var folder_structure : Dictionary = {}
 			if directory.file_exists(folder):
-				folder_structure[folder] = "FILE"
+				folderStructureCache[folder][folder] = "FILE"
 			elif directory.dir_exists(folder):
 				if not folder.ends_with("/"):
 					folder += "/"
@@ -5342,17 +5346,14 @@ class _FolderAccess:
 				for object in files:
 					if object.ends_with("/"):
 						var data : Dictionary = __get_folder_structure(folder+object,store_file_content)
-						folder_structure.merge({object:data})
+						folderStructureCache[folder].merge({object:data})
 					else:
 						var fd : String = "FILE"
 						if store_file_content:
 							file.open(folder + object,File.READ)
 							fd = file.get_as_text(true)
 							file.close()
-						folder_structure.merge({object:fd})
-			folderStructureCache[folder] = folder_structure.duplicate(true)
-			return folder_structure
-		return folderStructureCache[folder].duplicate(true)
+		return folderStructureCache.get(folder,{}).duplicate(true)
 	
 	func __get_files_with_extensions(folder:String,extensions:PoolStringArray,recurse_depth:int = -1) -> Array:
 		if not directory.dir_exists(folder):
