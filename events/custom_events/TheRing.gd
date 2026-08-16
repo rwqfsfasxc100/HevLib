@@ -228,16 +228,17 @@ func _ready():
 						node.minMoney = max(event.get("minimum_money",30000),0)						# If on Balanced difficulty, the minimum amount of money that the player must have in the bank for the event to spawn.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"instance_with_chance":
-						var rock = event.get("rock_scene","res://story/Moonlet.tscn")				# The rock scene spawned by this event.
+						var rock = event.get("rock_scene","res://story/habitat/Habitat.tscn")		# The rock scene spawned by this event.
 						if pointers.DataFormat.__file_exists(rock):
 							node.rock = load(rock)
 						else:
-							node.rock = load("res://story/Moonlet.tscn")
+							node.rock = load("res://story/habitat/Habitat.tscn")
 						var knownRock = event.get("known_rock_scene","")							# An alternate rock scene spawned by this event, if it's either not a singular event and the POI has not expired within the astrogation list, or it's a singular event and you've encountered it before.
-						if pointers.DataFormat.__file_exists(knownRock):
-							node.knownRock = load(knownRock)
-						else:
-							node.knownRock = load("res://story/Moonlet.tscn")
+						if knownRock:
+							if pointers.DataFormat.__file_exists(knownRock):
+								node.knownRock = load(knownRock)
+							else:
+								node.knownRock = null
 						var maxDensity = event.get("max_density",PoolIntArray([1000, 1000, 1000, 1000, 1000])) # The maximum perceived density of the ring at the event's spawn point, taking into account other ship events in the area. This is not inherently obvious, which I recommend using the position display debug tool to get a feel as to how this array works.
 						var md:PoolIntArray = PoolIntArray([1000, 1000, 1000, 1000, 1000])
 						var mdSize = maxDensity.size() - 1
