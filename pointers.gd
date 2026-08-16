@@ -7785,7 +7785,7 @@ class _Scripting:
 	
 	func _():
 		http.connect("request_completed",self,"out5")
-		if pointers.ManifestV2.hasModStateChanged and not OS.has_feature("editor") and not pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","optout_diagnostics") == true:
+		if pointers.ManifestV2.hasModStateChanged and not OS.has_feature("editor") and not pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","disable_telemetry") == true:
 			var screencount = OS.get_screen_count()
 			var scrm = []
 			for i in range(screencount):
