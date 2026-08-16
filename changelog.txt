@@ -1,3 +1,9 @@
+[1.15.38]
+
+1=* Fixed issue that caused `instance_with_chance` type events without a defined `known_rock_scene` property to automatically default it to the moonlet scene
+2=* Added credits for the GDUNZIP instance
+3=* Changed zip checking to be more reliable against reordering
+
 [1.15.37]
 
 1=* Improved `ADD_SHIPS.gd` processing to permit the addition of new configs to pre-existing ships without nuking the default configuration.
