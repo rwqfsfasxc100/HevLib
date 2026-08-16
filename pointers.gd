@@ -8786,10 +8786,16 @@ class _Zip:
 		if (excluded > 0):
 			print("%s files excluded by filters: %d" % [file_path,excluded])
 		if Files:
-			pointers.l("Finished fetching PCK data, found %d files" % Files.size())
+			pointers.l("Finished fetching PCK data, found %d files" % Files.size(),"pointers.Zip")
 			return Files
-		pointers.l("Finished fetching PCK data, fetched %d files" % Contents.size())
+		pointers.l("Finished fetching PCK data, fetched %d files" % Contents.size(),"pointers.Zip")
 		return Contents
+	
+	
+	
+	
+	
+	
 	
 	
 	

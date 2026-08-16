@@ -2528,6 +2528,14 @@ const TRANSLATIONS = {
 		"HEVLIB_CREDITS_SUPPORTERS_KOFI_TESSIER": {
 			"string": "Tessier-Ashpool S.A. - supporter (ko-fi)",
 			"version_hash": 2705946943
+		},
+		"HEVLIB_CREDITS_SOFTWARE_HEADER": {
+			"string": "   --- Software ---   ",
+			"version_hash": 2827177182
+		},
+		"HEVLIB_CREDITS_SOFTWARE_JELLE": {
+			"string": "jelle - GDUNZIP implementation",
+			"version_hash": 784233189
 		}
 	},
 	"uk_UA": {
