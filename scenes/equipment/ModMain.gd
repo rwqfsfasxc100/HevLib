@@ -342,8 +342,8 @@ func testing():
 #	var F = pointers.Zip.Files
 #	var can = pointers.ConfigDriver.__validate_dictionary({"mod_requirements":[[["hev.LIBRARY",1,0,0,1,16,0]]]})
 	
-	
-	
+	var gdunzip = pointers.gdunzip.new()
+	gdunzip.load("C:/Users/ben/Downloads/hashmap.zip")
 	
 	
 	breakpoint
