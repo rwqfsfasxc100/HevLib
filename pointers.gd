@@ -5263,57 +5263,64 @@ class _FolderAccess:
 		else: return value
 	
 	func __recursive_delete(path: String) -> bool:
-		if not directory.open(path) == OK:
-			return false
-		if not path.ends_with("/"):
-			path = path + "/"
-		var filesForDeletion : Array = []
-		var foldersForDeletion : Array = []
-		var pms : Array = __fetch_folder_files(path, true, true)
-		for entry in pms:
-			if str(entry).ends_with("/"):
-				foldersForDeletion.append(entry)
-			else:
-				filesForDeletion.append(entry)
-		for f in filesForDeletion:
-			var splitFiles = str(f).split("/")[str(f).split("/").size()-1]
+		if directory.file_exists(path):
+			directory.remove(path)
+			return true
+		else:
+			if not directory.open(path) == OK:
+				return false
+			if not path.ends_with("/"):
+				path = path + "/"
+			var filesForDeletion : Array = []
+			var foldersForDeletion : Array = []
+			var pms : Array = __fetch_folder_files(path, true, true)
+			for entry in pms:
+				if str(entry).ends_with("/"):
+					foldersForDeletion.append(entry)
+				else:
+					filesForDeletion.append(entry)
+			for f in filesForDeletion:
+				var splitFiles = str(f).split("/")[str(f).split("/").size()-1]
+				if directory.file_exists(splitFiles):
+					directory.remove(splitFiles)
+			for folder in foldersForDeletion:
+				__recursive_delete(folder)
 			directory.open(path)
-			directory.remove(splitFiles)
-		for folder in foldersForDeletion:
-			__recursive_delete(folder)
-		directory.open(path)
-		directory.remove(path)
-		return true
+			directory.remove(path)
+			return true
 	
 	func __fetch_folder_files(folder: String, showFolders: bool = false, returnFullPath: bool = false,globalizePath: bool = false) -> Array:
 		var fileList : PoolStringArray = PoolStringArray()
-		if not folder.ends_with("/"):
-			folder += "/"
-		if not directory.dir_exists(folder):
-			return []
-		directory.open(folder)
-		directory.list_dir_begin(true)
-		while true:
-			var fileName : String = directory.get_next()
-			var capture:bool = true
-			if fileName.ends_with("/"):
-				capture = false
-			if fileName == "." or fileName == "..":
-				capture = false
-			if capture:
-				if not fileName:
-					break
-				if directory.current_is_dir():
-					if not showFolders:
-						continue
-					if not fileName.ends_with("/"):
-						fileName = fileName + "/"
-				if returnFullPath:
-					fileName = folder + fileName
-				if globalizePath:
-					fileList.append(ProjectSettings.globalize_path(fileName))
-				else:
-					fileList.append(fileName)
+		if directory.file_exists(folder):
+			fileList.append(folder)
+		else:
+			if not folder.ends_with("/"):
+				folder += "/"
+			if not directory.dir_exists(folder):
+				return []
+			directory.open(folder)
+			directory.list_dir_begin(true)
+			while true:
+				var fileName : String = directory.get_next()
+				var capture:bool = true
+				if fileName.ends_with("/"):
+					capture = false
+				if fileName == "." or fileName == "..":
+					capture = false
+				if capture:
+					if not fileName:
+						break
+					if directory.current_is_dir():
+						if not showFolders:
+							continue
+						if not fileName.ends_with("/"):
+							fileName = fileName + "/"
+					if returnFullPath:
+						fileName = folder + fileName
+					if globalizePath:
+						fileList.append(ProjectSettings.globalize_path(fileName))
+					else:
+						fileList.append(fileName)
 		return Array(fileList)
 	
 	func __get_first_file(folder: String) -> String:
@@ -5326,18 +5333,23 @@ class _FolderAccess:
 	func __get_folder_structure(folder : String,store_file_content : bool = false, recache : bool = true):
 		if (not folder in folderStructureCache) or recache:
 			var folder_structure : Dictionary = {}
-			var files : Array = __fetch_folder_files(folder,true,false)
-			for object in files:
-				if object.ends_with("/"):
-					var data : Dictionary = __get_folder_structure(folder+object,store_file_content)
-					folder_structure.merge({object:data})
-				else:
-					var fd : String = "FILE"
-					if store_file_content:
-						file.open(folder + object,File.READ)
-						fd = file.get_as_text(true)
-						file.close()
-					folder_structure.merge({object:fd})
+			if directory.file_exists(folder):
+				folder_structure[folder] = "FILE"
+			elif directory.dir_exists(folder):
+				if not folder.ends_with("/"):
+					folder += "/"
+				var files : Array = __fetch_folder_files(folder,true,false)
+				for object in files:
+					if object.ends_with("/"):
+						var data : Dictionary = __get_folder_structure(folder+object,store_file_content)
+						folder_structure.merge({object:data})
+					else:
+						var fd : String = "FILE"
+						if store_file_content:
+							file.open(folder + object,File.READ)
+							fd = file.get_as_text(true)
+							file.close()
+						folder_structure.merge({object:fd})
 			folderStructureCache[folder] = folder_structure.duplicate(true)
 			return folder_structure
 		return folderStructureCache[folder].duplicate(true)
@@ -8791,7 +8803,18 @@ class _Zip:
 		pointers.l("Finished fetching PCK data, fetched %d files" % Contents.size(),"pointers.Zip")
 		return Contents
 	
-	
+	func __create_zip(path:String):
+		var structure:Dictionary = {}
+		if dir.file_exists(path):
+			structure[path] = "FILE"
+		elif dir.dir_exists(path):
+			if not path.ends_with("/"):
+				path += "/"
+			structure[path] = pointers.FolderAccess.__get_folder_structure(path)
+		
+		
+		
+		breakpoint
 	
 	
 	
