@@ -5337,6 +5337,7 @@ class _FolderAccess:
 	
 	func __get_folder_structure(folder : String,store_file_content : bool = false, recache : bool = true):
 		if (not folder in folderStructureCache) or recache:
+			folderStructureCache[folder] = {}
 			if directory.file_exists(folder):
 				folderStructureCache[folder][folder] = "FILE"
 			elif directory.dir_exists(folder):
@@ -5353,7 +5354,7 @@ class _FolderAccess:
 							file.open(folder + object,File.READ)
 							fd = file.get_as_text(true)
 							file.close()
-		return folderStructureCache.get(folder,{}).duplicate(true)
+		return folderStructureCache[folder].duplicate(true)
 	
 	func __get_files_with_extensions(folder:String,extensions:PoolStringArray,recurse_depth:int = -1) -> Array:
 		if not directory.dir_exists(folder):
