@@ -74,7 +74,7 @@ func _init(modLoader : ModLoader = ModLoader):
 		directory.make_dir_recursive(variables_folder)
 		pointers.FileAccess.__load_precached_mods()
 		
-#		testing()
+		testing()
 		
 		var scv = pointers.FolderAccess.__fetch_folder_files(variables_folder,false,true)
 		for s in scv:
@@ -341,10 +341,10 @@ func testing():
 #	yield(pointers.Zip.__load_pck("C:\\Program Files (x86)\\Steam\\steamapps\\common\\dV Rings of Saturn\\Delta-V.pck",true,true,100),"completed")
 #	var F = pointers.Zip.Files
 #	var can = pointers.ConfigDriver.__validate_dictionary({"mod_requirements":[[["hev.LIBRARY",1,0,0,1,16,0]]]})
-	
-	var gdunzip = pointers.gdunzip.new()
-	gdunzip.load("C:/Users/ben/Downloads/hashmap.zip")
-	
+	var zipfile = "C:/Users/ben/Downloads/hashmap.zip"
+	var makezip = "C:/Users/ben/Downloads/dv-database-ae1f5a2cac86beddc0ebec34776544eeaa918403"
+	var zip = pointers.Zip.__create_zip(makezip)
+#	var zip = pointers.Zip.__create_zip(zipfile)
 	
 	breakpoint
 

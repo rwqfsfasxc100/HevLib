@@ -1933,16 +1933,55 @@ class _DataFormat:
 					"return":[
 						"String containing the property as could be inserted into a script file. Will still need property identifiers (var, const, etc.)"
 					]
+				},
+				"__reserve_in_array":{
+					"description":"A safer resize method for arrays that works on a relative size change, and initializes blank spaces with a blanked/zeroed value (or null for regular arrays). Can also reduce size safely and ensures the size never goes below zero. Returns null if inputting any non-array property.",
+					"args":[
+						"array -> (ANY Array/PoolArray) the array to be resized. Returns null if not an array constructor.",
+						"count -> (int) the size to change the array by. Can be negative to reduce the size by X indeces.",
+						"absolute (optional) -> (bool) whether count acts as the absolute size instead of the relative size change."
+					],
+					"return":[
+						"Array/PoolArray of the respective input type with the readjusted size.",
+						"null if `array` was not an array constructor."
+					]
+				},
+				"__to_uint32":{
+					"description":"Converts an integer into an unsigned 32 bit integer",
+					"args":[
+						"integer -> (int) the input integer"
+					],
+					"return":[
+						"int for the unsigned 32 bit value"
+					]
+				},
+				"__get_crc_32":{
+					"description":"Calculates the 32-bit CRC checksum from a set of bytes",
+					"args":[
+						"bytes -> (PoolByteArray) bytes to generate the checksum from"
+					],
+					"return":[
+						"int for the 32 bit checksum"
+					]
 				}
 			}
 		}
 	
 	var file:File = File.new()
 	
+	var crc_table:PoolIntArray = PoolIntArray()
 	var pointers
 	func _init(f):
 		pointers = f
 		urlRegex.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,63}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
+		
+		for i in range(256):
+			var k = i
+			for j in range(8):
+				if k & 1:
+					k = pointers.DataFormat.__to_uint32(k ^ 0x1db710640)
+				k = pointers.DataFormat.__to_uint32(k >> 1)
+			crc_table.append(k)
 	
 	func __array_to_string(arr: Array) -> String:
 		return "".join(PoolStringArray(arr))
@@ -2620,7 +2659,94 @@ class _DataFormat:
 			out = "\"%s\"" % out
 		return out
 	
-
+	func __reserve_in_array(array,count:int,absolute:bool = false):
+		match typeof(array):
+			TYPE_ARRAY:
+				var size = array.size()
+				if absolute:
+					size = 0
+				var new_count = max(size + count,0)
+				array.resize(new_count)
+				if new_count > size:
+					for i in range(new_count - size):
+						array[i + size] = null
+			TYPE_COLOR_ARRAY:
+				var size = array.size()
+				if absolute:
+					size = 0
+				var new_count = max(size + count,0)
+				array.resize(new_count)
+				if new_count > size:
+					for i in range(new_count - size):
+						array[i + size] = Color.black
+			TYPE_INT_ARRAY:
+				var size = array.size()
+				if absolute:
+					size = 0
+				var new_count = max(size + count,0)
+				array.resize(new_count)
+				if new_count > size:
+					for i in range(new_count - size):
+						array[i + size] = 0
+			TYPE_RAW_ARRAY:
+				var size = array.size()
+				if absolute:
+					size = 0
+				var new_count = max(size + count,0)
+				array.resize(new_count)
+				if new_count > size:
+					for i in range(new_count - size):
+						array[i + size] = 0x0
+			TYPE_REAL_ARRAY:
+				var size = array.size()
+				if absolute:
+					size = 0
+				var new_count = max(size + count,0)
+				array.resize(new_count)
+				if new_count > size:
+					for i in range(new_count - size):
+						array[i + size] = 0.0
+			TYPE_STRING_ARRAY:
+				var size = array.size()
+				if absolute:
+					size = 0
+				var new_count = max(size + count,0)
+				array.resize(new_count)
+				if new_count > size:
+					for i in range(new_count - size):
+						array[i + size] = ""
+			TYPE_VECTOR2_ARRAY:
+				var size = array.size()
+				if absolute:
+					size = 0
+				var new_count = max(size + count,0)
+				array.resize(new_count)
+				if new_count > size:
+					for i in range(new_count - size):
+						array[i + size] = Vector2.ZERO
+			TYPE_VECTOR3_ARRAY:
+				var size = array.size()
+				if absolute:
+					size = 0
+				var new_count = max(size + count,0)
+				array.resize(new_count)
+				if new_count > size:
+					for i in range(new_count - size):
+						array[i + size] = Vector3.ZERO
+			_:
+				return null
+		return array
+	
+	func __to_uint32(integer:int) -> int:
+		return integer & 0xFFFFFFFF
+	
+	func __get_crc_32(bytes:PoolByteArray) -> int:
+		var crc = 0 ^ 0xffffffff
+		for k in bytes:
+			crc = __to_uint32((crc >> 8) ^ crc_table[(crc & 0xff) ^ k])
+		return __to_uint32(crc ^ 0xffffffff)
+		
+	
 class _DriverManagement:
 	var scripts : Array = [
 		
@@ -5196,9 +5322,10 @@ class _FolderAccess:
 					"description":"Fetches a folder's contents",
 					"args":[
 						"folder -> (String) path to the directory to fetch the contents of",
-						"showFolders -> (bool) Whether to display any subdirectories, which will have a forward slash at the end of the name to differentiate them. Defaults to `false`",
-						"returnFullPath -> (bool) Whether to show the full directory path of the file/folder, instead of just the name. Defaults to `false`",
-						"globalizePath -> (bool) Whether to globalize the path with ProjectSettings.globalize_path() Defaults to `false`"
+						"show_folders (optional) -> (bool) Whether to display any subdirectories, which will have a forward slash at the end of the name to differentiate them. Defaults to `false`",
+						"return_full_path (optional) -> (bool) Whether to show the full directory path of the file/folder, instead of just the name. Defaults to `false`",
+						"globalize_path (optional) -> (bool) Whether to globalize the path with ProjectSettings.globalize_path() Defaults to `false`",
+						"recursive_search (optional) -> (bool) whether files would be searched from within subdirectories. Folder paths still respect `show_folders`, and file paths will be relative to the base directory if `return_full_path` is false",
 					],
 					"return":[
 						"Array containing strings for the names of all files and/or folders within the provided directory."
@@ -5289,24 +5416,26 @@ class _FolderAccess:
 			directory.remove(path)
 			return true
 	
-	func __fetch_folder_files(folder: String, showFolders: bool = false, returnFullPath: bool = false,globalizePath: bool = false) -> Array:
-		var fileList : PoolStringArray = PoolStringArray()
-		if directory.file_exists(folder):
-			if not returnFullPath:
-				folder = folder.get_file()
-			if globalizePath:
-				return [ProjectSettings.globalize_path(folder)]
+	func __fetch_folder_files(folder: String, show_folders: bool = false, return_full_path: bool = false,globalize_path: bool = false,recursive_search: bool = false,baseDirForRecurseDontExpose = "") -> Array:
+		var fileList : Array = Array()
+		var dir = Directory.new()
+		if dir.file_exists(folder):
+			var file_name = folder.get_file()
+			if return_full_path:
+				file_name = folder.get_base_dir() + "/" + file_name
+			if globalize_path:
+				return [ProjectSettings.globalize_path(file_name)]
 			else:
-				return [folder]
+				return [file_name]
 		else:
 			if not folder.ends_with("/"):
 				folder += "/"
-			if not directory.dir_exists(folder):
+			if not dir.dir_exists(folder):
 				return []
-			directory.open(folder)
-			directory.list_dir_begin(true)
+			dir.open(folder)
+			dir.list_dir_begin(true)
 			while true:
-				var fileName : String = directory.get_next()
+				var fileName : String = dir.get_next()
 				var capture:bool = true
 				if fileName.ends_with("/"):
 					capture = false
@@ -5315,18 +5444,22 @@ class _FolderAccess:
 				if capture:
 					if not fileName:
 						break
-					if directory.current_is_dir():
-						if not showFolders:
-							continue
+					if dir.current_is_dir():
 						if not fileName.ends_with("/"):
 							fileName = fileName + "/"
-					if returnFullPath:
+						if recursive_search:
+							fileList.append_array(__fetch_folder_files(folder + fileName,show_folders,return_full_path,globalize_path,true,baseDirForRecurseDontExpose + fileName))
+						if not show_folders:
+							continue
+					if return_full_path:
 						fileName = folder + fileName
-					if globalizePath:
+					else:
+						fileName = baseDirForRecurseDontExpose + fileName
+					if globalize_path:
 						fileList.append(ProjectSettings.globalize_path(fileName))
 					else:
 						fileList.append(fileName)
-			return Array(fileList)
+			return fileList
 	
 	func __get_first_file(folder: String) -> String:
 		var fileList : Array = __fetch_folder_files(folder)
@@ -8806,13 +8939,91 @@ class _Zip:
 		return Contents
 	
 	func __create_zip(path:String):
-		var structure:Dictionary = {}
+		var base_directory:String = ""
+		var filenames:PoolStringArray = PoolStringArray()
 		if dir.file_exists(path):
-			structure[path] = "FILE"
+			base_directory = path.get_base_dir() + "/"
+			filenames.append(path.get_file())
 		elif dir.dir_exists(path):
+			filenames = PoolStringArray(pointers.FolderAccess.__fetch_folder_files(path,true,false,false,true))
 			if not path.ends_with("/"):
 				path += "/"
-			structure[path] = pointers.FolderAccess.__get_folder_structure(path)
+			base_directory = path
+		
+		var buffer : PoolByteArray = PoolByteArray()
+		var file_refs:Dictionary = {}
+		
+		var crc_table:PoolIntArray = PoolIntArray()
+		for i in range(256):
+			var k = i
+			for j in range(8):
+				if k & 1:
+					k = pointers.DataFormat.__to_uint32(k ^ 0x1db710640)
+				k = pointers.DataFormat.__to_uint32(k >> 1)
+			crc_table.append(k)
+		
+		for file_name in filenames:
+			var offset = buffer.size()
+			buffer = pointers.DataFormat.__reserve_in_array(buffer,30)
+			
+			var full_path = base_directory + file_name
+			file.open(full_path,File.READ)
+			var bytes = file.get_buffer(file.get_len())
+			file.close()
+			var compressed = bytes.compress(1)
+			
+			var useCompressed = false
+			if compressed.size() < (bytes.size() - 15):
+				useCompressed = true
+			
+			buffer[offset] = 0x50
+			buffer[offset+1] = 0x4B
+			buffer[offset+2] = 0x03
+			buffer[offset+3] = 0x04
+			buffer[offset+4] = 0x14
+			
+			if useCompressed:
+				buffer[offset+8] = 0x08
+			
+			var timestamp = Time.get_datetime_dict_from_unix_time(file.get_modified_time(full_path))
+			var dos_time = ((timestamp.hour << 11) | (timestamp.minute << 5) | (int(floor(timestamp.second / 2.0))))
+			var dos_date = (((timestamp.year - 1980) << 9) | (timestamp.month << 5) | timestamp.day)
+			buffer[offset+10] = (dos_time & 0xFF)
+			buffer[offset+11] = (dos_time & 0xFF00) >> 8
+			buffer[offset+12] = (dos_date & 0xFF)
+			buffer[offset+13] = (dos_date & 0xFF00) >> 8
+			
+			var crc = pointers.DataFormat.__get_crc_32(bytes)
+			
+			buffer[offset+14] = (crc & 0xFF)
+			buffer[offset+15] = (crc & 0xFF00) >> 8
+			buffer[offset+16] = (crc & 0xFF0000) >> 16
+			buffer[offset+17] = (crc & 0xFF000000) >> 24
+			
+			pass
+		
+		
+		# CDFH header code, implement later as it's more efficient to build the file store first
+#		for file_name in filenames:
+#			var offset = buffer.size()
+#			buffer = pointers.DataFormat.__reserve_in_array(buffer,46)
+#			buffer[offset] = 0x50
+#			buffer[offset+1] = 0x4B
+#			buffer[offset+2] = 0x01
+#			buffer[offset+3] = 0x02
+#			buffer[offset+4] = 0x1F
+#			buffer[offset+6] = 0x14
+#			buffer[offset+10] = 0x08
+			
+		breakpoint
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		
 		
