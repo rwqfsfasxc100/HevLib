@@ -74,7 +74,7 @@ func _init(modLoader : ModLoader = ModLoader):
 		directory.make_dir_recursive(variables_folder)
 		pointers.FileAccess.__load_precached_mods()
 		
-		testing()
+#		testing()
 		
 		var scv = pointers.FolderAccess.__fetch_folder_files(variables_folder,false,true)
 		for s in scv:
@@ -342,8 +342,10 @@ func testing():
 #	var F = pointers.Zip.Files
 #	var can = pointers.ConfigDriver.__validate_dictionary({"mod_requirements":[[["hev.LIBRARY",1,0,0,1,16,0]]]})
 	var zipfile = "C:/Users/ben/Downloads/hashmap.zip"
-	var makezip = "C:/Users/ben/Downloads/dv-database-ae1f5a2cac86beddc0ebec34776544eeaa918403"
-	var zip = pointers.Zip.__create_zip(makezip)
+	var zipdest = "C:/Users/ben/Downloads/zip_test.zip"
+#	var makezip = "C:/Users/ben/Downloads/savegame-e.dv"
+	var makezip = "C:/Users/ben/Downloads/test"
+	var zip = pointers.Zip.__create_zip(makezip,zipdest)
 #	var zip = pointers.Zip.__create_zip(zipfile)
 	
 	breakpoint

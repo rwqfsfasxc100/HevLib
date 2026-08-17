@@ -1979,8 +1979,8 @@ class _DataFormat:
 			var k = i
 			for j in range(8):
 				if k & 1:
-					k = pointers.DataFormat.__to_uint32(k ^ 0x1db710640)
-				k = pointers.DataFormat.__to_uint32(k >> 1)
+					k = __to_uint32(k ^ 0x1db710640)
+				k = __to_uint32(k >> 1)
 			crc_table.append(k)
 	
 	func __array_to_string(arr: Array) -> String:
@@ -5470,9 +5470,8 @@ class _FolderAccess:
 	
 	func __get_folder_structure(folder : String,store_file_content : bool = false, recache : bool = true):
 		if (not folder in folderStructureCache) or recache:
-			folderStructureCache[folder] = {}
 			if directory.file_exists(folder):
-				folderStructureCache[folder][folder] = "FILE"
+				folderStructureCache[folder] = "FILE"
 			elif directory.dir_exists(folder):
 				if not folder.ends_with("/"):
 					folder += "/"
@@ -7459,6 +7458,9 @@ class _ManifestV2:
 				var dvs : PoolStringArray = pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[])
 				for a in dvs:
 					restrict_to_modmains.append(a.get_base_dir() + "/")
+				var enabled_modmains = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets")
+				for a in enabled_modmains:
+					restrict_to_modmains.append(a.get_base_dir() + "/")
 			var arr1 : PoolStringArray = siftFolderStructureForModFiles(pointers.FolderAccess.__get_folder_structure("res://",false,false),"res://",restrict_to_modmains)
 			var arr2 : PoolStringArray = PoolStringArray()
 			if OS.has_feature("editor"):
@@ -8938,7 +8940,7 @@ class _Zip:
 		pointers.l("Finished fetching PCK data, fetched %d files" % Contents.size(),"pointers.Zip")
 		return Contents
 	
-	func __create_zip(path:String):
+	func __create_zip(path:String,destination:String):
 		var base_directory:String = ""
 		var filenames:PoolStringArray = PoolStringArray()
 		if dir.file_exists(path):
@@ -8950,27 +8952,23 @@ class _Zip:
 				path += "/"
 			base_directory = path
 		
+		
 		var buffer : PoolByteArray = PoolByteArray()
 		var file_refs:Dictionary = {}
-		
-		var crc_table:PoolIntArray = PoolIntArray()
-		for i in range(256):
-			var k = i
-			for j in range(8):
-				if k & 1:
-					k = pointers.DataFormat.__to_uint32(k ^ 0x1db710640)
-				k = pointers.DataFormat.__to_uint32(k >> 1)
-			crc_table.append(k)
 		
 		for file_name in filenames:
 			var offset = buffer.size()
 			buffer = pointers.DataFormat.__reserve_in_array(buffer,30)
 			
+			var compressed = PoolByteArray()
+			var bytes = PoolByteArray()
+			
 			var full_path = base_directory + file_name
-			file.open(full_path,File.READ)
-			var bytes = file.get_buffer(file.get_len())
-			file.close()
-			var compressed = bytes.compress(1)
+			if file.file_exists(full_path):
+				file.open(full_path,File.READ)
+				bytes = file.get_buffer(file.get_len())
+				file.close()
+				compressed = bytes.compress(1)
 			
 			var useCompressed = false
 			if compressed.size() < (bytes.size() - 15):
@@ -8993,41 +8991,143 @@ class _Zip:
 			buffer[offset+12] = (dos_date & 0xFF)
 			buffer[offset+13] = (dos_date & 0xFF00) >> 8
 			
+			# CRC 32 checksum, although it looks like it might not be always
+			# required as WinRAR accepts a zeroed CRC32
 			var crc = pointers.DataFormat.__get_crc_32(bytes)
-			
 			buffer[offset+14] = (crc & 0xFF)
 			buffer[offset+15] = (crc & 0xFF00) >> 8
 			buffer[offset+16] = (crc & 0xFF0000) >> 16
 			buffer[offset+17] = (crc & 0xFF000000) >> 24
+			var decompressedSize = pointers.DataFormat.__to_uint32(bytes.size())
+			var compressedSize = pointers.DataFormat.__to_uint32(compressed.size())
+			if useCompressed:
+				buffer[offset+18] = (compressedSize & 0xFF)
+				buffer[offset+19] = (compressedSize & 0xFF00) >> 8
+				buffer[offset+20] = (compressedSize & 0xFF0000) >> 16
+				buffer[offset+21] = (compressedSize & 0xFF000000) >> 24
+			else:
+				buffer[offset+18] = (decompressedSize & 0xFF)
+				buffer[offset+19] = (decompressedSize & 0xFF00) >> 8
+				buffer[offset+20] = (decompressedSize & 0xFF0000) >> 16
+				buffer[offset+21] = (decompressedSize & 0xFF000000) >> 24
+			buffer[offset+22] = (decompressedSize & 0xFF)
+			buffer[offset+23] = (decompressedSize & 0xFF00) >> 8
+			buffer[offset+24] = (decompressedSize & 0xFF0000) >> 16
+			buffer[offset+25] = (decompressedSize & 0xFF000000) >> 24
 			
-			pass
-		
-		
-		# CDFH header code, implement later as it's more efficient to build the file store first
-#		for file_name in filenames:
-#			var offset = buffer.size()
-#			buffer = pointers.DataFormat.__reserve_in_array(buffer,46)
-#			buffer[offset] = 0x50
-#			buffer[offset+1] = 0x4B
-#			buffer[offset+2] = 0x01
-#			buffer[offset+3] = 0x02
-#			buffer[offset+4] = 0x1F
-#			buffer[offset+6] = 0x14
-#			buffer[offset+10] = 0x08
+			var name_len = file_name.length()
+			buffer[offset+26] = (name_len & 0xFF)
+			buffer[offset+27] = (name_len & 0xFF00) >> 8
 			
-		breakpoint
+			buffer = pointers.DataFormat.__reserve_in_array(buffer,name_len)
+			var nameBytes = file_name.to_utf8()
+			for i in range(name_len):
+				buffer[offset+30+i] = nameBytes[i]
+			if useCompressed:
+				var boffsetnow = buffer.size()
+				buffer = pointers.DataFormat.__reserve_in_array(buffer,compressedSize)
+				for i in range(compressedSize):
+					buffer[boffsetnow+i] = compressed[i]
+			else:
+				var boffsetnow = buffer.size()
+				buffer = pointers.DataFormat.__reserve_in_array(buffer,decompressedSize)
+				for i in range(decompressedSize):
+					buffer[boffsetnow+i] = bytes[i]
+			file_refs[file_name] = {
+				"offset":offset,
+				"crc32":crc,
+				"is_compressed":useCompressed,
+				"compressed_size":compressedSize,
+				"decompressed_size":decompressedSize,
+				"file_name_length":name_len,
+				"date":dos_date,
+				"time":dos_time,
+			}
+		var CDFH_offset = buffer.size()
 		
+		for file_name in filenames:
+			var ref_data = file_refs[file_name]
+			var offset = buffer.size()
+			buffer = pointers.DataFormat.__reserve_in_array(buffer,46)
+			buffer[offset] = 0x50
+			buffer[offset+1] = 0x4B
+			buffer[offset+2] = 0x01
+			buffer[offset+3] = 0x02
+			buffer[offset+4] = 0x1F
+			buffer[offset+6] = 0x14
+			
+			if ref_data.is_compressed:
+				buffer[offset+10] = 0x08
+			
+			buffer[offset+12] = (ref_data.time & 0xFF)
+			buffer[offset+13] = (ref_data.time & 0xFF00) >> 8
+			buffer[offset+14] = (ref_data.date & 0xFF)
+			buffer[offset+15] = (ref_data.date & 0xFF00) >> 8
+			
+			buffer[offset+16] = (ref_data.crc32 & 0xFF)
+			buffer[offset+17] = (ref_data.crc32 & 0xFF00) >> 8
+			buffer[offset+18] = (ref_data.crc32 & 0xFF0000) >> 16
+			buffer[offset+19] = (ref_data.crc32 & 0xFF000000) >> 24
+			
+			buffer[offset+20] = (ref_data.compressed_size & 0xFF)
+			buffer[offset+21] = (ref_data.compressed_size & 0xFF00) >> 8
+			buffer[offset+22] = (ref_data.compressed_size & 0xFF0000) >> 16
+			buffer[offset+23] = (ref_data.compressed_size & 0xFF000000) >> 24
+			
+			buffer[offset+24] = (ref_data.decompressed_size & 0xFF)
+			buffer[offset+25] = (ref_data.decompressed_size & 0xFF00) >> 8
+			buffer[offset+26] = (ref_data.decompressed_size & 0xFF0000) >> 16
+			buffer[offset+27] = (ref_data.decompressed_size & 0xFF000000) >> 24
+			
+			
+			buffer[offset+28] = (ref_data.file_name_length & 0xFF)
+			buffer[offset+29] = (ref_data.file_name_length & 0xFF00) >> 8
+			
+			buffer[offset+42] = (ref_data.offset & 0xFF)
+			buffer[offset+43] = (ref_data.offset & 0xFF00) >> 8
+			buffer[offset+44] = (ref_data.offset & 0xFF0000) >> 16
+			buffer[offset+45] = (ref_data.offset & 0xFF000000) >> 24
+			
+			var name_len = file_name.length()
+			buffer = pointers.DataFormat.__reserve_in_array(buffer,name_len)
+			var nameBytes = file_name.to_utf8()
+			for i in range(name_len):
+				buffer[offset+46+i] = nameBytes[i]
 		
+		# EPCD
+		var EOCD_offset = buffer.size()
+		buffer = pointers.DataFormat.__reserve_in_array(buffer,22)
 		
+		# Magic number
+		buffer[EOCD_offset] = 0x50
+		buffer[EOCD_offset+1] = 0x4B
+		buffer[EOCD_offset+2] = 0x05
+		buffer[EOCD_offset+3] = 0x06
 		
+		# CDFH records
+		buffer[EOCD_offset+8] = (CDFH_offset & 0xFF)
+		buffer[EOCD_offset+9] = (CDFH_offset & 0xFF00) >> 8
+		buffer[EOCD_offset+10] = (CDFH_offset & 0xFF)
+		buffer[EOCD_offset+11] = (CDFH_offset & 0xFF00) >> 8
 		
+		# CDFH Size
+		var cdfh_size = EOCD_offset - CDFH_offset
+		buffer[EOCD_offset+8] = (cdfh_size & 0xFF)
+		buffer[EOCD_offset+9] = (cdfh_size & 0xFF00) >> 8
+		buffer[EOCD_offset+10] = (cdfh_size & 0xFF0000) >> 16
+		buffer[EOCD_offset+11] = (cdfh_size & 0xFF000000) >> 24
 		
+		# CDFH Offset
+		buffer[EOCD_offset+8] = (EOCD_offset & 0xFF)
+		buffer[EOCD_offset+9] = (EOCD_offset & 0xFF00) >> 8
+		buffer[EOCD_offset+10] = (EOCD_offset & 0xFF0000) >> 16
+		buffer[EOCD_offset+11] = (EOCD_offset & 0xFF000000) >> 24
 		
-		
-		
-		
-		
-		breakpoint
+		if destination:
+			file.open(destination,File.WRITE)
+			file.seek(0)
+			file.store_buffer(buffer)
+			file.close()
 	
 	
 	
