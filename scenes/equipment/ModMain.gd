@@ -341,12 +341,7 @@ func testing():
 #	yield(pointers.Zip.__load_pck("C:\\Program Files (x86)\\Steam\\steamapps\\common\\dV Rings of Saturn\\Delta-V.pck",true,true,100),"completed")
 #	var F = pointers.Zip.Files
 #	var can = pointers.ConfigDriver.__validate_dictionary({"mod_requirements":[[["hev.LIBRARY",1,0,0,1,16,0]]]})
-	var zipfile = "C:/Users/ben/Downloads/hashmap.zip"
-	var zipdest = "C:/Users/ben/Downloads/zip_test.zip"
-#	var makezip = "C:/Users/ben/Downloads/savegame-e.dv"
-	var makezip = "C:/Users/ben/Downloads/test"
-	var zip = pointers.Zip.__create_zip(makezip,zipdest)
-#	var zip = pointers.Zip.__create_zip(zipfile)
+	
 	
 	breakpoint
 

@@ -5470,22 +5470,20 @@ class _FolderAccess:
 	
 	func __get_folder_structure(folder : String,store_file_content : bool = false, recache : bool = true):
 		if (not folder in folderStructureCache) or recache:
-			if directory.file_exists(folder):
-				folderStructureCache[folder] = "FILE"
-			elif directory.dir_exists(folder):
-				if not folder.ends_with("/"):
-					folder += "/"
-				var files : Array = __fetch_folder_files(folder,true,false)
-				for object in files:
-					if object.ends_with("/"):
-						var data : Dictionary = __get_folder_structure(folder+object,store_file_content)
-						folderStructureCache[folder].merge({object:data})
-					else:
-						var fd : String = "FILE"
-						if store_file_content:
-							file.open(folder + object,File.READ)
-							fd = file.get_as_text(true)
-							file.close()
+			var folder_structure : Dictionary = {}
+			var files : Array = __fetch_folder_files(folder,true,false)
+			for object in files:
+				if object.ends_with("/"):
+					var data : Dictionary = __get_folder_structure(folder+object,store_file_content)
+					folder_structure.merge({object:data})
+				else:
+					var fd : String = "FILE"
+					if store_file_content:
+						file.open(folder + object,File.READ)
+						fd = file.get_as_text(true)
+						file.close()
+					folder_structure.merge({object:fd})
+			folderStructureCache[folder] = folder_structure
 		return folderStructureCache[folder].duplicate(true)
 	
 	func __get_files_with_extensions(folder:String,extensions:PoolStringArray,recurse_depth:int = -1) -> Array:
@@ -8940,17 +8938,23 @@ class _Zip:
 		pointers.l("Finished fetching PCK data, fetched %d files" % Contents.size(),"pointers.Zip")
 		return Contents
 	
-	func __create_zip(path:String,destination:String):
-		var base_directory:String = ""
+	func __create_zip(base_directory:String,paths:PoolStringArray,destination:String):
 		var filenames:PoolStringArray = PoolStringArray()
-		if dir.file_exists(path):
-			base_directory = path.get_base_dir() + "/"
-			filenames.append(path.get_file())
-		elif dir.dir_exists(path):
-			filenames = PoolStringArray(pointers.FolderAccess.__fetch_folder_files(path,true,false,false,true))
-			if not path.ends_with("/"):
-				path += "/"
-			base_directory = path
+		if not base_directory.ends_with("/"):
+			base_directory += "/"
+		for path in paths:
+			var full_filepath = base_directory + path
+			if dir.file_exists(full_filepath):
+				filenames.append(path)
+			elif dir.dir_exists(full_filepath):
+				if not path.ends_with("/"):
+					path += "/"
+				if not full_filepath.ends_with("/"):
+					full_filepath += "/"
+				filenames.append(path)
+				for subpath in PoolStringArray(pointers.FolderAccess.__fetch_folder_files(full_filepath,true,false,false,true)):
+					filenames.append(path + subpath)
+				
 		
 		
 		var buffer : PoolByteArray = PoolByteArray()

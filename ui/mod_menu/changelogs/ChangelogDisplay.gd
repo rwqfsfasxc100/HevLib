@@ -124,7 +124,7 @@ func clear():
 		i.clearing = true
 		i.set_physics_process(false)
 		i.set_process(false)
-		add_container.remove_child(i)
+		i.get_parent().remove_child(i)
 		Tool.remove(i)
 	for i in refs:
 		i.visible = false

@@ -34,936 +34,6 @@
 
 const TRANSLATIONS = {
 	"master_locale": "en",
-	"de": {
-		"HEVLIB_MOD_BRIEF": {
-			"string": "Mod-Bibliothek für die meistgenutzten Funktionen erstellt von __hev",
-			"version_hash": 0
-		},
-		"HEVLIB_MOD_DESCRIPTION": {
-			"string": "Eine Programmbibliothek beitet eine Reihe von Funktionen für andere Mods duch 'Pointer'-Dateien. \\n * Umgang mit Mod-Manifest-Dateien mittels Versionierung, um ein einheitliches Medium zur Abfrage von Informationen daraus zu schaffen.\\n * EquipmentTreiber - Hinzufügen und verwalten von Ausrüstungs-Items\\\\-Plätzen und mehr...\\n * WaffenPlatzTreiber - Hinzufügen und verwalten von Ausrüstung für die Befestigungen.\\n\\nDiese Bibliothek verfolgt außerdem das Ziel, eine konsistente Vorgehensweise beizubehalten, um Modding zu erleichtern. Die Kompatibilität mit Mods ist ebenfalls ein zentraler Schwerpunkt der bereitgestellten Funktionalität.\\n\\nWeitere Informationen findest du im Wiki dieses Mods. Wenn du Vorschläge oder Ideen hast, hinterlasse sie bitte im Discord oder als GitHub-Issue.",
-			"version_hash": 0
-		},
-		"HEVLIB_MOD_ERROR_HEADER": {
-			"string": "%s MOD ISSUES",
-			"version_hash": 0
-		},
-		"HEVLIB_MOD_ERROR_DEPENDANCY_DIALOGUE_BOX": {
-			"string": "Es gibt aktuell %s ubefriedigte Mod-Abhängigkeiten. Stelle sicher dass die Vorraussetzungen vorhanden sind, oder entferne die Mods: %s",
-			"version_hash": 0
-		},
-		"HEVLIB_GENERIC_ERROR_DIALOGUE_BOX": {
-			"string": "Etwas ist schief gelaufen. Bitte das Spiel neustarten!",
-			"version_hash": 0
-		},
-		"EVENTDRIVER_MENU": {
-			"string": "EventDriver Debug Menü",
-			"version_hash": 0
-		},
-		"EVENTDRIVER_EVENTS": {
-			"string": "Ausgewähltes Event",
-			"version_hash": 0
-		},
-		"EVENTDRIVER_TIMER": {
-			"string": "Storyteller Event Timer",
-			"version_hash": 0
-		},
-		"EVENTDRIVER_SPAWNNOW": {
-			"string": "Erzwinge aktuell gewähltes Event zu starten",
-			"version_hash": 0
-		},
-		"EVENTDRIVER_EVENT_SELECTOR": {
-			"string": "Event Selektor",
-			"version_hash": 0
-		},
-		"EVENTDRIVER_CLEAREVENT": {
-			"string": "Ausgewählte(s) Event(s) bereinigen",
-			"version_hash": 0
-		},
-		"HEVLIB_MISSING_DOCUMENTATION_1": {
-			"string": "!!!!! Für dieses Feature wurde keine Dokumentation bereitgestellt!",
-			"version_hash": 0
-		},
-		"HEVLIB_MISSING_DOCUMENTATION_2": {
-			"string": "!!!!! Bitte teile es mir (__hev) ASAP mit, da Dokumentationen der Schlüssel für Bibliotheken wie diese sind, um Instandhaltung zu wahren!",
-			"version_hash": 0
-		},
-		"HEVLIB_DESCRIPTION_PLACEHOLDER": {
-			"string": "Dieser Mods hat keine Beschreibung. \\n\\nÜberprüfe die Webseite, wo du den Mod erhalten hast oder frage beim Ersteller nach einer Beschreibung.",
-			"version_hash": 0
-		},
-		"HEVLIB_SELF_CHECK_ERROR_MESSAGE": {
-			"string": "HevLib wurde nicht korrekt installiert. Überprüfe deine Quelle und stelle sicher, dass es wie folgt aussieht: HevLib.zip/HevLib/\\n\\nMit OK wird das Spiel beendet und du es werden die aktuellsten Releases im Browser geöffnet.",
-			"version_hash": 0
-		},
-		"HEVLIB_SELF_CHECK_ERROR_HEADER": {
-			"string": "HEVLIB LOAD ERROR!",
-			"version_hash": 0
-		},
-		"HEVLIB_INCORRECT_SHIP": {
-			"string": "(ERROR!) Fehlender Schiffs-Typ: '%s'\\nDas Save kann nicht geladen werden, da das aktive Schiff nicht verügbar ist!\\nUm das Save zu laden, installiere bitte den Mod erneut, der diesen Schiffs-Typ enthält!",
-			"version_hash": 0
-		},
-		"HEVLIB_SLOT": {
-			"string": "Slot",
-			"version_hash": 0
-		},
-		"HEVLIB_MOD_MENU": {
-			"string": "Mod Menü",
-			"version_hash": 0
-		},
-		"HEVLIB_MISSING_MOD_NAME": {
-			"string": "Mod Name nicht verfügbar :(",
-			"version_hash": 0
-		},
-		"HEVLIB_MISSING_DESCRIPTION": {
-			"string": "Dieser Mods hat keine Beschreibung. :( \\n\\nÜberprüfe die Webseite, wo du den Mod erhalten hast oder frage beim Ersteller nach einer Beschreibung.",
-			"version_hash": 0
-		},
-		"HEVLIB_AUTHOR": {
-			"string": "Ersteller:",
-			"version_hash": 0
-		},
-		"HEVLIB_CREDITS": {
-			"string": "Danksagung:",
-			"version_hash": 0
-		},
-		"HEVLIB_UNKNOWN": {
-			"string": "Unbekannt",
-			"version_hash": 0
-		},
-		"HEVLIB_MM_TOOLTIP_HEADER": {
-			"string": "Mod Information:",
-			"version_hash": 0
-		},
-		"HEVLIB_MM_TOOLTIP_ID": {
-			"string": "Mod ID: %s",
-			"version_hash": 0
-		},
-		"HEVLIB_MM_TOOLTIP_MV": {
-			"string": "Manifest Version: %s",
-			"version_hash": 0
-		},
-		"HEVLIB_MM_TOOLTIP_ZIP": {
-			"string": "Zip File: %s",
-			"version_hash": 0
-		},
-		"HEVLIB_MM_TOOLTIP_LIBRARY": {
-			"string": "Bibliothek: %s \\ Immer zeigen: %s",
-			"version_hash": 0
-		},
-		"HEVLIB_MM_BUTTON_TOOLTIP_GITHUB": {
-			"string": "Mod Github Seite",
-			"version_hash": 0
-		},
-		"HEVLIB_MM_BUTTON_TOOLTIP_DISCORD": {
-			"string": "Mod Discord Thread",
-			"version_hash": 0
-		},
-		"HEVLIB_MM_BUTTON_TOOLTIP_NEXUS": {
-			"string": "Nexus Mods Seite",
-			"version_hash": 0
-		},
-		"HEVLIB_MM_BUTTON_TOOLTIP_DONATIONS": {
-			"string": "Spenden ans Projekt",
-			"version_hash": 0
-		},
-		"HEVLIB_MM_BUTTON_TOOLTIP_WIKI": {
-			"string": "Mod Wiki Seite",
-			"version_hash": 0
-		},
-		"HEVLIB_MM_BUTTON_TOOLTIP_BUGREPORTS": {
-			"string": "Einen Fehler melden",
-			"version_hash": 0
-		},
-		"HEVLIB_MM_BUTTON_TOOLTIP_CUSTOM": {
-			"string": "Mehr...",
-			"version_hash": 0
-		},
-		"HEVLIB_VANILLA_DESCRIPTION": {
-			"string": "Eine physikbasierte Bergbau-Simulation, angesiedelt im dichtesten Trümmerfeld des Sonnensystems. Jede Aktion hat eine Reaktion, Laser sind ohne ein Medium unsichtbar, und dein Schub ist eine mächtige Waffe. Finde Handelspartner, passe deine Ausrüstung an deinen Spielstil an und heuere eine Crew zur Unterstützung an. Lüfte die Geheimnisse der Ringe – oder werde einfach nur reich.",
-			"version_hash": 0
-		},
-		"HEVLIB_VANILLA_BRIEF": {
-			"string": "Das Basis Spiel",
-			"version_hash": 0
-		},
-		"HEVLIB_MODMENU_MODS": {
-			"string": "Mods",
-			"version_hash": 0
-		},
-		"HEVLIB_MODMENU_OK": {
-			"string": "Ok",
-			"version_hash": 0
-		},
-		"HEVLIB_MODMENU_CLOSE": {
-			"string": "Schließen",
-			"version_hash": 0
-		},
-		"HEVLIB_MODMENU_OPENFOLDER": {
-			"string": "Öffne Mod-Ordner",
-			"version_hash": 0
-		},
-		"HEVLIB_MODMENU_MODS_VISIBLE": {
-			"string": "Zeige %d Mods",
-			"version_hash": 0
-		},
-		"HEVLIB_DROP_FILES_TO_ADD_MODS": {
-			"string": "Ziehe Dateien per Drag-and-drop in dieses Fenster, um Mods hinzuzufügen.\\nMod-Dateien mit identischem Namen werden überschrieben.",
-			"version_hash": 0
-		},
-		"HEVLIB_MODMENU_VER_AND_PRIO": {
-			"string": "Version: v%s / Priorität: %s",
-			"version_hash": 0
-		},
-		"HEVLIB_MODMENU_PRIO": {
-			"string": "Priorität: %s",
-			"version_hash": 0
-		},
-		"HEVLIB_MODMENU_VERSION": {
-			"string": "Version: v%s",
-			"version_hash": 0
-		},
-		"HEVLIB_MODMENU_PRIO_MID_HEADER": {
-			"string": "Mod ID und Priorität",
-			"version_hash": 0
-		},
-		"HEVLIB_GITHUB": {
-			"string": "GitHub",
-			"version_hash": 0
-		},
-		"HEVLIB_DISCORD": {
-			"string": "Discord",
-			"version_hash": 0
-		},
-		"HEVLIB_NEXUS": {
-			"string": "Nexusmods",
-			"version_hash": 0
-		},
-		"HEVLIB_DONATIONS": {
-			"string": "Eine Spende machen",
-			"version_hash": 0
-		},
-		"HEVLIB_WIKI": {
-			"string": "Wiki",
-			"version_hash": 0
-		},
-		"HEVLIB_BUGREPORTS": {
-			"string": "Melde einen Fehler",
-			"version_hash": 0
-		},
-		"HEVLIB_GITHUB_TOOLTIP": {
-			"string": "GitHub repository für das Projekt",
-			"version_hash": 0
-		},
-		"HEVLIB_DISCORD_TOOLTIP": {
-			"string": "Discord thread/channel/server für das Projekt",
-			"version_hash": 0
-		},
-		"HEVLIB_NEXUS_TOOLTIP": {
-			"string": "Nexusmods Seite für das Projekt",
-			"version_hash": 0
-		},
-		"HEVLIB_DONATIONS_TOOLTIP": {
-			"string": "Spende an das Projekt",
-			"version_hash": 0
-		},
-		"HEVLIB_WIKI_TOOLTIP": {
-			"string": "Wiki Seite(n) für das Projekt",
-			"version_hash": 0
-		},
-		"HEVLIB_BUGREPORTS_TOOLTIP": {
-			"string": "Melde Fehler über des Projekt's Melde-Link",
-			"version_hash": 0
-		},
-		"HEVLIB_FILTER_BY_TAGS": {
-			"string": "Filter Mods bei Schlagwort",
-			"version_hash": 0
-		},
-		"HEVLIB_SETTINGS_BUTTON_TOOLTIP": {
-			"string": "Öffne das Einstellungen-Menü",
-			"version_hash": 0
-		},
-		"HEVLIB_LINKS_BUTTON": {
-			"string": "Links",
-			"version_hash": 0
-		},
-		"HEVLIB_BUGREPORTS_BUTTON": {
-			"string": "Fehlermeldungen",
-			"version_hash": 0
-		},
-		"HEVLIB_LINKS_TOOLTIP": {
-			"string": "Links des Projekts zeigen",
-			"version_hash": 0
-		},
-		"TAG_ALLOW_ACHIEVEMENTS": {
-			"string": "Erlaube Errungenschaften",
-			"version_hash": 0
-		},
-		"TAG_QOL": {
-			"string": "Quality of life",
-			"version_hash": 0
-		},
-		"TAG_USING_HEVLIB_RESEARCH": {
-			"string": "Nutzt HevLib Research",
-			"version_hash": 0
-		},
-		"TAG_VISUAL": {
-			"string": "Visuell",
-			"version_hash": 0
-		},
-		"TAG_FUN": {
-			"string": "Spaß",
-			"version_hash": 0
-		},
-		"TAG_UI": {
-			"string": "User interface (UI)",
-			"version_hash": 0
-		},
-		"TAG_ADDS_SHIPS": {
-			"string": "Fügt neue Schiffe hinzu",
-			"version_hash": 0
-		},
-		"TAG_ADDS_EQUIPMENT": {
-			"string": "Fügt neue Ausrüstung hinzu",
-			"version_hash": 0
-		},
-		"TAG_ADDS_GAMEPLAY_MECHANICS": {
-			"string": "Fügt neue Gamplay-Mechaniken hinzu",
-			"version_hash": 0
-		},
-		"TAG_ADDS_EVENTS": {
-			"string": "Fügt neue Ring-Events hinzu",
-			"version_hash": 0
-		},
-		"TAG_HANDLE_EXTRA_CREW": {
-			"string": "Handhabt extra Besatzung",
-			"version_hash": 0
-		},
-		"HEVLIB_TAG_FILTER": {
-			"string": "Filter Mods durch Schlagwort",
-			"version_hash": 0
-		},
-		"HEVLIB_VANILLA_STEAM_STORE": {
-			"string": "Steam",
-			"version_hash": 0
-		},
-		"HEVLIB_VANILLA_STEAM_STORE_TOOLTIP": {
-			"string": "Öffnet die Steam-Store-Seite für das Spiel",
-			"version_hash": 0
-		},
-		"HEVLIB_VANILLA_ITCH_STORE": {
-			"string": "itch.io",
-			"version_hash": 0
-		},
-		"HEVLIB_VANILLA_ITCH_STORE_TOOLTIP": {
-			"string": "Öffnet die itch.io-Seite für das Spiel",
-			"version_hash": 0
-		},
-		"HEVLIB_VANILLA_EPIC_STORE": {
-			"string": "Epic Games",
-			"version_hash": 0
-		},
-		"HEVLIB_VANILLA_EPIC_STORE_TOOLTIP": {
-			"string": "Öffnet die Epic Games-Seite für das Spiel",
-			"version_hash": 0
-		},
-		"HEVLIB_VANILLA_GOG_STORE": {
-			"string": "GOG",
-			"version_hash": 0
-		},
-		"HEVLIB_VANILLA_GOG_STORE_TOOLTIP": {
-			"string": "Öffnet die GOG-Seite für das Spiel",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_SORT_BY_PRICE": {
-			"string": "Ausrüstung nach Preis sortieren",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_SORT_BY_PRICE_TOOLTIP": {
-			"string": "Zwingt die Ausrüstung nach Preis zu sortieren.\t\\nDies zerstört zwar die Hilfsenergieeinheit, aber beugt Fehler mit gemoddeter Ausrüstung vor. ",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_SORT_SLOT_BY_TYPE": {
-			"string": "Sortiere Plätze nach Typ",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_SORT_SLOT_BY_TYPE_TOOLTIP": {
-			"string": "Sortiert Plätze nach Typ. Verhindert das willkürliche Versetzen von gemoddeten Plätzen.",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_USE_LEGACY_EQUIPMENT_HANDLING": {
-			"string": "Veraltetes System für Ausrüstung verwenden",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_USE_LEGACY_EQUIPMENT_HANDLING_TOOLTIP": {
-			"string": "Verwendet das Ausrüstungssystem von vor v1.7\\nSollte nur für ältere Mods verwendet werden.\\nFunktionalität wird nicht garantiert.",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_WRITE_EVENTS": {
-			"string": "Events aufzeichnen",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_WRITE_EVENTS_TOOLTIP": {
-			"string": "Schreibt in eine Datei unter user://cache/.HevLib_Cache/current_events.txt, welche alle Events beinhaltet, die bei Spielstart geladen werden.",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES": {
-			"string": "Zeige verstecke Bibliotheken",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES_TOOLTIP": {
-			"string": "Zeigt alle Bibliotheken, welche nicht dauerhaft angezeigt.",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_INPUT_DEBUGGER": {
-			"string": "Input debugger",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_INPUT_DEBUGGER_TOOLTIP": {
-			"string": "Zeigt Debug-Informationen über deine aktuellen Eingaben.",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_EVENT_DEBUGGER": {
-			"string": "Event debugger",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_EVENT_DEBUGGER_TOOLTIP": {
-			"string": "Zeigt Schlüsselereignisse und ob diese in-/aktiv sind.",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_POSITION_DATA_DEBUGGER": {
-			"string": "Position data debugger",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_POSITION_DATA_DEBUGGER_TOOLTIP": {
-			"string": "Zeigt das aktuelle Chaos und die erwartete Anzahl an möglichen Ereignissen währen eines Tauchvorganges",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS": {
-			"string": "Zeige genaue Events",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS_TOOLTIP": {
-			"string": "Wird im Zusammenhang mit dem Position data debugger verwendet. Zeigt einen Zähler für alle vorhandene Events Im Bereich.\\nBasierend darauf, wie wie diese Einstellung funktioniert, wird die Performance stark beeinträchtigt und es werden tausende Zeilen Logs geschrieben.\\n\\nDIE NUTZUNG WIRD NICHT UNTERSTÜTZT UND INVALIDIERT ALLE FEHLERMELDUNGEN! DU WURDEST GEWARNT!",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU": {
-			"string": "Debug event Menü",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU_TOOLTIP": {
-			"string": "Welche Taste öffnet das Event debugger Menü.",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_OPEN_DEBUGGER": {
-			"string": "Debug display umschalten",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_OPEN_DEBUGGER_TOOLTIP": {
-			"string": "Schaltet die Sichtbarkeit der --debug-console Anzeige, welches normalerweise ein Argument benötigt.",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS": {
-			"string": "HevLib debugger Menüs",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS_TOOLTIP": {
-			"string": "Wenn aktiviert, zeigt es den Input debugger sowie Event debugger",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_LINEEDIT_PLACEHOLDER": {
-			"string": "Text einfügen",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_SECTION_EQUIPMENT": {
-			"string": "Ausrüstung",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_SECTION_EVENTS": {
-			"string": "Events",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_SECTION_DRIVERS": {
-			"string": "Treiber",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_SECTION_DEBUG": {
-			"string": "Debug",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_SECTION_INPUT": {
-			"string": "Tasten",
-			"version_hash": 0
-		},
-		"HEVLIB_NOTIFICATIONS": {
-			"string": "Mod Benachrichtigungen",
-			"version_hash": 0
-		},
-		"HEVLIB_UPDATE_COUNT": {
-			"string": "Neue Updates: %s Mod(s)!",
-			"version_hash": 0
-		},
-		"HEVLIB_DEPENDANCY_COUNT": {
-			"string": "Fehlende Abhängigkeiten: %s Mod(s)!",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFLICT_COUNT": {
-			"string": "%s mod(s) konfligieren!",
-			"version_hash": 0
-		},
-		"HEVLIB_UPDATE_INFO_HEADER": {
-			"string": "Dieser Mod hat ausstehende Updates!",
-			"version_hash": 0
-		},
-		"HEVLIB_DEPENDANCY_INFO_HEADER": {
-			"string": "Diesem Mod fehlen Abhängigkeiten!",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFLICT_INFO_HEADER": {
-			"string": "Dieser Mod steht im Konflikt!",
-			"version_hash": 0
-		},
-		"HEVLIB_UPDATE_INFO_BODY": {
-			"string": "Den Mod von Version [%s] auf Version [%s] upgraden?",
-			"version_hash": 0
-		},
-		"HEVLIB_DEPENDANCY_INFO_BODY": {
-			"string": "Diesem Mod fehlen folgende Abhängigkeiten:\\n%s\\n\\n\\n\\Erwarte nicht, dass der Mods wie erwartet funktioniert!",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFLICT_INFO_BODY": {
-			"string": "Dieser Mod steht in Konflikt mit anderen Mods. Bitte nutze eine kompatiblere Version für die folgenden Mods:\\n%s\\n\\n\\n\\Erwarte nicht, dass der Mods wie erwartet funktioniert!",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_RANDOMIZE_MINERALS": {
-			"string": "Zufälliger Mineral-Seed",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_RANDOMIZE_MINERALS_TOOLTIP": {
-			"string": "Erstellt bei Spielstart immer einen zufälligen Seed für die Mineralien. \\n\\nWenn deaktiviert, wird ein vorrausbestimmte Liste an Konstanten für die Seeds verwendet.",
-			"version_hash": 0
-		},
-		"HEVLIB_UPDATE_CENTER": {
-			"string": "Mod Update Center",
-			"version_hash": 0
-		},
-		"HEVLIB_UPDATE_CENTER_DESC": {
-			"string": "Die folgenden Mods haben Updates",
-			"version_hash": 0
-		},
-		"HEVLIB_UPDATE_ALL": {
-			"string": "Update alle Mods",
-			"version_hash": 0
-		},
-		"HEVLIB_IGNORE_ALL": {
-			"string": "Ignorier alle Mods",
-			"version_hash": 0
-		},
-		"HEVLIB_IGNORE_UPDATE": {
-			"string": "Update ignorieren",
-			"version_hash": 0
-		},
-		"HEVLIB_UPDATE_MOD": {
-			"string": "Mod updaten",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD": {
-			"string": "Den Mod von Version [%s v%s] auf [%s] updaten? \\n\\nJe nach Größe des Mods kann dies etwas dauern.",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MOD_UPDATE": {
-			"string": "Das Update des Mods von Version [%s] auf [%s] ignorieren? \\n\\nDiese Entscheidung kann im Mod-Menü zurückgesetzt werden.",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MODS": {
-			"string": "Alle Mods updaten? \\n\\nJe nach Größe und Anzahl der Mods kann dies etwas dauern.",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MODS": {
-			"string": "Alle Mod-Updates ignorieren? \\n\\nDiese Entscheidung kann im Mod-Menü zurückgesetzt werden.",
-			"version_hash": 0
-		},
-		"HEVLIB_ICON_TOOLTIP_CONFLICT": {
-			"string": "Dieser Mods steht in Konflikt mit folgenden Mods:%s",
-			"version_hash": 0
-		},
-		"HEVLIB_ICON_TOOLTIP_DEPENDANCIES": {
-			"string": "Diesem Mod fehlen folgende Abhängigkeiten:%s",
-			"version_hash": 0
-		},
-		"HEVLIB_ICON_TOOLTIP_COMPLEMENTARY": {
-			"string": "Dieser Mod ergänzt die folgenden Mods:%s",
-			"version_hash": 0
-		},
-		"HEVLIB_ICON_TOOLTIP_UPDATES": {
-			"string": "Dieser Mod hat ein Update! \\nVersion [%s] -> Version [%s]",
-			"version_hash": 0
-		},
-		"HEVLIB_MODMENU_UPDATE_NOTIFIER": {
-			"string": "Es sind Mod-Updates verfügbar. \\n\\nWillst du das Update-Menü öffnen?",
-			"version_hash": 0
-		},
-		"HEVLIB_PLEASE_WAIT": {
-			"string": "Bitte warte...",
-			"version_hash": 0
-		},
-		"HEVLIB_RESTART": {
-			"string": "Spiel neustarten",
-			"version_hash": 0
-		},
-		"HEVLIB_EXIT_INSTEAD": {
-			"string": "Spiel beenden",
-			"version_hash": 0
-		},
-		"HEVLIB_RESTART_BECAUSE_NEW_MODS": {
-			"string": "Ein Neustart wird benötigt. \\n\\nAlternativ kann dieses Fenster geschlossen werden, damit du noch vorher speichern kannst.",
-			"version_hash": 0
-		},
-		"HEVLIB_WAIT_TO_UPDATE_ALL": {
-			"string": "Bitte warte... \\n\\nDownloade Mod %02d von %02d \\n%s [%s] Version [%s]",
-			"version_hash": 0
-		},
-		"HEVLIB_TITLE_IGNORE_MOD": {
-			"string": "Mod ignorieren?",
-			"version_hash": 0
-		},
-		"HEVLIB_TITLE_UPDATE_MOD": {
-			"string": "Mod updaten?",
-			"version_hash": 0
-		},
-		"HEVLIB_TITLE_IGNORE_MODS": {
-			"string": "Mods ignorieren?",
-			"version_hash": 0
-		},
-		"HEVLIB_TITLE_UPDATE_MODS": {
-			"string": "Mods updaten?",
-			"version_hash": 0
-		},
-		"HEVLIB_DLCLIST_DLC_HEADER": {
-			"string": "------- DLC ------",
-			"version_hash": 0
-		},
-		"HEVLIB_DLCLIST_MODS_HEADER": {
-			"string": "------ MODS ------",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST": {
-			"string": "Bibliotheken mit \"Immer zeigen\" in der DLC-Liste auflisten",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST_TOOLTIP": {
-			"string": "Bibliotheken mit dem 'Immer Zeigen' tag (so wie HevLib) erlauben, in der DLC-Mod-Liste zu erscheinen.",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST": {
-			"string": "Alle Bibliotheken auflisten",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST_TOOLTIP": {
-			"string": "Alle Bibliotheken in der DLC-Mod-Liste auflisten. Die Liste kann durch Mods mit vielen Sub-Prozessen sehr lang werden.",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_DLCLIST_SORT_ORDER": {
-			"string": "DLC-Mod-Liste Sortierung",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_DLCLIST_SORT_ORDER_TOOLTIP": {
-			"string": "Ob und wie die Liste sortiert werden soll.",
-			"version_hash": 0
-		},
-		"HEVLIB_RESEARCH": {
-			"string": "Forschung",
-			"version_hash": 0
-		},
-		"HEVLIB_RESEARCH_CURRENT": {
-			"string": "Aktuelle Forschung",
-			"version_hash": 0
-		},
-		"HEVLIB_CURRENT_PROJECTS": {
-			"string": "Aktive Forschungsprojekte",
-			"version_hash": 0
-		},
-		"HEVLIB_RESEARCH_STATS": {
-			"string": "Alle Projektstatistiken",
-			"version_hash": 0
-		},
-		"HEVLIB_RESEARCH_AVAILABLE": {
-			"string": "Verfügbare Projekte",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT": {
-			"string": "UI links scrollen",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT_TOOLTIP": {
-			"string": "Primäre Taste für horizontale Bildlaufmenüs",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT": {
-			"string": "UI rechts scrollen",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT_TOOLTIP": {
-			"string": "Primäre Taste für horizontale Bildlaufmenüs",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2": {
-			"string": "UI links scrollen (alt)",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2_TOOLTIP": {
-			"string": "Alternative Taste für horizontale Bildlaufmenüs",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2": {
-			"string": "UI rechts scrollen (alt)",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2_TOOLTIP": {
-			"string": "Alternative Alternative Taste für horizontale Bildlaufmenüs",
-			"version_hash": 0
-		},
-		"SYSTEM_HEVLIB_INTERNALS_NODE": {
-			"string": "Interne System Mod Laufzeit",
-			"version_hash": 0
-		},
-		"NOTIFICATION_NAME_PLACEHOLDER": {
-			"string": "{Benachrichtigungskörper fehlt}",
-			"version_hash": 0
-		},
-		"NOTIFICATION_TITLE_PLACEHOLDER": {
-			"string": "{Benachrichtigungsname fehlt}",
-			"version_hash": 0
-		},
-		"HEVLIB_AVAILABLE_RESEARCH": {
-			"string": "Verfügbare Forschungsprojekte",
-			"version_hash": 0
-		},
-		"HEVLIB_RESEARCH_TOTAL_TOOLTIP": {
-			"string": "Gesammter Forschungsstand für das Projekt",
-			"version_hash": 0
-		},
-		"DLC_ANDROID": {
-			"string": "Android face pack",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT": {
-			"string": "Limitiere Nanodrohnenlagerarbeitsleistung",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT_TOOLTIP": {
-			"string": "Verhindert, dass Nanodrohnen mehr als das vom installiertem Medium bereitgestellten Rate nutzen können. \\nNotiz: Dies wird nur in speziellen Konfigurationen passieren.",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING": {
-			"string": "Zeige aktuelle Spieleranzahl",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING_TOOLTIP": {
-			"string": "Zeigt die Anzahl aller Steam-Clienten in der oberen linken Bildschirmecke.\\nDieser Zähler unterscheidet zwischen Vollversion und Demo.",
-			"version_hash": 0
-		},
-		"HEVLIB_CLEAR_LEADERBOARDS": {
-			"string": "Leaderboardstatistiken resetten",
-			"version_hash": 0
-		},
-		"HEVLIB_CLEAR_LEADERBOARDS_TOOLTIP": {
-			"string": "Öffnet ein Menü, in welchem man individuelle Statistiken zurücksetzen kann. \\n\\nNOTIZ: Nur für Steam-Versionen",
-			"version_hash": 0
-		},
-		"HEVLIB_OPEN_MENU": {
-			"string": "Öffne Menü",
-			"version_hash": 0
-		},
-		"STEAMSTAT_best_haul": {
-			"string": "Beste Ausbeute (komplett)",
-			"version_hash": 0
-		},
-		"STEAMSTAT_best_ore": {
-			"string": "Beste Ausbeute (Erz)",
-			"version_hash": 0
-		},
-		"STEAMSTAT_longest_dive": {
-			"string": "Längster Tauchgang (mit Astrogation)",
-			"version_hash": 0
-		},
-		"STEAMSTAT_longest_dive_realtime": {
-			"string": "Längster Tauchgang (Steuerzeit)",
-			"version_hash": 0
-		},
-		"STEAMSTAT_money_per_day": {
-			"string": "Durchschnittliche Einnahmen pro Tag",
-			"version_hash": 0
-		},
-		"STEAMSTAT_time": {
-			"string": "Tage in den Ringen",
-			"version_hash": 0
-		},
-		"STEAMSTAT_total_money": {
-			"string": "Vermögen",
-			"version_hash": 0
-		},
-		"STEAMSTAT_CLEAR_STAT": {
-			"string": "Statistik reinigen",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIRM": {
-			"string": "Aktion bestätigen",
-			"version_hash": 0
-		},
-		"HEVLIB_WIPE_STAT_ARE_YOU_SURE": {
-			"string": "Bist du dir sicher, dass du %s ausradieren willst?",
-			"version_hash": 0
-		},
-		"HEVLIB_NOSTEAM": {
-			"string": "Dieses Menü funktioniert auf Steam.",
-			"version_hash": 0
-		},
-		"HEVLIB_OPT_PROFILES": {
-			"string": "Einstellungsprofile",
-			"version_hash": 0
-		},
-		"HEVLIB_PROFILE_SELECT": {
-			"string": "Profil wählen",
-			"version_hash": 0
-		},
-		"HEVLIB_ADD_PROFILE": {
-			"string": "Profil hinzufügen",
-			"version_hash": 0
-		},
-		"HEVLIB_RENAME_PROFILE": {
-			"string": "Profil umbenennen",
-			"version_hash": 0
-		},
-		"HEVLIB_DELETE_PROFILE": {
-			"string": "Profil löschen",
-			"version_hash": 0
-		},
-		"HEVLIB_PROFILENAME_ADD": {
-			"string": "Profil hinzufügen",
-			"version_hash": 0
-		},
-		"HEVLIB_PROFILENAME_RENAME": {
-			"string": "Profil umbenennen",
-			"version_hash": 0
-		},
-		"HEVLIB_PROFILE_DELETE": {
-			"string": "Profil löschen",
-			"version_hash": 0
-		},
-		"HEVLIB_PROFILE_DELETE_ARE_YOU_SURE": {
-			"string": "Bist du dir sicher, dass du das Profil löschen willst?",
-			"version_hash": 0
-		},
-		"HEVLIB_CHANGELOGS": {
-			"string": "Änderungsprotokoll",
-			"version_hash": 0
-		},
-		"HEVLIB_CHANGELOGS_NEW": {
-			"string": "Neues Änderungsprotokoll",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK": {
-			"string": "Multiple Mineralien pro Brocken",
-			"version_hash": 0
-		},
-		"HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK_TOOLTIP": {
-			"string": "Verbietet, dass multiple Mineralien sich auf einen Erz-Brocken sammeln. \\n\\nDank an Za'krin für die ursprüngliche Implementierung. Diese Version adaptiert und verbessert sie.",
-			"version_hash": 0
-		},
-		"HEVLIB_TRANSIT_TIP_1": {
-			"string": "Mehr Besatzung des gleichen Berufes lässt diese zusammen arbeiten.",
-			"version_hash": 0
-		},
-		"HEVLIB_TRANSIT_TIP_2": {
-			"string": "Abgesehen vom Autopiloten können deine Triebwerke immer noch angesteuert werden, auch wenn Bordcomputer oder HUD nicht mehr online sind.",
-			"version_hash": 0
-		},
-		"HEVLIB_TRANSIT_TIP_3": {
-			"string": "Beim bergen einer Rettungskapsel kann ein freier Halterungsarm diese sicher halten, während dein Frachtraum nicht zugemüllt wird.",
-			"version_hash": 0
-		},
-		"HEVLIB_TRANSIT_TIP_4": {
-			"string": "Eine Beanspruchungsbake kann mehr Aufmerksamkeit erzeugen.",
-			"version_hash": 0
-		},
-		"HEVLIB_TRANSIT_TIP_5": {
-			"string": "Dein Geologe kann einschränken, was deine Ausrüstung erkennen kan. Je strenger die Filter sind, desto weniger werden die Systeme überfordert.",
-			"version_hash": 0
-		},
-		"HEVLIB_TRANSIT_TIP_6": {
-			"string": "Wenn dir Jameson's monatlicher Satz zu wenig ist, kannst du im Ring ein Search-and-Rescue-Schiff aufsuchen, um mehr Versicherung zu erhalten.",
-			"version_hash": 0
-		},
-		"HEVLIB_TRANSIT_TIP_7": {
-			"string": "Eine glückliche Besatzung arbeitet weniger hart und unglücklich fühlen sie sich weniger motiviert.",
-			"version_hash": 0
-		},
-		"HEVLIB_TRANSIT_TIP_8": {
-			"string": "Wenn ein object mit dem Autopiloten auswählt wurde, können mikroseismische Drohnen das Zielobjekt scannen, ansonsten wird das Objekt gescannt, was sich unter der Maus befindet",
-			"version_hash": 0
-		},
-		"HEVLIB_TRANSIT_TIP_9": {
-			"string": "Habitate zahlen immer bessere Preise als den aktuellen  Marktpreis.",
-			"version_hash": 0
-		},
-		"HEVLIB_TRANSIT_TIP_10": {
-			"string": "Zu viele Nanodrohnen genutzt, die unnützes Erz sammeln? Richte deinen Filter im Geologen ein, um nur das zu erhalten, was du möchtest und spare dabei an Drohnen.",
-			"version_hash": 0
-		},
-		"HEVLIB_TRANSIT_TIP_11": {
-			"string": "Probleme mit Mods? Melde es dort, wo du sie herbekommen hast, oder versuche es im Discord für zeitnahen Support. ",
-			"version_hash": 0
-		},
-		"HEVLIB_TRANSIT_TIP_12": {
-			"string": "Hast du einen Vorschlag für einen mods? Betritt den Discord und frage freundlich nach.",
-			"version_hash": 0
-		},
-		"HEVLIB_TRANSIT_TIP_13": {
-			"string": "Möchtest du mehr mods? Schau die dir hier die ganze Liste an: 'https://delta-v.kodera.pl/index.php/Mod_List'",
-			"version_hash": 0
-		},
-		"HEVLIB_TRANSIT_TIP_14": {
-			"string": "Behalte im Hinterkopf, das alles, was Steine zerstören kann, auch andere Schiffe beschädigen kann.",
-			"version_hash": 0
-		},
-		"HEVLIB_TRANSIT_TIP_15": {
-			"string": "Autonome Systeme arbeiten wie vorgesehen, jedoch braucht es Geduld, damit sie arbeiten.",
-			"version_hash": 0
-		},
-		"HEVLIB_TRANSIT_TIP_16": {
-			"string": "Gefallen dir die Mods, die du nutzt? Unterstütze doch die Schöpfer!",
-			"version_hash": 0
-		},
-		"HEVLIB_TRANSIT_TIP_17": {
-			"string": "Mods verhalten sich nach einem Update anders? Schau in das Änderungsprotokoll oder frag den Verfasser.",
-			"version_hash": 0
-		},
-		"MODMENU2_MOD_DESCRIPTION": {
-			"string": "Ein erweitertes Mod-Menü, welches beinahe eine komplette Kontrolle darüber hat, wie du deine Mods siehst.\\n\\nBesonderheiten:\\n\\n* Einfache Mod-Ansicht - zeigt, welche Mods installiert sind, egal ob sie ein modernes Manifest haben, oder einfach nur simple Mods sind, aber auch aber Infos über das Hauptspiel.\\n* Mod Einstellungen - Erlaubt dem Nutzer Mods einzustellen, ohne dass er die Manifest-Datei bearbeiten muss.\\n* Update Kontrolle - Jeder Mod, der die benötigten Informationen liefert, kann auf Updates beim Spielstart kontrolliert werden. Updates können individuell oder im ganzen heruntergeladen, oder auch ignoriert werden.\\n* Konflikt- und Abhängigkeitsprüfungen – jede Mod, die Mod-IDs für erforderliche Mods oder für inkompatible Mods angibt, zeigt eine Warnung auf dem Startbildschirm an. Hinweis: Dies funktioniert nur bei Mods mit Manifest-Dateien.\\n* Tag- & Suchfilter – ermöglichen es, die angezeigten Mods nach Schlüsselwort oder Mod-ID zu filtern oder aus einer Menge von in den Mods enthaltenen Schlüsselwörtern auszuwählen, um nur Mods anzuzeigen, die ein bestimmtes Schlüsselwort verwenden.",
-			"version_hash": 0
-		},
-		"MODMENU2_MOD_BRIEF": {
-			"string": "Ein erweitertes Mod-Menü",
-			"version_hash": 0
-		},
-		"MODMENU2_CONFIG_GENERAL": {
-			"string": "Allgemein",
-			"version_hash": 0
-		},
-		"MODMENU2_CLEAR_IGNORED_UPDATES": {
-			"string": "Ignorierte Updates zurücksetzen",
-			"version_hash": 0
-		},
-		"MODMENU2_CLEAR_IGNORED_UPDATES_TOOLTIP": {
-			"string": "Setzt die Liste der Mods, die beim updaten ignoriert werden, zurück",
-			"version_hash": 0
-		},
-		"MODMENU2_CLEAR_IGNORED_UPDATES_BUTTON": {
-			"string": "Zurücksetzen",
-			"version_hash": 0
-		}
-	},
 	"en": {
 		"HEVLIB_MOD_BRIEF": {
 			"string": "Library mod containing several common functions created by __hev",
@@ -2282,12 +1352,8 @@ const TRANSLATIONS = {
 			"version_hash": 4113957048
 		},
 		"HEVLIB_CREDITS_CONTRIBUTORS_1WT1": {
-			"string": "WT - Ukranian translations, configs for SHIP_NODE_MODIFY",
-			"version_hash": 1793258836
-		},
-		"HEVLIB_CREDITS_CONTRIBUTORS_HEDRAUTA": {
-			"string": "Hedrauta - German translations",
-			"version_hash": 1012571612
+			"string": "WT - Configs for SHIP_NODE_MODIFY",
+			"version_hash": 4219071341
 		},
 		"HEVLIB_CREDITS_SUPPORTERS_HEADER": {
 			"string": "   --- Supporters ---   ",
@@ -2536,6 +1602,948 @@ const TRANSLATIONS = {
 		"HEVLIB_CREDITS_SOFTWARE_JELLE": {
 			"string": "jelle - GDUNZIP implementation",
 			"version_hash": 784233189
+		},
+		"HEVLIB_CREDITS_TRANSLATORS_HEADER": {
+			"string": "   --- Translators ---   ",
+			"version_hash": 3211741168
+		},
+		"HEVLIB_CREDITS_TRANSLATORS_1WT1": {
+			"string": "WT - Ukranian translations",
+			"version_hash": 1851458392
+		},
+		"HEVLIB_CREDITS_TRANSLATORS_HEDRAUTA": {
+			"string": "Hedrauta - German translations",
+			"version_hash": 1012571612
+		}
+	},
+	"de": {
+		"HEVLIB_MOD_BRIEF": {
+			"string": "Mod-Bibliothek für die meistgenutzten Funktionen erstellt von __hev",
+			"version_hash": 0
+		},
+		"HEVLIB_MOD_DESCRIPTION": {
+			"string": "Eine Programmbibliothek beitet eine Reihe von Funktionen für andere Mods duch 'Pointer'-Dateien. \\n * Umgang mit Mod-Manifest-Dateien mittels Versionierung, um ein einheitliches Medium zur Abfrage von Informationen daraus zu schaffen.\\n * EquipmentTreiber - Hinzufügen und verwalten von Ausrüstungs-Items\\\\-Plätzen und mehr...\\n * WaffenPlatzTreiber - Hinzufügen und verwalten von Ausrüstung für die Befestigungen.\\n\\nDiese Bibliothek verfolgt außerdem das Ziel, eine konsistente Vorgehensweise beizubehalten, um Modding zu erleichtern. Die Kompatibilität mit Mods ist ebenfalls ein zentraler Schwerpunkt der bereitgestellten Funktionalität.\\n\\nWeitere Informationen findest du im Wiki dieses Mods. Wenn du Vorschläge oder Ideen hast, hinterlasse sie bitte im Discord oder als GitHub-Issue.",
+			"version_hash": 0
+		},
+		"HEVLIB_MOD_ERROR_HEADER": {
+			"string": "%s MOD ISSUES",
+			"version_hash": 0
+		},
+		"HEVLIB_MOD_ERROR_DEPENDANCY_DIALOGUE_BOX": {
+			"string": "Es gibt aktuell %s ubefriedigte Mod-Abhängigkeiten. Stelle sicher dass die Vorraussetzungen vorhanden sind, oder entferne die Mods: %s",
+			"version_hash": 0
+		},
+		"HEVLIB_GENERIC_ERROR_DIALOGUE_BOX": {
+			"string": "Etwas ist schief gelaufen. Bitte das Spiel neustarten!",
+			"version_hash": 0
+		},
+		"EVENTDRIVER_MENU": {
+			"string": "EventDriver Debug Menü",
+			"version_hash": 0
+		},
+		"EVENTDRIVER_EVENTS": {
+			"string": "Ausgewähltes Event",
+			"version_hash": 0
+		},
+		"EVENTDRIVER_TIMER": {
+			"string": "Storyteller Event Timer",
+			"version_hash": 0
+		},
+		"EVENTDRIVER_SPAWNNOW": {
+			"string": "Erzwinge aktuell gewähltes Event zu starten",
+			"version_hash": 0
+		},
+		"EVENTDRIVER_EVENT_SELECTOR": {
+			"string": "Event Selektor",
+			"version_hash": 0
+		},
+		"EVENTDRIVER_CLEAREVENT": {
+			"string": "Ausgewählte(s) Event(s) bereinigen",
+			"version_hash": 0
+		},
+		"HEVLIB_MISSING_DOCUMENTATION_1": {
+			"string": "!!!!! Für dieses Feature wurde keine Dokumentation bereitgestellt!",
+			"version_hash": 0
+		},
+		"HEVLIB_MISSING_DOCUMENTATION_2": {
+			"string": "!!!!! Bitte teile es mir (__hev) ASAP mit, da Dokumentationen der Schlüssel für Bibliotheken wie diese sind, um Instandhaltung zu wahren!",
+			"version_hash": 0
+		},
+		"HEVLIB_DESCRIPTION_PLACEHOLDER": {
+			"string": "Dieser Mods hat keine Beschreibung. \\n\\nÜberprüfe die Webseite, wo du den Mod erhalten hast oder frage beim Ersteller nach einer Beschreibung.",
+			"version_hash": 0
+		},
+		"HEVLIB_SELF_CHECK_ERROR_MESSAGE": {
+			"string": "HevLib wurde nicht korrekt installiert. Überprüfe deine Quelle und stelle sicher, dass es wie folgt aussieht: HevLib.zip/HevLib/\\n\\nMit OK wird das Spiel beendet und du es werden die aktuellsten Releases im Browser geöffnet.",
+			"version_hash": 0
+		},
+		"HEVLIB_SELF_CHECK_ERROR_HEADER": {
+			"string": "HEVLIB LOAD ERROR!",
+			"version_hash": 0
+		},
+		"HEVLIB_INCORRECT_SHIP": {
+			"string": "(ERROR!) Fehlender Schiffs-Typ: '%s'\\nDas Save kann nicht geladen werden, da das aktive Schiff nicht verügbar ist!\\nUm das Save zu laden, installiere bitte den Mod erneut, der diesen Schiffs-Typ enthält!",
+			"version_hash": 0
+		},
+		"HEVLIB_SLOT": {
+			"string": "Slot",
+			"version_hash": 0
+		},
+		"HEVLIB_MOD_MENU": {
+			"string": "Mod Menü",
+			"version_hash": 0
+		},
+		"HEVLIB_MISSING_MOD_NAME": {
+			"string": "Mod Name nicht verfügbar :(",
+			"version_hash": 0
+		},
+		"HEVLIB_MISSING_DESCRIPTION": {
+			"string": "Dieser Mods hat keine Beschreibung. :( \\n\\nÜberprüfe die Webseite, wo du den Mod erhalten hast oder frage beim Ersteller nach einer Beschreibung.",
+			"version_hash": 0
+		},
+		"HEVLIB_AUTHOR": {
+			"string": "Ersteller:",
+			"version_hash": 0
+		},
+		"HEVLIB_CREDITS": {
+			"string": "Danksagung:",
+			"version_hash": 0
+		},
+		"HEVLIB_UNKNOWN": {
+			"string": "Unbekannt",
+			"version_hash": 0
+		},
+		"HEVLIB_MM_TOOLTIP_HEADER": {
+			"string": "Mod Information:",
+			"version_hash": 0
+		},
+		"HEVLIB_MM_TOOLTIP_ID": {
+			"string": "Mod ID: %s",
+			"version_hash": 0
+		},
+		"HEVLIB_MM_TOOLTIP_MV": {
+			"string": "Manifest Version: %s",
+			"version_hash": 0
+		},
+		"HEVLIB_MM_TOOLTIP_ZIP": {
+			"string": "Zip File: %s",
+			"version_hash": 0
+		},
+		"HEVLIB_MM_TOOLTIP_LIBRARY": {
+			"string": "Bibliothek: %s \\ Immer zeigen: %s",
+			"version_hash": 0
+		},
+		"HEVLIB_MM_BUTTON_TOOLTIP_GITHUB": {
+			"string": "Mod Github Seite",
+			"version_hash": 0
+		},
+		"HEVLIB_MM_BUTTON_TOOLTIP_DISCORD": {
+			"string": "Mod Discord Thread",
+			"version_hash": 0
+		},
+		"HEVLIB_MM_BUTTON_TOOLTIP_NEXUS": {
+			"string": "Nexus Mods Seite",
+			"version_hash": 0
+		},
+		"HEVLIB_MM_BUTTON_TOOLTIP_DONATIONS": {
+			"string": "Spenden ans Projekt",
+			"version_hash": 0
+		},
+		"HEVLIB_MM_BUTTON_TOOLTIP_WIKI": {
+			"string": "Mod Wiki Seite",
+			"version_hash": 0
+		},
+		"HEVLIB_MM_BUTTON_TOOLTIP_BUGREPORTS": {
+			"string": "Einen Fehler melden",
+			"version_hash": 0
+		},
+		"HEVLIB_MM_BUTTON_TOOLTIP_CUSTOM": {
+			"string": "Mehr...",
+			"version_hash": 0
+		},
+		"HEVLIB_VANILLA_DESCRIPTION": {
+			"string": "Eine physikbasierte Bergbau-Simulation, angesiedelt im dichtesten Trümmerfeld des Sonnensystems. Jede Aktion hat eine Reaktion, Laser sind ohne ein Medium unsichtbar, und dein Schub ist eine mächtige Waffe. Finde Handelspartner, passe deine Ausrüstung an deinen Spielstil an und heuere eine Crew zur Unterstützung an. Lüfte die Geheimnisse der Ringe – oder werde einfach nur reich.",
+			"version_hash": 0
+		},
+		"HEVLIB_VANILLA_BRIEF": {
+			"string": "Das Basis Spiel",
+			"version_hash": 0
+		},
+		"HEVLIB_MODMENU_MODS": {
+			"string": "Mods",
+			"version_hash": 0
+		},
+		"HEVLIB_MODMENU_OK": {
+			"string": "Ok",
+			"version_hash": 0
+		},
+		"HEVLIB_MODMENU_CLOSE": {
+			"string": "Schließen",
+			"version_hash": 0
+		},
+		"HEVLIB_MODMENU_OPENFOLDER": {
+			"string": "Öffne Mod-Ordner",
+			"version_hash": 0
+		},
+		"HEVLIB_MODMENU_MODS_VISIBLE": {
+			"string": "Zeige %d Mods",
+			"version_hash": 0
+		},
+		"HEVLIB_DROP_FILES_TO_ADD_MODS": {
+			"string": "Ziehe Dateien per Drag-and-drop in dieses Fenster, um Mods hinzuzufügen.\\nMod-Dateien mit identischem Namen werden überschrieben.",
+			"version_hash": 0
+		},
+		"HEVLIB_MODMENU_VER_AND_PRIO": {
+			"string": "Version: v%s / Priorität: %s",
+			"version_hash": 0
+		},
+		"HEVLIB_MODMENU_PRIO": {
+			"string": "Priorität: %s",
+			"version_hash": 0
+		},
+		"HEVLIB_MODMENU_VERSION": {
+			"string": "Version: v%s",
+			"version_hash": 0
+		},
+		"HEVLIB_MODMENU_PRIO_MID_HEADER": {
+			"string": "Mod ID und Priorität",
+			"version_hash": 0
+		},
+		"HEVLIB_GITHUB": {
+			"string": "GitHub",
+			"version_hash": 0
+		},
+		"HEVLIB_DISCORD": {
+			"string": "Discord",
+			"version_hash": 0
+		},
+		"HEVLIB_NEXUS": {
+			"string": "Nexusmods",
+			"version_hash": 0
+		},
+		"HEVLIB_DONATIONS": {
+			"string": "Eine Spende machen",
+			"version_hash": 0
+		},
+		"HEVLIB_WIKI": {
+			"string": "Wiki",
+			"version_hash": 0
+		},
+		"HEVLIB_BUGREPORTS": {
+			"string": "Melde einen Fehler",
+			"version_hash": 0
+		},
+		"HEVLIB_GITHUB_TOOLTIP": {
+			"string": "GitHub repository für das Projekt",
+			"version_hash": 0
+		},
+		"HEVLIB_DISCORD_TOOLTIP": {
+			"string": "Discord thread/channel/server für das Projekt",
+			"version_hash": 0
+		},
+		"HEVLIB_NEXUS_TOOLTIP": {
+			"string": "Nexusmods Seite für das Projekt",
+			"version_hash": 0
+		},
+		"HEVLIB_DONATIONS_TOOLTIP": {
+			"string": "Spende an das Projekt",
+			"version_hash": 0
+		},
+		"HEVLIB_WIKI_TOOLTIP": {
+			"string": "Wiki Seite(n) für das Projekt",
+			"version_hash": 0
+		},
+		"HEVLIB_BUGREPORTS_TOOLTIP": {
+			"string": "Melde Fehler über des Projekt's Melde-Link",
+			"version_hash": 0
+		},
+		"HEVLIB_FILTER_BY_TAGS": {
+			"string": "Filter Mods bei Schlagwort",
+			"version_hash": 0
+		},
+		"HEVLIB_SETTINGS_BUTTON_TOOLTIP": {
+			"string": "Öffne das Einstellungen-Menü",
+			"version_hash": 0
+		},
+		"HEVLIB_LINKS_BUTTON": {
+			"string": "Links",
+			"version_hash": 0
+		},
+		"HEVLIB_BUGREPORTS_BUTTON": {
+			"string": "Fehlermeldungen",
+			"version_hash": 0
+		},
+		"HEVLIB_LINKS_TOOLTIP": {
+			"string": "Links des Projekts zeigen",
+			"version_hash": 0
+		},
+		"TAG_ALLOW_ACHIEVEMENTS": {
+			"string": "Erlaube Errungenschaften",
+			"version_hash": 0
+		},
+		"TAG_QOL": {
+			"string": "Quality of life",
+			"version_hash": 0
+		},
+		"TAG_USING_HEVLIB_RESEARCH": {
+			"string": "Nutzt HevLib Research",
+			"version_hash": 0
+		},
+		"TAG_VISUAL": {
+			"string": "Visuell",
+			"version_hash": 0
+		},
+		"TAG_FUN": {
+			"string": "Spaß",
+			"version_hash": 0
+		},
+		"TAG_UI": {
+			"string": "User interface (UI)",
+			"version_hash": 0
+		},
+		"TAG_ADDS_SHIPS": {
+			"string": "Fügt neue Schiffe hinzu",
+			"version_hash": 0
+		},
+		"TAG_ADDS_EQUIPMENT": {
+			"string": "Fügt neue Ausrüstung hinzu",
+			"version_hash": 0
+		},
+		"TAG_ADDS_GAMEPLAY_MECHANICS": {
+			"string": "Fügt neue Gamplay-Mechaniken hinzu",
+			"version_hash": 0
+		},
+		"TAG_ADDS_EVENTS": {
+			"string": "Fügt neue Ring-Events hinzu",
+			"version_hash": 0
+		},
+		"TAG_HANDLE_EXTRA_CREW": {
+			"string": "Handhabt extra Besatzung",
+			"version_hash": 0
+		},
+		"HEVLIB_TAG_FILTER": {
+			"string": "Filter Mods durch Schlagwort",
+			"version_hash": 0
+		},
+		"HEVLIB_VANILLA_STEAM_STORE": {
+			"string": "Steam",
+			"version_hash": 0
+		},
+		"HEVLIB_VANILLA_STEAM_STORE_TOOLTIP": {
+			"string": "Öffnet die Steam-Store-Seite für das Spiel",
+			"version_hash": 0
+		},
+		"HEVLIB_VANILLA_ITCH_STORE": {
+			"string": "itch.io",
+			"version_hash": 0
+		},
+		"HEVLIB_VANILLA_ITCH_STORE_TOOLTIP": {
+			"string": "Öffnet die itch.io-Seite für das Spiel",
+			"version_hash": 0
+		},
+		"HEVLIB_VANILLA_EPIC_STORE": {
+			"string": "Epic Games",
+			"version_hash": 0
+		},
+		"HEVLIB_VANILLA_EPIC_STORE_TOOLTIP": {
+			"string": "Öffnet die Epic Games-Seite für das Spiel",
+			"version_hash": 0
+		},
+		"HEVLIB_VANILLA_GOG_STORE": {
+			"string": "GOG",
+			"version_hash": 0
+		},
+		"HEVLIB_VANILLA_GOG_STORE_TOOLTIP": {
+			"string": "Öffnet die GOG-Seite für das Spiel",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_SORT_BY_PRICE": {
+			"string": "Ausrüstung nach Preis sortieren",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_SORT_BY_PRICE_TOOLTIP": {
+			"string": "Zwingt die Ausrüstung nach Preis zu sortieren.\t\\nDies zerstört zwar die Hilfsenergieeinheit, aber beugt Fehler mit gemoddeter Ausrüstung vor. ",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_SORT_SLOT_BY_TYPE": {
+			"string": "Sortiere Plätze nach Typ",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_SORT_SLOT_BY_TYPE_TOOLTIP": {
+			"string": "Sortiert Plätze nach Typ. Verhindert das willkürliche Versetzen von gemoddeten Plätzen.",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_USE_LEGACY_EQUIPMENT_HANDLING": {
+			"string": "Veraltetes System für Ausrüstung verwenden",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_USE_LEGACY_EQUIPMENT_HANDLING_TOOLTIP": {
+			"string": "Verwendet das Ausrüstungssystem von vor v1.7\\nSollte nur für ältere Mods verwendet werden.\\nFunktionalität wird nicht garantiert.",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_WRITE_EVENTS": {
+			"string": "Events aufzeichnen",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_WRITE_EVENTS_TOOLTIP": {
+			"string": "Schreibt in eine Datei unter user://cache/.HevLib_Cache/current_events.txt, welche alle Events beinhaltet, die bei Spielstart geladen werden.",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES": {
+			"string": "Zeige verstecke Bibliotheken",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES_TOOLTIP": {
+			"string": "Zeigt alle Bibliotheken, welche nicht dauerhaft angezeigt.",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_INPUT_DEBUGGER": {
+			"string": "Input debugger",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_INPUT_DEBUGGER_TOOLTIP": {
+			"string": "Zeigt Debug-Informationen über deine aktuellen Eingaben.",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_EVENT_DEBUGGER": {
+			"string": "Event debugger",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_EVENT_DEBUGGER_TOOLTIP": {
+			"string": "Zeigt Schlüsselereignisse und ob diese in-/aktiv sind.",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_POSITION_DATA_DEBUGGER": {
+			"string": "Position data debugger",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_POSITION_DATA_DEBUGGER_TOOLTIP": {
+			"string": "Zeigt das aktuelle Chaos und die erwartete Anzahl an möglichen Ereignissen währen eines Tauchvorganges",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS": {
+			"string": "Zeige genaue Events",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS_TOOLTIP": {
+			"string": "Wird im Zusammenhang mit dem Position data debugger verwendet. Zeigt einen Zähler für alle vorhandene Events Im Bereich.\\nBasierend darauf, wie wie diese Einstellung funktioniert, wird die Performance stark beeinträchtigt und es werden tausende Zeilen Logs geschrieben.\\n\\nDIE NUTZUNG WIRD NICHT UNTERSTÜTZT UND INVALIDIERT ALLE FEHLERMELDUNGEN! DU WURDEST GEWARNT!",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU": {
+			"string": "Debug event Menü",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_OPEN_DEBUG_EVENT_MENU_TOOLTIP": {
+			"string": "Welche Taste öffnet das Event debugger Menü.",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_OPEN_DEBUGGER": {
+			"string": "Debug display umschalten",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_OPEN_DEBUGGER_TOOLTIP": {
+			"string": "Schaltet die Sichtbarkeit der --debug-console Anzeige, welches normalerweise ein Argument benötigt.",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS": {
+			"string": "HevLib debugger Menüs",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_TOGGLE_DEBUG_MENUS_TOOLTIP": {
+			"string": "Wenn aktiviert, zeigt es den Input debugger sowie Event debugger",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_LINEEDIT_PLACEHOLDER": {
+			"string": "Text einfügen",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_SECTION_EQUIPMENT": {
+			"string": "Ausrüstung",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_SECTION_EVENTS": {
+			"string": "Events",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_SECTION_DRIVERS": {
+			"string": "Treiber",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_SECTION_DEBUG": {
+			"string": "Debug",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_SECTION_INPUT": {
+			"string": "Tasten",
+			"version_hash": 0
+		},
+		"HEVLIB_NOTIFICATIONS": {
+			"string": "Mod Benachrichtigungen",
+			"version_hash": 0
+		},
+		"HEVLIB_UPDATE_COUNT": {
+			"string": "Neue Updates: %s Mod(s)!",
+			"version_hash": 0
+		},
+		"HEVLIB_DEPENDANCY_COUNT": {
+			"string": "Fehlende Abhängigkeiten: %s Mod(s)!",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFLICT_COUNT": {
+			"string": "%s mod(s) konfligieren!",
+			"version_hash": 0
+		},
+		"HEVLIB_UPDATE_INFO_HEADER": {
+			"string": "Dieser Mod hat ausstehende Updates!",
+			"version_hash": 0
+		},
+		"HEVLIB_DEPENDANCY_INFO_HEADER": {
+			"string": "Diesem Mod fehlen Abhängigkeiten!",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFLICT_INFO_HEADER": {
+			"string": "Dieser Mod steht im Konflikt!",
+			"version_hash": 0
+		},
+		"HEVLIB_UPDATE_INFO_BODY": {
+			"string": "Den Mod von Version [%s] auf Version [%s] upgraden?",
+			"version_hash": 0
+		},
+		"HEVLIB_DEPENDANCY_INFO_BODY": {
+			"string": "Diesem Mod fehlen folgende Abhängigkeiten:\\n%s\\n\\n\\n\\Erwarte nicht, dass der Mods wie erwartet funktioniert!",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFLICT_INFO_BODY": {
+			"string": "Dieser Mod steht in Konflikt mit anderen Mods. Bitte nutze eine kompatiblere Version für die folgenden Mods:\\n%s\\n\\n\\n\\Erwarte nicht, dass der Mods wie erwartet funktioniert!",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_RANDOMIZE_MINERALS": {
+			"string": "Zufälliger Mineral-Seed",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_RANDOMIZE_MINERALS_TOOLTIP": {
+			"string": "Erstellt bei Spielstart immer einen zufälligen Seed für die Mineralien. \\n\\nWenn deaktiviert, wird ein vorrausbestimmte Liste an Konstanten für die Seeds verwendet.",
+			"version_hash": 0
+		},
+		"HEVLIB_UPDATE_CENTER": {
+			"string": "Mod Update Center",
+			"version_hash": 0
+		},
+		"HEVLIB_UPDATE_CENTER_DESC": {
+			"string": "Die folgenden Mods haben Updates",
+			"version_hash": 0
+		},
+		"HEVLIB_UPDATE_ALL": {
+			"string": "Update alle Mods",
+			"version_hash": 0
+		},
+		"HEVLIB_IGNORE_ALL": {
+			"string": "Ignorier alle Mods",
+			"version_hash": 0
+		},
+		"HEVLIB_IGNORE_UPDATE": {
+			"string": "Update ignorieren",
+			"version_hash": 0
+		},
+		"HEVLIB_UPDATE_MOD": {
+			"string": "Mod updaten",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD": {
+			"string": "Den Mod von Version [%s v%s] auf [%s] updaten? \\n\\nJe nach Größe des Mods kann dies etwas dauern.",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MOD_UPDATE": {
+			"string": "Das Update des Mods von Version [%s] auf [%s] ignorieren? \\n\\nDiese Entscheidung kann im Mod-Menü zurückgesetzt werden.",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MODS": {
+			"string": "Alle Mods updaten? \\n\\nJe nach Größe und Anzahl der Mods kann dies etwas dauern.",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MODS": {
+			"string": "Alle Mod-Updates ignorieren? \\n\\nDiese Entscheidung kann im Mod-Menü zurückgesetzt werden.",
+			"version_hash": 0
+		},
+		"HEVLIB_ICON_TOOLTIP_CONFLICT": {
+			"string": "Dieser Mods steht in Konflikt mit folgenden Mods:%s",
+			"version_hash": 0
+		},
+		"HEVLIB_ICON_TOOLTIP_DEPENDANCIES": {
+			"string": "Diesem Mod fehlen folgende Abhängigkeiten:%s",
+			"version_hash": 0
+		},
+		"HEVLIB_ICON_TOOLTIP_COMPLEMENTARY": {
+			"string": "Dieser Mod ergänzt die folgenden Mods:%s",
+			"version_hash": 0
+		},
+		"HEVLIB_ICON_TOOLTIP_UPDATES": {
+			"string": "Dieser Mod hat ein Update! \\nVersion [%s] -> Version [%s]",
+			"version_hash": 0
+		},
+		"HEVLIB_MODMENU_UPDATE_NOTIFIER": {
+			"string": "Es sind Mod-Updates verfügbar. \\n\\nWillst du das Update-Menü öffnen?",
+			"version_hash": 0
+		},
+		"HEVLIB_PLEASE_WAIT": {
+			"string": "Bitte warte...",
+			"version_hash": 0
+		},
+		"HEVLIB_RESTART": {
+			"string": "Spiel neustarten",
+			"version_hash": 0
+		},
+		"HEVLIB_EXIT_INSTEAD": {
+			"string": "Spiel beenden",
+			"version_hash": 0
+		},
+		"HEVLIB_RESTART_BECAUSE_NEW_MODS": {
+			"string": "Ein Neustart wird benötigt. \\n\\nAlternativ kann dieses Fenster geschlossen werden, damit du noch vorher speichern kannst.",
+			"version_hash": 0
+		},
+		"HEVLIB_WAIT_TO_UPDATE_ALL": {
+			"string": "Bitte warte... \\n\\nDownloade Mod %02d von %02d \\n%s [%s] Version [%s]",
+			"version_hash": 0
+		},
+		"HEVLIB_TITLE_IGNORE_MOD": {
+			"string": "Mod ignorieren?",
+			"version_hash": 0
+		},
+		"HEVLIB_TITLE_UPDATE_MOD": {
+			"string": "Mod updaten?",
+			"version_hash": 0
+		},
+		"HEVLIB_TITLE_IGNORE_MODS": {
+			"string": "Mods ignorieren?",
+			"version_hash": 0
+		},
+		"HEVLIB_TITLE_UPDATE_MODS": {
+			"string": "Mods updaten?",
+			"version_hash": 0
+		},
+		"HEVLIB_DLCLIST_DLC_HEADER": {
+			"string": "------- DLC ------",
+			"version_hash": 0
+		},
+		"HEVLIB_DLCLIST_MODS_HEADER": {
+			"string": "------ MODS ------",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST": {
+			"string": "Bibliotheken mit \"Immer zeigen\" in der DLC-Liste auflisten",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST_TOOLTIP": {
+			"string": "Bibliotheken mit dem 'Immer Zeigen' tag (so wie HevLib) erlauben, in der DLC-Mod-Liste zu erscheinen.",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST": {
+			"string": "Alle Bibliotheken auflisten",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST_TOOLTIP": {
+			"string": "Alle Bibliotheken in der DLC-Mod-Liste auflisten. Die Liste kann durch Mods mit vielen Sub-Prozessen sehr lang werden.",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_DLCLIST_SORT_ORDER": {
+			"string": "DLC-Mod-Liste Sortierung",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_DLCLIST_SORT_ORDER_TOOLTIP": {
+			"string": "Ob und wie die Liste sortiert werden soll.",
+			"version_hash": 0
+		},
+		"HEVLIB_RESEARCH": {
+			"string": "Forschung",
+			"version_hash": 0
+		},
+		"HEVLIB_RESEARCH_CURRENT": {
+			"string": "Aktuelle Forschung",
+			"version_hash": 0
+		},
+		"HEVLIB_CURRENT_PROJECTS": {
+			"string": "Aktive Forschungsprojekte",
+			"version_hash": 0
+		},
+		"HEVLIB_RESEARCH_STATS": {
+			"string": "Alle Projektstatistiken",
+			"version_hash": 0
+		},
+		"HEVLIB_RESEARCH_AVAILABLE": {
+			"string": "Verfügbare Projekte",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT": {
+			"string": "UI links scrollen",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT_TOOLTIP": {
+			"string": "Primäre Taste für horizontale Bildlaufmenüs",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT": {
+			"string": "UI rechts scrollen",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT_TOOLTIP": {
+			"string": "Primäre Taste für horizontale Bildlaufmenüs",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2": {
+			"string": "UI links scrollen (alt)",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_LEFT2_TOOLTIP": {
+			"string": "Alternative Taste für horizontale Bildlaufmenüs",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2": {
+			"string": "UI rechts scrollen (alt)",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2_TOOLTIP": {
+			"string": "Alternative Alternative Taste für horizontale Bildlaufmenüs",
+			"version_hash": 0
+		},
+		"SYSTEM_HEVLIB_INTERNALS_NODE": {
+			"string": "Interne System Mod Laufzeit",
+			"version_hash": 0
+		},
+		"NOTIFICATION_NAME_PLACEHOLDER": {
+			"string": "{Benachrichtigungskörper fehlt}",
+			"version_hash": 0
+		},
+		"NOTIFICATION_TITLE_PLACEHOLDER": {
+			"string": "{Benachrichtigungsname fehlt}",
+			"version_hash": 0
+		},
+		"HEVLIB_AVAILABLE_RESEARCH": {
+			"string": "Verfügbare Forschungsprojekte",
+			"version_hash": 0
+		},
+		"HEVLIB_RESEARCH_TOTAL_TOOLTIP": {
+			"string": "Gesammter Forschungsstand für das Projekt",
+			"version_hash": 0
+		},
+		"DLC_ANDROID": {
+			"string": "Android face pack",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT": {
+			"string": "Limitiere Nanodrohnenlagerarbeitsleistung",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_LIMIT_NANODRONE_OUTPUT_TOOLTIP": {
+			"string": "Verhindert, dass Nanodrohnen mehr als das vom installiertem Medium bereitgestellten Rate nutzen können. \\nNotiz: Dies wird nur in speziellen Konfigurationen passieren.",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING": {
+			"string": "Zeige aktuelle Spieleranzahl",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING_TOOLTIP": {
+			"string": "Zeigt die Anzahl aller Steam-Clienten in der oberen linken Bildschirmecke.\\nDieser Zähler unterscheidet zwischen Vollversion und Demo.",
+			"version_hash": 0
+		},
+		"HEVLIB_CLEAR_LEADERBOARDS": {
+			"string": "Leaderboardstatistiken resetten",
+			"version_hash": 0
+		},
+		"HEVLIB_CLEAR_LEADERBOARDS_TOOLTIP": {
+			"string": "Öffnet ein Menü, in welchem man individuelle Statistiken zurücksetzen kann. \\n\\nNOTIZ: Nur für Steam-Versionen",
+			"version_hash": 0
+		},
+		"HEVLIB_OPEN_MENU": {
+			"string": "Öffne Menü",
+			"version_hash": 0
+		},
+		"STEAMSTAT_best_haul": {
+			"string": "Beste Ausbeute (komplett)",
+			"version_hash": 0
+		},
+		"STEAMSTAT_best_ore": {
+			"string": "Beste Ausbeute (Erz)",
+			"version_hash": 0
+		},
+		"STEAMSTAT_longest_dive": {
+			"string": "Längster Tauchgang (mit Astrogation)",
+			"version_hash": 0
+		},
+		"STEAMSTAT_longest_dive_realtime": {
+			"string": "Längster Tauchgang (Steuerzeit)",
+			"version_hash": 0
+		},
+		"STEAMSTAT_money_per_day": {
+			"string": "Durchschnittliche Einnahmen pro Tag",
+			"version_hash": 0
+		},
+		"STEAMSTAT_time": {
+			"string": "Tage in den Ringen",
+			"version_hash": 0
+		},
+		"STEAMSTAT_total_money": {
+			"string": "Vermögen",
+			"version_hash": 0
+		},
+		"STEAMSTAT_CLEAR_STAT": {
+			"string": "Statistik reinigen",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIRM": {
+			"string": "Aktion bestätigen",
+			"version_hash": 0
+		},
+		"HEVLIB_WIPE_STAT_ARE_YOU_SURE": {
+			"string": "Bist du dir sicher, dass du %s ausradieren willst?",
+			"version_hash": 0
+		},
+		"HEVLIB_NOSTEAM": {
+			"string": "Dieses Menü funktioniert auf Steam.",
+			"version_hash": 0
+		},
+		"HEVLIB_OPT_PROFILES": {
+			"string": "Einstellungsprofile",
+			"version_hash": 0
+		},
+		"HEVLIB_PROFILE_SELECT": {
+			"string": "Profil wählen",
+			"version_hash": 0
+		},
+		"HEVLIB_ADD_PROFILE": {
+			"string": "Profil hinzufügen",
+			"version_hash": 0
+		},
+		"HEVLIB_RENAME_PROFILE": {
+			"string": "Profil umbenennen",
+			"version_hash": 0
+		},
+		"HEVLIB_DELETE_PROFILE": {
+			"string": "Profil löschen",
+			"version_hash": 0
+		},
+		"HEVLIB_PROFILENAME_ADD": {
+			"string": "Profil hinzufügen",
+			"version_hash": 0
+		},
+		"HEVLIB_PROFILENAME_RENAME": {
+			"string": "Profil umbenennen",
+			"version_hash": 0
+		},
+		"HEVLIB_PROFILE_DELETE": {
+			"string": "Profil löschen",
+			"version_hash": 0
+		},
+		"HEVLIB_PROFILE_DELETE_ARE_YOU_SURE": {
+			"string": "Bist du dir sicher, dass du das Profil löschen willst?",
+			"version_hash": 0
+		},
+		"HEVLIB_CHANGELOGS": {
+			"string": "Änderungsprotokoll",
+			"version_hash": 0
+		},
+		"HEVLIB_CHANGELOGS_NEW": {
+			"string": "Neues Änderungsprotokoll",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK": {
+			"string": "Multiple Mineralien pro Brocken",
+			"version_hash": 0
+		},
+		"HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK_TOOLTIP": {
+			"string": "Verbietet, dass multiple Mineralien sich auf einen Erz-Brocken sammeln. \\n\\nDank an Za'krin für die ursprüngliche Implementierung. Diese Version adaptiert und verbessert sie.",
+			"version_hash": 0
+		},
+		"HEVLIB_TRANSIT_TIP_1": {
+			"string": "Mehr Besatzung des gleichen Berufes lässt diese zusammen arbeiten.",
+			"version_hash": 0
+		},
+		"HEVLIB_TRANSIT_TIP_2": {
+			"string": "Abgesehen vom Autopiloten können deine Triebwerke immer noch angesteuert werden, auch wenn Bordcomputer oder HUD nicht mehr online sind.",
+			"version_hash": 0
+		},
+		"HEVLIB_TRANSIT_TIP_3": {
+			"string": "Beim bergen einer Rettungskapsel kann ein freier Halterungsarm diese sicher halten, während dein Frachtraum nicht zugemüllt wird.",
+			"version_hash": 0
+		},
+		"HEVLIB_TRANSIT_TIP_4": {
+			"string": "Eine Beanspruchungsbake kann mehr Aufmerksamkeit erzeugen.",
+			"version_hash": 0
+		},
+		"HEVLIB_TRANSIT_TIP_5": {
+			"string": "Dein Geologe kann einschränken, was deine Ausrüstung erkennen kan. Je strenger die Filter sind, desto weniger werden die Systeme überfordert.",
+			"version_hash": 0
+		},
+		"HEVLIB_TRANSIT_TIP_6": {
+			"string": "Wenn dir Jameson's monatlicher Satz zu wenig ist, kannst du im Ring ein Search-and-Rescue-Schiff aufsuchen, um mehr Versicherung zu erhalten.",
+			"version_hash": 0
+		},
+		"HEVLIB_TRANSIT_TIP_7": {
+			"string": "Eine glückliche Besatzung arbeitet weniger hart und unglücklich fühlen sie sich weniger motiviert.",
+			"version_hash": 0
+		},
+		"HEVLIB_TRANSIT_TIP_8": {
+			"string": "Wenn ein object mit dem Autopiloten auswählt wurde, können mikroseismische Drohnen das Zielobjekt scannen, ansonsten wird das Objekt gescannt, was sich unter der Maus befindet",
+			"version_hash": 0
+		},
+		"HEVLIB_TRANSIT_TIP_9": {
+			"string": "Habitate zahlen immer bessere Preise als den aktuellen  Marktpreis.",
+			"version_hash": 0
+		},
+		"HEVLIB_TRANSIT_TIP_10": {
+			"string": "Zu viele Nanodrohnen genutzt, die unnützes Erz sammeln? Richte deinen Filter im Geologen ein, um nur das zu erhalten, was du möchtest und spare dabei an Drohnen.",
+			"version_hash": 0
+		},
+		"HEVLIB_TRANSIT_TIP_11": {
+			"string": "Probleme mit Mods? Melde es dort, wo du sie herbekommen hast, oder versuche es im Discord für zeitnahen Support. ",
+			"version_hash": 0
+		},
+		"HEVLIB_TRANSIT_TIP_12": {
+			"string": "Hast du einen Vorschlag für einen mods? Betritt den Discord und frage freundlich nach.",
+			"version_hash": 0
+		},
+		"HEVLIB_TRANSIT_TIP_13": {
+			"string": "Möchtest du mehr mods? Schau die dir hier die ganze Liste an: 'https://delta-v.kodera.pl/index.php/Mod_List'",
+			"version_hash": 0
+		},
+		"HEVLIB_TRANSIT_TIP_14": {
+			"string": "Behalte im Hinterkopf, das alles, was Steine zerstören kann, auch andere Schiffe beschädigen kann.",
+			"version_hash": 0
+		},
+		"HEVLIB_TRANSIT_TIP_15": {
+			"string": "Autonome Systeme arbeiten wie vorgesehen, jedoch braucht es Geduld, damit sie arbeiten.",
+			"version_hash": 0
+		},
+		"HEVLIB_TRANSIT_TIP_16": {
+			"string": "Gefallen dir die Mods, die du nutzt? Unterstütze doch die Schöpfer!",
+			"version_hash": 0
+		},
+		"HEVLIB_TRANSIT_TIP_17": {
+			"string": "Mods verhalten sich nach einem Update anders? Schau in das Änderungsprotokoll oder frag den Verfasser.",
+			"version_hash": 0
+		},
+		"MODMENU2_MOD_DESCRIPTION": {
+			"string": "Ein erweitertes Mod-Menü, welches beinahe eine komplette Kontrolle darüber hat, wie du deine Mods siehst.\\n\\nBesonderheiten:\\n\\n* Einfache Mod-Ansicht - zeigt, welche Mods installiert sind, egal ob sie ein modernes Manifest haben, oder einfach nur simple Mods sind, aber auch aber Infos über das Hauptspiel.\\n* Mod Einstellungen - Erlaubt dem Nutzer Mods einzustellen, ohne dass er die Manifest-Datei bearbeiten muss.\\n* Update Kontrolle - Jeder Mod, der die benötigten Informationen liefert, kann auf Updates beim Spielstart kontrolliert werden. Updates können individuell oder im ganzen heruntergeladen, oder auch ignoriert werden.\\n* Konflikt- und Abhängigkeitsprüfungen – jede Mod, die Mod-IDs für erforderliche Mods oder für inkompatible Mods angibt, zeigt eine Warnung auf dem Startbildschirm an. Hinweis: Dies funktioniert nur bei Mods mit Manifest-Dateien.\\n* Tag- & Suchfilter – ermöglichen es, die angezeigten Mods nach Schlüsselwort oder Mod-ID zu filtern oder aus einer Menge von in den Mods enthaltenen Schlüsselwörtern auszuwählen, um nur Mods anzuzeigen, die ein bestimmtes Schlüsselwort verwenden.",
+			"version_hash": 0
+		},
+		"MODMENU2_MOD_BRIEF": {
+			"string": "Ein erweitertes Mod-Menü",
+			"version_hash": 0
+		},
+		"MODMENU2_CONFIG_GENERAL": {
+			"string": "Allgemein",
+			"version_hash": 0
+		},
+		"MODMENU2_CLEAR_IGNORED_UPDATES": {
+			"string": "Ignorierte Updates zurücksetzen",
+			"version_hash": 0
+		},
+		"MODMENU2_CLEAR_IGNORED_UPDATES_TOOLTIP": {
+			"string": "Setzt die Liste der Mods, die beim updaten ignoriert werden, zurück",
+			"version_hash": 0
+		},
+		"MODMENU2_CLEAR_IGNORED_UPDATES_BUTTON": {
+			"string": "Zurücksetzen",
+			"version_hash": 0
 		}
 	},
 	"uk_UA": {
