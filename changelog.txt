@@ -1,3 +1,28 @@
+[1.15.39]
+
+1=* `__recursive_delete` and `__fetch_folder_files` methods in the `FolderAccess` class now can properly handle being provided a filepath instead of a directory path
+2=* Added several methods to the `DataFormat` class:
+2.1=* `__reserve_in_array`:
+2.1.1=* Modifies the length of any array type in a safer manner than using `.resize(x)`
+2.1.2=* If extending past the array's current size, new entries get zeroed out instead of using junk data from the memory they take up.
+2.1.2.1=* PoolIntArrays, PoolRealArrays, PoolByteArrays, PoolVector2Arrays, and PoolVector3Arrays have all new values set to zero.
+2.1.2.2=* PoolStringArrays have all new values set as empty strings
+2.1.2.3=* PoolColorArrays have all new values set to `Color.black` (`Color(0,0,0,0)`)
+2.1.2.4=* Regular arrays have all new values set to `null`
+2.1.3=* `array` -> (ANY Array/PoolArray) the array to be resized. If not an array, returns null.
+2.1.4=* `count` -> (int) the relative size to adjust the array by. Negative numbers reduce the size and cannot go below zero.
+2.1.5=* `absolute` (optional) -> (bool) whether `count` should instead refer to absolute size. If set, the value provided through `count` will be the size of the output array.
+2.1.6=* Returns the new array. NOTE: when using regular arrays, the original array will be modified as well. Duplicate the array if intending a difference between arrays.
+2.2=* `__to_uint32`:
+2.2.1=* Converts an integer into a 32-bit unsigned integer, and will overflow if the size exceeds the uint32 maximum.
+2.2.2=* `integer` -> (int) the provided integer
+2.2.3=* Returns the new integer.
+2.3=* `__get_crc_32`:
+2.3.1=* Calculates the 32-bit checksum of a PoolByteArray
+2.3.2=* `bytes` -> (PoolByteArray) the bytes to calculate the checksum of
+2.3.3=* Returns a 32-bit unsigned integer checksum
+3=* Separated translators into their own section in the credits
+
 [1.15.38]
 
 1=* Fixed issue that caused `instance_with_chance` type events without a defined `known_rock_scene` property to automatically default it to the moonlet scene
