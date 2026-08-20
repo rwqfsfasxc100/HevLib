@@ -1614,6 +1614,14 @@ const TRANSLATIONS = {
 		"HEVLIB_CREDITS_TRANSLATORS_HEDRAUTA": {
 			"string": "Hedrauta - German translations",
 			"version_hash": 1012571612
+		},
+		"HEVLIB_CREDITS_TRANSLATORS_NEKO!!": {
+			"string": "NeKo!! - Chinese translations",
+			"version_hash": 3552644866
+		},
+		"HEVLIB_CREDITS_TRANSLATORS_TESSIER": {
+			"string": "Tessier-Ashpool S.A. - Chinese translations",
+			"version_hash": 2709571237
 		}
 	},
 	"de": {
