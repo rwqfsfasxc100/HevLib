@@ -76,8 +76,10 @@ func create():
 		"connect_method":"_on_DELETE_SAVE_pressed",
 		"enable_on_save":true,
 	}]
-	buttons.append_array(ModLoader._savedObjects[0].Equipment.save_button_cache)
+	var pointers = ModLoader._savedObjects[0]
+	buttons.append_array(pointers.Equipment.save_button_cache)
 	for button in buttons:
+		var popup_path = button.get("popup_path","")
 		var BUTTON:Button = Button.new()
 		var displayname:String = button.get("display_name","MISSING_BUTTON_NAME")
 		var tooltip:String = button.get("tooltip","")
@@ -86,7 +88,6 @@ func create():
 		if tooltip:
 			BUTTON.hint_tooltip = tooltip
 			BUTTON.add_child(tt_label.instance())
-		var popup_path = button.get("popup_path")
 		var method:String = button.get("connect_method","_on_save_option_button_pressed")
 		if not popup_path:
 			match button.get("popup_override"):
@@ -97,14 +98,17 @@ func create():
 					BUTTON.connect("pressed",sender,method)
 					connections["SAVE_BUTTON"].append({BUTTON:["pressed",sender,method]})
 		else:
-			var popup = load(popup_path).instance()
-			if button.get("send_additional_info",false):
-				BUTTON.connect("pressed",popup,method,[self.save_slot_file,self.sender])
-				connections["ADDITIONAL"].append({BUTTON:["pressed",popup,method]})
+			if pointers.DataFormat.__load_if_can(popup_path):
+				var popup = pointers.DataFormat.__get_load().instance()
+				if button.get("send_additional_info",false):
+					BUTTON.connect("pressed",popup,method,[self.save_slot_file,self.sender])
+					connections["ADDITIONAL"].append({BUTTON:["pressed",popup,method]})
+				else:
+					BUTTON.connect("pressed",popup,method)
+					connections["GENERIC"].append({BUTTON:["pressed",popup,method]})
+				popup_container.call_deferred("add_child",popup)
 			else:
-				BUTTON.connect("pressed",popup,method)
-				connections["GENERIC"].append({BUTTON:["pressed",popup,method]})
-			popup_container.call_deferred("add_child",popup)
+				pointers.l("ERROR: Failed to load save button popup at [%s], skipping" % popup_path,"SaveSettings")
 		if button.get("enable_on_save",false):
 			enable_on_save_buttons.append(displayname)
 		BUTTON.connect("pressed",self,"cancel")

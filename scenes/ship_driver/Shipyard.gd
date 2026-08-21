@@ -75,6 +75,8 @@ func _ready():
 		if ship_name:
 			if syPointers.DataFormat.__load_if_can(path):
 				ships[ship_name] = syPointers.DataFormat.__get_load()
+			else:
+				syPointers.l("ERROR: Failed to load ship scene for [%s], located at [%s]" % [ship_name,path],"ShipDriver")
 			if alias != ship_name:
 				configAlias[ship_name] = alias
 			if config.config:

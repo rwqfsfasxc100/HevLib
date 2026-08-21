@@ -25,7 +25,11 @@
 4.2.2=* If the `original_path` property leads to a file that doesn't exist, defaults to using the regular script extension behaviour
 5=* `LOAD_RESOURCES.gd` now checks to make sure the provided script/scene/resource exists.
 6=* Reduced driver processing time by removing unnecessary dictionary and array duplication calls.
-7=* 
+7=* ThrusterSlotDriver now properly supports using Color, Vector2 and Rect2 for thruster/nozzle properties that use those specific types, instead of having to use arrays.
+7.1=* Driver rework permits this change to be made due to data not being parsed as JSON and incorrectly serialized anymore.
+7.2=* This change still permits the use of arrays, and also adds support for PoolIntArrays and PoolRealArrays
+8=* Drivers loading files now log an error if the script or scene couldn't be found or loaded.
+9=* Removed junk data and functions from ThrusterSlotDriver's handler due to it no longer being used to handle new thrusters
 
 [1.15.41]
 

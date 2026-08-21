@@ -63,15 +63,17 @@ func _ready():
 			node.name = event_name
 			if event_type == "script":
 				var script_path = event.get("script_path","")
-				if script_path and pointers.DataFormat.__file_exists(script_path):
-					node.set_script(load(script_path))
+				if script_path and pointers.DataFormat.__load_if_can(script_path):
+					node.set_script(pointers.DataFormat.__get_load())
 				else:
+					pointers.l("ERROR: Cannot load custom event's script at [%s], skipping" % script_path,"EventDriver")
 					do_add = false
 			elif event_type in script_references:
 				var script_path = script_references[event_type]
-				if script_path and pointers.DataFormat.__file_exists(script_path):
-					node.set_script(load(script_path))
+				if script_path and pointers.DataFormat.__load_if_can(script_path):
+					node.set_script(pointers.DataFormat.__get_load())
 				else:
+					pointers.l("ERROR: Cannot load vanilla event script at [%s], skipping. This likely means a bigger issue elsewhere..." % script_path,"EventDriver")
 					do_add = false
 			else:
 				do_add = false

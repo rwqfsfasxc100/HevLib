@@ -459,7 +459,7 @@ func hl_add_nodes_process_ship_register():
 			var obj_fallback_override = object.get("fallback_override",baseShipName)
 			var obj_node_definitions = object.get("node_definitions",{})
 			
-			if obj_ship_name in pd.keys():
+			if obj_ship_name in pd:
 				for definition in obj_node_definitions:
 					if definition in processed_node_definitions:
 						var def = obj_node_definitions[definition]
@@ -504,7 +504,8 @@ func hl_add_nodes_process_node_definitons():
 				var ignore = md.get("ships_to_ignore",[])
 				var recursive = md.get("recurse_to_variants",true)
 				pd.merge({module:{"node":node,"properties":properties,"position_data":pos_basic,"ships_to_ignore":ignore,"recurse_to_variants":recursive}})
-	
+			else:
+				pointers_hl_addnodes.l("ERROR: Failed to load node register located at [%s], skipping" % filepath,"NodeDefinitions")
 	return pd
 
 func hl_add_nodes_process_modified_ship_numerics() -> Dictionary:

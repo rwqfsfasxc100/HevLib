@@ -35,48 +35,21 @@ var mpdg = "res://ships/modules/AuxMpd.tscn"
 var smes = "res://ships/modules/AuxSmes.tscn"
 var aux_hybrid = "res://HevLib/scenes/equipment/custom_equipment/AuxHybrid.tscn"
 var thruster = "res://sfx/thruster.tscn"
-var exhaust = "res://sfx/exhaust.tscn"
-var exhaust_fusion = "res://sfx/exhaust-fusion.tscn"
-var nozzle = "res://ships/modules/nozzle-conventonal.tscn"
 
-const torch_base_scale = [0.939,1.395]
-const rcs_base_scale = [0.2,0.2]
-const thruster_base_pos = [0,-3]
+var timerObject:Timer = Timer.new()
+var fco:Color = Color.white
 
-var timerObject
-var fco
-
-var shipName
-var baseShipName
+var shipName:String = ""
+var baseShipName:String = ""
 
 var itsPointers
 
-const nozzle_template = {
-	"cool_time":4,
-	"heat_time":0.25,
-	"texture":"res://ships/modules/nozzle-cd.png",
-	"normal":"res://ships/modules/nozzle-n.png",
-	"heat":"res://ships/modules/nozzle-cl.png",
-	"heat_normal":null,
-	"region_enabled":false,
-	"region_rect":[0,0,0,0],
-	"region_filter_clip":false,
-	"position":[0,0],
-	"rotation":0,
-	"scale":[1,1],
-	"heat_region_enabled":false,
-	"heat_region_rect":[0,0,0,0],
-	"heat_region_filter_clip":false,
-	"heat_position":[0,0],
-	"heat_rotation":0,
-	"heat_scale":[1,1],
-}
-var aux_type
+var aux_type : String = "MPDG"
 func loadPlaceholder():
 	itsPointers = ModLoader._savedObjects[0]
 	hl_thrusterslot_modify()
 	.loadPlaceholder()
-#	yield(get_tree(),"idle_frame")
+
 func hl_thrusterslot_modify():
 	var datastore = itsPointers.Equipment.auxslot_data
 	shipName = ship.shipName
@@ -85,7 +58,7 @@ func hl_thrusterslot_modify():
 	var currentInstall = ship.getConfig(type)
 	if slotType in datastore:
 		for data in datastore[slotType]:
-			var aux_path = data.get("path","")
+			var aux_path:String = data.get("path","")
 			aux_type = data.get("type","MPDG").to_upper()
 			match aux_type:
 				"THRUSTER":
@@ -101,11 +74,12 @@ func hl_thrusterslot_modify():
 					if not itsPointers.ConfigDriver.__validate_dictionary(data):
 						return
 				var valid_scene = false
-				if aux_path != "":
+				if aux_path:
 					if itsPointers.DataFormat.__load_if_can(aux_path):
 						valid_scene = true
 						item = itsPointers.DataFormat.__get_load().instance()
-				
+					else:
+						itsPointers.l("ERROR: Failed to load custom thruster/aux scene at [%s], falling back to default of unit type (if possible)" % aux_path,"ThrusterSlotDriver")
 				if not valid_scene:
 					match aux_type:
 						"MPDG":
@@ -119,15 +93,11 @@ func hl_thrusterslot_modify():
 							if itsPointers.DataFormat.__load_if_can(thrusterScene):
 								item = itsPointers.DataFormat.__get_load().instance()
 							else:
+								itsPointers.l("ERROR: Failed to load thruster at [%s], falling back to default thruster scene" % thrusterScene,"ThrusterSlotDriver")
 								item = load(thruster).instance()
 				
-#				var sysn = name + "_" + sys
 				item.name = sys
-#				system = item
-				
-#				item.name = sys\
 				if not valid_scene:
-					
 					item.command = data.get("command","m" if aux_type == "TORCH" else "")
 					item.systemName = sys
 					item.mass = data.get("mass",0)
@@ -184,26 +154,7 @@ func hl_thrusterslot_modify():
 								fco = Color(color_override)
 								hl_thrusterslot_make_timer()
 				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
 				if item:
-#					var savepath = "user://thrusterTest.tscn"
-#					var pc = PackedScene.new()
-#					pc.pack(item)
-#					ResourceSaver.save(savepath,pc)
-#					breakpoint
-#					add_child(item)
-
 					key = name + "_" + mounted
 					add_child(item)
 					systemName = _getSystemName()
@@ -218,19 +169,11 @@ func hl_thrusterslot_modify():
 
 func hl_thrusterslot_make_timer():
 	if timerObject == null:
-		timerObject = Timer.new()
 		timerObject.wait_time = 0.5
 		timerObject.one_shot = true
 		timerObject.connect("timeout",self,"hl_thrusterslot_recolor")
 		CurrentGame.get_tree().get_root().add_child(timerObject)
 		timerObject.call_deferred("start")
-
-func hl_thrusterslot_convert_to_nozzle(noz):
-	var nozzle = nozzle_template.duplicate(true)
-	for i in nozzle:
-		if i in noz and typeof(nozzle[i]) == typeof(noz[i]):
-			nozzle[i] = noz[i]
-	return nozzle
 
 func hl_thrusterslot_recolor():
 	if not flare:
@@ -241,69 +184,8 @@ func hl_thrusterslot_recolor():
 		flare.color = fco
 	Tool.remove(timerObject)
 
-func hl_thrusterslot_modify_nozzle(nozzleA,nd):
-	if nozzleA:
-		if aux_type != "NOT_A_THRUSTER":
-			nozzleA.coolTime = nd.cool_time
-			nozzleA.heatTime = nd.heat_time
-		var tr
-		if itsPointers.DataFormat.__load_if_can(nd.texture):
-			tr = itsPointers.DataFormat.__get_load()
-		else:
-			tr = load("res://ships/modules/nozzle-cd.png")
-		nozzleA.texture = tr
-		var tl
-		if itsPointers.DataFormat.__load_if_can(nd.normal):
-			tr = itsPointers.DataFormat.__get_load()
-		else:
-			tl = load("res://ships/modules/nozzle-n.png")
-		nozzleA.normal_map = tl
-		var heat = nozzleA.get_node_or_null("heat")
-		if heat:
-			var h
-			if itsPointers.DataFormat.__load_if_can(nd.heat):
-				h = itsPointers.DataFormat.__get_load()
-			else:
-				h = load("res://ships/modules/nozzle-cl.png")
-			heat.texture = h
-			var thn = null
-			if itsPointers.DataFormat.__load_if_can(nd.heat_normal):
-				thn = itsPointers.DataFormat.__get_load()
-			if thn:
-				heat.normal_map = thn
-			heat.region_enabled = nd.heat_region_enabled
-		
-			var rr = nd.heat_region_rect
-			if rr.size() >= 4:
-				heat.region_rect = Rect2(rr[0],rr[1],rr[2],rr[3])
-			heat.region_filter_clip = nd.heat_region_filter_clip
-			var rp = nd.heat_position
-			if rp.size() >= 2:
-				heat.position = Vector2(rp[0],rp[1])
-			heat.set("rotation",deg2rad(nd.heat_rotation))
-#			heat.set_deferred("rotation",deg2rad(nd.heat_rotation))
-			var rs = nd.heat_scale
-			if rs.size() >= 2:
-				heat.scale = Vector2(rs[0],rs[1])
-		nozzleA.region_enabled = nd.region_enabled
-		
-		var rr = nd.region_rect
-		if rr.size() >= 4:
-			nozzleA.region_rect = Rect2(rr[0],rr[1],rr[2],rr[3])
-		nozzleA.region_filter_clip = nd.region_filter_clip
-		var rp = nd.position
-		if rp.size() >= 2:
-			nozzleA.position = Vector2(rp[0],rp[1])
-		nozzleA.set("rotation",deg2rad(nd.rotation))
-#		nozzleA.set_deferred("rotation",deg2rad(nd.rotation))
-		var rs = nd.scale
-		if rs.size() >= 2:
-			nozzleA.scale = Vector2(rs[0],rs[1])
-
 func hl_thrusterslot_get_colors():
-	
-	var color_data = ModLoader._savedObjects[0].Equipment.ship_thruster_colors
-	
+	var color_data = itsPointers.Equipment.ship_thruster_colors
 	for i in color_data:
 		var d = color_data[i]
 		if not itsPointers.ConfigDriver.__validate_dictionary(d):

@@ -3011,7 +3011,6 @@ class _Equipment:
 	var ship_equipment_template_internals : Dictionary = {}
 	var ship_equipment_modification_internals : Dictionary = {}
 	var ship_equipment_modification_internals_completed : Dictionary = {}
-	var ws_additions : Dictionary = {}
 	var ws_stuff_to_add : Array = []
 	var ws_stuff_to_modify : Array = []
 	var add_ships_store : Array = []

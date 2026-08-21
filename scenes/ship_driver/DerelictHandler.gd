@@ -76,8 +76,14 @@ func _ready():
 	for fd in data:
 		if pointers.ConfigDriver.__validate_dictionary(fd,true,true,true,"settings_config") and mode in fd and "name" in fd and "path" in fd:
 			var shipName = fd["name"]
-			var event = fd[mode]
-			ship_pool.merge({shipName:event})
+			if "path" in fd and fd.path:
+				if pointers.DataFormat.__file_exists(fd.path):
+					var event = fd[mode]
+					ship_pool.merge({shipName:event})
+				else:
+					pointers.l("ERROR: Failed to add modded derelict for ship [%s] due to it's ship scene not being a valid filepath." % shipName,"ShipDriver")
+			else:
+				pointers.l("Skipping addition of modded derelict instance of ship [%s] due to it not adding a ship scene." % shipName,"ShipDriver")
 	if ship_pool.keys().size() < index:
 		prevent = true
 

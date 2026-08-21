@@ -61,7 +61,7 @@ func _ready():
 	equipment_templates = equipment_templates[slot]
 	
 	if not equipment_templates:
-		Debug.n("HevLib WeaponSlotDriver: building equipment state for %s/%s" % [shipName,slot])
+		pointers.n("building equipment state for %s/%s" % [shipName,slot],"WeaponSlotDriver")
 		var generic_modify_templates = pointers.Equipment.weaponslot_modify_templates
 		var generic_modify_standalone = pointers.Equipment.weaponslot_modify_standalone
 		var ship_modify_templates = pointers.Equipment.weaponslot_ship_templates
@@ -253,7 +253,7 @@ func loadPlaceholder():
 		var path = hl_weaponslot_addition.get("path","")
 		if not pointers.ConfigDriver.__validate_dictionary(hl_weaponslot_addition):
 			path = ""
-		
+			pointers.l("Skipping addition of %s to weapon slot %s due to failed validation check" % t,"WeaponSlotDriver")
 		
 		if pointers.DataFormat.__load_if_can(path):
 			var pv = pointers.DataFormat.__get_load().instance()
@@ -300,4 +300,6 @@ func loadPlaceholder():
 			repairReplacementPrice = _repairReplacementPrice()
 			repairReplacementTime = _repairReplacementTime()
 			mass = _getMass()
+		else:
+			pointers.l("ERROR: Cannot load weapon at [%s], possibly incorrect path?" % path,"WeaponSlotDriver")
 	ship.changeExternalPlaceholders( - 1)

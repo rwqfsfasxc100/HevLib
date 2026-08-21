@@ -57,12 +57,18 @@ func hl_shipdriver_init_ships_to_dealer():
 	modded_ship_list = []
 	var add_ship_store = pointersShipDriver.Equipment.add_ships_store
 	for fd in add_ship_store:
-		if pointersShipDriver.ConfigDriver.__validate_dictionary(fd,true,true,true,"settings_config") and "dealer" in fd:
+		if pointersShipDriver.ConfigDriver.__validate_dictionary(fd,true,true,true,"settings_config") and "name" in fd and fd.name and "dealer" in fd:
 			var shipName = fd["name"]
-			var age = fd["dealer"].get("age",200)
-			var dict = {"name":shipName,"age":24 * 3600 * 365 * age}
-			for i in range(max(0,fd["dealer"].get("weight",1))):
-				modded_ship_list.append(dict)
+			if "path" in fd and fd.path:
+				if pointersShipDriver.DataFormat.__file_exists(fd.path):
+					var age = fd["dealer"].get("age",200)
+					var dict = {"name":shipName,"age":24 * 3600 * 365 * age}
+					for i in range(max(0,fd["dealer"].get("weight",1))):
+						modded_ship_list.append(dict)
+				else:
+					pointersShipDriver.l("ERROR: Failed to add modded ship [%s] to the dealership pool due to it's ship scene not being a valid filepath." % shipName,"ShipDriver")
+			else:
+				pointersShipDriver.l("Skipping addition of modded ship instance [%s] to the dealership pool due to it not adding a ship scene." % shipName,"ShipDriver")
 	var rng = pointersShipDriver.ConfigDriver.__get_config("HevLib").get("HEVLIB_CONFIG_SECTION_DRIVERS",{}).get("max_modded_dealership_pools",7)
 	if previous_count == rng:
 		return
@@ -91,18 +97,25 @@ var scrap_entry = "\n[node name=\"%s\" type=\"Node\" parent=\"DIALOG_SALVAGE_STA
 func initialize_scrapwright():
 	var scrap_concat = ""
 	for data in pointersShipDriver.Equipment.add_ships_store:
-		if pointersShipDriver.ConfigDriver.__validate_dictionary(data,false) and "salvage_broadcast" in data:
-			var salv = data["salvage_broadcast"]
-			var dname = data.get("specific_derelict_name","ModdedDerelict_" + data.get("name","TRTL"))
-			match typeof(salv):
-				TYPE_ARRAY,TYPE_STRING_ARRAY:
-					for i in salv:
-						if i:
-							scrap_concat += scrap_entry % [i,"POI_SALVAGE",dname]
-				TYPE_DICTIONARY:
-					for i in salv:
-						if i:
-							var id = salv[i]
-							scrap_concat += scrap_entry % [i,id.get("poi_name","POI_SALVAGE"),dname]
+		if pointersShipDriver.ConfigDriver.__validate_dictionary(data,false) and "name" in data and data.name and "salvage_broadcast" in data:
+			var shipName = data["name"]
+			if "path" in data and data.path:
+				if pointersShipDriver.DataFormat.__file_exists(data.path):
+					var salv = data["salvage_broadcast"]
+					var dname = data.get("specific_derelict_name","ModdedDerelict_" + shipName)
+					match typeof(salv):
+						TYPE_ARRAY,TYPE_STRING_ARRAY:
+							for i in salv:
+								if i:
+									scrap_concat += scrap_entry % [i,"POI_SALVAGE",dname]
+						TYPE_DICTIONARY:
+							for i in salv:
+								if i:
+									var id = salv[i]
+									scrap_concat += scrap_entry % [i,id.get("poi_name","POI_SALVAGE"),dname]
+				else:
+					pointersShipDriver.l("WARNING: Failed to add modded ship [%s] to the SRO broadcast pool due to it's ship scene not being a valid filepath." % shipName,"ShipDriver")
+			else:
+				pointersShipDriver.l("Skipping addition of modded ship instance [%s] to the SRO broadcast pool due to it not adding a ship scene." % shipName,"ShipDriver")
 	if scrap_concat:
 		pointersShipDriver.DataFormat.__replace_scene(scrap_header + scrap_concat,"res://comms/conversation/SalvageBanter.tscn")
