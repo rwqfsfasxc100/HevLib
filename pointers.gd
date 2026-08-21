@@ -5390,76 +5390,58 @@ class _FolderAccess:
 		else: return value
 	
 	func __recursive_delete(path: String) -> bool:
-		if directory.file_exists(path):
-			directory.remove(path)
-			return true
-		else:
-			if not directory.open(path) == OK:
-				return false
-			if not path.ends_with("/"):
-				path = path + "/"
-			var filesForDeletion : Array = []
-			var foldersForDeletion : Array = []
-			var pms : Array = __fetch_folder_files(path, true, true)
-			for entry in pms:
-				if str(entry).ends_with("/"):
-					foldersForDeletion.append(entry)
-				else:
-					filesForDeletion.append(entry)
-			for f in filesForDeletion:
-				var splitFiles = str(f).split("/")[str(f).split("/").size()-1]
-				if directory.file_exists(splitFiles):
-					directory.remove(splitFiles)
-			for folder in foldersForDeletion:
-				__recursive_delete(folder)
-			directory.open(path)
-			directory.remove(path)
-			return true
-	
-	func __fetch_folder_files(folder: String, show_folders: bool = false, return_full_path: bool = false,globalize_path: bool = false,recursive_search: bool = false,baseDirForRecurseDontExpose = "") -> Array:
-		var fileList : Array = Array()
-		var dir = Directory.new()
-		if dir.file_exists(folder):
-			var file_name = folder.get_file()
-			if return_full_path:
-				file_name = folder.get_base_dir() + "/" + file_name
-			if globalize_path:
-				return [ProjectSettings.globalize_path(file_name)]
+		if not directory.open(path) == OK:
+			return false
+		if not path.ends_with("/"):
+			path = path + "/"
+		var filesForDeletion : Array = []
+		var foldersForDeletion : Array = []
+		var pms : Array = __fetch_folder_files(path, true, true)
+		for entry in pms:
+			if str(entry).ends_with("/"):
+				foldersForDeletion.append(entry)
 			else:
-				return [file_name]
-		else:
-			if not folder.ends_with("/"):
-				folder += "/"
-			if not dir.dir_exists(folder):
-				return []
-			dir.open(folder)
-			dir.list_dir_begin(true)
-			while true:
-				var fileName : String = dir.get_next()
-				var capture:bool = true
-				if fileName.ends_with("/"):
-					capture = false
-				if fileName == "." or fileName == "..":
-					capture = false
-				if capture:
-					if not fileName:
-						break
-					if dir.current_is_dir():
-						if not fileName.ends_with("/"):
-							fileName = fileName + "/"
-						if recursive_search:
-							fileList.append_array(__fetch_folder_files(folder + fileName,show_folders,return_full_path,globalize_path,true,baseDirForRecurseDontExpose + fileName))
-						if not show_folders:
-							continue
-					if return_full_path:
-						fileName = folder + fileName
-					else:
-						fileName = baseDirForRecurseDontExpose + fileName
-					if globalize_path:
-						fileList.append(ProjectSettings.globalize_path(fileName))
-					else:
-						fileList.append(fileName)
-			return fileList
+				filesForDeletion.append(entry)
+		for f in filesForDeletion:
+			var splitFiles = str(f).split("/")[str(f).split("/").size()-1]
+			directory.open(path)
+			directory.remove(splitFiles)
+		for folder in foldersForDeletion:
+			__recursive_delete(folder)
+		directory.open(path)
+		directory.remove(path)
+		return true
+	
+	func __fetch_folder_files(folder: String, showFolders: bool = false, returnFullPath: bool = false,globalizePath: bool = false) -> Array:
+		var fileList : PoolStringArray = PoolStringArray()
+		if not folder.ends_with("/"):
+			folder += "/"
+		if not directory.dir_exists(folder):
+			return []
+		directory.open(folder)
+		directory.list_dir_begin(true)
+		while true:
+			var fileName : String = directory.get_next()
+			var capture:bool = true
+			if fileName.ends_with("/"):
+				capture = false
+			if fileName == "." or fileName == "..":
+				capture = false
+			if capture:
+				if not fileName:
+					break
+				if directory.current_is_dir():
+					if not showFolders:
+						continue
+					if not fileName.ends_with("/"):
+						fileName = fileName + "/"
+				if returnFullPath:
+					fileName = folder + fileName
+				if globalizePath:
+					fileList.append(ProjectSettings.globalize_path(fileName))
+				else:
+					fileList.append(fileName)
+		return Array(fileList)
 	
 	func __get_first_file(folder: String) -> String:
 		var fileList : Array = __fetch_folder_files(folder)

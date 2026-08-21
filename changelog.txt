@@ -1,3 +1,7 @@
+[1.15.41]
+
+1=* Reverted change to `__recursive_delete` and `__fetch_folder_files`, as it caused the library to completely break when run on non-editor builds
+
 [1.15.40]
 
 1=* Fixed updater menu incorrectly focusing the wrong buttons if one or two mods were available for updates.
