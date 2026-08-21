@@ -80,10 +80,7 @@ func _about_to_show():
 	yield(get_tree(),"physics_frame")
 	match update_data.size():
 		0:
-			$base/VBoxContainer/ButtonContainer/UpdateAll/Button.disabled = true
-			$base/VBoxContainer/ButtonContainer/UpdateAll/Button.modulate = Color(0.7,0.7,0.7,1)
-			$base/VBoxContainer/ButtonContainer/IgnoreAll/Button.disabled = true
-			$base/VBoxContainer/ButtonContainer/IgnoreAll/Button.modulate = Color(0.7,0.7,0.7,1)
+			no_mods_available()
 		1:
 			container.get_child(0).repos()
 		_:
@@ -105,9 +102,8 @@ func _ready():
 	
 
 func _input(event):
-	if is_visible_in_tree():
-		if event.is_action_pressed("ui_cancel"):
-			cancel()
+	if is_visible_in_tree() and event.is_action_pressed("ui_cancel"):
+		cancel()
 
 func restart_cancel():
 	restart_dialog.hide()
@@ -118,6 +114,7 @@ func cancel():
 	file.close()
 	if has == "1":
 		hide()
+		yield(get_tree(),"idle_frame")
 		restart_dialog.popup_centered()
 	else:
 		hide()
@@ -187,6 +184,7 @@ func _ignore_all_pressed():
 	for mod in mods:
 		mod._ignore_confirmed()
 	
+func no_mods_available():
 	$base/VBoxContainer/ButtonContainer/Cancel/Button.grab_focus()
 	$base/VBoxContainer/ButtonContainer/UpdateAll/Button.disabled = true
 	$base/VBoxContainer/ButtonContainer/UpdateAll/Button.modulate = Color(0.7,0.7,0.7,1)

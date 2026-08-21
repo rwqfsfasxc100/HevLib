@@ -1,3 +1,8 @@
+[1.15.40]
+
+1=* Fixed updater menu incorrectly focusing the wrong buttons if one or two mods were available for updates.
+2=* Fixed mod menu and updater menu not showing the restart menu if escape was held for more than one frame.
+
 [1.15.39]
 
 1=* `__recursive_delete` and `__fetch_folder_files` methods in the `FolderAccess` class now can properly handle being provided a filepath instead of a directory path

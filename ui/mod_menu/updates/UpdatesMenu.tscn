@@ -7,6 +7,7 @@
 [ext_resource path="res://HevLib/ui/mod_menu/updates/NoDownload.gd" type="Script" id=5]
 
 [node name="UpdatesMenu" type="Popup"]
+visible = true
 margin_right = 40.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 1280, 720 )

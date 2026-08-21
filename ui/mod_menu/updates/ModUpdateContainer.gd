@@ -120,19 +120,12 @@ func _downloaded_zip(filepath):
 func repos():
 	var mods = get_parent().get_child_count()
 	var pos = get_position_in_parent()
-	if mods > 2:
+	if mods > 1:
 		get_parent().get_parent().get_parent().get_node("ButtonContainer/UpdateAll/Button").grab_focus()
-	elif mods > 1:
-		if pos != 0:
-			get_parent().get_child(0).get_node("Buttons/Update").grab_focus()
-		else:
-			get_parent().get_child(1).get_node("Buttons/Update").grab_focus()
+	elif mods > 0:
+		get_node("Buttons/Update").grab_focus()
 	else:
-		get_parent().get_parent().get_parent().get_node("ButtonContainer/Cancel/Button").grab_focus()
-		get_parent().get_parent().get_parent().get_node("ButtonContainer/UpdateAll/Button").disabled = true
-		get_parent().get_parent().get_parent().get_node("ButtonContainer/UpdateAll/Button").modulate = Color(0.7,0.7,0.7,1)
-		get_parent().get_parent().get_parent().get_node("ButtonContainer/IgnoreAll/Button").disabled = true
-		get_parent().get_parent().get_parent().get_node("ButtonContainer/IgnoreAll/Button").modulate = Color(0.7,0.7,0.7,1)
+		get_parent().get_parent().get_parent().get_parent().get_parent().no_mods_available()
 
 var frameCounter = 0
 
