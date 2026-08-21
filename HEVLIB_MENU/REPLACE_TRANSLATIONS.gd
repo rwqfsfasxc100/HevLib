@@ -1622,6 +1622,14 @@ const TRANSLATIONS = {
 		"HEVLIB_CREDITS_TRANSLATORS_TESSIER": {
 			"string": "Tessier-Ashpool S.A. - Chinese translations",
 			"version_hash": 2709571237
+		},
+		"HEVLIB_ERRORCHECK_MISSING_TRANSLATIONS": {
+			"string": "HevLib's translations could not load. This indicates that a severe issue has occurred, and there's a high likelihood that your mods will not work.\n\nClosing this popup will open the mod's bug report form. Please fill this out to the best of your ability. You will need to manually install the update once it has been released.",
+			"version_hash": 655551688
+		},
+		"HEVLIB_ERRORCHECK_MISSING_VANILLA_LOCALES": {
+			"string": "Exiting game due to a non-initialized TranslationServer. This is likely caused by a severe issue with any mods you have installed and/or Vanilla's .PCK file is corrupted.",
+			"version_hash": 4154468583
 		}
 	},
 	"de": {

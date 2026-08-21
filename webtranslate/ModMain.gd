@@ -57,10 +57,9 @@ func _ready():
 	
 #	loadTranslationsFromCache()
 	if correct:
-		yield(Debug.get_tree(),"idle_frame")
-		if TranslationServer.translate("SYSTEM_AMMO_10000_DESC") == "SYSTEM_AMMO_10000_DESC":
-			l("Translations did not get initialized, queued exit for 200 seconds to preserve report-ready state")
-			pointers.NodeAccess.__exit(false,"Exiting due to a non-initialized TranslationServer","HevLib Library WebTranslate Module",200)
+		pass
+	
+
 var cache_extension:String = ".file_check_cache"
 
 func loadTranslationsFromCache():
