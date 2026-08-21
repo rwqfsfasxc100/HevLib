@@ -110,6 +110,14 @@ func _ready():
 	get_parent().move_child(self,get_parent().get_child_count())
 	# This node cannot be paused
 	pause_mode = Node.PAUSE_MODE_PROCESS
+	
+	if TranslationServer.translate("HEVLIB_INCORRECT_SHIP") == "HEVLIB_INCORRECT_SHIP":
+		l("HevLib translations did not get initialized, quitting and ensuring the user is aware.","pointers.Translations")
+		Translations.__updateTL_from_dictionary(load("HEVLIB_MENU/REPLACE_TRANSLATIONS.gd").get_script().get_script_constant_map().get("TRANSLATIONS",{}))
+		NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_ERRORCHECK_MISSING_TRANSLATIONS"),"pointers.Translations",0.0,"https://forms.gle/RmC4Zgonp6frFgnK7",true)
+	if TranslationServer.translate("SYSTEM_AMMO_10000_DESC") == "SYSTEM_AMMO_10000_DESC":
+		l("Vanilla translations did not get initialized, queued exit for 200 seconds to preserve report-ready state.","pointers.Translations")
+		NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_ERRORCHECK_MISSING_VANILLA_LOCALES"),"pointers.Translations",200)
 
 # Logging function used for cases where critial info must not be overwritten by game logs
 # cycling back to dv_log_0 (and yes this is from a specific bug report with AI slop code,
@@ -1478,6 +1486,8 @@ class _ConfigDriver:
 		return sect_name
 	
 	func __validate_dictionary(data_dict : Dictionary,check_config : bool = true, check_requirements : bool = true, check_incompatibilities : bool = true, config_entry_override : String = "config", mod_requirements_entry_override : String = "mod_requirements", mod_incompatibilities_entry_override : String = "mod_incompatibilities"):
+		if data_dict == null:
+			return false
 		if check_config and config_entry_override in data_dict and data_dict[config_entry_override] is Dictionary:
 			var cfg : Dictionary = data_dict[config_entry_override]
 			match typeof(cfg):
@@ -1822,16 +1832,29 @@ class _DataFormat:
 						"Object with the new script set as it's script"
 					]
 				},
-				"__compile_and_override_script":{
-					"description":"Compiles a script and overrides it. Similar to the installScriptExtension method used in ModMain scripts",
+				"__compile_and_extend_script":{
+					"description":"Compiles a script and extends it. Similar to the installScriptExtension method used in ModMain scripts",
 					"args":[
 						"source_code -> (String) source code for the script override.",
 					],
 				},
-				"__compile_and_override_script_with_scene":{
-					"description":"Similar to __compile_and_override_script, additionally creates and updates one or more scenes after overriding the script in case script needs to have scenes reloaded to apply the update.",
+				"__extend_script_with_script_object":{
+					"description":"Extends a script with a provided script object. Similar to the installScriptExtension method used in ModMain scripts.",
 					"args":[
-						"source_code -> (String) source code for the script override.",
+						"script -> (String) script object to extend the base script with.",
+					],
+				},
+				"__compile_and_extend_script_with_scene":{
+					"description":"Similar to __compile_and_extend_script, additionally creates and updates one or more scenes after overriding the script in case script needs to have scenes reloaded to apply the update.",
+					"args":[
+						"source_code -> (String) source code for the script extension.",
+						"scene_path (optional) -> (String/PoolStringArray) String or PoolStringArray containing the file path or paths to scenes to be updated. Using array of paths will have them update in order. Defaults to `PoolStringArray()`"
+					],
+				},
+				"__extend_script_with_script_object_and_scene":{
+					"description":"Similar to __compile_and_extend_script_with_scene, using a script object to extend the script instead of compiling from source.",
+					"args":[
+						"source_code -> (String) script object to extend the base script with.",
 						"scene_path (optional) -> (String/PoolStringArray) String or PoolStringArray containing the file path or paths to scenes to be updated. Using array of paths will have them update in order. Defaults to `PoolStringArray()`"
 					],
 				},
@@ -2370,22 +2393,40 @@ class _DataFormat:
 		return out
 	
 	var _savedScriptObjects : Array = []
-	func __compile_and_override_script(source_code : String) -> void:
-		pointers.l("Compiling script of length %s" % str(source_code.length()),"pointers.DataFormat")
+	
+	func __extend_script(file_path : String):
+		pointers.l("Attempting to install script extension at [%s]" % file_path,"pointers.DataFormat")
+		if __load_if_can(file_path):
+			var sc:Script = __get_load()
+			pointers.l("Script extension successful with length of %s, passing to compiler" % sc.get_source_code().length(),"pointers.DataFormat")
+			__extend_script_with_script_object(sc)
+	
+	func __compile_and_extend_script(source_code : String) -> void:
+		pointers.l("Compiling script for script extension with length of %d" % source_code.length(),"pointers.DataFormat")
 		pointers.equipment_modmain.installScriptExtensionFromSource(source_code)
 	
-	func __compile_and_override_script_with_script(script : Script) -> void:
+	func __extend_script_with_script_object(script : Script) -> void:
 		pointers.l("Installing script extension with script %s" % str(script),"pointers.DataFormat")
 		pointers.equipment_modmain.installScriptExtensionFromScript(script)
 	
-	func __compile_and_override_script_with_scene(source_code : String, scene_path = [], override : bool = false) -> void:
+	func __compile_and_extend_script_with_scene(source_code : String, scene_path = [], override : bool = false) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
-		pointers.l("Attempting to compile and override script (with override) with script of length [%s], [%s] scene path(s) to reload" % [source_code.length(),scene_path.size()],"pointers.DataFormat")
-		__compile_and_override_script(source_code)
+		pointers.l("Attempting to compile and extend script (with scene override) with script of length %d, [%d] scene path(s) to reload" % [source_code.length(),scene_path.size()],"pointers.DataFormat")
+		__compile_and_extend_script(source_code)
 		for i in range(scene_path.size()):
 			var sc:String = scene_path[i]
-			pointers.l("Passing scene replacement %s/%s to reloader: %s" % [i,scene_path.size(),sc],"pointers.DataFormat")
+			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),str(sc)],"pointers.DataFormat")
+			__reload_scene(sc,override)
+	
+	func __extend_script_with_script_object_and_scene(script : Script, scene_path = [], override : bool = false) -> void:
+		if not scene_path is Array and not scene_path is PoolStringArray:
+			scene_path = PoolStringArray([scene_path])
+		pointers.l("Attempting to extend script (with scene override) with script %s, [%d] scene path(s) to reload" % [str(script),scene_path.size()],"pointers.DataFormat")
+		__extend_script_with_script_object(script)
+		for i in range(scene_path.size()):
+			var sc:String = scene_path[i]
+			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],"pointers.DataFormat")
 			__reload_scene(sc,override)
 	
 	func __reload_scene(scene_path : String, override : bool = false):
@@ -2402,12 +2443,40 @@ class _DataFormat:
 			pointers.l("Successfully found data for reloading scene with root [%s], passing to scene replacer" % root,"pointers.DataFormat")
 			__replace_scene(p,scene_path)
 	
-	func __override_script(file_path : String):
-		pointers.l("Attempting to install script override at [%s]" % file_path,"pointers.DataFormat")
-		if __load_if_can(file_path):
+	func __override_script(script_path : String, original_path : String):
+		pointers.l("Attempting to install script override @ [%s], overwriting [%s]" % [script_path,original_path],"pointers.DataFormat")
+		if __load_if_can(script_path):
 			var sc:Script = __get_load()
-			pointers.l("Script override successful with length of %s, passing to compiler" % str(sc.get_source_code().length()),"pointers.DataFormat")
-			__compile_and_override_script_with_script(sc)
+			pointers.l("Script override successful with length of %d, passing to compiler" % sc.get_source_code().length(),"pointers.DataFormat")
+			__override_script_with_script_object(sc, original_path)
+	
+	func __compile_and_override_script(source_code : String, original_path : String) -> void:
+		pointers.l("Compiling script for script override overwriting [%s] with a length of %d" % [original_path,source_code.length()],"pointers.DataFormat")
+		pointers.equipment_modmain.installScriptOverrideFromSource(source_code, original_path)
+	
+	func __override_script_with_script_object(script : Script, original_path : String) -> void:
+		pointers.l("Installing script override with script %s, overwriting [%s]" % [str(script),original_path],"pointers.DataFormat")
+		pointers.equipment_modmain.installScriptOverrideFromScript(script, original_path)
+	
+	func __compile_and_override_script_with_scene(source_code : String, original_path : String, scene_path = [], override : bool = false) -> void:
+		if not scene_path is Array and not scene_path is PoolStringArray:
+			scene_path = PoolStringArray([scene_path])
+		pointers.l("Attempting to compile and overwrite [%s] (with scene override) with script of length %d, [%d] scene path(s) to reload" % [original_path,source_code.length(),scene_path.size()],"pointers.DataFormat")
+		__compile_and_override_script(source_code, original_path)
+		for i in range(scene_path.size()):
+			var sc:String = scene_path[i]
+			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),str(sc)],"pointers.DataFormat")
+			__reload_scene(sc,override)
+	
+	func __override_script_with_script_object_and_scene(script : Script, original_path : String, scene_path = [], override : bool = false) -> void:
+		if not scene_path is Array and not scene_path is PoolStringArray:
+			scene_path = PoolStringArray([scene_path])
+		pointers.l("Attempting to override overwriting [%s] (with scene override) with script %s, [%d] scene path(s) to reload" % [original_path,str(script),scene_path.size()],"pointers.DataFormat")
+		__override_script_with_script_object(script, original_path)
+		for i in range(scene_path.size()):
+			var sc:String = scene_path[i]
+			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],"pointers.DataFormat")
+			__reload_scene(sc,override)
 	
 	func __replace_resource(resource_path:String, original_path:String):
 		if not ResourceLoader.exists(resource_path) or not ResourceLoader.exists(original_path):
@@ -2857,10 +2926,10 @@ class _DriverManagement:
 		"HEVLIB_DRIVERS/",
 	])
 	
+	var driver_ref_cache = {}
+	
 	func __get_drivers_from_modmain_path(file_path: String, get_fresh_drivers: bool = false):
-		if not get_fresh_drivers and driver_get_cache.get(file_path):
-			return driver_get_cache[file_path].duplicate(true)
-		else:
+		if get_fresh_drivers or not file_path in driver_get_cache:
 			var this_mod_data : Dictionary = {}
 			if not file.file_exists(file_path):
 				return {}
@@ -2870,15 +2939,13 @@ class _DriverManagement:
 				if driverDir in folderCheck:
 					var driverFolder : String  = folder_path + driverDir
 					for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
-						if not driver in this_mod_data:
-							this_mod_data.merge({driver:{}})
-						var consts : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(driverFolder + driver)
+						this_mod_data[driver] = {}
+						var driver_filepath = driverFolder + driver
+						var consts : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(driver_filepath)
 						for i in consts:
-							this_mod_data[driver].merge({i:consts[i]})
-			driver_get_cache[file_path] = this_mod_data.duplicate(true)
-			return this_mod_data.duplicate(true)
-	
-	
+							this_mod_data[driver][i] = consts[i]
+			driver_get_cache[file_path] = this_mod_data
+		return driver_get_cache[file_path].duplicate(true)
 	
 
 class _Equipment:
@@ -3024,7 +3091,7 @@ class _Equipment:
 		for md in mods:
 			var mod = mods[md]
 			if mod.drivers:
-				drivers.append(mod.drivers.duplicate(true))
+				drivers.append(mod.drivers)
 		mods.clear()
 		
 		
@@ -3044,7 +3111,7 @@ class _Equipment:
 				match last_bit:
 					"ADD_EQUIPMENT_ITEMS.gd":
 						for item in constants:
-							var equipment = constants.get(item).duplicate(true)
+							var equipment = constants.get(item)
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								match equipment.get("slot_type","HARDPOINT"):
 									"HARDPOINT":
@@ -3237,15 +3304,15 @@ class _Equipment:
 													bp["price"] = equipment["price"]
 												var dc : Dictionary = {equipment.get("num_val",0):bp}
 												register_ship_numerics_store["REGISTER_PROPELLANT"].append(dc)
-								ADD_EQUIPMENT_ITEMS.append(equipment.duplicate(true))
+								ADD_EQUIPMENT_ITEMS.append(equipment)
 					"ADD_EQUIPMENT_SLOTS.gd":
 						for item in constants:
-							var equipment = constants.get(item).duplicate(true)
+							var equipment = constants.get(item)
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
-								ADD_EQUIPMENT_SLOTS.append(equipment.duplicate(true))
+								ADD_EQUIPMENT_SLOTS.append(equipment)
 					"EQUIPMENT_TAGS.gd":
-						var ar : Dictionary = constants.get("EQUIPMENT_TAGS",{}).duplicate(true)
-						EQUIPMENT_TAGS.append(ar.duplicate(true))
+						var ar : Dictionary = constants.get("EQUIPMENT_TAGS",{})
+						EQUIPMENT_TAGS.append(ar)
 					"SLOT_ORDER.gd":
 						var orders : Array = constants.get("SLOT_ORDER",[])
 						for order in orders:
@@ -3258,14 +3325,14 @@ class _Equipment:
 								relative_equipment_slot_order[order] = orders2[order]
 						
 					"SLOT_TAGS.gd":
-						var ar : Dictionary = constants.get("SLOT_TAGS",{}).duplicate(true)
-						SLOT_TAGS.append(ar.duplicate(true))
+						var ar : Dictionary = constants.get("SLOT_TAGS",{})
+						SLOT_TAGS.append(ar)
 					"AUX_POWER_SLOT.gd","THRUSTERS.gd","AUX_POWER_AND_THRUSTERS.gd":
 						for item in constants:
-							var equipment : Dictionary = constants.get(item).duplicate(true)
+							var equipment : Dictionary = constants.get(item)
 							
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
-								AUX_POWER_AND_THRUSTERS.append(equipment.duplicate(true))
+								AUX_POWER_AND_THRUSTERS.append(equipment)
 
 					"MODIFY_INTERNALS.gd":
 						if "MODIFY_INTERNALS" in constants:
@@ -3336,7 +3403,7 @@ class _Equipment:
 									if "emp_scale_multi_upper" in item or "emp_scale_multi_lower" in item:
 										ls["emp_scale_multi"] = float(item.get("emp_scale_multi_upper",1.0))/float(item.get("emp_scale_multi_lower",1.0)) * ls.get("emp_scale_multi",1.0)
 									
-									MODIFY_INTERNALS[listingSystemName] = ls.duplicate(true)
+									MODIFY_INTERNALS[listingSystemName] = ls
 							
 					"NODE_DEFINITIONS.gd":
 						
@@ -3377,15 +3444,15 @@ class _Equipment:
 
 					"WEAPONSLOT_ADD.gd":
 						for item in constants:
-							var equipment : Dictionary = constants.get(item).duplicate(true)
+							var equipment : Dictionary = constants.get(item)
 							var n : String = equipment.get("name","")
 							if n:
 								if not n in ws_equipment_names:
 									ws_equipment_names.append(n)
 								if pointers.ConfigDriver.__validate_dictionary(equipment,false):
-									WEAPONSLOT_ADD.append(equipment.duplicate(true))
+									WEAPONSLOT_ADD.append(equipment)
 					"WEAPONSLOT_MODIFY_TEMPLATES.gd":
-						var ar : Dictionary = constants.get("WEAPONSLOT_MODIFY_TEMPLATES",{}).duplicate(true)
+						var ar : Dictionary = constants.get("WEAPONSLOT_MODIFY_TEMPLATES",{})
 						for template in ar:
 							if template in weaponslot_modify_templates:
 								for datapoint in ar[template]:
@@ -3409,10 +3476,10 @@ class _Equipment:
 												if not is_in_dict:
 													weaponslot_modify_templates[template][datapoint].append({"property":key,"value":data_formatted.get(key)})
 							else:
-								weaponslot_modify_templates[template] = ar.get(template).duplicate(true)
+								weaponslot_modify_templates[template] = ar.get(template)
 						
 					"WEAPONSLOT_MODIFY.gd":
-						var ar = constants.get("WEAPONSLOT_MODIFY",{}).duplicate(true)
+						var ar = constants.get("WEAPONSLOT_MODIFY",{})
 						
 						for item in ar:
 							if not item in ws_equipment_names:
@@ -3442,7 +3509,7 @@ class _Equipment:
 							
 						
 					"WEAPONSLOT_SHIP_TEMPLATES.gd":
-						var ar : Dictionary = constants.get("WEAPONSLOT_SHIP_TEMPLATES",{}).duplicate(true)
+						var ar : Dictionary = constants.get("WEAPONSLOT_SHIP_TEMPLATES",{})
 						for ship in ar:
 							if ship in weaponslot_ship_templates:
 								var shipdata : Dictionary = ar.get(ship)
@@ -3465,14 +3532,14 @@ class _Equipment:
 										for item in current_dict:
 											for equip in current_dict[item]:
 												compile[item].append({"property":equip,"value":current_dict[item].get(equip)})
-										weaponslot_ship_templates[ship][slot] = compile.duplicate(true)
+										weaponslot_ship_templates[ship][slot] = compile
 									else:
-										weaponslot_ship_templates[ship][slot] = shipdata.get(slot).duplicate(true)
+										weaponslot_ship_templates[ship][slot] = shipdata.get(slot)
 							else:
 								weaponslot_ship_templates.merge(ar)
 						
 					"WEAPONSLOT_SHIP_MODIFY.gd":
-						var ar = constants.get("WEAPONSLOT_SHIP_MODIFY",{}).duplicate(true)
+						var ar = constants.get("WEAPONSLOT_SHIP_MODIFY",{})
 						for ship in ar:
 							var slots : Dictionary = ar[ship]
 							for slot in slots:
@@ -3502,14 +3569,14 @@ class _Equipment:
 										for item in current_dict:
 											for equip in current_dict[item]:
 												compile[item].append({"property":equip,"value":current_dict[item].get(equip)})
-										weaponslot_ship_standalone[ship][slot] = compile.duplicate(true)
+										weaponslot_ship_standalone[ship][slot] = compile
 									else:
-										weaponslot_ship_standalone[ship][slot] = shipdata.get(slot).duplicate(true)
+										weaponslot_ship_standalone[ship][slot] = shipdata.get(slot)
 							else:
 								weaponslot_ship_standalone.merge(ar)
 						
 					"SAVE_BUTTONS.gd":
-						var ar : Array = constants.get("SAVE_BUTTONS",[]).duplicate(true)
+						var ar : Array = constants.get("SAVE_BUTTONS",[])
 						for button in ar:
 							if pointers.ConfigDriver.__validate_dictionary(button,false):
 								save_button_cache.append(button)
@@ -3517,7 +3584,7 @@ class _Equipment:
 						for ar in constants:
 							var ac : Dictionary = constants[ar]
 							if pointers.ConfigDriver.__validate_dictionary(ac,false):
-								add_ships_store.append(ac.duplicate(true))
+								add_ships_store.append(ac)
 					"MODIFY_SHIP_BUILDS.gd":
 						for ar in constants:
 							var sorting = {}
@@ -3582,7 +3649,7 @@ class _Equipment:
 								register_ship_numerics_store[ar] = []
 							var ac = constants[ar]
 							for v in ac:
-								var ax = ac[v].duplicate(true)
+								var ax = ac[v]
 								if pointers.ConfigDriver.__validate_dictionary(ax,false):
 									register_ship_numerics_store[ar].append({v:ax})
 					"MODIFY_SHIP_NUMERICS.gd":
@@ -6366,10 +6433,8 @@ class _ManifestV2:
 								zip_ref_store[modGlobalPath] = modFSPath
 					gdunzip = null
 				if zip_ref_store.get("res://HevLib/ModMain.gd","").get_file() != "HevLib.zip":
-					pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.")
+					pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.","pointers.ManifestV2")
 				pointers.SafeMode.__handle_exit_for_file_checks()
-				if not OS.has_feature("editor") and not ResourceLoader.exists("res://HevLib/pointers.gd"):
-					pointers.NodeAccess.__exit(false,"HevLib was not installed correctly, assuming incorrect file downloaded (didn't download from releases page?). Crashing & opening releases page for a potential help.","pointers.FileAccess",0.0,"https://github.com/rwqfsfasxc100/HevLib/releases/latest",true)
 			var stat_tags : Dictionary = {}
 			for mod in modListArr:
 				var mod_entry : Dictionary = __make_mod_entry(mod)
@@ -6387,7 +6452,11 @@ class _ManifestV2:
 					library_count += 1
 				else:
 					non_library_count += 1
-			
+			if not "res://HevLib/ModMain.gd" in mod_dictionary or not ResourceLoader.exists("res://HevLib/pointers.gd"):
+				if mod_dictionary.size():
+					pointers.NodeAccess.__exit(false,"Mod data was successfully fetched, but HevLib was not found. Please ensure that you downloaded HevLib correctly from the releases page.\n\nClosing this popup will crash the game & open HevLib's latest release page.","pointers.ManifestV2",0.0,"https://github.com/rwqfsfasxc100/HevLib/releases/latest",true)
+				else:
+					pointers.NodeAccess.__exit(false,"Mod data was not successfully fetched, assuming that a severe bug with HevLib filesystem querying on non-editor builds has occurred. You will need to manually update due to an issue of this severity.\n\nClosing this popup will crash the game & open Hev's bug report form so the issue can be addressed.","pointers.ManifestV2",0.0,"https://forms.gle/RmC4Zgonp6frFgnK7",true)
 			
 			var stat_count : Dictionary = {"total_mod_count":total_mod_count,"mods_using_manifests":manifest_count,"mods":non_library_count,"libraries":library_count}
 			var statistics : Dictionary = {"counts":stat_count,"tags":stat_tags}
@@ -7522,20 +7591,25 @@ class _ManifestV2:
 							match load_type:
 								"script":
 									var path : String = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
-									if pointers.ConfigDriver.__validate_dictionary(subdata):
-										pointers.DataFormat.__override_script(path)
+									if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.DataFormat.__file_exists(path):
+										var override = subdata.get("override",false)
+										var op = subdata.get("override_path","res:/" + path.split(modlet.get_base_dir())[1])
+										var override_path : String = op if (op.begins_with("res:/")) else ("res:/" + ("" if op.begins_with("/") else "/") + op)
+										if override and pointers.DataFormat.__file_exists(override_path):
+											pointers.DataFormat.__override_script(path,override_path)
+										else:
+											pointers.DataFormat.__extend_script(path)
 								"scene","resource":
 									var path : String = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
 									var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[1])
-									var old_relative:bool = old.begins_with("res:/")
-									var old_path : String = old if old_relative else ("res:/" + ("" if old.begins_with("/") else "/") + old)
-									if pointers.ConfigDriver.__validate_dictionary(subdata):
+									var old_path : String = old if (old.begins_with("res:/")) else ("res:/" + ("" if old.begins_with("/") else "/") + old)
+									if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.DataFormat.__file_exists(path):
 										pointers.DataFormat.__replace_resource(path,old_path)
 										if not old_path in scenes_to_reload:
 											scenes_to_reload.append(old_path)
 								"reload":
 									var path : String = resource if is_relative else ("res:/" + ("" if resource.begins_with("/") else "/") + resource)
-									if pointers.ConfigDriver.__validate_dictionary(subdata):
+									if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.DataFormat.__file_exists(path):
 										pointers.DataFormat.__reload_scene(path,subdata.get("complete_reload",false))
 				pointers.DataFormat.__loadDLC()
 		return scenes_to_reload
@@ -7848,7 +7922,7 @@ class _SafeMode:
 			if file_path in PCKFILES:
 				pointers.l("WARNING: file %s @ %s overwrites Vanilla resource." % [file_path,zip_path.get_file()],"pointers.SafeMode")
 				pointers.l(" -> File should use a uniqure directory as to ensure the Vanilla file can be accessed at all times.","pointers.SafeMode")
-				pointers.l(" -> If you need to completely overwrite a script, use DataFormat.__override_script","pointers.SafeMode")
+				pointers.l(" -> If you need to completely overwrite a script, use DataFormat.__extend_script","pointers.SafeMode")
 				if not zip_path.get_file() in offendingFiles:
 					offendingFiles[zip_path.get_file()] = []
 				offendingFiles[zip_path.get_file()].append(file_path)
@@ -7864,7 +7938,7 @@ class _SafeMode:
 			for i in zip_files:
 				pointers.l(" -> [%s]" % i,"pointers.SafeMode")
 		if safeCheck and safeCheckTriggered:
-			pointers.NodeAccess.__exit(false,"Safe mode tripped. One or more mods attempted to overwrite a Vanilla resource file at the directory level.\n\nIf you are looking to extend/overwrite a Vanilla resource, please use DataFormat.__override_script() for scripts, DataFormat.__replace_resource() for scenes/resources, or any equivalent method within your ModMain/LOAD_RESOURCES scripts.\n\nCheck logs for details regarding offending mod(s).","pointers.SafeMode",0.0,"",true)
+			pointers.NodeAccess.__exit(false,"Safe mode tripped. One or more mods attempted to overwrite a Vanilla resource file at the directory level.\n\nIf you are looking to extend/overwrite a Vanilla resource, please use DataFormat.__extend_script() for scripts, DataFormat.__replace_resource() for scenes/resources, or any equivalent method within your ModMain/LOAD_RESOURCES scripts.\n\nCheck logs for details regarding offending mod(s).","pointers.SafeMode",0.0,"",true)
 	
 	
 
@@ -8124,7 +8198,7 @@ class _Scripting:
 			trace_text += "\n\tif not \"%s\" in %s:\n\t\t%s.append(\"%s\")" % [trace,"traceMinerals","traceMinerals",str(trace)]
 		
 		# Compiles and extends the CurrentGame.gd script
-		pointers.DataFormat.__compile_and_override_script("extends \"res://CurrentGame.gd\"\nfunc _init():\n\tpass%s%s%s\nfunc isDemo():\n\treturn false" % [price_text,color_text,trace_text])
+		pointers.DataFormat.__compile_and_extend_script("extends \"res://CurrentGame.gd\"\nfunc _init():\n\tpass%s%s%s\nfunc isDemo():\n\treturn false" % [price_text,color_text,trace_text])
 		
 		
 		# Initialize and create ore chunk additions
@@ -8266,7 +8340,7 @@ class _Scripting:
 			content += "\n\tif not \"%s\" in %s:\n\t\t%s.merge({%s})" % [m,"objectClass[objectClass.size() - 1]","objectClass[objectClass.size() - 1]",mineral_list[m]]
 		
 		# Installs the AsteroidSpawner.gd script to add new ore scenes
-		pointers.DataFormat.__compile_and_override_script(content)
+		pointers.DataFormat.__compile_and_extend_script(content)
 	
 	const not_random_seeds = PoolIntArray([1861,-2531,1337,1776,2014,1384,2684,842,2802,1597,2116,755,1596,2661,1928,-1861,-2531,-1337,-1776,-2014,-1384,-2684,-842,-2802,-1597,-2116,-755,-1596,-2661,-1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928])
 	
@@ -8305,7 +8379,7 @@ class _Scripting:
 			v_arr.append_array([item + ".r",item + ".g",item + ".b",item + ".a"])
 		variable_statements += "\n\n\tvar values = %s\n\n\tvar total = 0\n\tfor n in range(CurrentGame.traceMinerals.size()):\n\t\tvar tm = CurrentGame.traceMinerals[n]\n\t\tvalues[n] = pow(values[n] / pow(CurrentGame.mineralPrices.get(tm, 1), 0.2), 4)\n\t\ttotal += values[n]\n\tvar rnd = randf() * total\n\tvar nr = 0\n\tfor n in values:\n\t\trnd -= n\n\t\tif rnd < 0:\n\t\t\treturn CurrentGame.traceMinerals[nr]\n\t\tnr += 1\n\n\treturn CurrentGame.traceMinerals[0]" % str(v_arr)
 		
-		pointers.DataFormat.__compile_and_override_script_with_scene(variable_statements,["res://story/TheRing.tscn"])
+		pointers.DataFormat.__compile_and_extend_script_with_scene(variable_statements,["res://story/TheRing.tscn"])
 		
 		pointers.DataFormat.__replace_scene("[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://TheRing.gd\" type=\"Script\" id=1]\n[ext_resource path=\"res://story/TheRing.tscn\" type=\"PackedScene\" id=2]\n\n[node name=\"TheRing\" instance=ExtResource( 2 )]\nscript = ExtResource( 1 )\n","res://story/TheRing.tscn")
 	

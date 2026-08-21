@@ -1,3 +1,32 @@
+[1.15.42]
+
+1=* All current script extender functions in the `DataFormat` class have been renamed to make the naming conventions close to what's actually happening, as well as to make room for new methods to actually override scripts.
+1.1=* `__compile_and_override_script` -> `__compile_and_extend_script`
+1.2=* `__compile_and_override_script_with_script` -> `__extend_script_with_script_object`
+1.3=* `__compile_and_override_script_with_scene` -> `__compile_and_extend_script_with_scene`
+1.4=* `__override_script` -> `__extend_script`
+2=* Added `DataFormat`.`__extend_script_with_script_object_and_scene`
+2.1=* Similar to `DataFormat`.`__compile_and_extend_script_with_scene`, instead replacing the source code input with that of a script object
+3=* Added several methods to the `DataFormat` class, mirroring it's 5 script extension methods with copies that are capable of completely overwriting a script loaded by the vanilla game or another mod prior to it's call.
+3.1=* `__override_script`:
+3.1.1=* 
+3.2=* `__compile_and_override_script`:
+3.2.1=* 
+3.3=* `__override_script_with_script_object`:
+3.3.1=* 
+3.4=* `__compile_and_override_script_with_scene`:
+3.4.1=* 
+3.5=* `__override_script_with_script_object_and_scene`:
+3.5.1=* 
+4=* Added support for script extensions to instead override a script entirely using the `script` load type for a `LOAD_RESOURCES.gd` entry
+4.1=* Enabled by setting the `override` property to true.
+4.2=* Path for the script to be overriden can be set by the `override_path` property.
+4.2.1=* Behaves similarly to the `original_path` property for `scene`/`resource` load types, including behaviour for omitting this property.
+4.2.2=* If the `original_path` property leads to a file that doesn't exist, defaults to using the regular script extension behaviour
+5=* `LOAD_RESOURCES.gd` now checks to make sure the provided script/scene/resource exists.
+6=* Reduced driver processing time by removing unnecessary dictionary and array duplication calls.
+7=* 
+
 [1.15.41]
 
 1=* Reverted change to `__recursive_delete` and `__fetch_folder_files`, as it caused the library to completely break when run on non-editor builds

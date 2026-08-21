@@ -254,21 +254,35 @@ func installScriptExtension(path:String):
 
 	childScript.take_over_path(parentPath)
 	_savedObjects.append(childScript)
+
 func installScriptExtensionFromSource(source_code:String):
 	var out = GDScript.new()
 	out.set_source_code(source_code)
 	out.reload()
-	
 	var parentScript:Script = out.get_base_script()
 	var parentPath:String = parentScript.resource_path
-	l("Installing script extension from source to: %s" % [parentPath])
+	l("Installing script extension from [Source Code -> %s]" % parentPath)
 	out.take_over_path(parentPath)
 	_savedObjects.append(out)
+
 func installScriptExtensionFromScript(out:Script):
 	var parentScript:Script = out.get_base_script()
 	var parentPath:String = parentScript.resource_path
-	l("Installing script extension from source to: %s" % [parentPath])
+	l("Installing script extension from [%s -> %s]" % [str(out),parentPath])
 	out.take_over_path(parentPath)
+	_savedObjects.append(out)
+
+func installScriptOverrideFromSource(source_code:String,original_path:String):
+	var out = GDScript.new()
+	out.set_source_code(source_code)
+	out.reload()
+	l("Installing script override from [Source Code -> %s]" % original_path)
+	out.take_over_path(original_path)
+	_savedObjects.append(out)
+
+func installScriptOverrideFromScript(out:Script,original_path:String):
+	l("Installing script override from [%s -> %s]" % [str(out),original_path])
+	out.take_over_path(original_path)
 	_savedObjects.append(out)
 
 
