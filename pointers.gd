@@ -3086,12 +3086,12 @@ class _Equipment:
 		weaponslot_ship_templates = ws_ship_templates_2.get("SHIP_TEMPLATES",{})
 		weaponslot_ship_standalone = ws_ship_templates.get("SHIP_MODIFY",{})
 		
-		var drivers : Array = []
+		var drivers : Dictionary = {}
 		var mods : Dictionary = pointers.ManifestV2.__get_mod_data()["mods"]
 		for md in mods:
 			var mod = mods[md]
-			if mod.drivers:
-				drivers.append(mod.drivers)
+			if "drivers" in mod and mod.drivers:
+				drivers[mod.file_path] = mod.drivers
 		mods.clear()
 		
 		
@@ -3105,7 +3105,8 @@ class _Equipment:
 				if type and not type in equipment_validity_for_slots[sys]:
 					equipment_validity_for_slots[sys].append(type)
 		
-		for cvh in drivers:
+		for mod_filepath in drivers:
+			var cvh = drivers[mod_filepath]
 			for last_bit in cvh:
 				var constants : Dictionary = cvh[last_bit]
 				match last_bit:
@@ -4308,13 +4309,13 @@ class _Equipment:
 		thruster_vars += "\n" + "pitchOverride = %f" % pitchOverride
 		var minChoke:float = data.get("min_choke",0.25)
 		thruster_vars += "\n" + "minChoke = %f" % minChoke
-		var modulate:Color = Color(data.get("modulate",Color(1,1,1,1)))
+		var modulate:Color = Color(data.get("modulate",Color.white))
 		thruster_vars += "\n" + "modulate = Color( %f , %f , %f , %f )" % [modulate.r,modulate.g,modulate.b,modulate.a]
 		var self_modulate:Color = Color(data.get("self_modulate",Color(1,1,1,0)))
 		thruster_vars += "\n" + "self_modulate = Color( %f , %f , %f , %f )" % [self_modulate.r,self_modulate.g,self_modulate.b,self_modulate.a]
 		var offset:Vector2 = Vector2(-32,-16)
 		var po = data.get("plume_offset",[-32,-16])
-		if (po is Vector2) or (po is Array and po.size() > 1):
+		if (po is Vector2) or ((po is Array or po is PoolIntArray or po is PoolRealArray) and po.size() > 1):
 			offset[0] = po[0]
 			offset[1] = po[1]
 		thruster_vars += "\n" + "offset = Vector2( %f , %f )" % [offset.x,offset.y]
@@ -4330,7 +4331,7 @@ class _Equipment:
 		thruster_vars += "\n" + "vframes = %f" % vframes
 		var frame:int = data.get("plume_frame",1)
 		thruster_vars += "\n" + "frame = %f" % frame
-		var frame_coords:Vector2 = Vector2(1,0)
+		var frame_coords:Vector2 = Vector2.RIGHT
 		var plumeFrameCoords = data.get("plume_frame_coords",frame_coords)
 		if (plumeFrameCoords is Vector2) or (plumeFrameCoords is Array and plumeFrameCoords.size() > 1):
 			frame_coords[0] = plumeFrameCoords[0]
@@ -4340,7 +4341,7 @@ class _Equipment:
 		thruster_vars += "\n" + "region_enabled = %s" % ("true" if region_enabled else "false")
 		var region_rect:Rect2 = Rect2(0,0,0,0)
 		var plRect = data.get("plume_region_rect",Rect2(0,0,0,0))
-		if plRect is Array and plRect.size() > 3:
+		if (plRect is Array or plRect is PoolIntArray or plRect is PoolRealArray) and plRect.size() > 3:
 			region_rect = Rect2(plRect[0],plRect[1],plRect[2],plRect[3])
 		elif plRect is Rect2:
 			region_rect = plRect
@@ -4349,7 +4350,7 @@ class _Equipment:
 		thruster_vars += "\n" + "region_filter_clip = %s" % ("true" if region_filter_clip else "false")
 		var position:Vector2 = Vector2(0,-3)
 		var tp = data.get("position",position)
-		if tp is Vector2 or (tp is Array and tp.size() > 1):
+		if tp is Vector2 or ((tp is Array or tp is PoolIntArray or tp is PoolRealArray) and tp.size() > 1):
 			position[0] = tp[0]
 			position[1] = tp[1]
 		thruster_vars += "\n" + "position = Vector2( %f , %f )" % [position.x,position.y]
@@ -4357,7 +4358,7 @@ class _Equipment:
 		thruster_vars += "\n" + "rotation = %f" % rotation
 		var scale:Vector2 = Vector2(0.2,0.2) if aux_type == "RCS" else Vector2(0.939,1.395)
 		var ts = data.get("scale",scale)
-		if ts is Vector2 or (ts is Array and ts.size() > 1):
+		if ts is Vector2 or ((ts is Array or ts is PoolIntArray or ts is PoolRealArray) and ts.size() > 1):
 			scale[0] = ts[0]
 			scale[1] = ts[1]
 		thruster_vars += "\n" + "scale = Vector2( %f , %f )" % [scale.x,scale.y]
@@ -4388,7 +4389,7 @@ class _Equipment:
 		flare_vars += "\n" + "range_layer_max = %f" % flare_range_layer_max
 		var flare_offset:Vector2 = Vector2.ZERO
 		var fo = data.get("flare_offset",flare_offset)
-		if fo is Vector2 or (fo is Array and fo.size() > 1):
+		if fo is Vector2 or ((fo is Array or fo is PoolIntArray or fo is PoolRealArray) and fo.size() > 1):
 			flare_offset[0] = fo[0]
 			flare_offset[1] = fo[1]
 		flare_vars += "\n" + "offset = Vector2( %f , %f )" % [flare_offset.x,flare_offset.y]
@@ -4397,13 +4398,13 @@ class _Equipment:
 		var flare_rotation:float = deg2rad(data.get("flare_rotation",0))
 		flare_vars += "\n" + "rotation = %f" % flare_rotation
 		var flare_position:Vector2 = Vector2.ZERO
-		var fp = data.get("flare_position",[0,0])
-		if fp is Vector2 or (fp is Array and fp.size() > 1):
+		var fp = data.get("flare_position",Vector2.ZERO)
+		if fp is Vector2 or ((fp is Array or fp is PoolIntArray or fp is PoolRealArray) and fp.size() > 1):
 			flare_position[0] = fp[0]
 			flare_position[1] = fp[1]
-		var flare_scale:Vector2 = Vector2(1,1)
-		var fs = data.get("flare_scale",[1,1])
-		if fs is Vector2 or (fs is Array and fs.size() > 1):
+		var flare_scale:Vector2 = Vector2.ONE
+		var fs = data.get("flare_scale",Vector2.ONE)
+		if fs is Vector2 or ((fs is Array or fs is PoolIntArray or fs is PoolRealArray) and fs.size() > 1):
 			flare_scale[0] = fs[0]
 			flare_scale[1] = fs[1]
 		flare_vars += "\n" + "scale = Vector2( %f , %f )" % [flare_scale.x,flare_scale.y]
@@ -4600,8 +4601,9 @@ class _Equipment:
 		nozzle_vars += "\n" + "normal_map = ExtResource( %d )" % current_ext
 		
 		
-		var offset : Array = nd.offset
-		nozzle_vars += "\n" + "offset = Vector2( %f , %f )" % [offset[0],offset[1]]
+		var offset = nd.offset
+		if offset is Vector2 or ((offset is Array or offset is PoolIntArray or offset is PoolRealArray) and offset.size() > 1):
+			nozzle_vars += "\n" + "offset = Vector2( %f , %f )" % [offset[0],offset[1]]
 		var centered:bool = nd.centered
 		nozzle_vars += "\n" + "centered = %s" % ("true" if centered else "false")
 		var flip_h:bool = nd.flip_h
@@ -4614,20 +4616,28 @@ class _Equipment:
 		nozzle_vars += "\n" + "vframes = %f" % vframes
 		var frame:int = nd.frame
 		nozzle_vars += "\n" + "frame = %f" % frame
-		var frame_coords : Array = nd.frame_coords
-		nozzle_vars += "\n" + "frame_coords = Vector2( %f , %f )" % [frame_coords[0],frame_coords[1]]
+		var frame_coords = nd.frame_coords
+		if frame_coords is Vector2 or ((frame_coords is Array or frame_coords is PoolIntArray or frame_coords is PoolRealArray) and frame_coords.size() > 1):
+			nozzle_vars += "\n" + "frame_coords = Vector2( %f , %f )" % [frame_coords[0],frame_coords[1]]
 		var region_enabled:bool = nd.region_enabled
 		nozzle_vars += "\n" + "region_enabled = %s" % ("true" if region_enabled else "false")
-		var region_rect : Array = nd.region_rect
-		nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [region_rect[0],region_rect[1],region_rect[2],region_rect[3]]
+		var region_rect = nd.region_rect
+		match typeof(region_rect):
+			TYPE_ARRAY, TYPE_INT_ARRAY, TYPE_REAL_ARRAY:
+				if region_rect.size() > 3:
+					nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [region_rect[0],region_rect[1],region_rect[2],region_rect[3]]
+			TYPE_RECT2:
+				nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [region_rect.position.x,region_rect.position.y,region_rect.size.x,region_rect.size.y]
 		var region_filter_clip:bool = nd.region_filter_clip
 		nozzle_vars += "\n" + "region_filter_clip = %s" % ("true" if region_filter_clip else "false")
-		var position : Array = nd.position
-		nozzle_vars += "\n" + "position = Vector2( %f , %f )" % [position[0],position[1]]
+		var position = nd.position
+		if position is Vector2 or ((position is Array or position is PoolIntArray or position is PoolRealArray) and position.size() > 1):
+			nozzle_vars += "\n" + "position = Vector2( %f , %f )" % [position[0],position[1]]
 		var rotation:float = deg2rad(nd.rotation)
 		nozzle_vars += "\n" + "rotation = %f" % rotation
-		var scale : Array = nd.scale
-		nozzle_vars += "\n" + "scale = Vector2( %f , %f )" % [scale[0],scale[1]]
+		var scale = nd.scale
+		if scale is Vector2 or ((scale is Array or scale is PoolIntArray or scale is PoolRealArray) and scale.size() > 1):
+			nozzle_vars += "\n" + "scale = Vector2( %f , %f )" % [scale[0],scale[1]]
 		
 		nozzle_vars += "\n\n[node name=\"heat\" parent=\"%s\" index=\"0\"]" % nozzlename
 		
@@ -4655,8 +4665,9 @@ class _Equipment:
 			nozzle_vars += "\n" + "normal_map = ExtResource( %d )" % current_ext
 		
 		
-		var heat_offset : Array = nd.offset
-		nozzle_vars += "\n" + "offset = Vector2( %f , %f )" % [heat_offset[0],heat_offset[1]]
+		var heat_offset = nd.offset
+		if heat_offset is Vector2 or ((heat_offset is Array or heat_offset is PoolIntArray or heat_offset is PoolRealArray) and heat_offset.size() > 1):
+			nozzle_vars += "\n" + "offset = Vector2( %f , %f )" % [heat_offset[0],heat_offset[1]]
 		var heat_centered:bool = nd.heat_centered
 		nozzle_vars += "\n" + "centered = %s" % ("true" if heat_centered else "false")
 		var heat_flip_h:bool = nd.heat_flip_h
@@ -4669,20 +4680,28 @@ class _Equipment:
 		nozzle_vars += "\n" + "vframes = %f" % heat_vframes
 		var heat_frame:int = nd.heat_frame
 		nozzle_vars += "\n" + "frame = %f" % heat_frame
-		var heat_frame_coords : Array = nd.heat_frame_coords
-		nozzle_vars += "\n" + "frame_coords = Vector2( %f , %f )" % [heat_frame_coords[0],heat_frame_coords[1]]
+		var heat_frame_coords = nd.heat_frame_coords
+		if heat_frame_coords is Vector2 or ((heat_frame_coords is Array or heat_frame_coords is PoolIntArray or heat_frame_coords is PoolRealArray) and heat_frame_coords.size() > 1):
+			nozzle_vars += "\n" + "frame_coords = Vector2( %f , %f )" % [heat_frame_coords[0],heat_frame_coords[1]]
 		var heat_region_enabled:bool = nd.heat_region_enabled
 		nozzle_vars += "\n" + "region_enabled = %s" % ("true" if heat_region_enabled else "false")
-		var heat_region_rect : Array = nd.heat_region_rect
-		nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [heat_region_rect[0],heat_region_rect[1],heat_region_rect[2],heat_region_rect[3]]
+		var heat_region_rect = nd.heat_region_rect
+		match typeof(heat_region_rect):
+			TYPE_ARRAY, TYPE_INT_ARRAY, TYPE_REAL_ARRAY:
+				if heat_region_rect.size() > 3:
+					nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [heat_region_rect[0],heat_region_rect[1],heat_region_rect[2],heat_region_rect[3]]
+			TYPE_RECT2:
+				nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [heat_region_rect.position.x,heat_region_rect.position.y,heat_region_rect.size.x,heat_region_rect.size.y]
 		var heat_region_filter_clip:bool = nd.heat_region_filter_clip
 		nozzle_vars += "\n" + "region_filter_clip = %s" % ("true" if heat_region_filter_clip else "false")
-		var heat_position : Array = nd.heat_position
-		nozzle_vars += "\n" + "position = Vector2( %f , %f )" % [heat_position[0],heat_position[1]]
+		var heat_position = nd.heat_position
+		if heat_position is Vector2 or ((heat_position is Array or heat_position is PoolIntArray or heat_position is PoolRealArray) and heat_position.size() > 1):
+			nozzle_vars += "\n" + "position = Vector2( %f , %f )" % [heat_position[0],heat_position[1]]
 		var heat_rotation:float = deg2rad(nd.heat_rotation)
 		nozzle_vars += "\n" + "rotation = %f" % heat_rotation
-		var heat_scale : Array = nd.heat_scale
-		nozzle_vars += "\n" + "scale = Vector2( %f , %f )" % [heat_scale[0],heat_scale[1]]
+		var heat_scale = nd.heat_scale
+		if heat_scale is Vector2 or ((heat_scale is Array or heat_scale is PoolIntArray or heat_scale is PoolRealArray) and heat_scale.size() > 1):
+			nozzle_vars += "\n" + "scale = Vector2( %f , %f )" % [heat_scale[0],heat_scale[1]]
 		
 		var out : Array = [nozzle_vars,current_ext,ext_entries]
 		return out
@@ -4696,33 +4715,33 @@ class _Equipment:
 		"heat":"res://ships/modules/nozzle-cl.png",
 		"heat_normal":"",
 		"centered":true,
-		"offset":[0,0],
+		"offset":Vector2.ZERO,
 		"flip_h":false,
 		"flip_v":false,
 		"horizontal_frames":1,
 		"vertical_frames":1,
 		"frame":0,
-		"frame_coords":[0,0],
+		"frame_coords":Vector2.ZERO,
 		"region_enabled":false,
-		"region_rect":[0,0,0,0],
+		"region_rect":Rect2(0,0,0,0),
 		"region_filter_clip":false,
-		"position":[0,0],
+		"position":Vector2.ZERO,
 		"rotation":0,
-		"scale":[1,1],
+		"scale":Vector2.ONE,
 		"heat_centered":true,
-		"heat_offset":[0,0],
+		"heat_offset":Vector2.ZERO,
 		"heat_flip_h":false,
 		"heat_flip_v":false,
 		"heat_horizontal_frames":1,
 		"heat_vertical_frames":1,
 		"heat_frame":0,
-		"heat_frame_coords":[0,0],
+		"heat_frame_coords":Vector2.ZERO,
 		"heat_region_enabled":false,
-		"heat_region_rect":[0,0,0,0],
+		"heat_region_rect":Rect2(0,0,0,0),
 		"heat_region_filter_clip":false,
-		"heat_position":[0,0],
+		"heat_position":Vector2.ZERO,
 		"heat_rotation":0,
-		"heat_scale":[1,1],
+		"heat_scale":Vector2.ONE,
 	}
 	
 	func convert_to_nozzle(noz):
@@ -4744,7 +4763,7 @@ class _Equipment:
 		var self_remove:float = data.get("exhaust_self_remove",0.02)
 		var mass:float = data.get("exhaust_mass",0.1)
 		var sprite : String = data.get("exhaust_sprite","res://sfx/ball-of-flame.png")
-		var sprite_scale : Array = data.get("exhaust_sprite_scale",[0.5,0.5])
+		var sprite_scale = data.get("exhaust_sprite_scale",Vector2(0.5,0.5))
 		var radius:float = data.get("exhaust_collider_radius",2.87)
 		
 		var tex_type : String = ""
@@ -4769,7 +4788,8 @@ class _Equipment:
 			exhaust_text += "\nselfRemove = false"
 		
 		exhaust_text += "\n\n[node name=\"CollisionShape2D\" parent=\".\" index=\"0\"]\nshape = SubResource( 1 )\n\n" + exhaust_footer
-		exhaust_text += "\nscale = Vector2(%s,%s)" % [sprite_scale[0],sprite_scale[1]]
+		if sprite_scale is Vector2 or ((sprite_scale is Array or sprite_scale is PoolIntArray or sprite_scale is PoolRealArray) and sprite_scale.size() > 1):
+			exhaust_text += "\nscale = Vector2(%s,%s)" % [sprite_scale[0],sprite_scale[1]]
 		return exhaust_text
 
 	func confirm_equipment(equipment_node, slot_type, slot_alignment, slot_restriction, slot_allowed_equipment) -> bool:
@@ -4949,8 +4969,8 @@ class _Equipment:
 		var hardpoint_type : String = slot_data.get("hardpoint_type","")
 		var alignment : String = slot_data.get("alignment","")
 		var restriction : String = slot_data.get("restriction","")
-		var override_additive : Array = slot_data.get("override_additive",[])
-		var override_subtractive : Array = slot_data.get("override_subtractive",[])
+		var override_additive : Array = Array(slot_data.get("override_additive",[]))
+		var override_subtractive : Array = Array(slot_data.get("override_subtractive",[]))
 		var restrict_hold_type : String = slot_data.get("restrict_hold_type","")
 		
 		var cfg : Dictionary = slot_data.get("config",{})
