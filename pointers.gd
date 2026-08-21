@@ -1832,10 +1832,16 @@ class _DataFormat:
 						"Object with the new script set as it's script"
 					]
 				},
+				"__extend_script":{
+					"description":"Extends a script from a filepath. Similar to the installScriptExtension method used in ModMain scripts",
+					"args":[
+						"file_path -> (String) file path for the script extension.",
+					],
+				},
 				"__compile_and_extend_script":{
 					"description":"Compiles a script and extends it. Similar to the installScriptExtension method used in ModMain scripts",
 					"args":[
-						"source_code -> (String) source code for the script override.",
+						"source_code -> (String) source code for the script extension.",
 					],
 				},
 				"__extend_script_with_script_object":{
@@ -1855,6 +1861,43 @@ class _DataFormat:
 					"description":"Similar to __compile_and_extend_script_with_scene, using a script object to extend the script instead of compiling from source.",
 					"args":[
 						"source_code -> (String) script object to extend the base script with.",
+						"scene_path (optional) -> (String/PoolStringArray) String or PoolStringArray containing the file path or paths to scenes to be updated. Using array of paths will have them update in order. Defaults to `PoolStringArray()`"
+					],
+				},
+				"__override_script":{
+					"description":"Overrides a script with another script.",
+					"args":[
+						"file_path -> (String) file path for the script extension.",
+						"original_path -> (String) file path for the script to be overriden",
+					],
+				},
+				"__compile_and_override_script":{
+					"description":"Compiles a script and overrides the script at the provided path.",
+					"args":[
+						"source_code -> (String) source code for the script extension.",
+						"original_path -> (String) file path for the script to be overriden",
+					],
+				},
+				"__override_script_with_script_object":{
+					"description":"Overrides a script with a provided script object.",
+					"args":[
+						"script -> (Script) script object to extend the base script with.",
+						"original_path -> (String) file path for the script to be overriden",
+					],
+				},
+				"__compile_and_override_script_with_scene":{
+					"description":"Similar to __compile_and_override_script, additionally creates and updates one or more scenes after overriding the script in case script needs to have scenes reloaded to apply the update.",
+					"args":[
+						"source_code -> (String) source code for the script override.",
+						"original_path -> (String) file path for the script to be overriden",
+						"scene_path (optional) -> (String/PoolStringArray) String or PoolStringArray containing the file path or paths to scenes to be updated. Using array of paths will have them update in order. Defaults to `PoolStringArray()`"
+					],
+				},
+				"__override_script_with_script_object_and_scene":{
+					"description":"Similar to __compile_and_override_script_with_scene, using a script object to override the script instead of compiling from source.",
+					"args":[
+						"script -> (Script) script object to extend the base script with.",
+						"original_path -> (String) file path for the script to be overriden",
 						"scene_path (optional) -> (String/PoolStringArray) String or PoolStringArray containing the file path or paths to scenes to be updated. Using array of paths will have them update in order. Defaults to `PoolStringArray()`"
 					],
 				},
@@ -2429,20 +2472,6 @@ class _DataFormat:
 			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],"pointers.DataFormat")
 			__reload_scene(sc,override)
 	
-	func __reload_scene(scene_path : String, override : bool = false):
-		pointers.l("Attempting to reload scene at [%s]" % scene_path,"pointers.DataFormat")
-		if __load_if_can(scene_path,override):
-			var scn = __get_load().instance()
-			var root : String  = scn.name
-			if Tool.validex != null:
-				Tool.remove(scn)
-			else:
-				if is_instance_valid(scn) and not scn.is_queued_for_deletion():
-					scn.free()
-			var p : String  = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"%s\" type=\"PackedScene\" id=1]\n\n[node name=\"%s\" instance=ExtResource( 1 )]" % [scene_path,root]
-			pointers.l("Successfully found data for reloading scene with root [%s], passing to scene replacer" % root,"pointers.DataFormat")
-			__replace_scene(p,scene_path)
-	
 	func __override_script(script_path : String, original_path : String):
 		pointers.l("Attempting to install script override @ [%s], overwriting [%s]" % [script_path,original_path],"pointers.DataFormat")
 		if __load_if_can(script_path):
@@ -2477,6 +2506,20 @@ class _DataFormat:
 			var sc:String = scene_path[i]
 			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],"pointers.DataFormat")
 			__reload_scene(sc,override)
+	
+	func __reload_scene(scene_path : String, override : bool = false):
+		pointers.l("Attempting to reload scene at [%s]" % scene_path,"pointers.DataFormat")
+		if __load_if_can(scene_path,override):
+			var scn = __get_load().instance()
+			var root : String  = scn.name
+			if Tool.validex != null:
+				Tool.remove(scn)
+			else:
+				if is_instance_valid(scn) and not scn.is_queued_for_deletion():
+					scn.free()
+			var p : String  = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"%s\" type=\"PackedScene\" id=1]\n\n[node name=\"%s\" instance=ExtResource( 1 )]" % [scene_path,root]
+			pointers.l("Successfully found data for reloading scene with root [%s], passing to scene replacer" % root,"pointers.DataFormat")
+			__replace_scene(p,scene_path)
 	
 	func __replace_resource(resource_path:String, original_path:String):
 		if not ResourceLoader.exists(resource_path) or not ResourceLoader.exists(original_path):
