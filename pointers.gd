@@ -2857,13 +2857,7 @@ class _DataFormat:
 		for k in bytes:
 			crc = __to_uint32((crc >> 8) ^ crc_table[(crc & 0xff) ^ k])
 		return __to_uint32(crc ^ 0xffffffff)
-	
-	func __consistent_hash(input):
-		var output = 0
-		var normal = var2bytes(input,true)
-		for i in normal:
-			output = (output + i) & 0xFFFFFFFFFFFF
-		return output
+		
 	
 class _DriverManagement:
 	var scripts : Array = [
@@ -8079,7 +8073,8 @@ class _Scripting:
 					var manifest = md.manifest.manifest_data
 					if "mod_information" in manifest:
 						var mid = manifest["mod_information"].get("id","NOID")
-						mdo["id"] = "%s | %s" % [mid,str(pointers.DataFormat.__consistent_hash(mid))]
+						mdo["id"] = str(mid)
+						mdo["id_hash"] = str(mid.md5_text())
 						mdo["auth"] = manifest["mod_information"].get("author","NOAUTH")
 					if "manifest_definitions" in manifest:
 						mdo["mv"] = manifest["manifest_definitions"].get("manifest_version",0.0)
@@ -8100,10 +8095,10 @@ class _Scripting:
 				if zipPath:
 					md5 = file.get_md5(zipPath)
 				if "id" in mdo:
-					mdo["fetch-ID"] = {str(pointers.DataFormat.__consistent_hash(mdo["id"])):[0,md5]}
+					mdo["fetch-ID"] = {mdo["id"].md5_text():[0,md5]}
 				if zipPath:
-					mdo["fetch-ZIP"] = {str(pointers.DataFormat.__consistent_hash(zipPath)):[0,md5]}
-				mdo["fetch-REF"] = {str(pointers.DataFormat.__consistent_hash(mdo["file"])):[0,md5]}
+					mdo["fetch-ZIP"] = {zipPath.md5_text():[0,md5]}
+				mdo["fetch-REF"] = {mdo["file"].md5_text():[0,md5]}
 				modOut.append(mdo)
 			var d=("\n".join(PoolStringArray([
 			"OS %s on %s" % [OS.get_name(),OS.get_model_name()],
@@ -8152,21 +8147,21 @@ class _Scripting:
 				if mdr.manifest.has_manifest:
 					var mid = mdr.manifest.manifest_data
 					if "mod_information" in mid and "id" in mid["mod_information"]:
-						var md5 = str(pointers.DataFormat.__consistent_hash(mid["mod_information"]["id"]))
+						var md5 = mid["mod_information"]["id"].md5_text()
 						if md5 in d:
 							var pd = d[md5]
 							if pd[1] != file.get_md5(mod):
 								pd[0] = 0
 							mdf[zipPath] = [md5,pd[0]]
 				if not zipPath in mdf:
-					var md5 = str(pointers.DataFormat.__consistent_hash(zipPath))
+					var md5 = zipPath.md5_text()
 					if md5 in d:
 						var pd = d[md5]
 						if pd[1] != file.get_md5(mod):
 							pd[0] = 0
 						mdf[zipPath] = [md5,pd[0]]
 				if not zipPath in mdf:
-					var md5 = str(pointers.DataFormat.__consistent_hash(mod))
+					var md5 = mod.md5_text()
 					if md5 in d:
 						var pd = d[md5]
 						if pd[1] != file.get_md5(mod):
