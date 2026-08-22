@@ -3086,6 +3086,8 @@ class _Equipment:
 	var AUX_POWER_AND_THRUSTERS:Array = []
 	var MODIFY_INTERNALS:Dictionary = {}
 	var WEAPONSLOT_ADD:Array = []
+	
+	var research_store : Dictionary = {}
 	# END OF DATA STORAGE
 	
 	var equipment_validity_for_slots:Dictionary = {}
@@ -3132,8 +3134,11 @@ class _Equipment:
 		var mods : Dictionary = pointers.ManifestV2.__get_mod_data()["mods"]
 		for md in mods:
 			var mod = mods[md]
-			if "drivers" in mod and mod.drivers:
-				drivers[mod.file_path] = mod.drivers
+			if mod["manifest"]["has_manifest"]:
+				var mod_id = mod["manifest"]["manifest_data"].get("mod_information",{}).get("id","")
+				if mod_id:
+					if "drivers" in mod and mod.drivers:
+						drivers[mod_id] = mod.drivers
 		mods.clear()
 		
 		
@@ -3147,8 +3152,8 @@ class _Equipment:
 				if type and not type in equipment_validity_for_slots[sys]:
 					equipment_validity_for_slots[sys].append(type)
 		
-		for mod_filepath in drivers:
-			var cvh = drivers[mod_filepath]
+		for mod_id in drivers:
+			var cvh = drivers[mod_id]
 			for last_bit in cvh:
 				var constants : Dictionary = cvh[last_bit]
 				match last_bit:
@@ -3716,7 +3721,12 @@ class _Equipment:
 					"EVENT_DRIVER.gd":
 						for entry in constants:
 							event_driver_event_entries.append(constants[entry])
-						
+					
+					"RESEARCH.gd":
+						for entry in constants:
+							if not mod_id in research_store:
+								research_store[mod_id] = {}
+							research_store[mod_id][entry] = constants[entry]
 					
 		
 		var all_slot_node_names : Array = []
