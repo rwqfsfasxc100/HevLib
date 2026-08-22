@@ -66,12 +66,29 @@ func _ready():
 	CurrentGame.connect("generic_notification",self,"_notification_start")
 	tween = Tween.new()
 	add_child(tween)
+	animation.connect("animation_finished", self, "playNextCustomInQueue")
 	
 
 var vp_objects = []
 var pointers = ModLoader._savedObjects[0]
 var tween
+
+var customInQueue = []
+
+func playNextCustomInQueue(what = null):
+	yield(get_tree(),"idle_frame")
+	if not animation.is_playing():
+		playCustomAnim(customInQueue.pop_front())
+
 func _notification_start(data):
+	if animation.is_playing():
+		customInQueue.append(data)
+	else:
+		playCustomAnim(data)
+
+func playCustomAnim(data):
+	if not data:
+		return
 	var title = data.get("title",{}).get("text","NOTIFICATION_TITLE_PLACEHOLDER")
 	var desc_a = data.get("body",{}).get("text","NOTIFICATION_NAME_PLACEHOLDER")
 	var desc_b = data.get("description",{}).get("text","")
@@ -87,10 +104,6 @@ func _notification_start(data):
 	var type = data.get("transition",{}).get("label","")
 	var from = data.get("transition",{}).get("old","")
 	var to = data.get("transition",{}).get("new","")
-	
-	
-	if animation.is_playing():
-		yield(animation, "animation_finished")
 	animation.play("generic")
 	hl_notif_clear_vp()
 	animations.Show.play("show")
@@ -162,3 +175,7 @@ func hl_notif_clear_vp():
 	for child in vp_objects:
 		Tool.remove(child)
 
+func _process(delta):
+	if animations.Show.is_playing():
+		for animationPlayer in animations:
+			animations[animationPlayer].playback_speed = 1.0 / Engine.time_scale

@@ -52,7 +52,7 @@ load_path = "res://HevLib/achievements/achievement_border.stex"
 
 [sub_resource type="Animation" id=16]
 resource_name = "generic"
-length = 4.01
+length = 4.05
 
 [sub_resource type="Animation" id=18]
 resource_name = "show"
@@ -228,10 +228,10 @@ tracks/0/keys = {
 "transitions": PoolRealArray( 1, 1 ),
 "values": [ {
 "args": [  ],
-"method": "add_vp"
+"method": "hl_notif_add_vp"
 }, {
 "args": [  ],
-"method": "clear_vp"
+"method": "hl_notif_clear_vp"
 } ]
 }
 tracks/1/type = "value"
@@ -478,6 +478,12 @@ tracks/4/keys = {
 [node name="Notifications" instance=ExtResource( 1 )]
 script = ExtResource( 3 )
 
+[node name="PC" parent="." index="0"]
+margin_left = 260.0
+margin_top = 75.0
+margin_right = 1020.0
+margin_bottom = 285.0
+
 [node name="Discovered" parent="PC/POI" index="0"]
 margin_right = 453.0
 
@@ -507,10 +513,7 @@ margin_right = 121.0
 margin_bottom = 82.0
 
 [node name="XP" parent="PC" index="3"]
-margin_bottom = 197.0
-
-[node name="H" parent="PC/XP" index="2"]
-visible = true
+margin_bottom = 146.0
 
 [node name="Type" parent="PC/XP/H" index="0"]
 modulate = Color( 1, 1, 1, 0.0187691 )
@@ -529,18 +532,20 @@ margin_right = 488.0
 margin_right = 488.0
 
 [node name="Generic" type="VBoxContainer" parent="PC" index="5"]
-visible = false
 margin_left = 128.0
 margin_top = 64.0
-margin_right = 128.0
-margin_bottom = 64.0
+margin_right = 632.0
+margin_bottom = 146.0
 mouse_filter = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="PC/Generic" index="0"]
+margin_right = 504.0
 size_flags_horizontal = 3
 alignment = 1
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PC/Generic/HBoxContainer" index="0"]
+margin_left = 252.0
+margin_right = 252.0
 
 [node name="Control" type="Control" parent="PC/Generic/HBoxContainer/VBoxContainer" index="0"]
 
@@ -569,6 +574,7 @@ expand = true
 
 [node name="ViewportContainer" type="ViewportContainer" parent="PC/Generic/HBoxContainer/VBoxContainer/Control" index="2"]
 visible = false
+modulate = Color( 1, 1, 1, 0 )
 margin_left = -100.0
 margin_top = -200.0
 margin_right = 100.0
@@ -638,7 +644,7 @@ expand = true
 visible = false
 modulate = Color( 1, 1, 1, 0 )
 margin_top = 4.0
-margin_right = 97.0
+margin_right = 276.0
 margin_bottom = 43.0
 text = "TITLE"
 align = 1
@@ -646,26 +652,26 @@ align = 1
 [node name="DescriptionA" type="Label" parent="PC/Generic" index="2"]
 visible = false
 modulate = Color( 1, 1, 1, 0 )
-margin_top = 47.0
+margin_top = 4.0
 margin_right = 276.0
-margin_bottom = 86.0
+margin_bottom = 43.0
 text = "DESCRIPTION_A"
 align = 1
 
 [node name="DescriptionB" type="Label" parent="PC/Generic" index="3"]
 visible = false
 modulate = Color( 1, 1, 1, 0 )
-margin_top = 90.0
-margin_right = 276.0
-margin_bottom = 129.0
+margin_top = 4.0
+margin_right = 275.0
+margin_bottom = 43.0
 text = "DESCRIPTION_B"
 align = 1
 
 [node name="H" type="HBoxContainer" parent="PC/Generic" index="4"]
 visible = false
-margin_top = 133.0
-margin_right = 276.0
-margin_bottom = 133.0
+margin_top = 4.0
+margin_right = 78.0
+margin_bottom = 43.0
 mouse_filter = 2
 custom_constants/separation = 20
 alignment = 1
@@ -673,16 +679,14 @@ alignment = 1
 [node name="Type" type="Label" parent="PC/Generic/H" index="0"]
 visible = false
 modulate = Color( 1, 1, 1, 0.00963366 )
-margin_left = 92.0
-margin_right = 184.0
+margin_right = 92.0
 margin_bottom = 39.0
 text = "TYPE"
 align = 2
 
 [node name="C" type="MarginContainer" parent="PC/Generic/H" index="1"]
 visible = false
-margin_left = 194.0
-margin_right = 194.0
+margin_right = 78.0
 margin_bottom = 39.0
 mouse_filter = 2
 
