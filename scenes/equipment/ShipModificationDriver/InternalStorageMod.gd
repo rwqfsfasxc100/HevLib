@@ -85,6 +85,8 @@ func _enter_tree():
 	configMutex.lock()
 	currentInstalledEquipmentWithChanges = ismPointers.DataFormat.__sift_ship_config(shipConfig.duplicate(true),sysNames,["currentCargo","currentCargoBy","currentCargoComposition","damage","juryRig","preferredCrew","processedCargo","remoteCargo","tuning"])
 	configMutex.unlock()
+	if "ALL" in sysNames:
+		currentInstalledEquipmentWithChanges.append("ALL")
 	for i in currentInstalledEquipmentWithChanges:
 		hl_ism_installedequipment.append(i.split(".")[i.split(".").size() - 1])
 	
@@ -111,136 +113,146 @@ func _enter_tree():
 	var individual_capacity_changes = []
 	
 	for item in hl_ism_installedequipment:
-		var iddata = listings[item]
-		if not ismPointers.ConfigDriver.__validate_dictionary(iddata):
-			continue
-		var minimum_ammo_utilization_for_reduction = iddata.get("minimum_ammo_utilization_for_reduction",0.0)
-		var minimum_nano_utilization_for_reduction = iddata.get("minimum_nano_utilization_for_reduction",0.0)
-		var minimum_propellant_utilization_for_reduction = iddata.get("minimum_propellant_utilization_for_reduction",0.0)
-		
-		var current_ammo_amt = base_ammo_storage
-		var current_nano_amt = base_nano_storage
-		var current_propellant_amt = base_propellant
-		var ammo_limit = upgradeLimits["ammo.capacity"][1]
-		var nano_limit = upgradeLimits["drones.capacity"][1]
-		var propellant_limit = upgradeLimits["fuel.capacity"][1]
-		
-		var this_added_capacity = 0
-		var this_storage_multi = 1
-		var this_ammo_multi = 1
-		var this_nano_multi = 1
-		var this_propellant_multi = 1
-		var mass_per_tonne_storage_added = 0
-		
-		for key in iddata:
-			var val = iddata[key]
-			match key:
-				"storage_flat":
-					storage_add += val
-					this_added_capacity += val
-				"storage_ammo":
-					ammo_add += val
-					this_added_capacity += val
-				"storage_nano":
-					nano_add += val
-					this_added_capacity += val
-				"storage_propellant":
-					propellant_add += val
-					this_added_capacity += val
-				"display_system":
-					var dname = val.get("name","")
-					var mv = val.get("can_display_multiple",false)
-					if (dname and dname != "") and ((not dname in hl_ism_system_name_registers) or mv):
-						var status = val.get("status",100.0)
-						var power = val.get("power",0.0)
-						var inspect = val.get("affect_inspection",false)
-						var o = {
-							"name":dname,
-							"can_display_multiple":mv,
-							"power":power,
-							"status":status,
-							"affect_inspection":inspect
-						}
-						hl_ism_system_name_registers.append(dname)
-						hl_ism_add_systems.append(o)
-				"storage_multi":
-					val = float(max(val,0.001))
-					storage_multi *= val
-					this_storage_multi *= val
-				"ammo_multi":
-					if val < 1.0 and minimum_ammo_utilization_for_reduction > 0.0:
-						var diff = 1.0 - val
-						var curr = ((minimum_ammo_utilization_for_reduction * nano_limit) - current_nano_amt) / nano_limit
-						if curr >= 0:
-							val += diff
-						else:
-							val = clamp(val + (diff + curr),val,1.0)
-					val = float(max(val,0.001))
-					ammo_multi *= val
-					this_ammo_multi *= val
-				"nano_multi":
-					if val < 1.0 and minimum_nano_utilization_for_reduction > 0.0:
-						var diff = 1.0 - val
-						var curr = ((minimum_nano_utilization_for_reduction * nano_limit) - current_nano_amt) / nano_limit
-						if curr >= 0:
-							val += diff
-						else:
-							val = clamp(val + (diff + curr),val,1.0)
-					val = float(max(val,0.001))
-					nano_multi *= val
-					this_nano_multi *= val
-				"propellant_multi":
-					if val < 1.0 and minimum_propellant_utilization_for_reduction > 0.0:
-						var diff = 1.0 - val
-						var curr = ((minimum_propellant_utilization_for_reduction * nano_limit) - current_nano_amt) / nano_limit
-						if curr >= 0:
-							val += diff
-						else:
-							val = clamp(val + (diff + curr),val,1.0)
-					val = float(max(val,0.001))
-					propellant_multi *= val
-					this_propellant_multi *= val
-				"emp_scale_multi":
-					emp_scale_multi *= float(max(val,0.001))
-				"mass_multi":
-					mass_multi *= float(max(val,0.001))
-				"force_type":
-					modifyable_type = val
-				"crew_count":
-					modifyable_crew_count += val
-				"crew_morale":
-					modifyable_crew_morale += val
-				"mass":
-					mass_add += val
-				"mass_per_crew_member":
-					mass_per_crew += val
-				"mass_per_tonne_of_processed_ore":
-					mass_per_processed_tonne += val
-				"mass_per_tonne_total_storage_added":
-					mass_per_tonne_total_storage_added += val
-				"mass_per_tonne_storage_added":
-					mass_per_tonne_storage_added = val
-				"ammo_speed_add":
-					ammo_speed_add += val
-				"nano_speed_add":
-					nano_speed_add += val
-				"ammo_speed_multi":
-					ammo_speed_multi *= val
-				"nano_speed_multi":
-					nano_speed_multi *= val
-				"emp_shielding":
-					emp_shielding += val
-		total_added_capacity += this_added_capacity
-		if mass_per_tonne_storage_added != 0:
-			individual_capacity_changes.append([
-				mass_per_tonne_storage_added,
-				this_added_capacity,
-				this_ammo_multi,
-				this_nano_multi,
-				this_propellant_multi,
-				this_storage_multi,
-			])
-		
+		var list = listings[item]
+		for iddata in list:
+			if not ismPointers.ConfigDriver.__validate_dictionary(iddata):
+				continue
+			var limit_to_ship = iddata.get("specific_ship","")
+			if limit_to_ship:
+				var leave = false
+				if limit_to_ship != shipName:
+					leave = true
+				if leave and iddata.get("recurse_to_variants",false) and limit_to_ship == baseShipName:
+					leave = false
+				if leave:
+					continue
+			var minimum_ammo_utilization_for_reduction = iddata.get("minimum_ammo_utilization_for_reduction",0.0)
+			var minimum_nano_utilization_for_reduction = iddata.get("minimum_nano_utilization_for_reduction",0.0)
+			var minimum_propellant_utilization_for_reduction = iddata.get("minimum_propellant_utilization_for_reduction",0.0)
+			
+			var current_ammo_amt = base_ammo_storage
+			var current_nano_amt = base_nano_storage
+			var current_propellant_amt = base_propellant
+			var ammo_limit = upgradeLimits["ammo.capacity"][1]
+			var nano_limit = upgradeLimits["drones.capacity"][1]
+			var propellant_limit = upgradeLimits["fuel.capacity"][1]
+			
+			var this_added_capacity = 0
+			var this_storage_multi = 1
+			var this_ammo_multi = 1
+			var this_nano_multi = 1
+			var this_propellant_multi = 1
+			var mass_per_tonne_storage_added = 0
+			
+			for key in iddata:
+				var val = iddata[key]
+				match key:
+					"storage_flat":
+						storage_add += val
+						this_added_capacity += val
+					"storage_ammo":
+						ammo_add += val
+						this_added_capacity += val
+					"storage_nano":
+						nano_add += val
+						this_added_capacity += val
+					"storage_propellant":
+						propellant_add += val
+						this_added_capacity += val
+					"display_system":
+						var dname = val.get("name","")
+						var mv = val.get("can_display_multiple",false)
+						if (dname and dname != "") and ((not dname in hl_ism_system_name_registers) or mv):
+							var status = val.get("status",100.0)
+							var power = val.get("power",0.0)
+							var inspect = val.get("affect_inspection",false)
+							var o = {
+								"name":dname,
+								"can_display_multiple":mv,
+								"power":power,
+								"status":status,
+								"affect_inspection":inspect
+							}
+							hl_ism_system_name_registers.append(dname)
+							hl_ism_add_systems.append(o)
+					"storage_multi":
+						val = float(max(val,0.001))
+						storage_multi *= val
+						this_storage_multi *= val
+					"ammo_multi":
+						if val < 1.0 and minimum_ammo_utilization_for_reduction > 0.0:
+							var diff = 1.0 - val
+							var curr = ((minimum_ammo_utilization_for_reduction * nano_limit) - current_nano_amt) / nano_limit
+							if curr >= 0:
+								val += diff
+							else:
+								val = clamp(val + (diff + curr),val,1.0)
+						val = float(max(val,0.001))
+						ammo_multi *= val
+						this_ammo_multi *= val
+					"nano_multi":
+						if val < 1.0 and minimum_nano_utilization_for_reduction > 0.0:
+							var diff = 1.0 - val
+							var curr = ((minimum_nano_utilization_for_reduction * nano_limit) - current_nano_amt) / nano_limit
+							if curr >= 0:
+								val += diff
+							else:
+								val = clamp(val + (diff + curr),val,1.0)
+						val = float(max(val,0.001))
+						nano_multi *= val
+						this_nano_multi *= val
+					"propellant_multi":
+						if val < 1.0 and minimum_propellant_utilization_for_reduction > 0.0:
+							var diff = 1.0 - val
+							var curr = ((minimum_propellant_utilization_for_reduction * nano_limit) - current_nano_amt) / nano_limit
+							if curr >= 0:
+								val += diff
+							else:
+								val = clamp(val + (diff + curr),val,1.0)
+						val = float(max(val,0.001))
+						propellant_multi *= val
+						this_propellant_multi *= val
+					"emp_scale_multi":
+						emp_scale_multi *= float(max(val,0.001))
+					"mass_multi":
+						mass_multi *= float(max(val,0.001))
+					"force_type":
+						modifyable_type = val
+					"crew_count":
+						modifyable_crew_count += val
+					"crew_morale":
+						modifyable_crew_morale += val
+					"mass":
+						mass_add += val
+					"mass_per_crew_member":
+						mass_per_crew += val
+					"mass_per_tonne_of_processed_ore":
+						mass_per_processed_tonne += val
+					"mass_per_tonne_total_storage_added":
+						mass_per_tonne_total_storage_added += val
+					"mass_per_tonne_storage_added":
+						mass_per_tonne_storage_added = val
+					"ammo_speed_add":
+						ammo_speed_add += val
+					"nano_speed_add":
+						nano_speed_add += val
+					"ammo_speed_multi":
+						ammo_speed_multi *= val
+					"nano_speed_multi":
+						nano_speed_multi *= val
+					"emp_shielding":
+						emp_shielding += val
+			total_added_capacity += this_added_capacity
+			if mass_per_tonne_storage_added != 0:
+				individual_capacity_changes.append([
+					mass_per_tonne_storage_added,
+					this_added_capacity,
+					this_ammo_multi,
+					this_nano_multi,
+					this_propellant_multi,
+					this_storage_multi,
+				])
+	
 	if modifyable_crew_count > 0:
 		l("Adding mass @ %s kg for each of %s crew members" % [mass_per_crew,modifyable_crew_count])
 		mass_add += (modifyable_crew_count * mass_per_crew)

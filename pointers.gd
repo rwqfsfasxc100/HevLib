@@ -3084,7 +3084,6 @@ class _Equipment:
 	var EQUIPMENT_TAGS:Array = []
 	var SLOT_TAGS:Array = []
 	var AUX_POWER_AND_THRUSTERS:Array = []
-	var MODIFY_INTERNALS:Dictionary = {}
 	var WEAPONSLOT_ADD:Array = []
 	
 	var research_store : Dictionary = {}
@@ -3392,28 +3391,19 @@ class _Equipment:
 									if not listingSystemName in processed_storage_systems:
 										processed_storage_systems.append(listingSystemName)
 									if not listingSystemName in processed_storage_mods:
-										processed_storage_mods[listingSystemName] = {}
-									var ls : Dictionary = processed_storage_mods[listingSystemName]
-									
-									ls["minimum_ammo_utilization_for_reduction"] = item.get("minimum_ammo_utilization_for_reduction",ls.get("minimum_ammo_utilization_for_reduction",0.0))
-									ls["minimum_nano_utilization_for_reduction"] = item.get("minimum_nano_utilization_for_reduction",ls.get("minimum_nano_utilization_for_reduction",0.0))
-									ls["minimum_propellant_utilization_for_reduction"] = item.get("minimum_propellant_utilization_for_reduction",ls.get("minimum_propellant_utilization_for_reduction",0.0))
-									
+										processed_storage_mods[listingSystemName] = []
+									var ls : Dictionary = {}
 									
 									for data in item:
 										match data:
-											"emp_shielding","nano_speed_add","ammo_speed_add","mass_per_tonne_storage_added","mass_per_tonne_total_storage_added","storage_flat","crew_morale","mass","mass_per_crew_member","mass_per_tonne_of_processed_ore":
-												ls[data] = item[data] + ls.get(data,0.0)
+											"specific_ship","recurse_to_variants","minimum_propellant_utilization_for_reduction","minimum_nano_utilization_for_reduction","minimum_ammo_utilization_for_reduction","emp_shielding","force_type","nano_speed_add","ammo_speed_add","mass_per_tonne_storage_added","mass_per_tonne_total_storage_added","storage_flat","crew_morale","mass","mass_per_crew_member","mass_per_tonne_of_processed_ore","crew_count":
+												ls[data] = item[data]
 											"storage_ammo","storage_ammunition":
-												ls["storage_ammo"] = item[data] + ls.get("storage_ammo",0.0)
+												ls["storage_ammo"] = item[data]
 											"storage_nano","storage_nanodrones":
-												ls["storage_nano"] = item[data] + ls.get("storage_nano",0.0)
+												ls["storage_nano"] = item[data]
 											"storage_propellant","storage_prop":
-												ls["storage_propellant"] = item[data] + ls.get("storage_propellant",0.0)
-											"force_type":
-												ls["force_type"] = item["force_type"]
-											"crew_count":
-												ls[data] = item[data] + ls.get(data,0)
+												ls["storage_propellant"] = item[data]
 											"display_system":
 												if not "display_system" in ls:
 													ls["display_system"] = {
@@ -3435,24 +3425,23 @@ class _Equipment:
 												if "affect_inspection" in val:
 													ls["display_system"]["affect_inspection"] = val.get("affect_inspection",false)
 									if "storage_multi_upper" in item or "storage_multi_lower" in item:
-										ls["storage_multi"] = float(item.get("storage_multi_upper",1.0))/float(item.get("storage_multi_lower",1.0)) * ls.get("storage_multi",1.0)
+										ls["storage_multi"] = float(item.get("storage_multi_upper",1.0))/float(item.get("storage_multi_lower",1.0))
 									if "ammo_multi_upper" in item or "ammo_multi_lower" in item:
-										ls["ammo_multi"] = float(item.get("ammo_multi_upper",1.0))/float(item.get("ammo_multi_lower",1.0)) * ls.get("ammo_multi",1.0)
+										ls["ammo_multi"] = float(item.get("ammo_multi_upper",1.0))/float(item.get("ammo_multi_lower",1.0))
 									if "nano_multi_upper" in item or "nano_multi_lower" in item:
-										ls["nano_multi"] = float(item.get("nano_multi_upper",1.0))/float(item.get("nano_multi_lower",1.0)) * ls.get("nano_multi",1.0)
+										ls["nano_multi"] = float(item.get("nano_multi_upper",1.0))/float(item.get("nano_multi_lower",1.0))
 									if "propellant_multi_upper" in item or "propellant_multi_lower" in item:
-										ls["propellant_multi"] = float(item.get("propellant_multi_upper",1.0))/float(item.get("propellant_multi_lower",1.0)) * ls.get("propellant_multi",1.0)
+										ls["propellant_multi"] = float(item.get("propellant_multi_upper",1.0))/float(item.get("propellant_multi_lower",1.0))
 									if "mass_multi_upper" in item or "mass_multi_lower" in item:
-										ls["mass_multi"] = float(item.get("mass_multi_upper",1.0))/float(item.get("mass_multi_lower",1.0)) * ls.get("mass_multi",1.0)
+										ls["mass_multi"] = float(item.get("mass_multi_upper",1.0))/float(item.get("mass_multi_lower",1.0))
 									if "ammo_speed_multi_upper" in item or "ammo_speed_multi_lower" in item:
-										ls["ammo_speed_multi"] = float(item.get("ammo_speed_multi_upper",1.0))/float(item.get("ammo_speed_multi_lower",1.0)) * ls.get("ammo_speed_multi",1.0)
+										ls["ammo_speed_multi"] = float(item.get("ammo_speed_multi_upper",1.0))/float(item.get("ammo_speed_multi_lower",1.0))
 									if "nano_speed_multi_upper" in item or "nano_speed_multi_lower" in item:
-										ls["nano_speed_multi"] = float(item.get("nano_speed_multi_upper",1.0))/float(item.get("nano_speed_multi_lower",1.0)) * ls.get("nano_speed_multi",1.0)
+										ls["nano_speed_multi"] = float(item.get("nano_speed_multi_upper",1.0))/float(item.get("nano_speed_multi_lower",1.0))
 									if "emp_scale_multi_upper" in item or "emp_scale_multi_lower" in item:
-										ls["emp_scale_multi"] = float(item.get("emp_scale_multi_upper",1.0))/float(item.get("emp_scale_multi_lower",1.0)) * ls.get("emp_scale_multi",1.0)
+										ls["emp_scale_multi"] = float(item.get("emp_scale_multi_upper",1.0))/float(item.get("emp_scale_multi_lower",1.0))
 									
-									MODIFY_INTERNALS[listingSystemName] = ls
-							
+									processed_storage_mods[listingSystemName].append(ls)
 					"NODE_DEFINITIONS.gd":
 						
 						for item in constants:
