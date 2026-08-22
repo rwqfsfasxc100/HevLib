@@ -254,52 +254,52 @@ func loadPlaceholder():
 		if not pointers.ConfigDriver.__validate_dictionary(hl_weaponslot_addition):
 			path = ""
 			pointers.l("Skipping addition of %s to weapon slot %s due to failed validation check" % t,"WeaponSlotDriver")
-		
-		if pointers.DataFormat.__load_if_can(path):
-			var pv = pointers.DataFormat.__get_load().instance()
-			if directMount:
-				key = name + "_" + mounted
-			else:
-				key = t + "_" + mounted
-			var data = hl_weaponslot_addition.get("data",{})
-			for nodepath in data:
-				var o = data[nodepath]
-				var np = pv.get_node_or_null(nodepath)
-				if np:
-					for i in o:
-						var d = i[0]
-						var g = i[1]
-						np[d] = g
-			for i in hl_weaponslot_template:
-				var d = i[0]
-				var g = i[1]
-				pv[d] = g
-			for f in hl_weaponslot_modification:
-				var db = f.get("data",{})
-				for nodepath in db:
-					var o = db[nodepath]
+		if path:
+			if pointers.DataFormat.__load_if_can(path):
+				var pv = pointers.DataFormat.__get_load().instance()
+				if directMount:
+					key = name + "_" + mounted
+				else:
+					key = t + "_" + mounted
+				var data = hl_weaponslot_addition.get("data",{})
+				for nodepath in data:
+					var o = data[nodepath]
 					var np = pv.get_node_or_null(nodepath)
 					if np:
 						for i in o:
 							var d = i[0]
 							var g = i[1]
 							np[d] = g
-			if "key" in pv:
-				pv.key = key
-			add_child(pv)
-			system = pv
-			system.name = name + "_" + system.name
-			system.visible = true
-			if "slotName" in system:
-				system.slotName = t + "_" + system.systemName
-			systemName = _getSystemName()
-			slotName = _getSlotName()
-			inspection = _getInspection()
-			repairFixPrice = _getRepairFixPrice()
-			repairFixTime = _getRepairFixTime()
-			repairReplacementPrice = _repairReplacementPrice()
-			repairReplacementTime = _repairReplacementTime()
-			mass = _getMass()
-		else:
-			pointers.l("ERROR: Cannot load weapon at [%s], possibly incorrect path?" % path,"WeaponSlotDriver")
+				for i in hl_weaponslot_template:
+					var d = i[0]
+					var g = i[1]
+					pv[d] = g
+				for f in hl_weaponslot_modification:
+					var db = f.get("data",{})
+					for nodepath in db:
+						var o = db[nodepath]
+						var np = pv.get_node_or_null(nodepath)
+						if np:
+							for i in o:
+								var d = i[0]
+								var g = i[1]
+								np[d] = g
+				if "key" in pv:
+					pv.key = key
+				add_child(pv)
+				system = pv
+				system.name = name + "_" + system.name
+				system.visible = true
+				if "slotName" in system:
+					system.slotName = t + "_" + system.systemName
+				systemName = _getSystemName()
+				slotName = _getSlotName()
+				inspection = _getInspection()
+				repairFixPrice = _getRepairFixPrice()
+				repairFixTime = _getRepairFixTime()
+				repairReplacementPrice = _repairReplacementPrice()
+				repairReplacementTime = _repairReplacementTime()
+				mass = _getMass()
+			else:
+				pointers.l("ERROR: Cannot load weapon at [%s], possibly incorrect path?" % path,"WeaponSlotDriver")
 	ship.changeExternalPlaceholders( - 1)

@@ -50,17 +50,17 @@ func show():
 	
 
 
-	var notif = {
-		"title":{"text":"Title Test"},
-		"body":{"text":"Body Test"},
-		"description":{"text":"Desc Test"},
-		"particles":{"show":true},
-		"transition":{"label":"Label Test","old":"Old Value","new":"New Value"},
-		"scene":{"path":"res://ships/RA-TRTL.tscn","position":Vector2(-25,0),"scale":Vector2(0.5,0.5),"rotation":90,"rotation_speed":1800}
-	}
-
-
-	CurrentGame.send_notification(notif)
+#	var notif = {
+#		"title":{"text":"Title Test"},
+#		"body":{"text":"Body Test"},
+#		"description":{"text":"Desc Test"},
+#		"particles":{"show":true},
+#		"transition":{"label":"Label Test","old":"Old Value","new":"New Value"},
+#		"scene":{"path":"res://ships/RA-TRTL.tscn","position":Vector2(-25,0),"scale":Vector2(0.5,0.5),"rotation":90,"rotation_speed":1800}
+#	}
+#
+#
+#	CurrentGame.send_notification(notif)
 	
 		
 func hide():

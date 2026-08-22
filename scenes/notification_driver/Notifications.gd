@@ -89,21 +89,24 @@ func _notification_start(data):
 func playCustomAnim(data):
 	if not data:
 		return
-	var title = data.get("title",{}).get("text","NOTIFICATION_TITLE_PLACEHOLDER")
-	var desc_a = data.get("body",{}).get("text","NOTIFICATION_NAME_PLACEHOLDER")
-	var desc_b = data.get("description",{}).get("text","")
-	var particles = data.get("particles",{}).get("show",false)
-	var background = data.get("scene",{}).get("background",{}).get("path","res://HevLib/ui/panels/none.stex")
-	var border = data.get("scene",{}).get("border",{}).get("path","res://HevLib/achievements/achievement_border.stex")
-	var scene = data.get("scene",{}).get("path","")
-	var pos = data.get("scene",{}).get("position",Vector2(0,0))
-	var scale = data.get("scene",{}).get("scale",Vector2(1,1))
-	var rotation = data.get("scene",{}).get("rotation",0)
-	var rot_speed = data.get("scene",{}).get("rotation_speed",0)
-	var icon = data.get("icon",{}).get("path","")
-	var type = data.get("transition",{}).get("label","")
-	var from = data.get("transition",{}).get("old","")
-	var to = data.get("transition",{}).get("new","")
+	var sceneData = data.get("scene",{})
+	var transitionData = data.get("transition",{})
+	
+	var title = str(data.get("title",{}).get("text","NOTIFICATION_TITLE_PLACEHOLDER"))
+	var desc_a = str(data.get("body",{}).get("text","NOTIFICATION_NAME_PLACEHOLDER"))
+	var desc_b = str(data.get("description",{}).get("text",""))
+	var particles = bool(data.get("particles",{}).get("show",false))
+	var background = str(sceneData.get("background",{}).get("path","res://HevLib/ui/panels/none.stex"))
+	var border = str(sceneData.get("border",{}).get("path","res://HevLib/achievements/achievement_border.stex"))
+	var scene = str(sceneData.get("path",""))
+	var pos = sceneData.get("position",Vector2(0,0))
+	var scale = sceneData.get("scale",Vector2(1,1))
+	var rotation = int(sceneData.get("rotation",0))
+	var rot_speed = int(sceneData.get("rotation_speed",0))
+	var icon = str(data.get("icon",{}).get("path",""))
+	var type = str(transitionData.get("label",""))
+	var from = str(transitionData.get("old",""))
+	var to = str(transitionData.get("new",""))
 	animation.play("generic")
 	hl_notif_clear_vp()
 	animations.Show.play("show")
@@ -112,24 +115,24 @@ func playCustomAnim(data):
 	boxes.DescA.text = desc_a
 	animations.Title.play("Title")
 	animations.DescA.play("DescA")
-	if desc_b != "":
+	if desc_b:
 		boxes.DescB.text = desc_b
 		animations.DescB.play("DescB")
-	if type != "":
+	if type:
 		boxes.Type.text = type
 		animations.Type.play("Type")
-	if from != "":
+	if from:
 		boxes.From.text = from
 		animations.From.play("From")
-	if to != "":
+	if to:
 		boxes.To.text = to
 		animations.To.play("To")
-	if icon != "" and icon.ends_with(".stex"):
+	if icon and icon.ends_with(".stex"):
 		var tex = StreamTexture.new()
 		tex.load_path = icon
 		boxes.Icon.texture = tex
 		animations.Icon.play("IconPlay")
-	if scene != "" and scene.ends_with(".tscn"):
+	if scene and scene.ends_with(".tscn"):
 		var i = load(scene).instance()
 		pointers.NodeAccess.__remove_scripts(i)
 		
@@ -137,16 +140,6 @@ func playCustomAnim(data):
 		vp_objects.append(i)
 		tween.interpolate_property(boxes.VP.get_node("Container"),"rotation",0,(4 * deg2rad(rot_speed)),4,Tween.TRANS_LINEAR)
 		tween.start()
-#		if "shipName" in i:
-#			i.setReactorState(false)
-#			i.preheat = false
-#			i.cutscene = true
-#		if i is RigidBody2D:
-#			i.can_sleep = true
-#			i.linear_damp = 1024
-#			i.angular_damp = 1024
-#		if "dummy" in i:
-#			i.dummy = true
 		boxes.VP.get_node("Container/Rotation_offset").position = pos
 		boxes.VP.get_node("Container/Rotation_offset").rotation = deg2rad(rotation)
 		boxes.VP.get_node("Camera2D").zoom.x = 1/scale.x
