@@ -303,10 +303,6 @@ const TRANSLATIONS = {
 			"string": "Quality of life",
 			"version_hash": 2157051683
 		},
-		"TAG_USING_HEVLIB_RESEARCH": {
-			"string": "Using HevLib Research",
-			"version_hash": 3394429874
-		},
 		"TAG_VISUAL": {
 			"string": "Visual",
 			"version_hash": 3626485241
@@ -1901,10 +1897,6 @@ const TRANSLATIONS = {
 			"string": "Quality of life",
 			"version_hash": 0
 		},
-		"TAG_USING_HEVLIB_RESEARCH": {
-			"string": "Nutzt HevLib Research",
-			"version_hash": 0
-		},
 		"TAG_VISUAL": {
 			"string": "Visuell",
 			"version_hash": 0
@@ -2830,10 +2822,6 @@ const TRANSLATIONS = {
 		"TAG_QOL": {
 			"string": "QoL",
 			"version_hash": 2157051683
-		},
-		"TAG_USING_HEVLIB_RESEARCH": {
-			"string": "Використовує дослідження HevLib",
-			"version_hash": 3394429874
 		},
 		"TAG_VISUAL": {
 			"string": "Візуальні",

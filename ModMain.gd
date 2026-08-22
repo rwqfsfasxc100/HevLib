@@ -40,8 +40,6 @@ var _savedObjects := []
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
 
-var enable_research = false
-
 var pointers
 
 var file = File.new()
@@ -195,9 +193,6 @@ func _ready():
 			if data > count:
 				count = data
 		pointers.NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",count)
-		
-		if enable_research:
-			replaceScene("scenes/research/Enceladus.tscn","res://enceladus/Enceladus.tscn")
 		
 		if OS.has_feature("editor") and not file.file_exists("res://VersionLabel.tscn"):
 			printerr("FAILED TO FETCH FILE SYSTEM")

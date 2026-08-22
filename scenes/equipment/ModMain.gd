@@ -51,6 +51,8 @@ var pointerDir:String = modPath.get_base_dir().get_base_dir().get_base_dir() + "
 var correct:bool = ResourceLoader.exists(pointerDir)
 var pointers = null
 
+var enable_research = true
+
 func _init(modLoader : ModLoader = ModLoader):
 	if correct:
 		pointers = load(pointerDir).new()
@@ -117,6 +119,9 @@ func _init(modLoader : ModLoader = ModLoader):
 		installScriptExtension("../../events/controls/CurrentGame.gd")
 		installScriptExtension("../../events/controls/ship-ctrl.gd")
 		installScriptExtension("../../events/controls/camera.gd")
+		
+		if enable_research:
+			installScriptExtension("../research/Enceladus.gd")
 		
 		installScriptExtension("../../scripts/Namer.gd")
 
