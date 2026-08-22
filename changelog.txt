@@ -1,3 +1,16 @@
+[1.15.43]
+
+1=* Drivers can now only be run by mods with a mod ID
+2=* `NotificationDriver` now properly queues up notifications if any are playing at the time a new one was requested
+3=* `WeaponSlotDriver` now no longer throws errors when trying to process equipment with a blank filepath (notably blank/vanilla equipment)
+4=* MODIFY_INTERNALS.gd now properly supports multiple modifications for the same system instead of concatenating all into a singular change
+4.1=* This change permits the use of multiple `display_system` entries to be used used for an individual system. 
+4.2=* Added `specific_ship` & `recurse_to_variants` options to limit an individual packet's modifications to a specific ship or line of ships
+4.2.1=* `specific_ship` is the `shipName` variable to check for, or the `baseShipName` if `recurse_to_variants` is set to true
+5=* Added `ALL` keyword as a special option for the system name of an entry for `MODIFY_INTERNALS.gd`
+5.1=* This causes the specific change to be applied to all ships.
+5.2=* `specific_ship` can still limit this to specific ship(s).
+
 [1.15.42]
 
 1=* All current script extender functions in the `DataFormat` class have been renamed to make the naming conventions close to what's actually happening, as well as to make room for new methods to actually override scripts.

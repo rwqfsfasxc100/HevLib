@@ -120,7 +120,7 @@ func _enter_tree():
 			var limit_to_ship = iddata.get("specific_ship","")
 			if limit_to_ship:
 				var leave = false
-				if limit_to_ship != shipName:
+				if (limit_to_ship != shipName) and (limit_to_ship != baseShipName):
 					leave = true
 				if leave and iddata.get("recurse_to_variants",false) and limit_to_ship == baseShipName:
 					leave = false
