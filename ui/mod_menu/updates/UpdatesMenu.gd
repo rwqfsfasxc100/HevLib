@@ -157,7 +157,7 @@ var current_mod_text = ""
 var download_status = ""
 
 func move_to_next_mod():
-	if mods_to_download.size() > 0:
+	if mods_to_download:
 		var current = mods_to_download.pop_front()
 		update_all_current += 1
 		current_mod_text = TranslationServer.translate("HEVLIB_WAIT_TO_UPDATE_ALL") % [update_all_current,update_all_count,current["name"],current["id"],current["version"]]
@@ -165,7 +165,7 @@ func move_to_next_mod():
 		current["container"]._update_confirmed()
 		$WAIT/PanelContainer/Button.grab_focus()
 	else:
-		$WAIT.hide()
+		no_mods_available()
 
 func _process(delta):
 	if $WAIT.visible:
@@ -185,6 +185,7 @@ func _ignore_all_pressed():
 		mod._ignore_confirmed()
 	
 func no_mods_available():
+	$WAIT.hide()
 	$base/VBoxContainer/ButtonContainer/Cancel/Button.grab_focus()
 	$base/VBoxContainer/ButtonContainer/UpdateAll/Button.disabled = true
 	$base/VBoxContainer/ButtonContainer/UpdateAll/Button.modulate = Color(0.7,0.7,0.7,1)
