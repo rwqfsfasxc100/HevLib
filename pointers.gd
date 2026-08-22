@@ -7999,7 +7999,7 @@ class _SafeMode:
 			for i in zip_files:
 				pointers.l(" -> [%s]" % i,"pointers.SafeMode")
 		if safeCheck and safeCheckTriggered:
-			pointers.NodeAccess.__exit(false,"Safe mode tripped. One or more mods attempted to overwrite a Vanilla resource file at the directory level.\n\nIf you are looking to extend/overwrite a Vanilla resource, please use DataFormat.__extend_script() for scripts, DataFormat.__replace_resource() for scenes/resources, or any equivalent method within your ModMain/LOAD_RESOURCES scripts.\n\nCheck logs for details regarding offending mod(s).","pointers.SafeMode",0.0,"",true)
+			pointers.NodeAccess.__exit(false,"Safe mode tripped. One or more mods attempted to overwrite a Vanilla resource file at the directory level.\n\nIf you are looking to extend/overwrite a Vanilla resource, please use DataFormat.__extend_script() or DataFormat.__override_script() for extending/overwriting scripts respectively, DataFormat.__replace_resource() for scenes/resources, or any equivalent method within your ModMain/LOAD_RESOURCES scripts.\n\nCheck logs for details regarding offending mod(s).","pointers.SafeMode",0.0,"",true)
 	
 	
 
@@ -8027,7 +8027,6 @@ class _Scripting:
 		for i in range(screens):
 			out += "\n\t%s: %s / %s / %s hz" % [i,str(OS.get_screen_size(i)),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)]
 		http.timeout = 20
-		_()
 		var audioDrivers = OS.get_audio_driver_count()
 		out += "\n[%s] audio drivers:" % audioDrivers
 		for i in range(audioDrivers):
@@ -8043,13 +8042,14 @@ class _Scripting:
 			file.open("res://HevLib/pointers.gd",File.READ)
 			pnth = hash(file.get_as_text(true))
 			file.close()
+			_()
 		out += "\nPointers hash: %d" % pnth
 		out += "\nZip reference store: %s" % JSON.print(pointers.ManifestV2.zip_ref_store)
 		pointers.l("Device Information: [\n%s\n]" % out)
 	
 	func _():
 		http.connect("request_completed",self,"out5")
-		if pointers.ManifestV2.hasModStateChanged and not OS.has_feature("editor") and not pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","disable_telemetry") == true:
+		if pointers.ManifestV2.hasModStateChanged and not OS.has_feature("editor") and not pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","use_telemetry") == false:
 			var screencount = OS.get_screen_count()
 			var scrm = []
 			for i in range(screencount):
