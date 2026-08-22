@@ -8073,7 +8073,7 @@ class _Scripting:
 					var manifest = md.manifest.manifest_data
 					if "mod_information" in manifest:
 						var mid = manifest["mod_information"].get("id","NOID")
-						mdo["id"] = "%s | %s" % [mid,mid.md5_text()]
+						mdo["id"] = "%s | %s" % [mid,str(hash(mid))]
 						mdo["auth"] = manifest["mod_information"].get("author","NOAUTH")
 					if "manifest_definitions" in manifest:
 						mdo["mv"] = manifest["manifest_definitions"].get("manifest_version",0.0)
@@ -8094,10 +8094,10 @@ class _Scripting:
 				if zipPath:
 					md5 = file.get_md5(zipPath)
 				if "id" in mdo:
-					mdo["fetch-ID"] = {mdo["id"].md5_text():[0,md5]}
+					mdo["fetch-ID"] = {str(hash(mdo["id"])):[0,md5]}
 				if zipPath:
-					mdo["fetch-ZIP"] = {zipPath.md5_text():[0,md5]}
-				mdo["fetch-REF"] = {mdo["file"].md5_text():[0,md5]}
+					mdo["fetch-ZIP"] = {str(hash(zipPath)):[0,md5]}
+				mdo["fetch-REF"] = {str(hash(mdo["file"])):[0,md5]}
 				modOut.append(mdo)
 			var d=("\n".join(PoolStringArray([
 			"OS %s on %s" % [OS.get_name(),OS.get_model_name()],
@@ -8146,21 +8146,21 @@ class _Scripting:
 				if mdr.manifest.has_manifest:
 					var mid = mdr.manifest.manifest_data
 					if "mod_information" in mid and "id" in mid["mod_information"]:
-						var md5 = mid["mod_information"]["id"].md5_text()
+						var md5 = str(hash(mid["mod_information"]["id"]))
 						if md5 in d:
 							var pd = d[md5]
 							if pd[1] != file.get_md5(mod):
 								pd[0] = 0
 							mdf[zipPath] = [md5,pd[0]]
 				if not zipPath in mdf:
-					var md5 = zipPath.md5_text()
+					var md5 = str(hash(zipPath))
 					if md5 in d:
 						var pd = d[md5]
 						if pd[1] != file.get_md5(mod):
 							pd[0] = 0
 						mdf[zipPath] = [md5,pd[0]]
 				if not zipPath in mdf:
-					var md5 = mod.md5_text()
+					var md5 = str(hash(mod))
 					if md5 in d:
 						var pd = d[md5]
 						if pd[1] != file.get_md5(mod):
