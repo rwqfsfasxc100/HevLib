@@ -3405,25 +3405,14 @@ class _Equipment:
 											"storage_propellant","storage_prop":
 												ls["storage_propellant"] = item[data]
 											"display_system":
-												if not "display_system" in ls:
-													ls["display_system"] = {
-														"name":"",
-														"can_display_multiple":false,
-														"power":0.0,
-														"status":100.0,
-														"affect_inspection":false
-													}
 												var val : Dictionary = item["display_system"]
-												if "name" in val:
-													ls["display_system"]["name"] = val.get("name","")
-												if "can_display_multiple" in val:
-													ls["display_system"]["can_display_multiple"] = val.get("can_display_multiple",false)
-												if "status" in val:
-													ls["display_system"]["status"] = val.get("status",100.0)
-												if "power" in val:
-													ls["display_system"]["power"] = val.get("power",0.0)
-												if "affect_inspection" in val:
-													ls["display_system"]["affect_inspection"] = val.get("affect_inspection",false)
+												ls["display_system"] = {
+													"name":val.get("name",""),
+													"can_display_multiple":val.get("can_display_multiple",false),
+													"power":val.get("power",0.0),
+													"status":val.get("status",100.0),
+													"affect_inspection":val.get("affect_inspection",false)
+												}
 									if "storage_multi_upper" in item or "storage_multi_lower" in item:
 										ls["storage_multi"] = float(item.get("storage_multi_upper",1.0))/float(item.get("storage_multi_lower",1.0))
 									if "ammo_multi_upper" in item or "ammo_multi_lower" in item:
