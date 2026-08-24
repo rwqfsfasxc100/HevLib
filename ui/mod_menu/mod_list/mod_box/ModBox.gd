@@ -94,10 +94,10 @@ func _pressed():
 	
 	var manifestData = MOD_INFO["manifest"]["manifest_data"]
 	already_pressed = false
-	var mod_name = translateIfCan(MOD_INFO["name"])
-	if information_nodes["info_name"].text == mod_name:
+	var mod_name = MOD_INFO["name"]
+	if information_nodes["info_name"].text == translateIfCan(mod_name):
 		already_pressed = true
-	information_nodes["info_name"].text = mod_name
+	information_nodes["info_name"].text = translateIfCan(mod_name)
 	var prio = MOD_INFO["priority"]
 	if str(prio).ends_with("INF"):
 		if str(prio).begins_with("-"):
@@ -534,7 +534,7 @@ func _draw():
 		elif needs_restart_from_toggling:
 			disabled_text = translateIfCan("HEVLIB_MODMENU_MODNAME_ENABLED_NEEDS_RESTART") + " "
 	
-	var mod_name = disabled_text + MOD_INFO["name"]
+	var mod_name = disabled_text + translateIfCan(MOD_INFO["name"])
 	var prio = MOD_INFO["priority"]
 	if str(prio).ends_with("INF"):
 		if str(prio).begins_with("-"):
@@ -563,7 +563,7 @@ func _draw():
 	var manifest = MOD_INFO["manifest"]
 	if is_library:
 		button_lib_icon.visible = true
-	button_label.text = mod_name
+	button_label.text = translateIfCan(mod_name)
 	if is_disabled:
 		get_child(0).modulate = Color(0.5,0.5,0.5,1)
 	else:
