@@ -29,7 +29,7 @@
 
 extends MarginContainer
 
-const research_item = preload("res://HevLib/scenes/research/research_item_box/ResearchItem.tscn")
+onready var research_item = load("res://HevLib/scenes/research/research_item_box/ResearchItem.tscn")
 var research_state = {}
 
 var current_mod_ids = []

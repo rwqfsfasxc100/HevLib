@@ -72,7 +72,6 @@ func _tree_entered():
 			if rt in h:
 				if 0 in h[rt]:
 					do = false
-			breakpoint
 			if steamNode and do:
 				yield(CurrentGame.get_tree(),"idle_frame")
 				for i in range(5):
@@ -89,20 +88,18 @@ func _tree_entered():
 
 func sort_slot(slot):
 	pointers.l("Sorting equipment for slot %s" % slot.name)
-	var items = slot.get_node("VBoxContainer").get_children()
-	var nodePositions = []
+	var items:Array = slot.get_node("VBoxContainer").get_children()
+	var nodePositions:Array = []
 	for item in items:
 		nodePositions.append([item, item.get_index()])
-	var noFail = false
-	var maxIndex = items.size()
+	var noFail:bool = false
+	var maxIndex:int = items.size()
 	while noFail == false:
 		var doesFailThisLoop = false
 		for item in slot.get_child(0).get_children():
-			if item.get_index() < 2:
-				pass
-			else:
-				var A = item
-				var B = A.get_parent().get_child(A.get_index() - 1)
+			if item.get_index() > 1:
+				var A:Node = item
+				var B:Node = A.get_parent().get_child(A.get_index() - 1)
 				if A.price < B.price:
 					doesFailThisLoop = true
 					A.get_parent().move_child(A, B.get_index())
@@ -112,46 +109,45 @@ func sort_slot(slot):
 			noFail = true
 
 func display_slots() -> Array:
-	var children = self.get_children()
-	var list = []
+	var children:Array = self.get_children()
+	var list:Array = []
 	for child in children:
 		if child.get_parent() == self:
 			list.append(child)
 	return list
 
 func reorganize_slots():
-	var slot_names = []
-	var slot_types = {}
-	var slot_types_i = {}
-	var order = pointers.Equipment.equipment_slot_order
-	var order2 = pointers.Equipment.relative_equipment_slot_order
-	var slotnames = []
+	var slot_names:Array = []
+	var slot_types:Dictionary = {}
+	var slot_types_i:Dictionary = {}
+	var order:Array = pointers.Equipment.equipment_slot_order
+	var order2:Dictionary = pointers.Equipment.relative_equipment_slot_order
+	var slotnames:Array = []
 	for slot in get_children():
 		slotnames.append(slot.name)
-		var children = slot.get_node("VBoxContainer").get_children()
-		if children.size() <= 1:
+		var children:Array = slot.get_node("VBoxContainer").get_children()
+		if children.size() < 2:
 			continue
 		slot_names.append(slot.name)
-		var sys_slot = slot.slot
-		var index = 1
-		if sys_slot == "":
+		var sys_slot:String = slot.slot
+		var index:int = 1
+		if sys_slot.empty():
 			while not sys_slot:
 				sys_slot = children[index].slot
 				index += 1
 		slot_types.merge({slot.name:sys_slot})
 		slot_types_i.merge({sys_slot:slot.name})
-	var sys_dict = {}
+	var sys_dict:Dictionary = {}
 	for slot in slot_types:
-		var sys = slot_types[slot].split(".")
-		var sys_main = sys[0]
-		if sys_main in sys_dict.keys():
-			sys_dict[sys_main].append(slot)
-		else:
-			sys_dict[sys_main] = [slot]
-	var index = 0
+		var sys:PoolStringArray = slot_types[slot].split(".")
+		var sys_main:String = sys[0]
+		if not sys_main in sys_dict:
+			sys_dict[sys_main] = []
+		sys_dict[sys_main].append(slot)
+	var index:int = 0
 	for sys in sys_dict:
-		var arr = sys_dict.get(sys)
-		var ordering = []
+		var arr:Array = sys_dict.get(sys,[])
+		var ordering:Array = []
 		for item in order:
 			if item in arr:
 				ordering.append(item)
@@ -163,24 +159,24 @@ func reorganize_slots():
 			move_child(get_node(item),index - 1)
 	for slot in order2:
 		if slot in slot_types:
-			var data = order2[slot]
-			var against = data.get("relative_to",null)
+			var data:Dictionary = order2[slot]
+			var against:String = data.get("relative_to","")
 			if against:
-				var nd = get_node(slot)
-				var name_or_config = data.get("use_node_name",true)
-				var targetNode = null
+				var nd:Node = get_node(slot)
+				var name_or_config:bool = data.get("use_node_name",true)
+				var targetNode:Node = null
 				if name_or_config:
 					targetNode = get_node_or_null(against)
 				else:
 					targetNode = get_node_or_null(slot_types_i.get(against,""))
 				if targetNode:
-					var targetPos = targetNode.get_position_in_parent()
-					var entire_group = data.get("entire_group",true)
+					var targetPos:int = targetNode.get_position_in_parent()
+					var entire_group:bool = data.get("entire_group",true)
 					if data.get("order_below",true):
 						if entire_group:
-							var cf = against
+							var cf:String = against
 							if name_or_config:
-								cf = slot_types.get(against,null)
+								cf = slot_types.get(against,"")
 							if cf:
 								targetPos += sys_dict.get(cf.split(".")[0]).size()
 							else:
@@ -189,13 +185,13 @@ func reorganize_slots():
 							targetPos += 1
 					else:
 						if entire_group:
-							var cf = against
-							var cn = against
+							var cf:String = against
+							var cn:String = against
 							if name_or_config:
-								cf = slot_types.get(against,null)
+								cf = slot_types.get(against,"")
 							else:
-								cn = slot_types_i.get(against,null)
+								cn = slot_types_i.get(against,"")
 							if cf and cn:
-								var av = sys_dict.get(cf.split(".")[0])[0]
+								var av:String = sys_dict.get(cf.split(".")[0])[0]
 								targetPos = get_node(av).get_position_in_parent()
 					move_child(nd,targetPos)
