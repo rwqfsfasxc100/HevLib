@@ -29,6 +29,7 @@
 
 const VANILLA = {
 	"name":"ΔV: Rings of Saturn",
+	"id":"kodera.vanilla",
 	"priority":0,
 	"version_data":{
 		"version_major":1,
@@ -92,5 +93,8 @@ const VANILLA = {
 			}
 		}
 	},
-	"zip":""
+	"zip":"",
+	"drivers":{},
+	"mod_type":"mod",
+	"enabled":true,
 }

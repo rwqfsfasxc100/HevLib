@@ -175,9 +175,6 @@ func _ready():
 	vd["version_data"]["full_version_string"] = verstr
 	vd["version_data"]["legacy_mod_version"] = verstr
 	
-	vd["drivers"] = {}
-	vd["mod_type"] = "mod"
-	vd["enabled"] = true
 	vd["master_locale"] = TranslationServer.get_locale()
 	
 	mod_data.merge({"VANILLA":vd})
