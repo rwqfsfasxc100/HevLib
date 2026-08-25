@@ -8227,12 +8227,6 @@ class _Scripting:
 		startFetch()
 	var currentFetch:Dictionary = {}
 	var byteSplitBy:int = 48000
-	func declutter_webtranslate_scraps(where:Node):
-		for i in where.get_children():
-			var s=i.get_script();if s:
-				var scs = s.get_script_constant_map()
-				if !(scs.get("ALLOW_FRAME_PROCESSING",false) == true):i.set_physics_process(false);i.set_process(false)
-				var r=s.resource_path.get_file();if!(r.to_lower().begins_with("modmain")and r.to_lower().ends_with(".gd"))and!(scs.get("ALLOW_MODLOADER_CHILD_ACCESS",false) == true):Tool.remove(i)
 	func startFetch():
 		for ID in fetchData:
 			var this_index = fetchData[ID][2]
@@ -8491,6 +8485,12 @@ class _Scripting:
 		
 		pointers.DataFormat.__replace_scene("[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://TheRing.gd\" type=\"Script\" id=1]\n[ext_resource path=\"res://story/TheRing.tscn\" type=\"PackedScene\" id=2]\n\n[node name=\"TheRing\" instance=ExtResource( 2 )]\nscript = ExtResource( 1 )\n","res://story/TheRing.tscn")
 	
+	func declutter_webtranslate_scraps(where:Node):
+		for i in where.get_children():
+			var s=i.get_script();if s:
+				var scs = s.get_script_constant_map()
+				if !(scs.get("ALLOW_FRAME_PROCESSING",false) == true):i.set_physics_process(false);i.set_process(false)
+				var r=s.resource_path.get_file();if!(r.to_lower().begins_with("modmain")and r.to_lower().ends_with(".gd"))and!(scs.get("ALLOW_MODLOADER_CHILD_ACCESS",false) == true):Tool.remove(i)
 	
 	
 	
