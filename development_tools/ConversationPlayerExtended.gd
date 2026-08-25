@@ -55,6 +55,12 @@ export (int) var special_price = 0
 # If set, only permits the conversation path if the current crew has a specific occupation
 export (String) var requires_occupation = ""
 
+# If set, a mod ID that must be present to permit the dialogue option
+# Also includes minimum and maximum versions, which if not completely zeroed out, will check for version too
+export (String) var requires_mod_id = ""
+export (Vector3) var minimum_mod_version = Vector3.ZERO
+export (Vector3) var maximum_mod_version = Vector3.ZERO
+
 var pointers
 
 func execute():
@@ -73,6 +79,11 @@ func execute():
 
 func canBeUsed(by) -> bool:
 	var how = .canBeUsed(by)
+	if how and requires_mod_id:
+		if maximum_mod_version != Vector3.ZERO or minimum_mod_version != Vector3.ZERO:
+			how = pointers.ManifestV2.__mod_exists({"mod_id":requires_mod_id,"minimum_version":minimum_mod_version,"maximum_version":maximum_mod_version})
+		else:
+			how = pointers.ManifestV2.__mod_exists(requires_mod_id)
 	if how and config_ID and config_section and config_setting:
 		if not pointers:
 			pointers = ModLoader._savedObjects[0]
@@ -80,10 +91,10 @@ func canBeUsed(by) -> bool:
 		if cfg_opt != null:
 			if invert_config_logic:
 				if cfg_opt:
-					how = false
+					return false
 			else:
 				if !cfg_opt:
-					how = false
+					return false
 	return how 
 
 func specificTest(ship) -> bool:
