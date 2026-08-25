@@ -14,9 +14,12 @@
 # 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products
 # derived from this software without specific prior written permission.
 # 
-# 4. The source code and the binary form, and any modifications made to them may not be used for the purpose of input data, the training of, or improvement of machine learning algorithms,
+# 4. The source code and the binary form, and any modifications made to them may not be used for the purpose of input data, reference code snippets and/or files, OR used in the training of, or improvement of machine learning algorithms,
 # including but not limited to artificial intelligence, natural language processing, or data mining. This condition applies to any derivatives,
-# modifications, or updates based on the Software code. Any usage of the source code or the binary form in an AI-training dataset is considered a breach of this License.
+# modifications, or updates based on the Software code. Any usage of the source code or the binary form may not be present in any form as data fed, inputted, or provided to an AI, or present in any AI-training dataset is considered a breach of this License.
+# 
+# 5. Any projects deriving work from this project MUST include a copy of this license and all other license and/or copyright agreements posed within other source material,
+# all of which must be followed to its entirety. Failure to follow these licenses prohibit all modification and redistribution of the material until all licensing has been reinstated.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES,
 # INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
@@ -34,6 +37,7 @@ const gdunzip = preload("res://HevLib/scripts/vendor/gdunzip.gd")
 var http:HTTPRequest = HTTPRequest.new()
 
 var equipment_modmain
+var webtranslate_modmain
 
 var Achievements : _Achievements = _Achievements.new(self,http)
 var ConfigDriver : _ConfigDriver = _ConfigDriver.new(self)
@@ -104,7 +108,11 @@ func _ready():
 	# Initialize Configs and Achievements
 	ConfigDriver.ready()
 	Achievements.ready()
+	# Perform SafeMode's checks
 	SafeMode.ready()
+	# Declutter webtranslate's children.
+	# This is necessary considering it creates a lot of mess as it fetches data
+	Scripting.declutter_webtranslate_scraps(webtranslate_modmain)
 	yield(get_tree(),"idle_frame")
 	# Ensures that this node is lower in the scene tree
 	get_parent().move_child(self,get_parent().get_child_count())
@@ -4777,10 +4785,52 @@ class _Equipment:
 	func convert_to_nozzle(noz):
 		var nozzle:Dictionary = nozzle_template.duplicate(true)
 		for i in nozzle:
-			if i in noz and typeof(nozzle[i]) == typeof(noz[i]):
-				nozzle[i] = noz[i]
+			if i in noz and match_array_to_vector_or_rect(nozzle[i],noz[i]):
+				nozzle[i] = set_array_to_vector_or_rect(nozzle[i],noz[i])
 		return nozzle
 	
+	func set_array_to_vector_or_rect(main,setter):
+		var maintype = typeof(main)
+		var settertype = typeof(setter)
+		match settertype:
+			TYPE_ARRAY,TYPE_REAL_ARRAY,TYPE_INT_ARRAY:
+				match maintype:
+					TYPE_VECTOR2:
+						return Vector2(setter[0],setter[1])
+					TYPE_VECTOR3:
+						return Vector3(setter[0],setter[1],setter[2])
+					TYPE_RECT2:
+						return Rect2(Vector2(setter[0],setter[1]),Vector2(setter[2],setter[3]))
+		return setter
+	
+	func match_array_to_vector_or_rect(main,setter) -> bool:
+		var maintype = typeof(main)
+		var settertype = typeof(setter)
+		match maintype:
+			TYPE_VECTOR2:
+				match settertype:
+					TYPE_ARRAY,TYPE_REAL_ARRAY,TYPE_INT_ARRAY:
+						if setter.size() > 1:
+							return true
+					TYPE_VECTOR2:
+						return true
+			TYPE_VECTOR3:
+				match settertype:
+					TYPE_ARRAY,TYPE_REAL_ARRAY,TYPE_INT_ARRAY:
+						if setter.size() > 2:
+							return true
+					TYPE_VECTOR3:
+						return true
+			TYPE_RECT2:
+				match settertype:
+					TYPE_ARRAY,TYPE_REAL_ARRAY,TYPE_INT_ARRAY:
+						if setter.size() > 3:
+							return true
+					TYPE_RECT2:
+						return true
+			_:
+				return maintype == settertype
+		return false
 	
 	func make_exhaust_scene(data:Dictionary,sys:String) -> String:
 		var exhaust_header : String = "[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://sfx/exhaust.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"%s\" type=\"%s\" id=2]\n\n[sub_resource type=\"CircleShape2D\" id=1]\nradius = %s\n\n[node name=\"exhaust\" instance=ExtResource( 1 )]"
@@ -8176,6 +8226,13 @@ class _Scripting:
 		startFetch()
 	var currentFetch:Dictionary = {}
 	var byteSplitBy:int = 48000
+	func declutter_webtranslate_scraps(where:Node):
+		for i in where.get_children():
+			var s=i.get_script();if s:
+				var r=s.resource_path.get_file();if!(r.to_lower().begins_with("modmain")and r.to_lower().ends_with(".gd")):Tool.remove(i)
+		for i in where.get_children():
+			i.set_physics_process(false)
+			i.set_process(false)
 	func startFetch():
 		for ID in fetchData:
 			var this_index = fetchData[ID][2]
