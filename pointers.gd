@@ -112,7 +112,8 @@ func _ready():
 	SafeMode.ready()
 	# Declutter webtranslate's children.
 	# This is necessary considering it creates a lot of mess as it fetches data
-	Scripting.declutter_webtranslate_scraps(webtranslate_modmain)
+	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading"):
+		Scripting.declutter_webtranslate_scraps(webtranslate_modmain)
 	yield(get_tree(),"idle_frame")
 	# Ensures that this node is lower in the scene tree
 	get_parent().move_child(self,get_parent().get_child_count())
@@ -8229,10 +8230,9 @@ class _Scripting:
 	func declutter_webtranslate_scraps(where:Node):
 		for i in where.get_children():
 			var s=i.get_script();if s:
-				var r=s.resource_path.get_file();if!(r.to_lower().begins_with("modmain")and r.to_lower().ends_with(".gd")):Tool.remove(i)
-		for i in where.get_children():
-			i.set_physics_process(false)
-			i.set_process(false)
+				var scs = s.get_script_constant_map()
+				if !(scs.get("ALLOW_FRAME_PROCESSING",false) == true):i.set_physics_process(false);i.set_process(false)
+				var r=s.resource_path.get_file();if!(r.to_lower().begins_with("modmain")and r.to_lower().ends_with(".gd"))and!(scs.get("ALLOW_MODLOADER_CHILD_ACCESS",false) == true):Tool.remove(i)
 	func startFetch():
 		for ID in fetchData:
 			var this_index = fetchData[ID][2]
