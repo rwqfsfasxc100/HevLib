@@ -1,3 +1,11 @@
+[1.15.44]
+
+1=* Fixed thruster nozzle handling of arrays when used in place of Vector2s or Rect2s.
+2=* Mod items now properly have their names translated in mod menu's mod list
+3=* Equipment item and slot sorting is now statically typed for efficiency
+4=* Simplified display system handling to reduce processing time considering the checks it makes are now no longer needed
+5=* Fixed focusing issues after updates have finished
+
 [1.15.43]
 
 1=* Drivers can now only be run by mods with a mod ID
