@@ -55,116 +55,110 @@ var correct:bool = ResourceLoader.exists(pointerDir)
 var pointers = null
 
 func _init(modLoader : ModLoader = ModLoader):
-	if correct:
-		pointers = load(pointerDir).new()
-		pointers.equipment_modmain = self
-		pointers.name = "HevLib~Pointers"
-		if modLoader._savedObjects:
-			var new_objects = [pointers]
-			var firstItemCheck = modLoader._savedObjects[0]
-			if firstItemCheck is Resource:
-				var RP = firstItemCheck.resource_path
-				if RP == "res://HevLib/pointers.gd" or RP == pointerDir:
-					OS.alert("HevLib is double-loaded. Please remove any extra zip files and restart the game.")
-			for i in modLoader._savedObjects:
-				new_objects.append(i)
-			modLoader._savedObjects = new_objects
-		else:
-			modLoader._savedObjects.append(pointers)
-		l("Initializing Equipment Driver")
-		pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/")
-		var variables_folder = "user://cache/.HevLib_Cache/Variable_Fetch/"
-		directory.make_dir_recursive(variables_folder)
-		pointers.FileAccess.__load_precached_mods()
-		
-#		testing()
-		
-		var scv = pointers.FolderAccess.__fetch_folder_files(variables_folder,false,true)
-		for s in scv:
-			directory.remove(s)
-		var fstr_old = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/file_caches"
-		if directory.dir_exists(fstr_old):
-			pointers.FolderAccess.__recursive_delete(fstr_old)
-		pointers.ConfigDriver.__load_configs()
-		pointers.Translations.__inject_translations()
-		
-		installScriptExtension("../notification_driver/CurrentGame.gd")
-		if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk"):
-			installScriptExtension("../minerals/multiminerals/mineral.gd")
-			installScriptExtension("../minerals/multiminerals/MineralProcessingUnit.gd")
-			installScriptExtension("../minerals/multiminerals/AsteroidSpawner.gd")
-		
-		
-		# Bind button display modifications
-		installScriptExtension("../keymapping/bind_displays/AnalogAxisDisplay.gd")
-		installScriptExtension("../keymapping/bind_displays/GamepadKeybindDisplay.gd")
-		installScriptExtension("../keymapping/bind_displays/KeybindDisplay.gd")
-		installScriptExtension("../keymapping/bind_displays/MousebindDisplay.gd")
-		
-		
-		installScriptExtension("../../ui/ExtensionPopup.gd")
-		installScriptExtension("../scene_replacements/DLClist.gd")
-		replaceScene("../scene_replacements/DLClist.tscn","res://tools/DLClist.tscn")
-
-		installScriptExtension("../better_title_screen/CurrentlyPlaying.gd")
-		
-		installScriptExtension("../minerals/AstrogatorPanel.gd")
-		installScriptExtension("../minerals/OMS.gd")
-		installScriptExtension("../minerals/CargoScanner.gd")
-		installScriptExtension("../minerals/ProcessedCargoManifest.gd")
-		
-		pointers.Scripting.make_mineral_scripting()
-
-		replaceScene("../../events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn")
-		# Adds in_hevlib_menu to the CurrentGame script and preventing controls while it's true
-		installScriptExtension("../../events/controls/CurrentGame.gd")
-		installScriptExtension("../../events/controls/ship-ctrl.gd")
-		installScriptExtension("../../events/controls/camera.gd")
-		
-		installScriptExtension("../research/Enceladus.gd")
-		
-		installScriptExtension("../../scripts/Namer.gd")
-
-		installScriptExtension("ThrusterSlot.gd")
-		installScriptExtension("SystemShipUpgradeUI.gd")
-		installScriptExtension("SystemBuyUI.gd")
-		installScriptExtension("UpgradeGroup.gd")
-		installScriptExtension("hardpoints/EquipmentItemTemplate.gd")
-
-		installScriptExtension("../weaponslot/weapon_slot_handler.gd")
-
-		installScriptExtension("ShipModificationDriver/AddNodes.gd")
-		installScriptExtension("ShipModificationDriver/InternalStorageMod.gd")
-
-		installScriptExtension("../better_title_screen/SaveSlotButton.gd")
-		
-		for old_path in pointers.ManifestV2.__load_modlets(false):
-			pointers.DataFormat.__reload_scene(old_path)
-	else:
+	if not correct:
 		Debug.l("Folder structure not correct, exiting HevLib load")
+		return
+	pointers = load(pointerDir).new()
+	pointers.equipment_modmain = self
+	pointers.name = "HevLib~Pointers"
+	if modLoader._savedObjects:
+		var new_objects = [pointers]
+		var firstItemCheck = modLoader._savedObjects[0]
+		if firstItemCheck is Resource:
+			var RP = firstItemCheck.resource_path
+			if RP == "res://HevLib/pointers.gd" or RP == pointerDir:OS.alert("HevLib is double-loaded. Please remove any extra zip files and restart the game.")
+		for i in modLoader._savedObjects:new_objects.append(i)
+		modLoader._savedObjects = new_objects
+	else:modLoader._savedObjects.append(pointers)
+	l("Initializing Equipment Driver")
+	pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/")
+	var variables_folder = "user://cache/.HevLib_Cache/Variable_Fetch/"
+	directory.make_dir_recursive(variables_folder)
+	pointers.FileAccess.__load_precached_mods()
+	
+#	testing()
+	
+	var scv = pointers.FolderAccess.__fetch_folder_files(variables_folder,false,true)
+	for s in scv:
+		directory.remove(s)
+	var fstr_old = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/file_caches"
+	if directory.dir_exists(fstr_old):
+		pointers.FolderAccess.__recursive_delete(fstr_old)
+	pointers.ConfigDriver.__load_configs()
+	pointers.Translations.__inject_translations()
+	
+	installScriptExtension("../notification_driver/CurrentGame.gd")
+	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk"):
+		installScriptExtension("../minerals/multiminerals/mineral.gd")
+		installScriptExtension("../minerals/multiminerals/MineralProcessingUnit.gd")
+		installScriptExtension("../minerals/multiminerals/AsteroidSpawner.gd")
+	
+	# Bind button display modifications
+	installScriptExtension("../keymapping/bind_displays/AnalogAxisDisplay.gd")
+	installScriptExtension("../keymapping/bind_displays/GamepadKeybindDisplay.gd")
+	installScriptExtension("../keymapping/bind_displays/KeybindDisplay.gd")
+	installScriptExtension("../keymapping/bind_displays/MousebindDisplay.gd")
+	
+	
+	installScriptExtension("../../ui/ExtensionPopup.gd")
+	installScriptExtension("../scene_replacements/DLClist.gd")
+	replaceScene("../scene_replacements/DLClist.tscn","res://tools/DLClist.tscn")
+
+	installScriptExtension("../better_title_screen/CurrentlyPlaying.gd")
+	
+	installScriptExtension("../minerals/AstrogatorPanel.gd")
+	installScriptExtension("../minerals/OMS.gd")
+	installScriptExtension("../minerals/CargoScanner.gd")
+	installScriptExtension("../minerals/ProcessedCargoManifest.gd")
+	
+	pointers.Scripting.make_mineral_scripting()
+
+	replaceScene("../../events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn")
+	installScriptExtension("../../events/controls/CurrentGame.gd")
+	installScriptExtension("../../events/controls/ship-ctrl.gd")
+	installScriptExtension("../../events/controls/camera.gd")
+	
+	installScriptExtension("../research/Enceladus.gd")
+	
+	installScriptExtension("../../scripts/Namer.gd")
+
+	installScriptExtension("ThrusterSlot.gd")
+	installScriptExtension("SystemShipUpgradeUI.gd")
+	installScriptExtension("SystemBuyUI.gd")
+	installScriptExtension("UpgradeGroup.gd")
+	installScriptExtension("hardpoints/EquipmentItemTemplate.gd")
+
+	installScriptExtension("../weaponslot/weapon_slot_handler.gd")
+
+	installScriptExtension("ShipModificationDriver/AddNodes.gd")
+	installScriptExtension("ShipModificationDriver/InternalStorageMod.gd")
+
+	installScriptExtension("../better_title_screen/SaveSlotButton.gd")
+	
+	for old_path in pointers.ManifestV2.__load_modlets(false):
+		pointers.DataFormat.__reload_scene(old_path)
 var libid = "hev.LIBRARY"
 func _ready():
-	if correct:
-		l("Readying")
-		
-		initiate_mod_update_fetch()
-		
-		pointers.Scripting.make_ring_modifications()
-		
-		pointers.Equipment.__make_upgrades_scene()
-		
-		installScriptExtension("../minerals/Summary.gd")
-		
-		replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")
-
-		replaceScene("../minerals/multiminerals/AsteroidField.tscn","res://AsteroidField.tscn")
-		
-		for old_path in pointers.ManifestV2.__load_modlets(true):
-			pointers.DataFormat.__reload_scene(old_path)
-#		reload_packed_resources()
-		l("Ready")
-	else:
+	if not correct:
 		Debug.l("HevLib Equipment Driver onready process cannot be carried out")
+		return
+	l("Readying")
+	
+	initiate_mod_update_fetch()
+	
+	pointers.Scripting.make_ring_modifications()
+	
+	pointers.Equipment.__make_upgrades_scene()
+	
+	installScriptExtension("../minerals/Summary.gd")
+	
+	replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")
+
+	replaceScene("../minerals/multiminerals/AsteroidField.tscn","res://AsteroidField.tscn")
+	
+	for old_path in pointers.ManifestV2.__load_modlets(true):
+		pointers.DataFormat.__reload_scene(old_path)
+	l("Ready")
 
 # Mod update checking
 signal updates_fetched
@@ -183,35 +177,30 @@ func updatelist_return(result, response_code,headers,body,mh):
 		var updates = {}
 		for ID in p:
 			if ID in ids:
-				var fetchData = p[ID]
-				var modData = pointers.ManifestV2.__get_mod_by_id(ID)
-				var current_version = modData["version_data"]
-				var doUpdate = false
-				var newVer = [fetchData["major"],fetchData["minor"],fetchData["bugfix"]]
+				var fetchData=p[ID]
+				var modData=pointers.ManifestV2.__get_mod_by_id(ID)
+				var current_version=modData["version_data"]
+				var doUpdate=false
+				var newVer=[fetchData["major"],fetchData["minor"],fetchData["bugfix"]]
 				var ctr = 0
-				while (not doUpdate) and (ctr < 3):
+				while(not doUpdate)and(ctr < 3):
 					match ctr:
 						0:
-							if newVer[0] > current_version["version_major"]:
-								doUpdate = true
-							elif newVer[0] < current_version["version_major"]:
-								ctr = 5
+							if newVer[0] > current_version["version_major"]:doUpdate = true
+							elif newVer[0] < current_version["version_major"]:ctr = 5
 						1:
-							if newVer[1] > current_version["version_minor"]:
-								doUpdate = true
-							elif newVer[1] < current_version["version_minor"]:
-								ctr = 5
+							if newVer[1] > current_version["version_minor"]:doUpdate = true
+							elif newVer[1] < current_version["version_minor"]:ctr = 5
 						2:
-							if newVer[2] > current_version["version_bugfix"]:
-								doUpdate = true
-							elif newVer[2] < current_version["version_bugfix"]:
-								ctr = 5
+							if newVer[2] > current_version["version_bugfix"]:doUpdate = true
+							elif newVer[2] < current_version["version_bugfix"]:ctr = 5
 					ctr += 1
 				if doUpdate:
 					var file_name = fetchData.get("file_name","file.zip")
 					var fetchURL = "https://github.com/rwqfsfasxc100/dv_update_database/raw/refs/heads/main/zip_store/%s/%d.%d.%d/%s" % [ID,newVer[0],newVer[1],newVer[2],file_name]
 					var mod_name = modData.get("name","")
 					updates[ID] = {"name":mod_name,"id":ID,"version":[current_version["version_major"],current_version["version_minor"],current_version["version_bugfix"]],"new_version":newVer,"github":fetchURL,"file_name":file_name,"display":mod_name + " (" + ID + ")"}
+		var dont = false
 		if libid in p:
 			var curr = pointers.ManifestV2.__get_mod_by_id(libid)["version_data"]
 			var major = p[libid].major
@@ -220,19 +209,13 @@ func updatelist_return(result, response_code,headers,body,mh):
 			var cm = curr.version_major
 			var cn = curr.version_minor
 			var cb = curr.version_bugfix
-			var dont = false
-			if major > cm:
-				if minor > cn:
-					dont = true
-				elif bugfix > cb + 2:
-					dont = true
-			elif minor > cn:
-				if bugfix > cb + 5:
-					dont = true
-			elif bugfix > cb + 10:
-				dont = true
-			if dont:
-				pointers.DataFormat.__exit(false,"cannot collect version specific data. Is HevLib out of date?","pointers.SafeMode",20.0)
+			if major>cm:
+				if minor>cn:dont=true
+				elif bugfix>cb+2:dont=true
+			elif minor>cn:if bugfix>cb+5:dont=true
+			elif bugfix>cb+10:dont=true
+		if dont:
+			pointers.DataFormat.__exit(false,"cannot collect version specific data. Is HevLib out of date?","pointers.SafeMode",20.0)
 		file.open(update_store,File.WRITE)
 		file.store_string(JSON.print(updates))
 		file.close()
