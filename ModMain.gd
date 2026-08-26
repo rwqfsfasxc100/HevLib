@@ -237,37 +237,6 @@ func l(msg:String, title:String = MOD_NAME, version:String = str(MOD_VERSION_MAJ
 	var line = "%s V%s" % [title, version]
 	pointers.l(msg,line)
 
-
-func network_return(result, response_code,headers,body,mh):
-	if result == 0 and response_code == 200:
-		var p = body.get_string_from_utf8()
-		var path = "user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/network_manifest_%s.cfg"
-		var path2 = "user://cache/.Mod_Menu_2_Cache/updates/network_manifest.json"
-		var id = 0
-		for i in body:
-			id += i
-		file.open(path % id,File.WRITE)
-		file.store_string(p)
-		file.close()
-		file.open(url_store,File.READ)
-		var current = JSON.parse(file.get_as_text(true)).result
-		file.close()
-		var manifest = pointers.ManifestV2.__parse_file_as_manifest(path % id,true)
-		
-		for item in current:
-			if item[1] in update_urls:
-				var nv1 = manifest["version"]["version_major"]
-				var nv2 = manifest["version"]["version_minor"]
-				var nv3 = manifest["version"]["version_bugfix"]
-				var does = pointers.DataFormat.__compare_versions(item[2],item[3],item[4],nv1,nv2,nv3)
-				if not does and item[1] == manifest["mod_information"]["id"]:
-					file.open(update_store,File.READ_WRITE)
-					var updates = JSON.parse(file.get_as_text()).result
-					updates.merge({item[1]:{"name":item[0],"id":item[1],"version":[item[2],item[3],item[4]],"new_version":[nv1,nv2,nv3],"github":manifest["links"].get("HEVLIB_GITHUB",{"URL":""}).get("URL",""),"nexus":manifest["links"].get("HEVLIB_NEXUS",{"URL":""}).get("URL",""),"display":item[0] + " (" + item[1] + ")"}})
-					file.store_string(JSON.print(updates))
-					file.close()
-	Tool.deferCallInPhysics(Tool,"remove",[get_node(mh)])
-
 func _notification(what):
 	if what == NOTIFICATION_CRASH:
 		file.open("user://cache/.HevLib_Cache/currently_installed_mods.json", File.WRITE)

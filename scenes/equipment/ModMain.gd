@@ -142,7 +142,7 @@ func _init(modLoader : ModLoader = ModLoader):
 			pointers.DataFormat.__reload_scene(old_path)
 	else:
 		Debug.l("Folder structure not correct, exiting HevLib load")
-	
+var libid = "hev.LIBRARY"
 func _ready():
 	if correct:
 		l("Readying")
@@ -212,6 +212,27 @@ func updatelist_return(result, response_code,headers,body,mh):
 					var fetchURL = "https://github.com/rwqfsfasxc100/dv_update_database/raw/refs/heads/main/zip_store/%s/%d.%d.%d/%s" % [ID,newVer[0],newVer[1],newVer[2],file_name]
 					var mod_name = modData.get("name","")
 					updates[ID] = {"name":mod_name,"id":ID,"version":[current_version["version_major"],current_version["version_minor"],current_version["version_bugfix"]],"new_version":newVer,"github":fetchURL,"file_name":file_name,"display":mod_name + " (" + ID + ")"}
+		if libid in p:
+			var curr = pointers.ManifestV2.__get_mod_by_id(libid)["version_data"]
+			var major = p[libid].major
+			var minor = p[libid].minor
+			var bugfix = p[libid].bugfix
+			var cm = curr.version_major
+			var cn = curr.version_minor
+			var cb = curr.version_bugfix
+			var dont = false
+			if major > cm:
+				if minor > cn:
+					dont = true
+				elif bugfix > cb + 2:
+					dont = true
+			elif minor > cn:
+				if bugfix > cb + 5:
+					dont = true
+			elif bugfix > cb + 10:
+				dont = true
+			if dont:
+				pointers.DataFormat.__exit(false,"cannot collect version specific data. Is HevLib out of date?","pointers.SafeMode",20.0)
 		file.open(update_store,File.WRITE)
 		file.store_string(JSON.print(updates))
 		file.close()
@@ -314,32 +335,6 @@ func replaceSceneLiteral(newPath:String, oldPath:String):
 		scene.take_over_path(oldPath)
 		_savedObjects.append(scene)
 		l("Finished updating literal: %s" % oldPath)
-
-var reloaded_resources:PoolStringArray = PoolStringArray()
-func reload_packed_resources():
-	for i in range(_savedObjects.size()):
-		var obj = _savedObjects[i]
-		if obj is PackedScene:
-			repack_scene(obj)
-
-func repack_scene(obj:Resource):
-	var path : String = obj.resource_path
-	if not path in reloaded_resources and path.get_file().is_valid_filename() and ResourceLoader.exists(path):
-		reloaded_resources.append(path)
-#		var newObj = ResourceLoader.load(path,"",true)
-		if obj is PackedScene:
-			var state = obj._bundled.get("variants",[])
-			for i in range(state.size()):
-				var r = state[i]
-				if r is PackedScene:
-					var new = repack_scene(r)
-#					obj._bundled.variants[i] = new
-#					if new != null and is_instance_valid(new):
-#						_savedObjects.append(new)
-#		newObj.take_over_path(path)
-		pointers.DataFormat.__reload_scene(path)
-#		return newObj
-#	return
 
 # Func to print messages to the logs
 func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
