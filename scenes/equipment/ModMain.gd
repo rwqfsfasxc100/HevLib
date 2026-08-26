@@ -98,6 +98,7 @@ func _init(modLoader : ModLoader = ModLoader):
 	installScriptExtension("../keymapping/bind_displays/GamepadKeybindDisplay.gd")
 	installScriptExtension("../keymapping/bind_displays/KeybindDisplay.gd")
 	installScriptExtension("../keymapping/bind_displays/MousebindDisplay.gd")
+	installScriptExtension("../../scripts/SteamWebAPI.gd")
 	
 	
 	installScriptExtension("../../ui/ExtensionPopup.gd")
@@ -338,6 +339,7 @@ func testing():
 #	yield(pointers.Zip.__load_pck("C:\\Program Files (x86)\\Steam\\steamapps\\common\\dV Rings of Saturn\\Delta-V.pck",true,true,100),"completed")
 #	var F = pointers.Zip.Files
 #	var can = pointers.ConfigDriver.__validate_dictionary({"mod_requirements":[[["hev.LIBRARY",1,0,0,1,16,0]]]})
+	
 	
 	
 	breakpoint
