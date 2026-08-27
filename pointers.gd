@@ -84,7 +84,7 @@ var Classes = [
 ]
 
 
-var copyrights = "© 2026 Benjamin Buckhurst. All rights reserved. No works developed, produced, and/or licensed under __hev, rwqfsfasxc100, or any other alias may be used in conjunction with any AI-written works under any circumstances."
+var copyrights = "© 2026 Benjamin Buckhurst. All rights reserved."
 
 var logging_frame_interval = 0
 var logging_current_frame_timer = 0
@@ -130,6 +130,11 @@ func _ready():
 	if TranslationServer.translate("SYSTEM_AMMO_10000_DESC") == "SYSTEM_AMMO_10000_DESC":
 		l("Vanilla translations did not get initialized, queued exit for 200 seconds to preserve report-ready state.","pointers.Translations")
 		NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_ERRORCHECK_MISSING_VANILLA_LOCALES"),"pointers.Translations",200)
+
+var resource_path = ""
+func _init(r,e):
+	resource_path = r
+	equipment_modmain = e
 
 # Logging function used for cases where critial info must not be overwritten by game logs
 # cycling back to dv_log_0 (and yes this is from a specific bug report with AI slop code,
@@ -2812,6 +2817,15 @@ class _DriverManagement:
 						"Dictionary with each driver script name as a key, with a dictionary containing it's constant map as the respective value."
 					]
 				},
+				"__is_driver_file":{
+					"description":"Checks a provided filepath to see if it's a driver file or not",
+					"args":[
+						"file_path -> (String) the filepath to check. Does not need to exist, rather just if it could be a valid driver."
+					],
+					"return":[
+						"bool for whether the filepath is a valid driver or not"
+					]
+				}
 			}
 		}
 	
@@ -2819,6 +2833,7 @@ class _DriverManagement:
 	var pointers
 	func _init(f):
 		pointers = f
+		driver_file_regex.compile("[a-z]")
 	
 	var file:File = File.new()
 	
@@ -2905,11 +2920,20 @@ class _DriverManagement:
 					for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
 						this_mod_data[driver] = {}
 						var driver_filepath = driverFolder + driver
+						if not __is_driver_file(driver_filepath):
+							continue
 						var consts : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(driver_filepath)
 						for i in consts:
 							this_mod_data[driver][i] = consts[i]
 			driver_get_cache[file_path] = this_mod_data
 		return driver_get_cache[file_path].duplicate(true)
+	
+	var driver_file_regex = RegEx.new()
+	
+	func __is_driver_file(file_path:String) -> bool:
+		if file_path.get_extension() == "gd" and file_path.get_base_dir().split("/")[-1] + "/" in driver_dirs and not driver_file_regex.search(file_path.get_file().rstrip(".gd")):
+			return true
+		return false
 	
 
 class _Equipment:
@@ -8032,7 +8056,7 @@ class _SafeMode:
 				offendingFileCount += 1
 				if crash:
 					safeCheckTriggered = true
-			else:
+			elif not safeCheckTriggered and file_path.get_extension() == "gd" and file_path.split("/",false)[1] != pointers.resource_path.split("/",false)[1] and not pointers.DriverManagement.__is_driver_file(file_path):
 				file.open(file_path,File.READ)
 				var tex = file.get_as_text(true)
 				file.close()
