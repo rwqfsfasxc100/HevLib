@@ -8035,13 +8035,14 @@ class _SafeMode:
 	var pointers
 	func _init(p):
 		pointers = p
-		regex.compile("(?<=^|\\s)(?:\\._ready\\(\\)|self\\._ready\\(\\)|\\._physics_process\\(delta\\)|self\\._physics_process\\(delta\\)|\\._process\\(delta\\)|self\\._process\\(delta\\)|\\._draw\\(\\)|self\\._draw\\(\\))(?=$|\\s)")
+		regex.compile(PoolByteArray([ 40, 63, 109, 41, 94, 91, 94, 35, 93, 40, 63, 60, 61, 94, 124, 92, 115, 124, 35, 41, 40, 63, 58, 92, 46, 95, 114, 101, 97, 100, 121, 92, 40, 92, 41, 124, 115, 101, 108, 102, 92, 46, 95, 114, 101, 97, 100, 121, 92, 40, 92, 41, 124, 92, 46, 95, 112, 104, 121, 115, 105, 99, 115, 95, 112, 114, 111, 99, 101, 115, 115, 92, 40, 100, 101, 108, 116, 97, 92, 41, 124, 115, 101, 108, 102, 92, 46, 95, 112, 104, 121, 115, 105, 99, 115, 95, 112, 114, 111, 99, 101, 115, 115, 92, 40, 100, 101, 108, 116, 97, 92, 41, 124, 92, 46, 95, 112, 114, 111, 99, 101, 115, 115, 92, 40, 100, 101, 108, 116, 97, 92, 41, 124, 115, 101, 108, 102, 92, 46, 95, 112, 114, 111, 99, 101, 115, 115, 92, 40, 100, 101, 108, 116, 97, 92, 41, 124, 92, 46, 95, 100, 114, 97, 119, 92, 40, 92, 41, 124, 115, 101, 108, 102, 92, 46, 95, 100, 114, 97, 119, 92, 40, 92, 41, 41, 40, 63, 61, 36, 124, 92, 115, 41 ]).get_string_from_utf8())
 	
 	func ready():
 		if not OS.has_feature("editor"):
 			PCKFILES = pointers.FolderAccess.__get_vanilla_script_and_scenes()
 			safeCheck = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading")
-			pointers.l("Safe mode enabled? [%s]" % str(safeCheck),"pointers.SafeMode")
+			if safeCheck:pointers.l("Safe mode enabled.","pointers.SafeMode")
+			else:pointers.l("Safe mode disabled! NOTE: this will remove any warranties or possibility for support, please keep that in mind!","pointers.SafeMode")
 		else:
 			pointers.l("Running from the editor, safe mode disabled by default as it cannot fail","pointers.SafeMode")
 	
@@ -8052,6 +8053,7 @@ class _SafeMode:
 				pointers.l("WARNING: file %s @ %s overwrites Vanilla resource." % [file_path,zip_path.get_file()],"pointers.SafeMode")
 				pointers.l(" -> File should use a uniqure directory as to ensure the Vanilla file can be accessed at all times.","pointers.SafeMode")
 				pointers.l(" -> If you need to completely overwrite a script, use DataFormat.__extend_script","pointers.SafeMode")
+				pointers.l(" -> If you are unable to find a suitable solution, you may also ask for help regarding it in the Discord at `https://discord.gg/dv`","pointers.SafeMode")
 				if not zip_path.get_file() in offendingFiles:
 					offendingFiles[zip_path.get_file()] = []
 				offendingFiles[zip_path.get_file()].append(file_path)
@@ -8063,7 +8065,10 @@ class _SafeMode:
 				var tex = file.get_as_text(true)
 				file.close()
 				if regex.search(tex):
-					pointers.l(PoolByteArray([ 69, 82, 82, 79, 82, 58, 32, 102, 105, 108, 101, 32, 37, 115, 32, 64, 32, 37, 115, 32, 105, 115, 32, 110, 111, 116, 32, 112, 114, 111, 112, 101, 114, 108, 121, 32, 99, 111, 109, 112, 105, 108, 101, 100, 46, 32, 68, 111, 32, 110, 111, 116, 32, 101, 120, 112, 101, 99, 116, 32, 116, 104, 105, 115, 32, 115, 99, 114, 105, 112, 116, 32, 116, 111, 32, 114, 117, 110, 32, 97, 115, 32, 105, 110, 116, 101, 110, 100, 101, 100, 46 ]).get_string_from_utf8() % [file_path,zip_path.get_file()],"pointers.SafeMode")
+					pointers.l("ERROR: file %s @ %s is not properly compiled and likely runs recursive code. Do not expect this script to run as intended." % [file_path,zip_path.get_file()],"pointers.SafeMode")
+					pointers.l(" -> This is likely due to a signature of incorrectly supering a virtual method. and is not permitted to be ran while it is installed and running SafeMode checks.","pointers.SafeMode")
+					pointers.l(" -> It is unsupported behaviour while running HevLib due to historically being very unstable and has led to crashes. If you require this functionality, please refactor to not require the use of HevLib, or disable SafeMode's checks. (NOTE: Disabling SafeMode voids your ability to make bug reports, please be cautious with this.)","pointers.SafeMode")
+					pointers.l(" -> If you are unable to find a suitable solution, you may also ask for help regarding it in the Discord at `https://discord.gg/dv`","pointers.SafeMode")
 					if not zip_path.get_file() in offendingFiles:
 						offendingFiles[zip_path.get_file()] = []
 					offendingFiles[zip_path.get_file()].append(file_path)
