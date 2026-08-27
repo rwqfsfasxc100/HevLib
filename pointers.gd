@@ -376,8 +376,7 @@ class _Achievements:
 			if file.open_encrypted_with_pass(achievementsFile, File.READ, password) == OK:
 				var sg : String = file.get_line()
 				achivements = parse_json(sg)
-			else:
-				pointers.l("Error loading achievements file","pointers.Achievements")
+			else:pointers.l("Error loading achievements file","pointers.Achievements")
 		file.close()
 		
 		var count : float = 0.0
@@ -847,36 +846,28 @@ class _ConfigDriver:
 				if node.has_method(method):
 					if not is_connected("config_changed",node,method):
 						connect("config_changed",node,method)
-					else:
-						pointers.l("node %s already connected with the method '%s', connect failed" % [str(node),method],"pointers.ConfigDriver")
-				else:
-					pointers.l("node %s does not have the method '%s', cannot connect" % [str(node),method],"pointers.ConfigDriver")
+					else:pointers.l("node %s already connected with the method '%s', connect failed" % [str(node),method],"pointers.ConfigDriver")
+				else:pointers.l("node %s does not have the method '%s', cannot connect" % [str(node),method],"pointers.ConfigDriver")
 			# Emitted only when configs of input type change
 			"input":
 				if node.has_method(method):
 					if not is_connected("input_changed",node,method):
 						connect("input_changed",node,method)
-					else:
-						pointers.l("node %s already connected with the method '%s', connect failed" % [str(node),method],"pointers.ConfigDriver")
-				else:
-					pointers.l("node %s does not have the method '%s', cannot connect" % [str(node),method],"pointers.ConfigDriver")
+					else:pointers.l("node %s already connected with the method '%s', connect failed" % [str(node),method],"pointers.ConfigDriver")
+				else:pointers.l("node %s does not have the method '%s', cannot connect" % [str(node),method],"pointers.ConfigDriver")
 			# Connects two methods within the object to the 'config' and 'input' types respectively
 			# 'input_method' should at least be defined when calling this to help readability
 			"both":
 				if node.has_method(input_method):
 					if not is_connected("input_changed",node,input_method):
 						connect("input_changed",node,input_method)
-					else:
-						pointers.l("node %s already connected with the method '%s', connect failed" % [str(node),method],"pointers.ConfigDriver")
-				else:
-					pointers.l("node %s does not have the method '%s', cannot connect" % [str(node),input_method],"pointers.ConfigDriver")
+					else:pointers.l("node %s already connected with the method '%s', connect failed" % [str(node),method],"pointers.ConfigDriver")
+				else:pointers.l("node %s does not have the method '%s', cannot connect" % [str(node),input_method],"pointers.ConfigDriver")
 				if node.has_method(method):
 					if not is_connected("config_changed",node,method):
 						connect("config_changed",node,method)
-					else:
-						pointers.l("node %s already connected with the method '%s', connect failed" % [str(node),method],"pointers.ConfigDriver")
-				else:
-					pointers.l("node %s does not have the method '%s', cannot connect" % [str(node),method],"pointers.ConfigDriver")
+					else:pointers.l("node %s already connected with the method '%s', connect failed" % [str(node),method],"pointers.ConfigDriver")
+				else:pointers.l("node %s does not have the method '%s', cannot connect" % [str(node),method],"pointers.ConfigDriver")
 	
 	# Inverse method to __establish connection
 	# See that method for comments, as this just disconnects those connections
@@ -886,33 +877,25 @@ class _ConfigDriver:
 				if node.has_method(method):
 					if is_connected("config_changed",node,method):
 						disconnect("config_changed",node,method)
-					else:
-						pointers.l("node %s not connected with the method '%s', disconnect failed" % [str(node),method],"pointers.ConfigDriver")
-				else:
-					pointers.l("node %s does not have the method '%s', cannot disconnect" % [str(node),method],"pointers.ConfigDriver")
+					else:pointers.l("node %s not connected with the method '%s', disconnect failed" % [str(node),method],"pointers.ConfigDriver")
+				else:pointers.l("node %s does not have the method '%s', cannot disconnect" % [str(node),method],"pointers.ConfigDriver")
 			"input":
 				if node.has_method(method):
 					if is_connected("input_changed",node,method):
 						disconnect("input_changed",node,method)
-					else:
-						pointers.l("node %s not connected with the method '%s', disconnect failed" % [str(node),method],"pointers.ConfigDriver")
-				else:
-					pointers.l("node %s does not have the method '%s', cannot disconnect" % [str(node),method],"pointers.ConfigDriver")
+					else:pointers.l("node %s not connected with the method '%s', disconnect failed" % [str(node),method],"pointers.ConfigDriver")
+				else:pointers.l("node %s does not have the method '%s', cannot disconnect" % [str(node),method],"pointers.ConfigDriver")
 			"both":
 				if node.has_method(input_method):
 					if is_connected("input_changed",node,input_method):
 						disconnect("input_changed",node,input_method)
-					else:
-						pointers.l("node %s not connected with the method '%s', disconnect failed" % [str(node),method],"pointers.ConfigDriver")
-				else:
-					pointers.l("node %s does not have the method '%s', cannot disconnect" % [str(node),input_method],"pointers.ConfigDriver")
+					else:pointers.l("node %s not connected with the method '%s', disconnect failed" % [str(node),method],"pointers.ConfigDriver")
+				else:pointers.l("node %s does not have the method '%s', cannot disconnect" % [str(node),input_method],"pointers.ConfigDriver")
 				if node.has_method(method):
 					if is_connected("config_changed",node,method):
 						disconnect("config_changed",node,method)
-					else:
-						pointers.l("node %s not connected with the method '%s', disconnect failed" % [str(node),method],"pointers.ConfigDriver")
-				else:
-					pointers.l("node %s does not have the method '%s', cannot disconnect" % [str(node),method],"pointers.ConfigDriver")
+					else:pointers.l("node %s not connected with the method '%s', disconnect failed" % [str(node),method],"pointers.ConfigDriver")
+				else:pointers.l("node %s does not have the method '%s', cannot disconnect" % [str(node),method],"pointers.ConfigDriver")
 	
 	# Called from the EquipmentDriver ModMain and initializes configs
 	func __load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
@@ -1170,8 +1153,7 @@ class _ConfigDriver:
 							pointers.l("Adding input key [%s]" % key,"pointers.ConfigDriver")
 							InputMap.add_action(key,deadzone)
 							actionList.append(key)
-						else:
-							pointers.l("Input key [%s] already exists, skipping" % key,"pointers.ConfigDriver")
+						else:pointers.l("Input key [%s] already exists, skipping" % key,"pointers.ConfigDriver")
 						pointers.Keymapping.__load_input_data(key,p,opts)
 		
 	
@@ -1236,16 +1218,14 @@ class _ConfigDriver:
 				if not InputMap.action_has_event(key,event):
 					pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.ConfigDriver")
 					InputMap.action_add_event(key, event)
-				else:
-					pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.ConfigDriver")
+				else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.ConfigDriver")
 			if i.begins_with("JoyButton "):
 				var event:InputEventJoypadButton = InputEventJoypadButton.new()
 				event.button_index = int(i.split("JoyButton ")[1])
 				if not InputMap.action_has_event(key,event):
 					pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.ConfigDriver")
 					InputMap.action_add_event(key, event)
-				else:
-					pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.ConfigDriver")
+				else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.ConfigDriver")
 			if i.begins_with("JoyAxis "):
 				var event:InputEventJoypadMotion = InputEventJoypadMotion.new()
 				event.axis = abs(int(i.split("JoyAxis ")[1]))
@@ -1256,8 +1236,7 @@ class _ConfigDriver:
 				if not InputMap.action_has_event(key,event):
 					pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.ConfigDriver")
 					InputMap.action_add_event(key, event)
-				else:
-					pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.ConfigDriver")
+				else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.ConfigDriver")
 				
 			else:
 				var event:InputEventKey = InputEventKey.new()
@@ -1265,8 +1244,7 @@ class _ConfigDriver:
 				if not InputMap.action_has_event(key,event):
 					pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.ConfigDriver")
 					InputMap.action_add_event(key, event)
-				else:
-					pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.ConfigDriver")
+				else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.ConfigDriver")
 		
 	func set_button_focus(button,check_button):
 		var parent = button.get_parent()
@@ -1463,8 +1441,7 @@ class _ConfigDriver:
 					do = false
 			if do:
 				subscriptions[top][setting].append([object,method])
-		else:
-			pointers.l("node %s does not have the method '%s'" % [str(object),method],"pointers.ConfigDriver")
+		else:pointers.l("node %s does not have the method '%s'" % [str(object),method],"pointers.ConfigDriver")
 			
 	
 	func __disconnect_subscription(method: String,object: Object,id: String,section: String,setting: String):
@@ -5815,16 +5792,14 @@ class _Keymapping:
 			if not InputMap.action_has_event(key,event):
 				pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.Keymapping")
 				InputMap.action_add_event(key, event)
-			else:
-				pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.Keymapping")
+			else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.Keymapping")
 		elif i.begins_with("JoyButton "):
 			var event = InputEventJoypadButton.new()
 			event.button_index = int(i.split("JoyButton ")[1])
 			if not InputMap.action_has_event(key,event):
 				pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.Keymapping")
 				InputMap.action_add_event(key, event)
-			else:
-				pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.Keymapping")
+			else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.Keymapping")
 		elif i.begins_with("JoyAxis "):
 			var event = InputEventJoypadMotion.new()
 			event.axis = abs(int(i.split("JoyAxis ")[1]))
@@ -5835,8 +5810,7 @@ class _Keymapping:
 			if not InputMap.action_has_event(key,event):
 				pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.Keymapping")
 				InputMap.action_add_event(key, event)
-			else:
-				pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.Keymapping")
+			else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.Keymapping")
 
 		else:
 			var event = InputEventKey.new()
@@ -5844,8 +5818,7 @@ class _Keymapping:
 			if not InputMap.action_has_event(key,event):
 				pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.Keymapping")
 				InputMap.action_add_event(key, event)
-			else:
-				pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.Keymapping")
+			else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.Keymapping")
 	
 	var input_cache = {}
 	
@@ -6482,8 +6455,7 @@ class _ManifestV2:
 							if modGlobalPath.to_lower() in modFiles:
 								zip_ref_store[modGlobalPath] = modFSPath
 					gdunzip = null
-				if zip_ref_store.get("res://HevLib/ModMain.gd","").get_file() != "HevLib.zip":
-					pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.","pointers.ManifestV2")
+				if zip_ref_store.get("res://HevLib/ModMain.gd","").get_file() != "HevLib.zip":pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.","pointers.ManifestV2")
 				if not pointers.SafeMode.__handle_exit_for_file_checks():modListArr.clear()
 			var stat_tags : Dictionary = {}
 			for mod in modListArr:
@@ -7048,8 +7020,7 @@ class _ManifestV2:
 								for cfname in sec_data:
 									var cfdata = sec_data[cfname]
 									var type = cfdata.get("type",null)
-									if cfdata.get("disabled",false):
-										pointers.l("Config %s/%s is disabled, skipping" % [section,cfname],"pointers.ConfigDriver")
+									if cfdata.get("disabled",false):pointers.l("Config %s/%s is disabled, skipping" % [section,cfname],"pointers.ConfigDriver")
 									elif typeof(type) != TYPE_STRING or not type:
 										var err = "Config %s @ %s does not define a type, skipping" % [cfname,section]
 										printerr(err)
@@ -8043,8 +8014,7 @@ class _SafeMode:
 			safeCheck = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading")
 			if safeCheck:pointers.l("Safe mode enabled.","pointers.SafeMode")
 			else:pointers.l("Safe mode disabled! NOTE: this will remove any warranties or possibility for support, please keep that in mind!","pointers.SafeMode")
-		else:
-			pointers.l("Running from the editor, safe mode disabled by default as it cannot fail","pointers.SafeMode")
+		else:pointers.l("Running from the editor, safe mode disabled by default as it cannot fail","pointers.SafeMode")
 	
 	func __check_file(file_path:String,zip_path:String,crash:bool = true):
 		if safeCheck:
@@ -8081,9 +8051,9 @@ class _SafeMode:
 		for zip_path in offendingFiles:
 			var zip_files = offendingFiles[zip_path]
 			pointers.l("[%d] offending files for mod [%s]:" % [zip_files.size(),zip_path],"pointers.SafeMode")
-			for i in zip_files:
-				pointers.l(" -> [%s]" % i,"pointers.SafeMode")
+			for i in zip_files:pointers.l(" -> [%s]" % i,"pointers.SafeMode")
 		pointers.l("Make sure to check the specific line where each script was checked, as it will provide more information regarding the specific issue.","pointers.SafeMode")
+		pointers.l("If you are having problems fixing these issues, you may also ask for help regarding it in the Discord at `https://discord.gg/dv`","pointers.SafeMode")
 		if safeCheck:
 			if safeCheckTriggered:
 				pointers.NodeAccess.__exit(false,"Safe mode tripped. One or more mods attempted to overwrite the behaviour of Vanilla resource file in a manner that would likely be unstable.\n\nIf you are looking to extend/overwrite a Vanilla resource, please use DataFormat.__extend_script() or DataFormat.__override_script() for extending/overwriting scripts respectively, DataFormat.__replace_resource() for scenes/resources, or any equivalent method within your ModMain/LOAD_RESOURCES scripts.\n\nCheck logs for details regarding offending mod(s).","pointers.SafeMode",0.0,"",true)
@@ -8674,11 +8644,9 @@ class _Translations:
 		pointers.l("%s Translations Updated from @ [%s]" % [translationCount, fileName],"pointers.Translations")
 	
 	func __updateTL_from_dictionary(path:Dictionary, fullLogging:bool = true):
-		pointers.l("Adding translations from dictionary","pointers.Translations")
+		pointers.l("Adding translations from dictionary: %s" % str(path.hash()),"pointers.Translations")
 		var translations : Array = []
 		var translationCount:int = 0
-		if fullLogging:
-			pointers.l("Adding translations as: %s" % str(path.hash()),"pointers.Translations")
 		if "file" in path:
 			var file_paths : String = path["file"]
 			for file in file_paths:

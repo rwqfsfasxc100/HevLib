@@ -1,3 +1,8 @@
+[1.15.47]
+
+1=* Fixed regex filters with edge cases involving several special characters
+2=* Improved verbosity of the logging of several functions
+
 [1.15.46]
 
 1=* Fixed issue that caused extremely long load times by replacing some expensive string searches with regex
