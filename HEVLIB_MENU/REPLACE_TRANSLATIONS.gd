@@ -1587,8 +1587,8 @@ const TRANSLATIONS = {
 			"version_hash": 1714521282
 		},
 		"HEVLIB_CONFIG_SAFE_MOD_LOADING_TOOLTIP": {
-			"string": "Prevents the game from being loaded if a mod overrides vanilla files.\n\nRecommended to keep this enabled to prevent issues with vanilla and/or other mods.",
-			"version_hash": 4199522322
+			"string": "Prevents the game from being loaded if a mod performs unsafe operations (such as overriding vanilla files directly.)\n\nRecommended to keep this enabled to prevent issues with vanilla and/or other mods. Note: I will dismiss bug reports that have disabled SafeMode due to the probable cause of the issue being related to it needing this disabled..",
+			"version_hash": 2729983956
 		},
 		"HEVLIB_CREDITS_SUPPORTERS_KOFI_TESSIER": {
 			"string": "Tessier-Ashpool S.A. - supporter (ko-fi)",
