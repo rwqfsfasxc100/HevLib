@@ -3,7 +3,7 @@
 1=* Fixed crash caused by having an input type config in the same section as a config entry of any other type
 2=* Improved the construction of weaponslot modifications, which should improve the load times when a new ship+slot+equipment combination is encountered
 3=* Fixed issue causing the DLC list mod sorting order to use the length of a mod's base translation string instead of the translated string's length when sorting by mod name length
-4=* Moved __mod_exists from the ConfigDriver class to the ManifestV2 class, where it made more sense to exist under
+4=* Moved `__mod_exists` from the `ConfigDriver` class to the `ManifestV2` class, where it made more sense to exist under
 5=* Added ability to require a mod ID and an optional min/max version requirement for the conversation player extension
 6=* Removed old update fetching netcode from the base ModMain script
 
