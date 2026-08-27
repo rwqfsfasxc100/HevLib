@@ -8031,9 +8031,11 @@ class _SafeMode:
 	var offendingFileCount:int = 0
 	var args = OS.get_cmdline_args()
 	var file = File.new()
+	var regex = RegEx.new()
 	var pointers
 	func _init(p):
 		pointers = p
+		regex.compile("(?<=^|\\s)(?:\\._ready\\(\\)|self\\._ready\\(\\)|\\._physics_process\\(delta\\)|self\\._physics_process\\(delta\\)|\\._process\\(delta\\)|self\\._process\\(delta\\)|\\._draw\\(\\)|self\\._draw\\(\\))(?=$|\\s)")
 	
 	func ready():
 		if not OS.has_feature("editor"):
@@ -8060,17 +8062,14 @@ class _SafeMode:
 				file.open(file_path,File.READ)
 				var tex = file.get_as_text(true)
 				file.close()
-				for line in tex:
-					for part in line.split(" ",false):
-						var stripped = part.strip_edges().strip_escapes()
-						if stripped in bytes2var(PoolByteArray([19, 0, 0, 0, 8, 0, 0, 0, 4, 0, 0, 0, 9, 0, 0, 0, 46, 95, 114, 101, 97, 100, 121, 40, 41, 0, 0, 0, 4, 0, 0, 0, 24, 0, 0, 0, 46, 95, 112, 104, 121, 115, 105, 99, 115, 95, 112, 114, 111, 99, 101, 115, 115, 40, 100, 101, 108, 116, 97, 41, 4, 0, 0, 0, 16, 0, 0, 0, 46, 95, 112, 114, 111, 99, 101, 115, 115, 40, 100, 101, 108, 116, 97, 41, 4, 0, 0, 0, 13, 0, 0, 0, 115, 101, 108, 102, 46, 95, 114, 101, 97, 100, 121, 40, 41, 0, 0, 0, 4, 0, 0, 0, 28, 0, 0, 0, 115, 101, 108, 102, 46, 95, 112, 104, 121, 115, 105, 99, 115, 95, 112, 114, 111, 99, 101, 115, 115, 40, 100, 101, 108, 116, 97, 41, 4, 0, 0, 0, 20, 0, 0, 0, 115, 101, 108, 102, 46, 95, 112, 114, 111, 99, 101, 115, 115, 40, 100, 101, 108, 116, 97, 41, 4, 0, 0, 0, 8, 0, 0, 0, 46, 95, 100, 114, 97, 119, 40, 41, 4, 0, 0, 0, 12, 0, 0, 0, 115, 101, 108, 102, 46, 95, 100, 114, 97, 119, 40, 41])):
-							pointers.l(PoolByteArray([ 69, 82, 82, 79, 82, 58, 32, 102, 105, 108, 101, 32, 37, 115, 32, 64, 32, 37, 115, 32, 105, 115, 32, 110, 111, 116, 32, 112, 114, 111, 112, 101, 114, 108, 121, 32, 99, 111, 109, 112, 105, 108, 101, 100, 46, 32, 68, 111, 32, 110, 111, 116, 32, 101, 120, 112, 101, 99, 116, 32, 116, 104, 105, 115, 32, 115, 99, 114, 105, 112, 116, 32, 116, 111, 32, 114, 117, 110, 32, 97, 115, 32, 105, 110, 116, 101, 110, 100, 101, 100, 46 ]).get_string_from_utf8() % [file_path,zip_path.get_file()],"pointers.SafeMode")
-							if not zip_path.get_file() in offendingFiles:
-								offendingFiles[zip_path.get_file()] = []
-							offendingFiles[zip_path.get_file()].append(file_path)
-							offendingFileCount += 1
-							if crash:
-								safeCheckTriggered = true
+				if regex.search(tex):
+					pointers.l(PoolByteArray([ 69, 82, 82, 79, 82, 58, 32, 102, 105, 108, 101, 32, 37, 115, 32, 64, 32, 37, 115, 32, 105, 115, 32, 110, 111, 116, 32, 112, 114, 111, 112, 101, 114, 108, 121, 32, 99, 111, 109, 112, 105, 108, 101, 100, 46, 32, 68, 111, 32, 110, 111, 116, 32, 101, 120, 112, 101, 99, 116, 32, 116, 104, 105, 115, 32, 115, 99, 114, 105, 112, 116, 32, 116, 111, 32, 114, 117, 110, 32, 97, 115, 32, 105, 110, 116, 101, 110, 100, 101, 100, 46 ]).get_string_from_utf8() % [file_path,zip_path.get_file()],"pointers.SafeMode")
+					if not zip_path.get_file() in offendingFiles:
+						offendingFiles[zip_path.get_file()] = []
+					offendingFiles[zip_path.get_file()].append(file_path)
+					offendingFileCount += 1
+					if crash:
+						safeCheckTriggered = true
 	
 	func __handle_exit_for_file_checks() -> bool:
 		pointers.l("Found %d offending files loaded between %d mods." % [offendingFileCount,offendingFiles.size()],"pointers.SafeMode")
@@ -8079,9 +8078,10 @@ class _SafeMode:
 			pointers.l("[%d] offending files for mod [%s]:" % [zip_files.size(),zip_path],"pointers.SafeMode")
 			for i in zip_files:
 				pointers.l(" -> [%s]" % i,"pointers.SafeMode")
+		pointers.l("Make sure to check the specific line where each script was checked, as it will provide more information regarding the specific issue.","pointers.SafeMode")
 		if safeCheck:
 			if safeCheckTriggered:
-				pointers.NodeAccess.__exit(false,"Safe mode tripped. One or more mods attempted to overwrite a Vanilla resource file at the directory level.\n\nIf you are looking to extend/overwrite a Vanilla resource, please use DataFormat.__extend_script() or DataFormat.__override_script() for extending/overwriting scripts respectively, DataFormat.__replace_resource() for scenes/resources, or any equivalent method within your ModMain/LOAD_RESOURCES scripts.\n\nCheck logs for details regarding offending mod(s).","pointers.SafeMode",0.0,"",true)
+				pointers.NodeAccess.__exit(false,"Safe mode tripped. One or more mods attempted to overwrite the behaviour of Vanilla resource file in a manner that would likely be unstable.\n\nIf you are looking to extend/overwrite a Vanilla resource, please use DataFormat.__extend_script() or DataFormat.__override_script() for extending/overwriting scripts respectively, DataFormat.__replace_resource() for scenes/resources, or any equivalent method within your ModMain/LOAD_RESOURCES scripts.\n\nCheck logs for details regarding offending mod(s).","pointers.SafeMode",0.0,"",true)
 			if "--test" in args:
 				return false
 		return true
