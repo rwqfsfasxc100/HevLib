@@ -6544,6 +6544,7 @@ class _ManifestV2:
 		return {}
 	
 	func __make_mod_entry(mod: Dictionary):
+		var mod_error:bool = false
 		var constants : Dictionary = mod.get("constants")
 		var script_path : String = mod.get("script_path")
 		var folder_path : String = script_path.get_base_dir() + "/"
@@ -6574,7 +6575,6 @@ class _ManifestV2:
 			var current : PoolStringArray = __get_modlet_files()
 			if not script_path in current:
 				mod_enabled = false
-		
 		for content_file in content:
 			if content_file.begins_with(folder_path):
 				var ft : String = content_file.split(folder_path)[1]
@@ -6592,8 +6592,9 @@ class _ManifestV2:
 					always_display = manifest_data["library"].get("always_display",false)
 					manifest_version = manifest_data["manifest_definitions"].get("manifest_version",1)
 					if mod["mod_type"] != "modlet" and manifest_data["manifest_definitions"].get("modlet_priority",0):
-						return {"name":"Mod Name Missing","priority":NAN,"file_path":"","zip_path":"","version_data":{"version_major":1,"version_minor":0,"version_bugfix":0,"version_metadata":""},"mod_icon":"","library_information":{"is_library":false,"always_display":false},"manifest":{"has_manifest":false,"manifest_data":{}},"drivers":{},"mod_type":"UNKNOWN","enabled":false,"master_locale":""}
-					
+						mod_version_metadata = "Manifest fault - Cannot determine mod type!"
+						manifest_data["version"]["version_metadata"] = "Manifest fault - Cannot determine mod type!"
+						mod_error = true
 					
 				if ft.to_lower().begins_with("icon"):
 					if ft.to_lower().ends_with(".png"):
@@ -6660,6 +6661,15 @@ class _ManifestV2:
 					var bucket : float = hs/(hs+float(counts[lang]["missing"]))
 					manifest_langs[lang] = "%3.1f%%" % ((bucket * 100) - (25 * (1 - ((hs - float(counts[lang]["not_updated"])) / hs))))
 				manifestEntry["manifest_data"]["languages"] = manifest_langs
+		if mod_error:
+			icon_dict = {"has_icon_file":false,"icon_path":""}
+			for i in manifestEntry["manifest_data"]:
+				if not i in ["mod_information","version","manifest_definitions"]:
+					manifestEntry["manifest_data"].erase(i)
+			mod["mod_type"] = "NULL"
+			mod_enabled = false
+			drivers.clear()
+			ml = "en"
 		return {"name":mod_name,"priority":mod_priority,"file_path":script_path,"zip_path":__match_mod_path_to_zip(script_path),"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"manifest":manifestEntry,"drivers":drivers,"mod_type":mod["mod_type"],"enabled":mod_enabled,"master_locale":ml}
 	
 	static func sortModList(a,b):
