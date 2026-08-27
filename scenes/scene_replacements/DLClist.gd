@@ -88,9 +88,8 @@ func _ready():
 func hl_dlc_make_label(text):
 	
 	var l = Label.new()
-	l.text = text
+	l.text = TranslationServer.translate(text)
 	l.align = Label.ALIGN_RIGHT
-	
 	
 	return l
 
