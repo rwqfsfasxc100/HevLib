@@ -1104,13 +1104,12 @@ class _ConfigDriver:
 						if key in current_config[sect]:
 							if type == "input":
 								var val : Dictionary = current_config[sect]
-								for b in val:
-									var out : Array = []
-									for a in val[b]:
-										if typeof(a) == TYPE_STRING:
-											a = [a]
-										out.append(a)
-									current_config[sect][b] = out
+								var out : Array = []
+								for a in val[key]:
+									if typeof(a) == TYPE_STRING:
+										a = [a]
+									out.append(a)
+								current_config[sect][key] = out
 						else:
 							match type:
 								"input":
