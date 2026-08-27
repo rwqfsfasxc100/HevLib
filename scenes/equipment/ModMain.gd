@@ -58,8 +58,7 @@ func _init(modLoader : ModLoader = ModLoader):
 	if not correct:
 		Debug.l("Folder structure not correct, exiting HevLib load")
 		return
-	pointers = load(pointerDir).new()
-	pointers.equipment_modmain = self
+	pointers = load(pointerDir).new(pointerDir,self)
 	pointers.name = "HevLib~Pointers"
 	if modLoader._savedObjects:
 		var new_objects = [pointers]
