@@ -180,9 +180,10 @@ func _ready():
 			if iname == c:
 				if not pointers.ConfigDriver.__validate_dictionary(item):
 					break
-				var this = {}
-				this.name = iname
-				this.data = {}
+				var this = {
+					"name":iname,
+					"data":{}
+				}
 				var f = item.get("data",{})
 				for n in f:
 					var d = f[n]
@@ -199,11 +200,12 @@ func _ready():
 			if iname == c:
 				if not pointers.ConfigDriver.__validate_dictionary(item):
 					break
-				var this = {}
-				this.name = iname
-				this.data = {}
-				this.path = item.get("path","")
-				this.config = item.get("config",{})
+				var this = {
+					"name":iname,
+					"data":{},
+					"path":item.get("path",""),
+					"config":item.get("config",{})
+				}
 				var f = item.get("data",{})
 				for n in f:
 					var d = f[n]
