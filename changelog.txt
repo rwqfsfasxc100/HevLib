@@ -1,3 +1,10 @@
+[1.15.46]
+
+1=* Fixed issue that caused extremely long load times by replacing some expensive string searches with regex
+2=* ShipDriver now only throws errors about an incorrect ship path if one was provided in the entry.
+3=* Fixed issues with assigning extra configs through a ShipDriver entry's `alternate_configs` property with it being able to overwrite previous entries
+4=* Added __is_driver_file to the DriverManagement class, which ensures no non-driver scripts are processed and cause delays
+
 [1.15.45]
 
 1=* Fixed crash caused by having an input type config in the same section as a config entry of any other type
