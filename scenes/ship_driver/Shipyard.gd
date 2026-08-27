@@ -62,10 +62,10 @@ func _ready():
 	# Ship driver
 	var alternates = {}
 	for sd in syPointers.Equipment.add_ships_store:
-		var ship_name = sd.get("name","")
-		var path = sd.get("path","")
-		var alias = sd.get("alias",ship_name)
-		var config = sd.get("config",{})
+		var ship_name:String = sd.get("name","")
+		var path:String = sd.get("path","")
+		var alias:String = sd.get("alias",ship_name)
+		var config:Dictionary = sd.get("config",{})
 		if not "config" in config:
 			var nc = {"config":config.duplicate(true)}
 			config = nc
@@ -73,13 +73,20 @@ func _ready():
 		
 		var alts = sd.get("alternate_configs","")
 		if alts:
-			alternates.merge({ship_name:alts})
+			if not ship_name in alternates:
+				alternates[ship_name] = []
+			match typeof(alts):
+				TYPE_STRING:
+					alternates[ship_name].append(alts)
+				TYPE_ARRAY,TYPE_STRING_ARRAY:
+					alternates[ship_name].append_array(alts)
 		
 		if ship_name:
-			if syPointers.DataFormat.__load_if_can(path):
-				ships[ship_name] = syPointers.DataFormat.__get_load()
-			else:
-				syPointers.l("ERROR: Failed to load ship scene for [%s], located at [%s]" % [ship_name,path],"ShipDriver")
+			if not path.empty():
+				if syPointers.DataFormat.__load_if_can(path):
+					ships[ship_name] = syPointers.DataFormat.__get_load()
+				else:
+					syPointers.l("ERROR: Failed to load ship scene for [%s], located at [%s]" % [ship_name,path],"ShipDriver")
 			if alias != ship_name:
 				configAlias[ship_name] = alias
 			if config.config:
@@ -95,55 +102,29 @@ func _ready():
 					cfg = nv
 				usedShipConfigs[ship_name].append(cfg)
 	for ship_name in alternates:
-		var alts = alternates[ship_name]
 		var usedConfigs = []
-		match typeof(alts):
-			TYPE_STRING:
-				var cfgalias = getShipAlias(alts)
-				if alts in defaultShipConfig:
-					var cf = defaultShipConfig[alts]
-					if "config" in cf:
-						cf = cf["config"].duplicate(true)
-					else:
-						cf = cf.duplicate(true)
-					usedConfigs.append(cf)
-				if alts in usedShipConfigs:
-					var cf = usedShipConfigs[alts].duplicate(true)
-					usedConfigs.append_array(cf)
-				if cfgalias in defaultShipConfig:
-					var cf = defaultShipConfig[cfgalias]
-					if "config" in cf:
-						cf = cf["config"].duplicate(true)
-					else:
-						cf = cf.duplicate(true)
-					usedConfigs.append(cf)
-				if cfgalias in usedShipConfigs:
-					var cf = usedShipConfigs[cfgalias].duplicate(true)
-					usedConfigs.append_array(cf)
-				
-			TYPE_ARRAY:
-				for a in alts:
-					var cfgalias = getShipAlias(a)
-					if a in defaultShipConfig:
-						var cf = defaultShipConfig[a]
-						if "config" in cf:
-							cf = cf["config"].duplicate(true)
-						else:
-							cf = cf.duplicate(true)
-						usedConfigs.append(cf)
-					if a in usedShipConfigs:
-						var cf = usedShipConfigs[a].duplicate(true)
-						usedConfigs.append_array(cf)
-					if cfgalias in defaultShipConfig:
-						var cf = defaultShipConfig[cfgalias]
-						if "config" in cf:
-							cf = cf["config"].duplicate(true)
-						else:
-							cf = cf.duplicate(true)
-						usedConfigs.append(cf)
-					if cfgalias in usedShipConfigs:
-						var cf = usedShipConfigs[cfgalias].duplicate(true)
-						usedConfigs.append_array(cf)
+		for a in alternates[ship_name]:
+			var cfgalias = getShipAlias(a)
+			if a in defaultShipConfig:
+				var cf = defaultShipConfig[a]
+				if "config" in cf:
+					cf = cf["config"].duplicate(true)
+				else:
+					cf = cf.duplicate(true)
+				usedConfigs.append(cf)
+			if a in usedShipConfigs:
+				var cf = usedShipConfigs[a].duplicate(true)
+				usedConfigs.append_array(cf)
+			if cfgalias in defaultShipConfig:
+				var cf = defaultShipConfig[cfgalias]
+				if "config" in cf:
+					cf = cf["config"].duplicate(true)
+				else:
+					cf = cf.duplicate(true)
+				usedConfigs.append(cf)
+			if cfgalias in usedShipConfigs:
+				var cf = usedShipConfigs[cfgalias].duplicate(true)
+				usedConfigs.append_array(cf)
 		for cfg in usedConfigs:
 			if not ship_name in usedShipConfigs:
 				usedShipConfigs[ship_name] = []
