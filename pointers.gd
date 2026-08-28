@@ -8324,12 +8324,6 @@ class _Scripting:
 		var color_text:String = ""
 		for color in colors:
 			color_text += "\n\tif not \"%s\" in %s:\n\t\t%s.merge({\"%s\" : Color(%s)})" % [color,"specificMineralColors","specificMineralColors", str(color),str(colors[color])]
-		var trace_text:String = ""
-		for trace in traces:
-			trace_text += "\n\tif not \"%s\" in %s:\n\t\t%s.append(\"%s\")" % [trace,"traceMinerals","traceMinerals",str(trace)]
-		
-		# Compiles and extends the CurrentGame.gd script
-		pointers.DataFormat.__compile_and_extend_script("extends \"res://CurrentGame.gd\"\nfunc _init():\n\tpass%s%s%s\nfunc isDemo():\n\treturn false" % [price_text,color_text,trace_text])
 		
 		
 		# Initialize and create ore chunk additions
@@ -8469,6 +8463,16 @@ class _Scripting:
 		var content = "extends \"res://AsteroidSpawner.gd\"\n\nfunc _init():\n\tpass"
 		for m in mineral_list:
 			content += "\n\tif not \"%s\" in %s:\n\t\t%s.merge({%s})" % [m,"objectClass[objectClass.size() - 1]","objectClass[objectClass.size() - 1]",mineral_list[m]]
+		
+		
+		var trace_text:String = ""
+		for trace in traces:
+			if trace in mineral_list:
+				trace_text += "\n\tif not \"%s\" in %s:\n\t\t%s.append(\"%s\")" % [trace,"traceMinerals","traceMinerals",str(trace)]
+			else:
+				pointers.l("WARNING: mineral [%s] not added as trace mineral due to not existing in the added mineral list" % trace,"pointers.Scripting")
+		# Compiles and extends the CurrentGame.gd script
+		pointers.DataFormat.__compile_and_extend_script("extends \"res://CurrentGame.gd\"\nfunc _init():\n\tpass%s%s%s\nfunc isDemo():\n\treturn false" % [price_text,color_text,trace_text])
 		
 		# Installs the AsteroidSpawner.gd script to add new ore scenes
 		pointers.DataFormat.__compile_and_extend_script(content)
