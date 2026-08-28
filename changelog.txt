@@ -1,3 +1,8 @@
+[1.15.48]
+
+1=* Fixed crash that was caused by MineralDriver adding minerals to the ring's mineral pool, but not taking into account failed attempts to add them to the asteroid pool.
+2=* Fixed edge case where a mod providing both a mod main priority and a modlet priority would cause issues when interacting with specific submenus of the mod menu.
+
 [1.15.47]
 
 1=* Fixed regex filters with edge cases involving several special characters
