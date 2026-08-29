@@ -6478,8 +6478,8 @@ class _ManifestV2:
 							if modGlobalPath.to_lower() in modFiles:
 								zip_ref_store[modGlobalPath] = modFSPath
 					gdunzip = null
-				if zip_ref_store.get("res://HevLib/ModMain.gd","").get_file() != "HevLib.zip":pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.","pointers.ManifestV2")
-				if not pointers.SafeMode.__handle_exit_for_file_checks():modListArr.clear()
+				if zip_ref_store.get("res://HevLib/ModMain.gd","").get_file()!="HevLib.zip":pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.","pointers.ManifestV2")
+				pointers.SafeMode.__handle_exit_for_file_checks()
 			var stat_tags : Dictionary = {}
 			for mod in modListArr:
 				var mod_entry : Dictionary = __make_mod_entry(mod)
@@ -8040,7 +8040,7 @@ class _SafeMode:
 			PCKFILES = pointers.FolderAccess.__get_vanilla_script_and_scenes()
 			safeCheck = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading")
 			if safeCheck:pointers.l("Safe mode enabled.","pointers.SafeMode")
-			else:pointers.l("Safe mode disabled! NOTE: this will remove any warranties or possibility for support, please keep that in mind!","pointers.SafeMode")
+			else:pointers.l("Safe mode disabled! NOTE: this will automatically assume that whatever you're doing that requires it to be disabled is the cause of the issue, so please keep that in mind! If you still need help, join the Discord at [https://discord.gg/dv], where myself and others are willing to help.","pointers.SafeMode")
 		else:pointers.l("Running from the editor, safe mode disabled by default as it cannot fail","pointers.SafeMode")
 	
 	func __check_file(file_path:String,zip_path:String,crash:bool = true):
@@ -8048,9 +8048,9 @@ class _SafeMode:
 			pointers.l("checking file %s:%s" % [zip_path.get_file(),file_path],"pointers.SafeMode")
 			if file_path in PCKFILES:
 				pointers.l("WARNING: file %s @ %s overwrites Vanilla resource." % [file_path,zip_path.get_file()],"pointers.SafeMode")
-				pointers.l(" -> File should use a uniqure directory as to ensure the Vanilla file can be accessed at all times.","pointers.SafeMode")
-				pointers.l(" -> If you need to completely overwrite a script, use DataFormat.__extend_script","pointers.SafeMode")
-				pointers.l(" -> If you are unable to find a suitable solution, you may also ask for help regarding it in the Discord at `https://discord.gg/dv`","pointers.SafeMode")
+				pointers.l(" -> File should use a unique directory as to ensure the Vanilla file can be accessed at all times.","pointers.SafeMode")
+				pointers.l(" -> If you need to completely overwrite a script, use DataFormat.__override_script","pointers.SafeMode")
+				pointers.l(" -> If you are unable to find a suitable solution, you may also ask for help regarding it in the Discord at [https://discord.gg/dv]","pointers.SafeMode")
 				if not zip_path.get_file() in offendingFiles:
 					offendingFiles[zip_path.get_file()] = []
 				offendingFiles[zip_path.get_file()].append(file_path)
@@ -8063,9 +8063,10 @@ class _SafeMode:
 				file.close()
 				if regex.search(tex):
 					pointers.l("ERROR: file %s @ %s is not properly compiled and likely runs recursive code. Do not expect this script to run as intended." % [file_path,zip_path.get_file()],"pointers.SafeMode")
-					pointers.l(" -> This is likely due to a signature of incorrectly supering a virtual method. and is not permitted to be ran while it is installed and running SafeMode checks.","pointers.SafeMode")
-					pointers.l(" -> It is unsupported behaviour while running HevLib due to historically being very unstable and has led to crashes. If you require this functionality, please refactor to not require the use of HevLib, or disable SafeMode's checks. (NOTE: Disabling SafeMode voids your ability to make bug reports, please be cautious with this.)","pointers.SafeMode")
-					pointers.l(" -> If you are unable to find a suitable solution, you may also ask for help regarding it in the Discord at `https://discord.gg/dv`","pointers.SafeMode")
+					pointers.l(" -> This is likely due to a signature of incorrectly supering a virtual method, and is not permitted to be ran while it is installed and running SafeMode checks.","pointers.SafeMode")
+					pointers.l(" -> It is unsupported behaviour due to it being at best very unperformant, and has historically resulted in crashes, and as a result is not supported to be run through HevLib.","pointers.SafeMode")
+					pointers.l(" -> If for whatever reason you require this functionality, I would recommend to instead refactor to not require the use of HevLib, completely overwrite the script that's being extended with the appropriate tools, or disable SafeMode's checks. (NOTE: Disabling SafeMode voids your ability to make bug reports, please be cautious with this.)","pointers.SafeMode")
+					pointers.l(" -> Otherwise, if you are unable to find a suitable solution, you may also ask for help regarding it in the Discord at [https://discord.gg/dv].","pointers.SafeMode")
 					if not zip_path.get_file() in offendingFiles:
 						offendingFiles[zip_path.get_file()] = []
 					offendingFiles[zip_path.get_file()].append(file_path)
@@ -8073,20 +8074,17 @@ class _SafeMode:
 					if crash:
 						safeCheckTriggered = true
 	
-	func __handle_exit_for_file_checks() -> bool:
+	func __handle_exit_for_file_checks():
 		pointers.l("Found %d offending files loaded between %d mods." % [offendingFileCount,offendingFiles.size()],"pointers.SafeMode")
 		for zip_path in offendingFiles:
 			var zip_files = offendingFiles[zip_path]
 			pointers.l("[%d] offending files for mod [%s]:" % [zip_files.size(),zip_path],"pointers.SafeMode")
 			for i in zip_files:pointers.l(" -> [%s]" % i,"pointers.SafeMode")
 		pointers.l("Make sure to check the specific line where each script was checked, as it will provide more information regarding the specific issue.","pointers.SafeMode")
-		pointers.l("If you are having problems fixing these issues, you may also ask for help regarding it in the Discord at `https://discord.gg/dv`","pointers.SafeMode")
+		pointers.l("If you are having problems fixing these issues, you may also ask for help regarding it in the Discord at [https://discord.gg/dv], where both myself and others are willing to help.","pointers.SafeMode")
 		if safeCheck:
 			if safeCheckTriggered:
 				pointers.NodeAccess.__exit(false,"Safe mode tripped. One or more mods attempted to overwrite the behaviour of Vanilla resource file in a manner that would likely be unstable.\n\nIf you are looking to extend/overwrite a Vanilla resource, please use DataFormat.__extend_script() or DataFormat.__override_script() for extending/overwriting scripts respectively, DataFormat.__replace_resource() for scenes/resources, or any equivalent method within your ModMain/LOAD_RESOURCES scripts.\n\nCheck logs for details regarding offending mod(s).","pointers.SafeMode",0.0,"",true)
-			if "--test" in args:
-				return false
-		return true
 	
 
 class _Scripting:
@@ -8539,8 +8537,8 @@ class _Scripting:
 		for i in where.get_children():
 			var s=i.get_script();if s:
 				var scs = s.get_script_constant_map()
-				if !(scs.get("ALLOW_FRAME_PROCESSING",false) == true):i.set_physics_process(false);i.set_process(false);i.set_physics_process_internal(false);i.set_process_internal(false)
-				var r=s.resource_path.get_file();if!(r.to_lower().begins_with("modmain")and r.to_lower().ends_with(".gd"))and!(scs.get("ALLOW_MODLOADER_CHILD_ACCESS",false) == true):Tool.remove(i)
+				if(scs.get("ALLOW_FRAME_PROCESSING",false)!=true):i.set_physics_process(false);i.set_process(false);i.set_physics_process_internal(false);i.set_process_internal(false)
+				var r=s.resource_path.get_file();if!(r.to_lower().begins_with("modmain")&&r.to_lower().ends_with(".gd"))&&(scs.get("ALLOW_MODLOADER_CHILD_ACCESS",false)!=true):Tool.remove(i)
 	
 	
 	
