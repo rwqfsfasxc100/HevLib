@@ -8539,7 +8539,7 @@ class _Scripting:
 		for i in where.get_children():
 			var s=i.get_script();if s:
 				var scs = s.get_script_constant_map()
-				if !(scs.get("ALLOW_FRAME_PROCESSING",false) == true):i.set_physics_process(false);i.set_process(false)
+				if !(scs.get("ALLOW_FRAME_PROCESSING",false) == true):i.set_physics_process(false);i.set_process(false);i.set_physics_process_internal(false);i.set_process_internal(false)
 				var r=s.resource_path.get_file();if!(r.to_lower().begins_with("modmain")and r.to_lower().ends_with(".gd"))and!(scs.get("ALLOW_MODLOADER_CHILD_ACCESS",false) == true):Tool.remove(i)
 	
 	

@@ -68,8 +68,7 @@ func _init(modLoader = ModLoader):
 	else:
 		Debug.l("Folder structure not correct, exiting HevLib load")
 	
-	
-	
+
 
 var update_urls = PoolStringArray()
 var url_store = "user://cache/.Mod_Menu_2_Cache/updates/url_refs.json"
