@@ -8082,9 +8082,8 @@ class _SafeMode:
 			for i in zip_files:pointers.l(" -> [%s]" % i,"pointers.SafeMode")
 		pointers.l("Make sure to check the specific line where each script was checked, as it will provide more information regarding the specific issue.","pointers.SafeMode")
 		pointers.l("If you are having problems fixing these issues, you may also ask for help regarding it in the Discord at [https://discord.gg/dv], where both myself and others are willing to help.","pointers.SafeMode")
-		if safeCheck:
-			if safeCheckTriggered:
-				pointers.NodeAccess.__exit(false,"Safe mode tripped. One or more mods attempted to overwrite the behaviour of Vanilla resource file in a manner that would likely be unstable.\n\nIf you are looking to extend/overwrite a Vanilla resource, please use DataFormat.__extend_script() or DataFormat.__override_script() for extending/overwriting scripts respectively, DataFormat.__replace_resource() for scenes/resources, or any equivalent method within your ModMain/LOAD_RESOURCES scripts.\n\nCheck logs for details regarding offending mod(s).","pointers.SafeMode",0.0,"",true)
+		if safeCheck and safeCheckTriggered:
+			pointers.NodeAccess.__exit(false,"Safe mode tripped. %d mods attempted to overwrite the behaviour of a total of %d Vanilla resource file(s) in a manner that would likely be unstable.\n\nIf you are looking to extend/overwrite a Vanilla resource, please use DataFormat.__extend_script() or DataFormat.__override_script() for extending/overwriting scripts respectively, DataFormat.__replace_resource() for scenes/resources, or any equivalent method within your ModMain/LOAD_RESOURCES script(s).\n\nCheck the game logs for verbose details regarding the offending mod(s).","pointers.SafeMode" % [offendingFiles.size(),offendingFileCount],0.0,"",true)
 	
 
 class _Scripting:
