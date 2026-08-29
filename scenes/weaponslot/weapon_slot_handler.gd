@@ -189,7 +189,7 @@ func _ready():
 					var d = f[n]
 					this["data"][n] = []
 					for l in d:
-						this["data"][n].append([l[0],pointers.DataFormat.__convert_var_from_string(l[1])])
+						this["data"][n].append([l[0],l[1]])
 				modStore["modification"].append(this)
 				break
 		completed["modification"] = true
@@ -211,7 +211,7 @@ func _ready():
 					var d = f[n]
 					this["data"][n] = []
 					for l in d:
-						this["data"][n].append([l[0],pointers.DataFormat.__convert_var_from_string(l[1])])
+						this["data"][n].append([l[0],l[1]])
 				modStore["addition"] = this
 				break
 		completed["addition"] = true
@@ -220,7 +220,7 @@ func _ready():
 		if c in equipment_templates:
 			var d = equipment_templates[c]
 			for i in d:
-				var s = [i,pointers.DataFormat.__convert_var_from_string(d[i])]
+				var s = [i,d[i]]
 				modStore["template"].append(s)
 		completed["template"] = true
 	hl_weaponslot_template = modStore["template"]

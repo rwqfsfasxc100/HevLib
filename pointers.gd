@@ -3092,19 +3092,19 @@ class _Equipment:
 												var objdata : Array = obj.get("data",[])
 												var has_price:bool = false
 												var has_invis:bool = false
-												var price_string : String  = str(wprice)
 												if not "name" in obj:
 													obj.merge({"name":wname})
 												for d in objdata:
 													if d.get("property","") == "repairReplacementPrice":
-														d["value"] = price_string
+														d["value"] = wprice
+														d["use_stringified_value"] = false
 														has_price = true
 													if d.get("property","") == "visible":
 														has_invis = true
 												if not has_price:
-													objdata.append({"property":"repairReplacementPrice","value":price_string})
+													objdata.append({"property":"repairReplacementPrice","value":wprice,"use_stringified_value":false})
 												if not has_invis:
-													objdata.append({"property":"visible","value":"false"})
+													objdata.append({"property":"visible","value":false,"use_stringified_value":false})
 												obj["data"] = objdata.duplicate(true)
 												WEAPONSLOT_ADD.append(obj)
 										if "WEAPONSLOT_ADD" in equipment:
@@ -3115,19 +3115,19 @@ class _Equipment:
 												var objdata : Array = obj.get("data",[])
 												var has_price:bool = false
 												var has_invis:bool = false
-												var price_string : String  = str(wprice)
 												if not "name" in obj:
 													obj.merge({"name":wname})
 												for d in objdata:
 													if d.get("property","") == "repairReplacementPrice":
-														d["value"] = price_string
+														d["value"] = wprice
+														d["use_stringified_value"] = false
 														has_price = true
 													if d.get("property","") == "visible":
 														has_invis = true
 												if not has_price:
-													objdata.append({"property":"repairReplacementPrice","value":price_string})
+													objdata.append({"property":"repairReplacementPrice","value":wprice,"use_stringified_value":false})
 												if not has_invis:
-													objdata.append({"property":"visible","value":"false"})
+													objdata.append({"property":"visible","value":false,"use_stringified_value":false})
 												obj["data"] = objdata.duplicate(true)
 												WEAPONSLOT_ADD.append(obj)
 									"MASS_DRIVER_AMMUNITION":
@@ -3414,8 +3414,12 @@ class _Equipment:
 										"data":
 											var data_formatted : Dictionary = {}
 											for item in ar[template][datapoint]:
-												data_formatted.merge({item.get("property"):item.get("value")})
-											for key in data_formatted.keys():
+												var property = item.get("property")
+												var value = item.get("value")
+												if item.get("use_stringified_value",true):
+													value = pointers.DataFormat.__convert_var_from_string(value)
+												data_formatted[property] = value
+											for key in data_formatted:
 												var is_in_dict:bool = false
 												for lps in weaponslot_modify_templates[template][datapoint]:
 													if lps.get("property") == key:
@@ -3433,27 +3437,28 @@ class _Equipment:
 							if not item in ws_equipment_names:
 								ws_equipment_names.append(item)
 							if item in weaponslot_modify_standalone:
-								var new_dict : Dictionary = {}
+								var dict : Dictionary = {}
 								for c in ar[item]:
 									var prop : String = c.get("property","")
-									var val : String = c.get("value","")
+									var val = c.get("value","")
+									if c.get("use_stringified_value",true):
+										val = pointers.DataFormat.__convert_var_from_string(val)
 									if prop and val:
-										new_dict.merge({prop:val})
-								var old_dict : Dictionary = {}
+										dict[prop] = val
 								var current_item_data : Dictionary = weaponslot_modify_standalone[item]
 								for c in current_item_data:
 									var prop : String = c.get("property","")
-									var val : String = c.get("value","")
+									var val = c.get("value","")
+									if c.get("use_stringified_value",true):
+										val = pointers.DataFormat.__convert_var_from_string(val)
 									if prop and val:
-										old_dict.merge({prop:val})
-								for op in new_dict:
-									old_dict[op] = new_dict[op]
+										dict[prop] = val
 								var processed : Array = []
-								for u in old_dict:
-									processed.append({"property":u,"value":old_dict[u]})
-								weaponslot_modify_standalone.merge({item:processed},true)
+								for u in dict:
+									processed.append({"property":u,"value":dict[u]})
+								weaponslot_modify_standalone[item] = processed
 							else:
-								weaponslot_modify_standalone.merge({item:ar[item]})
+								weaponslot_modify_standalone[item] = ar[item]
 							
 						
 					"WEAPONSLOT_SHIP_TEMPLATES.gd":
@@ -3465,18 +3470,24 @@ class _Equipment:
 									if slot in weaponslot_ship_templates[ship]:
 										var compile : Dictionary = {}
 										var current_dict : Dictionary = {}
-										var new_dict : Dictionary = {}
 										for type in weaponslot_ship_templates[ship][slot]:
-											compile.merge({type:[]},true)
-											current_dict.merge({type:{}},true)
+											if not type in compile:
+												compile[type] = []
+											if not type in current_dict:
+												current_dict[type] = {}
 											for equip in weaponslot_ship_templates[ship][slot][type]:
-												current_dict[type].merge({equip.get("property"):equip.get("value")})
+												var property = equip.get("property")
+												var value = equip.get("value")
+												current_dict[type][property] = value
 										for type in shipdata[slot]:
-											compile.merge({type:[]},true)
-											new_dict.merge({type:{}},true)
+											if not type in compile:
+												compile[type] = []
+											if not type in current_dict:
+												current_dict[type] = {}
 											for equip in shipdata[slot][type]:
-												new_dict[type].merge({equip.get("property"):equip.get("value")})
-										current_dict.merge(new_dict,true)
+												var property = equip.get("property")
+												var value = equip.get("value")
+												current_dict[type][property] = value
 										for item in current_dict:
 											for equip in current_dict[item]:
 												compile[item].append({"property":equip,"value":current_dict[item].get(equip)})
@@ -3502,18 +3513,26 @@ class _Equipment:
 									if slot in weaponslot_ship_standalone[ship]:
 										var compile : Dictionary = {}
 										var current_dict : Dictionary = {}
-										var new_dict : Dictionary = {}
 										for type in weaponslot_ship_standalone[ship][slot]:
-											compile.merge({type:[]},true)
-											current_dict.merge({type:{}},true)
+											if not type in compile:
+												compile[type] = []
+											if not type in current_dict:
+												current_dict[type] = {}
 											for equip in weaponslot_ship_standalone[ship][slot][type]:
-												current_dict[type].merge({equip.get("property"):equip.get("value")})
+												var property = equip.get("property")
+												var value = equip.get("value")
+												current_dict[type][property] = value
 										for type in shipdata[slot]:
-											compile.merge({type:[]},true)
-											new_dict.merge({type:{}},true)
+											if not type in compile:
+												compile[type] = []
+											if not type in current_dict:
+												current_dict[type] = {}
 											for equip in shipdata[slot][type]:
-												new_dict[type].merge({equip.get("property"):equip.get("value")})
-										current_dict.merge(new_dict,true)
+												var property = equip.get("property")
+												var value = equip.get("value")
+												if equip.get("use_stringified_value",true):
+													value = pointers.DataFormat.__convert_var_from_string(value)
+												current_dict[type][property] = value
 										for item in current_dict:
 											for equip in current_dict[item]:
 												compile[item].append({"property":equip,"value":current_dict[item].get(equip)})
@@ -3912,6 +3931,8 @@ class _Equipment:
 				for it in add.get("data",[]):
 					var ws_property : String  = it.get("property")
 					var ws_value = it.get("value")
+					if it.get("use_stringified_value",true):
+						ws_value = pointers.DataFormat.__convert_var_from_string(ws_value)
 					var split:PoolStringArray = ws_property.split("/")
 					if split.size() >= 3:
 						var node : String  = split[split.size() - 2]
@@ -3949,7 +3970,9 @@ class _Equipment:
 			
 			for it in add.get("data",[]):
 				var ws_property : String  = it.get("property")
-				var ws_value : String  = it.get("value")
+				var ws_value  = it.get("value")
+				if it.get("use_stringified_value",true):
+					ws_value = pointers.DataFormat.__convert_var_from_string(ws_value)
 				var split:PoolStringArray = ws_property.split("/")
 				if split.size() >= 3:
 					var node : String  = split[split.size() - 2]
@@ -3976,7 +3999,7 @@ class _Equipment:
 			weaponslot_string = weaponslot_string + "\n\n" + property
 			var data : Array = weaponslot_properties.get(property)
 			for dp in data:
-				weaponslot_string = weaponslot_string + "\n" + dp[0] + " = " + dp[1]
+				weaponslot_string = weaponslot_string + "\n" + dp[0] + " = " + var2str(dp[1])
 		
 		for data in AUX_POWER_AND_THRUSTERS:
 			
