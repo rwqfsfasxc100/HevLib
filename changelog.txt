@@ -1,3 +1,10 @@
+[1.15.49]
+
+1=* Equipment properties provided through WeaponSlot processes now no longer require a stringified property and can use an actial variable
+1.1=* Used by adding the `use_stringified_value` property after the `value` property and setting it to false.
+1.2=* Having `use_stringified_value` set uses the old behaviour for property handling, and is true by default.
+1.2=* NOTE: Starting from the 1.16 update cycle, `use_stringified_value` will be false by default. This is being done so mods are able to update.
+
 [1.15.48]
 
 1=* Fixed crash that was caused by MineralDriver adding minerals to the ring's mineral pool, but not taking into account failed attempts to add them to the asteroid pool.

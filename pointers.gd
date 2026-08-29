@@ -6686,13 +6686,7 @@ class _ManifestV2:
 				manifestEntry["manifest_data"]["languages"] = manifest_langs
 		if mod_error:
 			icon_dict = {"has_icon_file":false,"icon_path":""}
-			for i in manifestEntry["manifest_data"]:
-				if not i in ["mod_information","version","manifest_definitions"]:
-					manifestEntry["manifest_data"].erase(i)
 			mod["mod_type"] = "NULL"
-			mod_enabled = false
-			drivers.clear()
-			ml = "en"
 		return {"name":mod_name,"priority":mod_priority,"file_path":script_path,"zip_path":__match_mod_path_to_zip(script_path),"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"manifest":manifestEntry,"drivers":drivers,"mod_type":mod["mod_type"],"enabled":mod_enabled,"master_locale":ml}
 	
 	static func sortModList(a,b):
