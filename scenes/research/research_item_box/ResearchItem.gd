@@ -43,11 +43,12 @@ var mark_for_completion = false
 
 func _ready():
 	
-#	breakpoint
+	
+	
 	var project_mode = this_research_project.get("mode","story_only")
 	match project_mode:
 		"story_only":
-			var story_flag = this_research_project.get("story_flag")
+			var story_flag = this_research_project.get("story_flag","")
 			var story_val = getStory(story_flag)
 			var project_name = this_research_project.get("name","RESEARCH_TEMPLATE")
 			var project_description = this_research_project.get("tooltip_text","RESEARCH_DESC_TEMPLATE")
@@ -64,7 +65,7 @@ func _ready():
 				exit()
 			
 			
-			$Progress/Button.text = project_name
+			$Progress/Name.text = project_name
 			
 			var bar = progress_bar.instance()
 			bar.source = source
@@ -97,7 +98,7 @@ func _ready():
 			if story_val < story_min or story_val > story_max:
 				exit()
 			
-			$Progress/Button.text = project_name
+			$Progress/Name.text = project_name
 			
 			
 			
@@ -117,7 +118,7 @@ func _ready():
 			var source = this_research_project.get("source","missing.mod.id")
 			var project_state = this_research_project.get("state",{})
 			
-			$Progress/Button.text = project_name
+			$Progress/Name.text = project_name
 			if this_research_project.state.active:
 				for task in tasks:
 					var tooltip_text = task.get("tooltip_text","")
@@ -186,7 +187,12 @@ var default_vp_positioning = {"position":Vector2(0,0),"rotation":90,"scale":Vect
 func _process(_delta):
 	if is_visible_in_tree():
 		if mark_for_completion:
-			$AnimationPlayer.play("Complete")
+			var state = this_research_project.get("state",{})
+			if state.completed:
+				$AnimationPlayer.stop()
+				$Icon/PanelContainer.self_modulate = Color(0,1,0,1)
+			else:
+				$AnimationPlayer.play("Complete")
 		else:
 			$AnimationPlayer.stop()
 			$Icon/PanelContainer.self_modulate = Color(1,1,1,1)

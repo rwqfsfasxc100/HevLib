@@ -106,34 +106,40 @@ stretch_mode = 7
 
 [node name="Progress" type="VBoxContainer" parent="."]
 margin_left = 214.0
-margin_right = 504.0
+margin_right = 577.0
 margin_bottom = 210.0
 size_flags_horizontal = 3
 
-[node name="Button" type="Button" parent="Progress"]
-margin_right = 290.0
+[node name="Name" type="Button" parent="Progress"]
+margin_right = 363.0
 margin_bottom = 42.0
 size_flags_horizontal = 3
 text = "RESEARCH_TEMPLATE"
 
 [node name="SubBarProgress" type="VBoxContainer" parent="Progress"]
 margin_top = 46.0
-margin_right = 290.0
-margin_bottom = 206.0
+margin_right = 363.0
+margin_bottom = 160.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Progress/SubBarProgress"]
-margin_top = 80.0
-margin_right = 290.0
-margin_bottom = 80.0
+margin_top = 57.0
+margin_right = 363.0
+margin_bottom = 57.0
 
 [node name="FullProgress" type="HBoxContainer" parent="Progress"]
-margin_top = 210.0
-margin_right = 290.0
-margin_bottom = 210.0
+margin_top = 164.0
+margin_right = 363.0
+margin_bottom = 164.0
 size_flags_vertical = 0
+
+[node name="CompleteButton" type="Button" parent="Progress"]
+margin_top = 168.0
+margin_right = 363.0
+margin_bottom = 210.0
+text = "HEVLIB_FINISH_RESEARCH"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/Complete = SubResource( 3 )

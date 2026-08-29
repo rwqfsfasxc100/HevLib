@@ -1629,6 +1629,10 @@ const TRANSLATIONS = {
 		"HEVLIB_ERRORCHECK_MISSING_VANILLA_LOCALES": {
 			"string": "Exiting game due to a non-initialized TranslationServer. This is likely caused by a severe issue with any mods you have installed and/or Vanilla's .PCK file is corrupted.",
 			"version_hash": 4154468583
+		},
+		"HEVLIB_FINISH_RESEARCH": {
+			"string": "Complete Research!",
+			"version_hash": 2793565484
 		}
 	},
 	"de": {

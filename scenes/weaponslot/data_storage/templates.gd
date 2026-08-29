@@ -39,7 +39,8 @@ const TEMPLATES = {
 		"data":[
 			{
 				"property":"position",
-				"value":"Vector2(0,-15)"
+				"value":Vector2(0,-15),
+				
 			}
 		]
 	},
@@ -50,7 +51,8 @@ const TEMPLATES = {
 		"data":[
 			{
 				"property":"position",
-				"value":"Vector2(0,-16)"
+				"value":Vector2(0,-16),
+				
 			}
 		]
 	},
@@ -62,11 +64,13 @@ const TEMPLATES = {
 		"data":[
 			{
 				"property":"position",
-				"value":"Vector2(-71,19)"
+				"value":Vector2(-71,19),
+					
 			},
 			{
 				"property":"rotation",
-				"value":"-0.523599"
+				"value":-0.523599,
+				
 			},
 		]
 	},
@@ -77,11 +81,13 @@ const TEMPLATES = {
 		"data":[
 			{
 				"property":"position",
-				"value":"Vector2(-140,60)"
+				"value":Vector2(-140,60),
+				
 			},
 			{
 				"property":"rotation",
-				"value":"-1.0472"
+				"value":-1.0472,
+				
 			},
 		]
 	},
@@ -93,11 +99,13 @@ const TEMPLATES = {
 		"data":[
 			{
 				"property":"position",
-				"value":"Vector2(71,19)"
+				"value":Vector2(71,19),
+				
 			},
 			{
 				"property":"rotation",
-				"value":"0.523599"
+				"value":0.523599,
+				
 			},
 		]
 	},
@@ -108,11 +116,13 @@ const TEMPLATES = {
 		"data":[
 			{
 				"property":"position",
-				"value":"Vector2(140,60)"
+				"value":Vector2(140,60),
+				
 			},
 			{
 				"property":"rotation",
-				"value":"1.0472"
+				"value":1.0472,
+				
 			},
 		]
 	},
@@ -132,7 +142,8 @@ const TEMPLATES = {
 		"data":[
 			{
 				"property":"position",
-				"value":"Vector2(0,196)"
+				"value":Vector2(0,196),
+				
 			}
 		]
 	},
@@ -144,7 +155,8 @@ const TEMPLATES = {
 		"data":[
 			{
 				"property":"position",
-				"value":"Vector2(0,2)"
+				"value":Vector2(0,2),
+				
 			}
 		]
 	},
@@ -155,7 +167,8 @@ const TEMPLATES = {
 		"data":[
 			{
 				"property":"position",
-				"value":"Vector2(-1,2)"
+				"value":Vector2(-1,2),
+				
 			}
 		]
 	},
@@ -169,7 +182,8 @@ const TEMPLATES = {
 		"data":[
 			{
 				"property":"position",
-				"value":"Vector2(0,-30)"
+				"value":Vector2(0,-30),
+				
 			}
 		]
 	},
@@ -180,7 +194,8 @@ const TEMPLATES = {
 		"data":[
 			{
 				"property":"position",
-				"value":"Vector2(0,130)"
+				"value":Vector2(0,130),
+				
 			}
 		]
 	},
@@ -192,7 +207,8 @@ const TEMPLATES = {
 		"data":[
 			{
 				"property":"position",
-				"value":"Vector2(0,50)"
+				"value":Vector2(0,50),
+				
 			}
 		]
 	},

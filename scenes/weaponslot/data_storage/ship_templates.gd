@@ -36,27 +36,32 @@ const SHIP_MODIFY = {
 			"SYSTEM_SCOOP-L":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"SYSTEM_HUNK-L":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 80 )"
+					"value":Vector2( 0, 80 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"0.174533"
+					"value":0.174533,
+					
 				}
 			],
 			"SYSTEM_PDT-L":[
 				{
 					"property":"position",
-					"value":"Vector2( -69, -71 )"
+					"value":Vector2( -69, -71 ),
+					
 				}
 			]
 		},
@@ -64,27 +69,32 @@ const SHIP_MODIFY = {
 			"SYSTEM_SCOOP-R":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"SYSTEM_HUNK-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 80 )"
+					"value":Vector2( 0, 80 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"0.174533"
+					"value":0.174533,
+					
 				}
 			],
 			"SYSTEM_PDT-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 69, -71 )"
+					"value":Vector2( 69, -71 ),
+					
 				}
 			]
 		},
@@ -92,41 +102,49 @@ const SHIP_MODIFY = {
 			"SYSTEM_PDMWG-L":[
 				{
 					"property":"position",
-					"value":"Vector2( -200, 81 )"
+					"value":Vector2( -200, 81 ),
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 			"SYSTEM_SCOOP-L":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"SYSTEM_HUNK-L":[
 				{
 					"property":"rotation",
-					"value":"-0.174533"
+					"value":-0.174533,
+					
 				}
 			],
 			"SYSTEM_PDT-L":[
 				{
 					"property":"position",
-					"value":"Vector2( -190, 0 )"
+					"value":Vector2( -190, 0 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-1.0472"
+					"value":-1.0472,
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 		},
@@ -134,41 +152,49 @@ const SHIP_MODIFY = {
 			"SYSTEM_PDMWG-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 200, 81 )"
+					"value":Vector2( 200, 81 ),
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 			"SYSTEM_SCOOP-R":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"SYSTEM_HUNK-R":[
 				{
 					"property":"rotation",
-					"value":"0.174533"
+					"value":0.174533,
+					
 				}
 			],
 			"SYSTEM_PDT-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 190, 0 )"
+					"value":Vector2( 190, 0 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"1.0472"
+					"value":1.0472,
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 		},
@@ -176,41 +202,49 @@ const SHIP_MODIFY = {
 			"SYSTEM_PDMWG-L":[
 				{
 					"property":"position",
-					"value":"Vector2( -200, 81 )"
+					"value":Vector2( -200, 81 ),
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 			"SYSTEM_SCOOP-L":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"SYSTEM_HUNK-L":[
 				{
 					"property":"rotation",
-					"value":"-0.174533"
+					"value":-0.174533,
+					
 				}
 			],
 			"SYSTEM_PDT-L":[
 				{
 					"property":"position",
-					"value":"Vector2( -190, 0 )"
+					"value":Vector2( -190, 0 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-1.0472"
+					"value":-1.0472,
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 		},
@@ -218,41 +252,49 @@ const SHIP_MODIFY = {
 			"SYSTEM_PDMWG-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 200, 81 )"
+					"value":Vector2( 200, 81 ),
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 			"SYSTEM_SCOOP-R":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"SYSTEM_HUNK-R":[
 				{
 					"property":"rotation",
-					"value":"0.174533"
+					"value":0.174533,
+					
 				}
 			],
 			"SYSTEM_PDT-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 190, 0 )"
+					"value":Vector2( 190, 0 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"1.0472"
+					"value":1.0472,
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 		},
@@ -260,41 +302,49 @@ const SHIP_MODIFY = {
 			"SYSTEM_PDMWG-L":[
 				{
 					"property":"position",
-					"value":"Vector2( -200, 81 )"
+					"value":Vector2( -200, 81 ),
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 			"SYSTEM_SCOOP-L":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"SYSTEM_HUNK-L":[
 				{
 					"property":"rotation",
-					"value":"-0.174533"
+					"value":-0.174533,
+					
 				}
 			],
 			"SYSTEM_PDT-L":[
 				{
 					"property":"position",
-					"value":"Vector2( -190, 0 )"
+					"value":Vector2( -190, 0 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-1.0472"
+					"value":-1.0472,
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 		},
@@ -302,41 +352,49 @@ const SHIP_MODIFY = {
 			"SYSTEM_PDMWG-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 200, 81 )"
+					"value":Vector2( 200, 81 ),
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 			"SYSTEM_SCOOP-R":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"SYSTEM_HUNK-R":[
 				{
 					"property":"rotation",
-					"value":"0.174533"
+					"value":0.174533,
+					
 				}
 			],
 			"SYSTEM_PDT-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 190, 0 )"
+					"value":Vector2( 190, 0 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"1.0472"
+					"value":1.0472,
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 		}
@@ -346,11 +404,13 @@ const SHIP_MODIFY = {
 			"SYSTEM_HUNK-L":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 80 )"
+					"value":Vector2( 0, 80 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"0.174533"
+					"value":0.174533,
+					
 				}
 			]
 		},
@@ -358,11 +418,13 @@ const SHIP_MODIFY = {
 			"SYSTEM_HUNK-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 80 )"
+					"value":Vector2( 0, 80 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-0.174533"
+					"value":-0.174533,
+					
 				}
 			]
 		},
@@ -370,51 +432,61 @@ const SHIP_MODIFY = {
 			"SYSTEM_PDMWG-L":[
 				{
 					"property":"position",
-					"value":"Vector2( -150, 180 )"
+					"value":Vector2( -150, 180 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-2.0944"
+					"value":-2.0944,
+					
 				}
 			],
 			"SYSTEM_SCOOP-R":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"SYSTEM_SCOOP-L":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"SYSTEM_HUNK-L":[
 				{
 					"property":"rotation",
-					"value":"-0.174533"
+					"value":-0.174533,
+					
 				}
 			],
 			"SYSTEM_PDT-L":[
 				{
 					"property":"position",
-					"value":"Vector2( -146, 165 )"
+					"value":Vector2( -146, 165 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-2.0944"
+					"value":-2.0944,
+					
 				},
 				{
 					"property":"z_index",
-					"value":"18"
+					"value":18,
+					
 				}
 			]
 		},
@@ -422,51 +494,61 @@ const SHIP_MODIFY = {
 			"SYSTEM_PDMWG-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 150, 180 )"
+					"value":Vector2( 150, 180 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"2.0944"
+					"value":2.0944,
+					
 				}
 			],
 			"SYSTEM_SCOOP-R":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"SYSTEM_SCOOP-L":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"SYSTEM_HUNK-R":[
 				{
 					"property":"rotation",
-					"value":"0.174533"
+					"value":0.174533,
+					
 				}
 			],
 			"SYSTEM_PDT-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 146, 165 )"
+					"value":Vector2( 146, 165 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"2.0944"
+					"value":2.0944,
+					
 				},
 				{
 					"property":"z_index",
-					"value":"18"
+					"value":18,
+					
 				}
 			]
 		}
@@ -476,49 +558,58 @@ const SHIP_MODIFY = {
 			"SYSTEM_EXSTORAGE-L":[
 				{
 					"property":"position",
-					"value":"Vector2( 48, -86 )"
+					"value":Vector2( 48, -86 ),
+					
 				},
 				{
 					"property":"z_index",
-					"value":"-10"
+					"value":-10,
+					
 				}
 			],
 			"SYSTEM_CLAIM-L":[
 				{
 					"property":"position",
-					"value":"Vector2( 60, 60 )"
+					"value":Vector2( 60, 60 ),
+					
 				}
 			],
 			"SYSTEM_ACTEMD14":[
 				{
 					"property":"position",
-					"value":"Vector2( -15, 0 )"
+					"value":Vector2( -15, 0 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-0.0174533"
+					"value":-0.0174533,
+					
 				}
 			],
 			"SYSTEM_SCOOP-L":[
 				{
 					"property":"position",
-					"value":"Vector2( 52, -100 )"
+					"value":Vector2( 52, -100 ),
+					
 				}
 			],
 			"SYSTEM_HUNK-L":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 176 )"
+					"value":Vector2( 0, 176 ),
+					
 				}
 			],
 			"SYSTEM_EXMONO-L":[
 				{
 					"property":"position",
-					"value":"Vector2( 48, -86 )"
+					"value":Vector2( 48, -86 ),
+					
 				},
 				{
 					"property":"z_index",
-					"value":"-10"
+					"value":-10,
+					
 				}
 			]
 		},
@@ -526,49 +617,58 @@ const SHIP_MODIFY = {
 			"SYSTEM_EXSTORAGE-R":[
 				{
 					"property":"position",
-					"value":"Vector2( -48, -86 )"
+					"value":Vector2( -48, -86 ),
+					
 				},
 				{
 					"property":"z_index",
-					"value":"-10"
+					"value":-10,
+					
 				}
 			],
 			"SYSTEM_CLAIM-R":[
 				{
 					"property":"position",
-					"value":"Vector2( -60, 60 )"
+					"value":Vector2( -60, 60 ),
+					
 				}
 			],
 			"SYSTEM_ACTEMD14":[
 				{
 					"property":"position",
-					"value":"Vector2( 15, 0 )"
+					"value":Vector2( 15, 0 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"0.0174533"
+					"value":0.0174533,
+					
 				}
 			],
 			"SYSTEM_SCOOP-R":[
 				{
 					"property":"position",
-					"value":"Vector2( -52, -100 )"
+					"value":Vector2( -52, -100 ),
+					
 				}
 			],
 			"SYSTEM_HUNK-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 176 )"
+					"value":Vector2( 0, 176 ),
+					
 				}
 			],
 			"SYSTEM_EXMONO-R":[
 				{
 					"property":"position",
-					"value":"Vector2( -48, -86 )"
+					"value":Vector2( -48, -86 ),
+					
 				},
 				{
 					"property":"z_index",
-					"value":"-10"
+					"value":-10,
+					
 				}
 			]
 		}
@@ -578,7 +678,8 @@ const SHIP_MODIFY = {
 			"SYSTEM_CLAIM-L":[
 				{
 					"property":"position",
-					"value":"Vector2( 50, 60 )"
+					"value":Vector2( 50, 60 ),
+					
 				}
 			],
 		},
@@ -586,7 +687,8 @@ const SHIP_MODIFY = {
 			"SYSTEM_CLAIM-R":[
 				{
 					"property":"position",
-					"value":"Vector2( -50, 60 )"
+					"value":Vector2( -50, 60 ),
+					
 				}
 			],
 		},
@@ -596,25 +698,29 @@ const SHIP_MODIFY = {
 			"SYSTEM_EXSTORAGE-L":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 64 )"
+					"value":Vector2( 0, 64 ),
+					
 				}
 			],
 			"SYSTEM_CLAIM-L":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 64 )"
+					"value":Vector2( 0, 64 ),
+					
 				}
 			],
 			"SYSTEM_SCOOP-L":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 64 )"
+					"value":Vector2( 0, 64 ),
+					
 				}
 			],
 			"SYSTEM_EXMONO-L":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 64 )"
+					"value":Vector2( 0, 64 ),
+					
 				}
 			],
 		},
@@ -622,25 +728,29 @@ const SHIP_MODIFY = {
 			"SYSTEM_EXSTORAGE-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 64 )"
+					"value":Vector2( 0, 64 ),
+					
 				}
 			],
 			"SYSTEM_CLAIM-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 64 )"
+					"value":Vector2( 0, 64 ),
+					
 				}
 			],
 			"SYSTEM_SCOOP-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 64 )"
+					"value":Vector2( 0, 64 ),
+					
 				}
 			],
 			"SYSTEM_EXMONO-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 64 )"
+					"value":Vector2( 0, 64 ),
+					
 				}
 			],
 		},
@@ -650,11 +760,13 @@ const SHIP_MODIFY = {
 #			"SYSTEM_SALVAGE_ARM":[
 #				{
 #					"property":"flip",
-#					"value":"true"
+#					"value":true,
+#					
 #				},
 #				{
 #					"property":"feedVelocity",
-#					"value":"Vector2( -140, -280 )"
+#					"value":Vector2( -140, -280 ),
+#					
 #				},
 #			]
 #		},
@@ -662,7 +774,8 @@ const SHIP_MODIFY = {
 #			"SYSTEM_SALVAGE_ARM":[
 #				{
 #					"property":"feedVelocity",
-#					"value":"Vector2( 140, -280 )"
+#					"value":Vector2( 140, -280 ),
+#					
 #				},
 #			]
 #		},
@@ -672,21 +785,25 @@ const SHIP_MODIFY = {
 			"SYSTEM_HUNK-L":[
 				{
 					"property":"position",
-					"value":"Vector2( -40, 222 )"
+					"value":Vector2( -40, 222 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-0.523599"
+					"value":-0.523599,
+					
 				}
 			],
 			"SYSTEM_PDT-L":[
 				{
 					"property":"position",
-					"value":"Vector2( -124, 211 )"
+					"value":Vector2( -124, 211 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-2.0944"
+					"value":-2.0944,
+					
 				},
 			]
 		},
@@ -694,21 +811,25 @@ const SHIP_MODIFY = {
 			"SYSTEM_HUNK-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 40, 222 )"
+					"value":Vector2( 40, 222 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"0.523599"
+					"value":0.523599,
+					
 				}
 			],
 			"SYSTEM_PDT-R":[
 				{
 					"property":"position",
-					"value":"Vector2( 124, 211 )"
+					"value":Vector2( 124, 211 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"2.0944"
+					"value":2.0944,
+					
 				}
 			]
 		}

@@ -36,27 +36,32 @@ const SHIP_TEMPLATES = {
 			"MINING_COMPANIONS":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"IMPACT_ABSORBERS":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 80 )"
+					"value":Vector2( 0, 80 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"0.174533"
+					"value":0.174533,
+					
 				}
 			],
 			"LEFT_WEAPON_TURRETS":[
 				{
 					"property":"position",
-					"value":"Vector2( -69, -71 )"
+					"value":Vector2( -69, -71 ),
+					
 				}
 			]
 		},
@@ -64,27 +69,32 @@ const SHIP_TEMPLATES = {
 			"MINING_COMPANIONS":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"IMPACT_ABSORBERS":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 80 )"
+					"value":Vector2( 0, 80 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-0.174533"
+					"value":-0.174533,
+					
 				}
 			],
 			"RIGHT_WEAPON_TURRETS":[
 				{
 					"property":"position",
-					"value":"Vector2( 69, -71 )"
+					"value":Vector2( 69, -71 ),
+					
 				}
 			],
 		},
@@ -92,55 +102,65 @@ const SHIP_TEMPLATES = {
 			"MINING_COMPANIONS":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"IMPACT_ABSORBERS":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 80 )"
+					"value":Vector2( 0, 80 )
 				},
 				{
 					"property":"rotation",
-					"value":"-0.174533"
+					"value":-0.174533,
+					
 				}
 			],
 			"LEFT_WEAPON_TURRETS":[
 				{
 					"property":"position",
-					"value":"Vector2( -190, 0 )"
+					"value":Vector2( -190, 0 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-1.0472"
+					"value":-1.0472,
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 			"LEFT_MIKE_TURRETS":[
 				{
 					"property":"position",
-					"value":"Vector2( -200, 81 )"
+					"value":Vector2( -200, 81 ),
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 			"NANODRONES":[
 				{
 					"property":"position",
-					"value":"Vector2( -172, 142 )"
+					"value":Vector2( -172, 142 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-1.5708"
+					"value":-1.5708,
+					
 				},
 			]
 		},
@@ -148,55 +168,66 @@ const SHIP_TEMPLATES = {
 			"MINING_COMPANIONS":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"IMPACT_ABSORBERS":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 80 )"
+					"value":Vector2( 0, 80 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-0.174533"
+					"value":-0.174533,
+					
 				}
 			],
 			"LEFT_WEAPON_TURRETS":[
 				{
 					"property":"position",
-					"value":"Vector2( -190, 0 )"
+					"value":Vector2( -190, 0 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-1.0472"
+					"value":-1.0472,
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 			"LEFT_MIKE_TURRETS":[
 				{
 					"property":"position",
-					"value":"Vector2( -200, 81 )"
+					"value":Vector2( -200, 81 ),
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 			"NANODRONES":[
 				{
 					"property":"position",
-					"value":"Vector2( -172, 142 )"
+					"value":Vector2( -172, 142 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-1.5708"
+					"value":-1.5708,
+					
 				},
 			]
 		},
@@ -204,55 +235,66 @@ const SHIP_TEMPLATES = {
 			"MINING_COMPANIONS":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"IMPACT_ABSORBERS":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 80 )"
+					"value":Vector2( 0, 80 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-0.174533"
+					"value":-0.174533,
+					
 				}
 			],
 			"LEFT_WEAPON_TURRETS":[
 				{
 					"property":"position",
-					"value":"Vector2( -190, 0 )"
+					"value":Vector2( -190, 0 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-1.0472"
+					"value":-1.0472,
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 			"LEFT_MIKE_TURRETS":[
 				{
 					"property":"position",
-					"value":"Vector2( -200, 81 )"
+					"value":Vector2( -200, 81 ),
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 			"NANODRONES":[
 				{
 					"property":"position",
-					"value":"Vector2( -172, 142 )"
+					"value":Vector2( -172, 142 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-1.5708"
+					"value":-1.5708,
+					
 				},
 			]
 		},
@@ -260,55 +302,66 @@ const SHIP_TEMPLATES = {
 			"MINING_COMPANIONS":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"IMPACT_ABSORBERS":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 80 )"
+					"value":Vector2( 0, 80 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"0.174533"
+					"value":0.174533,
+					
 				}
 			],
 			"RIGHT_WEAPON_TURRETS":[
 				{
 					"property":"position",
-					"value":"Vector2( 190, 0 )"
+					"value":Vector2( 190, 0 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"1.0472"
+					"value":1.0472,
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 			"RIGHT_MIKE_TURRETS":[
 				{
 					"property":"position",
-					"value":"Vector2( 200, 81 )"
+					"value":Vector2( 200, 81 ),
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 			"NANODRONES":[
 				{
 					"property":"position",
-					"value":"Vector2( 172, 142 )"
+					"value":Vector2( 172, 142 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"1.5708"
+					"value":1.5708,
+					
 				},
 			]
 		},
@@ -316,55 +369,66 @@ const SHIP_TEMPLATES = {
 			"MINING_COMPANIONS":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"IMPACT_ABSORBERS":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 80 )"
+					"value":Vector2( 0, 80 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"0.174533"
+					"value":0.174533,
+					
 				}
 			],
 			"RIGHT_WEAPON_TURRETS":[
 				{
 					"property":"position",
-					"value":"Vector2( 190, 0 )"
+					"value":Vector2( 190, 0 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"1.0472"
+					"value":1.0472,
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 			"RIGHT_MIKE_TURRETS":[
 				{
 					"property":"position",
-					"value":"Vector2( 200, 81 )"
+					"value":Vector2( 200, 81 ),
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 			"NANODRONES":[
 				{
 					"property":"position",
-					"value":"Vector2( 172, 142 )"
+					"value":Vector2( 172, 142 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"1.5708"
+					"value":1.5708,
+					
 				},
 			]
 		},
@@ -372,55 +436,66 @@ const SHIP_TEMPLATES = {
 			"MINING_COMPANIONS":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"IMPACT_ABSORBERS":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 80 )"
+					"value":Vector2( 0, 80 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"0.174533"
+					"value":0.174533,
+					
 				}
 			],
 			"RIGHT_WEAPON_TURRETS":[
 				{
 					"property":"position",
-					"value":"Vector2( 190, 0 )"
+					"value":Vector2( 190, 0 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"1.0472"
+					"value":1.0472,
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 			"RIGHT_MIKE_TURRETS":[
 				{
 					"property":"position",
-					"value":"Vector2( 200, 81 )"
+					"value":Vector2( 200, 81 ),
+					
 				},
 				{
 					"property":"z_index",
-					"value":"27"
+					"value":27,
+					
 				}
 			],
 			"NANODRONES":[
 				{
 					"property":"position",
-					"value":"Vector2( 172, 142 )"
+					"value":Vector2( 172, 142 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"1.5708"
+					"value":1.5708,
+					
 				},
 			]
 		},
@@ -430,11 +505,13 @@ const SHIP_TEMPLATES = {
 			"IMPACT_ABSORBERS":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 80 )"
+					"value":Vector2( 0, 80 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"0.174533"
+					"value":0.174533,
+					
 				}
 			]
 		},
@@ -442,11 +519,13 @@ const SHIP_TEMPLATES = {
 			"IMPACT_ABSORBERS":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 80 )"
+					"value":Vector2( 0, 80 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-0.174533"
+					"value":-0.174533,
+					
 				}
 			]
 		},
@@ -454,41 +533,49 @@ const SHIP_TEMPLATES = {
 			"LEFT_MIKE_TURRETS":[
 				{
 					"property":"position",
-					"value":"Vector2( -150, 180 )"
+					"value":Vector2( -150, 180 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-2.0944"
+					"value":-2.0944,
+					
 				}
 			],
 			"MINING_COMPANIONS":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"IMPACT_ABSORBERS":[
 				{
 					"property":"rotation",
-					"value":"-0.174533"
+					"value":-0.174533,
+					
 				}
 			],
 			"LEFT_WEAPON_TURRETS":[
 				{
 					"property":"position",
-					"value":"Vector2( -146, 165 )"
+					"value":Vector2( -146, 165 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-2.0944"
+					"value":-2.0944,
+					
 				},
 				{
 					"property":"z_index",
-					"value":"18"
+					"value":18,
+					
 				}
 			]
 		},
@@ -496,41 +583,49 @@ const SHIP_TEMPLATES = {
 			"RIGHT_MIKE_TURRETS":[
 				{
 					"property":"position",
-					"value":"Vector2( 150, 180 )"
+					"value":Vector2( 150, 180 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"2.0944"
+					"value":2.0944,
+					
 				}
 			],
 			"MINING_COMPANIONS":[
 				{
 					"property":"command",
-					"value":"\"\""
+					"value":"",
+					
 				},
 				{
 					"property":"passFireAsCommand",
-					"value":"\"\""
+					"value":"",
+					
 				}
 			],
 			"IMPACT_ABSORBERS":[
 				{
 					"property":"rotation",
-					"value":"0.174533"
+					"value":0.174533,
+					
 				}
 			],
 			"RIGHT_WEAPON_TURRETS":[
 				{
 					"property":"position",
-					"value":"Vector2( 146, 165 )"
+					"value":Vector2( 146, 165 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"2.0944"
+					"value":2.0944,
+					
 				},
 				{
 					"property":"z_index",
-					"value":"18"
+					"value":18,
+					
 				}
 			]
 		}
@@ -540,39 +635,46 @@ const SHIP_TEMPLATES = {
 			"CARGO_CONTAINERS":[
 				{
 					"property":"position",
-					"value":"Vector2( 48, -86 )"
+					"value":Vector2( 48, -86 ),
+					
 				},
 				{
 					"property":"z_index",
-					"value":"-10"
+					"value":-10,
+					
 				}
 			],
 			"CLAIM_BEACONS":[
 				{
 					"property":"position",
-					"value":"Vector2( 60, 60 )"
+					"value":Vector2( 60, 60 ),
+					
 				}
 			],
 			"GIMBALS":[
 				{
 					"property":"position",
-					"value":"Vector2( -15, 0 )"
+					"value":Vector2( -15, 0 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-0.0174533"
+					"value":-0.0174533,
+					
 				}
 			],
 			"MINING_COMPANIONS":[
 				{
 					"property":"position",
-					"value":"Vector2( 52, -100 )"
+					"value":Vector2( 52, -100 ),
+					
 				}
 			],
 			"IMPACT_ABSORBERS":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 176 )"
+					"value":Vector2( 0, 176 ),
+					
 				}
 			]
 		},
@@ -580,39 +682,46 @@ const SHIP_TEMPLATES = {
 			"CARGO_CONTAINERS":[
 				{
 					"property":"position",
-					"value":"Vector2( -48, -86 )"
+					"value":Vector2( -48, -86 ),
+					
 				},
 				{
 					"property":"z_index",
-					"value":"-10"
+					"value":-10,
+					
 				}
 			],
 			"CLAIM_BEACONS":[
 				{
 					"property":"position",
-					"value":"Vector2( -60, 60 )"
+					"value":Vector2( -60, 60 ),
+					
 				}
 			],
 			"GIMBALS":[
 				{
 					"property":"position",
-					"value":"Vector2( 15, 0 )"
+					"value":Vector2( 15, 0 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"0.0174533"
+					"value":0.0174533,
+					
 				}
 			],
 			"MINING_COMPANIONS":[
 				{
 					"property":"position",
-					"value":"Vector2( -52, -100 )"
+					"value":Vector2( -52, -100 ),
+					
 				}
 			],
 			"IMPACT_ABSORBERS":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 176 )"
+					"value":Vector2( 0, 176 ),
+					
 				}
 			]
 		}
@@ -622,7 +731,8 @@ const SHIP_TEMPLATES = {
 			"CLAIM_BEACONS":[
 				{
 					"property":"position",
-					"value":"Vector2( 50, 60 )"
+					"value":Vector2( 50, 60 ),
+					
 				}
 			],
 		},
@@ -630,7 +740,8 @@ const SHIP_TEMPLATES = {
 			"CLAIM_BEACONS":[
 				{
 					"property":"position",
-					"value":"Vector2( -50, 60 )"
+					"value":Vector2( -50, 60 ),
+					
 				}
 			],
 		},
@@ -640,25 +751,28 @@ const SHIP_TEMPLATES = {
 			"CARGO_CONTAINERS":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 64 )"
+					"value":Vector2( 0, 64 ),
+					
 				}
 			],
 			"CRADLES":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 64 )"
+					"value":Vector2( 0, 64 ),
+					
 				}
 			],
 			"CLAIM_BEACONS":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 64 )"
+					"value":Vector2( 0, 64 )
 				}
 			],
 			"MINING_COMPANIONS":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 64 )"
+					"value":Vector2( 0, 64 ),
+					
 				}
 			],
 		},
@@ -666,25 +780,29 @@ const SHIP_TEMPLATES = {
 			"CARGO_CONTAINERS":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 64 )"
+					"value":Vector2( 0, 64 ),
+					
 				}
 			],
 			"CRADLES":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 64 )"
+					"value":Vector2( 0, 64 ),
+					
 				}
 			],
 			"CLAIM_BEACONS":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 64 )"
+					"value":Vector2( 0, 64 ),
+					
 				}
 			],
 			"MINING_COMPANIONS":[
 				{
 					"property":"position",
-					"value":"Vector2( 0, 64 )"
+					"value":Vector2( 0, 64 ),
+					
 				}
 			],
 		},
@@ -694,11 +812,13 @@ const SHIP_TEMPLATES = {
 			"MANIPULATION_ARMS":[
 				{
 					"property":"flip",
-					"value":"true"
+					"value":true,
+					
 				},
 				{
 					"property":"feedVelocity",
-					"value":"Vector2( -140, -280 )"
+					"value":Vector2( -140, -280 ),
+					
 				},
 			]
 		},
@@ -706,7 +826,8 @@ const SHIP_TEMPLATES = {
 			"MANIPULATION_ARMS":[
 				{
 					"property":"feedVelocity",
-					"value":"Vector2( 140, -280 )"
+					"value":Vector2( 140, -280 ),
+					
 				},
 			]
 		},
@@ -716,21 +837,25 @@ const SHIP_TEMPLATES = {
 			"IMPACT_ABSORBERS":[
 				{
 					"property":"position",
-					"value":"Vector2( -40, 222 )"
+					"value":Vector2( -40, 222 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-0.523599"
+					"value":-0.523599,
+					
 				}
 			],
 			"LEFT_WEAPON_TURRETS":[
 				{
 					"property":"position",
-					"value":"Vector2( -124, 211 )"
+					"value":Vector2( -124, 211 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"-2.0944"
+					"value":-2.0944,
+					
 				},
 			]
 		},
@@ -738,21 +863,25 @@ const SHIP_TEMPLATES = {
 			"IMPACT_ABSORBERS":[
 				{
 					"property":"position",
-					"value":"Vector2( 40, 222 )"
+					"value":Vector2( 40, 222 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"0.523599"
+					"value":0.523599,
+					
 				}
 			],
 			"RIGHT_WEAPON_TURRETS":[
 				{
 					"property":"position",
-					"value":"Vector2( 124, 211 )"
+					"value":Vector2( 124, 211 ),
+					
 				},
 				{
 					"property":"rotation",
-					"value":"2.0944"
+					"value":2.0944,
+					
 				}
 			]
 		}

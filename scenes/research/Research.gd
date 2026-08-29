@@ -46,7 +46,7 @@ func show():
 	$Shower.play("show")
 	var actives = current_project_management.get_node("VBoxContainer/ScrollContainer/Projects")
 	if actives.get_child_count() > 0:
-		var first = actives.get_child(0).get_node("Progress/Button")
+		var first = actives.get_child(0).get_node("Progress/Name")
 		first.grab_focus()
 	if visible:
 		hide()
