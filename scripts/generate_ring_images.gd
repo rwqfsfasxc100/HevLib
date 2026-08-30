@@ -50,9 +50,8 @@ static func generate(data: Dictionary = {}):
 	file.open("user://logs/ring_image_log_%s.txt" % thread_num,File.WRITE)
 	file.store_string("Ring Image Generator [%s] INITIALIZED!\n\nProcess started at time [%s]\n\n" % [thread_num,Time.get_datetime_string_from_system(true,true)])
 	file.close()
-	var RingInfo = preload("res://HevLib/pointers/RingInfo.gd")
-	var FolderAccess = preload("res://HevLib/pointers/FolderAccess.gd")
-	FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/image_gen")
+	var pointers = ModLoader._savedObjects[0]
+	pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/image_gen")
 	var offset = 1
 	var tex_path = "user://cache/.HevLib_Cache/image_gen/pixel_%s.png" % thread_num
 	var tex_path2 = "user://cache/.HevLib_Cache/image_gen/chaos_%s.png" % thread_num
@@ -81,12 +80,12 @@ static func generate(data: Dictionary = {}):
 		for y in range(v_index * height,height + (v_index * height)):
 #			l("Operating on row %s at offset [%s]" % [y,thread_num],thread_num)
 			var point = Vector2(x,y)
-			var it = RingInfo.__get_pixel_at(point*10000)
+			var it = pointers.RingInfo.__get_pixel_at(point*10000)
 			img.set_pixelv(point - Vector2(width * h_index + offset,height * v_index),it)
 			img2.set_pixelv(point - Vector2(width * h_index + offset,height * v_index),Color(it.r,0,0,1))
 			img3.set_pixelv(point - Vector2(width * h_index + offset,height * v_index),Color(0,0,it.b,1))
 			if generate_vein:
-				var v = RingInfo.__get_vein_pixel_at(point*10000 * factor)
+				var v = pointers.RingInfo.__get_vein_pixel_at(point*10000 * factor)
 				img4.set_pixelv(point - Vector2(width * h_index + offset,height * v_index),v)
 			var chaos = str(it.r)
 			var rnd = float(chaos.substr(0,5))

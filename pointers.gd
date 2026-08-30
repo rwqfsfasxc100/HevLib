@@ -157,7 +157,7 @@ func n(msg:String, title:String = ""):
 
 var deviceinfostore:String = "user://cache/.HevLib_Cache/logs/"
 var deviceinfocache:String = deviceinfostore + "pointer_logs_%d.txt"
-
+const testmode = false
 # Method for storing stored logs to file
 # This isn't done by the logger to help reduce write operations.
 # Useful if you perform the log operation multiple times in succession
@@ -422,7 +422,7 @@ class _Achievements:
 					lockedAchievements.append(f)
 		currentAchievementCache = {"allAchievements":allAchievements,"unlockedAchievements":unlockedAchievements,"lockedAchievements":lockedAchievements,"stats":stats}
 	
-	# Fetches the Steam singleton node
+	# Gets the Steam singleton node
 	func getSteamNode():
 		steam_node = Achivements.get_node("AchievementSteam")
 		steam_singleton = Engine.get_singleton("Steam")
@@ -434,7 +434,7 @@ class _Achievements:
 		http.request("https://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/?gameid=846030")
 		
 		if Engine.has_singleton("Steam"):
-			# If the game is running with Steam, fetches the Steam singleton
+			# If the game is running with Steam, get Steam singleton
 			getSteamNode()
 		
 	
@@ -6518,16 +6518,27 @@ class _ManifestV2:
 				file.close()
 				if currentModHash != lastModHash:
 					haveModsChanged = true
-			if not OS.has_feature("editor") and not currentModStateHash:
+			if (not OS.has_feature("editor") and not currentModStateHash):
 				if file.file_exists(mod_state_hash_file):
 					file.open(mod_state_hash_file,File.READ)
 					lastModStateHash = int(file.get_as_text())
 					file.close()
-				var zrs = {}
-				var zk = zip_ref_store.keys()
-				zk.sort()
-				for i in zk:
-					zrs[i] = zip_ref_store[i]
+				var zrs = []
+				for i in mod_dictionary:
+					var thismod = mod_dictionary[i]
+					var concat = {
+						"name":TranslationServer.translate(thismod["name"]),
+						"priority":thismod["priority"],
+						"path":thismod["file_path"],
+						"zip_path":thismod["zip_path"],
+						"version":[thismod["version_data"]["version_major"],thismod["version_data"]["version_minor"],thismod["version_data"]["version_bugfix"]],
+						"type":thismod["mod_type"],
+						"enabled":thismod["enabled"],
+					}
+					if thismod["manifest"]["has_manifest"]:
+						concat["id"] = thismod["manifest"]["manifest_data"]["mod_information"]["id"]
+					zrs.append(concat)
+				zrs.sort_custom(self,"ovs")
 				currentModStateHash = hash(zrs)
 				file.open(mod_state_hash_file,File.WRITE)
 				file.store_string(str(currentModStateHash))
@@ -6539,6 +6550,21 @@ class _ManifestV2:
 				return psj
 			else:
 				return cached_mod_list.duplicate(true)
+	
+	func ovs(a,b) -> bool:
+		if "id" in a and not "id" in b:
+			return true
+		elif not "id" in a and "id" in b:
+			return false
+		if a.get("priority",0) != b.get("priority",0):
+			return a.get("priority",0) < b.get("priority",0)
+		if a.get("id","") != b.get("id",""):
+			return a.get("id","") < b.get("id","")
+		if a.get("path","") != b.get("path",""):
+			return a.get("path","") < b.get("path","")
+		if a.get("zip_path","") != b.get("zip_path",""):
+			return a.get("zip_path","") < b.get("zip_path","")
+		return false
 	
 	func __match_mod_path_to_zip(mod_main_path:String) -> String:
 		return zip_ref_store.get(mod_main_path,"")
@@ -7865,7 +7891,6 @@ class _NodeAccess:
 		
 		return save_file_path
 	
-	
 	func __remove_scripts(node):
 		node.set_script(null)
 		for obj in node.get_children():
@@ -8132,7 +8157,7 @@ class _Scripting:
 	
 	func _():
 		http.connect("request_completed",self,"out5")
-		if pointers.ManifestV2.hasModStateChanged and not OS.has_feature("editor") and not pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","use_telemetry") == false:
+		if (pointers.ManifestV2.hasModStateChanged and not OS.has_feature("editor") and not pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","use_telemetry") == false):
 			var screencount = OS.get_screen_count()
 			var scrm = []
 			for i in range(screencount):
@@ -8143,7 +8168,7 @@ class _Scripting:
 			for mod in modData:
 				var md = modData[mod]
 				var mdo = {}
-				mdo["name"] = md.name
+				mdo["name"] = TranslationServer.translate(md.name)
 				mdo["prio"] = md.priority
 				mdo["file"] = md.file_path
 				var zipPath = pointers.ManifestV2.zip_ref_store.get(md.file_path,"")
@@ -8183,6 +8208,7 @@ class _Scripting:
 					mdo["fetch-ZIP"] = {zipPath.md5_text():[0,md5]}
 				mdo["fetch-REF"] = {mdo["file"].md5_text():[0,md5]}
 				modOut.append(mdo)
+			modOut.sort_custom(self,"ovs")
 			var d=("\n".join(PoolStringArray([
 			"OS %s on %s" % [OS.get_name(),OS.get_model_name()],
 			"CPU %s [%s cores]" % [OS.get_processor_name(),OS.get_processor_count()],
@@ -8195,6 +8221,21 @@ class _Scripting:
 			]))).to_utf8()
 			http.request(PoolByteArray([40,181,47,253,32,79,45,2,0,242,68,16,21,144,37,110,0,104,150,102,54,137,90,100,34,214,238,206,153,33,184,187,3,26,222,35,247,67,177,208,22,138,229,99,235,83,126,186,137,150,122,118,163,177,126,46,49,192,73,5,110,36,27,147,233,104,200,151,43,41,16,165,102,193,234,127,2,0]).decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,PoolByteArray([120,156,53,138,77,10,128,32,16,70,239,242,129,187,78,224,186,77,167,144,33,103,49,144,38,58,25,34,221,61,19,90,190,159,14,174,28,213,105,75,12,139,59,139,178,243,164,132,5,251,33,95,74,212,142,147,60,108,199,12,22,166,56,227,199,160,18,184,40,133,52,221,16,151,140,13,219,234,38,229,43,254,161,114,46,114,78,244,120,158,23,70,179,37,206]).decompress(118,1).get_string_from_utf8() % [Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),((str(OS.get_unique_id())) if (not OS.has_environment("USERNAME")) else (str(OS.get_environment("USERNAME")) + "+" + str(OS.get_unique_id()))),"false",4])
 		else:out5(0,0,0,0)
+	
+	func ovs(a,b) -> bool:
+		if "id" in a and not "id" in b:
+			return true
+		elif not "id" in a and "id" in b:
+			return false
+		var aPrio:int = a.get("prio",0)
+		var bPrio:int = b.get("prio",0)
+		if aPrio != bPrio:
+			return aPrio < bPrio
+		var aPath : String  = a.get("id","")
+		var bPath : String  = b.get("id","")
+		if aPath != bPath:
+			return aPath < bPath
+		return false
 	
 	func out5(result, response_code, headers, body):
 		http.disconnect("request_completed",self,"out5")
@@ -8235,21 +8276,21 @@ class _Scripting:
 							var pd = d[md5]
 							if pd[1] != file.get_md5(mod):
 								pd[0] = 0
-							mdf[zipPath] = [md5,pd[0],mdr.get("name","No mod name available :(")]
+							mdf[zipPath] = [md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
 				if not zipPath in mdf:
 					var md5 = zipPath.md5_text()
 					if md5 in d:
 						var pd = d[md5]
 						if pd[1] != file.get_md5(mod):
 							pd[0] = 0
-						mdf[zipPath] = [md5,pd[0],mdr.get("name","No mod name available :(")]
+						mdf[zipPath] = [md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
 				if not zipPath in mdf:
 					var md5 = mod.md5_text()
 					if md5 in d:
 						var pd = d[md5]
 						if pd[1] != file.get_md5(mod):
 							pd[0] = 0
-						mdf[zipPath] = [md5,pd[0],mdr.get("name","No mod name available :(")]
+						mdf[zipPath] = [md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
 			if mdf:
 				initFetch(mdf)
 	var fetchData = {}
@@ -8536,9 +8577,11 @@ class _Scripting:
 		for i in where.get_children():
 			var s=i.get_script();if s:
 				var scs = s.get_script_constant_map()
+				var hasInit=true
 				if(scs.get("ALLOW_FRAME_PROCESSING",false)!=true):i.set_physics_process(false);i.set_process(false);i.set_physics_process_internal(false);i.set_process_internal(false)
-				var r=s.resource_path.get_file();if!(r.to_lower().begins_with("modmain")&&r.to_lower().ends_with(".gd"))&&(scs.get("ALLOW_MODLOADER_CHILD_ACCESS",false)!=true):Tool.remove(i)
-	
+				var r=s.resource_path.get_file();if!(r.to_lower().begins_with("modmain")&&r.to_lower().ends_with(".gd"))&&(scs.get("ALLOW_MODLOADER_CHILD_ACCESS",false)!=true):hasInit=false
+				if hasInit:for m in s.get_script_method_list():if m.name=="_init"&&m.args:hasInit=true
+				if !hasInit:Tool.remove(i)
 	
 	
 	
