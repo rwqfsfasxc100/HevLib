@@ -8082,7 +8082,7 @@ class _SafeMode:
 				offendingFileCount += 1
 				if crash:
 					safeCheckTriggered = true
-			elif not safeCheckTriggered and file_path.get_extension() == "gd" and file_path.split("/",false)[1] != pointers.resource_path.split("/",false)[1] and not pointers.DriverManagement.__is_driver_file(file_path):
+			elif not safeCheckTriggered and file_path.get_extension() == "gd" and not pointers.DriverManagement.__is_driver_file(file_path) and file_path.split("/",false)[1] != pointers.resource_path.split("/",false)[1]:
 				file.open(file_path,File.READ)
 				var tex = file.get_as_text(true)
 				file.close()

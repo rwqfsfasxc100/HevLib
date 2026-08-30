@@ -63,11 +63,11 @@ func _init(modLoader : ModLoader = ModLoader):
 	if modLoader._savedObjects:
 		var new_objects = [pointers]
 		var firstItemCheck = modLoader._savedObjects[0]
-		if firstItemCheck is Resource:
-			var RP = firstItemCheck.resource_path
-			if RP == "res://HevLib/pointers.gd" or RP == pointerDir:OS.alert("HevLib is double-loaded. Please remove any extra zip files and restart the game.")
+		if "resource_path" in firstItemCheck:
+			var RP=firstItemCheck.resource_path
+			if RP=="res://HevLib/pointers.gd"or RP==pointerDir:OS.alert("HevLib is double-loaded. Please remove any extra zip files and restart the game.")
 		for i in modLoader._savedObjects:new_objects.append(i)
-		modLoader._savedObjects = new_objects
+		modLoader._savedObjects=new_objects
 	else:modLoader._savedObjects.append(pointers)
 	l("Initializing Equipment Driver")
 	pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/")
@@ -325,19 +325,8 @@ func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
 	pointers.l(msg,line)
 
 func testing():
-#	var shadow_tool = load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
-#	var time = (OS.get_unix_time_from_datetime({"day": 16, "hour": 11, "minute": 50, "month": 9, "second": 0, "year": 2273})) / (168.0 * 3600.0)
-#	var t2 = time - floor(time)
-#	var t3 = abs((t2*7) - 7)
-#	var v : Array = PoolStringArray()
-#	var can : Script = load("res://AymursEquipmentSuite/ModMain.gd").can_instance()
-#	var can : Script = load("res://HevLib/ModMain.gd")
-#	var prop = can.can_instance()
-#	var spath = "res://asteroids/asteroid.gd"
-#	var out = shadow_tool.__make_shadow_of_script(spath,[],[],[])
-#	yield(pointers.Zip.__load_pck("C:\\Program Files (x86)\\Steam\\steamapps\\common\\dV Rings of Saturn\\Delta-V.pck",true,true,100),"completed")
-#	var F = pointers.Zip.Files
-#	var can = pointers.ConfigDriver.__validate_dictionary({"mod_requirements":[[["hev.LIBRARY",1,0,0,1,16,0]]]})
+	
+	
 	
 	
 	

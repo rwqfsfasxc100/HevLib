@@ -84,6 +84,7 @@ func _ready():
 	var tag_exists = pointers.ManifestV2.__get_tags()
 	var research_store = pointers.Equipment.research_store
 	if research_store.empty():
+		research_button.get_parent().remove_child(research_button)
 		Tool.remove(research_button)
 	else:
 		var state = CurrentGame.state

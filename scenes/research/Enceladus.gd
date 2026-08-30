@@ -40,7 +40,7 @@ func _ready():
 	buttonList.add_child(researchButton)
 	buttonList.move_child(researchButton,5)
 	var research_panel = load("res://HevLib/scenes/research/Research.tscn").instance()
+	research_panel.research_button = researchButton
 	menusContainer.add_child(research_panel)
 	menusContainer.move_child(research_panel,5)
-	research_panel.research_button = researchButton
 	researchButton.connect("pressed",research_panel,"_on_Research_pressed")
