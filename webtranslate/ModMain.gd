@@ -56,8 +56,7 @@ func _init(webtranslate_modmain = self):
 func _ready():
 #	l("Readying")
 	
-	# var WebTranslate = preload("res://HevLib/pointers/WebTranslate.gd")
-	# WebTranslate.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]], "res://HevLib/webtranslate/ModMain.gd")
+	# pointers.WebTranslate.__webtranslate("https://github.com/rwqfsfasxc100/HevLib",[[modPath + "i18n/en.txt", "|"]], "res://HevLib/webtranslate/ModMain.gd")
 	
 #	loadTranslationsFromCache()
 	if correct:
