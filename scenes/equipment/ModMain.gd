@@ -75,7 +75,7 @@ func _init(modLoader : ModLoader = ModLoader):
 	directory.make_dir_recursive(variables_folder)
 	pointers.FileAccess.__load_precached_mods()
 	
-#	testing()
+	testing()
 	
 	var scv = pointers.FolderAccess.__fetch_folder_files(variables_folder,false,true)
 	for s in scv:
@@ -325,7 +325,7 @@ func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
 	pointers.l(msg,line)
 
 func testing():
-	
+	var files = pointers.Zip.__get_zip_file_names("C:/Program Files (x86)/Steam/steamapps/common/dV Rings of Saturn/mods/HevLib.zip")
 	
 	
 	

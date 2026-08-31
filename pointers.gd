@@ -1932,7 +1932,27 @@ class _DataFormat:
 					"return":[
 						"int for the 32 bit checksum"
 					]
-				}
+				},
+				"__get_uint32_from_buffer":{
+					"description":"Fetches the next 32 bits from a PoolByteArray and provides it as an unsigned 32 bit int",
+					"args":[
+						"buffer -> (PoolByteArray) bytes fetch the integer from",
+						"offset (optional) -> (int) the position to offset the bytes to fetch. Defaults to 0"
+					],
+					"return":[
+						"int for the unsigned 32 bit value"
+					]
+				},
+				"__get_uint16_from_buffer":{
+					"description":"Fetches the next 16 bits from a PoolByteArray and provides it as an unsigned 16 bit int",
+					"args":[
+						"buffer -> (PoolByteArray) bytes fetch the integer from",
+						"offset (optional) -> (int) the position to offset the bytes to fetch. Defaults to 0"
+					],
+					"return":[
+						"int for the unsigned 16 bit value"
+					]
+				},
 			}
 		}
 	
@@ -2760,7 +2780,13 @@ class _DataFormat:
 		for k in bytes:
 			crc = __to_uint32((crc >> 8) ^ crc_table[(crc & 0xff) ^ k])
 		return __to_uint32(crc ^ 0xffffffff)
-		
+	
+	func __get_uint32_from_buffer(buffer: PoolByteArray, offset: int = 0) -> int:
+		return buffer[offset] | (buffer[offset + 1] << 8) | (buffer[offset + 2] << 16) | (buffer[offset + 3] << 24)
+	
+	func __get_uint16_from_buffer(buffer: PoolByteArray, offset: int = 0) -> int:
+		return buffer[offset] | (buffer[offset + 1] << 8)
+	
 	
 class _DriverManagement:
 	var scripts : Array = [
@@ -9051,8 +9077,8 @@ class _Zip:
 	func _init(p):
 		pointers = p
 	
-	var file = File.new()
-	var dir = Directory.new()
+	var file:File = File.new()
+	var dir:Directory = Directory.new()
 	func __get_zip_content(path:String, stripFolder:bool = false, lowerCase:bool = false):
 		var listOfNames = []
 		var g = gdunzip.new()
@@ -9190,200 +9216,71 @@ class _Zip:
 		pointers.l("Finished fetching PCK data, fetched %d files" % Contents.size(),"pointers.Zip")
 		return Contents
 	
-	func __create_zip(base_directory:String,paths:PoolStringArray,destination:String):
-		var filenames:PoolStringArray = PoolStringArray()
-		if not base_directory.ends_with("/"):
-			base_directory += "/"
-		for path in paths:
-			var full_filepath = base_directory + path
-			if dir.file_exists(full_filepath):
-				filenames.append(path)
-			elif dir.dir_exists(full_filepath):
-				if not path.ends_with("/"):
-					path += "/"
-				if not full_filepath.ends_with("/"):
-					full_filepath += "/"
-				filenames.append(path)
-				for subpath in PoolStringArray(pointers.FolderAccess.__fetch_folder_files(full_filepath,true,false,false,true)):
-					filenames.append(path + subpath)
-				
-		
-		
-		var buffer : PoolByteArray = PoolByteArray()
-		var file_refs:Dictionary = {}
-		
-		for file_name in filenames:
-			var offset = buffer.size()
-			buffer = pointers.DataFormat.__reserve_in_array(buffer,30)
-			
-			var compressed = PoolByteArray()
-			var bytes = PoolByteArray()
-			
-			var full_path = base_directory + file_name
-			if file.file_exists(full_path):
-				file.open(full_path,File.READ)
-				bytes = file.get_buffer(file.get_len())
-				file.close()
-				compressed = bytes.compress(1)
-			
-			var useCompressed = false
-			if compressed.size() < (bytes.size() - 15):
-				useCompressed = true
-			
-			buffer[offset] = 0x50
-			buffer[offset+1] = 0x4B
-			buffer[offset+2] = 0x03
-			buffer[offset+3] = 0x04
-			buffer[offset+4] = 0x14
-			
-			if useCompressed:
-				buffer[offset+8] = 0x08
-			
-			var timestamp = Time.get_datetime_dict_from_unix_time(file.get_modified_time(full_path))
-			var dos_time = ((timestamp.hour << 11) | (timestamp.minute << 5) | (int(floor(timestamp.second / 2.0))))
-			var dos_date = (((timestamp.year - 1980) << 9) | (timestamp.month << 5) | timestamp.day)
-			buffer[offset+10] = (dos_time & 0xFF)
-			buffer[offset+11] = (dos_time & 0xFF00) >> 8
-			buffer[offset+12] = (dos_date & 0xFF)
-			buffer[offset+13] = (dos_date & 0xFF00) >> 8
-			
-			# CRC 32 checksum, although it looks like it might not be always
-			# required as WinRAR accepts a zeroed CRC32
-			var crc = pointers.DataFormat.__get_crc_32(bytes)
-			buffer[offset+14] = (crc & 0xFF)
-			buffer[offset+15] = (crc & 0xFF00) >> 8
-			buffer[offset+16] = (crc & 0xFF0000) >> 16
-			buffer[offset+17] = (crc & 0xFF000000) >> 24
-			var decompressedSize = pointers.DataFormat.__to_uint32(bytes.size())
-			var compressedSize = pointers.DataFormat.__to_uint32(compressed.size())
-			if useCompressed:
-				buffer[offset+18] = (compressedSize & 0xFF)
-				buffer[offset+19] = (compressedSize & 0xFF00) >> 8
-				buffer[offset+20] = (compressedSize & 0xFF0000) >> 16
-				buffer[offset+21] = (compressedSize & 0xFF000000) >> 24
-			else:
-				buffer[offset+18] = (decompressedSize & 0xFF)
-				buffer[offset+19] = (decompressedSize & 0xFF00) >> 8
-				buffer[offset+20] = (decompressedSize & 0xFF0000) >> 16
-				buffer[offset+21] = (decompressedSize & 0xFF000000) >> 24
-			buffer[offset+22] = (decompressedSize & 0xFF)
-			buffer[offset+23] = (decompressedSize & 0xFF00) >> 8
-			buffer[offset+24] = (decompressedSize & 0xFF0000) >> 16
-			buffer[offset+25] = (decompressedSize & 0xFF000000) >> 24
-			
-			var name_len = file_name.length()
-			buffer[offset+26] = (name_len & 0xFF)
-			buffer[offset+27] = (name_len & 0xFF00) >> 8
-			
-			buffer = pointers.DataFormat.__reserve_in_array(buffer,name_len)
-			var nameBytes = file_name.to_utf8()
-			for i in range(name_len):
-				buffer[offset+30+i] = nameBytes[i]
-			if useCompressed:
-				var boffsetnow = buffer.size()
-				buffer = pointers.DataFormat.__reserve_in_array(buffer,compressedSize)
-				for i in range(compressedSize):
-					buffer[boffsetnow+i] = compressed[i]
-			else:
-				var boffsetnow = buffer.size()
-				buffer = pointers.DataFormat.__reserve_in_array(buffer,decompressedSize)
-				for i in range(decompressedSize):
-					buffer[boffsetnow+i] = bytes[i]
-			file_refs[file_name] = {
-				"offset":offset,
-				"crc32":crc,
-				"is_compressed":useCompressed,
-				"compressed_size":compressedSize,
-				"decompressed_size":decompressedSize,
-				"file_name_length":name_len,
-				"date":dos_date,
-				"time":dos_time,
-			}
-		var CDFH_offset = buffer.size()
-		
-		for file_name in filenames:
-			var ref_data = file_refs[file_name]
-			var offset = buffer.size()
-			buffer = pointers.DataFormat.__reserve_in_array(buffer,46)
-			buffer[offset] = 0x50
-			buffer[offset+1] = 0x4B
-			buffer[offset+2] = 0x01
-			buffer[offset+3] = 0x02
-			buffer[offset+4] = 0x1F
-			buffer[offset+6] = 0x14
-			
-			if ref_data.is_compressed:
-				buffer[offset+10] = 0x08
-			
-			buffer[offset+12] = (ref_data.time & 0xFF)
-			buffer[offset+13] = (ref_data.time & 0xFF00) >> 8
-			buffer[offset+14] = (ref_data.date & 0xFF)
-			buffer[offset+15] = (ref_data.date & 0xFF00) >> 8
-			
-			buffer[offset+16] = (ref_data.crc32 & 0xFF)
-			buffer[offset+17] = (ref_data.crc32 & 0xFF00) >> 8
-			buffer[offset+18] = (ref_data.crc32 & 0xFF0000) >> 16
-			buffer[offset+19] = (ref_data.crc32 & 0xFF000000) >> 24
-			
-			buffer[offset+20] = (ref_data.compressed_size & 0xFF)
-			buffer[offset+21] = (ref_data.compressed_size & 0xFF00) >> 8
-			buffer[offset+22] = (ref_data.compressed_size & 0xFF0000) >> 16
-			buffer[offset+23] = (ref_data.compressed_size & 0xFF000000) >> 24
-			
-			buffer[offset+24] = (ref_data.decompressed_size & 0xFF)
-			buffer[offset+25] = (ref_data.decompressed_size & 0xFF00) >> 8
-			buffer[offset+26] = (ref_data.decompressed_size & 0xFF0000) >> 16
-			buffer[offset+27] = (ref_data.decompressed_size & 0xFF000000) >> 24
-			
-			
-			buffer[offset+28] = (ref_data.file_name_length & 0xFF)
-			buffer[offset+29] = (ref_data.file_name_length & 0xFF00) >> 8
-			
-			buffer[offset+42] = (ref_data.offset & 0xFF)
-			buffer[offset+43] = (ref_data.offset & 0xFF00) >> 8
-			buffer[offset+44] = (ref_data.offset & 0xFF0000) >> 16
-			buffer[offset+45] = (ref_data.offset & 0xFF000000) >> 24
-			
-			var name_len = file_name.length()
-			buffer = pointers.DataFormat.__reserve_in_array(buffer,name_len)
-			var nameBytes = file_name.to_utf8()
-			for i in range(name_len):
-				buffer[offset+46+i] = nameBytes[i]
-		
-		# EPCD
-		var EOCD_offset = buffer.size()
-		buffer = pointers.DataFormat.__reserve_in_array(buffer,22)
-		
-		# Magic number
-		buffer[EOCD_offset] = 0x50
-		buffer[EOCD_offset+1] = 0x4B
-		buffer[EOCD_offset+2] = 0x05
-		buffer[EOCD_offset+3] = 0x06
-		
-		# CDFH records
-		buffer[EOCD_offset+8] = (CDFH_offset & 0xFF)
-		buffer[EOCD_offset+9] = (CDFH_offset & 0xFF00) >> 8
-		buffer[EOCD_offset+10] = (CDFH_offset & 0xFF)
-		buffer[EOCD_offset+11] = (CDFH_offset & 0xFF00) >> 8
-		
-		# CDFH Size
-		var cdfh_size = EOCD_offset - CDFH_offset
-		buffer[EOCD_offset+8] = (cdfh_size & 0xFF)
-		buffer[EOCD_offset+9] = (cdfh_size & 0xFF00) >> 8
-		buffer[EOCD_offset+10] = (cdfh_size & 0xFF0000) >> 16
-		buffer[EOCD_offset+11] = (cdfh_size & 0xFF000000) >> 24
-		
-		# CDFH Offset
-		buffer[EOCD_offset+8] = (EOCD_offset & 0xFF)
-		buffer[EOCD_offset+9] = (EOCD_offset & 0xFF00) >> 8
-		buffer[EOCD_offset+10] = (EOCD_offset & 0xFF0000) >> 16
-		buffer[EOCD_offset+11] = (EOCD_offset & 0xFF000000) >> 24
-		
-		if destination:
-			file.open(destination,File.WRITE)
-			file.seek(0)
-			file.store_buffer(buffer)
+	func __get_zip_file_names(zip_path: String) -> Array:
+		var names := []
+		for entry in __get_zip_central_directory(zip_path):
+			names.append(entry.name)
+		return names
+	
+	func __get_zip_central_directory(zip_path: String) -> Array:
+		if file.open(zip_path, File.READ) != OK:
+			pointers.l("could not open zip at [%s]" % zip_path,"pointers.Zip")
+			return []
+		var file_len:int = file.get_len()
+		if file_len < 22:
+			pointers.l("[%s] not a zip file","pointers.Zip")
 			file.close()
+			return []
+		# Fetch EOCD, including max potential comment size
+		# More mem efficient than fetching entire buffer
+		var search_start = max(file_len - 0x06054b50 - 65536, 0)
+		file.seek(search_start)
+		var tail:PoolByteArray = file.get_buffer(file_len - search_start)
+		var eocd_pos:int = -1
+		var i:int = tail.size() - 22
+		while i > -1:
+			if tail[i] == 0x50 and tail[i + 1] == 0x4b and tail[i + 2] == 0x05 and tail[i + 3] == 0x06:
+				eocd_pos = i
+				break
+			i -= 1
+		if eocd_pos < 0:
+			pointers.l("[%s] doesn't have a correct CD" % zip_path,"pointers.Zip")
+			file.close()
+			return []
+		var total_entries:int = pointers.DataFormat.__get_uint16_from_buffer(tail, eocd_pos + 10)
+		var central_dir_offset:int = pointers.DataFormat.__get_uint32_from_buffer(tail, eocd_pos + 16)
+		file.seek(central_dir_offset)
+		var entries := []
+		for _n in range(total_entries):
+			if file.get_32() != 0x02014b50:
+				pointers.l("Zip CD at [%d] in [%s] is corrupt" % [file.get_position(),zip_path])
+				break
+			file.get_16() # written version
+			file.get_16() # required version
+			file.get_16()
+			var entry_data = {
+				"method":file.get_16()
+			}
+			file.get_16() # time
+			file.get_16() # date
+			file.get_32() # CRC32
+			entry_data["comp_size"] = file.get_32()
+			entry_data["uncomp_size"] = file.get_32()
+			var name_len:int = file.get_16()
+			var extra_len:int = file.get_16()
+			var comment_len:int = file.get_16()
+			file.get_16() # disk num.
+			file.get_16() # internal attrib
+			file.get_32() # external attrib.
+			entry_data["local_offset"] = file.get_32()
+			entry_data["name"] = file.get_buffer(name_len).get_string_from_utf8()
+			if extra_len > 0:
+				file.get_buffer(extra_len)
+			if comment_len > 0:
+				file.get_buffer(comment_len)
+			entries.append(entry_data)
+		file.close()
+		return entries
 	
 	
 	
