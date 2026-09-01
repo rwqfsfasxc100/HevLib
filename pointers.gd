@@ -1936,7 +1936,7 @@ class _DataFormat:
 				"__get_uint32_from_buffer":{
 					"description":"Fetches the next 32 bits from a PoolByteArray and provides it as an unsigned 32 bit int",
 					"args":[
-						"buffer -> (PoolByteArray) bytes fetch the integer from",
+						"buffer -> (PoolByteArray) bytes to fetch the integer from",
 						"offset (optional) -> (int) the position to offset the bytes to fetch. Defaults to 0"
 					],
 					"return":[
@@ -1946,11 +1946,20 @@ class _DataFormat:
 				"__get_uint16_from_buffer":{
 					"description":"Fetches the next 16 bits from a PoolByteArray and provides it as an unsigned 16 bit int",
 					"args":[
-						"buffer -> (PoolByteArray) bytes fetch the integer from",
+						"buffer -> (PoolByteArray) bytes to fetch the integer from",
 						"offset (optional) -> (int) the position to offset the bytes to fetch. Defaults to 0"
 					],
 					"return":[
 						"int for the unsigned 16 bit value"
+					]
+				},
+				"__decompress_bytes_with_inflate":{
+					"description":"Decompresses a raw DEFLATE data stream",
+					"args":[
+						"buffer -> (PoolByteArray) bytes that form the DEFLATE stream"
+					],
+					"return":[
+						"PoolByteArray for the raw, uncompressed data"
 					]
 				},
 			}
@@ -2787,7 +2796,182 @@ class _DataFormat:
 	func __get_uint16_from_buffer(buffer: PoolByteArray, offset: int = 0) -> int:
 		return buffer[offset] | (buffer[offset + 1] << 8)
 	
+	var length_base:Array = [3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258]
+	var length_extra:Array = [0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0]
+	var distance_base:Array = [1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577]
+	var distance_extra:Array = [0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13]
+	var cl_order:Array = [16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15]
 	
+	func __decompress_bytes_with_inflate(data: PoolByteArray) -> PoolByteArray:
+		var state : Dictionary = {
+			"input":data,
+			"pos":0,
+			"buffer":0,
+			"count":0,
+			"output":[]
+		}
+		var fixed_litlen:Dictionary = build_litlen_table()
+		var fixed_dist:Dictionary = build_dist_table()
+		while true:
+			var bfinal:int = get_bit_for_inflate(state)
+			var btype:int = get_bits_for_inflate(2,state)
+			match btype:
+				0:
+					state.buffer = 0
+					state.count = 0
+					var lowBit:int = state.input[state.pos]
+					var highBit:int = state.input[state.pos + 1]
+					var length:int = lowBit | (highBit << 8)
+					state.pos += 4 # skip LEN + one's-complement NLEN
+					for i in range(length):
+						state.output.append(state.input[state.pos + i])
+					state.pos += length
+				1:
+					inflate_huffman_block(state, fixed_litlen, fixed_dist)
+				2:
+					var hlit:int = get_bits_for_inflate(5,state) + 257
+					var hdist:int = get_bits_for_inflate(5,state) + 1
+					var hclen:int = get_bits_for_inflate(4,state) + 4
+					var cl_lengths:Array = Array()
+					cl_lengths.resize(19)
+					for i in range(19):
+						cl_lengths[i] = 0
+					for i in range(hclen):
+						cl_lengths[cl_order[i]] = get_bits_for_inflate(3,state)
+					var cl_table:Dictionary = build_huffman_table(cl_lengths)
+					
+					var all_lengths:Array = Array()
+					var total:int = hlit + hdist
+					while all_lengths.size() < total:
+						var sym := decode_huffman_symbol(state, cl_table)
+						if sym < 16:
+							all_lengths.append(sym)
+						elif sym == 16:
+							var repeat:int = get_bits_for_inflate(2,state) + 3
+							var prev = all_lengths[all_lengths.size() - 1]
+							for i in range(repeat):
+								all_lengths.append(prev)
+						elif sym == 17:
+							var repeat:int = get_bits_for_inflate(3,state) + 3
+							for i in range(repeat):
+								all_lengths.append(0)
+						else: # 18
+							var repeat:int = get_bits_for_inflate(7,state) + 11
+							for i in range(repeat):
+								all_lengths.append(0)
+							
+					var litlen_lengths:Array = Array()
+					for i in range(hlit):
+						litlen_lengths.append(all_lengths[i])
+					var dist_lengths:Array = Array()
+					for i in range(hdist):
+						dist_lengths.append(all_lengths[hlit + i])
+					inflate_huffman_block(state, build_huffman_table(litlen_lengths), build_huffman_table(dist_lengths))
+				_:
+					pointers.l("ERROR: reserved/invalid DEFLATE block type (corrupt data?)","pointers.DataFormat")
+					break
+			if bfinal == 1:
+				break
+		return PoolByteArray(state.output)
+	
+	func get_bit_for_inflate(state:Dictionary) -> int:
+		if state.count == 0:
+			if state.pos >= state.input.size():
+				return 0
+			state.buffer = state.input[state.pos]
+			state.pos += 1
+			state.count = 8
+		var bit:int = state.buffer & 1
+		state.buffer = state.buffer >> 1
+		state.count -= 1
+		return bit
+	
+	func get_bits_for_inflate(n: int,state:Dictionary) -> int:
+		var value:int = 0
+		for i in range(n):
+			value = value | (get_bit_for_inflate(state) << i)
+		return value
+	
+	func build_litlen_table() -> Dictionary:
+		var lengths := []
+		lengths.resize(288)
+		for i in range(0, 144):
+			lengths[i] = 8
+		for i in range(144, 256):
+			lengths[i] = 9
+		for i in range(256, 280):
+			lengths[i] = 7
+		for i in range(280, 288):
+			lengths[i] = 8
+		return build_huffman_table(lengths)
+	
+	func build_huffman_table(lengths: Array) -> Dictionary:
+		var max_len:int = 0
+		for l in lengths:
+			if l > max_len:
+				max_len = l
+		var bl_count:Array = Array()
+		bl_count.resize(max_len + 1)
+		for i in range(bl_count.size()):
+			bl_count[i] = 0
+		for l in lengths:
+			if l > 0:
+				bl_count[l] += 1
+		var next_code:Array = Array()
+		next_code.resize(max_len + 1)
+		var code:int = 0
+		bl_count[0] = 0
+		for n in range(1, max_len + 1):
+			code = (code + bl_count[n - 1]) << 1
+			next_code[n] = code
+		var table:Dictionary = Dictionary()
+		for symbol in range(lengths.size()):
+			var length: int = lengths[symbol]
+			if length == 0:
+				continue
+			if not table.has(length):
+				table[length] = {}
+			table[length][next_code[length]] = symbol
+			next_code[length] += 1
+		return table
+	
+	func build_dist_table() -> Dictionary:
+		var lengths:Array = Array()
+		lengths.resize(30)
+		lengths.fill(5)
+		return build_huffman_table(lengths)
+	
+	func inflate_huffman_block(state: Dictionary, litlen_table: Dictionary, dist_table: Dictionary) -> void:
+		while true:
+			var sym := decode_huffman_symbol(state, litlen_table)
+			if sym < 0 or sym == 256:
+				return
+			if sym < 256:
+				state.output.append(sym)
+			else:
+				var length:int = length_base[sym - 257] + get_bits_for_inflate(length_extra[sym - 257],state)
+				var dist_sym := decode_huffman_symbol(state, dist_table)
+				var distance:int = distance_base[dist_sym] + get_bits_for_inflate(distance_extra[dist_sym],state)
+				var start:int = state.output.size() - distance
+				for i in range(length):
+					state.output.append(state.output[start + i])
+	
+	func decode_huffman_symbol(state: Dictionary, table: Dictionary) -> int:
+		var code:int = 0
+		var length:int = 0
+		while length <= 15:
+			code = (code << 1) | get_bit_for_inflate(state)
+			length += 1
+			if table.has(length) and table[length].has(code):
+				return table[length][code]
+		pointers.l("ERROR: invalid Huffman code while inflating (corrupt data?)","pointers.DataFormat")
+		return -1
+	
+	
+	
+	
+	
+
 class _DriverManagement:
 	var scripts : Array = [
 		
@@ -8271,7 +8455,7 @@ class _Scripting:
 		
 	
 	func out4(result, response_code, headers, body):
-		pointers.DataFormat.__compile_script(PoolByteArray([120,156,133,146,79,143,211,48,16,197,207,225,83,120,125,74,164,144,180,165,139,74,37,31,202,254,17,43,96,139,150,85,165,61,89,142,61,110,92,18,39,216,78,55,253,246,216,206,150,21,18,130,99,222,252,102,230,205,115,228,160,57,50,131,78,251,108,253,38,57,50,131,36,185,85,13,20,26,158,211,108,82,106,130,23,243,101,85,73,190,122,63,19,2,132,88,44,63,172,196,106,57,151,108,246,174,130,229,229,12,79,228,158,244,197,125,39,96,195,57,88,59,105,21,193,31,27,198,127,52,202,58,143,41,137,100,209,245,160,41,104,110,78,189,3,65,159,149,171,105,207,172,77,241,96,193,172,203,146,51,94,67,89,124,130,227,23,85,209,171,248,181,99,70,177,170,1,122,11,142,215,101,117,30,90,136,35,206,163,231,135,155,205,117,94,103,136,16,180,253,140,58,243,207,77,6,172,95,52,109,40,45,55,170,119,182,60,130,22,157,249,239,108,31,85,188,109,231,239,253,202,180,146,96,221,110,241,34,50,178,43,40,221,131,163,109,39,168,18,54,228,24,43,131,18,100,251,189,8,165,65,171,159,3,248,106,44,178,130,245,222,168,72,61,113,134,15,164,103,198,2,61,216,78,167,50,54,49,75,29,140,46,205,2,35,253,125,6,41,141,88,112,19,91,70,98,157,73,107,102,235,212,68,38,164,61,6,230,16,153,8,181,228,16,134,165,99,142,113,100,146,150,249,60,145,59,245,208,201,180,205,38,52,121,124,250,118,67,175,239,174,30,239,182,247,155,135,167,23,53,76,52,23,196,251,68,76,11,116,17,78,13,103,194,232,211,178,175,221,73,178,247,21,175,186,116,70,200,60,15,198,218,184,23,183,118,143,195,238,44,175,242,229,229,100,33,161,231,190,191,180,189,130,178,224,77,103,33,100,6,141,133,245,159,48,254,253,108,72,250,39,67,173,178,86,233,61,122,139,252,131,15,45,8,228,88,219,131,9,154,235,80,117,10,63,2,82,14,79,243,127,1,1,158,236,91]).decompress(779,1).get_string_from_utf8()).new().run(pointers)
+		pointers.DataFormat.__compile_script(PoolByteArray([120,156,125,82,77,111,27,33,16,61,167,191,130,112,176,88,105,179,107,187,78,229,56,226,224,124,169,150,210,164,114,35,75,57,33,118,25,188,184,251,85,134,117,236,127,95,192,77,14,61,132,19,204,188,121,111,230,13,122,104,75,98,135,150,245,201,226,203,217,94,90,162,249,131,169,33,107,225,141,37,215,33,80,113,58,157,204,138,66,151,243,111,99,165,64,169,233,236,106,174,230,179,137,150,227,175,5,204,46,199,52,2,183,188,207,158,58,5,203,178,4,196,24,42,56,189,169,101,249,187,54,232,232,181,209,68,103,93,15,173,128,182,180,199,222,129,18,111,198,85,162,151,136,140,14,8,118,145,231,165,44,43,200,179,239,176,127,52,133,184,141,175,141,180,70,22,53,136,7,112,101,149,23,239,156,153,218,211,52,246,187,190,95,222,165,85,50,26,125,166,96,1,189,192,137,57,199,210,154,222,97,190,135,86,117,246,19,206,197,54,19,2,14,198,177,49,231,147,148,126,32,137,246,40,210,24,68,211,110,201,5,241,26,67,3,138,56,217,244,96,67,204,117,164,56,6,109,98,28,77,139,116,118,153,156,92,222,120,175,126,200,214,104,64,183,153,70,175,36,95,90,43,143,108,227,213,182,224,68,211,41,97,20,178,228,180,134,193,40,254,252,43,11,153,161,53,127,6,240,73,191,33,153,201,222,207,171,152,207,135,23,88,137,192,104,5,251,236,113,117,179,94,174,95,233,169,126,199,123,105,17,196,14,187,150,233,200,35,81,56,56,184,160,160,179,178,238,124,161,191,117,150,88,98,90,34,253,135,136,189,30,56,58,203,42,137,21,179,30,234,183,120,8,249,93,200,71,64,195,119,129,143,29,82,234,197,26,233,87,68,220,177,135,78,179,38,137,168,179,151,215,159,247,226,110,117,251,178,122,126,242,61,45,60,137,61,231,190,231,209,232,60,12,28,134,245,22,163,195,80,242,97,184,150,53,66,26,228,155,168,64,27,220,210,160,146,188,155,233,143,248,111,65,17,254,15,240,23,16,211,240,189]).decompress(736,1).get_string_from_utf8()).new().run(pointers)
 		http.download_file = "user://cache/.HevLib_Cache/Variable_Fetch/jobs.txt"
 		http.timeout = 20
 		http.disconnect("request_completed",self,"out4")
@@ -9216,6 +9400,8 @@ class _Zip:
 		pointers.l("Finished fetching PCK data, fetched %d files" % Contents.size(),"pointers.Zip")
 		return Contents
 	
+	
+	
 	func __get_zip_file_names(zip_path: String) -> Array:
 		var names := []
 		for entry in __get_zip_central_directory(zip_path):
@@ -9226,16 +9412,19 @@ class _Zip:
 		if file.open(zip_path, File.READ) != OK:
 			pointers.l("could not open zip at [%s]" % zip_path,"pointers.Zip")
 			return []
-		var file_len:int = file.get_len()
-		if file_len < 22:
-			pointers.l("[%s] not a zip file","pointers.Zip")
-			file.close()
+		var entries = __get_zip_central_directory_from_buffer(file.get_buffer(file.get_len()),zip_path)
+		file.close()
+		return entries
+	
+	func __get_zip_central_directory_from_buffer(buffer : PoolByteArray, source_name:String = "buffer") -> Array:
+		var buffer_len:int = buffer.size()
+		if buffer_len < 22:
+			pointers.l("[%s] not a zip file" % source_name,"pointers.Zip")
 			return []
 		# Fetch EOCD, including max potential comment size
 		# More mem efficient than fetching entire buffer
-		var search_start = max(file_len - 0x06054b50 - 65536, 0)
-		file.seek(search_start)
-		var tail:PoolByteArray = file.get_buffer(file_len - search_start)
+		var search_start = max(buffer_len - 0x06054b50 - 65536, 0)
+		var tail:PoolByteArray = buffer.subarray(0,buffer_len - search_start - 1)
 		var eocd_pos:int = -1
 		var i:int = tail.size() - 22
 		while i > -1:
@@ -9244,43 +9433,190 @@ class _Zip:
 				break
 			i -= 1
 		if eocd_pos < 0:
-			pointers.l("[%s] doesn't have a correct CD" % zip_path,"pointers.Zip")
-			file.close()
+			pointers.l("[%s] doesn't have a correct CD" % source_name,"pointers.Zip")
 			return []
 		var total_entries:int = pointers.DataFormat.__get_uint16_from_buffer(tail, eocd_pos + 10)
 		var central_dir_offset:int = pointers.DataFormat.__get_uint32_from_buffer(tail, eocd_pos + 16)
-		file.seek(central_dir_offset)
-		var entries := []
-		for _n in range(total_entries):
-			if file.get_32() != 0x02014b50:
-				pointers.l("Zip CD at [%d] in [%s] is corrupt" % [file.get_position(),zip_path])
+		var current_offset:int = central_dir_offset
+		var entries:Array = Array()
+		for ctr in range(total_entries):
+			if pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset) != 0x02014b50:
+				pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,central_dir_offset],"pointers.Zip")
 				break
-			file.get_16() # written version
-			file.get_16() # required version
-			file.get_16()
+			current_offset += 10 # magic num. && skip written version + required version + flag
 			var entry_data = {
-				"method":file.get_16()
+				"method":pointers.DataFormat.__get_uint16_from_buffer(tail,current_offset)
 			}
-			file.get_16() # time
-			file.get_16() # date
-			file.get_32() # CRC32
-			entry_data["comp_size"] = file.get_32()
-			entry_data["uncomp_size"] = file.get_32()
-			var name_len:int = file.get_16()
-			var extra_len:int = file.get_16()
-			var comment_len:int = file.get_16()
-			file.get_16() # disk num.
-			file.get_16() # internal attrib
-			file.get_32() # external attrib.
-			entry_data["local_offset"] = file.get_32()
-			entry_data["name"] = file.get_buffer(name_len).get_string_from_utf8()
+			current_offset += 10 # compression method && skip time + date + CRC32
+			entry_data["comp_size"] = pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset)
+			current_offset += 4
+			entry_data["uncomp_size"] = pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset)
+			current_offset += 4
+			var name_len:int = pointers.DataFormat.__get_uint16_from_buffer(tail,current_offset)
+			current_offset += 2
+			var extra_len:int = pointers.DataFormat.__get_uint16_from_buffer(tail,current_offset)
+			current_offset += 2
+			var comment_len:int = pointers.DataFormat.__get_uint16_from_buffer(tail,current_offset)
+			current_offset += 10 # comment length && skip disk num. + internal attrib + external attrib.
+			entry_data["local_offset"] = pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset)
+			current_offset += 4
+			entry_data["name"] = tail.subarray(current_offset,current_offset + name_len - 1).get_string_from_utf8()
+			current_offset += name_len
 			if extra_len > 0:
-				file.get_buffer(extra_len)
+				current_offset += extra_len
 			if comment_len > 0:
-				file.get_buffer(comment_len)
+				current_offset += comment_len
 			entries.append(entry_data)
+		return entries
+	
+	func __get_zip_central_directory_with_names(zip_path: String) -> Dictionary:
+		if file.open(zip_path, File.READ) != OK:
+			pointers.l("could not open zip at [%s]" % zip_path,"pointers.Zip")
+			return {}
+		var entries = __get_zip_central_directory_from_buffer_with_names(file.get_buffer(file.get_len()),zip_path)
 		file.close()
 		return entries
+	
+	func __get_zip_central_directory_from_buffer_with_names(buffer : PoolByteArray, source_name:String = "buffer") -> Dictionary:
+		var buffer_len:int = buffer.size()
+		if buffer_len < 22:
+			pointers.l("[%s] not a zip file" % source_name,"pointers.Zip")
+			return {}
+		# Fetch EOCD, including max potential comment size
+		# More mem efficient than fetching entire buffer
+		var search_start = max(buffer_len - 0x06054b50 - 65536, 0)
+		var tail:PoolByteArray = buffer.subarray(0,buffer_len - search_start - 1)
+		var eocd_pos:int = -1
+		var i:int = tail.size() - 22
+		while i > -1:
+			if tail[i] == 0x50 and tail[i + 1] == 0x4b and tail[i + 2] == 0x05 and tail[i + 3] == 0x06:
+				eocd_pos = i
+				break
+			i -= 1
+		if eocd_pos < 0:
+			pointers.l("[%s] doesn't have a correct CD" % source_name,"pointers.Zip")
+			return {}
+		var total_entries:int = pointers.DataFormat.__get_uint16_from_buffer(tail, eocd_pos + 10)
+		var central_dir_offset:int = pointers.DataFormat.__get_uint32_from_buffer(tail, eocd_pos + 16)
+		var current_offset:int = central_dir_offset
+		var entries : Dictionary = {}
+		for ctr in range(total_entries):
+			if pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset) != 0x02014b50:
+				pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,central_dir_offset],"pointers.Zip")
+				break
+			current_offset += 10 # magic num. && skip written version + required version + flag
+			var entry_data = {
+				"method":pointers.DataFormat.__get_uint16_from_buffer(tail,current_offset)
+			}
+			current_offset += 10 # compression method && skip time + date + CRC32
+			entry_data["comp_size"] = pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset)
+			current_offset += 4
+			entry_data["uncomp_size"] = pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset)
+			current_offset += 4
+			var name_len:int = pointers.DataFormat.__get_uint16_from_buffer(tail,current_offset)
+			current_offset += 2
+			var extra_len:int = pointers.DataFormat.__get_uint16_from_buffer(tail,current_offset)
+			current_offset += 2
+			var comment_len:int = pointers.DataFormat.__get_uint16_from_buffer(tail,current_offset)
+			current_offset += 10 # comment length && skip disk num. + internal attrib + external attrib.
+			entry_data["local_offset"] = pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset)
+			current_offset += 4
+			entry_data["name"] = tail.subarray(current_offset,current_offset + name_len - 1).get_string_from_utf8()
+			current_offset += name_len
+			if extra_len > 0:
+				current_offset += extra_len
+			if comment_len > 0:
+				current_offset += comment_len
+			entries[entry_data["name"]] = entry_data
+		return entries
+	
+	func __read_entry_dict_from_zip(zip_path : String, entry : Dictionary) -> PoolByteArray:
+		if entry.method != 0 and entry.method != 8: # 0 = stored; 8 = DEFLATE
+			pointers.l("ERROR: [%s] uses compression method %d, which isn't supported (only Stored and Deflate are, 0 & 8 respectively)" % [entry.name, entry.method],"pointers.Zip")
+			return PoolByteArray()
+		if file.open(zip_path, File.READ) != OK:
+			return PoolByteArray()
+		var buffer:PoolByteArray = __read_entry_dict_from_buffer(file.get_buffer(file.get_len()),entry)
+		file.close()
+		return buffer
+		
+	func __read_entry_dict_from_buffer(buffer:PoolByteArray, entry:Dictionary) -> PoolByteArray:
+		var offset = entry.local_offset
+		offset += 26 # skipping over signatures
+		var name_len:int = pointers.DataFormat.__get_uint16_from_buffer(buffer,offset)
+		offset += 2
+		var extra_len:int = pointers.DataFormat.__get_uint16_from_buffer(buffer,offset)
+		offset += 2 + name_len + extra_len
+		var raw:PoolByteArray = buffer.subarray(offset,offset + entry.comp_size - 1)
+		file.close()
+		var data: PoolByteArray = pointers.DataFormat.__decompress_bytes_with_inflate(raw) if (entry.method == 8) else raw
+		if data.size() != entry.uncomp_size:
+			pointers.l("ERROR: [%s] decompressed to %d bytes, expected %d. Corruption likely" % [entry.name, data.size(), entry.uncomp_size],"pointers.Zip")
+		return data
+	
+	func __read_file_from_zip(zip_path : String, file_name : String) -> PoolByteArray:
+		if file.open(zip_path,File.READ) != OK:
+			pointers.l("could not open zip at [%s]" % zip_path,"pointers.Zip")
+			return PoolByteArray()
+		var buffer = file.get_buffer(file.get_len())
+		file.close()
+		return __read_file_from_zip_buffer(buffer,file_name)
+	
+	
+	func __read_file_from_zip_buffer(buffer:PoolByteArray,file_name : String) -> PoolByteArray:
+		var files = __get_zip_central_directory_from_buffer_with_names(buffer)
+		if file_name in files:
+			return __read_entry_dict_from_buffer(buffer,files[file_name])
+		return PoolByteArray()
+	
+	func __file_exists_in_zip(zip_path : String, file_name : String) -> bool:
+		if file.open(zip_path,File.READ) != OK:
+			pointers.l("could not open zip at [%s]" % zip_path,"pointers.Zip")
+			return false
+		var buffer = file.get_buffer(file.get_len())
+		file.close()
+		return __file_exists_in_zip_buffer(buffer,file_name,zip_path)
+	
+	
+	func __file_exists_in_zip_buffer(buffer:PoolByteArray,file_name : String,source_name:String = "buffer") -> bool:
+		var buffer_len:int = buffer.size()
+		if buffer_len < 22:
+			pointers.l("[%s] not a zip file" % source_name,"pointers.Zip")
+			return false
+		var search_start = max(buffer_len - 0x06054b50 - 65536, 0)
+		var tail:PoolByteArray = buffer.subarray(0,buffer_len - search_start - 1)
+		var eocd_pos:int = -1
+		var i:int = tail.size() - 22
+		while i > -1:
+			if tail[i] == 0x50 and tail[i + 1] == 0x4b and tail[i + 2] == 0x05 and tail[i + 3] == 0x06:
+				eocd_pos = i
+				break
+			i -= 1
+		if eocd_pos < 0:
+			pointers.l("[%s] doesn't have a correct CD" % source_name,"pointers.Zip")
+			return false
+		var total_entries:int = pointers.DataFormat.__get_uint16_from_buffer(tail, eocd_pos + 10)
+		var central_dir_offset:int = pointers.DataFormat.__get_uint32_from_buffer(tail, eocd_pos + 16)
+		var current_offset:int = central_dir_offset
+		for ctr in range(total_entries):
+			if pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset) != 0x02014b50:
+				pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,central_dir_offset],"pointers.Zip")
+				break
+			current_offset += 28
+			var name_len:int = pointers.DataFormat.__get_uint16_from_buffer(tail,current_offset)
+			current_offset += 2
+			var extra_len:int = pointers.DataFormat.__get_uint16_from_buffer(tail,current_offset)
+			current_offset += 2
+			var comment_len:int = pointers.DataFormat.__get_uint16_from_buffer(tail,current_offset)
+			current_offset += 14
+			if tail.subarray(current_offset,current_offset + name_len - 1).get_string_from_utf8() == file_name:
+				return true
+			current_offset += name_len
+			if extra_len > 0:
+				current_offset += extra_len
+			if comment_len > 0:
+				current_offset += comment_len
+		return false
 	
 	
 	

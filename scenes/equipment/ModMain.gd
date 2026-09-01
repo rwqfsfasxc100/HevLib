@@ -325,7 +325,10 @@ func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
 	pointers.l(msg,line)
 
 func testing():
-	var files = pointers.Zip.__get_zip_file_names("C:/Program Files (x86)/Steam/steamapps/common/dV Rings of Saturn/mods/HevLib.zip")
+	file.open("C:/Program Files (x86)/Steam/steamapps/common/dV Rings of Saturn/mods/HevLib.zip",File.READ)
+	var buffer = file.get_buffer(file.get_len())
+	file.close()
+	var files = pointers.Zip.__get_zip_central_directory_from_buffer(buffer)
 	
 	
 	
