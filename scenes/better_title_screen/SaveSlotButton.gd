@@ -181,7 +181,7 @@ func newSave():
 	
 
 func _pressed():
-	if file.file_exists(saveSlotFile):
+	if getMetaFromSave(saveSlotFile) != null:
 		Debug.l("pressed %s" % saveSlotFile)
 		CurrentGame.saveFile = saveSlotFile
 		emit_signal("continueGame")
@@ -211,6 +211,8 @@ func getMetaFromSave(file_name):
 		var transponder:String = savedState.ship.transponder
 		if "shipNames" in savedState:
 			var shipName:String = savedState.shipNames[transponder]
+			if not "model" in savedState.ship:
+				savedState["ship"] = CurrentGame.initialShip.duplicate(true)
 			var model:String = savedState.ship.model
 			return {
 				"transponder": transponder, 
