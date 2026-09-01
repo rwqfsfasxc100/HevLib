@@ -1997,14 +1997,10 @@ class _DataFormat:
 		angle = -angle
 		var x:float = point[0]
 		var y:float = point[1]
-		var xca:float = x*cos(angle)
-		var ysa:float = y*sin(angle)
-		var yca:float = y*cos(angle)
-		var xsa:float = x*sin(angle)
-		return Vector2(xca-ysa,yca+xsa)
+		return Vector2((x*cos(angle))-(y*sin(angle)),(y*cos(angle))+(x*sin(angle)))
 	
-	func __get_vanilla_version() -> Array:
-		var version : Array = [1,0,0]
+	func __get_vanilla_version() -> PoolIntArray:
+		var version : PoolIntArray = PoolIntArray([1,0,0])
 		var lb : Node = load("res://VersionLabel.tscn").instance()
 		var textData : PoolStringArray  = lb.text.split(".",false)
 		lb.free()
@@ -2527,15 +2523,11 @@ class _DataFormat:
 	
 	func __file_exists(file_path:String) -> bool:
 		file_path = ProjectSettings.localize_path(file_path)
-		if ResourceLoader.exists(file_path) or file.file_exists(file_path):
-			return true
-		return false
+		return (ResourceLoader.exists(file_path) or file.file_exists(file_path))
 	
 	var urlRegex = RegEx.new()
 	func __is_valid_url(URL:String) -> bool:
-		var vt = urlRegex.search(URL)
-		if vt: return true
-		return false
+		return urlRegex.search(URL) != null
 	
 	func __loadDLC():
 		pointers.l("Preloading DLC as workaround","pointers.DataFormat")
@@ -2821,14 +2813,11 @@ class _DataFormat:
 		var fixed_dist:Dictionary = build_dist_table()
 		while true:
 			var bfinal:int = get_bit_for_inflate(state)
-			var btype:int = get_bits_for_inflate(2,state)
-			match btype:
+			match get_bits_for_inflate(2,state):
 				0:
 					state.buffer = 0
 					state.count = 0
-					var lowBit:int = state.input[state.pos]
-					var highBit:int = state.input[state.pos + 1]
-					var length:int = lowBit | (highBit << 8)
+					var length:int = (state.input[state.pos]) | ((state.input[state.pos + 1]) << 8)
 					state.pos += 4 # skip LEN + one's-complement NLEN
 					for i in range(length):
 						state.output.append(state.input[state.pos + i])
@@ -2845,23 +2834,19 @@ class _DataFormat:
 					var cl_table:Dictionary = build_huffman_table(cl_lengths)
 					
 					var all_lengths:PoolIntArray = PoolIntArray()
-					var total:int = hlit + hdist
-					while all_lengths.size() < total:
+					while all_lengths.size() < (hlit + hdist):
 						var sym:int = decode_huffman_symbol(state, cl_table)
 						if sym < 16:
 							all_lengths.append(sym)
 						elif sym == 16:
-							var repeat:int = get_bits_for_inflate(2,state) + 3
-							var prev = all_lengths[all_lengths.size() - 1]
-							for i in range(repeat):
+							var prev:int = all_lengths[all_lengths.size() - 1]
+							for i in range(get_bits_for_inflate(2,state) + 3):
 								all_lengths.append(prev)
 						elif sym == 17:
-							var repeat:int = get_bits_for_inflate(3,state) + 3
-							for i in range(repeat):
+							for i in range(get_bits_for_inflate(3,state) + 3):
 								all_lengths.append(0)
 						else: # 18
-							var repeat:int = get_bits_for_inflate(7,state) + 11
-							for i in range(repeat):
+							for i in range(get_bits_for_inflate(7,state) + 11):
 								all_lengths.append(0)
 							
 					var litlen_lengths:PoolIntArray = PoolIntArray()
@@ -2886,18 +2871,18 @@ class _DataFormat:
 			state.pos += 1
 			state.count = 8
 		var bit:int = state.buffer & 1
-		state.buffer = state.buffer >> 1
+		state.buffer >>= 1
 		state.count -= 1
 		return bit
 	
-	func get_bits_for_inflate(n: int,state:Dictionary) -> int:
+	func get_bits_for_inflate(n:int,state:Dictionary) -> int:
 		var value:int = 0
 		for i in range(n):
 			value = value | (get_bit_for_inflate(state) << i)
 		return value
 	
 	func build_litlen_table() -> Dictionary:
-		var lengths := []
+		var lengths:PoolIntArray = PoolIntArray()
 		lengths.resize(288)
 		for i in range(0, 144):
 			lengths[i] = 8
@@ -2909,15 +2894,12 @@ class _DataFormat:
 			lengths[i] = 8
 		return build_huffman_table(lengths)
 	
-	func build_huffman_table(lengths: PoolIntArray) -> Dictionary:
+	func build_huffman_table(lengths : PoolIntArray) -> Dictionary:
 		var max_len:int = 0
 		for l in lengths:
 			if l > max_len:
 				max_len = l
-		var bl_count:PoolIntArray = PoolIntArray()
-		bl_count.resize(max_len + 1)
-		for i in range(bl_count.size()):
-			bl_count[i] = 0
+		var bl_count:PoolIntArray = __reserve_in_array(PoolIntArray(),max_len + 1)
 		for l in lengths:
 			if l > 0:
 				bl_count[l] += 1
@@ -2930,7 +2912,7 @@ class _DataFormat:
 			next_code[n] = code
 		var table:Dictionary = Dictionary()
 		for symbol in range(lengths.size()):
-			var length: int = lengths[symbol]
+			var length:int = lengths[symbol]
 			if length == 0:
 				continue
 			if not table.has(length):
@@ -2945,7 +2927,7 @@ class _DataFormat:
 		lengths.fill(5)
 		return build_huffman_table(lengths)
 	
-	func inflate_huffman_block(state: Dictionary, litlen_table: Dictionary, dist_table: Dictionary) -> void:
+	func inflate_huffman_block(state : Dictionary, litlen_table : Dictionary, dist_table : Dictionary) -> void:
 		while true:
 			var sym:int = decode_huffman_symbol(state, litlen_table)
 			if sym < 0 or sym == 256:
@@ -2955,8 +2937,7 @@ class _DataFormat:
 			else:
 				var length:int = length_base[sym - 257] + get_bits_for_inflate(length_extra[sym - 257],state)
 				var dist_sym:int = decode_huffman_symbol(state, dist_table)
-				var distance:int = distance_base[dist_sym] + get_bits_for_inflate(distance_extra[dist_sym],state)
-				var start:int = state.output.size() - distance
+				var start:int = state.output.size() - (distance_base[dist_sym] + get_bits_for_inflate(distance_extra[dist_sym],state))
 				for i in range(length):
 					state.output.append(state.output[start + i])
 	
@@ -3231,7 +3212,7 @@ class _Equipment:
 	
 	var equipment_validity_for_slots:Dictionary = {}
 	
-	var version : Array = [1,0,0]
+	var version : PoolIntArray = PoolIntArray([1,0,0])
 	
 	func __make_upgrades_scene():
 		
@@ -8552,7 +8533,7 @@ class _Scripting:
 		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Minerals/")
 		for f in pointers.FolderAccess.__fetch_folder_files("user://cache/.HevLib_Cache/Minerals/",true,true):
 			pointers.FolderAccess.__recursive_delete(f)
-		var version = pointers.DataFormat.__get_vanilla_version()
+		var version:PoolIntArray = pointers.DataFormat.__get_vanilla_version()
 		pointers.l("observed game version of %s.%s.%s" % [version[0],version[1],version[2]],"pointers.Scripting")
 		
 		var drivers:Array = pointers.DriverManagement.__get_drivers()
