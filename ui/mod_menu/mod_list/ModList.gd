@@ -384,8 +384,12 @@ func _open_conflicts():
 	var conflicts = pointers.ManifestV2.__check_mod_conflicts(currently_selected_mod_id)
 	var cfmods = ""
 	for mod in conflicts:
-		var data = pointers.ManifestV2.__get_mod_by_id(mod)
-		cfmods = cfmods + "\n" + data["name"] + " (" + data["manifest"]["manifest_data"]["mod_information"]["id"] + ")"
+		if mod.begins_with("res://"):
+			var data = pointers.ManifestV2.__get_mod_data()["mods"][mod]
+			cfmods += "\n ->" + data.get("name",mod.split("/",false)[1]) + " (" + mod + ")"
+		else:
+			var data = pointers.ManifestV2.__get_mod_by_id(mod)
+			cfmods += "\n ->" + data.get("name",mod.split("/",false)[1]) + " (" + data.get("manifest",{}).get("manifest_data",{}).get("mod_information",{}).get("id",mod) + ")"
 	conflict_menu.dialog_text = TranslationServer.translate("HEVLIB_CONFLICT_INFO_BODY") % cfmods
 	conflict_menu.popup()
 	var size = Settings.getViewportSize()
@@ -397,8 +401,12 @@ func _open_dependancies():
 	var conflicts = pointers.ManifestV2.__check_mod_dependancies(currently_selected_mod_id)
 	var cfmods = ""
 	for mod in conflicts:
-		var data = pointers.ManifestV2.__get_mod_by_id(mod)
-		cfmods = cfmods + "\n" + data["name"] + " (" + data["manifest"]["manifest_data"]["mod_information"]["id"] + ")"
+		if mod.begins_with("res://"):
+			var data = pointers.ManifestV2.__get_mod_data()["mods"][mod]
+			cfmods += "\n ->" + data.get("name",mod.split("/",false)[1]) + " (" + mod + ")"
+		else:
+			var data = pointers.ManifestV2.__get_mod_by_id(mod)
+			cfmods += "\n -> " + data.get("name",mod.split("/",false)[1]) + " (" + data.get("manifest",{}).get("manifest_data",{}).get("mod_information",{}).get("id",mod) + ")"
 	dependancy_menu.dialog_text = TranslationServer.translate("HEVLIB_DEPENDANCY_INFO_BODY") % cfmods
 	dependancy_menu.popup()
 	var size = Settings.getViewportSize()
