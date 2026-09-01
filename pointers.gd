@@ -1969,15 +1969,6 @@ class _DataFormat:
 						"PoolByteArraythat form the DEFLATE stream"
 					]
 				},
-				"__get_dos_datetime":{
-					"description":"Converts a datetime dictionary into a dictionary containing DOS date and time values",
-					"args":[
-						"datetime (optional) -> (Dictionary) a date time dictionary. Defaults to Time.get_datetime_dict_from_system() for the current local timestamp."
-					],
-					"return":[
-						"Dictionary containing a 'time' and 'date' key/value pair."
-					]
-				},
 			}
 		}
 	
@@ -2984,18 +2975,7 @@ class _DataFormat:
 		var bytes:PoolByteArray = data.compress(1)
 		return bytes.subarray(2, bytes.size() - 5)
 	
-	func __get_dos_datetime(datetime:Dictionary = Time.get_datetime_dict_from_system()) -> Dictionary:
-		var year:int = datetime.year
-		var month:int = datetime.month
-		var day:int = datetime.day
-		var hour:int = datetime.hour
-		var minute:int = datetime.minute
-		var second:int = datetime.second
-		
-		var dos_year:int = int(max(year - 1980, 0))
-		var dos_time:int = (hour << 11) | (minute << 5) | int(second / 2.0)
-		var dos_date:int = (dos_year << 9) | (month << 5) | day
-		return {"time":dos_time, "date":dos_date}
+	
 	
 	
 	
@@ -8845,6 +8825,15 @@ class _TimeAccess:
 						
 					]
 				},
+				"__get_dos_datetime":{
+					"description":"Converts a datetime dictionary into a dictionary containing DOS date and time values",
+					"args":[
+						"datetime (optional) -> (Dictionary) a date time dictionary. Defaults to Time.get_datetime_dict_from_system() for the current local timestamp."
+					],
+					"return":[
+						"Dictionary containing a 'time' and 'date' key/value pair."
+					]
+				},
 			}
 		}
 	
@@ -8884,6 +8873,19 @@ class _TimeAccess:
 		
 		
 		return time
+	
+	func __get_dos_datetime(datetime:Dictionary = Time.get_datetime_dict_from_system()) -> Dictionary:
+		var year:int = datetime.year
+		var month:int = datetime.month
+		var day:int = datetime.day
+		var hour:int = datetime.hour
+		var minute:int = datetime.minute
+		var second:int = datetime.second
+		
+		var dos_year:int = int(max(year - 1980, 0))
+		var dos_time:int = (hour << 11) | (minute << 5) | int(second / 2.0)
+		var dos_date:int = (dos_year << 9) | (month << 5) | day
+		return {"time":dos_time, "date":dos_date}
 	
 
 class _Translations:

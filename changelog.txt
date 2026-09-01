@@ -1,3 +1,29 @@
+[1.15.50]
+
+1=* Added fallback for saves which have inexplicably had the ship incorrectly setup
+2=* Fixed issues with `__check_mod_complementary`, `__check_mod_dependancies`, and `__check_mod_conflicts` in the `ManifestV2` class incorrectly assuming the wrong type during manifest processing
+3=* Fixed non-essential conflicts/requirements notification panel not working when encountering a filename instead of a mod ID
+4=* Updated non-essental conflict/requirement notifier texts
+5=* Fixed research menu appearing even while no research is registered
+6=* Added `__get_uint16_from_buffer` and `__get_uint32_from_buffer` to the `DataFormat` class
+6.1=* Used to get a 16 & 32 bit unsigned integer from a PoolByteArray with an offset. Both use the same arguments.
+6.2=* `buffer` -> (PoolByteArray) bytes to fetch the integer from
+6.3=* `offset` (optional) -> (int) position in the buffer to get the next bytes from. Defaults to 0
+6.4=* Returns an integer for the byte data
+7=* Removed old pointers directory due to them no longer being functional
+8=* Added `__decompress_raw_deflate_stream` to the `DataFormat` class
+8.1=* Decompresses a raw DEFLATE bitstream (i.e. without the header or uint32 Adler required by Godot's PoolByteArray.decompress() method)
+8.2=* `buffer` -> (PoolByteArray) bytes that form the DEFLATE stream
+8.3=* Returns a PoolByteArray containing the uncompressed data.
+9=* Added `__compress_to_raw_deflate_stream` to the `DataFormat` class
+9.1=* Compresses a PoolByteArray into a raw DEFLATE bitstream (i.e. without the header or uint32 Adler created by Godot's PoolByteArray.decompress() method)
+9.2=* `buffer` -> (PoolByteArray) bytes that form the raw, uncompressed data
+9.3=* Returns a PoolByteArray containing the compressed data.
+10=* Added `__get_dos_datetime` to the `TimeAccess` class
+10.1=* Converts a datetime dictionary into a dictionary containing DOS date and time values
+10.2=* `datetime` (optional) -> (Dictionary) a date time dictionary. Uses the current local timestamp as this defaults to Time.get_datetime_dict_from_system(). To use GMT, provide Time.get_datetime_dict_from_system(true) as 
+10.3=* Return a dictionary containing a 'time' and 'date' key/value pair.
+
 [1.15.49]
 
 1=* Equipment properties provided through WeaponSlot processes now no longer require a stringified property and can use an actial variable
