@@ -9466,12 +9466,11 @@ class _Zip:
 			pointers.l("[%s] doesn't have a correct CD" % source_name,"pointers.Zip")
 			return []
 		var total_entries:int = pointers.DataFormat.__get_uint16_from_buffer(tail, eocd_pos + 10)
-		var central_dir_offset:int = pointers.DataFormat.__get_uint32_from_buffer(tail, eocd_pos + 16)
-		var current_offset:int = central_dir_offset
+		var current_offset:int = pointers.DataFormat.__get_uint32_from_buffer(tail, eocd_pos + 16)
 		var entries:Array = Array()
 		for ctr in range(total_entries):
 			if pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset) != 0x02014b50:
-				pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,central_dir_offset],"pointers.Zip")
+				pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,current_offset],"pointers.Zip")
 				break
 			current_offset += 10 # magic num. && skip written version + required version + flag
 			var entry_data = {
@@ -9527,12 +9526,11 @@ class _Zip:
 			pointers.l("[%s] doesn't have a correct CD" % source_name,"pointers.Zip")
 			return {}
 		var total_entries:int = pointers.DataFormat.__get_uint16_from_buffer(tail, eocd_pos + 10)
-		var central_dir_offset:int = pointers.DataFormat.__get_uint32_from_buffer(tail, eocd_pos + 16)
-		var current_offset:int = central_dir_offset
+		var current_offset:int = pointers.DataFormat.__get_uint32_from_buffer(tail, eocd_pos + 16)
 		var entries : Dictionary = {}
 		for ctr in range(total_entries):
 			if pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset) != 0x02014b50:
-				pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,central_dir_offset],"pointers.Zip")
+				pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,current_offset],"pointers.Zip")
 				break
 			current_offset += 10 # magic num. && skip written version + required version + flag
 			var entry_data = {
@@ -9626,11 +9624,10 @@ class _Zip:
 			pointers.l("[%s] doesn't have a correct CD" % source_name,"pointers.Zip")
 			return false
 		var total_entries:int = pointers.DataFormat.__get_uint16_from_buffer(tail, eocd_pos + 10)
-		var central_dir_offset:int = pointers.DataFormat.__get_uint32_from_buffer(tail, eocd_pos + 16)
-		var current_offset:int = central_dir_offset
+		var current_offset:int = pointers.DataFormat.__get_uint32_from_buffer(tail, eocd_pos + 16)
 		for ctr in range(total_entries):
 			if pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset) != 0x02014b50:
-				pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,central_dir_offset],"pointers.Zip")
+				pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,current_offset],"pointers.Zip")
 				break
 			current_offset += 28
 			var name_len:int = pointers.DataFormat.__get_uint16_from_buffer(tail,current_offset)
@@ -9675,12 +9672,11 @@ class _Zip:
 			pointers.l("[%s] doesn't have a correct CD" % source_name,"pointers.Zip")
 			return PoolStringArray()
 		var total_entries:int = pointers.DataFormat.__get_uint16_from_buffer(tail, eocd_pos + 10)
-		var central_dir_offset:int = pointers.DataFormat.__get_uint32_from_buffer(tail, eocd_pos + 16)
-		var current_offset:int = central_dir_offset
+		var current_offset:int = pointers.DataFormat.__get_uint32_from_buffer(tail, eocd_pos + 16)
 		var entries : PoolStringArray = PoolStringArray()
 		for ctr in range(total_entries):
 			if pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset) != 0x02014b50:
-				pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,central_dir_offset],"pointers.Zip")
+				pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,current_offset],"pointers.Zip")
 				break
 			current_offset += 28
 			var name_len:int = pointers.DataFormat.__get_uint16_from_buffer(tail,current_offset)
