@@ -21,7 +21,7 @@
 9.3=* Returns a PoolByteArray containing the compressed data.
 10=* Added `__get_dos_datetime` to the `TimeAccess` class
 10.1=* Converts a datetime dictionary into a dictionary containing DOS date and time values
-10.2=* `datetime` (optional) -> (Dictionary) a date time dictionary. Uses the current local timestamp as this defaults to Time.get_datetime_dict_from_system(). To use GMT, provide Time.get_datetime_dict_from_system(true) as 
+10.2=* `datetime` (optional) -> (Dictionary) a date time dictionary. Uses the current local timestamp as this defaults to Time.get_datetime_dict_from_system(). To use GMT, provide Time.get_datetime_dict_from_system(true) as the argument
 10.3=* Return a dictionary containing a 'time' and 'date' key/value pair.
 
 [1.15.49]
