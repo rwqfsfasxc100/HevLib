@@ -7488,7 +7488,7 @@ class _ManifestV2:
 	
 	func __check_mod_complementary(mod_id):
 		var mods : Dictionary = __get_mod_data()["mods"]
-		var tags : Dictionary = __get_manifest_entry("manifest_definitions","complementary_mod_ids",mod_id)
+		var tags : Array = __get_manifest_entry("manifest_definitions","complementary_mod_ids",mod_id)
 		var complimentaries : Array = []
 		for mod in tags:
 			if mod in mods:
@@ -7510,7 +7510,7 @@ class _ManifestV2:
 		return complimentaries
 	
 	func __check_mod_dependancies(mod_id):
-		var tags : Dictionary = __get_manifest_entry("manifest_definitions","dependancy_mod_ids",mod_id)
+		var tags : Array = __get_manifest_entry("manifest_definitions","dependancy_mod_ids",mod_id)
 		var complimentaries : Array = []
 		for mod in tags:
 			if not __mod_exists(mod):
@@ -7532,7 +7532,7 @@ class _ManifestV2:
 		return complimentaries
 	
 	func __check_mod_conflicts(mod_id):
-		var tags : Dictionary = __get_manifest_entry("manifest_definitions","conflicting_mod_ids",mod_id)
+		var tags : Array = __get_manifest_entry("manifest_definitions","conflicting_mod_ids",mod_id)
 		var complimentaries : Array = []
 		for mod in tags:
 			if __mod_exists(mod):
