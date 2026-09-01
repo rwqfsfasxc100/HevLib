@@ -527,12 +527,12 @@ const TRANSLATIONS = {
 			"version_hash": 3420349538
 		},
 		"HEVLIB_DEPENDANCY_INFO_BODY": {
-			"string": "This mod requires the following mods, which are missing:\\n%s\\n\\n\\n\\nDo not expect this mod to operate as intended!",
-			"version_hash": 3077768863
+			"string": "This mod requires the following mods, which are missing:\n\n%s\n\nDo not expect this mod to operate as intended!",
+			"version_hash": 1224371477
 		},
 		"HEVLIB_CONFLICT_INFO_BODY": {
-			"string": "This mod is in conflict with other installed mods. Please install a compatable version of the following mods:\\n%s\\n\\n\\n\\nDo not expect this mod to operate as intended!",
-			"version_hash": 2921644039
+			"string": "This mod is in conflict with other installed mods. Please install a compatable version of the following mods:\n\n%s\n\nDo not expect this mod to operate as intended!",
+			"version_hash": 2530687101
 		},
 		"HEVLIB_CONFIG_RANDOMIZE_MINERALS": {
 			"string": "Randomize mineral seed",
