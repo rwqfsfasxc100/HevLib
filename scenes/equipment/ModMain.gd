@@ -75,7 +75,7 @@ func _init(modLoader : ModLoader = ModLoader):
 	directory.make_dir_recursive(variables_folder)
 	pointers.FileAccess.__load_precached_mods()
 	
-	testing()
+#	testing()
 	
 	var scv = pointers.FolderAccess.__fetch_folder_files(variables_folder,false,true)
 	for s in scv:

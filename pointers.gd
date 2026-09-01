@@ -111,8 +111,6 @@ func _ready():
 	# Initialize Configs and Achievements
 	ConfigDriver.ready()
 	Achievements.ready()
-	# Perform SafeMode's checks
-	SafeMode.ready()
 	# Declutter webtranslate's children.
 	# This is necessary considering it creates a lot of mess as it fetches data
 	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading"):
