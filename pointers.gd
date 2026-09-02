@@ -3032,7 +3032,7 @@ class _DriverManagement:
 						manifest_path = item
 			
 			var this_mod_data : Dictionary = {"drivers":{}}
-			var id : String  = ""
+			var id : String = ""
 			var manifest : Dictionary = {}
 			if has_manifest:
 				manifest = pointers.ManifestV2.__parse_file_as_manifest(manifest_path)
@@ -3096,11 +3096,10 @@ class _DriverManagement:
 					for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
 						this_mod_data[driver] = {}
 						var driver_filepath = driverFolder + driver
-						if not __is_driver_file(driver_filepath):
-							continue
-						var consts : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(driver_filepath)
-						for i in consts:
-							this_mod_data[driver][i] = consts[i]
+						if __is_driver_file(driver_filepath):
+							var consts : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(driver_filepath)
+							for i in consts:
+								this_mod_data[driver][i] = consts[i]
 			driver_get_cache[file_path] = this_mod_data
 		return driver_get_cache[file_path].duplicate(true)
 	
@@ -3231,12 +3230,11 @@ class _Equipment:
 			if children.size() < 2:
 				continue
 			vanilla_slot_names.append(slot.name)
-			var sys_slot : String  = slot.slot
+			var sys_slot : String = slot.slot
 			var index:int = 1
-			if not sys_slot:
-				while not sys_slot:
-					sys_slot = children[index].slot
-					index += 1
+			while not sys_slot:
+				sys_slot = children[index].slot
+				index += 1
 			vanilla_slot_types.merge({slot.name:sys_slot})
 		
 		var ws_default_templates : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
@@ -6725,11 +6723,16 @@ class _ManifestV2:
 				var zrs = []
 				for i in mod_dictionary:
 					var thismod = mod_dictionary[i]
+					var zip_size = 0
+					if file.open(thismod["zip_path"],File.READ) == OK:
+						zip_size = file.get_len()
+						file.close()
 					var concat = {
 						"name":TranslationServer.translate(thismod["name"]),
 						"priority":thismod["priority"],
 						"path":thismod["file_path"],
 						"zip_path":thismod["zip_path"],
+						"zip_size":zip_size,
 						"version":[thismod["version_data"]["version_major"],thismod["version_data"]["version_minor"],thismod["version_data"]["version_bugfix"]],
 						"type":thismod["mod_type"],
 						"enabled":thismod["enabled"],
@@ -9411,7 +9414,27 @@ class _Zip:
 		pointers.l("Finished fetching PCK data, fetched %d files" % Contents.size(),"pointers.Zip")
 		return Contents
 	
-	
+	func __write_pck(file_path:String,files:Dictionary) -> int:
+		var packer = PCKPacker.new()
+		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
+		packer.pck_start(file_path)
+		for file_name in files:
+			if file_name.begins_with("res://"):
+				var content = files[file_name]
+				match typeof(content):
+					TYPE_RAW_ARRAY:
+						var pkfilename = "writepck_%d" % (Time.get_ticks_usec() + hash(content))
+						file.open(pkfilename,File.WRITE)
+						file.store_buffer(content)
+						file.close()
+						packer.add_file(file_name,pkfilename)
+					TYPE_STRING:
+						var pkfilename = "writepck_%d" % (Time.get_ticks_usec() + hash(content))
+						file.open(pkfilename,File.WRITE)
+						file.store_string(content)
+						file.close()
+						packer.add_file(file_name,pkfilename)
+		return packer.flush()
 	
 	func __get_zip_file_names(zip_path: String) -> Array:
 		var names := []
@@ -9420,18 +9443,14 @@ class _Zip:
 		return names
 	
 	func __get_zip_central_directory(zip_path: String) -> Array:
-		if file.open(zip_path, File.READ) != OK:
-			pointers.l("could not open zip at [%s]" % zip_path,"pointers.Zip")
-			return []
+		if file.open(zip_path, File.READ) != OK:pointers.l("could not open zip at [%s]" % zip_path,"pointers.Zip");return []
 		var entries = __get_zip_central_directory_from_buffer(file.get_buffer(file.get_len()),zip_path)
 		file.close()
 		return entries
 	
 	func __get_zip_central_directory_from_buffer(buffer : PoolByteArray, source_name:String = "buffer") -> Array:
 		var buffer_len:int = buffer.size()
-		if buffer_len < 22:
-			pointers.l("[%s] not a zip file" % source_name,"pointers.Zip")
-			return []
+		if buffer_len < 22:pointers.l("[%s] not a zip file" % source_name,"pointers.Zip");return []
 		# Fetch EOCD, including max potential comment size
 		# More mem efficient than fetching entire buffer
 		var search_start = max(buffer_len - 0x06054b50 - 65536, 0)
@@ -9443,16 +9462,12 @@ class _Zip:
 				eocd_pos = i
 				break
 			i -= 1
-		if eocd_pos < 0:
-			pointers.l("[%s] doesn't have a correct CD" % source_name,"pointers.Zip")
-			return []
+		if eocd_pos < 0:pointers.l("[%s] doesn't have a correct CD" % source_name,"pointers.Zip");return []
 		var total_entries:int = pointers.DataFormat.__get_uint16_from_buffer(tail, eocd_pos + 10)
 		var current_offset:int = pointers.DataFormat.__get_uint32_from_buffer(tail, eocd_pos + 16)
 		var entries:Array = Array()
 		for ctr in range(total_entries):
-			if pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset) != 0x02014b50:
-				pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,current_offset],"pointers.Zip")
-				break
+			if pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset) != 0x02014b50:pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,current_offset],"pointers.Zip");break
 			current_offset += 10 # magic num. && skip written version + required version + flag
 			var entry_data = {
 				"method":pointers.DataFormat.__get_uint16_from_buffer(tail,current_offset)
@@ -9480,18 +9495,14 @@ class _Zip:
 		return entries
 	
 	func __get_zip_central_directory_with_names(zip_path: String) -> Dictionary:
-		if file.open(zip_path, File.READ) != OK:
-			pointers.l("could not open zip at [%s]" % zip_path,"pointers.Zip")
-			return {}
+		if file.open(zip_path, File.READ) != OK:pointers.l("could not open zip at [%s]" % zip_path,"pointers.Zip");return {}
 		var entries = __get_zip_central_directory_from_buffer_with_names(file.get_buffer(file.get_len()),zip_path)
 		file.close()
 		return entries
 	
 	func __get_zip_central_directory_from_buffer_with_names(buffer : PoolByteArray, source_name:String = "buffer") -> Dictionary:
 		var buffer_len:int = buffer.size()
-		if buffer_len < 22:
-			pointers.l("[%s] not a zip file" % source_name,"pointers.Zip")
-			return {}
+		if buffer_len < 22:pointers.l("[%s] not a zip file" % source_name,"pointers.Zip");return {}
 		# Fetch EOCD, including max potential comment size
 		# More mem efficient than fetching entire buffer
 		var search_start = max(buffer_len - 0x06054b50 - 65536, 0)
@@ -9503,16 +9514,12 @@ class _Zip:
 				eocd_pos = i
 				break
 			i -= 1
-		if eocd_pos < 0:
-			pointers.l("[%s] doesn't have a correct CD" % source_name,"pointers.Zip")
-			return {}
+		if eocd_pos < 0:pointers.l("[%s] doesn't have a correct CD" % source_name,"pointers.Zip");return {}
 		var total_entries:int = pointers.DataFormat.__get_uint16_from_buffer(tail, eocd_pos + 10)
 		var current_offset:int = pointers.DataFormat.__get_uint32_from_buffer(tail, eocd_pos + 16)
 		var entries : Dictionary = {}
 		for ctr in range(total_entries):
-			if pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset) != 0x02014b50:
-				pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,current_offset],"pointers.Zip")
-				break
+			if pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset) != 0x02014b50:pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,current_offset],"pointers.Zip");break
 			current_offset += 10 # magic num. && skip written version + required version + flag
 			var entry_data = {
 				"method":pointers.DataFormat.__get_uint16_from_buffer(tail,current_offset)
@@ -9543,8 +9550,7 @@ class _Zip:
 		if entry.method != 0 and entry.method != 8: # 0 = stored; 8 = DEFLATE
 			pointers.l("ERROR: [%s] uses compression method %d, which isn't supported (only Stored and Deflate are, 0 & 8 respectively)" % [entry.name, entry.method],"pointers.Zip")
 			return PoolByteArray()
-		if file.open(zip_path, File.READ) != OK:
-			return PoolByteArray()
+		if file.open(zip_path, File.READ) != OK:return PoolByteArray()
 		var buffer:PoolByteArray = __read_entry_dict_from_buffer(file.get_buffer(file.get_len()),entry)
 		file.close()
 		return buffer
@@ -9559,14 +9565,11 @@ class _Zip:
 		var raw:PoolByteArray = buffer.subarray(offset,offset + entry.comp_size - 1)
 		file.close()
 		var data: PoolByteArray = pointers.DataFormat.__decompress_raw_deflate_stream(raw) if (entry.method == 8) else raw
-		if data.size() != entry.uncomp_size:
-			pointers.l("ERROR: [%s] decompressed to %d bytes, expected %d. Corruption likely" % [entry.name, data.size(), entry.uncomp_size],"pointers.Zip")
+		if data.size() != entry.uncomp_size:pointers.l("ERROR: [%s] decompressed to %d bytes, expected %d. Corruption likely" % [entry.name, data.size(), entry.uncomp_size],"pointers.Zip")
 		return data
 	
 	func __read_file_from_zip(zip_path : String, file_name : String) -> PoolByteArray:
-		if file.open(zip_path,File.READ) != OK:
-			pointers.l("could not open zip at [%s]" % zip_path,"pointers.Zip")
-			return PoolByteArray()
+		if file.open(zip_path,File.READ) != OK:pointers.l("could not open zip at [%s]" % zip_path,"pointers.Zip");return PoolByteArray()
 		var buffer = file.get_buffer(file.get_len())
 		file.close()
 		return __read_file_from_zip_buffer(buffer,file_name)
@@ -9574,14 +9577,11 @@ class _Zip:
 	
 	func __read_file_from_zip_buffer(buffer:PoolByteArray,file_name : String) -> PoolByteArray:
 		var files = __get_zip_central_directory_from_buffer_with_names(buffer)
-		if file_name in files:
-			return __read_entry_dict_from_buffer(buffer,files[file_name])
+		if file_name in files: return __read_entry_dict_from_buffer(buffer,files[file_name])
 		return PoolByteArray()
 	
 	func __file_exists_in_zip(zip_path : String, file_name : String) -> bool:
-		if file.open(zip_path,File.READ) != OK:
-			pointers.l("could not open zip at [%s]" % zip_path,"pointers.Zip")
-			return false
+		if file.open(zip_path,File.READ) != OK:pointers.l("could not open zip at [%s]" % zip_path,"pointers.Zip");return false
 		var buffer = file.get_buffer(file.get_len())
 		file.close()
 		return __file_exists_in_zip_buffer(buffer,file_name,zip_path)
@@ -9589,9 +9589,7 @@ class _Zip:
 	
 	func __file_exists_in_zip_buffer(buffer:PoolByteArray,file_name : String,source_name:String = "buffer") -> bool:
 		var buffer_len:int = buffer.size()
-		if buffer_len < 22:
-			pointers.l("[%s] not a zip file" % source_name,"pointers.Zip")
-			return false
+		if buffer_len < 22:pointers.l("[%s] not a zip file" % source_name,"pointers.Zip");return false
 		var search_start = max(buffer_len - 0x06054b50 - 65536, 0)
 		var tail:PoolByteArray = buffer.subarray(0,buffer_len - search_start - 1)
 		var eocd_pos:int = -1
@@ -9601,15 +9599,11 @@ class _Zip:
 				eocd_pos = i
 				break
 			i -= 1
-		if eocd_pos < 0:
-			pointers.l("[%s] doesn't have a correct CD" % source_name,"pointers.Zip")
-			return false
+		if eocd_pos < 0:pointers.l("[%s] doesn't have a correct CD" % source_name,"pointers.Zip");return false
 		var total_entries:int = pointers.DataFormat.__get_uint16_from_buffer(tail, eocd_pos + 10)
 		var current_offset:int = pointers.DataFormat.__get_uint32_from_buffer(tail, eocd_pos + 16)
 		for ctr in range(total_entries):
-			if pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset) != 0x02014b50:
-				pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,current_offset],"pointers.Zip")
-				break
+			if pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset) != 0x02014b50:pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,current_offset],"pointers.Zip");break
 			current_offset += 28
 			var name_len:int = pointers.DataFormat.__get_uint16_from_buffer(tail,current_offset)
 			current_offset += 2
@@ -9617,8 +9611,7 @@ class _Zip:
 			current_offset += 2
 			var comment_len:int = pointers.DataFormat.__get_uint16_from_buffer(tail,current_offset)
 			current_offset += 14
-			if tail.subarray(current_offset,current_offset + name_len - 1).get_string_from_utf8() == file_name:
-				return true
+			if tail.subarray(current_offset,current_offset + name_len - 1).get_string_from_utf8() == file_name:return true
 			current_offset += name_len
 			if extra_len > 0:
 				current_offset += extra_len
@@ -9627,9 +9620,7 @@ class _Zip:
 		return false
 	
 	func __fetch_filenames_in_zip(zip_path : String) -> PoolStringArray:
-		if file.open(zip_path,File.READ) != OK:
-			pointers.l("could not open zip at [%s]" % zip_path,"pointers.Zip")
-			return PoolStringArray()
+		if file.open(zip_path,File.READ) != OK:pointers.l("could not open zip at [%s]" % zip_path,"pointers.Zip");return PoolStringArray()
 		var buffer = file.get_buffer(file.get_len())
 		file.close()
 		return __fetch_filenames_in_zip_buffer(buffer,zip_path)
@@ -9637,9 +9628,7 @@ class _Zip:
 	
 	func __fetch_filenames_in_zip_buffer(buffer:PoolByteArray,source_name:String = "buffer") -> PoolStringArray:
 		var buffer_len:int = buffer.size()
-		if buffer_len < 22:
-			pointers.l("[%s] not a zip file" % source_name,"pointers.Zip")
-			return PoolStringArray()
+		if buffer_len < 22:pointers.l("[%s] not a zip file" % source_name,"pointers.Zip");return PoolStringArray()
 		var search_start = max(buffer_len - 0x06054b50 - 65536, 0)
 		var tail:PoolByteArray = buffer.subarray(0,buffer_len - search_start - 1)
 		var eocd_pos:int = -1
@@ -9649,16 +9638,12 @@ class _Zip:
 				eocd_pos = i
 				break
 			i -= 1
-		if eocd_pos < 0:
-			pointers.l("[%s] doesn't have a correct CD" % source_name,"pointers.Zip")
-			return PoolStringArray()
+		if eocd_pos < 0:pointers.l("[%s] doesn't have a correct CD" % source_name,"pointers.Zip");return PoolStringArray()
 		var total_entries:int = pointers.DataFormat.__get_uint16_from_buffer(tail, eocd_pos + 10)
 		var current_offset:int = pointers.DataFormat.__get_uint32_from_buffer(tail, eocd_pos + 16)
 		var entries : PoolStringArray = PoolStringArray()
 		for ctr in range(total_entries):
-			if pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset) != 0x02014b50:
-				pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,current_offset],"pointers.Zip")
-				break
+			if pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset) != 0x02014b50:pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,current_offset],"pointers.Zip");break
 			current_offset += 28
 			var name_len:int = pointers.DataFormat.__get_uint16_from_buffer(tail,current_offset)
 			current_offset += 2
