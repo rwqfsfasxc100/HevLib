@@ -1966,7 +1966,7 @@ class _DataFormat:
 						"buffer -> (PoolByteArray) bytes for the raw, uncompressed data."
 					],
 					"return":[
-						"PoolByteArraythat form the DEFLATE stream"
+						"PoolByteArray that form the DEFLATE stream"
 					]
 				},
 			}
@@ -5474,6 +5474,15 @@ class _FileAccess:
 						"file_path -> (String) the file path to save the .stex file to. Note that this always changes the extension to .stex",
 						"flags (optional) -> (int) the texture flags for the image. Check the Texture.Flags enum for reference."
 					]
+				},
+				"__file_output_to_buffer":{
+					"description":"Ensures a file input is a PoolByteArray.",
+					"args":[
+						"content -> (String/PoolByteArray) file content. Can be either a string or PoolByteArray"
+					],
+					"return":[
+						"PoolByteArray for the output buffer."
+					]
 				}
 			}
 		}
@@ -5583,7 +5592,13 @@ class _FileAccess:
 		else:
 			return ""
 	
-	
+	func __file_output_to_buffer(content) -> PoolByteArray:
+		if typeof(content) == TYPE_STRING:
+			return content.to_utf8()
+		if typeof(content) == TYPE_RAW_ARRAY:
+			return content
+		pointers.l("ERROR: content must be a String or PoolByteArray to be converted to buffer","pointers.FileAccess")
+		return PoolByteArray()
 	
 	
 	
@@ -9712,10 +9727,90 @@ class _Zip:
 				current_offset += comment_len
 		return entries
 	
+	func __create_zip(zip_path: String, files: Dictionary, compress: bool = false) -> bool:
+		return write_zip_data(zip_path, files, compress)
 	
 	
-	
-	
+	func write_zip_data(zip_path: String, files: Dictionary, compress: bool = false) -> bool:
+		var file := File.new()
+		if file.open(zip_path, File.WRITE) != OK:
+			push_error("SimpleZip: could not open '%s' for writing" % zip_path)
+			return false
+
+		var dt:Dictionary = pointers.TimeAccess.__get_dos_datetime()
+		var central_records:Array = Array()
+
+		for entry_path in files:
+			var data:PoolByteArray = pointers.FileAccess.__file_output_to_buffer(files[entry_path])
+			var name_bytes: PoolByteArray = String(entry_path).to_utf8()
+			var crc := _crc32(data)
+			var local_offset := file.get_position()
+
+			var method := _METHOD_STORED
+			var payload := data
+			if compress and data.size() > 0:
+				var deflated := _deflate_compress(data)
+				if deflated.size() < data.size():
+					method = _METHOD_DEFLATE
+					payload = deflated
+
+			file.store_32(_LOCAL_FILE_SIG)
+			file.store_16(_VERSION_NEEDED)
+			file.store_16(_FLAG_UTF8)
+			file.store_16(method)
+			file.store_16(dt.time)
+			file.store_16(dt.date)
+			file.store_32(crc)
+			file.store_32(payload.size()) # compressed size
+			file.store_32(data.size())    # uncompressed size
+			file.store_16(name_bytes.size())
+			file.store_16(0)     # extra field length
+			file.store_buffer(name_bytes)
+			file.store_buffer(payload)
+
+			central_records.append({
+				"name_bytes": name_bytes,
+				"crc": crc,
+				"method": method,
+				"comp_size": payload.size(),
+				"uncomp_size": data.size(),
+				"offset": local_offset,
+			})
+
+		var central_dir_offset := file.get_position()
+		for rec in central_records:
+			file.store_32(_CENTRAL_DIR_SIG)
+			file.store_16(_VERSION_NEEDED) # version made by
+			file.store_16(_VERSION_NEEDED) # version needed to extract
+			file.store_16(_FLAG_UTF8)
+			file.store_16(rec.method)
+			file.store_16(dt.time)
+			file.store_16(dt.date)
+			file.store_32(rec.crc)
+			file.store_32(rec.comp_size)
+			file.store_32(rec.uncomp_size)
+			file.store_16(rec.name_bytes.size())
+			file.store_16(0) # extra field length
+			file.store_16(0) # comment length
+			file.store_16(0) # disk number start
+			file.store_16(0) # internal file attributes
+			file.store_32(0) # external file attributes
+			file.store_32(rec.offset)
+			file.store_buffer(rec.name_bytes)
+
+		var central_dir_size := file.get_position() - central_dir_offset
+
+		file.store_32(0x06054b50)
+		file.store_16(0) # number of this disk
+		file.store_16(0) # disk where central directory starts
+		file.store_16(central_records.size())
+		file.store_16(central_records.size())
+		file.store_32(central_dir_size)
+		file.store_32(central_dir_offset)
+		file.store_16(0) # zip comment length
+
+		file.close()
+		return true
 	
 	
 	
