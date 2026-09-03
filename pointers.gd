@@ -2784,10 +2784,15 @@ class _DataFormat:
 		return integer & 0xFFFFFFFF
 	
 	func __get_crc_32(bytes:PoolByteArray) -> int:
-		var crc = 0 ^ 0xffffffff
-		for k in bytes:
-			crc = __to_uint32((crc >> 8) ^ crc_table[(crc & 0xff) ^ k])
-		return __to_uint32(crc ^ 0xffffffff)
+		var crc:int = 0xFFFFFFFF
+		for i in range(bytes.size()):
+			crc ^= bytes[i]
+			for r in range(8):
+				if crc & 1:
+					crc = (crc >> 1) ^ 0xEDB88320
+				else:
+					crc >>= 1
+		return crc ^ 0xFFFFFFFF
 	
 	func __get_uint32_from_buffer(buffer: PoolByteArray, offset: int = 0) -> int:
 		return buffer[offset] | (buffer[offset + 1] << 8) | (buffer[offset + 2] << 16) | (buffer[offset + 3] << 24)
@@ -9736,53 +9741,54 @@ class _Zip:
 		if file.open(zip_path, File.WRITE) != OK:
 			push_error("SimpleZip: could not open '%s' for writing" % zip_path)
 			return false
-
+		
 		var dt:Dictionary = pointers.TimeAccess.__get_dos_datetime()
 		var central_records:Array = Array()
-
+		
 		for entry_path in files:
 			var data:PoolByteArray = pointers.FileAccess.__file_output_to_buffer(files[entry_path])
+			var uncompressed_size:int = data.size()
 			var name_bytes: PoolByteArray = String(entry_path).to_utf8()
-			var crc := _crc32(data)
-			var local_offset := file.get_position()
-
-			var method := _METHOD_STORED
-			var payload := data
+			var crc:int = pointers.DataFormat.__crc32(data)
+			var local_offset:int = file.get_position()
+			
+			var method:int = 0
 			if compress and data.size() > 0:
-				var deflated := _deflate_compress(data)
+				var deflated:PoolByteArray = pointers.DataFormat.__compress_to_raw_deflate_stream(data)
 				if deflated.size() < data.size():
-					method = _METHOD_DEFLATE
-					payload = deflated
-
-			file.store_32(_LOCAL_FILE_SIG)
-			file.store_16(_VERSION_NEEDED)
-			file.store_16(_FLAG_UTF8)
+					method = 8
+					data = deflated
+			
+			var compressed_size = data.size()
+			file.store_32(0x04034b50)
+			file.store_16(20)
+			file.store_16(0x0800)
 			file.store_16(method)
 			file.store_16(dt.time)
 			file.store_16(dt.date)
 			file.store_32(crc)
-			file.store_32(payload.size()) # compressed size
-			file.store_32(data.size())    # uncompressed size
+			file.store_32(compressed_size) # compressed size
+			file.store_32(uncompressed_size) # uncompressed size
 			file.store_16(name_bytes.size())
-			file.store_16(0)     # extra field length
+			file.store_16(0) # extra field length
 			file.store_buffer(name_bytes)
-			file.store_buffer(payload)
-
+			file.store_buffer(data)
+			
 			central_records.append({
-				"name_bytes": name_bytes,
-				"crc": crc,
-				"method": method,
-				"comp_size": payload.size(),
-				"uncomp_size": data.size(),
-				"offset": local_offset,
+				"name_bytes":name_bytes,
+				"crc":crc,
+				"method":method,
+				"comp_size":compressed_size,
+				"uncomp_size":uncompressed_size,
+				"offset":local_offset,
 			})
-
+			
 		var central_dir_offset := file.get_position()
 		for rec in central_records:
-			file.store_32(_CENTRAL_DIR_SIG)
-			file.store_16(_VERSION_NEEDED) # version made by
-			file.store_16(_VERSION_NEEDED) # version needed to extract
-			file.store_16(_FLAG_UTF8)
+			file.store_32(0x02014b50)
+			file.store_16(20) # version made by
+			file.store_16(20) # version needed to extract
+			file.store_16(0x0800)
 			file.store_16(rec.method)
 			file.store_16(dt.time)
 			file.store_16(dt.date)
@@ -9797,9 +9803,9 @@ class _Zip:
 			file.store_32(0) # external file attributes
 			file.store_32(rec.offset)
 			file.store_buffer(rec.name_bytes)
-
-		var central_dir_size := file.get_position() - central_dir_offset
-
+			
+		var central_dir_size:int = file.get_position() - central_dir_offset
+		
 		file.store_32(0x06054b50)
 		file.store_16(0) # number of this disk
 		file.store_16(0) # disk where central directory starts
@@ -9808,7 +9814,7 @@ class _Zip:
 		file.store_32(central_dir_size)
 		file.store_32(central_dir_offset)
 		file.store_16(0) # zip comment length
-
+		
 		file.close()
 		return true
 	
