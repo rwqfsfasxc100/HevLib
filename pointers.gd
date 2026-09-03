@@ -1973,20 +1973,40 @@ class _DataFormat:
 		}
 	
 	var file:File = File.new()
+	var crc_table:Array = Array()
 	
-	var crc_table:PoolIntArray = PoolIntArray()
 	var pointers
 	func _init(f):
 		pointers = f
 		urlRegex.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,63}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
 		
-		for i in range(256):
-			var k = i
-			for j in range(8):
-				if k & 1:
-					k = __to_uint32(k ^ 0x1db710640)
-				k = __to_uint32(k >> 1)
-			crc_table.append(k)
+		crc_table.resize(256)
+		for n in range(256):
+			var c:int = n
+			for _k in range(8):
+				if c & 1:
+					c = 0xEDB88320 ^ (c >> 1)
+				else:
+					c >>= 1
+			crc_table[n] = c
+	
+	
+	var bitmask_uint8:int = 0xFF
+	var bitmask_int8:int = 0x7F
+	var bitmask_uint16:int = 0xFFFF
+	var bitmask_int16:int = 0x7FFF
+	var bitmask_uint32:int = 0xFFFFFFFF
+	var bitmask_int32:int = 0x7FFFFFFF
+	var bitmask_int64:int = 0x7FFFFFFFFFFFFFFF
+	
+	var bitmask_byte_1:int = 0x00000000000000FF
+	var bitmask_byte_2:int = 0x000000000000FF00
+	var bitmask_byte_3:int = 0x0000000000FF0000
+	var bitmask_byte_4:int = 0x00000000FF000000
+	var bitmask_byte_5:int = 0x000000FF00000000
+	var bitmask_byte_6:int = 0x0000FF0000000000
+	var bitmask_byte_7:int = 0x00FF000000000000
+	var bitmask_byte_8:int = 0x7F00000000000000
 	
 	func __array_to_string(arr: Array) -> String:
 		return "".join(PoolStringArray(arr))
@@ -2781,18 +2801,13 @@ class _DataFormat:
 		return array
 	
 	func __to_uint32(integer:int) -> int:
-		return integer & 0xFFFFFFFF
+		return integer & bitmask_uint32
 	
 	func __get_crc_32(bytes:PoolByteArray) -> int:
-		var crc:int = 0xFFFFFFFF
-		for i in range(bytes.size()):
-			crc ^= bytes[i]
-			for r in range(8):
-				if crc & 1:
-					crc = (crc >> 1) ^ 0xEDB88320
-				else:
-					crc >>= 1
-		return crc ^ 0xFFFFFFFF
+		var crc:int = bitmask_uint32
+		for b in bytes:
+			crc = (crc_table[((crc ^ b) & 0xFF)]) ^ (crc >> 8)
+		return crc ^ bitmask_uint32
 	
 	func __get_uint32_from_buffer(buffer: PoolByteArray, offset: int = 0) -> int:
 		return buffer[offset] | (buffer[offset + 1] << 8) | (buffer[offset + 2] << 16) | (buffer[offset + 3] << 24)
@@ -2949,7 +2964,7 @@ class _DataFormat:
 	func decode_huffman_symbol(state: Dictionary, table: Dictionary) -> int:
 		var code:int = 0
 		var length:int = 0
-		while length <= 15:
+		while length < 16:
 			code = (code << 1) | get_bit_for_inflate(state)
 			length += 1
 			if table.has(length) and table[length].has(code):
@@ -2961,7 +2976,69 @@ class _DataFormat:
 		var bytes:PoolByteArray = data.compress(1)
 		return bytes.subarray(2, bytes.size() - 5)
 	
+	func __store_8_in_buffer(byte:int,buffer:PoolByteArray) -> PoolByteArray:
+		buffer.append(byte % bitmask_uint8)
+		return buffer
 	
+	func __store_16_in_buffer(byte:int,buffer:PoolByteArray,little_endian:bool = true) -> PoolByteArray:
+		byte %= bitmask_uint16
+		var first = byte & bitmask_byte_1
+		var second = (byte & bitmask_byte_2) >> 8
+		if little_endian:
+			buffer.append(first)
+			buffer.append(second)
+		else:
+			buffer.append(second)
+			buffer.append(first)
+		return buffer
+	
+	func __store_32_in_buffer(byte:int,buffer:PoolByteArray,little_endian:bool = true) -> PoolByteArray:
+		byte %= bitmask_uint32
+		var first = byte & bitmask_byte_1
+		var second = (byte & bitmask_byte_2) >> 8
+		var third = (byte & bitmask_byte_3) >> 16
+		var fourth = (byte & bitmask_byte_4) >> 24
+		if little_endian:
+			buffer.append(first)
+			buffer.append(second)
+			buffer.append(third)
+			buffer.append(fourth)
+		else:
+			buffer.append(fourth)
+			buffer.append(third)
+			buffer.append(second)
+			buffer.append(first)
+		return buffer
+	
+	func __store_64_in_buffer(byte:int,buffer:PoolByteArray,little_endian:bool = true) -> PoolByteArray:
+		byte %= bitmask_int64
+		var first = byte & bitmask_byte_1
+		var second = (byte & bitmask_byte_2) >> 8
+		var third = (byte & bitmask_byte_3) >> 16
+		var fourth = (byte & bitmask_byte_4) >> 24
+		var fifth = (byte & bitmask_byte_5) >> 32
+		var sixth = (byte & bitmask_byte_6) >> 40
+		var seventh = (byte & bitmask_byte_7) >> 48
+		var eighth = (byte & bitmask_byte_8) >> 56
+		if little_endian:
+			buffer.append(first)
+			buffer.append(second)
+			buffer.append(third)
+			buffer.append(fourth)
+			buffer.append(fifth)
+			buffer.append(sixth)
+			buffer.append(seventh)
+			buffer.append(eighth)
+		else:
+			buffer.append(eighth)
+			buffer.append(seventh)
+			buffer.append(sixth)
+			buffer.append(fifth)
+			buffer.append(fourth)
+			buffer.append(third)
+			buffer.append(second)
+			buffer.append(first)
+		return buffer
 	
 	
 	
@@ -5598,12 +5675,14 @@ class _FileAccess:
 			return ""
 	
 	func __file_output_to_buffer(content) -> PoolByteArray:
-		if typeof(content) == TYPE_STRING:
-			return content.to_utf8()
-		if typeof(content) == TYPE_RAW_ARRAY:
-			return content
-		pointers.l("ERROR: content must be a String or PoolByteArray to be converted to buffer","pointers.FileAccess")
-		return PoolByteArray()
+		match typeof(content):
+			TYPE_STRING:
+				return content.to_utf8()
+			TYPE_RAW_ARRAY:
+				return content
+			_:
+				pointers.l("ERROR: content must be a String or PoolByteArray to be converted to buffer","pointers.FileAccess")
+				return PoolByteArray()
 	
 	
 	
@@ -9538,7 +9617,7 @@ class _Zip:
 			return {}
 		# Fetch EOCD, including max potential comment size
 		# More mem efficient than fetching entire buffer
-		var search_start = max(buffer_len - 0x06054b50 - 65536, 0)
+		var search_start = max(buffer_len - 100944720, 0) # Magic number for max EOCD length
 		var tail:PoolByteArray = buffer.subarray(0,buffer_len - search_start - 1)
 		var eocd_pos:int = -1
 		var i:int = tail.size() - 22
@@ -9650,7 +9729,7 @@ class _Zip:
 		if buffer_len < 22:
 			pointers.l("[%s] not a zip file" % source_name,"pointers.Zip")
 			return false
-		var search_start = max(buffer_len - 0x06054b50 - 65536, 0)
+		var search_start = max(buffer_len - 100944720, 0)
 		var tail:PoolByteArray = buffer.subarray(0,buffer_len - search_start - 1)
 		var eocd_pos:int = -1
 		var i:int = tail.size() - 22
@@ -9698,7 +9777,7 @@ class _Zip:
 		if buffer_len < 22:
 			pointers.l("[%s] not a zip file" % source_name,"pointers.Zip")
 			return PoolStringArray()
-		var search_start = max(buffer_len - 0x06054b50 - 65536, 0)
+		var search_start = max(buffer_len - 100944720, 0)
 		var tail:PoolByteArray = buffer.subarray(0,buffer_len - search_start - 1)
 		var eocd_pos:int = -1
 		var i:int = tail.size() - 22
@@ -9737,43 +9816,46 @@ class _Zip:
 	
 	
 	func write_zip_data(zip_path: String, files: Dictionary, compress: bool = false) -> bool:
-		var file := File.new()
 		if file.open(zip_path, File.WRITE) != OK:
 			push_error("SimpleZip: could not open '%s' for writing" % zip_path)
 			return false
-		
+		file.store_buffer(write_zip_data_to_buffer(files,compress))
+		file.close()
+		return true
+	
+	func write_zip_data_to_buffer(files:Dictionary,compress:bool = false) -> PoolByteArray:
 		var dt:Dictionary = pointers.TimeAccess.__get_dos_datetime()
 		var central_records:Array = Array()
-		
+		var buffer:PoolByteArray = PoolByteArray()
+		var pos:int = 0
 		for entry_path in files:
 			var data:PoolByteArray = pointers.FileAccess.__file_output_to_buffer(files[entry_path])
 			var uncompressed_size:int = data.size()
-			var name_bytes: PoolByteArray = String(entry_path).to_utf8()
-			var crc:int = pointers.DataFormat.__crc32(data)
-			var local_offset:int = file.get_position()
-			
+			var name_bytes:PoolByteArray = entry_path.to_utf8()
+			var crc:int = pointers.DataFormat.__get_crc_32(data)
+			var local_offset:int = pos
 			var method:int = 0
-			if compress and data.size() > 0:
+			if compress and data:
 				var deflated:PoolByteArray = pointers.DataFormat.__compress_to_raw_deflate_stream(data)
 				if deflated.size() < data.size():
 					method = 8
 					data = deflated
-			
-			var compressed_size = data.size()
-			file.store_32(0x04034b50)
-			file.store_16(20)
-			file.store_16(0x0800)
-			file.store_16(method)
-			file.store_16(dt.time)
-			file.store_16(dt.date)
-			file.store_32(crc)
-			file.store_32(compressed_size) # compressed size
-			file.store_32(uncompressed_size) # uncompressed size
-			file.store_16(name_bytes.size())
-			file.store_16(0) # extra field length
-			file.store_buffer(name_bytes)
-			file.store_buffer(data)
-			
+			var compressed_size:int = data.size()
+			var name_size:int = name_bytes.size()
+			buffer = pointers.DataFormat.__store_32_in_buffer(0x04034b50,buffer)
+			buffer = pointers.DataFormat.__store_16_in_buffer(20,buffer)
+			buffer = pointers.DataFormat.__store_16_in_buffer(0x0800,buffer)
+			buffer = pointers.DataFormat.__store_16_in_buffer(method,buffer)
+			buffer = pointers.DataFormat.__store_16_in_buffer(dt.time,buffer)
+			buffer = pointers.DataFormat.__store_16_in_buffer(dt.date,buffer)
+			buffer = pointers.DataFormat.__store_32_in_buffer(crc,buffer)
+			buffer = pointers.DataFormat.__store_32_in_buffer(compressed_size,buffer) # compressed size
+			buffer = pointers.DataFormat.__store_32_in_buffer(uncompressed_size,buffer) # uncompressed size
+			buffer = pointers.DataFormat.__store_16_in_buffer(name_size,buffer)
+			buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # extra field length
+			buffer.append_array(name_bytes)
+			buffer.append_array(data)
+			pos += compressed_size + name_size + 30
 			central_records.append({
 				"name_bytes":name_bytes,
 				"crc":crc,
@@ -9783,40 +9865,42 @@ class _Zip:
 				"offset":local_offset,
 			})
 			
-		var central_dir_offset := file.get_position()
+		var central_dir_offset:int = pos
 		for rec in central_records:
-			file.store_32(0x02014b50)
-			file.store_16(20) # version made by
-			file.store_16(20) # version needed to extract
-			file.store_16(0x0800)
-			file.store_16(rec.method)
-			file.store_16(dt.time)
-			file.store_16(dt.date)
-			file.store_32(rec.crc)
-			file.store_32(rec.comp_size)
-			file.store_32(rec.uncomp_size)
-			file.store_16(rec.name_bytes.size())
-			file.store_16(0) # extra field length
-			file.store_16(0) # comment length
-			file.store_16(0) # disk number start
-			file.store_16(0) # internal file attributes
-			file.store_32(0) # external file attributes
-			file.store_32(rec.offset)
-			file.store_buffer(rec.name_bytes)
+			var name_size = rec.name_bytes.size()
+			var name_bytes = rec.name_bytes
+			buffer = pointers.DataFormat.__store_32_in_buffer(0x02014b50,buffer)
+			buffer = pointers.DataFormat.__store_16_in_buffer(20,buffer) # version made by
+			buffer = pointers.DataFormat.__store_16_in_buffer(20,buffer) # version needed to extract
+			buffer = pointers.DataFormat.__store_16_in_buffer(0x0800,buffer)
+			buffer = pointers.DataFormat.__store_16_in_buffer(rec.method,buffer)
+			buffer = pointers.DataFormat.__store_16_in_buffer(dt.time,buffer)
+			buffer = pointers.DataFormat.__store_16_in_buffer(dt.date,buffer)
+			buffer = pointers.DataFormat.__store_32_in_buffer(rec.crc,buffer)
+			buffer = pointers.DataFormat.__store_32_in_buffer(rec.comp_size,buffer)
+			buffer = pointers.DataFormat.__store_32_in_buffer(rec.uncomp_size,buffer)
+			buffer = pointers.DataFormat.__store_16_in_buffer(name_size,buffer)
+			buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # extra field length
+			buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # comment length
+			buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # disk number start
+			buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # internal file attributes
+			buffer = pointers.DataFormat.__store_32_in_buffer(0,buffer) # external file attributes
+			buffer = pointers.DataFormat.__store_32_in_buffer(rec.offset,buffer)
+			buffer.append_array(name_bytes)
+			pos += name_size + 46
 			
-		var central_dir_size:int = file.get_position() - central_dir_offset
+		var central_dir_size:int = pos - central_dir_offset
 		
-		file.store_32(0x06054b50)
-		file.store_16(0) # number of this disk
-		file.store_16(0) # disk where central directory starts
-		file.store_16(central_records.size())
-		file.store_16(central_records.size())
-		file.store_32(central_dir_size)
-		file.store_32(central_dir_offset)
-		file.store_16(0) # zip comment length
-		
-		file.close()
-		return true
+		buffer = pointers.DataFormat.__store_32_in_buffer(0x06054b50,buffer)
+		buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # number of this disk
+		buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # disk where central directory starts
+		buffer = pointers.DataFormat.__store_16_in_buffer(central_records.size(),buffer)
+		buffer = pointers.DataFormat.__store_16_in_buffer(central_records.size(),buffer)
+		buffer = pointers.DataFormat.__store_32_in_buffer(central_dir_size,buffer)
+		buffer = pointers.DataFormat.__store_32_in_buffer(central_dir_offset,buffer)
+		buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # zip comment length
+#		pos += 22
+		return buffer
 	
 	
 	
