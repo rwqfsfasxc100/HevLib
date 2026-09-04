@@ -2865,7 +2865,7 @@ class _DataFormat:
 		var i:int = 0
 		for g in range(groups):
 			# Rare me splitting a variable that isn't an array or dictionary between lines.
-			# Impossible to read and work on otherwise so :/
+			# Impossible to read and work on otherwise so enjoy the readable code while you can :P
 			crc = (
 				crc_table_31[(crc & bitmask_uint8) ^ bytes[i]] ^
 				crc_table_30[((crc >> 8) & bitmask_uint8) ^ bytes[i + 1]] ^
@@ -3060,12 +3060,10 @@ class _DataFormat:
 	
 	func decode_huffman_symbol(state: Dictionary, table: Dictionary) -> int:
 		var code:int = 0
-		var length:int = 0
-		while length < 16:
+		for i in range(1,17):
 			code = (code << 1) | get_bit_for_inflate(state)
-			length += 1
-			if table.has(length) and table[length].has(code):
-				return table[length][code]
+			if table.has(i) and table[i].has(code):
+				return table[i][code]
 		pointers.l("ERROR: invalid Huffman code while inflating (corrupt data?)","pointers.DataFormat")
 		return -1
 	
@@ -9766,8 +9764,7 @@ class _Zip:
 		return buffer
 		
 	func __read_entry_dict_from_buffer(buffer:PoolByteArray, entry:Dictionary) -> PoolByteArray:
-		var offset = entry.local_offset
-		offset += 26 # skipping over signatures
+		var offset = entry.local_offset + 26
 		var name_len:int = pointers.DataFormat.__get_uint16_from_buffer(buffer,offset)
 		offset += 2
 		var extra_len:int = pointers.DataFormat.__get_uint16_from_buffer(buffer,offset)
@@ -9904,6 +9901,37 @@ class _Zip:
 			if comment_len > 0:
 				current_offset += comment_len
 		return entries
+	
+	func __extract_files_from_zip(zip_file:String,destination_path:String) -> bool:
+		file.open(zip_file,File.READ)
+		var buffer = file.get_buffer(file.get_len())
+		file.close()
+		return __extract_files_from_zip_buffer(buffer,destination_path)
+	
+	func __extract_files_from_zip_buffer(buffer:PoolByteArray,destination_path:String) -> bool:
+		var entries = __get_zip_central_directory_from_buffer(buffer)
+		if entries.empty():
+			return false
+		if not destination_path.ends_with("/"):
+			destination_path += "/"
+		dir.make_dir_recursive(destination_path)
+		
+		for entry in entries:
+			var entry_name:String = entry.name
+			if entry_name.ends_with("/"):
+				dir.make_dir_recursive(destination_path + entry_name)
+				continue
+			
+			var out_path:String = destination_path + entry_name
+			dir.make_dir_recursive(out_path.get_base_dir())
+			var out = __read_entry_dict_from_buffer(buffer,entry)
+			file.open(out_path,File.WRITE)
+			if not file.is_open():
+				pointers.l("ERROR: could not write file [%s] to path [%s]" % [entry_name,out_path],"pointers.Zip")
+				continue
+			file.store_buffer(out)
+			file.close()
+		return true
 	
 	func __create_zip(zip_path: String, files: Dictionary, compress: bool = false) -> bool:
 		return write_zip_data(zip_path, files, compress)
