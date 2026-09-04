@@ -81,7 +81,6 @@ func _ready():
 	var mod_ids = pointers.ManifestV2.__get_mod_ids()
 	current_project_management.current_mod_ids = mod_ids
 	dormant_project_management.current_mod_ids = mod_ids
-	var tag_exists = pointers.ManifestV2.__get_tags()
 	var research_store = pointers.Equipment.research_store
 	if research_store.empty():
 		research_button.get_parent().remove_child(research_button)

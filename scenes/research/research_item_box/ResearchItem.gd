@@ -50,8 +50,8 @@ var progress_bars = {}
 
 func _ready():
 	var project_state = this_research_project.get("state",{})
+	connect("visibility_changed",self,"recheck_vis")
 	
-	start_button.visible = !project_state.active
 	
 	
 	var project_mode = this_research_project.get("mode","story_only")
@@ -194,8 +194,14 @@ var default_vp_positioning = {"position":Vector2(0,0),"rotation":90,"scale":Vect
 func update_progress():
 	pass
 
-func _process(_delta):
+func recheck_vis():
 	if is_visible_in_tree():
+		var project_state = this_research_project.get("state",{})
+		start_button.visible = !(project_state.active or project_state.completed)
+		complete_button.visible = project_state.active and !project_state.completed
+		
+		
+		
 		if mark_for_completion:
 			var state = this_research_project.get("state",{})
 			if state.completed:

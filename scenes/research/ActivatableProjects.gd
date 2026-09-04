@@ -61,10 +61,6 @@ func _initialize():
 				_:
 					
 					inactive_list.add_child(p)
-	
-	
-	
-	pass
 
 
 
