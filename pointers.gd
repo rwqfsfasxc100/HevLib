@@ -1973,23 +1973,78 @@ class _DataFormat:
 		}
 	
 	var file:File = File.new()
-	var crc_table:Array = Array()
 	
 	var pointers
 	func _init(f):
 		pointers = f
 		urlRegex.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,63}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
+		var crcTables = load("res://HevLib/scripts/crc32_table_cache.gd").get_script_constant_map()
 		
-		crc_table.resize(256)
-		for n in range(256):
-			var c:int = n
-			for _k in range(8):
-				if c & 1:
-					c = 0xEDB88320 ^ (c >> 1)
-				else:
-					c >>= 1
-			crc_table[n] = c
+		crc_table_0 = crcTables.T0
+		crc_table_1 = crcTables.T1
+		crc_table_2 = crcTables.T2
+		crc_table_3 = crcTables.T3
+		crc_table_4 = crcTables.T4
+		crc_table_5 = crcTables.T5
+		crc_table_6 = crcTables.T6
+		crc_table_7 = crcTables.T7
+		crc_table_8 = crcTables.T8
+		crc_table_9 = crcTables.T9
+		crc_table_10 = crcTables.T10
+		crc_table_11 = crcTables.T11
+		crc_table_12 = crcTables.T12
+		crc_table_13 = crcTables.T13
+		crc_table_14 = crcTables.T14
+		crc_table_15 = crcTables.T15
+		crc_table_16 = crcTables.T16
+		crc_table_17 = crcTables.T17
+		crc_table_18 = crcTables.T18
+		crc_table_19 = crcTables.T19
+		crc_table_20 = crcTables.T20
+		crc_table_21 = crcTables.T21
+		crc_table_22 = crcTables.T22
+		crc_table_23 = crcTables.T23
+		crc_table_24 = crcTables.T24
+		crc_table_25 = crcTables.T25
+		crc_table_26 = crcTables.T26
+		crc_table_27 = crcTables.T27
+		crc_table_28 = crcTables.T28
+		crc_table_29 = crcTables.T29
+		crc_table_30 = crcTables.T30
+		crc_table_31 = crcTables.T31
 	
+	var crc_table_0:Array = Array()
+	var crc_table_1:Array = Array()
+	var crc_table_2:Array = Array()
+	var crc_table_3:Array = Array()
+	var crc_table_4:Array = Array()
+	var crc_table_5:Array = Array()
+	var crc_table_6:Array = Array()
+	var crc_table_7:Array = Array()
+	var crc_table_8:Array = Array()
+	var crc_table_9:Array = Array()
+	var crc_table_10:Array = Array()
+	var crc_table_11:Array = Array()
+	var crc_table_12:Array = Array()
+	var crc_table_13:Array = Array()
+	var crc_table_14:Array = Array()
+	var crc_table_15:Array = Array()
+	var crc_table_16:Array = Array()
+	var crc_table_17:Array = Array()
+	var crc_table_18:Array = Array()
+	var crc_table_19:Array = Array()
+	var crc_table_20:Array = Array()
+	var crc_table_21:Array = Array()
+	var crc_table_22:Array = Array()
+	var crc_table_23:Array = Array()
+	var crc_table_24:Array = Array()
+	var crc_table_25:Array = Array()
+	var crc_table_26:Array = Array()
+	var crc_table_27:Array = Array()
+	var crc_table_28:Array = Array()
+	var crc_table_29:Array = Array()
+	var crc_table_30:Array = Array()
+	var crc_table_31:Array = Array()
 	
 	var bitmask_uint8:int = 0xFF
 	var bitmask_int8:int = 0x7F
@@ -2803,10 +2858,48 @@ class _DataFormat:
 	func __to_uint32(integer:int) -> int:
 		return integer & bitmask_uint32
 	
-	func __get_crc_32(bytes:PoolByteArray) -> int:
+	func __get_crc_32(bytes: PoolByteArray) -> int:
 		var crc:int = bitmask_uint32
-		for b in bytes:
-			crc = (crc_table[((crc ^ b) & 0xFF)]) ^ (crc >> 8)
+		var size:int = bytes.size()
+		var groups:int = int(floor(size / 32.0))
+		var i:int = 0
+		for g in range(groups):
+			crc = (crc_table_31[(crc & 0xFF) ^ bytes[i]] ^
+				crc_table_30[((crc >> 8) & 0xFF) ^ bytes[i + 1]] ^
+				crc_table_29[((crc >> 16) & 0xFF) ^ bytes[i + 2]] ^
+				crc_table_28[((crc >> 24) & 0xFF) ^ bytes[i + 3]] ^
+				crc_table_27[bytes[i + 4]] ^
+				crc_table_26[bytes[i + 5]] ^
+				crc_table_25[bytes[i + 6]] ^
+				crc_table_24[bytes[i + 7]] ^
+				crc_table_23[bytes[i + 8]] ^
+				crc_table_22[bytes[i + 9]] ^
+				crc_table_21[bytes[i + 10]] ^
+				crc_table_20[bytes[i + 11]] ^
+				crc_table_19[bytes[i + 12]] ^
+				crc_table_18[bytes[i + 13]] ^
+				crc_table_17[bytes[i + 14]] ^
+				crc_table_16[bytes[i + 15]] ^
+				crc_table_15[bytes[i + 16]] ^
+				crc_table_14[bytes[i + 17]] ^
+				crc_table_13[bytes[i + 18]] ^
+				crc_table_12[bytes[i + 19]] ^
+				crc_table_11[bytes[i + 20]] ^
+				crc_table_10[bytes[i + 21]] ^
+				crc_table_9[bytes[i + 22]] ^
+				crc_table_8[bytes[i + 23]] ^
+				crc_table_7[bytes[i + 24]] ^
+				crc_table_6[bytes[i + 25]] ^
+				crc_table_5[bytes[i + 26]] ^
+				crc_table_4[bytes[i + 27]] ^
+				crc_table_3[bytes[i + 28]] ^
+				crc_table_2[bytes[i + 29]] ^
+				crc_table_1[bytes[i + 30]] ^
+				crc_table_0[bytes[i + 31]])
+			i += 32
+		while i < size:
+			crc = crc_table_0[(crc ^ bytes[i]) & 0xFF] ^ (crc >> 8)
+			i += 1
 		return crc ^ bitmask_uint32
 	
 	func __get_uint32_from_buffer(buffer: PoolByteArray, offset: int = 0) -> int:
@@ -8576,22 +8669,19 @@ class _Scripting:
 						var md5 = mid["mod_information"]["id"].md5_text()
 						if md5 in d:
 							var pd = d[md5]
-							if pd[1] != file.get_md5(mod):
-								pd[0] = 0
+							if pd[1] != file.get_md5(mod):pd[0] = 0
 							mdf[zipPath] = [md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
 				if not zipPath in mdf:
 					var md5 = zipPath.md5_text()
 					if md5 in d:
 						var pd = d[md5]
-						if pd[1] != file.get_md5(mod):
-							pd[0] = 0
+						if pd[1] != file.get_md5(mod):pd[0] = 0
 						mdf[zipPath] = [md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
 				if not zipPath in mdf:
 					var md5 = mod.md5_text()
 					if md5 in d:
 						var pd = d[md5]
-						if pd[1] != file.get_md5(mod):
-							pd[0] = 0
+						if pd[1] != file.get_md5(mod): pd[0] = 0
 						mdf[zipPath] = [md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
 			if mdf:
 				initFetch(mdf)
@@ -8623,7 +8713,7 @@ class _Scripting:
 				if not ID in currentFetch:
 					currentFetch[ID] = []
 				currentFetch[ID].append(this_index)
-				fetchTimer.start(1)
+				fetchTimer.start(1.25)
 				var h = HTTPRequest.new()
 				pointers.add_child(h)
 				h.connect("request_completed",self,"removeFetch",[h])
@@ -9523,13 +9613,13 @@ class _Zip:
 				var content = files[file_name]
 				match typeof(content):
 					TYPE_RAW_ARRAY:
-						var pkfilename = "writepck_%d" % (Time.get_ticks_usec() + hash(content))
+						var pkfilename = "user://cache/.HevLib_Cache/Variable_Fetch/writepck_%d" % (Time.get_ticks_usec() + hash(content))
 						file.open(pkfilename,File.WRITE)
 						file.store_buffer(content)
 						file.close()
 						packer.add_file(file_name,pkfilename)
 					TYPE_STRING:
-						var pkfilename = "writepck_%d" % (Time.get_ticks_usec() + hash(content))
+						var pkfilename = "user://cache/.HevLib_Cache/Variable_Fetch/writepck_%d" % (Time.get_ticks_usec() + hash(content))
 						file.open(pkfilename,File.WRITE)
 						file.store_string(content)
 						file.close()
