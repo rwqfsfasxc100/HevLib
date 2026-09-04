@@ -2864,10 +2864,13 @@ class _DataFormat:
 		var groups:int = int(floor(size / 32.0))
 		var i:int = 0
 		for g in range(groups):
-			crc = (crc_table_31[(crc & 0xFF) ^ bytes[i]] ^
-				crc_table_30[((crc >> 8) & 0xFF) ^ bytes[i + 1]] ^
-				crc_table_29[((crc >> 16) & 0xFF) ^ bytes[i + 2]] ^
-				crc_table_28[((crc >> 24) & 0xFF) ^ bytes[i + 3]] ^
+			# Rare me splitting a variable that isn't an array or dictionary between lines.
+			# Impossible to read and work on otherwise so :/
+			crc = (
+				crc_table_31[(crc & bitmask_uint8) ^ bytes[i]] ^
+				crc_table_30[((crc >> 8) & bitmask_uint8) ^ bytes[i + 1]] ^
+				crc_table_29[((crc >> 16) & bitmask_uint8) ^ bytes[i + 2]] ^
+				crc_table_28[((crc >> 24) & bitmask_uint8) ^ bytes[i + 3]] ^
 				crc_table_27[bytes[i + 4]] ^
 				crc_table_26[bytes[i + 5]] ^
 				crc_table_25[bytes[i + 6]] ^
@@ -2895,10 +2898,11 @@ class _DataFormat:
 				crc_table_3[bytes[i + 28]] ^
 				crc_table_2[bytes[i + 29]] ^
 				crc_table_1[bytes[i + 30]] ^
-				crc_table_0[bytes[i + 31]])
+				crc_table_0[bytes[i + 31]]
+			)
 			i += 32
 		while i < size:
-			crc = crc_table_0[(crc ^ bytes[i]) & 0xFF] ^ (crc >> 8)
+			crc = crc_table_0[(crc ^ bytes[i]) & bitmask_uint8] ^ (crc >> 8)
 			i += 1
 		return crc ^ bitmask_uint32
 	
