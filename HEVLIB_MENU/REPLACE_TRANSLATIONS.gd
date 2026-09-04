@@ -1633,6 +1633,10 @@ const TRANSLATIONS = {
 		"HEVLIB_FINISH_RESEARCH": {
 			"string": "Complete Research!",
 			"version_hash": 2793565484
+		},
+		"HEVLIB_START_RESEARCH": {
+			"string": "Start research!",
+			"version_hash": 3449780673
 		}
 	},
 	"de": {

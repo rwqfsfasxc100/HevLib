@@ -91,18 +91,20 @@ shape = SubResource( 1 )
 
 [node name="WorldEnvironment" parent="Icon/PanelContainer/ViewportContainer/Viewport" instance=ExtResource( 3 )]
 
-[node name="TextureRect" type="TextureRect" parent="Icon/PanelContainer/ViewportContainer/Viewport"]
+[node name="Container" type="Node2D" parent="Icon/PanelContainer/ViewportContainer/Viewport"]
+
+[node name="Rotation_offset" type="Node2D" parent="Icon/PanelContainer/ViewportContainer/Viewport/Container"]
+
+[node name="TextureRect" type="TextureRect" parent="Icon/PanelContainer"]
 modulate = Color( 1, 1, 1, 0 )
-margin_right = 200.0
-margin_bottom = 200.0
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 205.0
+margin_bottom = 205.0
 rect_min_size = Vector2( 200, 200 )
 texture = SubResource( 2 )
 expand = true
 stretch_mode = 7
-
-[node name="Container" type="Node2D" parent="Icon/PanelContainer/ViewportContainer/Viewport"]
-
-[node name="Rotation_offset" type="Node2D" parent="Icon/PanelContainer/ViewportContainer/Viewport/Container"]
 
 [node name="Progress" type="VBoxContainer" parent="."]
 margin_left = 214.0
@@ -119,27 +121,47 @@ text = "RESEARCH_TEMPLATE"
 [node name="SubBarProgress" type="VBoxContainer" parent="Progress"]
 margin_top = 46.0
 margin_right = 363.0
-margin_bottom = 160.0
+margin_bottom = 114.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Progress/SubBarProgress"]
-margin_top = 57.0
+margin_top = 34.0
 margin_right = 363.0
-margin_bottom = 57.0
+margin_bottom = 34.0
+
+[node name="LB" type="HBoxContainer" parent="Progress/SubBarProgress/HBoxContainer"]
+margin_right = 5.0
+rect_min_size = Vector2( 5, 0 )
+
+[node name="BarContainer" type="VBoxContainer" parent="Progress/SubBarProgress/HBoxContainer"]
+margin_left = 9.0
+margin_right = 354.0
+size_flags_horizontal = 3
+
+[node name="RB" type="HBoxContainer" parent="Progress/SubBarProgress/HBoxContainer"]
+margin_left = 358.0
+margin_right = 363.0
+rect_min_size = Vector2( 5, 0 )
 
 [node name="FullProgress" type="HBoxContainer" parent="Progress"]
-margin_top = 164.0
+margin_top = 118.0
 margin_right = 363.0
-margin_bottom = 164.0
+margin_bottom = 118.0
 size_flags_vertical = 0
 
 [node name="CompleteButton" type="Button" parent="Progress"]
+margin_top = 122.0
+margin_right = 363.0
+margin_bottom = 164.0
+text = "HEVLIB_FINISH_RESEARCH"
+
+[node name="StartButton" type="Button" parent="Progress"]
 margin_top = 168.0
 margin_right = 363.0
 margin_bottom = 210.0
-text = "HEVLIB_FINISH_RESEARCH"
+text = "HEVLIB_START_RESEARCH"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/Complete = SubResource( 3 )

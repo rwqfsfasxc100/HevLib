@@ -38,7 +38,8 @@ var research_state = {}
 var current_mod_ids = []
 
 onready var inactive_list = $Scroll/Items
-onready var active_list = get_node("../../../../HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/ScrollContainer/Projects")
+export (NodePath) var active_list_path = NodePath("../../../../HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/ScrollContainer/Projects")
+onready var active_list = get_node_or_null(active_list_path)
 
 func _initialize():
 	research_state = CurrentGame.state.hevlib_research

@@ -34,15 +34,24 @@ extends HBoxContainer
 
 export var this_research_project = {}
 
-onready var sub_progress_container = $Progress/SubBarProgress/HBoxContainer
+onready var name_button = $Progress/Name
+
+onready var sub_progress_container = $Progress/SubBarProgress/HBoxContainer/BarContainer
 onready var total_progress_container = $Progress/FullProgress
+
+onready var start_button = $Progress/StartButton
+onready var complete_button = $Progress/CompleteButton
 
 const progress_bar = preload("res://HevLib/scenes/research/research_item_box/ResearchProgressBar.tscn")
 
 var mark_for_completion = false
 
+var progress_bars = {}
+
 func _ready():
+	var project_state = this_research_project.get("state",{})
 	
+	start_button.visible = !project_state.active
 	
 	
 	var project_mode = this_research_project.get("mode","story_only")
@@ -52,20 +61,20 @@ func _ready():
 			var story_val = getStory(story_flag)
 			var project_name = this_research_project.get("name","RESEARCH_TEMPLATE")
 			var project_description = this_research_project.get("tooltip_text","RESEARCH_DESC_TEMPLATE")
-			var story_min = this_research_project.get("story_min",0)
-			var story_max = this_research_project.get("story_max",1000)
+			var story_min = max(this_research_project.get("story_min",0),0)
+			var story_max = max(this_research_project.get("story_max",1000),0)
 			var progress_min = this_research_project.get("progress_zero",0)
 			var progress_max = this_research_project.get("progress_complete",1000)
 			
 			var source = this_research_project.get("source","missing.mod.id")
-			var project_state = this_research_project.get("state",{})
+			
 			
 			if story_val < story_min or story_val > story_max:
 #				project_state
 				exit()
 			
 			
-			$Progress/Name.text = project_name
+			name_button.text = project_name
 			
 			var bar = progress_bar.instance()
 			bar.source = source
@@ -76,7 +85,7 @@ func _ready():
 			bar.parent = self
 			bar.is_total = true
 			bar.connect("storyFlag",self,"handle_story")
-			$Progress/FullProgress.add_child(bar)
+			total_progress_container.add_child(bar)
 			
 #			breakpoint
 		"story_progress":
@@ -93,12 +102,11 @@ func _ready():
 			var unlock_set = this_research_project.get("unlock_set",1000)
 			
 			var source = this_research_project.get("source","missing.mod.id")
-			var project_state = this_research_project.get("state",{})
 			
 			if story_val < story_min or story_val > story_max:
 				exit()
 			
-			$Progress/Name.text = project_name
+			name_button.text = project_name
 			
 			
 			
@@ -116,9 +124,8 @@ func _ready():
 			var unlock_set = this_research_project.get("unlock_set",1000)
 			
 			var source = this_research_project.get("source","missing.mod.id")
-			var project_state = this_research_project.get("state",{})
 			
-			$Progress/Name.text = project_name
+			name_button.text = project_name
 			if this_research_project.state.active:
 				for task in tasks:
 					var tooltip_text = task.get("tooltip_text","")
@@ -183,6 +190,9 @@ func getStory(story):
 	return int(CurrentGame.state.story.get(story, -1))
 
 var default_vp_positioning = {"position":Vector2(0,0),"rotation":90,"scale":Vector2(1,1)}
+
+func update_progress():
+	pass
 
 func _process(_delta):
 	if is_visible_in_tree():
