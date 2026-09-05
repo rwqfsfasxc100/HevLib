@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://HevLib/scenes/research/research_item_box/ResearchProgressBar.gd" type="Script" id=1]
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=2]
 [ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=3]
+[ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=4]
 
 [node name="ResearchProgressBar" type="ProgressBar"]
 margin_right = 290.0
@@ -19,5 +20,8 @@ size_flags_horizontal = 3
 flat = true
 
 [node name="PlaySoundsOnTheseButtons" parent="Button" instance=ExtResource( 3 )]
+
+[node name="SmoothScrollTo" parent="Button" instance=ExtResource( 4 )]
+focusAt = NodePath("../..")
 
 [connection signal="pressed" from="Button" to="." method="_pressed"]

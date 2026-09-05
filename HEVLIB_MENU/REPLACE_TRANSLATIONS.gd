@@ -1637,6 +1637,22 @@ const TRANSLATIONS = {
 		"HEVLIB_START_RESEARCH": {
 			"string": "Start research!",
 			"version_hash": 3449780673
+		},
+		"HEVLIB_RESEARCH_ACTIVE_PROJECTS": {
+			"string": "Active Projects",
+			"version_hash": 3390722379
+		},
+		"HEVLIB_RESEARCH_COMPLETED_PROJECTS": {
+			"string": "Completed Projects",
+			"version_hash": 1653704780
+		},
+		"HEVLIB_SHOW_COMPLETED_PROJECTS": {
+			"string": "Show completed projects",
+			"version_hash": 633182925
+		},
+		"HEVLIB_COMPLETED_PROJECTS": {
+			"string": "Completed Projects",
+			"version_hash": 1653704780
 		}
 	},
 	"de": {

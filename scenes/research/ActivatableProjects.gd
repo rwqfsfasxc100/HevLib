@@ -38,15 +38,17 @@ var research_state = {}
 var current_mod_ids = []
 
 onready var inactive_list = $Scroll/Items
-export (NodePath) var active_list_path = NodePath("../../../../HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/ScrollContainer/Projects")
+export (NodePath) var active_list_path = NodePath("../../../../HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/ActiveProjectsList/Projects")
 onready var active_list = get_node_or_null(active_list_path)
+export (NodePath) var completed_list_path = NodePath("../../../../HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/CompletedProjects/Projects")
+onready var completed_list = get_node_or_null(completed_list_path)
 
 func _initialize():
 	research_state = CurrentGame.state.hevlib_research
 	for project in research_state:
 		var obj = research_state[project]
 		
-		if obj.state.active == false and obj.source in current_mod_ids:
+		if !obj.state.active and obj.source in current_mod_ids:
 			var p = research_item.instance()
 			p.this_research_project = obj
 			p.name = obj.source + "|" + obj.name
@@ -57,7 +59,7 @@ func _initialize():
 						active_list.add_child(p)
 					else:
 						obj.state.completed = true
-						active_list.add_child(p)
+						completed_list.add_child(p)
 				_:
 					
 					inactive_list.add_child(p)

@@ -39,15 +39,14 @@ var research_button
 onready var current_project_management = $TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement
 onready var dormant_project_management = $TabHintContainer/Tabs/HEVLIB_RESEARCH_AVAILABLE/MarginContainer/HBoxContainer/ActivatableProjects
 
+onready var show_completed_projects_btn = $TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer2/HBoxContainer/CheckButton
+
 func show():
 	if $Shower.is_playing():
 		return
 	lastFocus = get_focus_owner()
 	$Shower.play("show")
-	var actives = current_project_management.get_node("VBoxContainer/ScrollContainer/Projects")
-	if actives.get_child_count() > 0:
-		var first = actives.get_child(0).get_node("Progress/Name")
-		first.grab_focus()
+	show_completed_projects_btn.grab_focus()
 	if visible:
 		hide()
 	
@@ -64,8 +63,8 @@ func show():
 #
 #
 #	CurrentGame.send_notification(notif)
-	
-		
+
+
 func hide():
 	if not visible or $Shower.current_animation == "hide":
 		return

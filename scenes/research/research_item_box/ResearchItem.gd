@@ -49,32 +49,31 @@ var mark_for_completion = false
 var progress_bars = {}
 
 func _ready():
-	var project_state = this_research_project.get("state",{})
 	connect("visibility_changed",self,"recheck_vis")
+	initialize()
 	
-	
-	
+
+
+func initialize():
+	var project_state = this_research_project.get("state",{})
 	var project_mode = this_research_project.get("mode","story_only")
+	
+	var project_name = this_research_project.get("name","RESEARCH_TEMPLATE")
+	var project_description = this_research_project.get("tooltip_text","RESEARCH_DESC_TEMPLATE")
+	
 	match project_mode:
 		"story_only":
 			var story_flag = this_research_project.get("story_flag","")
 			var story_val = getStory(story_flag)
-			var project_name = this_research_project.get("name","RESEARCH_TEMPLATE")
-			var project_description = this_research_project.get("tooltip_text","RESEARCH_DESC_TEMPLATE")
 			var story_min = max(this_research_project.get("story_min",0),0)
 			var story_max = max(this_research_project.get("story_max",1000),0)
 			var progress_min = this_research_project.get("progress_zero",0)
 			var progress_max = this_research_project.get("progress_complete",1000)
-			
 			var source = this_research_project.get("source","missing.mod.id")
 			
 			
 			if story_val < story_min or story_val > story_max:
-#				project_state
 				exit()
-			
-			
-			name_button.text = project_name
 			
 			var bar = progress_bar.instance()
 			bar.source = source
@@ -91,8 +90,6 @@ func _ready():
 		"story_progress":
 			var story_flag = this_research_project.get("story_flag")
 			var story_val = getStory(story_flag)
-			var project_name = this_research_project.get("name","RESEARCH_TEMPLATE")
-			var project_description = this_research_project.get("tooltip_text","RESEARCH_DESC_TEMPLATE")
 			var story_min = this_research_project.get("story_min",0)
 			var story_max = this_research_project.get("story_max",1000)
 			var progress_min = this_research_project.get("progress_zero",0)
@@ -106,9 +103,6 @@ func _ready():
 			if story_val < story_min or story_val > story_max:
 				exit()
 			
-			name_button.text = project_name
-			
-			
 			
 			
 #			breakpoint
@@ -116,8 +110,6 @@ func _ready():
 			
 			var show_when = this_research_project.get("show_when")
 			var tasks = this_research_project.get("tasks",[])
-			var project_name = this_research_project.get("name","RESEARCH_TEMPLATE")
-			var project_description = this_research_project.get("tooltip_text","RESEARCH_DESC_TEMPLATE")
 			var initiation_price = this_research_project.get("initiation_price",100000)
 			
 			var unlock_story = this_research_project.get("unlock_story","")
@@ -125,7 +117,6 @@ func _ready():
 			
 			var source = this_research_project.get("source","missing.mod.id")
 			
-			name_button.text = project_name
 			if this_research_project.state.active:
 				for task in tasks:
 					var tooltip_text = task.get("tooltip_text","")
@@ -173,11 +164,15 @@ func _ready():
 							sub_progress_container.add_child(bar)
 							
 						
-						
-					
+				
 			
-			
-			
+#			breakpoint
+	name_button.text = project_name
+	name_button.hint_tooltip = project_description
+	
+	
+	
+	
 
 func handle_story(flag,value):
 	
