@@ -1653,6 +1653,14 @@ const TRANSLATIONS = {
 		"HEVLIB_COMPLETED_PROJECTS": {
 			"string": "Completed Projects",
 			"version_hash": 1653704780
+		},
+		"HEVLIB_RESEARCH_TOGGLE_COMPLETED_VISIBILITY": {
+			"string": "Whether the list of completed research projects should be displayed",
+			"version_hash": 4158265463
+		},
+		"HEVLIB_RESEARCH_TOGGLE_COMPLETED_VISIBILITY_DISABLED": {
+			"string": "No completed projects can be shown",
+			"version_hash": 3880024785
 		}
 	},
 	"de": {

@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://enceladus/ScrollWithAnalog.gd" type="Script" id=1]
 [ext_resource path="res://HevLib/scenes/research/ActivatableProjects.gd" type="Script" id=2]
@@ -10,6 +10,8 @@
 [ext_resource path="res://menu/SubMenuTheme.tres" type="Theme" id=8]
 [ext_resource path="res://enceladus/Subwindow.theme" type="Theme" id=9]
 [ext_resource path="res://menu/TabsWithGamepadControl.gd" type="Script" id=10]
+[ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=11]
+[ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=12]
 
 [node name="Research" type="MarginContainer"]
 margin_right = 1184.0
@@ -157,6 +159,11 @@ text = "HEVLIB_SHOW_COMPLETED_PROJECTS"
 margin_left = 1126.0
 margin_right = 1182.0
 margin_bottom = 26.0
+
+[node name="SmoothScrollTo" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer2/HBoxContainer/CheckButton" instance=ExtResource( 11 )]
+focusAt = NodePath("../..")
+
+[node name="PlaySoundsOnTheseButtons" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer2/HBoxContainer/CheckButton" instance=ExtResource( 12 )]
 
 [node name="CurrentProjects" type="Label" parent="TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer"]
 modulate = Color( 0.501961, 0.501961, 0.501961, 1 )

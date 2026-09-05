@@ -47,6 +47,7 @@ func show():
 	lastFocus = get_focus_owner()
 	$Shower.play("show")
 	show_completed_projects_btn.grab_focus()
+	show_completed_projects_btn.pressed = false
 	if visible:
 		hide()
 	

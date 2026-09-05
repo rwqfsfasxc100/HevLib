@@ -54,7 +54,8 @@ func _initialize():
 			p.name = obj.source + "|" + obj.name
 			match obj.mode:
 				"story_only":
-					if getStory(obj.story_flag) < obj.progress_complete:
+					var story = getStory(obj.story_flag)
+					if story > -1 and story < obj.progress_complete:
 						obj.state.active = true
 						active_list.add_child(p)
 					else:

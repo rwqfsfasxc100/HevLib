@@ -30,7 +30,7 @@
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
 
-extends ProgressBar
+extends MarginContainer
 
 var source = ""
 
@@ -56,29 +56,33 @@ var parent
 
 var is_total = false
 
+onready var progress_bar = $ProgressBar
+
 func _ready():
+	$Button.connect("pressed",self,"_pressed")
+	$ProgressBar.connect("value_changed",self,"_on_value_changed")
 	$Button.hint_tooltip = tooltip_text
 	match mode:
 		"story_only":
-			min_value = story_min
-			max_value = story_max
-			step = 1
+			progress_bar.min_value = story_min
+			progress_bar.max_value = story_max
+			progress_bar.step = 1
 		"payment":
-			min_value = 0
-			max_value = amount
-			step = 1
+			progress_bar.min_value = 0
+			progress_bar.max_value = amount
+			progress_bar.step = 1
 		"time":
-			min_value = 0
-			max_value = Time.get_unix_time_from_datetime_dict(handle_time({"year":years,"month":months,"day":days,"hour":hours,"minute":minutes,"second":0}))
+			progress_bar.min_value = 0
+			progress_bar.max_value = Time.get_unix_time_from_datetime_dict(handle_time({"year":years,"month":months,"day":days,"hour":hours,"minute":minutes,"second":0}))
 			if minutes:
-				step = 60
+				progress_bar.step = 60
 	
-	
+	connect("visibility_changed",self,"vis_changed")
 	
 	if story_flag == "":
 		Tool.remove(self)
 
-func _process(delta):
+func vis_changed():
 	if is_visible_in_tree():
 		set_progress()
 var pointers = ModLoader._savedObjects[0]
@@ -90,11 +94,9 @@ func handle_time(datetime_dict : Dictionary):
 
 func set_progress():
 	var val = getStory(story_flag)
-	$Button.rect_size = rect_size - Vector2(4,0)
-#	breakpoint
 	match mode:
 		"story_only":
-			value = clamp(val, story_min,story_max)
+			progress_bar.value = clamp(val,story_min,story_max)
 			if is_total and val >= story_max:
 				parent.mark_for_completion = true
 		"payment":
@@ -103,8 +105,11 @@ func set_progress():
 			pass
 		"total":
 			pass
+	
 
-
+func _on_value_changed(how:float):
+	var value = int(clamp(round(how / (story_max - story_min)),0,1) * 100)
+	$Button.text = "%d%%" % value
 
 
 

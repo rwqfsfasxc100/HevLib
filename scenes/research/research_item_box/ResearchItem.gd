@@ -39,8 +39,8 @@ onready var name_button = $Progress/Name
 onready var sub_progress_container = $Progress/SubBarProgress/HBoxContainer/BarContainer
 onready var total_progress_container = $Progress/FullProgress
 
-onready var start_button = $Progress/StartButton
-onready var complete_button = $Progress/CompleteButton
+onready var start_button = $Progress/StartContainer/StartButton
+onready var start_container = $Progress/StartContainer
 
 const progress_bar = preload("res://HevLib/scenes/research/research_item_box/ResearchProgressBar.tscn")
 
@@ -48,10 +48,23 @@ var mark_for_completion = false
 
 var progress_bars = {}
 
+var pointers = ModLoader._savedObjects[0]
+
+onready var sprite_container = $Icon/PanelContainer/TextureRect
+onready var scene_container = $Icon/PanelContainer/ViewportContainer
+onready var scene_offset = $Icon/PanelContainer/ViewportContainer/Viewport/Container/Rotation_offset
+
 func _ready():
 	connect("visibility_changed",self,"recheck_vis")
 	initialize()
 	
+	start_button.connect("pressed",self,"start_pressed")
+	
+	
+	
+
+signal completed
+signal started
 
 
 func initialize():
@@ -59,7 +72,7 @@ func initialize():
 	var project_mode = this_research_project.get("mode","story_only")
 	
 	var project_name = this_research_project.get("name","RESEARCH_TEMPLATE")
-	var project_description = this_research_project.get("tooltip_text","RESEARCH_DESC_TEMPLATE")
+	var project_description = this_research_project.get("description","RESEARCH_DESC_TEMPLATE")
 	
 	match project_mode:
 		"story_only":
@@ -72,7 +85,7 @@ func initialize():
 			var source = this_research_project.get("source","missing.mod.id")
 			
 			
-			if story_val < story_min or story_val > story_max:
+			if (story_min > -1 and story_val < story_min) or (story_max > -1 and story_val > story_max):
 				exit()
 			
 			var bar = progress_bar.instance()
@@ -95,12 +108,14 @@ func initialize():
 			var progress_min = this_research_project.get("progress_zero",0)
 			var progress_max = this_research_project.get("progress_complete",1000)
 			
+			var tooltip_text = this_research_project.get("tooltip_text","")
+			
 			var unlock_story = this_research_project.get("unlock_story","")
 			var unlock_set = this_research_project.get("unlock_set",1000)
 			
 			var source = this_research_project.get("source","missing.mod.id")
 			
-			if story_val < story_min or story_val > story_max:
+			if (story_min > -1 and story_val < story_min) or (story_max > -1 and story_val > story_max):
 				exit()
 			
 			
@@ -170,7 +185,45 @@ func initialize():
 	name_button.text = project_name
 	name_button.hint_tooltip = project_description
 	
-	
+	var display_mode = this_research_project.get("display_mode","sprite")
+	var display_path:String = this_research_project.get("display_path","")
+	var sprite_fallback = false
+	if pointers.FileAccess.__file_exists(display_path):
+		match display_mode:
+			"sprite":
+				match display_path.get_extension():
+					"png":
+						sprite_container.texture = pointers.FileAccess.__load_png(display_path)
+						sprite_container.visible = true
+						scene_container.visible = false
+					"stex":
+						var tex = StreamTexture.new()
+						tex.load_path = display_path
+						sprite_container.texture = tex
+						sprite_container.visible = true
+						scene_container.visible = false
+					_:
+						sprite_fallback = true
+			"scene":
+				var scene = load(display_path)
+				if scene is PackedScene:
+					var inst = scene.instance()
+					var display_positioning = this_research_project.get("display_positioning",{})
+					var scale = display_positioning.get("scale",Vector2.ONE)
+					scene_offset.position = display_positioning.get("position",Vector2.ZERO) * scale
+					scene_offset.rotation = deg2rad(display_positioning.get("rotation",0.0))
+					scene_offset.scale = scale
+					pointers.NodeAccess.__remove_scripts(inst)
+					scene_offset.add_child(inst)
+					sprite_container.visible = false
+					scene_container.visible = true
+				else:
+					sprite_fallback = true
+			_:
+				sprite_fallback = true
+	if sprite_fallback:
+		sprite_container.visible = true
+		scene_container.visible = false
 	
 	
 
@@ -189,11 +242,41 @@ var default_vp_positioning = {"position":Vector2(0,0),"rotation":90,"scale":Vect
 func update_progress():
 	pass
 
+func is_finished() -> bool:
+	match this_research_project.get("mode","story_only"):
+		"story_only","story_progress":
+			if getStory(this_research_project.get("story_flag","")) >= this_research_project.get("progress_complete",1000):
+				return true
+		"isolated":
+			var failed = false
+			for task in this_research_project.get("tasks",[]):
+				match task.get("mode",""):
+					"story":
+						if getStory(task.get("story_flag","")) != task.get("story_max",1000):
+							return false
+					"payment":
+						if getStory(task.get("story_flag","")) != task.get("amount",100000):
+							return false
+					"time":
+						var time_total = Time.get_unix_time_from_datetime_dict({
+							"year":task.get("years",0),
+							"month":task.get("months",0),
+							"day":task.get("days",0),
+							"hour":task.get("hours",0),
+							"minute":task.get("minutes",0),
+							"second":0
+						})
+						if getStory(task.get("story_flag","")) < time_total:
+							return false
+	return false
+
+func start_pressed():
+	pass
+
 func recheck_vis():
 	if is_visible_in_tree():
 		var project_state = this_research_project.get("state",{})
-		start_button.visible = !(project_state.active or project_state.completed)
-		complete_button.visible = project_state.active and !project_state.completed
+		start_container.visible = !(project_state.active or project_state.completed)
 		
 		
 		

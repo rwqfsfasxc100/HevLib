@@ -41,9 +41,18 @@ onready var active_list = $VBoxContainer/ActiveProjectsList/Projects
 onready var completed_list = $VBoxContainer/CompletedProjects/Projects
 
 onready var active_projects_count_label = $VBoxContainer/MarginContainer/GridContainer/Active/ActiveValue 
-onready var completed_projects_count_label = $VBoxContainer/MarginContainer/GridContainer/Active/ActiveValue 
+onready var completed_projects_count_label = $VBoxContainer/MarginContainer/GridContainer/Completed/CompletedValue 
+
+onready var show_completed_button = $VBoxContainer/MarginContainer2/HBoxContainer/CheckButton
+
+onready var completed_projects_header = $VBoxContainer/FinishedProjects
+onready var completed_projects_container = $VBoxContainer/CompletedProjects
 
 var has_operated = false
+
+func _ready():
+	show_completed_button.connect("toggled",self,"toggle_completed_visibility")
+	connect("visibility_changed",self,"vis_changed")
 
 func _initialize():
 	research_state = CurrentGame.state.hevlib_research
@@ -63,3 +72,21 @@ func _initialize():
 	
 	
 	pass
+
+func vis_changed():
+	if is_visible_in_tree():
+		var completed_count = completed_list.get_child_count()
+		if completed_count:
+			show_completed_button.disabled = false
+			show_completed_button.hint_tooltip = "HEVLIB_RESEARCH_TOGGLE_COMPLETED_VISIBILITY"
+			toggle_completed_visibility(show_completed_button.pressed)
+		else:
+			show_completed_button.disabled = true
+			show_completed_button.hint_tooltip = "HEVLIB_RESEARCH_TOGGLE_COMPLETED_VISIBILITY_DISABLED"
+			toggle_completed_visibility(false)
+		active_projects_count_label.text = ("%d" % active_list.get_child_count())
+		completed_projects_count_label.text = ("%d" % completed_count)
+
+func toggle_completed_visibility(how:bool):
+	completed_projects_header.visible = how
+	completed_projects_container.visible = how
