@@ -100,6 +100,7 @@ func _enter_tree():
 #	base_mass = currentMass
 	
 #	CurrentGame.setStory("dd.story.interplanetary",10)
+#	CurrentGame.setStory("hardware.nakamura",1)
 	l("Readying ship. Base storage of %s proc / %s ammo / %s nanodrones on storage type of %s" % [base_proc_storage, base_ammo_storage, base_nano_storage, base_storage_type])
 	
 	

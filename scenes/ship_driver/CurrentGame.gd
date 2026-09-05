@@ -63,7 +63,7 @@ func hl_shipdriver_init_ships_to_dealer():
 		if pointersShipDriver.ConfigDriver.__validate_dictionary(fd,true,true,true,"settings_config") and "name" in fd and fd.name and "dealer" in fd:
 			var shipName = fd["name"]
 			if "path" in fd and fd.path:
-				if pointersShipDriver.DataFormat.__file_exists(fd.path):
+				if pointersShipDriver.FileAccess.__file_exists(fd.path):
 					var age = fd["dealer"].get("age",200)
 					var dict = {"name":shipName,"age":24 * 3600 * 365 * age}
 					for i in range(max(0,fd["dealer"].get("weight",1))):
@@ -103,7 +103,7 @@ func initialize_scrapwright():
 		if pointersShipDriver.ConfigDriver.__validate_dictionary(data,false) and "name" in data and data.name and "salvage_broadcast" in data:
 			var shipName = data["name"]
 			if "path" in data and data.path:
-				if pointersShipDriver.DataFormat.__file_exists(data.path):
+				if pointersShipDriver.FileAccess.__file_exists(data.path):
 					var salv = data["salvage_broadcast"]
 					var dname = data.get("specific_derelict_name","ModdedDerelict_" + shipName)
 					match typeof(salv):

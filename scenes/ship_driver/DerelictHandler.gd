@@ -80,7 +80,7 @@ func _ready():
 		if pointers.ConfigDriver.__validate_dictionary(fd,true,true,true,"settings_config") and mode in fd and "name" in fd and "path" in fd:
 			var shipName = fd["name"]
 			if "path" in fd and fd.path:
-				if pointers.DataFormat.__file_exists(fd.path):
+				if pointers.FileAccess.__file_exists(fd.path):
 					var event = fd[mode]
 					ship_pool.merge({shipName:event})
 				else:

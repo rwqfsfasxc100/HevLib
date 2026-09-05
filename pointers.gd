@@ -41,11 +41,11 @@ var webtranslate_modmain
 
 var Achievements : _Achievements = _Achievements.new(self,http)
 var ConfigDriver : _ConfigDriver = _ConfigDriver.new(self)
+var FileAccess : _FileAccess = _FileAccess.new(self)
 var DataFormat : _DataFormat = _DataFormat.new(self)
 var DriverManagement : _DriverManagement = _DriverManagement.new(self)
 var Equipment : _Equipment = _Equipment.new(self)
 var Events : _Events = _Events.new(self)
-var FileAccess : _FileAccess = _FileAccess.new(self)
 var FolderAccess : _FolderAccess = _FolderAccess.new(self)
 var Github : _Github = _Github.new(self)
 var HevLib : _HevLib = _HevLib.new(self)
@@ -1857,15 +1857,6 @@ class _DataFormat:
 						"Bool for whether the object was loaded or not."
 					]
 				},
-				"__file_exists":{
-					"description":"An all-encompassing method to determine if a file exists in the filesystem, without the need to query File and ResourceLoader directly",
-					"args":[
-						"file_path -> (String) the file path to the desired resource to check. Can be both relative, global, or OS-global",
-					],
-					"return":[
-						"Bool for whether the file at file_path exists or not."
-					]
-				},
 				"__is_valid_url":{
 					"description":"Checks a provided URL to see if it's valid.",
 					"args":[
@@ -2578,7 +2569,7 @@ class _DataFormat:
 	func __load_if_can(filepath : String, override_cache : bool = false, type_hint : String = ""):
 		if not filepath:
 			return false
-		if __file_exists(filepath):
+		if pointers.FileAccess.__file_exists(filepath):
 			var obj = ResourceLoader.load(filepath,type_hint,override_cache)
 			if obj:
 				last_load = obj
@@ -2595,10 +2586,6 @@ class _DataFormat:
 		if not Tool.ovnolock(last_load):
 			last_load = null
 		return last_load
-	
-	func __file_exists(file_path:String) -> bool:
-		file_path = ProjectSettings.localize_path(file_path)
-		return (ResourceLoader.exists(file_path) or file.file_exists(file_path))
 	
 	var urlRegex = RegEx.new()
 	func __is_valid_url(URL:String) -> bool:
@@ -5660,7 +5647,16 @@ class _FileAccess:
 					"return":[
 						"PoolByteArray for the output buffer."
 					]
-				}
+				},
+				"__file_exists":{
+					"description":"An all-encompassing method to determine if a file exists in the filesystem, without the need to query File and ResourceLoader directly",
+					"args":[
+						"file_path -> (String) the file path to the desired resource to check. Can be both relative, global, or OS-global",
+					],
+					"return":[
+						"Bool for whether the file at file_path exists or not."
+					]
+				},
 			}
 		}
 	
@@ -5779,7 +5775,9 @@ class _FileAccess:
 				pointers.l("ERROR: content must be a String or PoolByteArray to be converted to buffer","pointers.FileAccess")
 				return PoolByteArray()
 	
-	
+	func __file_exists(file_path:String) -> bool:
+		file_path = ProjectSettings.localize_path(file_path)
+		return (ResourceLoader.exists(file_path) or file.file_exists(file_path))
 	
 	
 	
@@ -6851,7 +6849,7 @@ class _ManifestV2:
 					if dir.current_is_dir():
 						continue
 					var modFSPath = modPathPrefix.plus_file(fileName)
-					if pointers.DataFormat.__file_exists(modFSPath):
+					if pointers.FileAccess.__file_exists(modFSPath):
 						_modZipFiles.append(modFSPath)
 				dir.list_dir_end()
 				var modFiles = []
@@ -6966,7 +6964,7 @@ class _ManifestV2:
 		return zip_ref_store.get(mod_main_path,"")
 	
 	func __concat_mod_info(mod_path:String) -> Dictionary:
-		if not pointers.DataFormat.__file_exists(mod_path):
+		if not pointers.FileAccess.__file_exists(mod_path):
 			return {}
 		var cv : String = mod_path.get_file().to_lower()
 		if cv.begins_with("modmain") and cv.ends_with(".gd"):
@@ -8062,11 +8060,11 @@ class _ManifestV2:
 							match load_type:
 								"script":
 									var path : String = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
-									if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.DataFormat.__file_exists(path):
+									if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
 										var override = subdata.get("override",false)
 										var op = subdata.get("override_path","res:/" + path.split(modlet.get_base_dir())[1])
 										var override_path : String = op if (op.begins_with("res:/")) else ("res:/" + ("" if op.begins_with("/") else "/") + op)
-										if override and pointers.DataFormat.__file_exists(override_path):
+										if override and pointers.FileAccess.__file_exists(override_path):
 											pointers.DataFormat.__override_script(path,override_path)
 										else:
 											pointers.DataFormat.__extend_script(path)
@@ -8074,13 +8072,13 @@ class _ManifestV2:
 									var path : String = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
 									var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[1])
 									var old_path : String = old if (old.begins_with("res:/")) else ("res:/" + ("" if old.begins_with("/") else "/") + old)
-									if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.DataFormat.__file_exists(path):
+									if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
 										pointers.DataFormat.__replace_resource(path,old_path)
 										if not old_path in scenes_to_reload:
 											scenes_to_reload.append(old_path)
 								"reload":
 									var path : String = resource if is_relative else ("res:/" + ("" if resource.begins_with("/") else "/") + resource)
-									if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.DataFormat.__file_exists(path):
+									if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
 										pointers.DataFormat.__reload_scene(path,subdata.get("complete_reload",false))
 				pointers.DataFormat.__loadDLC()
 		return scenes_to_reload
@@ -8092,7 +8090,7 @@ class _ManifestV2:
 			var disabled:Dictionary = {}
 			var all_modlets:Dictionary = __get_all_modlets(false)
 			for modlet in all_modlets:
-				if not all_modlets[modlet] and pointers.DataFormat.__file_exists(modlet):
+				if not all_modlets[modlet] and pointers.FileAccess.__file_exists(modlet):
 					var mv:Dictionary = __parse_file_as_manifest(modlet)
 					disabled.merge({modlet:mv.get("mod_information",{}).get("id","%s_MISSING_ID" % modlet)})
 			disabledModletCache = disabled
@@ -8761,7 +8759,7 @@ class _Scripting:
 						var scenes:PoolStringArray = PoolStringArray()
 						for i in range(7):
 							var specific:String = mineral.get("ore_%s" % (i + 1),"")
-							if specific and pointers.DataFormat.__file_exists(specific):
+							if specific and pointers.FileAccess.__file_exists(specific):
 								scenes.append(specific)
 						if scenes.size() > 6:
 							traces.append(mname)
@@ -8788,7 +8786,7 @@ class _Scripting:
 						var scenes:PoolStringArray = PoolStringArray()
 						for i in range(7):
 							var specific:String = mineral.get("ore_%s" % (i + 1),"")
-							if specific and pointers.DataFormat.__file_exists(specific):
+							if specific and pointers.FileAccess.__file_exists(specific):
 								scenes.append(specific)
 						if scenes.size() > 6:
 							var mh = "\n\t\"%s\":[\n" % str(mname)

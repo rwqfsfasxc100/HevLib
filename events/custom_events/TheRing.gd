@@ -90,7 +90,7 @@ func _ready():
 						node.agenda = event.get("crew_agenda","AGENDA_LOOKING_FOR_SIBLING")			# Agenda that MUST be present within your crew for the event to spawn.
 						node.shipNameAgenda = event.get("agenda_ship_name","{agenda/ship/0/shipname}") # Ship name that would be consistently given based on the specific crew agenda.
 						var derelictConversation = event.get("derelict_conversation","res://comms/conversation/AgendaDerelictConversation.tscn") # The conversation player node to use for the derelict. Defaults to the missing sibling conversation.
-						if pointers.DataFormat.__file_exists(derelictConversation):
+						if pointers.FileAccess.__file_exists(derelictConversation):
 							node.derelictConversation = load(derelictConversation)
 						else:
 							node.derelictConversation = load("res://comms/conversation/AgendaDerelictConversation.tscn")
@@ -128,12 +128,12 @@ func _ready():
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"claim_beacon":
 						var claim = event.get("claim_beacon","res://ships/drone/ClaimBeacon.tscn")	# The scene for the claim beacon. NOTE: If using as actual claim beacons, these scenes must be unique to provide the beacon-specific dialogue trees.
-						if pointers.DataFormat.__file_exists(claim):
+						if pointers.FileAccess.__file_exists(claim):
 							node.claim = load(claim)
 						else:
 							node.claim = load("res://ships/drone/ClaimBeacon.tscn")
 						var alreadyClaimed = event.get("already_claimed","res://story/DummyBeacon.tscn") # Fallback scene if the transponder for the event's claim beacon is already an active transponder for whatever reason. The default scene should be sufficient for a fallback, but useful to override for additional handling.
-						if pointers.DataFormat.__file_exists(alreadyClaimed):
+						if pointers.FileAccess.__file_exists(alreadyClaimed):
 							node.alreadyClaimed = load(alreadyClaimed)
 						else:
 							node.alreadyClaimed = load("res://story/DummyBeacon.tscn")
@@ -144,7 +144,7 @@ func _ready():
 						node.transponderFormat = event.get("transponder_format","%s-CB%d")			# The format the beacon's transponder will use. MUST contain both a `%s` and `%d` once each for the code and suffix respectively.
 					"claim_beacon_foreign":
 						var claim = event.get("claim_beacon","res://ships/drone/ClaimBeaconForeign.tscn") # The scene for the claim beacon object. Should be a ship-based object, as four properties typically only found on objects using ship-ctrl.gd are set on this object.
-						if pointers.DataFormat.__file_exists(claim):
+						if pointers.FileAccess.__file_exists(claim):
 							node.claim = load(claim)
 						else:
 							node.claim = load("res://ships/drone/ClaimBeaconForeign.tscn")
@@ -161,7 +161,7 @@ func _ready():
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"dead_body":
 						var beacon = event.get("beacon","res://story/DeadTalkingBeacon.tscn") # Main beacon or ship object. Used as the parent for the body transponders.
-						if pointers.DataFormat.__file_exists(beacon):
+						if pointers.FileAccess.__file_exists(beacon):
 							node.beacon = load(beacon)
 						else:
 							node.beacon = load("res://story/DeadTalkingBeacon.tscn")
@@ -179,7 +179,7 @@ func _ready():
 						]))
 						var bd:Array = []
 						for body in bodies:
-							if pointers.DataFormat.__file_exists(body):
+							if pointers.FileAccess.__file_exists(body):
 								bd.append(load(body))
 						node.bodies = bd
 						node.nrMin = max(event.get("minimum_count",2),0)							# Minimum number of bodies that can be found.
@@ -211,13 +211,13 @@ func _ready():
 						node.maxAngular = event.get("maximum_angular_velocity",2)					# Maximum angular velocity that the ship can be set to, measured in radians per second.
 						node.gauss = max(event.get("gauss",6),0)									# Power the random value used to set random linear and angular velocities to. Used as pow(randf(), gauss).
 						var derelictConversation = event.get("derelict_conversation","res://comms/conversation/DerelictConversation.tscn") # The scene for the derelict K37's comms node.
-						if pointers.DataFormat.__file_exists(derelictConversation):
+						if pointers.FileAccess.__file_exists(derelictConversation):
 							node.derelictConversation = load(derelictConversation)
 						else:
 							node.derelictConversation = load("res://comms/conversation/DerelictConversation.tscn")
 					"humongous_hollow_rock":
 						var rock = event.get("rock_scene","res://story/Moonlet.tscn")				# The rock scene spawned by this event.
-						if pointers.DataFormat.__file_exists(rock):
+						if pointers.FileAccess.__file_exists(rock):
 							node.rock = load(rock)
 						else:
 							node.rock = load("res://story/Moonlet.tscn")
@@ -234,13 +234,13 @@ func _ready():
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"instance_with_chance":
 						var rock = event.get("rock_scene","res://story/habitat/Habitat.tscn")		# The rock scene spawned by this event.
-						if pointers.DataFormat.__file_exists(rock):
+						if pointers.FileAccess.__file_exists(rock):
 							node.rock = load(rock)
 						else:
 							node.rock = load("res://story/habitat/Habitat.tscn")
 						var knownRock = event.get("known_rock_scene","")							# An alternate rock scene spawned by this event, if it's either not a singular event and the POI has not expired within the astrogation list, or it's a singular event and you've encountered it before.
 						if knownRock:
-							if pointers.DataFormat.__file_exists(knownRock):
+							if pointers.FileAccess.__file_exists(knownRock):
 								node.knownRock = load(knownRock)
 							else:
 								node.knownRock = null
@@ -266,7 +266,7 @@ func _ready():
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"inter_crew_banter":
 						var beacon = event.get("beacon","res://story/TighbeamBeacon.tscn")			# The scene for the object/beacon used by the event. 
-						if pointers.DataFormat.__file_exists(beacon):
+						if pointers.FileAccess.__file_exists(beacon):
 							node.beacon = load(beacon)
 						else:
 							node.beacon = load("res://story/TighbeamBeacon.tscn")
@@ -275,7 +275,7 @@ func _ready():
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"lifepod_is_floating":
 						var lifepod = event.get("lifepod","res://ships/Lifepod.tscn")				# The lifepod/object scene spawned by this event.
-						if pointers.DataFormat.__file_exists(lifepod):
+						if pointers.FileAccess.__file_exists(lifepod):
 							node.lifepod = load(lifepod)
 						else:
 							node.lifepod = load("res://ships/Lifepod.tscn")
@@ -284,7 +284,7 @@ func _ready():
 						node.processedCargoMin = clamp(event.get("processed_cargo_min",0),0,1)		# The minimum fill percentage which all processed holds can be filled to.
 					"locust_swarm":
 						var beacon = event.get("beacon","res://story/Locust.tscn")					# The scene for the object used by the event.
-						if pointers.DataFormat.__file_exists(beacon):
+						if pointers.FileAccess.__file_exists(beacon):
 							node.beacon = load(beacon)
 						else:
 							node.beacon = load("res://story/Locust.tscn")
@@ -297,7 +297,7 @@ func _ready():
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"minefield":
 						var mine = event.get("mine","res://ships/drone/DroneMine.tscn")				# The scene for the objects spawned by this event.
-						if pointers.DataFormat.__file_exists(mine):
+						if pointers.FileAccess.__file_exists(mine):
 							node.mine = load(mine)
 						else:
 							node.mine = load("res://ships/drone/DroneMine.tscn")
@@ -326,7 +326,7 @@ func _ready():
 						node.hasCivilian = event.get("has_civilian",true)							# Whether to spawn a miner NPC.
 						node.hasPirate = event.get("has_pirate",true)								# Whether to spawn a pirate NPC.
 						var bounty = event.get("bounty","res://ships/LifepodPirate.tscn")			# If has pirate is set, the scene used for the pirate's lifepod.
-						if pointers.DataFormat.__file_exists(bounty):
+						if pointers.FileAccess.__file_exists(bounty):
 							node.bounty = load(bounty)
 						else:
 							node.bounty = load("res://ships/LifepodPirate.tscn")
@@ -339,12 +339,12 @@ func _ready():
 						node.depthMinKm = max(event.get("minimum_depth_in_km",30),0)				# Minimum depth that the event is permitted to spawn at, in kilometers.
 						node.depthMaxKm = max(event.get("maximum_depth_in_km",2970),0)				# Maximum depth that the event is permitted to spawn at, in kilometers.
 						var bounty = event.get("bounty","res://ships/LifepodPirate.tscn")			# The scene used for the pirate's lifepod.
-						if pointers.DataFormat.__file_exists(bounty):
+						if pointers.FileAccess.__file_exists(bounty):
 							node.bounty = load(bounty)
 						else:
 							node.bounty = load("res://ships/LifepodPirate.tscn")
 						var lifepod = event.get("lifepod","res://ships/Lifepod.tscn")				# The bait object scene spawned by this event.
-						if pointers.DataFormat.__file_exists(lifepod):
+						if pointers.FileAccess.__file_exists(lifepod):
 							node.lifepod = load(lifepod)
 						else:
 							node.lifepod = load("res://ships/Lifepod.tscn")
@@ -371,7 +371,7 @@ func _ready():
 						node.wreck = event.get("derelict",true)										# Whether this event spawns a derelict.
 						node.rescue = event.get("rescue",true)										# Whether this event spawns a SAR CERF.
 						var derelictConversation = event.get("derelict_conversation","res://comms/conversation/DerelictConversation.tscn") # The conversation player node to use. Defaults to the regular derelict conversation.
-						if pointers.DataFormat.__file_exists(derelictConversation):
+						if pointers.FileAccess.__file_exists(derelictConversation):
 							node.derelictConversation = load(derelictConversation)
 						else:
 							node.derelictConversation = load("res://comms/conversation/DerelictConversation.tscn")
@@ -382,12 +382,12 @@ func _ready():
 						node.stormChance = clamp(event.get("storm_chance",0.3),0,1)					# The chance that the event will have a ringstorm occur.
 						node.pirateChance = clamp(event.get("pirate_chance",0.3),0,1)				# The chance that the event will have a pirate CERF spawn.
 						var stormBeacon = event.get("storm_beacon","res://story/StormBeacon.tscn") 	# The object spawned if the ringstorm chance passes. Usually used to handle the ringstorm if it happens.
-						if pointers.DataFormat.__file_exists(stormBeacon):
+						if pointers.FileAccess.__file_exists(stormBeacon):
 							node.stormBeacon = load(stormBeacon)
 						else:
 							node.stormBeacon = load("res://story/StormBeacon.tscn")
 						var bounty = event.get("bounty","res://ships/LifepodPirate.tscn")			# The scene used for the pirate's lifepod.
-						if pointers.DataFormat.__file_exists(bounty):
+						if pointers.FileAccess.__file_exists(bounty):
 							node.bounty = load(bounty)
 						else:
 							node.bounty = load("res://ships/LifepodPirate.tscn")
@@ -414,11 +414,11 @@ func _ready():
 						]))
 						var bd:Array = []
 						for body in misc:
-							if pointers.DataFormat.__file_exists(body):
+							if pointers.FileAccess.__file_exists(body):
 								bd.append(load(body))
 						node.misc = bd
 						var main = event.get("main","res://story/SingularityCore.tscn") 			# The scene for the main event object.
-						if pointers.DataFormat.__file_exists(main):
+						if pointers.FileAccess.__file_exists(main):
 							node.main = load(main)
 						else:
 							node.main = load("res://story/SingularityCore.tscn")
@@ -430,14 +430,14 @@ func _ready():
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"tesla_is_floating":
 						var tesla = event.get("tesla","res://easters/Tesla.tscn")	 				# The scene for the event object.
-						if pointers.DataFormat.__file_exists(tesla):
+						if pointers.FileAccess.__file_exists(tesla):
 							node.tesla = load(tesla)
 						else:
 							node.tesla = load("res://easters/Tesla.tscn")
 						node.myLine = event.get("event_story_flag","easters.tesla")					# Unique story for this event. This flag must be zero for the event to spawn, and once the event object is considered inside cargo bay, this flag is set to one.
 					"timed_event":
 						var rock = event.get("rock_scene","res://easters/Helloroid.tscn")			# The scene spawned by this event.
-						if pointers.DataFormat.__file_exists(rock):
+						if pointers.FileAccess.__file_exists(rock):
 							node.rock = load(rock)
 						else:
 							node.rock = load("res://easters/Helloroid.tscn")
@@ -480,12 +480,12 @@ func _ready():
 						node.awayRadius = max(event.get("away_radius",10000),0)						# Radius which a fleeing pirate checks for POI when it tries to spawn the pirate station after 10 minutes have passed.
 						node.reEncounterChance = clamp(1.0 - event.get("stock_chance",0.5),0,1)		# Chance that the vilcy and/or pirates will have a pristine ship.
 						var bounty = event.get("bounty","res://ships/LifepodPirate.tscn")			# If pirates will spawn, the scene used for their lifepods.
-						if pointers.DataFormat.__file_exists(bounty):
+						if pointers.FileAccess.__file_exists(bounty):
 							node.bounty = load(bounty)
 						else:
 							node.bounty = load("res://ships/LifepodPirate.tscn")
 						var pirateStationResource = event.get("pirate_station","res://story/pirates/Pistacja.tscn") # Scene used for the pirate station spawn.
-						if pointers.DataFormat.__file_exists(pirateStationResource):
+						if pointers.FileAccess.__file_exists(pirateStationResource):
 							node.pirateStationResource = load(pirateStationResource)
 						else:
 							node.pirateStationResource = load("res://story/pirates/Pistacja.tscn")

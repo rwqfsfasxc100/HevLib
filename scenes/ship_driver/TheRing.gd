@@ -41,7 +41,7 @@ func _ready():
 	var data = pointers.Equipment.add_ships_store
 	var ro = load("res://story/RescueOperation.gd")
 	for ship in data:
-		if "name" in ship and ship.name and "path" in ship and ship.path and pointers.DataFormat.__file_exists(ship.path):
+		if "name" in ship and ship.name and "path" in ship and ship.path and pointers.FileAccess.__file_exists(ship.path):
 			pointers.l("Adding uniquely-named derelict event for ship %s" % ship.name,"ShipDriver")
 			
 			var derelict_data = ship.get("derelict",{})
