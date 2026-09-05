@@ -1661,6 +1661,10 @@ const TRANSLATIONS = {
 		"HEVLIB_RESEARCH_TOGGLE_COMPLETED_VISIBILITY_DISABLED": {
 			"string": "No completed projects can be shown",
 			"version_hash": 3880024785
+		},
+		"HEVLIB_TRANSIT_TIP_27": {
+			"string": "Want to assist with translating mods and have them integrated directly within them? Check out TranslationTracker & its wiki to get started at 'https://github.com/rwqfsfasxc100/TranslationTracker/wiki'",
+			"version_hash": 3021212995
 		}
 	},
 	"de": {

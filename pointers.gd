@@ -9087,11 +9087,12 @@ class _Translations:
 	func _init(c):
 		pointers = c
 	
+	var tlFile:File = File.new()
+	
 	func __updateTL(path:String, delim:String = ",", fullLogging:bool = true):
 		var fileName : String = path.split("/")[path.split("/").size() - 1]
 		var folderName : String = path.split(fileName)[0]
 		pointers.l("Adding translations from [%s] in [%s]" % [fileName, folderName],"pointers.Translations")
-		var tlFile:File = File.new()
 		tlFile.open(path, File.READ)
 		var translations : Array = []
 		var translationCount:int = 0
@@ -9207,10 +9208,9 @@ class _Translations:
 		if not Directory.new().file_exists(path):
 			return {}
 		var dictionary:Dictionary = {}
-		var file:File = File.new()
-		file.open(path,File.READ)
-		var lines:PoolStringArray = file.get_as_text(true).split("\n")
-		file.close()
+		tlFile.open(path,File.READ)
+		var lines:PoolStringArray = tlFile.get_as_text(true).split("\n")
+		tlFile.close()
 		
 		var lang_data:String = lines[0]
 		var language_lines:PoolStringArray = lang_data.split(delimiter)
@@ -9269,7 +9269,6 @@ class _Translations:
 	
 	func __inject_translations():
 		var fullLogging:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","full_logging")
-		var file:File = File.new()
 		TranslationServer.clear()
 		var drivers:Array = pointers.DriverManagement.__get_drivers()
 		var data:Dictionary = {}
@@ -9336,9 +9335,9 @@ class _Translations:
 		if date.month == 4 and date.day == 1:
 			data["en"].merge({"H2O": "C2H6O"},true)
 		
-		file.open("user://cache/.HevLib_Cache/translation_check_data.json",File.WRITE)
-		file.store_string(JSON.print(ml_check_data,"\t"))
-		file.close()
+		tlFile.open("user://cache/.HevLib_Cache/translation_check_data.json",File.WRITE)
+		tlFile.store_string(JSON.print(ml_check_data,"\t"))
+		tlFile.close()
 		__updateTL_from_dictionary(data.duplicate(true),fullLogging)
 
 class _WebTranslate:
