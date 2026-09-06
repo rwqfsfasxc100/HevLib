@@ -1665,6 +1665,10 @@ const TRANSLATIONS = {
 		"HEVLIB_TRANSIT_TIP_27": {
 			"string": "Want to assist with translating mods and have them integrated directly within them? Check out TranslationTracker & its wiki to get started at 'https://github.com/rwqfsfasxc100/TranslationTracker/wiki'",
 			"version_hash": 3021212995
+		},
+		"HEVLIB_INSUFFICIENT_FUNDS_TOOLTIP": {
+			"string": "Insufficient funds",
+			"version_hash": 2943580940
 		}
 	},
 	"de": {
