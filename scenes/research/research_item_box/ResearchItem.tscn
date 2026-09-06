@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://lights/distant-proxy.png" type="Texture" id=1]
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=2]
@@ -9,6 +9,7 @@
 [ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=7]
 [ext_resource path="res://enceladus/Upgrades/buy.png" type="Texture" id=8]
 [ext_resource path="res://enceladus/Dealer/confirmationButtonGroup.tres" type="ButtonGroup" id=9]
+[ext_resource path="res://HevLib/ui/themes/styles/tooltip/panel.tres" type="StyleBox" id=10]
 
 [sub_resource type="CircleShape2D" id=1]
 radius = 512.0
@@ -32,6 +33,150 @@ tracks/0/keys = {
 "transitions": PoolRealArray( 1, 1, 1 ),
 "update": 0,
 "values": [ Color( 1, 1, 1, 1 ), Color( 3, 3, 0.5, 1 ), Color( 1, 1, 1, 1 ) ]
+}
+
+[sub_resource type="Animation" id=4]
+resource_name = "ShowStartIsolated"
+tracks/0/type = "value"
+tracks/0/path = NodePath("Progress/StartContainer/StartConfirm:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, true ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Progress/StartContainer/StartConfirm:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ) ]
+}
+tracks/2/type = "method"
+tracks/2/path = NodePath("Progress/StartContainer/StartConfirm/PanelContainer/Isolated/BuyCancel")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"values": [ {
+"args": [  ],
+"method": "grab_focus"
+} ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Progress/StartContainer/StartConfirm/PanelContainer/Isolated:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("Progress/StartContainer/StartConfirm/PanelContainer/Story:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ false ]
+}
+tracks/5/type = "method"
+tracks/5/path = NodePath(".")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"values": [ {
+"args": [  ],
+"method": "show_initiation_price"
+} ]
+}
+
+[sub_resource type="Animation" id=5]
+resource_name = "ShowStartStory"
+tracks/0/type = "value"
+tracks/0/path = NodePath("Progress/StartContainer/StartConfirm:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 1,
+"values": [ true, true ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Progress/StartContainer/StartConfirm:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ) ]
+}
+tracks/2/type = "method"
+tracks/2/path = NodePath("Progress/StartContainer/StartConfirm/PanelContainer/Story/BuyCancel")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"values": [ {
+"args": [  ],
+"method": "grab_focus"
+} ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Progress/StartContainer/StartConfirm/PanelContainer/Isolated:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ false ]
+}
+tracks/4/type = "value"
+tracks/4/path = NodePath("Progress/StartContainer/StartConfirm/PanelContainer/Story:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
 }
 
 [node name="ResearchItem" type="HBoxContainer"]
@@ -133,15 +278,15 @@ focusAt = NodePath("../..")
 [node name="SubBarProgress" type="VBoxContainer" parent="Progress"]
 margin_top = 46.0
 margin_right = 351.0
-margin_bottom = 134.0
+margin_bottom = 132.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Progress/SubBarProgress"]
-margin_top = 44.0
+margin_top = 43.0
 margin_right = 351.0
-margin_bottom = 44.0
+margin_bottom = 43.0
 
 [node name="LB" type="HBoxContainer" parent="Progress/SubBarProgress/HBoxContainer"]
 margin_right = 5.0
@@ -158,63 +303,138 @@ margin_right = 351.0
 rect_min_size = Vector2( 5, 0 )
 
 [node name="FullProgress" type="HBoxContainer" parent="Progress"]
-margin_top = 138.0
+margin_top = 136.0
 margin_right = 351.0
-margin_bottom = 138.0
+margin_bottom = 136.0
 size_flags_vertical = 0
 
 [node name="StartContainer" type="MarginContainer" parent="Progress"]
-margin_top = 142.0
+margin_top = 140.0
 margin_right = 351.0
 margin_bottom = 210.0
+rect_min_size = Vector2( 0, 70 )
 size_flags_horizontal = 3
 
 [node name="StartButton" type="Button" parent="Progress/StartContainer"]
 margin_right = 351.0
-margin_bottom = 68.0
+margin_bottom = 70.0
 text = "HEVLIB_START_RESEARCH"
 
-[node name="StartConfirm" type="PanelContainer" parent="Progress/StartContainer"]
+[node name="StartConfirm" type="HBoxContainer" parent="Progress/StartContainer"]
+visible = false
 margin_right = 351.0
-margin_bottom = 68.0
+margin_bottom = 70.0
+rect_min_size = Vector2( 0, 70 )
+mouse_filter = 2
+alignment = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Progress/StartContainer/StartConfirm"]
+[node name="PanelContainer" type="PanelContainer" parent="Progress/StartContainer/StartConfirm"]
+margin_left = 92.0
+margin_right = 351.0
+margin_bottom = 70.0
+mouse_filter = 2
+custom_styles/panel = ExtResource( 10 )
+
+[node name="Story" type="HBoxContainer" parent="Progress/StartContainer/StartConfirm/PanelContainer"]
+visible = false
 margin_left = 5.0
 margin_top = 5.0
-margin_right = 346.0
-margin_bottom = 63.0
+margin_right = 254.0
+margin_bottom = 65.0
+mouse_filter = 2
 custom_constants/separation = 16
 
-[node name="PriceLabel" type="Label" parent="Progress/StartContainer/StartConfirm/HBoxContainer"]
-margin_top = 10.0
-margin_right = 102.0
-margin_bottom = 48.0
+[node name="BuyConfirm" type="Button" parent="Progress/StartContainer/StartConfirm/PanelContainer/Story"]
+margin_right = 47.0
+margin_bottom = 60.0
+focus_neighbour_left = NodePath(".")
+focus_neighbour_top = NodePath(".")
+focus_neighbour_right = NodePath("../BuyCancel")
+focus_neighbour_bottom = NodePath(".")
+focus_next = NodePath("../BuyCancel")
+focus_previous = NodePath("../BuyCancel")
+group = ExtResource( 9 )
+text = "OK"
+
+[node name="SmoothScrollTo" parent="Progress/StartContainer/StartConfirm/PanelContainer/Story/BuyConfirm" instance=ExtResource( 6 )]
+focusAt = NodePath("../../../../../../../..")
+
+[node name="PlaySoundsOnTheseButtons" parent="Progress/StartContainer/StartConfirm/PanelContainer/Story/BuyConfirm" instance=ExtResource( 7 )]
+
+[node name="BuyCancel" type="Button" parent="Progress/StartContainer/StartConfirm/PanelContainer/Story"]
+margin_left = 63.0
+margin_right = 173.0
+margin_bottom = 60.0
+focus_neighbour_left = NodePath("../BuyConfirm")
+focus_neighbour_top = NodePath(".")
+focus_neighbour_right = NodePath(".")
+focus_neighbour_bottom = NodePath(".")
+focus_next = NodePath("../BuyConfirm")
+focus_previous = NodePath("../BuyConfirm")
+group = ExtResource( 9 )
+text = "CANCEL"
+
+[node name="SmoothScrollTo" parent="Progress/StartContainer/StartConfirm/PanelContainer/Story/BuyCancel" instance=ExtResource( 6 )]
+focusAt = NodePath("../../../../../../../..")
+
+[node name="PlaySoundsOnTheseButtons" parent="Progress/StartContainer/StartConfirm/PanelContainer/Story/BuyCancel" instance=ExtResource( 7 )]
+
+[node name="Isolated" type="HBoxContainer" parent="Progress/StartContainer/StartConfirm/PanelContainer"]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 254.0
+margin_bottom = 65.0
+mouse_filter = 2
+custom_constants/separation = 16
+
+[node name="PriceLabel" type="Label" parent="Progress/StartContainer/StartConfirm/PanelContainer/Isolated"]
+margin_top = 11.0
+margin_right = 10.0
+margin_bottom = 49.0
 size_flags_horizontal = 3
 
-[node name="BuyConfirm" type="Button" parent="Progress/StartContainer/StartConfirm/HBoxContainer"]
-margin_left = 118.0
-margin_right = 215.0
-margin_bottom = 58.0
+[node name="BuyConfirm" type="Button" parent="Progress/StartContainer/StartConfirm/PanelContainer/Isolated"]
+margin_left = 26.0
+margin_right = 123.0
+margin_bottom = 60.0
+focus_neighbour_left = NodePath(".")
+focus_neighbour_top = NodePath(".")
 focus_neighbour_right = NodePath("../BuyCancel")
+focus_neighbour_bottom = NodePath(".")
+focus_next = NodePath("../BuyCancel")
+focus_previous = NodePath("../BuyCancel")
 group = ExtResource( 9 )
 text = "OK"
 icon = ExtResource( 8 )
 
-[node name="SmoothScrollTo" parent="Progress/StartContainer/StartConfirm/HBoxContainer/BuyConfirm" instance=ExtResource( 6 )]
-focusAt = NodePath("../../../../../../..")
+[node name="SmoothScrollTo" parent="Progress/StartContainer/StartConfirm/PanelContainer/Isolated/BuyConfirm" instance=ExtResource( 6 )]
+focusAt = NodePath("../../../../../../../..")
 
-[node name="BuyCancel" type="Button" parent="Progress/StartContainer/StartConfirm/HBoxContainer"]
-margin_left = 231.0
-margin_right = 341.0
-margin_bottom = 58.0
+[node name="PlaySoundsOnTheseButtons" parent="Progress/StartContainer/StartConfirm/PanelContainer/Isolated/BuyConfirm" instance=ExtResource( 7 )]
+
+[node name="BuyCancel" type="Button" parent="Progress/StartContainer/StartConfirm/PanelContainer/Isolated"]
+margin_left = 139.0
+margin_right = 249.0
+margin_bottom = 60.0
 focus_neighbour_left = NodePath("../BuyConfirm")
+focus_neighbour_top = NodePath(".")
+focus_neighbour_right = NodePath(".")
+focus_neighbour_bottom = NodePath(".")
+focus_next = NodePath("../BuyConfirm")
+focus_previous = NodePath("../BuyConfirm")
 group = ExtResource( 9 )
 text = "CANCEL"
 
-[node name="SmoothScrollTo" parent="Progress/StartContainer/StartConfirm/HBoxContainer/BuyCancel" instance=ExtResource( 6 )]
-focusAt = NodePath("../../../../../../..")
+[node name="SmoothScrollTo" parent="Progress/StartContainer/StartConfirm/PanelContainer/Isolated/BuyCancel" instance=ExtResource( 6 )]
+focusAt = NodePath("../../../../../../../..")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+[node name="PlaySoundsOnTheseButtons" parent="Progress/StartContainer/StartConfirm/PanelContainer/Isolated/BuyCancel" instance=ExtResource( 7 )]
+
+[node name="IconAnimator" type="AnimationPlayer" parent="."]
 anims/Complete = SubResource( 3 )
+
+[node name="ConfirmationPlayer" type="AnimationPlayer" parent="."]
+anims/ShowStartIsolated = SubResource( 4 )
+anims/ShowStartStory = SubResource( 5 )
 
 [connection signal="body_entered" from="Icon/PanelContainer/ViewportContainer/Viewport/SleepEverything" to="Icon/PanelContainer/ViewportContainer/Viewport/SleepEverything" method="_on_SleepEverything_body_entered"]

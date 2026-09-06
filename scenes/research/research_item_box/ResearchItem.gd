@@ -41,6 +41,12 @@ onready var total_progress_container = $Progress/FullProgress
 
 onready var start_button = $Progress/StartContainer/StartButton
 onready var start_container = $Progress/StartContainer
+onready var start_confirm = $Progress/StartContainer/StartConfirm
+onready var start_confirm_buy = $Progress/StartContainer/StartConfirm
+onready var start_confirm_cancel = $Progress/StartContainer/StartConfirm
+
+onready var icon_anim = $IconAnimator
+onready var confirmation_player = $ConfirmationPlayer
 
 const progress_bar = preload("res://HevLib/scenes/research/research_item_box/ResearchProgressBar.tscn")
 
@@ -53,6 +59,13 @@ var pointers = ModLoader._savedObjects[0]
 onready var sprite_container = $Icon/PanelContainer/TextureRect
 onready var scene_container = $Icon/PanelContainer/ViewportContainer
 onready var scene_offset = $Icon/PanelContainer/ViewportContainer/Viewport/Container/Rotation_offset
+
+onready var initiation_price_label = $Progress/StartContainer/StartConfirm/PanelContainer/Isolated/PriceLabel
+onready var isolated_confirm = $Progress/StartContainer/StartConfirm/PanelContainer/Isolated/BuyConfirm
+onready var isolated_cancel = $Progress/StartContainer/StartConfirm/PanelContainer/Isolated/BuyCancel
+onready var story_confirm = $Progress/StartContainer/StartConfirm/PanelContainer/Story/BuyConfirm
+onready var story_cancel = $Progress/StartContainer/StartConfirm/PanelContainer/Story/BuyCancel
+
 
 func _ready():
 	connect("visibility_changed",self,"recheck_vis")
@@ -271,7 +284,24 @@ func is_finished() -> bool:
 	return false
 
 func start_pressed():
-	pass
+	match this_research_project.get("mode","story_only"):
+		"isolated":
+			confirmation_player.play("ShowStartIsolated")
+		_:
+			confirmation_player.play("ShowStartStory")
+	
+	
+
+func show_initiation_price():
+	var value = this_research_project.get("initiation_price",100000)
+	initiation_price_label.text = "%d E$" % value
+	var current_cash = CurrentGame.getMoney()
+	if value > current_cash:
+		isolated_confirm.disabled = true
+		isolated_confirm.hint_tooltip = "HEVLIB_INSUFFICIENT_FUNDS_TOOLTIP"
+	else:
+		isolated_confirm.disabled = false
+		isolated_confirm.hint_tooltip = ""
 
 func recheck_vis():
 	if is_visible_in_tree():
@@ -283,10 +313,10 @@ func recheck_vis():
 		if mark_for_completion:
 			var state = this_research_project.get("state",{})
 			if state.completed:
-				$AnimationPlayer.stop()
+				icon_anim.stop()
 				$Icon/PanelContainer.self_modulate = Color(0,1,0,1)
 			else:
-				$AnimationPlayer.play("Complete")
+				icon_anim.play("Complete")
 		else:
-			$AnimationPlayer.stop()
+			icon_anim.stop()
 			$Icon/PanelContainer.self_modulate = Color(1,1,1,1)
