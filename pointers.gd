@@ -494,6 +494,7 @@ class _ConfigDriver:
 						"mod_id -> (String) providing the mod/identifier to fetch the config from. Cannot contain forward slashes (/) or spaces ( ), and these will be removed when being processed.",
 						"section -> (String) for the config's section to fetch from.",
 						"key -> (String) for the setting value to get.",
+						"default (optional) -> (Variant) a default value to return if the config doesn't exist. Defaults to null",
 						"cfg_filename (optional) -> (String) used for the file this config is stored in within the 'user://cfg/' folder. Defaults to 'Mod_Configurations.cfg'"
 					],
 					"return":[
@@ -795,7 +796,7 @@ class _ConfigDriver:
 	
 	# Fetches a specific value from the config
 	# Will return null if it does not exist
-	func __get_value(mod_id: String, section: String, key: String, cfg_filename : String = "Mod_Configurations" + ".cfg"):
+	func __get_value(mod_id: String, section: String, key: String, default = null, cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var cfg_folder : String  = "user://cfg/"
 		var full : String  = __truncate_to_setting_entry(mod_id,section)
 		# Truncate to get the section directly
