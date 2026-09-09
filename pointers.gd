@@ -810,8 +810,8 @@ class _ConfigDriver:
 					if tout == TYPE_ARRAY or tout == TYPE_DICTIONARY:
 						return out.duplicate(true)
 					return out
-				return null
-			return null
+				return default
+			return default
 		else:
 			# Not cached, fetch from file instead
 			var cfg:ConfigFile = ConfigFile.new()
@@ -826,8 +826,8 @@ class _ConfigDriver:
 				if key in keys:
 					var data = cfg.get_value(full,key)
 					return data
-				return null
-			return null
+				return default
+			return default
 	
 	# Method called onready to prepare the config and hashes, and push any connections
 	func pushCFG(cfg_filename : String = "Mod_Configurations" + ".cfg"):
@@ -7975,7 +7975,7 @@ class _ManifestV2:
 			if OS.has_feature("editor"):
 				for a in pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[]):
 					restrict_to_modmains.append(a.get_base_dir() + "/")
-				for a in pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets"):
+				for a in pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets",[]):
 					restrict_to_modmains.append(a.get_base_dir() + "/")
 			var arr1 : PoolStringArray = siftFolderStructureForModFiles(pointers.FolderAccess.__get_folder_structure("res://",false,false),"res://",restrict_to_modmains)
 			var arr2 : PoolStringArray = PoolStringArray()
