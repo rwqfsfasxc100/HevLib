@@ -265,6 +265,14 @@ HEVLIB_CONFIG_SECTION_DEBUG={
 "name": "HEVLIB_CONFIG_EVENT_DEBUGGER",
 "type": "bool"
 },
+"mark_placeholder_translations": {
+"default": true,
+"description": "HEVLIB_CONFIG_MARK_PLACEHOLDER_TRANSLATIONS_DESC",
+"display_order_position": 16,
+"name": "HEVLIB_CONFIG_MARK_PLACEHOLDER_TRANSLATIONS",
+"require_restart": true,
+"type": "bool"
+},
 "pointer_logging_frame_interval": {
 "default": 2.0,
 "description": "HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL_TOOLTIP",

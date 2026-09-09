@@ -40,5 +40,5 @@ func _ready():
 	if cr.empty():
 		# This should never trip. If it did, join the Discord and ask me. https://discord.gg/dv
 		pt.DataFormat.__exit(false,"Copyright missing :/","pointers.SafeMode",20)
-	pt.l(cr)
+	pt.l(cr,"HevLib")
 	pt.copyrights = ""

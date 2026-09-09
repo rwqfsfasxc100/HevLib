@@ -1,5 +1,5 @@
 # This translation file is generated automatically
-# Do not modify anything directly, as this will break things for translators
+# Do not modify anything directly, as this will cause the file to break for translators
 # Please use Translation Tracker to modify these yourself, and contact the mod author to implement them
 # https://github.com/rwqfsfasxc100/TranslationTracker/releases/latest
 
@@ -40,7 +40,8 @@ const TRANSLATIONS = {
 	"en": {
 		"HEVLIB_MOD_BRIEF": {
 			"string": "Library mod containing several common functions created by __hev",
-			"version_hash": 504726156
+			"version_hash": 504726156,
+			"placeholder": true
 		},
 		"HEVLIB_MOD_DESCRIPTION": {
 			"string": "A library providing several functional parts:\\n\\n * Common functionality provided through 'pointer' files.\\n * Handling of mod manifest files via versioning to create a unified medium to fetch information from them.\\n * EquipmentDriver - Add & manage equipment items, slots, and more...\\n * WeaponSlotDriver - Add and modify equipment added to ship hardpoints.\\n\\nThis library also aims to keep a consistent method to make modding easier. Compatability with mods is also a primary focus of the functionality provided.\\n\\nFor more information, please check this mod's wiki. If you have any suggestons or ideas, please leave them in the Discord or a GitHub issue.",
@@ -1741,6 +1742,15 @@ const TRANSLATIONS = {
 		"HEVLIB_SAFEMODE_SM_ENABLED": {
 			"string": "Safe mode enabled.",
 			"version_hash": 1554000514
+		},
+		"HEVLIB_CONFIG_MARK_PLACEHOLDER_TRANSLATIONS": {
+			"string": "Mark placeholder translations",
+			"version_hash": 3783987957,
+			"placeholder": false
+		},
+		"HEVLIB_CONFIG_MARK_PLACEHOLDER_TRANSLATIONS_DESC": {
+			"string": "Any translation that is marked as a placeholder within its respective\ndriver will be made obvious it is with a [placeholder] suffix.",
+			"version_hash": 383478201
 		}
 	},
 	"de": {

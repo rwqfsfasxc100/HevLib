@@ -84,7 +84,7 @@ var Classes = [
 ]
 
 
-var copyrights = "© 2026 Benjamin Buckhurst. All rights reserved."
+var copyrights = "© 2024-2026 Benjamin Buckhurst aka __hev. All rights reserved."
 
 var logging_frame_interval = 0
 var logging_current_frame_timer = 0
@@ -9269,6 +9269,7 @@ class _Translations:
 	
 	func __inject_translations():
 		var fullLogging:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","full_logging")
+		var markPlaceholders:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","mark_placeholder_translations")
 		TranslationServer.clear()
 		var drivers:Array = pointers.DriverManagement.__get_drivers()
 		var data:Dictionary = {}
@@ -9307,27 +9308,32 @@ class _Translations:
 					if not language in data:
 						data[language] = {}
 					if master_locale and language != master_locale:
-						if not language in ml_check_data:
-							ml_check_data[language] = {"needs_updating":[],"needs_updating_size":0,"not_in_master":[],"not_in_master_size":0,"missing_translations":[],"missing_translations_size":0}
-						check_ml = true
-						mlt = translations[master_locale]
-						if lang.size() < mlt.size():
-							for tv in mlt:
-								if not tv in lang:
-									ml_check_data[language]["missing_translations"].append(tv)
-									ml_check_data[language]["missing_translations_size"] += 1
+							if not language in ml_check_data:
+								ml_check_data[language] = {"needs_updating":[],"needs_updating_size":0,"not_in_master":[],"not_in_master_size":0,"missing_translations":[],"missing_translations_size":0,"placeholders":[],"placeholders_size":0}
+							check_ml = true
+							mlt = translations[master_locale]
+							if lang.size() < mlt.size():
+								for tv in mlt:
+									if not tv in lang:
+										ml_check_data[language]["missing_translations"].append(tv)
+										ml_check_data[language]["missing_translations_size"] += 1
 					for t in lang:
 						var v = lang[t]
-						if check_ml and "version_hash" in v:
+						if check_ml:
 							if mlt and t in mlt:
 								var c = mlt[t]
-								if typeof(c) == TYPE_DICTIONARY and "string" in c:
+								if "version_hash" in v and typeof(c) == TYPE_DICTIONARY and "string" in c:
 									if hash(c.string) != v.version_hash:
 										ml_check_data[language]["needs_updating"].append(t)
 										ml_check_data[language]["needs_updating_size"] += 1
 							else:
 								ml_check_data[language]["not_in_master"].append(t)
 								ml_check_data[language]["not_in_master_size"] += 1
+						if "placeholder" in v:
+							if not language in ml_check_data:
+								ml_check_data[language] = {"placeholders":[],"placeholders_size":0}
+							ml_check_data[language]["placeholders"].append(t)
+							ml_check_data[language]["placeholders_size"] += 1
 						data[language][t] = v
 		
 		# April Fool's alcohol!
