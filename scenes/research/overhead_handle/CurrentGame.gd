@@ -30,25 +30,28 @@
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
 
-extends "res://AsteroidSpawner.gd"
+extends "res://CurrentGame.gd"
 
-var research_overhead = null
+signal hlr_storychanged(story,from,to)
 
-var hl_researchfieldhandler_uinit : bool = false
+var hl_research_enabled:bool = false setget setResearchEnabled
+var researchSysPointers
+
+var hl_researchoverhead_uinit : bool = false
 func _ready():
-	if hl_researchfieldhandler_uinit:
+	if hl_researchoverhead_uinit:
 		OS.kill(OS.get_process_id())
-	hl_researchfieldhandler_uinit = true
-	research_overhead = get_tree().get_root().get_node("ResearchOverheadHandle")
+	hl_researchoverhead_uinit = true
+	researchSysPointers = ModLoader._savedObjects[0]
+
+func setStory(story, to, onlyRise = true):
+	if hl_research_enabled:
+		emit_signal("hlr_storychanged",story,getStory(story),to)
+	.setStory(story,to,onlyRise)
+
+func setResearchEnabled(how:bool):
+	hl_research_enabled = how
+	researchSysPointers.l("Setting research system to be enabled? [%s]" % how,"Research")
 	
-	
-	if research_overhead:
-		research_overhead.loading_enceladus()
-		connect("tree_exiting",research_overhead,"unloading")
-		connect("tree_exiting",self,"unloading")
-	
-	
-	
-func unloading():
-	if research_overhead:
-		disconnect("tree_exiting",research_overhead,"unloading")
+
+

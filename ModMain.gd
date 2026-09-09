@@ -58,7 +58,7 @@ func _init(modLoader = ModLoader):
 		installScriptExtension("scenes/ship_driver/CurrentGame.gd")
 		installScriptExtension("scenes/ship_driver/TheRing.gd")
 		
-		
+		installScriptExtension("scenes/research/overhead_handle/CurrentGame.gd")
 		
 		installScriptExtension("events/TheRing.gd")
 		installScriptExtension("events/custom_events/TheRing.gd")
@@ -179,11 +179,6 @@ func _ready():
 #		file.close()
 		
 		replaceScene("scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
-		
-		installScriptExtension("scenes/research/overhead_handle/Enceladus.gd")
-		installScriptExtension("scenes/research/overhead_handle/AsteroidSpawner.gd")
-		var nNode = load("res://HevLib/scenes/research/overhead_handle/ResearchOverheadHandle.tscn").instance()
-		CRoot.call_deferred("add_child",nNode)
 		
 		pointers.ManifestV2.__get_mod_versions(true)
 		var ncrew = pointers.ManifestV2.__get_manifest_entry("tags","TAG_HANDLE_EXTRA_CREW")
