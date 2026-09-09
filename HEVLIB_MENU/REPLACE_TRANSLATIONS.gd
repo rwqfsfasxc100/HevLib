@@ -1669,6 +1669,78 @@ const TRANSLATIONS = {
 		"HEVLIB_INSUFFICIENT_FUNDS_TOOLTIP": {
 			"string": "Insufficient funds",
 			"version_hash": 2943580940
+		},
+		"HEVLIB_SAFEMODE_SM_TRIPPED_POPUP_MSG": {
+			"string": "Safe mode tripped! %d mods attempted to overwrite the behaviour of a total of %d Vanilla resource file(s) in a manner that would likely be unstable.\n\nIf you are looking to extend/overwrite a Vanilla resource, please use DataFormat.__extend_script() or DataFormat.__override_script() for extending/overwriting scripts respectively, DataFormat.__replace_resource() for scenes/resources, or any equivalent method within your ModMain/LOAD_RESOURCES script(s).\n\nCheck the game logs for verbose details regarding the offending mod(s).",
+			"version_hash": 44561853
+		},
+		"HEVLIB_SAFEMODE_SM_TRIPPED_ERR_1": {
+			"string": "Make sure to check the specific line where each script was checked, as it will provide more information regarding the specific issue.",
+			"version_hash": 1565839805
+		},
+		"HEVLIB_SAFEMODE_SM_TRIPPED_ERR_2": {
+			"string": "If you are having problems fixing these issues, you may also ask for help regarding it in the Discord at [https://discord.gg/dv], where both myself and others are willing to help.",
+			"version_hash": 1444952411
+		},
+		"HEVLIB_SAFEMODE_SM_TOTALLING": {
+			"string": "Found %d offending files loaded between %d mods.",
+			"version_hash": 1066159722
+		},
+		"HEVLIB_SAFEMODE_SM_TOTALLING_FOR_MOD": {
+			"string": "[%d] offending files for mod [%s]:",
+			"version_hash": 3656929850
+		},
+		"HEVLIB_SAFEMODE_SM_SUPERING_ERR_AI_LIKELY": {
+			"string": "ERROR: file %s @ %s is not properly compiled and likely runs recursive code. Do not expect this script to run as intended.",
+			"version_hash": 2471823957
+		},
+		"HEVLIB_SAFEMODE_SM_SUPERING_ERR_2": {
+			"string": " -> This is likely due to a signature of incorrectly supering a virtual method, and is not permitted to be ran while it is installed and running SafeMode checks.",
+			"version_hash": 2353006025
+		},
+		"HEVLIB_SAFEMODE_SM_SUPERING_ERR_3": {
+			"string": " -> It is unsupported behaviour due to it being in best-case scenario terrible for performance and has historically resulted in frequent crashes. As a result is not supported to be run through HevLib.",
+			"version_hash": 1451242435
+		},
+		"HEVLIB_SAFEMODE_SM_SUPERING_ERR_4": {
+			"string": " -> If for whatever reason you require this functionality, I would recommend to instead refactor to not require the use of HevLib, completely overwrite the script that's being extended with the appropriate tools, or disable SafeMode's checks. (NOTE: Disabling SafeMode voids your ability to make bug reports, please be cautious with this.)",
+			"version_hash": 707209201
+		},
+		"HEVLIB_SAFEMODE_SM_SUPERING_ERR_5": {
+			"string": " -> Otherwise, if you are unable to find a suitable solution, you may also ask for help regarding it in the Discord at [https://discord.gg/dv].",
+			"version_hash": 4132048125
+		},
+		"HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_1": {
+			"string": "WARNING: file %s @ %s overwrites a Vanilla resource file.",
+			"version_hash": 1478591741
+		},
+		"HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_2": {
+			"string": " -> File should use a unique directory as to ensure the Vanilla file can be accessed at all times.",
+			"version_hash": 1822456348
+		},
+		"HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_3": {
+			"string": " -> If you need to completely overwrite a script, use DataFormat.__override_script() or use an equivalent within the ModMain.gd script",
+			"version_hash": 642916197
+		},
+		"HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_4": {
+			"string": " -> If you are unable to find a suitable solution, you may also ask for help regarding it in the Discord at [https://discord.gg/dv].",
+			"version_hash": 2592290551
+		},
+		"HEVLIB_SAFEMODE_SM_CHECKINGFILE": {
+			"string": "checking file %s:%s",
+			"version_hash": 3109389835
+		},
+		"HEVLIB_SAFEMODE_SM_DISABLED_EDITOR": {
+			"string": "Running from the editor, safe mode disabled by default as it cannot fail.",
+			"version_hash": 3077477960
+		},
+		"HEVLIB_SAFEMODE_SM_DISABLED": {
+			"string": "Safe mode disabled! NOTE: this will automatically assume that whatever you're doing that requires it to be disabled is the cause of the issue, so please keep that in mind! If you still need help, join the Discord at [https://discord.gg/dv], where myself and others are willing to help.",
+			"version_hash": 3377736353
+		},
+		"HEVLIB_SAFEMODE_SM_ENABLED": {
+			"string": "Safe mode enabled.",
+			"version_hash": 1554000514
 		}
 	},
 	"de": {

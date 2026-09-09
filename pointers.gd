@@ -6801,6 +6801,8 @@ class _ManifestV2:
 	var mod_hash_file:String = "user://cache/.Mod_Menu_2_Cache/updates/mod_data_hash.txt"
 	var mod_state_hash_file:String = "user://cache/.Mod_Menu_2_Cache/updates/mod_zip_hash.txt"
 	
+	var needs_translated:bool = true
+	
 	var fetchZips:bool = true
 	func __get_mod_data(print_json: bool = false):
 		if not cached_mod_list.empty():
@@ -6868,7 +6870,10 @@ class _ManifestV2:
 								zip_ref_store[modGlobalPath] = modFSPath
 					gdunzip = null
 				if zip_ref_store.get("res://HevLib/ModMain.gd","").get_file()!="HevLib.zip":pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.","pointers.ManifestV2")
-				pointers.SafeMode.__handle_exit_for_file_checks()
+			if needs_translated:
+				pointers.Translations.__inject_translations()
+				needs_translated = false
+			pointers.SafeMode.__handle_exit_for_file_checks()
 			var stat_tags : Dictionary = {}
 			for mod in modListArr:
 				var mod_entry : Dictionary = __make_mod_entry(mod)
@@ -8217,8 +8222,8 @@ class _NodeAccess:
 		var paths : Array = []
 		for m in arr:
 			var selfPath : String = in_node.get_path()
-			var modify:PoolStringArray = str(m.get_path()).split(selfPath)
-			if modify[1] != "":
+			var modify:PoolStringArray = m.get_path().split(selfPath)
+			if modify[1]:
 				paths.append(m)
 		return paths
 
@@ -8229,17 +8234,12 @@ class _NodeAccess:
 			var path : String = m.get_path()
 			paths.append(path)
 		if relative:
-			var rel : Array = []
-			for i in paths:
-				var ps : String = str(str(i).split(parentPath)[1])
-				var tsu : String = ps.lstrip("/")
-				rel.append(tsu)
-			paths = rel
+			for i in range(paths.size()):
+				paths[i] = paths[i].split(parentPath)[1].lstrip("/")
 		return paths
 	
 	func __claim_child_ownership(node: Node):
-		var children : Array = node.get_children()
-		for child in children:
+		for child in node.get_children():
 			setOwnership(child, node)
 
 	func setOwnership(current_node: Node,set_owner_node: Node):
@@ -8458,18 +8458,18 @@ class _SafeMode:
 		if not OS.has_feature("editor"):
 			PCKFILES = pointers.FolderAccess.__get_vanilla_script_and_scenes()
 			safeCheck = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading")
-			if safeCheck:pointers.l("Safe mode enabled.","pointers.SafeMode")
-			else:pointers.l("Safe mode disabled! NOTE: this will automatically assume that whatever you're doing that requires it to be disabled is the cause of the issue, so please keep that in mind! If you still need help, join the Discord at [https://discord.gg/dv], where myself and others are willing to help.","pointers.SafeMode")
-		else:pointers.l("Running from the editor, safe mode disabled by default as it cannot fail","pointers.SafeMode")
+			if safeCheck:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_ENABLED"),"pointers.SafeMode")
+			else:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_DISABLED"),"pointers.SafeMode")
+		else:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_DISABLED_EDITOR"),"pointers.SafeMode")
 	
 	func __check_file(file_path:String,zip_path:String,crash:bool = true):
 		if safeCheck:
-			pointers.l("checking file %s:%s" % [zip_path.get_file(),file_path],"pointers.SafeMode")
+			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_CHECKINGFILE") % [zip_path.get_file(),file_path],"pointers.SafeMode")
 			if file_path in PCKFILES:
-				pointers.l("WARNING: file %s @ %s overwrites Vanilla resource." % [file_path,zip_path.get_file()],"pointers.SafeMode")
-				pointers.l(" -> File should use a unique directory as to ensure the Vanilla file can be accessed at all times.","pointers.SafeMode")
-				pointers.l(" -> If you need to completely overwrite a script, use DataFormat.__override_script","pointers.SafeMode")
-				pointers.l(" -> If you are unable to find a suitable solution, you may also ask for help regarding it in the Discord at [https://discord.gg/dv]","pointers.SafeMode")
+				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_1") % [file_path,zip_path.get_file()],"pointers.SafeMode")
+				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_2"),"pointers.SafeMode")
+				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_3"),"pointers.SafeMode")
+				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_4"),"pointers.SafeMode")
 				if not zip_path.get_file() in offendingFiles:
 					offendingFiles[zip_path.get_file()] = []
 				offendingFiles[zip_path.get_file()].append(file_path)
@@ -8481,11 +8481,11 @@ class _SafeMode:
 				var tex = file.get_as_text(true)
 				file.close()
 				if regex.search(tex):
-					pointers.l("ERROR: file %s @ %s is not properly compiled and likely runs recursive code. Do not expect this script to run as intended." % [file_path,zip_path.get_file()],"pointers.SafeMode")
-					pointers.l(" -> This is likely due to a signature of incorrectly supering a virtual method, and is not permitted to be ran while it is installed and running SafeMode checks.","pointers.SafeMode")
-					pointers.l(" -> It is unsupported behaviour due to it being at best very unperformant, and has historically resulted in crashes, and as a result is not supported to be run through HevLib.","pointers.SafeMode")
-					pointers.l(" -> If for whatever reason you require this functionality, I would recommend to instead refactor to not require the use of HevLib, completely overwrite the script that's being extended with the appropriate tools, or disable SafeMode's checks. (NOTE: Disabling SafeMode voids your ability to make bug reports, please be cautious with this.)","pointers.SafeMode")
-					pointers.l(" -> Otherwise, if you are unable to find a suitable solution, you may also ask for help regarding it in the Discord at [https://discord.gg/dv].","pointers.SafeMode")
+					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_AI_LIKELY") % [file_path,zip_path.get_file()],"pointers.SafeMode")
+					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_2"),"pointers.SafeMode")
+					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_3"),"pointers.SafeMode")
+					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_4"),"pointers.SafeMode")
+					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_5"),"pointers.SafeMode")
 					if not zip_path.get_file() in offendingFiles:
 						offendingFiles[zip_path.get_file()] = []
 					offendingFiles[zip_path.get_file()].append(file_path)
@@ -8494,16 +8494,16 @@ class _SafeMode:
 						safeCheckTriggered = true
 	
 	func __handle_exit_for_file_checks():
-		pointers.l("Found %d offending files loaded between %d mods." % [offendingFileCount,offendingFiles.size()],"pointers.SafeMode")
+		pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TOTALLING") % [offendingFileCount,offendingFiles.size()],"pointers.SafeMode")
 		for zip_path in offendingFiles:
 			var zip_files = offendingFiles[zip_path]
-			pointers.l("[%d] offending files for mod [%s]:" % [zip_files.size(),zip_path],"pointers.SafeMode")
+			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TOTALLING_FOR_MOD") % [zip_files.size(),zip_path],"pointers.SafeMode")
 			for i in zip_files:pointers.l(" -> [%s]" % i,"pointers.SafeMode")
 		if offendingFiles:
-			pointers.l("Make sure to check the specific line where each script was checked, as it will provide more information regarding the specific issue.","pointers.SafeMode")
-			pointers.l("If you are having problems fixing these issues, you may also ask for help regarding it in the Discord at [https://discord.gg/dv], where both myself and others are willing to help.","pointers.SafeMode")
+			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TRIPPED_ERR_1"),"pointers.SafeMode")
+			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TRIPPED_ERR_2"),"pointers.SafeMode")
 			if safeCheck and safeCheckTriggered:
-				pointers.NodeAccess.__exit(false,"Safe mode tripped. %d mods attempted to overwrite the behaviour of a total of %d Vanilla resource file(s) in a manner that would likely be unstable.\n\nIf you are looking to extend/overwrite a Vanilla resource, please use DataFormat.__extend_script() or DataFormat.__override_script() for extending/overwriting scripts respectively, DataFormat.__replace_resource() for scenes/resources, or any equivalent method within your ModMain/LOAD_RESOURCES script(s).\n\nCheck the game logs for verbose details regarding the offending mod(s).","pointers.SafeMode" % [offendingFiles.size(),offendingFileCount],0.0,"",true)
+				pointers.NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_SAFEMODE_SM_TRIPPED_POPUP_MSG") % [offendingFiles.size(),offendingFileCount],"pointers.SafeMode",0.0,"",true)
 	
 
 class _Scripting:
