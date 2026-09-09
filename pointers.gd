@@ -446,7 +446,7 @@ class _Achievements:
 			var aData : Dictionary = {}
 			if not data == null:
 				for dic in data:
-					aData.merge({dic.get("name"):dic.get("percent")})
+					aData[dic.get("name")] = dic.get("percent")
 			completionCache = aData.duplicate(true)
 		http.disconnect("request_completed",self,"out")
 		pointers.Scripting.log_essential_info_for_bugreports()
@@ -9264,7 +9264,7 @@ class _Translations:
 			index += 1
 			translation_count += 1
 		if fullLogging:
-			pointers.l("%s Translations converted from translation file %s" % [translation_count,path],"pointers.Translations")
+			pointers.l("%s translations converted from translation file %s" % [translation_count,path],"pointers.Translations")
 		return dictionary
 	
 	func __inject_translations():
@@ -9298,14 +9298,14 @@ class _Translations:
 							for lang in dict:
 								if not lang in translations:
 									translations[lang] = {}
-								translations[lang].merge(dict[lang])
+								translations[lang].merge(dict[lang],true)
 					translations.erase("file")
 				for language in translations:
 					var check_ml:bool = false
 					var lang = translations[language]
 					var mlt = null
 					if not language in data:
-						data.merge({language:{}})
+						data[language] = {}
 					if master_locale and language != master_locale:
 						if not language in ml_check_data:
 							ml_check_data[language] = {"needs_updating":[],"needs_updating_size":0,"not_in_master":[],"not_in_master_size":0,"missing_translations":[],"missing_translations_size":0}
@@ -9319,7 +9319,7 @@ class _Translations:
 					for t in lang:
 						var v = lang[t]
 						if check_ml and "version_hash" in v:
-							if t in mlt:
+							if mlt and t in mlt:
 								var c = mlt[t]
 								if typeof(c) == TYPE_DICTIONARY and "string" in c:
 									if hash(c.string) != v.version_hash:
@@ -9333,7 +9333,7 @@ class _Translations:
 		# April Fool's alcohol!
 		var date = Time.get_date_dict_from_system()
 		if date.month == 4 and date.day == 1:
-			data["en"].merge({"H2O": "C2H6O"},true)
+			data["en"]["H2O"] = "C2H6O"
 		
 		tlFile.open("user://cache/.HevLib_Cache/translation_check_data.json",File.WRITE)
 		tlFile.store_string(JSON.print(ml_check_data,"\t"))
