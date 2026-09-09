@@ -85,6 +85,7 @@ func _init(modLoader : ModLoader = ModLoader):
 		pointers.FolderAccess.__recursive_delete(fstr_old)
 	pointers.ConfigDriver.__load_configs()
 	pointers.Translations.__inject_translations()
+	pointers.SafeMode.__handle_exit_for_file_checks()
 	
 	installScriptExtension("../notification_driver/CurrentGame.gd")
 	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk"):
@@ -328,9 +329,17 @@ func testing():
 	file.open("C:/Program Files (x86)/Steam/steamapps/common/dV Rings of Saturn/mods/HevLib.zip",File.READ)
 	var buffer = file.get_buffer(file.get_len())
 	file.close()
-	var files = pointers.Zip.__get_zip_central_directory_from_buffer(buffer)
+#	var files = pointers.Zip.__extract_files_from_zip_buffer(buffer,"user://dump")
+#	var files = pointers.Zip.__read_select_files_from_zip_buffer(buffer,PoolStringArray(["HevLib/ModMain.gd"]))
 	
-	
+#	var nb = pointers.DataFormat.__store_32_in_buffer(0x04034b50,PoolByteArray())
+	var t1 = Time.get_ticks_usec()
+	pointers.Zip.__create_zip("user://dump.zip",{"test.zip":buffer},false)
+	var t2 = Time.get_ticks_usec()
+	print(t2-t1)
+#	pointers.Zip.__write_pck("user://test_pack.pck",{"res://test.tscn":"TEST DATA!"})
+#	var pck = pointers.Zip.__load_pck("user://test_pack.pck")["res://test.tscn"]["GetData"].get_string_from_utf8()
+#	var pck = pointers.Zip.__load_pck("C:/Program Files (x86)/Steam/steamapps/common/dV Rings of Saturn/dlc/032_here-be-dragons.pck",true)
 	
 	
 	breakpoint

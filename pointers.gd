@@ -6802,8 +6802,6 @@ class _ManifestV2:
 	var mod_hash_file:String = "user://cache/.Mod_Menu_2_Cache/updates/mod_data_hash.txt"
 	var mod_state_hash_file:String = "user://cache/.Mod_Menu_2_Cache/updates/mod_zip_hash.txt"
 	
-	var needs_translated:bool = true
-	
 	var fetchZips:bool = true
 	func __get_mod_data(print_json: bool = false):
 		if not cached_mod_list.empty():
@@ -6871,10 +6869,6 @@ class _ManifestV2:
 								zip_ref_store[modGlobalPath] = modFSPath
 					gdunzip = null
 				if zip_ref_store.get("res://HevLib/ModMain.gd","").get_file()!="HevLib.zip":pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.","pointers.ManifestV2")
-			if needs_translated:
-				pointers.Translations.__inject_translations()
-				needs_translated = false
-			pointers.SafeMode.__handle_exit_for_file_checks()
 			var stat_tags : Dictionary = {}
 			for mod in modListArr:
 				var mod_entry : Dictionary = __make_mod_entry(mod)
@@ -7979,11 +7973,9 @@ class _ManifestV2:
 			need_mod_file_cache = false
 			var restrict_to_modmains : PoolStringArray = PoolStringArray()
 			if OS.has_feature("editor"):
-				var dvs : PoolStringArray = pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[])
-				for a in dvs:
+				for a in pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[]):
 					restrict_to_modmains.append(a.get_base_dir() + "/")
-				var enabled_modmains = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets")
-				for a in enabled_modmains:
+				for a in pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets"):
 					restrict_to_modmains.append(a.get_base_dir() + "/")
 			var arr1 : PoolStringArray = siftFolderStructureForModFiles(pointers.FolderAccess.__get_folder_structure("res://",false,false),"res://",restrict_to_modmains)
 			var arr2 : PoolStringArray = PoolStringArray()
