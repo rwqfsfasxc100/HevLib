@@ -143,9 +143,9 @@ func _input(event:InputEvent):
 				material.set_shader_param("darken_factor", new)
 				get_tree().set_input_as_handled()
 			if event.is_action_pressed("hl_ring_map_overlay_oob_opacity_down"):
-				var current = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","")
+				var current = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_oob_opacity")
 				var new = clamp(current - 0.05,0.0,1.0)
-				pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","",new)
+				pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_oob_opacity",new)
 				material.set_shader_param("darken_factor", new)
 				get_tree().set_input_as_handled()
 		
