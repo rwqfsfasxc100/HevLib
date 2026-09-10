@@ -40,6 +40,10 @@ func _ready():
 		OS.kill(OS.get_process_id())
 	hl_modmenu2dlclistdriver_uinit = true
 	pointers = ModLoader._savedObjects[0]
+	
+	if pointers.is_editor_and_needs_restart:
+		pointers.NodeAccess.__exit(false,"config file not able to be correctly constructed from fresh instance, closing game now that it has been properly built. Nothing is wrong, but you do need to restart the game manually.\n\nSorry for the inconvenience!","HevLib",0.0,"",true)
+	
 	grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	if get_child_count() >= 1:
 		var p = hl_dlc_make_label("HEVLIB_DLCLIST_DLC_HEADER")

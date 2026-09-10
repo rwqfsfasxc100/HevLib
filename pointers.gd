@@ -129,6 +129,8 @@ func _ready():
 		l("Vanilla translations did not get initialized, queued exit for 200 seconds to preserve report-ready state.","pointers.Translations")
 		NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_ERRORCHECK_MISSING_VANILLA_LOCALES"),"pointers.Translations",200)
 
+var is_editor_and_needs_restart:bool = false
+
 var resource_path = ""
 func _init(r,e):
 	resource_path = r
@@ -7975,7 +7977,11 @@ class _ManifestV2:
 			if OS.has_feature("editor"):
 				for a in pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[]):
 					restrict_to_modmains.append(a.get_base_dir() + "/")
-				for a in pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets",[]):
+				var allowed_modlets = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets")
+				if allowed_modlets == null:
+					pointers.is_editor_and_needs_restart = true
+					allowed_modlets = []
+				for a in allowed_modlets:
 					restrict_to_modmains.append(a.get_base_dir() + "/")
 			var arr1 : PoolStringArray = siftFolderStructureForModFiles(pointers.FolderAccess.__get_folder_structure("res://",false,false),"res://",restrict_to_modmains)
 			var arr2 : PoolStringArray = PoolStringArray()
@@ -9327,6 +9333,8 @@ class _Translations:
 								ml_check_data[language] = {"placeholders":[],"placeholders_size":0}
 							ml_check_data[language]["placeholders"].append(t)
 							ml_check_data[language]["placeholders_size"] += 1
+							if markPlaceholders:
+								v["string"] = "[PLACEHOLDER] " + v["string"]
 						data[language][t] = v
 		
 		# April Fool's alcohol!
