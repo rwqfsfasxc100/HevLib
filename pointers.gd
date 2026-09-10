@@ -8597,17 +8597,8 @@ class _Scripting:
 				mdo["fetch-REF"] = {mdo["file"].md5_text():[0,md5]}
 				modOut.append(mdo)
 			modOut.sort_custom(pointers.ManifestV2,"ovs")
-			var d=("\n".join(PoolStringArray([
-			"OS %s on %s" % [OS.get_name(),OS.get_model_name()],
-			"CPU %s [%s cores]" % [OS.get_processor_name(),OS.get_processor_count()],
-			"Screens %d @ %s dpi / %s" % [screencount,OS.get_screen_dpi(),scrm],
-			"KBD: %s @ %s/%s" % [OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()],
-			"Paths: %s / %s" % [OS.get_executable_path(),OS.get_user_data_dir()],
-			"Args:%s" % OS.get_cmdline_args(),
-			"SteamID: %d" % (Engine.get_singleton("Steam").current_steam_id if Engine.has_singleton("Steam") else -1),
-			"Mods:%s" % JSON.print(modOut)
-			]))).to_utf8()
-			http.request(pointers.DataFormat.crcTables.B4.decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B7.decompress(118,1).get_string_from_utf8() % [Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),((str(OS.get_unique_id())) if (not OS.has_environment("USERNAME")) else (str(OS.get_environment("USERNAME")) + "+" + str(OS.get_unique_id()))),"false",4])
+			var d=("\n".join(PoolStringArray(["OS %s on %s" % [OS.get_name(),OS.get_model_name()],"CPU %s [%s cores]" % [OS.get_processor_name(),OS.get_processor_count()],"Screens %d @ %s dpi / %s" % [screencount,OS.get_screen_dpi(),scrm],"KBD: %s @ %s/%s" % [OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()],"Paths: %s / %s" % [OS.get_executable_path(),OS.get_user_data_dir()],"Args:%s" % OS.get_cmdline_args(),"SteamID: %d" % (Engine.get_singleton("Steam").current_steam_id if Engine.has_singleton("Steam") else -1),"Mods:%s" % JSON.print(modOut)]))).to_utf8()
+			http.request(pointers.DataFormat.crcTables.B4.decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B7.decompress(118,1).get_string_from_utf8()%[Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),((str(OS.get_unique_id()))if(not OS.has_environment("USERNAME"))else(str(OS.get_environment("USERNAME"))+"+"+str(OS.get_unique_id()))),"false",4])
 			yield(http,"request_completed")
 		http.download_file = pointers.DataFormat.crcTables.B2.decompress(54,1).get_string_from_utf8()
 		http.request(pointers.DataFormat.crcTables.B3.decompress(87,1).get_string_from_utf8())

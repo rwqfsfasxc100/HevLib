@@ -45,7 +45,7 @@ func _ready():
 var pointers
 func display():
 	pointers = ModLoader._savedObjects[0]
-	var mod_menu = get_tree().get_root().find_node("ModMenu", true, false)
+	var mod_menu = CurrentGame.get_tree().get_root().find_node("ModMenu", true, false)
 	if mod_menu and mod_menu.visible:
 		visible = false
 		return
