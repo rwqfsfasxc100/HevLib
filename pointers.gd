@@ -8050,41 +8050,42 @@ class _ManifestV2:
 	
 	func __load_modlets(is_onready : bool) -> PoolStringArray:
 		var scenes_to_reload : PoolStringArray = PoolStringArray()
+		var providedResources:Array = []
+		pointers.DataFormat.__loadDLC()
 		for modlet in __get_modlet_files():
-			var drivers = pointers.DriverManagement.__get_drivers_from_modmain_path(modlet)
+			var drivers:Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(modlet)
 			if "LOAD_RESOURCES.gd" in drivers:
-				pointers.DataFormat.__loadDLC()
 				var resources : Dictionary = drivers["LOAD_RESOURCES.gd"].get("LOAD_RESOURCES",{})
-				if resources and typeof(resources) == TYPE_DICTIONARY:
-					for resource in resources:
-						var subdata : Dictionary = resources[resource]
-						var load_type : String = subdata.get("load_type","").to_lower()
-						var is_relative:bool = resource.begins_with("res://")
-						if is_onready == subdata.get("onready",false):
-							match load_type:
-								"script":
-									var path : String = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
-									if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
-										var override = subdata.get("override",false)
-										var op = subdata.get("override_path","res:/" + path.split(modlet.get_base_dir())[1])
-										var override_path : String = op if (op.begins_with("res:/")) else ("res:/" + ("" if op.begins_with("/") else "/") + op)
-										if override and pointers.FileAccess.__file_exists(override_path):
-											pointers.DataFormat.__override_script(path,override_path)
-										else:
-											pointers.DataFormat.__extend_script(path)
-								"scene","resource":
-									var path : String = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
-									var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[1])
-									var old_path : String = old if (old.begins_with("res:/")) else ("res:/" + ("" if old.begins_with("/") else "/") + old)
-									if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
-										pointers.DataFormat.__replace_resource(path,old_path)
-										if not old_path in scenes_to_reload:
-											scenes_to_reload.append(old_path)
-								"reload":
-									var path : String = resource if is_relative else ("res:/" + ("" if resource.begins_with("/") else "/") + resource)
-									if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
-										pointers.DataFormat.__reload_scene(path,subdata.get("complete_reload",false))
-				pointers.DataFormat.__loadDLC()
+				for resource in resources:
+					providedResources.append([resource,resources[resource],modlet])
+		for r in providedResources:
+			var resource:String = r[0];var subdata:Dictionary = r[1];var modlet:String = r[2]
+			var is_relative:bool = resource.begins_with("res://")
+			if is_onready == subdata.get("onready",false):
+				match subdata.get("load_type","").to_lower():
+					"script":
+						var path:String=resource if is_relative else(modlet.get_base_dir()+(""if resource.begins_with("/")else"/")+resource)
+						if pointers.ConfigDriver.__validate_dictionary(subdata)&&pointers.FileAccess.__file_exists(path):
+							var override=subdata.get("override",false)
+							var op=subdata.get("override_path","res:/"+path.split(modlet.get_base_dir())[1])
+							var override_path:String=op if(op.begins_with("res:/"))else("res:/"+(""if op.begins_with("/")else"/")+op)
+							if override&&pointers.FileAccess.__file_exists(override_path):
+								pointers.DataFormat.__override_script(path,override_path)
+							else:
+								pointers.DataFormat.__extend_script(path)
+					"scene","resource":
+						var path : String = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
+						var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[1])
+						var old_path : String = old if (old.begins_with("res:/")) else ("res:/" + ("" if old.begins_with("/") else "/") + old)
+						if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
+							pointers.DataFormat.__replace_resource(path,old_path)
+							if not old_path in scenes_to_reload:
+								scenes_to_reload.append(old_path)
+					"reload":
+						var path : String = resource if is_relative else ("res:/" + ("" if resource.begins_with("/") else "/") + resource)
+						if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
+							pointers.DataFormat.__reload_scene(path,subdata.get("complete_reload",false))
+		pointers.DataFormat.__loadDLC()
 		return scenes_to_reload
 	
 	var disabledModletCache:Dictionary = {}
@@ -8681,7 +8682,6 @@ class _Scripting:
 			pointers.FolderAccess.__recursive_delete(f)
 		var version:PoolIntArray = pointers.DataFormat.__get_vanilla_version()
 		pointers.l("observed game version of %s.%s.%s" % [version[0],version[1],version[2]],"pointers.Scripting")
-		
 		var drivers:Array = pointers.DriverManagement.__get_drivers()
 		var mineral_data:Array = []
 		for driver in drivers:
