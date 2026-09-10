@@ -5722,16 +5722,23 @@ class _FileAccess:
 		var modPathPrefix = gameInstallDirectory.plus_file("mods")
 		if file.file_exists(updateCacheFile):
 			var files_to_copy : Array = JSON.parse(__get_file_content(updateCacheFile)).result
-			var reboot:bool = false
-			for mod in files_to_copy:
-				if file.file_exists(mod) and __copy_file(mod,modPathPrefix) == OK: reboot = true
 			file.open(updateCacheFile,File.WRITE)
 			file.store_string("[]")
 			file.close()
+			var reboot:bool = not files_to_copy.empty()
 			if reboot:
-				var exitMsg = "new and/or updated mods detected, rebooting game"
+				var foundnewfiles:String = "new mods found, attempting to copy"
+				print(foundnewfiles)
+				pointers.l(foundnewfiles,"pointers.FileAccess")
+				for mod in files_to_copy:
+					if file.file_exists(mod) and __copy_file(mod,modPathPrefix) == OK:
+						var newmodmsg:String = "copied new mod %s" % mod.get_file()
+						print(newmodmsg)
+						pointers.l(newmodmsg,"pointers.FileAccess")
+				var exitMsg:String = "new and/or updated mods detected, rebooting game"
 				print(exitMsg)
 				pointers.NodeAccess.__exit(true,exitMsg,"pointers.FileAccess")
+			
 	
 	# Code sourced from lifelike's Godot Animator Import plugin
 	# https://github.com/lifelike/godot-animator-import
