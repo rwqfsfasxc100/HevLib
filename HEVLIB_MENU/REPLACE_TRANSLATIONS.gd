@@ -1047,10 +1047,6 @@ const TRANSLATIONS = {
 			"string": "Whether Input Virtualization should not handle engine built-in keybinds, even those not intended to be rebound.",
 			"version_hash": 4016249648
 		},
-		"HEVLIB_ANALYTICS_DISABLED": {
-			"string": "Analytics disabled, not allowed to fetch this data.",
-			"version_hash": 1949719479
-		},
 		"HEVLIB_OPT_MODPACKS": {
 			"string": "Modpacks",
 			"version_hash": 3714458839
@@ -2677,6 +2673,674 @@ const TRANSLATIONS = {
 		"MODMENU2_CLEAR_IGNORED_UPDATES_BUTTON": {
 			"string": "Zurücksetzen",
 			"version_hash": 0
+		},
+		"TAG_OVERHAUL": {
+			"string": "Капитальный ремонт",
+			"version_hash": 3544097003
+		},
+		"HEVLIB_GITHUB_PROGRESS_WAITING_ON_RESPONSE": {
+			"string": "Ожидание ответа от сервера.",
+			"version_hash": 1988119143
+		},
+		"HEVLIB_GITHUB_PROGRESS_ZIP_FOUND_AND_REQUESTING": {
+			"string": "Ответ получен. Запрос файла.",
+			"version_hash": 1619856286
+		},
+		"HEVLIB_GITHUB_PROGRESS_DOWNLOADING": {
+			"string": "Загрузка файла | %06.2f%%\\n\\n%0.2f %s загружено из %0.2f %s",
+			"version_hash": 812004994
+		},
+		"HEVLIB_GITHUB_PROGRESS_DOWNLOADING_ONLY_BYTES": {
+			"string": "Загрузка file.\\n\\n%0.2f %s загружен",
+			"version_hash": 2232387281
+		},
+		"HEVLIB_GITHUB_PROGRESS_DOWNLOADED_FILE": {
+			"string": "Загрузка завершена.",
+			"version_hash": 249088469
+		},
+		"HEVLIB_SIZE_LABEL_BYTES": {
+			"string": "байт",
+			"version_hash": 254850636
+		},
+		"HEVLIB_SIZE_LABEL_KILOBYTES": {
+			"string": "килобайт",
+			"version_hash": 214961083
+		},
+		"HEVLIB_SIZE_LABEL_MEGABYTES": {
+			"string": "мегабайт",
+			"version_hash": 2738237862
+		},
+		"HEVLIB_NO_DOWNLOAD_HEADER": {
+			"string": "ССЫЛКА НЕ УКАЗАНА!",
+			"version_hash": 3291089198
+		},
+		"HEVLIB_NO_DOWNLOAD_CONTENT": {
+			"string": "NOTICE: мод [%s] не имеет действующей ссылки для скачивания и не был загружен. \\n\\nПожалуйста, обращайтесь к источнику этого мода для получения любых обновлений и сообщите об этом автору мода.",
+			"version_hash": 2446599643
+		},
+		"HEVLIB_SAVEOPT_FIX_CORRUPTED_CARGO": {
+			"string": "Исправить поврежденный груз.",
+			"version_hash": 802028065
+		},
+		"HEVLIB_SAVEOPT_FIX_CORRUPTED_CARGO_TOOLTIP": {
+			"string": "Используйте эту функцию, если сохранение не загружается из-за некорректного груза, доставленного в предыдущем рейсе. \\n\\nХарактерный признак — предпоследняя строка файла engine_log.txt: \\n'ERROR: No loader found for resource: res://.' после вылета при возвращении из колец или загрузке сохранения.",
+			"version_hash": 885117514
+		},
+		"HEVLIB_CONFIG_MAX_MODDED_DEALERSHIP_POOLS": {
+			"string": "Максимальное количество записей модифицированного дилерского центра",
+			"version_hash": 1666179083
+		},
+		"HEVLIB_CONFIG_MAX_MODDED_DEALERSHIP_POOLS_TOOLTIP": {
+			"string": "Максимальное количество пулов модифицированных кораблей, добавленных в список используемых кораблей дилерского центра.\\n\\nЭто обрабатывает только корабли, добавленные через ShipDriver, причем число не\\n увеличивается, если добавлено меньше кораблей, чем это число.",
+			"version_hash": 3536264146
+		},
+		"HEVLIB_SAVEOPT_CLEAR_SOLD_SHIPS": {
+			"string": "Очистить кэш проданных кораблей",
+			"version_hash": 4176761126
+		},
+		"HEVLIB_SAVEOPT_CLEAR_SOLD_SHIPS_TOOLTIP": {
+			"string": "Очищает все данные, хранящиеся о проданных кораблях. Это используется для исправления проблем с проданными модифицированными кораблями, в которых постоянный корабль-призрак навсегда остается в дилерском центре.",
+			"version_hash": 713581652
+		},
+		"HEVLIB_CONFIG_INPUT_VIRTUALIZATION": {
+			"string": "Виртуализация ввода (WIP)",
+			"version_hash": 1330041627
+		},
+		"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_TOOLTIP": {
+			"string": "Использует программную систему для обработки ввода вместо игры. Разрешает использование действий привязки нескольких клавиш.",
+			"version_hash": 4158244573
+		},
+		"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_OVERRIDE_BUILTIN": {
+			"string": "Игнорировать встроенные привязки",
+			"version_hash": 1598156349
+		},
+		"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_OVERRIDE_BUILTIN_TOOLTIP": {
+			"string": "Должна ли виртуализация ввода обрабатывать встроенные в механизм привязки клавиш, даже те, которые не предназначены для повторного привязки.",
+			"version_hash": 4016249648
+		},
+		"HEVLIB_OPT_MODPACKS": {
+			"string": "Модпаки",
+			"version_hash": 3714458839
+		},
+		"HEVLIB_MODPACKS IMPORT": {
+			"string": "Импорт модпаков",
+			"version_hash": 126074482
+		},
+		"HEVLIB_MODPACKS EXPORT": {
+			"string": "Экспорт модпаков",
+			"version_hash": 103317849
+		},
+		"HEVLIB_APPLICABLE_MODS": {
+			"string": "Модпаки, совместимые с модпаками",
+			"version_hash": 476877116
+		},
+		"HEVLIB_SAVE_MODPACK": {
+			"string": "Сохранить модпак",
+			"version_hash": 1264474579
+		},
+		"HEVLIB_OPEN_MODPACK": {
+			"string": "Открыть модпак",
+			"version_hash": 732682486
+		},
+		"HEVLIB_MODPACK_LIMITATIONS": {
+			"string": "Модпаки не могут включать моды без манифеста, отформатированного как минимум до MV2.2 и иметь как ссылку на репозиторий GitHub, так и манифест URL.",
+			"version_hash": 2148121562
+		},
+		"HEVLIB_MODPACK_TOGGLE": {
+			"string": "Включить этот мод в экспортированный пакет модов?",
+			"version_hash": 909574562
+		},
+		"HEVLIB_MODPACK_DOWNLOADING": {
+			"string": "Пожалуйста, подождите... \\n\\nЗагрузка мода %02d из %02d \\n%s [%s]\\n\\n(%s моды пропущены.)",
+			"version_hash": 640450355
+		},
+		"HEVLIB_CONFIG_CARGO_SCANNER_DISPLAY_LIMIT": {
+			"string": "Ограничение отображения минералов в сканере груза",
+			"version_hash": 3554924120
+		},
+		"HEVLIB_CONFIG_CARGO_SCANNER_DISPLAY_LIMIT_TOOLTIP": {
+			"string": "Сколько записей о минералах разрешено отображать в любом списке сканера необработанных минералов.\\nЭто включает только минералы и пропускает пустое пространство, оборудование, \\n и неопознанные записи.",
+			"version_hash": 886148855
+		},
+		"TAG_ADD_TRANSIT_TIPS": {
+			"string": "Добавляет подсказки по транзиту",
+			"version_hash": 3276505670
+		},
+		"EVENTDRIVER_ENABLE_ALL": {
+			"string": "Включить все события",
+			"version_hash": 987521466
+		},
+		"EVENTDRIVER_DISABLE_ALL": {
+			"string": "Отключить все события",
+			"version_hash": 1138158759
+		},
+		"HEVLIB_GITHUBMODS_TITLE": {
+			"string": "Доступные моды",
+			"version_hash": 2637865945
+		},
+		"HEVLIB_GITHUBMODS_COUNT": {
+			"string": "%d доступны",
+			"version_hash": 913247151
+		},
+		"HEVLIB_CONFIG_PROCESSED_MINERAL_DISPLAY_LIMIT": {
+			"string": "Предел отображения полезных ископаемых переработанного груза",
+			"version_hash": 2547578582
+		},
+		"HEVLIB_CONFIG_PROCESSED_MINERAL_DISPLAY_LIMIT_TOOLTIP": {
+			"string": "Сколько записей о минералах может появиться в любое время в списке обработанной руды.\\nЭтот дисплей циклически переключается по страницам после превышения лимита, поэтому могут быть показаны все минералы.",
+			"version_hash": 1369356988
+		},
+		"HEVLIB_TRANSIT_TIP_18": {
+			"string": "Хотите увидеть несколько руд в одном куске минерала или настроить другие параметры минерала? Проверьте вкладку «Драйверы» в конфигурации HevLib.",
+			"version_hash": 2874849155
+		},
+		"HEVLIB_TRANSIT_TIP_19": {
+			"string": "Хотите настроить вероятность появления модифицированных кораблей у дилера? Проверьте вкладку «Драйверы» в конфигурации HevLib.",
+			"version_hash": 809628308
+		},
+		"HEVLIB_TRANSIT_TIP_20": {
+			"string": "Хотите контролировать определенные изменения в оборудовании, например сортировку слотов или ограничения сканера минералов? Проверьте раздел «Оборудование» в конфигурации HevLib.",
+			"version_hash": 186912265
+		},
+		"HEVLIB_TRANSIT_TIP_21": {
+			"string": "Возникли проблемы с управлением кораблем? Рассмотрите возможность замены двигателей или автопилота, а также настройте мощность тяги и параметры автопилота!",
+			"version_hash": 841163575
+		},
+		"HEVLIB_TRANSIT_TIP_22": {
+			"string": "Определенное оборудование может работать без дополнительной настройки только на предназначенных для него судах. Если у вас возникли проблемы с конкретным элементом оборудования, возможно, попробуйте соответствующий корабль?",
+			"version_hash": 2483296260
+		},
+		"HEVLIB_TRANSIT_TIP_23": {
+			"string": "Вы можете отсортировать порядок любых модов, отображаемых в списке DLC в разделе «Драйверы» в HevLib.",
+			"version_hash": 1367355062
+		},
+		"HEVLIB_TRANSIT_TIP_24": {
+			"string": "Устали от майнинга? Есть множество способов заработать деньги другими способами.",
+			"version_hash": 3573113157
+		},
+		"HEVLIB_TRANSIT_TIP_25": {
+			"string": "Магазины массовых драйверов и компоненты нанодронов ограничены скоростью доставки в их хранилище.",
+			"version_hash": 2903300490
+		},
+		"HEVLIB_TRANSIT_TIP_26": {
+			"string": "На вкладке «Геолог» предусмотрена полоса прокрутки, которая помогает просматривать длинные названия оборудования и/или списки полезных ископаемых.",
+			"version_hash": 1092699375
+		},
+		"EVENTDRIVER_LEGACY": {
+			"string": "Использовать устаревший обработчик появления?",
+			"version_hash": 2630802733
+		},
+		"EVENTDRIVER_INJECT": {
+			"string": "Внести странность?",
+			"version_hash": 548009294
+		},
+		"EVENTDRIVER_SPAWNER_CONTROLS": {
+			"string": "Создать элементы управления событиями",
+			"version_hash": 383031684
+		},
+		"EVENTDRIVER_CLEARER_CONTROLS": {
+			"string": "Очистить элементы управления событиями",
+			"version_hash": 3681275490
+		},
+		"EVENTDRIVER_CLEAR_POI": {
+			"string": "Очистить связанные POI",
+			"version_hash": 3673548405
+		},
+		"EVENTDRIVER_CLEAR_POI_TOOLTIP": {
+			"string": "POI- события создают местоположение внутри кэша астронавигации и возобновятся при нормальной очистке. \\n\\nЭтот переключатель удалит POI для события, если оно находится поблизости.",
+			"version_hash": 2980544907
+		},
+		"EVENTDRIVER_CLEAR_CARGO": {
+			"string": "Освободили груз?",
+			"version_hash": 3991202254
+		},
+		"EVENTDRIVER_EVENTS_TOOLTIP": {
+			"string": "Желаемое событие для создания/очистки\\n\\\"none\\\" - создать случайное событие/очистить все события",
+			"version_hash": 2910940133
+		},
+		"EVENTDRIVER_TIMER_TOOLTIP": {
+			"string": "Время между появлением событий в секундах.",
+			"version_hash": 1166419779
+		},
+		"EVENTDRIVER_SPAWNNOW_TOOLTIP": {
+			"string": "Создает выбранное событие.\\nЕсли выбрано \\\"none\\\", порождает случайное событие",
+			"version_hash": 2314890076
+		},
+		"EVENTDRIVER_LEGACY_TOOLTIP": {
+			"string": "Используйте очень старую систему с использованием testSpecificStoryElement для создания события",
+			"version_hash": 555589987
+		},
+		"EVENTDRIVER_INJECT_TOOLTIP": {
+			"string": "Размещайте объекты события непосредственно в кольце. \\nЭто обходит стандартный механизм создания событий и может вызвать сбои",
+			"version_hash": 324336902
+		},
+		"EVENTDRIVER_CLEAREVENT_TOOLTIP": {
+			"string": "Удаляет все события выбранного типа.\\nЕсли выбрано \\\"none\\\", очищаются все события",
+			"version_hash": 30519526
+		},
+		"EVENTDRIVER_CLEAR_CARGO_TOOLTIP": {
+			"string": "Если выбрано, также удаляются все странности, непосредственно порожденные событием, которые находятся внутри вашего груза бухта.",
+			"version_hash": 917771176
+		},
+		"HEVLIB_DOWNLOAD_MOD": {
+			"string": "Скачать мод!",
+			"version_hash": 570592894
+		},
+		"MODMENU_MOD_UNAVAILABLE": {
+			"string": "Этот мод в настоящее время недоступен. Это может быть связано с несколькими причинами, включая, помимо прочего: \\n\\n- GitHub была ограничена по скорости (вероятно, слишком много запросов)\\n- Проблемы с подключением к Интернету\\n- Мод не имеет правильной настройки загрузки",
+			"version_hash": 3639564067
+		},
+		"HEVLIB_CONFIG_FULL_LOGGING": {
+			"string": "Полное журналирование",
+			"version_hash": 2478639519
+		},
+		"HEVLIB_CONFIG_FULL_LOGGING_TOOLTIP": {
+			"string": "Есть ли потенциально многословная информация Функции HevLib должны создавать дополнительные журналы",
+			"version_hash": 3570790396
+		},
+		"MODMENU_GET_NEW_MODS": {
+			"string": "Получить новые моды из GitHub",
+			"version_hash": 2573811993
+		},
+		"HEVLIB_MM_TOOLTIP_LANGUAGE_ENTRY": {
+			"string": "%s: %s",
+			"version_hash": 1718567247
+		},
+		"HEVLIB_SUPPORTED_LANGUAGES": {
+			"string": "Поддерживаемые языки/завершение %:",
+			"version_hash": 31187306
+		},
+		"HEVLIB_CONFIG_SECTION_KEYMAPPING": {
+			"string": "Раскладка клавиш",
+			"version_hash": 3052849914
+		},
+		"HEVLIB_MODMENU_CANNOT_RESTART": {
+			"string": "В настоящее время в кольцах.\\nПерезапустите вручную.",
+			"version_hash": 3242006044
+		},
+		"HEVLIB_CONFIG_UNRESTRICTED_AMMO_OUTPUT": {
+			"string": "Удаляет ограничения на доставку боеприпасов.",
+			"version_hash": 537716554
+		},
+		"HEVLIB_CONFIG_UNRESTRICTED_AMMO_OUTPUT_TOOLTIP": {
+			"string": "Возвращает поведение магазина боеприпасов до версии 1.64.14,\\n, без ограничений на скорость доставки боеприпасов\\n к оборудованию.",
+			"version_hash": 1708599757
+		},
+		"HEVLIB_SETTING_REQUIRES_RESTART": {
+			"string": "NOTICE: после изменения этого параметра требуется перезагрузка.",
+			"version_hash": 1236302953
+		},
+		"HEVLIB_MODMENU_MODNAME_DISABLED": {
+			"string": "(отключено)",
+			"version_hash": 3167290830
+		},
+		"HEVLIB_MODLET_ENABLED": {
+			"string": "Включено?",
+			"version_hash": 644251567
+		},
+		"HEVLIB_MODMENU_MODNAME_ENABLED_NEEDS_RESTART": {
+			"string": "(включено, требуется перезагрузка)",
+			"version_hash": 1899921857
+		},
+		"HEVLIB_MODMENU_MODNAME_DISABLED_NEEDS_RESTART": {
+			"string": "(отключено, требуется перезагрузка)",
+			"version_hash": 2601371502
+		},
+		"MODMENU2_TRANSIT_TIP_1": {
+			"string": "Пакеты модов упрощают обмен модами! Создайте или импортируйте их в меню модов.",
+			"version_hash": 2128454254
+		},
+		"MODMENU2_TRANSIT_TIP_2": {
+			"string": "Хотите попробовать новые конфигурации, не меняя текущие настройки? Создайте новый профиль конфигурации, чтобы легко переключаться на предпочитаемые вами настройки.",
+			"version_hash": 331405958
+		},
+		"MODMENU2_TRANSIT_TIP_3": {
+			"string": "Хотите новые моды и не хотите искать их в Интернете? Проверьте меню загрузчика GitHub!",
+			"version_hash": 2668803293
+		},
+		"HEVLIB_MODMENU_MODLET_TOGGLE_TOOLTIP": {
+			"string": "Переключает, включен ли этот модлет.\\n\\n (требуется перезапуск игры)",
+			"version_hash": 3820371863
+		},
+		"HEVLIB_MODMENU_MODLET_TOGGLE_MM2FALLBACK": {
+			"string": "Невозможно переключить ModMenu2.\\n\\nZip необходимо удалить вручную или \\nпереключить непосредственно в файле конфигурации.",
+			"version_hash": 915722318
+		},
+		"MODMENU2_CHANGELOG_SPACING_SIZE": {
+			"string": "Размер интервала журнала изменений",
+			"version_hash": 3748345741
+		},
+		"MODMENU2_CHANGELOG_SPACING_SIZE_TOOLTIP": {
+			"string": "Пробелы, размещаемые в каждом отступе для подраздела журнала изменений",
+			"version_hash": 1698732061
+		},
+		"HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL": {
+			"string": "Интервал регистрации указателя (физические кадры)",
+			"version_hash": 346203813
+		},
+		"HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL_TOOLTIP": {
+			"string": "Количество физических кадров между автоматическими записями в журнал указателя\\n (т. е. информация, регистрируемая специально модами в кэш)\\n\\nЭто зависит от вашей текущей частоты кадров в физике",
+			"version_hash": 515481480
+		},
+		"HEVLIB_CONFIG_EXTEND_DIVIDED_STORAGE_MULTIPLIER": {
+			"string": "Увеличить вместимость секционных хранилищ",
+			"version_hash": 3830358193
+		},
+		"HEVLIB_CONFIG_EXTEND_DIVIDED_STORAGE_MULTIPLIER_TOOLTIP": {
+			"string": "Определяет, должна ли вместимость переработанного груза, добавляемая оборудованием через драйвер MODIFY_INTERNALS, автоматически меняться в зависимости от количества видов минералов в кольцах.\\n\\nЕсли параметр отключён, расчёт выполняется для шести минералов из основной игры.",
+			"version_hash": 759404083
+		},
+		"HEVLIB_CONFIG_MAX_DEALERSHIP_MODIFICATION_ROLLS": {
+			"string": "Максимальное количество бросков для корректировки снаряжения нового корабля",
+			"version_hash": 3469313118
+		},
+		"HEVLIB_CONFIG_MAX_DEALERSHIP_MODIFICATION_ROLLS_TOOLTIP": {
+			"string": "Сколько раз новый корабль может иметь изменения в своей базовой комплектации.\\n\\nМаксимум будет зависеть от количества, добавленного другими модами с MODIFY_SHIP_BUILDS.gd.",
+			"version_hash": 2944029967
+		},
+		"HEVLIB_CONFIG_DEALERSHIP_MODIFICATION_ROLL_CHANCE_SCALE": {
+			"string": "Корректировка шанса модификации корабля",
+			"version_hash": 2832891408
+		},
+		"HEVLIB_CONFIG_DEALERSHIP_MODIFICATION_ROLL_CHANCE_SCALE_TOOLTIP": {
+			"string": "Масштабируйте вероятность внесения изменений в конфигурацию корабля с вероятностью \\n для каждой модификации.",
+			"version_hash": 543789100
+		},
+		"HEVLIB_CREDITS_CONTRIBUTORS_HEADER": {
+			"string": "   --- Участники ---   ",
+			"version_hash": 3641455841
+		},
+		"HEVLIB_CREDITS_CONTRIBUTORS_ZAKRIN": {
+			"string": "Za'krin - Основной дизайн мода, оригинальная реализация updateTL",
+			"version_hash": 3828627238
+		},
+		"HEVLIB_CREDITS_CONTRIBUTORS_SPDX": {
+			"string": "spaceDOTexe - Дизайн манифеста, логика ограничения корабля UpgradeGroup",
+			"version_hash": 4113957048
+		},
+		"HEVLIB_CREDITS_CONTRIBUTORS_1WT1": {
+			"string": "WT - Конфигурации для SHIP_NODE_MODIFY",
+			"version_hash": 4219071341
+		},
+		"HEVLIB_CREDITS_SUPPORTERS_HEADER": {
+			"string": "   --- Сторонники ---   ",
+			"version_hash": 1704348250
+		},
+		"HEVLIB_CREDITS_SUPPORTERS_KOFI_GAZI": {
+			"string": "GAZI - сторонник (ко-фи)",
+			"version_hash": 4085861848
+		},
+		"HEVLIB_CREDITS_SUPPORTERS_KOFI_BAGGERDUDE": {
+			"string": "Bagger dude - сторонник (ко-фи)",
+			"version_hash": 2887391095
+		},
+		"HEVLIB_CREDITS_SUPPORTERS_KOFI_1WT1": {
+			"string": "WT - сторонник (ко-фи)",
+			"version_hash": 3531547864
+		},
+		"HEVLIB_DEV_PUSH": {
+			"string": "Опубликовать обновления модов",
+			"version_hash": 4122676635
+		},
+		"HEVLIB_DEV_PUSH_CONFIRM": {
+			"string": "Вы уверены, что хотите выпускать обновления для своих модов?",
+			"version_hash": 3051814466
+		},
+		"HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS": {
+			"string": "Отправлять новую информацию о модах в сборках редактора.",
+			"version_hash": 3525213644
+		},
+		"HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS_TOOLTIP": {
+			"string": "Должен ли UpdateDB получать информацию о модах, о которых он не знает, в сборках редактора.\\n\\nЭта опция предназначена для разработчиков модов. В релизных сборках игры он ничего не делает.",
+			"version_hash": 113417870
+		},
+		"HEVLIB_CONFIG_SHOW_RINGMAP_OVERLAY": {
+			"string": "Показать наложение карты кольца",
+			"version_hash": 2186846390
+		},
+		"HEVLIB_CONFIG_SHOW_RINGMAP_OVERLAY_TOOLTIP": {
+			"string": "Переключает видимость наложения карты кольца",
+			"version_hash": 1321643511
+		},
+		"HEVLIB_CONFIG_RINGMAP_HEATMAP": {
+			"string": "Преобразовать данные наложения карты кольца в тепловую карту",
+			"version_hash": 2108586739
+		},
+		"HEVLIB_CONFIG_RINGMAP_HEATMAP_TOOLTIP": {
+			"string": "Должен ли наложение карты кольца использовать тепловую карту HSV вместо \\n отображения необработанных данных пикселей.\\n\\nНеобработанные данные содержат конкретный канал/индекс для соответствующий метод \\ngetPixelAt() или getTargetDensityAt().",
+			"version_hash": 3398779976
+		},
+		"HEVLIB_CONFIG_RINGMAP_HEATMAP_CLAMP": {
+			"string": "Степификация цвета наложения карты кольца",
+			"version_hash": 4564075
+		},
+		"HEVLIB_CONFIG_RINGMAP_HEATMAP_CLAMP_TOOLTIP": {
+			"string": "Следует ли ограничивать выходной цвет карты кольца шагом 1/20, округляя вниз.\\n\\nЭто происходит конкретно с необработанным значением перед визуализацией, и его лучше всего использовать для определения\\n, когда были достигнуты определенные значения.",
+			"version_hash": 3469990629
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE": {
+			"string": "Минимальное значение карты кольца",
+			"version_hash": 2811375820
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_TOOLTIP": {
+			"string": "Минимальное значение, которое должно быть достигнуто, чтобы дисплей отображался с полной яркостью.\\n\\nОбласти, которые не прошли проверку, имеют непрозрачность за пределами границ, умноженную на ее текущую непрозрачность.",
+			"version_hash": 3861393134
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE": {
+			"string": "Максимальное значение карты кольца",
+			"version_hash": 414329998
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_TOOLTIP": {
+			"string": "Максимальное значение, которое должно быть достигнуто, чтобы отобразить дисплей с полной яркостью.\\n\\nОбласти, которые не прошли проверку, имеют непрозрачность за пределами границ, умноженную на ее текущую непрозрачность",
+			"version_hash": 2602012528
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY": {
+			"string": "Непрозрачность карты кольца",
+			"version_hash": 1582996684
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_TOOLTIP": {
+			"string": "Базовая непрозрачность наложения карты кольца",
+			"version_hash": 4040631661
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY": {
+			"string": "Карта кольца выходит за пределы непрозрачности",
+			"version_hash": 2317746276
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_TOOLTIP": {
+			"string": "Множитель непрозрачности для любых значений наложения, выходящих за пределы заданного \\nминимального и максимального значения",
+			"version_hash": 1226795897
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE": {
+			"string": "Режим отображения наложения карты кольца",
+			"version_hash": 2985551792
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_TOOLTIP": {
+			"string": "Какой визуализатор в настоящее время использует карта кольца.\\n\\n* Хаос — отображает значение хаоса кольца. (красный канал getPixelAt())\\n* Смещение размера — отображает значение смещения размера рингроида. (зелёный канал getPixelAt())\\n* Необработанная плотность — отображает необработанное значение плотности. (синий канал getPixelAt())\\n* Плотность класса 1 — отображает плотность C1 (самых крупных) рингроидов. (getTargetDensityAt() индекс 0)\\n* Плотность класса 2 — отображает плотность рингроидов C2. (getTargetDensityAt() индекс 1)\\n* Плотность класса 3 — отображает плотность рингроидов C3. (getTargetDensityAt() index 2)\\n* Плотность класса 4 — отображает плотность рингроидов C4. (getTargetDensityAt() index 3)\\n* Плотность класса 5 — отображает плотность C6 (наименьших) рингроидов. (индекс getTargetDensityAt() 4)\\n* Самый распространенный размер рингроида — отображает наиболее распространенный размер рингроида в области.\\n Чем ярче область, тем больше распространенность рингроида.",
+			"version_hash": 869282124
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_CHAOS": {
+			"string": "Хаос",
+			"version_hash": 217455795
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_BIAS": {
+			"string": "Смещение размера",
+			"version_hash": 986321567
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_RAWDENSITY": {
+			"string": "Чистая плотность",
+			"version_hash": 3733987279
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C1": {
+			"string": "Плотность класса 1",
+			"version_hash": 2812853740
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C2": {
+			"string": "Плотность класса 2",
+			"version_hash": 472198893
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C3": {
+			"string": "Плотность класса 3",
+			"version_hash": 2426511342
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C4": {
+			"string": "Плотность класса 4",
+			"version_hash": 85856495
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_C5": {
+			"string": "Плотность класса 5",
+			"version_hash": 2040168944
+		},
+		"HEVLIB_CONFIG_RINGMAP_DISPLAY_MODE_DENSITY_MOST_PREVALENT": {
+			"string": "Наиболее распространенный размер рингроида",
+			"version_hash": 609523250
+		},
+		"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY": {
+			"string": "Переключение наложения карты кольца",
+			"version_hash": 2000092087
+		},
+		"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_TOOLTIP": {
+			"string": "Клавиши, используемые для переключения наложения карты кольца",
+			"version_hash": 4280819030
+		},
+		"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_HEATMAP": {
+			"string": "Переключить отображение тепловой карты карты кольца",
+			"version_hash": 2570144278
+		},
+		"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_HEATMAP_TOOLTIP": {
+			"string": "Клавиши, используемые для переключения того, использует ли карта кольца тепловую карту",
+			"version_hash": 3603998316
+		},
+		"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_HEATMAP_CLAMP": {
+			"string": "Переключение шага значений тепловой карты кольцевой карты",
+			"version_hash": 459047484
+		},
+		"HEVLIB_CONFIG_TOGGLE_RINGMAP_OVERLAY_HEATMAP_CLAMP_TOOLTIP": {
+			"string": "Клавиши, используемые для переключения того, имеет ли тепловая карта кольцевой карты фиксированные значения.",
+			"version_hash": 2375962285
+		},
+		"HEVLIB_CONFIG_CYCLE_RINGMAP_OVERLAY_MODE": {
+			"string": "Циклический режим наложения карты кольца",
+			"version_hash": 3781027242
+		},
+		"HEVLIB_CONFIG_CYCLE_RINGMAP_OVERLAY_MODE_TOOLTIP": {
+			"string": "Клавиши, используемые для переключения между режимами наложения карты кольца. \\n\\nПроверьте режим отображения наложения карты отладки/кольца, какие режимы что делают.",
+			"version_hash": 2873646839
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_UP": {
+			"string": "Увеличение минимального значения наложения карты кольца.",
+			"version_hash": 2310825944
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_UP_TOOLTIP": {
+			"string": "Клавиши, используемые для увеличения минимального значения наложения карты кольца.",
+			"version_hash": 1532744479
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_DOWN": {
+			"string": "Уменьшить минимальное значение наложения карты кольца.",
+			"version_hash": 380670570
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MIN_VALUE_DOWN_TOOLTIP": {
+			"string": "Клавиши, используемые для уменьшения минимального значения наложения карты кольца.",
+			"version_hash": 2833586929
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_UP": {
+			"string": "Увеличение максимального значения наложения карты кольца",
+			"version_hash": 935367002
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_UP_TOOLTIP": {
+			"string": "Клавиши, используемые для увеличения максимального значения наложения карты кольца",
+			"version_hash": 781650721
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_DOWN": {
+			"string": "Уменьшить максимальное значение наложения карты кольца",
+			"version_hash": 3300178924
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_MAX_VALUE_DOWN_TOOLTIP": {
+			"string": "Клавиши, используемые для уменьшения максимального значения наложения карты кольца",
+			"version_hash": 2082493171
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_UP": {
+			"string": "Увеличьте непрозрачность карты кольца",
+			"version_hash": 1968471254
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_UP_TOOLTIP": {
+			"string": "Клавиши, используемые для увеличения непрозрачности наложения карты кольца",
+			"version_hash": 1962015821
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_DOWN": {
+			"string": "Уменьшить непрозрачность карты кольца",
+			"version_hash": 3534073832
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OPACITY_DOWN_TOOLTIP": {
+			"string": "Клавиши, используемые для уменьшения непрозрачности наложения карты кольца",
+			"version_hash": 3717483615
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_UP": {
+			"string": "Увеличить непрозрачность карты кольца за пределами границ",
+			"version_hash": 3249678830
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_UP_TOOLTIP": {
+			"string": "Клавиши, используемые для увеличения непрозрачности наложения карты кольца за пределами границ",
+			"version_hash": 15580581
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_DOWN": {
+			"string": "Уменьшить непрозрачность карты кольца за пределами границ",
+			"version_hash": 1319523456
+		},
+		"HEVLIB_CONFIG_RINGMAP_OVERLAY_OOB_OPACITY_DOWN_TOOLTIP": {
+			"string": "Клавиши, используемые для уменьшения непрозрачности за пределами наложения карты кольца",
+			"version_hash": 2858534199
+		},
+		"HEVLIB_CONFIG_SAFE_MOD_LOADING": {
+			"string": "Безопасная загрузка модов",
+			"version_hash": 1714521282
+		},
+		"HEVLIB_CONFIG_SAFE_MOD_LOADING_TOOLTIP": {
+			"string": "Предотвращает загрузку игры, если мод выполняет небезопасные операции (например, напрямую переопределяет ванильные файлы).\\n\\nРекомендуется оставить эту опцию включенной, чтобы предотвратить проблемы с ванильными и/или другими модами. Примечание. Я буду отклонять отчеты об ошибках, в которых отключен безопасный режим, поскольку вероятная причина проблемы связана с необходимостью его отключения.",
+			"version_hash": 2729983956
+		},
+		"HEVLIB_CREDITS_SUPPORTERS_KOFI_TESSIER": {
+			"string": "Tessier-Ashpool SA - сторонник (ко-фи)",
+			"version_hash": 2705946943
+		},
+		"HEVLIB_CREDITS_SOFTWARE_HEADER": {
+			"string": "   --- Программное обеспечение ---   ",
+			"version_hash": 2827177182
+		},
+		"HEVLIB_CREDITS_SOFTWARE_JELLE": {
+			"string": "jelle — реализация GDUNZIP",
+			"version_hash": 784233189
+		},
+		"HEVLIB_CREDITS_TRANSLATORS_HEADER": {
+			"string": "   --- Переводчики ---   ",
+			"version_hash": 3211741168
+		},
+		"HEVLIB_CREDITS_TRANSLATORS_1WT1": {
+			"string": "WT - украинские переводы",
+			"version_hash": 1851458392
+		},
+		"HEVLIB_CREDITS_TRANSLATORS_HEDRAUTA": {
+			"string": "Хедраута - переводы на немецкий язык",
+			"version_hash": 1012571612
+		},
+		"HEVLIB_CREDITS_TRANSLATORS_NEKO!!": {
+			"string": "НеКо!! - Китайские переводы",
+			"version_hash": 3552644866
+		},
+		"HEVLIB_CREDITS_TRANSLATORS_TESSIER": {
+			"string": "Tessier-Ashpool S.A. - переводы на китайский язык",
+			"version_hash": 2709571237
+		},
+		"HEVLIB_ERRORCHECK_MISSING_TRANSLATIONS": {
+			"string": "Не удалось загрузить переводы HevLib. Это указывает на то, что возникла серьезная проблема, и существует высокая вероятность того, что ваши моды не будут работать.\\n\\nЗакрытие этого всплывающего окна откроет форму отчета об ошибках мода. Пожалуйста, заполните это как можно лучше. Вам нужно будет вручную установить обновление после его выпуска.",
+			"version_hash": 655551688
+		},
+		"HEVLIB_ERRORCHECK_MISSING_VANILLA_LOCALES": {
+			"string": "Выход из игры из-за неинициализированного сервера перевода. Вероятно, это вызвано серьезной проблемой с любыми установленными вами модами и/или повреждением файла .PCK Vanilla.",
+			"version_hash": 4154468583
+		},
+		"HEVLIB_FINISH_RESEARCH": {
+			"string": "Завершите исследование!",
+			"version_hash": 2793565484
 		}
 	},
 	"uk_UA": {
@@ -3687,10 +4351,6 @@ const TRANSLATIONS = {
 		"HEVLIB_CONFIG_INPUT_VIRTUALIZATION_OVERRIDE_BUILTIN_TOOLTIP": {
 			"string": "Чи повинна віртуалізація вводу обробляти вбудовані клавіші рушія, навіть ті, що не призначені для зміни.",
 			"version_hash": 4016249648
-		},
-		"HEVLIB_ANALYTICS_DISABLED": {
-			"string": "Аналітику вимкнено, отримання цих даних заборонено.",
-			"version_hash": 1949719479
 		},
 		"HEVLIB_OPT_MODPACKS": {
 			"string": "Збірки модів (Modpacks)",

