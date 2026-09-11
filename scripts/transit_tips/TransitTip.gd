@@ -41,7 +41,7 @@ func _ready():
 		OS.kill(OS.get_process_id())
 	hl_modmenu2transittiphandler_uinit = true
 	pointers = ModLoader._savedObjects[0]
-	for i in range(tips):
+	for i in tips:
 		list.append(base % (i + 1))
 	var tags = pointers.ManifestV2.__get_tags()
 	if "TAG_ADD_TRANSIT_TIPS" in tags:

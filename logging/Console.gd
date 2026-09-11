@@ -41,7 +41,7 @@ onready var list = $MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer
 var currentNodeRes = Vector2(1280,720)
 
 func _ready():
-	for i in range(max_lines):
+	for i in max_lines:
 		var label = richLabel.instance()
 		label.name = "line_" + str(i)
 		list.add_child(label)

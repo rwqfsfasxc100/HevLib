@@ -66,7 +66,7 @@ func hl_shipdriver_init_ships_to_dealer():
 				if pointersShipDriver.FileAccess.__file_exists(fd.path):
 					var age = fd["dealer"].get("age",200)
 					var dict = {"name":shipName,"age":24 * 3600 * 365 * age}
-					for i in range(max(0,fd["dealer"].get("weight",1))):
+					for i in max(0,fd["dealer"].get("weight",1)):
 						modded_ship_list.append(dict)
 				else:
 					pointersShipDriver.l("ERROR: Failed to add modded ship [%s] to the dealership pool due to it's ship scene not being a valid filepath." % shipName,"ShipDriver")
@@ -79,14 +79,14 @@ func hl_shipdriver_init_ships_to_dealer():
 	if added_modded_ships:
 		hl_shipdriver_clear_modded_ships()
 	var vps = []
-	for i in range(clamp(modded_ship_list.size(),0,rng)):
+	for i in clamp(modded_ship_list.size(),0,rng):
 		vps.append({"name":"HevLibShipyardEntry|%s" % i,"age":0})
 	usedShipsPool.append_array(vps)
 	added_modded_ships = true
 
 func hl_shipdriver_clear_modded_ships():
 	var list = []
-	for r in range(usedShipsPool.size()):
+	for r in usedShipsPool.size():
 		var i = usedShipsPool[r]
 		if i["name"].begins_with("HevLibShipyardEntry"):
 			list.append(r)

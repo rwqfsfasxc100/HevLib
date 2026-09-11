@@ -58,7 +58,7 @@ func handle_list(ores,oresize) -> Array:
 		var offset:int = page * cargo_limit
 		var thisSize:int = min(cargo_limit,oresize - offset)
 		var pages:int = int(ceil(float(oresize) / float(cargo_limit)))
-		for i in range(thisSize):
+		for i in thisSize:
 			out.append(ores[offset + i])
 		if counter > 49:
 			counter = 0

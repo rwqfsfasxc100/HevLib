@@ -56,7 +56,7 @@ func smoothValue(dict, s):
 		sms = top.size()
 		top.sort_custom(self,"hl_cs_compare_for_order")
 		if sms > cargo_limit:
-			for a in range(sms - cargo_limit):
+			for a in (sms - cargo_limit):
 				smooth.erase(top[a + cargo_limit])
 	return smooth
 

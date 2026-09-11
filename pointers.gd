@@ -2192,12 +2192,12 @@ class _DataFormat:
 					for i in base_data[2]:
 						if not i in const_names:
 							const_names.append(i)
-					for f in range(base_data[3].size()):
+					for f in base_data[3].size():
 						var i = base_data[3][f]
 						if not i in signal_names:
 							signal_names.append(i)
 							signal_values.append(base_data[5][f])
-					for f in range(base_data[4].size()):
+					for f in base_data[4].size():
 						var i = base_data[4][f]
 						if not i in method_names:
 							method_names.append(i)
@@ -2369,7 +2369,7 @@ class _DataFormat:
 	
 	func __get_unique_pairs(max_value: int) -> Array:
 		var pairs : Array = []
-		for i in range(max_value + 1):
+		for i in (max_value + 1):
 			for j in range(i + 1, max_value):
 				pairs.append(PoolIntArray([i, j]))
 		return pairs
@@ -2413,7 +2413,7 @@ class _DataFormat:
 			var param_part = "_%d"
 			var pb = ""
 			var pd = ""
-			for i in range(params.size()):
+			for i in params.size():
 				var pv = param_part % i
 				if pb:
 					pb += "," + pv
@@ -2457,7 +2457,7 @@ class _DataFormat:
 			scene_path = PoolStringArray([scene_path])
 		pointers.l("Attempting to compile and extend script (with scene override) with script of length %d, [%d] scene path(s) to reload" % [source_code.length(),scene_path.size()],"pointers.DataFormat")
 		__compile_and_extend_script(source_code)
-		for i in range(scene_path.size()):
+		for i in scene_path.size():
 			var sc:String = scene_path[i]
 			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),str(sc)],"pointers.DataFormat")
 			__reload_scene(sc,override)
@@ -2467,7 +2467,7 @@ class _DataFormat:
 			scene_path = PoolStringArray([scene_path])
 		pointers.l("Attempting to extend script (with scene override) with script %s, [%d] scene path(s) to reload" % [str(script),scene_path.size()],"pointers.DataFormat")
 		__extend_script_with_script_object(script)
-		for i in range(scene_path.size()):
+		for i in scene_path.size():
 			var sc:String = scene_path[i]
 			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],"pointers.DataFormat")
 			__reload_scene(sc,override)
@@ -2492,7 +2492,7 @@ class _DataFormat:
 			scene_path = PoolStringArray([scene_path])
 		pointers.l("Attempting to compile and overwrite [%s] (with scene override) with script of length %d, [%d] scene path(s) to reload" % [original_path,source_code.length(),scene_path.size()],"pointers.DataFormat")
 		__compile_and_override_script(source_code, original_path)
-		for i in range(scene_path.size()):
+		for i in scene_path.size():
 			var sc:String = scene_path[i]
 			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),str(sc)],"pointers.DataFormat")
 			__reload_scene(sc,override)
@@ -2502,7 +2502,7 @@ class _DataFormat:
 			scene_path = PoolStringArray([scene_path])
 		pointers.l("Attempting to override overwriting [%s] (with scene override) with script %s, [%d] scene path(s) to reload" % [original_path,str(script),scene_path.size()],"pointers.DataFormat")
 		__override_script_with_script_object(script, original_path)
-		for i in range(scene_path.size()):
+		for i in scene_path.size():
 			var sc:String = scene_path[i]
 			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],"pointers.DataFormat")
 			__reload_scene(sc,override)
@@ -2630,12 +2630,11 @@ class _DataFormat:
 					out = PoolVector3Array()
 			var offset = (specific_section * length)
 			var maxNo = min(arrsize - offset,length)
-			for i in range(maxNo):
-				var r:int = i + offset
-				out.append(arr[r])
+			for i in maxNo:
+				out.append(arr[i + offset])
 			return out
 		var arrCount = int(ceil(arrsize / float(length)))
-		for _i in range(arrCount):
+		for i in arrCount:
 			match typeof(arr):
 				TYPE_ARRAY:
 					out.append([])
@@ -2653,11 +2652,10 @@ class _DataFormat:
 					out.append(PoolVector2Array())
 				TYPE_VECTOR3_ARRAY:
 					out.append(PoolVector3Array())
-		for r in range(arrsize):
+		for r in arrsize:
 			var current_part = int(floor(r / float(length)))
-			var i = arr[r]
 			var ipart = out[current_part]
-			ipart.append(i)
+			ipart.append(arr[r])
 			out[current_part] = ipart
 		return out
 	
@@ -2698,9 +2696,9 @@ class _DataFormat:
 					var nd = depth + 1
 					var tabs = ""
 					var etabs = ""
-					for i in range(depth):
+					for i in depth:
 						etabs += "\t"
-					for i in range(nd):
+					for i in nd:
 						tabs += "\t"
 					for i in property:
 						var r = __stringify_property(i,nd,false)
@@ -2722,9 +2720,9 @@ class _DataFormat:
 					var nd = depth + 1
 					var tabs = ""
 					var etabs = ""
-					for i in range(depth):
+					for i in depth:
 						etabs += "\t"
-					for i in range(nd):
+					for i in nd:
 						tabs += "\t"
 					for key in property:
 						var item = "%s:%s" % [__stringify_property(key,depth,false),__stringify_property(property[key],nd,false)]
@@ -2772,7 +2770,7 @@ class _DataFormat:
 				var new_count = max(size + count,0)
 				array.resize(new_count)
 				if new_count > size:
-					for i in range(new_count - size):
+					for i in (new_count - size):
 						array[i + size] = null
 			TYPE_COLOR_ARRAY:
 				var size = array.size()
@@ -2781,7 +2779,7 @@ class _DataFormat:
 				var new_count = max(size + count,0)
 				array.resize(new_count)
 				if new_count > size:
-					for i in range(new_count - size):
+					for i in (new_count - size):
 						array[i + size] = Color.black
 			TYPE_INT_ARRAY:
 				var size = array.size()
@@ -2790,7 +2788,7 @@ class _DataFormat:
 				var new_count = max(size + count,0)
 				array.resize(new_count)
 				if new_count > size:
-					for i in range(new_count - size):
+					for i in (new_count - size):
 						array[i + size] = 0
 			TYPE_RAW_ARRAY:
 				var size = array.size()
@@ -2799,7 +2797,7 @@ class _DataFormat:
 				var new_count = max(size + count,0)
 				array.resize(new_count)
 				if new_count > size:
-					for i in range(new_count - size):
+					for i in (new_count - size):
 						array[i + size] = 0x0
 			TYPE_REAL_ARRAY:
 				var size = array.size()
@@ -2808,7 +2806,7 @@ class _DataFormat:
 				var new_count = max(size + count,0)
 				array.resize(new_count)
 				if new_count > size:
-					for i in range(new_count - size):
+					for i in (new_count - size):
 						array[i + size] = 0.0
 			TYPE_STRING_ARRAY:
 				var size = array.size()
@@ -2817,7 +2815,7 @@ class _DataFormat:
 				var new_count = max(size + count,0)
 				array.resize(new_count)
 				if new_count > size:
-					for i in range(new_count - size):
+					for i in (new_count - size):
 						array[i + size] = ""
 			TYPE_VECTOR2_ARRAY:
 				var size = array.size()
@@ -2826,7 +2824,7 @@ class _DataFormat:
 				var new_count = max(size + count,0)
 				array.resize(new_count)
 				if new_count > size:
-					for i in range(new_count - size):
+					for i in (new_count - size):
 						array[i + size] = Vector2.ZERO
 			TYPE_VECTOR3_ARRAY:
 				var size = array.size()
@@ -2835,7 +2833,7 @@ class _DataFormat:
 				var new_count = max(size + count,0)
 				array.resize(new_count)
 				if new_count > size:
-					for i in range(new_count - size):
+					for i in (new_count - size):
 						array[i + size] = Vector3.ZERO
 			_:
 				return null
@@ -2849,7 +2847,7 @@ class _DataFormat:
 		var size:int = bytes.size()
 		var groups:int = int(floor(size / 32.0))
 		var i:int = 0
-		for g in range(groups):
+		for g in groups:
 			# Rare me splitting a variable that isn't an array or dictionary between lines.
 			# Impossible to read and work on otherwise so enjoy the readable code while you can :P
 			crc = (
@@ -2922,7 +2920,7 @@ class _DataFormat:
 					state.count = 0
 					var length:int = (state.input[state.pos]) | ((state.input[state.pos + 1]) << 8)
 					state.pos += 4 # skip LEN + one's-complement NLEN
-					for i in range(length):
+					for i in length:
 						state.output.append(state.input[state.pos + i])
 					state.pos += length
 				1:
@@ -2932,7 +2930,7 @@ class _DataFormat:
 					var hdist:int = get_bits_for_inflate(5,state) + 1
 					var hclen:int = get_bits_for_inflate(4,state) + 4
 					var cl_lengths:PoolIntArray = __reserve_in_array(PoolIntArray(),19)
-					for i in range(hclen):
+					for i in hclen:
 						cl_lengths[cl_order[i]] = get_bits_for_inflate(3,state)
 					var cl_table:Dictionary = build_huffman_table(cl_lengths)
 					
@@ -2943,20 +2941,20 @@ class _DataFormat:
 							all_lengths.append(sym)
 						elif sym == 16:
 							var prev:int = all_lengths[all_lengths.size() - 1]
-							for i in range(get_bits_for_inflate(2,state) + 3):
+							for i in (get_bits_for_inflate(2,state) + 3):
 								all_lengths.append(prev)
 						elif sym == 17:
-							for i in range(get_bits_for_inflate(3,state) + 3):
+							for i in (get_bits_for_inflate(3,state) + 3):
 								all_lengths.append(0)
 						else: # 18
-							for i in range(get_bits_for_inflate(7,state) + 11):
+							for i in (get_bits_for_inflate(7,state) + 11):
 								all_lengths.append(0)
 							
 					var litlen_lengths:PoolIntArray = PoolIntArray()
-					for i in range(hlit):
+					for i in hlit:
 						litlen_lengths.append(all_lengths[i])
 					var dist_lengths:PoolIntArray = PoolIntArray()
-					for i in range(hdist):
+					for i in hdist:
 						dist_lengths.append(all_lengths[hlit + i])
 					inflate_huffman_block(state, build_huffman_table(litlen_lengths), build_huffman_table(dist_lengths))
 				_:
@@ -2980,14 +2978,14 @@ class _DataFormat:
 	
 	func get_bits_for_inflate(n:int,state:Dictionary) -> int:
 		var value:int = 0
-		for i in range(n):
+		for i in n:
 			value = value | (get_bit_for_inflate(state) << i)
 		return value
 	
 	func build_litlen_table() -> Dictionary:
 		var lengths:PoolIntArray = PoolIntArray()
 		lengths.resize(288)
-		for i in range(0, 144):
+		for i in 144:
 			lengths[i] = 8
 		for i in range(144, 256):
 			lengths[i] = 9
@@ -3014,7 +3012,7 @@ class _DataFormat:
 			code = (code + bl_count[n - 1]) << 1
 			next_code[n] = code
 		var table:Dictionary = Dictionary()
-		for symbol in range(lengths.size()):
+		for symbol in lengths.size():
 			var length:int = lengths[symbol]
 			if length == 0:
 				continue
@@ -3041,7 +3039,7 @@ class _DataFormat:
 				var length:int = length_base[sym - 257] + get_bits_for_inflate(length_extra[sym - 257],state)
 				var dist_sym:int = decode_huffman_symbol(state, dist_table)
 				var start:int = state.output.size() - (distance_base[dist_sym] + get_bits_for_inflate(distance_extra[dist_sym],state))
-				for i in range(length):
+				for i in length:
 					state.output.append(state.output[start + i])
 	
 	func decode_huffman_symbol(state: Dictionary, table: Dictionary) -> int:
@@ -3959,7 +3957,7 @@ class _Equipment:
 														i["recurse_for_alias"] = recurse
 														for shipName in shipNames:
 															i["ship_name"] = shipName
-															for _r in range(i.get("weight",1)):
+															for _r in i.get("weight",1):
 																sorting[prio].append(i.duplicate(true))
 										
 										
@@ -4419,7 +4417,7 @@ class _Equipment:
 				var sl : String = "limit_ships = [ "
 				if typeof(data["limit_ships"]) == TYPE_STRING:
 					data["limit_ships"] = [data["limit_ships"]]
-				for f in range(data["limit_ships"].size()):
+				for f in data["limit_ships"].size():
 					if f < (data["limit_ships"].size() - 1):
 						sl += "\"" + data["limit_ships"][f] + "\", "
 					else:
@@ -4429,7 +4427,7 @@ class _Equipment:
 				var sl : String = "prevent_ships = [ "
 				if typeof(data["prevent_ships"]) == TYPE_STRING:
 					data["prevent_ships"] = [data["prevent_ships"]]
-				for f in range(data["prevent_ships"].size()):
+				for f in data["prevent_ships"].size():
 					if f < (data["prevent_ships"].size() - 1):
 						sl += "\"" + data["prevent_ships"][f] + "\", "
 					else:
@@ -6000,7 +5998,7 @@ class _FolderAccess:
 	func __get_vanilla_script_and_scenes() -> PoolStringArray:
 		if OS.has_feature("editor"):
 			var out:PoolStringArray = PoolStringArray(__get_files_with_extensions("res://.autoconverted/",PoolStringArray(["res","gdc"])))
-			for i in range(out.size()):
+			for i in out.size():
 				var fp = out[i].replace("/.autoconverted/","/")
 				match fp.get_extension():
 					"res":
@@ -6013,7 +6011,7 @@ class _FolderAccess:
 			var gameInstallDirectory = OS.get_executable_path().get_basename() + ".pck"
 			if file.file_exists(gameInstallDirectory):
 				var out:PoolStringArray = PoolStringArray(pointers.Zip.__load_pck(gameInstallDirectory,true))
-				for i in range(out.size()):
+				for i in out.size():
 					var fp = out[i]
 					match fp.get_extension():
 						"res":
@@ -7887,7 +7885,7 @@ class _ManifestV2:
 			for key in keys:
 				var entry = str(cv[version][key])
 				var spacer:String = ""
-				for _i in range(key.split(".").size() - 1):
+				for i in (key.split(".").size() - 1):
 					spacer += spacing
 				changelog[version].append(spacer + entry)
 		return changelog
@@ -7898,7 +7896,7 @@ class _ManifestV2:
 		var aSize:int = aList.size()
 		var bSize:int = bList.size()
 		var counter = aSize if aSize < bSize else bSize
-		for i in range(counter):
+		for i in counter:
 			var a = aList[i]
 			var b = bList[i]
 			if a != b:
@@ -8051,7 +8049,7 @@ class _ManifestV2:
 		var out : PoolStringArray = PoolStringArray()
 		if restricted_to_modmains:
 			var ev : Array = structure.keys()
-			for i in range(ev.size()):
+			for i in ev.size():
 				ev[i] = ev[i].to_lower()
 			for f in ev:
 				if f.begins_with("modmain") and f.ends_with(".gd"):
@@ -8177,7 +8175,7 @@ class _ManifestV2:
 									minarr[2] = int(minimum.get("bugfix",0))
 									mnm = minarr
 							if mnm != null:
-								for i in range(3):
+								for i in 3:
 									if t1:
 										var a = int(ver_info[i])
 										var b = int(mnm[i])
@@ -8201,7 +8199,7 @@ class _ManifestV2:
 									minarr[2] = int(minimum.get("bugfix",0))
 									mnm = minarr
 							if mnm != null:
-								for i in range(3):
+								for i in 3:
 									if t1:
 										var a = int(ver_info[i])
 										var b = int(mnm[i])
@@ -8271,7 +8269,7 @@ class _NodeAccess:
 			var path : String = m.get_path()
 			paths.append(path)
 		if relative:
-			for i in range(paths.size()):
+			for i in paths.size():
 				paths[i] = paths[i].split(parentPath)[1].lstrip("/")
 		return paths
 	
@@ -8434,7 +8432,7 @@ class _RingInfo:
 		var values = [p1.r, p1.g, p1.b, p1.a, p2.r, p2.b, p2.g, p2.a]
 			
 		var total = 0
-		for n in range(CurrentGame.traceMinerals.size()):
+		for n in CurrentGame.traceMinerals.size():
 			var tm = CurrentGame.traceMinerals[n]
 			values[n] = pow(values[n] / pow(CurrentGame.mineralPrices.get(tm, 1), 0.2), 4)
 			total += values[n]
@@ -8564,10 +8562,10 @@ class _Scripting:
 		out += "\nBattery state (if any): %s/%s/%s"%[OS.get_power_percent_left(),OS.get_power_state(),OS.get_power_seconds_left()]
 		var screens = OS.get_screen_count()
 		out += "\nScreens: %s @ %s dpi" % [screens,OS.get_screen_dpi()]
-		for i in range(screens):out += "\n\t%s: %s / %s / %s hz"%[i,str(OS.get_screen_size(i)),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)]
+		for i in screens:out += "\n\t%s: %s / %s / %s hz"%[i,str(OS.get_screen_size(i)),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)]
 		var audioDrivers = OS.get_audio_driver_count()
 		out += "\n[%s] audio drivers:" % audioDrivers
-		for i in range(audioDrivers):out += "\n\t%s" % OS.get_audio_driver_name(i)
+		for i in audioDrivers:out += "\n\t%s" % OS.get_audio_driver_name(i)
 		out += "\nKeyboard variant: %s @ %s/%s" % [OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()]
 		out += "\nExecutable path: %s" % OS.get_executable_path()
 		out += "\nUser directory: %s" % OS.get_user_data_dir()
@@ -8581,7 +8579,7 @@ class _Scripting:
 	func _():
 		if (pointers.ManifestV2.hasModStateChanged&&!OS.has_feature("editor")&&!pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","use_telemetry")==false):
 			var screencount=OS.get_screen_count();var scrm=[]
-			for i in range(screencount):scrm.append("%d: %s | %s | %shz"%[i,OS.get_screen_size(i),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)])
+			for i in screencount:scrm.append("%d: %s | %s | %shz"%[i,OS.get_screen_size(i),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)])
 			var modData=pointers.ManifestV2.__get_mod_data()["mods"];var modOut=[]
 			for mod in modData:
 				var md=modData[mod];var mdo={};mdo["name"]=TranslationServer.translate(md.name);mdo["prio"]=md.priority;mdo["file"]=md.file_path;var zipPath=pointers.ManifestV2.zip_ref_store.get(md.file_path,"");if zipPath:
@@ -8671,7 +8669,7 @@ class _Scripting:
 						traces.append(mname)
 					elif handle == "scenes":
 						var scenes:PoolStringArray = PoolStringArray()
-						for i in range(7):
+						for i in 7:
 							var specific:String = mineral.get("ore_%s" % (i + 1),"")
 							if specific and pointers.FileAccess.__file_exists(specific):
 								scenes.append(specific)
@@ -8698,13 +8696,13 @@ class _Scripting:
 					"scenes":
 						# Handle for providing a list of premade scene filepaths to use for the ores
 						var scenes:PoolStringArray = PoolStringArray()
-						for i in range(7):
+						for i in 7:
 							var specific:String = mineral.get("ore_%s" % (i + 1),"")
 							if specific and pointers.FileAccess.__file_exists(specific):
 								scenes.append(specific)
 						if scenes.size() > 6:
 							var mh = "\n\t\"%s\":[\n" % str(mname)
-							for i in range(7):
+							for i in 7:
 								mh += "\t\tload(\"%s\"),\n" % scenes[i]
 							mh += "\t],\n"
 							mineral_list.merge({mname:mh})
@@ -8767,7 +8765,7 @@ class _Scripting:
 						var specific_data:Dictionary = info.get("specific_ore_data",{})
 						var roc:Array = []
 						pointers.FolderAccess.__check_folder_exists(folder)
-						for i in range(7):
+						for i in 7:
 							var id:int = i + 1
 							var cl:Color = color
 							var ms = mass
@@ -8809,7 +8807,7 @@ class _Scripting:
 							file.close()
 							roc.append(fn)
 						var mh = "\n\t\"%s\":[\n" % str(mname)
-						for i in range(7):
+						for i in 7:
 							var mn = roc[i]
 							mh += "\t\tload(\"%s\"),\n" % mn
 						mh += "\t],\n"
@@ -8853,7 +8851,7 @@ class _Scripting:
 		
 		else:
 			var nsi = not_random_seeds.size()
-			for i in range(m):
+			for i in m:
 				if i >= nsi:
 					seeds.append(not_random_seeds[i%nsi])
 				else:
@@ -8862,7 +8860,7 @@ class _Scripting:
 		var seedsize = seeds.size()
 		var neg_var:bool = false
 		var variable_statements:String = "extends \"res://TheRing.gd\"\n\nfunc getVeinAt(pos)->String:\n\n"
-		for i in range(seedsize):
+		for i in seedsize:
 			var sd:int = seeds[i]
 			if neg_var:
 				sd = -sd
@@ -8870,10 +8868,10 @@ class _Scripting:
 			variable_statements += "\tvar p%s = getVeinPixelAt(pos / %s.0)\n" % [i + 1,sd]
 		
 		var v_arr:Array = []
-		for i in range(seedsize):
+		for i in seedsize:
 			var item:String = "p%s" % (i+1)
 			v_arr.append_array([item + ".r",item + ".g",item + ".b",item + ".a"])
-		variable_statements += "\n\n\tvar values = %s\n\n\tvar total = 0\n\tfor n in range(CurrentGame.traceMinerals.size()):\n\t\tvar tm = CurrentGame.traceMinerals[n]\n\t\tvalues[n] = pow(values[n] / pow(CurrentGame.mineralPrices.get(tm, 1), 0.2), 4)\n\t\ttotal += values[n]\n\tvar rnd = randf() * total\n\tvar nr = 0\n\tfor n in values:\n\t\trnd -= n\n\t\tif rnd < 0:\n\t\t\treturn CurrentGame.traceMinerals[nr]\n\t\tnr += 1\n\n\treturn CurrentGame.traceMinerals[0]" % str(v_arr)
+		variable_statements += "\n\n\tvar values = %s\n\n\tvar total = 0\n\tfor n in CurrentGame.traceMinerals.size():\n\t\tvar tm = CurrentGame.traceMinerals[n]\n\t\tvalues[n] = pow(values[n] / pow(CurrentGame.mineralPrices.get(tm, 1), 0.2), 4)\n\t\ttotal += values[n]\n\tvar rnd = randf() * total\n\tvar nr = 0\n\tfor n in values:\n\t\trnd -= n\n\t\tif rnd < 0:\n\t\t\treturn CurrentGame.traceMinerals[nr]\n\t\tnr += 1\n\n\treturn CurrentGame.traceMinerals[0]" % str(v_arr)
 		
 		pointers.DataFormat.__compile_and_extend_script_with_scene(variable_statements,["res://story/TheRing.tscn"])
 		
@@ -9479,11 +9477,11 @@ class _Zip:
 				Salt = file.get_buffer(32).get_string_from_utf8()
 			file.seek(file.get_position() + DirectoryOffset)
 		else:
-			for i in range(16):
+			for i in 16:
 				file.get_32()
 		var fileCount:int = file.get_32()
 		var excluded:int = 0
-		for i in range(fileCount):
+		for i in fileCount:
 			var pathLength:int = file.get_32()
 			var path:String = file.get_buffer(pathLength).get_string_from_utf8().trim_suffix(char(0))
 			if only_filenames:
@@ -9583,7 +9581,7 @@ class _Zip:
 		var total_entries:int = pointers.DataFormat.__get_uint16_from_buffer(tail, eocd_pos + 10)
 		var current_offset:int = pointers.DataFormat.__get_uint32_from_buffer(tail, eocd_pos + 16)
 		var entries:Array = Array()
-		for ctr in range(total_entries):
+		for ctr in total_entries:
 			if pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset) != 0x02014b50:
 				pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,current_offset],"pointers.Zip")
 				break
@@ -9643,7 +9641,7 @@ class _Zip:
 		var total_entries:int = pointers.DataFormat.__get_uint16_from_buffer(tail, eocd_pos + 10)
 		var current_offset:int = pointers.DataFormat.__get_uint32_from_buffer(tail, eocd_pos + 16)
 		var entries : Dictionary = {}
-		for ctr in range(total_entries):
+		for ctr in total_entries:
 			if pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset) != 0x02014b50:
 				pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,current_offset],"pointers.Zip")
 				break
@@ -9753,7 +9751,7 @@ class _Zip:
 			return false
 		var total_entries:int = pointers.DataFormat.__get_uint16_from_buffer(tail, eocd_pos + 10)
 		var current_offset:int = pointers.DataFormat.__get_uint32_from_buffer(tail, eocd_pos + 16)
-		for ctr in range(total_entries):
+		for ctr in total_entries:
 			if pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset) != 0x02014b50:
 				pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,current_offset],"pointers.Zip")
 				break
@@ -9802,7 +9800,7 @@ class _Zip:
 		var total_entries:int = pointers.DataFormat.__get_uint16_from_buffer(tail, eocd_pos + 10)
 		var current_offset:int = pointers.DataFormat.__get_uint32_from_buffer(tail, eocd_pos + 16)
 		var entries : PoolStringArray = PoolStringArray()
-		for ctr in range(total_entries):
+		for ctr in total_entries:
 			if pointers.DataFormat.__get_uint32_from_buffer(tail,current_offset) != 0x02014b50:
 				pointers.l("[%s] CD #%d at [%d] is corrupt" % [source_name,ctr,current_offset],"pointers.Zip")
 				break

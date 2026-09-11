@@ -67,7 +67,7 @@ func recheck_availability():
 	if default.size() != values.size():
 		reset = true
 	else:
-		for g in range(values.size()):
+		for g in values.size():
 			var i = values[g]
 			if typeof(i) == TYPE_STRING:
 				i = [i]

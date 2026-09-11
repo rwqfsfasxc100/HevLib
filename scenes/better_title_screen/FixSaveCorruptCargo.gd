@@ -47,7 +47,7 @@ func _pressed(p,n):
 				if "currentCargo" in f and "currentCargoComposition" in f:
 					var cargo = f["currentCargo"]
 					var comp = f["currentCargoComposition"]
-					for i in range(cargo.size()):
+					for i in cargo.size():
 						if cargo[i] == "":
 							cargo.remove(i)
 							comp.remove(i)

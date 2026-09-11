@@ -165,7 +165,7 @@ func recalculate():
 		var offset = (current_page * page_size)
 		var max_pages = int(ceil(float(size)/float(page_size))) - 1
 		if size > page_size:
-			for iv in range(clamp(size - offset,0,page_size)):
+			for iv in clamp(size - offset,0,page_size):
 				objList[iv + offset].visible = true
 			$Collapsable/Info/VBoxContainer/PAGE.visible = true
 		else:

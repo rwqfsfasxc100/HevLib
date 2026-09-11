@@ -292,7 +292,7 @@ func make_asteroids(pos):
 	if include_class_5_asteroids:
 		aimerAsteroids.append_array(asteroids_5)
 	var player = CurrentGame.getPlayerShip()
-	for i in range(asteroid_number):
+	for i in asteroid_number:
 		var bp = aimerAsteroids[randi() % aimerAsteroids.size()]
 		var a = bp.instance()
 		if asteroid_aim:
@@ -328,7 +328,7 @@ func make_shower(pos):
 	if include_class_5_asteroids_shower:
 		showerAsteroids.append_array(asteroids_5)
 	var player = CurrentGame.getPlayerShip()
-	for i in range(shower_number):
+	for i in shower_number:
 		var bp = showerAsteroids[randi() % showerAsteroids.size()]
 		var a = bp.instance()
 		var pc = CurrentGame.globalCoords(player.position)

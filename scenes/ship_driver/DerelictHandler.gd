@@ -195,7 +195,7 @@ func makeAt(pos):
 			ships.append(wreckage)
 			
 			if randf() < rock_cluster_chance:
-				for i in range(rock_cluster_count):
+				for i in rock_cluster_count:
 					var bp = asteroids[randi() % asteroids.size()]
 					var a = bp.instance()
 					a.angular_velocity = (randf() - 0.5)

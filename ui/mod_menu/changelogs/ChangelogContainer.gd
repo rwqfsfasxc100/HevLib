@@ -47,7 +47,7 @@ func parse(path:String,current_page:int,page_size:int,LEFT:Button,RIGHT:Button,r
 	var keys = data.keys()
 	LEFT.disabled = current_page < 1
 	RIGHT.disabled = current_page > max_pages - 1
-	for iv in range(clamp(size - offset,0,page_size)):
+	for iv in clamp(size - offset,0,page_size):
 		var config = keys[iv + offset]
 		var lines = data[config]
 		var header = header_label.instance()

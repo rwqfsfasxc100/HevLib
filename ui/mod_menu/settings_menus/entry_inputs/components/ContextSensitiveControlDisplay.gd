@@ -186,15 +186,14 @@ func recheck_availability():
 	var a = pv.action
 	var info = pointers.ConfigDriver.__get_value(m,s,a)
 	var infosize = info.size()
-	for rfs in range(infosize):
+	for rfs in infosize:
 		if rfs:
 			var sep = separator.instance()
 			keys.add_child(sep)
 		var ref = info[rfs]
 		if typeof(ref) == TYPE_STRING:
 			ref = [ref]
-		var refsize = ref.size()
-		for iv in range(refsize):
+		for iv in ref.size():
 			
 			var i = ref[iv]
 			var type = OS.find_scancode_from_string(i)

@@ -268,10 +268,10 @@ func getBuildsFor(s: String):
 		seed(cfrRand)
 		var tcfgs = cfg_mod_refs[s].duplicate(true)
 		tcfgs.shuffle()
-		for i in range(min(maxRolls,scfgs)):
+		for i in min(maxRolls,scfgs):
 			useTheseConfigs.append(tcfgs[(randi() % ((2 * i) + 0xFF)) % scfgs])
 		cfrRand = (cfrRand + randi()) % wraparound
-		for cnum in range(useTheseConfigs.size()):
+		for cnum in useTheseConfigs.size():
 			var config = useTheseConfigs[cnum]
 			var rand = CurrentGame.sraf(cfrRand % (cnum + 0xFF))# * 1.33
 			if syPointers.ConfigDriver.__validate_dictionary(config,true,false,false):
@@ -455,7 +455,7 @@ func getConfigHevLib(key, c, default = null):
 func setConfigHevLib(key, c, value):
 	configMutexHevLib.lock()
 	var path = key.split(".")
-	for n in range(path.size() - 1):
+	for n in (path.size() - 1):
 		var k = path[n]
 		if not (k in c):
 			c[k] = {}

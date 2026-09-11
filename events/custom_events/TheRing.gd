@@ -112,7 +112,7 @@ func _ready():
 						var maxDensity = event.get("max_density",PoolIntArray([1000, 1000, 1000, 1000, 1000])) # The maximum perceived density of the ring at the event's spawn point, taking into account other ship events in the area. I recommend using the position display debug tool to get a feel as to how this array works.
 						var md:PoolIntArray = PoolIntArray([1000, 1000, 1000, 1000, 1000])
 						var mdSize = maxDensity.size() - 1
-						for i in range(5):
+						for i in 5:
 							if i > mdSize:
 								md[i] = 1000
 							else:
@@ -247,7 +247,7 @@ func _ready():
 						var maxDensity = event.get("max_density",PoolIntArray([1000, 1000, 1000, 1000, 1000])) # The maximum perceived density of the ring at the event's spawn point, taking into account other ship events in the area. This is not inherently obvious, which I recommend using the position display debug tool to get a feel as to how this array works.
 						var md:PoolIntArray = PoolIntArray([1000, 1000, 1000, 1000, 1000])
 						var mdSize = maxDensity.size() - 1
-						for i in range(5):
+						for i in 5:
 							if i > mdSize:
 								md[i] = 1000
 							else:

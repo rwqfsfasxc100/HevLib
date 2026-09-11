@@ -130,7 +130,7 @@ func __make_shadow_of_script(script_path: String,desired_methods:Array,desired_v
 					var oArgs = []
 					var args = a.args
 					var argsSize = args.size()
-					for i in range(argsSize):
+					for i in argsSize:
 						var arg = args[i]
 						var aout = arg.name
 						var ov = "_" + aout + "_"
@@ -153,7 +153,7 @@ func __make_shadow_of_script(script_path: String,desired_methods:Array,desired_v
 					var oArgs = []
 					var args = a.args
 					var argsSize = args.size()
-					for i in range(argsSize):
+					for i in argsSize:
 						var arg = args[i]
 						var aout = arg.name
 						oArgs.append("_" + aout + "_")
@@ -190,7 +190,7 @@ func __make_shadow_of_script(script_path: String,desired_methods:Array,desired_v
 	
 	var function_handles = ""
 	
-	for i in range(method_names.size()):
+	for i in method_names.size():
 		var method = method_names[i]
 		var canadd = true
 		if desired_methods:
@@ -210,7 +210,7 @@ func __make_shadow_of_script(script_path: String,desired_methods:Array,desired_v
 				var sspl = selfsplit.size()
 				if sspl > 1:
 					var rejoin = ""
-					for r in range(sspl - 1):
+					for r in sspl - 1:
 						var part1 = selfsplit[r]
 						var part2 = selfsplit[r + 1]
 						var echar = part1.substr(part1.length())
@@ -269,7 +269,7 @@ func __make_shadow_of_script(script_path: String,desired_methods:Array,desired_v
 	var signal_connectors = ""
 	var signal_emitters = ""
 	
-	for i in range(signal_names.size()):
+	for i in signal_names.size():
 		var sig = signal_names[i]
 		var canadd = true
 		if desired_signals:

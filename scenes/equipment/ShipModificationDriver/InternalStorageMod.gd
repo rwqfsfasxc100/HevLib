@@ -339,7 +339,7 @@ func _enter_tree():
 	
 	empShield += emp_shielding
 	
-	for a in range(hl_ism_add_systems.size()):
+	for a in hl_ism_add_systems.size():
 		var i = hl_ism_add_systems[a]
 		var dname = i.get("name","")
 		var power = i.get("power",0.0)

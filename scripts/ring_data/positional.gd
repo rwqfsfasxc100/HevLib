@@ -93,7 +93,7 @@ static func getVeinAt(pos) -> String:
 	var values = [p1.r, p1.g, p1.b, p1.a, p2.r, p2.b, p2.g, p2.a]
 		
 	var total = 0
-	for n in range(CurrentGame.traceMinerals.size()):
+	for n in CurrentGame.traceMinerals.size():
 		var tm = CurrentGame.traceMinerals[n]
 		values[n] = pow(values[n] / pow(CurrentGame.mineralPrices.get(tm, 1), 0.2), 4)
 		total += values[n]
