@@ -3055,11 +3055,11 @@ class _DataFormat:
 		var bytes:PoolByteArray = data.compress(1)
 		return bytes.subarray(2, bytes.size() - 5)
 	
-	func __store_8_in_buffer(byte:int,buffer:PoolByteArray) -> PoolByteArray:
+	func __store_8_in_buffer(byte:int,buffer:PoolByteArray = PoolByteArray()) -> PoolByteArray:
 		buffer.append(byte % bitmask_uint8)
 		return buffer
 	
-	func __store_16_in_buffer(byte:int,buffer:PoolByteArray,little_endian:bool = true) -> PoolByteArray:
+	func __store_16_in_buffer(byte:int,buffer:PoolByteArray = PoolByteArray(),little_endian:bool = true) -> PoolByteArray:
 		byte %= bitmask_uint16
 		var first = byte & bitmask_byte_1
 		var second = (byte & bitmask_byte_2) >> 8
@@ -3071,7 +3071,7 @@ class _DataFormat:
 			buffer.append(first)
 		return buffer
 	
-	func __store_32_in_buffer(byte:int,buffer:PoolByteArray,little_endian:bool = true) -> PoolByteArray:
+	func __store_32_in_buffer(byte:int,buffer:PoolByteArray = PoolByteArray(),little_endian:bool = true) -> PoolByteArray:
 		byte %= bitmask_uint32
 		var first = byte & bitmask_byte_1
 		var second = (byte & bitmask_byte_2) >> 8
@@ -3089,7 +3089,7 @@ class _DataFormat:
 			buffer.append(first)
 		return buffer
 	
-	func __store_64_in_buffer(byte:int,buffer:PoolByteArray,little_endian:bool = true) -> PoolByteArray:
+	func __store_64_in_buffer(byte:int,buffer:PoolByteArray = PoolByteArray(),little_endian:bool = true) -> PoolByteArray:
 		byte %= bitmask_int64
 		var first = byte & bitmask_byte_1
 		var second = (byte & bitmask_byte_2) >> 8
@@ -9878,34 +9878,35 @@ class _Zip:
 		for rec in central_records:
 			var name_size = rec.name_bytes.size()
 			var name_bytes = rec.name_bytes
-			buffer = pointers.DataFormat.__store_32_in_buffer(0x02014b50,buffer)
-			buffer = pointers.DataFormat.__store_16_in_buffer(20,buffer) # version made by
-			buffer = pointers.DataFormat.__store_16_in_buffer(20,buffer) # version needed to extract
-			buffer = pointers.DataFormat.__store_16_in_buffer(0x0800,buffer)
-			buffer = pointers.DataFormat.__store_16_in_buffer(rec.method,buffer)
-			buffer = pointers.DataFormat.__store_16_in_buffer(dt.time,buffer)
-			buffer = pointers.DataFormat.__store_16_in_buffer(dt.date,buffer)
-			buffer = pointers.DataFormat.__store_32_in_buffer(rec.crc,buffer)
-			buffer = pointers.DataFormat.__store_32_in_buffer(rec.comp_size,buffer)
-			buffer = pointers.DataFormat.__store_32_in_buffer(rec.uncomp_size,buffer)
-			buffer = pointers.DataFormat.__store_16_in_buffer(name_size,buffer)
-			buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # extra field length
-			buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # comment length
-			buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # disk number start
-			buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # internal file attributes
-			buffer = pointers.DataFormat.__store_32_in_buffer(0,buffer) # external file attributes
-			buffer = pointers.DataFormat.__store_32_in_buffer(rec.offset,buffer)
+			buffer.append_array(pointers.DataFormat.__store_32_in_buffer(0x02014b50))
+			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(20)) # version made by
+			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(20)) # version needed to extract
+			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0x0800))
+			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(rec.method))
+			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(dt.time))
+			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(dt.date))
+			buffer.append_array(pointers.DataFormat.__store_32_in_buffer(rec.crc))
+			buffer.append_array(pointers.DataFormat.__store_32_in_buffer(rec.comp_size))
+			buffer.append_array(pointers.DataFormat.__store_32_in_buffer(rec.uncomp_size))
+			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(name_size))
+			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # extra field length
+			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # comment length
+			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # disk number start
+			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # internal file attributes
+			buffer.append_array(pointers.DataFormat.__store_32_in_buffer(0)) # external file attributes
+			buffer.append_array(pointers.DataFormat.__store_32_in_buffer(rec.offset))
 			buffer.append_array(name_bytes)
 			
 		var central_dir_size:int = buffer.size() - central_dir_offset
-		buffer = pointers.DataFormat.__store_32_in_buffer(0x06054b50,buffer)
-		buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # number of this disk
-		buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # disk where central directory starts
-		buffer = pointers.DataFormat.__store_16_in_buffer(central_records.size(),buffer)
-		buffer = pointers.DataFormat.__store_16_in_buffer(central_records.size(),buffer)
-		buffer = pointers.DataFormat.__store_32_in_buffer(central_dir_size,buffer)
-		buffer = pointers.DataFormat.__store_32_in_buffer(central_dir_offset,buffer)
-		buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # zip comment length
+		var cr_size:int = central_records.size()
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(0x06054b50))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # number of this disk
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # disk where central directory starts
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(cr_size))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(cr_size))
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(central_dir_size))
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(central_dir_offset))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # zip comment length
 		return buffer
 	
 	func create_central_dir_record(bytes:PoolByteArray,entry_path:String,compress:bool,dt:Dictionary):
@@ -9922,17 +9923,17 @@ class _Zip:
 		var compressed_size:int = data.size()
 		var name_size:int = name_bytes.size()
 		var buffer:PoolByteArray = PoolByteArray()
-		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(0x04034b50,PoolByteArray()))
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(20,PoolByteArray()))
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0x0800,PoolByteArray()))
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(method,PoolByteArray()))
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(dt.time,PoolByteArray()))
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(dt.date,PoolByteArray()))
-		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(crc,PoolByteArray()))
-		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(compressed_size,PoolByteArray())) # compressed size
-		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(uncompressed_size,PoolByteArray())) # uncompressed size
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(name_size,PoolByteArray()))
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0,PoolByteArray())) # extra field length
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(0x04034b50))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(20))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0x0800))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(method))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(dt.time))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(dt.date))
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(crc))
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(compressed_size)) # compressed size
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(uncompressed_size)) # uncompressed size
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(name_size))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # extra field length
 		buffer.append_array(name_bytes)
 		buffer.append_array(data)
 		return [
