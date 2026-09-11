@@ -9856,7 +9856,7 @@ class _Zip:
 	
 	func write_zip_data(zip_path: String, files: Dictionary, compress: bool = false) -> bool:
 		if file.open(zip_path, File.WRITE) != OK:
-			push_error("SimpleZip: could not open '%s' for writing" % zip_path)
+			pointers.l("could not open '%s' for writing" % zip_path,"pointers.Zip")
 			return false
 		file.store_buffer(write_zip_data_to_buffer(files,compress))
 		file.close()
@@ -9868,42 +9868,10 @@ class _Zip:
 		var buffer:PoolByteArray = PoolByteArray()
 		var pos:int = 0
 		for entry_path in files:
-			var data:PoolByteArray = pointers.FileAccess.__file_output_to_buffer(files[entry_path])
-			var uncompressed_size:int = data.size()
-			var name_bytes:PoolByteArray = entry_path.to_utf8()
-			var crc:int = pointers.DataFormat.__get_crc_32(data)
-			var local_offset:int = pos
-			var method:int = 0
-			if compress and data:
-				var deflated:PoolByteArray = pointers.DataFormat.__compress_to_raw_deflate_stream(data)
-				if deflated.size() < data.size():
-					method = 8
-					data = deflated
-			var compressed_size:int = data.size()
-			var name_size:int = name_bytes.size()
-			buffer = pointers.DataFormat.__store_32_in_buffer(0x04034b50,buffer)
-			buffer = pointers.DataFormat.__store_16_in_buffer(20,buffer)
-			buffer = pointers.DataFormat.__store_16_in_buffer(0x0800,buffer)
-			buffer = pointers.DataFormat.__store_16_in_buffer(method,buffer)
-			buffer = pointers.DataFormat.__store_16_in_buffer(dt.time,buffer)
-			buffer = pointers.DataFormat.__store_16_in_buffer(dt.date,buffer)
-			buffer = pointers.DataFormat.__store_32_in_buffer(crc,buffer)
-			buffer = pointers.DataFormat.__store_32_in_buffer(compressed_size,buffer) # compressed size
-			buffer = pointers.DataFormat.__store_32_in_buffer(uncompressed_size,buffer) # uncompressed size
-			buffer = pointers.DataFormat.__store_16_in_buffer(name_size,buffer)
-			buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # extra field length
-			buffer.append_array(name_bytes)
-			buffer.append_array(data)
-			pos += compressed_size + name_size + 30
-			central_records.append({
-				"name_bytes":name_bytes,
-				"crc":crc,
-				"method":method,
-				"comp_size":compressed_size,
-				"uncomp_size":uncompressed_size,
-				"offset":local_offset,
-			})
-			
+			var cdr = create_central_dir_record(files[entry_path],pos,entry_path,compress,dt)
+			central_records.append(cdr[0])
+			pos = cdr[1]
+			buffer.append(cdr[2])
 		var central_dir_offset:int = pos
 		for rec in central_records:
 			var name_size = rec.name_bytes.size()
@@ -9941,7 +9909,46 @@ class _Zip:
 #		pos += 22
 		return buffer
 	
-	
+	func create_central_dir_record(bytes:PoolByteArray,local_offset:int,entry_path:String,compress:bool,dt:Dictionary):
+		var buffer:PoolByteArray = PoolByteArray()
+		var data:PoolByteArray = pointers.FileAccess.__file_output_to_buffer(bytes)
+		var uncompressed_size:int = data.size()
+		var name_bytes:PoolByteArray = entry_path.to_utf8()
+		var crc:int = pointers.DataFormat.__get_crc_32(data)
+		var method:int = 0
+		if compress and data:
+			var deflated:PoolByteArray = pointers.DataFormat.__compress_to_raw_deflate_stream(data)
+			if deflated.size() < data.size():
+				method = 8
+				data = deflated
+		var compressed_size:int = data.size()
+		var name_size:int = name_bytes.size()
+		buffer = pointers.DataFormat.__store_32_in_buffer(0x04034b50,buffer)
+		buffer = pointers.DataFormat.__store_16_in_buffer(20,buffer)
+		buffer = pointers.DataFormat.__store_16_in_buffer(0x0800,buffer)
+		buffer = pointers.DataFormat.__store_16_in_buffer(method,buffer)
+		buffer = pointers.DataFormat.__store_16_in_buffer(dt.time,buffer)
+		buffer = pointers.DataFormat.__store_16_in_buffer(dt.date,buffer)
+		buffer = pointers.DataFormat.__store_32_in_buffer(crc,buffer)
+		buffer = pointers.DataFormat.__store_32_in_buffer(compressed_size,buffer) # compressed size
+		buffer = pointers.DataFormat.__store_32_in_buffer(uncompressed_size,buffer) # uncompressed size
+		buffer = pointers.DataFormat.__store_16_in_buffer(name_size,buffer)
+		buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # extra field length
+		buffer.append_array(name_bytes)
+		buffer.append_array(data)
+		var pos = local_offset + compressed_size + name_size + 30
+		return [
+			{
+				"name_bytes":name_bytes,
+				"crc":crc,
+				"method":method,
+				"comp_size":compressed_size,
+				"uncomp_size":uncompressed_size,
+				"offset":local_offset,
+			},
+			pos,
+			buffer
+		]
 	
 	
 	
