@@ -5656,6 +5656,15 @@ class _FileAccess:
 						"Bool for whether the file at file_path exists or not."
 					]
 				},
+				"__get_real_filename_from_compiled_resource":{
+					"description":"If the provided filepath would match a compiled resource (extension is .gdc or .converted.res), matches an appropriate filepath where the actual resource exists for it.",
+					"args":[
+						"file_path -> (String) Filepath for the file to check"
+					],
+					"return":[
+						"Actual resource path for the file. Returns the provided filepath if it doesn't match."
+					]
+				},
 			}
 		}
 	
@@ -5785,6 +5794,13 @@ class _FileAccess:
 		file_path = ProjectSettings.localize_path(file_path)
 		return (ResourceLoader.exists(file_path) or file.file_exists(file_path))
 	
+	func __get_real_filename_from_compiled_resource(file_path:String) -> String:
+		match file_path.get_extension():
+			"res":
+				return file_path.get_basename().get_basename()
+			"gdc":
+				return file_path.get_basename() + ".gd"
+		return file_path
 	
 	
 
@@ -5866,7 +5882,7 @@ class _FolderAccess:
 					"return":[
 						"PoolStringArray containing all valid scripts and scenes"
 					]
-				}
+				},
 			}
 		}
 	
@@ -5988,7 +6004,8 @@ class _FolderAccess:
 				var fp = out[i].replace("/.autoconverted/","/")
 				match fp.get_extension():
 					"res":
-						out[i] = (fp.get_basename().get_basename())
+						if fp.get_basename().get_extension() == "converted":
+							out[i] = (fp.get_basename().get_basename())
 					"gdc":
 						out[i] = (fp.get_basename() + ".gd")
 			return out
@@ -6000,7 +6017,8 @@ class _FolderAccess:
 					var fp = out[i]
 					match fp.get_extension():
 						"res":
-							out[i] = (fp.get_basename().get_basename())
+							if fp.get_basename().get_extension() == "converted":
+								out[i] = (fp.get_basename().get_basename())
 						"gdc":
 							out[i] = (fp.get_basename() + ".gd")
 				return out
@@ -6008,14 +6026,6 @@ class _FolderAccess:
 				pointers.NodeAccess.__exit(false,"CRITICAL ERROR! Cannot find the game's .PCK file, and is a likely indicator that your game is corrupted.\n\nPlease validate your game files. If this issue persists, please make a bug report at [https://forms.gle/RmC4Zgonp6frFgnK7] so this issue can be fixed as soon as possible.","pointers.FolderAccess",0.0,"",true)
 				return PoolStringArray()
 		
-	
-	func __get_real_filename_from_compiled_resource(file_path:String) -> String:
-		match file_path.get_extension():
-			"res":
-				return file_path.get_basename().get_basename()
-			"gdc":
-				return file_path.get_basename() + ".gd"
-		return file_path
 	
 
 class _Github:
