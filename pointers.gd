@@ -9876,30 +9876,14 @@ class _Zip:
 			buffer.append_array(bytes)
 		var central_dir_offset:int = buffer.size()
 		for rec in central_records:
-			var name_size = rec.name_bytes.size()
-			var name_bytes = rec.name_bytes
-			buffer.append_array(pointers.DataFormat.__store_32_in_buffer(0x02014b50))
-			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(20)) # version made by
-			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(20)) # version needed to extract
-			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0x0800))
-			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(rec.method))
-			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(dt.time))
-			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(dt.date))
-			buffer.append_array(pointers.DataFormat.__store_32_in_buffer(rec.crc))
-			buffer.append_array(pointers.DataFormat.__store_32_in_buffer(rec.comp_size))
-			buffer.append_array(pointers.DataFormat.__store_32_in_buffer(rec.uncomp_size))
-			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(name_size))
-			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # extra field length
-			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # comment length
-			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # disk number start
-			buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # internal file attributes
-			buffer.append_array(pointers.DataFormat.__store_32_in_buffer(0)) # external file attributes
-			buffer.append_array(pointers.DataFormat.__store_32_in_buffer(rec.offset))
-			buffer.append_array(name_bytes)
-			
+			buffer.append_array(create_local_entry(rec,dt))
 		var central_dir_size:int = buffer.size() - central_dir_offset
 		var cr_size:int = central_records.size()
-		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(0x06054b50))
+		buffer.append_array(create_eocd(cr_size,central_dir_size,central_dir_offset))
+		return buffer
+	
+	func create_eocd(cr_size:int,central_dir_size:int,central_dir_offset:int):
+		var buffer:PoolByteArray = pointers.DataFormat.__store_32_in_buffer(0x06054b50)
 		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # number of this disk
 		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # disk where central directory starts
 		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(cr_size))
@@ -9907,6 +9891,29 @@ class _Zip:
 		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(central_dir_size))
 		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(central_dir_offset))
 		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # zip comment length
+		return buffer
+	
+	func create_local_entry(rec:Dictionary,dt:Dictionary):
+		var name_size = rec.name_bytes.size()
+		var name_bytes = rec.name_bytes
+		var buffer:PoolByteArray = pointers.DataFormat.__store_32_in_buffer(0x02014b50)
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(20)) # version made by
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(20)) # version needed to extract
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0x0800))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(rec.method))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(dt.time))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(dt.date))
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(rec.crc))
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(rec.comp_size))
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(rec.uncomp_size))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(name_size))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # extra field length
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # comment length
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # disk number start
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # internal file attributes
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(0)) # external file attributes
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(rec.offset))
+		buffer.append_array(name_bytes)
 		return buffer
 	
 	func create_central_dir_record(bytes:PoolByteArray,entry_path:String,compress:bool,dt:Dictionary):
