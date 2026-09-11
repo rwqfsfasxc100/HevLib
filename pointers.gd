@@ -5862,7 +5862,7 @@ class _FolderAccess:
 					]
 				},
 				"__get_vanilla_script_and_scenes":{
-					"description":"Fetches all vanilla scripts and scenes from the PCK file. NOTE: does not work correctly on editor builds since no PCK file exists, it instead fetches all files that are specifically scenes (tscn files) and scripts (gd files) available to the filesystem. To get PCK data in-editor, use Zip.__load_pck.",
+					"description":"Fetches all vanilla scripts and scenes from the PCK file. NOTE: editor builds MUST keep GDRE's .autoconverted directory since no PCK file is readily available to source data from. To get PCK data in-editor, use Zip.__load_pck.",
 					"return":[
 						"PoolStringArray containing all valid scripts and scenes"
 					]
@@ -5982,17 +5982,41 @@ class _FolderAccess:
 		return Array(out)
 	
 	func __get_vanilla_script_and_scenes() -> PoolStringArray:
-		var actual = PoolStringArray()
 		if OS.has_feature("editor"):
-			actual = __get_files_with_extensions("res://",PoolStringArray(["gd","tscn"]))
+			var out:PoolStringArray = PoolStringArray(__get_files_with_extensions("res://.autoconverted/",PoolStringArray(["res","gdc"])))
+			for i in range(out.size()):
+				var fp = out[i].replace("/.autoconverted/","/")
+				match fp.get_extension():
+					"res":
+						out[i] = (fp.get_basename().get_basename())
+					"gdc":
+						out[i] = (fp.get_basename() + ".gd")
+			return out
 		else:
 			var gameInstallDirectory = OS.get_executable_path().get_basename() + ".pck"
 			if file.file_exists(gameInstallDirectory):
-				var out = pointers.Zip.__load_pck(gameInstallDirectory,true)
-				for fp in out:
-					if fp.get_extension() == "remap":
-						actual.append(fp.get_basename())
-		return actual
+				var out:PoolStringArray = PoolStringArray(pointers.Zip.__load_pck(gameInstallDirectory,true))
+				for i in range(out.size()):
+					var fp = out[i]
+					match fp.get_extension():
+						"res":
+							out[i] = (fp.get_basename().get_basename())
+						"gdc":
+							out[i] = (fp.get_basename() + ".gd")
+				return out
+			else:
+				pointers.NodeAccess.__exit(false,"CRITICAL ERROR! Cannot find the game's .PCK file, and is a likely indicator that your game is corrupted.\n\nPlease validate your game files. If this issue persists, please make a bug report at [https://forms.gle/RmC4Zgonp6frFgnK7] so this issue can be fixed as soon as possible.","pointers.FolderAccess",0.0,"",true)
+				return PoolStringArray()
+		
+	
+	func __get_real_filename_from_compiled_resource(file_path:String) -> String:
+		match file_path.get_extension():
+			"res":
+				return file_path.get_basename().get_basename()
+			"gdc":
+				return file_path.get_basename() + ".gd"
+		return file_path
+	
 
 class _Github:
 	var scripts : Array = [
@@ -8056,41 +8080,38 @@ class _ManifestV2:
 	
 	func __load_modlets(is_onready : bool) -> PoolStringArray:
 		var scenes_to_reload : PoolStringArray = PoolStringArray()
-		var providedResources:Array = []
+		var providedResources:Dictionary = {}
 		pointers.DataFormat.__loadDLC()
 		for modlet in __get_modlet_files():
 			var drivers:Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(modlet)
 			if "LOAD_RESOURCES.gd" in drivers:
 				var resources : Dictionary = drivers["LOAD_RESOURCES.gd"].get("LOAD_RESOURCES",{})
 				for resource in resources:
-					providedResources.append([resource,resources[resource],modlet])
-		for r in providedResources:
-			var resource:String = r[0];var subdata:Dictionary = r[1];var modlet:String = r[2]
-			var is_relative:bool = resource.begins_with("res://")
-			if is_onready == subdata.get("onready",false):
-				match subdata.get("load_type","").to_lower():
-					"script":
-						var path:String=resource if is_relative else(modlet.get_base_dir()+(""if resource.begins_with("/")else"/")+resource)
-						if pointers.ConfigDriver.__validate_dictionary(subdata)&&pointers.FileAccess.__file_exists(path):
-							var override=subdata.get("override",false)
-							var op=subdata.get("override_path","res:/"+path.split(modlet.get_base_dir())[1])
-							var override_path:String=op if(op.begins_with("res:/"))else("res:/"+(""if op.begins_with("/")else"/")+op)
-							if override&&pointers.FileAccess.__file_exists(override_path):
-								pointers.DataFormat.__override_script(path,override_path)
-							else:
-								pointers.DataFormat.__extend_script(path)
-					"scene","resource":
-						var path : String = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
-						var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[1])
-						var old_path : String = old if (old.begins_with("res:/")) else ("res:/" + ("" if old.begins_with("/") else "/") + old)
-						if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
-							pointers.DataFormat.__replace_resource(path,old_path)
-							if not old_path in scenes_to_reload:
-								scenes_to_reload.append(old_path)
-					"reload":
-						var path : String = resource if is_relative else ("res:/" + ("" if resource.begins_with("/") else "/") + resource)
-						if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
-							pointers.DataFormat.__reload_scene(path,subdata.get("complete_reload",false))
+					var subdata:Dictionary = resources[resource]
+					var is_relative:bool = resource.begins_with("res://")
+					if is_onready == subdata.get("onready",false):
+						match subdata.get("load_type","").to_lower():
+							"script":
+								var path:String=resource if is_relative else(modlet.get_base_dir()+(""if resource.begins_with("/")else"/")+resource)
+								if pointers.ConfigDriver.__validate_dictionary(subdata)&&pointers.FileAccess.__file_exists(path):
+									var op=subdata.get("override_path","res:/"+path.split(modlet.get_base_dir())[1])
+									var override_path:String=op if(op.begins_with("res:/"))else("res:/"+(""if op.begins_with("/")else"/")+op)
+									if subdata.get("override",false)&&pointers.FileAccess.__file_exists(override_path):
+										pointers.DataFormat.__override_script(path,override_path)
+									else:
+										pointers.DataFormat.__extend_script(path)
+							"scene","resource":
+								var path : String = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
+								var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[1])
+								var old_path : String = old if (old.begins_with("res:/")) else ("res:/" + ("" if old.begins_with("/") else "/") + old)
+								if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
+									pointers.DataFormat.__replace_resource(path,old_path)
+									if not old_path in scenes_to_reload:
+										scenes_to_reload.append(old_path)
+							"reload":
+								var path : String = resource if is_relative else ("res:/" + ("" if resource.begins_with("/") else "/") + resource)
+								if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
+									pointers.DataFormat.__reload_scene(path,subdata.get("complete_reload",false))
 		pointers.DataFormat.__loadDLC()
 		return scenes_to_reload
 	
