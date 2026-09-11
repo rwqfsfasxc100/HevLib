@@ -47,42 +47,36 @@ var modPath:String = get_script().resource_path.get_base_dir() + "/"
 var _savedObjects := []
 
 var cache_dir:String = "user://cache/.HevLib_Cache"
+var variables_folder:String = "user://cache/.HevLib_Cache/Variable_Fetch/"
 
 var file:File = File.new()
 var directory:Directory = Directory.new()
-var pointerDir:String = modPath.get_base_dir().get_base_dir().get_base_dir() + "/pointers.gd"
-var correct:bool = ResourceLoader.exists(pointerDir)
+var pointers_dir:String = modPath.get_base_dir().get_base_dir().get_base_dir() + "/pointers.gd"
+var correct:bool = ResourceLoader.exists(pointers_dir)
 var pointers = null
 
 func _init(modLoader : ModLoader = ModLoader):
 	if not correct:
 		Debug.l("Folder structure not correct, exiting HevLib load")
 		return
-	pointers = load(pointerDir).new(pointerDir,self)
+	pointers = load(pointers_dir).new(pointers_dir,self)
 	pointers.name = "HevLib~Pointers"
 	if modLoader._savedObjects:
 		var new_objects = [pointers]
 		var firstItemCheck = modLoader._savedObjects[0]
 		if "resource_path" in firstItemCheck:
 			var RP=firstItemCheck.resource_path
-			if RP=="res://HevLib/pointers.gd"or RP==pointerDir:OS.alert("HevLib is double-loaded. Please remove any extra zip files and restart the game.")
+			if RP=="res://HevLib/pointers.gd"or RP==pointers_dir:OS.alert("HevLib is double-loaded. Please remove any extra zip files and restart the game.")
 		for i in modLoader._savedObjects:new_objects.append(i)
 		modLoader._savedObjects=new_objects
 	else:modLoader._savedObjects.append(pointers)
 	l("Initializing Equipment Driver")
 	pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/")
-	var variables_folder = "user://cache/.HevLib_Cache/Variable_Fetch/"
 	directory.make_dir_recursive(variables_folder)
 	pointers.FileAccess.__load_precached_mods()
 	
 #	testing()
 	
-	var scv = pointers.FolderAccess.__fetch_folder_files(variables_folder,false,true)
-	for s in scv:
-		directory.remove(s)
-	var fstr_old = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/file_caches"
-	if directory.dir_exists(fstr_old):
-		pointers.FolderAccess.__recursive_delete(fstr_old)
 	pointers.ConfigDriver.__load_configs()
 	pointers.Translations.__inject_translations()
 	pointers.SafeMode.__handle_exit_for_file_checks()

@@ -78,9 +78,7 @@ var exclusives_checker_expression_part = "%s in bits"
 
 func compile_keymap():
 	var p = {}
-	file.open(vanilla,File.READ)
-	var h = JSON.parse(file.get_as_text()).result
-	file.close()
+	var h:Dictionary = pointers.Keymapping.__get_formatted_vanilla_binds()
 	control_vars.clear()
 	for action in h:
 		var d = h[action]

