@@ -88,7 +88,7 @@
 
 func __make_shadow_of_script(script_path: String,desired_methods:Array,desired_variables:Array,desired_signals:Array,extend_mode = "none",initialize_with_args = true,initialize_with_script_updaters = false,use_class_variables:bool = true,use_class_methods:bool = true,use_class_signals:bool = true) -> String:
 	var out = ""
-	var pointers = preload("res://HevLib/pointers.gd").new()
+	var pointers = ModLoader._savedObjects[0]
 	var data = pointers.DataFormat.__trim_scripts(script_path,true,true)
 	var var_names = data[1]
 	var const_names = data[2]
