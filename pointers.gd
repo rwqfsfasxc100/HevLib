@@ -9866,13 +9866,15 @@ class _Zip:
 		var dt:Dictionary = pointers.TimeAccess.__get_dos_datetime()
 		var central_records:Array = Array()
 		var buffer:PoolByteArray = PoolByteArray()
-		var pos:int = 0
 		for entry_path in files:
-			var cdr = create_central_dir_record(files[entry_path],pos,entry_path,compress,dt)
-			central_records.append(cdr[0])
-			pos = cdr[1]
-			buffer.append(cdr[2])
-		var central_dir_offset:int = pos
+			var cdr = create_central_dir_record(files[entry_path],entry_path,compress,dt)
+			var data = cdr[0]
+			var bytes:PoolByteArray = cdr[1]
+			var local_offset:int = buffer.size()
+			data["offset"] = local_offset
+			central_records.append(data)
+			buffer.append_array(bytes)
+		var central_dir_offset:int = buffer.size()
 		for rec in central_records:
 			var name_size = rec.name_bytes.size()
 			var name_bytes = rec.name_bytes
@@ -9894,10 +9896,8 @@ class _Zip:
 			buffer = pointers.DataFormat.__store_32_in_buffer(0,buffer) # external file attributes
 			buffer = pointers.DataFormat.__store_32_in_buffer(rec.offset,buffer)
 			buffer.append_array(name_bytes)
-			pos += name_size + 46
 			
-		var central_dir_size:int = pos - central_dir_offset
-		
+		var central_dir_size:int = buffer.size() - central_dir_offset
 		buffer = pointers.DataFormat.__store_32_in_buffer(0x06054b50,buffer)
 		buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # number of this disk
 		buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # disk where central directory starts
@@ -9906,11 +9906,9 @@ class _Zip:
 		buffer = pointers.DataFormat.__store_32_in_buffer(central_dir_size,buffer)
 		buffer = pointers.DataFormat.__store_32_in_buffer(central_dir_offset,buffer)
 		buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # zip comment length
-#		pos += 22
 		return buffer
 	
-	func create_central_dir_record(bytes:PoolByteArray,local_offset:int,entry_path:String,compress:bool,dt:Dictionary):
-		var buffer:PoolByteArray = PoolByteArray()
+	func create_central_dir_record(bytes:PoolByteArray,entry_path:String,compress:bool,dt:Dictionary):
 		var data:PoolByteArray = pointers.FileAccess.__file_output_to_buffer(bytes)
 		var uncompressed_size:int = data.size()
 		var name_bytes:PoolByteArray = entry_path.to_utf8()
@@ -9923,20 +9921,20 @@ class _Zip:
 				data = deflated
 		var compressed_size:int = data.size()
 		var name_size:int = name_bytes.size()
-		buffer = pointers.DataFormat.__store_32_in_buffer(0x04034b50,buffer)
-		buffer = pointers.DataFormat.__store_16_in_buffer(20,buffer)
-		buffer = pointers.DataFormat.__store_16_in_buffer(0x0800,buffer)
-		buffer = pointers.DataFormat.__store_16_in_buffer(method,buffer)
-		buffer = pointers.DataFormat.__store_16_in_buffer(dt.time,buffer)
-		buffer = pointers.DataFormat.__store_16_in_buffer(dt.date,buffer)
-		buffer = pointers.DataFormat.__store_32_in_buffer(crc,buffer)
-		buffer = pointers.DataFormat.__store_32_in_buffer(compressed_size,buffer) # compressed size
-		buffer = pointers.DataFormat.__store_32_in_buffer(uncompressed_size,buffer) # uncompressed size
-		buffer = pointers.DataFormat.__store_16_in_buffer(name_size,buffer)
-		buffer = pointers.DataFormat.__store_16_in_buffer(0,buffer) # extra field length
+		var buffer:PoolByteArray = PoolByteArray()
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(0x04034b50,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(20,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0x0800,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(method,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(dt.time,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(dt.date,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(crc,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(compressed_size,PoolByteArray())) # compressed size
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(uncompressed_size,PoolByteArray())) # uncompressed size
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(name_size,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0,PoolByteArray())) # extra field length
 		buffer.append_array(name_bytes)
 		buffer.append_array(data)
-		var pos = local_offset + compressed_size + name_size + 30
 		return [
 			{
 				"name_bytes":name_bytes,
@@ -9944,9 +9942,7 @@ class _Zip:
 				"method":method,
 				"comp_size":compressed_size,
 				"uncomp_size":uncompressed_size,
-				"offset":local_offset,
 			},
-			pos,
 			buffer
 		]
 	
