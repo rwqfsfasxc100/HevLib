@@ -79,6 +79,8 @@ func _ready():
 		$Collapsable/Info/VBoxContainer/SIZE.connect("value_changed",self,"_size_value_changed")
 	if not $Collapsable/Info/VBoxContainer/PAGE.is_connected("value_changed",self,"_page_value_changed"):
 		$Collapsable/Info/VBoxContainer/PAGE.connect("value_changed",self,"_page_value_changed")
+	if not is_connected("visibility_changed",self,"recalculate"):
+		connect("visibility_changed",self,"recalculate")
 	recalculate()
 
 func _on_changed():

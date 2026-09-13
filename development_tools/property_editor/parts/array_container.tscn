@@ -21,16 +21,28 @@ margin_left = 151.0
 margin_right = 155.0
 margin_bottom = 24.0
 
+[node name="UP" type="Button" parent="."]
+margin_left = 159.0
+margin_right = 171.0
+margin_bottom = 24.0
+text = "↑"
+
+[node name="DOWN" type="Button" parent="."]
+margin_left = 175.0
+margin_right = 187.0
+margin_bottom = 24.0
+text = "↓"
+
 [node name="DELETE" type="Button" parent="."]
 self_modulate = Color( 1, 0, 0, 1 )
-margin_left = 159.0
-margin_right = 179.0
+margin_left = 191.0
+margin_right = 211.0
 margin_bottom = 24.0
 text = "X"
 
 [node name="RBAR" type="HBoxContainer" parent="."]
-margin_left = 183.0
-margin_right = 188.0
+margin_left = 215.0
+margin_right = 220.0
 margin_bottom = 24.0
 rect_min_size = Vector2( 5, 0 )
 

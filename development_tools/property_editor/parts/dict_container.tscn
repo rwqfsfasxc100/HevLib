@@ -9,46 +9,59 @@ script = ExtResource( 1 )
 
 [node name="LBAR" type="HBoxContainer" parent="."]
 margin_right = 5.0
-margin_bottom = 38.0
+margin_bottom = 24.0
 rect_min_size = Vector2( 5, 0 )
 
 [node name="key" parent="." instance=ExtResource( 3 )]
 margin_left = 9.0
-margin_right = 89.0
-margin_bottom = 38.0
+margin_right = 147.0
+margin_bottom = 24.0
 
 [node name="VSeparator" type="VSeparator" parent="."]
-margin_left = 93.0
-margin_right = 97.0
-margin_bottom = 38.0
+margin_left = 151.0
+margin_right = 155.0
+margin_bottom = 24.0
 
 [node name="Label" type="Label" parent="."]
-margin_left = 101.0
-margin_right = 122.0
-margin_bottom = 38.0
+margin_left = 159.0
+margin_top = 5.0
+margin_right = 163.0
+margin_bottom = 19.0
 text = ":"
 
 [node name="value" parent="." instance=ExtResource( 3 )]
-margin_left = 126.0
-margin_right = 206.0
-margin_bottom = 38.0
+margin_left = 167.0
+margin_right = 305.0
+margin_bottom = 24.0
 
 [node name="VSeparator2" type="VSeparator" parent="."]
-margin_left = 210.0
-margin_right = 214.0
-margin_bottom = 38.0
+margin_left = 309.0
+margin_right = 313.0
+margin_bottom = 24.0
+
+[node name="UP" type="Button" parent="."]
+margin_left = 317.0
+margin_right = 329.0
+margin_bottom = 24.0
+text = "↑"
+
+[node name="DOWN" type="Button" parent="."]
+margin_left = 333.0
+margin_right = 345.0
+margin_bottom = 24.0
+text = "↓"
 
 [node name="DELETE" type="Button" parent="."]
 self_modulate = Color( 1, 0, 0, 1 )
-margin_left = 218.0
-margin_right = 242.0
-margin_bottom = 38.0
+margin_left = 349.0
+margin_right = 369.0
+margin_bottom = 24.0
 text = "X"
 
 [node name="RBAR" type="HBoxContainer" parent="."]
-margin_left = 246.0
-margin_right = 251.0
-margin_bottom = 38.0
+margin_left = 373.0
+margin_right = 378.0
+margin_bottom = 24.0
 rect_min_size = Vector2( 5, 0 )
 
 [node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
