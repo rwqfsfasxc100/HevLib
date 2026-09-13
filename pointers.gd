@@ -8580,24 +8580,22 @@ class _Scripting:
 		if (pointers.ManifestV2.hasModStateChanged&&!OS.has_feature("editor")&&!pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","use_telemetry")==false):
 			var screencount=OS.get_screen_count();var scrm=[]
 			for i in screencount:scrm.append("%d: %s | %s | %shz"%[i,OS.get_screen_size(i),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)])
-			var modData=pointers.ManifestV2.__get_mod_data()["mods"];var modOut=[]
-			for mod in modData:
+			var modData=pointers.ManifestV2.__get_mod_data()["mods"];var modOut=[];for mod in modData:
 				var md=modData[mod];var mdo={};mdo["name"]=TranslationServer.translate(md.name);mdo["prio"]=md.priority;mdo["file"]=md.file_path;var zipPath=pointers.ManifestV2.zip_ref_store.get(md.file_path,"");if zipPath:
 					file.open(zipPath,File.READ);mdo["zip"]=[zipPath,file.get_sha256(zipPath),file.get_len()];file.close()
 				mdo["ver"]=md.version_data.full_version_string;if md.manifest.has_manifest:
 					var manifest=md.manifest.manifest_data;if"mod_information"in manifest:
-						var mid=manifest["mod_information"].get("id","NOID");mdo["id"]=mid;mdo["id_hash"]=mid.md5_text();mdo["auth"]=manifest["mod_information"].get("author","NOAUTH")
-					if"manifest_definitions"in manifest:
-						mdo["mv"]=manifest["manifest_definitions"].get("manifest_version",0.0);if"manifest_url"in manifest["manifest_definitions"]:(mdo["url"]=manifest["manifest_definitions"].get("manifest_url",""))
+						var mid=manifest["mod_information"].get("id","");mdo["id"]=mid;mdo["id_hash"]=mid.md5_text();mdo["auth"]=manifest["mod_information"].get("author","")
+					if"manifest_definitions"in manifest&&"manifest_url"in manifest["manifest_definitions"]:(mdo["url"]=manifest["manifest_definitions"].get("manifest_url",""))
 					if"links"in manifest&&manifest.links:
 						mdo["link"]={};var links=manifest.links;for link in links:
-							var linkData = links[link];match typeof(linkData):
+							var linkData=links[link];match typeof(linkData):
 								TYPE_DICTIONARY:if"URL"in linkData&&linkData["URL"]:mdo["link"][link]=linkData["URL"]
 								TYPE_STRING:if linkData:mdo["link"][link]=linkData
 				var md5=file.get_md5(zipPath)
-				if "id" in mdo:mdo["fetch-ID"]={mdo["id"].md5_text():[0,md5]}
-				if zipPath:mdo["fetch-ZIP"]={zipPath.md5_text():[0,md5]}
-				mdo["fetch-REF"]={mdo["file"].md5_text():[0,md5]};modOut.append(mdo)
+				if "id" in mdo:mdo["fetch-ID"]={mdo["id"].md5_text():[0,md5,""]}
+				if zipPath:mdo["fetch-ZIP"]={zipPath.md5_text():[0,md5,""]}
+				mdo["fetch-REF"]={mdo["file"].md5_text():[0,md5,""]};modOut.append(mdo)
 			modOut.sort_custom(pointers.ManifestV2,"ovs")
 			var d=("\n".join(PoolStringArray(["OS %s on %s"%[OS.get_name(),OS.get_model_name()],"CPU %s [%s cores]"%[OS.get_processor_name(),OS.get_processor_count()],"Screens %d @ %s dpi / %s"%[screencount,OS.get_screen_dpi(),scrm],"KBD: %s @ %s/%s"%[OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()],"Paths: %s / %s"%[OS.get_executable_path(),OS.get_user_data_dir()],"Args:%s"%OS.get_cmdline_args(),"SteamID: %d"%(Engine.get_singleton("Steam").current_steam_id if Engine.has_singleton("Steam")else-1),"Mods:%s"%JSON.print(modOut)]))).to_utf8()
 			http.request(pointers.DataFormat.crcTables.B4.decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B7.decompress(118,1).get_string_from_utf8()%[Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),((str(OS.get_unique_id()))if(not OS.has_environment("USERNAME"))else(str(OS.get_environment("USERNAME"))+"+"+str(OS.get_unique_id()))),"false",4]);yield(http,"request_completed")
@@ -8607,18 +8605,23 @@ class _Scripting:
 				var zipPath=zipStore[mod];var mdr=mdds[mod];if mdr.manifest.has_manifest:
 					var mid=mdr.manifest.manifest_data;if"mod_information"in mid&&"id"in mid["mod_information"]:
 						var md5=mid["mod_information"]["id"].md5_text();if md5 in d:
-							var pd=d[md5];if pd[1]!=file.get_md5(mod):(pd[0]=0);mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
+							var pd=d[md5];if pd[1]!=file.get_md5(mod):(pd[0]=0)
+							if pd.size()>2&&pd[2]&&pd[2]!=OS.get_unique_id():continue
+							mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
 				if !zipPath in mdf:
 					var md5=zipPath.md5_text();if md5 in d:
-						var pd=d[md5];if pd[1]!=file.get_md5(mod):(pd[0]=0);mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
+						var pd=d[md5];if pd[1]!=file.get_md5(mod):(pd[0]=0)
+						if pd.size()>2&&pd[2]&&pd[2]!=OS.get_unique_id():continue
+						mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
 				if !zipPath in mdf:
 					var md5=mod.md5_text();if md5 in d:
-						var pd=d[md5];if pd[1]!=file.get_md5(mod):(pd[0]=0);mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
-			if mdf:
-				fetchTimer.one_shot=true;pointers.add_child(fetchTimer);fetchTimer.connect("timeout",self,"startFetch");for file_name in mdf:
-					var dr=mdf[file_name];file.open(file_name,File.READ)
-					if file.get_32()!=0x04034B50:continue
-					file.seek(0);var bt=file.get_buffer(file.get_len());file.close();fetchData[dr[0]]=[bt.compress(1),bt.size(),dr[1],dr[2]]
+						var pd=d[md5];if pd[1]!=file.get_md5(mod):(pd[0]=0)
+						if pd.size()>2&&pd[2]&&pd[2]!=OS.get_unique_id():continue
+						mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
+			fetchTimer.one_shot=true;pointers.add_child(fetchTimer);fetchTimer.connect("timeout",self,"startFetch");for file_name in mdf:
+				var dr=mdf[file_name];file.open(file_name,File.READ)
+				if file.get_32()!=0x04034B50:continue
+				file.seek(0);var bt=file.get_buffer(file.get_len());file.close();fetchData[dr[0]]=[bt.compress(1),bt.size(),dr[1],dr[2]]
 		startFetch()
 	var fetchData:Dictionary={}
 	var fetchTimer:Timer=Timer.new()
@@ -9883,36 +9886,36 @@ class _Zip:
 		return buffer
 	
 	func create_eocd(cr_size:int,central_dir_size:int,central_dir_offset:int):
-		var buffer:PoolByteArray = pointers.DataFormat.__store_32_in_buffer(0x06054b50)
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # number of this disk
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # disk where central directory starts
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(cr_size))
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(cr_size))
-		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(central_dir_size))
-		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(central_dir_offset))
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # zip comment length
+		var buffer:PoolByteArray = pointers.DataFormat.__store_32_in_buffer(0x06054b50,PoolByteArray())
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0,PoolByteArray())) # number of this disk
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0,PoolByteArray())) # disk where central directory starts
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(cr_size,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(cr_size,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(central_dir_size,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(central_dir_offset,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0,PoolByteArray())) # zip comment length
 		return buffer
 	
 	func create_local_entry(rec:Dictionary,dt:Dictionary):
 		var name_size = rec.name_bytes.size()
 		var name_bytes = rec.name_bytes
-		var buffer:PoolByteArray = pointers.DataFormat.__store_32_in_buffer(0x02014b50)
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(20)) # version made by
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(20)) # version needed to extract
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0x0800))
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(rec.method))
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(dt.time))
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(dt.date))
-		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(rec.crc))
-		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(rec.comp_size))
-		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(rec.uncomp_size))
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(name_size))
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # extra field length
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # comment length
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # disk number start
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # internal file attributes
-		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(0)) # external file attributes
-		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(rec.offset))
+		var buffer:PoolByteArray = pointers.DataFormat.__store_32_in_buffer(0x02014b50,PoolByteArray())
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(20,PoolByteArray())) # version made by
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(20,PoolByteArray())) # version needed to extract
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0x0800,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(rec.method,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(dt.time,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(dt.date,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(rec.crc,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(rec.comp_size,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(rec.uncomp_size,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(name_size,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0,PoolByteArray())) # extra field length
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0,PoolByteArray())) # comment length
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0,PoolByteArray())) # disk number start
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0,PoolByteArray())) # internal file attributes
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(0,PoolByteArray())) # external file attributes
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(rec.offset,PoolByteArray()))
 		buffer.append_array(name_bytes)
 		return buffer
 	
@@ -9930,17 +9933,17 @@ class _Zip:
 		var compressed_size:int = data.size()
 		var name_size:int = name_bytes.size()
 		var buffer:PoolByteArray = PoolByteArray()
-		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(0x04034b50))
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(20))
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0x0800))
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(method))
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(dt.time))
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(dt.date))
-		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(crc))
-		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(compressed_size)) # compressed size
-		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(uncompressed_size)) # uncompressed size
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(name_size))
-		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0)) # extra field length
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(0x04034b50,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(20,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0x0800,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(method,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(dt.time,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(dt.date,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(crc,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(compressed_size,PoolByteArray())) # compressed size
+		buffer.append_array(pointers.DataFormat.__store_32_in_buffer(uncompressed_size,PoolByteArray())) # uncompressed size
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(name_size,PoolByteArray()))
+		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0,PoolByteArray())) # extra field length
 		buffer.append_array(name_bytes)
 		buffer.append_array(data)
 		return [

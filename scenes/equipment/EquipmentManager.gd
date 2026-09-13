@@ -38,7 +38,7 @@ var file:File = File.new()
 func _tree_entered():
 	var sTime = OS.get_system_time_msecs()
 	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_equipment_by_price"):
-		for slot in display_slots():
+		for slot in get_children():
 			sort_slot(slot)
 	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_slots_by_type"):
 		reorganize_slots()
@@ -90,12 +90,9 @@ func _tree_entered():
 func sort_slot(slot):
 	pointers.l("Sorting equipment for slot %s" % slot.name)
 	var items:Array = slot.get_node("VBoxContainer").get_children()
-	var nodePositions:Array = []
-	for item in items:
-		nodePositions.append([item, item.get_index()])
-	var noFail:bool = false
+	var noFail:bool = true
 	var maxIndex:int = items.size()
-	while noFail == false:
+	while noFail:
 		var doesFailThisLoop = false
 		for item in slot.get_child(0).get_children():
 			if item.get_index() > 1:
@@ -104,21 +101,10 @@ func sort_slot(slot):
 				if A.price < B.price:
 					doesFailThisLoop = true
 					A.get_parent().move_child(A, B.get_index())
-		if doesFailThisLoop:
+		if not doesFailThisLoop:
 			noFail = false
-		else:
-			noFail = true
-
-func display_slots() -> Array:
-	var children:Array = self.get_children()
-	var list:Array = []
-	for child in children:
-		if child.get_parent() == self:
-			list.append(child)
-	return list
 
 func reorganize_slots():
-	var slot_names:Array = []
 	var slot_types:Dictionary = {}
 	var slot_types_i:Dictionary = {}
 	var order:Array = pointers.Equipment.equipment_slot_order
@@ -129,7 +115,6 @@ func reorganize_slots():
 		var children:Array = slot.get_node("VBoxContainer").get_children()
 		if children.size() < 2:
 			continue
-		slot_names.append(slot.name)
 		var sys_slot:String = slot.slot
 		var index:int = 1
 		if sys_slot.empty():
