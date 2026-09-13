@@ -1630,7 +1630,7 @@ class _DataFormat:
 					"args":[
 						"dictionary -> (Dictionary) the ship config to sort through",
 						"search_keys -> (Array) list of string entries to search for",
-						"cfgs_to_ignore -> (Array) any keys within the config to remove from the search. Due to the way this works, it's highly recommended to do a deep duplication of the dictionary before searching.",
+						"cfgs_to_ignore -> (Array) any keys within the config to remove from the search. Due to the way this works, it's highly recommended to do a deep duplication of the dictionary before __get_dependancies_for_vanilla_fileg.",
 						"return_only_system_names (optional) -> (bool) whether the output array should ONLY be system names and not the entire config path. Defaults to false"
 					],
 					"return":[
@@ -5875,6 +5875,12 @@ class _FolderAccess:
 						"Array containing all valid file paths that match the extensions criteria."
 					]
 				},
+				"__get_vanilla_script_and_scene_data":{
+					"description":"Fetches all vanilla files from the PCK file and the file's data. NOTE: editor builds MUST keep GDRE's .autoconverted directory since no PCK file is readily available to source data from. To get PCK data in-editor, use Zip.__load_pck.",
+					"return":[
+						"Dictionary containing all valid files. File data is a PoolByteArray under the `GetData` index"
+					]
+				},
 				"__get_vanilla_script_and_scenes":{
 					"description":"Fetches all vanilla scripts and scenes from the PCK file. NOTE: editor builds MUST keep GDRE's .autoconverted directory since no PCK file is readily available to source data from. To get PCK data in-editor, use Zip.__load_pck.",
 					"return":[
@@ -5995,34 +6001,32 @@ class _FolderAccess:
 					out.append(f)
 		return Array(out)
 	
-	func __get_vanilla_script_and_scenes() -> PoolStringArray:
+	func __get_vanilla_script_and_scene_data() -> Dictionary:
 		if OS.has_feature("editor"):
-			var out:PoolStringArray = PoolStringArray(__get_files_with_extensions("res://.autoconverted/",PoolStringArray(["res","gdc"])))
-			for i in out.size():
-				var fp = out[i].replace("/.autoconverted/","/")
+			var out:Dictionary = {}
+			for i in __get_files_with_extensions("res://.autoconverted/",PoolStringArray(["res","gdc"])):
+				var fp = i.replace("/.autoconverted/","/")
 				match fp.get_extension():
 					"res":
 						if fp.get_basename().get_extension() == "converted":
-							out[i] = (fp.get_basename().get_basename())
+							fp = (fp.get_basename().get_basename())
 					"gdc":
-						out[i] = (fp.get_basename() + ".gd")
+						fp = (fp.get_basename() + ".gd")
+				if file.file_exists(fp):
+					file.open(fp,File.READ)
+					out[fp] = {"GetData":file.get_buffer(file.get_len())}
+					file.close()
 			return out
 		else:
 			var gameInstallDirectory = OS.get_executable_path().get_basename() + ".pck"
 			if file.file_exists(gameInstallDirectory):
-				var out:PoolStringArray = PoolStringArray(pointers.Zip.__load_pck(gameInstallDirectory,true))
-				for i in out.size():
-					var fp = out[i]
-					match fp.get_extension():
-						"res":
-							if fp.get_basename().get_extension() == "converted":
-								out[i] = (fp.get_basename().get_basename())
-						"gdc":
-							out[i] = (fp.get_basename() + ".gd")
-				return out
+				return pointers.Zip.__load_pck(gameInstallDirectory,false)
 			else:
 				pointers.NodeAccess.__exit(false,"CRITICAL ERROR! Cannot find the game's .PCK file, and is a likely indicator that your game is corrupted.\n\nPlease validate your game files. If this issue persists, please make a bug report at [https://forms.gle/RmC4Zgonp6frFgnK7] so this issue can be fixed as soon as possible.","pointers.FolderAccess",0.0,"",true)
-				return PoolStringArray()
+				return {}
+	
+	func __get_vanilla_script_and_scenes() -> PoolStringArray:
+		return PoolStringArray(__get_vanilla_script_and_scene_data().keys())
 		
 	
 
@@ -8483,11 +8487,14 @@ class _SafeMode:
 			}
 		}
 	
-	var PCKFILES:PoolStringArray = PoolStringArray()
+	var PCKFILES:Dictionary = Dictionary()
+	var PCKNAMES:PoolStringArray = PoolStringArray()
 	var safeCheck:bool = false
 	var safeCheckTriggered:bool = false
 	var offendingFiles:Dictionary = {}
 	var offendingFileCount:int = 0
+	var dependancy_dictionary:Dictionary = Dictionary()
+	var dependancy_lookup:Dictionary = Dictionary()
 	var args = OS.get_cmdline_args()
 	var file = File.new()
 	var regex = RegEx.new()
@@ -8497,8 +8504,9 @@ class _SafeMode:
 		regex.compile(pointers.DataFormat.crcTables.B10.get_string_from_utf8())
 	
 	func ready():
+		PCKFILES = pointers.FolderAccess.__get_vanilla_script_and_scene_data()
+		PCKNAMES = PoolStringArray(PCKFILES.keys())
 		if not OS.has_feature("editor"):
-			PCKFILES = pointers.FolderAccess.__get_vanilla_script_and_scenes()
 			safeCheck = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading")
 			if safeCheck:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_ENABLED"),"pointers.SafeMode")
 			else:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_DISABLED"),"pointers.SafeMode")
@@ -8507,7 +8515,7 @@ class _SafeMode:
 	func __check_file(file_path:String,zip_path:String,crash:bool = true):
 		if safeCheck:
 			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_CHECKINGFILE") % [zip_path.get_file(),file_path],"pointers.SafeMode")
-			if file_path in PCKFILES:
+			if file_path in PCKNAMES:
 				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_1") % [file_path,zip_path.get_file()],"pointers.SafeMode")
 				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_2"),"pointers.SafeMode")
 				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_3"),"pointers.SafeMode")
@@ -8546,6 +8554,69 @@ class _SafeMode:
 			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TRIPPED_ERR_2"),"pointers.SafeMode")
 			if safeCheck and safeCheckTriggered:
 				pointers.NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_SAFEMODE_SM_TRIPPED_POPUP_MSG") % [offendingFiles.size(),offendingFileCount],"pointers.SafeMode",0.0,"",true)
+	
+	var resHex:String = "res://".to_ascii().hex_encode()
+	var binaryArr:PoolStringArray = PoolStringArray(["tres","tscn","gd"])
+	
+	func __get_dependancies_for_vanilla_file(file_path:String):
+		if not file_path in PCKFILES:
+			return
+		var fileBytes:PoolByteArray = PCKFILES[file_path].GetData
+		var dependencies:PoolStringArray = PoolStringArray()
+		var realBaseName:String = getRealFilename(file_path)
+		dependencies.append_array(ResourceLoader.get_dependencies(realBaseName))
+		if realBaseName.get_extension() != "gd":
+			var bytecodeStr:String = fileBytes.hex_encode()
+			if resHex in bytecodeStr:
+				var hexArray:PoolStringArray = bytecodeStr.split(resHex)
+				var buffer:int = 0
+				for idx in hexArray.size():
+					var hexText:String = hexArray[idx]
+					if idx > 0:
+						hexText = resHex + hexText
+						dependencies.append(fileBytes.subarray(buffer, buffer + hexText.length()/2.0 - 1).get_string_from_ascii())
+					buffer += hexText.length() / 2.0
+		dependancy_dictionary[realBaseName] = dependencies
+		for dp in dependencies:
+			if not dp in dependancy_lookup:
+				dependancy_lookup[dp] = []
+			dependancy_lookup[dp].append(realBaseName)
+		for m in dependencies:
+			if m.get_extension() in binaryArr and not m in dependancy_dictionary:
+				__get_dependancies_for_vanilla_file(m)
+	
+	func getRealFilename(base:String) -> String:
+		match base.get_extension():
+			"res":
+				base = base.get_basename().get_basename()
+			"gdc":
+				base = base.get_basename() + ".gd"
+		return base
+	
+	func __lookup_vanilla_file_dependancies(dependancy,order:Array) -> Array:
+		var out:Array = Array()
+		if dependancy in dependancy_lookup:
+				var dp = dependancy_lookup[dependancy]
+				for d in dp:
+					if not d.split("/",false)[1] == "tests":
+						if d in order:
+							var tpos = order.find(dependancy)
+							var npos = order.find(d)
+							if npos < tpos:
+								order[tpos] = d
+								order[npos] = dependancy
+						else:
+							order.append(d)
+							__lookup_vanilla_file_dependancies(d,order)
+		return out
+	
+	func __lookup_file_dependancies(dependancy:String,order:Array) -> Array:
+		var deps = ResourceLoader.get_dependencies(dependancy)
+		for d in deps:
+			__lookup_vanilla_file_dependancies(d,order)
+		return []
+	
+	
 	
 
 class _Scripting:
