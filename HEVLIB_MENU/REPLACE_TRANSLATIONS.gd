@@ -1340,8 +1340,8 @@ const TRANSLATIONS = {
 			"version_hash": 3641455841
 		},
 		"HEVLIB_CREDITS_CONTRIBUTORS_ZAKRIN": {
-			"string": "Za'krin - Mod Main design, original implementation of updateTL",
-			"version_hash": 3828627238
+			"string": "Za'krin - Mod Main design, original implementation of updateTL, original load order processing from ZKYLoader",
+			"version_hash": 710854217
 		},
 		"HEVLIB_CREDITS_CONTRIBUTORS_SPDX": {
 			"string": "spaceDOTexe - Manifest design, UpgradeGroup ship limiting logic",

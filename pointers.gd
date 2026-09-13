@@ -8098,7 +8098,14 @@ class _ManifestV2:
 					var subdata:Dictionary = resources[resource]
 					var is_relative:bool = resource.begins_with("res://")
 					if is_onready == subdata.get("onready",false):
-						match subdata.get("load_type","").to_lower():
+						var load_type:String = subdata.get("load_type","").to_lower()
+						if load_type.empty():
+							match load_type.get_extension():
+								"gd":
+									load_type = "script"
+								"tscn","res","tres":
+									load_type = "resource"
+						match load_type:
 							"script":
 								var path:String=resource if is_relative else(modlet.get_base_dir()+(""if resource.begins_with("/")else"/")+resource)
 								if pointers.ConfigDriver.__validate_dictionary(subdata)&&pointers.FileAccess.__file_exists(path):
