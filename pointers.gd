@@ -1464,7 +1464,8 @@ class _ConfigDriver:
 	func __validate_dictionary(data_dict : Dictionary,check_config : bool = true, check_requirements : bool = true, check_incompatibilities : bool = true, config_entry_override : String = "config", mod_requirements_entry_override : String = "mod_requirements", mod_incompatibilities_entry_override : String = "mod_incompatibilities"):
 		if data_dict == null:
 			return false
-		if check_config and config_entry_override in data_dict.keys() and data_dict[config_entry_override] is Dictionary:
+		var ddk:Array = data_dict.keys()
+		if check_config and config_entry_override in ddk and data_dict[config_entry_override] is Dictionary:
 			var cfg:Dictionary = data_dict[config_entry_override]
 			var config_id : String  = cfg.get("id",cfg.get("mod",cfg.get("mod_id","")))
 			var config_section : String  = cfg.get("section","")
@@ -1482,7 +1483,7 @@ class _ConfigDriver:
 							how = cfg_opt
 					if not how:
 						return false
-		if check_requirements and mod_requirements_entry_override in data_dict and data_dict[mod_requirements_entry_override] is Array:
+		if check_requirements and mod_requirements_entry_override in ddk and data_dict[mod_requirements_entry_override] is Array:
 			var needs : Array = data_dict[mod_requirements_entry_override]
 			var can:int = 0
 			for a in needs:
@@ -1493,7 +1494,7 @@ class _ConfigDriver:
 							can += 1
 			if can != needs.size():
 				return false
-		if check_incompatibilities and mod_incompatibilities_entry_override in data_dict and data_dict[mod_incompatibilities_entry_override] is Array:
+		if check_incompatibilities and mod_incompatibilities_entry_override in ddk and data_dict[mod_incompatibilities_entry_override] is Array:
 			var needs : Array = data_dict[mod_incompatibilities_entry_override]
 			var can:int = 0
 			for a in needs:
@@ -1524,9 +1525,9 @@ class _ConfigDriver:
 	
 	func __config_store(dict : Dictionary,filepath:String):
 		var cfg:ConfigFile = ConfigFile.new()
-		for section in dict:
+		for section in dict.keys():
 			var keys = dict[section]
-			for key in keys:
+			for key in keys.keys():
 				cfg.set_value(section,key,keys[key])
 		cfg.save(filepath)
 	
@@ -2054,7 +2055,7 @@ class _DataFormat:
 	
 	func __sift_dictionary(dictionary: Dictionary,search_keys: Array) -> Array:
 		var returning_keys : Array = []
-		for key in dictionary:
+		for key in dictionary.keys():
 			if key in search_keys:
 				returning_keys.append(key)
 			var kdata = dictionary[key]
@@ -2103,7 +2104,7 @@ class _DataFormat:
 		var prefab : String = ""
 		if parent:
 			prefab = parent + splitter
-		for key in dictionary:
+		for key in dictionary.keys():
 			var kdata = dictionary[key]
 			match typeof(kdata):
 				TYPE_STRING:
@@ -2352,18 +2353,21 @@ class _DataFormat:
 		return pairs
 	
 	var compiled_scripts : Dictionary = {}
+	var csk:Array = Array()
 	var compiled_script_object_storage : Dictionary = {}
+	var csosk:Array = Array()
 	
 	func __compile_script(source_code : String) -> Script:
 		var shash:int = hash(source_code)
 		pointers.l("Compiling script resource [%d]" % shash,"pointers.DataFormat")
-		if shash in compiled_scripts:
+		if shash in csk:
 			pointers.l("Fetching from cache","pointers.DataFormat")
 			return compiled_scripts[shash]
 		var out:GDScript = GDScript.new()
 		out.set_source_code(source_code)
 		out.reload()
 		compiled_scripts[shash] = out
+		csk = compiled_scripts.keys()
 		return out
 	
 	
@@ -2377,7 +2381,7 @@ class _DataFormat:
 		else:
 			shash = str(hash(source_code))
 		pointers.l("Compiling script as object @ [%s]; parameters: %s, new object: %s" % [shash,str(params),str(new_object)],"pointers.DataFormat")
-		if not new_object and shash in compiled_script_object_storage:
+		if not new_object and shash in csosk:
 			pointers.l("Fetching from cache","pointers.DataFormat")
 			return compiled_script_object_storage[shash]
 		
@@ -2410,6 +2414,7 @@ class _DataFormat:
 		else:
 			out = gd.new()
 		compiled_script_object_storage[shash] = out
+		csosk=compiled_script_object_storage.keys()
 		return out
 	
 	var _savedScriptObjects : Array = []
@@ -2524,10 +2529,10 @@ class _DataFormat:
 		return null
 	
 	var var_hash : Dictionary = {}
-	
+	var vhk:Array = Array()
 	func __convert_var_from_string(string : String, constant = true):
 		var shash:int = hash(string + str(constant))
-		if shash in var_hash:
+		if shash in vhk:
 			return var_hash[shash]
 		var header : String 
 		if constant:
@@ -2537,6 +2542,7 @@ class _DataFormat:
 		var script = __compile_script_object(header + string)
 		var variable = script.VARIABLE
 		var_hash[shash] = variable
+		vhk=var_hash.keys()
 		return variable
 	
 	var last_successful_object = null
@@ -2606,12 +2612,10 @@ class _DataFormat:
 				TYPE_VECTOR3_ARRAY:
 					out = PoolVector3Array()
 			var offset = (specific_section * length)
-			var maxNo = min(arrsize - offset,length)
-			for i in maxNo:
+			for i in min(arrsize - offset,length):
 				out.append(arr[i + offset])
 			return out
-		var arrCount = int(ceil(arrsize / float(length)))
-		for i in arrCount:
+		for i in int(ceil(arrsize / float(length))):
 			match typeof(arr):
 				TYPE_ARRAY:
 					out.append([])
@@ -3153,8 +3157,7 @@ class _DriverManagement:
 	
 	func __get_drivers(get_ids : Array = []) -> Array:
 		var mod_drivers : Array = []
-		var mms : PoolStringArray = pointers.ManifestV2.__get_modmain_files() + pointers.ManifestV2.__get_modlet_files()
-		for modmain_path in mms:
+		for modmain_path in (pointers.ManifestV2.__get_modmain_files() + pointers.ManifestV2.__get_modlet_files()):
 			var has_manifest:bool = false
 			var manifest_path : String  = ""
 			var modFolder : String  = modmain_path.get_base_dir() + "/"
@@ -3182,7 +3185,7 @@ class _DriverManagement:
 				manifest.get("manifest_definitions",{}).get("modlet_priority",0)
 			else:
 				var modmain : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(modmain_path)
-				if "MOD_PRIORITY" in modmain:
+				if "MOD_PRIORITY" in modmain.keys():
 					mm_prio = modmain["MOD_PRIORITY"]
 			this_mod_data.merge({"priority":mm_prio})
 			
@@ -3211,6 +3214,7 @@ class _DriverManagement:
 		return false
 	
 	var driver_get_cache : Dictionary = {}
+	var dgck:Array = Array()
 	
 	const driver_dirs = PoolStringArray([
 		"HEVLIB_EQUIPMENT_DRIVER_TAGS/",
@@ -3219,10 +3223,8 @@ class _DriverManagement:
 		"HEVLIB_DRIVERS/",
 	])
 	
-	var driver_ref_cache = {}
-	
 	func __get_drivers_from_modmain_path(file_path: String, get_fresh_drivers: bool = false):
-		if get_fresh_drivers or not file_path in driver_get_cache:
+		if get_fresh_drivers or not file_path in dgck:
 			var this_mod_data : Dictionary = {}
 			if not file.file_exists(file_path):
 				return {}
@@ -3236,9 +3238,10 @@ class _DriverManagement:
 						var driver_filepath = driverFolder + driver
 						if __is_driver_file(driver_filepath):
 							var consts : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(driver_filepath)
-							for i in consts:
+							for i in consts.keys():
 								this_mod_data[driver][i] = consts[i]
 			driver_get_cache[file_path] = this_mod_data
+			dgck = driver_get_cache.keys()
 		return driver_get_cache[file_path].duplicate(true)
 	
 	var driver_file_regex = RegEx.new()
@@ -3379,7 +3382,7 @@ class _Equipment:
 		var ws_ship_templates : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
 		var ws_ship_templates_2 : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd").get_script_constant_map()
 		var ship_register : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/equipment/ShipModificationDriver/ship_register_vanilla.gd") #load("res://HevLib/scenes/equipment/ShipModificationDriver/ship_register_vanilla.gd").get_script_constant_map()
-		for item in ship_register:
+		for item in ship_register.keys():
 			ship_node_register.append(ship_register[item])
 		
 		weaponslot_modify_templates = ws_default_templates.get("TEMPLATES", {})
@@ -3388,38 +3391,40 @@ class _Equipment:
 		
 		var drivers : Dictionary = {}
 		var mods : Dictionary = pointers.ManifestV2.__get_mod_data()["mods"]
-		for md in mods:
+		for md in mods.keys():
 			var mod = mods[md]
 			if mod["manifest"]["has_manifest"]:
 				var mod_id = mod["manifest"]["manifest_data"].get("mod_information",{}).get("id","")
 				if mod_id:
-					if "drivers" in mod and mod.drivers:
+					if "drivers" in mod.keys() and mod.drivers:
 						drivers[mod_id] = mod.drivers
 		mods.clear()
 		
 		
-		for i in vanilla_equipment:
+		for i in vanilla_equipment.keys():
 			var item = vanilla_equipment[i]
 			var sys = item.get("system")
 			if sys:
 				var type = item.get("equipment_type")
-				if not sys in equipment_validity_for_slots:
+				if not sys in equipment_validity_for_slots.keys():
 					equipment_validity_for_slots[sys] = []
 				if type and not type in equipment_validity_for_slots[sys]:
 					equipment_validity_for_slots[sys].append(type)
 		
-		for mod_id in drivers:
+		for mod_id in drivers.keys():
 			var cvh = drivers[mod_id]
-			for last_bit in cvh:
+			for last_bit in cvh.keys():
 				var constants : Dictionary = cvh[last_bit]
+				var constKeys:Array = constants.keys()
 				match last_bit:
 					"ADD_EQUIPMENT_ITEMS.gd":
-						for item in constants:
+						for item in constKeys:
 							var equipment = constants.get(item)
+							var eqkeys:Array = equipment.keys()
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								match equipment.get("slot_type","HARDPOINT"):
 									"HARDPOINT":
-										if "weapon_slot" in equipment:
+										if "weapon_slot" in eqkeys:
 											var obj : Dictionary = equipment.get("weapon_slot").duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(obj,false):
 												var wname : String  = equipment.get("system","")
@@ -3427,7 +3432,7 @@ class _Equipment:
 												var objdata : Array = obj.get("data",[])
 												var has_price:bool = false
 												var has_invis:bool = false
-												if not "name" in obj:
+												if not "name" in obj.keys():
 													obj.merge({"name":wname})
 												for d in objdata:
 													if d.get("property","") == "repairReplacementPrice":
@@ -3442,7 +3447,7 @@ class _Equipment:
 													objdata.append({"property":"visible","value":false,"use_stringified_value":false})
 												obj["data"] = objdata.duplicate(true)
 												WEAPONSLOT_ADD.append(obj)
-										if "WEAPONSLOT_ADD" in equipment:
+										if "WEAPONSLOT_ADD" in eqkeys:
 											var obj : Dictionary = equipment.get("WEAPONSLOT_ADD").duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(obj,false):
 												var wname : String  = equipment.get("system","")
@@ -3450,7 +3455,7 @@ class _Equipment:
 												var objdata : Array = obj.get("data",[])
 												var has_price:bool = false
 												var has_invis:bool = false
-												if not "name" in obj:
+												if not "name" in obj.keys():
 													obj.merge({"name":wname})
 												for d in objdata:
 													if d.get("property","") == "repairReplacementPrice":
@@ -3466,7 +3471,7 @@ class _Equipment:
 												obj["data"] = objdata.duplicate(true)
 												WEAPONSLOT_ADD.append(obj)
 									"MASS_DRIVER_AMMUNITION":
-										if "REGISTER_AMMO" in equipment:
+										if "REGISTER_AMMO" in eqkeys:
 											if not "REGISTER_AMMO" in register_ship_numerics_store:
 												register_ship_numerics_store["REGISTER_AMMO"] = []
 											var bp : Dictionary = equipment["REGISTER_AMMO"].duplicate(true)
@@ -3476,7 +3481,7 @@ class _Equipment:
 												var dc : Dictionary = {equipment.get("num_val",0):bp}
 												register_ship_numerics_store["REGISTER_AMMO"].append(dc)
 									"NANODRONE_STORAGE":
-										if "REGISTER_NANO" in equipment:
+										if "REGISTER_NANO" in eqkeys:
 											if not "REGISTER_NANO" in register_ship_numerics_store:
 												register_ship_numerics_store["REGISTER_NANO"] = []
 											var bp : Dictionary = equipment["REGISTER_NANO"].duplicate(true)
@@ -3486,7 +3491,7 @@ class _Equipment:
 												var dc : Dictionary = {equipment.get("num_val",0):bp}
 												register_ship_numerics_store["REGISTER_NANO"].append(dc)
 									"STANDARD_REACTION_CONTROL_THRUSTERS":
-										if "AUX_POWER_SLOT" in equipment:
+										if "AUX_POWER_SLOT" in eqkeys:
 											var bp : Dictionary = equipment["AUX_POWER_SLOT"].duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "system" in bp:
@@ -3494,7 +3499,7 @@ class _Equipment:
 												if not "price" in bp:
 													bp["price"] = equipment["price"]
 												AUX_POWER_AND_THRUSTERS.append(bp)
-										if "THRUSTERS" in equipment:
+										if "THRUSTERS" in eqkeys:
 											var bp : Dictionary = equipment["THRUSTERS"].duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "system" in bp:
@@ -3502,7 +3507,7 @@ class _Equipment:
 												if not "price" in bp:
 													bp["price"] = equipment["price"]
 												AUX_POWER_AND_THRUSTERS.append(bp)
-										if "AUX_POWER_AND_THRUSTERS" in equipment:
+										if "AUX_POWER_AND_THRUSTERS" in eqkeys:
 											var bp : Dictionary = equipment["AUX_POWER_AND_THRUSTERS"].duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "system" in bp:
@@ -3511,7 +3516,7 @@ class _Equipment:
 													bp["price"] = equipment["price"]
 												AUX_POWER_AND_THRUSTERS.append(bp)
 									"STANDARD_MAIN_ENGINE":
-										if "AUX_POWER_SLOT" in equipment:
+										if "AUX_POWER_SLOT" in eqkeys:
 											var bp : Dictionary = equipment["AUX_POWER_SLOT"].duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "system" in bp:
@@ -3519,7 +3524,7 @@ class _Equipment:
 												if not "price" in bp:
 													bp["price"] = equipment["price"]
 												AUX_POWER_AND_THRUSTERS.append(bp)
-										if "THRUSTERS" in equipment:
+										if "THRUSTERS" in eqkeys:
 											var bp : Dictionary = equipment["THRUSTERS"].duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "system" in bp:
@@ -3527,7 +3532,7 @@ class _Equipment:
 												if not "price" in bp:
 													bp["price"] = equipment["price"]
 												AUX_POWER_AND_THRUSTERS.append(bp)
-										if "AUX_POWER_AND_THRUSTERS" in equipment:
+										if "AUX_POWER_AND_THRUSTERS" in eqkeys:
 											var bp : Dictionary = equipment["AUX_POWER_AND_THRUSTERS"].duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "system" in bp:
@@ -3536,7 +3541,7 @@ class _Equipment:
 													bp["price"] = equipment["price"]
 												AUX_POWER_AND_THRUSTERS.append(bp)
 									"FISSION_RODS":
-										if "REGISTER_REACTOR_RODS" in equipment:
+										if "REGISTER_REACTOR_RODS" in eqkeys:
 											if not "REGISTER_REACTOR_RODS" in register_ship_numerics_store:
 												register_ship_numerics_store["REGISTER_REACTOR_RODS"] = []
 											var bp : Dictionary = equipment["REGISTER_REACTOR_RODS"].duplicate(true)
@@ -3546,7 +3551,7 @@ class _Equipment:
 												var dc : Dictionary = {equipment.get("num_val",0):bp}
 												register_ship_numerics_store["REGISTER_REACTOR_RODS"].append(dc)
 									"ULTRACAPACITOR":
-										if "REGISTER_ULTRACAPACITORS" in equipment:
+										if "REGISTER_ULTRACAPACITORS" in eqkeys:
 											if not "REGISTER_ULTRACAPACITORS" in register_ship_numerics_store:
 												register_ship_numerics_store["REGISTER_ULTRACAPACITORS"] = []
 											var bp : Dictionary = equipment["REGISTER_ULTRACAPACITORS"].duplicate(true)
@@ -3556,7 +3561,7 @@ class _Equipment:
 												var dc : Dictionary = {equipment.get("num_val",0):bp}
 												register_ship_numerics_store["REGISTER_ULTRACAPACITORS"].append(dc)
 									"FISSION_TURBINE":
-										if "REGISTER_TURBINES" in equipment:
+										if "REGISTER_TURBINES" in eqkeys:
 											if not "REGISTER_TURBINES" in register_ship_numerics_store:
 												register_ship_numerics_store["REGISTER_TURBINES"] = []
 											var bp : Dictionary = equipment["REGISTER_TURBINES"].duplicate(true)
@@ -3566,7 +3571,7 @@ class _Equipment:
 												var dc : Dictionary = {equipment.get("num_val",0):bp}
 												register_ship_numerics_store["REGISTER_TURBINES"].append(dc)
 									"AUX_POWER_SLOT":
-										if "auxiliary_power_unit" in equipment:
+										if "auxiliary_power_unit" in eqkeys:
 											var bp : Dictionary = equipment["auxiliary_power_unit"].duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "system" in bp:
@@ -3574,7 +3579,7 @@ class _Equipment:
 												if not "price" in bp:
 													bp["price"] = equipment["price"]
 												AUX_POWER_AND_THRUSTERS.append(bp)
-										if "AUX_POWER_SLOT" in equipment:
+										if "AUX_POWER_SLOT" in eqkeys:
 											var bp : Dictionary = equipment["AUX_POWER_SLOT"].duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "system" in bp:
@@ -3582,7 +3587,7 @@ class _Equipment:
 												if not "price" in bp:
 													bp["price"] = equipment["price"]
 												AUX_POWER_AND_THRUSTERS.append(bp)
-										if "THRUSTERS" in equipment:
+										if "THRUSTERS" in eqkeys:
 											var bp : Dictionary = equipment["THRUSTERS"].duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "system" in bp:
@@ -3590,7 +3595,7 @@ class _Equipment:
 												if not "price" in bp:
 													bp["price"] = equipment["price"]
 												AUX_POWER_AND_THRUSTERS.append(bp)
-										if "AUX_POWER_AND_THRUSTERS" in equipment:
+										if "AUX_POWER_AND_THRUSTERS" in eqkeys:
 											var bp : Dictionary = equipment["AUX_POWER_AND_THRUSTERS"].duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "system" in bp:
@@ -3599,7 +3604,7 @@ class _Equipment:
 													bp["price"] = equipment["price"]
 												AUX_POWER_AND_THRUSTERS.append(bp)
 									"PROPELLANT_TANK":
-										if "REGISTER_PROPELLANT" in equipment:
+										if "REGISTER_PROPELLANT" in eqkeys:
 											if not "REGISTER_PROPELLANT" in register_ship_numerics_store:
 												register_ship_numerics_store["REGISTER_PROPELLANT"] = []
 											var bp : Dictionary = equipment["REGISTER_PROPELLANT"].duplicate(true)
@@ -3610,7 +3615,7 @@ class _Equipment:
 												register_ship_numerics_store["REGISTER_PROPELLANT"].append(dc)
 								ADD_EQUIPMENT_ITEMS.append(equipment)
 					"ADD_EQUIPMENT_SLOTS.gd":
-						for item in constants:
+						for item in constKeys:
 							var equipment = constants.get(item)
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								ADD_EQUIPMENT_SLOTS.append(equipment)
@@ -3632,14 +3637,14 @@ class _Equipment:
 						var ar : Dictionary = constants.get("SLOT_TAGS",{})
 						SLOT_TAGS.append(ar)
 					"AUX_POWER_SLOT.gd","THRUSTERS.gd","AUX_POWER_AND_THRUSTERS.gd":
-						for item in constants:
+						for item in constKeys:
 							var equipment : Dictionary = constants.get(item)
 							
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								AUX_POWER_AND_THRUSTERS.append(equipment)
 
 					"MODIFY_INTERNALS.gd":
-						if "MODIFY_INTERNALS" in constants:
+						if "MODIFY_INTERNALS" in constKeys:
 							var pdata : Array = constants.MODIFY_INTERNALS
 							
 							for item in pdata:
@@ -3690,17 +3695,17 @@ class _Equipment:
 									processed_storage_mods[listingSystemName].append(ls)
 					"NODE_DEFINITIONS.gd":
 						
-						for item in constants:
+						for item in constKeys:
 							var xd : Dictionary = {item:constants.get(item)}
 							node_definitions_cache.merge(xd)
 							
 					"SHIP_NODE_REGISTER.gd":
-						for item in constants:
+						for item in constKeys:
 							var xd = constants.get(item)
 							ship_node_register.append(xd)
 					"SHIP_NODE_MODIFY.gd":
 						
-						for item in constants:
+						for item in constKeys:
 							var ship : String  = constants[item].get("ship_name","")
 							if ship != "":
 								if not ship in ship_node_modify:
@@ -3726,7 +3731,7 @@ class _Equipment:
 								
 
 					"WEAPONSLOT_ADD.gd":
-						for item in constants:
+						for item in constKeys:
 							var equipment : Dictionary = constants.get(item)
 							var n : String = equipment.get("name","")
 							if n:
@@ -3883,12 +3888,12 @@ class _Equipment:
 							if pointers.ConfigDriver.__validate_dictionary(button,false):
 								save_button_cache.append(button)
 					"ADD_SHIPS.gd":
-						for ar in constants:
+						for ar in constKeys:
 							var ac : Dictionary = constants[ar]
 							if pointers.ConfigDriver.__validate_dictionary(ac,false):
 								add_ships_store.append(ac)
 					"MODIFY_SHIP_BUILDS.gd":
-						for ar in constants:
+						for ar in constKeys:
 							var sorting = {}
 							var dict : Dictionary = constants[ar]
 							if pointers.ConfigDriver.__validate_dictionary(dict):
@@ -3946,7 +3951,7 @@ class _Equipment:
 								for i in sorting[o]:
 									ship_build_mod_store.append(i)
 					"REGISTER_SHIP_NUMERICS.gd":
-						for ar in constants:
+						for ar in constKeys:
 							if not ar in register_ship_numerics_store:
 								register_ship_numerics_store[ar] = []
 							var ac = constants[ar]
@@ -3955,7 +3960,7 @@ class _Equipment:
 								if pointers.ConfigDriver.__validate_dictionary(ax,false):
 									register_ship_numerics_store[ar].append({v:ax})
 					"MODIFY_SHIP_NUMERICS.gd":
-						for item in constants:
+						for item in constKeys:
 							var di : Dictionary = constants[item]
 							var ship : String  = di.get("ship_name","")
 							if ship != "":
@@ -3964,11 +3969,11 @@ class _Equipment:
 								modify_ship_numerics[ship].append(di)
 					"NAMER.gd":
 						
-						if "CREW" in constants:
+						if "CREW" in constKeys:
 							var d : Array = constants["CREW"]
 							namer_store["crew"].append_array(d)
 						
-						if "SHIPS" in constants:
+						if "SHIPS" in constKeys:
 							var d : Array = constants["SHIPS"]
 							namer_store["ships"].append_array(d)
 						
@@ -3977,7 +3982,7 @@ class _Equipment:
 							event_driver_event_entries.append(constants[entry])
 					
 					"RESEARCH.gd":
-						for entry in constants:
+						for entry in constKeys:
 							if not mod_id in research_store:
 								research_store[mod_id] = {}
 							research_store[mod_id][entry] = constants[entry]
@@ -3992,6 +3997,7 @@ class _Equipment:
 		var ship_limitations : Dictionary = {}
 		var ship_limitation_string : String  = ""
 		
+		var slotDefKeys:Array = slot_defaults.keys()
 		for nodes in EQUIPMENT_TAGS:
 			if nodes:
 				var slotTypes : Array = Array(nodes.get("slot_types",[]))
@@ -4016,8 +4022,8 @@ class _Equipment:
 						if not st in hardpoint_types:
 							hardpoint_types.append(st)
 				if slotDefaults:
-					for st in slotDefaults:
-						if st in slot_defaults:
+					for st in slotDefaults.keys():
+						if st in slotDefKeys:
 							for item in slotDefaults.get(st):
 								if not item in slot_defaults.get(st):
 									slot_defaults[st].append(item)
@@ -4026,12 +4032,13 @@ class _Equipment:
 		for slotDict in ADD_EQUIPMENT_SLOTS:
 			var snn : String  = slotDict.get("slot_node_name","")
 			var spp : Dictionary = ship_limitations.get(snn,{})
+			var sppKeys:Array = spp.keys()
 			if "limit_ships" in slotDict:
 				var val : Array = Array(slotDict["limit_ships"]).duplicate()
 				if snn in ship_limitations:
-					if "limit_ships" in spp:
+					if "limit_ships" in sppKeys:
 						for i in val:
-							if not i in spp:
+							if not i in sppKeys:
 								ship_limitations[snn]["limit_ships"] = i
 					else:
 						ship_limitations[snn]["limit_ships"] = spp["limit_ships"]
@@ -4041,9 +4048,9 @@ class _Equipment:
 			if "prevent_ships" in slotDict:
 				var val : Array = Array(slotDict["prevent_ships"]).duplicate()
 				if snn in ship_limitations:
-					if "prevent_ships" in spp:
+					if "prevent_ships" in sppKeys:
 						for i in val:
-							if not i in spp:
+							if not i in sppKeys:
 								ship_limitations[snn]["prevent_ships"] = i
 					else:
 						ship_limitations[snn]["prevent_ships"] = spp["prevent_ships"]
@@ -4059,12 +4066,13 @@ class _Equipment:
 				for snn in node:
 					var data : Dictionary = node[snn]
 					var spp : Dictionary = ship_limitations.get(snn,{})
+					var sppKeys:Array = spp.keys()
 					if "limit_ships" in data:
 						var val : Array = Array(data["limit_ships"]).duplicate()
 						if snn in ship_limitations:
-							if "limit_ships" in spp:
+							if "limit_ships" in sppKeys:
 								for f in val:
-									if not f in spp:
+									if not f in sppKeys:
 										ship_limitations[snn]["limit_ships"] = f
 							else:
 								ship_limitations[snn]["limit_ships"] = spp["limit_ships"]
@@ -4074,9 +4082,9 @@ class _Equipment:
 					if "prevent_ships" in data:
 						var val : Array = Array(data["prevent_ships"]).duplicate()
 						if snn in ship_limitations:
-							if "prevent_ships" in spp:
+							if "prevent_ships" in sppKeys:
 								for f in val:
-									if not f in spp:
+									if not f in sppKeys:
 										ship_limitations[snn]["prevent_ships"] = f
 							else:
 								ship_limitations[snn]["prevent_ships"] = spp["prevent_ships"]
@@ -4095,7 +4103,7 @@ class _Equipment:
 			
 			# FUTURE ME: Write a mod that tag modifies a modded slot, need to double check functionality of this code + define types
 			for data in tag_modifications:
-				if m in data:
+				if m in data.keys():
 					var slot_override_additive = format[2]["override_additive"]
 					var slot_override_subtractive = format[2]["override_subtractive"]
 					var override_additive = Array(data[m].get("override_additive",[]))
@@ -4198,6 +4206,8 @@ class _Equipment:
 						var string : String  = __make_equipment_for_scene(item, slot.get("slot_node_name",""), system_slot)
 						
 						equipment_format.append(string)
+		var sfaKeys :Array = slots_for_adding_dict.keys()
+		var vedfrKeys :Array = vanilla_equipment_defaults_for_reference.keys()
 		for slot in all_slot_node_names:
 			if slot in slot_allowed_equipment:
 				for item in ADD_EQUIPMENT_ITEMS:
@@ -4205,12 +4215,12 @@ class _Equipment:
 					var alignment : String = ""
 					var restriction : String = ""
 					var system_slot : String = ""
-					if slot in vanilla_equipment_defaults_for_reference:
+					if slot in vedfrKeys:
 						slot_type = vanilla_equipment_defaults_for_reference[slot].get("slot_type","")
 						alignment = vanilla_equipment_defaults_for_reference[slot].get("alignment","")
 						restriction = vanilla_equipment_defaults_for_reference[slot].get("restriction","")
 						system_slot = vanilla_slot_types[slot]
-					elif slot in slots_for_adding_dict:
+					elif slot in sfaKeys:
 						slot_type = slots_for_adding_dict[slot].get("slot_type","")
 						alignment = slots_for_adding_dict[slot].get("alignment","")
 						restriction = slots_for_adding_dict[slot].get("restriction","")
