@@ -1630,7 +1630,7 @@ class _DataFormat:
 					"args":[
 						"dictionary -> (Dictionary) the ship config to sort through",
 						"search_keys -> (Array) list of string entries to search for",
-						"cfgs_to_ignore -> (Array) any keys within the config to remove from the search. Due to the way this works, it's highly recommended to do a deep duplication of the dictionary before __get_dependancies_for_vanilla_fileg.",
+						"cfgs_to_ignore -> (Array) any keys within the config to remove from the search. Due to the way this works, it's highly recommended to do a deep duplication of the dictionary before searching.",
 						"return_only_system_names (optional) -> (bool) whether the output array should ONLY be system names and not the entire config path. Defaults to false"
 					],
 					"return":[
@@ -7002,6 +7002,8 @@ class _ManifestV2:
 			return a.get("path","") < b.get("path","")
 		if a.get("zip_path","") != b.get("zip_path",""):
 			return a.get("zip_path","") < b.get("zip_path","")
+		if a.get("name","") != b.get("name",""):
+			return a.get("name","") < b.get("name","")
 		return false
 	
 	func __match_mod_path_to_zip(mod_main_path:String) -> String:
@@ -8495,6 +8497,8 @@ class _SafeMode:
 	var offendingFileCount:int = 0
 	var dependancy_dictionary:Dictionary = Dictionary()
 	var dependancy_lookup:Dictionary = Dictionary()
+	var vanilla_load_order:Array = Array()
+	
 	var args = OS.get_cmdline_args()
 	var file = File.new()
 	var regex = RegEx.new()
@@ -8505,7 +8509,25 @@ class _SafeMode:
 	
 	func ready():
 		PCKFILES = pointers.FolderAccess.__get_vanilla_script_and_scene_data()
-		PCKNAMES = PoolStringArray(PCKFILES.keys())
+		vanilla_load_order=PCKFILES.keys()
+		PCKNAMES = PoolStringArray(vanilla_load_order)
+#		for f in PCKNAMES:get_dependancies_for_vanilla_file(f)
+#		var idx:int = 0
+#		while idx < vanilla_load_order.size():
+#			var item = vanilla_load_order[idx]
+#			var requirements = dependancy_dictionary.get(item,PoolStringArray())
+#			if requirements:
+#				var rq:bool = false
+#				for r in requirements:
+#					var pos = vanilla_load_order.find(r)
+#					if pos >= idx:
+#						vanilla_load_order.remove(pos)
+#						vanilla_load_order.insert(idx-1,r)
+#						rq = true
+#				if rq:
+#					idx = 0
+#					continue
+#			idx += 1
 		if not OS.has_feature("editor"):
 			safeCheck = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading")
 			if safeCheck:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_ENABLED"),"pointers.SafeMode")
@@ -8557,15 +8579,12 @@ class _SafeMode:
 	
 	var resHex:String = "res://".to_ascii().hex_encode()
 	var binaryArr:PoolStringArray = PoolStringArray(["tres","tscn","gd"])
-	
-	func __get_dependancies_for_vanilla_file(file_path:String):
-		if not file_path in PCKFILES:
+	func get_dependancies_for_vanilla_file(file_path:String):
+		if (not file_path in PCKNAMES) or (file_path in dependancy_dictionary):
 			return
-		var fileBytes:PoolByteArray = PCKFILES[file_path].GetData
-		var dependencies:PoolStringArray = PoolStringArray()
-		var realBaseName:String = getRealFilename(file_path)
-		dependencies.append_array(ResourceLoader.get_dependencies(realBaseName))
-		if realBaseName.get_extension() != "gd":
+		var dependencies:PoolStringArray = ResourceLoader.get_dependencies(file_path)
+		if file_path.get_extension() != "gd":
+			var fileBytes:PoolByteArray = PCKFILES[file_path].GetData
 			var bytecodeStr:String = fileBytes.hex_encode()
 			if resHex in bytecodeStr:
 				var hexArray:PoolStringArray = bytecodeStr.split(resHex)
@@ -8574,16 +8593,18 @@ class _SafeMode:
 					var hexText:String = hexArray[idx]
 					if idx > 0:
 						hexText = resHex + hexText
-						dependencies.append(fileBytes.subarray(buffer, buffer + hexText.length()/2.0 - 1).get_string_from_ascii())
+						var fn:String = fileBytes.subarray(buffer, buffer + hexText.length()/2.0 - 1).get_string_from_ascii().split("\"")[0]
+						if not fn in dependencies:
+							dependencies.append(fn)
 					buffer += hexText.length() / 2.0
-		dependancy_dictionary[realBaseName] = dependencies
+		dependancy_dictionary[file_path] = dependencies
 		for dp in dependencies:
 			if not dp in dependancy_lookup:
 				dependancy_lookup[dp] = []
-			dependancy_lookup[dp].append(realBaseName)
+			dependancy_lookup[dp].append(file_path)
 		for m in dependencies:
-			if m.get_extension() in binaryArr and not m in dependancy_dictionary:
-				__get_dependancies_for_vanilla_file(m)
+			if (m.get_extension() in binaryArr) and (not m in dependancy_dictionary):
+				get_dependancies_for_vanilla_file(m)
 	
 	func getRealFilename(base:String) -> String:
 		match base.get_extension():
@@ -8593,30 +8614,28 @@ class _SafeMode:
 				base = base.get_basename() + ".gd"
 		return base
 	
-	func __lookup_vanilla_file_dependancies(dependancy,order:Array) -> Array:
-		var out:Array = Array()
-		if dependancy in dependancy_lookup:
-				var dp = dependancy_lookup[dependancy]
-				for d in dp:
-					if not d.split("/",false)[1] == "tests":
-						if d in order:
-							var tpos = order.find(dependancy)
-							var npos = order.find(d)
-							if npos < tpos:
-								order[tpos] = d
-								order[npos] = dependancy
-						else:
-							order.append(d)
-							__lookup_vanilla_file_dependancies(d,order)
+	func __lookup_vanilla_file_dependancies(dependancy) -> PoolStringArray:
+		var out:PoolStringArray = LDA(dependancy,PoolStringArray())
+		
 		return out
 	
-	func __lookup_file_dependancies(dependancy:String,order:Array) -> Array:
+	func LDA(dependancy,order:PoolStringArray) -> PoolStringArray:
+		if dependancy in dependancy_lookup:
+			for d in dependancy_lookup[dependancy]:
+				if not d.split("/",false)[1] == "tests":
+					if not d in order:
+						order.append(d)
+						LDA(d,order)
+		return order
+	
+	func __lookup_file_dependancies(dependancy:String) -> PoolStringArray:
+		var out:PoolStringArray = PoolStringArray()
 		var deps = ResourceLoader.get_dependencies(dependancy)
 		for d in deps:
-			__lookup_vanilla_file_dependancies(d,order)
-		return []
-	
-	
+			for i in __lookup_vanilla_file_dependancies(d):
+				if not i in out:
+					out.append(i)
+		return out
 	
 
 class _Scripting:
