@@ -1466,22 +1466,22 @@ class _ConfigDriver:
 			return false
 		if check_config and config_entry_override in data_dict.keys() and data_dict[config_entry_override] is Dictionary:
 			var cfg:Dictionary = data_dict[config_entry_override]
-				var config_id : String  = cfg.get("id",cfg.get("mod",cfg.get("mod_id","")))
-				var config_section : String  = cfg.get("section","")
-				var config_setting : String  = cfg.get("entry",cfg.get("setting",cfg.get("key",cfg.get("value",cfg.get("opt","")))))
-				var invert_config:bool = cfg.get("invert_config",cfg.get("invert",false))
-				if config_id and config_section and config_setting:
-					var cfg_opt = __get_value(config_id,config_section,config_setting)
-					if cfg_opt != null:
-						var how:bool = true
-						if invert_config:
-							if cfg_opt:
-								how = false
-						else:
-							if !cfg_opt:
-								how = cfg_opt
-						if not how:
-							return false
+			var config_id : String  = cfg.get("id",cfg.get("mod",cfg.get("mod_id","")))
+			var config_section : String  = cfg.get("section","")
+			var config_setting : String  = cfg.get("entry",cfg.get("setting",cfg.get("key",cfg.get("value",cfg.get("opt","")))))
+			var invert_config:bool = cfg.get("invert_config",cfg.get("invert",false))
+			if config_id and config_section and config_setting:
+				var cfg_opt = __get_value(config_id,config_section,config_setting)
+				if cfg_opt != null:
+					var how:bool = true
+					if invert_config:
+						if cfg_opt:
+							how = false
+					else:
+						if !cfg_opt:
+							how = cfg_opt
+					if not how:
+						return false
 		if check_requirements and mod_requirements_entry_override in data_dict and data_dict[mod_requirements_entry_override] is Array:
 			var needs : Array = data_dict[mod_requirements_entry_override]
 			var can:int = 0
