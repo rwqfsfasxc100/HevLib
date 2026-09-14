@@ -682,7 +682,7 @@ class _ConfigDriver:
 		# This removes forward slashes and spaces
 		mod_id = __truncate_mod_id(mod_id)
 		# Iterates through the sections in the provided config
-		for section in configuration:
+		for section in configuration.keys():
 			# Similar process to format the section
 			# Also concatenates it with the mod id to form
 			# an identifier that fits in ini configs
@@ -691,13 +691,13 @@ class _ConfigDriver:
 			# Gets the data within this specific configuration
 			var sect_data = configuration[section]
 			
-			if not sect_name in settings:
+			if not sect_name in settings.keys():
 				# Implies a new section is being added,
 				# automatically marks for an update 
 				settings[sect_name] = {}
 				made_change = true
 			# Iterates through the section entries
-			for s in sect_data:
+			for s in sect_data.keys():
 				# Entry data
 				var sr = sect_data[s]
 				var current = settings[sect_name].get(s,null)
@@ -706,7 +706,7 @@ class _ConfigDriver:
 					# value is different to what's already in the file
 					settings[sect_name][s] = sr
 					made_change = true
-					if not sect_name in changes:
+					if not sect_name in changes.keys():
 						changes[sect_name] = []
 					changes[sect_name].append(s)
 					cfg.set_value(sect_name,s,sr)
@@ -736,7 +736,7 @@ class _ConfigDriver:
 		cfg.set_value(modSection,key,value)
 		var profile= cfg.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","default")
 		
-		if not modSection in settings:
+		if not modSection in settings.keys():
 			# Automatically mark as a new change if new parts have to be added
 			settings[modSection] = {}
 			made_change = true
@@ -765,14 +765,14 @@ class _ConfigDriver:
 		mod_id = __truncate_mod_id(mod_id)
 		if settingsHash:
 			# Hash usually means the data is already cached
-			for section in settings:
+			for section in settings.keys():
 				var split : PoolStringArray = section.split("/")
 				# Checks if the first part of the section matches the ID
 				# If they match, recurse through the section to add configs to the output
 				if split[0] == mod_id:
 					var sub : Dictionary = {}
 					var sec = settings[section].duplicate(true)
-					for key in sec:
+					for key in sec.keys():
 						sub.merge({key:sec[key]})
 					dictionary.merge({split[1]:sub})
 		else:
@@ -784,14 +784,13 @@ class _ConfigDriver:
 				pointers.l("HevLib Config File: Error loading settings %s" % error,"pointers.ConfigDriver")
 				return {}
 			var config_sections = cfg.get_sections()
-			for section in config_sections:
+			for section in config_sections.keys():
 				var split:PoolStringArray = section.split("/")
 				# Checks if the first part of the section matches the ID
 				# If they match, recurse through the section to add configs to the output
 				if split[0] == mod_id:
 					var sub : Dictionary = {}
-					var keys:Array = cfg.get_section_keys(section)
-					for key in keys:
+					for key in cfg.get_section_keys(section):
 						var value = cfg.get_value(section, key)
 						sub.merge({key:value})
 					dictionary.merge({split[1]:sub})
@@ -805,8 +804,8 @@ class _ConfigDriver:
 		# Truncate to get the section directly
 		if settingsHash:
 			# Config is cached, may as well fetch from there
-			if full in settings:
-				if key in settings[full]:
+			if full in settings.keys():
+				if key in settings[full].keys():
 					var out = settings[full][key]
 					var tout:int = typeof(out)
 					# Hard duplicating array or dictionary types to ensure no reference weirdness
@@ -825,8 +824,7 @@ class _ConfigDriver:
 				return null
 			
 			if cfg.has_section(full):
-				var keys : Array = cfg.get_section_keys(full)
-				if key in keys:
+				if key in cfg.get_section_keys(full):
 					var data = cfg.get_value(full,key)
 					return data
 				return default
@@ -983,7 +981,7 @@ class _ConfigDriver:
 		var current_config : Dictionary = __config_parse(cfg_file)
 		var incorrect_paths : Array = Array()
 		var problematic_mods : Dictionary = {}
-		for mod in mod_entries:
+		for mod in mod_entries.keys():
 			var manifest : Dictionary = mod_entries[mod]["manifest"]
 			var has_manifest:bool = manifest["has_manifest"]
 			if has_manifest:
@@ -1058,7 +1056,7 @@ class _ConfigDriver:
 		if problematic_mods:
 			var mod_error_text:String = "The following mods have issues with the currently installed mods and are unable to run as a result. This can be due to incorrect/out-of-date mod versions, missing mods, or mods that aren't compatible.\n%s\nPlease ensure all requirements are met before being able to launch the game."
 			var mod_concat:String = ""
-			for mod_name in problematic_mods:
+			for mod_name in problematic_mods.keys():
 				mod_concat += "\n%s\n" % mod_name
 				var missing_requirements = problematic_mods[mod_name].get("missing_requirements",PoolStringArray())
 				var incompatible_mods = problematic_mods[mod_name].get("incompatible_mods",PoolStringArray())
@@ -1072,22 +1070,22 @@ class _ConfigDriver:
 						mod_concat += "     -> %s\n" % i
 			pointers.NodeAccess.__exit(false,mod_error_text % mod_concat,"pointers.ConfigDriver",0.0,"",true)
 		pointers.l("config contains [%s] mods" % configs.size(),"pointers.ConfigDriver")
-		for mod in configs:
+		for mod in configs.keys():
 			var data : Dictionary = configs[mod]
 			mod = __truncate_mod_id(mod)
-			for section in data:
+			for section in data.keys():
 				var sectData : Dictionary = data[section]
 				var sect : String  = mod + "/" + __truncate_section(section)
-				if not sect in current_config:
-					current_config.merge({sect:{}})
-				for key in sectData:
+				if not sect in current_config.keys():
+					current_config[sect] = {}
+				for key in sectData.keys():
 					var key_data : Dictionary = sectData[key]
 					if typeof(key_data) == TYPE_DICTIONARY:
 						var type : String  = key_data.get("type","")
 						if not type:
 							continue
 						type = type.to_lower()
-						if key in current_config[sect]:
+						if key in current_config[sect].keys():
 							if type == "input":
 								var val : Dictionary = current_config[sect]
 								var out : Array = []
@@ -1121,14 +1119,14 @@ class _ConfigDriver:
 		c.save(profiles_dir + current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",{}).get("profile_name","Default") + ".cfg")
 		pointers.l("loaded [%s] mod configurations" % configs.size(),"pointers.ConfigDriver")
 		var actionList : Array = InputMap.get_actions()
-		for mod in configs:
+		for mod in configs.keys():
 			pointers.l("inspecting [%s]" % mod,"pointers.ConfigDriver")
 			var data = __get_config(mod)
 			pointers.l("found [%s] sections" % data.size(),"pointers.ConfigDriver")
-			for section in configs[mod]:
+			for section in configs[mod].keys():
 				pointers.l("inspecting section [%s]" % section,"pointers.ConfigDriver")
 				var sectData = configs[mod][section]
-				for key in sectData:
+				for key in sectData.keys():
 					var key_data = sectData[key]
 					pointers.l("found entry [%s] of type [%s] with a default of [%s]" % [key,key_data["type"],key_data.get("default","Null")],"pointers.ConfigDriver")
 					if key_data["type"].to_lower() == "input":
@@ -1200,7 +1198,7 @@ class _ConfigDriver:
 			if additional:
 				mdOut += " (%s)" % additional
 			return mdOut
-		elif typeof(MDM) == TYPE_STRING and MDM and MDM in pointers.ManifestV2.cached_mod_list.get("mods",{}):
+		elif typeof(MDM) == TYPE_STRING and MDM and MDM in pointers.ManifestV2.cached_mod_list.get("mods",{}).keys():
 			var zip = pointers.ManifestV2.__match_mod_path_to_zip(MDM)
 			if zip:
 				return zip.get_file()
@@ -1366,8 +1364,8 @@ class _ConfigDriver:
 		mk_c = false
 	
 	func __subscribed_changes():
-		for i in changes:
-			if i in subscriptions:
+		for i in changes.keys():
+			if i in subscriptions.keys():
 				var sub = subscriptions[i]
 				var s = i.split("/")
 				var entries = changes[i]
@@ -1390,12 +1388,12 @@ class _ConfigDriver:
 			inputnames = cached_input_config_names
 		else:
 			var ax : Dictionary = pointers.ManifestV2.__get_manifest_cache()
-			for sect in ax:
+			for sect in ax.keys():
 				var dv : Dictionary = ax[sect]
 				var dl : Dictionary = dv.get("configs",{})
-				for sec in dl:
+				for sec in dl.keys():
 					var sv : Dictionary = dl[sec]
-					for setting in sv:
+					for setting in sv.keys():
 						var data : Dictionary = sv[setting]
 						if data.get("type").to_lower() == "input":
 							var n : String  = __truncate_mod_id(dv["mod_information"]["name"])
@@ -1405,9 +1403,9 @@ class _ConfigDriver:
 								cached_input_config_names[n][sec] = []
 							cached_input_config_names[n][sec].append(setting)
 			inputnames = cached_input_config_names
-		for n in inputnames:
+		for n in inputnames.keys():
 			var nd : Dictionary = inputnames[n]
-			for sec in nd:
+			for sec in nd.keys():
 				var sc : Array = nd[sec]
 				for setting in sc:
 					var vf : Array = __get_value(n,sec,setting)
@@ -1429,9 +1427,9 @@ class _ConfigDriver:
 	func __subscribe_to_setting_change(method: String,object: Object,id: String,section: String,setting: String):
 		if object.has_method(method):
 			var top : String  = __truncate_to_setting_entry(id,section)
-			if not top in subscriptions:
+			if not top in subscriptions.keys():
 				subscriptions[top] = {}
-			if not setting in subscriptions[top]:
+			if not setting in subscriptions[top].keys():
 				subscriptions[top][setting] = []
 			var do:bool = true
 			for item in subscriptions[top][setting]:
@@ -1444,8 +1442,8 @@ class _ConfigDriver:
 	
 	func __disconnect_subscription(method: String,object: Object,id: String,section: String,setting: String):
 		var top : String  = __truncate_to_setting_entry(id,section)
-		if top in subscriptions:
-			if setting in subscriptions[top]:
+		if top in subscriptions.keys():
+			if setting in subscriptions[top].keys():
 				for item in subscriptions[top][setting]:
 					if item[0] == object:
 						if item[1] == method:
@@ -1466,45 +1464,24 @@ class _ConfigDriver:
 	func __validate_dictionary(data_dict : Dictionary,check_config : bool = true, check_requirements : bool = true, check_incompatibilities : bool = true, config_entry_override : String = "config", mod_requirements_entry_override : String = "mod_requirements", mod_incompatibilities_entry_override : String = "mod_incompatibilities"):
 		if data_dict == null:
 			return false
-		if check_config and config_entry_override in data_dict and data_dict[config_entry_override] is Dictionary:
-			var cfg : Dictionary = data_dict[config_entry_override]
-			match typeof(cfg):
-				TYPE_DICTIONARY:
-					var config_id : String  = cfg.get("id",cfg.get("mod",cfg.get("mod_id","")))
-					var config_section : String  = cfg.get("section","")
-					var config_setting : String  = cfg.get("entry",cfg.get("setting",cfg.get("key",cfg.get("value",cfg.get("opt","")))))
-					var invert_config:bool = cfg.get("invert_config",cfg.get("invert",false))
-					if config_id and config_section and config_setting:
-						var cfg_opt = __get_value(config_id,config_section,config_setting)
-						if cfg_opt != null:
-							var how:bool = true
-							if invert_config:
-								if cfg_opt:
-									how = false
-							else:
-								if !cfg_opt:
-									how = cfg_opt
-							if not how:
-								return false
-				TYPE_ARRAY:
-					for cfgr in cfg:
-						if typeof(cfgr) == TYPE_DICTIONARY:
-							var config_id : String  = cfgr.get("id",cfgr.get("mod",cfgr.get("mod_id","")))
-							var config_section : String  = cfgr.get("section","")
-							var config_setting : String  = cfgr.get("entry",cfgr.get("setting",cfgr.get("key",cfgr.get("value",cfgr.get("opt","")))))
-							var invert_config:bool = cfgr.get("invert_config",cfgr.get("invert",false))
-							if config_id and config_section and config_setting:
-								var cfg_opt = __get_value(config_id,config_section,config_setting)
-								if cfg_opt != null:
-									var how:bool = true
-									if invert_config:
-										if cfg_opt:
-											how = false
-									else:
-										if !cfg_opt:
-											how = cfg_opt
-									if not how:
-										return false
+		if check_config and config_entry_override in data_dict.keys() and data_dict[config_entry_override] is Dictionary:
+			var cfg:Dictionary = data_dict[config_entry_override]
+				var config_id : String  = cfg.get("id",cfg.get("mod",cfg.get("mod_id","")))
+				var config_section : String  = cfg.get("section","")
+				var config_setting : String  = cfg.get("entry",cfg.get("setting",cfg.get("key",cfg.get("value",cfg.get("opt","")))))
+				var invert_config:bool = cfg.get("invert_config",cfg.get("invert",false))
+				if config_id and config_section and config_setting:
+					var cfg_opt = __get_value(config_id,config_section,config_setting)
+					if cfg_opt != null:
+						var how:bool = true
+						if invert_config:
+							if cfg_opt:
+								how = false
+						else:
+							if !cfg_opt:
+								how = cfg_opt
+						if not how:
+							return false
 		if check_requirements and mod_requirements_entry_override in data_dict and data_dict[mod_requirements_entry_override] is Array:
 			var needs : Array = data_dict[mod_requirements_entry_override]
 			var can:int = 0
@@ -9341,7 +9318,7 @@ class _Translations:
 							else:
 								ml_check_data[language]["not_in_master"].append(t)
 								ml_check_data[language]["not_in_master_size"] += 1
-						if "placeholder" in v:
+						if "placeholder" in v and v.placeholder:
 							if not language in ml_check_data:
 								ml_check_data[language] = {"placeholders":[],"placeholders_size":0}
 							ml_check_data[language]["placeholders"].append(t)
