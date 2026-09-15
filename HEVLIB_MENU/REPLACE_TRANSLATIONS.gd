@@ -1747,6 +1747,14 @@ const TRANSLATIONS = {
 		"HEVLIB_CONFIG_MARK_PLACEHOLDER_TRANSLATIONS_DESC": {
 			"string": "Any translation that is marked as a placeholder within its respective\ndriver will be made obvious it is with a [placeholder] prefix.",
 			"version_hash": 685449490
+		},
+		"HEVLIB_CONFIG_SAFE_MODLET_LOADING": {
+			"string": "Resolve modlet load conflicts",
+			"version_hash": 2972641615
+		},
+		"HEVLIB_CONFIG_SAFE_MODLET_LOADING_DESC": {
+			"string": "Uses a presumed Vanilla load order heuristic to ensure that modifications made through LOAD_RESOURCES.gd are load-safe.\n\nNOTICE: May cause issues with mods loading during and after the onready phase.",
+			"version_hash": 2218953947
 		}
 	},
 	"de": {

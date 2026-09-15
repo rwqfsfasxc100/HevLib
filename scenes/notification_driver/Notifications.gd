@@ -66,6 +66,7 @@ func _ready():
 	if hl_notificationdriverhandler_uinit:
 		OS.kill(OS.get_process_id())
 	hl_notificationdriverhandler_uinit = true
+	pointers = ModLoader._savedObjects[0]
 	CurrentGame.connect("generic_notification",self,"_notification_start")
 	tween = Tween.new()
 	add_child(tween)
@@ -73,7 +74,7 @@ func _ready():
 	
 
 var vp_objects = []
-var pointers = ModLoader._savedObjects[0]
+var pointers
 var tween
 
 var customInQueue = []

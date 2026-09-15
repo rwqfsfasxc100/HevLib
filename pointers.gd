@@ -2498,7 +2498,7 @@ class _DataFormat:
 				Tool.remove(scn)
 			else:
 				if is_instance_valid(scn) and not scn.is_queued_for_deletion():
-					scn.free()
+					scn.queue_free()
 			var p : String  = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"%s\" type=\"PackedScene\" id=1]\n\n[node name=\"%s\" instance=ExtResource( 1 )]" % [scene_path,root]
 			pointers.l("Successfully found data for reloading scene with root [%s], passing to scene replacer" % root,"pointers.DataFormat")
 			__replace_scene(p,scene_path)
@@ -8083,9 +8083,66 @@ class _ManifestV2:
 					cached_icon_files.append(r)
 		return cached_icon_files
 	
-	func __load_modlets(is_onready : bool) -> PoolStringArray:
+	enum LOAD_TYPE{
+		EXTEND_SCRIPT,
+		OVERRIDE_SCRIPT,
+		REPLACE_RESOURCE
+	}
+	
+	func __load_modlets(is_onready : bool,do_safe_load : bool) -> PoolStringArray:
+		if do_safe_load:
+			pointers.DataFormat.__loadDLC()
+			var resource_paths:Array = Array()
+			for modlet in __get_modlet_files():
+				var drivers:Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(modlet)
+				if "LOAD_RESOURCES.gd" in drivers:
+					var resources : Dictionary = drivers["LOAD_RESOURCES.gd"].get("LOAD_RESOURCES",{})
+					for resource in resources.keys():
+						var subdata:Dictionary = resources[resource]
+						var is_relative:bool = resource.begins_with("res://")
+						var load_type:String = subdata.get("load_type","").to_lower()
+						if load_type.empty():
+							match load_type.get_extension():
+								"gd":
+									load_type = "script"
+								"tscn","res","tres":
+									load_type = "resource"
+						match load_type:
+							"script":
+								var path:String=resource if is_relative else(modlet.get_base_dir()+(""if resource.begins_with("/")else"/")+resource)
+								if pointers.ConfigDriver.__validate_dictionary(subdata)&&pointers.FileAccess.__file_exists(path):
+									var op=subdata.get("override_path","res:/"+path.split(modlet.get_base_dir())[1])
+									var override_path:String=op if(op.begins_with("res:/"))else("res:/"+(""if op.begins_with("/")else"/")+op)
+									if subdata.get("override",false)&&pointers.FileAccess.__file_exists(override_path):
+										resource_paths.append({"path":path,"mode":LOAD_TYPE.OVERRIDE_SCRIPT,"override_path":override_path})
+									else:
+										resource_paths.append({"path":path,"mode":LOAD_TYPE.EXTEND_SCRIPT})
+							"scene","resource":
+								var path : String = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
+								var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[1])
+								var old_path : String = old if (old.begins_with("res:/")) else ("res:/" + ("" if old.begins_with("/") else "/") + old)
+								if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
+									resource_paths.append({"path":path,"mode":LOAD_TYPE.REPLACE_RESOURCE,"old_path":old_path})
+			var requirements:PoolStringArray = PoolStringArray()
+			var order:Array = Array()
+			for f in resource_paths:
+				for i in pointers.SafeMode.__lookup_file_dependancies(f["path"]):
+					if not i in requirements:
+						requirements.append(i)
+						order.append([i,pointers.SafeMode.vanilla_load_order.find(i)])
+			order.sort_custom(self,"sortLoadOrder")
+			for i in order.size():
+				requirements[i] = order[i][0]
+			for i in resource_paths:
+				match i.mode:
+					LOAD_TYPE.EXTEND_SCRIPT:
+						pointers.DataFormat.__extend_script(i.path)
+					LOAD_TYPE.OVERRIDE_SCRIPT:
+						pointers.DataFormat.__override_script(i.path,i.override_path)
+					LOAD_TYPE.REPLACE_RESOURCE:
+						pointers.DataFormat.__replace_resource(i.path,i.old_path)
+			return requirements
 		var scenes_to_reload : PoolStringArray = PoolStringArray()
-		var providedResources:Dictionary = {}
 		pointers.DataFormat.__loadDLC()
 		for modlet in __get_modlet_files():
 			var drivers:Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(modlet)
@@ -8126,6 +8183,9 @@ class _ManifestV2:
 									pointers.DataFormat.__reload_scene(path,subdata.get("complete_reload",false))
 		pointers.DataFormat.__loadDLC()
 		return scenes_to_reload
+	
+	func sortLoadOrder(a:Array,b:Array) -> bool:
+		return a[1] < b[1]
 	
 	var disabledModletCache:Dictionary = {}
 	
@@ -8499,18 +8559,24 @@ class _SafeMode:
 		regex.compile(pointers.DataFormat.crcTables.B10.get_string_from_utf8())
 	
 	var validation_check_path:String = "user://cache/.HevLib_Cache/SafeMode/recache_validation.json"
+	var pck_file_paths_store:String = "user://cache/.HevLib_Cache/SafeMode/pck_file_paths.json"
+	var vanilla_load_order_store:String = "user://cache/.HevLib_Cache/SafeMode/vanilla_load_order.json"
+	var dependancy_data_store:String = "user://cache/.HevLib_Cache/SafeMode/dependancy_data.json"
+	var dependancy_lookup_store:String = "user://cache/.HevLib_Cache/SafeMode/dependancy_lookup.json"
 	
 	func ready():
-		PCKFILES = pointers.FolderAccess.__get_vanilla_script_and_scene_data()
-		vanilla_load_order=PCKFILES.keys()
-		PCKNAMES = PoolStringArray(vanilla_load_order)
 		var vanilla_version:PoolIntArray = pointers.DataFormat.__get_vanilla_version()
 		var validation_check:Dictionary = Dictionary()
 		if file.file_exists(validation_check_path):
 			file.open(validation_check_path,File.READ)
 			validation_check = JSON.parse(file.get_as_text()).result
 			file.close()
-		if not deep_equal(validation_check.get("vanilla_version",PoolIntArray([1,0,0])),vanilla_version):
+		if !deep_equal(PoolIntArray(validation_check.get("vanilla_version",PoolIntArray([1,0,0]))),vanilla_version) or !file.file_exists(validation_check_path) or !file.file_exists(pck_file_paths_store) or !file.file_exists(vanilla_load_order_store) or !file.file_exists(dependancy_data_store) or !file.file_exists(dependancy_lookup_store) or pointers.ManifestV2.haveModsChanged:
+			pointers.l("Game has updated or cache is missing, rebuilding file info cache.")
+			var timerStart:int = Time.get_ticks_usec()
+			PCKFILES = pointers.FolderAccess.__get_vanilla_script_and_scene_data()
+			vanilla_load_order=PCKFILES.keys()
+			PCKNAMES = PoolStringArray(vanilla_load_order)
 			validation_check["vanilla_version"] = vanilla_version
 			file.open(validation_check_path,File.WRITE)
 			file.store_string(JSON.print(validation_check))
@@ -8532,7 +8598,35 @@ class _SafeMode:
 						idx = 0
 						continue
 				idx += 1
-			
+			file.open(pck_file_paths_store,File.WRITE)
+			file.store_string(JSON.print(PCKNAMES))
+			file.close()
+			file.open(vanilla_load_order_store,File.WRITE)
+			file.store_string(JSON.print(vanilla_load_order))
+			file.close()
+			file.open(dependancy_data_store,File.WRITE)
+			file.store_string(JSON.print(dependancy_dictionary))
+			file.close()
+			file.open(dependancy_lookup_store,File.WRITE)
+			file.store_string(JSON.print(dependancy_lookup))
+			file.close()
+			var timerEnd:int = Time.get_ticks_usec()
+			pointers.l("Cache rebuilt in %d.%03d ms" % [int(floor((timerEnd-timerStart) / 1000.0)),(timerEnd-timerStart) % 1000])
+		else:
+			file.open(pck_file_paths_store,File.READ)
+			PCKNAMES = JSON.parse(file.get_as_text()).result
+			file.close()
+			file.open(vanilla_load_order_store,File.READ)
+			vanilla_load_order = JSON.parse(file.get_as_text()).result
+			file.close()
+			file.open(dependancy_data_store,File.READ)
+			dependancy_dictionary = JSON.parse(file.get_as_text()).result
+			file.close()
+			file.open(dependancy_lookup_store,File.READ)
+			dependancy_lookup = JSON.parse(file.get_as_text()).result
+			file.close()
+		
+		
 		if not OS.has_feature("editor"):
 			safeCheck = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading")
 			if safeCheck:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_ENABLED"),"pointers.SafeMode")

@@ -36,7 +36,7 @@ const MOD_PRIORITY = INF
 const MOD_NAME = "HevLib"
 const MOD_VERSION_MAJOR = 1
 const MOD_VERSION_MINOR = 15
-const MOD_VERSION_BUGFIX = 51
+const MOD_VERSION_BUGFIX = 52
 const MOD_VERSION_METADATA = ""
 const MOD_IS_LIBRARY = true
 const LIBRARY_HIDDEN_BY_DEFAULT = false
@@ -47,6 +47,8 @@ var file = File.new()
 var pointerDir:String = modPath + "pointers.gd"
 var correct = ResourceLoader.exists(pointerDir)
 var HevLibModMain = true
+var reload_scenes:Array = Array()
+
 func _init(modLoader = ModLoader):
 	if correct:
 		pointers = modLoader._savedObjects[0]
@@ -65,6 +67,8 @@ func _init(modLoader = ModLoader):
 		replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
 		replaceScene("scenes/notification_driver/Notifications.tscn","res://achievement/Notifications.tscn")
 		installScriptExtension("scripts/transit_tips/TransitTip.gd")
+		if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_modlet_loading"):
+			reload_scenes = pointers.ManifestV2.__load_modlets(false,true)
 	else:
 		Debug.l("Folder structure not correct, exiting HevLib load")
 	
@@ -90,6 +94,9 @@ var modlet_toggle_restart_path = "user://cache/.Mod_Menu_2_Cache/updates/modlet_
 
 func _ready():
 	if correct:
+		for old_path in reload_scenes:
+			if ResourceLoader.has_cached(old_path) and not old_path.get_extension() == "gd":
+				pointers.DataFormat.__reload_scene(old_path)
 		l("Readying")
 		var p = ProjectSettings.get_setting("locale/translations")
 		for i in p:

@@ -11,7 +11,7 @@ credits=PoolStringArray( "HEVLIB_CREDITS_CONTRIBUTORS_HEADER", "HEVLIB_CREDITS_C
 
 version_major=1
 version_minor=15
-version_bugfix=51
+version_bugfix=52
 
 [tags]
 
@@ -196,6 +196,13 @@ HEVLIB_CONFIG_SECTION_DRIVERS={
 "display_order_position": 10,
 "name": "HEVLIB_CONFIG_SAFE_MOD_LOADING",
 "require_restart": true,
+"type": "bool"
+},
+"safe_modlet_loading": {
+"default": true,
+"description": "HEVLIB_CONFIG_SAFE_MODLET_LOADING_DESC",
+"display_order_position": 11,
+"name": "HEVLIB_CONFIG_SAFE_MODLET_LOADING",
 "type": "bool"
 },
 "show_all_libraries_in_dlclist": {
