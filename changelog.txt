@@ -1,6 +1,6 @@
 [1.15.53]
 
-1=* Fixed dependancy resolver taking 2+ minutes to cache dependancies due to an unsanitized search of vanilla files.
+1=* Fixed dependency resolver taking 2+ minutes to cache dependancies due to an unsanitized search of vanilla files.
 
 [1.15.52]
 
