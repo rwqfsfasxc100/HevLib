@@ -1,3 +1,25 @@
+[1.15.52]
+
+1=* Added `Resolve modlet load conflicts`
+1.1=* When enabled, any resources that are dependent on any scripts, scenes, or resources modified by a modlet's LOAD_RESOURCES.gd driver script would be reloaded in order of the requirements tree to ensure that what one mod loads doesn't block another mod's modifications.
+1.2=* 
+2=* Removed unused code to dictionary validations for arrays, despite it never being reachable ever since arrays became unsupported.
+2.1=* It also makes it slightly faster
+3=* Fixed translations being marked as placeholder if the `placeholder` entry existed within the item's data, even when false
+4=* LOAD_RESOURCES.gd can now infer load type if it is omitted.
+4.1=* NOTE: Does not work for `reload` type.
+5=* Updated property editor to add sorting to arrays and dictionaries, and improved sorting when collapsed/expanded
+6=* All store bytes in buffer methods now have the buffer argument default to an empty byte array to simplify the creation of small byte arrays from an integer
+7=* Improved all code iterating over an integer to avoid the array creation step wherever possible.
+8=* Fixed script shadow tool being broken in recent updates
+9=* Added `FileAccess`.`__get_real_filename_from_compiled_resource`
+9.1=* Gets the base filename of a `.gdc` or `.converted.res` file
+10=* `FolderAccess`.`__get_vanilla_script_and_scenes` now properly works on editor builds assuming GDRE's `.autoconverted` directory is kept intact
+11=* The cache is now no longer unnecessarily wiped
+12=* Improved logging when installing mod updates
+13=* Fixed crash caused by the currently playing display
+14=* Updated translations and improved equipment load times
+
 [1.15.51]
 
 1=* Added handling for placeholder translations
@@ -577,7 +599,7 @@
 6=* SAVE_BUTTONS.gd can now be prevented from adding a button based on mod availability
 7=* MODIFY_INTERNALS.gd now can be disabled with config or mod availability
 8=* Drivers instanced through subdriver process within an ADD_EQUIPMENT_ITEMS.gd entry now go through dictionary validation to be added
-9=* LOAD_CONFIGS.gd entries can now add `config`, `mod_requirements`, or `mod_incompatibilities` entries to limit loading of certain parts of a modlet
+9=* LOAD_RESOURCES.gd entries can now add `config`, `mod_requirements`, or `mod_incompatibilities` entries to limit loading of certain parts of a modlet
 10=* No longer saving a 'last hash' file to cache since it does not serve any functional purpose
 
 [1.14.25]
