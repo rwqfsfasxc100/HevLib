@@ -2041,17 +2041,17 @@ class _DataFormat:
 		var x:float = point[0]
 		var y:float = point[1]
 		return Vector2((x*cos(angle))-(y*sin(angle)),(y*cos(angle))+(x*sin(angle)))
-	
+	var vanilla_version : PoolIntArray = PoolIntArray([1,0,0])
 	func __get_vanilla_version() -> PoolIntArray:
-		var version : PoolIntArray = PoolIntArray([1,0,0])
-		var lb : Node = load("res://VersionLabel.tscn").instance()
-		var textData : PoolStringArray  = lb.text.split(".",false)
-		lb.free()
-		if textData.size() > 2:
-			version[0] = int(textData[0])
-			version[1] = int(textData[1])
-			version[2] = int(textData[2])
-		return version
+		if deep_equal(vanilla_version, PoolIntArray([1,0,0])):
+			var lb : Node = load("res://VersionLabel.tscn").instance()
+			var textData : PoolStringArray  = lb.text.split(".",false)
+			lb.free()
+			if textData.size() > 2:
+				vanilla_version[0] = int(textData[0])
+				vanilla_version[1] = int(textData[1])
+				vanilla_version[2] = int(textData[2])
+		return vanilla_version
 	
 	func __sift_dictionary(dictionary: Dictionary,search_keys: Array) -> Array:
 		var returning_keys : Array = []
@@ -3354,6 +3354,8 @@ class _Equipment:
 	
 	var version : PoolIntArray = PoolIntArray([1,0,0])
 	
+	var validation_check_path:String = "user://cache/.HevLib_Cache/SafeMode/recache_validation.json"
+	
 	func __make_upgrades_scene():
 		
 		var exhaust_cache_path : String = "user://cache/.HevLib_Cache/AuxAndThrusterDriver/"
@@ -3361,6 +3363,7 @@ class _Equipment:
 		
 		version = pointers.DataFormat.__get_vanilla_version()
 		pointers.l("observed game version of %s" % str(version),"pointers.Equipment")
+		
 		var UpgradeMenu : Node = load("res://enceladus/Upgrades.tscn").instance()
 		var nodes_parent:Node = UpgradeMenu.get_node("VB/MarginContainer/ScrollContainer/MarginContainer/Items")
 		var vanilla_slot_names : Array = []
@@ -4346,6 +4349,10 @@ class _Equipment:
 			for dp in data:
 				weaponslot_string = weaponslot_string + "\n" + dp[0] + " = " + var2str(dp[1])
 		
+		file.open(validation_check_path,File.READ)
+		var validation_check:Dictionary = JSON.parse(file.get_as_text()).result
+		file.close()
+		
 		for data in AUX_POWER_AND_THRUSTERS:
 			
 			var equipSlots : Array = data.get("slots",[])
@@ -4372,28 +4379,20 @@ class _Equipment:
 					
 					pointers.FolderAccess.__check_folder_exists(auxTypePath)
 					
-					var exhaust_text : String = make_exhaust_scene(data,sys)
+					var this_thruster_path : String = auxTypePath + "/" + sys + "_thruster.tscn"
+					
 					
 					var this_exhaust_path : String = auxTypePath + "/" + sys + "_exhaust.tscn"
+					var exhaust_text : String = make_exhaust_scene(data,sys)
 					file.open(this_exhaust_path,File.WRITE)
 					file.store_string(exhaust_text)
 					file.close()
-					var exhaust_scn = load(this_exhaust_path).instance()
-					var exhaust_pck = PackedScene.new()
-					exhaust_pck.pack(exhaust_scn)
-					ResourceSaver.save(this_exhaust_path,exhaust_pck)
-					exhaust_scn.free()
 					
 					var thruster_scene : String = make_thruster_scene(data,sys,aux_type,exhaust_cache_path)
-					var this_thruster_path : String = auxTypePath + "/" + sys + "_thruster.tscn"
 					file.open(this_thruster_path,File.WRITE)
 					file.store_string(thruster_scene)
 					file.close()
-					var thruster_scn = load(this_thruster_path).instance()
-					var thruster_pck = PackedScene.new()
-					thruster_pck.pack(thruster_scn)
-					ResourceSaver.save(this_thruster_path,thruster_pck)
-					thruster_scn.free()
+					
 		var lim_header : String  = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]"
 		var lim_item : String  = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\"]"
 		ship_limitation_string = lim_header
@@ -4466,7 +4465,7 @@ class _Equipment:
 		var cached_exhaust_path : String = this_sys_path + "_exhaust.tscn"
 		var cached_tex_path : String = this_sys_path + "_texture_%s.res"
 		
-		var thruster_header : String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://sfx/thruster.tscn\" type=\"PackedScene\" id=1]"
+		var thruster_header : String = "[gd_scene load_steps=%d format=2]\n\n[ext_resource path=\"res://sfx/thruster.tscn\" type=\"PackedScene\" id=1]"
 		var nozzle_footer : String = "[editable path=\"nozzle\"]"
 		var extra_nozzle_footer : String = "[editable path=\"%s\"]"
 		
@@ -4866,19 +4865,21 @@ class _Equipment:
 				ext_entries.append(nodeExt)
 				nodes_to_add.append(nodeId)
 		
-		var header_compile : String = thruster_header
-		for i in ext_entries:
-			header_compile += "\n" + i
+		var header_compile : String = ""
+		if ext_entries:
+			header_compile = thruster_header % (ext_entries.size() + 3)
+			for i in ext_entries:
+				header_compile += "\n" + i
 		
 		var nozzle_compile : String = ""
 		for i in nozzle_groups:
-			nozzle_compile += "\n" + i
+				nozzle_compile += i
 		
 		var extra_node_compile : String = ""
 		for i in nodes_to_add:
-			extra_node_compile += "\n" + i
+			extra_node_compile += i
 		
-		var footer : String = "\n\n"
+		var footer : String = "\n"
 		for i in footer_groups:
 			footer += "\n" + i
 		
@@ -8489,35 +8490,49 @@ class _SafeMode:
 	var dependancy_lookup:Dictionary = Dictionary()
 	var vanilla_load_order:Array = Array()
 	
-	var args = OS.get_cmdline_args()
-	var file = File.new()
-	var regex = RegEx.new()
+	var args:Array = OS.get_cmdline_args()
+	var file:File = File.new()
+	var regex:RegEx = RegEx.new()
 	var pointers
 	func _init(p):
 		pointers = p
 		regex.compile(pointers.DataFormat.crcTables.B10.get_string_from_utf8())
 	
+	var validation_check_path:String = "user://cache/.HevLib_Cache/SafeMode/recache_validation.json"
+	
 	func ready():
 		PCKFILES = pointers.FolderAccess.__get_vanilla_script_and_scene_data()
 		vanilla_load_order=PCKFILES.keys()
 		PCKNAMES = PoolStringArray(vanilla_load_order)
-#		for f in PCKNAMES:get_dependancies_for_vanilla_file(f)
-#		var idx:int = 0
-#		while idx < vanilla_load_order.size():
-#			var item = vanilla_load_order[idx]
-#			var requirements = dependancy_dictionary.get(item,PoolStringArray())
-#			if requirements:
-#				var rq:bool = false
-#				for r in requirements:
-#					var pos = vanilla_load_order.find(r)
-#					if pos >= idx:
-#						vanilla_load_order.remove(pos)
-#						vanilla_load_order.insert(idx-1,r)
-#						rq = true
-#				if rq:
-#					idx = 0
-#					continue
-#			idx += 1
+		var vanilla_version:PoolIntArray = pointers.DataFormat.__get_vanilla_version()
+		var validation_check:Dictionary = Dictionary()
+		if file.file_exists(validation_check_path):
+			file.open(validation_check_path,File.READ)
+			validation_check = JSON.parse(file.get_as_text()).result
+			file.close()
+		if not deep_equal(validation_check.get("vanilla_version",PoolIntArray([1,0,0])),vanilla_version):
+			validation_check["vanilla_version"] = vanilla_version
+			file.open(validation_check_path,File.WRITE)
+			file.store_string(JSON.print(validation_check))
+			file.close()
+			for f in PCKNAMES:get_dependancies_for_vanilla_file(f)
+			var idx:int = 0
+			while idx < vanilla_load_order.size():
+				var item = vanilla_load_order[idx]
+				var requirements = dependancy_dictionary.get(item,PoolStringArray())
+				if requirements:
+					var rq:bool = false
+					for r in requirements:
+						var pos = vanilla_load_order.find(r)
+						if pos >= idx:
+							vanilla_load_order.remove(pos)
+							vanilla_load_order.insert(idx-1,r)
+							rq = true
+					if rq:
+						idx = 0
+						continue
+				idx += 1
+			
 		if not OS.has_feature("editor"):
 			safeCheck = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading")
 			if safeCheck:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_ENABLED"),"pointers.SafeMode")
