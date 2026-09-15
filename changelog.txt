@@ -2,7 +2,8 @@
 
 1=* Added `Resolve modlet load conflicts`
 1.1=* When enabled, any resources that are dependent on any scripts, scenes, or resources modified by a modlet's LOAD_RESOURCES.gd driver script would be reloaded in order of the requirements tree to ensure that what one mod loads doesn't block another mod's modifications.
-1.2=* 
+1.2=* Note: This may have issues with mods modifying resources during and after the onready phase
+1.3=* Enabled by default.
 2=* Removed unused code to dictionary validations for arrays, despite it never being reachable ever since arrays became unsupported.
 2.1=* It also makes it slightly faster
 3=* Fixed translations being marked as placeholder if the `placeholder` entry existed within the item's data, even when false
