@@ -2046,7 +2046,7 @@ class _DataFormat:
 		if deep_equal(vanilla_version, PoolIntArray([1,0,0])):
 			var lb : Node = load("res://VersionLabel.tscn").instance()
 			var textData : PoolStringArray  = lb.text.split(".",false)
-			lb.free()
+			lb.queue_free()
 			if textData.size() > 2:
 				vanilla_version[0] = int(textData[0])
 				vanilla_version[1] = int(textData[1])
@@ -5863,12 +5863,6 @@ class _FolderAccess:
 						"Array containing all valid file paths that match the extensions criteria."
 					]
 				},
-				"__get_vanilla_script_and_scene_data":{
-					"description":"Fetches all vanilla files from the PCK file and the file's data. NOTE: editor builds MUST keep GDRE's .autoconverted directory since no PCK file is readily available to source data from. To get PCK data in-editor, use Zip.__load_pck.",
-					"return":[
-						"Dictionary containing all valid files. File data is a PoolByteArray under the `GetData` index"
-					]
-				},
 				"__get_vanilla_script_and_scenes":{
 					"description":"Fetches all vanilla scripts and scenes from the PCK file. NOTE: editor builds MUST keep GDRE's .autoconverted directory since no PCK file is readily available to source data from. To get PCK data in-editor, use Zip.__load_pck.",
 					"return":[
@@ -5989,10 +5983,11 @@ class _FolderAccess:
 					out.append(f)
 		return Array(out)
 	
-	func __get_vanilla_script_and_scene_data() -> Dictionary:
+	func __get_vanilla_script_and_scenes() -> PoolStringArray:
+		var findExt:PoolStringArray = PoolStringArray(["res","gdc","material"])
 		if OS.has_feature("editor"):
-			var out:Dictionary = {}
-			for i in __get_files_with_extensions("res://.autoconverted/",PoolStringArray(["res","gdc"])):
+			var out:PoolStringArray = PoolStringArray()
+			for i in __get_files_with_extensions("res://.autoconverted/",findExt):
 				var fp = i.replace("/.autoconverted/","/")
 				match fp.get_extension():
 					"res":
@@ -6001,20 +5996,19 @@ class _FolderAccess:
 					"gdc":
 						fp = (fp.get_basename() + ".gd")
 				if file.file_exists(fp):
-					file.open(fp,File.READ)
-					out[fp] = {"GetData":file.get_buffer(file.get_len())}
-					file.close()
+					out.append(fp)
 			return out
 		else:
 			var gameInstallDirectory = OS.get_executable_path().get_basename() + ".pck"
 			if file.file_exists(gameInstallDirectory):
-				return pointers.Zip.__load_pck(gameInstallDirectory,false)
+				var out:PoolStringArray = PoolStringArray()
+				for i in pointers.Zip.__load_pck(gameInstallDirectory,true):
+					if i.get_extension() in findExt:
+						out.append(i)
+				return out
 			else:
 				pointers.NodeAccess.__exit(false,"CRITICAL ERROR! Cannot find the game's .PCK file, and is a likely indicator that your game is corrupted.\n\nPlease validate your game files. If this issue persists, please make a bug report at [https://forms.gle/RmC4Zgonp6frFgnK7] so this issue can be fixed as soon as possible.","pointers.FolderAccess",0.0,"",true)
-				return {}
-	
-	func __get_vanilla_script_and_scenes() -> PoolStringArray:
-		return PoolStringArray(__get_vanilla_script_and_scene_data().keys())
+				return PoolStringArray()
 		
 	
 
@@ -8540,7 +8534,6 @@ class _SafeMode:
 			}
 		}
 	
-	var PCKFILES:Dictionary = Dictionary()
 	var PCKNAMES:PoolStringArray = PoolStringArray()
 	var safeCheck:bool = false
 	var safeCheckTriggered:bool = false
@@ -8574,9 +8567,8 @@ class _SafeMode:
 		if !deep_equal(PoolIntArray(validation_check.get("vanilla_version",PoolIntArray([1,0,0]))),vanilla_version) or !file.file_exists(validation_check_path) or !file.file_exists(pck_file_paths_store) or !file.file_exists(vanilla_load_order_store) or !file.file_exists(dependancy_data_store) or !file.file_exists(dependancy_lookup_store) or pointers.ManifestV2.haveModsChanged:
 			pointers.l("Game has updated or cache is missing, rebuilding file info cache.")
 			var timerStart:int = Time.get_ticks_usec()
-			PCKFILES = pointers.FolderAccess.__get_vanilla_script_and_scene_data()
-			vanilla_load_order=PCKFILES.keys()
-			PCKNAMES = PoolStringArray(vanilla_load_order)
+			PCKNAMES = pointers.FolderAccess.__get_vanilla_script_and_scenes()
+			vanilla_load_order=Array(PCKNAMES)
 			validation_check["vanilla_version"] = vanilla_version
 			file.open(validation_check_path,File.WRITE)
 			file.store_string(JSON.print(validation_check))
@@ -8683,7 +8675,9 @@ class _SafeMode:
 			return
 		var dependencies:PoolStringArray = ResourceLoader.get_dependencies(file_path)
 		if file_path.get_extension() != "gd":
-			var fileBytes:PoolByteArray = PCKFILES[file_path].GetData
+			file.open(file_path,File.READ)
+			var fileBytes:PoolByteArray = file.get_buffer(file.get_len())
+			file.close()
 			var bytecodeStr:String = fileBytes.hex_encode()
 			if resHex in bytecodeStr:
 				var hexArray:PoolStringArray = bytecodeStr.split(resHex)
