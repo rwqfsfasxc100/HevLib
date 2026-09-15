@@ -1,3 +1,8 @@
+[1.15.54]
+
+1=* Bridged gap between editor and release filesystems for forming the check order.
+2=* Added cache versioning, where updates to HevLib changing this would cause the cache to be rebuilt, even if the game's version did not change.
+
 [1.15.53]
 
 1=* Fixed dependency resolver taking 2+ minutes to cache dependencies due to an unsanitized search of vanilla files.

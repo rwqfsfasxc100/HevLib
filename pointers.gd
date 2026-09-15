@@ -86,6 +86,8 @@ var Classes = [
 
 var copyrights = "© 2024-2026 Benjamin Buckhurst a.k.a. __hev. All rights reserved."
 
+const HEVLIB_CACHE_VERSION : int = 1
+
 var logging_frame_interval = 0
 var logging_current_frame_timer = 0
 func _physics_process(delta:float):
@@ -5984,7 +5986,7 @@ class _FolderAccess:
 		return Array(out)
 	
 	func __get_vanilla_script_and_scenes() -> PoolStringArray:
-		var findExt:PoolStringArray = PoolStringArray(["res","gdc","material"])
+		var findExt:PoolStringArray = PoolStringArray(["res","gdc"])
 		if OS.has_feature("editor"):
 			var out:PoolStringArray = PoolStringArray()
 			for i in __get_files_with_extensions("res://.autoconverted/",findExt):
@@ -5995,16 +5997,22 @@ class _FolderAccess:
 							fp = (fp.get_basename().get_basename())
 					"gdc":
 						fp = (fp.get_basename() + ".gd")
-				if file.file_exists(fp):
+				if ResourceLoader.exists(fp):
 					out.append(fp)
 			return out
 		else:
 			var gameInstallDirectory = OS.get_executable_path().get_basename() + ".pck"
 			if file.file_exists(gameInstallDirectory):
 				var out:PoolStringArray = PoolStringArray()
-				for i in pointers.Zip.__load_pck(gameInstallDirectory,true):
-					if i.get_extension() in findExt:
-						out.append(i)
+				for fp in pointers.Zip.__load_pck(gameInstallDirectory,true):
+					match fp.get_extension():
+						"res":
+							if fp.get_basename().get_extension() == "converted":
+								fp = (fp.get_basename().get_basename())
+						"gdc":
+							fp = (fp.get_basename() + ".gd")
+					if ResourceLoader.exists(fp):
+						out.append(fp)
 				return out
 			else:
 				pointers.NodeAccess.__exit(false,"CRITICAL ERROR! Cannot find the game's .PCK file, and is a likely indicator that your game is corrupted.\n\nPlease validate your game files. If this issue persists, please make a bug report at [https://forms.gle/RmC4Zgonp6frFgnK7] so this issue can be fixed as soon as possible.","pointers.FolderAccess",0.0,"",true)
@@ -8564,12 +8572,13 @@ class _SafeMode:
 			file.open(validation_check_path,File.READ)
 			validation_check = JSON.parse(file.get_as_text()).result
 			file.close()
-		if !deep_equal(PoolIntArray(validation_check.get("vanilla_version",PoolIntArray([1,0,0]))),vanilla_version) or !file.file_exists(validation_check_path) or !file.file_exists(pck_file_paths_store) or !file.file_exists(vanilla_load_order_store) or !file.file_exists(dependancy_data_store) or !file.file_exists(dependancy_lookup_store) or pointers.ManifestV2.haveModsChanged:
+		if validation_check.get("hevlib_cache_version",-1) != pointers.HEVLIB_CACHE_VERSION or !deep_equal(PoolIntArray(validation_check.get("vanilla_version",PoolIntArray([1,0,0]))),vanilla_version) or !file.file_exists(validation_check_path) or !file.file_exists(pck_file_paths_store) or !file.file_exists(vanilla_load_order_store) or !file.file_exists(dependancy_data_store) or !file.file_exists(dependancy_lookup_store) or pointers.ManifestV2.haveModsChanged:
 			pointers.l("Game has updated or cache is missing, rebuilding file info cache.")
 			var timerStart:int = Time.get_ticks_usec()
 			PCKNAMES = pointers.FolderAccess.__get_vanilla_script_and_scenes()
 			vanilla_load_order=Array(PCKNAMES)
 			validation_check["vanilla_version"] = vanilla_version
+			validation_check["hevlib_cache_version"] = pointers.HEVLIB_CACHE_VERSION
 			file.open(validation_check_path,File.WRITE)
 			file.store_string(JSON.print(validation_check))
 			file.close()
@@ -8584,7 +8593,7 @@ class _SafeMode:
 						var pos = vanilla_load_order.find(r)
 						if pos >= idx:
 							vanilla_load_order.remove(pos)
-							vanilla_load_order.insert(idx-1,r)
+							vanilla_load_order.insert(idx,r)
 							rq = true
 					if rq:
 						idx = 0
@@ -8670,12 +8679,16 @@ class _SafeMode:
 	
 	var resHex:String = "res://".to_ascii().hex_encode()
 	var binaryArr:PoolStringArray = PoolStringArray(["tres","tscn","gd"])
+	var deeperSearch:PoolStringArray = PoolStringArray(["tres","tscn"])
 	func get_dependancies_for_vanilla_file(file_path:String):
 		if (not file_path in PCKNAMES) or (file_path in dependancy_dictionary):
 			return
 		var dependencies:PoolStringArray = ResourceLoader.get_dependencies(file_path)
-		if file_path.get_extension() != "gd":
-			file.open(file_path,File.READ)
+		if file_path.get_extension() in deeperSearch:
+			if not OS.has_feature("editor"):
+				file.open(file_path + ".converted.res",File.READ)
+			else:
+				file.open(file_path,File.READ)
 			var fileBytes:PoolByteArray = file.get_buffer(file.get_len())
 			file.close()
 			var bytecodeStr:String = fileBytes.hex_encode()
@@ -8688,7 +8701,7 @@ class _SafeMode:
 						hexText = resHex + hexText
 						var fn:String = fileBytes.subarray(buffer, buffer + hexText.length()/2.0 - 1).get_string_from_ascii().split("\"")[0]
 						if not fn in dependencies:
-							dependencies.append(fn)
+							dependencies.append(getRealFilename(fn))
 					buffer += hexText.length() / 2.0
 		dependancy_dictionary[file_path] = dependencies
 		for dp in dependencies:
