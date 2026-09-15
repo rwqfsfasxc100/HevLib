@@ -46,14 +46,16 @@ var modPath:String = get_script().resource_path.get_base_dir() + "/"
 
 var _savedObjects := []
 
-var cache_dir:String = "user://cache/.HevLib_Cache"
 var variables_folder:String = "user://cache/.HevLib_Cache/Variable_Fetch/"
+var validation_check_path:String = "user://cache/.HevLib_Cache/SafeMode/recache_validation.json"
 
 var file:File = File.new()
 var directory:Directory = Directory.new()
 var pointers_dir:String = modPath.get_base_dir().get_base_dir().get_base_dir() + "/pointers.gd"
 var correct:bool = ResourceLoader.exists(pointers_dir)
 var pointers = null
+
+var do_safe_load:bool = true
 
 func _init(modLoader : ModLoader = ModLoader):
 	if not correct:
@@ -71,14 +73,17 @@ func _init(modLoader : ModLoader = ModLoader):
 		modLoader._savedObjects=new_objects
 	else:modLoader._savedObjects.append(pointers)
 	l("Initializing Equipment Driver")
-	pointers.FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/")
+	pointers.FolderAccess.__recursive_delete(variables_folder)
 	directory.make_dir_recursive(variables_folder)
+	directory.make_dir_recursive(validation_check_path.get_base_dir())
 	pointers.FileAccess.__load_precached_mods()
-	
-#	testing()
 	
 	pointers.ConfigDriver.__load_configs()
 	pointers.Translations.__inject_translations()
+	do_safe_load = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_modlet_loading")
+	
+#	testing()
+	
 	pointers.SafeMode.__handle_exit_for_file_checks()
 	
 	installScriptExtension("../notification_driver/CurrentGame.gd")
@@ -129,9 +134,9 @@ func _init(modLoader : ModLoader = ModLoader):
 	installScriptExtension("ShipModificationDriver/InternalStorageMod.gd")
 
 	installScriptExtension("../better_title_screen/SaveSlotButton.gd")
-	
-	for old_path in pointers.ManifestV2.__load_modlets(false):
-		pointers.DataFormat.__reload_scene(old_path)
+	if not do_safe_load:
+		for old_path in pointers.ManifestV2.__load_modlets(false,false):
+			pointers.DataFormat.__reload_scene(old_path)
 var libid = "hev.LIBRARY"
 func _ready():
 	if not correct:
@@ -150,9 +155,9 @@ func _ready():
 	replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")
 
 	replaceScene("../minerals/multiminerals/AsteroidField.tscn","res://AsteroidField.tscn")
-	
-	for old_path in pointers.ManifestV2.__load_modlets(true):
-		pointers.DataFormat.__reload_scene(old_path)
+	if not do_safe_load:
+		for old_path in pointers.ManifestV2.__load_modlets(true,false):
+			pointers.DataFormat.__reload_scene(old_path)
 	l("Ready")
 
 # Mod update checking
@@ -320,20 +325,19 @@ func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
 	pointers.l(msg,line)
 
 func testing():
-	file.open("C:/Program Files (x86)/Steam/steamapps/common/dV Rings of Saturn/mods/HevLib.zip",File.READ)
-	var buffer = file.get_buffer(file.get_len())
-	file.close()
+#	file.open("C:/Program Files (x86)/Steam/steamapps/common/dV Rings of Saturn/mods/HevLib.zip",File.READ)
+#	var buffer = file.get_buffer(file.get_len())
+#	file.close()
 #	var files = pointers.Zip.__extract_files_from_zip_buffer(buffer,"user://dump")
 #	var files = pointers.Zip.__read_select_files_from_zip_buffer(buffer,PoolStringArray(["HevLib/ModMain.gd"]))
 	
 #	var nb = pointers.DataFormat.__store_32_in_buffer(0x04034b50,PoolByteArray())
-	var t1 = Time.get_ticks_usec()
-	pointers.Zip.__create_zip("user://dump.zip",{"test.zip":buffer},false)
-	var t2 = Time.get_ticks_usec()
-	print(t2-t1)
-#	pointers.Zip.__write_pck("user://test_pack.pck",{"res://test.tscn":"TEST DATA!"})
+	
+#	var t1 = Time.get_ticks_usec()
+#	pointers.Zip.__create_zip("user://dump.zip",{"test.zip":buffer},false)
+#	var t2 = Time.get_ticks_usec()
+#	print(t2-t1)
 #	var pck = pointers.Zip.__load_pck("user://test_pack.pck")["res://test.tscn"]["GetData"].get_string_from_utf8()
 #	var pck = pointers.Zip.__load_pck("C:/Program Files (x86)/Steam/steamapps/common/dV Rings of Saturn/dlc/032_here-be-dragons.pck",true)
-	
 	
 	breakpoint
