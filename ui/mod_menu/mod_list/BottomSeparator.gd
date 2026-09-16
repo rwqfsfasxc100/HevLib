@@ -41,7 +41,7 @@ func _visibility_changed():
 	modify()
 	
 func modify():
-	rect_min_size.y = 200
+	rect_min_size.y = 300
 	var pos = get_parent().get_child_count()
 	get_parent().call_deferred("move_child",self,pos)
 	if close_button:
