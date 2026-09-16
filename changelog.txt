@@ -1,6 +1,6 @@
 [1.16.0]
 
-1=* Added Discord Rich Presense
+1=* Added Discord Rich Presence
 1.1=* Successor to the Delta-V Discord RPC mod, this time without the need for an extra application.
 1.2=* The HevLib Discord RPC module must be installed instead to provide the RPC library.
 1.3=* Can be disabled in the config.
