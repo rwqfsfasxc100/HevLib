@@ -83,7 +83,7 @@ func _init(modLoader : ModLoader = ModLoader):
 	pointers.DynamicLibraryLoader.ready()
 	do_safe_load = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_modlet_loading")
 	
-	testing()
+#	testing()
 	
 	pointers.SafeMode.__handle_exit_for_file_checks()
 	
