@@ -80,6 +80,7 @@ func _init(modLoader : ModLoader = ModLoader):
 	
 	pointers.ConfigDriver.__load_configs()
 	pointers.Translations.__inject_translations()
+	pointers.DynamicLibraryLoader.ready()
 	do_safe_load = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_modlet_loading")
 	
 #	testing()
@@ -98,6 +99,8 @@ func _init(modLoader : ModLoader = ModLoader):
 	installScriptExtension("../keymapping/bind_displays/KeybindDisplay.gd")
 	installScriptExtension("../keymapping/bind_displays/MousebindDisplay.gd")
 	installScriptExtension("../../scripts/SteamWebAPI.gd")
+	
+	# RPC
 	
 	
 	installScriptExtension("../../ui/ExtensionPopup.gd")
@@ -339,5 +342,8 @@ func testing():
 #	print(t2-t1)
 #	var pck = pointers.Zip.__load_pck("user://test_pack.pck")["res://test.tscn"]["GetData"].get_string_from_utf8()
 #	var pck = pointers.Zip.__load_pck("C:/Program Files (x86)/Steam/steamapps/common/dV Rings of Saturn/dlc/032_here-be-dragons.pck",true)
+	
+#	var out = pointers.SafeMode.get_dependancies_for_vanilla_file("res://enceladus/Dealer.tscn")
+	
 	
 	breakpoint

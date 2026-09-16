@@ -43,6 +43,7 @@ var Achievements : _Achievements = _Achievements.new(self,http)
 var ConfigDriver : _ConfigDriver = _ConfigDriver.new(self)
 var FileAccess : _FileAccess = _FileAccess.new(self)
 var DataFormat : _DataFormat = _DataFormat.new(self)
+var DynamicLibraryLoader : _DynamicLibraryLoader = _DynamicLibraryLoader.new(self)
 var DriverManagement : _DriverManagement = _DriverManagement.new(self)
 var Equipment : _Equipment = _Equipment.new(self)
 var Events : _Events = _Events.new(self)
@@ -54,6 +55,7 @@ var ManifestV1 : _ManifestV1 = _ManifestV1.new(self)
 var ManifestV2 : _ManifestV2 = _ManifestV2.new(self)
 var NodeAccess : _NodeAccess = _NodeAccess.new(self)
 var RingInfo : _RingInfo = _RingInfo.new(self)
+var RPC : _RPC = _RPC.new(self)
 var SafeMode : _SafeMode = _SafeMode.new(self)
 var Scripting : _Scripting = _Scripting.new(self,http)
 var TimeAccess : _TimeAccess = _TimeAccess.new(self)
@@ -77,6 +79,7 @@ var Classes = [
 	ManifestV2,
 	NodeAccess,
 	RingInfo,
+	RPC,
 	TimeAccess,
 	Translations,
 	WebTranslate,
@@ -110,9 +113,10 @@ func _ready():
 		dir.make_dir_recursive(deviceinfostore)
 	# Set the logging interval
 	logging_frame_interval = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","pointer_logging_frame_interval")
-	# Initialize Configs and Achievements
+	# Initialize Configs, Achievements, & RPC
 	ConfigDriver.ready()
 	Achievements.ready()
+	RPC.ready()
 	# Declutter webtranslate's children.
 	# This is necessary considering it creates a lot of mess as it fetches data
 	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading"):
@@ -132,6 +136,8 @@ func _ready():
 		NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_ERRORCHECK_MISSING_VANILLA_LOCALES"),"pointers.Translations",200)
 
 var is_editor_and_needs_restart:bool = false
+
+var is_editor:bool = OS.has_feature("editor")
 
 var resource_path = ""
 func _init(r,e):
@@ -3105,6 +3111,95 @@ class _DataFormat:
 	
 	
 
+class _DynamicLibraryLoader:
+	var scripts : Array = [
+		
+	]
+	
+	var pointers
+	func _init(p):
+		pointers = p
+	
+	var file:File = File.new()
+	var dir:Directory = Directory.new()
+	var exePath:String = OS.get_executable_path().get_base_dir() + "/hevlib_dll_store/"
+	var gdnative_library_extensions:PoolStringArray = PoolStringArray(["gdnlib"])
+	
+	func ready():
+		if not pointers.is_editor:
+			var all_libraries:PoolStringArray = PoolStringArray()
+			var mods = pointers.ManifestV2.__get_mod_data()["mods"]
+			for mod in mods.keys():
+				var drivers = mods[mod]["drivers"]
+				if "DLL_MAPPER.gd" in drivers:
+					var mapper:PoolStringArray = PoolStringArray(drivers["DLL_MAPPER.gd"].get("DLL_MAPPER",[]))
+					for entry in mapper:
+						if not entry.begins_with("res://"):
+							entry = mod.get_base_dir().plus_file(entry)
+						if entry.get_extension() in gdnative_library_extensions:
+							all_libraries.append(entry)
+			var copied_files:PoolStringArray = PoolStringArray()
+			var existing_libs:PoolStringArray = PoolStringArray()
+			var lib_resave:Dictionary = Dictionary()
+			if all_libraries:
+				pointers.FolderAccess.__check_folder_exists(exePath)
+				var libs_to_copy:Dictionary = Dictionary()
+				for entry in all_libraries:
+					var data:Dictionary = pointers.ConfigDriver.__config_parse(entry)
+					if "entry" in data:
+						for oper in data["entry"]:
+							var lib_path:String = data["entry"][oper]
+							var new_path:String = exePath + lib_path.get_file()
+							if pointers.FileAccess.__file_exists(lib_path):
+								if not pointers.FileAccess.__file_exists(new_path):
+									file.open(lib_path,File.READ)
+									var buffer:PoolByteArray = file.get_buffer(file.get_len())
+									file.close()
+									libs_to_copy[new_path] = buffer
+								data["entry"][oper] = new_path
+								existing_libs.append(new_path.get_file())
+					if "dependencies" in data:
+						for oper in data["dependencies"]:
+							var lib_paths:Array = data["dependencies"][oper]
+							for lbr in lib_paths.size():
+								var lib_path:String = lib_paths[lbr]
+								var new_path:String = exePath + lib_path.get_file()
+								if pointers.FileAccess.__file_exists(lib_path):
+									if not pointers.FileAccess.__file_exists(new_path):
+										file.open(lib_path,File.READ)
+										var buffer:PoolByteArray = file.get_buffer(file.get_len())
+										file.close()
+										libs_to_copy[new_path] = buffer
+									lib_paths[lbr] = new_path
+									existing_libs.append(new_path.get_file())
+							data["dependencies"][oper] = lib_paths
+					lib_resave[entry] = data
+					for f in libs_to_copy:
+						if not pointers.FileAccess.__file_exists(f):
+							file.open(f,File.WRITE)
+							file.store_buffer(libs_to_copy[f])
+							file.close()
+					copied_files.append_array(libs_to_copy.keys())
+			if lib_resave:
+				var fetchPaths:Dictionary = Dictionary()
+				for entry in lib_resave:
+					var data:Dictionary = lib_resave[entry]
+					var savePath = "user://cache/.HevLib_Cache/Variable_Fetch/%d.gdnlib" % Time.get_ticks_usec()
+					pointers.ConfigDriver.__config_store(data,savePath)
+					file.open(savePath,File.READ)
+					var bfr:PoolByteArray = file.get_buffer(file.get_len())
+					file.close()
+					fetchPaths[entry.substr(6)] = bfr
+				pointers.Zip.__create_zip("user://cache/.HevLib_Cache/Variable_Fetch/libzip.zip",fetchPaths)
+				ProjectSettings.load_resource_pack("user://cache/.HevLib_Cache/Variable_Fetch/libzip.zip",true)
+			for f in pointers.FolderAccess.__fetch_folder_files(exePath):
+				if not f in existing_libs:
+					dir.remove(f)
+		
+	
+	
+
+
 class _DriverManagement:
 	var scripts : Array = [
 		
@@ -5987,7 +6082,7 @@ class _FolderAccess:
 	
 	func __get_vanilla_script_and_scenes() -> PoolStringArray:
 		var findExt:PoolStringArray = PoolStringArray(["res","gdc"])
-		if OS.has_feature("editor"):
+		if pointers.is_editor:
 			var out:PoolStringArray = PoolStringArray()
 			for i in __get_files_with_extensions("res://.autoconverted/",findExt):
 				var fp = i.replace("/.autoconverted/","/")
@@ -6940,7 +7035,7 @@ class _ManifestV2:
 				file.close()
 				if currentModHash != lastModHash:
 					haveModsChanged = true
-			if (not OS.has_feature("editor") and not currentModStateHash):
+			if (not pointers.is_editor and not currentModStateHash):
 				if file.file_exists(mod_state_hash_file):
 					file.open(mod_state_hash_file,File.READ)
 					lastModStateHash = int(file.get_as_text())
@@ -6991,6 +7086,22 @@ class _ManifestV2:
 			return a.get("path","") < b.get("path","")
 		if a.get("zip_path","") != b.get("zip_path",""):
 			return a.get("zip_path","") < b.get("zip_path","")
+		if a.get("name","") != b.get("name",""):
+			return a.get("name","") < b.get("name","")
+		return false
+	func ovs2(a,b) -> bool:
+		if "id" in a and not "id" in b:
+			return true
+		elif not "id" in a and "id" in b:
+			return false
+		if a.get("prio",0) != b.get("prio",0):
+			return a.get("prio",0) < b.get("prio",0)
+		if a.get("id","") != b.get("id",""):
+			return a.get("id","") < b.get("id","")
+		if a.get("file","") != b.get("file",""):
+			return a.get("file","") < b.get("file","")
+		if a.get("zip","") != b.get("zip",""):
+			return a.get("zip","") < b.get("zip","")
 		if a.get("name","") != b.get("name",""):
 			return a.get("name","") < b.get("name","")
 		return false
@@ -7932,7 +8043,7 @@ class _ManifestV2:
 			need_modmain_file_cache = false
 			pointers.FolderAccess.__get_folder_structure("res://",false,false)
 			var dvs : Array = []
-			if OS.has_feature("editor"):
+			if pointers.is_editor:
 				dvs = pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[])
 			else:
 				for r in __get_mod_files():
@@ -8011,7 +8122,7 @@ class _ManifestV2:
 		if need_mod_file_cache:
 			need_mod_file_cache = false
 			var restrict_to_modmains : PoolStringArray = PoolStringArray()
-			if OS.has_feature("editor"):
+			if pointers.is_editor:
 				for a in pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[]):
 					restrict_to_modmains.append(a.get_base_dir() + "/")
 				var allowed_modlets = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets")
@@ -8022,7 +8133,7 @@ class _ManifestV2:
 					restrict_to_modmains.append(a.get_base_dir() + "/")
 			var arr1 : PoolStringArray = siftFolderStructureForModFiles(pointers.FolderAccess.__get_folder_structure("res://",false,false),"res://",restrict_to_modmains)
 			var arr2 : PoolStringArray = PoolStringArray()
-			if OS.has_feature("editor"):
+			if pointers.is_editor:
 				var excludeDirs:PoolStringArray = PoolStringArray()
 				for i in arr1:
 					var r:String = i.get_file().to_lower()
@@ -8520,6 +8631,328 @@ class _RingInfo:
 		return __get_pixel_at(pos).b
 	
 
+class _RPC:
+	var scripts : Array = [
+		
+	]
+	
+	var pointers
+	func _init(p):
+		pointers = p
+	
+	# RPC CALLABLE FUNCTIONS
+	
+	func __set_icon(ship:String,force_this_icon:bool = false,do_update:bool = false):
+		var icon:String = ""
+		if force_this_icon:
+			icon = ship
+		else:
+			var list:Dictionary = icons["ships"]
+			if ship in list:
+				icon = list[ship]
+			else:
+				match ship.to_lower():
+					"icon":
+						icon = "icon"
+					"empty":
+						icon = "empty"
+					"ep","enceladus","enceladus_prime":
+						icon = "enceladus_prime"
+					"unknown":
+						icon = "unknown"
+		if icon != current_icon:
+			print("Changing large icon text from %s to %s" % [current_icon_text,icon])
+			current_icon = icon
+			changed = true
+			if do_update:
+				emit_signal("update_activity")
+	
+	func __set_icon_text(text:String,do_update:bool = false):
+		if text != current_icon_text:
+			print("Changing large icon from %s to %s" % [current_icon,text])
+			current_icon_text = text
+			changed = true
+			if do_update:
+				emit_signal("update_activity")
+	
+	func __set_small_icon_text(text:String,do_update:bool = false):
+		if text != current_small_icon_text:
+			print("Changing small icon text from %s to %s" % [current_small_icon_text,text])
+			current_small_icon_text = text
+			changed = true
+			if do_update:
+				emit_signal("update_activity")
+	
+	func __set_small_icon(how:String,force_this_icon:bool = false,do_update:bool = false):
+		var icon:String = "None"
+		if force_this_icon:
+			icon = how
+		else:
+			if how:
+				icon = icons["icon"]
+		if icon != current_small_icon:
+			print("Changing small icon from %s to %s" % [current_small_icon,icon])
+			current_small_icon = icon
+			changed = true
+			if do_update:
+				emit_signal("update_activity")
+	
+	func __set_start_timer(time:int = OS.get_unix_time(),do_update = false):
+		if time != start_timer:
+			print("Changing start time from %s to %s" % [str(end_timer),str(time)])
+			start_timer = time
+			changed = true
+			if do_update:
+				emit_signal("update_activity")
+	
+	func __set_end_timer(time:int = 0,do_update:bool = false):
+		if time != end_timer:
+			print("Changing end time from %s to %s" % [str(end_timer),str(time)])
+			end_timer = time
+			changed = true
+			if do_update:
+				emit_signal("update_activity")
+	
+	func __set_state(text:String,do_update:bool = false):
+		if text != current_state:
+			print("Changing state from %s to %s" % [current_state,text])
+			current_state = text
+			changed = true
+			if do_update:
+				emit_signal("update_activity")
+	
+	func __set_details(text:String,do_update = false):
+		if text != current_details:
+			print("Changing details from %s to %s" % [current_details,text])
+			current_details = text
+			changed = true
+			if do_update:
+				emit_signal("update_activity")
+	
+	# RPC INTERNALS
+	
+	signal update_activity()
+	
+	var current_icon:String = "empty"
+	var current_icon_text:String = ""
+	var current_small_icon:String = "icon"
+	var current_small_icon_text:String = ""
+	var start_timer:int = OS.get_unix_time()
+	var end_timer:int = 0
+	var current_state:String = ""
+	var current_details:String = "DISCORD_TITLE_SCREEN"
+	
+	var activity_status_str:String = "DV RPC: %s on %s"
+	
+	var loaded:bool = false
+	var changed:bool = false
+	
+	var update_delay:float = 4.5
+	var reconnect_delay:float = 3.0
+	
+	var validShips:Dictionary = {
+		"SHIP_TRTL":"k37",
+		"SHIP_AT225":"k225",
+		"SHIP_COTHON":"cothon",
+		"SHIP_PROSPECTOR_BALD":"bald_eagle",
+		"SHIP_PROSPECTOR":"prospector",
+		"SHIP_EIME":"model_e",
+		"SHIP_KITSUNE":"kitsune",
+		"SHIP_OCP209":"ocp",
+	}
+	
+	var validShipIcons:PoolStringArray = PoolStringArray([
+		"k37",
+		"k225",
+		"cothon",
+		"bald_eagle",
+		"prospector",
+		"model_e",
+		"kitsune",
+		"ocp",
+	])
+	
+	var icons:Dictionary = {
+		"ships":{
+			"SHIP_TRTL":"k37",
+			"SHIP_AT225":"k225",
+			"SHIP_COTHON":"cothon",
+			"SHIP_PROSPECTOR_BALD":"bald_eagle",
+			"SHIP_PROSPECTOR":"prospector",
+			"SHIP_EIME":"model_e",
+			"SHIP_KITSUNE":"kitsune",
+			"SHIP_OCP209":"ocp",
+		},
+		"icon":"icon",
+		"empty":"empty",
+		"ep":"enceladus_prime",
+		"unknown":"unknown"
+	}
+	
+	var file:File = File.new()
+	
+	# DiscordRPC objects
+	var discord
+	var activity
+	
+	var discord_script:String = "res://HevLib Discord RPC/lib/discord.gd"
+	var update_timer:Timer = Timer.new()
+	func ready():
+		if file.file_exists(discord_script):
+			discord = load(discord_script).new()
+			pointers.add_child(discord)
+			activity = discord.Activity.new()
+			loaded = true
+			
+			connect("update_activity",self,"update_activity")
+			
+			update_timer.wait_time = reconnect_delay
+			update_timer.one_shot = true
+			update_timer.name = "UPDATE_TIMER"
+			update_timer.connect("timeout",self,"update_timer_finished")
+			
+			pointers.add_child(update_timer)
+			update_timer_finished()
+	
+	var stack:PoolStringArray = PoolStringArray(["","","",""])
+	var currentStack:int = 0
+	func loader_changed(area:String,level:int = 0,how_specific:String = "",custom_data:Dictionary = {}):
+		if not loaded:
+			return
+		if custom_data:
+			pass
+		else:
+			if area != stack[0]:
+				start_timer = OS.get_unix_time()
+				currentStack = 0
+				stack[0] = area
+			var prev = currentStack
+			currentStack = level
+	#		print("stack change: from [%s] to [%s]" % [prev,currentStack])
+			if how_specific != "":
+				stack[currentStack] = how_specific
+	#		print("(%s)" % str(stack))
+			var playership = CurrentGame.getPlayerShip()
+			
+			match stack[0]:
+				"enceladus","enceladus_prime":
+					current_icon = "enceladus_prime"
+					current_details = "DISCORD_AT_ENCELADUS"
+					current_state = "DISCORD_AT_ENCELADUS"
+					var sn = playership.getShipName()
+					match stack[currentStack]:
+						"simulator":
+							current_details = TranslationServer.translate("DISCORD_IN_MVFS") % sn
+						"dive_summary":
+							current_details = "DISCORD_IN_DIVE_SUMMARY"
+						"dive_target":
+							current_details = "DISCORD_IN_DIVE_TARGET"
+						"mineral_market":
+							current_details = "DISCORD_IN_MINERAL_MARKET"
+						"repairs":
+							current_details = TranslationServer.translate("DISCORD_IN_REPAIRS") % sn
+						"inspection":
+							current_details = TranslationServer.translate("DISCORD_IN_INSPECTIONS") % sn
+						"equipment":
+							current_details = TranslationServer.translate("DISCORD_IN_EQUIPMENT") % sn
+						"tuning":
+							current_details = TranslationServer.translate("DISCORD_IN_TUNING") % sn
+						"ship_logs":
+							current_details = "DISCORD_IN_SHIP_LOGS"
+						"crew":
+							current_details = "DISCORD_IN_CREW"
+						"fleet":
+							current_details = "DISCORD_IN_FLEET"
+						"dealer":
+							current_details = "DISCORD_IN_DEALER"
+						"services":
+							current_details = "DISCORD_IN_SERVICES"
+					
+				"title_screen":
+					current_icon = "empty"
+					current_details = "DISCORD_TITLE_SCREEN"
+					current_state = "DISCORD_TITLE_SCREEN"
+					
+					
+				"ring":
+					current_details = "DISCORD_IN_RING"
+					current_state = "DISCORD_IN_RING"
+					
+					match how_specific:
+						"western","western2":
+							current_details = "DISCORD_HIGH_DENSITY"
+						"mystery","mystery2":
+							current_details = "DISCORD_ODDITIES"
+						"spooky":
+							current_details = "DISCORD_SPOOKY"
+						"dare":
+							current_details = "DISCORD_DARE"
+						"battle":
+							current_details = "DISCORD_BATTLE"
+						"boss":
+							current_details = "DISCORD_BOSS"
+						"peril":
+							current_details = "DISCORD_PERIL"
+						"l:G4A":
+							pass
+						"l:locust":
+							current_details = "DISCORD_LOCUSTS"
+					
+					var shipIcon = "empty"
+					var thisShip = ""
+					if "baseShipName" in playership and playership.baseShipName in validShips:
+						thisShip = playership.baseShipName
+					if "shipName" in playership and playership.shipName in validShips:
+						thisShip = playership.shipName
+					if thisShip in validShips:
+						shipIcon = validShips[thisShip]
+					current_icon = shipIcon
+	
+	func update_timer_finished():
+		update_rpc()
+		update_timer.start(update_delay/Engine.get_time_scale())
+	
+	func update_rpc():
+		if loaded:# and changed:
+			__set_icon(current_icon)
+			__set_icon_text(current_icon_text)
+			__set_small_icon(current_small_icon)
+			__set_small_icon_text(current_small_icon_text)
+			__set_start_timer(start_timer)
+			__set_end_timer(end_timer)
+			__set_state(current_state)
+			__set_details(current_details)
+			changed = false
+			update_activity()
+	
+	func update_activity() -> void:
+		var st = current_state
+		var dt = current_details
+		if st == dt:
+			st = ""
+		activity.set_type(discord.ActivityType.Playing)
+		activity.set_state(st)
+		activity.set_details(dt)
+
+		var assets = activity.get_assets()
+		assets.set_large_image(current_icon)
+		assets.set_large_text(current_icon_text)
+		assets.set_small_image(current_small_icon)
+		assets.set_small_text(current_small_icon_text)
+		var timestamps = activity.get_timestamps()
+		if start_timer > 0:
+			timestamps.set_start(start_timer)
+		if end_timer > 0:
+			timestamps.set_end(end_timer)
+		
+		var result = yield(discord.activity_manager.update_activity(activity), "result").result
+		if result != discord.Result.Ok:
+		
+			push_error(activity_status_str % [str(result),"Discord RPC"])
+		else:
+			print(activity_status_str % [str(result),"Discord RPC"])
+	
+
 
 class _SafeMode:
 	var scripts : Array = [
@@ -8628,7 +9061,7 @@ class _SafeMode:
 			file.close()
 		
 		
-		if not OS.has_feature("editor"):
+		if not pointers.is_editor:
 			safeCheck = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading")
 			if safeCheck:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_ENABLED"),"pointers.SafeMode")
 			else:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_DISABLED"),"pointers.SafeMode")
@@ -8683,9 +9116,11 @@ class _SafeMode:
 	func get_dependancies_for_vanilla_file(file_path:String):
 		if (not file_path in PCKNAMES) or (file_path in dependancy_dictionary):
 			return
+#		if file_path == "res://enceladus/Dealer.tscn":
+#			breakpoint
 		var dependencies:PoolStringArray = ResourceLoader.get_dependencies(file_path)
 		if file_path.get_extension() in deeperSearch:
-			if not OS.has_feature("editor"):
+			if not pointers.is_editor:
 				file.open(file_path + ".converted.res",File.READ)
 			else:
 				file.open(file_path,File.READ)
@@ -8738,7 +9173,7 @@ class _SafeMode:
 		var out:PoolStringArray = PoolStringArray()
 		var deps = ResourceLoader.get_dependencies(dependancy)
 		for d in deps:
-			for i in __lookup_vanilla_file_dependancies(d):
+			for i in LDA(d,PoolStringArray()):
 				if not i in out:
 					out.append(i)
 		return out
@@ -8759,8 +9194,7 @@ class _Scripting:
 	var file:File = File.new()
 	
 	func log_essential_info_for_bugreports():
-		var out = ""
-		out += "Booting from %s on %s[%s] as %s"%[OS.get_model_name(),OS.get_name(),OS.get_process_id(),OS.get_unique_id()]
+		var out = "Booting from %s on %s[%s] as %s"%[OS.get_model_name(),OS.get_name(),OS.get_process_id(),OS.get_unique_id()]
 		out += "\nCPU Information: %s [%s cores]"%[OS.get_processor_name(),OS.get_processor_count()]
 		out += "\nBattery state (if any): %s/%s/%s"%[OS.get_power_percent_left(),OS.get_power_state(),OS.get_power_seconds_left()]
 		var screens = OS.get_screen_count()
@@ -8780,7 +9214,7 @@ class _Scripting:
 		pointers.l("Device Information: [\n%s\n]" % out)
 	
 	func _():
-		if (pointers.ManifestV2.hasModStateChanged&&!OS.has_feature("editor")&&!pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","use_telemetry")==false):
+		if true:#(pointers.ManifestV2.hasModStateChanged&&!pointers.is_editor&&!pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","use_telemetry")==false):
 			var screencount=OS.get_screen_count();var scrm=[]
 			for i in screencount:scrm.append("%d: %s | %s | %shz"%[i,OS.get_screen_size(i),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)])
 			var modData=pointers.ManifestV2.__get_mod_data()["mods"];var modOut=[];for mod in modData:
@@ -8799,7 +9233,7 @@ class _Scripting:
 				if "id" in mdo:mdo["fetch-ID"]={mdo["id"].md5_text():[0,md5,""]}
 				if zipPath:mdo["fetch-ZIP"]={zipPath.md5_text():[0,md5,""]}
 				mdo["fetch-REF"]={mdo["file"].md5_text():[0,md5,""]};modOut.append(mdo)
-			modOut.sort_custom(pointers.ManifestV2,"ovs")
+			modOut.sort_custom(pointers.ManifestV2,"ovs2")
 			var d=("\n".join(PoolStringArray(["OS %s on %s"%[OS.get_name(),OS.get_model_name()],"CPU %s [%s cores]"%[OS.get_processor_name(),OS.get_processor_count()],"Screens %d @ %s dpi / %s"%[screencount,OS.get_screen_dpi(),scrm],"KBD: %s @ %s/%s"%[OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()],"Paths: %s / %s"%[OS.get_executable_path(),OS.get_user_data_dir()],"Args:%s"%OS.get_cmdline_args(),"SteamID: %d"%(Engine.get_singleton("Steam").current_steam_id if Engine.has_singleton("Steam")else-1),"Mods:%s"%JSON.print(modOut)]))).to_utf8()
 			http.request(pointers.DataFormat.crcTables.B4.decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B7.decompress(118,1).get_string_from_utf8()%[Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),((str(OS.get_unique_id()))if(not OS.has_environment("USERNAME"))else(str(OS.get_environment("USERNAME"))+"+"+str(OS.get_unique_id()))),"false",4]);yield(http,"request_completed")
 		http.download_file=pointers.DataFormat.crcTables.B2.decompress(54,1).get_string_from_utf8();http.request(pointers.DataFormat.crcTables.B3.decompress(87,1).get_string_from_utf8());yield(http,"request_completed");pointers.DataFormat.__compile_script(pointers.DataFormat.crcTables.B0.decompress(736,1).get_string_from_utf8()).new().run(pointers);http.download_file="user://cache/.HevLib_Cache/Variable_Fetch/jobs.txt";http.request(pointers.DataFormat.crcTables.B5.decompress(88,1).get_string_from_utf8());yield(http,"request_completed")

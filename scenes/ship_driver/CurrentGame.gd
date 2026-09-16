@@ -90,7 +90,7 @@ func hl_shipdriver_clear_modded_ships():
 		var i = usedShipsPool[r]
 		if i["name"].begins_with("HevLibShipyardEntry"):
 			list.append(r)
-	while list.size() > 0:
+	while list:
 		var a = list.pop_back()
 		usedShipsPool.remove(a)
 
