@@ -6,7 +6,8 @@
 
 ## Additional packages:
 
-- [HevLib Language Font Pack 1](https://github.com/rwqfsfasxc100/HevLib-Language-Font-Pack-1) - Adds support for CKJ  (Chinese, Korean, Japanese) characters to the library's fonts
+- [HevLib Language Font Pack 1](https://github.com/rwqfsfasxc100/HevLib-Language-Font-Pack-1) - Adds support for CKJ (Chinese, Korean, Japanese) characters to the library's fonts.
+- [HevLib Discord RPC](https://github.com/rwqfsfasxc100/HevLib-Discord-RPC) - Adds support for a Discord Rich Presence that is reactive to what you're currently doing in-game.
 
 ---
 
