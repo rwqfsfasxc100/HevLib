@@ -1755,6 +1755,106 @@ const TRANSLATIONS = {
 		"HEVLIB_CONFIG_SAFE_MODLET_LOADING_DESC": {
 			"string": "Uses a presumed Vanilla load order heuristic to ensure that modifications made through LOAD_RESOURCES.gd are load-safe.\n\nNOTICE: May cause issues with mods loading during and after the onready phase.",
 			"version_hash": 2218953947
+		},
+		"HEVLIB_DISCORDRPC_STATUS_MINING": {
+			"string": "Mining in the rings",
+			"version_hash": 1794128482
+		},
+		"HEVLIB_DISCORDRPC_AT_ENCELADUS": {
+			"string": "At Enceladus Prime",
+			"version_hash": 2282306347
+		},
+		"HEVLIB_DISCORDRPC_IN_MVFS": {
+			"string": "Testing %s inside the MVFS",
+			"version_hash": 105970932
+		},
+		"HEVLIB_DISCORDRPC_TITLE_SCREEN": {
+			"string": "On the Title Screen",
+			"version_hash": 4082034277
+		},
+		"HEVLIB_DISCORDRPC_IN_RING": {
+			"string": "In Saturn's Rings",
+			"version_hash": 652577654
+		},
+		"HEVLIB_DISCORDRPC_IN_DIVE_SUMMARY": {
+			"string": "Viewing the last dive summary",
+			"version_hash": 3415836617
+		},
+		"HEVLIB_DISCORDRPC_IN_DIVE_TARGET": {
+			"string": "Choosing a dive target",
+			"version_hash": 2303825455
+		},
+		"HEVLIB_DISCORDRPC_IN_MINERAL_MARKET": {
+			"string": "Viewing the mineral market",
+			"version_hash": 4251987531
+		},
+		"HEVLIB_DISCORDRPC_IN_REPAIRS": {
+			"string": "Performing repairs on %s",
+			"version_hash": 55798409
+		},
+		"HEVLIB_DISCORDRPC_IN_INSPECTIONS": {
+			"string": "Putting %s through inspections",
+			"version_hash": 3724105976
+		},
+		"HEVLIB_DISCORDRPC_IN_EQUIPMENT": {
+			"string": "Swapping out %s's equipment",
+			"version_hash": 3411143760
+		},
+		"HEVLIB_DISCORDRPC_IN_TUNING": {
+			"string": "Tuning up %s",
+			"version_hash": 2945523159
+		},
+		"HEVLIB_DISCORDRPC_IN_SHIP_LOGS": {
+			"string": "Viewing the ship's logs",
+			"version_hash": 3334504610
+		},
+		"HEVLIB_DISCORDRPC_IN_CREW": {
+			"string": "Dealing with crew",
+			"version_hash": 3401089862
+		},
+		"HEVLIB_DISCORDRPC_IN_FLEET": {
+			"string": "Observing the company's fleet",
+			"version_hash": 478247382
+		},
+		"HEVLIB_DISCORDRPC_IN_DEALER": {
+			"string": "Looking at buying a new ship",
+			"version_hash": 1241902618
+		},
+		"HEVLIB_DISCORDRPC_IN_SERVICES": {
+			"string": "Checking available services",
+			"version_hash": 2542325670
+		},
+		"HEVLIB_DISCORDRPC_HIGH_DENSITY": {
+			"string": "In a high-density region",
+			"version_hash": 1695665678
+		},
+		"HEVLIB_DISCORDRPC_ODDITIES": {
+			"string": "Nearby anomolous objects",
+			"version_hash": 1060157101
+		},
+		"HEVLIB_DISCORDRPC_SPOOKY": {
+			"string": "Around some unfortunate circumstances",
+			"version_hash": 4159892305
+		},
+		"HEVLIB_DISCORDRPC_DARE": {
+			"string": "Flying fast!",
+			"version_hash": 2103288157
+		},
+		"HEVLIB_DISCORDRPC_BATTLE": {
+			"string": "Around combatants",
+			"version_hash": 43343162
+		},
+		"HEVLIB_DISCORDRPC_BOSS": {
+			"string": "Around dangerous combatants",
+			"version_hash": 3290983682
+		},
+		"HEVLIB_DISCORDRPC_PERIL": {
+			"string": "Undergoing ship damage!",
+			"version_hash": 2574431627
+		},
+		"HEVLIB_DISCORDRPC_LOCUSTS": {
+			"string": "Encompassed by the swarm!",
+			"version_hash": 978088542
 		}
 	},
 	"de": {

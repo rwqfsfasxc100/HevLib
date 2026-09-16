@@ -3537,14 +3537,13 @@ class _Equipment:
 												for d in objdata:
 													if d.get("property","") == "repairReplacementPrice":
 														d["value"] = wprice
-														d["use_stringified_value"] = false
 														has_price = true
 													if d.get("property","") == "visible":
 														has_invis = true
 												if not has_price:
-													objdata.append({"property":"repairReplacementPrice","value":wprice,"use_stringified_value":false})
+													objdata.append({"property":"repairReplacementPrice","value":wprice})
 												if not has_invis:
-													objdata.append({"property":"visible","value":false,"use_stringified_value":false})
+													objdata.append({"property":"visible","value":false})
 												obj["data"] = objdata.duplicate(true)
 												WEAPONSLOT_ADD.append(obj)
 										if "WEAPONSLOT_ADD" in eqkeys:
@@ -3560,14 +3559,13 @@ class _Equipment:
 												for d in objdata:
 													if d.get("property","") == "repairReplacementPrice":
 														d["value"] = wprice
-														d["use_stringified_value"] = false
 														has_price = true
 													if d.get("property","") == "visible":
 														has_invis = true
 												if not has_price:
-													objdata.append({"property":"repairReplacementPrice","value":wprice,"use_stringified_value":false})
+													objdata.append({"property":"repairReplacementPrice","value":wprice})
 												if not has_invis:
-													objdata.append({"property":"visible","value":false,"use_stringified_value":false})
+													objdata.append({"property":"visible","value":false})
 												obj["data"] = objdata.duplicate(true)
 												WEAPONSLOT_ADD.append(obj)
 									"MASS_DRIVER_AMMUNITION":
@@ -3856,7 +3854,7 @@ class _Equipment:
 											for item in ar[template][datapoint]:
 												var property = item.get("property")
 												var value = item.get("value")
-												if item.get("use_stringified_value",true):
+												if item.get("use_stringified_value",false):
 													value = pointers.DataFormat.__convert_var_from_string(value)
 												data_formatted[property] = value
 											for key in data_formatted:
@@ -3881,7 +3879,7 @@ class _Equipment:
 								for c in ar[item]:
 									var prop : String = c.get("property","")
 									var val = c.get("value","")
-									if c.get("use_stringified_value",true):
+									if c.get("use_stringified_value",false):
 										val = pointers.DataFormat.__convert_var_from_string(val)
 									if prop and val:
 										dict[prop] = val
@@ -3889,7 +3887,7 @@ class _Equipment:
 								for c in current_item_data:
 									var prop : String = c.get("property","")
 									var val = c.get("value","")
-									if c.get("use_stringified_value",true):
+									if c.get("use_stringified_value",false):
 										val = pointers.DataFormat.__convert_var_from_string(val)
 									if prop and val:
 										dict[prop] = val
@@ -3970,7 +3968,7 @@ class _Equipment:
 											for equip in shipdata[slot][type]:
 												var property = equip.get("property")
 												var value = equip.get("value")
-												if equip.get("use_stringified_value",true):
+												if equip.get("use_stringified_value",false):
 													value = pointers.DataFormat.__convert_var_from_string(value)
 												current_dict[type][property] = value
 										for item in current_dict:
@@ -4376,7 +4374,7 @@ class _Equipment:
 				for it in add.get("data",[]):
 					var ws_property : String  = it.get("property")
 					var ws_value = it.get("value")
-					if it.get("use_stringified_value",true):
+					if it.get("use_stringified_value",false):
 						ws_value = pointers.DataFormat.__convert_var_from_string(ws_value)
 					var split:PoolStringArray = ws_property.split("/")
 					if split.size() >= 3:
@@ -4416,7 +4414,7 @@ class _Equipment:
 			for it in add.get("data",[]):
 				var ws_property : String  = it.get("property")
 				var ws_value  = it.get("value")
-				if it.get("use_stringified_value",true):
+				if it.get("use_stringified_value",false):
 					ws_value = pointers.DataFormat.__convert_var_from_string(ws_value)
 				var split:PoolStringArray = ws_property.split("/")
 				if split.size() >= 3:
@@ -8661,7 +8659,7 @@ class _RPC:
 					"unknown":
 						icon = "unknown"
 		if icon != current_icon:
-			print("Changing large icon text from %s to %s" % [current_icon_text,icon])
+			pointers.l("Changing large icon text from %s to %s" % [current_icon_text,icon],"pointers.RPC")
 			current_icon = icon
 			changed = true
 			if do_update:
@@ -8669,7 +8667,7 @@ class _RPC:
 	
 	func __set_icon_text(text:String,do_update:bool = false):
 		if text != current_icon_text:
-			print("Changing large icon from %s to %s" % [current_icon,text])
+			pointers.l("Changing large icon from %s to %s" % [current_icon,text],"pointers.RPC")
 			current_icon_text = text
 			changed = true
 			if do_update:
@@ -8677,7 +8675,7 @@ class _RPC:
 	
 	func __set_small_icon_text(text:String,do_update:bool = false):
 		if text != current_small_icon_text:
-			print("Changing small icon text from %s to %s" % [current_small_icon_text,text])
+			pointers.l("Changing small icon text from %s to %s" % [current_small_icon_text,text],"pointers.RPC")
 			current_small_icon_text = text
 			changed = true
 			if do_update:
@@ -8691,7 +8689,7 @@ class _RPC:
 			if how:
 				icon = icons["icon"]
 		if icon != current_small_icon:
-			print("Changing small icon from %s to %s" % [current_small_icon,icon])
+			pointers.l("Changing small icon from %s to %s" % [current_small_icon,icon],"pointers.RPC")
 			current_small_icon = icon
 			changed = true
 			if do_update:
@@ -8699,7 +8697,7 @@ class _RPC:
 	
 	func __set_start_timer(time:int = OS.get_unix_time(),do_update = false):
 		if time != start_timer:
-			print("Changing start time from %s to %s" % [str(end_timer),str(time)])
+			pointers.l("Changing start time from %s to %s" % [str(end_timer),str(time)],"pointers.RPC")
 			start_timer = time
 			changed = true
 			if do_update:
@@ -8707,7 +8705,7 @@ class _RPC:
 	
 	func __set_end_timer(time:int = 0,do_update:bool = false):
 		if time != end_timer:
-			print("Changing end time from %s to %s" % [str(end_timer),str(time)])
+			pointers.l("Changing end time from %s to %s" % [str(end_timer),str(time)],"pointers.RPC")
 			end_timer = time
 			changed = true
 			if do_update:
@@ -8715,7 +8713,7 @@ class _RPC:
 	
 	func __set_state(text:String,do_update:bool = false):
 		if text != current_state:
-			print("Changing state from %s to %s" % [current_state,text])
+			pointers.l("Changing state from %s to %s" % [current_state,text],"pointers.RPC")
 			current_state = text
 			changed = true
 			if do_update:
@@ -8723,7 +8721,7 @@ class _RPC:
 	
 	func __set_details(text:String,do_update = false):
 		if text != current_details:
-			print("Changing details from %s to %s" % [current_details,text])
+			pointers.l("Changing details from %s to %s" % [current_details,text],"pointers.RPC")
 			current_details = text
 			changed = true
 			if do_update:
@@ -8740,15 +8738,19 @@ class _RPC:
 	var start_timer:int = OS.get_unix_time()
 	var end_timer:int = 0
 	var current_state:String = ""
-	var current_details:String = "DISCORD_TITLE_SCREEN"
-	
-	var activity_status_str:String = "DV RPC: %s on %s"
+	var current_details:String = "HEVLIB_DISCORDRPC_TITLE_SCREEN"
 	
 	var loaded:bool = false
 	var changed:bool = false
 	
-	var update_delay:float = 4.5
-	var reconnect_delay:float = 3.0
+	var update_wait_time:float = 4.5
+	var reconnect_wait_time:float = 3.0
+	
+	var err_update_wait_time:float = 60.0
+	var err_reconnect_wait_time:float = 60.0
+	
+	var update_delay:float = update_wait_time
+	var reconnect_delay:float = reconnect_wait_time
 	
 	var validShips:Dictionary = {
 		"SHIP_TRTL":"k37",
@@ -8813,6 +8815,8 @@ class _RPC:
 			
 			pointers.add_child(update_timer)
 			update_timer_finished()
+#			yield(CurrentGame.get_tree(),"idle_frame")
+#			emit_signal("update_activity")
 	
 	var stack:PoolStringArray = PoolStringArray(["","","",""])
 	var currentStack:int = 0
@@ -8837,66 +8841,66 @@ class _RPC:
 			match stack[0]:
 				"enceladus","enceladus_prime":
 					current_icon = "enceladus_prime"
-					current_details = "DISCORD_AT_ENCELADUS"
-					current_state = "DISCORD_AT_ENCELADUS"
+					current_details = "HEVLIB_DISCORDRPC_AT_ENCELADUS"
+					current_state = "HEVLIB_DISCORDRPC_AT_ENCELADUS"
 					var sn = playership.getShipName()
 					match stack[currentStack]:
 						"simulator":
-							current_details = TranslationServer.translate("DISCORD_IN_MVFS") % sn
+							current_details = TranslationServer.translate("HEVLIB_DISCORDRPC_IN_MVFS") % sn
 						"dive_summary":
-							current_details = "DISCORD_IN_DIVE_SUMMARY"
+							current_details = "HEVLIB_DISCORDRPC_IN_DIVE_SUMMARY"
 						"dive_target":
-							current_details = "DISCORD_IN_DIVE_TARGET"
+							current_details = "HEVLIB_DISCORDRPC_IN_DIVE_TARGET"
 						"mineral_market":
-							current_details = "DISCORD_IN_MINERAL_MARKET"
+							current_details = "HEVLIB_DISCORDRPC_IN_MINERAL_MARKET"
 						"repairs":
-							current_details = TranslationServer.translate("DISCORD_IN_REPAIRS") % sn
+							current_details = TranslationServer.translate("HEVLIB_DISCORDRPC_IN_REPAIRS") % sn
 						"inspection":
-							current_details = TranslationServer.translate("DISCORD_IN_INSPECTIONS") % sn
+							current_details = TranslationServer.translate("HEVLIB_DISCORDRPC_IN_INSPECTIONS") % sn
 						"equipment":
-							current_details = TranslationServer.translate("DISCORD_IN_EQUIPMENT") % sn
+							current_details = TranslationServer.translate("HEVLIB_DISCORDRPC_IN_EQUIPMENT") % sn
 						"tuning":
-							current_details = TranslationServer.translate("DISCORD_IN_TUNING") % sn
+							current_details = TranslationServer.translate("HEVLIB_DISCORDRPC_IN_TUNING") % sn
 						"ship_logs":
-							current_details = "DISCORD_IN_SHIP_LOGS"
+							current_details = "HEVLIB_DISCORDRPC_IN_SHIP_LOGS"
 						"crew":
-							current_details = "DISCORD_IN_CREW"
+							current_details = "HEVLIB_DISCORDRPC_IN_CREW"
 						"fleet":
-							current_details = "DISCORD_IN_FLEET"
+							current_details = "HEVLIB_DISCORDRPC_IN_FLEET"
 						"dealer":
-							current_details = "DISCORD_IN_DEALER"
+							current_details = "HEVLIB_DISCORDRPC_IN_DEALER"
 						"services":
-							current_details = "DISCORD_IN_SERVICES"
+							current_details = "HEVLIB_DISCORDRPC_IN_SERVICES"
 					
 				"title_screen":
 					current_icon = "empty"
-					current_details = "DISCORD_TITLE_SCREEN"
-					current_state = "DISCORD_TITLE_SCREEN"
+					current_details = "HEVLIB_DISCORDRPC_TITLE_SCREEN"
+					current_state = "HEVLIB_DISCORDRPC_TITLE_SCREEN"
 					
 					
 				"ring":
-					current_details = "DISCORD_IN_RING"
-					current_state = "DISCORD_IN_RING"
+					current_details = "HEVLIB_DISCORDRPC_IN_RING"
+					current_state = "HEVLIB_DISCORDRPC_IN_RING"
 					
 					match how_specific:
 						"western","western2":
-							current_details = "DISCORD_HIGH_DENSITY"
+							current_details = "HEVLIB_DISCORDRPC_HIGH_DENSITY"
 						"mystery","mystery2":
-							current_details = "DISCORD_ODDITIES"
+							current_details = "HEVLIB_DISCORDRPC_ODDITIES"
 						"spooky":
-							current_details = "DISCORD_SPOOKY"
+							current_details = "HEVLIB_DISCORDRPC_SPOOKY"
 						"dare":
-							current_details = "DISCORD_DARE"
+							current_details = "HEVLIB_DISCORDRPC_DARE"
 						"battle":
-							current_details = "DISCORD_BATTLE"
+							current_details = "HEVLIB_DISCORDRPC_BATTLE"
 						"boss":
-							current_details = "DISCORD_BOSS"
+							current_details = "HEVLIB_DISCORDRPC_BOSS"
 						"peril":
-							current_details = "DISCORD_PERIL"
+							current_details = "HEVLIB_DISCORDRPC_PERIL"
 						"l:G4A":
 							pass
 						"l:locust":
-							current_details = "DISCORD_LOCUSTS"
+							current_details = "HEVLIB_DISCORDRPC_LOCUSTS"
 					
 					var shipIcon = "empty"
 					var thisShip = ""
@@ -8922,17 +8926,19 @@ class _RPC:
 			__set_end_timer(end_timer)
 			__set_state(current_state)
 			__set_details(current_details)
-			changed = false
-			update_activity()
+#			changed = false
+			emit_signal("update_activity")
 	
+	
+	var err_count:int = 0
 	func update_activity() -> void:
 		var st = current_state
 		var dt = current_details
 		if st == dt:
 			st = ""
 		activity.set_type(discord.ActivityType.Playing)
-		activity.set_state(st)
-		activity.set_details(dt)
+		activity.set_state(TranslationServer.translate(st))
+		activity.set_details(TranslationServer.translate(dt))
 
 		var assets = activity.get_assets()
 		assets.set_large_image(current_icon)
@@ -8947,10 +8953,16 @@ class _RPC:
 		
 		var result = yield(discord.activity_manager.update_activity(activity), "result").result
 		if result != discord.Result.Ok:
-		
-			push_error(activity_status_str % [str(result),"Discord RPC"])
+			err_count += 1
+			if err_count > 3:
+				update_delay = err_update_wait_time
+				reconnect_delay = err_reconnect_wait_time
+			pointers.l("ERROR: RPC returned error code %d" % result,"pointers.RPC")
 		else:
-			print(activity_status_str % [str(result),"Discord RPC"])
+			if err_count:
+				update_delay = update_wait_time
+				reconnect_delay = reconnect_wait_time
+			err_count = 0
 	
 
 
