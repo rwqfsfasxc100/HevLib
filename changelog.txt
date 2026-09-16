@@ -13,6 +13,7 @@
 3=* `use_stringified_value` now defaults to false for all drivers that use the feature
 4=* Resolve modlet load conflicts has been disabled until further notice due to continued issues.
 5=* Blank space at the bottom of the mod list and config menu scroll sections has been increased by 50% to improve tooltip visibility on smaller screens.
+6=* Removed achievement icons as they have been unused the entire time.
 
 [1.15.54]
 
