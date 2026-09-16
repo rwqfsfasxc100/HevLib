@@ -1584,8 +1584,8 @@ const TRANSLATIONS = {
 			"version_hash": 1714521282
 		},
 		"HEVLIB_CONFIG_SAFE_MOD_LOADING_TOOLTIP": {
-			"string": "Prevents the game from being loaded if a mod performs unsafe operations (such as overriding vanilla files directly.)\n\nRecommended to keep this enabled to prevent issues with vanilla and/or other mods. Note: I will dismiss bug reports that have disabled SafeMode due to the probable cause of the issue being related to it needing this disabled..",
-			"version_hash": 2729983956
+			"string": "Prevents the game from being loaded if a mod performs unsafe operations\n(such as overriding vanilla files directly.)\n\nRecommended to keep this enabled to prevent issues with vanilla and/or other mods.\nNote: I will dismiss bug reports that have disabled SafeMode due to the probable\ncause of the issue being related to it needing this disabled..",
+			"version_hash": 3596140498
 		},
 		"HEVLIB_CREDITS_SUPPORTERS_KOFI_TESSIER": {
 			"string": "Tessier-Ashpool S.A. - supporter (ko-fi)",
@@ -1855,6 +1855,26 @@ const TRANSLATIONS = {
 		"HEVLIB_DISCORDRPC_LOCUSTS": {
 			"string": "Encompassed by the swarm!",
 			"version_hash": 978088542
+		},
+		"HEVLIB_CREDITS_SOFTWARE_SAMSFACE": {
+			"string": "samsface - Author of the Godot Discord Game SDK",
+			"version_hash": 2929833247
+		},
+		"HEVLIBRPC_BRIEF": {
+			"string": "Provides the Godot Discord Game SDK library",
+			"version_hash": 1565604616
+		},
+		"HEVLIB_CONFIG_SECTION_RPC": {
+			"string": "RPC",
+			"version_hash": 193469002
+		},
+		"HEVLIB_CONFIG_DISCORD_RPC_ENABLED": {
+			"string": "Discord RPC enabled",
+			"version_hash": 962902461
+		},
+		"HEVLIB_CONFIG_DISCORD_RPC_ENABLED_DESC": {
+			"string": "Whether the Discord Rich Presence should be enabled.\n\nRequires HevLib Discord RPC to be installed to be functional.",
+			"version_hash": 1129104431
 		}
 	},
 	"de": {

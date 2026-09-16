@@ -1,3 +1,18 @@
+[1.16.0]
+
+1=* Added Discord Rich Presense
+1.1=* Successor to the Delta-V Discord RPC mod, this time without the need for an extra application.
+1.2=* The HevLib Discord RPC module must be installed instead to provide the RPC library.
+1.3=* Can be disabled in the config.
+2=* Added `DLL_MAPPER.gd` driver
+2.1=* This is used to register GDNative plugins.
+2.2=* Stores a singular PoolStringArray constant `DLL_MAPPER`
+2.3=* Each entry should be the `.gdnlib` library mapper file.
+2.4=* All files that reference this should not be preloaded to make sure that the plugin is properly loaded
+2.5=* An entry can be either an absolute (res://) path, or a path relative to the mod's folder.
+3=* `use_stringified_value` now defaults to false for all drivers that use the feature
+4=* Resolve modlet load conflicts has been disabled until further notice due to continued issues.
+
 [1.15.54]
 
 1=* Bridged gap between editor and release filesystems for forming the check order.

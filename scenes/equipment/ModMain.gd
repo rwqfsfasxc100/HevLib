@@ -153,6 +153,9 @@ func _init(modLoader : ModLoader = ModLoader):
 	installScriptExtension("ShipModificationDriver/InternalStorageMod.gd")
 
 	installScriptExtension("../better_title_screen/SaveSlotButton.gd")
+	
+	# Disabled for reworking later on 
+	do_safe_load = false
 	if not do_safe_load:
 		for old_path in pointers.ManifestV2.__load_modlets(false,false):
 			pointers.DataFormat.__reload_scene(old_path)

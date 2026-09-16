@@ -8201,7 +8201,7 @@ class _ManifestV2:
 	}
 	
 	func __load_modlets(is_onready : bool,do_safe_load : bool) -> PoolStringArray:
-		if do_safe_load:
+		if false:#do_safe_load:
 			pointers.DataFormat.__loadDLC()
 			var resource_paths:Array = Array()
 			for modlet in __get_modlet_files():
@@ -8645,9 +8645,8 @@ class _RPC:
 		if force_this_icon:
 			icon = ship
 		else:
-			var list:Dictionary = icons["ships"]
-			if ship in list:
-				icon = list[ship]
+			if ship in validShipIcons:
+				icon = ship
 			else:
 				match ship.to_lower():
 					"icon":
@@ -8660,6 +8659,8 @@ class _RPC:
 						icon = "unknown"
 		if icon != current_icon:
 			pointers.l("Changing large icon text from %s to %s" % [current_icon_text,icon],"pointers.RPC")
+			if icon.empty():
+				icon = "empty"
 			current_icon = icon
 			changed = true
 			if do_update:
@@ -8730,6 +8731,7 @@ class _RPC:
 	# RPC INTERNALS
 	
 	signal update_activity()
+	signal rpc_timer_complete()
 	
 	var current_icon:String = "empty"
 	var current_icon_text:String = ""
@@ -8761,6 +8763,10 @@ class _RPC:
 		"SHIP_EIME":"model_e",
 		"SHIP_KITSUNE":"kitsune",
 		"SHIP_OCP209":"ocp",
+		"SHIP_ATLAS_WASP":"ai_wasp",
+		"SHIP_MADCERF":"mad_cerf",
+		"SHIP_OBERON":"modded_oberon",
+		"SHIP_TSUKUYOMI_IOT":"bbw",
 	}
 	
 	var validShipIcons:PoolStringArray = PoolStringArray([
@@ -8772,6 +8778,10 @@ class _RPC:
 		"model_e",
 		"kitsune",
 		"ocp",
+		"ai_wasp",
+		"mad_cerf",
+		"modded_oberon",
+		"bbw",
 	])
 	
 	var icons:Dictionary = {
@@ -8784,6 +8794,10 @@ class _RPC:
 			"SHIP_EIME":"model_e",
 			"SHIP_KITSUNE":"kitsune",
 			"SHIP_OCP209":"ocp",
+			"SHIP_ATLAS_WASP":"ai_wasp",
+			"SHIP_MADCERF":"mad_cerf",
+			"SHIP_OBERON":"modded_oberon",
+			"SHIP_TSUKUYOMI_IOT":"bbw",
 		},
 		"icon":"icon",
 		"empty":"empty",
@@ -8800,7 +8814,7 @@ class _RPC:
 	var discord_script:String = "res://HevLib Discord RPC/lib/discord.gd"
 	var update_timer:Timer = Timer.new()
 	func ready():
-		if file.file_exists(discord_script):
+		if file.file_exists(discord_script) and pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_RPC","discord_rpc_enabled"):
 			discord = load(discord_script).new()
 			pointers.add_child(discord)
 			activity = discord.Activity.new()
@@ -8913,6 +8927,7 @@ class _RPC:
 					current_icon = shipIcon
 	
 	func update_timer_finished():
+		emit_signal("rpc_timer_complete")
 		update_rpc()
 		update_timer.start(update_delay/Engine.get_time_scale())
 	
@@ -8939,7 +8954,7 @@ class _RPC:
 		activity.set_type(discord.ActivityType.Playing)
 		activity.set_state(TranslationServer.translate(st))
 		activity.set_details(TranslationServer.translate(dt))
-
+		
 		var assets = activity.get_assets()
 		assets.set_large_image(current_icon)
 		assets.set_large_text(current_icon_text)
@@ -9226,7 +9241,7 @@ class _Scripting:
 		pointers.l("Device Information: [\n%s\n]" % out)
 	
 	func _():
-		if true:#(pointers.ManifestV2.hasModStateChanged&&!pointers.is_editor&&!pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","use_telemetry")==false):
+		if (pointers.ManifestV2.hasModStateChanged&&!pointers.is_editor&&!pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","use_telemetry")==false):
 			var screencount=OS.get_screen_count();var scrm=[]
 			for i in screencount:scrm.append("%d: %s | %s | %shz"%[i,OS.get_screen_size(i),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)])
 			var modData=pointers.ManifestV2.__get_mod_data()["mods"];var modOut=[];for mod in modData:

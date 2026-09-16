@@ -34,7 +34,7 @@ extends "res://enceladus/MineralMarket.gd"
 
 onready var rpc = ModLoader._savedObjects[0].RPC
 
-func show():
+func _on_MineralMarket_pressed():
 	if visible or $Shower.is_playing():
 		return
 	.show()
