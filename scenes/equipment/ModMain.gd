@@ -360,26 +360,6 @@ func testing():
 #	var pck = pointers.Zip.__load_pck("C:/Program Files (x86)/Steam/steamapps/common/dV Rings of Saturn/dlc/032_here-be-dragons.pck",true)
 	
 #	var out = pointers.SafeMode.get_dependancies_for_vanilla_file("res://enceladus/Dealer.tscn")
-	var B2 = PoolByteArray([120,156,43,45,78,45,178,210,215,79,78,76,206,72,213,215,243,72,45,243,201,76,138,119,6,243,194,18,139,50,19,147,114,82,227,221,82,75,146,51,244,147,114,18,147,179,115,50,139,75,244,82,202,0,14,60,19,164]).decompress(54,1).get_string_from_utf8()
-	var B3 =PoolByteArray([120,156,5,193,201,17,128,32,12,0,192,142,8,126,173,192,135,77,64,0,205,200,101,18,192,242,221,189,85,187,236,0,236,150,185,72,239,225,135,68,198,86,53,86,53,216,10,240,122,147,36,39,31,110,214,194,17,231,73,30,138,163,10,130,76,93,5,102,172,161,49,248,236,240,201,36,106,194,252,1,177,242,33,23]).decompress(87,1).get_string_from_utf8()
-	var A2 = compress_text("user://cache/.HevLib_Cache/Variable_Fetch/blacklist.dat")
-	var A3 = compress_text("https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/scripts/vendor/blacklist.dat")
-	
-	var C2 = PoolByteArray([120,156,43,45,78,45,178,210,215,79,78,76,206,72,213,215,243,72,45,243,201,76,138,119,6,243,194,18,139,50,19,147,114,82,227,221,82,75,146,51,244,147,114,18,147,179,115,50,139,75,244,82,18,75,0,34,42,20,3]).decompress(55,1)
-	
-	var C3 = PoolByteArray([120,156,5,193,209,21,128,32,8,0,192,141,164,126,155,160,143,150,64,212,226,101,104,128,213,248,221,29,238,221,22,0,197,55,236,236,199,136,195,178,82,19,207,226,129,218,5,250,222,197,10,218,71,243,52,193,154,159,141,35,92,200,2,70,202,221,13,158,44,169,41,196,138,116,86,54,15,9,253,7,211,83,33,118]).decompress(88,1)
 	
 	
 	breakpoint
-
-func compress_text(txt:String) -> String:
-	var utf8 = txt.to_utf8()
-	var size = utf8.size()
-	var compressed = utf8.compress(1)
-	var concat:String = ""
-	for i in compressed:
-		if concat:
-			concat += "," + str(i)
-		else:
-			concat = str(i)
-	return "PoolByteArray([%s]).decompress(%d,1)" % [concat,size]
