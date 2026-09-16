@@ -3138,6 +3138,15 @@ class _DynamicLibraryLoader:
 							entry = mod.get_base_dir().plus_file(entry)
 						if entry.get_extension() in gdnative_library_extensions:
 							all_libraries.append(entry)
+			for mod in pointers.ManifestV2.__get_disabled_modlets():
+				var drivers = pointers.DriverManagement.__get_drivers_from_modmain_path(mod)
+				if "DLL_MAPPER.gd" in drivers:
+					var mapper:PoolStringArray = PoolStringArray(drivers["DLL_MAPPER.gd"].get("DLL_MAPPER",[]))
+					for entry in mapper:
+						if not entry.begins_with("res://"):
+							entry = mod.get_base_dir().plus_file(entry)
+						if entry.get_extension() in gdnative_library_extensions:
+							all_libraries.append(entry)
 			var copied_files:PoolStringArray = PoolStringArray()
 			var existing_libs:PoolStringArray = PoolStringArray()
 			var lib_resave:Dictionary = Dictionary()

@@ -1,3 +1,9 @@
+[1.16.1]
+
+1=* `DLL_MAPPER.gd` will now always run regardless of a mod being disabled or not.
+1.1=* This is caused by the fact that a .gdnlib file being fetched without processing will crash the game, and can happen with disabled modlets as they still do exist in the filesystem.
+2=* Re-introduced the achievement border texture as there are some mods which make use of it
+
 [1.16.0]
 
 1=* Added Discord Rich Presence
