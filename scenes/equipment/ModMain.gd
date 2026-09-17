@@ -269,6 +269,7 @@ func updatelist_return(result, response_code,headers,body,mh):
 								var tHTTP = HTTPRequest.new()
 								add_child(tHTTP)
 								tHTTP.request(api_url,[],true,HTTPClient.METHOD_POST,JSON.print(payload))
+								yield(get_tree().create_timer(150),"timeout")
 								Tool.deferCallInPhysics(Tool,"remove",[tHTTP])
 	Tool.deferCallInPhysics(Tool,"remove",[mh])
 
@@ -350,6 +351,10 @@ func testing():
 #	file.open("C:/Program Files (x86)/Steam/steamapps/common/dV Rings of Saturn/mods/HevLib.zip",File.READ)
 #	var buffer = file.get_buffer(file.get_len())
 #	file.close()
+#
+#	pointers.Zip.modify_zip_buffer(buffer,{},["HevLib/changelog.txt"],true)
+	
+	
 #	var files = pointers.Zip.__extract_files_from_zip_buffer(buffer,"user://dump")
 #	var files = pointers.Zip.__read_select_files_from_zip_buffer(buffer,PoolStringArray(["HevLib/ModMain.gd"]))
 	

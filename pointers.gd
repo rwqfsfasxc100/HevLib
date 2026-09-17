@@ -10527,6 +10527,9 @@ class _Zip:
 		return write_zip_data(zip_path, files, compress)
 	
 	
+	
+	
+	
 	func write_zip_data(zip_path: String, files: Dictionary, compress: bool = false) -> bool:
 		if file.open(zip_path, File.WRITE) != OK:
 			pointers.l("could not open '%s' for writing" % zip_path,"pointers.Zip")
@@ -10537,10 +10540,10 @@ class _Zip:
 	
 	func write_zip_data_to_buffer(files:Dictionary,compress:bool = false) -> PoolByteArray:
 		var dt:Dictionary = pointers.TimeAccess.__get_dos_datetime()
-		var central_records:Array = Array()
 		var buffer:PoolByteArray = PoolByteArray()
+		var central_records:Array = Array()
 		for entry_path in files:
-			var cdr = create_central_dir_record(files[entry_path],entry_path,compress,dt)
+			var cdr:Array = create_central_dir_record(files[entry_path],entry_path,compress,dt)
 			var data = cdr[0]
 			var bytes:PoolByteArray = cdr[1]
 			var local_offset:int = buffer.size()
@@ -10627,7 +10630,53 @@ class _Zip:
 			buffer
 		]
 	
-	
+	func modify_zip_buffer(buffer:PoolByteArray, insert_files: Dictionary, remove_names: Array, compress: bool) -> PoolByteArray:
+		var central_dir:Dictionary = __get_zip_central_directory_from_buffer_with_names(buffer)
+		var remove_set:Dictionary = Dictionary()
+		for n in remove_names:
+			remove_set[n] = true
+		
+		var has_conflict := false
+		for entry in central_dir:
+			if insert_files.has(entry) or remove_set.has(entry):
+				has_conflict = true
+				break
+		
+		var dt:Dictionary = pointers.TimeAccess.__get_dos_datetime()
+		var out:PoolByteArray = PoolByteArray()
+		var records:Array = []
+		
+		if has_conflict:
+			for entry in central_dir:
+				if insert_files.has(entry) or remove_set.has(entry):
+					continue
+				var dta = central_dir[entry]
+				var start: int = dta.local_offset
+				var name_len:int = pointers.DataFormat.__get_uint16_from_buffer(buffer, start + 26)
+				var extra_len:int = pointers.DataFormat.__get_uint16_from_buffer(buffer, start + 28)
+				var end:int = start + 30 + name_len + extra_len + dta.comp_size
+				var bytes:PoolByteArray = buffer.subarray(start,end-1)
+				records.append(create_central_dir_record(bytes,entry,compress,dt))
+				out.append_array(bytes)
+		else:
+			var append_at:int = 0
+			for entry in central_dir:
+				var dta = central_dir[entry]
+				var start: int = dta.local_offset
+				var name_len:int = pointers.DataFormat.__get_uint16_from_buffer(buffer, start + 26)
+				var extra_len:int = pointers.DataFormat.__get_uint16_from_buffer(buffer, start + 28)
+				var end:int = start + 30 + name_len + extra_len + dta.comp_size
+				append_at = max(append_at, end)
+				records.append(create_central_dir_record(dta,entry,compress,dt))
+			out = buffer.subarray(0, append_at - 1) if append_at else PoolByteArray()
+		
+		for entry in insert_files.keys():
+			var dta = insert_files[entry]
+			var construct = create_local_entry({},dt)
+			
+			pass
+		
+		return buffer
 	
 	
 	
