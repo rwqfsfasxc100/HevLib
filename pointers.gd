@@ -3125,7 +3125,7 @@ class _DynamicLibraryLoader:
 	var exePath:String = OS.get_executable_path().get_base_dir() + "/hevlib_dll_store/"
 	var gdnative_library_extensions:PoolStringArray = PoolStringArray(["gdnlib"])
 	
-	func ready():
+	func process_gdnative_plugins():
 		if not pointers.is_editor:
 			var all_libraries:PoolStringArray = PoolStringArray()
 			var mods = pointers.ManifestV2.__get_mod_data()["mods"]
@@ -8843,97 +8843,94 @@ class _RPC:
 	
 	var stack:PoolStringArray = PoolStringArray(["","","",""])
 	var currentStack:int = 0
-	func loader_changed(area:String,level:int = 0,how_specific:String = "",custom_data:Dictionary = {}):
+	func loader_changed(area:String,level:int = 0,how_specific:String = ""):
 		if not loaded:
 			return
-		if custom_data:
-			pass
-		else:
-			if area != stack[0]:
-				start_timer = OS.get_unix_time()
-				currentStack = 0
-				stack[0] = area
-			var prev = currentStack
-			currentStack = level
-	#		print("stack change: from [%s] to [%s]" % [prev,currentStack])
-			if how_specific != "":
-				stack[currentStack] = how_specific
-	#		print("(%s)" % str(stack))
-			var playership = CurrentGame.getPlayerShip()
-			
-			match stack[0]:
-				"enceladus","enceladus_prime":
-					current_icon = "enceladus_prime"
-					current_details = "HEVLIB_DISCORDRPC_AT_ENCELADUS"
-					current_state = "HEVLIB_DISCORDRPC_AT_ENCELADUS"
-					var sn = playership.getShipName()
-					match stack[currentStack]:
-						"simulator":
-							current_details = TranslationServer.translate("HEVLIB_DISCORDRPC_IN_MVFS") % sn
-						"dive_summary":
-							current_details = "HEVLIB_DISCORDRPC_IN_DIVE_SUMMARY"
-						"dive_target":
-							current_details = "HEVLIB_DISCORDRPC_IN_DIVE_TARGET"
-						"mineral_market":
-							current_details = "HEVLIB_DISCORDRPC_IN_MINERAL_MARKET"
-						"repairs":
-							current_details = TranslationServer.translate("HEVLIB_DISCORDRPC_IN_REPAIRS") % sn
-						"inspection":
-							current_details = TranslationServer.translate("HEVLIB_DISCORDRPC_IN_INSPECTIONS") % sn
-						"equipment":
-							current_details = TranslationServer.translate("HEVLIB_DISCORDRPC_IN_EQUIPMENT") % sn
-						"tuning":
-							current_details = TranslationServer.translate("HEVLIB_DISCORDRPC_IN_TUNING") % sn
-						"ship_logs":
-							current_details = "HEVLIB_DISCORDRPC_IN_SHIP_LOGS"
-						"crew":
-							current_details = "HEVLIB_DISCORDRPC_IN_CREW"
-						"fleet":
-							current_details = "HEVLIB_DISCORDRPC_IN_FLEET"
-						"dealer":
-							current_details = "HEVLIB_DISCORDRPC_IN_DEALER"
-						"services":
-							current_details = "HEVLIB_DISCORDRPC_IN_SERVICES"
-					
-				"title_screen":
-					current_icon = "empty"
-					current_details = "HEVLIB_DISCORDRPC_TITLE_SCREEN"
-					current_state = "HEVLIB_DISCORDRPC_TITLE_SCREEN"
-					
-					
-				"ring":
-					current_details = "HEVLIB_DISCORDRPC_IN_RING"
-					current_state = "HEVLIB_DISCORDRPC_IN_RING"
-					
-					match how_specific:
-						"western","western2":
-							current_details = "HEVLIB_DISCORDRPC_HIGH_DENSITY"
-						"mystery","mystery2":
-							current_details = "HEVLIB_DISCORDRPC_ODDITIES"
-						"spooky":
-							current_details = "HEVLIB_DISCORDRPC_SPOOKY"
-						"dare":
-							current_details = "HEVLIB_DISCORDRPC_DARE"
-						"battle":
-							current_details = "HEVLIB_DISCORDRPC_BATTLE"
-						"boss":
-							current_details = "HEVLIB_DISCORDRPC_BOSS"
-						"peril":
-							current_details = "HEVLIB_DISCORDRPC_PERIL"
-						"l:G4A":
-							pass
-						"l:locust":
-							current_details = "HEVLIB_DISCORDRPC_LOCUSTS"
-					
-					var shipIcon = "empty"
-					var thisShip = ""
-					if "baseShipName" in playership and playership.baseShipName in validShips:
-						thisShip = playership.baseShipName
-					if "shipName" in playership and playership.shipName in validShips:
-						thisShip = playership.shipName
-					if thisShip in validShips:
-						shipIcon = validShips[thisShip]
-					current_icon = shipIcon
+		if area != stack[0]:
+			start_timer = OS.get_unix_time()
+			currentStack = 0
+			stack[0] = area
+		var prev = currentStack
+		currentStack = level
+#		print("stack change: from [%s] to [%s]" % [prev,currentStack])
+		if how_specific != "":
+			stack[currentStack] = how_specific
+#		print("(%s)" % str(stack))
+		var playership = CurrentGame.getPlayerShip()
+		
+		match stack[0]:
+			"enceladus","enceladus_prime":
+				current_icon = "enceladus_prime"
+				current_details = "HEVLIB_DISCORDRPC_AT_ENCELADUS"
+				current_state = "HEVLIB_DISCORDRPC_AT_ENCELADUS"
+				var sn = playership.getShipName()
+				match stack[currentStack]:
+					"simulator":
+						current_details = TranslationServer.translate("HEVLIB_DISCORDRPC_IN_MVFS") % sn
+					"dive_summary":
+						current_details = "HEVLIB_DISCORDRPC_IN_DIVE_SUMMARY"
+					"dive_target":
+						current_details = "HEVLIB_DISCORDRPC_IN_DIVE_TARGET"
+					"mineral_market":
+						current_details = "HEVLIB_DISCORDRPC_IN_MINERAL_MARKET"
+					"repairs":
+						current_details = TranslationServer.translate("HEVLIB_DISCORDRPC_IN_REPAIRS") % sn
+					"inspection":
+						current_details = TranslationServer.translate("HEVLIB_DISCORDRPC_IN_INSPECTIONS") % sn
+					"equipment":
+						current_details = TranslationServer.translate("HEVLIB_DISCORDRPC_IN_EQUIPMENT") % sn
+					"tuning":
+						current_details = TranslationServer.translate("HEVLIB_DISCORDRPC_IN_TUNING") % sn
+					"ship_logs":
+						current_details = "HEVLIB_DISCORDRPC_IN_SHIP_LOGS"
+					"crew":
+						current_details = "HEVLIB_DISCORDRPC_IN_CREW"
+					"fleet":
+						current_details = "HEVLIB_DISCORDRPC_IN_FLEET"
+					"dealer":
+						current_details = "HEVLIB_DISCORDRPC_IN_DEALER"
+					"services":
+						current_details = "HEVLIB_DISCORDRPC_IN_SERVICES"
+				
+			"title_screen":
+				current_icon = "empty"
+				current_details = "HEVLIB_DISCORDRPC_TITLE_SCREEN"
+				current_state = "HEVLIB_DISCORDRPC_TITLE_SCREEN"
+				
+				
+			"ring":
+				current_details = "HEVLIB_DISCORDRPC_IN_RING"
+				current_state = "HEVLIB_DISCORDRPC_IN_RING"
+				
+				match how_specific:
+					"western","western2":
+						current_details = "HEVLIB_DISCORDRPC_HIGH_DENSITY"
+					"mystery","mystery2":
+						current_details = "HEVLIB_DISCORDRPC_ODDITIES"
+					"spooky":
+						current_details = "HEVLIB_DISCORDRPC_SPOOKY"
+					"dare":
+						current_details = "HEVLIB_DISCORDRPC_DARE"
+					"battle":
+						current_details = "HEVLIB_DISCORDRPC_BATTLE"
+					"boss":
+						current_details = "HEVLIB_DISCORDRPC_BOSS"
+					"peril":
+						current_details = "HEVLIB_DISCORDRPC_PERIL"
+					"l:G4A":
+						pass
+					"l:locust":
+						current_details = "HEVLIB_DISCORDRPC_LOCUSTS"
+				
+				var shipIcon = "empty"
+				var thisShip = ""
+				if "baseShipName" in playership and playership.baseShipName in validShips:
+					thisShip = playership.baseShipName
+				if "shipName" in playership and playership.shipName in validShips:
+					thisShip = playership.shipName
+				if thisShip in validShips:
+					shipIcon = validShips[thisShip]
+				current_icon = shipIcon
 	
 	func update_timer_finished():
 		emit_signal("rpc_timer_complete")

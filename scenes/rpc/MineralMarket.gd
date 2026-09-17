@@ -37,7 +37,7 @@ onready var rpc = ModLoader._savedObjects[0].RPC
 func _on_MineralMarket_pressed():
 	if visible or $Shower.is_playing():
 		return
-	.show()
+	._on_MineralMarket_pressed()
 	rpc.call_deferred("loader_changed","enceladus_prime",1,"mineral_market")
 
 func hide():

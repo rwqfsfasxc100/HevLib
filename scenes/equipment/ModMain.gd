@@ -80,7 +80,7 @@ func _init(modLoader : ModLoader = ModLoader):
 	
 	pointers.ConfigDriver.__load_configs()
 	pointers.Translations.__inject_translations()
-	pointers.DynamicLibraryLoader.ready()
+	pointers.DynamicLibraryLoader.process_gdnative_plugins()
 	do_safe_load = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_modlet_loading")
 	
 #	testing()
