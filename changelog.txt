@@ -1,3 +1,9 @@
+[1.16.2]
+
+1=* Fixed mineral market not being able to be reopened
+2=* Fixed an issue that prevented UpdateDB from being informed about new mods.
+2.1=* It now also has a 2.5 minute delay between push requests to ensure that the update was completed in it's entirety in the event that there are several new mods exposed.
+
 [1.16.1]
 
 1=* `DLL_MAPPER.gd` will now always run regardless of a mod being disabled or not.
