@@ -1875,6 +1875,10 @@ const TRANSLATIONS = {
 		"HEVLIB_CONFIG_DISCORD_RPC_ENABLED_DESC": {
 			"string": "Whether the Discord Rich Presence should be enabled.\n\nRequires HevLib Discord RPC to be installed to be functional.",
 			"version_hash": 1129104431
+		},
+		"HEVLIB_DISCORDRPC_IN_RESEARCH": {
+			"string": "Investigating research projects",
+			"version_hash": 1195760120
 		}
 	},
 	"de": {

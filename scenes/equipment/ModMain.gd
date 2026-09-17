@@ -100,25 +100,6 @@ func _init(modLoader : ModLoader = ModLoader):
 	installScriptExtension("../keymapping/bind_displays/MousebindDisplay.gd")
 	installScriptExtension("../../scripts/SteamWebAPI.gd")
 	
-	# RPC
-	installScriptExtension("../rpc/Crew.gd")
-	installScriptExtension("../rpc/Dealer.gd")
-	installScriptExtension("../rpc/DiveTarget.gd")
-	installScriptExtension("../rpc/Enceladus.gd")
-	installScriptExtension("../rpc/Game.gd")
-	installScriptExtension("../rpc/Logs.gd")
-	installScriptExtension("../rpc/MineralMarket.gd")
-	installScriptExtension("../rpc/Music.gd")
-	installScriptExtension("../rpc/PreFlightInspection.gd")
-	installScriptExtension("../rpc/Repairs.gd")
-	installScriptExtension("../rpc/Services.gd")
-	installScriptExtension("../rpc/SimulationLayer.gd")
-	installScriptExtension("../rpc/Summary.gd")
-	installScriptExtension("../rpc/TitleMenu.gd")
-	installScriptExtension("../rpc/Tuning.gd")
-	installScriptExtension("../rpc/Upgrades.gd")
-	replaceScene("../rpc/Music.tscn")
-	
 	installScriptExtension("../../ui/ExtensionPopup.gd")
 	installScriptExtension("../scene_replacements/DLClist.gd")
 	replaceScene("../scene_replacements/DLClist.tscn","res://tools/DLClist.tscn")
@@ -165,6 +146,25 @@ func _ready():
 		Debug.l("HevLib Equipment Driver onready process cannot be carried out")
 		return
 	l("Readying")
+	
+	# RPC
+	installScriptExtension("../rpc/Crew.gd")
+	installScriptExtension("../rpc/Dealer.gd")
+	installScriptExtension("../rpc/DiveTarget.gd")
+	installScriptExtension("../rpc/Enceladus.gd")
+	installScriptExtension("../rpc/Game.gd")
+	installScriptExtension("../rpc/Logs.gd")
+	installScriptExtension("../rpc/MineralMarket.gd")
+	installScriptExtension("../rpc/Music.gd")
+	installScriptExtension("../rpc/PreFlightInspection.gd")
+	installScriptExtension("../rpc/Repairs.gd")
+	installScriptExtension("../rpc/Services.gd")
+	installScriptExtension("../rpc/SimulationLayer.gd")
+	installScriptExtension("../rpc/Summary.gd")
+	installScriptExtension("../rpc/TitleMenu.gd")
+	installScriptExtension("../rpc/Tuning.gd")
+	installScriptExtension("../rpc/Upgrades.gd")
+	replaceScene("../rpc/Music.tscn")
 	
 	initiate_mod_update_fetch()
 	

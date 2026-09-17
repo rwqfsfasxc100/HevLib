@@ -8891,6 +8891,8 @@ class _RPC:
 						current_details = "HEVLIB_DISCORDRPC_IN_DEALER"
 					"services":
 						current_details = "HEVLIB_DISCORDRPC_IN_SERVICES"
+					"research":
+						current_details = "HEVLIB_DISCORDRPC_IN_RESEARCH"
 				
 			"title_screen":
 				current_icon = "empty"

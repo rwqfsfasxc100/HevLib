@@ -41,16 +41,16 @@ onready var dormant_project_management = $TabHintContainer/Tabs/HEVLIB_RESEARCH_
 
 onready var show_completed_projects_btn = $TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer2/HBoxContainer/CheckButton
 
+onready var rpc = ModLoader._savedObjects[0].RPC
+
 func show():
-	if $Shower.is_playing():
+	if visible or $Shower.is_playing():
 		return
 	lastFocus = get_focus_owner()
 	$Shower.play("show")
 	show_completed_projects_btn.grab_focus()
 	show_completed_projects_btn.pressed = false
-	if visible:
-		hide()
-	
+	rpc.call_deferred("loader_changed","enceladus_prime",1,"research")
 
 
 #	var notif = {
@@ -72,6 +72,7 @@ func hide():
 	$Shower.play("hide")
 	if lastFocus:
 		lastFocus.grab_focus()
+	rpc.loader_changed("enceladus",0,"")
 var pointers
 func _ready():
 	pointers = ModLoader._savedObjects[0]
