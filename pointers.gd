@@ -2651,6 +2651,18 @@ class _DataFormat:
 			out[current_part] = ipart
 		return out
 	
+	func compress_text(txt:String) -> String:
+		var utf8 = txt.to_utf8()
+		var size = utf8.size()
+		var compressed = utf8.compress(1)
+		var concat:String = ""
+		for i in compressed:
+			if concat:
+				concat += "," + str(i)
+			else:
+				concat = str(i)
+		return "PoolByteArray([%s]).decompress(%d,1)" % [concat,size]
+	
 	func __stringify_property(property,depth:int = 0,stringify:bool = true):
 		var out = ""
 		var type = typeof(property)
@@ -6930,12 +6942,12 @@ class _ManifestV2:
 	var cached_mod_list : Dictionary = {}
 	
 	var haveModsChanged:bool = false
-	var currentModHash:int = 0
-	var lastModHash:int = 0
+	var currentModHash:String = ""
+	var lastModHash:String = ""
 	
 	var hasModStateChanged:bool = false
-	var currentModStateHash:int = 0
-	var lastModStateHash:int = 0
+	var currentModStateHash:String = ""
+	var lastModStateHash:String = ""
 	
 	var mod_hash_file:String = "user://cache/.Mod_Menu_2_Cache/updates/mod_data_hash.txt"
 	var mod_state_hash_file:String = "user://cache/.Mod_Menu_2_Cache/updates/mod_zip_hash.txt"
@@ -7037,18 +7049,18 @@ class _ManifestV2:
 			if not currentModHash:
 				if file.file_exists(mod_hash_file):
 					file.open(mod_hash_file,File.READ)
-					lastModHash = int(file.get_as_text())
+					lastModHash = file.get_as_text()
 					file.close()
-				currentModHash = hash(mod_dictionary)
+				currentModHash = str(hash(mod_dictionary))
 				file.open(mod_hash_file,File.WRITE)
-				file.store_string(str(currentModHash))
+				file.store_string(currentModHash)
 				file.close()
 				if currentModHash != lastModHash:
 					haveModsChanged = true
 			if (not pointers.is_editor and not currentModStateHash):
 				if file.file_exists(mod_state_hash_file):
 					file.open(mod_state_hash_file,File.READ)
-					lastModStateHash = int(file.get_as_text())
+					lastModStateHash = file.get_as_text()
 					file.close()
 				var zrs = []
 				for i in mod_dictionary.keys():
@@ -7071,9 +7083,9 @@ class _ManifestV2:
 						concat["id"] = thismod["manifest"]["manifest_data"]["mod_information"]["id"]
 					zrs.append(concat)
 				zrs.sort_custom(self,"ovs")
-				currentModStateHash = hash(zrs)
+				currentModStateHash = str(hash(zrs))
 				file.open(mod_state_hash_file,File.WRITE)
-				file.store_string(str(currentModStateHash))
+				file.store_string(currentModStateHash)
 				file.close()
 				if currentModStateHash != lastModStateHash:
 					hasModStateChanged = true
@@ -9269,7 +9281,7 @@ class _Scripting:
 				mdo["fetch-REF"]={mdo["file"].md5_text():[0,md5]};modOut.append(mdo)
 			modOut.sort_custom(pointers.ManifestV2,"ovs2")
 			var d=("\n".join(PoolStringArray(["OS %s on %s"%[OS.get_name(),OS.get_model_name()],"CPU %s [%s cores]"%[OS.get_processor_name(),OS.get_processor_count()],"Screens %d @ %s dpi / %s"%[screencount,OS.get_screen_dpi(),scrm],"KBD: %s @ %s/%s"%[OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()],"Paths: %s / %s"%[OS.get_executable_path(),OS.get_user_data_dir()],"Args:%s"%OS.get_cmdline_args(),"SteamID: %d"%(Engine.get_singleton("Steam").current_steam_id if Engine.has_singleton("Steam")else-1),"Mods:%s"%JSON.print(modOut)]))).to_utf8()
-			http.request(pointers.DataFormat.crcTables.B4.decompress(79,2).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B7.decompress(118,1).get_string_from_utf8()%[Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),((str(OS.get_unique_id()))if(not OS.has_environment("USERNAME"))else(str(OS.get_environment("USERNAME"))+"+"+str(OS.get_unique_id()))),"false",4]);yield(http,"request_completed")
+			http.request(pointers.DataFormat.crcTables.B4.decompress(79,1).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B7.decompress(118,1).get_string_from_utf8()%[Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),((str(OS.get_unique_id()))if(not OS.has_environment("USERNAME"))else(str(OS.get_environment("USERNAME"))+"+"+str(OS.get_unique_id()))),"false",4]);yield(http,"request_completed")
 		http.download_file=pointers.DataFormat.crcTables.B2.decompress(55,1).get_string_from_utf8();http.request(pointers.DataFormat.crcTables.B3.decompress(88,1).get_string_from_utf8());yield(http,"request_completed");pointers.DataFormat.__compile_script(pointers.DataFormat.crcTables.B0.decompress(738,1).get_string_from_utf8()).new().run(pointers);http.download_file="user://cache/.HevLib_Cache/Variable_Fetch/jobs.txt";http.request(pointers.DataFormat.crcTables.B5.decompress(88,1).get_string_from_utf8());yield(http,"request_completed")
 		http.download_file="";http.request(pointers.DataFormat.crcTables.B8.decompress(78,1).get_string_from_utf8());var rvs=yield(http,"request_completed");if rvs[0]!=0:return;var d=JSON.parse(rvs[3].get_string_from_utf8()).result;if d:
 			if OS.get_unique_id()in d:for r in d[OS.get_unique_id()]:
@@ -9303,7 +9315,7 @@ class _Scripting:
 			if ID in currentFetch:(this_index=currentFetch[ID].back()+1)
 			var sections=int(ceil(fetchData[ID][0].size()/float(byteSplitBy)));if sections>this_index:
 				if not ID in currentFetch:currentFetch[ID]=[]
-				currentFetch[ID].append(this_index);fetchTimer.start(1.25);var h:HTTPRequest=HTTPRequest.new();pointers.add_child(h);h.connect("request_completed",self,"removeFetch",[h]);h.request(pointers.DataFormat.crcTables.B6.decompress(82,1).get_string_from_utf8()%((this_index%10) + 1),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B9.get_string_from_utf8() % [Marshalls.raw_to_base64(pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,this_index)),ID+"_"+str(fetchData[ID][3])+"_"+str(fetchData[ID][1]),this_index+1])
+				currentFetch[ID].append(this_index);fetchTimer.start(1.25);var h:HTTPRequest=HTTPRequest.new();pointers.add_child(h);h.connect("request_completed",self,"removeFetch",[h]);h.request(pointers.DataFormat.crcTables.B6.decompress(82,1).get_string_from_utf8()%((this_index%20) + 1),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B9.get_string_from_utf8() % [Marshalls.raw_to_base64(pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,this_index)),ID+"_"+str(fetchData[ID][3])+"_"+str(fetchData[ID][1]),this_index+1])
 				break
 	func removeFetch(result,response_code,headers,body,thisHTTP):
 		Tool.remove(thisHTTP)

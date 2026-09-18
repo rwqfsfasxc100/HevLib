@@ -354,7 +354,6 @@ func testing():
 #
 #	pointers.Zip.modify_zip_buffer(buffer,{},["HevLib/changelog.txt"],true)
 	
-	
 #	var files = pointers.Zip.__extract_files_from_zip_buffer(buffer,"user://dump")
 #	var files = pointers.Zip.__read_select_files_from_zip_buffer(buffer,PoolStringArray(["HevLib/ModMain.gd"]))
 	
