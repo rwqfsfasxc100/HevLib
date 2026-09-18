@@ -1,3 +1,13 @@
+[1.16.3]
+
+1=* The pointers node now uses the class_name `HevLibPointers` in order to be more readily available to provide autocomplete options
+1.1=* Autocomplete should be able to cover both classes as well as their functions
+1.2=* Best use-case is when declaring the variable
+1.2.1=* e.g. var pointers:HevLibPointers
+1.3=* WARNING: This should only be used when writing in-editor and all cases of the type casting should be removed before releasing a mod
+1.4=* Failing to remove it will cause any scripts that have it to be unable to load, due to the game needing to have the type registered within it's pck. There is no way around this currently.
+1.5=* There is a semi-workaround to this being worked on in the DVTools plugin, with it being able to be added/removed with a keybind.
+
 [1.16.2]
 
 1=* Fixed mineral market not being able to be reopened
