@@ -3407,7 +3407,7 @@ class _Equipment:
 		}
 	
 	var vanilla_equipment : Dictionary
-	var vanilla_data = preload("res://HevLib/scenes/equipment/vanilla_defaults/slot_tagging.gd")
+	var vanilla_data = load("res://HevLib/scenes/equipment/vanilla_defaults/slot_tagging.gd")
 	var hardpoint_types : Array
 	var alignments : Array
 	var equipment_types : Array
@@ -6164,7 +6164,7 @@ class _Github:
 		var rng:RandomNumberGenerator = RandomNumberGenerator.new()
 		rng.randomize()
 		var CRoot = Tool.get_tree().get_root()
-		var gitHubFS := preload("res://HevLib/scenes/fetch_from_github/fs/FetchGithubData.tscn").instance()
+		var gitHubFS:Node = load("res://HevLib/scenes/fetch_from_github/fs/FetchGithubData.tscn").instance()
 		gitHubFS.URL = URL
 		gitHubFS.ActOnModData = behaviour
 		gitHubFS.mod_version = special_behaviour_data
@@ -6186,7 +6186,7 @@ class _Github:
 			printerr(e)
 		if cancel: return
 		var CRoot = Tool.get_tree().get_root()
-		var gitHubFS := preload("res://HevLib/scenes/fetch_from_github/releases/NetHandles.tscn").instance()
+		var gitHubFS :Node= load("res://HevLib/scenes/fetch_from_github/releases/NetHandles.tscn").instance()
 		if not node_to_return_to.has_method("_get_github_progress"):
 			gitHubFS.state_progress = false
 			pointers.l("Release Downloader NOTICE! Provided node [%s] does not have the method [_get_github_progress]. No download progress will be reported." % str(node_to_return_to),"pointers.Github")
@@ -9970,7 +9970,7 @@ class _WebTranslate:
 	
 	func __webtranslate(URL: String, fallback: Array = [], file_check: String = ""):
 		pointers.l("Fetching translations from %s" % URL,"pointers.WebTranslate")
-		var HevLib = preload("res://HevLib/webtranslate/FetchGithubData.tscn").instance()
+		var HevLib = load("res://HevLib/webtranslate/FetchGithubData.tscn").instance()
 		var pms = Debug.get_node("/root")
 		var tstamp = Time.get_datetime_string_from_system()
 		var date = str(tstamp.split("T")[0])
@@ -10028,7 +10028,7 @@ class _WebTranslate:
 	
 	func __webtranslate_timed(URL: String, MINUTES_DELAY: int, fallback: Array = [], file_check: String = ""):
 		pointers.l("function 'webtranslate_timed' initiated, starting constant translation of [%s] with a delay of [%s] minutes" % [URL,MINUTES_DELAY],"pointers.WebTranslate")
-		var handleNode = preload("res://HevLib/webtranslate/WebtranslateTimerHandler.tscn").instance()
+		var handleNode = load("res://HevLib/webtranslate/WebtranslateTimerHandler.tscn").instance()
 		handleNode.name = URL + Time.get_time_string_from_system()
 		handleNode.URL = URL
 		handleNode.MINUTES = MINUTES_DELAY

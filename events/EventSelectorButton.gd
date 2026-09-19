@@ -34,7 +34,7 @@ extends CheckButton
 
 var event = ""
 
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 var isEnabled = true
 

@@ -140,7 +140,7 @@ func _timer_complete():
 	ring.testSpecificStoryElement = defaultTestSpecificStoryElement
 	ring.odditiesEvery = defaultOdditiesEvery
 	busy = false
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 
 func _on_ClearEvent_pressed():

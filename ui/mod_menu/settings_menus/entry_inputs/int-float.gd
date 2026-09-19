@@ -39,7 +39,7 @@ var CONFIG_ENTRY = ""
 var CONFIG_SECTION = ""
 
 var CONFIG_MOD = ""
-var pointers = ModLoader._savedObjects[0]
+var pointers :HevLibPointers= ModLoader._savedObjects[0]
 export (String,"slider","spinbox") var style = "slider"
 
 export (String,"int","float") var val_type = "int"

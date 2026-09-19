@@ -32,7 +32,7 @@
 
 extends "res://ships/Shipyard.gd"
 
-var syPointers
+var syPointers:HevLibPointers
 
 var inverseShipAliases = {}
 

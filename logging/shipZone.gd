@@ -41,7 +41,7 @@ var available = false
 var accurate_event_counter = false
 var visibility = false
 
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 
 func hl_shipzone_uv():

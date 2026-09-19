@@ -42,7 +42,7 @@ func _ready():
 	if mod_menu:
 		mod_menu.connect("visibility_changed", self , "display")
 
-var pointers
+var pointers:HevLibPointers
 func display():
 	pointers = ModLoader._savedObjects[0]
 	var mod_menu = CurrentGame.get_tree().get_root().find_node("ModMenu", true, false)

@@ -32,7 +32,7 @@
 
 extends "res://hud/CargoScanner.gd"
 
-var HevLib_pointers
+var HevLib_pointers:HevLibPointers
 
 func _enter_tree():
 	HevLib_pointers = ModLoader._savedObjects[0]

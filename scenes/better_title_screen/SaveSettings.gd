@@ -79,7 +79,7 @@ func create():
 		"connect_method":"_on_DELETE_SAVE_pressed",
 		"enable_on_save":true,
 	}]
-	var pointers = ModLoader._savedObjects[0]
+	var pointers:HevLibPointers = ModLoader._savedObjects[0]
 	buttons.append_array(pointers.Equipment.save_button_cache)
 	for button in buttons:
 		var popup_path = button.get("popup_path","")

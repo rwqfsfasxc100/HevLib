@@ -38,7 +38,7 @@ var rich_entry_label = load("res://HevLib/ui/mod_menu/changelogs/labels/rich_cha
 
 var changelog_container = load("res://HevLib/ui/mod_menu/changelogs/ChangelogContainer.tscn")
 
-var pointers = ModLoader._savedObjects[0]
+var pointers :HevLibPointers= ModLoader._savedObjects[0]
 export (String,"singular","dynamic") var operation = "singular"
 
 onready var LEFT = $PAGES/LEFT

@@ -32,7 +32,7 @@
 
 extends "res://Music.gd"
 
-onready var rpc = ModLoader._savedObjects[0].RPC
+onready var rpc:HevLibPointers._RPC = ModLoader._savedObjects[0].RPC
 
 var current_state = ""
 

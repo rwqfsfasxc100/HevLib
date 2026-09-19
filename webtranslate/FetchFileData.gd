@@ -37,7 +37,7 @@ var cacheExtension = ".hev"
 
 var file_check = ""
 
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 func _ready():
 	connect("request_completed",self,"_on_request_complete")

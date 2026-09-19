@@ -32,7 +32,7 @@
 
 extends VBoxContainer
 
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers = ModLoader._savedObjects[0]
 var file:File = File.new()
 
 func _tree_entered():

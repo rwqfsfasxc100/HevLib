@@ -35,7 +35,7 @@ extends Button
 export var changelog_menu = NodePath("")
 onready var menu = get_node_or_null(changelog_menu)
 
-var pointers = ModLoader._savedObjects[0]
+var pointers :HevLibPointers= ModLoader._savedObjects[0]
 func _ready():
 	var data = pointers.ManifestV2.__have_mods_updated()
 	if data and menu:

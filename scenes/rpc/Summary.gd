@@ -32,7 +32,7 @@
 
 extends "res://enceladus/Summary.gd"
 
-onready var rpc = ModLoader._savedObjects[0].RPC
+onready var rpc:HevLibPointers._RPC = ModLoader._savedObjects[0].RPC
 
 func loadOutput(outputData, processed = {}, rem = {}) -> bool:
 	var val = .loadOutput(outputData,processed,rem)

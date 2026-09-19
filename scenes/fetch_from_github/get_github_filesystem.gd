@@ -34,7 +34,7 @@ func get_github_filesystem(URL: String, nodeToReturnTo: Node, behaviour: String 
 	var rng = RandomNumberGenerator.new()
 	rng.randomize()
 	var CRoot = Tool.get_tree().get_root()
-	var gitHubFS = preload("res://HevLib/scenes/fetch_from_github/fs/FetchGithubData.tscn").instance()
+	var gitHubFS = load("res://HevLib/scenes/fetch_from_github/fs/FetchGithubData.tscn").instance()
 	gitHubFS.URL = URL
 	gitHubFS.ActOnModData = behaviour
 	gitHubFS.mod_version = special_behaviour_data

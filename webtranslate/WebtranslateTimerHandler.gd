@@ -32,7 +32,7 @@
 
 extends Node
 
-var pointers = ModLoader._savedObjects[0]
+var pointers :HevLibPointers= ModLoader._savedObjects[0]
 
 export var URL = ""
 export var MINUTES = 30
@@ -40,7 +40,7 @@ export var fallback = []
 export var file_check = ""
 
 func _ready():
-	var timer = preload("res://HevLib/scenes/timer/Timer.tscn").instance()
+	var timer = load("res://HevLib/scenes/timer/Timer.tscn").instance()
 	add_child(timer)
 	get_child(0).start_timer(MINUTES)
 	pointers.WebTranslate.__webtranslate(URL, fallback, file_check)

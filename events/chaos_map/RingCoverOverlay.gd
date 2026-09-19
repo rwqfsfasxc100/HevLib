@@ -39,7 +39,7 @@ func _ready():
 	visible = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_overlay")
 	
 
-var pointers
+var pointers:HevLibPointers
 
 func _physics_process(delta):
 	if visible:

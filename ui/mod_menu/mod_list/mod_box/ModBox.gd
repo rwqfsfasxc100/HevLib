@@ -60,7 +60,7 @@ var MAX_SIZE = Vector2(0,0)
 
 var information_nodes = {}
 
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers = ModLoader._savedObjects[0]
 var file = File.new()
 
 

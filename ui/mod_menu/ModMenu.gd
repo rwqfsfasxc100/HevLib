@@ -32,7 +32,7 @@
 
 extends Popup
 
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers = ModLoader._savedObjects[0]
 var offset = Vector2(12,12)
 
 var cache_folder : String = "user://cache/.Mod_Menu_2_Cache/"

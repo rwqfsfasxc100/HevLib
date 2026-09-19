@@ -32,7 +32,7 @@
 
 extends "res://ships/WeaponSlot.gd"
 
-var pointers
+var pointers:HevLibPointers
 
 var shipName = ""
 var baseShipName = ""

@@ -36,7 +36,7 @@ export var update_menu_path = NodePath("")
 onready var update_menu = get_node(update_menu_path)
 
 var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers = ModLoader._savedObjects[0]
 var file = File.new()
 
 func _ready():

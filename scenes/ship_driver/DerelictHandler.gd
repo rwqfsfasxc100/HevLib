@@ -69,7 +69,7 @@ func _exit_tree():
 
 var prevent = false
 
-var pointers
+var pointers:HevLibPointers
 var ship_pool = {}
 func _ready():
 	pointers = ModLoader._savedObjects[0]

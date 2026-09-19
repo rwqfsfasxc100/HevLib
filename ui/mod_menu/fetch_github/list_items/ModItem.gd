@@ -41,7 +41,7 @@ signal pressed(data,box)
 
 onready var http = get_node("HTTPRequest")
 
-var pointers = ModLoader._savedObjects[0]
+var pointers :HevLibPointers= ModLoader._savedObjects[0]
 var dir = Directory.new()
 var unique_icon = ""
 var user_icon_uuid = ""

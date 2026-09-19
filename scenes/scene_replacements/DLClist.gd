@@ -32,7 +32,7 @@
 
 extends "res://tools/DLClist.gd"
 
-var pointers
+var pointers:HevLibPointers
 
 var hl_modmenu2dlclistdriver_uinit : bool = false
 func _ready():

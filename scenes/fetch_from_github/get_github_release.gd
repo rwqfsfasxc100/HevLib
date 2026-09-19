@@ -47,7 +47,7 @@ func get_github_release(URL: String, folder: String, node_to_return_to: Node, ge
 	if cancel:
 		return
 	var CRoot = Tool.get_tree().get_root()
-	var gitHubFS = preload("res://HevLib/scenes/fetch_from_github/releases/NetHandles.tscn").instance()
+	var gitHubFS = load("res://HevLib/scenes/fetch_from_github/releases/NetHandles.tscn").instance()
 	if not node_to_return_to.has_method("_get_github_progress"):
 		gitHubFS.state_progress = false
 		Debug.l("HevLib Github Release Downloader: NOTICE! Provided node [%s] does not have the method [_get_github_progress]. No download progress will be reported." % str(node_to_return_to))

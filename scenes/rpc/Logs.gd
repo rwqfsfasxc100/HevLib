@@ -32,7 +32,7 @@
 
 extends "res://enceladus/Logs.gd"
 
-onready var rpc = ModLoader._savedObjects[0].RPC
+onready var rpc:HevLibPointers._RPC = ModLoader._savedObjects[0].RPC
 
 func show():
 	if visible or $Shower.is_playing():

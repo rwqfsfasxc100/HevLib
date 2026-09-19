@@ -61,7 +61,7 @@ export (String) var requires_mod_id = ""
 export (Vector3) var minimum_mod_version = Vector3.ZERO
 export (Vector3) var maximum_mod_version = Vector3.ZERO
 
-var pointers
+var pointers:HevLibPointers
 
 func execute():
 	.execute()

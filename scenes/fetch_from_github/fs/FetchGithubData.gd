@@ -166,7 +166,7 @@ func handleVersionCheck():
 	nodeToReturnTo._on_update_completed(update_data)
 	
 	
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers= ModLoader._savedObjects[0]
 func on_timeout():
 	
 	if not fallbackFiles == []:

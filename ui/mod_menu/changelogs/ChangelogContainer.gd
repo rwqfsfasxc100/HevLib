@@ -35,7 +35,7 @@ extends VBoxContainer
 var clearing = false
 
 func parse(path:String,current_page:int,page_size:int,LEFT:Button,RIGHT:Button,refs:Array):
-	var pointers = ModLoader._savedObjects[0]
+	var pointers:HevLibPointers = ModLoader._savedObjects[0]
 	var header_label = load("res://HevLib/ui/mod_menu/changelogs/labels/version_label.tscn")
 	var entry_label = load("res://HevLib/ui/mod_menu/changelogs/labels/changelog_entry.tscn")
 	

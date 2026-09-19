@@ -34,7 +34,7 @@ extends Node
 
 var ship
 
-var pointers
+var pointers:HevLibPointers
 
 func _init(p):
 	pointers = p

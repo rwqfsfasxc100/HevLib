@@ -43,7 +43,7 @@ enum control{
 	auto, 
 	key
 }
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 export (PackedScene) var keybindDisplay
 export (PackedScene) var gamepadKeyDisplay

@@ -30,7 +30,7 @@
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
 
-var pointers
+var pointers:HevLibPointers
 
 func _init(p):
 	pointers = p

@@ -39,7 +39,7 @@ func _ready():
 	if hl_mineraldriverprocessedcargohainterrupthandler_uinit:
 		OS.kill(OS.get_process_id())
 	hl_mineraldriverprocessedcargohainterrupthandler_uinit = true
-	var p = ModLoader._savedObjects[0]
+	var p:HevLibPointers = ModLoader._savedObjects[0]
 	processed_cargo_limiter_obj = load("res://HevLib/scenes/minerals/ShipInterrupt.gd").new(p)
 	processed_cargo_limiter_obj.ship = ship
 	ship = processed_cargo_limiter_obj

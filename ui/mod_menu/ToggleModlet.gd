@@ -32,7 +32,7 @@
 
 extends CheckButton
 
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 var current_modlet = null
 var current_modlet_path : String = ""

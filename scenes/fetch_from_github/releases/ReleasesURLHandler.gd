@@ -32,7 +32,7 @@
 
 extends HTTPRequest
 
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers= ModLoader._savedObjects[0]
 var folder = ""
 var get_pre_releases = false
 var file_preference = "any" # Accepts "any" or "zip"

@@ -35,7 +35,7 @@ extends "res://Boot.gd"
 func _ready():
 	# This checks to see that the copyright message exists and is displayed once the game is finished loading.
 	# Using this point in the load cycle so the license will be posted before potential spam from the title screen
-	var pt = ModLoader._savedObjects[0]
+	var pt:HevLibPointers = ModLoader._savedObjects[0]
 	var cr:String = pt.copyrights
 	if cr.empty():
 		# This should never trip. If it did, join the Discord and ask me. https://discord.gg/dv

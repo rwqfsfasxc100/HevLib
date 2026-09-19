@@ -49,7 +49,7 @@ var fallbackFunc = ""
 
 var file_check = ""
 
-var pointers = ModLoader._savedObjects[0]
+var pointers :HevLibPointers= ModLoader._savedObjects[0]
 
 func _ready():
 	fetch_github_data(URLFullStopReformat)

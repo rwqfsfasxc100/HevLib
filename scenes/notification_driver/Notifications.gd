@@ -74,7 +74,7 @@ func _ready():
 	
 
 var vp_objects = []
-var pointers
+var pointers:HevLibPointers
 var tween
 
 var customInQueue = []

@@ -39,7 +39,7 @@ var CONFIG_ENTRY = ""
 var CONFIG_SECTION = ""
 
 var CONFIG_MOD = ""
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 onready var label_button = $Label/LABELBUTTON
 onready var key_diag = $Label/LABELBUTTON/CanvasLayer/CaptureKeyDialog

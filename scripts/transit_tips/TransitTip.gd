@@ -34,7 +34,7 @@ extends "res://codex/TransitTip.gd"
 
 var list:PoolStringArray = PoolStringArray()
 
-var pointers
+var pointers:HevLibPointers
 var hl_modmenu2transittiphandler_uinit : bool = false
 func _ready():
 	if hl_modmenu2transittiphandler_uinit:

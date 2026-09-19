@@ -32,7 +32,7 @@
 
 extends "res://enceladus/Simulator/SimulationLayer.gd"
 
-onready var rpc = ModLoader._savedObjects[0].RPC
+onready var rpc:HevLibPointers._RPC = ModLoader._savedObjects[0].RPC
 
 func clearSimulation():
 	if visible:

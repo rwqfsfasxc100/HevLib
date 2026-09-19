@@ -36,7 +36,7 @@ var link_button = preload("res://HevLib/ui/mod_menu/urls/URL_BUTTON.tscn")
 
 var MOD_INFO : Dictionary = {}
 
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 func update():
 	var b : Node = $VBoxContainer/ScrollContainer/VBoxContainer

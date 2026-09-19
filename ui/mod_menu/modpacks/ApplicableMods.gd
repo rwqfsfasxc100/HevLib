@@ -41,7 +41,7 @@ onready var root = get_node_or_null("../../..")
 var applicable_mods = {}
 var exported_mods = []
 
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers = ModLoader._savedObjects[0]
 var modPathPrefix = ""
 func _ready():
 	var mods = pointers.ManifestV2.__get_mod_data()["mods"]

@@ -37,7 +37,7 @@ var processed_ship_register = {}
 var processed_ship_modify = {}
 var processed_ship_numerics_modifications = {}
 
-var pointers_hl_addnodes
+var pointers_hl_addnodes:HevLibPointers
 func _enter_tree():
 	pointers_hl_addnodes = ModLoader._savedObjects[0]
 	hl_add_nodes_make_node_mods()

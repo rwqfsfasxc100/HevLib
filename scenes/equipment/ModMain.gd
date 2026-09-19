@@ -61,8 +61,8 @@ func _init(modLoader : ModLoader = ModLoader):
 	if not correct:
 		Debug.l("Folder structure not correct, exiting HevLib load")
 		return
-	if not OS.has_feature("editor"):
-		handle_pointer_cast_clearing(modLoader)
+#	if not OS.has_feature("editor"):
+	handle_pointer_cast_clearing(modLoader)
 	pointers = load(pointers_dir).new(pointers_dir,self)
 	pointers.name = "HevLib~Pointers"
 	if modLoader._savedObjects:
@@ -396,7 +396,7 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 	if script_paths:
 		var dir:Directory = Directory.new()
 		dir.make_dir_recursive("user://cache/.HevLib_Cache/Variable_Fetch/")
-		var classes_to_clear:PoolStringArray = PoolStringArray()
+		var classes_to_clear:PoolStringArray = PoolStringArray(["HevLibPointers"])
 		var driver_dirs = PoolStringArray([
 			"HEVLIB_EQUIPMENT_DRIVER_TAGS",
 			"HEVLIB_MENU",
@@ -415,15 +415,26 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 		var replacements:Dictionary = {}
 		for script in script_paths:
 			file.open("res://" + script,File.READ)
-			var text = file.get_as_text()
+			var text = file.get_as_text(true)
 			file.close()
 			var entries = regex.search_all(text)
 			if entries:
 				var cases:PoolStringArray = PoolStringArray()
+				entries.invert()
+				var ignoreChars:PoolStringArray = PoolStringArray(["\n","=",";"])
 				for entry in entries:
+					var endPos:int = entry.get_end()
+					var appendage:String = ""
+					while endPos < text.length():
+						var c:String = text[endPos]
+						if c in ignoreChars:
+							break
+						appendage += c
+						endPos += 1
 					for s in entry.strings:
-						if not s in cases:
-							cases.append(s)
+						var sp = s + appendage
+						if not sp in cases:
+							cases.append(sp)
 				for r in cases:
 					text = text.replace(r,"")
 				replacements[script] = text.to_utf8()

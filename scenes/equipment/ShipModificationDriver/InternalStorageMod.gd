@@ -441,7 +441,7 @@ func handleAmmoDelivery(delta):
 			availableAmmoToDrawNow += diff * (ammo_speed_multi - 1.0)
 		availableAmmoToDrawNow += ammo_speed_add
 	
-var ismPointers
+var ismPointers:HevLibPointers
 
 
 var limitDroneOutput = true

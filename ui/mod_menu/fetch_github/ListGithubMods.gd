@@ -63,7 +63,7 @@ var mod_item = load("res://HevLib/ui/mod_menu/fetch_github/list_items/ModItem.ts
 var file = File.new()
 signal icon_downloaded(uuid)
 
-var pointers = ModLoader._savedObjects[0]
+var pointers :HevLibPointers= ModLoader._savedObjects[0]
 var mod_ids:Array = pointers.ManifestV2.__get_mod_ids()
 
 var mod_list_cache = "user://cache/.Mod_Menu_2_Cache/github_list/list_cache.json"

@@ -45,7 +45,7 @@ var fco:Color = Color.white
 var shipName:String = ""
 var baseShipName:String = ""
 
-var itsPointers
+var itsPointers:HevLibPointers
 
 var aux_type : String = "MPDG"
 func loadPlaceholder():

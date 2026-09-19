@@ -37,7 +37,7 @@ func _ready():
 	if hl_shipdriverderelictadder_uinit:
 		OS.kill(OS.get_process_id())
 	hl_shipdriverderelictadder_uinit = true
-	var pointers = ModLoader._savedObjects[0]
+	var pointers:HevLibPointers = ModLoader._savedObjects[0]
 	var data = pointers.Equipment.add_ships_store
 	var ro = load("res://story/RescueOperation.gd")
 	for ship in data:

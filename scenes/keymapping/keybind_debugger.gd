@@ -88,7 +88,7 @@ func _input(event):
 		ieDebug()
 	if inputDebug:
 		iDebug(event)
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 var count = 0
 func _physics_process(delta):

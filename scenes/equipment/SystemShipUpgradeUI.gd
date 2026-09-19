@@ -36,7 +36,7 @@ export (String) var config_id = ""
 export (String) var config_section = ""
 export (String) var config_setting = ""
 export (bool) var invert_config = false
-var ssuuPointers
+var ssuuPointers:HevLibPointers
 var hl_eqdrssui_uinit : bool = false
 func _ready():
 	if hl_eqdrssui_uinit:

@@ -41,7 +41,7 @@ onready var dormant_project_management = $TabHintContainer/Tabs/HEVLIB_RESEARCH_
 
 onready var show_completed_projects_btn = $TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer2/HBoxContainer/CheckButton
 
-onready var rpc = ModLoader._savedObjects[0].RPC
+onready var rpc :HevLibPointers._RPC= ModLoader._savedObjects[0].RPC
 
 func show():
 	if visible or $Shower.is_playing():

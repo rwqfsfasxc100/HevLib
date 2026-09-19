@@ -45,7 +45,7 @@ var childData = {}
 var dataDictionary = {}
 var updateMods = []
 
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers= ModLoader._savedObjects[0]
 
 func handleZips():
 	

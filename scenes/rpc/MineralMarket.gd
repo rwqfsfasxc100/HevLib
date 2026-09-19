@@ -32,7 +32,7 @@
 
 extends "res://enceladus/MineralMarket.gd"
 
-onready var rpc = ModLoader._savedObjects[0].RPC
+onready var rpc:HevLibPointers._RPC = ModLoader._savedObjects[0].RPC
 
 func _on_MineralMarket_pressed():
 	if visible or $Shower.is_playing():

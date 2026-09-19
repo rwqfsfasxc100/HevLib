@@ -61,7 +61,7 @@ var allowed_equipment := []
 
 var data_dictionary = ""
 
-var pointers
+var pointers:HevLibPointers
 var cv = null
 var hl_eqdrupggrp_uinit : bool = false
 func _ready():

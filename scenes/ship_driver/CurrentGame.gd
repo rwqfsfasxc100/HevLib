@@ -32,7 +32,7 @@
 
 extends "res://CurrentGame.gd"
 
-var pointersShipDriver
+var pointersShipDriver:HevLibPointers
 var modded_ship_list = []
 
 var added_modded_ships = false

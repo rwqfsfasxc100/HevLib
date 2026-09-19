@@ -54,7 +54,7 @@ var mark_for_completion = false
 
 var progress_bars = {}
 
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 onready var sprite_container = $Icon/PanelContainer/TextureRect
 onready var scene_container = $Icon/PanelContainer/ViewportContainer

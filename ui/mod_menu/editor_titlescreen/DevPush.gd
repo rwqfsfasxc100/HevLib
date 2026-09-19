@@ -36,7 +36,7 @@ onready var button = $VBoxContainer/Button
 onready var label = $VBoxContainer/Label
 onready var confirm = $ConfirmationDialog
 
-onready var pointers = ModLoader._savedObjects[0]
+onready var pointers :HevLibPointers= ModLoader._savedObjects[0]
 
 func _ready():
 	var property:String = str(pointers.ManifestV2.__get_mod_data(true).hash())

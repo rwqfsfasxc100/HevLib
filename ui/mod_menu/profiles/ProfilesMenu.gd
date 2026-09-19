@@ -32,7 +32,7 @@
 
 extends Popup
 
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers = ModLoader._savedObjects[0]
 var profiles = []
 var display = []
 

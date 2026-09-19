@@ -34,7 +34,7 @@ extends Label
 
 onready var modpacks_handle = get_node_or_null(NodePath("../../../../../../../ModpacksMenu/base/VBoxContainer/ApplicableMods"))
 
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers = ModLoader._savedObjects[0]
 func _ready():
 	get_tree().connect("files_dropped",self,"_files_dropped")
 

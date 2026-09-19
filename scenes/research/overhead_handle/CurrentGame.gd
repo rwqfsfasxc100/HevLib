@@ -35,7 +35,7 @@ extends "res://CurrentGame.gd"
 signal hlr_storychanged(story,from,to)
 
 var hl_research_enabled:bool = false setget setResearchEnabled
-var researchSysPointers
+var researchSysPointers:HevLibPointers
 
 var hl_researchoverhead_uinit : bool = false
 func _ready():

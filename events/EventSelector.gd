@@ -33,7 +33,7 @@
 extends ScrollContainer
 
 onready var ring = get_node("/root/Game/TheRing")
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 var all_events = {}
 

@@ -32,7 +32,7 @@
 
 extends "res://TheRing.gd"
 
-var pointers
+var pointers:HevLibPointers
 
 var cache_folder : String = "user://cache/.HevLib_Cache/"
 

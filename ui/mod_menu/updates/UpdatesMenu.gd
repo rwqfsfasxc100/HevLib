@@ -40,7 +40,7 @@ onready var container = $base/VBoxContainer/ScrollContainer/LabelContainer
 onready var no_download_popup = $NoDownload
 
 var file = File.new()
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers = ModLoader._savedObjects[0]
 const update_container = preload("res://HevLib/ui/mod_menu/updates/ModUpdateContainer.tscn")
 var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 

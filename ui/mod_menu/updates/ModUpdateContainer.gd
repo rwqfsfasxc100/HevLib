@@ -32,7 +32,7 @@
 
 extends HBoxContainer
 
-var pointers = ModLoader._savedObjects[0]
+var pointers :HevLibPointers= ModLoader._savedObjects[0]
 
 var mod_id = ""
 var mod_name = ""
