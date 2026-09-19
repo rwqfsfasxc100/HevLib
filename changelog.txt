@@ -1,3 +1,11 @@
+[1.16.4]
+
+1=* The `HevLibPointers` casting now no longer needs to be removed from scripts
+2=* Added `DEFINED_CLASS_NAMES.gd` driver.
+2.1=* This lets you define the classes of any scripts using `class_name` for cases where variables using them have the name cast (i.e. var example:HevLibPointers)
+2.2=* Uses the constant `DEFINED_CLASS_NAMES`, which is an array or PoolStringArray storing the names of all classes.
+2.3=* See HevLib's own `DEFINED_CLASS_NAMES.gd` for an example
+
 [1.16.3]
 
 1=* The pointers node now uses the class_name `HevLibPointers` in order to be more readily available to provide autocomplete options

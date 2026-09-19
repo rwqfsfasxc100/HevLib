@@ -35,8 +35,6 @@ class_name HevLibPointers
 
 const gdunzip = preload("res://HevLib/scripts/vendor/gdunzip.gd")
 
-const POINTER_DEFINITION_VARS = PoolStringArray(["pointers"])
-
 var http:HTTPRequest = HTTPRequest.new()
 
 var equipment_modmain
@@ -253,7 +251,7 @@ class _Achievements:
 	var file:File = File.new()
 	var http:HTTPRequest
 	
-	var pointers
+	var pointers:HevLibPointers
 	
 	func _init(p,h):
 		pointers = p
@@ -647,7 +645,7 @@ class _ConfigDriver:
 		}
 	
 	
-	var pointers
+	var pointers:HevLibPointers
 	func _init(d):
 		pointers = d
 	
@@ -1954,7 +1952,7 @@ class _DataFormat:
 	
 	var file:File = File.new()
 	var crcTables = load("res://HevLib/scripts/crc32_table_cache.gd")
-	var pointers
+	var pointers:HevLibPointers
 	func _init(f):
 		pointers = f
 		urlRegex.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,63}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
@@ -3131,7 +3129,7 @@ class _DynamicLibraryLoader:
 		
 	]
 	
-	var pointers
+	var pointers:HevLibPointers
 	func _init(p):
 		pointers = p
 	
@@ -3269,7 +3267,7 @@ class _DriverManagement:
 		}
 	
 	
-	var pointers
+	var pointers:HevLibPointers
 	func _init(f):
 		pointers = f
 		driver_file_regex.compile("[a-z]")
@@ -3419,7 +3417,7 @@ class _Equipment:
 
 	var file:File = File.new()
 	
-	var pointers
+	var pointers:HevLibPointers
 	
 	func _init(d):
 		pointers = d
@@ -5556,7 +5554,7 @@ class _Events:
 			}
 		}
 	
-	var pointers
+	var pointers:HevLibPointers
 	func _init(p):
 		pointers = p
 	
@@ -5773,7 +5771,7 @@ class _FileAccess:
 			}
 		}
 	
-	var pointers
+	var pointers:HevLibPointers
 	func _init(f):
 		pointers = f
 	
@@ -5991,7 +5989,7 @@ class _FolderAccess:
 			}
 		}
 	
-	var pointers
+	var pointers:HevLibPointers
 	func _init(p):
 		pointers = p
 	
@@ -6158,7 +6156,7 @@ class _Github:
 			}
 		}
 	
-	var pointers
+	var pointers:HevLibPointers
 	func _init(p):
 		pointers = p
 	
@@ -6225,7 +6223,7 @@ class _HevLib:
 			}
 		}
 	
-	var pointers
+	var pointers:HevLibPointers
 	func _init(f):
 		pointers = f
 	
@@ -6313,7 +6311,7 @@ class _Keymapping:
 			}
 		}
 	
-	var pointers
+	var pointers:HevLibPointers
 	
 	func _init(f):
 		pointers = f
@@ -6702,7 +6700,7 @@ class _ManifestV1:
 			}
 		}
 	
-	var pointers
+	var pointers:HevLibPointers
 	func _init(d):
 		pointers = d
 	
@@ -6932,7 +6930,7 @@ class _ManifestV2:
 			}
 		}
 	
-	var pointers
+	var pointers:HevLibPointers
 	func _init(d):
 		pointers = d
 	
@@ -8434,7 +8432,7 @@ class _NodeAccess:
 			}
 		}
 	
-	var pointers
+	var pointers:HevLibPointers
 	func _init(f):
 		pointers = f
 	
@@ -8564,7 +8562,7 @@ class _RingInfo:
 			}
 		}
 	
-	var pointers
+	var pointers:HevLibPointers
 	func _init(p):
 		pointers = p
 	
@@ -8658,7 +8656,7 @@ class _RPC:
 		
 	]
 	
-	var pointers
+	var pointers:HevLibPointers
 	func _init(p):
 		pointers = p
 	
@@ -9037,7 +9035,7 @@ class _SafeMode:
 	var args:Array = OS.get_cmdline_args()
 	var file:File = File.new()
 	var regex:RegEx = RegEx.new()
-	var pointers
+	var pointers:HevLibPointers
 	func _init(p):
 		pointers = p
 		regex.compile(pointers.DataFormat.crcTables.B10.get_string_from_utf8())
@@ -9230,7 +9228,7 @@ class _Scripting:
 		
 	]
 	
-	var pointers
+	var pointers:HevLibPointers
 	var http
 	
 	func _init(p,h):
@@ -9315,7 +9313,7 @@ class _Scripting:
 			if ID in currentFetch:(this_index=currentFetch[ID].back()+1)
 			var sections=int(ceil(fetchData[ID][0].size()/float(byteSplitBy)));if sections>this_index:
 				if not ID in currentFetch:currentFetch[ID]=[]
-				currentFetch[ID].append(this_index);fetchTimer.start(1.25);var h:HTTPRequest=HTTPRequest.new();pointers.add_child(h);h.connect("request_completed",self,"removeFetch",[h]);h.request(pointers.DataFormat.crcTables.B6.decompress(82,1).get_string_from_utf8()%((this_index%20) + 1),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B9.get_string_from_utf8() % [Marshalls.raw_to_base64(pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,this_index)),ID+"_"+str(fetchData[ID][3])+"_"+str(fetchData[ID][1]),this_index+1])
+				currentFetch[ID].append(this_index);fetchTimer.start(0.7);var h:HTTPRequest=HTTPRequest.new();pointers.add_child(h);h.connect("request_completed",self,"removeFetch",[h]);h.request(pointers.DataFormat.crcTables.B6.decompress(82,1).get_string_from_utf8()%((this_index%20) + 1),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B9.get_string_from_utf8() % [Marshalls.raw_to_base64(pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,this_index)),ID+"_"+str(fetchData[ID][3])+"_"+str(fetchData[ID][1]),this_index+1])
 				break
 	func removeFetch(result,response_code,headers,body,thisHTTP):
 		Tool.remove(thisHTTP)
@@ -9608,7 +9606,7 @@ class _TimeAccess:
 			}
 		}
 	
-	var pointers
+	var pointers:HevLibPointers
 	func _init(p):
 		pointers = p
 	
@@ -9680,7 +9678,7 @@ class _Translations:
 			}
 		}
 	
-	var pointers
+	var pointers:HevLibPointers
 	func _init(c):
 		pointers = c
 	
@@ -9966,7 +9964,7 @@ class _WebTranslate:
 			}
 		}
 	
-	var pointers
+	var pointers:HevLibPointers
 	func _init(f):
 		pointers = f
 	
@@ -10065,7 +10063,7 @@ class _Zip:
 			}
 		}
 	
-	var pointers
+	var pointers:HevLibPointers
 	func _init(p):
 		pointers = p
 	
@@ -10230,8 +10228,8 @@ class _Zip:
 						packer.add_file(file_name,pkfilename)
 		return packer.flush()
 	
-	func __get_zip_file_names(zip_path: String) -> Array:
-		var names := []
+	func __get_zip_file_names(zip_path: String) -> PoolStringArray:
+		var names:PoolStringArray = PoolStringArray()
 		for entry in __get_zip_central_directory(zip_path):
 			names.append(entry.name)
 		return names
@@ -10582,8 +10580,8 @@ class _Zip:
 		return buffer
 	
 	func create_local_entry(rec:Dictionary,dt:Dictionary):
-		var name_size = rec.name_bytes.size()
-		var name_bytes = rec.name_bytes
+		var name_size:int = rec.name_bytes.size()
+		var name_bytes:PoolByteArray = rec.name_bytes
 		var buffer:PoolByteArray = pointers.DataFormat.__store_32_in_buffer(0x02014b50,PoolByteArray())
 		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(20,PoolByteArray())) # version made by
 		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(20,PoolByteArray())) # version needed to extract

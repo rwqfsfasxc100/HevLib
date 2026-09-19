@@ -61,6 +61,8 @@ func _init(modLoader : ModLoader = ModLoader):
 	if not correct:
 		Debug.l("Folder structure not correct, exiting HevLib load")
 		return
+	if not OS.has_feature("editor"):
+		handle_pointer_cast_clearing(modLoader)
 	pointers = load(pointers_dir).new(pointers_dir,self)
 	pointers.name = "HevLib~Pointers"
 	if modLoader._savedObjects:
@@ -347,6 +349,292 @@ func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
 	var line = "%s V%s" % [title, version]
 	pointers.l(msg,line)
 
+func handle_pointer_cast_clearing(modLoader:ModLoader):
+	var zipFileNames:PoolStringArray = PoolStringArray(modLoader._modZipFiles)
+	var script_paths:PoolStringArray = PoolStringArray()
+	for zip in zipFileNames:
+		file.open(zip,File.READ)
+		var buffer:PoolByteArray = file.get_buffer(file.get_len())
+		file.close()
+		
+		var buffer_len:int = buffer.size()
+		if buffer_len < 22:
+			continue
+		# Fetch EOCD, including max potential comment size
+		# More mem efficient than fetching entire buffer
+		var search_start = max(buffer_len - 0x06054b50 - 65536, 0)
+		var tail:PoolByteArray = buffer.subarray(0,buffer_len - search_start - 1)
+		var eocd_pos:int = -1
+		var i:int = tail.size() - 22
+		while i > -1:
+			if tail[i] == 0x50 and tail[i + 1] == 0x4b and tail[i + 2] == 0x05 and tail[i + 3] == 0x06:
+				eocd_pos = i
+				break
+			i -= 1
+		if eocd_pos < 0:
+			continue
+		var total_entries:int = (tail[eocd_pos + 10] | (tail[eocd_pos + 10 + 1] << 8))
+		var current_offset:int = (tail[eocd_pos + 16] | (tail[eocd_pos + 16 + 1] << 8) | (tail[eocd_pos + 16 + 2] << 16) | (tail[eocd_pos + 16 + 3] << 24))
+		for ctr in total_entries:
+			var magic:int = (tail[current_offset] | (tail[current_offset + 1] << 8) | (tail[current_offset + 2] << 16) | (tail[current_offset + 3] << 24))
+			var magicCheck:int = 0x02014b50
+			if magic != magicCheck:
+				break
+			current_offset += 28 # magic num. && skip written version + required version + flag && compression method && skip time + date + CRC32 + comp_size + uncomp_size
+			var name_len:int = (tail[current_offset] | (tail[current_offset + 1] << 8))
+			var extra_len:int = (tail[current_offset + 2] | (tail[current_offset + 3] << 8))
+			var comment_len:int = (tail[current_offset + 4] | (tail[current_offset + 5] << 8))
+			current_offset += 18 # comment length && skip disk num. + internal attrib + external attrib. + local_offset
+			var file_name:String = tail.subarray(current_offset,current_offset + name_len - 1).get_string_from_utf8()
+			current_offset += name_len
+			if extra_len > 0:
+				current_offset += extra_len
+			if comment_len > 0:
+				current_offset += comment_len
+			if file_name.get_extension() == "gd":
+				script_paths.append(file_name)
+	if script_paths:
+		var dir:Directory = Directory.new()
+		dir.make_dir_recursive("user://cache/.HevLib_Cache/Variable_Fetch/")
+		var classes_to_clear:PoolStringArray = PoolStringArray()
+		var driver_dirs = PoolStringArray([
+			"HEVLIB_EQUIPMENT_DRIVER_TAGS",
+			"HEVLIB_MENU",
+			"HEVLIB_MINERAL_DRIVER_TAGS",
+			"HEVLIB_DRIVERS",
+		])
+		for sc in script_paths:
+			if sc.get_file() == "DEFINED_CLASS_NAMES.gd" and sc.split("/",false)[-2] in driver_dirs:
+				for i in PoolStringArray(load(sc).get_script_constant_map().get("DEFINED_CLASS_NAMES",PoolStringArray())):
+					if not i in classes_to_clear:
+						classes_to_clear.append(i)
+		var clearlist:String = "|".join(classes_to_clear)
+		var regex:RegEx = RegEx.new()
+#		regex.compile("\\b(?:var)\\s+\\w+\\K\\s*:\\s*(?!(?:%s)\\b)\\w+" % vanilla_classes)
+		regex.compile("\\b(?:var)\\s+\\w+\\K\\s*:\\s*(?:%s)\\b" % clearlist)
+		var replacements:Dictionary = {}
+		for script in script_paths:
+			file.open("res://" + script,File.READ)
+			var text = file.get_as_text()
+			file.close()
+			var entries = regex.search_all(text)
+			if entries:
+				var cases:PoolStringArray = PoolStringArray()
+				for entry in entries:
+					for s in entry.strings:
+						if not s in cases:
+							cases.append(s)
+				for r in cases:
+					text = text.replace(r,"")
+				replacements[script] = text.to_utf8()
+		if replacements:
+			var datetime:Dictionary = Time.get_datetime_dict_from_system()
+			var year:int = datetime.year
+			var month:int = datetime.month
+			var day:int = datetime.day
+			var hour:int = datetime.hour
+			var minute:int = datetime.minute
+			var second:int = datetime.second
+			var dos_year:int = int(max(year - 1980, 0))
+			var dos_time:int = (hour << 11) | (minute << 5) | int(second / 2.0)
+			var dos_date:int = (dos_year << 9) | (month << 5) | day
+			var dt:Dictionary = {"time":dos_time, "date":dos_date}
+			
+			var buffer:PoolByteArray = PoolByteArray()
+			var central_records:Array = Array()
+			for entry_path in replacements:
+				var data:PoolByteArray = replacements[entry_path]
+				var offset:int = buffer.size()
+				var uncompressed_size:int = data.size()
+				var name_bytes:PoolByteArray = entry_path.to_utf8()
+				var crc:int = __get_crc_32(data)
+				var name_size:int = name_bytes.size()
+				buffer.append_array(__store_32_in_buffer(0x04034b50))
+				buffer.append_array(__store_16_in_buffer(20))
+				buffer.append_array(__store_16_in_buffer(0x0800))
+				buffer.append_array(__store_16_in_buffer(0))
+				buffer.append_array(__store_16_in_buffer(dt.time))
+				buffer.append_array(__store_16_in_buffer(dt.date))
+				buffer.append_array(__store_32_in_buffer(crc))
+				buffer.append_array(__store_32_in_buffer(uncompressed_size)) # compressed size
+				buffer.append_array(__store_32_in_buffer(uncompressed_size)) # uncompressed size
+				buffer.append_array(__store_16_in_buffer(name_size))
+				buffer.append_array(__store_16_in_buffer(0)) # extra field length
+				buffer.append_array(name_bytes)
+				buffer.append_array(data)
+				central_records.append({
+					"name_bytes":name_bytes,
+					"crc":crc,
+					"uncomp_size":uncompressed_size,
+					"offset":offset
+				})
+			var central_dir_offset:int = buffer.size()
+			for rec in central_records:
+				var name_size:int = rec.name_bytes.size()
+				var name_bytes:PoolByteArray = rec.name_bytes
+				var uncomp_size:int = rec.uncomp_size
+				buffer.append_array(__store_32_in_buffer(0x02014b50))
+				buffer.append_array(__store_16_in_buffer(20)) # version made by
+				buffer.append_array(__store_16_in_buffer(20)) # version needed to extract
+				buffer.append_array(__store_16_in_buffer(0x0800))
+				buffer.append_array(__store_16_in_buffer(0))
+				buffer.append_array(__store_16_in_buffer(dt.time))
+				buffer.append_array(__store_16_in_buffer(dt.date))
+				buffer.append_array(__store_32_in_buffer(rec.crc))
+				buffer.append_array(__store_32_in_buffer(uncomp_size))
+				buffer.append_array(__store_32_in_buffer(uncomp_size))
+				buffer.append_array(__store_16_in_buffer(name_size))
+				buffer.append_array(__store_16_in_buffer(0)) # extra field length
+				buffer.append_array(__store_16_in_buffer(0)) # comment length
+				buffer.append_array(__store_16_in_buffer(0)) # disk number start
+				buffer.append_array(__store_16_in_buffer(0)) # internal file attributes
+				buffer.append_array(__store_32_in_buffer(0)) # external file attributes
+				buffer.append_array(__store_32_in_buffer(rec.offset))
+				buffer.append_array(name_bytes)
+			var central_dir_size:int = buffer.size() - central_dir_offset
+			var cr_size:int = central_records.size()
+			buffer.append_array(__store_32_in_buffer(0x06054b50))
+			buffer.append_array(__store_16_in_buffer(0)) # number of this disk
+			buffer.append_array(__store_16_in_buffer(0)) # disk where central directory starts
+			buffer.append_array(__store_16_in_buffer(cr_size))
+			buffer.append_array(__store_16_in_buffer(cr_size))
+			buffer.append_array(__store_32_in_buffer(central_dir_size))
+			buffer.append_array(__store_32_in_buffer(central_dir_offset))
+			buffer.append_array(__store_16_in_buffer(0)) # zip comment length
+			file.open("user://cache/.HevLib_Cache/Variable_Fetch/remove_pointer_casting.zip",File.WRITE)
+			file.store_buffer(buffer)
+			file.close()
+			ProjectSettings.load_resource_pack("user://cache/.HevLib_Cache/Variable_Fetch/remove_pointer_casting.zip")
+
+func __store_32_in_buffer(byte:int) -> PoolByteArray:
+	byte %= 0xFFFFFFFF
+	var first = byte & 0xFF
+	var second = (byte & 0xFF00) >> 8
+	var third = (byte & 0xFF0000) >> 16
+	var fourth = (byte & 0xFF000000) >> 24
+	return PoolByteArray([first,second,third,fourth])
+
+func __store_16_in_buffer(byte:int) -> PoolByteArray:
+	byte %= 0xFFFF
+	var first = byte & 0xFF
+	var second = (byte & 0xFF00) >> 8
+	return PoolByteArray([first,second])
+
+var crc_table_0:Array = Array()
+var crc_table_1:Array = Array()
+var crc_table_2:Array = Array()
+var crc_table_3:Array = Array()
+var crc_table_4:Array = Array()
+var crc_table_5:Array = Array()
+var crc_table_6:Array = Array()
+var crc_table_7:Array = Array()
+var crc_table_8:Array = Array()
+var crc_table_9:Array = Array()
+var crc_table_10:Array = Array()
+var crc_table_11:Array = Array()
+var crc_table_12:Array = Array()
+var crc_table_13:Array = Array()
+var crc_table_14:Array = Array()
+var crc_table_15:Array = Array()
+var crc_table_16:Array = Array()
+var crc_table_17:Array = Array()
+var crc_table_18:Array = Array()
+var crc_table_19:Array = Array()
+var crc_table_20:Array = Array()
+var crc_table_21:Array = Array()
+var crc_table_22:Array = Array()
+var crc_table_23:Array = Array()
+var crc_table_24:Array = Array()
+var crc_table_25:Array = Array()
+var crc_table_26:Array = Array()
+var crc_table_27:Array = Array()
+var crc_table_28:Array = Array()
+var crc_table_29:Array = Array()
+var crc_table_30:Array = Array()
+var crc_table_31:Array = Array()
+
+func __get_crc_32(bytes: PoolByteArray) -> int:
+	if crc_table_0.empty():
+		var crcTables = load(modPath + "../../scripts/crc32_table_cache.gd")
+		crc_table_0 = crcTables.T0
+		crc_table_1 = crcTables.T1
+		crc_table_2 = crcTables.T2
+		crc_table_3 = crcTables.T3
+		crc_table_4 = crcTables.T4
+		crc_table_5 = crcTables.T5
+		crc_table_6 = crcTables.T6
+		crc_table_7 = crcTables.T7
+		crc_table_8 = crcTables.T8
+		crc_table_9 = crcTables.T9
+		crc_table_10 = crcTables.T10
+		crc_table_11 = crcTables.T11
+		crc_table_12 = crcTables.T12
+		crc_table_13 = crcTables.T13
+		crc_table_14 = crcTables.T14
+		crc_table_15 = crcTables.T15
+		crc_table_16 = crcTables.T16
+		crc_table_17 = crcTables.T17
+		crc_table_18 = crcTables.T18
+		crc_table_19 = crcTables.T19
+		crc_table_20 = crcTables.T20
+		crc_table_21 = crcTables.T21
+		crc_table_22 = crcTables.T22
+		crc_table_23 = crcTables.T23
+		crc_table_24 = crcTables.T24
+		crc_table_25 = crcTables.T25
+		crc_table_26 = crcTables.T26
+		crc_table_27 = crcTables.T27
+		crc_table_28 = crcTables.T28
+		crc_table_29 = crcTables.T29
+		crc_table_30 = crcTables.T30
+		crc_table_31 = crcTables.T31
+	var crc:int = 0xFFFFFFFF
+	var size:int = bytes.size()
+	var groups:int = int(floor(size / 32.0))
+	var i:int = 0
+	for g in groups:
+		# Rare me splitting a variable that isn't an array or dictionary between lines.
+		# Impossible to read and work on otherwise so enjoy the readable code while you can :P
+		crc = (
+			crc_table_31[(crc & 0xFF) ^ bytes[i]] ^
+			crc_table_30[((crc >> 8) & 0xFF) ^ bytes[i + 1]] ^
+			crc_table_29[((crc >> 16) & 0xFF) ^ bytes[i + 2]] ^
+			crc_table_28[((crc >> 24) & 0xFF) ^ bytes[i + 3]] ^
+			crc_table_27[bytes[i + 4]] ^
+			crc_table_26[bytes[i + 5]] ^
+			crc_table_25[bytes[i + 6]] ^
+			crc_table_24[bytes[i + 7]] ^
+			crc_table_23[bytes[i + 8]] ^
+			crc_table_22[bytes[i + 9]] ^
+			crc_table_21[bytes[i + 10]] ^
+			crc_table_20[bytes[i + 11]] ^
+			crc_table_19[bytes[i + 12]] ^
+			crc_table_18[bytes[i + 13]] ^
+			crc_table_17[bytes[i + 14]] ^
+			crc_table_16[bytes[i + 15]] ^
+			crc_table_15[bytes[i + 16]] ^
+			crc_table_14[bytes[i + 17]] ^
+			crc_table_13[bytes[i + 18]] ^
+			crc_table_12[bytes[i + 19]] ^
+			crc_table_11[bytes[i + 20]] ^
+			crc_table_10[bytes[i + 21]] ^
+			crc_table_9[bytes[i + 22]] ^
+			crc_table_8[bytes[i + 23]] ^
+			crc_table_7[bytes[i + 24]] ^
+			crc_table_6[bytes[i + 25]] ^
+			crc_table_5[bytes[i + 26]] ^
+			crc_table_4[bytes[i + 27]] ^
+			crc_table_3[bytes[i + 28]] ^
+			crc_table_2[bytes[i + 29]] ^
+			crc_table_1[bytes[i + 30]] ^
+			crc_table_0[bytes[i + 31]]
+		)
+		i += 32
+	while i < size:
+		crc = crc_table_0[(crc ^ bytes[i]) & 0xFF] ^ (crc >> 8)
+		i += 1
+	return crc ^ 0xFFFFFFFF
+
 func testing():
 #	file.open("C:/Program Files (x86)/Steam/steamapps/common/dV Rings of Saturn/mods/HevLib.zip",File.READ)
 #	var buffer = file.get_buffer(file.get_len())
@@ -357,7 +645,7 @@ func testing():
 #	var files = pointers.Zip.__extract_files_from_zip_buffer(buffer,"user://dump")
 #	var files = pointers.Zip.__read_select_files_from_zip_buffer(buffer,PoolStringArray(["HevLib/ModMain.gd"]))
 	
-#	var nb = pointers.DataFormat.__store_32_in_buffer(0x04034b50,PoolByteArray())
+#	var nb = __store_32_in_buffer(0x04034b50)
 	
 #	var t1 = Time.get_ticks_usec()
 #	pointers.Zip.__create_zip("user://dump.zip",{"test.zip":buffer},false)
