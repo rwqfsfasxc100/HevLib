@@ -1,3 +1,9 @@
+[1.16.5]
+
+1=* Added support for variables casting as a sub-class of a non-vanilla script class.
+1.1=* e.g. `var ConfigDriver:HevLibPointers._ConfigDriver = ModLoader._savedObjects[0].ConfigDriver` gets converted into `var ConfigDriver= ModLoader._savedObjects[0].ConfigDriver`
+2=* Added pointers casting for all scripts making use of it (excluding ModMains, as these should NEVER have it cast due to being the only scripts to be completely untouchable by the removal process)
+
 [1.16.4]
 
 1=* The `HevLibPointers` casting now no longer needs to be removed from scripts

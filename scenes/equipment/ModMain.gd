@@ -61,7 +61,6 @@ func _init(modLoader : ModLoader = ModLoader):
 	if not correct:
 		Debug.l("Folder structure not correct, exiting HevLib load")
 		return
-#	if not OS.has_feature("editor"):
 	handle_pointer_cast_clearing(modLoader)
 	pointers = load(pointers_dir).new(pointers_dir,self)
 	pointers.name = "HevLib~Pointers"
@@ -350,9 +349,8 @@ func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
 	pointers.l(msg,line)
 
 func handle_pointer_cast_clearing(modLoader:ModLoader):
-	var zipFileNames:PoolStringArray = PoolStringArray(modLoader._modZipFiles)
 	var script_paths:PoolStringArray = PoolStringArray()
-	for zip in zipFileNames:
+	for zip in modLoader._modZipFiles:
 		file.open(zip,File.READ)
 		var buffer:PoolByteArray = file.get_buffer(file.get_len())
 		file.close()
