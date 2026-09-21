@@ -52,5 +52,7 @@ func calc():
 			state = i
 			highest_prio = prio
 	var priority = priorities[state]
-	if priority > 0:
+	if highest_prio > 0.33 and priority > 0:
 		rpc.loader_changed("ring",1,state)
+	else:
+		rpc.loader_changed("ring",1,"")

@@ -418,7 +418,6 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 			var entries = regex.search_all(text)
 			if entries:
 				var cases:PoolStringArray = PoolStringArray()
-				entries.invert()
 				var ignoreChars:PoolStringArray = PoolStringArray(["\n","=",";"])
 				for entry in entries:
 					var endPos:int = entry.get_end()

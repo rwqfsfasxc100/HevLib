@@ -39,5 +39,5 @@ func loadOutput(outputData, processed = {}, rem = {}) -> bool:
 	if val:
 		rpc.call_deferred("loader_changed","enceladus_prime",1,"dive_summary")
 	else:
-		rpc.loader_changed("enceladus",0,"")
+		rpc.loader_changed("enceladus_prime",0,"")
 	return val

@@ -64,28 +64,28 @@ var Translations : _Translations = _Translations.new(self)
 var WebTranslate : _WebTranslate = _WebTranslate.new(self)
 var Zip : _Zip = _Zip.new(self)
 
-var Classes = [
-	Achievements,
-	ConfigDriver,
-	DataFormat,
-	DriverManagement,
-	Equipment,
-	Events,
-	FileAccess,
-	FolderAccess,
-	Github,
-	HevLib,
-	Keymapping,
-	ManifestV1,
-	ManifestV2,
-	NodeAccess,
-	RingInfo,
-	RPC,
-	TimeAccess,
-	Translations,
-	WebTranslate,
-	Zip,
-]
+var Classes = {
+	"Achievements":Achievements,
+	"ConfigDriver":ConfigDriver,
+	"DataFormat":DataFormat,
+	"DriverManagement":DriverManagement,
+	"Equipment":Equipment,
+	"Events":Events,
+	"FileAccess":FileAccess,
+	"FolderAccess":FolderAccess,
+	"Github":Github,
+	"HevLib":HevLib,
+	"Keymapping":Keymapping,
+	"ManifestV1":ManifestV1,
+	"ManifestV2":ManifestV2,
+	"NodeAccess":NodeAccess,
+	"RingInfo":RingInfo,
+	"RPC":RPC,
+	"TimeAccess":TimeAccess,
+	"Translations":Translations,
+	"WebTranslate":WebTranslate,
+	"Zip":Zip,
+}
 
 
 var copyrights = "© 2024-2026 Benjamin Buckhurst a.k.a. __hev. All rights reserved."
@@ -3458,6 +3458,8 @@ class _Equipment:
 	var processed_storage_systems:Array = []
 	var drone_delivery_speed:Dictionary = {}
 	var event_driver_event_entries:Array = []
+	var rpc_second_state_store:Dictionary = {"ring":[],"enceladus_prime":[],"title_screen":[]}
+	var rpc_non_autoload_object_persist:Dictionary = {}
 	
 	var ADD_EQUIPMENT_ITEMS:Array = []
 	var ADD_EQUIPMENT_SLOTS:Array = []
@@ -3470,6 +3472,8 @@ class _Equipment:
 	# END OF DATA STORAGE
 	
 	var equipment_validity_for_slots:Dictionary = {}
+	
+	var AUTOLOAD_REF_STORE:Dictionary = {}
 	
 	var version : PoolIntArray = PoolIntArray([1,0,0])
 	
@@ -3522,6 +3526,13 @@ class _Equipment:
 						drivers[mod_id] = mod.drivers
 		mods.clear()
 		
+		for i in ProjectSettings.get_property_list():
+			if i.name.begins_with("autoload/"):
+				var autoName = i.name.split("autoload/")[1]
+				AUTOLOAD_REF_STORE[autoName] = CurrentGame.get_node("/root/" + autoName)
+		for i in pointers.Classes:
+			AUTOLOAD_REF_STORE["pointers." + i] = pointers.Classes[i]
+		AUTOLOAD_REF_STORE["pointers"] = pointers
 		
 		for i in vanilla_equipment.keys():
 			var item = vanilla_equipment[i]
@@ -4098,7 +4109,7 @@ class _Equipment:
 							namer_store["ships"].append_array(d)
 						
 					"EVENT_DRIVER.gd":
-						for entry in constants:
+						for entry in constKeys:
 							event_driver_event_entries.append(constants[entry])
 					
 					"RESEARCH.gd":
@@ -4106,6 +4117,57 @@ class _Equipment:
 							if not mod_id in research_store:
 								research_store[mod_id] = {}
 							research_store[mod_id][entry] = constants[entry]
+					
+					"RPC_EXTRA_STATES.gd":
+						var data:Dictionary = constants.get("RPC_EXTRA_STATES",{})
+						for type in data:
+							if type in rpc_second_state_store:
+								var states:Array = Array()
+								for item in data[type]:
+									var can_add:bool = true
+									if "sensors" in item:
+										for i in item.sensors.size():
+											var sensorItem = item.sensors[i]
+											match typeof(sensorItem):
+												TYPE_DICTIONARY:
+													if "func_object_path" in sensorItem and "func_method_name" in sensorItem:
+														var object_name:String = sensorItem.func_object_path
+														if object_name.begins_with("res://") and object_name.get_extension() == "gd":
+															if object_name in rpc_non_autoload_object_persist:
+																sensorItem["funcref"] = funcref(rpc_non_autoload_object_persist[object_name],sensorItem.func_method_name)
+															elif pointers.DataFormat.__load_if_can(object_name):
+																var refobject = pointers.DataFormat.__get_load().new()
+																sensorItem["funcref"] = funcref(refobject,sensorItem.func_method_name)
+																rpc_non_autoload_object_persist[object_name] = refobject
+															else:
+																can_add = false
+														elif object_name in AUTOLOAD_REF_STORE:
+															sensorItem["funcref"] = funcref(AUTOLOAD_REF_STORE[object_name],sensorItem.func_method_name)
+														else: can_add = false
+												TYPE_STRING:
+													states.append(item)
+												_:
+													can_add = false
+									if "function_outputs" in item:
+										for i in item.function_outputs.size():
+											var sensorItem = item.function_outputs[i]
+											if typeof(sensorItem) == TYPE_DICTIONARY:
+												if "func_object_path" in sensorItem and "func_method_name" in sensorItem:
+													var object_name:String = sensorItem.func_object_path
+													if object_name.begins_with("res://") and object_name.get_extension() == "gd":
+														if object_name in rpc_non_autoload_object_persist:
+															sensorItem["funcref"] = funcref(rpc_non_autoload_object_persist[object_name],sensorItem.func_method_name)
+														elif pointers.DataFormat.__load_if_can(object_name):
+															var refobject = pointers.DataFormat.__get_load().new()
+															sensorItem["funcref"] = funcref(refobject,sensorItem.func_method_name)
+															rpc_non_autoload_object_persist[object_name] = refobject
+														else: can_add = false
+													elif object_name in AUTOLOAD_REF_STORE:
+														sensorItem["funcref"] = funcref(AUTOLOAD_REF_STORE[object_name],sensorItem.func_method_name)
+													else: can_add = false
+											else: can_add = false
+									if can_add: states.append(item)
+								rpc_second_state_store[type].append_array(states)
 					
 		
 		var all_slot_node_names : Array = []
@@ -6943,12 +7005,12 @@ class _ManifestV2:
 	var cached_mod_list : Dictionary = {}
 	
 	var haveModsChanged:bool = false
-	var currentModHash:String = ""
-	var lastModHash:String = ""
+	var currentModHash:int = 0
+	var lastModHash:int = 0
 	
 	var hasModStateChanged:bool = false
-	var currentModStateHash:String = ""
-	var lastModStateHash:String = ""
+	var currentModStateHash:int = 0
+	var lastModStateHash:int = 0
 	
 	var mod_hash_file:String = "user://cache/.Mod_Menu_2_Cache/updates/mod_data_hash.txt"
 	var mod_state_hash_file:String = "user://cache/.Mod_Menu_2_Cache/updates/mod_zip_hash.txt"
@@ -7050,18 +7112,18 @@ class _ManifestV2:
 			if not currentModHash:
 				if file.file_exists(mod_hash_file):
 					file.open(mod_hash_file,File.READ)
-					lastModHash = file.get_as_text()
+					lastModHash = file.get_32()
 					file.close()
-				currentModHash = str(hash(mod_dictionary))
+				currentModHash = mod_dictionary.hash()
 				file.open(mod_hash_file,File.WRITE)
-				file.store_string(currentModHash)
+				file.store_32(currentModHash)
 				file.close()
 				if currentModHash != lastModHash:
 					haveModsChanged = true
 			if (not pointers.is_editor and not currentModStateHash):
 				if file.file_exists(mod_state_hash_file):
 					file.open(mod_state_hash_file,File.READ)
-					lastModStateHash = file.get_as_text()
+					lastModStateHash = file.get_32()
 					file.close()
 				var zrs = []
 				for i in mod_dictionary.keys():
@@ -7084,9 +7146,9 @@ class _ManifestV2:
 						concat["id"] = thismod["manifest"]["manifest_data"]["mod_information"]["id"]
 					zrs.append(concat)
 				zrs.sort_custom(self,"ovs")
-				currentModStateHash = str(hash(zrs))
+				currentModStateHash = zrs.hash()
 				file.open(mod_state_hash_file,File.WRITE)
-				file.store_string(currentModStateHash)
+				file.store_32(currentModStateHash)
 				file.close()
 				if currentModStateHash != lastModStateHash:
 					hasModStateChanged = true
@@ -8665,7 +8727,7 @@ class _RPC:
 	
 	# RPC CALLABLE FUNCTIONS
 	
-	func __set_icon(ship:String,force_this_icon:bool = false,do_update:bool = false):
+	func set_icon(ship:String,force_this_icon:bool = false):
 		var icon:String = ""
 		if force_this_icon:
 			icon = ship
@@ -8687,27 +8749,18 @@ class _RPC:
 			if icon.empty():
 				icon = "empty"
 			current_icon = icon
-			changed = true
-			if do_update:
-				emit_signal("update_activity")
 	
-	func __set_icon_text(text:String,do_update:bool = false):
+	func set_icon_text(text:String):
 		if text != current_icon_text:
 			pointers.l("Changing large icon from %s to %s" % [current_icon,text],"pointers.RPC")
 			current_icon_text = text
-			changed = true
-			if do_update:
-				emit_signal("update_activity")
 	
-	func __set_small_icon_text(text:String,do_update:bool = false):
+	func set_small_icon_text(text:String):
 		if text != current_small_icon_text:
 			pointers.l("Changing small icon text from %s to %s" % [current_small_icon_text,text],"pointers.RPC")
 			current_small_icon_text = text
-			changed = true
-			if do_update:
-				emit_signal("update_activity")
 	
-	func __set_small_icon(how:String,force_this_icon:bool = false,do_update:bool = false):
+	func set_small_icon(how:String,force_this_icon:bool = false):
 		var icon:String = "None"
 		if force_this_icon:
 			icon = how
@@ -8717,41 +8770,26 @@ class _RPC:
 		if icon != current_small_icon:
 			pointers.l("Changing small icon from %s to %s" % [current_small_icon,icon],"pointers.RPC")
 			current_small_icon = icon
-			changed = true
-			if do_update:
-				emit_signal("update_activity")
 	
-	func __set_start_timer(time:int = OS.get_unix_time(),do_update = false):
+	func set_start_timer(time:int = OS.get_unix_time()):
 		if time != start_timer:
 			pointers.l("Changing start time from %s to %s" % [str(end_timer),str(time)],"pointers.RPC")
 			start_timer = time
-			changed = true
-			if do_update:
-				emit_signal("update_activity")
 	
-	func __set_end_timer(time:int = 0,do_update:bool = false):
+	func set_end_timer(time:int = 0):
 		if time != end_timer:
 			pointers.l("Changing end time from %s to %s" % [str(end_timer),str(time)],"pointers.RPC")
 			end_timer = time
-			changed = true
-			if do_update:
-				emit_signal("update_activity")
 	
-	func __set_state(text:String,do_update:bool = false):
+	func set_state(text:String):
 		if text != current_state:
 			pointers.l("Changing state from %s to %s" % [current_state,text],"pointers.RPC")
 			current_state = text
-			changed = true
-			if do_update:
-				emit_signal("update_activity")
 	
-	func __set_details(text:String,do_update = false):
+	func set_details(text:String):
 		if text != current_details:
 			pointers.l("Changing details from %s to %s" % [current_details,text],"pointers.RPC")
 			current_details = text
-			changed = true
-			if do_update:
-				emit_signal("update_activity")
 	
 	# RPC INTERNALS
 	
@@ -8767,8 +8805,11 @@ class _RPC:
 	var current_state:String = ""
 	var current_details:String = "HEVLIB_DISCORDRPC_TITLE_SCREEN"
 	
+	var secondary_state_index:int = 0
+	var secondary_states:Array = Array()
+	var absolute_state:String = ""
+	
 	var loaded:bool = false
-	var changed:bool = false
 	
 	var update_wait_time:float = 4.5
 	var reconnect_wait_time:float = 3.0
@@ -8854,8 +8895,6 @@ class _RPC:
 			
 			pointers.add_child(update_timer)
 			update_timer_finished()
-#			yield(CurrentGame.get_tree(),"idle_frame")
-#			emit_signal("update_activity")
 	
 	var stack:PoolStringArray = PoolStringArray(["","","",""])
 	var currentStack:int = 0
@@ -8866,20 +8905,19 @@ class _RPC:
 			start_timer = OS.get_unix_time()
 			currentStack = 0
 			stack[0] = area
+			secondary_states = pointers.Equipment.rpc_second_state_store[area]
+			secondary_state_index = 0
 		var prev = currentStack
 		currentStack = level
-#		print("stack change: from [%s] to [%s]" % [prev,currentStack])
 		if how_specific != "":
 			stack[currentStack] = how_specific
-#		print("(%s)" % str(stack))
-		var playership = CurrentGame.getPlayerShip()
 		
 		match stack[0]:
-			"enceladus","enceladus_prime":
+			"enceladus_prime":
 				current_icon = "enceladus_prime"
 				current_details = "HEVLIB_DISCORDRPC_AT_ENCELADUS"
 				current_state = "HEVLIB_DISCORDRPC_AT_ENCELADUS"
-				var sn = playership.getShipName()
+				var sn = CurrentGame.getPlayerShip().getShipName()
 				match stack[currentStack]:
 					"simulator":
 						current_details = TranslationServer.translate("HEVLIB_DISCORDRPC_IN_MVFS") % sn
@@ -8920,6 +8958,8 @@ class _RPC:
 				current_details = "HEVLIB_DISCORDRPC_IN_RING"
 				current_state = "HEVLIB_DISCORDRPC_IN_RING"
 				
+				var playership = CurrentGame.getPlayerShip()
+				
 				match how_specific:
 					"western","western2":
 						current_details = "HEVLIB_DISCORDRPC_HIGH_DENSITY"
@@ -8957,21 +8997,69 @@ class _RPC:
 	
 	func update_rpc():
 		if loaded:# and changed:
-			__set_icon(current_icon)
-			__set_icon_text(current_icon_text)
-			__set_small_icon(current_small_icon)
-			__set_small_icon_text(current_small_icon_text)
-			__set_start_timer(start_timer)
-			__set_end_timer(end_timer)
-			__set_state(current_state)
-			__set_details(current_details)
-#			changed = false
+			set_icon(current_icon)
+			set_icon_text(current_icon_text)
+			set_small_icon(current_small_icon)
+			set_small_icon_text(current_small_icon_text)
+			set_start_timer(start_timer)
+			set_end_timer(end_timer)
+			set_state(current_state)
+			set_details(current_details)
+			calculate_current_state()
 			emit_signal("update_activity")
 	
+	func get_state_data(state:Dictionary) -> String:
+		var out:String = TranslationServer.translate(state.get("text","RPC text missing :("))
+		var playership = CurrentGame.getPlayerShip()
+		var toFormat = {}
+		for sensor in state.get("sensors",Array()):
+			match typeof(sensor):
+				TYPE_STRING:
+					toFormat["sensor:" + sensor] = playership.sensorGet(sensor)
+				TYPE_DICTIONARY:
+					var sensor_name:String = sensor.get("sensor","")
+					var fallbackFormat = sensor.get("fallback","unknown")
+					var sensorOut = playership.sensorGet(sensor_name)
+					if "funcref" in sensor:
+						sensorOut = sensor.get("funcref").call_funcv([sensorOut] + sensor.get("extra_operands",[]))
+					if sensorOut:
+						toFormat["sensor:" + sensor_name] = sensorOut
+					elif fallbackFormat:
+						toFormat["sensor:" + sensor_name] = TranslationServer.translate(fallbackFormat)
+		for sensor in state.get("function_outputs",Array()):
+			if typeof(sensor)==TYPE_DICTIONARY:
+				var sensor_name:String = sensor.get("name","")
+				var fallbackFormat = sensor.get("fallback","unknown")
+				var sensorOut
+				if "funcref" in sensor:
+					sensorOut = sensor.get("funcref").call_funcv(sensor.get("extra_operands",[]))
+				if sensorOut:
+					toFormat["output:" + sensor_name] = sensorOut
+				elif fallbackFormat:
+					toFormat["output:" + sensor_name] = TranslationServer.translate(fallbackFormat)
+		if toFormat:
+			out = out.format(toFormat)
+		return out
+	
+	func calculate_current_state():
+		if secondary_states:
+			secondary_state_index += 1
+			if secondary_state_index > secondary_states.size():
+				secondary_state_index = 0
+			if secondary_state_index == 0 and current_state == current_details:
+				secondary_state_index = 1
+			if secondary_state_index > 0:
+				var thisState = secondary_states[secondary_state_index - 1]
+				absolute_state = get_state_data(thisState)
+			else:
+				absolute_state = current_state
+		else:
+			secondary_state_index = 0
+			absolute_state = current_state
 	
 	var err_count:int = 0
 	func update_activity() -> void:
-		var st = current_state
+		var st = absolute_state
 		var dt = current_details
 		if st == dt:
 			st = ""

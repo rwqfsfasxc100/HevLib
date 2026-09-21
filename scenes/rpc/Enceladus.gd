@@ -37,4 +37,4 @@ func _ready():
 	if rpc_enceladus_uinit:
 		OS.kill(OS.get_process_id())
 	rpc_enceladus_uinit = true
-	ModLoader._savedObjects[0].RPC.loader_changed("enceladus")
+	ModLoader._savedObjects[0].RPC.loader_changed("enceladus_prime")

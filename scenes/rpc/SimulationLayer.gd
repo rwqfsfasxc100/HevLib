@@ -36,11 +36,11 @@ onready var rpc:HevLibPointers._RPC = ModLoader._savedObjects[0].RPC
 
 func clearSimulation():
 	if visible:
-		rpc.loader_changed("enceladus",1)
+		rpc.loader_changed("enceladus_prime",1)
 	.clearSimulation()
 
 func startSimulation(sim):
 	if sim and not visible:
-		rpc.loader_changed("enceladus",2,"simulator")
+		rpc.loader_changed("enceladus_prime",2,"simulator")
 	.startSimulation(sim)
 	

@@ -52,10 +52,8 @@ onready var add_container = $ScrollContainer/VBoxContainer
 func _ready():
 	LEFT.connect("pressed",self,"_left_pressed")
 	RIGHT.connect("pressed",self,"_right_pressed")
-	if operation == "singular" and path != "":
+	if path and operation == "singular":
 		rect_size = get_parent().rect_size
-#		yield(CurrentGame.get_tree(),"idle_frame")
-#		parse()
 
 var refs = []
 var panelRefs = []
@@ -87,20 +85,13 @@ var clearing = false
 export var page_size = 15
 var current_page = 0
 func parse():
-#	yield(CurrentGame.get_tree(),"idle_frame")
-	
 	if path:
-#		clear()
-#		if clearing:
-#			yield(self,"cleared")
 		var panel = changelog_container.instance()
 		panelRefs.append(panel)
 		panel.rect_min_size = rect_size - Vector2(12,6)
 		add_container.add_child(panel)
 		yield(CurrentGame.get_tree(),"idle_frame")
 		panel.parse(path,current_page,page_size,LEFT,RIGHT,refs)
-		
-	
 
 func _visibility_changed():
 	yield(CurrentGame.get_tree(),"idle_frame")
@@ -117,12 +108,10 @@ func clear_and_update(new):
 	if clearing:
 		yield(self,"cleared")
 	path = new
-
 	parse()
 
 func clear():
 	clearing = true
-#	yield(CurrentGame.get_tree().create_timer(0.1),"timeout")
 	for i in panelRefs:
 		i.clearing = true
 		i.set_physics_process(false)

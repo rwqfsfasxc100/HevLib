@@ -82,13 +82,11 @@ func _unhandled_input(event):
 
 func _on_resize():
 	if is_visible_in_tree():
-		var size = Settings.getViewportSize()
-		var offsetSize = size - offset
-		var vbsize = offsetSize - Vector2(10,10)
+		var size:Vector2 = Settings.getViewportSize()
+		var offsetSize:Vector2 = size - offset
+		var vbsize:Vector2 = offsetSize - Vector2(10,10)
 		rect_size = size
-#		$ColorRect.rect_min_size = size
 		$ColorRect.rect_size = size
-#		$base.rect_min_size = offsetSize
 		$base.rect_size = offsetSize
 		$base.rect_position = offset/2
 		$base/PanelContainer.rect_size = offsetSize

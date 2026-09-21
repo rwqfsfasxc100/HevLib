@@ -62,14 +62,9 @@ func update_filters(tag,change):
 		if tag_visibility[t] == true:
 			has_filters = true
 			currently_filtering_tags.append(t)
-	if has_filters:
-		filtering = true
-	else:
-		filtering = false
+	filtering = has_filters
 	for tag in currently_filtering_tags:
 		var mods = tags[tag]
 		for mod in mods:
-			if mod in mod_visibility:
-				pass
-			else:
+			if not mod in mod_visibility:
 				mod_visibility.append(mod)

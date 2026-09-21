@@ -41,10 +41,10 @@ func parse(path:String,current_page:int,page_size:int,LEFT:Button,RIGHT:Button,r
 	
 	var data:Dictionary = pointers.ManifestV2.__parse_changelogs(path)
 	
-	var size = data.size()
-	var offset = (current_page * page_size)
-	var max_pages = int(ceil(float(size)/float(page_size))) - 1
-	var keys = data.keys()
+	var size:int = data.size()
+	var offset:int = current_page * page_size
+	var max_pages:int = int(ceil(float(size)/float(page_size))) - 1
+	var keys:Array = data.keys()
 	LEFT.disabled = current_page < 1
 	RIGHT.disabled = current_page > max_pages - 1
 	for iv in clamp(size - offset,0,page_size):

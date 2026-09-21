@@ -1879,6 +1879,18 @@ const TRANSLATIONS = {
 		"HEVLIB_DISCORDRPC_IN_RESEARCH": {
 			"string": "Investigating research projects",
 			"version_hash": 1195760120
+		},
+		"HEVLIB_DISCORDRPC_SECONDARY_CARGOVALUE": {
+			"string": "Cargo value: {sensor:cargo.value} E$",
+			"version_hash": 4119875156
+		},
+		"HEVLIB_DISCORDRPC_SECONDARY_DEPTH": {
+			"string": "Depth: {sensor:diveDepth} km",
+			"version_hash": 1680391573
+		},
+		"HEVLIB_DISCORDRPC_SECONDARY_DATETIME": {
+			"string": "{output:dateTime}",
+			"version_hash": 329275765
 		}
 	},
 	"de": {
