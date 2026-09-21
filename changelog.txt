@@ -13,6 +13,7 @@
 1.4.3.2=* `func_object_path` -> (String) the res:// filepath of a script file, autoload name, or pointers class name for the object to handle the sensor output. ("CurrentGame","pointers.DataFormat","res://path/to/script.gd")
 1.4.3.3=* `extra_operands` -> (Array) additional operands that can be supplied to the function if it needs more than the sensor's output
 1.4.3.4=* `fallback` -> (Variant) if the sensor returns null (i.e. damaged sensors, sensor doesn't exist), the value to use for formatting instead
+1.4.4=* The text string/translation should contain the following to be replaced with the sensor's output: `{sensor:<sensor name>}`, with `<sensor name>` being replaced with the `sensor` property's value
 1.5=* `function_outputs` -> (Array) any parameters using the outputs of functions
 1.5.1=* Can be used in any context
 1.5.3=* Each entry must be a dictionary, and uses the following format:
