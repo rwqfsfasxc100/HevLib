@@ -9012,20 +9012,21 @@ class _RPC:
 		var out:String = TranslationServer.translate(state.get("text","RPC text missing :("))
 		var playership = CurrentGame.getPlayerShip()
 		var toFormat = {}
-		for sensor in state.get("sensors",Array()):
-			match typeof(sensor):
-				TYPE_STRING:
-					toFormat["sensor:" + sensor] = playership.sensorGet(sensor)
-				TYPE_DICTIONARY:
-					var sensor_name:String = sensor.get("sensor","")
-					var fallbackFormat = sensor.get("fallback","unknown")
-					var sensorOut = playership.sensorGet(sensor_name)
-					if "funcref" in sensor:
-						sensorOut = sensor.get("funcref").call_funcv([sensorOut] + sensor.get("extra_operands",[]))
-					if sensorOut:
-						toFormat["sensor:" + sensor_name] = sensorOut
-					elif fallbackFormat:
-						toFormat["sensor:" + sensor_name] = TranslationServer.translate(fallbackFormat)
+		if stack[0] == "ring":
+			for sensor in state.get("sensors",Array()):
+				match typeof(sensor):
+					TYPE_STRING:
+						toFormat["sensor:" + sensor] = playership.sensorGet(sensor)
+					TYPE_DICTIONARY:
+						var sensor_name:String = sensor.get("sensor","")
+						var fallbackFormat = sensor.get("fallback","unknown")
+						var sensorOut = playership.sensorGet(sensor_name)
+						if "funcref" in sensor:
+							sensorOut = sensor.get("funcref").call_funcv([sensorOut] + sensor.get("extra_operands",[]))
+						if sensorOut != null:
+							toFormat["sensor:" + sensor_name] = sensorOut
+						elif fallbackFormat:
+							toFormat["sensor:" + sensor_name] = TranslationServer.translate(fallbackFormat)
 		for sensor in state.get("function_outputs",Array()):
 			if typeof(sensor)==TYPE_DICTIONARY:
 				var sensor_name:String = sensor.get("name","")

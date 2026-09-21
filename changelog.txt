@@ -1,3 +1,32 @@
+[1.16.6]
+
+1=* RPC can now cycle through custom decorator text displays for the minor details display
+1.1=* Can be defined with the `RPC_EXTRA_STATES.gd` driver from within a `RPC_EXTRA_STATES` dictionary
+1.2=* Split between context (`title_screen`, `enceladus_prime`, and `ring`)
+1.3=* `text` -> (String) the text/translation key for the displayed text
+1.4=* `sensors` -> (Array) any parameters using the player's `sensorGet` method.
+1.4.1=* Can only be used in the `ring` context, with each entry being either a string or a dictionary
+1.4.2=* If an entry is a string, it is handled in the literal sense for the `sensorGet` call. 
+1.4.3=* If it is a dictionary, uses the following format:
+1.4.3.1=* `sensor` -> (String) the sensor name to be fetched with `sensorGet`
+1.4.3.2=* `func_method_name` -> (String) the name of a function to pipe the `sensorGet` output through, with it's output being supplied to the formatter
+1.4.3.2=* `func_object_path` -> (String) the res:// filepath of a script file, autoload name, or pointers class name for the object to handle the sensor output. ("CurrentGame","pointers.DataFormat","res://path/to/script.gd")
+1.4.3.3=* `extra_operands` -> (Array) additional operands that can be supplied to the function if it needs more than the sensor's output
+1.4.3.4=* `fallback` -> (Variant) if the sensor returns null (i.e. damaged sensors, sensor doesn't exist), the value to use for formatting instead
+1.5=* `function_outputs` -> (Array) any parameters using the outputs of functions
+1.5.1=* Can be used in any context
+1.5.3=* Each entry must be a dictionary, and uses the following format:
+1.5.3.1=* `name` -> (String) the name used for the formatting string
+1.5.3.2=* `func_method_name` -> (String) the name of a function to get the data from
+1.5.3.2=* `func_object_path` -> (String) the res:// filepath of a script file, autoload name, or pointers class name for the object containing the desired function. ("CurrentGame","pointers.DataFormat","res://path/to/script.gd")
+1.5.3.3=* `extra_operands` -> (Array) additional operands that can be supplied to the function if it needs any
+1.5.3.4=* `fallback` -> (Variant) if the output returns null (i.e. intentional output, method returns void), the value to use for formatting instead
+1.5.4=* The text string/translation should contain the following to be replaced with the function's output: `{output:<ID>}`, with `<ID>` being replaced with the `name` property's value
+1.6=* See HevLib's own `RPC_EXTRA_STATES.gd` for an example
+2=* Fixed issue where music fading out would not update RPC
+3=* Unified all enceladus RPC calls to use `enceladus_prime` for the keyword
+4=* `ThrusterSlotDriver` now no longer stores entries for the thruster's audio nodes, as they're controlled by other properties
+
 [1.16.5]
 
 1=* Added support for variables casting as a sub-class of a non-vanilla script class.
