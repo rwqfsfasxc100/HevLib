@@ -317,7 +317,7 @@ static func _crc32(data: PoolByteArray) -> int:
 
 	var crc := 0xFFFFFFFF
 	var size := data.size()
-	var groups := size / 32
+	var groups := int(size / 32.0)
 	var i := 0
 	for _g in range(groups):
 		# The running crc is 4 bytes; XOR each of its bytes with the next
