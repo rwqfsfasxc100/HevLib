@@ -72,7 +72,7 @@ func hide():
 	$Shower.play("hide")
 	if lastFocus:
 		lastFocus.grab_focus()
-	rpc.loader_changed("enceladus",0,"")
+	rpc.loader_changed("enceladus_prime",0,"")
 var pointers
 func _ready():
 	pointers = ModLoader._savedObjects[0]

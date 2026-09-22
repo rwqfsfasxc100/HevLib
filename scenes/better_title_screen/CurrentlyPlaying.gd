@@ -38,18 +38,27 @@ func _ready():
 		OS.kill(OS.get_process_id())
 	hl_currhider_uinit = true
 	yield(get_tree(), "idle_frame")
-	var mod_menu = CurrentGame.get_tree().get_root().find_node("ModMenu", true, false)
+	var groups:Array = CurrentGame.get_tree().get_nodes_in_group("hevlib_mod_menu")
+	var mod_menu:Node
+	if groups:
+		mod_menu = groups[0]
+	if not mod_menu:
+		mod_menu = CurrentGame.get_tree().get_root().find_node("ModMenu", true, false)
 	if mod_menu:
 		mod_menu.connect("visibility_changed", self , "display")
 
 var pointers:HevLibPointers
 func display():
 	pointers = ModLoader._savedObjects[0]
-	var mod_menu = CurrentGame.get_tree().get_root().find_node("ModMenu", true, false)
+	var groups:Array = CurrentGame.get_tree().get_nodes_in_group("hevlib_mod_menu")
+	var mod_menu:Node
+	if groups:
+		mod_menu = groups[0]
+	if not mod_menu:
+		mod_menu = CurrentGame.get_tree().get_root().find_node("ModMenu", true, false)
 	if mod_menu and mod_menu.visible:
 		visible = false
 		return
-		
 	if pointers.ConfigDriver.__get_value("HevLib", "HEVLIB_CONFIG_SECTION_DRIVERS", "show_currently_playing"):
 		.display()
 	else:

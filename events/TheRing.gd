@@ -57,24 +57,24 @@ func hl_ring_UV():
 			disabled_events = []
 		
 		var write_events:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","write_events")
+		var string : Dictionary = {}
 		for i in get_children():
-			base_playlist.append(i.name)
+			var event:String = i.name
+			base_playlist.append(event)
+			string[event] = not event in disabled_events
 		if write_events:
-			var string : Dictionary = {}
-			for event in base_playlist:
-				string[event] = not event in disabled_events
 			pointers.FolderAccess.__check_folder_exists(cache_folder)
 			file.open(cache_folder + "current_events.txt",File.WRITE)
 			file.store_string(JSON.print(string,"\t"))
 			file.close()
 		
 		playlist = []
-		if disabled_events.size() >= base_playlist.size():
-			playlist.append(dummy_event)
-		else:
+		if disabled_events.size() < base_playlist.size():
 			for event in base_playlist:
 				if not event in disabled_events:
 					playlist.append(get_node(event))
+		else:
+			playlist.append(dummy_event)
 
 func forcedOddityConfirmed(which):
 	unspawnedOddities.erase(which)
@@ -135,11 +135,11 @@ func oddity_spawning(nearby, oddity):
 func enterNearby(what, id):
 	if not what in current_event_log:
 		current_event_log.merge({what:{}})
-	var ctime : String = Time.get_datetime_string_from_system(true)
+	var ctime : float = Time.get_unix_time_from_system()
 	if not id in current_event_log[what]:
 		current_event_log[what].merge({id:{}})
 	current_event_log[what][id]["enter_time"] = ctime
-	if Time.get_unix_time_from_datetime_string(ctime) > Time.get_unix_time_from_datetime_string(current_event_log[what][id].get("exit_time","2020-01-01T03:45:01")):
+	if ctime > current_event_log[what][id].get("exit_time",0.0):
 		if "exit_time" in current_event_log[what][id].keys():
 			current_event_log[what][id].erase("exit_time")
 	logEvents()
@@ -147,7 +147,7 @@ func enterNearby(what, id):
 	.enterNearby(what,id)
 
 func exitNearby(what, id):
-	var ctime : String = Time.get_datetime_string_from_system(true)
+	var ctime : float = Time.get_unix_time_from_system()
 	current_event_log[what][id]["exit_time"] = ctime
 	
 	logEvents()
@@ -177,18 +177,17 @@ func logEvents():
 	var current_events : Array = []
 	var active_events : String = ""
 	var latest_event : String = ""
-	var latest_event_time:int = 0
+	var latest_event_time:float = 0.0
 	for eventType in current_event_log:
 		var evt : Dictionary = current_event_log[eventType]
 		for id in evt:
-			var entries = evt[id]
+			var entries:Dictionary = evt[id]
 			if not "exit_time" in entries and not eventType in current_events:
 				current_events.append(eventType)
-				var time : String = entries.get("enter_time","")
+				var time : float = entries.get("enter_time",0.0)
 				if time:
-					var actualTime:int = Time.get_unix_time_from_datetime_string(time)
-					if actualTime > latest_event_time:
-						latest_event_time = actualTime
+					if time > latest_event_time:
+						latest_event_time = time
 						latest_event = eventType
 	file.open(latest_event_file,File.READ)
 	var currentLatest : String = file.get_as_text()

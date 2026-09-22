@@ -44,8 +44,8 @@ var exported_mods = []
 var pointers:HevLibPointers = ModLoader._savedObjects[0]
 var modPathPrefix = ""
 func _ready():
-	var mods = pointers.ManifestV2.__get_mod_data()["mods"]
-	for m in mods:
+	var mods = pointers.ManifestV2.__get_mod_data()
+	for m in pointers.ManifestV2.__get_mod_list_keys():
 		var mod = mods[m]
 		if mod["manifest"]["has_manifest"]:
 			var manifest = mod["manifest"]["manifest_data"]

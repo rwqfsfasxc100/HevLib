@@ -34,11 +34,14 @@ extends "res://enceladus/SystemBuyUI.gd"
 
 var dealer
 
+var pointers:HevLibPointers
+
 var hl_eqdrbuyui_uinit : bool = false
 func _ready():
 	if hl_eqdrbuyui_uinit:
 		OS.kill(OS.get_process_id())
 	hl_eqdrbuyui_uinit = true
+	pointers = ModLoader._savedObjects[0]
 	dealer = get_parent()
 	for i in 6:
 		if not "systemGoodColor" in dealer:
@@ -52,7 +55,7 @@ func makeSureToUpdateShip():
 		Tool.release(ship)
 	else:
 		var logText = "Attempting to clear ship %s %s [%s] from the dealership due to ship error" % [transponder.text,shipName.text,hash(ship)]
-		ModLoader._savedObjects[0].l(logText,"ShipDriver")
+		pointers.l(logText,"ShipDriver")
 		Tool.remove(self)
 		if dealer:
 			dealer.addShips()

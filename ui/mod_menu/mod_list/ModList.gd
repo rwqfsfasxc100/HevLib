@@ -157,7 +157,7 @@ func _ready():
 		"credits_splitter":get_node(credits_splitter),
 		"languages_splitter":get_node(languages_splitter),
 	}
-	var data = pointers.ManifestV2.__get_mod_data()["mods"]
+	var data = pointers.ManifestV2.__get_mod_data()
 	var groups = {}
 	var mod_data = {}
 	var vdata = load("res://HevLib/ui/mod_menu/vanilla/data_dict.gd").get_script_constant_map()
@@ -190,7 +190,7 @@ func _ready():
 		var dict = pointers.ManifestV2.__make_mod_entry(pointers.ManifestV2.__concat_mod_info(modlet))
 		data[modlet] = dict
 	
-	for mod in data:
+	for mod in data.keys():
 		var fname = mod.split("/")[2]
 		var info = data[mod]
 		var zipinfo = pointers.ManifestV2.__match_mod_path_to_zip(mod)
@@ -385,7 +385,7 @@ func _open_conflicts():
 	var cfmods = ""
 	for mod in conflicts:
 		if mod.begins_with("res://"):
-			var data = pointers.ManifestV2.__get_mod_data()["mods"][mod]
+			var data = pointers.ManifestV2.__get_mod_data()[mod]
 			cfmods += "\n ->" + data.get("name",mod.split("/",false)[1]) + " (" + mod + ")"
 		else:
 			var data = pointers.ManifestV2.__get_mod_by_id(mod)
@@ -402,7 +402,7 @@ func _open_dependancies():
 	var cfmods = ""
 	for mod in conflicts:
 		if mod.begins_with("res://"):
-			var data = pointers.ManifestV2.__get_mod_data()["mods"][mod]
+			var data = pointers.ManifestV2.__get_mod_data()[mod]
 			cfmods += "\n ->" + data.get("name",mod.split("/",false)[1]) + " (" + mod + ")"
 		else:
 			var data = pointers.ManifestV2.__get_mod_by_id(mod)

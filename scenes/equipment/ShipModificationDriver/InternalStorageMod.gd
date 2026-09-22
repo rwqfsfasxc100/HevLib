@@ -32,50 +32,47 @@
 
 extends "res://ships/ship-ctrl.gd"
 
-var base_proc_storage = 0
-var base_ammo_storage = 0
-var base_nano_storage = 0
-var base_storage_type = processedCargoStorageType
-var base_propellant = 0
-var base_crew_count = 0
-var base_crew_morale = 0
-var base_mass = 0
-var base_emp_shielding = 0
+var base_proc_storage:float = 0
+var base_ammo_storage:float = 0
+var base_nano_storage:float = 0
+var base_storage_type:String = processedCargoStorageType
+var base_propellant:float = 0
+var base_crew_count:int = 0
+var base_crew_morale:float = 0
+var base_mass:float = 0
+var base_emp_shielding:float = 0
 
 
-var storage_add = 0
-var ammo_add = 0
-var nano_add = 0
-var storage_multi = 1.0
-var ammo_multi = 1.0
-var nano_multi = 1.0
-var propellant_multi = 1.0
-var mass_multi = 1.0
-var propellant_add = 0
-var mass_add = 0
-var mass_per_crew = 0
-var mass_per_processed_tonne = 0
-var mass_per_tonne_total_storage_added = 0
-var ammo_speed_add = 0
-var nano_speed_add = 0
-var ammo_speed_multi = 1.0
-var nano_speed_multi = 1.0
-var emp_shielding = 0
-var emp_scale_multi = 1.0
+var storage_add:float = 0
+var ammo_add:float = 0
+var nano_add:float = 0
+var storage_multi:float = 1.0
+var ammo_multi:float = 1.0
+var nano_multi:float = 1.0
+var propellant_multi:float = 1.0
+var mass_multi:float = 1.0
+var propellant_add:float = 0
+var mass_add:float = 0
+var mass_per_crew:float = 0
+var mass_per_processed_tonne:float = 0
+var mass_per_tonne_total_storage_added:float = 0
+var ammo_speed_add:float = 0
+var nano_speed_add:float = 0
+var ammo_speed_multi:float = 1.0
+var nano_speed_multi:float = 1.0
+var emp_shielding:float = 0
+var emp_scale_multi:float = 1.0
 
-var nanodroneMagazine = 0
-var listings = {}
+var nanodroneMagazine:float = 0
+var listings:Dictionary = {}
 
-var hl_ism_system_name_registers = []
-var hl_ism_add_systems = []
+var hl_ism_system_name_registers:Array = []
+var hl_ism_add_systems:Array = []
 
-var currentInstalledEquipmentWithChanges = []
-var hl_ism_installedequipment = []
+var currentInstalledEquipmentWithChanges:Array = []
+var hl_ism_installedequipment:Array = []
 
-
-
-
-var hl_ism_mineral_trace_length = 6
+var hl_ism_mineral_trace_length:int = 6
 
 func _enter_tree():
 	ismPointers = ModLoader._savedObjects[0]
@@ -84,7 +81,7 @@ func _enter_tree():
 	ismPointers.ConfigDriver.__establish_connection("hl_ism_UV",self)
 	listings = ismPointers.Equipment.processed_storage_mods
 	
-	var sysNames = ismPointers.Equipment.processed_storage_systems
+	var sysNames:Array = ismPointers.Equipment.processed_storage_systems
 	configMutex.lock()
 	currentInstalledEquipmentWithChanges = ismPointers.DataFormat.__sift_ship_config(shipConfig.duplicate(true),sysNames,["currentCargo","currentCargoBy","currentCargoComposition","damage","juryRig","preferredCrew","processedCargo","remoteCargo","tuning"])
 	configMutex.unlock()
@@ -107,46 +104,46 @@ func _enter_tree():
 	
 	
 	
-	var modifyable_type = base_storage_type
-	var modifyable_capacity = base_proc_storage
-	var modifyable_crew_count = base_crew_count
-	var modifyable_crew_morale = base_crew_morale
+	var modifyable_type:String = base_storage_type
+	var modifyable_capacity:float = base_proc_storage
+	var modifyable_crew_count:int = base_crew_count
+	var modifyable_crew_morale:float = base_crew_morale
 	
-	var total_added_capacity = 0
+	var total_added_capacity:float = 0
 	
-	var individual_capacity_changes = []
+	var individual_capacity_changes:Array = []
 	
 	for item in hl_ism_installedequipment:
-		var list = listings[item]
+		var list:Array = listings[item]
 		for iddata in list:
 			if not ismPointers.ConfigDriver.__validate_dictionary(iddata):
 				continue
-			var limit_to_ship = iddata.get("specific_ship","")
+			var limit_to_ship:String = iddata.get("specific_ship","")
 			if limit_to_ship:
-				var leave = false
+				var leave:bool = false
 				if (limit_to_ship != shipName) and (limit_to_ship != baseShipName):
 					leave = true
 				if leave and iddata.get("recurse_to_variants",false) and limit_to_ship == baseShipName:
 					leave = false
 				if leave:
 					continue
-			var minimum_ammo_utilization_for_reduction = iddata.get("minimum_ammo_utilization_for_reduction",0.0)
-			var minimum_nano_utilization_for_reduction = iddata.get("minimum_nano_utilization_for_reduction",0.0)
-			var minimum_propellant_utilization_for_reduction = iddata.get("minimum_propellant_utilization_for_reduction",0.0)
+			var minimum_ammo_utilization_for_reduction:float = iddata.get("minimum_ammo_utilization_for_reduction",0.0)
+			var minimum_nano_utilization_for_reduction:float = iddata.get("minimum_nano_utilization_for_reduction",0.0)
+			var minimum_propellant_utilization_for_reduction:float = iddata.get("minimum_propellant_utilization_for_reduction",0.0)
 			
-			var current_ammo_amt = base_ammo_storage
-			var current_nano_amt = base_nano_storage
-			var current_propellant_amt = base_propellant
-			var ammo_limit = upgradeLimits["ammo.capacity"][1]
-			var nano_limit = upgradeLimits["drones.capacity"][1]
-			var propellant_limit = upgradeLimits["fuel.capacity"][1]
+			var current_ammo_amt:float = base_ammo_storage
+			var current_nano_amt:float = base_nano_storage
+			var current_propellant_amt:float = base_propellant
+			var ammo_limit:float = upgradeLimits["ammo.capacity"][1]
+			var nano_limit:float = upgradeLimits["drones.capacity"][1]
+			var propellant_limit:float = upgradeLimits["fuel.capacity"][1]
 			
-			var this_added_capacity = 0
-			var this_storage_multi = 1
-			var this_ammo_multi = 1
-			var this_nano_multi = 1
-			var this_propellant_multi = 1
-			var mass_per_tonne_storage_added = 0
+			var this_added_capacity:float = 0
+			var this_storage_multi:float = 1
+			var this_ammo_multi:float = 1
+			var this_nano_multi:float = 1
+			var this_propellant_multi:float = 1
+			var mass_per_tonne_storage_added:float = 0
 			
 			for key in iddata:
 				var val = iddata[key]
@@ -164,13 +161,13 @@ func _enter_tree():
 						propellant_add += val
 						this_added_capacity += val
 					"display_system":
-						var dname = val.get("name","")
-						var mv = val.get("can_display_multiple",false)
+						var dname:String = val.get("name","")
+						var mv:bool = val.get("can_display_multiple",false)
 						if (dname and dname != "") and ((not dname in hl_ism_system_name_registers) or mv):
-							var status = val.get("status",100.0)
-							var power = val.get("power",0.0)
-							var inspect = val.get("affect_inspection",false)
-							var o = {
+							var status:float = val.get("status",100.0)
+							var power:float = val.get("power",0.0)
+							var inspect:bool = val.get("affect_inspection",false)
+							var o:Dictionary = {
 								"name":dname,
 								"can_display_multiple":mv,
 								"power":power,
@@ -185,8 +182,8 @@ func _enter_tree():
 						this_storage_multi *= val
 					"ammo_multi":
 						if val < 1.0 and minimum_ammo_utilization_for_reduction > 0.0:
-							var diff = 1.0 - val
-							var curr = ((minimum_ammo_utilization_for_reduction * nano_limit) - current_nano_amt) / nano_limit
+							var diff:float = 1.0 - val
+							var curr:float = ((minimum_ammo_utilization_for_reduction * nano_limit) - current_nano_amt) / nano_limit
 							if curr >= 0:
 								val += diff
 							else:
@@ -282,55 +279,46 @@ func _enter_tree():
 		mass_per_processed_tonne = mass_per_processed_tonne * hl_ism_mineral_trace_length
 		l("Hold type is divided, additional mass per tonne is scaled for the new mineral size")
 	
-	processedCargoCapacity = int(float(modifyable_capacity) * storage_multi)
+	processedCargoCapacity = int(modifyable_capacity * storage_multi)
 	l("Changing base hold size of %s by multiplier %s. Results in new size of %s" % [modifyable_capacity,storage_multi,processedCargoCapacity])
 	processedCargoCapacity += storage_add
 	l("Adding storage bonus of %s. New size of %s" % [storage_add,processedCargoCapacity])
 	
 	processedCargoCapacity = max(processedCargoCapacity,0)
 	if storage_multi != 1.0:
-		var change = processedCargoCapacity - modifyable_capacity
-		total_added_capacity += change
+		total_added_capacity += processedCargoCapacity - modifyable_capacity
 	if ammo_multi != 1.0:
-		var change = (base_ammo_storage * ammo_multi) - base_ammo_storage
-		total_added_capacity += change
+		total_added_capacity += (base_ammo_storage * ammo_multi) - base_ammo_storage
 	if nano_multi != 1.0:
-		var change = (base_nano_storage * nano_multi) - base_nano_storage
-		total_added_capacity += change
+		total_added_capacity += (base_nano_storage * nano_multi) - base_nano_storage
 	if propellant_multi != 1.0:
-		var change = (base_propellant * propellant_multi) - base_propellant
-		total_added_capacity += change
+		total_added_capacity += (base_propellant * propellant_multi) - base_propellant
 	
 	if mass_per_processed_tonne != 0:
 		l("Adding mass @ %s kg for every tonne of processed capacity" % mass_per_processed_tonne)
-		var change = ((float(processedCargoCapacity)/1000.0) * mass_per_processed_tonne)
-		mass_add += change
+		mass_add += ((float(processedCargoCapacity)/1000.0) * mass_per_processed_tonne)
 	
 	if mass_multi != 1.0:
-		var val = 0
-		val = ((mass + mass_add) * mass_multi) - (mass + mass_add)
-		mass_add += val
+		mass_add += ((mass + mass_add) * mass_multi) - (mass + mass_add)
 	
 	
 	
 	
 	if mass_per_tonne_total_storage_added != 0:
 		l("Changing mass by %s kg for every tonne of total storage changed by" % total_added_capacity)
-		var change = ((float(total_added_capacity) /1000.0) * mass_per_tonne_total_storage_added)
-		mass_add += change
+		mass_add += ((total_added_capacity /1000.0) * mass_per_tonne_total_storage_added)
 	for c in individual_capacity_changes:
-		var massChangePerTonne = c[0]
-		var capacity = c[1]
+		var massChangePerTonne:float = c[0]
+		var capacity:float = c[1]
 		capacity += (base_ammo_storage * c[2]) - base_ammo_storage
 		capacity += (base_nano_storage * c[3]) - base_nano_storage
 		capacity += (base_propellant * c[4]) - base_propellant
 		capacity += (c[5] * modifyable_capacity) - modifyable_capacity
-		var change = int(round((float(capacity) / 1000.0) * massChangePerTonne))
-		mass_add += change
+		mass_add += (capacity / 1000.0) * massChangePerTonne
 	
 	l("Making modificatins to crew. Crew count changed from %s to %s / crew morale changed from %s to %s" % [base_crew_count,modifyable_crew_count,base_crew_morale,modifyable_crew_morale])
 	
-	crew = max(0,modifyable_crew_count)
+	crew = int(max(0,modifyable_crew_count))
 	crewMoraleBonus = clamp(modifyable_crew_morale,-0.5,0.5)
 	
 	
@@ -340,15 +328,13 @@ func _enter_tree():
 	empShield += emp_shielding
 	
 	for a in hl_ism_add_systems.size():
-		var i = hl_ism_add_systems[a]
-		var dname = i.get("name","")
-		var power = i.get("power",0.0)
-		var status = i.get("status",100.0)
-		var inspect = i.get("affect_inspection",false)
+		var i:Dictionary = hl_ism_add_systems[a]
+		var dname:String = i.get("name","")
+		var power:float = i.get("power",0.0)
+		var status:float = i.get("status",100.0)
+		var inspect:bool = i.get("affect_inspection",false)
 		
-		
-		var sys = Node2D.new()
-		sys.set_script(load("res://HevLib/scenes/equipment/var_nodes/system_display.gd"))
+		var sys:Node2D = load("res://HevLib/scenes/equipment/var_nodes/system_display.gd").new()
 		sys.systemName = dname
 		sys.power = power
 		sys.status = status
@@ -357,7 +343,7 @@ func _enter_tree():
 		call_deferred("move_child",sys,get_child_count())
 	
 	
-	var droneData = ismPointers.Equipment.drone_delivery_speed
+	var droneData:Dictionary = ismPointers.Equipment.drone_delivery_speed
 	for amnt in droneData:
 		nanoDeliveryPerSecond[float(amnt)] = droneData[amnt]
 var hl_smdism_uinit : bool = false
@@ -375,43 +361,35 @@ func _ready():
 			addDronesCapacity(nano_add)
 		l("Modifying consumables multiplicatively")
 		if ammo_multi != 1.0:
-			var val = 0
-			val = (massDriverAmmoMax * ammo_multi) - massDriverAmmoMax
-			addAmmoCapacity(val)
+			addAmmoCapacity((massDriverAmmoMax * ammo_multi) - massDriverAmmoMax)
 		if nano_multi != 1.0:
-			var val = 0
-			val = (dronePartsMax * nano_multi) - dronePartsMax
-			addDronesCapacity(val)
+			addDronesCapacity((dronePartsMax * nano_multi) - dronePartsMax)
 		if propellant_multi != 1.0:
-			var val = 0
-			val = (reactiveMassMax * propellant_multi) - reactiveMassMax
-			addPropellantCapacity(val)
+			addPropellantCapacity((reactiveMassMax * propellant_multi) - reactiveMassMax)
 	nanodroneMagazine = float(getConfig("drones.capacity",0.0))
 	massDriverMagazine = float(getConfig("ammo.capacity", 0.0))
 	
 	yield(CurrentGame.get_tree(),"physics_frame")
 	clampConsumables()
 	if isPlayerControlled():
-		var cfg = shipConfig
-		var state = CurrentGame.state.ship.config
+		var cfg:Dictionary = shipConfig
+		var state:Dictionary = CurrentGame.state.ship.config
 		l("Ensuring crew correctness")
-		var chash = cfg.hash()
-		var shash = state.hash()
+		var chash:int = cfg.hash()
+		var shash:int = state.hash()
 		if chash == shash:
 			if "preferredCrew" in CurrentGame.state.ship.config:
 				if CurrentGame.state.ship.config["preferredCrew"].size() > crew:
 					CurrentGame.state.ship.config["preferredCrew"].resize(crew)
 		
 		
-			var active = CurrentGame.getCurrentlyActiveCrewNames()
+			var active:Array = CurrentGame.getCurrentlyActiveCrewNames()
 			if active.size() > crew:
 				hl_ism_deactivateCrew(crew)
 func temporaryCargoMass() -> float:
-	var out = .temporaryCargoMass()
-	out += mass_add
-	return out
+	return .temporaryCargoMass() + mass_add
 
-var nanoDeliveryPerSecond = {
+var nanoDeliveryPerSecond:Dictionary = {
 	0.0: 20, 
 	1000.0: 20, 
 	5000.0: 100, 
@@ -420,12 +398,12 @@ var nanoDeliveryPerSecond = {
 	50000.0: 100
 }
 
-var availableNanoToDrawNow = 0.0
+var availableNanoToDrawNow:float = 0.0
 func hl_ism_handleNanoDelivery(delta):
-	var ps = nanoDeliveryPerSecond.get(nanodroneMagazine, nanoDeliveryPerSecond[0.0])
-	var current = availableNanoToDrawNow
+	var ps:float = nanoDeliveryPerSecond.get(nanodroneMagazine, nanoDeliveryPerSecond[0.0])
+	var current:float = availableNanoToDrawNow
 	availableNanoToDrawNow = clamp(availableNanoToDrawNow + delta * ps, 0, ps)
-	var diff = availableNanoToDrawNow - current
+	var diff:float = availableNanoToDrawNow - current
 	if nano_speed_multi != 1.0:
 		availableNanoToDrawNow += diff * (nano_speed_multi - 1.0)
 	availableNanoToDrawNow += nano_speed_add
@@ -434,9 +412,9 @@ func handleAmmoDelivery(delta):
 	if unrestrictedAmmoOutput:
 		availableAmmoToDrawNow = 90000000000
 	else:
-		var currentDraw = availableAmmoToDrawNow
+		var currentDraw:float = availableAmmoToDrawNow
 		.handleAmmoDelivery(delta)
-		var diff = availableAmmoToDrawNow - currentDraw
+		var diff:float = availableAmmoToDrawNow - currentDraw
 		if ammo_speed_multi != 1.0:
 			availableAmmoToDrawNow += diff * (ammo_speed_multi - 1.0)
 		availableAmmoToDrawNow += ammo_speed_add
@@ -444,8 +422,8 @@ func handleAmmoDelivery(delta):
 var ismPointers:HevLibPointers
 
 
-var limitDroneOutput = true
-var unrestrictedAmmoOutput = false
+var limitDroneOutput:bool = true
+var unrestrictedAmmoOutput:bool = false
 func drawDrones(kg, really = true):
 	if limitDroneOutput:
 		if availableNanoToDrawNow < kg:
@@ -454,10 +432,9 @@ func drawDrones(kg, really = true):
 			if really:
 				availableNanoToDrawNow -= kg
 	return .drawDrones(kg, really)
-var massNodeName = "InternalStorageMod_MassModifier"
 
 func hl_ism_deactivateCrew(maximum):
-	var count = 0
+	var count:int = 0
 	for m in CurrentGame.getCurrentlyActiveCrewNames():
 		if count < maximum:
 			if CurrentGame.state.crew[m].get("active", true):
@@ -467,19 +444,19 @@ func hl_ism_deactivateCrew(maximum):
 				CurrentGame.state.crew[m]["active"] = false
 	CurrentGame.emit_signal("employmentChanged")
 func addAmmoCapacity(kg: float):
-	var change = massDriverAmmoMax + kg
+	var change:float = massDriverAmmoMax + kg
 	if change < 0:
 		kg += change
 	.addAmmoCapacity(kg)
 
 func addDronesCapacity(kg: float):
-	var change = dronePartsMax + kg
+	var change:float = dronePartsMax + kg
 	if change < 0:
 		kg += change
 	.addDronesCapacity(kg)
 
 func addPropellantCapacity(kg: float):
-	var change = reactiveMassMax + kg
+	var change:float = reactiveMassMax + kg
 	if change < 0:
 		kg += change
 	reactiveMassMax += kg

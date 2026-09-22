@@ -52,13 +52,13 @@ func _ready():
 		
 		add_child(hl_dlc_make_label("HEVLIB_DLCLIST_MODS_HEADER"))
 		
-	var mods = pointers.ManifestV2.__get_mod_data()["mods"]
+	var mods = pointers.ManifestV2.__get_mod_data()
 	var labels = []
 	var names = []
 	var show_always_display_libraries_in_dlclist = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_always_display_libraries_in_dlclist")
 	var show_all_libraries_in_dlclist = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_all_libraries_in_dlclist")
 	var dlc_mod_list_sort_order = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","dlc_mod_list_sort_order")
-	for mod in mods:
+	for mod in pointers.ManifestV2.__get_mod_list_keys():
 		var data = mods[mod]
 		if not data["library_information"]["is_library"]:
 			labels.append(hl_dlc_make_label(data["name"]))

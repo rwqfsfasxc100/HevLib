@@ -160,7 +160,7 @@ tracks/0/keys = {
 "values": [ Color( 1, 1, 0.164706, 0.25098 ) ]
 }
 
-[node name="ModMenu" type="Popup"]
+[node name="ModMenu" type="Popup" groups=["hevlib_mod_menu"]]
 mouse_filter = 2
 theme = ExtResource( 2 )
 popup_exclusive = true

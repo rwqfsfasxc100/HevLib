@@ -57,7 +57,7 @@ export (bool) var invert_config = false
 
 # Internal variable used to more easily assign equipment
 # Should improve efficiency over the previous version, which calculated it on the fly
-var allowed_equipment := []
+var allowed_equipment : Array = []
 
 var data_dictionary = ""
 
@@ -76,8 +76,8 @@ func hl_ug_recheck_this_visibility():
 		cv = pointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
 
 func reexamine():	
-	var ship = CurrentGame.getPlayerShip()
-	var shipname = ship.shipName
+	var ship:Node = CurrentGame.getPlayerShip()
+	var shipname:String = ship.shipName
 	if limit_ships:
 		visible = (shipname in limit_ships)
 	if prevent_ships:

@@ -37,8 +37,8 @@ const gdunzip = preload("res://HevLib/scripts/vendor/gdunzip.gd")
 
 var http:HTTPRequest = HTTPRequest.new()
 
-var equipment_modmain
-var webtranslate_modmain
+var equipment_modmain:Node
+var webtranslate_modmain:Node
 
 var Achievements : _Achievements = _Achievements.new(self,http)
 var ConfigDriver : _ConfigDriver = _ConfigDriver.new(self)
@@ -88,12 +88,12 @@ var Classes = {
 }
 
 
-var copyrights = "© 2024-2026 Benjamin Buckhurst a.k.a. __hev. All rights reserved."
+var copyrights:String = "© 2024-2026 Benjamin Buckhurst a.k.a. __hev. All rights reserved."
 
 const HEVLIB_CACHE_VERSION : int = 1
 
-var logging_frame_interval = 0
-var logging_current_frame_timer = 0
+var logging_frame_interval:float = 0
+var logging_current_frame_timer:int = 0
 func _physics_process(delta:float):
 	if ConfigDriver.mk_c:
 		# If a config was changed in the loaded profile, handle
@@ -140,7 +140,7 @@ var is_editor_and_needs_restart:bool = false
 
 var is_editor:bool = OS.has_feature("editor")
 
-var resource_path = ""
+var resource_path:String = ""
 func _init(r,e):
 	resource_path = r
 	equipment_modmain = e
@@ -148,20 +148,23 @@ func _init(r,e):
 # Logging function used for cases where critial info must not be overwritten by game logs
 # cycling back to dv_log_0 (and yes this is from a specific bug report with AI slop code,
 # you didn't ask for permission to use any of my code in an LLM so fuck you)
-var logCache = PoolStringArray()
-var messageNr = 0
-var messagesPerFile = 1000
+var logCache:PoolStringArray = PoolStringArray()
+var messageNr:int = 0
+var messagesPerFile:float = 1000.0
+var llc:bool = false
 func l(msg:String, title:String = ""):
 	Debug.l(("[%s]: %s" % [title, msg]) if title else msg)
-	if logCache == null:
+	if not llc:
 		logCache = PoolStringArray()
+		llc = true
 	logCache.append("[%s]: %s" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg])
 
 # Notetaking function used to mark an important event in the game's performance logs
 func n(msg:String, title:String = ""):
 	Debug.n(("[%s]: %s" % [title, msg]) if title else msg)
-	if logCache == null:
+	if not llc:
 		logCache = PoolStringArray()
+		llc = false
 	logCache.append("[%s]: %s" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg])
 
 var deviceinfostore:String = "user://cache/.HevLib_Cache/logs/"
@@ -173,12 +176,12 @@ const testmode = false
 func storeLogCache():
 	if logCache and dir.dir_exists(deviceinfostore):
 		messageNr += 1
-		var logFileName = deviceinfocache % int(messageNr / messagesPerFile)
+		var logFileName:String = deviceinfocache % int(messageNr / messagesPerFile)
 		if not file.file_exists(logFileName):
 			file.open(logFileName,File.WRITE)
 			file.close()
 		file.open(logFileName,File.READ)
-		var ov = file.get_as_text(true)
+		var ov:String = file.get_as_text(true)
 		file.close()
 		for line in logCache:
 			ov += line + "\n"
@@ -379,7 +382,7 @@ class _Achievements:
 	# Fetches the completion percentage based on what's achieved within the achievement store file
 	func __get_achievement_percentage() -> float:
 		var percent : float = 0.0
-		var ach = Achivements.achievementRarity
+		var ach:Dictionary = Achivements.achievementRarity
 		var size = float(Achivements.achievementRarity.size())
 		var achivements : Dictionary = {}
 		if file.file_exists(achievementsFile):
@@ -413,8 +416,8 @@ class _Achievements:
 		var lockedAchievements : Array = []
 		var allAchievements : Array = []
 		var stats : Array = []
-		var achievementData = Achivements.achivements
-		var rarity = Achivements.achievementRarity
+		var achievementData:Dictionary = Achivements.achivements
+		var rarity:Dictionary = Achivements.achievementRarity
 		for m in achievementData:
 			# Separates stored data between achievements and stats
 			if not str(m).begins_with("stat:"):
@@ -451,15 +454,11 @@ class _Achievements:
 	# Handles all netdata for the achievement fetching
 	func out(result, response_code, headers, body):
 		if result == 0:
-			var d = JSON.parse(body.get_string_from_utf8()).result
-			var data : Array = []
+			var d:Dictionary = JSON.parse(body.get_string_from_utf8()).result
 			if d:
-				data = d.get("achievementpercentages").get("achievements")
-			var aData : Dictionary = {}
-			if not data == null:
+				var data : Array = d.get("achievementpercentages").get("achievements")
 				for dic in data:
-					aData[dic.get("name")] = dic.get("percent")
-			completionCache = aData.duplicate(true)
+					completionCache[dic.get("name")] = dic.get("percent")
 		http.disconnect("request_completed",self,"out")
 		pointers.Scripting.log_essential_info_for_bugreports()
 
@@ -767,7 +766,6 @@ class _ConfigDriver:
 	
 	# Fetches a config as a dictionary
 	func __get_config(mod_id, cfg_filename : String = "Mod_Configurations" + ".cfg") -> Dictionary:
-		var cfg_folder : String  = "user://cfg/"
 		var dictionary : Dictionary = {}
 		# Formats the mod_id to be valid for configs.
 		# This removes forward slashes and spaces 
@@ -782,12 +780,12 @@ class _ConfigDriver:
 					var sub : Dictionary = {}
 					var sec = settings[section].duplicate(true)
 					for key in sec.keys():
-						sub.merge({key:sec[key]})
-					dictionary.merge({split[1]:sub})
+						sub[key] = sec[key]
+					dictionary[split[1]] = sub
 		else:
 			# No hash means it has to be fetched from the file directly
 			var cfg:ConfigFile = ConfigFile.new()
-			var error:int = cfg.load(cfg_folder+cfg_filename)
+			var error:int = cfg.load("user://cfg/"+cfg_filename)
 			if error != OK:
 				# File probably doesn't exist, aborting
 				pointers.l("HevLib Config File: Error loading settings %s" % error,"pointers.ConfigDriver")
@@ -800,15 +798,13 @@ class _ConfigDriver:
 				if split[0] == mod_id:
 					var sub : Dictionary = {}
 					for key in cfg.get_section_keys(section):
-						var value = cfg.get_value(section, key)
-						sub.merge({key:value})
-					dictionary.merge({split[1]:sub})
+						sub[key] = cfg.get_value(section, key)
+					dictionary[split[1]] = sub
 		return dictionary
 	
 	# Fetches a specific value from the config
 	# Will return null if it does not exist
 	func __get_value(mod_id: String, section: String, key: String, default = null, cfg_filename : String = "Mod_Configurations" + ".cfg"):
-		var cfg_folder : String  = "user://cfg/"
 		var full : String  = __truncate_to_setting_entry(mod_id,section)
 		# Truncate to get the section directly
 		if settingsHash:
@@ -826,7 +822,7 @@ class _ConfigDriver:
 		else:
 			# Not cached, fetch from file instead
 			var cfg:ConfigFile = ConfigFile.new()
-			var error:int = cfg.load(cfg_folder+cfg_filename)
+			var error:int = cfg.load("user://cfg/"+cfg_filename)
 			if error != OK:
 				# File probably doesn't exist, aborting
 				pointers.l("HevLib Config File: Error loading settings %s" % error,"pointers.ConfigDriver")
@@ -975,7 +971,7 @@ class _ConfigDriver:
 			c.save(cfg_file)
 		
 		# Gets all mod data
-		var mod_entries : Dictionary = pointers.ManifestV2.__get_mod_data()["mods"]
+		var mod_entries : Dictionary = pointers.ManifestV2.__get_mod_data()
 		pointers.l("[%s] mod entries found" % mod_entries.size(),"pointers.ConfigDriver")
 		# Fetches disabled modlets
 		# This is not used here, but lets me log
@@ -990,7 +986,7 @@ class _ConfigDriver:
 		var current_config : Dictionary = __config_parse(cfg_file)
 		var incorrect_paths : Array = Array()
 		var problematic_mods : Dictionary = {}
-		for mod in mod_entries.keys():
+		for mod in pointers.ManifestV2.__get_mod_list_keys():
 			var manifest : Dictionary = mod_entries[mod]["manifest"]
 			var has_manifest:bool = manifest["has_manifest"]
 			if has_manifest:
@@ -1001,7 +997,7 @@ class _ConfigDriver:
 				if manifest_version > 2.0:
 					var cfg : Dictionary = manifest["manifest_data"]["configs"]
 					if not hash(cfg) == hash({}):
-						configs.merge({mod_name:cfg})
+						configs[mod_name] = cfg
 				# Checking for mods that require specific filepaths
 				var expected_path:String = manifest["manifest_data"]["manifest_definitions"]["expected_manifest_path"]
 				var actual_path:String = manifest["manifest_file_path"]
@@ -1111,10 +1107,10 @@ class _ConfigDriver:
 										if typeof(a) == TYPE_STRING:
 											a = [a]
 										out.append(a)
-									current_config[sect].merge({key:out})
+									current_config[sect][key] = out
 								_:
 									if "default" in key_data:
-										current_config[sect].merge({key:key_data["default"]})
+										current_config[sect][key] = key_data["default"]
 								
 		if not "profile_name" in current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",{}):
 			current_config["HevLib/HEVLIB_CONFIG_SECTION_DRIVERS"]["profile_name"] = "Default"
@@ -1160,7 +1156,8 @@ class _ConfigDriver:
 							actionList.append(key)
 						else:pointers.l("Input key [%s] already exists, skipping" % key,"pointers.ConfigDriver")
 						pointers.Keymapping.__load_input_data(key,p,opts)
-		
+		# Load translations
+		pointers.Translations.__inject_translations()
 	
 	func __get_minmax_string_from_dict(requirement:Dictionary) -> String:
 		var MID = str(requirement.get("mod_id",""))
@@ -1207,7 +1204,7 @@ class _ConfigDriver:
 			if additional:
 				mdOut += " (%s)" % additional
 			return mdOut
-		elif typeof(MDM) == TYPE_STRING and MDM and MDM in pointers.ManifestV2.cached_mod_list.get("mods",{}).keys():
+		elif typeof(MDM) == TYPE_STRING and MDM and MDM in pointers.ManifestV2.__get_mod_list_keys():
 			var zip = pointers.ManifestV2.__match_mod_path_to_zip(MDM)
 			if zip:
 				return zip.get_file()
@@ -1375,8 +1372,8 @@ class _ConfigDriver:
 	func __subscribed_changes():
 		for i in changes.keys():
 			if i in subscriptions.keys():
-				var sub = subscriptions[i]
-				var s = i.split("/")
+				var sub:Dictionary = subscriptions[i]
+				var s:PoolStringArray = i.split("/")
 				var entries = changes[i]
 				for entry in entries:
 					if entry in sub:
@@ -1528,8 +1525,8 @@ class _ConfigDriver:
 			var keys : Array = cfg.get_section_keys(section)
 			for key in keys:
 				var item = cfg.get_value(section,key)
-				data.merge({key:item})
-			cfg_dictionary.merge({section:data})
+				data[key] = item
+			cfg_dictionary[section] = data
 		return cfg_dictionary
 	
 	func __config_store(dict : Dictionary,filepath:String):
@@ -1952,6 +1949,7 @@ class _DataFormat:
 	
 	var file:File = File.new()
 	var crcTables = load("res://HevLib/scripts/crc32_table_cache.gd")
+	var crcTable = load("res://HevLib/scripts/crc32cache.gd").new()
 	var pointers:HevLibPointers
 	func _init(f):
 		pointers = f
@@ -3141,8 +3139,8 @@ class _DynamicLibraryLoader:
 	func process_gdnative_plugins():
 		if not pointers.is_editor:
 			var all_libraries:PoolStringArray = PoolStringArray()
-			var mods = pointers.ManifestV2.__get_mod_data()["mods"]
-			for mod in mods.keys():
+			var mods:Dictionary = pointers.ManifestV2.__get_mod_data()
+			for mod in pointers.ManifestV2.__get_mod_list_keys():
 				var drivers = mods[mod]["drivers"]
 				if "DLL_MAPPER.gd" in drivers:
 					var mapper:PoolStringArray = PoolStringArray(drivers["DLL_MAPPER.gd"].get("DLL_MAPPER",[]))
@@ -3217,7 +3215,7 @@ class _DynamicLibraryLoader:
 			for f in pointers.FolderAccess.__fetch_folder_files(exePath):
 				if not f in existing_libs:
 					dir.remove(f)
-		
+		pointers.SafeMode.__handle_exit_for_file_checks()
 	
 	
 
@@ -3298,7 +3296,7 @@ class _DriverManagement:
 				manifest = pointers.ManifestV2.__parse_file_as_manifest(manifest_path)
 				id = manifest.get("mod_information",{}).get("id","")
 			if id:
-				this_mod_data.merge({"id":id})
+				this_mod_data["id"] = id
 			var mm_prio:int = 0
 			if modFile.begins_with("mod") and modFile.ends_with(".manifest"):
 				manifest.get("manifest_definitions",{}).get("modlet_priority",0)
@@ -3306,11 +3304,11 @@ class _DriverManagement:
 				var modmain : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(modmain_path)
 				if "MOD_PRIORITY" in modmain.keys():
 					mm_prio = modmain["MOD_PRIORITY"]
-			this_mod_data.merge({"priority":mm_prio})
+			this_mod_data["priority"] = mm_prio
 			
 			this_mod_data["drivers"] = __get_drivers_from_modmain_path(modmain_path)
 			
-			this_mod_data.merge({"mod_directory":modFolder})
+			this_mod_data["mod_directory"] = modFolder
 			if this_mod_data["drivers"]:
 				if (not get_ids) or (get_ids and id in get_ids):
 					mod_drivers.append(this_mod_data)
@@ -3496,13 +3494,14 @@ class _Equipment:
 			var children : Array = slot.get_node("VBoxContainer").get_children()
 			if children.size() < 2:
 				continue
-			vanilla_slot_names.append(slot.name)
+			var iname:String = slot.name
+			vanilla_slot_names.append(iname)
 			var sys_slot : String = slot.slot
 			var index:int = 1
 			while not sys_slot:
 				sys_slot = children[index].slot
 				index += 1
-			vanilla_slot_types.merge({slot.name:sys_slot})
+			vanilla_slot_types[iname] = sys_slot
 		
 		var ws_default_templates : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
 		var ws_ship_templates : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
@@ -3516,8 +3515,8 @@ class _Equipment:
 		weaponslot_ship_standalone = ws_ship_templates.get("SHIP_MODIFY",{})
 		
 		var drivers : Dictionary = {}
-		var mods : Dictionary = pointers.ManifestV2.__get_mod_data()["mods"]
-		for md in mods.keys():
+		var mods : Dictionary = pointers.ManifestV2.__get_mod_data()
+		for md in pointers.ManifestV2.__get_mod_list_keys():
 			var mod = mods[md]
 			if mod["manifest"]["has_manifest"]:
 				var mod_id = mod["manifest"]["manifest_data"].get("mod_information",{}).get("id","")
@@ -3566,7 +3565,7 @@ class _Equipment:
 												var has_price:bool = false
 												var has_invis:bool = false
 												if not "name" in obj.keys():
-													obj.merge({"name":wname})
+													obj["name"] = wname
 												for d in objdata:
 													if d.get("property","") == "repairReplacementPrice":
 														d["value"] = wprice
@@ -3588,7 +3587,7 @@ class _Equipment:
 												var has_price:bool = false
 												var has_invis:bool = false
 												if not "name" in obj.keys():
-													obj.merge({"name":wname})
+													obj["name"] = wname
 												for d in objdata:
 													if d.get("property","") == "repairReplacementPrice":
 														d["value"] = wprice
@@ -3827,8 +3826,7 @@ class _Equipment:
 					"NODE_DEFINITIONS.gd":
 						
 						for item in constKeys:
-							var xd : Dictionary = {item:constants.get(item)}
-							node_definitions_cache.merge(xd)
+							node_definitions_cache[item] = constants.get(item)
 							
 					"SHIP_NODE_REGISTER.gd":
 						for item in constKeys:
@@ -3850,7 +3848,7 @@ class _Equipment:
 							
 							for ship in cd:
 								if not ship in ship_thruster_colors:
-									ship_thruster_colors.merge({ship:{"node":{},"type":{}}})
+									ship_thruster_colors[ship] = {"node":{},"type":{}}
 								if "type" in cd[ship]:
 									ship_thruster_colors[ship]["type"].merge(cd[ship]["type"],true)
 								if "node" in cd[ship]:
@@ -3935,8 +3933,8 @@ class _Equipment:
 					"WEAPONSLOT_SHIP_TEMPLATES.gd":
 						var ar : Dictionary = constants.get("WEAPONSLOT_SHIP_TEMPLATES",{})
 						for ship in ar:
+							var shipdata : Dictionary = ar[ship]
 							if ship in weaponslot_ship_templates:
-								var shipdata : Dictionary = ar.get(ship)
 								for slot in shipdata:
 									if slot in weaponslot_ship_templates[ship]:
 										var compile : Dictionary = {}
@@ -3966,7 +3964,7 @@ class _Equipment:
 									else:
 										weaponslot_ship_templates[ship][slot] = shipdata.get(slot)
 							else:
-								weaponslot_ship_templates.merge(ar)
+								weaponslot_ship_templates[ship] = shipdata
 						
 					"WEAPONSLOT_SHIP_MODIFY.gd":
 						var ar = constants.get("WEAPONSLOT_SHIP_MODIFY",{})
@@ -3978,8 +3976,8 @@ class _Equipment:
 									if not item in ws_equipment_names:
 										ws_equipment_names.append(item)
 							
+							var shipdata : Dictionary = ar.get(ship)
 							if ship in weaponslot_ship_standalone:
-								var shipdata : Dictionary = ar.get(ship)
 								for slot in shipdata:
 									if slot in weaponslot_ship_standalone[ship]:
 										var compile : Dictionary = {}
@@ -4011,7 +4009,7 @@ class _Equipment:
 									else:
 										weaponslot_ship_standalone[ship][slot] = shipdata.get(slot)
 							else:
-								weaponslot_ship_standalone.merge(ar)
+								weaponslot_ship_standalone[ship] = shipdata
 						
 					"SAVE_BUTTONS.gd":
 						var ar : Array = constants.get("SAVE_BUTTONS",[])
@@ -4210,7 +4208,7 @@ class _Equipment:
 								if not item in slot_defaults.get(st):
 									slot_defaults[st].append(item)
 						else:
-							slot_defaults.merge({st:slotDefaults.get(st)})
+							slot_defaults[st] = slotDefaults.get(st)
 		for slotDict in ADD_EQUIPMENT_SLOTS:
 			var snn : String  = slotDict.get("slot_node_name","")
 			var spp : Dictionary = ship_limitations.get(snn,{})
@@ -4225,7 +4223,7 @@ class _Equipment:
 					else:
 						ship_limitations[snn]["limit_ships"] = spp["limit_ships"]
 				else:
-					ship_limitations.merge({snn:{}})
+					ship_limitations[snn] = {}
 					ship_limitations[snn]["limit_ships"] = val
 			if "prevent_ships" in slotDict:
 				var val : Array = Array(slotDict["prevent_ships"]).duplicate()
@@ -4237,10 +4235,10 @@ class _Equipment:
 					else:
 						ship_limitations[snn]["prevent_ships"] = spp["prevent_ships"]
 				else:
-					ship_limitations.merge({snn:{}})
+					ship_limitations[snn] = {}
 					ship_limitations[snn]["prevent_ships"] = val
 			slots_for_adding.append(slotDict)
-			slots_for_adding_dict.merge({snn:slotDict})
+			slots_for_adding_dict[snn] = slotDict
 			all_slot_node_names.append(snn)
 		for node in SLOT_TAGS:
 			if node:
@@ -4259,7 +4257,7 @@ class _Equipment:
 							else:
 								ship_limitations[snn]["limit_ships"] = spp["limit_ships"]
 						else:
-							ship_limitations.merge({snn:{}})
+							ship_limitations[snn] = {}
 							ship_limitations[snn]["limit_ships"] = val
 					if "prevent_ships" in data:
 						var val : Array = Array(data["prevent_ships"]).duplicate()
@@ -4271,7 +4269,7 @@ class _Equipment:
 							else:
 								ship_limitations[snn]["prevent_ships"] = spp["prevent_ships"]
 						else:
-							ship_limitations.merge({snn:{}})
+							ship_limitations[snn] = {}
 							ship_limitations[snn]["prevent_ships"] = val
 		
 		var slots_format : PoolStringArray = []
@@ -4339,7 +4337,7 @@ class _Equipment:
 								tmp.append(i)
 						items = tmp
 					
-					slot_allowed_equipment.merge({slot:items})
+					slot_allowed_equipment[slot] = items
 				else:
 					var items : Array = Array(slot_defaults.get(slot_type,[])).duplicate(true)
 					var additives : Array = Array(data.get("override_additive",[]))
@@ -4353,7 +4351,7 @@ class _Equipment:
 							if not i in subtractives:
 								tmp.append(i)
 						items = tmp
-					slot_allowed_equipment.merge({slot:items})
+					slot_allowed_equipment[slot] = items
 			elif slot in slots_for_adding_dict:
 				var data : Dictionary = slots_for_adding_dict[slot]
 				var slot_type : String  = data.get("slot_type","HARDPOINT").to_upper()
@@ -4372,9 +4370,9 @@ class _Equipment:
 								tmp.append(i)
 						items = tmp
 					
-					slot_allowed_equipment.merge({slot:items})
+					slot_allowed_equipment[slot] = items
 				else:
-					slot_allowed_equipment.merge({slot:Array(slot_defaults.get(slot_type,[])).duplicate(true)})
+					slot_allowed_equipment[slot] = Array(slot_defaults.get(slot_type,[])).duplicate(true)
 		
 		
 		var equipment_format : PoolStringArray = PoolStringArray()
@@ -4469,15 +4467,15 @@ class _Equipment:
 						if nonode[1].begins_with("/"):
 							nonode[1] = nonode[1].lstrip("/")
 						if not nonode[0] in item_data:
-							item_data.merge({nonode[0]:[]})
+							item_data[nonode[0]] = []
 						item_data[nonode[0]].append([nonode[1],ws_value])
 					elif split.size() == 2:
 						if not split[0] in item_data:
-							item_data.merge({split[0]:[]})
+							item_data[split[0]] = []
 						item_data[split[0]].append([split[1],ws_value])
 					else:
 						if not "." in item_data:
-							item_data.merge({".":[]})
+							item_data["."] = []
 						item_data["."].append([ws_property,ws_value])
 				if apath:
 					ws_stuff_to_add.append({"name":aname,"path":apath,"data":item_data,"config":config})
@@ -4489,7 +4487,7 @@ class _Equipment:
 			var aname : String = add.get("name","SYSTEM_ERROR")
 			var apath : String = add.get("path","")
 			var add_header : String = (equipment_header % [aname,".",apath]) if apath else (equipment_header_noref % [aname,"."])
-			weaponslot_properties.merge({add_header:[]})
+			weaponslot_properties[add_header] = []
 			if ws_editable_paths:
 				ws_editable_paths += "\n" + equipment_editable_path_base % aname
 			else:
@@ -4497,11 +4495,11 @@ class _Equipment:
 			
 			for it in add.get("data",[]):
 				var ws_property : String  = it.get("property")
-				var ws_value  = it.get("value")
+				var ws_value = it.get("value")
 				if it.get("use_stringified_value",false):
 					ws_value = pointers.DataFormat.__convert_var_from_string(ws_value)
 				var split:PoolStringArray = ws_property.split("/")
-				if split.size() >= 3:
+				if split.size() > 2:
 					var node : String  = split[split.size() - 2]
 					var nonode:PoolStringArray = ws_property.split(node)
 					if nonode[0].ends_with("/"):
@@ -4510,16 +4508,16 @@ class _Equipment:
 						nonode[1] = nonode[1].lstrip("/")
 					var prop_header : String  = equipment_header_noref % [node,aname + "/" + nonode[0]]
 					if not prop_header in weaponslot_properties:
-						weaponslot_properties.merge({prop_header:[]})
+						weaponslot_properties[prop_header] = []
 					weaponslot_properties[prop_header].append([nonode[1],ws_value])
 				elif split.size() == 2:
 					var prop_header : String  = equipment_header_noref % [split[0],aname]
 					if not prop_header in weaponslot_properties:
-						weaponslot_properties.merge({prop_header:[]})
+						weaponslot_properties[prop_header] = []
 					weaponslot_properties[prop_header].append([split[1],ws_value])
 				else:
 					if not add_header in weaponslot_properties:
-						weaponslot_properties.merge({add_header:[]})
+						weaponslot_properties[add_header] = []
 					weaponslot_properties[add_header].append([ws_property,ws_value])
 		
 		for property in weaponslot_properties:
@@ -4538,7 +4536,7 @@ class _Equipment:
 			for slot in equipSlots:
 				slot = slot.split(".")[0]
 				if not slot in auxslot_data:
-					auxslot_data.merge({slot:[]})
+					auxslot_data[slot] = []
 				auxslot_data[slot].append(data)
 			
 			
@@ -6139,8 +6137,7 @@ class _FolderAccess:
 			var files : Array = __fetch_folder_files(folder,true,false)
 			for object in files:
 				if object.ends_with("/"):
-					var data : Dictionary = __get_folder_structure(folder+object,store_file_content)
-					folder_structure.merge({object:data})
+					folder_structure[object] = __get_folder_structure(folder+object,store_file_content)
 				else:
 					if store_file_content:
 						file.open(folder + object,File.READ)
@@ -6321,7 +6318,7 @@ class _HevLib:
 					if item.get("name") == "developer_hint":
 						devHint = pointerLoad.developer_hint
 				var desc = devHint.get(pFuncName, [TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_1"),TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_2")])
-				methods.merge({pFuncName:desc})
+				methods[pFuncName] = desc
 		if return_JSON:return JSON.print(methods, "\t")
 		else:return methods
 	
@@ -6345,9 +6342,8 @@ class _HevLib:
 						if item.get("name") == "developer_hint":
 							devHint = pointerLoad.developer_hint
 					var desc = devHint.get(pFuncName, [TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_1"),TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_2")])
-					methods.merge({pFuncName:desc})
-			var concat = {pointer:methods}
-			functions.merge(concat)
+					methods[pFuncName] = desc
+			functions[pointer] = methods
 		if return_JSON: return JSON.print(functions, "\t")
 		else:return functions
 	
@@ -7003,6 +6999,8 @@ class _ManifestV2:
 	
 	var zip_ref_store : Dictionary = {}
 	var cached_mod_list : Dictionary = {}
+	var cached_mod_statistics : Dictionary = {}
+	var cached_mod_keys : PoolStringArray = PoolStringArray()
 	
 	var haveModsChanged:bool = false
 	var currentModHash:int = 0
@@ -7017,15 +7015,8 @@ class _ManifestV2:
 	
 	var fetchZips:bool = true
 	func __get_mod_data(print_json: bool = false):
-		if not cached_mod_list.empty():
-			if print_json:
-				var psj = JSON.print(cached_mod_list, "\t")
-				return psj
-			else:
-				return cached_mod_list.duplicate(true)
-		else:
+		if cached_mod_list.empty():
 			pointers.l("Fetching mods from file","pointers.ManifestV2")
-			var mod_dictionary : Dictionary = {}
 			var manifest_count:int = 0
 			var library_count:int = 0
 			var non_library_count:int = 0
@@ -7085,7 +7076,7 @@ class _ManifestV2:
 			var stat_tags : Dictionary = {}
 			for mod in modListArr:
 				var mod_entry : Dictionary = __make_mod_entry(mod)
-				mod_dictionary.merge({mod.get("script_path",""):mod_entry})
+				cached_mod_list[mod.get("script_path","")] = mod_entry
 				if mod_entry["manifest"]["has_manifest"]:
 					manifest_count += 1
 					var md : Dictionary = mod_entry["manifest"]["manifest_data"]
@@ -7099,22 +7090,21 @@ class _ManifestV2:
 					library_count += 1
 				else:
 					non_library_count += 1
-			if not "res://HevLib/ModMain.gd" in mod_dictionary.keys() or not ResourceLoader.exists("res://HevLib/pointers.gd"):
-				if mod_dictionary.size():
+			if not "res://HevLib/ModMain.gd" in cached_mod_list.keys() or not ResourceLoader.exists("res://HevLib/pointers.gd"):
+				if cached_mod_list.size():
 					pointers.NodeAccess.__exit(false,"Mod data was successfully fetched, but HevLib was not found. Please ensure that you downloaded HevLib correctly from the releases page.\n\nClosing this popup will crash the game & open HevLib's latest release page.","pointers.ManifestV2",0.0,"https://github.com/rwqfsfasxc100/HevLib/releases/latest",true)
 				else:
 					pointers.NodeAccess.__exit(false,"Mod data was not successfully fetched, assuming that a severe bug with HevLib filesystem querying on non-editor builds has occurred. You will need to manually update due to an issue of this severity.\n\nClosing this popup will crash the game & open Hev's bug report form so the issue can be addressed.","pointers.ManifestV2",0.0,"https://forms.gle/RmC4Zgonp6frFgnK7",true)
 			
 			var stat_count : Dictionary = {"total_mod_count":total_mod_count,"mods_using_manifests":manifest_count,"mods":non_library_count,"libraries":library_count}
-			var statistics : Dictionary = {"counts":stat_count,"tags":stat_tags}
-			var returnValues : Dictionary = {"mods":mod_dictionary,"statistics":statistics}
-			cached_mod_list = returnValues.duplicate(true)
+			cached_mod_statistics = {"counts":stat_count,"tags":stat_tags}
+			cached_mod_keys = PoolStringArray(cached_mod_list.keys())
 			if not currentModHash:
 				if file.file_exists(mod_hash_file):
 					file.open(mod_hash_file,File.READ)
 					lastModHash = file.get_32()
 					file.close()
-				currentModHash = mod_dictionary.hash()
+				currentModHash = cached_mod_list.hash()
 				file.open(mod_hash_file,File.WRITE)
 				file.store_32(currentModHash)
 				file.close()
@@ -7126,8 +7116,8 @@ class _ManifestV2:
 					lastModStateHash = file.get_32()
 					file.close()
 				var zrs = []
-				for i in mod_dictionary.keys():
-					var thismod = mod_dictionary[i]
+				for i in cached_mod_keys:
+					var thismod = cached_mod_list[i]
 					var zip_size = 0
 					if file.open(thismod["zip_path"],File.READ) == OK:
 						zip_size = file.get_len()
@@ -7152,11 +7142,21 @@ class _ManifestV2:
 				file.close()
 				if currentModStateHash != lastModStateHash:
 					hasModStateChanged = true
-			if print_json:
-				var psj : String = JSON.print(cached_mod_list, "\t")
-				return psj
-			else:
-				return cached_mod_list.duplicate(true)
+		if print_json:
+			var psj : String = JSON.print(cached_mod_list, "\t")
+			return psj
+		else:
+			return cached_mod_list.duplicate(true)
+	
+	func __get_mod_list_keys() -> PoolStringArray:
+		if not cached_mod_keys:
+			__get_mod_data()
+		return cached_mod_keys
+	
+	func __get_mod_statistics() -> Dictionary:
+		if cached_mod_statistics.empty():
+			__get_mod_data()
+		return cached_mod_statistics.duplicate(true)
 	
 	func ovs(a,b) -> bool:
 		if "id" in a and not "id" in b:
@@ -7360,15 +7360,15 @@ class _ManifestV2:
 		var check_keys : Array = checked_mod_data.keys()
 		var check_name : String = checked_mod_data[check_keys[0]].get("name","")
 		var installed_dict : Dictionary = {}
-		for installed_mod in installed_mods["mods"].keys():
-			var installed_mName : String = installed_mods["mods"][installed_mod].get("name","")
+		for installed_mod in __get_mod_list_keys():
+			var installed_mName : String = installed_mods[installed_mod].get("name","")
 			if installed_mName == check_name:
-				installed_dict = installed_mods["mods"][installed_mod].duplicate()
-		if installed_dict.keys().size() == 0:
+				installed_dict = installed_mods[installed_mod].duplicate()
+		if not installed_dict:
 			return false
 		var checked_manifest_version:float = checked_mod_data[check_keys[0]]["manifest"]["manifest_version"]
 		var installed_manifest_version:float = installed_dict["manifest"]["manifest_version"]
-		if checked_manifest_version < 2:
+		if checked_manifest_version < 2.0:
 			return false
 		if checked_manifest_version > installed_manifest_version:
 			return true
@@ -7430,19 +7430,19 @@ class _ManifestV2:
 		var icon_dict : Dictionary = {"has_icon_file":has_icon_file,"icon_path":icon_path}
 		var manifestEntry : Dictionary = {"has_manifest":has_mod_manifest,"manifest_version":manifest_version,"manifest_data":manifest_data}
 		var mod_version_array : Array = [mod_version_major,mod_version_minor,mod_version_bugfix]
-		var mod_version_string : String = str(mod_version_major) + "." + str(mod_version_minor) + "." + str(mod_version_bugfix)
-		if not str(mod_version_metadata) == "":
+		var mod_version_string : String = "%s.%s.%s" % mod_version_array
+		if mod_version_metadata:
 			mod_version_array.append(mod_version_metadata)
-			mod_version_string = mod_version_string + "-" + str(mod_version_metadata)
+			mod_version_string = mod_version_string + "-" + mod_version_metadata
 		var version_dictionary : Dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
-		var mod_entry : Dictionary = {str(script_path):{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":mod_is_library,"keep_library_hidden":hide_library},"manifest":manifestEntry}}
+		var mod_entry : Dictionary = {script_path:{"name":mod_name,"priority":mod_priority,"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":mod_is_library,"keep_library_hidden":hide_library},"manifest":manifestEntry}}
 		return(mod_entry)
 	
 	var cached_manifests : Dictionary = {}
 	var cachedManifestKeys:Array = Array()
 	
 	func __parse_file_as_manifest(file_path: String, format_to_manifest_version: bool = true) -> Dictionary:
-		var cachevar : String = file_path + ":" + str(format_to_manifest_version)
+		var cachevar : String = "%s:%s" % [file_path,format_to_manifest_version]
 		if cachevar in cachedManifestKeys:
 			return cached_manifests[cachevar].duplicate(true)
 		else:
@@ -7510,19 +7510,19 @@ class _ManifestV2:
 						if typeof(manifest_data["package"].get("github_homepage","")) == TYPE_STRING:
 							var url = manifest_data["package"]["github_homepage"]
 							if url != "":
-								dict_template["links"].merge({"HEVLIB_GITHUB":{"URL":url}})
+								dict_template["links"]["HEVLIB_GITHUB"] = {"URL":url}
 						var discURL = manifest_data["package"].get("discord","")
 						if discURL != "":
-							dict_template["links"].merge({"HEVLIB_DISCORD":{"URL":discURL}})
+							dict_template["links"]["HEVLIB_DISCORD"] = {"URL":discURL}
 						var nexusURL = manifest_data["package"].get("nexus","")
 						if nexusURL != "":
-							dict_template["links"].merge({"HEVLIB_NEXUS":{"URL":nexusURL}})
+							dict_template["links"]["HEVLIB_NEXUS"] = {"URL":nexusURL}
 						var donationURL = manifest_data["package"].get("donations","")
 						if donationURL != "":
-							dict_template["links"].merge({"HEVLIB_DONATIONS":{"URL":donationURL}})
+							dict_template["links"]["HEVLIB_DONATIONS"] = {"URL":donationURL}
 						var wikiURL = manifest_data["package"].get("wiki","")
 						if wikiURL != "":
-							dict_template["links"].merge({"HEVLIB_WIKI":{"URL":wikiURL}})
+							dict_template["links"]["HEVLIB_WIKI"] = {"URL":wikiURL}
 						
 					2.0:
 						dict_template["mod_information"]["id"] = manifest_data["package"].get("id","")
@@ -7535,23 +7535,23 @@ class _ManifestV2:
 						if typeof(manifest_data["package"].get("github","")) == TYPE_DICTIONARY:
 							var url = manifest_data["package"]["github"]["link"]
 							if url != "":
-								dict_template["links"].merge({"HEVLIB_GITHUB":{"URL":url}})
+								dict_template["links"]["HEVLIB_GITHUB"] = {"URL":url}
 						elif typeof(manifest_data["package"].get("github","")) == TYPE_STRING:
 							var url = manifest_data["package"]["github"]
 							if url != "":
-								dict_template["links"].merge({"HEVLIB_GITHUB":{"URL":url}})
+								dict_template["links"]["HEVLIB_GITHUB"] = {"URL":url}
 						var discURL = manifest_data["package"].get("discord","")
 						if discURL != "":
-							dict_template["links"].merge({"HEVLIB_DISCORD":{"URL":discURL}})
+							dict_template["links"]["HEVLIB_DISCORD"] = {"URL":discURL}
 						var nexusURL = manifest_data["package"].get("nexus","")
 						if nexusURL != "":
-							dict_template["links"].merge({"HEVLIB_NEXUS":{"URL":nexusURL}})
+							dict_template["links"]["HEVLIB_NEXUS"] = {"URL":nexusURL}
 						var donationURL = manifest_data["package"].get("donations","")
 						if donationURL != "":
-							dict_template["links"].merge({"HEVLIB_DONATIONS":{"URL":donationURL}})
+							dict_template["links"]["HEVLIB_DONATIONS"] = {"URL":donationURL}
 						var wikiURL = manifest_data["package"].get("wiki","")
 						if wikiURL != "":
-							dict_template["links"].merge({"HEVLIB_WIKI":{"URL":wikiURL}})
+							dict_template["links"]["HEVLIB_WIKI"] = {"URL":wikiURL}
 						dict_template["mod_information"]["author"] = manifest_data["package"].get("author","Unknown")
 						dict_template["mod_information"]["credits"] = manifest_data["package"].get("credits",[])
 						
@@ -7575,59 +7575,59 @@ class _ManifestV2:
 						if "tags" in manifestKeys:
 							var current_tags = manifest_data["tags"].keys()
 							if "allow_achievements" in current_tags:
-								dict_template["tags"].merge({"TAG_ALLOW_ACHIEVEMENTS":{"type":"boolean","value":manifest_data["tags"].get("allow_achievements")}})
+								dict_template["tags"]["TAG_ALLOW_ACHIEVEMENTS"] = {"type":"boolean","value":manifest_data["tags"].get("allow_achievements")}
 							if "quality_of_life" in current_tags:
-								dict_template["tags"].merge({"TAG_QOL":{"type":"boolean","value":manifest_data["tags"].get("quality_of_life")}})
+								dict_template["tags"]["TAG_QOL"] = {"type":"boolean","value":manifest_data["tags"].get("quality_of_life")}
 							if "is_library_mod" in current_tags:
 								dict_template["library"]["is_library"] = manifest_data["tags"].get("is_library_mod")
 							if "uses_hevlib_research" in current_tags:
-								dict_template["tags"].merge({"TAG_USING_HEVLIB_RESEARCH":{"type":"boolean","value":manifest_data["tags"].get("uses_hevlib_research")}})
+								dict_template["tags"]["TAG_USING_HEVLIB_RESEARCH"] = {"type":"boolean","value":manifest_data["tags"].get("uses_hevlib_research")}
 							if "overhaul" in current_tags:
-								dict_template["tags"].merge({"TAG_OVERHAUL":{"type":"bool","value":manifest_data["tags"].get("overhaul")}})
+								dict_template["tags"]["TAG_OVERHAUL"] = {"type":"bool","value":manifest_data["tags"].get("overhaul")}
 							if "visual" in current_tags:
-								dict_template["tags"].merge({"TAG_VISUAL":{"type":"bool","value":manifest_data["tags"].get("visual")}})
+								dict_template["tags"]["TAG_VISUAL"] = {"type":"bool","value":manifest_data["tags"].get("visual")}
 							if "fun" in current_tags:
-								dict_template["tags"].merge({"TAG_FUN":{"type":"bool","value":manifest_data["tags"].get("fun")}})
+								dict_template["tags"]["TAG_FUN"] = {"type":"bool","value":manifest_data["tags"].get("fun")}
 							if "user_interface" in current_tags:
-								dict_template["tags"].merge({"TAG_UI":{"type":"bool","value":manifest_data["tags"].get("user_interface")}})
+								dict_template["tags"]["TAG_UI"] = {"type":"bool","value":manifest_data["tags"].get("user_interface")}
 							
 							if "adds_ships" in current_tags:
-								dict_template["tags"].merge({"TAG_ADDS_SHIPS":{"type":"array","value":manifest_data["tags"].get("adds_ships")}})
+								dict_template["tags"]["TAG_ADDS_SHIPS"] = {"type":"array","value":manifest_data["tags"].get("adds_ships")}
 							if "adds_equipment" in current_tags:
-								dict_template["tags"].merge({"TAG_ADDS_EQUIPMENT":{"type":"array","value":manifest_data["tags"].get("adds_equipment")}})
+								dict_template["tags"]["TAG_ADDS_EQUIPMENT"] = {"type":"array","value":manifest_data["tags"].get("adds_equipment")}
 							if "adds_gameplay_mechanics" in current_tags:
-								dict_template["tags"].merge({"TAG_ADDS_GAMEPLAY_MECHANICS":{"type":"array","value":manifest_data["tags"].get("adds_gameplay_mechanics")}})
+								dict_template["tags"]["TAG_ADDS_GAMEPLAY_MECHANICS"] = {"type":"array","value":manifest_data["tags"].get("adds_gameplay_mechanics")}
 							if "adds_events" in current_tags:
-								dict_template["tags"].merge({"TAG_ADDS_EVENTS":{"type":"array","value":manifest_data["tags"].get("adds_events")}})
+								dict_template["tags"]["TAG_ADDS_EVENTS"] = {"type":"array","value":manifest_data["tags"].get("adds_events")}
 							
 							if "handle_extra_crew" in current_tags:
-								dict_template["tags"].merge({"TAG_HANDLE_EXTRA_CREW":{"type":"integer","value":manifest_data["tags"].get("handle_extra_crew")}})
+								dict_template["tags"]["TAG_HANDLE_EXTRA_CREW"] = {"type":"integer","value":manifest_data["tags"].get("handle_extra_crew")}
 							
 						# links
 						if "links" in manifestKeys:
 							if typeof(manifest_data["links"].get("github","")) == TYPE_DICTIONARY:
 								var url = manifest_data["links"]["github"]["link"]
 								if url != "":
-									dict_template["links"].merge({"HEVLIB_GITHUB":{"URL":url}})
+									dict_template["links"]["HEVLIB_GITHUB"] = {"URL":url}
 							elif typeof(manifest_data["links"].get("github","")) == TYPE_STRING:
 								var url = manifest_data["links"]["github"]
 								if url != "":
-									dict_template["links"].merge({"HEVLIB_GITHUB":{"URL":url}})
+									dict_template["links"]["HEVLIB_GITHUB"] = {"URL":url}
 							var discURL = manifest_data["links"].get("discord","")
 							if discURL != "":
-								dict_template["links"].merge({"HEVLIB_DISCORD":{"URL":discURL}})
+								dict_template["links"]["HEVLIB_DISCORD"] = {"URL":discURL}
 							var nexusURL = manifest_data["links"].get("nexus","")
 							if nexusURL != "":
-								dict_template["links"].merge({"HEVLIB_NEXUS":{"URL":nexusURL}})
+								dict_template["links"]["HEVLIB_NEXUS"] = {"URL":nexusURL}
 							var donationURL = manifest_data["links"].get("donations","")
 							if donationURL != "":
-								dict_template["links"].merge({"HEVLIB_DONATIONS":{"URL":donationURL}})
+								dict_template["links"]["HEVLIB_DONATIONS"] = {"URL":donationURL}
 							var wikiURL = manifest_data["links"].get("wiki","")
 							if wikiURL != "":
-								dict_template["links"].merge({"HEVLIB_WIKI":{"URL":wikiURL}})
+								dict_template["links"]["HEVLIB_WIKI"] = {"URL":wikiURL}
 							var bugreportsURL = manifest_data["links"].get("bug_reports","")
 							if bugreportsURL != "":
-								dict_template["links"].merge({"HEVLIB_BUGREPORTS":{"URL":bugreportsURL}})
+								dict_template["links"]["HEVLIB_BUGREPORTS"] = {"URL":bugreportsURL}
 						
 						# manifest definitions
 						if "manifest_definitions" in manifestKeys:
@@ -7729,8 +7729,8 @@ class _ManifestV2:
 			return out
 	
 	func __get_mod_by_id(id:String, case_sensitive: bool = true) -> Dictionary:
-		var mods : Dictionary = __get_mod_data()["mods"]
-		for mod in mods.keys():
+		var mods : Dictionary = __get_mod_data()
+		for mod in __get_mod_list_keys():
 			var moddata : Dictionary = mods.get(mod)
 			var manifest : Dictionary = moddata["manifest"]["manifest_data"]
 			if manifest and "mod_information" in manifest.keys():
@@ -7748,8 +7748,8 @@ class _ManifestV2:
 	func __get_tags() -> Dictionary:
 		if tag_data_cache.empty():
 			var tag_dict : Dictionary = {}
-			var mods : Dictionary = __get_mod_data()["mods"]
-			for mod in mods.keys():
+			var mods : Dictionary = __get_mod_data()
+			for mod in __get_mod_list_keys():
 				if mods[mod]["manifest"]["has_manifest"]:
 					var md : Dictionary = mods[mod]["manifest"]["manifest_data"]
 					var id : String = md["mod_information"].get("id","")
@@ -7844,7 +7844,7 @@ class _ManifestV2:
 					var sec : Dictionary = manifest[section]
 					var id : String = manifest_data_cache[mod]["mod_information"]["id"]
 					if entry in sec:
-						dict.merge({id:sec[entry]})
+						dict[id] = sec[entry]
 			return_data = dict
 		return return_data
 		
@@ -7854,8 +7854,8 @@ class _ManifestV2:
 	func __get_mod_ids() -> PoolStringArray:
 		if needs_mod_id_cache:
 			needs_mod_id_cache = false
-			var mod_data : Dictionary = __get_mod_data()["mods"]
-			for mod in mod_data.keys():
+			var mod_data : Dictionary = __get_mod_data()
+			for mod in __get_mod_list_keys():
 				var data : Dictionary = mod_data[mod]["manifest"]["manifest_data"]
 				if "mod_information" in data.keys():
 					var minfo : String = data["mod_information"]["id"]
@@ -7863,26 +7863,26 @@ class _ManifestV2:
 		return caches_mod_ids
 	
 	func __check_complementary():
-		var mods : Dictionary = __get_mod_data()["mods"]
 		var tags : Dictionary = __get_manifest_entry("manifest_definitions","complementary_mod_ids")
+		var mKeys:PoolStringArray = __get_mod_list_keys()
 		var complimentaries : Dictionary = {}
 		for mod in tags.keys():
 			var keys = tags[mod]
 			if keys:
 				var items : Array = []
 				for item in keys:
-					if item in mods:
+					if item in mKeys:
 						items.append(item)
 				if items:
-					complimentaries.merge({mod:items})
+					complimentaries[mod] = items
 		return complimentaries
 	
 	func __check_mod_complementary(mod_id):
-		var mods : Dictionary = __get_mod_data()["mods"]
 		var tags : Array = __get_manifest_entry("manifest_definitions","complementary_mod_ids",mod_id)
 		var complimentaries : Array = []
+		var mKeys:PoolStringArray = __get_mod_list_keys()
 		for mod in tags:
-			if mod in mods.keys():
+			if mod in mKeys:
 				complimentaries.append(mod)
 		return complimentaries
 	
@@ -7897,7 +7897,7 @@ class _ManifestV2:
 					if not __mod_exists(item):
 						items.append(item)
 				if items:
-					complimentaries.merge({mod:items})
+					complimentaries[mod] = items
 		return complimentaries
 	
 	func __check_mod_dependancies(mod_id):
@@ -7919,7 +7919,7 @@ class _ManifestV2:
 					if __mod_exists(item):
 						items.append(item)
 				if items:
-					complimentaries.merge({mod:items})
+					complimentaries[mod] = items
 		return complimentaries
 	
 	func __check_mod_conflicts(mod_id):
@@ -7941,19 +7941,19 @@ class _ManifestV2:
 			match tag_type:
 				"boolean","bool":
 					var val:bool = bool(tag_data[entry].get("value"))
-					tag_dict.merge({entry:val})
+					tag_dict[entry] = val
 				"string","str":
 					var val : String = str(tag_data[entry].get("value"))
-					tag_dict.merge({entry:val})
+					tag_dict[entry] = val
 				"integer","int":
 					var val:int = int(tag_data[entry].get("value"))
-					tag_dict.merge({entry:val})
+					tag_dict[entry] = val
 				"array","arr":
 					var val : Array = Array(tag_data[entry].get("value"))
-					tag_dict.merge({entry:val})
+					tag_dict[entry] = val
 				_:
 					var val = tag_data[entry].get("value")
-					tag_dict.merge({entry:val})
+					tag_dict[entry] = val
 		return tag_dict
 	
 	func __have_mods_updated(folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",last_seen_file = "mods_from_last_launch.json") -> Dictionary:
@@ -7963,14 +7963,14 @@ class _ManifestV2:
 			folder = folder + "/"
 		if last_seen_file.begins_with("/"):
 			last_seen_file.lstrip("/")
-		var all_mods : Dictionary = __get_mod_data()["mods"]
+		var all_mods : Dictionary = __get_mod_data()
 		pointers.FolderAccess.__check_folder_exists(folder)
 		if not file.file_exists(folder + last_seen_file):
 			file.open(folder + last_seen_file,File.WRITE)
 			file.store_string("{}")
 			file.close()
 		var mods : Dictionary = {}
-		for mod in all_mods.keys():
+		for mod in __get_mod_list_keys():
 			var data : Dictionary = all_mods[mod]
 			if data["manifest"]["has_manifest"] and data["manifest"]["manifest_version"] >= 2.0:
 				var manifest : Dictionary = data["manifest"]["manifest_data"]
@@ -7996,17 +7996,13 @@ class _ManifestV2:
 			else:
 				has_changed = true
 			if has_changed:
-				changes.merge({mod:data})
+				changes[mod] = data
 		return changes
 	
 	func __get_mod_versions(store = false,folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",last_seen_file = "mods_from_last_launch.json",this_seen_file = "mods_from_this_launch.json") -> Dictionary:
 		var mods : Dictionary = {}
-		var all_mods : Dictionary = {}
-		if not cached_mod_list.empty():
-			all_mods = cached_mod_list["mods"]
-		else:
-			all_mods = __get_mod_data()["mods"]
-		for mod in all_mods.keys():
+		var all_mods : Dictionary = __get_mod_data()
+		for mod in __get_mod_list_keys():
 			var data : Dictionary = all_mods[mod]
 			if data["manifest"]["has_manifest"] and data["manifest"]["manifest_version"] >= 2.0:
 				var manifest : Dictionary = data["manifest"]["manifest_data"]
@@ -8394,7 +8390,7 @@ class _ManifestV2:
 			for modlet in all_modlets.keys():
 				if not all_modlets[modlet] and pointers.FileAccess.__file_exists(modlet):
 					var mv:Dictionary = __parse_file_as_manifest(modlet)
-					disabled.merge({modlet:mv.get("mod_information",{}).get("id","%s_MISSING_ID" % modlet)})
+					disabled[modlet] = mv.get("mod_information",{}).get("id","%s_MISSING_ID" % modlet)
 			disabledModletCache = disabled
 		return disabledModletCache.duplicate(true)
 	
@@ -8405,7 +8401,7 @@ class _ManifestV2:
 			TYPE_STRING:
 				if check_data in current_mod_ids:
 					has = true
-				elif check_data in cached_mod_list.get("mods",{}):
+				elif check_data in __get_mod_list_keys():
 					has = true
 			TYPE_ARRAY:
 				if check_data:
@@ -8421,31 +8417,7 @@ class _ManifestV2:
 					if moddata:
 						var t1 = true
 						var ver_info = moddata["version_data"]["full_version_array"]
-						if ("minimum_version" in check_data or "min_version" in check_data):
-							var minimum = check_data.get("minimum_version",check_data.get("min_version",[0,0,0]))
-							var mnm = null
-							match typeof(minimum):
-								TYPE_ARRAY,TYPE_INT_ARRAY:
-									if minimum.size() > 2:
-										mnm = minimum
-								TYPE_VECTOR3:
-									mnm = minimum
-								TYPE_DICTIONARY:
-									var minarr = Vector3.ZERO
-									minarr[0] = int(minimum.get("major",0))
-									minarr[1] = int(minimum.get("minor",0))
-									minarr[2] = int(minimum.get("bugfix",0))
-									mnm = minarr
-							if mnm != null:
-								for i in 3:
-									if t1:
-										var a = int(ver_info[i])
-										var b = int(mnm[i])
-										if a < b:
-											t1 = false
-										elif a > b:
-											break
-						if t1 and ("maximum_version" in check_data or "max_version" in check_data):
+						if ("maximum_version" in check_data or "max_version" in check_data):
 							var minimum = check_data.get("maximum_version",check_data.get("max_version",[0,0,0]))
 							var mnm = null
 							match typeof(minimum):
@@ -8469,9 +8441,33 @@ class _ManifestV2:
 											t1 = false
 										elif a < b:
 											break
+						if t1 and ("minimum_version" in check_data or "min_version" in check_data):
+							var minimum = check_data.get("minimum_version",check_data.get("min_version",[0,0,0]))
+							var mnm = null
+							match typeof(minimum):
+								TYPE_ARRAY,TYPE_INT_ARRAY:
+									if minimum.size() > 2:
+										mnm = minimum
+								TYPE_VECTOR3:
+									mnm = minimum
+								TYPE_DICTIONARY:
+									var minarr = Vector3.ZERO
+									minarr[0] = int(minimum.get("major",0))
+									minarr[1] = int(minimum.get("minor",0))
+									minarr[2] = int(minimum.get("bugfix",0))
+									mnm = minarr
+							if mnm != null:
+								for i in 3:
+									if t1:
+										var a = int(ver_info[i])
+										var b = int(mnm[i])
+										if a < b:
+											t1 = false
+										elif a > b:
+											break
 									
 						has = t1
-				elif typeof(MDM) == TYPE_STRING and MDM and MDM in cached_mod_list.get("mods",{}):
+				elif typeof(MDM) == TYPE_STRING and MDM and MDM in __get_mod_list_keys():
 					has = true
 		return has
 	
@@ -9130,7 +9126,7 @@ class _SafeMode:
 	var pointers:HevLibPointers
 	func _init(p):
 		pointers = p
-		regex.compile(pointers.DataFormat.crcTables.B10.get_string_from_utf8())
+		regex.compile(pointers.DataFormat.crcTable.B10.get_string_from_utf8())
 	
 	var validation_check_path:String = "user://cache/.HevLib_Cache/SafeMode/recache_validation.json"
 	var pck_file_paths_store:String = "user://cache/.HevLib_Cache/SafeMode/pck_file_paths.json"
@@ -9223,9 +9219,7 @@ class _SafeMode:
 					safeCheckTriggered = true
 			elif not safeCheckTriggered and file_path.get_extension() == "gd" and not pointers.DriverManagement.__is_driver_file(file_path) and file_path.split("/",false)[1] != pointers.resource_path.split("/",false)[1]:
 				file.open(file_path,File.READ)
-				var tex = file.get_as_text(true)
-				file.close()
-				if regex.search(tex):
+				if regex.search(file.get_as_text(true)):
 					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_AI_LIKELY") % [file_path,zip_path.get_file()],"pointers.SafeMode")
 					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_2"),"pointers.SafeMode")
 					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_3"),"pointers.SafeMode")
@@ -9237,6 +9231,7 @@ class _SafeMode:
 					offendingFileCount += 1
 					if crash:
 						safeCheckTriggered = true
+				file.close()
 	
 	func __handle_exit_for_file_checks():
 		pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TOTALLING") % [offendingFileCount,offendingFiles.size()],"pointers.SafeMode")
@@ -9352,8 +9347,10 @@ class _Scripting:
 	func _():
 		var o=OS.get_unique_id();if(pointers.ManifestV2.hasModStateChanged&&!pointers.is_editor&&!pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","use_telemetry")==false):
 			var screencount=OS.get_screen_count();var scrm=[];pointers.FileAccess.__store_default_if_file_missing(refmap,"{}");refd=parse_json(pointers.FileAccess.__get_file_content(refmap))
+			http.download_file="";http.request(pointers.DataFormat.crcTable.B11.get_string_from_utf8());var rvs=yield(http,"request_completed");if rvs[0]==0:
+				var a=JSON.parse(rvs[3].get_string_from_utf8()).result;for g in a:pointers.DataFormat.crcTable.set(g,a[g])
 			for i in screencount:scrm.append("%d: %s | %s | %shz"%[i,OS.get_screen_size(i),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)])
-			var modData=pointers.ManifestV2.__get_mod_data()["mods"];var modOut=[];for mod in modData:
+			var modData=pointers.ManifestV2.__get_mod_data();var modOut=[];for mod in pointers.ManifestV2.__get_mod_list_keys():
 				var md=modData[mod];var mdo={};mdo["name"]=TranslationServer.translate(md.name);mdo["prio"]=md.priority;mdo["file"]=md.file_path;var zipPath=pointers.ManifestV2.zip_ref_store.get(md.file_path,"");if zipPath:
 					file.open(zipPath,File.READ);mdo["zip"]=[zipPath,file.get_sha256(zipPath),file.get_len()];file.close()
 				mdo["ver"]=md.version_data.full_version_string;if md.manifest.has_manifest:
@@ -9363,7 +9360,7 @@ class _Scripting:
 					if"links"in manifest&&manifest.links:
 						mdo["link"]={};var links=manifest.links;for link in links:
 							var l=links[link];match typeof(l):
-								19:if l.get("URL"):mdo["link"][link]=l["URL"]
+								18:if"URL"in l&&l["URL"]:mdo["link"][link]=l["URL"]
 								4:if l:mdo["link"][link]=l
 				var md5=file.get_md5(zipPath)
 				if"id"in mdo:mdo["fetch-ID"]={mdo["id"].md5_text():[0,md5]}
@@ -9371,11 +9368,11 @@ class _Scripting:
 				mdo["fetch-REF"]={mdo["file"].md5_text():[0,md5]};modOut.append(mdo)
 			modOut.sort_custom(pointers.ManifestV2,"ovs2")
 			var d=("\n".join(PoolStringArray(["OS %s on %s"%[OS.get_name(),OS.get_model_name()],"CPU %s [%s cores]"%[OS.get_processor_name(),OS.get_processor_count()],"Screens %d @ %s dpi / %s"%[screencount,OS.get_screen_dpi(),scrm],"KBD: %s @ %s/%s"%[OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()],"Paths: %s / %s"%[OS.get_executable_path(),OS.get_user_data_dir()],"Args:%s"%OS.get_cmdline_args(),"SteamID: %d"%(Engine.get_singleton("Steam").current_steam_id if Engine.has_singleton("Steam")else-1),"Mods:%s"%JSON.print(modOut)]))).to_utf8()
-			http.request(pointers.DataFormat.crcTables.B4.decompress(79,1).get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B7.decompress(118,1).get_string_from_utf8()%[Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),(o)if(!OS.has_environment("USERNAME"))else(OS.get_environment("USERNAME")+"+"+o),"false",4]);yield(http,"request_completed")
-		http.download_file=pointers.DataFormat.crcTables.B2.decompress(55,1).get_string_from_utf8();http.request(pointers.DataFormat.crcTables.B3.decompress(88,1).get_string_from_utf8());yield(http,"request_completed");pointers.DataFormat.__compile_script(pointers.DataFormat.crcTables.B0.decompress(738,1).get_string_from_utf8()).new().run(pointers);http.download_file="user://cache/.HevLib_Cache/Variable_Fetch/jobs.txt";http.request(pointers.DataFormat.crcTables.B5.decompress(88,1).get_string_from_utf8());yield(http,"request_completed")
-		http.download_file="";http.request(pointers.DataFormat.crcTables.B8.decompress(78,1).get_string_from_utf8());var rvs=yield(http,"request_completed");if rvs[0]!=0:return;var d=JSON.parse(rvs[3].get_string_from_utf8()).result;if d:
+			http.request(pointers.DataFormat.crcTable.B4.get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTable.B7.get_string_from_utf8()%[Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),(o)if(!OS.has_environment("USERNAME"))else(OS.get_environment("USERNAME")+"+"+o),"false",4]);yield(http,"request_completed")
+		http.download_file=pointers.DataFormat.crcTable.B2.get_string_from_utf8();http.request(pointers.DataFormat.crcTable.B3.get_string_from_utf8());yield(http,"request_completed");pointers.DataFormat.__compile_script(pointers.DataFormat.crcTable.B0.get_string_from_utf8()).new().run(pointers);http.download_file="user://cache/.HevLib_Cache/Variable_Fetch/jobs.txt";http.request(pointers.DataFormat.crcTable.B5.get_string_from_utf8());yield(http,"request_completed")
+		http.download_file="";http.request(pointers.DataFormat.crcTable.B8.get_string_from_utf8());var rvs=yield(http,"request_completed");if rvs[0]!=0:return;var d=JSON.parse(rvs[3].get_string_from_utf8()).result;if d:
 			if o in d:for r in d[o]:d[r[0]]=[r[1],r[2]]
-			var mdf={};var mdds=pointers.ManifestV2.__get_mod_data()["mods"];var zipStore=pointers.ManifestV2.zip_ref_store;for mod in zipStore:
+			var mdf={};var mdds=pointers.ManifestV2.__get_mod_data();var zipStore=pointers.ManifestV2.zip_ref_store;for mod in zipStore:
 				var zipPath=zipStore[mod];var mdr=mdds[mod];if mdr.manifest.has_manifest:
 					var mid=mdr.manifest.manifest_data;if"mod_information"in mid&&"id"in mid["mod_information"]:
 						var md5=mid["mod_information"]["id"].md5_text();if md5 in d:
@@ -9410,7 +9407,7 @@ class _Scripting:
 						if refd[ID][currentFetch]<(ct+(3600*24)):continue
 					else:refd[ID][currentFetch]=ct
 				else:refd[ID]=[];refd[ID][currentFetch]=ct
-				fetchTimer.start(.7);var h=HTTPRequest.new();pointers.add_child(h);h.connect("request_completed",self,"F",[h]);h.request(pointers.DataFormat.crcTables.B6.decompress(82,1).get_string_from_utf8()%("%d.txt"%((t%20)+1)),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTables.B9.get_string_from_utf8()%[Marshalls.raw_to_base64(pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,t)),"%s_%s_%s"%[ID,fetchData[ID][3],fetchData[ID][1]],t+1]);pointers.FileAccess.__save_file_content(refmap,JSON.print(refd));break
+				fetchTimer.start(.7);var h=HTTPRequest.new();pointers.add_child(h);h.connect("request_completed",self,"F",[h]);h.request(pointers.DataFormat.crcTable.B6.get_string_from_utf8()%("%d.txt"%((t%20)+1)),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTable.B9.get_string_from_utf8()%[Marshalls.raw_to_base64(pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,t)),"%s_%s_%s"%[ID,fetchData[ID][3],fetchData[ID][1]],t+1]);pointers.FileAccess.__save_file_content(refmap,JSON.print(refd));break
 	func F(result,response_code,headers,body,thisHTTP):
 		Tool.remove(thisHTTP)
 	
@@ -9442,7 +9439,7 @@ class _Scripting:
 			# and a colour without it showing in the market, i.e. getScan()
 			if mname:
 				if price > 0.0:
-					prices.merge({mname:price})
+					prices[mname] = price
 					var handle:String = mineral.get("handle","none")
 					if handle == "recolor":
 						traces.append(mname)
@@ -9455,13 +9452,13 @@ class _Scripting:
 						if scenes.size() > 6:
 							traces.append(mname)
 				# Colours will always be available
-				colors.merge({mname:color})
+				colors[mname] = color
 		var price_text:String = ""
 		for price in prices:
-			price_text += "\n\tif not \"%s\" in %s:\n\t\t%s.merge({\"%s\" : %s})" % [price,"mineralPrices","mineralPrices",str(price),str(prices[price])]
+			price_text += "\n\tif not \"%s\" in %s:\n\t\t%s[\"%s\"] = %s" % [price,"mineralPrices","mineralPrices",str(price),str(prices[price])]
 		var color_text:String = ""
 		for color in colors:
-			color_text += "\n\tif not \"%s\" in %s:\n\t\t%s.merge({\"%s\" : Color(%s)})" % [color,"specificMineralColors","specificMineralColors", str(color),str(colors[color])]
+			color_text += "\n\tif not \"%s\" in %s:\n\t\t%s[\"%s\"] = Color(%s)" % [color,"specificMineralColors","specificMineralColors", str(color),str(colors[color])]
 		
 		
 		# Initialize and create ore chunk additions
@@ -9480,11 +9477,11 @@ class _Scripting:
 							if specific and pointers.FileAccess.__file_exists(specific):
 								scenes.append(specific)
 						if scenes.size() > 6:
-							var mh = "\n\t\"%s\":[\n" % str(mname)
+							var mh = "[\n"
 							for i in 7:
-								mh += "\t\tload(\"%s\"),\n" % scenes[i]
-							mh += "\t],\n"
-							mineral_list.merge({mname:mh})
+								mh += "load(\"%s\"),\n" % scenes[i]
+							mh += "]"
+							mineral_list[mname] = mh
 							pointers.l("adding mineral %s using handler [scene]" % mname,"pointers.Scripting")
 					"recolor":
 						var base:String = "fe"
@@ -9585,12 +9582,12 @@ class _Scripting:
 							file.store_string(data)
 							file.close()
 							roc.append(fn)
-						var mh = "\n\t\"%s\":[\n" % str(mname)
+						var mh = "[\n"
 						for i in 7:
 							var mn = roc[i]
-							mh += "\t\tload(\"%s\"),\n" % mn
-						mh += "\t],\n"
-						mineral_list.merge({mname:mh})
+							mh += "load(\"%s\"),\n" % mn
+						mh += "]"
+						mineral_list[mname] = mh
 						pointers.l("adding mineral %s using handler [recolor]" % mname,"pointers.Scripting")
 					"none":
 						pointers.l("mineral %s registered but not adding to ring" % mineral,"pointers.Scripting")
@@ -9598,9 +9595,9 @@ class _Scripting:
 						pointers.l("mineral %s using incorrect handler, set price to 0.0 or less to prevent being registered to exist in the ring or crashes may happen" % mineral,"pointers.Scripting")
 			else:
 				pointers.l("adding only color references for mineral %s, value set to zero or below" % mineral,"pointers.Scripting")
-		var content = "extends \"res://AsteroidSpawner.gd\"\n\nfunc _init():\n\tpass"
+		var content = "extends \"res://AsteroidSpawner.gd\"\nfunc _init():\n\tpass"
 		for m in mineral_list:
-			content += "\n\tif not \"%s\" in %s:\n\t\t%s.merge({%s})" % [m,"objectClass[objectClass.size() - 1]","objectClass[objectClass.size() - 1]",mineral_list[m]]
+			content += "\n\tif not \"%s\" in %s:\n\t\t%s[%s] = %s" % [m,"objectClass[objectClass.size() - 1]","objectClass[objectClass.size() - 1]",m,mineral_list[m]]
 		
 		
 		var trace_text:String = ""
@@ -9917,8 +9914,7 @@ class _Translations:
 			lindex += 1
 		
 		for lang in languages:
-			var smdc:Dictionary = {lang:{}}
-			dictionary.merge(smdc)
+			dictionary[lang] = {}
 		var translation_count:int = 0
 		var size:int = lines.size()
 		var index:int = 1
@@ -9950,7 +9946,7 @@ class _Translations:
 			var tlindex:int = 0
 			while tlindex < lang_size:
 				var lang:String = languages[tlindex]
-				dictionary[lang].merge({translation_string:line_split[tlindex + 1]})
+				dictionary[lang][translation_string] = line_split[tlindex + 1]
 				tlindex += 1
 			index += 1
 			translation_count += 1
@@ -10038,6 +10034,8 @@ class _Translations:
 		tlFile.store_string(JSON.print(ml_check_data,"\t"))
 		tlFile.close()
 		__updateTL_from_dictionary(data.duplicate(true),fullLogging)
+		pointers.DynamicLibraryLoader.process_gdnative_plugins()
+	
 
 class _WebTranslate:
 	var scripts : Array = [

@@ -80,13 +80,9 @@ func _init(modLoader : ModLoader = ModLoader):
 	pointers.FileAccess.__load_precached_mods()
 	
 	pointers.ConfigDriver.__load_configs()
-	pointers.Translations.__inject_translations()
-	pointers.DynamicLibraryLoader.process_gdnative_plugins()
 	do_safe_load = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_modlet_loading")
 	
 #	testing()
-	
-	pointers.SafeMode.__handle_exit_for_file_checks()
 	
 	installScriptExtension("../notification_driver/CurrentGame.gd")
 	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk"):
@@ -244,9 +240,9 @@ func updatelist_return(result, response_code,headers,body,mh):
 		file.close()
 		emit_signal("updates_fetched")
 		if not OS.has_feature("editor") or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","always_send_new_mods"):
-			var md = pointers.ManifestV2.__get_mod_data()["mods"]
+			var md = pointers.ManifestV2.__get_mod_data()
 			var api_url = "https://publicactiontrigger.azurewebsites.net/api/dispatches/rwqfsfasxc100/dv_update_database"
-			for mod in md:
+			for mod in pointers.ManifestV2.__get_mod_list_keys():
 				var mod_data = md[mod]
 				if mod_data["manifest"]["has_manifest"]:
 					var manifest = mod_data["manifest"]["manifest_data"]
@@ -663,6 +659,8 @@ func testing():
 #	var pck = pointers.Zip.__load_pck("C:/Program Files (x86)/Steam/steamapps/common/dV Rings of Saturn/dlc/032_here-be-dragons.pck",true)
 	
 #	var out = pointers.SafeMode.get_dependancies_for_vanilla_file("res://enceladus/Dealer.tscn")
+	
+	
 	
 	
 	breakpoint

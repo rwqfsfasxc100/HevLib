@@ -32,12 +32,12 @@
 
 extends "res://ships/modules/ThrusterSlot.gd"
 
-var exhaust_cache_path = "user://cache/.HevLib_Cache/AuxAndThrusterDriver/"
+var exhaust_cache_path:String = "user://cache/.HevLib_Cache/AuxAndThrusterDriver/"
 var flare
-var mpdg = "res://ships/modules/AuxMpd.tscn"
-var smes = "res://ships/modules/AuxSmes.tscn"
-var aux_hybrid = "res://HevLib/scenes/equipment/custom_equipment/AuxHybrid.tscn"
-var thruster = "res://sfx/thruster.tscn"
+var mpdg:String = "res://ships/modules/AuxMpd.tscn"
+var smes:String = "res://ships/modules/AuxSmes.tscn"
+var aux_hybrid:String = "res://HevLib/scenes/equipment/custom_equipment/AuxHybrid.tscn"
+var thruster:String = "res://sfx/thruster.tscn"
 
 var timerObject:Timer = Timer.new()
 var fco:Color = Color.white
@@ -54,11 +54,11 @@ func loadPlaceholder():
 	.loadPlaceholder()
 
 func hl_thrusterslot_modify():
-	var datastore = itsPointers.Equipment.auxslot_data
+	var datastore:Dictionary = itsPointers.Equipment.auxslot_data
 	shipName = ship.shipName
 	baseShipName = ship.baseShipName
-	var slotType = type.split(".")[0]
-	var currentInstall = ship.getConfig(type)
+	var slotType:String = type.split(".")[0]
+	var currentInstall:String = ship.getConfig(type)
 	if slotType in datastore:
 		for data in datastore[slotType]:
 			var aux_path:String = data.get("path","")
@@ -71,12 +71,11 @@ func hl_thrusterslot_modify():
 				"HYBRID":
 					aux_type = "AUX_HYBRID"
 			var item
-			var sys = data.get("system","SYSTEM_NAME_MISSING")
-			if sys == currentInstall:
+			if currentInstall == data.get("system","SYSTEM_NAME_MISSING"):
 				if itsPointers:
 					if not itsPointers.ConfigDriver.__validate_dictionary(data):
 						return
-				var valid_scene = false
+				var valid_scene:bool = false
 				if aux_path:
 					if itsPointers.DataFormat.__load_if_can(aux_path):
 						valid_scene = true
@@ -92,17 +91,17 @@ func hl_thrusterslot_modify():
 						"AUX_HYBRID":
 							item = load(aux_hybrid).instance()
 						"RCS","TORCH":
-							var thrusterScene = exhaust_cache_path + aux_type + "/" + sys + "_thruster.tscn"
+							var thrusterScene:String = exhaust_cache_path + aux_type + "/" + currentInstall + "_thruster.tscn"
 							if itsPointers.DataFormat.__load_if_can(thrusterScene):
 								item = itsPointers.DataFormat.__get_load().instance()
 							else:
 								itsPointers.l("ERROR: Failed to load thruster at [%s], falling back to default thruster scene" % thrusterScene,"ThrusterSlotDriver")
 								item = load(thruster).instance()
 				
-				item.name = sys
+				item.name = currentInstall
 				if not valid_scene:
 					item.command = data.get("command","m" if aux_type == "TORCH" else "")
-					item.systemName = sys
+					item.systemName = currentInstall
 					item.mass = data.get("mass",0)
 					
 					match aux_type:
@@ -188,9 +187,9 @@ func hl_thrusterslot_recolor():
 	Tool.remove(timerObject)
 
 func hl_thrusterslot_get_colors():
-	var color_data = itsPointers.Equipment.ship_thruster_colors
+	var color_data:Dictionary = itsPointers.Equipment.ship_thruster_colors
 	for i in color_data:
-		var d = color_data[i]
+		var d:Dictionary = color_data[i]
 		if not itsPointers.ConfigDriver.__validate_dictionary(d):
 			continue
 		
@@ -201,7 +200,7 @@ func hl_thrusterslot_get_colors():
 		
 
 func hl_thrusterslot_modify_colors(data):
-	var change = false
+	var change:bool = false
 	if "type" in data:
 		var c = data["type"]
 		if type in c:
