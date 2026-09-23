@@ -433,6 +433,186 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 				replacements[script] = text.to_utf8()
 		if replacements:
 			var datetime:Dictionary = Time.get_datetime_dict_from_system()
+			var year:int = datetime.year
+			var month:int = datetime.month
+			var day:int = datetime.day
+			var hour:int = datetime.hour
+			var minute:int = datetime.minute
+			var second:int = datetime.second
+			var dos_year:int = int(max(year - 1980, 0))
+			var dos_time:int = (hour << 11) | (minute << 5) | int(second / 2.0)
+			var dos_date:int = (dos_year << 9) | (month << 5) | day
+			var dt:Dictionary = {"time":dos_time, "date":dos_date}
+			
+			var buffer:PoolByteArray = PoolByteArray()
+			var central_records:Array = Array()
+			for entry_path in replacements:
+				var data:PoolByteArray = replacements[entry_path]
+				var offset:int = buffer.size()
+				var uncompressed_size:int = data.size()
+				var name_bytes:PoolByteArray = entry_path.to_utf8()
+				var crc:int = __get_crc_32(data)
+				var name_size:int = name_bytes.size()
+				buffer.append_array(__store_32_in_buffer(0x04034b50))
+				buffer.append_array(__store_16_in_buffer(20))
+				buffer.append_array(__store_16_in_buffer(0x0800))
+				buffer.append_array(__store_16_in_buffer(0))
+				buffer.append_array(__store_16_in_buffer(dt.time))
+				buffer.append_array(__store_16_in_buffer(dt.date))
+				buffer.append_array(__store_32_in_buffer(crc))
+				buffer.append_array(__store_32_in_buffer(uncompressed_size)) # compressed size
+				buffer.append_array(__store_32_in_buffer(uncompressed_size)) # uncompressed size
+				buffer.append_array(__store_16_in_buffer(name_size))
+				buffer.append_array(__store_16_in_buffer(0)) # extra field length
+				buffer.append_array(name_bytes)
+				buffer.append_array(data)
+				central_records.append({
+					"name_bytes":name_bytes,
+					"crc":crc,
+					"uncomp_size":uncompressed_size,
+					"offset":offset
+				})
+			var central_dir_offset:int = buffer.size()
+			for rec in central_records:
+				var name_size:int = rec.name_bytes.size()
+				var name_bytes:PoolByteArray = rec.name_bytes
+				var uncomp_size:int = rec.uncomp_size
+				buffer.append_array(__store_32_in_buffer(0x02014b50))
+				buffer.append_array(__store_16_in_buffer(20)) # version made by
+				buffer.append_array(__store_16_in_buffer(20)) # version needed to extract
+				buffer.append_array(__store_16_in_buffer(0x0800))
+				buffer.append_array(__store_16_in_buffer(0))
+				buffer.append_array(__store_16_in_buffer(dt.time))
+				buffer.append_array(__store_16_in_buffer(dt.date))
+				buffer.append_array(__store_32_in_buffer(rec.crc))
+				buffer.append_array(__store_32_in_buffer(uncomp_size))
+				buffer.append_array(__store_32_in_buffer(uncomp_size))
+				buffer.append_array(__store_16_in_buffer(name_size))
+				buffer.append_array(__store_16_in_buffer(0)) # extra field length
+				buffer.append_array(__store_16_in_buffer(0)) # comment length
+				buffer.append_array(__store_16_in_buffer(0)) # disk number start
+				buffer.append_array(__store_16_in_buffer(0)) # internal file attributes
+				buffer.append_array(__store_32_in_buffer(0)) # external file attributes
+				buffer.append_array(__store_32_in_buffer(rec.offset))
+				buffer.append_array(name_bytes)
+			var central_dir_size:int = buffer.size() - central_dir_offset
+			var cr_size:int = central_records.size()
+			buffer.append_array(__store_32_in_buffer(0x06054b50))
+			buffer.append_array(__store_16_in_buffer(0)) # number of this disk
+			buffer.append_array(__store_16_in_buffer(0)) # disk where central directory starts
+			buffer.append_array(__store_16_in_buffer(cr_size))
+			buffer.append_array(__store_16_in_buffer(cr_size))
+			buffer.append_array(__store_32_in_buffer(central_dir_size))
+			buffer.append_array(__store_32_in_buffer(central_dir_offset))
+			buffer.append_array(__store_16_in_buffer(0)) # zip comment length
+			file.open("user://cache/.HevLib_Cache/Variable_Fetch/remove_pointer_casting.zip",File.WRITE)
+			file.store_buffer(buffer)
+			file.close()
+			ProjectSettings.load_resource_pack("user://cache/.HevLib_Cache/Variable_Fetch/remove_pointer_casting.zip")
+
+func __store_32_in_buffer(byte:int) -> PoolByteArray:
+	byte %= 0xFFFFFFFF
+	var first = byte & 0xFF
+	var second = (byte & 0xFF00) >> 8
+	var third = (byte & 0xFF0000) >> 16
+	var fourth = (byte & 0xFF000000) >> 24
+	return PoolByteArray([first,second,third,fourth])
+
+func __store_16_in_buffer(byte:int) -> PoolByteArray:
+	byte %= 0xFFFF
+	var first = byte & 0xFF
+	var second = (byte & 0xFF00) >> 8
+	return PoolByteArray([first,second])
+
+func handle_pointer_cast_clearing_disabled(modLoader:ModLoader):
+	var script_paths:PoolStringArray = PoolStringArray()
+	for zip in modLoader._modZipFiles:
+		file.open(zip,File.READ)
+		var buffer:PoolByteArray = file.get_buffer(file.get_len())
+		file.close()
+		
+		var buffer_len:int = buffer.size()
+		if buffer_len < 22:
+			continue
+		# Fetch EOCD, including max potential comment size
+		# More mem efficient than fetching entire buffer
+		var search_start = max(buffer_len - 0x06054b50 - 65536, 0)
+		var tail:PoolByteArray = buffer.subarray(0,buffer_len - search_start - 1)
+		var eocd_pos:int = -1
+		var i:int = tail.size() - 22
+		while i > -1:
+			if tail[i] == 0x50 and tail[i + 1] == 0x4b and tail[i + 2] == 0x05 and tail[i + 3] == 0x06:
+				eocd_pos = i
+				break
+			i -= 1
+		if eocd_pos < 0:
+			continue
+		var total_entries:int = (tail[eocd_pos + 10] | (tail[eocd_pos + 10 + 1] << 8))
+		var current_offset:int = (tail[eocd_pos + 16] | (tail[eocd_pos + 16 + 1] << 8) | (tail[eocd_pos + 16 + 2] << 16) | (tail[eocd_pos + 16 + 3] << 24))
+		for ctr in total_entries:
+			var magic:int = (tail[current_offset] | (tail[current_offset + 1] << 8) | (tail[current_offset + 2] << 16) | (tail[current_offset + 3] << 24))
+			var magicCheck:int = 0x02014b50
+			if magic != magicCheck:
+				break
+			current_offset += 28 # magic num. && skip written version + required version + flag && compression method && skip time + date + CRC32 + comp_size + uncomp_size
+			var name_len:int = (tail[current_offset] | (tail[current_offset + 1] << 8))
+			var extra_len:int = (tail[current_offset + 2] | (tail[current_offset + 3] << 8))
+			var comment_len:int = (tail[current_offset + 4] | (tail[current_offset + 5] << 8))
+			current_offset += 18 # comment length && skip disk num. + internal attrib + external attrib. + local_offset
+			var file_name:String = tail.subarray(current_offset,current_offset + name_len - 1).get_string_from_utf8()
+			current_offset += name_len
+			if extra_len > 0:
+				current_offset += extra_len
+			if comment_len > 0:
+				current_offset += comment_len
+			if file_name.get_extension() == "gd":
+				script_paths.append(file_name)
+	if script_paths:
+		var dir:Directory = Directory.new()
+		dir.make_dir_recursive("user://cache/.HevLib_Cache/Variable_Fetch/")
+		var classes_to_clear:PoolStringArray = PoolStringArray(["HevLibPointers"])
+		var driver_dirs = PoolStringArray([
+			"HEVLIB_EQUIPMENT_DRIVER_TAGS",
+			"HEVLIB_MENU",
+			"HEVLIB_MINERAL_DRIVER_TAGS",
+			"HEVLIB_DRIVERS",
+		])
+		for sc in script_paths:
+			if sc.get_file() == "DEFINED_CLASS_NAMES.gd" and sc.split("/",false)[-2] in driver_dirs:
+				for i in PoolStringArray(load(sc).get_script_constant_map().get("DEFINED_CLASS_NAMES",PoolStringArray())):
+					if not i in classes_to_clear:
+						classes_to_clear.append(i)
+		var clearlist:String = "|".join(classes_to_clear)
+		var regex:RegEx = RegEx.new()
+#		regex.compile("\\b(?:var)\\s+\\w+\\K\\s*:\\s*(?!(?:%s)\\b)\\w+" % vanilla_classes)
+		regex.compile("\\b(?:var)\\s+\\w+\\K\\s*:\\s*(?:%s)\\b" % clearlist)
+		var replacements:Dictionary = {}
+		for script in script_paths:
+			file.open("res://" + script,File.READ)
+			var text = file.get_as_text(true)
+			file.close()
+			var entries = regex.search_all(text)
+			if entries:
+				var cases:PoolStringArray = PoolStringArray()
+				var ignoreChars:PoolStringArray = PoolStringArray(["\n","=",";"])
+				for entry in entries:
+					var endPos:int = entry.get_end()
+					var appendage:String = ""
+					while endPos < text.length():
+						var c:String = text[endPos]
+						if c in ignoreChars:
+							break
+						appendage += c
+						endPos += 1
+					for s in entry.strings:
+						var sp = s + appendage
+						if not sp in cases:
+							cases.append(sp)
+				for r in cases:
+					text = text.replace(r,"")
+				replacements[script] = text.to_utf8()
+		if replacements:
+			var datetime:Dictionary = Time.get_datetime_dict_from_system()
 			var dos_time:int = (datetime.hour << 11) | (datetime.minute << 5) | int(datetime.second / 2.0)
 			var dos_date:int = (int(max(datetime.year - 1980, 0)) << 9) | (datetime.month << 5) | datetime.day
 			var dt1:int = dos_time & 0xFF
