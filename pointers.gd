@@ -8962,12 +8962,10 @@ class _RPC:
 		var currentStack:int = rpc_data["currentStack"]
 		if area != stack[0]:
 			rpc_data["start_timer"] = OS.get_unix_time()
-			currentStack = 0
 			stack[0] = area
 			rpc_data["secondary_states"] = rpc_data["pointers"].Equipment.rpc_second_state_store[area]
 			rpc_data["secondary_state_index"] = 0
-		var prev:int = currentStack
-		rpc_data["currentStack"] = level
+		currentStack = level
 		if how_specific != "":
 			stack[currentStack] = how_specific
 		var current_icon:String = ""
@@ -9053,6 +9051,7 @@ class _RPC:
 		rpc_data["current_details"] = current_details
 		rpc_data["current_icon"] = current_icon
 		rpc_data["current_state"] = current_state
+		rpc_data["currentStack"] = currentStack
 	static func update_timer_finished():
 		rpc_data["self"].emit_signal("rpc_timer_complete")
 		update_rpc()
