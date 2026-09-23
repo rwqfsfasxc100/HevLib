@@ -1,3 +1,10 @@
+[1.16.8]
+
+1=* Moved nearly all pointers methods to be static to improve general efficiency.
+1.1=* WARNING: This is a very large change, and abuses how dictionaries and arrays are stored in memory to keep the entire script functional. Please report any and all issues that may have occurred due to this change.
+2=* Greatly improved the efficiency of the zip writing algorithm for the class cast removal code
+3=* Fixed issue that caused MineralDriver to build it's script incorrectly, causing a crash if a modded mineral was selected for fracturing.
+
 [1.16.7]
 
 1=* Improved the efficiency of the following systems:
