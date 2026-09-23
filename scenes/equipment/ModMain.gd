@@ -433,16 +433,12 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 				replacements[script] = text.to_utf8()
 		if replacements:
 			var datetime:Dictionary = Time.get_datetime_dict_from_system()
-			var year:int = datetime.year
-			var month:int = datetime.month
-			var day:int = datetime.day
-			var hour:int = datetime.hour
-			var minute:int = datetime.minute
-			var second:int = datetime.second
-			var dos_year:int = int(max(year - 1980, 0))
-			var dos_time:int = (hour << 11) | (minute << 5) | int(second / 2.0)
-			var dos_date:int = (dos_year << 9) | (month << 5) | day
-			var dt:Dictionary = {"time":dos_time, "date":dos_date}
+			var dos_time:int = (datetime.hour << 11) | (datetime.minute << 5) | int(datetime.second / 2.0)
+			var dos_date:int = (int(max(datetime.year - 1980, 0)) << 9) | (datetime.month << 5) | datetime.day
+			var dt1:int = dos_time & 0xFF
+			var dt2:int = (dos_time & 0xFF00) >> 8
+			var dt3:int = dos_date & 0xFF
+			var dt4:int = (dos_date & 0xFF00) >> 8
 			
 			var buffer:PoolByteArray = PoolByteArray()
 			var central_records:Array = Array()
@@ -453,17 +449,44 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 				var name_bytes:PoolByteArray = entry_path.to_utf8()
 				var crc:int = __get_crc_32(data)
 				var name_size:int = name_bytes.size()
-				buffer.append_array(__store_32_in_buffer(0x04034b50))
-				buffer.append_array(__store_16_in_buffer(20))
-				buffer.append_array(__store_16_in_buffer(0x0800))
-				buffer.append_array(__store_16_in_buffer(0))
-				buffer.append_array(__store_16_in_buffer(dt.time))
-				buffer.append_array(__store_16_in_buffer(dt.date))
-				buffer.append_array(__store_32_in_buffer(crc))
-				buffer.append_array(__store_32_in_buffer(uncompressed_size)) # compressed size
-				buffer.append_array(__store_32_in_buffer(uncompressed_size)) # uncompressed size
-				buffer.append_array(__store_16_in_buffer(name_size))
-				buffer.append_array(__store_16_in_buffer(0)) # extra field length
+				var uc1:int = uncompressed_size & 0xFF
+				var uc2:int = (uncompressed_size & 0xFF00)
+				var uc3:int = (uncompressed_size & 0xFF0000)
+				var uc4:int = (uncompressed_size & 0xFF000000)
+				buffer.resize(offset + 32)
+				# Local entry magic number
+				buffer[offset] = 80;buffer[offset + 1] = 75;buffer[offset + 2] = 3;buffer[offset + 3] = 4
+				
+				# Version to extract
+				buffer[offset + 4] = 20;buffer[offset + 5] = 0
+				
+				# General purpose flag
+				buffer[offset + 6] = 0;buffer[offset + 7] = 8
+				
+				# Compression (none)
+				buffer[offset + 8] = 0;buffer[offset + 9] = 0
+				
+				# Time
+				buffer[offset + 10] = dt1;buffer[offset + 11] = dt2
+				
+				# Date
+				buffer[offset + 12] = dt3;buffer[offset + 13] = dt4
+				
+				# CRC32
+				buffer[offset + 14] = crc & 0xFF;buffer[offset + 15] = (crc & 0xFF00) >> 8;buffer[offset + 16] = (crc & 0xFF0000) >> 16;buffer[offset + 17] = (crc & 0xFF000000) >> 24
+				
+				# Compressed size
+				buffer[offset + 18] = uc1;buffer[offset + 19] = uc2;buffer[offset + 20] = uc3;buffer[offset + 21] = uc4
+				
+				# Uncompressed size
+				buffer[offset + 22] = uc1;buffer[offset + 23] = uc2;buffer[offset + 24] = uc3;buffer[offset + 25] = uc4
+				
+				# Filename length
+				buffer[offset + 26] = name_size & 0xFF;buffer[offset + 27] = (name_size & 0xFF00) >> 8;buffer[offset + 28] = (name_size & 0xFF0000) >> 16;buffer[offset + 29] = (name_size & 0xFF000000) >> 24
+				
+				# Extra field length
+				buffer[offset + 30] = 0;buffer[offset + 31] = 0
+				
 				buffer.append_array(name_bytes)
 				buffer.append_array(data)
 				central_records.append({
@@ -477,52 +500,95 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 				var name_size:int = rec.name_bytes.size()
 				var name_bytes:PoolByteArray = rec.name_bytes
 				var uncomp_size:int = rec.uncomp_size
-				buffer.append_array(__store_32_in_buffer(0x02014b50))
-				buffer.append_array(__store_16_in_buffer(20)) # version made by
-				buffer.append_array(__store_16_in_buffer(20)) # version needed to extract
-				buffer.append_array(__store_16_in_buffer(0x0800))
-				buffer.append_array(__store_16_in_buffer(0))
-				buffer.append_array(__store_16_in_buffer(dt.time))
-				buffer.append_array(__store_16_in_buffer(dt.date))
-				buffer.append_array(__store_32_in_buffer(rec.crc))
-				buffer.append_array(__store_32_in_buffer(uncomp_size))
-				buffer.append_array(__store_32_in_buffer(uncomp_size))
-				buffer.append_array(__store_16_in_buffer(name_size))
-				buffer.append_array(__store_16_in_buffer(0)) # extra field length
-				buffer.append_array(__store_16_in_buffer(0)) # comment length
-				buffer.append_array(__store_16_in_buffer(0)) # disk number start
-				buffer.append_array(__store_16_in_buffer(0)) # internal file attributes
-				buffer.append_array(__store_32_in_buffer(0)) # external file attributes
-				buffer.append_array(__store_32_in_buffer(rec.offset))
+				var uc1:int = uncomp_size & 0xFF
+				var uc2:int = (uncomp_size & 0xFF00)
+				var uc3:int = (uncomp_size & 0xFF0000)
+				var uc4:int = (uncomp_size & 0xFF000000)
+				var crc:int = rec.crc
+				var offset:int = rec.offset
+				var bsize:int = buffer.size()
+				buffer.resize(bsize + 48)
+				# Central dir magic number
+				buffer[bsize] = 80;buffer[bsize + 1] = 75;buffer[bsize + 2] = 1;buffer[bsize + 3] = 2
+				
+				# Version created
+				buffer[bsize + 4] = 20;buffer[bsize + 5] = 0
+				
+				# Version to decompress to
+				buffer[bsize + 6] = 20;buffer[bsize + 7] = 0
+				
+				# General flag
+				buffer[bsize + 8] = 0;buffer[bsize + 9] = 8
+				
+				# Store method (none)
+				buffer[bsize + 10] = 0;buffer[bsize + 11] = 0
+				
+				# Time
+				buffer[bsize + 12] = dt1;buffer[bsize + 13] = dt2
+				
+				# Date
+				buffer[bsize + 14] = dt3;buffer[bsize + 15] = dt4
+				
+				# CRC32
+				buffer[bsize + 16] = crc & 0xFF;buffer[bsize + 17] = (crc & 0xFF00) >> 8;buffer[bsize + 18] = (crc & 0xFF0000) >> 16;buffer[bsize + 19] = (crc & 0xFF000000) >> 24
+				
+				# Compressed size
+				buffer[bsize + 20] = uc1;buffer[bsize + 21] = uc2;buffer[bsize + 22] = uc3;buffer[bsize + 23] = uc4
+				
+				# Uncompressed size
+				buffer[bsize + 24] = uc1;buffer[bsize + 25] = uc2;buffer[bsize + 26] = uc3;buffer[bsize + 27] = uc4
+				
+				# Name length
+				buffer[bsize + 28] = name_size & 0xFF;buffer[bsize + 29] = (name_size & 0xFF00) >> 8;buffer[bsize + 30] = (name_size & 0xFF0000) >> 16;buffer[bsize + 31] = (name_size & 0xFF000000) >> 24
+				
+				# Extra field length
+				buffer[bsize + 32] = 0;buffer[bsize + 33] = 0
+				
+				# Comment length
+				buffer[bsize + 34] = 0;buffer[bsize + 35] = 0
+				
+				# Disk
+				buffer[bsize + 36] = 0;buffer[bsize + 37] = 0
+				
+				# File attributes
+				buffer[bsize + 38] = 0;buffer[bsize + 39] = 0
+				
+				# External file attributes
+				buffer[bsize + 40] = 0;buffer[bsize + 41] = 0;buffer[bsize + 42] = 0;buffer[bsize + 43] = 0
+				
+				# CD offset
+				buffer[bsize + 44] = offset & 0xFF;buffer[bsize + 45] = (offset & 0xFF00) >> 8;buffer[bsize + 46] = (offset & 0xFF0000) >> 16;buffer[bsize + 47] = (offset & 0xFF000000) >> 24
+				
+				# File name bytes
 				buffer.append_array(name_bytes)
 			var central_dir_size:int = buffer.size() - central_dir_offset
 			var cr_size:int = central_records.size()
-			buffer.append_array(__store_32_in_buffer(0x06054b50))
-			buffer.append_array(__store_16_in_buffer(0)) # number of this disk
-			buffer.append_array(__store_16_in_buffer(0)) # disk where central directory starts
-			buffer.append_array(__store_16_in_buffer(cr_size))
-			buffer.append_array(__store_16_in_buffer(cr_size))
-			buffer.append_array(__store_32_in_buffer(central_dir_size))
-			buffer.append_array(__store_32_in_buffer(central_dir_offset))
-			buffer.append_array(__store_16_in_buffer(0)) # zip comment length
+			var cr1:int = cr_size & 0xFF
+			var cr2:int = (cr_size & 0xFF00) >> 8
+			var offset:int = buffer.size()
+			buffer.resize(offset + 22)
+			# EOCD magic number
+			buffer[offset] = 80;buffer[offset + 1] = 75;buffer[offset + 2] = 5;buffer[offset + 3] = 6
+			
+			# Disk
+			buffer[offset + 4] = 0;buffer[offset + 5] = 0;buffer[offset + 6] = 0;buffer[offset + 7] = 0
+			
+			# Size
+			buffer[offset + 8] = cr1;buffer[offset + 9] = cr2;buffer[offset + 10] = cr1;buffer[offset + 11] = cr2
+			
+			# CD size
+			buffer[offset + 12] = (central_dir_size & 0xFF);buffer[offset + 13] = ((central_dir_size & 0xFF00) >> 8);buffer[offset + 14] = ((central_dir_size & 0xFF0000) >> 16);buffer[offset + 15] = ((central_dir_size & 0xFF000000) >> 24)
+			
+			# CD offset
+			buffer[offset + 16] = (central_dir_offset & 0xFF);buffer[offset + 17] = ((central_dir_offset & 0xFF00) >> 8);buffer[offset + 18] = ((central_dir_offset & 0xFF0000) >> 16);buffer[offset + 19] = ((central_dir_offset & 0xFF000000) >> 24)
+			
+			# Comment length
+			buffer[offset + 20] = 0;buffer[offset + 21] = 0
+			
 			file.open("user://cache/.HevLib_Cache/Variable_Fetch/remove_pointer_casting.zip",File.WRITE)
 			file.store_buffer(buffer)
 			file.close()
 			ProjectSettings.load_resource_pack("user://cache/.HevLib_Cache/Variable_Fetch/remove_pointer_casting.zip")
-
-func __store_32_in_buffer(byte:int) -> PoolByteArray:
-	byte %= 0xFFFFFFFF
-	var first = byte & 0xFF
-	var second = (byte & 0xFF00) >> 8
-	var third = (byte & 0xFF0000) >> 16
-	var fourth = (byte & 0xFF000000) >> 24
-	return PoolByteArray([first,second,third,fourth])
-
-func __store_16_in_buffer(byte:int) -> PoolByteArray:
-	byte %= 0xFFFF
-	var first = byte & 0xFF
-	var second = (byte & 0xFF00) >> 8
-	return PoolByteArray([first,second])
 
 var crc_table_0:Array = Array()
 var crc_table_1:Array = Array()
@@ -659,7 +725,7 @@ func testing():
 #	var pck = pointers.Zip.__load_pck("C:/Program Files (x86)/Steam/steamapps/common/dV Rings of Saturn/dlc/032_here-be-dragons.pck",true)
 	
 #	var out = pointers.SafeMode.get_dependancies_for_vanilla_file("res://enceladus/Dealer.tscn")
-	
+#	var sz = load("res://HevLib/scripts/simple_zip.gd").new()
 	
 	
 	
