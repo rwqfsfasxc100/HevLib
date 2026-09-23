@@ -9682,7 +9682,7 @@ class _Scripting:
 				pointers.l("adding only color references for mineral %s, value set to zero or below" % mineral,"pointers.Scripting")
 		var content = "extends \"res://AsteroidSpawner.gd\"\nfunc _init():\n\tpass"
 		for m in mineral_list:
-			content += "\n\tif not \"%s\" in %s:\n\t\t%s[%s] = %s" % [m,"objectClass[objectClass.size() - 1]","objectClass[objectClass.size() - 1]",m,mineral_list[m]]
+			content += "\n\tif not \"%s\" in %s:\n\t\t%s[\"%s\"] = %s" % [m,"objectClass[objectClass.size() - 1]","objectClass[objectClass.size() - 1]",m,mineral_list[m]]
 		
 		
 		var trace_text:String = ""
