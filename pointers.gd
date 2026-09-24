@@ -1487,7 +1487,7 @@ class _ConfigDriver:
 							subscriptions[top][setting].erase(item)
 	
 	static func __truncate_mod_id(mod_id:String) -> String:
-		var pointers = non_static["pointers"].DataFormat
+		var pointers:HevLibPointers = non_static["pointers"].DataFormat
 		mod_id = pointers.__array_to_string(mod_id.split("/"))
 		mod_id = pointers.__array_to_string(mod_id.split(" "))
 		return mod_id
@@ -1503,7 +1503,7 @@ class _ConfigDriver:
 		if data_dict == null:
 			return false
 		var ddk:Array = data_dict.keys()
-		var pointers = non_static["pointers"].ManifestV2
+		var pointers:HevLibPointers = non_static["pointers"].ManifestV2
 		if check_config and config_entry_override in ddk and data_dict[config_entry_override] is Dictionary:
 			var cfg:Dictionary = data_dict[config_entry_override]
 			var config_id : String  = cfg.get("id",cfg.get("mod",cfg.get("mod_id","")))
@@ -2620,6 +2620,17 @@ class _DataFormat:
 	static func __is_valid_url(URL:String) -> bool:
 		return non_statics["urlRegex"].search(URL) != null
 	
+	static func __ensure_string_is_url(URL:String):
+		if not __is_valid_url(URL):
+			if not URL.begins_with("https://"):
+				if not URL.begins_with("//"):
+					URL = "//" + URL
+				if not URL.begins_with(":"):
+					URL = ":" + URL
+				if not URL.begins_with("https"):
+					URL = "https" + URL
+		return URL
+	
 	static func __loadDLC():
 		l("Preloading DLC as workaround")
 		var DLCLoader:Settings = preload("res://Settings.gd").new()
@@ -3175,7 +3186,7 @@ class _DynamicLibraryLoader:
 	const gdnative_library_extensions:PoolStringArray = PoolStringArray(["gdnlib"])
 	
 	static func process_gdnative_plugins():
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var file:File = File.new()
 		var dir:Directory = Directory.new()
 		var exePath:String = OS.get_executable_path().get_base_dir() + "/hevlib_dll_store/"
@@ -3318,7 +3329,7 @@ class _DriverManagement:
 	static func __get_drivers(get_ids : Array = []) -> Array:
 		var base = non_static["self"]
 		var mod_drivers : Array = []
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		for modmain_path in (pointers.ManifestV2.__get_modmain_files() + pointers.ManifestV2.__get_modlet_files()):
 			var has_manifest:bool = false
 			var manifest_path : String  = ""
@@ -3391,7 +3402,7 @@ class _DriverManagement:
 			var this_mod_data : Dictionary = {}
 			if not file.file_exists(file_path):
 				return {}
-			var pointers = non_static["pointers"]
+			var pointers:HevLibPointers = non_static["pointers"]
 			var folder_path : String  = file_path.get_base_dir() + "/"
 			var folderCheck : Array = pointers.FolderAccess.__fetch_folder_files(folder_path,true)
 			for driverDir in driver_dirs:
@@ -5694,6 +5705,7 @@ class _Events:
 				busy[1] = focusObject
 			else:
 				var focusObject = CurrentGame.getPlayerShip()
+				busy[1] = focusObject
 				if focusObject and focusObject.zone == "rings":
 					var tree = ring.get_tree()
 					var event_node = ring.get_node_or_null(event)
@@ -5713,7 +5725,7 @@ class _Events:
 							ring.unspawnedOddities[randomOddityKey] = oddity
 							ring.unspawnedOdditiesLocation[randomOddityKey] = pos
 							pointers.n("force spawning oddity %s" % event,"pointers.EventDriver")
-				busy[1] = focusObject
+				
 			busy[0] = false
 	
 	static func __clear_event(event : String, ring, clear_related_poi : bool = true,clear_in_cargo : bool = false,delay_seconds : float = 0.0):
@@ -5956,7 +5968,7 @@ class _FileAccess:
 			if reboot:
 				var foundnewfiles:String = "new mods found, attempting to copy"
 				print(foundnewfiles)
-				var pointers = non_static["pointers"]
+				var pointers:HevLibPointers = non_static["pointers"]
 				pointers.l(foundnewfiles,"pointers.FileAccess")
 				for mod in files_to_copy:
 					if file.file_exists(mod) and __copy_file(mod,modPathPrefix) == OK:
@@ -6298,7 +6310,7 @@ class _Github:
 	
 	static func __get_github_release(URL: String, folder: String, node_to_return_to: Node, get_pre_releases: bool = false, file_preference: String = "any", file_to_download: String = "first"):
 		var cancel:bool = false
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		if node_to_return_to == null or (not node_to_return_to is Node):
 			cancel = true
 			var e : String = "Release Downloader ERROR! Provided node [%s] either does not exist or is not of [Node] type." % str(node_to_return_to)
@@ -6466,7 +6478,7 @@ class _Keymapping:
 		if not controls:
 			return
 		var i = controls[0]
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		if i.begins_with("Mouse "):
 			var event = InputEventMouseButton.new()
 			event.button_index = int(i.split("Mouse ")[1])
@@ -6523,7 +6535,7 @@ class _Keymapping:
 			var bound = {}
 			var current = {}
 			var file = File.new()
-			var pointers = non_static["pointers"]
+			var pointers:HevLibPointers = non_static["pointers"]
 			if file.file_exists(vanilla_binds_file):
 				current = pointers.ConfigDriver.__config_parse(vanilla_binds_file)
 			if file.file_exists("user://settings.cfg"):
@@ -7071,7 +7083,7 @@ class _ManifestV2:
 	static func __get_mod_data(print_json: bool = false):
 		if cached_mod_list.empty():
 			var base = non_static["self"]
-			var pointers = non_static["pointers"]
+			var pointers:HevLibPointers = non_static["pointers"]
 			pointers.l("Fetching mods from file","pointers.ManifestV2")
 			var manifest_count:int = 0
 			var library_count:int = 0
@@ -7252,7 +7264,7 @@ class _ManifestV2:
 		return zip_ref_store.get(mod_main_path,"")
 	
 	static func __concat_mod_info(mod_path:String) -> Dictionary:
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		if not pointers.FileAccess.__file_exists(mod_path):
 			return {}
 		var cv : String = mod_path.get_file().to_lower()
@@ -7347,7 +7359,7 @@ class _ManifestV2:
 			mod_version_array.append(mod_version_metadata)
 			mod_version_string = mod_version_string + "-" + str(mod_version_metadata)
 		var version_dictionary : Dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var drivers : Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(script_path)
 		var ml : String = "en"
 		if "REPLACE_TRANSLATIONS.gd" in drivers.keys():
@@ -7504,7 +7516,7 @@ class _ManifestV2:
 		var cachevar : String = "%s:%s" % [file_path,format_to_manifest_version]
 		if not cachevar in cachedManifestKeys:
 			var out : Dictionary = {}
-			var pointers = non_static["pointers"]
+			var pointers:HevLibPointers = non_static["pointers"]
 			var cfg : Dictionary = pointers.ConfigDriver.__config_parse(file_path)
 			var manifest_data : Dictionary = {}
 			var manifest_version:float = 1.0
@@ -7566,21 +7578,21 @@ class _ManifestV2:
 						dict_template["mod_information"]["description"] = manifest_data["package"].get("description","MODMENU_DESCRIPTION_PLACEHOLDER")
 						
 						if typeof(manifest_data["package"].get("github_homepage","")) == TYPE_STRING:
-							var url = manifest_data["package"]["github_homepage"]
-							if url != "":
-								dict_template["links"]["HEVLIB_GITHUB"] = {"URL":url}
-						var discURL = manifest_data["package"].get("discord","")
-						if discURL != "":
-							dict_template["links"]["HEVLIB_DISCORD"] = {"URL":discURL}
-						var nexusURL = manifest_data["package"].get("nexus","")
-						if nexusURL != "":
-							dict_template["links"]["HEVLIB_NEXUS"] = {"URL":nexusURL}
-						var donationURL = manifest_data["package"].get("donations","")
-						if donationURL != "":
-							dict_template["links"]["HEVLIB_DONATIONS"] = {"URL":donationURL}
-						var wikiURL = manifest_data["package"].get("wiki","")
-						if wikiURL != "":
-							dict_template["links"]["HEVLIB_WIKI"] = {"URL":wikiURL}
+							var url:String = manifest_data["package"]["github_homepage"]
+							if url:
+								dict_template["links"]["HEVLIB_GITHUB"] = {"URL":pointers.DataFormat.__ensure_string_is_url(url)}
+						var discURL:String = manifest_data["package"].get("discord","")
+						if discURL:
+							dict_template["links"]["HEVLIB_DISCORD"] = {"URL":pointers.DataFormat.__ensure_string_is_url(discURL)}
+						var nexusURL:String = manifest_data["package"].get("nexus","")
+						if nexusURL:
+							dict_template["links"]["HEVLIB_NEXUS"] = {"URL":pointers.DataFormat.__ensure_string_is_url(nexusURL)}
+						var donationURL:String = manifest_data["package"].get("donations","")
+						if donationURL:
+							dict_template["links"]["HEVLIB_DONATIONS"] = {"URL":pointers.DataFormat.__ensure_string_is_url(donationURL)}
+						var wikiURL:String = manifest_data["package"].get("wiki","")
+						if wikiURL:
+							dict_template["links"]["HEVLIB_WIKI"] = {"URL":pointers.DataFormat.__ensure_string_is_url(wikiURL)}
 						
 					2.0:
 						dict_template["mod_information"]["id"] = manifest_data["package"].get("id","")
@@ -7591,25 +7603,25 @@ class _ManifestV2:
 						dict_template["version"]["version_metadata"] = manifest_data["package"].get("version_metadata","")
 						dict_template["mod_information"]["description"] = manifest_data["package"].get("description","HEVLIB_DESCRIPTION_PLACEHOLDER")
 						if typeof(manifest_data["package"].get("github","")) == TYPE_DICTIONARY:
-							var url = manifest_data["package"]["github"]["link"]
-							if url != "":
-								dict_template["links"]["HEVLIB_GITHUB"] = {"URL":url}
+							var url:String = manifest_data["package"]["github"]["link"]
+							if url:
+								dict_template["links"]["HEVLIB_GITHUB"] = {"URL":pointers.DataFormat.__ensure_string_is_url(url)}
 						elif typeof(manifest_data["package"].get("github","")) == TYPE_STRING:
-							var url = manifest_data["package"]["github"]
-							if url != "":
-								dict_template["links"]["HEVLIB_GITHUB"] = {"URL":url}
-						var discURL = manifest_data["package"].get("discord","")
-						if discURL != "":
-							dict_template["links"]["HEVLIB_DISCORD"] = {"URL":discURL}
-						var nexusURL = manifest_data["package"].get("nexus","")
-						if nexusURL != "":
-							dict_template["links"]["HEVLIB_NEXUS"] = {"URL":nexusURL}
-						var donationURL = manifest_data["package"].get("donations","")
-						if donationURL != "":
-							dict_template["links"]["HEVLIB_DONATIONS"] = {"URL":donationURL}
-						var wikiURL = manifest_data["package"].get("wiki","")
-						if wikiURL != "":
-							dict_template["links"]["HEVLIB_WIKI"] = {"URL":wikiURL}
+							var url:String = manifest_data["package"]["github"]
+							if url:
+								dict_template["links"]["HEVLIB_GITHUB"] = {"URL":pointers.DataFormat.__ensure_string_is_url(url)}
+						var discURL:String = manifest_data["package"].get("discord","")
+						if discURL:
+							dict_template["links"]["HEVLIB_DISCORD"] = {"URL":pointers.DataFormat.__ensure_string_is_url(discURL)}
+						var nexusURL:String = manifest_data["package"].get("nexus","")
+						if nexusURL:
+							dict_template["links"]["HEVLIB_NEXUS"] = {"URL":pointers.DataFormat.__ensure_string_is_url(nexusURL)}
+						var donationURL:String = manifest_data["package"].get("donations","")
+						if donationURL:
+							dict_template["links"]["HEVLIB_DONATIONS"] = {"URL":pointers.DataFormat.__ensure_string_is_url(donationURL)}
+						var wikiURL:String = manifest_data["package"].get("wiki","")
+						if wikiURL:
+							dict_template["links"]["HEVLIB_WIKI"] = {"URL":pointers.DataFormat.__ensure_string_is_url(wikiURL)}
 						dict_template["mod_information"]["author"] = manifest_data["package"].get("author","Unknown")
 						dict_template["mod_information"]["credits"] = manifest_data["package"].get("credits",[])
 						
@@ -7664,28 +7676,28 @@ class _ManifestV2:
 						# links
 						if "links" in manifestKeys:
 							if typeof(manifest_data["links"].get("github","")) == TYPE_DICTIONARY:
-								var url = manifest_data["links"]["github"]["link"]
-								if url != "":
-									dict_template["links"]["HEVLIB_GITHUB"] = {"URL":url}
+								var url:String = manifest_data["links"]["github"]["link"]
+								if url:
+									dict_template["links"]["HEVLIB_GITHUB"] = {"URL":pointers.DataFormat.__ensure_string_is_url(url)}
 							elif typeof(manifest_data["links"].get("github","")) == TYPE_STRING:
-								var url = manifest_data["links"]["github"]
-								if url != "":
-									dict_template["links"]["HEVLIB_GITHUB"] = {"URL":url}
-							var discURL = manifest_data["links"].get("discord","")
-							if discURL != "":
-								dict_template["links"]["HEVLIB_DISCORD"] = {"URL":discURL}
-							var nexusURL = manifest_data["links"].get("nexus","")
-							if nexusURL != "":
-								dict_template["links"]["HEVLIB_NEXUS"] = {"URL":nexusURL}
-							var donationURL = manifest_data["links"].get("donations","")
-							if donationURL != "":
-								dict_template["links"]["HEVLIB_DONATIONS"] = {"URL":donationURL}
-							var wikiURL = manifest_data["links"].get("wiki","")
-							if wikiURL != "":
-								dict_template["links"]["HEVLIB_WIKI"] = {"URL":wikiURL}
-							var bugreportsURL = manifest_data["links"].get("bug_reports","")
-							if bugreportsURL != "":
-								dict_template["links"]["HEVLIB_BUGREPORTS"] = {"URL":bugreportsURL}
+								var url:String = manifest_data["links"]["github"]
+								if url:
+									dict_template["links"]["HEVLIB_GITHUB"] = {"URL":pointers.DataFormat.__ensure_string_is_url(url)}
+							var discURL:String = manifest_data["links"].get("discord","")
+							if discURL:
+								dict_template["links"]["HEVLIB_DISCORD"] = {"URL":pointers.DataFormat.__ensure_string_is_url(discURL)}
+							var nexusURL:String = manifest_data["links"].get("nexus","")
+							if nexusURL:
+								dict_template["links"]["HEVLIB_NEXUS"] = {"URL":pointers.DataFormat.__ensure_string_is_url(nexusURL)}
+							var donationURL:String = manifest_data["links"].get("donations","")
+							if donationURL:
+								dict_template["links"]["HEVLIB_DONATIONS"] = {"URL":pointers.DataFormat.__ensure_string_is_url(donationURL)}
+							var wikiURL:String = manifest_data["links"].get("wiki","")
+							if wikiURL:
+								dict_template["links"]["HEVLIB_WIKI"] = {"URL":pointers.DataFormat.__ensure_string_is_url(wikiURL)}
+							var bugreportsURL:String = manifest_data["links"].get("bug_reports","")
+							if bugreportsURL:
+								dict_template["links"]["HEVLIB_BUGREPORTS"] = {"URL":pointers.DataFormat.__ensure_string_is_url(bugreportsURL)}
 						
 						# manifest definitions
 						if "manifest_definitions" in manifestKeys:
@@ -7726,7 +7738,7 @@ class _ManifestV2:
 								var ld = links[link]
 								if typeof(ld) == TYPE_DICTIONARY:
 									if "URL" in ld and typeof(ld.URL) == TYPE_STRING:
-										ovLinks[link] = ld
+										ovLinks[link] = pointers.DataFormat.__ensure_string_is_url(ld)
 							if ovLinks:
 								dict_template["links"] = ovLinks
 						if "tags" in manifestKeys:
@@ -7776,7 +7788,7 @@ class _ManifestV2:
 						
 				var version_metadata : String = dict_template["version"]["version_metadata"]
 				var version_string : String = str(dict_template["version"]["version_major"]) + "." + str(dict_template["version"]["version_minor"]) + "." + str(dict_template["version"]["version_bugfix"])
-				if not version_metadata == "":
+				if not version_metadata.empty():
 					version_string = version_string + "-" + version_metadata
 				dict_template["version"]["version_string"] = version_string
 				out = dict_template
@@ -7789,7 +7801,7 @@ class _ManifestV2:
 	static func __get_mod_by_id(id:String, case_sensitive: bool = true) -> Dictionary:
 		var mods : Dictionary = __get_mod_data()
 		for mod in __get_mod_list_keys():
-			var moddata : Dictionary = mods.get(mod)
+			var moddata : Dictionary = mods[mod]
 			var manifest : Dictionary = moddata["manifest"]["manifest_data"]
 			if manifest and "mod_information" in manifest.keys():
 				var ID : String = manifest["mod_information"].get("id","")
@@ -8179,7 +8191,7 @@ class _ManifestV2:
 	const modmain_file_list : PoolStringArray = PoolStringArray()
 	static func __get_modmain_files() -> PoolStringArray:
 		if modmain_file_list.empty():
-			var pointers = non_static["pointers"]
+			var pointers:HevLibPointers = non_static["pointers"]
 			pointers.FolderAccess.__get_folder_structure("res://",false,false)
 			if pointers.is_editor:
 				modmain_file_list.append_array(pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[]))
@@ -8198,7 +8210,7 @@ class _ManifestV2:
 	const cached_modlets : Dictionary = {}
 	
 	static func __get_all_modlets(only_show_installed : bool = true,recache : bool = false) -> Dictionary:
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		if cached_modlets:
 			var modletCheck = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets")
 			for modlet in modletCheck.keys():
@@ -8263,7 +8275,7 @@ class _ManifestV2:
 	static func __get_mod_files():
 		if cached_mod_files.empty():
 			var restrict_to_modmains : PoolStringArray = PoolStringArray()
-			var pointers = non_static["pointers"]
+			var pointers:HevLibPointers = non_static["pointers"]
 			if pointers.is_editor:
 				for a in pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[]):
 					restrict_to_modmains.append(a.get_base_dir() + "/")
@@ -8341,7 +8353,7 @@ class _ManifestV2:
 	}
 	
 	static func __load_modlets(is_onready : bool,do_safe_load : bool) -> PoolStringArray:
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		if false:#do_safe_load:
 			pointers.DataFormat.__loadDLC()
 			var resource_paths:Array = Array()
@@ -8607,7 +8619,7 @@ class _NodeAccess:
 		return not p_node.filename.empty()
 	
 	static func __dynamic_crew_expander(folder_path: String = "user://cache/.HevLib_Cache/dynamic_crew_expander/", max_crew:int = 24) -> String:
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.FolderAccess.__check_folder_exists(folder_path)
 		var base:int = 24
 
@@ -8645,7 +8657,7 @@ class _NodeAccess:
 			__remove_scripts(obj)
 	
 	static func __exit(restart : bool = false, exit_message : String = "", exit_header : String = "", delay : float = 0.0,exit_url : String = "",use_os_error_message : bool = false):
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		if delay > 0.0 and pointers.is_inside_tree():
 			pointers.get_tree().create_timer(delay).connect("timeout",non_static["self"],"__exit",[restart,exit_message,exit_header,0.0,exit_url,use_os_error_message])
 		else:
@@ -9206,7 +9218,7 @@ class _SafeMode:
 	
 	static func ready():
 		var file:File = File.new()
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var vanilla_version:PoolIntArray = pointers.DataFormat.__get_vanilla_version()
 		var validation_check:Dictionary = Dictionary()
 		if file.file_exists(validation_check_path):
@@ -9279,7 +9291,7 @@ class _SafeMode:
 	static func __check_file(file_path:String,zip_path:String,crash:bool = true):
 		var base = non_static["self"]
 		if base.safeCheck:
-			var pointers = non_static["pointers"]
+			var pointers:HevLibPointers = non_static["pointers"]
 			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_CHECKINGFILE") % [zip_path.get_file(),file_path],"pointers.SafeMode")
 			if file_path in PCKNAMES:
 				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_1") % [file_path,zip_path.get_file()],"pointers.SafeMode")
@@ -9310,7 +9322,7 @@ class _SafeMode:
 				file.close()
 	
 	static func __handle_exit_for_file_checks():
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var base = non_static["self"]
 		pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TOTALLING") % [base.offendingFileCount,offendingFiles.size()],"pointers.SafeMode")
 		for zip_path in offendingFiles:
@@ -9407,7 +9419,7 @@ class _Scripting:
 		non_static["self"] = self
 	
 	static func log_essential_info_for_bugreports():
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var out = "Booting from %s on %s[%s] as %s"%[OS.get_model_name(),OS.get_name(),OS.get_process_id(),OS.get_unique_id()]
 		out += "\nCPU Information: %s [%s cores]"%[OS.get_processor_name(),OS.get_processor_count()]
 		out += "\nBattery state (if any): %s/%s/%s"%[OS.get_power_percent_left(),OS.get_power_state(),OS.get_power_seconds_left()]
@@ -9496,7 +9508,7 @@ class _Scripting:
 		Tool.remove(thisHTTP)
 	
 	static func make_mineral_scripting():
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Minerals/")
 		for f in pointers.FolderAccess.__fetch_folder_files("user://cache/.HevLib_Cache/Minerals/",true,true):
 			pointers.FolderAccess.__recursive_delete(f)
@@ -9702,7 +9714,7 @@ class _Scripting:
 	static func make_ring_modifications():
 		var m:int = int(floor((float(CurrentGame.traceMinerals.size()) / 4))) + 1
 		var seeds:PoolIntArray = PoolIntArray()
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","randomize_minerals") and m > 2:
 			seeds.append(not_random_seeds[0])
 			seeds.append(not_random_seeds[1])
@@ -9861,7 +9873,7 @@ class _Translations:
 		non_static["pointers"] = c
 	
 	static func __updateTL(path:String, delim:String = ",", fullLogging:bool = true):
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var tlFile:File = File.new()
 		var fileName : String = path.split("/")[path.split("/").size() - 1]
 		var folderName : String = path.split(fileName)[0]
@@ -9903,7 +9915,7 @@ class _Translations:
 		pointers.l("%s Translations Updated from @ [%s]" % [translationCount, fileName],"pointers.Translations")
 	
 	static func __updateTL_from_dictionary(path:Dictionary, fullLogging:bool = true):
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.l("Adding translations from dictionary: %s" % str(path.hash()),"pointers.Translations")
 		var translations : Array = []
 		var translationCount:int = 0
@@ -10042,7 +10054,7 @@ class _Translations:
 		return dictionary
 	
 	static func __inject_translations():
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var fullLogging:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","full_logging")
 		var markPlaceholders:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","mark_placeholder_translations")
 		TranslationServer.clear()
@@ -10151,7 +10163,7 @@ class _WebTranslate:
 		non_static["pointers"] = f
 	
 	func __webtranslate(URL: String, fallback: Array = [], file_check: String = ""):
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.l("Fetching translations from %s" % URL,"pointers.WebTranslate")
 		var HevLib = load("res://HevLib/webtranslate/FetchGithubData.tscn").instance()
 		var pms = Debug.get_node("/root")
@@ -10183,14 +10195,14 @@ class _WebTranslate:
 		var user = dataSplit[0]
 		var repo = dataSplit[1]
 		var folderToDelete = "user://cache/.HevLib_Cache/WebTranslate/" + user + "~_~" + repo
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.l("deleting cache folder @ %s" % folderToDelete,"pointers.WebTranslate")
 		return pointers.FolderAccess.__recursive_delete(folderToDelete)
 	
 	func __webtranslate_reset_by_file_check(file_check: String) -> bool:
 		var did = false
 		var folder_to_delete = ""
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var files = pointers.FolderAccess.__fetch_folder_files("user://cache/.HevLib_Cache/WebTranslate/", true, true)
 		for file in files:
 			if not file.ends_with("/"):
@@ -10212,7 +10224,7 @@ class _WebTranslate:
 		return did
 	
 	func __webtranslate_timed(URL: String, MINUTES_DELAY: int, fallback: Array = [], file_check: String = ""):
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.l("function 'webtranslate_timed' initiated, starting constant translation of [%s] with a delay of [%s] minutes" % [URL,MINUTES_DELAY],"pointers.WebTranslate")
 		var handleNode = load("res://HevLib/webtranslate/WebtranslateTimerHandler.tscn").instance()
 		handleNode.name = URL + Time.get_time_string_from_system()
@@ -10309,7 +10321,7 @@ class _Zip:
 	const PckFileSparseBundle = 1 << 2
 	const MaxSupportedPckVersionLoad = 4
 	func __load_pck(file_path:String,only_filenames:bool = false):
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.l("Loading PCK @ %s, fetching only filenames? [%s]" % [file_path,str(only_filenames)],"pointers.Zip")
 		var Contents:Dictionary = {}
 		var Files:PoolStringArray = PoolStringArray()
@@ -10431,7 +10443,7 @@ class _Zip:
 	
 	func __get_zip_central_directory_from_buffer(buffer : PoolByteArray, source_name:String = "buffer") -> Array:
 		var buffer_len:int = buffer.size()
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		if buffer_len < 22:
 			pointers.l("[%s] not a zip file" % source_name,"pointers.Zip")
 			return []
@@ -10492,7 +10504,7 @@ class _Zip:
 	
 	func __get_zip_central_directory_from_buffer_with_names(buffer : PoolByteArray, source_name:String = "buffer") -> Dictionary:
 		var buffer_len:int = buffer.size()
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		if buffer_len < 22:
 			pointers.l("[%s] not a zip file" % source_name,"pointers.Zip")
 			return {}
@@ -10554,7 +10566,7 @@ class _Zip:
 		
 	func __read_entry_dict_from_buffer(buffer:PoolByteArray, entry:Dictionary) -> PoolByteArray:
 		var offset = entry.local_offset + 26
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var name_len:int = pointers.DataFormat.__get_uint16_from_buffer(buffer,offset)
 		offset += 2
 		var extra_len:int = pointers.DataFormat.__get_uint16_from_buffer(buffer,offset)
@@ -10607,7 +10619,7 @@ class _Zip:
 	
 	func __file_exists_in_zip_buffer(buffer:PoolByteArray,file_name : String,source_name:String = "buffer") -> bool:
 		var buffer_len:int = buffer.size()
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		if buffer_len < 22:
 			pointers.l("[%s] not a zip file" % source_name,"pointers.Zip")
 			return false
@@ -10656,7 +10668,7 @@ class _Zip:
 	
 	func __fetch_filenames_in_zip_buffer(buffer:PoolByteArray,source_name:String = "buffer") -> PoolStringArray:
 		var buffer_len:int = buffer.size()
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		if buffer_len < 22:
 			pointers.l("[%s] not a zip file" % source_name,"pointers.Zip")
 			return PoolStringArray()
@@ -10707,7 +10719,7 @@ class _Zip:
 		if not destination_path.ends_with("/"):
 			destination_path += "/"
 		dir.make_dir_recursive(destination_path)
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		for entry in entries:
 			var entry_name:String = entry.name
 			if entry_name.ends_with("/"):
@@ -10761,7 +10773,7 @@ class _Zip:
 		return buffer
 	
 	func create_eocd(cr_size:int,central_dir_size:int,central_dir_offset:int):
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var buffer:PoolByteArray = pointers.DataFormat.__store_32_in_buffer(0x06054b50,PoolByteArray())
 		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0,PoolByteArray())) # number of this disk
 		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(0,PoolByteArray())) # disk where central directory starts
@@ -10775,7 +10787,7 @@ class _Zip:
 	func create_local_entry(rec:Dictionary,dt:Dictionary):
 		var name_size:int = rec.name_bytes.size()
 		var name_bytes:PoolByteArray = rec.name_bytes
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var buffer:PoolByteArray = pointers.DataFormat.__store_32_in_buffer(0x02014b50,PoolByteArray())
 		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(20,PoolByteArray())) # version made by
 		buffer.append_array(pointers.DataFormat.__store_16_in_buffer(20,PoolByteArray())) # version needed to extract
@@ -10797,7 +10809,7 @@ class _Zip:
 		return buffer
 	
 	func create_central_dir_record(bytes:PoolByteArray,entry_path:String,compress:bool,dt:Dictionary):
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var data:PoolByteArray = pointers.FileAccess.__file_output_to_buffer(bytes)
 		var uncompressed_size:int = data.size()
 		var name_bytes:PoolByteArray = entry_path.to_utf8()
@@ -10846,7 +10858,7 @@ class _Zip:
 			if insert_files.has(entry) or remove_set.has(entry):
 				has_conflict = true
 				break
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var dt:Dictionary = pointers.TimeAccess.__get_dos_datetime()
 		var out:PoolByteArray = PoolByteArray()
 		var records:Array = []
