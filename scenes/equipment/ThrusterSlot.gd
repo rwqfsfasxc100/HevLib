@@ -39,8 +39,8 @@ var smes:String = "res://ships/modules/AuxSmes.tscn"
 var aux_hybrid:String = "res://HevLib/scenes/equipment/custom_equipment/AuxHybrid.tscn"
 var thruster:String = "res://sfx/thruster.tscn"
 
-var timerObject:Timer = Timer.new()
 var fco:Color = Color.white
+var change_color:bool = false
 
 var shipName:String = ""
 var baseShipName:String = ""
@@ -154,7 +154,7 @@ func hl_thrusterslot_modify():
 							var color_override = data.get("flare_override_color","")
 							if color_override:
 								fco = Color(color_override)
-								hl_thrusterslot_make_timer()
+								change_color = true
 				
 				if item:
 					key = name + "_" + mounted
@@ -168,19 +168,13 @@ func hl_thrusterslot_modify():
 					mass = _getMass()
 	hl_thrusterslot_get_colors()
 
-
-func hl_thrusterslot_make_timer():
-	yield(CurrentGame.get_tree().create_timer(0.5),"timeout")
-	call_deferred("hl_thrusterslot_recolor")
-
 func hl_thrusterslot_recolor():
 	if not flare:
 		for node in get_children():
 			if node.name.begins_with(name + "_"):
 				flare = node.get_node_or_null("Flare")
-	if flare and fco:
+	if flare:
 		flare.color = fco
-	Tool.remove(timerObject)
 
 func hl_thrusterslot_get_colors():
 	var color_data:Dictionary = itsPointers.Equipment.ship_thruster_colors
@@ -193,21 +187,21 @@ func hl_thrusterslot_get_colors():
 			hl_thrusterslot_modify_colors(d)
 		if i == shipName:
 			hl_thrusterslot_modify_colors(d)
-		
+	if change_color:
+		yield(CurrentGame.get_tree().create_timer(0.5),"timeout")
+		call_deferred("hl_thrusterslot_recolor")
 
 func hl_thrusterslot_modify_colors(data):
-	var change:bool = false
 	if "type" in data:
 		var c = data["type"]
 		if type in c:
 			var color = c[type]
 			fco = color
-			change = true
+			change_color = true
 	if "node" in data:
 		var c = data["node"]
 		if name in c:
 			var color = c[name]
 			fco = color
-			change = true
-	if change:
-		hl_thrusterslot_make_timer()
+			change_color = true
+	

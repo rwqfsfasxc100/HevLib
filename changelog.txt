@@ -1,3 +1,12 @@
+[1.16.10]
+
+1=* Re-introduced the improved zip writing algorithm for the class cast removal code
+2=* Fixed thruster colour overrides not working
+3=* Fixed ThrusterColorDriver causing colours defined by a ship's base ship to override a variant-specific set of colours
+4=* Fixed crash caused by EventDriver when spawning an event
+5=* The parsing of manifest files now does a very simple attempt at fixing URLs for links
+5.1=* Provided by a new method in `DataFormat`: `__ensure_string_is_url`
+
 [1.16.9]
 
 1=* Temporarily reverted class cast removal code to 1.16.7 due to a crash.
