@@ -1,3 +1,10 @@
+[1.16.11]
+
+1=* Added `excluded_files` argument to `FolderAccess`.`__recursive_delete`
+1.1=* A PoolStringArray of file or folder names to exclude from deletion (i.e. `file.png`, `folder/`])
+2=* Fixed issue causing class cast removal code to crash on certain Linux distros.
+3=* `FolderAccess` functions are now static
+
 [1.16.10]
 
 1=* Re-introduced the improved zip writing algorithm for the class cast removal code

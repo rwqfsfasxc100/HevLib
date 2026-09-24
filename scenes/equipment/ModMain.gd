@@ -74,7 +74,7 @@ func _init(modLoader : ModLoader = ModLoader):
 		modLoader._savedObjects=new_objects
 	else:modLoader._savedObjects.append(pointers)
 	l("Initializing Equipment Driver")
-	pointers.FolderAccess.__recursive_delete(variables_folder)
+	pointers.FolderAccess.__recursive_delete(variables_folder,PoolStringArray(["remove_pointer_casting.zip"]))
 	directory.make_dir_recursive(variables_folder)
 	directory.make_dir_recursive(validation_check_path.get_base_dir())
 	pointers.FileAccess.__load_precached_mods()

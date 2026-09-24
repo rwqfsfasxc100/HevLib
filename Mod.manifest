@@ -11,7 +11,7 @@ credits=PoolStringArray( "HEVLIB_CREDITS_CONTRIBUTORS_HEADER", "HEVLIB_CREDITS_C
 
 version_major=1
 version_minor=16
-version_bugfix=10
+version_bugfix=11
 
 [tags]
 

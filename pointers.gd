@@ -6117,7 +6117,7 @@ class _FolderAccess:
 	func _init(p):
 		non_static["pointers"] = p
 	
-	func __check_folder_exists(folder: String, status_array: bool = false):
+	static func __check_folder_exists(folder: String, status_array: bool = false):
 		var value:bool = false
 		var exists:bool = false
 		var directory:Directory = Directory.new()
@@ -6130,7 +6130,7 @@ class _FolderAccess:
 		if status_array: return [value,exists]
 		else: return value
 	
-	func __recursive_delete(path: String) -> bool:
+	static func __recursive_delete(path: String, excluded_files:PoolStringArray = PoolStringArray()) -> bool:
 		var directory:Directory = Directory.new()
 		if not directory.open(path) == OK:
 			return false
@@ -6138,23 +6138,27 @@ class _FolderAccess:
 			path = path + "/"
 		var filesForDeletion : Array = []
 		var foldersForDeletion : Array = []
-		var pms : Array = __fetch_folder_files(path, true, true)
+		var pms : PoolStringArray = PoolStringArray(__fetch_folder_files(path, true, true))
 		for entry in pms:
-			if str(entry).ends_with("/"):
-				foldersForDeletion.append(entry)
+			if entry.ends_with("/"):
+				var fsplit:PoolStringArray = entry.split("/",false)
+				if not fsplit[fsplit.size() - 1] + "/" in excluded_files:
+					foldersForDeletion.append(entry)
 			else:
-				filesForDeletion.append(entry)
+				if not entry.get_file() in excluded_files:
+					filesForDeletion.append(entry)
 		for f in filesForDeletion:
-			var splitFiles = str(f).split("/")[str(f).split("/").size()-1]
+			var fsplit:PoolStringArray = f.split("/")
+			var splitFiles = fsplit[fsplit.size()-1]
 			directory.open(path)
 			directory.remove(splitFiles)
 		for folder in foldersForDeletion:
-			__recursive_delete(folder)
+			__recursive_delete(folder,excluded_files)
 		directory.open(path)
 		directory.remove(path)
 		return true
 	
-	func __fetch_folder_files(folder: String, showFolders: bool = false, returnFullPath: bool = false,globalizePath: bool = false) -> Array:
+	static func __fetch_folder_files(folder: String, showFolders: bool = false, returnFullPath: bool = false,globalizePath: bool = false) -> Array:
 		var fileList : PoolStringArray = PoolStringArray()
 		if not folder.ends_with("/"):
 			folder += "/"
@@ -6186,14 +6190,14 @@ class _FolderAccess:
 					fileList.append(fileName)
 		return Array(fileList)
 	
-	func __get_first_file(folder: String) -> String:
+	static func __get_first_file(folder: String) -> String:
 		var fileList : Array = __fetch_folder_files(folder)
 		if fileList: return fileList[0]
 		else: return ""
 	
-	var folderStructureCache : Dictionary = {}
+	const folderStructureCache : Dictionary = {}
 	
-	func __get_folder_structure(folder : String,store_file_content : bool = false, recache : bool = true):
+	static func __get_folder_structure(folder : String,store_file_content : bool = false, recache : bool = true):
 		if (not folder in folderStructureCache) or recache:
 			var folder_structure : Dictionary = {}
 			var files : Array = __fetch_folder_files(folder,true,false)
@@ -6211,7 +6215,7 @@ class _FolderAccess:
 			folderStructureCache[folder] = folder_structure
 		return folderStructureCache[folder].duplicate(true)
 	
-	func __get_files_with_extensions(folder:String,extensions:PoolStringArray,recurse_depth:int = -1) -> Array:
+	static func __get_files_with_extensions(folder:String,extensions:PoolStringArray,recurse_depth:int = -1) -> Array:
 		var directory:Directory = Directory.new()
 		if not directory.dir_exists(folder):
 			return Array()
@@ -6226,7 +6230,7 @@ class _FolderAccess:
 					out.append(f)
 		return Array(out)
 	
-	func __get_vanilla_script_and_scenes() -> PoolStringArray:
+	static func __get_vanilla_script_and_scenes() -> PoolStringArray:
 		var findExt:PoolStringArray = PoolStringArray(["res","gdc"])
 		var pointers = non_static["pointers"]
 		if pointers.is_editor:
@@ -9240,7 +9244,10 @@ class _SafeMode:
 			file.store_string(JSON.print(validation_check))
 			file.close()
 			for f in PCKNAMES:get_dependancies_for_vanilla_file(f)
+#			tree_these_dependancies()
+#			var strtree = JSON.print(dependancy_dictionary)
 			var idx:int = 0
+#			breakpoint
 			while idx < vanilla_load_order.size():
 				var item = vanilla_load_order[idx]
 				var requirements = dependancy_dictionary.get(item,PoolStringArray())
@@ -9343,7 +9350,8 @@ class _SafeMode:
 	const binaryArr:PoolStringArray = PoolStringArray(["tres","tscn","gd"])
 	const deeperSearch:PoolStringArray = PoolStringArray(["tres","tscn"])
 	static func get_dependancies_for_vanilla_file(file_path:String):
-		if (not file_path in PCKNAMES) or (file_path in dependancy_dictionary):
+		var fileHash:int = hash(file_path)
+		if (not file_path in PCKNAMES) or (fileHash in dependancy_dictionary):
 			return
 		var dependencies:PoolStringArray = ResourceLoader.get_dependencies(file_path)
 		var file:File = File.new()
@@ -9366,14 +9374,37 @@ class _SafeMode:
 						if not fn in dependencies:
 							dependencies.append(getRealFilename(fn))
 					buffer += hexText.length() / 2.0
-		dependancy_dictionary[file_path] = dependencies
+		var dependancyHashes:Array = []
+		for i in dependencies:
+			dependancyHashes.append(hash(i))
+		dependancy_dictionary[fileHash] = dependancyHashes
 		for dp in dependencies:
 			if not dp in dependancy_lookup:
 				dependancy_lookup[dp] = []
 			dependancy_lookup[dp].append(file_path)
 		for m in dependencies:
-			if (m.get_extension() in binaryArr) and (not m in dependancy_dictionary):
+			if (m.get_extension() in binaryArr):
 				get_dependancies_for_vanilla_file(m)
+	
+	static func tree_these_dependancies():
+		for item in dependancy_dictionary.keys():
+			format_for_tree(item)
+		
+		
+	
+	static func format_for_tree(item:int):
+		if item in dependancy_dictionary:
+			var data = dependancy_dictionary[item]
+			match typeof(data):
+				TYPE_ARRAY:
+					var dict:Dictionary = {}
+					for i in data:
+						format_for_tree(i)
+						dict[i] = dependancy_dictionary[i]
+					dependancy_dictionary[item] = dict
+				TYPE_DICTIONARY:
+					dependancy_dictionary[item] = data
+		return {}
 	
 	static func getRealFilename(base:String) -> String:
 		match base.get_extension():
