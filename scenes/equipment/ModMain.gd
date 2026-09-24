@@ -588,7 +588,7 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 			file.open("user://cache/.HevLib_Cache/Variable_Fetch/remove_pointer_casting.zip",File.WRITE)
 			file.store_buffer(buffer)
 			file.close()
-#			ProjectSettings.load_resource_pack("user://cache/.HevLib_Cache/Variable_Fetch/remove_pointer_casting.zip")
+			ProjectSettings.load_resource_pack("user://cache/.HevLib_Cache/Variable_Fetch/remove_pointer_casting.zip")
 
 var crc_table_0:Array = Array()
 var crc_table_1:Array = Array()
