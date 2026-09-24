@@ -2613,7 +2613,7 @@ class _DataFormat:
 		return non_statics["urlRegex"].search(URL) != null
 	
 	static func __ensure_string_is_url(URL:String):
-		if not __is_valid_url(URL):
+		if URL and not __is_valid_url(URL):
 			if not URL.begins_with("https://"):
 				if not URL.begins_with("//"):
 					URL = "//" + URL
