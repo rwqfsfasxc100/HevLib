@@ -170,12 +170,8 @@ func hl_thrusterslot_modify():
 
 
 func hl_thrusterslot_make_timer():
-	if timerObject == null:
-		timerObject.wait_time = 0.5
-		timerObject.one_shot = true
-		timerObject.connect("timeout",self,"hl_thrusterslot_recolor")
-		CurrentGame.get_tree().get_root().add_child(timerObject)
-		timerObject.call_deferred("start")
+	yield(CurrentGame.get_tree().create_timer(0.5),"timeout")
+	call_deferred("hl_thrusterslot_recolor")
 
 func hl_thrusterslot_recolor():
 	if not flare:
@@ -193,9 +189,9 @@ func hl_thrusterslot_get_colors():
 		if not itsPointers.ConfigDriver.__validate_dictionary(d):
 			continue
 		
-		if i == shipName:
-			hl_thrusterslot_modify_colors(d)
 		if i == baseShipName and d.get("recurse_to_variants",false):
+			hl_thrusterslot_modify_colors(d)
+		if i == shipName:
 			hl_thrusterslot_modify_colors(d)
 		
 
