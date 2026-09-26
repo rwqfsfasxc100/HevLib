@@ -90,7 +90,7 @@ var Classes = {
 
 var copyrights:String = "© 2024-2026 Benjamin Buckhurst a.k.a. __hev. All rights reserved."
 
-const HEVLIB_CACHE_VERSION : int = 1
+const HEVLIB_CACHE_VERSION : int = 2
 
 var logging_frame_interval:float = 0
 var logging_current_frame_timer:int = 0
@@ -8364,7 +8364,9 @@ class _ManifestV2:
 	
 	static func __load_modlets(is_onready : bool,do_safe_load : bool) -> PoolStringArray:
 		var pointers = non_static["pointers"]
-		if false:#do_safe_load:
+		var file:File = File.new()
+		if do_safe_load:
+			pointers.l("Loading modlet resources with order-safe mode. Skipping onready distinction and proceeding in a single batch","pointers.SafeMode")
 			pointers.DataFormat.__loadDLC()
 			var resource_paths:Array = Array()
 			for modlet in __get_modlet_files():
@@ -8388,35 +8390,57 @@ class _ManifestV2:
 									var op=subdata.get("override_path","res:/"+path.split(modlet.get_base_dir())[1])
 									var override_path:String=op if(op.begins_with("res:/"))else("res:/"+(""if op.begins_with("/")else"/")+op)
 									if subdata.get("override",false)&&pointers.FileAccess.__file_exists(override_path):
-										resource_paths.append({"path":path,"mode":LOAD_TYPE.OVERRIDE_SCRIPT,"override_path":override_path})
+										resource_paths.append({"path":path,"mode":LOAD_TYPE.OVERRIDE_SCRIPT,"extra_data":override_path})
 									else:
-										resource_paths.append({"path":path,"mode":LOAD_TYPE.EXTEND_SCRIPT})
+										var ed:String = ""
+										file.open(path,File.READ)
+										var data:String = file.get_as_text(true)
+										file.close()
+										if "extends \"" in data:
+											for line in data.split("\n"):
+												if line.strip_edges().begins_with("extends \""):
+													ed = line.split("\"")[1]
+										resource_paths.append({"path":path,"mode":LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed})
 							"scene","resource":
 								var path : String = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
 								var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[1])
 								var old_path : String = old if (old.begins_with("res:/")) else ("res:/" + ("" if old.begins_with("/") else "/") + old)
 								if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
-									resource_paths.append({"path":path,"mode":LOAD_TYPE.REPLACE_RESOURCE,"old_path":old_path})
-			var requirements:PoolStringArray = PoolStringArray()
+									resource_paths.append({"path":path,"mode":LOAD_TYPE.REPLACE_RESOURCE,"extra_data":old_path})
+			var ovr:Dictionary = Dictionary()
 			var order:Array = Array()
+			var LO:Array = pointers.SafeMode.vanilla_load_order
 			for f in resource_paths:
-				for i in pointers.SafeMode.__lookup_file_dependancies(f["path"]):
-					if not i in requirements:
-						requirements.append(i)
-						order.append([i,pointers.SafeMode.vanilla_load_order.find(i)])
+				var path:String = f["path"]
+				var extra:String = f["extra_data"]
+				if not extra:
+					extra = path
+				if not extra in ovr:
+					ovr[extra] = {"paths":Array(),"deps":Array()}
+				for i in pointers.SafeMode.__lookup_file_dependancies(path):
+					if not i in ovr[extra]["deps"]:
+						ovr[extra]["deps"].append(i)
+				ovr[extra]["paths"].append([f.mode,path])
+			for i in ovr:
+				var d:Dictionary = ovr[i]
+				order.append([i,d.deps,d.paths,LO.find(i)])
 			order.sort_custom(non_static["self"],"sortLoadOrder")
-			for i in order.size():
-				requirements[i] = order[i][0]
-			for i in resource_paths:
-				match i.mode:
-					LOAD_TYPE.EXTEND_SCRIPT:
-						pointers.DataFormat.__extend_script(i.path)
-					LOAD_TYPE.OVERRIDE_SCRIPT:
-						pointers.DataFormat.__override_script(i.path,i.override_path)
-					LOAD_TYPE.REPLACE_RESOURCE:
-						pointers.DataFormat.__replace_resource(i.path,i.old_path)
-			return requirements
+			for r in order:
+				var extra:String = r[0]
+				for i in r[2]:
+					var this_resource:String = i[1]
+					match i[0]:
+						LOAD_TYPE.EXTEND_SCRIPT:
+							pointers.DataFormat.__extend_script(this_resource)
+						LOAD_TYPE.OVERRIDE_SCRIPT:
+							pointers.DataFormat.__override_script(this_resource,extra)
+						LOAD_TYPE.REPLACE_RESOURCE:
+							pointers.DataFormat.__replace_resource(this_resource,extra)
+			pointers.l("%d modlet resources loaded." % resource_paths.size(),"pointers.SafeMode")
+			return PoolStringArray()
+		pointers.l("Loading modlet resources with legacy mode. Processing onready phase? [%s]" % (is_onready),"pointers.SafeMode")
 		var scenes_to_reload : PoolStringArray = PoolStringArray()
+		var resCount:int = 0
 		pointers.DataFormat.__loadDLC()
 		for modlet in __get_modlet_files():
 			var drivers:Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(modlet)
@@ -8443,6 +8467,7 @@ class _ManifestV2:
 										pointers.DataFormat.__override_script(path,override_path)
 									else:
 										pointers.DataFormat.__extend_script(path)
+									resCount += 1
 							"scene","resource":
 								var path : String = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
 								var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[1])
@@ -8451,15 +8476,18 @@ class _ManifestV2:
 									pointers.DataFormat.__replace_resource(path,old_path)
 									if not old_path in scenes_to_reload:
 										scenes_to_reload.append(old_path)
+									resCount += 1
 							"reload":
 								var path : String = resource if is_relative else ("res:/" + ("" if resource.begins_with("/") else "/") + resource)
 								if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
 									pointers.DataFormat.__reload_scene(path,subdata.get("complete_reload",false))
+									resCount += 1
+		pointers.l("%d modlet resources loaded." % resCount,"pointers.SafeMode")
 		pointers.DataFormat.__loadDLC()
 		return scenes_to_reload
 	
 	static func sortLoadOrder(a:Array,b:Array) -> bool:
-		return a[1] < b[1]
+		return a[3] < b[3]
 	
 	const disabledModletCache:Dictionary = {}
 	
@@ -9203,65 +9231,63 @@ class _SafeMode:
 	const offendingFiles:Dictionary = {}
 	var offendingFileCount:int = 0
 	const dependancy_dictionary:Dictionary = Dictionary()
+	const dependancy_dict_keys:Array = Array()
 	const dependancy_lookup:Dictionary = Dictionary()
+	const dependancy_lookup_keys:Array = Array()
 	const vanilla_load_order:Array = Array()
 	
-	const args:PoolStringArray = PoolStringArray()
-	
+	const order_tree:Dictionary = Dictionary()
 	
 	const non_static = {}
 	func _init(p):
 		non_static["pointers"] = p
-		args.append_array(PoolStringArray(OS.get_cmdline_args()))
 		var regex:RegEx = RegEx.new()
 		regex.compile(p.DataFormat.crcTable.B10.get_string_from_utf8())
 		non_static["regex"] = regex
 		non_static["self"] = self
 	
-	const validation_check_path:String = "user://cache/.HevLib_Cache/SafeMode/recache_validation.json"
-	const pck_file_paths_store:String = "user://cache/.HevLib_Cache/SafeMode/pck_file_paths.json"
-	const vanilla_load_order_store:String = "user://cache/.HevLib_Cache/SafeMode/vanilla_load_order.json"
-	const dependancy_data_store:String = "user://cache/.HevLib_Cache/SafeMode/dependancy_data.json"
-	const dependancy_lookup_store:String = "user://cache/.HevLib_Cache/SafeMode/dependancy_lookup.json"
+	const safemode_dir = "user://cache/.HevLib_Cache/SafeMode/"
+	const validation_check_path:String = safemode_dir + "recache_validation.json"
+	const pck_file_paths_store:String = safemode_dir + "pck_file_paths.json"
+	const vanilla_load_order_store:String = safemode_dir + "vanilla_load_order.json"
+	const dependancy_lookup_store:String = safemode_dir + "dependancy_lookup.json"
+	const dependancy_dictionary_store:String = safemode_dir + "dependancy_dictionary.json"
 	
 	static func ready():
 		var file:File = File.new()
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var vanilla_version:PoolIntArray = pointers.DataFormat.__get_vanilla_version()
 		var validation_check:Dictionary = Dictionary()
 		if file.file_exists(validation_check_path):
 			file.open(validation_check_path,File.READ)
 			validation_check = JSON.parse(file.get_as_text()).result
 			file.close()
-		if validation_check.get("hevlib_cache_version",-1) != pointers.HEVLIB_CACHE_VERSION or !deep_equal(PoolIntArray(validation_check.get("vanilla_version",PoolIntArray([1,0,0]))),vanilla_version) or !file.file_exists(validation_check_path) or !file.file_exists(pck_file_paths_store) or !file.file_exists(vanilla_load_order_store) or !file.file_exists(dependancy_data_store) or !file.file_exists(dependancy_lookup_store) or pointers.ManifestV2.haveModsChanged:
+		if validation_check.get("hevlib_cache_version",-1) != pointers.HEVLIB_CACHE_VERSION or !deep_equal(PoolIntArray(validation_check.get("vanilla_version",PoolIntArray([1,0,0]))),vanilla_version) or !file.file_exists(validation_check_path) or !file.file_exists(pck_file_paths_store) or !file.file_exists(vanilla_load_order_store) or !file.file_exists(dependancy_lookup_store) or !file.file_exists(dependancy_dictionary_store) or pointers.ManifestV2.haveModsChanged:
 			pointers.l("Game has updated or cache is missing, rebuilding file info cache.")
+			pointers.FolderAccess.__recursive_delete(safemode_dir)
+			Directory.new().make_dir(safemode_dir)
 			var timerStart:int = Time.get_ticks_usec()
 			PCKNAMES.append_array(pointers.FolderAccess.__get_vanilla_script_and_scenes())
-			vanilla_load_order.append_array(PCKNAMES)
 			validation_check["vanilla_version"] = vanilla_version
 			validation_check["hevlib_cache_version"] = pointers.HEVLIB_CACHE_VERSION
 			file.open(validation_check_path,File.WRITE)
 			file.store_string(JSON.print(validation_check))
 			file.close()
 			for f in PCKNAMES:get_dependancies_for_vanilla_file(f)
-#			tree_these_dependancies()
-#			var strtree = JSON.print(dependancy_dictionary)
+			vanilla_load_order.append_array(dependancy_dict_keys)
+			order_tree.merge(flatten_tree(get_dependancy_tree()))
+			var vsize:int = vanilla_load_order.size()
 			var idx:int = 0
-#			breakpoint
-			while idx < vanilla_load_order.size():
-				var item = vanilla_load_order[idx]
-				var requirements = dependancy_dictionary.get(item,PoolStringArray())
-				if requirements:
-					var rq:bool = false
-					for r in requirements:
-						var pos = vanilla_load_order.find(r)
-						if pos >= idx:
-							vanilla_load_order.remove(pos)
-							vanilla_load_order.insert(idx,r)
-							rq = true
-					if rq:
-						idx = 0
-						continue
+			while idx < vsize:
+				if idx > 0:
+					var item:String = vanilla_load_order[idx]
+					for i in idx:
+						var deps:Array = order_tree[vanilla_load_order[i]]
+						if item in deps:
+							vanilla_load_order.remove(idx)
+							vanilla_load_order.insert(i,item)
+							idx = i
+							break
 				idx += 1
 			file.open(pck_file_paths_store,File.WRITE)
 			file.store_string(JSON.print(PCKNAMES))
@@ -9269,14 +9295,14 @@ class _SafeMode:
 			file.open(vanilla_load_order_store,File.WRITE)
 			file.store_string(JSON.print(vanilla_load_order))
 			file.close()
-			file.open(dependancy_data_store,File.WRITE)
-			file.store_string(JSON.print(dependancy_dictionary))
-			file.close()
 			file.open(dependancy_lookup_store,File.WRITE)
 			file.store_string(JSON.print(dependancy_lookup))
 			file.close()
-			var timerEnd:int = Time.get_ticks_usec()
-			pointers.l("Cache rebuilt in %d.%03d ms" % [int(floor((timerEnd-timerStart) / 1000.0)),(timerEnd-timerStart) % 1000])
+			file.open(dependancy_dictionary_store,File.WRITE)
+			file.store_string(JSON.print(dependancy_dictionary))
+			file.close()
+			var timerEnd:int = Time.get_ticks_usec()-timerStart
+			pointers.l("Cache rebuilt in %d.%03d ms" % [int(floor(timerEnd / 1000.0)),timerEnd % 1000])
 		else:
 			file.open(pck_file_paths_store,File.READ)
 			PCKNAMES.append_array(JSON.parse(file.get_as_text()).result)
@@ -9284,13 +9310,14 @@ class _SafeMode:
 			file.open(vanilla_load_order_store,File.READ)
 			vanilla_load_order.append_array(JSON.parse(file.get_as_text()).result)
 			file.close()
-			file.open(dependancy_data_store,File.READ)
-			dependancy_dictionary.merge(JSON.parse(file.get_as_text()).result)
-			file.close()
 			file.open(dependancy_lookup_store,File.READ)
 			dependancy_lookup.merge(JSON.parse(file.get_as_text()).result)
 			file.close()
-		
+			file.open(dependancy_dictionary_store,File.READ)
+			dependancy_dictionary.merge(JSON.parse(file.get_as_text()).result)
+			file.close()
+			dependancy_lookup_keys.append_array(dependancy_lookup.keys())
+			dependancy_dict_keys.append_array(dependancy_dictionary.keys())
 		
 		if not pointers.is_editor:
 			var safeCheck = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading")
@@ -9346,13 +9373,42 @@ class _SafeMode:
 			if base.safeCheck and base.safeCheckTriggered:
 				pointers.NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_SAFEMODE_SM_TRIPPED_POPUP_MSG") % [offendingFiles.size(),base.offendingFileCount],"pointers.SafeMode",0.0,"",true)
 	
+	static func flatten_tree(tree:Dictionary) -> Dictionary:
+		var out = {}
+		for i in tree.keys():
+			out[i] = get_all_branches(tree[i],PoolStringArray())
+		
+		return out
+	
+	static func get_all_branches(dict:Dictionary,out:PoolStringArray) -> PoolStringArray:
+		for i in dict.keys():
+			if not i in out:
+				out.append(i)
+			out = get_all_branches(dict[i],out)
+		return out
+	
+	static func get_dependancy_tree() -> Dictionary:
+		var out:Dictionary = {}
+		for i in dependancy_dict_keys:
+			out[i] = get_dependancies_for_tree(i,out)
+		return out
+	
+	static func get_dependancies_for_tree(which:String,current:Dictionary) -> Dictionary:
+		if which in current:
+			return current[which]
+		var out:Dictionary = {}
+		if which in dependancy_dict_keys:
+			for i in dependancy_dictionary[which]:
+				out[i] = get_dependancies_for_tree(i,current)
+		return out
+	
 	const resHex:String = "7265733a2f2f" # "res://".to_ascii().hex_encode()
 	const binaryArr:PoolStringArray = PoolStringArray(["tres","tscn","gd"])
 	const deeperSearch:PoolStringArray = PoolStringArray(["tres","tscn"])
 	static func get_dependancies_for_vanilla_file(file_path:String):
-		var fileHash:int = hash(file_path)
-		if (not file_path in PCKNAMES) or (fileHash in dependancy_dictionary):
+		if (not file_path in PCKNAMES) or (file_path in dependancy_dict_keys):
 			return
+		dependancy_dict_keys.append(file_path)
 		var dependencies:PoolStringArray = ResourceLoader.get_dependencies(file_path)
 		var file:File = File.new()
 		if file_path.get_extension() in deeperSearch:
@@ -9374,37 +9430,17 @@ class _SafeMode:
 						if not fn in dependencies:
 							dependencies.append(getRealFilename(fn))
 					buffer += hexText.length() / 2.0
-		var dependancyHashes:Array = []
-		for i in dependencies:
-			dependancyHashes.append(hash(i))
-		dependancy_dictionary[fileHash] = dependancyHashes
+		dependancy_dictionary[file_path] = dependencies
 		for dp in dependencies:
 			if not dp in dependancy_lookup:
 				dependancy_lookup[dp] = []
+				dependancy_lookup_keys.append(dp)
 			dependancy_lookup[dp].append(file_path)
 		for m in dependencies:
 			if (m.get_extension() in binaryArr):
 				get_dependancies_for_vanilla_file(m)
 	
-	static func tree_these_dependancies():
-		for item in dependancy_dictionary.keys():
-			format_for_tree(item)
-		
-		
 	
-	static func format_for_tree(item:int):
-		if item in dependancy_dictionary:
-			var data = dependancy_dictionary[item]
-			match typeof(data):
-				TYPE_ARRAY:
-					var dict:Dictionary = {}
-					for i in data:
-						format_for_tree(i)
-						dict[i] = dependancy_dictionary[i]
-					dependancy_dictionary[item] = dict
-				TYPE_DICTIONARY:
-					dependancy_dictionary[item] = data
-		return {}
 	
 	static func getRealFilename(base:String) -> String:
 		match base.get_extension():
@@ -9418,21 +9454,20 @@ class _SafeMode:
 		return out
 	
 	static func LDA(dependancy,order:PoolStringArray) -> PoolStringArray:
-		if dependancy in dependancy_lookup:
+		if dependancy in dependancy_lookup_keys:
 			for d in dependancy_lookup[dependancy]:
-				if not d.split("/",false)[1] == "tests":
-					if not d in order:
-						order.append(d)
-						LDA(d,order)
+				if not d in order:
+					order.append(d)
+					LDA(d,order)
 		return order
 	
 	static func __lookup_file_dependancies(dependancy:String) -> PoolStringArray:
-		var out:PoolStringArray = PoolStringArray()
-		var deps = ResourceLoader.get_dependencies(dependancy)
+		var deps:PoolStringArray = ResourceLoader.get_dependencies(dependancy)
+		var out:PoolStringArray = deps
 		for d in deps:
-			for i in LDA(d,PoolStringArray()):
-				if not i in out:
-					out.append(i)
+				for i in LDA(d,PoolStringArray()):
+					if not i in out:
+						out.append(i)
 		return out
 	
 

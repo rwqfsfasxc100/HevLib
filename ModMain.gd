@@ -36,7 +36,7 @@ const MOD_PRIORITY = INF
 const MOD_NAME = "HevLib"
 const MOD_VERSION_MAJOR = 1
 const MOD_VERSION_MINOR = 16
-const MOD_VERSION_BUGFIX = 11
+const MOD_VERSION_BUGFIX = 12
 const MOD_VERSION_METADATA = ""
 const MOD_IS_LIBRARY = true
 const LIBRARY_HIDDEN_BY_DEFAULT = false
@@ -68,7 +68,7 @@ func _init(modLoader = ModLoader):
 		replaceScene("scenes/notification_driver/Notifications.tscn","res://achievement/Notifications.tscn")
 		installScriptExtension("scripts/transit_tips/TransitTip.gd")
 		
-		# Disabled for reworking later on
+		
 #		if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_modlet_loading"):
 #			reload_scenes = pointers.ManifestV2.__load_modlets(false,true)
 	else:

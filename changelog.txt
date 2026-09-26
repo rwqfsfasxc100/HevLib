@@ -1,3 +1,11 @@
+[1.16.12]
+
+1=* Re-introduced the Resolve Modlet load order code
+1.1=* This should make load orders a non-issue for `LOAD_RESOURCES.gd` entries
+1.2=* For entries overriding the same script or resource, they still keep the same order defined by modlet priority and position in LOAD_RESOURCES.gd
+1.3=* It is not perfect, so please report issues caused by this update
+2=* Updated credits and licensing
+
 [1.16.11]
 
 1=* Added `excluded_files` argument to `FolderAccess`.`__recursive_delete`

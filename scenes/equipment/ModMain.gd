@@ -65,10 +65,10 @@ func _init(modLoader : ModLoader = ModLoader):
 	pointers = load(pointers_dir).new(pointers_dir,self)
 	pointers.name = "HevLib~Pointers"
 	if modLoader._savedObjects:
-		var new_objects = [pointers]
+		var new_objects:Array = [pointers]
 		var firstItemCheck = modLoader._savedObjects[0]
 		if "resource_path" in firstItemCheck:
-			var RP=firstItemCheck.resource_path
+			var RP:String=firstItemCheck.resource_path
 			if RP=="res://HevLib/pointers.gd"or RP==pointers_dir:OS.alert("HevLib is double-loaded. Please remove any extra zip files and restart the game.","Warning!")
 		for i in modLoader._savedObjects:new_objects.append(i)
 		modLoader._savedObjects=new_objects
@@ -132,12 +132,10 @@ func _init(modLoader : ModLoader = ModLoader):
 
 	installScriptExtension("../better_title_screen/SaveSlotButton.gd")
 	
-	# Disabled for reworking later on 
-	do_safe_load = false
-	if not do_safe_load:
-		for old_path in pointers.ManifestV2.__load_modlets(false,false):
-			pointers.DataFormat.__reload_scene(old_path)
-var libid = "hev.LIBRARY"
+	
+	for old_path in pointers.ManifestV2.__load_modlets(false,do_safe_load):
+		pointers.DataFormat.__reload_scene(old_path)
+const libid:String = "hev.LIBRARY"
 func _ready():
 	if not correct:
 		Debug.l("HevLib Equipment Driver onready process cannot be carried out")
@@ -172,8 +170,9 @@ func _ready():
 	installScriptExtension("../minerals/Summary.gd")
 	
 	replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")
-
+	
 	replaceScene("../minerals/multiminerals/AsteroidField.tscn","res://AsteroidField.tscn")
+	
 	if not do_safe_load:
 		for old_path in pointers.ManifestV2.__load_modlets(true,false):
 			pointers.DataFormat.__reload_scene(old_path)
@@ -181,27 +180,31 @@ func _ready():
 
 # Mod update checking
 signal updates_fetched
-var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
+
+const update_store:String = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
+const api_url:String = "https://publicactiontrigger.azurewebsites.net/api/dispatches/rwqfsfasxc100/dv_update_database"
+const updateDB_url:String = "https://raw.githubusercontent.com/rwqfsfasxc100/dv_update_database/refs/heads/main/manifest_path_store.json"
+
 func initiate_mod_update_fetch():
-	var http = HTTPRequest.new()
+	var http:HTTPRequest = HTTPRequest.new()
 	http.connect("request_completed",self,"updatelist_return",[http])
 	http.timeout = 20
 	add_child(http)
-	http.request("https://raw.githubusercontent.com/rwqfsfasxc100/dv_update_database/refs/heads/main/manifest_path_store.json")
+	http.request(updateDB_url)
 
 func updatelist_return(result, response_code,headers,body,mh):
 	if result == 0 and response_code == 200:
-		var p = JSON.parse(body.get_string_from_utf8()).result
-		var ids = pointers.ManifestV2.__get_mod_ids()
-		var updates = {}
+		var p:Dictionary = JSON.parse(body.get_string_from_utf8()).result
+		var ids:PoolStringArray = pointers.ManifestV2.__get_mod_ids()
+		var updates:Dictionary = {}
 		for ID in p:
 			if ID in ids:
-				var fetchData=p[ID]
-				var modData=pointers.ManifestV2.__get_mod_by_id(ID)
-				var current_version=modData["version_data"]
-				var doUpdate=false
-				var newVer=[fetchData["major"],fetchData["minor"],fetchData["bugfix"]]
-				var ctr = 0
+				var fetchData:Dictionary=p[ID]
+				var modData:Dictionary=pointers.ManifestV2.__get_mod_by_id(ID)
+				var current_version:Dictionary=modData["version_data"]
+				var doUpdate:bool=false
+				var newVer:Array=[fetchData["major"],fetchData["minor"],fetchData["bugfix"]]
+				var ctr:int = 0
 				while(not doUpdate)and(ctr < 3):
 					match ctr:
 						0:
@@ -215,19 +218,19 @@ func updatelist_return(result, response_code,headers,body,mh):
 							elif newVer[2] < current_version["version_bugfix"]:ctr = 5
 					ctr += 1
 				if doUpdate:
-					var file_name = fetchData.get("file_name","file.zip")
-					var fetchURL = "https://github.com/rwqfsfasxc100/dv_update_database/raw/refs/heads/main/zip_store/%s/%d.%d.%d/%s" % [ID,newVer[0],newVer[1],newVer[2],file_name]
-					var mod_name = modData.get("name","")
+					var file_name:String = fetchData.get("file_name","file.zip")
+					var fetchURL:String = "https://github.com/rwqfsfasxc100/dv_update_database/raw/refs/heads/main/zip_store/%s/%d.%d.%d/%s" % [ID,newVer[0],newVer[1],newVer[2],file_name]
+					var mod_name:String = modData.get("name","")
 					updates[ID] = {"name":mod_name,"id":ID,"version":[current_version["version_major"],current_version["version_minor"],current_version["version_bugfix"]],"new_version":newVer,"github":fetchURL,"file_name":file_name,"display":mod_name + " (" + ID + ")"}
-		var dont = false
+		var dont:bool = false
 		if libid in p:
-			var curr = pointers.ManifestV2.__get_mod_by_id(libid)["version_data"]
-			var major = p[libid].major
-			var minor = p[libid].minor
-			var bugfix = p[libid].bugfix
-			var cm = curr.version_major
-			var cn = curr.version_minor
-			var cb = curr.version_bugfix
+			var curr:Dictionary = pointers.ManifestV2.__get_mod_by_id(libid)["version_data"]
+			var major:int = p[libid].major
+			var minor:int = p[libid].minor
+			var bugfix:int = p[libid].bugfix
+			var cm:int = curr.version_major
+			var cn:int = curr.version_minor
+			var cb:int = curr.version_bugfix
 			if major>cm:
 				if minor>cn:dont=true
 				elif bugfix>cb+2:dont=true
@@ -240,32 +243,35 @@ func updatelist_return(result, response_code,headers,body,mh):
 		file.close()
 		emit_signal("updates_fetched")
 		if not OS.has_feature("editor") or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","always_send_new_mods"):
-			var md = pointers.ManifestV2.__get_mod_data()
-			var api_url = "https://publicactiontrigger.azurewebsites.net/api/dispatches/rwqfsfasxc100/dv_update_database"
+			var md:Dictionary = pointers.ManifestV2.__get_mod_data()
 			for mod in pointers.ManifestV2.__get_mod_list_keys():
-				var mod_data = md[mod]
+				var mod_data:Dictionary = md[mod]
 				if mod_data["manifest"]["has_manifest"]:
-					var manifest = mod_data["manifest"]["manifest_data"]
+					var manifest:Dictionary = mod_data["manifest"]["manifest_data"]
 					if "mod_information" in manifest:
-						var mid = manifest["mod_information"].get("id","")
+						var mid:String = manifest["mod_information"].get("id","")
 						if mid and not mid in p:
-							var mURL = ""
-							var gURL = ""
+							var mURL:String = ""
+							var gURL:String = ""
 							if "manifest_definitions" in manifest:
 								mURL = manifest["manifest_definitions"].get("manifest_url","")
 							if "links" in manifest:
 								if "HEVLIB_GITHUB" in manifest["links"]:
 									gURL = manifest["links"]["HEVLIB_GITHUB"].get("URL","")
 							if mURL and gURL:
-								var pld = {
-									"id":mid,
-									"manifest_url":mURL,
-									"github_url":gURL
-								}
-								var payload = {"event_type":"add_mod_entry","client_payload":{"data":JSON.print(pld)}}
-								var tHTTP = HTTPRequest.new()
+								var payload:String = JSON.print({
+									"event_type":"add_mod_entry",
+									"client_payload":{
+										"data":{
+											"id":mid,
+											"manifest_url":mURL,
+											"github_url":gURL
+										}
+									}
+								})
+								var tHTTP:HTTPRequest = HTTPRequest.new()
 								add_child(tHTTP)
-								tHTTP.request(api_url,[],true,HTTPClient.METHOD_POST,JSON.print(payload))
+								tHTTP.request(api_url,[],true,HTTPClient.METHOD_POST,payload)
 								yield(get_tree().create_timer(150),"timeout")
 								Tool.deferCallInPhysics(Tool,"remove",[tHTTP])
 	Tool.deferCallInPhysics(Tool,"remove",[mh])
@@ -356,7 +362,7 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 			continue
 		# Fetch EOCD, including max potential comment size
 		# More mem efficient than fetching entire buffer
-		var search_start = max(buffer_len - 0x06054b50 - 65536, 0)
+		var search_start:int = max(buffer_len - 0x06054b50 - 65536, 0)
 		var tail:PoolByteArray = buffer.subarray(0,buffer_len - search_start - 1)
 		var eocd_pos:int = -1
 		var i:int = tail.size() - 22
@@ -391,7 +397,7 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 		var dir:Directory = Directory.new()
 		dir.make_dir_recursive("user://cache/.HevLib_Cache/Variable_Fetch/")
 		var classes_to_clear:PoolStringArray = PoolStringArray(["HevLibPointers"])
-		var driver_dirs = PoolStringArray([
+		var driver_dirs:PoolStringArray = PoolStringArray([
 			"HEVLIB_EQUIPMENT_DRIVER_TAGS",
 			"HEVLIB_MENU",
 			"HEVLIB_MINERAL_DRIVER_TAGS",
@@ -409,9 +415,9 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 		var replacements:Dictionary = {}
 		for script in script_paths:
 			file.open("res://" + script,File.READ)
-			var text = file.get_as_text(true)
+			var text:String = file.get_as_text(true)
 			file.close()
-			var entries = regex.search_all(text)
+			var entries:Array = regex.search_all(text)
 			if entries:
 				var cases:PoolStringArray = PoolStringArray()
 				var ignoreChars:PoolStringArray = PoolStringArray(["\n","=",";"])
@@ -425,7 +431,7 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 						appendage += c
 						endPos += 1
 					for s in entry.strings:
-						var sp = s + appendage
+						var sp:String = s + appendage
 						if not sp in cases:
 							cases.append(sp)
 				for r in cases:

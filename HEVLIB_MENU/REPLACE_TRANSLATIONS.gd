@@ -1580,8 +1580,8 @@ const TRANSLATIONS = {
 			"version_hash": 2858534199
 		},
 		"HEVLIB_CONFIG_SAFE_MOD_LOADING": {
-			"string": "Safe Mod Loading",
-			"version_hash": 1714521282
+			"string": "Safe mod loading",
+			"version_hash": 2970600706
 		},
 		"HEVLIB_CONFIG_SAFE_MOD_LOADING_TOOLTIP": {
 			"string": "Prevents the game from being loaded if a mod performs unsafe operations\n(such as overriding vanilla files directly.)\n\nRecommended to keep this enabled to prevent issues with vanilla and/or other mods.\nNote: I will dismiss bug reports that have disabled SafeMode due to the probable\ncause of the issue being related to it needing this disabled.",
@@ -1749,8 +1749,8 @@ const TRANSLATIONS = {
 			"version_hash": 685449490
 		},
 		"HEVLIB_CONFIG_SAFE_MODLET_LOADING": {
-			"string": "Resolve modlet load conflicts",
-			"version_hash": 2972641615
+			"string": "Resolve Modlet load order",
+			"version_hash": 2337334118
 		},
 		"HEVLIB_CONFIG_SAFE_MODLET_LOADING_DESC": {
 			"string": "Uses a presumed Vanilla load order heuristic to ensure that modifications made through LOAD_RESOURCES.gd are load-safe.\n\nNOTICE: May cause issues with mods loading during and after the onready phase.",
@@ -1891,6 +1891,14 @@ const TRANSLATIONS = {
 		"HEVLIB_DISCORDRPC_SECONDARY_DATETIME": {
 			"string": "{output:dateTime}",
 			"version_hash": 329275765
+		},
+		"HEVLIB_CREDITS_SOFTWARE_HHYYRYLAINEN": {
+			"string": "hhyyrylainen - Original PCK extraction code",
+			"version_hash": 3119626885
+		},
+		"HEVLIB_CREDITS_SUPPORTERS_KOFI_VERAN": {
+			"string": "Veran - supporter (ko-fi)",
+			"version_hash": 2550219049
 		}
 	},
 	"de": {

@@ -635,7 +635,7 @@ static func _read_entry_data_from_bytes(zip_bytes: PoolByteArray, entry: Diction
 	if entry.comp_size > 0:
 		raw = zip_bytes.subarray(data_start, data_start + entry.comp_size - 1)
 
-	var data: PoolByteArray = _inflate(raw) if entry.method == _METHOD_DEFLATE else raw
+	var data: PoolByteArray = _inflate(raw, entry.uncomp_size) if entry.method == _METHOD_DEFLATE else raw
 
 	if data.size() != entry.uncomp_size:
 		push_error("SimpleZip: '%s' decompressed to %d bytes, expected %d - it may be corrupted" % [entry.name, data.size(), entry.uncomp_size])
@@ -766,11 +766,34 @@ static func _collect_directory(disk_dir: String, zip_prefix: String, out_files: 
 #
 # Godot's own PoolByteArray.decompress() can't be reused here (see the
 # note at the top of this file), so this is a real, independent INFLATE
-# implementation. It's plain and unoptimized on purpose, favoring
-# straightforward-to-verify code over speed: expect on the order of a
-# second or two per megabyte of decompressed output. For large payloads
-# read often, a compiled GDExtension would be far faster; for the
-# occasional config/save/data file bundled in a zip, this is fine.
+# implementation - a GDScript port of the same tinf-style algorithm the
+# "gdunzip" addon uses, chosen after comparing against it directly:
+#
+#  - Huffman decoding uses plain array indexing (a per-length count
+#    table plus a symbols-sorted-by-code array, walked with simple
+#    arithmetic - see _decode_huffman_symbol) rather than nested
+#    Dictionary lookups. Dictionary hashing per bit, for every symbol
+#    decoded, was the single biggest cost in an earlier version of this
+#    file.
+#  - The output buffer is allocated once, up front, to the exact
+#    decompressed size (always known from the zip entry's own header),
+#    and filled with direct indexed writes instead of growing via
+#    append().
+#
+# A GDScript-specific trap shapes how the code below is written: indexed
+# assignment into a PoolByteArray/PoolIntArray held as an object property
+# or a Dictionary value (e.g. `some_state.output[i] = x`, repeated many
+# times) is not just uncached - it's quadratic overall, apparently
+# re-touching the whole buffer on every single write. The fix is the one
+# gdunzip also uses: a Pool*Array only ever gets indexed in a tight loop
+# after it's a genuine local variable or a plain function parameter
+# (confirmed by direct measurement to be the fast, expected O(1)-per-write
+# case) - never through a `.property[i] =` or `dict['key'][i] =` chain.
+# Concretely, that means `output` is threaded through the block-decoding
+# functions as a parameter, and handed back (since parameter mutations
+# don't propagate to the caller either - only *reading* a Pool*Array
+# through a property or parameter is cheap; every kind of write through
+# one is not) for the caller to reassign into its own local variable.
 
 const _LENGTH_BASE  := [3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258]
 const _LENGTH_EXTRA := [0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0]
@@ -778,21 +801,14 @@ const _DIST_BASE    := [1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,7
 const _DIST_EXTRA   := [0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13]
 const _CL_ORDER     := [16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15]
 
-# Bit-level cursor over the compressed bytes, plus the output built up so
-# far. This is an object (not static state) so each inflate() call gets
-# its own; note the output buffer is a plain Array, not a PoolByteArray -
-# PoolByteArray has value-copy semantics in GDScript 3.x (mutating one
-# received as a parameter, or reached through an object property, does
-# not affect the original), which silently breaks exactly this kind of
-# "helper functions grow a shared buffer" pattern. Array behaves as a
-# normal shared/reference container, so it's used internally and only
-# converted to a PoolByteArray once, right at the end.
+# Bit-level cursor over the compressed bytes. `input` is only ever read
+# from (never written to) through this object, which is the cheap case
+# regardless of it being a property - see the note above.
 class _InflateState:
 	var input: PoolByteArray
 	var pos: int = 0
 	var bit_buf: int = 0
 	var bit_count: int = 0
-	var output: Array = []
 
 	func _init(data: PoolByteArray) -> void:
 		input = data
@@ -811,71 +827,79 @@ class _InflateState:
 
 	# Fixed-width fields (extra bits, header counts, stored-block length)
 	# are packed LSB-first: the first bit read is bit 0 of the value.
-	func get_bits(n: int) -> int:
-		var value := 0
-		for i in range(n):
-			value = value | (get_bit() << i)
-		return value
+	# `base` is added directly to the result, since every call site wants
+	# "N extra bits, plus some base value" - one fewer place to add it.
+	func get_bits(n: int, base: int = 0) -> int:
+		var val := 0
+		if n > 0:
+			var limit := 1 << n
+			var mask := 1
+			while mask < limit:
+				if get_bit():
+					val += mask
+				mask = mask * 2
+		return val + base
 
 	func align_to_byte() -> void:
 		bit_buf = 0
 		bit_count = 0
 
 
-# Builds a canonical-Huffman decode table (RFC 1951 3.2.2) from an array
-# of code lengths indexed by symbol (0 = symbol unused). Returns
-# table[bit_length][code_value] = symbol.
-static func _build_huffman_table(lengths: Array) -> Dictionary:
-	var max_len := 0
-	for l in lengths:
-		if l > max_len:
-			max_len = l
+# Builds a tinf-style decode structure from an array of code lengths
+# (lengths[symbol] = bit length, 0 = symbol unused, for the first `num`
+# symbols): table[L] holds the plain count of symbols with length L, and
+# trans[] holds every symbol with a nonzero length, grouped by length
+# and then by symbol index - i.e. codes in canonical order. Decoding
+# (_decode_huffman_symbol) only ever does array indexing against these,
+# no dictionary/hash lookups, which is the main speed win over a more
+# direct "build a code->symbol map" approach.
+static func _build_huffman_tree(lengths: PoolByteArray, num: int) -> Dictionary:
+	var table := PoolIntArray()
+	table.resize(16)
+	for i in range(16):
+		table[i] = 0
+	for i in range(num):
+		table[lengths[i]] += 1
+	table[0] = 0
 
-	var bl_count := []
-	bl_count.resize(max_len + 1)
-	for i in range(bl_count.size()):
-		bl_count[i] = 0
-	for l in lengths:
-		if l > 0:
-			bl_count[l] += 1
+	var offs := PoolIntArray()
+	offs.resize(16)
+	var sum := 0
+	for i in range(16):
+		offs[i] = sum
+		sum += table[i]
 
-	var next_code := []
-	next_code.resize(max_len + 1)
-	var code := 0
-	bl_count[0] = 0
-	for n in range(1, max_len + 1):
-		code = (code + bl_count[n - 1]) << 1
-		next_code[n] = code
+	var trans := PoolIntArray()
+	trans.resize(288)
+	for i in range(num):
+		if lengths[i]:
+			trans[offs[lengths[i]]] = i
+			offs[lengths[i]] += 1
 
-	var table := {}
-	for symbol in range(lengths.size()):
-		var length: int = lengths[symbol]
-		if length == 0:
-			continue
-		if not table.has(length):
-			table[length] = {}
-		table[length][next_code[length]] = symbol
-		next_code[length] += 1
-
-	return table
+	return {"table": table, "trans": trans}
 
 
-# Unlike get_bits(), Huffman codes are packed MSB-first, so this builds
-# the code bit by bit (shift-and-OR) rather than reading a fixed width.
-static func _decode_huffman_symbol(state: _InflateState, table: Dictionary) -> int:
-	var code := 0
+# Decodes one Huffman symbol. `sum`/`cur` track, bit by bit, how far the
+# code read so far is from the first code of the current length; once
+# `cur` goes negative the code has landed within this length's block of
+# `table[length]` codes, and `trans[sum + cur]` is exactly that symbol.
+# (Concretely verified against a hand-traced example before trusting it.)
+static func _decode_huffman_symbol(state: _InflateState, table: PoolIntArray, trans: PoolIntArray) -> int:
+	var sum := 0
+	var cur := 0
 	var length := 0
-	while length <= 15:
-		code = (code << 1) | state.get_bit()
+	while true:
+		cur = 2 * cur + state.get_bit()
 		length += 1
-		if table.has(length) and table[length].has(code):
-			return table[length][code]
-	push_error("SimpleZip: invalid Huffman code while inflating (corrupt data?)")
-	return -1
+		sum += table[length]
+		cur -= table[length]
+		if cur < 0:
+			return trans[sum + cur]
+	return -1 # unreachable: the loop above always returns once cur < 0
 
 
-static func _fixed_litlen_table() -> Dictionary:
-	var lengths := []
+static func _fixed_litlen_tree() -> Dictionary:
+	var lengths := PoolByteArray()
 	lengths.resize(288)
 	for i in range(0, 144):
 		lengths[i] = 8
@@ -885,92 +909,96 @@ static func _fixed_litlen_table() -> Dictionary:
 		lengths[i] = 7
 	for i in range(280, 288):
 		lengths[i] = 8
-	return _build_huffman_table(lengths)
+	return _build_huffman_tree(lengths, 288)
 
 
-static func _fixed_dist_table() -> Dictionary:
-	var lengths := []
+static func _fixed_dist_tree() -> Dictionary:
+	var lengths := PoolByteArray()
 	lengths.resize(30)
 	for i in range(30):
 		lengths[i] = 5
-	return _build_huffman_table(lengths)
+	return _build_huffman_tree(lengths, 30)
 
 
 # Reads a dynamic block's header (RFC 1951 3.2.7) and returns
-# [litlen_table, dist_table] built from the code lengths it describes.
-static func _read_dynamic_tables(state: _InflateState) -> Array:
-	var hlit := state.get_bits(5) + 257
-	var hdist := state.get_bits(5) + 1
-	var hclen := state.get_bits(4) + 4
+# [litlen_tree, dist_tree] built from the code lengths it describes.
+static func _read_dynamic_trees(state: _InflateState) -> Array:
+	var hlit := state.get_bits(5, 257)
+	var hdist := state.get_bits(5, 1)
+	var hclen := state.get_bits(4, 4)
 
-	var cl_lengths := []
+	var cl_lengths := PoolByteArray()
 	cl_lengths.resize(19)
 	for i in range(19):
 		cl_lengths[i] = 0
 	for i in range(hclen):
 		cl_lengths[_CL_ORDER[i]] = state.get_bits(3)
-	var cl_table := _build_huffman_table(cl_lengths)
+	var cl_tree := _build_huffman_tree(cl_lengths, 19)
+	var cl_table: PoolIntArray = cl_tree.table
+	var cl_trans: PoolIntArray = cl_tree.trans
 
-	var all_lengths := []
+	var lengths := PoolByteArray()
+	lengths.resize(288 + 32)
+	var num := 0
 	var total := hlit + hdist
-	while all_lengths.size() < total:
-		var sym := _decode_huffman_symbol(state, cl_table)
+	while num < total:
+		var sym := _decode_huffman_symbol(state, cl_table, cl_trans)
 		if sym < 16:
-			all_lengths.append(sym)
+			lengths[num] = sym
+			num += 1
 		elif sym == 16:
-			var repeat := state.get_bits(2) + 3
-			var prev = all_lengths[all_lengths.size() - 1]
-			for _i in range(repeat):
-				all_lengths.append(prev)
+			var prev := lengths[num - 1]
+			var repeat := state.get_bits(2, 3)
+			while repeat > 0:
+				lengths[num] = prev
+				num += 1
+				repeat -= 1
 		elif sym == 17:
-			var repeat := state.get_bits(3) + 3
-			for _i in range(repeat):
-				all_lengths.append(0)
+			var repeat := state.get_bits(3, 3)
+			while repeat > 0:
+				lengths[num] = 0
+				num += 1
+				repeat -= 1
 		else: # 18
-			var repeat := state.get_bits(7) + 11
-			for _i in range(repeat):
-				all_lengths.append(0)
+			var repeat := state.get_bits(7, 11)
+			while repeat > 0:
+				lengths[num] = 0
+				num += 1
+				repeat -= 1
 
-	var litlen_lengths := []
-	for i in range(hlit):
-		litlen_lengths.append(all_lengths[i])
-	var dist_lengths := []
-	for i in range(hdist):
-		dist_lengths.append(all_lengths[hlit + i])
+	var litlen_tree := _build_huffman_tree(lengths, hlit)
+	var dist_lengths := lengths.subarray(hlit, hlit + hdist - 1)
+	var dist_tree := _build_huffman_tree(dist_lengths, hdist)
 
-	return [_build_huffman_table(litlen_lengths), _build_huffman_table(dist_lengths)]
-
-
-# Decodes literal/length/distance symbols into state.output until the
-# block's end-of-block marker (symbol 256).
-static func _inflate_huffman_block(state: _InflateState, litlen_table: Dictionary, dist_table: Dictionary) -> void:
-	while true:
-		var sym := _decode_huffman_symbol(state, litlen_table)
-		if sym < 0:
-			return
-		if sym < 256:
-			state.output.append(sym)
-		elif sym == 256:
-			return
-		else:
-			var length: int = _LENGTH_BASE[sym - 257] + state.get_bits(_LENGTH_EXTRA[sym - 257])
-			var dist_sym := _decode_huffman_symbol(state, dist_table)
-			var distance: int = _DIST_BASE[dist_sym] + state.get_bits(_DIST_EXTRA[dist_sym])
-			var start: int = state.output.size() - distance
-			for i in range(length):
-				# Read one byte at a time (not a bulk copy): when distance
-				# < length this back-reference deliberately reads bytes
-				# this same loop just appended, e.g. distance=1 repeats
-				# the previous byte `length` times.
-				state.output.append(state.output[start + i])
+	return [litlen_tree, dist_tree]
 
 
 # Decompresses a raw DEFLATE stream (RFC 1951, no zlib/gzip wrapper) -
-# exactly what a zip's "Deflated" entries contain on disk.
-static func _inflate(data: PoolByteArray) -> PoolByteArray:
+# exactly what a zip's "Deflated" entries contain on disk - into exactly
+# `uncompressed_size` bytes (always known up front from the entry's own
+# header, which is what lets the output buffer be allocated once instead
+# of grown incrementally).
+#
+# The literal/length/distance decode loop lives directly in this
+# function rather than in a helper it calls once per block, and that's
+# not just style: passing a PoolByteArray as a parameter and then writing
+# through it costs time proportional to the array's *entire* current
+# size, not to the write - confirmed by direct measurement, apparently a
+# copy-on-write detach that copies the whole buffer on first mutation
+# rather than tracking the single change. A small file with few blocks
+# barely notices; a large file making that trip once per block (of which
+# there can be hundreds) turns into real quadratic-ish overhead. Keeping
+# `output`/`out_pos` as this one function's own locals for the entire
+# decompression avoids it.
+static func _inflate(data: PoolByteArray, uncompressed_size: int) -> PoolByteArray:
 	var state := _InflateState.new(data)
-	var fixed_litlen := _fixed_litlen_table()
-	var fixed_dist := _fixed_dist_table()
+	var output := PoolByteArray()
+	output.resize(uncompressed_size)
+	var out_pos := 0
+
+	var fixed_litlen: Dictionary
+	var fixed_dist: Dictionary
+	var have_fixed := false
 
 	while true:
 		var bfinal := state.get_bit()
@@ -983,18 +1011,60 @@ static func _inflate(data: PoolByteArray) -> PoolByteArray:
 			var length := len_lo | (len_hi << 8)
 			state.pos += 4 # skip LEN + one's-complement NLEN
 			for i in range(length):
-				state.output.append(state.input[state.pos + i])
+				output[out_pos + i] = state.input[state.pos + i]
+			out_pos += length
 			state.pos += length
-		elif btype == 1:
-			_inflate_huffman_block(state, fixed_litlen, fixed_dist)
+			if bfinal == 1:
+				break
+			continue
+
+		var table: PoolIntArray
+		var trans: PoolIntArray
+		var dtable: PoolIntArray
+		var dtrans: PoolIntArray
+
+		if btype == 1:
+			if not have_fixed:
+				fixed_litlen = _fixed_litlen_tree()
+				fixed_dist = _fixed_dist_tree()
+				have_fixed = true
+			table = fixed_litlen.table
+			trans = fixed_litlen.trans
+			dtable = fixed_dist.table
+			dtrans = fixed_dist.trans
 		elif btype == 2:
-			var tables := _read_dynamic_tables(state)
-			_inflate_huffman_block(state, tables[0], tables[1])
+			var trees := _read_dynamic_trees(state)
+			var litlen_tree: Dictionary = trees[0]
+			var dist_tree: Dictionary = trees[1]
+			table = litlen_tree.table
+			trans = litlen_tree.trans
+			dtable = dist_tree.table
+			dtrans = dist_tree.trans
 		else:
 			push_error("SimpleZip: reserved/invalid DEFLATE block type (corrupt data?)")
 			break
 
+		while true:
+			var sym := _decode_huffman_symbol(state, table, trans)
+			if sym < 256:
+				output[out_pos] = sym
+				out_pos += 1
+			elif sym == 256:
+				break
+			else:
+				sym -= 257
+				var length := state.get_bits(_LENGTH_EXTRA[sym], _LENGTH_BASE[sym])
+				var dist_sym := _decode_huffman_symbol(state, dtable, dtrans)
+				var distance := state.get_bits(_DIST_EXTRA[dist_sym], _DIST_BASE[dist_sym])
+				# One byte at a time (not a bulk copy): when distance <
+				# length this back-reference deliberately reads bytes
+				# this same loop just wrote, e.g. distance=1 repeats the
+				# previous byte `length` times.
+				for i in range(length):
+					output[out_pos + i] = output[out_pos + i - distance]
+				out_pos += length
+
 		if bfinal == 1:
 			break
 
-	return PoolByteArray(state.output)
+	return output
