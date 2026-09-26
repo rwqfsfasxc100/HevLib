@@ -262,11 +262,11 @@ func updatelist_return(result, response_code,headers,body,mh):
 								var payload:String = JSON.print({
 									"event_type":"add_mod_entry",
 									"client_payload":{
-										"data":{
+										"data":JSON.print({
 											"id":mid,
 											"manifest_url":mURL,
 											"github_url":gURL
-										}
+										})
 									}
 								})
 								var tHTTP:HTTPRequest = HTTPRequest.new()

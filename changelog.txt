@@ -1,3 +1,7 @@
+[1.16.13]
+
+1=* Fixed an issue that would prevent new mods from being uploaded to updateDB
+
 [1.16.12]
 
 1=* Re-introduced the Resolve Modlet load order code
