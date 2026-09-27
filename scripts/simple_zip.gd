@@ -317,7 +317,7 @@ static func _crc32(data: PoolByteArray) -> int:
 
 	var crc := 0xFFFFFFFF
 	var size := data.size()
-	var groups := int(size / 32.0)
+	var groups := size / 32
 	var i := 0
 	for _g in range(groups):
 		# The running crc is 4 bytes; XOR each of its bytes with the next
@@ -424,18 +424,19 @@ static func _save_bytes_to_file(zip_path: String, data: PoolByteArray) -> bool:
 # Array parameters/properties are value-copied on mutation), which is
 # also why the DEFLATE decoder further down uses a plain Array instead.
 
-static func _u16_le(value: int) -> PoolByteArray:
-	return PoolByteArray([value & 0xFF, (value >> 8) & 0xFF])
-
-
-static func _u32_le(value: int) -> PoolByteArray:
-	return PoolByteArray([value & 0xFF, (value >> 8) & 0xFF, (value >> 16) & 0xFF, (value >> 24) & 0xFF])
-
-
 # Builds the complete local file header + (possibly compressed) data for
 # one entry. Returns {bytes, record}: `bytes` is what to place directly
 # in the archive, `record` is what _build_central_directory_and_eocd()
 # needs once the entry's final offset is known.
+#
+# The buffer is sized once (30-byte fixed header + name + payload) and
+# filled with direct indexed writes rather than many small
+# append_array() calls - resize-then-index measured faster than
+# append_array in this environment. Fields that are the same for every
+# entry (the signature, version-needed, and UTF-8 flag) are written as
+# their already-known bytes instead of being bit-shifted out of
+# _LOCAL_FILE_SIG/_VERSION_NEEDED/_FLAG_UTF8 on every single call; update
+# both if any of those three constants ever change.
 static func _build_local_entry(name: String, content, compress: bool, mod_time: int, mod_date: int) -> Dictionary:
 	var data := _to_bytes(content)
 	var name_bytes: PoolByteArray = name.to_utf8()
@@ -449,20 +450,48 @@ static func _build_local_entry(name: String, content, compress: bool, mod_time: 
 			method = _METHOD_DEFLATE
 			payload = deflated
 
+	var name_len := name_bytes.size()
+	var comp_size := payload.size()
+	var uncomp_size := data.size()
+
 	var out := PoolByteArray()
-	out.append_array(_u32_le(_LOCAL_FILE_SIG))
-	out.append_array(_u16_le(_VERSION_NEEDED))
-	out.append_array(_u16_le(_FLAG_UTF8))
-	out.append_array(_u16_le(method))
-	out.append_array(_u16_le(mod_time))
-	out.append_array(_u16_le(mod_date))
-	out.append_array(_u32_le(crc))
-	out.append_array(_u32_le(payload.size())) # compressed size
-	out.append_array(_u32_le(data.size()))    # uncompressed size
-	out.append_array(_u16_le(name_bytes.size()))
-	out.append_array(_u16_le(0)) # extra field length
-	out.append_array(name_bytes)
-	out.append_array(payload)
+	out.resize(30 + name_len + comp_size)
+
+	out[0] = 0x50 # local file header signature (_LOCAL_FILE_SIG), fixed
+	out[1] = 0x4b
+	out[2] = 0x03
+	out[3] = 0x04
+	out[4] = 20   # version needed (_VERSION_NEEDED = 20), fixed
+	out[5] = 0
+	out[6] = 0x00 # general purpose flag (_FLAG_UTF8 = 0x0800), fixed
+	out[7] = 0x08
+	out[8] = method & 0xFF
+	out[9] = (method >> 8) & 0xFF
+	out[10] = mod_time & 0xFF
+	out[11] = (mod_time >> 8) & 0xFF
+	out[12] = mod_date & 0xFF
+	out[13] = (mod_date >> 8) & 0xFF
+	out[14] = crc & 0xFF
+	out[15] = (crc >> 8) & 0xFF
+	out[16] = (crc >> 16) & 0xFF
+	out[17] = (crc >> 24) & 0xFF
+	out[18] = comp_size & 0xFF
+	out[19] = (comp_size >> 8) & 0xFF
+	out[20] = (comp_size >> 16) & 0xFF
+	out[21] = (comp_size >> 24) & 0xFF
+	out[22] = uncomp_size & 0xFF
+	out[23] = (uncomp_size >> 8) & 0xFF
+	out[24] = (uncomp_size >> 16) & 0xFF
+	out[25] = (uncomp_size >> 24) & 0xFF
+	out[26] = name_len & 0xFF
+	out[27] = (name_len >> 8) & 0xFF
+	out[28] = 0 # extra field length, always 0
+	out[29] = 0
+
+	for i in range(name_len):
+		out[30 + i] = name_bytes[i]
+	for i in range(comp_size):
+		out[30 + name_len + i] = payload[i]
 
 	return {
 		"bytes": out,
@@ -470,8 +499,8 @@ static func _build_local_entry(name: String, content, compress: bool, mod_time: 
 			"name_bytes": name_bytes,
 			"crc": crc,
 			"method": method,
-			"comp_size": payload.size(),
-			"uncomp_size": data.size(),
+			"comp_size": comp_size,
+			"uncomp_size": uncomp_size,
 			"mod_time": mod_time,
 			"mod_date": mod_date,
 		},
@@ -483,38 +512,111 @@ static func _build_local_entry(name: String, content, compress: bool, mod_time: 
 # data will sit within the *final* archive, which the caller must know
 # (it's just "how much I've written so far"), since the EOCD needs to
 # record it as an absolute position.
+#
+# Same approach as _build_local_entry(): the exact final size is known
+# up front (46 bytes per record, plus its name, plus the fixed 22-byte
+# EOCD), so the buffer is resized once and filled by indexed writes with
+# a running cursor `p`, instead of building it up through many small
+# append_array() calls. As above, the per-record signature/version/flag
+# bytes and the always-zero fields are written directly rather than
+# recomputed from the constants each time.
 static func _build_central_directory_and_eocd(records: Array, central_dir_offset: int) -> PoolByteArray:
-	var out := PoolByteArray()
+	var central_dir_size := 0
 	for rec in records:
-		out.append_array(_u32_le(_CENTRAL_DIR_SIG))
-		out.append_array(_u16_le(_VERSION_NEEDED)) # version made by
-		out.append_array(_u16_le(_VERSION_NEEDED)) # version needed to extract
-		out.append_array(_u16_le(_FLAG_UTF8))
-		out.append_array(_u16_le(rec.method))
-		out.append_array(_u16_le(rec.mod_time))
-		out.append_array(_u16_le(rec.mod_date))
-		out.append_array(_u32_le(rec.crc))
-		out.append_array(_u32_le(rec.comp_size))
-		out.append_array(_u32_le(rec.uncomp_size))
-		out.append_array(_u16_le(rec.name_bytes.size()))
-		out.append_array(_u16_le(0)) # extra field length
-		out.append_array(_u16_le(0)) # comment length
-		out.append_array(_u16_le(0)) # disk number start
-		out.append_array(_u16_le(0)) # internal file attributes
-		out.append_array(_u32_le(0)) # external file attributes
-		out.append_array(_u32_le(rec.offset))
-		out.append_array(rec.name_bytes)
+		var name_bytes: PoolByteArray = rec.name_bytes
+		central_dir_size += 46 + name_bytes.size()
 
-	var central_dir_size := out.size()
+	var out := PoolByteArray()
+	out.resize(central_dir_size + _EOCD_FIXED_SIZE)
 
-	out.append_array(_u32_le(_EOCD_SIG))
-	out.append_array(_u16_le(0)) # number of this disk
-	out.append_array(_u16_le(0)) # disk where central directory starts
-	out.append_array(_u16_le(records.size()))
-	out.append_array(_u16_le(records.size()))
-	out.append_array(_u32_le(central_dir_size))
-	out.append_array(_u32_le(central_dir_offset))
-	out.append_array(_u16_le(0)) # zip comment length
+	var p := 0
+	for rec in records:
+		var name_bytes: PoolByteArray = rec.name_bytes
+		var name_len := name_bytes.size()
+		var method: int = rec.method
+		var mod_time: int = rec.mod_time
+		var mod_date: int = rec.mod_date
+		var crc: int = rec.crc
+		var comp_size: int = rec.comp_size
+		var uncomp_size: int = rec.uncomp_size
+		var offset: int = rec.offset
+
+		out[p] = 0x50 # central file header signature (_CENTRAL_DIR_SIG), fixed
+		out[p + 1] = 0x4b
+		out[p + 2] = 0x01
+		out[p + 3] = 0x02
+		out[p + 4] = 20   # version made by (_VERSION_NEEDED = 20), fixed
+		out[p + 5] = 0
+		out[p + 6] = 20   # version needed (_VERSION_NEEDED = 20), fixed
+		out[p + 7] = 0
+		out[p + 8] = 0x00 # general purpose flag (_FLAG_UTF8 = 0x0800), fixed
+		out[p + 9] = 0x08
+		out[p + 10] = method & 0xFF
+		out[p + 11] = (method >> 8) & 0xFF
+		out[p + 12] = mod_time & 0xFF
+		out[p + 13] = (mod_time >> 8) & 0xFF
+		out[p + 14] = mod_date & 0xFF
+		out[p + 15] = (mod_date >> 8) & 0xFF
+		out[p + 16] = crc & 0xFF
+		out[p + 17] = (crc >> 8) & 0xFF
+		out[p + 18] = (crc >> 16) & 0xFF
+		out[p + 19] = (crc >> 24) & 0xFF
+		out[p + 20] = comp_size & 0xFF
+		out[p + 21] = (comp_size >> 8) & 0xFF
+		out[p + 22] = (comp_size >> 16) & 0xFF
+		out[p + 23] = (comp_size >> 24) & 0xFF
+		out[p + 24] = uncomp_size & 0xFF
+		out[p + 25] = (uncomp_size >> 8) & 0xFF
+		out[p + 26] = (uncomp_size >> 16) & 0xFF
+		out[p + 27] = (uncomp_size >> 24) & 0xFF
+		out[p + 28] = name_len & 0xFF
+		out[p + 29] = (name_len >> 8) & 0xFF
+		out[p + 30] = 0 # extra field length, always 0
+		out[p + 31] = 0
+		out[p + 32] = 0 # file comment length, always 0
+		out[p + 33] = 0
+		out[p + 34] = 0 # disk number start, always 0
+		out[p + 35] = 0
+		out[p + 36] = 0 # internal file attributes, always 0
+		out[p + 37] = 0
+		out[p + 38] = 0 # external file attributes, always 0
+		out[p + 39] = 0
+		out[p + 40] = 0
+		out[p + 41] = 0
+		out[p + 42] = offset & 0xFF
+		out[p + 43] = (offset >> 8) & 0xFF
+		out[p + 44] = (offset >> 16) & 0xFF
+		out[p + 45] = (offset >> 24) & 0xFF
+
+		for i in range(name_len):
+			out[p + 46 + i] = name_bytes[i]
+
+		p += 46 + name_len
+
+	var count := records.size()
+	out[p] = 0x50 # end of central directory signature (_EOCD_SIG), fixed
+	out[p + 1] = 0x4b
+	out[p + 2] = 0x05
+	out[p + 3] = 0x06
+	out[p + 4] = 0 # number of this disk, always 0
+	out[p + 5] = 0
+	out[p + 6] = 0 # disk where central directory starts, always 0
+	out[p + 7] = 0
+	out[p + 8] = count & 0xFF
+	out[p + 9] = (count >> 8) & 0xFF
+	out[p + 10] = count & 0xFF
+	out[p + 11] = (count >> 8) & 0xFF
+	out[p + 12] = central_dir_size & 0xFF
+	out[p + 13] = (central_dir_size >> 8) & 0xFF
+	out[p + 14] = (central_dir_size >> 16) & 0xFF
+	out[p + 15] = (central_dir_size >> 24) & 0xFF
+	out[p + 16] = central_dir_offset & 0xFF
+	out[p + 17] = (central_dir_offset >> 8) & 0xFF
+	out[p + 18] = (central_dir_offset >> 16) & 0xFF
+	out[p + 19] = (central_dir_offset >> 24) & 0xFF
+	out[p + 20] = 0 # zip comment length, always 0
+	out[p + 21] = 0
+
 	return out
 
 

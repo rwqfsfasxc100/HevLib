@@ -237,7 +237,7 @@ func updatelist_return(result, response_code,headers,body,mh):
 			elif minor>cn:if bugfix>cb+5:dont=true
 			elif bugfix>cb+10:dont=true
 		if dont:
-			pointers.DataFormat.__exit(false,"cannot collect version specific data. Is HevLib out of date?","pointers.SafeMode",20.0)
+			pointers.DataFormat.__exit(false,"cannot collect version specific data. Is HevLib out of date?","pointers.SafeMode",60.0)
 		file.open(update_store,File.WRITE)
 		file.store_string(JSON.print(updates))
 		file.close()
@@ -442,9 +442,9 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 			var dos_time:int = (datetime.hour << 11) | (datetime.minute << 5) | int(datetime.second / 2.0)
 			var dos_date:int = (int(max(datetime.year - 1980, 0)) << 9) | (datetime.month << 5) | datetime.day
 			var dt1:int = dos_time & 0xFF
-			var dt2:int = (dos_time & 0xFF00) >> 8
+			var dt2:int = (dos_time >> 8) & 0xFF
 			var dt3:int = dos_date & 0xFF
-			var dt4:int = (dos_date & 0xFF00) >> 8
+			var dt4:int = (dos_date >> 8) & 0xFF
 			
 			var buffer:PoolByteArray = PoolByteArray()
 			var central_records:Array = Array()
@@ -456,9 +456,9 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 				var crc:int = __get_crc_32(data)
 				var name_size:int = name_bytes.size()
 				var uc1:int = uncompressed_size & 0xFF
-				var uc2:int = (uncompressed_size & 0xFF00) >> 8
-				var uc3:int = (uncompressed_size & 0xFF0000) >> 16
-				var uc4:int = (uncompressed_size & 0xFF000000) >> 24
+				var uc2:int = (uncompressed_size >> 8) & 0xFF
+				var uc3:int = (uncompressed_size >> 16) & 0xFF
+				var uc4:int = (uncompressed_size >> 24) & 0xFF
 				buffer.resize(offset + 30)
 				# Local entry magic number
 				buffer[offset] = 80;buffer[offset + 1] = 75;buffer[offset + 2] = 3;buffer[offset + 3] = 4
@@ -466,7 +466,7 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 				# Version to extract
 				buffer[offset + 4] = 20;buffer[offset + 5] = 0
 				
-				# General purpose flag
+				# General purpose flag, marks use of UTF8
 				buffer[offset + 6] = 0;buffer[offset + 7] = 8
 				
 				# Compression (none)
@@ -479,7 +479,7 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 				buffer[offset + 12] = dt3;buffer[offset + 13] = dt4
 				
 				# CRC32
-				buffer[offset + 14] = crc & 0xFF;buffer[offset + 15] = (crc & 0xFF00) >> 8;buffer[offset + 16] = (crc & 0xFF0000) >> 16;buffer[offset + 17] = (crc & 0xFF000000) >> 24
+				buffer[offset + 14] = crc & 0xFF;buffer[offset + 15] = (crc >> 8) & 0xFF;buffer[offset + 16] = (crc >> 16) & 0xFF;buffer[offset + 17] = (crc >> 24) & 0xFF
 				
 				# Compressed size
 				buffer[offset + 18] = uc1;buffer[offset + 19] = uc2;buffer[offset + 20] = uc3;buffer[offset + 21] = uc4
@@ -488,7 +488,7 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 				buffer[offset + 22] = uc1;buffer[offset + 23] = uc2;buffer[offset + 24] = uc3;buffer[offset + 25] = uc4
 				
 				# Filename length
-				buffer[offset + 26] = name_size & 0xFF;buffer[offset + 27] = (name_size & 0xFF00) >> 8
+				buffer[offset + 26] = name_size & 0xFF;buffer[offset + 27] = (name_size >> 8) & 0xFF
 				
 				# Extra field length
 				buffer[offset + 28] = 0;buffer[offset + 29] = 0
@@ -507,9 +507,9 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 				var name_bytes:PoolByteArray = rec.name_bytes
 				var uncomp_size:int = rec.uncomp_size
 				var uc1:int = uncomp_size & 0xFF
-				var uc2:int = (uncomp_size & 0xFF00) >> 8
-				var uc3:int = (uncomp_size & 0xFF0000) >> 16
-				var uc4:int = (uncomp_size & 0xFF000000) >> 24
+				var uc2:int = (uncomp_size >> 8) & 0xFF
+				var uc3:int = (uncomp_size >> 16) & 0xFF
+				var uc4:int = (uncomp_size >> 24) & 0xFF
 				var crc:int = rec.crc
 				var offset:int = rec.offset
 				var bsize:int = buffer.size()
@@ -523,7 +523,7 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 				# Version to decompress to
 				buffer[bsize + 6] = 20;buffer[bsize + 7] = 0
 				
-				# General flag
+				# General flag, marks use of UTF8
 				buffer[bsize + 8] = 0;buffer[bsize + 9] = 8
 				
 				# Store method (none)
@@ -536,7 +536,7 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 				buffer[bsize + 14] = dt3;buffer[bsize + 15] = dt4
 				
 				# CRC32
-				buffer[bsize + 16] = crc & 0xFF;buffer[bsize + 17] = (crc & 0xFF00) >> 8;buffer[bsize + 18] = (crc & 0xFF0000) >> 16;buffer[bsize + 19] = (crc & 0xFF000000) >> 24
+				buffer[bsize + 16] = crc & 0xFF;buffer[bsize + 17] = (crc >> 8) & 0xFF;buffer[bsize + 18] = (crc >> 16) & 0xFF;buffer[bsize + 19] = (crc >> 24) & 0xFF
 				
 				# Compressed size
 				buffer[bsize + 20] = uc1;buffer[bsize + 21] = uc2;buffer[bsize + 22] = uc3;buffer[bsize + 23] = uc4
@@ -545,7 +545,7 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 				buffer[bsize + 24] = uc1;buffer[bsize + 25] = uc2;buffer[bsize + 26] = uc3;buffer[bsize + 27] = uc4
 				
 				# Name length
-				buffer[bsize + 28] = name_size & 0xFF;buffer[bsize + 29] = (name_size & 0xFF00) >> 8
+				buffer[bsize + 28] = name_size & 0xFF;buffer[bsize + 29] = (name_size >> 8) & 0xFF
 				
 				# Extra field length
 				buffer[bsize + 30] = 0;buffer[bsize + 31] = 0
@@ -563,14 +563,14 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 				buffer[bsize + 38] = 0;buffer[bsize + 39] = 0;buffer[bsize + 40] = 0;buffer[bsize + 41] = 0
 				
 				# CD offset
-				buffer[bsize + 42] = offset & 0xFF;buffer[bsize + 43] = (offset & 0xFF00) >> 8;buffer[bsize + 44] = (offset & 0xFF0000) >> 16;buffer[bsize + 45] = (offset & 0xFF000000) >> 24
+				buffer[bsize + 42] = offset & 0xFF;buffer[bsize + 43] = (offset >> 8) & 0xFF;buffer[bsize + 44] = (offset >> 16) & 0xFF;buffer[bsize + 45] = (offset >> 24) & 0xFF
 				
 				# File name bytes
 				buffer.append_array(name_bytes)
 			var central_dir_size:int = buffer.size() - central_dir_offset
 			var cr_size:int = central_records.size()
-			var cr1:int = cr_size & 0xFF
-			var cr2:int = (cr_size & 0xFF00) >> 8
+			var cr1:int = cr_size
+			var cr2:int = (cr_size >> 8) & 0xFF
 			var offset:int = buffer.size()
 			buffer.resize(offset + 22)
 			# EOCD magic number
@@ -732,6 +732,13 @@ func testing():
 	
 #	var out = pointers.SafeMode.get_dependancies_for_vanilla_file("res://enceladus/Dealer.tscn")
 #	var sz = load("res://HevLib/scripts/simple_zip.gd").new()
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

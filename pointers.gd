@@ -144,51 +144,50 @@ var resource_path:String = ""
 func _init(r,e):
 	resource_path = r
 	equipment_modmain = e
+	dir.make_dir_recursive(deviceinfostore)
 
 # Logging function used for cases where critial info must not be overwritten by game logs
 # cycling back to dv_log_0 (and yes this is from a specific bug report with AI slop code,
 # you didn't ask for permission to use any of my code in an LLM so fuck you)
-var logCache:PoolStringArray = PoolStringArray()
+var logCache:String = ""
 var messageNr:int = 0
-var messagesPerFile:float = 1000.0
-var llc:bool = false
+const messagesPerFile:float = 1000.0
 func l(msg:String, title:String = ""):
 	Debug.l(("[%s]: %s" % [title, msg]) if title else msg)
-	if not llc:
-		logCache = PoolStringArray()
-		llc = true
-	logCache.append("[%s]: %s" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg])
+	if logCache:
+		logCache += "[%s]: %s\n" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg]
+	else:
+		logCache = "[%s]: %s\n" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg]
 
 # Notetaking function used to mark an important event in the game's performance logs
 func n(msg:String, title:String = ""):
 	Debug.n(("[%s]: %s" % [title, msg]) if title else msg)
-	if not llc:
-		logCache = PoolStringArray()
-		llc = false
-	logCache.append("[%s]: %s" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg])
+	if logCache:
+		logCache += "[%s]: %s\n" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg]
+	else:
+		logCache = "[%s]: %s\n" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg]
 
-var deviceinfostore:String = "user://cache/.HevLib_Cache/logs/"
-var deviceinfocache:String = deviceinfostore + "pointer_logs_%d.txt"
+const deviceinfostore:String = "user://cache/.HevLib_Cache/logs/"
+const deviceinfocache:String = deviceinfostore + "pointer_logs_%d.txt"
+var currentFileName:String = ""
 const testmode = false
 # Method for storing stored logs to file
 # This isn't done by the logger to help reduce write operations.
 # Useful if you perform the log operation multiple times in succession
 func storeLogCache():
-	if logCache and dir.dir_exists(deviceinfostore):
+	if logCache:
 		messageNr += 1
 		var logFileName:String = deviceinfocache % int(messageNr / messagesPerFile)
-		if not file.file_exists(logFileName):
-			file.open(logFileName,File.WRITE)
+		if currentFileName != logFileName:
+			currentFileName = logFileName
+			file.open(currentFileName,File.WRITE)
+			file.store_string("")
 			file.close()
-		file.open(logFileName,File.READ)
-		var ov:String = file.get_as_text(true)
+		file.open(currentFileName, File.READ_WRITE)
+		file.seek_end()
+		file.store_string(logCache)
 		file.close()
-		for line in logCache:
-			ov += line + "\n"
-		file.open(logFileName,File.WRITE)
-		file.store_string(ov)
-		file.close()
-		logCache.clear()
+		logCache = ""
 
 class _Achievements:
 	var scripts : Array = [
@@ -1170,8 +1169,7 @@ class _ConfigDriver:
 							actionList.append(key)
 						else:pointers.l("Input key [%s] already exists, skipping" % key,"pointers.ConfigDriver")
 						pointers.Keymapping.__load_input_data(key,p,opts)
-		# Load translations
-		pointers.Translations.__inject_translations()
+		
 	
 	static func __get_minmax_string_from_dict(requirement:Dictionary) -> String:
 		var MID = str(requirement.get("mod_id",""))
@@ -3184,19 +3182,18 @@ class _DynamicLibraryLoader:
 		var exePath:String = OS.get_executable_path().get_base_dir() + "/hevlib_dll_store/"
 		if not pointers.is_editor:
 			var all_libraries:PoolStringArray = PoolStringArray()
-			var mods:Dictionary = pointers.ManifestV2.__get_mod_data()
-			for mod in pointers.ManifestV2.__get_mod_list_keys():
-				var drivers = mods[mod]["drivers"]
-				if "DLL_MAPPER.gd" in drivers:
+			for mod in pointers.DriverManagement.__get_drivers():
+				var drivers = mod["drivers"]
+				if "DLL_MAPPER.gd" in drivers.keys():
 					var mapper:PoolStringArray = PoolStringArray(drivers["DLL_MAPPER.gd"].get("DLL_MAPPER",[]))
 					for entry in mapper:
 						if not entry.begins_with("res://"):
-							entry = mod.get_base_dir().plus_file(entry)
+							entry = mod.mod_directory.plus_file(entry)
 						if entry.get_extension() in gdnative_library_extensions:
 							all_libraries.append(entry)
 			for mod in pointers.ManifestV2.__get_disabled_modlets():
 				var drivers = pointers.DriverManagement.__get_drivers_from_modmain_path(mod)
-				if "DLL_MAPPER.gd" in drivers:
+				if "DLL_MAPPER.gd" in drivers.keys():
 					var mapper:PoolStringArray = PoolStringArray(drivers["DLL_MAPPER.gd"].get("DLL_MAPPER",[]))
 					for entry in mapper:
 						if not entry.begins_with("res://"):
@@ -7099,6 +7096,8 @@ class _ManifestV2:
 			total_mod_count = modListArr.size()
 			pointers.l("solved [%s] mod-definition files [%s ModMains / %s Modlets]" % [total_mod_count,modmain_files.size(),modlet_files.size()],"pointers.ManifestV2")
 			modListArr.sort_custom(non_static["self"],"sortModList")
+			# Load translations
+			pointers.Translations.__inject_translations()
 			if base.fetchZips:
 				base.fetchZips = false
 				var _modZipFiles = []
@@ -7126,16 +7125,16 @@ class _ManifestV2:
 				for mod in modListArr:
 					modFiles.append(mod.script_path.to_lower())
 				for modFSPath in _modZipFiles:
-					var gdunzip = pointers.gdunzip.new()
-					gdunzip.load(modFSPath)
-					var zipFiles = gdunzip.files
+					var gd = gdunzip.new()
+					gd.load(modFSPath)
+					var zipFiles = gd.files
 					for modEntryPath in zipFiles:
 						var modGlobalPath:String = "res://" + modEntryPath
 						if not modGlobalPath.ends_with("/"):
 							pointers.SafeMode.__check_file(modGlobalPath,modFSPath)
 							if modGlobalPath.to_lower() in modFiles:
 								zip_ref_store[modGlobalPath] = modFSPath
-					gdunzip = null
+					gd = null
 				if zip_ref_store.get("res://HevLib/ModMain.gd","").get_file()!="HevLib.zip":pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.","pointers.ManifestV2")
 			var stat_tags : Dictionary = {}
 			for mod in modListArr:
@@ -9262,14 +9261,14 @@ class _SafeMode:
 			file.open(validation_check_path,File.READ)
 			validation_check = JSON.parse(file.get_as_text()).result
 			file.close()
-		if validation_check.get("hevlib_cache_version",-1) != pointers.HEVLIB_CACHE_VERSION or !deep_equal(PoolIntArray(validation_check.get("vanilla_version",PoolIntArray([1,0,0]))),vanilla_version) or !file.file_exists(validation_check_path) or !file.file_exists(pck_file_paths_store) or !file.file_exists(vanilla_load_order_store) or !file.file_exists(dependancy_lookup_store) or !file.file_exists(dependancy_dictionary_store) or pointers.ManifestV2.haveModsChanged:
+		if validation_check.get("hevlib_cache_version",-1) != HEVLIB_CACHE_VERSION or !deep_equal(PoolIntArray(validation_check.get("vanilla_version",PoolIntArray([1,0,0]))),vanilla_version) or !file.file_exists(validation_check_path) or !file.file_exists(pck_file_paths_store) or !file.file_exists(vanilla_load_order_store) or !file.file_exists(dependancy_lookup_store) or !file.file_exists(dependancy_dictionary_store) or pointers.ManifestV2.haveModsChanged:
 			pointers.l("Game has updated or cache is missing, rebuilding file info cache.")
 			pointers.FolderAccess.__recursive_delete(safemode_dir)
 			Directory.new().make_dir(safemode_dir)
 			var timerStart:int = Time.get_ticks_usec()
 			PCKNAMES.append_array(pointers.FolderAccess.__get_vanilla_script_and_scenes())
 			validation_check["vanilla_version"] = vanilla_version
-			validation_check["hevlib_cache_version"] = pointers.HEVLIB_CACHE_VERSION
+			validation_check["hevlib_cache_version"] = HEVLIB_CACHE_VERSION
 			file.open(validation_check_path,File.WRITE)
 			file.store_string(JSON.print(validation_check))
 			file.close()
@@ -10341,7 +10340,7 @@ class _Zip:
 		var listOfNames = []
 		var g = gdunzip.new()
 		g.load(path)
-		var fileList = gdunzip.files
+		var fileList = g.files
 		for m in fileList:
 			if stripFolder:
 				var delim = m.split("/")[0] + "/"
