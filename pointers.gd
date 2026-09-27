@@ -90,7 +90,7 @@ var Classes = {
 
 var copyrights:String = "© 2024-2026 Benjamin Buckhurst a.k.a. __hev. All rights reserved."
 
-const HEVLIB_CACHE_VERSION : int = 2
+const HEVLIB_CACHE_VERSION : int = 3
 
 var logging_frame_interval:float = 0
 var logging_current_frame_timer:int = 0
@@ -6227,40 +6227,52 @@ class _FolderAccess:
 					out.append(f)
 		return Array(out)
 	
-	static func __get_vanilla_script_and_scenes() -> PoolStringArray:
+	static func __get_vanilla_script_and_scenes(restrict:bool = false) -> PoolStringArray:
 		var findExt:PoolStringArray = PoolStringArray(["res","gdc"])
 		var pointers = non_static["pointers"]
+		var file:File = File.new()
+		var gameInstallDirectory = OS.get_executable_path().get_basename() + ".pck"
 		if pointers.is_editor:
-			var out:PoolStringArray = PoolStringArray()
-			for i in __get_files_with_extensions("res://.autoconverted/",findExt):
-				var fp = i.replace("/.autoconverted/","/")
-				match fp.get_extension():
-					"res":
-						if fp.get_basename().get_extension() == "converted":
-							fp = (fp.get_basename().get_basename())
-					"gdc":
-						fp = (fp.get_basename() + ".gd")
-				if ResourceLoader.exists(fp):
-					out.append(fp)
-			return out
-		else:
-			var gameInstallDirectory = OS.get_executable_path().get_basename() + ".pck"
-			var file:File = File.new()
-			if file.file_exists(gameInstallDirectory):
+			var cfg:ConfigFile = ConfigFile.new()
+			cfg.load("user://cfg/Mod_Configurations.cfg")
+			var pckPath:String = cfg.get_value("HevLib/HEVLIB_CONFIG_SECTION_DEBUG","pck_path_for_editor_testing","")
+			if not file.file_exists(pckPath):
 				var out:PoolStringArray = PoolStringArray()
-				for fp in pointers.Zip.__load_pck(gameInstallDirectory,true):
+				for i in __get_files_with_extensions("res://.autoconverted/",findExt):
+					var fp = i.replace("/.autoconverted/","/")
 					match fp.get_extension():
 						"res":
 							if fp.get_basename().get_extension() == "converted":
 								fp = (fp.get_basename().get_basename())
+							if restrict and ResourceLoader.exists(fp):
+								out.append(fp)
 						"gdc":
-							fp = (fp.get_basename() + ".gd")
-					if ResourceLoader.exists(fp):
+							fp = fp.get_basename() + ".gd"
+							if restrict and ResourceLoader.exists(fp):
+								out.append(fp)
+					if not restrict and ResourceLoader.exists(fp):
 						out.append(fp)
 				return out
-			else:
-				pointers.NodeAccess.__exit(false,"CRITICAL ERROR! Cannot find the game's .PCK file, and is a likely indicator that your game is corrupted.\n\nPlease validate your game files. If this issue persists, please make a bug report at [https://forms.gle/RmC4Zgonp6frFgnK7] so this issue can be fixed as soon as possible.","pointers.FolderAccess",0.0,"",true)
-				return PoolStringArray()
+			gameInstallDirectory = pckPath
+		if file.file_exists(gameInstallDirectory):
+			var out:PoolStringArray = PoolStringArray()
+			for fp in pointers.Zip.__load_pck(gameInstallDirectory,true):
+				match fp.get_extension():
+					"res":
+						if fp.get_basename().get_extension() == "converted":
+							fp = (fp.get_basename().get_basename())
+						if restrict and ResourceLoader.exists(fp):
+							out.append(fp)
+					"gdc":
+						fp = fp.get_basename() + ".gd"
+						if restrict and ResourceLoader.exists(fp):
+							out.append(fp)
+				if not restrict and ResourceLoader.exists(fp):
+					out.append(fp)
+			return out
+		else:
+			pointers.NodeAccess.__exit(false,"CRITICAL ERROR! Cannot find the game's .PCK file, and is a likely indicator that your game is corrupted.\n\nPlease validate your game files. If this issue persists, please make a bug report at [https://forms.gle/RmC4Zgonp6frFgnK7] so this issue can be fixed as soon as possible.","pointers.FolderAccess",0.0,"",true)
+			return PoolStringArray()
 		
 	
 
@@ -9266,7 +9278,7 @@ class _SafeMode:
 			pointers.FolderAccess.__recursive_delete(safemode_dir)
 			Directory.new().make_dir(safemode_dir)
 			var timerStart:int = Time.get_ticks_usec()
-			PCKNAMES.append_array(pointers.FolderAccess.__get_vanilla_script_and_scenes())
+			PCKNAMES.append_array(pointers.FolderAccess.__get_vanilla_script_and_scenes(true))
 			validation_check["vanilla_version"] = vanilla_version
 			validation_check["hevlib_cache_version"] = HEVLIB_CACHE_VERSION
 			file.open(validation_check_path,File.WRITE)
