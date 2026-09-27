@@ -232,9 +232,9 @@ func updatelist_return(result, response_code,headers,body,mh):
 			var cn:int = curr.version_minor
 			var cb:int = curr.version_bugfix
 			if major>cm:
-				if minor>cn:dont=true
-				elif bugfix>cb+2:dont=true
-			elif minor>cn:if bugfix>cb+5:dont=true
+				if minor>0:dont=true
+				elif bugfix>5:dont=true
+			elif minor>cn:if bugfix>cb+4:dont=true
 			elif bugfix>cb+10:dont=true
 		if dont:
 			pointers.DataFormat.__exit(false,"cannot collect version specific data. Is HevLib out of date?","pointers.SafeMode",60.0)
