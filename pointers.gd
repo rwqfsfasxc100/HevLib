@@ -90,7 +90,7 @@ var Classes = {
 
 var copyrights:String = "© 2024-2026 Benjamin Buckhurst a.k.a. __hev. All rights reserved."
 
-const HEVLIB_CACHE_VERSION : int = 3
+const HEVLIB_CACHE_VERSION : int = 4
 
 var logging_frame_interval:float = 0
 var logging_current_frame_timer:int = 0
@@ -6227,7 +6227,7 @@ class _FolderAccess:
 					out.append(f)
 		return Array(out)
 	
-	static func __get_vanilla_script_and_scenes(restrict:bool = false) -> PoolStringArray:
+	static func __get_vanilla_script_and_scenes() -> PoolStringArray:
 		var findExt:PoolStringArray = PoolStringArray(["res","gdc"])
 		var pointers = non_static["pointers"]
 		var file:File = File.new()
@@ -6244,13 +6244,9 @@ class _FolderAccess:
 						"res":
 							if fp.get_basename().get_extension() == "converted":
 								fp = (fp.get_basename().get_basename())
-							if restrict and ResourceLoader.exists(fp):
-								out.append(fp)
 						"gdc":
 							fp = fp.get_basename() + ".gd"
-							if restrict and ResourceLoader.exists(fp):
-								out.append(fp)
-					if not restrict and ResourceLoader.exists(fp):
+					if ResourceLoader.exists(fp):
 						out.append(fp)
 				return out
 			gameInstallDirectory = pckPath
@@ -6261,13 +6257,9 @@ class _FolderAccess:
 					"res":
 						if fp.get_basename().get_extension() == "converted":
 							fp = (fp.get_basename().get_basename())
-						if restrict and ResourceLoader.exists(fp):
-							out.append(fp)
 					"gdc":
 						fp = fp.get_basename() + ".gd"
-						if restrict and ResourceLoader.exists(fp):
-							out.append(fp)
-				if not restrict and ResourceLoader.exists(fp):
+				if ResourceLoader.exists(fp):
 					out.append(fp)
 			return out
 		else:
@@ -9278,13 +9270,14 @@ class _SafeMode:
 			pointers.FolderAccess.__recursive_delete(safemode_dir)
 			Directory.new().make_dir(safemode_dir)
 			var timerStart:int = Time.get_ticks_usec()
-			PCKNAMES.append_array(pointers.FolderAccess.__get_vanilla_script_and_scenes(true))
+			PCKNAMES.append_array(pointers.FolderAccess.__get_vanilla_script_and_scenes())
 			validation_check["vanilla_version"] = vanilla_version
 			validation_check["hevlib_cache_version"] = HEVLIB_CACHE_VERSION
 			file.open(validation_check_path,File.WRITE)
 			file.store_string(JSON.print(validation_check))
 			file.close()
-			for f in PCKNAMES:get_dependancies_for_vanilla_file(f)
+			for f in PCKNAMES:
+				get_dependancies_for_vanilla_file(f)
 			vanilla_load_order.append_array(dependancy_dict_keys)
 			order_tree.merge(flatten_tree(get_dependancy_tree()))
 			var vsize:int = vanilla_load_order.size()
@@ -9419,37 +9412,38 @@ class _SafeMode:
 	static func get_dependancies_for_vanilla_file(file_path:String):
 		if (not file_path in PCKNAMES) or (file_path in dependancy_dict_keys):
 			return
-		dependancy_dict_keys.append(file_path)
 		var dependencies:PoolStringArray = ResourceLoader.get_dependencies(file_path)
-		var file:File = File.new()
-		if file_path.get_extension() in deeperSearch:
-			if not non_static["pointers"].is_editor:
-				file.open(file_path + ".converted.res",File.READ)
-			else:
-				file.open(file_path,File.READ)
-			var fileBytes:PoolByteArray = file.get_buffer(file.get_len())
-			file.close()
-			var bytecodeStr:String = fileBytes.hex_encode()
-			if resHex in bytecodeStr:
-				var hexArray:PoolStringArray = bytecodeStr.split(resHex)
-				var buffer:int = 0
-				for idx in hexArray.size():
-					var hexText:String = hexArray[idx]
-					if idx > 0:
-						hexText = resHex + hexText
-						var fn:String = fileBytes.subarray(buffer, buffer + hexText.length()/2.0 - 1).get_string_from_ascii().split("\"")[0]
-						if not fn in dependencies:
-							dependencies.append(getRealFilename(fn))
-					buffer += hexText.length() / 2.0
-		dependancy_dictionary[file_path] = dependencies
-		for dp in dependencies:
-			if not dp in dependancy_lookup:
-				dependancy_lookup[dp] = []
-				dependancy_lookup_keys.append(dp)
-			dependancy_lookup[dp].append(file_path)
-		for m in dependencies:
-			if (m.get_extension() in binaryArr):
-				get_dependancies_for_vanilla_file(m)
+#		var file:File = File.new()
+#		if file_path.get_extension() in deeperSearch:
+#			if not non_static["pointers"].is_editor:
+#				file.open(file_path + ".converted.res",File.READ)
+#			else:
+#				file.open(file_path,File.READ)
+#			var fileBytes:PoolByteArray = file.get_buffer(file.get_len())
+#			file.close()
+#			var bytecodeStr:String = fileBytes.hex_encode()
+#			if resHex in bytecodeStr:
+#				var hexArray:PoolStringArray = bytecodeStr.split(resHex)
+#				var buffer:int = 0
+#				for idx in hexArray.size():
+#					var hexText:String = hexArray[idx]
+#					if idx > 0:
+#						hexText = resHex + hexText
+#						var fn:String = fileBytes.subarray(buffer, buffer + hexText.length()/2.0 - 1).get_string_from_ascii().split("\"")[0]
+#						if not fn in dependencies:
+#							dependencies.append(getRealFilename(fn))
+#					buffer += hexText.length() / 2.0
+		if dependencies:
+			dependancy_dict_keys.append(file_path)
+			dependancy_dictionary[file_path] = dependencies
+			for dp in dependencies:
+				if not dp in dependancy_lookup:
+					dependancy_lookup[dp] = []
+					dependancy_lookup_keys.append(dp)
+				dependancy_lookup[dp].append(file_path)
+			for m in dependencies:
+				if (m.get_extension() in binaryArr):
+					get_dependancies_for_vanilla_file(m)
 	
 	
 	
@@ -9476,9 +9470,9 @@ class _SafeMode:
 		var deps:PoolStringArray = ResourceLoader.get_dependencies(dependancy)
 		var out:PoolStringArray = deps
 		for d in deps:
-				for i in LDA(d,PoolStringArray()):
-					if not i in out:
-						out.append(i)
+			for i in LDA(d,PoolStringArray()):
+				if not i in out:
+					out.append(i)
 		return out
 	
 

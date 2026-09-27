@@ -1,3 +1,8 @@
+[1.16.15]
+
+1=* Load ordering now can appropriately reorder the modification of material and theme resources.
+2=* Load ordering now ignores placeholder resources, as they only load during runtime they're redundant to process.
+
 [1.16.14]
 
 1=* Fixed logging not clearing the log file on rebooting

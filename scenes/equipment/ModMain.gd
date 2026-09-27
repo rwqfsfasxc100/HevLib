@@ -219,9 +219,8 @@ func updatelist_return(result, response_code,headers,body,mh):
 					ctr += 1
 				if doUpdate:
 					var file_name:String = fetchData.get("file_name","file.zip")
-					var fetchURL:String = "https://github.com/rwqfsfasxc100/dv_update_database/raw/refs/heads/main/zip_store/%s/%d.%d.%d/%s" % [ID,newVer[0],newVer[1],newVer[2],file_name]
 					var mod_name:String = modData.get("name","")
-					updates[ID] = {"name":mod_name,"id":ID,"version":[current_version["version_major"],current_version["version_minor"],current_version["version_bugfix"]],"new_version":newVer,"github":fetchURL,"file_name":file_name,"display":mod_name + " (" + ID + ")"}
+					updates[ID] = {"name":mod_name,"id":ID,"version":[current_version["version_major"],current_version["version_minor"],current_version["version_bugfix"]],"new_version":newVer,"github":"https://github.com/rwqfsfasxc100/dv_update_database/raw/refs/heads/main/zip_store/%s/%d.%d.%d/%s" % [ID,newVer[0],newVer[1],newVer[2],file_name],"file_name":file_name,"display":mod_name + " (" + ID + ")"}
 		var dont:bool = false
 		if libid in p:
 			var curr:Dictionary = pointers.ManifestV2.__get_mod_by_id(libid)["version_data"]
