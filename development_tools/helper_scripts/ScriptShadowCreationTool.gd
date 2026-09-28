@@ -1,6 +1,5 @@
 # This is a script used to create shadow (man in the middle) scripts, or in other words,
-#  a means of changing the inputs and/or outputs of the communication between two
-#  scripts.
+#  a means of changing the inputs and/or outputs of the communication between two scripts.
 # 
 # e.g. modify the communication between the ship and a _ready() method of an equipment
 #  item. Given that virtual methods cannot be overriden normally, this brings some 
@@ -51,6 +50,8 @@
 # use_class_signals -> Bool used to determine if the object type's signals should 
 #  be shadowed as well. Only works when signals are defined with desired_signals
 # 
+# pointers -> Lets you provide the pointers node if this script is used before the
+#  onready phase.
 # 
 # 
 # [license]
@@ -86,9 +87,10 @@
 # [/license]
 # 
 
-func __make_shadow_of_script(script_path: String,desired_methods:Array,desired_variables:Array,desired_signals:Array,extend_mode = "none",initialize_with_args = true,initialize_with_script_updaters = false,use_class_variables:bool = true,use_class_methods:bool = true,use_class_signals:bool = true) -> String:
+func __make_shadow_of_script(script_path: String,desired_methods:Array,desired_variables:Array,desired_signals:Array,extend_mode = "none",initialize_with_args = true,initialize_with_script_updaters = false,use_class_variables:bool = true,use_class_methods:bool = true,use_class_signals:bool = true,pointers = null) -> String:
 	var out = ""
-	var pointers:HevLibPointers = ModLoader._savedObjects[0]
+	if not pointers:
+		pointers = ModLoader._savedObjects[0]
 	var data = pointers.DataFormat.__trim_scripts(script_path,true,true)
 	var var_names = data[1]
 	var const_names = data[2]
