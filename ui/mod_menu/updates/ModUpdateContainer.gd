@@ -40,8 +40,8 @@ var current_version = ""
 var new_version = ""
 var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
 
-var file = File.new()
-var http = HTTPRequest.new()
+var file:File = File.new()
+var http:HTTPRequest = HTTPRequest.new()
 onready var manager = get_parent().get_parent().get_parent().get_parent().get_parent()
 func _ready():
 	add_child(http)
@@ -76,13 +76,14 @@ func _do_update():
 
 func _update_confirmed():
 	file.open(update_store,File.READ)
-	var data = JSON.parse(file.get_as_text()).result
+	var data:Dictionary = JSON.parse(file.get_as_text()).result
 	file.close()
-	var github = data[mod_id].get("github","")
+	var github:String = data[mod_id].get("github","")
 	if github:
 		http.download_file = zip_folder + data[mod_id]["file_name"]
 		http.request(github)
 		updating_percent = true
+		_get_github_progress("HEVLIB_GITHUB_PROGRESS_WAITING_ON_RESPONSE",0,0,0)
 #		if github.ends_with("/"):
 #			github.rstrip("/")
 #		if not github.ends_with("/releases"):
@@ -97,7 +98,8 @@ func _update_confirmed():
 		$Popups/WAIT.popup_centered()
 
 func update_return(result, response_code,headers,body):
-	var fp = http.download_file
+	_get_github_progress("HEVLIB_GITHUB_PROGRESS_DOWNLOADED_FILE",0,0,0)
+	var fp:String = http.download_file
 	http.download_file = ""
 	updating_percent = false
 	_downloaded_zip(fp)
@@ -143,12 +145,13 @@ func _physics_process(delta):
 	if updating_percent:
 		total_bytes = http.get_body_size()
 		bytes_downloaded = http.get_downloaded_bytes()
-		var frac = float(bytes_downloaded)/float(total_bytes)
-		var f2 = frac * 100
-		percent = f2
+		var frac:float = float(bytes_downloaded)/float(total_bytes)
+		percent = frac * 100
 		print("HevLib GitHub Zip Downloader: Updating percent: %s%% | %s of %s" % [str(percent),bytes_downloaded,total_bytes])
 		if bytes_downloaded > 0.0:
 			_handle_downloaded_percent()
+		else:
+			_get_github_progress("HEVLIB_GITHUB_PROGRESS_ZIP_FOUND_AND_REQUESTING",0,0,0)
 
 func _handle_downloaded_percent():
 	if total_bytes > 0:

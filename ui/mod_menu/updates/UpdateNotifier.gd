@@ -32,31 +32,31 @@
 
 extends Popup
 
-export var update_menu_path = NodePath("")
-onready var update_menu = get_node(update_menu_path)
+export var update_menu_path:NodePath = NodePath("")
+onready var update_menu:Node = get_node(update_menu_path)
 
-var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
 var pointers:HevLibPointers = ModLoader._savedObjects[0]
-var file = File.new()
+var file:File = File.new()
 
 func _ready():
 	check()
 	pointers.equipment_modmain.connect("updates_fetched",self,"check")
 
 func check():
-	file.open(update_store,File.READ)
-	var updates = JSON.parse(file.get_as_text()).result
+	file.open("user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json",File.READ)
+	var updates:Dictionary = JSON.parse(file.get_as_text()).result
 	file.close()
+	var uKeys:Array = updates.keys()
 	if updates:
-		var currently_ignored = pointers.ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
-		if currently_ignored == null:
-			currently_ignored = {}
-		for u in currently_ignored:
-			if u in updates:
-				if currently_ignored[u] == str(updates[u]["new_version"][0]) + "." + str(updates[u]["new_version"][1]) + "." + str(updates[u]["new_version"][2]):
+		var currently_ignored:Dictionary = pointers.ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates",{})
+		for u in currently_ignored.keys():
+			if u in uKeys:
+				if currently_ignored[u] == "%s.%s.%s" % [updates[u]["new_version"][0],updates[u]["new_version"][1],updates[u]["new_version"][2]]:
 					updates.erase(u)
+					uKeys.erase(u)
 				else:
 					currently_ignored.erase(u)
+		pointers.ConfigDriver.__store_value("ModMenu2","datastore","ignored_updates",currently_ignored)
 		show_menu()
 
 func show_menu():

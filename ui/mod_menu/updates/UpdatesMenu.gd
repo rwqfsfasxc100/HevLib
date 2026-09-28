@@ -32,53 +32,53 @@
 
 extends Popup
 
-var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
+const update_store:String = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
 
-var offset = Vector2(100,75)
+const offset:Vector2 = Vector2(100,75)
 
-onready var container = $base/VBoxContainer/ScrollContainer/LabelContainer
-onready var no_download_popup = $NoDownload
+onready var container:Node = $base/VBoxContainer/ScrollContainer/LabelContainer
+onready var no_download_popup:Node = $NoDownload
 
 var file = File.new()
 var pointers:HevLibPointers = ModLoader._savedObjects[0]
-const update_container = preload("res://HevLib/ui/mod_menu/updates/ModUpdateContainer.tscn")
-var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
+var update_container:PackedScene = load("res://HevLib/ui/mod_menu/updates/ModUpdateContainer.tscn")
+var has_updated_store:String = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 
-export var restart_dialog_path = NodePath("")
-onready var restart_dialog = get_node(restart_dialog_path)
+export (NodePath) var restart_dialog_path:NodePath = NodePath("")
+onready var restart_dialog:Node = get_node(restart_dialog_path)
 
-var updating_all = false
+var updating_all:bool = false
 
 func _about_to_show():
 	for child in container.get_children():
 		Tool.remove(child)
 	
 	file.open(update_store,File.READ)
-	var update_data = JSON.parse(file.get_as_text()).result
+	var update_data:Dictionary = JSON.parse(file.get_as_text()).result
 	file.close()
-	
-	var currently_ignored = pointers.ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
-	if currently_ignored == null:
-		currently_ignored = {}
-	for u in currently_ignored:
-		if u in update_data:
-			if currently_ignored[u] == str(update_data[u]["new_version"][0]) + "." + str(update_data[u]["new_version"][1]) + "." + str(update_data[u]["new_version"][2]):
+	var uKeys:Array = update_data.keys()
+	var currently_ignored:Dictionary = pointers.ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates",{})
+	for u in currently_ignored.keys():
+		if u in uKeys:
+			if currently_ignored[u] == "%s.%s.%s" % [update_data[u]["new_version"][0],update_data[u]["new_version"][1],update_data[u]["new_version"][2]]:
 				update_data.erase(u)
+				uKeys.erase(u)
 			else:
 				currently_ignored.erase(u)
+	pointers.ConfigDriver.__store_value("ModMenu2","datastore","ignored_updates",updates)
 	
-	for mod in update_data:
-		var c = update_container.instance()
-		var md = update_data[mod]
-		var info = pointers.ManifestV2.__get_mod_by_id(mod)
-		var display_name = md["display"]
-		var old_version = md["version"]
-		var new_version = md["new_version"]
+	for mod in uKeys:
+		var c:Node = update_container.instance()
+		var md:Dictionary = update_data[mod]
+		var info:Dictionary = pointers.ManifestV2.__get_mod_by_id(mod)
+		var display_name:String = md["display"]
+		var old_version:Array = md["version"]
+		var new_version:Array = md["new_version"]
 		c.get_node("ModInfo/Label").text = display_name
 		c.mod_id = mod
 		c.mod_name = md["name"]
-		c.current_version = str(old_version[0]) + "." + str(old_version[1]) + "." + str(old_version[2])
-		c.new_version = str(new_version[0]) + "." + str(new_version[1]) + "." + str(new_version[2])
+		c.current_version = "%s.%s.%s" % [old_version[0],old_version[1],old_version[2]]
+		c.new_version = "%s.%s.%s" % [new_version[0],new_version[1],new_version[2]]
 		container.add_child(c)
 	yield(get_tree(),"physics_frame")
 	match update_data.size():
@@ -96,7 +96,7 @@ func _visibility_changed():
 
 func show_menu():
 	popup()
-var updates = {}
+var updates:Dictionary = {}
 func _ready():
 	restart_dialog.get_node("PanelContainer/VBoxContainer/HBoxContainer/Restart/Button").connect("pressed",self,"_confirmed")
 	restart_dialog.get_node("PanelContainer/VBoxContainer/HBoxContainer/Exit/Button").connect("pressed",self,"_custom_action")
@@ -113,7 +113,7 @@ func restart_cancel():
 
 func cancel():
 	file.open(has_updated_store,File.READ)
-	var has = file.get_as_text()
+	var has:String = file.get_as_text()
 	file.close()
 	if has == "1":
 		hide()
@@ -131,23 +131,21 @@ func refocus():
 		Debug.l("I have no focus to fall back to!")
 
 func _on_resize():
-	var size = Settings.getViewportSize()
+	var size:Vector2 = Settings.getViewportSize()
 	rect_size = size
 	$ColorRect.rect_size = size
 	$base.rect_min_size = size - offset
 	$base.rect_position = offset/2
 	
 
-var mods_to_download = []
+var mods_to_download:Array = []
 
-var update_all_count = 0
-var update_all_current = 0
+var update_all_count:int = 0
+var update_all_current:int = 0
 
 func _update_all_pressed():
 	updating_all = true
-	var mods = container.get_children()
-#	update_all_count = mods.size()
-	for mod in mods:
+	for mod in container.get_children():
 		mods_to_download.append({"name":mod.mod_name,"id":mod.mod_id,"version":mod.new_version,"container":mod})
 	start_updates()
 
@@ -156,8 +154,8 @@ func start_updates():
 	move_to_next_mod()
 	$WAIT.popup_centered()
 
-var current_mod_text = ""
-var download_status = ""
+var current_mod_text:String = ""
+var download_status:String = ""
 
 func move_to_next_mod():
 	if mods_to_download:
@@ -183,8 +181,7 @@ func _custom_action():
 
 
 func _ignore_all_pressed():
-	var mods = container.get_children()
-	for mod in mods:
+	for mod in container.get_children():
 		mod._ignore_confirmed()
 	
 func no_mods_available():
@@ -203,22 +200,22 @@ func _update_all_desired():
 func _ignore_all_desired():
 	$IgnorePopup.popup_centered()
 
-export var notifications_button_path = NodePath("")
-onready var notifications_button = get_node(notifications_button_path)
+export var notifications_button_path:NodePath = NodePath("")
+onready var notifications_button:Node = get_node(notifications_button_path)
 
 func notifications_pressed():
 	file.open(update_store,File.READ)
 	updates = JSON.parse(file.get_as_text()).result
 	file.close()
 	
-	var currently_ignored = pointers.ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
-	if currently_ignored == null:
-		currently_ignored = {}
-	for u in updates:
-		if u in currently_ignored:
-			if currently_ignored[u] == str(updates[u]["new_version"][0]) + "." + str(updates[u]["new_version"][1]) + "." + str(updates[u]["new_version"][2]):
+	var currently_ignored:Dictionary = pointers.ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates",{})
+	var iKeys:Array = currently_ignored.keys()
+	for u in updates.keys():
+		if u in iKeys:
+			if currently_ignored[u] == "%s.%s.%s" % [updates[u]["new_version"][0],updates[u]["new_version"][1],updates[u]["new_version"][2]]:
 				updates.erase(u)
 			else:
 				currently_ignored.erase(u)
-	if updates.size() >= 1:
+				iKeys.erase(u)
+	if updates:
 		popup()
