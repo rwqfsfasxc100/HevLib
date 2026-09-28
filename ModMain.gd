@@ -243,5 +243,5 @@ func l(msg:String, title:String = MOD_NAME, version:String = str(MOD_VERSION_MAJ
 func _notification(what):
 	if what == NOTIFICATION_CRASH:
 		file.open("user://cache/.HevLib_Cache/currently_installed_mods.json", File.WRITE)
-		file.store_string(pointers.ManifestV2.__get_mod_data(true))
+		file.store_string(JSON.print(pointers.ManifestV2.__get_mod_data(),"\t"))
 		file.close()

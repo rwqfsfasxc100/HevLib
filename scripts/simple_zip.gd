@@ -317,7 +317,7 @@ static func _crc32(data: PoolByteArray) -> int:
 
 	var crc := 0xFFFFFFFF
 	var size := data.size()
-	var groups := size / 32
+	var groups := int(size / 32.0)
 	var i := 0
 	for _g in range(groups):
 		# The running crc is 4 bytes; XOR each of its bytes with the next
@@ -429,14 +429,16 @@ static func _save_bytes_to_file(zip_path: String, data: PoolByteArray) -> bool:
 # in the archive, `record` is what _build_central_directory_and_eocd()
 # needs once the entry's final offset is known.
 #
-# The buffer is sized once (30-byte fixed header + name + payload) and
-# filled with direct indexed writes rather than many small
-# append_array() calls - resize-then-index measured faster than
-# append_array in this environment. Fields that are the same for every
-# entry (the signature, version-needed, and UTF-8 flag) are written as
-# their already-known bytes instead of being bit-shifted out of
-# _LOCAL_FILE_SIG/_VERSION_NEEDED/_FLAG_UTF8 on every single call; update
-# both if any of those three constants ever change.
+# The fixed-size, 30-byte header is filled with direct indexed writes
+# into a buffer sized to exactly that up front - measured faster than
+# building it via many small append_array() calls of 2-4 bytes each.
+# The name and payload are then added with append_array(), since for a
+# bulk copy like that append_array's native implementation measured
+# faster than looping byte-by-byte with indexed reads/writes. Fields
+# that are the same for every entry (the signature, version-needed, and
+# UTF-8 flag) are written as their already-known bytes instead of being
+# bit-shifted out of _LOCAL_FILE_SIG/_VERSION_NEEDED/_FLAG_UTF8 on every
+# single call; update both if any of those three constants ever change.
 static func _build_local_entry(name: String, content, compress: bool, mod_time: int, mod_date: int) -> Dictionary:
 	var data := _to_bytes(content)
 	var name_bytes: PoolByteArray = name.to_utf8()
@@ -455,7 +457,7 @@ static func _build_local_entry(name: String, content, compress: bool, mod_time: 
 	var uncomp_size := data.size()
 
 	var out := PoolByteArray()
-	out.resize(30 + name_len + comp_size)
+	out.resize(30)
 
 	out[0] = 0x50 # local file header signature (_LOCAL_FILE_SIG), fixed
 	out[1] = 0x4b
@@ -488,10 +490,8 @@ static func _build_local_entry(name: String, content, compress: bool, mod_time: 
 	out[28] = 0 # extra field length, always 0
 	out[29] = 0
 
-	for i in range(name_len):
-		out[30 + i] = name_bytes[i]
-	for i in range(comp_size):
-		out[30 + name_len + i] = payload[i]
+	out.append_array(name_bytes)
+	out.append_array(payload)
 
 	return {
 		"bytes": out,
@@ -513,23 +513,17 @@ static func _build_local_entry(name: String, content, compress: bool, mod_time: 
 # (it's just "how much I've written so far"), since the EOCD needs to
 # record it as an absolute position.
 #
-# Same approach as _build_local_entry(): the exact final size is known
-# up front (46 bytes per record, plus its name, plus the fixed 22-byte
-# EOCD), so the buffer is resized once and filled by indexed writes with
-# a running cursor `p`, instead of building it up through many small
-# append_array() calls. As above, the per-record signature/version/flag
-# bytes and the always-zero fields are written directly rather than
+# Same split as _build_local_entry(): each record's fixed-size, 46-byte
+# portion is filled with indexed writes into its own small buffer (sized
+# up front, faster than many small append_array() calls), and that
+# fixed part plus the entry's name are then added to the growing result
+# with append_array(), which measured faster than copying the name
+# byte-by-byte. As above, the per-record signature/version/flag bytes
+# and the always-zero fields are written directly rather than
 # recomputed from the constants each time.
 static func _build_central_directory_and_eocd(records: Array, central_dir_offset: int) -> PoolByteArray:
-	var central_dir_size := 0
-	for rec in records:
-		var name_bytes: PoolByteArray = rec.name_bytes
-		central_dir_size += 46 + name_bytes.size()
-
 	var out := PoolByteArray()
-	out.resize(central_dir_size + _EOCD_FIXED_SIZE)
 
-	var p := 0
 	for rec in records:
 		var name_bytes: PoolByteArray = rec.name_bytes
 		var name_len := name_bytes.size()
@@ -541,82 +535,87 @@ static func _build_central_directory_and_eocd(records: Array, central_dir_offset
 		var uncomp_size: int = rec.uncomp_size
 		var offset: int = rec.offset
 
-		out[p] = 0x50 # central file header signature (_CENTRAL_DIR_SIG), fixed
-		out[p + 1] = 0x4b
-		out[p + 2] = 0x01
-		out[p + 3] = 0x02
-		out[p + 4] = 20   # version made by (_VERSION_NEEDED = 20), fixed
-		out[p + 5] = 0
-		out[p + 6] = 20   # version needed (_VERSION_NEEDED = 20), fixed
-		out[p + 7] = 0
-		out[p + 8] = 0x00 # general purpose flag (_FLAG_UTF8 = 0x0800), fixed
-		out[p + 9] = 0x08
-		out[p + 10] = method & 0xFF
-		out[p + 11] = (method >> 8) & 0xFF
-		out[p + 12] = mod_time & 0xFF
-		out[p + 13] = (mod_time >> 8) & 0xFF
-		out[p + 14] = mod_date & 0xFF
-		out[p + 15] = (mod_date >> 8) & 0xFF
-		out[p + 16] = crc & 0xFF
-		out[p + 17] = (crc >> 8) & 0xFF
-		out[p + 18] = (crc >> 16) & 0xFF
-		out[p + 19] = (crc >> 24) & 0xFF
-		out[p + 20] = comp_size & 0xFF
-		out[p + 21] = (comp_size >> 8) & 0xFF
-		out[p + 22] = (comp_size >> 16) & 0xFF
-		out[p + 23] = (comp_size >> 24) & 0xFF
-		out[p + 24] = uncomp_size & 0xFF
-		out[p + 25] = (uncomp_size >> 8) & 0xFF
-		out[p + 26] = (uncomp_size >> 16) & 0xFF
-		out[p + 27] = (uncomp_size >> 24) & 0xFF
-		out[p + 28] = name_len & 0xFF
-		out[p + 29] = (name_len >> 8) & 0xFF
-		out[p + 30] = 0 # extra field length, always 0
-		out[p + 31] = 0
-		out[p + 32] = 0 # file comment length, always 0
-		out[p + 33] = 0
-		out[p + 34] = 0 # disk number start, always 0
-		out[p + 35] = 0
-		out[p + 36] = 0 # internal file attributes, always 0
-		out[p + 37] = 0
-		out[p + 38] = 0 # external file attributes, always 0
-		out[p + 39] = 0
-		out[p + 40] = 0
-		out[p + 41] = 0
-		out[p + 42] = offset & 0xFF
-		out[p + 43] = (offset >> 8) & 0xFF
-		out[p + 44] = (offset >> 16) & 0xFF
-		out[p + 45] = (offset >> 24) & 0xFF
+		var fixed := PoolByteArray()
+		fixed.resize(46)
+		fixed[0] = 0x50 # central file header signature (_CENTRAL_DIR_SIG), fixed
+		fixed[1] = 0x4b
+		fixed[2] = 0x01
+		fixed[3] = 0x02
+		fixed[4] = 20   # version made by (_VERSION_NEEDED = 20), fixed
+		fixed[5] = 0
+		fixed[6] = 20   # version needed (_VERSION_NEEDED = 20), fixed
+		fixed[7] = 0
+		fixed[8] = 0x00 # general purpose flag (_FLAG_UTF8 = 0x0800), fixed
+		fixed[9] = 0x08
+		fixed[10] = method & 0xFF
+		fixed[11] = (method >> 8) & 0xFF
+		fixed[12] = mod_time & 0xFF
+		fixed[13] = (mod_time >> 8) & 0xFF
+		fixed[14] = mod_date & 0xFF
+		fixed[15] = (mod_date >> 8) & 0xFF
+		fixed[16] = crc & 0xFF
+		fixed[17] = (crc >> 8) & 0xFF
+		fixed[18] = (crc >> 16) & 0xFF
+		fixed[19] = (crc >> 24) & 0xFF
+		fixed[20] = comp_size & 0xFF
+		fixed[21] = (comp_size >> 8) & 0xFF
+		fixed[22] = (comp_size >> 16) & 0xFF
+		fixed[23] = (comp_size >> 24) & 0xFF
+		fixed[24] = uncomp_size & 0xFF
+		fixed[25] = (uncomp_size >> 8) & 0xFF
+		fixed[26] = (uncomp_size >> 16) & 0xFF
+		fixed[27] = (uncomp_size >> 24) & 0xFF
+		fixed[28] = name_len & 0xFF
+		fixed[29] = (name_len >> 8) & 0xFF
+		fixed[30] = 0 # extra field length, always 0
+		fixed[31] = 0
+		fixed[32] = 0 # file comment length, always 0
+		fixed[33] = 0
+		fixed[34] = 0 # disk number start, always 0
+		fixed[35] = 0
+		fixed[36] = 0 # internal file attributes, always 0
+		fixed[37] = 0
+		fixed[38] = 0 # external file attributes, always 0
+		fixed[39] = 0
+		fixed[40] = 0
+		fixed[41] = 0
+		fixed[42] = offset & 0xFF
+		fixed[43] = (offset >> 8) & 0xFF
+		fixed[44] = (offset >> 16) & 0xFF
+		fixed[45] = (offset >> 24) & 0xFF
 
-		for i in range(name_len):
-			out[p + 46 + i] = name_bytes[i]
+		out.append_array(fixed)
+		out.append_array(name_bytes)
 
-		p += 46 + name_len
-
+	var central_dir_size := out.size()
 	var count := records.size()
-	out[p] = 0x50 # end of central directory signature (_EOCD_SIG), fixed
-	out[p + 1] = 0x4b
-	out[p + 2] = 0x05
-	out[p + 3] = 0x06
-	out[p + 4] = 0 # number of this disk, always 0
-	out[p + 5] = 0
-	out[p + 6] = 0 # disk where central directory starts, always 0
-	out[p + 7] = 0
-	out[p + 8] = count & 0xFF
-	out[p + 9] = (count >> 8) & 0xFF
-	out[p + 10] = count & 0xFF
-	out[p + 11] = (count >> 8) & 0xFF
-	out[p + 12] = central_dir_size & 0xFF
-	out[p + 13] = (central_dir_size >> 8) & 0xFF
-	out[p + 14] = (central_dir_size >> 16) & 0xFF
-	out[p + 15] = (central_dir_size >> 24) & 0xFF
-	out[p + 16] = central_dir_offset & 0xFF
-	out[p + 17] = (central_dir_offset >> 8) & 0xFF
-	out[p + 18] = (central_dir_offset >> 16) & 0xFF
-	out[p + 19] = (central_dir_offset >> 24) & 0xFF
-	out[p + 20] = 0 # zip comment length, always 0
-	out[p + 21] = 0
 
+	var eocd := PoolByteArray()
+	eocd.resize(_EOCD_FIXED_SIZE)
+	eocd[0] = 0x50 # end of central directory signature (_EOCD_SIG), fixed
+	eocd[1] = 0x4b
+	eocd[2] = 0x05
+	eocd[3] = 0x06
+	eocd[4] = 0 # number of this disk, always 0
+	eocd[5] = 0
+	eocd[6] = 0 # disk where central directory starts, always 0
+	eocd[7] = 0
+	eocd[8] = count & 0xFF
+	eocd[9] = (count >> 8) & 0xFF
+	eocd[10] = count & 0xFF
+	eocd[11] = (count >> 8) & 0xFF
+	eocd[12] = central_dir_size & 0xFF
+	eocd[13] = (central_dir_size >> 8) & 0xFF
+	eocd[14] = (central_dir_size >> 16) & 0xFF
+	eocd[15] = (central_dir_size >> 24) & 0xFF
+	eocd[16] = central_dir_offset & 0xFF
+	eocd[17] = (central_dir_offset >> 8) & 0xFF
+	eocd[18] = (central_dir_offset >> 16) & 0xFF
+	eocd[19] = (central_dir_offset >> 24) & 0xFF
+	eocd[20] = 0 # zip comment length, always 0
+	eocd[21] = 0
+
+	out.append_array(eocd)
 	return out
 
 

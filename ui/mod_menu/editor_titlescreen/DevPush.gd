@@ -39,7 +39,7 @@ onready var confirm = $ConfirmationDialog
 onready var pointers :HevLibPointers= ModLoader._savedObjects[0]
 
 func _ready():
-	var property:String = str(pointers.ManifestV2.__get_mod_data(true).hash())
+	var property:String = str(pointers.ManifestV2.__get_mod_data().hash())
 	label.text = property
 	button.connect("pressed",self,"popup_confirmation")
 	confirm.connect("confirmed",self,"send_msg")
