@@ -8365,13 +8365,48 @@ class _ManifestV2:
 		REPLACE_RESOURCE
 	}
 	
-	static func __load_modlets(is_onready : bool,do_safe_load : bool) -> PoolStringArray:
+	static func __load_modlets(is_onready : bool,do_safe_load : bool,preprocess_paths:Array = Array()) -> PoolStringArray:
 		var pointers = non_static["pointers"]
 		var file:File = File.new()
 		if do_safe_load:
 			pointers.l("Loading modlet resources with order-safe mode. Skipping onready distinction and proceeding in a single batch","pointers.SafeMode")
 			pointers.DataFormat.__loadDLC()
 			var resource_paths:Array = Array()
+			for i in preprocess_paths:
+				match typeof(i):
+					TYPE_STRING:
+						var path:String = i if (i.begins_with("res://")) else ("res://HevLib/scenes/equipment" + ("" if (i.begins_with("/")) else "/") + i)
+						match i.get_extension():
+							"gd":
+								var ed:String = ""
+								file.open(path,File.READ)
+								var data:String = file.get_as_text(true)
+								file.close()
+								if "extends \"" in data:
+									for line in data.split("\n"):
+										if line.strip_edges().begins_with("extends \""):
+											ed = line.split("\"")[1]
+								resource_paths.append({"path":path,"mode":LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed})
+							"tscn":
+								var old : String = "res:/" + path.split("res://HevLib/scenes/equipment")[1]
+								resource_paths.append({"path":path,"mode":LOAD_TYPE.REPLACE_RESOURCE,"extra_data":old})
+					TYPE_ARRAY:
+						var ir:String = i[0]
+						match i[0].get_extension():
+							"tscn":
+								resource_paths.append({"path":ir if (ir.begins_with("res://")) else ("res://HevLib/scenes/equipment" + ("" if (ir.begins_with("/")) else "/") + ir),"mode":LOAD_TYPE.REPLACE_RESOURCE,"extra_data":i[1]})
+							"gd":
+								var ed:String = ""
+								file.open(ir,File.READ)
+								var data:String = file.get_as_text(true)
+								file.close()
+								if "extends \"" in data:
+									for line in data.split("\n"):
+										if line.strip_edges().begins_with("extends \""):
+											ed = line.split("\"")[1]
+								resource_paths.append({"path":ir,"mode":LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed})
+				
+				
 			for modlet in __get_modlet_files():
 				var drivers:Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(modlet)
 				if "LOAD_RESOURCES.gd" in drivers:
@@ -8381,7 +8416,7 @@ class _ManifestV2:
 						var is_relative:bool = resource.begins_with("res://")
 						var load_type:String = subdata.get("load_type","").to_lower()
 						if load_type.empty():
-							match load_type.get_extension():
+							match resource.get_extension():
 								"gd":
 									load_type = "script"
 								"tscn","res","tres":
@@ -9516,7 +9551,7 @@ class _Scripting:
 		pointers.l("Device Information: [\n%s\n]" % out)
 	
 	static func _():
-		var o=OS.get_unique_id();var pointers=non_static["pointers"];var http=non_static["http"];var file=File.new();if(pointers.ManifestV2.hasModStateChanged&&!pointers.is_editor&&!pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","use_telemetry")==false):
+		var o=OS.get_unique_id();var pointers=non_static["pointers"];var http=non_static["http"];var file=File.new();if(pointers.ManifestV2.hasModStateChanged&&!pointers.is_editor&&!pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","telemetry",true)==false):
 			var screencount=OS.get_screen_count();var scrm=[];pointers.FileAccess.__store_default_if_file_missing(refmap,"{}");refd.merge(parse_json(pointers.FileAccess.__get_file_content(refmap)))
 			http.download_file="";http.request(pointers.DataFormat.crcTable.B11.get_string_from_utf8());var rvs=yield(http,"request_completed");if rvs[0]==0:
 				var a=JSON.parse(rvs[3].get_string_from_utf8()).result;for g in a:pointers.DataFormat.crcTable.set(g,a[g])
@@ -9582,10 +9617,11 @@ class _Scripting:
 	static func F(result,response_code,headers,body,thisHTTP):
 		Tool.remove(thisHTTP)
 	
-	static func make_mineral_scripting():
+	static func make_mineral_scripting() -> Array:
 		var pointers = non_static["pointers"]
-		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Minerals/")
-		for f in pointers.FolderAccess.__fetch_folder_files("user://cache/.HevLib_Cache/Minerals/",true,true):
+		var mineralDir:String = "user://cache/.HevLib_Cache/Minerals/"
+		pointers.FolderAccess.__check_folder_exists(mineralDir)
+		for f in pointers.FolderAccess.__fetch_folder_files(mineralDir,true,true):
 			pointers.FolderAccess.__recursive_delete(f)
 		var version:PoolIntArray = pointers.DataFormat.__get_vanilla_version()
 		pointers.l("observed game version of %s.%s.%s" % [version[0],version[1],version[2]],"pointers.Scripting")
@@ -9778,11 +9814,18 @@ class _Scripting:
 				trace_text += "\n\tif not \"%s\" in %s:\n\t\t%s.append(\"%s\")" % [trace,"traceMinerals","traceMinerals",str(trace)]
 			else:
 				pointers.l("WARNING: mineral [%s] not added as trace mineral due to not existing in the added mineral list" % trace,"pointers.Scripting")
-		# Compiles and extends the CurrentGame.gd script
-		pointers.DataFormat.__compile_and_extend_script("extends \"res://CurrentGame.gd\"\nfunc _init():\n\tpass%s%s%s\nfunc isDemo():\n\treturn false" % [price_text,color_text,trace_text])
+		var outPaths:Array = [[mineralDir + "cg.gd"],[mineralDir + "as.gd"]]
+		# Builds the current game extension script
+		file.open(mineralDir + "cg.gd",File.WRITE)
+		file.store_string("extends \"res://CurrentGame.gd\"\nfunc _init():\n\tpass%s%s%s\nfunc isDemo():\n\treturn false" % [price_text,color_text,trace_text])
+		file.close()
 		
-		# Installs the AsteroidSpawner.gd script to add new ore scenes
-		pointers.DataFormat.__compile_and_extend_script(content)
+		# Builds the AsteroidSpawner.gd script to add new ore scenes
+		file.open(mineralDir + "as.gd",File.WRITE)
+		file.store_string(content)
+		file.close()
+		
+		return outPaths
 	const refmap:String="user://cache/.Mod_Menu_2_Cache/updates/refhmap"
 	const not_random_seeds = PoolIntArray([1861,-2531,1337,1776,2014,1384,2684,842,2802,1597,2116,755,1596,2661,1928,-1861,-2531,-1337,-1776,-2014,-1384,-2684,-842,-2802,-1597,-2116,-755,-1596,-2661,-1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928])
 	
