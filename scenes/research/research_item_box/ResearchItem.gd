@@ -204,8 +204,8 @@ func initialize():
 	if pointers.FileAccess.__file_exists(display_path):
 		match display_mode:
 			"sprite":
-				match display_path.get_extension():
-					"png":
+				match display_path.get_extension().to_lower():
+					"png","jpg","jpeg","bmp","webp":
 						sprite_container.texture = pointers.FileAccess.__load_png(display_path)
 						sprite_container.visible = true
 						scene_container.visible = false

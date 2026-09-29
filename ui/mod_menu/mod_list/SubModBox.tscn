@@ -5,7 +5,6 @@
 [ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=3]
 [ext_resource path="res://HevLib/ui/fonts/courier_new/font-courierbold.tres" type="DynamicFont" id=4]
 
-
 [sub_resource type="StreamTexture" id=1]
 flags = 4
 load_path = "res://HevLib/ui/themes/icons/missing_icon.png.stex"
@@ -50,7 +49,6 @@ margin_top = 2.0
 margin_right = 216.0
 margin_bottom = 96.0
 size_flags_horizontal = 3
-alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="ModButton/VBoxContainer"]
 margin_right = 212.0

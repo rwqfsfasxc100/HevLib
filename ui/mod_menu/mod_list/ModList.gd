@@ -314,11 +314,11 @@ func _process(_delta):
 				var iconTexture = null
 				if ar["mod_icon"]["has_icon_file"]:
 					var icon_filepath = ar["mod_icon"]["icon_path"]
-					if icon_filepath.ends_with(".stex"):
+					if icon_filepath.get_extension().to_lower() == "stex":
 						var tex = StreamTexture.new()
 						tex.load_path = icon_filepath
 						iconTexture = tex
-					elif icon_filepath.ends_with(".png"):
+					elif icon_filepath.get_extension().to_lower() in pointers.SUPPORTED_IMAGE_EXTENSIONS:
 						iconTexture = pointers.FileAccess.__load_png(icon_filepath)
 				else:
 					var tex = StreamTexture.new()

@@ -112,12 +112,12 @@ func _pressed():
 	information_nodes["info_priority"].text = translateIfCan("HEVLIB_MODMENU_PRIO") % prio
 	var iconTexture = null
 	if MOD_INFO["mod_icon"]["has_icon_file"]:
-		var icon_filepath = MOD_INFO["mod_icon"]["icon_path"]
-		if icon_filepath.ends_with(".stex"):
-			var tex = StreamTexture.new()
+		var icon_filepath:String = MOD_INFO["mod_icon"]["icon_path"]
+		if icon_filepath.get_extension().to_lower() == "stex":
+			var tex:StreamTexture = StreamTexture.new()
 			tex.load_path = icon_filepath
 			iconTexture = tex
-		elif icon_filepath.ends_with(".png"):
+		elif icon_filepath.get_extension().to_lower() in pointers.SUPPORTED_IMAGE_EXTENSIONS:
 			iconTexture = pointers.FileAccess.__load_png(icon_filepath)
 	else:
 		var tex = StreamTexture.new()
@@ -430,17 +430,18 @@ func _ready():
 		var pname = pdata["name"]
 		var iconTexture = null
 		if pdata["mod_icon"]["has_icon_file"]:
-			var icon_filepath = pdata["mod_icon"]["icon_path"]
-			if icon_filepath.ends_with(".stex"):
+			var icon_filepath:String = pdata["mod_icon"]["icon_path"]
+			if icon_filepath.get_extension().to_lower() == "stex":
 				var tex = StreamTexture.new()
 				tex.load_path = icon_filepath
 				iconTexture = tex
-			elif icon_filepath.ends_with(".png"):
+			elif icon_filepath.get_extension().to_lower() in pointers.SUPPORTED_IMAGE_EXTENSIONS:
 				iconTexture = pointers.FileAccess.__load_png(icon_filepath)
 		else:
 			var tex = StreamTexture.new()
 			tex.load_path = "res://HevLib/ui/themes/icons/missing_icon.png.stex"
 			iconTexture = tex
+		panel.get_node("Icon").texture = iconTexture
 		panel.get_node("ModButton/VBoxContainer/HBoxContainer/LABELS/NAME").text = translateIfCan(pname)
 		if pdata["manifest"]["has_manifest"]:
 			panel.get_node("ModButton/VBoxContainer/HBoxContainer/LABELS/BRIEF").text = translateIfCan(pdata["manifest"]["manifest_data"]["mod_information"]["brief"])
@@ -548,12 +549,12 @@ func _draw():
 	var version_print = MOD_INFO["version_data"]["full_version_string"]
 	var iconTexture = null
 	if MOD_INFO["mod_icon"]["has_icon_file"]:
-		var icon_filepath = MOD_INFO["mod_icon"]["icon_path"]
-		if icon_filepath.ends_with(".stex"):
+		var icon_filepath:String = MOD_INFO["mod_icon"]["icon_path"]
+		if icon_filepath.get_extension().to_lower() == "stex":
 			var tex = StreamTexture.new()
 			tex.load_path = icon_filepath
 			iconTexture = tex
-		elif icon_filepath.ends_with(".png"):
+		elif icon_filepath.get_extension().to_lower() in pointers.SUPPORTED_IMAGE_EXTENSIONS:
 			iconTexture = pointers.FileAccess.__load_png(icon_filepath)
 	else:
 		var tex = StreamTexture.new()

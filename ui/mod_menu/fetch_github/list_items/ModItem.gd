@@ -110,7 +110,7 @@ func icon_announcement(u):
 	if u == user_icon_uuid:
 		set_icon_to(unique_icon)
 func set_icon_to(path):
-	get_node("ICON").texture = pointers.FileAccess.__load_png(path)
+	get_node("ICON").texture = pointers.FileAccess.__load_png(path,get_node("ICON").texture.get_data())
 
 var is_downloading = false
 var this_zip_filename = ""

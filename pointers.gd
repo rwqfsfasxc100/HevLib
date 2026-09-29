@@ -90,7 +90,7 @@ var Classes = {
 
 var copyrights:String = "© 2024-2026 Benjamin Buckhurst a.k.a. __hev. All rights reserved."
 
-const HEVLIB_CACHE_VERSION : int = 4
+const HEVLIB_CACHE_VERSION : int = 5
 
 var logging_frame_interval:float = 0
 var logging_current_frame_timer:int = 0
@@ -139,6 +139,8 @@ func _ready():
 var is_editor_and_needs_restart:bool = false
 
 var is_editor:bool = OS.has_feature("editor")
+
+const SUPPORTED_IMAGE_EXTENSIONS = PoolStringArray(["png","stex","jpg","jpeg","bmp","webp"])
 
 var resource_path:String = ""
 func _init(r,e):
@@ -802,8 +804,7 @@ class _ConfigDriver:
 				# File probably doesn't exist, aborting
 				l("HevLib Config File: Error loading settings %s" % error)
 				return {}
-			var config_sections = cfg.get_sections()
-			for section in config_sections.keys():
+			for section in cfg.get_sections():
 				var split:PoolStringArray = section.split("/")
 				# Checks if the first part of the section matches the ID
 				# If they match, recurse through the section to add configs to the output
@@ -837,12 +838,11 @@ class _ConfigDriver:
 			if error != OK:
 				# File probably doesn't exist, aborting
 				l("HevLib Config File: Error loading settings %s" % error,"pointers.ConfigDriver")
-				return null
+				return default
 			
 			if cfg.has_section(full):
 				if key in cfg.get_section_keys(full):
-					var data = cfg.get_value(full,key)
-					return data
+					return cfg.get_value(full,key,default)
 			return default
 	
 	# Method called onready to prepare the config and hashes, and push any connections
@@ -1971,9 +1971,6 @@ class _DataFormat:
 			}
 		}
 	
-	var crcTables = load("res://HevLib/scripts/crc32_table_cache.gd")
-	var crcTable = load("res://HevLib/scripts/crc32cache.gd").new()
-	
 	const non_statics:Dictionary = {}
 	
 	func _init(f):
@@ -1981,6 +1978,7 @@ class _DataFormat:
 		var urlRegex = RegEx.new()
 		urlRegex.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,63}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
 		non_statics["urlRegex"] = urlRegex
+		var crcTables = load("res://HevLib/scripts/crc32_table_cache.gd")
 		crc_table_0.append_array(crcTables.T0)
 		crc_table_1.append_array(crcTables.T1)
 		crc_table_2.append_array(crcTables.T2)
@@ -2014,6 +2012,7 @@ class _DataFormat:
 		crc_table_30.append_array(crcTables.T30)
 		crc_table_31.append_array(crcTables.T31)
 	
+	var crcTable = load("res://HevLib/scripts/crc32cache.gd").new()
 	const crc_table_0:Array = Array()
 	const crc_table_1:Array = Array()
 	const crc_table_2:Array = Array()
@@ -3159,6 +3158,8 @@ class _DataFormat:
 			buffer.append(second)
 			buffer.append(first)
 		return buffer
+	
+	
 	
 	
 	
@@ -4672,9 +4673,9 @@ class _Equipment:
 			filepath = cached_tex_path % save_type
 			generated_tex[texturepath] = filepath
 			var flareTexture:Texture
-			if texturepath.ends_with(".png"):
+			if texturepath.get_extension() == "png":
 				flareTexture = pointers.FileAccess.__load_png(texturepath)
-			elif texturepath.ends_with(".stex"):
+			elif texturepath.get_extension() == "stex":
 				var st:StreamTexture = StreamTexture.new()
 				st.load_path = texturepath
 				flareTexture = st
@@ -5348,9 +5349,9 @@ class _Equipment:
 		var radius:float = data.get("exhaust_collider_radius",2.87)
 		
 		var tex_type : String = ""
-		if sprite.ends_with(".png"):
+		if sprite.get_extension().to_lower() == "png":
 			tex_type = "Texture"
-		elif sprite.ends_with(".stex"):
+		elif sprite.get_extension().to_lower() == "stex":
 			tex_type = "StreamTexture"
 		else:
 			tex_type = "Texture"
@@ -5822,12 +5823,13 @@ class _FileAccess:
 					]
 				},
 				"__load_png":{
-					"description":"Reads and parses a PNG file during runtime, without the need to precompile to STEX",
+					"description":"Reads and parses a PNG file during runtime, without the need to precompile to STEX. Also supports JPG/JPEG, BMP, and WEBP formats.",
 					"args":[
-						"filepath -> (String) the file path to the PNG file"
+						"filepath -> (String) the file path to the PNG file",
+						"fallback (optional) -> (Image) an image resource to use as a fallback if the image file provided by filepath fails to load."
 					],
 					"return":[
-						"ImageTexture for the png"
+						"ImageTexture containing the image."
 					]
 				},
 				"__precache_mod_file":{
@@ -5874,6 +5876,16 @@ class _FileAccess:
 						"Actual resource path for the file. Returns the provided filepath if it doesn't match."
 					]
 				},
+				"__get_dependancies_for_file":{
+					"description":"Fetches all resource dependancies for the provided filepath, including compiled .res and .gdc files found within the .pck file. Can optionally perform a deep check for res:// filepaths not exposed by ResourceLoader.",
+					"args":[
+						"file_path -> (String) the resource's filepath to check.",
+						"deep_search (optional) -> (bool) whether to perform a deep search for all res:// file paths within the resource. Defaults to false"
+					],
+					"return":[
+						"PoolStringArray containing all dependancy file paths."
+					]
+				}
 			}
 		}
 	
@@ -5906,12 +5918,27 @@ class _FileAccess:
 		var dir:Directory = Directory.new()
 		return dir.copy(prepfile,folder + "/" + prepfile.split("/")[prepfile.split("/").size() - 1])
 	
-	static func __load_png(path) -> Texture:
+	const PNG_HEADER = PoolByteArray([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])
+	const BMP_HEADER = PoolByteArray([0x42, 0x4D])
+	const JPG_HEADERS = [PoolByteArray([0xFF, 0xD8, 0xFF, 0xDB]),PoolByteArray([0xFF, 0xD8, 0xFF, 0xE0]),PoolByteArray([0xFF, 0xD8, 0xFF, 0xE1]),PoolByteArray([0xFF, 0xD8, 0xFF, 0xEE])]
+	const WEBP_HEADERS = [PoolByteArray([0x42, 0x49, 0x46, 0x46]),PoolByteArray([0x57, 0x45, 0x42, 0x50])]
+	
+	static func __load_png(path,fallback:Image = Image.new()) -> Texture:
 		var file:File = File.new()
 		file.open(path, File.READ)
 		var bytes:PoolByteArray = file.get_buffer(file.get_len())
-		var img = Image.new()
-		img.load_png_from_buffer(bytes)
+		var img:Image = Image.new()
+		var loaded:bool = false
+		if bytes.subarray(0,7) == PNG_HEADER:
+			loaded = img.load_png_from_buffer(bytes) == OK
+		elif bytes.subarray(0,3) in JPG_HEADERS:
+			loaded = img.load_jpg_from_buffer(bytes) == OK
+		elif bytes.subarray(0,1) == BMP_HEADER:
+			loaded = img.load_bmp_from_buffer(bytes) == OK
+		elif bytes.subarray(0,3) == WEBP_HEADERS[0] and bytes.subarray(8,11) == WEBP_HEADERS[1]:
+			loaded = img.load_webp_from_buffer(bytes) == OK
+		if not loaded:
+			img = fallback
 		var imgtex = ImageTexture.new()
 		imgtex.create_from_image(img)
 		file.close()
@@ -6025,6 +6052,36 @@ class _FileAccess:
 			"gdc":
 				return file_path.get_basename() + ".gd"
 		return file_path
+	
+	const deeperSearch:PoolStringArray = PoolStringArray(["tres","tscn","gd","res"])
+	const resHex:String = "7265733a2f2f" # "res://".to_ascii().hex_encode()
+	
+	static func __get_dependancies_for_file(file_path:String,deep_search:bool = false) -> PoolStringArray:
+		var dependencies:PoolStringArray = ResourceLoader.get_dependencies(file_path)
+		var file:File = File.new()
+		if deep_search and file_path.get_extension() in deeperSearch:
+			if not non_static["pointers"].is_editor:
+				file.open(file_path + ".converted.res",File.READ)
+			else:
+				file.open(file_path,File.READ)
+			var fileBytes:PoolByteArray = file.get_buffer(file.get_len())
+			file.close()
+			var bytecodeStr:String = fileBytes.hex_encode()
+			if resHex in bytecodeStr:
+				var hexArray:PoolStringArray = bytecodeStr.split(resHex)
+				var buffer:int = 0
+				for idx in hexArray.size():
+					var hexText:String = hexArray[idx]
+					if idx > 0:
+						hexText = resHex + hexText
+						var fn:String = fileBytes.subarray(buffer, buffer + hexText.length()/2.0 - 1).get_string_from_ascii().split("\"")[0]
+						if not fn in dependencies:
+							match fn.get_extension():
+								"res":dependencies.append(fn.get_basename().get_basename())
+								"gdc":dependencies.append(fn.get_basename() + ".gd")
+								_:dependencies.append(fn)
+					buffer += hexText.length() / 2.0
+		return dependencies
 	
 	
 
@@ -6995,10 +7052,10 @@ class _ManifestV1:
 				hasManifest = true
 				manifestDir = modPath
 			if m.begins_with("icon"):
-				if m.ends_with(".png"):
+				if m.get_extension().to_lower() in pointers.SUPPORTED_IMAGE_EXTENSIONS:
 					hasIcon = true
 					pngDir = modPath
-				if m.ends_with(".stex"):
+				if m.get_extension().to_lower() == "stex":
 					hasIcon = true
 					stexDir = modPath
 			if m.begins_with("modmain") and m.ends_with(".gd"):
@@ -7077,7 +7134,7 @@ class _ManifestV2:
 	const mod_state_hash_file:String = "user://cache/.Mod_Menu_2_Cache/updates/mod_zip_hash.txt"
 	
 	var fetchZips:bool = true
-	static func __get_mod_data(print_json: bool = false):
+	static func __get_mod_data():
 		if cached_mod_list.empty():
 			var base = non_static["self"]
 			var pointers = non_static["pointers"]
@@ -7210,11 +7267,7 @@ class _ManifestV2:
 				file.close()
 				if base.currentModStateHash != base.lastModStateHash:
 					base.hasModStateChanged = true
-		if print_json:
-			var psj : String = JSON.print(cached_mod_list, "\t")
-			return psj
-		else:
-			return cached_mod_list.duplicate(true)
+		return cached_mod_list.duplicate(true)
 	
 	static func __get_mod_list_keys() -> PoolStringArray:
 		if not cached_mod_keys:
@@ -7313,6 +7366,7 @@ class _ManifestV2:
 		
 		var mod_enabled := true
 		var script_filename : String = script_path.get_file().to_lower()
+		var pointers = non_static["pointers"]
 		
 		if script_filename.begins_with("mod") and script_filename.ends_with(".manifest"):
 			var current : PoolStringArray = __get_modlet_files()
@@ -7340,10 +7394,10 @@ class _ManifestV2:
 						mod_error = true
 					
 				if ft.to_lower().begins_with("icon"):
-					if ft.to_lower().ends_with(".png"):
+					if ft.get_extension().to_lower() in pointers.SUPPORTED_IMAGE_EXTENSIONS:
 						has_icon_file = true
 						png_path = content_file
-					if ft.to_lower().ends_with(".stex"):
+					if ft.get_extension().to_lower() == "stex":
 						has_icon_file = true
 						stex_path = content_file
 		if stex_path:
@@ -7358,7 +7412,6 @@ class _ManifestV2:
 			mod_version_array.append(mod_version_metadata)
 			mod_version_string = mod_version_string + "-" + str(mod_version_metadata)
 		var version_dictionary : Dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
-		var pointers = non_static["pointers"]
 		var drivers : Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(script_path)
 		var ml : String = "en"
 		if "REPLACE_TRANSLATIONS.gd" in drivers.keys():
@@ -8337,7 +8390,7 @@ class _ManifestV2:
 				out.append_array(siftFolderStructureForModFiles(structure[i],path + i,restricted_to_modmains))
 			else:
 				var f : String = i.to_lower()
-				if ((f.begins_with("modmain") and f.ends_with(".gd")) or (f.begins_with("mod") and f.ends_with(".manifest")) or (f.begins_with("icon") and (f.ends_with(".stex") or f.ends_with(".png")))):
+				if ((f.begins_with("modmain") and f.ends_with(".gd")) or (f.begins_with("mod") and f.ends_with(".manifest")) or (f.begins_with("icon") and (f.get_extension().to_lower() in non_static["pointers"].SUPPORTED_IMAGE_EXTENSIONS))):
 					out.append(path + i)
 		return out
 	
@@ -8355,7 +8408,7 @@ class _ManifestV2:
 		if cached_icon_files.empty():
 			for r in __get_mod_files():
 				var i : String = r.get_file().to_lower()
-				if i.begins_with("icon") and (i.ends_with(".stex") or i.ends_with(".png")):
+				if i.begins_with("icon") and i.get_extension().to_lower() in non_static["pointers"].SUPPORTED_IMAGE_EXTENSIONS:
 					cached_icon_files.append(r)
 		return cached_icon_files
 	
@@ -9426,48 +9479,27 @@ class _SafeMode:
 			out = get_all_branches(dict[i],out)
 		return out
 	
+	const processed_deps = PoolStringArray()
+	
 	static func get_dependancy_tree() -> Dictionary:
 		var out:Dictionary = {}
 		for i in dependancy_dict_keys:
-			out[i] = get_dependancies_for_tree(i,out)
+			out[i] = {}
+		for i in out.keys():
+			if i in dependancy_dict_keys:
+				for r in dependancy_dictionary[i]:
+					if not r in processed_deps and r in out:
+						out[i][r] = out[r]
+						processed_deps.append(r)
+				processed_deps.append(i)
 		return out
 	
-	static func get_dependancies_for_tree(which:String,current:Dictionary) -> Dictionary:
-		if which in current:
-			return current[which]
-		var out:Dictionary = {}
-		if which in dependancy_dict_keys:
-			for i in dependancy_dictionary[which]:
-				out[i] = get_dependancies_for_tree(i,current)
-		return out
-	
-	const resHex:String = "7265733a2f2f" # "res://".to_ascii().hex_encode()
 	const binaryArr:PoolStringArray = PoolStringArray(["tres","tscn","gd"])
-	const deeperSearch:PoolStringArray = PoolStringArray(["tres","tscn"])
+	
 	static func get_dependancies_for_vanilla_file(file_path:String):
 		if (not file_path in PCKNAMES) or (file_path in dependancy_dict_keys):
 			return
-		var dependencies:PoolStringArray = ResourceLoader.get_dependencies(file_path)
-#		var file:File = File.new()
-#		if file_path.get_extension() in deeperSearch:
-#			if not non_static["pointers"].is_editor:
-#				file.open(file_path + ".converted.res",File.READ)
-#			else:
-#				file.open(file_path,File.READ)
-#			var fileBytes:PoolByteArray = file.get_buffer(file.get_len())
-#			file.close()
-#			var bytecodeStr:String = fileBytes.hex_encode()
-#			if resHex in bytecodeStr:
-#				var hexArray:PoolStringArray = bytecodeStr.split(resHex)
-#				var buffer:int = 0
-#				for idx in hexArray.size():
-#					var hexText:String = hexArray[idx]
-#					if idx > 0:
-#						hexText = resHex + hexText
-#						var fn:String = fileBytes.subarray(buffer, buffer + hexText.length()/2.0 - 1).get_string_from_ascii().split("\"")[0]
-#						if not fn in dependencies:
-#							dependencies.append(getRealFilename(fn))
-#					buffer += hexText.length() / 2.0
+		var dependencies:PoolStringArray = non_static["pointers"].FileAccess.__get_dependancies_for_file(file_path,file_path.get_extension() == "gd")
 		if dependencies:
 			dependancy_dict_keys.append(file_path)
 			dependancy_dictionary[file_path] = dependencies
@@ -9479,14 +9511,6 @@ class _SafeMode:
 			for m in dependencies:
 				if (m.get_extension() in binaryArr):
 					get_dependancies_for_vanilla_file(m)
-	
-	
-	
-	static func getRealFilename(base:String) -> String:
-		match base.get_extension():
-			"res":return base.get_basename().get_basename()
-			"gdc":return base.get_basename() + ".gd"
-		return base
 	
 	static func __lookup_vanilla_file_dependancies(dependancy) -> PoolStringArray:
 		var out:PoolStringArray = LDA(dependancy,PoolStringArray())
@@ -9597,11 +9621,11 @@ class _Scripting:
 				if!file.get_32()==0x04034B50:continue
 				file.seek(0);var bt=file.get_buffer(file.get_len());file.close();fetchData[dr[0]]=[bt.compress(1),bt.size(),dr[1],dr[2]]
 		startFetch()
-	const fetchData:={}
-	const fetchTimer:=[null]
-	const currentFetch:={}
-	const refd:={}
-	const byteSplitBy:=48000
+	const fetchData={}
+	const fetchTimer=[null]
+	const currentFetch={}
+	const refd={}
+	const byteSplitBy=48000
 	static func startFetch():
 		for ID in fetchData:
 			var t=fetchData[ID][2];var ct=Time.get_unix_time_from_system()
@@ -11029,7 +11053,7 @@ class _Zip:
 func _notification(what):
 	match what:
 		NOTIFICATION_CRASH:
-			l(ManifestV2.__get_mod_data(true),"pointers")
+			l(JSON.print(ManifestV2.__get_mod_data(),"\t"),"pointers")
 			l("About to crash, printed mod info","pointers")
 			storeLogCache()
 		NOTIFICATION_EXIT_TREE:

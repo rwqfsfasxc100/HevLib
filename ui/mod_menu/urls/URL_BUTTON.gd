@@ -40,11 +40,11 @@ var icon_path = "res://HevLib/ui/themes/icons/alias.stex"
 func _ready():
 	$Button/Label.text = text
 	var tex
-	match icon_path.get_extension():
+	match icon_path.get_extension().to_lower():
 		"stex":
 			tex = StreamTexture.new()
 			tex.load_path = icon_path
-		"png":
+		"png","jpg","jpeg","bmp","webp":
 			tex = ModLoader._savedObjects[0].DataFormat.__load_png(icon_path)
 	$Control/TextureRect.texture = tex
 	$Button.hint_tooltip = tooltip
