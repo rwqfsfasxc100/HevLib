@@ -1,3 +1,8 @@
+[1.16.17]
+
+1=* Fixed issue that prevented some scripts from having a deep dependency search
+2=* Fixed issue with several core scripts not being able to load due to `File` not being able to properly traverse for whatever reason.
+
 [1.16.16]
 
 1=* Added ability to provide the pointers node to the script shadow creation tool, if it's ran before the onready phase

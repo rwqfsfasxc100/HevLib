@@ -6060,10 +6060,13 @@ class _FileAccess:
 		var dependencies:PoolStringArray = ResourceLoader.get_dependencies(file_path)
 		var file:File = File.new()
 		if deep_search and file_path.get_extension() in deeperSearch:
+			var nfp:String = file_path
 			if not non_static["pointers"].is_editor:
-				file.open(file_path + ".converted.res",File.READ)
-			else:
-				file.open(file_path,File.READ)
+				if file_path.get_extension().to_lower() == "gd":
+					nfp = file_path.get_basename() + ".gdc"
+				else:
+					nfp += ".converted.res"
+			file.open(nfp,File.READ)
 			var fileBytes:PoolByteArray = file.get_buffer(file.get_len())
 			file.close()
 			var bytecodeStr:String = fileBytes.hex_encode()
@@ -9495,11 +9498,12 @@ class _SafeMode:
 		return out
 	
 	const binaryArr:PoolStringArray = PoolStringArray(["tres","tscn","gd"])
+	const deepSearchFor = PoolStringArray(["gd","gdc"])
 	
 	static func get_dependancies_for_vanilla_file(file_path:String):
 		if (not file_path in PCKNAMES) or (file_path in dependancy_dict_keys):
 			return
-		var dependencies:PoolStringArray = non_static["pointers"].FileAccess.__get_dependancies_for_file(file_path,file_path.get_extension() == "gd")
+		var dependencies:PoolStringArray = non_static["pointers"].FileAccess.__get_dependancies_for_file(file_path,file_path.get_extension() in deepSearchFor)
 		if dependencies:
 			dependancy_dict_keys.append(file_path)
 			dependancy_dictionary[file_path] = dependencies

@@ -84,40 +84,40 @@ func _init(modLoader : ModLoader = ModLoader):
 	
 #	testing()
 	
-	var files_to_load:Array = ["../notification_driver/CurrentGame.gd"]
+	var files_to_load:Array = [["res://HevLib/scenes/notification_driver/CurrentGame.gd"]]
 	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk"):
-		files_to_load.append("../minerals/multiminerals/mineral.gd")
-		files_to_load.append("../minerals/multiminerals/MineralProcessingUnit.gd")
-		files_to_load.append("../minerals/multiminerals/AsteroidSpawner.gd")
+		files_to_load.append(["res://HevLib/scenes/minerals/multiminerals/mineral.gd"])
+		files_to_load.append(["res://HevLib/scenes/minerals/multiminerals/MineralProcessingUnit.gd"])
+		files_to_load.append(["res://HevLib/scenes/minerals/multiminerals/AsteroidSpawner.gd"])
 	
 	# Bind button display modifications
-	files_to_load.append("../keymapping/bind_displays/AnalogAxisDisplay.gd")
-	files_to_load.append("../keymapping/bind_displays/GamepadKeybindDisplay.gd")
-	files_to_load.append("../keymapping/bind_displays/KeybindDisplay.gd")
-	files_to_load.append("../keymapping/bind_displays/MousebindDisplay.gd")
-	files_to_load.append("../../scripts/SteamWebAPI.gd")
+	files_to_load.append(["res://HevLib/scenes/keymapping/bind_displays/AnalogAxisDisplay.gd"])
+	files_to_load.append(["res://HevLib/scenes/keymapping/bind_displays/GamepadKeybindDisplay.gd"])
+	files_to_load.append(["res://HevLib/scenes/keymapping/bind_displays/KeybindDisplay.gd"])
+	files_to_load.append(["res://HevLib/scenes/keymapping/bind_displays/MousebindDisplay.gd"])
+	files_to_load.append(["res://HevLib/scripts/SteamWebAPI.gd"])
 	
-	files_to_load.append("../../ui/ExtensionPopup.gd")
-	files_to_load.append("../scene_replacements/DLClist.gd")
-	files_to_load.append(["../scene_replacements/DLClist.tscn","res://tools/DLClist.tscn"])
+	files_to_load.append(["res://HevLib/ui/ExtensionPopup.gd"])
+	files_to_load.append(["res://HevLib/scenes/scene_replacements/DLClist.gd"])
+	files_to_load.append(["res://HevLib/scenes/scene_replacements/DLClist.tscn","res://tools/DLClist.tscn"])
 
-	files_to_load.append("../better_title_screen/CurrentlyPlaying.gd")
+	files_to_load.append(["res://HevLib/scenes/better_title_screen/CurrentlyPlaying.gd"])
 	
-	files_to_load.append("../minerals/AstrogatorPanel.gd")
-	files_to_load.append("../minerals/OMS.gd")
-	files_to_load.append("../minerals/CargoScanner.gd")
-	files_to_load.append("../minerals/ProcessedCargoManifest.gd")
+	files_to_load.append(["res://HevLib/scenes/minerals/AstrogatorPanel.gd"])
+	files_to_load.append(["res://HevLib/scenes/minerals/OMS.gd"])
+	files_to_load.append(["res://HevLib/scenes/minerals/CargoScanner.gd"])
+	files_to_load.append(["res://HevLib/scenes/minerals/ProcessedCargoManifest.gd"])
 	
 	files_to_load.append_array(pointers.Scripting.make_mineral_scripting())
 
-	files_to_load.append(["../../events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn"])
-	files_to_load.append("../../events/controls/CurrentGame.gd")
-	files_to_load.append("../../events/controls/ship-ctrl.gd")
-	files_to_load.append("../../events/controls/camera.gd")
+	files_to_load.append(["res://HevLib/events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn"])
+	files_to_load.append(["res://HevLib/events/controls/CurrentGame.gd"])
+	files_to_load.append(["res://HevLib/events/controls/ship-ctrl.gd"])
+	files_to_load.append(["res://HevLib/events/controls/camera.gd"])
 	
-	files_to_load.append("../research/Enceladus.gd")
+	files_to_load.append(["res://HevLib/scenes/research/Enceladus.gd"])
 	
-	files_to_load.append("../../scripts/Namer.gd")
+	files_to_load.append(["res://HevLib/scripts/Namer.gd"])
 
 	files_to_load.append("ThrusterSlot.gd")
 	files_to_load.append("SystemShipUpgradeUI.gd")
@@ -125,12 +125,12 @@ func _init(modLoader : ModLoader = ModLoader):
 	files_to_load.append("UpgradeGroup.gd")
 	files_to_load.append("hardpoints/EquipmentItemTemplate.gd")
 
-	files_to_load.append("../weaponslot/weapon_slot_handler.gd")
+	files_to_load.append(["res://HevLib/scenes/weaponslot/weapon_slot_handler.gd"])
 
 	files_to_load.append("ShipModificationDriver/AddNodes.gd")
 	files_to_load.append("ShipModificationDriver/InternalStorageMod.gd")
 
-	files_to_load.append("../better_title_screen/SaveSlotButton.gd")
+	files_to_load.append(["res://HevLib/scenes/better_title_screen/SaveSlotButton.gd"])
 	if not do_safe_load:
 		for i in files_to_load:
 			match typeof(i):
