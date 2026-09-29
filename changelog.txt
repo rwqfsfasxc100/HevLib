@@ -1,3 +1,23 @@
+[1.16.16]
+
+1=* Added ability to provide the pointers node to the script shadow creation tool, if it's ran before the onready phase
+2=* Updated HevLib's initialization phase modifications to funnel through the load reordering code if it's enabled
+3=* Fixed update display not properly resetting text when downloading multiple mods
+4=* Removed `parse_json` argument in `ManifestV2`.`__get_mod_data` to ensure proper output. Now must be done externally (i.e. `JSON.print(pointers.ManifestV2.__get_mod_data(),"\t")`)
+5=* Fixed crash caused by incorrectly assumed code within the edge-case fallback handling for the `__get_config` and `__get_value` methods in the `ConfigDriver` class.
+6=* Added support for JPEG, BMP, and WEBP image formats within `FileAccess`.`__load_png`.
+7=* Added fallback option for `FileAccess`.`__load_png`, where you can pass an `Image` resource to be handled in the event that the file could not be loaded.
+8=* Added `FileAccess`.`__get_dependancies_for_file`
+8.1=* Provides a PoolStringArray containing all resource file paths that the provided file needs.
+8.2=* `file_path` -> (String) the resource's filepath to check.
+8.3=* `deep_search` (optional) -> (bool) whether to perform a deep search for all res:// file paths within the resource. Defaults to false
+9=* Fixed resource load order processing being not able to see script preloads.
+9.1=* This is a limitation of `ResourceLoader.get_dependencies`, which does not appear to be able to see all preloads.
+9.2=* This change will add roughly 2 seconds of load time for every time the load order cache would need to be rebuilt.
+10=* Added support for JPEG, BMP, and WEBP images for mods in ModMenu and the GitHub mod fetcher, both for mod icons and user PFP if no icon is provided.
+11=* Fixed submods not having icons set, despite it being processed.
+12=* Fixed text alignment of submods to not try and center all text boxes against the entire box.
+
 [1.16.15]
 
 1=* Load ordering now can appropriately reorder the modification of material and theme resources.
