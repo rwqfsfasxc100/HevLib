@@ -5927,6 +5927,7 @@ class _FileAccess:
 		var file:File = File.new()
 		file.open(path, File.READ)
 		var bytes:PoolByteArray = file.get_buffer(file.get_len())
+		file.close()
 		var img:Image = Image.new()
 		var loaded:bool = false
 		if bytes.subarray(0,7) == PNG_HEADER:
@@ -5939,9 +5940,8 @@ class _FileAccess:
 			loaded = img.load_webp_from_buffer(bytes) == OK
 		if not loaded:
 			img = fallback
-		var imgtex = ImageTexture.new()
+		var imgtex:ImageTexture = ImageTexture.new()
 		imgtex.create_from_image(img)
-		file.close()
 		return imgtex
 	
 	const updateCacheDir : String = "user://cache/.Mod_Menu_2_Cache/updates"
