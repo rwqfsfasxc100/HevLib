@@ -1595,9 +1595,9 @@ const TRANSLATIONS = {
 			"string": "   --- Software ---   ",
 			"version_hash": 2827177182
 		},
-		"HEVLIB_CREDITS_SOFTWARE_JELLE": {
-			"string": "jelle - GDUNZIP implementation",
-			"version_hash": 784233189
+		"HEVLIB_CREDITS_SOFTWARE_RICHGEL999": {
+			"string": "Rich Geldreich - miniz library",
+			"version_hash": 4175402747
 		},
 		"HEVLIB_CREDITS_TRANSLATORS_HEADER": {
 			"string": "   --- Translators ---   ",

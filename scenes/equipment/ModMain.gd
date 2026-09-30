@@ -954,26 +954,7 @@ func testing():
 	var script_shadow_creator = load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
 	
 	
-#	file.open("C:/Program Files (x86)/Steam/steamapps/common/dV Rings of Saturn/mods/HevLib.zip",File.READ)
-#	var buffer = file.get_buffer(file.get_len())
-#	file.close()
-#
-#	pointers.Zip.modify_zip_buffer(buffer,{},["HevLib/changelog.txt"],true)
 	
-#	var files = pointers.Zip.__extract_files_from_zip_buffer(buffer,"user://dump")
-#	var files = pointers.Zip.__read_select_files_from_zip_buffer(buffer,PoolStringArray(["HevLib/ModMain.gd"]))
-	
-#	var nb = __store_32_in_buffer(0x04034b50)
-	
-#	var t1 = Time.get_ticks_usec()
-#	pointers.Zip.__create_zip("user://dump.zip",{"test.zip":buffer},false)
-#	var t2 = Time.get_ticks_usec()
-#	print(t2-t1)
-#	var pck = pointers.Zip.__load_pck("user://test_pack.pck")["res://test.tscn"]["GetData"].get_string_from_utf8()
-#	var pck = pointers.Zip.__load_pck("C:/Program Files (x86)/Steam/steamapps/common/dV Rings of Saturn/dlc/032_here-be-dragons.pck",true)
-	
-#	var out = pointers.SafeMode.get_dependancies_for_vanilla_file("res://enceladus/Dealer.tscn")
-#	var shadow = script_shadow_creator.__make_shadow_of_script("res://AsteroidSpawner.gd",["spawnAsteroidByClass"],[],[],"none",true,false,true,true,true,pointers)
 	
 	
 	

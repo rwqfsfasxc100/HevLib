@@ -55,7 +55,7 @@ func handleZips():
 		var zipCacheFilename = zip + cacheExtension
 		var zipCacheStore = zipCache + zip + "/"
 		pointers.FolderAccess.__check_folder_exists(zipCacheStore)
-		var fetchedManifest = pointers.Zip.__fetch_file_from_zip(zipStore + zip, zipCacheStore, ["mod.manifest"])
+		var fetchedManifest = pointers.Zip.__fetch_file_from_zip(zipStore + zip, PoolStringArray(["mod.manifest"]), zipCacheStore)
 		var manifestData = pointers.ManifestV1.__load_manifest_from_file(pointers.DataFormat.__array_to_string(fetchedManifest))["package"]
 		dataStore = {
 			manifestData["id"]:
