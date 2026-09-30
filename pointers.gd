@@ -44,7 +44,6 @@ var Achievements : _Achievements = _Achievements.new(self,http)
 var ConfigDriver : _ConfigDriver = _ConfigDriver.new(self)
 var FileAccess : _FileAccess = _FileAccess.new(self)
 var DataFormat : _DataFormat = _DataFormat.new(self)
-var DynamicLibraryLoader : _DynamicLibraryLoader = _DynamicLibraryLoader.new(self)
 var DriverManagement : _DriverManagement = _DriverManagement.new(self)
 var Equipment : _Equipment = _Equipment.new(self)
 var Events : _Events = _Events.new(self)
@@ -144,6 +143,7 @@ const SUPPORTED_IMAGE_EXTENSIONS = PoolStringArray(["png","stex","jpg","jpeg","b
 
 var resource_path:String = ""
 func _init(r,e):
+	name = "HevLib~Pointers"
 	resource_path = r
 	equipment_modmain = e
 	dir.make_dir_recursive(deviceinfostore)
@@ -1546,10 +1546,8 @@ class _ConfigDriver:
 		var cfg_dictionary : Dictionary = {}
 		for section in cfg_sections:
 			var data : Dictionary = {}
-			var keys : Array = cfg.get_section_keys(section)
-			for key in keys:
-				var item = cfg.get_value(section,key)
-				data[key] = item
+			for key in cfg.get_section_keys(section):
+				data[key] = cfg.get_value(section,key)
 			cfg_dictionary[section] = data
 		return cfg_dictionary
 	
@@ -3158,109 +3156,6 @@ class _DataFormat:
 			buffer.append(second)
 			buffer.append(first)
 		return buffer
-	
-	
-	
-	
-	
-
-class _DynamicLibraryLoader:
-	var scripts : Array = [
-		
-	]
-	
-	const non_static:Dictionary = {}
-	
-	func _init(p):
-		non_static["pointers"] = p
-	
-	const gdnative_library_extensions:PoolStringArray = PoolStringArray(["gdnlib"])
-	
-	static func process_gdnative_plugins():
-		var pointers = non_static["pointers"]
-		var file:File = File.new()
-		var dir:Directory = Directory.new()
-		var exePath:String = OS.get_executable_path().get_base_dir() + "/hevlib_dll_store/"
-		if not pointers.is_editor:
-			var all_libraries:PoolStringArray = PoolStringArray()
-			for mod in pointers.DriverManagement.__get_drivers():
-				var drivers = mod["drivers"]
-				if "DLL_MAPPER.gd" in drivers.keys():
-					var mapper:PoolStringArray = PoolStringArray(drivers["DLL_MAPPER.gd"].get("DLL_MAPPER",[]))
-					for entry in mapper:
-						if not entry.begins_with("res://"):
-							entry = mod.mod_directory.plus_file(entry)
-						if entry.get_extension() in gdnative_library_extensions:
-							all_libraries.append(entry)
-			for mod in pointers.ManifestV2.__get_disabled_modlets():
-				var drivers = pointers.DriverManagement.__get_drivers_from_modmain_path(mod)
-				if "DLL_MAPPER.gd" in drivers.keys():
-					var mapper:PoolStringArray = PoolStringArray(drivers["DLL_MAPPER.gd"].get("DLL_MAPPER",[]))
-					for entry in mapper:
-						if not entry.begins_with("res://"):
-							entry = mod.get_base_dir().plus_file(entry)
-						if entry.get_extension() in gdnative_library_extensions:
-							all_libraries.append(entry)
-			var copied_files:PoolStringArray = PoolStringArray()
-			var existing_libs:PoolStringArray = PoolStringArray()
-			var lib_resave:Dictionary = Dictionary()
-			if all_libraries:
-				pointers.FolderAccess.__check_folder_exists(exePath)
-				var libs_to_copy:Dictionary = Dictionary()
-				for entry in all_libraries:
-					var data:Dictionary = pointers.ConfigDriver.__config_parse(entry)
-					if "entry" in data:
-						for oper in data["entry"]:
-							var lib_path:String = data["entry"][oper]
-							var new_path:String = exePath + lib_path.get_file()
-							if pointers.FileAccess.__file_exists(lib_path):
-								if not pointers.FileAccess.__file_exists(new_path):
-									file.open(lib_path,File.READ)
-									var buffer:PoolByteArray = file.get_buffer(file.get_len())
-									file.close()
-									libs_to_copy[new_path] = buffer
-								data["entry"][oper] = new_path
-								existing_libs.append(new_path.get_file())
-					if "dependencies" in data:
-						for oper in data["dependencies"]:
-							var lib_paths:Array = data["dependencies"][oper]
-							for lbr in lib_paths.size():
-								var lib_path:String = lib_paths[lbr]
-								var new_path:String = exePath + lib_path.get_file()
-								if pointers.FileAccess.__file_exists(lib_path):
-									if not pointers.FileAccess.__file_exists(new_path):
-										file.open(lib_path,File.READ)
-										var buffer:PoolByteArray = file.get_buffer(file.get_len())
-										file.close()
-										libs_to_copy[new_path] = buffer
-									lib_paths[lbr] = new_path
-									existing_libs.append(new_path.get_file())
-							data["dependencies"][oper] = lib_paths
-					lib_resave[entry] = data
-					for f in libs_to_copy:
-						if not pointers.FileAccess.__file_exists(f):
-							file.open(f,File.WRITE)
-							file.store_buffer(libs_to_copy[f])
-							file.close()
-					copied_files.append_array(libs_to_copy.keys())
-			if lib_resave:
-				var fetchPaths:Dictionary = Dictionary()
-				for entry in lib_resave:
-					var data:Dictionary = lib_resave[entry]
-					var savePath = "user://cache/.HevLib_Cache/Variable_Fetch/%d.gdnlib" % Time.get_ticks_usec()
-					pointers.ConfigDriver.__config_store(data,savePath)
-					file.open(savePath,File.READ)
-					var bfr:PoolByteArray = file.get_buffer(file.get_len())
-					file.close()
-					fetchPaths[entry.substr(6)] = bfr
-				pointers.Zip.__create_zip("user://cache/.HevLib_Cache/Variable_Fetch/libzip.zip",fetchPaths)
-				ProjectSettings.load_resource_pack("user://cache/.HevLib_Cache/Variable_Fetch/libzip.zip",true)
-			for f in pointers.FolderAccess.__fetch_folder_files(exePath):
-				if not f in existing_libs:
-					dir.remove(f)
-		pointers.SafeMode.__handle_exit_for_file_checks()
-	
-	
 
 
 class _DriverManagement:
@@ -9205,11 +9100,15 @@ class _RPC:
 			rpc_data["self"].emit_signal("update_activity")
 	
 	static func get_state_data(state:Dictionary) -> String:
-		var out:String = TranslationServer.translate(state.get("text","RPC text missing :("))
 		var playership = CurrentGame.getPlayerShip()
+		if not Tool.claim(playership):
+			return rpc_data["current_state"]
+		Tool.release(playership)
+		var out:String = TranslationServer.translate(state.get("text","RPC text missing :("))
 		var toFormat:Dictionary = {}
-		if stack[0] == "ring":
-			for sensor in state.get("sensors",Array()):
+		var sensors:Array = state.get("sensors",Array())
+		if sensors and stack[0] == "ring":
+			for sensor in sensors:
 				match typeof(sensor):
 					TYPE_STRING:
 						toFormat["sensor:" + sensor] = playership.sensorGet(sensor)
@@ -10280,7 +10179,7 @@ class _Translations:
 		tlFile.store_string(JSON.print(ml_check_data,"\t"))
 		tlFile.close()
 		__updateTL_from_dictionary(data.duplicate(true),fullLogging)
-		pointers.DynamicLibraryLoader.process_gdnative_plugins()
+		pointers.SafeMode.__handle_exit_for_file_checks()
 	
 
 class _WebTranslate:

@@ -61,9 +61,10 @@ func _init(modLoader : ModLoader = ModLoader):
 	if not correct:
 		Debug.l("Folder structure not correct, exiting HevLib load")
 		return
-	handle_pointer_cast_clearing(modLoader)
+	var preproc_files:Dictionary = process_gdnative_plugins()
+	handle_pointer_cast_clearing(preproc_files,modLoader)
+	create_zip_for_overrides(preproc_files)
 	pointers = load(pointers_dir).new(pointers_dir,self)
-	pointers.name = "HevLib~Pointers"
 	if modLoader._savedObjects:
 		var new_objects:Array = [pointers]
 		var firstItemCheck = modLoader._savedObjects[0]
@@ -78,9 +79,7 @@ func _init(modLoader : ModLoader = ModLoader):
 	directory.make_dir_recursive(variables_folder)
 	directory.make_dir_recursive(validation_check_path.get_base_dir())
 	pointers.FileAccess.__load_precached_mods()
-	
 	pointers.ConfigDriver.__load_configs()
-	do_safe_load = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_modlet_loading")
 	
 #	testing()
 	
@@ -131,6 +130,7 @@ func _init(modLoader : ModLoader = ModLoader):
 	files_to_load.append("ShipModificationDriver/InternalStorageMod.gd")
 
 	files_to_load.append(["res://HevLib/scenes/better_title_screen/SaveSlotButton.gd"])
+	do_safe_load = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_modlet_loading")
 	if not do_safe_load:
 		for i in files_to_load:
 			match typeof(i):
@@ -282,7 +282,7 @@ func updatelist_return(result, response_code,headers,body,mh):
 								var tHTTP:HTTPRequest = HTTPRequest.new()
 								add_child(tHTTP)
 								tHTTP.request(api_url,[],true,HTTPClient.METHOD_POST,payload)
-								yield(get_tree().create_timer(150),"timeout")
+								yield(get_tree().create_timer(300),"timeout")
 								Tool.deferCallInPhysics(Tool,"remove",[tHTTP])
 	Tool.deferCallInPhysics(Tool,"remove",[mh])
 
@@ -360,7 +360,106 @@ func l(msg:String, title:String = MOD_NAME, version:String = MOD_VERSION):
 	var line = "%s V%s" % [title, version]
 	pointers.l(msg,line)
 
-func handle_pointer_cast_clearing(modLoader:ModLoader):
+const gdnative_library_extensions:PoolStringArray = PoolStringArray(["gdnlib"])
+const driver_dirs = PoolStringArray([
+	"HEVLIB_EQUIPMENT_DRIVER_TAGS/",
+	"HEVLIB_MENU/",
+	"HEVLIB_MINERAL_DRIVER_TAGS/",
+	"HEVLIB_DRIVERS/",
+])
+
+
+
+
+func process_gdnative_plugins():
+	var fetchPaths:Dictionary = {}
+	var exePath:String = OS.get_executable_path().get_base_dir() + "/hevlib_dll_store/"
+	if not OS.has_feature("editor"):
+		var all_libraries:PoolStringArray = PoolStringArray()
+		for first in fetch_folder_files("res://",true):
+			if first.ends_with("/"):
+				for second in fetch_folder_files("res://" + first,true):
+					if second in driver_dirs:
+						for driverFile in fetch_folder_files("res://" + first + second):
+							if driverFile == "DLL_MAPPER.gd":
+								var mod_dir:String = "res://" + first
+								var mapper:PoolStringArray = PoolStringArray(get_script_constant_map_without_load(mod_dir + second + "DLL_MAPPER.gd").get("DLL_MAPPER",[]))
+								for entry in mapper:
+									if not entry.begins_with("res://"):
+										entry = mod_dir.plus_file(entry)
+									if entry.get_extension() in gdnative_library_extensions:
+										all_libraries.append(entry)
+		var copied_files:PoolStringArray = PoolStringArray()
+		var existing_libs:PoolStringArray = PoolStringArray()
+		var lib_resave:Dictionary = Dictionary()
+		var configFile:ConfigFile = ConfigFile.new()
+		if all_libraries:
+			directory.make_dir_recursive(exePath)
+			var libs_to_copy:Dictionary = Dictionary()
+			for entry in all_libraries:
+				configFile.clear()
+				configFile.load(entry)
+				var cfg_sections : Array = configFile.get_sections()
+				var data : Dictionary = {}
+				for section in cfg_sections:
+					var dta : Dictionary = {}
+					for key in configFile.get_section_keys(section):
+						dta[key] = configFile.get_value(section,key)
+					data[section] = dta
+				if "entry" in data:
+					for oper in data["entry"]:
+						var lib_path:String = data["entry"][oper]
+						var new_path:String = exePath + lib_path.get_file()
+						if file_exists(lib_path):
+							if not file_exists(new_path):
+								file.open(lib_path,File.READ)
+								var buffer:PoolByteArray = file.get_buffer(file.get_len())
+								file.close()
+								libs_to_copy[new_path] = buffer
+							data["entry"][oper] = new_path
+							existing_libs.append(new_path.get_file())
+				if "dependencies" in data:
+					for oper in data["dependencies"]:
+						var lib_paths:Array = data["dependencies"][oper]
+						for lbr in lib_paths.size():
+							var lib_path:String = lib_paths[lbr]
+							var new_path:String = exePath + lib_path.get_file()
+							if file_exists(lib_path):
+								if not file_exists(new_path):
+									file.open(lib_path,File.READ)
+									var buffer:PoolByteArray = file.get_buffer(file.get_len())
+									file.close()
+									libs_to_copy[new_path] = buffer
+								lib_paths[lbr] = new_path
+								existing_libs.append(new_path.get_file())
+						data["dependencies"][oper] = lib_paths
+				lib_resave[entry] = data
+				for f in libs_to_copy:
+					if not file_exists(f):
+						file.open(f,File.WRITE)
+						file.store_buffer(libs_to_copy[f])
+						file.close()
+				copied_files.append_array(libs_to_copy.keys())
+		if lib_resave:
+			for entry in lib_resave:
+				var data:Dictionary = lib_resave[entry]
+				var savePath = "user://cache/.HevLib_Cache/Variable_Fetch/%d.gdnlib" % Time.get_ticks_usec()
+				configFile.clear()
+				for section in data.keys():
+					var keys = data[section]
+					for key in keys.keys():
+						configFile.set_value(section,key,keys[key])
+				configFile.save(savePath)
+				file.open(savePath,File.READ)
+				var bfr:PoolByteArray = file.get_buffer(file.get_len())
+				file.close()
+				fetchPaths[entry.substr(6)] = bfr
+		for f in fetch_folder_files(exePath,false,true,true):
+			if not f in existing_libs:
+				directory.remove(f)
+	return fetchPaths
+
+func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader):
 	var script_paths:PoolStringArray = PoolStringArray()
 	for zip in modLoader._modZipFiles:
 		file.open(zip,File.READ)
@@ -422,7 +521,6 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 		var regex:RegEx = RegEx.new()
 #		regex.compile("\\b(?:var)\\s+\\w+\\K\\s*:\\s*(?!(?:%s)\\b)\\w+" % vanilla_classes)
 		regex.compile("\\b(?:var)\\s+\\w+\\K\\s*:\\s*(?:%s)\\b" % clearlist)
-		var replacements:Dictionary = {}
 		for script in script_paths:
 			file.open("res://" + script,File.READ)
 			var text:String = file.get_as_text(true)
@@ -447,164 +545,165 @@ func handle_pointer_cast_clearing(modLoader:ModLoader):
 				for r in cases:
 					text = text.replace(r,"")
 				replacements[script] = text.to_utf8()
-		if replacements:
-			var datetime:Dictionary = Time.get_datetime_dict_from_system()
-			var dos_time:int = (datetime.hour << 11) | (datetime.minute << 5) | int(datetime.second / 2.0)
-			var dos_date:int = (int(max(datetime.year - 1980, 0)) << 9) | (datetime.month << 5) | datetime.day
-			var dt1:int = dos_time & 0xFF
-			var dt2:int = (dos_time >> 8) & 0xFF
-			var dt3:int = dos_date & 0xFF
-			var dt4:int = (dos_date >> 8) & 0xFF
-			
-			var buffer:PoolByteArray = PoolByteArray()
-			var central_records:Array = Array()
-			for entry_path in replacements:
-				var data:PoolByteArray = replacements[entry_path]
-				var offset:int = buffer.size()
-				var uncompressed_size:int = data.size()
-				var name_bytes:PoolByteArray = entry_path.to_utf8()
-				var crc:int = __get_crc_32(data)
-				var name_size:int = name_bytes.size()
-				var uc1:int = uncompressed_size & 0xFF
-				var uc2:int = (uncompressed_size >> 8) & 0xFF
-				var uc3:int = (uncompressed_size >> 16) & 0xFF
-				var uc4:int = (uncompressed_size >> 24) & 0xFF
-				buffer.resize(offset + 30)
-				# Local entry magic number
-				buffer[offset] = 80;buffer[offset + 1] = 75;buffer[offset + 2] = 3;buffer[offset + 3] = 4
-				
-				# Version to extract
-				buffer[offset + 4] = 20;buffer[offset + 5] = 0
-				
-				# General purpose flag, marks use of UTF8
-				buffer[offset + 6] = 0;buffer[offset + 7] = 8
-				
-				# Compression (none)
-				buffer[offset + 8] = 0;buffer[offset + 9] = 0
-				
-				# Time
-				buffer[offset + 10] = dt1;buffer[offset + 11] = dt2
-				
-				# Date
-				buffer[offset + 12] = dt3;buffer[offset + 13] = dt4
-				
-				# CRC32
-				buffer[offset + 14] = crc & 0xFF;buffer[offset + 15] = (crc >> 8) & 0xFF;buffer[offset + 16] = (crc >> 16) & 0xFF;buffer[offset + 17] = (crc >> 24) & 0xFF
-				
-				# Compressed size
-				buffer[offset + 18] = uc1;buffer[offset + 19] = uc2;buffer[offset + 20] = uc3;buffer[offset + 21] = uc4
-				
-				# Uncompressed size
-				buffer[offset + 22] = uc1;buffer[offset + 23] = uc2;buffer[offset + 24] = uc3;buffer[offset + 25] = uc4
-				
-				# Filename length
-				buffer[offset + 26] = name_size & 0xFF;buffer[offset + 27] = (name_size >> 8) & 0xFF
-				
-				# Extra field length
-				buffer[offset + 28] = 0;buffer[offset + 29] = 0
-				
-				buffer.append_array(name_bytes)
-				buffer.append_array(data)
-				central_records.append({
-					"name_bytes":name_bytes,
-					"crc":crc,
-					"uncomp_size":uncompressed_size,
-					"offset":offset
-				})
-			var central_dir_offset:int = buffer.size()
-			for rec in central_records:
-				var name_size:int = rec.name_bytes.size()
-				var name_bytes:PoolByteArray = rec.name_bytes
-				var uncomp_size:int = rec.uncomp_size
-				var uc1:int = uncomp_size & 0xFF
-				var uc2:int = (uncomp_size >> 8) & 0xFF
-				var uc3:int = (uncomp_size >> 16) & 0xFF
-				var uc4:int = (uncomp_size >> 24) & 0xFF
-				var crc:int = rec.crc
-				var offset:int = rec.offset
-				var bsize:int = buffer.size()
-				buffer.resize(bsize + 46)
-				# Central dir magic number
-				buffer[bsize] = 80;buffer[bsize + 1] = 75;buffer[bsize + 2] = 1;buffer[bsize + 3] = 2
-				
-				# Version created
-				buffer[bsize + 4] = 20;buffer[bsize + 5] = 0
-				
-				# Version to decompress to
-				buffer[bsize + 6] = 20;buffer[bsize + 7] = 0
-				
-				# General flag, marks use of UTF8
-				buffer[bsize + 8] = 0;buffer[bsize + 9] = 8
-				
-				# Store method (none)
-				buffer[bsize + 10] = 0;buffer[bsize + 11] = 0
-				
-				# Time
-				buffer[bsize + 12] = dt1;buffer[bsize + 13] = dt2
-				
-				# Date
-				buffer[bsize + 14] = dt3;buffer[bsize + 15] = dt4
-				
-				# CRC32
-				buffer[bsize + 16] = crc & 0xFF;buffer[bsize + 17] = (crc >> 8) & 0xFF;buffer[bsize + 18] = (crc >> 16) & 0xFF;buffer[bsize + 19] = (crc >> 24) & 0xFF
-				
-				# Compressed size
-				buffer[bsize + 20] = uc1;buffer[bsize + 21] = uc2;buffer[bsize + 22] = uc3;buffer[bsize + 23] = uc4
-				
-				# Uncompressed size
-				buffer[bsize + 24] = uc1;buffer[bsize + 25] = uc2;buffer[bsize + 26] = uc3;buffer[bsize + 27] = uc4
-				
-				# Name length
-				buffer[bsize + 28] = name_size & 0xFF;buffer[bsize + 29] = (name_size >> 8) & 0xFF
-				
-				# Extra field length
-				buffer[bsize + 30] = 0;buffer[bsize + 31] = 0
-				
-				# Comment length
-				buffer[bsize + 32] = 0;buffer[bsize + 33] = 0
-				
-				# Disk
-				buffer[bsize + 34] = 0;buffer[bsize + 35] = 0
-				
-				# File attributes
-				buffer[bsize + 36] = 0;buffer[bsize + 37] = 0
-				
-				# External file attributes
-				buffer[bsize + 38] = 0;buffer[bsize + 39] = 0;buffer[bsize + 40] = 0;buffer[bsize + 41] = 0
-				
-				# CD offset
-				buffer[bsize + 42] = offset & 0xFF;buffer[bsize + 43] = (offset >> 8) & 0xFF;buffer[bsize + 44] = (offset >> 16) & 0xFF;buffer[bsize + 45] = (offset >> 24) & 0xFF
-				
-				# File name bytes
-				buffer.append_array(name_bytes)
-			var central_dir_size:int = buffer.size() - central_dir_offset
-			var cr_size:int = central_records.size()
-			var cr1:int = cr_size
-			var cr2:int = (cr_size >> 8) & 0xFF
+func create_zip_for_overrides(replacements:Dictionary):
+	if replacements:
+		var datetime:Dictionary = Time.get_datetime_dict_from_system()
+		var dos_time:int = (datetime.hour << 11) | (datetime.minute << 5) | int(datetime.second / 2.0)
+		var dos_date:int = (int(max(datetime.year - 1980, 0)) << 9) | (datetime.month << 5) | datetime.day
+		var dt1:int = dos_time & 0xFF
+		var dt2:int = (dos_time >> 8) & 0xFF
+		var dt3:int = dos_date & 0xFF
+		var dt4:int = (dos_date >> 8) & 0xFF
+		
+		var buffer:PoolByteArray = PoolByteArray()
+		var central_records:Array = Array()
+		for entry_path in replacements:
+			var data:PoolByteArray = replacements[entry_path]
 			var offset:int = buffer.size()
-			buffer.resize(offset + 22)
-			# EOCD magic number
-			buffer[offset] = 80;buffer[offset + 1] = 75;buffer[offset + 2] = 5;buffer[offset + 3] = 6
+			var uncompressed_size:int = data.size()
+			var name_bytes:PoolByteArray = entry_path.to_utf8()
+			var crc:int = get_crc_32(data)
+			var name_size:int = name_bytes.size()
+			var uc1:int = uncompressed_size & 0xFF
+			var uc2:int = (uncompressed_size >> 8) & 0xFF
+			var uc3:int = (uncompressed_size >> 16) & 0xFF
+			var uc4:int = (uncompressed_size >> 24) & 0xFF
+			buffer.resize(offset + 30)
+			# Local entry magic number
+			buffer[offset] = 80;buffer[offset + 1] = 75;buffer[offset + 2] = 3;buffer[offset + 3] = 4
 			
-			# Disk
-			buffer[offset + 4] = 0;buffer[offset + 5] = 0;buffer[offset + 6] = 0;buffer[offset + 7] = 0
+			# Version to extract
+			buffer[offset + 4] = 20;buffer[offset + 5] = 0
 			
-			# Size
-			buffer[offset + 8] = cr1;buffer[offset + 9] = cr2;buffer[offset + 10] = cr1;buffer[offset + 11] = cr2
+			# General purpose flag, marks use of UTF8
+			buffer[offset + 6] = 0;buffer[offset + 7] = 8
 			
-			# CD size
-			buffer[offset + 12] = central_dir_size & 0xFF;buffer[offset + 13] = (central_dir_size & 0xFF00) >> 8;buffer[offset + 14] = (central_dir_size & 0xFF0000) >> 16;buffer[offset + 15] = (central_dir_size & 0xFF000000) >> 24
+			# Compression (none)
+			buffer[offset + 8] = 0;buffer[offset + 9] = 0
 			
-			# CD offset
-			buffer[offset + 16] = central_dir_offset & 0xFF;buffer[offset + 17] = (central_dir_offset & 0xFF00) >> 8;buffer[offset + 18] = (central_dir_offset & 0xFF0000) >> 16;buffer[offset + 19] = (central_dir_offset & 0xFF000000) >> 24
+			# Time
+			buffer[offset + 10] = dt1;buffer[offset + 11] = dt2
+			
+			# Date
+			buffer[offset + 12] = dt3;buffer[offset + 13] = dt4
+			
+			# CRC32
+			buffer[offset + 14] = crc & 0xFF;buffer[offset + 15] = (crc >> 8) & 0xFF;buffer[offset + 16] = (crc >> 16) & 0xFF;buffer[offset + 17] = (crc >> 24) & 0xFF
+			
+			# Compressed size
+			buffer[offset + 18] = uc1;buffer[offset + 19] = uc2;buffer[offset + 20] = uc3;buffer[offset + 21] = uc4
+			
+			# Uncompressed size
+			buffer[offset + 22] = uc1;buffer[offset + 23] = uc2;buffer[offset + 24] = uc3;buffer[offset + 25] = uc4
+			
+			# Filename length
+			buffer[offset + 26] = name_size & 0xFF;buffer[offset + 27] = (name_size >> 8) & 0xFF
+			
+			# Extra field length
+			buffer[offset + 28] = 0;buffer[offset + 29] = 0
+			
+			buffer.append_array(name_bytes)
+			buffer.append_array(data)
+			central_records.append({
+				"name_bytes":name_bytes,
+				"crc":crc,
+				"uncomp_size":uncompressed_size,
+				"offset":offset
+			})
+		var central_dir_offset:int = buffer.size()
+		for rec in central_records:
+			var name_size:int = rec.name_bytes.size()
+			var name_bytes:PoolByteArray = rec.name_bytes
+			var uncomp_size:int = rec.uncomp_size
+			var uc1:int = uncomp_size & 0xFF
+			var uc2:int = (uncomp_size >> 8) & 0xFF
+			var uc3:int = (uncomp_size >> 16) & 0xFF
+			var uc4:int = (uncomp_size >> 24) & 0xFF
+			var crc:int = rec.crc
+			var offset:int = rec.offset
+			var bsize:int = buffer.size()
+			buffer.resize(bsize + 46)
+			# Central dir magic number
+			buffer[bsize] = 80;buffer[bsize + 1] = 75;buffer[bsize + 2] = 1;buffer[bsize + 3] = 2
+			
+			# Version created
+			buffer[bsize + 4] = 20;buffer[bsize + 5] = 0
+			
+			# Version to decompress to
+			buffer[bsize + 6] = 20;buffer[bsize + 7] = 0
+			
+			# General flag, marks use of UTF8
+			buffer[bsize + 8] = 0;buffer[bsize + 9] = 8
+			
+			# Store method (none)
+			buffer[bsize + 10] = 0;buffer[bsize + 11] = 0
+			
+			# Time
+			buffer[bsize + 12] = dt1;buffer[bsize + 13] = dt2
+			
+			# Date
+			buffer[bsize + 14] = dt3;buffer[bsize + 15] = dt4
+			
+			# CRC32
+			buffer[bsize + 16] = crc & 0xFF;buffer[bsize + 17] = (crc >> 8) & 0xFF;buffer[bsize + 18] = (crc >> 16) & 0xFF;buffer[bsize + 19] = (crc >> 24) & 0xFF
+			
+			# Compressed size
+			buffer[bsize + 20] = uc1;buffer[bsize + 21] = uc2;buffer[bsize + 22] = uc3;buffer[bsize + 23] = uc4
+			
+			# Uncompressed size
+			buffer[bsize + 24] = uc1;buffer[bsize + 25] = uc2;buffer[bsize + 26] = uc3;buffer[bsize + 27] = uc4
+			
+			# Name length
+			buffer[bsize + 28] = name_size & 0xFF;buffer[bsize + 29] = (name_size >> 8) & 0xFF
+			
+			# Extra field length
+			buffer[bsize + 30] = 0;buffer[bsize + 31] = 0
 			
 			# Comment length
-			buffer[offset + 20] = 0;buffer[offset + 21] = 0
+			buffer[bsize + 32] = 0;buffer[bsize + 33] = 0
 			
-			file.open("user://cache/.HevLib_Cache/Variable_Fetch/remove_pointer_casting.zip",File.WRITE)
-			file.store_buffer(buffer)
-			file.close()
-			ProjectSettings.load_resource_pack("user://cache/.HevLib_Cache/Variable_Fetch/remove_pointer_casting.zip")
+			# Disk
+			buffer[bsize + 34] = 0;buffer[bsize + 35] = 0
+			
+			# File attributes
+			buffer[bsize + 36] = 0;buffer[bsize + 37] = 0
+			
+			# External file attributes
+			buffer[bsize + 38] = 0;buffer[bsize + 39] = 0;buffer[bsize + 40] = 0;buffer[bsize + 41] = 0
+			
+			# CD offset
+			buffer[bsize + 42] = offset & 0xFF;buffer[bsize + 43] = (offset >> 8) & 0xFF;buffer[bsize + 44] = (offset >> 16) & 0xFF;buffer[bsize + 45] = (offset >> 24) & 0xFF
+			
+			# File name bytes
+			buffer.append_array(name_bytes)
+		var central_dir_size:int = buffer.size() - central_dir_offset
+		var cr_size:int = central_records.size()
+		var cr1:int = cr_size
+		var cr2:int = (cr_size >> 8) & 0xFF
+		var offset:int = buffer.size()
+		buffer.resize(offset + 22)
+		# EOCD magic number
+		buffer[offset] = 80;buffer[offset + 1] = 75;buffer[offset + 2] = 5;buffer[offset + 3] = 6
+		
+		# Disk
+		buffer[offset + 4] = 0;buffer[offset + 5] = 0;buffer[offset + 6] = 0;buffer[offset + 7] = 0
+		
+		# Size
+		buffer[offset + 8] = cr1;buffer[offset + 9] = cr2;buffer[offset + 10] = cr1;buffer[offset + 11] = cr2
+		
+		# CD size
+		buffer[offset + 12] = central_dir_size & 0xFF;buffer[offset + 13] = (central_dir_size & 0xFF00) >> 8;buffer[offset + 14] = (central_dir_size & 0xFF0000) >> 16;buffer[offset + 15] = (central_dir_size & 0xFF000000) >> 24
+		
+		# CD offset
+		buffer[offset + 16] = central_dir_offset & 0xFF;buffer[offset + 17] = (central_dir_offset & 0xFF00) >> 8;buffer[offset + 18] = (central_dir_offset & 0xFF0000) >> 16;buffer[offset + 19] = (central_dir_offset & 0xFF000000) >> 24
+		
+		# Comment length
+		buffer[offset + 20] = 0;buffer[offset + 21] = 0
+		
+		file.open("user://cache/.HevLib_Cache/Variable_Fetch/remove_pointer_casting.zip",File.WRITE)
+		file.store_buffer(buffer)
+		file.close()
+		ProjectSettings.load_resource_pack("user://cache/.HevLib_Cache/Variable_Fetch/remove_pointer_casting.zip")
 
 var crc_table_0:Array = Array()
 var crc_table_1:Array = Array()
@@ -639,7 +738,7 @@ var crc_table_29:Array = Array()
 var crc_table_30:Array = Array()
 var crc_table_31:Array = Array()
 
-func __get_crc_32(bytes: PoolByteArray) -> int:
+func get_crc_32(bytes: PoolByteArray) -> int:
 	if crc_table_0.empty():
 		var crcTables = load(modPath + "../../scripts/crc32_table_cache.gd")
 		crc_table_0 = crcTables.T0
@@ -721,6 +820,136 @@ func __get_crc_32(bytes: PoolByteArray) -> int:
 		i += 1
 	return crc ^ 0xFFFFFFFF
 
+func fetch_folder_files(folder: String, showFolders: bool = false, returnFullPath: bool = false,globalizePath: bool = false) -> PoolStringArray:
+	var fileList : PoolStringArray = PoolStringArray()
+	if not folder.ends_with("/"):
+		folder += "/"
+	if not directory.dir_exists(folder):
+		return fileList
+	directory.open(folder)
+	directory.list_dir_begin(true)
+	while true:
+		var fileName : String = directory.get_next()
+		var capture:bool = true
+		if fileName.ends_with("/"):
+			capture = false
+		if fileName == "." or fileName == "..":
+			capture = false
+		if capture:
+			if not fileName:
+				break
+			if directory.current_is_dir():
+				if not showFolders:
+					continue
+				if not fileName.ends_with("/"):
+					fileName = fileName + "/"
+			if returnFullPath:
+				fileName = folder + fileName
+			if globalizePath:
+				fileList.append(ProjectSettings.globalize_path(fileName))
+			else:
+				fileList.append(fileName)
+	return fileList
+
+func file_exists(file_path):
+	return file.file_exists(file_path) or ResourceLoader.exists(file_path)
+
+
+const function_prefixes = ["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func "]
+const all_prefixes = ["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func ","onready ","var ","signal ","const ","export ","extends "]
+
+func get_script_constant_map_without_load(script_path : String) -> Dictionary:
+	var concat : String = ""
+	var script_source:Script = load(script_path)
+	var const_names : Array = []
+	if script_source:
+		var extend_this:bool = true
+		var data : String  = script_source.get_source_code()
+		var streaming:bool = false
+		var this_stream : String = ""
+		var lines:PoolStringArray = data.split("\n")
+		for line in lines:
+			var result : String = ""
+			var is_part_of_string:bool = false
+			var prev_char_escape:bool = false
+			while line != "":
+				var part:String = line.substr(0,1)
+				if part == "\\":
+					prev_char_escape = !prev_char_escape
+				else:
+					prev_char_escape = false
+				if part == "\"" and not prev_char_escape:
+					is_part_of_string = !is_part_of_string
+				if part == "#" and (not is_part_of_string and not prev_char_escape):
+					break
+				line.erase(0,1)
+				result += part
+			line = result
+			var has_prefix:bool = false
+			var has_sig:bool = false
+			for prefix in function_prefixes:
+				if line.begins_with(prefix):
+					has_prefix = true
+			if line.begins_with("signal "):
+				has_sig = true
+			if has_prefix:
+				if streaming:
+					concat += this_stream.strip_edges() + "\n"
+					this_stream = ""
+					streaming = false
+			elif has_sig:
+				if streaming:
+					concat += this_stream.strip_edges() + "\n"
+					this_stream = ""
+					streaming = false
+			elif line.begins_with("const "):
+				if streaming:
+					concat += this_stream.strip_edges() + "\n"
+					this_stream = ""
+					streaming = false
+				const_names.append(line.split("=",false)[0].strip_edges().split("const ",true)[1].strip_edges().split(":",false)[0].strip_edges())
+				streaming = true
+			elif line.begins_with("var "):
+				if streaming:
+					concat += this_stream.strip_edges() + "\n"
+					this_stream = ""
+					streaming = false
+				streaming = true
+			elif line.begins_with("export ") and " var " in line:
+				if streaming:
+					concat += this_stream.strip_edges() + "\n"
+					this_stream = ""
+					streaming = false
+				streaming = true
+			elif line.begins_with("onready ") and " var " in line:
+				if streaming:
+					concat += this_stream.strip_edges() + "\n"
+					this_stream = ""
+					streaming = false
+				streaming = true
+			elif line.begins_with("extends "):
+				if streaming:
+					concat += this_stream.strip_edges() + "\n"
+					this_stream = ""
+					streaming = false
+				if extend_this:
+					streaming = true
+			if streaming:
+				this_stream = this_stream + "\n" + line
+		if streaming:
+			concat += this_stream.strip_edges() + "\n"
+			this_stream = ""
+			streaming = false
+	if not const_names: return {}
+	var dict : Dictionary = {}
+	var rld:GDScript = GDScript.new()
+	rld.set_source_code(concat)
+	rld.reload()
+	var l : Dictionary = rld.get_script_constant_map()
+	for i in const_names:
+		dict[i] = l[i]
+	return dict
+
 func testing():
 	var script_shadow_creator = load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
 	
@@ -744,11 +973,7 @@ func testing():
 #	var pck = pointers.Zip.__load_pck("C:/Program Files (x86)/Steam/steamapps/common/dV Rings of Saturn/dlc/032_here-be-dragons.pck",true)
 	
 #	var out = pointers.SafeMode.get_dependancies_for_vanilla_file("res://enceladus/Dealer.tscn")
-#	var sz = load("res://HevLib/scripts/simple_zip.gd").new()
-	
 #	var shadow = script_shadow_creator.__make_shadow_of_script("res://AsteroidSpawner.gd",["spawnAsteroidByClass"],[],[],"none",true,false,true,true,true,pointers)
-	
-	
 	
 	
 	
