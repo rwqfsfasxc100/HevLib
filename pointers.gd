@@ -1951,7 +1951,8 @@ class _DataFormat:
 				"__decompress_raw_deflate_stream":{
 					"description":"Decompresses a DEFLATE data stream without the header or uint32 Adler. PoolByteArray.decompress() requires the proper headers, which can't be created without knowing the decompressed data.",
 					"args":[
-						"buffer -> (PoolByteArray) bytes that form the DEFLATE stream"
+						"buffer -> (PoolByteArray) bytes that form the DEFLATE stream",
+						"max_size (optional) -> (int) if above zero, the maximum size for the output data. Use for potentially untrustworthy data. Defaults to 0"
 					],
 					"return":[
 						"PoolByteArray for the raw, uncompressed data"
@@ -1973,6 +1974,7 @@ class _DataFormat:
 	
 	func _init(f):
 		non_statics["pointers"] = f
+		non_statics["ziptools"] = load("res://HevLib/scripts/ziptools/ziptools.gdns").new()
 		var urlRegex = RegEx.new()
 		urlRegex.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,63}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
 		non_statics["urlRegex"] = urlRegex
@@ -2881,52 +2883,7 @@ class _DataFormat:
 		return integer & bitmask_uint32
 	
 	static func __get_crc_32(bytes: PoolByteArray) -> int:
-		var crc:int = bitmask_uint32
-		var size:int = bytes.size()
-		var groups:int = int(floor(size / 32.0))
-		var i:int = 0
-		for g in groups:
-			# Rare me splitting a variable that isn't an array or dictionary between lines.
-			# Impossible to read and work on otherwise so enjoy the readable code while you can :P
-			crc = (
-				crc_table_31[(crc & bitmask_uint8) ^ bytes[i]] ^
-				crc_table_30[((crc >> 8) & bitmask_uint8) ^ bytes[i + 1]] ^
-				crc_table_29[((crc >> 16) & bitmask_uint8) ^ bytes[i + 2]] ^
-				crc_table_28[((crc >> 24) & bitmask_uint8) ^ bytes[i + 3]] ^
-				crc_table_27[bytes[i + 4]] ^
-				crc_table_26[bytes[i + 5]] ^
-				crc_table_25[bytes[i + 6]] ^
-				crc_table_24[bytes[i + 7]] ^
-				crc_table_23[bytes[i + 8]] ^
-				crc_table_22[bytes[i + 9]] ^
-				crc_table_21[bytes[i + 10]] ^
-				crc_table_20[bytes[i + 11]] ^
-				crc_table_19[bytes[i + 12]] ^
-				crc_table_18[bytes[i + 13]] ^
-				crc_table_17[bytes[i + 14]] ^
-				crc_table_16[bytes[i + 15]] ^
-				crc_table_15[bytes[i + 16]] ^
-				crc_table_14[bytes[i + 17]] ^
-				crc_table_13[bytes[i + 18]] ^
-				crc_table_12[bytes[i + 19]] ^
-				crc_table_11[bytes[i + 20]] ^
-				crc_table_10[bytes[i + 21]] ^
-				crc_table_9[bytes[i + 22]] ^
-				crc_table_8[bytes[i + 23]] ^
-				crc_table_7[bytes[i + 24]] ^
-				crc_table_6[bytes[i + 25]] ^
-				crc_table_5[bytes[i + 26]] ^
-				crc_table_4[bytes[i + 27]] ^
-				crc_table_3[bytes[i + 28]] ^
-				crc_table_2[bytes[i + 29]] ^
-				crc_table_1[bytes[i + 30]] ^
-				crc_table_0[bytes[i + 31]]
-			)
-			i += 32
-		while i < size:
-			crc = crc_table_0[(crc ^ bytes[i]) & bitmask_uint8] ^ (crc >> 8)
-			i += 1
-		return crc ^ bitmask_uint32
+		return non_statics["ziptools"].crc32(bytes)
 	
 	static func __get_uint32_from_buffer(buffer: PoolByteArray, offset: int = 0) -> int:
 		return buffer[offset] | (buffer[offset + 1] << 8) | (buffer[offset + 2] << 16) | (buffer[offset + 3] << 24)
@@ -2934,164 +2891,11 @@ class _DataFormat:
 	static func __get_uint16_from_buffer(buffer: PoolByteArray, offset: int = 0) -> int:
 		return buffer[offset] | (buffer[offset + 1] << 8)
 	
-	const length_base:PoolIntArray = PoolIntArray([3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258])
-	const length_extra:PoolByteArray = PoolByteArray([0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0])
-	const distance_base:PoolIntArray = PoolIntArray([1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577])
-	const distance_extra:PoolByteArray = PoolByteArray([0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13])
-	const cl_order:PoolByteArray = PoolByteArray([16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15])
-	
-	static func __decompress_raw_deflate_stream(data: PoolByteArray) -> PoolByteArray:
-		var state : Dictionary = {
-			"input":data,
-			"pos":0,
-			"buffer":0,
-			"count":0,
-			"output":[]
-		}
-		var fixed_litlen:Dictionary = build_litlen_table()
-		var fixed_dist:Dictionary = build_dist_table()
-		while true:
-			var bfinal:int = get_bit_for_inflate(state)
-			match get_bits_for_inflate(2,state):
-				0:
-					state.buffer = 0
-					state.count = 0
-					var length:int = (state.input[state.pos]) | ((state.input[state.pos + 1]) << 8)
-					state.pos += 4 # skip LEN + one's-complement NLEN
-					for i in length:
-						state.output.append(state.input[state.pos + i])
-					state.pos += length
-				1:
-					inflate_huffman_block(state, fixed_litlen, fixed_dist)
-				2:
-					var hlit:int = get_bits_for_inflate(5,state) + 257
-					var hdist:int = get_bits_for_inflate(5,state) + 1
-					var hclen:int = get_bits_for_inflate(4,state) + 4
-					var cl_lengths:PoolIntArray = __reserve_in_array(PoolIntArray(),19)
-					for i in hclen:
-						cl_lengths[cl_order[i]] = get_bits_for_inflate(3,state)
-					var cl_table:Dictionary = build_huffman_table(cl_lengths)
-					
-					var all_lengths:PoolIntArray = PoolIntArray()
-					while all_lengths.size() < (hlit + hdist):
-						var sym:int = decode_huffman_symbol(state, cl_table)
-						if sym < 16:
-							all_lengths.append(sym)
-						elif sym == 16:
-							var prev:int = all_lengths[all_lengths.size() - 1]
-							for i in (get_bits_for_inflate(2,state) + 3):
-								all_lengths.append(prev)
-						elif sym == 17:
-							for i in (get_bits_for_inflate(3,state) + 3):
-								all_lengths.append(0)
-						else: # 18
-							for i in (get_bits_for_inflate(7,state) + 11):
-								all_lengths.append(0)
-							
-					var litlen_lengths:PoolIntArray = PoolIntArray()
-					for i in hlit:
-						litlen_lengths.append(all_lengths[i])
-					var dist_lengths:PoolIntArray = PoolIntArray()
-					for i in hdist:
-						dist_lengths.append(all_lengths[hlit + i])
-					inflate_huffman_block(state, build_huffman_table(litlen_lengths), build_huffman_table(dist_lengths))
-				_:
-					l("ERROR: reserved/invalid DEFLATE block type (corrupt data?)","pointers.DataFormat")
-					break
-			if bfinal == 1:
-				break
-		return PoolByteArray(state.output)
-	
-	static func get_bit_for_inflate(state:Dictionary) -> int:
-		if state.count == 0:
-			if state.pos >= state.input.size():
-				return 0
-			state.buffer = state.input[state.pos]
-			state.pos += 1
-			state.count = 8
-		var bit:int = state.buffer & 1
-		state.buffer >>= 1
-		state.count -= 1
-		return bit
-	
-	static func get_bits_for_inflate(n:int,state:Dictionary) -> int:
-		var value:int = 0
-		for i in n:
-			value = value | (get_bit_for_inflate(state) << i)
-		return value
-	
-	static func build_litlen_table() -> Dictionary:
-		var lengths:PoolIntArray = PoolIntArray()
-		lengths.resize(288)
-		for i in 144:
-			lengths[i] = 8
-		for i in range(144, 256):
-			lengths[i] = 9
-		for i in range(256, 280):
-			lengths[i] = 7
-		for i in range(280, 288):
-			lengths[i] = 8
-		return build_huffman_table(lengths)
-	
-	static func build_huffman_table(lengths : PoolIntArray) -> Dictionary:
-		var max_len:int = 0
-		for l in lengths:
-			if l > max_len:
-				max_len = l
-		var bl_count:PoolIntArray = __reserve_in_array(PoolIntArray(),max_len + 1)
-		for l in lengths:
-			if l > 0:
-				bl_count[l] += 1
-		var next_code:PoolIntArray = PoolIntArray()
-		next_code.resize(max_len + 1)
-		var code:int = 0
-		bl_count[0] = 0
-		for n in range(1, max_len + 1):
-			code = (code + bl_count[n - 1]) << 1
-			next_code[n] = code
-		var table:Dictionary = Dictionary()
-		for symbol in lengths.size():
-			var length:int = lengths[symbol]
-			if length == 0:
-				continue
-			if not table.has(length):
-				table[length] = {}
-			table[length][next_code[length]] = symbol
-			next_code[length] += 1
-		return table
-	
-	static func build_dist_table() -> Dictionary:
-		var lengths:PoolIntArray = PoolIntArray()
-		lengths.resize(30)
-		lengths.fill(5)
-		return build_huffman_table(lengths)
-	
-	static func inflate_huffman_block(state : Dictionary, litlen_table : Dictionary, dist_table : Dictionary) -> void:
-		while true:
-			var sym:int = decode_huffman_symbol(state, litlen_table)
-			if sym < 0 or sym == 256:
-				return
-			if sym < 256:
-				state.output.append(sym)
-			else:
-				var length:int = length_base[sym - 257] + get_bits_for_inflate(length_extra[sym - 257],state)
-				var dist_sym:int = decode_huffman_symbol(state, dist_table)
-				var start:int = state.output.size() - (distance_base[dist_sym] + get_bits_for_inflate(distance_extra[dist_sym],state))
-				for i in length:
-					state.output.append(state.output[start + i])
-	
-	static func decode_huffman_symbol(state: Dictionary, table: Dictionary) -> int:
-		var code:int = 0
-		for i in range(1,17):
-			code = (code << 1) | get_bit_for_inflate(state)
-			if table.has(i) and table[i].has(code):
-				return table[i][code]
-		l("ERROR: invalid Huffman code while inflating (corrupt data?)","pointers.DataFormat")
-		return -1
+	static func __decompress_raw_deflate_stream(data: PoolByteArray, max_size:int = 0) -> PoolByteArray:
+		return non_statics["ziptools"].decompress_zlib(data,max_size)
 	
 	static func __compress_to_raw_deflate_stream(data: PoolByteArray) -> PoolByteArray:
-		var bytes:PoolByteArray = data.compress(1)
-		return bytes.subarray(2, bytes.size() - 5)
+		return non_statics["ziptools"].compress_zlib(data)
 	
 	static func __store_8_in_buffer(byte:int,buffer:PoolByteArray = PoolByteArray()) -> PoolByteArray:
 		buffer.append(byte % bitmask_uint8)
