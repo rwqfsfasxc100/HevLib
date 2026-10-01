@@ -75,15 +75,15 @@ func hl_ug_recheck_this_visibility():
 	if pointers and config_id and config_section and config_setting:
 		cv = pointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
 
-func reexamine():	
+func reexamine():
+	.reexamine()
 	var ship:Node = CurrentGame.getPlayerShip()
 	var shipname:String = ship.shipName
-	if limit_ships:
-		visible = (shipname in limit_ships)
-	if prevent_ships:
-		visible = not (shipname in prevent_ships)
-	.reexamine()
-	if cv is bool:
+	if limit_ships and not (shipname in limit_ships):
+		visible = false
+	if prevent_ships and (shipname in prevent_ships):
+		visible = false
+	if visible and cv is bool:
 		if invert_config:
 			cv = !cv
 		visible = cv
