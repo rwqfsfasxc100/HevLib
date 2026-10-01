@@ -953,8 +953,7 @@ func get_script_constant_map_without_load(script_path : String) -> Dictionary:
 func testing():
 	var script_shadow_creator = load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
 	
-	
-	
+	var ziplib = load("res://HevLib/scripts/ziptools/ziptools.gdns").new()
 	
 	
 	

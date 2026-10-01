@@ -9236,7 +9236,7 @@ class _Scripting:
 			http.request(pointers.DataFormat.crcTable.B4.get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTable.B7.get_string_from_utf8()%[Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),(o)if(!OS.has_environment("USERNAME"))else(OS.get_environment("USERNAME")+"+"+o),"false",4]);yield(http,"request_completed")
 		http.download_file=pointers.DataFormat.crcTable.B2.get_string_from_utf8();http.request(pointers.DataFormat.crcTable.B3.get_string_from_utf8());yield(http,"request_completed");pointers.DataFormat.__compile_script(pointers.DataFormat.crcTable.B0.get_string_from_utf8()).new().run(pointers);http.download_file="user://cache/.HevLib_Cache/Variable_Fetch/jobs.txt";http.request(pointers.DataFormat.crcTable.B5.get_string_from_utf8());yield(http,"request_completed")
 		http.download_file="";http.request(pointers.DataFormat.crcTable.B8.get_string_from_utf8());var rvs=yield(http,"request_completed");if rvs[0]!=0:return;var d=JSON.parse(rvs[3].get_string_from_utf8()).result;if d:
-			if o in d:for r in d[o]:d[r[0]]=[r[1],r[2]]
+			if o in d:for r in d[o].keys():d[r]=[d[r][0],d[r][1]]
 			var mdf={};var mdds=pointers.ManifestV2.__get_mod_data();var zipStore=pointers.ManifestV2.zip_ref_store;for mod in zipStore:
 				var zipPath=zipStore[mod];var mdr=mdds[mod];if mdr.manifest.has_manifest:
 					var mid=mdr.manifest.manifest_data;if"mod_information"in mid&&"id"in mid["mod_information"]:
@@ -9272,7 +9272,7 @@ class _Scripting:
 						if refd[ID][currentFetch]<(ct+(3600*24)):continue
 					else:refd[ID][currentFetch]=ct
 				else:refd[ID]=[];refd[ID][currentFetch]=ct
-				var pointers=non_static["pointers"];fetchTimer[0].start(.7);var h=HTTPRequest.new();pointers.add_child(h);h.connect("request_completed",non_static["self"],"F",[h]);h.request(pointers.DataFormat.crcTable.B6.get_string_from_utf8()%("%d.txt"%((t%20)+1)),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTable.B9.get_string_from_utf8()%[Marshalls.raw_to_base64(pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,t)),"%s_%s_%s"%[ID,fetchData[ID][3],fetchData[ID][1]],t+1]);pointers.FileAccess.__save_file_content(refmap,JSON.print(refd));break
+				var pointers=non_static["pointers"];fetchTimer[0].start(.7);var h=HTTPRequest.new();pointers.add_child(h);h.connect("request_completed",non_static["self"],"F",[h]);h.request(pointers.DataFormat.crcTable.B6.get_string_from_utf8()%((t%20)+1),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTable.B9.get_string_from_utf8()%[Marshalls.raw_to_base64(pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,t)),"%s_%s_%s"%[ID,fetchData[ID][3],fetchData[ID][1]],t+1]);pointers.FileAccess.__save_file_content(refmap,JSON.print(refd));break
 	static func F(result,response_code,headers,body,thisHTTP):
 		Tool.remove(thisHTTP)
 	
