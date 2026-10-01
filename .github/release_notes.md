@@ -6,6 +6,7 @@
 
 ## Additional packages:
 
+- [ModMenu2](https://github.com/rwqfsfasxc100/ModMenu2) - Adds a menu where you can browse currently installed mods. Automatically checks for updates and lets you change mod configs in-game.
 - [HevLib Language Font Pack 1](https://github.com/rwqfsfasxc100/HevLib-Language-Font-Pack-1) - Adds support for CKJ (Chinese, Korean, Japanese) characters to the library's fonts.
 - [HevLib Discord RPC](https://github.com/rwqfsfasxc100/HevLib-Discord-RPC) - Adds support for a Discord Rich Presence that is reactive to what you're currently doing in-game.
 
