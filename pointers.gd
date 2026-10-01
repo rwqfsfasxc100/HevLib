@@ -91,6 +91,7 @@ const HEVLIB_CACHE_VERSION : int = 5
 
 var logging_frame_interval:float = 0
 var logging_current_frame_timer:int = 0
+
 func _physics_process(delta:float):
 	if ConfigDriver.mk_c:
 		# If a config was changed in the loaded profile, handle
@@ -102,6 +103,7 @@ func _physics_process(delta:float):
 		# This won't run until the interval is fetched after being onready
 		logging_current_frame_timer = 0
 		storeLogCache()
+#		VisualServer.render_loop_enabled = OS.is_window_focused()
 
 var dir:Directory = Directory.new()
 var file:File = File.new()
@@ -3926,31 +3928,28 @@ class _Equipment:
 				for snn in node:
 					var data : Dictionary = node[snn]
 					var spp : Dictionary = ship_limitations.get(snn,{})
-					var sppKeys:Array = spp.keys()
 					if "limit_ships" in data:
 						var val : Array = Array(data["limit_ships"]).duplicate()
 						if snn in ship_limitations:
-							if "limit_ships" in sppKeys:
+							if "limit_ships" in spp.keys():
 								for f in val:
-									if not f in sppKeys:
-										ship_limitations[snn]["limit_ships"] = f
+									if not f in spp["limit_ships"]:
+										ship_limitations[snn]["limit_ships"].append(f)
 							else:
 								ship_limitations[snn]["limit_ships"] = spp["limit_ships"]
 						else:
-							ship_limitations[snn] = {}
-							ship_limitations[snn]["limit_ships"] = val
+							ship_limitations[snn] = {"limit_ships":val}
 					if "prevent_ships" in data:
 						var val : Array = Array(data["prevent_ships"]).duplicate()
 						if snn in ship_limitations:
-							if "prevent_ships" in sppKeys:
+							if "prevent_ships" in spp.keys():
 								for f in val:
-									if not f in sppKeys:
-										ship_limitations[snn]["prevent_ships"] = f
+									if not f in spp["prevent_ships"]:
+										ship_limitations[snn]["prevent_ships"].append(f)
 							else:
 								ship_limitations[snn]["prevent_ships"] = spp["prevent_ships"]
 						else:
-							ship_limitations[snn] = {}
-							ship_limitations[snn]["prevent_ships"] = val
+							ship_limitations[snn] = {"prevent_ships":val}
 		
 		var slots_format : PoolStringArray = []
 		var editable_paths : PoolStringArray = []
@@ -10163,22 +10162,31 @@ class _Zip:
 	
 	
 	func __get_zip_content(path:String) -> PoolStringArray:
-		var listOfNames = []
 		var ziptools = load("res://HevLib/scripts/ziptools/ziptools.gdns").new()
 		ziptools.open_read(path)
-		var fileList = PoolStringArray(ziptools.list_files())
+		var fileList:PoolStringArray = ziptools.list_files()
 		ziptools.close()
-		return listOfNames
+		return fileList
 	
-	func __fetch_file_from_zip(path:String, desired_file_names:PoolStringArray, output_directory:String):
-		var listOfNames = []
+	func __fetch_file_from_zip(path:String, desired_file_names:PoolStringArray, output_directory:String) -> PoolStringArray:
+		for i in desired_file_names.size():
+			desired_file_names[i] = desired_file_names[i].to_lower()
 		var ziptools = load("res://HevLib/scripts/ziptools/ziptools.gdns").new()
+		var listOfNames:Dictionary = {}
 		ziptools.open_read(path)
-		var fileList = ziptools.list_files()
-		for d in desired_file_names:
-			if ziptools.file_exists(d):
-				ziptools.extract_file(d, output_directory.plus_file(d))
+		for d in ziptools.list_files():
+			var df:String = d.to_lower().get_file()
+			if df in desired_file_names:
+				listOfNames[df] = ziptools.read_file(d)
 		ziptools.close()
+		var out:PoolStringArray = listOfNames.keys()
+		for i in out:
+			var ovr:String = output_directory.plus_file(i)
+			dir.make_dir_recursive(ovr.get_base_dir())
+			file.open(ovr,File.WRITE)
+			file.store_buffer(listOfNames[i])
+			file.close()
+		return out
 	
 	
 	
