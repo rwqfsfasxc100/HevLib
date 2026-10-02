@@ -35,18 +35,23 @@ extends "res://asteroids/mineral.gd"
 export var color = Color(1,1,1,1)
 export var ferrous = false
 
+var hl_sprite_overlay:Sprite
+
 var hl_mineraldriverminerak_uinit : bool = false
 func _ready():
 	if hl_mineraldriverminerak_uinit:
 		OS.kill(OS.get_process_id())
 	hl_mineraldriverminerak_uinit = true
-	var o : Sprite = load("res://HevLib/scenes/minerals/icons/MineralOverlay.tscn").instance()
-	o.region_rect = sprite.region_rect
-	o.scale = sprite.scale
-	o.position = sprite.position
-	add_child(o)
+	hl_sprite_overlay = load("res://HevLib/scenes/minerals/icons/MineralOverlay.tscn").instance()
+	redraw_mineral_overlay_tex()
+	add_child(hl_sprite_overlay)
 	sprite.modulate = color
+	sprite.connect("draw",self,"redraw_mineral_overlay_tex")
 	name = mineral
 	if ferrous:
 		set_collision_layer_bit(5,true)
-	
+
+func redraw_mineral_overlay_tex():
+	hl_sprite_overlay.region_rect = sprite.region_rect
+	hl_sprite_overlay.scale = sprite.scale
+	hl_sprite_overlay.position = sprite.position

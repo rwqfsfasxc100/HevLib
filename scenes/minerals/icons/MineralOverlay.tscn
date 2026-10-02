@@ -10,7 +10,7 @@ load_path = "res://HevLib/scenes/minerals/icons/minerals-c-overlay.stex"
 flags = 4
 load_path = "res://HevLib/scenes/minerals/icons/minerals-n-overlay.stex"
 
-[node name="Overlay" type="Sprite"]
+[node name="MineralOverlay" type="Sprite"]
 material = ExtResource( 1 )
 scale = Vector2( 0.25, 0.25 )
 texture = SubResource( 1 )
