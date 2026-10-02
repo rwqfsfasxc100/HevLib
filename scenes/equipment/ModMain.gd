@@ -503,9 +503,9 @@ func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader):
 			if file_name.get_extension() == "gd":
 				script_paths.append(file_name)
 	if script_paths:
-		var dir:Directory = Directory.new()
-		dir.make_dir_recursive("user://cache/.HevLib_Cache/Variable_Fetch/")
-		var classes_to_clear:PoolStringArray = PoolStringArray(["HevLibPointers"])
+		directory.make_dir_recursive("user://cache/.HevLib_Cache/Variable_Fetch/")
+		var class_names_to_clear:PoolStringArray = PoolStringArray(["HevLibPointers","MINIZ"])
+		var class_refs:Dictionary = {"HevLibPointers":"res://HevLib/pointers.gd","MINIZ":"res://HevLib/scripts/miniz/miniz.gd"}
 		var driver_dirs:PoolStringArray = PoolStringArray([
 			"HEVLIB_EQUIPMENT_DRIVER_TAGS",
 			"HEVLIB_MENU",
@@ -514,21 +514,48 @@ func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader):
 		])
 		for sc in script_paths:
 			if sc.get_file() == "DEFINED_CLASS_NAMES.gd" and sc.split("/",false)[-2] in driver_dirs:
-				for i in PoolStringArray(load(sc).get_script_constant_map().get("DEFINED_CLASS_NAMES",PoolStringArray())):
-					if not i in classes_to_clear:
-						classes_to_clear.append(i)
-		var clearlist:String = "|".join(classes_to_clear)
-		var regex:RegEx = RegEx.new()
+				var fetched = load(sc).get_script_constant_map().get("DEFINED_CLASS_NAMES",[])
+				match typeof(fetched):
+					TYPE_ARRAY,TYPE_STRING_ARRAY:
+						for i in fetched:
+							match typeof(i):
+								TYPE_ARRAY,TYPE_STRING_ARRAY:
+									var itemName:String = i[0]
+									if not itemName in class_names_to_clear:
+										class_names_to_clear.append(itemName)
+										class_refs[itemName] = i[1]
+								TYPE_STRING:
+									if not i in class_names_to_clear:
+										class_names_to_clear.append(i)
+										class_refs[i] = ""
+					TYPE_DICTIONARY:
+						for i in fetched.keys():
+							if not i in class_names_to_clear and typeof(fetched[i]) == TYPE_STRING:
+								class_names_to_clear.append(i)
+								class_refs[i] = fetched[i]
+		var clearlist:String = "|".join(class_names_to_clear)
+		var regex:RegEx = RegEx.new() # Checks for type-casting
+		var regex2:RegEx = RegEx.new() # Checks for object literal
+		var regex3:RegEx = RegEx.new() # Checks for method casting
 #		regex.compile("\\b(?:var)\\s+\\w+\\K\\s*:\\s*(?!(?:%s)\\b)\\w+" % vanilla_classes)
-		regex.compile("\\b(?:var)\\s+\\w+\\K\\s*:\\s*(?:%s)\\b" % clearlist)
+		var compiler_A:String = "\\b(?:var|\\-\\>)\\s+\\w+\\K\\s*:\\s*(?:%s)\\b" % clearlist
+		var compiler_B:String = clearlist
+		var compiler_C:String = "(?:\\-\\>)\\s+(?:%s)\\b\\s*(?:\\:)" % clearlist
+		
+		
+		regex.compile(compiler_A)
+		regex2.compile(compiler_B)
+		regex3.compile(compiler_C)
 		for script in script_paths:
 			file.open("res://" + script,File.READ)
 			var text:String = file.get_as_text(true)
 			file.close()
+			var doSave:bool = false
+			var ignoreChars:PoolStringArray = PoolStringArray(["\n","=",";"])
 			var entries:Array = regex.search_all(text)
 			if entries:
-				var cases:PoolStringArray = PoolStringArray()
-				var ignoreChars:PoolStringArray = PoolStringArray(["\n","=",";"])
+				var cases:Array = Array()
+				var cHashes:Array = Array()
 				for entry in entries:
 					var endPos:int = entry.get_end()
 					var appendage:String = ""
@@ -541,10 +568,52 @@ func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader):
 					for s in entry.strings:
 						var sp:String = s + appendage
 						if not sp in cases:
-							cases.append(sp)
-				for r in cases:
-					text = text.replace(r,"")
+							var case:Array = [sp,""]
+							var ch:int = hash(case)
+							if not ch in cHashes:
+								cases.append(case)
+								cHashes.append(ch)
+				if cases:
+					doSave = true
+					for r in cases:
+						text = text.replace(r[0],r[1])
+#			var entries_3:Array = regex3.search_all(text)
+#			if entries_3:
+#				var cases:Array = Array()
+#				var cHashes:Array = Array()
+#				for entry in entries_3:
+#					for s in entry.strings:
+#						if not s in cases:
+#							var case:Array = [s,":"]
+#							var ch:int = hash(case)
+#							if not ch in cHashes:
+#								cases.append(case)
+#								cHashes.append(ch)
+#				if cases:
+#					doSave = true
+#					for r in cases:
+#						text = text.replace(r[0],r[1])
+#			var entries_2:Array = regex2.search_all(text)
+#			if entries_2:
+#				var cases:Array = Array()
+#				var cHashes:Array = Array()
+#				for entry in entries_2:
+#					var endPos:int = entry.get_end()
+#					var maxLen:int = text.length()
+#					var appendage:String = text.substr(endPos,4)
+#					for s in entry.strings:
+#						var case:Array = [s,"load(\"%s\")" % class_refs.get(s,"")]
+#						var ch:int = hash(case)
+#						if not ch in cHashes:
+#							cases.append(case)
+#							cHashes.append(ch)
+#				if cases:
+#					doSave = true
+#					for r in cases:
+#						text = text.replace(r[0],r[1])
+			if doSave:
 				replacements[script] = text.to_utf8()
+			
 func create_zip_for_overrides(replacements:Dictionary):
 	if replacements:
 		var datetime:Dictionary = Time.get_datetime_dict_from_system()
@@ -952,10 +1021,6 @@ func get_script_constant_map_without_load(script_path : String) -> Dictionary:
 
 func testing():
 	var script_shadow_creator = load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
-	
-	var ziplib = load("res://HevLib/scripts/ziptools/ziptools.gdns").new()
-	
-	
 	
 	
 	

@@ -1974,7 +1974,7 @@ class _DataFormat:
 	
 	func _init(f):
 		non_statics["pointers"] = f
-		non_statics["ziptools"] = load("res://HevLib/scripts/ziptools/ziptools.gdns").new()
+		non_statics["miniz"] = load("res://HevLib/scripts/miniz/miniz.gdns").new()
 		var urlRegex = RegEx.new()
 		urlRegex.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,63}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
 		non_statics["urlRegex"] = urlRegex
@@ -2818,7 +2818,7 @@ class _DataFormat:
 		return integer & bitmask_uint32
 	
 	static func __get_crc_32(bytes: PoolByteArray) -> int:
-		return non_statics["ziptools"].crc32(bytes)
+		return non_statics["miniz"].crc32(bytes)
 	
 	static func __get_uint32_from_buffer(buffer: PoolByteArray, offset: int = 0) -> int:
 		return buffer[offset] | (buffer[offset + 1] << 8) | (buffer[offset + 2] << 16) | (buffer[offset + 3] << 24)
@@ -2827,10 +2827,12 @@ class _DataFormat:
 		return buffer[offset] | (buffer[offset + 1] << 8)
 	
 	static func __decompress_raw_deflate_stream(data: PoolByteArray, max_size:int = 0) -> PoolByteArray:
-		return non_statics["ziptools"].decompress_zlib(data,max_size)
+		return non_statics["miniz"].decompress_zlib(data,max_size)
 	
-	static func __compress_to_raw_deflate_stream(data: PoolByteArray) -> PoolByteArray:
-		return non_statics["ziptools"].compress_zlib(data)
+	static func __compress_to_raw_deflate_stream(data: PoolByteArray,compression_level:int = 6) -> PoolByteArray:
+		var miniz = non_statics["miniz"]
+		miniz.compression_level = compression_level
+		return miniz.compress_zlib(data)
 	
 	static func __store_8_in_buffer(byte:int,buffer:PoolByteArray = PoolByteArray()) -> PoolByteArray:
 		buffer.append(byte % bitmask_uint8)
@@ -10162,33 +10164,38 @@ class _Zip:
 	
 	
 	func __get_zip_content(path:String) -> PoolStringArray:
-		var ziptools = load("res://HevLib/scripts/ziptools/ziptools.gdns").new()
-		ziptools.open_read(path)
-		var fileList:PoolStringArray = ziptools.list_files()
-		ziptools.close()
+		var miniz = load("res://HevLib/scripts/miniz/miniz.gdns").new()
+		miniz.open_read(path)
+		var fileList:PoolStringArray = miniz.list_files()
+		miniz.close()
 		return fileList
 	
 	func __fetch_file_from_zip(path:String, desired_file_names:PoolStringArray, output_directory:String) -> PoolStringArray:
 		for i in desired_file_names.size():
 			desired_file_names[i] = desired_file_names[i].to_lower()
-		var ziptools = load("res://HevLib/scripts/ziptools/ziptools.gdns").new()
+		var miniz = load("res://HevLib/scripts/miniz/miniz.gdns").new()
 		var listOfNames:Dictionary = {}
-		ziptools.open_read(path)
-		for d in ziptools.list_files():
+		miniz.open_read(path)
+		for d in miniz.list_files():
 			var df:String = d.to_lower().get_file()
 			if df in desired_file_names:
-				listOfNames[df] = ziptools.read_file(d)
-		ziptools.close()
-		var out:PoolStringArray = listOfNames.keys()
-		for i in out:
+				listOfNames[df] = miniz.read_file(d)
+		miniz.close()
+		var out:PoolStringArray = PoolStringArray()
+		for i in listOfNames.keys():
 			var ovr:String = output_directory.plus_file(i)
 			dir.make_dir_recursive(ovr.get_base_dir())
 			file.open(ovr,File.WRITE)
 			file.store_buffer(listOfNames[i])
 			file.close()
+			out.append(ovr)
 		return out
 	
+	func __get_miniz_object():
+		return load("res://HevLib/scripts/miniz/miniz.gd").new()
 	
+	func __get_miniz_library():
+		return load("res://HevLib/scripts/miniz/miniz.gdns").new()
 	
 	
 	

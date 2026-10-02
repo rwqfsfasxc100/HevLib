@@ -1,0 +1,22 @@
+[general]
+
+singleton=false
+load_once=true
+symbol_prefix="godot_"
+reloadable=false
+
+[entry]
+
+X11.64="res://HevLib/scripts/miniz/libminiz.so"
+Server.64="res://HevLib/scripts/miniz/libminiz.so"
+Windows.64="res://HevLib/scripts/miniz/miniz.dll"
+OSX.64="res://HevLib/scripts/ziptools/libminiz.dylib"
+OSX.arm64="res://HevLib/scripts/ziptools/libminiz.dylib"
+
+[dependencies]
+
+X11.64=[  ]
+Server.64=[  ]
+Windows.64=[  ]
+OSX.64=[  ]
+OSX.arm64=[  ]
