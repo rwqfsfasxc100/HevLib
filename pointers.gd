@@ -10044,8 +10044,6 @@ class _Zip:
 	func _init(p):
 		non_static["pointers"] = p
 	
-	var file:File = File.new()
-	var dir:Directory = Directory.new()
 	# Port of the `load` method from hhyyrylainen's GodotPckTool
 	# https://github.com/hhyyrylainen/GodotPckTool
 	const PckHeaderMagic = 0x43504447
@@ -10055,7 +10053,9 @@ class _Zip:
 	const PckFileRelativeBase = 1 << 1
 	const PckFileSparseBundle = 1 << 2
 	const MaxSupportedPckVersionLoad = 4
-	func __load_pck(file_path:String,only_filenames:bool = false):
+	static func __load_pck(file_path:String,only_filenames:bool = false):
+		var file:File = File.new()
+		var dir:Directory = Directory.new()
 		var pointers = non_static["pointers"]
 		pointers.l("Loading PCK @ %s, fetching only filenames? [%s]" % [file_path,str(only_filenames)],"pointers.Zip")
 		var Contents:Dictionary = {}
@@ -10140,8 +10140,9 @@ class _Zip:
 		pointers.l("Finished fetching PCK data, fetched %d files" % Contents.size(),"pointers.Zip")
 		return Contents
 	
-	func __write_pck(file_path:String,files:Dictionary) -> int:
+	static func __write_pck(file_path:String,files:Dictionary) -> int:
 		var packer = PCKPacker.new()
+		var file:File = File.new()
 		non_static["pointers"].FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
 		packer.pck_start(file_path)
 		for file_name in files:
@@ -10163,17 +10164,17 @@ class _Zip:
 		return packer.flush()
 	
 	
-	func __get_zip_content(path:String) -> PoolStringArray:
-		var miniz = load("res://HevLib/scripts/miniz/miniz.gdns").new()
+	static func __get_zip_content(path:String) -> PoolStringArray:
+		var miniz = __get_miniz_object()
 		miniz.open_read(path)
 		var fileList:PoolStringArray = miniz.list_files()
 		miniz.close()
 		return fileList
 	
-	func __fetch_file_from_zip(path:String, desired_file_names:PoolStringArray, output_directory:String) -> PoolStringArray:
+	static func __fetch_file_from_zip(path:String, desired_file_names:PoolStringArray, output_directory:String) -> PoolStringArray:
 		for i in desired_file_names.size():
 			desired_file_names[i] = desired_file_names[i].to_lower()
-		var miniz = load("res://HevLib/scripts/miniz/miniz.gdns").new()
+		var miniz = __get_miniz_object()
 		var listOfNames:Dictionary = {}
 		miniz.open_read(path)
 		for d in miniz.list_files():
@@ -10181,6 +10182,8 @@ class _Zip:
 			if df in desired_file_names:
 				listOfNames[df] = miniz.read_file(d)
 		miniz.close()
+		var file:File = File.new()
+		var dir:Directory = Directory.new()
 		var out:PoolStringArray = PoolStringArray()
 		for i in listOfNames.keys():
 			var ovr:String = output_directory.plus_file(i)
@@ -10191,13 +10194,16 @@ class _Zip:
 			out.append(ovr)
 		return out
 	
-	func __get_miniz_object():
+	static func __get_miniz_object():
 		return load("res://HevLib/scripts/miniz/miniz.gd").new()
 	
-	func __get_miniz_library():
+	static func __get_miniz_library():
 		return load("res://HevLib/scripts/miniz/miniz.gdns").new()
 	
-	
+	static func __extract_zip_to_dir(zip_path:String,dir_path:String):
+		var miniz:MINIZ = __get_miniz_object()
+		if miniz.open_read(zip_path) == OK:
+			miniz.extract_all(dir_path)
 	
 	
 	
