@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://HevLib/ui/shaders/PolyTexClip.gd" type="Script" id=1]
+
+[node name="PolyTexClip" type="Polygon2D"]
+color = Color( 1, 1, 1, 0 )
+polygon = PoolVector2Array( 20, 10, 180, 30, 150, 160, 40, 140 )
+script = ExtResource( 1 )

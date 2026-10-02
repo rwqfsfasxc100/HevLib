@@ -87,7 +87,7 @@ var Classes = {
 
 var copyrights:String = "© 2024-2026 Benjamin Buckhurst a.k.a. __hev. All rights reserved."
 
-const HEVLIB_CACHE_VERSION : int = 5
+const HEVLIB_CACHE_VERSION : int = 6
 
 var logging_frame_interval:float = 0
 var logging_current_frame_timer:int = 0
@@ -5715,7 +5715,7 @@ class _FileAccess:
 							match fn.get_extension():
 								"res":dependencies.append(fn.get_basename().get_basename())
 								"gdc":dependencies.append(fn.get_basename() + ".gd")
-								_:dependencies.append(fn)
+								_:dependencies.append(fn.strip_edges())
 					buffer += hexText.length() / 2.0
 		return dependencies
 	
@@ -9002,8 +9002,8 @@ class _SafeMode:
 			file.close()
 			for f in PCKNAMES:
 				get_dependancies_for_vanilla_file(f)
-			vanilla_load_order.append_array(dependancy_dict_keys)
 			order_tree.merge(flatten_tree(get_dependancy_tree()))
+			vanilla_load_order.append_array(dependancy_dict_keys)
 			var vsize:int = vanilla_load_order.size()
 			var idx:int = 0
 			while idx < vsize:
