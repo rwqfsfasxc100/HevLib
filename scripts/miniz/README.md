@@ -14,8 +14,7 @@ func get_miniz_plugin():
 	return load("res://HevLib/scripts/miniz/miniz.gdns").new()
 
 # Returns a copy of the helper script
-# Can be cast as the `MINIZ` type to ensure proper autocomplete
-func get_miniz_helper() -> MINIZ:
+func get_miniz_helper():
 	return load("res://HevLib/scripts/miniz/miniz.gd").new()
 ```
 
