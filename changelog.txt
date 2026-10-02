@@ -12,7 +12,7 @@
 4.2=* 0 dictates no compression, 10 is heavy compression
 4.3=* Defaults to 6. This is a good compromise between speed and file size.
 5=* `__get_zip_content` and `__fetch_file_from_zip` now are much faster and make use of the miniz library
-6=* `Zip` clas is now static
+6=* `Zip` class is now static
 7=* Added `__get_miniz_object` and `__get_miniz_library` to the `Zip` class.
 7.1=* These provide the miniz script and library objects respectively.
 7.2=* They're functionally identical, however the script object can be used to give better autocomplete
