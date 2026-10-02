@@ -1,6 +1,6 @@
 [1.16.19]
 
-1=* Fixed crash caused by incorrect file fetching
+1=* Fixed crash caused by a malformatted file check incorrectly wiping libraries
 
 [1.16.18]
 
