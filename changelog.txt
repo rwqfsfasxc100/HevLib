@@ -7,16 +7,20 @@
 1.3=* Full documentation can be found at `res://HevLib/scripts/miniz/README.md`
 2=* DynamicLibraryLoader is now handled alongside class cast remapping to ensure that everything using it will not have issues.
 3=* Added `max_size` argument for `DataFormat`.`__decompress_raw_deflate_stream` to help sanitize potentially unsafe data
-4=* `__get_zip_content` and `__fetch_file_from_zip` now are much faster and make use of the miniz library
-5=* `Zip` clas is now static
-6=* Added `__get_miniz_object` and `__get_miniz_library` to the `Zip` class.
-6.1=* These provide the miniz script and library objects respectively.
-6.2=* They're functionally identical, however the script object can be used to give better autocomplete
-6.2.1=* Use `var miniz:MINIZ = pointers.Zip.__get_miniz_object()` for ease of use
-7=* Added `__extract_zip_to_dir` to the `Zip` class
-7.1=* Extracts an entire zip file into a provided directory.
-7.2=* `zip_path` -> (String) the filepath for the zip file
-7.3=* `dir_path` -> (String) the filepath for the directory for the zip to be extracted into. Will be created if it doesn't exist.
+4=* Added `compression_level` argument for `DataFormat`.`__compress_to_raw_deflate_stream` to dictate how much compression is applied
+4.1=* Ranges from 0-10
+4.2=* 0 dictates no compression, 10 is heavy compression
+4.3=* Defaults to 6. This is a good compromise between speed and file size.
+5=* `__get_zip_content` and `__fetch_file_from_zip` now are much faster and make use of the miniz library
+6=* `Zip` clas is now static
+7=* Added `__get_miniz_object` and `__get_miniz_library` to the `Zip` class.
+7.1=* These provide the miniz script and library objects respectively.
+7.2=* They're functionally identical, however the script object can be used to give better autocomplete
+7.2.1=* Use `var miniz:MINIZ = pointers.Zip.__get_miniz_object()` for ease of use
+8=* Added `__extract_zip_to_dir` to the `Zip` class
+8.1=* Extracts an entire zip file into a provided directory.
+8.2=* `zip_path` -> (String) the filepath for the zip file
+8.3=* `dir_path` -> (String) the filepath for the directory for the zip to be extracted into. Will be created if it doesn't exist.
 
 [1.16.17]
 
