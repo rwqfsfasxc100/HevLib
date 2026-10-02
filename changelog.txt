@@ -1,3 +1,7 @@
+[1.16.19]
+
+1=* Fixed crash caused by incorrect file fetching
+
 [1.16.18]
 
 1=* Added new `miniz` library to replace the GDUNZIP library

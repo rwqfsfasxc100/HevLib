@@ -454,7 +454,7 @@ func process_gdnative_plugins():
 				var bfr:PoolByteArray = file.get_buffer(file.get_len())
 				file.close()
 				fetchPaths[entry.substr(6)] = bfr
-		for f in fetch_folder_files(exePath,false,true,true):
+		for f in fetch_folder_files(exePath,false,false):
 			if not f in existing_libs:
 				directory.remove(f)
 	return fetchPaths
