@@ -2005,9 +2005,7 @@ class _DataFormat:
 		if degrees:
 			angle = deg2rad(angle)
 		angle = -angle
-		var x:float = point[0]
-		var y:float = point[1]
-		return Vector2((x*cos(angle))-(y*sin(angle)),(y*cos(angle))+(x*sin(angle)))
+		return Vector2((point.x*cos(angle))-(point.y*sin(angle)),(point.y*cos(angle))+(point.x*sin(angle)))
 	const vanilla_version : PoolIntArray = PoolIntArray([1,0,0])
 	static func __get_vanilla_version() -> PoolIntArray:
 		if deep_equal(vanilla_version, PoolIntArray([1,0,0])):
@@ -9058,15 +9056,17 @@ class _SafeMode:
 		var base = non_static["self"]
 		if base.safeCheck:
 			var pointers = non_static["pointers"]
-			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_CHECKINGFILE") % [zip_path.get_file(),file_path],"pointers.SafeMode")
+			var zf:String = zip_path.get_file()
+			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_CHECKINGFILE") % [zf,file_path],"pointers.SafeMode")
 			if file_path in PCKNAMES:
-				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_1") % [file_path,zip_path.get_file()],"pointers.SafeMode")
+				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_1") % [file_path,zf],"pointers.SafeMode")
 				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_2"),"pointers.SafeMode")
 				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_3"),"pointers.SafeMode")
 				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_4"),"pointers.SafeMode")
-				if not zip_path.get_file() in offendingFiles:
-					offendingFiles[zip_path.get_file()] = []
-				offendingFiles[zip_path.get_file()].append(file_path)
+				if not zf in offendingFiles:
+					offendingFiles[zf] = PoolStringArray([file_path])
+				else:
+					offendingFiles[zf].append(file_path)
 				base.offendingFileCount += 1
 				if crash:
 					base.safeCheckTriggered = true
@@ -9074,14 +9074,15 @@ class _SafeMode:
 				var file:File = File.new()
 				file.open(file_path,File.READ)
 				if non_static["regex"].search(file.get_as_text(true)):
-					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_AI_LIKELY") % [file_path,zip_path.get_file()],"pointers.SafeMode")
+					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_AI_LIKELY") % [file_path,zf],"pointers.SafeMode")
 					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_2"),"pointers.SafeMode")
 					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_3"),"pointers.SafeMode")
 					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_4"),"pointers.SafeMode")
 					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_5"),"pointers.SafeMode")
-					if not zip_path.get_file() in offendingFiles:
-						offendingFiles[zip_path.get_file()] = []
-					offendingFiles[zip_path.get_file()].append(file_path)
+					if not zf in offendingFiles:
+						offendingFiles[zf] = PoolStringArray([file_path])
+					else:
+						offendingFiles[zf].append(file_path)
 					base.offendingFileCount += 1
 					if crash:
 						base.safeCheckTriggered = true
@@ -9092,7 +9093,7 @@ class _SafeMode:
 		var base = non_static["self"]
 		pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TOTALLING") % [base.offendingFileCount,offendingFiles.size()],"pointers.SafeMode")
 		for zip_path in offendingFiles:
-			var zip_files = offendingFiles[zip_path]
+			var zip_files:PoolStringArray = offendingFiles[zip_path]
 			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TOTALLING_FOR_MOD") % [zip_files.size(),zip_path],"pointers.SafeMode")
 			for i in zip_files:pointers.l(" -> [%s]" % i,"pointers.SafeMode")
 		if offendingFiles:
@@ -9105,7 +9106,6 @@ class _SafeMode:
 		var out = {}
 		for i in tree.keys():
 			out[i] = get_all_branches(tree[i],PoolStringArray())
-		
 		return out
 	
 	static func get_all_branches(dict:Dictionary,out:PoolStringArray) -> PoolStringArray:

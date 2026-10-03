@@ -261,7 +261,7 @@ func getBuildsFor(s: String):
 	if out and s in cfg_mod_refs:
 		var scfgs = cfg_mod_refs[s].size()
 		var useTheseConfigs = []
-		var outHash = hash(out) + hash(s)
+		var outHash = hash(out) + hash(s) + syPointers.ManifestV2.currentModHash
 		var cfrRand = ((CurrentGame.srai(day + outHash + scfgs, 1)[0]) % wraparound) + randi()
 		if not s in rehash_rand[day]:
 			rehash_rand[day][s] = []

@@ -45,8 +45,7 @@ bool point_in_polygon(vec2 p, int count, float row_v) {
 		int j = (i == 0) ? count - 1 : i - 1;
 		vec2 a = get_point(i, row_v);
 		vec2 b = get_point(j, row_v);
-		if (((a.y > p.y) != (b.y > p.y)) &&
-			(p.x < (b.x - a.x) * (p.y - a.y) / (b.y - a.y) + a.x)) {
+		if (((a.y > p.y) != (b.y > p.y)) && (p.x < (b.x - a.x) * (p.y - a.y) / (b.y - a.y) + a.x)) {
 			inside = !inside;
 		}
 	}
@@ -177,12 +176,12 @@ void fragment() {
 	// Modified portion
 	vec2 grid = vec2(float(hframes), float(vframes));
 	vec2 cell = clamp(floor(UV * grid), vec2(0.0), grid - vec2(1.0));
-	vec2 local_uv = UV * grid - cell;               // 0..1 within the current frame
+	vec2 local_uv = UV * grid - cell;
 	int frame = int(cell.y) * hframes + int(cell.x);
-
+	
 	float row_v = (float(frame) + 0.5) / (grid.x * grid.y);
 	int count = int(texture(poly_tex, vec2(0.5 / float(tex_width), row_v)).b + 0.5);
-
+	
 	if (count < 3 || !point_in_polygon(local_uv, count, row_v)) {
 		COLOR.a = 0.0;
 	}
