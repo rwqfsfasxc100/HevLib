@@ -6,7 +6,7 @@
 3.1=* Currently only supports sprites using `ao-spec-difuse.shader` and `blendWithMask.shader`
 3.1.1=* Both replace the shader with a modified equivalent found in `res://HevLib/ui/shaders`
 3.2=* Polygon can either be set manually or with the visual editor with the PolyTexClip tool node selected
-3.3=* This tool runs every frame and does differentiate between running in-editor or not. This node should be removed after you are finished with it.
+3.3=* This tool runs every frame and does not differentiate between running in-editor or not. This node should be removed after you are finished with it.
 3.3.1=* The polygon is preserved, and can be recovered by adding the tool as a child node later on.
 3.4=* Tool can be found at `res://HevLib/development_tools/sprites_and_shaders/PolyTexClip.tscn`
 
