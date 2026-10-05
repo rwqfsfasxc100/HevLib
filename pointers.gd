@@ -51,6 +51,7 @@ var HevLib : _HevLib = _HevLib.new(self)
 var Keymapping : _Keymapping = _Keymapping.new(self)
 var ManifestV1 : _ManifestV1 = _ManifestV1.new(self)
 var ManifestV2 : _ManifestV2 = _ManifestV2.new(self)
+var Math : _Math = _Math.new(self)
 var NodeAccess : _NodeAccess = _NodeAccess.new(self)
 var RingInfo : _RingInfo = _RingInfo.new(self)
 var RPC : _RPC = _RPC.new(self)
@@ -75,6 +76,7 @@ var Classes = {
 	"Keymapping":Keymapping,
 	"ManifestV1":ManifestV1,
 	"ManifestV2":ManifestV2,
+	"Math":Math,
 	"NodeAccess":NodeAccess,
 	"RingInfo":RingInfo,
 	"RPC":RPC,
@@ -1580,17 +1582,6 @@ class _DataFormat:
 						"String containing the concatenated array"
 					]
 				},
-				"__rotate_point":{
-					"description":"Provides a Vector2 point after being rotated around (0,0)",
-					"args":[
-						"point -> (Vector2) point that is being rotated around (0,0)",
-						"angle -> (float) angles to rotate by",
-						"degrees (optional) -> (bool) for whether 'angle' should be treated as degree angles, and uses radians if not. Defaults to `true`"
-					],
-					"return":[
-						"Vector2 for the rotated point"
-					]
-				},
 				"__get_vanilla_version":{
 					"description":"Fetches the game's current version. May break if any mods change the version label.",
 					"return":[
@@ -1699,24 +1690,6 @@ class _DataFormat:
 						" signal args -> (Array) of arrays containing the names of all arguments for the respective signal. The index of each array is respective of the index of the signal's name, and will be empty if the signal has no arguments",
 						" method args -> (Array) of arrays containing the names and types for the respective method. The index of each array is respective of the index of the method's name, and will be empty if the method has no arguments. If an argument uses a specific type, will be formatted as `<arg name>: <arg type>`",
 						" method return type -> (Array) of strings for the type that the method will return as. If not specified, will be blank. NOTE: If the method explicitely returns void, then it will state a void return type.",
-					]
-				},
-				"__factorial":{
-					"description":"Calculates the factorial of the provided integer",
-					"args":[
-						"n -> (int) the number to be set to it's factorial"
-					],
-					"return":[
-						"int for the output factorial"
-					]
-				},
-				"__get_unique_pairs":{
-					"description":"Provides an array of PoolIntArrays of all pairs of numbers in a range from zero to the provided integer (not inclusive). E.g. 3 = [[0,1],[0,2],[1,2]]",
-					"args":[
-						"max_value -> (int) the range of the pairs, non-inclusive"
-					],
-					"return":[
-						"Array of PoolIntArrays for each pair."
 					]
 				},
 				"__compile_script":{
@@ -2001,11 +1974,6 @@ class _DataFormat:
 	static func __array_to_string(arr: Array) -> String:
 		return "".join(PoolStringArray(arr))
 	
-	static func __rotate_point(point : Vector2, angle : float, degrees : bool = true) -> Vector2:
-		if degrees:
-			angle = deg2rad(angle)
-		angle = -angle
-		return Vector2((point.x*cos(angle))-(point.y*sin(angle)),(point.y*cos(angle))+(point.x*sin(angle)))
 	const vanilla_version : PoolIntArray = PoolIntArray([1,0,0])
 	static func __get_vanilla_version() -> PoolIntArray:
 		if deep_equal(vanilla_version, PoolIntArray([1,0,0])):
@@ -2041,10 +2009,10 @@ class _DataFormat:
 			var aRaw = array[index]
 			var bRaw = array[index + 1]
 			if not (aRaw is float or aRaw is int or aRaw is String):
-				l("Cannot convert type %s for PoolVector2Array" % aRaw)
+				l("Cannot convert type [%s] for PoolVector2Array" % aRaw)
 				return converted
 			if not (bRaw is float or bRaw is int or bRaw is String):
-				l("Cannot convert type %s for PoolVector2Array" % bRaw)
+				l("Cannot convert type [%s] for PoolVector2Array" % bRaw)
 				return converted
 			converted[r] = Vector2(float(aRaw),float(bRaw))
 		return converted
@@ -2291,30 +2259,6 @@ class _DataFormat:
 				reconcat += ls
 			concat = reconcat
 		return [concat if concat !="" else "extends Node",var_names,const_names,signal_names,method_names,signal_values,method_values,method_output_type]
-	
-	static func __factorial(n:int) -> int:
-		var holdvalue:int = 0
-		var boolis:bool = true
-		var s:int = sign(n)
-		n = abs(n)
-		if n == 0 or n == 1:
-			holdvalue = 1
-		else:
-			while n > 0:
-				if boolis:
-					boolis = false
-					holdvalue = n
-				else:
-					holdvalue = holdvalue * n
-				n = n-1
-		return (holdvalue * s)
-	
-	static func __get_unique_pairs(max_value: int) -> Array:
-		var pairs : Array = []
-		for i in (max_value + 1):
-			for j in range(i + 1, max_value):
-				pairs.append(PoolIntArray([i, j]))
-		return pairs
 	
 	const compiled_scripts : Dictionary = {}
 	const csk:Array = Array()
@@ -8295,6 +8239,109 @@ class _ManifestV2:
 				elif typeof(MDM) == TYPE_STRING and MDM and MDM in __get_mod_list_keys():
 					has = true
 		return has
+	
+
+class _Math:
+	var scripts : Array = [
+		
+	]
+	
+	static func get_class_documentation():
+		return {
+			"description":"",
+			"methods":{
+				"__rotate_point":{
+					"description":"Provides a Vector2 point after being rotated around (0,0)",
+					"args":[
+						"point -> (Vector2) point that is being rotated around (0,0)",
+						"angle -> (float) angles to rotate by",
+						"degrees (optional) -> (bool) for whether 'angle' should be treated as degree angles, and uses radians if not. Defaults to `true`"
+					],
+					"return":[
+						"Vector2 for the rotated point"
+					]
+				},
+				"__factorial":{
+					"description":"Calculates the factorial of the provided integer",
+					"args":[
+						"n -> (int) the number to be set to it's factorial"
+					],
+					"return":[
+						"int for the output factorial"
+					]
+				},
+				"__get_unique_pairs":{
+					"description":"Provides an array of PoolIntArrays of all pairs of numbers in a range from zero to the provided integer (not inclusive). E.g. 3 = [[0,1],[0,2],[1,2]]",
+					"args":[
+						"max_value -> (int) the range of the pairs, non-inclusive"
+					],
+					"return":[
+						"Array of PoolIntArrays for each pair."
+					]
+				},
+				"":{
+					"description":"",
+					"args":[
+						
+					],
+					"return":[
+						
+					]
+				},
+			}
+		}
+	
+	const non_static = {}
+	func _init(p):
+		non_static["pointers"] = p
+	
+	
+	static func __rotate_point(point : Vector2, angle : float, degrees : bool = true) -> Vector2:
+		if degrees:
+			angle = deg2rad(angle)
+		return Vector2((point.x*cos(-angle))-(point.y*sin(-angle)),(point.y*cos(-angle))+(point.x*sin(-angle)))
+	
+	static func __factorial(n:int) -> int:
+		var holdvalue:int = 0
+		var boolis:bool = true
+		var s:int = sign(n)
+		n = abs(n)
+		if n < 2:
+			return holdvalue * s
+		while n > 0:
+			if boolis:
+				boolis = false
+				holdvalue = n
+			else:
+				holdvalue = holdvalue * n
+			n -= 1
+		return holdvalue * s
+	
+	static func __get_unique_pairs(max_value: int) -> Array:
+		var pairs : Array = []
+		for i in (max_value + 1):
+			for j in range(i + 1, max_value):
+				pairs.append(PoolIntArray([i, j]))
+		return pairs
+	
+	static func __mirror_vector(point:Vector2, reflection_angle:float = 0.0, use_degrees:bool = false, angle_offset:Vector2 = Vector2.ZERO, scale:Vector2 = Vector2.ONE) -> Vector2:
+		if use_degrees:
+			reflection_angle = deg2rad(reflection_angle)
+		point *= scale
+		reflection_angle = -reflection_angle - (PI/2)
+		var x1:float = point.x
+		var y1:float = point.y
+		var a:float = -sin(reflection_angle)
+		var b:float = cos(reflection_angle)
+		var c:float = -((a * angle_offset.x) + (b * angle_offset.y))
+		var t:float = (-2 * ((a * x1) + (b * y1) + c)) / ((a * a) + (b * b))
+		return Vector2(x1 + (a * t),y1 + (b * t)) / scale
+	
+	static func __mirror_vector_array(points:PoolVector2Array, reflection_angle:float = 0.0, use_degrees:bool = false, angle_offset:Vector2 = Vector2.ZERO, scale:Vector2 = Vector2.ONE) -> PoolVector2Array:
+		for i in points.size():
+			points[i] = __mirror_vector(points[i],reflection_angle,use_degrees,angle_offset,scale)
+		return points
+	
 	
 
 class _NodeAccess:
