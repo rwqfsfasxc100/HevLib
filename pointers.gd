@@ -2034,22 +2034,19 @@ class _DataFormat:
 	
 	static func __convert_arr_to_vec2arr(array: Array) -> PoolVector2Array:
 		var converted:PoolVector2Array = PoolVector2Array()
-		var size = array.size()
-		if size % 2:
-			l("Cannot convert array to PoolVector2Array with an odd number of entries, truncating the last point")
-			array.resize(size - 1)
-		var index:int = 0
-		while index < size:
+		var size:int = int(floor(array.size() / 2.0))
+		converted.resize(size)
+		for r in size:
+			var index:int = r * 2
 			var aRaw = array[index]
 			var bRaw = array[index + 1]
 			if not (aRaw is float or aRaw is int or aRaw is String):
 				l("Cannot convert type %s for PoolVector2Array" % aRaw)
-				return PoolVector2Array()
+				return converted
 			if not (bRaw is float or bRaw is int or bRaw is String):
 				l("Cannot convert type %s for PoolVector2Array" % bRaw)
-				return PoolVector2Array()
-			converted.append(Vector2(float(aRaw),float(bRaw)))
-			index += 2
+				return converted
+			converted[r] = Vector2(float(aRaw),float(bRaw))
 		return converted
 	
 	static func __compare_versions(primary_major : int,primary_minor : int,primary_bugfix : int, compare_major : int, compare_minor : int, compare_bugfix : int) -> bool:
@@ -2357,10 +2354,10 @@ class _DataFormat:
 		gd.reload()
 		var out
 		if params:
-			var f = funcref(gd,"new")
-			var param_part = "_%d"
-			var pb = ""
-			var pd = ""
+			var f:FuncRef = funcref(gd,"new")
+			var param_part:String = "_%d"
+			var pb:String = ""
+			var pd:String = ""
 			for i in params.size():
 				var pv = param_part % i
 				if pb:
@@ -2371,10 +2368,8 @@ class _DataFormat:
 					pd += "\n\tvar %s = arr[%d]" % [pv,i]
 				else:
 					pd = "\n\tvar %s = arr[%d]" % [pv,i]
-			var sv = "static func parse(ref,arr):%s\n\treturn ref.call_func(%s)" % [pd,pb]
-			
 			var g:GDScript = GDScript.new()
-			g.set_source_code(sv)
+			g.set_source_code("static func parse(ref,arr):%s\n\treturn ref.call_func(%s)" % [pd,pb])
 			g.reload()
 			g.new()
 			out = g.parse(f,params)
@@ -10165,7 +10160,7 @@ class _Zip:
 	
 	
 	static func __get_zip_content(path:String) -> PoolStringArray:
-		var miniz = __get_miniz_object()
+		var miniz:MINIZ = __get_miniz_object()
 		miniz.open_read(path)
 		var fileList:PoolStringArray = miniz.list_files()
 		miniz.close()
@@ -10174,7 +10169,7 @@ class _Zip:
 	static func __fetch_file_from_zip(path:String, desired_file_names:PoolStringArray, output_directory:String) -> PoolStringArray:
 		for i in desired_file_names.size():
 			desired_file_names[i] = desired_file_names[i].to_lower()
-		var miniz = __get_miniz_object()
+		var miniz:MINIZ = __get_miniz_object()
 		var listOfNames:Dictionary = {}
 		miniz.open_read(path)
 		for d in miniz.list_files():
