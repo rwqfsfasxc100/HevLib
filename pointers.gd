@@ -5796,19 +5796,11 @@ class _FolderAccess:
 		directory.list_dir_begin(true)
 		while true:
 			var fileName : String = directory.get_next()
-			var capture:bool = true
-			if fileName.ends_with("/"):
-				capture = false
-			if fileName == "." or fileName == "..":
-				capture = false
-			if capture:
-				if not fileName:
-					break
+			if not (fileName.ends_with("/") or fileName == "." or fileName == ".."):
+				if not fileName: break
 				if directory.current_is_dir():
-					if not showFolders:
-						continue
-					if not fileName.ends_with("/"):
-						fileName = fileName + "/"
+					if not showFolders: continue
+					if not fileName.ends_with("/"): fileName += "/"
 				if returnFullPath:
 					fileName = folder + fileName
 				if globalizePath:
@@ -8329,13 +8321,11 @@ class _Math:
 			reflection_angle = deg2rad(reflection_angle)
 		point *= scale
 		reflection_angle = -reflection_angle - (PI/2)
-		var x1:float = point.x
-		var y1:float = point.y
 		var a:float = -sin(reflection_angle)
 		var b:float = cos(reflection_angle)
 		var c:float = -((a * angle_offset.x) + (b * angle_offset.y))
-		var t:float = (-2 * ((a * x1) + (b * y1) + c)) / ((a * a) + (b * b))
-		return Vector2(x1 + (a * t),y1 + (b * t)) / scale
+		var t:float = (-2 * ((a * point.x) + (b * point.y) + c)) / ((a * a) + (b * b))
+		return Vector2(point.x + (a * t), point.y + (b * t)) / scale
 	
 	static func __mirror_vector_array(points:PoolVector2Array, reflection_angle:float = 0.0, use_degrees:bool = false, angle_offset:Vector2 = Vector2.ZERO, scale:Vector2 = Vector2.ONE) -> PoolVector2Array:
 		for i in points.size():
