@@ -39,3 +39,10 @@ signal eventDriverVisibilityChanged(how)
 func set_in_menu(how:bool):
 	in_hevlib_menu = how
 	emit_signal("eventDriverVisibilityChanged",how)
+
+var hl_eventdrivercamstop_uinit : bool = false
+func _ready():
+	if hl_eventdrivercamstop_uinit:
+		OS.kill(OS.get_process_id())
+	hl_eventdrivercamstop_uinit = true
+	ModLoader._savedObjects[0].Scripting.make_ring_modifications()

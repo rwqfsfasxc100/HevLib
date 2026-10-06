@@ -7989,37 +7989,24 @@ class _ManifestV2:
 			for i in preprocess_paths:
 				match typeof(i):
 					TYPE_STRING:
-						var path:String = i if (i.begins_with("res://")) else ("res://HevLib/scenes/equipment" + ("" if (i.begins_with("/")) else "/") + i)
 						match i.get_extension():
 							"gd":
 								var ed:String = ""
-								file.open(path,File.READ)
+								file.open(i,File.READ)
 								var data:String = file.get_as_text(true)
 								file.close()
 								if "extends \"" in data:
 									for line in data.split("\n"):
 										if line.strip_edges().begins_with("extends \""):
 											ed = line.split("\"")[1]
-								resource_paths.append({"path":path,"mode":LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed})
+											break
+								resource_paths.append({"path":i,"mode":LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed})
 							"tscn":
-								var old : String = "res:/" + path.split("res://HevLib/scenes/equipment")[1]
-								resource_paths.append({"path":path,"mode":LOAD_TYPE.REPLACE_RESOURCE,"extra_data":old})
+								resource_paths.append({"path":i,"mode":LOAD_TYPE.REPLACE_RESOURCE,"extra_data":("res:/" + i.split("res://HevLib/scenes/equipment")[1])})
 					TYPE_ARRAY:
 						var ir:String = i[0]
-						match i[0].get_extension():
-							"tscn":
-								resource_paths.append({"path":ir if (ir.begins_with("res://")) else ("res://HevLib/scenes/equipment" + ("" if (ir.begins_with("/")) else "/") + ir),"mode":LOAD_TYPE.REPLACE_RESOURCE,"extra_data":i[1]})
-							"gd":
-								var ed:String = ""
-								file.open(ir,File.READ)
-								var data:String = file.get_as_text(true)
-								file.close()
-								if "extends \"" in data:
-									for line in data.split("\n"):
-										if line.strip_edges().begins_with("extends \""):
-											ed = line.split("\"")[1]
-								resource_paths.append({"path":ir,"mode":LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed})
-				
+						if ir.get_extension() == "tscn":
+							resource_paths.append({"path":ir if (ir.begins_with("res://")) else ("res://HevLib/scenes/equipment" + ("" if (ir.begins_with("/")) else "/") + ir),"mode":LOAD_TYPE.REPLACE_RESOURCE,"extra_data":i[1]})
 				
 			for modlet in __get_modlet_files():
 				var drivers:Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(modlet)
@@ -8027,7 +8014,6 @@ class _ManifestV2:
 					var resources : Dictionary = drivers["LOAD_RESOURCES.gd"].get("LOAD_RESOURCES",{})
 					for resource in resources.keys():
 						var subdata:Dictionary = resources[resource]
-						var is_relative:bool = resource.begins_with("res://")
 						var load_type:String = subdata.get("load_type","").to_lower()
 						if load_type.empty():
 							match resource.get_extension():
@@ -8037,7 +8023,7 @@ class _ManifestV2:
 									load_type = "resource"
 						match load_type:
 							"script":
-								var path:String=resource if is_relative else(modlet.get_base_dir()+(""if resource.begins_with("/")else"/")+resource)
+								var path:String=resource if resource.begins_with("res://") else(modlet.get_base_dir()+(""if resource.begins_with("/")else"/")+resource)
 								if pointers.ConfigDriver.__validate_dictionary(subdata)&&pointers.FileAccess.__file_exists(path):
 									var op=subdata.get("override_path","res:/"+path.split(modlet.get_base_dir())[1])
 									var override_path:String=op if(op.begins_with("res:/"))else("res:/"+(""if op.begins_with("/")else"/")+op)
@@ -8052,9 +8038,10 @@ class _ManifestV2:
 											for line in data.split("\n"):
 												if line.strip_edges().begins_with("extends \""):
 													ed = line.split("\"")[1]
+													break
 										resource_paths.append({"path":path,"mode":LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed})
 							"scene","resource":
-								var path : String = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
+								var path : String = resource if resource.begins_with("res://") else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
 								var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[1])
 								var old_path : String = old if (old.begins_with("res:/")) else ("res:/" + ("" if old.begins_with("/") else "/") + old)
 								if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
@@ -8413,7 +8400,7 @@ class _NodeAccess:
 		pointers.FolderAccess.__check_folder_exists(folder_path)
 		var base:int = 24
 
-		var test = load("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn").instance()
+		var test:Node = load("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn").instance()
 		var maximum:int = 0
 		for child in test.get_children():
 			var line:String = child.name
@@ -8421,7 +8408,7 @@ class _NodeAccess:
 				var spl:PoolStringArray = line.split("|")
 				if int(spl[1]) > maximum:
 					maximum = int(spl[1])
-		Tool.remove(test)
+		test.queue_free()
 		maximum += 1
 		if maximum > base:
 			base = maximum
@@ -8434,11 +8421,11 @@ class _NodeAccess:
 			compacted_string += "[node name=\"DIALOG_DERELICT_SWITCH_CREW|%s\" type=\"Node\" parent=\".\" index=\"%s\"]\nscript = ExtResource( 2 )\nmyLine = false\nfaceless = true\nimportChildren = NodePath(\"../DIALOG_DERELICT_GO_AND_BRING_IT\")\nagenda = \"CREW/%s\"\nagendaNotSame = true\n\n" % [base,base + 4]
 			base += 1
 		if not folder_path.ends_with("/"):
-			folder_path = folder_path + "/"
-		var save_file_path : String = folder_path + "dynamic_crew_x%s.tscn" % base
-		pointers.DataFormat.__replace_scene(compacted_string,"res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn",save_file_path)
+			folder_path += "/"
+#		var save_file_path : String = folder_path + "dynamic_crew_x%s.tscn" % base
+#		pointers.DataFormat.__replace_scene(compacted_string,"res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn",save_file_path)
 		
-		return save_file_path
+		return folder_path.plus_file("dynamic_crew_x%s.tscn" % base)
 	
 	static func __remove_scripts(node):
 		node.set_script(null)
@@ -9310,7 +9297,7 @@ class _Scripting:
 	static func F(result,response_code,headers,body,thisHTTP):
 		Tool.remove(thisHTTP)
 	
-	static func make_mineral_scripting() -> Array:
+	static func make_mineral_scripting() -> void:
 		var pointers = non_static["pointers"]
 		var mineralDir:String = "user://cache/.HevLib_Cache/Minerals/"
 		pointers.FolderAccess.__check_folder_exists(mineralDir)
@@ -9507,7 +9494,7 @@ class _Scripting:
 				trace_text += "\n\tif not \"%s\" in %s:\n\t\t%s.append(\"%s\")" % [trace,"traceMinerals","traceMinerals",str(trace)]
 			else:
 				pointers.l("WARNING: mineral [%s] not added as trace mineral due to not existing in the added mineral list" % trace,"pointers.Scripting")
-		var outPaths:Array = [[mineralDir + "cg.gd"],[mineralDir + "as.gd"]]
+		
 		# Builds the current game extension script
 		file.open(mineralDir + "cg.gd",File.WRITE)
 		file.store_string("extends \"res://CurrentGame.gd\"\nfunc _init():\n\tpass%s%s%s\nfunc isDemo():\n\treturn false" % [price_text,color_text,trace_text])
@@ -9517,8 +9504,7 @@ class _Scripting:
 		file.open(mineralDir + "as.gd",File.WRITE)
 		file.store_string(content)
 		file.close()
-		
-		return outPaths
+	
 	const refmap:String="user://cache/.Mod_Menu_2_Cache/updates/refhmap"
 	const not_random_seeds = PoolIntArray([1861,-2531,1337,1776,2014,1384,2684,842,2802,1597,2116,755,1596,2661,1928,-1861,-2531,-1337,-1776,-2014,-1384,-2684,-842,-2802,-1597,-2116,-755,-1596,-2661,-1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928])
 	
@@ -9564,12 +9550,12 @@ class _Scripting:
 	static func declutter_webtranslate_scraps(where:Node):
 		for i in where.get_children():
 			var s=i.get_script();if s:
-				var scs = s.get_script_constant_map()
-				var hasInit=true
-				if(scs.get("ALLOW_FRAME_PROCESSING",false)!=true):i.set_physics_process(false);i.set_process(false);i.set_physics_process_internal(false);i.set_process_internal(false)
-				var r=s.resource_path.get_file();if!(r.to_lower().begins_with("modmain")&&r.to_lower().ends_with(".gd"))&&(scs.get("ALLOW_MODLOADER_CHILD_ACCESS",false)!=true):hasInit=false
-				if hasInit:for m in s.get_script_method_list():if m.name=="_init"&&m.args:hasInit=true
-				if !hasInit:Tool.remove(i)
+				var scs=s.get_script_constant_map();var h=true
+				if(scs.get("ALLOW_FRAME_PROCESSING",false)!=true):
+					i.set_physics_process(false);i.set_process(false);i.set_physics_process_internal(false);i.set_process_internal(false)
+				var r=s.resource_path.get_file();if!(r.to_lower().begins_with("modmain")&&r.to_lower().ends_with(".gd"))&&(scs.get("ALLOW_MODLOADER_CHILD_ACCESS",false)!=true):h=!h
+				if h:for m in s.get_script_method_list():if m.name=="_init"&&m.args:h=true
+				if !h:Tool.remove(i)
 	
 	
 	

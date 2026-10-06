@@ -57,6 +57,8 @@ var pointers=null
 
 var do_safe_load:bool=true
 
+var is_editor:bool = OS.has_feature("editor")
+
 func _init(modLoader : ModLoader=ModLoader):
 	if not correct:
 		Debug.l("Folder structure not correct, exiting HevLib load")
@@ -71,55 +73,89 @@ func _init(modLoader : ModLoader=ModLoader):
 	
 #	testing()
 	
-	var files_to_load:Array=[["res://HevLib/scenes/notification_driver/CurrentGame.gd"]]
+	pointers.Scripting.make_mineral_scripting()
+	
+	var files_to_load:Array=[
+		"res://HevLib/scenes/notification_driver/CurrentGame.gd",
+		"res://HevLib/scenes/keymapping/bind_displays/AnalogAxisDisplay.gd",
+		"res://HevLib/scenes/keymapping/bind_displays/GamepadKeybindDisplay.gd",
+		"res://HevLib/scenes/keymapping/bind_displays/KeybindDisplay.gd",
+		"res://HevLib/scenes/keymapping/bind_displays/MousebindDisplay.gd",
+		"res://HevLib/scripts/SteamWebAPI.gd",
+		"res://HevLib/ui/ExtensionPopup.gd",
+		"res://HevLib/scenes/scene_replacements/DLClist.gd",
+		"res://HevLib/scenes/better_title_screen/CurrentlyPlaying.gd",
+		"res://HevLib/scenes/minerals/AstrogatorPanel.gd",
+		"res://HevLib/scenes/minerals/OMS.gd",
+		"res://HevLib/scenes/minerals/CargoScanner.gd",
+		"res://HevLib/scenes/minerals/ProcessedCargoManifest.gd",
+		"user://cache/.HevLib_Cache/Minerals/cg.gd",
+		"user://cache/.HevLib_Cache/Minerals/as.gd",
+		["res://HevLib/events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn"],
+		"res://HevLib/events/controls/CurrentGame.gd",
+		"res://HevLib/events/controls/ship-ctrl.gd",
+		"res://HevLib/events/controls/camera.gd",
+		"res://HevLib/scenes/research/Enceladus.gd",
+		"res://HevLib/scripts/Namer.gd",
+		"res://HevLib/ui/mod_menu/titlescreen/TitleMenu.gd",
+		"res://HevLib/scenes/equipment/ThrusterSlot.gd",
+		"res://HevLib/scenes/equipment/SystemShipUpgradeUI.gd",
+		"res://HevLib/scenes/equipment/SystemBuyUI.gd",
+		"res://HevLib/scenes/equipment/UpgradeGroup.gd",
+		"res://HevLib/scenes/equipment/hardpoints/EquipmentItemTemplate.gd",
+		"res://HevLib/scenes/weaponslot/weapon_slot_handler.gd",
+		"res://HevLib/scenes/equipment/ShipModificationDriver/AddNodes.gd",
+		"res://HevLib/scenes/equipment/ShipModificationDriver/InternalStorageMod.gd",
+		"res://HevLib/scenes/better_title_screen/SaveSlotButton.gd",
+		"res://HevLib/scenes/ship_driver/Shipyard.gd",
+		"res://HevLib/scenes/ship_driver/CurrentGame.gd",
+		"res://HevLib/scenes/ship_driver/TheRing.gd",
+		"res://HevLib/scenes/research/overhead_handle/CurrentGame.gd",
+		"res://HevLib/events/TheRing.gd",
+		"res://HevLib/events/custom_events/TheRing.gd",
+		["res://HevLib/scenes/notification_driver/Notifications.tscn","res://achievement/Notifications.tscn"],
+		["res://HevLib/scenes/better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn"],
+		["res://HevLib/scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"],
+		"res://HevLib/scripts/transit_tips/TransitTip.gd",
+		"res://HevLib/scenes/minerals/Summary.gd",
+		"res://HevLib/scenes/rpc/Crew.gd",
+		"res://HevLib/scenes/rpc/Dealer.gd",
+		"res://HevLib/scenes/rpc/DiveTarget.gd",
+		"res://HevLib/scenes/rpc/Enceladus.gd",
+		"res://HevLib/scenes/rpc/Game.gd",
+		"res://HevLib/scenes/rpc/Logs.gd",
+		"res://HevLib/scenes/rpc/MineralMarket.gd",
+		"res://HevLib/scenes/rpc/Music.gd",
+		"res://HevLib/scenes/rpc/PreFlightInspection.gd",
+		"res://HevLib/scenes/rpc/Repairs.gd",
+		"res://HevLib/scenes/rpc/Services.gd",
+		"res://HevLib/scenes/rpc/SimulationLayer.gd",
+		"res://HevLib/scenes/rpc/Summary.gd",
+		"res://HevLib/scenes/rpc/TitleMenu.gd",
+		"res://HevLib/scenes/rpc/Tuning.gd",
+		"res://HevLib/scenes/rpc/Upgrades.gd",
+	]
+	
 	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk"):
-		files_to_load.append(["res://HevLib/scenes/minerals/multiminerals/mineral.gd"])
-		files_to_load.append(["res://HevLib/scenes/minerals/multiminerals/MineralProcessingUnit.gd"])
-		files_to_load.append(["res://HevLib/scenes/minerals/multiminerals/AsteroidSpawner.gd"])
+		files_to_load.append_array([
+			"res://HevLib/scenes/minerals/multiminerals/mineral.gd",
+			"res://HevLib/scenes/minerals/multiminerals/MineralProcessingUnit.gd",
+			"res://HevLib/scenes/minerals/multiminerals/AsteroidSpawner.gd",
+		])
 	
-	# Bind button display modifications
-	files_to_load.append(["res://HevLib/scenes/keymapping/bind_displays/AnalogAxisDisplay.gd"])
-	files_to_load.append(["res://HevLib/scenes/keymapping/bind_displays/GamepadKeybindDisplay.gd"])
-	files_to_load.append(["res://HevLib/scenes/keymapping/bind_displays/KeybindDisplay.gd"])
-	files_to_load.append(["res://HevLib/scenes/keymapping/bind_displays/MousebindDisplay.gd"])
-	files_to_load.append(["res://HevLib/scripts/SteamWebAPI.gd"])
+	var ncrew:Dictionary = pointers.ManifestV2.__get_manifest_entry("tags","TAG_HANDLE_EXTRA_CREW")
+	var count:int = 24
+	for mod in ncrew.keys():
+		var data:int = ncrew[mod]
+		if data > count:
+			count = data
+	var crewsize_entry:String = pointers.NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",count)
+	if crewsize_entry:
+		files_to_load.append([crewsize_entry,"res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"])
 	
-	files_to_load.append(["res://HevLib/ui/ExtensionPopup.gd"])
-	files_to_load.append(["res://HevLib/scenes/scene_replacements/DLClist.gd"])
-	files_to_load.append(["res://HevLib/scenes/scene_replacements/DLClist.tscn","res://tools/DLClist.tscn"])
-
-	files_to_load.append(["res://HevLib/scenes/better_title_screen/CurrentlyPlaying.gd"])
+	if is_editor:
+		files_to_load.append(["res://HevLib/ui/mod_menu/titlescreen/editor/TitleScreen.tscn","res://TitleScreen.tscn"])
 	
-	files_to_load.append(["res://HevLib/scenes/minerals/AstrogatorPanel.gd"])
-	files_to_load.append(["res://HevLib/scenes/minerals/OMS.gd"])
-	files_to_load.append(["res://HevLib/scenes/minerals/CargoScanner.gd"])
-	files_to_load.append(["res://HevLib/scenes/minerals/ProcessedCargoManifest.gd"])
-	
-	files_to_load.append_array(pointers.Scripting.make_mineral_scripting())
-
-	files_to_load.append(["res://HevLib/events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn"])
-	files_to_load.append(["res://HevLib/events/controls/CurrentGame.gd"])
-	files_to_load.append(["res://HevLib/events/controls/ship-ctrl.gd"])
-	files_to_load.append(["res://HevLib/events/controls/camera.gd"])
-	
-	files_to_load.append(["res://HevLib/scenes/research/Enceladus.gd"])
-	
-	files_to_load.append(["res://HevLib/scripts/Namer.gd"])
-	
-	files_to_load.append(["res://HevLib/ui/mod_menu/titlescreen/TitleMenu.gd"])
-
-	files_to_load.append("ThrusterSlot.gd")
-	files_to_load.append("SystemShipUpgradeUI.gd")
-	files_to_load.append("SystemBuyUI.gd")
-	files_to_load.append("UpgradeGroup.gd")
-	files_to_load.append("hardpoints/EquipmentItemTemplate.gd")
-
-	files_to_load.append(["res://HevLib/scenes/weaponslot/weapon_slot_handler.gd"])
-
-	files_to_load.append("ShipModificationDriver/AddNodes.gd")
-	files_to_load.append("ShipModificationDriver/InternalStorageMod.gd")
-
-	files_to_load.append(["res://HevLib/scenes/better_title_screen/SaveSlotButton.gd"])
 	do_safe_load=pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_modlet_loading")
 	if not do_safe_load:
 		for i in files_to_load:
@@ -143,36 +179,16 @@ func _ready():
 		return
 	l("Readying")
 	
-	# RPC
-	installScriptExtension("../rpc/Crew.gd")
-	installScriptExtension("../rpc/Dealer.gd")
-	installScriptExtension("../rpc/DiveTarget.gd")
-	installScriptExtension("../rpc/Enceladus.gd")
-	installScriptExtension("../rpc/Game.gd")
-	installScriptExtension("../rpc/Logs.gd")
-	installScriptExtension("../rpc/MineralMarket.gd")
-	installScriptExtension("../rpc/Music.gd")
-	installScriptExtension("../rpc/PreFlightInspection.gd")
-	installScriptExtension("../rpc/Repairs.gd")
-	installScriptExtension("../rpc/Services.gd")
-	installScriptExtension("../rpc/SimulationLayer.gd")
-	installScriptExtension("../rpc/Summary.gd")
-	installScriptExtension("../rpc/TitleMenu.gd")
-	installScriptExtension("../rpc/Tuning.gd")
-	installScriptExtension("../rpc/Upgrades.gd")
-	replaceScene("../rpc/Music.tscn")
+#	replaceScene("../rpc/Music.tscn")
 	
 	initiate_mod_update_fetch()
 	
-	pointers.Scripting.make_ring_modifications()
-	
 	pointers.Equipment.__make_upgrades_scene()
 	
-	installScriptExtension("../minerals/Summary.gd")
 	
-	replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")
+#	replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")
 	
-	replaceScene("../minerals/multiminerals/AsteroidField.tscn","res://AsteroidField.tscn")
+#	replaceScene("../minerals/multiminerals/AsteroidField.tscn","res://AsteroidField.tscn")
 	
 	if not do_safe_load:
 		for old_path in pointers.ManifestV2.__load_modlets(true,false):
@@ -242,7 +258,7 @@ func updatelist_return(result, response_code,headers,body,mh):
 		file.store_string(JSON.print(updates))
 		file.close()
 		emit_signal("updates_fetched")
-		if not OS.has_feature("editor") or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","always_send_new_mods"):
+		if not is_editor or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","always_send_new_mods"):
 			var md:Dictionary=pointers.ManifestV2.__get_mod_data()
 			for mod in pointers.ManifestV2.__get_mod_list_keys():
 				var mod_data:Dictionary=md[mod]
@@ -364,7 +380,7 @@ const driver_dirs=PoolStringArray([
 func process_gdnative_plugins() -> Dictionary:
 	var fetchPaths:Dictionary={}
 	var exePath:String=OS.get_executable_path().get_base_dir() + "/hevlib_dll_store/"
-	if not OS.has_feature("editor"):
+	if not is_editor:
 		var all_libraries:PoolStringArray=PoolStringArray()
 		for first in fetch_folder_files("res://",true):
 			if first.ends_with("/"):

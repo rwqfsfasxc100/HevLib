@@ -50,30 +50,9 @@ var HevLibModMain = true
 var reload_scenes:Array = Array()
 
 func _init(modLoader = ModLoader):
-	if correct:
-		pointers = modLoader._savedObjects[0]
-		l("Initializing HevLib")
-		l("Initializing DLC")
-		loadDLC()
-		
-		installScriptExtension("scenes/ship_driver/Shipyard.gd")
-		installScriptExtension("scenes/ship_driver/CurrentGame.gd")
-		installScriptExtension("scenes/ship_driver/TheRing.gd")
-		
-		installScriptExtension("scenes/research/overhead_handle/CurrentGame.gd")
-		
-		installScriptExtension("events/TheRing.gd")
-		installScriptExtension("events/custom_events/TheRing.gd")
-		replaceScene("scenes/scene_replacements/TheRing.tscn", "res://story/TheRing.tscn")
-		replaceScene("scenes/notification_driver/Notifications.tscn","res://achievement/Notifications.tscn")
-		installScriptExtension("scripts/transit_tips/TransitTip.gd")
-		
-		
-#		if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_modlet_loading"):
-#			reload_scenes = pointers.ManifestV2.__load_modlets(false,true)
-	else:
+	if not correct:
 		Debug.l("Folder structure not correct, exiting HevLib load")
-	
+	pointers = modLoader._savedObjects[0]
 
 
 var update_urls = PoolStringArray()
@@ -95,120 +74,102 @@ var releases_cache = "user://cache/.Mod_Menu_2_Cache/github_list/releases_cache.
 var modlet_toggle_restart_path = "user://cache/.Mod_Menu_2_Cache/updates/modlet_restart_requests.json"
 
 func _ready():
-	if correct:
-		for old_path in reload_scenes:
-			if ResourceLoader.has_cached(old_path) and not old_path.get_extension() == "gd":
-				pointers.DataFormat.__reload_scene(old_path)
-		l("Readying")
-		var p = ProjectSettings.get_setting("locale/translations")
-		for i in p:
-			var translation = ResourceLoader.load(i,"",true)
-			TranslationServer.add_translation(translation)
-		
-		pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/")
-		pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/")
-		pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/dependancies/")
-		pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/conflicts/")
-		pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/complementary/")
-		pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/github_list/icon_cache/")
-		pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/github_list/downloaded_zips/")
-		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Event_Driver/")
-		var zips = pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/",true,true)
-		var zips2 = pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/github_list/downloaded_zips/",true,true)
-		var manifests = pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/",true,true)
-		var d = Directory.new()
-		for f in zips:
-			d.remove(f)
-		for f in zips2:
-			d.remove(f)
-		for f in manifests:
-			d.remove(f)
-		if d.dir_exists(weaponslot_cache):
-			pointers.FolderAccess.__recursive_delete(weaponslot_cache)
-		if file.file_exists(releases_cache):
-			var age = OS.get_unix_time() - file.get_modified_time(releases_cache)
-			if age > 3600:
-				file.open(releases_cache,File.WRITE)
-				file.store_string("{}")
-				file.close()
-				Debug.l("Releases cache older than an hour (%s minutes old), clearing" % [floor(age/60)])
-			else:
-				Debug.l("Releases cache too new (%s minutes old), not clearing" % [floor(age/60)])
-		file.open(url_store,File.WRITE)
-		file.store_string("[]")
-		file.close()
-		file.open(has_updated_store,File.WRITE)
-		file.store_string("0")
-		file.close()
-		file.open(update_store,File.WRITE)
-		file.store_string("{}")
-		file.close()
-		file.open(event_log_file,File.WRITE)
-		file.store_string("{}")
-		file.close()
-		file.open(active_events_file,File.WRITE)
-		file.store_string("")
-		file.close()
-		file.open(latest_event_file,File.WRITE)
-		file.store_string("")
-		file.close()
-		file.open(modlet_toggle_restart_path,File.WRITE)
-		file.store_string("[]")
-		file.close()
-		if OS.has_feature("editor"):
-			replaceScene("ui/mod_menu/titlescreen/editor/TitleScreen.tscn","res://TitleScreen.tscn")
-		replaceScene("scenes/better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
-		
-		
-		
-		var conflicts = pointers.ManifestV2.__check_conflicts()
-		var dependancies = pointers.ManifestV2.__check_dependancies()
-		var complementary = pointers.ManifestV2.__check_complementary()
-		
-		file.open(conflicts_store,File.WRITE)
-		file.store_string(JSON.print(conflicts))
-		file.close()
-		file.open(dependancies_store,File.WRITE)
-		file.store_string(JSON.print(dependancies))
-		file.close()
-		file.open(complementary_store,File.WRITE)
-		file.store_string(JSON.print(complementary))
-		file.close()
-		
-		var CRoot = get_tree().get_root()
-		
-		replaceScene("scenes/scene_replacements/Game.tscn", "res://Game.tscn")
-		var dir = Directory.new()
-		dir.make_dir_recursive("user://cache/.HevLib_Cache/")
-		
-		# Fix this later and update the HevLib class once documentation is finished.
-#		file.open("user://cache/.HevLib_Cache/library_documentation.json", File.WRITE)
-#		var functionality = pointers.HevLib.__get_library_functionality(true)
-#		file.store_string(functionality)
-#		file.close()
-		
-		replaceScene("scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
-		
-		pointers.ManifestV2.__get_mod_versions(true)
-		var ncrew = pointers.ManifestV2.__get_manifest_entry("tags","TAG_HANDLE_EXTRA_CREW")
-		var count = 24
-		for mod in ncrew:
-			var data = ncrew[mod]
-			if data > count:
-				count = data
-		pointers.NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",count)
-		
-		if OS.has_feature("editor") and not file.file_exists("res://VersionLabel.tscn"):
-			printerr("FAILED TO FETCH FILE SYSTEM")
-			l("ERROR! FAILED TO FETCH FILE SYSTEM")
-		CRoot.call_deferred("add_child",pointers)
-		
-#		var console = ResourceLoader.load("res://HevLib/logging/Console.tscn").instance()
-#		CRoot.call_deferred("add_child",console)
-#		pointers.free()
-		l("Ready")
-	else:
+	if not correct:
 		Debug.l("HevLib onready process cannot be carried out")
+		return
+	for old_path in reload_scenes:
+		if ResourceLoader.has_cached(old_path) and not old_path.get_extension() == "gd":
+			pointers.DataFormat.__reload_scene(old_path)
+	l("Readying")
+	
+	for i in ProjectSettings.get_setting("locale/translations"):
+		TranslationServer.add_translation(ResourceLoader.load(i,"",true))
+	
+	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/")
+	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/")
+	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/dependancies/")
+	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/conflicts/")
+	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/complementary/")
+	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/github_list/icon_cache/")
+	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/github_list/downloaded_zips/")
+	pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Event_Driver/")
+	var zips = pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/",true,true)
+	var zips2 = pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/github_list/downloaded_zips/",true,true)
+	var manifests = pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/",true,true)
+	var d:Directory = Directory.new()
+	for f in zips:
+		d.remove(f)
+	for f in zips2:
+		d.remove(f)
+	for f in manifests:
+		d.remove(f)
+	if d.dir_exists(weaponslot_cache):
+		pointers.FolderAccess.__recursive_delete(weaponslot_cache)
+	if file.file_exists(releases_cache):
+		var age = OS.get_unix_time() - file.get_modified_time(releases_cache)
+		if age > 3600:
+			file.open(releases_cache,File.WRITE)
+			file.store_string("{}")
+			file.close()
+			Debug.l("Releases cache older than an hour (%s minutes old), clearing" % [floor(age/60)])
+		else:
+			Debug.l("Releases cache too new (%s minutes old), not clearing" % [floor(age/60)])
+	file.open(url_store,File.WRITE)
+	file.store_string("[]")
+	file.close()
+	file.open(has_updated_store,File.WRITE)
+	file.store_string("0")
+	file.close()
+	file.open(update_store,File.WRITE)
+	file.store_string("{}")
+	file.close()
+	file.open(event_log_file,File.WRITE)
+	file.store_string("{}")
+	file.close()
+	file.open(active_events_file,File.WRITE)
+	file.store_string("")
+	file.close()
+	file.open(latest_event_file,File.WRITE)
+	file.store_string("")
+	file.close()
+	file.open(modlet_toggle_restart_path,File.WRITE)
+	file.store_string("[]")
+	file.close()
+	
+	file.open(conflicts_store,File.WRITE)
+	file.store_string(JSON.print(pointers.ManifestV2.__check_conflicts()))
+	file.close()
+	file.open(dependancies_store,File.WRITE)
+	file.store_string(JSON.print(pointers.ManifestV2.__check_dependancies()))
+	file.close()
+	file.open(complementary_store,File.WRITE)
+	file.store_string(JSON.print(pointers.ManifestV2.__check_complementary()))
+	file.close()
+	
+	
+#	replaceScene("scenes/scene_replacements/Game.tscn", "res://Game.tscn")
+	
+	
+	# Fix this later and update the HevLib class once documentation is finished.
+#	file.open("user://cache/.HevLib_Cache/library_documentation.json", File.WRITE)
+#	var functionality = pointers.HevLib.__get_library_functionality(true)
+#	file.store_string(functionality)
+#	file.close()
+	
+#	replaceScene("scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn")
+	
+	pointers.ManifestV2.__get_mod_versions(true)
+	
+	if OS.has_feature("editor") and not file.file_exists("res://VersionLabel.tscn"):
+		printerr("FAILED TO FETCH FILE SYSTEM")
+		l("ERROR! FAILED TO FETCH FILE SYSTEM")
+	
+	var CRoot = get_tree().get_root()
+	CRoot.call_deferred("add_child",pointers)
+	
+#	var console = ResourceLoader.load("res://HevLib/logging/Console.tscn").instance()
+#	CRoot.call_deferred("add_child",console)
+	l("Ready")
 	
 func installScriptExtension(path:String):
 	var childPath:String = str(modPath + path)
