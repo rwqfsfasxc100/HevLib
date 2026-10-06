@@ -1,3 +1,25 @@
+[1.16.21]
+
+1=* Added a new pointers class: `Math`
+1.1=* Used to unify mathematical functions
+1.2=* Moved `__rotate_point`, `__factorial`, and `__get_unique_pairs` from the DataFormat` class
+1.3=* Added `__mirror_vector` - Used for mirroring a 2D vector across a line
+1.3.1=* `point` -> (Vector2) point to be mirrored
+1.3.2=* `reflection_angle` (optional) -> (float) radian angle of the line at which the point is mirrored across. Defaults to 0.0 (up)
+1.3.3=* `use_degrees` (optional) -> (bool) whether `reflection_angle` should use degrees instead. Defaults to false
+1.3.4=* `angle_offset` (optional) -> (Vector2) the offset to move the reflection line by. Defaults to Vector2.ZERO
+1.3.5=* `scale` (optional) -> (Vector2) scale to take into account for the calculation. Useful for cases using Node2D or Control nodes with a changed scale. Defaults to Vector2.ONE
+1.3=* Added `__mirror_vector_array` - Used for mirroring a polygon across a line. NOTE: All points are calculated individually instead of from the center of the poly.
+1.3.1=* `points` -> (PoolVector2Array) points to be mirrored
+1.3.2=* `reflection_angle` (optional) -> (float) radian angle of the line at which the points are mirrored across. Defaults to 0.0 (up)
+1.3.3=* `use_degrees` (optional) -> (bool) whether `reflection_angle` should use degrees instead. Defaults to false
+1.3.4=* `angle_offset` (optional) -> (Vector2) the offset to move the reflection line by. Defaults to Vector2.ZERO
+1.3.5=* `scale` (optional) -> (Vector2) scale to take into account for the calculation. Useful for cases using Node2D or Control nodes with a changed scale. Defaults to Vector2.ONE
+2=* `DataFormat`.`__convert_arr_to_vec2arr` now resizes and inserts data rather than appending to a new array. This should provide a small boost in time taken to calculate.
+3=* `DataFormat`.`__convert_arr_to_vec2arr` now has type conversion failures return the output array as it had been processed up until the failure point instead of returning a blank PoolVector2Array
+3.1=* This includes junk data from sections that are yet to be processed
+4=* Moved the title screen update notifier to HevLib to allow users without ModMenu2 installed to have automatic updates.
+
 [1.16.20]
 
 1=* Fixed issue with Vanilla load order assignment that would cause some vanilla file names to pick up a few extra bytes, causing them to be incorrectly sorted

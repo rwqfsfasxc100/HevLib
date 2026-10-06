@@ -45,7 +45,7 @@ var update_container:PackedScene = load("res://HevLib/ui/mod_menu/updates/ModUpd
 var has_updated_store:String = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 
 export (NodePath) var restart_dialog_path:NodePath = NodePath("")
-onready var restart_dialog:Node = get_node(restart_dialog_path)
+onready var restart_dialog:Node = get_node_or_null(restart_dialog_path)
 
 var updating_all:bool = false
 
@@ -65,7 +65,7 @@ func _about_to_show():
 				uKeys.erase(u)
 			else:
 				currently_ignored.erase(u)
-	pointers.ConfigDriver.__store_value("ModMenu2","datastore","ignored_updates",updates)
+	pointers.ConfigDriver.__store_value("ModMenu2","datastore","ignored_updates",currently_ignored)
 	
 	for mod in uKeys:
 		var c:Node = update_container.instance()
@@ -101,7 +101,8 @@ func _ready():
 	restart_dialog.get_node("PanelContainer/VBoxContainer/HBoxContainer/Restart/Button").connect("pressed",self,"_confirmed")
 	restart_dialog.get_node("PanelContainer/VBoxContainer/HBoxContainer/Exit/Button").connect("pressed",self,"_custom_action")
 	restart_dialog.get_node("PanelContainer/VBoxContainer/HBoxContainer/Cancel/Button").connect("pressed",self,"restart_cancel")
-	notifications_button.connect("pressed",self,"notifications_pressed")
+	if notifications_button:
+		notifications_button.connect("pressed",self,"notifications_pressed")
 	
 
 func _input(event):
@@ -201,7 +202,7 @@ func _ignore_all_desired():
 	$IgnorePopup.popup_centered()
 
 export var notifications_button_path:NodePath = NodePath("")
-onready var notifications_button:Node = get_node(notifications_button_path)
+onready var notifications_button:Node = get_node_or_null(notifications_button_path)
 
 func notifications_pressed():
 	file.open(update_store,File.READ)

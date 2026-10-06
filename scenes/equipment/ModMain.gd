@@ -117,6 +117,8 @@ func _init(modLoader : ModLoader = ModLoader):
 	files_to_load.append(["res://HevLib/scenes/research/Enceladus.gd"])
 	
 	files_to_load.append(["res://HevLib/scripts/Namer.gd"])
+	
+	files_to_load.append(["res://HevLib/ui/mod_menu/titlescreen/TitleMenu.gd"])
 
 	files_to_load.append("ThrusterSlot.gd")
 	files_to_load.append("SystemShipUpgradeUI.gd")
@@ -1021,6 +1023,7 @@ func get_script_constant_map_without_load(script_path : String) -> Dictionary:
 
 func testing():
 	var script_shadow_creator = load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
+	
 	
 	
 	

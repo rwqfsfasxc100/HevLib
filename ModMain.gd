@@ -36,7 +36,7 @@ const MOD_PRIORITY = INF
 const MOD_NAME = "HevLib"
 const MOD_VERSION_MAJOR = 1
 const MOD_VERSION_MINOR = 16
-const MOD_VERSION_BUGFIX = 20
+const MOD_VERSION_BUGFIX = 21
 const MOD_VERSION_METADATA = ""
 const MOD_IS_LIBRARY = true
 const LIBRARY_HIDDEN_BY_DEFAULT = false
@@ -156,7 +156,7 @@ func _ready():
 		file.store_string("[]")
 		file.close()
 		if OS.has_feature("editor"):
-			replaceScene("ui/mod_menu/editor_titlescreen/TitleScreen.tscn","res://TitleScreen.tscn")
+			replaceScene("ui/mod_menu/titlescreen/editor/TitleScreen.tscn","res://TitleScreen.tscn")
 		replaceScene("scenes/better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn")
 		
 		
