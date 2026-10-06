@@ -44,6 +44,8 @@ func _ready():
 	if pointers.is_editor_and_needs_restart:
 		pointers.NodeAccess.__exit(false,"config file not able to be correctly constructed from fresh instance, closing game now that it has been properly built. Nothing is wrong, but you do need to restart the game manually.\n\nSorry for the inconvenience!","HevLib",0.0,"",true)
 	
+	theme = load("res://hud/TNTRL-theme.tres")
+	
 	grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	if get_child_count() >= 1:
 		var p = hl_dlc_make_label("HEVLIB_DLCLIST_DLC_HEADER")
@@ -52,23 +54,19 @@ func _ready():
 		
 		add_child(hl_dlc_make_label("HEVLIB_DLCLIST_MODS_HEADER"))
 		
-	var mods = pointers.ManifestV2.__get_mod_data()
-	var labels = []
-	var names = []
-	var show_always_display_libraries_in_dlclist = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_always_display_libraries_in_dlclist")
-	var show_all_libraries_in_dlclist = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_all_libraries_in_dlclist")
-	var dlc_mod_list_sort_order = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","dlc_mod_list_sort_order")
+	var mods:Dictionary = pointers.ManifestV2.__get_mod_data()
+	var labels:Array = []
+	var show_always_display_libraries_in_dlclist:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_always_display_libraries_in_dlclist")
+	var show_all_libraries_in_dlclist:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_all_libraries_in_dlclist")
+	var dlc_mod_list_sort_order:String = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","dlc_mod_list_sort_order")
 	for mod in pointers.ManifestV2.__get_mod_list_keys():
-		var data = mods[mod]
+		var data:Dictionary = mods[mod]
 		if not data["library_information"]["is_library"]:
 			labels.append(hl_dlc_make_label(data["name"]))
-			names.append(data["name"])
 		elif data["library_information"]["always_display"] and show_always_display_libraries_in_dlclist:
 			labels.append(hl_dlc_make_label(data["name"]))
-			names.append(data["name"])
 		elif show_all_libraries_in_dlclist:
 			labels.append(hl_dlc_make_label(data["name"]))
-			names.append(data["name"])
 	match dlc_mod_list_sort_order:
 		"alphabetical_ascending":
 			descending = true
@@ -90,23 +88,20 @@ func _ready():
 
 
 func hl_dlc_make_label(text):
-	
-	var l = Label.new()
+	var l:Label = Label.new()
 	l.text = TranslationServer.translate(text)
 	l.align = Label.ALIGN_RIGHT
-	
 	return l
 
 var descending:bool = false
 
 func hl_dlc_sort_alphabetical(a, b, index = 0) -> bool: 
-	if index >= a.text.length() or index >= b.text.length():
+	if a.text.length() < index or b.text.length() < index:
 		return descending
 	if a.text[index] < b.text[index]: 
 		return !descending
 	elif a.text[index] == b.text[index]:
-		index += 1
-		hl_dlc_sort_alphabetical(a,b,index)
+		hl_dlc_sort_alphabetical(a,b,index + 1)
 	return descending
 
 func hl_dlc_sort_length(a,b) -> bool:
