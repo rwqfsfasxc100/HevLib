@@ -32,10 +32,24 @@
 
 extends "res://AsteroidSpawner.gd"
 
+var multiminerals:bool = false
+
+var HevLib_pointers:HevLibPointers
+
+func _enter_tree():
+	HevLib_pointers = ModLoader._savedObjects[0]
+	HevLib_pointers.ConfigDriver.__establish_connection("hl_multiminerals_UV",self)
+	hl_multiminerals_UV()
+
+func hl_multiminerals_UV():
+	if HevLib_pointers:
+		multiminerals = HevLib_pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk")
+
 func spawnAsteroidByClass(oc, spot, chaos, spawnPointRandomness = 0.0, initialLinearVelocity = Vector2(0, 0), initialAngularVelocity = 0.0, tries = 1, spawned = true):
 	#Generate the asteroid normally
 	var i = .spawnAsteroidByClass(oc, spot, chaos, spawnPointRandomness, initialLinearVelocity, initialAngularVelocity, tries, spawned)
-	
+	if not multiminerals:
+		return i
 	
 	#If it's a class 5 roid, it's a mineral chunk
 	if oc == 5 and i:
@@ -78,8 +92,7 @@ func spawnAsteroidByClass(oc, spot, chaos, spawnPointRandomness = 0.0, initialLi
 			# Checks for the mineral in an array of mineral entries
 			# Fix for one bug in the preexisting mod
 			var doesContainMineral = false
-			var comp = i.composition.keys()
-			for t in comp:
+			for t in i.composition.keys():
 				if t == m:
 					doesContainMineral = true
 			if not m == null:
@@ -95,22 +108,19 @@ func spawnAsteroidByClass(oc, spot, chaos, spawnPointRandomness = 0.0, initialLi
 		if i.has_method("hl_multiminerals_update_mass"):
 			i.hl_multiminerals_update_mass()
 		else:
-			printerr("Mineral [",i,"] lacks hl_multiminerals_update_mass() method")
+			printerr("Mineral [%s] lacks hl_multiminerals_update_mass() method" % i)
 			var ps = hl_multiminerals_update_mass(i)
 			i = ps
 		
 	return i
 #Update the roid's mass incase something went fucky
 func hl_multiminerals_update_mass(i):
-	hl_multiminerals_calc_comp(i)
-	i.mass = comp_val
+	i.mass = hl_multiminerals_calc_comp(i)
 	return i
 
-#Sum of all components of the roid
-var comp_val = 0.0
-func hl_multiminerals_calc_comp(i):
+func hl_multiminerals_calc_comp(i) -> float:
 #	print(composition)
-	comp_val = 0.0
+	var comp_val = 0.0
 	#For every material in the roid
 	for type in i.composition:
 		#If that material actually exists 
@@ -121,6 +131,4 @@ func hl_multiminerals_calc_comp(i):
 		else:
 			#Remove the stray atoms
 			i.composition.erase(type)
-
-
-	return i
+	return comp_val

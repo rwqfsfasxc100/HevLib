@@ -32,6 +32,18 @@
 
 extends "res://asteroids/mineral.gd"
 
+var multiminerals:bool = false
+
+var HevLib_pointers:HevLibPointers
+
+func _enter_tree():
+	HevLib_pointers = ModLoader._savedObjects[0]
+	hl_multiminerals_UV()
+
+func hl_multiminerals_UV():
+	if HevLib_pointers:
+		multiminerals = HevLib_pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk")
+
 #Update the roid's mass incase something went fucky
 func hl_multiminerals_update_mass():
 	hl_multiminerals_calc_comp()
@@ -61,6 +73,8 @@ func hl_multiminerals_calc_comp():
 
 #Func to let scanners detect all minerals
 func getScan():
+	if not multiminerals:
+		return .getScan()
 	#Get our scan value
 	var scan : float = rand_range(0, comp_val)
 	#For every material in the roid

@@ -41,7 +41,7 @@ func _physics_process(delta):
 			#If we can claim the entity
 			if Tool.claim(p):
 				#Check if it's a valid mineral chunk about to be processed
-				if "comp_val" in p and (p.fillerContent < 0.05 or p.mass < 0.02):
+				if "comp_val" in p and not is_zero_approx(p.comp_val) and (p.fillerContent < 0.05 or p.mass < 0.02):
 					#For every material in the chunk
 					for type in p.composition:
 						#If the material is not the filler

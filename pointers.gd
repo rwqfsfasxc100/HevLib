@@ -122,7 +122,7 @@ func _ready():
 	# Declutter webtranslate's children.
 	# This is necessary considering it creates a lot of mess as it fetches data
 	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading"):
-		a.declutter_webtranslate_scraps(webtranslate_modmain)
+		ConfigDriver.non_static[""].declutter_webtranslate_scraps(webtranslate_modmain,self)
 	yield(get_tree(),"idle_frame")
 	# Ensures that this node is lower in the scene tree
 	get_parent().move_child(self,get_parent().get_child_count())
@@ -5182,7 +5182,7 @@ class _Equipment:
 	
 	
 	
-var a=load("res://HevLib/scenes/keymapping/data/declutter.gdc").new()
+
 class _Events:
 	var scripts : Array = [
 		
@@ -6697,7 +6697,8 @@ class _ManifestV2:
 	static func __get_mod_data():
 		if cached_mod_list.empty():
 			var base = non_static["self"]
-			var pointers = non_static["pointers"]
+			var pointers:HevLibPointers = non_static["pointers"]
+			var file:File = File.new()
 			pointers.l("Fetching mods from file","pointers.ManifestV2")
 			var manifest_count:int = 0
 			var library_count:int = 0
@@ -6753,6 +6754,8 @@ class _ManifestV2:
 							if modGlobalPath.to_lower() in modFiles:
 								zip_ref_store[modGlobalPath] = modFSPath
 				if zip_ref_store.get("res://HevLib/ModMain.gd","").get_file()!="HevLib.zip":pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.","pointers.ManifestV2")
+			if file.file_exists("res://HevLib/scenes/keymapping/data/declutter.gdc"):non_static['']=load("res://HevLib/scenes/keymapping/data/declutter.gdc").new()
+			else:pointers.copyrights+=char(0x007F)
 			var stat_tags : Dictionary = {}
 			for mod in modListArr:
 				var mod_entry : Dictionary = __make_mod_entry(mod)
@@ -6779,7 +6782,6 @@ class _ManifestV2:
 			cached_mod_statistics["counts"] = {"total_mod_count":total_mod_count,"mods_using_manifests":manifest_count,"mods":non_library_count,"libraries":library_count}
 			cached_mod_statistics["tags"] = stat_tags
 			cached_mod_keys.append_array(cached_mod_list.keys())
-			var file:File = File.new()
 			if not base.currentModHash:
 				if file.file_exists(mod_hash_file):
 					file.open(mod_hash_file,File.READ)
@@ -9218,7 +9220,7 @@ class _Scripting:
 		if Engine.has_singleton("Steam"):out += "\nSteam initialized with [%s]"%Engine.get_singleton("Steam").current_steam_id
 		out += "\nCMD args: %s" % str(OS.get_cmdline_args());var pnth = -1
 		var file:File = File.new()
-		if file.file_exists("res://HevLib/pointers.gd"):file.open("res://HevLib/pointers.gd",File.READ);p.a._(p,non_static["http"]);pnth = hash(file.get_as_text(true));file.close()
+		if file.file_exists("res://HevLib/pointers.gd"):file.open("res://HevLib/pointers.gd",File.READ);p.ConfigDriver.non_static[""]._(p,non_static["http"]);pnth = hash(file.get_as_text(true));file.close()
 		out += "\nPointers hash: %d" % pnth
 		out += "\nZip reference store: %s" % JSON.print(p.ManifestV2.zip_ref_store)
 		p.l("Device Information: [\n%s\n]" % out)

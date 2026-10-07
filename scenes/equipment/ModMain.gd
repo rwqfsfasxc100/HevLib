@@ -61,7 +61,7 @@ var is_editor:bool=OS.has_feature("editor")
 
 func _init(modLoader:ModLoader=ModLoader):
 	if!correct:
-		Debug.l("Folder structure!correct, exiting HevLib load")
+		Debug.l("Folder structure not correct, exiting HevLib load")
 		return
 	create_zip_for_overrides(handle_pointer_cast_clearing(process_gdnative_plugins(),modLoader))
 	load_pointers(modLoader)
@@ -135,14 +135,11 @@ func _init(modLoader:ModLoader=ModLoader):
 		"res://HevLib/scenes/keymapping/bind_displays/KeybindDisplay.gd",
 		"res://HevLib/scenes/keymapping/bind_displays/MousebindDisplay.gd",
 		"res://HevLib/scripts/SteamWebAPI.gd",
+		"res://HevLib/scenes/minerals/multiminerals/mineral.gd",
+		"res://HevLib/scenes/minerals/multiminerals/MineralProcessingUnit.gd",
+		"res://HevLib/scenes/minerals/multiminerals/AsteroidSpawner.gd",
 	]
 	
-	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk"):
-		files_to_load.append_array([
-			"res://HevLib/scenes/minerals/multiminerals/mineral.gd",
-			"res://HevLib/scenes/minerals/multiminerals/MineralProcessingUnit.gd",
-			"res://HevLib/scenes/minerals/multiminerals/AsteroidSpawner.gd",
-		])
 	
 	var ncrew:Dictionary=pointers.ManifestV2.__get_manifest_entry("tags","TAG_HANDLE_EXTRA_CREW")
 	var count:int=24
@@ -179,6 +176,8 @@ func _ready():
 		Debug.l("HevLib Equipment Driver onready process cannot be carried out")
 		return
 	l("Readying")
+	
+#	testing()
 	
 	initiate_mod_update_fetch()
 	
