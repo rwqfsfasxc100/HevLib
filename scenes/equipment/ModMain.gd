@@ -93,6 +93,7 @@ func _init(modLoader : ModLoader=ModLoader):
 		"user://cache/.HevLib_Cache/Minerals/as.gd",
 		["res://HevLib/events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn"],
 		"res://HevLib/events/controls/CurrentGame.gd",
+		"res://HevLib/scenes/minerals/TheRing.gd",
 		"res://HevLib/events/controls/ship-ctrl.gd",
 		"res://HevLib/events/controls/camera.gd",
 		"res://HevLib/scenes/research/Enceladus.gd",

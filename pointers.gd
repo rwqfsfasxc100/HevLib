@@ -9509,7 +9509,7 @@ class _Scripting:
 	const not_random_seeds = PoolIntArray([1861,-2531,1337,1776,2014,1384,2684,842,2802,1597,2116,755,1596,2661,1928,-1861,-2531,-1337,-1776,-2014,-1384,-2684,-842,-2802,-1597,-2116,-755,-1596,-2661,-1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928])
 	
 	static func make_ring_modifications():
-		var m:int = int(floor((float(CurrentGame.traceMinerals.size()) / 4))) + 1
+		var m:int = int(floor(CurrentGame.traceMinerals.size() / 4.0)) + 1
 		var seeds:PoolIntArray = PoolIntArray()
 		var pointers = non_static["pointers"]
 		if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","randomize_minerals") and m > 2:
@@ -9545,7 +9545,7 @@ class _Scripting:
 		
 		pointers.DataFormat.__compile_and_extend_script_with_scene(variable_statements,["res://story/TheRing.tscn"])
 		
-		pointers.DataFormat.__replace_scene("[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://TheRing.gd\" type=\"Script\" id=1]\n[ext_resource path=\"res://story/TheRing.tscn\" type=\"PackedScene\" id=2]\n\n[node name=\"TheRing\" instance=ExtResource( 2 )]\nscript = ExtResource( 1 )\n","res://story/TheRing.tscn")
+#		pointers.DataFormat.__replace_scene("[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://TheRing.gd\" type=\"Script\" id=1]\n[ext_resource path=\"res://story/TheRing.tscn\" type=\"PackedScene\" id=2]\n\n[node name=\"TheRing\" instance=ExtResource( 2 )]\nscript = ExtResource( 1 )\n","res://story/TheRing.tscn")
 	
 	static func declutter_webtranslate_scraps(where:Node):
 		for i in where.get_children():

@@ -30,12 +30,54 @@
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
 
-extends "res://CurrentGame.gd"
+extends "res://TheRing.gd"
 
-var in_hevlib_menu = false setget set_in_menu
+var pix_values:PoolIntArray = PoolIntArray()
 
-signal eventDriverVisibilityChanged(how)
+const not_random_seeds = PoolIntArray([1337,1776,2014,1384,2684,842,2802,1597,2116,755,1596,2661,1928,-1861,-2531,-1337,-1776,-2014,-1384,-2684,-842,-2802,-1597,-2116,-755,-1596,-2661,-1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928])
 
-func set_in_menu(how:bool):
-	in_hevlib_menu = how
-	emit_signal("eventDriverVisibilityChanged",how)
+func get_pixel_values(pos:Vector2) -> PoolRealArray:
+	if pix_values.empty():
+		var mineral_size:int = int(floor(CurrentGame.traceMinerals.size() / 4.0)) - 1
+		pix_values.resize(mineral_size + 2)
+		pix_values[0] = 1861.0
+		pix_values[1] = - 2531.0
+		if mineral_size:
+			var random:bool = ModLoader._savedObjects[0].ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","randomize_minerals")
+			var nsi:int = not_random_seeds.size()
+			for i in mineral_size:
+				if random:
+					pix_values[i + 2] = ((randi() % 2250) + 750) * sign(randf() - 0.5)
+				else:
+					pix_values[i + 2] = not_random_seeds[i%nsi]
+	var pxSize:int = pix_values.size()
+	var out:PoolRealArray = PoolRealArray()
+	out.resize(pxSize * 4)
+	for i in pxSize:
+		var pixel:Color = getVeinPixelAt(pos / pix_values[i])
+		var offset:int = i * 4
+		out[offset] = pixel.r
+		out[offset + 1] = pixel.g
+		out[offset + 2] = pixel.b
+		out[offset + 3] = pixel.a
+	return out
+
+func getVeinAt(pos) -> String:
+	
+	var values:PoolRealArray = get_pixel_values(pos)
+		
+	var total:float = 0.0
+	for n in CurrentGame.traceMinerals.size():
+		var tm:String = CurrentGame.traceMinerals[n]
+		values[n] = pow(values[n] / pow(CurrentGame.mineralPrices.get(tm, 1), 0.2), 4)
+		total += values[n]
+		
+	var rnd:float = randf() * total
+	var nr:int = 0
+	for n in values:
+		rnd -= n
+		if rnd < 0:
+			return CurrentGame.traceMinerals[nr]
+		nr += 1
+	
+	return CurrentGame.traceMinerals[0]

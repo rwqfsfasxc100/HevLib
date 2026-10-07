@@ -200,9 +200,3 @@ func l(msg:String, title:String = MOD_NAME, version:String = str(MOD_VERSION_MAJ
 		version = version + "-" + MOD_VERSION_METADATA
 	var line = "%s V%s" % [title, version]
 	pointers.l(msg,line)
-
-func _notification(what):
-	if what == NOTIFICATION_CRASH:
-		file.open("user://cache/.HevLib_Cache/currently_installed_mods.json", File.WRITE)
-		file.store_string(JSON.print(pointers.ManifestV2.__get_mod_data(),"\t"))
-		file.close()
