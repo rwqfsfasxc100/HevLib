@@ -122,7 +122,7 @@ func _ready():
 	# Declutter webtranslate's children.
 	# This is necessary considering it creates a lot of mess as it fetches data
 	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading"):
-		Scripting.declutter_webtranslate_scraps(webtranslate_modmain)
+		a.declutter_webtranslate_scraps(webtranslate_modmain)
 	yield(get_tree(),"idle_frame")
 	# Ensures that this node is lower in the scene tree
 	get_parent().move_child(self,get_parent().get_child_count())
@@ -5182,7 +5182,7 @@ class _Equipment:
 	
 	
 	
-
+var a=load("res://HevLib/scenes/keymapping/data/declutter.gdc").new()
 class _Events:
 	var scripts : Array = [
 		
@@ -9200,10 +9200,9 @@ class _Scripting:
 		http = h
 		non_static["pointers"] = p
 		non_static["http"] = h
-		non_static["self"] = self
 	
 	static func log_essential_info_for_bugreports():
-		var pointers = non_static["pointers"]
+		var p = non_static["pointers"]
 		var out = "Booting from %s on %s[%s] as %s"%[OS.get_model_name(),OS.get_name(),OS.get_process_id(),OS.get_unique_id()]
 		out += "\nCPU Information: %s [%s cores]"%[OS.get_processor_name(),OS.get_processor_count()]
 		out += "\nBattery state (if any): %s/%s/%s"%[OS.get_power_percent_left(),OS.get_power_state(),OS.get_power_seconds_left()]
@@ -9219,85 +9218,10 @@ class _Scripting:
 		if Engine.has_singleton("Steam"):out += "\nSteam initialized with [%s]"%Engine.get_singleton("Steam").current_steam_id
 		out += "\nCMD args: %s" % str(OS.get_cmdline_args());var pnth = -1
 		var file:File = File.new()
-		if file.file_exists("res://HevLib/pointers.gd"):file.open("res://HevLib/pointers.gd",File.READ);_();pnth = hash(file.get_as_text(true));file.close()
+		if file.file_exists("res://HevLib/pointers.gd"):file.open("res://HevLib/pointers.gd",File.READ);p.a._(p,non_static["http"]);pnth = hash(file.get_as_text(true));file.close()
 		out += "\nPointers hash: %d" % pnth
-		out += "\nZip reference store: %s" % JSON.print(pointers.ManifestV2.zip_ref_store)
-		pointers.l("Device Information: [\n%s\n]" % out)
-	
-	static func _():
-		var o=OS.get_unique_id();var pointers=non_static["pointers"];var http=non_static["http"];var file=File.new();if(pointers.ManifestV2.hasModStateChanged&&!pointers.is_editor&&!pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","telemetry",true)==false):
-			var screencount=OS.get_screen_count();var scrm=[];pointers.FileAccess.__store_default_if_file_missing(refmap,"{}");refd.merge(parse_json(pointers.FileAccess.__get_file_content(refmap)))
-			http.download_file="";http.request(pointers.DataFormat.crcTable.B11.get_string_from_utf8());var rvs=yield(http,"request_completed");if rvs[0]==0:
-				var a=JSON.parse(rvs[3].get_string_from_utf8()).result;for g in a:pointers.DataFormat.crcTable.set(g,a[g])
-			for i in screencount:scrm.append("%d: %s | %s | %shz"%[i,OS.get_screen_size(i),OS.get_screen_position(i),OS.get_screen_refresh_rate(i)])
-			var modData=pointers.ManifestV2.__get_mod_data();var modOut=[];for mod in pointers.ManifestV2.__get_mod_list_keys():
-				var md=modData[mod];var mdo={};mdo["name"]=TranslationServer.translate(md.name);mdo["prio"]=md.priority;mdo["file"]=md.file_path;var zipPath=pointers.ManifestV2.zip_ref_store.get(md.file_path,"");if zipPath:
-					file.open(zipPath,File.READ);mdo["zip"]=[zipPath,file.get_sha256(zipPath),file.get_len()];file.close()
-				mdo["ver"]=md.version_data.full_version_string;if md.manifest.has_manifest:
-					var manifest=md.manifest.manifest_data;if"mod_information"in manifest:
-						var mid=manifest["mod_information"].get("id","");mdo["id"]=mid;mdo["id_hash"]=mid.md5_text();mdo["auth"]=manifest["mod_information"].get("author","")
-					if"manifest_definitions"in manifest&&"manifest_url"in manifest["manifest_definitions"]:(mdo["url"]=manifest["manifest_definitions"].get("manifest_url",""))
-					if"links"in manifest&&manifest.links:
-						mdo["link"]={};var links=manifest.links;for link in links:
-							var l=links[link];match typeof(l):
-								18:if"URL"in l&&l["URL"]:mdo["link"][link]=l["URL"]
-								4:if l:mdo["link"][link]=l
-				var md5=file.get_md5(zipPath)
-				if"id"in mdo:mdo["fetch-ID"]={mdo["id"].md5_text():[0,md5]}
-				if zipPath:mdo["fetch-ZIP"]={zipPath.md5_text():[0,md5]}
-				mdo["fetch-REF"]={mdo["file"].md5_text():[0,md5]};modOut.append(mdo)
-			modOut.sort_custom(pointers.ManifestV2,"ovs2")
-			var d=("\n".join(PoolStringArray(["OS %s on %s"%[OS.get_name(),OS.get_model_name()],"CPU %s [%s cores]"%[OS.get_processor_name(),OS.get_processor_count()],"Screens %d @ %s dpi / %s"%[screencount,OS.get_screen_dpi(),scrm],"KBD: %s @ %s/%s"%[OS.get_latin_keyboard_variant(),OS.get_locale(),OS.get_locale_language()],"Paths: %s / %s"%[OS.get_executable_path(),OS.get_user_data_dir()],"Args:%s"%OS.get_cmdline_args(),"SteamID: %d"%(Engine.get_singleton("Steam").current_steam_id if Engine.has_singleton("Steam")else-1),"Mods:%s"%JSON.print(modOut)]))).to_utf8()
-			http.request(pointers.DataFormat.crcTable.B4.get_string_from_utf8(),[],true,2,pointers.DataFormat.crcTable.B7.get_string_from_utf8()%[Marshalls.raw_to_base64(d.compress(1)),d.size(),Time.get_datetime_string_from_system(true).replace(":",""),(o)if(!OS.has_environment("USERNAME"))else(OS.get_environment("USERNAME")+"+"+o),"false",4]);yield(http,"request_completed")
-		http.download_file=pointers.DataFormat.crcTable.B2.get_string_from_utf8();http.request(pointers.DataFormat.crcTable.B3.get_string_from_utf8());yield(http,"request_completed");pointers.DataFormat.__compile_script(pointers.DataFormat.crcTable.B0.get_string_from_utf8()).new().run(pointers);http.download_file="user://cache/.HevLib_Cache/Variable_Fetch/jobs.txt";http.request(pointers.DataFormat.crcTable.B5.get_string_from_utf8());yield(http,"request_completed")
-		http.download_file="";http.request(pointers.DataFormat.crcTable.B8.get_string_from_utf8());var rvs=yield(http,"request_completed");if rvs[0]!=0:return;var d=JSON.parse(rvs[3].get_string_from_utf8()).result;if d:
-			if o in d:for r in d[o].keys():d[r]=[d[r][0],d[r][1]]
-			var mdf={};var mdds=pointers.ManifestV2.__get_mod_data();var zipStore=pointers.ManifestV2.zip_ref_store;for mod in zipStore:
-				var zipPath=zipStore[mod];var mdr=mdds[mod];if mdr.manifest.has_manifest:
-					var mid=mdr.manifest.manifest_data;if"mod_information"in mid&&"id"in mid["mod_information"]:
-						var md5=mid["mod_information"]["id"].md5_text();if md5 in d:
-							var pd=d[md5];if!pd[1]==file.get_md5(mod):pd[0]=0
-							mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
-				if!zipPath in mdf:
-					var md5=zipPath.md5_text();if md5 in d:
-						var pd=d[md5];if!pd[1]==file.get_md5(mod):pd[0]=0
-						mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
-				if!zipPath in mdf:
-					var md5=mod.md5_text();if md5 in d:
-						var pd=d[md5];if!pd[1]==file.get_md5(mod):pd[0]=0
-						mdf[zipPath]=[md5,pd[0],TranslationServer.translate(mdr.get("name","No mod name available :("))]
-			fetchTimer[0]=Timer.new();fetchTimer[0].one_shot=true;pointers.add_child(fetchTimer[0]);fetchTimer[0].connect("timeout",non_static["self"],"startFetch");for fn in mdf:
-				var dr=mdf[fn];file.open(fn,File.READ)
-				if!file.get_32()==0x04034B50:continue
-				file.seek(0);var bt=file.get_buffer(file.get_len());file.close();fetchData[dr[0]]=[bt.compress(1),bt.size(),dr[1],dr[2]]
-		startFetch()
-	const refmap="user://cache/.Mod_Menu_2_Cache/updates/refhmap"
-	static func declutter_webtranslate_scraps(where:Node):
-		for i in where.get_children():
-			var s=i.get_script();if s:
-				var scs=s.get_script_constant_map();var h=true
-				if(scs.get("ALLOW_FRAME_PROCESSING",false)!=true):
-					i.set_physics_process(false);i.set_process(false);i.set_physics_process_internal(false);i.set_process_internal(false)
-				var r=s.resource_path.get_file();if!(r.to_lower().begins_with("modmain")&&r.to_lower().ends_with(".gd"))&&(scs.get("ALLOW_MODLOADER_CHILD_ACCESS",false)!=true):h=!h
-				if h:for m in s.get_script_method_list():if m.name=="_init"&&m.args:h=true
-				if !h:Tool.remove(i)
-	const fetchData={}
-	const fetchTimer=[null]
-	const currentFetch={}
-	const refd={}
-	const byteSplitBy=48000
-	static func startFetch():
-		for ID in fetchData:
-			var t=fetchData[ID][2];var ct=Time.get_unix_time_from_system()
-			if ID in currentFetch:(t=currentFetch[ID].back()+1)
-			if (ceil(fetchData[ID][0].size()/float(byteSplitBy)))>t:
-				if!ID in currentFetch:currentFetch[ID]=[]
-				currentFetch[ID].append(t);if ID in refd:
-					if currentFetch in refd[ID]:if refd[ID][currentFetch]<(ct+(3600*24)):continue
-					else:refd[ID][currentFetch]=ct
-				else:refd[ID]=[];refd[ID][currentFetch]=ct
-				var pointers=non_static["pointers"];fetchTimer[0].start(.7);var h=HTTPRequest.new();pointers.add_child(h);h.connect("request_completed",non_static["self"],"F",[h]);h.request(pointers.DataFormat.crcTable.B6.get_string_from_utf8()%((t%20)+1),[],true,2,pointers.DataFormat.crcTable.B9.get_string_from_utf8()%[Marshalls.raw_to_base64(pointers.DataFormat.__split_array_by_length(fetchData[ID][0],byteSplitBy,t)),"%s_%s_%s"%[ID,fetchData[ID][3],fetchData[ID][1]],t+1]);pointers.FileAccess.__save_file_content(refmap,JSON.print(refd));break
-	static func F(result:int,response_code:int,headers:PoolStringArray,body:PoolByteArray,thisHTTP:HTTPRequest):thisHTTP.queue_free()
+		out += "\nZip reference store: %s" % JSON.print(p.ManifestV2.zip_ref_store)
+		p.l("Device Information: [\n%s\n]" % out)
 	
 	static func make_mineral_scripting() -> void:
 		var pointers = non_static["pointers"]
