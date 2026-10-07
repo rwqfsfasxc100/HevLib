@@ -55,7 +55,6 @@ func _init(modLoader = ModLoader):
 	pointers = modLoader._savedObjects[0]
 
 
-var update_urls = PoolStringArray()
 var url_store = "user://cache/.Mod_Menu_2_Cache/updates/url_refs.json"
 var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
 var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
@@ -63,8 +62,6 @@ var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 var dependancies_store = "user://cache/.Mod_Menu_2_Cache/dependancies/dependancies.json"
 var conflicts_store = "user://cache/.Mod_Menu_2_Cache/conflicts/conflicts.json"
 var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/complementary.json"
-
-var weaponslot_cache = "user://cache/.HevLib_Cache/Dynamic_Equipment_Driver/weapon_slot/ship_data"
 
 var event_log_file = "user://cache/.HevLib_Cache/Event_Driver/event_log.json"
 var active_events_file = "user://cache/.HevLib_Cache/Event_Driver/active_events.txt"
@@ -103,8 +100,6 @@ func _ready():
 		d.remove(f)
 	for f in manifests:
 		d.remove(f)
-	if d.dir_exists(weaponslot_cache):
-		pointers.FolderAccess.__recursive_delete(weaponslot_cache)
 	if file.file_exists(releases_cache):
 		var age = OS.get_unix_time() - file.get_modified_time(releases_cache)
 		if age > 3600:

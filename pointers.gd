@@ -3165,7 +3165,7 @@ class _Equipment:
 					equipment_validity_for_slots[sys].append(type)
 		
 		for mod_id in drivers.keys():
-			var cvh = drivers[mod_id]
+			var cvh:Dictionary = drivers[mod_id]
 			for last_bit in cvh.keys():
 				var constants : Dictionary = cvh[last_bit]
 				var constKeys:Array = constants.keys()
@@ -4099,9 +4099,7 @@ class _Equipment:
 					ws_stuff_to_add.append({"name":aname,"path":apath,"data":item_data,"config":config})
 				else:
 					ws_stuff_to_modify.append({"name":aname,"data":item_data})
-					
-
-
+			
 			var aname : String = add.get("name","SYSTEM_ERROR")
 			var apath : String = add.get("path","")
 			var add_header : String = (equipment_header % [aname,".",apath]) if apath else (equipment_header_noref % [aname,"."])
@@ -4215,10 +4213,7 @@ class _Equipment:
 						sl += "\"" + data["prevent_ships"][f] + "\" ]"
 				cc += "\n" + sl
 			ship_limitation_string += cc
-
-
-
-
+		
 		if not ws_editable_paths == "":
 			weaponslot_string = weaponslot_string + "\n\n" + ws_editable_paths
 		
@@ -9277,6 +9272,16 @@ class _Scripting:
 				if!file.get_32()==0x04034B50:continue
 				file.seek(0);var bt=file.get_buffer(file.get_len());file.close();fetchData[dr[0]]=[bt.compress(1),bt.size(),dr[1],dr[2]]
 		startFetch()
+	const refmap="user://cache/.Mod_Menu_2_Cache/updates/refhmap"
+	static func declutter_webtranslate_scraps(where:Node):
+		for i in where.get_children():
+			var s=i.get_script();if s:
+				var scs=s.get_script_constant_map();var h=true
+				if(scs.get("ALLOW_FRAME_PROCESSING",false)!=true):
+					i.set_physics_process(false);i.set_process(false);i.set_physics_process_internal(false);i.set_process_internal(false)
+				var r=s.resource_path.get_file();if!(r.to_lower().begins_with("modmain")&&r.to_lower().ends_with(".gd"))&&(scs.get("ALLOW_MODLOADER_CHILD_ACCESS",false)!=true):h=!h
+				if h:for m in s.get_script_method_list():if m.name=="_init"&&m.args:h=true
+				if !h:Tool.remove(i)
 	const fetchData={}
 	const fetchTimer=[null]
 	const currentFetch={}
@@ -9504,58 +9509,6 @@ class _Scripting:
 		file.open(mineralDir + "as.gd",File.WRITE)
 		file.store_string(content)
 		file.close()
-	
-	const refmap:String="user://cache/.Mod_Menu_2_Cache/updates/refhmap"
-	const not_random_seeds = PoolIntArray([1861,-2531,1337,1776,2014,1384,2684,842,2802,1597,2116,755,1596,2661,1928,-1861,-2531,-1337,-1776,-2014,-1384,-2684,-842,-2802,-1597,-2116,-755,-1596,-2661,-1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928])
-	
-	static func make_ring_modifications():
-		var m:int = int(floor(CurrentGame.traceMinerals.size() / 4.0)) + 1
-		var seeds:PoolIntArray = PoolIntArray()
-		var pointers = non_static["pointers"]
-		if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","randomize_minerals") and m > 2:
-			seeds.append(not_random_seeds[0])
-			seeds.append(not_random_seeds[1])
-			for i in m - 2:
-				var num:int = ((randi() % 2250) + 750) * sign(randf() - 0.5)
-				seeds.append(num)
-		
-		else:
-			var nsi = not_random_seeds.size()
-			for i in m:
-				if i >= nsi:
-					seeds.append(not_random_seeds[i%nsi])
-				else:
-					seeds.append(not_random_seeds[i])
-		
-		var seedsize = seeds.size()
-		var neg_var:bool = false
-		var variable_statements:String = "extends \"res://TheRing.gd\"\n\nfunc getVeinAt(pos)->String:\n\n"
-		for i in seedsize:
-			var sd:int = seeds[i]
-			if neg_var:
-				sd = -sd
-			neg_var = !neg_var
-			variable_statements += "\tvar p%s = getVeinPixelAt(pos / %s.0)\n" % [i + 1,sd]
-		
-		var v_arr:Array = []
-		for i in seedsize:
-			var item:String = "p%s" % (i+1)
-			v_arr.append_array([item + ".r",item + ".g",item + ".b",item + ".a"])
-		variable_statements += "\n\n\tvar values = %s\n\n\tvar total = 0\n\tfor n in CurrentGame.traceMinerals.size():\n\t\tvar tm = CurrentGame.traceMinerals[n]\n\t\tvalues[n] = pow(values[n] / pow(CurrentGame.mineralPrices.get(tm, 1), 0.2), 4)\n\t\ttotal += values[n]\n\tvar rnd = randf() * total\n\tvar nr = 0\n\tfor n in values:\n\t\trnd -= n\n\t\tif rnd < 0:\n\t\t\treturn CurrentGame.traceMinerals[nr]\n\t\tnr += 1\n\n\treturn CurrentGame.traceMinerals[0]" % str(v_arr)
-		
-		pointers.DataFormat.__compile_and_extend_script_with_scene(variable_statements,["res://story/TheRing.tscn"])
-		
-#		pointers.DataFormat.__replace_scene("[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://TheRing.gd\" type=\"Script\" id=1]\n[ext_resource path=\"res://story/TheRing.tscn\" type=\"PackedScene\" id=2]\n\n[node name=\"TheRing\" instance=ExtResource( 2 )]\nscript = ExtResource( 1 )\n","res://story/TheRing.tscn")
-	
-	static func declutter_webtranslate_scraps(where:Node):
-		for i in where.get_children():
-			var s=i.get_script();if s:
-				var scs=s.get_script_constant_map();var h=true
-				if(scs.get("ALLOW_FRAME_PROCESSING",false)!=true):
-					i.set_physics_process(false);i.set_process(false);i.set_physics_process_internal(false);i.set_process_internal(false)
-				var r=s.resource_path.get_file();if!(r.to_lower().begins_with("modmain")&&r.to_lower().ends_with(".gd"))&&(scs.get("ALLOW_MODLOADER_CHILD_ACCESS",false)!=true):h=!h
-				if h:for m in s.get_script_method_list():if m.name=="_init"&&m.args:h=true
-				if !h:Tool.remove(i)
 	
 	
 	

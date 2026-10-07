@@ -76,49 +76,69 @@ func _init(modLoader : ModLoader=ModLoader):
 	pointers.Scripting.make_mineral_scripting()
 	
 	var files_to_load:Array=[
-		"res://HevLib/scenes/notification_driver/CurrentGame.gd",
-		"res://HevLib/scenes/keymapping/bind_displays/AnalogAxisDisplay.gd",
-		"res://HevLib/scenes/keymapping/bind_displays/GamepadKeybindDisplay.gd",
-		"res://HevLib/scenes/keymapping/bind_displays/KeybindDisplay.gd",
-		"res://HevLib/scenes/keymapping/bind_displays/MousebindDisplay.gd",
-		"res://HevLib/scripts/SteamWebAPI.gd",
-		"res://HevLib/ui/ExtensionPopup.gd",
-		"res://HevLib/scenes/scene_replacements/DLClist.gd",
-		"res://HevLib/scenes/better_title_screen/CurrentlyPlaying.gd",
+		# MineralDriver
 		"res://HevLib/scenes/minerals/AstrogatorPanel.gd",
 		"res://HevLib/scenes/minerals/OMS.gd",
 		"res://HevLib/scenes/minerals/CargoScanner.gd",
 		"res://HevLib/scenes/minerals/ProcessedCargoManifest.gd",
 		"user://cache/.HevLib_Cache/Minerals/cg.gd",
 		"user://cache/.HevLib_Cache/Minerals/as.gd",
-		["res://HevLib/events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn"],
-		"res://HevLib/events/controls/CurrentGame.gd",
+		
+		# Research
 		"res://HevLib/scenes/minerals/TheRing.gd",
-		"res://HevLib/events/controls/ship-ctrl.gd",
-		"res://HevLib/events/controls/camera.gd",
 		"res://HevLib/scenes/research/Enceladus.gd",
-		"res://HevLib/scripts/Namer.gd",
-		"res://HevLib/ui/mod_menu/titlescreen/TitleMenu.gd",
-		"res://HevLib/scenes/equipment/ThrusterSlot.gd",
+		"res://HevLib/scenes/research/overhead_handle/CurrentGame.gd",
+		
+		# EquipmentDriver & Derivatives
 		"res://HevLib/scenes/equipment/SystemShipUpgradeUI.gd",
 		"res://HevLib/scenes/equipment/SystemBuyUI.gd",
 		"res://HevLib/scenes/equipment/UpgradeGroup.gd",
 		"res://HevLib/scenes/equipment/hardpoints/EquipmentItemTemplate.gd",
+		"res://HevLib/scenes/equipment/ThrusterSlot.gd",
 		"res://HevLib/scenes/weaponslot/weapon_slot_handler.gd",
 		"res://HevLib/scenes/equipment/ShipModificationDriver/AddNodes.gd",
 		"res://HevLib/scenes/equipment/ShipModificationDriver/InternalStorageMod.gd",
-		"res://HevLib/scenes/better_title_screen/SaveSlotButton.gd",
+		
+		# ShipDriver
 		"res://HevLib/scenes/ship_driver/Shipyard.gd",
 		"res://HevLib/scenes/ship_driver/CurrentGame.gd",
 		"res://HevLib/scenes/ship_driver/TheRing.gd",
-		"res://HevLib/scenes/research/overhead_handle/CurrentGame.gd",
+		
+		# NameDriver
+		"res://HevLib/scripts/Namer.gd",
+		
+		# EventDriver
 		"res://HevLib/events/TheRing.gd",
+		"res://HevLib/events/controls/camera.gd",
+		"res://HevLib/events/controls/ship-ctrl.gd",
+		"res://HevLib/events/controls/CurrentGame.gd",
+		["res://HevLib/events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn"],
+		
+		# EventDriver custom events
 		"res://HevLib/events/custom_events/TheRing.gd",
+		
+		# NotificationDriver
 		["res://HevLib/scenes/notification_driver/Notifications.tscn","res://achievement/Notifications.tscn"],
+		"res://HevLib/scenes/notification_driver/CurrentGame.gd",
+		
+		# Title screen modifications (save slot refreshing, save options menus)
 		["res://HevLib/scenes/better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn"],
+		"res://HevLib/scenes/better_title_screen/SaveSlotButton.gd",
+		"res://HevLib/scenes/better_title_screen/CurrentlyPlaying.gd",
+		"res://HevLib/ui/ExtensionPopup.gd",
+		"res://HevLib/ui/mod_menu/titlescreen/TitleMenu.gd",
+		"res://HevLib/scenes/scene_replacements/DLClist.gd",
+		
+		# Base 24-crew support for derelict dialogue
 		["res://HevLib/scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"],
+		
+		# Transit tip tag handling
 		"res://HevLib/scripts/transit_tips/TransitTip.gd",
+		
+		# Dive summary slider for display overflow
 		"res://HevLib/scenes/minerals/Summary.gd",
+		
+		# RPC
 		"res://HevLib/scenes/rpc/Crew.gd",
 		"res://HevLib/scenes/rpc/Dealer.gd",
 		"res://HevLib/scenes/rpc/DiveTarget.gd",
@@ -135,6 +155,13 @@ func _init(modLoader : ModLoader=ModLoader):
 		"res://HevLib/scenes/rpc/TitleMenu.gd",
 		"res://HevLib/scenes/rpc/Tuning.gd",
 		"res://HevLib/scenes/rpc/Upgrades.gd",
+		
+		# Misc
+		"res://HevLib/scenes/keymapping/bind_displays/AnalogAxisDisplay.gd",
+		"res://HevLib/scenes/keymapping/bind_displays/GamepadKeybindDisplay.gd",
+		"res://HevLib/scenes/keymapping/bind_displays/KeybindDisplay.gd",
+		"res://HevLib/scenes/keymapping/bind_displays/MousebindDisplay.gd",
+		"res://HevLib/scripts/SteamWebAPI.gd",
 	]
 	
 	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk"):
@@ -180,16 +207,11 @@ func _ready():
 		return
 	l("Readying")
 	
-#	replaceScene("../rpc/Music.tscn")
-	
 	initiate_mod_update_fetch()
 	
 	pointers.Equipment.__make_upgrades_scene()
 	
-	
-#	replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")
-	
-#	replaceScene("../minerals/multiminerals/AsteroidField.tscn","res://AsteroidField.tscn")
+	replaceScene("Upgrades.tscn", "res://enceladus/Upgrades.tscn")
 	
 	if not do_safe_load:
 		for old_path in pointers.ManifestV2.__load_modlets(true,false):
