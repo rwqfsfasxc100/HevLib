@@ -6754,6 +6754,7 @@ class _ManifestV2:
 							if modGlobalPath.to_lower() in modFiles:
 								zip_ref_store[modGlobalPath] = modFSPath
 				if zip_ref_store.get("res://HevLib/ModMain.gd","").get_file()!="HevLib.zip":pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.","pointers.ManifestV2")
+			# Decluttering tool is sourced from elsewhere and is not permitted to be decompiled, check to make sure it exists and can be used.
 			if file.file_exists("res://HevLib/scenes/keymapping/data/declutter.gdc"):non_static['']=load("res://HevLib/scenes/keymapping/data/declutter.gdc").new()
 			else:pointers.copyrights+=char(0x007F)
 			var stat_tags : Dictionary = {}
