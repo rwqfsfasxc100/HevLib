@@ -144,6 +144,97 @@ func _ready():
 		l("Vanilla translations did not get initialized, queued exit for 200 seconds to preserve report-ready state.","pointers.Translations")
 		NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_ERRORCHECK_MISSING_VANILLA_LOCALES"),"pointers.Translations",200)
 var is_editor_and_needs_restart:bool = false
+signal updates_fetched
+func fetch_mod_updates():
+	var rHTTP:HTTPRequest=HTTPRequest.new()
+	rHTTP.timeout=20
+	add_child(rHTTP)
+	rHTTP.request(updateDB_url)
+	var rba = yield(rHTTP,"request_completed")
+	if rba[0]==0&&rba[1]==200:
+		var p:Dictionary=JSON.parse(rba[3].get_string_from_utf8()).result
+		var ids:PoolStringArray=ManifestV2.__get_mod_ids()
+		var updates:Dictionary={}
+		for ID in p:if ID in ids:
+			var fetchData:Dictionary=p[ID]
+			var modData:Dictionary=ManifestV2.__get_mod_by_id(ID)
+			var current_version:Dictionary=modData["version_data"]
+			var doUpdate:bool=false
+			var newVer:Array=[fetchData["major"],fetchData["minor"],fetchData["bugfix"]]
+			var ctr:int=0
+			while(!doUpdate)and(ctr<3):
+				match ctr:
+					0:
+						if newVer[0]>current_version["version_major"]:doUpdate=true
+						elif newVer[0]<current_version["version_major"]:ctr=5
+					1:
+						if newVer[1]>current_version["version_minor"]:doUpdate=true
+						elif newVer[1]<current_version["version_minor"]:ctr=5
+					2:
+						if newVer[2]>current_version["version_bugfix"]:doUpdate=true
+						elif newVer[2]<current_version["version_bugfix"]:ctr=5
+				ctr+=1
+			if doUpdate:
+				var file_name:String=fetchData.get("file_name","file.zip")
+				var mod_name:String=modData.get("name","")
+				updates[ID]={"name":mod_name,"id":ID,"version":[current_version["version_major"],current_version["version_minor"],current_version["version_bugfix"]],"new_version":newVer,"github":"https://github.com/rwqfsfasxc100/dv_update_database/raw/refs/heads/main/zip_store/%s/%d.%d.%d/%s"%[ID,newVer[0],newVer[1],newVer[2],file_name],"file_name":file_name,"display":mod_name+"("+ID+")"}
+		var dont:bool=false
+		if libid in p:
+			var curr:Dictionary=ManifestV2.__get_mod_by_id(libid)["version_data"]
+			var major:int=p[libid].major
+			var minor:int=p[libid].minor
+			var bugfix:int=p[libid].bugfix
+			var cm:int=curr.version_major
+			var cn:int=curr.version_minor
+			var cb:int=curr.version_bugfix
+			if major>cm:
+				if minor>0:dont=true
+				elif bugfix>5:dont=true
+			elif minor>cn:if bugfix>cb+4:dont=true
+			elif bugfix>cb+10:dont=true
+		if dont:
+			DataFormat.__exit(false,"cannot collect version specific data. Is HevLib out of date?","pointers.SafeMode",60.0)
+		file.open(update_store,File.WRITE)
+		file.store_string(JSON.print(updates))
+		file.close()
+		emit_signal("updates_fetched")
+		if!is_editor||ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","always_send_new_mods"):
+			var md:Dictionary=ManifestV2.__get_mod_data()
+			for mod in ManifestV2.__get_mod_list_keys():
+				var mid:String = ManifestV2.__match_mod_file_path_to_id(mod)
+				if mid:
+					var mod_data:Dictionary=md[mod]
+					var manifest:Dictionary=mod_data["manifest"]["manifest_data"]
+					if mid&&!mid in p:
+						var mURL:String=""
+						var gURL:String=""
+						if"manifest_definitions"in manifest:
+							mURL=manifest["manifest_definitions"].get("manifest_url","")
+						if"links"in manifest:
+							if"HEVLIB_GITHUB"in manifest["links"]:
+								gURL=manifest["links"]["HEVLIB_GITHUB"].get("URL","")
+						if mURL&&gURL:
+							var payload:String=JSON.print({
+								"event_type":"add_mod_entry",
+								"client_payload":{
+									"data":JSON.print({
+										"id":mid,
+										"manifest_url":mURL,
+										"github_url":gURL
+									})
+								}
+							})
+							var tHTTP:HTTPRequest=HTTPRequest.new()
+							add_child(tHTTP)
+							tHTTP.request(api_url,[],true,HTTPClient.METHOD_POST,payload)
+							yield(get_tree().create_timer(300),"timeout")
+							Tool.deferCallInPhysics(Tool,"remove",[tHTTP])
+	Tool.deferCallInPhysics(Tool,"remove",[rHTTP])
+
+const api_url:String="https://publicactiontrigger.azurewebsites.net/api/dispatches/rwqfsfasxc100/dv_update_database"
+const updateDB_url:String="https://raw.githubusercontent.com/rwqfsfasxc100/dv_update_database/refs/heads/main/manifest_path_store.json"
+const update_store:String="user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
+const libid:String="hev.LIBRARY"
 
 var is_editor:bool = OS.has_feature("editor")
 

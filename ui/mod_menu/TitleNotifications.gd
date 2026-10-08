@@ -37,7 +37,7 @@ var file = File.new()
 var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
 func _ready():
 	check()
-	pointers.equipment_modmain.connect("updates_fetched",self,"check")
+	pointers.connect("updates_fetched",self,"check")
 	visible = false
 var visibility = false
 

@@ -32,12 +32,16 @@
 
 extends "res://menu/TitleMenu.gd"
 
+var pointers:HevLibPointers
+
 var mm2_titlemenu_uinit : bool = false
 func _ready():
 	if mm2_titlemenu_uinit:
 		OS.kill(OS.get_process_id())
 	mm2_titlemenu_uinit = true
-	var pointers:HevLibPointers = ModLoader._savedObjects[0]
+	update_timer.connect("timeout",self,"update_recheck")
+	update_timer.start(30)
+	pointers = ModLoader._savedObjects[0]
 	var mm2_entry:Dictionary = pointers.ManifestV2.__get_mod_by_id("hev.ModMenu2")
 	if mm2_entry:
 		var mm2_ver:Array = mm2_entry.get("version_data",{}).get("full_version_array",[0,0,0])
@@ -83,7 +87,6 @@ func _ready():
 		var updNotifier:Popup = load("res://HevLib/ui/mod_menu/updates/UpdateNotifier.tscn").instance()
 		updNotifier.update_menu_path = NodePath("../../UpdatesMenu")
 		popups.add_child(updNotifier)
-		
 	else:
 		var popups:CenterContainer = $NoMargins/Popups
 		var restart:Popup = load("res://HevLib/ui/mod_menu/updates/MMRestartDialog.tscn").instance()
@@ -96,4 +99,8 @@ func _ready():
 		var updNotifier:Popup = load("res://HevLib/ui/mod_menu/updates/UpdateNotifier.tscn").instance()
 		updNotifier.update_menu_path = NodePath("../../UpdatesMenu")
 		popups.add_child(updNotifier)
-		
+var update_timer:Timer = Timer.new()
+func update_recheck():
+	pointers.fetch_mod_updates()
+	update_timer.start(60)
+

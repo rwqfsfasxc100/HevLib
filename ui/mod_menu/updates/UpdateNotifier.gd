@@ -40,7 +40,7 @@ var file:File = File.new()
 
 func _ready():
 	check()
-	pointers.equipment_modmain.connect("updates_fetched",self,"check")
+	pointers.connect("updates_fetched",self,"check")
 
 func check():
 	file.open("user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json",File.READ)
