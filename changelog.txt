@@ -1,3 +1,8 @@
+[1.16.24]
+
+1=* Fixed critical issue with the updater script that would cause the HTTPRequest object to be unintentionally freed before it could fetch update data.
+2=* Any and all users who installed 1.16.22 and 1.16.23 will need to manually update
+
 [1.16.23]
 
 1=* Fixed crash caused by EventDriver not being able to properly parse certain event types

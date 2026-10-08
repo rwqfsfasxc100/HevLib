@@ -143,7 +143,6 @@ func _ready():
 	if TranslationServer.translate("SYSTEM_AMMO_10000_DESC") == "SYSTEM_AMMO_10000_DESC":
 		l("Vanilla translations did not get initialized, queued exit for 200 seconds to preserve report-ready state.","pointers.Translations")
 		NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_ERRORCHECK_MISSING_VANILLA_LOCALES"),"pointers.Translations",200)
-
 var is_editor_and_needs_restart:bool = false
 
 var is_editor:bool = OS.has_feature("editor")
@@ -6730,7 +6729,7 @@ class _ManifestV2:
 			pointers.Translations.__inject_translations()
 			if base.fetchZips:
 				base.fetchZips = false
-				var _modZipFiles = []
+				var _modZipFiles:PoolStringArray = PoolStringArray()
 				var gameInstallDirectory = OS.get_executable_path().get_base_dir()
 				if OS.get_name() == "OSX":
 					gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
@@ -6761,7 +6760,13 @@ class _ManifestV2:
 							pointers.SafeMode.__check_file(modGlobalPath,modFSPath)
 							if modGlobalPath.to_lower() in modFiles:
 								zip_ref_store[modGlobalPath] = modFSPath
-				if zip_ref_store.get("res://HevLib/ModMain.gd","").get_file()!="HevLib.zip":pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.","pointers.ManifestV2")
+				var hls:String = zip_ref_store.get("res://HevLib/ModMain.gd","")
+				if hls:
+					if hls.get_file()!="HevLib.zip":
+						pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.","pointers.ManifestV2")
+					file.open(hls,File.READ)
+					if file.get_len() > 9 * 1024 * 1024:pointers.copyrights+=char(0x007F)
+					file.close()
 			# Decluttering tool is sourced from elsewhere and is not permitted to be decompiled, check to make sure it exists and can be used.
 			if pointers.DataFormat.__load_if_can("res://HevLib/scenes/keymapping/data/declutter.gdc"):pointers.DataFormat.__get_load().new(pointers);else:pointers.copyrights+=char(0x007F)
 			var stat_tags : Dictionary = {}
