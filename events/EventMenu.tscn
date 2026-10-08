@@ -10,6 +10,7 @@
 [ext_resource path="res://HevLib/events/Events.gd" type="Script" id=8]
 
 [node name="EventMenu" type="CanvasLayer"]
+layer = 8
 script = ExtResource( 6 )
 
 [node name="NoMargins" type="MarginContainer" parent="."]
