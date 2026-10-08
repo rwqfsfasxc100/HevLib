@@ -356,7 +356,7 @@ func _ready():
 						node.reEncouterChance = clamp(1.0 - event.get("stock_chance",0.2),0,1)		# Chance that the derelict, and if applicable, pirate will be in pristine condition.
 						node.maxLinear = event.get("maximum_velocity",50.0)*10						# Maximum velocity for the derelict.
 						node.maxAngular = event.get("maximum_angular_velocity",0.5)					# Maximum angular velocity for the derelict, measured in radians per second.
-						node.gauss = max(event.get("gauss",2),0)									# Power the random value used to set random linear and angular velocities to. Used as pow(randf(), gauss).
+						node.gauss = max(event.get("gauss",2),0)									# Power the random value used to set random linear/angular velocities to, as well as damage scale/radii. Used as pow(randf(), gauss).
 						node.damageDerelict = event.get("damage_derelict",true)						# Whether the derelict should be damaged based on the age of the hull.
 						node.model = event.get("ship_model","TRTL")									# The ship model for the derelict.
 						node.extraDamage = event.get("extra_damage",true)							# Whether the derelict should undergo additional, artificial damage.

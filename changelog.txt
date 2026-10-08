@@ -1,3 +1,21 @@
+[1.16.25]
+
+1=* Updated ShipDriver's derelict handling to expose more of the RescueOperation event to the API
+1.1=* `maximum_velocity` - (float) maximum velocity of the derelict in m/s. Defaults to 50.0
+1.2=* `maximum_angular_velocity` - (float) maximum angular velocity of the derelict in rad/sec. Defaults to 0.5
+1.3=* `gauss` - (float) Power the random value used to set random linear/angular velocities to, as well as damage scale/radii. Used as pow(randf(), gauss). Defaults to 2.0
+1.4=* `extra_kinetic_damage` - (float) extra KE damage added to the derelict if extra_damage is enabled. Defaults to 100 000.0
+1.5=* `extra_emp_damage` - (float) extra EMP damage added to the derelict if extra_damage is enabled. Defaults to 100 000.0
+1.6=* `extra_damage_radius` - (float) radius in meters for where the extra damage hitpoint can occur within. Defaults to 10.0
+1.7=* `new_derelict_conversation` - (String) if set and a valid file path, the conversation scene to replace the regular derelict conversation with. Defaults to ""
+1.8=* `new_storm_beacon` - (String) if set and a valid file path, the storm beacon scene to replace the regular storm beacon with. Defaults to ""
+1.9=* `new_bounty` - (String) if set and a valid file path, the scene to replace the pirate's lifepod scene with. Defaults to ""
+2=* Improved efficiency of ShipDriver events, where event data is only solved for and set if the event were to pass the `canBeAt` check and be a derelict event.
+3=* Fixed modded ships not being able to appear as derelicts or NPCs
+4=* Fixed multiple debug menus not working
+5=* Moved update checks out of the modloader to pointers
+6=* While on the title screen, additional update checks will happen 30 seconds after loading, and once every minute after that.
+
 [1.16.24]
 
 1=* Fixed critical issue with the updater script that would cause the HTTPRequest object to be unintentionally freed before it could fetch update data.

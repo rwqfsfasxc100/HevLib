@@ -98,7 +98,7 @@ var rescue:bool = false
 
 var maximum_velocity:float = 50.0
 var maximum_angular_velocity:float = 0.5
-var gauss:int = 2
+var gauss:float = 2.0
 var extra_kinetic_damage:float = 100000.0
 var extra_emp_damage:float = 100000.0
 var extra_damage_radius:float = 10.0
@@ -115,12 +115,15 @@ func canBeAt(pos):
 	var selected:Dictionary = ship_pool[model]
 	Debug.l("* %s handler %s attempting spawn of ship %s" % [mode,str(index),model])
 	var permit:bool = true
-	if mode == "derelict":
+	var isDerelict:bool = mode == "derelict"
+	if isDerelict:
 		var rc = clamp(selected.get("chance",1.0) * (1 - CurrentGame.getMoney() / selected.get("money",10000000.0)), selected.get("minimum_chance",0.1), 1)
 		if randf() > rc:
 			Debug.l("* Denied because of random chance of %f" % rc)
 			permit = false
-	if permit and get_parent().getChaosAt(pos) > selected.get("chaos",0.0):
+	if permit:
+		permit = get_parent().getChaosAt(pos) > selected.get("chaos",0.0)
+	if permit and isDerelict:
 		stock_chance = selected.get("stock_chance",0.2)
 		allow_damage = selected.get("allow_damage",true)
 		cause_extra_damage = selected.get("cause_extra_damage",true)
@@ -140,7 +143,6 @@ func canBeAt(pos):
 		new_derelict_conversation = selected.get("new_derelict_conversation","")
 		new_storm_beacon = selected.get("new_storm_beacon","")
 		new_bounty = selected.get("new_bounty","")
-		return true
 	return false
 	
 
