@@ -5236,7 +5236,7 @@ class _Events:
 	static func __spawn_event(event : String,ring : Node,parameters : Dictionary = {},delay_seconds = 0.0):
 		if not busy[0]:
 			var pointers = non_static["pointers"]
-			if (not ring) or (not ring.has_method("hl_ring_UV")):
+			if (not ring) or (not ring.has_method("hl_thering_UV")):
 				pointers.l("No ring object specified, returning","pointers.EventDriver")
 				return
 			if delay_seconds > 0.0:
@@ -5292,7 +5292,7 @@ class _Events:
 	static func __clear_event(event : String, ring, clear_related_poi : bool = true,clear_in_cargo : bool = false,delay_seconds : float = 0.0):
 		var pointers = non_static["pointers"]
 		pointers.n("clearing oddities %s" % event,"pointers.EventDriver")
-		if (not ring) or (not ring.has_method("hl_ring_UV")):
+		if (not ring) or (not ring.has_method("hl_thering_UV")):
 			pointers.l("No ring object specified, returning","pointers.EventDriver")
 			return
 		if delay_seconds > 0.0:

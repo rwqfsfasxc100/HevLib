@@ -49,17 +49,13 @@ func _ready():
 					"set":
 						odditiesEvery = max(1,time)
 					"add":
-						var newtime = odditiesEvery + time
-						odditiesEvery = max(1,newtime)
+						odditiesEvery = max(1,odditiesEvery + time)
 					"subtract":
-						var newtime = odditiesEvery - time
-						odditiesEvery = max(1,newtime)
+						odditiesEvery = max(1,odditiesEvery - time)
 					"multiply":
-						var newtime = odditiesEvery * time
-						odditiesEvery = max(1,newtime)
+						odditiesEvery = max(1,odditiesEvery * time)
 					"divide":
-						var newtime = odditiesEvery / time
-						odditiesEvery = max(1,newtime)
+						odditiesEvery = max(1,odditiesEvery / time)
 		elif event_name:
 			var do_add:bool = true
 			var node:Node = Node.new()
@@ -464,7 +460,7 @@ func _ready():
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"vilcy":
 						node.depthMinKm = max(event.get("minimum_depth_in_km",0),0)					# Minimum depth that the event is permitted to spawn at, in kilometers.
-						node.depthMaxKm = max(event.get(" ",10000),0)				# Maximum depth that the event is permitted to spawn at, in kilometers.
+						node.depthMaxKm = max(event.get("maximum_depth_in_km",10000),0)				# Maximum depth that the event is permitted to spawn at, in kilometers.
 						node.vilcyPatroler = max(event.get("vilcy_patroler",0),0)					# Creates a vilcy K37, adding EMD-14s to left and right low-stress hardpoints, 1 GW turbine, and dual ultracapacitors.
 						node.vilcyDisabler = max(event.get("vilcy_disabler",0),0)					# Creates a vilcy K37, adding MWGs to all hardpoints, 1 GW turbine, and dual ultracapacitors.
 						node.vilcyBurner = max(event.get("vilcy_burner",0),0)						# Creates a vilcy K37, adding CL-150s to left and right low-stress hardpoints, 1 GW turbine, and dual ultracapacitors.
