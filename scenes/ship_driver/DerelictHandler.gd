@@ -35,16 +35,10 @@ extends Node
 export (int, 1,5,1) var index = 1
 export (String,"derelict","miner") var mode = "derelict"
 
-export (int) var gauss = 2
-export (int) var maxLinear = 500
-export (float) var maxAngular = 0.5
-export var derelictConversation = preload("res://comms/conversation/DerelictConversation.tscn")
+var derelictConversation = load("res://comms/conversation/DerelictConversation.tscn")
 
-export (int) var extraRadius = 100
-export (float) var extraKinetic = 100000.0
-export (float) var extraEmp = 100000.0
-export var stormBeacon = preload("res://story/StormBeacon.tscn")
-export var bounty = preload("res://ships/LifepodPirate.tscn")
+var stormBeacon = load("res://story/StormBeacon.tscn")
+var bounty = load("res://ships/LifepodPirate.tscn")
 var specificShipName = ""
 
 func setParam(param):
@@ -71,6 +65,7 @@ var prevent = false
 
 var pointers:HevLibPointers
 var ship_pool = {}
+var dataSet = null
 func _ready():
 	pointers = ModLoader._savedObjects[0]
 	var data = pointers.Equipment.add_ships_store
@@ -90,9 +85,6 @@ func _ready():
 	if ship_pool.keys().size() < index:
 		prevent = true
 
-var chance:float = 1.0
-var minimum_chance:float = 0.1
-var money:float = 10000000.0
 var stock_chance:float = 0.2
 var allow_damage:bool = true
 var cause_extra_damage:bool = true
@@ -102,50 +94,55 @@ var clump:bool = false
 var clump_velocity:int = 25
 var ring_storm_chance:float = 0.3
 var pirate_chance:float = 0.3
-var chaos:float = 0.0
 var rescue:bool = false
 
+var maximum_velocity:float = 50.0
+var maximum_angular_velocity:float = 0.5
+var gauss:int = 2
+var extra_kinetic_damage:float = 100000.0
+var extra_emp_damage:float = 100000.0
+var extra_damage_radius:float = 10.0
+var new_derelict_conversation:String = ""
+var new_storm_beacon:String = ""
+var new_bounty:String = ""
+
 var model = "TRTL"
-var defaults = {
-	chance = 1.0,
-	minimum_chance = 0.1,
-	money = 10000000.0,
-	stock_chance = 0.2,
-	allow_damage = true,
-	cause_extra_damage = true,
-	rock_cluster_chance = 0.3,
-	rock_cluster_count = 33,
-	clump = false,
-	clump_velocity = 25,
-	ring_storm_chance = 0.3,
-	pirate_chance = 0.3,
-	chaos = 0.0,
-	rescue = false,
-}
+
 func canBeAt(pos):
 	if prevent:
 		return false
-	var sn = ship_pool.keys()[randi() % ship_pool.keys().size()]
-	var selected = ship_pool[sn]
-	model = sn
-	Debug.l("* %s handler %s attempting spawn of ship %s" % [mode,str(index),sn])
-	for i in defaults:
-		set(i,defaults[i])
-	for i in selected:
-		set(i,selected[i])
-	match mode:
-		"miner":
-			var cv = get_parent().getChaosAt(pos)
-			return cv > chaos
-		
-		"derelict":
-			
-			var rc = clamp(chance * (1 - CurrentGame.getMoney() / money), minimum_chance, 1)
-			if randf() > rc:
-				Debug.l("* Denied because of random chance of %f" % rc)
-				return false
-			var cv = get_parent().getChaosAt(pos)
-			return cv >= chaos
+	model = ship_pool.keys()[randi() % ship_pool.keys().size()]
+	var selected:Dictionary = ship_pool[model]
+	Debug.l("* %s handler %s attempting spawn of ship %s" % [mode,str(index),model])
+	var permit:bool = true
+	if mode == "derelict":
+		var rc = clamp(selected.get("chance",1.0) * (1 - CurrentGame.getMoney() / selected.get("money",10000000.0)), selected.get("minimum_chance",0.1), 1)
+		if randf() > rc:
+			Debug.l("* Denied because of random chance of %f" % rc)
+			permit = false
+	if permit and get_parent().getChaosAt(pos) > selected.get("chaos",0.0):
+		stock_chance = selected.get("stock_chance",0.2)
+		allow_damage = selected.get("allow_damage",true)
+		cause_extra_damage = selected.get("cause_extra_damage",true)
+		rock_cluster_chance = selected.get("rock_cluster_chance",0.3)
+		rock_cluster_count = selected.get("rock_cluster_count",33)
+		clump = selected.get("clump",true)
+		clump_velocity = selected.get("clump_velocity",25)
+		ring_storm_chance = selected.get("ring_storm_chance",0.3)
+		pirate_chance = selected.get("pirate_chance",0.3)
+		rescue = selected.get("rescue",false)
+		maximum_velocity = selected.get("maximum_velocity",50.0)
+		maximum_angular_velocity = selected.get("maximum_angular_velocity",0.5)
+		gauss = selected.get("gauss",2)
+		extra_kinetic_damage = selected.get("extra_kinetic_damage",100000.0)
+		extra_emp_damage = selected.get("extra_emp_damage",100000.0)
+		extra_damage_radius = selected.get("extra_damage_radius",10.0)
+		new_derelict_conversation = selected.get("new_derelict_conversation","")
+		new_storm_beacon = selected.get("new_storm_beacon","")
+		new_bounty = selected.get("new_bounty","")
+		return true
+	return false
+	
 
 func makeAt(pos):
 	
@@ -165,10 +162,10 @@ func makeAt(pos):
 			ships.append(miner)
 		
 		"derelict":
-			var velocity = Vector2(randf() - 0.5, randf() - 0.5).normalized() * pow(randf(), gauss) * maxLinear
+			var velocity = Vector2(randf() - 0.5, randf() - 0.5).normalized() * pow(randf(), gauss) * (maximum_velocity * 10.0)
 			
 			var wreckage = Shipyard.createShipBuildByName(model, "helpless", randf() > clamp((1 - stock_chance),0,1))
-			wreckage.angular_velocity = (grandf()) * maxAngular
+			wreckage.angular_velocity = (grandf()) * (maximum_angular_velocity * 10)
 			wreckage.linear_velocity = velocity
 			wreckage.setReactorState(false)
 			wreckage.rotation = randf() * 2 * PI
@@ -186,7 +183,11 @@ func makeAt(pos):
 				wreckage.setShipName(specificShipName)
 			if allow_damage:
 				wreckage.damageLimit = 1
-			var dci = derelictConversation.instance()
+			var dci
+			if new_derelict_conversation and pointers.FileAccess.__file_exists(new_derelict_conversation):
+				dci = load(new_derelict_conversation).instance()
+			else:
+				dci = derelictConversation.instance()
 			wreckage.add_child(dci)
 			wreckage.dialogTree = wreckage.get_path_to(dci)
 			if cause_extra_damage:
@@ -203,8 +204,10 @@ func makeAt(pos):
 					ships.append(a)
 					
 			if randf() < ring_storm_chance:
-				var storm = stormBeacon.instance()
-				ships.append(storm)
+				if new_storm_beacon and pointers.FileAccess.__file_exists(new_storm_beacon):
+					ships.append(load(new_storm_beacon).instance())
+				else:
+					ships.append(stormBeacon.instance())
 			if randf() < pirate_chance:
 				match Settings.getDifficulty():
 					0:
@@ -246,7 +249,10 @@ func makeAbductor():
 	ship.preheat = true
 	ship.autopilotMaxVelocity = 500
 	ship.rotation = randf() * 2 * PI
-	ship.lifepod = bounty
+	if new_bounty and pointers.FileAccess.__file_exists(new_bounty):
+		ship.lifepod = load(new_bounty)
+	else:
+		ship.lifepod = bounty
 	ship.hostilityHitWhenEncelading = 0.2
 	return ship
 
@@ -259,9 +265,9 @@ func grandf():
 
 func applyExtraDamage(to):
 	Debug.l("Applying extra damage to %s" % [to])
-	var point = Vector2(randf() - 0.5, randf() - 0.5).normalized() * pow(randf(), gauss) * extraRadius + to.global_position
-	to.applyKineticDamage(pow(randf(), gauss) * extraKinetic, point)
-	to.applyEmpDamage(pow(randf(), gauss) * extraEmp, point, 1.0 / 60.0)
+	var point = Vector2(randf() - 0.5, randf() - 0.5).normalized() * pow(randf(), gauss) * (extra_damage_radius * 10.0) + to.global_position
+	to.applyKineticDamage(pow(randf(), gauss) * extra_kinetic_damage, point)
+	to.applyEmpDamage(pow(randf(), gauss) * extra_emp_damage, point, 1.0 / 60.0)
 
 func doClump(what, towards, velocity):
 	Debug.l("Clumping asteroid %s towards %s" % [what, towards])
