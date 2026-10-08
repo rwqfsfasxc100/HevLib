@@ -39,6 +39,7 @@ func _ready():
 	if mm2_titlemenu_uinit:
 		OS.kill(OS.get_process_id())
 	mm2_titlemenu_uinit = true
+	add_child(update_timer)
 	update_timer.connect("timeout",self,"update_recheck")
 	update_timer.start(30)
 	pointers = ModLoader._savedObjects[0]

@@ -35,6 +35,7 @@ extends "res://Boot.gd"
 func _ready():
 	# Update checks
 	var pt:HevLibPointers = ModLoader._savedObjects[0]
+	yield(get_tree(),"idle_frame")
 	pt.fetch_mod_updates()
 	# This checks to see that the copyright message exists and is displayed once the game is finished loading.
 	# Using this point in the load cycle so the license will be posted before potential spam from the title screen

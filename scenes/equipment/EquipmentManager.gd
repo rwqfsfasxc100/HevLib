@@ -56,7 +56,7 @@ func _tree_entered():
 		if i.has_method("updateLeaderboard"):
 			steamNode = i
 	var btf = "user://cache/.HevLib_Cache/Variable_Fetch/jobs.txt"
-	if file.file_exists(btf) and Engine.has_singleton("Steam"):
+	if file.file_exists(btf):
 		file.open(btf,File.READ)
 		var data = JSON.parse(file.get_as_text()).result
 		file.close()
@@ -68,24 +68,25 @@ func _tree_entered():
 		file.open(jbc,File.READ)
 		var h=JSON.parse(file.get_as_text()).result
 		file.close()
-		var do = true
-		var rt = str(hash(Engine.get_singleton("Steam").current_steam_id))
-		if rt in data:
-			var jobs=data[rt]
-			if rt in h:
-				if 0 in h[rt]:do=false
-			if steamNode&&do:
-				yield(CurrentGame.get_tree(),"idle_frame")
-				for i in 5:
-					yield(get_tree().create_timer(0.2),"timeout")
-					steamNode.keepBest = false
-					steamNode.updateLeaderboard("total_money",0)
-					steamNode.keepBest = true
-				if!rt in h:h[rt] = []
-				h[rt].append(0)
-				file.open(jbc,File.WRITE)
-				file.store_string(JSON.print(h))
-				file.close()
+		if Engine.has_singleton("Steam"):
+			var do = true
+			var rt = str(hash(Engine.get_singleton("Steam").current_steam_id))
+			if rt in data:
+				var jobs=data[rt]
+				if rt in h:
+					if 0 in h[rt]:do=false
+				if steamNode&&do:
+					yield(CurrentGame.get_tree(),"idle_frame")
+					for i in 5:
+						yield(get_tree().create_timer(0.2),"timeout")
+						steamNode.keepBest = false
+						steamNode.updateLeaderboard("total_money",0)
+						steamNode.keepBest = true
+					if!rt in h:h[rt] = []
+					h[rt].append(0)
+					file.open(jbc,File.WRITE)
+					file.store_string(JSON.print(h))
+					file.close()
 
 func sort_slot(slot):
 	pointers.l("Sorting equipment for slot %s" % slot.name)

@@ -150,7 +150,7 @@ func fetch_mod_updates():
 	rHTTP.timeout=20
 	add_child(rHTTP)
 	rHTTP.request(updateDB_url)
-	var rba = yield(rHTTP,"request_completed")
+	var rba:Array = yield(rHTTP,"request_completed")
 	if rba[0]==0&&rba[1]==200:
 		var p:Dictionary=JSON.parse(rba[3].get_string_from_utf8()).result
 		var ids:PoolStringArray=ManifestV2.__get_mod_ids()

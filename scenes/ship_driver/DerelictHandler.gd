@@ -90,20 +90,20 @@ func _ready():
 	if ship_pool.keys().size() < index:
 		prevent = true
 
-var chance = 1.0
-var minimum_chance = 0.1
-var money = 10000000.0
-var stock_chance = 0.2
-var allow_damage = true
-var cause_extra_damage = true
-var rock_cluster_chance = 0.3
-var rock_cluster_count = 33
-var clump = false
-var clump_velocity = 25
-var ring_storm_chance = 0.3
-var pirate_chance = 0.3
-var chaos = 0.0
-var rescue = false
+var chance:float = 1.0
+var minimum_chance:float = 0.1
+var money:float = 10000000.0
+var stock_chance:float = 0.2
+var allow_damage:bool = true
+var cause_extra_damage:bool = true
+var rock_cluster_chance:float = 0.3
+var rock_cluster_count:int = 33
+var clump:bool = false
+var clump_velocity:int = 25
+var ring_storm_chance:float = 0.3
+var pirate_chance:float = 0.3
+var chaos:float = 0.0
+var rescue:bool = false
 
 var model = "TRTL"
 var defaults = {

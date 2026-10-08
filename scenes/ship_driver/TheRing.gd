@@ -38,8 +38,20 @@ func _ready():
 		OS.kill(OS.get_process_id())
 	hl_shipdriverderelictadder_uinit = true
 	var pointers:HevLibPointers = ModLoader._savedObjects[0]
+	var derelict_handler:Script = load("res://HevLib/scenes/ship_driver/DerelictHandler.gd")
+	for index in 5:
+		index += 1
+		var dh = derelict_handler.new()
+		dh.name = "DerelictHandler%d" % index
+		dh.index = index
+		add_child(dh)
+		var mh = derelict_handler.new()
+		mh.name = "MinerHandler%d" % index
+		mh.mode = "miner"
+		mh.index = index
+		add_child(mh)
 	var data = pointers.Equipment.add_ships_store
-	var ro = load("res://story/RescueOperation.gd")
+	var ro:Script = load("res://story/RescueOperation.gd")
 	for ship in data:
 		if "name" in ship and ship.name and "path" in ship and ship.path and pointers.FileAccess.__file_exists(ship.path):
 			pointers.l("Adding uniquely-named derelict event for ship %s" % ship.name,"ShipDriver")
