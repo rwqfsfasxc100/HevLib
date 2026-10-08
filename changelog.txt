@@ -1,3 +1,14 @@
+[1.16.22]
+
+1=* Multi-minerals now no longer needs to have the game rebooted for the changes to take effect
+1.1=* Mineral chunks that existed before toggling will retain the behaviour they had at extraction.
+2=* Improved how the DLC list displays installed mods
+3=* Reorganized modmain resource modifications to all use order-specific handles
+4=* MineralDriver now dynamically fetches the trace minerals to support mods not using MineralDriver to add new minerals
+5=* Improved efficiency of `FolderAccess`.`__fetch_folder_files`
+6=* Cleaned up modmain and unused scripting methods from reorganized script loading
+7=* 
+
 [1.16.21]
 
 1=* Added a new pointers class: `Math`

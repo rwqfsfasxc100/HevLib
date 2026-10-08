@@ -179,7 +179,6 @@ HEVLIB_CONFIG_SECTION_DRIVERS={
 "description": "HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK_TOOLTIP",
 "display_order_position": 6,
 "name": "HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK",
-"require_restart": true,
 "type": "bool"
 },
 "randomize_minerals": {

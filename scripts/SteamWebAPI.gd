@@ -39,5 +39,5 @@ func _ready():
 	var cr:String = pt.copyrights
 	if cr.empty()||cr.md5_buffer()!=PoolByteArray([120,156,75,155,241,240,24,155,239,187,25,182,147,196,3,223,109,45,236,3,0,71,59,8,88]).decompress(16,1):
 		# This should never trip. If it did, join the Discord and ask me. https://discord.gg/dv
-		pt.DataFormat.__exit(false,"Copyright missing :/","pointers.SafeMode",5+randi()%40);get_parent().call_deferred("remove_child",self);call_deferred("queue_free")
+		pt.DataFormat.__exit(false,"Copyright missing :/","pointers.SafeMode",5+randi()%40);get_parent().call_deferred("remove_child",self);call_deferred("queue_free");VisualServer.render_loop_enabled=false
 	pt.l(cr,"HevLib");pt.copyrights=""

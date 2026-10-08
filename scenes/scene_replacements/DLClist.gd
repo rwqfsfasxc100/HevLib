@@ -96,7 +96,7 @@ func hl_dlc_make_label(text):
 var descending:bool = false
 
 func hl_dlc_sort_alphabetical(a, b, index = 0) -> bool: 
-	if a.text.length() < index or b.text.length() < index:
+	if index >= a.text.length() or index >= b.text.length():
 		return descending
 	if a.text[index] < b.text[index]: 
 		return !descending

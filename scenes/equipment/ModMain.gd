@@ -873,7 +873,7 @@ func get_script_constant_map_without_load(script_path:String) -> Dictionary:
 			concat+=this_stream.strip_edges()+"\n"
 			this_stream=""
 			streaming=false
-	if!const_names:return {}
+	if!const_names:return{}
 	var dict:Dictionary={}
 	var rld:GDScript=GDScript.new()
 	rld.set_source_code(concat)
@@ -882,7 +882,6 @@ func get_script_constant_map_without_load(script_path:String) -> Dictionary:
 
 func testing():
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
-	
 	
 	
 	
