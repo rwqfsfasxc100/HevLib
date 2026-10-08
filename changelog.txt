@@ -7,7 +7,10 @@
 4=* MineralDriver now dynamically fetches the trace minerals to support mods not using MineralDriver to add new minerals
 5=* Improved efficiency of `FolderAccess`.`__fetch_folder_files`
 6=* Cleaned up modmain and unused scripting methods from reorganized script loading
-7=* 
+7=* Added `ManifestV2`.`__match_mod_file_path_to_id`
+7.1=* Returns the associated mod ID for a provided ModMain.gd/Mod.manifest filepath, or a blank string if the mod does not have an ID.
+7.2=* Faster than parsing a manifest for the ID
+7.3=* `file_path` -> (String) full filepath for the ModMain/mod manifest file
 
 [1.16.21]
 

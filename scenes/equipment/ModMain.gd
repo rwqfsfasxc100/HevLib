@@ -254,35 +254,34 @@ func updatelist_return(result, response_code,headers,body,mh):
 		if!is_editor||pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","always_send_new_mods"):
 			var md:Dictionary=pointers.ManifestV2.__get_mod_data()
 			for mod in pointers.ManifestV2.__get_mod_list_keys():
-				var mod_data:Dictionary=md[mod]
-				if mod_data["manifest"]["has_manifest"]:
+				var mid:String = pointers.ManifestV2.__match_mod_file_path_to_id(mod)
+				if mid:
+					var mod_data:Dictionary=md[mod]
 					var manifest:Dictionary=mod_data["manifest"]["manifest_data"]
-					if"mod_information"in manifest:
-						var mid:String=manifest["mod_information"].get("id","")
-						if mid&&!mid in p:
-							var mURL:String=""
-							var gURL:String=""
-							if"manifest_definitions"in manifest:
-								mURL=manifest["manifest_definitions"].get("manifest_url","")
-							if"links"in manifest:
-								if"HEVLIB_GITHUB"in manifest["links"]:
-									gURL=manifest["links"]["HEVLIB_GITHUB"].get("URL","")
-							if mURL&&gURL:
-								var payload:String=JSON.print({
-									"event_type":"add_mod_entry",
-									"client_payload":{
-										"data":JSON.print({
-											"id":mid,
-											"manifest_url":mURL,
-											"github_url":gURL
-										})
-									}
-								})
-								var tHTTP:HTTPRequest=HTTPRequest.new()
-								add_child(tHTTP)
-								tHTTP.request(api_url,[],true,HTTPClient.METHOD_POST,payload)
-								yield(get_tree().create_timer(300),"timeout")
-								Tool.deferCallInPhysics(Tool,"remove",[tHTTP])
+					if mid&&!mid in p:
+						var mURL:String=""
+						var gURL:String=""
+						if"manifest_definitions"in manifest:
+							mURL=manifest["manifest_definitions"].get("manifest_url","")
+						if"links"in manifest:
+							if"HEVLIB_GITHUB"in manifest["links"]:
+								gURL=manifest["links"]["HEVLIB_GITHUB"].get("URL","")
+						if mURL&&gURL:
+							var payload:String=JSON.print({
+								"event_type":"add_mod_entry",
+								"client_payload":{
+									"data":JSON.print({
+										"id":mid,
+										"manifest_url":mURL,
+										"github_url":gURL
+									})
+								}
+							})
+							var tHTTP:HTTPRequest=HTTPRequest.new()
+							add_child(tHTTP)
+							tHTTP.request(api_url,[],true,HTTPClient.METHOD_POST,payload)
+							yield(get_tree().create_timer(300),"timeout")
+							Tool.deferCallInPhysics(Tool,"remove",[tHTTP])
 	Tool.deferCallInPhysics(Tool,"remove",[mh])
 
 func installScriptExtension(path:String):

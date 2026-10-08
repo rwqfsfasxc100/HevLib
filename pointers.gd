@@ -3138,12 +3138,11 @@ class _Equipment:
 		var drivers : Dictionary = {}
 		var mods : Dictionary = pointers.ManifestV2.__get_mod_data()
 		for md in pointers.ManifestV2.__get_mod_list_keys():
-			var mod = mods[md]
-			if mod["manifest"]["has_manifest"]:
-				var mod_id = mod["manifest"]["manifest_data"].get("mod_information",{}).get("id","")
-				if mod_id:
-					if "drivers" in mod.keys() and mod.drivers:
-						drivers[mod_id] = mod.drivers
+			var mod_id:String = pointers.ManifestV2.__match_mod_file_path_to_id(md)
+			if mod_id:
+				var mod = mods[md]
+				if "drivers" in mod.keys() and mod.drivers:
+					drivers[mod_id] = mod.drivers
 		mods.clear()
 		
 		for i in ProjectSettings.get_property_list():
