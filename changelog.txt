@@ -1,3 +1,9 @@
+[1.16.23]
+
+1=* Fixed crash caused by EventDriver not being able to properly parse certain event types
+2=* Fixed a bug that would prevent custom EventDriver events using the Vilcy event type from setting a maximum event depth
+3=* Vilcy type custom events now properly default to using depth ranges between 30 & 2970 km
+
 [1.16.22]
 
 1=* Multi-minerals now no longer needs to have the game rebooted for the changes to take effect
