@@ -459,7 +459,7 @@ func _ready():
 						node.awayRadius = max(event.get("away_radius",10000),0)						# Radius which the event checks for any POI, which if any exist, prevents the event from being chosen by the storyteller.
 						node.chaosLimit = clamp(event.get("chaos",0.0),0,1)							# The minimum chaos needed to spawn the event.
 					"vilcy":
-						node.depthMinKm = max(event.get("minimum_depth_in_km",30),0)					# Minimum depth that the event is permitted to spawn at, in kilometers.
+						node.depthMinKm = max(event.get("minimum_depth_in_km",30),0)				# Minimum depth that the event is permitted to spawn at, in kilometers.
 						node.depthMaxKm = max(event.get("maximum_depth_in_km",2970),0)				# Maximum depth that the event is permitted to spawn at, in kilometers.
 						node.vilcyPatroler = max(event.get("vilcy_patroler",0),0)					# Creates a vilcy K37, adding EMD-14s to left and right low-stress hardpoints, 1 GW turbine, and dual ultracapacitors.
 						node.vilcyDisabler = max(event.get("vilcy_disabler",0),0)					# Creates a vilcy K37, adding MWGs to all hardpoints, 1 GW turbine, and dual ultracapacitors.
