@@ -231,6 +231,13 @@ HEVLIB_CONFIG_SECTION_DRIVERS={
 "display_order_position": 0,
 "name": "HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES",
 "type": "bool"
+},
+"stop_rendering_on_lost_focus": {
+"default": false,
+"description": "HEVLIB_CONFIG_DISABLE_RENDERING_ON_LOST_FOCUS_DESC",
+"display_order_position": 12,
+"name": "HEVLIB_CONFIG_DISABLE_RENDERING_ON_LOST_FOCUS",
+"type": "bool"
 }
 }
 HEVLIB_CONFIG_SECTION_DEBUG={

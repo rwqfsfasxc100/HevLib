@@ -1899,6 +1899,14 @@ const TRANSLATIONS = {
 		"HEVLIB_CREDITS_SUPPORTERS_KOFI_VERAN": {
 			"string": "Veran - supporter (ko-fi)",
 			"version_hash": 2550219049
+		},
+		"HEVLIB_CONFIG_DISABLE_RENDERING_ON_LOST_FOCUS": {
+			"string": "Disable rendering on lost focus",
+			"version_hash": 3983227798
+		},
+		"HEVLIB_CONFIG_DISABLE_RENDERING_ON_LOST_FOCUS_DESC": {
+			"string": "Disables Godot's VisualServer rendering pipeline while the game is not in focus.",
+			"version_hash": 1202440136
 		}
 	},
 	"de": {

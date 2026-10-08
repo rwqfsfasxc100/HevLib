@@ -11,6 +11,9 @@
 7.1=* Returns the associated mod ID for a provided ModMain.gd/Mod.manifest filepath, or a blank string if the mod does not have an ID.
 7.2=* Faster than parsing a manifest for the ID
 7.3=* `file_path` -> (String) full filepath for the ModMain/mod manifest file
+8=* Added optional `Disable rendering on lost focus` to the Drivers section of the config
+8.1=* When enabled and the game isn't in focus, pauses game rendering.
+8.2=* This can likely see best used on lower-end devices when multitasking
 
 [1.16.21]
 

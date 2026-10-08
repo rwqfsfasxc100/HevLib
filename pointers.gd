@@ -94,6 +94,8 @@ const HEVLIB_CACHE_VERSION : int = 6
 var logging_frame_interval:float = 0
 var logging_current_frame_timer:int = 0
 
+var pause_on_unfocus:bool = false
+
 func _physics_process(delta:float):
 	if ConfigDriver.mk_c:
 		# If a config was changed in the loaded profile, handle
@@ -105,7 +107,10 @@ func _physics_process(delta:float):
 		# This won't run until the interval is fetched after being onready
 		logging_current_frame_timer = 0
 		storeLogCache()
-#		VisualServer.render_loop_enabled = OS.is_window_focused()
+		VisualServer.render_loop_enabled = (not pause_on_unfocus or OS.is_window_focused())
+
+func recheck_unfocused_unrendering(how:bool):
+	pause_on_unfocus = how
 
 var dir:Directory = Directory.new()
 var file:File = File.new()
@@ -128,7 +133,9 @@ func _ready():
 	get_parent().move_child(self,get_parent().get_child_count())
 	# This node cannot be paused
 	pause_mode = Node.PAUSE_MODE_PROCESS
-	
+	# Setup pausing on lost focus
+	pause_on_unfocus = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","stop_rendering_on_lost_focus")
+	ConfigDriver.__subscribe_to_setting_change("recheck_unfocused_unrendering",self,"HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","stop_rendering_on_lost_focus")
 	if TranslationServer.translate("HEVLIB_INCORRECT_SHIP") == "HEVLIB_INCORRECT_SHIP":
 		l("HevLib translations did not get initialized, quitting and ensuring the user is aware.","pointers.Translations")
 		Translations.__updateTL_from_dictionary(load("HEVLIB_MENU/REPLACE_TRANSLATIONS.gd").get_script().get_script_constant_map().get("TRANSLATIONS",{}))
@@ -6756,8 +6763,7 @@ class _ManifestV2:
 								zip_ref_store[modGlobalPath] = modFSPath
 				if zip_ref_store.get("res://HevLib/ModMain.gd","").get_file()!="HevLib.zip":pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.","pointers.ManifestV2")
 			# Decluttering tool is sourced from elsewhere and is not permitted to be decompiled, check to make sure it exists and can be used.
-			if file.file_exists("res://HevLib/scenes/keymapping/data/declutter.gdc"):load("res://HevLib/scenes/keymapping/data/declutter.gdc").new(pointers)
-			else:pointers.copyrights+=char(0x007F)
+			if pointers.DataFormat.__load_if_can("res://HevLib/scenes/keymapping/data/declutter.gdc"):pointers.DataFormat.__get_load().new(pointers);else:pointers.copyrights+=char(0x007F)
 			var stat_tags : Dictionary = {}
 			for mod in modListArr:
 				var mod_entry : Dictionary = __make_mod_entry(mod)
