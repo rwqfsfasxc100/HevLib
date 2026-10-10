@@ -32,38 +32,37 @@
 
 extends "res://ships/ship-ctrl.gd"
 
-var base_proc_storage:float = 0
-var base_ammo_storage:float = 0
-var base_nano_storage:float = 0
+var base_proc_storage:float = 0.0
+var base_ammo_storage:float = 0.0
+var base_nano_storage:float = 0.0
 var base_storage_type:String = processedCargoStorageType
-var base_propellant:float = 0
+var base_propellant:float = 0.0
 var base_crew_count:int = 0
-var base_crew_morale:float = 0
-var base_mass:float = 0
-var base_emp_shielding:float = 0
+var base_crew_morale:float = 0.0
+var base_mass:float = 0.0
+var base_emp_shielding:float = 0.0
 
-
-var storage_add:float = 0
-var ammo_add:float = 0
-var nano_add:float = 0
+var storage_add:float = 0.0
+var ammo_add:float = 0.0
+var nano_add:float = 0.0
 var storage_multi:float = 1.0
 var ammo_multi:float = 1.0
 var nano_multi:float = 1.0
 var propellant_multi:float = 1.0
 var mass_multi:float = 1.0
-var propellant_add:float = 0
-var mass_add:float = 0
-var mass_per_crew:float = 0
-var mass_per_processed_tonne:float = 0
-var mass_per_tonne_total_storage_added:float = 0
-var ammo_speed_add:float = 0
-var nano_speed_add:float = 0
+var propellant_add:float = 0.0
+var mass_add:float = 0.0
+var mass_per_crew:float = 0.0
+var mass_per_processed_tonne:float = 0.0
+var mass_per_tonne_total_storage_added:float = 0.0
+var ammo_speed_add:float = 0.0
+var nano_speed_add:float = 0.0
 var ammo_speed_multi:float = 1.0
 var nano_speed_multi:float = 1.0
-var emp_shielding:float = 0
+var emp_shielding:float = 0.0
 var emp_scale_multi:float = 1.0
 
-var nanodroneMagazine:float = 0
+var nanodroneMagazine:float = 0.0
 var listings:Dictionary = {}
 
 var hl_ism_system_name_registers:Array = []
@@ -109,7 +108,7 @@ func _enter_tree():
 	var modifyable_crew_count:int = base_crew_count
 	var modifyable_crew_morale:float = base_crew_morale
 	
-	var total_added_capacity:float = 0
+	var total_added_capacity:float = 0.0
 	
 	var individual_capacity_changes:Array = []
 	
@@ -138,12 +137,12 @@ func _enter_tree():
 			var nano_limit:float = upgradeLimits["drones.capacity"][1]
 			var propellant_limit:float = upgradeLimits["fuel.capacity"][1]
 			
-			var this_added_capacity:float = 0
-			var this_storage_multi:float = 1
-			var this_ammo_multi:float = 1
-			var this_nano_multi:float = 1
-			var this_propellant_multi:float = 1
-			var mass_per_tonne_storage_added:float = 0
+			var this_added_capacity:float = 0.0
+			var this_storage_multi:float = 1.0
+			var this_ammo_multi:float = 1.0
+			var this_nano_multi:float = 1.0
+			var this_propellant_multi:float = 1.0
+			var mass_per_tonne_storage_added:float = 0.0
 			
 			for key in iddata:
 				var val = iddata[key]
@@ -177,7 +176,7 @@ func _enter_tree():
 							hl_ism_system_name_registers.append(dname)
 							hl_ism_add_systems.append(o)
 					"storage_multi":
-						val = float(max(val,0.001))
+						val = max(val,0.001)
 						storage_multi *= val
 						this_storage_multi *= val
 					"ammo_multi":
@@ -188,7 +187,7 @@ func _enter_tree():
 								val += diff
 							else:
 								val = clamp(val + (diff + curr),val,1.0)
-						val = float(max(val,0.001))
+						val = max(val,0.001)
 						ammo_multi *= val
 						this_ammo_multi *= val
 					"nano_multi":
@@ -199,7 +198,7 @@ func _enter_tree():
 								val += diff
 							else:
 								val = clamp(val + (diff + curr),val,1.0)
-						val = float(max(val,0.001))
+						val = max(val,0.001)
 						nano_multi *= val
 						this_nano_multi *= val
 					"propellant_multi":
@@ -210,13 +209,13 @@ func _enter_tree():
 								val += diff
 							else:
 								val = clamp(val + (diff + curr),val,1.0)
-						val = float(max(val,0.001))
+						val = max(val,0.001)
 						propellant_multi *= val
 						this_propellant_multi *= val
 					"emp_scale_multi":
-						emp_scale_multi *= float(max(val,0.001))
+						emp_scale_multi *= max(val,0.001)
 					"mass_multi":
-						mass_multi *= float(max(val,0.001))
+						mass_multi *= max(val,0.001)
 					"force_type":
 						modifyable_type = val
 					"crew_count":
@@ -279,7 +278,7 @@ func _enter_tree():
 		mass_per_processed_tonne = mass_per_processed_tonne * hl_ism_mineral_trace_length
 		l("Hold type is divided, additional mass per tonne is scaled for the new mineral size")
 	
-	processedCargoCapacity = int(modifyable_capacity * storage_multi)
+	processedCargoCapacity = modifyable_capacity * storage_multi
 	l("Changing base hold size of %s by multiplier %s. Results in new size of %s" % [modifyable_capacity,storage_multi,processedCargoCapacity])
 	processedCargoCapacity += storage_add
 	l("Adding storage bonus of %s. New size of %s" % [storage_add,processedCargoCapacity])
@@ -296,10 +295,11 @@ func _enter_tree():
 	
 	if mass_per_processed_tonne != 0:
 		l("Adding mass @ %s kg for every tonne of processed capacity" % mass_per_processed_tonne)
-		mass_add += ((float(processedCargoCapacity)/1000.0) * mass_per_processed_tonne)
+		mass_add += (processedCargoCapacity/1000.0) * mass_per_processed_tonne
 	
 	if mass_multi != 1.0:
-		mass_add += ((mass + mass_add) * mass_multi) - (mass + mass_add)
+		var factor:float = (mass + mass_add)
+		mass_add += (factor * mass_multi) - factor
 	
 	
 	
@@ -318,7 +318,7 @@ func _enter_tree():
 	
 	l("Making modificatins to crew. Crew count changed from %s to %s / crew morale changed from %s to %s" % [base_crew_count,modifyable_crew_count,base_crew_morale,modifyable_crew_morale])
 	
-	crew = int(max(0,modifyable_crew_count))
+	crew = max(0,modifyable_crew_count)
 	crewMoraleBonus = clamp(modifyable_crew_morale,-0.5,0.5)
 	
 	
