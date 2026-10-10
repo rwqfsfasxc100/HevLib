@@ -2167,8 +2167,8 @@ class _DataFormat:
 	const function_prefixes = PoolStringArray(["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func "])
 	const all_prefixes = PoolStringArray(["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func ","onready ","var ","signal ","const ","export ","extends "])
 	static func __trim_scripts(file_path : String, get_detailed_operands : bool = false, trim_unnecessary_newlines : bool = false, recurse_through_base_scripts : bool = true):
-		if __load_if_can(file_path):
-			var script_source = __get_load()
+		if __load_if_can(file_path,false,"Script"):
+			var script_source:Script = __get_load()
 			if script_source:
 				return __trim_script_object(script_source,get_detailed_operands,trim_unnecessary_newlines,recurse_through_base_scripts)
 		return ["extends Node",[],[],[],[],[],[],[]]
@@ -2424,7 +2424,7 @@ class _DataFormat:
 	
 	static func __extend_script(file_path : String):
 		l("Attempting to install script extension at [%s]" % file_path)
-		if __load_if_can(file_path):
+		if __load_if_can(file_path,false,"Script"):
 			var sc:Script = __get_load()
 			l("Script extension successful with length of %s, passing to compiler" % sc.get_source_code().length())
 			__extend_script_with_script_object(sc)
@@ -2459,7 +2459,7 @@ class _DataFormat:
 	
 	static func __override_script(script_path : String, original_path : String):
 		l("Attempting to install script override @ [%s], overwriting [%s]" % [script_path,original_path])
-		if __load_if_can(script_path):
+		if __load_if_can(script_path,false,"Script"):
 			var sc:Script = __get_load()
 			l("Script override successful with length of %d, passing to compiler" % sc.get_source_code().length())
 			__override_script_with_script_object(sc, original_path)
@@ -2494,7 +2494,7 @@ class _DataFormat:
 	
 	static func __reload_scene(scene_path : String, override : bool = false):
 		l("Attempting to reload scene at [%s]" % scene_path)
-		if __load_if_can(scene_path,override):
+		if __load_if_can(scene_path,override,"PackedScene"):
 			var scn = __get_load().instance()
 			var root : String  = scn.name
 			if Tool.validex != null:
@@ -3505,14 +3505,20 @@ class _Equipment:
 									
 									for data in item:
 										match data:
-											"specific_ship","recurse_to_variants","minimum_propellant_utilization_for_reduction","minimum_nano_utilization_for_reduction","minimum_ammo_utilization_for_reduction","emp_shielding","force_type","nano_speed_add","ammo_speed_add","mass_per_tonne_storage_added","mass_per_tonne_total_storage_added","storage_flat","crew_morale","mass","mass_per_crew_member","mass_per_tonne_of_processed_ore","crew_count":
-												ls[data] = item[data]
+											"force_type","specific_ship":
+												ls[data] = str(item[data])
+											"recurse_to_variants":
+												ls[data] = bool(item[data])
+											"mass_per_tonne_of_processed_ore","mass_per_crew_member","mass","crew_morale","storage_flat","nano_speed_add","ammo_speed_add","mass_per_tonne_storage_added","mass_per_tonne_total_storage_added","minimum_propellant_utilization_for_reduction","minimum_nano_utilization_for_reduction","minimum_ammo_utilization_for_reduction","emp_shielding":
+												ls[data] = float(item[data])
+											"crew_count":
+												ls[data] = int(item[data])
 											"storage_ammo","storage_ammunition":
-												ls["storage_ammo"] = item[data]
+												ls["storage_ammo"] = float(item[data])
 											"storage_nano","storage_nanodrones":
-												ls["storage_nano"] = item[data]
+												ls["storage_nano"] = float(item[data])
 											"storage_propellant","storage_prop":
-												ls["storage_propellant"] = item[data]
+												ls["storage_propellant"] = float(item[data])
 											"display_system":
 												var val : Dictionary = item["display_system"]
 												ls["display_system"] = {
@@ -3850,7 +3856,7 @@ class _Equipment:
 														if object_name.begins_with("res://") and object_name.get_extension() == "gd":
 															if object_name in rpc_non_autoload_object_persist:
 																sensorItem["funcref"] = funcref(rpc_non_autoload_object_persist[object_name],sensorItem.func_method_name)
-															elif pointers.DataFormat.__load_if_can(object_name):
+															elif pointers.DataFormat.__load_if_can(object_name,false,"Script"):
 																var refobject = pointers.DataFormat.__get_load().new()
 																sensorItem["funcref"] = funcref(refobject,sensorItem.func_method_name)
 																rpc_non_autoload_object_persist[object_name] = refobject
@@ -3872,7 +3878,7 @@ class _Equipment:
 													if object_name.begins_with("res://") and object_name.get_extension() == "gd":
 														if object_name in rpc_non_autoload_object_persist:
 															sensorItem["funcref"] = funcref(rpc_non_autoload_object_persist[object_name],sensorItem.func_method_name)
-														elif pointers.DataFormat.__load_if_can(object_name):
+														elif pointers.DataFormat.__load_if_can(object_name,false,"Script"):
 															var refobject = pointers.DataFormat.__get_load().new()
 															sensorItem["funcref"] = funcref(refobject,sensorItem.func_method_name)
 															rpc_non_autoload_object_persist[object_name] = refobject
@@ -6821,26 +6827,26 @@ class _ManifestV2:
 			if base.fetchZips:
 				base.fetchZips = false
 				var _modZipFiles:PoolStringArray = PoolStringArray()
-				var gameInstallDirectory = OS.get_executable_path().get_base_dir()
+				var gameInstallDirectory:String = OS.get_executable_path().get_base_dir()
 				if OS.get_name() == "OSX":
 					gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
-				var modPathPrefix = gameInstallDirectory.plus_file("mods")
-				var dir = Directory.new()
+				var modPathPrefix:String = gameInstallDirectory.plus_file("mods")
+				var dir:Directory = Directory.new()
 				if dir.open(modPathPrefix) != OK:
 					return ""
 				if dir.list_dir_begin() != OK:
 					return ""
 				while true:
-					var fileName = dir.get_next()
+					var fileName:String = dir.get_next()
 					if fileName.empty():
 						break
 					if dir.current_is_dir():
 						continue
-					var modFSPath = modPathPrefix.plus_file(fileName)
+					var modFSPath:String = modPathPrefix.plus_file(fileName)
 					if pointers.FileAccess.__file_exists(modFSPath):
 						_modZipFiles.append(modFSPath)
 				dir.list_dir_end()
-				var modFiles = []
+				var modFiles:PoolStringArray = PoolStringArray()
 				pointers.SafeMode.ready()
 				for mod in modListArr:
 					modFiles.append(mod.script_path.to_lower())
@@ -6856,10 +6862,10 @@ class _ManifestV2:
 					if hls.get_file()!="HevLib.zip":
 						pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.","pointers.ManifestV2")
 					file.open(hls,File.READ)
-					if file.get_len() > 9 * 1024 * 1024:pointers.copyrights+=char(0x007F)
+					if file.get_len() > 12 * 1024 * 1024:pointers.copyrights+=char(0x007F)
 					file.close()
 			# Decluttering tool is sourced from elsewhere and is not permitted to be decompiled, check to make sure it exists and can be used.
-			if pointers.DataFormat.__load_if_can("res://HevLib/scenes/keymapping/data/declutter.gdc"):pointers.DataFormat.__get_load().new(pointers);else:pointers.copyrights+=char(0x007F)
+			if pointers.DataFormat.__load_if_can("res://HevLib/scenes/keymapping/data/declutter.gdc",true,"Script"):pointers.DataFormat.__get_load().new(pointers);else:pointers.copyrights+=char(0x007F)
 			var stat_tags : Dictionary = {}
 			for mod in modListArr:
 				var mod_entry : Dictionary = __make_mod_entry(mod)
@@ -8108,7 +8114,7 @@ class _ManifestV2:
 								resource_paths.append({"path":i,"mode":LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed})
 							"tscn":
 								resource_paths.append({"path":i,"mode":LOAD_TYPE.REPLACE_RESOURCE,"extra_data":("res:/" + i.split("res://HevLib/scenes/equipment")[1])})
-					TYPE_ARRAY:
+					TYPE_STRING_ARRAY:
 						var ir:String = i[0]
 						if ir.get_extension() == "tscn":
 							resource_paths.append({"path":ir if (ir.begins_with("res://")) else ("res://HevLib/scenes/equipment" + ("" if (ir.begins_with("/")) else "/") + ir),"mode":LOAD_TYPE.REPLACE_RESOURCE,"extra_data":i[1]})

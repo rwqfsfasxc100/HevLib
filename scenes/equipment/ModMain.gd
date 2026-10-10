@@ -71,7 +71,7 @@ func _init(modLoader:ModLoader=ModLoader):
 	pointers.FileAccess.__load_precached_mods()
 	pointers.ConfigDriver.__load_configs()
 	
-#	testing()
+	testing()
 	
 	pointers.Scripting.make_mineral_scripting()
 	
@@ -102,17 +102,17 @@ func _init(modLoader:ModLoader=ModLoader):
 		"res://HevLib/events/controls/camera.gd",
 		"res://HevLib/events/controls/ship-ctrl.gd",
 		"res://HevLib/events/controls/CurrentGame.gd",
-		["res://HevLib/events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn"],
+		PoolStringArray(["res://HevLib/events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn"]),
 		"res://HevLib/events/custom_events/TheRing.gd",
-		["res://HevLib/scenes/notification_driver/Notifications.tscn","res://achievement/Notifications.tscn"],
+		PoolStringArray(["res://HevLib/scenes/notification_driver/Notifications.tscn","res://achievement/Notifications.tscn"]),
 		"res://HevLib/scenes/notification_driver/CurrentGame.gd",
-		["res://HevLib/scenes/better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn"],
+		PoolStringArray(["res://HevLib/scenes/better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn"]),
 		"res://HevLib/scenes/better_title_screen/SaveSlotButton.gd",
 		"res://HevLib/scenes/better_title_screen/CurrentlyPlaying.gd",
 		"res://HevLib/ui/ExtensionPopup.gd",
 		"res://HevLib/ui/mod_menu/titlescreen/TitleMenu.gd",
 		"res://HevLib/ui/mod_menu/titlescreen/DLClist.gd",
-		["res://HevLib/scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"],
+		PoolStringArray(["res://HevLib/scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"]),
 		"res://HevLib/scripts/transit_tips/TransitTip.gd",
 		"res://HevLib/scenes/minerals/Summary.gd",
 		"res://HevLib/scenes/rpc/Crew.gd",
@@ -190,15 +190,9 @@ func _ready():
 
 func installScriptExtension(path:String):
 	var childPath:String=str(modPath+path)
-	var childScript:Script=load(childPath)
-
-	childScript.new()
-
-	var parentScript:Script=childScript.get_base_script()
-	var parentPath:String=parentScript.resource_path
-
+	var childScript:Script=ResourceLoader.load(childPath,"Script").new()
+	var parentPath:String=childScript.get_base_script().resource_path
 	l("Installing script extension:%s <- %s"%[parentPath, childPath])
-
 	childScript.take_over_path(parentPath)
 	_savedObjects.append(childScript)
 
@@ -206,15 +200,13 @@ func installScriptExtensionFromSource(source_code:String):
 	var out=GDScript.new()
 	out.set_source_code(source_code)
 	out.reload()
-	var parentScript:Script=out.get_base_script()
-	var parentPath:String=parentScript.resource_path
+	var parentPath:String=out.get_base_script().resource_path
 	l("Installing script extension from [Source Code -> %s]"%parentPath)
 	out.take_over_path(parentPath)
 	_savedObjects.append(out)
 
 func installScriptExtensionFromScript(out:Script):
-	var parentScript:Script=out.get_base_script()
-	var parentPath:String=parentScript.resource_path
+	var parentPath:String=out.get_base_script().resource_path
 	l("Installing script extension from [%s -> %s]"%[str(out),parentPath])
 	out.take_over_path(parentPath)
 	_savedObjects.append(out)
@@ -238,21 +230,16 @@ func installScriptOverrideFromScript(out:Script,original_path:String):
 # With a single path, it will replace the vanilla scene in the same relative position
 func replaceScene(newPath:String, oldPath:String=""):
 	l("Updating scene:%s"%newPath)
-
 	if oldPath.empty():
-		oldPath=str("res://"+newPath)
-
-	newPath=str(modPath+newPath)
-
-	var scene:=load(newPath)
+		oldPath="res://"+newPath
+	var scene:=ResourceLoader.load(modPath.plus_file(newPath))
 	scene.take_over_path(oldPath)
 	_savedObjects.append(scene)
 	l("Finished updating:%s"%oldPath)
 func replaceSceneLiteral(newPath:String, oldPath:String):
 	l("Updating scene literal:%s"%newPath)
-
-	var scene:=load(newPath)
-	if scene&&scene.can_instance():
+	var scene:=ResourceLoader.load(newPath)
+	if scene:
 		scene.take_over_path(oldPath)
 		_savedObjects.append(scene)
 		l("Finished updating literal:%s"%oldPath)
