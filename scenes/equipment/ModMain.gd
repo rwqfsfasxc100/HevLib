@@ -71,7 +71,7 @@ func _init(modLoader:ModLoader=ModLoader):
 	pointers.FileAccess.__load_precached_mods()
 	pointers.ConfigDriver.__load_configs()
 	
-	testing()
+#	testing()
 	
 	pointers.Scripting.make_mineral_scripting()
 	
@@ -152,8 +152,6 @@ func _init(modLoader:ModLoader=ModLoader):
 	if crewsize_entry:
 		files_to_load.append([crewsize_entry,"res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"])
 	
-	if is_editor:
-		files_to_load.append(["res://HevLib/ui/mod_menu/titlescreen/editor/TitleScreen.tscn","res://TitleScreen.tscn"])
 	
 	do_safe_load=pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_modlet_loading")
 	if!do_safe_load:
@@ -772,8 +770,6 @@ func get_script_constant_map_without_load(script_path:String) -> Dictionary:
 
 func testing():
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
-	
-	
 	
 	
 	

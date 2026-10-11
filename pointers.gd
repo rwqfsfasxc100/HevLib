@@ -3048,6 +3048,10 @@ class _DriverManagement:
 	
 	const driver_get_cache : Dictionary = {}
 	const dgck:Array = Array()
+	const driver_ext = PoolStringArray([
+		"gd",
+		"gdc",
+	])
 	
 	const driver_dirs = PoolStringArray([
 		"HEVLIB_EQUIPMENT_DRIVER_TAGS/",
@@ -3082,7 +3086,8 @@ class _DriverManagement:
 	
 	
 	static func __is_driver_file(file_path:String) -> bool:
-		if file_path.get_extension() == "gd" and file_path.get_base_dir().split("/")[-1] + "/" in driver_dirs and not non_static["regex"].search(file_path.get_file().rstrip(".gd")):
+		var fext:String = file_path.get_extension()
+		if fext in driver_ext and file_path.get_base_dir().split("/")[-1] + "/" in driver_dirs and not non_static["regex"].search(file_path.get_file().rstrip("." + fext)):
 			return true
 		return false
 	
@@ -8121,35 +8126,36 @@ class _ManifestV2:
 				
 			for modlet in __get_modlet_files():
 				var drivers:Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(modlet)
-				if "LOAD_RESOURCES.gd" in drivers:
+				if "LOAD_RESOURCES.gd" in drivers.keys():
 					var resources : Dictionary = drivers["LOAD_RESOURCES.gd"].get("LOAD_RESOURCES",{})
 					for resource in resources.keys():
 						var subdata:Dictionary = resources[resource]
 						var load_type:String = subdata.get("load_type","").to_lower()
 						if load_type.empty():
 							match resource.get_extension():
-								"gd":
+								"gd","gdc":
 									load_type = "script"
 								"tscn","res","tres":
 									load_type = "resource"
 						match load_type:
 							"script":
-								var path:String=resource if resource.begins_with("res://") else(modlet.get_base_dir()+(""if resource.begins_with("/")else"/")+resource)
+								var path:String=resource if resource.begins_with("res://")else(modlet.get_base_dir()+(""if resource.begins_with("/")else"/")+resource)
 								if pointers.ConfigDriver.__validate_dictionary(subdata)&&pointers.FileAccess.__file_exists(path):
 									var op=subdata.get("override_path","res:/"+path.split(modlet.get_base_dir())[1])
 									var override_path:String=op if(op.begins_with("res:/"))else("res:/"+(""if op.begins_with("/")else"/")+op)
 									if subdata.get("override",false)&&pointers.FileAccess.__file_exists(override_path):
 										resource_paths.append({"path":path,"mode":LOAD_TYPE.OVERRIDE_SCRIPT,"extra_data":override_path})
 									else:
-										var ed:String = ""
-										file.open(path,File.READ)
-										var data:String = file.get_as_text(true)
-										file.close()
-										if "extends \"" in data:
-											for line in data.split("\n"):
-												if line.strip_edges().begins_with("extends \""):
-													ed = line.split("\"")[1]
-													break
+										var ed:String = subdata.get("base_script_path","")
+										if ed.empty()&&path.get_extension()=="gd":
+											file.open(path,File.READ)
+											var data:String = file.get_as_text(true)
+											file.close()
+											if "extends \"" in data:
+												for line in data.split("\n"):
+													if line.strip_edges().begins_with("extends \""):
+														ed = line.split("\"")[1]
+														break
 										resource_paths.append({"path":path,"mode":LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed})
 							"scene","resource":
 								var path : String = resource if resource.begins_with("res://") else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
@@ -8158,8 +8164,6 @@ class _ManifestV2:
 								if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
 									resource_paths.append({"path":path,"mode":LOAD_TYPE.REPLACE_RESOURCE,"extra_data":old_path})
 			var ovr:Dictionary = Dictionary()
-			var order:Array = Array()
-			var LO:Array = pointers.SafeMode.vanilla_load_order
 			for f in resource_paths:
 				var path:String = f["path"]
 				var extra:String = f["extra_data"]
@@ -8171,6 +8175,8 @@ class _ManifestV2:
 					if not i in ovr[extra]["deps"]:
 						ovr[extra]["deps"].append(i)
 				ovr[extra]["paths"].append([f.mode,path])
+			var LO:Array = pointers.SafeMode.vanilla_load_order
+			var order:Array = Array()
 			for i in ovr:
 				var d:Dictionary = ovr[i]
 				order.append([i,d.deps,d.paths,LO.find(i)])
@@ -8194,22 +8200,21 @@ class _ManifestV2:
 		pointers.DataFormat.__loadDLC()
 		for modlet in __get_modlet_files():
 			var drivers:Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(modlet)
-			if "LOAD_RESOURCES.gd" in drivers:
+			if "LOAD_RESOURCES.gd" in drivers.keys():
 				var resources : Dictionary = drivers["LOAD_RESOURCES.gd"].get("LOAD_RESOURCES",{})
 				for resource in resources.keys():
 					var subdata:Dictionary = resources[resource]
-					var is_relative:bool = resource.begins_with("res://")
 					if is_onready == subdata.get("onready",false):
 						var load_type:String = subdata.get("load_type","").to_lower()
 						if load_type.empty():
-							match load_type.get_extension():
-								"gd":
+							match resource.get_extension():
+								"gd","gdc":
 									load_type = "script"
 								"tscn","res","tres":
 									load_type = "resource"
 						match load_type:
 							"script":
-								var path:String=resource if is_relative else(modlet.get_base_dir()+(""if resource.begins_with("/")else"/")+resource)
+								var path:String=resource if resource.begins_with("res://") else(modlet.get_base_dir()+(""if resource.begins_with("/")else"/")+resource)
 								if pointers.ConfigDriver.__validate_dictionary(subdata)&&pointers.FileAccess.__file_exists(path):
 									var op=subdata.get("override_path","res:/"+path.split(modlet.get_base_dir())[1])
 									var override_path:String=op if(op.begins_with("res:/"))else("res:/"+(""if op.begins_with("/")else"/")+op)
@@ -8219,7 +8224,7 @@ class _ManifestV2:
 										pointers.DataFormat.__extend_script(path)
 									resCount += 1
 							"scene","resource":
-								var path : String = resource if is_relative else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
+								var path : String = resource if resource.begins_with("res://") else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
 								var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[1])
 								var old_path : String = old if (old.begins_with("res:/")) else ("res:/" + ("" if old.begins_with("/") else "/") + old)
 								if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
@@ -8228,7 +8233,7 @@ class _ManifestV2:
 										scenes_to_reload.append(old_path)
 									resCount += 1
 							"reload":
-								var path : String = resource if is_relative else ("res:/" + ("" if resource.begins_with("/") else "/") + resource)
+								var path : String = resource if resource.begins_with("res://") else ("res:/" + ("" if resource.begins_with("/") else "/") + resource)
 								if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
 									pointers.DataFormat.__reload_scene(path,subdata.get("complete_reload",false))
 									resCount += 1
@@ -8424,7 +8429,7 @@ class _Math:
 		if use_degrees:
 			reflection_angle = deg2rad(reflection_angle)
 		point *= scale
-		reflection_angle = -reflection_angle - (PI/2)
+		reflection_angle = -reflection_angle - (PI/2.0)
 		var a:float = -sin(reflection_angle)
 		var b:float = cos(reflection_angle)
 		var c:float = -((a * angle_offset.x) + (b * angle_offset.y))

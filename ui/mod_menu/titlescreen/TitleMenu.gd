@@ -43,6 +43,10 @@ func _ready():
 	update_timer.connect("timeout",self,"update_recheck")
 	update_timer.start(30)
 	pointers = ModLoader._savedObjects[0]
+	if pointers.is_editor:
+		var devMenu:Popup = load("res://HevLib/ui/mod_menu/titlescreen/editor/DevPushMenu.tscn").instance()
+		add_child(devMenu)
+		move_child(devMenu,0)
 	var mm2_entry:Dictionary = pointers.ManifestV2.__get_mod_by_id("hev.ModMenu2")
 	if mm2_entry:
 		var mm2_ver:Array = mm2_entry.get("version_data",{}).get("full_version_array",[0,0,0])
