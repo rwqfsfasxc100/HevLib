@@ -3063,17 +3063,17 @@ class _DriverManagement:
 			if not file.file_exists(file_path):
 				return {}
 			var pointers:HevLibPointers = non_static["pointers"]
-			var uid_path:String = "res://%s/.uid/.%%s.uid" % file_path.split("/",false)[1]
+			var uid_path : String = "res://%s/.uid/.%%s.uid" % file_path.split("/",false)[1]
 			var folder_path : String  = file_path.get_base_dir() + "/"
 			var folderCheck : Array = pointers.FolderAccess.__fetch_folder_files(folder_path,true)
 			for driverDir in driver_dirs:
 				if driverDir in folderCheck:
 					var driverFolder : String  = folder_path + driverDir
 					for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
-						var driver_filepath:String = driverFolder + driver
+						var driver_filepath : String = driverFolder + driver
 						if __is_driver_file(driver_filepath):
 							if require_uid_check:
-								var druid:String = uid_path % driver_filepath.sha256_text()
+								var druid : String = uid_path % driver_filepath.sha256_text()
 								if not file.file_exists(druid) or pointers.FileAccess.__get_file_content(druid) != pointers.FileAccess.__get_uid_of_file(driver_filepath):
 									continue
 							this_mod_data[driver] = {}
