@@ -3062,16 +3062,21 @@ class _DriverManagement:
 			var this_mod_data : Dictionary = {}
 			if not file.file_exists(file_path):
 				return {}
-			var pointers = non_static["pointers"]
+			var pointers:HevLibPointers = non_static["pointers"]
+			var uid_path:String = "res://%s/.uid/.%%s.uid" % file_path.split("/",false)[1]
 			var folder_path : String  = file_path.get_base_dir() + "/"
 			var folderCheck : Array = pointers.FolderAccess.__fetch_folder_files(folder_path,true)
 			for driverDir in driver_dirs:
 				if driverDir in folderCheck:
 					var driverFolder : String  = folder_path + driverDir
 					for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
-						this_mod_data[driver] = {}
-						var driver_filepath = driverFolder + driver
+						var driver_filepath:String = driverFolder + driver
 						if __is_driver_file(driver_filepath):
+							if require_uid_check:
+								var druid:String = uid_path % driver_filepath.sha256_text()
+								if not file.file_exists(druid) or pointers.FileAccess.__get_file_content(druid) != pointers.FileAccess.__get_uid_of_file(driver_filepath):
+									continue
+							this_mod_data[driver] = {}
 							var consts : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(driver_filepath)
 							for i in consts.keys():
 								this_mod_data[driver][i] = consts[i]
@@ -3083,19 +3088,7 @@ class _DriverManagement:
 	
 	static func __is_driver_file(file_path:String) -> bool:
 		var fext:String = file_path.get_extension()
-		if(
-			fext in driver_ext
-			and
-			file_path.get_base_dir().split("/")[-1] + "/" in driver_dirs
-			and
-			not non_static["regex"].search(file_path.get_file().rstrip("." + fext))
-		):
-			var file:File = File.new()
-			var FileAccess:HevLibPointers._FileAccess = non_static["pointers"].FileAccess
-			var fc:String = file_path.get_base_dir().plus_file("." + file_path.get_file().get_basename() + ".uid")
-			var content:String = FileAccess.__get_file_content(fc).strip_edges()
-			if not file.file_exists(fc) or (FileAccess.__get_file_content(fc)==FileAccess.__get_uid_of_file(fc)):
-				pass
+		if(fext in driver_ext and file_path.get_base_dir().split("/")[-1] + "/" in driver_dirs and not non_static["regex"].search(file_path.get_file().rstrip("." + fext))):
 			return true
 		return false
 	
