@@ -349,8 +349,8 @@ class _Achievements:
 			}
 		}
 	
-	const achievementsFile : String  = "user://achievements.dv"
-	const password : String  = "b0ngadabonga"
+	const achievementsFile : String = "user://achievements.dv"
+	const password : String = "b0ngadabonga"
 	var http:HTTPRequest
 	
 	var pointers:HevLibPointers
@@ -849,8 +849,8 @@ class _ConfigDriver:
 	# Stores a value under an ID's section and entry
 	static func __store_value(mod_id:String, section:String, key:String, value, cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var made_change : bool = false
-		var cfg_folder : String  = "user://cfg/"
-		var profiles_dir : String  = "user://cfg/.profiles/"
+		var cfg_folder : String = "user://cfg/"
+		var profiles_dir : String = "user://cfg/.profiles/"
 		var cfg : ConfigFile = ConfigFile.new()
 		cfg.load(cfg_folder+cfg_filename)
 		# Automatically converts the ID and section into what
@@ -917,7 +917,7 @@ class _ConfigDriver:
 	# Fetches a specific value from the config
 	# Will return null if it does not exist
 	static func __get_value(mod_id: String, section: String, key: String, default = null, cfg_filename : String = "Mod_Configurations" + ".cfg"):
-		var full : String  = __truncate_to_setting_entry(mod_id,section)
+		var full : String = __truncate_to_setting_entry(mod_id,section)
 		# Truncate to get the section directly
 		if non_static["self"].settingsHash:
 			var settings:Dictionary = non_static["self"].settings
@@ -1020,10 +1020,10 @@ class _ConfigDriver:
 		var dir:Directory = Directory.new()
 		var c:ConfigFile = ConfigFile.new()
 		# Directory and file definitions
-		var keybinds_cache : String  = "user://cache/.HevLib_Cache/Keybinds/"
-		var cfg_file : String  = "user://cfg/" + cfg_filename
-		var profiles_dir : String  = "user://cfg/.profiles/"
-		var profiles_setter : String  = ".profiles.ini"
+		var keybinds_cache : String = "user://cache/.HevLib_Cache/Keybinds/"
+		var cfg_file : String = "user://cfg/" + cfg_filename
+		var profiles_dir : String = "user://cfg/.profiles/"
+		var profiles_setter : String = ".profiles.ini"
 		# Initializes profiles and keybind cache directories
 		dir.make_dir_recursive(profiles_dir)
 		dir.make_dir_recursive(keybinds_cache)
@@ -1104,7 +1104,7 @@ class _ConfigDriver:
 			if has_manifest:
 				var missing_requirements : Array = Array()
 				var incompatible_mods : Array = Array()
-				var mod_name : String  = mod_entries[mod]["name"]
+				var mod_name : String = mod_entries[mod]["name"]
 				var manifest_version : float = float(manifest["manifest_version"])
 				if manifest_version > 2.0:
 					var cfg : Dictionary = manifest["manifest_data"]["configs"]
@@ -1192,13 +1192,13 @@ class _ConfigDriver:
 			mod = __truncate_mod_id(mod)
 			for section in data.keys():
 				var sectData : Dictionary = data[section]
-				var sect : String  = mod + "/" + __truncate_section(section)
+				var sect : String = mod + "/" + __truncate_section(section)
 				if not sect in current_config.keys():
 					current_config[sect] = {}
 				for key in sectData.keys():
 					var key_data : Dictionary = sectData[key]
 					if typeof(key_data) == TYPE_DICTIONARY:
-						var type : String  = key_data.get("type","")
+						var type : String = key_data.get("type","")
 						if not type:
 							continue
 						type = type.to_lower()
@@ -1450,7 +1450,7 @@ class _ConfigDriver:
 					else: breakpoint
 			var direction2 = 1
 			var neighbour2 = parent.get_child(pos + direction2)
-			var script : Script  = neighbour2.get_script()
+			var script : Script = neighbour2.get_script()
 			if script != null:
 				if neighbour2:
 					if neighbour2.has_method("get_label"):
@@ -1520,7 +1520,7 @@ class _ConfigDriver:
 					for setting in sv.keys():
 						var data : Dictionary = sv[setting]
 						if data.get("type").to_lower() == "input":
-							var n : String  = __truncate_mod_id(dv["mod_information"]["name"])
+							var n : String = __truncate_mod_id(dv["mod_information"]["name"])
 							if not n in cached_input_config_names:
 								cached_input_config_names[n] = {}
 							if not sec in cached_input_config_names[n]:
@@ -1551,7 +1551,7 @@ class _ConfigDriver:
 	static func __subscribe_to_setting_change(method: String,object: Object,id: String,section: String,setting: String):
 		if object.has_method(method):
 			var subscriptions:Dictionary = non_static["self"].subscriptions
-			var top : String  = __truncate_to_setting_entry(id,section)
+			var top : String = __truncate_to_setting_entry(id,section)
 			if not top in subscriptions.keys():
 				subscriptions[top] = {}
 			if not setting in subscriptions[top].keys():
@@ -1566,7 +1566,7 @@ class _ConfigDriver:
 			
 	
 	static func __disconnect_subscription(method: String,object: Object,id: String,section: String,setting: String):
-		var top : String  = __truncate_to_setting_entry(id,section)
+		var top : String = __truncate_to_setting_entry(id,section)
 		var subscriptions:Dictionary = non_static["self"].subscriptions
 		if top in subscriptions.keys():
 			if setting in subscriptions[top].keys():
@@ -1585,7 +1585,7 @@ class _ConfigDriver:
 		return non_static["pointers"].DataFormat.__array_to_string(section.split("/"))
 	
 	static func __truncate_to_setting_entry(mod_id:String,section:String) -> String:
-		var sect_name : String  = __truncate_mod_id(mod_id) + "/" + __truncate_section(section)
+		var sect_name : String = __truncate_mod_id(mod_id) + "/" + __truncate_section(section)
 		return sect_name
 	
 	static func __validate_dictionary(data_dict : Dictionary,check_config : bool = true, check_requirements : bool = true, check_incompatibilities : bool = true, config_entry_override : String = "config", mod_requirements_entry_override : String = "mod_requirements", mod_incompatibilities_entry_override : String = "mod_incompatibilities"):
@@ -1595,9 +1595,9 @@ class _ConfigDriver:
 		var pointers = non_static["pointers"].ManifestV2
 		if check_config and config_entry_override in ddk and data_dict[config_entry_override] is Dictionary:
 			var cfg:Dictionary = data_dict[config_entry_override]
-			var config_id : String  = cfg.get("id",cfg.get("mod",cfg.get("mod_id","")))
-			var config_section : String  = cfg.get("section","")
-			var config_setting : String  = cfg.get("entry",cfg.get("setting",cfg.get("key",cfg.get("value",cfg.get("opt","")))))
+			var config_id : String = cfg.get("id",cfg.get("mod",cfg.get("mod_id","")))
+			var config_section : String = cfg.get("section","")
+			var config_setting : String = cfg.get("entry",cfg.get("setting",cfg.get("key",cfg.get("value",cfg.get("opt","")))))
 			var invert_config:bool = cfg.get("invert_config",cfg.get("invert",false))
 			if config_id and config_section and config_setting:
 				var cfg_opt = __get_value(config_id,config_section,config_setting)
@@ -2075,7 +2075,7 @@ class _DataFormat:
 	static func __get_vanilla_version() -> PoolIntArray:
 		if deep_equal(vanilla_version, PoolIntArray([1,0,0])):
 			var lb : Node = load("res://VersionLabel.tscn").instance()
-			var textData : PoolStringArray  = lb.text.split(".",false)
+			var textData : PoolStringArray = lb.text.split(".",false)
 			lb.queue_free()
 			if textData.size() > 2:
 				vanilla_version[0] = int(textData[0])
@@ -2210,7 +2210,7 @@ class _DataFormat:
 							method_names.append(i)
 							method_values.append(base_data[6][f])
 							method_output_type.append(base_data[7][f])
-			var data : String  = script_source.get_source_code()
+			var data : String = script_source.get_source_code()
 			var streaming:bool = false
 			var this_stream : String = ""
 			var lines:PoolStringArray = data.split("\n")
@@ -2244,7 +2244,7 @@ class _DataFormat:
 						this_stream = ""
 						streaming = false
 					var av:PoolStringArray = line.split("func ")[1].split("(")
-					var mname : String  = av[0]
+					var mname : String = av[0]
 					if get_detailed_operands:
 						var operands : String = line.split(mname)[1].strip_edges()
 						var os:PoolStringArray = operands.split("->")
@@ -2259,7 +2259,7 @@ class _DataFormat:
 						if operands.ends_with(")"):
 							operands = operands.substr(0,operands.length() - 1)
 						var opvalues : Array = []
-						var thisOpValue : String  = ""
+						var thisOpValue : String = ""
 						var colonDelim:bool = false
 						var bracketDelim:bool = false
 						for i in operands:
@@ -2288,11 +2288,11 @@ class _DataFormat:
 						this_stream = ""
 						streaming = false
 					var av:PoolStringArray = line.split("signal ")[1].split("(")
-					var sname : String  = av[0]
+					var sname : String = av[0]
 					if get_detailed_operands:
 						var op = []
 						if av.size() > 1:
-							var operands : String  = av[1].rstrip(")")
+							var operands : String = av[1].rstrip(")")
 							if operands:
 								for o in operands.split(","):
 									op.append(o.strip_edges())
@@ -2303,7 +2303,7 @@ class _DataFormat:
 						concat += this_stream.strip_edges() + "\n"
 						this_stream = ""
 						streaming = false
-					var cname : String  = line.split("=",false)[0].strip_edges().split("const ",true)[1].strip_edges().split(":",false)[0].strip_edges()
+					var cname : String = line.split("=",false)[0].strip_edges().split("const ",true)[1].strip_edges().split(":",false)[0].strip_edges()
 					const_names.append(cname)
 					streaming = true
 				elif line.begins_with("var "):
@@ -2311,7 +2311,7 @@ class _DataFormat:
 						concat += this_stream.strip_edges() + "\n"
 						this_stream = ""
 						streaming = false
-					var vname : String  = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
+					var vname : String = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
 					var_names.append(vname)
 					streaming = true
 				elif line.begins_with("export ") and " var " in line:
@@ -2319,7 +2319,7 @@ class _DataFormat:
 						concat += this_stream.strip_edges() + "\n"
 						this_stream = ""
 						streaming = false
-					var vname : String  = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
+					var vname : String = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
 					var_names.append(vname)
 					streaming = true
 				elif line.begins_with("onready ") and " var " in line:
@@ -2327,7 +2327,7 @@ class _DataFormat:
 						concat += this_stream.strip_edges() + "\n"
 						this_stream = ""
 						streaming = false
-					var vname : String  = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
+					var vname : String = line.split("=",false)[0].strip_edges().split("var ",true)[1].strip_edges().split(":",false)[0].strip_edges()
 					var_names.append(vname)
 					streaming = true
 				elif line.begins_with("extends "):
@@ -2344,10 +2344,10 @@ class _DataFormat:
 				this_stream = ""
 				streaming = false
 		if trim_unnecessary_newlines:
-			var reconcat : String  = ""
+			var reconcat : String = ""
 			for line in concat.split("\n"):
 				var newline:bool = false
-				var ls : String  = line.strip_edges()
+				var ls : String = line.strip_edges()
 				for a in all_prefixes:
 					if ls.begins_with(a):
 						newline = true
@@ -2379,13 +2379,12 @@ class _DataFormat:
 	static func __compile_script_object(source_code : String, params = [],new_object : bool = false) -> Script:
 		if not params is Array:
 			params = [params]
-		var shash : String  = ""
+		var shash : String = ""
 		if params:
-			var parStr : String  = str(params)
-			shash = str(hash(source_code)) + "_" + str(hash(parStr))
+			shash = "%s_%s"% [hash(source_code) + hash(params)]
 		else:
 			shash = str(hash(source_code))
-		l("Compiling script as object @ [%s]; parameters: %s, new object: %s" % [shash,str(params),str(new_object)])
+		l("Compiling script as object @ [%s]; parameters: %s, new object: %s" % [shash,params,new_object])
 		if not new_object and shash in csosk:
 			l("Fetching from cache")
 			return compiled_script_object_storage[shash]
@@ -2496,13 +2495,13 @@ class _DataFormat:
 		l("Attempting to reload scene at [%s]" % scene_path)
 		if __load_if_can(scene_path,override,"PackedScene"):
 			var scn = __get_load().instance()
-			var root : String  = scn.name
+			var root : String = scn.name
 			if Tool.validex != null:
 				Tool.remove(scn)
 			else:
 				if is_instance_valid(scn) and not scn.is_queued_for_deletion():
 					scn.queue_free()
-			var p : String  = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"%s\" type=\"PackedScene\" id=1]\n\n[node name=\"%s\" instance=ExtResource( 1 )]" % [scene_path,root]
+			var p : String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"%s\" type=\"PackedScene\" id=1]\n\n[node name=\"%s\" instance=ExtResource( 1 )]" % [scene_path,root]
 			l("Successfully found data for reloading scene with root [%s], passing to scene replacer" % root)
 			__replace_scene(p,scene_path)
 	
@@ -2514,7 +2513,7 @@ class _DataFormat:
 		non_statics["pointers"].equipment_modmain.replaceSceneLiteral(resource_path,original_path)
 	
 	static func __replace_scene(scene_data:String,override_path:String = "",scene_file_path:String = "",cache_scene:bool = true) -> PackedScene:
-		var scene_replacement : String  = (scene_file_path) if scene_file_path else ("user://cache/.HevLib_Cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec())
+		var scene_replacement : String = (scene_file_path) if scene_file_path else ("user://cache/.HevLib_Cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec())
 		l("__replace scene called with [override: %s / store path: %s / force cache: %s]" % [override_path,scene_replacement,str(cache_scene)])
 		non_statics["pointers"].FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
 		var file:File = File.new()
@@ -2992,9 +2991,9 @@ class _DriverManagement:
 		var pointers = non_static["pointers"]
 		for modmain_path in (pointers.ManifestV2.__get_modmain_files() + pointers.ManifestV2.__get_modlet_files()):
 			var has_manifest:bool = false
-			var manifest_path : String  = ""
-			var modFolder : String  = modmain_path.get_base_dir() + "/"
-			var modFile : String  = modmain_path.get_file().to_lower()
+			var manifest_path : String = ""
+			var modFolder : String = modmain_path.get_base_dir() + "/"
+			var modFile : String = modmain_path.get_file().to_lower()
 			if modFile.begins_with("mod") and modFile.ends_with(".manifest"):
 				has_manifest = true
 				manifest_path = modmain_path
@@ -3035,8 +3034,8 @@ class _DriverManagement:
 		if aPrio != bPrio:
 			return aPrio < bPrio
 		
-		var aPath : String  = a.get("mod_directory","")
-		var bPath : String  = b.get("mod_directory","")
+		var aPath : String = a.get("mod_directory","")
+		var bPath : String = b.get("mod_directory","")
 		if aPath != bPath:
 			return aPath < bPath
 
@@ -3064,11 +3063,11 @@ class _DriverManagement:
 				return {}
 			var pointers:HevLibPointers = non_static["pointers"]
 			var uid_path : String = "res://%s/.uid/.%%s.uid" % file_path.split("/",false)[1]
-			var folder_path : String  = file_path.get_base_dir() + "/"
+			var folder_path : String = file_path.get_base_dir() + "/"
 			var folderCheck : Array = pointers.FolderAccess.__fetch_folder_files(folder_path,true)
 			for driverDir in driver_dirs:
 				if driverDir in folderCheck:
-					var driverFolder : String  = folder_path + driverDir
+					var driverFolder : String = folder_path + driverDir
 					for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
 						var driver_filepath : String = driverFolder + driver
 						if __is_driver_file(driver_filepath):
@@ -3282,7 +3281,7 @@ class _Equipment:
 										if "weapon_slot" in eqkeys:
 											var obj : Dictionary = equipment.get("weapon_slot").duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(obj,false):
-												var wname : String  = equipment.get("system","")
+												var wname : String = equipment.get("system","")
 												var wprice:int = equipment.get("price",0)
 												var objdata : Array = obj.get("data",[])
 												var has_price:bool = false
@@ -3304,7 +3303,7 @@ class _Equipment:
 										if "WEAPONSLOT_ADD" in eqkeys:
 											var obj : Dictionary = equipment.get("WEAPONSLOT_ADD").duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(obj,false):
-												var wname : String  = equipment.get("system","")
+												var wname : String = equipment.get("system","")
 												var wprice:int = equipment.get("price",0)
 												var objdata : Array = obj.get("data",[])
 												var has_price:bool = false
@@ -3502,7 +3501,7 @@ class _Equipment:
 							
 							for item in pdata:
 								if pointers.ConfigDriver.__validate_dictionary(item,false):
-									var listingSystemName : String  = item.get("system","SYSTEM_MISSING_NAME")
+									var listingSystemName : String = item.get("system","SYSTEM_MISSING_NAME")
 									if not listingSystemName in processed_storage_systems:
 										processed_storage_systems.append(listingSystemName)
 									if not listingSystemName in processed_storage_mods:
@@ -3564,7 +3563,7 @@ class _Equipment:
 					"SHIP_NODE_MODIFY.gd":
 						
 						for item in constKeys:
-							var ship : String  = constants[item].get("ship_name","")
+							var ship : String = constants[item].get("ship_name","")
 							if ship != "":
 								if not ship in ship_node_modify:
 									ship_node_modify[ship] = []
@@ -3820,7 +3819,7 @@ class _Equipment:
 					"MODIFY_SHIP_NUMERICS.gd":
 						for item in constKeys:
 							var di : Dictionary = constants[item]
-							var ship : String  = di.get("ship_name","")
+							var ship : String = di.get("ship_name","")
 							if ship != "":
 								if not ship in modify_ship_numerics:
 									modify_ship_numerics[ship] = []
@@ -3904,7 +3903,7 @@ class _Equipment:
 		var tag_modifications : Array = []
 		
 		var ship_limitations : Dictionary = {}
-		var ship_limitation_string : String  = ""
+		var ship_limitation_string : String = ""
 		
 		var slotDefKeys:Array = slot_defaults.keys()
 		for nodes in EQUIPMENT_TAGS:
@@ -3939,7 +3938,7 @@ class _Equipment:
 						else:
 							slot_defaults[st] = slotDefaults.get(st)
 		for slotDict in ADD_EQUIPMENT_SLOTS:
-			var snn : String  = slotDict.get("slot_node_name","")
+			var snn : String = slotDict.get("slot_node_name","")
 			var spp : Dictionary = ship_limitations.get(snn,{})
 			var sppKeys:Array = spp.keys()
 			if "limit_ships" in slotDict:
@@ -4004,7 +4003,7 @@ class _Equipment:
 		var slot_allowed_equipment : Dictionary = {}
 		
 		for slot in slots_for_adding:
-			var m : String  = slot.get("slot_node_name","")
+			var m : String = slot.get("slot_node_name","")
 			var format : Array = __make_slot_for_scene(slot)
 			
 			# FUTURE ME: Write a mod that tag modifies a modded slot, need to double check functionality of this code + define types
@@ -4047,9 +4046,9 @@ class _Equipment:
 		for slot in all_slot_node_names:
 			if slot in vanilla_equipment_defaults_for_reference:
 				var data : Dictionary = vanilla_equipment_defaults_for_reference[slot]
-				var slot_type : String  = data.get("slot_type","HARDPOINT").to_upper()
+				var slot_type : String = data.get("slot_type","HARDPOINT").to_upper()
 				if slot_type == "HARDPOINT":
-					var hardpoint : String  = data.get("hardpoint_type", "")
+					var hardpoint : String = data.get("hardpoint_type", "")
 					var items : Array = Array(slot_defaults.get(hardpoint,[])).duplicate(true)
 					var additives : Array = Array(data.get("override_additive",[]))
 					var subtractives : Array = Array(data.get("override_subtractive",[]))
@@ -4080,9 +4079,9 @@ class _Equipment:
 					slot_allowed_equipment[slot] = items
 			elif slot in slots_for_adding_dict:
 				var data : Dictionary = slots_for_adding_dict[slot]
-				var slot_type : String  = data.get("slot_type","HARDPOINT").to_upper()
+				var slot_type : String = data.get("slot_type","HARDPOINT").to_upper()
 				if slot_type == "HARDPOINT":
-					var hardpoint : String  = data.get("hardpoint_type", "")
+					var hardpoint : String = data.get("hardpoint_type", "")
 					var items : Array = Array(slot_defaults.get(hardpoint,[])).duplicate(true)
 					var additives : Array = Array(data.get("override_additive",[]))
 					var subtractives : Array = Array(data.get("override_subtractive",[]))
@@ -4108,8 +4107,8 @@ class _Equipment:
 				for equip in vanilla_equipment:
 					var item : Dictionary = vanilla_equipment[equip]
 					if confirm_equipment(vanilla_equipment[equip], slot.get("slot_type",""), slot.get("alignment",""), slot.get("restriction",""), Array(slot_allowed_equipment.get(slot.get("slot_node_name",""),[]))):
-						var system_slot : String  = slot.get("system_slot","")
-						var string : String  = __make_equipment_for_scene(item, slot.get("slot_node_name",""), system_slot)
+						var system_slot : String = slot.get("system_slot","")
+						var string : String = __make_equipment_for_scene(item, slot.get("slot_node_name",""), system_slot)
 						
 						equipment_format.append(string)
 		var sfaKeys :Array = slots_for_adding_dict.keys()
@@ -4132,7 +4131,7 @@ class _Equipment:
 						restriction = slots_for_adding_dict[slot].get("restriction","")
 						system_slot = slots_for_adding_dict[slot].get("system_slot","")
 					if confirm_equipment(item, slot_type, alignment, restriction, Array(slot_allowed_equipment.get(slot,[]))):
-						var string : String  = __make_equipment_for_scene(item, slot, system_slot)
+						var string : String = __make_equipment_for_scene(item, slot, system_slot)
 						var this_sys = item.get("system","")
 						if this_sys:
 							var this_type = item.get("equipment_type")
@@ -4153,15 +4152,15 @@ class _Equipment:
 		for path in editable_paths:
 			concat += "\n\n" + path
 		
-		var ws_header : String  = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://weapons/WeaponSlot.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"WeaponSlot\" instance=ExtResource( 1 )]"
+		var ws_header : String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://weapons/WeaponSlot.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"WeaponSlot\" instance=ExtResource( 1 )]"
 		
-		var equipment_header : String  = "[node name=\"%s\" parent=\"%s\" instance_placeholder=\"%s\"]"
-		var equipment_header_noref : String  = "[node name=\"%s\" parent=\"%s\"]"
-		var equipment_editable_path_base : String  = "[editable path=\"%s\"]"
+		var equipment_header : String = "[node name=\"%s\" parent=\"%s\" instance_placeholder=\"%s\"]"
+		var equipment_header_noref : String = "[node name=\"%s\" parent=\"%s\"]"
+		var equipment_editable_path_base : String = "[editable path=\"%s\"]"
 		
 		
-		var weaponslot_string : String  = ws_header
-		var ws_editable_paths : String  = ""
+		var weaponslot_string : String = ws_header
+		var ws_editable_paths : String = ""
 		var weaponslot_properties : Dictionary = {}
 		
 		var all_slot_types = vanilla_slot_types.duplicate(true)
@@ -4175,18 +4174,18 @@ class _Equipment:
 		
 		for add in WEAPONSLOT_ADD:
 			if pointers.ConfigDriver.__validate_dictionary(add,false):
-				var aname : String  = add.get("name","SYSTEM_ERROR")
-				var apath : String  = add.get("path","")
+				var aname : String = add.get("name","SYSTEM_ERROR")
+				var apath : String = add.get("path","")
 				var item_data : Dictionary = {}
 				var config : Dictionary = add.get("config",{})
 				for it in add.get("data",[]):
-					var ws_property : String  = it.get("property")
+					var ws_property : String = it.get("property")
 					var ws_value = it.get("value")
 					if it.get("use_stringified_value",false):
 						ws_value = pointers.DataFormat.__convert_var_from_string(ws_value)
 					var split:PoolStringArray = ws_property.split("/")
 					if split.size() >= 3:
-						var node : String  = split[split.size() - 2]
+						var node : String = split[split.size() - 2]
 						var nonode:PoolStringArray = ws_property.split(node)
 						if nonode[0].ends_with("/"):
 							nonode[0] = nonode[0].rstrip("/")
@@ -4218,24 +4217,24 @@ class _Equipment:
 				ws_editable_paths = equipment_editable_path_base % aname
 			
 			for it in add.get("data",[]):
-				var ws_property : String  = it.get("property")
+				var ws_property : String = it.get("property")
 				var ws_value = it.get("value")
 				if it.get("use_stringified_value",false):
 					ws_value = pointers.DataFormat.__convert_var_from_string(ws_value)
 				var split:PoolStringArray = ws_property.split("/")
 				if split.size() > 2:
-					var node : String  = split[split.size() - 2]
+					var node : String = split[split.size() - 2]
 					var nonode:PoolStringArray = ws_property.split(node)
 					if nonode[0].ends_with("/"):
 						nonode[0] = nonode[0].rstrip("/")
 					if nonode[1].begins_with("/"):
 						nonode[1] = nonode[1].lstrip("/")
-					var prop_header : String  = equipment_header_noref % [node,aname + "/" + nonode[0]]
+					var prop_header : String = equipment_header_noref % [node,aname + "/" + nonode[0]]
 					if not prop_header in weaponslot_properties:
 						weaponslot_properties[prop_header] = []
 					weaponslot_properties[prop_header].append([nonode[1],ws_value])
 				elif split.size() == 2:
-					var prop_header : String  = equipment_header_noref % [split[0],aname]
+					var prop_header : String = equipment_header_noref % [split[0],aname]
 					if not prop_header in weaponslot_properties:
 						weaponslot_properties[prop_header] = []
 					weaponslot_properties[prop_header].append([split[1],ws_value])
@@ -4264,8 +4263,8 @@ class _Equipment:
 				auxslot_data[slot].append(data)
 			
 			
-			var aux_path : String  = data.get("path","")
-			var aux_type : String  = data.get("type","MPDG").to_upper()
+			var aux_path : String = data.get("path","")
+			var aux_type : String = data.get("type","MPDG").to_upper()
 			match aux_type:
 				"THRUSTER","RCS","TORCH","MAIN_PROPULSION":
 					match aux_type:
@@ -4294,8 +4293,8 @@ class _Equipment:
 					file.store_string(thruster_scene)
 					file.close()
 					
-		var lim_header : String  = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]"
-		var lim_item : String  = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\"]"
+		var lim_header : String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]"
+		var lim_item : String = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\"]"
 		ship_limitation_string = lim_header
 		for i in ship_limitations:
 			var cc : String = "\n\n" + lim_item % i
@@ -5150,31 +5149,31 @@ class _Equipment:
 		var base : String = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s/VBoxContainer\" instance=ExtResource( 3 )]" % [system.to_upper(),slot_node_name]
 		if num_val != -1:
 			base += "\nnumVal = %d" % num_val
-		base += "\nslot = \"%s\"" %  system_slot
+		base += "\nslot = \"%s\"" % system_slot
 		if system:
-			base += "\nsystem = \"%s\"" %  system
+			base += "\nsystem = \"%s\"" % system
 		if capability_lock:
 			base += "\ncapabilityLock = true"
 #		else:
 #			base += "\ncapabilityLock = false"
 		if name_override:
-			base += "\nnameOverride = \"%s\"" %  name_override
+			base += "\nnameOverride = \"%s\"" % name_override
 		if description:
-			base += "\ndescription = \"%s\"" %  description
+			base += "\ndescription = \"%s\"" % description
 		if manual:
-			base += "\nmanual = \"%s\"" %  manual
+			base += "\nmanual = \"%s\"" % manual
 		if specs:
-			base += "\nspecs = \"%s\"" %  specs
+			base += "\nspecs = \"%s\"" % specs
 		if price > 0:
 			base += "\nprice = %d" % price
 		if test_protocol && test_protocol != "fire":
-			base += "\ntestProtocol = \"%s\"" %  test_protocol
+			base += "\ntestProtocol = \"%s\"" % test_protocol
 		if default:
 			base += "\ndefault = true"
 #		else:
 #			base += "\ndefault = false"
 		if control:
-			base += "\ncontrol = \"%s\"" %  control
+			base += "\ncontrol = \"%s\"" % control
 		if story_flag:
 			base += "\nstoryFlag = \"%s\"" % story_flag
 		if story_flag_min != -1:
@@ -6790,8 +6789,8 @@ class _ManifestV2:
 						"check_data -> (Variant) the data used to check if the mod exists. See the following lines for acceptable inputs:",
 						" -> (String) mod ID for the mod to check for. Performs no version checking, and will return purely if a mod with the ID exists.",
 						" -> (Array) assumes it contains multiple entries to check. If any one of these entries exist, the entire check passes",
-						" -> (Dictionary) must contain `mod_id` for the mod ID, and can have either minimum_version or min_version represent the minimum version, and  either maximum_version or max_version represent the maximum version.",
-						"    -> min/max version entries can either be an Array/PoolIntArray with 3 indeces for the major, minor, and bugfix versions, a Vector3 with the versions in each respective index, or a dictionary with `major`, `minor`, and `bugfix` keys containing each respective version.",
+						" -> (Dictionary) must contain `mod_id` for the mod ID, and can have either minimum_version or min_version represent the minimum version, and either maximum_version or max_version represent the maximum version.",
+						"   -> min/max version entries can either be an Array/PoolIntArray with 3 indeces for the major, minor, and bugfix versions, a Vector3 with the versions in each respective index, or a dictionary with `major`, `minor`, and `bugfix` keys containing each respective version.",
 					],
 					"return":[
 						"bool for whether the mod exists based on the provided criteria"
