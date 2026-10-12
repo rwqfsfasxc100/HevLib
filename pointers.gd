@@ -3004,25 +3004,22 @@ class _DriverManagement:
 					if modEntryName.begins_with("mod") and modEntryName.ends_with(".manifest"):
 						has_manifest = true
 						manifest_path = item
+			if not has_manifest:
+				continue
+			var this_mod_data : Dictionary = {}
+			var manifest : Dictionary = pointers.ManifestV2.__parse_file_as_manifest(manifest_path)
+			var mrv:Dictionary = manifest.get("manifest_definitions",{})
+			var manifest_ver : float = mrv.get("manifest_version",1.0)
+			if manifest_ver < 2.2:
+				continue
+			var id : String = manifest.get("mod_information",{}).get("id","")
+			if not id:
+				continue
+			this_mod_data["id"] = id
 			
-			var this_mod_data : Dictionary = {"drivers":{}}
-			var id : String = ""
-			var manifest : Dictionary = {}
-			if has_manifest:
-				manifest = pointers.ManifestV2.__parse_file_as_manifest(manifest_path)
-				id = manifest.get("mod_information",{}).get("id","")
-			if id:
-				this_mod_data["id"] = id
-			var mm_prio:int = 0
-			if modFile.begins_with("mod") and modFile.ends_with(".manifest"):
-				manifest.get("manifest_definitions",{}).get("modlet_priority",0)
-			else:
-				var modmain : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(modmain_path)
-				if "MOD_PRIORITY" in modmain.keys():
-					mm_prio = modmain["MOD_PRIORITY"]
-			this_mod_data["priority"] = mm_prio
+			this_mod_data["priority"] = mrv.get("modlet_priority",0)
 			
-			this_mod_data["drivers"] = __get_drivers_from_modmain_path(modmain_path)
+			this_mod_data["drivers"] = __get_drivers_from_modmain_path(modmain_path,false,manifest_ver >= 2.3)
 			
 			this_mod_data["mod_directory"] = modFolder
 			if this_mod_data["drivers"]:
@@ -3037,7 +3034,6 @@ class _DriverManagement:
 		var bPrio:int = b.get("priority",0)
 		if aPrio != bPrio:
 			return aPrio < bPrio
-
 		
 		var aPath : String  = a.get("mod_directory","")
 		var bPath : String  = b.get("mod_directory","")
@@ -3060,7 +3056,7 @@ class _DriverManagement:
 		"HEVLIB_DRIVERS/",
 	])
 	
-	static func __get_drivers_from_modmain_path(file_path: String, get_fresh_drivers: bool = false):
+	static func __get_drivers_from_modmain_path(file_path: String, get_fresh_drivers: bool = false, require_uid_check : bool = false):
 		var file:File = File.new()
 		if get_fresh_drivers or not file_path in dgck:
 			var this_mod_data : Dictionary = {}
@@ -3087,7 +3083,19 @@ class _DriverManagement:
 	
 	static func __is_driver_file(file_path:String) -> bool:
 		var fext:String = file_path.get_extension()
-		if fext in driver_ext and file_path.get_base_dir().split("/")[-1] + "/" in driver_dirs and not non_static["regex"].search(file_path.get_file().rstrip("." + fext)):
+		if(
+			fext in driver_ext
+			and
+			file_path.get_base_dir().split("/")[-1] + "/" in driver_dirs
+			and
+			not non_static["regex"].search(file_path.get_file().rstrip("." + fext))
+		):
+			var file:File = File.new()
+			var FileAccess:HevLibPointers._FileAccess = non_static["pointers"].FileAccess
+			var fc:String = file_path.get_base_dir().plus_file("." + file_path.get_file().get_basename() + ".uid")
+			var content:String = FileAccess.__get_file_content(fc).strip_edges()
+			if not file.file_exists(fc) or (FileAccess.__get_file_content(fc)==FileAccess.__get_uid_of_file(fc)):
+				pass
 			return true
 		return false
 	
@@ -5521,6 +5529,15 @@ class _FileAccess:
 						"flags (optional) -> (int) the texture flags for the image. Check the Texture.Flags enum for reference."
 					]
 				},
+				"__get_uid_of_file":{
+					"description":"Returns a unique identifier string for the provided file.",
+					"args":[
+						"file_path -> (String) file path to check."
+					],
+					"return":[
+						"String for the file uid. Will be an empty string if the file does not exist."
+					]
+				},
 				"__file_output_to_buffer":{
 					"description":"Ensures a file input is a PoolByteArray.",
 					"args":[
@@ -5667,6 +5684,14 @@ class _FileAccess:
 				print(exitMsg)
 				pointers.NodeAccess.__exit(true,exitMsg,"pointers.FileAccess")
 			
+	static func __get_uid_of_file(file_path:String) -> String:
+		if not __file_exists(file_path):
+			return ""
+		var file:File = File.new()
+		file.open(file_path,File.READ)
+		var num:int = non_static["pointers"].DataFormat.__get_crc_32(file.get_buffer(file.get_len()))
+		file.close()
+		return (PoolByteArray([(num>>16)&0xFF,(num>>24)&0xFF,(num)&0xFF,(num>>8)&0xFF]).hex_encode() + file_path).sha256_text()
 	
 	# Code sourced from lifelike's Godot Animator Import plugin
 	# https://github.com/lifelike/godot-animator-import
@@ -5757,6 +5782,9 @@ class _FileAccess:
 								_:dependencies.append(fn.strip_edges())
 					buffer += hexText.length() / 2.0
 		return dependencies
+	
+	
+	
 	
 	
 
@@ -7457,7 +7485,7 @@ class _ManifestV2:
 							dict_template["manifest_definitions"]["dependancy_mod_ids"] = Array(manifest_data["manifest_definitions"].get("dependancy_mod_ids",[]))
 							dict_template["manifest_definitions"]["conflicting_mod_ids"] = Array(manifest_data["manifest_definitions"].get("conflicting_mod_ids",[]))
 							dict_template["manifest_definitions"]["complementary_mod_ids"] = Array(manifest_data["manifest_definitions"].get("complementary_mod_ids",[]))
-					2.2:
+					2.2,2.3:
 						
 						if "mod_information" in manifestKeys:
 							dict_template["mod_information"]["id"] = String(manifest_data["mod_information"].get("id",""))
@@ -7537,8 +7565,8 @@ class _ManifestV2:
 							if ovConfigs:
 								pointers.l("Parsed configs for %s, has disabled configs: [%s]" % [file_path,str(hash(configs) != hash(ovConfigs))],"pointers.ManifestV2")
 								dict_template["configs"] = ovConfigs
-						
-						
+				
+				
 				var version_metadata : String = dict_template["version"]["version_metadata"]
 				var version_string : String = str(dict_template["version"]["version_major"]) + "." + str(dict_template["version"]["version_minor"]) + "." + str(dict_template["version"]["version_bugfix"])
 				if not version_metadata.empty():

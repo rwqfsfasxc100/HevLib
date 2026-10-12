@@ -71,7 +71,7 @@ func _init(modLoader:ModLoader=ModLoader):
 	pointers.FileAccess.__load_precached_mods()
 	pointers.ConfigDriver.__load_configs()
 	
-#	testing()
+	testing()
 	
 	pointers.Scripting.make_mineral_scripting()
 	
@@ -771,7 +771,9 @@ func get_script_constant_map_without_load(script_path:String) -> Dictionary:
 func testing():
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
 	
-	
-	
+	var t1=Time.get_ticks_usec()
+	var uid:String = pointers.FileAccess.__get_uid_of_file("res://HevLib/ModMain.gd")
+	var t2=Time.get_ticks_usec()
+	var d=t2-t1
 	
 	breakpoint
