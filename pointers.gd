@@ -3096,7 +3096,6 @@ class _Equipment:
 	var scripts : Array = [
 		
 	]
-	
 	static func get_class_documentation():
 		return {
 			"description":"Contains internal methods used for creating equipment scenes. Use at your own discretion",
@@ -3285,19 +3284,17 @@ class _Equipment:
 												var wprice:int = equipment.get("price",0)
 												var objdata : Array = obj.get("data",[])
 												var has_price:bool = false
-												var has_invis:bool = false
 												if not "name" in obj.keys():
 													obj["name"] = wname
 												for d in objdata:
 													if d.get("property","") == "repairReplacementPrice":
 														d["value"] = wprice
 														has_price = true
-													if d.get("property","") == "visible":
-														has_invis = true
 												if not has_price:
-													objdata.append({"property":"repairReplacementPrice","value":wprice})
-												if not has_invis:
-													objdata.append({"property":"visible","value":false})
+													objdata.append({
+														"property":"repairReplacementPrice",
+														"value":wprice
+													})
 												obj["data"] = objdata.duplicate(true)
 												WEAPONSLOT_ADD.append(obj)
 										if "WEAPONSLOT_ADD" in eqkeys:
@@ -3307,19 +3304,17 @@ class _Equipment:
 												var wprice:int = equipment.get("price",0)
 												var objdata : Array = obj.get("data",[])
 												var has_price:bool = false
-												var has_invis:bool = false
 												if not "name" in obj.keys():
 													obj["name"] = wname
 												for d in objdata:
 													if d.get("property","") == "repairReplacementPrice":
 														d["value"] = wprice
 														has_price = true
-													if d.get("property","") == "visible":
-														has_invis = true
 												if not has_price:
-													objdata.append({"property":"repairReplacementPrice","value":wprice})
-												if not has_invis:
-													objdata.append({"property":"visible","value":false})
+													objdata.append({
+														"property":"repairReplacementPrice",
+														"value":wprice
+													})
 												obj["data"] = objdata.duplicate(true)
 												WEAPONSLOT_ADD.append(obj)
 									"MASS_DRIVER_AMMUNITION":
@@ -3554,12 +3549,11 @@ class _Equipment:
 					"NODE_DEFINITIONS.gd":
 						
 						for item in constKeys:
-							node_definitions_cache[item] = constants.get(item)
+							node_definitions_cache[item] = constants[item]
 							
 					"SHIP_NODE_REGISTER.gd":
 						for item in constKeys:
-							var xd = constants.get(item)
-							ship_node_register.append(xd)
+							ship_node_register.append(constants[item])
 					"SHIP_NODE_MODIFY.gd":
 						
 						for item in constKeys:
@@ -3755,7 +3749,6 @@ class _Equipment:
 							var dict : Dictionary = constants[ar]
 							if pointers.ConfigDriver.__validate_dictionary(dict):
 								var shipNames = dict.get("ship_name",[])
-								var doAdd = true
 								match typeof(shipNames):
 									TYPE_STRING:
 										shipNames = PoolStringArray([shipNames])
@@ -3767,40 +3760,38 @@ class _Equipment:
 										shipNames = ovr
 									TYPE_STRING_ARRAY:
 										pass
-									_: doAdd = false
-								if doAdd:
-									var recurse = dict.get("recurse_for_alias",false)
-									for entry in dict:
-										match entry:
-											"if_equipment_in_slot","if_tag_in_slot","random","if_equipment","if_tag","check_numerics","config":
-												for i in dict[entry]:
-													if "do_add_if" in i:
-														for st in i["do_add_if"]:
-															if not st:
-																i["do_add_if"].erase(st)
-															for r in st:
-																if not r:
-																	st.erase(r)
-													if "dont_add_if" in i:
-														for st in i["dont_add_if"]:
-															if not st:
-																i["dont_add_if"].erase(st)
-															for r in st:
-																if not r:
-																	st.erase(r)
-													if i.get("slot",null) and i.get("system",null):
-														var prio = i.get("priority",0)
-														if not prio in sorting:
-															sorting[prio] = []
-														i["mode"] = entry
-														i["recurse_for_alias"] = recurse
-														for shipName in shipNames:
-															i["ship_name"] = shipName
-															for _r in i.get("weight",1):
-																sorting[prio].append(i.duplicate(true))
-										
-										
-							var sKeys = sorting.keys()
+									_: continue
+								var recurse = dict.get("recurse_for_alias",false)
+								for entry in dict:
+									match entry:
+										"if_equipment_in_slot","if_tag_in_slot","random","if_equipment","if_tag","check_numerics","config":
+											for i in dict[entry]:
+												if "do_add_if" in i:
+													for st in i["do_add_if"]:
+														if not st:
+															i["do_add_if"].erase(st)
+														for r in st:
+															if not r:
+																st.erase(r)
+												if "dont_add_if" in i:
+													for st in i["dont_add_if"]:
+														if not st:
+															i["dont_add_if"].erase(st)
+														for r in st:
+															if not r:
+																st.erase(r)
+												if i.get("slot",null) and i.get("system",null):
+													var prio = i.get("priority",0)
+													if not prio in sorting:
+														sorting[prio] = []
+													i["mode"] = entry
+													i["recurse_for_alias"] = recurse
+													for shipName in shipNames:
+														i["ship_name"] = shipName
+														for _r in i.get("weight",1):
+															sorting[prio].append(i.duplicate(true))
+							
+							var sKeys:Array = sorting.keys()
 							sKeys.sort()
 							for o in sKeys:
 								seed(hash(sorting))
@@ -3811,16 +3802,16 @@ class _Equipment:
 						for ar in constKeys:
 							if not ar in register_ship_numerics_store:
 								register_ship_numerics_store[ar] = []
-							var ac = constants[ar]
-							for v in ac:
-								var ax = ac[v]
+							var ac:Dictionary = constants[ar]
+							for v in ac.keys():
+								var ax:Dictionary = ac[v]
 								if pointers.ConfigDriver.__validate_dictionary(ax,false):
 									register_ship_numerics_store[ar].append({v:ax})
 					"MODIFY_SHIP_NUMERICS.gd":
 						for item in constKeys:
 							var di : Dictionary = constants[item]
 							var ship : String = di.get("ship_name","")
-							if ship != "":
+							if not ship.empty():
 								if not ship in modify_ship_numerics:
 									modify_ship_numerics[ship] = []
 								modify_ship_numerics[ship].append(di)
@@ -3850,7 +3841,6 @@ class _Equipment:
 							if type in rpc_second_state_store:
 								var states:Array = Array()
 								for item in data[type]:
-									var can_add:bool = true
 									if "sensors" in item:
 										for i in item.sensors.size():
 											var sensorItem = item.sensors[i]
@@ -3865,15 +3855,13 @@ class _Equipment:
 																var refobject = pointers.DataFormat.__get_load().new()
 																sensorItem["funcref"] = funcref(refobject,sensorItem.func_method_name)
 																rpc_non_autoload_object_persist[object_name] = refobject
-															else:
-																can_add = false
+															else: continue
 														elif object_name in AUTOLOAD_REF_STORE:
 															sensorItem["funcref"] = funcref(AUTOLOAD_REF_STORE[object_name],sensorItem.func_method_name)
-														else: can_add = false
+														else: continue
 												TYPE_STRING:
 													states.append(item)
-												_:
-													can_add = false
+												_: continue
 									if "function_outputs" in item:
 										for i in item.function_outputs.size():
 											var sensorItem = item.function_outputs[i]
@@ -3882,17 +3870,26 @@ class _Equipment:
 													var object_name:String = sensorItem.func_object_path
 													if object_name.begins_with("res://") and object_name.get_extension() == "gd":
 														if object_name in rpc_non_autoload_object_persist:
-															sensorItem["funcref"] = funcref(rpc_non_autoload_object_persist[object_name],sensorItem.func_method_name)
+															sensorItem["funcref"] = funcref(
+																rpc_non_autoload_object_persist[object_name],
+																sensorItem.func_method_name
+															)
 														elif pointers.DataFormat.__load_if_can(object_name,false,"Script"):
 															var refobject = pointers.DataFormat.__get_load().new()
-															sensorItem["funcref"] = funcref(refobject,sensorItem.func_method_name)
+															sensorItem["funcref"] = funcref(
+																refobject,
+																sensorItem.func_method_name
+															)
 															rpc_non_autoload_object_persist[object_name] = refobject
-														else: can_add = false
+														else: continue
 													elif object_name in AUTOLOAD_REF_STORE:
-														sensorItem["funcref"] = funcref(AUTOLOAD_REF_STORE[object_name],sensorItem.func_method_name)
-													else: can_add = false
-											else: can_add = false
-									if can_add: states.append(item)
+														sensorItem["funcref"] = funcref(
+															AUTOLOAD_REF_STORE[object_name],
+															sensorItem.func_method_name
+														)
+													else: continue
+											else: continue
+									states.append(item)
 								rpc_second_state_store[type].append_array(states)
 					
 		
@@ -3903,7 +3900,6 @@ class _Equipment:
 		var tag_modifications : Array = []
 		
 		var ship_limitations : Dictionary = {}
-		var ship_limitation_string : String = ""
 		
 		var slotDefKeys:Array = slot_defaults.keys()
 		for nodes in EQUIPMENT_TAGS:
@@ -4184,8 +4180,9 @@ class _Equipment:
 					if it.get("use_stringified_value",false):
 						ws_value = pointers.DataFormat.__convert_var_from_string(ws_value)
 					var split:PoolStringArray = ws_property.split("/")
-					if split.size() >= 3:
-						var node : String = split[split.size() - 2]
+					var splitSize:int = split.size()
+					if splitSize > 2:
+						var node : String = split[splitSize - 2]
 						var nonode:PoolStringArray = ws_property.split(node)
 						if nonode[0].ends_with("/"):
 							nonode[0] = nonode[0].rstrip("/")
@@ -4194,7 +4191,7 @@ class _Equipment:
 						if not nonode[0] in item_data:
 							item_data[nonode[0]] = []
 						item_data[nonode[0]].append([nonode[1],ws_value])
-					elif split.size() == 2:
+					elif splitSize == 2:
 						if not split[0] in item_data:
 							item_data[split[0]] = []
 						item_data[split[0]].append([split[1],ws_value])
@@ -4293,9 +4290,8 @@ class _Equipment:
 					file.store_string(thruster_scene)
 					file.close()
 					
-		var lim_header : String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]"
+		var ship_limitation_string : String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]"
 		var lim_item : String = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\"]"
-		ship_limitation_string = lim_header
 		for i in ship_limitations:
 			var cc : String = "\n\n" + lim_item % i
 			var data : Dictionary = ship_limitations[i]
