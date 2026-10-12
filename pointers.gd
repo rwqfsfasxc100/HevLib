@@ -3056,7 +3056,7 @@ class _DriverManagement:
 		"HEVLIB_DRIVERS/",
 	])
 	
-	static func __get_drivers_from_modmain_path(file_path: String, get_fresh_drivers: bool = false, require_uid_check : bool = false):
+	static func __get_drivers_from_modmain_path(file_path : String, get_fresh_drivers : bool = false, require_uid_check : bool = false):
 		var file:File = File.new()
 		if get_fresh_drivers or not file_path in dgck:
 			var this_mod_data : Dictionary = {}
