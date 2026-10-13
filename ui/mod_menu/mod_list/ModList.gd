@@ -191,34 +191,38 @@ func _ready():
 		data[modlet] = dict
 	
 	for mod in data.keys():
-		var fname = mod.split("/")[2]
-		var info = data[mod]
-		var zipinfo = pointers.ManifestV2.__match_mod_path_to_zip(mod)
-		info.merge({"zip":zipinfo})
+		var fname:String = mod.split("/",false)[1]
+		var info:Dictionary = data[mod]
+		var zipinfo:String = pointers.ManifestV2.__match_mod_path_to_zip(mod)
+		info["zip"] = zipinfo
 		if not fname in groups:
-			groups.merge({fname:{}})
+			groups[fname] = {}
 		if info["manifest"]["has_manifest"]:
-			var id = info["manifest"]["manifest_data"]["mod_information"]["id"]
+			var id:String = info["manifest"]["manifest_data"]["mod_information"]["id"]
 			if not id in manifests:
 				manifests.append(id)
-		groups[fname].merge({mod:info})
+		groups[fname][mod] = info
 	for modClass in groups:
-		var groupID = ""
-		var group = groups[modClass]
-		var mainManifestMod = ""
+		var groupID:String = ""
+		var group:Dictionary = groups[modClass]
+		var mainManifestMod:String = ""
 		for modpath in group:
-			var mod = group[modpath]
+			var mod:Dictionary = group[modpath]
 			if mod["manifest"]["has_manifest"]:
-				var id = mod["manifest"]["manifest_data"]["mod_information"]["id"]
+				var id:String = mod["manifest"]["manifest_data"]["mod_information"]["id"]
 				if groupID:
-					if id.split(".").size() <= groupID.split(".").size():
+					var thisSize:int = id.split(".").size()
+					var groupSize:int = groupID.split(".").size()
+					if thisSize < groupSize:
 						groupID = id
+						mainManifestMod = modpath
+					elif thisSize == groupSize and modpath.split("/").size() < mainManifestMod.split("/").size():
 						mainManifestMod = modpath
 				else:
 					groupID = id
 					mainManifestMod = modpath
-		var idSplit = groupID.split(".")
-		var baseID = groupID
+		var idSplit:PoolStringArray = groupID.split(".")
+		var baseID:String = groupID
 		
 		if groupID:
 			if idSplit.size() > 1:
@@ -232,7 +236,7 @@ func _ready():
 				manifestGroups[i] = {i:group[i].duplicate(true)}
 				mainManifestMods[i] = i
 	for mod in manifestGroups:
-		if manifestGroups[mod].size() >= 2:
+		if manifestGroups[mod].size() > 1:
 			var main = mainManifestMods[mod]
 			var mainmod = data[main].duplicate()
 			mainmod.merge({"children":{}})

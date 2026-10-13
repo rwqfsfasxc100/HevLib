@@ -274,7 +274,7 @@ func process_gdnative_plugins() -> Dictionary:
 								for entry in mapper:
 									if!entry.begins_with("res://"):
 										entry=mod_dir.plus_file(entry)
-									if entry.get_extension() in gdnative_library_extensions:
+									if entry.get_extension()in gdnative_library_extensions:
 										all_libraries.append(entry)
 		var copied_files:PoolStringArray=PoolStringArray()
 		var existing_libs:PoolStringArray=PoolStringArray()
@@ -742,7 +742,7 @@ func get_script_constant_map_without_load(script_path:String) -> Dictionary:
 					streaming=false
 				const_names.append(line.split("=",false)[0].strip_edges().split("const",true)[1].strip_edges().split(":",false)[0].strip_edges())
 				streaming=true
-			elif line.begins_with("var")||((line.begins_with("onready")||line.begins_with("export"))&&"var"in line):
+			elif(line.begins_with("var")||((line.begins_with("onready")||line.begins_with("export"))&&"var"in line)):
 				if streaming:
 					concat+=this_stream.strip_edges()+"\n"
 					this_stream=""

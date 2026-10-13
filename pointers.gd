@@ -7053,17 +7053,16 @@ class _ManifestV2:
 		var png_path : String = ""
 		var stex_path : String = ""
 		var icon_path : String = ""
-		var content : PoolStringArray = __get_manifest_files() + __get_icon_files()
 		
-		var mod_enabled := true
+		var mod_enabled:bool = true
 		var script_filename : String = script_path.get_file().to_lower()
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		
 		if script_filename.begins_with("mod") and script_filename.ends_with(".manifest"):
 			var current : PoolStringArray = __get_modlet_files()
 			if not script_path in current:
 				mod_enabled = false
-		for content_file in content:
+		for content_file in (__get_manifest_files() + __get_icon_files()):
 			if content_file.begins_with(folder_path):
 				var ft : String = content_file.split(folder_path)[1]
 				if not has_mod_manifest and ft.to_lower() == "mod.manifest":
@@ -7091,6 +7090,30 @@ class _ManifestV2:
 					if ft.get_extension().to_lower() == "stex":
 						has_icon_file = true
 						stex_path = content_file
+		if not has_mod_manifest:
+			var tcDir:String = folder_path.trim_suffix("/").get_base_dir()
+			while not has_mod_manifest and not tcDir == "res://":
+				for file in pointers.FolderAccess.__fetch_folder_files(tcDir):
+					var fl:String = file.to_lower()
+					if fl.begins_with("mod") and fl.get_extension() == "manifest":
+						var content_file:String = tcDir.plus_file(file)
+						has_mod_manifest = true
+						manifest_filepath = content_file
+						manifest_data = __parse_file_as_manifest(content_file)
+						manifest_data.mod_information.brief = ""
+						legacy_mod_version = manifest_data["version"].get("version_string",legacy_mod_version)
+						mod_version_major = manifest_data["version"].get("version_major",mod_version_major)
+						mod_version_minor = manifest_data["version"].get("version_minor",mod_version_minor)
+						mod_version_bugfix = manifest_data["version"].get("version_bugfix",mod_version_bugfix)
+						mod_version_metadata = manifest_data["version"].get("version_metadata",mod_version_metadata)
+						is_library = manifest_data["library"].get("is_library",false)
+						always_display = manifest_data["library"].get("always_display",false)
+						manifest_version = manifest_data["manifest_definitions"].get("manifest_version",1)
+						if mod["mod_type"] != "modlet" and manifest_data["manifest_definitions"].get("modlet_priority",0):
+							mod_version_metadata = "Manifest fault - Cannot determine mod type!"
+							manifest_data["version"]["version_metadata"] = "Manifest fault - Cannot determine mod type!"
+							mod_error = true
+				tcDir = tcDir.get_base_dir()
 		if stex_path:
 			icon_path = stex_path
 		elif png_path:
@@ -7098,7 +7121,7 @@ class _ManifestV2:
 		var icon_dict : Dictionary = {"has_icon_file":has_icon_file,"icon_path":icon_path}
 		var manifestEntry : Dictionary = {"has_manifest":has_mod_manifest,"manifest_version":manifest_version,"manifest_file_path":manifest_filepath,"manifest_data":manifest_data}
 		var mod_version_array : Array = [mod_version_major,mod_version_minor,mod_version_bugfix]
-		var mod_version_string : String = str(mod_version_major) + "." + str(mod_version_minor) + "." + str(mod_version_bugfix)
+		var mod_version_string : String = "%d.%d.%d" % [mod_version_major,mod_version_minor,mod_version_bugfix]
 		if not str(mod_version_metadata) == "":
 			mod_version_array.append(mod_version_metadata)
 			mod_version_string = mod_version_string + "-" + str(mod_version_metadata)
