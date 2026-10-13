@@ -7936,7 +7936,7 @@ class _ManifestV2:
 		var bList:PoolStringArray = bl.split(".")
 		var aSize:int = aList.size()
 		var bSize:int = bList.size()
-		var counter = aSize if aSize < bSize else bSize
+		var counter:int = aSize if aSize < bSize else bSize
 		for i in counter:
 			var a = aList[i]
 			var b = bList[i]

@@ -34,7 +34,7 @@ extends Node
 
 const MOD_PRIORITY=-INF
 
-const MOD_NAME="HevLib Library Equipment Driver Module"
+const MOD_NAME="HevLib EquipmentDriver"
 const MOD_VERSION="1.0.0"
 const MOD_VERSION_MAJOR=1
 const MOD_VERSION_MINOR=0
@@ -771,9 +771,7 @@ func get_script_constant_map_without_load(script_path:String) -> Dictionary:
 func testing():
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
 	
-	var t1=Time.get_ticks_usec()
-	var uid:String = pointers.FileAccess.__get_uid_of_file("res://HevLib/ModMain.gd")
-	var t2=Time.get_ticks_usec()
-	var d=t2-t1
+	
+	
 	
 	breakpoint

@@ -33,7 +33,7 @@
 extends Node
 
 const MOD_PRIORITY = INF
-const MOD_NAME = "HevLib Library Keymapping & Variable Node Module"
+const MOD_NAME = "HevLib Keymapping"
 const MOD_VERSION = "1.0.0"
 const MOD_VERSION_MAJOR = 1
 const MOD_VERSION_MINOR = 0

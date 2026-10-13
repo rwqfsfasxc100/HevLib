@@ -36,7 +36,7 @@ extends Node
 # Mods are loaded from lowest to highest priority, default is 0
 const MOD_PRIORITY = INF
 # Name of the mod, used for writing to the logs
-const MOD_NAME = "HevLib Library WebTranslate Module"
+const MOD_NAME = "HevLib WebTranslate"
 const MOD_VERSION = "1.0.0"
 const MOD_VERSION_MAJOR = 1
 const MOD_VERSION_MINOR = 0

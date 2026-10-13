@@ -1,3 +1,13 @@
+[1.16.26]
+
+1=* Fixed issue that prevented `LOAD_RESOURCES` from loading non-scene resource types
+2=* Ship internals modification is better typed on initialization to speed up calculations
+3=* Fixed dev update push menu
+4=* Improved driver fetching efficiency by preventing the processing of any mods that would not load drivers regardless
+5=* DriverManagement will now no longer make blank driver entries for non-driver files in a driver folder
+6=* Fixed `FileAccess`.`__save_stex` not saving to the correct directory
+7=* ModMains without a directly associated manifest file will now recursively search upwards in the filesystem for another manifest that is likely associated with the same mod
+
 [1.16.25]
 
 1=* Updated ShipDriver's derelict handling to expose more of the RescueOperation event to the API
