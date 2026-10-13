@@ -5645,30 +5645,28 @@ class _FileAccess:
 				file.open(has_updated_store,File.WRITE)
 				file.store_string("1")
 				file.close()
-	
+	const foundnewfiles:String = "new mods found, attempting to copy"
+	const exitMsg:String = "new and/or updated mods detected, rebooting game"
 	static func __load_precached_mods():
-		var gameInstallDirectory = OS.get_executable_path().get_base_dir()
+		var gameInstallDirectory:String = OS.get_executable_path().get_base_dir()
 		if OS.get_name() == "OSX":
 			gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
-		var modPathPrefix = gameInstallDirectory.plus_file("mods")
+		var modPathPrefix:String = gameInstallDirectory.plus_file("mods")
 		var file:File = File.new()
 		if file.file_exists(updateCacheFile):
 			var files_to_copy : Array = JSON.parse(__get_file_content(updateCacheFile)).result
 			file.open(updateCacheFile,File.WRITE)
 			file.store_string("[]")
 			file.close()
-			var reboot:bool = not files_to_copy.empty()
-			if reboot:
-				var foundnewfiles:String = "new mods found, attempting to copy"
+			if not files_to_copy.empty():
 				print(foundnewfiles)
-				var pointers = non_static["pointers"]
+				var pointers:HevLibPointers = non_static["pointers"]
 				pointers.l(foundnewfiles,"pointers.FileAccess")
 				for mod in files_to_copy:
 					if file.file_exists(mod) and __copy_file(mod,modPathPrefix) == OK:
 						var newmodmsg:String = "copied new mod %s" % mod.get_file()
 						print(newmodmsg)
 						pointers.l(newmodmsg,"pointers.FileAccess")
-				var exitMsg:String = "new and/or updated mods detected, rebooting game"
 				print(exitMsg)
 				pointers.NodeAccess.__exit(true,exitMsg,"pointers.FileAccess")
 			
@@ -5684,13 +5682,13 @@ class _FileAccess:
 	# Code sourced from lifelike's Godot Animator Import plugin
 	# https://github.com/lifelike/godot-animator-import
 	static func __save_stex(image:Image, file_path:String, flags:int=0):
-		var out_path = "%s.stex" % file_path.get_extension()
-		var tmppng = "%s-tmp.png" % file_path
+		var out_path:String = "%s.stex" % file_path.get_basename()
+		var tmppng:String = "%s-tmp.png" % file_path
 		image.save_png(tmppng)
 		var file = File.new()
 		file.open(tmppng, File.READ)
-		var pnglen = file.get_len()
-		var pngdata = file.get_buffer(pnglen)
+		var pnglen:int = file.get_len()
+		var pngdata:PoolByteArray = file.get_buffer(pnglen)
 		file.close()
 		Directory.new().remove(tmppng)
 		file.open(out_path, File.WRITE)

@@ -71,7 +71,7 @@ func _init(modLoader:ModLoader=ModLoader):
 	pointers.FileAccess.__load_precached_mods()
 	pointers.ConfigDriver.__load_configs()
 	
-	testing()
+#	testing()
 	
 	pointers.Scripting.make_mineral_scripting()
 	
