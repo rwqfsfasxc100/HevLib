@@ -298,11 +298,9 @@ func process_gdnative_plugins() -> Dictionary:
 						var lib_path:String=data["entry"][oper]
 						var new_path:String=exePath+lib_path.get_file()
 						if file_exists(lib_path):
-							if!file_exists(new_path):
-								file.open(lib_path,File.READ)
-								var buffer:PoolByteArray=file.get_buffer(file.get_len())
-								file.close()
-								libs_to_copy[new_path]=buffer
+							file.open(lib_path,File.READ)
+							libs_to_copy[new_path]=file.get_buffer(file.get_len())
+							file.close()
 							data["entry"][oper]=new_path
 							existing_libs.append(new_path.get_file())
 				if"dependencies"in data:
@@ -312,20 +310,17 @@ func process_gdnative_plugins() -> Dictionary:
 							var lib_path:String=lib_paths[lbr]
 							var new_path:String=exePath+lib_path.get_file()
 							if file_exists(lib_path):
-								if!file_exists(new_path):
-									file.open(lib_path,File.READ)
-									var buffer:PoolByteArray=file.get_buffer(file.get_len())
-									file.close()
-									libs_to_copy[new_path]=buffer
+								file.open(lib_path,File.READ)
+								libs_to_copy[new_path]=file.get_buffer(file.get_len())
+								file.close()
 								lib_paths[lbr]=new_path
 								existing_libs.append(new_path.get_file())
 						data["dependencies"][oper]=lib_paths
 				lib_resave[entry]=data
 				for f in libs_to_copy:
-					if!file_exists(f):
-						file.open(f,File.WRITE)
-						file.store_buffer(libs_to_copy[f])
-						file.close()
+					file.open(f,File.WRITE)
+					file.store_buffer(libs_to_copy[f])
+					file.close()
 				copied_files.append_array(libs_to_copy.keys())
 		if lib_resave:
 			for entry in lib_resave:
