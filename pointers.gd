@@ -7108,6 +7108,7 @@ class _ManifestV2:
 						has_mod_manifest = true
 						manifest_filepath = content_file
 						manifest_data = __parse_file_as_manifest(content_file)
+						manifest_data["configs"].clear()
 						manifest_data.mod_information.brief = ""
 						legacy_mod_version = manifest_data["version"].get("version_string",legacy_mod_version)
 						mod_version_major = manifest_data["version"].get("version_major",mod_version_major)
@@ -7309,6 +7310,50 @@ class _ManifestV2:
 	const cached_manifests : Dictionary = {}
 	const cachedManifestKeys:Array = Array()
 	
+	const base_manifest_template : Dictionary = {
+		"mod_information":{
+			"name":"",
+			"id":"",
+			"description":"",
+			"brief":"",
+			"author":"",
+			"credits":PoolStringArray()
+		},
+		"version":{
+			"version_major":1,
+			"version_minor":0,
+			"version_bugfix":0,
+			"version_metadata":"",
+			"version_string":"1.0.0"
+		},
+		"tags":{
+			
+		},
+		"links":{
+			
+		},
+		"configs":{
+			
+		},
+		"languages":{
+			
+		},
+		"library":{
+			"is_library":false,
+			"always_display":false,
+		},
+		"manifest_definitions":{
+			"manifest_version":1.0,
+			"dependancy_mod_ids":Array(),
+			"conflicting_mod_ids":Array(),
+			"complementary_mod_ids":Array(),
+			"manifest_url":"", # EXAMPLE: https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest
+			"changelog_path":"", # This is relative to the ModMain.gd file. EXAMPLE: for a file at 'res://Example Mod/data/folder/changelogs.txt', you would put 'data/folder/changelogs.txt'
+			"modlet_priority":0, # SPECIFIC TO MODLETS! The order at which the modlet would be loaded. Most modlets load before other mods, but this will affect load order within the list of installed modlets
+			"expected_manifest_path":"", # If set and used for a mod's manifest, the res:// filepath the manifest is expected to be at. If it isn't, prevents the mod from loading and closes the game.
+		}
+	}
+	
 	static func __parse_file_as_manifest(file_path: String, format_to_manifest_version: bool = true) -> Dictionary:
 		var cachevar : String = "%s:%s" % [file_path,format_to_manifest_version]
 		if not cachevar in cachedManifestKeys:
@@ -7324,49 +7369,7 @@ class _ManifestV2:
 					manifest_version = 1.0
 			manifest_data = cfg
 			if format_to_manifest_version:
-				var dict_template : Dictionary = {
-					"mod_information":{
-						"name":"",
-						"id":"",
-						"description":"",
-						"brief":"",
-						"author":"",
-						"credits":PoolStringArray()
-					},
-					"version":{
-						"version_major":1,
-						"version_minor":0,
-						"version_bugfix":0,
-						"version_metadata":"",
-						"version_string":"1.0.0"
-					},
-					"tags":{
-						
-					},
-					"links":{
-						
-					},
-					"configs":{
-						
-					},
-					"languages":{
-						
-					},
-					"library":{
-						"is_library":false,
-						"always_display":false,
-					},
-					"manifest_definitions":{
-						"manifest_version":1.0,
-						"dependancy_mod_ids":Array(),
-						"conflicting_mod_ids":Array(),
-						"complementary_mod_ids":Array(),
-						"manifest_url":"", # EXAMPLE: https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest
-						"changelog_path":"", # This is relative to the ModMain.gd file. EXAMPLE: for a file at 'res://Example Mod/data/folder/changelogs.txt', you would put 'data/folder/changelogs.txt'
-						"modlet_priority":0, # SPECIFIC TO MODLETS! The order at which the modlet would be loaded. Most modlets load before other mods, but this will affect load order within the list of installed modlets
-						"expected_manifest_path":"", # If set and used for a mod's manifest, the res:// filepath the manifest is expected to be at. If it isn't, prevents the mod from loading and closes the game.
-					}
-				}
+				var dict_template:Dictionary = base_manifest_template.duplicate(true)
 				var manifestKeys:Array = manifest_data.keys()
 				match manifest_version:
 					1.0:
