@@ -427,7 +427,7 @@ func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader) -
 		var regex3:RegEx=RegEx.new() # Checks for method casting
 		var regex4:RegEx=RegEx.new() # Checks for common signatures of memory-unsafe code
 #		regex.compile("\\b(?:var)\\s+\\w+\\K\\s*:\\s*(?!(?:%s)\\b)\\w+"%vanilla_classes)
-		var rpt:int=driver_dirs.size()+ignoreChars.size();
+		var rpt:int=driver_dirs.size()+ignoreChars.size()+3;
 		var compiler_A:String="\\b(?:var|\\-\\>)\\s+\\w+\\K\\s*:\\s*(?:%s)\\b"%clearlist
 		var compiler_B:String=clearlist
 		var compiler_C:String="(?:\\-\\>)\\s+(?:%s)\\b\\s*(?:\\:)"%clearlist

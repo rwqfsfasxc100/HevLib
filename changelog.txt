@@ -1,3 +1,7 @@
+[1.16.29]
+
+1=* Fixed issue with RegEx that would fail to properly detect type casts and wipe a script during load.
+
 [1.16.28]
 
 1=* Fixed errors being spammed in the engine logs during initialization
