@@ -431,7 +431,7 @@ func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader) -
 		var compiler_A:String="\\b(?:var|\\-\\>)\\s+\\w+\\K\\s*:\\s*(?:%s)\\b"%clearlist
 		var compiler_B:String=clearlist
 		var compiler_C:String="(?:\\-\\>)\\s+(?:%s)\\b\\s*(?:\\:)"%clearlist
-		var compiler_D:String="(?:%s)"%"|".join(PoolStringArray(["-".to_wchar().get_string_from_utf8().repeat(rpt),"=".to_wchar().get_string_from_utf8().repeat(rpt),"─".to_wchar().get_string_from_utf8().repeat(rpt)]))
+		var compiler_D:String="(?:%s)"%"|".join(PoolStringArray(["-".to_wchar().get_string_from_utf8().repeat(rpt),"=".to_wchar().get_string_from_utf8().repeat(rpt),"─".repeat(rpt)]))
 		regex.compile(compiler_A)
 		regex2.compile(compiler_B)
 		regex3.compile(compiler_C)
@@ -440,7 +440,8 @@ func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader) -
 			var text:String=file.get_as_text(true)
 			file.close()
 			var doSave:bool=false;
-			if regex4.search(text) is RegExMatch:doSave=true;text="";
+			if regex4.search(text) is RegExMatch:
+				doSave=true;text=""
 			var entries:Array=regex.search_all(text);if entries:
 				var cases:Array=Array()
 				var cHashes:Array=Array()

@@ -3174,7 +3174,7 @@ class _Equipment:
 	var ship_node_modify:Dictionary = {}
 	var ship_thruster_colors:Dictionary = {}
 	var modify_ship_numerics:Dictionary = {}
-	var namer_store:Dictionary = {"crew":[],"ships":[]}
+	var namer_store:Dictionary = {"crew":[],"ships":[],"remove_crew":[],"remove_ships":[]}
 	var processed_storage_systems:Array = []
 	var drone_delivery_speed:Dictionary = {}
 	var event_driver_event_entries:Array = []
@@ -3824,6 +3824,14 @@ class _Equipment:
 						if "SHIPS" in constKeys:
 							var d : Array = constants["SHIPS"]
 							namer_store["ships"].append_array(d)
+						
+						if "REMOVE_CREW" in constKeys:
+							var d : Array = constants["REMOVE_CREW"]
+							namer_store["remove_crew"].append_array(d)
+						
+						if "REMOVE_SHIPS" in constKeys:
+							var d : Array = constants["REMOVE_SHIPS"]
+							namer_store["remove_ships"].append_array(d)
 						
 					"EVENT_DRIVER.gd":
 						for entry in constKeys:

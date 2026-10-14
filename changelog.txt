@@ -1,3 +1,10 @@
+[1.16.27]
+
+1=* Added `REMOVE_CREW` and `REMOVE_SHIPS` constants to `NAMER.gd`
+1.1=* Formatted in the same way as the constants to add crew or ship names, any defined names that have exact matches from vanilla and processed names will be removed.
+1.2=* Crew type names do not need to define a gender identifier for the fourth index, and will wipe for any exact name.
+2=* Fixed broken RegEx that would fail to properly process type-casting for non-vanilla scripts
+
 [1.16.26]
 
 1=* Fixed issue that prevented `LOAD_RESOURCES` from loading non-scene resource types

@@ -39,19 +39,49 @@ func _ready():
 	hl_namerdriverhandler_uinit = true
 	var data:Dictionary = ModLoader._savedObjects[0].Equipment.namer_store
 	
+	var valid_ship_types:PoolStringArray = PoolStringArray(["en","verbatim"])
+	var valid_crew_types:PoolStringArray = PoolStringArray(["usa","verbatim"])
+	
 	# Hardcoded
 	data["crew"].append(["usa","Celine","Nguyen",0])
 	
 	for item in data["ships"]:
 		var iv = item[0]
-		if iv == "en" or iv == "verbatim":
+		if iv in valid_ship_types:
 			names["ship"][iv].append([item[1],item[2],0.5])
 	for item in data["crew"]:
 		var iv = item[0]
-		var gender = item[3]
-		if iv == "usa" or iv == "verbatim":
+		if iv in valid_crew_types:
+			var gender = item[3]
 			names["crew"][iv].append([item[1],item[2],gender])
 			if gender > 0:
 				names["male"][iv].append([item[1],item[2],gender])
 			if gender < 1:
 				names["female"][iv].append([item[1],item[2],gender])
+	for item in data["remove_ships"]:
+		var iv = item[0]
+		if iv in valid_ship_types:
+			var prefix = item[1]
+			var suffix = item[2]
+			var content = names["ship"][iv]
+			for i in content:
+				if i[0] == prefix and i[1] == suffix:
+					content.erase(i)
+					break
+	for item in data["remove_crew"]:
+		var iv = item[0]
+		if iv in valid_crew_types:
+			var first = item[1]
+			var last = item[2]
+			var content = names["crew"][iv]
+			if item.size() > 3:
+				var gender = item[3]
+				for i in content:
+					if i[0] == first and i[1] == last and i[2] == gender:
+						content.erase(i)
+						break
+			else:
+				for i in content:
+					if i[0] == first and i[1] == last:
+						content.erase(i)
+						break
