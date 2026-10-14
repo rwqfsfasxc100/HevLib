@@ -284,7 +284,6 @@ func process_gdnative_plugins() -> Dictionary:
 			directory.make_dir_recursive(exePath)
 			var libs_to_copy:Dictionary=Dictionary()
 			for entry in all_libraries:
-				configFile.clear()
 				configFile.load(entry)
 				var cfg_sections:Array=configFile.get_sections()
 				var data:Dictionary={}
@@ -336,6 +335,7 @@ func process_gdnative_plugins() -> Dictionary:
 				var bfr:PoolByteArray=file.get_buffer(file.get_len())
 				file.close()
 				fetchPaths[entry.substr(6)]=bfr
+				configFile.clear()
 		for f in fetch_folder_files(exePath):
 			if!f in existing_libs:
 				directory.remove(exePath.plus_file(f))
