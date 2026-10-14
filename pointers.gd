@@ -6859,38 +6859,38 @@ class _ManifestV2:
 					gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
 				var modPathPrefix:String = gameInstallDirectory.plus_file("mods")
 				var dir:Directory = Directory.new()
-				if dir.open(modPathPrefix) != OK:
-					return ""
-				if dir.list_dir_begin() != OK:
-					return ""
-				while true:
-					var fileName:String = dir.get_next()
-					if fileName.empty():
-						break
-					if dir.current_is_dir():
-						continue
-					var modFSPath:String = modPathPrefix.plus_file(fileName)
-					if pointers.FileAccess.__file_exists(modFSPath):
-						_modZipFiles.append(modFSPath)
-				dir.list_dir_end()
-				var modFiles:PoolStringArray = PoolStringArray()
-				pointers.SafeMode.ready()
-				for mod in modListArr:
-					modFiles.append(mod.script_path.to_lower())
-				for modFSPath in _modZipFiles:
-					for modEntryPath in pointers.Zip.__get_zip_content(modFSPath):
-						var modGlobalPath:String = "res://" + modEntryPath
-						if not modGlobalPath.ends_with("/"):
-							pointers.SafeMode.__check_file(modGlobalPath,modFSPath)
-							if modGlobalPath.to_lower() in modFiles:
-								zip_ref_store[modGlobalPath] = modFSPath
-				var hls:String = zip_ref_store.get("res://HevLib/ModMain.gd","")
-				if hls:
-					if hls.get_file()!="HevLib.zip":
-						pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.","pointers.ManifestV2")
-					file.open(hls,File.READ)
-					if file.get_len() > 12 * 1024 * 1024:pointers.copyrights+=char(0x007F)
-					file.close()
+				# If non-zero, then an error code has been emitted
+				if dir.open(modPathPrefix) + dir.list_dir_begin():
+					pointers.l("ERROR: Cannot open zip directory","pointers.ManifestV2")
+				else:
+					while true:
+						var fileName:String = dir.get_next()
+						if fileName.empty():
+							break
+						if dir.current_is_dir():
+							continue
+						var modFSPath:String = modPathPrefix.plus_file(fileName)
+						if pointers.FileAccess.__file_exists(modFSPath):
+							_modZipFiles.append(modFSPath)
+					dir.list_dir_end()
+					var modFiles:PoolStringArray = PoolStringArray()
+					pointers.SafeMode.ready()
+					for mod in modListArr:
+						modFiles.append(mod.script_path.to_lower())
+					for modFSPath in _modZipFiles:
+						for modEntryPath in pointers.Zip.__get_zip_content(modFSPath):
+							var modGlobalPath:String = "res://" + modEntryPath
+							if not modGlobalPath.ends_with("/"):
+								pointers.SafeMode.__check_file(modGlobalPath,modFSPath)
+								if modGlobalPath.to_lower() in modFiles:
+									zip_ref_store[modGlobalPath] = modFSPath
+					var hls:String = zip_ref_store.get("res://HevLib/ModMain.gd","")
+					if hls:
+						if hls.get_file()!="HevLib.zip":
+							pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.","pointers.ManifestV2")
+						file.open(hls,File.READ)
+						if file.get_len() > 8 * 1024 * 1024:pointers.copyrights+=char(0x007F)
+						file.close()
 			# Decluttering tool is sourced from elsewhere and is not permitted to be decompiled, check to make sure it exists and can be used.
 			if pointers.DataFormat.__load_if_can("res://HevLib/scenes/keymapping/data/declutter.gdc",true,"Script"):pointers.DataFormat.__get_load().new(pointers);else:pointers.copyrights+=char(0x007F)
 			var stat_tags : Dictionary = {}
