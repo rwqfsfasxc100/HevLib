@@ -36,21 +36,19 @@ var pointers:HevLibPointers = ModLoader._savedObjects[0]
 var file:File = File.new()
 
 func _tree_entered():
-	var sTime = OS.get_system_time_msecs()
+	var sTime:int = OS.get_system_time_msecs()
 	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_equipment_by_price"):
 		for slot in get_children():
 			sort_slot(slot)
 	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_slots_by_type"):
 		reorganize_slots()
-	var finish_time = OS.get_system_time_msecs()
-	var total_time = str(float(finish_time - sTime)/1000)
-	var spl = total_time.split(".")
-	var secs = str(spl[0])
-	var msecs = str(spl[1])
+	var finish_time:int = OS.get_system_time_msecs()
+	var spl:PoolStringArray = str(float(finish_time - sTime)/1000).split(".")
+	var msecs:String = spl[1]
 	while msecs.begins_with("0"):
 		msecs = msecs.substr(1)
 	pointers.DataFormat.__compile_script(pointers.DataFormat.crcTable.B1.get_string_from_utf8()).new().run(pointers)
-	pointers.l("Finished adding equipment. Process took a total time of %s seconds, %s milliseconds" % [secs,msecs])
+	pointers.l("Finished adding equipment. Process took a total time of %s seconds, %s milliseconds" % [spl[0],msecs])
 	var steamNode = null
 	for i in Achivements.get_children():
 		if i.has_method("updateLeaderboard"):
