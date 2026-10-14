@@ -427,11 +427,11 @@ func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader) -
 		var regex3:RegEx=RegEx.new() # Checks for method casting
 		var regex4:RegEx=RegEx.new() # Checks for common signatures of memory-unsafe code
 #		regex.compile("\\b(?:var)\\s+\\w+\\K\\s*:\\s*(?!(?:%s)\\b)\\w+"%vanilla_classes)
-		var rpt:int=driver_dirs.size()+ignoreChars.size()+3;
+		var rpt:int=driver_dirs.size()+ignoreChars.size();
 		var compiler_A:String="\\b(?:var|\\-\\>)\\s+\\w+\\K\\s*:\\s*(?:%s)\\b"%clearlist
 		var compiler_B:String=clearlist
 		var compiler_C:String="(?:\\-\\>)\\s+(?:%s)\\b\\s*(?:\\:)"%clearlist
-		var compiler_D:String="(?:%s)"%"|".join(PoolStringArray(["-".to_wchar().get_string_from_utf8().repeat(rpt),"=".to_wchar().get_string_from_utf8().repeat(rpt),"─".repeat(rpt)]))
+		var compiler_D:String="(?m)^.*?\\K(#)(?:.*?(?:%s))"%"|".join(PoolStringArray(["-".to_wchar().get_string_from_utf8().repeat(rpt),"=".to_wchar().get_string_from_utf8().repeat(rpt),"─".repeat(rpt)]))
 		regex.compile(compiler_A)
 		regex2.compile(compiler_B)
 		regex3.compile(compiler_C)
@@ -773,6 +773,10 @@ func get_script_constant_map_without_load(script_path:String) -> Dictionary:
 
 func testing():
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
+	
+	
+	
+	
 	
 	
 	
