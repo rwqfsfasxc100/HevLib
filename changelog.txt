@@ -7,6 +7,7 @@
 5=* DriverManagement will now no longer make blank driver entries for non-driver files in a driver folder
 6=* Fixed `FileAccess`.`__save_stex` not saving to the correct directory
 7=* ModMains without a directly associated manifest file will now recursively search upwards in the filesystem for another manifest that is likely associated with the same mod
+8=* Improved the time taken to add modded equipment to weaponslots
 
 [1.16.25]
 
