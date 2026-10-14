@@ -435,6 +435,7 @@ func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader) -
 		regex.compile(compiler_A)
 		regex2.compile(compiler_B)
 		regex3.compile(compiler_C)
+		regex4.compile(compiler_D)
 		for script in script_paths:
 			file.open("res://"+script,File.READ)
 			var text:String=file.get_as_text(true)

@@ -1,3 +1,7 @@
+[1.16.28]
+
+1=* Fixed errors being spammed in the engine logs during initialization
+
 [1.16.27]
 
 1=* Added `REMOVE_CREW` and `REMOVE_SHIPS` constants to `NAMER.gd`
