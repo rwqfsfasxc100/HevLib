@@ -54,8 +54,7 @@ func makeSureToUpdateShip():
 	if Tool.claim(ship):
 		Tool.release(ship)
 	else:
-		var logText = "Attempting to clear ship %s %s [%s] from the dealership due to ship error" % [transponder.text,shipName.text,hash(ship)]
-		pointers.l(logText,"ShipDriver")
+		pointers.l("Attempting to clear ship %s %s [%s] from the dealership due to ship error" % [transponder.text,shipName.text,hash(ship)],"ShipDriver")
 		Tool.remove(self)
 		if dealer:
 			dealer.addShips()

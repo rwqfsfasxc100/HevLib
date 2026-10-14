@@ -81,25 +81,24 @@ func hl_add_nodes_make_node_mods():
 	
 	var get_base_ship_fallback:bool = true
 	var fallback_ship = baseShipName
-	
-	if shipName in processed_ship_register:
+	var pkn:Array = processed_ship_register.keys()
+	if shipName in pkn:
 		n_store = processed_ship_register[shipName]["node_definitions"]
 		get_base_ship_fallback = n_store.get("fallback_to_base_ship",true)
 		fallback_ship = n_store.get("fallback_override",baseShipName)
 	if get_base_ship_fallback:
-		if fallback_ship and fallback_ship in processed_ship_register:
+		if fallback_ship and fallback_ship in pkn:
 			var datafetch:Dictionary = processed_ship_register[fallback_ship]["node_definitions"]
-			for obj in datafetch:
-				if processed_node_definitions[obj]["recurse_to_variants"]:
-					if not obj in n_store:
-						n_store[obj] = datafetch[obj]
+			for obj in datafetch.keys():
+				if processed_node_definitions[obj]["recurse_to_variants"] and not obj in n_store:
+					n_store[obj] = datafetch[obj]
 	
 	
 	var selfpath:NodePath = get_path()
 	var node_parent_path:NodePath = get_path_to(self)
 	var thisNode:NodePath = node_parent_path
 	
-	for object in n_store:
+	for object in n_store.keys():
 		var obj_data:Dictionary = n_store[object]
 		var node_data:Dictionary = processed_node_definitions[object]
 		
@@ -126,12 +125,13 @@ func hl_add_nodes_make_node_mods():
 				properties.append_array(obj_prop)
 			TYPE_DICTIONARY:
 				for p in obj_prop:
-					var dv = obj_prop[p]
-					dv.merge({"property":p})
+					var dv:Dictionary = obj_prop[p]
+					dv["property"] = p
 					properties.append(dv)
-		for p in obj_data.get("position_data",{}):
+		var obj_posdat:Dictionary = obj_data.get("position_data",{})
+		for p in obj_posdat.keys():
 			if not p in position_data:
-				position_data.merge({p:obj_data["position_data"][p]})
+				position_data[p] = obj_posdat[p]
 		var node_prop = node_data.get("properties",{})
 		match typeof(node_prop):
 			TYPE_ARRAY:
@@ -141,9 +141,10 @@ func hl_add_nodes_make_node_mods():
 					var dv = node_prop[p]
 					dv.merge({"property":p})
 					properties.append(dv)
-		for p in node_data.get("position_data",{}):
+		var node_posdat:Dictionary = node_data.get("position_data",{})
+		for p in node_posdat.keys():
 			if not p in position_data:
-				position_data.merge({p:node_data["position_data"][p]})
+				position_data[p] = node_posdat[p]
 		
 		var node:Node = node_data["node"].instance()
 		node.name = object
@@ -158,7 +159,7 @@ func hl_add_nodes_make_node_mods():
 					new_pos = npos
 					node.set_deferred("position",new_pos)
 				TYPE_VECTOR2_ARRAY:
-					if npos.size() >= 1:
+					if npos:
 						new_pos = npos[0]
 						node.set_deferred("position",new_pos)
 				TYPE_ARRAY, TYPE_INT_ARRAY, TYPE_REAL_ARRAY:
@@ -174,10 +175,11 @@ func hl_add_nodes_make_node_mods():
 			var nscale = position_data.get("scale")
 			match typeof(nscale):
 				TYPE_ARRAY, TYPE_RAW_ARRAY, TYPE_REAL_ARRAY, TYPE_INT_ARRAY:
-					if nscale.size() > 1:
-						node.set_deferred("scale",Vector2(nscale[0],nscale[1]))
-					elif nscale.size() == 1:
-						node.set_deferred("scale",Vector2(nscale[0],nscale[0]))
+					if nscale:
+						if nscale.size() > 1:
+							node.set_deferred("scale",Vector2(nscale[0],nscale[1]))
+						else:
+							node.set_deferred("scale",Vector2(nscale[0],nscale[0]))
 				TYPE_INT, TYPE_REAL:
 					node.set_deferred("scale",Vector2(nscale,nscale))
 				TYPE_VECTOR2:
@@ -253,7 +255,8 @@ func hl_add_nodes_make_node_mods():
 
 func hl_add_nodes_node_modify():
 	var modify_data:Dictionary = pointers_hl_addnodes.Equipment.ship_node_modify
-	if shipName != baseShipName and baseShipName in modify_data:
+	var moddatkeys:Array = modify_data.keys()
+	if shipName != baseShipName and baseShipName in moddatkeys:
 		for xd in modify_data[baseShipName]:
 			if pointers_hl_addnodes.ConfigDriver.__validate_dictionary(xd) and xd.get("recurse_to_variants",false):
 				var node:Node = get_node_or_null(xd.get("path","."))
@@ -263,12 +266,12 @@ func hl_add_nodes_node_modify():
 						node.set_deferred(property,xd.get("value",null))
 					else:
 						node.set(property,xd.get("value",null))
-	if shipName in modify_data:
+	if shipName in moddatkeys:
 		for xd in modify_data[shipName]:
 			if pointers_hl_addnodes.ConfigDriver.__validate_dictionary(xd):
 				var node = get_node_or_null(xd.get("path","."))
 				var value = xd.get("value",null)
-				var property = xd.get("property","null_value_to_ensure_that_this_fails_when_absent_lol_hi")
+				var property:String = xd.get("property","null_value_to_ensure_that_this_fails_when_absent_lol_hi")
 				if node and property in node:
 					if xd.get("defer",false):
 						node.set_deferred(property,value)
@@ -298,10 +301,11 @@ func hl_add_nodes_format_data(data, format):
 
 func hl_add_nodes_convert_arr_to_vec2(array:Array) -> Vector2:
 	var new_scale:Vector2 = Vector2.ZERO
-	if array.size() > 1:
-		new_scale = Vector2(float(array[0]),float(array[1]))
-	elif array.size() == 1:
-		new_scale = Vector2(float(array[0]),float(array[0]))
+	if array:
+		if array.size() > 1:
+			new_scale = Vector2(float(array[0]),float(array[1]))
+		else:
+			new_scale = Vector2(float(array[0]),float(array[0]))
 	return new_scale
 
 func hl_add_nodes_copy_property(path: String,property: String,method: String = ""):
@@ -325,7 +329,7 @@ func hl_add_nodes_center_to_ship(property,base_node,ignore_scaling = false,paren
 			pos.x = pos.x * (1/s.x)
 			pos.y = pos.y * (1/s.y)
 		true_position -= pos
-		positions.merge({"base_node":pos})
+		positions["base_node"] = pos
 	var parent:Node = get_node(parent_path)
 	while parent != null and parent != self:
 		var pos:Vector2 = parent.position
@@ -334,7 +338,7 @@ func hl_add_nodes_center_to_ship(property,base_node,ignore_scaling = false,paren
 			pos.x = pos.x * (1/s.x)
 			pos.y = pos.y * (1/s.y)
 		true_position -= pos
-		positions.merge({parent.name:pos})
+		positions[parent.name] = pos
 		parent = parent.get_parent()
 	var split:Array = Array(property.split("/"))
 	var iterations:int = split.size()
@@ -406,16 +410,15 @@ func hl_add_nodes_invert_scaling(node_path,base_node):
 func hl_add_nodes_process_ship_register(processed_node_definitions:Dictionary):
 	var file:File = File.new()
 	var pd:Dictionary = {}
-	var data:Array = pointers_hl_addnodes.Equipment.ship_node_register
 	
-	for object in data:
+	for object in pointers_hl_addnodes.Equipment.ship_node_register:
 		var obj_ship_name:String = object.get("ship_name","")
 		if obj_ship_name:
 			var obj_fallback_to_base_ship:bool = object.get("fallback_to_base_ship",true)
 			var obj_fallback_override:String = object.get("fallback_override",baseShipName)
 			var obj_node_definitions:Dictionary = object.get("node_definitions",{})
 			
-			if obj_ship_name in pd:
+			if obj_ship_name in pd.keys():
 				for definition in obj_node_definitions:
 					if definition in processed_node_definitions:
 						pd[obj_ship_name]["node_definitions"][definition] = obj_node_definitions[definition]
@@ -423,7 +426,7 @@ func hl_add_nodes_process_ship_register(processed_node_definitions:Dictionary):
 				var dictionary:Dictionary = {}
 				for definition in obj_node_definitions:
 					if definition in processed_node_definitions:
-							dictionary[definition] = obj_node_definitions[definition]
+						dictionary[definition] = obj_node_definitions[definition]
 				
 				pd[obj_ship_name] = {
 					"fallback_to_base_ship":obj_fallback_to_base_ship,
@@ -440,7 +443,7 @@ func hl_add_nodes_process_node_definitons():
 	var pd:Dictionary = {}
 	var data:Dictionary = pointers_hl_addnodes.Equipment.node_definitions_cache
 	
-	for module in data:
+	for module in data.keys():
 		var md:Dictionary = data[module]
 		if "path" in md:
 			var filepath:String = md["path"]

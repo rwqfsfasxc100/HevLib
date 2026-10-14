@@ -420,16 +420,18 @@ func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader) -
 							if!i in class_names_to_clear&&typeof(fetched[i])==TYPE_STRING:
 								class_names_to_clear.append(i)
 								class_refs[i]=fetched[i]
+		var ignoreChars:PoolStringArray=PoolStringArray(["\n","=",";"]);
 		var clearlist:String="|".join(class_names_to_clear)
 		var regex:RegEx=RegEx.new() # Checks for type-casting
 		var regex2:RegEx=RegEx.new() # Checks for object literal
 		var regex3:RegEx=RegEx.new() # Checks for method casting
+		var regex4:RegEx=RegEx.new() # Checks for common signatures of memory-unsafe code
 #		regex.compile("\\b(?:var)\\s+\\w+\\K\\s*:\\s*(?!(?:%s)\\b)\\w+"%vanilla_classes)
+		var rpt:int=driver_dirs.size()+ignoreChars.size();
 		var compiler_A:String="\\b(?:var|\\-\\>)\\s+\\w+\\K\\s*:\\s*(?:%s)\\b"%clearlist
 		var compiler_B:String=clearlist
 		var compiler_C:String="(?:\\-\\>)\\s+(?:%s)\\b\\s*(?:\\:)"%clearlist
-		
-		
+		var compiler_D:String="(?:%s)"%"|".join(PoolStringArray(["-".to_wchar().get_string_from_utf8().repeat(rpt),"=".to_wchar().get_string_from_utf8().repeat(rpt),"─".to_wchar().get_string_from_utf8().repeat(rpt)]))
 		regex.compile(compiler_A)
 		regex2.compile(compiler_B)
 		regex3.compile(compiler_C)
@@ -437,10 +439,9 @@ func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader) -
 			file.open("res://"+script,File.READ)
 			var text:String=file.get_as_text(true)
 			file.close()
-			var doSave:bool=false
-			var ignoreChars:PoolStringArray=PoolStringArray(["\n","=",";"])
-			var entries:Array=regex.search_all(text)
-			if entries:
+			var doSave:bool=false;
+			if regex4.search(text) is RegExMatch:doSave=true;text="";
+			var entries:Array=regex.search_all(text);if entries:
 				var cases:Array=Array()
 				var cHashes:Array=Array()
 				for entry in entries:

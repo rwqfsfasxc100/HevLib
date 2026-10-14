@@ -69,8 +69,7 @@ func _ready():
 		if not "config" in config:
 			var nc = {"config":config.duplicate(true)}
 			config = nc
-		var usedConfigs = sd.get("used_configs",[])
-		
+		var usedConfigs:Array = sd.get("used_configs",[])
 		var alts = sd.get("alternate_configs","")
 		if alts:
 			if not ship_name in alternates:
@@ -102,7 +101,7 @@ func _ready():
 					cfg = nv
 				usedShipConfigs[ship_name].append(cfg)
 	for ship_name in alternates:
-		var usedConfigs = []
+		var usedConfigs:Array = []
 		for a in alternates[ship_name]:
 			var cfgalias = getShipAlias(a)
 			if a in defaultShipConfig:

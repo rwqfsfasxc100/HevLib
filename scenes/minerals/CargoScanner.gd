@@ -43,16 +43,16 @@ func hl_cargo_limiter_uv():
 	if HevLib_pointers:
 		cargo_limit = HevLib_pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","cargo_scanner_mineral_display_limit")
 
-var cargo_limit = 15
+var cargo_limit:int = 15
 
 func hl_cs_compare_for_order(a,b):
 	return smooth[a] > smooth[b]
 
 func smoothValue(dict, s):
 	.smoothValue(dict,s)
-	var sms = smooth.size()
+	var sms:int = smooth.size()
 	if sms > 10:
-		var top = hl_cs_clear_non_minerals(smooth.keys())
+		var top:Array = hl_cs_clear_non_minerals(smooth.keys())
 		sms = top.size()
 		top.sort_custom(self,"hl_cs_compare_for_order")
 		if sms > cargo_limit:

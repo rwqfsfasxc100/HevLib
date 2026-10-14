@@ -92,28 +92,8 @@ func _ready():
 	mlist.horizontalSmoothScrollSpeed = 25
 	mlist.verticalSmoothScrollSpeed = 25
 	mlist._ready()
-#	mscroll = ScrollContainer.new()
-#
-#	var sysList = mechanic.get_node("ScrollContainer/CenterContainer/OMS")
-#	var cscd = sysList.cscd.duplicate(true)
-#	var damageLabelResource = sysList.damageLabelResource.duplicate(true)
-##	var toggleButton = sysList.toggleButton.duplicate(true)
-#
-#	mscroll.set_script(load(scroller_script_path))
-#	mscroll.rect_size = geo.rect_size
-#	mscroll.size_flags_vertical = SIZE_EXPAND_FILL
-#	mechanic.add_child(mscroll)
-#	var mlistSize = mlist.rect_size
-#	mechanic.remove_child(mlist)
-#	mlist.size_flags_vertical = SIZE_FILL
-#	mscroll.add_child(mlist)
-#	mlist.rect_min_size = mlistSize - Vector2(0,5)
-#	sysList.cscd = cscd.duplicate(true)
-#	sysList.damageLabelResource = damageLabelResource.duplicate(true)
-##	sysList.toggleButton = toggleButton.duplicate(true)
 	
 	operated = true
 func _process(delta):
 	if operated:
 		scroll.rect_size.y = mineral.rect_size.y + 20
-#		mscroll.rect_size.y = mlist.rect_size.y + 20
