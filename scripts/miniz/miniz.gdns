@@ -3,6 +3,6 @@
 [ext_resource path="res://HevLib/scripts/miniz/miniz.gdnlib" type="GDNativeLibrary" id=1]
 
 [resource]
-resource_name = "miniz"
-class_name = "ZipTools"
+resource_name = "MinizGodot"
+class_name = "MinizGodot"
 library = ExtResource( 1 )
