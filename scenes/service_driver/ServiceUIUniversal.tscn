@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://enceladus/ServiceUI.tscn" type="PackedScene" id=1]
+[ext_resource path="res://HevLib/scenes/service_driver/ServiceUIUniversal.gd" type="Script" id=2]
+
+[node name="ServiceUI" instance=ExtResource( 1 )]
+script = ExtResource( 2 )
+factionBased = ""
+fearPrice = 0.0
+hostilityPrice = 0.0
+insuranceGain = 0.0

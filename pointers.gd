@@ -2102,7 +2102,7 @@ class _DataFormat:
 		return returning_keys
 	static func l(text:String,header:String = "pointers.DataFormat"):
 		non_statics["pointers"].l(text,header)
-	
+	const accepted_vector_types = PoolIntArray([TYPE_INT,TYPE_REAL,TYPE_STRING])
 	static func __convert_arr_to_vec2arr(array: Array) -> PoolVector2Array:
 		var converted:PoolVector2Array = PoolVector2Array()
 		var size:int = int(floor(array.size() / 2.0))
@@ -2111,10 +2111,10 @@ class _DataFormat:
 			var index:int = r * 2
 			var aRaw = array[index]
 			var bRaw = array[index + 1]
-			if not (aRaw is float or aRaw is int or aRaw is String):
+			if not typeof(aRaw) in accepted_vector_types:
 				l("Cannot convert type [%s] for PoolVector2Array" % aRaw)
 				return converted
-			if not (bRaw is float or bRaw is int or bRaw is String):
+			if not typeof(bRaw) in accepted_vector_types:
 				l("Cannot convert type [%s] for PoolVector2Array" % bRaw)
 				return converted
 			converted[r] = Vector2(float(aRaw),float(bRaw))
@@ -3194,6 +3194,8 @@ class _Equipment:
 	var AUX_POWER_AND_THRUSTERS:Array = []
 	var WEAPONSLOT_ADD:Array = []
 	
+	var services_store:Array = []
+	
 	var research_store : Dictionary = {}
 	# END OF DATA STORAGE
 	
@@ -3230,7 +3232,6 @@ class _Equipment:
 				sys_slot = children[index].slot
 				index += 1
 			vanilla_slot_types[iname] = sys_slot
-		
 		var ws_default_templates : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
 		var ws_ship_templates : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
 		var ws_ship_templates_2 : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd").get_script_constant_map()
@@ -3255,9 +3256,9 @@ class _Equipment:
 		for i in ProjectSettings.get_property_list():
 			if i.name.begins_with("autoload/"):
 				var autoName = i.name.split("autoload/")[1]
-				AUTOLOAD_REF_STORE[autoName] = CurrentGame.get_node("/root/" + autoName);AUTOLOAD_REF_STORE[autoName].name+="_"
+				AUTOLOAD_REF_STORE[autoName] = CurrentGame.get_node("/root/" + autoName);AUTOLOAD_REF_STORE[autoName].name+=pointers.Math.__rand_string(32)
 		for i in pointers.Classes:
-			AUTOLOAD_REF_STORE["pointers." + i] = pointers.Classes[i]
+			AUTOLOAD_REF_STORE["pointers." + i]=pointers.Classes[i]
 		AUTOLOAD_REF_STORE["pointers"] = pointers
 		
 		for i in vanilla_equipment.keys():
@@ -3906,6 +3907,9 @@ class _Equipment:
 									states.append(item)
 								rpc_second_state_store[type].append_array(states)
 					
+					"SERVICES.gd":
+						for i in constants["SERVICES"]:
+							services_store.append(i)
 		
 		var all_slot_node_names : Array = []
 		all_slot_node_names.append_array(vanilla_slot_names)
@@ -6975,7 +6979,7 @@ class _ManifestV2:
 		return cached_mod_list.duplicate(true)
 	
 	static func __get_mod_list_keys() -> PoolStringArray:
-		if not cached_mod_keys:
+		if cached_mod_keys.empty():
 			__get_mod_data()
 		return cached_mod_keys
 	
@@ -8477,7 +8481,7 @@ class _Math:
 		var a:float = -sin(reflection_angle)
 		var b:float = cos(reflection_angle)
 		var c:float = -((a * angle_offset.x) + (b * angle_offset.y))
-		var t:float = (-2 * ((a * point.x) + (b * point.y) + c)) / ((a * a) + (b * b))
+		var t:float = (-2.0 * ((a * point.x) + (b * point.y) + c)) / ((a * a) + (b * b))
 		return Vector2(point.x + (a * t), point.y + (b * t)) / scale
 	
 	static func __mirror_vector_array(points:PoolVector2Array, reflection_angle:float = 0.0, use_degrees:bool = false, angle_offset:Vector2 = Vector2.ZERO, scale:Vector2 = Vector2.ONE) -> PoolVector2Array:
@@ -8485,6 +8489,19 @@ class _Math:
 			points[i] = __mirror_vector(points[i],reflection_angle,use_degrees,angle_offset,scale)
 		return points
 	
+	static func __rand_string(length:int = 16) -> String:
+		var rng:RandomNumberGenerator = RandomNumberGenerator.new()
+		rng.set_seed(randi())
+		rng.randomize()
+		var randsuffix:String = ""
+		for i in("%d"%rng.randi()).sha256_buffer():
+			randsuffix += char(i)
+		var buffer:PoolByteArray=randsuffix.sha256_text().to_wchar()
+		var bs:int = buffer.size()
+		var rand_string:String = ""
+		for i in length:
+			rand_string += char(buffer[i % bs])
+		return rand_string
 	
 
 class _NodeAccess:
@@ -9373,8 +9390,8 @@ class _Scripting:
 		non_static["http"] = h
 	
 	static func log_essential_info_for_bugreports():
-		var p = non_static["pointers"]
-		var out = "Booting from %s on %s[%s] as %s"%[OS.get_model_name(),OS.get_name(),OS.get_process_id(),OS.get_unique_id()]
+		var p:HevLibPointers = non_static["pointers"]
+		var out:String = "Booting from %s on %s[%s] as %s"%[OS.get_model_name(),OS.get_name(),OS.get_process_id(),OS.get_unique_id()]
 		out += "\nCPU Information: %s [%s cores]"%[OS.get_processor_name(),OS.get_processor_count()]
 		out += "\nBattery state (if any): %s/%s/%s"%[OS.get_power_percent_left(),OS.get_power_state(),OS.get_power_seconds_left()]
 		var screens = OS.get_screen_count()
@@ -9395,7 +9412,7 @@ class _Scripting:
 		p.l("Device Information: [\n%s\n]" % out)
 	
 	static func make_mineral_scripting() -> void:
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var mineralDir:String = "user://cache/.HevLib_Cache/Minerals/"
 		pointers.FolderAccess.__check_folder_exists(mineralDir)
 		for f in pointers.FolderAccess.__fetch_folder_files(mineralDir,true,true):
@@ -9408,7 +9425,7 @@ class _Scripting:
 			var dv:Dictionary = driver["drivers"]
 			if "ADD_MINERALS.gd" in dv:
 				var mineral_dict:Dictionary = dv["ADD_MINERALS.gd"]
-				for mineral in mineral_dict:
+				for mineral in mineral_dict.keys():
 					mineral_data.append(mineral_dict[mineral])
 		
 		# Initialize info for mineral names, colours, and value
@@ -9449,6 +9466,7 @@ class _Scripting:
 		# Initialize and create ore chunk additions
 		var mineral_list:Dictionary = {}
 		for mineral in mineral_data:
+			var mineral_keys:Array = mineral.keys()
 			var mname:String = mineral["name"]
 			var handle:String = mineral.get("handle","none")
 			var price:float = mineral.get("price",0.0)
@@ -9471,19 +9489,19 @@ class _Scripting:
 					"recolor":
 						var base:String = "fe"
 						var info:Dictionary = {}
-						if "color" in mineral:
+						if "color" in mineral_keys:
 							info["color"] = mineral["color"]
-						if "filler" in mineral:
+						if "filler" in mineral_keys:
 							info["filler"] = mineral["filler"]
-						if "mass" in mineral:
+						if "mass" in mineral_keys:
 							info["mass"] = mineral["mass"]
-						if "min_scale" in mineral:
+						if "min_scale" in mineral_keys:
 							info["min_scale"] = mineral["min_scale"]
-						if "max_scale" in mineral:
+						if "max_scale" in mineral_keys:
 							info["max_scale"] = mineral["max_scale"]
-						if "purity" in mineral:
+						if "purity" in mineral_keys:
 							info["purity"] = mineral["purity"]
-						if "specific_ore_data" in mineral:
+						if "specific_ore_data" in mineral_keys:
 							info["specific_ore_data"] = mineral["specific_ore_data"]
 						match mineral.get("base",base).to_lower():
 							"fe","iron":
@@ -9527,50 +9545,50 @@ class _Scripting:
 						var roc:Array = []
 						pointers.FolderAccess.__check_folder_exists(folder)
 						for i in 7:
-							var id:int = i + 1
+							i += 1
 							var cl:Color = color
 							var ms = mass
 							var fm = filler_mineral
 							var mns = min_scale
 							var mxs = max_scale
 							var fr:bool = ferrous
-							var fn:String = folder + "h%s.tscn" % id
-							var data:String = header % [info["base"],id] + content
-							if id in specific_data:
-								var idx = specific_data[id]
-								if "color" in idx:
+							var fn:String = folder + "h%s.tscn" % i
+							var data:String = header % [info["base"],i] + content
+							if i in specific_data:
+								var idx:Dictionary = specific_data[i]
+								var idks:Array = idx.keys()
+								if "color" in idks:
 									cl = idx["color"]
-								if "mass" in idx:
+								if "mass" in idks:
 									ms = idx["mass"]
-								if "filler" in idx:
+								if "filler" in idks:
 									fm = idx["filler"]
-								if "min_scale" in idx:
+								if "min_scale" in idks:
 									mns = idx["min_scale"]
-								if "max_scale" in idx:
+								if "max_scale" in idks:
 									mxs = idx["max_scale"]
-								if "ferrous" in idx:
+								if "ferrous" in idks:
 									fr = idx["ferrous"]
 							data += "\ncolor = Color( %s, %s, %s, 1 )" % [cl.r,cl.g,cl.b]
 							if ms:
-								data += "\nmass = %s" % str(ms)
+								data += "\nmass = %f" % ms
 							if fm:
 								data += "\nfiller = \"%s\"" % fm
 							if mns:
-								data += "\nscaleMin = %s" % str(mns)
+								data += "\nscaleMin = %f" % mns
 							if mxs:
-								data += "\nscaleMax = %s" % str(mxs)
+								data += "\nscaleMax = %f" % mxs
 							if fr:
 								data += "\nferrous = true"
-							if id in purityInfo:
-								data += "\npurity = %s" % str(purityInfo[id])
+							if i in purityInfo:
+								data += "\npurity = %f" % purityInfo[i]
 							file.open(fn,File.WRITE)
 							file.store_string(data)
 							file.close()
 							roc.append(fn)
-						var mh = "[\n"
+						var mh:String = "[\n"
 						for i in 7:
-							var mn = roc[i]
-							mh += "load(\"%s\"),\n" % mn
+							mh += "load(\"%s\"),\n" % roc[i]
 						mh += "]"
 						mineral_list[mname] = mh
 						pointers.l("adding mineral %s using handler [recolor]" % mname,"pointers.Scripting")
@@ -9580,7 +9598,7 @@ class _Scripting:
 						pointers.l("mineral %s using incorrect handler, set price to 0.0 or less to prevent being registered to exist in the ring or crashes may happen" % mineral,"pointers.Scripting")
 			else:
 				pointers.l("adding only color references for mineral %s, value set to zero or below" % mineral,"pointers.Scripting")
-		var content = "extends \"res://AsteroidSpawner.gd\"\nfunc _init():\n\tpass"
+		var content:String = "extends \"res://AsteroidSpawner.gd\"\nfunc _init():\n\tpass"
 		for m in mineral_list:
 			content += "\n\tif not \"%s\" in %s:\n\t\t%s[\"%s\"] = %s" % [m,"objectClass[objectClass.size() - 1]","objectClass[objectClass.size() - 1]",m,mineral_list[m]]
 		
