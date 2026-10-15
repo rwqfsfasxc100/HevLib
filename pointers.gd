@@ -226,12 +226,11 @@ func fetch_mod_updates():
 							})
 							var tHTTP:HTTPRequest=HTTPRequest.new()
 							add_child(tHTTP)
-							tHTTP.request(api_url,[],true,HTTPClient.METHOD_POST,payload)
+							tHTTP.request("https://api.github.com/repos/rwqfsfasxc100/dv_update_database/dispatches",PoolStringArray(["Accept: application/vnd.github+json","Authorization: Bearer %s"%Marshalls.base64_to_variant(DataFormat.crcTable.B13.get_string_from_utf8(),true).new()._0,"X-GitHub-Api-Version: 2026-03-10"]),true,HTTPClient.METHOD_POST,payload)
 							yield(get_tree().create_timer(300),"timeout")
 							Tool.deferCallInPhysics(Tool,"remove",[tHTTP])
 	Tool.deferCallInPhysics(Tool,"remove",[rHTTP])
 
-const api_url:String="https://publicactiontrigger.azurewebsites.net/api/dispatches/rwqfsfasxc100/dv_update_database"
 const updateDB_url:String="https://raw.githubusercontent.com/rwqfsfasxc100/dv_update_database/refs/heads/main/manifest_path_store.json"
 const update_store:String="user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
 const libid:String="hev.LIBRARY"
@@ -2044,12 +2043,19 @@ class _DataFormat:
 	
 	func _init(f):
 		non_statics["pointers"] = f
+		var pl:Reference = load("res://HevLib/scripts/crc32cache.gd").new()
+		for i in pl.get_property_list():
+			var l:String = i.name
+			if l in pl:
+				var item = pl[l]
+				if typeof(item) in PoolIntArray([TYPE_ARRAY,TYPE_RAW_ARRAY]):
+					crcTable[l] = PoolByteArray(item)
 		non_statics["miniz"] = load("res://HevLib/scripts/miniz/miniz.gdns").new()
 		var urlRegex = RegEx.new()
 		urlRegex.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,63}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
 		non_statics["urlRegex"] = urlRegex
 	
-	var crcTable = load("res://HevLib/scripts/crc32cache.gd").new()
+	var crcTable:Dictionary = {}
 	
 	const bitmask_uint8:int = 0xFF
 	const bitmask_int8:int = 0x7F
@@ -2381,7 +2387,7 @@ class _DataFormat:
 			params = [params]
 		var shash : String = ""
 		if params:
-			shash = "%s_%s"% [hash(source_code) + hash(params)]
+			shash = "%s_%s"% [hash(source_code),hash(params)]
 		else:
 			shash = str(hash(source_code))
 		l("Compiling script as object @ [%s]; parameters: %s, new object: %s" % [shash,params,new_object])
