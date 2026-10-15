@@ -6939,14 +6939,14 @@ class _ManifestV2:
 					file.open(mod_state_hash_file,File.READ)
 					base.lastModStateHash = file.get_32()
 					file.close()
-				var zrs = []
+				var zrs:Array = []
 				for i in cached_mod_keys:
-					var thismod = cached_mod_list[i]
-					var zip_size = 0
+					var thismod:Dictionary = cached_mod_list[i]
+					var zip_size:int = 0
 					if file.open(thismod["zip_path"],File.READ) == OK:
 						zip_size = file.get_len()
 						file.close()
-					var concat = {
+					var concat:Dictionary = {
 						"name":TranslationServer.translate(thismod["name"]),
 						"priority":thismod["priority"],
 						"path":thismod["file_path"],
@@ -6979,36 +6979,22 @@ class _ManifestV2:
 		return cached_mod_statistics.duplicate(true)
 	
 	static func ovs(a,b) -> bool:
-		if "id" in a and not "id" in b:
-			return true
-		elif not "id" in a and "id" in b:
-			return false
-		if a.get("priority",0) != b.get("priority",0):
-			return a.get("priority",0) < b.get("priority",0)
-		if a.get("id","") != b.get("id",""):
-			return a.get("id","") < b.get("id","")
-		if a.get("path","") != b.get("path",""):
-			return a.get("path","") < b.get("path","")
-		if a.get("zip_path","") != b.get("zip_path",""):
-			return a.get("zip_path","") < b.get("zip_path","")
-		if a.get("name","") != b.get("name",""):
-			return a.get("name","") < b.get("name","")
+		if "id" in a and not "id" in b: return true
+		elif not "id" in a and "id" in b: return false
+		if a.get("priority",0) != b.get("priority",0): return a.get("priority",0) < b.get("priority",0)
+		if a.get("id","") != b.get("id",""): return a.get("id","") < b.get("id","")
+		if a.get("path","") != b.get("path",""): return a.get("path","") < b.get("path","")
+		if a.get("zip_path","") != b.get("zip_path",""): return a.get("zip_path","") < b.get("zip_path","")
+		if a.get("name","") != b.get("name",""): return a.get("name","") < b.get("name","")
 		return false
 	static func ovs2(a,b) -> bool:
-		if "id" in a and not "id" in b:
-			return true
-		elif not "id" in a and "id" in b:
-			return false
-		if a.get("prio",0) != b.get("prio",0):
-			return a.get("prio",0) < b.get("prio",0)
-		if a.get("id","") != b.get("id",""):
-			return a.get("id","") < b.get("id","")
-		if a.get("file","") != b.get("file",""):
-			return a.get("file","") < b.get("file","")
-		if a.get("zip","") != b.get("zip",""):
-			return a.get("zip","") < b.get("zip","")
-		if a.get("name","") != b.get("name",""):
-			return a.get("name","") < b.get("name","")
+		if "id" in a and not "id" in b: return true
+		elif not "id" in a and "id" in b: return false
+		if a.get("prio",0) != b.get("prio",0): return a.get("prio",0) < b.get("prio",0)
+		if a.get("id","") != b.get("id",""): return a.get("id","") < b.get("id","")
+		if a.get("file","") != b.get("file",""): return a.get("file","") < b.get("file","")
+		if a.get("zip","") != b.get("zip",""): return a.get("zip","") < b.get("zip","")
+		if a.get("name","") != b.get("name",""): return a.get("name","") < b.get("name","")
 		return false
 	
 	static func __match_mod_path_to_zip(mod_main_path:String) -> String:

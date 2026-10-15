@@ -1,3 +1,10 @@
+[1.16.32]
+
+1=* Further sanitized recursed manifest fetching, now only fetches the `mod_information`, `version`, `library` sections, and the manifest version
+2=* Mapped libraries now will always be copied regardless of the file already existing on file to ensure that updated libraries would be properly copied
+3=* Fixed issue with the zip fetching portion of mod data collection causing a preemptive return
+4=* Reduced file size of the miniz GDNative plugin by removing unused Godot bindings
+
 [1.16.31]
 
 1=* Recursively fetched manifests now sanitize all configs from the fetched manifest
