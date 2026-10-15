@@ -621,8 +621,8 @@ var crc_table_31:Array=crcTables.T31
 func get_crc_32(bytes:PoolByteArray) -> int:
 	var crc:int=0xFFFFFFFF;var size:int=bytes.size();var groups:float=floor(size/32.0);var i:int=0
 	for g in groups:
-		# Rare me splitting a variable that isn't an array||dictionary between lines.
-		# Impossible to read&&work on otherwise so enjoy the readable code while you can:P
+		# Rare me splitting a variable that isn't an array or dictionary between lines.
+		# Impossible to read and work on otherwise so enjoy the readable code while you can:P
 		crc=(
 			crc_table_31[(crc&0xFF)^bytes[i]]^
 			crc_table_30[((crc>>8)&0xFF)^bytes[i+1]]^
@@ -664,21 +664,20 @@ func fetch_folder_files(folder:String,showFolders:bool=false,returnFullPath:bool
 	var fileList:PoolStringArray=PoolStringArray()
 	if!folder.ends_with("/"):folder+="/"
 	if!directory.dir_exists(folder):return fileList
-	directory.open(folder)
-	directory.list_dir_begin(true)
-	while true:
-		var fileName:String=directory.get_next()
-		if!(fileName.ends_with("/")||fileName=="."||fileName==".."):
-			if!fileName:break
-			if directory.current_is_dir():
-				if!showFolders:continue
-				if!fileName.ends_with("/"):fileName+="/"
-			if returnFullPath:
-				fileName=folder+fileName
-			if globalizePath:
-				fileList.append(ProjectSettings.globalize_path(fileName))
-			else:
-				fileList.append(fileName)
+	if!(directory.open(folder)+directory.list_dir_begin(true)):
+		while true:
+			var fileName:String=directory.get_next()
+			if!(fileName.ends_with("/")||fileName=="."||fileName==".."):
+				if!fileName:break
+				if directory.current_is_dir():
+					if!showFolders:continue
+					if!fileName.ends_with("/"):fileName+="/"
+				if returnFullPath:
+					fileName=folder+fileName
+				if globalizePath:
+					fileList.append(ProjectSettings.globalize_path(fileName))
+				else:
+					fileList.append(fileName)
 	return fileList
 func file_exists(file_path):
 	return file.file_exists(file_path)||ResourceLoader.exists(file_path)
@@ -768,8 +767,6 @@ func get_script_constant_map_without_load(script_path:String) -> Dictionary:
 
 func testing():
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
-	
-	
 	
 	
 	

@@ -7107,8 +7107,12 @@ class _ManifestV2:
 						var content_file:String = tcDir.plus_file(file)
 						has_mod_manifest = true
 						manifest_filepath = content_file
-						manifest_data = __parse_file_as_manifest(content_file)
-						manifest_data["configs"].clear()
+						manifest_data = base_manifest_template.duplicate(true)
+						var new_manifest_data = __parse_file_as_manifest(content_file)
+						manifest_data["mod_information"] = new_manifest_data["mod_information"]
+						manifest_data["version"] = new_manifest_data["version"]
+						manifest_data["library"] = new_manifest_data["library"]
+						manifest_data["manifest_definitions"]["manifest_version"] = new_manifest_data["manifest_definitions"]["manifest_version"]
 						manifest_data.mod_information.brief = ""
 						legacy_mod_version = manifest_data["version"].get("version_string",legacy_mod_version)
 						mod_version_major = manifest_data["version"].get("version_major",mod_version_major)
