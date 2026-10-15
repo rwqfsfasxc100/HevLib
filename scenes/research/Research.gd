@@ -73,7 +73,7 @@ func hide():
 	if lastFocus:
 		lastFocus.grab_focus()
 	rpc.loader_changed("enceladus_prime",0,"")
-var pointers
+var pointers:HevLibPointers
 func _ready():
 	pointers = ModLoader._savedObjects[0]
 	visible = false
@@ -83,7 +83,7 @@ func _ready():
 	current_project_management.current_mod_ids = mod_ids
 	dormant_project_management.current_mod_ids = mod_ids
 	var research_store = pointers.Equipment.research_store
-	var researchEnabled = research_store.empty()
+	var researchEnabled = research_store.empty() and pointers.is_editor
 	CurrentGame.hl_research_enabled = researchEnabled
 	if researchEnabled:
 		research_button.get_parent().remove_child(research_button)
