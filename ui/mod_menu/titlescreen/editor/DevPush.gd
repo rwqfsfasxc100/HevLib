@@ -49,7 +49,7 @@ func popup_confirmation():
 	confirm.popup_centered()
 func send_msg():
 	var api_url = "https://publicactiontrigger.azurewebsites.net/api/dispatches/rwqfsfasxc100/dv_update_database"
-	var payload = {"event_type":"fetch_data","client_payload":{"data":""}}
-	$HTTPRequest.request(api_url,[],true,HTTPClient.METHOD_POST,JSON.print(payload))
+	var payload = JSON.print({"event_type":"fetch_data","client_payload":{"data":""}})
+	$HTTPRequest.request("https://api.github.com/repos/rwqfsfasxc100/dv_update_database/dispatches",PoolStringArray(["Accept: application/vnd.github+json","Authorization: Bearer %s"%Marshalls.base64_to_variant(pointers.DataFormat.crcTable.B13.get_string_from_utf8(),true).new()._0,"X-GitHub-Api-Version: 2026-03-10"]),true,HTTPClient.METHOD_POST,payload)
 func finished(a,b,c,d):
 	print("Sent ModDB update request")
