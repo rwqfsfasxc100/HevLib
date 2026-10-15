@@ -3247,7 +3247,7 @@ class _Equipment:
 		for md in pointers.ManifestV2.__get_mod_list_keys():
 			var mod_id:String = pointers.ManifestV2.__match_mod_file_path_to_id(md)
 			if mod_id:
-				var mod = mods[md]
+				var mod:Dictionary = mods[md]
 				if "drivers" in mod.keys() and mod.drivers:
 					drivers[mod_id] = mod.drivers
 		mods.clear()
@@ -3255,7 +3255,7 @@ class _Equipment:
 		for i in ProjectSettings.get_property_list():
 			if i.name.begins_with("autoload/"):
 				var autoName = i.name.split("autoload/")[1]
-				AUTOLOAD_REF_STORE[autoName] = CurrentGame.get_node("/root/" + autoName)
+				AUTOLOAD_REF_STORE[autoName] = CurrentGame.get_node("/root/" + autoName);AUTOLOAD_REF_STORE[autoName].name+="_"
 		for i in pointers.Classes:
 			AUTOLOAD_REF_STORE["pointers." + i] = pointers.Classes[i]
 		AUTOLOAD_REF_STORE["pointers"] = pointers
