@@ -1,6 +1,6 @@
 [1.16.33]
 
-1=* Fixed `__compile_script_object` not properly storing a hashed object when provided with parameters
+1=* Fixed `DataFormat`.`__compile_script_object` not properly storing a hashed object when provided with parameters
 2=* Fixed unfinished research showing up in release builds
 
 [1.16.32]
