@@ -8117,24 +8117,18 @@ class _ManifestV2:
 			for i in preprocess_paths:
 				match typeof(i):
 					TYPE_STRING:
-						match i.get_extension():
-							"gd":
-								var ed:String = ""
-								file.open(i,File.READ)
-								var data:String = file.get_as_text(true)
-								file.close()
-								if "extends \"" in data:
-									for line in data.split("\n"):
-										if line.strip_edges().begins_with("extends \""):
-											ed = line.split("\"")[1]
-											break
-								resource_paths.append({"path":i,"mode":LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed})
-							"tscn":
-								resource_paths.append({"path":i,"mode":LOAD_TYPE.REPLACE_RESOURCE,"extra_data":("res:/" + i.split("res://HevLib/scenes/equipment")[1])})
+						var ed:String = ""
+						file.open(i,File.READ)
+						var data:String = file.get_as_text(true)
+						file.close()
+						if "extends \"" in data:
+							for line in data.split("\n"):
+								if line.strip_edges().begins_with("extends \""):
+									ed = line.split("\"")[1]
+									break
+						resource_paths.append({"path":i,"mode":LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed})
 					TYPE_STRING_ARRAY:
-						var ir:String = i[0]
-						if ir.get_extension() == "tscn":
-							resource_paths.append({"path":ir if (ir.begins_with("res://")) else ("res://HevLib/scenes/equipment" + ("" if (ir.begins_with("/")) else "/") + ir),"mode":LOAD_TYPE.REPLACE_RESOURCE,"extra_data":i[1]})
+						resource_paths.append({"path":i[0],"mode":LOAD_TYPE.REPLACE_RESOURCE,"extra_data":i[1]})
 				
 			for modlet in __get_modlet_files():
 				var drivers:Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(modlet)
