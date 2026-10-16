@@ -36,7 +36,7 @@ func _ready():
 				panel.storyMax = max(item.get("story_flag_max",-1),-1)
 				panel.storyHide = item.get("story_flag_hide",false)
 				panel.disabledColor = item.get("disabled_color",Color(0.5,0.5,0.5,1.0))
-				panel.disabledColor.a = 1
+				panel.disabledColor.a = 1.0
 				panel.buyOnView = item.get("buy_on_view",false)
 				panel.factionBased = item.get("faction_based","")
 				panel.fearPrice = max(item.get("fear_price",0.0),0.0)
@@ -51,9 +51,11 @@ func _ready():
 				var camera_rotation:float = deg2rad(cam_data.get("rotation",0.0))
 				camera_node.rotation = camera_rotation
 				camera_node.scale = cam_data.get("scale",Vector2.ONE)
-				for sign_panel in item.get("signs",[]):
+				var signs:Array = item.get("signs",[])
+				for idx in signs.size():
+					var sign_panel:Dictionary = signs[idx]
 					var sprite_node:Sprite = Sprite.new()
-					sprite_node.name = item_name + "_sprite"
+					sprite_node.name = item_name + "_sprite%d" % idx
 					sprite_node.set_script(flicker_script)
 					sprite_node.texture = pointers.FileAccess.__load_png(sign_panel.get("sprite",""))
 					sprite_node.position = camera_pos + sign_panel.get("position_offset",Vector2.ZERO)
@@ -62,7 +64,7 @@ func _ready():
 					sprite_node.flicker = sign_panel.get("flicker",0.2)
 					sprite_node.flickerBase = sign_panel.get("flicker_base",0.15)
 					sprite_node.modulate = sign_panel.get("color",Color.white)
-					sprite_node.modulate.a = 1
+					sprite_node.modulate.a = 1.0
 					var light_node:Light2D = Light2D.new()
 					light_node.texture = pointers.FileAccess.__load_png(sign_panel.get("light",""))
 					light_node.color = sign_panel.get("light_color",Color.white)
