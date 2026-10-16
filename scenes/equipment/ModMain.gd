@@ -281,47 +281,46 @@ func process_gdnative_plugins() -> Dictionary:
 		var existing_libs:PoolStringArray=PoolStringArray()
 		var lib_resave:Dictionary=Dictionary()
 		var configFile:ConfigFile=ConfigFile.new()
-		if all_libraries:
-			directory.make_dir_recursive(exePath)
-			var libs_to_copy:Dictionary=Dictionary()
-			for entry in all_libraries:
-				configFile.load(entry)
-				var cfg_sections:Array=configFile.get_sections()
-				var data:Dictionary={}
-				for section in cfg_sections:
-					var dta:Dictionary={}
-					for key in configFile.get_section_keys(section):
-						dta[key]=configFile.get_value(section,key)
-					data[section]=dta
-				if"entry"in data:
-					for oper in data["entry"]:
-						var lib_path:String=data["entry"][oper]
+		directory.make_dir_recursive(exePath)
+		var libs_to_copy:Dictionary=Dictionary()
+		for entry in all_libraries:
+			configFile.load(entry)
+			var cfg_sections:Array=configFile.get_sections()
+			var data:Dictionary={}
+			for section in cfg_sections:
+				var dta:Dictionary={}
+				for key in configFile.get_section_keys(section):
+					dta[key]=configFile.get_value(section,key)
+				data[section]=dta
+			if"entry"in data:
+				for oper in data["entry"]:
+					var lib_path:String=data["entry"][oper]
+					var new_path:String=exePath+lib_path.get_file()
+					if file_exists(lib_path):
+						file.open(lib_path,File.READ)
+						libs_to_copy[new_path]=file.get_buffer(file.get_len())
+						file.close()
+						data["entry"][oper]=new_path
+						existing_libs.append(new_path.get_file())
+			if"dependencies"in data:
+				for oper in data["dependencies"]:
+					var lib_paths:Array=data["dependencies"][oper]
+					for lbr in lib_paths.size():
+						var lib_path:String=lib_paths[lbr]
 						var new_path:String=exePath+lib_path.get_file()
 						if file_exists(lib_path):
 							file.open(lib_path,File.READ)
 							libs_to_copy[new_path]=file.get_buffer(file.get_len())
 							file.close()
-							data["entry"][oper]=new_path
+							lib_paths[lbr]=new_path
 							existing_libs.append(new_path.get_file())
-				if"dependencies"in data:
-					for oper in data["dependencies"]:
-						var lib_paths:Array=data["dependencies"][oper]
-						for lbr in lib_paths.size():
-							var lib_path:String=lib_paths[lbr]
-							var new_path:String=exePath+lib_path.get_file()
-							if file_exists(lib_path):
-								file.open(lib_path,File.READ)
-								libs_to_copy[new_path]=file.get_buffer(file.get_len())
-								file.close()
-								lib_paths[lbr]=new_path
-								existing_libs.append(new_path.get_file())
-						data["dependencies"][oper]=lib_paths
-				lib_resave[entry]=data
-				for f in libs_to_copy:
-					file.open(f,File.WRITE)
-					file.store_buffer(libs_to_copy[f])
-					file.close()
-				copied_files.append_array(libs_to_copy.keys())
+					data["dependencies"][oper]=lib_paths
+			lib_resave[entry]=data
+			for f in libs_to_copy:
+				file.open(f,File.WRITE)
+				file.store_buffer(libs_to_copy[f])
+				file.close()
+			copied_files.append_array(libs_to_copy.keys())
 		if lib_resave:
 			for entry in lib_resave:
 				var data:Dictionary=lib_resave[entry]

@@ -4940,11 +4940,9 @@ class _Equipment:
 		return nozzle
 	
 	func set_array_to_vector_or_rect(main,setter):
-		var maintype = typeof(main)
-		var settertype = typeof(setter)
-		match settertype:
+		match typeof(setter):
 			TYPE_ARRAY,TYPE_REAL_ARRAY,TYPE_INT_ARRAY:
-				match maintype:
+				match typeof(main):
 					TYPE_VECTOR2:
 						return Vector2(setter[0],setter[1])
 					TYPE_VECTOR3:
@@ -4954,8 +4952,8 @@ class _Equipment:
 		return setter
 	
 	func match_array_to_vector_or_rect(main,setter) -> bool:
-		var maintype = typeof(main)
-		var settertype = typeof(setter)
+		var maintype:int = typeof(main)
+		var settertype:int = typeof(setter)
 		match maintype:
 			TYPE_VECTOR2:
 				match settertype:
@@ -5580,23 +5578,25 @@ class _FileAccess:
 	static func __load_png(path,fallback:Image = Image.new()) -> Texture:
 		var file:File = File.new()
 		file.open(path, File.READ)
-		var bytes:PoolByteArray = file.get_buffer(file.get_len())
-		file.close()
-		if bytes.subarray(0,3) == STEX_HEADER:
+		var header:PoolByteArray = file.get_buffer(12)
+		file.seek(0)
+		if header.subarray(0,3) == STEX_HEADER:
+			file.close()
 			var stex:StreamTexture = StreamTexture.new()
 			stex.load_path = path
 			return stex
 		else:
 			var img:Image = Image.new()
 			var loaded:bool = false
-			if bytes.subarray(0,7) == PNG_HEADER:
-				loaded = img.load_png_from_buffer(bytes) == OK
-			elif bytes.subarray(0,3) in JPG_HEADERS:
-				loaded = img.load_jpg_from_buffer(bytes) == OK
-			elif bytes.subarray(0,1) == BMP_HEADER:
-				loaded = img.load_bmp_from_buffer(bytes) == OK
-			elif bytes.subarray(0,3) == WEBP_HEADERS[0] and bytes.subarray(8,11) == WEBP_HEADERS[1]:
-				loaded = img.load_webp_from_buffer(bytes) == OK
+			if header.subarray(0,7) == PNG_HEADER:
+				loaded = img.load_png_from_buffer(file.get_buffer(file.get_len())) == OK
+			elif header.subarray(0,3) in JPG_HEADERS:
+				loaded = img.load_jpg_from_buffer(file.get_buffer(file.get_len())) == OK
+			elif header.subarray(0,1) == BMP_HEADER:
+				loaded = img.load_bmp_from_buffer(file.get_buffer(file.get_len())) == OK
+			elif header.subarray(0,3) == WEBP_HEADERS[0] and header.subarray(8,11) == WEBP_HEADERS[1]:
+				loaded = img.load_webp_from_buffer(file.get_buffer(file.get_len())) == OK
+			file.close()
 			if not loaded:
 				img = fallback
 			var imgtex:ImageTexture = ImageTexture.new()
