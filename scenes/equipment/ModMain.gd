@@ -321,24 +321,23 @@ func process_gdnative_plugins() -> Dictionary:
 				file.store_buffer(libs_to_copy[f])
 				file.close()
 			copied_files.append_array(libs_to_copy.keys())
-		if lib_resave:
-			for entry in lib_resave:
-				var data:Dictionary=lib_resave[entry]
-				var savePath="user://cache/.HevLib_Cache/Variable_Fetch/%d.gdnlib"%Time.get_ticks_usec()
-				configFile.clear()
-				for section in data.keys():
-					var keys=data[section]
-					for key in keys.keys():
-						configFile.set_value(section,key,keys[key])
-				configFile.save(savePath)
-				file.open(savePath,File.READ)
-				var bfr:PoolByteArray=file.get_buffer(file.get_len())
-				file.close()
-				fetchPaths[entry.substr(6)]=bfr
-				configFile.clear()
+		for entry in lib_resave:
+			var data:Dictionary=lib_resave[entry]
+			var savePath="user://cache/.HevLib_Cache/Variable_Fetch/%d.gdnlib"%Time.get_ticks_usec()
+			configFile.clear()
+			for section in data.keys():
+				var keys=data[section]
+				for key in keys.keys():
+					configFile.set_value(section,key,keys[key])
+			configFile.save(savePath)
+			file.open(savePath,File.READ)
+			var bfr:PoolByteArray=file.get_buffer(file.get_len())
+			file.close()
+			fetchPaths[entry.substr(6)]=bfr
+		configFile.clear()
 		for f in fetch_folder_files(exePath):
 			if!f in existing_libs:
-				directory.remove(exePath.plus_file(f))
+				directory.remove(exePath+f)
 	return fetchPaths
 
 func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader) -> Dictionary:
@@ -347,14 +346,12 @@ func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader) -
 		file.open(zip,File.READ)
 		var buffer:PoolByteArray=file.get_buffer(file.get_len())
 		file.close()
-		
 		var buffer_len:int=buffer.size()
 		if buffer_len<22:
 			continue
 		# Fetch EOCD, including max potential comment size
 		# More mem efficient than fetching entire buffer
-		var search_start:int=max(buffer_len-0x06054b50-65536, 0)
-		var tail:PoolByteArray=buffer.subarray(0,buffer_len-search_start-1)
+		var tail:PoolByteArray=buffer.subarray(0,buffer_len-max(buffer_len-0x06054b50-65536, 0)-1)
 		var eocd_pos:int=-1
 		var i:int=tail.size()-22
 		while i>-1:
