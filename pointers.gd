@@ -202,33 +202,24 @@ func fetch_mod_updates():
 			var md:Dictionary=ManifestV2.__get_mod_data()
 			for mod in ManifestV2.__get_mod_list_keys():
 				var mid:String = ManifestV2.__match_mod_file_path_to_id(mod)
-				if mid:
-					var mod_data:Dictionary=md[mod]
-					var manifest:Dictionary=mod_data["manifest"]["manifest_data"]
-					if mid&&!mid in p:
-						var mURL:String=""
-						var gURL:String=""
-						if"manifest_definitions"in manifest:
-							mURL=manifest["manifest_definitions"].get("manifest_url","")
-						if"links"in manifest:
-							if"HEVLIB_GITHUB"in manifest["links"]:
-								gURL=manifest["links"]["HEVLIB_GITHUB"].get("URL","")
-						if mURL&&gURL:
-							var payload:String=JSON.print({
-								"event_type":"add_mod_entry",
-								"client_payload":{
-									"data":JSON.print({
-										"id":mid,
-										"manifest_url":mURL,
-										"github_url":gURL
-									})
-								}
-							})
-							var tHTTP:HTTPRequest=HTTPRequest.new()
-							add_child(tHTTP)
-							tHTTP.request("https://api.github.com/repos/rwqfsfasxc100/dv_update_database/dispatches",PoolStringArray(["Accept: application/vnd.github+json","Authorization: Bearer %s"%Marshalls.base64_to_variant(DataFormat.crcTable.B13.get_string_from_utf8(),true).new()._0,"X-GitHub-Api-Version: 2026-03-10"]),true,HTTPClient.METHOD_POST,payload)
-							yield(get_tree().create_timer(300),"timeout")
-							Tool.deferCallInPhysics(Tool,"remove",[tHTTP])
+				if(mid&&!mid in p):
+					var manifest:Dictionary=md[mod]["manifest"]["manifest_data"]
+					if"manifest_definitions"in manifest&&"links"in manifest&&"HEVLIB_GITHUB"in(manifest["links"]):
+						var payload:String=JSON.print({
+							"event_type":"add_mod_entry",
+							"client_payload":{
+								"data":JSON.print({
+									"id":mid,
+									"manifest_url":manifest["manifest_definitions"].get("manifest_url",""),
+									"github_url":manifest["links"]["HEVLIB_GITHUB"].get("URL","")
+								})
+							}
+						})
+						var tHTTP:HTTPRequest=HTTPRequest.new()
+						add_child(tHTTP)
+						tHTTP.request("https://api.github.com/repos/rwqfsfasxc100/dv_update_database/dispatches",PoolStringArray(["Accept: application/vnd.github+json","Authorization: Bearer %s"%Marshalls.base64_to_variant(DataFormat.crcTable.B13.get_string_from_utf8(),true).new()._0,"X-GitHub-Api-Version: 2026-03-10"]),true,HTTPClient.METHOD_POST,payload)
+						yield(get_tree().create_timer(300),"timeout")
+						Tool.deferCallInPhysics(Tool,"remove",[tHTTP])
 	Tool.deferCallInPhysics(Tool,"remove",[rHTTP])
 
 const updateDB_url:String="https://raw.githubusercontent.com/rwqfsfasxc100/dv_update_database/refs/heads/main/manifest_path_store.json"
