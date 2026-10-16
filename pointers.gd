@@ -177,7 +177,7 @@ func fetch_mod_updates():
 			if doUpdate:
 				var file_name:String=fetchData.get("file_name","file.zip")
 				var mod_name:String=modData.get("name","")
-				updates[ID]={"name":mod_name,"id":ID,"version":[current_version["version_major"],current_version["version_minor"],current_version["version_bugfix"]],"new_version":newVer,"github":"https://github.com/rwqfsfasxc100/dv_update_database/raw/refs/heads/main/zip_store/%s/%d.%d.%d/%s"%[ID,newVer[0],newVer[1],newVer[2],file_name],"file_name":file_name,"display":mod_name+"("+ID+")"}
+				updates[ID]={"name":mod_name,"id":ID,"version":[current_version["version_major"],current_version["version_minor"],current_version["version_bugfix"]],"new_version":newVer,"github":"https://github.com/rwqfsfasxc100/dv_update_database/raw/refs/heads/main/zip_store/%s/%d.%d.%d/%s"%[ID,newVer[0],newVer[1],newVer[2],file_name],"file_name":file_name,"display":"%s (%s)"%[mod_name,ID]}
 		var dont:bool=false
 		if libid in p:
 			var curr:Dictionary=ManifestV2.__get_mod_by_id(libid)["version_data"]
@@ -1685,16 +1685,6 @@ class _DataFormat:
 						"Array containing all found keys and values matching the searched keys array"
 					]
 				},
-				"__convert_arr_to_vec2arr":{
-					"description":"Converts an array containing integers and/or floats into a PoolVector2Array",
-					"args":[
-						"array -> (Array) for the data being converted into a PoolVector2Arr."
-					],
-					"return":[
-						"PoolVector2Array for the output variables.",
-						"NOTE: If the input array has an odd length, or contains any variables that are not of int/float type, the returning PoolVector2Array will be empty."
-					]
-				},
 				"__compare_versions":{
 					"description":"Compares two semantically formatted versions. Primary version must be equal or newer than the checked version to return true, otherwise returns false.",
 					"args":[
@@ -2093,23 +2083,6 @@ class _DataFormat:
 		return returning_keys
 	static func l(text:String,header:String = "pointers.DataFormat"):
 		non_statics["pointers"].l(text,header)
-	const accepted_vector_types = PoolIntArray([TYPE_INT,TYPE_REAL,TYPE_STRING])
-	static func __convert_arr_to_vec2arr(array: Array) -> PoolVector2Array:
-		var converted:PoolVector2Array = PoolVector2Array()
-		var size:int = int(floor(array.size() / 2.0))
-		converted.resize(size)
-		for r in size:
-			var index:int = r * 2
-			var aRaw = array[index]
-			var bRaw = array[index + 1]
-			if not typeof(aRaw) in accepted_vector_types:
-				l("Cannot convert type [%s] for PoolVector2Array" % aRaw)
-				return converted
-			if not typeof(bRaw) in accepted_vector_types:
-				l("Cannot convert type [%s] for PoolVector2Array" % bRaw)
-				return converted
-			converted[r] = Vector2(float(aRaw),float(bRaw))
-		return converted
 	
 	static func __compare_versions(primary_major : int,primary_minor : int,primary_bugfix : int, compare_major : int, compare_minor : int, compare_bugfix : int) -> bool:
 		if primary_major < compare_major:
@@ -2215,7 +2188,7 @@ class _DataFormat:
 				var result : String = ""
 				var is_part_of_string:bool = false
 				var prev_char_escape:bool = false
-				while line != "":
+				while line:
 					var part:String = line.substr(0,1)
 					if part == "\\":
 						prev_char_escape = !prev_char_escape
@@ -2352,7 +2325,7 @@ class _DataFormat:
 					ls = "\n" + ls
 				reconcat += ls
 			concat = reconcat
-		return [concat if concat !="" else "extends Node",var_names,const_names,signal_names,method_names,signal_values,method_values,method_output_type]
+		return [concat if not concat.empty() else "extends Node",var_names,const_names,signal_names,method_names,signal_values,method_values,method_output_type]
 	
 	const compiled_scripts : Dictionary = {}
 	const csk:Array = Array()
@@ -2665,13 +2638,13 @@ class _DataFormat:
 		return "PoolByteArray([%s]).decompress(%d,1)" % [concat,size]
 	
 	static func __stringify_property(property,depth:int = 0,stringify:bool = true):
-		var out = ""
+		var out:String = ""
 		var type = typeof(property)
 		match type:
 			TYPE_NIL:
 				out = "null"
 			TYPE_ARRAY,TYPE_COLOR_ARRAY,TYPE_INT_ARRAY,TYPE_RAW_ARRAY,TYPE_REAL_ARRAY,TYPE_STRING_ARRAY,TYPE_VECTOR2_ARRAY,TYPE_VECTOR3_ARRAY:
-				var l = ""
+				var l:String = ""
 				match type:
 					TYPE_ARRAY:
 						l = "%s"
@@ -2697,20 +2670,19 @@ class _DataFormat:
 						out = l % ""
 				else:
 					l = l % "[%s\n%s]"
-					var combine = ""
-					var nd = depth + 1
-					var tabs = ""
-					var etabs = ""
+					var combine:String = ""
+					var nd:int = depth + 1
+					var tabs:String = ""
+					var etabs:String = ""
 					for i in depth:
 						etabs += "\t"
 					for i in nd:
 						tabs += "\t"
 					for i in property:
-						var r = __stringify_property(i,nd,false)
-						var p = tabs + r
+						var r:String = __stringify_property(i,nd,false)
 						if combine:
 							combine += ","
-						combine += "\n%s" % p
+						combine += "\n%s" % (tabs + r)
 					out = l % [combine,etabs]
 			TYPE_BOOL:
 				out = ("true") if property else ("false")
@@ -2720,21 +2692,20 @@ class _DataFormat:
 				if property.empty():
 					out = "{}"
 				else:
-					var l = "{%s\n%s}"
-					var st = ""
-					var nd = depth + 1
-					var tabs = ""
-					var etabs = ""
+					var l:String = "{%s\n%s}"
+					var st:String = ""
+					var nd:int = depth + 1
+					var tabs:String = ""
+					var etabs:String = ""
 					for i in depth:
 						etabs += "\t"
 					for i in nd:
 						tabs += "\t"
 					for key in property:
-						var item = "%s:%s" % [__stringify_property(key,depth,false),__stringify_property(property[key],nd,false)]
-						var p = tabs + item
+						var item:String = "%s:%s" % [__stringify_property(key,depth,false),__stringify_property(property[key],nd,false)]
 						if st:
 							st += ","
-						st += "\n%s" % p
+						st += "\n%s" % (tabs + item)
 					out = l % [st,etabs]
 			TYPE_INT,TYPE_REAL:
 				out = str(property)
@@ -3556,7 +3527,7 @@ class _Equipment:
 						
 						for item in constKeys:
 							var ship : String = constants[item].get("ship_name","")
-							if ship != "":
+							if not ship.empty():
 								if not ship in ship_node_modify:
 									ship_node_modify[ship] = []
 								for modification in constants[item].get("modifications",[]):
@@ -4278,7 +4249,7 @@ class _Equipment:
 							aux_type = "RCS"
 						"MAIN_PROPULSION":
 							aux_type = "TORCH"
-					if aux_path != "":
+					if aux_path:
 						continue
 					var sys : String = data.get("system","SYSTEM_NAME_MISSING")
 					var auxTypePath : String = exhaust_cache_path + aux_type
@@ -4326,7 +4297,7 @@ class _Equipment:
 				cc += "\n" + sl
 			ship_limitation_string += cc
 		
-		if not ws_editable_paths == "":
+		if ws_editable_paths:
 			weaponslot_string = weaponslot_string + "\n\n" + ws_editable_paths
 		
 		
@@ -5145,22 +5116,20 @@ class _Equipment:
 		var warn_if_electric_below:float = equipment_data.get("warn_if_electric_below", 0)
 		var sticker_price_format : String = equipment_data.get("sticker_price_format", "%s E$")
 		var sticker_price_multi_format : String = equipment_data.get("sticker_price_multi_format", "%s E$ (x%d)")
-		var installed_color:Color = equipment_data.get("installed_color", Color(0.0, 1.0, 0.0, 1.0))
+		var installed_color:Color = equipment_data.get("installed_color", Color.green)
 		var disabled_color:Color = equipment_data.get("disabled_color", Color(0.2, 0.2, 0.2, 1.0))
-		var normal_color:Color = equipment_data.get("normal_color", Color(1.0, 1.0, 1.0, 1.0))
+		var normal_color:Color = equipment_data.get("normal_color", Color.white)
 		
 		var cfg : Dictionary = equipment_data.get("config",{})
 		
 		var base : String = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s/VBoxContainer\" instance=ExtResource( 3 )]" % [system.to_upper(),slot_node_name]
-		if num_val != -1:
+		if num_val > -1:
 			base += "\nnumVal = %d" % num_val
 		base += "\nslot = \"%s\"" % system_slot
 		if system:
 			base += "\nsystem = \"%s\"" % system
 		if capability_lock:
 			base += "\ncapabilityLock = true"
-#		else:
-#			base += "\ncapabilityLock = false"
 		if name_override:
 			base += "\nnameOverride = \"%s\"" % name_override
 		if description:
@@ -5175,15 +5144,13 @@ class _Equipment:
 			base += "\ntestProtocol = \"%s\"" % test_protocol
 		if default:
 			base += "\ndefault = true"
-#		else:
-#			base += "\ndefault = false"
 		if control:
 			base += "\ncontrol = \"%s\"" % control
 		if story_flag:
 			base += "\nstoryFlag = \"%s\"" % story_flag
-		if story_flag_min != -1:
+		if story_flag_min > -1:
 			base += "\nstoryFlagMin = %d" % story_flag_min
-		if story_flag_max != -1:
+		if story_flag_max > -1:
 			base += "\nstoryFlagMax = %d" % story_flag_max
 		if warn_if_thermal_below > 0:
 			base += "\nwarnIfThermalBelow = %0.1f" % warn_if_thermal_below
@@ -5193,10 +5160,10 @@ class _Equipment:
 			base += "\nstickerPriceFormat = \"%s\"" % sticker_price_format
 		if sticker_price_multi_format != "%s E$ (x%d)":
 			base += "\nstickerPriceMultiFormat = \"%s\"" % sticker_price_multi_format
-		if installed_color != Color(0.0, 1.0, 0.0, 1.0):
-			base += "\ninstalledColor = Color( %s, %s, %s, %s )" % [installed_color.r,installed_color.g,installed_color.b,installed_color.a]
+		if installed_color != Color.green:
+			base += "\ninstalledColor = Color( %f, %f, %f, %f )" % [installed_color.r,installed_color.g,installed_color.b,installed_color.a]
 		if disabled_color != Color(0.2, 0.2, 0.2, 1.0):
-			base += "\ndisabledColor = Color( %s, %s, %s, %s )" % [disabled_color.r,disabled_color.g,disabled_color.b,disabled_color.a]
+			base += "\ndisabledColor = Color( %f, %f, %f, %f )" % [disabled_color.r,disabled_color.g,disabled_color.b,disabled_color.a]
 		
 		if cfg:
 			var cfg_id : String = cfg.get("id","")
@@ -5210,8 +5177,8 @@ class _Equipment:
 				base += "\ninvert_config = true"
 			else:
 				base += "\ninvert_config = false"
-		if normal_color != Color(1.0, 1.0, 1.0, 1.0):
-			base += "[node name=\"System\" parent=\"HBox\" index=\"0\"]\nmodulate = Color( %s, %s, %s, %s )" % [normal_color.r,normal_color.g,normal_color.b,normal_color.a]
+		if normal_color != Color.white:
+			base += "[node name=\"System\" parent=\"HBox\" index=\"0\"]\nmodulate = Color( %f, %f, %f, %f )" % [normal_color.r,normal_color.g,normal_color.b,normal_color.a]
 		return base
 	
 	func __make_slot_for_scene(slot_data: Dictionary) -> Array:
@@ -5257,7 +5224,7 @@ class _Equipment:
 				base += "\ninvert_config = true"
 			else:
 				base += "\ninvert_config = false"
-		if restrictType != "":
+		if restrictType:
 			base += "\nrestrictType = \"%s\"" % restrictType
 		if not limitShips.empty():
 			var initial : String = ""
@@ -5404,7 +5371,7 @@ class _Events:
 		if delay_seconds > 0.0:
 			pointers.l("Delaying event clear by %0.1f seconds" % delay_seconds,"pointers.EventDriver")
 			yield(CurrentGame.get_tree().create_timer(delay_seconds),"timeout")
-		if event == "" or event == "none":
+		if event.empty() or event == "none":
 			var events = ring.all_oddities
 			for e in events:
 				if Tool.claim(e):
@@ -5604,6 +5571,7 @@ class _FileAccess:
 		var dir:Directory = Directory.new()
 		return dir.copy(prepfile,folder + "/" + prepfile.split("/")[prepfile.split("/").size() - 1])
 	
+	const STEX_HEADER = PoolByteArray([0x47, 0x44, 0x53, 0x54])
 	const PNG_HEADER = PoolByteArray([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])
 	const BMP_HEADER = PoolByteArray([0x42, 0x4D])
 	const JPG_HEADERS = [PoolByteArray([0xFF, 0xD8, 0xFF, 0xDB]),PoolByteArray([0xFF, 0xD8, 0xFF, 0xE0]),PoolByteArray([0xFF, 0xD8, 0xFF, 0xE1]),PoolByteArray([0xFF, 0xD8, 0xFF, 0xEE])]
@@ -5614,21 +5582,26 @@ class _FileAccess:
 		file.open(path, File.READ)
 		var bytes:PoolByteArray = file.get_buffer(file.get_len())
 		file.close()
-		var img:Image = Image.new()
-		var loaded:bool = false
-		if bytes.subarray(0,7) == PNG_HEADER:
-			loaded = img.load_png_from_buffer(bytes) == OK
-		elif bytes.subarray(0,3) in JPG_HEADERS:
-			loaded = img.load_jpg_from_buffer(bytes) == OK
-		elif bytes.subarray(0,1) == BMP_HEADER:
-			loaded = img.load_bmp_from_buffer(bytes) == OK
-		elif bytes.subarray(0,3) == WEBP_HEADERS[0] and bytes.subarray(8,11) == WEBP_HEADERS[1]:
-			loaded = img.load_webp_from_buffer(bytes) == OK
-		if not loaded:
-			img = fallback
-		var imgtex:ImageTexture = ImageTexture.new()
-		imgtex.create_from_image(img)
-		return imgtex
+		if bytes.subarray(0,3) == STEX_HEADER:
+			var stex:StreamTexture = StreamTexture.new()
+			stex.load_path = path
+			return stex
+		else:
+			var img:Image = Image.new()
+			var loaded:bool = false
+			if bytes.subarray(0,7) == PNG_HEADER:
+				loaded = img.load_png_from_buffer(bytes) == OK
+			elif bytes.subarray(0,3) in JPG_HEADERS:
+				loaded = img.load_jpg_from_buffer(bytes) == OK
+			elif bytes.subarray(0,1) == BMP_HEADER:
+				loaded = img.load_bmp_from_buffer(bytes) == OK
+			elif bytes.subarray(0,3) == WEBP_HEADERS[0] and bytes.subarray(8,11) == WEBP_HEADERS[1]:
+				loaded = img.load_webp_from_buffer(bytes) == OK
+			if not loaded:
+				img = fallback
+			var imgtex:ImageTexture = ImageTexture.new()
+			imgtex.create_from_image(img)
+			return imgtex
 	
 	const updateCacheDir : String = "user://cache/.Mod_Menu_2_Cache/updates"
 	const updateCacheFile : String = updateCacheDir + "/mods_to_update.json"
@@ -6654,7 +6627,7 @@ class _ManifestV1:
 		var content = f.get_as_text(true)
 		var modMainLines = content.split("\n")
 		for l in modMainLines:
-			if not hasManifest or manifestName == "" or manifestName == null:
+			if not hasManifest or manifestName.empty() or manifestName == null:
 				var modNameCheck = l.split("const MOD_NAME = ")
 				var modNameCheckSize = modNameCheck.size()
 				if modNameCheckSize >= 2:
@@ -6681,7 +6654,7 @@ class _ManifestV1:
 				modPrio = 0
 			var versionCheck = l.split("const MOD_VERSION = ")
 			var versionCheckSize = versionCheck.size()
-			if not manifestVersion == "":
+			if manifestVersion:
 				verCheck = 1
 				modVer = manifestVersion
 			elif versionCheckSize >= 2 and not manifestVersion == modVer:
@@ -6696,27 +6669,27 @@ class _ManifestV1:
 		else:
 			ver = "unknown"
 		var verData = String(ver)
-		if manifestDescription == null or manifestDescription == "":
+		if manifestDescription == null or manifestDescription.empty():
 			manifestDescription = "MODMENU_DESCRIPTION_PLACEHOLDER"
-		if manifestGroup == null or manifestGroup == "":
+		if manifestGroup == null or manifestGroup.empty():
 			manifestGroup = "MODMENU_GROUP_PLACEHOLDER"
-		if manifestId == null or manifestId == "":
+		if manifestId == null or manifestId.empty():
 			manifestId = "MODMENU_ID_PLACEHOLDER"
-		if github_homepage == null or github_homepage == "":
+		if github_homepage == null or github_homepage.empty():
 			github_homepage = "MODMENU_GITHUB_HOMEPAGE_PLACEHOLDER"
-		if github_releases == null or github_releases == "":
+		if github_releases == null or github_releases.empty():
 			github_releases = "MODMENU_GITHUB_RELEASES_PLACEHOLDER"
-		if discord_thread == null or discord_thread == "":
+		if discord_thread == null or discord_thread.empty():
 			discord_thread = "MODMENU_DISCORD_PLACEHOLDER"
-		if nexus_page == null or nexus_page == "":
+		if nexus_page == null or nexus_page.empty():
 			nexus_page = "MODMENU_NEXUS_PLACEHOLDER"
-		if donations_page == null or donations_page == "":
+		if donations_page == null or donations_page.empty():
 			donations_page = "MODMENU_DONATIONS_PLACEHOLDER"
-		if wiki_page == null or wiki_page == "":
+		if wiki_page == null or wiki_page.empty():
 			wiki_page = "MODMENU_WIKI_PLACEHOLDER"
-		if custom_link == null or custom_link == "":
+		if custom_link == null or custom_link.empty():
 			custom_link = "MODMENU_CUSTOM_LINK_PLACEHOLDER"
-		if custom_link_name == null or custom_link_name == "":
+		if custom_link_name == null or custom_link_name.empty():
 			custom_link_name = "MODMENU_CUSTOM_LINK_NAME_PLACEHOLDER"
 		if hasIcon:
 			iconDir = iconDir
@@ -7122,9 +7095,9 @@ class _ManifestV2:
 		var manifestEntry : Dictionary = {"has_manifest":has_mod_manifest,"manifest_version":manifest_version,"manifest_file_path":manifest_filepath,"manifest_data":manifest_data}
 		var mod_version_array : Array = [mod_version_major,mod_version_minor,mod_version_bugfix]
 		var mod_version_string : String = "%d.%d.%d" % [mod_version_major,mod_version_minor,mod_version_bugfix]
-		if not str(mod_version_metadata) == "":
+		if mod_version_metadata:
 			mod_version_array.append(mod_version_metadata)
-			mod_version_string = mod_version_string + "-" + str(mod_version_metadata)
+			mod_version_string += "-%s" % mod_version_metadata
 		var version_dictionary : Dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
 		var drivers : Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(script_path)
 		var ml : String = "en"
@@ -7916,8 +7889,8 @@ class _ManifestV2:
 		var versions : Array = cv.keys()
 #		versions.resize(clamp(versions.size(),0,10))
 		var spacing : String = "  "
-		var spc = non_static["pointers"].ConfigDriver.__get_value("ModMenu2","MODMENU2_CONFIG_GENERAL","changelog_spacing_size")
-		if spc != "" or spc != null:
+		var spc:String = non_static["pointers"].ConfigDriver.__get_value("ModMenu2","MODMENU2_CONFIG_GENERAL","changelog_spacing_size","")
+		if spc:
 			spacing = spc
 		for version in versions:
 			changelog[version] = []
@@ -8419,6 +8392,16 @@ class _Math:
 						"Array of PoolIntArrays for each pair."
 					]
 				},
+				"__convert_arr_to_vec2arr":{
+					"description":"Converts an array containing integers and/or floats into a PoolVector2Array",
+					"args":[
+						"array -> (Array) for the data being converted into a PoolVector2Arr."
+					],
+					"return":[
+						"PoolVector2Array for the output variables.",
+						"NOTE: If the input array has an odd length, or contains any variables that are not of int/float type, the returning PoolVector2Array will be empty."
+					]
+				},
 				"":{
 					"description":"",
 					"args":[
@@ -8493,6 +8476,25 @@ class _Math:
 		for i in length:
 			rand_string += char(buffer[i % bs])
 		return rand_string
+	
+	const accepted_vector_types = PoolIntArray([TYPE_INT,TYPE_REAL,TYPE_STRING])
+	static func __convert_arr_to_vec2arr(array: Array) -> PoolVector2Array:
+		var converted:PoolVector2Array = PoolVector2Array()
+		var size:int = int(floor(array.size() / 2.0))
+		converted.resize(size)
+		for r in size:
+			var index:int = r * 2
+			var aRaw = array[index]
+			var bRaw = array[index + 1]
+			if not typeof(aRaw) in accepted_vector_types:
+				non_static["pointers"].l("Cannot convert type [%s] for PoolVector2Array" % aRaw)
+				return converted
+			if not typeof(bRaw) in accepted_vector_types:
+				non_static["pointers"].l("Cannot convert type [%s] for PoolVector2Array" % bRaw)
+				return converted
+			converted[r] = Vector2(float(aRaw),float(bRaw))
+		return converted
+	
 	
 
 class _NodeAccess:
@@ -8927,7 +8929,7 @@ class _RPC:
 			rpc_data["secondary_states"] = rpc_data["pointers"].Equipment.rpc_second_state_store[area]
 			rpc_data["secondary_state_index"] = 0
 		currentStack = level
-		if how_specific != "":
+		if how_specific:
 			stack[currentStack] = how_specific
 		var current_icon:String = ""
 		var current_details:String = ""
@@ -9785,12 +9787,12 @@ class _Translations:
 						var setting : String = delim.get("setting","")
 						var invert:bool = delim.get("invert",false)
 						var val = pointers.ConfigDriver.__get_value(mod,section,setting)
-						var do = true
+						var do:bool = true
 						if typeof(val) == TYPE_BOOL:
 							do = val
 						if invert:
 							do = !do
-						if do and string != "":
+						if do and string:
 							var dict : Dictionary = __translation_file_to_dictionary(file,string)
 							__updateTL_from_dictionary(dict,fullLogging)
 						
@@ -9818,7 +9820,7 @@ class _Translations:
 							do = val
 						if invert:
 							do = !do
-						if do and string != "":
+						if do and string:
 							translationObject.add_message(key,string.c_unescape())
 						if fullLogging:
 							pointers.l("Added translation: %s" % key,"pointers.Translations")
@@ -9870,7 +9872,7 @@ class _Translations:
 		var index:int = 1
 		while index < size:
 			var line:String = lines[index]
-			if line == "":
+			if line.empty():
 				index += 1
 				continue
 			if line.begins_with("#"):

@@ -139,6 +139,7 @@ func _init(modLoader:ModLoader=ModLoader):
 		"res://HevLib/scenes/minerals/multiminerals/mineral.gd",
 		"res://HevLib/scenes/minerals/multiminerals/MineralProcessingUnit.gd",
 		"res://HevLib/scenes/minerals/multiminerals/AsteroidSpawner.gd",
+		"res://HevLib/scenes/service_driver/Services.gd",
 	]
 	
 	

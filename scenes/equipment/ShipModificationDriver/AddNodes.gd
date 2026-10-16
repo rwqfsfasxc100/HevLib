@@ -163,7 +163,7 @@ func hl_add_nodes_make_node_mods():
 						new_pos = npos[0]
 						node.set_deferred("position",new_pos)
 				TYPE_ARRAY, TYPE_INT_ARRAY, TYPE_REAL_ARRAY:
-					var scan:PoolVector2Array = pointers_hl_addnodes.DataFormat.__convert_arr_to_vec2arr(npos)
+					var scan:PoolVector2Array = pointers_hl_addnodes.Math.__convert_arr_to_vec2arr(npos)
 					if scan:
 						new_pos = scan[0]
 						node.set_deferred("position",new_pos)
@@ -293,7 +293,7 @@ func hl_add_nodes_format_properties(data,format,property,property_path,base_node
 func hl_add_nodes_format_data(data, format):
 	match format:
 		"arr2vec2arr":
-			return pointers_hl_addnodes.DataFormat.__convert_arr_to_vec2arr(data)
+			return pointers_hl_addnodes.Math.__convert_arr_to_vec2arr(data)
 		"arr2vec2":
 			return hl_add_nodes_convert_arr_to_vec2(data)
 		_:
