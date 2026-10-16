@@ -166,7 +166,7 @@ var updateCacheDir = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 func triggerVolatile():
 	var file = File.new()
 	file.open(updateCacheDir,File.WRITE)
-	file.store_string("1")
+	file.store_8(1)
 	file.close()
 
 # Color picker node. _picker_created must have been ran for this to be filled.

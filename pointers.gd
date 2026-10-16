@@ -5576,6 +5576,10 @@ class _FileAccess:
 	const WEBP_HEADERS = [PoolByteArray([0x42, 0x49, 0x46, 0x46]),PoolByteArray([0x57, 0x45, 0x42, 0x50])]
 	
 	static func __load_png(path,fallback:Image = Image.new()) -> Texture:
+		if not __file_exists(path):
+			var imgtex:ImageTexture = ImageTexture.new()
+			imgtex.create_from_image(fallback)
+			return imgtex
 		var file:File = File.new()
 		file.open(path, File.READ)
 		var header:PoolByteArray = file.get_buffer(12)
@@ -5625,7 +5629,7 @@ class _FileAccess:
 			file.close()
 			if exists == OK:
 				file.open(has_updated_store,File.WRITE)
-				file.store_string("1")
+				file.store_8(1)
 				file.close()
 	const foundnewfiles:String = "new mods found, attempting to copy"
 	const exitMsg:String = "new and/or updated mods detected, rebooting game"
@@ -5659,7 +5663,7 @@ class _FileAccess:
 		file.open(file_path,File.READ)
 		var num:int = non_static["pointers"].DataFormat.__get_crc_32(file.get_buffer(file.get_len()))
 		file.close()
-		return (PoolByteArray([(num>>16)&0xFF,(num>>24)&0xFF,(num)&0xFF,(num>>8)&0xFF]).hex_encode() + file_path).sha256_text()
+		return (PoolByteArray([(num>>16)&0xFF,(num>>24)&0xFF,(num)&0xFF,(num>>8)&0xFF]).hex_encode() + ProjectSettings.localize_path(file_path)).sha256_text()
 	
 	# Code sourced from lifelike's Godot Animator Import plugin
 	# https://github.com/lifelike/godot-animator-import

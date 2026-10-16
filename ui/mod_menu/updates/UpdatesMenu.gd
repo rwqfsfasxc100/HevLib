@@ -114,9 +114,9 @@ func restart_cancel():
 
 func cancel():
 	file.open(has_updated_store,File.READ)
-	var has:String = file.get_as_text()
+	var has:int = file.get_8()
 	file.close()
-	if has == "1":
+	if has:
 		hide()
 		yield(get_tree(),"idle_frame")
 		restart_dialog.popup_centered()

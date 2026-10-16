@@ -113,9 +113,9 @@ func show_restart_menu():
 		Tool.release(ps)
 	restart_menu.let_restart(valid)
 	file.open(has_updated_store,File.READ)
-	var has : String = file.get_as_text()
+	var has : int = file.get_8()
 	file.close()
-	if has == "1":
+	if has:
 		restart_menu.show()
 		return true
 	return false

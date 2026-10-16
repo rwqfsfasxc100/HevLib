@@ -325,7 +325,7 @@ var updateCacheDir = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 func triggerVolatile():
 	var file = File.new()
 	file.open(updateCacheDir,File.WRITE)
-	file.store_string("1")
+	file.store_8(1)
 	file.close()
 
 func get_focusable(direction = 0):

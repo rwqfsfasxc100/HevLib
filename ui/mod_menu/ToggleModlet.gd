@@ -57,7 +57,7 @@ func _toggled(button_pressed):
 		file.store_string(JSON.print(restarting))
 		file.close()
 		file.open(updateCacheDir,File.WRITE)
-		file.store_string("1")
+		file.store_8(1)
 		file.close()
 		pointers.ConfigDriver.__store_value("HevLib","modlets","seen_modlets",all_modlets)
 		yield(CurrentGame.get_tree(),"idle_frame")
