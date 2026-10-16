@@ -15,12 +15,9 @@ func _ready():
 			if "name" in itemKeys and item.name:
 				var panel:MarginContainer = service_ui.instance()
 				var item_name:String = item["name"]
-				var layer:String = ""
-				match item.get("layer","industrial").to_lower():
-					"residential":
-						layer = "Residential"
-					_:
-						layer = "Industrial"
+				var layer:String = "Industrial"
+				if item.get("layer","industrial")[0].to_lower() == "r":
+					layer = "Residential"
 				panel.serviceName = item_name
 				panel.name = item_name
 				panel.connect("view",self,"serviceView")
