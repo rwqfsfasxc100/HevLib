@@ -5616,21 +5616,18 @@ class _FileAccess:
 		filepath = ProjectSettings.localize_path(filepath)
 		non_static["pointers"].FolderAccess.__check_folder_exists(modCacheDir)
 		if file.file_exists(filepath):
-			var exists:int = OK
-			var modDir : String = filepath.get_base_dir()
-			if modDir != modCacheDir:
-				exists = __copy_file(filepath,modCacheDir)
-				filepath = modCacheDir + filepath.split(modDir)[1]
-			var cache : Array = []
-			if file.file_exists(updateCacheFile): cache = JSON.parse(__get_file_content(updateCacheFile)).result
+			if filepath.get_base_dir() != modCacheDir:
+				if __copy_file(filepath,modCacheDir):
+					return
+				filepath = modCacheDir.plus_file(filepath.get_file())
+			var cache : Array = JSON.parse(__get_file_content(updateCacheFile)).result
 			if not filepath in cache: cache.append(filepath)
 			file.open(updateCacheFile,File.WRITE)
 			file.store_string(JSON.print(cache))
 			file.close()
-			if exists == OK:
-				file.open(has_updated_store,File.WRITE)
-				file.store_8(1)
-				file.close()
+			file.open(has_updated_store,File.WRITE)
+			file.store_8(1)
+			file.close()
 	const foundnewfiles:String = "new mods found, attempting to copy"
 	const exitMsg:String = "new and/or updated mods detected, rebooting game"
 	static func __load_precached_mods():

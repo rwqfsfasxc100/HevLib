@@ -59,6 +59,8 @@ var url_store = "user://cache/.Mod_Menu_2_Cache/updates/url_refs.json"
 var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
 var has_updated_store = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 
+var updateCacheFile : String = "user://cache/.Mod_Menu_2_Cache/updates/mods_to_update.json"
+
 var dependancies_store = "user://cache/.Mod_Menu_2_Cache/dependancies/dependancies.json"
 var conflicts_store = "user://cache/.Mod_Menu_2_Cache/conflicts/conflicts.json"
 var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/complementary.json"
@@ -101,12 +103,12 @@ func _ready():
 	for f in manifests:
 		d.remove(f)
 	if file.file_exists(releases_cache):
-		var age = OS.get_unix_time() - file.get_modified_time(releases_cache)
+		var age:float = Time.get_unix_time_from_system() - file.get_modified_time(releases_cache)
 		if age > 3600:
 			file.open(releases_cache,File.WRITE)
 			file.store_string("{}")
 			file.close()
-			Debug.l("Releases cache older than an hour (%s minutes old), clearing" % [floor(age/60)])
+			Debug.l("Releases cache older than an hour (%s minutes old), clearing" % [floor(age/60.0)])
 		else:
 			Debug.l("Releases cache too new (%s minutes old), not clearing" % [floor(age/60)])
 	file.open(url_store,File.WRITE)
@@ -128,6 +130,9 @@ func _ready():
 	file.store_string("")
 	file.close()
 	file.open(modlet_toggle_restart_path,File.WRITE)
+	file.store_string("[]")
+	file.close()
+	file.open(updateCacheFile,File.WRITE)
 	file.store_string("[]")
 	file.close()
 	
