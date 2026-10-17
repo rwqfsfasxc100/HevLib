@@ -213,13 +213,17 @@ func fetch_mod_updates():
 				if(mid&&!mid in p):
 					var manifest:Dictionary=md[mod]["manifest"]["manifest_data"]
 					if"manifest_definitions"in manifest&&"links"in manifest&&"HEVLIB_GITHUB"in(manifest["links"]):
+						var murl:String = manifest["manifest_definitions"].get("manifest_url","")
+						var gurl:String = manifest["links"]["HEVLIB_GITHUB"].get("URL","")
+						if(murl.empty()||gurl.empty()):
+							continue
 						var payload:String=JSON.print({
 							"event_type":"add_mod_entry",
 							"client_payload":{
 								"data":JSON.print({
 									"id":mid,
-									"manifest_url":manifest["manifest_definitions"].get("manifest_url",""),
-									"github_url":manifest["links"]["HEVLIB_GITHUB"].get("URL","")
+									"manifest_url":murl,
+									"github_url":gurl
 								})
 							}
 						})

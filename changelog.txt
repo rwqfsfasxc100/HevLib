@@ -5,6 +5,7 @@
 3=* Added `process_tick` and `physics_process_tick` signals to the pointers script.
 3.1=* These act as a means of having an equivalent to `_process` and `_physics_process` where you'd be otherwise unable to (such as disabling processing to avoid a complete script overwrite, or for non-Node objects)
 3.2=* Both have a `delta` float operand
+4=* Fixed issue where mods without a manifest or GitHub url would be marked for upload to UpdateDB
 
 [1.17.0]
 
