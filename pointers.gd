@@ -96,6 +96,9 @@ var logging_current_frame_timer:int = 0
 
 var pause_on_unfocus:bool = false
 
+signal process_tick(delta)
+signal physics_process_tick(delta)
+
 func _physics_process(delta:float):
 	if ConfigDriver.mk_c:
 		# If a config was changed in the loaded profile, handle
@@ -108,6 +111,11 @@ func _physics_process(delta:float):
 		logging_current_frame_timer = 0
 		storeLogCache()
 		VisualServer.render_loop_enabled = (not pause_on_unfocus or OS.is_window_focused())
+	
+	emit_signal("physics_process_tick",delta)
+
+func _process(delta):
+	emit_signal("process_tick",delta)
 
 func recheck_unfocused_unrendering(how:bool):
 	pause_on_unfocus = how

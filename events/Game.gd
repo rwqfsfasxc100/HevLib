@@ -38,3 +38,13 @@ func _ready():
 	add_child(ringspace_canvas)
 	add_child(event_menu)
 	move_child(event_menu,3)
+
+func _enter_tree():
+	CurrentGame.hl_game_available = true
+	CurrentGame.hl_game_node = self
+	CurrentGame.hl_ring_node = $TheRing
+
+func _exit_tree():
+	CurrentGame.hl_game_available = false
+	CurrentGame.hl_game_node = null
+	CurrentGame.hl_ring_node = null

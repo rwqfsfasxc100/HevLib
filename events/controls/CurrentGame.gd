@@ -32,10 +32,17 @@
 
 extends "res://CurrentGame.gd"
 
-var in_hevlib_menu = false setget set_in_menu
+var in_hevlib_menu:bool = false setget set_in_menu
 
 signal eventDriverVisibilityChanged(how)
 
 func set_in_menu(how:bool):
 	in_hevlib_menu = how
 	emit_signal("eventDriverVisibilityChanged",how)
+
+var hl_game_available:bool = false
+var hl_game_node:Node = null
+var hl_ring_node:Node = null
+
+
+
