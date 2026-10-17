@@ -487,7 +487,7 @@ class _Achievements:
 				var sg : String = file.get_line()
 				achivements = parse_json(sg)
 			else:l("Error loading achievements file")
-		file.close()
+			file.close()
 		
 		var count : float = 0.0
 		
@@ -1626,8 +1626,7 @@ class _ConfigDriver:
 		return true
 	
 	static func __config_parse(file_path: String) -> Dictionary:
-		var file:File = File.new()
-		if not file.file_exists(file_path) and not ResourceLoader.exists(file_path):
+		if not ResourceLoader.exists(file_path) and not File.new().file_exists(file_path):
 			return {}
 		var cfg:ConfigFile = ConfigFile.new()
 		cfg.load(file_path)
@@ -3024,9 +3023,9 @@ class _DriverManagement:
 	])
 	
 	static func __get_drivers_from_modmain_path(file_path : String, get_fresh_drivers : bool = false, require_uid_check : bool = false):
-		var file:File = File.new()
 		if get_fresh_drivers or not file_path in dgck:
 			var this_mod_data : Dictionary = {}
+			var file:File = File.new()
 			if not file.file_exists(file_path):
 				return {}
 			var pointers:HevLibPointers = non_static["pointers"]
@@ -5558,8 +5557,7 @@ class _FileAccess:
 		file.close()
 	
 	static func __store_default_if_file_missing(file_path: String,data:String) -> bool:
-		var file:File = File.new()
-		if not file.file_exists(file_path):
+		if not File.new().file_exists(file_path):
 			__save_file_content(file_path,data)
 			return false
 		return true
@@ -5708,8 +5706,7 @@ class _FileAccess:
 	
 	static func __file_exists(file_path:String) -> bool:
 		file_path = ProjectSettings.localize_path(file_path)
-		var file:File = File.new()
-		return (ResourceLoader.exists(file_path) or file.file_exists(file_path))
+		return (ResourceLoader.exists(file_path) or File.new().file_exists(file_path))
 	
 	static func __get_real_filename_from_compiled_resource(file_path:String) -> String:
 		match file_path.get_extension():
@@ -5724,7 +5721,6 @@ class _FileAccess:
 	
 	static func __get_dependancies_for_file(file_path:String,deep_search:bool = false) -> PoolStringArray:
 		var dependencies:PoolStringArray = ResourceLoader.get_dependencies(file_path)
-		var file:File = File.new()
 		if deep_search and file_path.get_extension() in deeperSearch:
 			var nfp:String = file_path
 			if not non_static["pointers"].is_editor:
@@ -5732,6 +5728,7 @@ class _FileAccess:
 					nfp = file_path.get_basename() + ".gdc"
 				else:
 					nfp += ".converted.res"
+			var file:File = File.new()
 			file.open(nfp,File.READ)
 			var fileBytes:PoolByteArray = file.get_buffer(file.get_len())
 			file.close()
@@ -8110,11 +8107,11 @@ class _ManifestV2:
 	
 	static func __load_modlets(is_onready : bool,do_safe_load : bool,preprocess_paths:Array = Array()) -> PoolStringArray:
 		var pointers = non_static["pointers"]
-		var file:File = File.new()
 		if do_safe_load:
 			pointers.l("Loading modlet resources with order-safe mode. Skipping onready distinction and proceeding in a single batch","pointers.SafeMode")
 			pointers.DataFormat.__loadDLC()
 			var resource_paths:Array = Array()
+			var file:File = File.new()
 			for i in preprocess_paths:
 				match typeof(i):
 					TYPE_STRING:
@@ -8893,9 +8890,8 @@ class _RPC:
 	
 	const discord_script:String = "res://HevLib Discord RPC/lib/discord.gd"
 	static func ready():
-		var file:File = File.new()
 		var pointers = rpc_data["pointers"]
-		if file.file_exists(discord_script) and pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_RPC","discord_rpc_enabled"):
+		if File.new().file_exists(discord_script) and pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_RPC","discord_rpc_enabled"):
 			var discord = load(discord_script).new()
 			rpc_data["activity"] = discord.Activity.new()
 			rpc_data["loaded"] = true
