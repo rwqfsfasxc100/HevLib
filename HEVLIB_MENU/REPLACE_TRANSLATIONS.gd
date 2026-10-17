@@ -1907,6 +1907,14 @@ const TRANSLATIONS = {
 		"HEVLIB_CONFIG_DISABLE_RENDERING_ON_LOST_FOCUS_DESC": {
 			"string": "Disables Godot's VisualServer rendering pipeline while the game is not in focus.",
 			"version_hash": 1202440136
+		},
+		"HEVLIB_CONFIG_COMPILE": {
+			"string": "Compile",
+			"version_hash": 874366990
+		},
+		"HEVLIB_CONFIG_COMPILE_DESC": {
+			"string": "(WIP, not currently functionally implemented) Recompiles mod zips with portions of the code converted to faster conventions to improve runtime efficiency.",
+			"version_hash": 3959481423
 		}
 	},
 	"de": {
