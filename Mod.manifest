@@ -257,6 +257,13 @@ HEVLIB_CONFIG_SECTION_DEBUG={
 "script_path": "res://HevLib/achievements/OpenClearLeaderboards.gd",
 "type": "action"
 },
+"compile": {
+"default": true,
+"description": "HEVLIB_CONFIG_COMPILE_DESC",
+"display_order_position": 17,
+"name": "HEVLIB_CONFIG_COMPILE",
+"type": "bool"
+},
 "full_logging": {
 "default": false,
 "description": "HEVLIB_CONFIG_FULL_LOGGING_TOOLTIP",
