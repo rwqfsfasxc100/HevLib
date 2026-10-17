@@ -33,7 +33,7 @@
 extends Reference
 class_name MINIZ
 
-# Translation layer to permit proper autocompletion
+# Translation layer to permit proper autocompletion of the miniz implementation
 # SCRIPT USAGE: var miniz:MINIZ = load("res://HevLib/scripts/miniz/miniz.gd").new()
 # See res://HevLib/scripts/miniz/README.md for complete usage instructions
 

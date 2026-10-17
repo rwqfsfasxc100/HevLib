@@ -1,3 +1,53 @@
+[1.17.0]
+
+1=* Added ServiceDriver - Adds services to Enceladus Prime via an array of dictionaries from a `SERVICES` constant within `SERVICES.gd`
+1.1=* `name` -> (String) Service display name.
+1.2=* `description` -> (String) Service description. Defaults to `name + "_DESC"`
+1.3=* `offer` -> (String) Service offered stats. Defaults to `name + "_OFFER"`
+1.4=* `hours` -> (int) Time skipped. Defaults to 24
+1.5=* `cooldown` -> (int) Time to wait after purchase. Defaults to 0
+1.6=* `morale_change` -> (float) Direct morale change. -0.5 <-> 0.5. Defaults to 0.0
+1.7=* `morale_stability` -> (float) Adjusted morale stability point during the duration of the stay. -0.5 <-> 0.5. Defaults to 0.0
+1.8=* `price` -> (float) Flat price. Defaults to 100.0
+1.9=* `price_per_active_crew` -> (float) Cost per active crewmember. Defaults to 0.0
+1.10=* `price_per_total_crew` -> (float) Cost per crewmember regardless of activity. Defaults to 0.0
+1.11=* `allow_debt` -> (bool) Whether you can go into debt from the purchase of this service. Defaults to false
+1.12=* `story_flag` -> (String) Story flag to adjust visibility. Defaults to ""
+1.13=* `story_flag_min` -> (int) Minimum story flag to be visible. Ignored if set to -1. Deaults to -1
+1.14=* `story_flag_max` -> (int) Maximum story flag to be visible. Ignored if set to -1. Deaults to -1
+1.15=* `story_flag_hide` -> (bool) If failed story flag check, hide the service. Defaults to false
+1.16=* `disabled_color` -> (Color) Colour of the disabled service. Defaults to Color(0.5,0.5,0.5,1.0)
+1.17=* `buy_on_view` -> (bool) Whether pressing the service's name button should purchase the service. Defaults to false
+1.18=* `insurance_gain` -> (float) How much insurance to be granted on purchase. Defaults to 0.0
+1.19=* `faction_based` -> (String) If set, the faction to nullify all hostility and fear. Defaults to ""
+1.20=* `fear_price` -> (float) If nullifying faction hostilities, the maximum cost to nullify fear. Defaults to 0.0
+1.21=* `hostility_price` -> (float) If nullifying faction hostilities, the maximum cost to nullify hostility. Defaults to 0.0
+1.22=* `layer` -> (String) Where the service is located. Accepts 'industrial' or 'residential'. Is not case sensitive and defaults to `industrial`
+1.23=* `camera` -> (Dictionary) Data regarding where the camera points in the perspective display
+1.23.1=* `position` -> (Vector2) Camera position. Defaults to Vector2(0,0)
+1.23.2=* `rotation` -> (float) Camera rotation in degrees. Defaults to 0.0
+1.23.3=* `scale` -> (Vector2) Camera scale. Defaults to Vector2(1,1)
+1.24=* `signs` -> (Array[Dictionary]) Array of dictionaries regarding data for the sign displays for the service
+1.24.1=* `sprite` -> (String) File path for the main sprite. Defaults to ""
+1.24.2=* `light` -> (String) File path for the light sprite. Defaults to ""
+1.24.3=* `flicker` -> (float) How much the lights flicker by. Defaults to 0.2
+1.24.4=* `flicker_base` -> (float) Minimum transparency for the flicker. Defaults to 0.15
+1.24.5=* `position_offset` -> (Vector2) Offset from the camera's centre. Defaults to Vector2(0,0)
+1.24.6=* `rotation_offset` -> (float) Offset from the camera's rotation in degrees. Defaults to 0.0
+1.24.7=* `scale` -> (Vector2) The sprite's scale. Defaults to Vector2(1,1)
+1.24.8=* `color` -> (Color) The color of the sprite. Alpha is ignored. Defaults to Color(1,1,1)
+1.24.9=* `light_color` -> (Color) The color of the light. Alpha is ignored. Defaults to Color(1,1,1)
+1.24.10=* `light_scale` -> (float) The scale of the light's scale. Defaults to 1.0
+1.24.11=* `light_height` -> (float) The height of the light infront of the sprite. Defaults to 100.0
+1.24.12=* `light_energy` -> (float) The energy of the light. Defaults to 1.0
+1.24.13=* `light_position_offset` -> (Vector2) The offset of the light. Defaults to Vector2(0,0)
+2=* Optimized update checks
+3=* Moved `__convert_arr_to_vec2arr` from `DataFormat` to `Math`
+4=* `FileAccess`.`__load_png` now supports STEX files
+5=* Improved efficiency of storing and fetching whether updates have occurred
+6=* Improved pre-caching of mod files
+7=* Fixed issue that prevented MacOS from seeing the miniz library.
+
 [1.16.33]
 
 1=* Fixed `DataFormat`.`__compile_script_object` not properly storing a hashed object when provided with parameters
