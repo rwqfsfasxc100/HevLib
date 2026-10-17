@@ -1,3 +1,7 @@
+[1.17.2]
+
+1=* Fixed `FileAccess`.`__load_png` trying to a blank image as a fallback
+
 [1.17.1]
 
 1=* Ring debug overlays now only update at 15 fps to prevent severe lag on low-to-medium-end devices

@@ -5585,11 +5585,14 @@ class _FileAccess:
 	const JPG_HEADERS = [PoolByteArray([0xFF, 0xD8, 0xFF, 0xDB]),PoolByteArray([0xFF, 0xD8, 0xFF, 0xE0]),PoolByteArray([0xFF, 0xD8, 0xFF, 0xE1]),PoolByteArray([0xFF, 0xD8, 0xFF, 0xEE])]
 	const WEBP_HEADERS = [PoolByteArray([0x42, 0x49, 0x46, 0x46]),PoolByteArray([0x57, 0x45, 0x42, 0x50])]
 	
-	static func __load_png(path,fallback:Image = Image.new()) -> Texture:
+	static func __load_png(path,fallback:Image = null) -> Texture:
 		if not __file_exists(path):
-			var imgtex:ImageTexture = ImageTexture.new()
-			imgtex.create_from_image(fallback)
-			return imgtex
+			if fallback != null and fallback.get_data():
+				var imgtex:ImageTexture = ImageTexture.new()
+				imgtex.create_from_image(fallback)
+				return imgtex
+			else:
+				return ImageTexture.new()
 		var file:File = File.new()
 		file.open(path, File.READ)
 		var header:PoolByteArray = file.get_buffer(12)
@@ -5612,7 +5615,10 @@ class _FileAccess:
 				loaded = img.load_webp_from_buffer(file.get_buffer(file.get_len())) == OK
 			file.close()
 			if not loaded:
-				img = fallback
+				if fallback != null and fallback.get_data():
+					img = fallback
+				else:
+					return ImageTexture.new()
 			var imgtex:ImageTexture = ImageTexture.new()
 			imgtex.create_from_image(img)
 			return imgtex
