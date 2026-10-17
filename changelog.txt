@@ -1,3 +1,11 @@
+[1.17.1]
+
+1=* Ring debug overlays now only update at 15 fps to prevent severe lag on low-to-medium-end devices
+2=* Fixed crash caused by debug overlays not locking the player ship when fetching it's zone and position data
+3=* Added `process_tick` and `physics_process_tick` signals to the pointers script.
+3.1=* These act as a means of having an equivalent to `_process` and `_physics_process` where you'd be otherwise unable to (such as disabling processing to avoid a complete script overwrite, or for non-Node objects)
+3.2=* Both have a `delta` float operand
+
 [1.17.0]
 
 1=* Added ServiceDriver - Adds services to Enceladus Prime via an array of dictionaries from a `SERVICES` constant within `SERVICES.gd`
