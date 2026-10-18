@@ -3637,7 +3637,7 @@ class _Equipment:
 						for ship in ar:
 							var shipdata : Dictionary = ar[ship]
 							if ship in weaponslot_ship_templates:
-								for slot in shipdata:
+								for slot in shipdata.keys():
 									if slot in weaponslot_ship_templates[ship]:
 										var compile : Dictionary = {}
 										var current_dict : Dictionary = {}
@@ -3669,18 +3669,15 @@ class _Equipment:
 								weaponslot_ship_templates[ship] = shipdata
 						
 					"WEAPONSLOT_SHIP_MODIFY.gd":
-						var ar = constants.get("WEAPONSLOT_SHIP_MODIFY",{})
-						for ship in ar:
-							var slots : Dictionary = ar[ship]
-							for slot in slots:
-								var equipment = slots[slot]
-								for item in equipment:
-									if not item in ws_equipment_names:
-										ws_equipment_names.append(item)
-							
-							var shipdata : Dictionary = ar.get(ship)
+						var ar:Dictionary = constants.get("WEAPONSLOT_SHIP_MODIFY",{})
+						for ship in ar.keys():
+							var shipdata : Dictionary = ar[ship]
 							if ship in weaponslot_ship_standalone:
-								for slot in shipdata:
+								for slot in shipdata.keys():
+									var equipment:Dictionary = shipdata[slot]
+									for item in equipment.keys():
+										if not item in ws_equipment_names:
+											ws_equipment_names.append(item)
 									if slot in weaponslot_ship_standalone[ship]:
 										var compile : Dictionary = {}
 										var current_dict : Dictionary = {}
@@ -3693,13 +3690,13 @@ class _Equipment:
 												var property = equip.get("property")
 												var value = equip.get("value")
 												current_dict[type][property] = value
-										for type in shipdata[slot]:
+										for type in equipment[slot].keys():
 											if not type in compile:
 												compile[type] = []
 											if not type in current_dict:
 												current_dict[type] = {}
-											for equip in shipdata[slot][type]:
-												var property = equip.get("property")
+											for equip in equipment[slot][type]:
+												var property:String = equip.get("property")
 												var value = equip.get("value")
 												if equip.get("use_stringified_value",false):
 													value = pointers.DataFormat.__convert_var_from_string(value)
@@ -3712,6 +3709,11 @@ class _Equipment:
 										weaponslot_ship_standalone[ship][slot] = shipdata.get(slot)
 							else:
 								weaponslot_ship_standalone[ship] = shipdata
+								for slot in shipdata.keys():
+									var equipment:Dictionary = shipdata[slot]
+									for item in equipment.keys():
+										if not item in ws_equipment_names:
+											ws_equipment_names.append(item)
 						
 					"SAVE_BUTTONS.gd":
 						var ar : Array = constants.get("SAVE_BUTTONS",[])
