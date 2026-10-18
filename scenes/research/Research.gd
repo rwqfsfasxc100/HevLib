@@ -83,9 +83,9 @@ func _ready():
 	current_project_management.current_mod_ids = mod_ids
 	dormant_project_management.current_mod_ids = mod_ids
 	var research_store = pointers.Equipment.research_store
-	var researchEnabled = research_store.empty() and pointers.is_editor # REMOVE WHEN FINISHED
-	CurrentGame.hl_research_enabled = researchEnabled
-	if researchEnabled:
+	var researchDisabled = research_store.empty() or not pointers.is_editor # REMOVE WHEN FINISHED
+	CurrentGame.hl_research_enabled = researchDisabled
+	if researchDisabled:
 		research_button.get_parent().remove_child(research_button)
 		Tool.remove(research_button)
 	else:
