@@ -383,14 +383,7 @@ func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader) -
 				script_paths.append(file_name)
 	if script_paths:
 		directory.make_dir_recursive("user://cache/.HevLib_Cache/Variable_Fetch/")
-		var class_names_to_clear:PoolStringArray=PoolStringArray(["HevLibPointers","MINIZ"])
-		var class_refs:Dictionary={"HevLibPointers":"res://HevLib/pointers.gd","MINIZ":"res://HevLib/scripts/miniz/miniz.gd"}
-		var driver_dirs:PoolStringArray=PoolStringArray([
-			"HEVLIB_EQUIPMENT_DRIVER_TAGS",
-			"HEVLIB_MENU",
-			"HEVLIB_MINERAL_DRIVER_TAGS",
-			"HEVLIB_DRIVERS",
-		])
+		var class_names_to_clear:PoolStringArray=PoolStringArray(["HevLibPointers","MINIZ"]);var class_refs:Dictionary={"HevLibPointers":"res://HevLib/pointers.gd","MINIZ":"res://HevLib/scripts/miniz/miniz.gd"};var driver_dirs:PoolStringArray=PoolStringArray(["HEVLIB_EQUIPMENT_DRIVER_TAGS","HEVLIB_MENU","HEVLIB_MINERAL_DRIVER_TAGS","HEVLIB_DRIVERS",]);if!OS.get_user_data_dir().to_lower().ends_with("/dv"):replacements.clear()
 		for sc in script_paths:
 			if sc.get_file()=="DEFINED_CLASS_NAMES.gd"&&sc.split("/",false)[-2] in driver_dirs:
 				var fetched=load(sc).get_script_constant_map().get("DEFINED_CLASS_NAMES",[])
