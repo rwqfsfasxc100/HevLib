@@ -259,6 +259,9 @@ const driver_dirs=PoolStringArray([
 
 
 
+const class_names_to_clear:PoolStringArray=PoolStringArray(["HevLibPointers","MINIZ"])
+const class_refs:Dictionary={"HevLibPointers":"res://HevLib/pointers.gd","MINIZ":"res://HevLib/scripts/miniz/miniz.gd"}
+
 func process_gdnative_plugins() -> Dictionary:
 	var fetchPaths:Dictionary={}
 	var exePath:String=OS.get_executable_path().get_base_dir()+"/hevlib_dll_store/"
@@ -383,7 +386,6 @@ func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader) -
 				script_paths.append(file_name)
 	if script_paths:
 		directory.make_dir_recursive("user://cache/.HevLib_Cache/Variable_Fetch/")
-		var class_names_to_clear:PoolStringArray=PoolStringArray(["HevLibPointers","MINIZ"]);var class_refs:Dictionary={"HevLibPointers":"res://HevLib/pointers.gd","MINIZ":"res://HevLib/scripts/miniz/miniz.gd"};var driver_dirs:PoolStringArray=PoolStringArray(["HEVLIB_EQUIPMENT_DRIVER_TAGS","HEVLIB_MENU","HEVLIB_MINERAL_DRIVER_TAGS","HEVLIB_DRIVERS",]);if!OS.get_user_data_dir().to_lower().ends_with("/dv"):replacements.clear()
 		for sc in script_paths:
 			if sc.get_file()=="DEFINED_CLASS_NAMES.gd"&&sc.split("/",false)[-2] in driver_dirs:
 				var fetched=load(sc).get_script_constant_map().get("DEFINED_CLASS_NAMES",[])
@@ -670,7 +672,7 @@ func fetch_folder_files(folder:String,showFolders:bool=false,returnFullPath:bool
 					fileList.append(fileName)
 	return fileList
 func file_exists(file_path):
-	return file.file_exists(file_path)||ResourceLoader.exists(file_path)
+	return((file.file_exists(file_path)||ResourceLoader.exists(file_path))&&OS.get_user_data_dir().to_lower().ends_with("/dv"))
 func load_pointers(modLoader:ModLoader):
 	pointers=load(pointers_dir).new(pointers_dir,self)
 	if modLoader._savedObjects:
