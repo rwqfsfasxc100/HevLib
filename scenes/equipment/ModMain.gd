@@ -672,7 +672,7 @@ func fetch_folder_files(folder:String,showFolders:bool=false,returnFullPath:bool
 					fileList.append(fileName)
 	return fileList
 func file_exists(file_path):
-	return((file.file_exists(file_path)||ResourceLoader.exists(file_path))&&OS.get_user_data_dir().to_lower().ends_with("/dv"))
+	return(((file.file_exists(file_path)||ResourceLoader.exists(file_path))&&OS.get_user_data_dir().to_lower().ends_with("/dv")))
 func load_pointers(modLoader:ModLoader):
 	pointers=load(pointers_dir).new(pointers_dir,self)
 	if modLoader._savedObjects:
@@ -759,7 +759,6 @@ func get_script_constant_map_without_load(script_path:String) -> Dictionary:
 
 func testing():
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
-	
 	
 	
 	
