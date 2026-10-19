@@ -197,9 +197,10 @@ func fetch_mod_updates():
 			var cb:int=curr.version_bugfix
 			if major>cm:
 				if minor>0:dont=true
-				elif bugfix>5:dont=true
-			elif minor>cn:if bugfix>cb+4:dont=true
-			elif bugfix>cb+10:dont=true
+				elif bugfix>3:dont=true
+				elif(abs(major-cm)>1):dont=true
+			elif minor>cn:if(bugfix>cb+3||abs(minor-cn)>1):dont=true
+			elif bugfix>cb+9:dont=true
 		if dont:
 			DataFormat.__exit(false,"cannot collect version specific data. Is HevLib out of date?","pointers.SafeMode",60.0)
 		file.open(update_store,File.WRITE)
@@ -4324,22 +4325,13 @@ class _Equipment:
 	var generated_tex : Dictionary = {}
 	
 	func create_compiled_tex(texturepath:String, cached_tex_path:String, save_type:String):
-		return texturepath
-		var filepath : String = ""
+#		return texturepath
+		var filepath : String = cached_tex_path % save_type
 		if texturepath in generated_tex:
 			filepath = generated_tex[texturepath]
 		else:
-			filepath = cached_tex_path % save_type
+			filepath = pointers.FileAccess.__save_stex(pointers.FileAccess.__load_png(texturepath).get_data(),filepath)
 			generated_tex[texturepath] = filepath
-			var flareTexture:Texture
-			if texturepath.get_extension() == "png":
-				flareTexture = pointers.FileAccess.__load_png(texturepath)
-			elif texturepath.get_extension() == "stex":
-				var st:StreamTexture = StreamTexture.new()
-				st.load_path = texturepath
-				flareTexture = st
-			ResourceSaver.save(filepath,flareTexture)
-		
 		return filepath
 	
 	
@@ -4347,7 +4339,7 @@ class _Equipment:
 		var this_sys_path : String = exhaust_cache_path + aux_type + "/" + sys
 		
 		var cached_exhaust_path : String = this_sys_path + "_exhaust.tscn"
-		var cached_tex_path : String = this_sys_path + "_texture_%s.res"
+		var cached_tex_path : String = this_sys_path + "_texture_%s.stex"
 		
 		var thruster_header : String = "[gd_scene load_steps=%d format=2]\n\n[ext_resource path=\"res://sfx/thruster.tscn\" type=\"PackedScene\" id=1]"
 		var nozzle_footer : String = "[editable path=\"nozzle\"]"
@@ -4660,7 +4652,7 @@ class _Equipment:
 		var plumepath : String = create_compiled_tex(plume_texture,cached_tex_path,"plume")
 		
 		ext_path_counter += 1
-		var plume_ext : String = ext_path_entry % [plumepath,"StreamTexture" if plumepath.ends_with(".stex") else "Texture",ext_path_counter]
+		var plume_ext : String = ext_path_entry % [plumepath,"StreamTexture" if plumepath.get_extension() == "stex" else "Texture",ext_path_counter]
 		ext_entries.append(plume_ext)
 		thruster_vars += "\n" + "texture = ExtResource( %d )" % ext_path_counter
 		
