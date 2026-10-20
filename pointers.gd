@@ -5187,6 +5187,9 @@ class _Equipment:
 		var override_additive : Array = Array(slot_data.get("override_additive",[]))
 		var override_subtractive : Array = Array(slot_data.get("override_subtractive",[]))
 		var restrict_hold_type : String = slot_data.get("restrict_hold_type","")
+		var story_flag : String = slot_data.get("story_flag","")
+		var story_flag_min : int = slot_data.get("story_flag_min",-1)
+		var story_flag_max : int = slot_data.get("story_flag_max",-1)
 		
 		var cfg : Dictionary = slot_data.get("config",{})
 		
@@ -5233,6 +5236,13 @@ class _Equipment:
 			base += initial
 		if restrict_hold_type:
 			base += "\nrestrict_hold_type = \"%s\"" % restrict_hold_type
+		if story_flag:
+			base += "\nstory_flag = \"\"%s\"" % story_flag
+			if story_flag_min > -1:
+				base += "\nstory_flag_min = %d" % story_flag_min
+			if story_flag_max > -1:
+				base += "\nstory_flag_max = %d" % story_flag_max
+		
 		base += "\n\n[node name=\"CheckButton\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s/VBoxContainer/HBoxContainer\"]\ntext = \"%s\"" % [slotNodeName,slotDisplayName]
 		
 		if hasNone: base += "\n\n" + __make_equipment_for_scene({"system":"SYSTEM_NONE","default":true,"name":"None"}, slotNodeName, systemSlot)

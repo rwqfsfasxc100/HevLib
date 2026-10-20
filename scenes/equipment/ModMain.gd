@@ -88,7 +88,6 @@ func _init(modLoader:ModLoader=ModLoader):
 		"res://HevLib/scenes/equipment/SystemShipUpgradeUI.gd",
 		"res://HevLib/scenes/equipment/SystemBuyUI.gd",
 		"res://HevLib/scenes/equipment/UpgradeGroup.gd",
-		"res://HevLib/scenes/equipment/hardpoints/EquipmentItemTemplate.gd",
 		"res://HevLib/scenes/equipment/ThrusterSlot.gd",
 		"res://HevLib/scenes/weaponslot/weapon_slot_handler.gd",
 		"res://HevLib/scenes/equipment/ShipModificationDriver/AddNodes.gd",
