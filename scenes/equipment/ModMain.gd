@@ -114,6 +114,8 @@ func _init(modLoader:ModLoader=ModLoader):
 		"res://HevLib/ui/mod_menu/titlescreen/DLClist.gd",
 		PoolStringArray(["res://HevLib/scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"]),
 		"res://HevLib/scripts/transit_tips/TransitTip.gd",
+		"res://HevLib/scripts/easters/Screensaver.gd",
+		"res://HevLib/scripts/easters/TitleMenu.gd",
 		"res://HevLib/scenes/minerals/Summary.gd",
 		"res://HevLib/scenes/rpc/Crew.gd",
 		"res://HevLib/scenes/rpc/Dealer.gd",
@@ -140,6 +142,7 @@ func _init(modLoader:ModLoader=ModLoader):
 		"res://HevLib/scenes/minerals/multiminerals/MineralProcessingUnit.gd",
 		"res://HevLib/scenes/minerals/multiminerals/AsteroidSpawner.gd",
 		"res://HevLib/scenes/service_driver/Services.gd",
+		["res://HevLib/scripts/Screensaver.gd",1000],
 	]
 	
 	
