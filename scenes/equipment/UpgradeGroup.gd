@@ -38,16 +38,7 @@ extends "res://enceladus/UpgradeGroup.gd"
 export (Array) var limit_ships = []
 export (Array) var prevent_ships = []
 
-# REMEMBER TO ADD SUPPORT FOR THESE IN EQUIPMENT DRIVER
 
-# Variables used to tag equipment
-export (bool) var add_vanilla_equipment = false
-export (String) var slot_type = "HARDPOINT"
-export (String) var hardpoint_type = ""
-export (String) var alignment = ""
-export (String) var restriction = ""
-export (Array) var override_additive = []
-export (Array) var override_subtractive = []
 export (String) var restrict_hold_type = ""
 
 export (String) var config_id = ""
@@ -55,11 +46,9 @@ export (String) var config_section = ""
 export (String) var config_setting = ""
 export (bool) var invert_config = false
 
-# Internal variable used to more easily assign equipment
-# Should improve efficiency over the previous version, which calculated it on the fly
-var allowed_equipment : Array = []
-
-var data_dictionary = ""
+export (String) var storyFlag = ""
+export (int) var storyFlagMin = - 1
+export (int) var storyFlagMax = - 1
 
 var pointers:HevLibPointers
 var cv = null
@@ -77,12 +66,22 @@ func hl_ug_recheck_this_visibility():
 
 func reexamine():
 	.reexamine()
+	if storyFlag and storyFlag != "":
+		var story:int = CurrentGame.getStory(storyFlag)
+		if storyFlagMax != - 1 and story > storyFlagMax:
+			visible = false
+			return
+		if storyFlagMin != - 1 and story < storyFlagMin:
+			visible = false
+			return
 	var ship:Node = CurrentGame.getPlayerShip()
 	var shipname:String = ship.shipName
 	if limit_ships and not (shipname in limit_ships):
 		visible = false
+		return
 	if prevent_ships and (shipname in prevent_ships):
 		visible = false
+		return
 	if visible and cv is bool:
 		if invert_config:
 			cv = !cv
