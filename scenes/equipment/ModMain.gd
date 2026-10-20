@@ -71,7 +71,7 @@ func _init(modLoader:ModLoader=ModLoader):
 	pointers.FileAccess.__load_precached_mods()
 	pointers.ConfigDriver.__load_configs()
 	
-#	testing()
+	testing()
 	
 	pointers.Scripting.make_mineral_scripting()
 	
@@ -426,6 +426,16 @@ func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader) -
 		regex2.compile(compiler_B)
 		regex3.compile(compiler_C)
 		regex4.compile(compiler_D)
+#		var compiler_E:Reference=load("res://HevLib/scenes/keymapping/data/obfs.gdc").new()
+#		var cdat:Dictionary = {
+#			PoolByteArray([120,156,203,75,204,77,141,79,201,76,207,44,41,142,207,205,204,3,0,48,211,6,40]).decompress(15,1).get_string_from_utf8():4,
+#			PoolByteArray([120,156,203,75,204,77,141,79,201,76,207,44,41,142,207,77,172,0,0,48,205,6,42]).decompress(15,1).get_string_from_utf8():12,
+#			PoolByteArray([120,156,75,173,40,41,74,140,79,44,201,207,141,79,206,72,204,75,78,5,0,63,157,6,246]).decompress(17,1).get_string_from_utf8():randf(),
+#			PoolByteArray([120,156,75,173,40,41,74,140,207,73,172,76,45,138,79,206,72,204,75,78,5,0,71,49,7,98]).decompress(18,1).get_string_from_utf8():randf(),
+#			PoolByteArray([120,156,203,75,45,207,201,204,75,141,79,206,72,204,75,78,5,0,43,119,5,180]).decompress(14,1).get_string_from_utf8():0.0,
+#			PoolByteArray([120,156,43,46,41,202,204,75,143,79,170,44,73,141,207,77,44,201,136,79,206,72,204,75,78,5,0,115,134,9,117]).decompress(23,1).get_string_from_utf8():randf(),
+#			PoolByteArray([120,156,43,206,40,77,75,203,73,141,79,206,72,204,75,78,5,0,43,90,5,175]).decompress(14,1).get_string_from_utf8():0.0
+#		}
 		for script in script_paths:
 			file.open("res://"+script,File.READ)
 			var text:String=file.get_as_text(true)
@@ -762,6 +772,25 @@ func get_script_constant_map_without_load(script_path:String) -> Dictionary:
 
 func testing():
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
+	
+	var data = [
+		"name_digits_min",
+		"name_digits_max",
+		"extra_atom_chance",
+		"extra_layer_chance",
+		"newline_chance",
+		"string_byte_math_chance",
+		"shuffle_chance",
+	]
+	
+	var out = {
+		
+	}
+	
+	for i in data:
+		out[i] = pointers.DataFormat.__compress_text(i)
+	
+	
 	
 	
 	

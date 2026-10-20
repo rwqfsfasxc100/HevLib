@@ -1,3 +1,9 @@
+[1.17.4]
+
+1=* Added `priority` operand for `LOAD_RESOURCES.gd` entries, which let the specific resource override the modlet's `modlet_priority` value and use what's provided
+2=* Screensaver mode now only exits when the escape key is held down for a second
+3=* Added easter eggs
+
 [1.17.3]
 
 1=* Disabled research menu appearing on release builds for real this time
