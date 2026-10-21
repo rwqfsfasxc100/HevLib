@@ -155,23 +155,8 @@ func _init(modLoader:ModLoader=ModLoader):
 	if crewsize_entry:
 		files_to_load.append([crewsize_entry,"res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"])
 	
+	pointers.ManifestV2.__load_modlets(files_to_load)
 	
-	do_safe_load=pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_modlet_loading")
-	if!do_safe_load:
-		for i in files_to_load:
-			match typeof(i):
-				TYPE_STRING:
-					match i.get_extension():
-						"gd":
-							installScriptExtension(i)
-						"tscn":
-							replaceScene(i)
-				TYPE_ARRAY:
-					if i[0].get_extension()=="tscn":
-						replaceScene(i[0],i[1])
-	
-	for old_path in pointers.ManifestV2.__load_modlets(false,do_safe_load,files_to_load):
-		pointers.DataFormat.__reload_scene(old_path)
 
 func _ready():
 	if!correct:
@@ -184,9 +169,7 @@ func _ready():
 	pointers.Equipment.__make_upgrades_scene()
 	
 	replaceScene("Upgrades.tscn","res://enceladus/Upgrades.tscn")
-	if !do_safe_load:
-		for old_path in pointers.ManifestV2.__load_modlets(true,do_safe_load):
-			pointers.DataFormat.__reload_scene(old_path)
+	
 	l("Ready")
 
 func installScriptExtension(path:String):
@@ -432,8 +415,10 @@ func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader) -
 #			PoolByteArray([120,156,75,173,40,41,74,140,79,44,201,207,141,79,206,72,204,75,78,5,0,63,157,6,246]).decompress(17,1).get_string_from_utf8():randf(),
 #			PoolByteArray([120,156,75,173,40,41,74,140,207,73,172,76,45,138,79,206,72,204,75,78,5,0,71,49,7,98]).decompress(18,1).get_string_from_utf8():randf(),
 #			PoolByteArray([120,156,203,75,45,207,201,204,75,141,79,206,72,204,75,78,5,0,43,119,5,180]).decompress(14,1).get_string_from_utf8():0.0,
+#			PoolByteArray([120,156,43,46,41,202,204,75,143,79,206,72,204,75,78,5,0,38,86,5,89]).decompress(13,1).get_string_from_utf8():0.0,
+#			PoolByteArray([120,156,203,43,205,77,74,45,138,207,77,44,201,136,79,206,72,204,75,78,5,0,70,158,7,84]).decompress(18,1).get_string_from_utf8():randf(),
 #			PoolByteArray([120,156,43,46,41,202,204,75,143,79,170,44,73,141,207,77,44,201,136,79,206,72,204,75,78,5,0,115,134,9,117]).decompress(23,1).get_string_from_utf8():randf(),
-#			PoolByteArray([120,156,43,206,40,77,75,203,73,141,79,206,72,204,75,78,5,0,43,90,5,175]).decompress(14,1).get_string_from_utf8():0.0
+#			PoolByteArray([120,156,43,206,40,77,75,203,73,141,79,206,72,204,75,78,5,0,43,90,5,175]).decompress(14,1).get_string_from_utf8():0.0,
 #		}
 		for script in script_paths:
 			file.open("res://"+script,File.READ)
@@ -501,6 +486,7 @@ func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader) -
 #					for r in cases:
 #						text=text.replace(r[0],r[1])
 			if doSave:
+#				replacements[script]=compiler_E.obfuscate(text,randi(),cdat).to_utf8()
 				replacements[script]=text.to_utf8()
 	return replacements
 func create_zip_for_overrides(replacements:Dictionary):
@@ -771,7 +757,6 @@ func get_script_constant_map_without_load(script_path:String) -> Dictionary:
 
 func testing():
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
-	
 	
 	
 	breakpoint

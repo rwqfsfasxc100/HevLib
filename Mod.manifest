@@ -197,13 +197,6 @@ HEVLIB_CONFIG_SECTION_DRIVERS={
 "require_restart": true,
 "type": "bool"
 },
-"safe_modlet_loading": {
-"default": true,
-"description": "HEVLIB_CONFIG_SAFE_MODLET_LOADING_DESC",
-"display_order_position": 11,
-"name": "HEVLIB_CONFIG_SAFE_MODLET_LOADING",
-"type": "bool"
-},
 "show_all_libraries_in_dlclist": {
 "default": false,
 "description": "HEVLIB_CONFIG_SHOW_ALL_LIBRARIES_IN_DLCLIST_TOOLTIP",
@@ -235,7 +228,7 @@ HEVLIB_CONFIG_SECTION_DRIVERS={
 "stop_rendering_on_lost_focus": {
 "default": false,
 "description": "HEVLIB_CONFIG_DISABLE_RENDERING_ON_LOST_FOCUS_DESC",
-"display_order_position": 12,
+"display_order_position": 11,
 "name": "HEVLIB_CONFIG_DISABLE_RENDERING_ON_LOST_FOCUS",
 "type": "bool"
 }

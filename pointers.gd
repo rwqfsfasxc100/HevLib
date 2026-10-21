@@ -4282,27 +4282,12 @@ class _Equipment:
 					file.store_string(thruster_scene)
 					file.close()
 					
-		var ship_limitation_string : String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]"
-		var lim_item : String = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\"]"
-		for i in ship_limitations:
-			ship_limitation_string += "\n\n" + lim_item % i
-			var data : Dictionary = ship_limitations[i]
-			if "limit_ships" in data:
-				if typeof(data["limit_ships"]) == TYPE_STRING:
-					data["limit_ships"] = PoolStringArray([data["limit_ships"]])
-				ship_limitation_string += "\nlimit_ships = [\"%s\"]" % "\",\"".join(PoolStringArray(data["limit_ships"]))
-			if "prevent_ships" in data:
-				if typeof(data["prevent_ships"]) == TYPE_STRING:
-					data["prevent_ships"] = PoolStringArray([data["prevent_ships"]])
-				ship_limitation_string += "\nprevent_ships = [\"%s\"]" % "\",\"".join(PoolStringArray(data["prevent_ships"]))
-			
 		
 		if ws_editable_paths:
 			weaponslot_string = weaponslot_string + "\n\n" + ws_editable_paths
 		
 		
 		pointers.DataFormat.__replace_scene(concat,"res://enceladus/Upgrades.tscn")
-		pointers.DataFormat.__replace_scene(ship_limitation_string,"res://enceladus/Upgrades.tscn")
 		
 		UpgradeMenu.free()
 
@@ -5178,8 +5163,8 @@ class _Equipment:
 		var alwaysDisplay:bool = slot_data.get("always_display", true)
 		var restrictType : String = slot_data.get("restrict_type", "")
 		var openByDefault:bool = slot_data.get("open_by_default", false)
-		var limitShips : Array = slot_data.get("limit_ships", [])
-		var preventShips : Array = slot_data.get("prevent_ships", [])
+		var limitShips : PoolStringArray = PoolStringArray([slot_data.get("limit_ships", [])])
+		var preventShips : PoolStringArray = PoolStringArray([slot_data.get("prevent_ships", [])])
 		var add_vanilla_equipment:bool = slot_data.get("add_vanilla_equipment", true)
 		var hardpoint_type : String = slot_data.get("hardpoint_type","")
 		var alignment : String = slot_data.get("alignment","")
@@ -5188,8 +5173,6 @@ class _Equipment:
 		var override_subtractive : Array = Array(slot_data.get("override_subtractive",[]))
 		var restrict_hold_type : String = slot_data.get("restrict_hold_type","")
 		var story_flag : String = slot_data.get("story_flag","")
-		var story_flag_min : int = slot_data.get("story_flag_min",-1)
-		var story_flag_max : int = slot_data.get("story_flag_max",-1)
 		
 		var cfg : Dictionary = slot_data.get("config",{})
 		
@@ -5218,26 +5201,17 @@ class _Equipment:
 				base += "\ninvert_config = false"
 		if restrictType:
 			base += "\nrestrictType = \"%s\"" % restrictType
-		if not limitShips.empty():
-			var initial : String = ""
-			for item in limitShips:
-				if initial: initial += ", "
-				else: initial = "\nlimit_ships = ["
-				initial += "\"%s\"" % item
-			initial += "]"
-			base += initial
-		if not preventShips.empty():
-			var initial : String = ""
-			for item in preventShips:
-				if initial: initial += ", "
-				else: initial = "\nprevent_ships = ["
-				initial += "\"%s\"" % item
-			initial += "]"
-			base += initial
+		if limitShips:
+			base += "\nlimit_ships = [\"%s\"]" % "\",\"".join(limitShips)
+		if preventShips:
+			base += "\nprevent_ships = [\"%s\"]" % "\",\"".join(preventShips)
+		
 		if restrict_hold_type:
 			base += "\nrestrict_hold_type = \"%s\"" % restrict_hold_type
 		if story_flag:
 			base += "\nstory_flag = \"\"%s\"" % story_flag
+			var story_flag_min : int = slot_data.get("story_flag_min",-1)
+			var story_flag_max : int = slot_data.get("story_flag_max",-1)
 			if story_flag_min > -1:
 				base += "\nstory_flag_min = %d" % story_flag_min
 			if story_flag_max > -1:
@@ -8113,161 +8087,117 @@ class _ManifestV2:
 		REPLACE_RESOURCE
 	}
 	
-	static func __load_modlets(is_onready : bool,do_safe_load : bool,preprocess_paths:Array = Array()) -> PoolStringArray:
+	const load_safe_resource_reference = []
+	
+	static func __load_modlets(preprocess_paths:Array = Array()) -> void:
 		var pointers:HevLibPointers = non_static["pointers"]
-		if do_safe_load:
-			pointers.l("Loading modlet resources with order-safe mode. Skipping onready distinction and proceeding in a single batch","pointers.SafeMode")
-			pointers.DataFormat.__loadDLC()
-			var resource_paths:Array = Array()
-			var file:File = File.new()
-			for i in preprocess_paths:
-				match typeof(i):
-					TYPE_STRING:
-						var ed:String = ""
-						file.open(i,File.READ)
-						var data:String = file.get_as_text(true)
-						file.close()
-						if "extends \"" in data:
-							for line in data.split("\n"):
-								if line.strip_edges().begins_with("extends \""):
-									ed = line.split("\"")[1]
-									break
-						resource_paths.append({"path":i,"mode":LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed,"priority":-INF,"mod_path":"res://HevLib/ModMain.gd"})
-					TYPE_STRING_ARRAY:
-						resource_paths.append({"path":i[0],"mode":LOAD_TYPE.REPLACE_RESOURCE,"extra_data":i[1],"priority":-INF,"mod_path":"res://HevLib/ModMain.gd"})
-					TYPE_ARRAY:
-						var ed:String = ""
-						var ot:String = i[0]
-						file.open(ot,File.READ)
-						var data:String = file.get_as_text(true)
-						file.close()
-						if "extends \"" in data:
-							for line in data.split("\n"):
-								if line.strip_edges().begins_with("extends \""):
-									ed = line.split("\"")[1]
-									break
-						resource_paths.append({"path":ot,"mode":LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed,"priority":i[1],"mod_path":"res://HevLib/ModMain.gd"})
-			for modlet in __get_modlet_files():
-				var mod_data:Dictionary = pointers.ManifestV2.__get_mod_by_id(pointers.ManifestV2.__match_mod_file_path_to_id(modlet))
-				var drivers:Dictionary = mod_data["drivers"]
-				var priority = mod_data["priority"]
-				if "LOAD_RESOURCES.gd" in drivers.keys():
-					var resources : Dictionary = drivers["LOAD_RESOURCES.gd"].get("LOAD_RESOURCES",{})
-					for resource in resources.keys():
-						var subdata:Dictionary = resources[resource]
-						var load_type:String = subdata.get("load_type","").to_lower()
-						if load_type.empty():
-							match resource.get_extension():
-								"gd","gdc":
-									load_type = "script"
-								"tscn","res","tres":
-									load_type = "resource"
-						match load_type:
-							"script":
-								var path:String=resource if resource.begins_with("res://")else(modlet.get_base_dir()+(""if resource.begins_with("/")else"/")+resource)
-								if pointers.ConfigDriver.__validate_dictionary(subdata)&&pointers.FileAccess.__file_exists(path):
-									var op=subdata.get("override_path","res:/"+path.split(modlet.get_base_dir())[1])
-									var override_path:String=op if(op.begins_with("res:/"))else("res:/"+(""if op.begins_with("/")else"/")+op)
-									if subdata.get("override",false)&&pointers.FileAccess.__file_exists(override_path):
-										resource_paths.append({"path":path,"mode":LOAD_TYPE.OVERRIDE_SCRIPT,"extra_data":override_path,"priority":subdata.get("priority",priority),"mod_path":modlet})
-									else:
-										var ed:String = subdata.get("base_script_path","")
-										if ed.empty()&&path.get_extension()=="gd":
-											file.open(path,File.READ)
-											var data:String = file.get_as_text(true)
-											file.close()
-											if "extends \"" in data:
-												for line in data.split("\n"):
-													if line.strip_edges().begins_with("extends \""):
-														ed = line.split("\"")[1]
-														break
-										resource_paths.append({"path":path,"mode":LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed,"priority":subdata.get("priority",priority),"mod_path":modlet})
-							"scene","resource":
-								var path : String = resource if resource.begins_with("res://") else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
-								var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[1])
-								var old_path : String = old if (old.begins_with("res:/")) else ("res:/" + ("" if old.begins_with("/") else "/") + old)
-								if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
-									resource_paths.append({"path":path,"mode":LOAD_TYPE.REPLACE_RESOURCE,"extra_data":old_path,"priority":subdata.get("priority",priority),"mod_path":modlet})
-			var ovr:Dictionary = Dictionary()
-			for f in resource_paths:
-				var path:String = f["path"]
-				var extra:String = f["extra_data"]
-				var priority:float = float(f["priority"])
-				if not extra:
-					extra = path
-				if not extra in ovr:
-					ovr[extra] = {"paths":Array(),"deps":Array()}
-				for i in pointers.SafeMode.__lookup_file_dependancies(path):
-					if not i in ovr[extra]["deps"]:
-						ovr[extra]["deps"].append(i)
-				ovr[extra]["paths"].append([f.mode,path,f.priority,f.mod_path])
-			var LO:Array = pointers.SafeMode.vanilla_load_order
-			var order:Array = Array()
-			for i in ovr:
-				var d:Dictionary = ovr[i]
-				var paths:Array = d.paths
-				paths.sort_custom(non_static["self"],"sortModOrder")
-				order.append([i,d.deps,paths,LO.find(i)])
-			order.sort_custom(non_static["self"],"sortLoadOrder")
-			for r in order:
-				var extra:String = r[0]
-				for i in r[2]:
-					var this_resource:String = i[1]
-					match i[0]:
-						LOAD_TYPE.EXTEND_SCRIPT:
-							pointers.DataFormat.__extend_script(this_resource)
-						LOAD_TYPE.OVERRIDE_SCRIPT:
-							pointers.DataFormat.__override_script(this_resource,extra)
-						LOAD_TYPE.REPLACE_RESOURCE:
-							pointers.DataFormat.__replace_resource(this_resource,extra)
-			pointers.l("%d modlet resources loaded." % resource_paths.size(),"pointers.SafeMode")
-			return PoolStringArray()
-		pointers.l("Loading modlet resources with legacy mode. Processing onready phase? [%s]" % (is_onready),"pointers.SafeMode")
-		var scenes_to_reload : PoolStringArray = PoolStringArray()
-		var resCount:int = 0
+		pointers.l("Loading modlet resources with order-safe mode.","pointers.SafeMode")
 		pointers.DataFormat.__loadDLC()
+		var resource_paths:Array = Array()
+		var file:File = File.new()
+		for i in preprocess_paths:
+			match typeof(i):
+				TYPE_STRING:
+					var ed:String = ""
+					file.open(i,File.READ)
+					var data:String = file.get_as_text(true)
+					file.close()
+					if "extends \"" in data:
+						for line in data.split("\n"):
+							if line.strip_edges().begins_with("extends \""):
+								ed = line.split("\"")[1]
+								break
+					resource_paths.append({"path":i,"mode":LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed,"priority":-INF,"mod_path":"res://HevLib/ModMain.gd"})
+				TYPE_STRING_ARRAY:
+					resource_paths.append({"path":i[0],"mode":LOAD_TYPE.REPLACE_RESOURCE,"extra_data":i[1],"priority":-INF,"mod_path":"res://HevLib/ModMain.gd"})
+				TYPE_ARRAY:
+					var ed:String = ""
+					var ot:String = i[0]
+					file.open(ot,File.READ)
+					var data:String = file.get_as_text(true)
+					file.close()
+					if "extends \"" in data:
+						for line in data.split("\n"):
+							if line.strip_edges().begins_with("extends \""):
+								ed = line.split("\"")[1]
+								break
+					resource_paths.append({"path":ot,"mode":LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed,"priority":i[1],"mod_path":"res://HevLib/ModMain.gd"})
 		for modlet in __get_modlet_files():
-			var drivers:Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(modlet)
+			var mod_data:Dictionary = pointers.ManifestV2.__get_mod_by_id(pointers.ManifestV2.__match_mod_file_path_to_id(modlet))
+			var drivers:Dictionary = mod_data["drivers"]
+			var priority = mod_data["priority"]
 			if "LOAD_RESOURCES.gd" in drivers.keys():
 				var resources : Dictionary = drivers["LOAD_RESOURCES.gd"].get("LOAD_RESOURCES",{})
 				for resource in resources.keys():
 					var subdata:Dictionary = resources[resource]
-					if is_onready == subdata.get("onready",false):
-						var load_type:String = subdata.get("load_type","").to_lower()
-						if load_type.empty():
-							match resource.get_extension():
-								"gd","gdc":
-									load_type = "script"
-								"tscn","res","tres":
-									load_type = "resource"
-						match load_type:
-							"script":
-								var path:String=resource if resource.begins_with("res://") else(modlet.get_base_dir()+(""if resource.begins_with("/")else"/")+resource)
-								if pointers.ConfigDriver.__validate_dictionary(subdata)&&pointers.FileAccess.__file_exists(path):
-									var op=subdata.get("override_path","res:/"+path.split(modlet.get_base_dir())[1])
-									var override_path:String=op if(op.begins_with("res:/"))else("res:/"+(""if op.begins_with("/")else"/")+op)
-									if subdata.get("override",false)&&pointers.FileAccess.__file_exists(override_path):
-										pointers.DataFormat.__override_script(path,override_path)
-									else:
-										pointers.DataFormat.__extend_script(path)
-									resCount += 1
-							"scene","resource":
-								var path : String = resource if resource.begins_with("res://") else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
-								var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[1])
-								var old_path : String = old if (old.begins_with("res:/")) else ("res:/" + ("" if old.begins_with("/") else "/") + old)
-								if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
-									pointers.DataFormat.__replace_resource(path,old_path)
-									if not old_path in scenes_to_reload:
-										scenes_to_reload.append(old_path)
-									resCount += 1
-							"reload":
-								var path : String = resource if resource.begins_with("res://") else ("res:/" + ("" if resource.begins_with("/") else "/") + resource)
-								if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
-									pointers.DataFormat.__reload_scene(path,subdata.get("complete_reload",false))
-									resCount += 1
-		pointers.l("%d modlet resources loaded." % resCount,"pointers.SafeMode")
-		pointers.DataFormat.__loadDLC()
-		return scenes_to_reload
+					var load_type:String = subdata.get("load_type","").to_lower()
+					if load_type.empty():
+						match resource.get_extension():
+							"gd","gdc":
+								load_type = "script"
+							"tscn","res","tres":
+								load_type = "resource"
+					match load_type:
+						"script":
+							var path:String=resource if resource.begins_with("res://")else(modlet.get_base_dir()+(""if resource.begins_with("/")else"/")+resource)
+							if pointers.ConfigDriver.__validate_dictionary(subdata)&&pointers.FileAccess.__file_exists(path):
+								var op=subdata.get("override_path","res:/"+path.split(modlet.get_base_dir())[1])
+								var override_path:String=op if(op.begins_with("res:/"))else("res:/"+(""if op.begins_with("/")else"/")+op)
+								if subdata.get("override",false)&&pointers.FileAccess.__file_exists(override_path):
+									resource_paths.append({"path":path,"mode":LOAD_TYPE.OVERRIDE_SCRIPT,"extra_data":override_path,"priority":subdata.get("priority",priority),"mod_path":modlet})
+								else:
+									var ed:String = subdata.get("base_script_path","")
+									if ed.empty()&&path.get_extension()=="gd":
+										file.open(path,File.READ)
+										var data:String = file.get_as_text(true)
+										file.close()
+										if "extends \"" in data:
+											for line in data.split("\n"):
+												if line.strip_edges().begins_with("extends \""):
+													ed = line.split("\"")[1]
+													break
+									resource_paths.append({"path":path,"mode":LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed,"priority":subdata.get("priority",priority),"mod_path":modlet})
+						"scene","resource":
+							var path : String = resource if resource.begins_with("res://") else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
+							var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[1])
+							var old_path : String = old if (old.begins_with("res:/")) else ("res:/" + ("" if old.begins_with("/") else "/") + old)
+							if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
+								resource_paths.append({"path":path,"mode":LOAD_TYPE.REPLACE_RESOURCE,"extra_data":old_path,"priority":subdata.get("priority",priority),"mod_path":modlet})
+		var ovr:Dictionary = Dictionary()
+		for f in resource_paths:
+			var path:String = f["path"]
+			var extra:String = f["extra_data"]
+			var priority:float = float(f["priority"])
+			if not extra:
+				extra = path
+			if not extra in ovr:
+				ovr[extra] = {"paths":Array(),"deps":Array()}
+			for i in pointers.SafeMode.__lookup_file_dependancies(path):
+				if not i in ovr[extra]["deps"]:
+					ovr[extra]["deps"].append(i)
+			ovr[extra]["paths"].append([f.mode,path,f.priority,f.mod_path])
+		var LO:Array = pointers.SafeMode.vanilla_load_order
+		var order:Array = Array()
+		for i in ovr:
+			var d:Dictionary = ovr[i]
+			var paths:Array = d.paths
+			paths.sort_custom(non_static["self"],"sortModOrder")
+			order.append([i,d.deps,paths,LO.find(i)])
+		order.sort_custom(non_static["self"],"sortLoadOrder")
+		load_safe_resource_reference.append_array(order)
+#		pointers.FileAccess.__save_file_content("user://dump.json",JSON.print(order,"\t"))
+		for r in order:
+			var extra:String = r[0]
+			for i in r[2]:
+				var this_resource:String = i[1]
+				match i[0]:
+					LOAD_TYPE.EXTEND_SCRIPT:
+						pointers.DataFormat.__extend_script(this_resource)
+					LOAD_TYPE.OVERRIDE_SCRIPT:
+						pointers.DataFormat.__override_script(this_resource,extra)
+					LOAD_TYPE.REPLACE_RESOURCE:
+						pointers.DataFormat.__replace_resource(this_resource,extra)
+		pointers.l("%d modlet resources loaded." % resource_paths.size(),"pointers.SafeMode")
 	
 	static func sortLoadOrder(a:Array,b:Array) -> bool:
 		return a[3] < b[3]
