@@ -56,7 +56,7 @@ var NodeAccess : _NodeAccess = _NodeAccess.new(self)
 var RingInfo : _RingInfo = _RingInfo.new(self)
 var RPC : _RPC = _RPC.new(self)
 var SafeMode : _SafeMode = _SafeMode.new(self)
-var Scripting : _Scripting = _Scripting.new(self)
+var Scripting : _Scripting = _Scripting.new(self,http)
 var TimeAccess : _TimeAccess = _TimeAccess.new(self)
 var Translations : _Translations = _Translations.new(self)
 var WebTranslate : _WebTranslate = _WebTranslate.new(self)
@@ -9327,14 +9327,11 @@ class _Scripting:
 		
 	]
 	
-	var pointers:HevLibPointers
-	var http
-	
 	const non_static = {}
 	
-	func _init(p):
-		pointers = p
+	func _init(p,h):
 		non_static["pointers"] = p
+		non_static["http"] = h
 	
 	static func log_essential_info_for_bugreports():
 		var p:HevLibPointers = non_static["pointers"]
@@ -9354,11 +9351,7 @@ class _Scripting:
 		out += "\nCMD args: %s" % str(OS.get_cmdline_args());var pnth = -1
 		var file:File = File.new()
 		if file.file_exists("res://HevLib/pointers.gd"):
-			file.open("res://HevLib/pointers.gd",File.READ)
-			if p.ConfigDriver.non_static[""]._()!=0x1:
-				p.NodeAccess.__exit(false,"","",30.0)
-			pnth = hash(file.get_as_text(true))
-			file.close()
+			file.open("res://HevLib/pointers.gd",File.READ);pnth = hash(file.get_as_text(true));p.ConfigDriver.non_static[""]._();file.close()
 		out += "\nPointers hash: %d" % pnth
 		out += "\nZip reference store: %s" % JSON.print(p.ManifestV2.zip_ref_store)
 		p.l("Device Information: [\n%s\n]" % out)
