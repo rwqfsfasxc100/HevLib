@@ -1,3 +1,8 @@
+[1.17.7]
+
+1=* Fixed regression where the `limit_ships` and `prevent_ships` properties for equipment slot modifications would be nested, causing the check to always remove ships due to the conversion to a PoolStringArray.
+2=* Re-added second Upgrades.tscn modification for `limit_ships` and `prevent_ships` due to Vanilla slots not being able to receive the change.
+
 [1.17.6]
 
 1=* Removed the ability to disable load order resolution due to it causing crashes within HevLib's own resource list.

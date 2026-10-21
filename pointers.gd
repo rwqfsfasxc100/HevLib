@@ -4286,8 +4286,22 @@ class _Equipment:
 		if ws_editable_paths:
 			weaponslot_string = weaponslot_string + "\n\n" + ws_editable_paths
 		
+		var ship_limitation_string : String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]"
+		var lim_item : String = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\"]"
+		for i in ship_limitations:
+			ship_limitation_string += "\n\n" + lim_item % i
+			var data : Dictionary = ship_limitations[i]
+			if "limit_ships" in data:
+				if typeof(data["limit_ships"]) == TYPE_STRING:
+					data["limit_ships"] = PoolStringArray([data["limit_ships"]])
+				ship_limitation_string += "\nlimit_ships = [\"%s\"]" % "\",\"".join(PoolStringArray(data["limit_ships"]))
+			if "prevent_ships" in data:
+				if typeof(data["prevent_ships"]) == TYPE_STRING:
+					data["prevent_ships"] = PoolStringArray([data["prevent_ships"]])
+				ship_limitation_string += "\nprevent_ships = [\"%s\"]" % "\",\"".join(PoolStringArray(data["prevent_ships"]))
 		
 		pointers.DataFormat.__replace_scene(concat,"res://enceladus/Upgrades.tscn")
+		pointers.DataFormat.__replace_scene(ship_limitation_string,"res://enceladus/Upgrades.tscn")
 		
 		UpgradeMenu.free()
 
@@ -5163,8 +5177,8 @@ class _Equipment:
 		var alwaysDisplay:bool = slot_data.get("always_display", true)
 		var restrictType : String = slot_data.get("restrict_type", "")
 		var openByDefault:bool = slot_data.get("open_by_default", false)
-		var limitShips : PoolStringArray = PoolStringArray([slot_data.get("limit_ships", [])])
-		var preventShips : PoolStringArray = PoolStringArray([slot_data.get("prevent_ships", [])])
+		var limitShips : PoolStringArray = PoolStringArray(slot_data.get("limit_ships", []))
+		var preventShips : PoolStringArray = PoolStringArray(slot_data.get("prevent_ships", []))
 		var add_vanilla_equipment:bool = slot_data.get("add_vanilla_equipment", true)
 		var hardpoint_type : String = slot_data.get("hardpoint_type","")
 		var alignment : String = slot_data.get("alignment","")
