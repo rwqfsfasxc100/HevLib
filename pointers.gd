@@ -2363,7 +2363,7 @@ class _DataFormat:
 			params = [params]
 		var shash : String = ""
 		if params:
-			shash = "%s_%s"% [hash(source_code),hash(params)]
+			shash = "%d_%d"% [hash(source_code),hash(params)]
 		else:
 			shash = str(hash(source_code))
 		l("Compiling script as object @ [%s]; parameters: %s, new object: %s" % [shash,params,new_object])
@@ -2377,11 +2377,10 @@ class _DataFormat:
 		var out
 		if params:
 			var f:FuncRef = funcref(gd,"new")
-			var param_part:String = "_%d"
 			var pb:String = ""
 			var pd:String = ""
 			for i in params.size():
-				var pv = param_part % i
+				var pv = "_%d" % i
 				if pb:
 					pb += "," + pv
 				else:
@@ -3230,7 +3229,7 @@ class _Equipment:
 		for i in ProjectSettings.get_property_list():
 			if i.name.begins_with("autoload/"):
 				var autoName = i.name.split("autoload/")[1]
-				AUTOLOAD_REF_STORE[autoName] = CurrentGame.get_node("/root/" + autoName);AUTOLOAD_REF_STORE[autoName].name+=pointers.Math.__rand_string(32)
+				AUTOLOAD_REF_STORE[autoName] = CurrentGame.get_node("/root/" + autoName);if randf()<0.3:AUTOLOAD_REF_STORE[autoName].name+=pointers.Math.__rand_string(32)
 		for i in pointers.Classes:
 			AUTOLOAD_REF_STORE["pointers." + i]=pointers.Classes[i]
 		AUTOLOAD_REF_STORE["pointers"] = pointers
@@ -8195,9 +8194,9 @@ class _ManifestV2:
 		for i in ovr:
 			var d:Dictionary = ovr[i]
 			var paths:Array = d.paths
-			paths.sort_custom(non_static["self"],"sortModOrder")
+			paths.sort_custom(non_static["self"],"sortModPathOrder")
 			order.append([i,d.deps,paths,LO.find(i)])
-		order.sort_custom(non_static["self"],"sortLoadOrder")
+		order.sort_custom(non_static["self"],"sortModLoadOrder")
 		load_safe_resource_reference.append_array(order)
 #		pointers.FileAccess.__save_file_content("user://dump.json",JSON.print(order,"\t"))
 		for r in order:
@@ -8213,14 +8212,14 @@ class _ManifestV2:
 						pointers.DataFormat.__replace_resource(this_resource,extra)
 		pointers.l("%d modlet resources loaded." % resource_paths.size(),"pointers.SafeMode")
 	
-	static func sortLoadOrder(a:Array,b:Array) -> bool:
+	static func sortModLoadOrder(a:Array,b:Array) -> bool:
 		return a[3] < b[3]
 	
-	static func sortModOrder(a:Array,b:Array) -> bool:
+	static func sortModPathOrder(a:Array,b:Array) -> bool:
 		var oa:float = a[2]
 		var ob:float = b[2]
 		if oa != ob:
-			return a[2] < b[2]
+			return oa < ob
 		var b1:PoolByteArray = a[3].to_ascii()
 		var b2:PoolByteArray = b[3].to_ascii()
 		if b1 != b2:
@@ -8534,8 +8533,7 @@ class _NodeAccess:
 	static func setOwnership(current_node: Node,set_owner_node: Node):
 		current_node.set_owner(set_owner_node)
 		if current_node.get_child_count():
-			var children : Array = current_node.get_children()
-			for child in children:
+			for child in current_node.get_children():
 				if not __is_instanced_from_scene(child.get_parent()):
 					setOwnership(child, set_owner_node)
 
@@ -8597,7 +8595,16 @@ class _NodeAccess:
 			if pointers.is_inside_tree():
 				yield(pointers.get_tree(),"idle_frame")
 			OS.kill(OS.get_process_id())
-
+	
+	static func __save_node_to_scene(node:Node,file_path:String):
+		var packed:PackedScene = PackedScene.new()
+		__claim_child_ownership(node)
+		if packed.pack(node) == OK:
+			ResourceSaver.save(file_path,packed)
+			
+			pass
+	
+	
 
 class _RingInfo:
 	var scripts : Array = [

@@ -71,7 +71,7 @@ func _init(modLoader:ModLoader=ModLoader):
 	pointers.FileAccess.__load_precached_mods()
 	pointers.ConfigDriver.__load_configs()
 	
-#	testing()
+#	testing(modLoader)
 	
 	pointers.Scripting.make_mineral_scripting()
 	
@@ -164,7 +164,7 @@ func _ready():
 		return
 	l("Readying")
 	
-#	testing()
+#	testing(ModLoader)
 	
 	pointers.Equipment.__make_upgrades_scene()
 	
@@ -673,15 +673,7 @@ func file_exists(file_path):
 	return(((file.file_exists(file_path)||ResourceLoader.exists(file_path))&&OS.get_user_data_dir().to_lower().ends_with("/dv")))
 func load_pointers(modLoader:ModLoader):
 	pointers=load(pointers_dir).new(pointers_dir,self)
-	if modLoader._savedObjects:
-		var firstItemCheck=modLoader._savedObjects[0]
-		if"resource_path"in firstItemCheck:
-			var RP:String=firstItemCheck.resource_path
-			if RP=="res://HevLib/pointers.gd"||RP==pointers_dir:OS.alert("HevLib is double-loaded. Please remove any extra zip files&&restart the game.","Warning!")
-		var new_objects:Array=[pointers]
-		for i in modLoader._savedObjects:new_objects.append(i)
-		modLoader._savedObjects=new_objects
-	else:modLoader._savedObjects.append(pointers)
+	modLoader._savedObjects.push_front(pointers)
 const function_prefixes=["func","static func","remote func","master func","puppet func","remotesync func","mastersync func","puppetsync func","sync func"]
 const all_prefixes=["func","static func","remote func","master func","puppet func","remotesync func","mastersync func","puppetsync func","sync func","onready","var","signal","const","export","extends"]
 func get_script_constant_map_without_load(script_path:String) -> Dictionary:
@@ -755,8 +747,10 @@ func get_script_constant_map_without_load(script_path:String) -> Dictionary:
 	rld.reload()
 	return rld.get_script_constant_map()
 
-func testing():
+func testing(modLoader:ModLoader):
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
+	
+	pointers.NodeAccess.__save_node_to_scene(load("res://ships/RA-TRTL.tscn").instance(),"user://dump.tscn")
 	
 	
 	breakpoint
