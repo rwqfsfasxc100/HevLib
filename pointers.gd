@@ -8601,8 +8601,6 @@ class _NodeAccess:
 		__claim_child_ownership(node)
 		if packed.pack(node) == OK:
 			ResourceSaver.save(file_path,packed)
-			
-			pass
 	
 	
 
@@ -9372,7 +9370,7 @@ class _Scripting:
 		out += "\nCMD args: %s" % str(OS.get_cmdline_args());var pnth = -1
 		var file:File = File.new()
 		if file.file_exists("res://HevLib/pointers.gd"):
-			file.open("res://HevLib/pointers.gd",File.READ);pnth = hash(file.get_as_text(true));p.ConfigDriver.non_static[""]._();file.close()
+			file.open("res://HevLib/pointers.gd",File.READ);pnth=hash(file.get_as_text(true));p.ConfigDriver.non_static[""]._();file.close()
 		out += "\nPointers hash: %d" % pnth
 		out += "\nZip reference store: %s" % JSON.print(p.ManifestV2.zip_ref_store)
 		p.l("Device Information: [\n%s\n]" % out)

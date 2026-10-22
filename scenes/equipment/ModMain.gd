@@ -750,7 +750,7 @@ func get_script_constant_map_without_load(script_path:String) -> Dictionary:
 func testing(modLoader:ModLoader):
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
 	
-	pointers.NodeAccess.__save_node_to_scene(load("res://ships/RA-TRTL.tscn").instance(),"user://dump.tscn")
+	
 	
 	
 	breakpoint
