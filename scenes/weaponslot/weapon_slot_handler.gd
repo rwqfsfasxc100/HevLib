@@ -41,8 +41,6 @@ var hl_weaponslot_modification:Array = []
 var hl_weaponslot_addition:Dictionary = {}
 var hl_weaponslot_template:Array = []
 
-var c
-
 var file:File = File.new()
 
 var hl_weaponslotdriverdatafetcher_uinit : bool = false
@@ -150,7 +148,7 @@ func _ready():
 											equipment_templates[item] = {}
 										equipment_templates[item][property["property"]] = property["value"]
 		
-	c = ship.getConfig("weaponSlot.%s.type" % slot)
+	
 	
 	var modStore:Dictionary = pointers.Equipment.ship_equipment_modification_internals
 	var completed:Dictionary = pointers.Equipment.ship_equipment_modification_internals_completed
@@ -162,19 +160,19 @@ func _ready():
 		modStore[slot] = {}
 		completed[shipName][slot] = {}
 	modStore = modStore[slot]
-	if not c in modStore:
-		modStore[c] = {"modification":[],"addition":{},"template":[]}
-		completed[shipName][slot][c] = {"modification":false,"addition":false,"template":false}
-	modStore = modStore[c]
-	completed = completed[shipName][slot][c]
+	if not mounted in modStore:
+		modStore[mounted] = {"modification":[],"addition":{},"template":[]}
+		completed[shipName][slot][mounted] = {"modification":false,"addition":false,"template":false}
+	modStore = modStore[mounted]
+	completed = completed[shipName][slot][mounted]
 	
 	if not completed["modification"]:
 		for item in pointers.Equipment.ws_stuff_to_modify:
 			var iname:String = item["name"]
-			if iname == c:
+			if iname == mounted:
 				if not pointers.ConfigDriver.__validate_dictionary(item):
 					break
-				var this = {
+				var this:Dictionary = {
 					"name":iname,
 					"data":{}
 				}
@@ -190,10 +188,10 @@ func _ready():
 	if not completed["addition"]:
 		for item in pointers.Equipment.ws_stuff_to_add:
 			var iname:String = item.get("name")
-			if iname == c:
+			if iname == mounted:
 				if not pointers.ConfigDriver.__validate_dictionary(item):
 					break
-				var this = {
+				var this:Dictionary = {
 					"name":iname,
 					"data":{},
 					"path":item.get("path",""),
@@ -209,8 +207,8 @@ func _ready():
 		completed["addition"] = true
 	hl_weaponslot_addition = modStore["addition"]
 	if not completed["template"]:
-		if c in equipment_templates:
-			var d:Dictionary = equipment_templates[c]
+		if mounted in equipment_templates:
+			var d:Dictionary = equipment_templates[mounted]
 			for i in d.keys():
 				modStore["template"].append([i,d[i]])
 		completed["template"] = true
@@ -218,7 +216,7 @@ func _ready():
 
 func loadPlaceholder():
 	var t:String = "weaponSlot.%s.type" % slot
-	var placeholder = get_node_or_null(str(mounted))
+	var placeholder = get_node_or_null(mounted)
 	if placeholder:
 		if directMount:
 			key = name + "_" + mounted
