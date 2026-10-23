@@ -32,10 +32,10 @@
 
 extends VBoxContainer
 
-var pointers:HevLibPointers = ModLoader._savedObjects[0]
+onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
 var file:File = File.new()
 
-func _tree_entered():
+func _ready():
 	var sTime:int = OS.get_system_time_msecs()
 	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_equipment_by_price"):
 		for slot in get_children():
