@@ -106,9 +106,9 @@ func sort_slot(slot):
 func reorganize_slots():
 	var slot_types:Dictionary = {}
 	var slot_types_i:Dictionary = {}
-	var order:Array = pointers.Equipment.equipment_slot_order
+	var order:PoolStringArray = pointers.Equipment.equipment_slot_order
 	var order2:Dictionary = pointers.Equipment.relative_equipment_slot_order
-	var slotnames:Array = []
+	var slotnames:PoolStringArray = PoolStringArray()
 	for slot in get_children():
 		slotnames.append(slot.name)
 		var children:Array = slot.get_node("VBoxContainer").get_children()

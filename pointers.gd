@@ -3118,14 +3118,14 @@ class _Equipment:
 			}
 		}
 	
-	var vanilla_equipment : Dictionary
-	var vanilla_data = load("res://HevLib/scenes/equipment/vanilla_defaults/slot_tagging.gd")
-	var hardpoint_types : Array
-	var alignments : Array
-	var equipment_types : Array
-	var slot_types : Array
-	var slot_defaults : Dictionary
-	var vanilla_equipment_defaults_for_reference : Dictionary
+	var vanilla_equipment : Dictionary = {}
+	var vanilla_data:Dictionary = load("res://HevLib/scenes/equipment/vanilla_defaults/slot_tagging.gd").get_script_constant_map()
+	var hardpoint_types : PoolStringArray = vanilla_data.hardpoint_types
+	var alignments : PoolStringArray = vanilla_data.alignments
+	var equipment_types : PoolStringArray = vanilla_data.equipment_types
+	var slot_types : PoolStringArray = vanilla_data.slot_types
+	var slot_defaults : Dictionary = vanilla_data.slot_defaults
+	var vanilla_equipment_defaults_for_reference : Dictionary = vanilla_data.vanilla_equipment_defaults_for_reference
 
 	var file:File = File.new()
 	
@@ -3133,14 +3133,7 @@ class _Equipment:
 	
 	func _init(d):
 		pointers = d
-		
 		vanilla_equipment = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd")
-		hardpoint_types = vanilla_data.hardpoint_types.duplicate(true)
-		alignments = vanilla_data.alignments.duplicate(true)
-		equipment_types = vanilla_data.equipment_types.duplicate(true)
-		slot_types = vanilla_data.slot_types.duplicate(true)
-		slot_defaults = vanilla_data.slot_defaults.duplicate(true)
-		vanilla_equipment_defaults_for_reference = vanilla_data.vanilla_equipment_defaults_for_reference.duplicate(true)
 	
 	# DATA SERIALIZATION STORAGE
 	var ship_equipment_template_internals : Dictionary = {}
@@ -3156,7 +3149,7 @@ class _Equipment:
 	var weaponslot_ship_templates:Dictionary = {}
 	var weaponslot_ship_standalone:Dictionary = {}
 	var ws_equipment_names:Array = []
-	var equipment_slot_order:Array = []
+	var equipment_slot_order:PoolStringArray = PoolStringArray()
 	var relative_equipment_slot_order:Dictionary = {}
 	var save_button_cache:Array = []
 	var processed_storage_mods:Dictionary = {}
@@ -3278,12 +3271,12 @@ class _Equipment:
 			var cvh:Dictionary = drivers[mod_id]
 			for last_bit in cvh.keys():
 				var constants : Dictionary = cvh[last_bit]
-				var constKeys:Array = constants.keys()
+				var constKeys:PoolStringArray = PoolStringArray(constants.keys())
 				match last_bit:
 					"ADD_EQUIPMENT_ITEMS.gd":
 						for item in constKeys:
-							var equipment = constants.get(item)
-							var eqkeys:Array = equipment.keys()
+							var equipment:Dictionary = constants[item]
+							var eqkeys:PoolStringArray = PoolStringArray(equipment.keys())
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								match equipment.get("slot_type","HARDPOINT"):
 									"HARDPOINT":
@@ -3465,15 +3458,13 @@ class _Equipment:
 								ADD_EQUIPMENT_ITEMS.append(equipment)
 					"ADD_EQUIPMENT_SLOTS.gd":
 						for item in constKeys:
-							var equipment = constants.get(item)
+							var equipment:Dictionary = constants[item]
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								ADD_EQUIPMENT_SLOTS.append(equipment)
 					"EQUIPMENT_TAGS.gd":
-						var ar : Dictionary = constants.get("EQUIPMENT_TAGS",{})
-						EQUIPMENT_TAGS.append(ar)
+						EQUIPMENT_TAGS.append(constants.get("EQUIPMENT_TAGS",{}))
 					"SLOT_ORDER.gd":
-						var orders : Array = constants.get("SLOT_ORDER",[])
-						for order in orders:
+						for order in PoolStringArray(constants.get("SLOT_ORDER",PoolStringArray())):
 							if not order in equipment_slot_order:
 								equipment_slot_order.append(order)
 						
@@ -3483,12 +3474,10 @@ class _Equipment:
 								relative_equipment_slot_order[order] = orders2[order]
 						
 					"SLOT_TAGS.gd":
-						var ar : Dictionary = constants.get("SLOT_TAGS",{})
-						SLOT_TAGS.append(ar)
+						SLOT_TAGS.append(constants.get("SLOT_TAGS",{}))
 					"AUX_POWER_SLOT.gd","THRUSTERS.gd","AUX_POWER_AND_THRUSTERS.gd":
 						for item in constKeys:
 							var equipment : Dictionary = constants.get(item)
-							
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								AUX_POWER_AND_THRUSTERS.append(equipment)
 
@@ -3907,17 +3896,16 @@ class _Equipment:
 						for i in constants["SERVICES"]:
 							services_store.append(i)
 		
-		var slots_for_adding : Array = []
 		var slots_for_adding_dict : Dictionary = {}
 		var tag_modifications : Array = []
 		
 		var ship_limitations : Dictionary = {}
 		for nodes in EQUIPMENT_TAGS:
 			if nodes:
-				var slotTypes : Array = Array(nodes.get("slot_types",[]))
-				var equipmentItems : Array = Array(nodes.get("equipment_types",[]))
-				var align : Array = Array(nodes.get("alignments",[]))
-				var hardpointTypes : Array = Array(nodes.get("hardpoint_types",[]))
+				var slotTypes : PoolStringArray = PoolStringArray(nodes.get("slot_types",PoolStringArray()))
+				var equipmentItems : PoolStringArray = PoolStringArray(nodes.get("equipment_types",PoolStringArray()))
+				var align : PoolStringArray = PoolStringArray(nodes.get("alignments",PoolStringArray()))
+				var hardpointTypes : PoolStringArray = PoolStringArray(nodes.get("hardpoint_types",PoolStringArray()))
 				var slotDefaults : Dictionary = nodes.get("slot_defaults",{})
 				for st in slotTypes:
 					if not st in slot_types:
@@ -3941,9 +3929,9 @@ class _Equipment:
 		for slotDict in ADD_EQUIPMENT_SLOTS:
 			var snn : String = slotDict.get("slot_node_name","")
 			var spp : Dictionary = ship_limitations.get(snn,{})
-			var sppKeys:Array = spp.keys()
+			var sppKeys:PoolStringArray = PoolStringArray(spp.keys())
 			if "limit_ships" in slotDict:
-				var val : Array = Array(slotDict["limit_ships"]).duplicate()
+				var val : PoolStringArray = PoolStringArray(slotDict["limit_ships"])
 				if snn in ship_limitations:
 					if "limit_ships" in sppKeys:
 						for i in val:
@@ -3954,7 +3942,7 @@ class _Equipment:
 				else:
 					ship_limitations[snn] = {"limit_ships":val}
 			if "prevent_ships" in slotDict:
-				var val : Array = Array(slotDict["prevent_ships"]).duplicate()
+				var val : PoolStringArray = PoolStringArray(slotDict["prevent_ships"])
 				if snn in ship_limitations:
 					if "prevent_ships" in sppKeys:
 						for i in val:
@@ -3964,7 +3952,6 @@ class _Equipment:
 						ship_limitations[snn]["prevent_ships"] = spp["prevent_ships"]
 				else:
 					ship_limitations[snn] = {"prevent_ships":val}
-			slots_for_adding.append(slotDict)
 			slots_for_adding_dict[snn] = slotDict
 			all_slot_node_names.append(snn)
 		for node in SLOT_TAGS:
@@ -3974,7 +3961,7 @@ class _Equipment:
 					var data : Dictionary = node[snn]
 					var spp : Dictionary = ship_limitations.get(snn,{})
 					if "limit_ships" in data:
-						var val : Array = Array(data["limit_ships"]).duplicate()
+						var val : PoolStringArray = PoolStringArray(data["limit_ships"])
 						if snn in ship_limitations:
 							if "limit_ships" in spp.keys():
 								for f in val:
@@ -3985,7 +3972,7 @@ class _Equipment:
 						else:
 							ship_limitations[snn] = {"limit_ships":val}
 					if "prevent_ships" in data:
-						var val : Array = Array(data["prevent_ships"]).duplicate()
+						var val : PoolStringArray = PoolStringArray(data["prevent_ships"])
 						if snn in ship_limitations:
 							if "prevent_ships" in spp.keys():
 								for f in val:
@@ -3996,39 +3983,41 @@ class _Equipment:
 						else:
 							ship_limitations[snn] = {"prevent_ships":val}
 		
-		var slots_format : PoolStringArray = []
-		var editable_paths : PoolStringArray = []
+		var slots_format : PoolStringArray = PoolStringArray()
+		var editable_paths : PoolStringArray = PoolStringArray()
 		
 		var slot_allowed_equipment : Dictionary = {}
 		
-		for slot in slots_for_adding:
-			var m : String = slot.get("slot_node_name","")
+		var vedfrKeys:PoolStringArray = PoolStringArray(vanilla_equipment_defaults_for_reference.keys())
+		var sfaKeys:PoolStringArray = PoolStringArray(slots_for_adding_dict.keys())
+		for m in sfaKeys:
+			var slot:Dictionary = slots_for_adding_dict[m]
 			var format : Array = __make_slot_for_scene(slot)
 			
 			# FUTURE ME: Write a mod that tag modifies a modded slot, need to double check functionality of this code + define types
 			for data in tag_modifications:
 				if m in data.keys():
-					var slot_override_additive = format[2]["override_additive"]
-					var slot_override_subtractive = format[2]["override_subtractive"]
-					for over in Array(data[m].get("override_additive",[])):
+					var slot_override_additive:PoolStringArray = format[2]["override_additive"]
+					var slot_override_subtractive:PoolStringArray = format[2]["override_subtractive"]
+					for over in PoolStringArray(data[m].get("override_additive",PoolStringArray())):
 						if not over in slot_override_additive:
 							slot_override_additive.append(over)
-					for over in Array(data[m].get("override_subtractive",[])):
+					for over in PoolStringArray(data[m].get("override_subtractive",PoolStringArray())):
 						if not over in slot_override_subtractive:
 							slot_override_subtractive.append(over)
 			slots_format.append(format[0])
 			editable_paths.append(format[1])
-		for slot in vanilla_equipment_defaults_for_reference:
+		for slot in vedfrKeys:
 			var vslot_data : Dictionary = vanilla_equipment_defaults_for_reference[slot]
-			var vslot_additives : Array = Array(vslot_data.get("override_additive",[]))
-			var vslot_subtractives : Array = Array(vslot_data.get("override_subtractive",[]))
+			var vslot_additives : PoolStringArray = PoolStringArray(vslot_data.get("override_additive",PoolStringArray()))
+			var vslot_subtractives : PoolStringArray = PoolStringArray(vslot_data.get("override_subtractive",PoolStringArray()))
 			for dict in tag_modifications:
-				if slot in dict:
+				if slot in dict.keys():
 					var tag_data : Dictionary = dict[slot]
-					for add in Array(tag_data.get("override_additive",[])):
+					for add in PoolStringArray(tag_data.get("override_additive",PoolStringArray())):
 						if not add in vslot_additives:
 							vslot_additives.append(add)
-					for sub in Array(tag_data.get("override_subtractive",[])):
+					for sub in PoolStringArray(tag_data.get("override_subtractive",PoolStringArray())):
 						if not sub in vslot_subtractives:
 							vslot_subtractives.append(sub)
 			if vslot_additives:
@@ -4039,66 +4028,47 @@ class _Equipment:
 			
 			
 		for slot in all_slot_node_names:
-			if slot in vanilla_equipment_defaults_for_reference:
+			if slot in vedfrKeys:
 				var data : Dictionary = vanilla_equipment_defaults_for_reference[slot]
 				var slot_type : String = data.get("slot_type","HARDPOINT").to_upper()
 				if slot_type == "HARDPOINT":
-					var items : Array = Array(slot_defaults.get(data.get("hardpoint_type", ""),[])).duplicate(true)
-					var subtractives : Array = Array(data.get("override_subtractive",[]))
-					for item in Array(data.get("override_additive",[])):
+					var items : Array = Array(PoolStringArray(slot_defaults.get(data.get("hardpoint_type", ""),[])))
+					for item in PoolStringArray(data.get("override_additive",PoolStringArray())):
 						if not item in items:
 							items.append(item)
-					for item in subtractives:
-						var tmp : Array = []
-						for i in items:
-							if not i in subtractives:
-								tmp.append(i)
-						items = tmp
-					
-					slot_allowed_equipment[slot] = items
+					for i in PoolStringArray(data.get("override_subtractive",PoolStringArray())):
+						items.erase(i)
+					slot_allowed_equipment[slot] = PoolStringArray(items)
 				else:
-					var items : Array = Array(slot_defaults.get(slot_type,[])).duplicate(true)
-					var subtractives : Array = Array(data.get("override_subtractive",[]))
-					for item in Array(data.get("override_additive",[])):
+					var items : Array = Array(PoolStringArray(slot_defaults.get(slot_type,[])))
+					for item in PoolStringArray(data.get("override_additive",PoolStringArray())):
 						if not item in items:
 							items.append(item)
-					for item in subtractives:
-						var tmp : Array = []
-						for i in items:
-							if not i in subtractives:
-								tmp.append(i)
-						items = tmp
-					slot_allowed_equipment[slot] = items
-			elif slot in slots_for_adding_dict:
+					for i in PoolStringArray(data.get("override_subtractive",PoolStringArray())):
+						items.erase(i)
+					slot_allowed_equipment[slot] = PoolStringArray(items)
+			elif slot in sfaKeys:
 				var data : Dictionary = slots_for_adding_dict[slot]
 				var slot_type : String = data.get("slot_type","HARDPOINT").to_upper()
 				if slot_type == "HARDPOINT":
-					var items : Array = Array(slot_defaults.get(data.get("hardpoint_type", ""),[])).duplicate(true)
-					var subtractives : Array = Array(data.get("override_subtractive",[]))
-					for item in Array(data.get("override_additive",[])):
+					var items : Array = Array(PoolStringArray(slot_defaults.get(data.get("hardpoint_type", ""),[])))
+					for item in PoolStringArray(data.get("override_additive",PoolStringArray())):
 						if not item in items:
 							items.append(item)
-					for item in subtractives:
-						var tmp : Array = []
-						for i in items:
-							if not i in subtractives:
-								tmp.append(i)
-						items = tmp
-					
-					slot_allowed_equipment[slot] = items
+					for i in PoolStringArray(data.get("override_subtractive",PoolStringArray())):
+						items.erase(i)
+					slot_allowed_equipment[slot] = PoolStringArray(items)
 				else:
-					slot_allowed_equipment[slot] = Array(slot_defaults.get(slot_type,[])).duplicate(true)
+					slot_allowed_equipment[slot] = PoolStringArray(slot_defaults.get(slot_type,PoolStringArray()))
 		
 		
 		var equipment_format : PoolStringArray = PoolStringArray()
-		
-		for slot in slots_for_adding:
+		for st in sfaKeys:
+			var slot:Dictionary = slots_for_adding_dict[st]
 			if slot.get("add_vanilla_equipment",true):
 				for equip in vanilla_equipment:
 					if confirm_equipment(vanilla_equipment[equip], slot.get("slot_type",""), slot.get("alignment",""), slot.get("restriction",""), Array(slot_allowed_equipment.get(slot.get("slot_node_name",""),[]))):
 						equipment_format.append(__make_equipment_for_scene(vanilla_equipment[equip], slot.get("slot_node_name",""), slot.get("system_slot","")))
-		var sfaKeys :Array = slots_for_adding_dict.keys()
-		var vedfrKeys :Array = vanilla_equipment_defaults_for_reference.keys()
 		for slot in all_slot_node_names:
 			if slot in slot_allowed_equipment:
 				for item in ADD_EQUIPMENT_ITEMS:
@@ -4107,30 +4077,45 @@ class _Equipment:
 					var restriction : String = ""
 					var system_slot : String = ""
 					if slot in vedfrKeys:
-						slot_type = vanilla_equipment_defaults_for_reference[slot].get("slot_type","")
-						alignment = vanilla_equipment_defaults_for_reference[slot].get("alignment","")
-						restriction = vanilla_equipment_defaults_for_reference[slot].get("restriction","")
+						var vd:Dictionary = vanilla_equipment_defaults_for_reference[slot]
+						slot_type = vd.get("slot_type","")
+						alignment = vd.get("alignment","")
+						restriction = vd.get("restriction","")
 						system_slot = vanilla_slot_types[slot]
 					elif slot in sfaKeys:
-						slot_type = slots_for_adding_dict[slot].get("slot_type","")
-						alignment = slots_for_adding_dict[slot].get("alignment","")
-						restriction = slots_for_adding_dict[slot].get("restriction","")
-						system_slot = slots_for_adding_dict[slot].get("system_slot","")
+						var sd:Dictionary = slots_for_adding_dict[slot]
+						slot_type = sd.get("slot_type","")
+						alignment = sd.get("alignment","")
+						restriction = sd.get("restriction","")
+						system_slot = sd.get("system_slot","")
 					if confirm_equipment(item, slot_type, alignment, restriction, Array(slot_allowed_equipment.get(slot,[]))):
 						var string : String = __make_equipment_for_scene(item, slot, system_slot)
-						var this_sys = item.get("system","")
-						if this_sys:
-							var this_type = item.get("equipment_type")
+						var this_sys:String = item.get("system","")
+						var this_type:String = item.get("equipment_type","")
+						if this_sys and this_type:
 							if not this_sys in equipment_validity_for_slots:
 								equipment_validity_for_slots[this_sys] = []
-							if this_type and not this_type in equipment_validity_for_slots[this_sys]:
+							if not this_type in equipment_validity_for_slots[this_sys]:
 								equipment_validity_for_slots[this_sys].append(this_type)
-						if not string in equipment_format:
-							equipment_format.append(string)
+							if not string in equipment_format:
+								equipment_format.append(string)
 		
 		
 		
-		var concat : String = "[gd_scene load_steps=4 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/WeaponSlotUpgradeTemplate.tscn\" type=\"PackedScene\" id=2]\n[ext_resource path=\"res://enceladus/SystemShipUpgradeUI.tscn\" type=\"PackedScene\" id=3]\n[ext_resource path=\"res://HevLib/scenes/equipment/Upgrades.gd\" type=\"Script\" id=4]\n[ext_resource path=\"res://HevLib/scenes/equipment/EquipmentManager.gd\" type=\"Script\" id=5]\n\n[sub_resource type=\"ViewportTexture\" id=1]\nflags = 5\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain1/Viewport\")\n\n[sub_resource type=\"ViewportTexture\" id=2]\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain2/Control\")\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]\nscript = ExtResource( 4 )\n\n[node name=\"TextureRect\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 2 )\n\n[node name=\"TextureRect2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 2 )\n\n[node name=\"Items\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer\" index=\"0\"]\nscript = ExtResource( 5 )"
+		var concat : String = """[gd_scene load_steps=6 format=2]
+
+[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]
+[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/WeaponSlotUpgradeTemplate.tscn\" type=\"PackedScene\" id=2]
+[ext_resource path=\"res://enceladus/SystemShipUpgradeUI.tscn\" type=\"PackedScene\" id=3]
+[ext_resource path=\"res://HevLib/scenes/equipment/Upgrades.gd\" type=\"Script\" id=4]
+[ext_resource path=\"res://HevLib/scenes/equipment/EquipmentManager.gd\" type=\"Script\" id=5]
+
+[node name=\"Upgrades\" instance=ExtResource( 1 )]
+script = ExtResource( 4 )
+
+[node name=\"Items\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer\" index=\"0\"]
+script = ExtResource( 5 )"""
+		
 		for ref in slots_format:
 			concat += "\n\n" + ref
 		for equip in equipment_format:
@@ -5169,8 +5154,8 @@ class _Equipment:
 		var hardpoint_type : String = slot_data.get("hardpoint_type","")
 		var alignment : String = slot_data.get("alignment","")
 		var restriction : String = slot_data.get("restriction","")
-		var override_additive : Array = Array(slot_data.get("override_additive",[]))
-		var override_subtractive : Array = Array(slot_data.get("override_subtractive",[]))
+		var override_additive : PoolStringArray = PoolStringArray(slot_data.get("override_additive",PoolStringArray()))
+		var override_subtractive : PoolStringArray = PoolStringArray(slot_data.get("override_subtractive",PoolStringArray()))
 		var restrict_hold_type : String = slot_data.get("restrict_hold_type","")
 		var story_flag : String = slot_data.get("story_flag","")
 		
