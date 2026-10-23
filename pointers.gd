@@ -10239,8 +10239,8 @@ class _Zip:
 			out.append(ovr)
 		return out
 	
-	static func __get_miniz_object():
-		return load("res://HevLib/scripts/miniz/miniz.gd").new()
+	static func __get_miniz_object() -> MINIZ:
+		return MINIZ.new()
 	
 	static func __get_miniz_library():
 		return load("res://HevLib/scripts/miniz/miniz.gdns").new()
