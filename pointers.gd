@@ -6813,6 +6813,7 @@ class _ManifestV2:
 	const mod_state_hash_file:String = "user://cache/.Mod_Menu_2_Cache/updates/mod_zip_hash.txt"
 	
 	const mod_file_to_id_cache = {}
+	const get_mod_path_from_lowercase_path = {}
 	
 	var fetchZips:bool = true
 	static func __get_mod_data():
@@ -6894,6 +6895,7 @@ class _ManifestV2:
 					var mid:String = md["mod_information"].get("id","")
 					if mid:
 						mod_file_to_id_cache[mdsc.to_lower()] = mid
+						get_mod_path_from_lowercase_path[mdsc.to_lower()] = mdsc
 						if "tags" in md.keys():
 							for tag in md["tags"]:
 								if tag in stat_tags:
@@ -7580,18 +7582,21 @@ class _ManifestV2:
 		return cached_manifests[cachevar].duplicate(true)
 	
 	static func __get_mod_by_id(id:String, case_sensitive: bool = true) -> Dictionary:
-		var mods : Dictionary = __get_mod_data()
-		for mod in __get_mod_list_keys():
-			var moddata : Dictionary = mods[mod]
-			var manifest : Dictionary = moddata["manifest"]["manifest_data"]
-			if manifest and "mod_information" in manifest.keys():
-				var ID : String = manifest["mod_information"].get("id","")
-				if case_sensitive:
-					if id.to_upper() == ID.to_upper():
-						return moddata
-				else:
-					if id == ID:
-						return moddata
+		var path:String = ""
+		var pathSplit:PoolStringArray = PoolStringArray()
+		for i in mod_file_to_id_cache.keys():
+			if path:
+				var split:PoolStringArray = i.split("/",false)
+				var splSize:int = split.size()
+				var pthSize:int = pathSplit.size()
+				if splSize < pthSize:
+					path = i;pathSplit = split
+				elif splSize == pthSize and i < path:
+					path = i;pathSplit = split
+			else:
+				path = i;pathSplit = i.split("/",false)
+		if path:
+			return __get_mod_data()[get_mod_path_from_lowercase_path[path]]
 		return {}
 	
 	const tag_data_cache = {}
