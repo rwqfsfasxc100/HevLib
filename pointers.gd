@@ -1046,7 +1046,7 @@ class _ConfigDriver:
 		# Stores default binds
 		# I don't remember why I cache this, although since the MultiBinds
 		# project is on hold, might be for something I never wrote down 
-		var pointers:Node = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var file:File = File.new()
 		file.open(keybinds_cache + "defined_control_configs.json",File.WRITE)
 		file.store_string("{}")
@@ -1289,7 +1289,7 @@ class _ConfigDriver:
 	static func __get_minmax_string_from_dict(requirement:Dictionary) -> String:
 		var MID = str(requirement.get("mod_id",""))
 		var MDM = str(requirement.get("mod_main",""))
-		var pointers:Node = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		if typeof(MID) == TYPE_STRING and MID:
 			var minVer = null
 			var maxVer = null
@@ -1592,7 +1592,7 @@ class _ConfigDriver:
 							subscriptions[top][setting].erase(item)
 	
 	static func __truncate_mod_id(mod_id:String) -> String:
-		var pointers = non_static["pointers"].DataFormat
+		var pointers:HevLibPointers._DataFormat = non_static["pointers"].DataFormat
 		mod_id = pointers.__array_to_string(mod_id.split("/"))
 		mod_id = pointers.__array_to_string(mod_id.split(" "))
 		return mod_id
@@ -1608,7 +1608,7 @@ class _ConfigDriver:
 		if data_dict == null:
 			return false
 		var ddk:Array = data_dict.keys()
-		var pointers = non_static["pointers"].ManifestV2
+		var pointers:HevLibPointers._ManifestV2 = non_static["pointers"].ManifestV2
 		if check_config and config_entry_override in ddk and data_dict[config_entry_override] is Dictionary:
 			var cfg:Dictionary = data_dict[config_entry_override]
 			var config_id : String = cfg.get("id",cfg.get("mod",cfg.get("mod_id","")))
@@ -2980,7 +2980,7 @@ class _DriverManagement:
 	static func __get_drivers(get_ids : Array = []) -> Array:
 		var base = non_static["self"]
 		var mod_drivers : Array = []
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		for modmain_path in (pointers.ManifestV2.__get_modmain_files() + pointers.ManifestV2.__get_modlet_files()):
 			var has_manifest:bool = false
 			var manifest_path : String = ""
@@ -5266,7 +5266,7 @@ class _Events:
 	const busy = [false,null]
 	static func __spawn_event(event : String,ring : Node,parameters : Dictionary = {},delay_seconds = 0.0):
 		if not busy[0]:
-			var pointers = non_static["pointers"]
+			var pointers:HevLibPointers = non_static["pointers"]
 			if (not ring) or (not ring.has_method("hl_thering_UV")):
 				pointers.l("No ring object specified, returning","pointers.EventDriver")
 				return
@@ -5321,7 +5321,7 @@ class _Events:
 			busy[0] = false
 	
 	static func __clear_event(event : String, ring, clear_related_poi : bool = true,clear_in_cargo : bool = false,delay_seconds : float = 0.0):
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.n("clearing oddities %s" % event,"pointers.EventDriver")
 		if (not ring) or (not ring.has_method("hl_thering_UV")):
 			pointers.l("No ring object specified, returning","pointers.EventDriver")
@@ -5914,7 +5914,7 @@ class _FolderAccess:
 	
 	static func __get_vanilla_script_and_scenes() -> PoolStringArray:
 		var findExt:PoolStringArray = PoolStringArray(["res","gdc"])
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var file:File = File.new()
 		var gameInstallDirectory = OS.get_executable_path().get_basename() + ".pck"
 		if pointers.is_editor:
@@ -5992,7 +5992,7 @@ class _Github:
 	
 	static func __get_github_release(URL: String, folder: String, node_to_return_to: Node, get_pre_releases: bool = false, file_preference: String = "any", file_to_download: String = "first"):
 		var cancel:bool = false
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		if node_to_return_to == null or (not node_to_return_to is Node):
 			cancel = true
 			var e : String = "Release Downloader ERROR! Provided node [%s] either does not exist or is not of [Node] type." % str(node_to_return_to)
@@ -6160,7 +6160,7 @@ class _Keymapping:
 		if not controls:
 			return
 		var i = controls[0]
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		if i.begins_with("Mouse "):
 			var event = InputEventMouseButton.new()
 			event.button_index = int(i.split("Mouse ")[1])
@@ -6217,7 +6217,7 @@ class _Keymapping:
 			var bound = {}
 			var current = {}
 			var file = File.new()
-			var pointers = non_static["pointers"]
+			var pointers:HevLibPointers = non_static["pointers"]
 			if file.file_exists(vanilla_binds_file):
 				current = pointers.ConfigDriver.__config_parse(vanilla_binds_file)
 			if file.file_exists("user://settings.cfg"):
@@ -6942,7 +6942,7 @@ class _ManifestV2:
 		return zip_ref_store.get(mod_main_path,"")
 	
 	static func __concat_mod_info(mod_path:String) -> Dictionary:
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		if not pointers.FileAccess.__file_exists(mod_path):
 			return {}
 		var cv : String = mod_path.get_file().to_lower()
@@ -7289,7 +7289,7 @@ class _ManifestV2:
 		var cachevar : String = "%s:%s" % [file_path,format_to_manifest_version]
 		if not cachevar in cachedManifestKeys:
 			var out : Dictionary = {}
-			var pointers = non_static["pointers"]
+			var pointers:HevLibPointers = non_static["pointers"]
 			var cfg : Dictionary = pointers.ConfigDriver.__config_parse(file_path)
 			var manifest_data : Dictionary = {}
 			var manifest_version:float = 1.0
@@ -7917,7 +7917,7 @@ class _ManifestV2:
 	const modmain_file_list : PoolStringArray = PoolStringArray()
 	static func __get_modmain_files() -> PoolStringArray:
 		if modmain_file_list.empty():
-			var pointers = non_static["pointers"]
+			var pointers:HevLibPointers = non_static["pointers"]
 			pointers.FolderAccess.__get_folder_structure("res://",false,false)
 			if pointers.is_editor:
 				modmain_file_list.append_array(pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[]))
@@ -7936,7 +7936,7 @@ class _ManifestV2:
 	const cached_modlets : Dictionary = {}
 	
 	static func __get_all_modlets(only_show_installed : bool = true,recache : bool = false) -> Dictionary:
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		if cached_modlets:
 			var modletCheck = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets")
 			for modlet in modletCheck.keys():
@@ -8001,7 +8001,7 @@ class _ManifestV2:
 	static func __get_mod_files():
 		if cached_mod_files.empty():
 			var restrict_to_modmains : PoolStringArray = PoolStringArray()
-			var pointers = non_static["pointers"]
+			var pointers:HevLibPointers = non_static["pointers"]
 			if pointers.is_editor:
 				for a in pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[]):
 					restrict_to_modmains.append(a.get_base_dir() + "/")
@@ -8519,7 +8519,7 @@ class _NodeAccess:
 		return not p_node.filename.empty()
 	
 	static func __dynamic_crew_expander(folder_path: String = "user://cache/.HevLib_Cache/dynamic_crew_expander/", max_crew:int = 24) -> String:
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.FolderAccess.__check_folder_exists(folder_path)
 		var base:int = 24
 
@@ -8556,7 +8556,7 @@ class _NodeAccess:
 			__remove_scripts(obj)
 	
 	static func __exit(restart : bool = false, exit_message : String = "", exit_header : String = "", delay : float = 0.0,exit_url : String = "",use_os_error_message : bool = false):
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		if delay > 0.0 and pointers.is_inside_tree():
 			pointers.get_tree().create_timer(delay).connect("timeout",non_static["self"],"__exit",[restart,exit_message,exit_header,0.0,exit_url,use_os_error_message])
 		else:
@@ -8854,7 +8854,7 @@ class _RPC:
 	
 	const discord_script:String = "res://HevLib Discord RPC/lib/discord.gd"
 	static func ready():
-		var pointers = rpc_data["pointers"]
+		var pointers:HevLibPointers = rpc_data["pointers"]
 		if File.new().file_exists(discord_script) and pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_RPC","discord_rpc_enabled"):
 			var discord = load(discord_script).new()
 			rpc_data["activity"] = discord.Activity.new()
@@ -9204,7 +9204,7 @@ class _SafeMode:
 	static func __check_file(file_path:String,zip_path:String,crash:bool = true):
 		var base = non_static["self"]
 		if base.safeCheck:
-			var pointers = non_static["pointers"]
+			var pointers:HevLibPointers = non_static["pointers"]
 			var zf:String = zip_path.get_file()
 			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_CHECKINGFILE") % [zf,file_path],"pointers.SafeMode")
 			if file_path in PCKNAMES:
@@ -9238,7 +9238,7 @@ class _SafeMode:
 				file.close()
 	
 	static func __handle_exit_for_file_checks():
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var base = non_static["self"]
 		pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TOTALLING") % [base.offendingFileCount,offendingFiles.size()],"pointers.SafeMode")
 		for zip_path in offendingFiles:
@@ -9677,7 +9677,7 @@ class _Translations:
 		non_static["pointers"] = c
 	
 	static func __updateTL(path:String, delim:String = ",", fullLogging:bool = true):
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var tlFile:File = File.new()
 		var fileName : String = path.split("/")[path.split("/").size() - 1]
 		var folderName : String = path.split(fileName)[0]
@@ -9719,7 +9719,7 @@ class _Translations:
 		pointers.l("%s Translations Updated from @ [%s]" % [translationCount, fileName],"pointers.Translations")
 	
 	static func __updateTL_from_dictionary(path:Dictionary, fullLogging:bool = true):
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.l("Adding translations from dictionary: %s" % str(path.hash()),"pointers.Translations")
 		var translations : Array = []
 		var translationCount:int = 0
@@ -9858,7 +9858,7 @@ class _Translations:
 		return dictionary
 	
 	static func __inject_translations():
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var fullLogging:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","full_logging")
 		var markPlaceholders:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","mark_placeholder_translations")
 		TranslationServer.clear()
@@ -9969,7 +9969,7 @@ class _WebTranslate:
 		non_static["pointers"] = f
 	
 	func __webtranslate(URL: String, fallback: Array = [], file_check: String = ""):
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.l("Fetching translations from %s" % URL,"pointers.WebTranslate")
 		var HevLib = load("res://HevLib/webtranslate/FetchGithubData.tscn").instance()
 		var pms = Debug.get_node("/root")
@@ -10001,14 +10001,14 @@ class _WebTranslate:
 		var user = dataSplit[0]
 		var repo = dataSplit[1]
 		var folderToDelete = "user://cache/.HevLib_Cache/WebTranslate/" + user + "~_~" + repo
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.l("deleting cache folder @ %s" % folderToDelete,"pointers.WebTranslate")
 		return pointers.FolderAccess.__recursive_delete(folderToDelete)
 	
 	func __webtranslate_reset_by_file_check(file_check: String) -> bool:
 		var did = false
 		var folder_to_delete = ""
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var files = pointers.FolderAccess.__fetch_folder_files("user://cache/.HevLib_Cache/WebTranslate/", true, true)
 		for file in files:
 			if not file.ends_with("/"):
@@ -10030,7 +10030,7 @@ class _WebTranslate:
 		return did
 	
 	func __webtranslate_timed(URL: String, MINUTES_DELAY: int, fallback: Array = [], file_check: String = ""):
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.l("function 'webtranslate_timed' initiated, starting constant translation of [%s] with a delay of [%s] minutes" % [URL,MINUTES_DELAY],"pointers.WebTranslate")
 		var handleNode = load("res://HevLib/webtranslate/WebtranslateTimerHandler.tscn").instance()
 		handleNode.name = URL + Time.get_time_string_from_system()
@@ -10083,7 +10083,7 @@ class _Zip:
 	static func __load_pck(file_path:String,only_filenames:bool = false):
 		var file:File = File.new()
 		var dir:Directory = Directory.new()
-		var pointers = non_static["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.l("Loading PCK @ %s, fetching only filenames? [%s]" % [file_path,str(only_filenames)],"pointers.Zip")
 		var Contents:Dictionary = {}
 		var Files:PoolStringArray = PoolStringArray()

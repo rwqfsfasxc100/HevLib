@@ -45,14 +45,9 @@ func _ready():
 	var tags:Dictionary = pointers.ManifestV2.__get_tags()
 	if "TAG_ADD_TRANSIT_TIPS" in tags.keys():
 		for mod in tags["TAG_ADD_TRANSIT_TIPS"]:
-			var data = tags["TAG_ADD_TRANSIT_TIPS"][mod]
-			var td:int = typeof(data)
-			if td == TYPE_ARRAY or td == TYPE_STRING_ARRAY:
-				for i in data:
-					if typeof(i) == TYPE_STRING:
-						list.append(i)
-			elif td == TYPE_STRING:
-				list.append(data)
+			var data:PoolStringArray = PoolStringArray(tags["TAG_ADD_TRANSIT_TIPS"][mod])
+			for i in data:
+				list.append(i)
 
 func _on_TransitTip_visibility_changed():
 	text = list[randi() % list.size()]

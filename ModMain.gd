@@ -46,8 +46,7 @@ func _init(modLoader:ModLoader=ModLoader):
 	var modPath:String=get_script().resource_path.get_base_dir()+"/"
 	var pointers_dir:String=modPath+"/pointers.gd"
 	if!file_exists(pointers_dir):
-		Debug.l("Folder structure not correct, exiting HevLib load")
-		return
+		Debug.l("Folder structure not correct, exiting HevLib load");return
 	strings.append(modPath)
 	strings.append(pointers_dir)
 	create_zip_for_overrides(handle_pointer_cast_clearing(process_gdnative_plugins(),modLoader),self)
@@ -55,8 +54,7 @@ func _init(modLoader:ModLoader=ModLoader):
 	l("Initializing Equipment Driver")
 	pointers.FolderAccess.__recursive_delete(variables_folder,PoolStringArray(["remove_pointer_casting.zip"]))
 	var directory:Directory=Directory.new();directory.make_dir_recursive(variables_folder);directory.make_dir_recursive(validation_check_path.get_base_dir())
-	pointers.FileAccess.__load_precached_mods()
-	pointers.ConfigDriver.__load_configs()
+	pointers.FileAccess.__load_precached_mods();pointers.ConfigDriver.__load_configs()
 	
 #	testing(modLoader)
 	
@@ -64,16 +62,14 @@ func _init(modLoader:ModLoader=ModLoader):
 	pointers.ManifestV2.__get_mod_versions(true)
 	
 	if OS.has_feature("editor") and not File.new().file_exists("res://VersionLabel.tscn"):
-		printerr("FAILED TO FETCH FILE SYSTEM")
-		l("ERROR! FAILED TO FETCH FILE SYSTEM")
+		printerr("FAILED TO FETCH FILE SYSTEM");l("ERROR! FAILED TO FETCH FILE SYSTEM")
 	
 	pointers.Scripting.make_mineral_scripting()
 	pointers.Equipment.__make_upgrades_scene()
 	var ncrew:Dictionary=pointers.ManifestV2.__get_manifest_entry("tags","TAG_HANDLE_EXTRA_CREW")
-	var count:int=24
-	for mod in ncrew.keys():
+	var count:int=24;for mod in ncrew.keys():
 		var data:int=ncrew[mod]
-		if data>count: count=data
+		if data>count:count=data
 	var crewsize_entry:String=pointers.NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",count)
 	if crewsize_entry:
 		files_to_load.append([crewsize_entry,"res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"])
@@ -475,15 +471,15 @@ static func create_zip_for_overrides(replacements:Dictionary,md:Node):
 			buffer[bsize+38]=0;buffer[bsize+39]=0;buffer[bsize+40]=0;buffer[bsize+41]=0 # External file attributes
 			buffer[bsize+42]=offset&0xFF;buffer[bsize+43]=(offset>>8)&0xFF;buffer[bsize+44]=(offset>>16)&0xFF;buffer[bsize+45]=(offset>>24)&0xFF # CD offset
 			buffer.append_array(name_bytes) # File name bytes
-		var central_dir_size:int=buffer.size()-cdr
-		var cr_size:int=central_records.size()
-		var cr1:int=cr_size;var cr2:int=(cr_size>>8)&0xFF
+		var cdrs:int=buffer.size()-cdr
+		var crs:int=central_records.size()
+		var cr1:int=crs;var cr2:int=(crs>>8)&0xFF
 		var offset:int=buffer.size()
 		buffer.resize(offset+22)
 		buffer[offset]=80;buffer[offset+1]=75;buffer[offset+2]=5;buffer[offset+3]=6 # EOCD magic number
 		buffer[offset+4]=0;buffer[offset+5]=0;buffer[offset+6]=0;buffer[offset+7]=0 # Disk
 		buffer[offset+8]=cr1;buffer[offset+9]=cr2;buffer[offset+10]=cr1;buffer[offset+11]=cr2 # Size
-		buffer[offset+12]=central_dir_size&0xFF;buffer[offset+13]=(central_dir_size&0xFF00)>>8;buffer[offset+14]=(central_dir_size&0xFF0000)>>16;buffer[offset+15]=(central_dir_size&0xFF000000)>>24 # CD size
+		buffer[offset+12]=cdrs&0xFF;buffer[offset+13]=(cdrs&0xFF00)>>8;buffer[offset+14]=(cdrs&0xFF0000)>>16;buffer[offset+15]=(cdrs&0xFF000000)>>24 # CD size
 		buffer[offset+16]=cdr&0xFF;buffer[offset+17]=(cdr&0xFF00)>>8;buffer[offset+18]=(cdr&0xFF0000)>>16;buffer[offset+19]=(cdr&0xFF000000)>>24 # CD offset
 		buffer[offset+20]=0;buffer[offset+21]=0 # Comment length
 		var castFile:String="user://cache/.HevLib_Cache/Variable_Fetch/remove_pointer_casting.zip"
@@ -571,7 +567,8 @@ static func remove_type_casting(source_code:String,class_data:Dictionary) -> Str
 						expect_name=true;just_saw_name=false;i+=1;continue
 					if depth==1&&tk.type==TOKEN_SYMBOL&&tk.text==":"&&just_saw_name:
 						i+=1;just_saw_name=false;if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
-							var p_path:Dictionary=check_following_tokens(tokens,i,n);i=p_path.next_i;if p_path.base in class_names:modifications.append({"start":current_name_end,"end":p_path.end,"text":""})
+							var p_path:Dictionary=check_following_tokens(tokens,i,n);i=p_path.next_i
+							if p_path.base in class_names:modifications.append({"start":current_name_end,"end":p_path.end,"text":""})
 						continue
 					if tk.type==TOKEN_IDENTIFIER&&expect_name:
 						current_name_end=tk.end;expect_name=false;just_saw_name=true;i+=1;continue
@@ -582,7 +579,8 @@ static func remove_type_casting(source_code:String,class_data:Dictionary) -> Str
 				if close_paren_end!=-1&&i<n&&tokens[i].type==TOKEN_SYMBOL&&tokens[i].text=="->":
 					i+=1
 					if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
-						var ret_path:Dictionary=check_following_tokens(tokens,i,n);i=ret_path.next_i;if ret_path.base in class_names:modifications.append({"start":close_paren_end,"end":ret_path.end,"text":""})
+						var ret_path:Dictionary=check_following_tokens(tokens,i,n);i=ret_path.next_i
+						if ret_path.base in class_names:modifications.append({"start":close_paren_end,"end":ret_path.end,"text":""})
 			continue
 		elif t.text=="export":
 			var export_tok:Dictionary=tokens[i];i+=1
