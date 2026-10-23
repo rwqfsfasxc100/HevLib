@@ -16,8 +16,9 @@
 3.1=* Wrapper for the PackedScene.pack()/ResourceSaver.save() pipeline for saving node trees
 3.2=* `node` -> (Node) the root node for the node tree to save
 3.3=* `file_path` -> (String) the filepath to save the scene to.
-4=* NOTICE FOR THOSE RUNNING FROM EDITOR:
-4.1=* HevLib now only runs from a single ModMain script. Please make sure to remove the other three from the ModLoader.addedMods array
+4=* Fixed issue where you could click buttons behind the mod menu.
+5=* NOTICE FOR THOSE RUNNING FROM EDITOR:
+5.1=* HevLib now only runs from a single ModMain script. Please make sure to remove the other three from the ModLoader.addedMods array
 
 [1.17.7]
 
