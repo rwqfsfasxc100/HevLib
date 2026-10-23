@@ -1,3 +1,24 @@
+[1.17.8]
+
+1=* Heavily optimized several core systems:
+1.1=* Pointers node being set as index 0 within ModLoader._savedObjects now does not use a complex systems
+1.2=* WeaponSlotDriver now no longer performs a second fetch on the ship's current config
+1.3=* Pointer fetching across most scripts now uses the onready keyword, with the exception of those using it upon entering the tree
+1.4=* Fetching mod by ID is now faster and now fetches the main mod if submods without manifests exist
+1.5=* Equipment menu is now significantly more optimized and now runs during the initialization phase
+1.6=* Combined all ModMain script processing into the initialization phase of the main script.
+2=* Reworked the type-cast replacement system to use a rudimentary version of Godot's tokenizer to better detect type casts
+2.1=* This now also supports cases where the type is operated on directly
+2.1.1=* For example, instead of loading the object by script, you can now refer to it by name.
+2.1.2=* E.g. `var miniz:MINIZ = load("res://HevLib/scripts/miniz/miniz.gd").new()` can now become `var miniz:MINIZ = MINIZ.new()`
+2.1.3=* As a result, `DEFINED_CLASS_NAMES.gd` now requires it to be a dictionary to provide the file path to replace it with.
+3=* Added `NodeAccess`.`__save_node_to_scene`
+3.1=* Wrapper for the PackedScene.pack()/ResourceSaver.save() pipeline for saving node trees
+3.2=* `node` -> (Node) the root node for the node tree to save
+3.3=* `file_path` -> (String) the filepath to save the scene to.
+4=* NOTICE FOR THOSE RUNNING FROM EDITOR:
+4.1=* HevLib now only runs from a single ModMain script. Please make sure to remove the other three from the ModLoader.addedMods array
+
 [1.17.7]
 
 1=* Fixed regression where the `limit_ships` and `prevent_ships` properties for equipment slot modifications would be nested, causing the check to always remove ships due to the conversion to a PoolStringArray.

@@ -8573,8 +8573,10 @@ class _NodeAccess:
 			if pointers.is_inside_tree():
 				yield(pointers.get_tree(),"idle_frame")
 			OS.kill(OS.get_process_id())
-	
+	const scene_extensions = PoolStringArray(["tscn","scn"])
 	static func __save_node_to_scene(node:Node,file_path:String):
+		if not file_path.get_extension() in scene_extensions:
+			return
 		var packed:PackedScene = PackedScene.new()
 		__claim_child_ownership(node)
 		if packed.pack(node) == OK:
@@ -9936,6 +9938,8 @@ class _Translations:
 		tlFile.store_string(JSON.print(ml_check_data,"\t"))
 		tlFile.close()
 		__updateTL_from_dictionary(data.duplicate(true),fullLogging)
+		for i in ProjectSettings.get_setting("locale/translations"):
+			TranslationServer.add_translation(ResourceLoader.load(i,"",true))
 		pointers.SafeMode.__handle_exit_for_file_checks()
 	
 

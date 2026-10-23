@@ -166,4 +166,8 @@ func _ready():
 
 func _visibility_changed():
 	_on_resize()
+	if visible:
+		$ColorRect.mouse_filter = Control.MOUSE_FILTER_STOP
+	else:
+		$ColorRect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 

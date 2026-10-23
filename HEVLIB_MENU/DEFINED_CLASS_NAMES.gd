@@ -33,5 +33,4 @@
 const DEFINED_CLASS_NAMES = {
 	"HevLibPointers":"res://HevLib/pointers.gd",
 	"MINIZ":"res://HevLib/scripts/miniz/miniz.gd",
-	"TOKENIZER":"res://HevLib/scripts/tokenizer/tokenizer.gd",
 }
