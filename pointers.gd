@@ -3249,7 +3249,7 @@ class _Equipment:
 		weaponslot_modify_templates = ws_default_templates.get("TEMPLATES", {})
 		weaponslot_ship_templates = ws_ship_templates_2.get("SHIP_TEMPLATES",{})
 		weaponslot_ship_standalone = ws_ship_templates.get("SHIP_MODIFY",{})
-		
+		var acceptible_script_extensions:PoolStringArray = PoolStringArray(["gd","gdc"])
 		var drivers : Dictionary = {}
 		var mods : Dictionary = pointers.ManifestV2.__get_mod_data()
 		for md in pointers.ManifestV2.__get_mod_list_keys():
@@ -3858,7 +3858,7 @@ class _Equipment:
 												TYPE_DICTIONARY:
 													if "func_object_path" in sensorItem and "func_method_name" in sensorItem:
 														var object_name:String = sensorItem.func_object_path
-														if object_name.begins_with("res://") and object_name.get_extension() == "gd":
+														if object_name.begins_with("res://") and object_name.get_extension() in acceptible_script_extensions:
 															if object_name in rpc_non_autoload_object_persist:
 																sensorItem["funcref"] = funcref(rpc_non_autoload_object_persist[object_name],sensorItem.func_method_name)
 															elif pointers.DataFormat.__load_if_can(object_name,false,"Script"):
@@ -3880,7 +3880,7 @@ class _Equipment:
 											if typeof(sensorItem) == TYPE_DICTIONARY:
 												if "func_object_path" in sensorItem and "func_method_name" in sensorItem:
 													var object_name:String = sensorItem.func_object_path
-													if object_name.begins_with("res://") and object_name.get_extension() == "gd":
+													if object_name.begins_with("res://") and object_name.get_extension() in acceptible_script_extensions:
 														if object_name in rpc_non_autoload_object_persist:
 															sensorItem["funcref"] = funcref(
 																rpc_non_autoload_object_persist[object_name],
@@ -3894,12 +3894,11 @@ class _Equipment:
 															)
 															rpc_non_autoload_object_persist[object_name] = refobject
 														else: continue
-													elif object_name in AUTOLOAD_REF_STORE:
-														sensorItem["funcref"] = funcref(
-															AUTOLOAD_REF_STORE[object_name],
-															sensorItem.func_method_name
-														)
-													else: continue
+													else:
+														if not object_name in needs_autoload_funcref.keys():
+															needs_autoload_funcref[object_name] = [sensorItem]
+														else:
+															needs_autoload_funcref[object_name].append(sensorItem)
 											else: continue
 									states.append(item)
 								rpc_second_state_store[type].append_array(states)
@@ -3913,8 +3912,6 @@ class _Equipment:
 		var tag_modifications : Array = []
 		
 		var ship_limitations : Dictionary = {}
-		
-		var slotDefKeys:Array = slot_defaults.keys()
 		for nodes in EQUIPMENT_TAGS:
 			if nodes:
 				var slotTypes : Array = Array(nodes.get("slot_types",[]))
@@ -3922,30 +3919,25 @@ class _Equipment:
 				var align : Array = Array(nodes.get("alignments",[]))
 				var hardpointTypes : Array = Array(nodes.get("hardpoint_types",[]))
 				var slotDefaults : Dictionary = nodes.get("slot_defaults",{})
-				if slotTypes:
-					for st in slotTypes:
-						if not st in slot_types:
-							slot_types.append(st)
-				if equipmentItems.size() > 0:
-					for st in equipmentItems:
-						if not st in equipment_types:
-							equipment_types.append(st)
-				if align:
-					for st in align:
-						if not st in alignments:
-							alignments.append(st)
-				if hardpointTypes:
-					for st in hardpointTypes:
-						if not st in hardpoint_types:
-							hardpoint_types.append(st)
-				if slotDefaults:
-					for st in slotDefaults.keys():
-						if st in slotDefKeys:
-							for item in slotDefaults.get(st):
-								if not item in slot_defaults.get(st):
-									slot_defaults[st].append(item)
-						else:
-							slot_defaults[st] = slotDefaults.get(st)
+				for st in slotTypes:
+					if not st in slot_types:
+						slot_types.append(st)
+				for st in equipmentItems:
+					if not st in equipment_types:
+						equipment_types.append(st)
+				for st in align:
+					if not st in alignments:
+						alignments.append(st)
+				for st in hardpointTypes:
+					if not st in hardpoint_types:
+						hardpoint_types.append(st)
+				for st in slotDefaults.keys():
+					if st in slot_defaults.keys():
+						for item in slotDefaults.get(st):
+							if not item in slot_defaults.get(st):
+								slot_defaults[st].append(item)
+					else:
+						slot_defaults[st] = slotDefaults.get(st)
 		for slotDict in ADD_EQUIPMENT_SLOTS:
 			var snn : String = slotDict.get("slot_node_name","")
 			var spp : Dictionary = ship_limitations.get(snn,{})
@@ -4020,12 +4012,10 @@ class _Equipment:
 				if m in data.keys():
 					var slot_override_additive = format[2]["override_additive"]
 					var slot_override_subtractive = format[2]["override_subtractive"]
-					var override_additive = Array(data[m].get("override_additive",[]))
-					var override_subtractive = Array(data[m].get("override_subtractive",[]))
-					for over in override_additive:
+					for over in Array(data[m].get("override_additive",[])):
 						if not over in slot_override_additive:
 							slot_override_additive.append(over)
-					for over in override_subtractive:
+					for over in Array(data[m].get("override_subtractive",[])):
 						if not over in slot_override_subtractive:
 							slot_override_subtractive.append(over)
 			slots_format.append(format[0])
@@ -4037,17 +4027,15 @@ class _Equipment:
 			for dict in tag_modifications:
 				if slot in dict:
 					var tag_data : Dictionary = dict[slot]
-					var tag_add : Array = Array(tag_data.get("override_additive",[]))
-					var tag_sub : Array = Array(tag_data.get("override_subtractive",[]))
-					for add in tag_add:
+					for add in Array(tag_data.get("override_additive",[])):
 						if not add in vslot_additives:
 							vslot_additives.append(add)
-					for sub in tag_sub:
+					for sub in Array(tag_data.get("override_subtractive",[])):
 						if not sub in vslot_subtractives:
 							vslot_subtractives.append(sub)
-			if vslot_additives != []:
+			if vslot_additives:
 				vslot_data["override_additive"] = vslot_additives
-			if vslot_subtractives != []:
+			if vslot_subtractives:
 				vslot_data["override_subtractive"] = vslot_subtractives
 			vanilla_equipment_defaults_for_reference[slot] = vslot_data
 			
@@ -4057,11 +4045,9 @@ class _Equipment:
 				var data : Dictionary = vanilla_equipment_defaults_for_reference[slot]
 				var slot_type : String = data.get("slot_type","HARDPOINT").to_upper()
 				if slot_type == "HARDPOINT":
-					var hardpoint : String = data.get("hardpoint_type", "")
-					var items : Array = Array(slot_defaults.get(hardpoint,[])).duplicate(true)
-					var additives : Array = Array(data.get("override_additive",[]))
+					var items : Array = Array(slot_defaults.get(data.get("hardpoint_type", ""),[])).duplicate(true)
 					var subtractives : Array = Array(data.get("override_subtractive",[]))
-					for item in additives:
+					for item in Array(data.get("override_additive",[])):
 						if not item in items:
 							items.append(item)
 					for item in subtractives:
@@ -4074,9 +4060,8 @@ class _Equipment:
 					slot_allowed_equipment[slot] = items
 				else:
 					var items : Array = Array(slot_defaults.get(slot_type,[])).duplicate(true)
-					var additives : Array = Array(data.get("override_additive",[]))
 					var subtractives : Array = Array(data.get("override_subtractive",[]))
-					for item in additives:
+					for item in Array(data.get("override_additive",[])):
 						if not item in items:
 							items.append(item)
 					for item in subtractives:
@@ -4090,11 +4075,9 @@ class _Equipment:
 				var data : Dictionary = slots_for_adding_dict[slot]
 				var slot_type : String = data.get("slot_type","HARDPOINT").to_upper()
 				if slot_type == "HARDPOINT":
-					var hardpoint : String = data.get("hardpoint_type", "")
-					var items : Array = Array(slot_defaults.get(hardpoint,[])).duplicate(true)
-					var additives : Array = Array(data.get("override_additive",[]))
+					var items : Array = Array(slot_defaults.get(data.get("hardpoint_type", ""),[])).duplicate(true)
 					var subtractives : Array = Array(data.get("override_subtractive",[]))
-					for item in additives:
+					for item in Array(data.get("override_additive",[])):
 						if not item in items:
 							items.append(item)
 					for item in subtractives:
@@ -4114,12 +4097,8 @@ class _Equipment:
 		for slot in slots_for_adding:
 			if slot.get("add_vanilla_equipment",true):
 				for equip in vanilla_equipment:
-					var item : Dictionary = vanilla_equipment[equip]
 					if confirm_equipment(vanilla_equipment[equip], slot.get("slot_type",""), slot.get("alignment",""), slot.get("restriction",""), Array(slot_allowed_equipment.get(slot.get("slot_node_name",""),[]))):
-						var system_slot : String = slot.get("system_slot","")
-						var string : String = __make_equipment_for_scene(item, slot.get("slot_node_name",""), system_slot)
-						
-						equipment_format.append(string)
+						equipment_format.append(__make_equipment_for_scene(vanilla_equipment[equip], slot.get("slot_node_name",""), slot.get("system_slot","")))
 		var sfaKeys :Array = slots_for_adding_dict.keys()
 		var vedfrKeys :Array = vanilla_equipment_defaults_for_reference.keys()
 		for slot in all_slot_node_names:
@@ -4161,14 +4140,12 @@ class _Equipment:
 		for path in editable_paths:
 			concat += "\n\n" + path
 		
-		var ws_header : String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://weapons/WeaponSlot.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"WeaponSlot\" instance=ExtResource( 1 )]"
-		
 		var equipment_header : String = "[node name=\"%s\" parent=\"%s\" instance_placeholder=\"%s\"]"
 		var equipment_header_noref : String = "[node name=\"%s\" parent=\"%s\"]"
 		var equipment_editable_path_base : String = "[editable path=\"%s\"]"
 		
 		
-		var weaponslot_string : String = ws_header
+		var weaponslot_string : String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://weapons/WeaponSlot.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"WeaponSlot\" instance=ExtResource( 1 )]"
 		var ws_editable_paths : String = ""
 		var weaponslot_properties : Dictionary = {}
 		
@@ -4182,10 +4159,8 @@ class _Equipment:
 		
 		for add in WEAPONSLOT_ADD:
 			if pointers.ConfigDriver.__validate_dictionary(add,false):
-				var aname : String = add.get("name","SYSTEM_ERROR")
 				var apath : String = add.get("path","")
 				var item_data : Dictionary = {}
-				var config : Dictionary = add.get("config",{})
 				for it in add.get("data",[]):
 					var ws_property : String = it.get("property")
 					var ws_value = it.get("value")
@@ -4194,8 +4169,7 @@ class _Equipment:
 					var split:PoolStringArray = ws_property.split("/")
 					var splitSize:int = split.size()
 					if splitSize > 2:
-						var node : String = split[splitSize - 2]
-						var nonode:PoolStringArray = ws_property.split(node)
+						var nonode:PoolStringArray = ws_property.split(split[splitSize - 2])
 						if nonode[0].ends_with("/"):
 							nonode[0] = nonode[0].rstrip("/")
 						if nonode[1].begins_with("/"):
@@ -4212,9 +4186,9 @@ class _Equipment:
 							item_data["."] = []
 						item_data["."].append([ws_property,ws_value])
 				if apath:
-					ws_stuff_to_add.append({"name":aname,"path":apath,"data":item_data,"config":config})
+					ws_stuff_to_add.append({"name":add.get("name","SYSTEM_ERROR"),"path":apath,"data":item_data,"config":add.get("config",{})})
 				else:
-					ws_stuff_to_modify.append({"name":aname,"data":item_data})
+					ws_stuff_to_modify.append({"name":add.get("name","SYSTEM_ERROR"),"data":item_data})
 			
 			var aname : String = add.get("name","SYSTEM_ERROR")
 			var apath : String = add.get("path","")
@@ -4231,8 +4205,9 @@ class _Equipment:
 				if it.get("use_stringified_value",false):
 					ws_value = pointers.DataFormat.__convert_var_from_string(ws_value)
 				var split:PoolStringArray = ws_property.split("/")
-				if split.size() > 2:
-					var node : String = split[split.size() - 2]
+				var splitSize:int = split.size()
+				if splitSize > 2:
+					var node : String = split[splitSize - 2]
 					var nonode:PoolStringArray = ws_property.split(node)
 					if nonode[0].ends_with("/"):
 						nonode[0] = nonode[0].rstrip("/")
@@ -4242,7 +4217,7 @@ class _Equipment:
 					if not prop_header in weaponslot_properties:
 						weaponslot_properties[prop_header] = []
 					weaponslot_properties[prop_header].append([nonode[1],ws_value])
-				elif split.size() == 2:
+				elif splitSize == 2:
 					var prop_header : String = equipment_header_noref % [split[0],aname]
 					if not prop_header in weaponslot_properties:
 						weaponslot_properties[prop_header] = []
@@ -4253,19 +4228,16 @@ class _Equipment:
 					weaponslot_properties[add_header].append([ws_property,ws_value])
 		
 		for property in weaponslot_properties:
-			weaponslot_string = weaponslot_string + "\n\n" + property
-			var data : Array = weaponslot_properties.get(property)
-			for dp in data:
-				weaponslot_string = weaponslot_string + "\n" + dp[0] + " = " + var2str(dp[1])
+			weaponslot_string += "\n\n" + property
+			for dp in weaponslot_properties[property]:
+				weaponslot_string += "\n%s = %s" % [dp[0],var2str(dp[1])]
 		
 		file.open(validation_check_path,File.READ)
 		var validation_check:Dictionary = JSON.parse(file.get_as_text()).result
 		file.close()
 		
 		for data in AUX_POWER_AND_THRUSTERS:
-			
-			var equipSlots : Array = data.get("slots",[])
-			for slot in equipSlots:
+			for slot in data.get("slots",[]):
 				slot = slot.split(".")[0]
 				if not slot in auxslot_data:
 					auxslot_data[slot] = []
@@ -4288,23 +4260,17 @@ class _Equipment:
 					
 					pointers.FolderAccess.__check_folder_exists(auxTypePath)
 					
-					var this_thruster_path : String = auxTypePath + "/" + sys + "_thruster.tscn"
-					
-					
-					var this_exhaust_path : String = auxTypePath + "/" + sys + "_exhaust.tscn"
-					var exhaust_text : String = make_exhaust_scene(data,sys)
-					file.open(this_exhaust_path,File.WRITE)
-					file.store_string(exhaust_text)
+					file.open(auxTypePath + "/" + sys + "_exhaust.tscn",File.WRITE)
+					file.store_string(make_exhaust_scene(data,sys))
 					file.close()
 					
-					var thruster_scene : String = make_thruster_scene(data,sys,aux_type,exhaust_cache_path)
-					file.open(this_thruster_path,File.WRITE)
-					file.store_string(thruster_scene)
+					file.open(auxTypePath + "/" + sys + "_thruster.tscn",File.WRITE)
+					file.store_string(make_thruster_scene(data,sys,aux_type,exhaust_cache_path))
 					file.close()
 					
 		
 		if ws_editable_paths:
-			weaponslot_string = weaponslot_string + "\n\n" + ws_editable_paths
+			weaponslot_string += "\n\n" + ws_editable_paths
 		
 		var ship_limitation_string : String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]"
 		var lim_item : String = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\"]"
