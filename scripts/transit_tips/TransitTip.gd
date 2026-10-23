@@ -34,20 +34,19 @@ extends "res://codex/TransitTip.gd"
 
 var list:PoolStringArray = PoolStringArray()
 
-var pointers:HevLibPointers
+onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
 var hl_modmenu2transittiphandler_uinit : bool = false
 func _ready():
 	if hl_modmenu2transittiphandler_uinit:
 		OS.kill(OS.get_process_id())
 	hl_modmenu2transittiphandler_uinit = true
-	pointers = ModLoader._savedObjects[0]
 	for i in tips:
 		list.append(base % (i + 1))
-	var tags = pointers.ManifestV2.__get_tags()
-	if "TAG_ADD_TRANSIT_TIPS" in tags:
+	var tags:Dictionary = pointers.ManifestV2.__get_tags()
+	if "TAG_ADD_TRANSIT_TIPS" in tags.keys():
 		for mod in tags["TAG_ADD_TRANSIT_TIPS"]:
 			var data = tags["TAG_ADD_TRANSIT_TIPS"][mod]
-			var td = typeof(data)
+			var td:int = typeof(data)
 			if td == TYPE_ARRAY or td == TYPE_STRING_ARRAY:
 				for i in data:
 					if typeof(i) == TYPE_STRING:

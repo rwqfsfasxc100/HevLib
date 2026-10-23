@@ -53,8 +53,8 @@ func spawnAsteroidByClass(oc, spot, chaos, spawnPointRandomness = 0.0, initialLi
 	
 	#If it's a class 5 roid, it's a mineral chunk
 	if oc == 5 and i:
-		var pure : float
-		var impure : float
+		var pure : float = 0.0
+		var impure : float = 0.0
 
 		#How many minerals are possible
 		var sm : int = randi() % 3
@@ -76,7 +76,7 @@ func spawnAsteroidByClass(oc, spot, chaos, spawnPointRandomness = 0.0, initialLi
 			var m : String = getVeinAt(CurrentGame.globalCoords(spot))
 
 			#Quantity of mineral
-			var q : float
+			var q : float = 0.0
 			#While there is more than one sub-mineral remaining
 			if sm > 0:
 				#Choose how much of the impurity should be the new mineral
@@ -87,11 +87,11 @@ func spawnAsteroidByClass(oc, spot, chaos, spawnPointRandomness = 0.0, initialLi
 			else:
 				#The remaining quantity should be this mineral
 				q = impure
-				impure = 0
+				impure = 0.0
 			
 			# Checks for the mineral in an array of mineral entries
 			# Fix for one bug in the preexisting mod
-			var doesContainMineral = false
+			var doesContainMineral:bool = false
 			for t in i.composition.keys():
 				if t == m:
 					doesContainMineral = true
@@ -102,15 +102,13 @@ func spawnAsteroidByClass(oc, spot, chaos, spawnPointRandomness = 0.0, initialLi
 					i.composition[m] += q
 				#If the roid does not have that mineral
 				else:
-					var mergeDict = {m:q}
 					#Add it to the roid
-					i.composition.merge(mergeDict)
+					i.composition[m] = q
 		if i.has_method("hl_multiminerals_update_mass"):
 			i.hl_multiminerals_update_mass()
 		else:
 			printerr("Mineral [%s] lacks hl_multiminerals_update_mass() method" % i)
-			var ps = hl_multiminerals_update_mass(i)
-			i = ps
+			i = hl_multiminerals_update_mass(i)
 		
 	return i
 #Update the roid's mass incase something went fucky
@@ -120,7 +118,7 @@ func hl_multiminerals_update_mass(i):
 
 func hl_multiminerals_calc_comp(i) -> float:
 #	print(composition)
-	var comp_val = 0.0
+	var comp_val:float = 0.0
 	#For every material in the roid
 	for type in i.composition:
 		#If that material actually exists 

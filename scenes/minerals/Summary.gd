@@ -35,7 +35,7 @@ extends "res://enceladus/Summary.gd"
 func loadOutput(outputData, processed = {}, rem = {}) -> bool:
 	var has = .loadOutput(outputData,processed,rem)
 	if has:
-		var vb = $PC / VBoxContainer
+		var vb:VBoxContainer = $PC/VBoxContainer
 		var margin = vb.get_node("MarginContainer2")
 		var new_scroll_bar = VScrollBar.new()
 		var hb = HBoxContainer.new()

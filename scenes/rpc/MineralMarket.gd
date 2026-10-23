@@ -45,4 +45,3 @@ func hide():
 		return
 	.hide()
 	rpc.loader_changed("enceladus",0,"")
-#	print("%s hidden" % self.name)

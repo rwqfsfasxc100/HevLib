@@ -45,11 +45,10 @@ var change_color:bool = false
 var shipName:String = ""
 var baseShipName:String = ""
 
-var itsPointers:HevLibPointers
+onready var itsPointers:HevLibPointers = ModLoader._savedObjects[0]
 
 var aux_type : String = "MPDG"
 func loadPlaceholder():
-	itsPointers = ModLoader._savedObjects[0]
 	hl_thrusterslot_modify()
 	.loadPlaceholder()
 

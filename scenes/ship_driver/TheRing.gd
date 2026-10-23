@@ -41,7 +41,7 @@ func _ready():
 	var derelict_handler:Script = load("res://HevLib/scenes/ship_driver/DerelictHandler.gd")
 	for index in 5:
 		index += 1
-		var dh = derelict_handler.new()
+		var dh:Node = derelict_handler.new()
 		dh.name = "DerelictHandler%d" % index
 		dh.index = index
 		add_child(dh)
@@ -50,18 +50,18 @@ func _ready():
 		mh.mode = "miner"
 		mh.index = index
 		add_child(mh)
-	var data = pointers.Equipment.add_ships_store
+	var data:Array = pointers.Equipment.add_ships_store
 	var ro:Script = load("res://story/RescueOperation.gd")
 	for ship in data:
 		if "name" in ship and ship.name and "path" in ship and ship.path and pointers.FileAccess.__file_exists(ship.path):
 			pointers.l("Adding uniquely-named derelict event for ship %s" % ship.name,"ShipDriver")
 			
-			var derelict_data = ship.get("derelict",{})
-			var model = ship.get("name","TRTL")
-			var dname = ship.get("specific_derelict_name","ModdedDerelict_" + model)
-			var node = ro.new()
+			var derelict_data:Dictionary = ship.get("derelict",{})
+			var model:String = ship.get("name","TRTL")
+			var dname:String = ship.get("specific_derelict_name","ModdedDerelict_" + model)
+			var node:Node = ro.new()
 			node.name = dname
-			var newname = node.name
+			var newname:String = node.name
 			node.randomChance = 0.0
 			node.minimumChance = 0.0
 			node.chaosLimit = 3.0

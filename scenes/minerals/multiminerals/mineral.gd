@@ -51,7 +51,7 @@ func hl_multiminerals_update_mass():
 
 
 #Sum of all components of the roid
-var comp_val = 0.0
+var comp_val:float = 0.0
 func hl_multiminerals_calc_comp():
 #	print(composition)
 	comp_val = 0.0
@@ -78,7 +78,7 @@ func getScan():
 	#Get our scan value
 	var scan : float = rand_range(0, comp_val)
 	#For every material in the roid
-	var cm = composition.duplicate(true)
+	var cm:Dictionary = composition.duplicate(true)
 	if "H2O" in cm:
 		cm.erase("H2O")
 	for type in cm:

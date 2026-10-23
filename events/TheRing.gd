@@ -32,9 +32,9 @@
 
 extends "res://TheRing.gd"
 
-var pointers:HevLibPointers
+onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
-var cache_folder : String = "user://cache/.HevLib_Cache/"
+const cache_folder : String = "user://cache/.HevLib_Cache/"
 
 var current_event_log : Dictionary = {}
 
@@ -46,13 +46,12 @@ var mod_request_log : Dictionary = {}
 
 var base_playlist : Array = []
 var disabled_events : Array = []
-onready var dummy_event = load("res://HevLib/events/event_selector/DummyEvent.gd").new()
+onready var dummy_event:Node = load("res://HevLib/events/event_selector/DummyEvent.gd").new()
 func hl_thering_UV():
 	if pointers:
 		base_playlist = []
-		disabled_events.clear()
 		disabled_events = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
-		if not disabled_events:
+		if disabled_events == null:
 			pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
 			disabled_events = []
 		
@@ -96,12 +95,11 @@ func request_event(oddity,event):
 		group[event].append(oddity)
 		all_oddities.append(oddity)
 	var id:int = hash(oddity)
-	if not event in mod_request_log:
-		mod_request_log.merge({event:{}})
-	var ctime : String = Time.get_datetime_string_from_system(true)
-	if not id in mod_request_log[event]:
-		mod_request_log[event].merge({id:{}})
-	mod_request_log[event][id]["enter_time"] = ctime
+	if not event in mod_request_log.keys():
+		mod_request_log[event] = {id:{}}
+	elif not id in mod_request_log[event].keys():
+		mod_request_log[event][id] = {}
+	mod_request_log[event][id]["enter_time"] = Time.get_datetime_string_from_system(true)
 	file.open(mod_request_file,File.WRITE)
 	file.store_string(JSON.print(mod_request_log,"\t"))
 	file.close()
@@ -134,14 +132,13 @@ func oddity_spawning(nearby, oddity):
 
 func enterNearby(what, id):
 	if not what in current_event_log:
-		current_event_log.merge({what:{}})
+		current_event_log[what] = {id:{}}
+	elif not id in current_event_log[what].keys():
+		current_event_log[what][id] = {}
 	var ctime : float = Time.get_unix_time_from_system()
-	if not id in current_event_log[what]:
-		current_event_log[what].merge({id:{}})
 	current_event_log[what][id]["enter_time"] = ctime
-	if ctime > current_event_log[what][id].get("exit_time",0.0):
-		if "exit_time" in current_event_log[what][id].keys():
-			current_event_log[what][id].erase("exit_time")
+	if ctime > current_event_log[what][id].get("exit_time",0.0) and "exit_time" in current_event_log[what][id].keys():
+		current_event_log[what][id].erase("exit_time")
 	logEvents()
 	
 	.enterNearby(what,id)
@@ -153,18 +150,13 @@ func exitNearby(what, id):
 	logEvents()
 	.exitNearby(what,id)
 
-var isDummy = false
 func getNextOnPlaylist():
-	if playlist:
-		var value = .getNextOnPlaylist()
-		return value
-	else:
-		return dummy_event
+	return .getNextOnPlaylist() if playlist else dummy_event
 
-var event_log_file : String = "user://cache/.HevLib_Cache/Event_Driver/event_log.json"
-var active_events_file : String = "user://cache/.HevLib_Cache/Event_Driver/active_events.txt"
-var latest_event_file : String = "user://cache/.HevLib_Cache/Event_Driver/latest_event.txt"
-var mod_request_file : String = "user://cache/.HevLib_Cache/Event_Driver/requested_events_from_mods.txt"
+const event_log_file : String = "user://cache/.HevLib_Cache/Event_Driver/event_log.json"
+const active_events_file : String = "user://cache/.HevLib_Cache/Event_Driver/active_events.txt"
+const latest_event_file : String = "user://cache/.HevLib_Cache/Event_Driver/latest_event.txt"
+const mod_request_file : String = "user://cache/.HevLib_Cache/Event_Driver/requested_events_from_mods.txt"
 func _exit_tree():
 	if current_event_log:
 		Debug.l("Ring exiting tree, active events log:\n\n%s\n" % [JSON.print(current_event_log,"\t")])
@@ -208,7 +200,6 @@ func _ready():
 	if hl_eventdriverintegrate_uinit:
 		OS.kill(OS.get_process_id())
 	hl_eventdriverintegrate_uinit = true
-	pointers = ModLoader._savedObjects[0]
 	connect("tree_exiting",self,"wipe_lists")
 	file.open(event_log_file,File.WRITE)
 	file.store_string("{}")

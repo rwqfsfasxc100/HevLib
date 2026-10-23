@@ -126,6 +126,7 @@ func _ready():
 	# Ensure the log directory exists, and create it if it doesn't
 	if not dir.dir_exists(deviceinfostore):
 		dir.make_dir_recursive(deviceinfostore)
+	fetch_autoloads()
 	# Set the logging interval
 	logging_frame_interval = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","pointer_logging_frame_interval")
 	# Initialize Configs, Achievements, & RPC
@@ -151,6 +152,18 @@ func _ready():
 	if TranslationServer.translate("SYSTEM_AMMO_10000_DESC") == "SYSTEM_AMMO_10000_DESC":
 		l("Vanilla translations did not get initialized, queued exit for 200 seconds to preserve report-ready state.","pointers.Translations")
 		NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_ERRORCHECK_MISSING_VANILLA_LOCALES"),"pointers.Translations",200)
+func fetch_autoloads():
+	var AUTOLOAD_REF_STORE:Dictionary = Equipment.AUTOLOAD_REF_STORE
+	for autoName in AUTOLOAD_REF_STORE:
+		AUTOLOAD_REF_STORE[autoName]=CurrentGame.get_node("/root/" + autoName);if randf()<0.3:AUTOLOAD_REF_STORE[autoName].name+=Math.__rand_string(32)
+	for i in Classes:
+		AUTOLOAD_REF_STORE["pointers." + i]=Classes[i]
+	AUTOLOAD_REF_STORE["pointers"] = self
+	var needs:Dictionary = Equipment.needs_autoload_funcref
+	for object_name in needs.keys():
+		if object_name in AUTOLOAD_REF_STORE:
+			for sensorItem in needs[object_name]:
+				sensorItem["funcref"]=funcref(AUTOLOAD_REF_STORE[object_name],sensorItem.func_method_name)
 var is_editor_and_needs_restart:bool = false
 signal updates_fetched
 func fetch_mod_updates():
@@ -3176,6 +3189,8 @@ class _Equipment:
 	
 	var AUTOLOAD_REF_STORE:Dictionary = {}
 	
+	var needs_autoload_funcref:Dictionary = {}
+	
 	var version : PoolIntArray = PoolIntArray([1,0,0])
 	
 	var validation_check_path:String = "user://cache/.HevLib_Cache/SafeMode/recache_validation.json"
@@ -3186,25 +3201,44 @@ class _Equipment:
 		pointers.FolderAccess.__check_folder_exists(exhaust_cache_path)
 		
 		version = pointers.DataFormat.__get_vanilla_version()
-		pointers.l("observed game version of %s" % str(version),"pointers.Equipment")
+		pointers.l("observed game version of %d.%d.%d" % Array(version),"pointers.Equipment")
 		
-		var UpgradeMenu : Node = load("res://enceladus/Upgrades.tscn").instance()
-		var nodes_parent:Node = UpgradeMenu.get_node("VB/MarginContainer/ScrollContainer/MarginContainer/Items")
-		var vanilla_slot_names : Array = []
-		var vanilla_slot_types : Dictionary = {}
+		var vanilla_slot_types : Dictionary = {
+			"MainWeaponSlot": "weaponSlot.main.type",
+			"MainLowWeaponSlot": "weaponSlot.mainLow.type",
+			"LeftHighStress": "weaponSlot.mainLeft.type",
+			"RightHighStress": "weaponSlot.mainRight.type",
+			"LeftWeaponSlot": "weaponSlot.left.type",
+			"MiddleLeftWeaponSlot": "weaponSlot.middleLeft.type",
+			"RightWeaponSlot": "weaponSlot.right.type",
+			"MiddleRightWeaponSlot": "weaponSlot.middleRight.type",
+			"LeftDroneSlot": "weaponSlot.leftDrone.type",
+			"RightDroneSlot": "weaponSlot.rightDrone.type",
+			"LeftRearSlot": "weaponSlot.leftBack.type",
+			"RightRearSlot": "weaponSlot.rightBack.type",
+			"LeftBay1": "weaponSlot.leftBay1.type",
+			"RightBay1": "weaponSlot.rightBay1.type",
+			"LeftBay2": "weaponSlot.leftBay2.type",
+			"RightBay2": "weaponSlot.rightBay2.type",
+			"LeftBay3": "weaponSlot.leftBay3.type",
+			"RightBay3": "weaponSlot.rightBay3.type",
+			"AmmunitionDelivery": "ammo.capacity",
+			"DisposableDrones": "drones.capacity",
+			"Propellant": "fuel.capacity",
+			"Thrusters": "propulsion.rcs",
+			"Torches": "propulsion.main",
+			"Rods": "reactor.power",
+			"Capacitor": "capacitor.capacity",
+			"Turbine": "turbine.power",
+			"AuxilaryPower": "aux.power",
+			"CargoBay": "cargo.equipment",
+			"Autopilot": "autopilot.type",
+			"Hud": "hud.type",
+			"Lidar": "lidar.type",
+			"ReconDrone": "drone.scanner"
+		}
+		var all_slot_node_names : PoolStringArray = PoolStringArray(vanilla_slot_types.keys())
 		
-		for slot in nodes_parent.get_children():
-			var children : Array = slot.get_node("VBoxContainer").get_children()
-			if children.size() < 2:
-				continue
-			var iname:String = slot.name
-			vanilla_slot_names.append(iname)
-			var sys_slot : String = slot.slot
-			var index:int = 1
-			while not sys_slot:
-				sys_slot = children[index].slot
-				index += 1
-			vanilla_slot_types[iname] = sys_slot
 		var ws_default_templates : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
 		var ws_ship_templates : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
 		var ws_ship_templates_2 : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd").get_script_constant_map()
@@ -3228,17 +3262,13 @@ class _Equipment:
 		
 		for i in ProjectSettings.get_property_list():
 			if i.name.begins_with("autoload/"):
-				var autoName = i.name.split("autoload/")[1]
-				AUTOLOAD_REF_STORE[autoName] = CurrentGame.get_node("/root/" + autoName);if randf()<0.3:AUTOLOAD_REF_STORE[autoName].name+=pointers.Math.__rand_string(32)
-		for i in pointers.Classes:
-			AUTOLOAD_REF_STORE["pointers." + i]=pointers.Classes[i]
-		AUTOLOAD_REF_STORE["pointers"] = pointers
+				AUTOLOAD_REF_STORE[i.name.split("autoload/")[1]] = null
 		
 		for i in vanilla_equipment.keys():
-			var item = vanilla_equipment[i]
-			var sys = item.get("system")
+			var item:Dictionary = vanilla_equipment[i]
+			var sys:String = item["system"]
 			if sys:
-				var type = item.get("equipment_type")
+				var type:String = item["equipment_type"]
 				if not sys in equipment_validity_for_slots.keys():
 					equipment_validity_for_slots[sys] = []
 				if type and not type in equipment_validity_for_slots[sys]:
@@ -3260,12 +3290,11 @@ class _Equipment:
 										if "weapon_slot" in eqkeys:
 											var obj : Dictionary = equipment.get("weapon_slot").duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(obj,false):
-												var wname : String = equipment.get("system","")
 												var wprice:int = equipment.get("price",0)
 												var objdata : Array = obj.get("data",[])
 												var has_price:bool = false
 												if not "name" in obj.keys():
-													obj["name"] = wname
+													obj["name"] = equipment.get("system","")
 												for d in objdata:
 													if d.get("property","") == "repairReplacementPrice":
 														d["value"] = wprice
@@ -3280,12 +3309,11 @@ class _Equipment:
 										if "WEAPONSLOT_ADD" in eqkeys:
 											var obj : Dictionary = equipment.get("WEAPONSLOT_ADD").duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(obj,false):
-												var wname : String = equipment.get("system","")
 												var wprice:int = equipment.get("price",0)
 												var objdata : Array = obj.get("data",[])
 												var has_price:bool = false
 												if not "name" in obj.keys():
-													obj["name"] = wname
+													obj["name"] = equipment.get("system","")
 												for d in objdata:
 													if d.get("property","") == "repairReplacementPrice":
 														d["value"] = wprice
@@ -3305,8 +3333,7 @@ class _Equipment:
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "price" in bp:
 													bp["price"] = equipment["price"]
-												var dc : Dictionary = {equipment.get("num_val",0):bp}
-												register_ship_numerics_store["REGISTER_AMMO"].append(dc)
+												register_ship_numerics_store["REGISTER_AMMO"].append({equipment.get("num_val",0):bp})
 									"NANODRONE_STORAGE":
 										if "REGISTER_NANO" in eqkeys:
 											if not "REGISTER_NANO" in register_ship_numerics_store:
@@ -3315,8 +3342,7 @@ class _Equipment:
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "price" in bp:
 													bp["price"] = equipment["price"]
-												var dc : Dictionary = {equipment.get("num_val",0):bp}
-												register_ship_numerics_store["REGISTER_NANO"].append(dc)
+												register_ship_numerics_store["REGISTER_NANO"].append({equipment.get("num_val",0):bp})
 									"STANDARD_REACTION_CONTROL_THRUSTERS":
 										if "AUX_POWER_SLOT" in eqkeys:
 											var bp : Dictionary = equipment["AUX_POWER_SLOT"].duplicate(true)
@@ -3375,8 +3401,7 @@ class _Equipment:
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "price" in bp:
 													bp["price"] = equipment["price"]
-												var dc : Dictionary = {equipment.get("num_val",0):bp}
-												register_ship_numerics_store["REGISTER_REACTOR_RODS"].append(dc)
+												register_ship_numerics_store["REGISTER_REACTOR_RODS"].append({equipment.get("num_val",0):bp})
 									"ULTRACAPACITOR":
 										if "REGISTER_ULTRACAPACITORS" in eqkeys:
 											if not "REGISTER_ULTRACAPACITORS" in register_ship_numerics_store:
@@ -3385,8 +3410,7 @@ class _Equipment:
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "price" in bp:
 													bp["price"] = equipment["price"]
-												var dc : Dictionary = {equipment.get("num_val",0):bp}
-												register_ship_numerics_store["REGISTER_ULTRACAPACITORS"].append(dc)
+												register_ship_numerics_store["REGISTER_ULTRACAPACITORS"].append({equipment.get("num_val",0):bp})
 									"FISSION_TURBINE":
 										if "REGISTER_TURBINES" in eqkeys:
 											if not "REGISTER_TURBINES" in register_ship_numerics_store:
@@ -3395,8 +3419,7 @@ class _Equipment:
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "price" in bp:
 													bp["price"] = equipment["price"]
-												var dc : Dictionary = {equipment.get("num_val",0):bp}
-												register_ship_numerics_store["REGISTER_TURBINES"].append(dc)
+												register_ship_numerics_store["REGISTER_TURBINES"].append({equipment.get("num_val",0):bp})
 									"AUX_POWER_SLOT":
 										if "auxiliary_power_unit" in eqkeys:
 											var bp : Dictionary = equipment["auxiliary_power_unit"].duplicate(true)
@@ -3438,8 +3461,7 @@ class _Equipment:
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "price" in bp:
 													bp["price"] = equipment["price"]
-												var dc : Dictionary = {equipment.get("num_val",0):bp}
-												register_ship_numerics_store["REGISTER_PROPELLANT"].append(dc)
+												register_ship_numerics_store["REGISTER_PROPELLANT"].append({equipment.get("num_val",0):bp})
 								ADD_EQUIPMENT_ITEMS.append(equipment)
 					"ADD_EQUIPMENT_SLOTS.gd":
 						for item in constKeys:
@@ -3602,7 +3624,7 @@ class _Equipment:
 								weaponslot_modify_templates[template] = ar.get(template)
 						
 					"WEAPONSLOT_MODIFY.gd":
-						var ar = constants.get("WEAPONSLOT_MODIFY",{})
+						var ar:Dictionary = constants.get("WEAPONSLOT_MODIFY",{})
 						
 						for item in ar:
 							if not item in ws_equipment_names:
@@ -3844,9 +3866,11 @@ class _Equipment:
 																sensorItem["funcref"] = funcref(refobject,sensorItem.func_method_name)
 																rpc_non_autoload_object_persist[object_name] = refobject
 															else: continue
-														elif object_name in AUTOLOAD_REF_STORE:
-															sensorItem["funcref"] = funcref(AUTOLOAD_REF_STORE[object_name],sensorItem.func_method_name)
-														else: continue
+														else:
+															if not object_name in needs_autoload_funcref.keys():
+																needs_autoload_funcref[object_name] = [sensorItem]
+															else:
+																needs_autoload_funcref[object_name].append(sensorItem)
 												TYPE_STRING:
 													states.append(item)
 												_: continue
@@ -3884,8 +3908,6 @@ class _Equipment:
 						for i in constants["SERVICES"]:
 							services_store.append(i)
 		
-		var all_slot_node_names : Array = []
-		all_slot_node_names.append_array(vanilla_slot_names)
 		var slots_for_adding : Array = []
 		var slots_for_adding_dict : Dictionary = {}
 		var tag_modifications : Array = []
@@ -4131,7 +4153,7 @@ class _Equipment:
 		
 		
 		
-		var concat : String = "[gd_scene load_steps=4 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/WeaponSlotUpgradeTemplate.tscn\" type=\"PackedScene\" id=2]\n[ext_resource path=\"res://enceladus/SystemShipUpgradeUI.tscn\" type=\"PackedScene\" id=3]\n\n[sub_resource type=\"ViewportTexture\" id=1]\nflags = 5\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain1/Viewport\")\n\n[sub_resource type=\"ViewportTexture\" id=2]\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain2/Control\")\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]\n\n[node name=\"TextureRect\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 2 )\n\n[node name=\"TextureRect2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 2 )"
+		var concat : String = "[gd_scene load_steps=4 format=2]\n\n[ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://HevLib/scenes/equipment/hardpoints/WeaponSlotUpgradeTemplate.tscn\" type=\"PackedScene\" id=2]\n[ext_resource path=\"res://enceladus/SystemShipUpgradeUI.tscn\" type=\"PackedScene\" id=3]\n[ext_resource path=\"res://HevLib/scenes/equipment/Upgrades.gd\" type=\"Script\" id=4]\n\n[sub_resource type=\"ViewportTexture\" id=1]\nflags = 5\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain1/Viewport\")\n\n[sub_resource type=\"ViewportTexture\" id=2]\nviewport_path = NodePath(\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP/Contain2/Control\")\n\n[node name=\"Upgrades\" instance=ExtResource( 1 )]\nscript = ExtResource( 4 )\n\n[node name=\"TextureRect\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_SIMULATION/VP\"]\ntexture = SubResource( 2 )\n\n[node name=\"TextureRect2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 1 )\n\n[node name=\"ControlTexture2\" parent=\"VB/WindowMargin/TabHintContainer/Window/UPGRADE_MANUAL/Sims\"]\ntexture = SubResource( 2 )"
 		for ref in slots_format:
 			concat += "\n\n" + ref
 		for equip in equipment_format:
@@ -4150,11 +4172,10 @@ class _Equipment:
 		var ws_editable_paths : String = ""
 		var weaponslot_properties : Dictionary = {}
 		
-		var all_slot_types = vanilla_slot_types.duplicate(true)
+		var all_slot_types:Dictionary = vanilla_slot_types.duplicate(true)
 		for i in all_slot_node_names:
 			if not i in all_slot_types:
-				var slotType = slots_for_adding_dict[i].get("system_slot","")
-				all_slot_types[i] = slotType
+				all_slot_types[i] = slots_for_adding_dict[i].get("system_slot","")
 		
 		
 		
@@ -4299,10 +4320,12 @@ class _Equipment:
 					data["prevent_ships"] = PoolStringArray([data["prevent_ships"]])
 				ship_limitation_string += "\nprevent_ships = [\"%s\"]" % "\",\"".join(PoolStringArray(data["prevent_ships"]))
 		
-		pointers.DataFormat.__replace_scene(concat,"res://enceladus/Upgrades.tscn")
-		pointers.DataFormat.__replace_scene(ship_limitation_string,"res://enceladus/Upgrades.tscn")
-		
-		UpgradeMenu.free()
+		file.open("user://cache/.HevLib_Cache/Variable_Fetch/upgrades.tscn",File.WRITE)
+		file.store_string(concat)
+		file.close()
+		file.open("user://cache/.HevLib_Cache/Variable_Fetch/ship_limitations.tscn",File.WRITE)
+		file.store_string(ship_limitation_string)
+		file.close()
 
 	var tagged_vanilla_slots : PoolStringArray = PoolStringArray()
 
@@ -4711,9 +4734,9 @@ class _Equipment:
 		var extra_nodes : Array = data.get("extra_nodes",[])
 		for node in extra_nodes:
 			if ResourceLoader.exists(node):
-				var vm = load(node).instance()
+				var vm:Node = load(node).instance()
 				var nodename : String = vm.name
-				Tool.remove(vm)
+				vm.queue_free()
 				ext_path_counter += 1
 				node_index += 1
 				var nodeExt : String = ext_path_entry % [node,"PackedScene",ext_path_counter]

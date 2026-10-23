@@ -32,14 +32,13 @@
 
 extends "res://tools/DLClist.gd"
 
-var pointers:HevLibPointers
+onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 var hl_modmenu2dlclistdriver_uinit : bool = false
 func _ready():
 	if hl_modmenu2dlclistdriver_uinit:
 		OS.kill(OS.get_process_id())
 	hl_modmenu2dlclistdriver_uinit = true
-	pointers = ModLoader._savedObjects[0]
 	
 	if pointers.is_editor_and_needs_restart:
 		pointers.NodeAccess.__exit(false,"config file not able to be correctly constructed from fresh instance, closing game now that it has been properly built. Nothing is wrong, but you do need to restart the game manually.\n\nSorry for the inconvenience!","HevLib",0.0,"",true)

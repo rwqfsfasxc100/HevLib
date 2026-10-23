@@ -34,16 +34,16 @@ extends Node
 
 var ship
 
-var pointers:HevLibPointers
+var pointers:HevLibPointers._ConfigDriver
 
 func _init(p):
 	pointers = p
-	pointers.ConfigDriver.__establish_connection("hl_shipinterruptupdate",self)
+	pointers.__establish_connection("hl_shipinterruptupdate",self)
 	hl_shipinterruptupdate()
 
 func hl_shipinterruptupdate():
 	if pointers:
-		cargo_limit = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","processed_mineral_max_display_limit")
+		cargo_limit = pointers.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","processed_mineral_max_display_limit")
 
 var cargo_limit:int = 15
 

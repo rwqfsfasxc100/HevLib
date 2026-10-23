@@ -32,7 +32,7 @@
 
 extends "res://menu/TitleMenu.gd"
 
-var pointers:HevLibPointers
+onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 var mm2_titlemenu_uinit : bool = false
 func _ready():
@@ -42,7 +42,6 @@ func _ready():
 	add_child(update_timer)
 	update_timer.connect("timeout",self,"update_recheck")
 	update_timer.start(30)
-	pointers = ModLoader._savedObjects[0]
 	if pointers.is_editor:
 		var devMenu:Popup = load("res://HevLib/ui/mod_menu/titlescreen/editor/DevPushMenu.tscn").instance()
 		add_child(devMenu)

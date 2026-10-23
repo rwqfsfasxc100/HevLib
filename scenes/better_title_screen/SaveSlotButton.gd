@@ -40,7 +40,7 @@ onready var delete_path = popup_path.get_node("Popups/Override")
 
 var password:String = "FTWOMG"
 
-var foolish
+onready var foolish = load("res://menu/Foolish.tscn").instance()
 
 var val:float = 0.0
 
@@ -59,7 +59,6 @@ func _ready():
 	if hl_btrssbtn_uinit:
 		OS.kill(OS.get_process_id())
 	hl_btrssbtn_uinit = true
-	var foolish = load("res://menu/Foolish.tscn").instance()
 	foolish.name = "Foolish"
 	add_child(foolish)
 	var box:HBoxContainer = HBoxContainer.new()
@@ -82,8 +81,6 @@ func _ready():
 	delete.icon = null
 	delete.rect_min_size = Vector2(64,41)
 	delete.add_child(box)
-	
-	foolish = $Foolish
 	
 	connect("newGame",CurrentGame,"newGame")
 	foolish.visible = false
@@ -108,7 +105,7 @@ var standHash:int = 0
 var has_save:bool = false
 
 var file:File = File.new()
-var force = false
+var force:bool = false
 func checkSave():
 	var does:bool = false
 	if file.file_exists(saveSlotFile):
@@ -126,7 +123,7 @@ func checkSave():
 		if has_save:
 			meta = getMetaFromSave(saveSlotFile)
 			if meta != null:
-				var demoLimit = CurrentGame.getGameStartTime() + 24 * 3600 * 30 * 256
+				var demoLimit:int = CurrentGame.getGameStartTime() + 24 * 3600 * 30 * 256
 				text = "%s %s" % [meta.transponder, meta.name]
 				if false and (CurrentGame.isDemo() and meta.gameTime > demoLimit):
 					disabled = true
@@ -138,11 +135,11 @@ func checkSave():
 					slot_available = true
 					delete_color = Color(1, 1, 1, 1)
 				if meta.model in Shipyard.ships:
-					$Foolish.visible = false
+					foolish.visible = false
 					hint_tooltip = ""
 					disabled = false
 				else:
-					$Foolish.visible = true
+					foolish.visible = true
 					hint_tooltip = TranslationServer.translate("HEVLIB_INCORRECT_SHIP") % meta.model
 					disabled = true
 		else:
@@ -161,7 +158,7 @@ func checkSave():
 	if not display_text:
 		display_text = newText
 
-var focuscheck_ctr = 0
+var focuscheck_ctr:int = 0
 func check_focus():
 	if is_inside_tree():
 		if first:

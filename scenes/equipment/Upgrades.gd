@@ -37,4 +37,4 @@ func _ready():
 	if hl_eqdrupgradestab_uinit:
 		OS.kill(OS.get_process_id())
 	hl_eqdrupgradestab_uinit = true
-	Debug.l("HevLib: Upgrades loaded to ready")
+	ModLoader._savedObjects[0].l("Upgrades loaded to ready","pointers.Equipment")

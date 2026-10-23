@@ -49,7 +49,8 @@ func _ready():
 
 var pointers:HevLibPointers
 func display():
-	pointers = ModLoader._savedObjects[0]
+	if not pointers:
+		pointers = ModLoader._savedObjects[0]
 	var groups:Array = CurrentGame.get_tree().get_nodes_in_group("hevlib_mod_menu")
 	var mod_menu:Node
 	if groups:

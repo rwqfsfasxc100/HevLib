@@ -36,18 +36,17 @@ export (String) var config_id = ""
 export (String) var config_section = ""
 export (String) var config_setting = ""
 export (bool) var invert_config = false
-var ssuuPointers:HevLibPointers
+onready var ssuuPointers:HevLibPointers._ConfigDriver = ModLoader._savedObjects[0].ConfigDriver
 var hl_eqdrssui_uinit : bool = false
 func _ready():
 	if hl_eqdrssui_uinit:
 		OS.kill(OS.get_process_id())
 	hl_eqdrssui_uinit = true
-	ssuuPointers = ModLoader._savedObjects[0]
 
 func isAvailable():
 	if .isAvailable():
 		if config_id and config_section and config_setting:
-			var cv = ssuuPointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
+			var cv = ssuuPointers.__get_value(config_id,config_section,config_setting)
 			if cv is bool:
 				if invert_config:
 					cv = !cv

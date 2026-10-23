@@ -34,17 +34,15 @@ extends "res://enceladus/Services.gd"
 
 onready var service_ui:PackedScene = load("res://HevLib/scenes/service_driver/ServiceUIUniversal.tscn")
 
-var pointers:HevLibPointers
+onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
 func _ready():
-	pointers = ModLoader._savedObjects[0]
 	var services_store:Array = pointers.Equipment.services_store
 	if services_store:
 		var service_item_list:VBoxContainer = $VB/MarginContainer/ScrollContainer/MarginContainer/Items
 		var perspective_base:Node2D = $VB/WindowMargin/Window/VP/ViewportContainer/Viewport/EnceladusPerspective
 		var flicker_script:Script = load("res://enceladus/Perspective/FlickerLight.gd")
 		for item in services_store:
-			var itemKeys:Array = item.keys()
-			if "name" in itemKeys and item.name:
+			if "name" in item.keys() and item.name:
 				var panel:MarginContainer = service_ui.instance()
 				var item_name:String = item["name"]
 				var layer:String = "Industrial"

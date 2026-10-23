@@ -32,17 +32,15 @@
 
 extends "res://enceladus/SystemBuyUI.gd"
 
-var dealer
+onready var dealer = get_parent()
 
-var pointers:HevLibPointers
+onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 var hl_eqdrbuyui_uinit : bool = false
 func _ready():
 	if hl_eqdrbuyui_uinit:
 		OS.kill(OS.get_process_id())
 	hl_eqdrbuyui_uinit = true
-	pointers = ModLoader._savedObjects[0]
-	dealer = get_parent()
 	for i in 6:
 		if not "systemGoodColor" in dealer:
 			dealer = dealer.get_parent()

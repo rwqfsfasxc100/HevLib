@@ -32,7 +32,7 @@
 
 extends "res://CurrentGame.gd"
 
-var pointersShipDriver:HevLibPointers
+onready var pointersShipDriver:HevLibPointers = ModLoader._savedObjects[0]
 var modded_ship_list = []
 
 var added_modded_ships = false
@@ -42,7 +42,6 @@ func _ready():
 	if hl_shipdriverinitializer_uinit:
 		OS.kill(OS.get_process_id())
 	hl_shipdriverinitializer_uinit = true
-	pointersShipDriver = ModLoader._savedObjects[0]
 	pointersShipDriver.ConfigDriver.__establish_connection("hl_shipdriver_init_ships_to_dealer",self)
 	hl_shipdriver_init_ships_to_dealer()
 	initialize_scrapwright()

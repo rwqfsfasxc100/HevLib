@@ -34,7 +34,7 @@ extends "res://TheRing.gd"
 
 func _ready():
 	var pointers:HevLibPointers = ModLoader._savedObjects[0]
-	var add_events = pointers.Equipment.event_driver_event_entries
+	var add_events:Array = pointers.Equipment.event_driver_event_entries
 	for event in add_events:
 		if not pointers.ConfigDriver.__validate_dictionary(event):
 			continue

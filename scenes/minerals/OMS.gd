@@ -32,31 +32,21 @@
 
 extends "res://hud/OMS.gd"
 
-var geo
-var mineral
-var scroll
+onready var geo = $MarginContainer/VBoxContainer/TabHintContainer/TabContainer/CREW_OCCUPATION_GEOLOGIST
+onready var mineral = geo.get_node("SystemMineralList")
+onready var scroll = load("res://HevLib/development_tools/control_and_ui/scrollbox_helpers/ScrollWithAnalogHorizontal.gd").new()
 
-var mechanic
-var mlist
-var mscroll
-
-var operated = false
-
-var scroller_script_path = "res://HevLib/development_tools/control_and_ui/scrollbox_helpers/ScrollWithAnalogHorizontal.gd"
+onready var mechanic = $MarginContainer/VBoxContainer/TabHintContainer/TabContainer/CREW_OCCUPATION_MECHANIC
+onready var mlist = mechanic.get_node("ScrollContainer")
 
 var hl_omswidthsliderhandle_uinit : bool = false
 func _ready():
 	if hl_omswidthsliderhandle_uinit:
 		OS.kill(OS.get_process_id())
 	hl_omswidthsliderhandle_uinit = true
-	geo = $MarginContainer/VBoxContainer/TabHintContainer/TabContainer/CREW_OCCUPATION_GEOLOGIST
-	scroll = ScrollContainer.new()
-	scroll.set_script(load(scroller_script_path))
-#	scroll.follow_focus = true
 	scroll.rect_size = geo.rect_size
 	scroll.size_flags_vertical = SIZE_EXPAND_FILL
 	geo.add_child(scroll)
-	mineral = geo.get_node("SystemMineralList")
 	geo.remove_child(mineral)
 	mineral.size_flags_vertical = SIZE_FILL
 	scroll.add_child(mineral)
@@ -82,18 +72,13 @@ func _ready():
 	splitter.rect_min_size = Vector2(5,0)
 	hb.add_child(splitter)
 	hb.add_child(vb2)
-	
-	
-	mechanic = $MarginContainer/VBoxContainer/TabHintContainer/TabContainer/CREW_OCCUPATION_MECHANIC
-	mlist = mechanic.get_node("ScrollContainer")
 	mlist.set_script(load("res://HevLib/development_tools/control_and_ui/scrollbox_helpers/OmniScroll.gd"))
 	mlist.follow_focus = true
 	mlist.scrollWithGamepad = false
 	mlist.horizontalSmoothScrollSpeed = 25
 	mlist.verticalSmoothScrollSpeed = 25
-	mlist._ready()
-	
-	operated = true
+	mlist.call("_ready")
+
 func _process(delta):
-	if operated:
+	if scroll:
 		scroll.rect_size.y = mineral.rect_size.y + 20

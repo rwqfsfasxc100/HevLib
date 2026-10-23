@@ -32,7 +32,7 @@
 
 extends "res://ships/Shipyard.gd"
 
-var syPointers:HevLibPointers
+onready var syPointers:HevLibPointers = ModLoader._savedObjects[0]
 
 var inverseShipAliases = {}
 
@@ -41,7 +41,6 @@ func _ready():
 	if hl_shipdrivershipyardhandler_uinit:
 		OS.kill(OS.get_process_id())
 	hl_shipdrivershipyardhandler_uinit = true
-	syPointers = ModLoader._savedObjects[0]
 	syPointers.ConfigDriver.__establish_connection("hl_shipyard_shipdriver_update",self)
 	hl_shipyard_shipdriver_update()
 	var file = File.new()

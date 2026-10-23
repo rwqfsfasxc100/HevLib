@@ -32,7 +32,7 @@
 
 extends "res://ships/WeaponSlot.gd"
 
-var pointers:HevLibPointers
+onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 var shipName:String = ""
 var baseShipName:String = ""
@@ -48,7 +48,6 @@ func _ready():
 	if hl_weaponslotdriverdatafetcher_uinit:
 		OS.kill(OS.get_process_id())
 	hl_weaponslotdriverdatafetcher_uinit = true
-	pointers = ModLoader._savedObjects[0]
 	
 	shipName=ship.shipName
 	baseShipName=ship.baseShipName

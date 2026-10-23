@@ -31,9 +31,7 @@
 # [/license]
 
 extends Node
-
 const MOD_PRIORITY=-INF
-
 const MOD_NAME="HevLib EquipmentDriver"
 const MOD_VERSION="1.0.0"
 const MOD_VERSION_MAJOR=1
@@ -41,30 +39,23 @@ const MOD_VERSION_MINOR=0
 const MOD_VERSION_BUGFIX=0
 const MOD_VERSION_METADATA=""
 const MOD_IS_LIBRARY=true
-
-var modPath:String=get_script().resource_path.get_base_dir()+"/"
-
-var _savedObjects:=[]
-
-var variables_folder:String="user://cache/.HevLib_Cache/Variable_Fetch/"
-var validation_check_path:String="user://cache/.HevLib_Cache/SafeMode/recache_validation.json"
-
+const _savedObjects:Array=Array()
+const variables_folder:String="user://cache/.HevLib_Cache/Variable_Fetch/"
+const validation_check_path:String="user://cache/.HevLib_Cache/SafeMode/recache_validation.json"
+const strings=Array()
 var file:File=File.new()
 var directory:Directory=Directory.new()
-var pointers_dir:String=modPath.get_base_dir().get_base_dir().get_base_dir()+"/pointers.gd"
-var correct:bool=ResourceLoader.exists(pointers_dir)
-var pointers=null
-
-var do_safe_load:bool=true
-
-var is_editor:bool=OS.has_feature("editor")
-
 func _init(modLoader:ModLoader=ModLoader):
-	if!correct:
+	strings.append(self)
+	var modPath:String=get_script().resource_path.get_base_dir()+"/"
+	var pointers_dir:String=modPath.get_base_dir().get_base_dir().get_base_dir()+"/pointers.gd"
+	strings.append(modPath)
+	strings.append(pointers_dir)
+	if!file_exists(pointers_dir):
 		Debug.l("Folder structure not correct, exiting HevLib load")
 		return
-	create_zip_for_overrides(handle_pointer_cast_clearing(process_gdnative_plugins(),modLoader))
-	load_pointers(modLoader)
+	create_zip_for_overrides(handle_pointer_cast_clearing(process_gdnative_plugins(),modLoader),self)
+	var pointers=load_pointers(modLoader)
 	l("Initializing Equipment Driver")
 	pointers.FolderAccess.__recursive_delete(variables_folder,PoolStringArray(["remove_pointer_casting.zip"]))
 	directory.make_dir_recursive(variables_folder);directory.make_dir_recursive(validation_check_path.get_base_dir())
@@ -74,113 +65,94 @@ func _init(modLoader:ModLoader=ModLoader):
 #	testing(modLoader)
 	
 	pointers.Scripting.make_mineral_scripting()
-	
-	var files_to_load:Array=[
-		"res://HevLib/scenes/minerals/AstrogatorPanel.gd",
-		"res://HevLib/scenes/minerals/OMS.gd",
-		"res://HevLib/scenes/minerals/CargoScanner.gd",
-		"res://HevLib/scenes/minerals/ProcessedCargoManifest.gd",
-		"user://cache/.HevLib_Cache/Minerals/cg.gd",
-		"user://cache/.HevLib_Cache/Minerals/as.gd",
-		"res://HevLib/scenes/minerals/TheRing.gd",
-		"res://HevLib/scenes/research/Enceladus.gd",
-		"res://HevLib/scenes/research/overhead_handle/CurrentGame.gd",
-		"res://HevLib/scenes/equipment/SystemShipUpgradeUI.gd",
-		"res://HevLib/scenes/equipment/SystemBuyUI.gd",
-		"res://HevLib/scenes/equipment/UpgradeGroup.gd",
-		"res://HevLib/scenes/equipment/ThrusterSlot.gd",
-		"res://HevLib/scenes/weaponslot/weapon_slot_handler.gd",
-		"res://HevLib/scenes/equipment/ShipModificationDriver/AddNodes.gd",
-		"res://HevLib/scenes/equipment/ShipModificationDriver/InternalStorageMod.gd",
-		"res://HevLib/scenes/ship_driver/Shipyard.gd",
-		"res://HevLib/scenes/ship_driver/CurrentGame.gd",
-		"res://HevLib/scenes/ship_driver/TheRing.gd",
-		"res://HevLib/scripts/Namer.gd",
-		"res://HevLib/events/TheRing.gd",
-		"res://HevLib/events/Game.gd",
-		"res://HevLib/events/controls/camera.gd",
-		"res://HevLib/events/controls/ship-ctrl.gd",
-		"res://HevLib/events/controls/CurrentGame.gd",
-		PoolStringArray(["res://HevLib/events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn"]),
-		"res://HevLib/events/custom_events/TheRing.gd",
-		PoolStringArray(["res://HevLib/scenes/notification_driver/Notifications.tscn","res://achievement/Notifications.tscn"]),
-		"res://HevLib/scenes/notification_driver/CurrentGame.gd",
-		PoolStringArray(["res://HevLib/scenes/better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn"]),
-		"res://HevLib/scenes/better_title_screen/SaveSlotButton.gd",
-		"res://HevLib/scenes/better_title_screen/CurrentlyPlaying.gd",
-		"res://HevLib/ui/ExtensionPopup.gd",
-		"res://HevLib/ui/mod_menu/titlescreen/TitleMenu.gd",
-		"res://HevLib/ui/mod_menu/titlescreen/DLClist.gd",
-		PoolStringArray(["res://HevLib/scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"]),
-		"res://HevLib/scripts/transit_tips/TransitTip.gd",
-		"res://HevLib/scripts/easters/Screensaver.gd",
-		"res://HevLib/scripts/easters/TitleMenu.gd",
-		"res://HevLib/scenes/minerals/Summary.gd",
-		"res://HevLib/scenes/rpc/Crew.gd",
-		"res://HevLib/scenes/rpc/Dealer.gd",
-		"res://HevLib/scenes/rpc/DiveTarget.gd",
-		"res://HevLib/scenes/rpc/Enceladus.gd",
-		"res://HevLib/scenes/rpc/Game.gd",
-		"res://HevLib/scenes/rpc/Logs.gd",
-		"res://HevLib/scenes/rpc/MineralMarket.gd",
-		"res://HevLib/scenes/rpc/Music.gd",
-		"res://HevLib/scenes/rpc/PreFlightInspection.gd",
-		"res://HevLib/scenes/rpc/Repairs.gd",
-		"res://HevLib/scenes/rpc/Services.gd",
-		"res://HevLib/scenes/rpc/SimulationLayer.gd",
-		"res://HevLib/scenes/rpc/Summary.gd",
-		"res://HevLib/scenes/rpc/TitleMenu.gd",
-		"res://HevLib/scenes/rpc/Tuning.gd",
-		"res://HevLib/scenes/rpc/Upgrades.gd",
-		"res://HevLib/scenes/keymapping/bind_displays/AnalogAxisDisplay.gd",
-		"res://HevLib/scenes/keymapping/bind_displays/GamepadKeybindDisplay.gd",
-		"res://HevLib/scenes/keymapping/bind_displays/KeybindDisplay.gd",
-		"res://HevLib/scenes/keymapping/bind_displays/MousebindDisplay.gd",
-		"res://HevLib/scripts/Boot.gd",
-		"res://HevLib/scenes/minerals/multiminerals/mineral.gd",
-		"res://HevLib/scenes/minerals/multiminerals/MineralProcessingUnit.gd",
-		"res://HevLib/scenes/minerals/multiminerals/AsteroidSpawner.gd",
-		"res://HevLib/scenes/service_driver/Services.gd",
-		["res://HevLib/scripts/Screensaver.gd",1000],
-	]
-	
-	
+	pointers.Equipment.__make_upgrades_scene()
 	var ncrew:Dictionary=pointers.ManifestV2.__get_manifest_entry("tags","TAG_HANDLE_EXTRA_CREW")
 	var count:int=24
 	for mod in ncrew.keys():
 		var data:int=ncrew[mod]
-		if data>count:
-			count=data
+		if data>count: count=data
 	var crewsize_entry:String=pointers.NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",count)
 	if crewsize_entry:
 		files_to_load.append([crewsize_entry,"res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"])
-	
 	pointers.ManifestV2.__load_modlets(files_to_load)
-	
-
-func _ready():
-	if!correct:
-		Debug.l("HevLib Equipment Driver onready process cannot be carried out")
-		return
-	l("Readying")
-	
-#	testing(ModLoader)
-	
-	pointers.Equipment.__make_upgrades_scene()
-	
-	replaceScene("Upgrades.tscn","res://enceladus/Upgrades.tscn")
-	
-	l("Ready")
-
-func installScriptExtension(path:String):
-	var childPath:String=str(modPath+path)
+const files_to_load:Array=[
+	"res://HevLib/scenes/minerals/AstrogatorPanel.gd",
+	"res://HevLib/scenes/minerals/OMS.gd",
+	"res://HevLib/scenes/minerals/CargoScanner.gd",
+	"res://HevLib/scenes/minerals/ProcessedCargoManifest.gd",
+	"user://cache/.HevLib_Cache/Minerals/cg.gd",
+	"user://cache/.HevLib_Cache/Minerals/as.gd",
+	"res://HevLib/scenes/minerals/TheRing.gd",
+	"res://HevLib/scenes/research/Enceladus.gd",
+	"res://HevLib/scenes/research/overhead_handle/CurrentGame.gd",
+	"res://HevLib/scenes/equipment/SystemShipUpgradeUI.gd",
+	"res://HevLib/scenes/equipment/SystemBuyUI.gd",
+	"res://HevLib/scenes/equipment/UpgradeGroup.gd",
+	"res://HevLib/scenes/equipment/ThrusterSlot.gd",
+	"res://HevLib/scenes/weaponslot/weapon_slot_handler.gd",
+	"res://HevLib/scenes/equipment/ShipModificationDriver/AddNodes.gd",
+	"res://HevLib/scenes/equipment/ShipModificationDriver/InternalStorageMod.gd",
+	"res://HevLib/scenes/ship_driver/Shipyard.gd",
+	"res://HevLib/scenes/ship_driver/CurrentGame.gd",
+	"res://HevLib/scenes/ship_driver/TheRing.gd",
+	"res://HevLib/scripts/Namer.gd",
+	"res://HevLib/events/TheRing.gd",
+	"res://HevLib/events/Game.gd",
+	"res://HevLib/events/controls/camera.gd",
+	"res://HevLib/events/controls/ship-ctrl.gd",
+	"res://HevLib/events/controls/CurrentGame.gd",
+	PoolStringArray(["res://HevLib/events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn"]),
+	"res://HevLib/events/custom_events/TheRing.gd",
+	PoolStringArray(["res://HevLib/scenes/notification_driver/Notifications.tscn","res://achievement/Notifications.tscn"]),
+	"res://HevLib/scenes/notification_driver/CurrentGame.gd",
+	PoolStringArray(["res://HevLib/scenes/better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn"]),
+	"res://HevLib/scenes/better_title_screen/SaveSlotButton.gd",
+	"res://HevLib/scenes/better_title_screen/CurrentlyPlaying.gd",
+	"res://HevLib/ui/ExtensionPopup.gd",
+	"res://HevLib/ui/mod_menu/titlescreen/TitleMenu.gd",
+	"res://HevLib/ui/mod_menu/titlescreen/DLClist.gd",
+	PoolStringArray(["res://HevLib/scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"]),
+	"res://HevLib/scripts/transit_tips/TransitTip.gd",
+	"res://HevLib/scripts/easters/Screensaver.gd",
+	"res://HevLib/scripts/easters/TitleMenu.gd",
+	"res://HevLib/scenes/minerals/Summary.gd",
+	"res://HevLib/scenes/rpc/Crew.gd",
+	"res://HevLib/scenes/rpc/Dealer.gd",
+	"res://HevLib/scenes/rpc/DiveTarget.gd",
+	"res://HevLib/scenes/rpc/Enceladus.gd",
+	"res://HevLib/scenes/rpc/Game.gd",
+	"res://HevLib/scenes/rpc/Logs.gd",
+	"res://HevLib/scenes/rpc/MineralMarket.gd",
+	"res://HevLib/scenes/rpc/Music.gd",
+	"res://HevLib/scenes/rpc/PreFlightInspection.gd",
+	"res://HevLib/scenes/rpc/Repairs.gd",
+	"res://HevLib/scenes/rpc/Services.gd",
+	"res://HevLib/scenes/rpc/SimulationLayer.gd",
+	"res://HevLib/scenes/rpc/Summary.gd",
+	"res://HevLib/scenes/rpc/TitleMenu.gd",
+	"res://HevLib/scenes/rpc/Tuning.gd",
+	"res://HevLib/scenes/rpc/Upgrades.gd",
+	"res://HevLib/scenes/keymapping/bind_displays/AnalogAxisDisplay.gd",
+	"res://HevLib/scenes/keymapping/bind_displays/GamepadKeybindDisplay.gd",
+	"res://HevLib/scenes/keymapping/bind_displays/KeybindDisplay.gd",
+	"res://HevLib/scenes/keymapping/bind_displays/MousebindDisplay.gd",
+	"res://HevLib/scripts/Boot.gd",
+	"res://HevLib/scenes/minerals/multiminerals/mineral.gd",
+	"res://HevLib/scenes/minerals/multiminerals/MineralProcessingUnit.gd",
+	"res://HevLib/scenes/minerals/multiminerals/AsteroidSpawner.gd",
+	"res://HevLib/scenes/service_driver/Services.gd",
+	["res://HevLib/scripts/Screensaver.gd",1000],
+	PoolStringArray(["user://cache/.HevLib_Cache/Variable_Fetch/upgrades.tscn","res://enceladus/Upgrades.tscn"]),
+	PoolStringArray(["user://cache/.HevLib_Cache/Variable_Fetch/ship_limitations.tscn","res://enceladus/Upgrades.tscn"]),
+]
+static func installScriptExtension(path:String):
+	var childPath:String=strings[1]+path
 	var childScript:Script=ResourceLoader.load(childPath,"Script").new()
 	var parentPath:String=childScript.get_base_script().resource_path
-	l("Installing script extension:%s <- %s"%[parentPath, childPath])
+	strings[3].l("Installing script extension:%s <- %s"%[parentPath, childPath])
 	childScript.take_over_path(parentPath)
 	_savedObjects.append(childScript)
-
-func installScriptExtensionFromSource(source_code:String):
+static func installScriptExtensionFromSource(source_code:String):
 	var out=GDScript.new()
 	out.set_source_code(source_code)
 	out.reload()
@@ -188,51 +160,38 @@ func installScriptExtensionFromSource(source_code:String):
 	l("Installing script extension from [Source Code -> %s]"%parentPath)
 	out.take_over_path(parentPath)
 	_savedObjects.append(out)
-
-func installScriptExtensionFromScript(out:Script):
+static func installScriptExtensionFromScript(out:Script):
 	var parentPath:String=out.get_base_script().resource_path
 	l("Installing script extension from [%s -> %s]"%[str(out),parentPath])
 	out.take_over_path(parentPath)
 	_savedObjects.append(out)
-
-func installScriptOverrideFromSource(source_code:String,original_path:String):
+static func installScriptOverrideFromSource(source_code:String,original_path:String):
 	var out=GDScript.new()
 	out.set_source_code(source_code)
 	out.reload()
 	l("Installing script override from [Source Code -> %s]"%original_path)
 	out.take_over_path(original_path)
 	_savedObjects.append(out)
-
-func installScriptOverrideFromScript(out:Script,original_path:String):
+static func installScriptOverrideFromScript(out:Script,original_path:String):
 	l("Installing script override from [%s -> %s]"%[str(out),original_path])
 	out.take_over_path(original_path)
 	_savedObjects.append(out)
-
-
-# Helper function to replace scenes
-# Can either be passed a single path,||two paths
-# With a single path, it will replace the vanilla scene in the same relative position
-func replaceScene(newPath:String, oldPath:String=""):
+static func replaceScene(newPath:String, oldPath:String=""):
 	l("Updating scene:%s"%newPath)
 	if oldPath.empty():
 		oldPath="res://"+newPath
-	var scene:=ResourceLoader.load(modPath.plus_file(newPath))
+	var scene:=ResourceLoader.load(strings[1].plus_file(newPath))
 	scene.take_over_path(oldPath)
 	_savedObjects.append(scene)
 	l("Finished updating:%s"%oldPath)
-func replaceSceneLiteral(newPath:String, oldPath:String):
+static func replaceSceneLiteral(newPath:String, oldPath:String):
 	l("Updating scene literal:%s"%newPath)
 	var scene:=ResourceLoader.load(newPath)
 	if scene:
 		scene.take_over_path(oldPath)
 		_savedObjects.append(scene)
 		l("Finished updating literal:%s"%oldPath)
-
-# Func to print messages to the logs
-func l(msg:String, title:String=MOD_NAME, version:String=MOD_VERSION):
-	var line="%s V%s"%[title, version]
-	pointers.l(msg,line)
-
+static func l(msg:String, title:String=MOD_NAME, version:String=MOD_VERSION):strings[3].l(msg,"%s V%s"%[title, version])
 const gdnative_library_extensions:PoolStringArray=PoolStringArray(["gdnlib"])
 const driver_dirs=PoolStringArray([
 	"HEVLIB_EQUIPMENT_DRIVER_TAGS/",
@@ -240,17 +199,12 @@ const driver_dirs=PoolStringArray([
 	"HEVLIB_MINERAL_DRIVER_TAGS/",
 	"HEVLIB_DRIVERS/",
 ])
-
-
-
-
 const class_names_to_clear:PoolStringArray=PoolStringArray(["HevLibPointers","MINIZ"])
 const class_refs:Dictionary={"HevLibPointers":"res://HevLib/pointers.gd","MINIZ":"res://HevLib/scripts/miniz/miniz.gd"}
-
-func process_gdnative_plugins() -> Dictionary:
+static func process_gdnative_plugins() -> Dictionary:
 	var fetchPaths:Dictionary={}
 	var exePath:String=OS.get_executable_path().get_base_dir()+"/hevlib_dll_store/"
-	if!is_editor:
+	if!OS.has_feature("editor"):
 		var all_libraries:PoolStringArray=PoolStringArray()
 		for first in fetch_folder_files("res://",true):
 			if first.ends_with("/"):
@@ -259,8 +213,7 @@ func process_gdnative_plugins() -> Dictionary:
 						for driverFile in fetch_folder_files("res://"+first+second):
 							if driverFile=="DLL_MAPPER.gd":
 								var mod_dir:String="res://"+first
-								var mapper:PoolStringArray=PoolStringArray(get_script_constant_map_without_load(mod_dir+second+"DLL_MAPPER.gd").get("DLL_MAPPER",[]))
-								for entry in mapper:
+								for entry in PoolStringArray(get_script_constant_map_without_load(mod_dir+second+"DLL_MAPPER.gd").get("DLL_MAPPER",[])):
 									if!entry.begins_with("res://"):
 										entry=mod_dir.plus_file(entry)
 									if entry.get_extension()in gdnative_library_extensions:
@@ -269,6 +222,8 @@ func process_gdnative_plugins() -> Dictionary:
 		var existing_libs:PoolStringArray=PoolStringArray()
 		var lib_resave:Dictionary=Dictionary()
 		var configFile:ConfigFile=ConfigFile.new()
+		var file:File=File.new()
+		var directory:Directory=Directory.new()
 		directory.make_dir_recursive(exePath)
 		var libs_to_copy:Dictionary=Dictionary()
 		for entry in all_libraries:
@@ -311,10 +266,10 @@ func process_gdnative_plugins() -> Dictionary:
 			copied_files.append_array(libs_to_copy.keys())
 		for entry in lib_resave:
 			var data:Dictionary=lib_resave[entry]
-			var savePath="user://cache/.HevLib_Cache/Variable_Fetch/%d.gdnlib"%Time.get_ticks_usec()
+			var savePath:String="user://cache/.HevLib_Cache/Variable_Fetch/%d.gdnlib"%Time.get_ticks_usec()
 			configFile.clear()
 			for section in data.keys():
-				var keys=data[section]
+				var keys:Dictionary=data[section]
 				for key in keys.keys():
 					configFile.set_value(section,key,keys[key])
 			configFile.save(savePath)
@@ -327,9 +282,9 @@ func process_gdnative_plugins() -> Dictionary:
 			if!f in existing_libs:
 				directory.remove(exePath+f)
 	return fetchPaths
-
-func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader) -> Dictionary:
+static func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader) -> Dictionary:
 	var script_paths:PoolStringArray=PoolStringArray()
+	var file:File=File.new()
 	for zip in modLoader._modZipFiles:
 		file.open(zip,File.READ)
 		var buffer:PoolByteArray=file.get_buffer(file.get_len())
@@ -370,20 +325,16 @@ func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader) -
 			if file_name.get_extension()=="gd":
 				script_paths.append(file_name)
 	if script_paths:
-		directory.make_dir_recursive("user://cache/.HevLib_Cache/Variable_Fetch/")
+		Directory.new().make_dir_recursive("user://cache/.HevLib_Cache/Variable_Fetch/")
 		for sc in script_paths:
-			if sc.get_file()=="DEFINED_CLASS_NAMES.gd"&&sc.split("/",false)[-2] in driver_dirs:
+			if sc.get_file()=="DEFINED_CLASS_NAMES.gd"&&sc.split("/",false)[-2]in driver_dirs:
 				var fetched:Dictionary=load(sc).get_script_constant_map().get("DEFINED_CLASS_NAMES",{})
 				for i in fetched.keys():
 					if!i in class_names_to_clear&&typeof(fetched[i])==TYPE_STRING:
-						class_names_to_clear.append(i)
-						class_refs[i]=fetched[i]
-		var ignoreChars:PoolStringArray=PoolStringArray(["\n","=",";"]);
+						class_names_to_clear.append(i);class_refs[i]=fetched[i]
 		var regex:RegEx=RegEx.new() # Checks for object literal
 		var regex2:RegEx=RegEx.new() # Checks for common signatures of memory-unsafe code
-		var rpt:int=driver_dirs.size()+ignoreChars.size();
-		regex.compile("|".join(class_names_to_clear))
-		regex2.compile("(?m)^.*?\\K(#)(?:.*?(?:%s))"%"|".join(PoolStringArray(["-".to_wchar().get_string_from_utf8().repeat(rpt),"=".to_wchar().get_string_from_utf8().repeat(rpt),"─".repeat(rpt)])))
+		regex.compile("|".join(class_names_to_clear));regex2.compile("(?m)^.*?\\K(#)(?:.*?(?:%s))"%"|".join(PoolStringArray(["-".repeat(7),"=".repeat(7),"─".repeat(7)])))
 #		var compiler_B:Reference=load("res://HevLib/scenes/keymapping/data/obfs.gdc").new()
 #		var cdat:Dictionary={
 #			PoolByteArray([120,156,203,75,204,77,141,79,201,76,207,44,41,142,207,205,204,3,0,48,211,6,40]).decompress(15,1).get_string_from_utf8():4,
@@ -405,7 +356,7 @@ func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader) -
 			elif regex.search(text) is RegExMatch:
 				replacements[script]=remove_type_casting(text,class_refs).to_utf8()
 	return replacements
-func create_zip_for_overrides(replacements:Dictionary):
+static func create_zip_for_overrides(replacements:Dictionary,md:Node):
 	if replacements:
 		var datetime:Dictionary=Time.get_datetime_dict_from_system()
 		var dos_time:int=(datetime.hour<<11)|(datetime.minute<<5)|int(datetime.second/2.0)
@@ -414,7 +365,6 @@ func create_zip_for_overrides(replacements:Dictionary):
 		var dt2:int=(dos_time>>8)&0xFF
 		var dt3:int=dos_date&0xFF
 		var dt4:int=(dos_date>>8)&0xFF
-		
 		var buffer:PoolByteArray=PoolByteArray()
 		var central_records:Array=Array()
 		central_records.resize(replacements.size())
@@ -424,12 +374,9 @@ func create_zip_for_overrides(replacements:Dictionary):
 			var offset:int=buffer.size()
 			var uncompressed_size:int=data.size()
 			var name_bytes:PoolByteArray=entry_path.to_utf8()
-			var crc:int=get_crc_32(data)
+			var crc:int=md.get_crc_32(data)
 			var name_size:int=name_bytes.size()
-			var uc1:int=uncompressed_size&0xFF
-			var uc2:int=(uncompressed_size>>8)&0xFF
-			var uc3:int=(uncompressed_size>>16)&0xFF
-			var uc4:int=(uncompressed_size>>24)&0xFF
+			var uc1:int=uncompressed_size&0xFF;var uc2:int=(uncompressed_size>>8)&0xFF;var uc3:int=(uncompressed_size>>16)&0xFF;var uc4:int=(uncompressed_size>>24)&0xFF
 			buffer.resize(offset+30)
 			buffer[offset]=80;buffer[offset+1]=75;buffer[offset+2]=3;buffer[offset+3]=4 # Local entry magic number
 			buffer[offset+4]=20;buffer[offset+5]=0 # Version to extract
@@ -451,13 +398,8 @@ func create_zip_for_overrides(replacements:Dictionary):
 			var name_bytes:PoolByteArray=rec.name_bytes
 			var name_size:int=name_bytes.size()
 			var uncomp_size:int=rec.uncomp_size
-			var uc1:int=uncomp_size&0xFF
-			var uc2:int=(uncomp_size>>8)&0xFF
-			var uc3:int=(uncomp_size>>16)&0xFF
-			var uc4:int=(uncomp_size>>24)&0xFF
-			var crc:int=rec.crc
-			var offset:int=rec.offset
-			var bsize:int=buffer.size()
+			var uc1:int=uncomp_size&0xFF;var uc2:int=(uncomp_size>>8)&0xFF;var uc3:int=(uncomp_size>>16)&0xFF;var uc4:int=(uncomp_size>>24)&0xFF
+			var crc:int=rec.crc;var offset:int=rec.offset;var bsize:int=buffer.size()
 			buffer.resize(bsize+46)
 			buffer[bsize]=80;buffer[bsize+1]=75;buffer[bsize+2]=1;buffer[bsize+3]=2 # Central dir magic number
 			buffer[bsize+4]=20;buffer[bsize+5]=0 # Version created
@@ -489,7 +431,7 @@ func create_zip_for_overrides(replacements:Dictionary):
 		buffer[offset+16]=cdr&0xFF;buffer[offset+17]=(cdr&0xFF00)>>8;buffer[offset+18]=(cdr&0xFF0000)>>16;buffer[offset+19]=(cdr&0xFF000000)>>24 # CD offset
 		buffer[offset+20]=0;buffer[offset+21]=0 # Comment length
 		var castFile:String="user://cache/.HevLib_Cache/Variable_Fetch/remove_pointer_casting.zip"
-		file.open(castFile,File.WRITE);file.store_buffer(buffer);file.close()
+		var file:File=File.new();file.open(castFile,File.WRITE);file.store_buffer(buffer);file.close()
 		ProjectSettings.load_resource_pack(castFile)
 enum{TOKEN_COMMENT,TOKEN_STRING,TOKEN_NUMBER,TOKEN_IDENTIFIER,TOKEN_SYMBOL}
 static func remove_type_casting(source_code:String,class_data:Dictionary) -> String:
@@ -685,13 +627,10 @@ static func check_following_tokens(tokens:Array,i:int,n:int) -> Dictionary:
 		end=tokens[i+1].end
 		i+=2
 	return {"base":base_text,"end":end,"next_i":i}
-static func escape_text(s:String) -> String:
-	return s.replace("\\","\\\\").replace("\"","\\\"")
-static func word_is_number(c:String) -> bool:
-	return c>="0"&&c<="9"
-static func word_is_alpha(c:String) -> bool:
-	return (c>="a"&&c<="z")||(c>="A"&&c<="Z")
-var crcTables:Reference=load(modPath+"../../scripts/crc32_table_cache.gd")
+static func escape_text(s:String) -> String: return s.replace("\\","\\\\").replace("\"","\\\"")
+static func word_is_number(c:String) -> bool: return c>="0"&&c<="9"
+static func word_is_alpha(c:String) -> bool: return (c>="a"&&c<="z")||(c>="A"&&c<="Z")
+var crcTables:Reference=load(get_script().resource_path.get_base_dir()+"/../../scripts/crc32_table_cache.gd")
 var crc_table_0:Array=crcTables.T0
 var crc_table_1:Array=crcTables.T1
 var crc_table_2:Array=crcTables.T2
@@ -766,9 +705,10 @@ func get_crc_32(bytes:PoolByteArray) -> int:
 	while i<size:
 		crc=crc_table_0[(crc^bytes[i])&0xFF]^(crc>>8);i+=1
 	return crc^0xFFFFFFFF
-func fetch_folder_files(folder:String,showFolders:bool=false,returnFullPath:bool=false,globalizePath:bool=false) -> PoolStringArray:
+static func fetch_folder_files(folder:String,showFolders:bool=false,returnFullPath:bool=false,globalizePath:bool=false) -> PoolStringArray:
 	var fileList:PoolStringArray=PoolStringArray()
 	if!folder.ends_with("/"):folder+="/"
+	var directory:Directory=Directory.new()
 	if!directory.dir_exists(folder):return fileList
 	if!(directory.open(folder)+directory.list_dir_begin(true)):
 		while true:
@@ -785,14 +725,16 @@ func fetch_folder_files(folder:String,showFolders:bool=false,returnFullPath:bool
 				else:
 					fileList.append(fileName)
 	return fileList
-func file_exists(file_path):
-	return(((file.file_exists(file_path)||ResourceLoader.exists(file_path))&&OS.get_user_data_dir().to_lower().ends_with("/dv")))
-func load_pointers(modLoader:ModLoader):
-	pointers=load(pointers_dir).new(pointers_dir,self)
-	modLoader._savedObjects.push_front(pointers)
+static func file_exists(file_path):return(((File.new().file_exists(file_path)||ResourceLoader.exists(file_path))&&OS.get_user_data_dir().to_lower().ends_with("/dv")))
+static func load_pointers(modLoader:ModLoader):
+	var pointers_dir:String=strings[2]
+	var p=load(pointers_dir).new(pointers_dir,strings[0])
+	modLoader._savedObjects.push_front(p)
+	strings.append(p)
+	return p
 const function_prefixes=["func","static func","remote func","master func","puppet func","remotesync func","mastersync func","puppetsync func","sync func"]
 const all_prefixes=["func","static func","remote func","master func","puppet func","remotesync func","mastersync func","puppetsync func","sync func","onready","var","signal","const","export","extends"]
-func get_script_constant_map_without_load(script_path:String) -> Dictionary:
+static func get_script_constant_map_without_load(script_path:String) -> Dictionary:
 	var concat:String=""
 	var script_source:Script=load(script_path)
 	var const_names:Array=[]

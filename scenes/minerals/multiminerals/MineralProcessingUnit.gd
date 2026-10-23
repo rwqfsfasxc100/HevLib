@@ -47,14 +47,13 @@ func _physics_process(delta):
 						#If the material is not the filler
 						if type != p.filler:
 							#Calculate how much of the mineral to store
-							var store = 1000 * p.composition[type] * mineralEfficiency
+							var store:float = 1000 * p.composition[type] * mineralEfficiency
 							#Try to store the mineral in the ship
-							var got = ship.addProcessedCargo(type, store, ship.getProcessedCargoCapacity(type) + internalStorage)
+							var got:float = ship.addProcessedCargo(type, store, ship.getProcessedCargoCapacity(type) + internalStorage)
 
 							#Vent excess material.... I think, tbh I just assumed I should keep this code
 							if got > 0:
-								var t = 1 - (store / got)
-								ventingMineral = ventTime * t
+								ventingMineral = ventTime * (1 - (store / got))
 							else :
 								ventingMineral = ventTime
 

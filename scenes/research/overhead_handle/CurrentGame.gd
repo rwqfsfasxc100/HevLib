@@ -35,14 +35,13 @@ extends "res://CurrentGame.gd"
 signal hlr_storychanged(story,from,to)
 
 var hl_research_enabled:bool = false setget setResearchEnabled
-var researchSysPointers:HevLibPointers
+onready var researchSysPointers:HevLibPointers = ModLoader._savedObjects[0]
 
 var hl_researchoverhead_uinit : bool = false
 func _ready():
 	if hl_researchoverhead_uinit:
 		OS.kill(OS.get_process_id())
 	hl_researchoverhead_uinit = true
-	researchSysPointers = ModLoader._savedObjects[0]
 
 func setStory(story, to, onlyRise = true):
 	if hl_research_enabled:

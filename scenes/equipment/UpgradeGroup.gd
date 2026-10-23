@@ -50,19 +50,18 @@ export (String) var storyFlag = ""
 export (int) var storyFlagMin = - 1
 export (int) var storyFlagMax = - 1
 
-var pointers:HevLibPointers
+onready var pointers:HevLibPointers._ConfigDriver = ModLoader._savedObjects[0].ConfigDriver
 var cv = null
 var hl_eqdrupggrp_uinit : bool = false
 func _ready():
 	if hl_eqdrupggrp_uinit:
 		OS.kill(OS.get_process_id())
 	hl_eqdrupggrp_uinit = true
-	pointers = ModLoader._savedObjects[0]
 	connect("visibility_changed",self,"hl_ug_recheck_this_visibility")
 
 func hl_ug_recheck_this_visibility():
 	if pointers and config_id and config_section and config_setting:
-		cv = pointers.ConfigDriver.__get_value(config_id,config_section,config_setting)
+		cv = pointers.__get_value(config_id,config_section,config_setting)
 
 func reexamine():
 	.reexamine()
