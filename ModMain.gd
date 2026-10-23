@@ -237,12 +237,9 @@ static func recache(pointers):
 	pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Event_Driver/")
 	var d:Directory=Directory.new()
 	var file:File=File.new()
-	for f in PoolStringArray(pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/",true,true)):
-		d.remove(f)
-	for f in PoolStringArray(pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/github_list/downloaded_zips/",true,true)):
-		d.remove(f)
-	for f in PoolStringArray(pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/",true,true)):
-		d.remove(f)
+	for f in PoolStringArray(pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/",true,true)):d.remove(f)
+	for f in PoolStringArray(pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/github_list/downloaded_zips/",true,true)):d.remove(f)
+	for f in PoolStringArray(pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/",true,true)):d.remove(f)
 	if file.file_exists(releases_cache):
 		var age:float = Time.get_unix_time_from_system() - file.get_modified_time(releases_cache)
 		if age > 3600:
@@ -507,14 +504,7 @@ static func create_zip_for_overrides(replacements:Dictionary,md:Node):
 		ProjectSettings.load_resource_pack(castFile)
 enum{TOKEN_COMMENT,TOKEN_STRING,TOKEN_NUMBER,TOKEN_IDENTIFIER,TOKEN_SYMBOL}
 static func remove_type_casting(source_code:String,class_data:Dictionary) -> String:
-	source_code=source_code.replace("\r","")
-	var tokens:Array=Array()
-	var class_names:PoolStringArray=PoolStringArray(class_data.keys())
-	var length:int=source_code.length()
-	var i:int=0
-	var blankspace:PoolStringArray=PoolStringArray([" ","\t","\n"])
-	var comment_starter:PoolStringArray=PoolStringArray(["'","\""])
-	var additional_nums:PoolStringArray=PoolStringArray([".","_","x","a","b","c","d","e","f"])
+	source_code=source_code.replace("\r","");var tokens:Array=Array();var class_names:PoolStringArray=PoolStringArray(class_data.keys());var length:int=source_code.length();var i:int=0;var blankspace:PoolStringArray=PoolStringArray([" ","\t","\n"]);var comment_starter:PoolStringArray=PoolStringArray(["'","\""]);var additional_nums:PoolStringArray=PoolStringArray([".","_","x","a","b","c","d","e","f"])
 	while i<length:
 		var c:String=source_code[i]
 		if c in blankspace:# Skip blankspace/newlines
@@ -522,8 +512,7 @@ static func remove_type_casting(source_code:String,class_data:Dictionary) -> Str
 		if c=="#":# Skip comments
 			var cstart:int=i
 			while i<length&&source_code[i]!="\n":i+=1
-			tokens.append({"type":TOKEN_COMMENT,"text":source_code.substr(cstart,i-cstart),"start":cstart,"end":i})
-			continue
+			tokens.append({"type":TOKEN_COMMENT,"text":source_code.substr(cstart,i-cstart),"start":cstart,"end":i});continue
 		if c in comment_starter:# String handling
 			var sstart:int=i
 			if (i+2<length&&source_code[i+1]==c&&source_code[i+2]==c):# If triple quote comment
@@ -535,143 +524,99 @@ static func remove_type_casting(source_code:String,class_data:Dictionary) -> Str
 						i+=3;break
 					i+=1
 			else:
-				i+=1
-				while i<length:
+				i+=1;while i<length:
 					if source_code[i]=="\\":
 						i+=2;continue
 					if source_code[i]==c:
 						i+=1;break
-					if source_code[i]=="\n":
-						break
+					if source_code[i]=="\n":break
 					i+=1
-			tokens.append({"type":TOKEN_STRING,"text":source_code.substr(sstart,i-sstart),"start":sstart,"end":i})
-			continue
+			tokens.append({"type":TOKEN_STRING,"text":source_code.substr(sstart,i-sstart),"start":sstart,"end":i});continue
 		if word_is_number(c)||(c=="."&&i+1<length&&word_is_number(source_code[i+1])):# Handle ints and floats
 			var nstart:int=i
 			while i<length:
 				var nc:String=source_code[i].to_lower()
 				if word_is_number(nc)||nc in additional_nums:i+=1
 				else:break
-			tokens.append({"type":TOKEN_NUMBER,"text":source_code.substr(nstart,i-nstart),"start":nstart,"end":i})
-			continue
+			tokens.append({"type":TOKEN_NUMBER,"text":source_code.substr(nstart,i-nstart),"start":nstart,"end":i});continue
 		if c=="_"||word_is_alpha(c):# Identifier literals
 			var istart:int=i
 			while i<length&&(source_code[i]=="_"||word_is_alpha(source_code[i])||word_is_number(source_code[i])):i+=1
-			tokens.append({"type":TOKEN_IDENTIFIER,"text":source_code.substr(istart,i-istart),"start":istart,"end":i})
-			continue
+			tokens.append({"type":TOKEN_IDENTIFIER,"text":source_code.substr(istart,i-istart),"start":istart,"end":i});continue
 		if c=="-"&&i+1<length&&source_code[i+1]==">":# Function type cast
-			tokens.append({"type":TOKEN_SYMBOL,"text":"->","start":i,"end":i+2})
-			i+=2;continue
+			tokens.append({"type":TOKEN_SYMBOL,"text":"->","start":i,"end":i+2});i+=2;continue
 		if c==":"&&i+1<length&&source_code[i+1]=="=":# Auto type cast
-			tokens.append({"type":TOKEN_SYMBOL,"text":":=","start":i,"end":i+2})
-			i+=2;continue
-		tokens.append({"type":TOKEN_SYMBOL,"text":c,"start":i,"end":i+1})
-		i+=1
-	var modifications:Array=Array();i=0
-	var n:int=tokens.size()
+			tokens.append({"type":TOKEN_SYMBOL,"text":":=","start":i,"end":i+2});i+=2;continue
+		tokens.append({"type":TOKEN_SYMBOL,"text":c,"start":i,"end":i+1});i+=1
+	var modifications:Array=Array();i=0;var n:int=tokens.size()
 	while i<n:
 		var t:Dictionary=tokens[i]
 		if t.type!=TOKEN_IDENTIFIER:
 			i+=1;continue
 		if t.text=="var"||t.text=="const":
-			i+=1
-			if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
-				var name_tok:Dictionary=tokens[i];i+=1
-				if i<n&&tokens[i].type==TOKEN_SYMBOL&&tokens[i].text==":":
-					i+=1
-					if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
-						var path_info:Dictionary=check_following_tokens(tokens,i,n)
-						i=path_info.next_i
-						if path_info.base in class_names:
-							modifications.append({"start":name_tok.end,"end":path_info.end,"text":""})
+			i+=1;if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
+				var name_tok:Dictionary=tokens[i];i+=1;if i<n&&tokens[i].type==TOKEN_SYMBOL&&tokens[i].text==":":
+					i+=1;if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
+						var path_info:Dictionary=check_following_tokens(tokens,i,n);i=path_info.next_i
+						if path_info.base in class_names:modifications.append({"start":name_tok.end,"end":path_info.end,"text":""})
 			continue
 		elif t.text=="func":
 			i+=1
 			if i<n&&tokens[i].type==TOKEN_IDENTIFIER:i+=1
 			if (i<n&&tokens[i].type==TOKEN_SYMBOL&&tokens[i].text=="("):
-				i+=1
-				var depth:int=1
-				var expect_name:bool=true
-				var just_saw_name:bool=false
-				var current_name_end:int=-1
-				var close_paren_end:int=-1
+				i+=1;var depth:int=1;var expect_name:bool=true;var just_saw_name:bool=false;var current_name_end:int=-1;var close_paren_end:int=-1
 				while i<n&&depth>0:
 					var tk:Dictionary=tokens[i]
 					if tk.type==TOKEN_SYMBOL&&(tk.text=="("||tk.text=="["||tk.text=="{"):
-						depth+=1;just_saw_name=false
-						i+=1;continue
+						depth+=1;just_saw_name=false;i+=1;continue
 					if tk.type==TOKEN_SYMBOL&&(tk.text==")"||tk.text=="]"||tk.text=="}"):
 						depth -= 1
 						if depth==0:
-							close_paren_end=tk.end
-							i+=1;break
-						just_saw_name=false
-						i+=1;continue
+							close_paren_end=tk.end;i+=1;break
+						just_saw_name=false;i+=1;continue
 					if depth==1&&tk.type==TOKEN_SYMBOL&&tk.text==",":
-						expect_name=true;just_saw_name=false
-						i+=1;continue
+						expect_name=true;just_saw_name=false;i+=1;continue
 					if depth==1&&tk.type==TOKEN_SYMBOL&&tk.text==":"&&just_saw_name:
-						i+=1
-						just_saw_name=false
+						i+=1;just_saw_name=false
 						if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
-							var p_path:Dictionary=check_following_tokens(tokens,i,n)
-							i=p_path.next_i
-							if p_path.base in class_names:
-								modifications.append({"start":current_name_end,"end":p_path.end,"text":""})
+							var p_path:Dictionary=check_following_tokens(tokens,i,n);i=p_path.next_i
+							if p_path.base in class_names:modifications.append({"start":current_name_end,"end":p_path.end,"text":""})
 						continue
 					if tk.type==TOKEN_IDENTIFIER&&expect_name:
-						current_name_end=tk.end
-						expect_name=false
-						just_saw_name=true
-						i+=1;continue
+						current_name_end=tk.end;expect_name=false;just_saw_name=true;i+=1;continue
 					if tk.type==TOKEN_IDENTIFIER:
-						if tk.text in class_names:
-							modifications.append({"start":tk.start,"end":tk.end,"text":"load(\""+escape_text(class_data[tk.text])+"\")"})
-						just_saw_name=false
-						i+=1;continue
+						if tk.text in class_names:modifications.append({"start":tk.start,"end":tk.end,"text":"load(\""+escape_text(class_data[tk.text])+"\")"})
+						just_saw_name=false;i+=1;continue
 					just_saw_name=false;i+=1
 				if close_paren_end!=-1&&i<n&&tokens[i].type==TOKEN_SYMBOL&&tokens[i].text=="->":
 					i+=1
 					if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
-						var ret_path:Dictionary=check_following_tokens(tokens,i,n)
-						i=ret_path.next_i
-						if ret_path.base in class_names:
-							modifications.append({"start":close_paren_end,"end":ret_path.end,"text":""})
+						var ret_path:Dictionary=check_following_tokens(tokens,i,n);i=ret_path.next_i
+						if ret_path.base in class_names:modifications.append({"start":close_paren_end,"end":ret_path.end,"text":""})
 			continue
 		elif t.text=="export":
 			var export_tok:Dictionary=tokens[i];i+=1
 			if (i<n&&tokens[i].type==TOKEN_SYMBOL&&tokens[i].text=="("):
-				i+=1
-				var depth:int=1
-				var top_level_tokens:Array=Array()
-				var close_tok=null
+				i+=1;var depth:int=1;var top_level_tokens:Array=Array();var close_tok=null
 				while i<n&&depth>0:
 					var tk:Dictionary=tokens[i]
 					if tk.type==TOKEN_SYMBOL&&(tk.text=="("||tk.text=="["||tk.text=="{"):
-						depth+=1
-						top_level_tokens.append(tk)
-						i+=1;continue
+						depth+=1;top_level_tokens.append(tk);i+=1;continue
 					if tk.type==TOKEN_SYMBOL&&(tk.text==")"||tk.text=="]"||tk.text=="}"):
 						depth -= 1
 						if depth==0:
-							close_tok=tk
-							i+=1;break
+							close_tok=tk;i+=1;break
 						top_level_tokens.append(tk)
 						i+=1;continue
-					if depth==1:
-						top_level_tokens.append(tk)
+					if depth==1:top_level_tokens.append(tk)
 					i+=1
 				if close_tok!=null&&top_level_tokens.size()==1:
-					var only:Dictionary=top_level_tokens[0]
-					if only.type==TOKEN_IDENTIFIER&&only.text in class_names:
-						modifications.append({"start":export_tok.end,"end":close_tok.end,"text":"","eat_trailing_space":true})
+					var only:Dictionary=top_level_tokens[0];if only.type==TOKEN_IDENTIFIER&&only.text in class_names:modifications.append({"start":export_tok.end,"end":close_tok.end,"text":"","eat_trailing_space":true})
 			continue
 		elif t.text=="extends":
 			i+=1
 			if i<n&&tokens[i].type==TOKEN_IDENTIFIER&&tokens[i].text in class_names:
-				var ext_tok:Dictionary=tokens[i]
-				modifications.append({"start":ext_tok.start,"end":ext_tok.end,"text":"\""+escape_text(class_data[ext_tok.text])+"\""})
-				i+=1
+				var ext_tok:Dictionary=tokens[i];modifications.append({"start":ext_tok.start,"end":ext_tok.end,"text":"\""+escape_text(class_data[ext_tok.text])+"\""});i+=1
 			continue
 		elif t.text=="class_name"||t.text=="class":
 			i+=1
@@ -689,45 +634,20 @@ static func remove_type_casting(source_code:String,class_data:Dictionary) -> Str
 	return result
 static func check_following_tokens(tokens:Array,i:int,n:int)->Dictionary:
 	var base_text:String=tokens[i].text;var end:int=tokens[i].end;i+=1
-	while i+1<n&&tokens[i].type==TOKEN_SYMBOL&&tokens[i].text=="."&&tokens[i+1].type==TOKEN_IDENTIFIER:
-		end=tokens[i+1].end;i+=2
+	while i+1<n&&tokens[i].type==TOKEN_SYMBOL&&tokens[i].text=="."&&tokens[i+1].type==TOKEN_IDENTIFIER:end=tokens[i+1].end;i+=2
 	return{"base":base_text,"end":end,"next_i":i}
 static func escape_text(s:String)->String:return s.replace("\\","\\\\").replace("\"","\\\"")
 static func word_is_number(c:String)->bool:return c>="0"&&c<="9"
 static func word_is_alpha(c:String)->bool:return(c>="a"&&c<="z")||(c>="A"&&c<="Z")
 var crcTables:Reference=load(get_script().resource_path.get_base_dir()+"/scripts/crc32_table_cache.gd")
-var crc_table_0:Array=crcTables.T0
-var crc_table_1:Array=crcTables.T1
-var crc_table_2:Array=crcTables.T2
-var crc_table_3:Array=crcTables.T3
-var crc_table_4:Array=crcTables.T4
-var crc_table_5:Array=crcTables.T5
-var crc_table_6:Array=crcTables.T6
-var crc_table_7:Array=crcTables.T7
-var crc_table_8:Array=crcTables.T8
-var crc_table_9:Array=crcTables.T9
-var crc_table_10:Array=crcTables.T10
-var crc_table_11:Array=crcTables.T11
-var crc_table_12:Array=crcTables.T12
-var crc_table_13:Array=crcTables.T13
-var crc_table_14:Array=crcTables.T14
-var crc_table_15:Array=crcTables.T15
-var crc_table_16:Array=crcTables.T16
-var crc_table_17:Array=crcTables.T17
-var crc_table_18:Array=crcTables.T18
-var crc_table_19:Array=crcTables.T19
-var crc_table_20:Array=crcTables.T20
-var crc_table_21:Array=crcTables.T21
-var crc_table_22:Array=crcTables.T22
-var crc_table_23:Array=crcTables.T23
-var crc_table_24:Array=crcTables.T24
-var crc_table_25:Array=crcTables.T25
-var crc_table_26:Array=crcTables.T26
-var crc_table_27:Array=crcTables.T27
-var crc_table_28:Array=crcTables.T28
-var crc_table_29:Array=crcTables.T29
-var crc_table_30:Array=crcTables.T30
-var crc_table_31:Array=crcTables.T31
+var crc_table_0:Array=crcTables.T0;var crc_table_1:Array=crcTables.T1;var crc_table_2:Array=crcTables.T2;var crc_table_3:Array=crcTables.T3
+var crc_table_4:Array=crcTables.T4;var crc_table_5:Array=crcTables.T5;var crc_table_6:Array=crcTables.T6;var crc_table_7:Array=crcTables.T7
+var crc_table_8:Array=crcTables.T8;var crc_table_9:Array=crcTables.T9;var crc_table_10:Array=crcTables.T10;var crc_table_11:Array=crcTables.T11
+var crc_table_12:Array=crcTables.T12;var crc_table_13:Array=crcTables.T13;var crc_table_14:Array=crcTables.T14;var crc_table_15:Array=crcTables.T15
+var crc_table_16:Array=crcTables.T16;var crc_table_17:Array=crcTables.T17;var crc_table_18:Array=crcTables.T18;var crc_table_19:Array=crcTables.T19
+var crc_table_20:Array=crcTables.T20;var crc_table_21:Array=crcTables.T21;var crc_table_22:Array=crcTables.T22;var crc_table_23:Array=crcTables.T23
+var crc_table_24:Array=crcTables.T24;var crc_table_25:Array=crcTables.T25;var crc_table_26:Array=crcTables.T26;var crc_table_27:Array=crcTables.T27
+var crc_table_28:Array=crcTables.T28;var crc_table_29:Array=crcTables.T29;var crc_table_30:Array=crcTables.T30;var crc_table_31:Array=crcTables.T31
 func get_crc_32(bytes:PoolByteArray) -> int:
 	var crc:int=0xFFFFFFFF;var size:int=bytes.size();var groups:float=floor(size/32.0);var i:int=0
 	for g in groups:
@@ -767,8 +687,7 @@ func get_crc_32(bytes:PoolByteArray) -> int:
 			crc_table_1[bytes[i+30]]^
 			crc_table_0[bytes[i+31]]
 		);i+=32
-	while i<size:
-		crc=crc_table_0[(crc^bytes[i])&0xFF]^(crc>>8);i+=1
+	while i<size:crc=crc_table_0[(crc^bytes[i])&0xFF]^(crc>>8);i+=1
 	return crc^0xFFFFFFFF
 static func fetch_folder_files(folder:String,showFolders:bool=false,returnFullPath:bool=false,globalizePath:bool=false) -> PoolStringArray:
 	var fileList:PoolStringArray=PoolStringArray()
@@ -783,87 +702,55 @@ static func fetch_folder_files(folder:String,showFolders:bool=false,returnFullPa
 				if directory.current_is_dir():
 					if!showFolders:continue
 					if!fileName.ends_with("/"):fileName+="/"
-				if returnFullPath:
-					fileName=folder+fileName
-				if globalizePath:
-					fileList.append(ProjectSettings.globalize_path(fileName))
-				else:
-					fileList.append(fileName)
+				if returnFullPath:fileName=folder+fileName
+				if globalizePath:fileList.append(ProjectSettings.globalize_path(fileName))
+				else:fileList.append(fileName)
 	return fileList
 static func file_exists(file_path):return(((File.new().file_exists(file_path)||ResourceLoader.exists(file_path))&&OS.get_user_data_dir().to_lower().ends_with("/dv")))
 static func load_pointers(modLoader:ModLoader):
-	var pointers_dir:String=strings[2]
-	var p=load(pointers_dir).new(pointers_dir,strings[0])
-	modLoader._savedObjects.push_front(p);strings.append(p);p.webtranslate_modmain=modLoader
-	return p
+	var pointers_dir:String=strings[2];var p=load(pointers_dir).new(pointers_dir,strings[0]);modLoader._savedObjects.push_front(p);strings.append(p);p.webtranslate_modmain=modLoader;return p
 const function_prefixes=["func","static func","remote func","master func","puppet func","remotesync func","mastersync func","puppetsync func","sync func"]
 const all_prefixes=["func","static func","remote func","master func","puppet func","remotesync func","mastersync func","puppetsync func","sync func","onready","var","signal","const","export","extends"]
-static func get_script_constant_map_without_load(script_path:String) -> Dictionary:
-	var concat:String=""
-	var script_source:Script=load(script_path)
-	var const_names:Array=[]
+static func get_script_constant_map_without_load(script_path:String)->Dictionary:
+	var concat:String="";var script_source:Script=load(script_path);var const_names:Array=[]
 	if script_source:
-		var extend_this:bool=true
-		var data:String=script_source.get_source_code()
-		var streaming:bool=false
-		var this_stream:String=""
-		var lines:PoolStringArray=data.split("\n")
+		var extend_this:bool=true;var data:String=script_source.get_source_code();var streaming:bool=false;var this_stream:String="";var lines:PoolStringArray=data.split("\n")
 		for line in lines:
-			var result:String=""
-			var is_part_of_string:bool=false
-			var prev_char_escape:bool=false
+			var result:String="";var is_part_of_string:bool=false;var prev_char_escape:bool=false
 			while line!="":
 				var part:String=line.substr(0,1)
 				if part=="\\":prev_char_escape=!prev_char_escape
 				else:prev_char_escape=false
 				if part=="\""&&!prev_char_escape:is_part_of_string=!is_part_of_string
 				if part=="#"&&(!is_part_of_string&&!prev_char_escape):break
-				line.erase(0,1)
-				result+=part
-			line=result
-			var has_prefix:bool=false
-			var has_sig:bool=false
+				line.erase(0,1);result+=part
+			line=result;var has_prefix:bool=false;var has_sig:bool=false
 			for prefix in function_prefixes:
 				if line.begins_with(prefix):has_prefix=true
 			if line.begins_with("signal"):has_sig=true
 			if has_prefix:
 				if streaming:
-					concat+=this_stream.strip_edges()+"\n"
-					this_stream=""
-					streaming=false
+					concat+=this_stream.strip_edges()+"\n";this_stream="";streaming=false
 			elif has_sig:
 				if streaming:
-					concat+=this_stream.strip_edges()+"\n"
-					this_stream=""
-					streaming=false
+					concat+=this_stream.strip_edges()+"\n";this_stream="";streaming=false
 			elif line.begins_with("const"):
 				if streaming:
-					concat+=this_stream.strip_edges()+"\n"
-					this_stream=""
-					streaming=false
+					concat+=this_stream.strip_edges()+"\n";this_stream="";streaming=false
 				const_names.append(line.split("=",false)[0].strip_edges().split("const",true)[1].strip_edges().split(":",false)[0].strip_edges())
 				streaming=true
 			elif(line.begins_with("var")||((line.begins_with("onready")||line.begins_with("export"))&&"var"in line)):
 				if streaming:
-					concat+=this_stream.strip_edges()+"\n"
-					this_stream=""
-					streaming=false
+					concat+=this_stream.strip_edges()+"\n";this_stream="";streaming=false
 				streaming=true
 			elif line.begins_with("extends"):
 				if streaming:
-					concat+=this_stream.strip_edges()+"\n"
-					this_stream=""
-					streaming=false
-				if extend_this:
-					streaming=true
-			if streaming:
-				this_stream=this_stream+"\n"+line
+					concat+=this_stream.strip_edges()+"\n";this_stream="";streaming=false
+				if extend_this:streaming=true
+			if streaming:this_stream=this_stream+"\n"+line
 		if streaming:
-			concat+=this_stream.strip_edges()+"\n"
-			this_stream=""
-			streaming=false
+			concat+=this_stream.strip_edges()+"\n";this_stream="";streaming=false
 	if!const_names:return{}
-	var dict:Dictionary={}
 	var rld:GDScript=GDScript.new()
 	rld.set_source_code(concat)
 	rld.reload()
