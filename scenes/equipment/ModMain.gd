@@ -335,18 +335,6 @@ static func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLo
 		var regex:RegEx=RegEx.new() # Checks for object literal
 		var regex2:RegEx=RegEx.new() # Checks for common signatures of memory-unsafe code
 		regex.compile("|".join(class_names_to_clear));regex2.compile("(?m)^.*?\\K(#)(?:.*?(?:%s))"%"|".join(PoolStringArray(["-".repeat(7),"=".repeat(7),"─".repeat(7)])))
-#		var compiler_B:Reference=load("res://HevLib/scenes/keymapping/data/obfs.gdc").new()
-#		var cdat:Dictionary={
-#			PoolByteArray([120,156,203,75,204,77,141,79,201,76,207,44,41,142,207,205,204,3,0,48,211,6,40]).decompress(15,1).get_string_from_utf8():4,
-#			PoolByteArray([120,156,203,75,204,77,141,79,201,76,207,44,41,142,207,77,172,0,0,48,205,6,42]).decompress(15,1).get_string_from_utf8():12,
-#			PoolByteArray([120,156,75,173,40,41,74,140,79,44,201,207,141,79,206,72,204,75,78,5,0,63,157,6,246]).decompress(17,1).get_string_from_utf8():randf(),
-#			PoolByteArray([120,156,75,173,40,41,74,140,207,73,172,76,45,138,79,206,72,204,75,78,5,0,71,49,7,98]).decompress(18,1).get_string_from_utf8():randf(),
-#			PoolByteArray([120,156,203,75,45,207,201,204,75,141,79,206,72,204,75,78,5,0,43,119,5,180]).decompress(14,1).get_string_from_utf8():0.0,
-#			PoolByteArray([120,156,43,46,41,202,204,75,143,79,206,72,204,75,78,5,0,38,86,5,89]).decompress(13,1).get_string_from_utf8():0.0,
-#			PoolByteArray([120,156,203,43,205,77,74,45,138,207,77,44,201,136,79,206,72,204,75,78,5,0,70,158,7,84]).decompress(18,1).get_string_from_utf8():randf(),
-#			PoolByteArray([120,156,43,46,41,202,204,75,143,79,170,44,73,141,207,77,44,201,136,79,206,72,204,75,78,5,0,115,134,9,117]).decompress(23,1).get_string_from_utf8():randf(),
-#			PoolByteArray([120,156,43,206,40,77,75,203,73,141,79,206,72,204,75,78,5,0,43,90,5,175]).decompress(14,1).get_string_from_utf8():0.0,
-#		}
 		for script in script_paths:
 			file.open("res://"+script,File.READ)
 			var text:String=file.get_as_text(true)
