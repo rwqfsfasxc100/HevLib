@@ -215,7 +215,7 @@ func fetch_mod_updates():
 			elif minor>cn:if(bugfix>cb+3||abs(minor-cn)>1):dont=true
 			elif bugfix>cb+9:dont=true
 		if dont:
-			DataFormat.__exit(false,"cannot collect version specific data. Is HevLib out of date?","pointers.SafeMode",60.0)
+			NodeAccess.__exit(false,"cannot collect version specific data. Is HevLib out of date?","pointers.SafeMode",60.0)
 		file.open(update_store,File.WRITE)
 		file.store_string(JSON.print(updates))
 		file.close()
@@ -7585,16 +7585,17 @@ class _ManifestV2:
 		var path:String = ""
 		var pathSplit:PoolStringArray = PoolStringArray()
 		for i in mod_file_to_id_cache.keys():
-			if path:
-				var split:PoolStringArray = i.split("/",false)
-				var splSize:int = split.size()
-				var pthSize:int = pathSplit.size()
-				if splSize < pthSize:
-					path = i;pathSplit = split
-				elif splSize == pthSize and i < path:
-					path = i;pathSplit = split
-			else:
-				path = i;pathSplit = i.split("/",false)
+			if id == mod_file_to_id_cache[i]:
+				if path:
+					var split:PoolStringArray = i.split("/",false)
+					var splSize:int = split.size()
+					var pthSize:int = pathSplit.size()
+					if splSize < pthSize:
+						path = i;pathSplit = split
+					elif splSize == pthSize and i < path:
+						path = i;pathSplit = split
+				else:
+					path = i;pathSplit = i.split("/",false)
 		if path:
 			return __get_mod_data()[get_mod_path_from_lowercase_path[path]]
 		return {}
