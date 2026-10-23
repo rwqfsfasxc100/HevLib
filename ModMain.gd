@@ -41,8 +41,6 @@ const MOD_IS_LIBRARY=true
 const LIBRARY_HIDDEN_BY_DEFAULT=false
 const _savedObjects:Array=Array()
 const strings=Array()
-var file:File=File.new()
-var directory:Directory=Directory.new()
 func _init(modLoader:ModLoader=ModLoader):
 	strings.append(self)
 	var modPath:String=get_script().resource_path.get_base_dir()+"/"
@@ -56,7 +54,7 @@ func _init(modLoader:ModLoader=ModLoader):
 	var pointers=load_pointers(modLoader)
 	l("Initializing Equipment Driver")
 	pointers.FolderAccess.__recursive_delete(variables_folder,PoolStringArray(["remove_pointer_casting.zip"]))
-	directory.make_dir_recursive(variables_folder);directory.make_dir_recursive(validation_check_path.get_base_dir())
+	var directory:Directory=Directory.new();directory.make_dir_recursive(variables_folder);directory.make_dir_recursive(validation_check_path.get_base_dir())
 	pointers.FileAccess.__load_precached_mods()
 	pointers.ConfigDriver.__load_configs()
 	
@@ -65,7 +63,7 @@ func _init(modLoader:ModLoader=ModLoader):
 	recache(pointers)
 	pointers.ManifestV2.__get_mod_versions(true)
 	
-	if OS.has_feature("editor") and not file.file_exists("res://VersionLabel.tscn"):
+	if OS.has_feature("editor") and not File.new().file_exists("res://VersionLabel.tscn"):
 		printerr("FAILED TO FETCH FILE SYSTEM")
 		l("ERROR! FAILED TO FETCH FILE SYSTEM")
 	
@@ -680,30 +678,23 @@ static func remove_type_casting(source_code:String,class_data:Dictionary) -> Str
 			if i<n&&tokens[i].type==TOKEN_IDENTIFIER:i+=1
 			continue
 		else:
-			if t.text in class_names:
-				modifications.append({"start":t.start,"end":t.end,"text":"load(\""+escape_text(class_data[t.text])+"\")"})
+			if t.text in class_names:modifications.append({"start":t.start,"end":t.end,"text":"load(\""+escape_text(class_data[t.text])+"\")"})
 			i+=1;continue
-	var result:String=""
-	var cursor:int=0
+	var result:String="";var cursor:int=0
 	for e in modifications:
-		result+=source_code.substr(cursor,e.start-cursor)
-		result+=e.text
-		var end:int=e.end
+		result+=source_code.substr(cursor,e.start-cursor);result+=e.text;var end:int=e.end
 		if"eat_trailing_space"in e&&end<length&&source_code[end]==" ":end+=1
 		cursor=end
 	result+=source_code.substr(cursor,length-cursor)
 	return result
-static func check_following_tokens(tokens:Array,i:int,n:int) -> Dictionary:
-	var base_text:String=tokens[i].text
-	var end:int=tokens[i].end
-	i+=1
+static func check_following_tokens(tokens:Array,i:int,n:int)->Dictionary:
+	var base_text:String=tokens[i].text;var end:int=tokens[i].end;i+=1
 	while i+1<n&&tokens[i].type==TOKEN_SYMBOL&&tokens[i].text=="."&&tokens[i+1].type==TOKEN_IDENTIFIER:
-		end=tokens[i+1].end
-		i+=2
-	return {"base":base_text,"end":end,"next_i":i}
-static func escape_text(s:String) -> String: return s.replace("\\","\\\\").replace("\"","\\\"")
-static func word_is_number(c:String) -> bool: return c>="0"&&c<="9"
-static func word_is_alpha(c:String) -> bool: return (c>="a"&&c<="z")||(c>="A"&&c<="Z")
+		end=tokens[i+1].end;i+=2
+	return{"base":base_text,"end":end,"next_i":i}
+static func escape_text(s:String)->String:return s.replace("\\","\\\\").replace("\"","\\\"")
+static func word_is_number(c:String)->bool:return c>="0"&&c<="9"
+static func word_is_alpha(c:String)->bool:return(c>="a"&&c<="z")||(c>="A"&&c<="Z")
 var crcTables:Reference=load(get_script().resource_path.get_base_dir()+"/scripts/crc32_table_cache.gd")
 var crc_table_0:Array=crcTables.T0
 var crc_table_1:Array=crcTables.T1
