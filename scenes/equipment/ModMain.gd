@@ -491,13 +491,7 @@ func create_zip_for_overrides(replacements:Dictionary):
 		var castFile:String="user://cache/.HevLib_Cache/Variable_Fetch/remove_pointer_casting.zip"
 		file.open(castFile,File.WRITE);file.store_buffer(buffer);file.close()
 		ProjectSettings.load_resource_pack(castFile)
-enum{
-	TOKEN_COMMENT,
-	TOKEN_STRING,
-	TOKEN_NUMBER,
-	TOKEN_IDENTIFIER,
-	TOKEN_SYMBOL
-}
+enum{TOKEN_COMMENT,TOKEN_STRING,TOKEN_NUMBER,TOKEN_IDENTIFIER,TOKEN_SYMBOL}
 static func remove_type_casting(source_code:String,class_data:Dictionary) -> String:
 	source_code=source_code.replace("\r","")
 	var tokens:Array=Array()
@@ -510,12 +504,10 @@ static func remove_type_casting(source_code:String,class_data:Dictionary) -> Str
 	while i<length:
 		var c:String=source_code[i]
 		if c in blankspace: # Skip blankspace/newlines
-			i+=1
-			continue
+			i+=1 ; continue
 		if c=="#": # Skip comments
 			var cstart:int=i
-			while i<length&&source_code[i]!="\n":
-				i+=1
+			while i<length&&source_code[i]!="\n": i+=1
 			tokens.append({"type":TOKEN_COMMENT,"text":source_code.substr(cstart,i-cstart),"start":cstart,"end":i})
 			continue
 		if c in comment_starter: # String handling
@@ -524,21 +516,17 @@ static func remove_type_casting(source_code:String,class_data:Dictionary) -> Str
 				i+=3
 				while i<length:
 					if source_code[i]=="\\":
-						i+=2
-						continue
+						i+=2 ; continue
 					if i+2<length&&source_code[i]==c&&source_code[i+1]==c&&source_code[i+2]==c:
-						i+=3
-						break
+						i+=3 ; break
 					i+=1
 			else:
 				i+=1
 				while i<length:
 					if source_code[i]=="\\":
-						i+=2
-						continue
+						i+=2 ; continue
 					if source_code[i]==c:
-						i+=1
-						break
+						i+=1 ; break
 					if source_code[i]=="\n":
 						break
 					i+=1
@@ -548,41 +536,33 @@ static func remove_type_casting(source_code:String,class_data:Dictionary) -> Str
 			var nstart:int=i
 			while i<length:
 				var nc:String=source_code[i].to_lower()
-				if word_is_number(nc)||nc in additional_nums:
-					i+=1
-				else:
-					break
+				if word_is_number(nc)||nc in additional_nums: i+=1
+				else: break
 			tokens.append({"type":TOKEN_NUMBER,"text":source_code.substr(nstart,i-nstart),"start":nstart,"end":i})
 			continue
 		if c=="_"||word_is_alpha(c): # Identifier literals
 			var istart:int=i
-			while i<length&&(source_code[i]=="_"||word_is_alpha(source_code[i])||word_is_number(source_code[i])):
-				i+=1
+			while i<length&&(source_code[i]=="_"||word_is_alpha(source_code[i])||word_is_number(source_code[i])): i+=1
 			tokens.append({"type":TOKEN_IDENTIFIER,"text":source_code.substr(istart,i-istart),"start":istart,"end":i})
 			continue
 		if c=="-"&&i+1<length&&source_code[i+1]==">": # Function type cast
 			tokens.append({"type":TOKEN_SYMBOL,"text":"->","start":i,"end":i+2})
-			i+=2
-			continue
+			i+=2 ; continue
 		if c==":"&&i+1<length&&source_code[i+1]=="=": # Auto type cast
 			tokens.append({"type":TOKEN_SYMBOL,"text":":=","start":i,"end":i+2})
-			i+=2
-			continue
+			i+=2 ; continue
 		tokens.append({"type":TOKEN_SYMBOL,"text":c,"start":i,"end":i+1})
 		i+=1
-	var modifications:Array=Array()
-	i=0
+	var modifications:Array=Array() ; i=0
 	var n:int=tokens.size()
 	while i<n:
 		var t:Dictionary=tokens[i]
 		if t.type!=TOKEN_IDENTIFIER:
-			i+=1
-			continue
+			i+=1 ; continue
 		if t.text=="var"||t.text=="const":
 			i+=1
 			if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
-				var name_tok:Dictionary=tokens[i]
-				i+=1
+				var name_tok:Dictionary=tokens[i] ; i+=1
 				if i<n&&tokens[i].type==TOKEN_SYMBOL&&tokens[i].text==":":
 					i+=1
 					if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
@@ -593,8 +573,7 @@ static func remove_type_casting(source_code:String,class_data:Dictionary) -> Str
 			continue
 		elif t.text=="func":
 			i+=1
-			if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
-				i+=1
+			if i<n&&tokens[i].type==TOKEN_IDENTIFIER: i+=1
 			if (i<n&&tokens[i].type==TOKEN_SYMBOL&&tokens[i].text=="("):
 				i+=1
 				var depth:int=1
@@ -605,24 +584,18 @@ static func remove_type_casting(source_code:String,class_data:Dictionary) -> Str
 				while i<n&&depth>0:
 					var tk:Dictionary=tokens[i]
 					if tk.type==TOKEN_SYMBOL&&(tk.text=="("||tk.text=="["||tk.text=="{"):
-						depth+=1
-						just_saw_name=false
-						i+=1
-						continue
+						depth+=1 ; just_saw_name=false
+						i+=1 ; continue
 					if tk.type==TOKEN_SYMBOL&&(tk.text==")"||tk.text=="]"||tk.text=="}"):
 						depth -= 1
 						if depth==0:
 							close_paren_end=tk.end
-							i+=1
-							break
+							i+=1 ; break
 						just_saw_name=false
-						i+=1
-						continue
+						i+=1 ; continue
 					if depth==1&&tk.type==TOKEN_SYMBOL&&tk.text==",":
-						expect_name=true
-						just_saw_name=false
-						i+=1
-						continue
+						expect_name=true ; just_saw_name=false
+						i+=1 ; continue
 					if depth==1&&tk.type==TOKEN_SYMBOL&&tk.text==":"&&just_saw_name:
 						i+=1
 						just_saw_name=false
@@ -636,16 +609,13 @@ static func remove_type_casting(source_code:String,class_data:Dictionary) -> Str
 						current_name_end=tk.end
 						expect_name=false
 						just_saw_name=true
-						i+=1
-						continue
+						i+=1 ; continue
 					if tk.type==TOKEN_IDENTIFIER:
 						if tk.text in class_names:
 							modifications.append({"start":tk.start,"end":tk.end,"text":"load(\""+escape_text(class_data[tk.text])+"\")"})
 						just_saw_name=false
-						i+=1
-						continue
-					just_saw_name=false
-					i+=1
+						i+=1 ; continue
+					just_saw_name=false ; i+=1
 				if close_paren_end!=-1&&i<n&&tokens[i].type==TOKEN_SYMBOL&&tokens[i].text=="->":
 					i+=1
 					if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
@@ -655,8 +625,7 @@ static func remove_type_casting(source_code:String,class_data:Dictionary) -> Str
 							modifications.append({"start":close_paren_end,"end":ret_path.end,"text":""})
 			continue
 		elif t.text=="export":
-			var export_tok:Dictionary=tokens[i]
-			i+=1
+			var export_tok:Dictionary=tokens[i] ; i+=1
 			if (i<n&&tokens[i].type==TOKEN_SYMBOL&&tokens[i].text=="("):
 				i+=1
 				var depth:int=1
@@ -667,17 +636,14 @@ static func remove_type_casting(source_code:String,class_data:Dictionary) -> Str
 					if tk.type==TOKEN_SYMBOL&&(tk.text=="("||tk.text=="["||tk.text=="{"):
 						depth+=1
 						top_level_tokens.append(tk)
-						i+=1
-						continue
+						i+=1 ; continue
 					if tk.type==TOKEN_SYMBOL&&(tk.text==")"||tk.text=="]"||tk.text=="}"):
 						depth -= 1
 						if depth==0:
 							close_tok=tk
-							i+=1
-							break
+							i+=1 ; break
 						top_level_tokens.append(tk)
-						i+=1
-						continue
+						i+=1 ; continue
 					if depth==1:
 						top_level_tokens.append(tk)
 					i+=1
@@ -695,22 +661,19 @@ static func remove_type_casting(source_code:String,class_data:Dictionary) -> Str
 			continue
 		elif t.text=="class_name"||t.text=="class":
 			i+=1
-			if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
-				i+=1
+			if i<n&&tokens[i].type==TOKEN_IDENTIFIER: i+=1
 			continue
 		else:
 			if t.text in class_names:
 				modifications.append({"start":t.start,"end":t.end,"text":"load(\""+escape_text(class_data[t.text])+"\")"})
-			i+=1
-			continue
+			i+=1 ; continue
 	var result:String=""
 	var cursor:int=0
 	for e in modifications:
 		result+=source_code.substr(cursor,e.start-cursor)
 		result+=e.text
 		var end:int=e.end
-		if"eat_trailing_space"in e&&end<length&&source_code[end]==" ":
-			end+=1
+		if"eat_trailing_space"in e&&end<length&&source_code[end]==" ": end+=1
 		cursor=end
 	result+=source_code.substr(cursor,length-cursor)
 	return result
