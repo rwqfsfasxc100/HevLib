@@ -293,12 +293,9 @@ static func process_gdnative_plugins() -> Dictionary:
 					if second in driver_dirs:
 						for driverFile in fetch_folder_files("res://"+first+second):
 							if driverFile=="DLL_MAPPER.gd":
-								var mod_dir:String="res://"+first
-								for entry in PoolStringArray(get_script_constant_map_without_load(mod_dir+second+"DLL_MAPPER.gd").get("DLL_MAPPER",[])):
-									if!entry.begins_with("res://"):
-										entry=mod_dir.plus_file(entry)
-									if entry.get_extension()in gdnative_library_extensions:
-										all_libraries.append(entry)
+								var mod_dir:String="res://"+first;for entry in PoolStringArray(get_script_constant_map_without_load(mod_dir+second+"DLL_MAPPER.gd").get("DLL_MAPPER",[])):
+									if!entry.begins_with("res://"):entry=mod_dir.plus_file(entry)
+									if entry.get_extension()in gdnative_library_extensions:all_libraries.append(entry)
 		var copied_files:PoolStringArray=PoolStringArray()
 		var existing_libs:PoolStringArray=PoolStringArray()
 		var lib_resave:Dictionary=Dictionary()
@@ -313,8 +310,7 @@ static func process_gdnative_plugins() -> Dictionary:
 			var data:Dictionary={}
 			for section in cfg_sections:
 				var dta:Dictionary={}
-				for key in configFile.get_section_keys(section):
-					dta[key]=configFile.get_value(section,key)
+				for key in configFile.get_section_keys(section):dta[key]=configFile.get_value(section,key)
 				data[section]=dta
 			if"entry"in data:
 				for oper in data["entry"]:
@@ -351,8 +347,7 @@ static func process_gdnative_plugins() -> Dictionary:
 			configFile.clear()
 			for section in data.keys():
 				var keys:Dictionary=data[section]
-				for key in keys.keys():
-					configFile.set_value(section,key,keys[key])
+				for key in keys.keys():configFile.set_value(section,key,keys[key])
 			configFile.save(savePath)
 			file.open(savePath,File.READ)
 			var bfr:PoolByteArray=file.get_buffer(file.get_len())
@@ -360,8 +355,7 @@ static func process_gdnative_plugins() -> Dictionary:
 			fetchPaths[entry.substr(6)]=bfr
 		configFile.clear()
 		for f in fetch_folder_files(exePath):
-			if!f in existing_libs:
-				directory.remove(exePath+f)
+			if!f in existing_libs:directory.remove(exePath+f)
 	return fetchPaths
 static func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader) -> Dictionary:
 	var script_paths:PoolStringArray=PoolStringArray()
@@ -371,8 +365,7 @@ static func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLo
 		var buffer:PoolByteArray=file.get_buffer(file.get_len())
 		file.close()
 		var buffer_len:int=buffer.size()
-		if buffer_len<22:
-			continue
+		if buffer_len<22:continue
 		# Fetch EOCD, including max potential comment size
 		# More mem efficient than fetching entire buffer
 		var tail:PoolByteArray=buffer.subarray(0,buffer_len-max(buffer_len-0x06054b50-65536, 0)-1)
@@ -380,18 +373,15 @@ static func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLo
 		var i:int=tail.size()-22
 		while i>-1:
 			if tail[i]==0x50&&tail[i+1]==0x4b&&tail[i+2]==0x05&&tail[i+3]==0x06:
-				eocd_pos=i
-				break
+				eocd_pos=i;break
 			i -=1
-		if eocd_pos<0:
-			continue
+		if eocd_pos<0:continue
 		var total_entries:int=(tail[eocd_pos+10]|(tail[eocd_pos+10+1]<<8))
 		var current_offset:int=(tail[eocd_pos+16]|(tail[eocd_pos+16+1]<<8)|(tail[eocd_pos+16+2]<<16)|(tail[eocd_pos+16+3]<<24))
 		for ctr in total_entries:
 			var magic:int=(tail[current_offset]|(tail[current_offset+1]<<8)|(tail[current_offset+2]<<16)|(tail[current_offset+3]<<24))
 			var magicCheck:int=0x02014b50
-			if magic!=magicCheck:
-				break
+			if magic!=magicCheck:break
 			current_offset+=28 # magic num. && skip written version+required version+flag && compression method && skip time+date+CRC32+comp_size+uncomp_size
 			var name_len:int=(tail[current_offset]|(tail[current_offset+1]<<8))
 			var extra_len:int=(tail[current_offset+2]|(tail[current_offset+3]<<8))
@@ -399,12 +389,9 @@ static func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLo
 			current_offset+=18 # comment length && skip disk num.+internal attrib+external attrib.+local_offset
 			var file_name:String=tail.subarray(current_offset,current_offset+name_len-1).get_string_from_utf8()
 			current_offset+=name_len
-			if extra_len>0:
-				current_offset+=extra_len
-			if comment_len>0:
-				current_offset+=comment_len
-			if file_name.get_extension()=="gd":
-				script_paths.append(file_name)
+			if extra_len>0:current_offset+=extra_len
+			if comment_len>0:current_offset+=comment_len
+			if file_name.get_extension()=="gd":script_paths.append(file_name)
 	if script_paths:
 		Directory.new().make_dir_recursive("user://cache/.HevLib_Cache/Variable_Fetch/")
 		for sc in script_paths:
@@ -504,7 +491,13 @@ static func create_zip_for_overrides(replacements:Dictionary,md:Node):
 		ProjectSettings.load_resource_pack(castFile)
 enum{TOKEN_COMMENT,TOKEN_STRING,TOKEN_NUMBER,TOKEN_IDENTIFIER,TOKEN_SYMBOL}
 static func remove_type_casting(source_code:String,class_data:Dictionary) -> String:
-	source_code=source_code.replace("\r","");var tokens:Array=Array();var class_names:PoolStringArray=PoolStringArray(class_data.keys());var length:int=source_code.length();var i:int=0;var blankspace:PoolStringArray=PoolStringArray([" ","\t","\n"]);var comment_starter:PoolStringArray=PoolStringArray(["'","\""]);var additional_nums:PoolStringArray=PoolStringArray([".","_","x","a","b","c","d","e","f"])
+	source_code=source_code.replace("\r","");var tokens:Array=Array()
+	var class_names:PoolStringArray=PoolStringArray(class_data.keys())
+	var length:int=source_code.length()
+	var i:int=0
+	var blankspace:PoolStringArray=PoolStringArray([" ","\t","\n"])
+	var comment_starter:PoolStringArray=PoolStringArray(["'","\""])
+	var additional_nums:PoolStringArray=PoolStringArray([".","_","x","a","b","c","d","e","f"])
 	while i<length:
 		var c:String=source_code[i]
 		if c in blankspace:# Skip blankspace/newlines
@@ -577,10 +570,8 @@ static func remove_type_casting(source_code:String,class_data:Dictionary) -> Str
 					if depth==1&&tk.type==TOKEN_SYMBOL&&tk.text==",":
 						expect_name=true;just_saw_name=false;i+=1;continue
 					if depth==1&&tk.type==TOKEN_SYMBOL&&tk.text==":"&&just_saw_name:
-						i+=1;just_saw_name=false
-						if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
-							var p_path:Dictionary=check_following_tokens(tokens,i,n);i=p_path.next_i
-							if p_path.base in class_names:modifications.append({"start":current_name_end,"end":p_path.end,"text":""})
+						i+=1;just_saw_name=false;if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
+							var p_path:Dictionary=check_following_tokens(tokens,i,n);i=p_path.next_i;if p_path.base in class_names:modifications.append({"start":current_name_end,"end":p_path.end,"text":""})
 						continue
 					if tk.type==TOKEN_IDENTIFIER&&expect_name:
 						current_name_end=tk.end;expect_name=false;just_saw_name=true;i+=1;continue
@@ -591,8 +582,7 @@ static func remove_type_casting(source_code:String,class_data:Dictionary) -> Str
 				if close_paren_end!=-1&&i<n&&tokens[i].type==TOKEN_SYMBOL&&tokens[i].text=="->":
 					i+=1
 					if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
-						var ret_path:Dictionary=check_following_tokens(tokens,i,n);i=ret_path.next_i
-						if ret_path.base in class_names:modifications.append({"start":close_paren_end,"end":ret_path.end,"text":""})
+						var ret_path:Dictionary=check_following_tokens(tokens,i,n);i=ret_path.next_i;if ret_path.base in class_names:modifications.append({"start":close_paren_end,"end":ret_path.end,"text":""})
 			continue
 		elif t.text=="export":
 			var export_tok:Dictionary=tokens[i];i+=1
