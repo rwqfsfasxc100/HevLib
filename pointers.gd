@@ -3952,8 +3952,7 @@ class _Equipment:
 					else:
 						ship_limitations[snn]["limit_ships"] = spp["limit_ships"]
 				else:
-					ship_limitations[snn] = {}
-					ship_limitations[snn]["limit_ships"] = val
+					ship_limitations[snn] = {"limit_ships":val}
 			if "prevent_ships" in slotDict:
 				var val : Array = Array(slotDict["prevent_ships"]).duplicate()
 				if snn in ship_limitations:
@@ -3964,8 +3963,7 @@ class _Equipment:
 					else:
 						ship_limitations[snn]["prevent_ships"] = spp["prevent_ships"]
 				else:
-					ship_limitations[snn] = {}
-					ship_limitations[snn]["prevent_ships"] = val
+					ship_limitations[snn] = {"prevent_ships":val}
 			slots_for_adding.append(slotDict)
 			slots_for_adding_dict[snn] = slotDict
 			all_slot_node_names.append(snn)
