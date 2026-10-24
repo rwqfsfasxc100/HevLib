@@ -6855,7 +6855,8 @@ class _ManifestV2:
 					library_count += 1
 				else:
 					non_library_count += 1
-			if not "res://HevLib/ModMain.gd" in cached_mod_list.keys() or not ResourceLoader.exists("res://HevLib/pointers.gd"):
+			cached_mod_keys.append_array(cached_mod_list.keys())
+			if not "res://HevLib/ModMain.gd" in cached_mod_keys or not ResourceLoader.exists("res://HevLib/pointers.gd"):
 				if cached_mod_list.size():
 					pointers.NodeAccess.__exit(false,"Mod data was successfully fetched, but HevLib was not found. Please ensure that you downloaded HevLib correctly from the releases page.\n\nClosing this popup will crash the game & open HevLib's latest release page.","pointers.ManifestV2",0.0,"https://github.com/rwqfsfasxc100/HevLib/releases/latest",true)
 				else:
@@ -6863,7 +6864,6 @@ class _ManifestV2:
 			
 			cached_mod_statistics["counts"] = {"total_mod_count":total_mod_count,"mods_using_manifests":manifest_count,"mods":non_library_count,"libraries":library_count}
 			cached_mod_statistics["tags"] = stat_tags
-			cached_mod_keys.append_array(cached_mod_list.keys())
 			if not base.currentModHash:
 				if file.file_exists(mod_hash_file):
 					file.open(mod_hash_file,File.READ)
@@ -6875,7 +6875,7 @@ class _ManifestV2:
 				file.close()
 				if base.currentModHash != base.lastModHash:
 					base.haveModsChanged = true
-			if (not pointers.is_editor and not base.currentModStateHash):
+			if(not pointers.is_editor and not base.currentModStateHash):
 				if file.file_exists(mod_state_hash_file):
 					file.open(mod_state_hash_file,File.READ)
 					base.lastModStateHash = file.get_32()
@@ -7035,7 +7035,7 @@ class _ManifestV2:
 						has_mod_manifest = true
 						manifest_filepath = content_file
 						manifest_data = base_manifest_template.duplicate(true)
-						var new_manifest_data = __parse_file_as_manifest(content_file)
+						var new_manifest_data:Dictionary = __parse_file_as_manifest(content_file)
 						manifest_data["mod_information"] = new_manifest_data["mod_information"]
 						manifest_data["version"] = new_manifest_data["version"]
 						manifest_data["library"] = new_manifest_data["library"]
@@ -7077,13 +7077,13 @@ class _ManifestV2:
 				var tlFiles = tlData["file"]
 				for tl in tlFiles.keys():
 					var d = tlFiles[tl]
-					var delim = "|"
+					var delim:String = "|"
 					match typeof(d):
 						TYPE_STRING:
 							delim = d
 						TYPE_DICTIONARY:
 							delim = d.get("string",delim)
-					var dict = pointers.Translations.__translation_file_to_dictionary(tl,delim)
+					var dict:Dictionary = pointers.Translations.__translation_file_to_dictionary(tl,delim)
 					for ln in dict.keys():
 						if not ln in tlKeys:
 							tlData[ln] = {}
@@ -7108,7 +7108,7 @@ class _ManifestV2:
 					counts[lang] = {"has":lc,"missing":total - (lc - not_in_master),"not_updated":not_updated}
 					counts[ml]["missing"] += not_in_master
 			if manifestEntry["has_manifest"]:
-				var manifest_langs = {}
+				var manifest_langs:Dictionary = {}
 				for lang in counts.keys():
 					var hs : float = float(counts[lang]["has"])
 					var bucket : float = hs/(hs+float(counts[lang]["missing"]))
@@ -7138,16 +7138,15 @@ class _ManifestV2:
 		var check_name : String = checked_mod_data[check_keys[0]].get("name","")
 		var installed_dict : Dictionary = {}
 		for installed_mod in __get_mod_list_keys():
-			var installed_mName : String = installed_mods[installed_mod].get("name","")
-			if installed_mName == check_name:
+			if installed_mods[installed_mod].get("name","") == check_name:
 				installed_dict = installed_mods[installed_mod].duplicate()
+				break
 		if not installed_dict:
 			return false
 		var checked_manifest_version:float = checked_mod_data[check_keys[0]]["manifest"]["manifest_version"]
-		var installed_manifest_version:float = installed_dict["manifest"]["manifest_version"]
 		if checked_manifest_version < 2.0:
 			return false
-		if checked_manifest_version > installed_manifest_version:
+		if checked_manifest_version > installed_dict["manifest"]["manifest_version"]:
 			return true
 		var checked_mod_version : Array = checked_mod_data[check_keys[0]]["version_data"]["full_version_array"]
 		var installed_mod_version : Array = installed_dict["version_data"]["full_version_array"]
@@ -7587,21 +7586,19 @@ class _ManifestV2:
 		
 		# REFACTOR TO USE __parse_tags
 		
-		var alldata : Dictionary = __get_tags()
-		var data : Dictionary = alldata.get(tag_name,{})
+		var data : Dictionary = __get_tags().get(tag_name,{})
 		var ex_data : Dictionary = {}
-		if data:
-			for mod in data.keys():
-				match tag_name:
-					"TAG_ADDS_EQUIPMENT","TAG_ADDS_EVENTS","TAG_ADDS_GAMEPLAY_MECHANICS","TAG_ADDS_SHIPS":
-						ex_data[mod] = Array(data.get(mod,[]))
-					"TAG_HANDLE_EXTRA_CREW":
-						var k:int = data.get(mod,24)
-						if k > 24:
-							ex_data[mod] = k
-					_:
-						var k:bool = data.get(mod,false)
+		for mod in data.keys():
+			match tag_name:
+				"TAG_ADDS_EQUIPMENT","TAG_ADDS_EVENTS","TAG_ADDS_GAMEPLAY_MECHANICS","TAG_ADDS_SHIPS":
+					ex_data[mod] = PoolStringArray(data.get(mod,PoolStringArray()))
+				"TAG_HANDLE_EXTRA_CREW":
+					var k:int = data.get(mod,24)
+					if k > 24:
 						ex_data[mod] = k
+				_:
+					var k:bool = data.get(mod,false)
+					ex_data[mod] = k
 		return ex_data
 	
 	static func __get_manifest_section(section: String, mod_id: String = "") -> Dictionary:
@@ -7676,10 +7673,9 @@ class _ManifestV2:
 		return complimentaries
 	
 	static func __check_mod_complementary(mod_id):
-		var tags : Array = __get_manifest_entry("manifest_definitions","complementary_mod_ids",mod_id)
 		var complimentaries : Array = []
 		var mKeys:PoolStringArray = __get_mod_list_keys()
-		for mod in tags:
+		for mod in __get_manifest_entry("manifest_definitions","complementary_mod_ids",mod_id):
 			if mod in mKeys:
 				complimentaries.append(mod)
 		return complimentaries
@@ -7699,9 +7695,8 @@ class _ManifestV2:
 		return complimentaries
 	
 	static func __check_mod_dependancies(mod_id):
-		var tags : Array = __get_manifest_entry("manifest_definitions","dependancy_mod_ids",mod_id)
 		var complimentaries : Array = []
-		for mod in tags:
+		for mod in __get_manifest_entry("manifest_definitions","dependancy_mod_ids",mod_id):
 			if not __mod_exists(mod):
 				complimentaries.append(mod)
 		return complimentaries
@@ -7721,9 +7716,8 @@ class _ManifestV2:
 		return complimentaries
 	
 	static func __check_mod_conflicts(mod_id):
-		var tags : Array = __get_manifest_entry("manifest_definitions","conflicting_mod_ids",mod_id)
 		var complimentaries : Array = []
-		for mod in tags:
+		for mod in __get_manifest_entry("manifest_definitions","conflicting_mod_ids",mod_id):
 			if __mod_exists(mod):
 				complimentaries.append(mod)
 		return complimentaries
@@ -7731,8 +7725,7 @@ class _ManifestV2:
 	static func __parse_tags(tag_data) -> Dictionary:
 		var tag_dict : Dictionary = {}
 		for entry in tag_data.keys():
-			var type:int = typeof(tag_data[entry])
-			if type != TYPE_DICTIONARY:
+			if typeof(tag_data[entry]) != TYPE_DICTIONARY:
 				return tag_dict
 			var tag_type : String = tag_data[entry].get("type","NULL_TYPE")
 			tag_type = tag_type.to_lower()
@@ -7750,14 +7743,12 @@ class _ManifestV2:
 		return tag_dict
 	
 	static func __have_mods_updated(folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",last_seen_file = "mods_from_last_launch.json") -> Dictionary:
-		var base = non_static["self"]
-		if not base.haveModsChanged:
+		if not non_static["self"].haveModsChanged:
 			return {}
 		if not folder.ends_with("/"):
-			folder = folder + "/"
+			folder += "/"
 		if last_seen_file.begins_with("/"):
 			last_seen_file.lstrip("/")
-		var all_mods : Dictionary = __get_mod_data()
 		non_static["pointers"].FolderAccess.__check_folder_exists(folder)
 		var file:File = File.new()
 		if not file.file_exists(folder + last_seen_file):
@@ -7765,6 +7756,7 @@ class _ManifestV2:
 			file.store_string("{}")
 			file.close()
 		var mods : Dictionary = {}
+		var all_mods : Dictionary = __get_mod_data()
 		for mod in __get_mod_list_keys():
 			var data : Dictionary = all_mods[mod]
 			if data["manifest"]["has_manifest"] and data["manifest"]["manifest_version"] >= 2.0:
@@ -7806,7 +7798,7 @@ class _ManifestV2:
 				mods[info["id"]] = {"name":info["name"],"version":{"major":version["version_major"],"minor":version["version_minor"],"bugfix":version["version_bugfix"]}}
 		if store:
 			if not folder.ends_with("/"):
-				folder = folder + "/"
+				folder += "/"
 			if last_seen_file.begins_with("/"):
 				last_seen_file.lstrip("/")
 			non_static["pointers"].FolderAccess.__check_folder_exists(folder)
@@ -7828,9 +7820,9 @@ class _ManifestV2:
 #		c.load(file_path)
 		var file:File = File.new()
 		file.open(file_path,File.READ)
-		var text = file.get_as_text(true)
+		var text:String = file.get_as_text(true)
 		file.close()
-		var cv = {}
+		var cv:Dictionary = {}
 		
 		var lastVer:String = ""
 		for line in text.split("\n"):
@@ -7838,7 +7830,7 @@ class _ManifestV2:
 			if noedge.begins_with(";"):
 				continue
 			if noedge.begins_with("[") and noedge.ends_with("]"):
-				var version = noedge.substr(1,noedge.length() - 2)
+				var version:String = noedge.substr(1,noedge.length() - 2)
 				if not version in cv:
 					lastVer = version
 					cv[version] = {}
@@ -7870,7 +7862,7 @@ class _ManifestV2:
 			keys = filterChangelogs(keys)
 			
 			for key in keys:
-				var entry = str(cv[version][key])
+				var entry:String = str(cv[version][key])
 				var spacer:String = ""
 				for i in (key.split(".").size() - 1):
 					spacer += spacing
@@ -7884,8 +7876,8 @@ class _ManifestV2:
 		var bSize:int = bList.size()
 		var counter:int = aSize if aSize < bSize else bSize
 		for i in counter:
-			var a = aList[i]
-			var b = bList[i]
+			var a:String = aList[i]
+			var b:String = bList[i]
 			if a != b:
 				return a < b
 		return aSize < bSize
@@ -7895,19 +7887,17 @@ class _ManifestV2:
 			var counter:int = 0
 			var total:int = keys.size() - 1
 			while counter < total:
-				var al:String = keys[counter]
-				var bl:String = keys[counter+1]
-				var aList:PoolStringArray = al.split(".")
-				var bList:PoolStringArray = bl.split(".")
+				var aList:PoolStringArray = keys[counter].split(".")
+				counter += 1
+				var bList:PoolStringArray = keys[counter].split(".")
 				var aSize:int = aList.size()
 				var bSize:int = bList.size()
-				if (aSize == bSize):
-					var aItem:String = aList[aSize - 1]
-					var bItem:String = bList[bSize - 1]
-					if int(bItem) > (int(aItem) + 1):
-						keys.remove(counter + 1)
+				if(aSize == bSize):
+					var aItem:int = int(aList[aSize - 1]) + 1
+					var bItem:int = int(bList[bSize - 1])
+					if(bItem > aItem):
+						keys.remove(counter)
 						total -= 1
-				counter += 1
 		return keys
 	
 	static func __get_manifest_cache() -> Dictionary:
@@ -7926,7 +7916,6 @@ class _ManifestV2:
 					var i : String = r.get_file().to_lower()
 					if i.begins_with("modmain") and i.ends_with(".gd"):
 						modmain_file_list.append(r)
-			
 		return modmain_file_list
 	
 	const active_modlet_file_list : PoolStringArray = PoolStringArray()
@@ -7937,11 +7926,6 @@ class _ManifestV2:
 	
 	static func __get_all_modlets(only_show_installed : bool = true,recache : bool = false) -> Dictionary:
 		var pointers:HevLibPointers = non_static["pointers"]
-		if cached_modlets:
-			var modletCheck = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets")
-			for modlet in modletCheck.keys():
-				if modletCheck[modlet] != cached_modlets[modlet]:
-					recache = true
 		if not cached_modlets or recache:
 			if not all_modlet_file_list:
 				var manifests:PoolStringArray = __get_manifest_files()
@@ -7976,7 +7960,11 @@ class _ManifestV2:
 			pointers.ConfigDriver.__store_value("HevLib","modlets","seen_modlets",allowed_modlets)
 			cached_modlets.clear()
 			cached_modlets.merge(allowed_modlets)
-			
+		else:
+			var modletCheck:Dictionary = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets",{})
+			for modlet in modletCheck.keys():
+				if modletCheck[modlet] != cached_modlets[modlet]:
+					recache = true
 		var out : Dictionary = cached_modlets.duplicate(true)
 		if only_show_installed:
 			for mod in cached_modlets:
