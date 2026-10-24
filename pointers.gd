@@ -8163,19 +8163,17 @@ class _ManifestV2:
 			paths.sort_custom(non_static["self"],"sortModPathOrder")
 			order.append([i,d.deps,paths,LO.find(i)])
 		order.sort_custom(non_static["self"],"sortModLoadOrder")
-		load_safe_resource_reference.append_array(order)
-#		pointers.FileAccess.__save_file_content("user://dump.json",JSON.print(order,"\t"))
+#		load_safe_resource_reference.append_array(order)
+		pointers.FileAccess.__save_file_content("user://dump.json",JSON.print(order,"\t"))
 		for r in order:
-			var extra:String = r[0]
 			for i in r[2]:
-				var this_resource:String = i[1]
 				match i[0]:
 					LOAD_TYPE.EXTEND_SCRIPT:
-						pointers.DataFormat.__extend_script(this_resource)
+						pointers.DataFormat.__extend_script(i[1])
 					LOAD_TYPE.OVERRIDE_SCRIPT:
-						pointers.DataFormat.__override_script(this_resource,extra)
+						pointers.DataFormat.__override_script(i[1],r[0])
 					LOAD_TYPE.REPLACE_RESOURCE:
-						pointers.DataFormat.__replace_resource(this_resource,extra)
+						pointers.DataFormat.__replace_resource(i[1],r[0])
 		pointers.l("%d modlet resources loaded." % resource_paths.size(),"pointers.SafeMode")
 	
 	static func sortModLoadOrder(a:Array,b:Array) -> bool:
@@ -8200,8 +8198,7 @@ class _ManifestV2:
 			var all_modlets:Dictionary = __get_all_modlets(false)
 			for modlet in all_modlets.keys():
 				if not all_modlets[modlet] and non_static["pointers"].FileAccess.__file_exists(modlet):
-					var mv:Dictionary = __parse_file_as_manifest(modlet)
-					disabled[modlet] = mv.get("mod_information",{}).get("id","%s_MISSING_ID" % modlet)
+					disabled[modlet] = __parse_file_as_manifest(modlet).get("mod_information",{}).get("id","%s_MISSING_ID" % modlet)
 			disabledModletCache.clear()
 			disabledModletCache.merge(disabled)
 		return disabledModletCache.duplicate(true)
@@ -8222,14 +8219,14 @@ class _ManifestV2:
 							has = true
 							break
 			TYPE_DICTIONARY:
-				var MID = str(check_data.get("mod_id",""))
-				var MDM = str(check_data.get("mod_main",""))
+				var MID:String = check_data.get("mod_id","")
+				var MDM:String = check_data.get("mod_main","")
 				if check_data and MID:
-					var moddata = __get_mod_by_id(MID)
+					var moddata:Dictionary = __get_mod_by_id(MID)
 					if moddata:
-						var t1 = true
-						var ver_info = moddata["version_data"]["full_version_array"]
-						if ("maximum_version" in check_data or "max_version" in check_data):
+						var t1:bool = true
+						var ver_info:Array = moddata["version_data"]["full_version_array"]
+						if("maximum_version" in check_data or "max_version" in check_data):
 							var minimum = check_data.get("maximum_version",check_data.get("max_version",[0,0,0]))
 							var mnm = null
 							match typeof(minimum):
@@ -8356,8 +8353,7 @@ class _Math:
 	
 	
 	static func __rotate_point(point : Vector2, angle : float, degrees : bool = true) -> Vector2:
-		if degrees:
-			angle = deg2rad(angle)
+		if degrees:angle = deg2rad(angle)
 		return Vector2((point.x*cos(-angle))-(point.y*sin(-angle)),(point.y*cos(-angle))+(point.x*sin(-angle)))
 	
 	static func __factorial(n:int) -> int:
@@ -8365,14 +8361,13 @@ class _Math:
 		var boolis:bool = true
 		var s:int = sign(n)
 		n = abs(n)
-		if n < 2:
-			return holdvalue * s
+		if n < 2:return holdvalue * s
 		while n > 0:
 			if boolis:
 				boolis = false
 				holdvalue = n
 			else:
-				holdvalue = holdvalue * n
+				holdvalue *= n
 			n -= 1
 		return holdvalue * s
 	
@@ -8390,8 +8385,7 @@ class _Math:
 		reflection_angle = -reflection_angle - (PI/2.0)
 		var a:float = -sin(reflection_angle)
 		var b:float = cos(reflection_angle)
-		var c:float = -((a * angle_offset.x) + (b * angle_offset.y))
-		var t:float = (-2.0 * ((a * point.x) + (b * point.y) + c)) / ((a * a) + (b * b))
+		var t:float = (-2.0 * ((a * point.x) + (b * point.y) + (-((a * angle_offset.x) + (b * angle_offset.y))))) / ((a * a) + (b * b))
 		return Vector2(point.x + (a * t), point.y + (b * t)) / scale
 	
 	static func __mirror_vector_array(points:PoolVector2Array, reflection_angle:float = 0.0, use_degrees:bool = false, angle_offset:Vector2 = Vector2.ZERO, scale:Vector2 = Vector2.ONE) -> PoolVector2Array:
@@ -8475,18 +8469,15 @@ class _NodeAccess:
 	static func strip_node(in_node, arr):
 		var paths : Array = []
 		for m in arr:
-			var selfPath : String = in_node.get_path()
-			var modify:PoolStringArray = m.get_path().split(selfPath)
-			if modify[1]:
+			if m.get_path().split(in_node.get_path())[1]:
 				paths.append(m)
 		return paths
 
 	static func returnPaths(arr, relative, in_node):
-		var parentPath : String = str(in_node.get_path())
+		var parentPath : String = in_node.get_path()
 		var paths : Array = []
 		for m in arr:
-			var path : String = m.get_path()
-			paths.append(path)
+			paths.append(m.get_path())
 		if relative:
 			for i in paths.size():
 				paths[i] = paths[i].split(parentPath)[1].lstrip("/")
@@ -8498,10 +8489,9 @@ class _NodeAccess:
 
 	static func setOwnership(current_node: Node,set_owner_node: Node):
 		current_node.set_owner(set_owner_node)
-		if current_node.get_child_count():
-			for child in current_node.get_children():
-				if not __is_instanced_from_scene(child.get_parent()):
-					setOwnership(child, set_owner_node)
+		for child in current_node.get_children():
+			if not __is_instanced_from_scene(child.get_parent()):
+				setOwnership(child, set_owner_node)
 
 	static func __is_instanced_from_scene(p_node):
 		return not p_node.filename.empty()
@@ -8516,13 +8506,9 @@ class _NodeAccess:
 		for child in test.get_children():
 			var line:String = child.name
 			if line.begins_with("DIALOG_DERELICT_SWITCH_CREW"):
-				var spl:PoolStringArray = line.split("|")
-				if int(spl[1]) > maximum:
-					maximum = int(spl[1])
+				maximum = max(int(line.split("|")[1]),maximum)
 		test.queue_free()
-		maximum += 1
-		if maximum > base:
-			base = maximum
+		maximum = max(base,maximum + 1)
 		if not max_crew > base:
 			pointers.l("TSCN Writer for dynamic crew handler: desired expansion to [%s] is less than or equal to the currently expanded number of [%s]" % [max_crew,base],"pointers.NodeAccess")
 			return ""
@@ -8531,11 +8517,7 @@ class _NodeAccess:
 		while max_crew > base:
 			compacted_string += "[node name=\"DIALOG_DERELICT_SWITCH_CREW|%s\" type=\"Node\" parent=\".\" index=\"%s\"]\nscript = ExtResource( 2 )\nmyLine = false\nfaceless = true\nimportChildren = NodePath(\"../DIALOG_DERELICT_GO_AND_BRING_IT\")\nagenda = \"CREW/%s\"\nagendaNotSame = true\n\n" % [base,base + 4]
 			base += 1
-		if not folder_path.ends_with("/"):
-			folder_path += "/"
-#		var save_file_path : String = folder_path + "dynamic_crew_x%s.tscn" % base
-#		pointers.DataFormat.__replace_scene(compacted_string,"res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn",save_file_path)
-		
+		if not folder_path.ends_with("/"):folder_path += "/"
 		return folder_path.plus_file("dynamic_crew_x%s.tscn" % base)
 	
 	static func __remove_scripts(node):
@@ -10156,26 +10138,18 @@ class _Zip:
 		return Contents
 	
 	static func __write_pck(file_path:String,files:Dictionary) -> int:
-		var packer = PCKPacker.new()
+		var packer:PCKPacker = PCKPacker.new()
 		var file:File = File.new()
-		non_static["pointers"].FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
+		var pointers:HevLibPointers = non_static["pointers"]
+		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
 		packer.pck_start(file_path)
-		for file_name in files:
+		for file_name in files.keys():
 			if file_name.begins_with("res://"):
-				var content = files[file_name]
-				match typeof(content):
-					TYPE_RAW_ARRAY:
-						var pkfilename = "user://cache/.HevLib_Cache/Variable_Fetch/writepck_%d" % (Time.get_ticks_usec() + hash(content))
-						file.open(pkfilename,File.WRITE)
-						file.store_buffer(content)
-						file.close()
-						packer.add_file(file_name,pkfilename)
-					TYPE_STRING:
-						var pkfilename = "user://cache/.HevLib_Cache/Variable_Fetch/writepck_%d" % (Time.get_ticks_usec() + hash(content))
-						file.open(pkfilename,File.WRITE)
-						file.store_string(content)
-						file.close()
-						packer.add_file(file_name,pkfilename)
+				var pkfilename:String = "user://cache/.HevLib_Cache/Variable_Fetch/writepck_%d" % Time.get_ticks_usec()
+				file.open(pkfilename,File.WRITE)
+				file.store_buffer(pointers.FileAccess.__file_output_to_buffer(files[file_name]))
+				file.close()
+				packer.add_file(file_name,pkfilename)
 		return packer.flush()
 	
 	
