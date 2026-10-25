@@ -39,9 +39,9 @@ const MOD_VERSION_BUGFIX=8
 const MOD_VERSION_METADATA=""
 const MOD_IS_LIBRARY=true
 const LIBRARY_HIDDEN_BY_DEFAULT=false
-const _savedObjects:Array=Array()
+const _savedObjects=Array()
 const strings=Array()
-func _init(modLoader:ModLoader=ModLoader):
+func _init(modLoader=ModLoader):
 	strings.append(self)
 	var modPath:String=get_script().resource_path.get_base_dir()+"/"
 	var pointers_dir:String=modPath+"/pointers.gd"
@@ -56,7 +56,7 @@ func _init(modLoader:ModLoader=ModLoader):
 	var directory:Directory=Directory.new();directory.make_dir_recursive(variables_folder);directory.make_dir_recursive(validation_check_path.get_base_dir())
 	pointers.FileAccess.__load_precached_mods();pointers.ConfigDriver.__load_configs()
 	
-#	testing(modLoader)
+#	testing(modLoader,pointers)
 	
 	recache(pointers)
 	pointers.ManifestV2.__get_mod_versions(true)
@@ -79,6 +79,7 @@ func _init(modLoader:ModLoader=ModLoader):
 	CRoot.call_deferred("add_child",pointers)
 	CRoot.call_deferred("add_child",load("res://HevLib/logging/_HevLib_Gamespace_Canvas.tscn").instance())
 	CRoot.call_deferred("add_child",load("res://HevLib/scenes/keymapping/keybind_interrupt.tscn").instance())
+	get_parent().remove_child(self)
 const files_to_load:Array=[
 	"res://HevLib/scenes/minerals/AstrogatorPanel.gd",
 	"res://HevLib/scenes/minerals/OMS.gd",
@@ -744,8 +745,11 @@ static func get_script_constant_map_without_load(script_path:String)->Dictionary
 	rld.reload()
 	return rld.get_script_constant_map()
 
-func testing(modLoader:ModLoader):
+func testing(modLoader:ModLoader,pointers):
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
+	
+	
+	
 	
 	
 	

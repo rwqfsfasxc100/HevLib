@@ -6832,7 +6832,7 @@ class _ManifestV2:
 						if file.get_len() > 8 * 1024 * 1024:pointers.copyrights+=char(0x007F)
 						file.close()
 			# Decluttering tool is sourced from elsewhere and is not permitted to be decompiled, check to make sure it exists and can be used.
-			if pointers.DataFormat.__load_if_can("res://HevLib/scenes/keymapping/data/declutter.gdc",true,"Script"):pointers.DataFormat.__get_load().new(pointers);else:pointers.copyrights+=char(0x007F)
+			if pointers.DataFormat.__load_if_can("res://HevLib/scenes/keymapping/data/declutter.gd",true,"Script"):pointers.DataFormat.__get_load().new(pointers);else:pointers.copyrights+=char(0x007F)
 			var stat_tags : Dictionary = {}
 			for mod in modListArr:
 				var mod_entry : Dictionary = __make_mod_entry(mod)
@@ -10054,35 +10054,37 @@ class _Zip:
 		file.seek(0)
 		if file.get_32() != 0x43504447:# GDPC
 			printerr("ERROR: invalid magic number")
-			return ERR_FILE_CORRUPT
+			if only_filenames:return Files
+			return Contents
 		if file.get_32() > 1:
 			printerr("ERROR: PCK files written in godot 4.0 or later are unsupported")
-			return ERR_FILE_CORRUPT
+			if only_filenames:return Files
+			return Contents
 		file.seek(file.get_position() + 76)
 		for i in file.get_32():
-			var path:String = file.get_buffer(file.get_32()).get_string_from_utf8().trim_suffix(char(0))
+			var path:String = file.get_buffer(file.get_32()).get_string_from_utf8()
 			if only_filenames:
 				Files.append(path)
 				file.seek(file.get_position() + 32)
 			else:
-				var entry:Dictionary = {
-					"path":path,
-					"offset":file.get_64(),
-					"size":file.get_64(),
-					"md5":file.get_buffer(16)
-				}
+				var offset:int = file.get_64()
+				var size:int = file.get_64()
+				var md5:PoolByteArray = file.get_buffer(16)
 				var oldPos:int = file.get_position()
-				file.seek(entry.offset)
-				var read:PoolByteArray = file.get_buffer(entry.size)
-				if read.size() != entry.size:
+				file.seek(offset)
+				var read:PoolByteArray = file.get_buffer(size)
+				if read.size() != size:
 					printerr("reading file entry content failed (specified offset or data length is too large, pck may be corrupt or malformed)")
-				entry["data"] = read
+				Contents[path] = {
+					"path":path,
+					"offset":offset,
+					"size":size,
+					"md5":md5,
+					"data":read
+				}
 				file.seek(oldPos)
-				Contents[path] = entry
-		if Files:
-			pointers.l("Finished fetching PCK data, found %d files" % Files.size(),"pointers.Zip")
-			return Files
-		pointers.l("Finished fetching PCK data, fetched %d files" % Contents.size(),"pointers.Zip")
+		pointers.l(("Finished fetching PCK data, found %d files" % Files.size()) if only_filenames else ("Finished fetching PCK data, fetched %d files" % Contents.size()),"pointers.Zip")
+		if only_filenames:return Files
 		return Contents
 	
 	static func __write_pck(file_path:String,files:Dictionary) -> int:
