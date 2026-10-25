@@ -10043,94 +10043,42 @@ class _Zip:
 	
 	# Port of the `load` method from hhyyrylainen's GodotPckTool
 	# https://github.com/hhyyrylainen/GodotPckTool
-	const PckHeaderMagic = 0x43504447
-	const PackDirEncrypted = 1 << 0
-	const PckFileEncrypted = 1 << 0
-	const PckFileDeleted = 1 << 1
-	const PckFileRelativeBase = 1 << 1
-	const PckFileSparseBundle = 1 << 2
-	const MaxSupportedPckVersionLoad = 4
 	static func __load_pck(file_path:String,only_filenames:bool = false):
 		var file:File = File.new()
 		var dir:Directory = Directory.new()
 		var pointers:HevLibPointers = non_static["pointers"]
-		pointers.l("Loading PCK @ %s, fetching only filenames? [%s]" % [file_path,str(only_filenames)],"pointers.Zip")
+		pointers.l("Loading PCK @ %s, fetching only filenames? [%s]" % [file_path,only_filenames],"pointers.Zip")
 		var Contents:Dictionary = {}
 		var Files:PoolStringArray = PoolStringArray()
 		file.open(file_path,File.READ)
 		file.seek(0)
-		var Salt:String = ""
-		var magic:int = file.get_32()
-		if magic != PckHeaderMagic:
+		if file.get_32() != 0x43504447:# GDPC
 			printerr("ERROR: invalid magic number")
 			return ERR_FILE_CORRUPT
-		var FormatVersion:int = file.get_32()
-		var MajorGodotVersion:int = file.get_32()
-		var MinorGodotVersion:int = file.get_32()
-		var PatchGototVersion:int = file.get_32()
-		var IncludeFilter:Array = Array()
-		if FormatVersion > MaxSupportedPckVersionLoad:
-			printerr("ERROR: pack is unsupported version: %d" % FormatVersion)
+		if file.get_32() > 1:
+			printerr("ERROR: PCK files written in godot 4.0 or later are unsupported")
 			return ERR_FILE_CORRUPT
-		var Flags:int = 0
-		var FileOffsetBase:int = 0
-		if FormatVersion >= 2:
-			Flags = file.get_32()
-			FileOffsetBase = file.get_64()
-		if (Flags & PackDirEncrypted) != 0:
-			printerr("ERROR: pck is encrypted")
-			return ERR_FILE_CORRUPT
-		if (Flags & PckFileSparseBundle) != 0:
-			print("Warning: Sparse pck detected, this is unlikely to work!")
-		if (FormatVersion >= 3 || (FormatVersion == 2 && (Flags & PckFileRelativeBase) != 0)):
-			FileOffsetBase = file.get_position()
-		var DirectoryOffset:int = 0
-		if (FormatVersion >= 3):
-			DirectoryOffset = file.get_64()
-			if (FormatVersion >= 4 && (Flags & PckFileSparseBundle) != 0 && (Flags & PackDirEncrypted) != 0):
-				Salt = file.get_buffer(32).get_string_from_utf8()
-			file.seek(file.get_position() + DirectoryOffset)
-		else:
-			for i in 16:
-				file.get_32()
-		var fileCount:int = file.get_32()
-		var excluded:int = 0
-		for i in fileCount:
-			var pathLength:int = file.get_32()
-			var path:String = file.get_buffer(pathLength).get_string_from_utf8().trim_suffix(char(0))
+		file.seek(file.get_position() + 76)
+		for i in file.get_32():
+			var path:String = file.get_buffer(file.get_32()).get_string_from_utf8().trim_suffix(char(0))
 			if only_filenames:
 				Files.append(path)
-				file.get_64()
-				file.get_64()
-				file.get_buffer(16)
-				if (FormatVersion >= 2):file.get_32()
+				file.seek(file.get_position() + 32)
 			else:
 				var entry:Dictionary = {
-					"Path":path,
-					"Offset":FileOffsetBase + file.get_64(),
-					"Size":file.get_64(),
-					"Md5":file.get_buffer(16)
+					"path":path,
+					"offset":file.get_64(),
+					"size":file.get_64(),
+					"md5":file.get_buffer(16)
 				}
-				if (FormatVersion >= 2):
-					entry["Flags"] = file.get_32()
-					entry["Salt"] = Salt
-					if ((entry.Flags & PckFileEncrypted) != 0):
-						print("WARNING: pck file %s is marked as encrypted, decoding the encryption is not implemented" % entry.Path)
-					if ((entry.Flags & PckFileDeleted) != 0):
-						print("Pck file is marked as removed (but still processing it): %s" % entry.Path)
 				var oldPos:int = file.get_position()
-				file.seek(entry.Offset)
-				var read:PoolByteArray = file.get_buffer(entry.Size)
-				if read.size() != entry.Size:
+				file.seek(entry.offset)
+				var read:PoolByteArray = file.get_buffer(entry.size)
+				if read.size() != entry.size:
 					printerr("reading file entry content failed (specified offset or data length is too large, pck may be corrupt or malformed)")
-				entry["GetData"] = read
+				entry["data"] = read
 				file.seek(oldPos)
-				if (!IncludeFilter.empty() && ! entry in IncludeFilter):
-					excluded += 1
-					continue
-				Contents[entry.Path] = entry
-		if (excluded > 0):
-			print("%s files excluded by filters: %d" % [file_path,excluded])
+				Contents[path] = entry
 		if Files:
 			pointers.l("Finished fetching PCK data, found %d files" % Files.size(),"pointers.Zip")
 			return Files
