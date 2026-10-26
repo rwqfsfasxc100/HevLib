@@ -5818,33 +5818,25 @@ class _FolderAccess:
 			exists = false
 			value = directory.make_dir_recursive(folder) == OK
 		if status_array: return [value,exists]
-		else: return value
+		return value
 	
 	static func __recursive_delete(path: String, excluded_files:PoolStringArray = PoolStringArray()) -> bool:
 		var directory:Directory = Directory.new()
-		if not directory.open(path) == OK:
-			return false
-		if not path.ends_with("/"):
-			path = path + "/"
+		if not directory.open(path) == OK: return false
+		if not path.ends_with("/"):path += "/"
 		var filesForDeletion : Array = []
 		var foldersForDeletion : Array = []
-		var pms : PoolStringArray = PoolStringArray(__fetch_folder_files(path, true, true))
-		for entry in pms:
+		for entry in PoolStringArray(__fetch_folder_files(path, true, true)):
 			if entry.ends_with("/"):
-				var fsplit:PoolStringArray = entry.split("/",false)
-				if not fsplit[fsplit.size() - 1] + "/" in excluded_files:
+				if not entry.split("/",false)[-1] + "/" in excluded_files:
 					foldersForDeletion.append(entry)
 			else:
 				if not entry.get_file() in excluded_files:
 					filesForDeletion.append(entry)
 		for f in filesForDeletion:
-			var fsplit:PoolStringArray = f.split("/")
-			var splitFiles = fsplit[fsplit.size()-1]
-			directory.open(path)
-			directory.remove(splitFiles)
+			directory.remove(f.split("/")[-1])
 		for folder in foldersForDeletion:
 			__recursive_delete(folder,excluded_files)
-		directory.open(path)
 		directory.remove(path)
 		return true
 	
