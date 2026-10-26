@@ -34,7 +34,7 @@ extends Reference
 class_name MINIZ
 
 # Translation layer to permit proper autocompletion of the miniz implementation
-# SCRIPT USAGE: var miniz:MINIZ = load("res://HevLib/scripts/miniz/miniz.gd").new()
+# SCRIPT USAGE: var miniz:MINIZ = MINIZ.new()
 # See res://HevLib/scripts/miniz/README.md for complete usage instructions
 
 var compression_level : int setget set_compression_level, get_compression_level

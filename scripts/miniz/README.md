@@ -15,7 +15,10 @@ func get_miniz_plugin():
 
 # Returns a copy of the helper script
 func get_miniz_helper():
-	return load("res://HevLib/scripts/miniz/miniz.gd").new()
+	return MINIZ.new()
+	
+	# Alternate use if the previous case was proplematic
+	# return load("res://HevLib/scripts/miniz/miniz.gd").new()
 ```
 
 
@@ -23,8 +26,8 @@ func get_miniz_helper():
 ```
 # Create a ZIP archive and stores files using various means.
 func write_zip_file():
-	var miniz = load("res://HevLib/scripts/miniz/miniz.gdns").new()
-	var err = miniz.open_write("user://save.zip")
+	var miniz:MINIZ = MINIZ.new()
+	var err:int = miniz.open_write("user://save.zip")
 	if err != OK:
 		# Call get_last_error() to get a readable error message.
 		# For methods that return data, it can be used to determine an error from empty data if calling get_last_error() does not return an empty string.
@@ -56,8 +59,8 @@ func write_zip_file():
 
 # Opens a ZIP archive and fetches data
 func read_zip_file():
-	var miniz = load("res://HevLib/scripts/miniz/miniz.gdns").new()
-	var err = miniz.open_read("user://save.zip")
+	var miniz:MINIZ = MINIZ.new()
+	var err:int = miniz.open_read("user://save.zip")
 	if err != OK:
 		printerr(miniz.get_last_error())
 		return err
@@ -79,8 +82,8 @@ func read_zip_file():
 
 # Opens a ZIP archive and modifies data within it
 func modify_zip_file():
-	var miniz = load("res://HevLib/scripts/miniz/miniz.gdns").new()
-	var err = miniz.open_append("user://save.zip")
+	var miniz:MINIZ = MINIZ.new()
+	var err:int = miniz.open_append("user://save.zip")
 	if err != OK:
 		printerr(miniz.get_last_error())
 		return err
