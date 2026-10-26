@@ -32,11 +32,11 @@
 
 extends Button
 
-export var url = ""
+export (String) var url = ""
 
-var has_pressed = false
+var has_pressed:bool = false
 
-onready var timer = $Timer
+onready var timer:Timer = $Timer
 
 func _ready():
 	timer.wait_time = 0.5
@@ -47,8 +47,6 @@ func _pressed():
 		OS.shell_open(url)
 		has_pressed = true
 		timer.start()
-		
-
 
 func _timeout():
 	has_pressed = false

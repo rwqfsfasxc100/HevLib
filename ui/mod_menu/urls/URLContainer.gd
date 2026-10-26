@@ -49,23 +49,20 @@ func update():
 	var nodes : Array = []
 	if links:
 		for link in links:
-			
 			var URL : String = links[link].get("URL","")
 			if URL and pointers.DataFormat.__is_valid_url(URL):
-				var node : Object = link_button.instance()
+				var node : Node = link_button.instance()
 				node.url = URL
 				node.name = link
 				node.icon_path = match_builtin_icon(link,links[link].get("ICON","res://HevLib/ui/themes/icons/alias.stex"))
 				node.tooltip = match_builtin_tooltip(link,links[link].get("TOOLTIP",""))
 				node.text = link
 				nodes.append(node)
-#	breakpoint
 	for node in nodes:
 		b.add_child(node)
 
 
 func match_builtin_icon(link_name : String,icon : String = "res://HevLib/ui/themes/icons/alias.stex") -> String:
-	
 	match link_name:
 		"HEVLIB_GITHUB":
 			return "res://HevLib/ui/themes/icons/github.stex"

@@ -74,9 +74,9 @@ func _about_to_show():
 		var display_name:String = md["display"]
 		var old_version:Array = md["version"]
 		var new_version:Array = md["new_version"]
-		c.get_node("ModInfo/Label").text = display_name
+		c.get_node("ModInfo/Label").text = TranslationServer.translate(display_name)
 		c.mod_id = mod
-		c.mod_name = md["name"]
+		c.mod_name = TranslationServer.translate(md["name"])
 		c.current_version = "%s.%s.%s" % [old_version[0],old_version[1],old_version[2]]
 		c.new_version = "%s.%s.%s" % [new_version[0],new_version[1],new_version[2]]
 		container.add_child(c)

@@ -32,7 +32,7 @@
 
 extends Popup
 
-var filter_offset = Vector2(200,200)
+var filter_offset:Vector2 = Vector2(200,200)
 
 func _visibility_changed():
 	_on_resize()
@@ -44,33 +44,16 @@ func refocus():
 	else:
 		Debug.l("I have no focus to fall back to!")
 
-
-#func _unhandled_input(event):
-#	if visible and Input.is_action_just_pressed("ui_cancel"):
-#		cancel()
-#		get_tree().set_input_as_handled()
-
 func _on_resize():
 	var size : Vector2 = Settings.getViewportSize()
 	rect_size = size
 	$ColorRect.rect_size = size
-#	rect_position = filter_offset/2
 	$base.rect_min_size = size - filter_offset
 	$base/URLContainer.rect_min_size = size - filter_offset
 	$base.rect_position = filter_offset/2
 
-#	var x_offset = 10
-#	var y_offset_a = 10
-#	var y_offset_b = 4
-#
-#	$base/URLContainer/VBoxContainer.rect_min_size = size - filter_offset - Vector2(x_offset,y_offset_a)
-#	$base/URLContainer/VBoxContainer/ScrollContainer.rect_min_size = size - filter_offset - Vector2(x_offset,y_offset_a + y_offset_b + 42)
-	
-	
-
 func show_menu():
 	popup()
-#	$base/URLContainer.show()
 
 func cancel():
 	$AnimateAppear.play("hider")
@@ -83,5 +66,4 @@ func hider():
 func _about_to_show():
 	lastFocus = get_focus_owner()
 	var container = $base/URLContainer/VBoxContainer/ScrollContainer/VBoxContainer
-	
 	_on_resize()

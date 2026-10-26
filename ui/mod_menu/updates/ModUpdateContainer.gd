@@ -46,8 +46,8 @@ onready var manager = get_parent().get_parent().get_parent().get_parent().get_pa
 func _ready():
 	add_child(http)
 	http.connect("request_completed",self,"update_return")
-	$Popups/IgnorePopup.dialog_text = TranslationServer.translate("HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MOD_UPDATE") % [mod_name,new_version]
-	$Popups/UpdatePopup.dialog_text = TranslationServer.translate("HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD") % [mod_name,current_version,new_version]
+	$Popups/IgnorePopup.dialog_text = TranslationServer.translate("HEVLIB_CONFIRMATION_DIALOGUE_IGNORE_MOD_UPDATE") % [TranslationServer.translate(mod_name),new_version]
+	$Popups/UpdatePopup.dialog_text = TranslationServer.translate("HEVLIB_CONFIRMATION_DIALOGUE_UPDATE_MOD") % [TranslationServer.translate(mod_name),current_version,new_version]
 
 func _Ignore_pressed():
 	$Popups/IgnorePopup.popup_centered()
@@ -70,8 +70,7 @@ func _ignore_confirmed():
 var zip_folder = "user://cache/.Mod_Menu_2_Cache/updates/zip_cache/"
 
 func _do_update():
-	var dv = {"name":mod_name,"id":mod_id,"version":new_version,"container":self}
-	manager.mods_to_download.append(dv)
+	manager.mods_to_download.append({"name":TranslationServer.translate(mod_name),"id":mod_id,"version":new_version,"container":self})
 	manager.start_updates()
 
 func _update_confirmed():
@@ -91,7 +90,7 @@ func _update_confirmed():
 #		pointers.Github.__get_github_release(github,zip_folder,self,true,"zip")
 	else:
 		var nod = manager.no_download_popup
-		nod.dialog_text = TranslationServer.translate("HEVLIB_NO_DOWNLOAD_CONTENT") % mod_name
+		nod.dialog_text = TranslationServer.translate("HEVLIB_NO_DOWNLOAD_CONTENT") % TranslationServer.translate(mod_name)
 		nod.current_mod = self
 		nod.call_deferred("popup_centered")
 	if display_wait_popup:

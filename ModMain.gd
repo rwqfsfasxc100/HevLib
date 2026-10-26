@@ -79,7 +79,6 @@ func _init(modLoader=ModLoader):
 	CRoot.call_deferred("add_child",pointers)
 	CRoot.call_deferred("add_child",load("res://HevLib/logging/_HevLib_Gamespace_Canvas.tscn").instance())
 	CRoot.call_deferred("add_child",load("res://HevLib/scenes/keymapping/keybind_interrupt.tscn").instance())
-	get_parent().remove_child(self)
 const files_to_load:Array=[
 	"res://HevLib/scenes/minerals/AstrogatorPanel.gd",
 	"res://HevLib/scenes/minerals/OMS.gd",

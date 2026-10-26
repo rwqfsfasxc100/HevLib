@@ -32,28 +32,18 @@
 
 extends HBoxContainer
 
-var url = ""
-var text = ""
-var tooltip = ""
-var icon_path = "res://HevLib/ui/themes/icons/alias.stex"
+var url:String = ""
+var text:String = ""
+var tooltip:String = ""
+var icon_path:String = "res://HevLib/ui/themes/icons/alias.stex"
 
 func _ready():
-	$Button/Label.text = text
-	var tex
-	match icon_path.get_extension().to_lower():
-		"stex":
-			tex = StreamTexture.new()
-			tex.load_path = icon_path
-		"png","jpg","jpeg","bmp","webp":
-			tex = ModLoader._savedObjects[0].DataFormat.__load_png(icon_path)
-	$Control/TextureRect.texture = tex
+	$Button/Label.text = TranslationServer.translate(text)
+	$Control/TextureRect.texture = ModLoader._savedObjects[0].DataFormat.__load_png(icon_path)
 	$Button.hint_tooltip = tooltip
-#	breakpoint
 
 func _pressed():
 	OS.shell_open(url)
-
-
 
 func _resized():
 	$Button/Label.rect_size = $Button.rect_size
