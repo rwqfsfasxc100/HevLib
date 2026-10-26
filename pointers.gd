@@ -5525,8 +5525,7 @@ class _FileAccess:
 	
 	static func __copy_file(file_path : String, folder : String):
 		var prepfile : String = ProjectSettings.localize_path(file_path)
-		var dir:Directory = Directory.new()
-		return dir.copy(prepfile,folder + "/" + prepfile.split("/")[prepfile.split("/").size() - 1])
+		return Directory.new().copy(prepfile,folder + "/" + prepfile.split("/")[-1])
 	
 	const STEX_HEADER = PoolByteArray([0x47, 0x44, 0x53, 0x54])
 	const PNG_HEADER = PoolByteArray([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])
@@ -5564,10 +5563,8 @@ class _FileAccess:
 				loaded = img.load_webp_from_buffer(file.get_buffer(file.get_len())) == OK
 			file.close()
 			if not loaded:
-				if fallback != null and fallback.get_data():
-					img = fallback
-				else:
-					return ImageTexture.new()
+				if fallback != null and fallback.get_data(): img = fallback
+				else: return ImageTexture.new()
 			var imgtex:ImageTexture = ImageTexture.new()
 			imgtex.create_from_image(img)
 			return imgtex
@@ -5584,8 +5581,8 @@ class _FileAccess:
 			if filepath.get_base_dir() != modCacheDir:
 				if __copy_file(filepath,modCacheDir):
 					return
-				filepath = modCacheDir.plus_file(filepath.get_file())
-			var cache : Array = JSON.parse(__get_file_content(updateCacheFile)).result
+				filepath = modCacheDir + "/" + filepath.get_file()
+			var cache : PoolStringArray = PoolStringArray(JSON.parse(__get_file_content(updateCacheFile)).result)
 			if not filepath in cache: cache.append(filepath)
 			file.open(updateCacheFile,File.WRITE)
 			file.store_string(JSON.print(cache))
@@ -5602,7 +5599,7 @@ class _FileAccess:
 		var modPathPrefix:String = gameInstallDirectory.plus_file("mods")
 		var file:File = File.new()
 		if file.file_exists(updateCacheFile):
-			var files_to_copy : Array = JSON.parse(__get_file_content(updateCacheFile)).result
+			var files_to_copy : PoolStringArray = PoolStringArray(JSON.parse(__get_file_content(updateCacheFile)).result)
 			file.open(updateCacheFile,File.WRITE)
 			file.store_string("[]")
 			file.close()
@@ -5677,10 +5674,8 @@ class _FileAccess:
 	
 	static func __get_real_filename_from_compiled_resource(file_path:String) -> String:
 		match file_path.get_extension():
-			"res":
-				return file_path.get_basename().get_basename()
-			"gdc":
-				return file_path.get_basename() + ".gd"
+			"res": return file_path.get_basename().get_basename()
+			"gdc": return file_path.get_basename() + ".gd"
 		return file_path
 	
 	const deeperSearch:PoolStringArray = PoolStringArray(["tres","tscn","gd","res"])
@@ -6053,8 +6048,7 @@ class _HevLib:
 	
 	func __get_pointer_functions(pointer: String, return_JSON: bool = false):
 		var path = "res://HevLib/pointers/"
-		var pSplit = pointer.split("/")
-		var actualPointer = path + pSplit[pSplit.size() - 1]
+		var actualPointer = path + pointer.split("/")[- 1]
 		var pointerLoad = load(actualPointer).new()
 		var pFuncs = pointerLoad.get_method_list()
 		var methods = {}
@@ -6076,8 +6070,7 @@ class _HevLib:
 		var functions = {}
 		var files = pointers.FolderAccess.__fetch_folder_files(path)
 		for pointer in files:
-			var pSplit = pointer.split("/")
-			var actualPointer = path + pSplit[pSplit.size() - 1]
+			var actualPointer = path + pointer.split("/")[- 1]
 			var pl = load(actualPointer)
 			var pointerLoad = pl.new()
 			var pFuncs = pointerLoad.get_method_list()
@@ -9506,7 +9499,7 @@ class _Scripting:
 				pointers.l("adding only color references for mineral %s, value set to zero or below" % mineral,"pointers.Scripting")
 		var content:String = "extends \"res://AsteroidSpawner.gd\"\nfunc _init():\n\tpass"
 		for m in mineral_list:
-			content += "\n\tif not \"%s\" in %s:\n\t\t%s[\"%s\"] = %s" % [m,"objectClass[objectClass.size() - 1]","objectClass[objectClass.size() - 1]",m,mineral_list[m]]
+			content += "\n\tif not \"%s\" in %s:\n\t\t%s[\"%s\"] = %s" % [m,"objectClass[- 1]","objectClass[- 1]",m,mineral_list[m]]
 		
 		
 		var trace_text:String = ""
@@ -9641,7 +9634,7 @@ class _Translations:
 	static func __updateTL(path:String, delim:String = ",", fullLogging:bool = true):
 		var pointers:HevLibPointers = non_static["pointers"]
 		var tlFile:File = File.new()
-		var fileName : String = path.split("/")[path.split("/").size() - 1]
+		var fileName : String = path.split("/")[- 1]
 		var folderName : String = path.split(fileName)[0]
 		pointers.l("Adding translations from [%s] in [%s]" % [fileName, folderName],"pointers.Translations")
 		tlFile.open(path, File.READ)
