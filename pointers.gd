@@ -2135,7 +2135,7 @@ class _DataFormat:
 		var pathway : Array = __trim_scripts(script_path)
 		if not pathway[2]: return {}
 		var dict : Dictionary = {}
-		var l : Dictionary = __compile_script(pathway[0]).get_script_constant_map()
+		var l : Dictionary = load(script_path).get_script_constant_map()
 		for i in pathway[2]:
 			dict[i] = l[i]
 		return dict
@@ -8666,7 +8666,7 @@ class _RPC:
 						icon = "empty"
 					"ep","enceladus","enceladus_prime":
 						icon = "enceladus_prime"
-					"unknown":
+					_:
 						icon = "unknown"
 		if icon != rpc_data["current_icon"]:
 			rpc_data["pointers"].l("Changing large icon from %s to %s" % [rpc_data["current_icon"],icon],"pointers.RPC")
