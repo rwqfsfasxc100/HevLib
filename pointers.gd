@@ -58,6 +58,7 @@ var RPC : _RPC = _RPC.new(self)
 var SafeMode : _SafeMode = _SafeMode.new(self)
 var Scripting : _Scripting = _Scripting.new(self,http)
 var TimeAccess : _TimeAccess = _TimeAccess.new(self)
+var Tokenizer : _Tokenizer = _Tokenizer.new(self)
 var Translations : _Translations = _Translations.new(self)
 var WebTranslate : _WebTranslate = _WebTranslate.new(self)
 var Zip : _Zip = _Zip.new(self)
@@ -86,6 +87,11 @@ var Classes = {
 	"Zip":Zip,
 }
 
+enum LOAD_TYPE{
+	EXTEND_SCRIPT,
+	OVERRIDE_SCRIPT,
+	REPLACE_RESOURCE
+}
 
 var copyrights:String = "© 2024-2026 Benjamin Buckhurst a.k.a. __hev. All rights reserved."
 
@@ -555,7 +561,7 @@ class _Achievements:
 		# since only unlocked achievements are stored
 		if unlockedAchievements.size() != allAchievements.size():
 			for f in allAchievements:
-				if not unlockedAchievements.has(f):
+				if not f in unlockedAchievements:
 					lockedAchievements.append(f)
 		currentAchievementCache["allAchievements"] = allAchievements
 		currentAchievementCache["unlockedAchievements"] = unlockedAchievements
@@ -1278,7 +1284,7 @@ class _ConfigDriver:
 	static func __get_minmax_string_from_dict(requirement:Dictionary) -> String:
 		var MID:String = requirement.get("mod_id","")
 		var MDM:String = requirement.get("mod_main","")
-		var pointers:HevLibPointers = non_static["pointers"]
+		var pointers:HevLibPointers._ManifestV2 = non_static["pointers"].ManifestV2
 		if MID:
 			var minVer = null
 			var maxVer = null
@@ -1321,8 +1327,8 @@ class _ConfigDriver:
 			if additional:
 				mdOut += " (%s)" % additional
 			return mdOut
-		elif MDM and MDM in pointers.ManifestV2.__get_mod_list_keys():
-			var zip:String = pointers.ManifestV2.__match_mod_path_to_zip(MDM)
+		elif MDM and MDM in pointers.__get_mod_list_keys():
+			var zip:String = pointers.__match_mod_path_to_zip(MDM)
 			if zip:
 				return zip.get_file()
 			else:
@@ -6192,11 +6198,11 @@ class _Keymapping:
 			var bound:Dictionary = {}
 			var current:Dictionary = {}
 			var file:File = File.new()
-			var pointers:HevLibPointers = non_static["pointers"]
+			var pointers:HevLibPointers._ConfigDriver = non_static["pointers"].ConfigDriver
 			if file.file_exists(vanilla_binds_file):
-				current = pointers.ConfigDriver.__config_parse(vanilla_binds_file)
+				current = pointers.__config_parse(vanilla_binds_file)
 			if file.file_exists("user://settings.cfg"):
-				bound = pointers.ConfigDriver.__config_parse("user://settings.cfg").get("input",{})
+				bound = pointers.__config_parse("user://settings.cfg").get("input",{})
 			var vanilla_binds = __define_vanilla_binds()
 			var vopts = overrides["vanilla_bind_opts"]
 			var missing = ""
@@ -6224,7 +6230,7 @@ class _Keymapping:
 					formatted_vanilla_binds_store[ie] = sect
 			if missing:
 				printerr(missing)
-			non_static["pointers"].ConfigDriver.__config_store(formatted_vanilla_binds_store,vanilla_binds_file)
+			pointers.__config_store(formatted_vanilla_binds_store,vanilla_binds_file)
 		return formatted_vanilla_binds_store.duplicate(true)
 	
 	static func __event_to_string(event):
@@ -7900,7 +7906,7 @@ class _ManifestV2:
 	const cached_modlets : Dictionary = {}
 	
 	static func __get_all_modlets(only_show_installed : bool = true,recache : bool = false) -> Dictionary:
-		var pointers:HevLibPointers = non_static["pointers"]
+		var pointers:HevLibPointers._ConfigDriver = non_static["pointers"].ConfigDriver
 		if not cached_modlets or recache:
 			if not all_modlet_file_list:
 				var manifests:PoolStringArray = __get_manifest_files()
@@ -7922,9 +7928,9 @@ class _ManifestV2:
 				all_modlet_file_list.clear()
 				all_modlet_file_list.append_array(PoolStringArray(ov))
 			cached_modlets.clear()
-			var allowed_modlets = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets")
+			var allowed_modlets = pointers.__get_value("HevLib","modlets","seen_modlets")
 			if allowed_modlets == null:
-				pointers.ConfigDriver.__store_value("HevLib","modlets","seen_modlets",{})
+				pointers.__store_value("HevLib","modlets","seen_modlets",{})
 				allowed_modlets = {}
 			active_modlet_file_list.clear()
 			for mod in all_modlet_file_list:
@@ -7932,11 +7938,11 @@ class _ManifestV2:
 					allowed_modlets[mod] = true
 				if allowed_modlets[mod]:
 					active_modlet_file_list.append(mod)
-			pointers.ConfigDriver.__store_value("HevLib","modlets","seen_modlets",allowed_modlets)
+			pointers.__store_value("HevLib","modlets","seen_modlets",allowed_modlets)
 			cached_modlets.clear()
 			cached_modlets.merge(allowed_modlets)
 		else:
-			var modletCheck:Dictionary = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets",{})
+			var modletCheck:Dictionary = pointers.__get_value("HevLib","modlets","seen_modlets",{})
 			for modlet in modletCheck.keys():
 				if modletCheck[modlet] != cached_modlets[modlet]:
 					recache = true
@@ -8035,12 +8041,6 @@ class _ManifestV2:
 					cached_icon_files.append(r)
 		return cached_icon_files
 	
-	enum LOAD_TYPE{
-		EXTEND_SCRIPT,
-		OVERRIDE_SCRIPT,
-		REPLACE_RESOURCE
-	}
-	
 	const load_safe_resource_reference = []
 	
 	static func __load_modlets(preprocess_paths:Array = Array()) -> void:
@@ -8061,9 +8061,9 @@ class _ManifestV2:
 							if line.strip_edges().begins_with("extends \""):
 								ed = line.split("\"")[1]
 								break
-					resource_paths.append({"path":i,"mode":LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed,"priority":-INF,"mod_path":"res://HevLib/ModMain.gd"})
+					resource_paths.append({"path":i,"mode":pointers.LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed,"priority":-INF,"mod_path":"res://HevLib/ModMain.gd"})
 				TYPE_STRING_ARRAY:
-					resource_paths.append({"path":i[0],"mode":LOAD_TYPE.REPLACE_RESOURCE,"extra_data":i[1],"priority":-INF,"mod_path":"res://HevLib/ModMain.gd"})
+					resource_paths.append({"path":i[0],"mode":pointers.LOAD_TYPE.REPLACE_RESOURCE,"extra_data":i[1],"priority":-INF,"mod_path":"res://HevLib/ModMain.gd"})
 				TYPE_ARRAY:
 					var ed:String = ""
 					var ot:String = i[0]
@@ -8075,7 +8075,7 @@ class _ManifestV2:
 							if line.strip_edges().begins_with("extends \""):
 								ed = line.split("\"")[1]
 								break
-					resource_paths.append({"path":ot,"mode":LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed,"priority":i[1],"mod_path":"res://HevLib/ModMain.gd"})
+					resource_paths.append({"path":ot,"mode":pointers.LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed,"priority":i[1],"mod_path":"res://HevLib/ModMain.gd"})
 		for modlet in __get_modlet_files():
 			var mod_data:Dictionary = pointers.ManifestV2.__get_mod_by_id(pointers.ManifestV2.__match_mod_file_path_to_id(modlet))
 			var drivers:Dictionary = mod_data["drivers"]
@@ -9596,6 +9596,620 @@ class _TimeAccess:
 		return {"time":dos_time, "date":dos_date}
 	
 
+class _Tokenizer:
+	var scripts : Array = [
+		
+	]
+	
+	const non_static = {}
+	func _init(p):
+		non_static["pointers"] = p
+		non_static["self"] = self
+		non_static["builtin_classes"] = ClassDB.get_class_list() + PoolStringArray(type_index.keys())
+	
+	enum{
+		TK_EMPTY,TK_IDENTIFIER,TK_CONSTANT,TK_SELF,TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_OP_IN,TK_OP_EQUAL,
+		TK_OP_NOT_EQUAL,TK_OP_LESS,TK_OP_LESS_EQUAL,TK_OP_GREATER,TK_OP_GREATER_EQUAL,TK_OP_AND,TK_OP_OR,
+		TK_OP_NOT,TK_OP_ADD,TK_OP_SUB,TK_OP_MUL,TK_OP_DIV,TK_OP_MOD,TK_OP_SHIFT_LEFT,TK_OP_SHIFT_RIGHT,TK_OP_ASSIGN,
+		TK_OP_ASSIGN_ADD,TK_OP_ASSIGN_SUB,TK_OP_ASSIGN_MUL,TK_OP_ASSIGN_DIV,TK_OP_ASSIGN_MOD,TK_OP_ASSIGN_SHIFT_LEFT,
+		TK_OP_ASSIGN_SHIFT_RIGHT,TK_OP_ASSIGN_BIT_AND,TK_OP_ASSIGN_BIT_OR,TK_OP_ASSIGN_BIT_XOR,TK_OP_BIT_AND,
+		TK_OP_BIT_OR,TK_OP_BIT_XOR,TK_OP_BIT_INVERT,TK_CF_IF,TK_CF_ELIF,TK_CF_ELSE,TK_CF_FOR,TK_CF_WHILE,TK_CF_BREAK,
+		TK_CF_CONTINUE,TK_CF_PASS,TK_CF_RETURN,TK_CF_MATCH,TK_PR_FUNCTION,TK_PR_CLASS,TK_PR_CLASS_NAME,TK_PR_EXTENDS,
+		TK_PR_IS,TK_PR_ONREADY,TK_PR_TOOL,TK_PR_STATIC,TK_PR_EXPORT,TK_PR_SETGET,TK_PR_CONST,TK_PR_VAR,TK_PR_AS,
+		TK_PR_VOID,TK_PR_ENUM,TK_PR_PRELOAD,TK_PR_ASSERT,TK_PR_YIELD,TK_PR_SIGNAL,TK_PR_BREAKPOINT,TK_PR_REMOTE,
+		TK_PR_SYNC,TK_PR_MASTER,TK_PR_SLAVE,TK_PR_PUPPET,TK_PR_REMOTESYNC,TK_PR_MASTERSYNC,TK_PR_PUPPETSYNC,
+		TK_BRACKET_OPEN,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_OPEN,TK_CURLY_BRACKET_CLOSE,TK_PARENTHESIS_OPEN,
+		TK_PARENTHESIS_CLOSE,TK_COMMA,TK_SEMICOLON,TK_PERIOD,TK_QUESTION_MARK,TK_COLON,TK_DOLLAR,TK_FORWARD_ARROW,
+		TK_NEWLINE,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN,TK_ERROR,TK_EOF,TK_CURSOR,}
+	const token_lookup = {
+		TK_EMPTY:"TK_EMPTY",
+		TK_IDENTIFIER:"TK_IDENTIFIER",
+		TK_CONSTANT:"TK_CONSTANT",
+		TK_SELF:"TK_SELF",
+		TK_BUILT_IN_TYPE:"TK_BUILT_IN_TYPE",
+		TK_BUILT_IN_FUNC:"TK_BUILT_IN_FUNC",
+		TK_OP_IN:"TK_OP_IN",
+		TK_OP_EQUAL:"TK_OP_EQUAL",
+		TK_OP_NOT_EQUAL:"TK_OP_NOT_EQUAL",
+		TK_OP_LESS:"TK_OP_LESS",
+		TK_OP_LESS_EQUAL:"TK_OP_LESS_EQUAL",
+		TK_OP_GREATER:"TK_OP_GREATER",
+		TK_OP_GREATER_EQUAL:"TK_OP_GREATER_EQUAL",
+		TK_OP_AND:"TK_OP_AND",
+		TK_OP_OR:"TK_OP_OR",
+		TK_OP_NOT:"TK_OP_NOT",
+		TK_OP_ADD:"TK_OP_ADD",
+		TK_OP_SUB:"TK_OP_SUB",
+		TK_OP_MUL:"TK_OP_MUL",
+		TK_OP_DIV:"TK_OP_DIV",
+		TK_OP_MOD:"TK_OP_MOD",
+		TK_OP_SHIFT_LEFT:"TK_OP_SHIFT_LEFT",
+		TK_OP_SHIFT_RIGHT:"TK_OP_SHIFT_RIGHT",
+		TK_OP_ASSIGN:"TK_OP_ASSIGN",
+		TK_OP_ASSIGN_ADD:"TK_OP_ASSIGN_ADD",
+		TK_OP_ASSIGN_SUB:"TK_OP_ASSIGN_SUB",
+		TK_OP_ASSIGN_MUL:"TK_OP_ASSIGN_MUL",
+		TK_OP_ASSIGN_DIV:"TK_OP_ASSIGN_DIV",
+		TK_OP_ASSIGN_MOD:"TK_OP_ASSIGN_MOD",
+		TK_OP_ASSIGN_SHIFT_LEFT:"TK_OP_ASSIGN_SHIFT_LEFT",
+		TK_OP_ASSIGN_SHIFT_RIGHT:"TK_OP_ASSIGN_SHIFT_RIGHT",
+		TK_OP_ASSIGN_BIT_AND:"TK_OP_ASSIGN_BIT_AND",
+		TK_OP_ASSIGN_BIT_OR:"TK_OP_ASSIGN_BIT_OR",
+		TK_OP_ASSIGN_BIT_XOR:"TK_OP_ASSIGN_BIT_XOR",
+		TK_OP_BIT_AND:"TK_OP_BIT_AND",
+		TK_OP_BIT_OR:"TK_OP_BIT_OR",
+		TK_OP_BIT_XOR:"TK_OP_BIT_XOR",
+		TK_OP_BIT_INVERT:"TK_OP_BIT_INVERT",
+		TK_CF_IF:"TK_CF_IF",
+		TK_CF_ELIF:"TK_CF_ELIF",
+		TK_CF_ELSE:"TK_CF_ELSE",
+		TK_CF_FOR:"TK_CF_FOR",
+		TK_CF_WHILE:"TK_CF_WHILE",
+		TK_CF_BREAK:"TK_CF_BREAK",
+		TK_CF_CONTINUE:"TK_CF_CONTINUE",
+		TK_CF_PASS:"TK_CF_PASS",
+		TK_CF_RETURN:"TK_CF_RETURN",
+		TK_CF_MATCH:"TK_CF_MATCH",
+		TK_PR_FUNCTION:"TK_PR_FUNCTION",
+		TK_PR_CLASS:"TK_PR_CLASS",
+		TK_PR_CLASS_NAME:"TK_PR_CLASS_NAME",
+		TK_PR_EXTENDS:"TK_PR_EXTENDS",
+		TK_PR_IS:"TK_PR_IS",
+		TK_PR_ONREADY:"TK_PR_ONREADY",
+		TK_PR_TOOL:"TK_PR_TOOL",
+		TK_PR_STATIC:"TK_PR_STATIC",
+		TK_PR_EXPORT:"TK_PR_EXPORT",
+		TK_PR_SETGET:"TK_PR_SETGET",
+		TK_PR_CONST:"TK_PR_CONST",
+		TK_PR_VAR:"TK_PR_VAR",
+		TK_PR_AS:"TK_PR_AS",
+		TK_PR_VOID:"TK_PR_VOID",
+		TK_PR_ENUM:"TK_PR_ENUM",
+		TK_PR_PRELOAD:"TK_PR_PRELOAD",
+		TK_PR_ASSERT:"TK_PR_ASSERT",
+		TK_PR_YIELD:"TK_PR_YIELD",
+		TK_PR_SIGNAL:"TK_PR_SIGNAL",
+		TK_PR_BREAKPOINT:"TK_PR_BREAKPOINT",
+		TK_PR_REMOTE:"TK_PR_REMOTE",
+		TK_PR_SYNC:"TK_PR_SYNC",
+		TK_PR_MASTER:"TK_PR_MASTER",
+		TK_PR_SLAVE:"TK_PR_SLAVE",
+		TK_PR_PUPPET:"TK_PR_PUPPET",
+		TK_PR_REMOTESYNC:"TK_PR_REMOTESYNC",
+		TK_PR_MASTERSYNC:"TK_PR_MASTERSYNC",
+		TK_PR_PUPPETSYNC:"TK_PR_PUPPETSYNC",
+		TK_BRACKET_OPEN:"TK_BRACKET_OPEN",
+		TK_BRACKET_CLOSE:"TK_BRACKET_CLOSE",
+		TK_CURLY_BRACKET_OPEN:"TK_CURLY_BRACKET_OPEN",
+		TK_CURLY_BRACKET_CLOSE:"TK_CURLY_BRACKET_CLOSE",
+		TK_PARENTHESIS_OPEN:"TK_PARENTHESIS_OPEN",
+		TK_PARENTHESIS_CLOSE:"TK_PARENTHESIS_CLOSE",
+		TK_COMMA:"TK_COMMA",
+		TK_SEMICOLON:"TK_SEMICOLON",
+		TK_PERIOD:"TK_PERIOD",
+		TK_QUESTION_MARK:"TK_QUESTION_MARK",
+		TK_COLON:"TK_COLON",
+		TK_DOLLAR:"TK_DOLLAR",
+		TK_FORWARD_ARROW:"TK_FORWARD_ARROW",
+		TK_NEWLINE:"TK_NEWLINE",
+		TK_CONST_PI:"TK_CONST_PI",
+		TK_CONST_TAU:"TK_CONST_TAU",
+		TK_WILDCARD:"TK_WILDCARD",
+		TK_CONST_INF:"TK_CONST_INF",
+		TK_CONST_NAN:"TK_CONST_NAN",
+		TK_ERROR:"TK_ERROR",
+		TK_EOF:"TK_EOF",
+		TK_CURSOR:"TK_CURSOR",
+	}
+
+	const func_index={
+		"sin":0,"cos":1,"tan":2,"sinh":3,"cosh":4,"tanh":5,"asin":6,"acos":7,"atan":8,"atan2":9,
+		"sqrt":10,"fmod":11,"fposmod":12,"posmod":13,"floor":14,"ceil":15,"round":16,"abs":17,"sign":18,"pow":19,
+		"log":20,"exp":21,"is_nan":22,"is_inf":23,"is_equal_approx":24,"is_zero_approx":25,"ease":26,"decimals":27,
+		"step_decimals":28,"stepify":29,"lerp":30,"lerp_angle":31,"inverse_lerp":32,"range_lerp":33,
+		"smoothstep":34,"move_toward":35,"dectime":36,"randomize":37,"randi":38,"randf":39,"rand_range":40,"seed":41,
+		"rand_seed":42,"deg2rad":43,"rad2deg":44,"linear2db":45,"db2linear":46,"polar2cartesian":47,
+		"cartesian2polar":48,"wrapi":49,"wrapf":50,"max":51,"min":52,"clamp":53,"nearest_po2":54,
+		"weakref":55,"funcref":56,"convert":57,"typeof":58,"type_exists":59,"char":60,"ord":61,"str":62,
+		"print":63,"printt":64,"prints":65,"printerr":66,"printraw":67,"print_debug":68,"push_error":69,
+		"push_warning":70,"var2str":71,"str2var":72,"var2bytes":73,"bytes2var":74,"range":75,"load":76,
+		"inst2dict":77,"dict2inst":78,"validate_json":79,"parse_json":80,"to_json":81,"hash":82,"Color8":83,"ColorN":84,
+		"print_stack":85,"get_stack":86,"instance_from_id":87,"len":88,"is_instance_valid":89,"deep_equal":90,
+	}
+	const type_index={
+		"bool":TYPE_BOOL,"int":TYPE_INT,"float":TYPE_REAL,"String":TYPE_STRING,
+		"Vector2":TYPE_VECTOR2,"Rect2":TYPE_RECT2,"Vector3":TYPE_VECTOR3,"Transform2D":TYPE_TRANSFORM2D,
+		"Plane":TYPE_PLANE,"Quat":TYPE_QUAT,"AABB":TYPE_AABB,"Basis":TYPE_BASIS,
+		"Transform":TYPE_TRANSFORM,"Color":TYPE_COLOR,"NodePath":TYPE_NODE_PATH,"RID":TYPE_RID,
+		"Object":TYPE_OBJECT,"Dictionary":TYPE_DICTIONARY,"Array":TYPE_ARRAY,
+		"PoolByteArray":TYPE_RAW_ARRAY,"PoolIntArray":TYPE_INT_ARRAY,"PoolRealArray":TYPE_REAL_ARRAY,
+		"PoolStringArray":TYPE_STRING_ARRAY,"PoolVector2Array":TYPE_VECTOR2_ARRAY,
+		"PoolVector3Array":TYPE_VECTOR3_ARRAY,"PoolColorArray":TYPE_COLOR_ARRAY,
+	}
+	const keywords={
+		"in":TK_OP_IN,"not":TK_OP_NOT,"or":TK_OP_OR,"and":TK_OP_AND,
+		"func":TK_PR_FUNCTION,"class":TK_PR_CLASS,"class_name":TK_PR_CLASS_NAME,
+		"extends":TK_PR_EXTENDS,"is":TK_PR_IS,"onready":TK_PR_ONREADY,
+		"tool":TK_PR_TOOL,"static":TK_PR_STATIC,"export":TK_PR_EXPORT,
+		"setget":TK_PR_SETGET,"var":TK_PR_VAR,"as":TK_PR_AS,"void":TK_PR_VOID,
+		"preload":TK_PR_PRELOAD,"assert":TK_PR_ASSERT,"yield":TK_PR_YIELD,
+		"signal":TK_PR_SIGNAL,"breakpoint":TK_PR_BREAKPOINT,
+		"remote":TK_PR_REMOTE,"master":TK_PR_MASTER,"slave":TK_PR_SLAVE,
+		"puppet":TK_PR_PUPPET,"sync":TK_PR_SYNC,"remotesync":TK_PR_REMOTESYNC,
+		"mastersync":TK_PR_MASTERSYNC,"puppetsync":TK_PR_PUPPETSYNC,
+		"const":TK_PR_CONST,"enum":TK_PR_ENUM,
+		"if":TK_CF_IF,"elif":TK_CF_ELIF,"else":TK_CF_ELSE,"for":TK_CF_FOR,
+		"while":TK_CF_WHILE,"break":TK_CF_BREAK,"continue":TK_CF_CONTINUE,
+		"return":TK_CF_RETURN,"match":TK_CF_MATCH,"pass":TK_CF_PASS,
+		"self":TK_SELF,"PI":TK_CONST_PI,"TAU":TK_CONST_TAU,"_":TK_WILDCARD,
+		"INF":TK_CONST_INF,"NAN":TK_CONST_NAN,
+	}
+	const compile_err_header="SCRIPT COMPILE ERR-line %d: %s"
+	enum{
+		KEY_HORIZONTALTAB=9,KEY_LINEFEED=10,KEY_CARRIAGERETURN=13,KEY_SINGLEQUOTE=39,
+		KEY_DOUBLEQUOTE=34,KEY_BELL=7,KEY_BACKSPACE=8,KEY_VERTICALTAB=11,KEY_FORMFEED=12,}
+	const blankspace_nolf_chars:PoolIntArray=PoolIntArray([9,32])
+	const quote_chars:PoolIntArray=PoolIntArray([34,39])
+	const post_store:PoolIntArray=PoolIntArray([0,0,0])
+	const type_store:PoolIntArray=PoolIntArray()
+	const args_store:Array=Array()
+	const line_store:PoolIntArray=PoolIntArray()
+	const char_store:PoolIntArray=PoolIntArray()
+	
+	
+	static func __source_to_tokens(source_code:String) -> bool:
+		source_code=source_code.replace("\r","")
+		var source_length:int = source_code.length()
+		post_store[0] = 0
+		post_store[1] = 0
+		post_store[2] = source_length
+		type_store.clear()
+		args_store.clear()
+		line_store.clear()
+		char_store.clear()
+		char_store.resize(source_length)
+		for i in source_length:
+			char_store[i] = source_code.ord_at(i)
+		while true:
+			if!next_token():
+				return false
+			if type_store[-1] == TK_EOF:
+				break
+		return true
+	
+	static func next_token() -> bool:
+		if post_store[0] > post_store[2]:
+			push_token(TK_EOF)
+			return true
+		while true:
+			var ch:int = get_char(0)
+			if ch == 0:
+				push_token(TK_EOF)
+				return true
+			if ch == KEY_BACKSLASH:
+				post_store[0] += 1
+				if get_char(0) != KEY_LINEFEED:
+					printerr(compile_err_header % [post_store[1],"Expected newline after '\\'."])
+					return false
+				post_store[0] += 1
+				post_store[1] += 1
+				while true:
+					if!get_char(0) in PoolIntArray([KEY_SPACE,KEY_HORIZONTALTAB]):
+						break
+					post_store[0] += 1
+				continue
+			
+			if ch == KEY_HORIZONTALTAB or ch == KEY_SPACE:
+				post_store[0] += 1
+				continue
+			
+			if ch == KEY_NUMBERSIGN:
+				while get_char(0) != KEY_LINEFEED:
+					post_store[0] += 1
+					if get_char(0) == 0:
+						push_token(TK_EOF)
+						return true
+				ch = KEY_LINEFEED
+			
+			if ch == KEY_LINEFEED:
+				post_store[1] += 1
+				post_store[0] += 1
+				var used_spaces:bool = get_char(0) == KEY_SPACE
+				var i:int = 0
+				while true:
+					var wc:int = get_char(i)
+					if wc == KEY_SPACE:
+						if not used_spaces:
+							printerr(compile_err_header % [post_store[1],"Mixed tabs&&spaces in indentation"])
+							return false
+						i += 1
+					elif wc == KEY_HORIZONTALTAB:
+						if used_spaces:
+							printerr(compile_err_header % [post_store[1],"Spaces used before tabs on a line"])
+							return false
+						i += 1
+					else:
+						break
+				push_token(TK_NEWLINE,i)
+				return true
+			
+			if ch == KEY_AT or ch == KEY_DOUBLEQUOTE or ch == KEY_SINGLEQUOTE:
+				return read_string_token(ch)
+			
+			if word_is_number(ch) or (ch == KEY_PERIOD and word_is_number(get_char(1))):
+				return read_number_token()
+			if word_is_tex(ch):
+				return read_word_token(ch)
+			var n1:int = get_char(1)
+			var n2:int = get_char(2)
+			var tok:int = -1
+			var width:int = 1
+			match ch:
+				KEY_SLASH:
+					if n1 == KEY_EQUAL:
+						tok = TK_OP_ASSIGN_DIV
+						width = 2
+					else:
+						tok = TK_OP_DIV
+				KEY_EQUAL:
+					if n1 == KEY_EQUAL:
+						tok = TK_OP_EQUAL
+						width = 2
+					else:
+						tok = TK_OP_ASSIGN
+				KEY_LESS:
+					if n1 == KEY_EQUAL:
+						tok = TK_OP_LESS_EQUAL
+						width = 2
+					elif n1 == KEY_LESS:
+						if n2 == KEY_EQUAL:
+							tok = TK_OP_ASSIGN_SHIFT_LEFT
+							width = 3
+						else:
+							tok = TK_OP_SHIFT_LEFT
+							width = 2
+					else:
+						tok = TK_OP_LESS
+				KEY_GREATER:
+					if n1 == KEY_EQUAL:
+						tok = TK_OP_GREATER_EQUAL
+						width = 2
+					elif n1 == KEY_GREATER:
+						if n2 == KEY_EQUAL:
+							tok = TK_OP_ASSIGN_SHIFT_RIGHT
+							width = 3
+						else:
+							tok = TK_OP_SHIFT_RIGHT
+							width = 2
+					else:
+						tok = TK_OP_GREATER
+				KEY_EXCLAM:
+					if n1 == KEY_EQUAL:
+						tok = TK_OP_NOT_EQUAL
+						width = 2
+					else:
+						tok = TK_OP_NOT
+				KEY_BRACELEFT: tok = TK_CURLY_BRACKET_OPEN
+				KEY_BRACERIGHT: tok = TK_CURLY_BRACKET_CLOSE
+				KEY_BRACKETLEFT: tok = TK_BRACKET_OPEN
+				KEY_BRACKETRIGHT: tok = TK_BRACKET_CLOSE
+				KEY_PARENLEFT: tok = TK_PARENTHESIS_OPEN
+				KEY_PARENRIGHT: tok = TK_PARENTHESIS_CLOSE
+				KEY_COMMA: tok = TK_COMMA
+				KEY_SEMICOLON: tok = TK_SEMICOLON
+				KEY_QUESTION: tok = TK_QUESTION_MARK
+				KEY_COLON: tok = TK_COLON
+				KEY_DOLLAR: tok = TK_DOLLAR
+				KEY_ASCIICIRCUM:
+					if n1 == KEY_EQUAL:
+						tok = TK_OP_ASSIGN_BIT_XOR
+						width = 2
+					else:
+						tok = TK_OP_BIT_XOR
+				KEY_ASCIITILDE: tok = TK_OP_BIT_INVERT
+				KEY_AMPERSAND:
+					if n1 == KEY_AMPERSAND:
+						tok = TK_OP_AND
+						width = 2
+					elif n1 == KEY_EQUAL:
+						tok = TK_OP_ASSIGN_BIT_AND
+						width = 2
+					else:
+						tok = TK_OP_BIT_AND
+				KEY_BAR:
+					if n1 == KEY_BAR:
+						tok = TK_OP_OR
+						width = 2
+					elif n1 == KEY_EQUAL:
+						tok = TK_OP_ASSIGN_BIT_OR
+						width = 2
+					else:
+						tok = TK_OP_BIT_OR
+				KEY_ASTERISK:
+					if n1 == KEY_EQUAL:
+						tok = TK_OP_ASSIGN_MUL
+						width = 2
+					else:
+						tok = TK_OP_MUL
+				KEY_PLUS:
+					if n1 == KEY_EQUAL:
+						tok = TK_OP_ASSIGN_ADD
+						width = 2
+					else:
+						tok = TK_OP_ADD
+				KEY_MINUS:
+					if n1 == KEY_EQUAL:
+						tok = TK_OP_ASSIGN_SUB
+						width = 2
+					elif n1 == KEY_GREATER:
+						tok = TK_FORWARD_ARROW
+						width = 2
+					else:
+						tok = TK_OP_SUB
+				KEY_PERCENT:
+					if n1 == KEY_EQUAL:
+						tok = TK_OP_ASSIGN_MOD
+						width = 2
+					else:
+						tok = TK_OP_MOD
+				KEY_PERIOD:
+					tok = TK_PERIOD
+			if tok == -1:
+				printerr(compile_err_header % [post_store[1],"Unknown character"])
+				return false
+			push_token(tok)
+			post_store[0] += width
+			return true
+		return false # unreachable :(
+	
+	static func read_word_token(ch:int)->bool:
+		var s:String = char(ch)
+		var i:int = 1
+		while word_is_tex(get_char(i)):
+			s += char(get_char(i))
+			i += 1
+		if s == "null":
+			push_token(TK_CONSTANT,null)
+		elif s == "true":
+			push_token(TK_CONSTANT,true)
+		elif s == "false":
+			push_token(TK_CONSTANT,false)
+		elif s in type_index:
+			push_token(TK_BUILT_IN_TYPE,type_index[s])
+		elif s in func_index:
+			push_token(TK_BUILT_IN_FUNC,func_index[s])
+		elif s in keywords:
+			push_token(keywords[s])
+		else:
+			push_token(TK_IDENTIFIER,s)
+		post_store[0] += s.length()
+		return true
+
+	static func read_number_token()->bool:
+		var period_found:bool = false
+		var exponent_found:bool = false
+		var hexa_found:bool = false
+		var bin_found:bool = false
+		var sign_found:bool = false
+		var s:String = ""
+		var i:int = 0
+		while true:
+			var c:int = get_char(i)
+			if c == KEY_PERIOD:
+				if period_found or exponent_found:
+					printerr(compile_err_header % [post_store[1],"Invalid numeric constant at '.'"])
+					return false
+				if bin_found:
+					printerr(compile_err_header % [post_store[1],"Invalid binary constant at '.'"])
+					return false
+				elif hexa_found:
+					printerr(compile_err_header % [post_store[1],"Invalid hexadecimal constant at '.'"])
+					return false
+				period_found=true
+			elif c == 120: # x
+				if hexa_found or bin_found or s.length() != 1 or not ((i == 1 and s[0] == "0") or (i == 2 and s[1] == "0" and s[0] == "-")):
+					printerr(compile_err_header % [post_store[1],"Invalid numeric constant at 'x'"])
+					return false
+				hexa_found=true
+			elif hexa_found and (c >= KEY_0 and c <= KEY_9) or (c >= 97 and c <= 102) or (c >= KEY_A and c <= KEY_Z):
+				pass
+			elif not hexa_found and c==98: # b
+				if bin_found or s.length() != 1 or not ((i == 1 and s[0] == "0") or (i == 2 and s[1] == "0" and s[0] == "-")):
+					printerr(compile_err_header % [post_store[1],"Invalid numeric constant at 'b'"])
+					return false
+				bin_found=true
+			elif not hexa_found and c == 101: # e
+				if exponent_found or bin_found:
+					printerr(compile_err_header % [post_store[1],"Invalid numeric constant at 'e'"])
+					return false
+				exponent_found=true
+			elif word_is_number(c):
+				pass
+			elif bin_found and (c == KEY_0 or c == KEY_1):
+				pass
+			elif (c == KEY_MINUS or c == KEY_PLUS) and exponent_found:
+				if sign_found:
+					printerr(compile_err_header % [post_store[1],"Invalid numeric constant at '-'"])
+					return false
+				sign_found=true
+			elif c == KEY_UNDERSCORE: # _ separator
+				i += 1
+				continue
+			else:
+				break
+			s += char(c)
+			i += 1
+		var last:int = s.ord_at(s.length() - 1) if s.length() > 0 else 0
+		if not (word_is_number(last) or (hexa_found and (last >= KEY_0 and last <= KEY_9) or (last >= 97 and last <= 102) or (last >= KEY_A and last <= KEY_Z))):
+			printerr(compile_err_header % [post_store[1],"Invalid numeric constant: "+s])
+			return false
+		post_store[0] += i
+		if hexa_found:
+			push_token(TK_CONSTANT,radixify(s,2,16))
+		elif bin_found:
+			push_token(TK_CONSTANT,radixify(s,2,2))
+		elif period_found or exponent_found:
+			if s.begins_with("."):
+				s = "0" + s
+			var v = str2var(s)
+			if typeof(v) == TYPE_INT or typeof(v) == TYPE_REAL:
+				push_token(TK_CONSTANT,float(v))
+			else:
+				push_token(TK_CONSTANT,s.to_float())
+		else:
+			push_token(TK_CONSTANT,s.to_int())
+		return true
+	
+	static func read_string_token(ch:int)->bool:
+		var is_node_path:bool = false
+		if ch == KEY_AT:
+			var q:int = get_char(1)
+			if q != KEY_DOUBLEQUOTE and q != KEY_SINGLEQUOTE:
+				printerr(compile_err_header % [post_store[1],"Unexpected '@'"])
+				return false
+			post_store[0] += 1
+			is_node_path = true
+		var mode:int = 0
+		if get_char(0) == KEY_SINGLEQUOTE:
+			mode=1
+		var i:int=1
+		if mode == 0 and get_char(i) == KEY_DOUBLEQUOTE and get_char(i + 1) == KEY_DOUBLEQUOTE:
+			i += 2
+			mode = 2
+		var s:String = ""
+		while true:
+			var c:int = get_char(i)
+			if c == 0:
+				printerr(compile_err_header % [post_store[1],"Unterminated String"])
+				return false
+			elif mode == 0 and c == KEY_DOUBLEQUOTE:
+				break
+			elif mode == 1 and c == KEY_SINGLEQUOTE:
+				break
+			elif mode == 2 and c == KEY_DOUBLEQUOTE and get_char(i + 1) == KEY_DOUBLEQUOTE and get_char(i + 2) == KEY_DOUBLEQUOTE:
+				i+=2
+				break
+			elif mode != 2 and c == 10:
+				printerr(compile_err_header % [post_store[1],"Unexpected EOL at String."])
+				return false
+			elif c == 0xFFFF:
+				i -= 1
+				break
+			elif c == KEY_BACKSLASH:
+				i += 1
+				var nx:int = get_char(i)
+				if nx == 0:
+					printerr(compile_err_header % [post_store[1],"Unterminated String"])
+					return false
+				var res:int = 0
+				match nx:
+					97:res = 7 # a
+					98:res = 8 # b
+					116:res = 9 # t
+					110:res = 10 # n
+					118:res = 11 # v
+					102:res = 12 # f
+					114:res = 13 # r
+					KEY_SINGLEQUOTE: res = KEY_SINGLEQUOTE
+					KEY_DOUBLEQUOTE: res = KEY_DOUBLEQUOTE
+					KEY_BACKSLASH: res = KEY_BACKSLASH
+					KEY_SLASH: res = KEY_SLASH
+					117: # u
+						i += 1
+						for j in 4:
+							var hc:int = get_char(i + j)
+							if hc == 0:
+								printerr(compile_err_header % [post_store[1],"Unterminated String"])
+								return false
+							var v:int = 0
+							if hc >= KEY_0 and hc <= KEY_9:
+								v = hc - 48
+							elif hc >= 97 and hc <= 102:
+								v = hc - 97 + 10
+							elif hc >= KEY_A and hc <= KEY_Z:
+								v = hc - 65 + 10
+							else:
+								printerr(compile_err_header % [post_store[1],"Malformed hex constant in string"])
+								return false
+							res = (res << 4) | v
+						i += 3
+					_:
+						printerr(compile_err_header % [post_store[1],"Invalid escape sequence"])
+						return false
+				s += char(res)
+			else:
+				if c == KEY_LINEFEED:
+					post_store[1] += 1
+				s += char(c)
+			i += 1
+		post_store[0] += i
+		if is_node_path:
+			push_token(TK_CONSTANT,NodePath(s))
+		else:
+			push_token(TK_CONSTANT,s)
+		post_store[0] += 1
+		return true
+	
+	static func radixify(s:String,start:int,radix:int) -> int:
+		var v:int = 0
+		for k in range(start,s.length()):
+			var c:int = s.ord_at(k)
+			var d:int = 0
+			if c >= KEY_0 and c <= KEY_9:
+				d = c - 48
+			elif c >= 97 and c <= 102:
+				d = c - 97 + 10
+			else:
+				d = c - 65 + 10
+			v = v * radix + d
+		return v
+	
+	static func push_token(type:int,arg = null) -> void:
+		type_store.append(type)
+		args_store.append(arg)
+		line_store.append(post_store[1])
+	
+	static func get_char(offset:int) -> int:
+		var p:int = post_store[0] + offset
+		if p < 0 or p >= post_store[2]:
+			return 0
+		return char_store[p]
+	
+	static func word_is_number(c:int) -> bool:
+		return c >= KEY_0 and c <= KEY_9
+	
+	static func word_is_alpha(c:int) -> bool:
+		return (c >= 97 and c <= 122) or (c >= KEY_A and c <= KEY_Z)
+	
+	static func word_is_tex(c:int) -> bool:
+		return (c >= 97 and c <= 122) or (c >= KEY_A and c<= KEY_Z) or (c >= KEY_0 and c <= KEY_9) or c == 95
+	
+	
+	
+	
+	
+
+
 class _Translations:
 	var scripts : Array = [
 		
@@ -9953,12 +10567,11 @@ class _WebTranslate:
 	func __webtranslate_reset_by_file_check(file_check: String) -> bool:
 		var did = false
 		var folder_to_delete = ""
-		var pointers:HevLibPointers = non_static["pointers"]
-		var files = pointers.FolderAccess.__fetch_folder_files("user://cache/.HevLib_Cache/WebTranslate/", true, true)
-		for file in files:
+		var pointers:HevLibPointers._FolderAccess = non_static["pointers"].FolderAccess
+		for file in pointers.__fetch_folder_files("user://cache/.HevLib_Cache/WebTranslate/", true, true):
 			if not file.ends_with("/"):
 				continue
-			var cFiles = pointers.FolderAccess.__fetch_folder_files(file, false, true)
+			var cFiles = pointers.__fetch_folder_files(file, false, true)
 			for f in cFiles:
 				if not f.ends_with(".file_check_cache"):
 					continue
@@ -9971,7 +10584,7 @@ class _WebTranslate:
 				else:
 					continue
 		if folder_to_delete:
-			did = pointers.FolderAccess.__recursive_delete(folder_to_delete)
+			did = pointers.__recursive_delete(folder_to_delete)
 		return did
 	
 	func __webtranslate_timed(URL: String, MINUTES_DELAY: int, fallback: Array = [], file_check: String = ""):
