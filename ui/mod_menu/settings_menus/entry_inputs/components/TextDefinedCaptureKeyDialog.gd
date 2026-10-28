@@ -130,25 +130,25 @@ func _input(event):
 	if capturing:
 		if (event is InputEventKey or event is InputEventMouseButton) and event.is_pressed():
 			get_tree().set_input_as_handled()
-			var key = eventToString(event)
+			var key:String = eventToString(event)
 			if event is InputEventKey and event.scancode == KEY_ESCAPE:
 				stopCapturing()
 			else:
 				stopCapturing()
-				var ent = pointers.ConfigDriver.__get_value(mod,section,action)
-				if not ent.has(key):
+				var ent:Array = pointers.ConfigDriver.__get_value(mod,section,action)
+				if not key in ent:
 					ent.append(key)
 					pointers.ConfigDriver.__store_value(mod,section,action,ent)
 					remakeActionButtons()
 		elif (event is InputEventJoypadButton or event is InputEventJoypadMotion) and event.is_pressed():
 			get_tree().set_input_as_handled()
-			var key = joyEventToString(event)
+			var key:String = joyEventToString(event)
 			if event is InputEventJoypadButton and event.button_index == JOY_BUTTON_11:
 				stopCapturing()
 			else:
 				stopCapturing()
-				var ent = pointers.ConfigDriver.__get_value(mod,section,action)
-				if not ent.has(key):
+				var ent:Array = pointers.ConfigDriver.__get_value(mod,section,action)
+				if not key in ent:
 					ent.append(key)
 					pointers.ConfigDriver.__store_value(mod,section,action,ent)
 					remakeActionButtons()
