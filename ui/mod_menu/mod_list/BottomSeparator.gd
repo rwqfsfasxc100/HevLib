@@ -45,11 +45,8 @@ func modify():
 	var pos = get_parent().get_child_count()
 	get_parent().call_deferred("move_child",self,pos)
 	if close_button:
-		var stPos = get_position_in_parent()
-		var posr = range(stPos)
-		posr.invert()
-		for i in posr:
-			var node = get_parent().get_child(i)
+		for i in range(get_position_in_parent(),0,-1):
+			var node:Node = get_parent().get_child(i)
 			if node.has_method("get_focusable"):
 				var foc = node.get_focusable()
 				if foc:
