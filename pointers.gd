@@ -82,6 +82,7 @@ var Classes = {
 	"RingInfo":RingInfo,
 	"RPC":RPC,
 	"TimeAccess":TimeAccess,
+	"Tokenizer":Tokenizer,
 	"Translations":Translations,
 	"WebTranslate":WebTranslate,
 	"Zip":Zip,
@@ -475,7 +476,7 @@ class _Achievements:
 				if a[1] == achievementID:
 					additional_stat_data = a[0]
 		
-		# If it's not a defined stat-based achievement, see if it's a stat not defined in the 
+		# If it's not a defined stat-based achievement, see if it's a stat not defined in the
 		# achievements script and set the stat and limit appropriately
 		if not stat:
 			if achievementID in annoyingAsFuckAchievements:
@@ -530,8 +531,6 @@ class _Achievements:
 			percent = count/size
 		return percent * 100.0
 	
-	
-	
 	# Fetches the current cache for achievements
 	static func __get_current_achievements() -> Dictionary:
 		return currentAchievementCache
@@ -567,7 +566,7 @@ class _Achievements:
 		currentAchievementCache["unlockedAchievements"] = unlockedAchievements
 		currentAchievementCache["lockedAchievements"] = lockedAchievements
 		currentAchievementCache["stats"] = stats
-	
+
 	# Gets the Steam singleton node
 	func getSteamNode():
 		steam_node = Achivements.get_node("AchievementSteam")
@@ -582,7 +581,7 @@ class _Achievements:
 		if Engine.has_singleton("Steam"):
 			# If the game is running with Steam, get Steam singleton
 			getSteamNode()
-		
+	
 	
 	# Handles all netdata for the achievement fetching
 	func out(result, response_code, headers, body):
@@ -594,7 +593,7 @@ class _Achievements:
 					completionCache[dic.get("name")] = dic.get("percent")
 		http.disconnect("request_completed",self,"out")
 		pointers.Scripting.log_essential_info_for_bugreports()
-
+	
 class _ConfigDriver:
 	var scripts : Array = [
 		
@@ -787,7 +786,7 @@ class _ConfigDriver:
 	static func l(text:String,header:String = "pointers.ConfigDriver"):
 		non_static["pointers"].l(text,header)
 	
-	# Signals used for 
+	# Signals used for
 	signal config_changed()
 	signal input_changed()
 	
@@ -833,11 +832,10 @@ class _ConfigDriver:
 			section = __truncate_section(section)
 			var sect_name : String = mod_id + "/" + section
 			# Gets the data within this specific configuration
-			var sect_data = configuration[section]
-			
+			var sect_data:Dictionary = configuration[section]
 			if not sect_name in settings.keys():
 				# Implies a new section is being added,
-				# automatically marks for an update 
+				# automatically marks for an update
 				settings[sect_name] = {}
 				made_change = true
 			# Iterates through the section entries
@@ -905,7 +903,7 @@ class _ConfigDriver:
 	static func __get_config(mod_id, cfg_filename : String = "Mod_Configurations" + ".cfg") -> Dictionary:
 		var dictionary : Dictionary = {}
 		# Formats the mod_id to be valid for configs.
-		# This removes forward slashes and spaces 
+		# This removes forward slashes and spaces
 		mod_id = __truncate_mod_id(mod_id)
 		var settings:Dictionary = non_static["self"].settings
 		if non_static["self"].settingsHash:
@@ -1050,7 +1048,7 @@ class _ConfigDriver:
 		dir.make_dir_recursive(keybinds_cache)
 		# Stores default binds
 		# I don't remember why I cache this, although since the MultiBinds
-		# project is on hold, might be for something I never wrote down 
+		# project is on hold, might be for something I never wrote down
 		var pointers:HevLibPointers = non_static["pointers"]
 		var file:File = File.new()
 		file.open(keybinds_cache + "defined_control_configs.json",File.WRITE)
@@ -1091,7 +1089,7 @@ class _ConfigDriver:
 					c.load(profiles_dir + m)
 					# Gets this file's profile
 					if desired_profile == c.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name"):
-						# Copies the currently open config if it matches the desired profile 
+						# Copies the currently open config if it matches the desired profile
 						dir.copy(profiles_dir + m,cfg_file)
 						profile_is_current = true
 					c.clear()
@@ -1241,7 +1239,7 @@ class _ConfigDriver:
 							_:
 								if "default" in key_data.keys():
 									current_config[sect][key] = key_data["default"]
-								
+		
 		if not "profile_name" in current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",{}):
 			current_config["HevLib/HEVLIB_CONFIG_SECTION_DRIVERS"]["profile_name"] = "Default"
 		for section in current_config.keys():
@@ -1279,7 +1277,7 @@ class _ConfigDriver:
 							actionList.append(key)
 						else:pointers.l("Input key [%s] already exists, skipping" % key,"pointers.ConfigDriver")
 						pointers.Keymapping.__load_input_data(key,p,pointers.Keymapping.__get_opts_from_key_data(key_data))
-		
+	
 	
 	static func __get_minmax_string_from_dict(requirement:Dictionary) -> String:
 		var MID:String = requirement.get("mod_id","")
@@ -1362,7 +1360,7 @@ class _ConfigDriver:
 					l("Adding input event [%s] for [%s]" % [i,key],"pointers.ConfigDriver")
 					InputMap.action_add_event(key, event)
 				else:l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.ConfigDriver")
-				
+			
 			else:
 				var event:InputEventKey = InputEventKey.new()
 				event.scancode = OS.find_scancode_from_string(i)
@@ -1370,7 +1368,7 @@ class _ConfigDriver:
 					l("Adding input event [%s] for [%s]" % [i,key],"pointers.ConfigDriver")
 					InputMap.action_add_event(key, event)
 				else:l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.ConfigDriver")
-		
+	
 	static func set_button_focus(button,check_button):
 		var parent = button.get_parent()
 		var children = parent.get_children()
@@ -1575,7 +1573,7 @@ class _ConfigDriver:
 			if do:
 				subscriptions[top][setting].append([object,method])
 		else:l("node %s does not have the method '%s'" % [str(object),method])
-		
+	
 	
 	static func __disconnect_subscription(method: String,object: Object,id: String,section: String,setting: String):
 		var top : String = __truncate_to_setting_entry(id,section)
@@ -1668,10 +1666,8 @@ class _ConfigDriver:
 			for key in keys.keys():
 				cfg.set_value(section,key,keys[key])
 		cfg.save(filepath)
-	
-	
-	
-	
+
+
 class _DataFormat:
 	var scripts : Array = [
 		
@@ -2154,7 +2150,7 @@ class _DataFormat:
 		for i in pathway[1]:
 			dict[i] = l.get(i)
 		return dict
-		
+	
 	const function_prefixes = PoolStringArray(["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func "])
 	const all_prefixes = PoolStringArray(["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func ","onready ","var ","signal ","const ","export ","extends "])
 	static func __trim_scripts(file_path : String, get_detailed_operands : bool = false, trim_unnecessary_newlines : bool = false, recurse_through_base_scripts : bool = true):
@@ -2366,7 +2362,6 @@ class _DataFormat:
 		csk.append(shash)
 		return out
 	
-	
 	static func __compile_script_object(source_code : String, params = [],new_object : bool = false) -> Script:
 		if not params is Array:
 			params = [params]
@@ -2379,7 +2374,6 @@ class _DataFormat:
 		if not new_object and shash in csosk:
 			l("Fetching from cache")
 			return compiled_script_object_storage[shash]
-		
 		var gd:GDScript = GDScript.new()
 		gd.set_source_code(source_code)
 		gd.reload()
@@ -2528,7 +2522,7 @@ class _DataFormat:
 		var shash:int = hash(string + str(constant))
 		if shash in vhk:
 			return var_hash[shash]
-		var header : String 
+		var header : String
 		if constant:
 			header = "extends Reference\nconst VARIABLE = "
 		else:
@@ -2562,7 +2556,6 @@ class _DataFormat:
 		if not Tool.ovnolock(last_load[0]):
 			last_load[0] = null
 		return last_load[0]
-	
 	
 	static func __is_valid_url(URL:String) -> bool:
 		return non_statics["urlRegex"].search(URL) != null
@@ -2682,7 +2675,6 @@ class _DataFormat:
 						l = "PoolVector2Array(%s)"
 					TYPE_VECTOR3_ARRAY:
 						l = "PoolVector3Array(%s)"
-					
 				if property.empty():
 					if type == TYPE_ARRAY:
 						out = "[]"
@@ -2919,7 +2911,6 @@ class _DataFormat:
 			buffer.append(first)
 		return buffer
 
-
 class _DriverManagement:
 	var scripts : Array = [
 		
@@ -2964,7 +2955,6 @@ class _DriverManagement:
 			}
 		}
 	
-	
 	const non_static = {}
 	func _init(f):
 		non_static["pointers"] = f
@@ -3003,16 +2993,12 @@ class _DriverManagement:
 			if not id:
 				continue
 			this_mod_data["id"] = id
-			
 			this_mod_data["priority"] = mrv.get("modlet_priority",0)
-			
 			this_mod_data["drivers"] = __get_drivers_from_modmain_path(modmain_path,false,manifest_ver >= 2.3)
-			
 			this_mod_data["mod_directory"] = modFolder
 			if this_mod_data["drivers"]:
 				if (not get_ids) or (get_ids and id in get_ids):
 					mod_drivers.append(this_mod_data)
-		
 		mod_drivers.sort_custom(base,"compare_driver_dictionaries")
 		return mod_drivers.duplicate(true)
 	
@@ -3021,12 +3007,10 @@ class _DriverManagement:
 		var bPrio:int = b.get("priority",0)
 		if aPrio != bPrio:
 			return aPrio < bPrio
-		
 		var aPath : String = a.get("mod_directory","")
 		var bPath : String = b.get("mod_directory","")
 		if aPath != bPath:
 			return aPath < bPath
-
 		return false
 	
 	const driver_get_cache : Dictionary = {}
@@ -3071,19 +3055,17 @@ class _DriverManagement:
 			dgck.append(file_path)
 		return driver_get_cache[file_path].duplicate(true)
 	
-	
-	
 	static func __is_driver_file(file_path:String) -> bool:
 		var fext:String = file_path.get_extension()
 		if(fext in driver_ext and file_path.get_base_dir().split("/")[-1] + "/" in driver_dirs and not non_static["regex"].search(file_path.get_file().rstrip("." + fext))):
 			return true
 		return false
-	
 
 class _Equipment:
 	var scripts : Array = [
 		
 	]
+	
 	static func get_class_documentation():
 		return {
 			"description":"Contains internal methods used for creating equipment scenes. Use at your own discretion",
@@ -3122,7 +3104,7 @@ class _Equipment:
 	var slot_types : PoolStringArray = vanilla_data.slot_types
 	var slot_defaults : Dictionary = vanilla_data.slot_defaults
 	var vanilla_equipment_defaults_for_reference : Dictionary = vanilla_data.vanilla_equipment_defaults_for_reference
-
+	
 	var file:File = File.new()
 	
 	var pointers:HevLibPointers
@@ -3185,10 +3167,8 @@ class _Equipment:
 	var validation_check_path:String = "user://cache/.HevLib_Cache/SafeMode/recache_validation.json"
 	
 	func __make_upgrades_scene():
-		
 		var exhaust_cache_path : String = "user://cache/.HevLib_Cache/AuxAndThrusterDriver/"
 		pointers.FolderAccess.__check_folder_exists(exhaust_cache_path)
-		
 		version = pointers.DataFormat.__get_vanilla_version()
 		pointers.l("observed game version of %d.%d.%d" % Array(version),"pointers.Equipment")
 		
@@ -3463,12 +3443,10 @@ class _Equipment:
 						for order in PoolStringArray(constants.get("SLOT_ORDER",PoolStringArray())):
 							if not order in equipment_slot_order:
 								equipment_slot_order.append(order)
-						
 						var orders2 : Dictionary = constants.get("SLOT_ORDER_RELATIVE",{})
 						for order in orders2:
 							if not order in relative_equipment_slot_order:
 								relative_equipment_slot_order[order] = orders2[order]
-						
 					"SLOT_TAGS.gd":
 						SLOT_TAGS.append(constants.get("SLOT_TAGS",{}))
 					"AUX_POWER_SLOT.gd","THRUSTERS.gd","AUX_POWER_AND_THRUSTERS.gd":
@@ -3476,73 +3454,65 @@ class _Equipment:
 							var equipment : Dictionary = constants.get(item)
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								AUX_POWER_AND_THRUSTERS.append(equipment)
-
 					"MODIFY_INTERNALS.gd":
-						if "MODIFY_INTERNALS" in constKeys:
-							var pdata : Array = constants.MODIFY_INTERNALS
-							
-							for item in pdata:
-								if pointers.ConfigDriver.__validate_dictionary(item,false):
-									var listingSystemName : String = item.get("system","SYSTEM_MISSING_NAME")
-									if not listingSystemName in processed_storage_systems:
-										processed_storage_systems.append(listingSystemName)
-									if not listingSystemName in processed_storage_mods:
-										processed_storage_mods[listingSystemName] = []
-									var ls : Dictionary = {}
-									
-									for data in item:
-										match data:
-											"force_type","specific_ship":
-												ls[data] = str(item[data])
-											"recurse_to_variants":
-												ls[data] = bool(item[data])
-											"mass_per_tonne_of_processed_ore","mass_per_crew_member","mass","crew_morale","storage_flat","nano_speed_add","ammo_speed_add","mass_per_tonne_storage_added","mass_per_tonne_total_storage_added","minimum_propellant_utilization_for_reduction","minimum_nano_utilization_for_reduction","minimum_ammo_utilization_for_reduction","emp_shielding":
-												ls[data] = float(item[data])
-											"crew_count":
-												ls[data] = int(item[data])
-											"storage_ammo","storage_ammunition":
-												ls["storage_ammo"] = float(item[data])
-											"storage_nano","storage_nanodrones":
-												ls["storage_nano"] = float(item[data])
-											"storage_propellant","storage_prop":
-												ls["storage_propellant"] = float(item[data])
-											"display_system":
-												var val : Dictionary = item["display_system"]
-												ls["display_system"] = {
-													"name":val.get("name",""),
-													"can_display_multiple":val.get("can_display_multiple",false),
-													"power":val.get("power",0.0),
-													"status":val.get("status",100.0),
-													"affect_inspection":val.get("affect_inspection",false)
-												}
-									if "storage_multi_upper" in item or "storage_multi_lower" in item:
-										ls["storage_multi"] = float(item.get("storage_multi_upper",1.0))/float(item.get("storage_multi_lower",1.0))
-									if "ammo_multi_upper" in item or "ammo_multi_lower" in item:
-										ls["ammo_multi"] = float(item.get("ammo_multi_upper",1.0))/float(item.get("ammo_multi_lower",1.0))
-									if "nano_multi_upper" in item or "nano_multi_lower" in item:
-										ls["nano_multi"] = float(item.get("nano_multi_upper",1.0))/float(item.get("nano_multi_lower",1.0))
-									if "propellant_multi_upper" in item or "propellant_multi_lower" in item:
-										ls["propellant_multi"] = float(item.get("propellant_multi_upper",1.0))/float(item.get("propellant_multi_lower",1.0))
-									if "mass_multi_upper" in item or "mass_multi_lower" in item:
-										ls["mass_multi"] = float(item.get("mass_multi_upper",1.0))/float(item.get("mass_multi_lower",1.0))
-									if "ammo_speed_multi_upper" in item or "ammo_speed_multi_lower" in item:
-										ls["ammo_speed_multi"] = float(item.get("ammo_speed_multi_upper",1.0))/float(item.get("ammo_speed_multi_lower",1.0))
-									if "nano_speed_multi_upper" in item or "nano_speed_multi_lower" in item:
-										ls["nano_speed_multi"] = float(item.get("nano_speed_multi_upper",1.0))/float(item.get("nano_speed_multi_lower",1.0))
-									if "emp_scale_multi_upper" in item or "emp_scale_multi_lower" in item:
-										ls["emp_scale_multi"] = float(item.get("emp_scale_multi_upper",1.0))/float(item.get("emp_scale_multi_lower",1.0))
-									
-									processed_storage_mods[listingSystemName].append(ls)
+						for item in constants.get("MODIFY_INTERNALS",[]):
+							if pointers.ConfigDriver.__validate_dictionary(item,false):
+								var listingSystemName : String = item.get("system","SYSTEM_MISSING_NAME")
+								if not listingSystemName in processed_storage_systems:
+									processed_storage_systems.append(listingSystemName)
+								if not listingSystemName in processed_storage_mods:
+									processed_storage_mods[listingSystemName] = []
+								var ls : Dictionary = {}
+								for data in item:
+									match data:
+										"force_type","specific_ship":
+											ls[data] = str(item[data])
+										"recurse_to_variants":
+											ls[data] = bool(item[data])
+										"mass_per_tonne_of_processed_ore","mass_per_crew_member","mass","crew_morale","storage_flat","nano_speed_add","ammo_speed_add","mass_per_tonne_storage_added","mass_per_tonne_total_storage_added","minimum_propellant_utilization_for_reduction","minimum_nano_utilization_for_reduction","minimum_ammo_utilization_for_reduction","emp_shielding":
+											ls[data] = float(item[data])
+										"crew_count":
+											ls[data] = int(item[data])
+										"storage_ammo","storage_ammunition":
+											ls["storage_ammo"] = float(item[data])
+										"storage_nano","storage_nanodrones":
+											ls["storage_nano"] = float(item[data])
+										"storage_propellant","storage_prop":
+											ls["storage_propellant"] = float(item[data])
+										"display_system":
+											var val : Dictionary = item["display_system"]
+											ls["display_system"] = {
+												"name":val.get("name",""),
+												"can_display_multiple":val.get("can_display_multiple",false),
+												"power":val.get("power",0.0),
+												"status":val.get("status",100.0),
+												"affect_inspection":val.get("affect_inspection",false)
+											}
+								if "storage_multi_upper" in item or "storage_multi_lower" in item:
+									ls["storage_multi"] = float(item.get("storage_multi_upper",1.0))/float(item.get("storage_multi_lower",1.0))
+								if "ammo_multi_upper" in item or "ammo_multi_lower" in item:
+									ls["ammo_multi"] = float(item.get("ammo_multi_upper",1.0))/float(item.get("ammo_multi_lower",1.0))
+								if "nano_multi_upper" in item or "nano_multi_lower" in item:
+									ls["nano_multi"] = float(item.get("nano_multi_upper",1.0))/float(item.get("nano_multi_lower",1.0))
+								if "propellant_multi_upper" in item or "propellant_multi_lower" in item:
+									ls["propellant_multi"] = float(item.get("propellant_multi_upper",1.0))/float(item.get("propellant_multi_lower",1.0))
+								if "mass_multi_upper" in item or "mass_multi_lower" in item:
+									ls["mass_multi"] = float(item.get("mass_multi_upper",1.0))/float(item.get("mass_multi_lower",1.0))
+								if "ammo_speed_multi_upper" in item or "ammo_speed_multi_lower" in item:
+									ls["ammo_speed_multi"] = float(item.get("ammo_speed_multi_upper",1.0))/float(item.get("ammo_speed_multi_lower",1.0))
+								if "nano_speed_multi_upper" in item or "nano_speed_multi_lower" in item:
+									ls["nano_speed_multi"] = float(item.get("nano_speed_multi_upper",1.0))/float(item.get("nano_speed_multi_lower",1.0))
+								if "emp_scale_multi_upper" in item or "emp_scale_multi_lower" in item:
+									ls["emp_scale_multi"] = float(item.get("emp_scale_multi_upper",1.0))/float(item.get("emp_scale_multi_lower",1.0))
+								
+								processed_storage_mods[listingSystemName].append(ls)
 					"NODE_DEFINITIONS.gd":
-						
 						for item in constKeys:
 							node_definitions_cache[item] = constants[item]
-							
 					"SHIP_NODE_REGISTER.gd":
 						for item in constKeys:
 							ship_node_register.append(constants[item])
 					"SHIP_NODE_MODIFY.gd":
-						
 						for item in constKeys:
 							var ship : String = constants[item].get("ship_name","")
 							if not ship.empty():
@@ -3550,24 +3520,19 @@ class _Equipment:
 									ship_node_modify[ship] = []
 								for modification in constants[item].get("modifications",[]):
 									ship_node_modify[ship].append(modification)
-						
 					"SHIP_THRUSTER_COLORS.gd":
 						var cd : Dictionary = constants.get("SHIP_THRUSTER_COLORS",{})
-						if cd.size() > 0:
-							
-							for ship in cd:
-								if not ship in ship_thruster_colors:
-									ship_thruster_colors[ship] = {"node":{},"type":{}}
-								if "type" in cd[ship]:
-									ship_thruster_colors[ship]["type"].merge(cd[ship]["type"],true)
-								if "node" in cd[ship]:
-									ship_thruster_colors[ship]["node"].merge(cd[ship]["node"],true)
-								if "recurse_to_variants" in cd[ship]:
-									ship_thruster_colors[ship]["recurse_to_variants"] = cd[ship]["recurse_to_variants"]
-								if "config" in cd[ship]:
-									ship_thruster_colors[ship]["config"] = cd[ship]["config"]
-								
-
+						for ship in cd.keys():
+							if not ship in ship_thruster_colors:
+								ship_thruster_colors[ship] = {"node":{},"type":{}}
+							if "type" in cd[ship]:
+								ship_thruster_colors[ship]["type"].merge(cd[ship]["type"],true)
+							if "node" in cd[ship]:
+								ship_thruster_colors[ship]["node"].merge(cd[ship]["node"],true)
+							if "recurse_to_variants" in cd[ship]:
+								ship_thruster_colors[ship]["recurse_to_variants"] = cd[ship]["recurse_to_variants"]
+							if "config" in cd[ship]:
+								ship_thruster_colors[ship]["config"] = cd[ship]["config"]
 					"WEAPONSLOT_ADD.gd":
 						for item in constKeys:
 							var equipment : Dictionary = constants.get(item)
@@ -3607,11 +3572,9 @@ class _Equipment:
 													weaponslot_modify_templates[template][datapoint].append({"property":key,"value":data_formatted.get(key)})
 							else:
 								weaponslot_modify_templates[template] = ar.get(template)
-						
 					"WEAPONSLOT_MODIFY.gd":
 						var ar:Dictionary = constants.get("WEAPONSLOT_MODIFY",{})
-						
-						for item in ar:
+						for item in ar.keys():
 							if not item in ws_equipment_names:
 								ws_equipment_names.append(item)
 							if item in weaponslot_modify_standalone:
@@ -3637,11 +3600,9 @@ class _Equipment:
 								weaponslot_modify_standalone[item] = processed
 							else:
 								weaponslot_modify_standalone[item] = ar[item]
-							
-						
 					"WEAPONSLOT_SHIP_TEMPLATES.gd":
 						var ar : Dictionary = constants.get("WEAPONSLOT_SHIP_TEMPLATES",{})
-						for ship in ar:
+						for ship in ar.keys():
 							var shipdata : Dictionary = ar[ship]
 							if ship in weaponslot_ship_templates:
 								for slot in shipdata:
@@ -3674,17 +3635,15 @@ class _Equipment:
 										weaponslot_ship_templates[ship][slot] = shipdata.get(slot)
 							else:
 								weaponslot_ship_templates[ship] = shipdata
-						
 					"WEAPONSLOT_SHIP_MODIFY.gd":
-						var ar = constants.get("WEAPONSLOT_SHIP_MODIFY",{})
-						for ship in ar:
+						var ar:Dictionary = constants.get("WEAPONSLOT_SHIP_MODIFY",{})
+						for ship in ar.keys():
 							var slots : Dictionary = ar[ship]
 							for slot in slots:
 								var equipment = slots[slot]
 								for item in equipment:
 									if not item in ws_equipment_names:
 										ws_equipment_names.append(item)
-							
 							var shipdata : Dictionary = ar.get(ship)
 							if ship in weaponslot_ship_standalone:
 								for slot in shipdata:
@@ -3719,10 +3678,8 @@ class _Equipment:
 										weaponslot_ship_standalone[ship][slot] = shipdata.get(slot)
 							else:
 								weaponslot_ship_standalone[ship] = shipdata
-						
 					"SAVE_BUTTONS.gd":
-						var ar : Array = constants.get("SAVE_BUTTONS",[])
-						for button in ar:
+						for button in constants.get("SAVE_BUTTONS",[]):
 							if pointers.ConfigDriver.__validate_dictionary(button,false):
 								save_button_cache.append(button)
 					"ADD_SHIPS.gd":
@@ -3732,7 +3689,7 @@ class _Equipment:
 								add_ships_store.append(ac)
 					"MODIFY_SHIP_BUILDS.gd":
 						for ar in constKeys:
-							var sorting = {}
+							var sorting:Dictionary = {}
 							var dict : Dictionary = constants[ar]
 							if pointers.ConfigDriver.__validate_dictionary(dict):
 								var shipNames = dict.get("ship_name",[])
@@ -3748,7 +3705,7 @@ class _Equipment:
 									TYPE_STRING_ARRAY:
 										pass
 									_: continue
-								var recurse = dict.get("recurse_for_alias",false)
+								var recurse:bool = dict.get("recurse_for_alias",false)
 								for entry in dict:
 									match entry:
 										"if_equipment_in_slot","if_tag_in_slot","random","if_equipment","if_tag","check_numerics","config":
@@ -3777,7 +3734,6 @@ class _Equipment:
 														i["ship_name"] = shipName
 														for _r in i.get("weight",1):
 															sorting[prio].append(i.duplicate(true))
-							
 							var sKeys:Array = sorting.keys()
 							sKeys.sort()
 							for o in sKeys:
@@ -3803,36 +3759,29 @@ class _Equipment:
 									modify_ship_numerics[ship] = []
 								modify_ship_numerics[ship].append(di)
 					"NAMER.gd":
-						
 						if "CREW" in constKeys:
 							var d : Array = constants["CREW"]
 							namer_store["crew"].append_array(d)
-						
 						if "SHIPS" in constKeys:
 							var d : Array = constants["SHIPS"]
 							namer_store["ships"].append_array(d)
-						
 						if "REMOVE_CREW" in constKeys:
 							var d : Array = constants["REMOVE_CREW"]
 							namer_store["remove_crew"].append_array(d)
-						
 						if "REMOVE_SHIPS" in constKeys:
 							var d : Array = constants["REMOVE_SHIPS"]
 							namer_store["remove_ships"].append_array(d)
-						
 					"EVENT_DRIVER.gd":
 						for entry in constKeys:
 							event_driver_event_entries.append(constants[entry])
-					
 					"RESEARCH.gd":
 						for entry in constKeys:
 							if not mod_id in research_store:
 								research_store[mod_id] = {}
 							research_store[mod_id][entry] = constants[entry]
-					
 					"RPC_EXTRA_STATES.gd":
 						var data:Dictionary = constants.get("RPC_EXTRA_STATES",{})
-						for type in data:
+						for type in data.keys():
 							if type in rpc_second_state_store:
 								var states:Array = Array()
 								for item in data[type]:
@@ -3887,11 +3836,9 @@ class _Equipment:
 											else: continue
 									states.append(item)
 								rpc_second_state_store[type].append_array(states)
-					
 					"SERVICES.gd":
 						for i in constants["SERVICES"]:
 							services_store.append(i)
-		
 		var slots_for_adding_dict : Dictionary = {}
 		var tag_modifications : Array = []
 		
@@ -4021,8 +3968,7 @@ class _Equipment:
 			if vslot_subtractives:
 				vslot_data["override_subtractive"] = vslot_subtractives
 			vanilla_equipment_defaults_for_reference[slot] = vslot_data
-			
-			
+		
 		for slot in all_slot_node_names:
 			if slot in vedfrKeys:
 				var data : Dictionary = vanilla_equipment_defaults_for_reference[slot]
@@ -4056,7 +4002,6 @@ class _Equipment:
 					slot_allowed_equipment[slot] = PoolStringArray(items)
 				else:
 					slot_allowed_equipment[slot] = PoolStringArray(slot_defaults.get(slot_type,PoolStringArray()))
-		
 		
 		var equipment_format : PoolStringArray = PoolStringArray()
 		for st in sfaKeys:
@@ -4096,8 +4041,6 @@ class _Equipment:
 							if not string in equipment_format:
 								equipment_format.append(string)
 		
-		
-		
 		var concat : String = """[gd_scene load_steps=6 format=2]
 
 [ext_resource path=\"res://enceladus/Upgrades.tscn\" type=\"PackedScene\" id=1]
@@ -4123,7 +4066,6 @@ script = ExtResource( 5 )"""
 		var equipment_header_noref : String = "[node name=\"%s\" parent=\"%s\"]"
 		var equipment_editable_path_base : String = "[editable path=\"%s\"]"
 		
-		
 		var weaponslot_string : String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://weapons/WeaponSlot.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"WeaponSlot\" instance=ExtResource( 1 )]"
 		var ws_editable_paths : String = ""
 		var weaponslot_properties : Dictionary = {}
@@ -4132,9 +4074,6 @@ script = ExtResource( 5 )"""
 		for i in all_slot_node_names:
 			if not i in all_slot_types:
 				all_slot_types[i] = slots_for_adding_dict[i].get("system_slot","")
-		
-		
-		
 		
 		for add in WEAPONSLOT_ADD:
 			if pointers.ConfigDriver.__validate_dictionary(add,false):
@@ -4222,7 +4161,6 @@ script = ExtResource( 5 )"""
 					auxslot_data[slot] = []
 				auxslot_data[slot].append(data)
 			
-			
 			var aux_path : String = data.get("path","")
 			var aux_type : String = data.get("type","MPDG").to_upper()
 			match aux_type:
@@ -4236,18 +4174,13 @@ script = ExtResource( 5 )"""
 						continue
 					var sys : String = data.get("system","SYSTEM_NAME_MISSING")
 					var auxTypePath : String = exhaust_cache_path + aux_type
-					
 					pointers.FolderAccess.__check_folder_exists(auxTypePath)
-					
 					file.open(auxTypePath + "/" + sys + "_exhaust.tscn",File.WRITE)
 					file.store_string(make_exhaust_scene(data,sys))
 					file.close()
-					
 					file.open(auxTypePath + "/" + sys + "_thruster.tscn",File.WRITE)
 					file.store_string(make_thruster_scene(data,sys,aux_type,exhaust_cache_path))
 					file.close()
-					
-		
 		if ws_editable_paths:
 			weaponslot_string += "\n\n" + ws_editable_paths
 		
@@ -4271,9 +4204,9 @@ script = ExtResource( 5 )"""
 		file.open("user://cache/.HevLib_Cache/Variable_Fetch/ship_limitations.tscn",File.WRITE)
 		file.store_string(ship_limitation_string)
 		file.close()
-
+	
 	var tagged_vanilla_slots : PoolStringArray = PoolStringArray()
-
+	
 	const SLOT_HEADER = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\" instance=ExtResource( 2 )]"
 	
 	var generated_tex : Dictionary = {}
@@ -4287,7 +4220,6 @@ script = ExtResource( 5 )"""
 			filepath = pointers.FileAccess.__save_stex(pointers.FileAccess.__load_png(texturepath).get_data(),filepath)
 			generated_tex[texturepath] = filepath
 		return filepath
-	
 	
 	func make_thruster_scene(data,sys,aux_type,exhaust_cache_path) -> String:
 		var this_sys_path : String = exhaust_cache_path + aux_type + "/" + sys
@@ -4310,7 +4242,6 @@ script = ExtResource( 5 )"""
 		var ext_path_entry : String = "[ext_resource path=\"%s\" type=\"%s\" id=%d]"
 		
 		var ext_entries : Array = []
-		
 		
 		var thruster_vars : String = thruster_node_header
 		# Base thruster programming
@@ -4554,17 +4485,6 @@ script = ExtResource( 5 )"""
 		var flare_color:Color = Color(data.get("flare_color","3bafff"))
 		flare_vars += "\n" + "color = Color( %f , %f , %f , %f )" % [flare_color.r, flare_color.g, flare_color.b, flare_color.a]
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 		# Exhaust scene
 		var exhaust_path : String = "res://sfx/exhaust.tscn"
 		match data.get("exhaust_type",""):
@@ -4581,7 +4501,7 @@ script = ExtResource( 5 )"""
 		var exhaust_ext : String = ext_path_entry % [exhaust_path,"PackedScene",ext_path_counter]
 		ext_entries.append(exhaust_ext)
 		thruster_vars += "\n" + "exhaust = ExtResource( %d )" % ext_path_counter
-		
+
 		# Material
 		var material : String = "res://sfx/AddOnly.material"
 		if data.get("plume_has_material",true):
@@ -4622,7 +4542,6 @@ script = ExtResource( 5 )"""
 		ext_entries.append(flare_ext)
 		flare_vars += "\n" + "texture = ExtResource( %d )" % ext_path_counter
 		
-		
 		# Nozzle handles
 		var after_nozzles : Array = []
 		var before_nozzles : Array = []
@@ -4652,7 +4571,7 @@ script = ExtResource( 5 )"""
 			ext_entries.append_array(nz[2])
 			nozzle_groups.append(nz[0])
 			footer_groups.append(extra_nozzle_footer % nozzlename)
-			
+		
 		node_index += 1
 		var basenozzlename : String = "nozzle"
 		var baseheader : String = nozzle_header % node_index
@@ -4671,7 +4590,6 @@ script = ExtResource( 5 )"""
 			ext_entries.append_array(nz[2])
 			nozzle_groups.append(nz[0])
 			footer_groups.append(extra_nozzle_footer % nozzlename)
-			
 		
 		var nodes_to_add:PoolStringArray = PoolStringArray()
 		
@@ -4707,10 +4625,7 @@ script = ExtResource( 5 )"""
 		for i in footer_groups:
 			footer += "\n" + i
 		
-		var thruster_text : String = header_compile + thruster_vars + flare_vars + nozzle_compile + extra_node_compile + footer
-		
-		
-		return thruster_text
+		return header_compile + thruster_vars + flare_vars + nozzle_compile + extra_node_compile + footer
 	
 	func format_nozzle(nd:Dictionary,header:String,nozzlename:String,current_ext:int,cached_tex_path:String,ext_path_entry:String) -> Array:
 		var ext_entries : Array = []
@@ -4744,7 +4659,6 @@ script = ExtResource( 5 )"""
 		var normal_ext : String = ext_path_entry % [normalpath,"StreamTexture" if normalpath.ends_with(".stex") else "Texture",current_ext]
 		ext_entries.append(normal_ext)
 		nozzle_vars += "\n" + "normal_map = ExtResource( %d )" % current_ext
-		
 		
 		var offset = nd.offset
 		if offset is Vector2 or ((offset is Array or offset is PoolIntArray or offset is PoolRealArray) and offset.size() > 1):
@@ -4808,7 +4722,6 @@ script = ExtResource( 5 )"""
 			var heatnormal_ext : String = ext_path_entry % [heatnormalpath,"StreamTexture" if heatnormalpath.ends_with(".stex") else "Texture",current_ext]
 			ext_entries.append(heatnormal_ext)
 			nozzle_vars += "\n" + "normal_map = ExtResource( %d )" % current_ext
-		
 		
 		var heat_offset = nd.offset
 		if heat_offset is Vector2 or ((heat_offset is Array or heat_offset is PoolIntArray or heat_offset is PoolRealArray) and heat_offset.size() > 1):
@@ -4976,7 +4889,7 @@ script = ExtResource( 5 )"""
 		if sprite_scale is Vector2 or ((sprite_scale is Array or sprite_scale is PoolIntArray or sprite_scale is PoolRealArray) and sprite_scale.size() > 1):
 			exhaust_text += "\nscale = Vector2(%s,%s)" % [sprite_scale[0],sprite_scale[1]]
 		return exhaust_text
-
+	
 	func confirm_equipment(equipment_node, slot_type, slot_alignment, slot_restriction, slot_allowed_equipment) -> bool:
 		var e_slot_type : String = equipment_node.get("slot_type","")
 		var e_equipment : String = equipment_node.get("equipment_type","")
@@ -5002,7 +4915,7 @@ script = ExtResource( 5 )"""
 			else:
 				pointers.l(failtext)
 				return false
-			
+		
 		if e_slot_type == slot_type:
 			var passes_slot_check:bool = false
 			if e_equipment in slot_allowed_equipment:
@@ -5034,7 +4947,6 @@ script = ExtResource( 5 )"""
 									passes_slot_check = true
 							else:
 								passes_slot_check = true
-						
 						else:
 							passes_slot_check = true
 				else:
@@ -5212,9 +5124,6 @@ script = ExtResource( 5 )"""
 			}
 		
 		return [base, editable_path, dict]
-	
-	
-	
 
 class _Events:
 	var scripts : Array = [
@@ -5258,7 +5167,6 @@ class _Events:
 	func _init(p):
 		non_static["pointers"] = p
 	
-	
 	const busy = [false,null]
 	static func __spawn_event(event : String,ring : Node,parameters : Dictionary = {},delay_seconds = 0.0):
 		if not busy[0]:
@@ -5301,7 +5209,6 @@ class _Events:
 						var pos = getPos(parameters)
 						event_node.canBeAt(pos)
 						var oddity = event_node.makeAt(pos)
-						
 						var randomOddityKey = ""
 						if oddity:
 							ring.addNearbyOddity(event, oddity, pos)
@@ -5313,7 +5220,7 @@ class _Events:
 							ring.unspawnedOddities[randomOddityKey] = oddity
 							ring.unspawnedOdditiesLocation[randomOddityKey] = pos
 							pointers.n("force spawning oddity %s" % event,"pointers.EventDriver")
-				
+			
 			busy[0] = false
 	
 	static func __clear_event(event : String, ring, clear_related_poi : bool = true,clear_in_cargo : bool = false,delay_seconds : float = 0.0):
@@ -5333,7 +5240,7 @@ class _Events:
 						ring.all_oddities.erase(e)
 						Tool.release(e)
 						Tool.remove(e)
-						
+		
 		elif event in ring.group:
 			var events = ring.group[event]
 			if events:
@@ -5349,7 +5256,6 @@ class _Events:
 	static func getPos(params : Dictionary):
 		var x_direction = clamp(params.get("x_direction",rand_range( - 1, 1)),-1,1)
 		var y_direction = clamp(params.get("y_direction",rand_range( - 1, 1)),-1,1)
-		
 		var spawnDirectionScale = params.get("spawn_direction_scale",0.75)
 		var odditySpawnRadiusMin = params.get("oddity_spawn_radius_min",24000)
 		var odditySpawnRadiusMinCutscene = params.get("oddity_spawn_radius_min_cutscene",6000)
@@ -5359,7 +5265,6 @@ class _Events:
 		var odditySpawnRadiusSafemaxSteps = params.get("oddity_spawn_radius_safe_max_steps",40)
 		var focusObject = busy[1]
 		if Tool.claim(focusObject):
-			
 			var cutscene = ("cutscene" in focusObject and focusObject.cutscene) and ("fastTravelDirection" in focusObject and focusObject.fastTravelDirection < 0)
 			var focusPoint = focusObject.global_position
 			var randomVector = Vector2(x_direction,y_direction).normalized()
@@ -5381,6 +5286,7 @@ class _Events:
 			if object in focus.cargo:
 				return false
 		return true
+	
 	static func clear_poi_for(globalPos : Vector2,this_event: String):
 		var nearby = CurrentGame.getEventNear(CurrentGame.globalCoords(globalPos))
 		while nearby and nearby.event == this_event:
@@ -5390,7 +5296,6 @@ class _Events:
 				if ev.event == nearby.event and Vector2(ev.vector.x,ev.vector.y).distance_to(nearby.vector) < 2000:
 					CurrentGame.forgetPoi(event)
 			nearby = CurrentGame.getEventNear(CurrentGame.globalCoords(globalPos))
-	
 
 class _FileAccess:
 	var scripts : Array = [
@@ -5610,7 +5515,7 @@ class _FileAccess:
 						pointers.l(newmodmsg,"pointers.FileAccess")
 				print(exitMsg)
 				pointers.NodeAccess.__exit(true,exitMsg,"pointers.FileAccess")
-			
+	
 	static func __get_uid_of_file(file_path:String) -> String:
 		if not __file_exists(file_path):
 			return ""
@@ -5626,14 +5531,13 @@ class _FileAccess:
 		var out_path:String = "%s.stex" % file_path.get_basename()
 		var tmppng:String = "%s-tmp.png" % file_path
 		image.save_png(tmppng)
-		var file = File.new()
+		var file:File = File.new()
 		file.open(tmppng, File.READ)
 		var pnglen:int = file.get_len()
 		var pngdata:PoolByteArray = file.get_buffer(pnglen)
 		file.close()
 		Directory.new().remove(tmppng)
-		file.open(out_path, File.WRITE)
-		if file.is_open():
+		if file.open(out_path, File.WRITE) == OK:
 			file.store_8(0x47) # G
 			file.store_8(0x44) # D
 			file.store_8(0x53) # S
@@ -5660,8 +5564,8 @@ class _FileAccess:
 				return content.to_utf8()
 			TYPE_RAW_ARRAY:
 				return content
-			_:
-				non_static["pointers"].l("ERROR: content must be a String or PoolByteArray to be converted to buffer","pointers.FileAccess")
+			var tk:
+				non_static["pointers"].l("ERROR: content must be a String or PoolByteArray to be converted to buffer, is of type %d" % tk,"pointers.FileAccess")
 				return PoolByteArray()
 	
 	static func __file_exists(file_path:String) -> bool:
@@ -5706,11 +5610,6 @@ class _FileAccess:
 								_:dependencies.append(fn.strip_edges())
 					buffer += hexText.length() / 2.0
 		return dependencies
-	
-	
-	
-	
-	
 
 class _FolderAccess:
 	var scripts : Array = [
@@ -5933,8 +5832,6 @@ class _FolderAccess:
 		else:
 			pointers.NodeAccess.__exit(false,"CRITICAL ERROR! Cannot find the game's .PCK file, and is a likely indicator that your game is corrupted.\n\nPlease validate your game files. If this issue persists, please make a bug report at [https://forms.gle/RmC4Zgonp6frFgnK7] so this issue can be fixed as soon as possible.","pointers.FolderAccess",0.0,"",true)
 			return PoolStringArray()
-		
-	
 
 class _Github:
 	var scripts : Array = [
@@ -6002,7 +5899,6 @@ class _Github:
 		gitHubFS.nodeToReturnTo = node_to_return_to
 		gitHubFS.name = "git_release_" + str(rng.randi_range(1, 32767))
 		CRoot.call_deferred("add_child",gitHubFS)
-	
 
 class _HevLib:
 	var scripts : Array = [
@@ -6084,10 +5980,6 @@ class _HevLib:
 			functions[pointer] = methods
 		if return_JSON: return JSON.print(functions, "\t")
 		else:return functions
-	
-	
-	
-	
 
 class _Keymapping:
 	var scripts : Array = [
@@ -6128,7 +6020,7 @@ class _Keymapping:
 		file.close()
 		if not key in current:
 			current[key] = {"controls":controls,"opts":opts}
-
+		
 		file.open(keybind_folder + "defined_control_configs.json",File.WRITE)
 		file.store_string(JSON.print(current))
 		file.close()
@@ -6167,7 +6059,6 @@ class _Keymapping:
 				pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.Keymapping")
 				InputMap.action_add_event(key, event)
 			else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.Keymapping")
-
 		else:
 			var event = InputEventKey.new()
 			event.scancode = OS.find_scancode_from_string(i)
@@ -6189,7 +6080,6 @@ class _Keymapping:
 					if not ev in input_cache[ie]:
 						input_cache[ie].append(ev)
 		return input_cache.duplicate(true)
-		
 	
 	const formatted_vanilla_binds_store:Dictionary = {}
 	
@@ -6208,14 +6098,10 @@ class _Keymapping:
 			var missing = ""
 			for ie in vanilla_binds.keys():
 				if ie in current:
-					pass
-					
 					formatted_vanilla_binds_store[ie] = current[ie]
-					
 				else:
 					var sect = {"can_be_rebound":false,"inputs":[],"opts":{}}
 					var dv = vanilla_binds[ie]
-					
 					if ie in vopts:
 						sect["opts"] = vopts[ie].duplicate(true)
 					else:
@@ -6293,7 +6179,6 @@ class _Keymapping:
 			else:
 				var key = OS.find_scancode_from_string(event)
 				return key
-	
 	
 	static func __match_event_type(event):
 		var eventType = []
@@ -6380,7 +6265,6 @@ class _Keymapping:
 		var allow_extra_keys = key_data.get("allow_extra_keys",true) # Are additional keys allowed to be held to still activate the keybind
 		var order_sensitive = key_data.get("order_sensitive",true) # Defines if the keys have to be pressed in the order they were inputted
 		var exclusive = key_data.get("exclusive",false) # If true, then cancels other exclusive actions containing only part of the binds this action uses.
-		
 		var opts = {
 #			"activation":activation,
 #			"context":context,
@@ -6389,7 +6273,6 @@ class _Keymapping:
 			"order_sensitive":order_sensitive,
 			"exclusive":exclusive
 		}
-		
 		return opts
 	
 	static func __create_input_event(action: String, event: Array,opts:Dictionary):
@@ -6464,11 +6347,6 @@ class _Keymapping:
 							ie.axis_value = sig
 							InputMap.action_add_event(action,ie)
 #					breakpoint
-	
-	
-	
-	
-	
 
 class _ManifestV1:
 	var scripts : Array = [
@@ -6482,10 +6360,10 @@ class _ManifestV1:
 				"":{
 					"description":"",
 					"args":[
-						
+
 					],
 					"return":[
-						
+
 					]
 				},
 			}
@@ -6680,12 +6558,6 @@ class _ManifestV1:
 			return modData
 		else:
 			return null
-	
-	
-	
-	
-	
-	
 
 class _ManifestV2:
 	var scripts : Array = [
@@ -6909,6 +6781,7 @@ class _ManifestV2:
 		if a.get("zip_path","") != b.get("zip_path",""): return a.get("zip_path","") < b.get("zip_path","")
 		if a.get("name","") != b.get("name",""): return a.get("name","") < b.get("name","")
 		return false
+	
 	static func ovs2(a,b) -> bool:
 		if "id" in a and not "id" in b: return true
 		elif not "id" in a and "id" in b: return false
@@ -6998,7 +6871,7 @@ class _ManifestV2:
 						mod_version_metadata = "Manifest fault - Cannot determine mod type!"
 						manifest_data["version"]["version_metadata"] = "Manifest fault - Cannot determine mod type!"
 						mod_error = true
-					
+				
 				if ft.to_lower().begins_with("icon"):
 					if ft.get_extension().to_lower() in pointers.SUPPORTED_IMAGE_EXTENSIONS:
 						has_icon_file = true
@@ -7110,8 +6983,6 @@ class _ManifestV2:
 		if b1 != b2:
 			return b1 < b2
 		return false
-	
-	
 	
 	static func __compare_versions(checked_mod_data:Dictionary) -> bool:
 		var installed_mods : Dictionary = __get_mod_data()
@@ -7238,16 +7109,16 @@ class _ManifestV2:
 			"version_string":"1.0.0"
 		},
 		"tags":{
-			
+
 		},
 		"links":{
-			
+
 		},
 		"configs":{
-			
+
 		},
 		"languages":{
-			
+
 		},
 		"library":{
 			"is_library":false,
@@ -7383,7 +7254,7 @@ class _ManifestV2:
 							
 							if "handle_extra_crew" in current_tags:
 								dict_template["tags"]["TAG_HANDLE_EXTRA_CREW"] = {"type":"integer","value":manifest_data["tags"].get("handle_extra_crew")}
-							
+						
 						# links
 						if "links" in manifestKeys:
 							if typeof(manifest_data["links"].get("github","")) == TYPE_DICTIONARY:
@@ -7441,7 +7312,7 @@ class _ManifestV2:
 							dict_template["manifest_definitions"]["changelog_path"] = String(manifest_data["manifest_definitions"].get("changelog_path",""))
 							dict_template["manifest_definitions"]["modlet_priority"] = int(manifest_data["manifest_definitions"].get("modlet_priority",0))
 							dict_template["manifest_definitions"]["expected_manifest_path"] = String(manifest_data["manifest_definitions"].get("expected_manifest_path",""))
-							
+						
 						if "links" in manifestKeys:
 							var links = manifest_data["links"]
 							var ovLinks = {}
@@ -7475,7 +7346,7 @@ class _ManifestV2:
 						if "library" in manifestKeys:
 							dict_template["library"]["is_library"] = manifest_data["library"].get("is_library",false)
 							dict_template["library"]["always_display"] = manifest_data["library"].get("always_display",false)
-							
+						
 						if "configs" in manifestKeys:
 							var configs = manifest_data["configs"]
 							var ovConfigs = {}
@@ -7496,7 +7367,6 @@ class _ManifestV2:
 							if ovConfigs:
 								pointers.l("Parsed configs for %s, has disabled configs: [%s]" % [file_path,str(hash(configs) != hash(ovConfigs))],"pointers.ManifestV2")
 								dict_template["configs"] = ovConfigs
-				
 				
 				var version_metadata : String = dict_template["version"]["version_metadata"]
 				var version_string : String = str(dict_template["version"]["version_major"]) + "." + str(dict_template["version"]["version_minor"]) + "." + str(dict_template["version"]["version_bugfix"])
@@ -7547,7 +7417,7 @@ class _ManifestV2:
 								var td : Dictionary = tags[tag]
 								if "value" in td and "type" in td and typeof(td.type) == TYPE_STRING:
 									tag_data_cache[tag][id] = td["value"]
-		return tag_data_cache.duplicate(true) 
+		return tag_data_cache.duplicate(true)
 	
 	static func __get_mod_tags(mod_id: String) -> Dictionary:
 		var tag_dict : Dictionary = {}
@@ -7624,7 +7494,6 @@ class _ManifestV2:
 						dict[id] = sec[entry]
 			return_data = dict
 		return return_data
-		
 	
 	const caches_mod_ids : PoolStringArray = PoolStringArray()
 	var needs_mod_id_cache:bool = true
@@ -7827,7 +7696,6 @@ class _ManifestV2:
 						entry = entry.substr(0,entry.length() - 1)
 				cv[lastVer][index] = entry
 		
-		
 		var changelog : Dictionary = {}
 #		var versions : Array = c.get_sections()
 		var versions : Array = cv.keys()
@@ -7841,7 +7709,7 @@ class _ManifestV2:
 			var keys : Array = cv[version].keys()
 			keys.sort_custom(non_static["self"],"changelogKeySorter")
 			keys = filterChangelogs(keys)
-			
+
 			for key in keys:
 				var entry:String = str(cv[version][key])
 				var spacer:String = ""
@@ -8249,7 +8117,6 @@ class _ManifestV2:
 											t1 = false
 										elif a > b:
 											break
-									
 						has = t1
 				elif typeof(MDM) == TYPE_STRING and MDM and MDM in __get_mod_list_keys():
 					has = true
@@ -8259,8 +8126,6 @@ class _ManifestV2:
 		if mod_file_to_id_cache.empty():
 			__get_mod_data()
 		return mod_file_to_id_cache.get(file_path.to_lower(),"")
-	
-	
 
 class _Math:
 	var scripts : Array = [
@@ -8325,7 +8190,6 @@ class _Math:
 	const non_static = {}
 	func _init(p):
 		non_static["pointers"] = p
-	
 	
 	static func __rotate_point(point : Vector2, angle : float, degrees : bool = true) -> Vector2:
 		if degrees:angle = deg2rad(angle)
@@ -8399,8 +8263,6 @@ class _Math:
 				return converted
 			converted[r] = Vector2(float(aRaw),float(bRaw))
 		return converted
-	
-	
 
 class _NodeAccess:
 	var scripts : Array = [
@@ -8435,19 +8297,19 @@ class _NodeAccess:
 		if return_only_paths:
 			children = returnPaths(children, use_relative_paths, node)
 		return children
-
+	
 	static func getAllChildren(in_node:Node,arr : Array = []):
 		arr.push_back(in_node)
 		for child in in_node.get_children():
 			getAllChildren(child,arr)
-
+	
 	static func strip_node(in_node, arr):
 		var paths : Array = []
 		for m in arr:
 			if m.get_path().split(in_node.get_path())[1]:
 				paths.append(m)
 		return paths
-
+	
 	static func returnPaths(arr, relative, in_node):
 		var parentPath : String = in_node.get_path()
 		var paths : Array = []
@@ -8461,13 +8323,13 @@ class _NodeAccess:
 	static func __claim_child_ownership(node: Node):
 		for child in node.get_children():
 			setOwnership(child, node)
-
+	
 	static func setOwnership(current_node: Node,set_owner_node: Node):
 		current_node.set_owner(set_owner_node)
 		for child in current_node.get_children():
 			if not __is_instanced_from_scene(child.get_parent()):
 				setOwnership(child, set_owner_node)
-
+	
 	static func __is_instanced_from_scene(p_node):
 		return not p_node.filename.empty()
 	
@@ -8475,7 +8337,7 @@ class _NodeAccess:
 		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.FolderAccess.__check_folder_exists(folder_path)
 		var base:int = 24
-
+		
 		var test:Node = load("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn").instance()
 		var maximum:int = 0
 		for child in test.get_children():
@@ -8518,7 +8380,9 @@ class _NodeAccess:
 			if pointers.is_inside_tree():
 				yield(pointers.get_tree(),"idle_frame")
 			OS.kill(OS.get_process_id())
+	
 	const scene_extensions = PoolStringArray(["tscn","scn"])
+	
 	static func __save_node_to_scene(node:Node,file_path:String):
 		if not file_path.get_extension() in scene_extensions:
 			return
@@ -8526,8 +8390,6 @@ class _NodeAccess:
 		__claim_child_ownership(node)
 		if packed.pack(node) == OK:
 			ResourceSaver.save(file_path,packed)
-	
-	
 
 class _RingInfo:
 	var scripts : Array = [
@@ -8578,7 +8440,7 @@ class _RingInfo:
 		
 		var cx = (pos.x - floor(pos.x / pixelToKm) * pixelToKm) / pixelToKm
 		var cy = (pos.y - floor(pos.y / pixelToKm) * pixelToKm) / pixelToKm
-
+		
 		var pu = (p00 * (1 - cx) + p10 * (cx))
 		var pd = (p01 * (1 - cx) + p11 * (cx))
 		
@@ -8602,7 +8464,7 @@ class _RingInfo:
 		
 		var cx = fposmod(pos.x, 1)
 		var cy = fposmod(pos.y, 1)
-
+		
 		var pu = lerp(p00, p10, cx)
 		var pd = lerp(p01, p11, cx)
 		
@@ -8614,13 +8476,13 @@ class _RingInfo:
 		var p2 = __get_vein_pixel_at(pos / - 2531.0)
 		
 		var values = [p1.r, p1.g, p1.b, p1.a, p2.r, p2.b, p2.g, p2.a]
-			
+		
 		var total = 0
 		for n in CurrentGame.traceMinerals.size():
 			var tm = CurrentGame.traceMinerals[n]
 			values[n] = pow(values[n] / pow(CurrentGame.mineralPrices.get(tm, 1), 0.2), 4)
 			total += values[n]
-			
+		
 		var rnd = randf() * total
 		var nr = 0
 		for n in values:
@@ -8636,7 +8498,6 @@ class _RingInfo:
 	
 	static func get_raw_density_at(pos):
 		return __get_pixel_at(pos).b
-	
 
 class _RPC:
 	var scripts : Array = [
@@ -8813,7 +8674,6 @@ class _RPC:
 			update_timer.one_shot = true
 			update_timer.name = "UPDATE_TIMER"
 			update_timer.connect("timeout",base,"update_timer_finished")
-			
 			pointers.add_child(update_timer)
 			update_timer_finished()
 	
@@ -8869,12 +8729,11 @@ class _RPC:
 						current_details = "HEVLIB_DISCORDRPC_IN_SERVICES"
 					"research":
 						current_details = "HEVLIB_DISCORDRPC_IN_RESEARCH"
-				
+					
 			"title_screen":
 				current_icon = "empty"
 				current_details = "HEVLIB_DISCORDRPC_TITLE_SCREEN"
 				current_state = "HEVLIB_DISCORDRPC_TITLE_SCREEN"
-				
 				
 			"ring":
 				current_details = "HEVLIB_DISCORDRPC_IN_RING"
@@ -8901,7 +8760,7 @@ class _RPC:
 						pass
 					"l:locust":
 						current_details = "HEVLIB_DISCORDRPC_LOCUSTS"
-				
+					
 				var shipIcon:String = "empty"
 				var thisShip:String = ""
 				if "baseShipName" in playership and playership.baseShipName in validShips:
@@ -8915,6 +8774,7 @@ class _RPC:
 		rpc_data["current_icon"] = current_icon
 		rpc_data["current_state"] = current_state
 		rpc_data["currentStack"] = currentStack
+	
 	static func update_timer_finished():
 		rpc_data["self"].emit_signal("rpc_timer_complete")
 		update_rpc()
@@ -8983,7 +8843,6 @@ class _RPC:
 		rpc_data["secondary_states"] = secondary_states
 		rpc_data["secondary_state_index"] = secondary_state_index
 	
-	
 	static func update_activity() -> void:
 		var st:String = rpc_data["absolute_state"]
 		var dt:String = rpc_data["current_details"]
@@ -9020,8 +8879,6 @@ class _RPC:
 				rpc_data["update_delay"] = rpc_data["update_wait_time"]
 				rpc_data["reconnect_delay"] = rpc_data["reconnect_wait_time"]
 			err_count = 0
-	
-
 
 class _SafeMode:
 	var scripts : Array = [
@@ -9244,9 +9101,7 @@ class _SafeMode:
 					get_dependancies_for_vanilla_file(m)
 	
 	static func __lookup_vanilla_file_dependancies(dependancy) -> PoolStringArray:
-		var out:PoolStringArray = LDA(dependancy,PoolStringArray())
-		
-		return out
+		return LDA(dependancy,PoolStringArray())
 	
 	static func LDA(dependancy,order:PoolStringArray) -> PoolStringArray:
 		if dependancy in dependancy_lookup_keys:
@@ -9264,7 +9119,6 @@ class _SafeMode:
 				if not i in out:
 					out.append(i)
 		return out
-	
 
 class _Scripting:
 	var scripts : Array = [
@@ -9429,7 +9283,6 @@ class _Scripting:
 						var purityInfo:Dictionary = info.get("purity",{})
 						var folder:String = "user://cache/.HevLib_Cache/Minerals/%s-%d%d%d/" % [mname,int(color.r*255),int(color.g*255),int(color.b*255)]
 						
-						
 						var specific_data:Dictionary = info.get("specific_ore_data",{})
 						var roc:Array = []
 						pointers.FolderAccess.__check_folder_exists(folder)
@@ -9491,7 +9344,6 @@ class _Scripting:
 		for m in mineral_list:
 			content += "\n\tif not \"%s\" in %s:\n\t\t%s[\"%s\"] = %s" % [m,"objectClass[- 1]","objectClass[- 1]",m,mineral_list[m]]
 		
-		
 		var trace_text:String = ""
 		for trace in traces:
 			if trace in mineral_list:
@@ -9508,12 +9360,6 @@ class _Scripting:
 		file.open(mineralDir + "as.gd",File.WRITE)
 		file.store_string(content)
 		file.close()
-	
-	
-	
-	
-	
-	
 
 class _TimeAccess:
 	var scripts : Array = [
@@ -9544,7 +9390,6 @@ class _TimeAccess:
 				},
 			}
 		}
-	
 	
 	func _init(p):
 		pass
@@ -9578,8 +9423,6 @@ class _TimeAccess:
 		time += (datetime_dict.get("day",0) * 60 * 60 * 24)
 		time += (datetime_dict.get("month",0) * 60 * 60 * 24 * 30)
 		time += (datetime_dict.get("year",0) * 60 * 60 * 24 * 30 * 12)
-		
-		
 		return time
 	
 	static func __get_dos_datetime(datetime:Dictionary = Time.get_datetime_dict_from_system()) -> Dictionary:
@@ -9594,7 +9437,6 @@ class _TimeAccess:
 		var dos_time:int = (hour << 11) | (minute << 5) | int(second / 2.0)
 		var dos_date:int = (dos_year << 9) | (month << 5) | day
 		return {"time":dos_time, "date":dos_date}
-	
 
 class _Tokenizer:
 	var scripts : Array = [
@@ -9606,6 +9448,165 @@ class _Tokenizer:
 		non_static["pointers"] = p
 		non_static["self"] = self
 		non_static["builtin_classes"] = ClassDB.get_class_list() + PoolStringArray(type_index.keys())
+	
+	static func __source_to_tokens(source_code:String) -> bool:
+		source_code=source_code.replace("\r","")
+		var source_length:int = source_code.length()
+		post_store[0] = 0
+		post_store[1] = 1
+		post_store[2] = source_length
+		type_store.clear()
+		args_store.clear()
+		line_store.clear()
+		char_store.clear()
+		char_store.resize(source_length)
+		for i in source_length:
+			char_store[i] = source_code.ord_at(i)
+		while true:
+			if!next_token():
+				return false
+			if type_store[-1] == TK_EOF:
+				break
+		return true
+	
+	static func __get_compiled_bytecode_from_tokens() -> PoolByteArray:
+		if not type_store.size():
+			printerr("Token store is empty")
+			return PoolByteArray()
+		var identifier_map:Dictionary = {}
+		var identifiers:PoolStringArray = PoolStringArray()
+		var constant_map:Dictionary = {}
+		var constants:Array = Array()
+		var line_tokens:PoolIntArray = PoolIntArray()
+		var line_numbers:PoolIntArray = PoolIntArray()
+		var token_array:PoolIntArray = PoolIntArray()
+		var line:int = -1
+		for k in type_store.size():
+			if line_store[k] != line:
+				line = line_store[k]
+				line_tokens.append(k)
+				line_numbers.append(line)
+			var t:int = type_store[k]
+			var local_token:int = t
+			if t == TK_IDENTIFIER:
+				var id:String = args_store[k]
+				if!id in identifier_map:
+					identifier_map[id] = identifiers.size()
+					identifiers.append(id)
+				local_token |= (identifier_map[id] << 8)
+			elif t == TK_CONSTANT:
+				var constant_val = args_store[k]
+				var key:String = ""
+				match typeof(constant_val):
+					TYPE_NIL:
+						key = "nil"
+					TYPE_BOOL:
+						key = "b" + str(constant_val)
+					TYPE_INT:
+						key = "i" + str(constant_val)
+					TYPE_REAL:
+						var tmp:StreamPeerBuffer = StreamPeerBuffer.new()
+						tmp.put_double(constant_val)
+						key = "f" + str(tmp.data_array)
+					TYPE_STRING:
+						key = "s" + constant_val
+					TYPE_NODE_PATH:
+						key = "n" + str(constant_val)
+					_:
+						key = "?" + str(constant_val)
+				if not key in constant_map:
+					constant_map[key] = constants.size()
+					constants.append(constant_val)
+				local_token |= (constant_map[key] << 8)
+			elif t == TK_BUILT_IN_TYPE or t == TK_BUILT_IN_FUNC or t == TK_NEWLINE:
+				local_token |= (args_store[k] << 8)
+			token_array.append(local_token)
+		var out:StreamPeerBuffer=StreamPeerBuffer.new()
+		out.put_u8(0x47) # G
+		out.put_u8(0x44) # D
+		out.put_u8(0x53) # S
+		out.put_u8(0x43) # C
+		out.put_u32(13)
+		out.put_u32(identifiers.size())
+		out.put_u32(constants.size())
+		out.put_u32(line_tokens.size())
+		out.put_u32(token_array.size())
+		for id in identifiers:
+			var cs:PoolByteArray = id.to_utf8()
+			var l:int = cs.size() + 1
+			var extra:int = 4 - (l % 4)
+			if extra == 4:
+				extra = 0
+			out.put_u32(l + extra)
+			for b in cs:
+				out.put_u8(b ^ 0xb6)
+			out.put_u8(0 ^ 0xb6)
+			for e in extra:
+				out.put_u8(0 ^ 0xb6)
+		for v in constants:
+			match typeof(v):
+				TYPE_NIL:
+					out.put_u32(0)
+				TYPE_BOOL:
+					out.put_u32(1)
+					out.put_u32(1 if v else 0)
+				TYPE_INT:
+					if v > 2147483647 or v < -2147483648:
+						out.put_u32(2 | (1 << 16))
+						out.put_64(v)
+					else:
+						out.put_u32(2)
+						out.put_32(v)
+				TYPE_REAL:
+					var tmp:StreamPeerBuffer = StreamPeerBuffer.new()
+					tmp.put_float(v)
+					tmp.seek(0)
+					var bits:StreamPeerBuffer = StreamPeerBuffer.new()
+					bits.put_double(v)
+					bits.put_double(tmp.get_float())
+					bits.seek(0)
+					if bits.get_64() == bits.get_64():
+						out.put_u32(3)
+						out.put_float(v)
+					else:
+						out.put_u32(3 | (1 << 16))
+						out.put_double(v)
+				TYPE_STRING:
+					out.put_u32(4)
+					stream_string(out,v)
+				TYPE_NODE_PATH:
+					var np:NodePath = v
+					out.put_u32(15)
+					out.put_u32(np.get_name_count() | 0x80000000)
+					out.put_u32(np.get_subname_count())
+					out.put_u32(1 if np.is_absolute() else 0)
+					for i in np.get_name_count():
+						stream_string(out,np.get_name(i))
+					for i in np.get_subname_count():
+						stream_string(out,np.get_subname(i))
+				_:
+					printerr("Cannot encode constant of type %d" % typeof(v))
+					return PoolByteArray()
+		for k in line_tokens.size():
+			out.put_u32(line_tokens[k])
+			out.put_u32(line_numbers[k])
+		for tk in token_array:
+			if tk & ~0xFF:
+				out.put_u32(tk | 0x80)
+			else:
+				out.put_u8(tk)
+		return out.data_array
+	
+	static func __get_token_string_name(token:int) -> String:
+		if token in token_list:
+			return token_lookup[token]
+		return ""
+	
+	static func __is_static_token(token:int) -> bool:
+		return token in static_token_list
+	
+	static func __get_static_token(token:int) -> String:
+		return static_tokens[token]
 	
 	enum{
 		TK_EMPTY,TK_IDENTIFIER,TK_CONSTANT,TK_SELF,TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_OP_IN,TK_OP_EQUAL,
@@ -9621,6 +9622,32 @@ class _Tokenizer:
 		TK_BRACKET_OPEN,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_OPEN,TK_CURLY_BRACKET_CLOSE,TK_PARENTHESIS_OPEN,
 		TK_PARENTHESIS_CLOSE,TK_COMMA,TK_SEMICOLON,TK_PERIOD,TK_QUESTION_MARK,TK_COLON,TK_DOLLAR,TK_FORWARD_ARROW,
 		TK_NEWLINE,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN,TK_ERROR,TK_EOF,TK_CURSOR,}
+	const token_list = PoolIntArray([TK_EMPTY,TK_IDENTIFIER,TK_CONSTANT,TK_SELF,TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_OP_IN,TK_OP_EQUAL,
+		TK_OP_NOT_EQUAL,TK_OP_LESS,TK_OP_LESS_EQUAL,TK_OP_GREATER,TK_OP_GREATER_EQUAL,TK_OP_AND,TK_OP_OR,
+		TK_OP_NOT,TK_OP_ADD,TK_OP_SUB,TK_OP_MUL,TK_OP_DIV,TK_OP_MOD,TK_OP_SHIFT_LEFT,TK_OP_SHIFT_RIGHT,TK_OP_ASSIGN,
+		TK_OP_ASSIGN_ADD,TK_OP_ASSIGN_SUB,TK_OP_ASSIGN_MUL,TK_OP_ASSIGN_DIV,TK_OP_ASSIGN_MOD,TK_OP_ASSIGN_SHIFT_LEFT,
+		TK_OP_ASSIGN_SHIFT_RIGHT,TK_OP_ASSIGN_BIT_AND,TK_OP_ASSIGN_BIT_OR,TK_OP_ASSIGN_BIT_XOR,TK_OP_BIT_AND,
+		TK_OP_BIT_OR,TK_OP_BIT_XOR,TK_OP_BIT_INVERT,TK_CF_IF,TK_CF_ELIF,TK_CF_ELSE,TK_CF_FOR,TK_CF_WHILE,TK_CF_BREAK,
+		TK_CF_CONTINUE,TK_CF_PASS,TK_CF_RETURN,TK_CF_MATCH,TK_PR_FUNCTION,TK_PR_CLASS,TK_PR_CLASS_NAME,TK_PR_EXTENDS,
+		TK_PR_IS,TK_PR_ONREADY,TK_PR_TOOL,TK_PR_STATIC,TK_PR_EXPORT,TK_PR_SETGET,TK_PR_CONST,TK_PR_VAR,TK_PR_AS,
+		TK_PR_VOID,TK_PR_ENUM,TK_PR_PRELOAD,TK_PR_ASSERT,TK_PR_YIELD,TK_PR_SIGNAL,TK_PR_BREAKPOINT,TK_PR_REMOTE,
+		TK_PR_SYNC,TK_PR_MASTER,TK_PR_SLAVE,TK_PR_PUPPET,TK_PR_REMOTESYNC,TK_PR_MASTERSYNC,TK_PR_PUPPETSYNC,
+		TK_BRACKET_OPEN,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_OPEN,TK_CURLY_BRACKET_CLOSE,TK_PARENTHESIS_OPEN,
+		TK_PARENTHESIS_CLOSE,TK_COMMA,TK_SEMICOLON,TK_PERIOD,TK_QUESTION_MARK,TK_COLON,TK_DOLLAR,TK_FORWARD_ARROW,
+		TK_NEWLINE,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN,TK_ERROR,TK_EOF,TK_CURSOR])
+	const static_token_list = PoolIntArray([TK_SELF,TK_OP_IN,TK_OP_EQUAL,
+		TK_OP_NOT_EQUAL,TK_OP_LESS,TK_OP_LESS_EQUAL,TK_OP_GREATER,TK_OP_GREATER_EQUAL,TK_OP_AND,TK_OP_OR,
+		TK_OP_NOT,TK_OP_ADD,TK_OP_SUB,TK_OP_MUL,TK_OP_DIV,TK_OP_MOD,TK_OP_SHIFT_LEFT,TK_OP_SHIFT_RIGHT,TK_OP_ASSIGN,
+		TK_OP_ASSIGN_ADD,TK_OP_ASSIGN_SUB,TK_OP_ASSIGN_MUL,TK_OP_ASSIGN_DIV,TK_OP_ASSIGN_MOD,TK_OP_ASSIGN_SHIFT_LEFT,
+		TK_OP_ASSIGN_SHIFT_RIGHT,TK_OP_ASSIGN_BIT_AND,TK_OP_ASSIGN_BIT_OR,TK_OP_ASSIGN_BIT_XOR,TK_OP_BIT_AND,
+		TK_OP_BIT_OR,TK_OP_BIT_XOR,TK_OP_BIT_INVERT,TK_CF_IF,TK_CF_ELIF,TK_CF_ELSE,TK_CF_FOR,TK_CF_WHILE,TK_CF_BREAK,
+		TK_CF_CONTINUE,TK_CF_PASS,TK_CF_RETURN,TK_CF_MATCH,TK_PR_FUNCTION,TK_PR_CLASS,TK_PR_CLASS_NAME,TK_PR_EXTENDS,
+		TK_PR_IS,TK_PR_ONREADY,TK_PR_TOOL,TK_PR_STATIC,TK_PR_EXPORT,TK_PR_SETGET,TK_PR_CONST,TK_PR_VAR,TK_PR_AS,
+		TK_PR_VOID,TK_PR_ENUM,TK_PR_PRELOAD,TK_PR_ASSERT,TK_PR_YIELD,TK_PR_SIGNAL,TK_PR_BREAKPOINT,TK_PR_REMOTE,
+		TK_PR_SYNC,TK_PR_MASTER,TK_PR_SLAVE,TK_PR_PUPPET,TK_PR_REMOTESYNC,TK_PR_MASTERSYNC,TK_PR_PUPPETSYNC,
+		TK_BRACKET_OPEN,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_OPEN,TK_CURLY_BRACKET_CLOSE,TK_PARENTHESIS_OPEN,
+		TK_PARENTHESIS_CLOSE,TK_COMMA,TK_SEMICOLON,TK_PERIOD,TK_QUESTION_MARK,TK_COLON,TK_DOLLAR,TK_FORWARD_ARROW,
+		TK_NEWLINE,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN])
 	const token_lookup = {
 		TK_EMPTY:"TK_EMPTY",
 		TK_IDENTIFIER:"TK_IDENTIFIER",
@@ -9721,7 +9748,99 @@ class _Tokenizer:
 		TK_EOF:"TK_EOF",
 		TK_CURSOR:"TK_CURSOR",
 	}
-
+	const static_tokens = {
+		TK_SELF:"self",
+		TK_OP_IN:"in",
+		TK_OP_EQUAL:"==",
+		TK_OP_NOT_EQUAL:"!=",
+		TK_OP_LESS:"<",
+		TK_OP_LESS_EQUAL:"<=",
+		TK_OP_GREATER:">",
+		TK_OP_GREATER_EQUAL:">=",
+		TK_OP_AND:"and",
+		TK_OP_OR:"or",
+		TK_OP_NOT:"not",
+		TK_OP_ADD:"+",
+		TK_OP_SUB:"-",
+		TK_OP_MUL:"*",
+		TK_OP_DIV:"/",
+		TK_OP_MOD:"%",
+		TK_OP_SHIFT_LEFT:"<<",
+		TK_OP_SHIFT_RIGHT:">>",
+		TK_OP_ASSIGN:"=",
+		TK_OP_ASSIGN_ADD:"+=",
+		TK_OP_ASSIGN_SUB:"-=",
+		TK_OP_ASSIGN_MUL:"*=",
+		TK_OP_ASSIGN_DIV:"/=",
+		TK_OP_ASSIGN_MOD:"%=",
+		TK_OP_ASSIGN_SHIFT_LEFT:"<<=",
+		TK_OP_ASSIGN_SHIFT_RIGHT:">>=",
+		TK_OP_ASSIGN_BIT_AND:"&=",
+		TK_OP_ASSIGN_BIT_OR:"|=",
+		TK_OP_ASSIGN_BIT_XOR:"^=",
+		TK_OP_BIT_AND:"&",
+		TK_OP_BIT_OR:"|",
+		TK_OP_BIT_XOR:"^",
+		TK_OP_BIT_INVERT:"~",
+		TK_CF_IF:"if",
+		TK_CF_ELIF:"elif",
+		TK_CF_ELSE:"else",
+		TK_CF_FOR:"for",
+		TK_CF_WHILE:"while",
+		TK_CF_BREAK:"break",
+		TK_CF_CONTINUE:"continue",
+		TK_CF_PASS:"pass",
+		TK_CF_RETURN:"return",
+		TK_CF_MATCH:"match",
+		TK_PR_FUNCTION:"func",
+		TK_PR_CLASS:"class",
+		TK_PR_CLASS_NAME:"class_name",
+		TK_PR_EXTENDS:"extends",
+		TK_PR_IS:"is",
+		TK_PR_ONREADY:"onready",
+		TK_PR_TOOL:"tool",
+		TK_PR_STATIC:"static",
+		TK_PR_EXPORT:"export",
+		TK_PR_SETGET:"setget",
+		TK_PR_CONST:"const",
+		TK_PR_VAR:"var",
+		TK_PR_AS:"as",
+		TK_PR_VOID:"void",
+		TK_PR_ENUM:"enum",
+		TK_PR_PRELOAD:"preload",
+		TK_PR_ASSERT:"assert",
+		TK_PR_YIELD:"yield",
+		TK_PR_SIGNAL:"signal",
+		TK_PR_BREAKPOINT:"breakpoint",
+		TK_PR_REMOTE:"remote",
+		TK_PR_SYNC:"sync",
+		TK_PR_MASTER:"master",
+		TK_PR_SLAVE:"slave",
+		TK_PR_PUPPET:"puppet",
+		TK_PR_REMOTESYNC:"remotesync",
+		TK_PR_MASTERSYNC:"mastersync",
+		TK_PR_PUPPETSYNC:"puppetsync",
+		TK_BRACKET_OPEN:"[",
+		TK_BRACKET_CLOSE:"]",
+		TK_CURLY_BRACKET_OPEN:"{",
+		TK_CURLY_BRACKET_CLOSE:"}",
+		TK_PARENTHESIS_OPEN:"(",
+		TK_PARENTHESIS_CLOSE:")",
+		TK_COMMA:",",
+		TK_SEMICOLON:";",
+		TK_PERIOD:".",
+		TK_QUESTION_MARK:"?",
+		TK_COLON:":",
+		TK_DOLLAR:"$",
+		TK_FORWARD_ARROW:"->",
+		TK_NEWLINE:"\n",
+		TK_CONST_PI:"PI",
+		TK_CONST_TAU:"TAU",
+		TK_WILDCARD:"_",
+		TK_CONST_INF:"INF",
+		TK_CONST_NAN:"NAN",
+	}
+	
 	const func_index={
 		"sin":0,"cos":1,"tan":2,"sinh":3,"cosh":4,"tanh":5,"asin":6,"acos":7,"atan":8,"atan2":9,
 		"sqrt":10,"fmod":11,"fposmod":12,"posmod":13,"floor":14,"ceil":15,"round":16,"abs":17,"sign":18,"pow":19,
@@ -9776,26 +9895,13 @@ class _Tokenizer:
 	const line_store:PoolIntArray=PoolIntArray()
 	const char_store:PoolIntArray=PoolIntArray()
 	
-	
-	static func __source_to_tokens(source_code:String) -> bool:
-		source_code=source_code.replace("\r","")
-		var source_length:int = source_code.length()
-		post_store[0] = 0
-		post_store[1] = 0
-		post_store[2] = source_length
-		type_store.clear()
-		args_store.clear()
-		line_store.clear()
-		char_store.clear()
-		char_store.resize(source_length)
-		for i in source_length:
-			char_store[i] = source_code.ord_at(i)
-		while true:
-			if!next_token():
-				return false
-			if type_store[-1] == TK_EOF:
-				break
-		return true
+	static func stream_string(out:StreamPeerBuffer,s:String)->void:
+		var u:PoolByteArray = s.to_utf8()
+		out.put_u32(u.size())
+		for b in u:
+			out.put_u8(b)
+		for p in (4 - (u.size() % 4)) % 4:
+			out.put_u8(0)
 	
 	static func next_token() -> bool:
 		if post_store[0] > post_store[2]:
@@ -9806,6 +9912,7 @@ class _Tokenizer:
 			if ch == 0:
 				push_token(TK_EOF)
 				return true
+			
 			if ch == KEY_BACKSLASH:
 				post_store[0] += 1
 				if get_char(0) != KEY_LINEFEED:
@@ -9840,7 +9947,7 @@ class _Tokenizer:
 					var wc:int = get_char(i)
 					if wc == KEY_SPACE:
 						if not used_spaces:
-							printerr(compile_err_header % [post_store[1],"Mixed tabs&&spaces in indentation"])
+							printerr(compile_err_header % [post_store[1],"Mixed tabs and spaces in indentation"])
 							return false
 						i += 1
 					elif wc == KEY_HORIZONTALTAB:
@@ -9858,8 +9965,10 @@ class _Tokenizer:
 			
 			if word_is_number(ch) or (ch == KEY_PERIOD and word_is_number(get_char(1))):
 				return read_number_token()
+			
 			if word_is_tex(ch):
 				return read_word_token(ch)
+			
 			var n1:int = get_char(1)
 			var n2:int = get_char(2)
 			var tok:int = -1
@@ -10004,7 +10113,7 @@ class _Tokenizer:
 			push_token(TK_IDENTIFIER,s)
 		post_store[0] += s.length()
 		return true
-
+	
 	static func read_number_token()->bool:
 		var period_found:bool = false
 		var exponent_found:bool = false
@@ -10203,12 +10312,6 @@ class _Tokenizer:
 	
 	static func word_is_tex(c:int) -> bool:
 		return (c >= 97 and c <= 122) or (c >= KEY_A and c<= KEY_Z) or (c >= KEY_0 and c <= KEY_9) or c == 95
-	
-	
-	
-	
-	
-
 
 class _Translations:
 	var scripts : Array = [
@@ -10305,7 +10408,7 @@ class _Translations:
 						if do and string:
 							var dict : Dictionary = __translation_file_to_dictionary(file,string)
 							__updateTL_from_dictionary(dict,fullLogging)
-						
+			
 			path.erase("file")
 		for lang in path.keys():
 			var translationObject := Translation.new()
@@ -10341,6 +10444,7 @@ class _Translations:
 			TranslationServer.add_translation(translationObject)
 		if fullLogging:
 			pointers.l("%s Translations Updated" % translationCount,"pointers.Translations")
+	
 	static func __fetch_all_translation_objects(index:int) -> Array:
 		var translations : Array = []
 		while index > 0:
@@ -10500,7 +10604,6 @@ class _Translations:
 		for i in ProjectSettings.get_setting("locale/translations"):
 			TranslationServer.add_translation(ResourceLoader.load(i,"",true))
 		pointers.SafeMode.__handle_exit_for_file_checks()
-	
 
 class _WebTranslate:
 	var scripts : Array = [
@@ -10545,8 +10648,6 @@ class _WebTranslate:
 			if name.begins_with("FetchGithubData"):
 				names.append(name)
 		var nSize = names.size()
-		
-		
 		pointers.l("attaching node @ FetchGithubData%s~%s" % [timestamp,str(nSize)],"pointers.WebTranslate")
 		HevLib.name = "FetchGithubData" + timestamp + "~" + str(nSize)
 		HevLib.URLFullStopReformat = URL
@@ -10597,12 +10698,6 @@ class _WebTranslate:
 		handleNode.fallback = fallback
 		handleNode.file_check = file_check
 		pointers.add_child(handleNode)
-	
-	
-	
-	
-	
-	
 
 class _Zip:
 	var scripts : Array = [
@@ -10640,7 +10735,7 @@ class _Zip:
 		var Files:PoolStringArray = PoolStringArray()
 		file.open(file_path,File.READ)
 		file.seek(0)
-		if file.get_32() != 0x43504447:# GDPC
+		if file.get_32() != 0x43504447: # GDPC
 			printerr("ERROR: invalid magic number")
 			if only_filenames:return Files
 			return Contents
@@ -10690,7 +10785,6 @@ class _Zip:
 				packer.add_file(file_name,pkfilename)
 		return packer.flush()
 	
-	
 	static func __get_zip_content(path:String) -> PoolStringArray:
 		var miniz:MINIZ = __get_miniz_object()
 		miniz.open_read(path)
@@ -10731,15 +10825,15 @@ class _Zip:
 		var miniz:MINIZ = __get_miniz_object()
 		if miniz.open_read(zip_path) == OK:
 			miniz.extract_all(dir_path)
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
 
 
 
