@@ -826,7 +826,6 @@ static func load_pointers(modLoader:ModLoader):
 	strings.append(p)
 	p.webtranslate_modmain=modLoader
 	return p
-	
 func testing(modLoader:ModLoader,pointers):
 	var file:File = File.new()
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
