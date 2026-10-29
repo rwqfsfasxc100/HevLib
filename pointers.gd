@@ -57,6 +57,7 @@ var RingInfo : _RingInfo = _RingInfo.new(self)
 var RPC : _RPC = _RPC.new(self)
 var SafeMode : _SafeMode = _SafeMode.new(self)
 var Scripting : _Scripting = _Scripting.new(self,http)
+var Threading : _Threading = _Threading.new(self)
 var TimeAccess : _TimeAccess = _TimeAccess.new(self)
 var Tokenizer : _Tokenizer = _Tokenizer.new(self)
 var Translations : _Translations = _Translations.new(self)
@@ -9360,6 +9361,50 @@ class _Scripting:
 		file.open(mineralDir + "as.gd",File.WRITE)
 		file.store_string(content)
 		file.close()
+
+class _Threading:
+	var busy:Mutex = Mutex.new()
+	
+	var pointers:HevLibPointers
+	
+	func _init(p):
+		pointers = p
+	
+	var active_threads:Array = []
+	
+	func __create_thread(object:Object,method_call:String,arguments:Array = [],priority:int = 1) -> ThreadStruct:
+		var thread:ThreadStruct = ThreadStruct.new(object,method_call,arguments,priority)
+		busy.lock()
+		active_threads.append(thread)
+		busy.unlock()
+		thread.run()
+		return thread
+	
+	
+	
+	class ThreadStruct:
+		var thread:Thread = Thread.new()
+		func _init(o:Object,m:String,a:Array,p:int):
+			object = o
+			method_call = m
+			args = a
+			priority = p
+		
+		var object:Object
+		var method_call:String = ""
+		var args:Array = []
+		var priority:int = 1
+		
+		func run():
+			thread.start(self,"call_object_func",null,priority)
+			var out = yield(thread.wait_to_finish(),"completed")
+			breakpoint
+		
+		func call_object_func(_a = null):
+			object.callv(method_call,args)
+		
+		
+		
 
 class _TimeAccess:
 	var scripts : Array = [

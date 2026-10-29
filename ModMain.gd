@@ -834,7 +834,9 @@ func testing(modLoader:ModLoader,pointers):
 #	script_shadow_creator.__make_shadow_of_script("res://DifficultyTweaker/story/Vilcy.gd")
 #	script_shadow_creator.__make_shadow_of_script("res://Test/empty.gd",pointers)
 	var t1=Time.get_ticks_usec()
-	var out = script_shadow_creator.__make_shadow_of_script("res://Test/format_torture.gd",pointers)
+	var thread = pointers.Threading.__create_thread(script_shadow_creator,"__make_shadow_of_script",["res://Test/format_torture.gd",pointers])
+	var out = yield(thread,"completed")
+#	var out = script_shadow_creator.__make_shadow_of_script("res://Test/format_torture.gd",pointers)
 #	var out = script_shadow_creator.__make_shadow_of_script(pointers.resource_path,pointers)
 	var t2=Time.get_ticks_usec()-t1
 	
