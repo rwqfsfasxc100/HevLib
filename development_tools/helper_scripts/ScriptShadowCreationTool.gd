@@ -408,7 +408,7 @@ func get_function_data(idx:int):
 			TK_CONSTANT:
 				var cs = args_store[idx]
 				if cs is String:
-					op[2] = "\"" + var2str(cs).trim_prefix("\"").trim_suffix("\"").replace("\a","\\a").replace("\b","\\b").replace("\f","\\f").replace("\n","\\n").replace("\r","\\r").replace("\t","\\t").replace("\v","\\v") + "\""
+					op[2] = var2str(cs).replace("\a","\\a").replace("\b","\\b").replace("\f","\\f").replace("\n","\\n").replace("\r","\\r").replace("\t","\\t").replace("\v","\\v")
 				else:
 					op[2] = var2str(cs)
 				idx += 1
@@ -488,7 +488,7 @@ func get_expression(idx) -> Array:
 				TK_CONSTANT:
 					var cs = args_store[idx]
 					if cs is String:
-						out += "\"" + var2str(cs).trim_prefix("\"").trim_suffix("\"").replace("\a","\\a").replace("\b","\\b").replace("\f","\\f").replace("\n","\\n").replace("\r","\\r").replace("\t","\\t").replace("\v","\\v") + "\""
+						out += var2str(cs).replace("\a","\\a").replace("\b","\\b").replace("\f","\\f").replace("\n","\\n").replace("\r","\\r").replace("\t","\\t").replace("\v","\\v")
 					else:
 						out += var2str(cs)
 				TK_BUILT_IN_TYPE:
