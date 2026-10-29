@@ -408,8 +408,9 @@ func get_function_data(idx:int):
 			TK_CONSTANT:
 				var cs = args_store[idx]
 				if cs is String:
-					cs = cs.c_escape()
-				op[2] = var2str(cs)
+					op[2] = "\"" + var2str(cs).trim_prefix("\"").trim_suffix("\"").replace("\a","\\a").replace("\b","\\b").replace("\f","\\f").replace("\n","\\n").replace("\r","\\r").replace("\t","\\t").replace("\v","\\v") + "\""
+				else:
+					op[2] = var2str(cs)
 				idx += 1
 			TK_COLON:
 				idx += 1
@@ -435,11 +436,7 @@ func get_function_data(idx:int):
 			var tok:
 				var tx:String = token_lookup[tok]
 				breakpoint
-
-
-
-
-
+	
 	return [func_data,idx]
 
 func get_var_data(idx:int):
@@ -491,8 +488,9 @@ func get_expression(idx) -> Array:
 				TK_CONSTANT:
 					var cs = args_store[idx]
 					if cs is String:
-						cs = cs.c_escape()
-					out += var2str(cs)
+						out += "\"" + var2str(cs).trim_prefix("\"").trim_suffix("\"").replace("\a","\\a").replace("\b","\\b").replace("\f","\\f").replace("\n","\\n").replace("\r","\\r").replace("\t","\\t").replace("\v","\\v") + "\""
+					else:
+						out += var2str(cs)
 				TK_BUILT_IN_TYPE:
 					out += pointers.type_index.keys()[pointers.type_index.values().find(args_store[idx])]
 				TK_BUILT_IN_FUNC:
