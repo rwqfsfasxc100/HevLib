@@ -9363,32 +9363,42 @@ class _Scripting:
 		file.close()
 
 class _Threading:
-	var busy:Mutex = Mutex.new()
+	
 	
 	var pointers:HevLibPointers
 	
 	func _init(p):
 		pointers = p
 	
+	var max_thread_count:int = int(max(OS.get_processor_count() - 2,2))
 	var active_threads:Array = []
 	
 	func __create_thread(object:Object,method_call:String,arguments:Array = [],priority:int = 1) -> ThreadStruct:
 		var thread:ThreadStruct = ThreadStruct.new(object,method_call,arguments,priority)
-		busy.lock()
+		
 		active_threads.append(thread)
-		busy.unlock()
 		thread.run()
 		return thread
 	
-	
+	func _notification(what):
+		if what == NOTIFICATION_PREDELETE:
+			active_threads.clear()
 	
 	class ThreadStruct:
+		extends Reference
+		
+		signal thread_finished(out)
+		
+		var busy:Mutex = Mutex.new()
+		var semaphore:Semaphore = Semaphore.new()
 		var thread:Thread = Thread.new()
 		func _init(o:Object,m:String,a:Array,p:int):
 			object = o
 			method_call = m
 			args = a
 			priority = p
+		
+		var exit_thread:bool = false
 		
 		var object:Object
 		var method_call:String = ""
@@ -9401,8 +9411,26 @@ class _Threading:
 			breakpoint
 		
 		func call_object_func(_a = null):
-			object.callv(method_call,args)
+			while true:
+				semaphore.wait()
+				
+				busy.lock()
+				var exit:bool = exit_thread
+				busy.unlock()
+				if exit:
+					break
+				
+				object.callv(method_call,args)
 		
+		func _notification(what):
+			if what == NOTIFICATION_PREDELETE:
+				busy.lock()
+				exit_thread = true
+				busy.unlock()
+				
+				semaphore.post()
+				
+				thread.wait_to_finish()
 		
 		
 
