@@ -7190,7 +7190,10 @@ class _Math:
 		return converted
 
 class _Networking:
-	pass
+	const non_static = {}
+	func _init(f):
+		non_static["pointers"] = f
+		non_static["self"] = self
 	
 	
 
