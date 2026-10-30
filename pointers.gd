@@ -7190,10 +7190,57 @@ class _Math:
 		return converted
 
 class _Networking:
+	# https://github.com/Abdera7mane/Godot-SimpleHTTPClient
+	
 	const non_static = {}
+	
 	func _init(f):
 		non_static["pointers"] = f
 		non_static["self"] = self
+	
+	static func __parse_url(url: String) -> Dictionary:
+		var use_ssl: bool = url.begins_with("https://")
+		url = url.trim_prefix("http://").trim_prefix("https://")
+		var path_delimiter:int = url.find("/")
+		if path_delimiter == -1:
+			path_delimiter = url.length()
+		var path:String = url.substr(path_delimiter)
+		if path.empty():
+			path = "/"
+		
+		var port_delimiter:int = url.find(":")
+		var has_port:bool = port_delimiter != -1 and port_delimiter < path_delimiter
+		var host_length:int = 0
+		
+		if url[0] == "[": # IPv6
+			if url.find("]") == -1:
+				host_length = 0 if not has_port else port_delimiter
+		else: # IPv4
+			host_length = path_delimiter if not has_port else port_delimiter
+		
+		var host: String = url.substr(0, host_length)
+		var port:int = (url.substr(port_delimiter,(
+				(path_delimiter - port_delimiter) if (path_delimiter > 0) else (url.length() - port_delimiter)
+			)).to_int()) if has_port else -1
+		
+		return {
+			"host":host,
+			"port":port,
+			"path":path,
+			"use_ssl":use_ssl
+		}
+	
+	static func __do_reconnect(old: Dictionary, new: Dictionary) -> bool:
+		return (old.empty() or new.empty()) or not old.host.empty() and (old.host != new.host or old.use_ssl != new.use_ssl) or old.port != new.port
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 
@@ -8227,7 +8274,7 @@ class _Scripting:
 		file.close()
 
 class _Threading:
-	
+	# https://www.reddit.com/r/godot/comments/elp4ap/how_to_use_multithreading/
 	
 	var pointers:HevLibPointers
 	
