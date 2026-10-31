@@ -1907,6 +1907,14 @@ const TRANSLATIONS = {
 		"HEVLIB_CONFIG_COMPILE_DESC": {
 			"string": "(WIP, not currently functionally implemented) Recompiles mod zips with portions of the code converted to faster conventions to improve runtime efficiency.",
 			"version_hash": 3959481423
+		},
+		"HEVLIB_CREDITS_SOFTWARE_NIKITA": {
+			"string": "Nikita - GDRE's tokenizer and .gdc read/write capabilities",
+			"version_hash": 1376640792
+		},
+		"HEVLIB_CREDITS_SOFTWARE_ABDERA": {
+			"string": "Abdera7mane - Original implementation of SimpleHTTPClient used within the networking pointer",
+			"version_hash": 2116577648
 		}
 	},
 	"de": {
