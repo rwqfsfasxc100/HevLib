@@ -7218,7 +7218,7 @@ class _Networking:
 		else: # IPv4
 			host_length = path_delimiter if not has_port else port_delimiter
 		
-		var host: String = url.substr(0, host_length)
+		var host:String = url.substr(0, host_length)
 		var port:int = (url.substr(port_delimiter,(
 				(path_delimiter - port_delimiter) if (path_delimiter > 0) else (url.length() - port_delimiter)
 			)).to_int()) if has_port else -1
@@ -7230,8 +7230,6 @@ class _Networking:
 			"use_ssl":use_ssl
 		}
 	
-	static func __do_reconnect(old: Dictionary, new: Dictionary) -> bool:
-		return (old.empty() or new.empty()) or not old.host.empty() and (old.host != new.host or old.use_ssl != new.use_ssl) or old.port != new.port
 	
 	
 	
