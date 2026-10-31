@@ -8411,7 +8411,7 @@ class _Tokenizer:
 		for i in source_length:
 			char_store[i] = source_code.ord_at(i)
 		while true:
-			if!next_token():
+			if not next_token():
 				return false
 			if type_store[-1] == TK_EOF:
 				break
@@ -8556,6 +8556,103 @@ class _Tokenizer:
 	static func __get_static_token(token:int) -> String:
 		return static_tokens[token]
 	
+	static func __compiled_bytecode_to_tokens(bytes:PoolByteArray) -> bool:
+		gdc_bytes.clear()
+		gdc_bytes.append_array(bytes)
+		post_store[2] = bytes.size()
+		post_store[1] = 1
+		post_store[0] = 0
+		
+		if post_store[2] < 24:
+			printerr("Data too short to be a GDScript token buffer (%d gdc_bytes)" % post_store[2])
+			return false
+		if gdc_bytes[0] != 0x47 or gdc_bytes[1] != 0x44 or gdc_bytes[2] != 0x53 or gdc_bytes[3] != 0x43:
+			printerr("Missing GDSC header")
+			return false
+		post_store[0] = 4
+		if get_uint32() != 13:
+			printerr("Unsupported bytecode version")
+			return false
+		
+		var identifier_count:int = get_uint32()
+		var constant_count:int = get_uint32()
+		var line_count:int = get_uint32()
+		var token_count:int = get_uint32()
+		var rest:int = post_store[2] - post_store[0]
+		
+		if identifier_count * 4 > rest or constant_count * 4 > rest or line_count * 8 > rest or token_count > rest:
+			printerr("Header counts exceed the size of the data")
+			return false
+		var identifiers:Array = []
+		for i in identifier_count:
+			var l:int = get_uint32()
+			if l > post_store[2] - post_store[0]:
+				printerr("Invalid identifier length %d" % l)
+				return false
+			var raw:PoolByteArray = get_next_bytes(l)
+			var decoded:PoolByteArray = PoolByteArray()
+			for byte in raw:
+				byte ^= 0xb6
+				if byte == 0:
+					break
+				decoded.append(byte)
+			identifiers.append(decoded.get_string_from_utf8())
+		var constants:Array = []
+		for i in constant_count:
+			var v = get_const()
+			constants.append(v)
+		if line_count * 8 > post_store[2] - post_store[0]:
+			printerr("Invalid line count")
+			return false
+		var line_at:Dictionary = {}
+		for i in line_count:
+			var tok_index:int = get_uint32()
+			var line:int = get_uint32()
+			line_at[tok_index] = line
+		type_store.resize(token_count)
+		args_store.resize(token_count)
+		line_store.resize(token_count)
+		var line_list:PoolIntArray = PoolIntArray(line_at.keys())
+		var current_line:int = 1
+		for i in token_count:
+			if post_store[2] - post_store[0] < 1:
+				printerr("Unexpected end of data in token list")
+				return false
+			var value:int = 0
+			if gdc_bytes[post_store[0]] & 0x80:
+				if post_store[2] - post_store[0] < 4:
+					printerr("Unexpected end of data in token list")
+					return false
+				value = get_uint32() & ~0x80
+			else:
+				value = gdc_bytes[post_store[0]]
+				post_store[0] += 1
+			var type:int = value & 0xFF
+			var arg:int = value >> 8
+			if type >= TK_MAX:
+				printerr("Unknown token id %d at token %d" % [type, i])
+				return false
+			var payload = null
+			match type:
+				TK_IDENTIFIER:
+					if arg >= identifiers.size():
+						printerr("Identifier index %d out of range at token %d" % [arg, i])
+						return false
+					payload = identifiers[arg]
+				TK_CONSTANT:
+					if arg >= constants.size():
+						printerr("Constant index %d out of range at token %d" % [arg, i])
+						return false
+					payload = constants[arg]
+				TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_NEWLINE:
+					payload = arg
+			if i in line_list:
+				current_line = line_at[i]
+			type_store[i] = type
+			args_store[i] = payload
+			line_store[i] = current_line
+		return true
+	
 	enum{
 		TK_EMPTY,TK_IDENTIFIER,TK_CONSTANT,TK_SELF,TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_OP_IN,TK_OP_EQUAL,
 		TK_OP_NOT_EQUAL,TK_OP_LESS,TK_OP_LESS_EQUAL,TK_OP_GREATER,TK_OP_GREATER_EQUAL,TK_OP_AND,TK_OP_OR,
@@ -8569,7 +8666,7 @@ class _Tokenizer:
 		TK_PR_SYNC,TK_PR_MASTER,TK_PR_SLAVE,TK_PR_PUPPET,TK_PR_REMOTESYNC,TK_PR_MASTERSYNC,TK_PR_PUPPETSYNC,
 		TK_BRACKET_OPEN,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_OPEN,TK_CURLY_BRACKET_CLOSE,TK_PARENTHESIS_OPEN,
 		TK_PARENTHESIS_CLOSE,TK_COMMA,TK_SEMICOLON,TK_PERIOD,TK_QUESTION_MARK,TK_COLON,TK_DOLLAR,TK_FORWARD_ARROW,
-		TK_NEWLINE,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN,TK_ERROR,TK_EOF,TK_CURSOR,}
+		TK_NEWLINE,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN,TK_ERROR,TK_EOF,TK_CURSOR,TK_MAX}
 	const token_list = PoolIntArray([TK_EMPTY,TK_IDENTIFIER,TK_CONSTANT,TK_SELF,TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_OP_IN,TK_OP_EQUAL,
 		TK_OP_NOT_EQUAL,TK_OP_LESS,TK_OP_LESS_EQUAL,TK_OP_GREATER,TK_OP_GREATER_EQUAL,TK_OP_AND,TK_OP_OR,
 		TK_OP_NOT,TK_OP_ADD,TK_OP_SUB,TK_OP_MUL,TK_OP_DIV,TK_OP_MOD,TK_OP_SHIFT_LEFT,TK_OP_SHIFT_RIGHT,TK_OP_ASSIGN,
@@ -8582,7 +8679,7 @@ class _Tokenizer:
 		TK_PR_SYNC,TK_PR_MASTER,TK_PR_SLAVE,TK_PR_PUPPET,TK_PR_REMOTESYNC,TK_PR_MASTERSYNC,TK_PR_PUPPETSYNC,
 		TK_BRACKET_OPEN,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_OPEN,TK_CURLY_BRACKET_CLOSE,TK_PARENTHESIS_OPEN,
 		TK_PARENTHESIS_CLOSE,TK_COMMA,TK_SEMICOLON,TK_PERIOD,TK_QUESTION_MARK,TK_COLON,TK_DOLLAR,TK_FORWARD_ARROW,
-		TK_NEWLINE,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN,TK_ERROR,TK_EOF,TK_CURSOR])
+		TK_NEWLINE,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN,TK_ERROR,TK_EOF,TK_CURSOR,TK_MAX])
 	const static_token_list = PoolIntArray([TK_SELF,TK_OP_IN,TK_OP_EQUAL,
 		TK_OP_NOT_EQUAL,TK_OP_LESS,TK_OP_LESS_EQUAL,TK_OP_GREATER,TK_OP_GREATER_EQUAL,TK_OP_AND,TK_OP_OR,
 		TK_OP_NOT,TK_OP_ADD,TK_OP_SUB,TK_OP_MUL,TK_OP_DIV,TK_OP_MOD,TK_OP_SHIFT_LEFT,TK_OP_SHIFT_RIGHT,TK_OP_ASSIGN,
@@ -8837,6 +8934,7 @@ class _Tokenizer:
 		KEY_DOUBLEQUOTE=34,KEY_BELL=7,KEY_BACKSPACE=8,KEY_VERTICALTAB=11,KEY_FORMFEED=12,}
 	const blankspace_nolf_chars:PoolIntArray=PoolIntArray([9,32])
 	const quote_chars:PoolIntArray=PoolIntArray([34,39])
+	
 	const post_store:PoolIntArray=PoolIntArray([0,0,0])
 	const type_store:PoolIntArray=PoolIntArray()
 	const args_store:Array=Array()
@@ -9260,6 +9358,92 @@ class _Tokenizer:
 	
 	static func word_is_tex(c:int) -> bool:
 		return (c >= 97 and c <= 122) or (c >= KEY_A and c<= KEY_Z) or (c >= KEY_0 and c <= KEY_9) or c == 95
+	
+	const gdc_bytes = PoolByteArray()
+	static func get_uint32() -> int:
+		var pos:int = post_store[0]
+		if pos + 4 > post_store[2]:
+			printerr("Unexpected end of data at offset %d" % pos)
+			post_store[0] = post_store[2]
+			return 0
+		var v:int = gdc_bytes[pos] | (gdc_bytes[pos + 1] << 8) | (gdc_bytes[pos + 2] << 16) | (gdc_bytes[pos + 3] << 24)
+		post_store[0] += 4
+		return v
+	
+	static func get_next_bytes(byte_count: int) -> PoolByteArray:
+		var pos:int = post_store[0]
+		if byte_count < 0 or pos + byte_count > post_store[2]:
+			printerr("Unexpected end of data at offset %d" % pos)
+			post_store[0] = post_store[2]
+			return PoolByteArray()
+		var out:PoolByteArray = PoolByteArray()
+		if byte_count > 0:
+			out = gdc_bytes.subarray(pos, pos + byte_count - 1)
+		post_store[0] += byte_count
+		return out
+	
+	static func get_string_data() -> String:
+		var l:int = get_uint32()
+		if l == 0:
+			return ""
+		var raw:PoolByteArray = get_next_bytes(l)
+		var pad:int = (4 - (l % 4)) % 4
+		if post_store[0] + pad > post_store[2]:
+			printerr("Unexpected end of data in string padding at offset %d" % post_store[0])
+			return ""
+		post_store[0] += pad
+		return raw.get_string_from_utf8()
+	
+	static func get_const():
+		var header:int = get_uint32()
+		match (header & 0xFF):
+			0: # Nil
+				return null
+			1: # Bool
+				return get_uint32() != 0
+			2: # Int
+				if (header & (1 << 16)) != 0:
+					return get_uint32() | (get_uint32() << 32)
+				var v:int = get_uint32()
+				if v >= 0x80000000:
+					v -= 0x100000000
+				return v
+			3: # Float
+				var spb:StreamPeerBuffer = StreamPeerBuffer.new()
+				if (header & (1 << 16)) != 0:
+					spb.data_array = get_next_bytes(8)
+					return spb.get_double()
+				spb.data_array = get_next_bytes(4)
+				return spb.get_float()
+			4: # String
+				return get_string_data()
+			15: # NodePath
+				var names:int = get_uint32()
+				if not (names & 0x80000000):
+					printerr("Old-format NodePath constants are not supported")
+					return null
+				var name_count:int = names & 0x7FFFFFFF
+				var subname_count:int = get_uint32()
+				var flags:int = get_uint32()
+				if name_count + subname_count > post_store[2] - post_store[0]:
+					printerr("Invalid NodePath constant")
+					return null
+				var name_list:PoolStringArray = PoolStringArray()
+				for i in name_count:
+					name_list.append(get_string_data())
+				var sub_list:PoolStringArray = PoolStringArray()
+				for i in subname_count:
+					sub_list.append(get_string_data())
+				var path:String = name_list.join("/")
+				if flags & 1:
+					path = "/" + path
+				if subname_count > 0:
+					path += ":" + sub_list.join(":")
+				return NodePath(path)
+			var vtype:
+				printerr("Unsupported constant type %d at offset %d" % [vtype, post_store[0]])
+				return null
+	
 
 class _Translations:
 	const non_static = {}
