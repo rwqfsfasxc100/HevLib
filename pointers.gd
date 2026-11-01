@@ -897,42 +897,40 @@ class _ConfigDriver:
 				if expected_path and expected_path.to_lower() != actual_path.to_lower():
 					incorrect_paths.append([manifest["manifest_data"]["mod_information"]["id"],expected_path,actual_path])
 				for requirement in manifest["manifest_data"]["manifest_definitions"]["dependancy_mod_ids"]:
-					match typeof(requirement):
-						TYPE_ARRAY:
-							var doesHaveAny:bool = false
-							var needsEitherOf:PoolStringArray = PoolStringArray()
-							for i in requirement:
-								if typeof(i) == TYPE_DICTIONARY and i.get("blocking",false) and not pointers.ManifestV2.__mod_exists(i):
-									var ov:String = __get_minmax_string_from_dict(i)
-									if ov:
-										needsEitherOf.append(ov)
-								else:
-									doesHaveAny = true
-							if not doesHaveAny:
-								missing_requirements.append(" OR ".join(needsEitherOf))
-						TYPE_DICTIONARY:
-							if requirement.get("blocking",false) and not pointers.ManifestV2.__mod_exists(requirement):
-								var ov:String = __get_minmax_string_from_dict(requirement)
+					if requirement is Array:
+						var doesHaveAny:bool = false
+						var needsEitherOf:PoolStringArray = PoolStringArray()
+						for i in requirement:
+							if i is Dictionary and i.get("blocking",false) and not pointers.ManifestV2.__mod_exists(i):
+								var ov:String = __get_minmax_string_from_dict(i)
 								if ov:
-									missing_requirements.append(ov)
+									needsEitherOf.append(ov)
+							else:
+								doesHaveAny = true
+						if not doesHaveAny:
+							missing_requirements.append(" OR ".join(needsEitherOf))
+					elif requirement is Dictionary:
+						if requirement.get("blocking",false) and not pointers.ManifestV2.__mod_exists(requirement):
+							var ov:String = __get_minmax_string_from_dict(requirement)
+							if ov:
+								missing_requirements.append(ov)
 				for incompat in manifest["manifest_data"]["manifest_definitions"]["conflicting_mod_ids"]:
-					match typeof(incompat):
-						TYPE_ARRAY:
-							var doesHaveAny:bool = false
-							var needsEitherOf:PoolStringArray = PoolStringArray()
-							for i in incompat:
-								if typeof(i) == TYPE_DICTIONARY and i.get("blocking",false) and pointers.ManifestV2.__mod_exists(i):
-									var ov:String = __get_minmax_string_from_dict(i)
-									if ov:
-										needsEitherOf.append(ov)
-										doesHaveAny = true
-							if doesHaveAny:
-								incompatible_mods.append(" OR ".join(needsEitherOf))
-						TYPE_DICTIONARY:
-							if incompat.get("blocking",false) and pointers.ManifestV2.__mod_exists(incompat):
-								var ov:String = __get_minmax_string_from_dict(incompat)
+					if incompat is Array:
+						var doesHaveAny:bool = false
+						var needsEitherOf:PoolStringArray = PoolStringArray()
+						for i in incompat:
+							if i is Dictionary and i.get("blocking",false) and pointers.ManifestV2.__mod_exists(i):
+								var ov:String = __get_minmax_string_from_dict(i)
 								if ov:
-									incompatible_mods.append(ov)
+									needsEitherOf.append(ov)
+									doesHaveAny = true
+						if doesHaveAny:
+							incompatible_mods.append(" OR ".join(needsEitherOf))
+					elif incompat is Dictionary:
+						if incompat.get("blocking",false) and pointers.ManifestV2.__mod_exists(incompat):
+							var ov:String = __get_minmax_string_from_dict(incompat)
+							if ov:
+								incompatible_mods.append(ov)
 				if missing_requirements or incompatible_mods:
 					problematic_mods[mod_name] = {}
 					if missing_requirements:
@@ -985,7 +983,7 @@ class _ConfigDriver:
 							var val : Array = current_config[sect][key]
 							for a in val.size():
 								var v = val[a]
-								if typeof(v) == TYPE_STRING:
+								if v is String:
 									v = [v]
 								val[a] = v
 							current_config[sect][key] = val
@@ -995,7 +993,7 @@ class _ConfigDriver:
 								var p:Array = key_data.get("default",[])
 								for h in p.size():
 									var v = p[h]
-									if typeof(v) == TYPE_STRING:
+									if v is String:
 										v = [v]
 									p[h] = v
 								current_config[sect][key] = p
@@ -1031,7 +1029,7 @@ class _ConfigDriver:
 						pointers.l("value of [%s] is [%s]" % [key,p],"pointers.ConfigDriver")
 						for h in p.size():
 							var v = p[h]
-							if typeof(v) == TYPE_STRING:
+							if v is String:
 								v = [v]
 							p[h] = v
 						if not key in actionList:
@@ -1051,32 +1049,30 @@ class _ConfigDriver:
 			var maxVer = null
 			if ("minimum_version" in requirement or "min_version" in requirement):
 				var minimum = requirement.get("minimum_version",requirement.get("min_version",null))
-				match typeof(minimum):
-					TYPE_ARRAY,TYPE_INT_ARRAY:
-						if minimum.size() > 2:
-							minVer = PoolIntArray(minimum)
-					TYPE_VECTOR3:
-						minVer = minimum
-					TYPE_DICTIONARY:
-						minVer = Vector3(
-							int(minimum.get("major",0)),
-							int(minimum.get("minor",0)),
-							int(minimum.get("bugfix",0))
-						)
+				if minimum is PoolIntArray or minimum is Array:
+					if minimum.size() > 2:
+						minVer = PoolIntArray(minimum)
+				elif minimum is Vector3:
+					minVer = minimum
+				elif minimum is Dictionary:
+					minVer = Vector3(
+						int(minimum.get("major",0)),
+						int(minimum.get("minor",0)),
+						int(minimum.get("bugfix",0))
+					)
 			if ("maximum_version" in requirement or "max_version" in requirement):
 				var minimum = requirement.get("maximum_version",requirement.get("max_version",null))
-				match typeof(minimum):
-					TYPE_ARRAY,TYPE_INT_ARRAY:
-						if minimum.size() > 2:
-							maxVer = PoolIntArray(minimum)
-					TYPE_VECTOR3:
-						maxVer = minimum
-					TYPE_DICTIONARY:
-						maxVer = Vector3(
-							int(minimum.get("major",0)),
-							int(minimum.get("minor",0)),
-							int(minimum.get("bugfix",0))
-						)
+				if minimum is PoolIntArray or minimum is Array:
+					if minimum.size() > 2:
+						maxVer = PoolIntArray(minimum)
+				elif minimum is Vector3:
+					maxVer = minimum
+				elif minimum is Dictionary:
+					maxVer = Vector3(
+						int(minimum.get("major",0)),
+						int(minimum.get("minor",0)),
+						int(minimum.get("bugfix",0))
+					)
 			var mdOut:String = MID
 			var additional:String = ""
 			if minVer:
@@ -1309,7 +1305,7 @@ class _ConfigDriver:
 					var out : Array = []
 					var resave:bool = false
 					for a in vf:
-						if typeof(a) == TYPE_STRING:
+						if a is String:
 							a = [a]
 							resave = true
 						out.append(a)
@@ -1388,8 +1384,7 @@ class _ConfigDriver:
 			var needs : Array = data_dict[mod_requirements_entry_override]
 			var can:int = 0
 			for a in needs:
-				var tx = typeof(a)
-				if tx == TYPE_ARRAY or tx == TYPE_STRING_ARRAY:
+				if a is Array or a is PoolStringArray:
 					for f in a:
 						if pointers.__mod_exists(f):
 							can += 1
@@ -1399,8 +1394,7 @@ class _ConfigDriver:
 			var needs : Array = data_dict[mod_incompatibilities_entry_override]
 			var can:int = 0
 			for a in needs:
-				var tx = typeof(a)
-				if tx == TYPE_ARRAY or tx == TYPE_STRING_ARRAY:
+				if a is Array or a is PoolStringArray:
 					for f in a:
 						if pointers.__mod_exists(f):
 							can += 1
@@ -1441,7 +1435,7 @@ class _DataFormat:
 			var l:String = i.name
 			if l in pl:
 				var item = pl[l]
-				if typeof(item) in PoolIntArray([TYPE_ARRAY,TYPE_RAW_ARRAY]):
+				if item is Array or item is PoolByteArray:
 					crcTable[l] = PoolByteArray(item)
 		non_statics["miniz"] = load("res://HevLib/scripts/miniz/miniz.gdns").new()
 		var urlRegex = RegEx.new()
@@ -1490,7 +1484,7 @@ class _DataFormat:
 			var kdata = dictionary[key]
 			if kdata in search_keys:
 				returning_keys.append(kdata)
-			if typeof(kdata) == TYPE_DICTIONARY:
+			if kdata is Dictionary:
 				returning_keys.append_array(__sift_dictionary(kdata,search_keys))
 		return returning_keys
 	static func l(text:String,header:String = "pointers.DataFormat"):
@@ -1517,15 +1511,14 @@ class _DataFormat:
 			prefab = parent + splitter
 		for key in dictionary.keys():
 			var kdata = dictionary[key]
-			match typeof(kdata):
-				TYPE_STRING:
-					if kdata in search_keys:
-						if return_only_system_names:
-							arr.append(kdata)
-						else:
-							arr.append(prefab + key + splitter + kdata)
-				TYPE_DICTIONARY:
-					arr.append_array(__sift_ship_config(kdata,search_keys,[],return_only_system_names,prefab + key))
+			if kdata is String:
+				if kdata in search_keys:
+					if return_only_system_names:
+						arr.append(kdata)
+					else:
+						arr.append(prefab + key + splitter + kdata)
+			elif kdata is Dictionary:
+				arr.append_array(__sift_ship_config(kdata,search_keys,[],return_only_system_names,prefab + key))
 		return arr
 	
 	static func __get_script_constant_map_without_load(script_path : String) -> Dictionary:
@@ -1973,13 +1966,11 @@ class _DataFormat:
 		DLCLoader.queue_free()
 		l("Finished loading DLC")
 	
+	const array_types = PoolIntArray([TYPE_ARRAY,TYPE_COLOR_ARRAY,TYPE_INT_ARRAY,TYPE_RAW_ARRAY,TYPE_REAL_ARRAY,TYPE_STRING_ARRAY,TYPE_VECTOR2_ARRAY,TYPE_VECTOR3_ARRAY])
 	static func __split_array_by_length(arr,length:int,specific_section = -1) -> Array:
 		var out = []
-		match typeof(arr):
-			TYPE_ARRAY,TYPE_COLOR_ARRAY,TYPE_INT_ARRAY,TYPE_RAW_ARRAY,TYPE_REAL_ARRAY,TYPE_STRING_ARRAY,TYPE_VECTOR2_ARRAY,TYPE_VECTOR3_ARRAY:
-				pass
-			_:
-				return out
+		if not typeof(arr) in array_types:
+			return out
 		var arrsize = arr.size()
 		if arrsize < length:
 			return arr
@@ -3011,18 +3002,17 @@ class _Equipment:
 							var dict : Dictionary = constants[ar]
 							if pointers.ConfigDriver.__validate_dictionary(dict):
 								var shipNames = dict.get("ship_name",[])
-								match typeof(shipNames):
-									TYPE_STRING:
-										shipNames = PoolStringArray([shipNames])
-									TYPE_ARRAY:
-										var ovr = PoolStringArray()
-										for i in shipNames:
-											if typeof(i) == TYPE_STRING:
-												ovr.append(i)
-										shipNames = ovr
-									TYPE_STRING_ARRAY:
-										pass
-									_: continue
+								if shipNames is String:
+									shipNames = PoolStringArray([shipNames])
+								elif shipNames is Array:
+									var ovr = PoolStringArray()
+									for i in shipNames:
+										if i is String:
+											ovr.append(i)
+									shipNames = ovr
+								elif shipNames is PoolStringArray:
+									pass
+								else: continue
 								var recurse:bool = dict.get("recurse_for_alias",false)
 								for entry in dict:
 									match entry:
@@ -3106,30 +3096,29 @@ class _Equipment:
 									if "sensors" in item:
 										for i in item.sensors.size():
 											var sensorItem = item.sensors[i]
-											match typeof(sensorItem):
-												TYPE_DICTIONARY:
-													if "func_object_path" in sensorItem and "func_method_name" in sensorItem:
-														var object_name:String = sensorItem.func_object_path
-														if object_name.begins_with("res://") and object_name.get_extension() in acceptible_script_extensions:
-															if object_name in rpc_non_autoload_object_persist:
-																sensorItem["funcref"] = funcref(rpc_non_autoload_object_persist[object_name],sensorItem.func_method_name)
-															elif pointers.DataFormat.__load_if_can(object_name,false,"Script"):
-																var refobject = pointers.DataFormat.__get_load().new()
-																sensorItem["funcref"] = funcref(refobject,sensorItem.func_method_name)
-																rpc_non_autoload_object_persist[object_name] = refobject
-															else: continue
+											if sensorItem is Dictionary:
+												if "func_object_path" in sensorItem and "func_method_name" in sensorItem:
+													var object_name:String = sensorItem.func_object_path
+													if object_name.begins_with("res://") and object_name.get_extension() in acceptible_script_extensions:
+														if object_name in rpc_non_autoload_object_persist:
+															sensorItem["funcref"] = funcref(rpc_non_autoload_object_persist[object_name],sensorItem.func_method_name)
+														elif pointers.DataFormat.__load_if_can(object_name,false,"Script"):
+															var refobject = pointers.DataFormat.__get_load().new()
+															sensorItem["funcref"] = funcref(refobject,sensorItem.func_method_name)
+															rpc_non_autoload_object_persist[object_name] = refobject
+														else: continue
+													else:
+														if not object_name in needs_autoload_funcref.keys():
+															needs_autoload_funcref[object_name] = [sensorItem]
 														else:
-															if not object_name in needs_autoload_funcref.keys():
-																needs_autoload_funcref[object_name] = [sensorItem]
-															else:
-																needs_autoload_funcref[object_name].append(sensorItem)
-												TYPE_STRING:
-													states.append(item)
-												_: continue
+															needs_autoload_funcref[object_name].append(sensorItem)
+											elif sensorItem is String:
+												states.append(item)
+											else: continue
 									if "function_outputs" in item:
 										for i in item.function_outputs.size():
 											var sensorItem = item.function_outputs[i]
-											if typeof(sensorItem) == TYPE_DICTIONARY:
+											if sensorItem is Dictionary:
 												if "func_object_path" in sensorItem and "func_method_name" in sensorItem:
 													var object_name:String = sensorItem.func_object_path
 													if object_name.begins_with("res://") and object_name.get_extension() in acceptible_script_extensions:
@@ -3508,11 +3497,11 @@ script = ExtResource( 5 )"""
 			ship_limitation_string += "\n\n" + lim_item % i
 			var data : Dictionary = ship_limitations[i]
 			if "limit_ships" in data:
-				if typeof(data["limit_ships"]) == TYPE_STRING:
+				if data["limit_ships"] is String:
 					data["limit_ships"] = PoolStringArray([data["limit_ships"]])
 				ship_limitation_string += "\nlimit_ships = [\"%s\"]" % "\",\"".join(PoolStringArray(data["limit_ships"]))
 			if "prevent_ships" in data:
-				if typeof(data["prevent_ships"]) == TYPE_STRING:
+				if data["prevent_ships"] is String:
 					data["prevent_ships"] = PoolStringArray([data["prevent_ships"]])
 				ship_limitation_string += "\nprevent_ships = [\"%s\"]" % "\",\"".join(PoolStringArray(data["prevent_ships"]))
 		
@@ -3999,12 +3988,11 @@ script = ExtResource( 5 )"""
 		var region_enabled:bool = nd.region_enabled
 		nozzle_vars += "\n" + "region_enabled = %s" % ("true" if region_enabled else "false")
 		var region_rect = nd.region_rect
-		match typeof(region_rect):
-			TYPE_ARRAY, TYPE_INT_ARRAY, TYPE_REAL_ARRAY:
-				if region_rect.size() > 3:
-					nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [region_rect[0],region_rect[1],region_rect[2],region_rect[3]]
-			TYPE_RECT2:
-				nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [region_rect.position.x,region_rect.position.y,region_rect.size.x,region_rect.size.y]
+		if region_rect is PoolIntArray or region_rect is PoolRealArray or region_rect is Array:
+			if region_rect.size() > 3:
+				nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [region_rect[0],region_rect[1],region_rect[2],region_rect[3]]
+		elif region_rect is Rect2:
+			nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [region_rect.position.x,region_rect.position.y,region_rect.size.x,region_rect.size.y]
 		var region_filter_clip:bool = nd.region_filter_clip
 		nozzle_vars += "\n" + "region_filter_clip = %s" % ("true" if region_filter_clip else "false")
 		var position = nd.position
@@ -4062,12 +4050,11 @@ script = ExtResource( 5 )"""
 		var heat_region_enabled:bool = nd.heat_region_enabled
 		nozzle_vars += "\n" + "region_enabled = %s" % ("true" if heat_region_enabled else "false")
 		var heat_region_rect = nd.heat_region_rect
-		match typeof(heat_region_rect):
-			TYPE_ARRAY, TYPE_INT_ARRAY, TYPE_REAL_ARRAY:
-				if heat_region_rect.size() > 3:
-					nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [heat_region_rect[0],heat_region_rect[1],heat_region_rect[2],heat_region_rect[3]]
-			TYPE_RECT2:
-				nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [heat_region_rect.position.x,heat_region_rect.position.y,heat_region_rect.size.x,heat_region_rect.size.y]
+		if heat_region_rect is PoolIntArray or heat_region_rect is PoolRealArray or heat_region_rect is Array:
+			if heat_region_rect.size() > 3:
+				nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [heat_region_rect[0],heat_region_rect[1],heat_region_rect[2],heat_region_rect[3]]
+		elif heat_region_rect is Rect2:
+			nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [heat_region_rect.position.x,heat_region_rect.position.y,heat_region_rect.size.x,heat_region_rect.size.y]
 		var heat_region_filter_clip:bool = nd.heat_region_filter_clip
 		nozzle_vars += "\n" + "region_filter_clip = %s" % ("true" if heat_region_filter_clip else "false")
 		var heat_position = nd.heat_position
@@ -4128,45 +4115,35 @@ script = ExtResource( 5 )"""
 		return nozzle
 	
 	func set_array_to_vector_or_rect(main,setter):
-		match typeof(setter):
-			TYPE_ARRAY,TYPE_REAL_ARRAY,TYPE_INT_ARRAY:
-				match typeof(main):
-					TYPE_VECTOR2:
-						return Vector2(setter[0],setter[1])
-					TYPE_VECTOR3:
-						return Vector3(setter[0],setter[1],setter[2])
-					TYPE_RECT2:
-						return Rect2(Vector2(setter[0],setter[1]),Vector2(setter[2],setter[3]))
+		if setter is PoolIntArray or setter is PoolRealArray or setter is Array:
+			if main is Vector2:
+					return Vector2(setter[0],setter[1])
+			elif main is Vector3:
+				return Vector3(setter[0],setter[1],setter[2])
+			elif main is Rect2:
+				return Rect2(Vector2(setter[0],setter[1]),Vector2(setter[2],setter[3]))
 		return setter
 	
 	func match_array_to_vector_or_rect(main,setter) -> bool:
-		var maintype:int = typeof(main)
-		var settertype:int = typeof(setter)
-		match maintype:
-			TYPE_VECTOR2:
-				match settertype:
-					TYPE_ARRAY,TYPE_REAL_ARRAY,TYPE_INT_ARRAY:
-						if setter.size() > 1:
-							return true
-					TYPE_VECTOR2:
-						return true
-			TYPE_VECTOR3:
-				match settertype:
-					TYPE_ARRAY,TYPE_REAL_ARRAY,TYPE_INT_ARRAY:
-						if setter.size() > 2:
-							return true
-					TYPE_VECTOR3:
-						return true
-			TYPE_RECT2:
-				match settertype:
-					TYPE_ARRAY,TYPE_REAL_ARRAY,TYPE_INT_ARRAY:
-						if setter.size() > 3:
-							return true
-					TYPE_RECT2:
-						return true
-			_:
-				return maintype == settertype
-		return false
+		if main is Vector2:
+			if setter is PoolIntArray or setter is PoolRealArray or setter is Array:
+				if setter.size() > 1:
+					return true
+			elif setter is Vector2:
+				return true
+		elif main is Vector3:
+			if setter is PoolIntArray or setter is PoolRealArray or setter is Array:
+				if setter.size() > 2:
+					return true
+			elif setter is Vector3:
+				return true
+		elif main is Rect2:
+			if setter is PoolIntArray or setter is PoolRealArray or setter is Array:
+				if setter.size() > 3:
+					return true
+			elif setter is Rect2:
+				return true
+		return typeof(main) == typeof(setter)
 	
 	func make_exhaust_scene(data:Dictionary,sys:String) -> String:
 		var exhaust_header : String = "[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://sfx/exhaust.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"%s\" type=\"%s\" id=2]\n\n[sub_resource type=\"CircleShape2D\" id=1]\nradius = %s\n\n[node name=\"exhaust\" instance=ExtResource( 1 )]"
@@ -4237,8 +4214,7 @@ script = ExtResource( 5 )"""
 		if e_slot_type == slot_type:
 			var passes_slot_check:bool = false
 			if e_equipment in slot_allowed_equipment:
-				var tp:int = typeof(slot_type)
-				if tp == TYPE_STRING:
+				if slot_type is String:
 					if slot_type == "HARDPOINT":
 						if slot_alignment in alignments:
 							if e_alignment in alignments:
@@ -4252,7 +4228,7 @@ script = ExtResource( 5 )"""
 							passes_slot_check = true
 					else:
 						passes_slot_check = true
-				elif tp == TYPE_ARRAY:
+				elif slot_type is Array or slot_type is PoolStringArray:
 					for s in slot_type:
 						if s == "HARDPOINT":
 							if slot_alignment in alignments:
@@ -4737,14 +4713,12 @@ class _FileAccess:
 			return ""
 	
 	static func __file_output_to_buffer(content) -> PoolByteArray:
-		match typeof(content):
-			TYPE_STRING:
-				return content.to_utf8()
-			TYPE_RAW_ARRAY:
-				return content
-			var tk:
-				non_static["pointers"].l("ERROR: content must be a String or PoolByteArray to be converted to buffer, is of type %d" % tk,"pointers.FileAccess")
-				return PoolByteArray()
+		if content is String:
+			return content.to_utf8()
+		elif content is PoolStringArray:
+			return content
+		non_static["pointers"].l("ERROR: content must be a String or PoolByteArray to be converted to buffer, is of type %d" % typeof(content),"pointers.FileAccess")
+		return PoolByteArray()
 	
 	static func __file_exists(file_path:String) -> bool:
 		file_path = ProjectSettings.localize_path(file_path)
@@ -5065,7 +5039,7 @@ class _Keymapping:
 			__add_inputs_to_inputmap(key,revis)
 	
 	static func __add_inputs_to_inputmap(key,controls):
-		if typeof(controls) == TYPE_STRING:
+		if controls is String:
 			controls = [controls]
 		if not controls:
 			return
@@ -5147,7 +5121,7 @@ class _Keymapping:
 					if ie in bound:
 						sect.can_be_rebound = true
 					for action in dv:
-						if typeof(action) == TYPE_STRING:
+						if action is String:
 							action = [action]
 						sect.inputs.append(action)
 					formatted_vanilla_binds_store[ie] = sect
@@ -5916,11 +5890,10 @@ class _ManifestV2:
 				for tl in tlFiles.keys():
 					var d = tlFiles[tl]
 					var delim:String = "|"
-					match typeof(d):
-						TYPE_STRING:
-							delim = d
-						TYPE_DICTIONARY:
-							delim = d.get("string",delim)
+					if d is String:
+						delim = d
+					elif d is Dictionary:
+						delim = d.get("string",delim)
 					var dict:Dictionary = pointers.Translations.__translation_file_to_dictionary(tl,delim)
 					for ln in dict.keys():
 						if not ln in tlKeys:
@@ -6129,9 +6102,10 @@ class _ManifestV2:
 			var manifest_data : Dictionary = {}
 			var manifest_version:float = 1.0
 			if "manifest_definitions" in cfg:
-				manifest_version = cfg["manifest_definitions"].get("manifest_version",manifest_version)
-				var tpf:int = typeof(manifest_version)
-				if not (tpf == TYPE_INT or tpf == TYPE_REAL):
+				var nrv = cfg["manifest_definitions"].get("manifest_version",manifest_version)
+				if nrv is int or nrv is float:
+					manifest_version = float(nrv)
+				else:
 					manifest_version = 1.0
 			manifest_data = cfg
 			if format_to_manifest_version:
@@ -6143,7 +6117,7 @@ class _ManifestV2:
 						dict_template["mod_information"]["name"] = manifest_data["package"].get("name","")
 						dict_template["mod_information"]["description"] = manifest_data["package"].get("description","MODMENU_DESCRIPTION_PLACEHOLDER")
 						
-						if typeof(manifest_data["package"].get("github_homepage","")) == TYPE_STRING:
+						if manifest_data["package"].get("github_homepage","") is String:
 							var url:String = manifest_data["package"]["github_homepage"]
 							if url:
 								dict_template["links"]["HEVLIB_GITHUB"] = {"URL":pointers.DataFormat.__ensure_string_is_url(url)}
@@ -6168,11 +6142,11 @@ class _ManifestV2:
 						dict_template["version"]["version_bugfix"] = manifest_data["package"].get("version_bugfix",0)
 						dict_template["version"]["version_metadata"] = manifest_data["package"].get("version_metadata","")
 						dict_template["mod_information"]["description"] = manifest_data["package"].get("description","HEVLIB_DESCRIPTION_PLACEHOLDER")
-						if typeof(manifest_data["package"].get("github","")) == TYPE_DICTIONARY:
+						if manifest_data["package"].get("github","") is Dictionary:
 							var url:String = manifest_data["package"]["github"]["link"]
 							if url:
 								dict_template["links"]["HEVLIB_GITHUB"] = {"URL":pointers.DataFormat.__ensure_string_is_url(url)}
-						elif typeof(manifest_data["package"].get("github","")) == TYPE_STRING:
+						elif manifest_data["package"].get("github","") is String:
 							var url:String = manifest_data["package"]["github"]
 							if url:
 								dict_template["links"]["HEVLIB_GITHUB"] = {"URL":pointers.DataFormat.__ensure_string_is_url(url)}
@@ -6241,11 +6215,11 @@ class _ManifestV2:
 						
 						# links
 						if "links" in manifestKeys:
-							if typeof(manifest_data["links"].get("github","")) == TYPE_DICTIONARY:
+							if manifest_data["links"].get("github","") is Dictionary:
 								var url:String = manifest_data["links"]["github"]["link"]
 								if url:
 									dict_template["links"]["HEVLIB_GITHUB"] = {"URL":pointers.DataFormat.__ensure_string_is_url(url)}
-							elif typeof(manifest_data["links"].get("github","")) == TYPE_STRING:
+							elif manifest_data["links"].get("github","") is String:
 								var url:String = manifest_data["links"]["github"]
 								if url:
 									dict_template["links"]["HEVLIB_GITHUB"] = {"URL":pointers.DataFormat.__ensure_string_is_url(url)}
@@ -6302,8 +6276,8 @@ class _ManifestV2:
 							var ovLinks = {}
 							for link in links.keys():
 								var ld = links[link]
-								if typeof(ld) == TYPE_DICTIONARY:
-									if "URL" in ld and typeof(ld.URL) == TYPE_STRING:
+								if ld is Dictionary:
+									if "URL" in ld and ld.URL is String:
 										ld.URL = pointers.DataFormat.__ensure_string_is_url(ld.URL)
 										ovLinks[link] = ld
 							if ovLinks:
@@ -6313,8 +6287,8 @@ class _ManifestV2:
 							var ovTags = {}
 							for tag in tags.keys():
 								var td = tags[tag]
-								if typeof(td) == TYPE_DICTIONARY:
-									if "type" in td and "value" in td and typeof(td.type) == TYPE_STRING:
+								if td is Dictionary:
+									if "type" in td and "value" in td and td.type is String:
 										ovTags[tag] = td
 							if ovTags:
 								dict_template["tags"] = ovTags
@@ -6322,10 +6296,9 @@ class _ManifestV2:
 							var languages = manifest_data["languages"]
 							for language in languages.keys():
 								var ld = languages[language]
-								var tld = typeof(ld)
-								if tld == TYPE_STRING:
+								if ld is String:
 									dict_template["languages"][language] = ld
-								elif tld == TYPE_INT or tld == TYPE_REAL:
+								elif ld is int or ld is float:
 									dict_template["languages"][language] = str(ld) + "%"
 						if "library" in manifestKeys:
 							dict_template["library"]["is_library"] = manifest_data["library"].get("is_library",false)
@@ -6340,8 +6313,8 @@ class _ManifestV2:
 									var cfdata = sec_data[cfname]
 									var type = cfdata.get("type",null)
 									if cfdata.get("disabled",false):pointers.l("Config %s/%s is disabled, skipping" % [section,cfname],"pointers.ConfigDriver")
-									elif typeof(type) != TYPE_STRING or not type:
-										var err = "Config %s @ %s does not define a type, skipping" % [cfname,section]
+									elif not (type or type is String):
+										var err:String = "Config %s @ %s does not define a type, skipping" % [cfname,section]
 										printerr(err)
 										pointers.l(err,"pointers.ConfigDriver")
 									else:
@@ -6397,9 +6370,9 @@ class _ManifestV2:
 						for tag in tags.keys():
 							if not tag in tag_data_cache:
 								tag_data_cache[tag] = {}
-							if typeof(tags[tag]) == TYPE_DICTIONARY:
+							if tags[tag] is Dictionary:
 								var td : Dictionary = tags[tag]
-								if "value" in td and "type" in td and typeof(td.type) == TYPE_STRING:
+								if "value" in td and "type" in td and td.type is String:
 									tag_data_cache[tag][id] = td["value"]
 		return tag_data_cache.duplicate(true)
 	
@@ -6559,7 +6532,7 @@ class _ManifestV2:
 	static func __parse_tags(tag_data) -> Dictionary:
 		var tag_dict : Dictionary = {}
 		for entry in tag_data.keys():
-			if typeof(tag_data[entry]) != TYPE_DICTIONARY:
+			if not tag_data[entry] is Dictionary:
 				return tag_dict
 			var tag_type : String = tag_data[entry].get("type","NULL_TYPE")
 			tag_type = tag_type.to_lower()
@@ -6902,32 +6875,31 @@ class _ManifestV2:
 		var resource_paths:Array = Array()
 		var file:File = File.new()
 		for i in preprocess_paths:
-			match typeof(i):
-				TYPE_STRING:
-					var ed:String = ""
-					file.open(i,File.READ)
-					var data:String = file.get_as_text(true)
-					file.close()
-					if "extends \"" in data:
-						for line in data.split("\n"):
-							if line.strip_edges().begins_with("extends \""):
-								ed = line.split("\"")[1]
-								break
-					resource_paths.append({"path":i,"mode":pointers.LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed,"priority":-INF,"mod_path":"res://HevLib/ModMain.gd"})
-				TYPE_STRING_ARRAY:
-					resource_paths.append({"path":i[0],"mode":pointers.LOAD_TYPE.REPLACE_RESOURCE,"extra_data":i[1],"priority":-INF,"mod_path":"res://HevLib/ModMain.gd"})
-				TYPE_ARRAY:
-					var ed:String = ""
-					var ot:String = i[0]
-					file.open(ot,File.READ)
-					var data:String = file.get_as_text(true)
-					file.close()
-					if "extends \"" in data:
-						for line in data.split("\n"):
-							if line.strip_edges().begins_with("extends \""):
-								ed = line.split("\"")[1]
-								break
-					resource_paths.append({"path":ot,"mode":pointers.LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed,"priority":i[1],"mod_path":"res://HevLib/ModMain.gd"})
+			if i is String:
+				var ed:String = ""
+				file.open(i,File.READ)
+				var data:String = file.get_as_text(true)
+				file.close()
+				if "extends \"" in data:
+					for line in data.split("\n"):
+						if line.strip_edges().begins_with("extends \""):
+							ed = line.split("\"")[1]
+							break
+				resource_paths.append({"path":i,"mode":pointers.LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed,"priority":-INF,"mod_path":"res://HevLib/ModMain.gd"})
+			elif i is PoolStringArray:
+				resource_paths.append({"path":i[0],"mode":pointers.LOAD_TYPE.REPLACE_RESOURCE,"extra_data":i[1],"priority":-INF,"mod_path":"res://HevLib/ModMain.gd"})
+			elif i is Array:
+				var ed:String = ""
+				var ot:String = i[0]
+				file.open(ot,File.READ)
+				var data:String = file.get_as_text(true)
+				file.close()
+				if "extends \"" in data:
+					for line in data.split("\n"):
+						if line.strip_edges().begins_with("extends \""):
+							ed = line.split("\"")[1]
+							break
+				resource_paths.append({"path":ot,"mode":pointers.LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed,"priority":i[1],"mod_path":"res://HevLib/ModMain.gd"})
 		for modlet in __get_modlet_files():
 			var mod_data:Dictionary = pointers.ManifestV2.__get_mod_by_id(pointers.ManifestV2.__match_mod_file_path_to_id(modlet))
 			var drivers:Dictionary = mod_data["drivers"]
@@ -7033,77 +7005,74 @@ class _ManifestV2:
 	static func __mod_exists(check_data) -> bool:
 		var has:bool = false
 		var current_mod_ids:PoolStringArray = __get_mod_ids()
-		match typeof(check_data):
-			TYPE_STRING:
-				if check_data in current_mod_ids:
-					has = true
-				elif check_data in __get_mod_list_keys():
-					has = true
-			TYPE_ARRAY:
-				if check_data:
-					for i in check_data:
-						if __mod_exists(i):
-							has = true
-							break
-			TYPE_DICTIONARY:
-				var MID:String = check_data.get("mod_id","")
-				var MDM:String = check_data.get("mod_main","")
-				if check_data and MID:
-					var moddata:Dictionary = __get_mod_by_id(MID)
-					if moddata:
-						var t1:bool = true
-						var ver_info:Array = moddata["version_data"]["full_version_array"]
-						if("maximum_version" in check_data or "max_version" in check_data):
-							var minimum = check_data.get("maximum_version",check_data.get("max_version",[0,0,0]))
-							var mnm = null
-							match typeof(minimum):
-								TYPE_ARRAY,TYPE_INT_ARRAY:
-									if minimum.size() > 2:
-										mnm = minimum
-								TYPE_VECTOR3:
-									mnm = minimum
-								TYPE_DICTIONARY:
-									var minarr = Vector3.ZERO
-									minarr[0] = int(minimum.get("major",0))
-									minarr[1] = int(minimum.get("minor",0))
-									minarr[2] = int(minimum.get("bugfix",0))
-									mnm = minarr
-							if mnm != null:
-								for i in 3:
-									if t1:
-										var a = int(ver_info[i])
-										var b = int(mnm[i])
-										if a > b:
-											t1 = false
-										elif a < b:
-											break
-						if t1 and ("minimum_version" in check_data or "min_version" in check_data):
-							var minimum = check_data.get("minimum_version",check_data.get("min_version",[0,0,0]))
-							var mnm = null
-							match typeof(minimum):
-								TYPE_ARRAY,TYPE_INT_ARRAY:
-									if minimum.size() > 2:
-										mnm = minimum
-								TYPE_VECTOR3:
-									mnm = minimum
-								TYPE_DICTIONARY:
-									var minarr = Vector3.ZERO
-									minarr[0] = int(minimum.get("major",0))
-									minarr[1] = int(minimum.get("minor",0))
-									minarr[2] = int(minimum.get("bugfix",0))
-									mnm = minarr
-							if mnm != null:
-								for i in 3:
-									if t1:
-										var a = int(ver_info[i])
-										var b = int(mnm[i])
-										if a < b:
-											t1 = false
-										elif a > b:
-											break
-						has = t1
-				elif typeof(MDM) == TYPE_STRING and MDM and MDM in __get_mod_list_keys():
-					has = true
+		if check_data is String:
+			if check_data in current_mod_ids:
+				has = true
+			elif check_data in __get_mod_list_keys():
+				has = true
+		elif check_data is Array:
+			if check_data:
+				for i in check_data:
+					if __mod_exists(i):
+						has = true
+						break
+		elif check_data is Dictionary:
+			var MID:String = check_data.get("mod_id","")
+			var MDM:String = check_data.get("mod_main","")
+			if check_data and MID:
+				var moddata:Dictionary = __get_mod_by_id(MID)
+				if moddata:
+					var t1:bool = true
+					var ver_info:Array = moddata["version_data"]["full_version_array"]
+					if("maximum_version" in check_data or "max_version" in check_data):
+						var minimum = check_data.get("maximum_version",check_data.get("max_version",[0,0,0]))
+						var mnm = null
+						if minimum is PoolIntArray or minimum is Array:
+							if minimum.size() > 2:
+								mnm = minimum
+						elif minimum is Vector3:
+							mnm = minimum
+						elif minimum is Dictionary:
+							var minarr = Vector3.ZERO
+							minarr[0] = int(minimum.get("major",0))
+							minarr[1] = int(minimum.get("minor",0))
+							minarr[2] = int(minimum.get("bugfix",0))
+							mnm = minarr
+						if mnm != null:
+							for i in 3:
+								if t1:
+									var a = int(ver_info[i])
+									var b = int(mnm[i])
+									if a > b:
+										t1 = false
+									elif a < b:
+										break
+					if t1 and ("minimum_version" in check_data or "min_version" in check_data):
+						var minimum = check_data.get("minimum_version",check_data.get("min_version",[0,0,0]))
+						var mnm = null
+						if minimum is PoolIntArray or minimum is Array:
+							if minimum.size() > 2:
+								mnm = minimum
+						elif minimum is Vector3:
+							mnm = minimum
+						elif minimum is Dictionary:
+							var minarr = Vector3.ZERO
+							minarr[0] = int(minimum.get("major",0))
+							minarr[1] = int(minimum.get("minor",0))
+							minarr[2] = int(minimum.get("bugfix",0))
+							mnm = minarr
+						if mnm != null:
+							for i in 3:
+								if t1:
+									var a = int(ver_info[i])
+									var b = int(mnm[i])
+									if a < b:
+										t1 = false
+									elif a > b:
+										break
+					has = t1
+			elif MDM is String and MDM and MDM in __get_mod_list_keys():
+				has = true
 		return has
 	
 	static func __match_mod_file_path_to_id(file_path:String) -> String:
@@ -7171,7 +7140,6 @@ class _Math:
 			rand_string += char(buffer[i % bs])
 		return rand_string
 	
-	const accepted_vector_types = PoolIntArray([TYPE_INT,TYPE_REAL,TYPE_STRING])
 	static func __convert_arr_to_vec2arr(array: Array) -> PoolVector2Array:
 		var converted:PoolVector2Array = PoolVector2Array()
 		var size:int = int(floor(array.size() / 2.0))
@@ -7180,10 +7148,10 @@ class _Math:
 			var index:int = r * 2
 			var aRaw = array[index]
 			var bRaw = array[index + 1]
-			if not typeof(aRaw) in accepted_vector_types:
+			if not (aRaw is int or aRaw is float or aRaw is String):
 				non_static["pointers"].l("Cannot convert type [%s] for PoolVector2Array" % aRaw)
 				return converted
-			if not typeof(bRaw) in accepted_vector_types:
+			if not (bRaw is int or bRaw is float or bRaw is String):
 				non_static["pointers"].l("Cannot convert type [%s] for PoolVector2Array" % bRaw)
 				return converted
 			converted[r] = Vector2(float(aRaw),float(bRaw))
@@ -7729,21 +7697,20 @@ class _RPC:
 		var sensors:Array = state.get("sensors",Array())
 		if sensors and stack[0] == "ring":
 			for sensor in sensors:
-				match typeof(sensor):
-					TYPE_STRING:
-						toFormat["sensor:" + sensor] = playership.sensorGet(sensor)
-					TYPE_DICTIONARY:
-						var sensor_name:String = sensor.get("sensor","")
-						var fallbackFormat:String = sensor.get("fallback","unknown")
-						var sensorOut = playership.sensorGet(sensor_name)
-						if "funcref" in sensor:
-							sensorOut = sensor.get("funcref").call_funcv([sensorOut] + sensor.get("extra_operands",[]))
-						if sensorOut != null:
-							toFormat["sensor:" + sensor_name] = sensorOut
-						elif fallbackFormat:
-							toFormat["sensor:" + sensor_name] = TranslationServer.translate(fallbackFormat)
+				if sensor is String:
+					toFormat["sensor:" + sensor] = playership.sensorGet(sensor)
+				elif sensor is Dictionary:
+					var sensor_name:String = sensor.get("sensor","")
+					var fallbackFormat:String = sensor.get("fallback","unknown")
+					var sensorOut = playership.sensorGet(sensor_name)
+					if "funcref" in sensor:
+						sensorOut = sensor.get("funcref").call_funcv([sensorOut] + sensor.get("extra_operands",[]))
+					if sensorOut != null:
+						toFormat["sensor:" + sensor_name] = sensorOut
+					elif fallbackFormat:
+						toFormat["sensor:" + sensor_name] = TranslationServer.translate(fallbackFormat)
 		for sensor in state.get("function_outputs",Array()):
-			if typeof(sensor)==TYPE_DICTIONARY:
+			if sensor is Dictionary:
 				var sensor_name:String = sensor.get("name","")
 				var fallbackFormat:String = sensor.get("fallback","unknown")
 				var sensorOut
@@ -8478,54 +8445,52 @@ class _Translations:
 			var file_paths : String = path["file"]
 			for file in file_paths:
 				var delim = file_paths[file]
-				match typeof(delim):
-					TYPE_STRING:
-						var dict : Dictionary = __translation_file_to_dictionary(file,delim)
+				if delim is String:
+					var dict : Dictionary = __translation_file_to_dictionary(file,delim)
+					__updateTL_from_dictionary(dict,fullLogging)
+				elif delim is Dictionary:
+					var string : String = delim.get("string","")
+					var mod : String = delim.get("mod","")
+					var section : String = delim.get("section","")
+					var setting : String = delim.get("setting","")
+					var invert:bool = delim.get("invert",false)
+					var val = pointers.ConfigDriver.__get_value(mod,section,setting)
+					var do:bool = true
+					if val is bool:
+						do = val
+					if invert:
+						do = !do
+					if do and string:
+						var dict : Dictionary = __translation_file_to_dictionary(file,string)
 						__updateTL_from_dictionary(dict,fullLogging)
-					TYPE_DICTIONARY:
-						var string : String = delim.get("string","")
-						var mod : String = delim.get("mod","")
-						var section : String = delim.get("section","")
-						var setting : String = delim.get("setting","")
-						var invert:bool = delim.get("invert",false)
-						var val = pointers.ConfigDriver.__get_value(mod,section,setting)
-						var do:bool = true
-						if typeof(val) == TYPE_BOOL:
-							do = val
-						if invert:
-							do = !do
-						if do and string:
-							var dict : Dictionary = __translation_file_to_dictionary(file,string)
-							__updateTL_from_dictionary(dict,fullLogging)
 			
 			path.erase("file")
 		for lang in path.keys():
 			var translationObject := Translation.new()
 			translationObject.locale = lang
-			var translation_dict = path.get(lang)
-			for key in translation_dict:
-				var data = translation_dict.get(key)
-				match typeof(data):
-					TYPE_STRING:
+			var translation_dict:Dictionary = path[lang]
+			for key in translation_dict.keys():
+				var data = translation_dict[key]
+				if data is String:
 						translationObject.add_message(key,data.c_unescape())
 						if fullLogging:
 							pointers.l("Added translation: %s" % key,"pointers.Translations")
-					TYPE_DICTIONARY:
-						var string = data.get("string","")
-						var mod = data.get("mod","")
-						var section = data.get("section","")
-						var setting = data.get("setting","")
-						var invert = data.get("invert",false)
-						var val = pointers.ConfigDriver.__get_value(mod,section,setting)
-						var do = true
-						if typeof(val) == TYPE_BOOL:
-							do = val
-						if invert:
-							do = !do
-						if do and string:
-							translationObject.add_message(key,string.c_unescape())
-						if fullLogging:
-							pointers.l("Added translation: %s" % key,"pointers.Translations")
+				elif data is Dictionary:
+					var string = data.get("string","")
+					var mod = data.get("mod","")
+					var section = data.get("section","")
+					var setting = data.get("setting","")
+					var invert = data.get("invert",false)
+					var val = pointers.ConfigDriver.__get_value(mod,section,setting)
+					var do = true
+					if val is bool:
+						do = val
+					if invert:
+						do = !do
+					if do and string:
+						translationObject.add_message(key,string.c_unescape())
+					if fullLogging:
+						pointers.l("Added translation: %s" % key,"pointers.Translations")
 			translationCount += 1
 			
 			translations.append(translationObject)
@@ -8630,13 +8595,12 @@ class _Translations:
 						var d = tlFiles[tl]
 						var delim:String = "|"
 						var operate:bool = true
-						match typeof(d):
-							TYPE_STRING:
-								delim = d
-							TYPE_DICTIONARY:
-								delim = d.get("string",delim)
-								if not pointers.ConfigDriver.__validate_dictionary(d):
-									operate = false
+						if d is String:
+							delim = d
+						elif d is Dictionary:
+							delim = d.get("string",delim)
+							if not pointers.ConfigDriver.__validate_dictionary(d):
+								operate = false
 						if operate:
 							var dict:Dictionary = __translation_file_to_dictionary(tl,delim)
 							for lang in dict:
@@ -8665,7 +8629,7 @@ class _Translations:
 						if check_ml:
 							if mlt and t in mlt:
 								var c = mlt[t]
-								if "version_hash" in v and typeof(c) == TYPE_DICTIONARY and "string" in c:
+								if "version_hash" in v and c is Dictionary and "string" in c:
 									if hash(c.string) != v.version_hash:
 										ml_check_data[language]["needs_updating"].append(t)
 										ml_check_data[language]["needs_updating_size"] += 1
