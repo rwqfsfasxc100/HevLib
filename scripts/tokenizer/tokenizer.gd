@@ -1053,7 +1053,7 @@ func read_number_token()->bool:
 		if s.begins_with("."):
 			s = "0" + s
 		var v = str2var(s)
-		if typeof(v) == TYPE_INT or typeof(v) == TYPE_REAL:
+		if v is int or v is float:
 			push_token(TK_CONSTANT,float(v))
 		else:
 			push_token(TK_CONSTANT,s.to_float())
