@@ -8243,17 +8243,70 @@ class _Threading:
 	
 	var pointers:HevLibPointers
 	
-	func _init(p):
-		pointers = p
-	
 	var active_threads:Array = []
 	
-	func __create_thread(object:Object,method_call:String,arguments:Array = [],priority:int = 1) -> ThreadStruct:
-		var thread:ThreadStruct = ThreadStruct.new(object,method_call,arguments,priority)
-		
-		active_threads.append(thread)
-		thread.run()
-		return thread
+	var thread_queue:Dictionary = {}
+	var thread_id_list:PoolIntArray = PoolIntArray()
+	var thread_operation_count:Dictionary = {}
+	
+	var max_threads:int = OS.get_processor_count() - 2
+	
+	var mutex:Mutex = Mutex.new()
+	
+	signal job_finished()
+	
+	func _init(p):
+		pointers = p
+		active_threads.resize(max_threads)
+		for i in max_threads:
+			active_threads[i] = ThreadStruct.new(self)
+	
+	func __request_multiple_threads(operations:Array) -> int:
+		var request_id:int = (operations.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
+		mutex.lock()
+		var ops:Array = []
+		for i in operations:
+			if i and i is Dictionary:
+				ops.append(i)
+		if ops:
+			thread_id_list.append(request_id)
+			thread_queue[request_id] = ops
+			thread_operation_count[request_id] = [ops.size(),0]
+		else:
+			request_id = -1
+		mutex.unlock()
+		wake()
+		return request_id
+	
+	func __request_single_thread(operation:Dictionary) -> int:
+		var request_id:int = (operation.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
+		mutex.lock()
+		if operation:
+			thread_id_list.append(request_id)
+			thread_queue[request_id] = [operation]
+		else:
+			request_id = -1
+		mutex.unlock()
+		wake()
+		return request_id
+	
+	signal requesting_next_thread()
+	func wake():
+		emit_signal("requesting_next_thread")
+	
+	func fetch_next_operation() -> Dictionary:
+		if thread_queue:
+			var id:int = thread_id_list[0]
+			var tk:Array = thread_queue[id]
+			var next:Dictionary = tk.pop_front()
+			if tk.empty():
+				thread_id_list.remove(thread_id_list.find(id))
+				thread_queue.erase(id)
+			return next
+		return {}
+	
+	func thread_handler():
+		pass
 	
 	func _notification(what):
 		if what == NOTIFICATION_PREDELETE:
@@ -8264,48 +8317,45 @@ class _Threading:
 		
 		signal thread_finished(out)
 		
-		var busy:Mutex = Mutex.new()
-		var semaphore:Semaphore = Semaphore.new()
 		var thread:Thread = Thread.new()
-		func _init(o:Object,m:String,a:Array,p:int):
-			object = o
-			method_call = m
-			args = a
-			priority = p
+		var container:_Threading
+		
+		func _init(cv:_Threading):
+			container = cv
+			cv.connect("requesting_next_thread",self,"run")
 		
 		var exit_thread:bool = false
 		
-		var object:Object
-		var method_call:String = ""
-		var args:Array = []
-		var priority:int = 1
+		var current_object:Object = null
+		var current_method_call:String = ""
+		var current_args:Array = []
+		var current_priority:int = 1
 		
 		func run():
-			thread.start(self,"call_object_func",null,priority)
-			var out = yield(thread.wait_to_finish(),"completed")
-			breakpoint
+			container.mutex.lock()
+			var next:Dictionary = container.fetch_next_operation()
+			container.mutex.unlock()
+			if next:
+				current_object = next.get("object",null)
+				current_method_call = next.get("method","")
+				if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
+					container.disconnect("requesting_next_thread",self,"run")
+					current_args = Array(next.get("args",[]))
+					current_priority = next.get("priority",1)
 		
 		func call_object_func(_a = null):
-			while true:
-				semaphore.wait()
-				
-				busy.lock()
-				var exit:bool = exit_thread
-				busy.unlock()
-				if exit:
-					break
-				
-				object.callv(method_call,args)
+			var out = current_object.callv(current_method_call,current_args)
+			if out is GDScriptFunctionState:
+				out = yield(out,"completed")
+			
+			
+			container.connect("requesting_next_thread",self,"run")
 		
 		func _notification(what):
 			if what == NOTIFICATION_PREDELETE:
-				busy.lock()
-				exit_thread = true
-				busy.unlock()
-				
-				semaphore.post()
-				
 				thread.wait_to_finish()
+		
+		
 		
 		
 
