@@ -196,9 +196,8 @@ func __compiled_bytecode_to_tokens(bytes:PoolByteArray) -> bool:
 		if l > length - pos:
 			printerr("Invalid identifier length %d" % l)
 			return false
-		var raw:PoolByteArray = get_next_bytes(l)
 		var decoded:PoolByteArray = PoolByteArray()
-		for byte in raw:
+		for byte in get_next_bytes(l):
 			byte ^= 0xb6
 			if byte == 0:
 				break
@@ -206,20 +205,21 @@ func __compiled_bytecode_to_tokens(bytes:PoolByteArray) -> bool:
 		identifiers.append(decoded.get_string_from_utf8())
 	var constants:Array = []
 	for i in constant_count:
-		var v = get_const()
-		constants.append(v)
+		constants.append(get_const())
 	if line_count * 8 > length - pos:
 		printerr("Invalid line count")
 		return false
 	var line_at:Dictionary = {}
+	var line_list:PoolIntArray = PoolIntArray()
+	line_list.resize(line_count)
 	for i in line_count:
-		var tok_index:int = get_uint32()
-		var line:int = get_uint32()
-		line_at[tok_index] = line
+		var v:int = get_uint32()
+		line_at[v] = get_uint32()
+		line_list[i] = v
 	type_store.resize(token_count)
 	args_store.resize(token_count)
 	line_store.resize(token_count)
-	var line_list:PoolIntArray = PoolIntArray(line_at.keys())
+	
 	var current_line:int = 1
 	for i in token_count:
 		if length - pos < 1:
@@ -987,52 +987,52 @@ func read_word_token(ch:int)->bool:
 	return true
 
 func read_number_token()->bool:
-	var period_found:bool = false
-	var exponent_found:bool = false
-	var hexa_found:bool = false
-	var bin_found:bool = false
-	var sign_found:bool = false
+	var is_floating:bool = false
+	var is_signed:bool = false
+	var uses_exponent:bool = false
+	var uses_hex:bool = false
+	var uses_bin:bool = false
 	var s:String = ""
 	var i:int = 0
 	while true:
 		var c:int = get_char(i)
 		if c == KEY_PERIOD:
-			if period_found or exponent_found:
+			if is_floating or uses_exponent:
 				printerr(compile_err_header % [line,"Invalid numeric constant at '.'"])
 				return false
-			if bin_found:
+			if uses_bin:
 				printerr(compile_err_header % [line,"Invalid binary constant at '.'"])
 				return false
-			elif hexa_found:
+			elif uses_hex:
 				printerr(compile_err_header % [line,"Invalid hexadecimal constant at '.'"])
 				return false
-			period_found=true
+			is_floating=true
 		elif c == 120: # x
-			if hexa_found or bin_found or s.length() != 1 or not ((i == 1 and s[0] == "0") or (i == 2 and s[1] == "0" and s[0] == "-")):
+			if uses_hex or uses_bin or s.length() != 1 or not ((i == 1 and s[0] == "0") or (i == 2 and s[1] == "0" and s[0] == "-")):
 				printerr(compile_err_header % [line,"Invalid numeric constant at 'x'"])
 				return false
-			hexa_found=true
-		elif hexa_found and (c >= KEY_0 and c <= KEY_9) or (c >= 97 and c <= 102) or (c >= KEY_A and c <= KEY_Z):
+			uses_hex=true
+		elif uses_hex and (c >= KEY_0 and c <= KEY_9) or (c >= 97 and c <= 102) or (c >= KEY_A and c <= KEY_Z):
 			pass
-		elif not hexa_found and c==98: # b
-			if bin_found or s.length() != 1 or not ((i == 1 and s[0] == "0") or (i == 2 and s[1] == "0" and s[0] == "-")):
+		elif not uses_hex and c==98: # b
+			if uses_bin or s.length() != 1 or not ((i == 1 and s[0] == "0") or (i == 2 and s[1] == "0" and s[0] == "-")):
 				printerr(compile_err_header % [line,"Invalid numeric constant at 'b'"])
 				return false
-			bin_found=true
-		elif not hexa_found and c == 101: # e
-			if exponent_found or bin_found:
+			uses_bin=true
+		elif not uses_hex and c == 101: # e
+			if uses_exponent or uses_bin:
 				printerr(compile_err_header % [line,"Invalid numeric constant at 'e'"])
 				return false
-			exponent_found=true
+			uses_exponent=true
 		elif word_is_number(c):
 			pass
-		elif bin_found and (c == KEY_0 or c == KEY_1):
+		elif uses_bin and (c == KEY_0 or c == KEY_1):
 			pass
-		elif (c == KEY_MINUS or c == KEY_PLUS) and exponent_found:
-			if sign_found:
+		elif (c == KEY_MINUS or c == KEY_PLUS) and uses_exponent:
+			if is_signed:
 				printerr(compile_err_header % [line,"Invalid numeric constant at '-'"])
 				return false
-			sign_found=true
+			is_signed=true
 		elif c == KEY_UNDERSCORE: # _ separator
 			i += 1
 			continue
@@ -1041,15 +1041,15 @@ func read_number_token()->bool:
 		s += char(c)
 		i += 1
 	var last:int = s.ord_at(s.length() - 1) if s.length() > 0 else 0
-	if not (word_is_number(last) or (hexa_found and (last >= KEY_0 and last <= KEY_9) or (last >= 97 and last <= 102) or (last >= KEY_A and last <= KEY_Z))):
+	if not (word_is_number(last) or (uses_hex and (last >= KEY_0 and last <= KEY_9) or (last >= 97 and last <= 102) or (last >= KEY_A and last <= KEY_Z))):
 		printerr(compile_err_header % [line,"Invalid numeric constant: "+s])
 		return false
 	pos += i
-	if hexa_found:
+	if uses_hex:
 		push_token(TK_CONSTANT,radixify(s,2,4))
-	elif bin_found:
+	elif uses_bin:
 		push_token(TK_CONSTANT,radixify(s,2,1))
-	elif period_found or exponent_found:
+	elif is_floating or uses_exponent:
 		if s.begins_with("."):
 			s = "0" + s
 		var v = str2var(s)
