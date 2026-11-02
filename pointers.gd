@@ -8253,7 +8253,7 @@ class _Threading:
 	
 	var mutex:Mutex = Mutex.new()
 	
-	signal job_finished()
+	signal finished_thread_operation(thread_id)
 	
 	func _init(p):
 		pointers = p
@@ -8261,7 +8261,7 @@ class _Threading:
 		for i in max_threads:
 			active_threads[i] = ThreadStruct.new(self)
 	
-	func __request_multiple_threads(operations:Array) -> int:
+	func __request_multiple_threads(operations:Array) -> Reference:
 		var request_id:int = (operations.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
 		mutex.lock()
 		var ops:Array = []
@@ -8271,24 +8271,28 @@ class _Threading:
 		if ops:
 			thread_id_list.append(request_id)
 			thread_queue[request_id] = ops
-			thread_operation_count[request_id] = [ops.size(),0]
+			thread_operation_count[request_id] = [0,ops.size(),[]]
 		else:
 			request_id = -1
 		mutex.unlock()
+		var ret_obj:Reference = ThreadReturn.new(request_id,self)
 		wake()
-		return request_id
+		return ret_obj
 	
-	func __request_single_thread(operation:Dictionary) -> int:
+	func __request_single_thread(operation:Dictionary) -> Reference:
 		var request_id:int = (operation.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
 		mutex.lock()
 		if operation:
+			operation["request_id"] = request_id
 			thread_id_list.append(request_id)
 			thread_queue[request_id] = [operation]
+			thread_operation_count[request_id] = [0,1,[]]
 		else:
 			request_id = -1
 		mutex.unlock()
+		var ret_obj:Reference = ThreadReturn.new(request_id,self)
 		wake()
-		return request_id
+		return ret_obj
 	
 	signal requesting_next_thread()
 	func wake():
@@ -8296,17 +8300,26 @@ class _Threading:
 	
 	func fetch_next_operation() -> Dictionary:
 		if thread_queue:
+			mutex.lock()
 			var id:int = thread_id_list[0]
 			var tk:Array = thread_queue[id]
 			var next:Dictionary = tk.pop_front()
 			if tk.empty():
 				thread_id_list.remove(thread_id_list.find(id))
 				thread_queue.erase(id)
+			mutex.unlock()
 			return next
 		return {}
 	
-	func thread_handler():
-		pass
+	func handle_completed_thread(thread_id:int,data):
+		mutex.lock()
+		var threadData:Array = thread_operation_count[thread_id]
+		threadData[2].append(data)
+		threadData[0] += 1
+		mutex.unlock()
+		var ret:bool = threadData[0] == threadData[1]
+		if ret:
+			emit_signal("finished_thread_operation",thread_id)
 	
 	func _notification(what):
 		if what == NOTIFICATION_PREDELETE:
@@ -8331,7 +8344,11 @@ class _Threading:
 		var current_args:Array = []
 		var current_priority:int = 1
 		
+		var current_thread_id:int = -1
+		
 		func run():
+			if thread.is_active():
+				return
 			container.mutex.lock()
 			var next:Dictionary = container.fetch_next_operation()
 			container.mutex.unlock()
@@ -8339,25 +8356,47 @@ class _Threading:
 				current_object = next.get("object",null)
 				current_method_call = next.get("method","")
 				if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
-					container.disconnect("requesting_next_thread",self,"run")
 					current_args = Array(next.get("args",[]))
 					current_priority = next.get("priority",1)
+					current_thread_id = next["request_id"]
+					thread.start(self,"call_object_func",null,current_priority)
 		
 		func call_object_func(_a = null):
 			var out = current_object.callv(current_method_call,current_args)
 			if out is GDScriptFunctionState:
 				out = yield(out,"completed")
-			
-			
-			container.connect("requesting_next_thread",self,"run")
+			container.handle_completed_thread(current_thread_id,out)
 		
 		func _notification(what):
 			if what == NOTIFICATION_PREDELETE:
 				thread.wait_to_finish()
 		
+	class ThreadReturn:
+		extends Reference
 		
+		signal thread_finished(data)
 		
+		var thread_id:int = -1
+		var handler:_Threading
 		
+		func _init(id:int,container:_Threading) -> void:
+			handler = container
+			container.connect("finished_thread_operation",self,"check_if_complete")
+			thread_id = id
+			if thread_id < 0:
+				emit_signal("thread_finished",null)
+		
+		func check_if_complete(id:int):
+			print("Thread returning: ",id)
+			if id == thread_id:
+				handler.mutex.lock()
+				var data:Array = handler.thread_operation_count[id][2]
+				handler.thread_operation_count.erase(id)
+				handler.mutex.unlock()
+				emit_signal("thread_finished",data)
+		
+	
+	
 
 class _TimeAccess:
 	func _init(p):
@@ -8425,7 +8464,7 @@ class _Tokenizer:
 			return tk.__tokens_to_source()
 		return ""
 	
-	func __declutter_source(source:String) -> String:
+	func __normalize_source(source:String) -> String:
 		var tk:Reference = tokenizer_script.new()
 		if tk.__source_to_tokens(source):
 			return tk.__tokens_to_source()
@@ -8456,6 +8495,8 @@ class _Tokenizer:
 		TK_PARENTHESIS_CLOSE,TK_COMMA,TK_SEMICOLON,TK_PERIOD,TK_QUESTION_MARK,TK_COLON,TK_DOLLAR,TK_FORWARD_ARROW,
 		TK_NEWLINE,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN,TK_ERROR,TK_EOF,TK_CURSOR,TK_MAX
 	}
+	
+	
 	
 
 class _Translations:

@@ -119,20 +119,20 @@ const type_store:PoolIntArray = PoolIntArray()
 const args_store:Array = Array()
 const line_store:PoolIntArray = PoolIntArray()
 
-var pointers:HevLibPointers._Tokenizer
+var pointers:Reference
 var builtin_classes:PoolStringArray = PoolStringArray()
 var file:File = File.new()
-func __make_shadow_of_script(script_path:String,p:HevLibPointers):
-	pointers = p.Tokenizer
+func __make_shadow_of_script(script_path:String,p:HevLibPointers) -> String:
+	pointers = p.Tokenizer.__get_tokenizer()
 	if not builtin_classes:
 		builtin_classes = ClassDB.get_class_list() + PoolStringArray(pointers.type_index.keys())
 		for i in builtin_classes.size():
 			var cn:String = builtin_classes[i]
 			if cn.begins_with("_"):
 				builtin_classes[i] = cn.trim_prefix("_")
-
+	
 	var is_tool:bool = false
-
+	
 	var extension_type:int = 0
 	var extension_class:String = ""
 	var functions:Dictionary = {}
@@ -141,9 +141,9 @@ func __make_shadow_of_script(script_path:String,p:HevLibPointers):
 	var signals:Dictionary = {}
 	var constants:PoolStringArray = PoolStringArray()
 	var classes:Array = []
-
+	
 	var has_extended:bool = false
-
+	
 	while extension_type != 1:
 		has_extended = false
 		if not (file.file_exists(script_path) or ResourceLoader.exists(script_path)):
@@ -253,10 +253,9 @@ func __make_shadow_of_script(script_path:String,p:HevLibPointers):
 	if is_tool:
 		compile = "tool\n"
 	compile += "extends %s\n\n" % extension_class
-#	compile += "extends Object\n\n"
-
+	
 	var passthrough_object_name:String = "__objref_%d__" % randi()
-
+	
 	compile += "var %s\n" % passthrough_object_name
 	compile += ("""
 func _init(obj_to_ref):
@@ -277,54 +276,9 @@ func __get__{var_name}__():
 	return %s.{var_name}
 
 """) % passthrough_object_name
-
-#	for i in ClassDB.class_get_enum_list(extension_class):
-#		enumerations.append("enum %s{%s}" % [i,ClassDB.class_get_enum_constants(extension_class,i).join(",")])
-
-#	var fKeys:PoolStringArray = PoolStringArray(functions.keys())
-#	if not "_init" in fKeys:
-#		fKeys.append("_init")
-#	for i in ClassDB.class_get_method_list(extension_class):
-#		var item_name:String = i.name
-#		if not item_name in fKeys:
-#			var args:Array = []
-#			for a in i.args:
-#				args.append([a.name,a["class_name"],""])
-#			var argOffset:int = args.size() - i.default_args.size()
-#			for idx in i.default_args.size():
-#				args[idx + argOffset][2] = var2str(i.default_args[idx])
-#			functions[item_name] = {"args":args,"type":i["return"]["class_name"]}
-
-#	var vkeys:PoolStringArray = PoolStringArray(variables.keys())
-#	for i in ClassDB.class_get_property_list(extension_class):
-#		var item_name:String = i.name
-#		if not (" " in item_name or item_name in vkeys):
-#			variables[item_name] = pointers.type_index.keys()[pointers.type_index.values().find(i.type)]
-
-#	var object_builtin_notifs:PoolStringArray = PoolStringArray([
-#		"NOTIFICATION_POSTINITIALIZE",
-#		"NOTIFICATION_PREDELETE",
-#		"CONNECT_DEFERRED",
-#		"CONNECT_PERSIST",
-#		"CONNECT_ONESHOT",
-#		"CONNECT_REFERENCE_COUNTED",
-#	])
-
-#	for i in ClassDB.class_get_integer_constant_list(extension_class):
-#		if not i in object_builtin_notifs:
-#			constants.append("const " + i + "=" + var2str(ClassDB.class_get_integer_constant(extension_class,i)))
-
-#	var skeys:PoolStringArray = PoolStringArray(signals.keys())
-#	for i in ClassDB.class_get_signal_list(extension_class):
-#		var item_name:String = i.name
-#		if not (item_name == "script_changed" or item_name in skeys):
-#			var args:PoolStringArray = PoolStringArray()
-#			for r in i.args:
-#				args.append(r.name)
-#			signals[item_name] = args
-
+	
 	var signal_emitters:String = ""
-
+	
 	for i in signals.keys():
 		var data:PoolStringArray = signals[i]
 		compile += "\t%s.connect(\"%s\",self,\"%s\")\n" % [passthrough_object_name,i,"__emit_%s_signal__"%i]
@@ -337,9 +291,9 @@ func __get__{var_name}__():
 	compile += signal_emitters
 	for i in constants:
 		compile += i + "\n"
-
+	
 	var builtin_identifiers:PoolStringArray = PoolStringArray(pointers.static_tokens.values())
-
+	
 	for i in enumerations:
 		compile += i + "\n"
 	functions.erase("_init")
@@ -371,23 +325,23 @@ func __get__{var_name}__():
 			else:
 				args_default = aName + aCast + aDefault
 				args = aName
-
+		
 		compile += ("""
 func %s(%s)%s:
-
+	
 	return %s.%s(%s)
 """) % [i,args_default,cast,passthrough_object_name,i,args]
-
-
+	
+	
 	for i in variables.keys():
 		var cast:String = variables[i]
 		if cast:
 			cast = ":" + cast
 		compile += setGet_template.format({"var_name":i,"class_cast":cast})
-
+	
 	for i in classes:
 		compile += class_template.format({"var_name":i})
-
+	
 	return compile
 
 const casting_escapes = PoolIntArray([TK_OP_ASSIGN,TK_NEWLINE,TK_SEMICOLON,TK_COMMA,TK_PARENTHESIS_CLOSE])

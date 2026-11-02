@@ -756,7 +756,8 @@ const compile_err_header="SCRIPT COMPILE ERR - line %d: %s"
 const decompile_err_header="SCRIPT DECOMPILE ERR - line %d: %s"
 enum{
 	KEY_HORIZONTALTAB=9,KEY_LINEFEED=10,KEY_CARRIAGERETURN=13,KEY_SINGLEQUOTE=39,
-	KEY_DOUBLEQUOTE=34,KEY_BELL=7,KEY_BACKSPACE=8,KEY_VERTICALTAB=11,KEY_FORMFEED=12,}
+	KEY_DOUBLEQUOTE=34,KEY_BELL=7,KEY_BACKSPACE=8,KEY_VERTICALTAB=11,KEY_FORMFEED=12,
+}
 
 const operator_characters = "+-*/%=<>!&|^~"
 
@@ -791,7 +792,7 @@ func next_token() -> bool:
 				printerr(compile_err_header % [line,"Expected newline after '\\'."])
 				return false
 			pos += 1
-			length += 1
+			line += 1
 			while true:
 				if!get_char(0) in PoolIntArray([KEY_SPACE,KEY_HORIZONTALTAB]):
 					break
