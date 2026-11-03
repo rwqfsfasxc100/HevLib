@@ -56,6 +56,31 @@ const RPC_EXTRA_STATES = {
 				}
 			]
 		},
+		{
+			"text":"HEVLIB_DISCORDRPC_SECONDARY_PROPELLANT",
+			"sensors":[
+				{
+					"sensor":"fuel",
+					"func_object_path":"CurrentGame",
+					"func_method_name":"formatThousandsWithDecimals",
+					"extra_operands":[1],
+					"fallback":"unknown"
+				}
+			]
+		},
+		{
+			"text":"HEVLIB_DISCORDRPC_SECONDARY_SHIP_CONDITION",
+			"sensors":[
+				{
+					"sensor":"status",
+					"sensor_identifier_override":"ship_status",
+					"func_object_path":"CurrentGame",
+					"func_method_name":"formatThousandsWithDecimals",
+					"extra_operands":[1],
+					"fallback":"unknown"
+				}
+			]
+		},
 	],
 	"enceladus_prime":[
 		{

@@ -7700,9 +7700,10 @@ class _RPC:
 				if sensor is String:
 					toFormat["sensor:" + sensor] = playership.sensorGet(sensor)
 				elif sensor is Dictionary:
-					var sensor_name:String = sensor.get("sensor","")
+					var raw_sensor:String = sensor.get("sensor","")
+					var sensor_name:String = sensor.get("sensor_identifier_override",raw_sensor)
 					var fallbackFormat:String = sensor.get("fallback","unknown")
-					var sensorOut = playership.sensorGet(sensor_name)
+					var sensorOut = playership.sensorGet(raw_sensor)
 					if "funcref" in sensor:
 						sensorOut = sensor.get("funcref").call_funcv([sensorOut] + sensor.get("extra_operands",[]))
 					if sensorOut != null:
@@ -8249,6 +8250,8 @@ class _Threading:
 	var thread_id_list:PoolIntArray = PoolIntArray()
 	var thread_operation_count:Dictionary = {}
 	
+	var semaphore_store:Dictionary = {}
+	
 	var max_threads:int = OS.get_processor_count() - 2
 	
 	var mutex:Mutex = Mutex.new()
@@ -8293,6 +8296,7 @@ class _Threading:
 		var ret_obj:Reference = ThreadReturn.new(request_id,self)
 		wake()
 		return ret_obj
+	
 	
 	signal requesting_next_thread()
 	func wake():

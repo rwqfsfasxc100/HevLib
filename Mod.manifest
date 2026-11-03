@@ -380,6 +380,14 @@ HEVLIB_CONFIG_SECTION_DEBUG={
 "display_order_position": 14,
 "name": "HEVLIB_CONFIG_POSITION_DATA_DEBUGGER",
 "type": "bool"
+},
+"single_thread_only": {
+"default": false,
+"description": "HEVLIB_CONFIG_SINGLETHREAD_ONLY_DESC",
+"display_order_position": 18,
+"name": "HEVLIB_CONFIG_SINGLETHREAD_ONLY",
+"require_restart": true,
+"type": "bool"
 }
 }
 HEVLIB_CONFIG_SECTION_INPUT={

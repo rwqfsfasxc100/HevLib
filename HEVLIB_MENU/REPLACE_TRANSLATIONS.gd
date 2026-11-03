@@ -1915,6 +1915,22 @@ const TRANSLATIONS = {
 		"HEVLIB_CREDITS_SOFTWARE_ABDERA": {
 			"string": "Abdera7mane - Original implementation of SimpleHTTPClient used within the networking pointer",
 			"version_hash": 2116577648
+		},
+		"HEVLIB_CONFIG_SINGLETHREAD_ONLY": {
+			"string": "Single-thread only",
+			"version_hash": 3832224558
+		},
+		"HEVLIB_CONFIG_SINGLETHREAD_ONLY_DESC": {
+			"string": "Partially disables the Threading class by re-routing all operations to run on the main thread.\n\nIf you are debugging code, it can be useful to enable this as code run in threads do not work with breakpoints.",
+			"version_hash": 2116667840
+		},
+		"HEVLIB_DISCORDRPC_SECONDARY_PROPELLANT": {
+			"string": "Propellant: {sensor:fuel} kg",
+			"version_hash": 4276880938
+		},
+		"HEVLIB_DISCORDRPC_SECONDARY_SHIP_CONDITION": {
+			"string": "Ship condition: {sensor:ship_status}%",
+			"version_hash": 4065239042
 		}
 	},
 	"de": {
