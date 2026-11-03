@@ -837,23 +837,40 @@ func testing(modLoader:ModLoader,pointers):
 #	script_shadow_creator.__make_shadow_of_script("res://Test/format_torture.gd",pointers)
 	
 #	var thread = pointers.Threading.__request_single_thread(script_shadow_creator,"__make_shadow_of_script",["res://Test/format_torture.gd",pointers])
-	for i in 5:
-		var thread = pointers.Threading.__request_single_thread({
-			"object":script_shadow_creator,
-			"method":"__make_shadow_of_script",
-			"args":["res://Test/format_torture.gd",pointers]
-		})
-		var out1 = yield(thread,"thread_finished")
+	
+	var thread = pointers.Threading.__request_multiple_threads([{
+		"object":script_shadow_creator,
+		"method":"__make_shadow_of_script",
+		"args":["res://Test/format_torture.gd",pointers]
+	},{
+		"object":script_shadow_creator,
+		"method":"__make_shadow_of_script",
+		"args":["res://Test/format_torture.gd",pointers]
+	},{
+		"object":script_shadow_creator,
+		"method":"__make_shadow_of_script",
+		"args":["res://Test/format_torture.gd",pointers]
+	},{
+		"object":script_shadow_creator,
+		"method":"__make_shadow_of_script",
+		"args":["res://Test/format_torture.gd",pointers]
+	},{
+		"object":script_shadow_creator,
+		"method":"__make_shadow_of_script",
+		"args":["res://Test/format_torture.gd",pointers]
+	}])
+	
 #	var out = script_shadow_creator.__make_shadow_of_script("res://Test/format_torture.gd",pointers)
 #	var out = script_shadow_creator.__make_shadow_of_script(pointers.resource_path,pointers)
 	var t2=Time.get_ticks_usec()
 	for i in 5:
+		print("Started regular at ",Time.get_ticks_usec())
 		var out = script_shadow_creator.__make_shadow_of_script("res://Test/format_torture.gd",pointers)
 	var t3=Time.get_ticks_usec()
 	
 	
-	print(t2-t1)
-	print(t3-t2)
+	var d1 = (t2-t1)
+	var d2 = (t3-t2)
 	
 	
 	breakpoint

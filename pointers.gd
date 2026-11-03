@@ -8244,86 +8244,63 @@ class _Threading:
 	
 	var pointers:HevLibPointers
 	
-	var active_threads:Array = []
-	
-	var thread_queue:Dictionary = {}
-	var thread_id_list:PoolIntArray = PoolIntArray()
-	var thread_operation_count:Dictionary = {}
-	
+	var thread_queue:Array = []
+	var thread_return:Dictionary = {}
 	var semaphore_store:Dictionary = {}
 	
+	var active_threads:Dictionary = {}
 	var max_threads:int = OS.get_processor_count() - 2
 	
 	var mutex:Mutex = Mutex.new()
 	
-	signal finished_thread_operation(thread_id)
+	signal request_next_thread()
 	
 	func _init(p):
 		pointers = p
-		active_threads.resize(max_threads)
 		for i in max_threads:
-			active_threads[i] = ThreadStruct.new(self)
+			var thread:ThreadStruct = ThreadStruct.new(self,p,i)
+			connect("request_next_thread",thread,"thread_requested")
+			active_threads[i] = thread
 	
-	func __request_multiple_threads(operations:Array) -> Reference:
+	func __request_multiple_threads(operations:Array):
 		var request_id:int = (operations.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
+		var semaphore:Semaphore = Semaphore.new()
+		var added_op:int = 0
 		mutex.lock()
-		var ops:Array = []
 		for i in operations:
 			if i and i is Dictionary:
-				ops.append(i)
-		if ops:
-			thread_id_list.append(request_id)
-			thread_queue[request_id] = ops
-			thread_operation_count[request_id] = [0,ops.size(),[]]
-		else:
-			request_id = -1
+				i["request_id"] = request_id
+				thread_queue.append(i)
+				added_op += 1
+		semaphore_store[request_id] = [added_op,semaphore]
+		thread_return[request_id] = []
 		mutex.unlock()
-		var ret_obj:Reference = ThreadReturn.new(request_id,self)
-		wake()
-		return ret_obj
+		emit_signal("request_next_thread")
+		semaphore.wait()
+		mutex.lock()
+		var out = thread_return[request_id]
+		thread_return.erase(request_id)
+		mutex.unlock()
+		return out
 	
-	func __request_single_thread(operation:Dictionary) -> Reference:
+	func __request_single_thread(operation:Dictionary):
 		var request_id:int = (operation.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
+		var semaphore:Semaphore = Semaphore.new()
 		mutex.lock()
-		if operation:
-			operation["request_id"] = request_id
-			thread_id_list.append(request_id)
-			thread_queue[request_id] = [operation]
-			thread_operation_count[request_id] = [0,1,[]]
-		else:
-			request_id = -1
+		operation["request_id"] = request_id
+		thread_queue.append(operation)
+		semaphore_store[request_id] = [1,semaphore]
+		thread_return[request_id] = []
 		mutex.unlock()
-		var ret_obj:Reference = ThreadReturn.new(request_id,self)
-		wake()
-		return ret_obj
-	
-	
-	signal requesting_next_thread()
-	func wake():
-		emit_signal("requesting_next_thread")
-	
-	func fetch_next_operation() -> Dictionary:
-		if thread_queue:
-			mutex.lock()
-			var id:int = thread_id_list[0]
-			var tk:Array = thread_queue[id]
-			var next:Dictionary = tk.pop_front()
-			if tk.empty():
-				thread_id_list.remove(thread_id_list.find(id))
-				thread_queue.erase(id)
-			mutex.unlock()
-			return next
-		return {}
-	
-	func handle_completed_thread(thread_id:int,data):
+		emit_signal("request_next_thread")
+		semaphore.wait()
 		mutex.lock()
-		var threadData:Array = thread_operation_count[thread_id]
-		threadData[2].append(data)
-		threadData[0] += 1
+		var out = thread_return[request_id]
+		thread_return.erase(request_id)
 		mutex.unlock()
-		var ret:bool = threadData[0] == threadData[1]
-		if ret:
-			emit_signal("finished_thread_operation",thread_id)
+		return out
+	
+	
 	
 	func _notification(what):
 		if what == NOTIFICATION_PREDELETE:
@@ -8332,73 +8309,78 @@ class _Threading:
 	class ThreadStruct:
 		extends Reference
 		
-		signal thread_finished(out)
-		
 		var thread:Thread = Thread.new()
-		var container:_Threading
+		var container:HevLibPointers._Threading
+		var pointers:HevLibPointers
 		
-		func _init(cv:_Threading):
+		func _init(cv:HevLibPointers._Threading,p:HevLibPointers,i:int):
 			container = cv
-			cv.connect("requesting_next_thread",self,"run")
+			pointers = p
+			thread_index = i
 		
-		var exit_thread:bool = false
+		var thread_index:int = -1
 		
 		var current_object:Object = null
 		var current_method_call:String = ""
 		var current_args:Array = []
 		var current_priority:int = 1
 		
+#		var semaphore:Semaphore = Semaphore.new()
+		
 		var current_thread_id:int = -1
 		
-		func run():
-			if thread.is_active():
-				return
-			container.mutex.lock()
-			var next:Dictionary = container.fetch_next_operation()
-			container.mutex.unlock()
-			if next:
-				current_object = next.get("object",null)
-				current_method_call = next.get("method","")
-				if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
-					current_args = Array(next.get("args",[]))
-					current_priority = next.get("priority",1)
-					current_thread_id = next["request_id"]
-					thread.start(self,"call_object_func",null,current_priority)
+		var available:bool = true
+		
+		func thread_requested():
+			if available:
+				available = false
+				container.mutex.lock()
+				if container.thread_queue:
+					var next:Dictionary = container.thread_queue.pop_front()
+					container.mutex.unlock()
+					print("Started thread at ",Time.get_ticks_usec())
+					start_thread_from_data(next)
+				else:
+					container.mutex.unlock()
+		
+		func start_thread_from_data(next:Dictionary):
+			current_thread_id = next["request_id"]
+			current_object = next.get("object",null)
+			current_method_call = next.get("method","")
+			if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
+				current_args = Array(next.get("args",[]))
+				current_priority = next.get("priority",1)
+				thread.start(self,"call_object_func",null,current_priority)
+				handle_thread_finish(thread.wait_to_finish())
+			else:
+				printerr("Thread error: object does not exist or does not have method [%s]" % current_method_call)
+				handle_thread_finish(null)
 		
 		func call_object_func(_a = null):
 			var out = current_object.callv(current_method_call,current_args)
 			if out is GDScriptFunctionState:
 				out = yield(out,"completed")
-			container.handle_completed_thread(current_thread_id,out)
+			return out
+		
+		func handle_thread_finish(out):
+			container.mutex.lock()
+			container.thread_return[current_thread_id].append(out)
+			var sem:Array = container.semaphore_store[current_thread_id]
+			sem[0] -= 1
+			if sem[0] < 1:
+				sem[1].post()
+			var next = null
+			if container.thread_queue:
+				next = container.thread_queue.pop_front()
+			else:
+				available = true
+			container.mutex.unlock()
+			if next is Dictionary:
+				start_thread_from_data(next)
 		
 		func _notification(what):
 			if what == NOTIFICATION_PREDELETE:
 				thread.wait_to_finish()
-		
-	class ThreadReturn:
-		extends Reference
-		
-		signal thread_finished(data)
-		
-		var thread_id:int = -1
-		var handler:_Threading
-		
-		func _init(id:int,container:_Threading) -> void:
-			handler = container
-			container.connect("finished_thread_operation",self,"check_if_complete")
-			thread_id = id
-			if thread_id < 0:
-				emit_signal("thread_finished",null)
-		
-		func check_if_complete(id:int):
-			print("Thread returning: ",id)
-			if id == thread_id:
-				handler.mutex.lock()
-				var data:Array = handler.thread_operation_count[id][2]
-				handler.thread_operation_count.erase(id)
-				handler.mutex.unlock()
-				emit_signal("thread_finished",data)
-		
 	
 	
 
