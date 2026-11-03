@@ -8325,11 +8325,13 @@ class _Threading:
 		var current_args:Array = []
 		var current_priority:int = 1
 		
-#		var semaphore:Semaphore = Semaphore.new()
+		var semaphore:Semaphore = Semaphore.new()
 		
 		var current_thread_id:int = -1
 		
 		var available:bool = true
+		
+		var running:bool = true
 		
 		func thread_requested():
 			if available:
@@ -8357,6 +8359,8 @@ class _Threading:
 				handle_thread_finish(null)
 		
 		func call_object_func(_a = null):
+			while running:
+				pass
 			var out = current_object.callv(current_method_call,current_args)
 			if out is GDScriptFunctionState:
 				out = yield(out,"completed")

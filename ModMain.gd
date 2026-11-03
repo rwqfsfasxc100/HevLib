@@ -863,6 +863,8 @@ func testing(modLoader:ModLoader,pointers):
 #	var out = script_shadow_creator.__make_shadow_of_script("res://Test/format_torture.gd",pointers)
 #	var out = script_shadow_creator.__make_shadow_of_script(pointers.resource_path,pointers)
 	var t2=Time.get_ticks_usec()
+	
+	
 	for i in 5:
 		print("Started regular at ",Time.get_ticks_usec())
 		var out = script_shadow_creator.__make_shadow_of_script("res://Test/format_torture.gd",pointers)

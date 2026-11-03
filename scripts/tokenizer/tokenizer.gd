@@ -45,7 +45,7 @@ func __get_compiled_bytecode_from_tokens() -> PoolByteArray:
 		var local_token:int = t
 		if t == TK_IDENTIFIER:
 			var id:String = args_store[k]
-			if!id in identifier_map:
+			if!id in identifiers:
 				identifier_map[id] = identifiers.size()
 				identifiers.append(id)
 			local_token |= (identifier_map[id] << 8)
@@ -69,7 +69,7 @@ func __get_compiled_bytecode_from_tokens() -> PoolByteArray:
 					key = "n" + str(constant_val)
 				_:
 					key = "?" + str(constant_val)
-			if not key in constant_map:
+			if not key in constants:
 				constant_map[key] = constants.size()
 				constants.append(constant_val)
 			local_token |= (constant_map[key] << 8)
@@ -282,9 +282,9 @@ func __tokens_to_source() -> String:
 		depth_at[i] = depth
 		tab_ctr[i] = 0
 		nesting_level[i] = level
-		if t in PoolIntArray([TK_PARENTHESIS_OPEN,TK_BRACKET_OPEN,TK_CURLY_BRACKET_OPEN]):
+		if t == TK_PARENTHESIS_OPEN or t == TK_BRACKET_OPEN or t == TK_CURLY_BRACKET_OPEN:
 			depth += 1
-		elif t in PoolIntArray([TK_PARENTHESIS_CLOSE,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_CLOSE]):
+		elif t == TK_PARENTHESIS_CLOSE or t == TK_BRACKET_CLOSE or TK_CURLY_BRACKET_CLOSE:
 			var d1:int = depth - 1
 			depth = d1 if d1 > 0 else 0
 		elif t == TK_NEWLINE:
@@ -316,7 +316,7 @@ func __tokens_to_source() -> String:
 		var t:int = type_store[i]
 		if t == TK_EOF:
 			break
-		if t in PoolIntArray([TK_EMPTY,TK_CURSOR]):
+		if t == TK_EMPTY or t == TK_CURSOR:
 			i += 1
 			continue
 		if t == TK_ERROR:
@@ -727,6 +727,12 @@ const type_index={
 	"PoolStringArray":TYPE_STRING_ARRAY,"PoolVector2Array":TYPE_VECTOR2_ARRAY,
 	"PoolVector3Array":TYPE_VECTOR3_ARRAY,"PoolColorArray":TYPE_COLOR_ARRAY,
 }
+const type_index_array = PoolStringArray([
+	"bool","int","float","String","Vector2","Rect2","Vector3","Transform2D",
+	"Plane","Quat","AABB","Basis","Transform","Color","NodePath","RID",
+	"Object","Dictionary","Array","PoolByteArray","PoolIntArray","PoolRealArray",
+	"PoolStringArray","PoolVector2Array","PoolVector3Array","PoolColorArray",
+])
 const type_names = {
 	1:"bool",2:"int",3:"float",4:"String",5:"Vector2",6:"Rect2",7: "Vector3",
 	8:"Transform2D",9:"Plane",10:"Quat",11:"AABB",12:"Basis",13:"Transform",
@@ -752,6 +758,13 @@ const keywords={
 	"self":TK_SELF,"PI":TK_CONST_PI,"TAU":TK_CONST_TAU,"_":TK_WILDCARD,
 	"INF":TK_CONST_INF,"NAN":TK_CONST_NAN,
 }
+const keyword_array = PoolStringArray([
+	"in","not","or","and","func","class","class_name","extends","is","onready",
+	"tool","static","export","setget","var","as","void","preload","assert","yield",
+	"signal","breakpoint","remote","master","slave","puppet","sync","remotesync",
+	"mastersync","puppetsync","const","enum","if","elif","else","for","while",
+	"break","continue","return","match","pass","self","PI","TAU","_","INF","NAN",
+])
 const compile_err_header="SCRIPT COMPILE ERR - line %d: %s"
 const decompile_err_header="SCRIPT DECOMPILE ERR - line %d: %s"
 enum{
@@ -766,7 +779,7 @@ var args_store:Array = Array()
 var line_store:PoolIntArray = PoolIntArray()
 var char_store:PoolIntArray = PoolIntArray()
 
-var builtin_classes = ClassDB.get_class_list() + PoolStringArray(type_index.keys())
+var builtin_classes = ClassDB.get_class_list() + type_index_array
 
 static func stream_string(out:StreamPeerBuffer,s:String)->void:
 	var u:PoolByteArray = s.to_utf8()
@@ -794,7 +807,8 @@ func next_token() -> bool:
 			pos += 1
 			line += 1
 			while true:
-				if!get_char(0) in PoolIntArray([KEY_SPACE,KEY_HORIZONTALTAB]):
+				var cr:int = get_char(0)
+				if not (cr == KEY_SPACE or cr == KEY_HORIZONTALTAB):
 					break
 				pos += 1
 			continue
@@ -962,25 +976,29 @@ func next_token() -> bool:
 		push_token(tok)
 		pos += width
 		return true
-	return false # unreachable :(
+	return false
 
 func read_word_token(ch:int)->bool:
 	var s:String = char(ch)
 	var i:int = 1
-	while word_is_tex(get_char(i)):
-		s += char(get_char(i))
-		i += 1
+	while true:
+		var cv:int = get_char(i)
+		if word_is_tex(cv):
+			s += char(cv)
+			i += 1
+		else:
+			break
 	if s == "null":
 		push_token(TK_CONSTANT,null)
 	elif s == "true":
 		push_token(TK_CONSTANT,true)
 	elif s == "false":
 		push_token(TK_CONSTANT,false)
-	elif s in type_index:
+	elif s in type_index_array:
 		push_token(TK_BUILT_IN_TYPE,type_index[s])
-	elif s in func_index:
+	elif s in func_index_array:
 		push_token(TK_BUILT_IN_FUNC,func_index[s])
-	elif s in keywords:
+	elif s in keyword_array:
 		push_token(keywords[s])
 	else:
 		push_token(TK_IDENTIFIER,s)
@@ -1164,7 +1182,7 @@ static func radixify(s:String,start:int,radix:int) -> int:
 		else:
 			d = c - 65 + 10
 		if (v >> (63 - radix)) != 0:
-			return (1 << 62) - 1 + (1 << 62)
+			return 9223372036854775807
 		v = (v << radix) | d
 	return v
 
@@ -1271,9 +1289,8 @@ func get_const():
 			printerr("Unsupported constant type %d at offset %d" % [vtype, pos])
 			return null
 
-const numeric_operand_tokens = PoolIntArray([TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN])
-const operand_word_tokens = PoolIntArray([TK_IDENTIFIER,TK_SELF,TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_OP_IN,TK_OP_NOT,TK_OP_AND,TK_OP_OR,TK_CF_IF,TK_PR_PUPPETSYNC]) + numeric_operand_tokens
-const operand_end_tokens = PoolIntArray([TK_IDENTIFIER,TK_CONSTANT,TK_SELF,TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_PARENTHESIS_CLOSE,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_CLOSE]) + numeric_operand_tokens
+const operand_word_tokens = PoolIntArray([TK_IDENTIFIER,TK_SELF,TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_OP_IN,TK_OP_NOT,TK_OP_AND,TK_OP_OR,TK_CF_IF,TK_PR_PUPPETSYNC,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN])
+const operand_end_tokens = PoolIntArray([TK_IDENTIFIER,TK_CONSTANT,TK_SELF,TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_PARENTHESIS_CLOSE,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_CLOSE,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN])
 const operand_callable_tokens = PoolIntArray([TK_IDENTIFIER,TK_BUILT_IN_FUNC,TK_BUILT_IN_TYPE,TK_PARENTHESIS_CLOSE,TK_BRACKET_CLOSE,TK_PR_PRELOAD,TK_PR_YIELD,TK_PR_ASSERT,TK_PR_EXPORT])
 
 func float_to_string(d:float) -> String:
@@ -1355,6 +1372,9 @@ func escape_string(s:String,keep_newlines:bool) -> String:
 func escape_string_with_quotes(s:String) -> String:
 	return "\"" + escape_string(s,false) + "\""
 
+const closing_tokens = PoolIntArray([TK_PARENTHESIS_CLOSE,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_CLOSE,TK_SEMICOLON,TK_COLON])
+const opening_tokens = PoolIntArray([TK_DOLLAR,TK_PERIOD,TK_PARENTHESIS_OPEN,TK_BRACKET_OPEN,TK_CURLY_BRACKET_OPEN])
+
 func get_string_separator(c:int,p:int,prev_unary:bool,nodepath_state:int,token_count:int) -> String:
 	var ct:int = type_store[c]
 	var pt:int = type_store[p]
@@ -1365,11 +1385,11 @@ func get_string_separator(c:int,p:int,prev_unary:bool,nodepath_state:int,token_c
 	elif nodepath_state == 2:
 		if ct == TK_OP_DIV and is_following_token_path(c + 1,token_count):
 			return ""
-	if prev_unary or ct in PoolIntArray([TK_PARENTHESIS_CLOSE,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_CLOSE,TK_SEMICOLON,TK_COLON]):
+	if prev_unary or ct in closing_tokens:
 		return ""
 	if ct == TK_COMMA:
 		return " " if pt == TK_PR_SETGET else ""
-	if pt in PoolIntArray([TK_DOLLAR,TK_PERIOD,TK_PARENTHESIS_OPEN,TK_BRACKET_OPEN,TK_CURLY_BRACKET_OPEN]):
+	if pt in opening_tokens:
 		return ""
 	if ct == TK_PERIOD:
 		if is_token_operand_end(p):
