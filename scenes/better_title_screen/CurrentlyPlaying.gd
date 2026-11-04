@@ -33,19 +33,23 @@
 extends "res://menu/CurrentlyPlaying.gd"
 
 var hl_currhider_uinit : bool = false
+var is_ready:bool = false
 func _ready():
 	if hl_currhider_uinit:
 		OS.kill(OS.get_process_id())
 	hl_currhider_uinit = true
-	yield(get_tree(), "idle_frame")
-	var groups:Array = CurrentGame.get_tree().get_nodes_in_group("hevlib_mod_menu")
-	var mod_menu:Node
-	if groups:
-		mod_menu = groups[0]
-	if not mod_menu:
-		mod_menu = CurrentGame.get_tree().get_root().find_node("ModMenu", true, false)
-	if mod_menu:
-		mod_menu.connect("visibility_changed", self , "display")
+	is_ready = true
+func _process(delta:float):
+	if is_ready:
+		var groups:Array = CurrentGame.get_tree().get_nodes_in_group("hevlib_mod_menu")
+		var mod_menu:Node
+		if groups:
+			mod_menu = groups[0]
+		if not mod_menu:
+			mod_menu = CurrentGame.get_tree().get_root().find_node("ModMenu", true, false)
+		if mod_menu:
+			mod_menu.connect("visibility_changed", self , "display")
+		set_process(false)
 
 var pointers:HevLibPointers
 func display():

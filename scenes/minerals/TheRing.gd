@@ -32,8 +32,7 @@
 
 extends "res://TheRing.gd"
 
-var pix_values:PoolIntArray = PoolIntArray()
-
+const pix_values:PoolIntArray = PoolIntArray()
 const not_random_seeds = PoolIntArray([1337,1776,2014,1384,2684,842,2802,1597,2116,755,1596,2661,1928,-1861,-2531,-1337,-1776,-2014,-1384,-2684,-842,-2802,-1597,-2116,-755,-1596,-2661,-1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928])
 
 func get_pixel_values(pos:Vector2) -> PoolRealArray:
@@ -63,20 +62,16 @@ func get_pixel_values(pos:Vector2) -> PoolRealArray:
 	return out
 
 func getVeinAt(pos) -> String:
-	
 	var values:PoolRealArray = get_pixel_values(pos)
-		
-	var total:float = 0.0
+	var rnd:float = 0.0
 	for n in CurrentGame.traceMinerals.size():
-		var tm:String = CurrentGame.traceMinerals[n]
-		values[n] = pow(values[n] / pow(CurrentGame.mineralPrices.get(tm, 1), 0.2), 4)
-		total += values[n]
-		
-	var rnd:float = randf() * total
+		values[n] = pow(values[n] / pow(CurrentGame.mineralPrices.get(CurrentGame.traceMinerals[n], 1.0), 0.2), 4)
+		rnd += values[n]
+	rnd *= randf()
 	var nr:int = 0
 	for n in values:
 		rnd -= n
-		if rnd < 0:
+		if rnd < 0.0:
 			return CurrentGame.traceMinerals[nr]
 		nr += 1
 	

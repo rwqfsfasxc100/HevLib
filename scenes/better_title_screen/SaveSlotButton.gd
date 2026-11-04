@@ -88,12 +88,17 @@ func _ready():
 	hint_tooltip = ""
 	foolish.hint_tooltip = ""
 	index = get_index()
-	yield(get_tree(),"idle_frame")
-	force = true
-	checkSave()
-	force = false
+	init_check = true
 
+var init_check:bool = false
 func _physics_process(delta):
+	if init_check:
+		init_check = false
+		force = true
+		checkSave()
+		force = false
+	if do_focus_check:
+		check_focus()
 	if is_visible_in_tree():
 		val = val + delta
 		if val > 5:
@@ -151,7 +156,7 @@ func checkSave():
 		delete_color = Color(1, 1, 1, 0.25)
 		text = newText
 	if first_time:
-		check_focus()
+		do_focus_check = true
 	first_time = false
 	
 	display_text = text
@@ -159,7 +164,9 @@ func checkSave():
 		display_text = newText
 
 var focuscheck_ctr:int = 0
+var do_focus_check:bool = false
 func check_focus():
+	do_focus_check = false
 	if is_inside_tree():
 		if first:
 			grab_focus()
@@ -169,8 +176,8 @@ func check_focus():
 				grab_focus()
 	elif focuscheck_ctr < 10:
 		focuscheck_ctr += 1
-		yield(CurrentGame.get_tree(),"idle_frame")
-		check_focus()
+		do_focus_check = true
+		
 func newSave():
 	Debug.l("delete %s pressed" % saveSlotFile)
 	CurrentGame.saveFile = saveSlotFile

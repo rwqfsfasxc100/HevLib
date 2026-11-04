@@ -830,6 +830,9 @@ func testing(modLoader:ModLoader,pointers):
 	var file:File = File.new()
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
 	
+	var do_thread:bool = true
+	
+	
 	
 #	script_shadow_creator.__make_shadow_of_script("res://DifficultyTweaker/story/Vilcy.gd")
 #	script_shadow_creator.__make_shadow_of_script("res://Test/empty.gd",pointers)
@@ -838,41 +841,50 @@ func testing(modLoader:ModLoader,pointers):
 	
 #	var thread = pointers.Threading.__request_single_thread(script_shadow_creator,"__make_shadow_of_script",["res://Test/format_torture.gd",pointers])
 	
-	var thread = pointers.Threading.__request_multiple_threads([{
-		"object":script_shadow_creator,
-		"method":"__make_shadow_of_script",
-		"args":["res://Test/format_torture.gd",pointers]
-	},{
-		"object":script_shadow_creator,
-		"method":"__make_shadow_of_script",
-		"args":["res://Test/format_torture.gd",pointers]
-	},{
-		"object":script_shadow_creator,
-		"method":"__make_shadow_of_script",
-		"args":["res://Test/format_torture.gd",pointers]
-	},{
-		"object":script_shadow_creator,
-		"method":"__make_shadow_of_script",
-		"args":["res://Test/format_torture.gd",pointers]
-	},{
-		"object":script_shadow_creator,
-		"method":"__make_shadow_of_script",
-		"args":["res://Test/format_torture.gd",pointers]
-	}])
+	
+	if do_thread:
+		var thread = pointers.Threading.__request_multiple_threads([{
+			"object":script_shadow_creator,
+			"method":"__make_shadow_of_script",
+			"args":["res://Test/format_torture.gd",pointers]
+		},
+		{
+			"object":script_shadow_creator,
+			"method":"__make_shadow_of_script",
+			"args":["res://Test/format_torture.gd",pointers]
+		},
+		{
+			"object":script_shadow_creator,
+			"method":"__make_shadow_of_script",
+			"args":["res://Test/format_torture.gd",pointers]
+		},
+		{
+			"object":script_shadow_creator,
+			"method":"__make_shadow_of_script",
+			"args":["res://Test/format_torture.gd",pointers]
+		},
+		{
+			"object":script_shadow_creator,
+			"method":"__make_shadow_of_script",
+			"args":["res://Test/format_torture.gd",pointers]
+		}
+		])
 	
 #	var out = script_shadow_creator.__make_shadow_of_script("res://Test/format_torture.gd",pointers)
 #	var out = script_shadow_creator.__make_shadow_of_script(pointers.resource_path,pointers)
 	var t2=Time.get_ticks_usec()
 	
 	
-	for i in 5:
-		print("Started regular at ",Time.get_ticks_usec())
-		var out = script_shadow_creator.__make_shadow_of_script("res://Test/format_torture.gd",pointers)
+	if do_thread:
+		for i in 5:
+			print("Started regular at ",Time.get_ticks_usec())
+			var out = script_shadow_creator.__make_shadow_of_script("res://Test/format_torture.gd",pointers)
 	var t3=Time.get_ticks_usec()
 	
 	
 	var d1 = (t2-t1)
 	var d2 = (t3-t2)
-	
+	print(d1)
+	print(d2)
 	
 	breakpoint
