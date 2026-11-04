@@ -8464,18 +8464,6 @@ class _Translations:
 		if fullLogging:
 			pointers.l("%s Translations Updated" % translationCount,"pointers.Translations")
 	
-	static func __fetch_all_translation_objects(index:int) -> Array:
-		var translations : Array = []
-		while index > 0:
-			var obj = instance_from_id(index)
-			index -= 1
-			if obj == null:
-				continue
-			if not obj.get_class() == "Translation":
-				continue
-			translations.append(obj) # for future, see if obj.self works to get the node instead of a reference
-		return translations
-	
 	static func __translation_file_to_dictionary(path : String, delimiter : String = "|", fullLogging : bool = true) -> Dictionary:
 		if not Directory.new().file_exists(path):
 			return {}

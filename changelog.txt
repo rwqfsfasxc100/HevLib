@@ -23,6 +23,8 @@
 10.1=* Allows multiple cases of the same sensor using multiple identifiers
 11=* Removed legacy ManifestV1 code
 12=* Added integer-safe division, max, min, and clamp functions for handling numbers above 2^53 to the Math class
+13=* Removed `Translations`.`__fetch_all_translation_objects` due to it being redundant from the `ProjectSettings`-based fetch method used in `__inject_translations`
+20=* Updated credits
 
 [1.17.8]
 
