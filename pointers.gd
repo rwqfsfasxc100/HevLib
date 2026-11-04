@@ -49,7 +49,6 @@ var FolderAccess : _FolderAccess = _FolderAccess.new(self)
 var Github : _Github = _Github.new(self)
 var HevLib : _HevLib = _HevLib.new(self)
 var Keymapping : _Keymapping = _Keymapping.new(self)
-var ManifestV1 : _ManifestV1 = _ManifestV1.new(self)
 var ManifestV2 : _ManifestV2 = _ManifestV2.new(self)
 var Math : _Math = _Math.new(self)
 var NodeAccess : _NodeAccess = _NodeAccess.new(self)
@@ -76,7 +75,6 @@ var Classes = {
 	"Github":Github,
 	"HevLib":HevLib,
 	"Keymapping":Keymapping,
-	"ManifestV1":ManifestV1,
 	"ManifestV2":ManifestV2,
 	"Math":Math,
 	"NodeAccess":NodeAccess,
@@ -1967,18 +1965,19 @@ class _DataFormat:
 		l("Finished loading DLC")
 	
 	const array_types = PoolIntArray([TYPE_ARRAY,TYPE_COLOR_ARRAY,TYPE_INT_ARRAY,TYPE_RAW_ARRAY,TYPE_REAL_ARRAY,TYPE_STRING_ARRAY,TYPE_VECTOR2_ARRAY,TYPE_VECTOR3_ARRAY])
-	static func __split_array_by_length(arr,length:int,specific_section = -1) -> Array:
-		var out = []
-		if not typeof(arr) in array_types:
+	static func __split_array_by_length(arr,length:int,specific_section:int = -1) -> Array:
+		var out:Array = []
+		var arrType:int = typeof(arr)
+		if not arrType in array_types:
 			return out
-		var arrsize = arr.size()
+		var arrsize:int = arr.size()
 		if arrsize < length:
 			return arr
-		if specific_section >= 0:
-			var sections = int(ceil(arrsize/float(length)))
+		if specific_section > -1:
+			var sections:int = int(ceil(arrsize/float(length)))
 			if specific_section > sections:
 				return out[0]
-			match typeof(arr):
+			match arrType:
 				TYPE_ARRAY:
 					out = []
 				TYPE_COLOR_ARRAY:
@@ -1995,12 +1994,12 @@ class _DataFormat:
 					out = PoolVector2Array()
 				TYPE_VECTOR3_ARRAY:
 					out = PoolVector3Array()
-			var offset = (specific_section * length)
+			var offset:int = (specific_section * length)
 			for i in min(arrsize - offset,length):
 				out.append(arr[i + offset])
 			return out
 		for i in int(ceil(arrsize / float(length))):
-			match typeof(arr):
+			match arrType:
 				TYPE_ARRAY:
 					out.append([])
 				TYPE_COLOR_ARRAY:
@@ -2018,23 +2017,16 @@ class _DataFormat:
 				TYPE_VECTOR3_ARRAY:
 					out.append(PoolVector3Array())
 		for r in arrsize:
-			var current_part = int(floor(r / float(length)))
+			var current_part:int = int(floor(r / float(length)))
 			var ipart = out[current_part]
 			ipart.append(arr[r])
 			out[current_part] = ipart
 		return out
 	
 	static func __compress_text(txt:String) -> String:
-		var utf8 = txt.to_utf8()
-		var size = utf8.size()
-		var compressed = utf8.compress(1)
-		var concat:String = ""
-		for i in compressed:
-			if concat:
-				concat += "," + str(i)
-			else:
-				concat = str(i)
-		return "PoolByteArray([%s]).decompress(%d,1)" % [concat,size]
+		var utf8:PoolByteArray = txt.to_utf8()
+		var compressed:PoolStringArray = PoolStringArray(Array(utf8.compress(1)))
+		return "PoolByteArray([%s]).decompress(%d,1)" % [compressed.join(","),utf8.size()]
 	
 	static func __stringify_property(property,depth:int = 0,stringify:bool = true):
 		var out:String = ""
@@ -2138,73 +2130,73 @@ class _DataFormat:
 	static func __reserve_in_array(array,count:int,absolute:bool = false):
 		match typeof(array):
 			TYPE_ARRAY:
-				var size = array.size()
+				var size:int = array.size()
 				if absolute:
 					size = 0
-				var new_count = max(size + count,0)
+				var new_count:int = int(max(size + count,0))
 				array.resize(new_count)
 				if new_count > size:
 					for i in (new_count - size):
 						array[i + size] = null
 			TYPE_COLOR_ARRAY:
-				var size = array.size()
+				var size:int = array.size()
 				if absolute:
 					size = 0
-				var new_count = max(size + count,0)
+				var new_count:int = int(max(size + count,0))
 				array.resize(new_count)
 				if new_count > size:
 					for i in (new_count - size):
 						array[i + size] = Color.black
 			TYPE_INT_ARRAY:
-				var size = array.size()
+				var size:int = array.size()
 				if absolute:
 					size = 0
-				var new_count = max(size + count,0)
+				var new_count:int = int(max(size + count,0))
 				array.resize(new_count)
 				if new_count > size:
 					for i in (new_count - size):
 						array[i + size] = 0
 			TYPE_RAW_ARRAY:
-				var size = array.size()
+				var size:int = array.size()
 				if absolute:
 					size = 0
-				var new_count = max(size + count,0)
+				var new_count:int = int(max(size + count,0))
 				array.resize(new_count)
 				if new_count > size:
 					for i in (new_count - size):
 						array[i + size] = 0x0
 			TYPE_REAL_ARRAY:
-				var size = array.size()
+				var size:int = array.size()
 				if absolute:
 					size = 0
-				var new_count = max(size + count,0)
+				var new_count:int = int(max(size + count,0))
 				array.resize(new_count)
 				if new_count > size:
 					for i in (new_count - size):
 						array[i + size] = 0.0
 			TYPE_STRING_ARRAY:
-				var size = array.size()
+				var size:int = array.size()
 				if absolute:
 					size = 0
-				var new_count = max(size + count,0)
+				var new_count:int = int(max(size + count,0))
 				array.resize(new_count)
 				if new_count > size:
 					for i in (new_count - size):
 						array[i + size] = ""
 			TYPE_VECTOR2_ARRAY:
-				var size = array.size()
+				var size:int = array.size()
 				if absolute:
 					size = 0
-				var new_count = max(size + count,0)
+				var new_count:int = int(max(size + count,0))
 				array.resize(new_count)
 				if new_count > size:
 					for i in (new_count - size):
 						array[i + size] = Vector2.ZERO
 			TYPE_VECTOR3_ARRAY:
-				var size = array.size()
+				var size:int = array.size()
 				if absolute:
 					size = 0
-				var new_count = max(size + count,0)
+				var new_count:int = int(max(size + count,0))
 				array.resize(new_count)
 				if new_count > size:
 					for i in (new_count - size):
@@ -2229,7 +2221,7 @@ class _DataFormat:
 		return non_statics["miniz"].decompress_zlib(data,max_size)
 	
 	static func __compress_to_raw_deflate_stream(data: PoolByteArray,compression_level:int = 6) -> PoolByteArray:
-		var miniz = non_statics["miniz"]
+		var miniz:MINIZ = non_statics["miniz"]
 		miniz.compression_level = compression_level
 		return miniz.compress_zlib(data)
 	
@@ -2239,8 +2231,8 @@ class _DataFormat:
 	
 	static func __store_16_in_buffer(byte:int,buffer:PoolByteArray = PoolByteArray(),little_endian:bool = true) -> PoolByteArray:
 		byte %= bitmask_uint16
-		var first = byte & bitmask_byte_1
-		var second = (byte & bitmask_byte_2) >> 8
+		var first:int = byte & bitmask_byte_1
+		var second:int = (byte & bitmask_byte_2) >> 8
 		if little_endian:
 			buffer.append(first)
 			buffer.append(second)
@@ -2269,14 +2261,14 @@ class _DataFormat:
 	
 	static func __store_64_in_buffer(byte:int,buffer:PoolByteArray = PoolByteArray(),little_endian:bool = true) -> PoolByteArray:
 		byte %= bitmask_int64
-		var first = byte & bitmask_byte_1
-		var second = (byte & bitmask_byte_2) >> 8
-		var third = (byte & bitmask_byte_3) >> 16
-		var fourth = (byte & bitmask_byte_4) >> 24
-		var fifth = (byte & bitmask_byte_5) >> 32
-		var sixth = (byte & bitmask_byte_6) >> 40
-		var seventh = (byte & bitmask_byte_7) >> 48
-		var eighth = (byte & bitmask_byte_8) >> 56
+		var first:int = byte & bitmask_byte_1
+		var second:int = (byte & bitmask_byte_2) >> 8
+		var third:int = (byte & bitmask_byte_3) >> 16
+		var fourth:int = (byte & bitmask_byte_4) >> 24
+		var fifth:int = (byte & bitmask_byte_5) >> 32
+		var sixth:int = (byte & bitmask_byte_6) >> 40
+		var seventh:int = (byte & bitmask_byte_7) >> 48
+		var eighth:int = (byte & bitmask_byte_8) >> 56
 		if little_endian:
 			buffer.append(first)
 			buffer.append(second)
@@ -2301,7 +2293,7 @@ class _DriverManagement:
 	const non_static = {}
 	func _init(f):
 		non_static["pointers"] = f
-		var driver_file_regex = RegEx.new()
+		var driver_file_regex:RegEx = RegEx.new()
 		driver_file_regex.compile("[a-z]")
 		non_static["regex"] = driver_file_regex
 		non_static["self"] = self
@@ -5313,7 +5305,7 @@ class _Keymapping:
 						var sig = sign(so)
 						var s = 0
 						var negoffset = (12000 * sig)
-						if sig >= 0:
+						if sig != -1:
 							sig = 1
 							s = so - negoffset
 						else:
@@ -5349,7 +5341,7 @@ class _Keymapping:
 							var sig = sign(so)
 							var s = 0
 							var negoffset = (12000 * sig)
-							if sig >= 0:
+							if sig != -1:
 								sig = 1
 								s = so - negoffset
 							else:
@@ -5357,198 +5349,6 @@ class _Keymapping:
 							ie.axis = s
 							ie.axis_value = sig
 							InputMap.action_add_event(action,ie)
-#					breakpoint
-
-class _ManifestV1:
-	var pointers:HevLibPointers
-	func _init(d):
-		pointers = d
-	
-	func __load_manifest_from_file(manifest):
-		var manifestConfig = {
-		"package":{
-			"id":null,
-			"name":null,
-			"version":"unknown",
-			"description":"MODMENU_DESCRIPTION_PLACEHOLDER",
-			"group":"",
-			"github_homepage":"",
-			"github_releases":"",
-			"discord_thread":"",
-			"nexus_page":"",
-			"donations_page":"",
-			"wiki_page":"",
-			"custom_link":"",
-			"custom_link_name":"",
-			}
-		}
-		var manifestFile = ConfigFile.new()
-		var error = manifestFile.load(manifest)
-		if error != OK:
-			return
-		for section in manifestConfig:
-			for key in manifestFile.get_section_keys(section):
-				manifestConfig[section][key] = manifestFile.get_value(section, key)
-		return manifestConfig
-	
-	func __load_file(modDir, zipDir, hasManifest, manifestDirectory, hasIcon, iconDir):
-		var manifestName = ""
-		var manifestId = ""
-		var manifestVersion = ""
-		var manifestDescription = ""
-		var manifestGroup = ""
-		var github_homepage = ""
-		var github_releases = ""
-		var discord_thread = ""
-		var nexus_page = ""
-		var donations_page = ""
-		var wiki_page = ""
-		var custom_link = "MODMENU_CUSTOM_LINK_PLACEHOLDER"
-		var custom_link_name = "MODMENU_CUSTOM_LINK_NAME_PLACEHOLDER"
-		var dirSplit = zipDir.split("/")
-		var dirSplitSize = dirSplit.size()
-		var fallbackDir = dirSplit[dirSplitSize - 1]
-		var parentFolder = str(dirSplit[dirSplitSize - 2])
-		var f = File.new()
-		if hasManifest and not parentFolder == "disabled_mod_cache":
-			f.open(manifestDirectory, File.READ)
-			var manifestData = __load_manifest_from_file(manifestDirectory)
-			manifestName = manifestData["package"]["name"]
-			manifestId = manifestData["package"]["id"]
-			manifestVersion = manifestData["package"]["version"]
-			manifestDescription = manifestData["package"]["description"]
-			manifestGroup = manifestData["package"]["group"]
-			github_homepage = manifestData["package"]["github_homepage"]
-			github_releases = manifestData["package"]["github_releases"]
-			discord_thread = manifestData["package"]["discord_thread"]
-			nexus_page = manifestData["package"]["nexus_page"]
-			donations_page = manifestData["package"]["donations_page"]
-			wiki_page = manifestData["package"]["wiki_page"]
-			custom_link = manifestData["package"]["custom_link"]
-			custom_link_name = manifestData["package"]["custom_link_name"]
-			f.close()
-		f.open(modDir, File.READ)
-		var modFolderSplit = modDir.split("/ModMain.gd")
-		var modFolderCount = modFolderSplit.size()
-		var separateModFolderDir = modFolderSplit[modFolderCount - 2].split("/")
-		var modFolderSecondCount = separateModFolderDir.size()
-		var modFolder = separateModFolderDir[modFolderSecondCount - 1]
-		var nameCheck = 0
-		var modName = ""
-		var prioCheck = 0
-		var modPrio = 0
-		var modVer = ""
-		var verCheck = 0
-		var content = f.get_as_text(true)
-		var modMainLines = content.split("\n")
-		for l in modMainLines:
-			if not hasManifest or manifestName.empty() or manifestName == null:
-				var modNameCheck = l.split("const MOD_NAME = ")
-				var modNameCheckSize = modNameCheck.size()
-				if modNameCheckSize >= 2:
-					var splitName = pointers.DataFormat.__array_to_string(modNameCheck[1].split("\""))
-					while splitName.begins_with(" "):
-						var beginningSpaceRemover = splitName.split(" ")
-						splitName = pointers.DataFormat.__array_to_string(beginningSpaceRemover[1])
-					while splitName.ends_with(" "):
-						var endSpaceRemover = splitName.split(" ")
-						splitName = pointers.DataFormat.__array_to_string(endSpaceRemover[0])
-					nameCheck = 1
-					modName = splitName
-			else:
-				nameCheck = 1
-				modName = manifestName
-			var priorityCheck = l.split("const MOD_PRIORITY = ")
-			var priorityCheckSize = priorityCheck.size()
-			if priorityCheckSize >= 2:
-				prioCheck += 1
-				modPrio = priorityCheck[1]
-			if not nameCheck == 1:
-				modName = fallbackDir
-			if not prioCheck == 1:
-				modPrio = 0
-			var versionCheck = l.split("const MOD_VERSION = ")
-			var versionCheckSize = versionCheck.size()
-			if manifestVersion:
-				verCheck = 1
-				modVer = manifestVersion
-			elif versionCheckSize >= 2 and not manifestVersion == modVer:
-				verCheck = 1
-				modVer = versionCheck[1]
-			else:
-				modVer = "unknown"
-		var prioStr = String(modPrio)
-		var ver = ""
-		if verCheck == 1:
-			ver = modVer
-		else:
-			ver = "unknown"
-		var verData = String(ver)
-		if manifestDescription == null or manifestDescription.empty():
-			manifestDescription = "MODMENU_DESCRIPTION_PLACEHOLDER"
-		if manifestGroup == null or manifestGroup.empty():
-			manifestGroup = "MODMENU_GROUP_PLACEHOLDER"
-		if manifestId == null or manifestId.empty():
-			manifestId = "MODMENU_ID_PLACEHOLDER"
-		if github_homepage == null or github_homepage.empty():
-			github_homepage = "MODMENU_GITHUB_HOMEPAGE_PLACEHOLDER"
-		if github_releases == null or github_releases.empty():
-			github_releases = "MODMENU_GITHUB_RELEASES_PLACEHOLDER"
-		if discord_thread == null or discord_thread.empty():
-			discord_thread = "MODMENU_DISCORD_PLACEHOLDER"
-		if nexus_page == null or nexus_page.empty():
-			nexus_page = "MODMENU_NEXUS_PLACEHOLDER"
-		if donations_page == null or donations_page.empty():
-			donations_page = "MODMENU_DONATIONS_PLACEHOLDER"
-		if wiki_page == null or wiki_page.empty():
-			wiki_page = "MODMENU_WIKI_PLACEHOLDER"
-		if custom_link == null or custom_link.empty():
-			custom_link = "MODMENU_CUSTOM_LINK_PLACEHOLDER"
-		if custom_link_name == null or custom_link_name.empty():
-			custom_link_name = "MODMENU_CUSTOM_LINK_NAME_PLACEHOLDER"
-		if hasIcon:
-			iconDir = iconDir
-		else:
-			iconDir = "empty"
-		var compiledData = modName + "\n" + fallbackDir + "\n" + prioStr + "\n" + modFolder + "\n" + verData + "\n" + manifestDescription + "\n" + github_homepage + "\n" + github_releases + "\n" + discord_thread + "\n" + nexus_page + "\n" + donations_page + "\n" + wiki_page + "\n" + custom_link + "\n" + custom_link_name + "\n" + iconDir + "\n" + manifestId
-		return compiledData
-	
-	func __get_mod_main(file, split_into_array = false):
-		var hasManifest = false
-		var manifestDir = ""
-		var hasIcon = false
-		var pngDir = ""
-		var stexDir = ""
-		var iconDir = ""
-		var modData
-		var modMainPath = ""
-		var filesInZip = pointers.Zip.__get_zip_content(file)
-		for m in filesInZip:
-			var modPath = "res://" + m
-			m = m.split(m.split("/")[0] + "/")[1].to_lower()
-			if m.begins_with("mod") and m.ends_with(".manifest"):
-				hasManifest = true
-				manifestDir = modPath
-			if m.begins_with("icon"):
-				if m.get_extension().to_lower() in pointers.SUPPORTED_IMAGE_EXTENSIONS:
-					hasIcon = true
-					pngDir = modPath
-				if m.get_extension().to_lower() == "stex":
-					hasIcon = true
-					stexDir = modPath
-			if m.begins_with("modmain") and m.ends_with(".gd"):
-				modMainPath = modPath
-		if stexDir:
-			iconDir = stexDir
-		elif pngDir:
-			iconDir = pngDir
-		modData = __load_file(modMainPath, file, hasManifest, manifestDir, hasIcon, iconDir)
-		if split_into_array:
-			modData = modData.split("\n")
-		if modMainPath != null:
-			return modData
-		else:
-			return null
 
 class _ManifestV2:
 	const non_static = {}
@@ -7156,6 +6956,103 @@ class _Math:
 				return converted
 			converted[r] = Vector2(float(aRaw),float(bRaw))
 		return converted
+	
+	const int64_max = (1 << 62) - 1 + (1 << 62)
+	const int64_min = -int64_max - 1
+	
+	const err_div_zero = "Division by zero error"
+	const err_int_overflow = "Integer overflow error"
+	
+	static func __imax(a:int,b:int) -> int:
+		return a if a > b else b
+	
+	static func __imin(a:int,b:int) -> int:
+		return a if a < b else b
+	
+	static func __iclamp(value:int,minimum:int,maximum:int) -> int:
+		return __imax(__imin(value,maximum),minimum)
+	
+	static func __idivide(num:int,denom:int) -> int:
+		if denom == 0:
+			non_static["pointers"].l(err_div_zero,"pointers.Math")
+			printerr(err_div_zero)
+			return 0
+		elif denom == 1:
+			return num
+		elif denom == -1:
+			if num == int64_min:
+				non_static["pointers"].l(err_int_overflow,"pointers.Math")
+				printerr(err_int_overflow)
+				return int64_max
+			return -num
+		var r:int = num if num < 0 else -num
+		var d:int = denom if denom < 0 else -denom
+		var shift:int = 0
+		var half:int = (int64_min >> 1) - 1
+		while d > half and (d << 1) > (r-1):
+			d <<= 1
+			shift += 1
+		var nq:int = 0
+		while shift > -1:
+			if d > (r-1):
+				r -= d
+				nq -= 1 << shift
+			d >>= 1
+			shift -= 1
+		if (num < 0) == (denom < 0):
+			return -nq
+		return nq
+	
+	static func __imodulo(num:int,denom:int) -> int:
+		if denom == 0:
+			non_static["pointers"].l(err_div_zero,"pointers.Math")
+			printerr(err_div_zero)
+			return 0
+		elif denom == 1 or denom == -1:
+			return 0
+		var r:int = num if num < 0 else -num
+		var d:int = denom if denom < 0 else -denom
+		var shift:int = 0
+		var half:int = (int64_min >> 1) - 1
+		while d > half and (d << 1) > (r-1):
+			d <<= 1
+			shift += 1
+		while shift > -1:
+			if d > (r-1):
+				r -= d
+			d >>= 1
+			shift -= 1
+		return (r if num < 0 else -r)
+	
+	static func __idivide_modulo(num:int,denom:int) -> Array:
+		if denom == 0:
+			non_static["pointers"].l(err_div_zero,"pointers.Math")
+			printerr(err_div_zero)
+			return [0,0]
+		elif denom == 1:
+			return [num,0]
+		elif denom == -1:
+			if num == int64_min:
+				non_static["pointers"].l(err_int_overflow,"pointers.Math")
+				printerr(err_int_overflow)
+				return [int64_max,0]
+			return [-num,0]
+		var r:int = num if num < 0 else -num
+		var d:int = denom if denom < 0 else -denom
+		var shift:int = 0
+		var half:int = (int64_min >> 1) - 1
+		while d > half and (d << 1) > (r-1):
+			d <<= 1
+			shift += 1
+		var nq:int = 0
+		while shift > -1:
+			if d > (r-1):
+				r -= d
+				nq -= 1 << shift
+			d >>= 1
+			shift -= 1
+		return [(-nq if (num < 0) == (denom < 0) else nq),(r if num < 0 else -r)]
+	
 
 class _Networking:
 	# https://github.com/Abdera7mane/Godot-SimpleHTTPClient
@@ -7167,7 +7064,7 @@ class _Networking:
 		non_static["self"] = self
 	
 	static func __parse_url(url: String) -> Dictionary:
-		var use_ssl: bool = url.begins_with("https://")
+		var use_ssl:bool = url.begins_with("https://")
 		url = url.trim_prefix("http://").trim_prefix("https://")
 		var path_delimiter:int = url.find("/")
 		if path_delimiter == -1:
@@ -7326,83 +7223,106 @@ class _RingInfo:
 	const pixelToKm = 10000
 	
 	static func __get_pixel_at(pos: Vector2) -> Color:
-		var image = images.map.get_data()
-		var size = image.get_size()
-		var x = int(clamp(floor(pos.x / pixelToKm), 0, size.x - 1))
-		var sy = int(size.y)
-		var y = ((int(floor(pos.y / pixelToKm)) %sy) + sy) %sy
-		var x1 = int(clamp(x + 1, 0, size.x - 1))
-		var y1 = (y + 1) % int(size.y)
+		var image:Image = images.map.get_data()
+		var size:Vector2 = image.get_size()
+		var x:int = int(clamp(floor(pos.x / pixelToKm), 0, size.x - 1))
+		var sy:int = int(size.y)
+		var y:int = ((int(floor(pos.y / pixelToKm)) %sy) + sy) %sy
+		var x1:int = int(clamp(x + 1, 0, size.x - 1))
+		var y1:int = (y + 1) % int(size.y)
 		
 		if x <= 0:
 			return Color(0, 0, 0, 0)
 		
 		image.lock()
-		var p00 = image.get_pixel(x, y)
-		var p10 = image.get_pixel(x1, y)
-		var p11 = image.get_pixel(x1, y1)
-		var p01 = image.get_pixel(x, y1)
+		var p00:Color = image.get_pixel(x, y)
+		var p10:Color = image.get_pixel(x1, y)
+		var p11:Color = image.get_pixel(x1, y1)
+		var p01:Color = image.get_pixel(x, y1)
 		image.unlock()
 		
-		var cx = (pos.x - floor(pos.x / pixelToKm) * pixelToKm) / pixelToKm
-		var cy = (pos.y - floor(pos.y / pixelToKm) * pixelToKm) / pixelToKm
+		var cx:float = (pos.x - floor(pos.x / pixelToKm) * pixelToKm) / pixelToKm
+		var cy:float = (pos.y - floor(pos.y / pixelToKm) * pixelToKm) / pixelToKm
 		
-		var pu = (p00 * (1 - cx) + p10 * (cx))
-		var pd = (p01 * (1 - cx) + p11 * (cx))
+		var pu:Color = (p00 * (1 - cx) + p10 * (cx))
+		var pd:Color = (p01 * (1 - cx) + p11 * (cx))
 		
-		var pixel = pu * (1 - cy) + pd * (cy)
-		return pixel
+		return (pu * (1 - cy) + pd * (cy))
 	
 	static func __get_vein_pixel_at(pos: Vector2) -> Color:
 		var veinImage:Image = images.veins.get_data()
 		var veinSize:Vector2 = veinImage.get_size()
-		var x = posmod(pos.x, veinSize.x)
-		var y = posmod(pos.y, veinSize.y)
-		var x1 = posmod(pos.x + 1, veinSize.x)
-		var y1 = posmod(pos.y + 1, veinSize.y)
+		var x:int = posmod(pos.x, veinSize.x)
+		var y:int = posmod(pos.y, veinSize.y)
+		var x1:int = posmod(pos.x + 1, veinSize.x)
+		var y1:int = posmod(pos.y + 1, veinSize.y)
 		
 		veinImage.lock()
-		var p00 = veinImage.get_pixel(x, y)
-		var p10 = veinImage.get_pixel(x1, y)
-		var p11 = veinImage.get_pixel(x1, y1)
-		var p01 = veinImage.get_pixel(x, y1)
+		var p00:Color = veinImage.get_pixel(x, y)
+		var p10:Color = veinImage.get_pixel(x1, y)
+		var p11:Color = veinImage.get_pixel(x1, y1)
+		var p01:Color = veinImage.get_pixel(x, y1)
 		veinImage.unlock()
 		
-		var cx = fposmod(pos.x, 1)
-		var cy = fposmod(pos.y, 1)
+		var cx:float = fposmod(pos.x, 1)
 		
-		var pu = lerp(p00, p10, cx)
-		var pd = lerp(p01, p11, cx)
-		
-		var pixel = lerp(pu, pd, cy)
-		return pixel
+		return lerp(lerp(p00, p10, cx), lerp(p01, p11, cx), fposmod(pos.y, 1))
 	
-	static func __get_vein_at(pos: Vector2) -> String:
-		var p1 = __get_vein_pixel_at(pos / 1861.0)
-		var p2 = __get_vein_pixel_at(pos / - 2531.0)
-		
-		var values = [p1.r, p1.g, p1.b, p1.a, p2.r, p2.b, p2.g, p2.a]
-		
-		var total = 0
+	static func __get_vein_at(pos: Vector2,only_vanilla:bool = false) -> String:
+		var values:PoolRealArray = PoolRealArray()
+		if only_vanilla:
+			var p1:Color = __get_vein_pixel_at(pos / 1861.0)
+			var p2:Color = __get_vein_pixel_at(pos / - 2531.0)
+			values = PoolRealArray([p1.r, p1.g, p1.b, p1.a, p2.r, p2.b, p2.g, p2.a])
+		else:
+			values = get_pixel_values(pos)
+		var rnd:float = 0.0
 		for n in CurrentGame.traceMinerals.size():
-			var tm = CurrentGame.traceMinerals[n]
-			values[n] = pow(values[n] / pow(CurrentGame.mineralPrices.get(tm, 1), 0.2), 4)
-			total += values[n]
-		
-		var rnd = randf() * total
-		var nr = 0
+			values[n] = pow(values[n] / pow(CurrentGame.mineralPrices.get(CurrentGame.traceMinerals[n], 1.0), 0.2), 4)
+			rnd += values[n]
+		rnd *= randf()
+		var nr:int = 0
 		for n in values:
 			rnd -= n
-			if rnd < 0:
+			if rnd < 0.0:
 				return CurrentGame.traceMinerals[nr]
 			nr += 1
-		
 		return CurrentGame.traceMinerals[0]
 	
-	static func get_chaos_at(pos):
+	static func get_chaos_at(pos) -> float:
 		return __get_pixel_at(pos).r
 	
-	static func get_raw_density_at(pos):
+	const pix_values:PoolIntArray = PoolIntArray()
+	
+	const not_random_seeds = PoolIntArray([1337,1776,2014,1384,2684,842,2802,1597,2116,755,1596,2661,1928,-1861,-2531,-1337,-1776,-2014,-1384,-2684,-842,-2802,-1597,-2116,-755,-1596,-2661,-1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928])
+	
+	static func get_pixel_values(pos:Vector2) -> PoolRealArray:
+		if pix_values.empty():
+			var mineral_size:int = int(floor(CurrentGame.traceMinerals.size() / 4.0)) - 1
+			pix_values.resize(mineral_size + 2)
+			pix_values[0] = 1861.0
+			pix_values[1] = - 2531.0
+			if mineral_size:
+				var random:bool = ModLoader._savedObjects[0].ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","randomize_minerals")
+				var nsi:int = not_random_seeds.size()
+				for i in mineral_size:
+					if random:
+						pix_values[i + 2] = ((randi() % 2250) + 750) * sign(randf() - 0.5)
+					else:
+						pix_values[i + 2] = not_random_seeds[i%nsi]
+		var pxSize:int = pix_values.size()
+		var out:PoolRealArray = PoolRealArray()
+		out.resize(pxSize * 4)
+		for i in pxSize:
+			var pixel:Color = __get_vein_pixel_at(pos / pix_values[i])
+			var offset:int = i * 4
+			out[offset] = pixel.r
+			out[offset + 1] = pixel.g
+			out[offset + 2] = pixel.b
+			out[offset + 3] = pixel.a
+		return out
+	
+	static func get_raw_density_at(pos) -> float:
 		return __get_pixel_at(pos).b
 
 class _RPC:
@@ -8323,7 +8243,6 @@ class _Threading:
 		var current_object:Object = null
 		var current_method_call:String = ""
 		var current_args:Array = []
-		var current_priority:int = 1
 		
 		var semaphore:Semaphore = Semaphore.new()
 		
@@ -8351,8 +8270,7 @@ class _Threading:
 			current_method_call = next.get("method","")
 			if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
 				current_args = Array(next.get("args",[]))
-				current_priority = next.get("priority",1)
-				thread.start(self,"call_object_func",null,current_priority)
+				thread.start(self,"call_object_func",null)
 				handle_thread_finish(thread.wait_to_finish())
 			else:
 				printerr("Thread error: object does not exist or does not have method [%s]" % current_method_call)
@@ -8360,11 +8278,13 @@ class _Threading:
 		
 		func call_object_func(_a = null):
 			while running:
-				pass
-			var out = current_object.callv(current_method_call,current_args)
-			if out is GDScriptFunctionState:
-				out = yield(out,"completed")
-			return out
+				semaphore.wait()
+				
+				
+				var out = current_object.callv(current_method_call,current_args)
+				if out is GDScriptFunctionState:
+					out = yield(out,"completed")
+			
 		
 		func handle_thread_finish(out):
 			container.mutex.lock()
@@ -8384,6 +8304,7 @@ class _Threading:
 		
 		func _notification(what):
 			if what == NOTIFICATION_PREDELETE:
+				running = false
 				thread.wait_to_finish()
 	
 	
@@ -8424,16 +8345,8 @@ class _TimeAccess:
 		return time
 	
 	static func __get_dos_datetime(datetime:Dictionary = Time.get_datetime_dict_from_system()) -> Dictionary:
-		var year:int = datetime.year
-		var month:int = datetime.month
-		var day:int = datetime.day
-		var hour:int = datetime.hour
-		var minute:int = datetime.minute
-		var second:int = datetime.second
-		
-		var dos_year:int = int(max(year - 1980, 0))
-		var dos_time:int = (hour << 11) | (minute << 5) | int(second / 2.0)
-		var dos_date:int = (dos_year << 9) | (month << 5) | day
+		var dos_time:int = (datetime.hour << 11) | (datetime.minute << 5) | int(datetime.second / 2.0)
+		var dos_date:int = (int(max(datetime.year - 1980, 0)) << 9) | (datetime.month << 5) | datetime.day
 		return {"time":dos_time, "date":dos_date}
 
 class _Tokenizer:
@@ -8624,7 +8537,7 @@ class _Translations:
 		var language_lines:PoolStringArray = lang_data.split(delimiter)
 		if not language_lines[0] == "locale":
 			return {}
-		if language_lines.size() <= 1:
+		if language_lines.size() < 2:
 			return {}
 		var languages:Array = []
 		var lsize:int = language_lines.size()
