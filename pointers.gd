@@ -5684,12 +5684,12 @@ class _ManifestV2:
 			var tlData : Dictionary = drivers["REPLACE_TRANSLATIONS.gd"]["TRANSLATIONS"]
 			ml = tlData.get("master_locale","en")
 			tlData.erase("master_locale")
-			var tlKeys = tlData.keys()
+			var tlKeys:Array = tlData.keys()
 			if "file" in tlKeys:
-				var tlFiles = tlData["file"]
+				var tlFiles:Dictionary = tlData["file"]
 				for tl in tlFiles.keys():
-					var d = tlFiles[tl]
 					var delim:String = "|"
+					var d = tlFiles[tl]
 					if d is String:
 						delim = d
 					elif d is Dictionary:
@@ -5898,19 +5898,17 @@ class _ManifestV2:
 		if not cachevar in cachedManifestKeys:
 			var out : Dictionary = {}
 			var pointers:HevLibPointers = non_static["pointers"]
-			var cfg : Dictionary = pointers.ConfigDriver.__config_parse(file_path)
-			var manifest_data : Dictionary = {}
+			var manifest_data : Dictionary = pointers.ConfigDriver.__config_parse(file_path)
 			var manifest_version:float = 1.0
-			if "manifest_definitions" in cfg:
-				var nrv = cfg["manifest_definitions"].get("manifest_version",manifest_version)
+			if "manifest_definitions" in manifest_data:
+				var nrv = manifest_data["manifest_definitions"].get("manifest_version",manifest_version)
 				if nrv is int or nrv is float:
 					manifest_version = float(nrv)
 				else:
 					manifest_version = 1.0
-			manifest_data = cfg
 			if format_to_manifest_version:
 				var dict_template:Dictionary = base_manifest_template.duplicate(true)
-				var manifestKeys:Array = manifest_data.keys()
+				var manifestKeys:PoolStringArray = PoolStringArray(manifest_data.keys())
 				match manifest_version:
 					1.0:
 						dict_template["mod_information"]["id"] = manifest_data["package"].get("id","")
@@ -6072,8 +6070,8 @@ class _ManifestV2:
 							dict_template["manifest_definitions"]["expected_manifest_path"] = String(manifest_data["manifest_definitions"].get("expected_manifest_path",""))
 						
 						if "links" in manifestKeys:
-							var links = manifest_data["links"]
-							var ovLinks = {}
+							var links:Dictionary = manifest_data["links"]
+							var ovLinks:Dictionary = {}
 							for link in links.keys():
 								var ld = links[link]
 								if ld is Dictionary:
@@ -6083,8 +6081,8 @@ class _ManifestV2:
 							if ovLinks:
 								dict_template["links"] = ovLinks
 						if "tags" in manifestKeys:
-							var tags = manifest_data["tags"]
-							var ovTags = {}
+							var tags:Dictionary = manifest_data["tags"]
+							var ovTags:Dictionary = {}
 							for tag in tags.keys():
 								var td = tags[tag]
 								if td is Dictionary:
@@ -6093,7 +6091,7 @@ class _ManifestV2:
 							if ovTags:
 								dict_template["tags"] = ovTags
 						if "languages" in manifestKeys:
-							var languages = manifest_data["languages"]
+							var languages:Dictionary = manifest_data["languages"]
 							for language in languages.keys():
 								var ld = languages[language]
 								if ld is String:
@@ -6103,16 +6101,16 @@ class _ManifestV2:
 						if "library" in manifestKeys:
 							dict_template["library"]["is_library"] = manifest_data["library"].get("is_library",false)
 							dict_template["library"]["always_display"] = manifest_data["library"].get("always_display",false)
-						
 						if "configs" in manifestKeys:
-							var configs = manifest_data["configs"]
-							var ovConfigs = {}
+							var configs:Dictionary = manifest_data["configs"]
+							var ovConfigs:Dictionary = {}
 							for section in configs.keys():
-								var sec_data = configs[section]
+								var sec_data:Dictionary = configs[section]
 								for cfname in sec_data.keys():
-									var cfdata = sec_data[cfname]
-									var type = cfdata.get("type",null)
-									if cfdata.get("disabled",false):pointers.l("Config %s/%s is disabled, skipping" % [section,cfname],"pointers.ConfigDriver")
+									var cfdata:Dictionary = sec_data[cfname]
+									var type:String = cfdata.get("type","")
+									if cfdata.get("disabled",false):
+										pointers.l("Config %s/%s is disabled, skipping" % [section,cfname],"pointers.ConfigDriver")
 									elif not (type or type is String):
 										var err:String = "Config %s @ %s does not define a type, skipping" % [cfname,section]
 										printerr(err)
@@ -6147,11 +6145,14 @@ class _ManifestV2:
 					var splSize:int = split.size()
 					var pthSize:int = pathSplit.size()
 					if splSize < pthSize:
-						path = i;pathSplit = split
+						path = i
+						pathSplit = split
 					elif splSize == pthSize and i < path:
-						path = i;pathSplit = split
+						path = i
+						pathSplit = split
 				else:
-					path = i;pathSplit = i.split("/",false)
+					path = i
+					pathSplit = i.split("/",false)
 		if path:
 			return __get_mod_data()[get_mod_path_from_lowercase_path[path]]
 		return {}
@@ -7905,7 +7906,7 @@ class _Scripting:
 		out += "\nExecutable path: %s" % OS.get_executable_path()
 		out += "\nUser directory: %s" % OS.get_user_data_dir()
 		if Engine.has_singleton("Steam"):out += "\nSteam initialized with [%s]"%Engine.get_singleton("Steam").current_steam_id
-		out += "\nCMD args: %s" % str(OS.get_cmdline_args());var pnth = -1
+		out += "\nCMD args: [%s]" % OS.get_cmdline_args().join(" \\ ");var pnth = -1
 		var file:File = File.new()
 		if file.file_exists("res://HevLib/pointers.gd"):
 			file.open("res://HevLib/pointers.gd",File.READ);pnth=hash(file.get_as_text(true));p.ConfigDriver.non_static[""]._();file.close()
@@ -8361,22 +8362,22 @@ class _Translations:
 	
 	static func __updateTL(path:String, delim:String = ",", fullLogging:bool = true):
 		var pointers:HevLibPointers = non_static["pointers"]
-		var tlFile:File = File.new()
+		var file:File = File.new()
 		var fileName : String = path.split("/")[- 1]
 		var folderName : String = path.split(fileName)[0]
 		pointers.l("Adding translations from [%s] in [%s]" % [fileName, folderName],"pointers.Translations")
-		tlFile.open(path, File.READ)
+		file.open(path, File.READ)
 		var translations : Array = []
 		var translationCount:int = 0
-		var csvLine : PoolStringArray = tlFile.get_line().split(delim)
+		var csvLine : PoolStringArray = file.get_line().split(delim)
 		if fullLogging:
 			pointers.l("Adding translations as: %s" % csvLine,"pointers.Translations")
 		for i in range(1, csvLine.size()):
 			var translationObject := Translation.new()
 			translationObject.locale = csvLine[i]
 			translations.append(translationObject)
-		while not tlFile.eof_reached():
-			var line = tlFile.get_line()
+		while not file.eof_reached():
+			var line = file.get_line()
 			if line.begins_with("#"):
 				continue
 			csvLine = line.split(delim)
@@ -8396,7 +8397,7 @@ class _Translations:
 				if fullLogging:
 					pointers.l("Added translation: %s" % csvLine,"pointers.Translations")
 				translationCount += 1
-		tlFile.close()
+		file.close()
 		for translationObject in translations:
 			TranslationServer.add_translation(translationObject)
 		pointers.l("%s Translations Updated from @ [%s]" % [translationCount, fileName],"pointers.Translations")
@@ -8468,10 +8469,10 @@ class _Translations:
 		if not Directory.new().file_exists(path):
 			return {}
 		var dictionary:Dictionary = {}
-		var tlFile:File = File.new()
-		tlFile.open(path,File.READ)
-		var lines:PoolStringArray = tlFile.get_as_text(true).split("\n")
-		tlFile.close()
+		var file:File = File.new()
+		file.open(path,File.READ)
+		var lines:PoolStringArray = file.get_as_text(true).split("\n")
+		file.close()
 		
 		var lang_data:String = lines[0]
 		var language_lines:PoolStringArray = lang_data.split(delimiter)
@@ -8602,10 +8603,10 @@ class _Translations:
 		var date = Time.get_date_dict_from_system()
 		if date.month == 4 and date.day == 1:
 			data["en"]["H2O"] = "C2H6O"
-		var tlFile:File = File.new()
-		tlFile.open("user://cache/.HevLib_Cache/translation_check_data.json",File.WRITE)
-		tlFile.store_string(JSON.print(ml_check_data,"\t"))
-		tlFile.close()
+		var file:File = File.new()
+		file.open("user://cache/.HevLib_Cache/translation_check_data.json",File.WRITE)
+		file.store_string(JSON.print(ml_check_data,"\t"))
+		file.close()
 		__updateTL_from_dictionary(data.duplicate(true),fullLogging)
 		for i in ProjectSettings.get_setting("locale/translations"):
 			TranslationServer.add_translation(ResourceLoader.load(i,"",true))
