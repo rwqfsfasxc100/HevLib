@@ -1,3 +1,29 @@
+[1.17.9]
+
+1=* Removed ability for `Zip`.`__load_pck` to read PCKs written in godot 4 or newer, and as a result is much faster at processing
+1.1=* This has the added bonus of making it considerably faster to read larger PCKs.
+2=* Updated MINIZ documentation to reflect the ability to use it's class name
+3=* Improved logic of `FolderAccess`.`__recursive_delete`
+4=* Fixed update menu not always showing a mod's translated name
+5=* Moved class descriptions to a standalone script file
+6=* Added `Threading` class.
+6.1=* This adds a handful of functions that lets code execution be arbritrarily moved to extra threads.
+6.2=* Useful for cutting down a batch of several heavy functions.
+6.3=* Threads are limited to your CPU's logical core count minus 2. CPUs with Hyper-Threading enabled will be considered.
+7=* Added `Tokenizer` class.
+7.1=* Run through a main tokenizer script (a copy can be fetched with `__get_tokenizer()`)
+7.2=* Allows the conversion of source code and compiled source to and from tokens, which is how the engine processes scripts.
+7.3=* Tokens can be used to normalize scripts and perform operations that modify a script's source code without issues caused by String or RegEx formatting
+7.4=* Several helper functions are provided to simplify specific tasks
+8=* Updated script shadow creation tool to use tokens.
+8.1=* This upgrade also brings about other improvements, such as enumeration support
+8.2=* The functionality is also simplified, and now just outputs source that shadows the entire base script.
+9=* Added more secondary RPC states in the ring`
+10=* Added `sensor_identifier_override` property for sensors in a `RPC_EXTRA_STATES.gd` entry
+10.1=* Allows multiple cases of the same sensor using multiple identifiers
+11=* Removed legacy ManifestV1 code
+12=* Added integer-safe division, max, min, and clamp functions for handling numbers above 2^53 to the Math class
+
 [1.17.8]
 
 1=* Heavily optimized several core systems:
