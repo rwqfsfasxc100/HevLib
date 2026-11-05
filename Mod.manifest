@@ -328,6 +328,78 @@ HEVLIB_CONFIG_SECTION_DEBUG={
 "type": "bool"
 }
 }
+HEVLIB_CONFIG_SECTION_POINTERS={
+"always_send_new_mods": {
+"default": false,
+"description": "HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS_TOOLTIP",
+"display_order_position": 6,
+"name": "HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS",
+"type": "bool"
+},
+"compile": {
+"default": true,
+"description": "HEVLIB_CONFIG_COMPILE_DESC",
+"display_order_position": 7,
+"name": "HEVLIB_CONFIG_COMPILE",
+"type": "bool"
+},
+"discord_rpc_enabled": {
+"default": true,
+"description": "HEVLIB_CONFIG_DISCORD_RPC_ENABLED_DESC",
+"display_order_position": 1,
+"name": "HEVLIB_CONFIG_DISCORD_RPC_ENABLED",
+"require_restart": true,
+"type": "bool"
+},
+"full_logging": {
+"default": false,
+"description": "HEVLIB_CONFIG_FULL_LOGGING_TOOLTIP",
+"display_order_position": 0,
+"name": "HEVLIB_CONFIG_FULL_LOGGING",
+"type": "bool"
+},
+"pointer_logging_frame_interval": {
+"default": 2.0,
+"description": "HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL_TOOLTIP",
+"display_order_position": 5,
+"max": 60.0,
+"min": 1.0,
+"name": "HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL",
+"step": 1.0,
+"style": "slider",
+"type": "int"
+},
+"safe_mod_loading": {
+"default": true,
+"description": "HEVLIB_CONFIG_SAFE_MOD_LOADING_TOOLTIP",
+"display_order_position": 4,
+"name": "HEVLIB_CONFIG_SAFE_MOD_LOADING",
+"require_restart": true,
+"type": "bool"
+},
+"show_currently_playing": {
+"default": true,
+"description": "HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING_TOOLTIP",
+"display_order_position": 2,
+"name": "HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING",
+"type": "bool"
+},
+"single_thread_only": {
+"default": false,
+"description": "HEVLIB_CONFIG_SINGLETHREAD_ONLY_DESC",
+"display_order_position": 8,
+"name": "HEVLIB_CONFIG_SINGLETHREAD_ONLY",
+"require_restart": true,
+"type": "bool"
+},
+"stop_rendering_on_lost_focus": {
+"default": false,
+"description": "HEVLIB_CONFIG_DISABLE_RENDERING_ON_LOST_FOCUS_DESC",
+"display_order_position": 3,
+"name": "HEVLIB_CONFIG_DISABLE_RENDERING_ON_LOST_FOCUS",
+"type": "bool"
+}
+}
 HEVLIB_CONFIG_SECTION_INPUT={
 "debugger": {
 "always_binds": [ "QuoteLeft" ],
@@ -462,78 +534,6 @@ HEVLIB_CONFIG_SECTION_INPUT={
 "display_order_position": 18,
 "name": "HEVLIB_CONFIG_TOGGLE_UI_SCROLL_RIGHT2",
 "type": "input"
-}
-}
-HEVLIB_CONFIG_SECTION_POINTERS={
-"always_send_new_mods": {
-"default": false,
-"description": "HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS_TOOLTIP",
-"display_order_position": 6,
-"name": "HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS",
-"type": "bool"
-},
-"compile": {
-"default": true,
-"description": "HEVLIB_CONFIG_COMPILE_DESC",
-"display_order_position": 7,
-"name": "HEVLIB_CONFIG_COMPILE",
-"type": "bool"
-},
-"discord_rpc_enabled": {
-"default": true,
-"description": "HEVLIB_CONFIG_DISCORD_RPC_ENABLED_DESC",
-"display_order_position": 0,
-"name": "HEVLIB_CONFIG_DISCORD_RPC_ENABLED",
-"require_restart": true,
-"type": "bool"
-},
-"full_logging": {
-"default": false,
-"description": "HEVLIB_CONFIG_FULL_LOGGING_TOOLTIP",
-"display_order_position": 4,
-"name": "HEVLIB_CONFIG_FULL_LOGGING",
-"type": "bool"
-},
-"pointer_logging_frame_interval": {
-"default": 2.0,
-"description": "HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL_TOOLTIP",
-"display_order_position": 5,
-"max": 60.0,
-"min": 1.0,
-"name": "HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL",
-"step": 1.0,
-"style": "slider",
-"type": "int"
-},
-"safe_mod_loading": {
-"default": true,
-"description": "HEVLIB_CONFIG_SAFE_MOD_LOADING_TOOLTIP",
-"display_order_position": 2,
-"name": "HEVLIB_CONFIG_SAFE_MOD_LOADING",
-"require_restart": true,
-"type": "bool"
-},
-"show_currently_playing": {
-"default": true,
-"description": "HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING_TOOLTIP",
-"display_order_position": 1,
-"name": "HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING",
-"type": "bool"
-},
-"single_thread_only": {
-"default": false,
-"description": "HEVLIB_CONFIG_SINGLETHREAD_ONLY_DESC",
-"display_order_position": 8,
-"name": "HEVLIB_CONFIG_SINGLETHREAD_ONLY",
-"require_restart": true,
-"type": "bool"
-},
-"stop_rendering_on_lost_focus": {
-"default": false,
-"description": "HEVLIB_CONFIG_DISABLE_RENDERING_ON_LOST_FOCUS_DESC",
-"display_order_position": 3,
-"name": "HEVLIB_CONFIG_DISABLE_RENDERING_ON_LOST_FOCUS",
-"type": "bool"
 }
 }
 
