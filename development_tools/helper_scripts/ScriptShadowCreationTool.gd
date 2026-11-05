@@ -147,15 +147,14 @@ const token_lookup = {
 	TK_CURSOR:"TK_CURSOR",
 }
 
-const type_store:PoolIntArray = PoolIntArray()
-const args_store:Array = Array()
-const line_store:PoolIntArray = PoolIntArray()
+var type_store:PoolIntArray = PoolIntArray()
+var args_store:Array = Array()
+var line_store:PoolIntArray = PoolIntArray()
 
-var pointers:Reference
+var pointers:Reference = load("res://HevLib/scripts/tokenizer/tokenizer.gd").new()
 var builtin_classes:PoolStringArray = PoolStringArray()
 var file:File = File.new()
-func __make_shadow_of_script(script_path:String,p:HevLibPointers) -> String:
-	pointers = p.Tokenizer.__get_tokenizer()
+func __make_shadow_of_script(script_path:String) -> String:
 	if not builtin_classes:
 		builtin_classes = ClassDB.get_class_list() + PoolStringArray(pointers.type_index.keys())
 		for i in builtin_classes.size():
