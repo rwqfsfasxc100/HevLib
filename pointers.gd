@@ -8223,11 +8223,11 @@ class _Threading:
 	
 	func __claim_thread() -> void:
 		max_threads -= 1
-		use_single_thread = max_threads < 1
+		use_single_thread = max_threads < 1 or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","single_thread_only")
 	
 	func __release_thread() -> void:
 		max_threads += 1
-		use_single_thread = max_threads < 1
+		use_single_thread = max_threads < 1 or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","single_thread_only")
 	
 	func _notification(what):
 		if what == NOTIFICATION_PREDELETE:
