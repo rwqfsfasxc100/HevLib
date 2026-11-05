@@ -8134,14 +8134,43 @@ class _Threading:
 	var available_threads:Array = []
 	var max_threads:int = OS.get_processor_count() - 2
 	
+	# If 2 or fewer logical cores, swap over to use single threading
+	var require_single_threading:bool = max_threads < 1
+	
+	var use_single_thread:bool = require_single_threading
+	
+	var thread_refs:Array = []
+	
 	var mutex:Mutex = Mutex.new()
 	
 	func _init(p):
 		pointers = p
-		for i in max_threads:
-			active_threads.append(ThreadStruct.new(self,p,i))
+		if require_single_threading:
+			pointers.l("2 or fewer logical CPU cores detected, forcing single thread mode.","pointers.Threading")
+		else:
+			use_single_thread = pointers.ConfigDriver.__config_parse("user://cfg/Mod_Configurations.cfg").get("HevLib/HEVLIB_CONFIG_SECTION_DEBUG",{}).get("single_thread_only",false)
+			pointers.ConfigDriver.__subscribe_to_setting_change("update_thread_mode",self,"HevLib","HEVLIB_CONFIG_SECTION_DEBUG","single_thread_only")
+			for i in max_threads:
+				thread_refs.append(ThreadStruct.new(self,p,i))
+	func update_thread_mode(how:bool):
+		use_single_thread = how
 	
-	func __request_multiple_threads(operations:Array):
+	
+	# This took me probably close to 2 weeks to fine tune, 1.5 days alone was chasing
+	# a bug caused by me testing with the single most thread-unsafe code I had
+	# Hope this actually ends up being useful...
+	func __request_multiple_threads(operations:Array) -> Array:
+		if use_single_thread:
+			var out:Array = []
+			for next_op in operations:
+				var current_object:Object = next_op.get("object",null)
+				var args:Array = next_op.get("args",[])
+				var current_method_call:String = next_op.get("method","")
+				if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
+					out.append(call_single_thread(next_op))
+				else:
+					out.append(null)
+			return out
 		var request_id:int = (operations.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
 		var semaphore:Semaphore = Semaphore.new()
 		var added_op:int = 0
@@ -8154,25 +8183,29 @@ class _Threading:
 				added_op += 1
 		semaphore_store[request_id] = [added_op,semaphore]
 		thread_return[request_id] = []
-		for thread in active_threads:
+		for thread in available_threads:
 			if ops:
-				thread.mutex.lock()
-				thread.next_op = ops.pop_front()
-				thread.semaphore.post()
-				thread.mutex.unlock()
-			else:
-				break
+				if not thread.get_running():
+					thread.pop_post(ops.pop_front())
+			else: break
 		if ops:
 			thread_queue.append_array(ops)
 		mutex.unlock()
 		semaphore.wait()
 		mutex.lock()
-		var out = thread_return[request_id]
+		var out:Array = thread_return[request_id]
 		thread_return.erase(request_id)
 		mutex.unlock()
 		return out
 	
-	func __request_single_thread(operation:Dictionary):
+	func __request_single_thread(operation:Dictionary) -> Array:
+		if use_single_thread:
+			var current_object:Object = operation.get("object",null)
+			var args:Array = operation.get("args",[])
+			var current_method_call:String = operation.get("method","")
+			if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
+				return [call_single_thread(operation)]
+			return [null]
 		var request_id:int = (operation.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
 		var semaphore:Semaphore = Semaphore.new()
 		mutex.lock()
@@ -8183,21 +8216,61 @@ class _Threading:
 		mutex.unlock()
 		semaphore.wait()
 		mutex.lock()
-		var out = thread_return[request_id]
+		var out:Array = thread_return[request_id]
 		thread_return.erase(request_id)
 		mutex.unlock()
 		return out
 	
+	func __claim_thread() -> void:
+		max_threads -= 1
+		use_single_thread = max_threads < 1
 	
+	func __release_thread() -> void:
+		max_threads += 1
+		use_single_thread = max_threads < 1
 	
 	func _notification(what):
 		if what == NOTIFICATION_PREDELETE:
 			active_threads.clear()
 	
+	func deactivate_thread(thread):
+		mutex.lock()
+		available_threads.erase(thread)
+		active_threads.append(thread)
+		print("Deactivating thread ",thread)
+		mutex.unlock()
+	
+	func activate_thread(thread):
+		mutex.lock()
+		active_threads.erase(thread)
+		available_threads.append(thread)
+		print("Activating thread ",thread)
+		mutex.unlock()
+	
+	func call_single_thread(data:Dictionary):
+		current_data_for_single_thread = data
+		single_thread_thread = Thread.new()
+		single_thread_thread.start(self,"single_thread_yield_safe")
+		return single_thread_thread.wait_to_finish()
+	
+	var single_thread_thread:Thread = null
+	var current_data_for_single_thread:Dictionary = {}
+	func single_thread_yield_safe(a):
+		var current_object:Object = current_data_for_single_thread.get("object",null)
+		var args:Array = current_data_for_single_thread.get("args",[])
+		var current_method_call:String = current_data_for_single_thread.get("method","")
+		var op = current_object.callv(current_method_call,args)
+		if op is GDScriptFunctionState:
+			op = yield(current_object,"completed")
+		return op
+	
 	class ThreadStruct:
 		extends Reference
 		
+		var semaphore:Semaphore = Semaphore.new()
+		var mutex:Mutex = Mutex.new()
 		var thread:Thread = Thread.new()
+		
 		var container:HevLibPointers._Threading
 		var pointers:HevLibPointers
 		
@@ -8209,46 +8282,47 @@ class _Threading:
 			pointers = p
 			thread.start(self,"running_thread")
 		
-		var semaphore:Semaphore = Semaphore.new()
-		var mutex:Mutex = Mutex.new()
-		
+		var running:bool = false
 		var quit:bool = false
 		var next_op = null
 		
 		func running_thread(_a = null):
 			while true:
-				if next_op == null:
+				mutex.lock()
+				if not next_op is Dictionary:
+					running = false
+					mutex.unlock()
+					container.activate_thread(self)
+					print("Setting thread %s to wait" % OS.get_thread_caller_id())
 					semaphore.wait()
 				
-				
+				mutex.lock()
 				if quit:
+					mutex.unlock()
 					return
 				
-				if next_op:
-					container.mutex.lock()
-					container.available_threads.erase(self)
-					container.active_threads.append(self)
-					container.mutex.unlock()
-					print("Thread %d started" % thread_id)
-					var current_thread_id:int = next_op["request_id"]
-					var current_object:Object = next_op.get("object",null)
-					var current_method_call:String = next_op.get("method","")
-					var out = null
-					if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
-						out = current_object.callv(current_method_call,next_op.get("args",[]))
-						if out is GDScriptFunctionState:
-							out = yield(out,"completed")
-					print("Thread %d finished" % thread_id)
-					container.mutex.lock()
-					container.thread_return[current_thread_id].append(out)
-					var cr:Array = container.semaphore_store[current_thread_id]
-					cr[0] -= 1
-					if cr[0] < 1:
-						cr[1].post()
-					mutex.lock()
-					next_op = container.thread_queue.pop_front()
-					mutex.unlock()
-					container.mutex.unlock()
+				container.deactivate_thread(self)
+				print("Thread %d started" % thread_id)
+				var current_thread_id:int = next_op["request_id"]
+				var current_object:Object = next_op.get("object",null)
+				var args:Array = next_op.get("args",[])
+				var current_method_call:String = next_op.get("method","")
+				next_op = null
+				mutex.unlock()
+				var out = null
+				if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
+					out = current_object.callv(current_method_call,args)
+					if out is GDScriptFunctionState:
+						out = yield(out,"completed")
+				print("Thread %d finished" % thread_id)
+				container.mutex.lock()
+				container.thread_return[current_thread_id].append(out)
+				var cr:Array = container.semaphore_store[current_thread_id]
+				cr[0] -= 1
+				if cr[0] < 1:
+					cr[1].post()
+				pop_post(container.thread_queue.pop_front())
+				container.mutex.unlock()
 		
 		func _notification(what):
 			if what == NOTIFICATION_PREDELETE:
@@ -8259,8 +8333,25 @@ class _Threading:
 				mutex.unlock()
 				
 				thread.wait_to_finish()
-	
-	
+		
+		func pop_post(data):
+			if data is Dictionary:
+				mutex.lock()
+				running = true
+				next_op = data
+				semaphore.post()
+				mutex.unlock()
+		
+		func set_running(how:bool):
+			mutex.lock()
+			running = how
+			mutex.unlock()
+		func get_running() -> bool:
+			mutex.lock()
+			var how:bool = running
+			mutex.unlock()
+			return how
+		
 
 class _TimeAccess:
 	func _init(p):
