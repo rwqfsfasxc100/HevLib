@@ -8258,14 +8258,14 @@ class _Threading:
 			semaphore_store.clear()
 			thread_refs.clear()
 	
-	func deactivate_thread(thread):
+	func thread_now_available(thread):
 		mutex.lock()
 		active_threads.append(thread)
 		available_threads.erase(thread)
 		print("Deactivating thread ",thread)
 		mutex.unlock()
 	
-	func activate_thread(thread):
+	func thread_now_unavailable(thread):
 		mutex.lock()
 		if active_threads.size() + available_threads.size() > max_threads:
 			deactivated_threads.append(thread)
@@ -8316,7 +8316,7 @@ class _Threading:
 				if not next_op is Dictionary:
 					running = false
 					mutex.unlock()
-					container.activate_thread(self)
+					container.thread_now_unavailable(self)
 					print("Setting thread %s to wait" % OS.get_thread_caller_id())
 					semaphore.wait()
 				
@@ -8325,7 +8325,7 @@ class _Threading:
 					mutex.unlock()
 					return
 				
-				container.deactivate_thread(self)
+				container.thread_now_available(self)
 				print("Thread %d started" % thread_id)
 				var current_thread_id:int = next_op["request_id"]
 				var current_object:Object = next_op.get("object",null)
