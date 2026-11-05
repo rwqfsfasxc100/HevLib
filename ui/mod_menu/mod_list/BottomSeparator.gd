@@ -53,9 +53,9 @@ func modify():
 					close_button.focus_neighbour_top = close_button.get_path_to(foc)
 					break
 
-func get_label(dir):
+func get_label(dir = null):
 	return close_button
-func get_reset(dir):
+func get_reset(dir = null):
 	return close_button
-func get_focusable(dir):
+func get_focusable(dir = null):
 	return close_button
