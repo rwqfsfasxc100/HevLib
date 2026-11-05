@@ -59,10 +59,7 @@ func _Update_pressed():
 var display_wait_popup = true
 
 func _ignore_confirmed():
-	var currently_ignored = pointers.ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
-	if currently_ignored == null:
-		pointers.ConfigDriver.__store_value("ModMenu2","datastore","ignored_updates",{})
-	currently_ignored = pointers.ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates")
+	var currently_ignored:Dictionary = pointers.ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates",{})
 	currently_ignored[mod_id] = new_version
 	pointers.ConfigDriver.__store_value("ModMenu2","datastore","ignored_updates",currently_ignored)
 	repos()

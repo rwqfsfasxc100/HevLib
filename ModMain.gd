@@ -61,6 +61,7 @@ func _init(modLoader=ModLoader):
 	
 	recache(pointers)
 	pointers.ManifestV2.__get_mod_versions(true)
+	pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
 	
 	if OS.has_feature("editor")&&!File.new().file_exists("res://VersionLabel.tscn"):
 		printerr("FAILED TO FETCH FILE SYSTEM")

@@ -37,10 +37,10 @@ var file:File = File.new()
 
 func _ready():
 	var sTime:int = OS.get_system_time_msecs()
-	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_equipment_by_price"):
+	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_equipment_by_price",true):
 		for slot in get_children():
 			sort_slot(slot)
-	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_slots_by_type"):
+	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_slots_by_type",true):
 		reorganize_slots()
 	var finish_time:int = OS.get_system_time_msecs()
 	var spl:PoolStringArray = str(float(finish_time - sTime)/1000).split(".")

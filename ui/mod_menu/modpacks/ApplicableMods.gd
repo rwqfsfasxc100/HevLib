@@ -91,7 +91,7 @@ onready var openPack = get_node_or_null(NodePath("../../../OpenPack"))
 onready var savePack = get_node_or_null(NodePath("../../../SavePack"))
 
 func _on_Export_pressed():
-	var directory = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","modpack_last_path")
+	var directory:String = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","modpack_last_path","")
 	if directory:
 		savePack.set_current_dir(directory)
 	savePack.set_current_file("modpack.dvmodpack")
@@ -121,7 +121,7 @@ func _on_OpenPack_file_selected(path):
 		start_downloads(data)
 		
 func _on_Import_pressed():
-	var directory = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","modpack_last_path")
+	var directory:String = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","modpack_last_path","")
 	if directory:
 		openPack.set_current_dir(directory)
 	openPack.set_current_file("modpack.dvmodpack")

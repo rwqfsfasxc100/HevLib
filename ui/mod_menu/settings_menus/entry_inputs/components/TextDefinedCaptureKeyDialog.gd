@@ -69,7 +69,7 @@ func _on_ActionDefining_pressed():
 func _remove_key(key):
 	if typeof(key) == TYPE_STRING:
 		key = [key]
-	var n = pointers.ConfigDriver.__get_value(mod,section,action)
+	var n = pointers.ConfigDriver.__get_value(mod,section,action,[])
 	n.erase(key)
 	pointers.ConfigDriver.__store_value(mod,section,action,n)
 	remakeActionButtons()
@@ -78,7 +78,7 @@ func remakeActionButtons():
 	for k in keybox.get_children():
 		k.queue_free()
 		
-	var actions = pointers.ConfigDriver.__get_value(mod,section,action)
+	var actions = pointers.ConfigDriver.__get_value(mod,section,action,[])
 	
 	
 	for act in actions:
@@ -105,7 +105,7 @@ var store = []
 func _on_CaptureKeyDialog_about_to_show():
 	lastFocus = get_focus_owner()
 	remakeActionButtons()
-	store = pointers.ConfigDriver.__get_value(mod,section,action)
+	store = pointers.ConfigDriver.__get_value(mod,section,action,[])
 var capturing = false
 
 var lastFocus = null
@@ -135,7 +135,7 @@ func _input(event):
 				stopCapturing()
 			else:
 				stopCapturing()
-				var ent:Array = pointers.ConfigDriver.__get_value(mod,section,action)
+				var ent:Array = pointers.ConfigDriver.__get_value(mod,section,action,[])
 				if not key in ent:
 					ent.append(key)
 					pointers.ConfigDriver.__store_value(mod,section,action,ent)
@@ -147,7 +147,7 @@ func _input(event):
 				stopCapturing()
 			else:
 				stopCapturing()
-				var ent:Array = pointers.ConfigDriver.__get_value(mod,section,action)
+				var ent:Array = pointers.ConfigDriver.__get_value(mod,section,action,[])
 				if not key in ent:
 					ent.append(key)
 					pointers.ConfigDriver.__store_value(mod,section,action,ent)
@@ -190,7 +190,7 @@ func stopCapturing():
 
 func applySettings():
 	var always_binds = hbttn.always_binds
-	always_binds.append_array(pointers.ConfigDriver.__get_value(mod,section,action))
+	always_binds.append_array(pointers.ConfigDriver.__get_value(mod,section,action,[]))
 	var vbinds = Settings.cfg.get("input",{})
 	if action in vbinds:
 		always_binds.append_array(vbinds[action])

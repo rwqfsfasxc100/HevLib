@@ -95,8 +95,8 @@ func _physics_process(delta):
 	count += 1
 	if count % 10 == 0:
 		count = 0
-		inputDebug = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","input_debugger")
-		inputEventDebug = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","input_event_debugger")
+		inputDebug = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","input_debugger",false)
+		inputEventDebug = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","input_event_debugger",false)
 		var siblingCount = get_parent().get_parent().get_child_count()
 		get_parent().get_parent().move_child(get_parent(), siblingCount)
 #		get_parent().get_parent().move_child(pointers, siblingCount - 1)

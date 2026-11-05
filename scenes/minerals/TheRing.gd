@@ -42,7 +42,7 @@ func get_pixel_values(pos:Vector2) -> PoolRealArray:
 		pix_values[0] = 1861.0
 		pix_values[1] = - 2531.0
 		if mineral_size:
-			var random:bool = ModLoader._savedObjects[0].ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","randomize_minerals")
+			var random:bool = ModLoader._savedObjects[0].ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","randomize_minerals",false)
 			var nsi:int = not_random_seeds.size()
 			for i in mineral_size:
 				if random:

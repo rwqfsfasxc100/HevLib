@@ -1905,8 +1905,8 @@ const TRANSLATIONS = {
 			"version_hash": 874366990
 		},
 		"HEVLIB_CONFIG_COMPILE_DESC": {
-			"string": "(WIP, not currently functionally implemented) Recompiles mod zips with portions of the code converted to faster conventions to improve runtime efficiency.",
-			"version_hash": 3959481423
+			"string": "(WIP, not currently functionally implemented) Recompiles mod zips with portions of the code\nconverted to faster conventions to improve runtime efficiency.",
+			"version_hash": 1535259065
 		},
 		"HEVLIB_CREDITS_SOFTWARE_NIKITA": {
 			"string": "Nikita - GDRE's tokenizer and .gdc read/write capabilities",
@@ -1921,8 +1921,8 @@ const TRANSLATIONS = {
 			"version_hash": 3832224558
 		},
 		"HEVLIB_CONFIG_SINGLETHREAD_ONLY_DESC": {
-			"string": "Partially disables the Threading class by re-routing all operations to run on the main thread.\n\nIf you are debugging code, it can be useful to enable this as code run in threads do not work with breakpoints.",
-			"version_hash": 2116667840
+			"string": "Partially disables the Threading class by re-routing all operations to\nrun in-sequence on the main thread.\n\n(Functions returning a GDScriptFunctionState are an exception, as a temp thread\nis used to mirror the behaviour when multi-threading is enabled)\n\nIf you are debugging code, it can be useful to enable this as code run in threads\ndo not work with breakpoints.",
+			"version_hash": 3962919420
 		},
 		"HEVLIB_DISCORDRPC_SECONDARY_PROPELLANT": {
 			"string": "Propellant: {sensor:fuel} kg",

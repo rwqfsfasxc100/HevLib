@@ -55,9 +55,8 @@ func _ready():
 		
 	var mods:Dictionary = pointers.ManifestV2.__get_mod_data()
 	var labels:Array = []
-	var show_always_display_libraries_in_dlclist:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_always_display_libraries_in_dlclist")
-	var show_all_libraries_in_dlclist:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_all_libraries_in_dlclist")
-	var dlc_mod_list_sort_order:String = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","dlc_mod_list_sort_order")
+	var show_always_display_libraries_in_dlclist:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_always_display_libraries_in_dlclist",true)
+	var show_all_libraries_in_dlclist:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_all_libraries_in_dlclist",false)
 	for mod in pointers.ManifestV2.__get_mod_list_keys():
 		var data:Dictionary = mods[mod]
 		if not data["library_information"]["is_library"]:
@@ -66,7 +65,7 @@ func _ready():
 			labels.append(hl_dlc_make_label(data["name"]))
 		elif show_all_libraries_in_dlclist:
 			labels.append(hl_dlc_make_label(data["name"]))
-	match dlc_mod_list_sort_order:
+	match pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","dlc_mod_list_sort_order","none"):
 		"alphabetical_ascending":
 			descending = true
 			labels.sort_custom(self,"hl_dlc_sort_alphabetical")

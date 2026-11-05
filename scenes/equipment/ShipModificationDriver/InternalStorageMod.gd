@@ -75,7 +75,7 @@ var hl_ism_mineral_trace_length:int = 6
 
 func _enter_tree():
 	ismPointers = ModLoader._savedObjects[0]
-	if ismPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","extend_divided_storage_multiplier"):
+	if ismPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","extend_divided_storage_multiplier",false):
 		hl_ism_mineral_trace_length = CurrentGame.traceMinerals.size()
 	ismPointers.ConfigDriver.__establish_connection("hl_ism_UV",self)
 	listings = ismPointers.Equipment.processed_storage_mods
@@ -469,8 +469,8 @@ func _physics_process(delta):
 	
 func hl_ism_UV():
 	if ismPointers:
-		limitDroneOutput = ismPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","limit_nanodrone_output")
-		unrestrictedAmmoOutput = ismPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","unrestricted_ammo_output")
+		limitDroneOutput = ismPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","limit_nanodrone_output",true)
+		unrestrictedAmmoOutput = ismPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","unrestricted_ammo_output",false)
 
 
 

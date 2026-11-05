@@ -87,7 +87,7 @@ func canBeUsed(by) -> bool:
 	if how and config_ID and config_section and config_setting:
 		if not pointers:
 			pointers = ModLoader._savedObjects[0]
-		var cfg_opt = pointers.ConfigDriver.__get_value(config_ID,config_section,config_setting)
+		var cfg_opt = pointers.ConfigDriver.__get_value(config_ID,config_section,config_setting,null)
 		if cfg_opt != null:
 			if invert_config_logic:
 				if cfg_opt:

@@ -36,7 +36,7 @@ var count = 0.0
 
 func _ready():
 	pointers = ModLoader._savedObjects[0]
-	visible = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_overlay")
+	visible = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_overlay",false)
 	
 
 var pointers:HevLibPointers
@@ -52,16 +52,16 @@ func _physics_process(delta):
 
 func handle_vis():
 	count = 0.0
-	var visibility = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_overlay")
+	var visibility:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_overlay",false)
 	visible = visibility
 	if visibility:
-		var minimum = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_min_value")
-		var maximum = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_max_value")
-		var oob_opacity = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_oob_opacity")
-		var opacity = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_opacity")
-		var display_mode = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_display_mode")
-		var heatmap = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_use_heatmap")
-		var clamp_heatmap = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_heatmap_clamp")
+		var minimum:float = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_min_value",0.65)
+		var maximum:float = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_max_value",1.0)
+		var oob_opacity:float = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_oob_opacity",0.0)
+		var opacity:float = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_opacity",0.35)
+		var display_mode:float = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_display_mode",0)
+		var heatmap:float = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_use_heatmap",true)
+		var clamp_heatmap:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_heatmap_clamp",false)
 		
 		material.set_shader_param("min_val", minimum)
 		material.set_shader_param("max_val", maximum)
@@ -75,76 +75,76 @@ func handle_vis():
 func _input(event:InputEvent):
 	if get_parent().is_visible_in_tree():
 		if event.is_action_pressed("hl_toggle_ring_map_overlay"):
-			var current = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_overlay")
+			var current:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_overlay",false)
 			pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_overlay",!current)
 			handle_vis()
 			get_tree().set_input_as_handled()
 		if is_visible_in_tree():
 			if event.is_action_pressed("hl_ring_map_overlay_min_value_up"):
-				var current = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_min_value")
-				var new = clamp(current + 0.05,0.0,1.0)
+				var current:float = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_min_value",0.65)
+				var new:float = clamp(current + 0.05,0.0,1.0)
 				pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_min_value",new)
 				material.set_shader_param("min_val", new)
 				get_tree().set_input_as_handled()
 			if event.is_action_pressed("hl_ring_map_overlay_min_value_down"):
-				var current = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_min_value")
-				var new = clamp(current - 0.05,0.0,1.0)
+				var current:float = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_min_value",0.65)
+				var new:float = clamp(current - 0.05,0.0,1.0)
 				pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_min_value",new)
 				material.set_shader_param("min_val", new)
 				get_tree().set_input_as_handled()
 			if event.is_action_pressed("hl_ring_map_overlay_opacity_up"):
-				var current = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_opacity")
-				var new = clamp(current + 0.05,0.0,1.0)
+				var current:float = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_opacity",0.35)
+				var new:float = clamp(current + 0.05,0.0,1.0)
 				pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_opacity",new)
 				material.set_shader_param("opacity", new)
 				get_tree().set_input_as_handled()
 			if event.is_action_pressed("hl_ring_map_overlay_opacity_down"):
-				var current = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_opacity")
-				var new = clamp(current - 0.05,0.0,1.0)
+				var current:float = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_opacity",0.35)
+				var new:float = clamp(current - 0.05,0.0,1.0)
 				pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_opacity",new)
 				material.set_shader_param("opacity", new)
 				get_tree().set_input_as_handled()
 			if event.is_action_pressed("hl_toggle_ring_map_use_heatmap"):
-				var current = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_use_heatmap")
-				var new = !current
+				var current:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_use_heatmap",true)
+				var new:bool = !current
 				pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_use_heatmap",new)
 				material.set_shader_param("heatmap", new)
 				get_tree().set_input_as_handled()
 			if event.is_action_pressed("hl_toggle_ring_map_heatmap_clamp"):
-				var current = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_heatmap_clamp")
-				var new = !current
+				var current:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_heatmap_clamp",false)
+				var new:bool = !current
 				pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_heatmap_clamp",new)
 				material.set_shader_param("clamp_heatmap", new)
 				get_tree().set_input_as_handled()
 			if event.is_action_pressed("hl_cycle_ring_map_mode"):
-				var current = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_display_mode")
-				var new = current + 1
+				var current:int = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_display_mode",0)
+				var new:int = current + 1
 				if new > 8:
 					new = 0
 				pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_display_mode",new)
 				material.set_shader_param("mode", new)
 				get_tree().set_input_as_handled()
 			if event.is_action_pressed("hl_ring_map_overlay_max_value_up"):
-				var current = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_max_value")
-				var new = clamp(current + 0.05,0.0,1.0)
+				var current:float = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_max_value",1.0)
+				var new:float = clamp(current + 0.05,0.0,1.0)
 				pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_max_value",new)
 				material.set_shader_param("max_val", new)
 				get_tree().set_input_as_handled()
 			if event.is_action_pressed("hl_ring_map_overlay_max_value_down"):
-				var current = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_max_value")
-				var new = clamp(current - 0.05,0.0,1.0)
+				var current:float = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_max_value",1.0)
+				var new:float = clamp(current - 0.05,0.0,1.0)
 				pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_max_value",new)
 				material.set_shader_param("max_val", new)
 				get_tree().set_input_as_handled()
 			if event.is_action_pressed("hl_ring_map_overlay_oob_opacity_up"):
-				var current = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_oob_opacity")
-				var new = clamp(current + 0.05,0.0,1.0)
+				var current:float = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_oob_opacity",0.0)
+				var new:float = clamp(current + 0.05,0.0,1.0)
 				pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_oob_opacity",new)
 				material.set_shader_param("darken_factor", new)
 				get_tree().set_input_as_handled()
 			if event.is_action_pressed("hl_ring_map_overlay_oob_opacity_down"):
-				var current = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_oob_opacity")
-				var new = clamp(current - 0.05,0.0,1.0)
+				var current:float = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_oob_opacity",0.0)
+				var new:float = clamp(current - 0.05,0.0,1.0)
 				pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_map_oob_opacity",new)
 				material.set_shader_param("darken_factor", new)
 				get_tree().set_input_as_handled()

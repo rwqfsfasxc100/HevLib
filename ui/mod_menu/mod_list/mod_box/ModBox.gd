@@ -598,15 +598,8 @@ func _draw():
 		brief = translateIfCan(manifestData["mod_information"]["brief"])
 	button_brief.text = brief
 	
-	
-	
-	var showHidden = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_hidden_libraries")
 	if is_library:
-		if showHidden or always_display:
-			visible = true
-		else:
-			visible = false
-	if is_library:
+		visible = is_library and (pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","show_hidden_libraries",false) or always_display)
 		tooltip_text += ("\n" + translateIfCan("HEVLIB_MM_TOOLTIP_LIBRARY") % [is_library,always_display])
 	
 	

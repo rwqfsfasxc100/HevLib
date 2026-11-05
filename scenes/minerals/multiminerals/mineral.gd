@@ -42,7 +42,7 @@ func _enter_tree():
 
 func hl_multiminerals_UV():
 	if HevLib_pointers:
-		multiminerals = HevLib_pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk")
+		multiminerals = HevLib_pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk",false)
 
 #Update the roid's mass incase something went fucky
 func hl_multiminerals_update_mass():

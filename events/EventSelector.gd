@@ -39,11 +39,8 @@ onready var list = $VBoxContainer
 func _ready():
 	get_node_or_null(NodePath("../HBoxContainer/EnableAll")).connect("pressed",self,"enableAll")
 	get_node_or_null(NodePath("../HBoxContainer/DisableAll")).connect("pressed",self,"disableAll")
-	var selector_button = load("res://HevLib/events/EventSelector.tscn")
-	var disabled_events = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
-	if disabled_events == null:
-		pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
-		disabled_events = []
+	var selector_button:PackedScene = load("res://HevLib/events/EventSelector.tscn")
+	var disabled_events:Array = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
 	for item in get_node("/root/Game/TheRing").get_children():
 		var event:String = item.name
 		var btn:Node = selector_button.instance()

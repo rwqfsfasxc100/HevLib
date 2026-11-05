@@ -41,7 +41,7 @@ func _enter_tree():
 
 func hl_cargo_limiter_uv():
 	if HevLib_pointers:
-		cargo_limit = HevLib_pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","cargo_scanner_mineral_display_limit")
+		cargo_limit = HevLib_pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","cargo_scanner_mineral_display_limit",12)
 
 var cargo_limit:int = 15
 

@@ -43,7 +43,7 @@ func _init(p):
 
 func hl_shipinterruptupdate():
 	if pointers:
-		cargo_limit = pointers.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","processed_mineral_max_display_limit")
+		cargo_limit = pointers.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","processed_mineral_max_display_limit",12)
 
 var cargo_limit:int = 15
 

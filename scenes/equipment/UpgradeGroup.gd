@@ -61,7 +61,7 @@ func _ready():
 
 func hl_ug_recheck_this_visibility():
 	if pointers and config_id and config_section and config_setting:
-		cv = pointers.__get_value(config_id,config_section,config_setting)
+		cv = pointers.__get_value(config_id,config_section,config_setting,null)
 
 func reexamine():
 	.reexamine()

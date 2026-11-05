@@ -39,13 +39,12 @@ var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 func hl_shipzone_uv():
 	if pointers:
-		visibility = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_position_data_debugger")
-		accurate_event_counter = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_position_accurate_events")
+		visibility = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_position_data_debugger",false)
+		accurate_event_counter = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_position_accurate_events",false)
 
 func _ready():
 	pointers.ConfigDriver.__establish_connection("hl_shipzone_uv",self)
 	hl_shipzone_uv()
-	accurate_event_counter = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","ring_position_accurate_events")
 	if accurate_event_counter:
 		pointers.l("\n\n\n\n###############################################################################################################################################################################\n\nWARNING! HevLib setting 'ring_position_accurate_events' is enabled. Due to the way this setting works, it will decrease performance by a significant enough amount, and will generate thousands of logs per minute.\n\nUSE OF THIS SETTING IS COMPLETELY UNSUPPORTED AND WILL INVALIDATE ALL BUG REPORTS! YOU HAVE BEEN WARNED!\n\n###############################################################################################################################################################################\n\n\n\n","GamespaceCanvas.EventDriver")
 	

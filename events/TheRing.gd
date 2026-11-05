@@ -50,12 +50,8 @@ onready var dummy_event:Node = load("res://HevLib/events/event_selector/DummyEve
 func hl_thering_UV():
 	if pointers:
 		base_playlist = []
-		disabled_events = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events")
-		if disabled_events == null:
-			pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
-			disabled_events = []
-		
-		var write_events:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","write_events")
+		disabled_events = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
+		var write_events:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","write_events",true)
 		var string : Dictionary = {}
 		for i in get_children():
 			var event:String = i.name

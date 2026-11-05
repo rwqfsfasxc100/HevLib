@@ -134,14 +134,14 @@ func _ready():
 		dir.make_dir_recursive(deviceinfostore)
 	fetch_autoloads()
 	# Set the logging interval
-	logging_frame_interval = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","pointer_logging_frame_interval")
+	logging_frame_interval = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","pointer_logging_frame_interval",2)
 	# Initialize Configs, Achievements, & RPC
 	ConfigDriver.ready()
 	Achievements.ready()
 	RPC.ready()
 	# Declutter webtranslate's children.
 	# This is necessary considering it creates a lot of mess as it fetches data
-	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","safe_mod_loading"):
+	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","safe_mod_loading",true):
 		ConfigDriver.non_static[""].declutter_webtranslate_scraps(webtranslate_modmain)
 	yield(get_tree(),"idle_frame")
 	# Ensures that this node is lower in the scene tree
@@ -149,7 +149,7 @@ func _ready():
 	# This node cannot be paused
 	pause_mode = Node.PAUSE_MODE_PROCESS
 	# Setup pausing on lost focus
-	pause_on_unfocus = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","stop_rendering_on_lost_focus")
+	pause_on_unfocus = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","stop_rendering_on_lost_focus",false)
 	ConfigDriver.__subscribe_to_setting_change("recheck_unfocused_unrendering",self,"HevLib","HEVLIB_CONFIG_SECTION_POINTERS","stop_rendering_on_lost_focus")
 	if TranslationServer.translate("HEVLIB_INCORRECT_SHIP") == "HEVLIB_INCORRECT_SHIP":
 		l("HevLib translations did not get initialized, quitting and ensuring the user is aware.","pointers.Translations")
@@ -226,7 +226,7 @@ func fetch_mod_updates():
 		file.store_string(JSON.print(updates))
 		file.close()
 		emit_signal("updates_fetched")
-		if!is_editor||ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","always_send_new_mods"):
+		if!is_editor||ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","always_send_new_mods",false):
 			var md:Dictionary=ManifestV2.__get_mod_data()
 			for mod in ManifestV2.__get_mod_list_keys():
 				var mid:String = ManifestV2.__match_mod_file_path_to_id(mod)
@@ -7265,7 +7265,7 @@ class _RingInfo:
 			pix_values[0] = 1861.0
 			pix_values[1] = - 2531.0
 			if mineral_size:
-				var random:bool = ModLoader._savedObjects[0].ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","randomize_minerals")
+				var random:bool = ModLoader._savedObjects[0].ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","randomize_minerals",false)
 				var nsi:int = not_random_seeds.size()
 				for i in mineral_size:
 					if random:
@@ -7445,7 +7445,7 @@ class _RPC:
 	const discord_script:String = "res://HevLib Discord RPC/lib/discord.gd"
 	static func ready():
 		var pointers:HevLibPointers = rpc_data["pointers"]
-		if File.new().file_exists(discord_script) and pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","discord_rpc_enabled"):
+		if File.new().file_exists(discord_script) and pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","discord_rpc_enabled",true):
 			var discord = load(discord_script).new()
 			rpc_data["activity"] = discord.Activity.new()
 			rpc_data["loaded"] = true
@@ -7761,7 +7761,7 @@ class _SafeMode:
 			dependancy_dict_keys.append_array(dependancy_dictionary.keys())
 		
 		if not pointers.is_editor:
-			var safeCheck = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","safe_mod_loading")
+			var safeCheck:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","safe_mod_loading",true)
 			if safeCheck:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_ENABLED"),"pointers.SafeMode")
 			else:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_DISABLED"),"pointers.SafeMode")
 			non_static["self"].safeCheck = safeCheck
@@ -8168,7 +8168,10 @@ class _Threading:
 				var args:Array = next_op.get("args",[])
 				var current_method_call:String = next_op.get("method","")
 				if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
-					out.append(call_single_thread(next_op))
+					var op = current_object.callv(current_method_call,args)
+					if op is GDScriptFunctionState:
+						op = call_single_thread(op)
+					out.append(op)
 				else:
 					out.append(null)
 			return out
@@ -8205,7 +8208,10 @@ class _Threading:
 			var args:Array = operation.get("args",[])
 			var current_method_call:String = operation.get("method","")
 			if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
-				return [call_single_thread(operation)]
+				var op = current_object.callv(current_method_call,args)
+				if op is GDScriptFunctionState:
+					op = call_single_thread(op)
+				return [op]
 			return [null]
 		var request_id:int = (operation.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
 		var semaphore:Semaphore = Semaphore.new()
@@ -8229,7 +8235,7 @@ class _Threading:
 			var thread = available_threads.pop_front()
 			deactivated_threads.append(thread)
 		mutex.unlock()
-		use_single_thread = max_threads < 1 or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","single_thread_only")
+		use_single_thread = max_threads < 1 or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","single_thread_only",false)
 	
 	func __release_thread() -> void:
 		mutex.lock()
@@ -8240,11 +8246,17 @@ class _Threading:
 			if thread_queue:
 				thread.pop_post(thread_queue.pop_front())
 		mutex.unlock()
-		use_single_thread = max_threads < 1 or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","single_thread_only")
+		use_single_thread = max_threads < 1 or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","single_thread_only",false)
 	
 	func _notification(what):
 		if what == NOTIFICATION_PREDELETE:
+			thread_queue.clear()
+			available_threads.clear()
+			deactivated_threads.clear()
 			active_threads.clear()
+			thread_return.clear()
+			semaphore_store.clear()
+			thread_refs.clear()
 	
 	func deactivate_thread(thread):
 		mutex.lock()
@@ -8262,21 +8274,18 @@ class _Threading:
 		active_threads.erase(thread)
 		mutex.unlock()
 	
-	func call_single_thread(data:Dictionary):
+	func call_single_thread(data:GDScriptFunctionState):
 		current_data_for_single_thread = data
 		single_thread_thread = Thread.new()
 		single_thread_thread.start(self,"single_thread_yield_safe")
 		return single_thread_thread.wait_to_finish()
 	
 	var single_thread_thread:Thread = null
-	var current_data_for_single_thread:Dictionary = {}
+	var current_data_for_single_thread:GDScriptFunctionState = null
 	func single_thread_yield_safe(a):
-		var current_object:Object = current_data_for_single_thread.get("object",null)
-		var args:Array = current_data_for_single_thread.get("args",[])
-		var current_method_call:String = current_data_for_single_thread.get("method","")
-		var op = current_object.callv(current_method_call,args)
-		if op is GDScriptFunctionState:
-			op = yield(current_object,"completed")
+		var op = current_data_for_single_thread
+		while op is GDScriptFunctionState:
+			op = yield(current_data_for_single_thread,"completed")
 		return op
 	
 	class ThreadStruct:
@@ -8327,7 +8336,7 @@ class _Threading:
 				var out = null
 				if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
 					out = current_object.callv(current_method_call,args)
-					if out is GDScriptFunctionState:
+					while out is GDScriptFunctionState:
 						out = yield(out,"completed")
 				print("Thread %d finished" % thread_id)
 				container.mutex.lock()
@@ -8526,7 +8535,7 @@ class _Translations:
 					var section : String = delim.get("section","")
 					var setting : String = delim.get("setting","")
 					var invert:bool = delim.get("invert",false)
-					var val = pointers.ConfigDriver.__get_value(mod,section,setting)
+					var val = pointers.ConfigDriver.__get_value(mod,section,setting,null)
 					var do:bool = true
 					if val is bool:
 						do = val
@@ -8553,7 +8562,7 @@ class _Translations:
 					var section = data.get("section","")
 					var setting = data.get("setting","")
 					var invert = data.get("invert",false)
-					var val = pointers.ConfigDriver.__get_value(mod,section,setting)
+					var val = pointers.ConfigDriver.__get_value(mod,section,setting,null)
 					var do = true
 					if val is bool:
 						do = val
@@ -8636,8 +8645,8 @@ class _Translations:
 	
 	static func __inject_translations():
 		var pointers:HevLibPointers = non_static["pointers"]
-		var fullLogging:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","full_logging")
-		var markPlaceholders:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","mark_placeholder_translations")
+		var fullLogging:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","full_logging",false)
+		var markPlaceholders:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","mark_placeholder_translations",false)
 		TranslationServer.clear()
 		var drivers:Array = pointers.DriverManagement.__get_drivers()
 		var data:Dictionary = {}

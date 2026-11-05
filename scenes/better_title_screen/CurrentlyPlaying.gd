@@ -64,7 +64,7 @@ func display():
 	if mod_menu and mod_menu.visible:
 		visible = false
 		return
-	if pointers.ConfigDriver.__get_value("HevLib", "HEVLIB_CONFIG_SECTION_POINTERS", "show_currently_playing"):
+	if pointers.ConfigDriver.__get_value("HevLib", "HEVLIB_CONFIG_SECTION_POINTERS", "show_currently_playing",true):
 		.display()
 	else:
 		visible = false

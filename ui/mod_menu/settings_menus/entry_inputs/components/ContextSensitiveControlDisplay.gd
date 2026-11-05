@@ -184,7 +184,7 @@ func recheck_availability():
 	var m = pv.mod
 	var s = pv.section
 	var a = pv.action
-	var info = pointers.ConfigDriver.__get_value(m,s,a)
+	var info = pointers.ConfigDriver.__get_value(m,s,a,[])
 	var infosize = info.size()
 	for rfs in infosize:
 		if rfs:

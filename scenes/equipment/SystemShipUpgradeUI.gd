@@ -46,7 +46,7 @@ func _ready():
 func isAvailable():
 	if .isAvailable():
 		if config_id and config_section and config_setting:
-			var cv = ssuuPointers.__get_value(config_id,config_section,config_setting)
+			var cv = ssuuPointers.__get_value(config_id,config_section,config_setting,null)
 			if cv is bool:
 				if invert_config:
 					cv = !cv
