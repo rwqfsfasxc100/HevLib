@@ -8132,6 +8132,7 @@ class _Threading:
 	
 	var active_threads:Array = []
 	var available_threads:Array = []
+	var deactivated_threads:Array = []
 	var max_threads:int = OS.get_processor_count() - 2
 	
 	# If 2 or fewer logical cores, swap over to use single threading
@@ -8222,11 +8223,23 @@ class _Threading:
 		return out
 	
 	func __claim_thread() -> void:
+		mutex.lock()
 		max_threads -= 1
+		if available_threads:
+			var thread = available_threads.pop_front()
+			deactivated_threads.append(thread)
+		mutex.unlock()
 		use_single_thread = max_threads < 1 or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","single_thread_only")
 	
 	func __release_thread() -> void:
+		mutex.lock()
 		max_threads += 1
+		if deactivated_threads:
+			var thread = deactivated_threads.pop_front()
+			available_threads.append(thread)
+			if thread_queue:
+				thread.pop_post(thread_queue.pop_front())
+		mutex.unlock()
 		use_single_thread = max_threads < 1 or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","single_thread_only")
 	
 	func _notification(what):
@@ -8235,16 +8248,18 @@ class _Threading:
 	
 	func deactivate_thread(thread):
 		mutex.lock()
-		available_threads.erase(thread)
 		active_threads.append(thread)
+		available_threads.erase(thread)
 		print("Deactivating thread ",thread)
 		mutex.unlock()
 	
 	func activate_thread(thread):
 		mutex.lock()
+		if active_threads.size() + available_threads.size() > max_threads:
+			deactivated_threads.append(thread)
+		else:
+			available_threads.append(thread)
 		active_threads.erase(thread)
-		available_threads.append(thread)
-		print("Activating thread ",thread)
 		mutex.unlock()
 	
 	func call_single_thread(data:Dictionary):
@@ -8286,7 +8301,7 @@ class _Threading:
 		var quit:bool = false
 		var next_op = null
 		
-		func running_thread(_a = null):
+		func running_thread(a):
 			while true:
 				mutex.lock()
 				if not next_op is Dictionary:
