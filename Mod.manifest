@@ -136,7 +136,7 @@ HEVLIB_CONFIG_SECTION_DRIVERS={
 "dealership_modification_roll_chance_scale": {
 "default": 1.0,
 "description": "HEVLIB_CONFIG_DEALERSHIP_MODIFICATION_ROLL_CHANCE_SCALE_TOOLTIP",
-"display_order_position": 9,
+"display_order_position": 8,
 "max": 2.0,
 "min": 0.25,
 "name": "HEVLIB_CONFIG_DEALERSHIP_MODIFICATION_ROLL_CHANCE_SCALE",
@@ -156,7 +156,7 @@ HEVLIB_CONFIG_SECTION_DRIVERS={
 "max_dealership_modification_rolls": {
 "default": 10.0,
 "description": "HEVLIB_CONFIG_MAX_DEALERSHIP_MODIFICATION_ROLLS_TOOLTIP",
-"display_order_position": 8,
+"display_order_position": 7,
 "max": 100.0,
 "name": "HEVLIB_CONFIG_MAX_DEALERSHIP_MODIFICATION_ROLLS",
 "step": 1.0,
@@ -166,7 +166,7 @@ HEVLIB_CONFIG_SECTION_DRIVERS={
 "max_modded_dealership_pools": {
 "default": 7.0,
 "description": "HEVLIB_CONFIG_MAX_MODDED_DEALERSHIP_POOLS_TOOLTIP",
-"display_order_position": 7,
+"display_order_position": 6,
 "max": 50.0,
 "min": 1.0,
 "name": "HEVLIB_CONFIG_MAX_MODDED_DEALERSHIP_POOLS",
@@ -177,23 +177,15 @@ HEVLIB_CONFIG_SECTION_DRIVERS={
 "multiple_minerals_per_chunk": {
 "default": false,
 "description": "HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK_TOOLTIP",
-"display_order_position": 6,
+"display_order_position": 5,
 "name": "HEVLIB_CONFIG_MULTIPLE_MINERALS_PER_CHUNK",
 "type": "bool"
 },
 "randomize_minerals": {
 "default": false,
 "description": "HEVLIB_CONFIG_RANDOMIZE_MINERALS_TOOLTIP",
-"display_order_position": 5,
+"display_order_position": 4,
 "name": "HEVLIB_CONFIG_RANDOMIZE_MINERALS",
-"require_restart": true,
-"type": "bool"
-},
-"safe_mod_loading": {
-"default": true,
-"description": "HEVLIB_CONFIG_SAFE_MOD_LOADING_TOOLTIP",
-"display_order_position": 10,
-"name": "HEVLIB_CONFIG_SAFE_MOD_LOADING",
 "require_restart": true,
 "type": "bool"
 },
@@ -211,36 +203,15 @@ HEVLIB_CONFIG_SECTION_DRIVERS={
 "name": "HEVLIB_CONFIG_SHOW_ALWAYS_LIBRARIES_IN_DLCLIST",
 "type": "bool"
 },
-"show_currently_playing": {
-"default": true,
-"description": "HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING_TOOLTIP",
-"display_order_position": 4,
-"name": "HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING",
-"type": "bool"
-},
 "show_hidden_libraries": {
 "default": false,
 "description": "HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES_TOOLTIP",
 "display_order_position": 0,
 "name": "HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES",
 "type": "bool"
-},
-"stop_rendering_on_lost_focus": {
-"default": false,
-"description": "HEVLIB_CONFIG_DISABLE_RENDERING_ON_LOST_FOCUS_DESC",
-"display_order_position": 11,
-"name": "HEVLIB_CONFIG_DISABLE_RENDERING_ON_LOST_FOCUS",
-"type": "bool"
 }
 }
 HEVLIB_CONFIG_SECTION_DEBUG={
-"always_send_new_mods": {
-"default": false,
-"description": "HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS_TOOLTIP",
-"display_order_position": 11,
-"name": "HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS",
-"type": "bool"
-},
 "clear_leaderboards": {
 "button_label": "HEVLIB_OPEN_MENU",
 "description": "HEVLIB_CLEAR_LEADERBOARDS_TOOLTIP",
@@ -250,52 +221,27 @@ HEVLIB_CONFIG_SECTION_DEBUG={
 "script_path": "res://HevLib/achievements/OpenClearLeaderboards.gd",
 "type": "action"
 },
-"compile": {
-"default": true,
-"description": "HEVLIB_CONFIG_COMPILE_DESC",
-"display_order_position": 17,
-"name": "HEVLIB_CONFIG_COMPILE",
-"type": "bool"
-},
-"full_logging": {
-"default": false,
-"description": "HEVLIB_CONFIG_FULL_LOGGING_TOOLTIP",
-"display_order_position": 9,
-"name": "HEVLIB_CONFIG_FULL_LOGGING",
-"type": "bool"
-},
 "input_debugger": {
 "default": false,
 "description": "HEVLIB_CONFIG_INPUT_DEBUGGER_TOOLTIP",
-"display_order_position": 12,
+"display_order_position": 9,
 "name": "HEVLIB_CONFIG_INPUT_DEBUGGER",
 "type": "bool"
 },
 "input_event_debugger": {
 "default": false,
 "description": "HEVLIB_CONFIG_EVENT_DEBUGGER_TOOLTIP",
-"display_order_position": 13,
+"display_order_position": 10,
 "name": "HEVLIB_CONFIG_EVENT_DEBUGGER",
 "type": "bool"
 },
 "mark_placeholder_translations": {
 "default": true,
 "description": "HEVLIB_CONFIG_MARK_PLACEHOLDER_TRANSLATIONS_DESC",
-"display_order_position": 16,
+"display_order_position": 13,
 "name": "HEVLIB_CONFIG_MARK_PLACEHOLDER_TRANSLATIONS",
 "require_restart": true,
 "type": "bool"
-},
-"pointer_logging_frame_interval": {
-"default": 2.0,
-"description": "HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL_TOOLTIP",
-"display_order_position": 10,
-"max": 60.0,
-"min": 1.0,
-"name": "HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL",
-"step": 1.0,
-"style": "slider",
-"type": "int"
 },
 "ring_map_display_mode": {
 "default": 0,
@@ -370,23 +316,15 @@ HEVLIB_CONFIG_SECTION_DEBUG={
 "ring_position_accurate_events": {
 "default": false,
 "description": "HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS_TOOLTIP",
-"display_order_position": 15,
+"display_order_position": 12,
 "name": "HEVLIB_CONFIG_SHOW_ACCURATE_EVENTS",
 "type": "bool"
 },
 "ring_position_data_debugger": {
 "default": false,
 "description": "HEVLIB_CONFIG_POSITION_DATA_DEBUGGER_TOOLTIP",
-"display_order_position": 14,
+"display_order_position": 11,
 "name": "HEVLIB_CONFIG_POSITION_DATA_DEBUGGER",
-"type": "bool"
-},
-"single_thread_only": {
-"default": false,
-"description": "HEVLIB_CONFIG_SINGLETHREAD_ONLY_DESC",
-"display_order_position": 18,
-"name": "HEVLIB_CONFIG_SINGLETHREAD_ONLY",
-"require_restart": true,
 "type": "bool"
 }
 }
@@ -526,13 +464,75 @@ HEVLIB_CONFIG_SECTION_INPUT={
 "type": "input"
 }
 }
-HEVLIB_CONFIG_SECTION_RPC={
+HEVLIB_CONFIG_SECTION_POINTERS={
+"always_send_new_mods": {
+"default": false,
+"description": "HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS_TOOLTIP",
+"display_order_position": 6,
+"name": "HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS",
+"type": "bool"
+},
+"compile": {
+"default": true,
+"description": "HEVLIB_CONFIG_COMPILE_DESC",
+"display_order_position": 7,
+"name": "HEVLIB_CONFIG_COMPILE",
+"type": "bool"
+},
 "discord_rpc_enabled": {
 "default": true,
 "description": "HEVLIB_CONFIG_DISCORD_RPC_ENABLED_DESC",
 "display_order_position": 0,
 "name": "HEVLIB_CONFIG_DISCORD_RPC_ENABLED",
 "require_restart": true,
+"type": "bool"
+},
+"full_logging": {
+"default": false,
+"description": "HEVLIB_CONFIG_FULL_LOGGING_TOOLTIP",
+"display_order_position": 4,
+"name": "HEVLIB_CONFIG_FULL_LOGGING",
+"type": "bool"
+},
+"pointer_logging_frame_interval": {
+"default": 2.0,
+"description": "HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL_TOOLTIP",
+"display_order_position": 5,
+"max": 60.0,
+"min": 1.0,
+"name": "HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL",
+"step": 1.0,
+"style": "slider",
+"type": "int"
+},
+"safe_mod_loading": {
+"default": true,
+"description": "HEVLIB_CONFIG_SAFE_MOD_LOADING_TOOLTIP",
+"display_order_position": 2,
+"name": "HEVLIB_CONFIG_SAFE_MOD_LOADING",
+"require_restart": true,
+"type": "bool"
+},
+"show_currently_playing": {
+"default": true,
+"description": "HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING_TOOLTIP",
+"display_order_position": 1,
+"name": "HEVLIB_CONFIG_DISPLAY_CURRENTLY_PLAYING",
+"type": "bool"
+},
+"single_thread_only": {
+"default": false,
+"description": "HEVLIB_CONFIG_SINGLETHREAD_ONLY_DESC",
+"display_order_position": 8,
+"name": "HEVLIB_CONFIG_SINGLETHREAD_ONLY",
+"require_restart": true,
+"type": "bool"
+},
+"stop_rendering_on_lost_focus": {
+"default": false,
+"description": "HEVLIB_CONFIG_DISABLE_RENDERING_ON_LOST_FOCUS_DESC",
+"display_order_position": 3,
+"name": "HEVLIB_CONFIG_DISABLE_RENDERING_ON_LOST_FOCUS",
 "type": "bool"
 }
 }

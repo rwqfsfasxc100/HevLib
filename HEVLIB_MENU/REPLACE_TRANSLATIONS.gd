@@ -1856,9 +1856,9 @@ const TRANSLATIONS = {
 			"string": "Provides the Godot Discord Game SDK library",
 			"version_hash": 1565604616
 		},
-		"HEVLIB_CONFIG_SECTION_RPC": {
-			"string": "RPC",
-			"version_hash": 193469002
+		"HEVLIB_CONFIG_SECTION_POINTERS": {
+			"string": "Pointers",
+			"version_hash": 2914759225
 		},
 		"HEVLIB_CONFIG_DISCORD_RPC_ENABLED": {
 			"string": "Discord RPC enabled",

@@ -134,14 +134,14 @@ func _ready():
 		dir.make_dir_recursive(deviceinfostore)
 	fetch_autoloads()
 	# Set the logging interval
-	logging_frame_interval = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","pointer_logging_frame_interval")
+	logging_frame_interval = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","pointer_logging_frame_interval")
 	# Initialize Configs, Achievements, & RPC
 	ConfigDriver.ready()
 	Achievements.ready()
 	RPC.ready()
 	# Declutter webtranslate's children.
 	# This is necessary considering it creates a lot of mess as it fetches data
-	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading"):
+	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","safe_mod_loading"):
 		ConfigDriver.non_static[""].declutter_webtranslate_scraps(webtranslate_modmain)
 	yield(get_tree(),"idle_frame")
 	# Ensures that this node is lower in the scene tree
@@ -149,8 +149,8 @@ func _ready():
 	# This node cannot be paused
 	pause_mode = Node.PAUSE_MODE_PROCESS
 	# Setup pausing on lost focus
-	pause_on_unfocus = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","stop_rendering_on_lost_focus")
-	ConfigDriver.__subscribe_to_setting_change("recheck_unfocused_unrendering",self,"HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","stop_rendering_on_lost_focus")
+	pause_on_unfocus = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","stop_rendering_on_lost_focus")
+	ConfigDriver.__subscribe_to_setting_change("recheck_unfocused_unrendering",self,"HevLib","HEVLIB_CONFIG_SECTION_POINTERS","stop_rendering_on_lost_focus")
 	if TranslationServer.translate("HEVLIB_INCORRECT_SHIP") == "HEVLIB_INCORRECT_SHIP":
 		l("HevLib translations did not get initialized, quitting and ensuring the user is aware.","pointers.Translations")
 		Translations.__updateTL_from_dictionary(load("HEVLIB_MENU/REPLACE_TRANSLATIONS.gd").get_script().get_script_constant_map().get("TRANSLATIONS",{}))
@@ -226,7 +226,7 @@ func fetch_mod_updates():
 		file.store_string(JSON.print(updates))
 		file.close()
 		emit_signal("updates_fetched")
-		if!is_editor||ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","always_send_new_mods"):
+		if!is_editor||ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","always_send_new_mods"):
 			var md:Dictionary=ManifestV2.__get_mod_data()
 			for mod in ManifestV2.__get_mod_list_keys():
 				var mid:String = ManifestV2.__match_mod_file_path_to_id(mod)
@@ -7445,7 +7445,7 @@ class _RPC:
 	const discord_script:String = "res://HevLib Discord RPC/lib/discord.gd"
 	static func ready():
 		var pointers:HevLibPointers = rpc_data["pointers"]
-		if File.new().file_exists(discord_script) and pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_RPC","discord_rpc_enabled"):
+		if File.new().file_exists(discord_script) and pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","discord_rpc_enabled"):
 			var discord = load(discord_script).new()
 			rpc_data["activity"] = discord.Activity.new()
 			rpc_data["loaded"] = true
@@ -7761,7 +7761,7 @@ class _SafeMode:
 			dependancy_dict_keys.append_array(dependancy_dictionary.keys())
 		
 		if not pointers.is_editor:
-			var safeCheck = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","safe_mod_loading")
+			var safeCheck = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","safe_mod_loading")
 			if safeCheck:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_ENABLED"),"pointers.SafeMode")
 			else:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_DISABLED"),"pointers.SafeMode")
 			non_static["self"].safeCheck = safeCheck
@@ -8149,8 +8149,8 @@ class _Threading:
 		if require_single_threading:
 			pointers.l("2 or fewer logical CPU cores detected, forcing single thread mode.","pointers.Threading")
 		else:
-			use_single_thread = pointers.ConfigDriver.__config_parse("user://cfg/Mod_Configurations.cfg").get("HevLib/HEVLIB_CONFIG_SECTION_DEBUG",{}).get("single_thread_only",false)
-			pointers.ConfigDriver.__subscribe_to_setting_change("update_thread_mode",self,"HevLib","HEVLIB_CONFIG_SECTION_DEBUG","single_thread_only")
+			use_single_thread = pointers.ConfigDriver.__config_parse("user://cfg/Mod_Configurations.cfg").get("HevLib/HEVLIB_CONFIG_SECTION_POINTERS",{}).get("single_thread_only",false)
+			pointers.ConfigDriver.__subscribe_to_setting_change("update_thread_mode",self,"HevLib","HEVLIB_CONFIG_SECTION_POINTERS","single_thread_only")
 			for i in max_threads:
 				thread_refs.append(ThreadStruct.new(self,p,i))
 	func update_thread_mode(how:bool):
@@ -8229,7 +8229,7 @@ class _Threading:
 			var thread = available_threads.pop_front()
 			deactivated_threads.append(thread)
 		mutex.unlock()
-		use_single_thread = max_threads < 1 or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","single_thread_only")
+		use_single_thread = max_threads < 1 or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","single_thread_only")
 	
 	func __release_thread() -> void:
 		mutex.lock()
@@ -8240,7 +8240,7 @@ class _Threading:
 			if thread_queue:
 				thread.pop_post(thread_queue.pop_front())
 		mutex.unlock()
-		use_single_thread = max_threads < 1 or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","single_thread_only")
+		use_single_thread = max_threads < 1 or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","single_thread_only")
 	
 	func _notification(what):
 		if what == NOTIFICATION_PREDELETE:
@@ -8636,7 +8636,7 @@ class _Translations:
 	
 	static func __inject_translations():
 		var pointers:HevLibPointers = non_static["pointers"]
-		var fullLogging:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","full_logging")
+		var fullLogging:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","full_logging")
 		var markPlaceholders:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","mark_placeholder_translations")
 		TranslationServer.clear()
 		var drivers:Array = pointers.DriverManagement.__get_drivers()
