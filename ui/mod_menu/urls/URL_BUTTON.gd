@@ -39,7 +39,7 @@ var icon_path:String = "res://HevLib/ui/themes/icons/alias.stex"
 
 func _ready():
 	$Button/Label.text = TranslationServer.translate(text)
-	$Control/TextureRect.texture = ModLoader._savedObjects[0].DataFormat.__load_png(icon_path)
+	$Control/TextureRect.texture = ModLoader._savedObjects[0].FileAccess.__load_png(icon_path)
 	$Button.hint_tooltip = tooltip
 
 func _pressed():
