@@ -1541,10 +1541,9 @@ class _DataFormat:
 	const function_prefixes = PoolStringArray(["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func "])
 	const all_prefixes = PoolStringArray(["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func ","onready ","var ","signal ","const ","export ","extends "])
 	static func __trim_scripts(file_path : String, get_detailed_operands : bool = false, trim_unnecessary_newlines : bool = false, recurse_through_base_scripts : bool = true):
-		if __load_if_can(file_path,false,"Script"):
-			var script_source:Script = __get_load()
-			if script_source:
-				return __trim_script_object(script_source,get_detailed_operands,trim_unnecessary_newlines,recurse_through_base_scripts)
+		var script_source:Script = ResourceLoader.load(file_path,"Script")
+		if script_source != null:
+			return __trim_script_object(script_source,get_detailed_operands,trim_unnecessary_newlines,recurse_through_base_scripts)
 		return ["extends Node",[],[],[],[],[],[],[]]
 	
 	static func __trim_script_object(script_source : Script, get_detailed_operands : bool = false, trim_unnecessary_newlines : bool = false, recurse_through_base_scripts : bool = true):
@@ -2301,44 +2300,46 @@ class _DriverManagement:
 		non_static["regex"] = driver_file_regex
 		non_static["self"] = self
 	
+	const driver_store = []
+	
 	static func __get_drivers(get_ids : Array = []) -> Array:
-		var base = non_static["self"]
-		var mod_drivers : Array = []
-		var pointers:HevLibPointers = non_static["pointers"]
-		for modmain_path in (pointers.ManifestV2.__get_modmain_files() + pointers.ManifestV2.__get_modlet_files()):
-			var has_manifest:bool = false
-			var manifest_path : String = ""
-			var modFolder : String = modmain_path.get_base_dir() + "/"
-			var modFile : String = modmain_path.get_file().to_lower()
-			if modFile.begins_with("mod") and modFile.ends_with(".manifest"):
-				has_manifest = true
-				manifest_path = modmain_path
-			else:
-				for item in pointers.FolderAccess.__fetch_folder_files(modFolder,false,true):
-					var modEntryName = item.get_file().to_lower()
-					if modEntryName.begins_with("mod") and modEntryName.ends_with(".manifest"):
-						has_manifest = true
-						manifest_path = item
-			if not has_manifest:
-				continue
-			var this_mod_data : Dictionary = {}
-			var manifest : Dictionary = pointers.ManifestV2.__parse_file_as_manifest(manifest_path)
-			var mrv:Dictionary = manifest.get("manifest_definitions",{})
-			var manifest_ver : float = mrv.get("manifest_version",1.0)
-			if manifest_ver < 2.2:
-				continue
-			var id : String = manifest.get("mod_information",{}).get("id","")
-			if not id:
-				continue
-			this_mod_data["id"] = id
-			this_mod_data["priority"] = mrv.get("modlet_priority",0)
-			this_mod_data["drivers"] = __get_drivers_from_modmain_path(modmain_path,false,manifest_ver >= 2.3)
-			this_mod_data["mod_directory"] = modFolder
-			if this_mod_data["drivers"]:
-				if (not get_ids) or (get_ids and id in get_ids):
-					mod_drivers.append(this_mod_data)
-		mod_drivers.sort_custom(base,"compare_driver_dictionaries")
-		return mod_drivers.duplicate(true)
+		if driver_store.empty():
+			var base:_DriverManagement = non_static["self"]
+			var pointers:HevLibPointers = non_static["pointers"]
+			for modmain_path in (pointers.ManifestV2.__get_modmain_files() + pointers.ManifestV2.__get_modlet_files()):
+				var has_manifest:bool = false
+				var manifest_path : String = ""
+				var modFolder : String = modmain_path.get_base_dir() + "/"
+				var modFile : String = modmain_path.get_file().to_lower()
+				if modFile.begins_with("mod") and modFile.ends_with(".manifest"):
+					has_manifest = true
+					manifest_path = modmain_path
+				else:
+					for item in pointers.FolderAccess.__fetch_folder_files(modFolder,false,true):
+						var modEntryName = item.get_file().to_lower()
+						if modEntryName.begins_with("mod") and modEntryName.ends_with(".manifest"):
+							has_manifest = true
+							manifest_path = item
+				if not has_manifest:
+					continue
+				var this_mod_data : Dictionary = {}
+				var manifest : Dictionary = pointers.ManifestV2.__parse_file_as_manifest(manifest_path)
+				var mrv:Dictionary = manifest.get("manifest_definitions",{})
+				var manifest_ver : float = mrv.get("manifest_version",1.0)
+				if manifest_ver < 2.2:
+					continue
+				var id : String = manifest.get("mod_information",{}).get("id","")
+				if not id:
+					continue
+				this_mod_data["id"] = id
+				this_mod_data["priority"] = mrv.get("modlet_priority",0)
+				this_mod_data["drivers"] = __get_drivers_from_modmain_path(modmain_path,false,manifest_ver >= 2.3)
+				this_mod_data["mod_directory"] = modFolder
+				if this_mod_data["drivers"]:
+					if (not get_ids) or (get_ids and id in get_ids):
+						driver_store.append(this_mod_data)
+			driver_store.sort_custom(base,"compare_driver_dictionaries")
+		return driver_store.duplicate(true)
 	
 	static func compare_driver_dictionaries(a, b):
 		var aPrio:int = a.get("priority",0)
@@ -4646,7 +4647,7 @@ class _FileAccess:
 		var gameInstallDirectory:String = OS.get_executable_path().get_base_dir()
 		if OS.get_name() == "OSX":
 			gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
-		var modPathPrefix:String = gameInstallDirectory.plus_file("mods")
+		var modPathPrefix:String = gameInstallDirectory + "/mods"
 		var file:File = File.new()
 		if file.file_exists(updateCacheFile):
 			var files_to_copy : PoolStringArray = PoolStringArray(JSON.parse(__get_file_content(updateCacheFile)).result)
@@ -5385,34 +5386,12 @@ class _ManifestV2:
 			var pointers:HevLibPointers = non_static["pointers"]
 			var file:File = File.new()
 			pointers.l("Fetching mods from file","pointers.ManifestV2")
-			var manifest_count:int = 0
-			var library_count:int = 0
-			var non_library_count:int = 0
-			var all_mod_files:Array = []
-			var modmain_files : PoolStringArray = __get_modmain_files()
-			pointers.l("found [%s] modmain files" % modmain_files.size(),"pointers.ManifestV2")
-			for item in modmain_files:
-				modFiles.append(item.to_lower())
-				pointers.l("registering ModMain %s" % item,"pointers.ManifestV2")
-				all_mod_files.append({"object":base,"method":"__concat_mod_info","args":[item]})
-			var modlet_files : PoolStringArray = __get_modlet_files()
-			pointers.l("found [%s] modlet files" % modlet_files.size(),"pointers.ManifestV2")
-			for item in modlet_files:
-				modFiles.append(item.to_lower())
-				pointers.l("registering Modlet %s" % item,"pointers.ManifestV2")
-				all_mod_files.append({"object":base,"method":"__concat_mod_info","args":[item]})
-			var modListArr : Array = pointers.Threading.__request_multiple_threads(all_mod_files)
-			var total_mod_count:int = modListArr.size()
-			pointers.l("solved [%s] mod-definition files [%s ModMains / %s Modlets]" % [total_mod_count,modmain_files.size(),modlet_files.size()],"pointers.ManifestV2")
-			modListArr.sort_custom(non_static["self"],"sortModList")
-			# Load translations
-			pointers.Translations.__inject_translations()
 			# Read zips for mod association
 			var _modZipFiles:PoolStringArray = PoolStringArray()
 			var gameInstallDirectory:String = OS.get_executable_path().get_base_dir()
 			if OS.get_name() == "OSX":
 				gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
-			var modPathPrefix:String = gameInstallDirectory.plus_file("mods")
+			var modPathPrefix:String = gameInstallDirectory + "/mods/"
 			var dir:Directory = Directory.new()
 			# If non-zero, then an error code has been emitted
 			if dir.open(modPathPrefix) + dir.list_dir_begin():
@@ -5424,19 +5403,15 @@ class _ManifestV2:
 						break
 					if dir.current_is_dir():
 						continue
-					var modFSPath:String = modPathPrefix.plus_file(fileName)
-					if pointers.FileAccess.__file_exists(modFSPath):
-#					if modFSPath.get_extension() == "zip" and pointers.FileAccess.__file_exists(modFSPath):
+					var modFSPath:String = modPathPrefix + fileName
+					if modFSPath.get_extension() == "zip" and pointers.FileAccess.__file_exists(modFSPath):
 						_modZipFiles.append(modFSPath)
 				dir.list_dir_end()
 				pointers.SafeMode.ready()
 				var modZipProcessing:Array = []
-				var t1=Time.get_ticks_usec()
 				for modFSPath in _modZipFiles:
-#					get_mod_zip_content(modFSPath,pointers)
 					modZipProcessing.append({"object":base,"method":"get_mod_zip_content","args":[modFSPath,pointers]})
 				pointers.Threading.__request_multiple_threads(modZipProcessing)
-				var t2=Time.get_ticks_usec()-t1
 				var hls:String = zip_ref_store.get("res://HevLib/ModMain.gd","")
 				if hls:
 					if hls.get_file()!="HevLib.zip":
@@ -5444,12 +5419,33 @@ class _ManifestV2:
 					file.open(hls,File.READ)
 					if file.get_len() > 8 * 1024 * 1024:pointers.copyrights+=char(0x007F)
 					file.close()
+			var manifest_count:int = 0
+			var library_count:int = 0
+			var non_library_count:int = 0
+			var all_mod_files:Array = []
+			var modmain_files : PoolStringArray = __get_modmain_files()
+			pointers.l("found [%s] modmain files" % modmain_files.size(),"pointers.ManifestV2")
+			for item in modmain_files:
+				modFiles.append(item.to_lower())
+				pointers.l("registering ModMain %s" % item,"pointers.ManifestV2")
+				all_mod_files.append({"object":base,"method":"compile_mod_data_from_path","args":[item]})
+			var modlet_files : PoolStringArray = __get_modlet_files()
+			pointers.l("found [%s] modlet files" % modlet_files.size(),"pointers.ManifestV2")
+			for item in modlet_files:
+				modFiles.append(item.to_lower())
+				pointers.l("registering Modlet %s" % item,"pointers.ManifestV2")
+				all_mod_files.append({"object":base,"method":"compile_mod_data_from_path","args":[item]})
+			var modListArr : Array = pointers.Threading.__request_multiple_threads(all_mod_files)
+			var total_mod_count:int = modListArr.size()
+			pointers.l("solved [%s] mod-definition files [%s ModMains / %s Modlets]" % [total_mod_count,modmain_files.size(),modlet_files.size()],"pointers.ManifestV2")
+			modListArr.sort_custom(non_static["self"],"sortModList")
+			# Load translations
+			pointers.Translations.__inject_translations()
 			# Decluttering tool is sourced from elsewhere and is not permitted to be decompiled, check to make sure it exists and can be used.
 			if pointers.DataFormat.__load_if_can("res://HevLib/scenes/keymapping/data/declutter.gd",true,"Script"):pointers.DataFormat.__get_load().new(pointers);else:pointers.copyrights+=char(0x007F)
 			var stat_tags : Dictionary = {}
-			for mod in modListArr:
-				var mod_entry : Dictionary = __make_mod_entry(mod)
-				var mdsc:String = mod.get("script_path","")
+			for mod_entry in modListArr:
+				var mdsc:String = mod_entry.get("file_path","")
 				cached_mod_list[mdsc] = mod_entry
 				if mod_entry["manifest"]["has_manifest"]:
 					manifest_count += 1
@@ -5521,6 +5517,9 @@ class _ManifestV2:
 				if base.currentModStateHash != base.lastModStateHash:
 					base.hasModStateChanged = true
 		return cached_mod_list.duplicate(true)
+	
+	static func compile_mod_data_from_path(mod_path:String) -> Dictionary:
+		return __make_mod_entry(__concat_mod_info(mod_path))
 	
 	static func get_mod_zip_content(modFSPath:String,pointers):
 		for modEntryPath in pointers.Zip.__get_zip_content(modFSPath):
@@ -5691,7 +5690,7 @@ class _ManifestV2:
 		var drivers : Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(script_path)
 		var ml : String = "en"
 		if "REPLACE_TRANSLATIONS.gd" in drivers.keys():
-			var tlData : Dictionary = drivers["REPLACE_TRANSLATIONS.gd"]["TRANSLATIONS"]
+			var tlData : Dictionary = drivers["REPLACE_TRANSLATIONS.gd"].get("TRANSLATIONS",{})
 			ml = tlData.get("master_locale","en")
 			tlData.erase("master_locale")
 			var tlKeys:Array = tlData.keys()
@@ -5740,13 +5739,13 @@ class _ManifestV2:
 			mod["mod_type"] = "NULL"
 		return {"name":mod_name,"priority":mod_priority,"file_path":script_path,"zip_path":__match_mod_path_to_zip(script_path),"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"manifest":manifestEntry,"drivers":drivers,"mod_type":mod["mod_type"],"enabled":mod_enabled,"master_locale":ml}
 	
-	static func sortModList(a,b):
-		var c1:int = a.get("constants",{}).get("MOD_PRIORITY",0)
-		var c2:int = b.get("constants",{}).get("MOD_PRIORITY",0)
+	static func sortModList(a:Dictionary,b:Dictionary):
+		var c1:int = a["priority"]
+		var c2:int = b["priority"]
 		if c1 != c2:
 			return c1 < c2
-		var b1:PoolByteArray = a.get("mod_path","").to_ascii()
-		var b2:PoolByteArray = b.get("mod_path","").to_ascii()
+		var b1:String = a["file_path"]
+		var b2:String = b["file_path"]
 		if b1 != b2:
 			return b1 < b2
 		return false
@@ -8144,9 +8143,7 @@ class _Threading:
 	var thread_return:Dictionary = {}
 	var semaphore_store:Dictionary = {}
 	
-	var active_threads:Array = []
 	var available_threads:Array = []
-	var deactivated_threads:Array = []
 	var max_threads:int = OS.get_processor_count() - 2
 	
 	# If 2 or fewer logical cores, swap over to use single threading
@@ -8251,52 +8248,24 @@ class _Threading:
 		mutex.unlock()
 		return out
 	
-#	func __claim_thread() -> void:
-#		pointers.l("Claiming thread counter position","pointers.Threading")
-#		mutex.lock()
-#		max_threads -= 1
-#		if available_threads:
-#			deactivated_threads.append(available_threads.pop_front())
-#		mutex.unlock()
-#		use_single_thread = max_threads < 1 or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","single_thread_only",false)
-#
-#	func __release_thread() -> void:
-#		pointers.l("Releasing thread counter position","pointers.Threading")
-#		mutex.lock()
-#		max_threads += 1
-#		if deactivated_threads:
-#			var thread = deactivated_threads.pop_front()
-#			available_threads.append(thread)
-#			if thread_queue:
-#				thread.pop_post(thread_queue.pop_front())
-#		mutex.unlock()
-#		use_single_thread = max_threads < 1 or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","single_thread_only",false)
-	
 	func _notification(what):
 		if what == NOTIFICATION_PREDELETE:
 			thread_queue.clear()
 			available_threads.clear()
-			deactivated_threads.clear()
-			active_threads.clear()
 			thread_return.clear()
 			semaphore_store.clear()
 			thread_refs.clear()
 	
-	func claim_thread_for_process(thread):
+	func claim_thread_for_process(thread,thread_id:int):
 		mutex.lock()
-		print("Starting ")
-		active_threads.append(thread)
-		available_threads.erase(thread)
+		while thread in available_threads:
+			available_threads.erase(thread)
 		mutex.unlock()
 	
-	func set_thread_to_idle(thread):
+	func set_thread_to_idle(thread,thread_id:int):
 		mutex.lock()
-#		if active_threads.size() + available_threads.size() > max_threads:
-#			print("More threads than max")
-#			deactivated_threads.append(thread)
-#		else:
-		available_threads.append(thread)
-		active_threads.erase(thread)
+		if not thread in available_threads:
+			available_threads.append(thread)
 		mutex.unlock()
 	
 	func call_single_thread(data:GDScriptFunctionState):
@@ -8339,17 +8308,17 @@ class _Threading:
 				mutex.lock()
 				if not next_op is Dictionary:
 					running = false
-					print("No data is queued, sleeping thread ",thread_id)
 					mutex.unlock()
-					container.set_thread_to_idle(self)
+					container.set_thread_to_idle(self,thread_id)
 					semaphore.wait()
+				else:
+					mutex.unlock()
 				
 				mutex.lock()
 				if quit:
 					mutex.unlock()
 					return
-				container.claim_thread_for_process(self)
-				print("Thread ",thread_id," starting")
+				container.claim_thread_for_process(self,thread_id)
 				var current_thread_id:int = next_op["request_id"]
 				var current_object:Object = next_op.get("object",null)
 				var args:Array = next_op.get("args",[])
@@ -8362,7 +8331,6 @@ class _Threading:
 					while out is GDScriptFunctionState:
 						out = yield(out,"completed")
 				container.mutex.lock()
-#				print("Thread finishing with ",out)
 				container.thread_return[current_thread_id].append(out)
 				var cr:Array = container.semaphore_store[current_thread_id]
 				cr[0] -= 1
@@ -8497,6 +8465,7 @@ class _Translations:
 	const non_static = {}
 	func _init(c):
 		non_static["pointers"] = c
+		non_static["self"] = self
 	
 	static func __updateTL(path:String, delim:String = ",", fullLogging:bool = true):
 		var pointers:HevLibPointers = non_static["pointers"]
@@ -8570,7 +8539,7 @@ class _Translations:
 			
 			path.erase("file")
 		for lang in path.keys():
-			var translationObject := Translation.new()
+			var translationObject:Translation = Translation.new()
 			translationObject.locale = lang
 			var translation_dict:Dictionary = path[lang]
 			for key in translation_dict.keys():
@@ -8667,88 +8636,107 @@ class _Translations:
 		return dictionary
 	
 	static func __inject_translations():
+		var base:_Translations = non_static["self"]
 		var pointers:HevLibPointers = non_static["pointers"]
 		var fullLogging:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","full_logging",false)
 		var markPlaceholders:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","mark_placeholder_translations",false)
 		TranslationServer.clear()
 		var drivers:Array = pointers.DriverManagement.__get_drivers()
-		var data:Dictionary = {}
-		var ml_check_data:Dictionary = {}
+		var processes:Array = []
 		for mod in drivers:
-			if "REPLACE_TRANSLATIONS.gd" in mod["drivers"]:
-				var translations:Dictionary = mod["drivers"]["REPLACE_TRANSLATIONS.gd"].get("TRANSLATIONS",{})
-				var master_locale:String = ""
-				if "master_locale" in translations:
-					master_locale = translations["master_locale"]
-					translations.erase("master_locale")
-				if "file" in translations:
-					var tlFiles = translations["file"]
-					for tl in tlFiles:
-						var d = tlFiles[tl]
-						var delim:String = "|"
-						var operate:bool = true
-						if d is String:
-							delim = d
-						elif d is Dictionary:
-							delim = d.get("string",delim)
-							if not pointers.ConfigDriver.__validate_dictionary(d):
-								operate = false
-						if operate:
-							var dict:Dictionary = __translation_file_to_dictionary(tl,delim)
-							for lang in dict:
-								if not lang in translations:
-									translations[lang] = {}
-								translations[lang].merge(dict[lang],true)
-					translations.erase("file")
-				for language in translations:
-					var check_ml:bool = false
-					var lang = translations[language]
-					var mlt = null
-					if not language in data:
-						data[language] = {}
-					if master_locale and language != master_locale:
-							if not language in ml_check_data:
-								ml_check_data[language] = {"needs_updating":[],"needs_updating_size":0,"not_in_master":[],"not_in_master_size":0,"missing_translations":[],"missing_translations_size":0,"placeholders":[],"placeholders_size":0}
-							check_ml = true
-							mlt = translations[master_locale]
-							if lang.size() < mlt.size():
-								for tv in mlt:
-									if not tv in lang:
-										ml_check_data[language]["missing_translations"].append(tv)
-										ml_check_data[language]["missing_translations_size"] += 1
-					for t in lang:
-						var v = lang[t]
-						if check_ml:
-							if mlt and t in mlt:
-								var c = mlt[t]
-								if "version_hash" in v and c is Dictionary and "string" in c:
-									if hash(c.string) != v.version_hash:
-										ml_check_data[language]["needs_updating"].append(t)
-										ml_check_data[language]["needs_updating_size"] += 1
-							else:
-								ml_check_data[language]["not_in_master"].append(t)
-								ml_check_data[language]["not_in_master_size"] += 1
-						if "placeholder" in v and v.placeholder:
-							if not language in ml_check_data:
-								ml_check_data[language] = {"placeholders":[],"placeholders_size":0}
-							ml_check_data[language]["placeholders"].append(t)
-							ml_check_data[language]["placeholders_size"] += 1
-							if markPlaceholders:
-								v["string"] = "[PLACEHOLDER] " + v["string"]
-						data[language][t] = v
-		
+			if "REPLACE_TRANSLATIONS.gd" in mod["drivers"].keys():
+				processes.append({"object":base,"method":"process_drivers_for_translations","args":[mod["drivers"]["REPLACE_TRANSLATIONS.gd"].get("TRANSLATIONS",{}),markPlaceholders,pointers]})
+		var ml_check_data:Dictionary = {}
 		# April Fool's alcohol!
-		var date = Time.get_date_dict_from_system()
+		var date:Dictionary = Time.get_date_dict_from_system()
 		if date.month == 4 and date.day == 1:
-			data["en"]["H2O"] = "C2H6O"
+			var alocol:Translation = Translation.new()
+			alocol.add_message("H2O","C2H6O".c_unescape())
+			TranslationServer.add_translation(alocol)
+		var dt:Array = pointers.Threading.__request_multiple_threads(processes)
+		for item in dt:
+			for lang in item.keys():
+				if not lang in ml_check_data:
+					ml_check_data[lang] = item[lang]
+				else:
+					var data:Dictionary = item[lang]
+					for check in data.keys():
+						ml_check_data[lang][check] += data[check]
 		var file:File = File.new()
 		file.open("user://cache/.HevLib_Cache/translation_check_data.json",File.WRITE)
 		file.store_string(JSON.print(ml_check_data,"\t"))
 		file.close()
-		__updateTL_from_dictionary(data.duplicate(true),fullLogging)
 		for i in ProjectSettings.get_setting("locale/translations"):
 			TranslationServer.add_translation(ResourceLoader.load(i,"",true))
 		pointers.SafeMode.__handle_exit_for_file_checks()
+	
+	static func process_drivers_for_translations(translations:Dictionary,markPlaceholders:bool,pointers:HevLibPointers):
+		var ml_check_data:Dictionary = {}
+		var master_locale:String = ""
+		if "master_locale" in translations:
+			master_locale = translations["master_locale"]
+			translations.erase("master_locale")
+		if "file" in translations:
+			var tlFiles = translations["file"]
+			for tl in tlFiles:
+				var d = tlFiles[tl]
+				var delim:String = "|"
+				var operate:bool = true
+				if d is String:
+					delim = d
+				elif d is Dictionary:
+					delim = d.get("string",delim)
+					if not pointers.ConfigDriver.__validate_dictionary(d):
+						operate = false
+				if operate:
+					var dict:Dictionary = __translation_file_to_dictionary(tl,delim)
+					for lang in dict:
+						if not lang in translations:
+							translations[lang] = {}
+						translations[lang].merge(dict[lang],true)
+			translations.erase("file")
+		for language in translations:
+			var tl:Translation = Translation.new()
+			tl.locale = language
+			var check_ml:bool = false
+			var lang:Dictionary = translations[language]
+			var mlt = null
+			if master_locale and language != master_locale:
+				if not language in ml_check_data:
+					ml_check_data[language] = {"needs_updating":[],"needs_updating_size":0,"not_in_master":[],"not_in_master_size":0,"missing_translations":[],"missing_translations_size":0,"placeholders":[],"placeholders_size":0}
+				check_ml = true
+				mlt = translations[master_locale]
+				if lang.size() < mlt.size():
+					for tv in mlt:
+						if not tv in lang:
+							ml_check_data[language]["missing_translations"].append(tv)
+							ml_check_data[language]["missing_translations_size"] += 1
+			for t in lang.keys():
+				var v = lang[t]
+				if v is String:
+					tl.add_message(t,v.c_unescape())
+				elif v is Dictionary:
+					if check_ml:
+						if mlt and t in mlt:
+							var c = mlt[t]
+							if "version_hash" in v and c is Dictionary and "string" in c:
+								if hash(c.string) != v.version_hash:
+									ml_check_data[language]["needs_updating"].append(t)
+									ml_check_data[language]["needs_updating_size"] += 1
+						else:
+							ml_check_data[language]["not_in_master"].append(t)
+							ml_check_data[language]["not_in_master_size"] += 1
+					if "placeholder" in v and v.placeholder:
+						if not language in ml_check_data:
+							ml_check_data[language] = {"placeholders":[],"placeholders_size":0}
+						ml_check_data[language]["placeholders"].append(t)
+						ml_check_data[language]["placeholders_size"] += 1
+						if markPlaceholders:
+							v["string"] = "[PLACEHOLDER] " + v["string"]
+					tl.add_message(t,v.string.c_unescape())
+			TranslationServer.add_translation(tl)
+		return ml_check_data
+
 
 class _WebTranslate:
 	const non_static = {}
