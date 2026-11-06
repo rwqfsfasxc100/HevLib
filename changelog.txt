@@ -57,7 +57,7 @@
 15=* EventDriver's disabled event list now clears on every game reboot.
 16=* A majority of HevLib's config fetches now use an appropriate default value, which should minimize potential issues for new users.
 17=* Improved the efficiency and code footprint of `DataFormat`.`__compile_script_object` when loading a script with initialization arguments
-18=* Improved the `__load_if_can`/`__get_load` pipeline for safely loading data.
+18=* Improved the `__load_if_can` / `__get_load` pipeline for safely loading data.
 18.1=* Swapped the `type_hint` and `override_cache` operands of `__load_if_can` to mirror `ResourceLoader`.`load`
 18.2=* Removed last successful load functionality.
 18.3=* Loading and fetching now is specific to the calling thread's ID and is mutexed. This permits these functions to be safely used by asynchronous threads.
