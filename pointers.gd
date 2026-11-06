@@ -8369,12 +8369,12 @@ class _Threading:
 		var mutex:Mutex = Mutex.new()
 		var thread:Thread = Thread.new()
 		
-		var container:HevLibPointers._Threading
+		var container:_Threading
 		var pointers:HevLibPointers
 		
 		var thread_id:int = -1
 		
-		func _init(cv:HevLibPointers._Threading,idx:int):
+		func _init(cv:_Threading,idx:int):
 			thread_id = idx
 			container = cv
 			thread.start(self,"running_thread")
