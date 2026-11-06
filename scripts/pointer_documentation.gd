@@ -372,7 +372,8 @@ class DataFormat:
 				"__compile_script":{
 					"description":"Compiles provided source code into a new script object",
 					"args":[
-						"source_code -> (String) the source code for the script"
+						"source_code -> (String) the source code for the script",
+						"use_cache (optional) -> (bool) whether a copy of the script should be stored in cache",
 					],
 					"return":[
 						"Script object using the provided source"
@@ -384,6 +385,7 @@ class DataFormat:
 						"source_code -> (String) the source code for the script.",
 						"params (optional) -> Any parameters for the object if needed by it's `_init` method. Multiple arguments can be passed by using an array. Defaults to `[]`",
 						"new_object (optional) -> (bool) whether to create a new object instead of fetching the old one from the cache. Defaults to `false`",
+						"use_cache (optional) -> (bool) whether a copy of the script should be stored in cache",
 					],
 					"return":[
 						"Object with the new script set as it's script"
@@ -900,12 +902,6 @@ class HevLib:
 	}
 
 class Keymapping:
-	const description = ""
-	const methods = {
-		
-	}
-
-class ManifestV1:
 	const description = ""
 	const methods = {
 		

@@ -37,7 +37,7 @@ class_name MINIZ
 # SCRIPT USAGE: var miniz:MINIZ = MINIZ.new()
 # See res://HevLib/scripts/miniz/README.md for complete usage instructions
 
-var compression_level : int setget set_compression_level, get_compression_level
+var compression_level : int = 6 setget set_compression_level, get_compression_level
 
 
 func set_compression_level(level : int) -> void:
@@ -189,7 +189,5 @@ func get_miniz_version() -> String:
 
 
 
-var miniz
+var miniz = load("res://HevLib/scripts/miniz/miniz.gdns").new()
 
-func _init():
-	miniz = load("res://HevLib/scripts/miniz/miniz.gdns").new()

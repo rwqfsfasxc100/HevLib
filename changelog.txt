@@ -30,14 +30,6 @@
 6.6.4=* Returns an array containing all return values of the called functions
 6.6.4.1=* Any function calls that fail or return void will have a null return value
 6.6.4.2=* Output order is NOT deterministic, and is reliant on whichever threads finish first.
-6.7=* `__claim_thread` -> void
-6.7.1=* Reduces the number of available threads.
-6.7.2=* Used to help potentially reduce workload in the event that Threads are being used by other code
-6.7.3=* This function has no lower bound, and will activate single thread mode if this counter is at zero or below
-6.8=* `__release_thread` -> void
-6.8.1=* Increases the number of available threads.
-6.8.2=* Used to return an available thread counter back to the Threading class
-6.8.3=* This function has no upper bound, however no new threads will be created when exceeding the default of `logical cores minus 2`
 7=* Added `Tokenizer` class.
 7.1=* Run through a main tokenizer script (a copy can be fetched with `__get_tokenizer()`)
 7.2=* Allows the conversion of source code and compiled source to and from tokens, which is how the engine processes scripts.

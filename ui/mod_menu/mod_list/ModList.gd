@@ -187,8 +187,7 @@ func _ready():
 	var mainManifestMods = {}
 	
 	for modlet in pointers.ManifestV2.__get_disabled_modlets():
-		var dict = pointers.ManifestV2.__make_mod_entry(pointers.ManifestV2.__concat_mod_info(modlet))
-		data[modlet] = dict
+		data[modlet] = pointers.ManifestV2.__make_mod_entry(pointers.ManifestV2.__concat_mod_info(modlet))
 	
 	for mod in data.keys():
 		var fname:String = mod.split("/",false)[1]

@@ -41,6 +41,7 @@ const MOD_IS_LIBRARY=true
 const LIBRARY_HIDDEN_BY_DEFAULT=false
 const _savedObjects=Array()
 const strings=Array()
+const MOD_VERSION_STRING="%d.%d.%d-%s"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX,MOD_VERSION_METADATA]if(MOD_VERSION_METADATA)else"%d.%d.%d"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX]
 func _init(modLoader=ModLoader):
 	strings.append(self)
 	var modPath:String=get_script().resource_path.get_base_dir()+"/"
@@ -52,7 +53,6 @@ func _init(modLoader=ModLoader):
 	strings.append(pointers_dir)
 	create_zip_for_overrides(handle_pointer_cast_clearing(process_gdnative_plugins(),modLoader),self)
 	var pointers=load_pointers(modLoader)
-	l("Initializing Equipment Driver")
 	pointers.FolderAccess.__recursive_delete(variables_folder,PoolStringArray(["remove_pointer_casting.zip"]))
 	var directory:Directory=Directory.new();directory.make_dir_recursive(variables_folder);directory.make_dir_recursive(validation_check_path.get_base_dir())
 	pointers.FileAccess.__load_precached_mods();pointers.ConfigDriver.__load_configs()
@@ -198,10 +198,8 @@ static func replaceSceneLiteral(newPath:String,oldPath:String):
 		scene.take_over_path(oldPath)
 		_savedObjects.append(scene)
 		l("Finished updating literal:%s"%oldPath)
-static func l(msg:String,title:String=MOD_NAME,version:String="%d.%d.%d"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX]):
-	if MOD_VERSION_METADATA:
-		version+="-"+MOD_VERSION_METADATA
-	strings[3].l(msg,"%s V%s"%[title,version])
+static func l(msg:String,title:String=MOD_NAME):
+	strings[3].l(msg,"%s V%s"%[title,MOD_VERSION_STRING])
 const gdnative_library_extensions:PoolStringArray=PoolStringArray(["gdnlib"])
 const driver_dirs=PoolStringArray([
 	"HEVLIB_EQUIPMENT_DRIVER_TAGS/",
@@ -822,7 +820,7 @@ static func file_exists(file_path):
 	return(((File.new().file_exists(file_path)||ResourceLoader.exists(file_path))&&OS.get_user_data_dir().to_lower().ends_with("/dv")))
 static func load_pointers(modLoader:ModLoader):
 	var pointers_dir:String=strings[2]
-	var p:Node=load(pointers_dir).new(pointers_dir,strings[0])
+	var p:Node=load(pointers_dir).new(pointers_dir,strings[0],MOD_VERSION_STRING)
 	modLoader._savedObjects.push_front(p)
 	strings.append(p)
 	p.webtranslate_modmain=modLoader

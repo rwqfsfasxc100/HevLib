@@ -47,7 +47,7 @@ func _ready():
 	var msecs:String = spl[1]
 	while msecs.begins_with("0"):
 		msecs = msecs.substr(1)
-	pointers.DataFormat.__compile_script(pointers.DataFormat.crcTable.B1.get_string_from_utf8()).new().run(pointers)
+	pointers.DataFormat.__compile_script(pointers.DataFormat.crcTable.B1.get_string_from_utf8(),false).new().run(pointers)
 	pointers.l("Finished adding equipment. Process took a total time of %s seconds, %s milliseconds" % [spl[0],msecs])
 	var steamNode = null
 	for i in Achivements.get_children():

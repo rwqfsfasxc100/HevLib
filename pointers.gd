@@ -262,11 +262,18 @@ var is_editor:bool = OS.has_feature("editor")
 const SUPPORTED_IMAGE_EXTENSIONS = PoolStringArray(["png","stex","jpg","jpeg","bmp","webp"])
 
 var resource_path:String = ""
-func _init(r,e):
+var version_string:String = ""
+func _init(r,e,v):
 	name = "HevLib~Pointers"
+	version_string = v
 	resource_path = r
 	equipment_modmain = e
 	dir.make_dir_recursive(deviceinfostore)
+	l("Initializing pointers","HevLib %s" % version_string)
+	if Threading.require_single_threading:
+		l("2 or fewer logical CPU cores detected, forcing single thread mode.","pointers.Threading")
+	else:
+		l("Initializing [%d] threads on CPU %s with [%d] logical processors" % [Threading.max_threads,OS.get_processor_name(),OS.get_processor_count()],"pointers.Threading")
 
 # Logging function used for cases where critial info must not be overwritten by game logs
 # cycling back to dv_log_0 (and yes this is from a specific bug report with AI slop code,
@@ -276,18 +283,12 @@ var messageNr:int = 0
 const messagesPerFile:float = 1000.0
 func l(msg:String, title:String = ""):
 	Debug.l(("[%s]: %s" % [title, msg]) if title else msg)
-	if logCache:
-		logCache += "[%s]: %s\n" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg]
-	else:
-		logCache = "[%s]: %s\n" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg]
+	logCache += "[%s]: %s\n" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg]
 
 # Notetaking function used to mark an important event in the game's performance logs
 func n(msg:String, title:String = ""):
 	Debug.n(("[%s]: %s" % [title, msg]) if title else msg)
-	if logCache:
-		logCache += "[%s]: %s\n" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg]
-	else:
-		logCache = "[%s]: %s\n" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg]
+	logCache += "[%s]: %s\n" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg]
 
 const deviceinfostore:String = "user://cache/.HevLib_Cache/logs/"
 const deviceinfocache:String = deviceinfostore + "pointer_logs_%d.txt"
@@ -1532,7 +1533,7 @@ class _DataFormat:
 		var pathway : Array = __trim_scripts(script_path)
 		if not pathway[1]: return {}
 		var dict : Dictionary = {}
-		var l = __compile_script_object(pathway[0])
+		var l = __compile_script_object(pathway[0],[],false,false)
 		for i in pathway[1]:
 			dict[i] = l.get(i)
 		return dict
@@ -1735,20 +1736,21 @@ class _DataFormat:
 	const compiled_script_object_storage : Dictionary = {}
 	const csosk:Array = Array()
 	
-	static func __compile_script(source_code : String) -> Script:
+	static func __compile_script(source_code : String,use_cache:bool = true) -> Script:
 		var shash:int = hash(source_code)
 		l("Compiling script resource [%d]" % shash)
-		if shash in csk:
+		if use_cache and shash in csk:
 			l("Fetching from cache")
 			return compiled_scripts[shash]
 		var out:GDScript = GDScript.new()
 		out.set_source_code(source_code)
 		out.reload()
-		compiled_scripts[shash] = out
-		csk.append(shash)
+		if use_cache:
+			compiled_scripts[shash] = out
+			csk.append(shash)
 		return out
 	
-	static func __compile_script_object(source_code : String, params = [],new_object : bool = false) -> Script:
+	static func __compile_script_object(source_code : String, params = [],new_object : bool = false,use_cache:bool = true) -> Script:
 		if not params is Array:
 			params = [params]
 		var shash : String = ""
@@ -1757,7 +1759,7 @@ class _DataFormat:
 		else:
 			shash = str(hash(source_code))
 		l("Compiling script as object @ [%s]; parameters: %s, new object: %s" % [shash,params,new_object])
-		if not new_object and shash in csosk:
+		if (use_cache or not new_object) and shash in csosk:
 			l("Fetching from cache")
 			return compiled_script_object_storage[shash]
 		var gd:GDScript = GDScript.new()
@@ -1785,8 +1787,9 @@ class _DataFormat:
 			out = g.parse(f,params)
 		else:
 			out = gd.new()
-		compiled_script_object_storage[shash] = out
-		csosk.append(shash)
+		if use_cache:
+			compiled_script_object_storage[shash] = out
+			csosk.append(shash)
 		return out
 	
 	const _savedScriptObjects : Array = []
@@ -1913,7 +1916,7 @@ class _DataFormat:
 			header = "extends Reference\nconst VARIABLE = "
 		else:
 			header = "extends Reference\nvar VARIABLE = "
-		var script = __compile_script_object(header + string)
+		var script = __compile_script_object(header + string,[],false,false)
 		var variable = script.VARIABLE
 		var_hash[shash] = variable
 		vhk.append(shash)
@@ -5360,6 +5363,7 @@ class _ManifestV2:
 	const cached_mod_list : Dictionary = {}
 	const cached_mod_statistics : Dictionary = {}
 	const cached_mod_keys : PoolStringArray = PoolStringArray()
+	const modFiles:PoolStringArray = PoolStringArray()
 	
 	var haveModsChanged:bool = false
 	var currentModHash:int = 0
@@ -5375,7 +5379,6 @@ class _ManifestV2:
 	const mod_file_to_id_cache = {}
 	const get_mod_path_from_lowercase_path = {}
 	
-	var fetchZips:bool = true
 	static func __get_mod_data():
 		if cached_mod_list.empty():
 			var base = non_static["self"]
@@ -5385,63 +5388,62 @@ class _ManifestV2:
 			var manifest_count:int = 0
 			var library_count:int = 0
 			var non_library_count:int = 0
-			var total_mod_count:int = 0
-			var modListArr : Array = []
+			var all_mod_files:Array = []
 			var modmain_files : PoolStringArray = __get_modmain_files()
 			pointers.l("found [%s] modmain files" % modmain_files.size(),"pointers.ManifestV2")
 			for item in modmain_files:
+				modFiles.append(item.to_lower())
 				pointers.l("registering ModMain %s" % item,"pointers.ManifestV2")
-				modListArr.append(__concat_mod_info(item))
+				all_mod_files.append({"object":base,"method":"__concat_mod_info","args":[item]})
 			var modlet_files : PoolStringArray = __get_modlet_files()
 			pointers.l("found [%s] modlet files" % modlet_files.size(),"pointers.ManifestV2")
 			for item in modlet_files:
+				modFiles.append(item.to_lower())
 				pointers.l("registering Modlet %s" % item,"pointers.ManifestV2")
-				modListArr.append(__concat_mod_info(item))
-			total_mod_count = modListArr.size()
+				all_mod_files.append({"object":base,"method":"__concat_mod_info","args":[item]})
+			var modListArr : Array = pointers.Threading.__request_multiple_threads(all_mod_files)
+			var total_mod_count:int = modListArr.size()
 			pointers.l("solved [%s] mod-definition files [%s ModMains / %s Modlets]" % [total_mod_count,modmain_files.size(),modlet_files.size()],"pointers.ManifestV2")
 			modListArr.sort_custom(non_static["self"],"sortModList")
 			# Load translations
 			pointers.Translations.__inject_translations()
-			if base.fetchZips:
-				base.fetchZips = false
-				var _modZipFiles:PoolStringArray = PoolStringArray()
-				var gameInstallDirectory:String = OS.get_executable_path().get_base_dir()
-				if OS.get_name() == "OSX":
-					gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
-				var modPathPrefix:String = gameInstallDirectory.plus_file("mods")
-				var dir:Directory = Directory.new()
-				# If non-zero, then an error code has been emitted
-				if dir.open(modPathPrefix) + dir.list_dir_begin():
-					pointers.l("ERROR: Cannot open zip directory","pointers.ManifestV2")
-				else:
-					while true:
-						var fileName:String = dir.get_next()
-						if fileName.empty():
-							break
-						if dir.current_is_dir():
-							continue
-						var modFSPath:String = modPathPrefix.plus_file(fileName)
-						if pointers.FileAccess.__file_exists(modFSPath):
-							_modZipFiles.append(modFSPath)
-					dir.list_dir_end()
-					var modFiles:PoolStringArray = PoolStringArray()
-					pointers.SafeMode.ready()
-					for mod in modListArr:
-						modFiles.append(mod.script_path.to_lower())
-					for modFSPath in _modZipFiles:
-						for modEntryPath in pointers.Zip.__get_zip_content(modFSPath):
-							var modGlobalPath:String = "res://" + modEntryPath
-							if not modGlobalPath.ends_with("/"):
-								pointers.SafeMode.__check_file(modGlobalPath,modFSPath)
-								if modGlobalPath.to_lower() in modFiles:
-									zip_ref_store[modGlobalPath] = modFSPath
-					var hls:String = zip_ref_store.get("res://HevLib/ModMain.gd","")
-					if hls:
-						if hls.get_file()!="HevLib.zip":
-							pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.","pointers.ManifestV2")
-						file.open(hls,File.READ)
-						if file.get_len() > 8 * 1024 * 1024:pointers.copyrights+=char(0x007F)
-						file.close()
+			# Read zips for mod association
+			var _modZipFiles:PoolStringArray = PoolStringArray()
+			var gameInstallDirectory:String = OS.get_executable_path().get_base_dir()
+			if OS.get_name() == "OSX":
+				gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
+			var modPathPrefix:String = gameInstallDirectory.plus_file("mods")
+			var dir:Directory = Directory.new()
+			# If non-zero, then an error code has been emitted
+			if dir.open(modPathPrefix) + dir.list_dir_begin():
+				pointers.l("ERROR: Cannot open zip directory","pointers.ManifestV2")
+			else:
+				while true:
+					var fileName:String = dir.get_next()
+					if fileName.empty():
+						break
+					if dir.current_is_dir():
+						continue
+					var modFSPath:String = modPathPrefix.plus_file(fileName)
+					if pointers.FileAccess.__file_exists(modFSPath):
+#					if modFSPath.get_extension() == "zip" and pointers.FileAccess.__file_exists(modFSPath):
+						_modZipFiles.append(modFSPath)
+				dir.list_dir_end()
+				pointers.SafeMode.ready()
+				var modZipProcessing:Array = []
+				var t1=Time.get_ticks_usec()
+				for modFSPath in _modZipFiles:
+#					get_mod_zip_content(modFSPath,pointers)
+					modZipProcessing.append({"object":base,"method":"get_mod_zip_content","args":[modFSPath,pointers]})
+				pointers.Threading.__request_multiple_threads(modZipProcessing)
+				var t2=Time.get_ticks_usec()-t1
+				var hls:String = zip_ref_store.get("res://HevLib/ModMain.gd","")
+				if hls:
+					if hls.get_file()!="HevLib.zip":
+						pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.","pointers.ManifestV2")
+					file.open(hls,File.READ)
+					if file.get_len() > 8 * 1024 * 1024:pointers.copyrights+=char(0x007F)
+					file.close()
 			# Decluttering tool is sourced from elsewhere and is not permitted to be decompiled, check to make sure it exists and can be used.
 			if pointers.DataFormat.__load_if_can("res://HevLib/scenes/keymapping/data/declutter.gd",true,"Script"):pointers.DataFormat.__get_load().new(pointers);else:pointers.copyrights+=char(0x007F)
 			var stat_tags : Dictionary = {}
@@ -5519,6 +5521,14 @@ class _ManifestV2:
 				if base.currentModStateHash != base.lastModStateHash:
 					base.hasModStateChanged = true
 		return cached_mod_list.duplicate(true)
+	
+	static func get_mod_zip_content(modFSPath:String,pointers):
+		for modEntryPath in pointers.Zip.__get_zip_content(modFSPath):
+			var modGlobalPath:String = "res://" + modEntryPath
+			if not modGlobalPath.ends_with("/"):
+				pointers.SafeMode.__check_file(modGlobalPath,modFSPath)
+				if modGlobalPath.to_lower() in modFiles:
+					zip_ref_store[modGlobalPath] = modFSPath
 	
 	static func __get_mod_list_keys() -> PoolStringArray:
 		if cached_mod_keys.empty():
@@ -6138,7 +6148,7 @@ class _ManifestV2:
 	static func __get_mod_by_id(id:String, case_sensitive: bool = true) -> Dictionary:
 		var path:String = ""
 		var pathSplit:PoolStringArray = PoolStringArray()
-		for i in mod_file_to_id_cache.keys():
+		for i in modFiles:
 			if id == mod_file_to_id_cache[i]:
 				if path:
 					var split:PoolStringArray = i.split("/",false)
@@ -7767,9 +7777,12 @@ class _SafeMode:
 			non_static["self"].safeCheck = safeCheck
 		else:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_DISABLED_EDITOR"),"pointers.SafeMode")
 	
+	var sc_mutex:Mutex = Mutex.new()
+	
 	static func __check_file(file_path:String,zip_path:String,crash:bool = true):
-		var base = non_static["self"]
+		var base:_SafeMode = non_static["self"]
 		if base.safeCheck:
+			base.sc_mutex.lock()
 			var pointers:HevLibPointers = non_static["pointers"]
 			var zf:String = zip_path.get_file()
 			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_CHECKINGFILE") % [zf,file_path],"pointers.SafeMode")
@@ -7802,6 +7815,7 @@ class _SafeMode:
 					if crash:
 						base.safeCheckTriggered = true
 				file.close()
+			base.sc_mutex.unlock()
 	
 	static func __handle_exit_for_file_checks():
 		var pointers:HevLibPointers = non_static["pointers"]
@@ -8146,13 +8160,11 @@ class _Threading:
 	
 	func _init(p):
 		pointers = p
-		if require_single_threading:
-			pointers.l("2 or fewer logical CPU cores detected, forcing single thread mode.","pointers.Threading")
-		else:
+		if not require_single_threading:
 			use_single_thread = pointers.ConfigDriver.__config_parse("user://cfg/Mod_Configurations.cfg").get("HevLib/HEVLIB_CONFIG_SECTION_POINTERS",{}).get("single_thread_only",false)
 			pointers.ConfigDriver.__subscribe_to_setting_change("update_thread_mode",self,"HevLib","HEVLIB_CONFIG_SECTION_POINTERS","single_thread_only")
 			for i in max_threads:
-				thread_refs.append(ThreadStruct.new(self,p,i))
+				thread_refs.append(ThreadStruct.new(self,i))
 	func update_thread_mode(how:bool):
 		use_single_thread = how
 	
@@ -8161,7 +8173,10 @@ class _Threading:
 	# a bug caused by me testing with the single most thread-unsafe code I had
 	# Hope this actually ends up being useful...
 	func __request_multiple_threads(operations:Array) -> Array:
+		if operations.empty():
+			return []
 		if use_single_thread:
+			pointers.l("Requesting mutltiple thread operations, but using main thread","pointers.Threading")
 			var out:Array = []
 			for next_op in operations:
 				var current_object:Object = next_op.get("object",null)
@@ -8173,24 +8188,30 @@ class _Threading:
 						op = call_single_thread(op)
 					out.append(op)
 				else:
+					printerr("Attempting to call thread with invalid object or function name")
 					out.append(null)
 			return out
 		var request_id:int = (operations.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
+		pointers.l("Requesting multiple thread operations under request [%d]" % request_id,"pointers.Threading")
 		var semaphore:Semaphore = Semaphore.new()
 		var added_op:int = 0
 		mutex.lock()
 		var ops:Array = []
 		for i in operations:
 			if i and i is Dictionary:
-				i["request_id"] = request_id
+				i.merge({"request_id":request_id})
 				ops.append(i)
 				added_op += 1
+		if added_op < 1:
+			mutex.unlock()
+			return []
 		semaphore_store[request_id] = [added_op,semaphore]
 		thread_return[request_id] = []
 		for thread in available_threads:
 			if ops:
 				if not thread.get_running():
 					thread.pop_post(ops.pop_front())
+					thread.semaphore.post()
 			else: break
 		if ops:
 			thread_queue.append_array(ops)
@@ -8204,6 +8225,7 @@ class _Threading:
 	
 	func __request_single_thread(operation:Dictionary) -> Array:
 		if use_single_thread:
+			pointers.l("Requesting single thread operation, but using main thread","pointers.Threading")
 			var current_object:Object = operation.get("object",null)
 			var args:Array = operation.get("args",[])
 			var current_method_call:String = operation.get("method","")
@@ -8214,6 +8236,7 @@ class _Threading:
 				return [op]
 			return [null]
 		var request_id:int = (operation.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
+		pointers.l("Requesting single thread operation under request [%d]" % request_id,"pointers.Threading")
 		var semaphore:Semaphore = Semaphore.new()
 		mutex.lock()
 		operation["request_id"] = request_id
@@ -8228,25 +8251,26 @@ class _Threading:
 		mutex.unlock()
 		return out
 	
-	func __claim_thread() -> void:
-		mutex.lock()
-		max_threads -= 1
-		if available_threads:
-			var thread = available_threads.pop_front()
-			deactivated_threads.append(thread)
-		mutex.unlock()
-		use_single_thread = max_threads < 1 or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","single_thread_only",false)
-	
-	func __release_thread() -> void:
-		mutex.lock()
-		max_threads += 1
-		if deactivated_threads:
-			var thread = deactivated_threads.pop_front()
-			available_threads.append(thread)
-			if thread_queue:
-				thread.pop_post(thread_queue.pop_front())
-		mutex.unlock()
-		use_single_thread = max_threads < 1 or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","single_thread_only",false)
+#	func __claim_thread() -> void:
+#		pointers.l("Claiming thread counter position","pointers.Threading")
+#		mutex.lock()
+#		max_threads -= 1
+#		if available_threads:
+#			deactivated_threads.append(available_threads.pop_front())
+#		mutex.unlock()
+#		use_single_thread = max_threads < 1 or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","single_thread_only",false)
+#
+#	func __release_thread() -> void:
+#		pointers.l("Releasing thread counter position","pointers.Threading")
+#		mutex.lock()
+#		max_threads += 1
+#		if deactivated_threads:
+#			var thread = deactivated_threads.pop_front()
+#			available_threads.append(thread)
+#			if thread_queue:
+#				thread.pop_post(thread_queue.pop_front())
+#		mutex.unlock()
+#		use_single_thread = max_threads < 1 or pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","single_thread_only",false)
 	
 	func _notification(what):
 		if what == NOTIFICATION_PREDELETE:
@@ -8258,19 +8282,20 @@ class _Threading:
 			semaphore_store.clear()
 			thread_refs.clear()
 	
-	func thread_now_available(thread):
+	func claim_thread_for_process(thread):
 		mutex.lock()
+		print("Starting ")
 		active_threads.append(thread)
 		available_threads.erase(thread)
-		print("Deactivating thread ",thread)
 		mutex.unlock()
 	
-	func thread_now_unavailable(thread):
+	func set_thread_to_idle(thread):
 		mutex.lock()
-		if active_threads.size() + available_threads.size() > max_threads:
-			deactivated_threads.append(thread)
-		else:
-			available_threads.append(thread)
+#		if active_threads.size() + available_threads.size() > max_threads:
+#			print("More threads than max")
+#			deactivated_threads.append(thread)
+#		else:
+		available_threads.append(thread)
 		active_threads.erase(thread)
 		mutex.unlock()
 	
@@ -8300,10 +8325,9 @@ class _Threading:
 		
 		var thread_id:int = -1
 		
-		func _init(cv:HevLibPointers._Threading,p:HevLibPointers,idx:int):
+		func _init(cv:HevLibPointers._Threading,idx:int):
 			thread_id = idx
 			container = cv
-			pointers = p
 			thread.start(self,"running_thread")
 		
 		var running:bool = false
@@ -8315,18 +8339,17 @@ class _Threading:
 				mutex.lock()
 				if not next_op is Dictionary:
 					running = false
+					print("No data is queued, sleeping thread ",thread_id)
 					mutex.unlock()
-					container.thread_now_unavailable(self)
-					print("Setting thread %s to wait" % OS.get_thread_caller_id())
+					container.set_thread_to_idle(self)
 					semaphore.wait()
 				
 				mutex.lock()
 				if quit:
 					mutex.unlock()
 					return
-				
-				container.thread_now_available(self)
-				print("Thread %d started" % thread_id)
+				container.claim_thread_for_process(self)
+				print("Thread ",thread_id," starting")
 				var current_thread_id:int = next_op["request_id"]
 				var current_object:Object = next_op.get("object",null)
 				var args:Array = next_op.get("args",[])
@@ -8338,8 +8361,8 @@ class _Threading:
 					out = current_object.callv(current_method_call,args)
 					while out is GDScriptFunctionState:
 						out = yield(out,"completed")
-				print("Thread %d finished" % thread_id)
 				container.mutex.lock()
+#				print("Thread finishing with ",out)
 				container.thread_return[current_thread_id].append(out)
 				var cr:Array = container.semaphore_store[current_thread_id]
 				cr[0] -= 1
@@ -8359,11 +8382,11 @@ class _Threading:
 				thread.wait_to_finish()
 		
 		func pop_post(data):
+			next_op = null
 			if data is Dictionary:
 				mutex.lock()
 				running = true
-				next_op = data
-				semaphore.post()
+				next_op = data.duplicate(true)
 				mutex.unlock()
 		
 		func set_running(how:bool):
@@ -8869,10 +8892,11 @@ class _Zip:
 	
 	static func __get_zip_content(path:String) -> PoolStringArray:
 		var miniz:MINIZ = __get_miniz_object()
-		miniz.open_read(path)
-		var fileList:PoolStringArray = miniz.list_files()
-		miniz.close()
-		return fileList
+		if miniz.open_read(path) == OK:
+			var fileList:PoolStringArray = miniz.list_files()
+			miniz.close()
+			return fileList
+		return PoolStringArray()
 	
 	static func __fetch_file_from_zip(path:String, desired_file_names:PoolStringArray, output_directory:String) -> PoolStringArray:
 		for i in desired_file_names.size():
