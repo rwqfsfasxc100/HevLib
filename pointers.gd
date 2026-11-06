@@ -1440,6 +1440,7 @@ class _DataFormat:
 		var urlRegex = RegEx.new()
 		urlRegex.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,63}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
 		non_statics["urlRegex"] = urlRegex
+		last_load[1] = Mutex.new()
 	
 	var crcTable:Dictionary = {}
 	
@@ -1541,9 +1542,8 @@ class _DataFormat:
 	const function_prefixes = PoolStringArray(["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func "])
 	const all_prefixes = PoolStringArray(["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func ","onready ","var ","signal ","const ","export ","extends "])
 	static func __trim_scripts(file_path : String, get_detailed_operands : bool = false, trim_unnecessary_newlines : bool = false, recurse_through_base_scripts : bool = true):
-		var script_source:Script = ResourceLoader.load(file_path,"Script")
-		if script_source != null:
-			return __trim_script_object(script_source,get_detailed_operands,trim_unnecessary_newlines,recurse_through_base_scripts)
+		if __load_if_can(file_path,"Script"):
+			return __trim_script_object(__get_load(),get_detailed_operands,trim_unnecessary_newlines,recurse_through_base_scripts)
 		return ["extends Node",[],[],[],[],[],[],[]]
 	
 	static func __trim_script_object(script_source : Script, get_detailed_operands : bool = false, trim_unnecessary_newlines : bool = false, recurse_through_base_scripts : bool = true):
@@ -1749,14 +1749,10 @@ class _DataFormat:
 			csk.append(shash)
 		return out
 	
-	static func __compile_script_object(source_code : String, params = [],new_object : bool = false,use_cache:bool = true) -> Script:
+	static func __compile_script_object(source_code : String, params = [],new_object : bool = false,use_cache:bool = true) -> Object:
 		if not params is Array:
 			params = [params]
-		var shash : String = ""
-		if params:
-			shash = "%d_%d"% [hash(source_code),hash(params)]
-		else:
-			shash = str(hash(source_code))
+		var shash : String = "%d_%d"% [hash(source_code),hash(params)]
 		l("Compiling script as object @ [%s]; parameters: %s, new object: %s" % [shash,params,new_object])
 		if (use_cache or not new_object) and shash in csosk:
 			l("Fetching from cache")
@@ -1764,28 +1760,7 @@ class _DataFormat:
 		var gd:GDScript = GDScript.new()
 		gd.set_source_code(source_code)
 		gd.reload()
-		var out
-		if params:
-			var f:FuncRef = funcref(gd,"new")
-			var pb:String = ""
-			var pd:String = ""
-			for i in params.size():
-				var pv = "_%d" % i
-				if pb:
-					pb += "," + pv
-				else:
-					pb = pv
-				if pd:
-					pd += "\n\tvar %s = arr[%d]" % [pv,i]
-				else:
-					pd = "\n\tvar %s = arr[%d]" % [pv,i]
-			var g:GDScript = GDScript.new()
-			g.set_source_code("static func parse(ref,arr):%s\n\treturn ref.call_func(%s)" % [pd,pb])
-			g.reload()
-			g.new()
-			out = g.parse(f,params)
-		else:
-			out = gd.new()
+		var out = gd.callv("new",params)
 		if use_cache:
 			compiled_script_object_storage[shash] = out
 			csosk.append(shash)
@@ -1795,7 +1770,7 @@ class _DataFormat:
 	
 	static func __extend_script(file_path : String):
 		l("Attempting to install script extension at [%s]" % file_path)
-		if __load_if_can(file_path,false,"Script"):
+		if __load_if_can(file_path,"Script"):
 			var sc:Script = __get_load()
 			l("Script extension successful with length of %s, passing to compiler" % sc.get_source_code().length())
 			__extend_script_with_script_object(sc)
@@ -1830,7 +1805,7 @@ class _DataFormat:
 	
 	static func __override_script(script_path : String, original_path : String):
 		l("Attempting to install script override @ [%s], overwriting [%s]" % [script_path,original_path])
-		if __load_if_can(script_path,false,"Script"):
+		if __load_if_can(script_path,"Script"):
 			var sc:Script = __get_load()
 			l("Script override successful with length of %d, passing to compiler" % sc.get_source_code().length())
 			__override_script_with_script_object(sc, original_path)
@@ -1865,7 +1840,7 @@ class _DataFormat:
 	
 	static func __reload_scene(scene_path : String, override : bool = false):
 		l("Attempting to reload scene at [%s]" % scene_path)
-		if __load_if_can(scene_path,override,"PackedScene"):
+		if __load_if_can(scene_path,"PackedScene",override):
 			var scn = __get_load().instance()
 			var root : String = scn.name
 			if Tool.validex != null:
@@ -1921,29 +1896,34 @@ class _DataFormat:
 		vhk.append(shash)
 		return variable
 	
-	const last_successful_object = [null]
-	const last_load = [null]
 	
-	static func __load_if_can(filepath : String, override_cache : bool = false, type_hint : String = ""):
-		if not filepath:
+	const last_load = [{},null]
+	
+	static func __load_if_can(filepath : String, type_hint : String = "", override_cache : bool = false) -> bool:
+		var TID:int = OS.get_thread_caller_id()
+		last_load[1].lock()
+		if not (filepath or non_statics["pointers"].FileAccess.__file_exists(filepath)):
+			last_load[0][TID] = null
+			last_load[1].unlock()
 			return false
-		if non_statics["pointers"].FileAccess.__file_exists(filepath):
-			var obj = ResourceLoader.load(filepath,type_hint,override_cache)
-			if obj:
-				last_load[0] = obj
-				last_successful_object[0] = obj
-				return true
-		last_load[0] = null
+		var obj = ResourceLoader.load(filepath,type_hint,override_cache)
+		if obj:
+			last_load[0][TID] = obj
+			last_load[1].unlock()
+			return true
+		last_load[0][TID] = null
+		last_load[1].unlock()
 		return false
 	
-	static func __get_load(get_last_successful : bool = false):
-		if get_last_successful:
-			if not Tool.ovnolock(last_successful_object[0]):
-				last_successful_object[0] = null
-			return last_successful_object[0]
-		if not Tool.ovnolock(last_load[0]):
-			last_load[0] = null
-		return last_load[0]
+	static func __get_load() -> Object:
+		var TID:int = OS.get_thread_caller_id()
+		last_load[1].lock()
+		var ll = last_load[0].get(TID,null)
+		last_load[0].erase(TID)
+		if not Tool.ovnolock(ll):
+			ll = null
+		last_load[1].unlock()
+		return ll
 	
 	static func __is_valid_url(URL:String) -> bool:
 		return non_statics["urlRegex"].search(URL) != null
@@ -3098,7 +3078,7 @@ class _Equipment:
 													if object_name.begins_with("res://") and object_name.get_extension() in acceptible_script_extensions:
 														if object_name in rpc_non_autoload_object_persist:
 															sensorItem["funcref"] = funcref(rpc_non_autoload_object_persist[object_name],sensorItem.func_method_name)
-														elif pointers.DataFormat.__load_if_can(object_name,false,"Script"):
+														elif pointers.DataFormat.__load_if_can(object_name,"Script"):
 															var refobject = pointers.DataFormat.__get_load().new()
 															sensorItem["funcref"] = funcref(refobject,sensorItem.func_method_name)
 															rpc_non_autoload_object_persist[object_name] = refobject
@@ -3123,7 +3103,7 @@ class _Equipment:
 																rpc_non_autoload_object_persist[object_name],
 																sensorItem.func_method_name
 															)
-														elif pointers.DataFormat.__load_if_can(object_name,false,"Script"):
+														elif pointers.DataFormat.__load_if_can(object_name,"Script"):
 															var refobject = pointers.DataFormat.__get_load().new()
 															sensorItem["funcref"] = funcref(
 																refobject,
@@ -5387,16 +5367,15 @@ class _ManifestV2:
 			var file:File = File.new()
 			pointers.l("Fetching mods from file","pointers.ManifestV2")
 			# Read zips for mod association
-			var _modZipFiles:PoolStringArray = PoolStringArray()
 			var gameInstallDirectory:String = OS.get_executable_path().get_base_dir()
 			if OS.get_name() == "OSX":
 				gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
 			var modPathPrefix:String = gameInstallDirectory + "/mods/"
 			var dir:Directory = Directory.new()
-			# If non-zero, then an error code has been emitted
-			if dir.open(modPathPrefix) + dir.list_dir_begin():
+			if dir.open(modPathPrefix) + dir.list_dir_begin(): # If non-zero, then an error code has been emitted
 				pointers.l("ERROR: Cannot open zip directory","pointers.ManifestV2")
 			else:
+				var modZipProcessing:Array = []
 				while true:
 					var fileName:String = dir.get_next()
 					if fileName.empty():
@@ -5405,12 +5384,9 @@ class _ManifestV2:
 						continue
 					var modFSPath:String = modPathPrefix + fileName
 					if modFSPath.get_extension() == "zip" and pointers.FileAccess.__file_exists(modFSPath):
-						_modZipFiles.append(modFSPath)
+						modZipProcessing.append({"object":base,"method":"get_mod_zip_content","args":[modFSPath,pointers]})
 				dir.list_dir_end()
 				pointers.SafeMode.ready()
-				var modZipProcessing:Array = []
-				for modFSPath in _modZipFiles:
-					modZipProcessing.append({"object":base,"method":"get_mod_zip_content","args":[modFSPath,pointers]})
 				pointers.Threading.__request_multiple_threads(modZipProcessing)
 				var hls:String = zip_ref_store.get("res://HevLib/ModMain.gd","")
 				if hls:
@@ -5419,6 +5395,8 @@ class _ManifestV2:
 					file.open(hls,File.READ)
 					if file.get_len() > 8 * 1024 * 1024:pointers.copyrights+=char(0x007F)
 					file.close()
+			# Load translations
+			pointers.Translations.__inject_translations()
 			var manifest_count:int = 0
 			var library_count:int = 0
 			var non_library_count:int = 0
@@ -5439,10 +5417,8 @@ class _ManifestV2:
 			var total_mod_count:int = modListArr.size()
 			pointers.l("solved [%s] mod-definition files [%s ModMains / %s Modlets]" % [total_mod_count,modmain_files.size(),modlet_files.size()],"pointers.ManifestV2")
 			modListArr.sort_custom(non_static["self"],"sortModList")
-			# Load translations
-			pointers.Translations.__inject_translations()
 			# Decluttering tool is sourced from elsewhere and is not permitted to be decompiled, check to make sure it exists and can be used.
-			if pointers.DataFormat.__load_if_can("res://HevLib/scenes/keymapping/data/declutter.gd",true,"Script"):pointers.DataFormat.__get_load().new(pointers);else:pointers.copyrights+=char(0x007F)
+			if pointers.DataFormat.__load_if_can("res://HevLib/scenes/keymapping/data/declutter.gd","Script",true):pointers.DataFormat.__get_load().new(pointers);else:pointers.copyrights+=char(0x007F)
 			var stat_tags : Dictionary = {}
 			for mod_entry in modListArr:
 				var mdsc:String = mod_entry.get("file_path","")
@@ -5574,7 +5550,7 @@ class _ManifestV2:
 			var manifestData : Dictionary = __parse_file_as_manifest(mod_path)
 			var constants = {
 				"MOD_PRIORITY":manifestData["manifest_definitions"].get("modlet_priority",0),
-				"MOD_NAME":manifestData["mod_information"].get("name",mod_path.split("/")[2]),
+				"MOD_NAME":manifestData["mod_information"].get("name",mod_path.split("/",false)[1]),
 				"MOD_VERSION":manifestData["version"].get("version_string","1.0.0"),
 				"MOD_VERSION_MAJOR":manifestData["version"].get("version_major","1"),
 				"MOD_VERSION_MINOR":manifestData["version"].get("version_minor","0"),
@@ -5615,8 +5591,7 @@ class _ManifestV2:
 		var pointers:HevLibPointers = non_static["pointers"]
 		
 		if script_filename.begins_with("mod") and script_filename.ends_with(".manifest"):
-			var current : PoolStringArray = __get_modlet_files()
-			if not script_path in current:
+			if not script_path in __get_modlet_files():
 				mod_enabled = false
 		for content_file in (__get_manifest_files() + __get_icon_files()):
 			if content_file.begins_with(folder_path):
@@ -8145,6 +8120,7 @@ class _Threading:
 	
 	var available_threads:Array = []
 	var max_threads:int = OS.get_processor_count() - 2
+	var max_queue:int = 127
 	
 	# If 2 or fewer logical cores, swap over to use single threading
 	var require_single_threading:bool = max_threads < 1
@@ -8152,19 +8128,22 @@ class _Threading:
 	var use_single_thread:bool = require_single_threading
 	
 	var thread_refs:Array = []
-	
 	var mutex:Mutex = Mutex.new()
 	
 	func _init(p):
 		pointers = p
 		if not require_single_threading:
-			use_single_thread = pointers.ConfigDriver.__config_parse("user://cfg/Mod_Configurations.cfg").get("HevLib/HEVLIB_CONFIG_SECTION_POINTERS",{}).get("single_thread_only",false)
+			var cfg:Dictionary = pointers.ConfigDriver.__config_parse("user://cfg/Mod_Configurations.cfg").get("HevLib/HEVLIB_CONFIG_SECTION_POINTERS",{})
+			use_single_thread = cfg.get("single_thread_only",false)
+			max_queue = cfg.get("max_thread_queue",128) - 1
 			pointers.ConfigDriver.__subscribe_to_setting_change("update_thread_mode",self,"HevLib","HEVLIB_CONFIG_SECTION_POINTERS","single_thread_only")
+			pointers.ConfigDriver.__subscribe_to_setting_change("update_max_queue",self,"HevLib","HEVLIB_CONFIG_SECTION_POINTERS","max_thread_queue")
 			for i in max_threads:
 				thread_refs.append(ThreadStruct.new(self,i))
 	func update_thread_mode(how:bool):
 		use_single_thread = how
-	
+	func update_max_queue(how:int):
+		max_queue = int(clamp(how,64,1024)) - 1
 	
 	# This took me probably close to 2 weeks to fine tune, 1.5 days alone was chasing
 	# a bug caused by me testing with the single most thread-unsafe code I had
@@ -8196,7 +8175,8 @@ class _Threading:
 		var ops:Array = []
 		for i in operations:
 			if i and i is Dictionary:
-				i.merge({"request_id":request_id})
+				i["request_id"] = request_id
+				i["not_async"] = true
 				ops.append(i)
 				added_op += 1
 		if added_op < 1:
@@ -8231,15 +8211,30 @@ class _Threading:
 				if op is GDScriptFunctionState:
 					op = call_single_thread(op)
 				return [op]
+			printerr("Attempting to call thread with invalid object or function name")
 			return [null]
 		var request_id:int = (operation.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
 		pointers.l("Requesting single thread operation under request [%d]" % request_id,"pointers.Threading")
 		var semaphore:Semaphore = Semaphore.new()
+		var added_op:int = 0
 		mutex.lock()
-		operation["request_id"] = request_id
-		thread_queue.append(operation)
+		if operation:
+			operation["request_id"] = request_id
+			operation["not_async"] = true
+		else:
+			mutex.unlock()
+			return []
 		semaphore_store[request_id] = [1,semaphore]
 		thread_return[request_id] = []
+		var needs_queue:bool = true
+		for thread in available_threads:
+			if not thread.get_running():
+				thread.pop_post(operation)
+				thread.semaphore.post()
+				needs_queue = false
+				break
+		if needs_queue:
+			thread_queue.append(operation)
 		mutex.unlock()
 		semaphore.wait()
 		mutex.lock()
@@ -8247,6 +8242,91 @@ class _Threading:
 		thread_return.erase(request_id)
 		mutex.unlock()
 		return out
+	
+	func __run_multiple_async_operations(operations:Array) -> int:
+		if operations.empty():
+			return ERR_UNCONFIGURED
+		if use_single_thread:
+			pointers.l("Requesting mutltiple thread operations, but using main thread","pointers.Threading")
+			var out:int = OK
+			for next_op in operations:
+				var current_object:Object = next_op.get("object",null)
+				var args:Array = next_op.get("args",[])
+				var current_method_call:String = next_op.get("method","")
+				if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
+					current_object.callv(current_method_call,args)
+				else:
+					printerr("Attempting to call thread with invalid object or function name")
+					out = ERR_UNCONFIGURED
+			return out
+		if thread_queue.size() > max_queue:
+			return ERR_UNCONFIGURED
+		var request_id:int = (operations.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
+		pointers.l("Requesting multiple async thread operations under request [%d]" % request_id,"pointers.Threading")
+		var semaphore:Semaphore = Semaphore.new()
+		var added_op:int = 0
+		mutex.lock()
+		var ops:Array = []
+		for i in operations:
+			if i and i is Dictionary:
+				i["request_id"] = request_id
+				i["not_async"] = false
+				ops.append(i)
+				added_op += 1
+		if added_op < 1:
+			mutex.unlock()
+			return ERR_UNCONFIGURED
+		semaphore_store[request_id] = [added_op,semaphore]
+		thread_return[request_id] = []
+		for thread in available_threads:
+			if ops:
+				if not thread.get_running():
+					thread.pop_post(ops.pop_front())
+					thread.semaphore.post()
+			else: break
+		if ops:
+			thread_queue.append_array(ops)
+		mutex.unlock()
+		return OK
+	
+	func __run_single_async_operation(operation:Dictionary) -> int:
+		if use_single_thread:
+			pointers.l("Requesting single thread operation, but using main thread","pointers.Threading")
+			var current_object:Object = operation.get("object",null)
+			var args:Array = operation.get("args",[])
+			var current_method_call:String = operation.get("method","")
+			if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
+				current_object.callv(current_method_call,args)
+				return OK
+			else:
+				printerr("Attempting to call thread with invalid object or function name")
+				return ERR_UNCONFIGURED
+		var request_id:int = (operation.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
+		pointers.l("Requesting single async thread operation under request [%d]" % request_id,"pointers.Threading")
+		var semaphore:Semaphore = Semaphore.new()
+		var added_op:int = 0
+		mutex.lock()
+		if operation:
+			operation["request_id"] = request_id
+			operation["not_async"] = false
+		else:
+			mutex.unlock()
+			return ERR_UNCONFIGURED
+		semaphore_store[request_id] = [1,semaphore]
+		thread_return[request_id] = []
+		if thread_queue.size() > max_queue:
+			return ERR_UNCONFIGURED
+		var needs_queue:bool = true
+		for thread in available_threads:
+			if not thread.get_running():
+				thread.pop_post(operation)
+				thread.semaphore.post()
+				needs_queue = false
+				break
+		if needs_queue:
+			thread_queue.append(operation)
+		mutex.unlock()
+		return OK
 	
 	func _notification(what):
 		if what == NOTIFICATION_PREDELETE:
@@ -8278,7 +8358,7 @@ class _Threading:
 	var current_data_for_single_thread:GDScriptFunctionState = null
 	func single_thread_yield_safe(a):
 		var op = current_data_for_single_thread
-		while op is GDScriptFunctionState:
+		if op is GDScriptFunctionState:
 			op = yield(current_data_for_single_thread,"completed")
 		return op
 	
@@ -8319,6 +8399,7 @@ class _Threading:
 					mutex.unlock()
 					return
 				container.claim_thread_for_process(self,thread_id)
+				var not_async:bool = next_op["not_async"]
 				var current_thread_id:int = next_op["request_id"]
 				var current_object:Object = next_op.get("object",null)
 				var args:Array = next_op.get("args",[])
@@ -8328,14 +8409,15 @@ class _Threading:
 				var out = null
 				if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
 					out = current_object.callv(current_method_call,args)
-					while out is GDScriptFunctionState:
+					if out is GDScriptFunctionState:
 						out = yield(out,"completed")
 				container.mutex.lock()
-				container.thread_return[current_thread_id].append(out)
-				var cr:Array = container.semaphore_store[current_thread_id]
-				cr[0] -= 1
-				if cr[0] < 1:
-					cr[1].post()
+				if not_async:
+					container.thread_return[current_thread_id].append(out)
+					var cr:Array = container.semaphore_store[current_thread_id]
+					cr[0] -= 1
+					if cr[0] < 1:
+						cr[1].post()
 				pop_post(container.thread_queue.pop_front())
 				container.mutex.unlock()
 		
@@ -8646,15 +8728,14 @@ class _Translations:
 		for mod in drivers:
 			if "REPLACE_TRANSLATIONS.gd" in mod["drivers"].keys():
 				processes.append({"object":base,"method":"process_drivers_for_translations","args":[mod["drivers"]["REPLACE_TRANSLATIONS.gd"].get("TRANSLATIONS",{}),markPlaceholders,pointers]})
-		var ml_check_data:Dictionary = {}
 		# April Fool's alcohol!
 		var date:Dictionary = Time.get_date_dict_from_system()
 		if date.month == 4 and date.day == 1:
 			var alocol:Translation = Translation.new()
-			alocol.add_message("H2O","C2H6O".c_unescape())
+			alocol.add_message("H2O","C2H6O")
 			TranslationServer.add_translation(alocol)
-		var dt:Array = pointers.Threading.__request_multiple_threads(processes)
-		for item in dt:
+		var ml_check_data:Dictionary = {}
+		for item in pointers.Threading.__request_multiple_threads(processes):
 			for lang in item.keys():
 				if not lang in ml_check_data:
 					ml_check_data[lang] = item[lang]

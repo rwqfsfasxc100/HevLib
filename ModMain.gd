@@ -57,7 +57,7 @@ func _init(modLoader=ModLoader):
 	var directory:Directory=Directory.new();directory.make_dir_recursive(variables_folder);directory.make_dir_recursive(validation_check_path.get_base_dir())
 	pointers.FileAccess.__load_precached_mods();pointers.ConfigDriver.__load_configs()
 	
-#	testing(modLoader,pointers)
+	testing(modLoader,pointers)
 	
 	recache(pointers)
 	pointers.ManifestV2.__get_mod_versions(true)
@@ -828,8 +828,6 @@ static func load_pointers(modLoader:ModLoader):
 func testing(modLoader:ModLoader,pointers):
 	var file:File = File.new()
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
-	
-	
 	
 	
 	breakpoint

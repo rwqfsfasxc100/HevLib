@@ -499,8 +499,8 @@ class DataFormat:
 					"description":"Loads a resource at the provided filepath and stores it, acting as a boolean to check if it exists or not. Stored objects will be initialized as null, and if the output of this method would be null, will be reflected by the last load.",
 					"args":[
 						"filepath -> (String) the file path to the desired resource to load",
-						"override_cache (optional) -> (bool) whether to load the resource anew, ignoring the cache. Equivalent to the similar property for ResourceLoader.load(). NOTE: Setting this true can be problematic with extended scripts. Defaults to false",
 						"type_hint (optional) -> (String) whether to define a specific resource type that this object has to be. Equivalent to the similar property for ResourceLoader.load(). Defaults to \"\"",
+						"override_cache (optional) -> (bool) whether to load the resource anew, ignoring the cache. Equivalent to the similar property for ResourceLoader.load(). NOTE: Setting this true can be problematic with extended scripts. Defaults to false",
 					],
 					"return":[
 						"Bool for whether the object was loaded or not."
@@ -509,10 +509,10 @@ class DataFormat:
 				"__get_load":{
 					"description":"Fetches the last object loaded by __load_if_can. Note that if the load failed or if the object is invalid, it will null the object, so make sure to use that method to confirm a load before trying to fetch the object.",
 					"args":[
-						"get_last_successful (optional) -> (bool) whether to get the last successfully loaded object by __load_if_can. Since this initializes as null, __load_if_can needs to have been successful at least once. Defaults to false",
+						
 					],
 					"return":[
-						"Bool for whether the object was loaded or not."
+						"The loaded object, or null."
 					]
 				},
 				"__is_valid_url":{

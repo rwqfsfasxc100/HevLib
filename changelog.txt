@@ -30,6 +30,14 @@
 6.6.4=* Returns an array containing all return values of the called functions
 6.6.4.1=* Any function calls that fail or return void will have a null return value
 6.6.4.2=* Output order is NOT deterministic, and is reliant on whichever threads finish first.
+6.7=* `__run_single_async_operation` -> int
+6.7.1=* Similar to `__request_single_thread`, however returns an error code instead of the called function's output and will not block the calling thread.
+6.7.2=* Used if you need to execute thread-safe code as soon as possible. Useful for render or server facing code.
+6.7.3=* Returns `ERR_UNCONFIGURED` if the thread queue has reached the max size in the config, and `OK` in every other instance.
+6.8=* `__run_multiple_async_operations` -> int
+6.8.1=* Similar to `__request_multiple_threads`, however returns an error code instead of the output array and will not block the calling thread.
+6.8.2=* Used if you need to execute thread-safe code as soon as possible. Useful for render or server facing code.
+6.8.3=* Returns `ERR_UNCONFIGURED` if the thread queue has reached the max size in the config, and `OK` in every other instance.
 7=* Added `Tokenizer` class.
 7.1=* Run through a main tokenizer script (a copy can be fetched with `__get_tokenizer()`)
 7.2=* Allows the conversion of source code and compiled source to and from tokens, which is how the engine processes scripts.
@@ -48,6 +56,15 @@
 14.1=* NOTE: This will not transfer your current value. Please double check options here just in case.
 15=* EventDriver's disabled event list now clears on every game reboot.
 16=* A majority of HevLib's config fetches now use an appropriate default value, which should minimize potential issues for new users.
+17=* Improved the efficiency and code footprint of `DataFormat`.`__compile_script_object` when loading a script with initialization arguments
+18=* Improved the `__load_if_can`/`__get_load` pipeline for safely loading data.
+18.1=* Swapped the `type_hint` and `override_cache` operands of `__load_if_can` to mirror `ResourceLoader`.`load`
+18.2=* Removed last successful load functionality.
+18.3=* Loading and fetching now is specific to the calling thread's ID and is mutexed. This permits these functions to be safely used by asynchronous threads.
+19=* Improved boot time by multithreading the following systems:
+19.1=* Mod data processing
+19.2=* Mod zip checks
+19.3=* Translation processing
 20=* Updated credits
 
 [1.17.8]

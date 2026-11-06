@@ -1931,6 +1931,14 @@ const TRANSLATIONS = {
 		"HEVLIB_DISCORDRPC_SECONDARY_SHIP_CONDITION": {
 			"string": "Ship condition: {sensor:ship_status}%",
 			"version_hash": 4065239042
+		},
+		"HEVLIB_CONFIG_MAX_THREAD_QUEUE": {
+			"string": "Maximum thread queue size",
+			"version_hash": 2084730619
+		},
+		"HEVLIB_CONFIG_MAX_THREAD_QUEUE_DESC": {
+			"string": "The maximum size of the thread queue before threads get blocked.\n\nOnly affects async operations. Multithread requests that block\nexecution will still run.",
+			"version_hash": 2760569008
 		}
 	},
 	"de": {

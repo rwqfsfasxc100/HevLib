@@ -162,6 +162,18 @@ HEVLIB_CONFIG_SECTION_POINTERS={
 "name": "HEVLIB_CONFIG_FULL_LOGGING",
 "type": "bool"
 },
+"max_thread_queue": {
+"default": 128.0,
+"description": "HEVLIB_CONFIG_MAX_THREAD_QUEUE_DESC",
+"display_order_position": 9,
+"max": 1024.0,
+"min": 64.0,
+"name": "HEVLIB_CONFIG_MAX_THREAD_QUEUE",
+"require_restart": true,
+"step": 1.0,
+"style": "slider",
+"type": "int"
+},
 "pointer_logging_frame_interval": {
 "default": 2.0,
 "description": "HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL_TOOLTIP",
