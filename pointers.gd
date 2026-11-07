@@ -8604,19 +8604,19 @@ class _Translations:
 					__updateTL_from_dictionary(dict,fullLogging)
 				elif delim is Dictionary:
 					var string : String = delim.get("string","")
-					var mod : String = delim.get("mod","")
-					var section : String = delim.get("section","")
-					var setting : String = delim.get("setting","")
-					var invert:bool = delim.get("invert",false)
-					var val = pointers.ConfigDriver.__get_value(mod,section,setting,null)
-					var do:bool = true
-					if val is bool:
-						do = val
-					if invert:
-						do = !do
-					if do and string:
-						var dict : Dictionary = __translation_file_to_dictionary(file,string)
-						__updateTL_from_dictionary(dict,fullLogging)
+					if string:
+						var mod : String = delim.get("mod","")
+						var section : String = delim.get("section","")
+						var setting : String = delim.get("setting","")
+						var invert:bool = delim.get("invert",false)
+						var val = pointers.ConfigDriver.__get_value(mod,section,setting,null)
+						var do:bool = true
+						if val is bool:
+							do = val
+						if invert:
+							do = !do
+						if do:
+							__updateTL_from_dictionary(__translation_file_to_dictionary(file,string),fullLogging)
 			
 			path.erase("file")
 		for lang in path.keys():
@@ -8626,9 +8626,9 @@ class _Translations:
 			for key in translation_dict.keys():
 				var data = translation_dict[key]
 				if data is String:
-						translationObject.add_message(key,data.c_unescape())
-						if fullLogging:
-							pointers.l("Added translation: %s" % key,"pointers.Translations")
+					translationObject.add_message(key,data.c_unescape())
+					if fullLogging:
+						pointers.l("Added translation: %s" % key,"pointers.Translations")
 				elif data is Dictionary:
 					var string:String = data.get("string","")
 					var mod:String = data.get("mod","")
