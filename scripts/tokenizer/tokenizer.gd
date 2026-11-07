@@ -343,6 +343,7 @@ func __tokens_to_source() -> String:
 	var nodepath_state:int = 0
 	var cont_tabs:int = 0
 	
+	var func_size:int = func_index_array.size() - 1
 	var i:int = 0
 	while i < token_count:
 		var t:int = type_store[i]
@@ -409,13 +410,13 @@ func __tokens_to_source() -> String:
 						return ""
 			TK_BUILT_IN_TYPE:
 				var tid = args_store[i]
-				if not tid is int or not type_names.has(tid):
+				if not tid is int or not tid in type_names:
 					printerr("SCRIPT DECOMPILE ERR: Unknown built-in type id %s at token %d" % [tid, i])
 					return ""
 				text = type_names[tid]
 			TK_BUILT_IN_FUNC:
 				var fid = args_store[i]
-				if not fid is int or fid < 0 or fid >= func_index_array.size():
+				if not fid is int or fid < 0 or fid > func_size:
 					printerr("SCRIPT DECOMPILE ERR: Unknown built-in function id %s at token %d" % [fid, i])
 					return ""
 				text = func_index_array[fid]
@@ -815,10 +816,11 @@ var builtin_classes = ClassDB.get_class_list() + type_index_array
 
 static func stream_string(out:StreamPeerBuffer,s:String)->void:
 	var u:PoolByteArray = s.to_utf8()
-	out.put_u32(u.size())
+	var bytesize:int = u.size()
+	out.put_u32(bytesize)
 	for b in u:
 		out.put_u8(b)
-	for p in (4 - (u.size() % 4)) % 4:
+	for p in (4 - (bytesize % 4)) % 4:
 		out.put_u8(0)
 
 func next_token() -> bool:
@@ -892,117 +894,116 @@ func next_token() -> bool:
 		var n2:int = get_char(2)
 		var tok:int = -1
 		var width:int = 1
-		match ch:
-			KEY_SLASH:
-				if n1 == KEY_EQUAL:
-					tok = TK_OP_ASSIGN_DIV
-					width = 2
+		if ch == KEY_SLASH:
+			if n1 == KEY_EQUAL:
+				tok = TK_OP_ASSIGN_DIV
+				width = 2
+			else:
+				tok = TK_OP_DIV
+		elif ch == KEY_EQUAL:
+			if n1 == KEY_EQUAL:
+				tok = TK_OP_EQUAL
+				width = 2
+			else:
+				tok = TK_OP_ASSIGN
+		elif ch == KEY_LESS:
+			if n1 == KEY_EQUAL:
+				tok = TK_OP_LESS_EQUAL
+				width = 2
+			elif n1 == KEY_LESS:
+				if n2 == KEY_EQUAL:
+					tok = TK_OP_ASSIGN_SHIFT_LEFT
+					width = 3
 				else:
-					tok = TK_OP_DIV
-			KEY_EQUAL:
-				if n1 == KEY_EQUAL:
-					tok = TK_OP_EQUAL
+					tok = TK_OP_SHIFT_LEFT
 					width = 2
+			else:
+				tok = TK_OP_LESS
+		elif ch == KEY_GREATER:
+			if n1 == KEY_EQUAL:
+				tok = TK_OP_GREATER_EQUAL
+				width = 2
+			elif n1 == KEY_GREATER:
+				if n2 == KEY_EQUAL:
+					tok = TK_OP_ASSIGN_SHIFT_RIGHT
+					width = 3
 				else:
-					tok = TK_OP_ASSIGN
-			KEY_LESS:
-				if n1 == KEY_EQUAL:
-					tok = TK_OP_LESS_EQUAL
+					tok = TK_OP_SHIFT_RIGHT
 					width = 2
-				elif n1 == KEY_LESS:
-					if n2 == KEY_EQUAL:
-						tok = TK_OP_ASSIGN_SHIFT_LEFT
-						width = 3
-					else:
-						tok = TK_OP_SHIFT_LEFT
-						width = 2
-				else:
-					tok = TK_OP_LESS
-			KEY_GREATER:
-				if n1 == KEY_EQUAL:
-					tok = TK_OP_GREATER_EQUAL
-					width = 2
-				elif n1 == KEY_GREATER:
-					if n2 == KEY_EQUAL:
-						tok = TK_OP_ASSIGN_SHIFT_RIGHT
-						width = 3
-					else:
-						tok = TK_OP_SHIFT_RIGHT
-						width = 2
-				else:
-					tok = TK_OP_GREATER
-			KEY_EXCLAM:
-				if n1 == KEY_EQUAL:
-					tok = TK_OP_NOT_EQUAL
-					width = 2
-				else:
-					tok = TK_OP_NOT
-			KEY_BRACELEFT: tok = TK_CURLY_BRACKET_OPEN
-			KEY_BRACERIGHT: tok = TK_CURLY_BRACKET_CLOSE
-			KEY_BRACKETLEFT: tok = TK_BRACKET_OPEN
-			KEY_BRACKETRIGHT: tok = TK_BRACKET_CLOSE
-			KEY_PARENLEFT: tok = TK_PARENTHESIS_OPEN
-			KEY_PARENRIGHT: tok = TK_PARENTHESIS_CLOSE
-			KEY_COMMA: tok = TK_COMMA
-			KEY_SEMICOLON: tok = TK_SEMICOLON
-			KEY_QUESTION: tok = TK_QUESTION_MARK
-			KEY_COLON: tok = TK_COLON
-			KEY_DOLLAR: tok = TK_DOLLAR
-			KEY_ASCIICIRCUM:
-				if n1 == KEY_EQUAL:
-					tok = TK_OP_ASSIGN_BIT_XOR
-					width = 2
-				else:
-					tok = TK_OP_BIT_XOR
-			KEY_ASCIITILDE: tok = TK_OP_BIT_INVERT
-			KEY_AMPERSAND:
-				if n1 == KEY_AMPERSAND:
-					tok = TK_OP_AND
-					width = 2
-				elif n1 == KEY_EQUAL:
-					tok = TK_OP_ASSIGN_BIT_AND
-					width = 2
-				else:
-					tok = TK_OP_BIT_AND
-			KEY_BAR:
-				if n1 == KEY_BAR:
-					tok = TK_OP_OR
-					width = 2
-				elif n1 == KEY_EQUAL:
-					tok = TK_OP_ASSIGN_BIT_OR
-					width = 2
-				else:
-					tok = TK_OP_BIT_OR
-			KEY_ASTERISK:
-				if n1 == KEY_EQUAL:
-					tok = TK_OP_ASSIGN_MUL
-					width = 2
-				else:
-					tok = TK_OP_MUL
-			KEY_PLUS:
-				if n1 == KEY_EQUAL:
-					tok = TK_OP_ASSIGN_ADD
-					width = 2
-				else:
-					tok = TK_OP_ADD
-			KEY_MINUS:
-				if n1 == KEY_EQUAL:
-					tok = TK_OP_ASSIGN_SUB
-					width = 2
-				elif n1 == KEY_GREATER:
-					tok = TK_FORWARD_ARROW
-					width = 2
-				else:
-					tok = TK_OP_SUB
-			KEY_PERCENT:
-				if n1 == KEY_EQUAL:
-					tok = TK_OP_ASSIGN_MOD
-					width = 2
-				else:
-					tok = TK_OP_MOD
-			KEY_PERIOD:
-				tok = TK_PERIOD
-		if tok == -1:
+			else:
+				tok = TK_OP_GREATER
+		elif ch == KEY_EXCLAM:
+			if n1 == KEY_EQUAL:
+				tok = TK_OP_NOT_EQUAL
+				width = 2
+			else:
+				tok = TK_OP_NOT
+		elif ch == KEY_BRACELEFT: tok = TK_CURLY_BRACKET_OPEN
+		elif ch == KEY_BRACERIGHT: tok = TK_CURLY_BRACKET_CLOSE
+		elif ch == KEY_BRACKETLEFT: tok = TK_BRACKET_OPEN
+		elif ch == KEY_BRACKETRIGHT: tok = TK_BRACKET_CLOSE
+		elif ch == KEY_PARENLEFT: tok = TK_PARENTHESIS_OPEN
+		elif ch == KEY_PARENRIGHT: tok = TK_PARENTHESIS_CLOSE
+		elif ch == KEY_COMMA: tok = TK_COMMA
+		elif ch == KEY_SEMICOLON: tok = TK_SEMICOLON
+		elif ch == KEY_QUESTION: tok = TK_QUESTION_MARK
+		elif ch == KEY_COLON: tok = TK_COLON
+		elif ch == KEY_DOLLAR: tok = TK_DOLLAR
+		elif ch == KEY_ASCIICIRCUM:
+			if n1 == KEY_EQUAL:
+				tok = TK_OP_ASSIGN_BIT_XOR
+				width = 2
+			else:
+				tok = TK_OP_BIT_XOR
+		elif ch == KEY_ASCIITILDE: tok = TK_OP_BIT_INVERT
+		elif ch == KEY_AMPERSAND:
+			if n1 == KEY_AMPERSAND:
+				tok = TK_OP_AND
+				width = 2
+			elif n1 == KEY_EQUAL:
+				tok = TK_OP_ASSIGN_BIT_AND
+				width = 2
+			else:
+				tok = TK_OP_BIT_AND
+		elif ch == KEY_BAR:
+			if n1 == KEY_BAR:
+				tok = TK_OP_OR
+				width = 2
+			elif n1 == KEY_EQUAL:
+				tok = TK_OP_ASSIGN_BIT_OR
+				width = 2
+			else:
+				tok = TK_OP_BIT_OR
+		elif ch == KEY_ASTERISK:
+			if n1 == KEY_EQUAL:
+				tok = TK_OP_ASSIGN_MUL
+				width = 2
+			else:
+				tok = TK_OP_MUL
+		elif ch == KEY_PLUS:
+			if n1 == KEY_EQUAL:
+				tok = TK_OP_ASSIGN_ADD
+				width = 2
+			else:
+				tok = TK_OP_ADD
+		elif ch == KEY_MINUS:
+			if n1 == KEY_EQUAL:
+				tok = TK_OP_ASSIGN_SUB
+				width = 2
+			elif n1 == KEY_GREATER:
+				tok = TK_FORWARD_ARROW
+				width = 2
+			else:
+				tok = TK_OP_SUB
+		elif ch == KEY_PERCENT:
+			if n1 == KEY_EQUAL:
+				tok = TK_OP_ASSIGN_MOD
+				width = 2
+			else:
+				tok = TK_OP_MOD
+		elif ch == KEY_PERIOD:
+			tok = TK_PERIOD
+		else:
 			printerr(compile_err_header % [line,"Unknown character"])
 			return false
 		push_token(tok)
@@ -1051,7 +1052,7 @@ func read_number_token()->bool:
 			if is_floating or uses_exponent:
 				printerr(compile_err_header % [line,"Invalid numeric constant at '.'"])
 				return false
-			if uses_bin:
+			elif uses_bin:
 				printerr(compile_err_header % [line,"Invalid binary constant at '.'"])
 				return false
 			elif uses_hex:
@@ -1134,9 +1135,7 @@ func read_string_token(ch:int)->bool:
 		if c == 0:
 			printerr(compile_err_header % [line,"Unterminated String"])
 			return false
-		elif mode == 0 and c == KEY_DOUBLEQUOTE:
-			break
-		elif mode == 1 and c == KEY_SINGLEQUOTE:
+		elif (mode == 0 and c == KEY_DOUBLEQUOTE) or (mode == 1 and c == KEY_SINGLEQUOTE):
 			break
 		elif mode == 2 and c == KEY_DOUBLEQUOTE and get_char(i + 1) == KEY_DOUBLEQUOTE and get_char(i + 2) == KEY_DOUBLEQUOTE:
 			i+=2
@@ -1154,40 +1153,39 @@ func read_string_token(ch:int)->bool:
 				printerr(compile_err_header % [line,"Unterminated String"])
 				return false
 			var res:int = 0
-			match nx:
-				97:res = 7 # a
-				98:res = 8 # b
-				116:res = 9 # t
-				110:res = 10 # n
-				118:res = 11 # v
-				102:res = 12 # f
-				114:res = 13 # r
-				KEY_SINGLEQUOTE: res = KEY_SINGLEQUOTE
-				KEY_DOUBLEQUOTE: res = KEY_DOUBLEQUOTE
-				KEY_BACKSLASH: res = KEY_BACKSLASH
-				KEY_SLASH: res = KEY_SLASH
-				117: # u
-					i += 1
-					for j in 4:
-						var hc:int = get_char(i + j)
-						if hc == 0:
-							printerr(compile_err_header % [line,"Unterminated String"])
-							return false
-						var v:int = 0
-						if hc >= KEY_0 and hc <= KEY_9:
-							v = hc - 48
-						elif hc >= 97 and hc <= 102:
-							v = hc - 97 + 10
-						elif hc >= KEY_A and hc <= KEY_Z:
-							v = hc - 65 + 10
-						else:
-							printerr(compile_err_header % [line,"Malformed hex constant in string"])
-							return false
-						res = (res << 4) | v
-					i += 3
-				_:
-					printerr(compile_err_header % [line,"Invalid escape sequence"])
-					return false
+			if nx == 97:res = 7 # a
+			elif nx == 98:res = 8 # b
+			elif nx == 116:res = 9 # t
+			elif nx == 110:res = 10 # n
+			elif nx == 118:res = 11 # v
+			elif nx == 102:res = 12 # f
+			elif nx == 114:res = 13 # r
+			elif nx == KEY_SINGLEQUOTE: res = KEY_SINGLEQUOTE
+			elif nx == KEY_DOUBLEQUOTE: res = KEY_DOUBLEQUOTE
+			elif nx == KEY_BACKSLASH: res = KEY_BACKSLASH
+			elif nx == KEY_SLASH: res = KEY_SLASH
+			elif nx == 117: # u
+				i += 1
+				for j in 4:
+					var hc:int = get_char(i + j)
+					if hc == 0:
+						printerr(compile_err_header % [line,"Unterminated String"])
+						return false
+					var v:int = 0
+					if hc >= KEY_0 and hc <= KEY_9:
+						v = hc - 48
+					elif hc >= 97 and hc <= 102:
+						v = hc - 97 + 10
+					elif hc >= KEY_A and hc <= KEY_Z:
+						v = hc - 65 + 10
+					else:
+						printerr(compile_err_header % [line,"Malformed hex constant in string"])
+						return false
+					res = (res << 4) | v
+				i += 3
+			else:
+				printerr(compile_err_header % [line,"Invalid escape sequence"])
+				return false
 			s += char(res)
 		else:
 			if c == KEY_LINEFEED:
@@ -1202,7 +1200,7 @@ func read_string_token(ch:int)->bool:
 	pos += 1
 	return true
 
-static func radixify(s:String,start:int,radix:int) -> int:
+static func radixify(s:String,start:int,radix_factor:int) -> int:
 	var v:int = 0
 	for k in range(start,s.length()):
 		var c:int = s.ord_at(k)
@@ -1213,9 +1211,9 @@ static func radixify(s:String,start:int,radix:int) -> int:
 			d = c - 97 + 10
 		else:
 			d = c - 65 + 10
-		if (v >> (63 - radix)) != 0:
+		if (v >> (63 - radix_factor)) != 0:
 			return 9223372036854775807
-		v = (v << radix) | d
+		v = (v << radix_factor) | d
 	return v
 
 func push_token(type:int,arg = null) -> void:
@@ -1273,53 +1271,53 @@ func get_string_data() -> String:
 
 func get_const():
 	var header:int = get_uint32()
-	match (header & 0xFF):
-		TYPE_NIL:
+	var vtype:int = (header & 0xFF)
+	if vtype == TYPE_NIL:
+		return null
+	elif vtype == TYPE_BOOL:
+		return get_uint32() != 0
+	elif vtype == TYPE_INT:
+		if (header & (1 << 16)) != 0:
+			return get_uint32() | (get_uint32() << 32)
+		var v:int = get_uint32()
+		if v >= 0x80000000:
+			v -= 0x100000000
+		return v
+	elif vtype == TYPE_REAL:
+		var spb:StreamPeerBuffer = StreamPeerBuffer.new()
+		if (header & (1 << 16)) != 0:
+			spb.data_array = get_next_bytes(8)
+			return spb.get_double()
+		spb.data_array = get_next_bytes(4)
+		return spb.get_float()
+	elif vtype == TYPE_STRING:
+		return get_string_data()
+	elif vtype == TYPE_NODE_PATH:
+		var names:int = get_uint32()
+		if not (names & 0x80000000):
+			printerr("Old-format NodePath constants are not supported")
 			return null
-		TYPE_BOOL:
-			return get_uint32() != 0
-		TYPE_INT:
-			if (header & (1 << 16)) != 0:
-				return get_uint32() | (get_uint32() << 32)
-			var v:int = get_uint32()
-			if v >= 0x80000000:
-				v -= 0x100000000
-			return v
-		TYPE_REAL:
-			var spb:StreamPeerBuffer = StreamPeerBuffer.new()
-			if (header & (1 << 16)) != 0:
-				spb.data_array = get_next_bytes(8)
-				return spb.get_double()
-			spb.data_array = get_next_bytes(4)
-			return spb.get_float()
-		TYPE_STRING:
-			return get_string_data()
-		TYPE_NODE_PATH:
-			var names:int = get_uint32()
-			if not (names & 0x80000000):
-				printerr("Old-format NodePath constants are not supported")
-				return null
-			var name_count:int = names & 0x7FFFFFFF
-			var subname_count:int = get_uint32()
-			var flags:int = get_uint32()
-			if name_count + subname_count > length - pos:
-				printerr("Invalid NodePath constant")
-				return null
-			var name_list:PoolStringArray = PoolStringArray()
-			for i in name_count:
-				name_list.append(get_string_data())
-			var sub_list:PoolStringArray = PoolStringArray()
-			for i in subname_count:
-				sub_list.append(get_string_data())
-			var path:String = name_list.join("/")
-			if flags & 1:
-				path = "/" + path
-			if subname_count > 0:
-				path += ":" + sub_list.join(":")
-			return NodePath(path)
-		var vtype:
-			printerr("Unsupported constant type %d at offset %d" % [vtype, pos])
+		var name_count:int = names & 0x7FFFFFFF
+		var subname_count:int = get_uint32()
+		var flags:int = get_uint32()
+		if name_count + subname_count > length - pos:
+			printerr("Invalid NodePath constant")
 			return null
+		var name_list:PoolStringArray = PoolStringArray()
+		for i in name_count:
+			name_list.append(get_string_data())
+		var sub_list:PoolStringArray = PoolStringArray()
+		for i in subname_count:
+			sub_list.append(get_string_data())
+		var path:String = name_list.join("/")
+		if flags & 1:
+			path = "/" + path
+		if subname_count > 0:
+			path += ":" + sub_list.join(":")
+		return NodePath(path)
+	else:
+		printerr("Unsupported constant type %d at offset %d" % [vtype, pos])
+		return null
 
 const operand_word_tokens = PoolIntArray([TK_IDENTIFIER,TK_SELF,TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_OP_IN,TK_OP_NOT,TK_OP_AND,TK_OP_OR,TK_CF_IF,TK_PR_PUPPETSYNC,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN])
 const operand_end_tokens = PoolIntArray([TK_IDENTIFIER,TK_CONSTANT,TK_SELF,TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_PARENTHESIS_CLOSE,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_CLOSE,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN])
@@ -1375,30 +1373,30 @@ func float_to_string(d:float) -> String:
 func escape_string(s:String,keep_newlines:bool) -> String:
 	var out:String = ""
 	for k in s:
-		match ord(k):
-			KEY_BACKSLASH:
-				out += "\\\\"
-			KEY_DOUBLEQUOTE:
-				out += "\\\""
-			KEY_LINEFEED:
-				out += ("\n" if keep_newlines else "\\n")
-			KEY_HORIZONTALTAB:
-				out += "\\t"
-			KEY_CARRIAGERETURN:
-				out += "\\r"
-			KEY_BELL:
-				out += "\\a"
-			KEY_BACKSPACE:
-				out += "\\b"
-			KEY_VERTICALTAB:
-				out += "\\v"
-			KEY_FORMFEED:
-				out += "\\f"
-			var code:
-				if code < KEY_SPACE or code == 0xFFFF:
-					out += "\\u%04x" % code
-				else:
-					out += k
+		var code:int = ord(k)
+		if code == KEY_BACKSLASH:
+			out += "\\\\"
+		elif code == KEY_DOUBLEQUOTE:
+			out += "\\\""
+		elif code == KEY_LINEFEED:
+			out += ("\n" if keep_newlines else "\\n")
+		elif code == KEY_HORIZONTALTAB:
+			out += "\\t"
+		elif code == KEY_CARRIAGERETURN:
+			out += "\\r"
+		elif code == KEY_BELL:
+			out += "\\a"
+		elif code == KEY_BACKSPACE:
+			out += "\\b"
+		elif code == KEY_VERTICALTAB:
+			out += "\\v"
+		elif code == KEY_FORMFEED:
+			out += "\\f"
+		else:
+			if code < KEY_SPACE or code == 0xFFFF:
+				out += "\\u%04x" % code
+			else:
+				out += k
 	return out
 
 func escape_string_with_quotes(s:String) -> String:
