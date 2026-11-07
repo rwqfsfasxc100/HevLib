@@ -77,7 +77,7 @@ func __get_compiled_bytecode_from_tokens() -> PoolByteArray:
 		var local_token:int = t
 		if t == TK_IDENTIFIER:
 			var id:String = args_store[k]
-			if!id in identifiers:
+			if not id in identifiers:
 				identifier_map[id] = identifiers.size()
 				identifiers.append(id)
 			local_token |= (identifier_map[id] << 8)
@@ -138,7 +138,7 @@ func __get_compiled_bytecode_from_tokens() -> PoolByteArray:
 				out.put_u32(1)
 				out.put_u32(1 if v else 0)
 			TYPE_INT:
-				if v > 2147483647 or v < -2147483648:
+				if abs(v) > 2147483647:
 					out.put_u32(2 | (1 << 16))
 					out.put_64(v)
 				else:
