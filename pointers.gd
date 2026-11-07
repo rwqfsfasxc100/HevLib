@@ -3123,6 +3123,7 @@ class _Equipment:
 					"SERVICES.gd":
 						for i in constants["SERVICES"]:
 							services_store.append(i)
+		
 		var slots_for_adding_dict : Dictionary = {}
 		var tag_modifications : Array = []
 		
@@ -5340,6 +5341,7 @@ class _ManifestV2:
 	func _init(d):
 		non_static["pointers"] = d
 		non_static["self"] = self
+		non_static["mutex"] = Mutex.new()
 	
 	const zip_ref_store : Dictionary = {}
 	const cached_mod_list : Dictionary = {}
@@ -5500,8 +5502,10 @@ class _ManifestV2:
 			var modGlobalPath:String = "res://" + modEntryPath
 			if not modGlobalPath.ends_with("/"):
 				pointers.SafeMode.__check_file(modGlobalPath,modFSPath)
+				non_static["mutex"].lock()
 				if modGlobalPath.to_lower() in modFiles:
 					zip_ref_store[modGlobalPath] = modFSPath
+				non_static["mutex"].unlock()
 	
 	static func __get_mod_list_keys() -> PoolStringArray:
 		if cached_mod_keys.empty():
@@ -8733,7 +8737,8 @@ class _Translations:
 			alocol.add_message("H2O","C2H6O")
 			TranslationServer.add_translation(alocol)
 		var ml_check_data:Dictionary = {}
-		for item in pointers.Threading.__request_multiple_threads(processes):
+		var trl:Array = pointers.Threading.__request_multiple_threads(processes)
+		for item in trl:
 			for lang in item.keys():
 				if not lang in ml_check_data:
 					ml_check_data[lang] = item[lang]
