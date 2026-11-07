@@ -8580,8 +8580,8 @@ class _Translations:
 							size -= 1
 						i += 1
 				var translationID : String = csvLine[0]
-				for i in range(1, size):
-					translations[i - 1].add_message(translationID, csvLine[i].c_unescape())
+				for i in (size - 1):
+					translations[i].add_message(translationID, csvLine[i].c_unescape())
 				if fullLogging:
 					pointers.l("Added translation: %s" % csvLine,"pointers.Translations")
 				translationCount += 1
@@ -8592,7 +8592,7 @@ class _Translations:
 	
 	static func __updateTL_from_dictionary(path:Dictionary, fullLogging:bool = true):
 		var pointers:HevLibPointers = non_static["pointers"]
-		pointers.l("Adding translations from dictionary: %s" % str(path.hash()),"pointers.Translations")
+		pointers.l("Adding translations from dictionary: %d" % path.hash(),"pointers.Translations")
 		var translations : Array = []
 		var translationCount:int = 0
 		if "file" in path:
@@ -8631,20 +8631,21 @@ class _Translations:
 						pointers.l("Added translation: %s" % key,"pointers.Translations")
 				elif data is Dictionary:
 					var string:String = data.get("string","")
-					var mod:String = data.get("mod","")
-					var section:String = data.get("section","")
-					var setting:String = data.get("setting","")
-					var invert:bool = data.get("invert",false)
-					var val = pointers.ConfigDriver.__get_value(mod,section,setting,null)
-					var do = true
-					if val is bool:
-						do = val
-					if invert:
-						do = !do
-					if do and string:
-						translationObject.add_message(key,string.c_unescape())
-					if fullLogging:
-						pointers.l("Added translation: %s" % key,"pointers.Translations")
+					if string:
+						var mod:String = data.get("mod","")
+						var section:String = data.get("section","")
+						var setting:String = data.get("setting","")
+						var invert:bool = data.get("invert",false)
+						var val = pointers.ConfigDriver.__get_value(mod,section,setting,null)
+						var do = true
+						if val is bool:
+							do = val
+						if invert:
+							do = !do
+						if do:
+							translationObject.add_message(key,string.c_unescape())
+						if fullLogging:
+							pointers.l("Added translation: %s" % key,"pointers.Translations")
 			translationCount += 1
 			
 			translations.append(translationObject)
