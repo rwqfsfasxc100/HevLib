@@ -8552,9 +8552,8 @@ class _Translations:
 	static func __updateTL(path:String, delim:String = ",", fullLogging:bool = true):
 		var pointers:HevLibPointers = non_static["pointers"]
 		var file:File = File.new()
-		var fileName : String = path.split("/")[- 1]
-		var folderName : String = path.split(fileName)[0]
-		pointers.l("Adding translations from [%s] in [%s]" % [fileName, folderName],"pointers.Translations")
+		var fileName : String = path.get_file()
+		pointers.l("Adding translations from [%s] in [%s]" % [fileName, path.split(fileName)[0]],"pointers.Translations")
 		file.open(path, File.READ)
 		var translations : Array = []
 		var translationCount:int = 0
@@ -8562,11 +8561,11 @@ class _Translations:
 		if fullLogging:
 			pointers.l("Adding translations as: %s" % csvLine,"pointers.Translations")
 		for i in range(1, csvLine.size()):
-			var translationObject := Translation.new()
+			var translationObject:Translation = Translation.new()
 			translationObject.locale = csvLine[i]
 			translations.append(translationObject)
 		while not file.eof_reached():
-			var line = file.get_line()
+			var line:String = file.get_line()
 			if line.begins_with("#"):
 				continue
 			csvLine = line.split(delim)
@@ -8576,7 +8575,7 @@ class _Translations:
 					var i:int = 0
 					while i < size:
 						if csvLine[i].ends_with("\\") and i < size:
-							csvLine[i] = csvLine[i].rstrip("\\") + delim + csvLine[i + 1]
+							csvLine[i] = csvLine[i].trim_suffix("\\") + delim + csvLine[i + 1]
 							csvLine.remove(i + 1)
 							size -= 1
 						i += 1
@@ -8631,11 +8630,11 @@ class _Translations:
 						if fullLogging:
 							pointers.l("Added translation: %s" % key,"pointers.Translations")
 				elif data is Dictionary:
-					var string = data.get("string","")
-					var mod = data.get("mod","")
-					var section = data.get("section","")
-					var setting = data.get("setting","")
-					var invert = data.get("invert",false)
+					var string:String = data.get("string","")
+					var mod:String = data.get("mod","")
+					var section:String = data.get("section","")
+					var setting:String = data.get("setting","")
+					var invert:bool = data.get("invert",false)
 					var val = pointers.ConfigDriver.__get_value(mod,section,setting,null)
 					var do = true
 					if val is bool:
