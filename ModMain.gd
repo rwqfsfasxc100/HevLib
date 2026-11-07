@@ -59,7 +59,7 @@ func _init(modLoader=ModLoader):
 	pointers.FileAccess.__load_precached_mods()
 	pointers.ConfigDriver.__load_configs()
 	
-	testing(modLoader,pointers)
+#	testing(modLoader,pointers)
 	
 	pointers.ManifestV2.__get_mod_versions(true)
 	pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
