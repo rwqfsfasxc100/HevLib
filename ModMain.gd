@@ -53,13 +53,14 @@ func _init(modLoader=ModLoader):
 	strings.append(pointers_dir)
 	create_zip_for_overrides(handle_pointer_cast_clearing(process_gdnative_plugins(),modLoader),self)
 	var pointers=load_pointers(modLoader)
+	recache(pointers)
 	pointers.FolderAccess.__recursive_delete(variables_folder,PoolStringArray(["remove_pointer_casting.zip"]))
 	var directory:Directory=Directory.new();directory.make_dir_recursive(variables_folder);directory.make_dir_recursive(validation_check_path.get_base_dir())
-	pointers.FileAccess.__load_precached_mods();pointers.ConfigDriver.__load_configs()
+	pointers.FileAccess.__load_precached_mods()
+	pointers.ConfigDriver.__load_configs()
 	
 	testing(modLoader,pointers)
 	
-	recache(pointers)
 	pointers.ManifestV2.__get_mod_versions(true)
 	pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
 	
@@ -279,7 +280,7 @@ static func recache(pointers):
 	file.open(complementary_store,File.WRITE)
 	file.store_string(JSON.print(pointers.ManifestV2.__check_complementary()))
 	file.close()
-const remap_str:String="[remap]\n\npath=\"%s\"\n"
+const remap_str:String="[remap]\n\npath=\"res://%s\"\n"
 static func process_gdnative_plugins()->Dictionary:
 	var fetchPaths:Dictionary={}
 	var exePath:String=OS.get_executable_path().get_base_dir()+"/hevlib_dll_store/"
@@ -393,6 +394,7 @@ static func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLo
 			if comment_len>0:current_offset+=comment_len
 			if file_name.get_extension()=="gd":script_paths.append(file_name)
 	if script_paths:
+		var tokenizer = load("res://HevLib/scripts/tokenizer/tokenizer.gd").new()
 		Directory.new().make_dir_recursive("user://cache/.HevLib_Cache/Variable_Fetch/")
 		for sc in script_paths:
 			if sc.get_file()=="DEFINED_CLASS_NAMES.gd"&&sc.split("/",false)[-2]in driver_dirs:
@@ -420,7 +422,8 @@ static func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLo
 				replacements[remapped_path]=PoolByteArray()
 			elif regex.search(text) is RegExMatch:
 				replacements[script+".remap"]=(remap_str%remapped_path).to_utf8()
-				replacements[remapped_path]=remove_type_casting(text,class_refs).to_utf8()
+				replacements[remapped_path]=tokenizer.__decast_source(text,class_names_to_clear,class_refs).to_utf8()
+#				replacements[remapped_path]=remove_type_casting(text,class_refs).to_utf8()
 	return replacements
 static func create_zip_for_overrides(replacements:Dictionary,md:Node):
 	if replacements:
@@ -511,238 +514,6 @@ static func create_zip_for_overrides(replacements:Dictionary,md:Node):
 		file.store_buffer(buffer)
 		file.close()
 		ProjectSettings.load_resource_pack(castFile)
-const blankspace:PoolStringArray=PoolStringArray([" ","\t","\n"])
-enum{TOKEN_COMMENT,TOKEN_STRING,TOKEN_NUMBER,TOKEN_IDENTIFIER,TOKEN_SYMBOL}
-static func remove_type_casting(source_code:String,class_data:Dictionary)->String:
-	source_code=source_code.replace("\r","")
-	var tokens:Array=Array()
-	var class_names:PoolStringArray=PoolStringArray(class_data.keys())
-	var length:int=source_code.length()
-	var i:int=0
-	var comment_starter:PoolStringArray=PoolStringArray(["'","\""])
-	var additional_nums:PoolStringArray=PoolStringArray([".","_","x","a","b","c","d","e","f"])
-	while i<length:
-		var c:String=source_code[i]
-		if c in blankspace:# Skip blankspace/newlines
-			i+=1
-			continue
-		if c=="#":# Skip comments
-			var cstart:int=i
-			while i<length&&source_code[i]!="\n":i+=1
-			tokens.append({"type":TOKEN_COMMENT,"text":source_code.substr(cstart,i-cstart),"start":cstart,"end":i})
-			continue
-		if c in comment_starter:# String handling
-			var sstart:int=i
-			if (i+2<length&&source_code[i+1]==c&&source_code[i+2]==c):# If triple quote comment
-				i+=3
-				while i<length:
-					if source_code[i]=="\\":
-						i+=2
-						continue
-					if i+2<length&&source_code[i]==c&&source_code[i+1]==c&&source_code[i+2]==c:
-						i+=3
-						break
-					i+=1
-			else:
-				i+=1
-				while i<length:
-					if source_code[i]=="\\":
-						i+=2
-						continue
-					if source_code[i]==c:
-						i+=1
-						break
-					if source_code[i]=="\n":break
-					i+=1
-			tokens.append({"type":TOKEN_STRING,"text":source_code.substr(sstart,i-sstart),"start":sstart,"end":i})
-			continue
-		if word_is_number(ord(c))||(c=="."&&i+1<length&&word_is_number(ord(source_code[i+1]))):# Handle ints&&floats
-			var nstart:int=i
-			while i<length:
-				var nc:String=source_code[i].to_lower()
-				if word_is_number(ord(nc))||nc in additional_nums:i+=1
-				else:break
-			tokens.append({"type":TOKEN_NUMBER,"text":source_code.substr(nstart,i-nstart),"start":nstart,"end":i})
-			continue
-		if c=="_"||word_is_alpha(ord(c)):# Identifier literals
-			var istart:int=i
-			while i<length&&(source_code[i]=="_"||word_is_alpha(ord(source_code[i]))||word_is_number(ord(source_code[i]))):i+=1
-			tokens.append({"type":TOKEN_IDENTIFIER,"text":source_code.substr(istart,i-istart),"start":istart,"end":i})
-			continue
-		if c=="-"&&i+1<length&&source_code[i+1]==">":# Function type cast
-			tokens.append({"type":TOKEN_SYMBOL,"text":"->","start":i,"end":i+2})
-			i+=2
-			continue
-		if c==":"&&i+1<length&&source_code[i+1]=="=":# Auto type cast
-			tokens.append({"type":TOKEN_SYMBOL,"text":":=","start":i,"end":i+2})
-			i+=2
-			continue
-		tokens.append({"type":TOKEN_SYMBOL,"text":c,"start":i,"end":i+1})
-		i+=1
-	var modifications:Array=Array()
-	i=0
-	var n:int=tokens.size()
-	while i<n:
-		var t:Dictionary=tokens[i]
-		var ttype:int=t.type
-		match ttype:
-			TOKEN_IDENTIFIER:
-				pass
-			TOKEN_COMMENT:
-				modifications.append({"start":t.start,"end":t.end,"text":""})
-			_:
-				i+=1
-				continue
-		if t.text=="var"||t.text=="const":
-			i+=1
-			if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
-				var name_tok:Dictionary=tokens[i]
-				i+=1
-				if i<n&&tokens[i].type==TOKEN_SYMBOL&&tokens[i].text==":":
-					i+=1
-					if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
-						var path_info:Dictionary=check_following_tokens(tokens,i,n)
-						i=path_info.next_i
-						if path_info.base in class_names:
-							modifications.append({"start":name_tok.end,"end":path_info.end,"text":""})
-			continue
-		elif t.text=="func":
-			i+=1
-			if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
-				i+=1
-			if (i<n&&tokens[i].type==TOKEN_SYMBOL&&tokens[i].text=="("):
-				i+=1
-				var depth:int=1
-				var expect_name:bool=true
-				var just_saw_name:bool=false
-				var current_name_end:int=-1
-				var close_paren_end:int=-1
-				while i<n&&depth>0:
-					var tk:Dictionary=tokens[i]
-					if tk.type==TOKEN_SYMBOL&&(tk.text=="("||tk.text=="["||tk.text=="{"):
-						depth+=1
-						just_saw_name=false
-						i+=1
-						continue
-					if tk.type==TOKEN_SYMBOL&&(tk.text==")"||tk.text=="]"||tk.text=="}"):
-						depth -= 1
-						if depth==0:
-							close_paren_end=tk.end
-							i+=1
-							break
-						just_saw_name=false
-						i+=1
-						continue
-					if depth==1&&tk.type==TOKEN_SYMBOL&&tk.text==",":
-						expect_name=true
-						just_saw_name=false
-						i+=1
-						continue
-					if depth==1&&tk.type==TOKEN_SYMBOL&&tk.text==":"&&just_saw_name:
-						i+=1
-						just_saw_name=false
-						if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
-							var p_path:Dictionary=check_following_tokens(tokens,i,n)
-							i=p_path.next_i
-							if p_path.base in class_names:
-								modifications.append({"start":current_name_end,"end":p_path.end,"text":""})
-						continue
-					if tk.type==TOKEN_IDENTIFIER&&expect_name:
-						current_name_end=tk.end
-						expect_name=false
-						just_saw_name=true
-						i+=1
-						continue
-					if tk.type==TOKEN_IDENTIFIER:
-						if tk.text in class_names:
-							modifications.append({"start":tk.start,"end":tk.end,"text":"load(\""+escape_text(class_data[tk.text])+"\")"})
-						just_saw_name=false
-						i+=1
-						continue
-					just_saw_name=false
-					i+=1
-				if close_paren_end!=-1&&i<n&&tokens[i].type==TOKEN_SYMBOL&&tokens[i].text=="->":
-					i+=1
-					if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
-						var ret_path:Dictionary=check_following_tokens(tokens,i,n)
-						i=ret_path.next_i
-						if ret_path.base in class_names:
-							modifications.append({"start":close_paren_end,"end":ret_path.end,"text":""})
-			continue
-		elif t.text=="export":
-			var export_tok:Dictionary=tokens[i]
-			i+=1
-			if (i<n&&tokens[i].type==TOKEN_SYMBOL&&tokens[i].text=="("):
-				i+=1
-				var depth:int=1
-				var top_level_tokens:Array=Array()
-				var close_tok=null
-				while i<n&&depth>0:
-					var tk:Dictionary=tokens[i]
-					if tk.type==TOKEN_SYMBOL&&(tk.text=="("||tk.text=="["||tk.text=="{"):
-						depth+=1
-						top_level_tokens.append(tk)
-						i+=1
-						continue
-					if tk.type==TOKEN_SYMBOL&&(tk.text==")"||tk.text=="]"||tk.text=="}"):
-						depth -= 1
-						if depth==0:
-							close_tok=tk
-							i+=1
-							break
-						top_level_tokens.append(tk)
-						i+=1
-						continue
-					if depth==1:
-						top_level_tokens.append(tk)
-					i+=1
-				if close_tok!=null&&top_level_tokens.size()==1:
-					var only:Dictionary=top_level_tokens[0]
-					if only.type==TOKEN_IDENTIFIER&&only.text in class_names:
-						modifications.append({"start":export_tok.end,"end":close_tok.end,"text":"","eat_trailing_space":true})
-			continue
-		elif t.text=="extends":
-			i+=1
-			if i<n&&tokens[i].type==TOKEN_IDENTIFIER&&tokens[i].text in class_names:
-				var ext_tok:Dictionary=tokens[i]
-				modifications.append({"start":ext_tok.start,"end":ext_tok.end,"text":"\""+escape_text(class_data[ext_tok.text])+"\""})
-				i+=1
-			continue
-		elif t.text=="class_name"||t.text=="class":
-			i+=1
-			if i<n&&tokens[i].type==TOKEN_IDENTIFIER:
-				i+=1
-			continue
-		else:
-			if t.text in class_names:
-				modifications.append({"start":t.start,"end":t.end,"text":"load(\""+escape_text(class_data[t.text])+"\")"})
-			i+=1
-			continue
-	var result:String=""
-	var cursor:int=0
-	for e in modifications:
-		result+=source_code.substr(cursor,e.start-cursor)
-		result+=e.text
-		var end:int=e.end
-		if"eat_trailing_space"in e&&end<length&&source_code[end]==" ":
-			end+=1
-		cursor=end
-	result+=source_code.substr(cursor,length-cursor)
-	return result
-static func check_following_tokens(tokens:Array,i:int,n:int)->Dictionary:
-	var base_text:String=tokens[i].text
-	var end:int=tokens[i].end
-	i+=1
-	while i+1<n&&tokens[i].type==TOKEN_SYMBOL&&tokens[i].text=="."&&tokens[i+1].type==TOKEN_IDENTIFIER:
-		end=tokens[i+1].end
-		i+=2
-	return{"base":base_text,"end":end,"next_i":i}
-static func escape_text(s:String)->String:
-	return s.replace("\\","\\\\").replace("\"","\\\"")
-static func word_is_number(c:int)->bool:
-	return c>47&&c<58
-static func word_is_alpha(c:int)->bool:
-	return(c>96&&c<123)||(c>64&&c<91)
 var crcTables:Reference=load(get_script().resource_path.get_base_dir()+"/scripts/crc32_table_cache.gd")
 var crc_table_0:Array=crcTables.T0;var crc_table_1:Array=crcTables.T1;var crc_table_2:Array=crcTables.T2;var crc_table_3:Array=crcTables.T3
 var crc_table_4:Array=crcTables.T4;var crc_table_5:Array=crcTables.T5;var crc_table_6:Array=crcTables.T6;var crc_table_7:Array=crcTables.T7

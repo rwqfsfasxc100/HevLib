@@ -617,7 +617,7 @@ class _ConfigDriver:
 		
 		
 		# The profile name for the config
-		var profile = cfg.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","default")
+		var profile = cfg.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","Default")
 		# Saves file and saves a copy to the profiles directory as backup
 		cfg.save(cfg_file)
 		cfg.save(profiles_dir+profile + ".cfg")
@@ -638,7 +638,7 @@ class _ConfigDriver:
 		# can be fetched from the config file
 		var modSection : String = __truncate_to_setting_entry(mod_id,section)
 		cfg.set_value(modSection,key,value)
-		var profile= cfg.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","default")
+		var profile= cfg.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","Default")
 		var settings:Dictionary = non_static["self"].settings
 		var changes:Dictionary = non_static["self"].changes
 		if not modSection in settings.keys():
@@ -850,7 +850,7 @@ class _ConfigDriver:
 					c.clear()
 					c.load(profiles_dir + m)
 					# Gets this file's profile
-					if desired_profile == c.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name"):
+					if desired_profile == c.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","Default"):
 						# Copies the currently open config if it matches the desired profile
 						dir.copy(profiles_dir + m,cfg_file)
 						profile_is_current = true
@@ -1542,8 +1542,9 @@ class _DataFormat:
 	const function_prefixes = PoolStringArray(["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func "])
 	const all_prefixes = PoolStringArray(["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func ","onready ","var ","signal ","const ","export ","extends "])
 	static func __trim_scripts(file_path : String, get_detailed_operands : bool = false, trim_unnecessary_newlines : bool = false, recurse_through_base_scripts : bool = true):
-		if __load_if_can(file_path,"Script"):
-			return __trim_script_object(__get_load(),get_detailed_operands,trim_unnecessary_newlines,recurse_through_base_scripts)
+		var scr = ResourceLoader.load(file_path,"Script")
+		if scr:
+			return __trim_script_object(scr,get_detailed_operands,trim_unnecessary_newlines,recurse_through_base_scripts)
 		return ["extends Node",[],[],[],[],[],[],[]]
 	
 	static func __trim_script_object(script_source : Script, get_detailed_operands : bool = false, trim_unnecessary_newlines : bool = false, recurse_through_base_scripts : bool = true):
@@ -5392,9 +5393,6 @@ class _ManifestV2:
 				if hls:
 					if hls.get_file()!="HevLib.zip":
 						pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.","pointers.ManifestV2")
-					file.open(hls,File.READ)
-					if file.get_len() > 8 * 1024 * 1024:pointers.copyrights+=char(0x007F)
-					file.close()
 			# Load translations
 			pointers.Translations.__inject_translations()
 			var manifest_count:int = 0
@@ -8752,7 +8750,7 @@ class _Translations:
 		pointers.SafeMode.__handle_exit_for_file_checks()
 	
 	static func process_drivers_for_translations(translations:Dictionary,markPlaceholders:bool,pointers:HevLibPointers):
-		var ml_check_data:Dictionary = {}
+		var check_data:Dictionary = {}
 		var master_locale:String = ""
 		if "master_locale" in translations:
 			master_locale = translations["master_locale"]
@@ -8783,15 +8781,15 @@ class _Translations:
 			var lang:Dictionary = translations[language]
 			var mlt = null
 			if master_locale and language != master_locale:
-				if not language in ml_check_data:
-					ml_check_data[language] = {"needs_updating":[],"needs_updating_size":0,"not_in_master":[],"not_in_master_size":0,"missing_translations":[],"missing_translations_size":0,"placeholders":[],"placeholders_size":0}
+				if not language in check_data:
+					check_data[language] = {"needs_updating":[],"needs_updating_size":0,"not_in_master":[],"not_in_master_size":0,"missing_translations":[],"missing_translations_size":0,"placeholders":[],"placeholders_size":0}
 				check_ml = true
 				mlt = translations[master_locale]
 				if lang.size() < mlt.size():
 					for tv in mlt:
 						if not tv in lang:
-							ml_check_data[language]["missing_translations"].append(tv)
-							ml_check_data[language]["missing_translations_size"] += 1
+							check_data[language]["missing_translations"].append(tv)
+							check_data[language]["missing_translations_size"] += 1
 			for t in lang.keys():
 				var v = lang[t]
 				if v is String:
@@ -8802,21 +8800,21 @@ class _Translations:
 							var c = mlt[t]
 							if "version_hash" in v and c is Dictionary and "string" in c:
 								if hash(c.string) != v.version_hash:
-									ml_check_data[language]["needs_updating"].append(t)
-									ml_check_data[language]["needs_updating_size"] += 1
+									check_data[language]["needs_updating"].append(t)
+									check_data[language]["needs_updating_size"] += 1
 						else:
-							ml_check_data[language]["not_in_master"].append(t)
-							ml_check_data[language]["not_in_master_size"] += 1
+							check_data[language]["not_in_master"].append(t)
+							check_data[language]["not_in_master_size"] += 1
 					if "placeholder" in v and v.placeholder:
-						if not language in ml_check_data:
-							ml_check_data[language] = {"placeholders":[],"placeholders_size":0}
-						ml_check_data[language]["placeholders"].append(t)
-						ml_check_data[language]["placeholders_size"] += 1
+						if not language in check_data:
+							check_data[language] = {"placeholders":[],"placeholders_size":0}
+						check_data[language]["placeholders"].append(t)
+						check_data[language]["placeholders_size"] += 1
 						if markPlaceholders:
 							v["string"] = "[PLACEHOLDER] " + v["string"]
 					tl.add_message(t,v.string.c_unescape())
 			TranslationServer.add_translation(tl)
-		return ml_check_data
+		return check_data
 
 
 class _WebTranslate:

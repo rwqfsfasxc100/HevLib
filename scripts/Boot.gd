@@ -33,6 +33,7 @@
 extends "res://Boot.gd"
 
 func _ready():
+	print("Time to boot: ",OS.get_ticks_msec())
 	# Update checks
 	var pt:HevLibPointers = ModLoader._savedObjects[0]
 	yield(get_tree(),"idle_frame")

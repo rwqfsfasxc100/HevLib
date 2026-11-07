@@ -316,7 +316,7 @@ func __tokens_to_source() -> String:
 		nesting_level[i] = level
 		if t == TK_PARENTHESIS_OPEN or t == TK_BRACKET_OPEN or t == TK_CURLY_BRACKET_OPEN:
 			depth += 1
-		elif t == TK_PARENTHESIS_CLOSE or t == TK_BRACKET_CLOSE or TK_CURLY_BRACKET_CLOSE:
+		elif t == TK_PARENTHESIS_CLOSE or t == TK_BRACKET_CLOSE or t == TK_CURLY_BRACKET_CLOSE:
 			var d1:int = depth - 1
 			depth = d1 if d1 > 0 else 0
 		elif t == TK_NEWLINE:
@@ -487,7 +487,6 @@ func __tokens_to_source() -> String:
 		source += "\n"
 	
 	return source
-
 enum{
 	TK_EMPTY,TK_IDENTIFIER,TK_CONSTANT,TK_SELF,TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_OP_IN,TK_OP_EQUAL,
 	TK_OP_NOT_EQUAL,TK_OP_LESS,TK_OP_LESS_EQUAL,TK_OP_GREATER,TK_OP_GREATER_EQUAL,TK_OP_AND,TK_OP_OR,
@@ -502,6 +501,105 @@ enum{
 	TK_BRACKET_OPEN,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_OPEN,TK_CURLY_BRACKET_CLOSE,TK_PARENTHESIS_OPEN,
 	TK_PARENTHESIS_CLOSE,TK_COMMA,TK_SEMICOLON,TK_PERIOD,TK_QUESTION_MARK,TK_COLON,TK_DOLLAR,TK_FORWARD_ARROW,
 	TK_NEWLINE,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN,TK_ERROR,TK_EOF,TK_CURSOR,TK_MAX}
+
+const load_type_signature = PoolIntArray([TK_BUILT_IN_FUNC,TK_PARENTHESIS_OPEN,TK_CONSTANT,TK_PARENTHESIS_CLOSE])
+const load_args_signature = Array([76,null,"",null])
+
+func __decast_source(source_code:String,class_names_to_clear:PoolStringArray,casting_to_replace:Dictionary) -> String:
+	source_code = source_code.replace("\r","")
+	var has_class_name:bool = (source_code.begins_with("class_name") or "\nclass_name" in source_code)
+	var needs_recompile:bool = has_class_name
+	var check_for_these_classes:PoolStringArray = PoolStringArray()
+	for i in class_names_to_clear:
+		if i in source_code:
+			needs_recompile = true
+	if not needs_recompile:
+		return source_code
+	__source_to_tokens(source_code)
+
+	var token_count:int = type_store.size()
+	var idx:int = 0
+	var new_type_store:PoolIntArray = PoolIntArray()
+	var new_line_store:PoolIntArray = PoolIntArray()
+	var new_args_store:Array = Array()
+
+	var need_class_name_handling:bool = has_class_name
+	while idx < token_count:
+		var this_type:int = type_store[idx]
+		var this_type_literal:String = token_lookup[this_type]
+		var this_arg = args_store[idx]
+		var this_line:int = line_store[idx]
+		if this_type == TK_PR_VAR:
+			new_type_store.append(this_type)
+			new_args_store.append(this_arg)
+			new_line_store.append(this_line)
+			new_type_store.append(type_store[idx + 1])
+			new_args_store.append(args_store[idx + 1])
+			new_line_store.append(line_store[idx + 1])
+			idx += 2
+			if type_store[idx] == TK_COLON:
+				idx += 1
+				var nex_tok:int = type_store[idx]
+				while not (nex_tok == TK_OP_ASSIGN or nex_tok == TK_NEWLINE or nex_tok == TK_EOF or nex_tok == TK_PR_SETGET):
+					idx += 1
+					nex_tok = type_store[idx]
+				new_type_store.append(type_store[idx])
+				new_args_store.append(args_store[idx])
+				new_line_store.append(line_store[idx])
+				idx += 1
+		elif this_type == TK_PR_FUNCTION:
+			new_type_store.append(this_type)
+			new_args_store.append(this_arg)
+			new_line_store.append(this_line)
+			new_type_store.append(type_store[idx + 1])
+			new_args_store.append(args_store[idx + 1])
+			new_line_store.append(line_store[idx + 1])
+			new_type_store.append(type_store[idx + 2])
+			new_args_store.append(args_store[idx + 2])
+			new_line_store.append(line_store[idx + 2])
+			idx += 3
+			var depth:int = 1
+			while depth > 0:
+				var cur_type:int = type_store[idx]
+				var type:String = token_lookup[cur_type]
+				if cur_type == TK_PARENTHESIS_CLOSE or cur_type == TK_BRACKET_CLOSE or cur_type == TK_CURLY_BRACKET_CLOSE:
+					depth -= 1
+				elif cur_type == TK_PARENTHESIS_OPEN or cur_type == TK_BRACKET_OPEN or cur_type == TK_CURLY_BRACKET_OPEN:
+					depth += 1
+				elif depth == 1 and cur_type == TK_COLON:
+					var nex_arg = args_store[idx + 1]
+					if nex_arg is String and nex_arg in class_names_to_clear:
+						idx += 2
+						var nex_type:int = type_store[idx]
+						var cr:String = token_lookup[nex_type]
+						while not (nex_type == TK_COMMA or nex_type == TK_OP_ASSIGN or nex_type == TK_PARENTHESIS_CLOSE):
+							idx += 1
+							nex_type = type_store[idx]
+						continue
+				new_type_store.append(type_store[idx])
+				new_args_store.append(args_store[idx])
+				new_line_store.append(line_store[idx])
+				idx += 1
+		elif this_type == TK_IDENTIFIER and this_arg in class_names_to_clear:
+			new_type_store.append_array(load_type_signature)
+			new_args_store.append_array([76,null,casting_to_replace[this_arg],null])
+			new_line_store.append_array(PoolIntArray([this_line,this_line,this_line,this_line]))
+			idx += 1
+		elif this_type == TK_FORWARD_ARROW:
+			idx += 2
+		elif need_class_name_handling and this_type == TK_PR_CLASS_NAME:
+			idx += 2
+			need_class_name_handling = false
+		else:
+			new_args_store.append(this_arg)
+			new_type_store.append(this_type)
+			new_line_store.append(this_line)
+			idx += 1
+	type_store = new_type_store
+	args_store = new_args_store
+	line_store = new_line_store
+	return __tokens_to_source()
+
 const token_list = PoolIntArray([TK_EMPTY,TK_IDENTIFIER,TK_CONSTANT,TK_SELF,TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_OP_IN,TK_OP_EQUAL,
 	TK_OP_NOT_EQUAL,TK_OP_LESS,TK_OP_LESS_EQUAL,TK_OP_GREATER,TK_OP_GREATER_EQUAL,TK_OP_AND,TK_OP_OR,
 	TK_OP_NOT,TK_OP_ADD,TK_OP_SUB,TK_OP_MUL,TK_OP_DIV,TK_OP_MOD,TK_OP_SHIFT_LEFT,TK_OP_SHIFT_RIGHT,TK_OP_ASSIGN,
