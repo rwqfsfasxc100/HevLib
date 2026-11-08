@@ -7690,6 +7690,7 @@ class _SafeMode:
 			file.open(validation_check_path,File.READ)
 			validation_check = JSON.parse(file.get_as_text()).result
 			file.close()
+		for m in ModLoader.get_meta_list():ModLoader.remove_meta(m)
 		if validation_check.get("hevlib_cache_version",-1) != HEVLIB_CACHE_VERSION or !deep_equal(PoolIntArray(validation_check.get("vanilla_version",PoolIntArray([1,0,0]))),vanilla_version) or !file.file_exists(validation_check_path) or !file.file_exists(pck_file_paths_store) or !file.file_exists(vanilla_load_order_store) or !file.file_exists(dependancy_lookup_store) or !file.file_exists(dependancy_dictionary_store) or pointers.ManifestV2.haveModsChanged:
 			pointers.l("Game has updated or cache is missing, rebuilding file info cache.")
 			pointers.FolderAccess.__recursive_delete(safemode_dir)

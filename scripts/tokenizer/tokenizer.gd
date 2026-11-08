@@ -84,23 +84,23 @@ func __get_compiled_bytecode_from_tokens() -> PoolByteArray:
 		elif t == TK_CONSTANT:
 			var constant_val = args_store[k]
 			var key:String = ""
-			match typeof(constant_val):
-				TYPE_NIL:
-					key = "nil"
-				TYPE_BOOL:
-					key = "b" + str(constant_val)
-				TYPE_INT:
-					key = "i" + str(constant_val)
-				TYPE_REAL:
-					var tmp:StreamPeerBuffer = StreamPeerBuffer.new()
-					tmp.put_double(constant_val)
-					key = "f" + str(tmp.data_array)
-				TYPE_STRING:
-					key = "s" + constant_val
-				TYPE_NODE_PATH:
-					key = "n" + str(constant_val)
-				_:
-					key = "?" + str(constant_val)
+			var ct:int = typeof(constant_val)
+			if ct == TYPE_NIL:
+				key = "nil"
+			elif ct == TYPE_BOOL:
+				key = "b" + str(constant_val)
+			elif ct == TYPE_INT:
+				key = "i" + str(constant_val)
+			elif ct == TYPE_REAL:
+				var tmp:StreamPeerBuffer = StreamPeerBuffer.new()
+				tmp.put_double(constant_val)
+				key = "f" + str(tmp.data_array)
+			elif ct == TYPE_STRING:
+				key = "s" + constant_val
+			elif ct == TYPE_NODE_PATH:
+				key = "n" + str(constant_val)
+			else:
+				key = "?" + str(constant_val)
 			if not key in constants:
 				constant_map[key] = constants.size()
 				constants.append(constant_val)

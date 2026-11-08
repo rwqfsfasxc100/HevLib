@@ -56,8 +56,7 @@ func _init(modLoader=ModLoader):
 	recache(pointers)
 	pointers.FolderAccess.__recursive_delete(variables_folder,PoolStringArray(["remove_pointer_casting.zip"]))
 	var directory:Directory=Directory.new();directory.make_dir_recursive(variables_folder);directory.make_dir_recursive(validation_check_path.get_base_dir())
-	pointers.FileAccess.__load_precached_mods()
-	pointers.ConfigDriver.__load_configs()
+	pointers.FileAccess.__load_precached_mods();pointers.ConfigDriver.__load_configs()
 	
 #	testing(modLoader,pointers)
 	
@@ -420,10 +419,10 @@ static func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLo
 			if regex2.search(text) is RegExMatch:
 				replacements[script+".remap"]=(remap_str%remapped_path).to_utf8()
 				replacements[remapped_path]=PoolByteArray()
+				replacements[script]=PoolByteArray()
 			elif regex.search(text) is RegExMatch:
 				replacements[script+".remap"]=(remap_str%remapped_path).to_utf8()
 				replacements[remapped_path]=tokenizer.__decast_source(text,class_names_to_clear,class_refs).to_utf8()
-#				replacements[remapped_path]=remove_type_casting(text,class_refs).to_utf8()
 	return replacements
 static func create_zip_for_overrides(replacements:Dictionary,md:Node):
 	if replacements:
