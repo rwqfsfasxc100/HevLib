@@ -65,7 +65,8 @@
 19.1=* Mod data processing
 19.2=* Mod zip checks
 19.3=* Translation processing
-20=* Updated credits
+20=* Class cast removal code has been improved to use the full tokenizer system
+25=* Updated credits
 
 [1.17.8]
 

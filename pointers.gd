@@ -2452,46 +2452,48 @@ class _Equipment:
 	
 	var validation_check_path:String = "user://cache/.HevLib_Cache/SafeMode/recache_validation.json"
 	
+	const vanilla_slot_types : Dictionary = {
+		"MainWeaponSlot": "weaponSlot.main.type",
+		"MainLowWeaponSlot": "weaponSlot.mainLow.type",
+		"LeftHighStress": "weaponSlot.mainLeft.type",
+		"RightHighStress": "weaponSlot.mainRight.type",
+		"LeftWeaponSlot": "weaponSlot.left.type",
+		"MiddleLeftWeaponSlot": "weaponSlot.middleLeft.type",
+		"RightWeaponSlot": "weaponSlot.right.type",
+		"MiddleRightWeaponSlot": "weaponSlot.middleRight.type",
+		"LeftDroneSlot": "weaponSlot.leftDrone.type",
+		"RightDroneSlot": "weaponSlot.rightDrone.type",
+		"LeftRearSlot": "weaponSlot.leftBack.type",
+		"RightRearSlot": "weaponSlot.rightBack.type",
+		"LeftBay1": "weaponSlot.leftBay1.type",
+		"RightBay1": "weaponSlot.rightBay1.type",
+		"LeftBay2": "weaponSlot.leftBay2.type",
+		"RightBay2": "weaponSlot.rightBay2.type",
+		"LeftBay3": "weaponSlot.leftBay3.type",
+		"RightBay3": "weaponSlot.rightBay3.type",
+		"AmmunitionDelivery": "ammo.capacity",
+		"DisposableDrones": "drones.capacity",
+		"Propellant": "fuel.capacity",
+		"Thrusters": "propulsion.rcs",
+		"Torches": "propulsion.main",
+		"Rods": "reactor.power",
+		"Capacitor": "capacitor.capacity",
+		"Turbine": "turbine.power",
+		"AuxilaryPower": "aux.power",
+		"CargoBay": "cargo.equipment",
+		"Autopilot": "autopilot.type",
+		"Hud": "hud.type",
+		"Lidar": "lidar.type",
+		"ReconDrone": "drone.scanner"
+	}
+	
 	func __make_upgrades_scene():
 		var exhaust_cache_path : String = "user://cache/.HevLib_Cache/AuxAndThrusterDriver/"
 		pointers.FolderAccess.__check_folder_exists(exhaust_cache_path)
 		version = pointers.DataFormat.__get_vanilla_version()
 		pointers.l("observed game version of %d.%d.%d" % Array(version),"pointers.Equipment")
 		
-		var vanilla_slot_types : Dictionary = {
-			"MainWeaponSlot": "weaponSlot.main.type",
-			"MainLowWeaponSlot": "weaponSlot.mainLow.type",
-			"LeftHighStress": "weaponSlot.mainLeft.type",
-			"RightHighStress": "weaponSlot.mainRight.type",
-			"LeftWeaponSlot": "weaponSlot.left.type",
-			"MiddleLeftWeaponSlot": "weaponSlot.middleLeft.type",
-			"RightWeaponSlot": "weaponSlot.right.type",
-			"MiddleRightWeaponSlot": "weaponSlot.middleRight.type",
-			"LeftDroneSlot": "weaponSlot.leftDrone.type",
-			"RightDroneSlot": "weaponSlot.rightDrone.type",
-			"LeftRearSlot": "weaponSlot.leftBack.type",
-			"RightRearSlot": "weaponSlot.rightBack.type",
-			"LeftBay1": "weaponSlot.leftBay1.type",
-			"RightBay1": "weaponSlot.rightBay1.type",
-			"LeftBay2": "weaponSlot.leftBay2.type",
-			"RightBay2": "weaponSlot.rightBay2.type",
-			"LeftBay3": "weaponSlot.leftBay3.type",
-			"RightBay3": "weaponSlot.rightBay3.type",
-			"AmmunitionDelivery": "ammo.capacity",
-			"DisposableDrones": "drones.capacity",
-			"Propellant": "fuel.capacity",
-			"Thrusters": "propulsion.rcs",
-			"Torches": "propulsion.main",
-			"Rods": "reactor.power",
-			"Capacitor": "capacitor.capacity",
-			"Turbine": "turbine.power",
-			"AuxilaryPower": "aux.power",
-			"CargoBay": "cargo.equipment",
-			"Autopilot": "autopilot.type",
-			"Hud": "hud.type",
-			"Lidar": "lidar.type",
-			"ReconDrone": "drone.scanner"
-		}
+		
 		var all_slot_node_names : PoolStringArray = PoolStringArray(vanilla_slot_types.keys())
 		
 		var ws_default_templates : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
