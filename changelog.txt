@@ -66,6 +66,7 @@
 19.2=* Mod zip checks
 19.3=* Translation processing
 20=* Class cast removal code has been improved to use the full tokenizer system
+21=* Fixed issues that would cause file corruption errors to be registered on HevLib's first boot regardless of the actual condition of the filesystem.
 25=* Updated credits
 
 [1.17.8]
