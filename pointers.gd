@@ -143,6 +143,7 @@ func _ready():
 	# This is necessary considering it creates a lot of mess as it fetches data
 	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","safe_mod_loading",true):
 		ConfigDriver.non_static[""].declutter_webtranslate_scraps(webtranslate_modmain)
+	for m in webtranslate_modmain.get_meta_list():webtranslate_modmain.remove_meta(m)
 	yield(get_tree(),"idle_frame")
 	# Ensures that this node is lower in the scene tree
 	get_parent().move_child(self,get_parent().get_child_count())
@@ -153,7 +154,7 @@ func _ready():
 	ConfigDriver.__subscribe_to_setting_change("recheck_unfocused_unrendering",self,"HevLib","HEVLIB_CONFIG_SECTION_POINTERS","stop_rendering_on_lost_focus")
 	if TranslationServer.translate("HEVLIB_INCORRECT_SHIP") == "HEVLIB_INCORRECT_SHIP":
 		l("HevLib translations did not get initialized, quitting and ensuring the user is aware.","pointers.Translations")
-		Translations.__updateTL_from_dictionary(load("HEVLIB_MENU/REPLACE_TRANSLATIONS.gd").get_script().get_script_constant_map().get("TRANSLATIONS",{}))
+		Translations.__updateTL_from_dictionary(load(resource_path.get_base_dir() + "/HEVLIB_MENU/REPLACE_TRANSLATIONS.gd").get_script().get_script_constant_map().get("TRANSLATIONS",{}))
 		NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_ERRORCHECK_MISSING_TRANSLATIONS"),"pointers.Translations",0.0,"https://forms.gle/RmC4Zgonp6frFgnK7",true)
 	if TranslationServer.translate("SYSTEM_AMMO_10000_DESC") == "SYSTEM_AMMO_10000_DESC":
 		l("Vanilla translations did not get initialized, queued exit for 200 seconds to preserve report-ready state.","pointers.Translations")
@@ -5376,6 +5377,8 @@ class _ManifestV2:
 			if OS.get_name() == "OSX":
 				gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
 			var modPathPrefix:String = gameInstallDirectory + "/mods/"
+			# Pre-cache mod data to prevent issues later down the line with potential future multithreading
+			__get_all_modlets(false,true);__get_icon_files();__get_modmain_files()
 			var dir:Directory = Directory.new()
 			if dir.open(modPathPrefix) + dir.list_dir_begin(): # If non-zero, then an error code has been emitted
 				pointers.l("ERROR: Cannot open zip directory","pointers.ManifestV2")
@@ -6521,7 +6524,12 @@ class _ManifestV2:
 	
 	static func __get_all_modlets(only_show_installed : bool = true,recache : bool = false) -> Dictionary:
 		var pointers:HevLibPointers._ConfigDriver = non_static["pointers"].ConfigDriver
-		if not cached_modlets or recache:
+		if cached_modlets:
+			var modletCheck:Dictionary = pointers.__get_value("HevLib","modlets","seen_modlets",{})
+			for modlet in modletCheck.keys():
+				if modletCheck[modlet] != cached_modlets[modlet]:
+					recache = true
+		if recache:
 			if not all_modlet_file_list:
 				var manifests:PoolStringArray = __get_manifest_files()
 				var manifest_checks : Array = []
@@ -6542,10 +6550,7 @@ class _ManifestV2:
 				all_modlet_file_list.clear()
 				all_modlet_file_list.append_array(PoolStringArray(ov))
 			cached_modlets.clear()
-			var allowed_modlets = pointers.__get_value("HevLib","modlets","seen_modlets")
-			if allowed_modlets == null:
-				pointers.__store_value("HevLib","modlets","seen_modlets",{})
-				allowed_modlets = {}
+			var allowed_modlets:Dictionary = pointers.__get_value("HevLib","modlets","seen_modlets",{})
 			active_modlet_file_list.clear()
 			for mod in all_modlet_file_list:
 				if not mod in allowed_modlets:
@@ -6555,11 +6560,6 @@ class _ManifestV2:
 			pointers.__store_value("HevLib","modlets","seen_modlets",allowed_modlets)
 			cached_modlets.clear()
 			cached_modlets.merge(allowed_modlets)
-		else:
-			var modletCheck:Dictionary = pointers.__get_value("HevLib","modlets","seen_modlets",{})
-			for modlet in modletCheck.keys():
-				if modletCheck[modlet] != cached_modlets[modlet]:
-					recache = true
 		var out : Dictionary = cached_modlets.duplicate(true)
 		if only_show_installed:
 			for mod in cached_modlets:
@@ -6588,11 +6588,7 @@ class _ManifestV2:
 			if pointers.is_editor:
 				for a in pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[]):
 					restrict_to_modmains.append(a.get_base_dir() + "/")
-				var allowed_modlets = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets")
-				if allowed_modlets == null:
-					pointers.is_editor_and_needs_restart = true
-					allowed_modlets = []
-				for a in allowed_modlets:
+				for a in PoolStringArray(pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets",{}).keys()):
 					restrict_to_modmains.append(a.get_base_dir() + "/")
 			var arr1 : PoolStringArray = siftFolderStructureForModFiles(pointers.FolderAccess.__get_folder_structure("res://",false,false),"res://",restrict_to_modmains)
 			var arr2 : PoolStringArray = PoolStringArray()
@@ -7690,7 +7686,6 @@ class _SafeMode:
 			file.open(validation_check_path,File.READ)
 			validation_check = JSON.parse(file.get_as_text()).result
 			file.close()
-		for m in ModLoader.get_meta_list():ModLoader.remove_meta(m)
 		if validation_check.get("hevlib_cache_version",-1) != HEVLIB_CACHE_VERSION or !deep_equal(PoolIntArray(validation_check.get("vanilla_version",PoolIntArray([1,0,0]))),vanilla_version) or !file.file_exists(validation_check_path) or !file.file_exists(pck_file_paths_store) or !file.file_exists(vanilla_load_order_store) or !file.file_exists(dependancy_lookup_store) or !file.file_exists(dependancy_dictionary_store) or pointers.ManifestV2.haveModsChanged:
 			pointers.l("Game has updated or cache is missing, rebuilding file info cache.")
 			pointers.FolderAccess.__recursive_delete(safemode_dir)
@@ -8173,7 +8168,9 @@ class _Threading:
 					out.append(null)
 			return out
 		var request_id:int = (operations.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
-		pointers.l("Requesting multiple thread operations under request [%d]" % request_id,"pointers.Threading")
+		var rqText:String = "Requesting multiple thread operations under request [%d] @ %d" % [request_id,OS.get_ticks_msec()]
+		pointers.l(rqText,"pointers.Threading")
+		print(rqText)
 		var semaphore:Semaphore = Semaphore.new()
 		var added_op:int = 0
 		mutex.lock()
