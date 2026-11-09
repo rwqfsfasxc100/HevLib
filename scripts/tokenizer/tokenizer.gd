@@ -131,49 +131,49 @@ func __get_compiled_bytecode_from_tokens() -> PoolByteArray:
 		for e in extra:
 			out.put_u8(0 ^ 0xb6)
 	for v in constants:
-		match typeof(v):
-			TYPE_NIL:
-				out.put_u32(0)
-			TYPE_BOOL:
-				out.put_u32(1)
-				out.put_u32(1 if v else 0)
-			TYPE_INT:
-				if abs(v) > 2147483647:
-					out.put_u32(2 | (1 << 16))
-					out.put_64(v)
-				else:
-					out.put_u32(2)
-					out.put_32(v)
-			TYPE_REAL:
-				var tmp:StreamPeerBuffer = StreamPeerBuffer.new()
-				tmp.put_float(v)
-				tmp.seek(0)
-				var bits:StreamPeerBuffer = StreamPeerBuffer.new()
-				bits.put_double(v)
-				bits.put_double(tmp.get_float())
-				bits.seek(0)
-				if bits.get_64() == bits.get_64():
-					out.put_u32(3)
-					out.put_float(v)
-				else:
-					out.put_u32(3 | (1 << 16))
-					out.put_double(v)
-			TYPE_STRING:
-				out.put_u32(4)
-				stream_string(out,v)
-			TYPE_NODE_PATH:
-				var np:NodePath = v
-				out.put_u32(15)
-				out.put_u32(np.get_name_count() | 0x80000000)
-				out.put_u32(np.get_subname_count())
-				out.put_u32(1 if np.is_absolute() else 0)
-				for i in np.get_name_count():
-					stream_string(out,np.get_name(i))
-				for i in np.get_subname_count():
-					stream_string(out,np.get_subname(i))
-			_:
-				printerr("Cannot encode constant of type %d" % typeof(v))
-				return PoolByteArray()
+		var ctype:int = typeof(v)
+		if ctype == TYPE_NIL:
+			out.put_u32(0)
+		elif ctype == TYPE_BOOL:
+			out.put_u32(1)
+			out.put_u32(1 if v else 0)
+		elif ctype == TYPE_INT:
+			if abs(v) > 2147483647:
+				out.put_u32(2 | (1 << 16))
+				out.put_64(v)
+			else:
+				out.put_u32(2)
+				out.put_32(v)
+		elif ctype == TYPE_REAL:
+			var tmp:StreamPeerBuffer = StreamPeerBuffer.new()
+			tmp.put_float(v)
+			tmp.seek(0)
+			var bits:StreamPeerBuffer = StreamPeerBuffer.new()
+			bits.put_double(v)
+			bits.put_double(tmp.get_float())
+			bits.seek(0)
+			if bits.get_64() == bits.get_64():
+				out.put_u32(3)
+				out.put_float(v)
+			else:
+				out.put_u32(3 | (1 << 16))
+				out.put_double(v)
+		elif ctype == TYPE_STRING:
+			out.put_u32(4)
+			stream_string(out,v)
+		elif ctype == TYPE_NODE_PATH:
+			var np:NodePath = v
+			out.put_u32(15)
+			out.put_u32(np.get_name_count() | 0x80000000)
+			out.put_u32(np.get_subname_count())
+			out.put_u32(1 if np.is_absolute() else 0)
+			for i in np.get_name_count():
+				stream_string(out,np.get_name(i))
+			for i in np.get_subname_count():
+				stream_string(out,np.get_subname(i))
+		else:
+			printerr("Cannot encode constant of type %d" % typeof(v))
+			return PoolByteArray()
 	for k in line_tokens.size():
 		out.put_u32(line_tokens[k])
 		out.put_u32(line_numbers[k])
