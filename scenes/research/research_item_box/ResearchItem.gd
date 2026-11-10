@@ -48,7 +48,7 @@ onready var start_confirm_cancel = $Progress/StartContainer/StartConfirm
 onready var icon_anim = $IconAnimator
 onready var confirmation_player = $ConfirmationPlayer
 
-const progress_bar = preload("res://HevLib/scenes/research/research_item_box/ResearchProgressBar.tscn")
+var progress_bar:PackedScene = load("res://HevLib/scenes/research/research_item_box/ResearchProgressBar.tscn")
 
 var mark_for_completion = false
 

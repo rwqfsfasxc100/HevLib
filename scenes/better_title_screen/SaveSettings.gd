@@ -69,7 +69,7 @@ var connections:Dictionary = {
 	"GENERIC":[]
 }
 
-var tt_label = preload("res://menu/sfx/PlaySoundsOnTheseButtons.tscn")
+var tt_label:PackedScene = load("res://menu/sfx/PlaySoundsOnTheseButtons.tscn")
 
 func create():
 	var buttons:Array = [{

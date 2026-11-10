@@ -33,7 +33,7 @@
 extends HBoxContainer
 
 var pointers:HevLibPointers = ModLoader._savedObjects[0]
-export var mod_box = preload("res://HevLib/ui/mod_menu/mod_list/mod_box/ModBox.tscn")
+var mod_box:PackedScene = load("res://HevLib/ui/mod_menu/mod_list/mod_box/ModBox.tscn")
 
 export (NodePath) var info_icon = NodePath("")
 export (NodePath) var info_name = NodePath("")

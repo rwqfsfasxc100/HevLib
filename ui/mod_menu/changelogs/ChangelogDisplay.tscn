@@ -5,15 +5,16 @@
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=3]
 
 [node name="ChangelogDisplay" type="VBoxContainer"]
-margin_right = 40.0
-margin_bottom = 40.0
+margin_right = 1080.0
+margin_bottom = 500.0
+rect_min_size = Vector2( 500, 300 )
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme = ExtResource( 3 )
 script = ExtResource( 2 )
 
 [node name="PAGES" type="HBoxContainer" parent="."]
-margin_right = 150.0
+margin_right = 1080.0
 margin_bottom = 42.0
 size_flags_horizontal = 3
 
@@ -33,28 +34,28 @@ text = "<"
 [node name="Label" type="Label" parent="PAGES"]
 margin_left = 70.0
 margin_top = 2.0
-margin_right = 80.0
+margin_right = 1010.0
 margin_bottom = 40.0
 size_flags_horizontal = 3
 
 [node name="RIGHT" type="Button" parent="PAGES"]
-margin_left = 84.0
-margin_right = 126.0
+margin_left = 1014.0
+margin_right = 1056.0
 margin_bottom = 42.0
 rect_min_size = Vector2( 42, 42 )
 focus_neighbour_left = NodePath("../LEFT")
 text = ">"
 
 [node name="RBORDER" type="HBoxContainer" parent="PAGES"]
-margin_left = 130.0
-margin_right = 150.0
+margin_left = 1060.0
+margin_right = 1080.0
 margin_bottom = 42.0
 rect_min_size = Vector2( 20, 42 )
 
 [node name="ScrollContainer" type="ScrollContainer" parent="."]
 margin_top = 46.0
-margin_right = 150.0
-margin_bottom = 46.0
+margin_right = 1080.0
+margin_bottom = 500.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource( 1 )

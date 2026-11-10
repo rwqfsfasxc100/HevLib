@@ -46,16 +46,16 @@ func setParam(param):
 		specificShipName = param
 
 var asteroids = [
-	preload("res://asteroids/class-11.tscn"), 
-	preload("res://asteroids/class-12.tscn"), 
-	preload("res://asteroids/class-13.tscn"), 
+	load("res://asteroids/class-11.tscn"), 
+	load("res://asteroids/class-12.tscn"), 
+	load("res://asteroids/class-13.tscn"), 
 	
-	preload("res://asteroids/class-22.tscn"), 
-	preload("res://asteroids/class-23.tscn"), 
-	preload("res://asteroids/class-24.tscn"), 
-	preload("res://asteroids/class-25.tscn"), 
-	preload("res://asteroids/class-26.tscn"), 
-	preload("res://asteroids/class-27.tscn")
+	load("res://asteroids/class-22.tscn"), 
+	load("res://asteroids/class-23.tscn"), 
+	load("res://asteroids/class-24.tscn"), 
+	load("res://asteroids/class-25.tscn"), 
+	load("res://asteroids/class-26.tscn"), 
+	load("res://asteroids/class-27.tscn")
 ]
 
 func _exit_tree():

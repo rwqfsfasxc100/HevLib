@@ -34,9 +34,9 @@ extends VBoxContainer
 
 var path = ""
 
-var rich_entry_label = load("res://HevLib/ui/mod_menu/changelogs/labels/rich_changelog_entry.tscn")
+var rich_entry_label:PackedScene = load("res://HevLib/ui/mod_menu/changelogs/labels/rich_changelog_entry.tscn")
 
-var changelog_container = load("res://HevLib/ui/mod_menu/changelogs/ChangelogContainer.tscn")
+var changelog_container:PackedScene = load("res://HevLib/ui/mod_menu/changelogs/ChangelogContainer.tscn")
 
 var pointers :HevLibPointers= ModLoader._savedObjects[0]
 export (String,"singular","dynamic") var operation = "singular"

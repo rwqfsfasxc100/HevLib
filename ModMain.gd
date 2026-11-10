@@ -600,4 +600,5 @@ func testing(modLoader:ModLoader,pointers):
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
 	
 	
+	
 	breakpoint

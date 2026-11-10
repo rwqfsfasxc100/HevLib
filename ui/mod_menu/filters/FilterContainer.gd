@@ -33,7 +33,7 @@
 extends PanelContainer
 
 var pointers:HevLibPointers = ModLoader._savedObjects[0]
-var filter_box_nd = preload("res://HevLib/ui/mod_menu/filters/FilterBox.tscn")
+var filter_box_nd:PackedScene = load("res://HevLib/ui/mod_menu/filters/FilterBox.tscn")
 
 var tags = pointers.ManifestV2.__get_tags()
 

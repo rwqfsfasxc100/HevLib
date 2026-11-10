@@ -32,7 +32,7 @@
 
 extends Tabs
 
-export var changelog_display = preload("res://HevLib/ui/mod_menu/changelogs/ChangelogDisplay.tscn")
+var changelog_display:PackedScene = load("res://HevLib/ui/mod_menu/changelogs/ChangelogDisplay.tscn")
 
 var mod_data = {}
 

@@ -36,7 +36,7 @@ export var mod = ""
 export var mod_id = ""
 var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
-const tab_base = preload("res://HevLib/ui/mod_menu/settings_menus/generic_section_tab.tscn")
+var tab_base:PackedScene = load("res://HevLib/ui/mod_menu/settings_menus/generic_section_tab.tscn")
 
 onready var container = $MarginContainer/TabContainer
 

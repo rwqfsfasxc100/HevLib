@@ -36,7 +36,7 @@ export var offset = Vector2(12,12)
 export var tablist = NodePath("")
 onready var tabs = get_node_or_null(tablist)
 
-export var mod_tab = preload("res://HevLib/ui/mod_menu/changelogs/ModChangelogTab.tscn")
+var mod_tab:PackedScene = load("res://HevLib/ui/mod_menu/changelogs/ModChangelogTab.tscn")
 
 func open(mods):
 	if tabs:
@@ -56,7 +56,7 @@ func _ready():
 
 func _about_to_show():
 	lastFocus = get_focus_owner()
-	$base/PanelContainer/VBoxContainer/FooterButtons/Close.grab_focus()
+	$base/VBoxContainer/FooterButtons/Close.grab_focus()
 	yield(get_tree().create_timer(0.1),"timeout")
 	for i in tabs.get_children():
 		i.show()
@@ -84,11 +84,6 @@ func _on_resize():
 	if is_visible_in_tree():
 		var size:Vector2 = Settings.getViewportSize()
 		var offsetSize:Vector2 = size - offset
-		var vbsize:Vector2 = offsetSize - Vector2(10,10)
 		rect_size = size
-		$ColorRect.rect_size = size
 		$base.rect_size = offsetSize
 		$base.rect_position = offset/2
-		$base/PanelContainer.rect_size = offsetSize
-		$base/PanelContainer/VBoxContainer.rect_position = Vector2(5,5)
-		$base/PanelContainer/VBoxContainer.rect_size = vbsize

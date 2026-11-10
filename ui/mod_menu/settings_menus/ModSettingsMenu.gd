@@ -42,7 +42,7 @@ onready var container = $base/TabContainer
 
 var offset = Vector2(12,12)
 
-const mod_tab = preload("res://HevLib/ui/mod_menu/settings_menus/generic_mod_tab.tscn")
+var mod_tab:PackedScene = load("res://HevLib/ui/mod_menu/settings_menus/generic_mod_tab.tscn")
 
 func _about_to_show():
 	for child in container.get_children():

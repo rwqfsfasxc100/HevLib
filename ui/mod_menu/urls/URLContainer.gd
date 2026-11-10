@@ -32,7 +32,7 @@
 
 extends PanelContainer
 
-var link_button = preload("res://HevLib/ui/mod_menu/urls/URL_BUTTON.tscn")
+var link_button:PackedScene = load("res://HevLib/ui/mod_menu/urls/URL_BUTTON.tscn")
 
 var MOD_INFO : Dictionary = {}
 

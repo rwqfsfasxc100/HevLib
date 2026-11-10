@@ -54,7 +54,7 @@ onready var button_children_count = $BaseModBox/ModButton/VBoxContainer/HBoxCont
 var ModButton = NodePath("ModButton")
 var button_size = Vector2(0,0)
 
-const SubModBox = preload("res://HevLib/ui/mod_menu/mod_list/SubModBox.tscn")
+var SubModBox:PackedScene = load("res://HevLib/ui/mod_menu/mod_list/SubModBox.tscn")
 
 var MAX_SIZE = Vector2(0,0)
 

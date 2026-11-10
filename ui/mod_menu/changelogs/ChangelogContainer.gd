@@ -33,34 +33,40 @@
 extends VBoxContainer
 
 var clearing = false
+onready var header_label:PackedScene = load("res://HevLib/ui/mod_menu/changelogs/labels/version_label.tscn")
+onready var entry_label:PackedScene = load("res://HevLib/ui/mod_menu/changelogs/labels/changelog_entry.tscn")
+
+func _init():
+	set_process(false)
+
+signal tick
 
 func parse(path:String,current_page:int,page_size:int,LEFT:Button,RIGHT:Button,refs:Array):
 	var pointers:HevLibPointers = ModLoader._savedObjects[0]
-	var header_label = load("res://HevLib/ui/mod_menu/changelogs/labels/version_label.tscn")
-	var entry_label = load("res://HevLib/ui/mod_menu/changelogs/labels/changelog_entry.tscn")
-	
 	var data:Dictionary = pointers.ManifestV2.__parse_changelogs(path)
-	
+	set_process(true)
 	var size:int = data.size()
 	var offset:int = current_page * page_size
-	var max_pages:int = int(ceil(float(size)/float(page_size))) - 1
 	var keys:Array = data.keys()
 	LEFT.disabled = current_page < 1
-	RIGHT.disabled = current_page > max_pages - 1
+	RIGHT.disabled = current_page > (int(ceil(size/float(page_size))) - 2)
 	for iv in clamp(size - offset,0,page_size):
-		var config = keys[iv + offset]
-		var lines = data[config]
-		var header = header_label.instance()
+		var config:String = keys[iv + offset]
+		var lines:Array = data[config]
+		var header:Label = header_label.instance()
 		header.text = config
 		if not clearing:
 			refs.append(header)
 			add_child(header)
 		for l in lines:
-			var label = entry_label.instance()
-			var tex = TranslationServer.translate(l)
-			label.text = tex
+			var label:Label = entry_label.instance()
+			label.text = TranslationServer.translate(l)
 			if not clearing:
 				refs.append(label)
 				add_child(label)
-			yield(CurrentGame.get_tree(),"idle_frame")
-		yield(CurrentGame.get_tree(),"idle_frame")
+			yield(self,"tick")
+		yield(self,"tick")
+	set_process(false)
+
+func _process(delta):
+	emit_signal("tick")

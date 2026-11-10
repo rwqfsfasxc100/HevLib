@@ -36,7 +36,7 @@ var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 onready var keybox = $PanelContainer / MarginContainer / VBoxContainer / CK / Keys
 
-onready var deleteButton = preload("res://menu/DeleteKeybind.tscn")
+var deleteButton:PackedScene = load("res://menu/DeleteKeybind.tscn")
 onready var addPlayer = $PanelContainer / MarginContainer / VBoxContainer / CenterContainer / Add / AnimationPlayer
 onready var addButton = $PanelContainer / MarginContainer / VBoxContainer / CenterContainer / Add
 var revert

@@ -45,8 +45,7 @@ onready var adjustments = load("res://HevLib/scenes/keymapping/data/key_adjustme
 
 var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
-
-onready var compiler = preload("res://HevLib/scenes/keymapping/compile_keymap.gd").new(pointers)
+var compiler:Reference = load("res://HevLib/scenes/keymapping/compile_keymap.gd").new(pointers)
 
 var keybind_folder = "user://cache/.HevLib_Cache/Keybinds/"
 var vanilla_binds_file = "user://cfg/Vanilla_Binds.cfg"

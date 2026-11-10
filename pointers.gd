@@ -188,7 +188,7 @@ func fetch_mod_updates():
 			var modData:Dictionary=ManifestV2.__get_mod_by_id(ID)
 			var current_version:Dictionary=modData["version_data"]
 			var doUpdate:bool=false
-			var newVer:Array=[fetchData["major"],fetchData["minor"],fetchData["bugfix"]]
+			var newVer:PoolIntArray=PoolIntArray([fetchData["major"],fetchData["minor"],fetchData["bugfix"]])
 			var ctr:int=0
 			while(!doUpdate)and(ctr<3):
 				match ctr:
@@ -805,7 +805,7 @@ class _ConfigDriver:
 		var keybinds_cache : String = "user://cache/.HevLib_Cache/Keybinds/"
 		var cfg_file : String = "user://cfg/" + cfg_filename
 		var profiles_dir : String = "user://cfg/.profiles/"
-		var profiles_setter : String = ".profiles.ini"
+		var profiles_setter : String = profiles_dir + ".profiles.ini"
 		# Initializes profiles and keybind cache directories
 		dir.make_dir_recursive(profiles_dir)
 		dir.make_dir_recursive(keybinds_cache)
@@ -817,11 +817,11 @@ class _ConfigDriver:
 		file.open(keybinds_cache + "defined_control_configs.json",File.WRITE)
 		file.store_string("{}")
 		file.close()
-		if not file.file_exists(profiles_dir + profiles_setter):
+		if not file.file_exists(profiles_setter):
 			# If no profile ini file exists, initializes it and sets 'Default' as the profile
 			c.clear()
 			c.set_value("profiles","selected","Default")
-			c.save(profiles_dir + profiles_setter)
+			c.save(profiles_setter)
 			c.clear()
 		if not file.file_exists(cfg_file):
 			# Creates the config file if it doesn't exist
@@ -830,7 +830,7 @@ class _ConfigDriver:
 			file.open(cfg_file,File.WRITE)
 			file.store_string("")
 			file.close()
-		c.load(profiles_dir + profiles_setter)
+		c.load(profiles_setter)
 		# Fetches the currently desired profile
 		var desired_profile:String = c.get_value("profiles","selected","Default")
 		c.clear()
@@ -889,7 +889,7 @@ class _ConfigDriver:
 				var manifest_version : float = float(manifest["manifest_version"])
 				if manifest_version >= 2.1:
 					var cfg : Dictionary = manifest["manifest_data"]["configs"]
-					if not hash(cfg) == hash({}):
+					if cfg.hash() != 177591:
 						configs[mod_name] = cfg
 				# Checking for mods that require specific filepaths
 				var expected_path:String = manifest["manifest_data"]["manifest_definitions"]["expected_manifest_path"]
@@ -907,6 +907,7 @@ class _ConfigDriver:
 									needsEitherOf.append(ov)
 							else:
 								doesHaveAny = true
+								break
 						if not doesHaveAny:
 							missing_requirements.append(" OR ".join(needsEitherOf))
 					elif requirement is Dictionary:
@@ -1754,7 +1755,7 @@ class _DataFormat:
 	static func __compile_script_object(source_code : String, params = [],new_object : bool = false,use_cache:bool = true) -> Object:
 		if not params is Array:
 			params = [params]
-		var shash : String = "%d_%d"% [hash(source_code),hash(params)]
+		var shash : String = "%d_%d"% [hash(source_code),params.hash()]
 		l("Compiling script as object @ [%s]; parameters: %s, new object: %s" % [shash,params,new_object])
 		if (use_cache or not new_object) and shash in csosk:
 			l("Fetching from cache")
@@ -3025,7 +3026,7 @@ class _Equipment:
 							var sKeys:Array = sorting.keys()
 							sKeys.sort()
 							for o in sKeys:
-								seed(hash(sorting))
+								seed(sorting.hash())
 								sorting[o].shuffle()
 								for i in sorting[o]:
 									ship_build_mod_store.append(i)
@@ -6035,7 +6036,6 @@ class _ManifestV2:
 							dict_template["manifest_definitions"]["conflicting_mod_ids"] = Array(manifest_data["manifest_definitions"].get("conflicting_mod_ids",[]))
 							dict_template["manifest_definitions"]["complementary_mod_ids"] = Array(manifest_data["manifest_definitions"].get("complementary_mod_ids",[]))
 					2.2,2.3:
-						
 						if "mod_information" in manifestKeys:
 							dict_template["mod_information"]["id"] = String(manifest_data["mod_information"].get("id",""))
 							dict_template["mod_information"]["name"] = String(manifest_data["mod_information"].get("name",""))
@@ -6111,13 +6111,13 @@ class _ManifestV2:
 											ovConfigs[section] = {}
 										ovConfigs[section][cfname] = cfdata
 							if ovConfigs:
-								pointers.l("Parsed configs for %s, has disabled configs: [%s]" % [file_path,str(hash(configs) != hash(ovConfigs))],"pointers.ManifestV2")
+								pointers.l("Parsed configs for %s, has disabled configs: [%s]" % [file_path,configs.hash() != ovConfigs.hash()],"pointers.ManifestV2")
 								dict_template["configs"] = ovConfigs
 				
 				var version_metadata : String = dict_template["version"]["version_metadata"]
-				var version_string : String = str(dict_template["version"]["version_major"]) + "." + str(dict_template["version"]["version_minor"]) + "." + str(dict_template["version"]["version_bugfix"])
-				if not version_metadata.empty():
-					version_string = version_string + "-" + version_metadata
+				var version_string : String = "%d.%d.%d" % [dict_template["version"]["version_major"],dict_template["version"]["version_minor"],dict_template["version"]["version_bugfix"]]
+				if version_metadata:
+					version_string += "-" + version_metadata
 				dict_template["version"]["version_string"] = version_string
 				out = dict_template
 			else:
@@ -6341,7 +6341,20 @@ class _ManifestV2:
 					tag_dict[entry] = tag_data[entry].get("value")
 		return tag_dict
 	
+	const test_mod_updates = true
+	
 	static func __have_mods_updated(folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",last_seen_file = "mods_from_last_launch.json") -> Dictionary:
+		if test_mod_updates:
+			var out:Dictionary = {}
+			var all_mods : Dictionary = __get_mod_data()
+			for mod in __get_mod_list_keys():
+				var data : Dictionary = all_mods[mod]
+				if data["manifest"]["has_manifest"] and data["manifest"]["manifest_version"] >= 2.0:
+					var manifest : Dictionary = data["manifest"]["manifest_data"]
+					var info : Dictionary = manifest["mod_information"]
+					var version : Dictionary = manifest["version"]
+					out[info["id"]] = {"name":info["name"],"version":{"major":version["version_major"],"minor":version["version_minor"],"bugfix":version["version_bugfix"]},"path":data["file_path"],"changelog":manifest["manifest_definitions"]["changelog_path"]}
+			return out
 		if not non_static["self"].haveModsChanged:
 			return {}
 		if not folder.ends_with("/"):
@@ -6355,6 +6368,12 @@ class _ManifestV2:
 			file.store_string("{}")
 			file.close()
 		var mods : Dictionary = {}
+		var changes : Dictionary = {}
+		var last : Dictionary = {}
+		if file.file_exists(folder + last_seen_file):
+			file.open(folder + last_seen_file,File.READ)
+			last = JSON.parse(file.get_as_text()).result
+			file.close()
 		var all_mods : Dictionary = __get_mod_data()
 		for mod in __get_mod_list_keys():
 			var data : Dictionary = all_mods[mod]
@@ -6362,27 +6381,15 @@ class _ManifestV2:
 				var manifest : Dictionary = data["manifest"]["manifest_data"]
 				var info : Dictionary = manifest["mod_information"]
 				var version : Dictionary = manifest["version"]
-				mods[info["id"]] = {"name":info["name"],"version":{"major":version["version_major"],"minor":version["version_minor"],"bugfix":version["version_bugfix"]},"path":data["file_path"],"changelog":manifest["manifest_definitions"]["changelog_path"]}
-		var last : Dictionary = {}
-		if file.file_exists(folder + last_seen_file):
-			file.open(folder + last_seen_file,File.READ)
-			last = JSON.parse(file.get_as_text()).result
-			file.close()
-		var changes : Dictionary = {}
-		for mod in mods:
-			var has_changed:bool = false
-			var data : Dictionary = mods[mod]
-			if mod in last:
-				if data["version"]["major"] != last[mod]["version"]["major"]:
-					has_changed = true
-				if data["version"]["minor"] != last[mod]["version"]["minor"]:
-					has_changed = true
-				if data["version"]["bugfix"] != last[mod]["version"]["bugfix"]:
-					has_changed = true
-			else:
-				has_changed = true
-			if has_changed:
-				changes[mod] = data
+				var id:String = info["id"]
+				if (not id in last or (
+					(version["major"] != last[id]["version"]["major"])
+					 or 
+					(version["minor"] != last[id]["version"]["minor"])
+					 or 
+					(version["bugfix"] != last[id]["version"]["bugfix"])
+				)):
+					changes[id] = {"name":info["name"],"version":{"major":version["version_major"],"minor":version["version_minor"],"bugfix":version["version_bugfix"]},"path":data["file_path"],"changelog":manifest["manifest_definitions"]["changelog_path"]}
 		return changes
 	
 	static func __get_mod_versions(store = false,folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",last_seen_file = "mods_from_last_launch.json",this_seen_file = "mods_from_this_launch.json") -> Dictionary:
