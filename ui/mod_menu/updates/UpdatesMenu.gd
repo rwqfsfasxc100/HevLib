@@ -80,7 +80,7 @@ func _about_to_show():
 		c.current_version = "%s.%s.%s" % [old_version[0],old_version[1],old_version[2]]
 		c.new_version = "%s.%s.%s" % [new_version[0],new_version[1],new_version[2]]
 		container.add_child(c)
-	yield(get_tree(),"physics_frame")
+	yield(pointers,"physics_process_tick")
 	match update_data.size():
 		0:
 			no_mods_available()
@@ -118,7 +118,7 @@ func cancel():
 	file.close()
 	if has:
 		hide()
-		yield(get_tree(),"idle_frame")
+		yield(pointers,"process_tick")
 		restart_dialog.popup_centered()
 	else:
 		hide()

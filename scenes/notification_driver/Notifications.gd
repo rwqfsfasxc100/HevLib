@@ -80,7 +80,7 @@ var tween
 var customInQueue = []
 
 func playNextCustomInQueue(what = null):
-	yield(get_tree(),"idle_frame")
+	yield(pointers,"process_tick")
 	if not animation.is_playing():
 		playCustomAnim(customInQueue.pop_front())
 

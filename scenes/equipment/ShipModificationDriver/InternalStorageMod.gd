@@ -369,7 +369,7 @@ func _ready():
 	nanodroneMagazine = float(getConfig("drones.capacity",0.0))
 	massDriverMagazine = float(getConfig("ammo.capacity", 0.0))
 	
-	yield(CurrentGame.get_tree(),"physics_frame")
+	yield(ismPointers,"physics_process_tick")
 	clampConsumables()
 	if isPlayerControlled():
 		var cfg:Dictionary = shipConfig

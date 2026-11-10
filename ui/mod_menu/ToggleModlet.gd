@@ -60,7 +60,7 @@ func _toggled(button_pressed):
 		file.store_8(1)
 		file.close()
 		pointers.ConfigDriver.__store_value("HevLib","modlets","seen_modlets",all_modlets)
-		yield(CurrentGame.get_tree(),"idle_frame")
+		yield(pointers,"process_tick")
 		current_modlet.update()
 
 func change_modlet_to(modlet,modlet_path:String):
@@ -77,5 +77,5 @@ func change_modlet_to(modlet,modlet_path:String):
 		var all_modlets = pointers.ManifestV2.__get_all_modlets(false)
 		var enabled = all_modlets[modlet_path]
 		pressed = enabled
-		yield(CurrentGame.get_tree(),"physics_frame")
+		yield(pointers,"physics_process_tick")
 		can_toggle = true

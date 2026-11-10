@@ -60,7 +60,7 @@ func check():
 		show_menu()
 
 func show_menu():
-	yield(get_tree(),"idle_frame")
+	yield(pointers,"process_tick")
 	popup_centered()
 	yield(get_tree().create_timer(0.25),"timeout")
 	$PanelContainer/VBoxContainer/HBoxContainer/OK/Button.grab_focus()

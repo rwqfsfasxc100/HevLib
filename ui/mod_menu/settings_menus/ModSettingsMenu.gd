@@ -57,7 +57,7 @@ func _about_to_show():
 	lastFocus = get_focus_owner()
 	_on_resize()
 	
-	yield(get_tree().create_timer(0.1),"timeout")
+	yield(ModLoader._savedObjects[0],"physics_process_tick")
 	for child in get_node("base/TabContainer").get_child(0).get_node("MarginContainer/TabContainer").get_child(0).get_node("MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer").get_children():
 		if "label_button" in child:
 			child.label_button.call_deferred("grab_focus")

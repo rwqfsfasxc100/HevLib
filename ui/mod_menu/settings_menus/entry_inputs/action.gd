@@ -102,7 +102,7 @@ func _draw():
 func refocus():
 	label_button.rect_size = name_label.rect_size
 	if is_visible_in_tree():
-		yield(get_tree(),"idle_frame")
+		yield(pointers,"process_tick")
 		pointers.ConfigDriver.set_button_focus(self,action_button)
 
 func get_focusable(direction = 0):

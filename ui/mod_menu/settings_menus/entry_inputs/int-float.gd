@@ -130,7 +130,7 @@ func refocus():
 		slider.visible = false
 		SliderLabel.visible = false
 	if is_visible_in_tree():
-		yield(get_tree(),"idle_frame")
+		yield(pointers,"process_tick")
 		pointers.ConfigDriver.set_button_focus(self,focus_button)
 
 func _value_changed(value):

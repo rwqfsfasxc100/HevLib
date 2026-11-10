@@ -144,7 +144,7 @@ func _ready():
 	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","safe_mod_loading",true):
 		ConfigDriver.non_static[""].declutter_webtranslate_scraps(webtranslate_modmain)
 	for m in webtranslate_modmain.get_meta_list():webtranslate_modmain.remove_meta(m)
-	yield(get_tree(),"idle_frame")
+	yield(self,"process_tick")
 	# Ensures that this node is lower in the scene tree
 	get_parent().move_child(self,get_parent().get_child_count())
 	# This node cannot be paused
@@ -905,7 +905,7 @@ class _ConfigDriver:
 						var doesHaveAny:bool = false
 						var needsEitherOf:PoolStringArray = PoolStringArray()
 						for i in requirement:
-							if i is Dictionary and i.get("blocking",false) and not pointers.__mod_exists(i):
+							if i is Dictionary and i.get("blocking",false) and not pointers.ManifestV2.__mod_exists(i):
 								var ov:String = __get_minmax_string_from_dict(i)
 								if ov:
 									needsEitherOf.append(ov)
@@ -915,7 +915,7 @@ class _ConfigDriver:
 						if not doesHaveAny:
 							missing_requirements.append(" OR ".join(needsEitherOf))
 					elif requirement is Dictionary:
-						if requirement.get("blocking",false) and not pointers.__mod_exists(requirement):
+						if requirement.get("blocking",false) and not pointers.ManifestV2.__mod_exists(requirement):
 							var ov:String = __get_minmax_string_from_dict(requirement)
 							if ov:
 								missing_requirements.append(ov)
@@ -924,7 +924,7 @@ class _ConfigDriver:
 						var doesHaveAny:bool = false
 						var needsEitherOf:PoolStringArray = PoolStringArray()
 						for i in incompat:
-							if i is Dictionary and i.get("blocking",false) and pointers.__mod_exists(i):
+							if i is Dictionary and i.get("blocking",false) and pointers.ManifestV2.__mod_exists(i):
 								var ov:String = __get_minmax_string_from_dict(i)
 								if ov:
 									needsEitherOf.append(ov)
@@ -932,7 +932,7 @@ class _ConfigDriver:
 						if doesHaveAny:
 							incompatible_mods.append(" OR ".join(needsEitherOf))
 					elif incompat is Dictionary:
-						if incompat.get("blocking",false) and pointers.__mod_exists(incompat):
+						if incompat.get("blocking",false) and pointers.ManifestV2.__mod_exists(incompat):
 							var ov:String = __get_minmax_string_from_dict(incompat)
 							if ov:
 								incompatible_mods.append(ov)
@@ -4409,17 +4409,17 @@ class _Events:
 				var counter = ring.oddityCounter
 				ring.oddityCounter = 0x0FFFFFFF
 				ring.testSpecificStoryElement = event
-				yield(ring.get_tree(),"idle_frame")
-				yield(ring.get_tree(),"idle_frame")
+				yield(pointers,"process_tick")
+				yield(pointers,"process_tick")
 				ring.testSpecificStoryElement = ""
 				ring.oddityCounter = counter
 			elif parameters.get("inject",false):
 				var focusObject = CurrentGame.getPlayerShip()
 				if focusObject and focusObject.zone == "rings":
-					var tree = ring.get_tree()
+					var tree:SceneTree = ring.get_tree()
 					var event_node = ring.get_node_or_null(event)
 					if event_node and event_node.has_method("canBeAt") and event_node.has_method("makeAt"):
-						var pos = getPos(parameters)
+						var pos:Vector2 = getPos(parameters)
 						event_node.canBeAt(pos)
 						var oddity = event_node.makeAt(pos)
 						if oddity and ring.has_method("request_event"):
@@ -7158,7 +7158,7 @@ class _NodeAccess:
 			if exit_url and pointers.DataFormat.__is_valid_url(exit_url):
 				OS.shell_open(exit_url)
 			if pointers.is_inside_tree():
-				yield(pointers.get_tree(),"idle_frame")
+				yield(pointers,"process_tick")
 			OS.kill(OS.get_process_id())
 	
 	const scene_extensions = PoolStringArray(["tscn","scn"])
@@ -7913,6 +7913,12 @@ class _Scripting:
 		out += "\nZip reference store: %s" % JSON.print(p.ManifestV2.zip_ref_store)
 		p.l("Device Information: [\n%s\n]" % out)
 	
+	const mdir_str = "user://cache/.HevLib_Cache/Minerals/%s-%d%d%d/"
+	const content_str = "\n\tif not \"%s\" in objectClass[- 1]:\n\t\tobjectClass[- 1][\"%s\"] = %s"
+	const trace_str = "\n\tif not \"%s\" in traceMinerals:\n\t\ttraceMinerals.append(\"%s\")"
+	const prices_str = "\n\tif not \"%s\" in mineralPrices:\n\t\tmineralPrices[\"%s\"] = %f"
+	const colour_str = "\n\tif not \"%s\" in specificMineralColors:\n\t\tspecificMineralColors[\"%s\"] = Color( %f, %f, %f, 1.0 )"
+	
 	static func make_mineral_scripting() -> void:
 		var pointers:HevLibPointers = non_static["pointers"]
 		var mineralDir:String = "user://cache/.HevLib_Cache/Minerals/"
@@ -7933,61 +7939,45 @@ class _Scripting:
 		# Initialize info for mineral names, colours, and value
 		var prices:Dictionary = {}
 		var colors:Dictionary = {}
-		var traces:Array = []
+		var trace_text:String = ""
+		var price_text:String = ""
+		var color_text:String = ""
 		for mineral in mineral_data:
 			var mname:String = mineral.get("name","")
-			var price:float = float(mineral.get("price",0.0))
-			var color:Color = mineral.get("color",Color.white)
-			# Only adds minerals to the ring if they have a value.
-			# Useful if you only want to reference a mineral by name
-			# and a colour without it showing in the market, i.e. getScan()
 			if mname:
-				if price > 0.0:
-					prices[mname] = price
-					var handle:String = mineral.get("handle","none")
-					if handle == "recolor":
-						traces.append(mname)
-					elif handle == "scenes":
-						var scenes:PoolStringArray = PoolStringArray()
-						for i in 7:
-							var specific:String = mineral.get("ore_%s" % (i + 1),"")
-							if specific and pointers.FileAccess.__file_exists(specific):
-								scenes.append(specific)
-						if scenes.size() > 6:
-							traces.append(mname)
-				# Colours will always be available
-				colors[mname] = color
-		var price_text:String = ""
-		for price in prices:
-			price_text += "\n\tif not \"%s\" in %s:\n\t\t%s[\"%s\"] = %s" % [price,"mineralPrices","mineralPrices",str(price),str(prices[price])]
-		var color_text:String = ""
-		for color in colors:
-			color_text += "\n\tif not \"%s\" in %s:\n\t\t%s[\"%s\"] = Color(%s)" % [color,"specificMineralColors","specificMineralColors", str(color),str(colors[color])]
+				# Mineral colours will always be available
+				var col:Color = mineral.get("color",Color.white)
+				color_text += colour_str % [mname,mname,col.r,col.g,col.b]
 		var file:File = File.new()
 		
 		# Initialize and create ore chunk additions
-		var mineral_list:Dictionary = {}
+		var content:String = "extends \"res://AsteroidSpawner.gd\"\nfunc _init():\n\tpass"
 		for mineral in mineral_data:
 			var mineral_keys:Array = mineral.keys()
 			var mname:String = mineral["name"]
 			var handle:String = mineral.get("handle","none")
 			var price:float = mineral.get("price",0.0)
 			if price > 0.0:
+				# Only adds minerals to the ring if they have a value.
+				# Useful if you only want to reference a mineral by name
+				# and a colour without it showing in the market, i.e. getScan()
+				price_text += prices_str % [mname,mname,price]
 				match handle:
 					"scenes":
 						# Handle for providing a list of premade scene filepaths to use for the ores
-						var scenes:PoolStringArray = PoolStringArray()
-						for i in 7:
-							var specific:String = mineral.get("ore_%s" % (i + 1),"")
-							if specific and pointers.FileAccess.__file_exists(specific):
-								scenes.append(specific)
-						if scenes.size() > 6:
-							var mh = "[\n"
-							for i in 7:
-								mh += "load(\"%s\"),\n" % scenes[i]
-							mh += "]"
-							mineral_list[mname] = mh
-							pointers.l("adding mineral %s using handler [scene]" % mname,"pointers.Scripting")
+						content += content_str % [mname,mname,
+							"[\n%s]" % PoolStringArray([
+								"load(\"%s\")" % mineral.get("ore_1"),
+								"load(\"%s\")" % mineral.get("ore_2"),
+								"load(\"%s\")" % mineral.get("ore_3"),
+								"load(\"%s\")" % mineral.get("ore_4"),
+								"load(\"%s\")" % mineral.get("ore_5"),
+								"load(\"%s\")" % mineral.get("ore_6"),
+								"load(\"%s\")" % mineral.get("ore_7"),
+							]).join(",\n")
+						]
+						trace_text += trace_str % [mname,mname]
+						pointers.l("adding mineral %s using handler [scene]" % mname,"pointers.Scripting")
 					"recolor":
 						var base:String = "fe"
 						var info:Dictionary = {}
@@ -8005,7 +7995,7 @@ class _Scripting:
 							info["purity"] = mineral["purity"]
 						if "specific_ore_data" in mineral_keys:
 							info["specific_ore_data"] = mineral["specific_ore_data"]
-						match mineral.get("base",base).to_lower():
+						match mineral.get("base","fe").to_lower():
 							"fe","iron":
 								base = "fe"
 							"v","vanadium":
@@ -8020,41 +8010,30 @@ class _Scripting:
 								base = "w"
 						info["base"] = base
 						var header:String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://HevLib/scenes/minerals/base_scenes/mineral-%s-%s.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"mineral\" instance=ExtResource( 1 )]"
-						var content:String = "\nmineral = \"%s\"" % mname
-						var color:Color = Color(1,1,1,1)
-						var mass = null
-						var filler_mineral = null
-						var min_scale = null
-						var max_scale = null
-						var ferrous:bool = false
-						if "color" in info:
-							color = info.get("color")
-						if "mass" in info:
-							mass = info["mass"]
-						if "filler" in info:
-							filler_mineral = info.get("filler","H2O")
-						if "min_scale" in info:
-							min_scale = info["min_scale"]
-						if "max_scale" in info:
-							max_scale = info["max_scale"]
-						if "ferrous" in info:
-							ferrous = info["ferrous"]
+						var mineral_content:String = "\nmineral = \"%s\"" % mname
+						var color:Color = mineral.get("color",Color.white)
+						var mass:float = mineral.get("mass",0.0)
+						var filler_mineral:String = mineral.get("filler","H2O")
+						var min_scale:float = mineral.get("min_scale",0.75)
+						var max_scale:float = mineral.get("max_scale",0.75)
+						var ferrous:bool = mineral.get("ferrous",false)
 						var purityInfo:Dictionary = info.get("purity",{})
-						var folder:String = "user://cache/.HevLib_Cache/Minerals/%s-%d%d%d/" % [mname,int(color.r*255),int(color.g*255),int(color.b*255)]
+						var folder:String = mdir_str % [mname,int(color.r*255),int(color.g*255),int(color.b*255)]
 						
 						var specific_data:Dictionary = info.get("specific_ore_data",{})
 						var roc:Array = []
 						pointers.FolderAccess.__check_folder_exists(folder)
+						var mh:String = "[\n"
 						for i in 7:
 							i += 1
 							var cl:Color = color
-							var ms = mass
-							var fm = filler_mineral
-							var mns = min_scale
-							var mxs = max_scale
+							var ms:float = mass
+							var fm:String = filler_mineral
+							var mns:float = min_scale
+							var mxs:float = max_scale
 							var fr:bool = ferrous
 							var fn:String = folder + "h%s.tscn" % i
-							var data:String = header % [info["base"],i] + content
+							var data:String = header % [info["base"],i] + mineral_content
 							if i in specific_data:
 								var idx:Dictionary = specific_data[i]
 								var idks:Array = idx.keys()
@@ -8070,7 +8049,7 @@ class _Scripting:
 									mxs = idx["max_scale"]
 								if "ferrous" in idks:
 									fr = idx["ferrous"]
-							data += "\ncolor = Color( %s, %s, %s, 1 )" % [cl.r,cl.g,cl.b]
+							data += "\ncolor = Color( %f, %f, %f, 1 )" % [cl.r,cl.g,cl.b]
 							if ms:
 								data += "\nmass = %f" % ms
 							if fm:
@@ -8086,12 +8065,9 @@ class _Scripting:
 							file.open(fn,File.WRITE)
 							file.store_string(data)
 							file.close()
-							roc.append(fn)
-						var mh:String = "[\n"
-						for i in 7:
-							mh += "load(\"%s\"),\n" % roc[i]
-						mh += "]"
-						mineral_list[mname] = mh
+							mh += "load(\"%s\"),\n" % data
+						content += content_str % [mname,mname,mh + "]"]
+						trace_text += trace_str % [mname,mname]
 						pointers.l("adding mineral %s using handler [recolor]" % mname,"pointers.Scripting")
 					"none":
 						pointers.l("mineral %s registered but not adding to ring" % mineral,"pointers.Scripting")
@@ -8099,16 +8075,8 @@ class _Scripting:
 						pointers.l("mineral %s using incorrect handler, set price to 0.0 or less to prevent being registered to exist in the ring or crashes may happen" % mineral,"pointers.Scripting")
 			else:
 				pointers.l("adding only color references for mineral %s, value set to zero or below" % mineral,"pointers.Scripting")
-		var content:String = "extends \"res://AsteroidSpawner.gd\"\nfunc _init():\n\tpass"
-		for m in mineral_list:
-			content += "\n\tif not \"%s\" in %s:\n\t\t%s[\"%s\"] = %s" % [m,"objectClass[- 1]","objectClass[- 1]",m,mineral_list[m]]
 		
-		var trace_text:String = ""
-		for trace in traces:
-			if trace in mineral_list:
-				trace_text += "\n\tif not \"%s\" in %s:\n\t\t%s.append(\"%s\")" % [trace,"traceMinerals","traceMinerals",str(trace)]
-			else:
-				pointers.l("WARNING: mineral [%s] not added as trace mineral due to not existing in the added mineral list" % trace,"pointers.Scripting")
+		
 		
 		# Builds the current game extension script
 		file.open(mineralDir + "cg.gd",File.WRITE)
@@ -8431,17 +8399,16 @@ class _Threading:
 					cr[0] -= 1
 					if cr[0] < 1:
 						cr[1].post()
-				pop_post(container.thread_queue.pop_front())
+				var next = container.thread_queue.pop_front()
 				container.mutex.unlock()
+				pop_post(next)
 		
 		func _notification(what):
 			if what == NOTIFICATION_PREDELETE:
-				
 				mutex.lock()
 				quit = true
 				semaphore.post()
 				mutex.unlock()
-				
 				thread.wait_to_finish()
 		
 		func pop_post(data):

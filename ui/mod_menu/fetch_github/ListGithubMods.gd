@@ -155,8 +155,8 @@ func _mod_selected(mod,btn):
 	current_button = btn
 
 func select_first_mod():
-	yield(CurrentGame.get_tree().create_timer(0.1),"timeout")
-	var v = list.get_children()
+	yield(pointers,"physics_process_tick")
+	var v:Array = list.get_children()
 	if v:
 		var first = v[0]
 		if first:

@@ -66,11 +66,9 @@ func _left_pressed():
 		if clearing:
 			yield(self,"cleared")
 		parse()
-		set_process(true)
-		yield(self,"tick")
-		yield(self,"tick")
-		yield(self,"tick")
-		set_process(false)
+		yield(pointers,"process_tick")
+		yield(pointers,"process_tick")
+		yield(pointers,"process_tick")
 		antispam = true
 
 func _right_pressed():
@@ -81,11 +79,9 @@ func _right_pressed():
 		if clearing:
 			yield(self,"cleared")
 		parse()
-		set_process(true)
-		yield(self,"tick")
-		yield(self,"tick")
-		yield(self,"tick")
-		set_process(false)
+		yield(pointers,"process_tick")
+		yield(pointers,"process_tick")
+		yield(pointers,"process_tick")
 		antispam = true
 
 var clearing = false
@@ -98,15 +94,11 @@ func parse():
 		panelRefs.append(panel)
 		panel.rect_min_size = rect_size - Vector2(12,6)
 		add_container.add_child(panel)
-		set_process(true)
-		yield(self,"tick")
-		set_process(false)
+		yield(pointers,"process_tick")
 		panel.parse(path,current_page,page_size,LEFT,RIGHT,refs)
 
 func _visibility_changed():
-	set_process(true)
-	yield(self,"tick")
-	set_process(false)
+	yield(pointers,"process_tick")
 	if is_visible_in_tree():
 		rect_size = get_parent().rect_size
 
@@ -129,15 +121,8 @@ func clear():
 	for i in refs:
 		i.visible = false
 		Tool.remove(i)
-	set_process(true)
-	yield(self,"tick")
-	set_process(false)
+	yield(pointers,"process_tick")
 	refs.clear()
 	panelRefs.clear()
 	clearing = false
 	emit_signal("cleared")
-
-signal tick
-
-func _process(delta):
-	emit_signal("tick")

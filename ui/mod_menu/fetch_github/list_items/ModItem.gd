@@ -100,8 +100,8 @@ func finished():
 	emit_signal("done",self)
 func _pressed():
 	emit_signal("pressed",DATA["formatted"]["readme"],self)
-	yield(get_tree(),"idle_frame")
-	yield(get_tree(),"idle_frame")
+	yield(pointers,"process_tick")
+	yield(pointers,"process_tick")
 	$MOD_BUTTON.grab_focus()
 
 

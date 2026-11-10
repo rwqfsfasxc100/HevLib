@@ -74,7 +74,7 @@ func _ready():
 				if rt in h:
 					if 0 in h[rt]:do=false
 				if steamNode&&do:
-					yield(CurrentGame.get_tree(),"idle_frame")
+					yield(pointers,"process_tick")
 					for i in 5:
 						yield(get_tree().create_timer(0.2),"timeout")
 						steamNode.keepBest = false

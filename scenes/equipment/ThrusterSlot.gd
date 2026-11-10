@@ -187,7 +187,7 @@ func hl_thrusterslot_get_colors():
 		if i == shipName:
 			hl_thrusterslot_modify_colors(d)
 	if change_color:
-		yield(CurrentGame.get_tree().create_timer(0.5),"timeout")
+		yield(itsPointers,"physics_process_tick")
 		call_deferred("hl_thrusterslot_recolor")
 
 func hl_thrusterslot_modify_colors(data):

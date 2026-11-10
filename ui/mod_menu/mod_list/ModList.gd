@@ -477,7 +477,7 @@ func _downloaded_zip(filepath):
 var tween
 func _visibility_changed():
 	if is_visible_in_tree():
-		yield(CurrentGame.get_tree(),"idle_frame")
+		yield(pointers,"process_tick")
 		var count = 0.03125
 		for child in listContainer.get_children():
 			if "MOD_INFO" in child:

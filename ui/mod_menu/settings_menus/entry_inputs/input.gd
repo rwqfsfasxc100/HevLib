@@ -141,7 +141,7 @@ func refocus():
 #	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 	
 	if is_visible_in_tree():
-		yield(get_tree(),"idle_frame")
+		yield(pointers,"process_tick")
 		pointers.ConfigDriver.set_button_focus(self,label_button)
 	
 

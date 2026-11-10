@@ -121,7 +121,7 @@ func show_restart_menu():
 	return false
 
 func hider():
-	yield(get_tree(),"idle_frame")
+	yield(pointers,"process_tick")
 	if restart_menu.can_restart:
 		if not show_restart_menu():
 			hide()

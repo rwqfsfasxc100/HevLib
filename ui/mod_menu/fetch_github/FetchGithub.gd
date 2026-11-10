@@ -81,5 +81,3 @@ func _on_resize():
 	$base.rect_min_size = size - offset
 	$base.rect_size = size - offset
 	$base.rect_position = offset/2
-	yield(CurrentGame.get_tree(),"idle_frame")
-#	$base/VBoxContainer/Content/Info/INFO/ScrollContainer.rect_size = $base/VBoxContainer/Content/Info/INFO.rect_size

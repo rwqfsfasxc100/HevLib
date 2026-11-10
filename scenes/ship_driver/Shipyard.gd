@@ -44,7 +44,7 @@ func _ready():
 	syPointers.ConfigDriver.__establish_connection("hl_shipyard_shipdriver_update",self)
 	hl_shipyard_shipdriver_update()
 	var file = File.new()
-	yield(get_tree(),"idle_frame")
+	yield(syPointers,"process_tick")
 	hl_shipdriver_resetter_timeout()
 	sys_slot_refs = syPointers.Equipment.equipment_validity_for_slots.duplicate(true)
 	for tag in sys_slot_refs:

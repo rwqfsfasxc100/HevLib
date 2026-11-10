@@ -36,15 +36,9 @@ var clearing = false
 onready var header_label:PackedScene = load("res://HevLib/ui/mod_menu/changelogs/labels/version_label.tscn")
 onready var entry_label:PackedScene = load("res://HevLib/ui/mod_menu/changelogs/labels/changelog_entry.tscn")
 
-func _init():
-	set_process(false)
-
-signal tick
-
 func parse(path:String,current_page:int,page_size:int,LEFT:Button,RIGHT:Button,refs:Array):
 	var pointers:HevLibPointers = ModLoader._savedObjects[0]
 	var data:Dictionary = pointers.ManifestV2.__parse_changelogs(path)
-	set_process(true)
 	var size:int = data.size()
 	var offset:int = current_page * page_size
 	var keys:Array = data.keys()
@@ -64,9 +58,5 @@ func parse(path:String,current_page:int,page_size:int,LEFT:Button,RIGHT:Button,r
 			if not clearing:
 				refs.append(label)
 				add_child(label)
-			yield(self,"tick")
-		yield(self,"tick")
-	set_process(false)
-
-func _process(delta):
-	emit_signal("tick")
+			yield(pointers,"process_tick")
+		yield(pointers,"process_tick")

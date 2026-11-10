@@ -640,7 +640,7 @@ func _refocus():
 	var parent = get_parent()
 	var parent_count = parent.get_child_count()-1
 	focus_button_neighbours(false)
-	yield(CurrentGame.get_tree(),"idle_frame")
+	yield(pointers,"process_tick")
 	if is_visible_in_tree():
 		update()
 
@@ -794,7 +794,7 @@ func handle_sub_mods():
 var all_tags = pointers.ManifestV2.__get_tags()
 
 func yield_button_focus():
-	yield(CurrentGame.get_tree(),"idle_frame")
+	yield(pointers,"process_tick")
 	button.grab_focus()
 
 var modTranslations = {}

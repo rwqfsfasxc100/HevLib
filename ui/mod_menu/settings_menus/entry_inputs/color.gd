@@ -153,7 +153,7 @@ func _draw():
 func refocus():
 	label_button.rect_size = name_label.rect_size
 	if is_visible_in_tree():
-		yield(get_tree(),"idle_frame")
+		yield(pointers,"process_tick")
 		pointers.ConfigDriver.set_button_focus(self,color_button)
 	
 
@@ -232,7 +232,7 @@ func _picker_created():
 
 func picker_showing(pc:ColorPicker):
 	if pc and pc.is_visible_in_tree():
-		yield(get_tree(),"idle_frame")
+		yield(pointers,"process_tick")
 		pc.get_child(4).get_child(0).get_child(1).grab_focus()
 	else:
 		color_button.grab_focus()

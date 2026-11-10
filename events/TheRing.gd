@@ -218,7 +218,7 @@ func _ready():
 	
 	pointers.ConfigDriver.__establish_connection("hl_thering_UV",self)
 	if not playlist:
-		yield(get_tree(),"idle_frame")
+		yield(pointers,"process_tick")
 	hl_thering_UV()
 
 func wipe_lists():

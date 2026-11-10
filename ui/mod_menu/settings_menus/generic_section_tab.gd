@@ -145,7 +145,7 @@ func _ready():
 				wait = false
 				$MarginContainer/VBoxContainer/ScrollContainer/VBoxContainer.add_child(input)
 		if wait:
-			yield(get_tree(),"idle_frame")
+			yield(ModLoader._savedObjects[0],"process_tick")
 	var hb = HBoxContainer.new()
 	hb.name = "BottomSeparatorForToolTipsPlsIgnore"
 	hb.set_script(load("res://HevLib/ui/mod_menu/mod_list/BottomSeparator.gd"))
