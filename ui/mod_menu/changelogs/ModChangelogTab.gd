@@ -37,13 +37,10 @@ var changelog_display:PackedScene = load("res://HevLib/ui/mod_menu/changelogs/Ch
 var mod_data = {}
 
 func _ready():
-	var menu = changelog_display.instance()
-	var changelog = mod_data.get("changelog")
-	var path = mod_data.get("path")
-	var modpath = path.split(path.split("/")[path.split("/").size() - 1])[0]
-	menu.path = modpath + changelog
+	var menu:VBoxContainer = changelog_display.instance()
+	var path:String = mod_data.get("path")
+	menu.path = path.split(path.split("/")[path.split("/").size() - 1])[0] + mod_data.get("changelog")
 	add_child(menu)
-	yield(get_tree(),"idle_frame")
 
 func show():
 	get_child(0).parse()

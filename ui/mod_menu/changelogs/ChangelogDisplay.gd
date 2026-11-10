@@ -66,7 +66,11 @@ func _left_pressed():
 		if clearing:
 			yield(self,"cleared")
 		parse()
-		yield(get_tree().create_timer(0.15),"timeout")
+		set_process(true)
+		yield(self,"tick")
+		yield(self,"tick")
+		yield(self,"tick")
+		set_process(false)
 		antispam = true
 
 func _right_pressed():
@@ -77,7 +81,11 @@ func _right_pressed():
 		if clearing:
 			yield(self,"cleared")
 		parse()
-		yield(get_tree().create_timer(0.15),"timeout")
+		set_process(true)
+		yield(self,"tick")
+		yield(self,"tick")
+		yield(self,"tick")
+		set_process(false)
 		antispam = true
 
 var clearing = false
@@ -90,18 +98,18 @@ func parse():
 		panelRefs.append(panel)
 		panel.rect_min_size = rect_size - Vector2(12,6)
 		add_container.add_child(panel)
-		yield(CurrentGame.get_tree(),"idle_frame")
+		set_process(true)
+		yield(self,"tick")
+		set_process(false)
 		panel.parse(path,current_page,page_size,LEFT,RIGHT,refs)
 
 func _visibility_changed():
-	yield(CurrentGame.get_tree(),"idle_frame")
+	set_process(true)
+	yield(self,"tick")
+	set_process(false)
 	if is_visible_in_tree():
-		var size = get_parent().rect_size
-		rect_size = size
-		scroll_box.rect_min_size = rect_size - Vector2(12,6) - Vector2(0,pageBox.rect_size.y)
-		for i in refs:
-			i.rect_min_size = rect_size - Vector2(12,12) - Vector2(0,pageBox.rect_size.y)
-	
+		rect_size = get_parent().rect_size
+
 signal cleared()
 func clear_and_update(new):
 	clear()
@@ -121,8 +129,15 @@ func clear():
 	for i in refs:
 		i.visible = false
 		Tool.remove(i)
-	yield(CurrentGame.get_tree(),"idle_frame")
+	set_process(true)
+	yield(self,"tick")
+	set_process(false)
 	refs.clear()
 	panelRefs.clear()
 	clearing = false
 	emit_signal("cleared")
+
+signal tick
+
+func _process(delta):
+	emit_signal("tick")

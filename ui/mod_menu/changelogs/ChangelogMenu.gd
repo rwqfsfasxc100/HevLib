@@ -43,7 +43,7 @@ func open(mods):
 		for i in tabs.get_children():
 			tabs.remove_child(i)
 		for mod in mods:
-			var data = mods[mod]
+			var data:Dictionary = mods[mod]
 			if data["changelog"] != "":
 				var tab = mod_tab.instance()
 				tab.name = data.get("name",mod)
@@ -56,7 +56,7 @@ func _ready():
 
 func _about_to_show():
 	lastFocus = get_focus_owner()
-	$base/VBoxContainer/FooterButtons/Close.grab_focus()
+	$base/PanelContainer/VBoxContainer/FooterButtons/Close.grab_focus()
 	yield(get_tree().create_timer(0.1),"timeout")
 	for i in tabs.get_children():
 		i.show()
@@ -85,5 +85,6 @@ func _on_resize():
 		var size:Vector2 = Settings.getViewportSize()
 		var offsetSize:Vector2 = size - offset
 		rect_size = size
+		$ColorRect.rect_size = size
 		$base.rect_size = offsetSize
 		$base.rect_position = offset/2

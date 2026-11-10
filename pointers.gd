@@ -794,6 +794,10 @@ class _ConfigDriver:
 					else:l("node %s not connected with the method '%s', disconnect failed" % [str(node),method])
 				else:l("node %s does not have the method '%s', cannot disconnect" % [str(node),method])
 	
+	const icsm_string = "    Incompatible mods:\n"
+	const icmr_string = "    Missing requirements:"
+	const mci_string = "     -> %s\n"
+	
 	# Called from the EquipmentDriver ModMain and initializes configs
 	static func __load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		# Fetches game default configs, including those in the config file
@@ -877,31 +881,31 @@ class _ConfigDriver:
 		# Store for the raw config information
 		var configs : Dictionary = {}
 		var current_config : Dictionary = __config_parse(cfg_file)
-		var incorrect_paths : Array = Array()
+		var incorrect_paths : PoolStringArray = PoolStringArray()
 		var problematic_mods : Dictionary = {}
-		for mod in pointers.ManifestV2.__get_mod_list_keys():
-			var manifest : Dictionary = mod_entries[mod]["manifest"]
-			var has_manifest:bool = manifest["has_manifest"]
-			if has_manifest:
+		for m in pointers.ManifestV2.__get_mod_list_keys():
+			var ME:Dictionary = mod_entries[m]
+			var manifest : Dictionary = ME["manifest"]
+			if manifest["has_manifest"]:
+				var modName:String = ME["name"]
 				var missing_requirements : PoolStringArray = PoolStringArray()
 				var incompatible_mods : PoolStringArray = PoolStringArray()
-				var mod_name : String = mod_entries[mod]["name"]
 				var manifest_version : float = float(manifest["manifest_version"])
 				if manifest_version >= 2.1:
 					var cfg : Dictionary = manifest["manifest_data"]["configs"]
 					if cfg.hash() != 177591:
-						configs[mod_name] = cfg
+						configs[modName] = cfg
 				# Checking for mods that require specific filepaths
 				var expected_path:String = manifest["manifest_data"]["manifest_definitions"]["expected_manifest_path"]
 				var actual_path:String = manifest["manifest_file_path"]
 				if expected_path and expected_path.to_lower() != actual_path.to_lower():
-					incorrect_paths.append([manifest["manifest_data"]["mod_information"]["id"],expected_path,actual_path])
+					incorrect_paths.append("%s: Expected manifest path: [%s]; actual manifest path: [%s]" % [manifest["manifest_data"]["mod_information"]["id"],expected_path,actual_path])
 				for requirement in manifest["manifest_data"]["manifest_definitions"]["dependancy_mod_ids"]:
 					if requirement is Array:
 						var doesHaveAny:bool = false
 						var needsEitherOf:PoolStringArray = PoolStringArray()
 						for i in requirement:
-							if i is Dictionary and i.get("blocking",false) and not pointers.ManifestV2.__mod_exists(i):
+							if i is Dictionary and i.get("blocking",false) and not pointers.__mod_exists(i):
 								var ov:String = __get_minmax_string_from_dict(i)
 								if ov:
 									needsEitherOf.append(ov)
@@ -911,7 +915,7 @@ class _ConfigDriver:
 						if not doesHaveAny:
 							missing_requirements.append(" OR ".join(needsEitherOf))
 					elif requirement is Dictionary:
-						if requirement.get("blocking",false) and not pointers.ManifestV2.__mod_exists(requirement):
+						if requirement.get("blocking",false) and not pointers.__mod_exists(requirement):
 							var ov:String = __get_minmax_string_from_dict(requirement)
 							if ov:
 								missing_requirements.append(ov)
@@ -920,7 +924,7 @@ class _ConfigDriver:
 						var doesHaveAny:bool = false
 						var needsEitherOf:PoolStringArray = PoolStringArray()
 						for i in incompat:
-							if i is Dictionary and i.get("blocking",false) and pointers.ManifestV2.__mod_exists(i):
+							if i is Dictionary and i.get("blocking",false) and pointers.__mod_exists(i):
 								var ov:String = __get_minmax_string_from_dict(i)
 								if ov:
 									needsEitherOf.append(ov)
@@ -928,26 +932,21 @@ class _ConfigDriver:
 						if doesHaveAny:
 							incompatible_mods.append(" OR ".join(needsEitherOf))
 					elif incompat is Dictionary:
-						if incompat.get("blocking",false) and pointers.ManifestV2.__mod_exists(incompat):
+						if incompat.get("blocking",false) and pointers.__mod_exists(incompat):
 							var ov:String = __get_minmax_string_from_dict(incompat)
 							if ov:
 								incompatible_mods.append(ov)
 				if missing_requirements or incompatible_mods:
-					problematic_mods[mod_name] = {}
+					var pr:Dictionary = {}
+					problematic_mods[modName] = pr
 					if missing_requirements:
-						problematic_mods[mod_name]["missing_requirements"] = missing_requirements
+						pr["missing_requirements"] = missing_requirements
 					if incompatible_mods:
-						problematic_mods[mod_name]["incompatible_mods"] = incompatible_mods
+						pr["incompatible_mods"] = incompatible_mods
 		# If incorrectly placed mods are found
 		if incorrect_paths:
-			var path_concat:String = ""
-			for i in incorrect_paths:
-				if path_concat:
-					path_concat += "\n\n%s: Expected manifest path: [%s]; actual manifest path: [%s]" % [i[0],i[1],i[2]]
-				else:
-					path_concat = "%s: Expected manifest path: [%s]; actual manifest path: [%s]" % [i[0],i[1],i[2]]
 			# Throws an error box and exits the game to let the user know that their mod(s) are broken.
-			pointers.NodeAccess.__exit(false,"The following mod(s) expect a specific file path, however are located at a different resource path than what it expects:\n\n%s\n\nPlease make sure you have downloaded the mod(s) correctly, and restart the game. If you have any further issues, please ask in the ∆V Discord [https://discord.gg/dv]" % path_concat,"pointers.ConfigDriver",0.0,"",true)
+			pointers.NodeAccess.__exit(false,"The following mod(s) expect a specific file path, however are located at a different resource path than what it expects:\n\n%s\n\nPlease make sure you have downloaded the mod(s) correctly, and restart the game. If you have any further issues, please ask in the ∆V Discord [https://discord.gg/dv]" % incorrect_paths.join("\n\n"),"pointers.ConfigDriver",0.0,"",true)
 		# If any blocking conflicts or missing requirements exist
 		if problematic_mods:
 			var mod_concat:String = ""
@@ -956,17 +955,19 @@ class _ConfigDriver:
 				var missing_requirements:PoolStringArray = problematic_mods[mod_name].get("missing_requirements",PoolStringArray())
 				var incompatible_mods:PoolStringArray = problematic_mods[mod_name].get("incompatible_mods",PoolStringArray())
 				if missing_requirements:
-					mod_concat += "    Missing requirements:"
+					mod_concat += icmr_string
 					for i in missing_requirements:
-						mod_concat += "     -> %s\n" % i
+						mod_concat += mci_string % i
 				if incompatible_mods:
-					mod_concat += "    Incompatible mods:\n"
+					mod_concat += icsm_string
 					for i in incompatible_mods:
-						mod_concat += "     -> %s\n" % i
+						mod_concat += mci_string % i
 			pointers.NodeAccess.__exit(false,"The following mods have issues with the currently installed mods and are unable to run as a result. This can be due to incorrect/out-of-date mod versions, missing mods, or mods that aren't compatible.\n%s\nPlease ensure all requirements are met before being able to launch the game." % mod_concat,"pointers.ConfigDriver",0.0,"",true)
 		pointers.l("config contains [%s] mods" % configs.size(),"pointers.ConfigDriver")
+		var actionList : Array = InputMap.get_actions()
 		for mod in configs.keys():
 			var data : Dictionary = configs[mod]
+			pointers.l("inspecting %s's config - found [%d] user-facing sections" % [mod,data.size()],"pointers.ConfigDriver")
 			mod = __truncate_mod_id(mod)
 			for section in data.keys():
 				var sectData : Dictionary = data[section]
@@ -974,33 +975,47 @@ class _ConfigDriver:
 				if not sect in current_config.keys():
 					current_config[sect] = {}
 				for key in sectData.keys():
+					pointers.l("inspecting section [%s]" % section,"pointers.ConfigDriver")
 					var key_data : Dictionary = sectData[key]
 					var type : String = key_data.get("type","").to_lower()
-					if not type:
+					if type.empty():
 						printerr("config %s does not define a type" % key)
 						continue
 					if key in current_config[sect].keys():
+						pointers.l("found entry [%s] of type [%s] with a default of [%s]" % [key,type,key_data.get("default",null)],"pointers.ConfigDriver")
 						if type == "input":
 							var val : Array = current_config[sect][key]
 							for a in val.size():
 								var v = val[a]
 								if v is String:
-									v = [v]
-								val[a] = v
-							current_config[sect][key] = val
+									val[a] = [v]
+							pointers.l("input config with value of [%s] is [%s]" % [key,val],"pointers.ConfigDriver")
+							if not key in actionList:
+								pointers.l("Adding input key [%s]" % key,"pointers.ConfigDriver")
+								InputMap.add_action(key,float(key_data.get("deadzone",0.5)))
+								actionList.append(key)
+							else:pointers.l("Input key [%s] already exists, skipping" % key,"pointers.ConfigDriver")
+							pointers.Keymapping.__load_input_data(key,val,pointers.Keymapping.__get_opts_from_key_data(key_data))
 					else:
-						match type:
-							"input":
-								var p:Array = key_data.get("default",[])
-								for h in p.size():
-									var v = p[h]
-									if v is String:
-										v = [v]
-									p[h] = v
-								current_config[sect][key] = p
-							_:
-								if "default" in key_data.keys():
-									current_config[sect][key] = key_data["default"]
+						if type == "input":
+							var p:Array = key_data.get("default",[])
+							pointers.l("found entry [%s] of type [%s] with a default of [%s]" % [key,type,p],"pointers.ConfigDriver")
+							for h in p.size():
+								var v = p[h]
+								if v is String:
+									p[h] = [v]
+							current_config[sect][key] = p
+							pointers.l("input config with value of [%s] is [%s]" % [key,p],"pointers.ConfigDriver")
+							if not key in actionList:
+								pointers.l("Adding input key [%s]" % key,"pointers.ConfigDriver")
+								InputMap.add_action(key,float(key_data.get("deadzone",0.5)))
+								actionList.append(key)
+							else:pointers.l("Input key [%s] already exists, skipping" % key,"pointers.ConfigDriver")
+							pointers.Keymapping.__load_input_data(key,p,pointers.Keymapping.__get_opts_from_key_data(key_data))
+						else:
+							var default = key_data.get("default",null)
+							pointers.l("found entry [%s] of type [%s] with a default of [%s]" % [key,type,default],"pointers.ConfigDriver")
+							current_config[sect][key] = default
 		
 		if not "profile_name" in current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",{}):
 			current_config["HevLib/HEVLIB_CONFIG_SECTION_DRIVERS"]["profile_name"] = "Default"
@@ -1013,33 +1028,6 @@ class _ConfigDriver:
 		c.save(cfg_file)
 		c.save(profiles_dir + current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",{}).get("profile_name","Default") + ".cfg")
 		pointers.l("loaded [%s] mod configurations" % configs.size(),"pointers.ConfigDriver")
-		var actionList : Array = InputMap.get_actions()
-		for mod in configs.keys():
-			var data:PoolStringArray = PoolStringArray(configs[mod].keys())
-			pointers.l("inspecting %s's config - found [%d] user-facing sections" % [mod,data.size()],"pointers.ConfigDriver")
-			for section in data:
-				pointers.l("inspecting section [%s]" % section,"pointers.ConfigDriver")
-				var sectData:Dictionary = configs[mod][section]
-				for key in sectData.keys():
-					var key_data:Dictionary = sectData[key]
-					var default = key_data.get("default",null)
-					var type:String = key_data["type"].to_lower()
-					pointers.l("found entry [%s] of type [%s] with a default of [%s]" % [key,type,default],"pointers.ConfigDriver")
-					if type == "input":
-						var p:Array = __get_value(mod,section,key,[])
-						pointers.l("value of [%s] is [%s]" % [key,p],"pointers.ConfigDriver")
-						for h in p.size():
-							var v = p[h]
-							if v is String:
-								v = [v]
-							p[h] = v
-						if not key in actionList:
-							pointers.l("Adding input key [%s]" % key,"pointers.ConfigDriver")
-							InputMap.add_action(key,float(key_data.get("deadzone",0.5)))
-							actionList.append(key)
-						else:pointers.l("Input key [%s] already exists, skipping" % key,"pointers.ConfigDriver")
-						pointers.Keymapping.__load_input_data(key,p,pointers.Keymapping.__get_opts_from_key_data(key_data))
-	
 	
 	static func __get_minmax_string_from_dict(requirement:Dictionary) -> String:
 		var MID:String = requirement.get("mod_id","")
@@ -6326,9 +6314,7 @@ class _ManifestV2:
 		for entry in tag_data.keys():
 			if not tag_data[entry] is Dictionary:
 				return tag_dict
-			var tag_type : String = tag_data[entry].get("type","NULL_TYPE")
-			tag_type = tag_type.to_lower()
-			match tag_type:
+			match tag_data[entry].get("type","null_type").to_lower():
 				"boolean","bool":
 					tag_dict[entry] = bool(tag_data[entry].get("value"))
 				"string","str":
@@ -6341,7 +6327,7 @@ class _ManifestV2:
 					tag_dict[entry] = tag_data[entry].get("value")
 		return tag_dict
 	
-	const test_mod_updates = true
+	const test_mod_updates = false
 	
 	static func __have_mods_updated(folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",last_seen_file = "mods_from_last_launch.json") -> Dictionary:
 		if test_mod_updates:
@@ -6353,7 +6339,16 @@ class _ManifestV2:
 					var manifest : Dictionary = data["manifest"]["manifest_data"]
 					var info : Dictionary = manifest["mod_information"]
 					var version : Dictionary = manifest["version"]
-					out[info["id"]] = {"name":info["name"],"version":{"major":version["version_major"],"minor":version["version_minor"],"bugfix":version["version_bugfix"]},"path":data["file_path"],"changelog":manifest["manifest_definitions"]["changelog_path"]}
+					out[info["id"]] = {
+						"name":info["name"],
+						"version":{
+							"major":version["version_major"],
+							"minor":version["version_minor"],
+							"bugfix":version["version_bugfix"]
+						},
+						"path":data["file_path"],
+						"changelog":manifest["manifest_definitions"]["changelog_path"]
+					}
 			return out
 		if not non_static["self"].haveModsChanged:
 			return {}
@@ -6383,13 +6378,22 @@ class _ManifestV2:
 				var version : Dictionary = manifest["version"]
 				var id:String = info["id"]
 				if (not id in last or (
-					(version["major"] != last[id]["version"]["major"])
+					(version["version_major"] != last[id]["version"]["major"])
 					 or 
-					(version["minor"] != last[id]["version"]["minor"])
+					(version["version_minor"] != last[id]["version"]["minor"])
 					 or 
-					(version["bugfix"] != last[id]["version"]["bugfix"])
+					(version["version_bugfix"] != last[id]["version"]["bugfix"])
 				)):
-					changes[id] = {"name":info["name"],"version":{"major":version["version_major"],"minor":version["version_minor"],"bugfix":version["version_bugfix"]},"path":data["file_path"],"changelog":manifest["manifest_definitions"]["changelog_path"]}
+					changes[id] = {
+						"name":info["name"],
+						"version":{
+							"major":version["version_major"],
+							"minor":version["version_minor"],
+							"bugfix":version["version_bugfix"]
+						},
+						"path":data["file_path"],
+						"changelog":manifest["manifest_definitions"]["changelog_path"]
+					}
 		return changes
 	
 	static func __get_mod_versions(store = false,folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",last_seen_file = "mods_from_last_launch.json",this_seen_file = "mods_from_this_launch.json") -> Dictionary:

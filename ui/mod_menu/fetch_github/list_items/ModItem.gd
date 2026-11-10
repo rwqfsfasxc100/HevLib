@@ -54,7 +54,7 @@ func boot():
 
 var file = File.new()
 func _tree_entered():
-	get_readme()
+	call_deferred("get_readme")
 
 var base_folder_path = "user://cache/.Mod_Menu_2_Cache/github_list/"
 var filepath = base_folder_path + "icon_cache/"
@@ -63,7 +63,6 @@ var releases_cache_path = base_folder_path + "releases_cache.json"
 var update_check_path = base_folder_path + "update_check_cache.json"
 var readmePath = ""
 func get_readme():
-	yield(CurrentGame.get_tree(),"idle_frame")
 	http.connect("request_completed",self,"_request_completed")
 	add_mod()
 
