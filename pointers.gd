@@ -87,10 +87,209 @@ var Classes = {
 	"Zip":Zip,
 }
 
-enum LOAD_TYPE{
-	EXTEND_SCRIPT,
-	OVERRIDE_SCRIPT,
-	REPLACE_RESOURCE
+const LIBRARY_LOAD = {
+	"res://HevLib/scenes/minerals/AstrogatorPanel.gd": {
+		"base_script_path": "res://hud/AstrogatorPanel.gd"
+	},
+	"res://HevLib/scenes/minerals/OMS.gd": {
+		"base_script_path": "res://hud/OMS.gd"
+	},
+	"res://HevLib/scenes/minerals/CargoScanner.gd": {
+		"base_script_path": "res://hud/CargoScanner.gd"
+	},
+	"res://HevLib/scenes/minerals/ProcessedCargoManifest.gd": {
+		"base_script_path": "res://hud/trtl/ProcessedCargoManifest.gd"
+	},
+	"user://cache/.HevLib_Cache/Minerals/cg.gd": {
+		"base_script_path": "res://CurrentGame.gd"
+	},
+	"user://cache/.HevLib_Cache/Minerals/as.gd": {
+		"base_script_path": "res://AsteroidSpawner.gd"
+	},
+	"res://HevLib/scenes/minerals/TheRing.gd": {
+		"base_script_path": "res://TheRing.gd"
+	},
+	"res://HevLib/scenes/research/Enceladus.gd": {
+		"base_script_path": "res://enceladus/Enceladus.gd"
+	},
+	"res://HevLib/scenes/research/overhead_handle/CurrentGame.gd": {
+		"base_script_path": "res://CurrentGame.gd"
+	},
+	"res://HevLib/scenes/equipment/SystemShipUpgradeUI.gd": {
+		"base_script_path": "res://enceladus/SystemShipUpgradeUI.gd"
+	},
+	"res://HevLib/scenes/equipment/SystemBuyUI.gd": {
+		"base_script_path": "res://enceladus/SystemBuyUI.gd"
+	},
+	"res://HevLib/scenes/equipment/UpgradeGroup.gd": {
+		"base_script_path": "res://enceladus/UpgradeGroup.gd"
+	},
+	"res://HevLib/scenes/equipment/ThrusterSlot.gd": {
+		"base_script_path": "res://ships/modules/ThrusterSlot.gd"
+	},
+	"res://HevLib/scenes/weaponslot/weapon_slot_handler.gd": {
+		"base_script_path": "res://ships/WeaponSlot.gd"
+	},
+	"res://HevLib/scenes/equipment/ShipModificationDriver/AddNodes.gd": {
+		"base_script_path": "res://ships/ship-ctrl.gd"
+	},
+	"res://HevLib/scenes/equipment/ShipModificationDriver/InternalStorageMod.gd": {
+		"base_script_path": "res://ships/ship-ctrl.gd"
+	},
+	"res://HevLib/scenes/ship_driver/Shipyard.gd": {
+		"base_script_path": "res://ships/Shipyard.gd"
+	},
+	"res://HevLib/scenes/ship_driver/CurrentGame.gd": {
+		"base_script_path": "res://CurrentGame.gd"
+	},
+	"res://HevLib/scenes/ship_driver/TheRing.gd": {
+		"base_script_path": "res://TheRing.gd"
+	},
+	"res://HevLib/scripts/Namer.gd": {
+		"base_script_path": "res://namer/Namer.gd"
+	},
+	"res://HevLib/events/TheRing.gd": {
+		"base_script_path": "res://TheRing.gd"
+	},
+	"res://HevLib/events/Game.gd": {
+		"base_script_path": "res://Game.gd"
+	},
+	"res://HevLib/events/controls/camera.gd": {
+		"base_script_path": "res://ships/camera.gd"
+	},
+	"res://HevLib/events/controls/ship-ctrl.gd": {
+		"base_script_path": "res://ships/ship-ctrl.gd"
+	},
+	"res://HevLib/events/controls/CurrentGame.gd": {
+		"base_script_path": "res://CurrentGame.gd"
+	},
+	"res://HevLib/events/chaos_map/RingTelescopeView.tscn": {
+		"base_script_path": "res://hud/components/RingTelescopeView.tscn"
+	},
+	"res://HevLib/events/custom_events/TheRing.gd": {
+		"base_script_path": "res://TheRing.gd"
+	},
+	"res://HevLib/scenes/notification_driver/Notifications.tscn": {
+		"base_script_path": "res://achievement/Notifications.tscn"
+	},
+	"res://HevLib/scenes/notification_driver/CurrentGame.gd": {
+		"base_script_path": "res://CurrentGame.gd"
+	},
+	"res://HevLib/scenes/better_title_screen/SaveSlotButton.gd": {
+		"base_script_path": "res://SaveSlotButton.gd"
+	},
+	"res://HevLib/scenes/better_title_screen/CurrentlyPlaying.gd": {
+		"base_script_path": "res://menu/CurrentlyPlaying.gd"
+	},
+	"res://HevLib/ui/ExtensionPopup.gd": {
+		"base_script_path": "res://menu/ExtensionPopup.gd"
+	},
+	"res://HevLib/ui/mod_menu/titlescreen/TitleMenu.gd": {
+		"base_script_path": "res://menu/TitleMenu.gd"
+	},
+	"res://HevLib/ui/mod_menu/titlescreen/DLClist.gd": {
+		"base_script_path": "res://tools/DLClist.gd"
+	},
+	"user://cache/.HevLib_Cache/Variable_Fetch/derelict_expansion.tscn": {
+		"base_script_path": "res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"
+	},
+	"res://HevLib/scripts/transit_tips/TransitTip.gd": {
+		"base_script_path": "res://codex/TransitTip.gd"
+	},
+	"res://HevLib/scripts/easters/Screensaver.gd": {
+		"base_script_path": "res://Screensaver.gd"
+	},
+	"res://HevLib/scripts/easters/TitleMenu.gd": {
+		"base_script_path": "res://menu/TitleMenu.gd"
+	},
+	"res://HevLib/scenes/minerals/Summary.gd": {
+		"base_script_path": "res://enceladus/Summary.gd"
+	},
+	"res://HevLib/scenes/rpc/Crew.gd": {
+		"base_script_path": "res://enceladus/Crew.gd"
+	},
+	"res://HevLib/scenes/rpc/Dealer.gd": {
+		"base_script_path": "res://enceladus/Dealer.gd"
+	},
+	"res://HevLib/scenes/rpc/DiveTarget.gd": {
+		"base_script_path": "res://enceladus/DiveTarget.gd"
+	},
+	"res://HevLib/scenes/rpc/Enceladus.gd": {
+		"base_script_path": "res://enceladus/Enceladus.gd"
+	},
+	"res://HevLib/scenes/rpc/Game.gd": {
+		"base_script_path": "res://Game.gd"
+	},
+	"res://HevLib/scenes/rpc/Logs.gd": {
+		"base_script_path": "res://enceladus/Logs.gd"
+	},
+	"res://HevLib/scenes/rpc/MineralMarket.gd": {
+		"base_script_path": "res://enceladus/MineralMarket.gd"
+	},
+	"res://HevLib/scenes/rpc/Music.gd": {
+		"base_script_path": "res://Music.gd"
+	},
+	"res://HevLib/scenes/rpc/PreFlightInspection.gd": {
+		"base_script_path": "res://enceladus/PreFlightInspection.gd"
+	},
+	"res://HevLib/scenes/rpc/Repairs.gd": {
+		"base_script_path": "res://enceladus/Repairs.gd"
+	},
+	"res://HevLib/scenes/rpc/Services.gd": {
+		"base_script_path": "res://enceladus/Services.gd"
+	},
+	"res://HevLib/scenes/rpc/SimulationLayer.gd": {
+		"base_script_path": "res://enceladus/Simulator/SimulationLayer.gd"
+	},
+	"res://HevLib/scenes/rpc/Summary.gd": {
+		"base_script_path": "res://enceladus/Summary.gd"
+	},
+	"res://HevLib/scenes/rpc/TitleMenu.gd": {
+		"base_script_path": "res://menu/TitleMenu.gd"
+	},
+	"res://HevLib/scenes/rpc/Tuning.gd": {
+		"base_script_path": "res://enceladus/Tuning.gd"
+	},
+	"res://HevLib/scenes/rpc/Upgrades.gd": {
+		"base_script_path": "res://enceladus/Upgrades.gd"
+	},
+	"res://HevLib/scenes/keymapping/bind_displays/AnalogAxisDisplay.gd": {
+		"base_script_path": "res://hud/components/AnalogAxisDisplay.gd"
+	},
+	"res://HevLib/scenes/keymapping/bind_displays/GamepadKeybindDisplay.gd": {
+		"base_script_path": "res://hud/components/GamepadKeybindDisplay.gd"
+	},
+	"res://HevLib/scenes/keymapping/bind_displays/KeybindDisplay.gd": {
+		"base_script_path": "res://hud/components/KeybindDisplay.gd"
+	},
+	"res://HevLib/scenes/keymapping/bind_displays/MousebindDisplay.gd": {
+		"base_script_path": "res://hud/components/MousebindDisplay.gd"
+	},
+	"res://HevLib/scripts/Boot.gd": {
+		"base_script_path": "res://Boot.gd"
+	},
+	"res://HevLib/scenes/minerals/multiminerals/mineral.gd": {
+		"base_script_path": "res://asteroids/mineral.gd"
+	},
+	"res://HevLib/scenes/minerals/multiminerals/MineralProcessingUnit.gd": {
+		"base_script_path": "res://ships/modules/MineralProcessingUnit.gd"
+	},
+	"res://HevLib/scenes/minerals/multiminerals/AsteroidSpawner.gd": {
+		"base_script_path": "res://AsteroidSpawner.gd"
+	},
+	"res://HevLib/scenes/service_driver/Services.gd": {
+		"base_script_path": "res://enceladus/Services.gd"
+	},
+	"res://HevLib/scripts/Screensaver.gd": {
+		"base_script_path": "res://Screensaver.gd",
+		"priority": 1000
+	},
+	"user://cache/.HevLib_Cache/Variable_Fetch/upgrades.tscn": {
+		"base_script_path": "res://enceladus/Upgrades.tscn"
+	},
+	"user://cache/.HevLib_Cache/Variable_Fetch/ship_limitations.tscn": {
+		"base_script_path": "res://enceladus/Upgrades.tscn"
+	}
 }
 
 var copyrights:String = "© 2024-2026 Benjamin Buckhurst a.k.a. __hev. All rights reserved."
@@ -704,14 +903,11 @@ class _ConfigDriver:
 		if non_static["self"].settingsHash:
 			var settings:Dictionary = non_static["self"].settings
 			# Config is cached, may as well fetch from there
-			if full in settings.keys():
-				if key in settings[full].keys():
-					var out = settings[full][key]
-					# Hard duplicating array or dictionary types to ensure no reference weirdness
-					if out is Array or out is Dictionary:
-						return out.duplicate(true)
-					return out
-			return default
+			var out = settings.get(full,{}).get(key,default)
+			# Hard duplicating array or dictionary types to ensure no reference weirdness
+			if out is Array or out is Dictionary:
+				return out.duplicate(true)
+			return out
 		else:
 			# Not cached, fetch from file instead
 			var cfg:ConfigFile = ConfigFile.new()
@@ -1311,8 +1507,8 @@ class _ConfigDriver:
 			var subscriptions:Dictionary = non_static["self"].subscriptions
 			var top : String = __truncate_to_setting_entry(id,section)
 			if not top in subscriptions.keys():
-				subscriptions[top] = {}
-			if not setting in subscriptions[top].keys():
+				subscriptions[top] = {setting:[]}
+			elif not setting in subscriptions[top].keys():
 				subscriptions[top][setting] = []
 			var do:bool = true
 			for item in subscriptions[top][setting]:
@@ -1326,12 +1522,10 @@ class _ConfigDriver:
 	static func __disconnect_subscription(method: String,object: Object,id: String,section: String,setting: String):
 		var top : String = __truncate_to_setting_entry(id,section)
 		var subscriptions:Dictionary = non_static["self"].subscriptions
-		if top in subscriptions.keys():
-			if setting in subscriptions[top].keys():
-				for item in subscriptions[top][setting]:
-					if item[0] == object:
-						if item[1] == method:
-							subscriptions[top][setting].erase(item)
+		for item in subscriptions.get(top,{}).get(setting,[]):
+			if item[0] == object:
+				if item[1] == method:
+					subscriptions[top][setting].erase(item)
 	
 	static func __truncate_mod_id(mod_id:String) -> String:
 		var pointers:HevLibPointers._DataFormat = non_static["pointers"].DataFormat
@@ -1408,7 +1602,7 @@ class _ConfigDriver:
 	static func __config_store(dict : Dictionary,filepath:String):
 		var cfg:ConfigFile = ConfigFile.new()
 		for section in dict.keys():
-			var keys = dict[section]
+			var keys:Dictionary = dict[section]
 			for key in keys.keys():
 				cfg.set_value(section,key,keys[key])
 		cfg.save(filepath)
@@ -2503,7 +2697,7 @@ class _Equipment:
 			var mod_id:String = pointers.ManifestV2.__match_mod_file_path_to_id(md)
 			if mod_id:
 				var mod:Dictionary = mods[md]
-				if "drivers" in mod.keys() and mod.drivers:
+				if mod.get("drivers",null):
 					drivers[mod_id] = mod.drivers
 		mods.clear()
 		
@@ -2517,8 +2711,9 @@ class _Equipment:
 			if sys:
 				var type:String = item["equipment_type"]
 				if not sys in equipment_validity_for_slots.keys():
-					equipment_validity_for_slots[sys] = []
-				if type and not type in equipment_validity_for_slots[sys]:
+					if type:
+						equipment_validity_for_slots[sys] = [type]
+				elif type and not type in equipment_validity_for_slots[sys]:
 					equipment_validity_for_slots[sys].append(type)
 		
 		for mod_id in drivers.keys():
@@ -3141,11 +3336,11 @@ class _Equipment:
 						hardpoint_types.append(st)
 				for st in slotDefaults.keys():
 					if st in slot_defaults.keys():
-						for item in slotDefaults.get(st):
-							if not item in slot_defaults.get(st):
+						for item in slotDefaults[st]:
+							if not item in slot_defaults[st]:
 								slot_defaults[st].append(item)
 					else:
-						slot_defaults[st] = slotDefaults.get(st)
+						slot_defaults[st] = slotDefaults[st]
 		for slotDict in ADD_EQUIPMENT_SLOTS:
 			var snn : String = slotDict.get("slot_node_name","")
 			var spp : Dictionary = ship_limitations.get(snn,{})
@@ -4076,7 +4271,7 @@ script = ExtResource( 5 )"""
 		"heat_rotation":0,
 		"heat_scale":Vector2.ONE,
 	}
-	var nozKeys = nozzle_template.keys()
+	var nozKeys:PoolStringArray = PoolStringArray(nozzle_template.keys())
 	func convert_to_nozzle(noz):
 		var nozzle:Dictionary = nozzle_template.duplicate(true)
 		for i in nozKeys:
@@ -5081,7 +5276,7 @@ class _Keymapping:
 				if ie in current:
 					formatted_vanilla_binds_store[ie] = current[ie]
 				else:
-					var sect = {"can_be_rebound":false,"inputs":[],"opts":{}}
+					var sect:Dictionary = {"can_be_rebound":false,"inputs":[],"opts":{}}
 					var dv = vanilla_binds[ie]
 					if ie in vopts:
 						sect["opts"] = vopts[ie].duplicate(true)
@@ -5660,8 +5855,8 @@ class _ManifestV2:
 		var version_dictionary : Dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
 		var drivers : Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(script_path)
 		var ml : String = "en"
-		if "REPLACE_TRANSLATIONS.gd" in drivers.keys():
-			var tlData : Dictionary = drivers["REPLACE_TRANSLATIONS.gd"].get("TRANSLATIONS",{})
+		var tlData : Dictionary = drivers.get("REPLACE_TRANSLATIONS.gd",{}).get("TRANSLATIONS",{})
+		if tlData:
 			ml = tlData.get("master_locale","en")
 			tlData.erase("master_locale")
 			var tlKeys:Array = tlData.keys()
@@ -6096,8 +6291,9 @@ class _ManifestV2:
 										pointers.l(err,"pointers.ConfigDriver")
 									else:
 										if not section in ovConfigs.keys():
-											ovConfigs[section] = {}
-										ovConfigs[section][cfname] = cfdata
+											ovConfigs[section] = {cfname:cfdata}
+										else:
+											ovConfigs[section][cfname] = cfdata
 							if ovConfigs:
 								pointers.l("Parsed configs for %s, has disabled configs: [%s]" % [file_path,configs.hash() != ovConfigs.hash()],"pointers.ManifestV2")
 								dict_template["configs"] = ovConfigs
@@ -6145,8 +6341,8 @@ class _ManifestV2:
 				if mods[mod]["manifest"]["has_manifest"]:
 					var md : Dictionary = mods[mod]["manifest"]["manifest_data"]
 					var id : String = md["mod_information"].get("id","")
-					if id and "tags" in md.keys():
-						var tags : Dictionary = md["tags"]
+					if id:
+						var tags : Dictionary = md.get("tags",{})
 						for tag in tags.keys():
 							if not tag in tag_data_cache:
 								tag_data_cache[tag] = {}
@@ -6662,117 +6858,142 @@ class _ManifestV2:
 					cached_icon_files.append(r)
 		return cached_icon_files
 	
-	const load_safe_resource_reference = []
+	enum LOAD_TYPE{
+		EXTEND_SCRIPT,
+		OVERRIDE_SCRIPT,
+		REPLACE_RESOURCE
+	}
 	
-	static func __load_modlets(preprocess_paths:Array = Array()) -> void:
+	static func __load_modlets() -> void:
 		var pointers:HevLibPointers = non_static["pointers"]
+		var base:_ManifestV2 = non_static["self"]
 		pointers.l("Loading modlet resources with order-safe mode.","pointers.SafeMode")
 		pointers.DataFormat.__loadDLC()
-		var resource_paths:Array = Array()
 		var file:File = File.new()
-		for i in preprocess_paths:
-			if i is String:
-				var ed:String = ""
-				file.open(i,File.READ)
-				var data:String = file.get_as_text(true)
-				file.close()
-				if "extends \"" in data:
-					for line in data.split("\n"):
-						if line.strip_edges().begins_with("extends \""):
-							ed = line.split("\"")[1]
-							break
-				resource_paths.append({"path":i,"mode":pointers.LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed,"priority":-INF,"mod_path":"res://HevLib/ModMain.gd"})
-			elif i is PoolStringArray:
-				resource_paths.append({"path":i[0],"mode":pointers.LOAD_TYPE.REPLACE_RESOURCE,"extra_data":i[1],"priority":-INF,"mod_path":"res://HevLib/ModMain.gd"})
-			elif i is Array:
-				var ed:String = ""
-				var ot:String = i[0]
-				file.open(ot,File.READ)
-				var data:String = file.get_as_text(true)
-				file.close()
-				if "extends \"" in data:
-					for line in data.split("\n"):
-						if line.strip_edges().begins_with("extends \""):
-							ed = line.split("\"")[1]
-							break
-				resource_paths.append({"path":ot,"mode":pointers.LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed,"priority":i[1],"mod_path":"res://HevLib/ModMain.gd"})
+		var load_stash:Array = [fetch_library_load(base,pointers)]
 		for modlet in __get_modlet_files():
 			var mod_data:Dictionary = pointers.ManifestV2.__get_mod_by_id(pointers.ManifestV2.__match_mod_file_path_to_id(modlet))
-			var drivers:Dictionary = mod_data["drivers"]
-			var priority = mod_data["priority"]
-			if "LOAD_RESOURCES.gd" in drivers.keys():
-				var resources : Dictionary = drivers["LOAD_RESOURCES.gd"].get("LOAD_RESOURCES",{})
-				for resource in resources.keys():
-					var subdata:Dictionary = resources[resource]
-					var load_type:String = subdata.get("load_type","").to_lower()
-					if load_type.empty():
-						match resource.get_extension():
-							"gd","gdc":
-								load_type = "script"
-							"tscn","res","tres":
-								load_type = "resource"
-					match load_type:
-						"script":
-							var path:String=resource if resource.begins_with("res://")else(modlet.get_base_dir()+(""if resource.begins_with("/")else"/")+resource)
-							if pointers.ConfigDriver.__validate_dictionary(subdata)&&pointers.FileAccess.__file_exists(path):
-								var op=subdata.get("override_path","res:/"+path.split(modlet.get_base_dir())[1])
-								var override_path:String=op if(op.begins_with("res:/"))else("res:/"+(""if op.begins_with("/")else"/")+op)
-								if subdata.get("override",false)&&pointers.FileAccess.__file_exists(override_path):
-									resource_paths.append({"path":path,"mode":LOAD_TYPE.OVERRIDE_SCRIPT,"extra_data":override_path,"priority":subdata.get("priority",priority),"mod_path":modlet})
-								else:
-									var ed:String = subdata.get("base_script_path","")
-									if ed.empty()&&path.get_extension()=="gd":
-										file.open(path,File.READ)
-										var data:String = file.get_as_text(true)
-										file.close()
-										if "extends \"" in data:
-											for line in data.split("\n"):
-												if line.strip_edges().begins_with("extends \""):
-													ed = line.split("\"")[1]
-													break
-									resource_paths.append({"path":path,"mode":LOAD_TYPE.EXTEND_SCRIPT,"extra_data":ed,"priority":subdata.get("priority",priority),"mod_path":modlet})
-						"scene","resource":
-							var path : String = resource if resource.begins_with("res://") else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
-							var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[1])
-							var old_path : String = old if (old.begins_with("res:/")) else ("res:/" + ("" if old.begins_with("/") else "/") + old)
-							if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
-								resource_paths.append({"path":path,"mode":LOAD_TYPE.REPLACE_RESOURCE,"extra_data":old_path,"priority":subdata.get("priority",priority),"mod_path":modlet})
+			var resources : Dictionary = mod_data["drivers"].get("LOAD_RESOURCES.gd",{}).get("LOAD_RESOURCES",{})
+			if resources:
+				load_stash.append({
+					"object":base,
+					"method":"process_mod_data_for_load",
+					"args":[
+						resources,
+						modlet,
+						pointers,
+						float(mod_data["priority"]),
+					]
+				})
 		var ovr:Dictionary = Dictionary()
-		for f in resource_paths:
-			var path:String = f["path"]
-			var extra:String = f["extra_data"]
-			var priority:float = float(f["priority"])
-			if not extra:
-				extra = path
-			if not extra in ovr:
-				ovr[extra] = {"paths":Array(),"deps":Array()}
-			for i in pointers.SafeMode.__lookup_file_dependancies(path):
-				if not i in ovr[extra]["deps"]:
-					ovr[extra]["deps"].append(i)
-			ovr[extra]["paths"].append([f.mode,path,f.priority,f.mod_path])
+		for r in pointers.Threading.__request_multiple_threads(load_stash):
+			for f in r:
+				var extra:String = f["extra_data"]
+				if not extra in ovr:
+					ovr[extra] = [f.data]
+#					ovr[extra] = {"paths":[f.data],"deps":f["deps"]}
+				else:
+#					for i in f["deps"]:
+#						if not i in ovr[extra]["deps"]:
+#							ovr[extra]["deps"].append(i)
+#					ovr[extra]["paths"].append(f.data)
+					ovr[extra].append(f.data)
 		var LO:Array = pointers.SafeMode.vanilla_load_order
 		var order:Array = Array()
 		for i in ovr:
-			var d:Dictionary = ovr[i]
-			var paths:Array = d.paths
+			var paths:Array = ovr[i]
 			paths.sort_custom(non_static["self"],"sortModPathOrder")
-			order.append([i,d.deps,paths,LO.find(i)])
+			order.append([i,LO.find(i),paths])
 		order.sort_custom(non_static["self"],"sortModLoadOrder")
-#		load_safe_resource_reference.append_array(order)
-		pointers.FileAccess.__save_file_content("user://dump.json",JSON.print(order,"\t"))
 		for r in order:
 			for i in r[2]:
-				match i[0]:
-					LOAD_TYPE.EXTEND_SCRIPT:
-						pointers.DataFormat.__extend_script(i[1])
-					LOAD_TYPE.OVERRIDE_SCRIPT:
-						pointers.DataFormat.__override_script(i[1],r[0])
-					LOAD_TYPE.REPLACE_RESOURCE:
-						pointers.DataFormat.__replace_resource(i[1],r[0])
-		pointers.l("%d modlet resources loaded." % resource_paths.size(),"pointers.SafeMode")
+				var type:int = i[0]
+				if type == LOAD_TYPE.OVERRIDE_SCRIPT or type == LOAD_TYPE.EXTEND_SCRIPT:
+					pointers.DataFormat.__override_script(i[1],r[0])
+				elif type == LOAD_TYPE.REPLACE_RESOURCE:
+					pointers.DataFormat.__replace_resource(i[1],r[0])
+		pointers.l("%d modlet resources loaded." % order.size(),"pointers.SafeMode")
 	
+	static func fetch_library_load(base,pointers:HevLibPointers):
+		return {
+			"object":base,
+			"method":"process_mod_data_for_load",
+			"args":[
+				pointers.LIBRARY_LOAD,
+				"res://HevLib/ModMain.gd",
+				pointers,
+				-INF
+			]
+		}
+
+	
+	static func process_mod_data_for_load(resources:Dictionary,modlet:String,pointers:HevLibPointers,priority:float):
+		var out:Array = []
+		for resource in resources.keys():
+			var subdata:Dictionary = resources[resource]
+			var load_type:String = subdata.get("load_type","").to_lower()
+			var file:File = File.new()
+			if load_type.empty():
+				match resource.get_extension():
+					"gd","gdc":
+						load_type = "script"
+					"tscn","res","tres","scn":
+						load_type = "resource"
+			if load_type == "script":
+				var path:String=resource if resource.begins_with("res://")else(modlet.get_base_dir()+(""if resource.begins_with("/")else"/")+resource)
+				if pointers.ConfigDriver.__validate_dictionary(subdata)&&pointers.FileAccess.__file_exists(path):
+					var op=subdata.get("override_path","res:/"+path.split(modlet.get_base_dir())[1])
+					var override_path:String=op if(op.begins_with("res:/"))else("res:/"+(""if op.begins_with("/")else"/")+op)
+					if subdata.get("override",false)&&pointers.FileAccess.__file_exists(override_path):
+						out.append({
+							"data":[
+								LOAD_TYPE.OVERRIDE_SCRIPT,
+								path,
+								subdata.get("priority",priority),
+								modlet
+							],
+							"extra_data":override_path,
+#							"deps":pointers.SafeMode.__lookup_file_dependancies(path)
+						})
+					else:
+						var ed:String = subdata.get("base_script_path","")
+						if ed.empty()&&path.get_extension()=="gd":
+							file.open(path,File.READ)
+							var data:String = file.get_as_text(true)
+							file.close()
+							if "extends \"" in data:
+								for line in data.split("\n"):
+									if line.strip_edges().begins_with("extends \""):
+										ed = line.split("\"")[1]
+										break
+						out.append({
+							"data":[
+								LOAD_TYPE.EXTEND_SCRIPT,
+								path,
+								subdata.get("priority",priority),
+								modlet
+							],
+							"extra_data":ed if ed else path,
+#							"deps":pointers.SafeMode.__lookup_file_dependancies(path)
+						})
+			elif load_type == "scene" or load_type == "resource":
+				var path : String = resource if resource.begins_with("res://") else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
+				var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[1])
+				var old_path : String = old if (old.begins_with("res:/")) else ("res:/" + ("" if old.begins_with("/") else "/") + old)
+				if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
+					out.append({
+						"data":[
+							LOAD_TYPE.REPLACE_RESOURCE,
+							path,
+							subdata.get("priority",priority),
+							modlet
+						],
+						"extra_data":old_path,
+#						"deps":pointers.SafeMode.__lookup_file_dependancies(path)
+					})
+		return out
 	static func sortModLoadOrder(a:Array,b:Array) -> bool:
-		return a[3] < b[3]
+		return a[1] < b[1]
 	
 	static func sortModPathOrder(a:Array,b:Array) -> bool:
 		var oa:float = a[2]
@@ -7113,29 +7334,23 @@ class _NodeAccess:
 	static func __is_instanced_from_scene(p_node):
 		return not p_node.filename.empty()
 	
-	static func __dynamic_crew_expander(folder_path: String = "user://cache/.HevLib_Cache/dynamic_crew_expander/", max_crew:int = 24) -> String:
+	static func __dynamic_crew_expander() -> void:
 		var pointers:HevLibPointers = non_static["pointers"]
-		pointers.FolderAccess.__check_folder_exists(folder_path)
-		var base:int = 24
-		
-		var test:Node = load("res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn").instance()
-		var maximum:int = 0
-		for child in test.get_children():
-			var line:String = child.name
-			if line.begins_with("DIALOG_DERELICT_SWITCH_CREW"):
-				maximum = max(int(line.split("|")[1]),maximum)
-		test.queue_free()
-		maximum = max(base,maximum + 1)
-		if not max_crew > base:
-			pointers.l("TSCN Writer for dynamic crew handler: desired expansion to [%s] is less than or equal to the currently expanded number of [%s]" % [max_crew,base],"pointers.NodeAccess")
-			return ""
-		
+		var ncrew:Dictionary = pointers.ManifestV2.__get_manifest_entry("tags","TAG_HANDLE_EXTRA_CREW")
+		var max_crew:int = 24
+		for mod in ncrew.keys():
+			var data:int = ncrew[mod]
+			if data > max_crew:
+				max_crew = data
 		var compacted_string : String = "[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"res://comms/ConversationPlayer.gd\" type=\"Script\" id=2]\n\n[node name=\"DIALOG_DERELICT_RANDOM_1\" instance=ExtResource( 1 )]\n\n"
-		while max_crew > base:
-			compacted_string += "[node name=\"DIALOG_DERELICT_SWITCH_CREW|%s\" type=\"Node\" parent=\".\" index=\"%s\"]\nscript = ExtResource( 2 )\nmyLine = false\nfaceless = true\nimportChildren = NodePath(\"../DIALOG_DERELICT_GO_AND_BRING_IT\")\nagenda = \"CREW/%s\"\nagendaNotSame = true\n\n" % [base,base + 4]
-			base += 1
-		if not folder_path.ends_with("/"):folder_path += "/"
-		return folder_path.plus_file("dynamic_crew_x%s.tscn" % base)
+		for i in (max_crew - 12):
+			i += 12
+			compacted_string += "[node name=\"DIALOG_DERELICT_SWITCH_CREW|%d\" type=\"Node\" parent=\".\" index=\"%d\"]\nscript = ExtResource( 2 )\nmyLine = false\nfaceless = true\nimportChildren = NodePath(\"../DIALOG_DERELICT_GO_AND_BRING_IT\")\nagenda = \"CREW/%d\"\nagendaNotSame = true\n\n" % [i,i + 4,i]
+		
+		var file:File = File.new()
+		file.open("user://cache/.HevLib_Cache/Variable_Fetch/derelict_expansion.tscn",File.WRITE)
+		file.store_string(compacted_string)
+		file.close()
 	
 	static func __remove_scripts(node):
 		node.set_script(null)
@@ -7919,6 +8134,20 @@ class _Scripting:
 	const prices_str = "\n\tif not \"%s\" in mineralPrices:\n\t\tmineralPrices[\"%s\"] = %f"
 	const colour_str = "\n\tif not \"%s\" in specificMineralColors:\n\t\tspecificMineralColors[\"%s\"] = Color( %f, %f, %f, 1.0 )"
 	
+	const mineral_header_str = """[gd_scene load_steps=2 format=2]
+
+[ext_resource path=\"res://HevLib/scenes/minerals/base_scenes/mineral-%s-%s.tscn\" type=\"PackedScene\" id=1]
+
+[node name=\"mineral\" instance=ExtResource( 1 )]
+mineral = \"%s\"
+color = Color( %f, %f, %f, 1 )
+mass = %f
+filler = \"%s\"
+scaleMin = %f
+scaleMax = %f
+ferrous = %s
+"""
+	
 	static func make_mineral_scripting() -> void:
 		var pointers:HevLibPointers = non_static["pointers"]
 		var mineralDir:String = "user://cache/.HevLib_Cache/Minerals/"
@@ -7930,11 +8159,9 @@ class _Scripting:
 		var drivers:Array = pointers.DriverManagement.__get_drivers()
 		var mineral_data:Array = []
 		for driver in drivers:
-			var dv:Dictionary = driver["drivers"]
-			if "ADD_MINERALS.gd" in dv:
-				var mineral_dict:Dictionary = dv["ADD_MINERALS.gd"]
-				for mineral in mineral_dict.keys():
-					mineral_data.append(mineral_dict[mineral])
+			var mineral_dict:Dictionary = driver["drivers"].get("ADD_MINERALS.gd",{})
+			for mineral in mineral_dict.keys():
+				mineral_data.append(mineral_dict[mineral])
 		
 		# Initialize info for mineral names, colours, and value
 		var prices:Dictionary = {}
@@ -7953,130 +8180,112 @@ class _Scripting:
 		# Initialize and create ore chunk additions
 		var content:String = "extends \"res://AsteroidSpawner.gd\"\nfunc _init():\n\tpass"
 		for mineral in mineral_data:
-			var mineral_keys:Array = mineral.keys()
 			var mname:String = mineral["name"]
-			var handle:String = mineral.get("handle","none")
 			var price:float = mineral.get("price",0.0)
 			if price > 0.0:
 				# Only adds minerals to the ring if they have a value.
 				# Useful if you only want to reference a mineral by name
 				# and a colour without it showing in the market, i.e. getScan()
 				price_text += prices_str % [mname,mname,price]
-				match handle:
-					"scenes":
-						# Handle for providing a list of premade scene filepaths to use for the ores
-						content += content_str % [mname,mname,
-							"[\n%s]" % PoolStringArray([
-								"load(\"%s\")" % mineral.get("ore_1"),
-								"load(\"%s\")" % mineral.get("ore_2"),
-								"load(\"%s\")" % mineral.get("ore_3"),
-								"load(\"%s\")" % mineral.get("ore_4"),
-								"load(\"%s\")" % mineral.get("ore_5"),
-								"load(\"%s\")" % mineral.get("ore_6"),
-								"load(\"%s\")" % mineral.get("ore_7"),
-							]).join(",\n")
-						]
-						trace_text += trace_str % [mname,mname]
-						pointers.l("adding mineral %s using handler [scene]" % mname,"pointers.Scripting")
-					"recolor":
-						var base:String = "fe"
-						var info:Dictionary = {}
-						if "color" in mineral_keys:
-							info["color"] = mineral["color"]
-						if "filler" in mineral_keys:
-							info["filler"] = mineral["filler"]
-						if "mass" in mineral_keys:
-							info["mass"] = mineral["mass"]
-						if "min_scale" in mineral_keys:
-							info["min_scale"] = mineral["min_scale"]
-						if "max_scale" in mineral_keys:
-							info["max_scale"] = mineral["max_scale"]
-						if "purity" in mineral_keys:
-							info["purity"] = mineral["purity"]
-						if "specific_ore_data" in mineral_keys:
-							info["specific_ore_data"] = mineral["specific_ore_data"]
-						match mineral.get("base","fe").to_lower():
-							"fe","iron":
-								base = "fe"
-							"v","vanadium":
-								base = "v"
-							"be","beryllium":
-								base = "be"
-							"pd","palladium":
-								base = "pd"
-							"pt","platinum":
-								base = "pt"
-							"w","tungsten","wolfram":
-								base = "w"
-						info["base"] = base
-						var header:String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://HevLib/scenes/minerals/base_scenes/mineral-%s-%s.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"mineral\" instance=ExtResource( 1 )]"
-						var mineral_content:String = "\nmineral = \"%s\"" % mname
-						var color:Color = mineral.get("color",Color.white)
-						var mass:float = mineral.get("mass",0.0)
-						var filler_mineral:String = mineral.get("filler","H2O")
-						var min_scale:float = mineral.get("min_scale",0.75)
-						var max_scale:float = mineral.get("max_scale",0.75)
-						var ferrous:bool = mineral.get("ferrous",false)
-						var purityInfo:Dictionary = info.get("purity",{})
-						var folder:String = mdir_str % [mname,int(color.r*255),int(color.g*255),int(color.b*255)]
-						
-						var specific_data:Dictionary = info.get("specific_ore_data",{})
-						var roc:Array = []
-						pointers.FolderAccess.__check_folder_exists(folder)
-						var mh:String = "[\n"
-						for i in 7:
-							i += 1
-							var cl:Color = color
-							var ms:float = mass
-							var fm:String = filler_mineral
-							var mns:float = min_scale
-							var mxs:float = max_scale
-							var fr:bool = ferrous
-							var fn:String = folder + "h%s.tscn" % i
-							var data:String = header % [info["base"],i] + mineral_content
-							if i in specific_data:
-								var idx:Dictionary = specific_data[i]
-								var idks:Array = idx.keys()
-								if "color" in idks:
-									cl = idx["color"]
-								if "mass" in idks:
-									ms = idx["mass"]
-								if "filler" in idks:
-									fm = idx["filler"]
-								if "min_scale" in idks:
-									mns = idx["min_scale"]
-								if "max_scale" in idks:
-									mxs = idx["max_scale"]
-								if "ferrous" in idks:
-									fr = idx["ferrous"]
-							data += "\ncolor = Color( %f, %f, %f, 1 )" % [cl.r,cl.g,cl.b]
-							if ms:
-								data += "\nmass = %f" % ms
-							if fm:
-								data += "\nfiller = \"%s\"" % fm
-							if mns:
-								data += "\nscaleMin = %f" % mns
-							if mxs:
-								data += "\nscaleMax = %f" % mxs
-							if fr:
-								data += "\nferrous = true"
-							if i in purityInfo:
+				var handle:String = mineral.get("handle","none")
+				if handle == "scenes":
+					# Handle for providing a list of premade scene filepaths to use for the ores
+					content += content_str % [mname,mname,
+						"[\n%s]" % PoolStringArray([
+							"load(\"%s\")" % mineral["ore_1"],
+							"load(\"%s\")" % mineral["ore_2"],
+							"load(\"%s\")" % mineral["ore_3"],
+							"load(\"%s\")" % mineral["ore_4"],
+							"load(\"%s\")" % mineral["ore_5"],
+							"load(\"%s\")" % mineral["ore_6"],
+							"load(\"%s\")" % mineral["ore_7"],
+						]).join(",\n")
+					]
+					trace_text += trace_str % [mname,mname]
+					pointers.l("adding mineral %s using handler [scene]" % mname,"pointers.Scripting")
+				elif handle == "recolor":
+					var base:String = "fe"
+					match mineral.get("base","fe").to_lower():
+						"fe","iron":
+							base = "fe"
+						"v","vanadium":
+							base = "v"
+						"be","beryllium":
+							base = "be"
+						"pd","palladium":
+							base = "pd"
+						"pt","platinum":
+							base = "pt"
+						"w","tungsten","wolfram":
+							base = "w"
+					var color:Color = mineral.get("color",Color.white)
+					var mass:float = mineral.get("mass",0.0)
+					var filler_mineral:String = mineral.get("filler","H2O")
+					var min_scale:float = mineral.get("min_scale",0.75)
+					var max_scale:float = mineral.get("max_scale",0.75)
+					var ferrous:bool = mineral.get("ferrous",false)
+					var purityInfo:Dictionary = mineral.get("purity",{})
+					var purityKeys:PoolIntArray = PoolIntArray(purityInfo.keys())
+					var folder:String = mdir_str % [mname,int(color.r*255),int(color.g*255),int(color.b*255)]
+					
+					var specific_data:Dictionary = mineral.get("specific_ore_data",{})
+					var specificKeys:PoolIntArray = PoolIntArray(specific_data.keys())
+					pointers.FolderAccess.__check_folder_exists(folder)
+					var mh:String = "[\n"
+					for i in 7:
+						i += 1
+						var fn:String = folder + "h%s.tscn" % i
+						if i in specificKeys:
+							var idx:Dictionary = specific_data[i]
+							var cl:Color = idx.get("color",color)
+							var data:String = mineral_header_str % [
+								base,
+								i,
+								mname,
+								cl.r,
+								cl.g,
+								cl.b,
+								idx.get("mass",mass),
+								idx.get("filler",filler_mineral),
+								idx.get("min_scale",min_scale),
+								idx.get("max_scale",max_scale),
+								"true" if idx.get("ferrous",ferrous) else "false",
+							]
+							if i in purityKeys:
 								data += "\npurity = %f" % purityInfo[i]
 							file.open(fn,File.WRITE)
 							file.store_string(data)
 							file.close()
-							mh += "load(\"%s\"),\n" % data
-						content += content_str % [mname,mname,mh + "]"]
-						trace_text += trace_str % [mname,mname]
-						pointers.l("adding mineral %s using handler [recolor]" % mname,"pointers.Scripting")
-					"none":
-						pointers.l("mineral %s registered but not adding to ring" % mineral,"pointers.Scripting")
-					_:
-						pointers.l("mineral %s using incorrect handler, set price to 0.0 or less to prevent being registered to exist in the ring or crashes may happen" % mineral,"pointers.Scripting")
+							mh += "load(\"%s\"),\n" % fn
+						else:
+							var data:String = mineral_header_str % [
+								base,
+								i,
+								mname,
+								color.r,
+								color.g,
+								color.b,
+								mass,
+								filler_mineral,
+								min_scale,
+								max_scale,
+								"true" if ferrous else "false",
+							]
+							if i in purityKeys:
+								data += "\npurity = %f" % purityInfo[i]
+							file.open(fn,File.WRITE)
+							file.store_string(data)
+							file.close()
+							mh += "load(\"%s\"),\n" % fn
+					content += content_str % [mname,mname,mh + "]"]
+					trace_text += trace_str % [mname,mname]
+					pointers.l("adding mineral %s using handler [recolor]" % mname,"pointers.Scripting")
+				elif handle == "none":
+					pointers.l("mineral %s registered but not adding to ring" % mineral,"pointers.Scripting")
+				else:
+					pointers.l("mineral %s using incorrect handler, set price to 0.0 or less to prevent being registered to exist in the ring or crashes may happen" % mineral,"pointers.Scripting")
 			else:
 				pointers.l("adding only color references for mineral %s, value set to zero or below" % mineral,"pointers.Scripting")
-		
-		
 		
 		# Builds the current game extension script
 		file.open(mineralDir + "cg.gd",File.WRITE)
@@ -8703,11 +8912,12 @@ class _Translations:
 		var fullLogging:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","full_logging",false)
 		var markPlaceholders:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","mark_placeholder_translations",false)
 		TranslationServer.clear()
+		var t1=Time.get_ticks_usec()
 		var drivers:Array = pointers.DriverManagement.__get_drivers()
+		var t2=Time.get_ticks_usec()-t1
 		var processes:Array = []
 		for mod in drivers:
-			if "REPLACE_TRANSLATIONS.gd" in mod["drivers"].keys():
-				processes.append({"object":base,"method":"process_drivers_for_translations","args":[mod["drivers"]["REPLACE_TRANSLATIONS.gd"].get("TRANSLATIONS",{}),markPlaceholders,pointers]})
+			processes.append({"object":base,"method":"process_drivers_for_translations","args":[mod["drivers"].get("REPLACE_TRANSLATIONS.gd",{}).get("TRANSLATIONS",{}),markPlaceholders,pointers]})
 		# April Fool's alcohol!
 		var date:Dictionary = Time.get_date_dict_from_system()
 		if date.month == 4 and date.day == 1:
@@ -8728,8 +8938,12 @@ class _Translations:
 		file.open("user://cache/.HevLib_Cache/translation_check_data.json",File.WRITE)
 		file.store_string(JSON.print(ml_check_data,"\t"))
 		file.close()
+		var add_v_tl:Array = []
+		var rl = ClassDB.instance("_ResourceLoader")
 		for i in ProjectSettings.get_setting("locale/translations"):
-			TranslationServer.add_translation(ResourceLoader.load(i,"",true))
+			add_v_tl.append({"object":rl,"method":"load","args":[i,"Translation",true]})
+		for i in pointers.Threading.__request_multiple_threads(add_v_tl):
+			TranslationServer.add_translation(i)
 		pointers.SafeMode.__handle_exit_for_file_checks()
 	
 	static func process_drivers_for_translations(translations:Dictionary,markPlaceholders:bool,pointers:HevLibPointers):

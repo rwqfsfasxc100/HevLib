@@ -413,10 +413,10 @@ func get_mod_data(data):
 				mname = rn
 	return mname
 
-var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
-var dependancies_store = "user://cache/.Mod_Menu_2_Cache/dependancies/dependancies.json"
-var conflicts_store = "user://cache/.Mod_Menu_2_Cache/conflicts/conflicts.json"
-var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/complementary.json"
+const update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
+const dependancies_store = "user://cache/.Mod_Menu_2_Cache/updates/dependancies.json"
+const conflicts_store = "user://cache/.Mod_Menu_2_Cache/updates/conflicts.json"
+const complementary_store = "user://cache/.Mod_Menu_2_Cache/updates/complementary.json"
 
 var children = {}
 func _ready():

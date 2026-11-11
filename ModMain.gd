@@ -56,7 +56,8 @@ func _init(modLoader=ModLoader):
 	recache(pointers)
 	pointers.FolderAccess.__recursive_delete(variables_folder,PoolStringArray(["remove_pointer_casting.zip"]))
 	var directory:Directory=Directory.new();directory.make_dir_recursive(variables_folder);directory.make_dir_recursive(validation_check_path.get_base_dir())
-	pointers.FileAccess.__load_precached_mods();pointers.ConfigDriver.__load_configs()
+	pointers.FileAccess.__load_precached_mods()
+	pointers.ConfigDriver.__load_configs()
 	
 #	testing(modLoader,pointers)
 	
@@ -68,90 +69,13 @@ func _init(modLoader=ModLoader):
 		l("ERROR! FAILED TO FETCH FILE SYSTEM")
 	pointers.Scripting.make_mineral_scripting()
 	pointers.Equipment.__make_upgrades_scene()
-	var ncrew:Dictionary=pointers.ManifestV2.__get_manifest_entry("tags","TAG_HANDLE_EXTRA_CREW")
-	var count:int=24
-	for mod in ncrew.keys():
-		var data:int=ncrew[mod]
-		if data>count:count=data
-	var crewsize_entry:String=pointers.NodeAccess.__dynamic_crew_expander("user://cache/.HevLib_Cache/",count)
-	if crewsize_entry:
-		files_to_load.append([crewsize_entry,"res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"])
-	pointers.ManifestV2.__load_modlets(files_to_load)
+	pointers.NodeAccess.__dynamic_crew_expander()
+	pointers.ManifestV2.__load_modlets()
 	yield(self,"ready")
 	var CRoot:Viewport=get_tree().get_root()
 	CRoot.call_deferred("add_child",pointers)
 	CRoot.call_deferred("add_child",load("res://HevLib/logging/_HevLib_Gamespace_Canvas.tscn").instance())
 	CRoot.call_deferred("add_child",load("res://HevLib/scenes/keymapping/keybind_interrupt.tscn").instance())
-const files_to_load:Array=[
-	"res://HevLib/scenes/minerals/AstrogatorPanel.gd",
-	"res://HevLib/scenes/minerals/OMS.gd",
-	"res://HevLib/scenes/minerals/CargoScanner.gd",
-	"res://HevLib/scenes/minerals/ProcessedCargoManifest.gd",
-	"user://cache/.HevLib_Cache/Minerals/cg.gd",
-	"user://cache/.HevLib_Cache/Minerals/as.gd",
-	"res://HevLib/scenes/minerals/TheRing.gd",
-	"res://HevLib/scenes/research/Enceladus.gd",
-	"res://HevLib/scenes/research/overhead_handle/CurrentGame.gd",
-	"res://HevLib/scenes/equipment/SystemShipUpgradeUI.gd",
-	"res://HevLib/scenes/equipment/SystemBuyUI.gd",
-	"res://HevLib/scenes/equipment/UpgradeGroup.gd",
-	"res://HevLib/scenes/equipment/ThrusterSlot.gd",
-	"res://HevLib/scenes/weaponslot/weapon_slot_handler.gd",
-	"res://HevLib/scenes/equipment/ShipModificationDriver/AddNodes.gd",
-	"res://HevLib/scenes/equipment/ShipModificationDriver/InternalStorageMod.gd",
-	"res://HevLib/scenes/ship_driver/Shipyard.gd",
-	"res://HevLib/scenes/ship_driver/CurrentGame.gd",
-	"res://HevLib/scenes/ship_driver/TheRing.gd",
-	"res://HevLib/scripts/Namer.gd",
-	"res://HevLib/events/TheRing.gd",
-	"res://HevLib/events/Game.gd",
-	"res://HevLib/events/controls/camera.gd",
-	"res://HevLib/events/controls/ship-ctrl.gd",
-	"res://HevLib/events/controls/CurrentGame.gd",
-	PoolStringArray(["res://HevLib/events/chaos_map/RingTelescopeView.tscn","res://hud/components/RingTelescopeView.tscn"]),
-	"res://HevLib/events/custom_events/TheRing.gd",
-	PoolStringArray(["res://HevLib/scenes/notification_driver/Notifications.tscn","res://achievement/Notifications.tscn"]),
-	"res://HevLib/scenes/notification_driver/CurrentGame.gd",
-	PoolStringArray(["res://HevLib/scenes/better_title_screen/TitleScreen.tscn","res://TitleScreen.tscn"]),
-	"res://HevLib/scenes/better_title_screen/SaveSlotButton.gd",
-	"res://HevLib/scenes/better_title_screen/CurrentlyPlaying.gd",
-	"res://HevLib/ui/ExtensionPopup.gd",
-	"res://HevLib/ui/mod_menu/titlescreen/TitleMenu.gd",
-	"res://HevLib/ui/mod_menu/titlescreen/DLClist.gd",
-	PoolStringArray(["res://HevLib/scenes/crew_extensions/base_expansion_x24.tscn","res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"]),
-	"res://HevLib/scripts/transit_tips/TransitTip.gd",
-	"res://HevLib/scripts/easters/Screensaver.gd",
-	"res://HevLib/scripts/easters/TitleMenu.gd",
-	"res://HevLib/scenes/minerals/Summary.gd",
-	"res://HevLib/scenes/rpc/Crew.gd",
-	"res://HevLib/scenes/rpc/Dealer.gd",
-	"res://HevLib/scenes/rpc/DiveTarget.gd",
-	"res://HevLib/scenes/rpc/Enceladus.gd",
-	"res://HevLib/scenes/rpc/Game.gd",
-	"res://HevLib/scenes/rpc/Logs.gd",
-	"res://HevLib/scenes/rpc/MineralMarket.gd",
-	"res://HevLib/scenes/rpc/Music.gd",
-	"res://HevLib/scenes/rpc/PreFlightInspection.gd",
-	"res://HevLib/scenes/rpc/Repairs.gd",
-	"res://HevLib/scenes/rpc/Services.gd",
-	"res://HevLib/scenes/rpc/SimulationLayer.gd",
-	"res://HevLib/scenes/rpc/Summary.gd",
-	"res://HevLib/scenes/rpc/TitleMenu.gd",
-	"res://HevLib/scenes/rpc/Tuning.gd",
-	"res://HevLib/scenes/rpc/Upgrades.gd",
-	"res://HevLib/scenes/keymapping/bind_displays/AnalogAxisDisplay.gd",
-	"res://HevLib/scenes/keymapping/bind_displays/GamepadKeybindDisplay.gd",
-	"res://HevLib/scenes/keymapping/bind_displays/KeybindDisplay.gd",
-	"res://HevLib/scenes/keymapping/bind_displays/MousebindDisplay.gd",
-	"res://HevLib/scripts/Boot.gd",
-	"res://HevLib/scenes/minerals/multiminerals/mineral.gd",
-	"res://HevLib/scenes/minerals/multiminerals/MineralProcessingUnit.gd",
-	"res://HevLib/scenes/minerals/multiminerals/AsteroidSpawner.gd",
-	"res://HevLib/scenes/service_driver/Services.gd",
-	["res://HevLib/scripts/Screensaver.gd",1000],
-	PoolStringArray(["user://cache/.HevLib_Cache/Variable_Fetch/upgrades.tscn","res://enceladus/Upgrades.tscn"]),
-	PoolStringArray(["user://cache/.HevLib_Cache/Variable_Fetch/ship_limitations.tscn","res://enceladus/Upgrades.tscn"]),
-]
 static func installScriptExtension(path:String):
 	var childPath:String=strings[1]+path
 	var childScript:Script=ResourceLoader.load(childPath,"Script").new()
@@ -218,25 +142,20 @@ const active_events_file="user://cache/.HevLib_Cache/Event_Driver/active_events.
 const latest_event_file="user://cache/.HevLib_Cache/Event_Driver/latest_event.txt"
 const modlet_toggle_restart_path="user://cache/.Mod_Menu_2_Cache/updates/modlet_restart_requests.json"
 const updateCacheFile :String="user://cache/.Mod_Menu_2_Cache/updates/mods_to_update.json"
-const dependancies_store="user://cache/.Mod_Menu_2_Cache/dependancies/dependancies.json"
-const conflicts_store="user://cache/.Mod_Menu_2_Cache/conflicts/conflicts.json"
-const complementary_store="user://cache/.Mod_Menu_2_Cache/complementary/complementary.json"
+const dependancies_store="user://cache/.Mod_Menu_2_Cache/updates/dependancies.json"
+const conflicts_store="user://cache/.Mod_Menu_2_Cache/updates/conflicts.json"
+const complementary_store="user://cache/.Mod_Menu_2_Cache/updates/complementary.json"
 const class_names_to_clear:PoolStringArray=PoolStringArray(["HevLibPointers","MINIZ"])
 const class_refs:Dictionary={"HevLibPointers":"res://HevLib/pointers.gd","MINIZ":"res://HevLib/scripts/miniz/miniz.gd"}
 static func recache(pointers):
-	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/")
-	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/")
-	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/dependancies/")
-	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/conflicts/")
-	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/complementary/")
-	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/github_list/icon_cache/")
-	pointers.FolderAccess.__check_folder_exists("user://cache/.Mod_Menu_2_Cache/github_list/downloaded_zips/")
-	pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Event_Driver/")
 	var d:Directory=Directory.new()
+	d.make_dir_recursive("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/")
+	d.make_dir_recursive("user://cache/.Mod_Menu_2_Cache/github_list/icon_cache/")
+	d.make_dir_recursive("user://cache/.Mod_Menu_2_Cache/github_list/downloaded_zips/")
+	d.make_dir_recursive("user://cache/.HevLib_Cache/Event_Driver/")
 	var file:File=File.new()
-	for f in PoolStringArray(pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/",true,true)):d.remove(f)
-	for f in PoolStringArray(pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/github_list/downloaded_zips/",true,true)):d.remove(f)
-	for f in PoolStringArray(pointers.FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/manifest_cache/",true,true)):d.remove(f)
+	pointers.FolderAccess.__recursive_delete("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/")
+	pointers.FolderAccess.__recursive_delete("user://cache/.Mod_Menu_2_Cache/github_list/downloaded_zips/")
 	if file.file_exists(releases_cache):
 		var age:float=Time.get_unix_time_from_system()-file.get_modified_time(releases_cache)
 		if age>3600:
@@ -599,6 +518,17 @@ func testing(modLoader:ModLoader,pointers):
 	var file:File = File.new()
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
 	
+	var dict = {"a":8,"b":9,"c":7,"d":{"tt":2}}
+	var arr = [0,1,2,3,4,5,6,7,8,9]
+	var t1=Time.get_ticks_usec()
+	for i in 100000:
+		var r = arr[0]
+	var t2=Time.get_ticks_usec()
+	for i in 100000:
+		var r = arr[9]
+	var t3=Time.get_ticks_usec()
+	var d1=t2-t1
+	var d2=t3-t2
 	
 	
 	breakpoint

@@ -34,16 +34,16 @@ extends Button
 
 var pointers:HevLibPointers = ModLoader._savedObjects[0]
 var file = File.new()
-var update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
+const update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
 func _ready():
 	check()
 	pointers.connect("updates_fetched",self,"check")
 	visible = false
 var visibility = false
 
-var dependancies_store = "user://cache/.Mod_Menu_2_Cache/dependancies/dependancies.json"
-var conflicts_store = "user://cache/.Mod_Menu_2_Cache/conflicts/conflicts.json"
-var complementary_store = "user://cache/.Mod_Menu_2_Cache/complementary/complementary.json"
+const dependancies_store = "user://cache/.Mod_Menu_2_Cache/updates/dependancies.json"
+const conflicts_store = "user://cache/.Mod_Menu_2_Cache/updates/conflicts.json"
+const complementary_store = "user://cache/.Mod_Menu_2_Cache/updates/complementary.json"
 
 func check():
 	file.open(update_store,File.READ)

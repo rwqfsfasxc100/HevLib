@@ -32,11 +32,11 @@
 
 extends "res://SaveSlotButton.gd"
 
-onready var popup_path = get_parent().get_parent().get_parent().get_parent().get_parent().get_node("NoMargins")
+onready var popup_path:MarginContainer = get_node_or_null(NodePath("../../../../../NoMargins"))
 
-onready var menu_path = popup_path.get_node("Popups/SaveSettings")
+onready var menu_path:Popup = load("res://HevLib/scenes/better_title_screen/SaveSettings.tscn").instance()
 
-onready var delete_path = popup_path.get_node("Popups/Override")
+onready var delete_path:ConfirmationDialog = popup_path.get_node("Popups/Override")
 
 var password:String = "FTWOMG"
 
@@ -59,6 +59,7 @@ func _ready():
 	if hl_btrssbtn_uinit:
 		OS.kill(OS.get_process_id())
 	hl_btrssbtn_uinit = true
+	popup_path.get_node("Popups").add_child(menu_path)
 	foolish.name = "Foolish"
 	add_child(foolish)
 	var box:HBoxContainer = HBoxContainer.new()

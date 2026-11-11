@@ -10,9 +10,11 @@
 [ext_resource path="res://menu/sfx/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=11]
 
 [node name="SaveSettings" type="Popup"]
-margin_left = -400.0
-margin_right = 160.0
-margin_bottom = 750.0
+process_priority = 999999
+margin_left = 282.0
+margin_top = 60.0
+margin_right = 998.0
+margin_bottom = 660.0
 grow_horizontal = 2
 grow_vertical = 2
 rect_min_size = Vector2( 716, 600 )
@@ -36,7 +38,7 @@ rect_min_size = Vector2( 716, 600 )
 
 [node name="CenterContainer" type="CenterContainer" parent="NoMargins"]
 margin_right = 986.0
-margin_bottom = 716.0
+margin_bottom = 600.0
 rect_min_size = Vector2( 716, 600 )
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -46,9 +48,8 @@ script = ExtResource( 2 )
 anchor_right = 0.0
 anchor_bottom = 0.0
 margin_left = 67.0
-margin_top = 58.0
 margin_right = 919.0
-margin_bottom = 658.0
+margin_bottom = 600.0
 rect_min_size = Vector2( 716, 600 )
 size_flags_horizontal = 4
 
