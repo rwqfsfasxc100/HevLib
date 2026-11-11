@@ -6922,12 +6922,7 @@ class _ManifestV2:
 				var extra:String = f["extra_data"]
 				if not extra in ovr:
 					ovr[extra] = [f.data]
-#					ovr[extra] = {"paths":[f.data],"deps":f["deps"]}
 				else:
-#					for i in f["deps"]:
-#						if not i in ovr[extra]["deps"]:
-#							ovr[extra]["deps"].append(i)
-#					ovr[extra]["paths"].append(f.data)
 					ovr[extra].append(f.data)
 		var LO:Array = pointers.SafeMode.vanilla_load_order
 		var order:Array = Array()
