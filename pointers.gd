@@ -2471,22 +2471,9 @@ class _DriverManagement:
 		if driver_store.empty():
 			var base:_DriverManagement = non_static["self"]
 			var pointers:HevLibPointers = non_static["pointers"]
-			for modmain_path in (pointers.ManifestV2.__get_modmain_files() + pointers.ManifestV2.__get_modlet_files()):
-				var has_manifest:bool = false
-				var manifest_path : String = ""
-				var modFolder : String = modmain_path.get_base_dir() + "/"
-				var modFile : String = modmain_path.get_file().to_lower()
-				if modFile.begins_with("mod") and modFile.ends_with(".manifest"):
-					has_manifest = true
-					manifest_path = modmain_path
-				else:
-					for item in pointers.FolderAccess.__fetch_folder_files(modFolder,false,true):
-						var modEntryName = item.get_file().to_lower()
-						if modEntryName.begins_with("mod") and modEntryName.ends_with(".manifest"):
-							has_manifest = true
-							manifest_path = item
-				if not has_manifest:
-					continue
+			for manifest_path in pointers.ManifestV2.__get_manifest_files():
+				var modFolder : String = manifest_path.get_base_dir() + "/"
+				var modFile : String = manifest_path.get_file().to_lower()
 				var this_mod_data : Dictionary = {}
 				var manifest : Dictionary = pointers.ManifestV2.__parse_file_as_manifest(manifest_path)
 				var mrv:Dictionary = manifest.get("manifest_definitions",{})
@@ -2494,17 +2481,39 @@ class _DriverManagement:
 				if manifest_ver < 2.2:
 					continue
 				var id : String = manifest.get("mod_information",{}).get("id","")
-				if not id:
+				if id.empty():
 					continue
 				this_mod_data["id"] = id
 				this_mod_data["priority"] = mrv.get("modlet_priority",0)
-				this_mod_data["drivers"] = __get_drivers_from_modmain_path(modmain_path,false,manifest_ver >= 2.3)
+				this_mod_data["drivers"] = __get_drivers_from_modmain_path(manifest_path,false,manifest_ver >= 2.3)
 				this_mod_data["mod_directory"] = modFolder
-				if this_mod_data["drivers"]:
-					if (not get_ids) or (get_ids and id in get_ids):
-						driver_store.append(this_mod_data)
+				if this_mod_data["drivers"] and ((not get_ids) or (get_ids and id in get_ids)):
+					driver_store.append(this_mod_data)
 			driver_store.sort_custom(base,"compare_driver_dictionaries")
 		return driver_store.duplicate(true)
+	
+	static func __get_specific_driver_type(desired_driver:String) -> Array:
+		var base:_DriverManagement = non_static["self"]
+		var pointers:HevLibPointers = non_static["pointers"]
+		var out:Array = []
+		for manifest_path in pointers.ManifestV2.__get_manifest_files():
+			var modFolder : String = manifest_path.get_base_dir() + "/"
+			var this_mod_data : Dictionary = {}
+			var manifest : Dictionary = pointers.ManifestV2.__parse_file_as_manifest(manifest_path)
+			var mrv:Dictionary = manifest.get("manifest_definitions",{})
+			if mrv.get("manifest_version",1.0) < 2.2:
+				continue
+			if manifest.get("mod_information",{}).get("id","").empty():
+				continue
+			var folderCheck : Array = pointers.FolderAccess.__fetch_folder_files(modFolder,true)
+			for driverDir in driver_dirs:
+				if driverDir in folderCheck:
+					var driverFolder : String = modFolder + driverDir
+					for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
+						var driver_filepath : String = driverFolder + driver
+						if __is_driver_file(driver_filepath) and desired_driver == driver:
+							out.append(pointers.DataFormat.__get_script_constant_map_without_load(driver_filepath))
+		return out
 	
 	static func compare_driver_dictionaries(a, b):
 		var aPrio:int = a.get("priority",0)
@@ -2551,10 +2560,7 @@ class _DriverManagement:
 								var druid : String = uid_path % driver_filepath.sha256_text()
 								if not file.file_exists(druid) or pointers.FileAccess.__get_file_content(druid) != pointers.FileAccess.__get_uid_of_file(driver_filepath):
 									continue
-							this_mod_data[driver] = {}
-							var consts : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(driver_filepath)
-							for i in consts.keys():
-								this_mod_data[driver][i] = consts[i]
+							this_mod_data[driver] = pointers.DataFormat.__get_script_constant_map_without_load(driver_filepath)
 			driver_get_cache[file_path] = this_mod_data
 			dgck.append(file_path)
 		return driver_get_cache[file_path].duplicate(true)
@@ -4932,6 +4938,7 @@ class _FolderAccess:
 	const non_static = {}
 	func _init(p):
 		non_static["pointers"] = p
+		non_static["self"] = self
 	
 	static func __check_folder_exists(folder: String, status_array: bool = false):
 		var value:bool = false
@@ -5001,9 +5008,15 @@ class _FolderAccess:
 		if (not folder in folderStructureCache) or recache:
 			var folder_structure : Dictionary = {}
 			var files : Array = __fetch_folder_files(folder,true,false)
+			var treeSearchWithThreads:Array = []
 			for object in files:
 				if object.ends_with("/"):
-					folder_structure[object] = __get_folder_structure(folder+object,store_file_content)
+#					folder_structure[object] = __get_folder_structure(folder+object,store_file_content)
+					treeSearchWithThreads.append({
+						"object":non_static["self"],
+						"method":"gfs",
+						"args":[folder+object,store_file_content]
+					})
 				else:
 					if store_file_content:
 						var file:File = File.new()
@@ -5012,8 +5025,26 @@ class _FolderAccess:
 						file.close()
 					else:
 						folder_structure[object] = "FILE"
+			for f in non_static["pointers"].Threading.__request_multiple_threads(treeSearchWithThreads):
+				folder_structure[f[1].split("/",false)[-1] + "/"] = f[0]
 			folderStructureCache[folder] = folder_structure
 		return folderStructureCache[folder].duplicate(true)
+	
+	static func gfs(folder:String,store_file_content:bool) -> Array:
+		var folder_structure : Dictionary = {}
+		var files : Array = __fetch_folder_files(folder,true,false)
+		for object in files:
+			if object.ends_with("/"):
+				folder_structure[object] = gfs(folder+object,store_file_content)[0]
+			else:
+				if store_file_content:
+					var file:File = File.new()
+					file.open(folder + object,File.READ)
+					folder_structure[object] = file.get_buffer(file.get_len())
+					file.close()
+				else:
+					folder_structure[object] = "FILE"
+		return [folder_structure,folder]
 	
 	static func __get_files_with_extensions(folder:String,extensions:PoolStringArray,recurse_depth:int = -1) -> Array:
 		var directory:Directory = Directory.new()
@@ -5562,7 +5593,9 @@ class _ManifestV2:
 				gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
 			var modPathPrefix:String = gameInstallDirectory + "/mods/"
 			# Pre-cache mod data to prevent issues later down the line with potential future multithreading
-			__get_all_modlets(false,true);__get_icon_files();__get_modmain_files()
+			__get_all_modlets(false,true)
+			__get_icon_files()
+			__get_modmain_files()
 			var dir:Directory = Directory.new()
 			if dir.open(modPathPrefix) + dir.list_dir_begin(): # If non-zero, then an error code has been emitted
 				pointers.l("ERROR: Cannot open zip directory","pointers.ManifestV2")
@@ -5654,27 +5687,10 @@ class _ManifestV2:
 					file.open(mod_state_hash_file,File.READ)
 					base.lastModStateHash = file.get_32()
 					file.close()
-				var zrs:Array = []
-				for i in cached_mod_keys:
-					var thismod:Dictionary = cached_mod_list[i]
-					var zip_size:int = 0
-					if file.open(thismod["zip_path"],File.READ) == OK:
-						zip_size = file.get_len()
-						file.close()
-					var concat:Dictionary = {
-						"name":TranslationServer.translate(thismod["name"]),
-						"priority":thismod["priority"],
-						"path":thismod["file_path"],
-						"zip_path":thismod["zip_path"],
-						"zip_size":zip_size,
-						"version":[thismod["version_data"]["version_major"],thismod["version_data"]["version_minor"],thismod["version_data"]["version_bugfix"]],
-						"type":thismod["mod_type"],
-						"enabled":thismod["enabled"],
-					}
-					if thismod["manifest"]["has_manifest"]:
-						concat["id"] = thismod["manifest"]["manifest_data"]["mod_information"]["id"]
-					zrs.append(concat)
-				zrs.sort_custom(non_static["self"],"ovs")
+				var zrs:Array = Array()
+				for mod in modListArr:
+					zrs.append(mod["hash"])
+				zrs.sort()
 				base.currentModStateHash = zrs.hash()
 				file.open(mod_state_hash_file,File.WRITE)
 				file.store_32(base.currentModStateHash)
@@ -5684,7 +5700,27 @@ class _ManifestV2:
 		return cached_mod_list.duplicate(true)
 	
 	static func compile_mod_data_from_path(mod_path:String) -> Dictionary:
-		return __make_mod_entry(__concat_mod_info(mod_path))
+		var thismod:Dictionary = __make_mod_entry(__concat_mod_info(mod_path))
+		var zp:String = thismod["zip_path"]
+		var concat:Dictionary = {
+			"name":TranslationServer.translate(thismod["name"]),
+			"priority":thismod["priority"],
+			"path":thismod["file_path"],
+			"zip_path":zp,
+			"zip_size":0,
+			"version":[thismod["version_data"]["version_major"],thismod["version_data"]["version_minor"],thismod["version_data"]["version_bugfix"]],
+			"type":thismod["mod_type"],
+			"enabled":thismod["enabled"],
+		}
+		var file:File=File.new()
+		if file.file_exists(zp):
+			file.open(zp,File.READ)
+			concat["zip_size"] = file.get_len()
+			file.close()
+		if thismod["manifest"]["has_manifest"]:
+			concat["id"] = thismod["manifest"]["manifest_data"]["mod_information"]["id"]
+		thismod["hash"] = concat.hash()
+		return thismod
 	
 	static func get_mod_zip_content(modFSPath:String,pointers):
 		for modEntryPath in pointers.Zip.__get_zip_content(modFSPath):
@@ -6717,10 +6753,7 @@ class _ManifestV2:
 			if pointers.is_editor:
 				modmain_file_list.append_array(pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[]))
 			else:
-				for r in __get_mod_files():
-					var i : String = r.get_file().to_lower()
-					if i.begins_with("modmain") and i.ends_with(".gd"):
-						modmain_file_list.append(r)
+				__get_mod_files()
 		return modmain_file_list
 	
 	const active_modlet_file_list : PoolStringArray = PoolStringArray()
@@ -6736,17 +6769,18 @@ class _ManifestV2:
 			for modlet in modletCheck.keys():
 				if modletCheck[modlet] != cached_modlets[modlet]:
 					recache = true
+					break
 		if recache:
 			if not all_modlet_file_list:
 				var manifests:PoolStringArray = __get_manifest_files()
 				var manifest_checks : Array = []
 				for i in manifests:
 					manifest_checks.append(i.to_lower())
-				var allModFiles : PoolStringArray = __get_mod_files()
-				for r in allModFiles:
-					var i : String = r.get_file().to_lower()
-					if (i.begins_with("modmain") and i.ends_with(".gd")):
-						var mr : String = r.get_base_dir().to_lower() + "/mod.manifest"
+				for r in __get_modmain_files():
+					r=r.to_lower()
+					var i : String = r.get_file()
+					if i.get_extension() == "gd" and i.begins_with("modmain"):
+						var mr : String = r.get_base_dir() + "/mod.manifest"
 						if mr in manifest_checks:
 							manifest_checks.erase(mr)
 				var ov : Array = []
@@ -6795,11 +6829,13 @@ class _ManifestV2:
 			if pointers.is_editor:
 				for a in pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[]):
 					restrict_to_modmains.append(a.get_base_dir() + "/")
-				for a in PoolStringArray(pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets",{}).keys()):
-					restrict_to_modmains.append(a.get_base_dir() + "/")
+				var sm:Dictionary = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets",{})
+				for a in sm.keys():
+					if sm[a]:
+						restrict_to_modmains.append(a.get_base_dir() + "/")
 			var arr1 : PoolStringArray = siftFolderStructureForModFiles(pointers.FolderAccess.__get_folder_structure("res://",false,false),"res://",restrict_to_modmains)
-			var arr2 : PoolStringArray = PoolStringArray()
 			if pointers.is_editor:
+				var arr2 : PoolStringArray = PoolStringArray()
 				var excludeDirs:PoolStringArray = PoolStringArray()
 				for i in arr1:
 					var r:String = i.get_file().to_lower()
@@ -6814,25 +6850,26 @@ class _ManifestV2:
 						var vr:String = file.get_base_dir().to_lower()
 						if not vr in excludeDirs:
 							arr2.append(file)
+					cached_mod_files.append_array(arr2)
 				else:
-					arr2 = arr1
+					cached_mod_files.append_array(arr1)
 			else:
-				arr2 = arr1
-			cached_mod_files.append_array(arr2)
+				cached_mod_files.append_array(arr1)
+			for r in cached_mod_files:
+				var i : String = r.get_file().to_lower()
+				var ext:String = i.get_extension()
+				if ext == "manifest" and i.begins_with("mod"):
+					cached_manifest_files.append(r)
+				elif ext == "gd" and i.begins_with("modmain"):
+					modmain_file_list.append(r)
+				elif ext in non_static["pointers"].SUPPORTED_IMAGE_EXTENSIONS and i.begins_with("icon"):
+					cached_icon_files.append(r)
 		return cached_mod_files
 	
 	static func siftFolderStructureForModFiles(structure:Dictionary,path:String = "res://",restricted_to_modmains : PoolStringArray = PoolStringArray()) -> PoolStringArray:
 		var out : PoolStringArray = PoolStringArray()
-		if restricted_to_modmains:
-			var ev : Array = structure.keys()
-			for i in ev.size():
-				ev[i] = ev[i].to_lower()
-			for f in ev:
-				if f.begins_with("modmain") and f.ends_with(".gd"):
-					if not path in restricted_to_modmains:
-						return PoolStringArray()
 		for i in structure:
-			if i.ends_with("/"):
+			if i.ends_with("/") and (path + i) in restricted_to_modmains:
 				out.append_array(siftFolderStructureForModFiles(structure[i],path + i,restricted_to_modmains))
 			else:
 				var f : String = i.to_lower()
@@ -6843,19 +6880,13 @@ class _ManifestV2:
 	const cached_manifest_files : PoolStringArray = PoolStringArray()
 	static func __get_manifest_files() -> PoolStringArray:
 		if cached_manifest_files.empty():
-			for r in __get_mod_files():
-				var i : String = r.get_file().to_lower()
-				if i.begins_with("mod") and i.ends_with(".manifest"):
-					cached_manifest_files.append(r)
+			__get_mod_files()
 		return cached_manifest_files
 	
 	const cached_icon_files : PoolStringArray = PoolStringArray()
 	static func __get_icon_files() -> PoolStringArray:
 		if cached_icon_files.empty():
-			for r in __get_mod_files():
-				var i : String = r.get_file().to_lower()
-				if i.begins_with("icon") and i.get_extension().to_lower() in non_static["pointers"].SUPPORTED_IMAGE_EXTENSIONS:
-					cached_icon_files.append(r)
+			__get_mod_files()
 		return cached_icon_files
 	
 	enum LOAD_TYPE{
@@ -8103,6 +8134,7 @@ class _Scripting:
 	
 	func _init(p,h):
 		non_static["pointers"] = p
+		non_static["self"] = self
 		non_static["http"] = h
 	
 	static func log_essential_info_for_bugreports():
@@ -8156,137 +8188,30 @@ ferrous = %s
 			pointers.FolderAccess.__recursive_delete(f)
 		var version:PoolIntArray = pointers.DataFormat.__get_vanilla_version()
 		pointers.l("observed game version of %s.%s.%s" % [version[0],version[1],version[2]],"pointers.Scripting")
-		var drivers:Array = pointers.DriverManagement.__get_drivers()
 		var mineral_data:Array = []
-		for driver in drivers:
-			var mineral_dict:Dictionary = driver["drivers"].get("ADD_MINERALS.gd",{})
+		for mineral_dict in pointers.DriverManagement.__get_specific_driver_type("ADD_MINERALS.gd"):
 			for mineral in mineral_dict.keys():
-				mineral_data.append(mineral_dict[mineral])
+				var md:Dictionary = mineral_dict[mineral]
+				if md.get("name",""):
+					mineral_data.append({
+						"object":non_static["self"],
+						"method":"process_mineral_dict",
+						"args":[md,pointers]
+					})
 		
 		# Initialize info for mineral names, colours, and value
-		var prices:Dictionary = {}
-		var colors:Dictionary = {}
 		var trace_text:String = ""
 		var price_text:String = ""
 		var color_text:String = ""
-		for mineral in mineral_data:
-			var mname:String = mineral.get("name","")
-			if mname:
-				# Mineral colours will always be available
-				var col:Color = mineral.get("color",Color.white)
-				color_text += colour_str % [mname,mname,col.r,col.g,col.b]
-		var file:File = File.new()
-		
-		# Initialize and create ore chunk additions
 		var content:String = "extends \"res://AsteroidSpawner.gd\"\nfunc _init():\n\tpass"
-		for mineral in mineral_data:
-			var mname:String = mineral["name"]
-			var price:float = mineral.get("price",0.0)
-			if price > 0.0:
-				# Only adds minerals to the ring if they have a value.
-				# Useful if you only want to reference a mineral by name
-				# and a colour without it showing in the market, i.e. getScan()
-				price_text += prices_str % [mname,mname,price]
-				var handle:String = mineral.get("handle","none")
-				if handle == "scenes":
-					# Handle for providing a list of premade scene filepaths to use for the ores
-					content += content_str % [mname,mname,
-						"[\n%s]" % PoolStringArray([
-							"load(\"%s\")" % mineral["ore_1"],
-							"load(\"%s\")" % mineral["ore_2"],
-							"load(\"%s\")" % mineral["ore_3"],
-							"load(\"%s\")" % mineral["ore_4"],
-							"load(\"%s\")" % mineral["ore_5"],
-							"load(\"%s\")" % mineral["ore_6"],
-							"load(\"%s\")" % mineral["ore_7"],
-						]).join(",\n")
-					]
-					trace_text += trace_str % [mname,mname]
-					pointers.l("adding mineral %s using handler [scene]" % mname,"pointers.Scripting")
-				elif handle == "recolor":
-					var base:String = "fe"
-					match mineral.get("base","fe").to_lower():
-						"fe","iron":
-							base = "fe"
-						"v","vanadium":
-							base = "v"
-						"be","beryllium":
-							base = "be"
-						"pd","palladium":
-							base = "pd"
-						"pt","platinum":
-							base = "pt"
-						"w","tungsten","wolfram":
-							base = "w"
-					var color:Color = mineral.get("color",Color.white)
-					var mass:float = mineral.get("mass",0.0)
-					var filler_mineral:String = mineral.get("filler","H2O")
-					var min_scale:float = mineral.get("min_scale",0.75)
-					var max_scale:float = mineral.get("max_scale",0.75)
-					var ferrous:bool = mineral.get("ferrous",false)
-					var purityInfo:Dictionary = mineral.get("purity",{})
-					var purityKeys:PoolIntArray = PoolIntArray(purityInfo.keys())
-					var folder:String = mdir_str % [mname,int(color.r*255),int(color.g*255),int(color.b*255)]
-					
-					var specific_data:Dictionary = mineral.get("specific_ore_data",{})
-					var specificKeys:PoolIntArray = PoolIntArray(specific_data.keys())
-					pointers.FolderAccess.__check_folder_exists(folder)
-					var mh:String = "[\n"
-					for i in 7:
-						i += 1
-						var fn:String = folder + "h%s.tscn" % i
-						if i in specificKeys:
-							var idx:Dictionary = specific_data[i]
-							var cl:Color = idx.get("color",color)
-							var data:String = mineral_header_str % [
-								base,
-								i,
-								mname,
-								cl.r,
-								cl.g,
-								cl.b,
-								idx.get("mass",mass),
-								idx.get("filler",filler_mineral),
-								idx.get("min_scale",min_scale),
-								idx.get("max_scale",max_scale),
-								"true" if idx.get("ferrous",ferrous) else "false",
-							]
-							if i in purityKeys:
-								data += "\npurity = %f" % purityInfo[i]
-							file.open(fn,File.WRITE)
-							file.store_string(data)
-							file.close()
-							mh += "load(\"%s\"),\n" % fn
-						else:
-							var data:String = mineral_header_str % [
-								base,
-								i,
-								mname,
-								color.r,
-								color.g,
-								color.b,
-								mass,
-								filler_mineral,
-								min_scale,
-								max_scale,
-								"true" if ferrous else "false",
-							]
-							if i in purityKeys:
-								data += "\npurity = %f" % purityInfo[i]
-							file.open(fn,File.WRITE)
-							file.store_string(data)
-							file.close()
-							mh += "load(\"%s\"),\n" % fn
-					content += content_str % [mname,mname,mh + "]"]
-					trace_text += trace_str % [mname,mname]
-					pointers.l("adding mineral %s using handler [recolor]" % mname,"pointers.Scripting")
-				elif handle == "none":
-					pointers.l("mineral %s registered but not adding to ring" % mineral,"pointers.Scripting")
-				else:
-					pointers.l("mineral %s using incorrect handler, set price to 0.0 or less to prevent being registered to exist in the ring or crashes may happen" % mineral,"pointers.Scripting")
-			else:
-				pointers.l("adding only color references for mineral %s, value set to zero or below" % mineral,"pointers.Scripting")
 		
+		for mineral in pointers.Threading.__request_multiple_threads(mineral_data):
+			color_text += mineral[0]
+			price_text += mineral[1]
+			content += mineral[2]
+			trace_text += mineral[3]
+		
+		var file:File = File.new()
 		# Builds the current game extension script
 		file.open(mineralDir + "cg.gd",File.WRITE)
 		file.store_string("extends \"res://CurrentGame.gd\"\nfunc _init():\n\tpass%s%s%s\nfunc isDemo():\n\treturn false" % [price_text,color_text,trace_text])
@@ -8296,6 +8221,118 @@ ferrous = %s
 		file.open(mineralDir + "as.gd",File.WRITE)
 		file.store_string(content)
 		file.close()
+	
+	static func process_mineral_dict(mineral:Dictionary,pointers:HevLibPointers) -> PoolStringArray:
+		var out:PoolStringArray = PoolStringArray(["","","",""])
+		var mname:String = mineral.get("name","")
+		var col:Color = mineral.get("color",Color.white)
+		out[0] = colour_str % [mname,mname,col.r,col.g,col.b]
+		var price:float = mineral.get("price",0.0)
+		if price > 0.0:
+			# Only adds minerals to the ring if they have a value.
+			# Useful if you only want to reference a mineral by name
+			# and a colour without it showing in the market, i.e. getScan()
+			out[1] = prices_str % [mname,mname,price]
+			var handle:String = mineral.get("handle","none")
+			if handle == "scenes":
+				# Handle for providing a list of premade scene filepaths to use for the ores
+				out[2] = content_str % [mname,mname,
+					"[\n%s]" % PoolStringArray([
+						"load(\"%s\")" % mineral["ore_1"],
+						"load(\"%s\")" % mineral["ore_2"],
+						"load(\"%s\")" % mineral["ore_3"],
+						"load(\"%s\")" % mineral["ore_4"],
+						"load(\"%s\")" % mineral["ore_5"],
+						"load(\"%s\")" % mineral["ore_6"],
+						"load(\"%s\")" % mineral["ore_7"],
+					]).join(",\n")
+				]
+				out[3] = trace_str % [mname,mname]
+				pointers.l("adding mineral %s using handler [scene]" % mname,"pointers.Scripting")
+			elif handle == "recolor":
+				var base:String = "fe"
+				match mineral.get("base","fe").to_lower():
+					"fe","iron":
+						base = "fe"
+					"v","vanadium":
+						base = "v"
+					"be","beryllium":
+						base = "be"
+					"pd","palladium":
+						base = "pd"
+					"pt","platinum":
+						base = "pt"
+					"w","tungsten","wolfram":
+						base = "w"
+				var color:Color = mineral.get("color",Color.white)
+				var mass:float = mineral.get("mass",0.0)
+				var filler_mineral:String = mineral.get("filler","H2O")
+				var min_scale:float = mineral.get("min_scale",0.75)
+				var max_scale:float = mineral.get("max_scale",0.75)
+				var ferrous:bool = mineral.get("ferrous",false)
+				var purityInfo:Dictionary = mineral.get("purity",{})
+				var purityKeys:PoolIntArray = PoolIntArray(purityInfo.keys())
+				var folder:String = mdir_str % [mname,int(color.r*255),int(color.g*255),int(color.b*255)]
+				var specific_data:Dictionary = mineral.get("specific_ore_data",{})
+				var specificKeys:PoolIntArray = PoolIntArray(specific_data.keys())
+				Directory.new().make_dir_recursive(folder)
+				var file:File = File.new()
+				var mh:String = "[\n"
+				for i in 7:
+					i += 1
+					var fn:String = folder + "h%s.tscn" % i
+					if i in specificKeys:
+						var idx:Dictionary = specific_data[i]
+						var cl:Color = idx.get("color",color)
+						var data:String = mineral_header_str % [
+							base,
+							i,
+							mname,
+							cl.r,
+							cl.g,
+							cl.b,
+							idx.get("mass",mass),
+							idx.get("filler",filler_mineral),
+							idx.get("min_scale",min_scale),
+							idx.get("max_scale",max_scale),
+							"true" if idx.get("ferrous",ferrous) else "false",
+						]
+						if i in purityKeys:
+							data += "\npurity = %f" % purityInfo[i]
+						file.open(fn,File.WRITE)
+						file.store_string(data)
+						file.close()
+						mh += "load(\"%s\"),\n" % fn
+					else:
+						var data:String = mineral_header_str % [
+							base,
+							i,
+							mname,
+							color.r,
+							color.g,
+							color.b,
+							mass,
+							filler_mineral,
+							min_scale,
+							max_scale,
+							"true" if ferrous else "false",
+						]
+						if i in purityKeys:
+							data += "\npurity = %f" % purityInfo[i]
+						file.open(fn,File.WRITE)
+						file.store_string(data)
+						file.close()
+						mh += "load(\"%s\"),\n" % fn
+				out[2] = content_str % [mname,mname,mh + "]"]
+				out[3] = trace_str % [mname,mname]
+				pointers.l("adding mineral %s using handler [recolor]" % mname,"pointers.Scripting")
+			elif handle == "none":
+				pointers.l("mineral %s registered but not adding to ring" % mineral,"pointers.Scripting")
+			else:
+				pointers.l("mineral %s using incorrect handler, set price to 0.0 or less to prevent being registered to exist in the ring or crashes may happen" % mineral,"pointers.Scripting")
+		else:
+			pointers.l("adding only color references for mineral %s, value set to zero or below" % mineral,"pointers.Scripting")
+		return out
 
 class _Threading:
 	# https://www.reddit.com/r/godot/comments/elp4ap/how_to_use_multithreading/
@@ -8912,12 +8949,11 @@ class _Translations:
 		var fullLogging:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","full_logging",false)
 		var markPlaceholders:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","mark_placeholder_translations",false)
 		TranslationServer.clear()
-		var t1=Time.get_ticks_usec()
-		var drivers:Array = pointers.DriverManagement.__get_drivers()
-		var t2=Time.get_ticks_usec()-t1
 		var processes:Array = []
-		for mod in drivers:
-			processes.append({"object":base,"method":"process_drivers_for_translations","args":[mod["drivers"].get("REPLACE_TRANSLATIONS.gd",{}).get("TRANSLATIONS",{}),markPlaceholders,pointers]})
+		for mod in pointers.DriverManagement.__get_specific_driver_type("REPLACE_TRANSLATIONS.gd"):
+			var tl:Dictionary = mod.get("TRANSLATIONS",{})
+			if tl:
+				processes.append({"object":base,"method":"process_drivers_for_translations","args":[tl,markPlaceholders,pointers]})
 		# April Fool's alcohol!
 		var date:Dictionary = Time.get_date_dict_from_system()
 		if date.month == 4 and date.day == 1:
