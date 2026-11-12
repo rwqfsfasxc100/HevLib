@@ -65,9 +65,34 @@
 19.1=* Mod data processing
 19.2=* Mod zip checks
 19.3=* Translation processing
+19.4=* Fetching folder structures of a filesystem
+19.5=* Processing of MineralDriver data
+19.6=* Re-adding of vanilla translations after loading of driver translations
+19.7=* Modlet resource loading
 20=* Class cast removal code has been improved to use the full tokenizer system
 21=* Fixed issues that would cause file corruption errors to be registered on HevLib's first boot regardless of the actual condition of the filesystem.
-25=* Updated credits
+22=* Merged two loops that were used for the config registry. The second one was able to be properly merged into the main loop.
+23=* Fixed several issues when redrawing the changelogs screen and improved load times of changelogs
+24=* Removed nearly all preloads
+25=* Improved efficiency of loading minerals, both with the check if mineral driver exists and processing of it
+26=* Improved the efficiency of modlet loading
+27=* Title screen modifications are now no longer scene extensions
+28=* Crew expansions are now always generated at runtime due to changes to library modification order
+29=* Improved fetching of drivers
+30=* Added `DriverManagement`.`__get_specific_driver_type`
+30.1=* Acts similarly to `DriverManagement`.`__get_drivers`, however for a single driver type.
+30.2=* Returns an array of dictionaries for the desired driver
+31=* Mod entries from `ManifestV2`.`__get_mod_data` now has a `hash` entry of a logical hash for when the library would need to mark it as changed
+32=* Fetching specific mod-related files now has all file types cached upon first search to improve lookup times
+33=* Fixed issue where sifting directories would not ignore directories when ran from the editor.
+34=* Improved modlet resource loading by removing unnecessary data fetching from it's processing
+35=* Library resource extensions are now hardcoded in the format used to process them.
+36=* Improved the efficiency of fetching individual configs.
+37=* Added support for .scn files to be used by modlet resource extensions
+38=* Improved the efficiency of increasing the available pool of crew to board a derelict
+39=* Time taken to reach the boot screen is now printed to stdout
+41=* Cleaned up and improved multi-mineral code
+45=* Updated credits
 
 [1.17.8]
 

@@ -34,60 +34,47 @@ extends "res://asteroids/mineral.gd"
 
 var multiminerals:bool = false
 
-var HevLib_pointers:HevLibPointers
-
 func _enter_tree():
-	HevLib_pointers = ModLoader._savedObjects[0]
-	hl_multiminerals_UV()
-
-func hl_multiminerals_UV():
-	if HevLib_pointers:
-		multiminerals = HevLib_pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk",false)
+	multiminerals = ModLoader._savedObjects[0].ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk",false)
 
 #Update the roid's mass incase something went fucky
 func hl_multiminerals_update_mass():
 	hl_multiminerals_calc_comp()
 	mass = comp_val
 
-
 #Sum of all components of the roid
 var comp_val:float = 0.0
 func hl_multiminerals_calc_comp():
-#	print(composition)
 	comp_val = 0.0
+	var ck:PoolStringArray = PoolStringArray(composition.keys())
 	#For every material in the roid
-	for type in composition:
-		#If that material actually exists 
-		if composition[type] >= 0.001:
-			#Add it to our sum
-			comp_val += composition[type]
+	for type in ck:
 		#If the material does not exist
-		else:
+		if composition[type] < 0.001:
 			#Remove the stray atoms
 			composition.erase(type)
-	if "fe" in composition:
+		#If that material actually exists
+		else:
+			#Add it to our sum
+			comp_val += composition[type]
+	if "fe" in ck:
 		set_collision_layer_bit(5,true)
-	#Set mineral content to zero so we can abuse the MPU code later
-#	mineralContent = 0.0
-
 
 #Func to let scanners detect all minerals
 func getScan():
 	if not multiminerals:
 		return .getScan()
 	#Get our scan value
-	var scan : float = rand_range(0, comp_val)
+	var scan : float = rand_range(0,comp_val)
 	#For every material in the roid
-	var cm:Dictionary = composition.duplicate(true)
-	if "H2O" in cm:
-		cm.erase("H2O")
+	var cm:Array = composition.keys()
+	cm.erase("H2O")
 	for type in cm:
 		#If the scan value is less then the material value
-		if scan < cm[type]:
+		if scan < composition[type]:
 			#Detect that meterial
 			return type
 		#Otherwise, reduce the scan value and try the next material
 		scan -= cm[type]
-
 	#If nothing was detected for some reason, default to the filler
 	return filler

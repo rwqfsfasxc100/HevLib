@@ -240,9 +240,10 @@ func _pressed():
 		information_nodes["languages_splitter"].visible = false
 		information_nodes["changelog_menu"].clear()
 	if already_pressed:
-		if get_child_count() > 1:
-			for i in range(1,get_child_count()):
-				var node = get_child(i)
+		var cnt:int = get_child_count()
+		if cnt > 1:
+			for i in cnt:
+				var node:Node = get_child(i + 1)
 				node.visible = !node.visible
 			submod_visibility = get_child(1).visible
 			yield_button_focus()
@@ -778,19 +779,13 @@ func _visibility_changed():
 			button.grab_focus()
 
 func handle_sub_mods():
-	var panels = get_child_count()
-	if panels >= 2:
-		for i in range(1,panels):
-			var panel = get_child(i)
+	var panels:int = get_child_count()
+	if panels > 1:
+		for i in panels:
+			var panel:Node = get_child(i + 1)
 			if panel.visible:
-#				panel.rect_pivot_offset = Vector2(panel.rect_size.x / 2,panel.rect_size.y / 2)
-#				panel.rect_scale = Vector2(0.5,0.5)
-#				if i == panels - 1:
-#					panel.get_node("Label/Line2D").points.size(3)
-				
 				panel.get_node("ModButton/VBoxContainer").rect_size.x = panel.get_node("ModButton").rect_size.x - 4
-#				breakpoint
-	
+
 var all_tags = pointers.ManifestV2.__get_tags()
 
 func yield_button_focus():

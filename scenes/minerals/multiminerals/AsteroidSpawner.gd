@@ -34,16 +34,13 @@ extends "res://AsteroidSpawner.gd"
 
 var multiminerals:bool = false
 
-var HevLib_pointers:HevLibPointers
-
 func _enter_tree():
-	HevLib_pointers = ModLoader._savedObjects[0]
-	HevLib_pointers.ConfigDriver.__establish_connection("hl_multiminerals_UV",self)
-	hl_multiminerals_UV()
+	var HevLib_pointers:HevLibPointers._ConfigDriver = ModLoader._savedObjects[0].ConfigDriver
+	HevLib_pointers.__subscribe_to_setting_change("hl_multiminerals_UV",self,"HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk")
+	multiminerals = HevLib_pointers.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk",false)
 
-func hl_multiminerals_UV():
-	if HevLib_pointers:
-		multiminerals = HevLib_pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk",false)
+func hl_multiminerals_UV(how:bool):
+	multiminerals = how
 
 func spawnAsteroidByClass(oc, spot, chaos, spawnPointRandomness = 0.0, initialLinearVelocity = Vector2(0, 0), initialAngularVelocity = 0.0, tries = 1, spawned = true):
 	#Generate the asteroid normally
@@ -53,80 +50,52 @@ func spawnAsteroidByClass(oc, spot, chaos, spawnPointRandomness = 0.0, initialLi
 	
 	#If it's a class 5 roid, it's a mineral chunk
 	if oc == 5 and i:
-		var pure : float = 0.0
-		var impure : float = 0.0
-
 		#How many minerals are possible
 		var sm : int = randi() % 3
-
+		
 		#If there are sub-minerals possible
 		if sm > 0:
 			#How much of the mineral should remain its base type
-			pure = i.composition[i.mineral] * range_lerp(i.purity, 0.0, 1.0, 0.5, 0.9) #maps the purity to between 0.5 and 0.9
+			var pure : float = i.composition[i.mineral] * range_lerp(i.purity, 0.0, 1.0, 0.5, 0.9) #maps the purity to between 0.5 and 0.9
 			#How much of the mineral should become a different mineral
-			impure = i.composition[i.mineral] - pure
+			var impure : float = i.composition[i.mineral] - pure
 			#Set the mineral to its new quantity
 			i.composition[i.mineral] = pure
-
-		#While we have uncalculated sub-minerals AND 1kg of impurity remaining
-		while sm > 0 and impure > 0.001:
-			#Remove 1 sub-mineral from the count
-			sm -= 1
-			#Get mineral vein
-			var m : String = getVeinAt(CurrentGame.globalCoords(spot))
-
-			#Quantity of mineral
-			var q : float = 0.0
-			#While there is more than one sub-mineral remaining
-			if sm > 0:
-				#Choose how much of the impurity should be the new mineral
-				q = rand_range(0, impure)
-				#Reduce the impurity left by that amount
-				impure -= q
-			#If this is the last sub-mineral
-			else:
-				#The remaining quantity should be this mineral
-				q = impure
-				impure = 0.0
 			
-			# Checks for the mineral in an array of mineral entries
-			# Fix for one bug in the preexisting mod
-			var doesContainMineral:bool = false
-			for t in i.composition.keys():
-				if t == m:
-					doesContainMineral = true
-			if not m == null:
-				#If the roid already has that mineral
-				if doesContainMineral:
-					#Add it to the existing amount
-					i.composition[m] += q
-				#If the roid does not have that mineral
+			#While we have uncalculated sub-minerals AND 1kg of impurity remaining
+			while sm > 0 and impure > 0.001:
+				#Remove 1 sub-mineral from the count
+				sm -= 1
+				#Get mineral vein
+				var m : String = getVeinAt(CurrentGame.globalCoords(spot))
+				
+				#Quantity of mineral
+				var q : float = impure
+				#While there is more than one sub-mineral remaining
+				if sm > 0:
+					#Choose how much of the impurity should be the new mineral
+					q *= randf()
+					#Reduce the impurity left by that amount
+					impure -= q
+				#If this is the last sub-mineral
 				else:
-					#Add it to the roid
-					i.composition[m] = q
-		if i.has_method("hl_multiminerals_update_mass"):
+					#The remaining quantity should be this mineral
+					impure = 0.0
+				
+				# Checks for the mineral in an array of mineral entries
+				# Fix for one bug in the preexisting mod
+				var doesContainMineral:bool = false
+				for t in i.composition.keys():
+					if t == m:
+						doesContainMineral = true
+				if not m == null:
+					#If the roid already has that mineral
+					if doesContainMineral:
+						#Add it to the existing amount
+						i.composition[m] += q
+					#If the roid does not have that mineral
+					else:
+						#Add it to the roid
+						i.composition[m] = q
 			i.hl_multiminerals_update_mass()
-		else:
-			printerr("Mineral [%s] lacks hl_multiminerals_update_mass() method" % i)
-			i = hl_multiminerals_update_mass(i)
-		
 	return i
-#Update the roid's mass incase something went fucky
-func hl_multiminerals_update_mass(i):
-	i.mass = hl_multiminerals_calc_comp(i)
-	return i
-
-func hl_multiminerals_calc_comp(i) -> float:
-#	print(composition)
-	var comp_val:float = 0.0
-	#For every material in the roid
-	for type in i.composition:
-		#If that material actually exists 
-		if i.composition[type] >= 0.001:
-			#Add it to our sum
-			comp_val += i.composition[type]
-		#If the material does not exist
-		else:
-			#Remove the stray atoms
-			i.composition.erase(type)
-	return comp_val

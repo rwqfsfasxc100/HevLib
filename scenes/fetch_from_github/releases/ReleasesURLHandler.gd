@@ -116,11 +116,7 @@ func downloadZip(url, folder):
 	var does = dir.file_exists(zipName)
 	
 	if does:
-		var rng = RandomNumberGenerator.new()
-		rng.randomize()
-		var rnd = rng.randi_range(1, 32767)
-		
-		zipName = str(rnd) + "_" + zipName
+		zipName = "%d_%s" % [(randi() % 32767) + 1,zipName]
 	var handler = get_parent().get_node("ZipDownloadHandler")
 	handler.set_download_file(folder + zipName)
 	handler.request(url)

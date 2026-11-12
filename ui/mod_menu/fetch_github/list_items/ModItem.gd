@@ -63,6 +63,7 @@ var releases_cache_path = base_folder_path + "releases_cache.json"
 var update_check_path = base_folder_path + "update_check_cache.json"
 var readmePath = ""
 func get_readme():
+	yield(pointers,"physics_process_tick")
 	http.connect("request_completed",self,"_request_completed")
 	add_mod()
 

@@ -1528,13 +1528,10 @@ class _ConfigDriver:
 					subscriptions[top][setting].erase(item)
 	
 	static func __truncate_mod_id(mod_id:String) -> String:
-		var pointers:HevLibPointers._DataFormat = non_static["pointers"].DataFormat
-		mod_id = pointers.__array_to_string(mod_id.split("/"))
-		mod_id = pointers.__array_to_string(mod_id.split(" "))
-		return mod_id
+		return mod_id.replace("/","").replace(" ","")
 	
 	static func __truncate_section(section:String) -> String:
-		return non_static["pointers"].DataFormat.__array_to_string(section.split("/"))
+		return section.replace("/","")
 	
 	static func __truncate_to_setting_entry(mod_id:String,section:String) -> String:
 		var sect_name : String = __truncate_mod_id(mod_id) + "/" + __truncate_section(section)
@@ -5106,15 +5103,13 @@ class _Github:
 		non_static["pointers"] = p
 	
 	static func __get_github_filesystem(URL: String, node_to_return_to: Node, behaviour: String = "normal", special_behaviour_data = ""):
-		var rng:RandomNumberGenerator = RandomNumberGenerator.new()
-		rng.randomize()
-		var CRoot = Tool.get_tree().get_root()
+		var CRoot:Viewport = Tool.get_tree().get_root()
 		var gitHubFS:Node = load("res://HevLib/scenes/fetch_from_github/fs/FetchGithubData.tscn").instance()
 		gitHubFS.URL = URL
 		gitHubFS.ActOnModData = behaviour
 		gitHubFS.mod_version = special_behaviour_data
 		gitHubFS.nodeToReturnTo = node_to_return_to
-		gitHubFS.name = "git_filesystem_" + str(rng.randi_range(1, 32767))
+		gitHubFS.name = "git_filesystem_%d" % ((randi() % 32767) + 1)
 		CRoot.call_deferred("add_child",gitHubFS)
 	
 	static func __get_github_release(URL: String, folder: String, node_to_return_to: Node, get_pre_releases: bool = false, file_preference: String = "any", file_to_download: String = "first"):
@@ -5136,15 +5131,13 @@ class _Github:
 		if not node_to_return_to.has_method("_get_github_progress"):
 			gitHubFS.state_progress = false
 			pointers.l("Release Downloader NOTICE! Provided node [%s] does not have the method [_get_github_progress]. No download progress will be reported." % str(node_to_return_to),"pointers.Github")
-		var rng:RandomNumberGenerator = RandomNumberGenerator.new()
-		rng.randomize()
 		gitHubFS.releases_URL = URL
 		gitHubFS.folder = folder
 		gitHubFS.get_pre_releases = get_pre_releases
 		gitHubFS.file_preference = file_preference
 		gitHubFS.file_to_download = file_to_download
 		gitHubFS.nodeToReturnTo = node_to_return_to
-		gitHubFS.name = "git_release_" + str(rng.randi_range(1, 32767))
+		gitHubFS.name = "git_release_%d" % ((randi() % 32767) + 1)
 		CRoot.call_deferred("add_child",gitHubFS)
 
 class _HevLib:
@@ -5594,8 +5587,6 @@ class _ManifestV2:
 			var modPathPrefix:String = gameInstallDirectory + "/mods/"
 			# Pre-cache mod data to prevent issues later down the line with potential future multithreading
 			__get_all_modlets(false,true)
-			__get_icon_files()
-			__get_modmain_files()
 			var dir:Directory = Directory.new()
 			if dir.open(modPathPrefix) + dir.list_dir_begin(): # If non-zero, then an error code has been emitted
 				pointers.l("ERROR: Cannot open zip directory","pointers.ManifestV2")
@@ -7496,7 +7487,7 @@ class _RingInfo:
 	
 	static func get_pixel_values(pos:Vector2) -> PoolRealArray:
 		if pix_values.empty():
-			var mineral_size:int = int(floor(CurrentGame.traceMinerals.size() / 4.0)) - 1
+			var mineral_size:int = int(CurrentGame.traceMinerals.size() / 4.0) - 1
 			pix_values.resize(mineral_size + 2)
 			pix_values[0] = 1861.0
 			pix_values[1] = - 2531.0
@@ -8368,11 +8359,11 @@ class _Threading:
 	# This took me probably close to 2 weeks to fine tune, 1.5 days alone was chasing
 	# a bug caused by me testing with the single most thread-unsafe code I had
 	# Hope this actually ends up being useful...
-	func __request_multiple_threads(operations:Array) -> Array:
+	func __request_multiple_threads(operations:Array,log_info:bool = false) -> Array:
 		if operations.empty():
 			return []
 		if use_single_thread:
-			pointers.l("Requesting mutltiple thread operations, but using main thread","pointers.Threading")
+			if log_info:pointers.l("Requesting mutltiple thread operations, but using main thread","pointers.Threading")
 			var out:Array = []
 			for next_op in operations:
 				var current_object:Object = next_op.get("object",null)
@@ -8388,9 +8379,7 @@ class _Threading:
 					out.append(null)
 			return out
 		var request_id:int = (operations.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
-		var rqText:String = "Requesting multiple thread operations under request [%d] @ %d" % [request_id,OS.get_ticks_msec()]
-		pointers.l(rqText,"pointers.Threading")
-		print(rqText)
+		if log_info:pointers.l("Requesting multiple thread operations under request [%d] @ %d" % [request_id,OS.get_ticks_msec()],"pointers.Threading")
 		var semaphore:Semaphore = Semaphore.new()
 		var added_op:int = 0
 		mutex.lock()
@@ -8422,9 +8411,9 @@ class _Threading:
 		mutex.unlock()
 		return out
 	
-	func __request_single_thread(operation:Dictionary) -> Array:
+	func __request_single_thread(operation:Dictionary,log_info:bool = false) -> Array:
 		if use_single_thread:
-			pointers.l("Requesting single thread operation, but using main thread","pointers.Threading")
+			if log_info:pointers.l("Requesting single thread operation, but using main thread","pointers.Threading")
 			var current_object:Object = operation.get("object",null)
 			var args:Array = operation.get("args",[])
 			var current_method_call:String = operation.get("method","")
@@ -8436,7 +8425,7 @@ class _Threading:
 			printerr("Attempting to call thread with invalid object or function name")
 			return [null]
 		var request_id:int = (operation.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
-		pointers.l("Requesting single thread operation under request [%d]" % request_id,"pointers.Threading")
+		if log_info:pointers.l("Requesting single thread operation under request [%d]" % request_id,"pointers.Threading")
 		var semaphore:Semaphore = Semaphore.new()
 		var added_op:int = 0
 		mutex.lock()
@@ -8465,11 +8454,11 @@ class _Threading:
 		mutex.unlock()
 		return out
 	
-	func __run_multiple_async_operations(operations:Array) -> int:
+	func __run_multiple_async_operations(operations:Array,log_info:bool = false) -> int:
 		if operations.empty():
 			return ERR_UNCONFIGURED
 		if use_single_thread:
-			pointers.l("Requesting mutltiple thread operations, but using main thread","pointers.Threading")
+			if log_info:pointers.l("Requesting mutltiple thread operations, but using main thread","pointers.Threading")
 			var out:int = OK
 			for next_op in operations:
 				var current_object:Object = next_op.get("object",null)
@@ -8484,7 +8473,7 @@ class _Threading:
 		if thread_queue.size() > max_queue:
 			return ERR_UNCONFIGURED
 		var request_id:int = (operations.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
-		pointers.l("Requesting multiple async thread operations under request [%d]" % request_id,"pointers.Threading")
+		if log_info:pointers.l("Requesting multiple async thread operations under request [%d]" % request_id,"pointers.Threading")
 		var semaphore:Semaphore = Semaphore.new()
 		var added_op:int = 0
 		mutex.lock()
@@ -8511,9 +8500,9 @@ class _Threading:
 		mutex.unlock()
 		return OK
 	
-	func __run_single_async_operation(operation:Dictionary) -> int:
+	func __run_single_async_operation(operation:Dictionary,log_info:bool = false) -> int:
 		if use_single_thread:
-			pointers.l("Requesting single thread operation, but using main thread","pointers.Threading")
+			if log_info:pointers.l("Requesting single thread operation, but using main thread","pointers.Threading")
 			var current_object:Object = operation.get("object",null)
 			var args:Array = operation.get("args",[])
 			var current_method_call:String = operation.get("method","")
@@ -8524,7 +8513,7 @@ class _Threading:
 				printerr("Attempting to call thread with invalid object or function name")
 				return ERR_UNCONFIGURED
 		var request_id:int = (operation.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
-		pointers.l("Requesting single async thread operation under request [%d]" % request_id,"pointers.Threading")
+		if log_info:pointers.l("Requesting single async thread operation under request [%d]" % request_id,"pointers.Threading")
 		var semaphore:Semaphore = Semaphore.new()
 		var added_op:int = 0
 		mutex.lock()
@@ -8781,9 +8770,9 @@ class _Translations:
 		var csvLine : PoolStringArray = file.get_line().split(delim)
 		if fullLogging:
 			pointers.l("Adding translations as: %s" % csvLine,"pointers.Translations")
-		for i in range(1, csvLine.size()):
+		for i in (csvLine.size() - 1):
 			var translationObject:Translation = Translation.new()
-			translationObject.locale = csvLine[i]
+			translationObject.locale = csvLine[i + 1]
 			translations.append(translationObject)
 		while not file.eof_reached():
 			var line:String = file.get_line()

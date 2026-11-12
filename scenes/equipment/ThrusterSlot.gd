@@ -57,7 +57,7 @@ func hl_thrusterslot_modify():
 	shipName = ship.shipName
 	baseShipName = ship.baseShipName
 	var slotType:String = type.split(".")[0]
-	var currentInstall:String = ship.getConfig(type)
+	var currentInstall:String = ship.getConfig(type,default)
 	if slotType in datastore:
 		for data in datastore[slotType]:
 			var aux_path:String = data.get("path","")

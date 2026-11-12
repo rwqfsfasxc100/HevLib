@@ -51,14 +51,12 @@ func get_github_release(URL: String, folder: String, node_to_return_to: Node, ge
 	if not node_to_return_to.has_method("_get_github_progress"):
 		gitHubFS.state_progress = false
 		Debug.l("HevLib Github Release Downloader: NOTICE! Provided node [%s] does not have the method [_get_github_progress]. No download progress will be reported." % str(node_to_return_to))
-	var rng = RandomNumberGenerator.new()
-	rng.randomize()
 	gitHubFS.releases_URL = URL
 	gitHubFS.folder = folder
 	gitHubFS.get_pre_releases = get_pre_releases
 	gitHubFS.file_preference = file_preference
 	gitHubFS.file_to_download = file_to_download
 	gitHubFS.nodeToReturnTo = node_to_return_to
-	gitHubFS.name = "git_release_" + str(rng.randi_range(1, 32767))
+	gitHubFS.name = "git_release_%d" % ((randi() % 32767) + 1)
 	CRoot.call_deferred("add_child",gitHubFS)
 	

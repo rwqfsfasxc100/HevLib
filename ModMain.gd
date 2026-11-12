@@ -43,7 +43,7 @@ const _savedObjects=Array()
 const strings=Array()
 const MOD_VERSION_STRING="%d.%d.%d-%s"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX,MOD_VERSION_METADATA]if(MOD_VERSION_METADATA)else"%d.%d.%d"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX]
 func _init(modLoader=ModLoader):
-	strings.append(self)
+	strings.append(self);var is_editor:bool=OS.has_feature("editor")
 	var modPath:String=get_script().resource_path.get_base_dir()+"/"
 	var pointers_dir:String=modPath+"pointers.gd"
 	if!file_exists(pointers_dir):
@@ -52,21 +52,22 @@ func _init(modLoader=ModLoader):
 	strings.append(modPath)
 	strings.append(pointers_dir)
 	create_zip_for_overrides(handle_pointer_cast_clearing(process_gdnative_plugins(),modLoader),self)
-	var pointers=load_pointers(modLoader)
+	var pointers:Node=load_pointers(modLoader)
 	recache(pointers)
 	pointers.FolderAccess.__recursive_delete(variables_folder,PoolStringArray(["remove_pointer_casting.zip"]))
-	var directory:Directory=Directory.new();directory.make_dir_recursive(variables_folder);directory.make_dir_recursive(validation_check_path.get_base_dir())
-	pointers.FileAccess.__load_precached_mods()
-	pointers.ConfigDriver.__load_configs()
+	var directory:Directory=Directory.new();
+	pointers.FileAccess.__load_precached_mods();pointers.ConfigDriver.__load_configs()
 	
-#	testing(modLoader,pointers)
+	testing(modLoader,pointers)
 	
 	pointers.ManifestV2.__get_mod_versions(true)
 	pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
 	
-	if OS.has_feature("editor")&&!File.new().file_exists("res://VersionLabel.tscn"):
-		printerr("FAILED TO FETCH FILE SYSTEM")
-		l("ERROR! FAILED TO FETCH FILE SYSTEM")
+	if is_editor:
+		pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","compile",false)
+		if!File.new().file_exists("res://VersionLabel.tscn"):
+			printerr("FAILED TO FETCH FILE SYSTEM")
+			l("ERROR! FAILED TO FETCH FILE SYSTEM")
 	pointers.Scripting.make_mineral_scripting()
 	pointers.Equipment.__make_upgrades_scene()
 	pointers.NodeAccess.__dynamic_crew_expander()
@@ -111,26 +112,19 @@ static func replaceScene(newPath:String,oldPath:String=""):
 	l("Updating scene:%s"%newPath)
 	if oldPath.empty():
 		oldPath="res://"+newPath
-	var scene:=ResourceLoader.load(strings[1].plus_file(newPath))
+	var scene:Resource=ResourceLoader.load(strings[1].plus_file(newPath),"Resource")
 	scene.take_over_path(oldPath)
 	_savedObjects.append(scene)
 	l("Finished updating:%s"%oldPath)
 static func replaceSceneLiteral(newPath:String,oldPath:String):
 	l("Updating scene literal:%s"%newPath)
-	var scene:=ResourceLoader.load(newPath)
+	var scene:Resource=ResourceLoader.load(newPath,"Resource")
 	if scene:
 		scene.take_over_path(oldPath)
 		_savedObjects.append(scene)
 		l("Finished updating literal:%s"%oldPath)
-static func l(msg:String,title:String=MOD_NAME):
-	strings[3].l(msg,"%s V%s"%[title,MOD_VERSION_STRING])
-const gdnative_library_extensions:PoolStringArray=PoolStringArray(["gdnlib"])
-const driver_dirs=PoolStringArray([
-	"HEVLIB_EQUIPMENT_DRIVER_TAGS/",
-	"HEVLIB_MENU/",
-	"HEVLIB_MINERAL_DRIVER_TAGS/",
-	"HEVLIB_DRIVERS/",
-])
+static func l(msg:String,title:String=MOD_NAME):strings[3].l(msg,"%s V%s"%[title,MOD_VERSION_STRING])
+const driver_dirs=PoolStringArray(["HEVLIB_EQUIPMENT_DRIVER_TAGS/","HEVLIB_MENU/","HEVLIB_MINERAL_DRIVER_TAGS/","HEVLIB_DRIVERS/"])
 const variables_folder:String="user://cache/.HevLib_Cache/Variable_Fetch/"
 const validation_check_path:String="user://cache/.HevLib_Cache/SafeMode/recache_validation.json"
 const releases_cache="user://cache/.Mod_Menu_2_Cache/github_list/releases_cache.json"
@@ -149,6 +143,8 @@ const class_names_to_clear:PoolStringArray=PoolStringArray(["HevLibPointers","MI
 const class_refs:Dictionary={"HevLibPointers":"res://HevLib/pointers.gd","MINIZ":"res://HevLib/scripts/miniz/miniz.gd"}
 static func recache(pointers):
 	var d:Directory=Directory.new()
+	d.make_dir_recursive(variables_folder)
+	d.make_dir_recursive(validation_check_path.get_base_dir())
 	d.make_dir_recursive("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/")
 	d.make_dir_recursive("user://cache/.Mod_Menu_2_Cache/github_list/icon_cache/")
 	d.make_dir_recursive("user://cache/.Mod_Menu_2_Cache/github_list/downloaded_zips/")
@@ -164,7 +160,7 @@ static func recache(pointers):
 			file.close()
 			Debug.l("Releases cache older than an hour (%s minutes old), clearing"%[floor(age/60.0)])
 		else:
-			Debug.l("Releases cache too new (%s minutes old), not clearing"%[floor(age/60)])
+			Debug.l("Releases cache too new (%s minutes old), not clearing"%[floor(age/60.0)])
 	file.open(url_store,File.WRITE)
 	file.store_string("[]")
 	file.close()
@@ -212,11 +208,11 @@ static func process_gdnative_plugins()->Dictionary:
 							if driverFile=="DLL_MAPPER.gd":
 								var mod_dir:String="res://"+first
 								for entry in PoolStringArray(load(mod_dir+second+"DLL_MAPPER.gd").get_script_constant_map().get("DLL_MAPPER",[])):
-									if!entry.begins_with("res://"):entry=mod_dir.plus_file(entry)
-									if entry.get_extension()in gdnative_library_extensions:all_libraries.append(entry)
+									if!entry.begins_with("res://"):entry=mod_dir + entry
+									if entry.get_extension()=="gdnlib":all_libraries.append(entry)
 		var copied_files:PoolStringArray=PoolStringArray()
 		var existing_libs:PoolStringArray=PoolStringArray()
-		var lib_resave:Dictionary=Dictionary()
+		var lib_resave:Array=Array()
 		var configFile:ConfigFile=ConfigFile.new()
 		var file:File=File.new()
 		var directory:Directory=Directory.new()
@@ -225,24 +221,20 @@ static func process_gdnative_plugins()->Dictionary:
 		for entry in all_libraries:
 			configFile.load(entry)
 			var cfg_sections:Array=configFile.get_sections()
-			var data:Dictionary={}
-			for section in cfg_sections:
-				var dta:Dictionary={}
-				for key in configFile.get_section_keys(section):dta[key]=configFile.get_value(section,key)
-				data[section]=dta
-			if"entry"in data:
-				for oper in data["entry"]:
-					var lib_path:String=data["entry"][oper]
+			var data:Array=[entry,{},{}]
+			if"entry"in cfg_sections:
+				for oper in configFile.get_section_keys("entry"):
+					var lib_path:String=configFile.get_value("entry",oper)
 					var new_path:String=exePath+lib_path.get_file()
 					if file_exists(lib_path):
 						file.open(lib_path,File.READ)
 						libs_to_copy[new_path]=file.get_buffer(file.get_len())
 						file.close()
-						data["entry"][oper]=new_path
+						data[1][oper]=new_path
 						existing_libs.append(new_path.get_file())
-			if"dependencies"in data:
-				for oper in data["dependencies"]:
-					var lib_paths:Array=data["dependencies"][oper]
+			if"dependencies"in cfg_sections:
+				for oper in configFile.get_section_keys("dependencies"):
+					var lib_paths:Array=configFile.get_value("dependencies",oper)
 					for lbr in lib_paths.size():
 						var lib_path:String=lib_paths[lbr]
 						var new_path:String=exePath+lib_path.get_file()
@@ -252,28 +244,28 @@ static func process_gdnative_plugins()->Dictionary:
 							file.close()
 							lib_paths[lbr]=new_path
 							existing_libs.append(new_path.get_file())
-					data["dependencies"][oper]=lib_paths
-			lib_resave[entry]=data
+					data[2][oper]=lib_paths
+			lib_resave.append(data)
 			for f in libs_to_copy:
 				file.open(f,File.WRITE)
 				file.store_buffer(libs_to_copy[f])
 				file.close()
 			copied_files.append_array(libs_to_copy.keys())
-		for entry in lib_resave:
-			var data:Dictionary=lib_resave[entry]
+		for data in lib_resave:
+			var entry:String=lib_resave[0]
 			var savePath:String="user://cache/.HevLib_Cache/Variable_Fetch/%d.gdnlib"%Time.get_ticks_usec()
 			configFile.clear()
-			for section in data.keys():
-				var keys:Dictionary=data[section]
-				for key in keys.keys():configFile.set_value(section,key,keys[key])
+			var entries:Dictionary=data[1]
+			var dependencies:Dictionary=data[2]
+			for key in entries.keys():configFile.set_value("entry",key,entries[key])
+			for key in dependencies.keys():configFile.set_value("dependencies",key,dependencies[key])
 			configFile.save(savePath)
 			file.open(savePath,File.READ)
 			var bfr:PoolByteArray=file.get_buffer(file.get_len())
 			file.close()
 			fetchPaths[entry.substr(6)]=bfr
 		configFile.clear()
-		for f in fetch_folder_files(exePath):
-			if!f in existing_libs:directory.remove(exePath+f)
+		for f in fetch_folder_files(exePath):if!f in existing_libs:directory.remove(exePath+f)
 	return fetchPaths
 static func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:ModLoader)->Dictionary:
 	var script_paths:PoolStringArray=PoolStringArray()
@@ -518,14 +510,13 @@ func testing(modLoader:ModLoader,pointers):
 	var file:File = File.new()
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
 	
-	var dict = {"a":8,"b":9,"c":7,"d":{"tt":2}}
-	var arr = [0,1,2,3,4,5,6,7,8,9]
+	
 	var t1=Time.get_ticks_usec()
 	for i in 100000:
-		var r = arr[0]
+		pass
 	var t2=Time.get_ticks_usec()
 	for i in 100000:
-		var r = arr[9]
+		pass
 	var t3=Time.get_ticks_usec()
 	var d1=t2-t1
 	var d2=t3-t2

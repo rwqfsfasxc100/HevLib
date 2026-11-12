@@ -136,14 +136,14 @@ HEVLIB_CONFIG_SECTION_POINTERS={
 "always_send_new_mods": {
 "default": false,
 "description": "HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS_TOOLTIP",
-"display_order_position": 7,
+"display_order_position": 8,
 "name": "HEVLIB_CONFIG_DEV_ALWAYS_SEND_NEW_MODS",
 "type": "bool"
 },
 "compile": {
 "default": true,
 "description": "HEVLIB_CONFIG_COMPILE_DESC",
-"display_order_position": 8,
+"display_order_position": 9,
 "name": "HEVLIB_CONFIG_COMPILE",
 "type": "bool"
 },
@@ -163,10 +163,10 @@ HEVLIB_CONFIG_SECTION_POINTERS={
 "type": "bool"
 },
 "max_thread_queue": {
-"default": 128.0,
+"default": 1024.0,
 "description": "HEVLIB_CONFIG_MAX_THREAD_QUEUE_DESC",
-"display_order_position": 9,
-"max": 1024.0,
+"display_order_position": 5,
+"max": 4096.0,
 "min": 64.0,
 "name": "HEVLIB_CONFIG_MAX_THREAD_QUEUE",
 "require_restart": true,
@@ -177,7 +177,7 @@ HEVLIB_CONFIG_SECTION_POINTERS={
 "pointer_logging_frame_interval": {
 "default": 2.0,
 "description": "HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL_TOOLTIP",
-"display_order_position": 6,
+"display_order_position": 7,
 "max": 60.0,
 "min": 1.0,
 "name": "HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL",
@@ -188,7 +188,7 @@ HEVLIB_CONFIG_SECTION_POINTERS={
 "safe_mod_loading": {
 "default": true,
 "description": "HEVLIB_CONFIG_SAFE_MOD_LOADING_TOOLTIP",
-"display_order_position": 5,
+"display_order_position": 6,
 "name": "HEVLIB_CONFIG_SAFE_MOD_LOADING",
 "require_restart": true,
 "type": "bool"
