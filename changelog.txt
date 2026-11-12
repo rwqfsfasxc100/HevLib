@@ -92,6 +92,7 @@
 38=* Improved the efficiency of increasing the available pool of crew to board a derelict
 39=* Time taken to reach the boot screen is now printed to stdout
 41=* Cleaned up and improved multi-mineral code
+42=* Fixed issue where exiting the mineral market would put RPC in a confused state
 45=* Updated credits
 
 [1.17.8]

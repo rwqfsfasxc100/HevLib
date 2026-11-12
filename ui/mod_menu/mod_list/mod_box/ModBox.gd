@@ -242,7 +242,7 @@ func _pressed():
 	if already_pressed:
 		var cnt:int = get_child_count()
 		if cnt > 1:
-			for i in cnt:
+			for i in cnt - 1:
 				var node:Node = get_child(i + 1)
 				node.visible = !node.visible
 			submod_visibility = get_child(1).visible
@@ -781,8 +781,8 @@ func _visibility_changed():
 func handle_sub_mods():
 	var panels:int = get_child_count()
 	if panels > 1:
-		for i in panels:
-			var panel:Node = get_child(i + 1)
+		for i in panels - 1:
+			var panel = get_child(i + 1)
 			if panel.visible:
 				panel.get_node("ModButton/VBoxContainer").rect_size.x = panel.get_node("ModButton").rect_size.x - 4
 

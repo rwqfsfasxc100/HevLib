@@ -965,9 +965,6 @@ func next_token() -> bool:
 			while true:
 				var wc:int = get_char(i)
 				if wc == KEY_SPACE:
-					if not used_spaces:
-						printerr(compile_err_header % [line,"Mixed tabs and spaces in indentation"])
-						return false
 					i += 1
 				elif wc == KEY_HORIZONTALTAB:
 					if used_spaces:

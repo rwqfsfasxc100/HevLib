@@ -58,7 +58,7 @@ func _init(modLoader=ModLoader):
 	var directory:Directory=Directory.new();
 	pointers.FileAccess.__load_precached_mods();pointers.ConfigDriver.__load_configs()
 	
-	testing(modLoader,pointers)
+#	testing(modLoader,pointers)
 	
 	pointers.ManifestV2.__get_mod_versions(true)
 	pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
@@ -252,7 +252,7 @@ static func process_gdnative_plugins()->Dictionary:
 				file.close()
 			copied_files.append_array(libs_to_copy.keys())
 		for data in lib_resave:
-			var entry:String=lib_resave[0]
+			var entry:String=data[0]
 			var savePath:String="user://cache/.HevLib_Cache/Variable_Fetch/%d.gdnlib"%Time.get_ticks_usec()
 			configFile.clear()
 			var entries:Dictionary=data[1]

@@ -41,8 +41,8 @@ func _ready():
 	# This checks to see that the copyright message exists and is displayed once the game is finished loading.
 	# Using this point in the load cycle so the license will be posted before potential spam from the title screen
 	var cr:String = pt.copyrights
-	if cr.empty()||cr.md5_buffer()!=PoolByteArray([120,156,75,155,241,240,24,155,239,187,25,182,147,196,3,223,109,45,236,3,0,71,59,8,88]).decompress(16,1):
+	if cr!=pt.hl_copyright||cr.md5_buffer()!=PoolByteArray([120,156,75,155,241,240,24,155,239,187,25,182,147,196,3,223,109,45,236,3,0,71,59,8,88]).decompress(16,1):
 		# This should never trip. If it did, join the Discord and ask me. https://discord.gg/dv
-		pt.DataFormat.__exit(false,"","",5+randi()%40);pt.l("Copyright missing or damaged :/","pointers.SafeMode");yield(get_tree().create_timer(30),"timeout");VisualServer.render_loop_enabled=false;#get_parent().call_deferred("remove_child",self);#call_deferred("queue_free");
-	pt.l(cr,"HevLib");pt.copyrights=""
+		pt.DataFormat.__exit(false,"","",5+randi()%40);yield(get_tree().create_timer(30),"timeout");VisualServer.render_loop_enabled=false#;pt.l("Copyright missing or damaged :/","pointers.SafeMode");get_parent().call_deferred("remove_child",self);#call_deferred("queue_free");
+	pt.l(cr,"HevLib")
 	

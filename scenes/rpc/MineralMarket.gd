@@ -44,4 +44,4 @@ func hide():
 	if not visible or $Shower.current_animation == "hide":
 		return
 	.hide()
-	rpc.loader_changed("enceladus",0,"")
+	rpc.loader_changed("enceladus_prime",0,"")

@@ -37,14 +37,9 @@ var multiminerals:bool = false
 func _enter_tree():
 	multiminerals = ModLoader._savedObjects[0].ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","multiple_minerals_per_chunk",false)
 
+var comp_val:float = 0.0
 #Update the roid's mass incase something went fucky
 func hl_multiminerals_update_mass():
-	hl_multiminerals_calc_comp()
-	mass = comp_val
-
-#Sum of all components of the roid
-var comp_val:float = 0.0
-func hl_multiminerals_calc_comp():
 	comp_val = 0.0
 	var ck:PoolStringArray = PoolStringArray(composition.keys())
 	#For every material in the roid
@@ -59,6 +54,7 @@ func hl_multiminerals_calc_comp():
 			comp_val += composition[type]
 	if "fe" in ck:
 		set_collision_layer_bit(5,true)
+	mass = comp_val
 
 #Func to let scanners detect all minerals
 func getScan():
