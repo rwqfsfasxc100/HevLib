@@ -6784,8 +6784,8 @@ class _ManifestV2:
 	
 	static func siftFolderStructureForModFiles(structure:Dictionary,path:String = "res://",restricted_to_modmains : PoolStringArray = PoolStringArray()) -> PoolStringArray:
 		var out : PoolStringArray = PoolStringArray()
-		for i in structure:
-			if i.ends_with("/") and (path + i) in restricted_to_modmains:
+		for i in structure.keys():
+			if i.ends_with("/") and (restricted_to_modmains.empty() or path + i in restricted_to_modmains):
 				out.append_array(siftFolderStructureForModFiles(structure[i],path + i,restricted_to_modmains))
 			else:
 				var f : String = i.to_lower()
