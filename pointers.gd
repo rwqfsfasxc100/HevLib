@@ -7392,30 +7392,42 @@ class _Math:
 	static func __are_float_operands_integer_equivalent(a:int,b:int) -> bool:
 		return (abs(a) < precision_limit) and (abs(b) < precision_limit)
 	
+	const radianify = PI/180
+	
 	static func __normalize_radian_angle(angle:float) -> float:
-		while angle >= 360.0:
-			angle -= 360.0
+		while angle >= TAU:
+			angle -= TAU
 		while angle < 0.0:
-			angle += 360.0
+			angle += TAU
 		return angle
 	
-	const radianify = PI/180
-	static func __make_circle(start:float,end:float,step:float,degrees:bool = true,anticlockwise:bool = true) -> PoolVector2Array:
+	static func __make_semicircle(radius:float,start:float,end:float,step:float,degrees:bool = true,anticlockwise:bool = true) -> PoolVector2Array:
 		var out:PoolVector2Array = PoolVector2Array()
-		start = __normalize_radian_angle(start * radianify if degrees else start)
-		end = __normalize_radian_angle(end * radianify if degrees else end)
-		if degrees:step *= radianify
-		var cd:float = start
+		step = (abs(step) * radianify) if degrees else abs(step)
+		if step <= 0:
+			return out
+		start = __normalize_radian_angle((start * radianify) if degrees else start)
+		end = __normalize_radian_angle((end * radianify) if degrees else end)
 		if anticlockwise:
-			
-			pass
+			if end > start:
+				end -= TAU
+			var cd:float = start
+			while cd > end:
+				out.append(__rotate_point(Vector2(0,-1) * radius,cd,false))
+				cd -= step
+			out.append(__rotate_point(Vector2(0,-1) * radius,end + 0.0001,false))
 		else:
-			
-			pass
+			if start > end:
+				start -= TAU
+			var cd:float = start
+			while cd < end:
+				out.append(__rotate_point(Vector2(0,-1) * radius,cd,false))
+				cd += step
+			out.append(__rotate_point(Vector2(0,-1) * radius,end - 0.0001,false))
 		return out
 	
 
-class _Networking:
+class _NetIO:
 	# https://github.com/Abdera7mane/Godot-SimpleHTTPClient
 	
 	const non_static = {}
