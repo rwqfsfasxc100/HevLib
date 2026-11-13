@@ -7392,6 +7392,28 @@ class _Math:
 	static func __are_float_operands_integer_equivalent(a:int,b:int) -> bool:
 		return (abs(a) < precision_limit) and (abs(b) < precision_limit)
 	
+	static func __normalize_radian_angle(angle:float) -> float:
+		while angle >= 360.0:
+			angle -= 360.0
+		while angle < 0.0:
+			angle += 360.0
+		return angle
+	
+	const radianify = PI/180
+	static func __make_circle(start:float,end:float,step:float,degrees:bool = true,anticlockwise:bool = true) -> PoolVector2Array:
+		var out:PoolVector2Array = PoolVector2Array()
+		start = __normalize_radian_angle(start * radianify if degrees else start)
+		end = __normalize_radian_angle(end * radianify if degrees else end)
+		if degrees:step *= radianify
+		var cd:float = start
+		if anticlockwise:
+			
+			pass
+		else:
+			
+			pass
+		return out
+	
 
 class _Networking:
 	# https://github.com/Abdera7mane/Godot-SimpleHTTPClient
