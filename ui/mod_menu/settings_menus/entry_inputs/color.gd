@@ -162,12 +162,8 @@ func _visibility_changed():
 		label_button.grab_focus()
 	refocus()
 
-var updateCacheDir = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 func triggerVolatile():
-	var file = File.new()
-	file.open(updateCacheDir,File.WRITE)
-	file.store_8(1)
-	file.close()
+	pointers.has_updated = true
 
 # Color picker node. _picker_created must have been ran for this to be filled.
 var picker:ColorPicker

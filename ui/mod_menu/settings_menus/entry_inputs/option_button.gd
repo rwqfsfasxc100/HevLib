@@ -201,12 +201,8 @@ func find_int(value):
 				i = value
 	return i
 
-var updateCacheDir = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 func triggerVolatile():
-	var file = File.new()
-	file.open(updateCacheDir,File.WRITE)
-	file.store_8(1)
-	file.close()
+	pointers.has_updated = true
 
 func get_focusable(direction = 0):
 	return option_button

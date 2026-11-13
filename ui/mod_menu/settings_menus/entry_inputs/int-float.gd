@@ -320,13 +320,9 @@ func _timeout():
 	if box:
 		box.focus_mode = Control.FOCUS_ALL
 		box.grab_focus()
-		
-var updateCacheDir = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
+
 func triggerVolatile():
-	var file = File.new()
-	file.open(updateCacheDir,File.WRITE)
-	file.store_8(1)
-	file.close()
+	pointers.has_updated = true
 
 func get_focusable(direction = 0):
 	return focus_button

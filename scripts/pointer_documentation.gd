@@ -524,9 +524,6 @@ class DataFormat:
 						"Bool for whether the URL is valid."
 					]
 				},
-				"__loadDLC":{
-					"description":"Clears cache as a fix for issues with loading DLC."
-				},
 				"__split_array_by_length":{
 					"description":"splits a provided array (or array of any Pool type) into an array containing arrays of the input's type by the splitting ammount. Also lets you return one of these specific sections instead.",
 					"args":[
@@ -756,7 +753,7 @@ class FileAccess:
 					],
 				},
 				"__load_precached_mods":{
-					"description":"Copies any prepared mods to the mod folder, and reboots if there are mods to copy. Normally this is done on game boot to provide a reliable experience for players. NOTE: Rebooting will happen at all cases with mods existing, even if it's safe to copy. Double check 'user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt', which will have a `1` stored if there are mods to copy, and `0` otherwise.",
+					"description":"Copies any prepared mods to the mod folder, and reboots if there are mods to copy. Normally this is done on game boot to provide a reliable experience for players. NOTE: Rebooting will happen at all cases with mods existing, even if it's safe to copy.",
 				},
 				"__save_stex(image:Image, file_path:String, flags:int=0)":{
 					"description":"Saves a provided image resource as a .stex file",

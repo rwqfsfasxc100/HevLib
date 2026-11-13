@@ -352,14 +352,9 @@ func _process(_delta):
 			
 			aligned_zero_focus = false
 
-const update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
-const dependancies_store = "user://cache/.Mod_Menu_2_Cache/updates/dependancies.json"
-const conflicts_store = "user://cache/.Mod_Menu_2_Cache/updates/conflicts.json"
-const complementary_store = "user://cache/.Mod_Menu_2_Cache/updates/complementary.json"
+var currently_selected_mod_id:String = ""
 
-var currently_selected_mod_id = ""
-
-var file = File.new()
+var file:File = File.new()
 
 func get_visible_mods():
 	var array = []
@@ -418,10 +413,19 @@ func _open_dependancies():
 	dependancy_menu.rect_size = Vector2(700,450)
 
 func _open_updates():
-	file.open(update_store,File.READ)
-	var udata = JSON.parse(file.get_as_text()).result
-	file.close()
-	var tex = TranslationServer.translate("HEVLIB_UPDATE_INFO_BODY") % [str(udata[currently_selected_mod_id]["version"][0]) + "." + str(udata[currently_selected_mod_id]["version"][1]) + "." + str(udata[currently_selected_mod_id]["version"][2]),str(udata[currently_selected_mod_id]["new_version"][0]) + "." + str(udata[currently_selected_mod_id]["new_version"][1]) + "." + str(udata[currently_selected_mod_id]["new_version"][2])]
+	var update_data:Dictionary = pointers.needs_updates[currently_selected_mod_id]
+	var tex:String = TranslationServer.translate("HEVLIB_UPDATE_INFO_BODY") % [
+			"%d.%d.%d" % [
+				update_data["version"][0],
+				update_data["version"][1],
+				update_data["version"][2]
+			],
+			"%d.%d.%d" % [
+				update_data["new_version"][0],
+				update_data["new_version"][1],
+				update_data["new_version"][2]
+			]
+		]
 	update_menu.dialog_text = tex
 	update_menu.popup()
 	var size = Settings.getViewportSize()
@@ -432,19 +436,12 @@ func _open_updates():
 
 var zip_folder = "user://cache/.Mod_Menu_2_Cache/updates/zip_cache/"
 func updates_started():
-	file.open(update_store,File.READ)
-	var data = JSON.parse(file.get_as_text()).result
-	file.close()
-	var github = data[currently_selected_mod_id].get("github","")
+	var data:Dictionary = pointers.needs_updates[currently_selected_mod_id]
+	var github:String = data.get("github","")
 	if github:
-		http.download_file = zip_folder + data[currently_selected_mod_id]["file_name"]
+		http.download_file = zip_folder + data["file_name"]
 		http.request(github)
 		updating_percent = true
-#		if github.ends_with("/"):
-#			github.rstrip("/")
-#		if not github.ends_with("/releases"):
-#			github = github + "/releases"
-#		pointers.Github.__get_github_release(github,zip_folder,self,true,"zip")
 	
 	get_node("../../../../../../WAIT").popup_centered()
 
@@ -461,15 +458,7 @@ var total_bytes: int = 0
 
 func _downloaded_zip(filepath):
 	get_node("../../../../../../WAIT").hide()
-	file.open(update_store,File.READ)
-	var data = JSON.parse(file.get_as_text()).result
-	file.close()
-	
-	if currently_selected_mod_id in data:
-		data.erase(currently_selected_mod_id)
-	file.open(update_store,File.WRITE)
-	file.store_string(JSON.print(data))
-	file.close()
+	pointers.needs_updates.erase(currently_selected_mod_id)
 	subroot.restart_menu.popup_centered()
 	if filepath:
 		pointers.FileAccess.__precache_mod_file(filepath)

@@ -102,7 +102,6 @@ func cancel():
 	$AnimateAppear.play("hider")
 
 onready var restart_menu : Node = $MMRestartDialog
-var has_updated_store : String = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 
 func show_restart_menu():
 	var valid = true
@@ -112,10 +111,7 @@ func show_restart_menu():
 			valid = false
 		Tool.release(ps)
 	restart_menu.let_restart(valid)
-	file.open(has_updated_store,File.READ)
-	var has : int = file.get_8()
-	file.close()
-	if has:
+	if pointers.has_updated:
 		restart_menu.show()
 		return true
 	return false

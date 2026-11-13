@@ -93,7 +93,12 @@
 39=* Time taken to reach the boot screen is now printed to stdout
 41=* Cleaned up and improved multi-mineral code
 42=* Fixed issue where exiting the mineral market would put RPC in a confused state
-45=* Updated credits
+43=* Fixed focusing issue when updating mods with KB or Controller
+44=* Cache folder creation is now performed on pointers load
+45=* Moved a majority of non-persistant cache data to be stored within the pointers node for much more efficient fetching
+46=* Removed `DataFormat`.`__loadDLC()` due to it not being functionally useful for modlet loading
+47=* Cleaned up procedural thruster creation
+50=* Updated credits
 
 [1.17.8]
 

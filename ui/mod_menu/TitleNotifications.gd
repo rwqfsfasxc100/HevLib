@@ -34,21 +34,15 @@ extends Button
 
 var pointers:HevLibPointers = ModLoader._savedObjects[0]
 var file = File.new()
-const update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
+
 func _ready():
 	check()
 	pointers.connect("updates_fetched",self,"check")
 	visible = false
-var visibility = false
-
-const dependancies_store = "user://cache/.Mod_Menu_2_Cache/updates/dependancies.json"
-const conflicts_store = "user://cache/.Mod_Menu_2_Cache/updates/conflicts.json"
-const complementary_store = "user://cache/.Mod_Menu_2_Cache/updates/complementary.json"
+var visibility:bool = false
 
 func check():
-	file.open(update_store,File.READ)
-	var update_data = JSON.parse(file.get_as_text()).result
-	file.close()
+	var update_data:Dictionary = pointers.needs_updates
 	var height = 50
 	if update_data:
 		visibility = true
@@ -57,26 +51,21 @@ func check():
 		$NotificationBox/VBoxContainer/Updates/Label.text = TranslationServer.translate("HEVLIB_UPDATE_COUNT") % update_data.size()
 	else:
 		$NotificationBox/VBoxContainer/Updates.visible = false
-	file.open(conflicts_store,File.READ)
-	var conflicts = JSON.parse(file.get_as_text()).result
-	file.close()
-	file.open(dependancies_store,File.READ)
-	var dependancies = JSON.parse(file.get_as_text()).result
-	file.close()
-	if conflicts.keys().size() == 0:
+	
+	if pointers.conflicts_keys.empty():
 		$NotificationBox/VBoxContainer/Conflicts.visible = false
 	else:
 		visibility = true
 		height += 50
 		$NotificationBox/VBoxContainer/Conflicts.visible = true
-		$NotificationBox/VBoxContainer/Conflicts/Label.text = TranslationServer.translate("HEVLIB_CONFLICT_COUNT") % conflicts.keys().size()
-	if dependancies.keys().size() == 0:
+		$NotificationBox/VBoxContainer/Conflicts/Label.text = TranslationServer.translate("HEVLIB_CONFLICT_COUNT") % pointers.conflicts_keys.size()
+	if pointers.dependancies_keys.empty():
 		$NotificationBox/VBoxContainer/Dependancies.visible = false
 	else:
 		visibility = true
 		height += 50
 		$NotificationBox/VBoxContainer/Dependancies.visible = true
-		$NotificationBox/VBoxContainer/Dependancies/Label.text = TranslationServer.translate("HEVLIB_DEPENDANCY_COUNT") % dependancies.keys().size()
+		$NotificationBox/VBoxContainer/Dependancies/Label.text = TranslationServer.translate("HEVLIB_DEPENDANCY_COUNT") % pointers.dependancies_keys.size()
 	$NotificationBox.rect_size.y = height
 	$NotificationBox.rect_position.y = -height
 

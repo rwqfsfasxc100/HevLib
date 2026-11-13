@@ -32,8 +32,6 @@
 
 extends Popup
 
-const update_store:String = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
-
 const offset:Vector2 = Vector2(100,75)
 
 onready var container:Node = $base/VBoxContainer/ScrollContainer/LabelContainer
@@ -42,7 +40,6 @@ onready var no_download_popup:Node = $NoDownload
 var file = File.new()
 var pointers:HevLibPointers = ModLoader._savedObjects[0]
 var update_container:PackedScene = load("res://HevLib/ui/mod_menu/updates/ModUpdateContainer.tscn")
-var has_updated_store:String = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
 
 export (NodePath) var restart_dialog_path:NodePath = NodePath("")
 onready var restart_dialog:Node = get_node_or_null(restart_dialog_path)
@@ -50,12 +47,11 @@ onready var restart_dialog:Node = get_node_or_null(restart_dialog_path)
 var updating_all:bool = false
 
 func _about_to_show():
+	lastFocus = get_focus_owner()
 	for child in container.get_children():
 		Tool.remove(child)
 	
-	file.open(update_store,File.READ)
-	var update_data:Dictionary = JSON.parse(file.get_as_text()).result
-	file.close()
+	var update_data:Dictionary = pointers.needs_updates
 	var uKeys:Array = update_data.keys()
 	var currently_ignored:Dictionary = pointers.ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates",{})
 	for u in currently_ignored.keys():
@@ -88,7 +84,6 @@ func _about_to_show():
 			container.get_child(0).repos()
 		_:
 			container.get_child(1).repos()
-	lastFocus = get_focus_owner()
 	_on_resize()
 
 func _visibility_changed():
@@ -113,10 +108,7 @@ func restart_cancel():
 	restart_dialog.hide()
 
 func cancel():
-	file.open(has_updated_store,File.READ)
-	var has:int = file.get_8()
-	file.close()
-	if has:
+	if pointers.has_updated:
 		hide()
 		yield(pointers,"process_tick")
 		restart_dialog.popup_centered()
@@ -205,9 +197,7 @@ export var notifications_button_path:NodePath = NodePath("")
 onready var notifications_button:Node = get_node_or_null(notifications_button_path)
 
 func notifications_pressed():
-	file.open(update_store,File.READ)
-	updates = JSON.parse(file.get_as_text()).result
-	file.close()
+	updates = pointers.needs_updates
 	
 	var currently_ignored:Dictionary = pointers.ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates",{})
 	var iKeys:Array = currently_ignored.keys()

@@ -88,139 +88,139 @@ var Classes = {
 }
 const LIBRARY_LOAD = [
 	[
-		0, "res://HevLib/scenes/minerals/AstrogatorPanel.gd", -INF, "res://HevLib/ModMain.gd", "res://hud/AstrogatorPanel.gd"
+		1, "res://HevLib/scenes/minerals/AstrogatorPanel.gd", -INF, "res://hud/AstrogatorPanel.gd"
 	], [
-		0, "res://HevLib/scenes/minerals/OMS.gd", -INF, "res://HevLib/ModMain.gd", "res://hud/OMS.gd"
+		1, "res://HevLib/scenes/minerals/OMS.gd", -INF, "res://hud/OMS.gd"
 	], [
-		0, "res://HevLib/scenes/minerals/CargoScanner.gd", -INF, "res://HevLib/ModMain.gd", "res://hud/CargoScanner.gd"
+		1, "res://HevLib/scenes/minerals/CargoScanner.gd", -INF, "res://hud/CargoScanner.gd"
 	], [
-		0, "res://HevLib/scenes/minerals/ProcessedCargoManifest.gd", -INF, "res://HevLib/ModMain.gd", "res://hud/trtl/ProcessedCargoManifest.gd"
+		1, "res://HevLib/scenes/minerals/ProcessedCargoManifest.gd", -INF, "res://hud/trtl/ProcessedCargoManifest.gd"
 	], [
-		0, "res://HevLib/scenes/minerals/TheRing.gd", -INF, "res://HevLib/ModMain.gd", "res://TheRing.gd"
+		1, "res://HevLib/scenes/minerals/TheRing.gd", -INF, "res://TheRing.gd"
 	], [
-		0, "res://HevLib/scenes/research/Enceladus.gd", -INF, "res://HevLib/ModMain.gd", "res://enceladus/Enceladus.gd"
+		1, "res://HevLib/scenes/research/Enceladus.gd", -INF, "res://enceladus/Enceladus.gd"
 	], [
-		0, "res://HevLib/scenes/research/overhead_handle/CurrentGame.gd", -INF, "res://HevLib/ModMain.gd", "res://CurrentGame.gd"
+		1, "res://HevLib/scenes/research/overhead_handle/CurrentGame.gd", -INF, "res://CurrentGame.gd"
 	], [
-		0, "res://HevLib/scenes/equipment/SystemShipUpgradeUI.gd", -INF, "res://HevLib/ModMain.gd", "res://enceladus/SystemShipUpgradeUI.gd"
+		1, "res://HevLib/scenes/equipment/SystemShipUpgradeUI.gd", -INF, "res://enceladus/SystemShipUpgradeUI.gd"
 	], [
-		0, "res://HevLib/scenes/equipment/SystemBuyUI.gd", -INF, "res://HevLib/ModMain.gd", "res://enceladus/SystemBuyUI.gd"
+		1, "res://HevLib/scenes/equipment/SystemBuyUI.gd", -INF, "res://enceladus/SystemBuyUI.gd"
 	], [
-		0, "res://HevLib/scenes/equipment/UpgradeGroup.gd", -INF, "res://HevLib/ModMain.gd", "res://enceladus/UpgradeGroup.gd"
+		1, "res://HevLib/scenes/equipment/UpgradeGroup.gd", -INF, "res://enceladus/UpgradeGroup.gd"
 	], [
-		0, "res://HevLib/scenes/equipment/ThrusterSlot.gd", -INF, "res://HevLib/ModMain.gd", "res://ships/modules/ThrusterSlot.gd"
+		1, "res://HevLib/scenes/equipment/ThrusterSlot.gd", -INF, "res://ships/modules/ThrusterSlot.gd"
 	], [
-		0, "res://HevLib/scenes/weaponslot/weapon_slot_handler.gd", -INF, "res://HevLib/ModMain.gd", "res://ships/WeaponSlot.gd"
+		1, "res://HevLib/scenes/weaponslot/weapon_slot_handler.gd", -INF, "res://ships/WeaponSlot.gd"
 	], [
-		0, "res://HevLib/scenes/equipment/ShipModificationDriver/AddNodes.gd", -INF, "res://HevLib/ModMain.gd", "res://ships/ship-ctrl.gd"
+		1, "res://HevLib/scenes/equipment/ShipModificationDriver/AddNodes.gd", -INF, "res://ships/ship-ctrl.gd"
 	], [
-		0, "res://HevLib/scenes/equipment/ShipModificationDriver/InternalStorageMod.gd", -INF, "res://HevLib/ModMain.gd", "res://ships/ship-ctrl.gd"
+		1, "res://HevLib/scenes/equipment/ShipModificationDriver/InternalStorageMod.gd", -INF, "res://ships/ship-ctrl.gd"
 	], [
-		0, "res://HevLib/scenes/ship_driver/Shipyard.gd", -INF, "res://HevLib/ModMain.gd", "res://ships/Shipyard.gd"
+		1, "res://HevLib/scenes/ship_driver/Shipyard.gd", -INF, "res://ships/Shipyard.gd"
 	], [
-		0, "res://HevLib/scenes/ship_driver/CurrentGame.gd", -INF, "res://HevLib/ModMain.gd", "res://CurrentGame.gd"
+		1, "res://HevLib/scenes/ship_driver/CurrentGame.gd", -INF, "res://CurrentGame.gd"
 	], [
-		0, "user://cache/.HevLib_Cache/Minerals/cg.gd", -INF, "res://HevLib/ModMain.gd", "res://CurrentGame.gd"
+		1, "user://cache/.HevLib_Cache/Minerals/cg.gd", -INF, "res://CurrentGame.gd"
 	], [
-		0, "user://cache/.HevLib_Cache/Minerals/as.gd", -INF, "res://HevLib/ModMain.gd", "res://AsteroidSpawner.gd"
+		1, "user://cache/.HevLib_Cache/Minerals/as.gd", -INF, "res://AsteroidSpawner.gd"
 	], [
-		2, "user://cache/.HevLib_Cache/Variable_Fetch/derelict_expansion.tscn", -INF, "res://HevLib/ModMain.gd", "res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"
+		2, "user://cache/.HevLib_Cache/Variable_Fetch/derelict_expansion.tscn", -INF, "res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"
 	], [
-		2, "user://cache/.HevLib_Cache/Variable_Fetch/upgrades.tscn", -INF, "res://HevLib/ModMain.gd", "res://enceladus/Upgrades.tscn"
+		2, "user://cache/.HevLib_Cache/Variable_Fetch/upgrades.tscn", -INF, "res://enceladus/Upgrades.tscn"
 	], [
-		2, "user://cache/.HevLib_Cache/Variable_Fetch/ship_limitations.tscn", -INF, "res://HevLib/ModMain.gd", "res://enceladus/Upgrades.tscn"
+		2, "user://cache/.HevLib_Cache/Variable_Fetch/ship_limitations.tscn", -INF, "res://enceladus/Upgrades.tscn"
 	], [
-		0, "res://HevLib/scenes/ship_driver/TheRing.gd", -INF, "res://HevLib/ModMain.gd", "res://TheRing.gd"
+		1, "res://HevLib/scenes/ship_driver/TheRing.gd", -INF, "res://TheRing.gd"
 	], [
-		0, "res://HevLib/scripts/Namer.gd", -INF, "res://HevLib/ModMain.gd", "res://namer/Namer.gd"
+		1, "res://HevLib/scripts/Namer.gd", -INF, "res://namer/Namer.gd"
 	], [
-		0, "res://HevLib/events/TheRing.gd", -INF, "res://HevLib/ModMain.gd", "res://TheRing.gd"
+		1, "res://HevLib/events/TheRing.gd", -INF, "res://TheRing.gd"
 	], [
-		0, "res://HevLib/events/Game.gd", -INF, "res://HevLib/ModMain.gd", "res://Game.gd"
+		1, "res://HevLib/events/Game.gd", -INF, "res://Game.gd"
 	], [
-		0, "res://HevLib/events/controls/camera.gd", -INF, "res://HevLib/ModMain.gd", "res://ships/camera.gd"
+		1, "res://HevLib/events/controls/camera.gd", -INF, "res://ships/camera.gd"
 	], [
-		0, "res://HevLib/events/controls/ship-ctrl.gd", -INF, "res://HevLib/ModMain.gd", "res://ships/ship-ctrl.gd"
+		1, "res://HevLib/events/controls/ship-ctrl.gd", -INF, "res://ships/ship-ctrl.gd"
 	], [
-		0, "res://HevLib/events/controls/CurrentGame.gd", -INF, "res://HevLib/ModMain.gd", "res://CurrentGame.gd"
+		1, "res://HevLib/events/controls/CurrentGame.gd", -INF, "res://CurrentGame.gd"
 	], [
-		2, "res://HevLib/events/chaos_map/RingTelescopeView.tscn", -INF, "res://HevLib/ModMain.gd", "res://hud/components/RingTelescopeView.tscn"
+		2, "res://HevLib/events/chaos_map/RingTelescopeView.tscn", -INF, "res://hud/components/RingTelescopeView.tscn"
 	], [
-		0, "res://HevLib/events/custom_events/TheRing.gd", -INF, "res://HevLib/ModMain.gd", "res://TheRing.gd"
+		1, "res://HevLib/events/custom_events/TheRing.gd", -INF, "res://TheRing.gd"
 	], [
-		2, "res://HevLib/scenes/notification_driver/Notifications.tscn", -INF, "res://HevLib/ModMain.gd", "res://achievement/Notifications.tscn"
+		2, "res://HevLib/scenes/notification_driver/Notifications.tscn", -INF, "res://achievement/Notifications.tscn"
 	], [
-		0, "res://HevLib/scenes/notification_driver/CurrentGame.gd", -INF, "res://HevLib/ModMain.gd", "res://CurrentGame.gd"
+		1, "res://HevLib/scenes/notification_driver/CurrentGame.gd", -INF, "res://CurrentGame.gd"
 	], [
-		0, "res://HevLib/scenes/better_title_screen/SaveSlotButton.gd", -INF, "res://HevLib/ModMain.gd", "res://SaveSlotButton.gd"
+		1, "res://HevLib/scenes/better_title_screen/SaveSlotButton.gd", -INF, "res://SaveSlotButton.gd"
 	], [
-		0, "res://HevLib/scenes/better_title_screen/CurrentlyPlaying.gd", -INF, "res://HevLib/ModMain.gd", "res://menu/CurrentlyPlaying.gd"
+		1, "res://HevLib/scenes/better_title_screen/CurrentlyPlaying.gd", -INF, "res://menu/CurrentlyPlaying.gd"
 	], [
-		0, "res://HevLib/ui/ExtensionPopup.gd", -INF, "res://HevLib/ModMain.gd", "res://menu/ExtensionPopup.gd"
+		1, "res://HevLib/ui/ExtensionPopup.gd", -INF, "res://menu/ExtensionPopup.gd"
 	], [
-		0, "res://HevLib/ui/mod_menu/titlescreen/TitleMenu.gd", -INF, "res://HevLib/ModMain.gd", "res://menu/TitleMenu.gd"
+		1, "res://HevLib/ui/mod_menu/titlescreen/TitleMenu.gd", -INF, "res://menu/TitleMenu.gd"
 	], [
-		0, "res://HevLib/ui/mod_menu/titlescreen/DLClist.gd", -INF, "res://HevLib/ModMain.gd", "res://tools/DLClist.gd"
+		1, "res://HevLib/ui/mod_menu/titlescreen/DLClist.gd", -INF, "res://tools/DLClist.gd"
 	], [
-		0, "res://HevLib/scripts/transit_tips/TransitTip.gd", -INF, "res://HevLib/ModMain.gd", "res://codex/TransitTip.gd"
+		1, "res://HevLib/scripts/transit_tips/TransitTip.gd", -INF, "res://codex/TransitTip.gd"
 	], [
-		0, "res://HevLib/scripts/easters/Screensaver.gd", -INF, "res://HevLib/ModMain.gd", "res://Screensaver.gd"
+		1, "res://HevLib/scripts/easters/Screensaver.gd", -INF, "res://Screensaver.gd"
 	], [
-		0, "res://HevLib/scripts/easters/TitleMenu.gd", -INF, "res://HevLib/ModMain.gd", "res://menu/TitleMenu.gd"
+		1, "res://HevLib/scripts/easters/TitleMenu.gd", -INF, "res://menu/TitleMenu.gd"
 	], [
-		0, "res://HevLib/scenes/minerals/Summary.gd", -INF, "res://HevLib/ModMain.gd", "res://enceladus/Summary.gd"
+		1, "res://HevLib/scenes/minerals/Summary.gd", -INF, "res://enceladus/Summary.gd"
 	], [
-		0, "res://HevLib/scenes/rpc/Crew.gd", -INF, "res://HevLib/ModMain.gd", "res://enceladus/Crew.gd"
+		1, "res://HevLib/scenes/rpc/Crew.gd", -INF, "res://enceladus/Crew.gd"
 	], [
-		0, "res://HevLib/scenes/rpc/Dealer.gd", -INF, "res://HevLib/ModMain.gd", "res://enceladus/Dealer.gd"
+		1, "res://HevLib/scenes/rpc/Dealer.gd", -INF, "res://enceladus/Dealer.gd"
 	], [
-		0, "res://HevLib/scenes/rpc/DiveTarget.gd", -INF, "res://HevLib/ModMain.gd", "res://enceladus/DiveTarget.gd"
+		1, "res://HevLib/scenes/rpc/DiveTarget.gd", -INF, "res://enceladus/DiveTarget.gd"
 	], [
-		0, "res://HevLib/scenes/rpc/Enceladus.gd", -INF, "res://HevLib/ModMain.gd", "res://enceladus/Enceladus.gd"
+		1, "res://HevLib/scenes/rpc/Enceladus.gd", -INF, "res://enceladus/Enceladus.gd"
 	], [
-		0, "res://HevLib/scenes/rpc/Game.gd", -INF, "res://HevLib/ModMain.gd", "res://Game.gd"
+		1, "res://HevLib/scenes/rpc/Game.gd", -INF, "res://Game.gd"
 	], [
-		0, "res://HevLib/scenes/rpc/Logs.gd", -INF, "res://HevLib/ModMain.gd", "res://enceladus/Logs.gd"
+		1, "res://HevLib/scenes/rpc/Logs.gd", -INF, "res://enceladus/Logs.gd"
 	], [
-		0, "res://HevLib/scenes/rpc/MineralMarket.gd", -INF, "res://HevLib/ModMain.gd", "res://enceladus/MineralMarket.gd"
+		1, "res://HevLib/scenes/rpc/MineralMarket.gd", -INF, "res://enceladus/MineralMarket.gd"
 	], [
-		0, "res://HevLib/scenes/rpc/Music.gd", -INF, "res://HevLib/ModMain.gd", "res://Music.gd"
+		1, "res://HevLib/scenes/rpc/Music.gd", -INF, "res://Music.gd"
 	], [
-		0, "res://HevLib/scenes/rpc/PreFlightInspection.gd", -INF, "res://HevLib/ModMain.gd", "res://enceladus/PreFlightInspection.gd"
+		1, "res://HevLib/scenes/rpc/PreFlightInspection.gd", -INF, "res://enceladus/PreFlightInspection.gd"
 	], [
-		0, "res://HevLib/scenes/rpc/Repairs.gd", -INF, "res://HevLib/ModMain.gd", "res://enceladus/Repairs.gd"
+		1, "res://HevLib/scenes/rpc/Repairs.gd", -INF, "res://enceladus/Repairs.gd"
 	], [
-		0, "res://HevLib/scenes/rpc/Services.gd", -INF, "res://HevLib/ModMain.gd", "res://enceladus/Services.gd"
+		1, "res://HevLib/scenes/rpc/Services.gd", -INF, "res://enceladus/Services.gd"
 	], [
-		0, "res://HevLib/scenes/rpc/SimulationLayer.gd", -INF, "res://HevLib/ModMain.gd", "res://enceladus/Simulator/SimulationLayer.gd"
+		1, "res://HevLib/scenes/rpc/SimulationLayer.gd", -INF, "res://enceladus/Simulator/SimulationLayer.gd"
 	], [
-		0, "res://HevLib/scenes/rpc/Summary.gd", -INF, "res://HevLib/ModMain.gd", "res://enceladus/Summary.gd"
+		1, "res://HevLib/scenes/rpc/Summary.gd", -INF, "res://enceladus/Summary.gd"
 	], [
-		0, "res://HevLib/scenes/rpc/TitleMenu.gd", -INF, "res://HevLib/ModMain.gd", "res://menu/TitleMenu.gd"
+		1, "res://HevLib/scenes/rpc/TitleMenu.gd", -INF, "res://menu/TitleMenu.gd"
 	], [
-		0, "res://HevLib/scenes/rpc/Tuning.gd", -INF, "res://HevLib/ModMain.gd", "res://enceladus/Tuning.gd"
+		1, "res://HevLib/scenes/rpc/Tuning.gd", -INF, "res://enceladus/Tuning.gd"
 	], [
-		0, "res://HevLib/scenes/rpc/Upgrades.gd", -INF, "res://HevLib/ModMain.gd", "res://enceladus/Upgrades.gd"
+		1, "res://HevLib/scenes/rpc/Upgrades.gd", -INF, "res://enceladus/Upgrades.gd"
 	], [
-		0, "res://HevLib/scenes/keymapping/bind_displays/AnalogAxisDisplay.gd", -INF, "res://HevLib/ModMain.gd", "res://hud/components/AnalogAxisDisplay.gd"
+		1, "res://HevLib/scenes/keymapping/bind_displays/AnalogAxisDisplay.gd", -INF, "res://hud/components/AnalogAxisDisplay.gd"
 	], [
-		0, "res://HevLib/scenes/keymapping/bind_displays/GamepadKeybindDisplay.gd", -INF, "res://HevLib/ModMain.gd", "res://hud/components/GamepadKeybindDisplay.gd"
+		1, "res://HevLib/scenes/keymapping/bind_displays/GamepadKeybindDisplay.gd", -INF, "res://hud/components/GamepadKeybindDisplay.gd"
 	], [
-		0, "res://HevLib/scenes/keymapping/bind_displays/KeybindDisplay.gd", -INF, "res://HevLib/ModMain.gd", "res://hud/components/KeybindDisplay.gd"
+		1, "res://HevLib/scenes/keymapping/bind_displays/KeybindDisplay.gd", -INF, "res://hud/components/KeybindDisplay.gd"
 	], [
-		0, "res://HevLib/scenes/keymapping/bind_displays/MousebindDisplay.gd", -INF, "res://HevLib/ModMain.gd", "res://hud/components/MousebindDisplay.gd"
+		1, "res://HevLib/scenes/keymapping/bind_displays/MousebindDisplay.gd", -INF, "res://hud/components/MousebindDisplay.gd"
 	], [
-		0, "res://HevLib/scripts/Boot.gd", -INF, "res://HevLib/ModMain.gd", "res://Boot.gd"
+		1, "res://HevLib/scripts/Boot.gd", -INF, "res://Boot.gd"
 	], [
-		0, "res://HevLib/scenes/minerals/multiminerals/mineral.gd", -INF, "res://HevLib/ModMain.gd", "res://asteroids/mineral.gd"
+		1, "res://HevLib/scenes/minerals/multiminerals/mineral.gd", -INF, "res://asteroids/mineral.gd"
 	], [
-		0, "res://HevLib/scenes/minerals/multiminerals/MineralProcessingUnit.gd", -INF, "res://HevLib/ModMain.gd", "res://ships/modules/MineralProcessingUnit.gd"
+		1, "res://HevLib/scenes/minerals/multiminerals/MineralProcessingUnit.gd", -INF, "res://ships/modules/MineralProcessingUnit.gd"
 	], [
-		0, "res://HevLib/scenes/minerals/multiminerals/AsteroidSpawner.gd", -INF, "res://HevLib/ModMain.gd", "res://AsteroidSpawner.gd"
+		1, "res://HevLib/scenes/minerals/multiminerals/AsteroidSpawner.gd", -INF, "res://AsteroidSpawner.gd"
 	], [
-		0, "res://HevLib/scenes/service_driver/Services.gd", -INF, "res://HevLib/ModMain.gd", "res://enceladus/Services.gd"
+		1, "res://HevLib/scenes/service_driver/Services.gd", -INF, "res://enceladus/Services.gd"
 	], [
-		0, "res://HevLib/scripts/Screensaver.gd", 1000, "res://HevLib/ModMain.gd", "res://Screensaver.gd"
+		1, "res://HevLib/scripts/Screensaver.gd", 1000, "res://Screensaver.gd"
 	]
 ]
 
@@ -313,7 +313,6 @@ func fetch_mod_updates():
 	if rba[0]==0&&rba[1]==200:
 		var p:Dictionary=JSON.parse(rba[3].get_string_from_utf8()).result
 		var ids:PoolStringArray=ManifestV2.__get_mod_ids()
-		var updates:Dictionary={}
 		for ID in p:if ID in ids:
 			var fetchData:Dictionary=p[ID]
 			var modData:Dictionary=ManifestV2.__get_mod_by_id(ID)
@@ -336,7 +335,7 @@ func fetch_mod_updates():
 			if doUpdate:
 				var file_name:String=fetchData.get("file_name","file.zip")
 				var mod_name:String=modData.get("name","")
-				updates[ID]={"name":mod_name,"id":ID,"version":[current_version["version_major"],current_version["version_minor"],current_version["version_bugfix"]],"new_version":newVer,"github":"https://github.com/rwqfsfasxc100/dv_update_database/raw/refs/heads/main/zip_store/%s/%d.%d.%d/%s"%[ID,newVer[0],newVer[1],newVer[2],file_name],"file_name":file_name,"display":"%s (%s)"%[mod_name,ID]}
+				needs_updates[ID]={"name":mod_name,"id":ID,"version":[current_version["version_major"],current_version["version_minor"],current_version["version_bugfix"]],"new_version":newVer,"github":"https://github.com/rwqfsfasxc100/dv_update_database/raw/refs/heads/main/zip_store/%s/%d.%d.%d/%s"%[ID,newVer[0],newVer[1],newVer[2],file_name],"file_name":file_name,"display":"%s (%s)"%[mod_name,ID]}
 		var dont:bool=false
 		if libid in p:
 			var curr:Dictionary=ManifestV2.__get_mod_by_id(libid)["version_data"]
@@ -354,9 +353,7 @@ func fetch_mod_updates():
 			elif bugfix>cb+9:dont=true
 		if dont:
 			NodeAccess.__exit(false,"cannot collect version specific data. Is HevLib out of date?","pointers.SafeMode",60.0)
-		file.open(update_store,File.WRITE)
-		file.store_string(JSON.print(updates))
-		file.close()
+		
 		emit_signal("updates_fetched")
 		if!is_editor||ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","always_send_new_mods",false):
 			var md:Dictionary=ManifestV2.__get_mod_data()
@@ -367,7 +364,7 @@ func fetch_mod_updates():
 					if"manifest_definitions"in manifest&&"links"in manifest&&"HEVLIB_GITHUB"in(manifest["links"]):
 						var murl:String=manifest["manifest_definitions"].get("manifest_url","")
 						var gurl:String=manifest["links"]["HEVLIB_GITHUB"].get("URL","")
-						if(murl.empty()||gurl.empty()):
+						if(!murl||!gurl):
 							continue
 						var payload:String=JSON.print({
 							"event_type":"add_mod_entry",
@@ -386,7 +383,19 @@ func fetch_mod_updates():
 						Tool.deferCallInPhysics(Tool,"remove",[tHTTP])
 	Tool.deferCallInPhysics(Tool,"remove",[rHTTP])
 
-const update_store:String="user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
+
+# Update handling datastore
+var has_updated:bool = false
+var modlet_toggle_restart_requests:Array = []
+var needs_updates:Dictionary = {}
+var complementary:Dictionary = {}
+var dependancies:Dictionary = {}
+var conflicts:Dictionary = {}
+var complementary_keys:PoolStringArray = PoolStringArray()
+var dependancies_keys:PoolStringArray = PoolStringArray()
+var conflicts_keys:PoolStringArray = PoolStringArray()
+# end of store
+
 const libid:String="hev.LIBRARY"
 
 var is_editor:bool = OS.has_feature("editor")
@@ -400,12 +409,49 @@ func _init(r,e,v):
 	version_string = v
 	resource_path = r
 	equipment_modmain = e
-	dir.make_dir_recursive(deviceinfostore)
 	l("Initializing pointers","HevLib %s" % version_string)
 	if Threading.require_single_threading:
 		l("2 or fewer logical CPU cores detected, forcing single thread mode.","pointers.Threading")
 	else:
 		l("Initializing [%d] threads on CPU %s with [%d] logical processors" % [Threading.max_threads,OS.get_processor_name(),OS.get_processor_count()],"pointers.Threading")
+	
+	dir.make_dir_recursive(deviceinfostore)
+	dir.make_dir_recursive("user://cache/.HevLib_Cache/SafeMode")
+	dir.make_dir_recursive("user://cache/.HevLib_Cache/Variable_Fetch")
+	dir.make_dir_recursive("user://cache/.Mod_Menu_2_Cache/updates/zip_cache")
+	dir.make_dir_recursive("user://cache/.Mod_Menu_2_Cache/github_list/icon_cache")
+	dir.make_dir_recursive("user://cache/.Mod_Menu_2_Cache/github_list/downloaded_zips")
+	dir.make_dir_recursive("user://cache/.HevLib_Cache/Event_Driver")
+	for i in FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/",false,true):
+		dir.remove(i)
+	for i in FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/github_list/downloaded_zips/",false,true):
+		dir.remove(i)
+	if file.file_exists(releases_cache):
+		var age:float=Time.get_unix_time_from_system()-file.get_modified_time(releases_cache)
+		if age>3600:
+			file.open(releases_cache,File.WRITE)
+			file.store_string("{}")
+			file.close()
+			Debug.l("Releases cache older than an hour (%s minutes old), clearing"%[floor(age/60.0)])
+		else:
+			Debug.l("Releases cache too new (%s minutes old), not clearing"%[floor(age/60.0)])
+	file.open("user://cache/.HevLib_Cache/Event_Driver/event_log.json",File.WRITE)
+	file.store_string("{}")
+	file.close()
+	file.open("user://cache/.HevLib_Cache/Event_Driver/active_events.txt",File.WRITE)
+	file.store_string("")
+	file.close()
+	file.open("user://cache/.HevLib_Cache/Event_Driver/latest_event.txt",File.WRITE)
+	file.store_string("")
+	file.close()
+	
+	complementary = ManifestV2.__check_complementary()
+	dependancies = ManifestV2.__check_dependancies()
+	conflicts = ManifestV2.__check_conflicts()
+	complementary_keys = PoolStringArray(complementary.keys())
+	dependancies_keys = PoolStringArray(dependancies.keys())
+	conflicts_keys = PoolStringArray(conflicts.keys())
+	
 
 # Logging function used for cases where critial info must not be overwritten by game logs
 # cycling back to dv_log_0 (and yes this is from a specific bug report with AI slop code,
@@ -443,6 +489,8 @@ func storeLogCache():
 		file.store_string(logCache)
 		file.close()
 		logCache = ""
+
+const releases_cache = "user://cache/.Mod_Menu_2_Cache/github_list/releases_cache.json"
 
 class _Achievements:
 	const achievementsFile : String = "user://achievements.dv"
@@ -1106,7 +1154,7 @@ class _ConfigDriver:
 					pointers.l("inspecting section [%s]" % section,"pointers.ConfigDriver")
 					var key_data : Dictionary = sectData[key]
 					var type : String = key_data.get("type","").to_lower()
-					if type.empty():
+					if!type:
 						printerr("config %s does not define a type" % key)
 						continue
 					if key in current_config[sect].keys():
@@ -1842,7 +1890,7 @@ class _DataFormat:
 					ls = "\n" + ls
 				reconcat += ls
 			concat = reconcat
-		return [concat if not concat.empty() else "extends Node",var_names,const_names,signal_names,method_names,signal_values,method_values,method_output_type]
+		return [concat if concat else "extends Node",var_names,const_names,signal_names,method_names,signal_values,method_values,method_output_type]
 	
 	const compiled_scripts : Dictionary = {}
 	const csk:Array = Array()
@@ -2053,13 +2101,6 @@ class _DataFormat:
 					URL = "https" + URL
 		return URL
 	
-	static func __loadDLC():
-		l("Loading DLC as workaround")
-		var DLCLoader:Settings = load("res://Settings.gd").new()
-		DLCLoader.loadDLC()
-		DLCLoader.queue_free()
-		l("Finished loading DLC")
-	
 	const array_types = PoolIntArray([TYPE_ARRAY,TYPE_COLOR_ARRAY,TYPE_INT_ARRAY,TYPE_RAW_ARRAY,TYPE_REAL_ARRAY,TYPE_STRING_ARRAY,TYPE_VECTOR2_ARRAY,TYPE_VECTOR3_ARRAY])
 	static func __split_array_by_length(arr,length:int,specific_section:int = -1) -> Array:
 		var out:Array = []
@@ -2149,7 +2190,7 @@ class _DataFormat:
 						l = "PoolVector2Array(%s)"
 					TYPE_VECTOR3_ARRAY:
 						l = "PoolVector3Array(%s)"
-				if property.empty():
+				if!property:
 					if type == TYPE_ARRAY:
 						out = "[]"
 					else:
@@ -2175,7 +2216,7 @@ class _DataFormat:
 			TYPE_COLOR:
 				out = "Color( %s, %s, %s, %s )" % [property.r,property.g,property.b,property.a]
 			TYPE_DICTIONARY:
-				if property.empty():
+				if!property:
 					out = "{}"
 				else:
 					var l:String = "{%s\n%s}"
@@ -2397,7 +2438,7 @@ class _DriverManagement:
 	const driver_store = []
 	
 	static func __get_drivers(get_ids : Array = []) -> Array:
-		if driver_store.empty():
+		if!driver_store:
 			var base:_DriverManagement = non_static["self"]
 			var pointers:HevLibPointers = non_static["pointers"]
 			for manifest_path in pointers.ManifestV2.__get_manifest_files():
@@ -2410,7 +2451,7 @@ class _DriverManagement:
 				if manifest_ver < 2.2:
 					continue
 				var id : String = manifest.get("mod_information",{}).get("id","")
-				if id.empty():
+				if!id:
 					continue
 				this_mod_data["id"] = id
 				this_mod_data["priority"] = mrv.get("modlet_priority",0)
@@ -2432,7 +2473,7 @@ class _DriverManagement:
 			var mrv:Dictionary = manifest.get("manifest_definitions",{})
 			if mrv.get("manifest_version",1.0) < 2.2:
 				continue
-			if manifest.get("mod_information",{}).get("id","").empty():
+			if!manifest.get("mod_information",{}).get("id",""):
 				continue
 			var folderCheck : Array = pointers.FolderAccess.__fetch_folder_files(modFolder,true)
 			for driverDir in driver_dirs:
@@ -2923,7 +2964,7 @@ class _Equipment:
 					"SHIP_NODE_MODIFY.gd":
 						for item in constKeys:
 							var ship : String = constants[item].get("ship_name","")
-							if not ship.empty():
+							if ship:
 								if not ship in ship_node_modify:
 									ship_node_modify[ship] = []
 								for modification in constants[item].get("modifications",[]):
@@ -3161,7 +3202,7 @@ class _Equipment:
 						for item in constKeys:
 							var di : Dictionary = constants[item]
 							var ship : String = di.get("ship_name","")
-							if not ship.empty():
+							if ship:
 								if not ship in modify_ship_numerics:
 									modify_ship_numerics[ship] = []
 								modify_ship_numerics[ship].append(di)
@@ -3648,154 +3689,84 @@ script = ExtResource( 5 )"""
 		var ext_path_counter:int = 1
 		var ext_path_entry : String = "[ext_resource path=\"%s\" type=\"%s\" id=%d]"
 		
-		var ext_entries : Array = []
+		var ext_entries : PoolStringArray = PoolStringArray()
 		
 		var thruster_vars : String = thruster_node_header
 		# Base thruster programming
 		
 		var mass:float = data.get("mass",0)
 		thruster_vars += "\n" + "mass = %d" % mass
-		var systemName : String = sys
-		thruster_vars += "\n" + "systemName = \"%s\"" % systemName
-		var priorityOffset:float = data.get("priority_offset",1.0 if aux_type == "RCS" else 8.0)
-		thruster_vars += "\n" + "priorityOffset = %f" % priorityOffset
-		var mainBrightRatio:float = data.get("main_bright_ratio",0.01)
-		thruster_vars += "\n" + "mainBrightRatio = %f" % mainBrightRatio
-		var repairReplacementPrice:int = data.get("price",3000 if aux_type == "RCS" else 15000)
-		thruster_vars += "\n" + "repairReplacementPrice = %d" % repairReplacementPrice
-		var repairReplacementTime:float = data.get("repair_time",1 if aux_type == "RCS" else 4)
-		thruster_vars += "\n" + "repairReplacementTime = %d" % repairReplacementTime
-		var repairFixPrice:int = data.get("fix_price",500 if aux_type == "RCS" else 1000)
-		thruster_vars += "\n" + "repairFixPrice = %d" % repairFixPrice
-		var repairFixTime:float = data.get("fix_time",4 if aux_type == "RCS" else 12)
-		thruster_vars += "\n" + "repairFixTime = %d" % repairFixTime
-		var exhaustEmitOffset:float = data.get("exhaust_emit_offset",8)
-		thruster_vars += "\n" + "exhaustEmitOffset = %f" % exhaustEmitOffset
-		var scaleOffsetWithPower:bool = data.get("scale_offset_with_power",false)
-		thruster_vars += "\n" + "scaleOffsetWithPower = %s" % ("true" if scaleOffsetWithPower else "false")
-		var distanceScale:float = data.get("distance_scale",5)
-		thruster_vars += "\n" + "distanceScale = %f" % distanceScale
-		var plumesFromSettings:bool = data.get("plumes_from_settings",true)
-		thruster_vars += "\n" + "plumesFromSettings = %s" % "true" if plumesFromSettings else "false"
-		var angularDegreedRange:float = data.get("angular_degree_range",30)
-		thruster_vars += "\n" + "angularDegreedRange = %f" % angularDegreedRange
-		var rotationRange:float = data.get("rotation_range",PI)
-		thruster_vars += "\n" + "rotationRange = %f" % rotationRange
+		thruster_vars += "\n" + "systemName = \"%s\"" % sys
+		thruster_vars += "\n" + "priorityOffset = %f" % data.get("priority_offset",1.0 if aux_type == "RCS" else 8.0)
+		thruster_vars += "\n" + "mainBrightRatio = %f" % data.get("main_bright_ratio",0.01)
+		thruster_vars += "\n" + "repairReplacementPrice = %d" % data.get("price",3000 if aux_type == "RCS" else 15000)
+		thruster_vars += "\n" + "repairReplacementTime = %d" % data.get("repair_time",1 if aux_type == "RCS" else 4)
+		thruster_vars += "\n" + "repairFixPrice = %d" % data.get("fix_price",500 if aux_type == "RCS" else 1000)
+		thruster_vars += "\n" + "repairFixTime = %d" % data.get("fix_time",4 if aux_type == "RCS" else 12)
+		thruster_vars += "\n" + "exhaustEmitOffset = %f" % data.get("exhaust_emit_offset",8.0)
+		thruster_vars += "\n" + "scaleOffsetWithPower = " + ("true" if data.get("scale_offset_with_power",false) else "false")
+		thruster_vars += "\n" + "distanceScale = %f" % data.get("distance_scale",5)
+		thruster_vars += "\n" + "plumesFromSettings = " + "true" if data.get("plumes_from_settings",true) else "false"
+		thruster_vars += "\n" + "angularDegreedRange = %f" % data.get("angular_degree_range",30)
+		thruster_vars += "\n" + "rotationRange = %f" % data.get("rotation_range",PI)
 		var consumeCargo:PoolStringArray = data.get("consume_cargo",PoolStringArray())
-		var cc : Array = Array(PoolStringArray(consumeCargo))
-		thruster_vars += "\n" + "consumeCargo = PoolStringArray(%s)" % (String(cc) if cc.size() else "")
-		var canFizzle:bool = data.get("can_fizzle",true)
-		thruster_vars += "\n" + "canFizzle = %s" % "true" if canFizzle else "false"
-		var wearPowerMaxChance:float = data.get("wear_power_max_chance",0.95)
-		thruster_vars += "\n" + "wearPowerMaxChance = %f" % wearPowerMaxChance
-		var wearChance:float = data.get("wear_chance",0.01)
-		thruster_vars += "\n" + "wearChance = %f" % wearChance
-		var accelerationFailLimit:float = data.get("acceleration_fail_limit",400)
-		thruster_vars += "\n" + "accelerationFailLimit = %f" % accelerationFailLimit
-		var accelerationFailScale:float = data.get("acceleration_fail_scale",200)
-		thruster_vars += "\n" + "accelerationFailScale = %f" % accelerationFailScale
-		var lightLagChance:float = data.get("light_lag_chance",0.5)
-		thruster_vars += "\n" + "lightLagChance = %f" % lightLagChance
-		var startJolt:float = data.get("start_jolt",0)
-		thruster_vars += "\n" + "startJolt = %f" % startJolt
-		var thrust:float = data.get("thrust",1000 if aux_type == "RCS" else 7500)
-		thruster_vars += "\n" + "thrust = %f" % thrust
-		var command : String = data.get("command","m" if aux_type == "TORCH" else "")
-		thruster_vars += "\n" + "command = \"%s\"" % command
-		var particleChance:float = data.get("particle_chance",0.5 if aux_type == "RCS" else 1.0)
-		thruster_vars += "\n" + "particleChance = %f" % particleChance
-		var chokeParticleAdjust:float = data.get("choke_particle_adjust",1)
-		thruster_vars += "\n" + "chokeParticleAdjust = %f" % chokeParticleAdjust
-		var fadeSeconds:float = data.get("fade_seconds",0.2 if aux_type == "RCS" else 0.4)
-		thruster_vars += "\n" + "fadeSeconds = %f" % fadeSeconds
-		var windUpSeconds:float = data.get("wind_up_seconds",0.017)
-		thruster_vars += "\n" + "windUpSeconds = %f" % windUpSeconds
-		var particleScale:float = data.get("particle_scale",5)
-		thruster_vars += "\n" + "particleScale = %f" % particleScale
-		var randomness:float = data.get("randomness",0.5)
-		thruster_vars += "\n" + "randomness = %f" % randomness
-		var heatCone:float = data.get("heat_cone",0.5)
-		thruster_vars += "\n" + "heatCone = %f" % heatCone
-		var minPower:float = data.get("min_power",0.2 if aux_type == "RCS" else 0.8)
-		thruster_vars += "\n" + "minPower = %f" % minPower
-		var damageWearCapacity:float = data.get("damage_wear_capacity",3600)
-		thruster_vars += "\n" + "damageWearCapacity = %f" % damageWearCapacity
-		var damageBentCapacity:float = data.get("damage_bent_capacity",3000)
-		thruster_vars += "\n" + "damageBentCapacity = %f" % damageBentCapacity
-		var damageBentThreshold:float = data.get("damage_bent_threshold",200)
-		thruster_vars += "\n" + "damageBentThreshold = %f" % damageBentThreshold
-		var damageChokeCapacity:float = data.get("damage_choke_capacity",6000)
-		thruster_vars += "\n" + "damageChokeCapacity = %f" % damageChokeCapacity
-		var damageChokeThreshold:float = data.get("damage_choke_threshold",400)
-		thruster_vars += "\n" + "damageChokeThreshold = %f" % damageChokeThreshold
-		var specialFuelLimit:float = data.get("special_fuel_limit",0)
-		thruster_vars += "\n" + "specialFuelLimit = %f" % specialFuelLimit
-		var heatFireThreshold:float = data.get("heat_fire_threshold",200)
-		thruster_vars += "\n" + "heatFireThreshold = %f" % heatFireThreshold
-		var heatFireScale:float = data.get("heat_fire_scale",8000)
-		thruster_vars += "\n" + "heatFireScale = %f" % heatFireScale
-		var heatFireMax:float = data.get("heat_fire_max",0.5)
-		thruster_vars += "\n" + "heatFireMax = %f" % heatFireMax
-		var maxMissalignment:float = data.get("max_misalignment",0.262 if aux_type == "RCS" else 0.02)
-		thruster_vars += "\n" + "maxMissalignment = %f" % maxMissalignment
-		var bendWearRatio:float = data.get("bend_wear_ratio",0.025)
-		thruster_vars += "\n" + "bendWearRatio = %f" % bendWearRatio
-		var specificImpulse:float = data.get("specific_impulse",65 if aux_type == "RCS" else 15)
-		thruster_vars += "\n" + "specificImpulse = %f" % specificImpulse
-		var thermalFactor:float = data.get("thermal_factor",40)
-		thruster_vars += "\n" + "thermalFactor = %f" % thermalFactor
-		var powerDraw:float = data.get("power_draw",5000 if aux_type == "RCS" else 100000)
-		thruster_vars += "\n" + "powerDraw = %f" % powerDraw
-		var gimbalPowerDraw:float = data.get("gimbal_power_draw",100)
-		thruster_vars += "\n" + "gimbalPowerDraw = %f" % gimbalPowerDraw
-		var thermalHitFactor:float = data.get("thermal_hit_factor",1)
-		thruster_vars += "\n" + "thermalHitFactor = %f" % thermalHitFactor
-		var inspection:bool = data.get("inspection",true)
-		thruster_vars += "\n" + "inspection = %s" % "true" if inspection else "false"
-		var gimbal:float = deg2rad(data.get("gimbal",0))
-		thruster_vars += "\n" + "gimbal = %f" % gimbal
-		var safetyProtocol:bool = data.get("safety_protocol",true)
-		thruster_vars += "\n" + "safetyProtocol = %s" % "true" if safetyProtocol else "false"
-		var safetyGimbalClear:float = data.get("safety_gimbal_clear",0.419)
-		thruster_vars += "\n" + "safetyGimbalClear = %f" % safetyGimbalClear
-		var ignitionsPerSecond:float = data.get("ignitions_per_second",10)
-		thruster_vars += "\n" + "ignitionsPerSecond = %f" % ignitionsPerSecond
-		var gimbalAccurancy:float = data.get("gimbal_accuracy",0.262)
-		thruster_vars += "\n" + "gimbalAccurancy = %f" % gimbalAccurancy
-		var gimbalPerSecond:float = data.get("gimbal_per_second",3.14)
-		thruster_vars += "\n" + "gimbalPerSecond = %f" % gimbalPerSecond
-		var gimbalRestAngle:float = data.get("gimbal_rest_angle",0)
-		thruster_vars += "\n" + "gimbalRestAngle = %f" % gimbalRestAngle
-		var gimbalVectoredThrust:bool = data.get("gimbal_vectored_thrust",false)
-		thruster_vars += "\n" + "gimbalVectoredThrust = %s" % ("true" if gimbalVectoredThrust else "false")
-		var pulsePerSecond:float = data.get("pulse_per_second",10 if aux_type == "RCS" else 4)
-		thruster_vars += "\n" + "pulsePerSecond = %f" % pulsePerSecond
-		var pulseEngine:bool = data.get("pulse_engine",true)
-		thruster_vars += "\n" + "pulseEngine = %s" % ("true" if pulseEngine else "false")
-		var externalPower:bool = data.get("external_power",false)
-		thruster_vars += "\n" + "externalPower = %s" % ("true" if externalPower else "false")
-		var safetyMaxPower:float = data.get("safety_max_power",1)
-		thruster_vars += "\n" + "safetyMaxPower = %f" % safetyMaxPower
-		var safetyExtraMargin:float = data.get("safety_extra_margin",1)
-		thruster_vars += "\n" + "safetyExtraMargin = %f" % safetyExtraMargin
-		var tuneThrustMin:float = data.get("tune_thrust_min",0.5)
-		thruster_vars += "\n" + "tuneThrustMin = %f" % tuneThrustMin
-		var tuneThrustMax:float = data.get("tune_thrust_max",1.5)
-		thruster_vars += "\n" + "tuneThrustMax = %f" % tuneThrustMax
-		var sweepHostilityFactor:float = data.get("sweep_hostility_factor",0.2)
-		thruster_vars += "\n" + "sweepHostilityFactor = %f" % sweepHostilityFactor
-		var damageHostilityScale:int = data.get("damage_hostility_scale",40000000)
-		thruster_vars += "\n" + "damageHostilityScale = %f" % damageHostilityScale
-		var maxVolume:float = data.get("max_volume",-20)
-		thruster_vars += "\n" + "maxVolume = %f" % maxVolume
-		var rangeOverride:float = data.get("range_override",0)
-		thruster_vars += "\n" + "rangeOverride = %f" % rangeOverride
-		var boresightAngleoverride:float = data.get("boresight_angle_override",0)
-		thruster_vars += "\n" + "boresightAngleoverride = %f" % boresightAngleoverride
-		var pitchOverride:float = data.get("pitch_override",0)
-		thruster_vars += "\n" + "pitchOverride = %f" % pitchOverride
-		var minChoke:float = data.get("min_choke",0.25)
-		thruster_vars += "\n" + "minChoke = %f" % minChoke
+		thruster_vars += "\n" + "consumeCargo = PoolStringArray(%s)" % (("\"" + consumeCargo.join("\", \"") + "\"") if consumeCargo else "")
+		thruster_vars += "\n" + "canFizzle = " + "true" if data.get("can_fizzle",true) else "false"
+		thruster_vars += "\n" + "wearPowerMaxChance = %f" % data.get("wear_power_max_chance",0.95)
+		thruster_vars += "\n" + "wearChance = %f" % data.get("wear_chance",0.01)
+		thruster_vars += "\n" + "accelerationFailLimit = %f" % data.get("acceleration_fail_limit",400)
+		thruster_vars += "\n" + "accelerationFailScale = %f" % data.get("acceleration_fail_scale",200)
+		thruster_vars += "\n" + "lightLagChance = %f" % data.get("light_lag_chance",0.5)
+		thruster_vars += "\n" + "startJolt = %f" % data.get("start_jolt",0)
+		thruster_vars += "\n" + "thrust = %f" % data.get("thrust",1000 if aux_type == "RCS" else 7500)
+		thruster_vars += "\n" + "command = \"" + data.get("command","m" if aux_type == "TORCH" else "") + "\""
+		thruster_vars += "\n" + "particleChance = %f" % data.get("particle_chance",0.5 if aux_type == "RCS" else 1.0)
+		thruster_vars += "\n" + "chokeParticleAdjust = %f" % data.get("choke_particle_adjust",1)
+		thruster_vars += "\n" + "fadeSeconds = %f" % data.get("fade_seconds",0.2 if aux_type == "RCS" else 0.4)
+		thruster_vars += "\n" + "windUpSeconds = %f" % data.get("wind_up_seconds",0.017)
+		thruster_vars += "\n" + "particleScale = %f" % data.get("particle_scale",5)
+		thruster_vars += "\n" + "randomness = %f" % data.get("randomness",0.5)
+		thruster_vars += "\n" + "heatCone = %f" % data.get("heat_cone",0.5)
+		thruster_vars += "\n" + "minPower = %f" % data.get("min_power",0.2 if aux_type == "RCS" else 0.8)
+		thruster_vars += "\n" + "damageWearCapacity = %f" % data.get("damage_wear_capacity",3600)
+		thruster_vars += "\n" + "damageBentCapacity = %f" % data.get("damage_bent_capacity",3000)
+		thruster_vars += "\n" + "damageBentThreshold = %f" % data.get("damage_bent_threshold",200)
+		thruster_vars += "\n" + "damageChokeCapacity = %f" % data.get("damage_choke_capacity",6000)
+		thruster_vars += "\n" + "damageChokeThreshold = %f" % data.get("damage_choke_threshold",400)
+		thruster_vars += "\n" + "specialFuelLimit = %f" % data.get("special_fuel_limit",0)
+		thruster_vars += "\n" + "heatFireThreshold = %f" % data.get("heat_fire_threshold",200)
+		thruster_vars += "\n" + "heatFireScale = %f" % data.get("heat_fire_scale",8000)
+		thruster_vars += "\n" + "heatFireMax = %f" % data.get("heat_fire_max",0.5)
+		thruster_vars += "\n" + "maxMissalignment = %f" % data.get("max_misalignment",0.262 if aux_type == "RCS" else 0.02)
+		thruster_vars += "\n" + "bendWearRatio = %f" % data.get("bend_wear_ratio",0.025)
+		thruster_vars += "\n" + "specificImpulse = %f" % data.get("specific_impulse",65 if aux_type == "RCS" else 15)
+		thruster_vars += "\n" + "thermalFactor = %f" % data.get("thermal_factor",40)
+		thruster_vars += "\n" + "powerDraw = %f" % data.get("power_draw",5000 if aux_type == "RCS" else 100000)
+		thruster_vars += "\n" + "gimbalPowerDraw = %f" % data.get("gimbal_power_draw",100)
+		thruster_vars += "\n" + "thermalHitFactor = %f" % data.get("thermal_hit_factor",1)
+		thruster_vars += "\n" + "inspection = " + "true" if data.get("inspection",true) else "false"
+		thruster_vars += "\n" + "gimbal = %f" % deg2rad(data.get("gimbal",0))
+		thruster_vars += "\n" + "safetyProtocol = " + "true" if data.get("safety_protocol",true) else "false"
+		thruster_vars += "\n" + "safetyGimbalClear = %f" % data.get("safety_gimbal_clear",0.419)
+		thruster_vars += "\n" + "ignitionsPerSecond = %f" % data.get("ignitions_per_second",10)
+		thruster_vars += "\n" + "gimbalAccurancy = %f" % data.get("gimbal_accuracy",0.262)
+		thruster_vars += "\n" + "gimbalPerSecond = %f" % data.get("gimbal_per_second",PI)
+		thruster_vars += "\n" + "gimbalRestAngle = %f" % data.get("gimbal_rest_angle",0)
+		thruster_vars += "\n" + "gimbalVectoredThrust = " + ("true" if data.get("gimbal_vectored_thrust",false) else "false")
+		thruster_vars += "\n" + "pulsePerSecond = %f" % data.get("pulse_per_second",10 if aux_type == "RCS" else 4)
+		thruster_vars += "\n" + "pulseEngine = " + ("true" if data.get("pulse_engine",true) else "false")
+		thruster_vars += "\n" + "externalPower = " + ("true" if data.get("external_power",false) else "false")
+		thruster_vars += "\n" + "safetyMaxPower = %f" % data.get("safety_max_power",1)
+		thruster_vars += "\n" + "safetyExtraMargin = %f" % data.get("safety_extra_margin",1)
+		thruster_vars += "\n" + "tuneThrustMin = %f" % data.get("tune_thrust_min",0.5)
+		thruster_vars += "\n" + "tuneThrustMax = %f" % data.get("tune_thrust_max",1.5)
+		thruster_vars += "\n" + "sweepHostilityFactor = %f" % data.get("sweep_hostility_factor",0.2)
+		thruster_vars += "\n" + "damageHostilityScale = %f" % data.get("damage_hostility_scale",40000000)
+		thruster_vars += "\n" + "maxVolume = %f" % data.get("max_volume",-20)
+		thruster_vars += "\n" + "rangeOverride = %f" % data.get("range_override",0)
+		thruster_vars += "\n" + "boresightAngleoverride = %f" % data.get("boresight_angle_override",0)
+		thruster_vars += "\n" + "pitchOverride = %f" % data.get("pitch_override",0)
+		thruster_vars += "\n" + "minChoke = %f" % data.get("min_choke",0.25)
 		var modulate:Color = Color(data.get("modulate",Color.white))
 		thruster_vars += "\n" + "modulate = Color( %f , %f , %f , %f )" % [modulate.r,modulate.g,modulate.b,modulate.a]
 		var self_modulate:Color = Color(data.get("self_modulate",Color(1,1,1,0)))
@@ -3806,26 +3777,19 @@ script = ExtResource( 5 )"""
 			offset[0] = po[0]
 			offset[1] = po[1]
 		thruster_vars += "\n" + "offset = Vector2( %f , %f )" % [offset.x,offset.y]
-		var centered:bool = data.get("plume_centered",false)
-		thruster_vars += "\n" + "centered = %s" % ("true" if centered else "false")
-		var flip_h:bool = data.get("plume_flip_h",false)
-		thruster_vars += "\n" + "flip_h = %s" % ("true" if flip_h else "false")
-		var flip_v:bool = data.get("plume_flip_v",false)
-		thruster_vars += "\n" + "flip_v = %s" % ("true" if flip_v else "false")
-		var hframes:int = data.get("plume_horizontal_frames",8)
-		thruster_vars += "\n" + "hframes = %f" % hframes
-		var vframes:int = data.get("plume_vertical_frames",1)
-		thruster_vars += "\n" + "vframes = %f" % vframes
-		var frame:int = data.get("plume_frame",1)
-		thruster_vars += "\n" + "frame = %f" % frame
+		thruster_vars += "\n" + "centered = " + ("true" if data.get("plume_centered",false) else "false")
+		thruster_vars += "\n" + "flip_h = " + ("true" if data.get("plume_flip_h",false) else "false")
+		thruster_vars += "\n" + "flip_v = " + ("true" if data.get("plume_flip_v",false) else "false")
+		thruster_vars += "\n" + "hframes = %d" % int(data.get("plume_horizontal_frames",8))
+		thruster_vars += "\n" + "vframes = %d" % int(data.get("plume_vertical_frames",1))
+		thruster_vars += "\n" + "frame = %d" % data.get("plume_frame",1)
 		var frame_coords:Vector2 = Vector2.RIGHT
 		var plumeFrameCoords = data.get("plume_frame_coords",frame_coords)
 		if (plumeFrameCoords is Vector2) or (plumeFrameCoords is Array and plumeFrameCoords.size() > 1):
 			frame_coords[0] = plumeFrameCoords[0]
 			frame_coords[1] = plumeFrameCoords[1]
 		thruster_vars += "\n" + "frame_coords = Vector2( %f , %f )" % [frame_coords.x,frame_coords.y]
-		var region_enabled:bool = data.get("plume_region_enabled",false)
-		thruster_vars += "\n" + "region_enabled = %s" % ("true" if region_enabled else "false")
+		thruster_vars += "\n" + "region_enabled = " + ("true" if data.get("plume_region_enabled",false) else "false")
 		var region_rect:Rect2 = Rect2(0,0,0,0)
 		var plRect = data.get("plume_region_rect",Rect2(0,0,0,0))
 		if (plRect is Array or plRect is PoolIntArray or plRect is PoolRealArray) and plRect.size() > 3:
@@ -3833,16 +3797,14 @@ script = ExtResource( 5 )"""
 		elif plRect is Rect2:
 			region_rect = plRect
 		thruster_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [region_rect.position.x,region_rect.position.y,region_rect.size.x,region_rect.size.y]
-		var region_filter_clip:float = data.get("plume_region_filter_clip",false)
-		thruster_vars += "\n" + "region_filter_clip = %s" % ("true" if region_filter_clip else "false")
+		thruster_vars += "\n" + "region_filter_clip = " + ("true" if data.get("plume_region_filter_clip",false) else "false")
 		var position:Vector2 = Vector2(0,-3)
 		var tp = data.get("position",position)
 		if tp is Vector2 or ((tp is Array or tp is PoolIntArray or tp is PoolRealArray) and tp.size() > 1):
 			position[0] = tp[0]
 			position[1] = tp[1]
 		thruster_vars += "\n" + "position = Vector2( %f , %f )" % [position.x,position.y]
-		var rotation:float = deg2rad(data.get("rotation",0))
-		thruster_vars += "\n" + "rotation = %f" % rotation
+		thruster_vars += "\n" + "rotation = %f" % deg2rad(data.get("rotation",0))
 		var scale:Vector2 = Vector2(0.2,0.2) if aux_type == "RCS" else Vector2(0.939,1.395)
 		var ts = data.get("scale",scale)
 		if ts is Vector2 or ((ts is Array or ts is PoolIntArray or ts is PoolRealArray) and ts.size() > 1):
@@ -3852,32 +3814,22 @@ script = ExtResource( 5 )"""
 		
 		var flare_vars : String = flare_header
 		# Flare programming
-		var flare_essentiality:float = data.get("flare_essentiality",0.5 if aux_type == "RCS" else 0.8)
-		flare_vars += "\n" + "essentiality = %f" % flare_essentiality
-		var flare_offsetByCamera:bool = data.get("flare_offset_by_camera",false)
-		flare_vars += "\n" + "offsetByCamera = %s" % ("true" if flare_offsetByCamera else "false")
-		var flare_energy:float = data.get("flare_energy",5)
-		flare_vars += "\n" + "energy = %f" % flare_energy
-		var flare_range_height:float = data.get("flare_range_height",-15)
-		flare_vars += "\n" + "range_height = %f" % flare_range_height
-		var flare_range_z_min:float = data.get("flare_range_z_min",-4096)
-		flare_vars += "\n" + "range_z_min = %f" % flare_range_z_min
-		var flare_range_z_max:float = data.get("flare_range_z_max",4096)
-		flare_vars += "\n" + "range_z_max = %f" % flare_range_z_max
-		var flare_range_layer_min:float = data.get("flare_range_layer_min",-1)
-		flare_vars += "\n" + "range_layer_min = %f" % flare_range_layer_min
-		var flare_range_layer_max:float = data.get("flare_range_layer_max",1)
-		flare_vars += "\n" + "range_layer_max = %f" % flare_range_layer_max
+		flare_vars += "\n" + "essentiality = %f" % data.get("flare_essentiality",0.5 if aux_type == "RCS" else 0.8)
+		flare_vars += "\n" + "offsetByCamera = " + ("true" if data.get("flare_offset_by_camera",false) else "false")
+		flare_vars += "\n" + "energy = %f" % data.get("flare_energy",5)
+		flare_vars += "\n" + "range_height = %f" % data.get("flare_range_height",-15)
+		flare_vars += "\n" + "range_z_min = %d" % data.get("flare_range_z_min",-4096)
+		flare_vars += "\n" + "range_z_max = %d" % data.get("flare_range_z_max",4096)
+		flare_vars += "\n" + "range_layer_min = %d" % data.get("flare_range_layer_min",-1)
+		flare_vars += "\n" + "range_layer_max = %d" % data.get("flare_range_layer_max",1)
 		var flare_offset:Vector2 = Vector2.ZERO
 		var fo = data.get("flare_offset",flare_offset)
 		if fo is Vector2 or ((fo is Array or fo is PoolIntArray or fo is PoolRealArray) and fo.size() > 1):
 			flare_offset[0] = fo[0]
 			flare_offset[1] = fo[1]
 		flare_vars += "\n" + "offset = Vector2( %f , %f )" % [flare_offset.x,flare_offset.y]
-		var flare_texture_scale:float = data.get("flare_texture_scale",6)
-		flare_vars += "\n" + "texture_scale = %f" % flare_texture_scale
-		var flare_rotation:float = deg2rad(data.get("flare_rotation",0))
-		flare_vars += "\n" + "rotation = %f" % flare_rotation
+		flare_vars += "\n" + "texture_scale = %f" % data.get("flare_texture_scale",6)
+		flare_vars += "\n" + "rotation = %f" % deg2rad(data.get("flare_rotation",0))
 		var flare_position:Vector2 = Vector2.ZERO
 		var fp = data.get("flare_position",Vector2.ZERO)
 		if fp is Vector2 or ((fp is Array or fp is PoolIntArray or fp is PoolRealArray) and fp.size() > 1):
@@ -3905,8 +3857,7 @@ script = ExtResource( 5 )"""
 				else:
 					exhaust_path = "res://sfx/exhaust.tscn"
 		ext_path_counter += 1
-		var exhaust_ext : String = ext_path_entry % [exhaust_path,"PackedScene",ext_path_counter]
-		ext_entries.append(exhaust_ext)
+		ext_entries.append(ext_path_entry % [exhaust_path,"PackedScene",ext_path_counter])
 		thruster_vars += "\n" + "exhaust = ExtResource( %d )" % ext_path_counter
 
 		# Material
@@ -3919,8 +3870,7 @@ script = ExtResource( 5 )"""
 			material = ""
 		if material:
 			ext_path_counter += 1
-			var material_ext = ext_path_entry % [material,"Material",ext_path_counter]
-			ext_entries.append(material_ext)
+			ext_entries.append(ext_path_entry % [material,"Material",ext_path_counter])
 			thruster_vars += "\n" + "material = ExtResource( %d )" % ext_path_counter
 		else:
 			thruster_vars += "\n" + "material = null"
@@ -3964,25 +3914,21 @@ script = ExtResource( 5 )"""
 		
 		var nozzle_scene_path : String = "res://ships/modules/nozzle-conventonal.tscn"
 		var nozzle_scene_ext:int = 0
-		if before_nozzles.size() or after_nozzles.size():
+		if before_nozzles or after_nozzles:
 			ext_path_counter += 1
 			nozzle_scene_ext = ext_path_counter
-			var nozzle_s_ext : String = ext_path_entry % [nozzle_scene_path,"PackedScene",nozzle_scene_ext]
-			ext_entries.append(nozzle_s_ext)
+			ext_entries.append(ext_path_entry % [nozzle_scene_path,"PackedScene",nozzle_scene_ext])
 		for n in before_nozzles:
 			node_index += 1
 			var nozzlename : String = "nozzle_%d" % node_index
-			var header : String = this_nozzle_header % [nozzlename,node_index,nozzle_scene_ext]
-			var nz : Array = format_nozzle(n,header,nozzlename,ext_path_counter,cached_tex_path,ext_path_entry)
+			var nz : Array = format_nozzle(n,this_nozzle_header % [nozzlename,node_index,nozzle_scene_ext],nozzlename,ext_path_counter,cached_tex_path,ext_path_entry)
 			ext_path_counter = nz[1]
 			ext_entries.append_array(nz[2])
 			nozzle_groups.append(nz[0])
 			footer_groups.append(extra_nozzle_footer % nozzlename)
 		
 		node_index += 1
-		var basenozzlename : String = "nozzle"
-		var baseheader : String = nozzle_header % node_index
-		var basenz : Array = format_nozzle(nd,baseheader,basenozzlename,ext_path_counter,cached_tex_path,ext_path_entry)
+		var basenz : Array = format_nozzle(nd,nozzle_header % node_index,"nozzle",ext_path_counter,cached_tex_path,ext_path_entry)
 		ext_path_counter = basenz[1]
 		ext_entries.append_array(basenz[2])
 		nozzle_groups.append(basenz[0])
@@ -3991,8 +3937,7 @@ script = ExtResource( 5 )"""
 		for n in after_nozzles:
 			node_index += 1
 			var nozzlename : String = "nozzle_%d" % node_index
-			var header : String = this_nozzle_header % [nozzlename,node_index,nozzle_scene_ext]
-			var nz : Array = format_nozzle(n,header,nozzlename,ext_path_counter,cached_tex_path,ext_path_entry)
+			var nz : Array = format_nozzle(n,this_nozzle_header % [nozzlename,node_index,nozzle_scene_ext],nozzlename,ext_path_counter,cached_tex_path,ext_path_entry)
 			ext_path_counter = nz[1]
 			ext_entries.append_array(nz[2])
 			nozzle_groups.append(nz[0])
@@ -4004,38 +3949,21 @@ script = ExtResource( 5 )"""
 		var extra_nodes : Array = data.get("extra_nodes",[])
 		for node in extra_nodes:
 			if ResourceLoader.exists(node):
-				var vm:Node = load(node).instance()
-				var nodename : String = vm.name
-				vm.queue_free()
 				ext_path_counter += 1
 				node_index += 1
-				var nodeExt : String = ext_path_entry % [node,"PackedScene",ext_path_counter]
-				var nodeId : String = this_nozzle_header % [nodename,node_index,ext_path_counter]
-				ext_entries.append(nodeExt)
-				nodes_to_add.append(nodeId)
+				var vm:Node = load(node).instance()
+				ext_entries.append(ext_path_entry % [node,"PackedScene",ext_path_counter])
+				nodes_to_add.append(this_nozzle_header % [vm.name,node_index,ext_path_counter])
+				vm.queue_free()
 		
 		var header_compile : String = ""
 		if ext_entries:
-			header_compile = thruster_header % (ext_entries.size() + 3)
-			for i in ext_entries:
-				header_compile += "\n" + i
+			header_compile = thruster_header % (ext_entries.size() + 3) + ext_entries.join("\n")
 		
-		var nozzle_compile : String = ""
-		for i in nozzle_groups:
-				nozzle_compile += i
-		
-		var extra_node_compile : String = ""
-		for i in nodes_to_add:
-			extra_node_compile += i
-		
-		var footer : String = "\n"
-		for i in footer_groups:
-			footer += "\n" + i
-		
-		return header_compile + thruster_vars + flare_vars + nozzle_compile + extra_node_compile + footer
+		return header_compile + thruster_vars + flare_vars + nozzle_groups.join("") + nodes_to_add.join("") + "\n" + footer_groups.join("\n")
 	
 	func format_nozzle(nd:Dictionary,header:String,nozzlename:String,current_ext:int,cached_tex_path:String,ext_path_entry:String) -> Array:
-		var ext_entries : Array = []
+		var ext_entries : PoolStringArray = PoolStringArray()
 		var nozzle_vars : String = header
 		var peakTemperature:int = nd.peak_temperature
 		var coolTime:float = nd.cool_time
@@ -4056,50 +3984,52 @@ script = ExtResource( 5 )"""
 		var texturepath : String = create_compiled_tex(texture,cached_tex_path,"nozzle_texture")
 		
 		current_ext += 1
-		var sprite_ext : String = ext_path_entry % [texturepath,"StreamTexture" if texturepath.ends_with(".stex") else "Texture",current_ext]
-		ext_entries.append(sprite_ext)
+		ext_entries.append(ext_path_entry % [texturepath,"StreamTexture" if texturepath.ends_with(".stex") else "Texture",current_ext])
 		nozzle_vars += "\n" + "texture = ExtResource( %d )" % current_ext
 		
 		var normalpath : String = create_compiled_tex(normal,cached_tex_path,"nozzle_normal")
 		
 		current_ext += 1
-		var normal_ext : String = ext_path_entry % [normalpath,"StreamTexture" if normalpath.ends_with(".stex") else "Texture",current_ext]
-		ext_entries.append(normal_ext)
+		ext_entries.append(ext_path_entry % [normalpath,"StreamTexture" if normalpath.ends_with(".stex") else "Texture",current_ext])
 		nozzle_vars += "\n" + "normal_map = ExtResource( %d )" % current_ext
 		
 		var offset = nd.offset
 		if offset is Vector2 or ((offset is Array or offset is PoolIntArray or offset is PoolRealArray) and offset.size() > 1):
 			nozzle_vars += "\n" + "offset = Vector2( %f , %f )" % [offset[0],offset[1]]
-		var centered:bool = nd.centered
-		nozzle_vars += "\n" + "centered = %s" % ("true" if centered else "false")
-		var flip_h:bool = nd.flip_h
-		nozzle_vars += "\n" + "flip_h = %s" % ("true" if flip_h else "false")
-		var flip_v:bool = nd.flip_v
-		nozzle_vars += "\n" + "flip_v = %s" % ("true" if flip_v else "false")
-		var hframes:int = nd.horizontal_frames
-		nozzle_vars += "\n" + "hframes = %f" % hframes
-		var vframes:int = nd.vertical_frames
-		nozzle_vars += "\n" + "vframes = %f" % vframes
-		var frame:int = nd.frame
-		nozzle_vars += "\n" + "frame = %f" % frame
+		
+		nozzle_vars += "\n" + "centered = " + ("true" if nd.centered else "false")
+		
+		nozzle_vars += "\n" + "flip_h = " + ("true" if nd.flip_h else "false")
+		
+		nozzle_vars += "\n" + "flip_v = " + ("true" if nd.flip_v else "false")
+		
+		nozzle_vars += "\n" + "hframes = %d" % int(nd.horizontal_frames)
+		
+		nozzle_vars += "\n" + "vframes = %d" % int(nd.vertical_frames)
+		
+		nozzle_vars += "\n" + "frame = %d" % int(nd.frame)
+		
 		var frame_coords = nd.frame_coords
 		if frame_coords is Vector2 or ((frame_coords is Array or frame_coords is PoolIntArray or frame_coords is PoolRealArray) and frame_coords.size() > 1):
 			nozzle_vars += "\n" + "frame_coords = Vector2( %f , %f )" % [frame_coords[0],frame_coords[1]]
-		var region_enabled:bool = nd.region_enabled
-		nozzle_vars += "\n" + "region_enabled = %s" % ("true" if region_enabled else "false")
+		
+		nozzle_vars += "\n" + "region_enabled = %s" % ("true" if nd.region_enabled else "false")
+		
 		var region_rect = nd.region_rect
 		if region_rect is PoolIntArray or region_rect is PoolRealArray or region_rect is Array:
 			if region_rect.size() > 3:
 				nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [region_rect[0],region_rect[1],region_rect[2],region_rect[3]]
 		elif region_rect is Rect2:
 			nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [region_rect.position.x,region_rect.position.y,region_rect.size.x,region_rect.size.y]
-		var region_filter_clip:bool = nd.region_filter_clip
-		nozzle_vars += "\n" + "region_filter_clip = %s" % ("true" if region_filter_clip else "false")
+		
+		nozzle_vars += "\n" + "region_filter_clip = " + ("true" if nd.region_filter_clip else "false")
+		
 		var position = nd.position
 		if position is Vector2 or ((position is Array or position is PoolIntArray or position is PoolRealArray) and position.size() > 1):
 			nozzle_vars += "\n" + "position = Vector2( %f , %f )" % [position[0],position[1]]
-		var rotation:float = deg2rad(nd.rotation)
-		nozzle_vars += "\n" + "rotation = %f" % rotation
+		
+		nozzle_vars += "\n" + "rotation = %f" % deg2rad(nd.rotation)
+		
 		var scale = nd.scale
 		if scale is Vector2 or ((scale is Array or scale is PoolIntArray or scale is PoolRealArray) and scale.size() > 1):
 			nozzle_vars += "\n" + "scale = Vector2( %f , %f )" % [scale[0],scale[1]]
@@ -4118,50 +4048,46 @@ script = ExtResource( 5 )"""
 		var heattexturepath : String = create_compiled_tex(heat,cached_tex_path,"nozzle_heat")
 		
 		current_ext += 1
-		var heat_sprite_ext : String = ext_path_entry % [heattexturepath,"StreamTexture" if heattexturepath.ends_with(".stex") else "Texture",current_ext]
-		ext_entries.append(heat_sprite_ext)
+		ext_entries.append(ext_path_entry % [heattexturepath,"StreamTexture" if heattexturepath.get_extension() == "stex" else "Texture",current_ext])
 		nozzle_vars += "\n" + "texture = ExtResource( %d )" % current_ext
 		if heat_normal:
 			var heatnormalpath : String = create_compiled_tex(heat_normal,cached_tex_path,"nozzle_heat_normal")
-			
 			current_ext += 1
-			var heatnormal_ext : String = ext_path_entry % [heatnormalpath,"StreamTexture" if heatnormalpath.ends_with(".stex") else "Texture",current_ext]
-			ext_entries.append(heatnormal_ext)
+			ext_entries.append(ext_path_entry % [heatnormalpath,"StreamTexture" if heatnormalpath.get_extension() == "stex" else "Texture",current_ext])
 			nozzle_vars += "\n" + "normal_map = ExtResource( %d )" % current_ext
 		
 		var heat_offset = nd.offset
 		if heat_offset is Vector2 or ((heat_offset is Array or heat_offset is PoolIntArray or heat_offset is PoolRealArray) and heat_offset.size() > 1):
 			nozzle_vars += "\n" + "offset = Vector2( %f , %f )" % [heat_offset[0],heat_offset[1]]
-		var heat_centered:bool = nd.heat_centered
-		nozzle_vars += "\n" + "centered = %s" % ("true" if heat_centered else "false")
-		var heat_flip_h:bool = nd.heat_flip_h
-		nozzle_vars += "\n" + "flip_h = %s" % ("true" if heat_flip_h else "false")
-		var heat_flip_v:bool = nd.heat_flip_v
-		nozzle_vars += "\n" + "flip_v = %s" % ("true" if heat_flip_v else "false")
-		var heat_hframes:int = nd.heat_horizontal_frames
-		nozzle_vars += "\n" + "hframes = %f" % heat_hframes
-		var heat_vframes:int = nd.heat_vertical_frames
-		nozzle_vars += "\n" + "vframes = %f" % heat_vframes
-		var heat_frame:int = nd.heat_frame
-		nozzle_vars += "\n" + "frame = %f" % heat_frame
+		
+		nozzle_vars += "\n" + "centered = " + ("true" if nd.heat_centered else "false")
+		nozzle_vars += "\n" + "flip_h = " + ("true" if nd.heat_flip_h else "false")
+		nozzle_vars += "\n" + "flip_v = " + ("true" if nd.heat_flip_v else "false")
+		nozzle_vars += "\n" + "hframes = %d" % int(nd.heat_horizontal_frames)
+		nozzle_vars += "\n" + "vframes = %d" % int(nd.heat_vertical_frames)
+		nozzle_vars += "\n" + "frame = %d" % int(nd.heat_frame)
+		
 		var heat_frame_coords = nd.heat_frame_coords
 		if heat_frame_coords is Vector2 or ((heat_frame_coords is Array or heat_frame_coords is PoolIntArray or heat_frame_coords is PoolRealArray) and heat_frame_coords.size() > 1):
 			nozzle_vars += "\n" + "frame_coords = Vector2( %f , %f )" % [heat_frame_coords[0],heat_frame_coords[1]]
-		var heat_region_enabled:bool = nd.heat_region_enabled
-		nozzle_vars += "\n" + "region_enabled = %s" % ("true" if heat_region_enabled else "false")
+		
+		nozzle_vars += "\n" + "region_enabled = " + ("true" if nd.heat_region_enabled else "false")
+		
 		var heat_region_rect = nd.heat_region_rect
 		if heat_region_rect is PoolIntArray or heat_region_rect is PoolRealArray or heat_region_rect is Array:
 			if heat_region_rect.size() > 3:
 				nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [heat_region_rect[0],heat_region_rect[1],heat_region_rect[2],heat_region_rect[3]]
 		elif heat_region_rect is Rect2:
 			nozzle_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [heat_region_rect.position.x,heat_region_rect.position.y,heat_region_rect.size.x,heat_region_rect.size.y]
-		var heat_region_filter_clip:bool = nd.heat_region_filter_clip
-		nozzle_vars += "\n" + "region_filter_clip = %s" % ("true" if heat_region_filter_clip else "false")
+		
+		nozzle_vars += "\n" + "region_filter_clip = " + ("true" if nd.heat_region_filter_clip else "false")
+		
 		var heat_position = nd.heat_position
 		if heat_position is Vector2 or ((heat_position is Array or heat_position is PoolIntArray or heat_position is PoolRealArray) and heat_position.size() > 1):
 			nozzle_vars += "\n" + "position = Vector2( %f , %f )" % [heat_position[0],heat_position[1]]
-		var heat_rotation:float = deg2rad(nd.heat_rotation)
-		nozzle_vars += "\n" + "rotation = %f" % heat_rotation
+		
+		nozzle_vars += "\n" + "rotation = %f" % deg2rad(nd.heat_rotation)
+		
 		var heat_scale = nd.heat_scale
 		if heat_scale is Vector2 or ((heat_scale is Array or heat_scale is PoolIntArray or heat_scale is PoolRealArray) and heat_scale.size() > 1):
 			nozzle_vars += "\n" + "scale = Vector2( %f , %f )" % [heat_scale[0],heat_scale[1]]
@@ -4589,7 +4515,7 @@ class _Events:
 		if delay_seconds > 0.0:
 			pointers.l("Delaying event clear by %0.1f seconds" % delay_seconds,"pointers.EventDriver")
 			yield(CurrentGame.get_tree().create_timer(delay_seconds),"timeout")
-		if event.empty() or event == "none":
+		if !event or event == "none":
 			var events = ring.all_oddities
 			for e in events:
 				if Tool.claim(e):
@@ -4727,24 +4653,23 @@ class _FileAccess:
 	const updateCacheDir : String = "user://cache/.Mod_Menu_2_Cache/updates"
 	const updateCacheFile : String = updateCacheDir + "/mods_to_update.json"
 	const modCacheDir : String = updateCacheDir + "/zip_cache"
-	const has_updated_store : String = updateCacheDir + "/has_updated.txt"
+	
 	static func __precache_mod_file(filepath:String):
 		var file:File = File.new()
 		filepath = ProjectSettings.localize_path(filepath)
-		non_static["pointers"].FolderAccess.__check_folder_exists(modCacheDir)
 		if file.file_exists(filepath):
 			if filepath.get_base_dir() != modCacheDir:
 				if __copy_file(filepath,modCacheDir):
 					return
 				filepath = modCacheDir + "/" + filepath.get_file()
-			var cache : PoolStringArray = PoolStringArray(JSON.parse(__get_file_content(updateCacheFile)).result)
+			file.open(updateCacheFile,File.READ)
+			var cache : Array = JSON.parse(file.get_as_text()).result
+			file.close()
 			if not filepath in cache: cache.append(filepath)
 			file.open(updateCacheFile,File.WRITE)
 			file.store_string(JSON.print(cache))
 			file.close()
-			file.open(has_updated_store,File.WRITE)
-			file.store_8(1)
-			file.close()
+			non_static["pointers"].has_updated = true
 	const foundnewfiles:String = "new mods found, attempting to copy"
 	const exitMsg:String = "new and/or updated mods detected, rebooting game"
 	static func __load_precached_mods():
@@ -4758,7 +4683,7 @@ class _FileAccess:
 			file.open(updateCacheFile,File.WRITE)
 			file.store_string("[]")
 			file.close()
-			if not files_to_copy.empty():
+			if files_to_copy:
 				print(foundnewfiles)
 				var pointers:HevLibPointers = non_static["pointers"]
 				pointers.l(foundnewfiles,"pointers.FileAccess")
@@ -4769,6 +4694,11 @@ class _FileAccess:
 						pointers.l(newmodmsg,"pointers.FileAccess")
 				print(exitMsg)
 				pointers.NodeAccess.__exit(true,exitMsg,"pointers.FileAccess")
+		else:
+			file.open(updateCacheFile,File.WRITE)
+			file.store_string("[]")
+			file.close()
+	
 	
 	static func __get_uid_of_file(file_path:String) -> String:
 		if not __file_exists(file_path):
@@ -5202,9 +5132,9 @@ class _Keymapping:
 	const input_cache = {}
 	
 	static func __define_vanilla_binds():
-		var recache = input_cache.empty()
+		var recache:bool = input_cache.empty()
 		non_static["pointers"].FolderAccess.__check_folder_exists(keybind_folder)
-		if input_cache.empty():
+		if!input_cache:
 			for ie in __get_vanilla_action_list():
 				input_cache[ie] = []
 				for event in InputMap.get_action_list(ie):
@@ -5216,7 +5146,7 @@ class _Keymapping:
 	const formatted_vanilla_binds_store:Dictionary = {}
 	
 	static func __get_formatted_vanilla_binds() -> Dictionary:
-		if formatted_vanilla_binds_store.empty():
+		if!formatted_vanilla_binds_store:
 			var bound:Dictionary = {}
 			var current:Dictionary = {}
 			var file:File = File.new()
@@ -5507,7 +5437,7 @@ class _ManifestV2:
 	const get_mod_path_from_lowercase_path = {}
 	
 	static func __get_mod_data():
-		if cached_mod_list.empty():
+		if !cached_mod_list:
 			var base = non_static["self"]
 			var pointers:HevLibPointers = non_static["pointers"]
 			var file:File = File.new()
@@ -5526,7 +5456,7 @@ class _ManifestV2:
 				var modZipProcessing:Array = []
 				while true:
 					var fileName:String = dir.get_next()
-					if fileName.empty():
+					if !fileName:
 						break
 					if dir.current_is_dir():
 						continue
@@ -5546,17 +5476,18 @@ class _ManifestV2:
 			var non_library_count:int = 0
 			var all_mod_files:Array = []
 			var modmain_files : PoolStringArray = __get_modmain_files()
+			var manifests_and_icons:PoolStringArray = (__get_manifest_files() + __get_icon_files())
+			var modlet_files : PoolStringArray = __get_modlet_files()
 			pointers.l("found [%s] modmain files" % modmain_files.size(),"pointers.ManifestV2")
 			for item in modmain_files:
 				modFiles.append(item.to_lower())
 				pointers.l("registering ModMain %s" % item,"pointers.ManifestV2")
-				all_mod_files.append({"object":base,"method":"compile_mod_data_from_path","args":[item]})
-			var modlet_files : PoolStringArray = __get_modlet_files()
+				all_mod_files.append({"object":base,"method":"compile_mod_data_from_path","args":[item,manifests_and_icons,modlet_files]})
 			pointers.l("found [%s] modlet files" % modlet_files.size(),"pointers.ManifestV2")
 			for item in modlet_files:
 				modFiles.append(item.to_lower())
 				pointers.l("registering Modlet %s" % item,"pointers.ManifestV2")
-				all_mod_files.append({"object":base,"method":"compile_mod_data_from_path","args":[item]})
+				all_mod_files.append({"object":base,"method":"compile_mod_data_from_path","args":[item,manifests_and_icons,modlet_files]})
 			var modListArr : Array = pointers.Threading.__request_multiple_threads(all_mod_files)
 			var total_mod_count:int = modListArr.size()
 			pointers.l("solved [%s] mod-definition files [%s ModMains / %s Modlets]" % [total_mod_count,modmain_files.size(),modlet_files.size()],"pointers.ManifestV2")
@@ -5620,28 +5551,321 @@ class _ManifestV2:
 					base.hasModStateChanged = true
 		return cached_mod_list.duplicate(true)
 	
-	static func compile_mod_data_from_path(mod_path:String) -> Dictionary:
-		var thismod:Dictionary = __make_mod_entry(__concat_mod_info(mod_path))
-		var zp:String = thismod["zip_path"]
-		var concat:Dictionary = {
-			"name":TranslationServer.translate(thismod["name"]),
-			"priority":thismod["priority"],
-			"path":thismod["file_path"],
-			"zip_path":zp,
-			"zip_size":0,
-			"version":[thismod["version_data"]["version_major"],thismod["version_data"]["version_minor"],thismod["version_data"]["version_bugfix"]],
-			"type":thismod["mod_type"],
-			"enabled":thismod["enabled"],
-		}
-		var file:File=File.new()
-		if file.file_exists(zp):
-			file.open(zp,File.READ)
-			concat["zip_size"] = file.get_len()
-			file.close()
-		if thismod["manifest"]["has_manifest"]:
-			concat["id"] = thismod["manifest"]["manifest_data"]["mod_information"]["id"]
-		thismod["hash"] = concat.hash()
-		return thismod
+	static func compile_mod_data_from_path(script_path:String,manifests_and_icons:PoolStringArray,modlet_files:PoolStringArray) -> Dictionary:
+		var pointers:HevLibPointers = non_static["pointers"]
+		if not pointers.FileAccess.__file_exists(script_path):
+			return {}
+		var cv : String = script_path.get_file().to_lower()
+		if cv.begins_with("modmain") and cv.get_extension() == "gd":
+			var constants : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(script_path)
+			var folder_path : String = script_path.get_base_dir() + "/"
+			var mod_priority : int = constants.get("MOD_PRIORITY",0)
+			var mod_name : String = str(constants.get("MOD_NAME",script_path.split("/")[2]))
+			var legacy_mod_version : String = constants.get("MOD_VERSION","1.0.0")
+			var mod_version_major : int = constants.get("MOD_VERSION_MAJOR",1)
+			var mod_version_minor : int = constants.get("MOD_VERSION_MINOR",0)
+			var mod_version_bugfix : int = constants.get("MOD_VERSION_BUGFIX",0)
+			var mod_version_metadata : String = constants.get("MOD_VERSION_METADATA","")
+			var is_library : bool = constants.get("MOD_IS_LIBRARY",false)
+			var always_display : bool = constants.get("ALWAYS_DISPLAY",false)
+			
+			var has_mod_manifest : bool = false
+			var manifest_filepath : String = ""
+			var manifest_data : Dictionary = {}
+			var manifest_version : float = 1.0
+			var has_icon_file : bool = false
+			var png_path : String = ""
+			var stex_path : String = ""
+			var icon_path : String = ""
+			
+			var mod_enabled:bool = true
+			var script_filename : String = script_path.get_file().to_lower()
+			
+			for content_file in manifests_and_icons:
+				if content_file.begins_with(folder_path):
+					var ft : String = content_file.split(folder_path)[1]
+					if not has_mod_manifest and ft.to_lower() == "mod.manifest":
+						has_mod_manifest = true
+						manifest_filepath = content_file
+						manifest_data = __parse_file_as_manifest(content_file)
+						mod_name = manifest_data["mod_information"].get("name",mod_name)
+						legacy_mod_version = manifest_data["version"].get("version_string",legacy_mod_version)
+						mod_version_major = manifest_data["version"].get("version_major",mod_version_major)
+						mod_version_minor = manifest_data["version"].get("version_minor",mod_version_minor)
+						mod_version_bugfix = manifest_data["version"].get("version_bugfix",mod_version_bugfix)
+						mod_version_metadata = manifest_data["version"].get("version_metadata",mod_version_metadata)
+						is_library = manifest_data["library"].get("is_library",false)
+						always_display = manifest_data["library"].get("always_display",false)
+						manifest_version = manifest_data["manifest_definitions"].get("manifest_version",1)
+						
+					
+					if ft.to_lower().begins_with("icon"):
+						if ft.get_extension().to_lower() in pointers.SUPPORTED_IMAGE_EXTENSIONS:
+							has_icon_file = true
+							png_path = content_file
+						if ft.get_extension().to_lower() == "stex":
+							has_icon_file = true
+							stex_path = content_file
+			if not has_mod_manifest:
+				var tcDir:String = folder_path.trim_suffix("/").get_base_dir()
+				while not has_mod_manifest and not tcDir == "res://":
+					for file in pointers.FolderAccess.__fetch_folder_files(tcDir):
+						var fl:String = file.to_lower()
+						if fl.begins_with("mod") and fl.get_extension() == "manifest":
+							var content_file:String = tcDir.plus_file(file)
+							has_mod_manifest = true
+							manifest_filepath = content_file
+							manifest_data = base_manifest_template.duplicate(true)
+							var new_manifest_data:Dictionary = __parse_file_as_manifest(content_file)
+							manifest_data["mod_information"] = new_manifest_data["mod_information"]
+							manifest_data["version"] = new_manifest_data["version"]
+							manifest_data["library"] = new_manifest_data["library"]
+							manifest_data["manifest_definitions"]["manifest_version"] = new_manifest_data["manifest_definitions"]["manifest_version"]
+							manifest_data.mod_information.brief = ""
+							legacy_mod_version = manifest_data["version"].get("version_string",legacy_mod_version)
+							mod_version_major = manifest_data["version"].get("version_major",mod_version_major)
+							mod_version_minor = manifest_data["version"].get("version_minor",mod_version_minor)
+							mod_version_bugfix = manifest_data["version"].get("version_bugfix",mod_version_bugfix)
+							mod_version_metadata = manifest_data["version"].get("version_metadata",mod_version_metadata)
+							is_library = manifest_data["library"].get("is_library",false)
+							always_display = manifest_data["library"].get("always_display",false)
+							manifest_version = manifest_data["manifest_definitions"].get("manifest_version",1)
+					tcDir = tcDir.get_base_dir()
+			if stex_path:
+				icon_path = stex_path
+			elif png_path:
+				icon_path = png_path
+			var icon_dict : Dictionary = {"has_icon_file":has_icon_file,"icon_path":icon_path}
+			var manifestEntry : Dictionary = {"has_manifest":has_mod_manifest,"manifest_version":manifest_version,"manifest_file_path":manifest_filepath,"manifest_data":manifest_data}
+			var mod_version_array : Array = [mod_version_major,mod_version_minor,mod_version_bugfix]
+			var mod_version_string : String = "%d.%d.%d" % [mod_version_major,mod_version_minor,mod_version_bugfix]
+			if mod_version_metadata:
+				mod_version_array.append(mod_version_metadata)
+				mod_version_string += "-%s" % mod_version_metadata
+			var version_dictionary : Dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
+			var drivers : Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(script_path)
+			var ml : String = "en"
+			var tlData : Dictionary = drivers.get("REPLACE_TRANSLATIONS.gd",{}).get("TRANSLATIONS",{})
+			if tlData:
+				ml = tlData.get("master_locale","en")
+				tlData.erase("master_locale")
+				var tlKeys:Array = tlData.keys()
+				if "file" in tlKeys:
+					var tlFiles:Dictionary = tlData["file"]
+					for tl in tlFiles.keys():
+						var delim:String = "|"
+						var d = tlFiles[tl]
+						if d is String:
+							delim = d
+						elif d is Dictionary:
+							delim = d.get("string",delim)
+						var dict:Dictionary = pointers.Translations.__translation_file_to_dictionary(tl,delim)
+						for ln in dict.keys():
+							if not ln in tlKeys:
+								tlData[ln] = {}
+							tlData[ln].merge(dict[ln])
+					tlData.erase("file")
+					tlKeys.erase("file")
+				var master_locale : Dictionary = tlData.get(ml,{})
+				var total : int = master_locale.size()
+				var counts : Dictionary = {ml:{"has":total,"missing":0,"not_updated":0}}
+				for lang in tlKeys:
+					if lang != ml:
+						var langData : Dictionary = tlData[lang]
+						var lc : int = langData.size()
+						var not_in_master:int = 0
+						var not_updated:int = 0
+						for l in langData.keys():
+							if not l in master_locale:
+								not_in_master += 1
+							else:
+								if langData[l].get("version_hash",0) != hash(master_locale[l].get("string","")):
+									not_updated += 1
+						counts[lang] = {"has":lc,"missing":total - (lc - not_in_master),"not_updated":not_updated}
+						counts[ml]["missing"] += not_in_master
+				if manifestEntry["has_manifest"]:
+					var manifest_langs:Dictionary = {}
+					for lang in counts.keys():
+						var hs : float = float(counts[lang]["has"])
+						var bucket : float = hs/(hs+float(counts[lang]["missing"]))
+						manifest_langs[lang] = "%3.1f%%" % ((bucket * 100) - (25 * (1 - ((hs - float(counts[lang]["not_updated"])) / hs))))
+					manifestEntry["manifest_data"]["languages"] = manifest_langs
+			
+			var zip_path:String = __match_mod_path_to_zip(script_path)
+			var zip_size:int = 0
+			
+			var file:File=File.new()
+			if file.file_exists(zip_path):
+				file.open(zip_path,File.READ)
+				zip_size = file.get_len()
+				file.close()
+			
+			var concat:Dictionary = {
+				"name":TranslationServer.translate(mod_name),
+				"priority":mod_priority,
+				"path":script_path,
+				"zip_path":zip_path,
+				"zip_size":zip_size,
+				"version":version_dictionary,
+				"type":"mod",
+				"enabled":true,
+			}
+			if has_mod_manifest:
+				concat["id"] = manifestEntry["manifest_data"]["mod_information"]["id"]
+			
+			return {
+				"name":mod_name,
+				"priority":mod_priority,
+				"file_path":script_path,
+				"zip_path":zip_path,
+				"version_data":version_dictionary,
+				"mod_icon":icon_dict,
+				"library_information":{
+					"is_library":is_library,
+					"always_display":always_display
+				},
+				"manifest":manifestEntry,
+				"drivers":drivers,
+				"mod_type":"mod",
+				"enabled":true,
+				"master_locale":ml,
+				"hash":concat.hash(),
+			}
+		elif cv.begins_with("mod") and cv.ends_with(".manifest"):
+			var manifest_data : Dictionary = __parse_file_as_manifest(script_path)
+			
+			var mod_error:bool = false
+			var folder_path : String = script_path.get_base_dir() + "/"
+			var mod_priority : int = manifest_data["manifest_definitions"].get("modlet_priority",0)
+			var mod_name : String = manifest_data["mod_information"].get("name",script_path.split("/",false)[1])
+			var legacy_mod_version : String = manifest_data["version"].get("version_string","1.0.0")
+			var mod_version_major : int = manifest_data["version"].get("version_major",1)
+			var mod_version_minor : int = manifest_data["version"].get("version_minor",0)
+			var mod_version_bugfix : int = manifest_data["version"].get("version_bugfix",0)
+			var mod_version_metadata : String = manifest_data["version"].get("version_metadata","")
+			
+			var manifest_version : float = manifest_data["manifest_definitions"].get("manifest_version",1.0)
+			var has_icon_file : bool = false
+			var png_path : String = ""
+			var stex_path : String = ""
+			var icon_path : String = ""
+			
+			var mod_enabled:bool = true
+			var script_filename : String = script_path.get_file().to_lower()
+			
+			if script_filename.begins_with("mod") and script_filename.ends_with(".manifest"):
+				if not script_path in modlet_files:
+					mod_enabled = false
+			for content_file in manifests_and_icons:
+				if content_file.begins_with(folder_path):
+					var ft : String = content_file.split(folder_path)[1].to_lower()
+					if ft.begins_with("icon"):
+						if ft.get_extension() == "stex":
+							has_icon_file = true
+							stex_path = content_file
+						elif ft.get_extension() in pointers.SUPPORTED_IMAGE_EXTENSIONS:
+							has_icon_file = true
+							png_path = content_file
+			if stex_path:
+				icon_path = stex_path
+			elif png_path:
+				icon_path = png_path
+			var icon_dict : Dictionary = {"has_icon_file":has_icon_file,"icon_path":icon_path}
+			var manifestEntry : Dictionary = {"has_manifest":true,"manifest_version":manifest_version,"manifest_file_path":script_path,"manifest_data":manifest_data}
+			var mod_version_array : Array = [mod_version_major,mod_version_minor,mod_version_bugfix]
+			var mod_version_string : String = "%d.%d.%d" % [mod_version_major,mod_version_minor,mod_version_bugfix]
+			if mod_version_metadata:
+				mod_version_array.append(mod_version_metadata)
+				mod_version_string += "-%s" % mod_version_metadata
+			var version_dictionary : Dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
+			var drivers : Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(script_path)
+			var ml : String = "en"
+			var tlData : Dictionary = drivers.get("REPLACE_TRANSLATIONS.gd",{}).get("TRANSLATIONS",{})
+			if tlData:
+				ml = tlData.get("master_locale","en")
+				tlData.erase("master_locale")
+				var tlKeys:Array = tlData.keys()
+				if "file" in tlKeys:
+					var tlFiles:Dictionary = tlData["file"]
+					for tl in tlFiles.keys():
+						var delim:String = "|"
+						var d = tlFiles[tl]
+						if d is String:
+							delim = d
+						elif d is Dictionary:
+							delim = d.get("string",delim)
+						var dict:Dictionary = pointers.Translations.__translation_file_to_dictionary(tl,delim)
+						for ln in dict.keys():
+							if not ln in tlKeys:
+								tlData[ln] = {}
+							tlData[ln].merge(dict[ln])
+					tlData.erase("file")
+					tlKeys.erase("file")
+				var master_locale : Dictionary = tlData.get(ml,{})
+				var total : int = master_locale.size()
+				var counts : Dictionary = {ml:{"has":total,"missing":0,"not_updated":0}}
+				for lang in tlKeys:
+					if lang != ml:
+						var langData : Dictionary = tlData[lang]
+						var lc : int = langData.size()
+						var not_in_master:int = 0
+						var not_updated:int = 0
+						for l in langData.keys():
+							if not l in master_locale:
+								not_in_master += 1
+							else:
+								if langData[l].get("version_hash",0) != hash(master_locale[l].get("string","")):
+									not_updated += 1
+						counts[lang] = {"has":lc,"missing":total - (lc - not_in_master),"not_updated":not_updated}
+						counts[ml]["missing"] += not_in_master
+				if manifestEntry["has_manifest"]:
+					var manifest_langs:Dictionary = {}
+					for lang in counts.keys():
+						var hs : float = float(counts[lang]["has"])
+						manifest_langs[lang] = "%3.1f%%" % (((hs/(hs+float(counts[lang]["missing"]))) * 100) - (25 * (1 - ((hs - float(counts[lang]["not_updated"])) / hs))))
+					manifestEntry["manifest_data"]["languages"] = manifest_langs
+			
+			
+			var zip_path:String = __match_mod_path_to_zip(script_path)
+			var zip_size:int = 0
+			
+			var file:File=File.new()
+			if file.file_exists(zip_path):
+				file.open(zip_path,File.READ)
+				zip_size = file.get_len()
+				file.close()
+			
+			var concat:Dictionary = {
+				"name":TranslationServer.translate(mod_name),
+				"priority":mod_priority,
+				"path":script_path,
+				"zip_path":zip_path,
+				"zip_size":zip_size,
+				"version":version_dictionary,
+				"type":"modlet",
+				"enabled":mod_enabled,
+				"id":manifestEntry["manifest_data"]["mod_information"]["id"]
+			}
+			
+			return {
+				"name":mod_name,
+				"priority":mod_priority,
+				"file_path":script_path,
+				"zip_path":zip_path,
+				"version_data":version_dictionary,
+				"mod_icon":{"has_icon_file":false,"icon_path":""} if mod_error else icon_dict,
+				"library_information":{
+					"is_library":manifest_data["library"].get("is_library",false),
+					"always_display":manifest_data["library"].get("always_display",false)
+				},
+				"manifest":manifestEntry,
+				"drivers":drivers,
+				"mod_type":"unknown" if mod_error else "modlet",
+				"enabled":true,
+				"master_locale":ml,
+				"hash":concat.hash(),
+			}
+		return {}
 	
 	static func get_mod_zip_content(modFSPath:String,pointers):
 		for modEntryPath in pointers.Zip.__get_zip_content(modFSPath):
@@ -5654,12 +5878,12 @@ class _ManifestV2:
 				non_static["mutex"].unlock()
 	
 	static func __get_mod_list_keys() -> PoolStringArray:
-		if cached_mod_keys.empty():
+		if !cached_mod_keys:
 			__get_mod_data()
 		return cached_mod_keys
 	
 	static func __get_mod_statistics() -> Dictionary:
-		if cached_mod_statistics.empty():
+		if !cached_mod_statistics:
 			__get_mod_data()
 		return cached_mod_statistics.duplicate(true)
 	
@@ -5685,6 +5909,43 @@ class _ManifestV2:
 	
 	static func __match_mod_path_to_zip(mod_main_path:String) -> String:
 		return zip_ref_store.get(mod_main_path,"")
+	
+	static func sortModList(a:Dictionary,b:Dictionary):
+		var c1:int = a["priority"]
+		var c2:int = b["priority"]
+		if c1 != c2:
+			return c1 < c2
+		var b1:String = a["file_path"]
+		var b2:String = b["file_path"]
+		if b1 != b2:
+			return b1 < b2
+		return false
+	
+	static func __compare_versions(checked_mod_data:Dictionary) -> bool:
+		var installed_mods : Dictionary = __get_mod_data()
+		var check_keys : Array = checked_mod_data.keys()
+		var check_name : String = checked_mod_data[check_keys[0]].get("name","")
+		var installed_dict : Dictionary = {}
+		for installed_mod in __get_mod_list_keys():
+			if installed_mods[installed_mod].get("name","") == check_name:
+				installed_dict = installed_mods[installed_mod].duplicate()
+				break
+		if not installed_dict:
+			return false
+		var checked_manifest_version:float = checked_mod_data[check_keys[0]]["manifest"]["manifest_version"]
+		if checked_manifest_version < 2.0:
+			return false
+		if checked_manifest_version > installed_dict["manifest"]["manifest_version"]:
+			return true
+		var checked_mod_version : Array = checked_mod_data[check_keys[0]]["version_data"]["full_version_array"]
+		var installed_mod_version : Array = installed_dict["version_data"]["full_version_array"]
+		if checked_mod_version[0] > installed_mod_version[0]:
+			return true
+		if checked_mod_version[1] > installed_mod_version[1]:
+			return true
+		if checked_mod_version[2] > installed_mod_version[2]:
+			return true
+		return false
 	
 	static func __concat_mod_info(mod_path:String) -> Dictionary:
 		var pointers:HevLibPointers = non_static["pointers"]
@@ -5861,43 +6122,7 @@ class _ManifestV2:
 			icon_dict = {"has_icon_file":false,"icon_path":""}
 			mod["mod_type"] = "NULL"
 		return {"name":mod_name,"priority":mod_priority,"file_path":script_path,"zip_path":__match_mod_path_to_zip(script_path),"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"manifest":manifestEntry,"drivers":drivers,"mod_type":mod["mod_type"],"enabled":mod_enabled,"master_locale":ml}
-	
-	static func sortModList(a:Dictionary,b:Dictionary):
-		var c1:int = a["priority"]
-		var c2:int = b["priority"]
-		if c1 != c2:
-			return c1 < c2
-		var b1:String = a["file_path"]
-		var b2:String = b["file_path"]
-		if b1 != b2:
-			return b1 < b2
-		return false
-	
-	static func __compare_versions(checked_mod_data:Dictionary) -> bool:
-		var installed_mods : Dictionary = __get_mod_data()
-		var check_keys : Array = checked_mod_data.keys()
-		var check_name : String = checked_mod_data[check_keys[0]].get("name","")
-		var installed_dict : Dictionary = {}
-		for installed_mod in __get_mod_list_keys():
-			if installed_mods[installed_mod].get("name","") == check_name:
-				installed_dict = installed_mods[installed_mod].duplicate()
-				break
-		if not installed_dict:
-			return false
-		var checked_manifest_version:float = checked_mod_data[check_keys[0]]["manifest"]["manifest_version"]
-		if checked_manifest_version < 2.0:
-			return false
-		if checked_manifest_version > installed_dict["manifest"]["manifest_version"]:
-			return true
-		var checked_mod_version : Array = checked_mod_data[check_keys[0]]["version_data"]["full_version_array"]
-		var installed_mod_version : Array = installed_dict["version_data"]["full_version_array"]
-		if checked_mod_version[0] > installed_mod_version[0]:
-			return true
-		if checked_mod_version[1] > installed_mod_version[1]:
-			return true
-		if checked_mod_version[2] > installed_mod_version[2]:
-			return true
-		return false
+
 	
 	static func __get_mod_data_from_files(script_path:String) -> Dictionary:
 		var constants : Dictionary = non_static["pointers"].DataFormat.__get_script_constant_map_without_load(script_path)
@@ -6292,7 +6517,7 @@ class _ManifestV2:
 	const tag_data_cache = {}
 	
 	static func __get_tags() -> Dictionary:
-		if tag_data_cache.empty():
+		if !tag_data_cache:
 			var mods : Dictionary = __get_mod_data()
 			for mod in __get_mod_list_keys():
 				if mods[mod]["manifest"]["has_manifest"]:
@@ -6388,7 +6613,7 @@ class _ManifestV2:
 	const caches_mod_ids : PoolStringArray = PoolStringArray()
 	var needs_mod_id_cache:bool = true
 	static func __get_mod_ids() -> PoolStringArray:
-		if caches_mod_ids.empty():
+		if !caches_mod_ids:
 			var mod_data : Dictionary = __get_mod_data()
 			for mod in __get_mod_list_keys():
 				var data : Dictionary = mod_data[mod]["manifest"]["manifest_data"]
@@ -6404,7 +6629,7 @@ class _ManifestV2:
 		for mod in tags.keys():
 			var keys = tags[mod]
 			if keys:
-				var items : Array = []
+				var items : PoolStringArray = PoolStringArray()
 				for item in keys:
 					if item in mKeys:
 						items.append(item)
@@ -6413,7 +6638,7 @@ class _ManifestV2:
 		return complimentaries
 	
 	static func __check_mod_complementary(mod_id):
-		var complimentaries : Array = []
+		var complimentaries : PoolStringArray = PoolStringArray()
 		var mKeys:PoolStringArray = __get_mod_list_keys()
 		for mod in __get_manifest_entry("manifest_definitions","complementary_mod_ids",mod_id):
 			if mod in mKeys:
@@ -6426,7 +6651,7 @@ class _ManifestV2:
 		for mod in tags.keys():
 			var keys = tags[mod]
 			if keys:
-				var items : Array = []
+				var items : PoolStringArray = PoolStringArray()
 				for item in keys:
 					if not __mod_exists(item):
 						items.append(item)
@@ -6435,7 +6660,7 @@ class _ManifestV2:
 		return complimentaries
 	
 	static func __check_mod_dependancies(mod_id):
-		var complimentaries : Array = []
+		var complimentaries : PoolStringArray = PoolStringArray()
 		for mod in __get_manifest_entry("manifest_definitions","dependancy_mod_ids",mod_id):
 			if not __mod_exists(mod):
 				complimentaries.append(mod)
@@ -6447,7 +6672,7 @@ class _ManifestV2:
 		for mod in tags.keys():
 			var keys = tags[mod]
 			if keys:
-				var items : Array = []
+				var items : PoolStringArray = PoolStringArray()
 				for item in keys:
 					if __mod_exists(item):
 						items.append(item)
@@ -6456,7 +6681,7 @@ class _ManifestV2:
 		return complimentaries
 	
 	static func __check_mod_conflicts(mod_id):
-		var complimentaries : Array = []
+		var complimentaries : PoolStringArray = PoolStringArray()
 		for mod in __get_manifest_entry("manifest_definitions","conflicting_mod_ids",mod_id):
 			if __mod_exists(mod):
 				complimentaries.append(mod)
@@ -6482,7 +6707,7 @@ class _ManifestV2:
 	
 	const test_mod_updates = false
 	
-	static func __have_mods_updated(folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",last_seen_file = "mods_from_last_launch.json") -> Dictionary:
+	static func __have_mods_updated() -> Dictionary:
 		if test_mod_updates:
 			var out:Dictionary = {}
 			var all_mods : Dictionary = __get_mod_data()
@@ -6505,21 +6730,17 @@ class _ManifestV2:
 			return out
 		if not non_static["self"].haveModsChanged:
 			return {}
-		if not folder.ends_with("/"):
-			folder += "/"
-		if last_seen_file.begins_with("/"):
-			last_seen_file.lstrip("/")
-		non_static["pointers"].FolderAccess.__check_folder_exists(folder)
-		var file:File = File.new()
-		if not file.file_exists(folder + last_seen_file):
-			file.open(folder + last_seen_file,File.WRITE)
-			file.store_string("{}")
-			file.close()
-		var mods : Dictionary = {}
-		var changes : Dictionary = {}
+		return mod_changes_cache.duplicate(true)
+	
+	const mod_changes_cache = {}
+	
+	const last_seen_file:String = "user://cache/.Mod_Menu_2_Cache/updates/mods_from_last_launch.json"
+	const this_seen_file:String = "user://cache/.Mod_Menu_2_Cache/updates/mods_from_this_launch.json"
+	static func __get_mod_versions() -> Dictionary:
 		var last : Dictionary = {}
-		if file.file_exists(folder + last_seen_file):
-			file.open(folder + last_seen_file,File.READ)
+		var file:File = File.new()
+		if file.file_exists(last_seen_file):
+			file.open(last_seen_file,File.READ)
 			last = JSON.parse(file.get_as_text()).result
 			file.close()
 		var all_mods : Dictionary = __get_mod_data()
@@ -6537,7 +6758,7 @@ class _ManifestV2:
 					 or 
 					(version["version_bugfix"] != last[id]["version"]["bugfix"])
 				)):
-					changes[id] = {
+					mod_changes_cache[id] = {
 						"name":info["name"],
 						"version":{
 							"major":version["version_major"],
@@ -6547,11 +6768,9 @@ class _ManifestV2:
 						"path":data["file_path"],
 						"changelog":manifest["manifest_definitions"]["changelog_path"]
 					}
-		return changes
-	
-	static func __get_mod_versions(store = false,folder = "user://cache/.Mod_Menu_2_Cache/changelogs/",last_seen_file = "mods_from_last_launch.json",this_seen_file = "mods_from_this_launch.json") -> Dictionary:
+		
+		
 		var mods : Dictionary = {}
-		var all_mods : Dictionary = __get_mod_data()
 		for mod in __get_mod_list_keys():
 			var data : Dictionary = all_mods[mod]
 			if data["manifest"]["has_manifest"] and data["manifest"]["manifest_version"] >= 2.0:
@@ -6559,23 +6778,9 @@ class _ManifestV2:
 				var info : Dictionary = manifest["mod_information"]
 				var version : Dictionary = manifest["version"]
 				mods[info["id"]] = {"name":info["name"],"version":{"major":version["version_major"],"minor":version["version_minor"],"bugfix":version["version_bugfix"]}}
-		if store:
-			if not folder.ends_with("/"):
-				folder += "/"
-			if last_seen_file.begins_with("/"):
-				last_seen_file.lstrip("/")
-			non_static["pointers"].FolderAccess.__check_folder_exists(folder)
-			var file:File = File.new()
-			if file.file_exists(folder + this_seen_file):
-				file.open(folder + this_seen_file,File.READ)
-				var lastData : Dictionary = JSON.parse(file.get_as_text()).result
-				file.close()
-				file.open(folder + last_seen_file,File.WRITE)
-				file.store_string(JSON.print(lastData))
-				file.close()
-			file.open(folder + this_seen_file,File.WRITE)
-			file.store_string(JSON.print(mods))
-			file.close()
+		file.open(last_seen_file,File.WRITE)
+		file.store_string(JSON.print(mods))
+		file.close()
 		return mods
 	
 	static func __parse_changelogs(file_path):
@@ -6668,7 +6873,7 @@ class _ManifestV2:
 	var need_modmain_file_cache:bool = true
 	const modmain_file_list : PoolStringArray = PoolStringArray()
 	static func __get_modmain_files() -> PoolStringArray:
-		if modmain_file_list.empty():
+		if !modmain_file_list:
 			__get_mod_files()
 		return modmain_file_list
 	
@@ -6739,17 +6944,39 @@ class _ManifestV2:
 	
 	const cached_mod_files : PoolStringArray = PoolStringArray()
 	static func __get_mod_files():
-		if cached_mod_files.empty():
+		if !cached_mod_files:
 			var restrict_to_modmains : PoolStringArray = PoolStringArray()
 			var pointers:HevLibPointers = non_static["pointers"]
 			if pointers.is_editor:
-				for a in pointers.DataFormat.__get_script_variables_without_load("res://ModLoader.gd").get("addedMods",[]):
-					restrict_to_modmains.append(a.get_base_dir() + "/")
+				var file:File = File.new()
+				file.open("res://ModLoader.gd",File.READ)
+				var tex:String = file.get_as_text(true)
+				file.close()
+				if "var addedMods = [" in tex:
+					var capturing:bool = false
+					for a in tex.split("\n"):
+						if not capturing and a.begins_with("var addedMods = ["):
+							capturing = true
+						elif capturing:
+							var ab:String = a.strip_edges()
+							if ab.begins_with("#"):
+								var br:String = ab.split("#")[1].strip_edges()
+								if br.begins_with("\""):
+									restrict_to_modmains.append(br.split("\"")[1].get_base_dir() + "/")
+								elif br.begins_with("\'"):
+									restrict_to_modmains.append(br.split("\'")[1].get_base_dir() + "/")
+							elif ab.begins_with("]"):
+								break
 				var sm:Dictionary = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets",{})
 				for a in sm.keys():
-					if sm[a]:
-						restrict_to_modmains.append(a.get_base_dir() + "/")
-			var arr1 : PoolStringArray = siftFolderStructureForModFiles(pointers.FolderAccess.__get_folder_structure("res://",false,false),"res://",restrict_to_modmains)
+					var bd:String = a.get_base_dir() + "/"
+					if not sm[a]:
+						if bd in restrict_to_modmains:
+							breakpoint
+						restrict_to_modmains.append(bd)
+					elif bd in restrict_to_modmains:
+						restrict_to_modmains.remove(restrict_to_modmains.find(bd))
+			var arr1 : PoolStringArray = siftFolderStructureForModFiles(restrict_to_modmains)
 			if pointers.is_editor:
 				var arr2 : PoolStringArray = PoolStringArray()
 				var excludeDirs:PoolStringArray = PoolStringArray()
@@ -6782,11 +7009,30 @@ class _ManifestV2:
 					cached_icon_files.append(r)
 		return cached_mod_files
 	
-	static func siftFolderStructureForModFiles(structure:Dictionary,path:String = "res://",restricted_to_modmains : PoolStringArray = PoolStringArray()) -> PoolStringArray:
+	static func siftFolderStructureForModFiles(restrictions:PoolStringArray,path:String = "res://") -> PoolStringArray:
+		var out:PoolStringArray = PoolStringArray()
+		var dir:Directory = Directory.new()
+		if dir.open(path) == OK:
+			dir.list_dir_begin(true)
+			var file:String = dir.get_next()
+			while file:
+				var pn:String = path + file
+				if dir.current_is_dir():
+					if (!restrictions or not pn + "/" in restrictions):
+						out.append_array(siftFolderStructureForModFiles(restrictions,pn + "/"))
+				else:
+					var f:String = file.to_lower()
+					if ((f.begins_with("modmain") and f.get_extension() == "gd") or (f.begins_with("mod") and f.get_extension() == "manifest") or (f.begins_with("icon") and (f.get_extension() in non_static["pointers"].SUPPORTED_IMAGE_EXTENSIONS))):
+						out.append(pn)
+				file = dir.get_next()
+			dir.list_dir_end()
+		return out
+	
+	static func siftFolderStructureForModFiles_legacy(structure:Dictionary,path:String = "res://",restricted_to_modmains : PoolStringArray = PoolStringArray()) -> PoolStringArray:
 		var out : PoolStringArray = PoolStringArray()
 		for i in structure.keys():
-			if i.ends_with("/") and (restricted_to_modmains.empty() or path + i in restricted_to_modmains):
-				out.append_array(siftFolderStructureForModFiles(structure[i],path + i,restricted_to_modmains))
+			if i.ends_with("/") and (!restricted_to_modmains or path + i in restricted_to_modmains):
+				out.append_array(siftFolderStructureForModFiles_legacy(structure[i],path + i,restricted_to_modmains))
 			else:
 				var f : String = i.to_lower()
 				if ((f.begins_with("modmain") and f.ends_with(".gd")) or (f.begins_with("mod") and f.ends_with(".manifest")) or (f.begins_with("icon") and (f.get_extension().to_lower() in non_static["pointers"].SUPPORTED_IMAGE_EXTENSIONS))):
@@ -6795,27 +7041,28 @@ class _ManifestV2:
 	
 	const cached_manifest_files : PoolStringArray = PoolStringArray()
 	static func __get_manifest_files() -> PoolStringArray:
-		if cached_manifest_files.empty():
+		if !cached_manifest_files:
 			__get_mod_files()
 		return cached_manifest_files
 	
 	const cached_icon_files : PoolStringArray = PoolStringArray()
 	static func __get_icon_files() -> PoolStringArray:
-		if cached_icon_files.empty():
+		if !cached_icon_files:
 			__get_mod_files()
 		return cached_icon_files
 	
 	enum LOAD_TYPE{
-		EXTEND_SCRIPT,
-		OVERRIDE_SCRIPT,
-		REPLACE_RESOURCE
+		EXTEND_SCRIPT = 1,
+		REPLACE_RESOURCE = 2,
 	}
 	
 	static func __load_modlets() -> void:
 		var pointers:HevLibPointers = non_static["pointers"]
 		var base:_ManifestV2 = non_static["self"]
 		pointers.l("Loading modlet resources with order-safe mode.","pointers.SafeMode")
-		pointers.DataFormat.__loadDLC()
+		pointers.Scripting.make_mineral_scripting()
+		pointers.Equipment.__make_upgrades_scene()
+		pointers.NodeAccess.__dynamic_crew_expander()
 		var file:File = File.new()
 		var load_stash:Array = []
 		for modlet in __get_modlet_files():
@@ -6837,11 +7084,9 @@ class _ManifestV2:
 		for r in pointers.Threading.__request_multiple_threads(load_stash):
 			cvr.append_array(r)
 		for f in cvr:
-			var extra:String = f[4]
-			if not extra in ovr:
-				ovr[extra] = [f]
-			else:
-				ovr[extra].append(f)
+			var extra:String = f[3]
+			if not extra in ovr: ovr[extra] = [f]
+			else: ovr[extra].append(f)
 		var LO:Array = pointers.SafeMode.vanilla_load_order
 		var order:Array = Array()
 		for i in ovr:
@@ -6852,10 +7097,11 @@ class _ManifestV2:
 		for r in order:
 			for i in r[2]:
 				var type:int = i[0]
-				if type == LOAD_TYPE.OVERRIDE_SCRIPT or type == LOAD_TYPE.EXTEND_SCRIPT:
-					pointers.DataFormat.__override_script(i[1],r[0])
-				elif type == LOAD_TYPE.REPLACE_RESOURCE:
-					pointers.DataFormat.__replace_resource(i[1],r[0])
+				if type:
+					if type == LOAD_TYPE.EXTEND_SCRIPT:
+						pointers.DataFormat.__override_script(i[1],r[0])
+					else:
+						pointers.DataFormat.__replace_resource(i[1],r[0])
 		pointers.l("%d modlet resources loaded." % order.size(),"pointers.SafeMode")
 	
 	static func process_mod_data_for_load(resources:Dictionary,modlet:String,pointers:HevLibPointers,priority:float):
@@ -6864,47 +7110,16 @@ class _ManifestV2:
 			var subdata:Dictionary = resources[resource]
 			var load_type:String = subdata.get("load_type","").to_lower()
 			var file:File = File.new()
-			if load_type.empty():
-				match resource.get_extension():
-					"gd","gdc":
-						load_type = "script"
-					"tscn","res","tres","scn":
-						load_type = "scene"
-			if load_type == "script":
-				var path:String=resource if resource.begins_with("res://")else(modlet.get_base_dir()+(""if resource.begins_with("/")else"/")+resource)
-				if pointers.ConfigDriver.__validate_dictionary(subdata)&&pointers.FileAccess.__file_exists(path):
-					if subdata.get("override",false):
-						var op=subdata.get("override_path","res:/"+path.split(modlet.get_base_dir())[1])
-						var override_path:String=op if(op.begins_with("res:/"))else("res:/"+(""if op.begins_with("/")else"/")+op)
-						if pointers.FileAccess.__file_exists(override_path):
-							out.append([
-								LOAD_TYPE.OVERRIDE_SCRIPT,
-								path,
-								subdata.get("priority",priority),
-								modlet,
-								override_path,
-	#							"deps":pointers.SafeMode.__lookup_file_dependancies(path)
-							])
-					else:
-						var ed:String = subdata.get("base_script_path","")
-						if ed.empty()&&path.get_extension()=="gd":
-							file.open(path,File.READ)
-							var data:String = file.get_as_text(true)
-							file.close()
-							if "extends \"" in data:
-								for line in data.split("\n"):
-									if line.strip_edges().begins_with("extends \""):
-										ed = line.split("\"")[1]
-										break
-						out.append([
-							LOAD_TYPE.EXTEND_SCRIPT,
-							path,
-							subdata.get("priority",priority),
-							modlet,
-							(ed if ed else path),
-#							"deps":pointers.SafeMode.__lookup_file_dependancies(path)
-						])
-			elif load_type == "scene" or load_type == "resource":
+			var is_resource:bool = false
+			if load_type == "scene" or load_type == "resource":is_resource = true
+			elif load_type != "script":
+				var re:String = resource.get_extension()
+				if re == "gd" or re == "gdc":pass
+				elif re in PoolStringArray(["tscn","res","tres","scn"]):
+					is_resource = true
+				else:
+					continue
+			if is_resource:
 				var path : String = resource if resource.begins_with("res://") else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
 				var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[1])
 				var old_path : String = old if (old.begins_with("res:/")) else ("res:/" + ("" if old.begins_with("/") else "/") + old)
@@ -6913,9 +7128,29 @@ class _ManifestV2:
 						LOAD_TYPE.REPLACE_RESOURCE,
 						path,
 						subdata.get("priority",priority),
-						modlet,
 						old_path,
-#						"deps":pointers.SafeMode.__lookup_file_dependancies(path)
+					])
+			else:
+				var path:String=resource if resource.begins_with("res://")else(modlet.get_base_dir()+(""if resource.begins_with("/")else"/")+resource)
+				if pointers.ConfigDriver.__validate_dictionary(subdata)&&pointers.FileAccess.__file_exists(path):
+					var ed:String = subdata.get("base_script_path","")
+					if subdata.get("override",false):
+						var op=subdata.get("override_path","res:/"+path.split(modlet.get_base_dir())[1])
+						ed = op if(op.begins_with("res:/"))else("res:/"+(""if op.begins_with("/")else"/")+op)
+					elif not ed:
+						file.open(path,File.READ)
+						var data:String = file.get_as_text(true)
+						file.close()
+						if "extends \"" in data:
+							for line in data.split("\n"):
+								if line.begins_with("extends \""):
+									ed = line.split("\"")[1]
+									break
+					out.append([
+						LOAD_TYPE.EXTEND_SCRIPT,
+						path,
+						subdata.get("priority",priority),
+						(ed if ed else path),
 					])
 		return out
 	static func sortModLoadOrder(a:Array,b:Array) -> bool:
@@ -7019,7 +7254,7 @@ class _ManifestV2:
 		return has
 	
 	static func __match_mod_file_path_to_id(file_path:String) -> String:
-		if mod_file_to_id_cache.empty():
+		if !mod_file_to_id_cache:
 			__get_mod_data()
 		return mod_file_to_id_cache.get(file_path.to_lower(),"")
 
@@ -7174,7 +7409,7 @@ class _Networking:
 		if path_delimiter == -1:
 			path_delimiter = url.length()
 		var path:String = url.substr(path_delimiter)
-		if path.empty():
+		if!path:
 			path = "/"
 		
 		var port_delimiter:int = url.find(":")
@@ -7395,7 +7630,7 @@ class _RingInfo:
 	const not_random_seeds = PoolIntArray([1337,1776,2014,1384,2684,842,2802,1597,2116,755,1596,2661,1928,-1861,-2531,-1337,-1776,-2014,-1384,-2684,-842,-2802,-1597,-2116,-755,-1596,-2661,-1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928])
 	
 	static func get_pixel_values(pos:Vector2) -> PoolRealArray:
-		if pix_values.empty():
+		if!pix_values:
 			var mineral_size:int = int(CurrentGame.traceMinerals.size() / 4.0) - 1
 			pix_values.resize(mineral_size + 2)
 			pix_values[0] = 1861.0
@@ -7451,7 +7686,7 @@ class _RPC:
 						icon = "unknown"
 		if icon != rpc_data["current_icon"]:
 			rpc_data["pointers"].l("Changing large icon from %s to %s" % [rpc_data["current_icon"],icon],"pointers.RPC")
-			if icon.empty():
+			if!icon:
 				icon = "empty"
 			rpc_data["current_icon"] = icon
 	
@@ -8081,8 +8316,6 @@ ferrous = %s
 		pointers.FolderAccess.__check_folder_exists(mineralDir)
 		for f in pointers.FolderAccess.__fetch_folder_files(mineralDir,true,true):
 			pointers.FolderAccess.__recursive_delete(f)
-		var version:PoolIntArray = pointers.DataFormat.__get_vanilla_version()
-		pointers.l("observed game version of %s.%s.%s" % [version[0],version[1],version[2]],"pointers.Scripting")
 		var mineral_data:Array = []
 		for mineral_dict in pointers.DriverManagement.__get_specific_driver_type("ADD_MINERALS.gd"):
 			for mineral in mineral_dict.keys():
@@ -8269,7 +8502,7 @@ class _Threading:
 	# a bug caused by me testing with the single most thread-unsafe code I had
 	# Hope this actually ends up being useful...
 	func __request_multiple_threads(operations:Array,log_info:bool = false) -> Array:
-		if operations.empty():
+		if!operations:
 			return []
 		if use_single_thread:
 			if log_info:pointers.l("Requesting mutltiple thread operations, but using main thread","pointers.Threading")
@@ -8364,7 +8597,7 @@ class _Threading:
 		return out
 	
 	func __run_multiple_async_operations(operations:Array,log_info:bool = false) -> int:
-		if operations.empty():
+		if!operations:
 			return ERR_UNCONFIGURED
 		if use_single_thread:
 			if log_info:pointers.l("Requesting mutltiple thread operations, but using main thread","pointers.Threading")
@@ -8803,7 +9036,7 @@ class _Translations:
 		var index:int = 1
 		while index < size:
 			var line:String = lines[index]
-			if line.empty():
+			if!line:
 				index += 1
 				continue
 			if line.begins_with("#"):

@@ -56,9 +56,9 @@ func _ready():
 	var btf = "user://cache/.HevLib_Cache/Variable_Fetch/jobs.txt"
 	if file.file_exists(btf):
 		file.open(btf,File.READ)
-		var data = JSON.parse(file.get_as_text()).result
+		var data:Dictionary = JSON.parse(file.get_as_text()).result
 		file.close()
-		var jbc = "user://cache/.Mod_Menu_2_Cache/updates/jobcache"
+		var jbc:String = "user://cache/.Mod_Menu_2_Cache/updates/jobcache"
 		if not file.file_exists(jbc):
 			file.open(jbc,File.WRITE)
 			file.store_string("{}")
@@ -67,10 +67,9 @@ func _ready():
 		var h=JSON.parse(file.get_as_text()).result
 		file.close()
 		if Engine.has_singleton("Steam"):
-			var do = true
-			var rt = str(hash(Engine.get_singleton("Steam").current_steam_id))
-			if rt in data:
-				var jobs=data[rt]
+			var do:bool = true
+			var rt:String = str(hash(Engine.get_singleton("Steam").current_steam_id))
+			if rt in data.keys():
 				if rt in h:
 					if 0 in h[rt]:do=false
 				if steamNode&&do:

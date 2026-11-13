@@ -39,26 +39,18 @@ var current_modlet_path : String = ""
 
 var can_toggle = false
 
-var file = File.new()
-var modlet_toggle_restart_path = "user://cache/.Mod_Menu_2_Cache/updates/modlet_restart_requests.json"
-var updateCacheDir = "user://cache/.Mod_Menu_2_Cache/updates/has_updated.txt"
+var file:File = File.new()
 
 func _toggled(button_pressed):
 	if can_toggle:
 		var all_modlets = pointers.ManifestV2.__get_all_modlets(false)
 		all_modlets[current_modlet_path] = button_pressed
-		file.open(modlet_toggle_restart_path,File.READ)
-		var restarting = JSON.parse(file.get_as_text()).result
-		file.close()
+		var restarting:Array = pointers.modlet_toggle_restart_requests
 		if not current_modlet_path in restarting:
 			restarting.append(current_modlet_path)
 		current_modlet.needs_restart_from_toggling = true
-		file.open(modlet_toggle_restart_path,File.WRITE)
-		file.store_string(JSON.print(restarting))
-		file.close()
-		file.open(updateCacheDir,File.WRITE)
-		file.store_8(1)
-		file.close()
+		
+		pointers.has_updated = true
 		pointers.ConfigDriver.__store_value("HevLib","modlets","seen_modlets",all_modlets)
 		yield(pointers,"process_tick")
 		current_modlet.update()

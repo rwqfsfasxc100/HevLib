@@ -80,7 +80,6 @@ var has_settings = false
 
 var is_modlet = false
 var needs_restart_from_toggling = false
-var modlet_toggle_restart_path = "user://cache/.Mod_Menu_2_Cache/updates/modlet_restart_requests.json"
 var mod_path = ""
 
 func _pressed():
@@ -89,10 +88,7 @@ func _pressed():
 	mod_path = MOD_INFO["file_path"]
 	var mod_dir = mod_path.get_base_dir() + "/"
 	
-	file.open(modlet_toggle_restart_path,File.READ)
-	var restarting_modlets = JSON.parse(file.get_as_text()).result
-	file.close()
-	if mod_path in restarting_modlets:
+	if mod_path in pointers.modlet_toggle_restart_requests:
 		needs_restart_from_toggling = true
 	
 	var manifestData = MOD_INFO["manifest"]["manifest_data"]
@@ -248,31 +244,32 @@ func _pressed():
 			submod_visibility = get_child(1).visible
 			yield_button_focus()
 			_refocus()
-	information_nodes["mod_list"].currently_selected_mod_id = ID
-	file.open(update_store,File.READ)
-	var update_data = JSON.parse(file.get_as_text()).result
-	file.close()
-	file.open(conflicts_store,File.READ)
-	var conflict_data = JSON.parse(file.get_as_text()).result
-	file.close()
-	file.open(dependancies_store,File.READ)
-	var dependancy_data = JSON.parse(file.get_as_text()).result
-	file.close()
+	information_nodes["mod_list"].currently_selected_mod_id = id
+	var update_data:Dictionary = pointers.needs_updates
 	
-	
-	
-	if id in update_data:
+	if id in update_data.keys():
 		information_nodes["updates_button"].visible = true
-		information_nodes["updates_button"].hint_tooltip = translateIfCan("HEVLIB_ICON_TOOLTIP_UPDATES") % [str(update_data[ID]["version"][0])+"."+str(update_data[ID]["version"][1])+"."+str(update_data[ID]["version"][2]),str(update_data[ID]["new_version"][0])+"."+str(update_data[ID]["new_version"][1])+"."+str(update_data[ID]["new_version"][2])]
+		information_nodes["updates_button"].hint_tooltip = translateIfCan("HEVLIB_ICON_TOOLTIP_UPDATES") % [
+			"%d.%d.%d" % [
+				update_data[id]["version"][0],
+				update_data[id]["version"][1],
+				update_data[id]["version"][2]
+			],
+			"%d.%d.%d" % [
+				update_data[id]["new_version"][0],
+				update_data[id]["new_version"][1],
+				update_data[id]["new_version"][2]
+			]
+		]
 		has_update = true
 	else:
 		information_nodes["updates_button"].visible = false
 		
 	
-	if id in dependancy_data:
+	if id in pointers.dependancies_keys:
 		information_nodes["dependancies_button"].visible = true
 		var cd = ""
-		for i in dependancy_data[id]:
+		for i in pointers.dependancies[id]:
 			var mname = get_mod_data(i)
 			if mname:
 				cd = cd + "\n\t" + mname
@@ -281,10 +278,10 @@ func _pressed():
 	else:
 		information_nodes["dependancies_button"].visible = false
 	
-	if id in conflict_data:
+	if id in pointers.conflicts_keys:
 		information_nodes["conflict_button"].visible = true
 		var cd = ""
-		for i in conflict_data[id]:
+		for i in pointers.conflicts[id]:
 			var mod_id = ""
 			match typeof(i):
 				TYPE_STRING:
@@ -414,11 +411,6 @@ func get_mod_data(data):
 				mname = rn
 	return mname
 
-const update_store = "user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json"
-const dependancies_store = "user://cache/.Mod_Menu_2_Cache/updates/dependancies.json"
-const conflicts_store = "user://cache/.Mod_Menu_2_Cache/updates/conflicts.json"
-const complementary_store = "user://cache/.Mod_Menu_2_Cache/updates/complementary.json"
-
 var children = {}
 func _ready():
 	
@@ -470,55 +462,49 @@ func _draw():
 	
 	mod_path = MOD_INFO["file_path"]
 	is_modlet = MOD_INFO["mod_type"] == "modlet"
-	file.open(modlet_toggle_restart_path,File.READ)
-	var restarting_modlets = JSON.parse(file.get_as_text()).result
-	file.close()
-	if mod_path in restarting_modlets:
+	
+	if mod_path in pointers.modlet_toggle_restart_requests:
 		needs_restart_from_toggling = true
 	
-	file.open(update_store,File.READ)
-	var updt = JSON.parse(file.get_as_text()).result
-	file.close()
-	file.open(conflicts_store,File.READ)
-	var conf = JSON.parse(file.get_as_text()).result
-	file.close()
-	file.open(dependancies_store,File.READ)
-	var dep = JSON.parse(file.get_as_text()).result
-	file.close()
-	file.open(complementary_store,File.READ)
-	var comp = JSON.parse(file.get_as_text()).result
-	file.close()
+	var update_data:Dictionary = pointers.needs_updates
 	
-	
-	if ID in updt:
+	if ID in update_data.keys():
 		icon_updates.visible = true
-		icon_updates.hint_tooltip = translateIfCan("HEVLIB_ICON_TOOLTIP_UPDATES") % [str(updt[ID]["version"][0])+"."+str(updt[ID]["version"][1])+"."+str(updt[ID]["version"][2]),str(updt[ID]["new_version"][0])+"."+str(updt[ID]["new_version"][1])+"."+str(updt[ID]["new_version"][2])]
+		icon_updates.hint_tooltip = translateIfCan("HEVLIB_ICON_TOOLTIP_UPDATES") % [
+			"%d.%d.%d" % [
+				update_data[ID]["version"][0],
+				update_data[ID]["version"][1],
+				update_data[ID]["version"][2]
+			],
+			"%d.%d.%d" % [
+				update_data[ID]["new_version"][0],
+				update_data[ID]["new_version"][1],
+				update_data[ID]["new_version"][2]
+			]
+		]
 	else:
 		icon_updates.visible = false
-	if ID in conf:
+	if ID in pointers.conflicts_keys:
 		icon_conflicts.visible = true
-		var cd = ""
-		for i in conf[ID]:
-			var mname = get_mod_data(i)
-			cd = cd + "\n" + mname
+		var cd:String = ""
+		for i in pointers.conflicts[ID]:
+			cd += "\n" + get_mod_data(i)
 		icon_conflicts.hint_tooltip = translateIfCan("HEVLIB_ICON_TOOLTIP_CONFLICT") % cd
 	else:
 		icon_conflicts.visible = false
-	if ID in dep:
+	if ID in pointers.dependancies_keys:
 		icon_dependancies.visible = true
-		var cd = ""
-		for i in dep[ID]:
-			var mname = get_mod_data(i)
-			cd = cd + "\n" + mname
+		var cd:String = ""
+		for i in pointers.dependancies[ID]:
+			cd += "\n" + get_mod_data(i)
 		icon_dependancies.hint_tooltip = translateIfCan("HEVLIB_ICON_TOOLTIP_DEPENDANCIES") % cd
 	else:
 		icon_dependancies.visible = false
-	if ID in comp:
+	if ID in pointers.complementary_keys:
 		icon_complementary.visible = true
-		var cd = ""
-		for i in comp[ID]:
-			var mname = pointers.ManifestV2.__get_mod_by_id(i)["name"]
-			cd = cd + "\n" + mname
+		var cd:String = ""
+		for i in pointers.complementary[ID]:
+			cd += "\n" + pointers.ManifestV2.__get_mod_by_id(i)["name"]
 		icon_complementary.hint_tooltip = translateIfCan("HEVLIB_ICON_TOOLTIP_COMPLEMENTARY") % cd
 	else:
 		icon_complementary.visible = false
@@ -576,7 +562,7 @@ func _draw():
 	icon_node.texture = iconTexture
 	var tooltip_text = translateIfCan("HEVLIB_MM_TOOLTIP_HEADER")
 
-	var md = manifest["manifest_data"]
+	var md:Dictionary = manifest["manifest_data"]
 	if md:
 		ID = md["mod_information"]["id"]
 		

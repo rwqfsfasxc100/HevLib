@@ -43,9 +43,7 @@ func _ready():
 	pointers.connect("updates_fetched",self,"check")
 
 func check():
-	file.open("user://cache/.Mod_Menu_2_Cache/updates/needs_updates.json",File.READ)
-	var updates:Dictionary = JSON.parse(file.get_as_text()).result
-	file.close()
+	var updates:Dictionary = pointers.needs_updates
 	var uKeys:Array = updates.keys()
 	if updates:
 		var currently_ignored:Dictionary = pointers.ConfigDriver.__get_value("ModMenu2","datastore","ignored_updates",{})
