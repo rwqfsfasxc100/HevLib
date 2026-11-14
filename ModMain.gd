@@ -182,7 +182,7 @@ static func process_gdnative_plugins()->Dictionary:
 			copied_files.append_array(libs_to_copy.keys())
 		for data in lib_resave:
 			var entry:String=data[0]
-			var savePath:String="user://cache/Variable_Fetch/%d.gdnlib"%Time.get_ticks_usec()
+			var savePath:String=variables_folder+"%d.gdnlib"%Time.get_ticks_usec()
 			configFile.clear()
 			var entries:Dictionary=data[1]
 			var dependencies:Dictionary=data[2]
@@ -190,9 +190,8 @@ static func process_gdnative_plugins()->Dictionary:
 			for key in dependencies.keys():configFile.set_value("dependencies",key,dependencies[key])
 			configFile.save(savePath)
 			file.open(savePath,File.READ)
-			var bfr:PoolByteArray=file.get_buffer(file.get_len())
+			fetchPaths[entry.substr(6)]=file.get_buffer(file.get_len())
 			file.close()
-			fetchPaths[entry.substr(6)]=bfr
 		configFile.clear()
 		for f in fetch_folder_files(exePath):if!f in existing_libs:directory.remove(exePath+f)
 	return fetchPaths
@@ -216,8 +215,8 @@ static func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:Array
 				break
 			i -=1
 		if eocd_pos<0:continue
-		var total_entries:int=(tail[eocd_pos+10]|(tail[eocd_pos+10+1]<<8))
-		var current_offset:int=(tail[eocd_pos+16]|(tail[eocd_pos+16+1]<<8)|(tail[eocd_pos+16+2]<<16)|(tail[eocd_pos+16+3]<<24))
+		var total_entries:int=(tail[eocd_pos+10]|(tail[eocd_pos+11]<<8))
+		var current_offset:int=(tail[eocd_pos+16]|(tail[eocd_pos+17]<<8)|(tail[eocd_pos+18]<<16)|(tail[eocd_pos+19]<<24))
 		for ctr in total_entries:
 			var magic:int=(tail[current_offset]|(tail[current_offset+1]<<8)|(tail[current_offset+2]<<16)|(tail[current_offset+3]<<24))
 			var magicCheck:int=0x02014b50
@@ -234,14 +233,12 @@ static func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:Array
 			if file_name.get_extension()=="gd":script_paths.append(file_name)
 	if script_paths:
 		var tokenizer = load("res://HevLib/scripts/tokenizer/tokenizer.gd").new()
-		Directory.new().make_dir_recursive("user://cache/Variable_Fetch/")
 		for sc in script_paths:
 			if sc.get_file()=="DEFINED_CLASS_NAMES.gd"&&sc.split("/",false)[-2]in driver_dirs:
 				var fetched:Dictionary=load(sc).get_script_constant_map().get("DEFINED_CLASS_NAMES",{})
 				for i in fetched.keys():
 					if!i in class_names_to_clear&&typeof(fetched[i])==TYPE_STRING:
-						class_names_to_clear.append(i)
-						class_refs[i]=fetched[i]
+						class_names_to_clear.append(i);class_refs[i]=fetched[i]
 		var regex:RegEx=RegEx.new() # Checks for object literal
 		var regex2:RegEx=RegEx.new() # Checks for common signatures of memory-unsafe code
 		regex.compile("|".join(class_names_to_clear))
@@ -263,7 +260,7 @@ static func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:Array
 			elif regex.search(text) is RegExMatch:
 				replacements[script+".remap"]=(remap_str%remapped_path).to_utf8()
 				replacements[remapped_path]=tokenizer.__decast_source(text,class_names_to_clear,class_refs).to_utf8()
-	if replacements:ProjectSettings.load_resource_pack(load(strings[1] + "scripts/miniz/legacy_zipping.gd").new().compress_data(replacements,"user://cache/Variable_Fetch/remove_pointer_casting.zip"))
+	load(strings[1] + "scripts/miniz/legacy_zipping.gd").new(replacements)
 static func fetch_folder_files(folder:String,showFolders:bool=false,returnFullPath:bool=false,globalizePath:bool=false)->PoolStringArray:
 	var fileList:PoolStringArray=PoolStringArray()
 	if!folder.ends_with("/"):folder+="/"
@@ -292,6 +289,8 @@ static func load_pointers(modLoader:ModLoader):
 func testing(modLoader:ModLoader,pointers):
 	var file:File = File.new()
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
+	
+	var val:float = 4.356
 	
 	var t1=Time.get_ticks_usec()
 	for i in 100000:

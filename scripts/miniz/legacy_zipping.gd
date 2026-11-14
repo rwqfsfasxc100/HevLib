@@ -31,8 +31,8 @@
 # [/license]
 
 extends Reference
-
-func compress_data(files:Dictionary,file_path:String) -> String:
+func _init(files:Dictionary):
+	if not files:return
 	var datetime:Dictionary=Time.get_datetime_dict_from_system()
 	var dos_time:int=(datetime.hour<<11)|(datetime.minute<<5)|int(datetime.second/2.0)
 	var dos_date:int=(int(max(datetime.year-1980,0))<<9)|(datetime.month<<5)|datetime.day
@@ -115,20 +115,44 @@ func compress_data(files:Dictionary,file_path:String) -> String:
 	buffer[offset+16]=cdr&0xFF;buffer[offset+17]=(cdr&0xFF00)>>8;buffer[offset+18]=(cdr&0xFF0000)>>16;buffer[offset+19]=(cdr&0xFF000000)>>24 # CD offset
 	buffer[offset+20]=0;buffer[offset+21]=0 # Comment length
 	var file:File=File.new()
-	file.open(file_path,File.WRITE)
+	var outFile:String="user://cache/Variable_Fetch/remove_pointer_casting.zip"
+	file.open(outFile,File.WRITE)
 	file.store_buffer(buffer)
 	file.close()
-	return file_path
-
-var crcTables:Reference=load(get_script().resource_path.get_base_dir()+"/crc32_table_cache.gd")
-var crc_table_0:Array=crcTables.T0;var crc_table_1:Array=crcTables.T1;var crc_table_2:Array=crcTables.T2;var crc_table_3:Array=crcTables.T3
-var crc_table_4:Array=crcTables.T4;var crc_table_5:Array=crcTables.T5;var crc_table_6:Array=crcTables.T6;var crc_table_7:Array=crcTables.T7
-var crc_table_8:Array=crcTables.T8;var crc_table_9:Array=crcTables.T9;var crc_table_10:Array=crcTables.T10;var crc_table_11:Array=crcTables.T11
-var crc_table_12:Array=crcTables.T12;var crc_table_13:Array=crcTables.T13;var crc_table_14:Array=crcTables.T14;var crc_table_15:Array=crcTables.T15
-var crc_table_16:Array=crcTables.T16;var crc_table_17:Array=crcTables.T17;var crc_table_18:Array=crcTables.T18;var crc_table_19:Array=crcTables.T19
-var crc_table_20:Array=crcTables.T20;var crc_table_21:Array=crcTables.T21;var crc_table_22:Array=crcTables.T22;var crc_table_23:Array=crcTables.T23
-var crc_table_24:Array=crcTables.T24;var crc_table_25:Array=crcTables.T25;var crc_table_26:Array=crcTables.T26;var crc_table_27:Array=crcTables.T27
-var crc_table_28:Array=crcTables.T28;var crc_table_29:Array=crcTables.T29;var crc_table_30:Array=crcTables.T30;var crc_table_31:Array=crcTables.T31
+	ProjectSettings.load_resource_pack(outFile)
+var crcTables:Reference=load(get_script().resource_path.get_base_dir()+"/../crc32_table_cache.gd")
+var crc_table_0:Array=crcTables.T0
+var crc_table_1:Array=crcTables.T1
+var crc_table_2:Array=crcTables.T2
+var crc_table_3:Array=crcTables.T3
+var crc_table_4:Array=crcTables.T4
+var crc_table_5:Array=crcTables.T5
+var crc_table_6:Array=crcTables.T6
+var crc_table_7:Array=crcTables.T7
+var crc_table_8:Array=crcTables.T8
+var crc_table_9:Array=crcTables.T9
+var crc_table_10:Array=crcTables.T10
+var crc_table_11:Array=crcTables.T11
+var crc_table_12:Array=crcTables.T12
+var crc_table_13:Array=crcTables.T13
+var crc_table_14:Array=crcTables.T14
+var crc_table_15:Array=crcTables.T15
+var crc_table_16:Array=crcTables.T16
+var crc_table_17:Array=crcTables.T17
+var crc_table_18:Array=crcTables.T18
+var crc_table_19:Array=crcTables.T19
+var crc_table_20:Array=crcTables.T20
+var crc_table_21:Array=crcTables.T21
+var crc_table_22:Array=crcTables.T22
+var crc_table_23:Array=crcTables.T23
+var crc_table_24:Array=crcTables.T24
+var crc_table_25:Array=crcTables.T25
+var crc_table_26:Array=crcTables.T26
+var crc_table_27:Array=crcTables.T27
+var crc_table_28:Array=crcTables.T28
+var crc_table_29:Array=crcTables.T29
+var crc_table_30:Array=crcTables.T30
+var crc_table_31:Array=crcTables.T31
 func get_crc_32(bytes:PoolByteArray)->int:
 	var crc:int=0xFFFFFFFF
 	var size:int=bytes.size()
@@ -176,4 +200,3 @@ func get_crc_32(bytes:PoolByteArray)->int:
 		crc=crc_table_0[(crc^bytes[i])&0xFF]^(crc>>8)
 		i+=1
 	return crc^0xFFFFFFFF
-

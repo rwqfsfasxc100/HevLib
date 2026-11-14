@@ -419,7 +419,6 @@ func _init(r,e,v):
 	dir.make_dir_recursive("user://cache/SafeMode")
 	dir.make_dir_recursive("user://cache/Keybinds")
 	dir.make_dir_recursive("user://cache/AuxAndThrusterDriver")
-	dir.make_dir_recursive("user://cache/Variable_Fetch")
 	dir.make_dir_recursive("user://cache/Minerals")
 	dir.make_dir_recursive("user://cache/updates/zip_cache")
 	dir.make_dir_recursive("user://cache/github_list/icon_cache")
