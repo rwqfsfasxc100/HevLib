@@ -56,7 +56,7 @@ var file = File.new()
 func _tree_entered():
 	call_deferred("get_readme")
 
-var base_folder_path = "user://cache/.Mod_Menu_2_Cache/github_list/"
+var base_folder_path = "user://cache/github_list/"
 var filepath = base_folder_path + "icon_cache/"
 var zip_path = base_folder_path + "downloaded_zips/"
 var releases_cache_path = base_folder_path + "releases_cache.json"

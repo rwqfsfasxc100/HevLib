@@ -34,8 +34,6 @@ extends "res://TheRing.gd"
 
 onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
-const cache_folder : String = "user://cache/.HevLib_Cache/"
-
 var current_event_log : Dictionary = {}
 
 var group : Dictionary = {}
@@ -58,8 +56,7 @@ func hl_thering_UV():
 			base_playlist.append(event)
 			string[event] = not event in disabled_events
 		if write_events:
-			pointers.FolderAccess.__check_folder_exists(cache_folder)
-			file.open(cache_folder + "current_events.txt",File.WRITE)
+			file.open("user://cache/current_events.txt",File.WRITE)
 			file.store_string(JSON.print(string,"\t"))
 			file.close()
 		
@@ -149,10 +146,10 @@ func exitNearby(what, id):
 func getNextOnPlaylist():
 	return .getNextOnPlaylist() if playlist else dummy_event
 
-const event_log_file : String = "user://cache/.HevLib_Cache/Event_Driver/event_log.json"
-const active_events_file : String = "user://cache/.HevLib_Cache/Event_Driver/active_events.txt"
-const latest_event_file : String = "user://cache/.HevLib_Cache/Event_Driver/latest_event.txt"
-const mod_request_file : String = "user://cache/.HevLib_Cache/Event_Driver/requested_events_from_mods.txt"
+const event_log_file : String = "user://cache/Event_Driver/event_log.json"
+const active_events_file : String = "user://cache/Event_Driver/active_events.txt"
+const latest_event_file : String = "user://cache/Event_Driver/latest_event.txt"
+const mod_request_file : String = "user://cache/Event_Driver/requested_events_from_mods.txt"
 func _exit_tree():
 	if current_event_log:
 		Debug.l("Ring exiting tree, active events log:\n\n%s\n" % [JSON.print(current_event_log,"\t")])

@@ -35,9 +35,6 @@ extends HTTPRequest
 var path = ""
 var modPath = ""
 
-var HevLibCache = "user://cache/.HevLib_Cache"
-var cacheExtension = ".hev"
-
 func _ready():
 	connect("request_completed",self,"_on_request_complete")
 	

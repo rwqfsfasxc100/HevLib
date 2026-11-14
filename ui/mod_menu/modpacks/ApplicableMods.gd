@@ -156,7 +156,7 @@ func start_downloads(data):
 		handle_downloads()
 var total_downloads = 0
 var current_mod = 0
-var zip_folder = "user://cache/.Mod_Menu_2_Cache/updates/zip_cache/"
+var zip_folder = "user://cache/updates/zip_cache/"
 var mods_to_download = []
 func handle_downloads():
 	var this_mod = mods_to_download.pop_front()

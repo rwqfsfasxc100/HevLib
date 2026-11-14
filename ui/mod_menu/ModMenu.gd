@@ -35,12 +35,10 @@ extends Popup
 var pointers:HevLibPointers = ModLoader._savedObjects[0]
 var offset = Vector2(12,12)
 
-var cache_folder : String = "user://cache/.Mod_Menu_2_Cache/"
-var filter_cache_file : String = "menu_filter_cache.json"
+const cache_folder = "user://cache/menu_filter_cache.json"
 var file : File = File.new()
 func _about_to_show():
-	pointers.FolderAccess.__check_folder_exists(cache_folder)
-	file.open(cache_folder + filter_cache_file,File.WRITE)
+	file.open(cache_folder,File.WRITE)
 	file.store_string("[]")
 	file.close()
 	var nodes : Array = $FilterPopup/base/FilterContainer/VBoxContainer/ScrollContainer/VBoxContainer.get_children()

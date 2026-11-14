@@ -274,15 +274,17 @@ func __compiled_bytecode_to_tokens(bytes:PoolByteArray) -> bool:
 		var payload = null
 		match type:
 			TK_IDENTIFIER:
-				if arg >= identifiers.size():
+				if arg < identifier_count:
+					payload = identifiers[arg]
+				else:
 					printerr("Identifier index %d out of range at token %d" % [arg, i])
 					return false
-				payload = identifiers[arg]
 			TK_CONSTANT:
-				if arg >= constants.size():
+				if arg < constant_count:
+					payload = constants[arg]
+				else:
 					printerr("Constant index %d out of range at token %d" % [arg, i])
 					return false
-				payload = constants[arg]
 			TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_NEWLINE:
 				payload = arg
 		if i in line_list:

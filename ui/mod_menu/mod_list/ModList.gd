@@ -434,7 +434,7 @@ func _open_updates():
 	update_menu.rect_size = Vector2(700,450)
 	
 
-var zip_folder = "user://cache/.Mod_Menu_2_Cache/updates/zip_cache/"
+var zip_folder = "user://cache/updates/zip_cache/"
 func updates_started():
 	var data:Dictionary = pointers.needs_updates[currently_selected_mod_id]
 	var github:String = data.get("github","")

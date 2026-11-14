@@ -32,7 +32,6 @@
 
 extends HTTPRequest
 
-var HevLibCache = "user://cache/.HevLib_Cache"
 var cacheExtension = ".hev"
 
 var file_check = ""
@@ -86,8 +85,8 @@ func _on_request_complete(result, response_code, headers, body):
 					utfc = str(ut)
 				else:
 					utfc = utfc + "-~-" + str(ut)
-			var base_folder = HevLibCache + "/WebTranslate/" + nameContent[0]
-			pointers.FolderAcces.__check_folder_exists(base_folder)
+			var base_folder:String = "user://cache/WebTranslate/" + nameContent[0]
+			Directory.new().make_dir_recursive(base_folder)
 			var file = File.new()
 			var fileName = base_folder + "/" + nameContent[1] + cacheExtension + "--" + utfc
 			file.open(fileName,File.WRITE)
@@ -98,10 +97,9 @@ func _on_request_complete(result, response_code, headers, body):
 			if file_check == "":
 				pointers.FolderAccess.__recursive_delete(fileName)
 			else:
-				var f = File.new()
-				f.open(base_folder + "/" + str(file_check.hash()) + ".file_check_cache",File.WRITE)
-				f.store_string(file_check)
-				f.close()
+				file.open(base_folder + "/" + str(file_check.hash()) + ".file_check_cache",File.WRITE)
+				file.store_string(file_check)
+				file.close()
 		get_parent().fetchTranslations()
 
 

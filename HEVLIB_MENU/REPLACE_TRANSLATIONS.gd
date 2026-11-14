@@ -404,8 +404,8 @@ const TRANSLATIONS = {
 			"version_hash": 924663846
 		},
 		"HEVLIB_CONFIG_WRITE_EVENTS_TOOLTIP": {
-			"string": "Writes events to a cache file located at 'user://cache/.HevLib_Cache/current_events.txt'\n\nThis contains all events loaded by the game at the time the rings are loaded.",
-			"version_hash": 2763919336
+			"string": "Writes events to a cache file located at 'user://cache/current_events.txt'\n\nThis contains all events loaded by the game at the time the rings are loaded.",
+			"version_hash": 2296775262
 		},
 		"HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES": {
 			"string": "Show hidden libraries",
@@ -2307,8 +2307,8 @@ const TRANSLATIONS = {
 			"version_hash": 0
 		},
 		"HEVLIB_CONFIG_WRITE_EVENTS_TOOLTIP": {
-			"string": "Schreibt in eine Datei unter user://cache/.HevLib_Cache/current_events.txt, welche alle Events beinhaltet, die bei Spielstart geladen werden.",
-			"version_hash": 0
+			"string": "Schreibt in eine Datei unter user://cache/current_events.txt, welche alle Events beinhaltet, die bei Spielstart geladen werden.",
+			"version_hash": 2296775262
 		},
 		"HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES": {
 			"string": "Zeige verstecke Bibliotheken",
@@ -3233,8 +3233,8 @@ const TRANSLATIONS = {
 			"version_hash": 924663846
 		},
 		"HEVLIB_CONFIG_WRITE_EVENTS_TOOLTIP": {
-			"string": "Записує до кеш-файлу, розташованого в user://cache/.HevLib_Cache/current_events.txt, який містить усі події, завантажені грою на момент завантаження кілець.",
-			"version_hash": 4263193676
+			"string": "Записує до кеш-файлу, розташованого в user://cache/current_events.txt, який містить усі події, завантажені грою на момент завантаження кілець.",
+			"version_hash": 2296775262
 		},
 		"HEVLIB_CONFIG_SHOW_HIDDEN_LIBRARIES": {
 			"string": "Показувати приховані бібліотеки",

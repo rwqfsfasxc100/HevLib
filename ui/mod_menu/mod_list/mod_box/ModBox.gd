@@ -447,7 +447,7 @@ func _ready():
 	
 
 
-var ID = null
+var ID:String = ""
 
 
 func _draw():
@@ -708,8 +708,7 @@ onready var mod_menu_panel = get_node(mod_menu_panel_path)
 var filterContainerPath = mod_menu_panel_path + "/FilterPopup/base/FilterContainer"
 onready var filter_container = get_node(filterContainerPath)
 
-var cache_folder = "user://cache/.Mod_Menu_2_Cache/"
-var filter_cache_file = "menu_filter_cache.json"
+const cache_folder = "user://cache/menu_filter_cache.json"
 
 func _process(_delta):
 	handle_sub_mods()
@@ -722,7 +721,7 @@ func _process(_delta):
 		var current_selection = filter_button.keys_pressed
 		
 		if all_tags:
-			file.open(cache_folder + filter_cache_file,File.READ)
+			file.open(cache_folder,File.READ)
 			var filter_data = JSON.parse(file.get_as_text()).result
 			file.close()
 			if filter_data.size() >= 1:

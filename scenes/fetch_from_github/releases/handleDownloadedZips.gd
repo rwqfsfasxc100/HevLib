@@ -32,36 +32,22 @@
 
 extends Node
 
-var cacheExtension = ".hevlibucache"
-var slatedForUpdateCacheFolder = "user://cache/.HevLib_Cache/updatecache/current_mod_caches/"
-var githubDataCache = "user://cache/.HevLib_Cache/updatecache/github_cache/"
-var persistUpdateCacheFolder = "user://cache/.HevLib_Cache/updatecache/persistent_mod_caches/"
-var zipStore = "user://cache/.HevLib_Cache/updatecache/downloaded_zips/"
-var zipCache = "user://cache/.HevLib_Cache/updatecache/zip_data_cache/"
-var debugPrefix = "HevLib Github Release Fetcher: "
+const zipStore = "user://cache/updatecache/downloaded_zips/"
+const zipCache = "user://cache/updatecache/zip_data_cache/"
 
-
-var childData = {}
-var dataDictionary = {}
-var updateMods = []
+var childData:Dictionary = {}
+var dataDictionary:Dictionary = {}
+var updateMods:Array = []
 
 var pointers:HevLibPointers= ModLoader._savedObjects[0]
 
 func handleZips():
-	
-	var zipList = pointers.FolderAccess.__fetch_folder_files(zipStore)
-	for zip in zipList:
-		var dataStore
-		var zipCacheFilename = zip + cacheExtension
-		var zipCacheStore = zipCache + zip + "/"
-		pointers.FolderAccess.__check_folder_exists(zipCacheStore)
+	for zip in pointers.FolderAccess.__fetch_folder_files(zipStore):
+		var zipCacheStore:String = zipCache + zip
+		Directory.new().make_dir_recursive(zipCacheStore)
 		var fetchedManifest = pointers.Zip.__fetch_file_from_zip(zipStore + zip, PoolStringArray(["mod.manifest"]), zipCacheStore)
 		var manifestData = pointers.ManifestV1.__load_manifest_from_file(pointers.DataFormat.__array_to_string(fetchedManifest))["package"]
-		dataStore = {
-			manifestData["id"]:
-				[manifestData["name"], manifestData["version"],zip]
-		}
-		dataDictionary.merge(dataStore)
+		dataDictionary[manifestData["id"]] = [manifestData["name"], manifestData["version"],zip]
 	var modDir = get_parent().get_parent().get_node("VBoxContainer")
 	var childNodes = modDir.get_children()
 	
@@ -91,7 +77,7 @@ func handleZips():
 			updates = updates + updateData
 		
 		var file = File.new()
-		file.open("user://cache/.HevLib_Cache/updatecache/mod.updates", File.WRITE)
+		file.open("user://cache/updatecache/mod.updates", File.WRITE)
 		file.store_string(updates)
 		file.close()
 	

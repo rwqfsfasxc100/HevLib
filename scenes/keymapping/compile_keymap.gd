@@ -41,7 +41,7 @@ func _init(p):
 var control_vars = {}
 # General variables
 var file = File.new()
-var keybind_folder = "user://cache/.HevLib_Cache/Keybinds/"
+var keybind_folder = "user://cache/Keybinds/"
 var keybinds = keybind_folder + "defined_control_configs.json"
 var vanilla = keybind_folder + "vanilla_binds.json"
 

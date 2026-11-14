@@ -63,7 +63,7 @@ func _ignore_confirmed():
 	pointers.ConfigDriver.__store_value("ModMenu2","datastore","ignored_updates",currently_ignored)
 	repos()
 	Tool.remove(self)
-var zip_folder = "user://cache/.Mod_Menu_2_Cache/updates/zip_cache/"
+var zip_folder = "user://cache/updates/zip_cache/"
 
 func _do_update():
 	manager.mods_to_download.append({"name":TranslationServer.translate(mod_name),"id":mod_id,"version":new_version,"container":self})

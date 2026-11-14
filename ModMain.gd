@@ -120,7 +120,7 @@ static func replaceSceneLiteral(newPath:String,oldPath:String):
 		l("Finished updating literal:%s"%oldPath)
 static func l(msg:String,title:String=MOD_NAME):strings[3].l(msg,"%s V%s"%[title,MOD_VERSION_STRING])
 const driver_dirs=PoolStringArray(["HEVLIB_EQUIPMENT_DRIVER_TAGS/","HEVLIB_MENU/","HEVLIB_MINERAL_DRIVER_TAGS/","HEVLIB_DRIVERS/"])
-const variables_folder:String="user://cache/.HevLib_Cache/Variable_Fetch/"
+const variables_folder:String="user://cache/Variable_Fetch/"
 const class_names_to_clear:PoolStringArray=PoolStringArray(["HevLibPointers","MINIZ"])
 const class_refs:Dictionary={"HevLibPointers":"res://HevLib/pointers.gd","MINIZ":"res://HevLib/scripts/miniz/miniz.gd"}
 const remap_str:String="[remap]\n\npath=\"res://%s\"\n"
@@ -182,7 +182,7 @@ static func process_gdnative_plugins()->Dictionary:
 			copied_files.append_array(libs_to_copy.keys())
 		for data in lib_resave:
 			var entry:String=data[0]
-			var savePath:String="user://cache/.HevLib_Cache/Variable_Fetch/%d.gdnlib"%Time.get_ticks_usec()
+			var savePath:String="user://cache/Variable_Fetch/%d.gdnlib"%Time.get_ticks_usec()
 			configFile.clear()
 			var entries:Dictionary=data[1]
 			var dependencies:Dictionary=data[2]
@@ -234,7 +234,7 @@ static func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:Array
 			if file_name.get_extension()=="gd":script_paths.append(file_name)
 	if script_paths:
 		var tokenizer = load("res://HevLib/scripts/tokenizer/tokenizer.gd").new()
-		Directory.new().make_dir_recursive("user://cache/.HevLib_Cache/Variable_Fetch/")
+		Directory.new().make_dir_recursive("user://cache/Variable_Fetch/")
 		for sc in script_paths:
 			if sc.get_file()=="DEFINED_CLASS_NAMES.gd"&&sc.split("/",false)[-2]in driver_dirs:
 				var fetched:Dictionary=load(sc).get_script_constant_map().get("DEFINED_CLASS_NAMES",{})
@@ -263,7 +263,7 @@ static func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:Array
 			elif regex.search(text) is RegExMatch:
 				replacements[script+".remap"]=(remap_str%remapped_path).to_utf8()
 				replacements[remapped_path]=tokenizer.__decast_source(text,class_names_to_clear,class_refs).to_utf8()
-	if replacements:ProjectSettings.load_resource_pack(load(strings[1] + "scripts/miniz/legacy_zipping.gd").new().compress_data(replacements,"user://cache/.HevLib_Cache/Variable_Fetch/remove_pointer_casting.zip"))
+	if replacements:ProjectSettings.load_resource_pack(load(strings[1] + "scripts/miniz/legacy_zipping.gd").new().compress_data(replacements,"user://cache/Variable_Fetch/remove_pointer_casting.zip"))
 static func fetch_folder_files(folder:String,showFolders:bool=false,returnFullPath:bool=false,globalizePath:bool=false)->PoolStringArray:
 	var fileList:PoolStringArray=PoolStringArray()
 	if!folder.ends_with("/"):folder+="/"

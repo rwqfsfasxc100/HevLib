@@ -32,7 +32,7 @@
 
 extends "res://ships/modules/ThrusterSlot.gd"
 
-var exhaust_cache_path:String = "user://cache/.HevLib_Cache/AuxAndThrusterDriver/"
+var exhaust_cache_path:String = "user://cache/AuxAndThrusterDriver/"
 var flare
 var mpdg:String = "res://ships/modules/AuxMpd.tscn"
 var smes:String = "res://ships/modules/AuxSmes.tscn"

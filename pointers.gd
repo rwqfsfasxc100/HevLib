@@ -120,15 +120,15 @@ const LIBRARY_LOAD = [
 	], [
 		1, "res://HevLib/scenes/ship_driver/CurrentGame.gd", -INF, "res://CurrentGame.gd"
 	], [
-		1, "user://cache/.HevLib_Cache/Minerals/cg.gd", -INF, "res://CurrentGame.gd"
+		1, "user://cache/Minerals/cg.gd", -INF, "res://CurrentGame.gd"
 	], [
-		1, "user://cache/.HevLib_Cache/Minerals/as.gd", -INF, "res://AsteroidSpawner.gd"
+		1, "user://cache/Minerals/as.gd", -INF, "res://AsteroidSpawner.gd"
 	], [
-		2, "user://cache/.HevLib_Cache/Variable_Fetch/derelict_expansion.tscn", -INF, "res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"
+		2, "user://cache/Variable_Fetch/derelict_expansion.tscn", -INF, "res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"
 	], [
-		2, "user://cache/.HevLib_Cache/Variable_Fetch/upgrades.tscn", -INF, "res://enceladus/Upgrades.tscn"
+		2, "user://cache/Variable_Fetch/upgrades.tscn", -INF, "res://enceladus/Upgrades.tscn"
 	], [
-		2, "user://cache/.HevLib_Cache/Variable_Fetch/ship_limitations.tscn", -INF, "res://enceladus/Upgrades.tscn"
+		2, "user://cache/Variable_Fetch/ship_limitations.tscn", -INF, "res://enceladus/Upgrades.tscn"
 	], [
 		1, "res://HevLib/scenes/ship_driver/TheRing.gd", -INF, "res://TheRing.gd"
 	], [
@@ -226,7 +226,7 @@ const LIBRARY_LOAD = [
 
 const hl_copyright = "© 2024-2026 Benjamin Buckhurst a.k.a. __hev. All rights reserved."
 
-const HEVLIB_CACHE_VERSION : int = 6
+const HEVLIB_CACHE_VERSION : int = 7
 
 var logging_frame_interval:float = 0
 var logging_current_frame_timer:int = 0
@@ -416,15 +416,18 @@ func _init(r,e,v):
 		l("Initializing [%d] threads on CPU %s with [%d] logical processors" % [Threading.max_threads,OS.get_processor_name(),OS.get_processor_count()],"pointers.Threading")
 	
 	dir.make_dir_recursive(deviceinfostore)
-	dir.make_dir_recursive("user://cache/.HevLib_Cache/SafeMode")
-	dir.make_dir_recursive("user://cache/.HevLib_Cache/Variable_Fetch")
-	dir.make_dir_recursive("user://cache/.Mod_Menu_2_Cache/updates/zip_cache")
-	dir.make_dir_recursive("user://cache/.Mod_Menu_2_Cache/github_list/icon_cache")
-	dir.make_dir_recursive("user://cache/.Mod_Menu_2_Cache/github_list/downloaded_zips")
-	dir.make_dir_recursive("user://cache/.HevLib_Cache/Event_Driver")
-	for i in FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/updates/zip_cache/",false,true):
+	dir.make_dir_recursive("user://cache/SafeMode")
+	dir.make_dir_recursive("user://cache/Keybinds")
+	dir.make_dir_recursive("user://cache/AuxAndThrusterDriver")
+	dir.make_dir_recursive("user://cache/Variable_Fetch")
+	dir.make_dir_recursive("user://cache/Minerals")
+	dir.make_dir_recursive("user://cache/updates/zip_cache")
+	dir.make_dir_recursive("user://cache/github_list/icon_cache")
+	dir.make_dir_recursive("user://cache/github_list/downloaded_zips")
+	dir.make_dir_recursive("user://cache/Event_Driver")
+	for i in FolderAccess.__fetch_folder_files("user://cache/updates/zip_cache/",false,true):
 		dir.remove(i)
-	for i in FolderAccess.__fetch_folder_files("user://cache/.Mod_Menu_2_Cache/github_list/downloaded_zips/",false,true):
+	for i in FolderAccess.__fetch_folder_files("user://cache/github_list/downloaded_zips/",false,true):
 		dir.remove(i)
 	if file.file_exists(releases_cache):
 		var age:float=Time.get_unix_time_from_system()-file.get_modified_time(releases_cache)
@@ -435,15 +438,20 @@ func _init(r,e,v):
 			Debug.l("Releases cache older than an hour (%s minutes old), clearing"%[floor(age/60.0)])
 		else:
 			Debug.l("Releases cache too new (%s minutes old), not clearing"%[floor(age/60.0)])
-	file.open("user://cache/.HevLib_Cache/Event_Driver/event_log.json",File.WRITE)
+	file.open("user://cache/Event_Driver/event_log.json",File.WRITE)
 	file.store_string("{}")
 	file.close()
-	file.open("user://cache/.HevLib_Cache/Event_Driver/active_events.txt",File.WRITE)
+	file.open("user://cache/Event_Driver/active_events.txt",File.WRITE)
 	file.store_string("")
 	file.close()
-	file.open("user://cache/.HevLib_Cache/Event_Driver/latest_event.txt",File.WRITE)
+	file.open("user://cache/Event_Driver/latest_event.txt",File.WRITE)
 	file.store_string("")
 	file.close()
+	
+	if dir.dir_exists("user://cache/.HevLib_Cache/"):
+		FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/")
+	if dir.dir_exists("user://cache/.Mod_Menu_2_Cache/"):
+		FolderAccess.__recursive_delete("user://cache/.Mod_Menu_2_Cache/")
 	
 	complementary = ManifestV2.__check_complementary()
 	dependancies = ManifestV2.__check_dependancies()
@@ -468,7 +476,7 @@ func n(msg:String, title:String = ""):
 	Debug.n(("[%s]: %s" % [title, msg]) if title else msg)
 	logCache += "[%s]: %s\n" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg]
 
-const deviceinfostore:String = "user://cache/.HevLib_Cache/logs/"
+const deviceinfostore:String = "user://cache/logs/"
 const deviceinfocache:String = deviceinfostore + "pointer_logs_%d.txt"
 var currentFileName:String = ""
 const testmode = false
@@ -490,7 +498,7 @@ func storeLogCache():
 		file.close()
 		logCache = ""
 
-const releases_cache = "user://cache/.Mod_Menu_2_Cache/github_list/releases_cache.json"
+const releases_cache = "user://cache/github_list/releases_cache.json"
 
 class _Achievements:
 	const achievementsFile : String = "user://achievements.dv"
@@ -981,7 +989,7 @@ class _ConfigDriver:
 		var dir:Directory = Directory.new()
 		var c:ConfigFile = ConfigFile.new()
 		# Directory and file definitions
-		var keybinds_cache : String = "user://cache/.HevLib_Cache/Keybinds/"
+		var keybinds_cache : String = "user://cache/Keybinds/"
 		var cfg_file : String = "user://cfg/" + cfg_filename
 		var profiles_dir : String = "user://cfg/.profiles/"
 		var profiles_setter : String = profiles_dir + ".profiles.ini"
@@ -2022,9 +2030,8 @@ class _DataFormat:
 		non_statics["pointers"].equipment_modmain.replaceSceneLiteral(resource_path,original_path)
 	
 	static func __replace_scene(scene_data:String,override_path:String = "",scene_file_path:String = "",cache_scene:bool = true) -> PackedScene:
-		var scene_replacement : String = (scene_file_path) if scene_file_path else ("user://cache/.HevLib_Cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec())
+		var scene_replacement : String = (scene_file_path) if scene_file_path else ("user://cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec())
 		l("__replace scene called with [override: %s / store path: %s / force cache: %s]" % [override_path,scene_replacement,str(cache_scene)])
-		non_statics["pointers"].FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
 		var file:File = File.new()
 		file.open(scene_replacement,File.WRITE)
 		file.store_string(scene_data)
@@ -2610,8 +2617,6 @@ class _Equipment:
 	
 	var version : PoolIntArray = PoolIntArray([1,0,0])
 	
-	var validation_check_path:String = "user://cache/.HevLib_Cache/SafeMode/recache_validation.json"
-	
 	const vanilla_slot_types : Dictionary = {
 		"MainWeaponSlot": "weaponSlot.main.type",
 		"MainLowWeaponSlot": "weaponSlot.mainLow.type",
@@ -2646,10 +2651,8 @@ class _Equipment:
 		"Lidar": "lidar.type",
 		"ReconDrone": "drone.scanner"
 	}
-	
+	const exhaust_cache_path : String = "user://cache/AuxAndThrusterDriver/"
 	func __make_upgrades_scene():
-		var exhaust_cache_path : String = "user://cache/.HevLib_Cache/AuxAndThrusterDriver/"
-		pointers.FolderAccess.__check_folder_exists(exhaust_cache_path)
 		version = pointers.DataFormat.__get_vanilla_version()
 		pointers.l("observed game version of %d.%d.%d" % Array(version),"pointers.Equipment")
 		
@@ -3598,10 +3601,6 @@ script = ExtResource( 5 )"""
 			for dp in weaponslot_properties[property]:
 				weaponslot_string += "\n%s = %s" % [dp[0],var2str(dp[1])]
 		
-		file.open(validation_check_path,File.READ)
-		var validation_check:Dictionary = JSON.parse(file.get_as_text()).result
-		file.close()
-		
 		for data in AUX_POWER_AND_THRUSTERS:
 			for slot in data.get("slots",[]):
 				slot = slot.split(".")[0]
@@ -3622,12 +3621,12 @@ script = ExtResource( 5 )"""
 						continue
 					var sys : String = data.get("system","SYSTEM_NAME_MISSING")
 					var auxTypePath : String = exhaust_cache_path + aux_type
-					pointers.FolderAccess.__check_folder_exists(auxTypePath)
+					Directory.new().make_dir_recursive(auxTypePath)
 					file.open(auxTypePath + "/" + sys + "_exhaust.tscn",File.WRITE)
 					file.store_string(make_exhaust_scene(data,sys))
 					file.close()
 					file.open(auxTypePath + "/" + sys + "_thruster.tscn",File.WRITE)
-					file.store_string(make_thruster_scene(data,sys,aux_type,exhaust_cache_path))
+					file.store_string(make_thruster_scene(data,sys,aux_type))
 					file.close()
 		if ws_editable_paths:
 			weaponslot_string += "\n\n" + ws_editable_paths
@@ -3646,10 +3645,10 @@ script = ExtResource( 5 )"""
 					data["prevent_ships"] = PoolStringArray([data["prevent_ships"]])
 				ship_limitation_string += "\nprevent_ships = [\"%s\"]" % "\",\"".join(PoolStringArray(data["prevent_ships"]))
 		
-		file.open("user://cache/.HevLib_Cache/Variable_Fetch/upgrades.tscn",File.WRITE)
+		file.open("user://cache/Variable_Fetch/upgrades.tscn",File.WRITE)
 		file.store_string(concat)
 		file.close()
-		file.open("user://cache/.HevLib_Cache/Variable_Fetch/ship_limitations.tscn",File.WRITE)
+		file.open("user://cache/Variable_Fetch/ship_limitations.tscn",File.WRITE)
 		file.store_string(ship_limitation_string)
 		file.close()
 	
@@ -3669,7 +3668,7 @@ script = ExtResource( 5 )"""
 			generated_tex[texturepath] = filepath
 		return filepath
 	
-	func make_thruster_scene(data,sys,aux_type,exhaust_cache_path) -> String:
+	func make_thruster_scene(data,sys,aux_type) -> String:
 		var this_sys_path : String = exhaust_cache_path + aux_type + "/" + sys
 		
 		var cached_exhaust_path : String = this_sys_path + "_exhaust.tscn"
@@ -4650,7 +4649,7 @@ class _FileAccess:
 			imgtex.create_from_image(img)
 			return imgtex
 	
-	const updateCacheDir : String = "user://cache/.Mod_Menu_2_Cache/updates"
+	const updateCacheDir : String = "user://cache/updates"
 	const updateCacheFile : String = updateCacheDir + "/mods_to_update.json"
 	const modCacheDir : String = updateCacheDir + "/zip_cache"
 	
@@ -5070,7 +5069,7 @@ class _Keymapping:
 		non_static["pointers"] = f
 		overrides.merge(load("res://HevLib/scenes/keymapping/data/overrides.gd").get_script_constant_map())
 	
-	const keybind_folder = "user://cache/.HevLib_Cache/Keybinds/"
+	const keybind_folder = "user://cache/Keybinds/"
 	const vanilla_binds_file = "user://cfg/Vanilla_Binds.cfg"
 	
 	const overrides = {}
@@ -5133,7 +5132,6 @@ class _Keymapping:
 	
 	static func __define_vanilla_binds():
 		var recache:bool = input_cache.empty()
-		non_static["pointers"].FolderAccess.__check_folder_exists(keybind_folder)
 		if!input_cache:
 			for ie in __get_vanilla_action_list():
 				input_cache[ie] = []
@@ -5430,8 +5428,8 @@ class _ManifestV2:
 	var currentModStateHash:int = 0
 	var lastModStateHash:int = 0
 	
-	const mod_hash_file:String = "user://cache/.Mod_Menu_2_Cache/updates/mod_data_hash.txt"
-	const mod_state_hash_file:String = "user://cache/.Mod_Menu_2_Cache/updates/mod_zip_hash.txt"
+	const mod_hash_file:String = "user://cache/updates/mod_data_hash.txt"
+	const mod_state_hash_file:String = "user://cache/updates/mod_zip_hash.txt"
 	
 	const mod_file_to_id_cache = {}
 	const get_mod_path_from_lowercase_path = {}
@@ -6734,8 +6732,7 @@ class _ManifestV2:
 	
 	const mod_changes_cache = {}
 	
-	const last_seen_file:String = "user://cache/.Mod_Menu_2_Cache/updates/mods_from_last_launch.json"
-	const this_seen_file:String = "user://cache/.Mod_Menu_2_Cache/updates/mods_from_this_launch.json"
+	const last_seen_file:String = "user://cachefrom_last_launch.json"
 	static func __get_mod_versions() -> Dictionary:
 		var last : Dictionary = {}
 		var file:File = File.new()
@@ -7543,7 +7540,7 @@ class _NodeAccess:
 			compacted_string += "[node name=\"DIALOG_DERELICT_SWITCH_CREW|%d\" type=\"Node\" parent=\".\" index=\"%d\"]\nscript = ExtResource( 2 )\nmyLine = false\nfaceless = true\nimportChildren = NodePath(\"../DIALOG_DERELICT_GO_AND_BRING_IT\")\nagenda = \"CREW/%d\"\nagendaNotSame = true\n\n" % [i,i + 4,i]
 		
 		var file:File = File.new()
-		file.open("user://cache/.HevLib_Cache/Variable_Fetch/derelict_expansion.tscn",File.WRITE)
+		file.open("user://cache/Variable_Fetch/derelict_expansion.tscn",File.WRITE)
 		file.store_string(compacted_string)
 		file.close()
 	
@@ -7592,11 +7589,12 @@ class _RingInfo:
 	static func __get_pixel_at(pos: Vector2) -> Color:
 		var image:Image = images.map.get_data()
 		var size:Vector2 = image.get_size()
-		var x:int = int(clamp(floor(pos.x / pixelToKm), 0, size.x - 1))
+		var sx:float = size.x
+		var x:int = int(clamp(floor(pos.x / pixelToKm), 0, sx - 1))
 		var sy:int = int(size.y)
 		var y:int = ((int(floor(pos.y / pixelToKm)) %sy) + sy) %sy
-		var x1:int = int(clamp(x + 1, 0, size.x - 1))
-		var y1:int = (y + 1) % int(size.y)
+		var x1:int = int(clamp(x + 1, 0, sx - 1))
+		var y1:int = (y + 1) % sy
 		
 		if x <= 0:
 			return Color(0, 0, 0, 0)
@@ -8091,23 +8089,23 @@ class _SafeMode:
 		non_static["regex"] = regex
 		non_static["self"] = self
 	
-	const safemode_dir = "user://cache/.HevLib_Cache/SafeMode/"
-	const validation_check_path:String = safemode_dir + "recache_validation.json"
-	const pck_file_paths_store:String = safemode_dir + "pck_file_paths.json"
-	const vanilla_load_order_store:String = safemode_dir + "vanilla_load_order.json"
-	const dependancy_lookup_store:String = safemode_dir + "dependancy_lookup.json"
-	const dependancy_dictionary_store:String = safemode_dir + "dependancy_dictionary.json"
+	const safemode_dir = "user://cache/SafeMode/"
+	const validation_check_path:String = safemode_dir + "recache_validation.dat"
+	const sm_data_path:String = safemode_dir + "pck.dat"
 	
 	static func ready():
 		var file:File = File.new()
 		var pointers:HevLibPointers = non_static["pointers"]
 		var vanilla_version:PoolIntArray = pointers.DataFormat.__get_vanilla_version()
 		var validation_check:Dictionary = Dictionary()
+		var decomp_size:int = -1
 		if file.file_exists(validation_check_path):
 			file.open(validation_check_path,File.READ)
-			validation_check = JSON.parse(file.get_as_text()).result
+			validation_check = bytes2var(file.get_buffer(file.get_len()))
+			if validation_check:
+				decomp_size = validation_check["decompressed_size"]
 			file.close()
-		if validation_check.get("hevlib_cache_version",-1) != HEVLIB_CACHE_VERSION or !deep_equal(PoolIntArray(validation_check.get("vanilla_version",PoolIntArray([1,0,0]))),vanilla_version) or !file.file_exists(validation_check_path) or !file.file_exists(pck_file_paths_store) or !file.file_exists(vanilla_load_order_store) or !file.file_exists(dependancy_lookup_store) or !file.file_exists(dependancy_dictionary_store) or pointers.ManifestV2.haveModsChanged:
+		if (validation_check and validation_check.get("hevlib_cache_version",-1) != HEVLIB_CACHE_VERSION) or decomp_size < 1 or pointers.ManifestV2.haveModsChanged or !deep_equal(PoolIntArray(validation_check.get("vanilla_version",PoolIntArray([1,0,0]))),vanilla_version) or !file.file_exists(validation_check_path) or !file.file_exists(sm_data_path):
 			pointers.l("Game has updated or cache is missing, rebuilding file info cache.")
 			pointers.FolderAccess.__recursive_delete(safemode_dir)
 			Directory.new().make_dir(safemode_dir)
@@ -8115,9 +8113,6 @@ class _SafeMode:
 			PCKNAMES.append_array(pointers.FolderAccess.__get_vanilla_script_and_scenes())
 			validation_check["vanilla_version"] = vanilla_version
 			validation_check["hevlib_cache_version"] = HEVLIB_CACHE_VERSION
-			file.open(validation_check_path,File.WRITE)
-			file.store_string(JSON.print(validation_check))
-			file.close()
 			for f in PCKNAMES:
 				get_dependancies_for_vanilla_file(f)
 			order_tree.merge(flatten_tree(get_dependancy_tree()))
@@ -8135,40 +8130,36 @@ class _SafeMode:
 							idx = i
 							break
 				idx += 1
-			file.open(pck_file_paths_store,File.WRITE)
-			file.store_string(JSON.print(PCKNAMES))
-			file.close()
-			file.open(vanilla_load_order_store,File.WRITE)
-			file.store_string(JSON.print(vanilla_load_order))
-			file.close()
-			file.open(dependancy_lookup_store,File.WRITE)
-			file.store_string(JSON.print(dependancy_lookup))
-			file.close()
-			file.open(dependancy_dictionary_store,File.WRITE)
-			file.store_string(JSON.print(dependancy_dictionary))
+			var data_to_store:PoolByteArray = var2bytes([
+				PCKNAMES,
+				vanilla_load_order,
+				dependancy_lookup,
+				dependancy_dictionary
+			])
+			decomp_size = data_to_store.size()
+			validation_check["decompressed_size"] = decomp_size
+			file.open(sm_data_path,File.WRITE)
+			file.store_buffer(data_to_store.compress(1))
 			file.close()
 			var timerEnd:int = Time.get_ticks_usec()-timerStart
 			pointers.l("Cache rebuilt in %d.%03d ms" % [int(floor(timerEnd / 1000.0)),timerEnd % 1000])
+			file.open(validation_check_path,File.WRITE)
+			file.store_buffer(var2bytes(validation_check))
+			file.close()
 		else:
-			file.open(pck_file_paths_store,File.READ)
-			PCKNAMES.append_array(JSON.parse(file.get_as_text()).result)
+			file.open(sm_data_path,File.READ)
+			var data:Array = bytes2var(file.get_buffer(file.get_len()).decompress(decomp_size,1))
 			file.close()
-			file.open(vanilla_load_order_store,File.READ)
-			vanilla_load_order.append_array(JSON.parse(file.get_as_text()).result)
-			file.close()
-			file.open(dependancy_lookup_store,File.READ)
-			dependancy_lookup.merge(JSON.parse(file.get_as_text()).result)
-			file.close()
-			file.open(dependancy_dictionary_store,File.READ)
-			dependancy_dictionary.merge(JSON.parse(file.get_as_text()).result)
-			file.close()
+			PCKNAMES.append_array(data[0])
+			vanilla_load_order.append_array(data[1])
+			dependancy_lookup.merge(data[2])
+			dependancy_dictionary.merge(data[3])
 			dependancy_lookup_keys.append_array(dependancy_lookup.keys())
 			dependancy_dict_keys.append_array(dependancy_dictionary.keys())
 		
 		if not pointers.is_editor:
 			var safeCheck:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","safe_mod_loading",true)
-			if safeCheck:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_ENABLED"),"pointers.SafeMode")
-			else:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_DISABLED"),"pointers.SafeMode")
+			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_ENABLED" if safeCheck else "HEVLIB_SAFEMODE_SM_DISABLED"),"pointers.SafeMode")
 			non_static["self"].safeCheck = safeCheck
 		else:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_DISABLED_EDITOR"),"pointers.SafeMode")
 	
@@ -8186,35 +8177,36 @@ class _SafeMode:
 				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_2"),"pointers.SafeMode")
 				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_3"),"pointers.SafeMode")
 				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_4"),"pointers.SafeMode")
-				if not zf in offendingFiles:
-					offendingFiles[zf] = PoolStringArray([file_path])
-				else:
+				if zf in offendingFiles:
 					offendingFiles[zf].append(file_path)
+				else:
+					offendingFiles[zf] = PoolStringArray([file_path])
 				base.offendingFileCount += 1
 				if crash:
 					base.safeCheckTriggered = true
 			elif not base.safeCheckTriggered and file_path.get_extension() == "gd" and not pointers.DriverManagement.__is_driver_file(file_path) and file_path.split("/",false)[1] != pointers.resource_path.split("/",false)[1]:
 				var file:File = File.new()
 				file.open(file_path,File.READ)
-				if non_static["regex"].search(file.get_as_text(true)):
+				var st:String = file.get_as_text(true)
+				file.close()
+				if non_static["regex"].search(st):
 					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_AI_LIKELY") % [file_path,zf],"pointers.SafeMode")
 					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_2"),"pointers.SafeMode")
 					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_3"),"pointers.SafeMode")
 					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_4"),"pointers.SafeMode")
 					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_5"),"pointers.SafeMode")
-					if not zf in offendingFiles:
-						offendingFiles[zf] = PoolStringArray([file_path])
-					else:
+					if zf in offendingFiles:
 						offendingFiles[zf].append(file_path)
+					else:
+						offendingFiles[zf] = PoolStringArray([file_path])
 					base.offendingFileCount += 1
 					if crash:
 						base.safeCheckTriggered = true
-				file.close()
 			base.sc_mutex.unlock()
 	
 	static func __handle_exit_for_file_checks():
 		var pointers:HevLibPointers = non_static["pointers"]
-		var base = non_static["self"]
+		var base:_SafeMode = non_static["self"]
 		pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TOTALLING") % [base.offendingFileCount,offendingFiles.size()],"pointers.SafeMode")
 		for zip_path in offendingFiles:
 			var zip_files:PoolStringArray = offendingFiles[zip_path]
@@ -8227,7 +8219,7 @@ class _SafeMode:
 				pointers.NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_SAFEMODE_SM_TRIPPED_POPUP_MSG") % [offendingFiles.size(),base.offendingFileCount],"pointers.SafeMode",0.0,"",true)
 	
 	static func flatten_tree(tree:Dictionary) -> Dictionary:
-		var out = {}
+		var out:Dictionary = {}
 		for i in tree.keys():
 			out[i] = get_all_branches(tree[i],PoolStringArray())
 		return out
@@ -8324,7 +8316,7 @@ class _Scripting:
 		out += "\nZip reference store: %s" % JSON.print(p.ManifestV2.zip_ref_store)
 		p.l("Device Information: [\n%s\n]" % out)
 	
-	const mdir_str = "user://cache/.HevLib_Cache/Minerals/%s-%d%d%d/"
+	const mdir_str = "user://cache/Minerals/%s-%d%d%d/"
 	const content_str = "\n\tif not \"%s\" in objectClass[- 1]:\n\t\tobjectClass[- 1][\"%s\"] = %s"
 	const trace_str = "\n\tif not \"%s\" in traceMinerals:\n\t\ttraceMinerals.append(\"%s\")"
 	const prices_str = "\n\tif not \"%s\" in mineralPrices:\n\t\tmineralPrices[\"%s\"] = %f"
@@ -8346,8 +8338,7 @@ ferrous = %s
 	
 	static func make_mineral_scripting() -> void:
 		var pointers:HevLibPointers = non_static["pointers"]
-		var mineralDir:String = "user://cache/.HevLib_Cache/Minerals/"
-		pointers.FolderAccess.__check_folder_exists(mineralDir)
+		var mineralDir:String = "user://cache/Minerals/"
 		for f in pointers.FolderAccess.__fetch_folder_files(mineralDir,true,true):
 			pointers.FolderAccess.__recursive_delete(f)
 		var mineral_data:Array = []
@@ -9132,7 +9123,7 @@ class _Translations:
 					for check in data.keys():
 						ml_check_data[lang][check] += data[check]
 		var file:File = File.new()
-		file.open("user://cache/.HevLib_Cache/translation_check_data.json",File.WRITE)
+		file.open("user://cache/translation_check_data.json",File.WRITE)
 		file.store_string(JSON.print(ml_check_data,"\t"))
 		file.close()
 		var add_v_tl:Array = []
@@ -9246,7 +9237,7 @@ class _WebTranslate:
 		var dataSplit = str(URL).split("github.com/")[1].split("/")
 		var user = dataSplit[0]
 		var repo = dataSplit[1]
-		var folderToDelete = "user://cache/.HevLib_Cache/WebTranslate/" + user + "~_~" + repo
+		var folderToDelete = "user://cache/WebTranslate/" + user + "~_~" + repo
 		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.l("deleting cache folder @ %s" % folderToDelete,"pointers.WebTranslate")
 		return pointers.FolderAccess.__recursive_delete(folderToDelete)
@@ -9255,7 +9246,7 @@ class _WebTranslate:
 		var did = false
 		var folder_to_delete = ""
 		var pointers:HevLibPointers._FolderAccess = non_static["pointers"].FolderAccess
-		for file in pointers.__fetch_folder_files("user://cache/.HevLib_Cache/WebTranslate/", true, true):
+		for file in pointers.__fetch_folder_files("user://cache/WebTranslate/", true, true):
 			if not file.ends_with("/"):
 				continue
 			var cFiles = pointers.__fetch_folder_files(file, false, true)
@@ -9339,14 +9330,12 @@ class _Zip:
 	static func __write_pck(file_path:String,files:Dictionary) -> int:
 		var packer:PCKPacker = PCKPacker.new()
 		var file:File = File.new()
-		var pointers:HevLibPointers = non_static["pointers"]
-		pointers.FolderAccess.__check_folder_exists("user://cache/.HevLib_Cache/Variable_Fetch")
 		packer.pck_start(file_path)
 		for file_name in files.keys():
 			if file_name.begins_with("res://"):
-				var pkfilename:String = "user://cache/.HevLib_Cache/Variable_Fetch/writepck_%d" % Time.get_ticks_usec()
+				var pkfilename:String = "user://cache/Variable_Fetch/writepck_%d" % Time.get_ticks_usec()
 				file.open(pkfilename,File.WRITE)
-				file.store_buffer(pointers.FileAccess.__file_output_to_buffer(files[file_name]))
+				file.store_buffer(non_static["pointers"].FileAccess.__file_output_to_buffer(files[file_name]))
 				file.close()
 				packer.add_file(file_name,pkfilename)
 		return packer.flush()

@@ -53,37 +53,34 @@ func _ready():
 	for i in Achivements.get_children():
 		if i.has_method("updateLeaderboard"):
 			steamNode = i
-	var btf = "user://cache/.HevLib_Cache/Variable_Fetch/jobs.txt"
-	if file.file_exists(btf):
-		file.open(btf,File.READ)
-		var data:Dictionary = JSON.parse(file.get_as_text()).result
+			break
+	var data:Dictionary = pointers.ConfigDriver.non_static[""]["eq_data"]
+	var jbc:String = "user://cache/updates/jc.dat"
+	if not file.file_exists(jbc):
+		file.open(jbc,File.WRITE)
+		file.store_string("{}")
 		file.close()
-		var jbc:String = "user://cache/.Mod_Menu_2_Cache/updates/jobcache"
-		if not file.file_exists(jbc):
-			file.open(jbc,File.WRITE)
-			file.store_string("{}")
-			file.close()
-		file.open(jbc,File.READ)
-		var h=JSON.parse(file.get_as_text()).result
-		file.close()
-		if Engine.has_singleton("Steam"):
-			var do:bool = true
-			var rt:String = str(hash(Engine.get_singleton("Steam").current_steam_id))
-			if rt in data.keys():
-				if rt in h:
-					if 0 in h[rt]:do=false
-				if steamNode&&do:
-					yield(pointers,"process_tick")
-					for i in 5:
-						yield(get_tree().create_timer(0.2),"timeout")
-						steamNode.keepBest = false
-						steamNode.updateLeaderboard("total_money",0)
-						steamNode.keepBest = true
-					if!rt in h:h[rt] = []
-					h[rt].append(0)
-					file.open(jbc,File.WRITE)
-					file.store_string(JSON.print(h))
-					file.close()
+	file.open(jbc,File.READ)
+	var h=JSON.parse(file.get_as_text()).result
+	file.close()
+	if Engine.has_singleton("Steam"):
+		var do:bool = true
+		var rt:String = str(hash(Engine.get_singleton("Steam").current_steam_id))
+		if rt in data.keys():
+			if rt in h:
+				if 0 in h[rt]:do=false
+			if steamNode&&do:
+				yield(pointers,"process_tick")
+				for i in 5:
+					yield(get_tree().create_timer(0.2),"timeout")
+					steamNode.keepBest = false
+					steamNode.updateLeaderboard("total_money",0)
+					steamNode.keepBest = true
+				if!rt in h:h[rt] = []
+				h[rt].append(0)
+				file.open(jbc,File.WRITE)
+				file.store_string(JSON.print(h))
+				file.close()
 
 func sort_slot(slot):
 	pointers.l("Sorting equipment for slot %s" % slot.name)

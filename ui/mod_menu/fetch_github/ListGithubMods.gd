@@ -49,7 +49,7 @@ const topic_url_base = "https://api.github.com/search/repositories?q=topic:delta
 const topic_url_database = "https://raw.githubusercontent.com/rwqfsfasxc100/dv_update_database/refs/heads/main/github_fetcher_store/compiled_topic_store.json"
 const page_size = 100
 var current_page = 1
-var icon_folder_path = "user://cache/.Mod_Menu_2_Cache/github_list/icon_cache/"
+const icon_folder_path = "user://cache/github_list/icon_cache/"
 
 onready var count = $Header/Count
 onready var list = $Mods/ScrollContainer/ListMods
@@ -66,7 +66,7 @@ signal icon_downloaded(uuid)
 var pointers :HevLibPointers= ModLoader._savedObjects[0]
 var mod_ids:Array = pointers.ManifestV2.__get_mod_ids()
 
-var mod_list_cache = "user://cache/.Mod_Menu_2_Cache/github_list/list_cache.json"
+const mod_list_cache = "user://cache/github_list/list_cache.json"
 func _ready():
 	if prevent_load:
 		return
@@ -90,9 +90,6 @@ func _ready():
 		fill_in_mods(dt)
 	else:
 		http.request(topic_url_database)
-#		http.request(topic_url_base % [page_size,current_page])
-	
-	
 
 var mod_count = 0
 

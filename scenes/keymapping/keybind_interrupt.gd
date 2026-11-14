@@ -47,15 +47,14 @@ var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 var compiler:Reference = load("res://HevLib/scenes/keymapping/compile_keymap.gd").new(pointers)
 
-var keybind_folder = "user://cache/.HevLib_Cache/Keybinds/"
-var vanilla_binds_file = "user://cfg/Vanilla_Binds.cfg"
+const keybind_folder = "user://cache/Keybinds/"
+const vanilla_binds_file = "user://cfg/Vanilla_Binds.cfg"
 
 var file = File.new()
 
 var input_handle = null
 
 func _ready():
-	pointers.FolderAccess.__check_folder_exists(keybind_folder)
 	self.pause_mode = Node.PAUSE_MODE_PROCESS
 	self.process_priority = -INF
 	INPUT_DRIVER_ACTIVE = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_KEYMAPPING","input_virtualization",true)
@@ -86,10 +85,10 @@ func compile():
 	
 	var active_script = compiler.compile_keymap()
 	input_handle = null
-#	file.open("user://cache/.HevLib_Cache/Keybinds/test_input.gd",File.WRITE)
+#	file.open("user://cache/Keybinds/test_input.gd",File.WRITE)
 #	file.store_string(active_script)
 #	file.close()
-#	var gd = load("user://cache/.HevLib_Cache/Keybinds/test_input.gd").new()
+#	var gd = load("user://cache/Keybinds/test_input.gd").new()
 	var gd = pointers.DataFormat.__compile_script_object(active_script)
 	input_handle = gd
 

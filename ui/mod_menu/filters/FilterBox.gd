@@ -32,18 +32,17 @@
 
 extends HBoxContainer
 
-var cache_folder = "user://cache/.Mod_Menu_2_Cache/"
-var filter_cache_file = "menu_filter_cache.json"
-var file = File.new()
+const cache_folder = "user://cache/menu_filter_cache.json"
+var file:File = File.new()
 
 
 func _toggled(button_pressed):
 	var toggle = self.name
-	file.open(cache_folder + filter_cache_file,File.READ)
-	var data = JSON.parse(file.get_as_text(true)).result
+	file.open(cache_folder,File.READ)
+	var data:Array = JSON.parse(file.get_as_text(true)).result
 	file.close()
 	if button_pressed:
-		var replace = []
+		var replace:Array = []
 		for item in data:
 			if item != toggle:
 				replace.append(item)
@@ -51,6 +50,6 @@ func _toggled(button_pressed):
 	else:
 		if not toggle in data:
 			data.append(toggle)
-	file.open(cache_folder + filter_cache_file,File.WRITE)
+	file.open(cache_folder,File.WRITE)
 	file.store_string(JSON.print(data))
 	file.close()

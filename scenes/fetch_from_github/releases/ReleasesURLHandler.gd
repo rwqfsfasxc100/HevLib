@@ -104,14 +104,12 @@ func checkIfAcceptable(n):
 
 
 func downloadZip(url, folder):
+	var dir = Directory.new()
 	if not folder.ends_with("/"):
-		folder = folder + "/"
-	var check = pointers.FolderAccess.__check_folder_exists(folder)
-	if not check:
-		return
+		folder += "/"
+	var check = dir.make_dir_recursive(folder)
 	var zipName = url.split("/")[url.split("/").size() - 1]
 	
-	var dir = Directory.new()
 	dir.open(folder)
 	var does = dir.file_exists(zipName)
 	
