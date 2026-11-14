@@ -157,7 +157,7 @@ func _ready():
 		"credits_splitter":get_node(credits_splitter),
 		"languages_splitter":get_node(languages_splitter),
 	}
-	var data = pointers.ManifestV2.__get_mod_data()
+	var data:Dictionary = pointers.ManifestV2.__get_mod_data().duplicate(true)
 	var groups = {}
 	var mod_data = {}
 	var vdata = load("res://HevLib/ui/mod_menu/vanilla/data_dict.gd").get_script_constant_map()
@@ -383,10 +383,9 @@ func _open_conflicts():
 	var cfmods = ""
 	for mod in conflicts:
 		if mod.begins_with("res://"):
-			var data = pointers.ManifestV2.__get_mod_data()[mod]
-			cfmods += "\n ->" + data.get("name",mod.split("/",false)[1]) + " (" + mod + ")"
+			cfmods += "\n ->" + pointers.ManifestV2.__get_mod_data()[mod].get("name",mod.split("/",false)[1]) + " (" + mod + ")"
 		else:
-			var data = pointers.ManifestV2.__get_mod_by_id(mod)
+			var data:Dictionary = pointers.ManifestV2.__get_mod_by_id(mod)
 			cfmods += "\n ->" + data.get("name",mod.split("/",false)[1]) + " (" + data.get("manifest",{}).get("manifest_data",{}).get("mod_information",{}).get("id",mod) + ")"
 	conflict_menu.dialog_text = TranslationServer.translate("HEVLIB_CONFLICT_INFO_BODY") % cfmods
 	conflict_menu.popup()
@@ -400,8 +399,7 @@ func _open_dependancies():
 	var cfmods = ""
 	for mod in conflicts:
 		if mod.begins_with("res://"):
-			var data = pointers.ManifestV2.__get_mod_data()[mod]
-			cfmods += "\n ->" + data.get("name",mod.split("/",false)[1]) + " (" + mod + ")"
+			cfmods += "\n ->" + pointers.ManifestV2.__get_mod_data()[mod].get("name",mod.split("/",false)[1]) + " (" + mod + ")"
 		else:
 			var data = pointers.ManifestV2.__get_mod_by_id(mod)
 			cfmods += "\n -> " + data.get("name",mod.split("/",false)[1]) + " (" + data.get("manifest",{}).get("manifest_data",{}).get("mod_information",{}).get("id",mod) + ")"

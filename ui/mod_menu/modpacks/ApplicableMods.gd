@@ -44,18 +44,17 @@ var exported_mods = []
 var pointers:HevLibPointers = ModLoader._savedObjects[0]
 var modPathPrefix = ""
 func _ready():
-	var mods = pointers.ManifestV2.__get_mod_data()
+	var mods:Dictionary = pointers.ManifestV2.__get_mod_data()
 	for m in pointers.ManifestV2.__get_mod_list_keys():
-		var mod = mods[m]
+		var mod:Dictionary = mods[m]
 		if mod["manifest"]["has_manifest"]:
-			var manifest = mod["manifest"]["manifest_data"]
-			if "HEVLIB_GITHUB" in manifest.get("links",{}):
-				var github = manifest["links"]["HEVLIB_GITHUB"].get("URL","")
+			var manifest:Dictionary = mod["manifest"]["manifest_data"]
+			if "HEVLIB_GITHUB" in manifest["links"].keys():
+				var github:String = manifest["links"]["HEVLIB_GITHUB"].get("URL","")
 				if github:
-					var info = manifest["mod_information"]
-					var id = info["id"]
-					var mname = info["name"]
-					applicable_mods[id] = {"name":mname,"github_url":github}
+					var info:Dictionary = manifest["mod_information"]
+					var id:String = info["id"]
+					applicable_mods[id] = {"name":info["name"],"github_url":github}
 					exported_mods.append(id)
 	for mod in applicable_mods:
 		var m = applicable_mods[mod]

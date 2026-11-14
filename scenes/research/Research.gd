@@ -83,9 +83,7 @@ func _ready():
 	current_project_management.current_mod_ids = mod_ids
 	dormant_project_management.current_mod_ids = mod_ids
 	var research_store = pointers.Equipment.research_store
-	var researchDisabled = research_store.empty() or not pointers.is_editor # REMOVE WHEN FINISHED
-	CurrentGame.hl_research_enabled = researchDisabled
-	if researchDisabled:
+	if not CurrentGame.hl_research_enabled:
 		research_button.get_parent().remove_child(research_button)
 		Tool.remove(research_button)
 	else:
@@ -114,11 +112,9 @@ func _on_Research_pressed():
 func get_research_data(research_store):
 	for mod in research_store:
 		var mod_store = research_store[mod]
-		for uid in mod_store:
-			var research_entry = mod_store[uid].duplicate(true)
-			var id = mod + "|" + uid
-			if not "source" in research_entry:
-				research_entry["source"] = mod
+		for id in mod_store:
+			var research_entry = mod_store[id].duplicate(true)
+			var uid = research_entry["uid"]
 			if not "state" in CurrentGame.state.hevlib_research:
 				var state = {
 					"active":false,
@@ -126,6 +122,6 @@ func get_research_data(research_store):
 					"completed":false,
 				}
 				research_entry["state"] = state
-			CurrentGame.state.hevlib_research[id] = research_entry
+			CurrentGame.state.hevlib_research[uid] = research_entry
 	current_project_management._initialize()
 	dormant_project_management._initialize()

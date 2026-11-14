@@ -1051,7 +1051,7 @@ class _ConfigDriver:
 			c.save(cfg_file)
 		
 		# Gets all mod data
-		var mod_entries : Dictionary = pointers.ManifestV2.__get_mod_data()
+		var mod_entries : Dictionary = pointers.ManifestV2.__get_mod_data().duplicate(true)
 		l("[%s] mod entries found" % mod_entries.size())
 		# Fetches disabled modlets
 		# This is not used here, but lets me log
@@ -2652,6 +2652,8 @@ class _Equipment:
 		"ReconDrone": "drone.scanner"
 	}
 	const exhaust_cache_path : String = "user://cache/AuxAndThrusterDriver/"
+	const shipBuildModifyOpts = PoolStringArray(["if_equipment_in_slot","if_tag_in_slot","random","if_equipment","if_tag","check_numerics","config"])
+	
 	func __make_upgrades_scene():
 		version = pointers.DataFormat.__get_vanilla_version()
 		pointers.l("observed game version of %d.%d.%d" % Array(version),"pointers.Equipment")
@@ -2677,8 +2679,7 @@ class _Equipment:
 			if mod_id:
 				var mod:Dictionary = mods[md]
 				if mod.get("drivers",null):
-					drivers[mod_id] = mod.drivers
-		mods.clear()
+					drivers[mod_id] = mod.drivers.duplicate(true)
 		
 		for i in ProjectSettings.get_property_list():
 			if i.name.begins_with("autoload/"):
@@ -2962,8 +2963,7 @@ class _Equipment:
 						for item in constKeys:
 							node_definitions_cache[item] = constants[item]
 					"SHIP_NODE_REGISTER.gd":
-						for item in constKeys:
-							ship_node_register.append(constants[item])
+						ship_node_register.append_array(constants.values())
 					"SHIP_NODE_MODIFY.gd":
 						for item in constKeys:
 							var ship : String = constants[item].get("ship_name","")
@@ -3100,34 +3100,25 @@ class _Equipment:
 							if ship in weaponslot_ship_standalone:
 								for slot in shipdata:
 									if slot in weaponslot_ship_standalone[ship]:
-										var compile : Dictionary = {}
 										var current_dict : Dictionary = {}
+										var cmpk:PoolStringArray = PoolStringArray()
 										for type in weaponslot_ship_standalone[ship][slot]:
-											if not type in compile:
-												compile[type] = []
-											if not type in current_dict:
-												current_dict[type] = {}
+											current_dict[type] = []
+											cmpk.append(type)
 											for equip in weaponslot_ship_standalone[ship][slot][type]:
-												var property = equip.get("property")
-												var value = equip.get("value")
-												current_dict[type][property] = value
+												current_dict[type].append({"property":equip["property"],"value":equip["value"]})
 										for type in shipdata[slot]:
-											if not type in compile:
-												compile[type] = []
-											if not type in current_dict:
-												current_dict[type] = {}
+											if not type in cmpk:
+												current_dict[type] = []
+												cmpk.append(type)
 											for equip in shipdata[slot][type]:
-												var property = equip.get("property")
-												var value = equip.get("value")
 												if equip.get("use_stringified_value",false):
-													value = pointers.DataFormat.__convert_var_from_string(value)
-												current_dict[type][property] = value
-										for item in current_dict:
-											for equip in current_dict[item]:
-												compile[item].append({"property":equip,"value":current_dict[item].get(equip)})
-										weaponslot_ship_standalone[ship][slot] = compile
+													current_dict[type].append({"property":equip["property"],"value":pointers.DataFormat.__convert_var_from_string(equip["value"])})
+												else:
+													current_dict[type].append({"property":equip["property"],"value":equip["value"]})
+										weaponslot_ship_standalone[ship][slot] = current_dict
 									else:
-										weaponslot_ship_standalone[ship][slot] = shipdata.get(slot)
+										weaponslot_ship_standalone[ship][slot] = shipdata[slot]
 							else:
 								weaponslot_ship_standalone[ship] = shipdata
 					"SAVE_BUTTONS.gd":
@@ -3148,43 +3139,37 @@ class _Equipment:
 								if shipNames is String:
 									shipNames = PoolStringArray([shipNames])
 								elif shipNames is Array:
-									var ovr = PoolStringArray()
-									for i in shipNames:
-										if i is String:
-											ovr.append(i)
-									shipNames = ovr
-								elif shipNames is PoolStringArray:
-									pass
-								else: continue
+									shipNames = PoolStringArray(shipNames)
+								elif not shipNames is PoolStringArray:
+									continue
 								var recurse:bool = dict.get("recurse_for_alias",false)
-								for entry in dict:
-									match entry:
-										"if_equipment_in_slot","if_tag_in_slot","random","if_equipment","if_tag","check_numerics","config":
-											for i in dict[entry]:
-												if "do_add_if" in i:
-													for st in i["do_add_if"]:
-														if not st:
-															i["do_add_if"].erase(st)
-														for r in st:
-															if not r:
-																st.erase(r)
-												if "dont_add_if" in i:
-													for st in i["dont_add_if"]:
-														if not st:
-															i["dont_add_if"].erase(st)
-														for r in st:
-															if not r:
-																st.erase(r)
-												if i.get("slot",null) and i.get("system",null):
-													var prio = i.get("priority",0)
-													if not prio in sorting:
-														sorting[prio] = []
-													i["mode"] = entry
-													i["recurse_for_alias"] = recurse
-													for shipName in shipNames:
-														i["ship_name"] = shipName
-														for _r in i.get("weight",1):
-															sorting[prio].append(i.duplicate(true))
+								for entry in dict.keys():
+									if entry in shipBuildModifyOpts:
+										for i in dict[entry]:
+											if "do_add_if" in i:
+												for st in i["do_add_if"]:
+													if not st:
+														i["do_add_if"].erase(st)
+													for r in st:
+														if not r:
+															st.erase(r)
+											if "dont_add_if" in i:
+												for st in i["dont_add_if"]:
+													if not st:
+														i["dont_add_if"].erase(st)
+													for r in st:
+														if not r:
+															st.erase(r)
+											if i.get("slot",null) and i.get("system",null):
+												var prio = i.get("priority",0)
+												if not prio in sorting:
+													sorting[prio] = []
+												i["mode"] = entry
+												i["recurse_for_alias"] = recurse
+												for shipName in shipNames:
+													i["ship_name"] = shipName
+													for _r in i.get("weight",1):
+														sorting[prio].append(i.duplicate(true))
 							var sKeys:Array = sorting.keys()
 							sKeys.sort()
 							for o in sKeys:
@@ -3206,30 +3191,30 @@ class _Equipment:
 							var di : Dictionary = constants[item]
 							var ship : String = di.get("ship_name","")
 							if ship:
-								if not ship in modify_ship_numerics:
-									modify_ship_numerics[ship] = []
-								modify_ship_numerics[ship].append(di)
+								if ship in modify_ship_numerics:
+									modify_ship_numerics[ship].append(di)
+								else:
+									modify_ship_numerics[ship] = [di]
 					"NAMER.gd":
 						if "CREW" in constKeys:
-							var d : Array = constants["CREW"]
-							namer_store["crew"].append_array(d)
+							namer_store["crew"].append_array(constants["CREW"])
 						if "SHIPS" in constKeys:
-							var d : Array = constants["SHIPS"]
-							namer_store["ships"].append_array(d)
+							namer_store["ships"].append_array(constants["SHIPS"])
 						if "REMOVE_CREW" in constKeys:
-							var d : Array = constants["REMOVE_CREW"]
-							namer_store["remove_crew"].append_array(d)
+							namer_store["remove_crew"].append_array(constants["REMOVE_CREW"])
 						if "REMOVE_SHIPS" in constKeys:
-							var d : Array = constants["REMOVE_SHIPS"]
-							namer_store["remove_ships"].append_array(d)
+							namer_store["remove_ships"].append_array(constants["REMOVE_SHIPS"])
 					"EVENT_DRIVER.gd":
-						for entry in constKeys:
-							event_driver_event_entries.append(constants[entry])
+						event_driver_event_entries.append_array(constants.values())
 					"RESEARCH.gd":
+						var rd:Dictionary = {}
 						for entry in constKeys:
-							if not mod_id in research_store:
-								research_store[mod_id] = {}
-							research_store[mod_id][entry] = constants[entry]
+							var data:Dictionary = constants[entry]
+							data["source"] = mod_id
+							data["uid"] = mod_id + "|" + entry
+							rd[entry] = data
+						if rd:
+							research_store[mod_id] = rd
 					"RPC_EXTRA_STATES.gd":
 						var data:Dictionary = constants.get("RPC_EXTRA_STATES",{})
 						for type in data.keys():
@@ -3260,35 +3245,32 @@ class _Equipment:
 											else: continue
 									if "function_outputs" in item:
 										for i in item.function_outputs.size():
-											var sensorItem = item.function_outputs[i]
-											if sensorItem is Dictionary:
-												if "func_object_path" in sensorItem and "func_method_name" in sensorItem:
-													var object_name:String = sensorItem.func_object_path
-													if object_name.begins_with("res://") and object_name.get_extension() in acceptible_script_extensions:
-														if object_name in rpc_non_autoload_object_persist:
-															sensorItem["funcref"] = funcref(
-																rpc_non_autoload_object_persist[object_name],
-																sensorItem.func_method_name
-															)
-														elif pointers.DataFormat.__load_if_can(object_name,"Script"):
-															var refobject = pointers.DataFormat.__get_load().new()
-															sensorItem["funcref"] = funcref(
-																refobject,
-																sensorItem.func_method_name
-															)
-															rpc_non_autoload_object_persist[object_name] = refobject
-														else: continue
+											var sensorItem:Dictionary = item.function_outputs[i]
+											if "func_object_path" in sensorItem and "func_method_name" in sensorItem:
+												var object_name:String = sensorItem.func_object_path
+												if object_name.begins_with("res://") and object_name.get_extension() in acceptible_script_extensions:
+													if object_name in rpc_non_autoload_object_persist:
+														sensorItem["funcref"] = funcref(
+															rpc_non_autoload_object_persist[object_name],
+															sensorItem.func_method_name
+														)
+													elif pointers.DataFormat.__load_if_can(object_name,"Script"):
+														var refobject = pointers.DataFormat.__get_load().new()
+														sensorItem["funcref"] = funcref(
+															refobject,
+															sensorItem.func_method_name
+														)
+														rpc_non_autoload_object_persist[object_name] = refobject
+													else: continue
+												else:
+													if not object_name in needs_autoload_funcref.keys():
+														needs_autoload_funcref[object_name] = [sensorItem]
 													else:
-														if not object_name in needs_autoload_funcref.keys():
-															needs_autoload_funcref[object_name] = [sensorItem]
-														else:
-															needs_autoload_funcref[object_name].append(sensorItem)
-											else: continue
+														needs_autoload_funcref[object_name].append(sensorItem)
 									states.append(item)
 								rpc_second_state_store[type].append_array(states)
 					"SERVICES.gd":
-						for i in constants["SERVICES"]:
-							services_store.append(i)
+						services_store.append_array(constants.get("SERVICES",[]))
 		
 		var slots_for_adding_dict : Dictionary = {}
 		var tag_modifications : Array = []
@@ -5547,7 +5529,7 @@ class _ManifestV2:
 				file.close()
 				if base.currentModStateHash != base.lastModStateHash:
 					base.hasModStateChanged = true
-		return cached_mod_list.duplicate(true)
+		return cached_mod_list
 	
 	static func compile_mod_data_from_path(script_path:String,manifests_and_icons:PoolStringArray,modlet_files:PoolStringArray) -> Dictionary:
 		var pointers:HevLibPointers = non_static["pointers"]
@@ -6509,7 +6491,7 @@ class _ManifestV2:
 					path = i
 					pathSplit = i.split("/",false)
 		if path:
-			return __get_mod_data()[get_mod_path_from_lowercase_path[path]]
+			return __get_mod_data()[get_mod_path_from_lowercase_path[path]].duplicate(true)
 		return {}
 	
 	const tag_data_cache = {}
@@ -6527,7 +6509,7 @@ class _ManifestV2:
 							if not tag in tag_data_cache:
 								tag_data_cache[tag] = {}
 							if tags[tag] is Dictionary:
-								var td : Dictionary = tags[tag]
+								var td : Dictionary = tags[tag].duplicate(true)
 								if "value" in td and "type" in td and td.type is String:
 									tag_data_cache[tag][id] = td["value"]
 		return tag_data_cache.duplicate(true)
@@ -6616,8 +6598,7 @@ class _ManifestV2:
 			for mod in __get_mod_list_keys():
 				var data : Dictionary = mod_data[mod]["manifest"]["manifest_data"]
 				if "mod_information" in data.keys():
-					var minfo : String = data["mod_information"]["id"]
-					caches_mod_ids.append(minfo)
+					caches_mod_ids.append(data["mod_information"]["id"])
 		return caches_mod_ids
 	
 	static func __check_complementary():
@@ -6732,7 +6713,7 @@ class _ManifestV2:
 	
 	const mod_changes_cache = {}
 	
-	const last_seen_file:String = "user://cachefrom_last_launch.json"
+	const last_seen_file:String = "user://cache/from_last_launch.json"
 	static func __get_mod_versions() -> Dictionary:
 		var last : Dictionary = {}
 		var file:File = File.new()
@@ -7391,36 +7372,31 @@ class _Math:
 	
 	const radianify = PI/180
 	
-	static func __normalize_radian_angle(angle:float) -> float:
-		while angle >= TAU:
-			angle -= TAU
-		while angle < 0.0:
-			angle += TAU
-		return angle
-	
-	static func __make_semicircle(radius:float,start:float,end:float,step:float,degrees:bool = true,anticlockwise:bool = true) -> PoolVector2Array:
+	static func __make_semicircle(radius:float,start:float,end:float,step:float,degrees:bool = true,anticlockwise:bool = true,include_center:bool = true) -> PoolVector2Array:
 		var out:PoolVector2Array = PoolVector2Array()
 		step = (abs(step) * radianify) if degrees else abs(step)
 		if step <= 0:
 			return out
-		start = __normalize_radian_angle((start * radianify) if degrees else start)
-		end = __normalize_radian_angle((end * radianify) if degrees else end)
+		if include_center:
+			out.append(Vector2.ZERO)
+		start = fposmod((start * radianify) if degrees else start,TAU)
+		end = fposmod((end * radianify) if degrees else end,TAU)
 		if anticlockwise:
 			if end > start:
 				end -= TAU
 			var cd:float = start
 			while cd > end:
-				out.append(__rotate_point(Vector2(0,-1) * radius,cd,false))
+				out.append(__rotate_point(Vector2.UP * radius,cd,false))
 				cd -= step
-			out.append(__rotate_point(Vector2(0,-1) * radius,end + 0.0001,false))
+			out.append(__rotate_point(Vector2.UP * radius,end + 0.0001,false))
 		else:
 			if start > end:
 				start -= TAU
 			var cd:float = start
 			while cd < end:
-				out.append(__rotate_point(Vector2(0,-1) * radius,cd,false))
+				out.append(__rotate_point(Vector2.UP * radius,cd,false))
 				cd += step
-			out.append(__rotate_point(Vector2(0,-1) * radius,end - 0.0001,false))
+			out.append(__rotate_point(Vector2.UP * radius,end - 0.0001,false))
 		return out
 	
 
@@ -7484,7 +7460,7 @@ class _NodeAccess:
 		non_static["self"] = self
 	
 	static func __get_all_children(node:Node, strip_supplied_node_from_array = false, return_only_paths = false, use_relative_paths = false):
-		var children : Array = getAllChildren(node)
+		var children : PoolStringArray = getAllChildren(node)
 		if strip_supplied_node_from_array:
 			children = strip_node(node, children)
 		if return_only_paths:
@@ -7497,7 +7473,7 @@ class _NodeAccess:
 			getAllChildren(child,arr)
 	
 	static func strip_node(in_node, arr):
-		var paths : Array = []
+		var paths : PoolStringArray = PoolStringArray()
 		for m in arr:
 			if m.get_path().split(in_node.get_path())[1]:
 				paths.append(m)
@@ -7505,7 +7481,7 @@ class _NodeAccess:
 	
 	static func returnPaths(arr, relative, in_node):
 		var parentPath : String = in_node.get_path()
-		var paths : Array = []
+		var paths : PoolStringArray = PoolStringArray()
 		for m in arr:
 			paths.append(m.get_path())
 		if relative:

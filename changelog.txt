@@ -100,6 +100,17 @@
 47=* Cleaned up procedural thruster creation
 48=* Unified cache folders
 49=* The PCK and load order cache is now 80% smaller and loads faster.
+50=* `ManifestV2`.`__get_mod_data` now does not automatically perform a deep duplication anymore
+50.1=* Please keep this in mind when manipulating it's data
+51=* Added `Math`.`__make_semicircle`
+51.1=* Produces a PoolVector2Array of points that make up the bounds of a semicircle
+51.2=* `radius` -> (float) the radius from (0,0) where points will be created
+51.3=* `start` -> (float) The starting angle of the semicircle. For reference, 0° is up.
+51.4=* `end` -> (float) The end angle of the semicircle.
+51.5=* `step` -> (float) The distance between points along the semicircle. If the difference between `start` and `end` is not a multiple of this value, the `end` point will always be placed.
+51.6=* `degrees` (optional) -> (bool) Whether the angles should accept angles in degrees rather than radians. Defaults to true.
+51.7=* `anticlockwise` (optional) -> (bool) Whether the circle should be drawn anti-clockwise of the `start` angle. Defaults to true
+51.8=* `include_center` (optional) -> (bool) Whether a point at (0,0) should be added. Defaults to true
 55=* Updated credits
 
 [1.17.8]

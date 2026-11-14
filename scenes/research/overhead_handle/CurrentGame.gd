@@ -34,14 +34,22 @@ extends "res://CurrentGame.gd"
 
 signal hlr_storychanged(story,from,to)
 
-var hl_research_enabled:bool = false setget setResearchEnabled
+onready var hl_research_enabled:bool = false setget setResearchEnabled , getResearchEnabled
 onready var researchSysPointers:HevLibPointers = ModLoader._savedObjects[0]
+
+
+onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
+onready var research_store:Dictionary = pointers.Equipment.research_store
+
+var research_state:Dictionary = {}
+onready var active_mods:PoolStringArray = pointers.ManifestV2.__get_mod_ids()
 
 var hl_researchoverhead_uinit : bool = false
 func _ready():
 	if hl_researchoverhead_uinit:
 		OS.kill(OS.get_process_id())
 	hl_researchoverhead_uinit = true
+	connect("newGame",self,"fetch_research_state")
 
 func setStory(story, to, onlyRise = true):
 	if hl_research_enabled:
@@ -51,6 +59,29 @@ func setStory(story, to, onlyRise = true):
 func setResearchEnabled(how:bool):
 	hl_research_enabled = how
 	researchSysPointers.l("Setting research system to be enabled? [%s]" % how,"Research")
+
+func getResearchEnabled() -> bool:
+	return research_store and pointers.is_editor
+
+func advanceTimeBySeconds(seconds):
+	.advanceTimeBySeconds(seconds)
 	
+
+func fetch_research_state():
+	research_state = state.get_or_add("hevlib_research",{})
+	for mod in research_store:
+		if not mod in active_mods:
+			continue
+		var mod_store:Dictionary = research_store[mod]
+		for entry in mod_store:
+			var research_entry:Dictionary = mod_store[entry]
+			var id:String = research_entry["uid"]
+			
+#			breakpoint
+	
+
+
+
+
 
 
