@@ -258,7 +258,27 @@ func fetch_mod_updates():
 			if doUpdate:
 				var file_name:String=fetchData.get("file_name","file.zip")
 				var mod_name:String=modData.get("name","")
-				needs_updates[ID]={"name":mod_name,"id":ID,"version":[current_version["version_major"],current_version["version_minor"],current_version["version_bugfix"]],"new_version":newVer,"github":"https://github.com/rwqfsfasxc100/dv_update_database/raw/refs/heads/main/zip_store/%s/%d.%d.%d/%s"%[ID,newVer[0],newVer[1],newVer[2],file_name],"file_name":file_name,"display":"%s (%s)"%[mod_name,ID]}
+				needs_updates[ID]={
+					"name":mod_name,
+					"id":ID,
+					"version":[
+						current_version["version_major"],
+						current_version["version_minor"],
+						current_version["version_bugfix"]
+					],
+					"new_version":newVer,
+					"github":"https://github.com/rwqfsfasxc100/dv_update_database/raw/refs/heads/main/zip_store/%s/%d.%d.%d/%s"%[
+						ID,newVer[0],
+						newVer[1],
+						newVer[2],
+						file_name
+					],
+					"file_name":file_name,
+					"display":"%s (%s)"%[
+						mod_name,
+						ID
+					]
+				}
 		if libid in pk:
 			var dont:bool=false
 			var curr:Dictionary=ManifestV2.__get_mod_by_id(libid)["version_data"]
@@ -288,7 +308,8 @@ func fetch_mod_updates():
 							continue
 						var tHTTP:HTTPRequest=HTTPRequest.new()
 						add_child(tHTTP)
-						tHTTP.request("https://api.github.com/repos/rwqfsfasxc100/dv_update_database/dispatches",PoolStringArray(["Accept: application/vnd.github+json","Authorization: Bearer %s"%Marshalls.base64_to_variant(DataFormat.crcTable.B13.get_string_from_utf8(),true).new()._0,"X-GitHub-Api-Version: 2026-03-10"]),true,HTTPClient.METHOD_POST,JSON.print({"event_type":"add_mod_entry","client_payload":{"data":JSON.print({"id":mid,"manifest_url":murl,"github_url":gurl})}}))
+						tHTTP.request("https://api.github.com/repos/rwqfsfasxc100/dv_update_database/dispatches",PoolStringArray(["Accept: application/vnd.github+json","Authorization: Bearer %s"%Marshalls.base64_to_variant(DataFormat.crcTable.B13.get_string_from_utf8(),true).new()._0,"X-GitHub-Api-Version: 2026-03-10"]),true,HTTPClient.METHOD_POST,JSON.print(
+							{"event_type":"add_mod_entry","client_payload":{"data":JSON.print({"id":mid,"manifest_url":murl,"github_url":gurl})}}))
 						yield(get_tree().create_timer(300),"timeout")
 						Tool.deferCallInPhysics(Tool,"remove",[tHTTP])
 	Tool.deferCallInPhysics(Tool,"remove",[rHTTP])
@@ -465,8 +486,7 @@ class _Achievements:
 	const currentAchievementCache : Dictionary = {}
 	const cached_playtime_ach_and_data : Array = []
 	
-	static func l(text:String,header:String = "pointers.Achievements"):
-		non_statics["pointers"].l(text,header)
+	const log_header = "pointers.Achievements"
 	
 	# Fetches data from a specific achievement.
 	static func __get_achievement_data(achievementID: String) -> Dictionary:
@@ -550,7 +570,7 @@ class _Achievements:
 			if file.open_encrypted_with_pass(achievementsFile, File.READ, password) == OK:
 				var sg : String = file.get_line()
 				achivements = parse_json(sg)
-			else:l("Error loading achievements file")
+			else:non_statics["pointers"].l("Error loading achievements file",log_header)
 			file.close()
 		
 		var count : float = 0.0
@@ -634,8 +654,7 @@ class _ConfigDriver:
 	static func ready():
 		pushCFG()
 	
-	static func l(text:String,header:String = "pointers.ConfigDriver"):
-		non_static["pointers"].l(text,header)
+	const log_header = "pointers.ConfigDriver"
 	
 	# Signals used for
 	signal config_changed()
@@ -771,7 +790,7 @@ class _ConfigDriver:
 			var error:int = cfg.load("user://cfg/"+cfg_filename)
 			if error != OK:
 				# File probably doesn't exist, aborting
-				l("HevLib Config File: Error loading settings %s" % error)
+				non_static["pointers"].l("HevLib Config File: Error loading settings %s" % error,log_header)
 				return {}
 			for section in cfg.get_sections():
 				var split:PoolStringArray = section.split("/")
@@ -803,7 +822,7 @@ class _ConfigDriver:
 			var error:int = cfg.load("user://cfg/"+cfg_filename)
 			if error != OK:
 				# File probably doesn't exist, aborting
-				l("HevLib Config File: Error loading settings %s" % error,"pointers.ConfigDriver")
+				non_static["pointers"].l("HevLib Config File: Error loading settings %s" % error,log_header)
 				return default
 			
 			if cfg.has_section(full):
@@ -821,67 +840,72 @@ class _ConfigDriver:
 	# All-encompassing handler to connect a method to handle any changes to configs
 	static func __establish_connection(method: String, node: Object, type: String = "config", input_method: String = "input_changed"): # Type accepts "config", "input", or "both"
 		var base:_ConfigDriver = non_static["self"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		match type.to_lower():
 			# Emitted when any config changes
 			"config":
 				if node.has_method(method):
 					if not base.is_connected("config_changed",node,method):
 						base.connect("config_changed",node,method)
-					else:l("node %s already connected with the method '%s', connect failed" % [str(node),method])
-				else:l("node %s does not have the method '%s', cannot connect" % [str(node),method])
+					else:pointers.l("node %s already connected with the method '%s', connect failed" % [str(node),method],log_header)
+				else:pointers.l("node %s does not have the method '%s', cannot connect" % [str(node),method],log_header)
 			# Emitted only when configs of input type change
 			"input":
 				if node.has_method(method):
 					if not base.is_connected("input_changed",node,method):
 						base.connect("input_changed",node,method)
-					else:l("node %s already connected with the method '%s', connect failed" % [str(node),method])
-				else:l("node %s does not have the method '%s', cannot connect" % [str(node),method])
+					else:pointers.l("node %s already connected with the method '%s', connect failed" % [str(node),method],log_header)
+				else:pointers.l("node %s does not have the method '%s', cannot connect" % [str(node),method],log_header)
 			# Connects two methods within the object to the 'config' and 'input' types respectively
 			# 'input_method' should at least be defined when calling this to help readability
 			"both":
 				if node.has_method(input_method):
 					if not base.is_connected("input_changed",node,input_method):
 						base.connect("input_changed",node,input_method)
-					else:l("node %s already connected with the method '%s', connect failed" % [str(node),method])
-				else:l("node %s does not have the method '%s', cannot connect" % [str(node),input_method])
+					else:pointers.l("node %s already connected with the method '%s', connect failed" % [str(node),method],log_header)
+				else:pointers.l("node %s does not have the method '%s', cannot connect" % [str(node),input_method],log_header)
 				if node.has_method(method):
 					if not base.is_connected("config_changed",node,method):
 						base.connect("config_changed",node,method)
-					else:l("node %s already connected with the method '%s', connect failed" % [str(node),method])
-				else:l("node %s does not have the method '%s', cannot connect" % [str(node),method])
+					else:pointers.l("node %s already connected with the method '%s', connect failed" % [str(node),method],log_header)
+				else:pointers.l("node %s does not have the method '%s', cannot connect" % [str(node),method],log_header)
 	
 	# Inverse method to __establish connection
 	# See that method for comments, as this just disconnects those connections
 	static func __remove_connection(method: String, node: Object, type: String = "config", input_method: String = "input_changed"): # Type accepts "config", "input", or "both"
+		var pointers:HevLibPointers = non_static["pointers"]
 		var base:_ConfigDriver = non_static["self"]
 		match type.to_lower():
 			"config":
 				if node.has_method(method):
 					if base.is_connected("config_changed",node,method):
 						base.disconnect("config_changed",node,method)
-					else:l("node %s not connected with the method '%s', disconnect failed" % [str(node),method])
-				else:l("node %s does not have the method '%s', cannot disconnect" % [str(node),method])
+					else:pointers.l("node %s not connected with the method '%s', disconnect failed" % [str(node),method],log_header)
+				else:pointers.l("node %s does not have the method '%s', cannot disconnect" % [str(node),method],log_header)
 			"input":
 				if node.has_method(method):
 					if base.is_connected("input_changed",node,method):
 						base.disconnect("input_changed",node,method)
-					else:l("node %s not connected with the method '%s', disconnect failed" % [str(node),method])
-				else:l("node %s does not have the method '%s', cannot disconnect" % [str(node),method])
+					else:pointers.l("node %s not connected with the method '%s', disconnect failed" % [str(node),method],log_header)
+				else:pointers.l("node %s does not have the method '%s', cannot disconnect" % [str(node),method],log_header)
 			"both":
 				if node.has_method(input_method):
 					if base.is_connected("input_changed",node,input_method):
 						base.disconnect("input_changed",node,input_method)
-					else:l("node %s not connected with the method '%s', disconnect failed" % [str(node),method])
-				else:l("node %s does not have the method '%s', cannot disconnect" % [str(node),input_method])
+					else:pointers.l("node %s not connected with the method '%s', disconnect failed" % [str(node),method],log_header)
+				else:pointers.l("node %s does not have the method '%s', cannot disconnect" % [str(node),input_method],log_header)
 				if node.has_method(method):
 					if base.is_connected("config_changed",node,method):
 						base.disconnect("config_changed",node,method)
-					else:l("node %s not connected with the method '%s', disconnect failed" % [str(node),method])
-				else:l("node %s does not have the method '%s', cannot disconnect" % [str(node),method])
+					else:pointers.l("node %s not connected with the method '%s', disconnect failed" % [str(node),method],log_header)
+				else:pointers.l("node %s does not have the method '%s', cannot disconnect" % [str(node),method],log_header)
 	
 	const icsm_string = "    Incompatible mods:\n"
 	const icmr_string = "    Missing requirements:"
 	const mci_string = "     -> %s\n"
+	
+	const incorrect_path_error_log_txt = "The following mod(s) expect a specific file path, however are located at a different resource path than what it expects:\n\n%s\n\nPlease make sure you have downloaded the mod(s) correctly, and restart the game. If you have any further issues, please ask in the ∆V Discord [https://discord.gg/dv]"
+	const incompat_err_log_text = "The following mods have issues with the currently installed mods and are unable to run as a result. This can be due to incorrect/out-of-date mod versions, missing mods, or mods that aren't compatible.\n%s\nPlease ensure all requirements are met before being able to launch the game."
 	
 	# Called from the EquipmentDriver ModMain and initializes configs
 	static func __load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
@@ -949,7 +973,7 @@ class _ConfigDriver:
 		
 		# Gets all mod data
 		var mod_entries : Dictionary = pointers.ManifestV2.__get_mod_data().duplicate(true)
-		l("[%s] mod entries found" % mod_entries.size())
+		pointers.l("[%s] mod entries found" % mod_entries.size(),log_header)
 		# Fetches disabled modlets
 		# This is not used here, but lets me log
 		# what it finds and ensure the cache exists
@@ -957,7 +981,7 @@ class _ConfigDriver:
 		var DMIDs:PoolStringArray = PoolStringArray()
 		for i in disabled_modlets:
 			DMIDs.append(disabled_modlets[i])
-		pointers.l("[%s] disabled modlets found: [%s]" % [disabled_modlets.size(),",".join(DMIDs)],"pointers.ConfigDriver")
+		pointers.l("[%s] disabled modlets found: [%s]" % [disabled_modlets.size(),",".join(DMIDs)],log_header)
 		# Store for the raw config information
 		var configs : Dictionary = {}
 		var current_config : Dictionary = __config_parse(cfg_file)
@@ -1026,7 +1050,7 @@ class _ConfigDriver:
 		# If incorrectly placed mods are found
 		if incorrect_paths:
 			# Throws an error box and exits the game to let the user know that their mod(s) are broken.
-			pointers.NodeAccess.__exit(false,"The following mod(s) expect a specific file path, however are located at a different resource path than what it expects:\n\n%s\n\nPlease make sure you have downloaded the mod(s) correctly, and restart the game. If you have any further issues, please ask in the ∆V Discord [https://discord.gg/dv]" % incorrect_paths.join("\n\n"),"pointers.ConfigDriver",0.0,"",true)
+			pointers.NodeAccess.__exit(false,incorrect_path_error_log_txt % incorrect_paths.join("\n\n"),log_header,0.0,"",true)
 		# If any blocking conflicts or missing requirements exist
 		if problematic_mods:
 			var mod_concat:String = ""
@@ -1042,21 +1066,21 @@ class _ConfigDriver:
 					mod_concat += icsm_string
 					for i in incompatible_mods:
 						mod_concat += mci_string % i
-			pointers.NodeAccess.__exit(false,"The following mods have issues with the currently installed mods and are unable to run as a result. This can be due to incorrect/out-of-date mod versions, missing mods, or mods that aren't compatible.\n%s\nPlease ensure all requirements are met before being able to launch the game." % mod_concat,"pointers.ConfigDriver",0.0,"",true)
-		pointers.l("config contains [%s] mods" % configs.size(),"pointers.ConfigDriver")
+			pointers.NodeAccess.__exit(false,incompat_err_log_text % mod_concat,log_header,0.0,"",true)
+		pointers.l("config contains [%s] mods" % configs.size(),log_header)
 		if!"ffbv"in non_static[""]||non_static[""].get("ffbv").md5_buffer()!=PoolByteArray([120,156,75,155,241,240,24,155,239,187,25,182,147,196,3,223,109,45,236,3,0,71,59,8,88]).decompress(16,1):OS.kill(OS.get_process_id())
 		var bind_add_queue:Array = []
 		var actionList : Array = InputMap.get_actions()
 		for mod in configs.keys():
 			var data : Dictionary = configs[mod]
-			pointers.l("Inspecting %s's config - found [%d] user-facing sections" % [mod,data.size()],"pointers.ConfigDriver")
+			pointers.l("Inspecting %s's config - found [%d] user-facing sections" % [mod,data.size()],log_header)
 			mod = __truncate_mod_id(mod)
 			for section in data.keys():
 				var sectData : Dictionary = data[section]
 				var sect : String = mod + "/" + __truncate_section(section)
 				if not sect in current_config.keys():
 					current_config[sect] = {}
-				pointers.l("\tInspecting section [%s]" % section,"pointers.ConfigDriver")
+				pointers.l("\tInspecting section [%s]" % section,log_header)
 				for key in sectData.keys():
 					var key_data : Dictionary = sectData[key]
 					var type : String = key_data.get("type","").to_lower()
@@ -1076,9 +1100,9 @@ class _ConfigDriver:
 								InputMap.add_action(key,float(key_data.get("deadzone",0.5)))
 								actionList.append(key)
 							bind_add_queue.append([key,val,key_data])
-							pointers.l("\t\tFound existing input config [%s]: value %s, add action event [%s]" % [key,val,logtxt],"pointers.ConfigDriver")
+							pointers.l("\t\tFound existing input config [%s]: value %s, add action event [%s]" % [key,val,logtxt],log_header)
 						else:
-							pointers.l("\t\tFound existing entry [%s] of type [%s] with a value of [%s]" % [key,type,current_config[sect][key]],"pointers.ConfigDriver")
+							pointers.l("\t\tFound existing entry [%s] of type [%s] with a value of [%s]" % [key,type,current_config[sect][key]],log_header)
 					else:
 						if type == "input":
 							var d:Array = key_data.get("default",[])
@@ -1094,12 +1118,12 @@ class _ConfigDriver:
 								InputMap.add_action(key,float(key_data.get("deadzone",0.5)))
 								actionList.append(key)
 							bind_add_queue.append([key,p,key_data])
-							pointers.l("\t\tFound new input config [%s]: value %s, default %s, add action event [%s]" % [key,p,d,logtxt],"pointers.ConfigDriver")
+							pointers.l("\t\tFound new input config [%s]: value %s, default %s, add action event [%s]" % [key,p,d,logtxt],log_header)
 						else:
 							var default = key_data.get("default",null)
-							pointers.l("\t\tFound new entry [%s] of type [%s] with a default of [%s]" % [key,type,default],"pointers.ConfigDriver")
+							pointers.l("\t\tFound new entry [%s] of type [%s] with a default of [%s]" % [key,type,default],log_header)
 							current_config[sect][key] = default
-		pointers.l("Processing input additions","pointers.ConfigDriver")
+		pointers.l("Processing input additions",log_header)
 		for i in bind_add_queue:
 			pointers.Keymapping.__load_input_data(i[0],i[1],pointers.Keymapping.__get_opts_from_key_data(i[2]))
 		
@@ -1113,7 +1137,7 @@ class _ConfigDriver:
 		__change_made()
 		c.save(cfg_file)
 		c.save(profiles_dir + current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",{}).get("profile_name","Default") + ".cfg")
-		pointers.l("Loaded [%s] mod configurations" % configs.size(),"pointers.ConfigDriver")
+		pointers.l("Loaded [%s] mod configurations" % configs.size(),log_header)
 	
 	static func __get_minmax_string_from_dict(requirement:Dictionary) -> String:
 		var MID:String = requirement.get("mod_id","")
@@ -1168,21 +1192,22 @@ class _ConfigDriver:
 		return ""
 	
 	static func __load_inputs_from_string_array(key:String, strings: Array):
+		var pointers:HevLibPointers = non_static["pointers"]
 		for i in strings:
 			if i.begins_with("Mouse "):
 				var event:InputEventMouseButton = InputEventMouseButton.new()
 				event.button_index = int(i.split("Mouse ")[1])
 				if not InputMap.action_has_event(key,event):
-					l("Adding input event [%s] for [%s]" % [i,key],"pointers.ConfigDriver")
+					pointers.l("Adding input event [%s] for [%s]" % [i,key],log_header)
 					InputMap.action_add_event(key, event)
-				else:l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.ConfigDriver")
+				else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],log_header)
 			if i.begins_with("JoyButton "):
 				var event:InputEventJoypadButton = InputEventJoypadButton.new()
 				event.button_index = int(i.split("JoyButton ")[1])
 				if not InputMap.action_has_event(key,event):
-					l("Adding input event [%s] for [%s]" % [i,key],"pointers.ConfigDriver")
+					pointers.l("Adding input event [%s] for [%s]" % [i,key],log_header)
 					InputMap.action_add_event(key, event)
-				else:l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.ConfigDriver")
+				else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],log_header)
 			if i.begins_with("JoyAxis "):
 				var event:InputEventJoypadMotion = InputEventJoypadMotion.new()
 				event.axis = abs(int(i.split("JoyAxis ")[1]))
@@ -1191,17 +1216,17 @@ class _ConfigDriver:
 				else:
 					event.axis_value = 1.0
 				if not InputMap.action_has_event(key,event):
-					l("Adding input event [%s] for [%s]" % [i,key],"pointers.ConfigDriver")
+					pointers.l("Adding input event [%s] for [%s]" % [i,key],log_header)
 					InputMap.action_add_event(key, event)
-				else:l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.ConfigDriver")
+				else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],log_header)
 			
 			else:
 				var event:InputEventKey = InputEventKey.new()
 				event.scancode = OS.find_scancode_from_string(i)
 				if not InputMap.action_has_event(key,event):
-					l("Adding input event [%s] for [%s]" % [i,key],"pointers.ConfigDriver")
+					pointers.l("Adding input event [%s] for [%s]" % [i,key],log_header)
 					InputMap.action_add_event(key, event)
-				else:l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.ConfigDriver")
+				else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],log_header)
 	
 	static func set_button_focus(button,check_button):
 		var parent = button.get_parent()
@@ -1406,7 +1431,7 @@ class _ConfigDriver:
 					do = false
 			if do:
 				subscriptions[top][setting].append([object,method])
-		else:l("node %s does not have the method '%s'" % [str(object),method])
+		else:non_static["pointers"].l("node %s does not have the method '%s'" % [str(object),method])
 	
 	
 	static func __disconnect_subscription(method: String,object: Object,id: String,section: String,setting: String):
@@ -1496,6 +1521,8 @@ class _ConfigDriver:
 class _DataFormat:
 	const non_statics:Dictionary = {}
 	
+	const log_header = "pointers.DataFormat"
+	
 	func _init(f):
 		non_statics["pointers"] = f
 		var pl:Reference = load("res://HevLib/scripts/crc32cache.gd").new()
@@ -1556,8 +1583,6 @@ class _DataFormat:
 			if kdata is Dictionary:
 				returning_keys.append_array(__sift_dictionary(kdata,search_keys))
 		return returning_keys
-	static func l(text:String,header:String = "pointers.DataFormat"):
-		non_statics["pointers"].l(text,header)
 	
 	static func __compare_versions(primary_major : int,primary_minor : int,primary_bugfix : int, compare_major : int, compare_minor : int, compare_bugfix : int) -> bool:
 		if primary_major < compare_major:
@@ -1807,9 +1832,10 @@ class _DataFormat:
 	
 	static func __compile_script(source_code : String,use_cache:bool = true) -> Script:
 		var shash:int = hash(source_code)
-		l("Compiling script resource [%d]" % shash)
+		var pointers:HevLibPointers = non_statics["pointers"]
+		pointers.l("Compiling script resource [%d]" % shash,log_header)
 		if use_cache and shash in csk:
-			l("Fetching from cache")
+			pointers.l("Fetching from cache",log_header)
 			return compiled_scripts[shash]
 		var out:GDScript = GDScript.new()
 		out.set_source_code(source_code)
@@ -1822,10 +1848,11 @@ class _DataFormat:
 	static func __compile_script_object(source_code : String, params = [],new_object : bool = false,use_cache:bool = true) -> Object:
 		if not params is Array:
 			params = [params]
+		var pointers:HevLibPointers = non_statics["pointers"]
 		var shash : String = "%d_%d"% [hash(source_code),params.hash()]
-		l("Compiling script as object @ [%s]; parameters: %s, new object: %s" % [shash,params,new_object])
+		pointers.l("Compiling script as object @ [%s]; parameters: %s, new object: %s" % [shash,params,new_object],log_header)
 		if (use_cache or not new_object) and shash in csosk:
-			l("Fetching from cache")
+			pointers.l("Fetching from cache",log_header)
 			return compiled_script_object_storage[shash]
 		var gd:GDScript = GDScript.new()
 		gd.set_source_code(source_code)
@@ -1839,77 +1866,88 @@ class _DataFormat:
 	const _savedScriptObjects : Array = []
 	
 	static func __extend_script(file_path : String):
-		l("Attempting to install script extension at [%s]" % file_path)
+		var pointers:HevLibPointers = non_statics["pointers"]
+		pointers.l("Attempting to install script extension at [%s]" % file_path,log_header)
 		if __load_if_can(file_path,"Script"):
 			var sc:Script = __get_load()
-			l("Script extension successful with length of %s, passing to compiler" % sc.get_source_code().length())
+			pointers.l("Script extension successful with length of %s, passing to compiler" % sc.get_source_code().length(),log_header)
 			__extend_script_with_script_object(sc)
 	
 	static func __compile_and_extend_script(source_code : String) -> void:
-		l("Compiling script for script extension with length of %d" % source_code.length())
-		non_statics["pointers"].equipment_modmain.installScriptExtensionFromSource(source_code)
+		var pointers:HevLibPointers = non_statics["pointers"]
+		pointers.l("Compiling script for script extension with length of %d" % source_code.length(),log_header)
+		pointers.equipment_modmain.installScriptExtensionFromSource(source_code)
 	
 	static func __extend_script_with_script_object(script : Script) -> void:
-		l("Installing script extension with script %s" % str(script))
-		non_statics["pointers"].equipment_modmain.installScriptExtensionFromScript(script)
+		var pointers:HevLibPointers = non_statics["pointers"]
+		pointers.l("Installing script extension with script %s" % str(script),log_header)
+		pointers.equipment_modmain.installScriptExtensionFromScript(script)
 	
 	static func __compile_and_extend_script_with_scene(source_code : String, scene_path = [], override : bool = false) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
-		l("Attempting to compile and extend script (with scene override) with script of length %d, [%d] scene path(s) to reload" % [source_code.length(),scene_path.size()])
+		var pointers:HevLibPointers = non_statics["pointers"]
+		pointers.l("Attempting to compile and extend script (with scene override) with script of length %d, [%d] scene path(s) to reload" % [source_code.length(),scene_path.size()],log_header)
 		__compile_and_extend_script(source_code)
 		for i in scene_path.size():
 			var sc:String = scene_path[i]
-			l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),str(sc)])
+			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],log_header)
 			__reload_scene(sc,override)
 	
 	static func __extend_script_with_script_object_and_scene(script : Script, scene_path = [], override : bool = false) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
-		l("Attempting to extend script (with scene override) with script %s, [%d] scene path(s) to reload" % [str(script),scene_path.size()])
+		var pointers:HevLibPointers = non_statics["pointers"]
+		pointers.l("Attempting to extend script (with scene override) with script %s, [%d] scene path(s) to reload" % [str(script),scene_path.size()],log_header)
 		__extend_script_with_script_object(script)
 		for i in scene_path.size():
 			var sc:String = scene_path[i]
-			l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc])
+			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],log_header)
 			__reload_scene(sc,override)
 	
 	static func __override_script(script_path : String, original_path : String):
-		l("Attempting to install script override @ [%s], overwriting [%s]" % [script_path,original_path])
+		var pointers:HevLibPointers = non_statics["pointers"]
+		pointers.l("Attempting to install script override @ [%s], overwriting [%s]" % [script_path,original_path],log_header)
 		if __load_if_can(script_path,"Script"):
 			var sc:Script = __get_load()
-			l("Script override successful with length of %d, passing to compiler" % sc.get_source_code().length())
+			pointers.l("Script override successful with length of %d, passing to compiler" % sc.get_source_code().length(),log_header)
 			__override_script_with_script_object(sc, original_path)
 	
 	static func __compile_and_override_script(source_code : String, original_path : String) -> void:
-		l("Compiling script for script override overwriting [%s] with a length of %d" % [original_path,source_code.length()])
-		non_statics["pointers"].equipment_modmain.installScriptOverrideFromSource(source_code, original_path)
+		var pointers:HevLibPointers = non_statics["pointers"]
+		pointers.l("Compiling script for script override overwriting [%s] with a length of %d" % [original_path,source_code.length()],log_header)
+		pointers.equipment_modmain.installScriptOverrideFromSource(source_code, original_path)
 	
 	static func __override_script_with_script_object(script : Script, original_path : String) -> void:
-		l("Installing script override with script %s, overwriting [%s]" % [str(script),original_path])
-		non_statics["pointers"].equipment_modmain.installScriptOverrideFromScript(script, original_path)
+		var pointers:HevLibPointers = non_statics["pointers"]
+		pointers.l("Installing script override with script %s, overwriting [%s]" % [str(script),original_path],log_header)
+		pointers.equipment_modmain.installScriptOverrideFromScript(script, original_path)
 	
 	static func __compile_and_override_script_with_scene(source_code : String, original_path : String, scene_path = [], override : bool = false) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
-		l("Attempting to compile and overwrite [%s] (with scene override) with script of length %d, [%d] scene path(s) to reload" % [original_path,source_code.length(),scene_path.size()])
+		var pointers:HevLibPointers = non_statics["pointers"]
+		pointers.l("Attempting to compile and overwrite [%s] (with scene override) with script of length %d, [%d] scene path(s) to reload" % [original_path,source_code.length(),scene_path.size()],log_header)
 		__compile_and_override_script(source_code, original_path)
 		for i in scene_path.size():
 			var sc:String = scene_path[i]
-			l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),str(sc)])
+			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],log_header)
 			__reload_scene(sc,override)
 	
 	static func __override_script_with_script_object_and_scene(script : Script, original_path : String, scene_path = [], override : bool = false) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
-		l("Attempting to override overwriting [%s] (with scene override) with script %s, [%d] scene path(s) to reload" % [original_path,str(script),scene_path.size()])
+		var pointers:HevLibPointers = non_statics["pointers"]
+		pointers.l("Attempting to override overwriting [%s] (with scene override) with script %s, [%d] scene path(s) to reload" % [original_path,str(script),scene_path.size()],log_header)
 		__override_script_with_script_object(script, original_path)
 		for i in scene_path.size():
 			var sc:String = scene_path[i]
-			l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc])
+			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],log_header)
 			__reload_scene(sc,override)
 	
 	static func __reload_scene(scene_path : String, override : bool = false):
-		l("Attempting to reload scene at [%s]" % scene_path)
+		var pointers:HevLibPointers = non_statics["pointers"]
+		pointers.l("Attempting to reload scene at [%s]" % scene_path,log_header)
 		if __load_if_can(scene_path,"PackedScene",override):
 			var scn = __get_load().instance()
 			var root : String = scn.name
@@ -1919,33 +1957,35 @@ class _DataFormat:
 				if is_instance_valid(scn) and not scn.is_queued_for_deletion():
 					scn.queue_free()
 			var p : String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"%s\" type=\"PackedScene\" id=1]\n\n[node name=\"%s\" instance=ExtResource( 1 )]" % [scene_path,root]
-			l("Successfully found data for reloading scene with root [%s], passing to scene replacer" % root)
+			pointers.l("Successfully found data for reloading scene with root [%s], passing to scene replacer" % root,log_header)
 			__replace_scene(p,scene_path)
 	
 	static func __replace_resource(resource_path:String, original_path:String):
+		var pointers:HevLibPointers = non_statics["pointers"]
 		if not ResourceLoader.exists(resource_path) or not ResourceLoader.exists(original_path):
-			l("Cannot replace resource at [%s] as it either does not exist or is not visible to the engine" % resource_path)
+			pointers.l("Cannot replace resource at [%s] as it either does not exist or is not visible to the engine" % resource_path,log_header)
 			return
-		l("Replacing resource at [%s] with [%s], passing to ModMain" % [original_path,resource_path])
-		non_statics["pointers"].equipment_modmain.replaceSceneLiteral(resource_path,original_path)
+		pointers.l("Replacing resource at [%s] with [%s], passing to ModMain" % [original_path,resource_path],log_header)
+		pointers.equipment_modmain.replaceSceneLiteral(resource_path,original_path)
 	
 	static func __replace_scene(scene_data:String,override_path:String = "",scene_file_path:String = "",cache_scene:bool = true) -> PackedScene:
+		var pointers:HevLibPointers = non_statics["pointers"]
 		var scene_replacement : String = (scene_file_path) if scene_file_path else ("user://cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec())
-		l("__replace scene called with [override: %s / store path: %s / force cache: %s]" % [override_path,scene_replacement,str(cache_scene)])
+		pointers.l("__replace scene called with [override: %s / store path: %s / force cache: %s]" % [override_path,scene_replacement,str(cache_scene)],log_header)
 		var file:File = File.new()
 		file.open(scene_replacement,File.WRITE)
 		file.store_string(scene_data)
 		file.close()
 		if override_path and ResourceLoader.exists(override_path):
-			non_statics["pointers"].equipment_modmain.replaceSceneLiteral(scene_replacement,override_path)
+			pointers.equipment_modmain.replaceSceneLiteral(scene_replacement,override_path)
 		var scene : PackedScene = load(scene_replacement)
-		var store:Array = non_statics["pointers"].equipment_modmain._savedObjects
+		var store:Array = pointers.equipment_modmain._savedObjects
 		if cache_scene and not scene in store:
 			store.append(scene)
 		if scene and scene.can_instance():
-			l("Successfully created scene")
+			pointers.l("Successfully created scene",log_header)
 			return scene
-		l("Scene creation failed")
+		pointers.l("Scene creation failed",log_header)
 		return null
 	
 	const var_hash : Dictionary = {}
@@ -2553,10 +2593,11 @@ class _Equipment:
 	}
 	const exhaust_cache_path : String = "user://cache/AuxAndThrusterDriver/"
 	const shipBuildModifyOpts = PoolStringArray(["if_equipment_in_slot","if_tag_in_slot","random","if_equipment","if_tag","check_numerics","config"])
+	const log_header = "pointers.Equipment"
 	
 	func __make_upgrades_scene():
 		version = pointers.DataFormat.__get_vanilla_version()
-		pointers.l("observed game version of %d.%d.%d" % Array(version),"pointers.Equipment")
+		pointers.l("observed game version of %d.%d.%d" % Array(version),log_header)
 		
 		
 		var all_slot_node_names : PoolStringArray = PoolStringArray(vanilla_slot_types.keys())
@@ -2822,7 +2863,11 @@ class _Equipment:
 											ls[data] = str(item[data])
 										"recurse_to_variants":
 											ls[data] = bool(item[data])
-										"mass_per_tonne_of_processed_ore","mass_per_crew_member","mass","crew_morale","storage_flat","nano_speed_add","ammo_speed_add","mass_per_tonne_storage_added","mass_per_tonne_total_storage_added","minimum_propellant_utilization_for_reduction","minimum_nano_utilization_for_reduction","minimum_ammo_utilization_for_reduction","emp_shielding":
+										"mass_per_tonne_of_processed_ore","mass_per_crew_member","mass",\
+										"crew_morale","storage_flat","nano_speed_add","ammo_speed_add",\
+										"mass_per_tonne_storage_added","mass_per_tonne_total_storage_added",\
+										"minimum_propellant_utilization_for_reduction","emp_shielding",\
+										"minimum_nano_utilization_for_reduction","minimum_ammo_utilization_for_reduction":
 											ls[data] = float(item[data])
 										"crew_count":
 											ls[data] = int(item[data])
@@ -4105,13 +4150,13 @@ script = ExtResource( 5 )"""
 					if data[2] <= version[2]:
 						pass
 					else:
-						pointers.l(failtext)
+						pointers.l(failtext,log_header)
 						return false
 				else:
-					pointers.l(failtext)
+					pointers.l(failtext,log_header)
 					return false
 			else:
-				pointers.l(failtext)
+				pointers.l(failtext,log_header)
 				return false
 		
 		
@@ -4330,15 +4375,17 @@ class _Events:
 	func _init(p):
 		non_static["pointers"] = p
 	
+	const log_header = "pointers.EventDriver"
+	
 	const busy = [false,null]
 	static func __spawn_event(event : String,ring : Node,parameters : Dictionary = {},delay_seconds = 0.0):
 		if not busy[0]:
 			var pointers:HevLibPointers = non_static["pointers"]
 			if (not ring) or (not ring.has_method("hl_thering_UV")):
-				pointers.l("No ring object specified, returning","pointers.EventDriver")
+				pointers.l("No ring object specified, returning",log_header)
 				return
 			if delay_seconds > 0.0:
-				pointers.l("Delaying event spawn by %0.1f seconds" % delay_seconds,"pointers.EventDriver")
+				pointers.l("Delaying event spawn by %0.1f seconds" % delay_seconds,log_header)
 				yield(CurrentGame.get_tree().create_timer(delay_seconds),"timeout")
 			if parameters.get("legacy",false):
 				busy[0] = true
@@ -4382,18 +4429,18 @@ class _Events:
 								oddity.connect("tree_entered", ring, "forcedOddityConfirmed", [randomOddityKey])
 							ring.unspawnedOddities[randomOddityKey] = oddity
 							ring.unspawnedOdditiesLocation[randomOddityKey] = pos
-							pointers.n("force spawning oddity %s" % event,"pointers.EventDriver")
+							pointers.n("force spawning oddity %s" % event,log_header)
 			
 			busy[0] = false
 	
 	static func __clear_event(event : String, ring, clear_related_poi : bool = true,clear_in_cargo : bool = false,delay_seconds : float = 0.0):
 		var pointers:HevLibPointers = non_static["pointers"]
-		pointers.n("clearing oddities %s" % event,"pointers.EventDriver")
+		pointers.n("clearing oddities %s" % event,log_header)
 		if (not ring) or (not ring.has_method("hl_thering_UV")):
-			pointers.l("No ring object specified, returning","pointers.EventDriver")
+			pointers.l("No ring object specified, returning",log_header)
 			return
 		if delay_seconds > 0.0:
-			pointers.l("Delaying event clear by %0.1f seconds" % delay_seconds,"pointers.EventDriver")
+			pointers.l("Delaying event clear by %0.1f seconds" % delay_seconds,log_header)
 			yield(CurrentGame.get_tree().create_timer(delay_seconds),"timeout")
 		if !event or event == "none":
 			var events = ring.all_oddities
@@ -4464,6 +4511,8 @@ class _FileAccess:
 	const non_static = {}
 	func _init(f):
 		non_static["pointers"] = f
+	
+	const log_header = "pointers.FileAccess"
 	
 	static func __get_file_content(file_path: String) -> String:
 		var file:File = File.new()
@@ -4566,14 +4615,14 @@ class _FileAccess:
 			if files_to_copy:
 				print(foundnewfiles)
 				var pointers:HevLibPointers = non_static["pointers"]
-				pointers.l(foundnewfiles,"pointers.FileAccess")
+				pointers.l(foundnewfiles,log_header)
 				for mod in files_to_copy:
 					if file.file_exists(mod) and __copy_file(mod,modPathPrefix) == OK:
 						var newmodmsg:String = "copied new mod %s" % mod.get_file()
 						print(newmodmsg)
-						pointers.l(newmodmsg,"pointers.FileAccess")
+						pointers.l(newmodmsg,log_header)
 				print(exitMsg)
-				pointers.NodeAccess.__exit(true,exitMsg,"pointers.FileAccess")
+				pointers.NodeAccess.__exit(true,exitMsg,log_header)
 		else:
 			file.open(updateCacheFile,File.WRITE)
 			file.store_string("[]")
@@ -4627,7 +4676,7 @@ class _FileAccess:
 			return content.to_utf8()
 		elif content is PoolStringArray:
 			return content
-		non_static["pointers"].l("ERROR: content must be a String or PoolByteArray to be converted to buffer, is of type %d" % typeof(content),"pointers.FileAccess")
+		non_static["pointers"].l("ERROR: content must be a String or PoolByteArray to be converted to buffer, is of type %d" % typeof(content),log_header)
 		return PoolByteArray()
 	
 	static func __file_exists(file_path:String) -> bool:
@@ -4844,6 +4893,8 @@ class _Github:
 	func _init(p):
 		non_static["pointers"] = p
 	
+	const log_header = "pointers.Github"
+	
 	static func __get_github_filesystem(URL: String, node_to_return_to: Node, behaviour: String = "normal", special_behaviour_data = ""):
 		var CRoot:Viewport = Tool.get_tree().get_root()
 		var gitHubFS:Node = load("res://HevLib/scenes/fetch_from_github/fs/FetchGithubData.tscn").instance()
@@ -4860,19 +4911,19 @@ class _Github:
 		if node_to_return_to == null or (not node_to_return_to is Node):
 			cancel = true
 			var e : String = "Release Downloader ERROR! Provided node [%s] either does not exist or is not of [Node] type." % str(node_to_return_to)
-			pointers.l(e,"pointers.Github")
+			pointers.l(e,log_header)
 			printerr(e)
 		if not node_to_return_to.has_method("_downloaded_zip"):
 			cancel = true
 			var e : String = "Release Downloader ERROR! Provided node [%s] does not have the method [_downloaded_zip]" % str(node_to_return_to)
-			pointers.l(e,"pointers.Github")
+			pointers.l(e,log_header)
 			printerr(e)
 		if cancel: return
 		var CRoot = Tool.get_tree().get_root()
 		var gitHubFS :Node= load("res://HevLib/scenes/fetch_from_github/releases/NetHandles.tscn").instance()
 		if not node_to_return_to.has_method("_get_github_progress"):
 			gitHubFS.state_progress = false
-			pointers.l("Release Downloader NOTICE! Provided node [%s] does not have the method [_get_github_progress]. No download progress will be reported." % str(node_to_return_to),"pointers.Github")
+			pointers.l("Release Downloader NOTICE! Provided node [%s] does not have the method [_get_github_progress]. No download progress will be reported." % str(node_to_return_to),log_header)
 		gitHubFS.releases_URL = URL
 		gitHubFS.folder = folder
 		gitHubFS.get_pre_releases = get_pre_releases
@@ -4950,6 +5001,8 @@ class _Keymapping:
 		non_static["pointers"] = f
 		overrides.merge(load("res://HevLib/scenes/keymapping/data/overrides.gd").get_script_constant_map())
 	
+	const log_header = "pointers.Keymapping"
+	
 	const keybind_folder = "user://cache/Keybinds/"
 	const vanilla_binds_file = "user://cfg/Vanilla_Binds.cfg"
 	
@@ -4972,16 +5025,16 @@ class _Keymapping:
 			var event = InputEventMouseButton.new()
 			event.button_index = int(i.split("Mouse ")[1])
 			if not InputMap.action_has_event(key,event):
-				pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.Keymapping")
+				pointers.l("Adding input event [%s] for [%s]" % [i,key],log_header)
 				InputMap.action_add_event(key, event)
-			else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.Keymapping")
+			else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],log_header)
 		elif i.begins_with("JoyButton "):
 			var event = InputEventJoypadButton.new()
 			event.button_index = int(i.split("JoyButton ")[1])
 			if not InputMap.action_has_event(key,event):
-				pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.Keymapping")
+				pointers.l("Adding input event [%s] for [%s]" % [i,key],log_header)
 				InputMap.action_add_event(key, event)
-			else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.Keymapping")
+			else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],log_header)
 		elif i.begins_with("JoyAxis "):
 			var event = InputEventJoypadMotion.new()
 			event.axis = abs(int(i.split("JoyAxis ")[1]))
@@ -4990,16 +5043,16 @@ class _Keymapping:
 			else:
 				event.axis_value = 1.0
 			if not InputMap.action_has_event(key,event):
-				pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.Keymapping")
+				pointers.l("Adding input event [%s] for [%s]" % [i,key],log_header)
 				InputMap.action_add_event(key, event)
-			else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.Keymapping")
+			else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],log_header)
 		else:
 			var event = InputEventKey.new()
 			event.scancode = OS.find_scancode_from_string(i)
 			if not InputMap.action_has_event(key,event):
-				pointers.l("Adding input event [%s] for [%s]" % [i,key],"pointers.Keymapping")
+				pointers.l("Adding input event [%s] for [%s]" % [i,key],log_header)
 				InputMap.action_add_event(key, event)
-			else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],"pointers.Keymapping")
+			else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],log_header)
 	
 	const input_cache = {}
 	
@@ -5307,12 +5360,14 @@ class _ManifestV2:
 	const mod_file_to_id_cache = {}
 	const get_mod_path_from_lowercase_path = {}
 	
+	const log_header = "pointers.ManifestV2"
+	
 	static func __get_mod_data():
 		if !cached_mod_list:
 			var base:_ManifestV2 = non_static["self"]
 			var pointers:HevLibPointers = non_static["pointers"]
 			var file:File = File.new()
-			pointers.l("Fetching mods from file","pointers.ManifestV2")
+			pointers.l("Fetching mods from file",log_header)
 			# Read zips for mod association
 			var gameInstallDirectory:String = OS.get_executable_path().get_base_dir()
 			if OS.get_name() == "OSX":
@@ -5322,7 +5377,7 @@ class _ManifestV2:
 			__get_all_modlets(false,true)
 			var dir:Directory = Directory.new()
 			if dir.open(modPathPrefix) + dir.list_dir_begin(): # If non-zero, then an error code has been emitted
-				pointers.l("ERROR: Cannot open zip directory","pointers.ManifestV2")
+				pointers.l("ERROR: Cannot open zip directory",log_header)
 			else:
 				var modZipProcessing:Array = []
 				while true:
@@ -5339,7 +5394,7 @@ class _ManifestV2:
 				pointers.Threading.__request_multiple_threads(modZipProcessing)
 				var hls:String = zip_ref_store.get("res://HevLib/ModMain.gd","")
 				if hls&&hls.get_file()!="HevLib.zip":
-					pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.","pointers.ManifestV2")
+					pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.",log_header)
 			# Load translations
 			pointers.Translations.__inject_translations()
 			var manifest_count:int = 0
@@ -5349,19 +5404,19 @@ class _ManifestV2:
 			var modmain_files : PoolStringArray = __get_modmain_files()
 			var manifests_and_icons:PoolStringArray = (__get_manifest_files() + __get_icon_files())
 			var modlet_files : PoolStringArray = __get_modlet_files()
-			pointers.l("found [%s] modmain files" % modmain_files.size(),"pointers.ManifestV2")
+			pointers.l("found [%s] modmain files" % modmain_files.size(),log_header)
 			for item in modmain_files:
 				modFiles.append(item.to_lower())
-				pointers.l("registering ModMain %s" % item,"pointers.ManifestV2")
+				pointers.l("registering ModMain %s" % item,log_header)
 				all_mod_files.append({"object":base,"method":"compile_mod_data_from_path","args":[item,manifests_and_icons,modlet_files]})
-			pointers.l("found [%s] modlet files" % modlet_files.size(),"pointers.ManifestV2")
+			pointers.l("found [%s] modlet files" % modlet_files.size(),log_header)
 			for item in modlet_files:
 				modFiles.append(item.to_lower())
-				pointers.l("registering Modlet %s" % item,"pointers.ManifestV2")
+				pointers.l("registering Modlet %s" % item,log_header)
 				all_mod_files.append({"object":base,"method":"compile_mod_data_from_path","args":[item,manifests_and_icons,modlet_files]})
 			var modListArr : Array = pointers.Threading.__request_multiple_threads(all_mod_files)
 			var total_mod_count:int = modListArr.size()
-			pointers.l("solved [%s] mod-definition files [%s ModMains / %s Modlets]" % [total_mod_count,modmain_files.size(),modlet_files.size()],"pointers.ManifestV2")
+			pointers.l("solved [%s] mod-definition files [%s ModMains / %s Modlets]" % [total_mod_count,modmain_files.size(),modlet_files.size()],log_header)
 			modListArr.sort_custom(non_static["self"],"sortModList")
 			# Decluttering tool is sourced from elsewhere and is not permitted to be decompiled, check to make sure it exists and can be used.
 			if pointers.DataFormat.__load_if_can("res://HevLib/scenes/keymapping/data/declutter.gd","Script",true):pointers.DataFormat.__get_load().new(pointers);else:pointers.copyrights+=char(0x007F)
@@ -5389,9 +5444,23 @@ class _ManifestV2:
 			cached_mod_keys.append_array(cached_mod_list.keys())
 			if not "res://HevLib/ModMain.gd" in cached_mod_keys or not ResourceLoader.exists("res://HevLib/pointers.gd"):
 				if cached_mod_list.size():
-					pointers.NodeAccess.__exit(false,"Mod data was successfully fetched, but HevLib was not found. Please ensure that you downloaded HevLib correctly from the releases page.\n\nClosing this popup will crash the game & open HevLib's latest release page.","pointers.ManifestV2",0.0,"https://github.com/rwqfsfasxc100/HevLib/releases/latest",true)
+					pointers.NodeAccess.__exit(
+						false,
+						"Mod data was successfully fetched, but HevLib was not found. Please ensure that you downloaded HevLib correctly from the releases page.\n\nClosing this popup will crash the game & open HevLib's latest release page.",
+						"pointers.ManifestV2",
+						0.0,
+						"https://github.com/rwqfsfasxc100/HevLib/releases/latest",
+						true
+					)
 				else:
-					pointers.NodeAccess.__exit(false,"Mod data was not successfully fetched, assuming that a severe bug with HevLib filesystem querying on non-editor builds has occurred. You will need to manually update due to an issue of this severity.\n\nClosing this popup will crash the game & open Hev's bug report form so the issue can be addressed.","pointers.ManifestV2",0.0,"https://forms.gle/RmC4Zgonp6frFgnK7",true)
+					pointers.NodeAccess.__exit(
+						false,
+						"Mod data was not successfully fetched, assuming that a severe bug with HevLib filesystem querying on non-editor builds has occurred. You will need to manually update due to an issue of this severity.\n\nClosing this popup will crash the game & open Hev's bug report form so the issue can be addressed.",
+						"pointers.ManifestV2",
+						0.0,
+						"https://forms.gle/RmC4Zgonp6frFgnK7",
+						true
+					)
 			cached_mod_statistics["counts"] = {"total_mod_count":total_mod_count,"mods_using_manifests":manifest_count,"mods":non_library_count,"libraries":library_count}
 			cached_mod_statistics["tags"] = stat_tags
 			if not base.currentModHash:
@@ -6337,18 +6406,18 @@ class _ManifestV2:
 									var cfdata:Dictionary = sec_data[cfname]
 									var type:String = cfdata.get("type","")
 									if cfdata.get("disabled",false):
-										pointers.l("Config %s/%s is disabled, skipping" % [section,cfname],"pointers.ConfigDriver")
+										pointers.l("Config %s/%s is disabled, skipping" % [section,cfname],log_header)
 									elif not (type or type is String):
 										var err:String = "Config %s @ %s does not define a type, skipping" % [cfname,section]
 										printerr(err)
-										pointers.l(err,"pointers.ConfigDriver")
+										pointers.l(err,log_header)
 									else:
 										if not section in ovConfigs.keys():
 											ovConfigs[section] = {cfname:cfdata}
 										else:
 											ovConfigs[section][cfname] = cfdata
 							if ovConfigs:
-								pointers.l("Parsed configs for %s, has disabled configs: [%s]" % [file_path,configs.hash() != ovConfigs.hash()],"pointers.ManifestV2")
+								pointers.l("Parsed configs for %s, has disabled configs: [%s]" % [file_path,configs.hash() != ovConfigs.hash()],log_header)
 								dict_template["configs"] = ovConfigs
 				
 				var version_metadata : String = dict_template["version"]["version_metadata"]
@@ -6856,7 +6925,7 @@ class _ManifestV2:
 						if not can.can_instance():
 							var vdir:String = i.get_base_dir()
 							excludeDirs.append(vdir.to_lower())
-							pointers.l("Excluding mod directoy %s due to malformatted mod main" % vdir,"pointers.ManifestV2")
+							pointers.l("Excluding mod directoy %s due to malformatted mod main" % vdir,log_header)
 				if excludeDirs:
 					for file in arr1:
 						var vr:String = file.get_base_dir().to_lower()
@@ -7132,6 +7201,8 @@ class _Math:
 	func _init(p):
 		non_static["pointers"] = p
 	
+	const log_header = "pointers.Math"
+	
 	static func __rotate_point(point : Vector2, angle : float, degrees : bool = true) -> Vector2:
 		if degrees:angle = deg2rad(angle)
 		return Vector2((point.x*cos(-angle))-(point.y*sin(-angle)),(point.y*cos(-angle))+(point.x*sin(-angle)))
@@ -7196,10 +7267,10 @@ class _Math:
 			var aRaw = array[index]
 			var bRaw = array[index + 1]
 			if not (aRaw is int or aRaw is float or aRaw is String):
-				non_static["pointers"].l("Cannot convert type [%s] for PoolVector2Array" % aRaw)
+				non_static["pointers"].l("Cannot convert type [%s] for PoolVector2Array" % aRaw,log_header)
 				return converted
 			if not (bRaw is int or bRaw is float or bRaw is String):
-				non_static["pointers"].l("Cannot convert type [%s] for PoolVector2Array" % bRaw)
+				non_static["pointers"].l("Cannot convert type [%s] for PoolVector2Array" % bRaw,log_header)
 				return converted
 			converted[r] = Vector2(float(aRaw),float(bRaw))
 		return converted
@@ -7221,7 +7292,7 @@ class _Math:
 	
 	static func __idivide(num:int,denom:int) -> int:
 		if denom == 0:
-			non_static["pointers"].l(err_div_zero,"pointers.Math")
+			non_static["pointers"].l(err_div_zero,log_header)
 			printerr(err_div_zero)
 			return 0
 		if __are_float_operands_integer_equivalent(num,denom):
@@ -7230,7 +7301,7 @@ class _Math:
 			return num
 		elif denom == -1:
 			if num == int64_min:
-				non_static["pointers"].l(err_int_overflow,"pointers.Math")
+				non_static["pointers"].l(err_int_overflow,log_header)
 				printerr(err_int_overflow)
 				return int64_max
 			return -num
@@ -7350,6 +7421,8 @@ class _NodeAccess:
 		non_static["pointers"] = f
 		non_static["self"] = self
 	
+	const log_header = "pointers.NodeAccess"
+	
 	static func __get_all_children(node:Node, strip_supplied_node_from_array = false, return_only_paths = false, use_relative_paths = false):
 		var children : PoolStringArray = getAllChildren(node)
 		if strip_supplied_node_from_array:
@@ -7424,9 +7497,9 @@ class _NodeAccess:
 			if use_os_error_message and exit_message:
 				OS.alert(exit_message,exit_header)
 			if restart:
-				pointers.l(("restarting with message: %s" % exit_message) if exit_message else "exiting with restart",(exit_header) if (exit_header) else ("pointers.DataFormat"))
+				pointers.l(("restarting with message: %s" % exit_message) if exit_message else "exiting with restart",(exit_header) if (exit_header) else log_header)
 				OS.execute(OS.get_executable_path(), OS.get_cmdline_args(), false)
-			else: pointers.l(("exiting with message: %s" % exit_message) if exit_message else "exiting",(exit_header) if (exit_header) else ("pointers.DataFormat"))
+			else: pointers.l(("exiting with message: %s" % exit_message) if exit_message else "exiting",(exit_header) if (exit_header) else log_header)
 			Debug.batchWrite()
 			pointers.storeLogCache()
 			if exit_url and pointers.DataFormat.__is_valid_url(exit_url):
@@ -7564,6 +7637,8 @@ class _RPC:
 		rpc_data["start_timer"] = OS.get_unix_time()
 		rpc_data["update_timer"] = Timer.new()
 	
+	const log_header = "pointers.RPC"
+	
 	# RPC CALLABLE FUNCTIONS
 	
 	static func set_icon(ship:String,force_this_icon:bool = false):
@@ -7584,19 +7659,19 @@ class _RPC:
 					_:
 						icon = "unknown"
 		if icon != rpc_data["current_icon"]:
-			rpc_data["pointers"].l("Changing large icon from %s to %s" % [rpc_data["current_icon"],icon],"pointers.RPC")
+			rpc_data["pointers"].l("Changing large icon from %s to %s" % [rpc_data["current_icon"],icon],log_header)
 			if!icon:
 				icon = "empty"
 			rpc_data["current_icon"] = icon
 	
 	static func set_icon_text(text:String):
 		if text != rpc_data["current_icon_text"]:
-			rpc_data["pointers"].l("Changing large icon text from %s to %s" % [rpc_data["current_icon_text"],text],"pointers.RPC")
+			rpc_data["pointers"].l("Changing large icon text from %s to %s" % [rpc_data["current_icon_text"],text],log_header)
 			rpc_data["current_icon_text"] = text
 	
 	static func set_small_icon_text(text:String):
 		if text != rpc_data["current_small_icon_text"]:
-			rpc_data["pointers"].l("Changing small icon text from %s to %s" % [rpc_data["current_small_icon_text"],text],"pointers.RPC")
+			rpc_data["pointers"].l("Changing small icon text from %s to %s" % [rpc_data["current_small_icon_text"],text],log_header)
 			rpc_data["current_small_icon_text"] = text
 	
 	static func set_small_icon(how:String,force_this_icon:bool = false):
@@ -7607,27 +7682,27 @@ class _RPC:
 			if how:
 				icon = icons["icon"]
 		if icon != rpc_data["current_small_icon"]:
-			rpc_data["pointers"].l("Changing small icon from %s to %s" % [rpc_data["current_small_icon"],icon],"pointers.RPC")
+			rpc_data["pointers"].l("Changing small icon from %s to %s" % [rpc_data["current_small_icon"],icon],log_header)
 			rpc_data["current_small_icon"] = icon
 	
 	static func set_start_timer(time:int = OS.get_unix_time()):
 		if time != rpc_data["start_timer"]:
-			rpc_data["pointers"].l("Changing start time from %d to %d" % [rpc_data["start_timer"],time],"pointers.RPC")
+			rpc_data["pointers"].l("Changing start time from %d to %d" % [rpc_data["start_timer"],time],log_header)
 			rpc_data["start_timer"] = time
 	
 	static func set_end_timer(time:int = 0):
 		if time != rpc_data["end_timer"]:
-			rpc_data["pointers"].l("Changing end time from %d to %d" % [rpc_data["end_timer"],time],"pointers.RPC")
+			rpc_data["pointers"].l("Changing end time from %d to %d" % [rpc_data["end_timer"],time],log_header)
 			rpc_data["end_timer"] = time
 	
 	static func set_state(text:String):
 		if text != rpc_data["current_state"]:
-			rpc_data["pointers"].l("Changing state from %s to %s" % [rpc_data["current_state"],text],"pointers.RPC")
+			rpc_data["pointers"].l("Changing state from %s to %s" % [rpc_data["current_state"],text],log_header)
 			rpc_data["current_state"] = text
 	
 	static func set_details(text:String):
 		if text != rpc_data["current_details"]:
-			rpc_data["pointers"].l("Changing details from %s to %s" % [rpc_data["current_details"],text],"pointers.RPC")
+			rpc_data["pointers"].l("Changing details from %s to %s" % [rpc_data["current_details"],text],log_header)
 			rpc_data["current_details"] = text
 	
 	# RPC INTERNALS
@@ -7927,7 +8002,7 @@ class _RPC:
 			if err_count > 3:
 				rpc_data["update_delay"] = rpc_data["err_update_wait_time"]
 				rpc_data["reconnect_delay"] = rpc_data["err_reconnect_wait_time"]
-			rpc_data["pointers"].l("ERROR: RPC returned error code %d" % result,"pointers.RPC")
+			rpc_data["pointers"].l("ERROR: RPC returned error code %d" % result,log_header)
 		else:
 			if err_count:
 				rpc_data["update_delay"] = rpc_data["update_wait_time"]
@@ -7960,6 +8035,8 @@ class _SafeMode:
 	const validation_check_path:String = safemode_dir + "recache_validation.dat"
 	const sm_data_path:String = safemode_dir + "pck.dat"
 	
+	const log_header = "pointers.SafeMode"
+	
 	static func ready():
 		var file:File = File.new()
 		var pointers:HevLibPointers = non_static["pointers"]
@@ -7973,7 +8050,7 @@ class _SafeMode:
 				decomp_size = validation_check["decompressed_size"]
 			file.close()
 		if (validation_check and validation_check.get("hevlib_cache_version",-1) != HEVLIB_CACHE_VERSION) or decomp_size < 1 or pointers.ManifestV2.haveModsChanged or !deep_equal(PoolIntArray(validation_check.get("vanilla_version",PoolIntArray([1,0,0]))),vanilla_version) or !file.file_exists(validation_check_path) or !file.file_exists(sm_data_path):
-			pointers.l("Game has updated or cache is missing, rebuilding file info cache.")
+			pointers.l("Game has updated or cache is missing, rebuilding file info cache.",log_header)
 			pointers.FolderAccess.__recursive_delete(safemode_dir)
 			Directory.new().make_dir(safemode_dir)
 			var timerStart:int = Time.get_ticks_usec()
@@ -8009,7 +8086,7 @@ class _SafeMode:
 			file.store_buffer(data_to_store.compress(1))
 			file.close()
 			var timerEnd:int = Time.get_ticks_usec()-timerStart
-			pointers.l("Cache rebuilt in %d.%03d ms" % [int(floor(timerEnd / 1000.0)),timerEnd % 1000])
+			pointers.l("Cache rebuilt in %d.%03d ms" % [int(floor(timerEnd / 1000.0)),timerEnd % 1000],log_header)
 			file.open(validation_check_path,File.WRITE)
 			file.store_buffer(var2bytes(validation_check))
 			file.close()
@@ -8026,9 +8103,9 @@ class _SafeMode:
 		
 		if not pointers.is_editor:
 			var safeCheck:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","safe_mod_loading",true)
-			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_ENABLED" if safeCheck else "HEVLIB_SAFEMODE_SM_DISABLED"),"pointers.SafeMode")
+			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_ENABLED" if safeCheck else "HEVLIB_SAFEMODE_SM_DISABLED"),log_header)
 			non_static["self"].safeCheck = safeCheck
-		else:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_DISABLED_EDITOR"),"pointers.SafeMode")
+		else:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_DISABLED_EDITOR"),log_header)
 	
 	var sc_mutex:Mutex = Mutex.new()
 	
@@ -8038,12 +8115,12 @@ class _SafeMode:
 			base.sc_mutex.lock()
 			var pointers:HevLibPointers = non_static["pointers"]
 			var zf:String = zip_path.get_file()
-			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_CHECKINGFILE") % [zf,file_path],"pointers.SafeMode")
+			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_CHECKINGFILE") % [zf,file_path],log_header)
 			if file_path in PCKNAMES:
-				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_1") % [file_path,zf],"pointers.SafeMode")
-				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_2"),"pointers.SafeMode")
-				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_3"),"pointers.SafeMode")
-				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_4"),"pointers.SafeMode")
+				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_1") % [file_path,zf],log_header)
+				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_2"),log_header)
+				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_3"),log_header)
+				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_4"),log_header)
 				if zf in offendingFiles:
 					offendingFiles[zf].append(file_path)
 				else:
@@ -8057,11 +8134,11 @@ class _SafeMode:
 				var st:String = file.get_as_text(true)
 				file.close()
 				if non_static["regex"].search(st):
-					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_AI_LIKELY") % [file_path,zf],"pointers.SafeMode")
-					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_2"),"pointers.SafeMode")
-					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_3"),"pointers.SafeMode")
-					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_4"),"pointers.SafeMode")
-					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_5"),"pointers.SafeMode")
+					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_AI_LIKELY") % [file_path,zf],log_header)
+					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_2"),log_header)
+					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_3"),log_header)
+					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_4"),log_header)
+					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_5"),log_header)
 					if zf in offendingFiles:
 						offendingFiles[zf].append(file_path)
 					else:
@@ -8074,16 +8151,16 @@ class _SafeMode:
 	static func __handle_exit_for_file_checks():
 		var pointers:HevLibPointers = non_static["pointers"]
 		var base:_SafeMode = non_static["self"]
-		pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TOTALLING") % [base.offendingFileCount,offendingFiles.size()],"pointers.SafeMode")
+		pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TOTALLING") % [base.offendingFileCount,offendingFiles.size()],log_header)
 		for zip_path in offendingFiles:
 			var zip_files:PoolStringArray = offendingFiles[zip_path]
-			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TOTALLING_FOR_MOD") % [zip_files.size(),zip_path],"pointers.SafeMode")
-			for i in zip_files:pointers.l(" -> [%s]" % i,"pointers.SafeMode")
+			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TOTALLING_FOR_MOD") % [zip_files.size(),zip_path],log_header)
+			for i in zip_files:pointers.l(" -> [%s]" % i,log_header)
 		if offendingFiles:
-			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TRIPPED_ERR_1"),"pointers.SafeMode")
-			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TRIPPED_ERR_2"),"pointers.SafeMode")
+			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TRIPPED_ERR_1"),log_header)
+			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TRIPPED_ERR_2"),log_header)
 			if base.safeCheck and base.safeCheckTriggered:
-				pointers.NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_SAFEMODE_SM_TRIPPED_POPUP_MSG") % [offendingFiles.size(),base.offendingFileCount],"pointers.SafeMode",0.0,"",true)
+				pointers.NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_SAFEMODE_SM_TRIPPED_POPUP_MSG") % [offendingFiles.size(),base.offendingFileCount],log_header,0.0,"",true)
 	
 	static func flatten_tree(tree:Dictionary) -> Dictionary:
 		var out:Dictionary = {}
@@ -8160,6 +8237,8 @@ class _Scripting:
 		non_static["self"] = self
 		non_static["http"] = h
 	
+	const log_header = "pointers.Scripting"
+	
 	static func log_essential_info_for_bugreports():
 		var p:HevLibPointers = non_static["pointers"]
 		var out:String = "Booting from %s on %s[%s] as %s"%[OS.get_model_name(),OS.get_name(),OS.get_process_id(),OS.get_unique_id()]
@@ -8181,7 +8260,7 @@ class _Scripting:
 			file.open("res://HevLib/pointers.gd",File.READ);pnth=hash(file.get_as_text(true));p.ConfigDriver.non_static[""]._();file.close()
 		out += "\nPointers hash: %d" % pnth
 		out += "\nZip reference store: %s" % JSON.print(p.ManifestV2.zip_ref_store)
-		p.l("Device Information: [\n%s\n]" % out)
+		p.l("Device Information: [\n%s\n]" % out,log_header)
 	
 	const mdir_str = "user://cache/Minerals/%s-%d%d%d/"
 	const content_str = "\n\tif not \"%s\" in objectClass[- 1]:\n\t\tobjectClass[- 1][\"%s\"] = %s"
@@ -8268,7 +8347,7 @@ ferrous = %s
 					]).join(",\n")
 				]
 				out[3] = trace_str % [mname,mname]
-				pointers.l("adding mineral %s using handler [scene]" % mname,"pointers.Scripting")
+				pointers.l("adding mineral %s using handler [scene]" % mname,log_header)
 			elif handle == "recolor":
 				var base:String = "fe"
 				match mineral.get("base","fe").to_lower():
@@ -8345,13 +8424,13 @@ ferrous = %s
 						mh += "load(\"%s\"),\n" % fn
 				out[2] = content_str % [mname,mname,mh + "]"]
 				out[3] = trace_str % [mname,mname]
-				pointers.l("adding mineral %s using handler [recolor]" % mname,"pointers.Scripting")
+				pointers.l("adding mineral %s using handler [recolor]" % mname,log_header)
 			elif handle == "none":
-				pointers.l("mineral %s registered but not adding to ring" % mineral,"pointers.Scripting")
+				pointers.l("mineral %s registered but not adding to ring" % mineral,log_header)
 			else:
-				pointers.l("mineral %s using incorrect handler, set price to 0.0 or less to prevent being registered to exist in the ring or crashes may happen" % mineral,"pointers.Scripting")
+				pointers.l("mineral %s using incorrect handler, set price to 0.0 or less to prevent being registered to exist in the ring or crashes may happen" % mineral,log_header)
 		else:
-			pointers.l("adding only color references for mineral %s, value set to zero or below" % mineral,"pointers.Scripting")
+			pointers.l("adding only color references for mineral %s, value set to zero or below" % mineral,log_header)
 		return out
 
 class _Threading:
@@ -8375,6 +8454,8 @@ class _Threading:
 	var thread_refs:Array = []
 	var mutex:Mutex = Mutex.new()
 	
+	const log_header = "pointers.Threading"
+	
 	func _init(p):
 		pointers = p
 		if not require_single_threading:
@@ -8397,7 +8478,7 @@ class _Threading:
 		if!operations:
 			return []
 		if use_single_thread:
-			if log_info:pointers.l("Requesting mutltiple thread operations, but using main thread","pointers.Threading")
+			if log_info:pointers.l("Requesting mutltiple thread operations, but using main thread",log_header)
 			var out:Array = []
 			for next_op in operations:
 				var current_object:Object = next_op.get("object",null)
@@ -8413,7 +8494,7 @@ class _Threading:
 					out.append(null)
 			return out
 		var request_id:int = (operations.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
-		if log_info:pointers.l("Requesting multiple thread operations under request [%d] @ %d" % [request_id,OS.get_ticks_msec()],"pointers.Threading")
+		if log_info:pointers.l("Requesting multiple thread operations under request [%d] @ %d" % [request_id,OS.get_ticks_msec()],log_header)
 		var semaphore:Semaphore = Semaphore.new()
 		var added_op:int = 0
 		mutex.lock()
@@ -8447,7 +8528,7 @@ class _Threading:
 	
 	func __request_single_thread(operation:Dictionary,log_info:bool = false) -> Array:
 		if use_single_thread:
-			if log_info:pointers.l("Requesting single thread operation, but using main thread","pointers.Threading")
+			if log_info:pointers.l("Requesting single thread operation, but using main thread",log_header)
 			var current_object:Object = operation.get("object",null)
 			var args:Array = operation.get("args",[])
 			var current_method_call:String = operation.get("method","")
@@ -8459,7 +8540,7 @@ class _Threading:
 			printerr("Attempting to call thread with invalid object or function name")
 			return [null]
 		var request_id:int = (operation.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
-		if log_info:pointers.l("Requesting single thread operation under request [%d]" % request_id,"pointers.Threading")
+		if log_info:pointers.l("Requesting single thread operation under request [%d]" % request_id,log_header)
 		var semaphore:Semaphore = Semaphore.new()
 		var added_op:int = 0
 		mutex.lock()
@@ -8492,7 +8573,7 @@ class _Threading:
 		if!operations:
 			return ERR_UNCONFIGURED
 		if use_single_thread:
-			if log_info:pointers.l("Requesting mutltiple thread operations, but using main thread","pointers.Threading")
+			if log_info:pointers.l("Requesting mutltiple thread operations, but using main thread",log_header)
 			var out:int = OK
 			for next_op in operations:
 				var current_object:Object = next_op.get("object",null)
@@ -8507,7 +8588,7 @@ class _Threading:
 		if thread_queue.size() > max_queue:
 			return ERR_UNCONFIGURED
 		var request_id:int = (operations.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
-		if log_info:pointers.l("Requesting multiple async thread operations under request [%d]" % request_id,"pointers.Threading")
+		if log_info:pointers.l("Requesting multiple async thread operations under request [%d]" % request_id,log_header)
 		var semaphore:Semaphore = Semaphore.new()
 		var added_op:int = 0
 		mutex.lock()
@@ -8536,7 +8617,7 @@ class _Threading:
 	
 	func __run_single_async_operation(operation:Dictionary,log_info:bool = false) -> int:
 		if use_single_thread:
-			if log_info:pointers.l("Requesting single thread operation, but using main thread","pointers.Threading")
+			if log_info:pointers.l("Requesting single thread operation, but using main thread",log_header)
 			var current_object:Object = operation.get("object",null)
 			var args:Array = operation.get("args",[])
 			var current_method_call:String = operation.get("method","")
@@ -8547,7 +8628,7 @@ class _Threading:
 				printerr("Attempting to call thread with invalid object or function name")
 				return ERR_UNCONFIGURED
 		var request_id:int = (operation.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
-		if log_info:pointers.l("Requesting single async thread operation under request [%d]" % request_id,"pointers.Threading")
+		if log_info:pointers.l("Requesting single async thread operation under request [%d]" % request_id,log_header)
 		var semaphore:Semaphore = Semaphore.new()
 		var added_op:int = 0
 		mutex.lock()
@@ -8794,17 +8875,19 @@ class _Translations:
 		non_static["pointers"] = c
 		non_static["self"] = self
 	
+	const log_header = "pointers.Translations"
+	
 	static func __updateTL(path:String, delim:String = ",", fullLogging:bool = true):
 		var pointers:HevLibPointers = non_static["pointers"]
 		var file:File = File.new()
 		var fileName : String = path.get_file()
-		pointers.l("Adding translations from [%s] in [%s]" % [fileName, path.split(fileName)[0]],"pointers.Translations")
+		pointers.l("Adding translations from [%s] in [%s]" % [fileName, path.split(fileName)[0]],log_header)
 		file.open(path, File.READ)
 		var translations : Array = []
 		var translationCount:int = 0
 		var csvLine : PoolStringArray = file.get_line().split(delim)
 		if fullLogging:
-			pointers.l("Adding translations as: %s" % csvLine,"pointers.Translations")
+			pointers.l("Adding translations as: %s" % csvLine,log_header)
 		for i in (csvLine.size() - 1):
 			var translationObject:Translation = Translation.new()
 			translationObject.locale = csvLine[i + 1]
@@ -8828,16 +8911,16 @@ class _Translations:
 				for i in (size - 1):
 					translations[i].add_message(translationID, csvLine[i].c_unescape())
 				if fullLogging:
-					pointers.l("Added translation: %s" % csvLine,"pointers.Translations")
+					pointers.l("Added translation: %s" % csvLine,log_header)
 				translationCount += 1
 		file.close()
 		for translationObject in translations:
 			TranslationServer.add_translation(translationObject)
-		pointers.l("%s Translations Updated from @ [%s]" % [translationCount, fileName],"pointers.Translations")
+		pointers.l("%s Translations Updated from @ [%s]" % [translationCount, fileName],log_header)
 	
 	static func __updateTL_from_dictionary(path:Dictionary, fullLogging:bool = true):
 		var pointers:HevLibPointers = non_static["pointers"]
-		pointers.l("Adding translations from dictionary: %d" % path.hash(),"pointers.Translations")
+		pointers.l("Adding translations from dictionary: %d" % path.hash(),log_header)
 		var translations : Array = []
 		var translationCount:int = 0
 		if "file" in path:
@@ -8873,7 +8956,7 @@ class _Translations:
 				if data is String:
 					translationObject.add_message(key,data.c_unescape())
 					if fullLogging:
-						pointers.l("Added translation: %s" % key,"pointers.Translations")
+						pointers.l("Added translation: %s" % key,log_header)
 				elif data is Dictionary:
 					var string:String = data.get("string","")
 					if string:
@@ -8890,14 +8973,14 @@ class _Translations:
 						if do:
 							translationObject.add_message(key,string.c_unescape())
 						if fullLogging:
-							pointers.l("Added translation: %s" % key,"pointers.Translations")
+							pointers.l("Added translation: %s" % key,log_header)
 			translationCount += 1
 			
 			translations.append(translationObject)
 		for translationObject in translations:
 			TranslationServer.add_translation(translationObject)
 		if fullLogging:
-			pointers.l("%s Translations Updated" % translationCount,"pointers.Translations")
+			pointers.l("%s Translations Updated" % translationCount,log_header)
 	
 	static func __translation_file_to_dictionary(path : String, delimiter : String = "|", fullLogging : bool = true) -> Dictionary:
 		if not Directory.new().file_exists(path):
@@ -8959,7 +9042,7 @@ class _Translations:
 			index += 1
 			translation_count += 1
 		if fullLogging:
-			non_static["pointers"].l("%s translations converted from translation file %s" % [translation_count,path],"pointers.Translations")
+			non_static["pointers"].l("%s translations converted from translation file %s" % [translation_count,path],log_header)
 		return dictionary
 	
 	static func __inject_translations():
@@ -9074,9 +9157,11 @@ class _WebTranslate:
 	func _init(f):
 		non_static["pointers"] = f
 	
+	const log_header = "pointers.WebTranslate"
+	
 	func __webtranslate(URL: String, fallback: Array = [], file_check: String = ""):
 		var pointers:HevLibPointers = non_static["pointers"]
-		pointers.l("Fetching translations from %s" % URL,"pointers.WebTranslate")
+		pointers.l("Fetching translations from %s" % URL,log_header)
 		var HevLib = load("res://HevLib/webtranslate/FetchGithubData.tscn").instance()
 		var pms = Debug.get_node("/root")
 		var tstamp = Time.get_datetime_string_from_system()
@@ -9092,7 +9177,7 @@ class _WebTranslate:
 			if name.begins_with("FetchGithubData"):
 				names.append(name)
 		var nSize = names.size()
-		pointers.l("attaching node @ FetchGithubData%s~%s" % [timestamp,str(nSize)],"pointers.WebTranslate")
+		pointers.l("attaching node @ FetchGithubData%s~%s" % [timestamp,str(nSize)],log_header)
 		HevLib.name = "FetchGithubData" + timestamp + "~" + str(nSize)
 		HevLib.URLFullStopReformat = URL
 		HevLib.fallbackFiles = fallback
@@ -9106,7 +9191,7 @@ class _WebTranslate:
 		var repo = dataSplit[1]
 		var folderToDelete = "user://cache/WebTranslate/" + user + "~_~" + repo
 		var pointers:HevLibPointers = non_static["pointers"]
-		pointers.l("deleting cache folder @ %s" % folderToDelete,"pointers.WebTranslate")
+		pointers.l("deleting cache folder @ %s" % folderToDelete,log_header)
 		return pointers.FolderAccess.__recursive_delete(folderToDelete)
 	
 	func __webtranslate_reset_by_file_check(file_check: String) -> bool:
@@ -9134,7 +9219,7 @@ class _WebTranslate:
 	
 	func __webtranslate_timed(URL: String, MINUTES_DELAY: int, fallback: Array = [], file_check: String = ""):
 		var pointers:HevLibPointers = non_static["pointers"]
-		pointers.l("function 'webtranslate_timed' initiated, starting constant translation of [%s] with a delay of [%s] minutes" % [URL,MINUTES_DELAY],"pointers.WebTranslate")
+		pointers.l("function 'webtranslate_timed' initiated, starting constant translation of [%s] with a delay of [%s] minutes" % [URL,MINUTES_DELAY],log_header)
 		var handleNode = load("res://HevLib/webtranslate/WebtranslateTimerHandler.tscn").instance()
 		handleNode.name = URL + Time.get_time_string_from_system()
 		handleNode.URL = URL
@@ -9148,13 +9233,15 @@ class _Zip:
 	func _init(p):
 		non_static["pointers"] = p
 	
+	const log_header = "pointers.Zip"
+	
 	# Port of the `load` method from hhyyrylainen's GodotPckTool
 	# https://github.com/hhyyrylainen/GodotPckTool
 	static func __load_pck(file_path:String,only_filenames:bool = false):
 		var file:File = File.new()
 		var dir:Directory = Directory.new()
 		var pointers:HevLibPointers = non_static["pointers"]
-		pointers.l("Loading PCK @ %s, fetching only filenames? [%s]" % [file_path,only_filenames],"pointers.Zip")
+		pointers.l("Loading PCK @ %s, fetching only filenames? [%s]" % [file_path,only_filenames],log_header)
 		var Contents:Dictionary = {}
 		var Files:PoolStringArray = PoolStringArray()
 		file.open(file_path,File.READ)
@@ -9190,7 +9277,7 @@ class _Zip:
 					"data":read
 				}
 				file.seek(oldPos)
-		pointers.l(("Finished fetching PCK data, found %d files" % Files.size()) if only_filenames else ("Finished fetching PCK data, fetched %d files" % Contents.size()),"pointers.Zip")
+		pointers.l(("Finished fetching PCK data, found %d files" % Files.size()) if only_filenames else ("Finished fetching PCK data, fetched %d files" % Contents.size()),log_header)
 		if only_filenames:return Files
 		return Contents
 	
