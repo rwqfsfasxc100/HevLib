@@ -40,7 +40,7 @@ onready var ssuuPointers:HevLibPointers._ConfigDriver = ModLoader._savedObjects[
 var hl_eqdrssui_uinit : bool = false
 func _ready():
 	if hl_eqdrssui_uinit:
-		OS.kill(OS.get_process_id())
+		ssuuPointers.main_modmain.log_double_load_error(get_script().resource_path)
 	hl_eqdrssui_uinit = true
 
 func isAvailable():

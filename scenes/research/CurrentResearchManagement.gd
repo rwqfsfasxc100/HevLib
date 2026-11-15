@@ -32,10 +32,10 @@
 
 extends MarginContainer
 
-onready var research_item = load("res://HevLib/scenes/research/research_item_box/ResearchItem.tscn")
-var research_state = {}
+onready var research_item:PackedScene = load("res://HevLib/scenes/research/research_item_box/ResearchItem.tscn")
 
-var current_mod_ids = []
+onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
+onready var current_mod_ids = pointers.ManifestV2.__get_mod_ids()
 
 onready var active_list = $VBoxContainer/ActiveProjectsList/Projects
 onready var completed_list = $VBoxContainer/CompletedProjects/Projects
@@ -53,21 +53,19 @@ var has_operated = false
 func _ready():
 	show_completed_button.connect("toggled",self,"toggle_completed_visibility")
 	connect("visibility_changed",self,"vis_changed")
+	_initialize()
 
 func _initialize():
-	research_state = CurrentGame.state.hevlib_research
-	for project in research_state:
-		var obj = research_state[project]
-		if obj.state.completed:
-			var p = research_item.instance()
-			p.this_research_project = obj
-			p.name = obj.source + "|" + obj.name
-			completed_list.add_child(p)
-		elif obj.state.active == true and obj.source in current_mod_ids:
-			var p = research_item.instance()
-			p.this_research_project = obj
-			p.name = obj.source + "|" + obj.name
-			active_list.add_child(p)
+	for obj in CurrentGame.get_active_research_projects():
+		var p:Node = research_item.instance()
+		p.this_research_project = obj
+		p.name = obj.source + "|" + obj.name
+		completed_list.add_child(p)
+	for obj in CurrentGame.get_completed_research_projects():
+		var p:Node = research_item.instance()
+		p.this_research_project = obj
+		p.name = obj.source + "|" + obj.name
+		active_list.add_child(p)
 		
 	
 	
@@ -75,7 +73,7 @@ func _initialize():
 
 func vis_changed():
 	if is_visible_in_tree():
-		var completed_count = completed_list.get_child_count()
+		var completed_count:int = completed_list.get_child_count()
 		if completed_count:
 			show_completed_button.disabled = false
 			show_completed_button.hint_tooltip = "HEVLIB_RESEARCH_TOGGLE_COMPLETED_VISIBILITY"
@@ -84,8 +82,8 @@ func vis_changed():
 			show_completed_button.disabled = true
 			show_completed_button.hint_tooltip = "HEVLIB_RESEARCH_TOGGLE_COMPLETED_VISIBILITY_DISABLED"
 			toggle_completed_visibility(false)
-		active_projects_count_label.text = ("%d" % active_list.get_child_count())
-		completed_projects_count_label.text = ("%d" % completed_count)
+		active_projects_count_label.text = str(active_list.get_child_count())
+		completed_projects_count_label.text = str(completed_count)
 
 func toggle_completed_visibility(how:bool):
 	completed_projects_header.visible = how

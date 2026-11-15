@@ -35,8 +35,9 @@ class_name HevLibPointers
 
 var http:HTTPRequest = HTTPRequest.new()
 
-var equipment_modmain:Node
-var webtranslate_modmain:Node
+var equipment_modmain:Node = null
+var webtranslate_modmain:Node = null
+var main_modmain:Node = null
 
 var Achievements : _Achievements = _Achievements.new(self,http)
 var ConfigDriver : _ConfigDriver = _ConfigDriver.new(self)
@@ -87,141 +88,73 @@ var Classes = {
 	"Zip":Zip,
 }
 const LIBRARY_LOAD = [
-	[
-		1, "res://HevLib/scenes/minerals/AstrogatorPanel.gd", -INF, "res://hud/AstrogatorPanel.gd"
-	], [
-		1, "res://HevLib/scenes/minerals/OMS.gd", -INF, "res://hud/OMS.gd"
-	], [
-		1, "res://HevLib/scenes/minerals/CargoScanner.gd", -INF, "res://hud/CargoScanner.gd"
-	], [
-		1, "res://HevLib/scenes/minerals/ProcessedCargoManifest.gd", -INF, "res://hud/trtl/ProcessedCargoManifest.gd"
-	], [
-		1, "res://HevLib/scenes/minerals/TheRing.gd", -INF, "res://TheRing.gd"
-	], [
-		1, "res://HevLib/scenes/research/Enceladus.gd", -INF, "res://enceladus/Enceladus.gd"
-	], [
-		1, "res://HevLib/scenes/research/overhead_handle/CurrentGame.gd", -INF, "res://CurrentGame.gd"
-	], [
-		1, "res://HevLib/scenes/equipment/SystemShipUpgradeUI.gd", -INF, "res://enceladus/SystemShipUpgradeUI.gd"
-	], [
-		1, "res://HevLib/scenes/equipment/SystemBuyUI.gd", -INF, "res://enceladus/SystemBuyUI.gd"
-	], [
-		1, "res://HevLib/scenes/equipment/UpgradeGroup.gd", -INF, "res://enceladus/UpgradeGroup.gd"
-	], [
-		1, "res://HevLib/scenes/equipment/ThrusterSlot.gd", -INF, "res://ships/modules/ThrusterSlot.gd"
-	], [
-		1, "res://HevLib/scenes/weaponslot/weapon_slot_handler.gd", -INF, "res://ships/WeaponSlot.gd"
-	], [
-		1, "res://HevLib/scenes/equipment/ShipModificationDriver/AddNodes.gd", -INF, "res://ships/ship-ctrl.gd"
-	], [
-		1, "res://HevLib/scenes/equipment/ShipModificationDriver/InternalStorageMod.gd", -INF, "res://ships/ship-ctrl.gd"
-	], [
-		1, "res://HevLib/scenes/ship_driver/Shipyard.gd", -INF, "res://ships/Shipyard.gd"
-	], [
-		1, "res://HevLib/scenes/ship_driver/CurrentGame.gd", -INF, "res://CurrentGame.gd"
-	], [
-		1, "user://cache/Minerals/cg.gd", -INF, "res://CurrentGame.gd"
-	], [
-		1, "user://cache/Minerals/as.gd", -INF, "res://AsteroidSpawner.gd"
-	], [
-		2, "user://cache/Variable_Fetch/derelict_expansion.tscn", -INF, "res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"
-	], [
-		2, "user://cache/Variable_Fetch/upgrades.tscn", -INF, "res://enceladus/Upgrades.tscn"
-	], [
-		2, "user://cache/Variable_Fetch/ship_limitations.tscn", -INF, "res://enceladus/Upgrades.tscn"
-	], [
-		1, "res://HevLib/scenes/ship_driver/TheRing.gd", -INF, "res://TheRing.gd"
-	], [
-		1, "res://HevLib/scripts/Namer.gd", -INF, "res://namer/Namer.gd"
-	], [
-		1, "res://HevLib/events/TheRing.gd", -INF, "res://TheRing.gd"
-	], [
-		1, "res://HevLib/events/Game.gd", -INF, "res://Game.gd"
-	], [
-		1, "res://HevLib/events/controls/camera.gd", -INF, "res://ships/camera.gd"
-	], [
-		1, "res://HevLib/events/controls/ship-ctrl.gd", -INF, "res://ships/ship-ctrl.gd"
-	], [
-		1, "res://HevLib/events/controls/CurrentGame.gd", -INF, "res://CurrentGame.gd"
-	], [
-		2, "res://HevLib/events/chaos_map/RingTelescopeView.tscn", -INF, "res://hud/components/RingTelescopeView.tscn"
-	], [
-		1, "res://HevLib/events/custom_events/TheRing.gd", -INF, "res://TheRing.gd"
-	], [
-		2, "res://HevLib/scenes/notification_driver/Notifications.tscn", -INF, "res://achievement/Notifications.tscn"
-	], [
-		1, "res://HevLib/scenes/notification_driver/CurrentGame.gd", -INF, "res://CurrentGame.gd"
-	], [
-		1, "res://HevLib/scenes/better_title_screen/SaveSlotButton.gd", -INF, "res://SaveSlotButton.gd"
-	], [
-		1, "res://HevLib/scenes/better_title_screen/CurrentlyPlaying.gd", -INF, "res://menu/CurrentlyPlaying.gd"
-	], [
-		1, "res://HevLib/ui/ExtensionPopup.gd", -INF, "res://menu/ExtensionPopup.gd"
-	], [
-		1, "res://HevLib/ui/mod_menu/titlescreen/TitleMenu.gd", -INF, "res://menu/TitleMenu.gd"
-	], [
-		1, "res://HevLib/ui/mod_menu/titlescreen/DLClist.gd", -INF, "res://tools/DLClist.gd"
-	], [
-		1, "res://HevLib/scripts/transit_tips/TransitTip.gd", -INF, "res://codex/TransitTip.gd"
-	], [
-		1, "res://HevLib/scripts/easters/Screensaver.gd", -INF, "res://Screensaver.gd"
-	], [
-		1, "res://HevLib/scripts/easters/TitleMenu.gd", -INF, "res://menu/TitleMenu.gd"
-	], [
-		1, "res://HevLib/scenes/minerals/Summary.gd", -INF, "res://enceladus/Summary.gd"
-	], [
-		1, "res://HevLib/scenes/rpc/Crew.gd", -INF, "res://enceladus/Crew.gd"
-	], [
-		1, "res://HevLib/scenes/rpc/Dealer.gd", -INF, "res://enceladus/Dealer.gd"
-	], [
-		1, "res://HevLib/scenes/rpc/DiveTarget.gd", -INF, "res://enceladus/DiveTarget.gd"
-	], [
-		1, "res://HevLib/scenes/rpc/Enceladus.gd", -INF, "res://enceladus/Enceladus.gd"
-	], [
-		1, "res://HevLib/scenes/rpc/Game.gd", -INF, "res://Game.gd"
-	], [
-		1, "res://HevLib/scenes/rpc/Logs.gd", -INF, "res://enceladus/Logs.gd"
-	], [
-		1, "res://HevLib/scenes/rpc/MineralMarket.gd", -INF, "res://enceladus/MineralMarket.gd"
-	], [
-		1, "res://HevLib/scenes/rpc/Music.gd", -INF, "res://Music.gd"
-	], [
-		1, "res://HevLib/scenes/rpc/PreFlightInspection.gd", -INF, "res://enceladus/PreFlightInspection.gd"
-	], [
-		1, "res://HevLib/scenes/rpc/Repairs.gd", -INF, "res://enceladus/Repairs.gd"
-	], [
-		1, "res://HevLib/scenes/rpc/Services.gd", -INF, "res://enceladus/Services.gd"
-	], [
-		1, "res://HevLib/scenes/rpc/SimulationLayer.gd", -INF, "res://enceladus/Simulator/SimulationLayer.gd"
-	], [
-		1, "res://HevLib/scenes/rpc/Summary.gd", -INF, "res://enceladus/Summary.gd"
-	], [
-		1, "res://HevLib/scenes/rpc/TitleMenu.gd", -INF, "res://menu/TitleMenu.gd"
-	], [
-		1, "res://HevLib/scenes/rpc/Tuning.gd", -INF, "res://enceladus/Tuning.gd"
-	], [
-		1, "res://HevLib/scenes/rpc/Upgrades.gd", -INF, "res://enceladus/Upgrades.gd"
-	], [
-		1, "res://HevLib/scenes/keymapping/bind_displays/AnalogAxisDisplay.gd", -INF, "res://hud/components/AnalogAxisDisplay.gd"
-	], [
-		1, "res://HevLib/scenes/keymapping/bind_displays/GamepadKeybindDisplay.gd", -INF, "res://hud/components/GamepadKeybindDisplay.gd"
-	], [
-		1, "res://HevLib/scenes/keymapping/bind_displays/KeybindDisplay.gd", -INF, "res://hud/components/KeybindDisplay.gd"
-	], [
-		1, "res://HevLib/scenes/keymapping/bind_displays/MousebindDisplay.gd", -INF, "res://hud/components/MousebindDisplay.gd"
-	], [
-		1, "res://HevLib/scripts/Boot.gd", -INF, "res://Boot.gd"
-	], [
-		1, "res://HevLib/scenes/minerals/multiminerals/mineral.gd", -INF, "res://asteroids/mineral.gd"
-	], [
-		1, "res://HevLib/scenes/minerals/multiminerals/MineralProcessingUnit.gd", -INF, "res://ships/modules/MineralProcessingUnit.gd"
-	], [
-		1, "res://HevLib/scenes/minerals/multiminerals/AsteroidSpawner.gd", -INF, "res://AsteroidSpawner.gd"
-	], [
-		1, "res://HevLib/scenes/service_driver/Services.gd", -INF, "res://enceladus/Services.gd"
-	], [
-		1, "res://HevLib/scripts/Screensaver.gd", 1000, "res://Screensaver.gd"
-	]
+	[1, "res://HevLib/scenes/minerals/AstrogatorPanel.gd", -INF, "res://hud/AstrogatorPanel.gd"],
+	[1, "res://HevLib/scenes/minerals/OMS.gd", -INF, "res://hud/OMS.gd"],
+	[1, "res://HevLib/scenes/minerals/CargoScanner.gd", -INF, "res://hud/CargoScanner.gd"],
+	[1, "res://HevLib/scenes/minerals/ProcessedCargoManifest.gd", -INF, "res://hud/trtl/ProcessedCargoManifest.gd"],
+	[1, "res://HevLib/scenes/minerals/TheRing.gd", -INF, "res://TheRing.gd"],
+	[1, "res://HevLib/scenes/research/Enceladus.gd", -INF, "res://enceladus/Enceladus.gd"],
+	[1, "res://HevLib/scenes/research/overhead_handle/CurrentGame.gd", -INF, "res://CurrentGame.gd"],
+	[1, "res://HevLib/scenes/equipment/SystemShipUpgradeUI.gd", -INF, "res://enceladus/SystemShipUpgradeUI.gd"],
+	[1, "res://HevLib/scenes/equipment/SystemBuyUI.gd", -INF, "res://enceladus/SystemBuyUI.gd"],
+	[1, "res://HevLib/scenes/equipment/UpgradeGroup.gd", -INF, "res://enceladus/UpgradeGroup.gd"],
+	[1, "res://HevLib/scenes/equipment/ThrusterSlot.gd", -INF, "res://ships/modules/ThrusterSlot.gd"],
+	[1, "res://HevLib/scenes/weaponslot/weapon_slot_handler.gd", -INF, "res://ships/WeaponSlot.gd"],
+	[1, "res://HevLib/scenes/equipment/ShipModificationDriver/AddNodes.gd", -INF, "res://ships/ship-ctrl.gd"],
+	[1, "res://HevLib/scenes/equipment/ShipModificationDriver/InternalStorageMod.gd", -INF, "res://ships/ship-ctrl.gd"],
+	[1, "res://HevLib/scenes/ship_driver/Shipyard.gd", -INF, "res://ships/Shipyard.gd"],
+	[1, "res://HevLib/scenes/ship_driver/CurrentGame.gd", -INF, "res://CurrentGame.gd"],
+	[1, "user://cache/Minerals/cg.gd", -INF, "res://CurrentGame.gd"],
+	[1, "user://cache/Minerals/as.gd", -INF, "res://AsteroidSpawner.gd"],
+	[2, "user://cache/Variable_Fetch/derelict_expansion.tscn", -INF, "res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"],
+	[2, "user://cache/Variable_Fetch/upgrades.tscn", -INF, "res://enceladus/Upgrades.tscn"],
+	[2, "user://cache/Variable_Fetch/ship_limitations.tscn", -INF, "res://enceladus/Upgrades.tscn"],
+	[1, "res://HevLib/scenes/ship_driver/TheRing.gd", -INF, "res://TheRing.gd"],
+	[1, "res://HevLib/scripts/Namer.gd", -INF, "res://namer/Namer.gd"],
+	[1, "res://HevLib/events/TheRing.gd", -INF, "res://TheRing.gd"],
+	[1, "res://HevLib/events/Game.gd", -INF, "res://Game.gd"],
+	[1, "res://HevLib/events/controls/camera.gd", -INF, "res://ships/camera.gd"],
+	[1, "res://HevLib/events/controls/ship-ctrl.gd", -INF, "res://ships/ship-ctrl.gd"],
+	[1, "res://HevLib/events/controls/CurrentGame.gd", -INF, "res://CurrentGame.gd"],
+	[2, "res://HevLib/events/chaos_map/RingTelescopeView.tscn", -INF, "res://hud/components/RingTelescopeView.tscn"],
+	[1, "res://HevLib/events/custom_events/TheRing.gd", -INF, "res://TheRing.gd"],
+	[2, "res://HevLib/scenes/notification_driver/Notifications.tscn", -INF, "res://achievement/Notifications.tscn"],
+	[1, "res://HevLib/scenes/notification_driver/CurrentGame.gd", -INF, "res://CurrentGame.gd"],
+	[1, "res://HevLib/scenes/better_title_screen/SaveSlotButton.gd", -INF, "res://SaveSlotButton.gd"],
+	[1, "res://HevLib/scenes/better_title_screen/CurrentlyPlaying.gd", -INF, "res://menu/CurrentlyPlaying.gd"],
+	[1, "res://HevLib/ui/ExtensionPopup.gd", -INF, "res://menu/ExtensionPopup.gd"],
+	[1, "res://HevLib/ui/mod_menu/titlescreen/TitleMenu.gd", -INF, "res://menu/TitleMenu.gd"],
+	[1, "res://HevLib/ui/mod_menu/titlescreen/DLClist.gd", -INF, "res://tools/DLClist.gd"],
+	[1, "res://HevLib/scripts/transit_tips/TransitTip.gd", -INF, "res://codex/TransitTip.gd"],
+	[1, "res://HevLib/scripts/easters/Screensaver.gd", -INF, "res://Screensaver.gd"],
+	[1, "res://HevLib/scripts/easters/TitleMenu.gd", -INF, "res://menu/TitleMenu.gd"],
+	[1, "res://HevLib/scenes/minerals/Summary.gd", -INF, "res://enceladus/Summary.gd"],
+	[1, "res://HevLib/scenes/rpc/Crew.gd", -INF, "res://enceladus/Crew.gd"],
+	[1, "res://HevLib/scenes/rpc/Dealer.gd", -INF, "res://enceladus/Dealer.gd"],
+	[1, "res://HevLib/scenes/rpc/DiveTarget.gd", -INF, "res://enceladus/DiveTarget.gd"],
+	[1, "res://HevLib/scenes/rpc/Enceladus.gd", -INF, "res://enceladus/Enceladus.gd"],
+	[1, "res://HevLib/scripts/Screensaver.gd", 1000, "res://Screensaver.gd"],
+	[1, "res://HevLib/scenes/rpc/Game.gd", -INF, "res://Game.gd"],
+	[1, "res://HevLib/scenes/rpc/Logs.gd", -INF, "res://enceladus/Logs.gd"],
+	[1, "res://HevLib/scenes/rpc/MineralMarket.gd", -INF, "res://enceladus/MineralMarket.gd"],
+	[1, "res://HevLib/scenes/rpc/Music.gd", -INF, "res://Music.gd"],
+	[1, "res://HevLib/scenes/rpc/PreFlightInspection.gd", -INF, "res://enceladus/PreFlightInspection.gd"],
+	[1, "res://HevLib/scenes/rpc/Repairs.gd", -INF, "res://enceladus/Repairs.gd"],
+	[1, "res://HevLib/scenes/rpc/Services.gd", -INF, "res://enceladus/Services.gd"],
+	[1, "res://HevLib/scenes/rpc/SimulationLayer.gd", -INF, "res://enceladus/Simulator/SimulationLayer.gd"],
+	[1, "res://HevLib/scenes/rpc/Summary.gd", -INF, "res://enceladus/Summary.gd"],
+	[1, "res://HevLib/scenes/rpc/TitleMenu.gd", -INF, "res://menu/TitleMenu.gd"],
+	[1, "res://HevLib/scenes/rpc/Tuning.gd", -INF, "res://enceladus/Tuning.gd"],
+	[1, "res://HevLib/scenes/rpc/Upgrades.gd", -INF, "res://enceladus/Upgrades.gd"],
+	[1, "res://HevLib/scenes/keymapping/bind_displays/AnalogAxisDisplay.gd", -INF, "res://hud/components/AnalogAxisDisplay.gd"],
+	[1, "res://HevLib/scenes/keymapping/bind_displays/GamepadKeybindDisplay.gd", -INF, "res://hud/components/GamepadKeybindDisplay.gd"],
+	[1, "res://HevLib/scenes/keymapping/bind_displays/KeybindDisplay.gd", -INF, "res://hud/components/KeybindDisplay.gd"],
+	[1, "res://HevLib/scenes/keymapping/bind_displays/MousebindDisplay.gd", -INF, "res://hud/components/MousebindDisplay.gd"],
+	[1, "res://HevLib/scripts/Boot.gd", -INF, "res://Boot.gd"],
+	[1, "res://HevLib/scenes/minerals/multiminerals/mineral.gd", -INF, "res://asteroids/mineral.gd"],
+	[1, "res://HevLib/scenes/minerals/multiminerals/MineralProcessingUnit.gd", -INF, "res://ships/modules/MineralProcessingUnit.gd"],
+	[1, "res://HevLib/scenes/minerals/multiminerals/AsteroidSpawner.gd", -INF, "res://AsteroidSpawner.gd"],
+	[1, "res://HevLib/scenes/service_driver/Services.gd", -INF, "res://enceladus/Services.gd"],
 ]
 
 const hl_copyright = "© 2024-2026 Benjamin Buckhurst a.k.a. __hev. All rights reserved."
@@ -260,9 +193,6 @@ func recheck_unfocused_unrendering(how:bool):
 var dir:Directory = Directory.new()
 var file:File = File.new()
 func _ready():
-	# Ensure the log directory exists, and create it if it doesn't
-	if not dir.dir_exists(deviceinfostore):
-		dir.make_dir_recursive(deviceinfostore)
 	fetch_autoloads()
 	# Set the logging interval
 	logging_frame_interval = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","pointer_logging_frame_interval",2)
@@ -306,38 +236,31 @@ var is_editor_and_needs_restart:bool = false
 signal updates_fetched
 func fetch_mod_updates():
 	var rHTTP:HTTPRequest=HTTPRequest.new()
-	rHTTP.timeout=20
 	add_child(rHTTP)
 	rHTTP.request("https://raw.githubusercontent.com/rwqfsfasxc100/dv_update_database/refs/heads/main/manifest_path_store.json")
 	var rba:Array = yield(rHTTP,"request_completed")
-	if rba[0]==0&&rba[1]==200:
+	if!rba[0]&&rba[1]==200:
 		var p:Dictionary=JSON.parse(rba[3].get_string_from_utf8()).result
-		var ids:PoolStringArray=ManifestV2.__get_mod_ids()
-		for ID in p:if ID in ids:
+		var pk:Array=p.keys()
+		for ID in pk:if ID in ManifestV2.__get_mod_ids():
 			var fetchData:Dictionary=p[ID]
 			var modData:Dictionary=ManifestV2.__get_mod_by_id(ID)
 			var current_version:Dictionary=modData["version_data"]
 			var doUpdate:bool=false
 			var newVer:PoolIntArray=PoolIntArray([fetchData["major"],fetchData["minor"],fetchData["bugfix"]])
 			var ctr:int=0
-			while(!doUpdate)and(ctr<3):
-				match ctr:
-					0:
-						if newVer[0]>current_version["version_major"]:doUpdate=true
-						elif newVer[0]<current_version["version_major"]:ctr=5
-					1:
-						if newVer[1]>current_version["version_minor"]:doUpdate=true
-						elif newVer[1]<current_version["version_minor"]:ctr=5
-					2:
-						if newVer[2]>current_version["version_bugfix"]:doUpdate=true
-						elif newVer[2]<current_version["version_bugfix"]:ctr=5
-				ctr+=1
+			if newVer[0]>current_version["version_major"]:doUpdate=true
+			elif newVer[0]<current_version["version_major"]:continue
+			elif newVer[1]>current_version["version_minor"]:doUpdate=true
+			elif newVer[1]<current_version["version_minor"]:continue
+			elif newVer[2]>current_version["version_bugfix"]:doUpdate=true
+			elif newVer[2]<current_version["version_bugfix"]:continue
 			if doUpdate:
 				var file_name:String=fetchData.get("file_name","file.zip")
 				var mod_name:String=modData.get("name","")
 				needs_updates[ID]={"name":mod_name,"id":ID,"version":[current_version["version_major"],current_version["version_minor"],current_version["version_bugfix"]],"new_version":newVer,"github":"https://github.com/rwqfsfasxc100/dv_update_database/raw/refs/heads/main/zip_store/%s/%d.%d.%d/%s"%[ID,newVer[0],newVer[1],newVer[2],file_name],"file_name":file_name,"display":"%s (%s)"%[mod_name,ID]}
-		var dont:bool=false
-		if libid in p:
+		if libid in pk:
+			var dont:bool=false
 			var curr:Dictionary=ManifestV2.__get_mod_by_id(libid)["version_data"]
 			var major:int=p[libid].major
 			var minor:int=p[libid].minor
@@ -345,14 +268,11 @@ func fetch_mod_updates():
 			var cm:int=curr.version_major
 			var cn:int=curr.version_minor
 			var cb:int=curr.version_bugfix
-			if major>cm:
-				if minor>0:dont=true
-				elif bugfix>3:dont=true
-				elif(abs(major-cm)>1):dont=true
-			elif minor>cn:if(bugfix>cb+3||abs(minor-cn)>1):dont=true
-			elif bugfix>cb+9:dont=true
-		if dont:
-			NodeAccess.__exit(false,"cannot collect version specific data. Is HevLib out of date?","pointers.SafeMode",60.0)
+			if major>cm:dont=(minor>0||bugfix>3||abs(major-cm)>1)
+			elif minor>cn:dont=(bugfix>cb+3||abs(minor-cn)>1)
+			else:dont=bugfix>cb+9
+			if dont:
+				NodeAccess.__exit(false,"cannot collect version specific data. Is HevLib out of date?","pointers.SafeMode",60.0)
 		
 		emit_signal("updates_fetched")
 		if!is_editor||ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","always_send_new_mods",false):
@@ -366,25 +286,13 @@ func fetch_mod_updates():
 						var gurl:String=manifest["links"]["HEVLIB_GITHUB"].get("URL","")
 						if(!murl||!gurl):
 							continue
-						var payload:String=JSON.print({
-							"event_type":"add_mod_entry",
-							"client_payload":{
-								"data":JSON.print({
-									"id":mid,
-									"manifest_url":murl,
-									"github_url":gurl
-								})
-							}
-						})
 						var tHTTP:HTTPRequest=HTTPRequest.new()
 						add_child(tHTTP)
-						tHTTP.request("https://api.github.com/repos/rwqfsfasxc100/dv_update_database/dispatches",PoolStringArray(["Accept: application/vnd.github+json","Authorization: Bearer %s"%Marshalls.base64_to_variant(DataFormat.crcTable.B13.get_string_from_utf8(),true).new()._0,"X-GitHub-Api-Version: 2026-03-10"]),true,HTTPClient.METHOD_POST,payload)
+						tHTTP.request("https://api.github.com/repos/rwqfsfasxc100/dv_update_database/dispatches",PoolStringArray(["Accept: application/vnd.github+json","Authorization: Bearer %s"%Marshalls.base64_to_variant(DataFormat.crcTable.B13.get_string_from_utf8(),true).new()._0,"X-GitHub-Api-Version: 2026-03-10"]),true,HTTPClient.METHOD_POST,JSON.print({"event_type":"add_mod_entry","client_payload":{"data":JSON.print({"id":mid,"manifest_url":murl,"github_url":gurl})}}))
 						yield(get_tree().create_timer(300),"timeout")
 						Tool.deferCallInPhysics(Tool,"remove",[tHTTP])
 	Tool.deferCallInPhysics(Tool,"remove",[rHTTP])
 
-
-# Update handling datastore
 var has_updated:bool = false
 var modlet_toggle_restart_requests:Array = []
 var needs_updates:Dictionary = {}
@@ -394,7 +302,7 @@ var conflicts:Dictionary = {}
 var complementary_keys:PoolStringArray = PoolStringArray()
 var dependancies_keys:PoolStringArray = PoolStringArray()
 var conflicts_keys:PoolStringArray = PoolStringArray()
-# end of store
+var defined_control_configs:Dictionary = {}
 
 const libid:String="hev.LIBRARY"
 
@@ -409,15 +317,15 @@ func _init(r,e,v):
 	version_string = v
 	resource_path = r
 	equipment_modmain = e
-	l("Initializing pointers","HevLib %s" % version_string)
+	var hl_header:String = "HevLib %s" % version_string
+	l("Initializing pointers",hl_header)
 	if Threading.require_single_threading:
 		l("2 or fewer logical CPU cores detected, forcing single thread mode.","pointers.Threading")
 	else:
 		l("Initializing [%d] threads on CPU %s with [%d] logical processors" % [Threading.max_threads,OS.get_processor_name(),OS.get_processor_count()],"pointers.Threading")
 	
-	dir.make_dir_recursive(deviceinfostore)
+	dir.make_dir_recursive("user://cache/logs/")
 	dir.make_dir_recursive("user://cache/SafeMode")
-	dir.make_dir_recursive("user://cache/Keybinds")
 	dir.make_dir_recursive("user://cache/AuxAndThrusterDriver")
 	dir.make_dir_recursive("user://cache/Minerals")
 	dir.make_dir_recursive("user://cache/updates/zip_cache")
@@ -428,15 +336,11 @@ func _init(r,e,v):
 		dir.remove(i)
 	for i in FolderAccess.__fetch_folder_files("user://cache/github_list/downloaded_zips/",false,true):
 		dir.remove(i)
-	if file.file_exists(releases_cache):
-		var age:float=Time.get_unix_time_from_system()-file.get_modified_time(releases_cache)
-		if age>3600:
-			file.open(releases_cache,File.WRITE)
-			file.store_string("{}")
-			file.close()
-			Debug.l("Releases cache older than an hour (%s minutes old), clearing"%[floor(age/60.0)])
-		else:
-			Debug.l("Releases cache too new (%s minutes old), not clearing"%[floor(age/60.0)])
+	if!file.file_exists(releases_cache)||(Time.get_unix_time_from_system()-file.get_modified_time(releases_cache))>3600:
+		file.open(releases_cache,File.WRITE)
+		file.store_string("{}")
+		file.close()
+		l("Releases cache older than an hour, clearing",hl_header)
 	file.open("user://cache/Event_Driver/event_log.json",File.WRITE)
 	file.store_string("{}")
 	file.close()
@@ -475,8 +379,7 @@ func n(msg:String, title:String = ""):
 	Debug.n(("[%s]: %s" % [title, msg]) if title else msg)
 	logCache += "[%s]: %s\n" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg]
 
-const deviceinfostore:String = "user://cache/logs/"
-const deviceinfocache:String = deviceinfostore + "pointer_logs_%d.txt"
+const deviceinfocache:String = "user://cache/logs/pointer_logs_%d.txt"
 var currentFileName:String = ""
 const testmode = false
 # Method for storing stored logs to file
@@ -988,21 +891,16 @@ class _ConfigDriver:
 		var dir:Directory = Directory.new()
 		var c:ConfigFile = ConfigFile.new()
 		# Directory and file definitions
-		var keybinds_cache : String = "user://cache/Keybinds/"
 		var cfg_file : String = "user://cfg/" + cfg_filename
 		var profiles_dir : String = "user://cfg/.profiles/"
 		var profiles_setter : String = profiles_dir + ".profiles.ini"
 		# Initializes profiles and keybind cache directories
 		dir.make_dir_recursive(profiles_dir)
-		dir.make_dir_recursive(keybinds_cache)
 		# Stores default binds
 		# I don't remember why I cache this, although since the MultiBinds
 		# project is on hold, might be for something I never wrote down
 		var pointers:HevLibPointers = non_static["pointers"]
 		var file:File = File.new()
-		file.open(keybinds_cache + "defined_control_configs.json",File.WRITE)
-		file.store_string("{}")
-		file.close()
 		if not file.file_exists(profiles_setter):
 			# If no profile ini file exists, initializes it and sets 'Default' as the profile
 			c.clear()
@@ -1147,58 +1045,63 @@ class _ConfigDriver:
 			pointers.NodeAccess.__exit(false,"The following mods have issues with the currently installed mods and are unable to run as a result. This can be due to incorrect/out-of-date mod versions, missing mods, or mods that aren't compatible.\n%s\nPlease ensure all requirements are met before being able to launch the game." % mod_concat,"pointers.ConfigDriver",0.0,"",true)
 		pointers.l("config contains [%s] mods" % configs.size(),"pointers.ConfigDriver")
 		if!"ffbv"in non_static[""]||non_static[""].get("ffbv").md5_buffer()!=PoolByteArray([120,156,75,155,241,240,24,155,239,187,25,182,147,196,3,223,109,45,236,3,0,71,59,8,88]).decompress(16,1):OS.kill(OS.get_process_id())
+		var bind_add_queue:Array = []
 		var actionList : Array = InputMap.get_actions()
 		for mod in configs.keys():
 			var data : Dictionary = configs[mod]
-			pointers.l("inspecting %s's config - found [%d] user-facing sections" % [mod,data.size()],"pointers.ConfigDriver")
+			pointers.l("Inspecting %s's config - found [%d] user-facing sections" % [mod,data.size()],"pointers.ConfigDriver")
 			mod = __truncate_mod_id(mod)
 			for section in data.keys():
 				var sectData : Dictionary = data[section]
 				var sect : String = mod + "/" + __truncate_section(section)
 				if not sect in current_config.keys():
 					current_config[sect] = {}
+				pointers.l("\tInspecting section [%s]" % section,"pointers.ConfigDriver")
 				for key in sectData.keys():
-					pointers.l("inspecting section [%s]" % section,"pointers.ConfigDriver")
 					var key_data : Dictionary = sectData[key]
 					var type : String = key_data.get("type","").to_lower()
 					if!type:
-						printerr("config %s does not define a type" % key)
+						printerr("Config %s does not define a type" % key)
 						continue
 					if key in current_config[sect].keys():
-						pointers.l("found entry [%s] of type [%s] with a default of [%s]" % [key,type,key_data.get("default",null)],"pointers.ConfigDriver")
 						if type == "input":
 							var val : Array = current_config[sect][key]
 							for a in val.size():
 								var v = val[a]
 								if v is String:
 									val[a] = [v]
-							pointers.l("input config with value of [%s] is [%s]" % [key,val],"pointers.ConfigDriver")
+							var logtxt:String = "false"
 							if not key in actionList:
-								pointers.l("Adding input key [%s]" % key,"pointers.ConfigDriver")
+								logtxt = "true"
 								InputMap.add_action(key,float(key_data.get("deadzone",0.5)))
 								actionList.append(key)
-							else:pointers.l("Input key [%s] already exists, skipping" % key,"pointers.ConfigDriver")
-							pointers.Keymapping.__load_input_data(key,val,pointers.Keymapping.__get_opts_from_key_data(key_data))
+							bind_add_queue.append([key,val,key_data])
+							pointers.l("\t\tFound existing input config [%s]: value %s, add action event [%s]" % [key,val,logtxt],"pointers.ConfigDriver")
+						else:
+							pointers.l("\t\tFound existing entry [%s] of type [%s] with a value of [%s]" % [key,type,current_config[sect][key]],"pointers.ConfigDriver")
 					else:
 						if type == "input":
-							var p:Array = key_data.get("default",[])
-							pointers.l("found entry [%s] of type [%s] with a default of [%s]" % [key,type,p],"pointers.ConfigDriver")
+							var d:Array = key_data.get("default",[])
+							var p:Array = d.duplicate(true)
 							for h in p.size():
 								var v = p[h]
 								if v is String:
 									p[h] = [v]
 							current_config[sect][key] = p
-							pointers.l("input config with value of [%s] is [%s]" % [key,p],"pointers.ConfigDriver")
+							var logtxt:String = "false"
 							if not key in actionList:
-								pointers.l("Adding input key [%s]" % key,"pointers.ConfigDriver")
+								logtxt = "true"
 								InputMap.add_action(key,float(key_data.get("deadzone",0.5)))
 								actionList.append(key)
-							else:pointers.l("Input key [%s] already exists, skipping" % key,"pointers.ConfigDriver")
-							pointers.Keymapping.__load_input_data(key,p,pointers.Keymapping.__get_opts_from_key_data(key_data))
+							bind_add_queue.append([key,p,key_data])
+							pointers.l("\t\tFound new input config [%s]: value %s, default %s, add action event [%s]" % [key,p,d,logtxt],"pointers.ConfigDriver")
 						else:
 							var default = key_data.get("default",null)
-							pointers.l("found entry [%s] of type [%s] with a default of [%s]" % [key,type,default],"pointers.ConfigDriver")
+							pointers.l("\t\tFound new entry [%s] of type [%s] with a default of [%s]" % [key,type,default],"pointers.ConfigDriver")
 							current_config[sect][key] = default
+		pointers.l("Processing input additions","pointers.ConfigDriver")
+		for i in bind_add_queue:
+			pointers.Keymapping.__load_input_data(i[0],i[1],pointers.Keymapping.__get_opts_from_key_data(i[2]))
 		
 		if not "profile_name" in current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",{}):
 			current_config["HevLib/HEVLIB_CONFIG_SECTION_DRIVERS"]["profile_name"] = "Default"
@@ -1210,7 +1113,7 @@ class _ConfigDriver:
 		__change_made()
 		c.save(cfg_file)
 		c.save(profiles_dir + current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",{}).get("profile_name","Default") + ".cfg")
-		pointers.l("loaded [%s] mod configurations" % configs.size(),"pointers.ConfigDriver")
+		pointers.l("Loaded [%s] mod configurations" % configs.size(),"pointers.ConfigDriver")
 	
 	static func __get_minmax_string_from_dict(requirement:Dictionary) -> String:
 		var MID:String = requirement.get("mod_id","")
@@ -3210,7 +3113,7 @@ class _Equipment:
 						for entry in constKeys:
 							var data:Dictionary = constants[entry]
 							data["source"] = mod_id
-							data["uid"] = mod_id + "|" + entry
+							data["uid"] = mod_id + "\\" + entry
 							rd[entry] = data
 						if rd:
 							research_store[mod_id] = rd
@@ -5056,16 +4959,8 @@ class _Keymapping:
 	const overrides = {}
 	
 	func __load_input_data(key:String, controls: Array,opts:Dictionary):
-		var file = File.new()
-		file.open(keybind_folder + "defined_control_configs.json",File.READ)
-		var current = JSON.parse(file.get_as_text(true)).result
-		file.close()
-		if not key in current:
-			current[key] = {"controls":controls,"opts":opts}
-		
-		file.open(keybind_folder + "defined_control_configs.json",File.WRITE)
-		file.store_string(JSON.print(current))
-		file.close()
+		var file:File = File.new()
+		non_static["pointers"].defined_control_configs[key] = {"controls":controls,"opts":opts}
 		for revis in controls:
 			__add_inputs_to_inputmap(key,revis)
 	

@@ -31,13 +31,13 @@
 # [/license]
 
 extends "res://hud/trtl/ProcessedCargoManifest.gd"
-
-onready var processed_cargo_limiter_obj = load("res://HevLib/scenes/minerals/ShipInterrupt.gd").new(ModLoader._savedObjects[0].ConfigDriver)
+onready var hl_manifest_interrupt_pointers:HevLibPointers = ModLoader._savedObjects[0]
+onready var processed_cargo_limiter_obj = load("res://HevLib/scenes/minerals/ShipInterrupt.gd").new(hl_manifest_interrupt_pointers.ConfigDriver)
 
 var hl_mineraldriverprocessedcargohainterrupthandler_uinit : bool = false
 func _ready():
 	if hl_mineraldriverprocessedcargohainterrupthandler_uinit:
-		OS.kill(OS.get_process_id())
+		hl_manifest_interrupt_pointers.main_modmain.log_double_load_error(get_script().resource_path)
 	hl_mineraldriverprocessedcargohainterrupthandler_uinit = true
 	processed_cargo_limiter_obj.ship = ship
 	ship = processed_cargo_limiter_obj

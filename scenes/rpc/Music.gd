@@ -39,7 +39,7 @@ var current_state = ""
 var rpc_music_uinit : bool = false
 func _ready():
 	if rpc_music_uinit:
-		OS.kill(OS.get_process_id())
+		ModLoader._savedObjects[0].main_modmain.log_double_load_error(get_script().resource_path)
 	rpc_music_uinit = true
 	rpc.connect("rpc_timer_complete",self,"calc")
 

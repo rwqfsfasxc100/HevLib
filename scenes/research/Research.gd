@@ -41,7 +41,7 @@ onready var dormant_project_management = $TabHintContainer/Tabs/HEVLIB_RESEARCH_
 
 onready var show_completed_projects_btn = $TabHintContainer/Tabs/HEVLIB_RESEARCH_CURRENT/CurrentResearchManagement/VBoxContainer/MarginContainer2/HBoxContainer/CheckButton
 
-onready var rpc :HevLibPointers._RPC= ModLoader._savedObjects[0].RPC
+onready var rpc:HevLibPointers._RPC= ModLoader._savedObjects[0].RPC
 
 func show():
 	if visible or $Shower.is_playing():
@@ -73,33 +73,20 @@ func hide():
 	if lastFocus:
 		lastFocus.grab_focus()
 	rpc.loader_changed("enceladus_prime",0,"")
-var pointers:HevLibPointers
+
 func _ready():
-	pointers = ModLoader._savedObjects[0]
 	visible = false
 	get_parent().connect("hidefoka", self, "hide")
 	
-	var mod_ids = pointers.ManifestV2.__get_mod_ids()
-	current_project_management.current_mod_ids = mod_ids
-	dormant_project_management.current_mod_ids = mod_ids
-	var research_store = pointers.Equipment.research_store
 	if not CurrentGame.hl_research_enabled:
 		research_button.get_parent().remove_child(research_button)
 		Tool.remove(research_button)
-	else:
-		var state = CurrentGame.state
-		if not "hevlib_research" in state:
-			CurrentGame.state.merge({"hevlib_research":{}})
-		get_research_data(research_store)
 
 
 func _input(event):
 	if visible and (Input.is_action_just_pressed("ui_cancel") or Input.is_action_just_pressed("pause")):
 		get_tree().set_input_as_handled()
 		hide()
-		
-#		if lastFocus:
-#			lastFocus.grab_focus()
 
 func unfocus():
 	if lastFocus and get_focus_owner() == null:
@@ -108,20 +95,3 @@ func unfocus():
 
 func _on_Research_pressed():
 	show()
-
-func get_research_data(research_store):
-	for mod in research_store:
-		var mod_store = research_store[mod]
-		for id in mod_store:
-			var research_entry = mod_store[id].duplicate(true)
-			var uid = research_entry["uid"]
-			if not "state" in CurrentGame.state.hevlib_research:
-				var state = {
-					"active":false,
-					"time_while_active":-1,
-					"completed":false,
-				}
-				research_entry["state"] = state
-			CurrentGame.state.hevlib_research[uid] = research_entry
-	current_project_management._initialize()
-	dormant_project_management._initialize()

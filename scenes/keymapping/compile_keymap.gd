@@ -40,10 +40,8 @@ func _init(p):
 
 var control_vars = {}
 # General variables
-var file = File.new()
-var keybind_folder = "user://cache/Keybinds/"
-var keybinds = keybind_folder + "defined_control_configs.json"
-var vanilla = keybind_folder + "vanilla_binds.json"
+var file:File = File.new()
+const vanilla = "user://cache/Keybinds/vanilla_binds.json"
 
 # Code prefabs
 var script_header = "extends Reference\n\nfunc handle_input(bits, event):\n\tpass"
@@ -96,10 +94,9 @@ func compile_keymap():
 		if not "opts" in g:
 			g["opts"] = d.get("opts",{"allow_extra_keys":true,"order_sensitive":true,"exclusive":false})
 		
-	file.open(keybinds,File.READ)
-	var apg = JSON.parse(file.get_as_text()).result
-	file.close()
-	for action in apg:
+	
+	var apg:Dictionary = pointers.defined_control_configs
+	for action in apg.keys():
 		var d = apg[action]
 		if action in p:
 			for ac in d["controls"]:

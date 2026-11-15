@@ -34,7 +34,8 @@ extends "res://enceladus/Enceladus.gd"
 
 var rpc_enceladus_uinit : bool = false
 func _ready():
+	var pointers:HevLibPointers = ModLoader._savedObjects[0]
 	if rpc_enceladus_uinit:
-		OS.kill(OS.get_process_id())
+		pointers.main_modmain.log_double_load_error(get_script().resource_path)
 	rpc_enceladus_uinit = true
-	ModLoader._savedObjects[0].RPC.loader_changed("enceladus_prime")
+	pointers.RPC.loader_changed("enceladus_prime")

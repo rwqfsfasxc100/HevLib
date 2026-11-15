@@ -56,7 +56,7 @@ func hl_thering_UV():
 			base_playlist.append(event)
 			string[event] = not event in disabled_events
 		if write_events:
-			file.open("user://cache/current_events.txt",File.WRITE)
+			file.open("user://cache/Event_Driver/current_events.txt",File.WRITE)
 			file.store_string(JSON.print(string,"\t"))
 			file.close()
 		
@@ -65,6 +65,7 @@ func hl_thering_UV():
 			for event in base_playlist:
 				if not event in disabled_events:
 					playlist.append(get_node(event))
+			playlist.erase(dummy_event)
 		else:
 			playlist.append(dummy_event)
 
@@ -191,7 +192,7 @@ func logEvents():
 var hl_eventdriverintegrate_uinit : bool = false
 func _ready():
 	if hl_eventdriverintegrate_uinit:
-		OS.kill(OS.get_process_id())
+		pointers.main_modmain.log_double_load_error(get_script().resource_path)
 	hl_eventdriverintegrate_uinit = true
 	connect("tree_exiting",self,"wipe_lists")
 	file.open(event_log_file,File.WRITE)

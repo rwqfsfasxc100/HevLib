@@ -33,11 +33,11 @@
 extends "res://TheRing.gd"
 
 var hl_shipdriverderelictadder_uinit : bool = false
+onready var hl_ring_shipdriver_additive_pointers:HevLibPointers = ModLoader._savedObjects[0]
 func _ready():
 	if hl_shipdriverderelictadder_uinit:
-		OS.kill(OS.get_process_id())
+		hl_ring_shipdriver_additive_pointers.main_modmain.log_double_load_error(get_script().resource_path)
 	hl_shipdriverderelictadder_uinit = true
-	var pointers:HevLibPointers = ModLoader._savedObjects[0]
 	var derelict_handler:Script = load("res://HevLib/scenes/ship_driver/DerelictHandler.gd")
 	for index in 5:
 		index += 1
@@ -50,11 +50,11 @@ func _ready():
 		mh.mode = "miner"
 		mh.index = index
 		add_child(mh)
-	var data:Array = pointers.Equipment.add_ships_store
+	var data:Array = hl_ring_shipdriver_additive_pointers.Equipment.add_ships_store
 	var ro:Script = load("res://story/RescueOperation.gd")
 	for ship in data:
-		if "name" in ship and ship.name and "path" in ship and ship.path and pointers.FileAccess.__file_exists(ship.path):
-			pointers.l("Adding uniquely-named derelict event for ship %s" % ship.name,"ShipDriver")
+		if "name" in ship and ship.name and "path" in ship and ship.path and hl_ring_shipdriver_additive_pointers.FileAccess.__file_exists(ship.path):
+			hl_ring_shipdriver_additive_pointers.l("Adding uniquely-named derelict event for ship %s" % ship.name,"ShipDriver")
 			
 			var derelict_data:Dictionary = ship.get("derelict",{})
 			var model:String = ship.get("name","TRTL")

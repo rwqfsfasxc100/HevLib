@@ -42,7 +42,7 @@ onready var mlist = mechanic.get_node("ScrollContainer")
 var hl_omswidthsliderhandle_uinit : bool = false
 func _ready():
 	if hl_omswidthsliderhandle_uinit:
-		OS.kill(OS.get_process_id())
+		ModLoader._savedObjects[0].main_modmain.log_double_load_error(get_script().resource_path)
 	hl_omswidthsliderhandle_uinit = true
 	scroll.rect_size = geo.rect_size
 	scroll.size_flags_vertical = SIZE_EXPAND_FILL

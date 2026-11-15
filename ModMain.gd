@@ -105,8 +105,7 @@ static func installScriptOverrideFromScript(out:Script,original_path:String):
 	_savedObjects.append(out)
 static func replaceScene(newPath:String,oldPath:String=""):
 	l("Updating scene:%s"%newPath)
-	if oldPath.empty():
-		oldPath="res://"+newPath
+	if!oldPath:oldPath="res://"+newPath
 	var scene:Resource=ResourceLoader.load(strings[1].plus_file(newPath),"Resource")
 	scene.take_over_path(oldPath)
 	_savedObjects.append(scene)
@@ -114,11 +113,11 @@ static func replaceScene(newPath:String,oldPath:String=""):
 static func replaceSceneLiteral(newPath:String,oldPath:String):
 	l("Updating scene literal:%s"%newPath)
 	var scene:Resource=ResourceLoader.load(newPath,"Resource")
-	if scene:
-		scene.take_over_path(oldPath)
-		_savedObjects.append(scene)
-		l("Finished updating literal:%s"%oldPath)
+	scene.take_over_path(oldPath)
+	_savedObjects.append(scene)
+	l("Finished updating literal:%s"%oldPath)
 static func l(msg:String,title:String=MOD_NAME):strings[3].l(msg,"%s V%s"%[title,MOD_VERSION_STRING])
+static func log_double_load_error(script_path:String):l("Script at [%s] is likely double loaded!" % script_path)
 const driver_dirs=PoolStringArray(["HEVLIB_EQUIPMENT_DRIVER_TAGS/","HEVLIB_MENU/","HEVLIB_MINERAL_DRIVER_TAGS/","HEVLIB_DRIVERS/"])
 const variables_folder:String="user://cache/Variable_Fetch/"
 const class_names_to_clear:PoolStringArray=PoolStringArray(["HevLibPointers","MINIZ"])
@@ -129,16 +128,13 @@ static func process_gdnative_plugins()->Dictionary:
 	var exePath:String=OS.get_executable_path().get_base_dir()+"/hevlib_dll_store/"
 	if!OS.has_feature("editor"):
 		var all_libraries:PoolStringArray=PoolStringArray()
-		for first in fetch_folder_files("res://",true):
-			if first.ends_with("/"):
-				for second in fetch_folder_files("res://"+first,true):
-					if second in driver_dirs:
-						for driverFile in fetch_folder_files("res://"+first+second):
-							if driverFile=="DLL_MAPPER.gd":
-								var mod_dir:String="res://"+first
-								for entry in PoolStringArray(load(mod_dir+second+"DLL_MAPPER.gd").get_script_constant_map().get("DLL_MAPPER",[])):
-									if!entry.begins_with("res://"):entry=mod_dir + entry
-									if entry.get_extension()=="gdnlib":all_libraries.append(entry)
+		for first in fetch_folder_files("res://",true):if first.ends_with("/"):
+			var mod_dir:String="res://"+first
+			for second in fetch_folder_files(mod_dir,true):if second in driver_dirs:
+				var cdir:String=mod_dir+second
+				for driverFile in fetch_folder_files(cdir):if driverFile=="DLL_MAPPER.gd":for entry in PoolStringArray(load(cdir+"DLL_MAPPER.gd").get_script_constant_map().get("DLL_MAPPER",[])):
+					if!entry.begins_with("res://"):entry=mod_dir+entry
+					if entry.get_extension()=="gdnlib":all_libraries.append(entry)
 		var copied_files:PoolStringArray=PoolStringArray()
 		var existing_libs:PoolStringArray=PoolStringArray()
 		var lib_resave:Array=Array()
@@ -192,7 +188,6 @@ static func process_gdnative_plugins()->Dictionary:
 			file.open(savePath,File.READ)
 			fetchPaths[entry.substr(6)]=file.get_buffer(file.get_len())
 			file.close()
-		configFile.clear()
 		for f in fetch_folder_files(exePath):if!f in existing_libs:directory.remove(exePath+f)
 	return fetchPaths
 static func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:Array)->void:
@@ -289,8 +284,6 @@ static func load_pointers(modLoader:ModLoader):
 func testing(modLoader:ModLoader,pointers):
 	var file:File = File.new()
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
-	
-	var val:float = 4.356
 	
 	var t1=Time.get_ticks_usec()
 	for i in 100000:

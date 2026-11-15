@@ -37,19 +37,18 @@ signal hlr_storychanged(story,from,to)
 onready var hl_research_enabled:bool = false setget setResearchEnabled , getResearchEnabled
 onready var researchSysPointers:HevLibPointers = ModLoader._savedObjects[0]
 
-
-onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
-onready var research_store:Dictionary = pointers.Equipment.research_store
+onready var research_store:Dictionary = researchSysPointers.Equipment.research_store
 
 var research_state:Dictionary = {}
-onready var active_mods:PoolStringArray = pointers.ManifestV2.__get_mod_ids()
+var research_project_ids:PoolStringArray = PoolStringArray()
+onready var active_mods:PoolStringArray = researchSysPointers.ManifestV2.__get_mod_ids()
 
 var hl_researchoverhead_uinit : bool = false
 func _ready():
 	if hl_researchoverhead_uinit:
-		OS.kill(OS.get_process_id())
+		researchSysPointers.main_modmain.log_double_load_error(get_script().resource_path)
 	hl_researchoverhead_uinit = true
-	connect("newGame",self,"fetch_research_state")
+	connect("newGame",self,"init_research_on_save_load")
 
 func setStory(story, to, onlyRise = true):
 	if hl_research_enabled:
@@ -61,27 +60,69 @@ func setResearchEnabled(how:bool):
 	researchSysPointers.l("Setting research system to be enabled? [%s]" % how,"Research")
 
 func getResearchEnabled() -> bool:
-	return research_store and pointers.is_editor
+	return research_store and researchSysPointers.is_editor
 
 func advanceTimeBySeconds(seconds):
 	.advanceTimeBySeconds(seconds)
 	
 
-func fetch_research_state():
+var active_projects:Array = []
+var inactive_projects:Array = []
+var complete_projects:Array = []
+
+func init_research_on_save_load():
 	research_state = state.get_or_add("hevlib_research",{})
+	research_project_ids = PoolStringArray(research_state.keys())
+	active_projects.clear()
+	inactive_projects.clear()
+	complete_projects.clear()
 	for mod in research_store:
-		if not mod in active_mods:
-			continue
 		var mod_store:Dictionary = research_store[mod]
 		for entry in mod_store:
-			var research_entry:Dictionary = mod_store[entry]
+			var research_entry:Dictionary = mod_store[entry].duplicate(true)
+			var mode:String = research_entry.mode
 			var id:String = research_entry["uid"]
+			if id in research_project_ids:
+				var rs:Dictionary = research_entry.state
+				if rs.completed:
+					complete_projects.append(research_entry)
+				elif rs.active:
+					active_projects.append(research_entry)
+				elif mode == "story_only":
+					var story:int = getStory(research_entry.story_flag)
+					if story > -1 and story < research_entry.progress_complete:
+						inactive_projects.append(research_entry)
+					else:
+						active_projects.append(research_entry)
+				else:
+					inactive_projects.append(research_entry)
+				researchSysPointers.l("Research project %s already in state" % id,"HevLib.Research")
+			else:
+				research_entry["state"] = {
+					"active":false,
+					"time_while_active":-1,
+					"completed":false,
+				}
+				research_state[id] = research_entry
+				if research_entry.mode == "story_only":
+					var story:int = getStory(research_entry.story_flag)
+					if story > -1 and story < research_entry.progress_complete:
+						inactive_projects.append(research_entry)
+					else:
+						active_projects.append(research_entry)
+				else:
+					inactive_projects.append(research_entry)
+				researchSysPointers.l("Adding research project %s to state" % id,"HevLib.Research")
 			
-#			breakpoint
-	
 
+func get_active_research_projects() -> Array:
+	return active_projects
 
+func get_inactive_research_projects() -> Array:
+	return inactive_projects
 
+func get_completed_research_projects() -> Array:
+	return complete_projects
 
 
 

@@ -41,16 +41,13 @@ var current_joy_strength = {}
 var is_active_window = true
 
 onready var vanilla_binds = Settings.cfg.input
-onready var adjustments = load("res://HevLib/scenes/keymapping/data/key_adjustments.gd").ADJUSTMENT.duplicate(true)
+onready var adjustments:Dictionary = load("res://HevLib/scenes/keymapping/data/key_adjustments.gd").ADJUSTMENT
 
 var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 var compiler:Reference = load("res://HevLib/scenes/keymapping/compile_keymap.gd").new(pointers)
 
-const keybind_folder = "user://cache/Keybinds/"
-const vanilla_binds_file = "user://cfg/Vanilla_Binds.cfg"
-
-var file = File.new()
+var file:File = File.new()
 
 var input_handle = null
 
@@ -66,10 +63,8 @@ func _ready():
 func compile():
 	var actions = InputMap.get_actions()
 	var sortedAv = pointers.Keymapping.__get_built_in_action_list()
-	var vb = pointers.ConfigDriver.__config_parse(vanilla_binds_file)
-	file.open(keybind_folder + "defined_control_configs.json",File.READ)
-	var mb = JSON.parse(file.get_as_text()).result
-	file.close()
+	var vb = pointers.ConfigDriver.__config_parse("user://cfg/Vanilla_Binds.cfg")
+	var mb:Dictionary = pointers.defined_control_configs
 	var ignore_builtin = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_KEYMAPPING","input_virtualization_ignore_builtin",false)
 	
 	for action in actions:

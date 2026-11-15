@@ -349,7 +349,7 @@ func _enter_tree():
 var hl_smdism_uinit : bool = false
 func _ready():
 	if hl_smdism_uinit:
-		OS.kill(OS.get_process_id())
+		ismPointers.main_modmain.log_double_load_error(get_script().resource_path)
 	hl_smdism_uinit = true
 	if initialize:
 		l("Adding consumables: + %s ammo / + %s nanodrones / + %s propellant" % [ammo_add, nano_add, propellant_add])

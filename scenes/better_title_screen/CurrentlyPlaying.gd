@@ -34,9 +34,12 @@ extends "res://menu/CurrentlyPlaying.gd"
 
 var hl_currhider_uinit : bool = false
 var is_ready:bool = false
+func _enter_tree() -> void:
+	pointers = ModLoader._savedObjects[0]
+
 func _ready():
 	if hl_currhider_uinit:
-		OS.kill(OS.get_process_id())
+		pointers.main_modmain.log_double_load_error(get_script().resource_path)
 	hl_currhider_uinit = true
 	is_ready = true
 func _process(delta:float):

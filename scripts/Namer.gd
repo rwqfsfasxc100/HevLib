@@ -34,10 +34,11 @@ extends "res://namer/Namer.gd"
 
 var hl_namerdriverhandler_uinit : bool = false
 func _ready():
+	var pointers:HevLibPointers = ModLoader._savedObjects[0]
 	if hl_namerdriverhandler_uinit:
-		OS.kill(OS.get_process_id())
+		pointers.main_modmain.log_double_load_error(get_script().resource_path)
 	hl_namerdriverhandler_uinit = true
-	var data:Dictionary = ModLoader._savedObjects[0].Equipment.namer_store
+	var data:Dictionary = pointers.Equipment.namer_store
 	
 	var valid_ship_types:PoolStringArray = PoolStringArray(["en","verbatim"])
 	var valid_crew_types:PoolStringArray = PoolStringArray(["usa","verbatim"])
