@@ -820,7 +820,7 @@ class _ConfigDriver:
 	
 	# All-encompassing handler to connect a method to handle any changes to configs
 	static func __establish_connection(method: String, node: Object, type: String = "config", input_method: String = "input_changed"): # Type accepts "config", "input", or "both"
-		var base = non_static["self"]
+		var base:_ConfigDriver = non_static["self"]
 		match type.to_lower():
 			# Emitted when any config changes
 			"config":
@@ -853,7 +853,7 @@ class _ConfigDriver:
 	# Inverse method to __establish connection
 	# See that method for comments, as this just disconnects those connections
 	static func __remove_connection(method: String, node: Object, type: String = "config", input_method: String = "input_changed"): # Type accepts "config", "input", or "both"
-		var base = non_static["self"]
+		var base:_ConfigDriver = non_static["self"]
 		match type.to_lower():
 			"config":
 				if node.has_method(method):
@@ -1316,7 +1316,7 @@ class _ConfigDriver:
 		non_static["self"].mk_c = true
 	
 	static func handle_change_made():
-		var base = non_static["self"]
+		var base:_ConfigDriver = non_static["self"]
 		var shs:int = base.settings.hash()
 		if shs != base.settingsHash:
 			__input_change_made()
@@ -1326,7 +1326,7 @@ class _ConfigDriver:
 		base.mk_c = false
 	
 	static func __subscribed_changes():
-		var base = non_static["self"]
+		var base:_ConfigDriver = non_static["self"]
 		var changes:Dictionary = base.changes
 		var subscriptions:Dictionary = base.subscriptions
 		var subKeys:PoolStringArray = PoolStringArray(subscriptions.keys())
@@ -1350,7 +1350,7 @@ class _ConfigDriver:
 	static func __input_change_made():
 		var ic : Array = []
 		var inputnames : Dictionary = {}
-		var base = non_static["self"]
+		var base:_ConfigDriver = non_static["self"]
 		var cached_input_config_names:Dictionary = base.cached_input_config_names
 		if cached_input_config_names:
 			inputnames = cached_input_config_names
@@ -1413,9 +1413,8 @@ class _ConfigDriver:
 		var top : String = __truncate_to_setting_entry(id,section)
 		var subscriptions:Dictionary = non_static["self"].subscriptions
 		for item in subscriptions.get(top,{}).get(setting,[]):
-			if item[0] == object:
-				if item[1] == method:
-					subscriptions[top][setting].erase(item)
+			if item[0] == object and item[1] == method:
+				subscriptions[top][setting].erase(item)
 	
 	static func __truncate_mod_id(mod_id:String) -> String:
 		return mod_id.replace("/","").replace(" ","")
@@ -1424,8 +1423,7 @@ class _ConfigDriver:
 		return section.replace("/","")
 	
 	static func __truncate_to_setting_entry(mod_id:String,section:String) -> String:
-		var sect_name : String = __truncate_mod_id(mod_id) + "/" + __truncate_section(section)
-		return sect_name
+		return __truncate_mod_id(mod_id) + "/" + __truncate_section(section)
 	
 	static func __validate_dictionary(data_dict : Dictionary,check_config : bool = true, check_requirements : bool = true, check_incompatibilities : bool = true, config_entry_override : String = "config", mod_requirements_entry_override : String = "mod_requirements", mod_incompatibilities_entry_override : String = "mod_incompatibilities"):
 		if data_dict == null:
@@ -5311,7 +5309,7 @@ class _ManifestV2:
 	
 	static func __get_mod_data():
 		if !cached_mod_list:
-			var base = non_static["self"]
+			var base:_ManifestV2 = non_static["self"]
 			var pointers:HevLibPointers = non_static["pointers"]
 			var file:File = File.new()
 			pointers.l("Fetching mods from file","pointers.ManifestV2")
@@ -7723,7 +7721,7 @@ class _RPC:
 			rpc_data["loaded"] = true
 			rpc_data["discord"] = discord
 			pointers.add_child(rpc_data["discord"])
-			var base = rpc_data["self"]
+			var base:_RPC = rpc_data["self"]
 			base.connect("update_activity",base,"update_activity")
 			var update_timer:Timer = rpc_data["update_timer"]
 			update_timer.wait_time = rpc_data["reconnect_delay"]
