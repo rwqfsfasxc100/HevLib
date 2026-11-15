@@ -1366,8 +1366,8 @@ class _ConfigDriver:
 						if data.get("type").to_lower() == "input":
 							var n : String = __truncate_mod_id(dv["mod_information"]["name"])
 							if not n in cached_input_config_names:
-								cached_input_config_names[n] = {}
-							if not sec in cached_input_config_names[n]:
+								cached_input_config_names[n] = {sec:[]}
+							elif not sec in cached_input_config_names[n]:
 								cached_input_config_names[n][sec] = []
 							cached_input_config_names[n][sec].append(setting)
 			inputnames = cached_input_config_names
@@ -3979,8 +3979,8 @@ script = ExtResource( 5 )"""
 		return out
 	
 	const nozzle_template = {
-		"peak_temperature":2500,
-		"cool_time":4,
+		"peak_temperature":2500.0,
+		"cool_time":4.0,
 		"heat_time":0.25,
 		"texture":"res://ships/modules/nozzle-cd.png",
 		"normal":"res://ships/modules/nozzle-n.png",
