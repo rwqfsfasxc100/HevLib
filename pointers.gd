@@ -171,6 +171,7 @@ signal process_tick(delta)
 signal physics_process_tick(delta)
 
 func _physics_process(delta:float):
+	emit_signal("physics_process_tick",delta)
 	logging_current_frame_timer += 1
 	if logging_frame_interval and logging_current_frame_timer > logging_frame_interval:
 		# If a config was changed in the loaded profile, handle
@@ -181,8 +182,6 @@ func _physics_process(delta:float):
 		logging_current_frame_timer = 0
 		storeLogCache()
 		VisualServer.render_loop_enabled = (not pause_on_unfocus or OS.is_window_focused())
-	
-	emit_signal("physics_process_tick",delta)
 
 func _process(delta):
 	emit_signal("process_tick",delta)
