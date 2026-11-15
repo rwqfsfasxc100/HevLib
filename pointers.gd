@@ -3343,7 +3343,7 @@ class _Equipment:
 			var slot:Dictionary = slots_for_adding_dict[st]
 			if slot.get("add_vanilla_equipment",true):
 				for equip in vanilla_equipment:
-					if confirm_equipment(vanilla_equipment[equip], slot.get("slot_type",""), slot.get("alignment",""), slot.get("restriction",""), Array(slot_allowed_equipment.get(slot.get("slot_node_name",""),[]))):
+					if confirm_equipment(vanilla_equipment[equip], slot.get("slot_type",""), slot.get("alignment",""), slot.get("restriction",""), PoolStringArray(slot_allowed_equipment.get(slot.get("slot_node_name",""),PoolStringArray()))):
 						equipment_format.append(__make_equipment_for_scene(vanilla_equipment[equip], slot.get("slot_node_name",""), slot.get("system_slot","")))
 		for slot in all_slot_node_names:
 			if slot in slot_allowed_equipment:
@@ -3364,7 +3364,7 @@ class _Equipment:
 						alignment = sd.get("alignment","")
 						restriction = sd.get("restriction","")
 						system_slot = sd.get("system_slot","")
-					if confirm_equipment(item, slot_type, alignment, restriction, Array(slot_allowed_equipment.get(slot,[]))):
+					if confirm_equipment(item, slot_type, alignment, restriction, PoolStringArray(slot_allowed_equipment.get(slot,PoolStringArray()))):
 						var string : String = __make_equipment_for_scene(item, slot, system_slot)
 						var this_sys:String = item.get("system","")
 						var this_type:String = item.get("equipment_type","")
@@ -4094,7 +4094,7 @@ script = ExtResource( 5 )"""
 			exhaust_text += "\nscale = Vector2(%s,%s)" % [sprite_scale[0],sprite_scale[1]]
 		return exhaust_text
 	
-	func confirm_equipment(equipment_node, slot_type, slot_alignment, slot_restriction, slot_allowed_equipment) -> bool:
+	func confirm_equipment(equipment_node:Dictionary, slot_type, slot_alignment:String, slot_restriction:String, slot_allowed_equipment:PoolStringArray) -> bool:
 		var e_slot_type : String = equipment_node.get("slot_type","")
 		var e_equipment : String = equipment_node.get("equipment_type","")
 		var e_alignment : String = equipment_node.get("alignment","")
