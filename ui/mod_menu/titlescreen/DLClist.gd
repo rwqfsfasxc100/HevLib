@@ -40,9 +40,6 @@ func _ready():
 		pointers.main_modmain.log_double_load_error(get_script().resource_path)
 	hl_modmenu2dlclistdriver_uinit = true
 	
-	if pointers.is_editor_and_needs_restart:
-		pointers.NodeAccess.__exit(false,"config file not able to be correctly constructed from fresh instance, closing game now that it has been properly built. Nothing is wrong, but you do need to restart the game manually.\n\nSorry for the inconvenience!","HevLib",0.0,"",true)
-	
 	theme = load("res://hud/TNTRL-theme.tres")
 	
 	grow_horizontal = Control.GROW_DIRECTION_BEGIN

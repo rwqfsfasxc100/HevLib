@@ -1308,8 +1308,8 @@ const TRANSLATIONS = {
 			"version_hash": 346203813
 		},
 		"HEVLIB_CONFIG_POINTER_LOGGING_FRAME_INTERVAL_TOOLTIP": {
-			"string": "The number of physics frames between automatic writes to the pointer log\n(i.e. information logged specifically by mods to the cache)\n\nThis is dependant on your current physics framerate.",
-			"version_hash": 515481480
+			"string": "The number of physics frames between config update calls and automatic writes to the library's log file.\n\nThis is dependant on your current physics framerate.",
+			"version_hash": 2281431588
 		},
 		"HEVLIB_CONFIG_EXTEND_DIVIDED_STORAGE_MULTIPLIER": {
 			"string": "Extend storage multiplier of divided holds",

@@ -117,6 +117,7 @@ const LIBRARY_LOAD = [
 	[1, "res://HevLib/events/controls/ship-ctrl.gd", -INF, "res://ships/ship-ctrl.gd"],
 	[1, "res://HevLib/events/controls/CurrentGame.gd", -INF, "res://CurrentGame.gd"],
 	[2, "res://HevLib/events/chaos_map/RingTelescopeView.tscn", -INF, "res://hud/components/RingTelescopeView.tscn"],
+	[1, "user://cache/Variable_Fetch/st.gd", INF, "res://Settings.gd"],
 	[1, "res://HevLib/events/custom_events/TheRing.gd", -INF, "res://TheRing.gd"],
 	[2, "res://HevLib/scenes/notification_driver/Notifications.tscn", -INF, "res://achievement/Notifications.tscn"],
 	[1, "res://HevLib/scenes/notification_driver/CurrentGame.gd", -INF, "res://CurrentGame.gd"],
@@ -170,12 +171,11 @@ signal process_tick(delta)
 signal physics_process_tick(delta)
 
 func _physics_process(delta:float):
-	if ConfigDriver.mk_c:
+	logging_current_frame_timer += 1
+	if logging_frame_interval and logging_current_frame_timer > logging_frame_interval:
 		# If a config was changed in the loaded profile, handle
 		# it and make sure connections get the updated values
 		ConfigDriver.handle_change_made()
-	logging_current_frame_timer += 1
-	if logging_frame_interval and logging_current_frame_timer > logging_frame_interval:
 		# Handle storing logs to file.
 		# This won't run until the interval is fetched after being onready
 		logging_current_frame_timer = 0
@@ -232,7 +232,6 @@ func fetch_autoloads():
 		if object_name in AUTOLOAD_REF_STORE:
 			for sensorItem in needs[object_name]:
 				sensorItem["funcref"]=funcref(AUTOLOAD_REF_STORE[object_name],sensorItem.func_method_name)
-var is_editor_and_needs_restart:bool = false
 signal updates_fetched
 func fetch_mod_updates():
 	var rHTTP:HTTPRequest=HTTPRequest.new()
@@ -601,7 +600,7 @@ class _Achievements:
 		var rarity:Dictionary = Achivements.achievementRarity
 		for m in achievementData:
 			# Separates stored data between achievements and stats
-			if not str(m).begins_with("stat:"):
+			if not m.begins_with("stat:"):
 				unlockedAchievements.append(m)
 			else:
 				stats.append(m)
@@ -900,9 +899,9 @@ class _ConfigDriver:
 					else:pointers.l("node %s not connected with the method '%s', disconnect failed" % [str(node),method],log_header)
 				else:pointers.l("node %s does not have the method '%s', cannot disconnect" % [str(node),method],log_header)
 	
-	const icsm_string = "    Incompatible mods:\n"
-	const icmr_string = "    Missing requirements:"
-	const mci_string = "     -> %s\n"
+	const icsm_string = "\tIncompatible mods:\n"
+	const icmr_string = "\tMissing requirements:"
+	const mci_string = "\t -> %s\n"
 	
 	const incorrect_path_error_log_txt = "The following mod(s) expect a specific file path, however are located at a different resource path than what it expects:\n\n%s\n\nPlease make sure you have downloaded the mod(s) correctly, and restart the game. If you have any further issues, please ask in the ∆V Discord [https://discord.gg/dv]"
 	const incompat_err_log_text = "The following mods have issues with the currently installed mods and are unable to run as a result. This can be due to incorrect/out-of-date mod versions, missing mods, or mods that aren't compatible.\n%s\nPlease ensure all requirements are met before being able to launch the game."
@@ -1340,15 +1339,15 @@ class _ConfigDriver:
 	static func __change_made():
 		non_static["self"].mk_c = true
 	
-	static func handle_change_made():
-		var base:_ConfigDriver = non_static["self"]
-		var shs:int = base.settings.hash()
-		if shs != base.settingsHash:
-			__input_change_made()
-			__subscribed_changes()
-			base.emit_signal("config_changed")
-			base.settingsHash = shs
-		base.mk_c = false
+	func handle_change_made():
+		if mk_c:
+			var shs:int = settings.hash()
+			if shs != settingsHash:
+				__input_change_made()
+				__subscribed_changes()
+				emit_signal("config_changed")
+				settingsHash = shs
+			mk_c = false
 	
 	static func __subscribed_changes():
 		var base:_ConfigDriver = non_static["self"]
@@ -8267,7 +8266,6 @@ class _Scripting:
 	const trace_str = "\n\tif not \"%s\" in traceMinerals:\n\t\ttraceMinerals.append(\"%s\")"
 	const prices_str = "\n\tif not \"%s\" in mineralPrices:\n\t\tmineralPrices[\"%s\"] = %f"
 	const colour_str = "\n\tif not \"%s\" in specificMineralColors:\n\t\tspecificMineralColors[\"%s\"] = Color( %f, %f, %f, 1.0 )"
-	
 	const mineral_header_str = """[gd_scene load_steps=2 format=2]
 
 [ext_resource path=\"res://HevLib/scenes/minerals/base_scenes/mineral-%s-%s.tscn\" type=\"PackedScene\" id=1]
@@ -8284,8 +8282,7 @@ ferrous = %s
 	
 	static func make_mineral_scripting() -> void:
 		var pointers:HevLibPointers = non_static["pointers"]
-		var mineralDir:String = "user://cache/Minerals/"
-		for f in pointers.FolderAccess.__fetch_folder_files(mineralDir,true,true):
+		for f in pointers.FolderAccess.__fetch_folder_files("user://cache/Minerals/",true,true):
 			pointers.FolderAccess.__recursive_delete(f)
 		var mineral_data:Array = []
 		for mineral_dict in pointers.DriverManagement.__get_specific_driver_type("ADD_MINERALS.gd"):
@@ -8312,13 +8309,18 @@ ferrous = %s
 		
 		var file:File = File.new()
 		# Builds the current game extension script
-		file.open(mineralDir + "cg.gd",File.WRITE)
+		file.open("user://cache/Minerals/cg.gd",File.WRITE)
 		file.store_string("extends \"res://CurrentGame.gd\"\nfunc _init():\n\tpass%s%s%s\nfunc isDemo():\n\treturn false" % [price_text,color_text,trace_text])
 		file.close()
 		
 		# Builds the AsteroidSpawner.gd script to add new ore scenes
-		file.open(mineralDir + "as.gd",File.WRITE)
+		file.open("user://cache/Minerals/as.gd",File.WRITE)
 		file.store_string(content)
+		file.close()
+		
+		# Builds the blank Settings extension
+		file.open("user://cache/Variable_Fetch/st.gd",File.WRITE)
+		file.store_string("extends \"res://Settings.gd\"\n\nfunc hasDlc(dlc) -> bool:return true if OS.has_feature(\"editor\") else .hasDlc(dlc)\n" if (pointers.is_editor and pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","unlock_dlc",false) == true) else "extends \"res://Settings.gd\"\n\n")
 		file.close()
 	
 	static func process_mineral_dict(mineral:Dictionary,pointers:HevLibPointers) -> PoolStringArray:
