@@ -1,48 +1,43 @@
-[1.17.9]
+[1.18.0]
 
-1=* Removed ability for `Zip`.`__load_pck` to read PCKs written in godot 4 or newer, and as a result is much faster at processing
-1.1=* This has the added bonus of making it considerably faster to read larger PCKs.
-2=* Updated MINIZ documentation to reflect the ability to use it's class name
-3=* Improved logic of `FolderAccess`.`__recursive_delete`
-4=* Fixed update menu not always showing a mod's translated name
-5=* Moved class descriptions to a standalone script file
-6=* Added `Threading` class.
-6.1=* This adds a handful of functions that lets code execution be arbritrarily moved to extra threads.
-6.2=* Useful for cutting down a batch of several heavy functions.
-6.3=* Threads are limited to your CPU's logical core count minus 2. CPUs with Hyper-Threading enabled will be considered.
-6.4=* Can be functionally disabled with the `Single-thread only` config option
-6.5=* `__request_single_thread` -> Array
-6.5.1=* Adds a single function call to the thread queue
-6.5.2=* This function blocks execution until the function call has been completed
-6.5.2.1=* All yields will be processed before execution returns to the caller
-6.5.3=* `operation` -> (Dictionary) data regarding the function call requests
-6.5.3.1=* `object` -> (Object) the object to call the function on
-6.5.3.2=* `method` -> (String) the function to be called from the object
-6.5.3.3=* `args` -> (Array) any arguments that the function accepts.
-6.5.4=* Returns an array containing a single entry for the return value of the function
-6.5.4.1=* This is to keep all outputs of threading functions consistent
-6.5.4.2=* Any function calls that fail or return void will have a null return value
-6.6=* `__request_multiple_threads` -> Array
-6.6.1=* Adds an arbitrary number of function calls to the thread queue
-6.6.2=* This function blocks execution until all queued function calls have been completed
-6.6.3=* `operations` -> (Array[Dictionary]) array of dictionaries for function call requests
-6.6.3.1=* Formatting of each dictionary is equivalent to `__request_single_thread`'s input
-6.6.4=* Returns an array containing all return values of the called functions
-6.6.4.1=* Any function calls that fail or return void will have a null return value
-6.6.4.2=* Output order is NOT deterministic, and is reliant on whichever threads finish first.
-6.7=* `__run_single_async_operation` -> int
-6.7.1=* Similar to `__request_single_thread`, however returns an error code instead of the called function's output and will not block the calling thread.
-6.7.2=* Used if you need to execute thread-safe code as soon as possible. Useful for render or server facing code.
-6.7.3=* Returns `ERR_UNCONFIGURED` if the thread queue has reached the max size in the config, and `OK` in every other instance.
-6.8=* `__run_multiple_async_operations` -> int
-6.8.1=* Similar to `__request_multiple_threads`, however returns an error code instead of the output array and will not block the calling thread.
-6.8.2=* Used if you need to execute thread-safe code as soon as possible. Useful for render or server facing code.
-6.8.3=* Returns `ERR_UNCONFIGURED` if the thread queue has reached the max size in the config, and `OK` in every other instance.
-7=* Added `Tokenizer` class.
-7.1=* Run through a main tokenizer script (a copy can be fetched with `__get_tokenizer()`)
-7.2=* Allows the conversion of source code and compiled source to and from tokens, which is how the engine processes scripts.
-7.3=* Tokens can be used to normalize scripts and perform operations that modify a script's source code without issues caused by String or RegEx formatting
-7.4=* Several helper functions are provided to simplify specific tasks
+2=* Removed ability for `Zip`.`__load_pck` to read PCKs written in godot 4 or newer, and as a result is much faster at processing
+2.1=* This has the added bonus of making it considerably faster to read larger PCKs.
+3=* Updated MINIZ documentation to reflect the ability to use it's class name
+4=* Improved logic of `FolderAccess`.`__recursive_delete`
+5=* Fixed update menu not always showing a mod's translated name
+6=* Moved class descriptions to a standalone script file
+7=* Added `Threading` class.
+7.1=* This adds a handful of functions that lets code execution be arbritrarily moved to extra threads.
+7.2=* Useful for cutting down a batch of several heavy functions.
+7.3=* Threads are limited to your CPU's logical core count minus 2. CPUs with Hyper-Threading enabled will be considered.
+7.4=* Can be functionally disabled with the `Single-thread only` config option
+7.5=* `__request_single_thread` -> Array
+7.5.1=* Adds a single function call to the thread queue
+7.5.2=* This function blocks execution until the function call has been completed
+7.5.2.1=* All yields will be processed before execution returns to the caller
+7.5.3=* `operation` -> (Dictionary) data regarding the function call requests
+7.5.3.1=* `object` -> (Object) the object to call the function on
+7.5.3.2=* `method` -> (String) the function to be called from the object
+7.5.3.3=* `args` -> (Array) any arguments that the function accepts.
+7.5.4=* Returns an array containing a single entry for the return value of the function
+7.5.4.1=* This is to keep all outputs of threading functions consistent
+7.5.4.2=* Any function calls that fail or return void will have a null return value
+7.6=* `__request_multiple_threads` -> Array
+7.6.1=* Adds an arbitrary number of function calls to the thread queue
+7.6.2=* This function blocks execution until all queued function calls have been completed
+7.6.3=* `operations` -> (Array[Dictionary]) array of dictionaries for function call requests
+7.6.3.1=* Formatting of each dictionary is equivalent to `__request_single_thread`'s input
+7.6.4=* Returns an array containing all return values of the called functions
+7.6.4.1=* Any function calls that fail or return void will have a null return value
+7.6.4.2=* Output order is NOT deterministic, and is reliant on whichever threads finish first.
+7.7=* `__run_single_async_operation` -> int
+7.7.1=* Similar to `__request_single_thread`, however returns an error code instead of the called function's output and will not block the calling thread.
+7.7.2=* Used if you need to execute thread-safe code as soon as possible. Useful for render or server facing code.
+7.7.3=* Returns `ERR_UNCONFIGURED` if the thread queue has reached the max size in the config, and `OK` in every other instance.
+7.8=* `__run_multiple_async_operations` -> int
+7.8.1=* Similar to `__request_multiple_threads`, however returns an error code instead of the output array and will not block the calling thread.
+7.8.2=* Used if you need to execute thread-safe code as soon as possible. Useful for render or server facing code.
+7.8.3=* Returns `ERR_UNCONFIGURED` if the thread queue has reached the max size in the config, and `OK` in every other instance.
 8=* Updated script shadow creation tool to use tokens.
 8.1=* This upgrade also brings about other improvements, such as enumeration support
 8.2=* The functionality is also simplified, and now just outputs source that shadows the entire base script.
@@ -226,332 +221,3 @@
 5=* Improved efficiency of storing and fetching whether updates have occurred
 6=* Improved pre-caching of mod files
 7=* Fixed issue that prevented MacOS from seeing the miniz library.
-
-[1.16.33]
-
-1=* Fixed `DataFormat`.`__compile_script_object` not properly storing a hashed object when provided with parameters
-2=* Fixed unfinished research showing up in release builds
-
-[1.16.32]
-
-1=* Further sanitized recursed manifest fetching, now only fetches the `mod_information`, `version`, `library` sections, and the manifest version
-2=* Mapped libraries now will always be copied regardless of the file already existing on file to ensure that updated libraries would be properly copied
-3=* Fixed issue with the zip fetching portion of mod data collection causing a preemptive return
-4=* Reduced file size of the miniz GDNative plugin by removing unused Godot bindings
-
-[1.16.31]
-
-1=* Recursively fetched manifests now sanitize all configs from the fetched manifest
-1.1=* This is done to prevent the base mod's configs from being duplicated for every additional ModMain script
-
-[1.16.30]
-
-1=* Improved several RegEx patterns to prevent issues caused by comments
-
-[1.16.29]
-
-1=* Fixed issue with RegEx that would fail to properly detect type casts and wipe a script during load.
-
-[1.16.28]
-
-1=* Fixed errors being spammed in the engine logs during initialization
-
-[1.16.27]
-
-1=* Added `REMOVE_CREW` and `REMOVE_SHIPS` constants to `NAMER.gd`
-1.1=* Formatted in the same way as the constants to add crew or ship names, any defined names that have exact matches from vanilla and processed names will be removed.
-1.2=* Crew type names do not need to define a gender identifier for the fourth index, and will wipe for any exact name.
-2=* Fixed broken RegEx that would fail to properly process type-casting for non-vanilla scripts
-
-[1.16.26]
-
-1=* Fixed issue that prevented `LOAD_RESOURCES` from loading non-scene resource types
-2=* Ship internals modification is better typed on initialization to speed up calculations
-3=* Fixed dev update push menu
-4=* Improved driver fetching efficiency by preventing the processing of any mods that would not load drivers regardless
-5=* DriverManagement will now no longer make blank driver entries for non-driver files in a driver folder
-6=* Fixed `FileAccess`.`__save_stex` not saving to the correct directory
-7=* ModMains without a directly associated manifest file will now recursively search upwards in the filesystem for another manifest that is likely associated with the same mod
-8=* Improved the time taken to add modded equipment to weaponslots
-
-[1.16.25]
-
-1=* Updated ShipDriver's derelict handling to expose more of the RescueOperation event to the API
-1.1=* `maximum_velocity` - (float) maximum velocity of the derelict in m/s. Defaults to 50.0
-1.2=* `maximum_angular_velocity` - (float) maximum angular velocity of the derelict in rad/sec. Defaults to 0.5
-1.3=* `gauss` - (float) Power the random value used to set random linear/angular velocities to, as well as damage scale/radii. Used as pow(randf(), gauss). Defaults to 2.0
-1.4=* `extra_kinetic_damage` - (float) extra KE damage added to the derelict if extra_damage is enabled. Defaults to 100 000.0
-1.5=* `extra_emp_damage` - (float) extra EMP damage added to the derelict if extra_damage is enabled. Defaults to 100 000.0
-1.6=* `extra_damage_radius` - (float) radius in meters for where the extra damage hitpoint can occur within. Defaults to 10.0
-1.7=* `new_derelict_conversation` - (String) if set and a valid file path, the conversation scene to replace the regular derelict conversation with. Defaults to ""
-1.8=* `new_storm_beacon` - (String) if set and a valid file path, the storm beacon scene to replace the regular storm beacon with. Defaults to ""
-1.9=* `new_bounty` - (String) if set and a valid file path, the scene to replace the pirate's lifepod scene with. Defaults to ""
-2=* Improved efficiency of ShipDriver events, where event data is only solved for and set if the event were to pass the `canBeAt` check and be a derelict event.
-3=* Fixed modded ships not being able to appear as derelicts or NPCs
-4=* Fixed multiple debug menus not working
-5=* Moved update checks out of the modloader to pointers
-6=* While on the title screen, additional update checks will happen 30 seconds after loading, and once every minute after that.
-
-[1.16.24]
-
-1=* Fixed critical issue with the updater script that would cause the HTTPRequest object to be unintentionally freed before it could fetch update data.
-2=* Any and all users who installed 1.16.22 and 1.16.23 will need to manually update
-
-[1.16.23]
-
-1=* Fixed crash caused by EventDriver not being able to properly parse certain event types
-2=* Fixed a bug that would prevent custom EventDriver events using the Vilcy event type from setting a maximum event depth
-3=* Vilcy type custom events now properly default to using depth ranges between 30 & 2970 km
-
-[1.16.22]
-
-1=* Multi-minerals now no longer needs to have the game rebooted for the changes to take effect
-1.1=* Mineral chunks that existed before toggling will retain the behaviour they had at extraction.
-2=* Improved how the DLC list displays installed mods
-3=* Reorganized modmain resource modifications to all use order-specific handles
-4=* MineralDriver now dynamically fetches the trace minerals to support mods not using MineralDriver to add new minerals
-5=* Improved efficiency of `FolderAccess`.`__fetch_folder_files`
-6=* Cleaned up modmain and unused scripting methods from reorganized script loading
-7=* Added `ManifestV2`.`__match_mod_file_path_to_id`
-7.1=* Returns the associated mod ID for a provided ModMain.gd/Mod.manifest filepath, or a blank string if the mod does not have an ID.
-7.2=* Faster than parsing a manifest for the ID
-7.3=* `file_path` -> (String) full filepath for the ModMain/mod manifest file
-8=* Added optional `Disable rendering on lost focus` to the Drivers section of the config
-8.1=* When enabled and the game isn't in focus, pauses game rendering.
-8.2=* This can likely see best used on lower-end devices when multitasking
-
-[1.16.21]
-
-1=* Added a new pointers class: `Math`
-1.1=* Used to unify mathematical functions
-1.2=* Moved `__rotate_point`, `__factorial`, and `__get_unique_pairs` from the DataFormat` class
-1.3=* Added `__mirror_vector` - Used for mirroring a 2D vector across a line
-1.3.1=* `point` -> (Vector2) point to be mirrored
-1.3.2=* `reflection_angle` (optional) -> (float) radian angle of the line at which the point is mirrored across. Defaults to 0.0 (up)
-1.3.3=* `use_degrees` (optional) -> (bool) whether `reflection_angle` should use degrees instead. Defaults to false
-1.3.4=* `angle_offset` (optional) -> (Vector2) the offset to move the reflection line by. Defaults to Vector2.ZERO
-1.3.5=* `scale` (optional) -> (Vector2) scale to take into account for the calculation. Useful for cases using Node2D or Control nodes with a changed scale. Defaults to Vector2.ONE
-1.4=* Added `__mirror_vector_array` - Used for mirroring a polygon across a line. NOTE: All points are calculated individually instead of from the center of the poly.
-1.4.1=* `points` -> (PoolVector2Array) points to be mirrored
-1.4.2=* `reflection_angle` (optional) -> (float) radian angle of the line at which the points are mirrored across. Defaults to 0.0 (up)
-1.4.3=* `use_degrees` (optional) -> (bool) whether `reflection_angle` should use degrees instead. Defaults to false
-1.4.4=* `angle_offset` (optional) -> (Vector2) the offset to move the reflection line by. Defaults to Vector2.ZERO
-1.4.5=* `scale` (optional) -> (Vector2) scale to take into account for the calculation. Useful for cases using Node2D or Control nodes with a changed scale. Defaults to Vector2.ONE
-2=* `DataFormat`.`__convert_arr_to_vec2arr` now resizes and inserts data rather than appending to a new array. This should provide a small boost in time taken to calculate.
-3=* `DataFormat`.`__convert_arr_to_vec2arr` now has type conversion failures return the output array as it had been processed up until the failure point instead of returning a blank PoolVector2Array
-3.1=* This includes junk data from sections that are yet to be processed
-4=* Moved the title screen update notifier to HevLib to allow users without ModMenu2 installed to have automatic updates.
-
-[1.16.20]
-
-1=* Fixed issue with Vanilla load order assignment that would cause some vanilla file names to pick up a few extra bytes, causing them to be incorrectly sorted
-2=* MineralDriver procedural minerals now refresh their texture if the sprite is redrawn
-3=* Added PolyTexClip tool. Adding this as the child of a Sprite lets you set a polygon to limit the area where the sprite is rendered.
-3.1=* Currently only supports sprites using `ao-spec-difuse.shader` and `blendWithMask.shader`
-3.1.1=* Both replace the shader with a modified equivalent found in `res://HevLib/ui/shaders`
-3.2=* Polygon can either be set manually or with the visual editor with the PolyTexClip tool node selected
-3.3=* This tool runs every frame and does not differentiate between running in-editor or not. This node should be removed after you are finished with it.
-3.3.1=* The polygon is preserved, and can be recovered by adding the tool as a child node later on.
-3.4=* Tool can be found at `res://HevLib/development_tools/sprites_and_shaders/PolyTexClip.tscn`
-
-[1.16.19]
-
-1=* Fixed crash caused by a malformatted file check incorrectly wiping libraries
-
-[1.16.18]
-
-1=* Added new `miniz` library to replace the GDUNZIP library
-1.1=* Contains a GDNative plugin for the miniz zipping library
-1.2=* Can be accessed by loading `res://HevLib/scripts/miniz/miniz.gdns`
-1.2.1=* WARNING: preloading this resource, especially within modmain scripts, can cause it to fail to run due to being loaded before DLL_MAPPER.gd can process it
-1.3=* Full documentation can be found at `res://HevLib/scripts/miniz/README.md`
-2=* DynamicLibraryLoader is now handled alongside class cast remapping to ensure that everything using it will not have issues.
-3=* Added `max_size` argument for `DataFormat`.`__decompress_raw_deflate_stream` to help sanitize potentially unsafe data
-4=* Added `compression_level` argument for `DataFormat`.`__compress_to_raw_deflate_stream` to dictate how much compression is applied
-4.1=* Ranges from 0-10
-4.2=* 0 dictates no compression, 10 is heavy compression
-4.3=* Defaults to 6. This is a good compromise between speed and file size.
-5=* `__get_zip_content` and `__fetch_file_from_zip` now are much faster and make use of the miniz library
-6=* `Zip` class is now static
-7=* Added `__get_miniz_object` and `__get_miniz_library` to the `Zip` class.
-7.1=* These provide the miniz script and library objects respectively.
-7.2=* They're functionally identical, however the script object can be used to give better autocomplete
-7.2.1=* Use `var miniz:MINIZ = pointers.Zip.__get_miniz_object()` for ease of use
-8=* Added `__extract_zip_to_dir` to the `Zip` class
-8.1=* Extracts an entire zip file into a provided directory.
-8.2=* `zip_path` -> (String) the filepath for the zip file
-8.3=* `dir_path` -> (String) the filepath for the directory for the zip to be extracted into. Will be created if it doesn't exist.
-
-[1.16.17]
-
-1=* Fixed issue that prevented some scripts from having a deep dependency search
-2=* Fixed issue with several core scripts not being able to load due to `File` not being able to properly traverse for whatever reason.
-
-[1.16.16]
-
-1=* Added ability to provide the pointers node to the script shadow creation tool, if it's ran before the onready phase
-2=* Updated HevLib's initialization phase modifications to funnel through the load reordering code if it's enabled
-3=* Fixed update display not properly resetting text when downloading multiple mods
-4=* Removed `parse_json` argument in `ManifestV2`.`__get_mod_data` to ensure proper output. Now must be done externally (i.e. `JSON.print(pointers.ManifestV2.__get_mod_data(),"\t")`)
-5=* Fixed crash caused by incorrectly assumed code within the edge-case fallback handling for the `__get_config` and `__get_value` methods in the `ConfigDriver` class.
-6=* Added support for JPEG, BMP, and WEBP image formats within `FileAccess`.`__load_png`.
-7=* Added fallback option for `FileAccess`.`__load_png`, where you can pass an `Image` resource to be handled in the event that the file could not be loaded.
-8=* Added `FileAccess`.`__get_dependancies_for_file`
-8.1=* Provides a PoolStringArray containing all resource file paths that the provided file needs.
-8.2=* `file_path` -> (String) the resource's filepath to check.
-8.3=* `deep_search` (optional) -> (bool) whether to perform a deep search for all res:// file paths within the resource. Defaults to false
-9=* Fixed resource load order processing being not able to see script preloads.
-9.1=* This is a limitation of `ResourceLoader.get_dependencies`, which does not appear to be able to see all preloads.
-9.2=* This change will add roughly 2 seconds of load time for every time the load order cache would need to be rebuilt.
-10=* Added support for JPEG, BMP, and WEBP images for mods in ModMenu and the GitHub mod fetcher, both for mod icons and user PFP if no icon is provided.
-11=* Fixed submods not having icons set, despite it being processed.
-12=* Fixed text alignment of submods to not try and center all text boxes against the entire box.
-
-[1.16.15]
-
-1=* Load ordering now can appropriately reorder the modification of material and theme resources.
-2=* Load ordering now ignores placeholder resources, as they only load during runtime they're redundant to process.
-
-[1.16.14]
-
-1=* Fixed logging not clearing the log file on rebooting
-2=* Improved the time taken to recache vanilla load ordering by about 16 times
-
-[1.16.13]
-
-1=* Fixed an issue that would prevent new mods from being uploaded to updateDB
-
-[1.16.12]
-
-1=* Re-introduced the Resolve Modlet load order code
-1.1=* This should make load orders a non-issue for `LOAD_RESOURCES.gd` entries
-1.2=* For entries overriding the same script or resource, they still keep the same order defined by modlet priority and position in LOAD_RESOURCES.gd
-1.3=* It is not perfect, so please report issues caused by this update
-2=* Updated credits and licensing
-
-[1.16.11]
-
-1=* Added `excluded_files` argument to `FolderAccess`.`__recursive_delete`
-1.1=* A PoolStringArray of file or folder names to exclude from deletion (i.e. `file.png`, `folder/`])
-2=* Fixed issue causing class cast removal code to crash on certain Linux distros.
-3=* `FolderAccess` functions are now static
-
-[1.16.10]
-
-1=* Re-introduced the improved zip writing algorithm for the class cast removal code
-2=* Fixed thruster colour overrides not working
-3=* Fixed ThrusterColorDriver causing colours defined by a ship's base ship to override a variant-specific set of colours
-4=* Fixed crash caused by EventDriver when spawning an event
-5=* The parsing of manifest files now does a very simple attempt at fixing URLs for links
-5.1=* Provided by a new method in `DataFormat`: `__ensure_string_is_url`
-
-[1.16.9]
-
-1=* Temporarily reverted class cast removal code to 1.16.7 due to a crash.
-
-[1.16.8]
-
-1=* Moved nearly all pointers methods to be static to improve general efficiency.
-1.1=* WARNING: This is a very large change, and abuses how dictionaries and arrays are stored in memory to keep the entire script functional. Please report any and all issues that may have occurred due to this change.
-2=* Greatly improved the efficiency of the zip writing algorithm for the class cast removal code
-3=* Fixed issue that caused MineralDriver to build it's script incorrectly, causing a crash if a modded mineral was selected for fracturing.
-
-[1.16.7]
-
-1=* Improved the efficiency of the following systems:
-1.1=* `NODE_DEFINITIONS.gd` processing, including node additions and modifications.
-1.2=* EventDriver processing.
-1.3=* `MODIFY_INTERNALS.gd` processing
-1.4=* MineralDriver processing and memory usage
-1.5=* Iterating over installed mods
-1.6=* Various other improvements within the pointers script
-2=* `ManifestV2`.`__get_mod_data` now returns just the `mods` key from it's old version, making it easier to fetch data.
-2.1=* The statistics portion is now supplied with `ManifestV2`.`__get_mod_statistics`
-3=* Added `ManifestV2`.`__get_mod_list_keys`
-3.1=* This returns a PoolStringArray of the file paths of all active ModMain scripts and Modlet manifests
-4=* EventDriver now stores timestamps as UNIX timestamps to make it easier to be used as an API for external systems
-5=* EventDriver vanilla-based event additions now enforce all scene-based properties to use a string to ensure it's a filepath
-
-[1.16.6]
-
-1=* RPC can now cycle through custom decorator text displays for the minor details display
-1.1=* Can be defined with the `RPC_EXTRA_STATES.gd` driver from within a `RPC_EXTRA_STATES` dictionary
-1.2=* Split between context (`title_screen`, `enceladus_prime`, and `ring`)
-1.3=* `text` -> (String) the text/translation key for the displayed text
-1.4=* `sensors` -> (Array) any parameters using the player's `sensorGet` method.
-1.4.1=* Can only be used in the `ring` context, with each entry being either a string or a dictionary
-1.4.2=* If an entry is a string, it is handled in the literal sense for the `sensorGet` call. 
-1.4.3=* If it is a dictionary, uses the following format:
-1.4.3.1=* `sensor` -> (String) the sensor name to be fetched with `sensorGet`
-1.4.3.2=* `func_method_name` -> (String) the name of a function to pipe the `sensorGet` output through, with it's output being supplied to the formatter
-1.4.3.2=* `func_object_path` -> (String) the res:// filepath of a script file, autoload name, or pointers class name for the object to handle the sensor output. ("CurrentGame","pointers.DataFormat","res://path/to/script.gd")
-1.4.3.3=* `extra_operands` -> (Array) additional operands that can be supplied to the function if it needs more than the sensor's output
-1.4.3.4=* `fallback` -> (Variant) if the sensor returns null (i.e. damaged sensors, sensor doesn't exist), the value to use for formatting instead
-1.4.4=* The text string/translation should contain the following to be replaced with the sensor's output: `{sensor:<sensor name>}`, with `<sensor name>` being replaced with the `sensor` property's value
-1.5=* `function_outputs` -> (Array) any parameters using the outputs of functions
-1.5.1=* Can be used in any context
-1.5.3=* Each entry must be a dictionary, and uses the following format:
-1.5.3.1=* `name` -> (String) the name used for the formatting string
-1.5.3.2=* `func_method_name` -> (String) the name of a function to get the data from
-1.5.3.2=* `func_object_path` -> (String) the res:// filepath of a script file, autoload name, or pointers class name for the object containing the desired function. ("CurrentGame","pointers.DataFormat","res://path/to/script.gd")
-1.5.3.3=* `extra_operands` -> (Array) additional operands that can be supplied to the function if it needs any
-1.5.3.4=* `fallback` -> (Variant) if the output returns null (i.e. intentional output, method returns void), the value to use for formatting instead
-1.5.4=* The text string/translation should contain the following to be replaced with the function's output: `{output:<ID>}`, with `<ID>` being replaced with the `name` property's value
-1.6=* See HevLib's own `RPC_EXTRA_STATES.gd` for an example
-2=* Fixed issue where music fading out would not update RPC
-3=* Unified all enceladus RPC calls to use `enceladus_prime` for the keyword
-4=* `ThrusterSlotDriver` now no longer stores entries for the thruster's audio nodes, as they're controlled by other properties
-
-[1.16.5]
-
-1=* Added support for variables casting as a sub-class of a non-vanilla script class.
-1.1=* e.g. `var ConfigDriver:HevLibPointers._ConfigDriver = ModLoader._savedObjects[0].ConfigDriver` gets converted into `var ConfigDriver= ModLoader._savedObjects[0].ConfigDriver`
-2=* Added pointers casting for all scripts making use of it (excluding ModMains, as these should NEVER have it cast due to being the only scripts to be completely untouchable by the removal process)
-3=* Removed all preloads of non-vanilla resources
-
-[1.16.4]
-
-1=* The `HevLibPointers` casting now no longer needs to be removed from scripts
-2=* Added `DEFINED_CLASS_NAMES.gd` driver.
-2.1=* This lets you define the classes of any scripts using `class_name` for cases where variables using them have the name cast (i.e. var example:HevLibPointers)
-2.2=* Uses the constant `DEFINED_CLASS_NAMES`, which is an array or PoolStringArray storing the names of all classes.
-2.3=* See HevLib's own `DEFINED_CLASS_NAMES.gd` for an example
-
-[1.16.3]
-
-1=* The pointers node now uses the class_name `HevLibPointers` in order to be more readily available to provide autocomplete options
-1.1=* Autocomplete should be able to cover both classes as well as their functions
-1.2=* Best use-case is when declaring the variable
-1.2.1=* e.g. var pointers:HevLibPointers
-1.3=* WARNING: This should only be used when writing in-editor and all cases of the type casting should be removed before releasing a mod
-1.4=* Failing to remove it will cause any scripts that have it to be unable to load, due to the game needing to have the type registered within it's pck. There is no way around this currently.
-1.5=* There is a semi-workaround to this being worked on in the DVTools plugin, with it being able to be added/removed with a keybind.
-
-[1.16.2]
-
-1=* Fixed mineral market not being able to be reopened
-2=* Fixed an issue that prevented UpdateDB from being informed about new mods.
-2.1=* It now also has a 2.5 minute delay between push requests to ensure that the update was completed in it's entirety in the event that there are several new mods exposed.
-
-[1.16.1]
-
-1=* `DLL_MAPPER.gd` will now always run regardless of a mod being disabled or not.
-1.1=* This is caused by the fact that a .gdnlib file being fetched without processing will crash the game, and can happen with disabled modlets as they still do exist in the filesystem.
-2=* Re-introduced the achievement border texture as there are some mods which make use of it
-
-[1.16.0]
-
-1=* Added Discord Rich Presence
-1.1=* Successor to the Delta-V Discord RPC mod, this time without the need for an extra application.
-1.2=* The HevLib Discord RPC module must be installed instead to provide the RPC library.
-1.3=* Can be disabled in the config.
-2=* Added `DLL_MAPPER.gd` driver
-2.1=* This is used to register GDNative plugins.
-2.2=* Stores a singular PoolStringArray constant `DLL_MAPPER`
-2.3=* Each entry should be the `.gdnlib` library mapper file.
-2.4=* All files that reference this should not be preloaded to make sure that the plugin is properly loaded
-2.5=* An entry can be either an absolute (res://) path, or a path relative to the mod's folder.
-3=* `use_stringified_value` now defaults to false for all drivers that use the feature
-4=* Resolve modlet load conflicts has been disabled until further notice due to continued issues.
-5=* Blank space at the bottom of the mod list and config menu scroll sections has been increased by 50% to improve tooltip visibility on smaller screens.
-6=* Removed achievement icons as they have been unused the entire time.
