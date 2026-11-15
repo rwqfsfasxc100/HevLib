@@ -4095,10 +4095,6 @@ script = ExtResource( 5 )"""
 		return exhaust_text
 	
 	func confirm_equipment(equipment_node:Dictionary, slot_type, slot_alignment:String, slot_restriction:String, slot_allowed_equipment:PoolStringArray) -> bool:
-		var e_slot_type : String = equipment_node.get("slot_type","")
-		var e_equipment : String = equipment_node.get("equipment_type","")
-		var e_alignment : String = equipment_node.get("alignment","")
-		var e_restriction : String = equipment_node.get("restriction","")
 		if equipment_node.get("system","") in vanilla_data.min_version:
 			var data : Array = vanilla_data.min_version.get(equipment_node.system)
 			var failtext : String = "Equipment %s not adding due to old game version. Needed min version: %s ; observed game version: %s" % [str(equipment_node.get("system","")), str(data), str(version)]
@@ -4120,9 +4116,11 @@ script = ExtResource( 5 )"""
 				pointers.l(failtext)
 				return false
 		
-		if e_slot_type == slot_type:
+		
+		if equipment_node.get("slot_type","") == slot_type:
 			var passes_slot_check:bool = false
-			if e_equipment in slot_allowed_equipment:
+			if equipment_node.get("equipment_type","") in slot_allowed_equipment:
+				var e_alignment : String = equipment_node.get("alignment","")
 				if slot_type is String:
 					if slot_type == "HARDPOINT":
 						if slot_alignment in alignments:
@@ -4158,6 +4156,7 @@ script = ExtResource( 5 )"""
 				return false
 			if passes_slot_check:
 				if slot_restriction:
+					var e_restriction : String = equipment_node.get("restriction","")
 					if e_restriction:
 						if e_restriction == slot_restriction:
 							return true
