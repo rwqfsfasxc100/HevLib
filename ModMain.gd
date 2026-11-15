@@ -117,7 +117,7 @@ static func replaceSceneLiteral(newPath:String,oldPath:String):
 	_savedObjects.append(scene)
 	l("Finished updating literal:%s"%oldPath)
 static func l(msg:String,title:String=MOD_NAME):strings[3].l(msg,"%s V%s"%[title,MOD_VERSION_STRING])
-static func log_double_load_error(script_path:String):l("Script at [%s] is likely double loaded!" % script_path)
+static func log_double_load_error(script_path:String):l("Script at [%s] is likely double loaded! Please check your zips!" % script_path)
 const driver_dirs=PoolStringArray(["HEVLIB_EQUIPMENT_DRIVER_TAGS/","HEVLIB_MENU/","HEVLIB_MINERAL_DRIVER_TAGS/","HEVLIB_DRIVERS/"])
 const variables_folder:String="user://cache/Variable_Fetch/"
 const class_names_to_clear:PoolStringArray=PoolStringArray(["HevLibPointers","MINIZ"])
