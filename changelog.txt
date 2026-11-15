@@ -112,6 +112,7 @@
 51.7=* `anticlockwise` (optional) -> (bool) Whether the circle should be drawn anti-clockwise of the `start` angle. Defaults to true
 51.8=* `include_center` (optional) -> (bool) Whether a point at (0,0) should be added. Defaults to true
 52=* Fixed rare issue where an event call would be skipped
+53=* Errors caused by double-loading are now more gracefully handled, and now have a unique log when it happens
 55=* Updated credits
 
 [1.17.8]
