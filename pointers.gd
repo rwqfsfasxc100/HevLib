@@ -4372,10 +4372,10 @@ class _Events:
 					var tree = ring.get_tree()
 					var event_node = ring.get_node_or_null(event)
 					if event_node and event_node.has_method("canBeAt") and event_node.has_method("makeAt"):
-						var pos = getPos(parameters)
+						var pos:Vector2 = getPos(parameters)
 						event_node.canBeAt(pos)
 						var oddity = event_node.makeAt(pos)
-						var randomOddityKey = ""
+						var randomOddityKey:String = ""
 						if oddity:
 							ring.addNearbyOddity(event, oddity, pos)
 							if oddity is Array:
@@ -4420,29 +4420,29 @@ class _Events:
 							Tool.remove(e)
 	
 	static func getPos(params : Dictionary):
-		var x_direction = clamp(params.get("x_direction",rand_range( - 1, 1)),-1,1)
-		var y_direction = clamp(params.get("y_direction",rand_range( - 1, 1)),-1,1)
-		var spawnDirectionScale = params.get("spawn_direction_scale",0.75)
-		var odditySpawnRadiusMin = params.get("oddity_spawn_radius_min",24000)
-		var odditySpawnRadiusMinCutscene = params.get("oddity_spawn_radius_min_cutscene",6000)
-		var odditySpawnRadiusMax = params.get("oddity_spawn_radius_max",38000)
-		var odditySpawnRadiusSafemax = params.get("oddity_spawn_radius_safe_max",80000)
-		var odditySpawnFailures = params.get("oddity_spawn_failures",0)
-		var odditySpawnRadiusSafemaxSteps = params.get("oddity_spawn_radius_safe_max_steps",40)
+		var x_direction:float = clamp(params.get("x_direction",rand_range( - 1, 1)),-1,1)
+		var y_direction:float = clamp(params.get("y_direction",rand_range( - 1, 1)),-1,1)
+		var spawnDirectionScale:float = params.get("spawn_direction_scale",0.75)
+		var odditySpawnRadiusMin:float = params.get("oddity_spawn_radius_min",24000)
+		var odditySpawnRadiusMinCutscene:float = params.get("oddity_spawn_radius_min_cutscene",6000)
+		var odditySpawnRadiusMax:float = params.get("oddity_spawn_radius_max",38000)
+		var odditySpawnRadiusSafemax:float = params.get("oddity_spawn_radius_safe_max",80000)
+		var odditySpawnFailures:float = params.get("oddity_spawn_failures",0)
+		var odditySpawnRadiusSafemaxSteps:float = params.get("oddity_spawn_radius_safe_max_steps",40)
 		var focusObject = busy[1]
 		if Tool.claim(focusObject):
-			var cutscene = ("cutscene" in focusObject and focusObject.cutscene) and ("fastTravelDirection" in focusObject and focusObject.fastTravelDirection < 0)
-			var focusPoint = focusObject.global_position
-			var randomVector = Vector2(x_direction,y_direction).normalized()
-			var directionVector = focusObject.linear_velocity.normalized() * spawnDirectionScale
-			var dirvec = (randomVector + directionVector).normalized()
+			var cutscene:bool = ("cutscene" in focusObject and focusObject.cutscene) and ("fastTravelDirection" in focusObject and focusObject.fastTravelDirection < 0)
+			var focusPoint:Vector2 = focusObject.global_position
+			var randomVector:Vector2 = Vector2(x_direction,y_direction).normalized()
+			var directionVector:Vector2 = focusObject.linear_velocity.normalized() * spawnDirectionScale
+			var dirvec:Vector2 = (randomVector + directionVector).normalized()
 			if dirvec.length() < 0.9:
 				dirvec = randomVector
-			var failBasedMax = clamp(float(odditySpawnFailures) / float(odditySpawnRadiusSafemaxSteps), 0, 1)
-			var oRangeMax = lerp(odditySpawnRadiusMax, odditySpawnRadiusSafemax, failBasedMax)
-			var oddityFocusOffset = dirvec * rand_range(odditySpawnRadiusMin if not cutscene else odditySpawnRadiusMinCutscene, lerp(odditySpawnRadiusMax, odditySpawnRadiusSafemax, clamp(float(odditySpawnFailures) / float(odditySpawnRadiusSafemaxSteps), 0, 1)))
+			var failBasedMax:float = clamp(float(odditySpawnFailures) / float(odditySpawnRadiusSafemaxSteps), 0, 1)
+			var oRangeMax:float = lerp(odditySpawnRadiusMax, odditySpawnRadiusSafemax, failBasedMax)
+			var oddityFocusOffset:Vector2 = dirvec * rand_range(odditySpawnRadiusMin if not cutscene else odditySpawnRadiusMinCutscene, lerp(odditySpawnRadiusMax, odditySpawnRadiusSafemax, clamp(float(odditySpawnFailures) / float(odditySpawnRadiusSafemaxSteps), 0, 1)))
 			
-			var oddityPoint = focusPoint + oddityFocusOffset
+			var oddityPoint:Vector2 = focusPoint + oddityFocusOffset
 			Tool.release(focusObject)
 			return CurrentGame.globalCoords(oddityPoint)
 	
