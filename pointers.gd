@@ -164,6 +164,7 @@ func fetch_autoloads():
 		if object_name in AUTOLOAD_REF_STORE:
 			for sensorItem in needs[object_name]:
 				sensorItem["funcref"]=funcref(AUTOLOAD_REF_STORE[object_name],sensorItem.func_method_name)
+const ood_err_text = "cannot collect version specific data. Is HevLib out of date?"
 signal updates_fetched
 func fetch_mod_updates():
 	var rHTTP:HTTPRequest=HTTPRequest.new()
@@ -219,11 +220,11 @@ func fetch_mod_updates():
 			var cm:int=curr.version_major
 			var cn:int=curr.version_minor
 			var cb:int=curr.version_bugfix
-			if major>cm:dont=(minor>0||bugfix>3||abs(major-cm)>1)
-			elif minor>cn:dont=(bugfix>cb+3||abs(minor-cn)>1)
-			else:dont=bugfix>cb+9
-			if dont:
-				NodeAccess.__exit(false,"cannot collect version specific data. Is HevLib out of date?","pointers.SafeMode",60.0)
+			var ood:bool=true
+			if major>cm:if(minor>0||bugfix>3||abs(major-cm)>1):ood=true
+			elif minor>cn:if(bugfix>cb+3||abs(minor-cn)>1):ood=true
+			elif bugfix>cb+9:ood=true
+			if ood:NodeAccess.__exit(false,ood_err_text,"pointers.SafeMode",60.0)
 		
 		emit_signal("updates_fetched")
 		if!is_editor||ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","always_send_new_mods",false):
