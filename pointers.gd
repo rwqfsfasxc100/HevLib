@@ -100,6 +100,9 @@ var pause_on_unfocus:bool = false
 signal process_tick(delta)
 signal physics_process_tick(delta)
 
+var os:Object = ClassDB.instance("_OS")
+var translationserver:Object = ClassDB.instance("TranslationServer")
+
 func _physics_process(delta:float):
 	emit_signal("physics_process_tick",delta)
 	logging_current_frame_timer += 1
@@ -111,7 +114,7 @@ func _physics_process(delta:float):
 		# This won't run until the interval is fetched after being onready
 		logging_current_frame_timer = 0
 		storeLogCache()
-		VisualServer.render_loop_enabled = (not pause_on_unfocus or OS.is_window_focused())
+		VisualServer.render_loop_enabled = (not pause_on_unfocus or os.is_window_focused())
 
 func _process(delta):
 	emit_signal("process_tick",delta)
@@ -142,13 +145,13 @@ func _ready():
 	# Setup pausing on lost focus
 	pause_on_unfocus = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","stop_rendering_on_lost_focus",false)
 	ConfigDriver.__subscribe_to_setting_change("recheck_unfocused_unrendering",self,"HevLib","HEVLIB_CONFIG_SECTION_POINTERS","stop_rendering_on_lost_focus")
-	if TranslationServer.translate("HEVLIB_INCORRECT_SHIP") == "HEVLIB_INCORRECT_SHIP":
+	if translationserver.translate("HEVLIB_INCORRECT_SHIP") == "HEVLIB_INCORRECT_SHIP":
 		l("HevLib translations did not get initialized, quitting and ensuring the user is aware.","pointers.Translations")
 		Translations.__updateTL_from_dictionary(load(resource_path.get_base_dir() + "/HEVLIB_MENU/REPLACE_TRANSLATIONS.gd").get_script().get_script_constant_map().get("TRANSLATIONS",Dictionary()))
-		NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_ERRORCHECK_MISSING_TRANSLATIONS"),"pointers.Translations",0.0,"https://forms.gle/RmC4Zgonp6frFgnK7",true)
-	if TranslationServer.translate("SYSTEM_AMMO_10000_DESC") == "SYSTEM_AMMO_10000_DESC":
+		NodeAccess.__exit(false,translationserver.translate("HEVLIB_ERRORCHECK_MISSING_TRANSLATIONS"),"pointers.Translations",0.0,"https://forms.gle/RmC4Zgonp6frFgnK7",true)
+	if translationserver.translate("SYSTEM_AMMO_10000_DESC") == "SYSTEM_AMMO_10000_DESC":
 		l("Vanilla translations did not get initialized, queued exit for 200 seconds to preserve report-ready state.","pointers.Translations")
-		NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_ERRORCHECK_MISSING_VANILLA_LOCALES"),"pointers.Translations",200)
+		NodeAccess.__exit(false,translationserver.translate("HEVLIB_ERRORCHECK_MISSING_VANILLA_LOCALES"),"pointers.Translations",200)
 func fetch_autoloads():
 	var AUTOLOAD_REF_STORE:Dictionary = Equipment.AUTOLOAD_REF_STORE
 	for autoName in AUTOLOAD_REF_STORE:
@@ -1879,7 +1882,7 @@ class _DataFormat:
 		if __load_if_can(scene_path,"PackedScene",override):
 			var scn = __get_load().instance()
 			var root : String = scn.name
-			if Tool.validex != null:
+			if Tool.validex:
 				Tool.remove(scn)
 			else:
 				if is_instance_valid(scn) and not scn.is_queued_for_deletion():
@@ -2037,8 +2040,7 @@ class _DataFormat:
 	
 	static func __compress_text(txt:String) -> String:
 		var utf8:PoolByteArray = txt.to_utf8()
-		var compressed:PoolStringArray = PoolStringArray(Array(utf8.compress(1)))
-		return "PoolByteArray([%s]).decompress(%d,1)" % [compressed.join(","),utf8.size()]
+		return "PoolByteArray([%s]).decompress(%d,1)" % [PoolStringArray(Array(utf8.compress(1))).join(","),utf8.size()]
 	
 	static func __stringify_property(property,depth:int = 0,stringify:bool = true):
 		var out:String = ""
@@ -4620,8 +4622,8 @@ class _FileAccess:
 	const deeperSearch:PoolStringArray = PoolStringArray(["tres","tscn","gd","res"])
 	const resHex:String = "7265733a2f2f" # "res://".to_ascii().hex_encode()
 	
-	static func __get_dependancies_for_file(file_path:String,deep_search:bool = false) -> PoolStringArray:
-		var dependencies:PoolStringArray = ResourceLoader.get_dependencies(file_path)
+	static func __get_dependancies_for_file(file_path:String,deep_search:bool = false,rl:Object = ClassDB.instance("_ResourceLoader")) -> PoolStringArray:
+		var dependencies:PoolStringArray = rl.get_dependencies(file_path)
 		if deep_search and file_path.get_extension() in deeperSearch:
 			var nfp:String = file_path
 			if not non_static["pointers"].is_editor:
@@ -8014,22 +8016,21 @@ class _SafeMode:
 	const order_tree:Dictionary = Dictionary()
 	
 	const non_static = Dictionary()
+	
+	var regex:RegEx = RegEx.new()
+	var pointers:HevLibPointers
 	func _init(p):
 		non_static["pointers"] = p
-		var regex:RegEx = RegEx.new()
+		pointers = p
 		regex.compile(p.DataFormat.crcTable.B10.get_string_from_utf8())
-		non_static["regex"] = regex
-		non_static["self"] = self
 	
 	const safemode_dir = "user://cache/SafeMode/"
 	const validation_check_path:String = safemode_dir + "recache_validation.dat"
 	const sm_data_path:String = safemode_dir + "pck.dat"
 	
 	const log_header = "pointers.SafeMode"
-	
-	static func ready():
-		var file:File = File.new()
-		var pointers:HevLibPointers = non_static["pointers"]
+	var file:File = File.new()
+	func ready():
 		var vanilla_version:PoolIntArray = pointers.DataFormat.__get_vanilla_version()
 		var validation_check:Dictionary = Dictionary()
 		var decomp_size:int = -1
@@ -8047,8 +8048,9 @@ class _SafeMode:
 			PCKNAMES.append_array(pointers.FolderAccess.__get_vanilla_script_and_scenes())
 			validation_check["vanilla_version"] = vanilla_version
 			validation_check["hevlib_cache_version"] = HEVLIB_CACHE_VERSION
+			var rl:Object = ClassDB.instance("_ResourceLoader")
 			for f in PCKNAMES:
-				get_dependancies_for_vanilla_file(f)
+				get_dependancies_for_vanilla_file(f,rl)
 			order_tree.merge(flatten_tree(get_dependancy_tree()))
 			vanilla_load_order.append_array(dependancy_dict_keys)
 			var vsize:int = vanilla_load_order.size()
@@ -8093,64 +8095,61 @@ class _SafeMode:
 		
 		if not pointers.is_editor:
 			var safeCheck:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","safe_mod_loading",true)
-			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_ENABLED" if safeCheck else "HEVLIB_SAFEMODE_SM_DISABLED"),log_header)
-			non_static["self"].safeCheck = safeCheck
-		else:pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_DISABLED_EDITOR"),log_header)
+			pointers.l(translationserver.translate("HEVLIB_SAFEMODE_SM_ENABLED" if safeCheck else "HEVLIB_SAFEMODE_SM_DISABLED"),log_header)
+			safeCheck = safeCheck
+		else:pointers.l(translationserver.translate("HEVLIB_SAFEMODE_SM_DISABLED_EDITOR"),log_header)
 	
 	var sc_mutex:Mutex = Mutex.new()
+	var translationserver:Object = ClassDB.instance("TranslationServer")
 	
-	static func __check_file(file_path:String,zip_path:String,crash:bool = true):
-		var base:_SafeMode = non_static["self"]
-		if base.safeCheck:
-			base.sc_mutex.lock()
-			var pointers:HevLibPointers = non_static["pointers"]
+	func __check_file(file_path:String,zip_path:String,crash:bool = true):
+		if safeCheck:
+			sc_mutex.lock()
 			var zf:String = zip_path.get_file()
-			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_CHECKINGFILE") % [zf,file_path],log_header)
+			pointers.l(translationserver.translate("HEVLIB_SAFEMODE_SM_CHECKINGFILE") % [zf,file_path],log_header)
 			if file_path in PCKNAMES:
-				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_1") % [file_path,zf],log_header)
-				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_2"),log_header)
-				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_3"),log_header)
-				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_4"),log_header)
+				pointers.l(translationserver.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_1") % [file_path,zf],log_header)
+				pointers.l(translationserver.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_2"),log_header)
+				pointers.l(translationserver.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_3"),log_header)
+				pointers.l(translationserver.translate("HEVLIB_SAFEMODE_SM_OVERWRITE_VANILLA_ERR_4"),log_header)
 				if zf in offendingFiles:
 					offendingFiles[zf].append(file_path)
 				else:
 					offendingFiles[zf] = PoolStringArray([file_path])
-				base.offendingFileCount += 1
+				offendingFileCount += 1
 				if crash:
-					base.safeCheckTriggered = true
-			elif not base.safeCheckTriggered and file_path.get_extension() == "gd" and not pointers.DriverManagement.__is_driver_file(file_path) and file_path.split("/",false)[1] != pointers.resource_path.split("/",false)[1]:
+					safeCheckTriggered = true
+			elif not safeCheckTriggered and file_path.get_extension() == "gd" and not pointers.DriverManagement.__is_driver_file(file_path) and file_path.split("/",false)[1] != pointers.resource_path.split("/",false)[1]:
 				var file:File = File.new()
 				file.open(file_path,File.READ)
 				var st:String = file.get_as_text(true)
 				file.close()
-				if non_static["regex"].search(st):
-					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_AI_LIKELY") % [file_path,zf],log_header)
-					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_2"),log_header)
-					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_3"),log_header)
-					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_4"),log_header)
-					pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_5"),log_header)
+				if regex.search(st):
+					pointers.l(translationserver.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_AI_LIKELY") % [file_path,zf],log_header)
+					pointers.l(translationserver.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_2"),log_header)
+					pointers.l(translationserver.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_3"),log_header)
+					pointers.l(translationserver.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_4"),log_header)
+					pointers.l(translationserver.translate("HEVLIB_SAFEMODE_SM_SUPERING_ERR_5"),log_header)
 					if zf in offendingFiles:
 						offendingFiles[zf].append(file_path)
 					else:
 						offendingFiles[zf] = PoolStringArray([file_path])
-					base.offendingFileCount += 1
+					offendingFileCount += 1
 					if crash:
-						base.safeCheckTriggered = true
-			base.sc_mutex.unlock()
+						safeCheckTriggered = true
+			sc_mutex.unlock()
 	
-	static func __handle_exit_for_file_checks():
-		var pointers:HevLibPointers = non_static["pointers"]
-		var base:_SafeMode = non_static["self"]
-		pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TOTALLING") % [base.offendingFileCount,offendingFiles.size()],log_header)
+	func __handle_exit_for_file_checks():
+		pointers.l(translationserver.translate("HEVLIB_SAFEMODE_SM_TOTALLING") % [offendingFileCount,offendingFiles.size()],log_header)
 		for zip_path in offendingFiles:
 			var zip_files:PoolStringArray = offendingFiles[zip_path]
-			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TOTALLING_FOR_MOD") % [zip_files.size(),zip_path],log_header)
+			pointers.l(translationserver.translate("HEVLIB_SAFEMODE_SM_TOTALLING_FOR_MOD") % [zip_files.size(),zip_path],log_header)
 			for i in zip_files:pointers.l(" -> [%s]" % i,log_header)
 		if offendingFiles:
-			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TRIPPED_ERR_1"),log_header)
-			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TRIPPED_ERR_2"),log_header)
-			if base.safeCheck and base.safeCheckTriggered:
-				pointers.NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_SAFEMODE_SM_TRIPPED_POPUP_MSG") % [offendingFiles.size(),base.offendingFileCount],log_header,0.0,"",true)
+			pointers.l(translationserver.translate("HEVLIB_SAFEMODE_SM_TRIPPED_ERR_1"),log_header)
+			pointers.l(translationserver.translate("HEVLIB_SAFEMODE_SM_TRIPPED_ERR_2"),log_header)
+			if safeCheck and safeCheckTriggered:
+				pointers.NodeAccess.__exit(false,translationserver.translate("HEVLIB_SAFEMODE_SM_TRIPPED_POPUP_MSG") % [offendingFiles.size(),offendingFileCount],log_header,0.0,"",true)
 	
 	static func flatten_tree(tree:Dictionary) -> Dictionary:
 		var out:Dictionary = Dictionary()
@@ -8183,7 +8182,7 @@ class _SafeMode:
 	const binaryArr:PoolStringArray = PoolStringArray(["tres","tscn","gd"])
 	const deepSearchFor = PoolStringArray(["gd","gdc"])
 	
-	static func get_dependancies_for_vanilla_file(file_path:String):
+	static func get_dependancies_for_vanilla_file(file_path:String,rl:Object = ClassDB.instance("_ResourceLoader")):
 		if (not file_path in PCKNAMES) or (file_path in dependancy_dict_keys):
 			return
 		var dependencies:PoolStringArray = non_static["pointers"].FileAccess.__get_dependancies_for_file(file_path,file_path.get_extension() in deepSearchFor)
@@ -8197,7 +8196,7 @@ class _SafeMode:
 				dependancy_lookup[dp].append(file_path)
 			for m in dependencies:
 				if (m.get_extension() in binaryArr):
-					get_dependancies_for_vanilla_file(m)
+					get_dependancies_for_vanilla_file(m,rl)
 	
 	static func __lookup_vanilla_file_dependancies(dependancy) -> PoolStringArray:
 		return LDA(dependancy,PoolStringArray())
@@ -8907,8 +8906,9 @@ class _Translations:
 					pointers.l("Added translation: %s" % csvLine,log_header)
 				translationCount += 1
 		file.close()
+		var translationserver:Object = ClassDB.instance("TranslationServer")
 		for translationObject in translations:
-			TranslationServer.add_translation(translationObject)
+			translationserver.add_translation(translationObject)
 		pointers.l("%s Translations Updated from @ [%s]" % [translationCount, fileName],log_header)
 	
 	static func __updateTL_from_dictionary(path:Dictionary, fullLogging:bool = true):
@@ -8970,8 +8970,9 @@ class _Translations:
 			translationCount += 1
 			
 			translations.append(translationObject)
+		var translationserver:Object = ClassDB.instance("TranslationServer")
 		for translationObject in translations:
-			TranslationServer.add_translation(translationObject)
+			translationserver.add_translation(translationObject)
 		if fullLogging:
 			pointers.l("%s Translations Updated" % translationCount,log_header)
 	
@@ -9043,18 +9044,19 @@ class _Translations:
 		var pointers:HevLibPointers = non_static["pointers"]
 		var fullLogging:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","full_logging",false)
 		var markPlaceholders:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","mark_placeholder_translations",false)
-		TranslationServer.clear()
+		var translationserver:Object = ClassDB.instance("TranslationServer")
+		translationserver.clear()
 		var processes:Array = Array()
 		for mod in pointers.DriverManagement.__get_specific_driver_type("REPLACE_TRANSLATIONS.gd"):
 			var tl:Dictionary = mod.get("TRANSLATIONS",Dictionary())
 			if tl:
-				processes.append({"object":base,"method":"process_drivers_for_translations","args":[tl,markPlaceholders,pointers]})
+				processes.append({"object":base,"method":"process_drivers_for_translations","args":[tl,markPlaceholders,pointers,translationserver]})
 		# April Fool's alcohol!
 		var date:Dictionary = Time.get_date_dict_from_system()
 		if date.month == 4 and date.day == 1:
 			var alocol:Translation = Translation.new()
 			alocol.add_message("H2O","C2H6O")
-			TranslationServer.add_translation(alocol)
+			translationserver.add_translation(alocol)
 		var ml_check_data:Dictionary = Dictionary()
 		var trl:Array = pointers.Threading.__request_multiple_threads(processes)
 		for item in trl:
@@ -9070,14 +9072,14 @@ class _Translations:
 		file.store_string(JSON.print(ml_check_data,"\t"))
 		file.close()
 		var add_v_tl:Array = Array()
-		var rl = ClassDB.instance("_ResourceLoader")
+		var rl:Object = ClassDB.instance("_ResourceLoader")
 		for i in ProjectSettings.get_setting("locale/translations"):
 			add_v_tl.append({"object":rl,"method":"load","args":[i,"Translation",true]})
 		for i in pointers.Threading.__request_multiple_threads(add_v_tl):
-			TranslationServer.add_translation(i)
+			translationserver.add_translation(i)
 		pointers.SafeMode.__handle_exit_for_file_checks()
 	
-	static func process_drivers_for_translations(translations:Dictionary,markPlaceholders:bool,pointers:HevLibPointers):
+	static func process_drivers_for_translations(translations:Dictionary,markPlaceholders:bool,pointers:HevLibPointers,translationserver:Object):
 		var check_data:Dictionary = Dictionary()
 		var master_locale:String = ""
 		if "master_locale" in translations:
@@ -9141,7 +9143,7 @@ class _Translations:
 						if markPlaceholders:
 							v["string"] = "[PLACEHOLDER] " + v["string"]
 					tl.add_message(t,v.string.c_unescape())
-			TranslationServer.add_translation(tl)
+			translationserver.add_translation(tl)
 		return check_data
 
 
