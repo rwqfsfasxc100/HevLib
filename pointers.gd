@@ -1754,9 +1754,9 @@ class _DataFormat:
 		return [concat if concat else "extends Node",var_names,const_names,signal_names,method_names,signal_values,method_values,method_output_type]
 	
 	const compiled_scripts : Dictionary = {}
-	const csk:Array = Array()
+	const csk:Array = []
 	const compiled_script_object_storage : Dictionary = {}
-	const csosk:Array = Array()
+	const csosk:Array = []
 	
 	static func __compile_script(source_code : String,use_cache:bool = true) -> Script:
 		var shash:int = hash(source_code)
@@ -1917,7 +1917,7 @@ class _DataFormat:
 		return null
 	
 	const var_hash : Dictionary = {}
-	const vhk:Array = Array()
+	const vhk:Array = []
 	static func __convert_var_from_string(string : String, constant = true):
 		var shash:int = hash(string + str(constant))
 		if shash in vhk:
@@ -2372,7 +2372,7 @@ class _DriverManagement:
 		return false
 	
 	const driver_get_cache : Dictionary = {}
-	const dgck:Array = Array()
+	const dgck:Array = []
 	const driver_ext = PoolStringArray([
 		"gd",
 		"gdc",
@@ -3092,7 +3092,7 @@ class _Equipment:
 						var data:Dictionary = constants.get("RPC_EXTRA_STATES",{})
 						for type in data.keys():
 							if type in rpc_second_state_store:
-								var states:Array = Array()
+								var states:Array = []
 								for item in data[type]:
 									if "sensors" in item:
 										for i in item.sensors.size():
@@ -4765,7 +4765,7 @@ class _FolderAccess:
 	static func __get_files_with_extensions(folder:String,extensions:PoolStringArray,recurse_depth:int = -1) -> Array:
 		var directory:Directory = Directory.new()
 		if not directory.dir_exists(folder):
-			return Array()
+			return []
 		var out = PoolStringArray()
 		var dir = __fetch_folder_files(folder,true,true)
 		for f in dir:
@@ -5407,7 +5407,7 @@ class _ManifestV2:
 					file.open(mod_state_hash_file,File.READ)
 					base.lastModStateHash = file.get_32()
 					file.close()
-				var zrs:Array = Array()
+				var zrs:Array = []
 				for mod in modListArr:
 					zrs.append(mod["hash"])
 				zrs.sort()
@@ -6072,7 +6072,7 @@ class _ManifestV2:
 		}}
 	
 	const cached_manifests : Dictionary = {}
-	const cachedManifestKeys:Array = Array()
+	const cachedManifestKeys:Array = []
 	
 	const base_manifest_template : Dictionary = {
 		"mod_information":{
@@ -6108,9 +6108,9 @@ class _ManifestV2:
 		},
 		"manifest_definitions":{
 			"manifest_version":1.0,
-			"dependancy_mod_ids":Array(),
-			"conflicting_mod_ids":Array(),
-			"complementary_mod_ids":Array(),
+			"dependancy_mod_ids":[],
+			"conflicting_mod_ids":[],
+			"complementary_mod_ids":[],
 			"manifest_url":"", # EXAMPLE: https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest
 			"changelog_path":"", # This is relative to the ModMain.gd file. EXAMPLE: for a file at 'res://Example Mod/data/folder/changelogs.txt', you would put 'data/folder/changelogs.txt'
 			"modlet_priority":0, # SPECIFIC TO MODLETS! The order at which the modlet would be loaded. Most modlets load before other mods, but this will affect load order within the list of installed modlets
@@ -6939,7 +6939,7 @@ class _ManifestV2:
 					"method":"process_mod_data_for_load",
 					"args":[resources,modlet,pointers,float(mod_data["priority"])]
 				})
-		var ovr:Dictionary = Dictionary()
+		var ovr:Dictionary = {}
 		var cvr:Array = [
 			[1, "res://HevLib/scenes/minerals/AstrogatorPanel.gd", -INF, "res://hud/AstrogatorPanel.gd"],
 			[1, "res://HevLib/scenes/minerals/OMS.gd", -INF, "res://hud/OMS.gd"],
@@ -7013,11 +7013,12 @@ class _ManifestV2:
 		for r in pointers.Threading.__request_multiple_threads(load_stash):
 			cvr.append_array(r)
 		for f in cvr:
-			var extra:String = f[3]
-			if not extra in ovr: ovr[extra] = [f]
-			else: ovr[extra].append(f)
+			if f[0]:
+				var extra:String = f[3]
+				if not extra in ovr: ovr[extra] = [f]
+				else: ovr[extra].append(f)
 		var LO:Array = pointers.SafeMode.vanilla_load_order
-		var order:Array = Array()
+		var order:Array = []
 		for i in ovr:
 			var paths:Array = ovr[i]
 			paths.sort_custom(non_static["self"],"sortModPathOrder")
@@ -7025,12 +7026,10 @@ class _ManifestV2:
 		order.sort_custom(non_static["self"],"sortModLoadOrder")
 		for r in order:
 			for i in r[2]:
-				var type:int = i[0]
-				if type:
-					if type == LOAD_TYPE.EXTEND_SCRIPT:
-						pointers.DataFormat.__override_script(i[1],r[0])
-					else:
-						pointers.DataFormat.__replace_resource(i[1],r[0])
+				if i[0] == LOAD_TYPE.EXTEND_SCRIPT:
+					pointers.DataFormat.__override_script(i[1],r[0])
+				else:
+					pointers.DataFormat.__replace_resource(i[1],r[0])
 		pointers.l("%d modlet resources loaded." % order.size(),"pointers.SafeMode")
 	
 	static func process_mod_data_for_load(resources:Dictionary,modlet:String,pointers:HevLibPointers,priority:float):
@@ -7711,7 +7710,7 @@ class _RPC:
 		"current_state":"",
 		"current_details":"HEVLIB_DISCORDRPC_TITLE_SCREEN",
 		"secondary_state_index":0,
-		"secondary_states":Array(),
+		"secondary_states":[],
 		"absolute_state":"",
 		"loaded":false,
 		"update_wait_time":4.5,
@@ -7912,7 +7911,7 @@ class _RPC:
 		Tool.release(playership)
 		var out:String = TranslationServer.translate(state.get("text","RPC text missing :("))
 		var toFormat:Dictionary = {}
-		var sensors:Array = state.get("sensors",Array())
+		var sensors:Array = state.get("sensors",[])
 		if sensors and stack[0] == "ring":
 			for sensor in sensors:
 				if sensor is String:
@@ -7928,7 +7927,7 @@ class _RPC:
 						toFormat["sensor:" + sensor_name] = sensorOut
 					elif fallbackFormat:
 						toFormat["sensor:" + sensor_name] = TranslationServer.translate(fallbackFormat)
-		for sensor in state.get("function_outputs",Array()):
+		for sensor in state.get("function_outputs",[]):
 			if sensor is Dictionary:
 				var sensor_name:String = sensor.get("name","")
 				var fallbackFormat:String = sensor.get("fallback","unknown")
@@ -8006,13 +8005,13 @@ class _SafeMode:
 	var safeCheckTriggered:bool = false
 	const offendingFiles:Dictionary = {}
 	var offendingFileCount:int = 0
-	const dependancy_dictionary:Dictionary = Dictionary()
-	const dependancy_dict_keys:Array = Array()
-	const dependancy_lookup:Dictionary = Dictionary()
-	const dependancy_lookup_keys:Array = Array()
-	const vanilla_load_order:Array = Array()
+	const dependancy_dictionary:Dictionary = {}
+	const dependancy_dict_keys:Array = []
+	const dependancy_lookup:Dictionary = {}
+	const dependancy_lookup_keys:Array = []
+	const vanilla_load_order:Array = []
 	
-	const order_tree:Dictionary = Dictionary()
+	const order_tree:Dictionary = {}
 	
 	const non_static = {}
 	func _init(p):
@@ -8032,7 +8031,7 @@ class _SafeMode:
 		var file:File = File.new()
 		var pointers:HevLibPointers = non_static["pointers"]
 		var vanilla_version:PoolIntArray = pointers.DataFormat.__get_vanilla_version()
-		var validation_check:Dictionary = Dictionary()
+		var validation_check:Dictionary = {}
 		var decomp_size:int = -1
 		if file.file_exists(validation_check_path):
 			file.open(validation_check_path,File.READ)
