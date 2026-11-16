@@ -42,9 +42,9 @@ const leaderboards = [
 	"total_money",
 ]
 
-var current_stat = ""
+var current_stat:String = ""
 
-onready var warning = $PanelContainer/Control/WipeStatConfirm
+onready var warning:Node = $PanelContainer/Control/WipeStatConfirm
 
 var steamNode = null
 

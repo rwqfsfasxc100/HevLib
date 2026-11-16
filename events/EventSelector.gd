@@ -34,13 +34,13 @@ extends ScrollContainer
 
 var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
-onready var list = $VBoxContainer
+onready var list:VBoxContainer = $VBoxContainer
 
 func _ready():
 	get_node_or_null(NodePath("../HBoxContainer/EnableAll")).connect("pressed",self,"enableAll")
 	get_node_or_null(NodePath("../HBoxContainer/DisableAll")).connect("pressed",self,"disableAll")
 	var selector_button:PackedScene = load("res://HevLib/events/EventSelector.tscn")
-	var disabled_events:Array = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
+	var disabled_events:Array = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",Array())
 	for item in get_node("/root/Game/TheRing").get_children():
 		var event:String = item.name
 		var btn:Node = selector_button.instance()
@@ -54,9 +54,9 @@ func _ready():
 func enableAll():
 	for c in list.get_children():
 		c.pressed = true
-	pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
+	pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",Array())
 func disableAll():
-	var arr:Array = []
+	var arr:Array = Array()
 	for c in list.get_children():
 		c.pressed = false
 		arr.append(c.event)

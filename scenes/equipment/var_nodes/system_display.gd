@@ -46,7 +46,7 @@ export var inspection = false
 func getStatus():
 	return clamp(status,0.0,100.0)
 func getPower():
-	var value = 0.0
+	var value:float = 0.0
 	match typeof(power):
 		TYPE_INT:
 			value = power as float / 100.0

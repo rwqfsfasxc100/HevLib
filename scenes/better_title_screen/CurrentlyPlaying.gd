@@ -34,6 +34,7 @@ extends "res://menu/CurrentlyPlaying.gd"
 
 var hl_currhider_uinit : bool = false
 var is_ready:bool = false
+var pointers:HevLibPointers
 func _enter_tree() -> void:
 	pointers = ModLoader._savedObjects[0]
 
@@ -54,10 +55,7 @@ func _process(delta:float):
 			mod_menu.connect("visibility_changed", self , "display")
 		set_process(false)
 
-var pointers:HevLibPointers
 func display():
-	if not pointers:
-		pointers = ModLoader._savedObjects[0]
 	var groups:Array = CurrentGame.get_tree().get_nodes_in_group("hevlib_mod_menu")
 	var mod_menu:Node
 	if groups:

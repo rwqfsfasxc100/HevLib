@@ -35,8 +35,8 @@ extends "res://enceladus/UpgradeGroup.gd"
 # Ship limiting code was ported from IoE
 # Thanks Space! The modding community misses you!
 
-export (Array) var limit_ships = []
-export (Array) var prevent_ships = []
+export (Array) var limit_ships = Array()
+export (Array) var prevent_ships = Array()
 
 
 export (String) var restrict_hold_type = ""

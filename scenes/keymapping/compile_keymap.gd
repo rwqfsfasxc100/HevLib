@@ -38,7 +38,7 @@ func _init(p):
 	pointers = p
 
 
-var control_vars = {}
+var control_vars = Dictionary()
 # General variables
 var file:File = File.new()
 const vanilla = "user://cache/Keybinds/vanilla_binds.json"
@@ -77,16 +77,16 @@ var exclusives_exit_from_no_keys = "\n\t\telse:\n\t\t\tCurrentGame.get_tree().se
 var exclusives_checker_expression_part = "%s in bits"
 
 func compile_keymap():
-	var p = {}
+	var p = Dictionary()
 	var h:Dictionary = pointers.Keymapping.__get_formatted_vanilla_binds()
 	control_vars.clear()
 	for action in h:
 		var d = h[action]
 		if not action in p:
-			p[action] = {}
+			p[action] = Dictionary()
 		var g = p[action]
 		if not "controls" in g:
-			g["controls"] = []
+			g["controls"] = Array()
 		var c = g["controls"]
 		for j in d["inputs"]:
 			if not j in c:
@@ -107,12 +107,12 @@ func compile_keymap():
 				if add:
 					p[action]["controls"].append(ac)
 		else:
-			p[action] = {}
+			p[action] = Dictionary()
 			p[action]["controls"] = d["controls"]
 			p[action]["opts"] = d["opts"]
 	var scripting = script_header
 	
-	var exclusives = {}
+	var exclusives = Dictionary()
 	
 	for action in p:
 		var data = p[action]
@@ -124,9 +124,9 @@ func compile_keymap():
 	if exclusives:
 		var exclSize = exclusives.size()
 		if exclSize > 1:
-			var ordered = {}
-			var disordered = {}
-			var cKeys = {}
+			var ordered = Dictionary()
+			var disordered = Dictionary()
+			var cKeys = Dictionary()
 			for e in exclusives:
 				var x = exclusives[e]
 				var o = x["opts"]
@@ -134,7 +134,7 @@ func compile_keymap():
 				for f in k:
 					for f1 in f:
 						if not f1 in cKeys:
-							cKeys[f1] = []
+							cKeys[f1] = Array()
 						if not e in cKeys[f1]:
 							cKeys[f1].append(e)
 				if o["order_sensitive"]:
@@ -159,7 +159,7 @@ func compile_keymap():
 							single = false
 					if not single:
 						var this_checker = ""
-						var checkArr = []
+						var checkArr = Array()
 						for a in stack:
 							if this_checker:
 								this_checker += "_" + a
@@ -183,7 +183,7 @@ func compile_keymap():
 						if a in cKeys:
 							single = false
 					if not single:
-						var checkArr = []
+						var checkArr = Array()
 						for a in stack:
 							if not a in checkArr:
 								checkArr.append(a)
@@ -224,7 +224,7 @@ func compile_keymap():
 				var key = statement_list[-1].split("_")
 				if key.size() > 1:
 					if opts["order_sensitive"]:
-						var map = {}
+						var map = Dictionary()
 						var mx = 214748364
 						var cb = 1
 						for kv in key:
@@ -241,7 +241,7 @@ func compile_keymap():
 							cb += 1
 						expression += ")"
 					else:
-						var map = {}
+						var map = Dictionary()
 						var mx = 214748364
 						var cb = 1
 						for kv in key:
@@ -276,8 +276,8 @@ func compile_keymap():
 				for k in statement_list:
 					falsifiers += exclusives_variable_falsify % k
 				var other_bind_check_expression = ""
-				var unexited_keys = []
-				var used_keys = []
+				var unexited_keys = Array()
+				var used_keys = Array()
 				for c in checker_vars:
 					for a in c.split("_"):
 						if not a in used_keys:
@@ -342,7 +342,7 @@ func handle_regular_controls(data:Dictionary,action: String):
 			if opts["order_sensitive"]:
 				var handler = orderspecific_checker_entry % action
 				var expression = ""
-				var map = {}
+				var map = Dictionary()
 				var mx = 214748364
 				var cb = 1
 				for kv in key:
@@ -368,7 +368,7 @@ func handle_regular_controls(data:Dictionary,action: String):
 			else:
 				var handler = orderspecific_checker_entry % action
 				var expression = ""
-				var map = {}
+				var map = Dictionary()
 				var mx = 214748364
 				var cb = 1
 				for kv in key:

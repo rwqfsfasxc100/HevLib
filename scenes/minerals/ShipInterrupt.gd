@@ -53,7 +53,7 @@ var page:int = 0
 var counter:int = 0
 func handle_list(ores,oresize) -> Array:
 	if oresize > cargo_limit:
-		var out:Array = []
+		var out:Array = Array()
 		counter += 1
 		var offset:int = page * cargo_limit
 		var thisSize:int = min(cargo_limit,oresize - offset)

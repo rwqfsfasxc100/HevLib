@@ -34,7 +34,17 @@ extends "res://ships/Shipyard.gd"
 
 onready var syPointers:HevLibPointers = ModLoader._savedObjects[0]
 
-var inverseShipAliases = {}
+var inverseShipAliases:Dictionary = Dictionary()
+
+var file:File = File.new()
+
+var numericRegEx:RegEx = RegEx.new()
+
+onready var sys_slot_refs:Dictionary = syPointers.Equipment.equipment_validity_for_slots.duplicate(true)
+var inverted_sys_slot_refs:Dictionary = Dictionary()
+var cfg_mod_refs:Dictionary = Dictionary()
+
+var rehash_rand:Dictionary = Dictionary()
 
 var hl_shipdrivershipyardhandler_uinit : bool = false
 func _ready():
@@ -43,44 +53,39 @@ func _ready():
 	hl_shipdrivershipyardhandler_uinit = true
 	syPointers.ConfigDriver.__establish_connection("hl_shipyard_shipdriver_update",self)
 	hl_shipyard_shipdriver_update()
-	var file = File.new()
 	yield(syPointers,"process_tick")
 	hl_shipdriver_resetter_timeout()
-	sys_slot_refs = syPointers.Equipment.equipment_validity_for_slots.duplicate(true)
-	for tag in sys_slot_refs:
-		var equipment = sys_slot_refs[tag]
+	for tag in sys_slot_refs.keys():
+		var equipment:String = sys_slot_refs[tag]
 		for item in equipment:
 			if not item in inverted_sys_slot_refs:
-				inverted_sys_slot_refs[item] = []
-			if not tag in inverted_sys_slot_refs[item]:
+				inverted_sys_slot_refs[item] = [tag]
+			elif not tag in inverted_sys_slot_refs[item]:
 				inverted_sys_slot_refs[item].append(tag)
-	var ship_build_mod_store:Array = syPointers.Equipment.ship_build_mod_store.duplicate(true)
 	numericRegEx.compile("[0-9]")
 	
 	
 	# Ship driver
-	var alternates = {}
+	var alternates:Dictionary = Dictionary()
 	for sd in syPointers.Equipment.add_ships_store:
 		var ship_name:String = sd.get("name","")
 		var path:String = sd.get("path","")
 		var alias:String = sd.get("alias",ship_name)
-		var config:Dictionary = sd.get("config",{})
+		var config:Dictionary = sd.get("config",Dictionary()).duplicate(true)
 		if not "config" in config:
-			var nc = {"config":config.duplicate(true)}
-			config = nc
-		var usedConfigs:Array = sd.get("used_configs",[])
+			config = {"config":config}
+		var usedConfigs:Array = sd.get("used_configs",Array()).duplicate(true)
 		var alts = sd.get("alternate_configs","")
 		if alts:
 			if not ship_name in alternates:
-				alternates[ship_name] = []
-			match typeof(alts):
-				TYPE_STRING:
-					alternates[ship_name].append(alts)
-				TYPE_ARRAY,TYPE_STRING_ARRAY:
-					alternates[ship_name].append_array(alts)
+				alternates[ship_name] = Array()
+			if alts is String:
+				alternates[ship_name].append(alts)
+			elif alts is Array or alts is PoolStringArray:
+				alternates[ship_name].append_array(alts)
 		
 		if ship_name:
-			if not path.empty():
+			if path:
 				if syPointers.DataFormat.__load_if_can(path):
 					ships[ship_name] = syPointers.DataFormat.__get_load()
 				else:
@@ -94,184 +99,174 @@ func _ready():
 					defaultShipConfig[ship_name] = config
 			for cfg in usedConfigs:
 				if not ship_name in usedShipConfigs:
-					usedShipConfigs[ship_name] = []
-				if "config" in cfg:
-					var nv = cfg["config"].duplicate(true)
-					cfg = nv
-				usedShipConfigs[ship_name].append(cfg)
+					usedShipConfigs[ship_name] = Array()
+				if "config" in cfg.keys():
+					usedShipConfigs[ship_name].append(cfg["config"])
+				else:
+					usedShipConfigs[ship_name].append(cfg)
 	for ship_name in alternates:
-		var usedConfigs:Array = []
-		for a in alternates[ship_name]:
+		var usedConfigs:Array = Array()
+		for a in alternates[ship_name].keys():
 			var cfgalias = getShipAlias(a)
 			if a in defaultShipConfig:
-				var cf = defaultShipConfig[a]
+				var cf:Dictionary = defaultShipConfig[a]
 				if "config" in cf:
 					cf = cf["config"].duplicate(true)
 				else:
 					cf = cf.duplicate(true)
 				usedConfigs.append(cf)
 			if a in usedShipConfigs:
-				var cf = usedShipConfigs[a].duplicate(true)
-				usedConfigs.append_array(cf)
+				usedConfigs.append_array(usedShipConfigs[a].duplicate(true))
 			if cfgalias in defaultShipConfig:
-				var cf = defaultShipConfig[cfgalias]
+				var cf:Dictionary = defaultShipConfig[cfgalias].duplicate(true)
 				if "config" in cf:
-					cf = cf["config"].duplicate(true)
+					usedConfigs.append(cf["config"])
 				else:
-					cf = cf.duplicate(true)
-				usedConfigs.append(cf)
+					usedConfigs.append(cf)
 			if cfgalias in usedShipConfigs:
-				var cf = usedShipConfigs[cfgalias].duplicate(true)
-				usedConfigs.append_array(cf)
+				usedConfigs.append_array(usedShipConfigs[cfgalias].duplicate(true))
 		for cfg in usedConfigs:
 			if not ship_name in usedShipConfigs:
-				usedShipConfigs[ship_name] = []
+				usedShipConfigs[ship_name] = Array()
 			if "config" in cfg:
-				var nv = cfg["config"].duplicate(true)
-				cfg = nv
-			usedShipConfigs[ship_name].append(cfg)
-			var cfgalias = getShipAlias(ship_name)
+				usedShipConfigs[ship_name].append(cfg["config"].duplicate(true))
+			else:
+				usedShipConfigs[ship_name].append(cfg.duplicate(true))
+			var cfgalias:String = getShipAlias(ship_name)
 			if cfgalias != ship_name:
-				usedShipConfigs[cfgalias].append(cfg)
+				usedShipConfigs[cfgalias].append(cfg.duplicate(true))
 	
 	for ship in configAlias:
-		var baseShip = configAlias[ship]
+		var baseShip:String = configAlias[ship]
 		if not baseShip in inverseShipAliases:
-			inverseShipAliases[baseShip] = []
-		inverseShipAliases[baseShip].append(ship)
+			inverseShipAliases[baseShip] = [ship]
+		else:
+			inverseShipAliases[baseShip].append(ship)
 	
 	# Ship numerics handler
-	var register_ship_numerics = syPointers.Equipment.register_ship_numerics_store
-	var nano_delivery = {}
-	for data in register_ship_numerics:
+	var register_ship_numerics:Dictionary = syPointers.Equipment.register_ship_numerics_store
+	var nano_delivery:Dictionary = Dictionary()
+	for data in register_ship_numerics.keys():
 		match data:
 			"REGISTER_AMMO":
 				for v in register_ship_numerics[data]:
 					for value in v:
-						var entries = v[value]
+						var entries:Dictionary = v[value]
+						var ek:Array = entries.keys()
 						value = float(value)
-						if "price" in entries:
+						if "price" in ek:
 							ammoValue[value] = float(entries["price"])
-						if "delivery_speed" in entries:
+						if "delivery_speed" in ek:
 							ammoDeliveryPerSeocond[value] = float(entries["delivery_speed"])
 			"REGISTER_NANO":
 				for v in register_ship_numerics[data]:
 					for value in v:
-						var entries = v[value]
+						var entries:Dictionary = v[value]
+						var ek:Array = entries.keys()
 						value = float(value)
-						if "price" in entries:
+						if "price" in ek:
 							droneValue[value] = float(entries["price"])
-						if "delivery_speed" in entries:
+						if "delivery_speed" in ek:
 							nano_delivery[value] = float(entries["delivery_speed"])
 			"REGISTER_REACTOR_RODS":
 				for v in register_ship_numerics[data]:
 					for value in v:
-						var entries = v[value]
+						var entries:Dictionary = v[value]
+						var ek:Array = entries.keys()
 						value = float(value)
-						if "price" in entries:
+						if "price" in ek:
 							rodsValue[value] = float(entries["price"])
-						if "mass" in entries:
+						if "mass" in ek:
 							rodsMass[value] = float(entries["mass"])
 			"REGISTER_ULTRACAPACITORS":
 				for v in register_ship_numerics[data]:
 					for value in v:
-						var entries = v[value]
+						var entries:Dictionary = v[value]
+						var ek:Array = entries.keys()
 						value = float(value)
-						if "price" in entries:
+						if "price" in ek:
 							capacitorValue[value] = float(entries["price"])
-						if "mass" in entries:
+						if "mass" in ek:
 							capacitorMass[value] = float(entries["mass"])
 			"REGISTER_TURBINES":
 				for v in register_ship_numerics[data]:
 					for value in v:
-						var entries = v[value]
+						var entries:Dictionary = v[value]
+						var ek:Array = entries.keys()
 						value = float(value)
-						if "price" in entries:
+						if "price" in ek:
 							turbineValue[value] = float(entries["price"])
-						if "mass" in entries:
+						if "mass" in ek:
 							turbineMass[value] = float(entries["mass"])
 			"REGISTER_PROPELLANT":
 				for v in register_ship_numerics[data]:
 					for value in v:
-						var entries = v[value]
-						if "price" in entries:
+						var entries:Dictionary = v[value]
+						if "price" in entries.keys():
 							turbineValue[float(value)] = float(entries["price"])
 	syPointers.Equipment.drone_delivery_speed = nano_delivery
 	
 	# Modify ship builds
-	for entry in ship_build_mod_store:
-		var ship = entry.ship_name
-		var mode = entry.mode
-		var recurse = entry.recurse_for_alias
-		if not ship in cfg_mod_refs:
-			cfg_mod_refs[ship] = []
-		cfg_mod_refs[ship].append(entry.duplicate(true))
-		if recurse:
-			var related_aliases = []
+	for entry in syPointers.Equipment.ship_build_mod_store.duplicate(true):
+		var ship:String = entry.ship_name
+		if ship in cfg_mod_refs:
+			cfg_mod_refs[ship].append(entry.duplicate(true))
+		else:
+			cfg_mod_refs[ship] = [entry.duplicate(true)]
+		if entry.recurse_for_alias:
+			var related_aliases:Array = Array()
 			if ship in configAlias:
-				var aliasOf = configAlias[ship]
-				related_aliases.append(aliasOf)
+				related_aliases.append(configAlias[ship])
 			if ship in inverseShipAliases:
 				for aliasOf in inverseShipAliases[ship]:
 					if not aliasOf in related_aliases:
 						related_aliases.append(aliasOf)
 			for aliasOf in related_aliases:
-				if not aliasOf in cfg_mod_refs:
-					cfg_mod_refs[aliasOf] = []
-				cfg_mod_refs[aliasOf].append(entry.duplicate(true))
+				if aliasOf in cfg_mod_refs:
+					cfg_mod_refs[aliasOf].append(entry.duplicate(true))
+				else:
+					cfg_mod_refs[aliasOf] = [entry.duplicate(true)]
 
-var maxRolls = 10
-var modChanceScale = 1.0
+var maxRolls:int = 10
+var modChanceScale:float = 1.0
 
 func hl_shipyard_shipdriver_update():
 	maxRolls = syPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","max_dealership_modification_rolls",10)
 	modChanceScale = syPointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","dealership_modification_roll_chance_scale",1.0)
 
-
 func hl_shipdriver_resetter_timeout():
 	for ship in ships:
-		var path = ships[ship].resource_path
-		var replacement = load(path)
-		var sc = ships[ship]
-		Tool.remove(sc)
+		Tool.remove(ships[ship])
 		ships[ship] = null
-		ships[ship] = replacement
+		ships[ship] = ResourceLoader.load(ships[ship].resource_path,"PackedScene")
 
-var numericRegEx = RegEx.new()
-
-var sys_slot_refs:Dictionary = {}
-var inverted_sys_slot_refs:Dictionary = {}
-var cfg_mod_refs:Dictionary = {}
-
-var rehash_rand:Dictionary = {}
+const wraparound:int = 0x0000FFFFFFFFFFFF
 
 func getBuildsFor(s: String):
-	var wraparound = 0x0000FFFFFFFFFFFF
 	var out = .getBuildsFor(s)
-	var now = CurrentGame.getInGameTimestamp()
-	var day = int(floor(now / (24 * 3600)))
+	var day:int = int(floor(CurrentGame.getInGameTimestamp() / (24 * 3600)))
 	for i in rehash_rand:
 		if i < day - 5:
 			rehash_rand.erase(i)
 	if not day in rehash_rand:
-		rehash_rand[day] = {}
+		rehash_rand[day] = Dictionary()
 	seed(hash(CurrentGame.state.time) + hash(CurrentGame.state.soldShips))
 	if out and s in cfg_mod_refs:
-		var scfgs = cfg_mod_refs[s].size()
-		var useTheseConfigs = []
-		var outHash = hash(out) + hash(s) + syPointers.ManifestV2.currentModHash
-		var cfrRand = ((CurrentGame.srai(day + outHash + scfgs, 1)[0]) % wraparound) + randi()
+		var scfgs:int = cfg_mod_refs[s].size()
+		var useTheseConfigs:Array = Array()
+		var outHash:int = hash(out) + hash(s) + syPointers.ManifestV2.currentModHash
+		var cfrRand:int = ((CurrentGame.srai(day + outHash + scfgs, 1)[0]) % wraparound) + randi()
 		if not s in rehash_rand[day]:
-			rehash_rand[day][s] = []
+			rehash_rand[day][s] = Array()
 		seed(cfrRand)
-		var tcfgs = cfg_mod_refs[s].duplicate(true)
+		var tcfgs:Array = cfg_mod_refs[s].duplicate(true)
 		tcfgs.shuffle()
 		for i in min(maxRolls,scfgs):
 			useTheseConfigs.append(tcfgs[(randi() % ((2 * i) + 0xFF)) % scfgs])
 		cfrRand = (cfrRand + randi()) % wraparound
 		for cnum in useTheseConfigs.size():
-			var config = useTheseConfigs[cnum]
-			var rand = CurrentGame.sraf(cfrRand % (cnum + 0xFF))# * 1.33
+			var config:Dictionary = useTheseConfigs[cnum]
+			var rand:float = CurrentGame.sraf(cfrRand % (cnum + 0xFF))# * 1.33
 			if syPointers.ConfigDriver.__validate_dictionary(config,true,false,false):
 				if (clamp(config.get("chance",0.1),0.0,1.0) * modChanceScale) > (rand * 1.33):
 					match config.get("mode",null):
@@ -300,15 +295,16 @@ func getBuildsFor(s: String):
 						"if_equipment":
 							for dict in out:
 								if numerics_check(config,dict):
-									var doAdd = config.get("do_add_if",[])
-									var dontAdd = config.get("dont_add_if",[])
+									var doAdd = config.get("do_add_if",Array())
+									var dontAdd = config.get("dont_add_if",Array())
 									var wantedSystems = doAdd + dontAdd
-									var systems = syPointers.DataFormat.__sift_ship_config(dict.duplicate(true),wantedSystems,["currentCargo","currentCargoBy","currentCargoComposition","damage","juryRig","preferredCrew","processedCargo","remoteCargo","tuning"],true)
+									var systems:Array = syPointers.DataFormat.__sift_ship_config(dict.duplicate(true),wantedSystems,["currentCargo","currentCargoBy","currentCargoComposition","damage","juryRig","preferredCrew","processedCargo","remoteCargo","tuning"],true)
 									if systems:
-										var add = true
+										var add:bool = true
 										for r in systems:
 											if r in dontAdd:
 												add = false
+												break
 										if add:
 											for thisSlot in config.get("slot","").split("&&",false):
 												var sys = config.get("system")
@@ -320,22 +316,23 @@ func getBuildsFor(s: String):
 						"if_tag":
 							for dict in out:
 								if numerics_check(config,dict):
-									var doAdd = config.get("do_add_if",[])
-									var dontAdd = config.get("dont_add_if",[])
-									var doSystems = []
-									var dontSystems = []
+									var doAdd:Array = config.get("do_add_if",Array())
+									var dontAdd:Array = config.get("dont_add_if",Array())
+									var doSystems:Array = Array()
+									var dontSystems:Array = Array()
 									for i in inverted_sys_slot_refs:
 										if i in doAdd:
 											doSystems.append_array(inverted_sys_slot_refs[i])
 										if i in dontAdd:
 											dontSystems.append_array(inverted_sys_slot_refs[i])
-									var wantedSystems = doSystems + dontSystems
-									var systems = syPointers.DataFormat.__sift_ship_config(dict.duplicate(true),wantedSystems,["currentCargo","currentCargoBy","currentCargoComposition","damage","juryRig","preferredCrew","processedCargo","remoteCargo","tuning"],true)
+									var wantedSystems:Array = doSystems + dontSystems
+									var systems:Array = syPointers.DataFormat.__sift_ship_config(dict.duplicate(true),wantedSystems,["currentCargo","currentCargoBy","currentCargoComposition","damage","juryRig","preferredCrew","processedCargo","remoteCargo","tuning"],true)
 									if systems:
-										var add = true
+										var add:bool = true
 										for r in systems:
 											if r in dontSystems:
 												add = false
+												break
 										if add:
 											for thisSlot in config.get("slot","").split("&&",false):
 												var sys = config.get("system")
@@ -359,8 +356,8 @@ func getBuildsFor(s: String):
 func conditional_system_check(config,dict,op:String):
 	var canAdd:bool = true
 	if canAdd and op in config:
-		var do = config[op]
-		for slot in do:
+		var do:Dictionary = config[op]
+		for slot in do.keys():
 			var slotcheck = do[slot]
 			var orChecks:PoolStringArray = slot.split("||",false)
 			var orPassed = false
@@ -371,18 +368,20 @@ func conditional_system_check(config,dict,op:String):
 					var inSlot = getConfigHevLib(a.strip_edges(),dict)
 					if not inSlot in slotcheck:
 						andPassed = false
+						break
 				if andPassed:
 					orPassed = true
 					break
 			if not orPassed:
 				canAdd = false
+				break
 	return canAdd
 
 func conditional_tag_check(config,dict,op:String):
 	var canAdd:bool = true
 	if canAdd and op in config:
-		var do = config[op]
-		for slot in do:
+		var do:Dictionary = config[op]
+		for slot in do.keys():
 			var slotcheck = do[slot]
 			var orChecks:PoolStringArray = slot.split("||",false)
 			var orPassed = false
@@ -393,36 +392,40 @@ func conditional_tag_check(config,dict,op:String):
 					var inSlot = getConfigHevLib(a.strip_edges(),dict)
 					if not inSlot in sys_slot_refs:
 						andPassed = false
+						break
 					else:
 						for g in slotcheck:
 							if g in sys_slot_refs[inSlot]:
 								andPassed = false
+								break
+						if not andPassed:
+							break
 				if andPassed:
 					orPassed = true
 					break
 			if not orPassed:
 				canAdd = false
+				break
 	return canAdd
 
 func numerics_check(config,dict):
-	var pass_numeric_check = true
+	var pass_numeric_check:bool = true
 	if "check_numerics" in config:
-		var ccheck = config.check_numerics
-		for slot in ccheck:
-			var slotArgs = ccheck[slot]
+		var ccheck:Dictionary = config.check_numerics
+		for slot in ccheck.keys():
+			var slotArgs:Dictionary = ccheck[slot]
 			var op:String = slotArgs.get("operation",slotArgs.get("expression","=="))
 			var val = slotArgs.get("comparison",slotArgs.get("value",0))
-			match typeof(val):
-				TYPE_INT,TYPE_REAL:
+			
+			if val is int or val is float:
+				val = float(val)
+			elif val is String:
+				if numericRegEx.search(val):
 					val = float(val)
-				TYPE_STRING:
-					var find = numericRegEx.search(val)
-					if find:
-						val = float(val)
-				_:
-					continue
+			else:
+				continue
 			var inSlot = getConfigHevLib(slot,dict,0.0)
-			var isnt = true
+			var isnt:bool = true
 			if op.begins_with("!"):
 				isnt = false
 				op = op.substr(1)
@@ -439,7 +442,7 @@ func numerics_check(config,dict):
 					pass_numeric_check = (val >= inSlot) == isnt
 	return pass_numeric_check
 
-var configMutexHevLib = Mutex.new()
+var configMutexHevLib:Mutex = Mutex.new()
 func getConfigHevLib(key, c, default = null):
 	configMutexHevLib.lock()
 	for k in key.split("."):
@@ -452,11 +455,11 @@ func getConfigHevLib(key, c, default = null):
 
 func setConfigHevLib(key, c, value):
 	configMutexHevLib.lock()
-	var path = key.split(".")
+	var path:PoolStringArray = key.split(".")
 	for n in (path.size() - 1):
 		var k = path[n]
 		if not (k in c):
-			c[k] = {}
+			c[k] = Dictionary()
 		c = c[k]
 	c[path[path.size() - 1]] = value
 	configMutexHevLib.unlock()

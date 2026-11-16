@@ -63,13 +63,13 @@ var emp_shielding:float = 0.0
 var emp_scale_multi:float = 1.0
 
 var nanodroneMagazine:float = 0.0
-var listings:Dictionary = {}
+var listings:Dictionary = Dictionary()
 
-var hl_ism_system_name_registers:Array = []
-var hl_ism_add_systems:Array = []
+var hl_ism_system_name_registers:Array = Array()
+var hl_ism_add_systems:Array = Array()
 
-var currentInstalledEquipmentWithChanges:Array = []
-var hl_ism_installedequipment:Array = []
+var currentInstalledEquipmentWithChanges:Array = Array()
+var hl_ism_installedequipment:Array = Array()
 
 var hl_ism_mineral_trace_length:int = 6
 
@@ -110,7 +110,7 @@ func _enter_tree():
 	
 	var total_added_capacity:float = 0.0
 	
-	var individual_capacity_changes:Array = []
+	var individual_capacity_changes:Array = Array()
 	
 	for item in hl_ism_installedequipment:
 		var list:Array = listings[item]

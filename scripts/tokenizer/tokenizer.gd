@@ -60,9 +60,9 @@ func __get_compiled_bytecode_from_tokens() -> PoolByteArray:
 	if not type_store.size():
 		printerr("Token store is empty")
 		return PoolByteArray()
-	var identifier_map:Dictionary = {}
+	var identifier_map:Dictionary = Dictionary()
 	var identifiers:PoolStringArray = PoolStringArray()
-	var constant_map:Dictionary = {}
+	var constant_map:Dictionary = Dictionary()
 	var constants:Array = Array()
 	var line_tokens:PoolIntArray = PoolIntArray()
 	var line_numbers:PoolIntArray = PoolIntArray()
@@ -222,7 +222,7 @@ func __compiled_bytecode_to_tokens(bytes:PoolByteArray) -> bool:
 	if identifier_count * 4 > rest or constant_count * 4 > rest or line_count * 8 > rest or token_count > rest:
 		printerr("Header counts exceed the size of the data")
 		return false
-	var identifiers:Array = []
+	var identifiers:Array = Array()
 	for i in identifier_count:
 		var l:int = get_uint32()
 		if l > length - pos:
@@ -235,13 +235,13 @@ func __compiled_bytecode_to_tokens(bytes:PoolByteArray) -> bool:
 				break
 			decoded.append(byte)
 		identifiers.append(decoded.get_string_from_utf8())
-	var constants:Array = []
+	var constants:Array = Array()
 	for i in constant_count:
 		constants.append(get_const())
 	if line_count * 8 > length - pos:
 		printerr("Invalid line count")
 		return false
-	var line_at:Dictionary = {}
+	var line_at:Dictionary = Dictionary()
 	var line_list:PoolIntArray = PoolIntArray()
 	line_list.resize(line_count)
 	for i in line_count:

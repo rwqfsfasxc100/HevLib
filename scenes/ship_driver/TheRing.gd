@@ -45,7 +45,7 @@ func _ready():
 		dh.name = "DerelictHandler%d" % index
 		dh.index = index
 		add_child(dh)
-		var mh = derelict_handler.new()
+		var mh:Node = derelict_handler.new()
 		mh.name = "MinerHandler%d" % index
 		mh.mode = "miner"
 		mh.index = index
@@ -53,10 +53,11 @@ func _ready():
 	var data:Array = hl_ring_shipdriver_additive_pointers.Equipment.add_ships_store
 	var ro:Script = load("res://story/RescueOperation.gd")
 	for ship in data:
-		if "name" in ship and ship.name and "path" in ship and ship.path and hl_ring_shipdriver_additive_pointers.FileAccess.__file_exists(ship.path):
+		var sk:Array = ship.keys()
+		if "name" in sk and ship.name and "path" in sk and ship.path and hl_ring_shipdriver_additive_pointers.FileAccess.__file_exists(ship.path):
 			hl_ring_shipdriver_additive_pointers.l("Adding uniquely-named derelict event for ship %s" % ship.name,"ShipDriver")
 			
-			var derelict_data:Dictionary = ship.get("derelict",{})
+			var derelict_data:Dictionary = ship.get("derelict",Dictionary())
 			var model:String = ship.get("name","TRTL")
 			var dname:String = ship.get("specific_derelict_name","ModdedDerelict_" + model)
 			var node:Node = ro.new()

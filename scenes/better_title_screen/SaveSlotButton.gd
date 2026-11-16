@@ -38,9 +38,9 @@ onready var menu_path:Popup = load("res://HevLib/scenes/better_title_screen/Save
 
 onready var delete_path:ConfirmationDialog = popup_path.get_node("Popups/Override")
 
-var password:String = "FTWOMG"
+const password = "FTWOMG"
 
-onready var foolish = load("res://menu/Foolish.tscn").instance()
+onready var foolish:TextureRect = load("res://menu/Foolish.tscn").instance()
 
 var val:float = 0.0
 

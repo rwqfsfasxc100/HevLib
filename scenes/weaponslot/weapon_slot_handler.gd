@@ -37,9 +37,9 @@ onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
 var shipName:String = ""
 var baseShipName:String = ""
 
-var hl_weaponslot_modification:Array = []
-var hl_weaponslot_addition:Dictionary = {}
-var hl_weaponslot_template:Array = []
+var hl_weaponslot_modification:Array = Array()
+var hl_weaponslot_addition:Dictionary = Dictionary()
+var hl_weaponslot_template:Array = Array()
 
 var file:File = File.new()
 
@@ -54,10 +54,10 @@ func _ready():
 	
 	var equipment_templates : Dictionary = pointers.Equipment.ship_equipment_template_internals
 	if not shipName in equipment_templates:
-		equipment_templates[shipName] = {}
+		equipment_templates[shipName] = Dictionary()
 	equipment_templates = equipment_templates[shipName]
 	if not slot in equipment_templates:
-		equipment_templates[slot] = {}
+		equipment_templates[slot] = Dictionary()
 	equipment_templates = equipment_templates[slot]
 	
 	if not equipment_templates:
@@ -75,7 +75,7 @@ func _ready():
 		for item in eqnames:
 			if not item in node_names:
 				node_names.append(item)
-		var templates:Dictionary = {}
+		var templates:Dictionary = Dictionary()
 		for template in generic_modify_templates:
 			var equipment:Array = generic_modify_templates[template]["equipment"].duplicate(true)
 			var data:Array = generic_modify_templates[template]["data"]
@@ -84,13 +84,13 @@ func _ready():
 					for property in data:
 						if check in node_names:
 							if not check in equipment_templates:
-								equipment_templates[check] = {}
+								equipment_templates[check] = Dictionary()
 							equipment_templates[check][property["property"]] = property["value"]
 			templates[template] = equipment
 		for standalone in generic_modify_standalone:
 			if standalone in node_names:
 					if not standalone in equipment_templates:
-						equipment_templates[standalone] = {}
+						equipment_templates[standalone] = Dictionary()
 					equipment_templates[standalone][standalone["property"]] = standalone["value"]
 				
 		for template in ship_modify_templates:
@@ -106,7 +106,7 @@ func _ready():
 								if item in node_names:
 									for property in properties:
 										if not item in equipment_templates:
-											equipment_templates[item] = {}
+											equipment_templates[item] = Dictionary()
 										equipment_templates[item][property["property"]] = property["value"]
 			if shipName != baseShipName:
 				if shipName == template:
@@ -120,7 +120,7 @@ func _ready():
 									for property in properties:
 										if item in node_names:
 											if not item in equipment_templates:
-												equipment_templates[item] = {}
+												equipment_templates[item] = Dictionary()
 											equipment_templates[item][property["property"]] = property["value"]
 		for standalone in ship_modify_standalone:
 			if baseShipName == standalone:
@@ -132,7 +132,7 @@ func _ready():
 							for property in eq[item]:
 								if item in node_names:
 									if not item in equipment_templates:
-										equipment_templates[item] = {}
+										equipment_templates[item] = Dictionary()
 									equipment_templates[item][property["property"]] = property["value"]
 			if shipName != baseShipName:
 				if shipName == standalone:
@@ -144,7 +144,7 @@ func _ready():
 								for property in eq[item]:
 									if item in node_names:
 										if not item in equipment_templates:
-											equipment_templates[item] = {}
+											equipment_templates[item] = Dictionary()
 										equipment_templates[item][property["property"]] = property["value"]
 		
 	
@@ -152,15 +152,15 @@ func _ready():
 	var modStore:Dictionary = pointers.Equipment.ship_equipment_modification_internals
 	var completed:Dictionary = pointers.Equipment.ship_equipment_modification_internals_completed
 	if not shipName in modStore:
-		modStore[shipName] = {}
-		completed[shipName] = {}
+		modStore[shipName] = Dictionary()
+		completed[shipName] = Dictionary()
 	modStore = modStore[shipName]
 	if not slot in modStore:
-		modStore[slot] = {}
-		completed[shipName][slot] = {}
+		modStore[slot] = Dictionary()
+		completed[shipName][slot] = Dictionary()
 	modStore = modStore[slot]
 	if not mounted in modStore:
-		modStore[mounted] = {"modification":[],"addition":{},"template":[]}
+		modStore[mounted] = {"modification":Array(),"addition":Dictionary(),"template":Array()}
 		completed[shipName][slot][mounted] = {"modification":false,"addition":false,"template":false}
 	modStore = modStore[mounted]
 	completed = completed[shipName][slot][mounted]
@@ -173,11 +173,11 @@ func _ready():
 					break
 				var this:Dictionary = {
 					"name":iname,
-					"data":{}
+					"data":Dictionary()
 				}
-				var f:Dictionary = item.get("data",{})
+				var f:Dictionary = item.get("data",Dictionary())
 				for n in f.keys():
-					this["data"][n] = []
+					this["data"][n] = Array()
 					for l in f[n]:
 						this["data"][n].append([l[0],l[1]])
 				modStore["modification"].append(this)
@@ -192,13 +192,13 @@ func _ready():
 					break
 				var this:Dictionary = {
 					"name":iname,
-					"data":{},
+					"data":Dictionary(),
 					"path":item.get("path",""),
-					"config":item.get("config",{})
+					"config":item.get("config",Dictionary())
 				}
-				var f:Dictionary = item.get("data",{})
+				var f:Dictionary = item.get("data",Dictionary())
 				for n in f.keys():
-					this["data"][n] = []
+					this["data"][n] = Array()
 					for l in f[n]:
 						this["data"][n].append([l[0],l[1]])
 				modStore["addition"] = this
@@ -225,7 +225,7 @@ func loadPlaceholder():
 			for i in hl_weaponslot_template:
 				placeholder[i[0]] = i[1]
 			for f in hl_weaponslot_modification:
-				var data:Dictionary = f.get("data",{})
+				var data:Dictionary = f.get("data",Dictionary())
 				for nodepath in data.keys():
 					var np:Node = placeholder.get_node_or_null(nodepath)
 					if np:
@@ -249,7 +249,7 @@ func loadPlaceholder():
 					key = name + "_" + mounted
 				else:
 					key = t + "_" + mounted
-				var data:Dictionary = hl_weaponslot_addition.get("data",{})
+				var data:Dictionary = hl_weaponslot_addition.get("data",Dictionary())
 				for nodepath in data.keys():
 					var np:Node = pv.get_node_or_null(nodepath)
 					if np:
@@ -258,7 +258,7 @@ func loadPlaceholder():
 				for i in hl_weaponslot_template:
 					pv[i[0]] = i[1]
 				for f in hl_weaponslot_modification:
-					var db:Dictionary = f.get("data",{})
+					var db:Dictionary = f.get("data",Dictionary())
 					for nodepath in db.keys():
 						var np:Node = pv.get_node_or_null(nodepath)
 						if np:

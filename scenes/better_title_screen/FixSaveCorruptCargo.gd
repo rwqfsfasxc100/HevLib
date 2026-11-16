@@ -32,23 +32,24 @@
 
 extends Node
 
-var file = File.new()
-var password = "FTWOMG"
+var file:File = File.new()
+const password = "FTWOMG"
 
 func _pressed(p,n):
 	if file.file_exists(p):
-		var has_changed = false
+		var has_changed:bool = false
 		file.open_encrypted_with_pass(p, File.READ, password)
-		var data = JSON.parse(file.get_as_text(true)).result
+		var data:Dictionary = JSON.parse(file.get_as_text(true)).result
 		file.close()
-		if "ship" in data:
+		if "ship" in data.keys():
 			if "config" in data["ship"]:
-				var f = data["ship"]["config"]
-				if "currentCargo" in f and "currentCargoComposition" in f:
-					var cargo = f["currentCargo"]
-					var comp = f["currentCargoComposition"]
+				var f:Dictionary = data["ship"]["config"]
+				var fk:Array = f.keys()
+				if "currentCargo" in fk and "currentCargoComposition" in fk:
+					var cargo:Array = f["currentCargo"]
+					var comp:Array = f["currentCargoComposition"]
 					for i in cargo.size():
-						if cargo[i] == "":
+						if not cargo[i]:
 							cargo.remove(i)
 							comp.remove(i)
 							has_changed = true
@@ -56,4 +57,3 @@ func _pressed(p,n):
 			file.open_encrypted_with_pass(p, File.WRITE, password)
 			file.store_string(JSON.print(data))
 			file.close()
-#			breakpoint

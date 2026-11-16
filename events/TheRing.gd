@@ -34,23 +34,23 @@ extends "res://TheRing.gd"
 
 onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
-var current_event_log : Dictionary = {}
+var current_event_log : Dictionary = Dictionary()
 
-var group : Dictionary = {}
-var all_oddities : Array = []
+var group : Dictionary = Dictionary()
+var all_oddities : Array = Array()
 
-var mod_requested_events : Array = []
-var mod_request_log : Dictionary = {}
+var mod_requested_events : Array = Array()
+var mod_request_log : Dictionary = Dictionary()
 
-var base_playlist : Array = []
-var disabled_events : Array = []
+var base_playlist : Array = Array()
+var disabled_events : Array = Array()
 onready var dummy_event:Node = load("res://HevLib/events/event_selector/DummyEvent.gd").new()
 func hl_thering_UV():
 	if pointers:
-		base_playlist = []
-		disabled_events = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
+		base_playlist = Array()
+		disabled_events = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",Array())
 		var write_events:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","write_events",true)
-		var string : Dictionary = {}
+		var string : Dictionary = Dictionary()
 		for i in get_children():
 			var event:String = i.name
 			base_playlist.append(event)
@@ -60,7 +60,7 @@ func hl_thering_UV():
 			file.store_string(JSON.print(string,"\t"))
 			file.close()
 		
-		playlist = []
+		playlist = Array()
 		if disabled_events.size() < base_playlist.size():
 			for event in base_playlist:
 				if not event in disabled_events:
@@ -80,19 +80,19 @@ func request_event(oddity,event):
 	if oddity is Array:
 		for o in oddity:
 			if not event in group:
-				group[event] = []
+				group[event] = Array()
 			group[event].append(o)
 			all_oddities.append(o)
 	else:
 		if not event in group:
-			group[event] = []
+			group[event] = Array()
 		group[event].append(oddity)
 		all_oddities.append(oddity)
 	var id:int = hash(oddity)
 	if not event in mod_request_log.keys():
-		mod_request_log[event] = {id:{}}
+		mod_request_log[event] = {id:Dictionary()}
 	elif not id in mod_request_log[event].keys():
-		mod_request_log[event][id] = {}
+		mod_request_log[event][id] = Dictionary()
 	mod_request_log[event][id]["enter_time"] = Time.get_datetime_string_from_system(true)
 	file.open(mod_request_file,File.WRITE)
 	file.store_string(JSON.print(mod_request_log,"\t"))
@@ -111,14 +111,14 @@ func oddity_spawning(nearby, oddity):
 	if oddity is Array:
 		for o in oddity:
 			if not nearby in group:
-				group[nearby] = []
+				group[nearby] = Array()
 			if not oddity in group[nearby]:
 				group[nearby].append(o)
 			if not oddity in all_oddities:
 				all_oddities.append(o)
 	else:
 		if not nearby in group:
-			group[nearby] = []
+			group[nearby] = Array()
 		if not oddity in group[nearby]:
 			group[nearby].append(oddity)
 		if not oddity in all_oddities:
@@ -126,9 +126,9 @@ func oddity_spawning(nearby, oddity):
 
 func enterNearby(what, id):
 	if not what in current_event_log:
-		current_event_log[what] = {id:{}}
+		current_event_log[what] = {id:Dictionary()}
 	elif not id in current_event_log[what].keys():
-		current_event_log[what][id] = {}
+		current_event_log[what][id] = Dictionary()
 	var ctime : float = Time.get_unix_time_from_system()
 	current_event_log[what][id]["enter_time"] = ctime
 	if ctime > current_event_log[what][id].get("exit_time",0.0) and "exit_time" in current_event_log[what][id].keys():
@@ -160,7 +160,7 @@ func logEvents():
 	file.open(event_log_file,File.WRITE)
 	file.store_string(JSON.print(current_event_log,"\t"))
 	file.close()
-	var current_events : Array = []
+	var current_events : Array = Array()
 	var active_events : String = ""
 	var latest_event : String = ""
 	var latest_event_time:float = 0.0
@@ -207,7 +207,7 @@ func _ready():
 	file.open(mod_request_file,File.WRITE)
 	file.store_string("")
 	file.close()
-	current_event_log = {}
+	current_event_log = Dictionary()
 	image = map.get_data()
 	size = image.get_size()
 	

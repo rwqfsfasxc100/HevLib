@@ -33,15 +33,15 @@
 extends "res://enceladus/Enceladus.gd"
 
 func _enter_tree():
-	var buttonList = get_node_or_null("EnceladusMenu/MenuContainer/MarginContainer/HBoxContainer/Options")
-	var researchButton = Button.new()
+	var buttonList:Control = get_node_or_null("EnceladusMenu/MenuContainer/MarginContainer/HBoxContainer/Options")
+	var researchButton:Button = Button.new()
 	researchButton.name = "Research"
 	researchButton.text = "HEVLIB_RESEARCH"
 	buttonList.add_child(researchButton)
 	buttonList.move_child(researchButton,5)
 	var research_panel = load("res://HevLib/scenes/research/Research.tscn").instance()
 	research_panel.research_button = researchButton
-	var mc = get_node_or_null("EnceladusMenu/MenuContainer/MarginContainer/CanvasLayer/MarginContainer")
+	var mc:MarginContainer = get_node_or_null("EnceladusMenu/MenuContainer/MarginContainer/CanvasLayer/MarginContainer")
 	mc.add_child(research_panel)
 	mc.move_child(research_panel,5)
 	researchButton.connect("pressed",research_panel,"_on_Research_pressed")

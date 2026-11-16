@@ -30,6 +30,8 @@
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
 
+extends Reference
+
 const RPC_EXTRA_STATES = {
 	"ring":[
 		{

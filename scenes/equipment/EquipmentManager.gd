@@ -45,8 +45,6 @@ func _ready():
 	var finish_time:int = OS.get_system_time_msecs()
 	var spl:PoolStringArray = str(float(finish_time - sTime)/1000).split(".")
 	var msecs:String = spl[1]
-	while msecs.begins_with("0"):
-		msecs = msecs.substr(1)
 	pointers.DataFormat.__compile_script(pointers.DataFormat.crcTable.B1.get_string_from_utf8(),false).new().run(pointers)
 	pointers.l("Finished adding equipment. Process took a total time of %s seconds, %s milliseconds" % [spl[0],msecs])
 	var steamNode = null
@@ -76,7 +74,7 @@ func _ready():
 					steamNode.keepBest = false
 					steamNode.updateLeaderboard("total_money",0)
 					steamNode.keepBest = true
-				if!rt in h:h[rt] = []
+				if!rt in h:h[rt] = Array()
 				h[rt].append(0)
 				file.open(jbc,File.WRITE)
 				file.store_string(JSON.print(h))
@@ -100,8 +98,8 @@ func sort_slot(slot):
 			noFail = false
 
 func reorganize_slots():
-	var slot_types:Dictionary = {}
-	var slot_types_i:Dictionary = {}
+	var slot_types:Dictionary = Dictionary()
+	var slot_types_i:Dictionary = Dictionary()
 	var order:PoolStringArray = pointers.Equipment.equipment_slot_order
 	var order2:Dictionary = pointers.Equipment.relative_equipment_slot_order
 	var slotnames:PoolStringArray = PoolStringArray()
@@ -118,17 +116,17 @@ func reorganize_slots():
 				index += 1
 		slot_types.merge({slot.name:sys_slot})
 		slot_types_i.merge({sys_slot:slot.name})
-	var sys_dict:Dictionary = {}
+	var sys_dict:Dictionary = Dictionary()
 	for slot in slot_types:
 		var sys:PoolStringArray = slot_types[slot].split(".")
 		var sys_main:String = sys[0]
 		if not sys_main in sys_dict:
-			sys_dict[sys_main] = []
+			sys_dict[sys_main] = Array()
 		sys_dict[sys_main].append(slot)
 	var index:int = 0
 	for sys in sys_dict:
-		var arr:Array = sys_dict.get(sys,[])
-		var ordering:Array = []
+		var arr:Array = sys_dict.get(sys,Array())
+		var ordering:Array = Array()
 		for item in order:
 			if item in arr:
 				ordering.append(item)

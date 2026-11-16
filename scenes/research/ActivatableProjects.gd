@@ -33,7 +33,7 @@
 extends MarginContainer
 
 onready var research_item = load("res://HevLib/scenes/research/research_item_box/ResearchItem.tscn")
-var research_state = {}
+var research_state:Dictionary = Dictionary()
 
 onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
 onready var current_mod_ids = pointers.ManifestV2.__get_mod_ids()

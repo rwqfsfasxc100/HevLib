@@ -33,6 +33,6 @@
 extends Node
 
 func _open():
-	var item = load("res://HevLib/achievements/ClearLeaderboards.tscn").instance()
+	var item:Node = load("res://HevLib/achievements/ClearLeaderboards.tscn").instance()
 	add_child(item)
 	item.show_menu()

@@ -35,8 +35,8 @@ extends Node
 const ALLOW_KEYBIND_MODIFICATIONS = ! true
 var INPUT_DRIVER_ACTIVE = true
 
-var current_key_inputs = []
-var current_joy_strength = {}
+var current_key_inputs = Array()
+var current_joy_strength = Dictionary()
 
 var is_active_window = true
 

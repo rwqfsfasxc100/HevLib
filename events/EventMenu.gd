@@ -32,11 +32,11 @@
 
 extends CanvasLayer
 
-var selected_events = {}
+var selected_events:Dictionary = Dictionary()
 
 func _ready():
 	visible = false
-	var margins = get_node("NoMargins")
+	var margins:Node = get_node("NoMargins")
 	margins.rect_position = get_viewport().size - margins.rect_size
 	
 	
@@ -49,3 +49,4 @@ func _input(event):
 	if visible: 
 		if event.is_action_pressed("ui_cancel"):
 			visible = false
+			CurrentGame.in_hevlib_menu = false

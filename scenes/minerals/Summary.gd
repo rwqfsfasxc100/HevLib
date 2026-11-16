@@ -32,7 +32,7 @@
 
 extends "res://enceladus/Summary.gd"
 
-func loadOutput(outputData, processed = {}, rem = {}) -> bool:
+func loadOutput(outputData, processed = Dictionary(), rem = Dictionary()) -> bool:
 	var has = .loadOutput(outputData,processed,rem)
 	if has:
 		var vb:VBoxContainer = $PC/VBoxContainer

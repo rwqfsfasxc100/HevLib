@@ -32,9 +32,9 @@
 
 extends Timer
 
-func start_timer(MINUTES, useSecondsInstead = false):
+func start_timer(MINUTES, useSecondsInstead:bool = false):
 	Debug.l("Timer started for %s minutes" % MINUTES)
-	if useSecondsInstead == true:
+	if useSecondsInstead:
 		wait_time = MINUTES
 	else:
 		wait_time = MINUTES*60

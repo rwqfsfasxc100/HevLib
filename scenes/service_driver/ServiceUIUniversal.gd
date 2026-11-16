@@ -42,14 +42,14 @@ func buy():
 	.buy()
 	CurrentGame.changeInsurance(insuranceGain)
 	if factionBased:
-		var disp = Factions.getDispositionTowards(factionBased, "player")
+		var disp:Dictionary = Factions.getDispositionTowards(factionBased, "player")
 		Factions.adjustFactionDisposition(factionBased, "player", "hostility", - disp.hostility)
 		Factions.adjustFactionDisposition(factionBased, "player", "fear", - disp.fear)
 	
 func getPrice():
 	var factionPrice = 0
 	if factionBased:
-		var disp = Factions.getDispositionTowards(factionBased, "player")
+		var disp:Dictionary = Factions.getDispositionTowards(factionBased, "player")
 		factionPrice = max(0, disp.hostility * hostilityPrice) + max(0, disp.fear * fearPrice)
 	
 	return .getPrice() + factionPrice

@@ -32,16 +32,16 @@
 
 extends CheckButton
 
-var event = ""
+var event:String = ""
 
 var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
-var isEnabled = true
+var isEnabled:bool = true
 
-onready var is_ready = true
+onready var is_ready:bool = true
 func _toggled(button_pressed):
 	if is_ready:
-		var disabled_events:Array = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
+		var disabled_events:Array = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",Array())
 		if button_pressed:
 			if not event in disabled_events:
 				disabled_events.append(event)

@@ -32,9 +32,9 @@
 
 extends "res://achievement/Notifications.gd"
 
-var dir = Directory.new()
+var dir:Directory = Directory.new()
 
-onready var animations = {
+onready var animations:Dictionary = {
 	"Show":$Animations/Show,
 	"Sound":$Animations/SoundPlay,
 	"Title":$Animations/TitlePlay,
@@ -48,7 +48,7 @@ onready var animations = {
 	"To":$Animations/ToPlay,
 }
 
-onready var boxes = {
+onready var boxes:Dictionary = {
 	"VP":$PC/Generic/HBoxContainer/VBoxContainer/Control/ViewportContainer/Viewport,
 	"Background":$PC/Generic/HBoxContainer/VBoxContainer/Control/Background,
 	"Border":$PC/Generic/HBoxContainer/VBoxContainer/Control/Border,
@@ -67,16 +67,16 @@ func _ready():
 		pointers.main_modmain.log_double_load_error(get_script().resource_path)
 	hl_notificationdriverhandler_uinit = true
 	CurrentGame.connect("generic_notification",self,"_notification_start")
-	tween = Tween.new()
+	
 	add_child(tween)
 	animation.connect("animation_finished", self, "playNextCustomInQueue")
 	
 
-var vp_objects = []
+var vp_objects = Array()
 onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
-var tween
+var tween:Tween = Tween.new()
 
-var customInQueue = []
+var customInQueue:Array = Array()
 
 func playNextCustomInQueue(what = null):
 	yield(pointers,"process_tick")
@@ -92,21 +92,21 @@ func _notification_start(data):
 func playCustomAnim(data):
 	if not data:
 		return
-	var sceneData = data.get("scene",{})
-	var transitionData = data.get("transition",{})
+	var sceneData = data.get("scene",Dictionary())
+	var transitionData = data.get("transition",Dictionary())
 	
-	var title = str(data.get("title",{}).get("text","NOTIFICATION_TITLE_PLACEHOLDER"))
-	var desc_a = str(data.get("body",{}).get("text","NOTIFICATION_NAME_PLACEHOLDER"))
-	var desc_b = str(data.get("description",{}).get("text",""))
-	var particles = bool(data.get("particles",{}).get("show",false))
-	var background = str(sceneData.get("background",{}).get("path","res://HevLib/ui/panels/none.stex"))
-	var border = str(sceneData.get("border",{}).get("path","res://HevLib/achievements/achievement_border.stex"))
+	var title = str(data.get("title",Dictionary()).get("text","NOTIFICATION_TITLE_PLACEHOLDER"))
+	var desc_a = str(data.get("body",Dictionary()).get("text","NOTIFICATION_NAME_PLACEHOLDER"))
+	var desc_b = str(data.get("description",Dictionary()).get("text",""))
+	var particles = bool(data.get("particles",Dictionary()).get("show",false))
+	var background = str(sceneData.get("background",Dictionary()).get("path","res://HevLib/ui/panels/none.stex"))
+	var border = str(sceneData.get("border",Dictionary()).get("path","res://HevLib/achievements/achievement_border.stex"))
 	var scene = str(sceneData.get("path",""))
 	var pos = sceneData.get("position",Vector2(0,0))
 	var scale = sceneData.get("scale",Vector2(1,1))
 	var rotation = int(sceneData.get("rotation",0))
 	var rot_speed = int(sceneData.get("rotation_speed",0))
-	var icon = str(data.get("icon",{}).get("path",""))
+	var icon = str(data.get("icon",Dictionary()).get("path",""))
 	var type = str(transitionData.get("label",""))
 	var from = str(transitionData.get("old",""))
 	var to = str(transitionData.get("new",""))

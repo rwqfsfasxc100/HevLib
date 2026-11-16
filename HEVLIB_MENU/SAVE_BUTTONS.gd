@@ -30,6 +30,8 @@
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # [/license]
 
+extends Reference
+
 const SAVE_BUTTONS = [
 	{
 		"display_name":"HEVLIB_SAVEOPT_FIX_CORRUPTED_CARGO",

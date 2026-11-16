@@ -32,7 +32,7 @@
 
 extends HBoxContainer
 
-export var this_research_project = {}
+export var this_research_project:Dictionary = Dictionary()
 
 onready var name_button = $Progress/Name
 
@@ -52,7 +52,7 @@ var progress_bar:PackedScene = load("res://HevLib/scenes/research/research_item_
 
 var mark_for_completion = false
 
-var progress_bars = {}
+var progress_bars:Dictionary = Dictionary()
 
 var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
@@ -81,7 +81,7 @@ signal started
 
 
 func initialize():
-	var project_state = this_research_project.get("state",{})
+	var project_state = this_research_project.get("state",Dictionary())
 	var project_mode = this_research_project.get("mode","story_only")
 	
 	var project_name = this_research_project.get("name","RESEARCH_TEMPLATE")

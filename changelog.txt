@@ -110,6 +110,7 @@
 53=* Errors caused by double-loading are now more gracefully handled, and now have a unique log when it happens
 54=* A restart is now no longer needed when starting from a fresh config file when ran from the editor
 55=* Config updates now happen during the logging tick, rather than every physics frame.
+56=* Improved typing of empty arrays and dictionaries to provide a performance boost.
 60=* Updated credits
 
 [1.17.8]

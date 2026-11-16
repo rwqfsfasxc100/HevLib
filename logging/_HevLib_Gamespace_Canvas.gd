@@ -32,8 +32,8 @@
 
 extends CanvasLayer
 
-var currentNodeRes = Vector2(1280,720)
-var can_work = false
+var currentNodeRes:Vector2 = Vector2(1280,720)
+var can_work:bool = false
 
 func _ready():
 	can_work = true

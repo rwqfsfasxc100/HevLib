@@ -32,8 +32,8 @@
 
 extends Label
 
-var accurate_event_counter = false
-var visibility = false
+var accurate_event_counter:bool = false
+var visibility:bool = false
 
 var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
@@ -66,8 +66,8 @@ func _physics_process(delta):
 			if visibility:
 				var ship = CurrentGame.getPlayerShip()
 				if Tool.claim(ship):
-					var ring = CurrentGame.hl_ring_node
-					var currentPos = CurrentGame.globalCoords(ship.global_position)
+					var ring:Node = CurrentGame.hl_ring_node
+					var currentPos:Vector2 = CurrentGame.globalCoords(ship.global_position)
 					var chaos:float = ring.getChaosAt(currentPos)
 					var density:float = ring.getRawDensityAt(currentPos)
 					var realDensity:Array = ring.getTargetDensityAt(currentPos)

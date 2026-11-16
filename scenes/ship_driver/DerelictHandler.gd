@@ -35,11 +35,11 @@ extends Node
 export (int, 1,5,1) var index = 1
 export (String,"derelict","miner") var mode = "derelict"
 
-var derelictConversation = load("res://comms/conversation/DerelictConversation.tscn")
+var derelictConversation:PackedScene = load("res://comms/conversation/DerelictConversation.tscn")
 
-var stormBeacon = load("res://story/StormBeacon.tscn")
-var bounty = load("res://ships/LifepodPirate.tscn")
-var specificShipName = ""
+var stormBeacon:PackedScene = load("res://story/StormBeacon.tscn")
+var bounty:PackedScene = load("res://ships/LifepodPirate.tscn")
+var specificShipName:String = ""
 
 func setParam(param):
 	if param:
@@ -61,23 +61,23 @@ var asteroids = [
 func _exit_tree():
 	asteroids.clear()
 
-var prevent = false
+var prevent:bool = false
 
-var pointers:HevLibPointers
-var ship_pool = {}
-var dataSet = null
+onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
+var ship_pool:Dictionary = Dictionary()
+
 func _ready():
-	pointers = ModLoader._savedObjects[0]
-	var data = pointers.Equipment.add_ships_store
-	randomize()
-	data.shuffle()
-	for fd in data:
-		if pointers.ConfigDriver.__validate_dictionary(fd,true,true,true,"settings_config") and mode in fd and "name" in fd and "path" in fd:
-			var shipName = fd["name"]
-			if "path" in fd and fd.path:
+	var data:Array = pointers.Equipment.add_ships_store
+	var dr:Array = range(data.size())
+	dr.shuffle()
+	for di in dr:
+		var fd:Dictionary = data[di]
+		var fdk:Array = fd.keys()
+		if pointers.ConfigDriver.__validate_dictionary(fd,true,true,true,"settings_config") and mode in fdk and "name" in fd and "path" in fdk:
+			var shipName:String = fd["name"]
+			if "path" in fdk and fd.path:
 				if pointers.FileAccess.__file_exists(fd.path):
-					var event = fd[mode]
-					ship_pool.merge({shipName:event})
+					ship_pool.merge({shipName:fd[mode]})
 				else:
 					pointers.l("ERROR: Failed to add modded derelict for ship [%s] due to it's ship scene not being a valid filepath." % shipName,"ShipDriver")
 			else:
@@ -117,7 +117,7 @@ func canBeAt(pos):
 	var permit:bool = true
 	var isDerelict:bool = mode == "derelict"
 	if isDerelict:
-		var rc = clamp(selected.get("chance",1.0) * (1 - CurrentGame.getMoney() / selected.get("money",10000000.0)), selected.get("minimum_chance",0.1), 1)
+		var rc:float = clamp(selected.get("chance",1.0) * (1 - CurrentGame.getMoney() / selected.get("money",10000000.0)), selected.get("minimum_chance",0.1), 1)
 		if randf() > rc:
 			Debug.l("* Denied because of random chance of %f" % rc)
 			permit = false
@@ -148,14 +148,14 @@ func canBeAt(pos):
 
 func makeAt(pos):
 	
-	var ships = []
+	var ships:Array = Array()
 	
 	Debug.l("* %s handler %s spawning ship %s at (%d,%d)" % [mode,str(index),model,pos.x,pos.y])
 	match mode:
 		"miner":
-			var config = Shipyard.getBuildConfigByName(model)
+			var config:Dictionary = Shipyard.getBuildConfigByName(model)
 			config.faction = "civilian"
-			var miner = Shipyard.createShipByConfig(config)
+			var miner:RigidBody2D = Shipyard.createShipByConfig(config)
 			miner.ai = true
 			miner.aiExcavationValueOffset = 0
 			miner.preheat = true
@@ -164,9 +164,8 @@ func makeAt(pos):
 			ships.append(miner)
 		
 		"derelict":
-			var velocity = Vector2(randf() - 0.5, randf() - 0.5).normalized() * pow(randf(), gauss) * (maximum_velocity * 10.0)
-			
-			var wreckage = Shipyard.createShipBuildByName(model, "helpless", randf() > clamp((1 - stock_chance),0,1))
+			var velocity:Vector2 = Vector2(randf() - 0.5, randf() - 0.5).normalized() * pow(randf(), gauss) * (maximum_velocity * 10.0)
+			var wreckage:RigidBody2D = Shipyard.createShipBuildByName(model, "helpless", randf() > clamp((1 - stock_chance),0,1))
 			wreckage.angular_velocity = (grandf()) * (maximum_angular_velocity * 10)
 			wreckage.linear_velocity = velocity
 			wreckage.setReactorState(false)
@@ -185,11 +184,7 @@ func makeAt(pos):
 				wreckage.setShipName(specificShipName)
 			if allow_damage:
 				wreckage.damageLimit = 1
-			var dci
-			if new_derelict_conversation and pointers.FileAccess.__file_exists(new_derelict_conversation):
-				dci = load(new_derelict_conversation).instance()
-			else:
-				dci = derelictConversation.instance()
+			var dci:Node = load(new_derelict_conversation).instance() if (new_derelict_conversation and pointers.FileAccess.__file_exists(new_derelict_conversation)) else derelictConversation.instance()
 			wreckage.add_child(dci)
 			wreckage.dialogTree = wreckage.get_path_to(dci)
 			if cause_extra_damage:
@@ -199,26 +194,22 @@ func makeAt(pos):
 			
 			if randf() < rock_cluster_chance:
 				for i in rock_cluster_count:
-					var bp = asteroids[randi() % asteroids.size()]
-					var a = bp.instance()
+					var a:RigidBody2D = asteroids[randi() % asteroids.size()].instance()
 					a.angular_velocity = (randf() - 0.5)
 					a.linear_velocity = velocity
 					ships.append(a)
 					
 			if randf() < ring_storm_chance:
-				if new_storm_beacon and pointers.FileAccess.__file_exists(new_storm_beacon):
-					ships.append(load(new_storm_beacon).instance())
-				else:
-					ships.append(stormBeacon.instance())
+				ships.append(load(new_storm_beacon).instance() if new_storm_beacon and pointers.FileAccess.__file_exists(new_storm_beacon) else ships.append(stormBeacon.instance()))
+				
 			if randf() < pirate_chance:
-				match Settings.getDifficulty():
-					0:
-						Debug.l("Preventing spawn of abductor due to peaceful difficulty")
-					_:
-						ships.append(makeAbductor())
+				if Settings.getDifficulty():
+					ships.append(makeAbductor())
+				else:
+					Debug.l("Preventing spawn of abductor due to peaceful difficulty")
 			
 			if rescue:
-				var helper = Shipyard.createShipBuildByName("MADCERF", "helper", randf() > clamp((1 - stock_chance),0,1))
+				var helper:RigidBody2D = Shipyard.createShipBuildByName("MADCERF", "helper", randf() > clamp((1 - stock_chance),0,1))
 				helper.ai = true
 				helper.preheat = true
 				helper.rotation = randf() * 2 * PI
@@ -230,7 +221,7 @@ func makeAt(pos):
 	return ships
 
 func makeAbductor():
-	var cfg = Shipyard.getDefaultConfigByName("MADCERF")
+	var cfg:Dictionary = Shipyard.getDefaultConfigByName("MADCERF")
 	cfg.config.weaponSlot = {
 		"left": {"type": "SYSTEM_EMD17RF"}, 
 		"left2": {"type": "SYSTEM_EMD17RF"}, 
@@ -246,20 +237,17 @@ func makeAbductor():
 	cfg.config.turbine.power = 500
 	cfg.config.capacitor.capacity = 3000
 	cfg.faction = "pirate"
-	var ship = Shipyard.createShipByConfig(cfg)
+	var ship:RigidBody2D = Shipyard.createShipByConfig(cfg)
 	ship.ai = true
 	ship.preheat = true
 	ship.autopilotMaxVelocity = 500
 	ship.rotation = randf() * 2 * PI
-	if new_bounty and pointers.FileAccess.__file_exists(new_bounty):
-		ship.lifepod = load(new_bounty)
-	else:
-		ship.lifepod = bounty
+	ship.lifepod = load(new_bounty) if (new_bounty and pointers.FileAccess.__file_exists(new_bounty)) else bounty
 	ship.hostilityHitWhenEncelading = 0.2
 	return ship
 
 func grandf():
-	var v = pow(randf(), gauss)
+	var v:float = pow(randf(), gauss)
 	if randi() % 2 == 0:
 		return v
 	else:
@@ -267,15 +255,13 @@ func grandf():
 
 func applyExtraDamage(to):
 	Debug.l("Applying extra damage to %s" % [to])
-	var point = Vector2(randf() - 0.5, randf() - 0.5).normalized() * pow(randf(), gauss) * (extra_damage_radius * 10.0) + to.global_position
+	var point:Vector2 = Vector2(randf() - 0.5, randf() - 0.5).normalized() * pow(randf(), gauss) * (extra_damage_radius * 10.0) + to.global_position
 	to.applyKineticDamage(pow(randf(), gauss) * extra_kinetic_damage, point)
 	to.applyEmpDamage(pow(randf(), gauss) * extra_emp_damage, point, 1.0 / 60.0)
 
 func doClump(what, towards, velocity):
 	Debug.l("Clumping asteroid %s towards %s" % [what, towards])
-	var pos = CurrentGame.globalCoords(what.position)
-	var target = (towards - pos).normalized()
-	var tv = target * clump_velocity + velocity
-	what.linear_velocity = tv
+	var target:Vector2 = (towards - CurrentGame.globalCoords(what.position)).normalized() * clump_velocity + velocity
+	what.linear_velocity = target
 
 

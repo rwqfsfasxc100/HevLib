@@ -32,74 +32,43 @@
 
 extends HTTPRequest
 
-var cacheExtension = ".hev"
-
-var file_check = ""
+var file_check:String = ""
+var file:File = File.new()
 
 var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 func _ready():
 	connect("request_completed",self,"_on_request_complete")
-	
-	
+
+
 func _on_request_complete(result, response_code, headers, body):
-	if not result == 0:
-		get_parent().on_timeout()
-	else:
-		var json = body.get_string_from_utf8()
-		var releasesContent
-		var data
-		if not json == null:
-			releasesContent = json
-		if releasesContent:
-			var cFile = str(get_parent().currentFile)
-			var CContent = str(cFile.split("https://raw.githubusercontent.com/")[1])
-			var nameContent = CContent.split("/refs/heads/")
-			var indexData = str(get_parent().indexData)
-			var delim = ""
-			var index = str(indexData.split("\n")[0])
-			if index.begins_with("delimiter:"):
-				delim = index.split("delimiter:")[1]
+	if not result:
+		var nameContent:PoolStringArray = get_parent().currentFile.split("https://raw.githubusercontent.com/")[1].split("/refs/heads/")
+		var index:String = get_parent().indexData.split("\n")[0]
+		var delim:String = index.split("delimiter:")[1] if index.begins_with("delimiter:") else "|"
+		var utfc:String = ""
+		for ut in delim.to_utf8():
+			if utfc:
+				utfc += "-~-" + str(ut)
 			else:
-				delim = "|"
-			var psmp = []
-			for p in nameContent:
-				var als = str(p).split("/")
-				var pindex = 0
-				var concatStr = ""
-				while pindex <= als.size() - 1:
-					if pindex == 0:
-						concatStr = als[pindex]
-					else:
-						concatStr = concatStr + "~_~" + als[pindex]
-					pindex += 1
-				if concatStr != "":
-					psmp.append(concatStr)
-			if psmp != []:
-				nameContent = psmp
-			var utf8 = delim.to_utf8()
-			var utfc = ""
-			for ut in utf8:
-				var chars = utf8.size()
-				if utfc == "":
-					utfc = str(ut)
-				else:
-					utfc = utfc + "-~-" + str(ut)
-			var base_folder:String = "user://cache/WebTranslate/" + nameContent[0]
-			Directory.new().make_dir_recursive(base_folder)
-			var file = File.new()
-			var fileName = base_folder + "/" + nameContent[1] + cacheExtension + "--" + utfc
-			file.open(fileName,File.WRITE)
-			file.store_string(releasesContent)
+				utfc = str(ut)
+		var base_folder:String = "user://cache/WebTranslate/" + nameContent[0].split("/").join("~_~")
+		Directory.new().make_dir_recursive(base_folder)
+		
+		var fileName:String = base_folder + "/" + nameContent[1].split("/").join("~_~") + ".hev--" + utfc
+		file.open(fileName,File.WRITE)
+		file.store_string(body.get_string_from_utf8())
+		file.close()
+		
+		pointers.Translations.__updateTL(fileName,delim)
+		if file_check:
+			file.open(base_folder + "/" + str(file_check.hash()) + ".file_check_cache",File.WRITE)
+			file.store_string(file_check)
 			file.close()
-			
-			pointers.Translations.__updateTL(fileName,delim)
-			if file_check == "":
-				pointers.FolderAccess.__recursive_delete(fileName)
-			else:
-				file.open(base_folder + "/" + str(file_check.hash()) + ".file_check_cache",File.WRITE)
-				file.store_string(file_check)
-				file.close()
+		else:
+			pointers.FolderAccess.__recursive_delete(fileName)
 		get_parent().fetchTranslations()
+	else:
+		get_parent().on_timeout()
 
 

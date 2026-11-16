@@ -34,7 +34,7 @@ extends "res://enceladus/Summary.gd"
 
 onready var rpc:HevLibPointers._RPC = ModLoader._savedObjects[0].RPC
 
-func loadOutput(outputData, processed = {}, rem = {}) -> bool:
+func loadOutput(outputData, processed = Dictionary(), rem = Dictionary()) -> bool:
 	var val = .loadOutput(outputData,processed,rem)
 	if val:
 		rpc.call_deferred("loader_changed","enceladus_prime",1,"dive_summary")

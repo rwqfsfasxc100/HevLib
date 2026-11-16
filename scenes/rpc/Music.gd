@@ -34,7 +34,7 @@ extends "res://Music.gd"
 
 onready var rpc:HevLibPointers._RPC = ModLoader._savedObjects[0].RPC
 
-var current_state = ""
+var current_state:String = ""
 
 var rpc_music_uinit : bool = false
 func _ready():
@@ -45,13 +45,13 @@ func _ready():
 
 func calc():
 	var highest_prio = 0
-	var state = ""
+	var state:String = ""
 	for i in targetMood:
-		var prio = targetMood[i]
+		var prio:float = targetMood[i]
 		if prio > highest_prio:
 			state = i
 			highest_prio = prio
-	var priority = priorities[state]
+	var priority:float = priorities[state]
 	if highest_prio > 0.33 and priority > 0:
 		rpc.loader_changed("ring",1,state)
 	else:

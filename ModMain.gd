@@ -58,7 +58,7 @@ func _init(modLoader=ModLoader):
 #	testing(modLoader,pointers)
 	
 	pointers.ManifestV2.__get_mod_versions()
-	pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",[])
+	pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",Array())
 	
 	if OS.has_feature("editor"):
 		pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","compile",false)
@@ -124,7 +124,7 @@ const class_names_to_clear:PoolStringArray=PoolStringArray(["HevLibPointers","MI
 const class_refs:Dictionary={"HevLibPointers":"res://HevLib/pointers.gd","MINIZ":"res://HevLib/scripts/miniz/miniz.gd"}
 const remap_str:String="[remap]\n\npath=\"res://%s\"\n"
 static func process_gdnative_plugins()->Dictionary:
-	var fetchPaths:Dictionary={}
+	var fetchPaths:Dictionary=Dictionary()
 	var exePath:String=OS.get_executable_path().get_base_dir()+"/hevlib_dll_store/"
 	if!OS.has_feature("editor"):
 		var all_libraries:PoolStringArray=PoolStringArray()
@@ -132,7 +132,7 @@ static func process_gdnative_plugins()->Dictionary:
 			var mod_dir:String="res://"+first
 			for second in fetch_folder_files(mod_dir,true):if second in driver_dirs:
 				var cdir:String=mod_dir+second
-				for driverFile in fetch_folder_files(cdir):if driverFile=="DLL_MAPPER.gd":for entry in PoolStringArray(load(cdir+"DLL_MAPPER.gd").get_script_constant_map().get("DLL_MAPPER",[])):
+				for driverFile in fetch_folder_files(cdir):if driverFile=="DLL_MAPPER.gd":for entry in PoolStringArray(load(cdir+"DLL_MAPPER.gd").get_script_constant_map().get("DLL_MAPPER",Array())):
 					if!entry.begins_with("res://"):entry=mod_dir+entry
 					if entry.get_extension()=="gdnlib":all_libraries.append(entry)
 		var copied_files:PoolStringArray=PoolStringArray()
@@ -146,7 +146,7 @@ static func process_gdnative_plugins()->Dictionary:
 		for entry in all_libraries:
 			configFile.load(entry)
 			var cfg_sections:Array=configFile.get_sections()
-			var data:Array=[entry,{},{}]
+			var data:Array=[entry,Dictionary(),Dictionary()]
 			if"entry"in cfg_sections:
 				for oper in configFile.get_section_keys("entry"):
 					var lib_path:String=configFile.get_value("entry",oper)
@@ -230,7 +230,7 @@ static func handle_pointer_cast_clearing(replacements:Dictionary,modLoader:Array
 		var tokenizer = load("res://HevLib/scripts/tokenizer/tokenizer.gd").new()
 		for sc in script_paths:
 			if sc.get_file()=="DEFINED_CLASS_NAMES.gd"&&sc.split("/",false)[-2]in driver_dirs:
-				var fetched:Dictionary=load(sc).get_script_constant_map().get("DEFINED_CLASS_NAMES",{})
+				var fetched:Dictionary=load(sc).get_script_constant_map().get("DEFINED_CLASS_NAMES",Dictionary())
 				for i in fetched.keys():
 					if!i in class_names_to_clear&&typeof(fetched[i])==TYPE_STRING:
 						class_names_to_clear.append(i);class_refs[i]=fetched[i]

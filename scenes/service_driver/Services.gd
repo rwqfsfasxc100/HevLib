@@ -73,7 +73,7 @@ func _ready():
 				panel.hostilityPrice = max(item.get("hostility_price",0.0),0.0)
 				panel.insuranceGain = item.get("insurance_gain",0.0)
 				var perspective_add_to:Node2D = perspective_base.get_node(layer)
-				var cam_data:Dictionary = item.get("camera",{})
+				var cam_data:Dictionary = item.get("camera",Dictionary())
 				var camera_node:Node2D = Node2D.new()
 				camera_node.name = item_name
 				var camera_pos:Vector2 = cam_data.get("position",Vector2.ZERO)
@@ -81,7 +81,7 @@ func _ready():
 				var camera_rotation:float = deg2rad(cam_data.get("rotation",0.0))
 				camera_node.rotation = camera_rotation
 				camera_node.scale = cam_data.get("scale",Vector2.ONE)
-				var signs:Array = item.get("signs",[])
+				var signs:Array = item.get("signs",Array())
 				for idx in signs.size():
 					var sign_panel:Dictionary = signs[idx]
 					var sprite_node:Sprite = Sprite.new()

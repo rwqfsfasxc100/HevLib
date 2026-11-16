@@ -36,17 +36,17 @@ var currentKeyEvents = ""
 onready var InputDebugPanel = get_parent().get_parent().get_node("_HevLib_Gamespace_Canvas/MarginContainer/DebugPanel/ScrollContainer/MarginContainer/VBoxContainer/InputDebug")
 onready var InputEventDebugPanel = get_parent().get_parent().get_node("_HevLib_Gamespace_Canvas/MarginContainer/DebugPanel/ScrollContainer/MarginContainer/VBoxContainer/inputEventDebug")
 
-var actionDict = {}
-var key_actions = []
+var actionDict = Dictionary()
+var key_actions = Array()
 
-var action_dict = {}
+var action_dict = Dictionary()
 
 var inputDebug = false
 var inputEventDebug = false
 
 func _ready():
 	var actions = InputMap.get_actions()
-	var bActionDict = {}
+	var bActionDict = Dictionary()
 	for action in actions:
 		var act = InputMap.get_action_list(action)
 		actionDict.merge({action:act})
@@ -108,7 +108,7 @@ func _physics_process(delta):
 
 
 func match_event_type(event):
-	var eventType = []
+	var eventType = PoolStringArray()
 	if event is InputEvent:
 		eventType.append("InputEvent")
 	if event is InputEventAction:
@@ -139,10 +139,7 @@ func match_event_type(event):
 		eventType.append("InputEventTouch")
 	if event is InputEventWithModifiers:
 		eventType.append("InputEventWithModifiers")
-	if eventType == null:
-		return false
-	else:
-		return eventType
+	return eventType
 	
 func ieDebug():
 	if Input.is_action_pressed("hl_toggle_debug_menus"):

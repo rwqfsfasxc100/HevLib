@@ -32,87 +32,84 @@
 
 extends OptionButton
 
-onready var ring = get_node("/root/Game/TheRing")
+onready var ring:Node = get_node("/root/Game/TheRing")
 
-var eventNames = {0:"none"}
-var justEvents = []
-var cnode = ""
+var eventNames:Dictionary = {0:"none"}
+var justEvents:Array = Array()
+var cnode:String = ""
 
-var defaultOdditiesEvery = 450
-var defaultTestSpecificStoryElement = ""
+var defaultOdditiesEvery:float = 450
+var defaultTestSpecificStoryElement:String = ""
 
-var busy = false
+var busy:bool = false
 
 var focusObject
 
-var use_legacy = false
-var use_inject = false
+var use_legacy:bool = false
+var use_inject:bool = false
 
-var clear_related_poi = true
-var clear_in_cargo = false
+var clear_related_poi:bool = true
+var clear_in_cargo:bool = false
 
 func _on_SpawnNow_pressed():
-	var ev = cnode
-	Debug.l("EventDriver: forcing spawn of %s; parameters: legacy [%s]" % [ev,str(use_legacy)])
+	var ev:String = cnode
+	Debug.l("EventDriver: forcing spawn of %s; parameters: legacy [%s]" % [ev,"true" if use_legacy else "false"])
 	if ev == "none" or ev == "":
 		ev = justEvents[randi() % justEvents.size()]
 		Debug.l("EventDriver: random event, selecting %s" % ev)
-	var params = {}
+	var params:Dictionary = Dictionary()
 	if use_legacy:
 		params["legacy"] = true
 	if use_inject:
 		params["spawn_now"] = true
 	pointers.Events.__spawn_event(ev,ring,params)
 
-var spawnDirectionScale = 0.75
-var odditySpawnRadiusMin = 24000
-var odditySpawnRadiusMinCutscene = 6000
-var odditySpawnRadiusMax = 38000
-var odditySpawnRadiusSafemax = 80000
-var odditySpawnFailures = 0
-var odditySpawnRadiusSafemaxSteps = 40
+var spawnDirectionScale:float = 0.75
+var odditySpawnRadiusMin:float = 24000
+var odditySpawnRadiusMinCutscene:float = 6000
+var odditySpawnRadiusMax:float = 38000
+var odditySpawnRadiusSafemax:float = 80000
+var odditySpawnFailures:float = 0
+var odditySpawnRadiusSafemaxSteps:float = 40
 
 func getPos():
 	if Tool.claim(focusObject):
-		var cutscene = ("cutscene" in focusObject and focusObject.cutscene) and ("fastTravelDirection" in focusObject and focusObject.fastTravelDirection < 0)
-		var focusPoint = focusObject.global_position
-		var randomVector = Vector2(rand_range( - 1, 1), rand_range( - 1, 1)).normalized()
-		var directionVector = focusObject.linear_velocity.normalized() * spawnDirectionScale
-		var dirvec = (randomVector + directionVector).normalized()
+		var cutscene:bool = ("cutscene" in focusObject and focusObject.cutscene) and ("fastTravelDirection" in focusObject and focusObject.fastTravelDirection < 0)
+		var focusPoint:Vector2 = focusObject.global_position
+		var randomVector:Vector2 = Vector2(rand_range( - 1, 1), rand_range( - 1, 1)).normalized()
+		var directionVector:Vector2 = focusObject.linear_velocity.normalized() * spawnDirectionScale
+		var dirvec:Vector2 = (randomVector + directionVector).normalized()
 		if dirvec.length() < 0.9:
 			dirvec = randomVector
-		var oddityFocusOffset = dirvec * rand_range(odditySpawnRadiusMin if not cutscene else odditySpawnRadiusMinCutscene, lerp(odditySpawnRadiusMax, odditySpawnRadiusSafemax, clamp(float(odditySpawnFailures) / float(odditySpawnRadiusSafemaxSteps), 0, 1)))
+		var oddityFocusOffset:Vector2 = dirvec * rand_range(odditySpawnRadiusMin if not cutscene else odditySpawnRadiusMinCutscene, lerp(odditySpawnRadiusMax, odditySpawnRadiusSafemax, clamp(float(odditySpawnFailures) / float(odditySpawnRadiusSafemaxSteps), 0, 1)))
 		
-		var oddityPoint = focusPoint + oddityFocusOffset
 		Tool.release(focusObject)
-		return CurrentGame.globalCoords(oddityPoint)
+		return CurrentGame.globalCoords(focusPoint + oddityFocusOffset)
 		
 
 func _ready():
 	focusObject = CurrentGame.getPlayerShip()
-	if not ring == null:
+	if ring:
 		defaultTestSpecificStoryElement = ring.testSpecificStoryElement
 		defaultOdditiesEvery = ring.odditiesEvery
-		var value = defaultOdditiesEvery
+		var value:float = defaultOdditiesEvery
 		
 		get_parent().get_node("HBoxContainer/Timer").text = "%s s" % value
 		get_parent().get_node("HSlider").value = value
 		
 		addEvents()
-var event_objects = {}
+var event_objects:Dictionary = Dictionary()
 func addEvents():
 	
-	var events = ring.get_children()
-	var indx = 1
-	for evnt in events:
-		var ename = evnt.name
-		eventNames.merge({indx:ename})
-		event_objects.merge({ename:evnt})
+	var events:Array = ring.get_children()
+	for indx in events.size():
+		var evnt:Dictionary = events[indx]
+		var ename:String = evnt.name
+		eventNames[indx + 1] = ename
+		event_objects[ename] = evnt
 		justEvents.append(ename)
-		indx += 1
 	for event in eventNames:
-		var evnt = eventNames.get(event)
-		add_item(evnt)
+		add_item(eventNames[event])
 	
 	
 
@@ -126,13 +123,12 @@ func _on_HSlider_value_changed(value):
 func _on_Events_item_selected(index):
 	for event in eventNames:
 		if event == index:
-			cnode = eventNames.get(index)
+			cnode = eventNames[index]
 	
 	
 func startEventTimerNode():
 	busy = true
-	var timer = $Timer
-	timer.start()
+	$Timer.start()
 	
 
 func _timer_complete():
@@ -147,8 +143,8 @@ func _on_ClearEvent_pressed():
 	
 	pointers.Events.__clear_event(cnode,ring,clear_related_poi,clear_in_cargo)
 
-onready var legacy_button = get_node_or_null(NodePath("../Toggles/Legacy"))
-onready var inject_button = get_node_or_null(NodePath("../Toggles/Inject"))
+onready var legacy_button:Control = get_node_or_null(NodePath("../Toggles/Legacy"))
+onready var inject_button:Control = get_node_or_null(NodePath("../Toggles/Inject"))
 func _toggle_legacy(how):
 	use_legacy = how
 	if how:

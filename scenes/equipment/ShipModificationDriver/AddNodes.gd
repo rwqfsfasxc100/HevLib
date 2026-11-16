@@ -77,7 +77,7 @@ func hl_add_nodes_make_node_mods():
 						upgradeLimits["turbine.power"].y = processed_ship_numerics_modifications[type]["max"]
 	
 	
-	var n_store:Dictionary = {}
+	var n_store:Dictionary = Dictionary()
 	
 	var get_base_ship_fallback:bool = true
 	var fallback_ship = baseShipName
@@ -104,7 +104,7 @@ func hl_add_nodes_make_node_mods():
 		
 		if pointers_hl_addnodes.ConfigDriver.__validate_dictionary(obj_data):
 			if not node_data["recurse_to_variants"]:
-				var sh:Dictionary = processed_ship_register.get(shipName,{"node_definitions":{}})
+				var sh:Dictionary = processed_ship_register.get(shipName,{"node_definitions":Dictionary()})
 				if not object in sh["node_definitions"].keys():
 					continue
 		
@@ -116,10 +116,10 @@ func hl_add_nodes_make_node_mods():
 			childNames.append(c.name)
 		if object in childNames:
 			continue
-		var properties:Array = []
-		var position_data:Dictionary = {}
+		var properties:Array = Array()
+		var position_data:Dictionary = Dictionary()
 		node_parent_path = NodePath(obj_data.get("parent_node_path",get_path_to(self)))
-		var obj_prop = obj_data.get("properties",[])
+		var obj_prop = obj_data.get("properties",Array())
 		match typeof(obj_prop):
 			TYPE_ARRAY:
 				properties.append_array(obj_prop)
@@ -128,11 +128,11 @@ func hl_add_nodes_make_node_mods():
 					var dv:Dictionary = obj_prop[p]
 					dv["property"] = p
 					properties.append(dv)
-		var obj_posdat:Dictionary = obj_data.get("position_data",{})
+		var obj_posdat:Dictionary = obj_data.get("position_data",Dictionary())
 		for p in obj_posdat.keys():
 			if not p in position_data:
 				position_data[p] = obj_posdat[p]
-		var node_prop = node_data.get("properties",{})
+		var node_prop = node_data.get("properties",Dictionary())
 		match typeof(node_prop):
 			TYPE_ARRAY:
 				properties.append_array(node_prop)
@@ -141,7 +141,7 @@ func hl_add_nodes_make_node_mods():
 					var dv = node_prop[p]
 					dv.merge({"property":p})
 					properties.append(dv)
-		var node_posdat:Dictionary = node_data.get("position_data",{})
+		var node_posdat:Dictionary = node_data.get("position_data",Dictionary())
 		for p in node_posdat.keys():
 			if not p in position_data:
 				position_data[p] = node_posdat[p]
@@ -321,7 +321,7 @@ func hl_add_nodes_center_to_ship(property,base_node,ignore_scaling = false,paren
 	if base_node.get_node_or_null(property) == null:
 		return
 	var true_position:Vector2 = Vector2.ZERO
-	var positions:Dictionary = {}
+	var positions:Dictionary = Dictionary()
 	if "position" in base_node:
 		var pos:Vector2 = base_node.position
 		if ignore_scaling and "scale" in base_node:
@@ -366,7 +366,7 @@ func hl_add_nodes_center_to_ship(property,base_node,ignore_scaling = false,paren
 	return true_position
 
 func hl_add_nodes_invert_scaling(node_path,base_node):
-	var scalings:Dictionary = {}
+	var scalings:Dictionary = Dictionary()
 	
 	var x_mod:float = 1.0
 	var y_mod:float = 1.0
@@ -409,21 +409,21 @@ func hl_add_nodes_invert_scaling(node_path,base_node):
 
 func hl_add_nodes_process_ship_register(processed_node_definitions:Dictionary):
 	var file:File = File.new()
-	var pd:Dictionary = {}
+	var pd:Dictionary = Dictionary()
 	
 	for object in pointers_hl_addnodes.Equipment.ship_node_register:
 		var obj_ship_name:String = object.get("ship_name","")
 		if obj_ship_name:
 			var obj_fallback_to_base_ship:bool = object.get("fallback_to_base_ship",true)
 			var obj_fallback_override:String = object.get("fallback_override",baseShipName)
-			var obj_node_definitions:Dictionary = object.get("node_definitions",{})
+			var obj_node_definitions:Dictionary = object.get("node_definitions",Dictionary())
 			
 			if obj_ship_name in pd.keys():
 				for definition in obj_node_definitions:
 					if definition in processed_node_definitions:
 						pd[obj_ship_name]["node_definitions"][definition] = obj_node_definitions[definition]
 			else:
-				var dictionary:Dictionary = {}
+				var dictionary:Dictionary = Dictionary()
 				for definition in obj_node_definitions:
 					if definition in processed_node_definitions:
 						dictionary[definition] = obj_node_definitions[definition]
@@ -440,7 +440,7 @@ func hl_add_nodes_process_ship_register(processed_node_definitions:Dictionary):
 
 func hl_add_nodes_process_node_definitons():
 	var file:File = File.new()
-	var pd:Dictionary = {}
+	var pd:Dictionary = Dictionary()
 	var data:Dictionary = pointers_hl_addnodes.Equipment.node_definitions_cache
 	
 	for module in data.keys():
@@ -449,12 +449,12 @@ func hl_add_nodes_process_node_definitons():
 			var filepath:String = md["path"]
 			if pointers_hl_addnodes.DataFormat.__load_if_can(filepath):
 				var node:PackedScene = pointers_hl_addnodes.DataFormat.__get_load()
-				var properties:Dictionary = md.get("properties",{})
+				var properties:Dictionary = md.get("properties",Dictionary())
 				var pos = md.get("position",[0,0])
 				var scl = md.get("scale",[1])
 				var rot = md.get("rotation",0)
 				var pos_basic:Dictionary = {"position":pos,"scale":scl,"rotation":rot}
-				var ignore:Array = Array(md.get("ships_to_ignore",[]))
+				var ignore:Array = Array(md.get("ships_to_ignore",Array()))
 				var recursive:bool = md.get("recurse_to_variants",true)
 				pd.merge({module:{"node":node,"properties":properties,"position_data":pos_basic,"ships_to_ignore":ignore,"recurse_to_variants":recursive}})
 			else:
@@ -462,7 +462,7 @@ func hl_add_nodes_process_node_definitons():
 	return pd
 
 func hl_add_nodes_process_modified_ship_numerics() -> Dictionary:
-	var pd:Dictionary = {}
+	var pd:Dictionary = Dictionary()
 	var dt:Dictionary = pointers_hl_addnodes.Equipment.modify_ship_numerics
 	if "ALL" in dt:
 		for shipData in dt["ALL"]:
@@ -484,42 +484,42 @@ func ship_numeric_modifier(shipData:Dictionary,pd:Dictionary):
 		match type:
 			"ammo","mass_driver_ammo","ammunition":
 				if not "ammo" in pd:
-					pd["ammo"] = {}
+					pd["ammo"] = Dictionary()
 				if "min" in shipData[type]:
 					pd["ammo"]["min"] = shipData[type]["min"]
 				if "max" in shipData[type]:
 					pd["ammo"]["max"] = shipData[type]["max"]
 			"nano","nanodrones","nanodrone_components":
 				if not "nano" in pd:
-					pd["nano"] = {}
+					pd["nano"] = Dictionary()
 				if "min" in shipData[type]:
 					pd["nano"]["min"] = shipData[type]["min"]
 				if "max" in shipData[type]:
 					pd["nano"]["max"] = shipData[type]["max"]
 			"fuel","propellant","remass":
 				if not "propellant" in pd:
-					pd["propellant"] = {}
+					pd["propellant"] = Dictionary()
 				if "min" in shipData[type]:
 					pd["propellant"]["min"] = shipData[type]["min"]
 				if "max" in shipData[type]:
 					pd["propellant"]["max"] = shipData[type]["max"]
 			"reactor_core","reactor","core":
 				if not "reactor_core" in pd:
-					pd["reactor_core"] = {}
+					pd["reactor_core"] = Dictionary()
 				if "min" in shipData[type]:
 					pd["reactor_core"]["min"] = shipData[type]["min"]
 				if "max" in shipData[type]:
 					pd["reactor_core"]["max"] = shipData[type]["max"]
 			"ultracapacitor","capacitor":
 				if not "ultracapacitor" in pd:
-					pd["ultracapacitor"] = {}
+					pd["ultracapacitor"] = Dictionary()
 				if "min" in shipData[type]:
 					pd["ultracapacitor"]["min"] = shipData[type]["min"]
 				if "max" in shipData[type]:
 					pd["ultracapacitor"]["max"] = shipData[type]["max"]
 			"turbine":
 				if not "turbine" in pd:
-					pd["turbine"] = {}
+					pd["turbine"] = Dictionary()
 				if "min" in shipData[type]:
 					pd["turbine"]["min"] = shipData[type]["min"]
 				if "max" in shipData[type]:

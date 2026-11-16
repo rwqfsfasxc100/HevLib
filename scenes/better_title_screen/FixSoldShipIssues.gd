@@ -32,17 +32,16 @@
 
 extends Node
 
-var password = "FTWOMG"
+const password = "FTWOMG"
 
+var f:File = File.new()
 func _pressed(a,b):
-	var f = File.new()
 	if f.file_exists(a):
 		f.open_encrypted_with_pass(a, File.READ, password)
-		var sg = f.get_line()
-		var savedState = parse_json(sg)
-		if "soldShips" in savedState:
+		var savedState:Dictionary = parse_json(f.get_line())
+		f.close()
+		if "soldShips" in savedState.keys():
 			savedState.soldShips.clear()
-		f.close()
-		f.open_encrypted_with_pass(a, File.WRITE, password)
-		f.store_string(to_json(savedState))
-		f.close()
+			f.open_encrypted_with_pass(a, File.WRITE, password)
+			f.store_string(to_json(savedState))
+			f.close()

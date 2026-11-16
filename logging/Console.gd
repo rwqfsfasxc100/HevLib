@@ -42,15 +42,14 @@ var currentNodeRes = Vector2(1280,720)
 
 func _ready():
 	for i in max_lines:
-		var label = richLabel.instance()
+		var label:Control = richLabel.instance()
 		label.name = "line_" + str(i)
 		list.add_child(label)
 		clearLabel(label)
 
 func _process(delta):
 	if $MarginContainer.is_visible_in_tree():
-		currentNodeRes = Settings.getViewportSize()
-		$MarginContainer.rect_size = currentNodeRes
+		$MarginContainer.rect_size = Settings.getViewportSize()
 
 func _input(event):
 	if event.is_action_pressed("open_console"):

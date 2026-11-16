@@ -39,7 +39,7 @@ onready var researchSysPointers:HevLibPointers = ModLoader._savedObjects[0]
 
 onready var research_store:Dictionary = researchSysPointers.Equipment.research_store
 
-var research_state:Dictionary = {}
+var research_state:Dictionary = Dictionary()
 var research_project_ids:PoolStringArray = PoolStringArray()
 onready var active_mods:PoolStringArray = researchSysPointers.ManifestV2.__get_mod_ids()
 
@@ -66,12 +66,12 @@ func advanceTimeBySeconds(seconds):
 	.advanceTimeBySeconds(seconds)
 	
 
-var active_projects:Array = []
-var inactive_projects:Array = []
-var complete_projects:Array = []
+var active_projects:Array = Array()
+var inactive_projects:Array = Array()
+var complete_projects:Array = Array()
 
 func init_research_on_save_load():
-	research_state = state.get_or_add("hevlib_research",{})
+	research_state = state.get_or_add("hevlib_research",Dictionary())
 	research_project_ids = PoolStringArray(research_state.keys())
 	active_projects.clear()
 	inactive_projects.clear()
