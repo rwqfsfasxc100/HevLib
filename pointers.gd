@@ -6929,7 +6929,6 @@ class _ManifestV2:
 		pointers.Scripting.make_mineral_scripting()
 		pointers.Equipment.__make_upgrades_scene()
 		pointers.NodeAccess.__dynamic_crew_expander()
-		var file:File = File.new()
 		var load_stash:Array = []
 		for modlet in __get_modlet_files():
 			var mod_data:Dictionary = pointers.ManifestV2.__get_mod_by_id(pointers.ManifestV2.__match_mod_file_path_to_id(modlet))
@@ -6938,12 +6937,7 @@ class _ManifestV2:
 				load_stash.append({
 					"object":base,
 					"method":"process_mod_data_for_load",
-					"args":[
-						resources,
-						modlet,
-						pointers,
-						float(mod_data["priority"]),
-					]
+					"args":[resources,modlet,pointers,float(mod_data["priority"])]
 				})
 		var ovr:Dictionary = Dictionary()
 		var cvr:Array = [
