@@ -144,7 +144,7 @@ func _ready():
 	ConfigDriver.__subscribe_to_setting_change("recheck_unfocused_unrendering",self,"HevLib","HEVLIB_CONFIG_SECTION_POINTERS","stop_rendering_on_lost_focus")
 	if TranslationServer.translate("HEVLIB_INCORRECT_SHIP") == "HEVLIB_INCORRECT_SHIP":
 		l("HevLib translations did not get initialized, quitting and ensuring the user is aware.","pointers.Translations")
-		Translations.__updateTL_from_dictionary(load(resource_path.get_base_dir() + "/HEVLIB_MENU/REPLACE_TRANSLATIONS.gd").get_script().get_script_constant_map().get("TRANSLATIONS",{}))
+		Translations.__updateTL_from_dictionary(load(resource_path.get_base_dir() + "/HEVLIB_MENU/REPLACE_TRANSLATIONS.gd").get_script().get_script_constant_map().get("TRANSLATIONS",Dictionary()))
 		NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_ERRORCHECK_MISSING_TRANSLATIONS"),"pointers.Translations",0.0,"https://forms.gle/RmC4Zgonp6frFgnK7",true)
 	if TranslationServer.translate("SYSTEM_AMMO_10000_DESC") == "SYSTEM_AMMO_10000_DESC":
 		l("Vanilla translations did not get initialized, queued exit for 200 seconds to preserve report-ready state.","pointers.Translations")
@@ -243,15 +243,15 @@ func fetch_mod_updates():
 	Tool.deferCallInPhysics(Tool,"remove",[rHTTP])
 
 var has_updated:bool = false
-var modlet_toggle_restart_requests:Array = []
-var needs_updates:Dictionary = {}
-var complementary:Dictionary = {}
-var dependancies:Dictionary = {}
-var conflicts:Dictionary = {}
+var modlet_toggle_restart_requests:Array = Array()
+var needs_updates:Dictionary = Dictionary()
+var complementary:Dictionary = Dictionary()
+var dependancies:Dictionary = Dictionary()
+var conflicts:Dictionary = Dictionary()
 var complementary_keys:PoolStringArray = PoolStringArray()
 var dependancies_keys:PoolStringArray = PoolStringArray()
 var conflicts_keys:PoolStringArray = PoolStringArray()
-var defined_control_configs:Dictionary = {}
+var defined_control_configs:Dictionary = Dictionary()
 
 const libid:String="hev.LIBRARY"
 
@@ -358,7 +358,7 @@ class _Achievements:
 	
 	var pointers:HevLibPointers
 	
-	const non_statics:Dictionary = {}
+	const non_statics:Dictionary = Dictionary()
 	
 	func _init(p,h):
 		non_statics["pointers"] = p
@@ -410,9 +410,9 @@ class _Achievements:
 	]
 	
 	
-	const completionCache : Dictionary = {}
-	const currentAchievementCache : Dictionary = {}
-	const cached_playtime_ach_and_data : Array = []
+	const completionCache : Dictionary = Dictionary()
+	const currentAchievementCache : Dictionary = Dictionary()
+	const cached_playtime_ach_and_data : Array = Array()
 	
 	const log_header = "pointers.Achievements"
 	
@@ -472,7 +472,7 @@ class _Achievements:
 		
 		var returnData : Dictionary = {
 			"name":achievementID, # achievement ID
-			"isUnlocked":achievementID in currentAchievementCache.get("unlockedAchievements",[]), # if the achievement has been unlocked
+			"isUnlocked":achievementID in currentAchievementCache.get("unlockedAchievements",Array()), # if the achievement has been unlocked
 			"stat":stat, # related stat if applicable
 			"limit":limit, # related stat limit if applicable
 			"data":additional_stat_data, # additional data
@@ -492,7 +492,7 @@ class _Achievements:
 		var percent : float = 0.0
 		var ach:Dictionary = Achivements.achievementRarity
 		var size = float(Achivements.achievementRarity.size())
-		var achivements : Dictionary = {}
+		var achivements : Dictionary = Dictionary()
 		var file:File = File.new()
 		if file.file_exists(achievementsFile):
 			if file.open_encrypted_with_pass(achievementsFile, File.READ, password) == OK:
@@ -521,10 +521,10 @@ class _Achievements:
 	
 	# Caches achievement data
 	static func get_current_achievements():
-		var unlockedAchievements : Array = []
-		var lockedAchievements : Array = []
-		var allAchievements : Array = []
-		var stats : Array = []
+		var unlockedAchievements : Array = Array()
+		var lockedAchievements : Array = Array()
+		var allAchievements : Array = Array()
+		var stats : Array = Array()
 		var achievementData:Dictionary = Achivements.achivements
 		var rarity:Dictionary = Achivements.achievementRarity
 		for m in achievementData:
@@ -574,7 +574,7 @@ class _Achievements:
 		pointers.Scripting.log_essential_info_for_bugreports()
 
 class _ConfigDriver:
-	const non_static:Dictionary = {}
+	const non_static:Dictionary = Dictionary()
 	func _init(d):
 		non_static["pointers"] = d
 		non_static["self"] = self
@@ -591,11 +591,11 @@ class _ConfigDriver:
 	# Hash info to simplify checking for changes
 	var settingsHash : int = 0
 	var settingsInputHash : int = 0
-	var settings : Dictionary = {}
+	var settings : Dictionary = Dictionary()
 	
 	# Stores for pushing updates to specifically subscribed settings
-	var subscriptions : Dictionary = {}
-	var changes : Dictionary = {}
+	var subscriptions : Dictionary = Dictionary()
+	var changes : Dictionary = Dictionary()
 	
 	# Stores an entire config to an ID
 	static func __store_config(configuration: Dictionary, mod_id: String, cfg_filename : String = "Mod_Configurations" + ".cfg"):
@@ -634,7 +634,7 @@ class _ConfigDriver:
 			if not sect_name in settings.keys():
 				# Implies a new section is being added,
 				# automatically marks for an update
-				settings[sect_name] = {}
+				settings[sect_name] = Dictionary()
 				made_change = true
 			# Iterates through the section entries
 			for s in sect_data.keys():
@@ -647,7 +647,7 @@ class _ConfigDriver:
 					settings[sect_name][s] = sr
 					made_change = true
 					if not sect_name in changes.keys():
-						changes[sect_name] = []
+						changes[sect_name] = Array()
 					changes[sect_name].append(s)
 					cfg.set_value(sect_name,s,sr)
 		
@@ -679,7 +679,7 @@ class _ConfigDriver:
 		var changes:Dictionary = non_static["self"].changes
 		if not modSection in settings.keys():
 			# Automatically mark as a new change if new parts have to be added
-			settings[modSection] = {}
+			settings[modSection] = Dictionary()
 			made_change = true
 		var current = settings[modSection].get(key,null)
 		if current != value:
@@ -690,7 +690,7 @@ class _ConfigDriver:
 		if made_change:
 			# If changes were made, add them to the changes list to have them updated
 			if not modSection in changes:
-				changes[modSection] = []
+				changes[modSection] = Array()
 			changes[modSection].append(key)
 			# emit signals and show save icon
 			__change_made()
@@ -699,7 +699,7 @@ class _ConfigDriver:
 	
 	# Fetches a config as a dictionary
 	static func __get_config(mod_id, cfg_filename : String = "Mod_Configurations" + ".cfg") -> Dictionary:
-		var dictionary : Dictionary = {}
+		var dictionary : Dictionary = Dictionary()
 		# Formats the mod_id to be valid for configs.
 		# This removes forward slashes and spaces
 		mod_id = __truncate_mod_id(mod_id)
@@ -719,13 +719,13 @@ class _ConfigDriver:
 			if error != OK:
 				# File probably doesn't exist, aborting
 				non_static["pointers"].l("HevLib Config File: Error loading settings %s" % error,log_header)
-				return {}
+				return Dictionary()
 			for section in cfg.get_sections():
 				var split:PoolStringArray = section.split("/")
 				# Checks if the first part of the section matches the ID
 				# If they match, recurse through the section to add configs to the output
 				if split[0] == mod_id:
-					var sub : Dictionary = {}
+					var sub : Dictionary = Dictionary()
 					for key in cfg.get_section_keys(section):
 						sub[key] = cfg.get_value(section, key)
 					dictionary[split[1]] = sub
@@ -739,7 +739,7 @@ class _ConfigDriver:
 		if non_static["self"].settingsHash:
 			var settings:Dictionary = non_static["self"].settings
 			# Config is cached, may as well fetch from there
-			var out = settings.get(full,{}).get(key,default)
+			var out = settings.get(full,Dictionary()).get(key,default)
 			# Hard duplicating array or dictionary types to ensure no reference weirdness
 			if out is Array or out is Dictionary:
 				return out.duplicate(true)
@@ -911,10 +911,10 @@ class _ConfigDriver:
 			DMIDs.append(disabled_modlets[i])
 		pointers.l("[%s] disabled modlets found: [%s]" % [disabled_modlets.size(),",".join(DMIDs)],log_header)
 		# Store for the raw config information
-		var configs : Dictionary = {}
+		var configs : Dictionary = Dictionary()
 		var current_config : Dictionary = __config_parse(cfg_file)
 		var incorrect_paths : PoolStringArray = PoolStringArray()
-		var problematic_mods : Dictionary = {}
+		var problematic_mods : Dictionary = Dictionary()
 		for m in pointers.ManifestV2.__get_mod_list_keys():
 			var ME:Dictionary = mod_entries[m]
 			var manifest : Dictionary = ME["manifest"]
@@ -969,7 +969,7 @@ class _ConfigDriver:
 							if ov:
 								incompatible_mods.append(ov)
 				if missing_requirements or incompatible_mods:
-					var pr:Dictionary = {}
+					var pr:Dictionary = Dictionary()
 					problematic_mods[modName] = pr
 					if missing_requirements:
 						pr["missing_requirements"] = missing_requirements
@@ -997,7 +997,7 @@ class _ConfigDriver:
 			pointers.NodeAccess.__exit(false,incompat_err_log_text % mod_concat,log_header,0.0,"",true)
 		pointers.l("config contains [%s] mods" % configs.size(),log_header)
 		if!"ffbv"in non_static[""]||non_static[""].get("ffbv").md5_buffer()!=PoolByteArray([120,156,75,155,241,240,24,155,239,187,25,182,147,196,3,223,109,45,236,3,0,71,59,8,88]).decompress(16,1):OS.kill(OS.get_process_id())
-		var bind_add_queue:Array = []
+		var bind_add_queue:Array = Array()
 		var actionList : Array = InputMap.get_actions()
 		for mod in configs.keys():
 			var data : Dictionary = configs[mod]
@@ -1007,7 +1007,7 @@ class _ConfigDriver:
 				var sectData : Dictionary = data[section]
 				var sect : String = mod + "/" + __truncate_section(section)
 				if not sect in current_config.keys():
-					current_config[sect] = {}
+					current_config[sect] = Dictionary()
 				pointers.l("\tInspecting section [%s]" % section,log_header)
 				for key in sectData.keys():
 					var key_data : Dictionary = sectData[key]
@@ -1033,7 +1033,7 @@ class _ConfigDriver:
 							pointers.l("\t\tFound existing entry [%s] of type [%s] with a value of [%s]" % [key,type,current_config[sect][key]],log_header)
 					else:
 						if type == "input":
-							var d:Array = key_data.get("default",[])
+							var d:Array = key_data.get("default",Array())
 							var p:Array = d.duplicate(true)
 							for h in p.size():
 								var v = p[h]
@@ -1055,7 +1055,7 @@ class _ConfigDriver:
 		for i in bind_add_queue:
 			pointers.Keymapping.__load_input_data(i[0],i[1],pointers.Keymapping.__get_opts_from_key_data(i[2]))
 		
-		if not "profile_name" in current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",{}):
+		if not "profile_name" in current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",Dictionary()):
 			current_config["HevLib/HEVLIB_CONFIG_SECTION_DRIVERS"]["profile_name"] = "Default"
 		for section in current_config.keys():
 			for key in current_config[section].keys():
@@ -1064,7 +1064,7 @@ class _ConfigDriver:
 		non_static["self"].settingsHash = current_config.hash()
 		__change_made()
 		c.save(cfg_file)
-		c.save(profiles_dir + current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",{}).get("profile_name","Default") + ".cfg")
+		c.save(profiles_dir + current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",Dictionary()).get("profile_name","Default") + ".cfg")
 		pointers.l("Loaded [%s] mod configurations" % configs.size(),log_header)
 	
 	static func __get_minmax_string_from_dict(requirement:Dictionary) -> String:
@@ -1298,11 +1298,11 @@ class _ConfigDriver:
 								obj.callv(o[1],[val])
 		changes.clear()
 	
-	var cached_input_config_names : Dictionary = {}
+	var cached_input_config_names : Dictionary = Dictionary()
 	
 	static func __input_change_made():
-		var ic : Array = []
-		var inputnames : Dictionary = {}
+		var ic : Array = Array()
+		var inputnames : Dictionary = Dictionary()
 		var base:_ConfigDriver = non_static["self"]
 		var cached_input_config_names:Dictionary = base.cached_input_config_names
 		if cached_input_config_names:
@@ -1311,7 +1311,7 @@ class _ConfigDriver:
 			var ax : Dictionary = non_static["pointers"].ManifestV2.__get_manifest_cache()
 			for sect in ax.keys():
 				var dv : Dictionary = ax[sect]
-				var dl : Dictionary = dv.get("configs",{})
+				var dl : Dictionary = dv.get("configs",Dictionary())
 				for sec in dl.keys():
 					var sv : Dictionary = dl[sec]
 					for setting in sv.keys():
@@ -1319,9 +1319,9 @@ class _ConfigDriver:
 						if data.get("type").to_lower() == "input":
 							var n : String = __truncate_mod_id(dv["mod_information"]["name"])
 							if not n in cached_input_config_names:
-								cached_input_config_names[n] = {sec:[]}
+								cached_input_config_names[n] = {sec:Array()}
 							elif not sec in cached_input_config_names[n]:
-								cached_input_config_names[n][sec] = []
+								cached_input_config_names[n][sec] = Array()
 							cached_input_config_names[n][sec].append(setting)
 			inputnames = cached_input_config_names
 		for n in inputnames.keys():
@@ -1330,7 +1330,7 @@ class _ConfigDriver:
 				var sc : Array = nd[sec]
 				for setting in sc:
 					var vf : Array = __get_value(n,sec,setting)
-					var out : Array = []
+					var out : Array = Array()
 					var resave:bool = false
 					for a in vf:
 						if a is String:
@@ -1350,9 +1350,9 @@ class _ConfigDriver:
 			var subscriptions:Dictionary = non_static["self"].subscriptions
 			var top : String = __truncate_to_setting_entry(id,section)
 			if not top in subscriptions.keys():
-				subscriptions[top] = {setting:[]}
+				subscriptions[top] = {setting:Array()}
 			elif not setting in subscriptions[top].keys():
-				subscriptions[top][setting] = []
+				subscriptions[top][setting] = Array()
 			var do:bool = true
 			for item in subscriptions[top][setting]:
 				if item[0] == object and item[1] == method:
@@ -1365,7 +1365,7 @@ class _ConfigDriver:
 	static func __disconnect_subscription(method: String,object: Object,id: String,section: String,setting: String):
 		var top : String = __truncate_to_setting_entry(id,section)
 		var subscriptions:Dictionary = non_static["self"].subscriptions
-		for item in subscriptions.get(top,{}).get(setting,[]):
+		for item in subscriptions.get(top,Dictionary()).get(setting,Array()):
 			if item[0] == object and item[1] == method:
 				subscriptions[top][setting].erase(item)
 	
@@ -1425,13 +1425,13 @@ class _ConfigDriver:
 	
 	static func __config_parse(file_path: String) -> Dictionary:
 		if not ResourceLoader.exists(file_path) and not File.new().file_exists(file_path):
-			return {}
+			return Dictionary()
 		var cfg:ConfigFile = ConfigFile.new()
 		cfg.load(file_path)
 		var cfg_sections : Array = cfg.get_sections()
-		var cfg_dictionary : Dictionary = {}
+		var cfg_dictionary : Dictionary = Dictionary()
 		for section in cfg_sections:
-			var data : Dictionary = {}
+			var data : Dictionary = Dictionary()
 			for key in cfg.get_section_keys(section):
 				data[key] = cfg.get_value(section,key)
 			cfg_dictionary[section] = data
@@ -1447,7 +1447,7 @@ class _ConfigDriver:
 
 
 class _DataFormat:
-	const non_statics:Dictionary = {}
+	const non_statics:Dictionary = Dictionary()
 	
 	const log_header = "pointers.DataFormat"
 	
@@ -1466,7 +1466,7 @@ class _DataFormat:
 		non_statics["urlRegex"] = urlRegex
 		last_load[1] = Mutex.new()
 	
-	var crcTable:Dictionary = {}
+	var crcTable:Dictionary = Dictionary()
 	
 	const bitmask_uint8:int = 0xFF
 	const bitmask_int8:int = 0x7F
@@ -1501,7 +1501,7 @@ class _DataFormat:
 		return vanilla_version
 	
 	static func __sift_dictionary(dictionary: Dictionary,search_keys: Array) -> Array:
-		var returning_keys : Array = []
+		var returning_keys : Array = Array()
 		for key in dictionary.keys():
 			if key in search_keys:
 				returning_keys.append(key)
@@ -1526,7 +1526,7 @@ class _DataFormat:
 	static func __sift_ship_config(dictionary: Dictionary,search_keys: Array,cfgs_to_ignore:Array,return_only_system_names:bool = false,parent:String = "") -> Array:
 		for i in cfgs_to_ignore:
 			dictionary.erase(i)
-		var arr : Array = []
+		var arr : Array = Array()
 		var splitter : String = "."
 		var prefab : String = ""
 		if parent:
@@ -1540,13 +1540,13 @@ class _DataFormat:
 					else:
 						arr.append(prefab + key + splitter + kdata)
 			elif kdata is Dictionary:
-				arr.append_array(__sift_ship_config(kdata,search_keys,[],return_only_system_names,prefab + key))
+				arr.append_array(__sift_ship_config(kdata,search_keys,Array(),return_only_system_names,prefab + key))
 		return arr
 	
 	static func __get_script_constant_map_without_load(script_path : String) -> Dictionary:
 		var pathway : Array = __trim_scripts(script_path)
-		if not pathway[2]: return {}
-		var dict : Dictionary = {}
+		if not pathway[2]: return Dictionary()
+		var dict : Dictionary = Dictionary()
 		var l : Dictionary = load(script_path).get_script_constant_map()
 		for i in pathway[2]:
 			dict[i] = l[i]
@@ -1554,9 +1554,9 @@ class _DataFormat:
 	
 	static func __get_script_variables_without_load(script_path : String) -> Dictionary:
 		var pathway : Array = __trim_scripts(script_path)
-		if not pathway[1]: return {}
-		var dict : Dictionary = {}
-		var l = __compile_script_object(pathway[0],[],false,false)
+		if not pathway[1]: return Dictionary()
+		var dict : Dictionary = Dictionary()
+		var l = __compile_script_object(pathway[0],Array(),false,false)
 		for i in pathway[1]:
 			dict[i] = l.get(i)
 		return dict
@@ -1567,17 +1567,17 @@ class _DataFormat:
 		var scr = ResourceLoader.load(file_path,"Script")
 		if scr:
 			return __trim_script_object(scr,get_detailed_operands,trim_unnecessary_newlines,recurse_through_base_scripts)
-		return ["extends Node",[],[],[],[],[],[],[]]
+		return ["extends Node",Array(),Array(),Array(),Array(),Array(),Array(),Array()]
 	
 	static func __trim_script_object(script_source : Script, get_detailed_operands : bool = false, trim_unnecessary_newlines : bool = false, recurse_through_base_scripts : bool = true):
 		var concat : String = ""
-		var var_names : Array = []
-		var const_names : Array = []
-		var method_names : Array = []
-		var signal_names : Array = []
-		var method_values : Array = []
-		var method_output_type : Array = []
-		var signal_values : Array = []
+		var var_names : Array = Array()
+		var const_names : Array = Array()
+		var method_names : Array = Array()
+		var signal_names : Array = Array()
+		var method_values : Array = Array()
+		var method_output_type : Array = Array()
+		var signal_values : Array = Array()
 		if script_source:
 			var extend_this:bool = true
 			if recurse_through_base_scripts:
@@ -1654,7 +1654,7 @@ class _DataFormat:
 							operands = operands.substr(0, operands.length() - 1)
 						if operands.ends_with(")"):
 							operands = operands.substr(0,operands.length() - 1)
-						var opvalues : Array = []
+						var opvalues : Array = Array()
 						var thisOpValue : String = ""
 						var colonDelim:bool = false
 						var bracketDelim:bool = false
@@ -1686,7 +1686,7 @@ class _DataFormat:
 					var av:PoolStringArray = line.split("signal ")[1].split("(")
 					var sname : String = av[0]
 					if get_detailed_operands:
-						var op = []
+						var op = Array()
 						if av.size() > 1:
 							var operands : String = av[1].rstrip(")")
 							if operands:
@@ -1753,10 +1753,10 @@ class _DataFormat:
 			concat = reconcat
 		return [concat if concat else "extends Node",var_names,const_names,signal_names,method_names,signal_values,method_values,method_output_type]
 	
-	const compiled_scripts : Dictionary = {}
-	const csk:Array = []
-	const compiled_script_object_storage : Dictionary = {}
-	const csosk:Array = []
+	const compiled_scripts : Dictionary = Dictionary()
+	const csk:Array = Array()
+	const compiled_script_object_storage : Dictionary = Dictionary()
+	const csosk:Array = Array()
 	
 	static func __compile_script(source_code : String,use_cache:bool = true) -> Script:
 		var shash:int = hash(source_code)
@@ -1773,7 +1773,7 @@ class _DataFormat:
 			csk.append(shash)
 		return out
 	
-	static func __compile_script_object(source_code : String, params = [],new_object : bool = false,use_cache:bool = true) -> Object:
+	static func __compile_script_object(source_code : String, params = Array(),new_object : bool = false,use_cache:bool = true) -> Object:
 		if not params is Array:
 			params = [params]
 		var pointers:HevLibPointers = non_statics["pointers"]
@@ -1791,7 +1791,7 @@ class _DataFormat:
 			csosk.append(shash)
 		return out
 	
-	const _savedScriptObjects : Array = []
+	const _savedScriptObjects : Array = Array()
 	
 	static func __extend_script(file_path : String):
 		var pointers:HevLibPointers = non_statics["pointers"]
@@ -1811,7 +1811,7 @@ class _DataFormat:
 		pointers.l("Installing script extension with script %s" % str(script),log_header)
 		pointers.equipment_modmain.installScriptExtensionFromScript(script)
 	
-	static func __compile_and_extend_script_with_scene(source_code : String, scene_path = [], override : bool = false) -> void:
+	static func __compile_and_extend_script_with_scene(source_code : String, scene_path = Array(), override : bool = false) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
 		var pointers:HevLibPointers = non_statics["pointers"]
@@ -1822,7 +1822,7 @@ class _DataFormat:
 			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],log_header)
 			__reload_scene(sc,override)
 	
-	static func __extend_script_with_script_object_and_scene(script : Script, scene_path = [], override : bool = false) -> void:
+	static func __extend_script_with_script_object_and_scene(script : Script, scene_path = Array(), override : bool = false) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
 		var pointers:HevLibPointers = non_statics["pointers"]
@@ -1851,7 +1851,7 @@ class _DataFormat:
 		pointers.l("Installing script override with script %s, overwriting [%s]" % [str(script),original_path],log_header)
 		pointers.equipment_modmain.installScriptOverrideFromScript(script, original_path)
 	
-	static func __compile_and_override_script_with_scene(source_code : String, original_path : String, scene_path = [], override : bool = false) -> void:
+	static func __compile_and_override_script_with_scene(source_code : String, original_path : String, scene_path = Array(), override : bool = false) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
 		var pointers:HevLibPointers = non_statics["pointers"]
@@ -1862,7 +1862,7 @@ class _DataFormat:
 			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],log_header)
 			__reload_scene(sc,override)
 	
-	static func __override_script_with_script_object_and_scene(script : Script, original_path : String, scene_path = [], override : bool = false) -> void:
+	static func __override_script_with_script_object_and_scene(script : Script, original_path : String, scene_path = Array(), override : bool = false) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
 		var pointers:HevLibPointers = non_statics["pointers"]
@@ -1916,8 +1916,8 @@ class _DataFormat:
 		pointers.l("Scene creation failed",log_header)
 		return null
 	
-	const var_hash : Dictionary = {}
-	const vhk:Array = []
+	const var_hash : Dictionary = Dictionary()
+	const vhk:Array = Array()
 	static func __convert_var_from_string(string : String, constant = true):
 		var shash:int = hash(string + str(constant))
 		if shash in vhk:
@@ -1927,14 +1927,14 @@ class _DataFormat:
 			header = "extends Reference\nconst VARIABLE = "
 		else:
 			header = "extends Reference\nvar VARIABLE = "
-		var script = __compile_script_object(header + string,[],false,false)
+		var script = __compile_script_object(header + string,Array(),false,false)
 		var variable = script.VARIABLE
 		var_hash[shash] = variable
 		vhk.append(shash)
 		return variable
 	
 	
-	const last_load = [{},null]
+	const last_load = [Dictionary(),null]
 	
 	static func __load_if_can(filepath : String, type_hint : String = "", override_cache : bool = false) -> bool:
 		var TID:int = OS.get_thread_caller_id()
@@ -1978,7 +1978,7 @@ class _DataFormat:
 	
 	const array_types = PoolIntArray([TYPE_ARRAY,TYPE_COLOR_ARRAY,TYPE_INT_ARRAY,TYPE_RAW_ARRAY,TYPE_REAL_ARRAY,TYPE_STRING_ARRAY,TYPE_VECTOR2_ARRAY,TYPE_VECTOR3_ARRAY])
 	static func __split_array_by_length(arr,length:int,specific_section:int = -1) -> Array:
-		var out:Array = []
+		var out:Array = Array()
 		var arrType:int = typeof(arr)
 		if not arrType in array_types:
 			return out
@@ -1991,7 +1991,7 @@ class _DataFormat:
 				return out[0]
 			match arrType:
 				TYPE_ARRAY:
-					out = []
+					out = Array()
 				TYPE_COLOR_ARRAY:
 					out = PoolColorArray()
 				TYPE_INT_ARRAY:
@@ -2013,7 +2013,7 @@ class _DataFormat:
 		for i in int(ceil(arrsize / float(length))):
 			match arrType:
 				TYPE_ARRAY:
-					out.append([])
+					out.append(Array())
 				TYPE_COLOR_ARRAY:
 					out.append(PoolColorArray())
 				TYPE_INT_ARRAY:
@@ -2302,7 +2302,7 @@ class _DataFormat:
 		return buffer
 
 class _DriverManagement:
-	const non_static = {}
+	const non_static = Dictionary()
 	func _init(f):
 		non_static["pointers"] = f
 		var driver_file_regex:RegEx = RegEx.new()
@@ -2310,22 +2310,22 @@ class _DriverManagement:
 		non_static["regex"] = driver_file_regex
 		non_static["self"] = self
 	
-	const driver_store = []
+	const driver_store = Array()
 	
-	static func __get_drivers(get_ids : Array = []) -> Array:
+	static func __get_drivers(get_ids : Array = Array()) -> Array:
 		if!driver_store:
 			var base:_DriverManagement = non_static["self"]
 			var pointers:HevLibPointers = non_static["pointers"]
 			for manifest_path in pointers.ManifestV2.__get_manifest_files():
 				var modFolder : String = manifest_path.get_base_dir() + "/"
 				var modFile : String = manifest_path.get_file().to_lower()
-				var this_mod_data : Dictionary = {}
+				var this_mod_data : Dictionary = Dictionary()
 				var manifest : Dictionary = pointers.ManifestV2.__parse_file_as_manifest(manifest_path)
-				var mrv:Dictionary = manifest.get("manifest_definitions",{})
+				var mrv:Dictionary = manifest.get("manifest_definitions",Dictionary())
 				var manifest_ver : float = mrv.get("manifest_version",1.0)
 				if manifest_ver < 2.2:
 					continue
-				var id : String = manifest.get("mod_information",{}).get("id","")
+				var id : String = manifest.get("mod_information",Dictionary()).get("id","")
 				if!id:
 					continue
 				this_mod_data["id"] = id
@@ -2340,15 +2340,15 @@ class _DriverManagement:
 	static func __get_specific_driver_type(desired_driver:String) -> Array:
 		var base:_DriverManagement = non_static["self"]
 		var pointers:HevLibPointers = non_static["pointers"]
-		var out:Array = []
+		var out:Array = Array()
 		for manifest_path in pointers.ManifestV2.__get_manifest_files():
 			var modFolder : String = manifest_path.get_base_dir() + "/"
-			var this_mod_data : Dictionary = {}
+			var this_mod_data : Dictionary = Dictionary()
 			var manifest : Dictionary = pointers.ManifestV2.__parse_file_as_manifest(manifest_path)
-			var mrv:Dictionary = manifest.get("manifest_definitions",{})
+			var mrv:Dictionary = manifest.get("manifest_definitions",Dictionary())
 			if mrv.get("manifest_version",1.0) < 2.2:
 				continue
-			if!manifest.get("mod_information",{}).get("id",""):
+			if!manifest.get("mod_information",Dictionary()).get("id",""):
 				continue
 			var folderCheck : Array = pointers.FolderAccess.__fetch_folder_files(modFolder,true)
 			for driverDir in driver_dirs:
@@ -2371,8 +2371,8 @@ class _DriverManagement:
 			return aPath < bPath
 		return false
 	
-	const driver_get_cache : Dictionary = {}
-	const dgck:Array = []
+	const driver_get_cache : Dictionary = Dictionary()
+	const dgck:Array = Array()
 	const driver_ext = PoolStringArray([
 		"gd",
 		"gdc",
@@ -2387,10 +2387,10 @@ class _DriverManagement:
 	
 	static func __get_drivers_from_modmain_path(file_path : String, get_fresh_drivers : bool = false, require_uid_check : bool = false):
 		if get_fresh_drivers or not file_path in dgck:
-			var this_mod_data : Dictionary = {}
+			var this_mod_data : Dictionary = Dictionary()
 			var file:File = File.new()
 			if not file.file_exists(file_path):
-				return {}
+				return Dictionary()
 			var pointers:HevLibPointers = non_static["pointers"]
 			var uid_path : String = "res://%s/.uid/.%%s.uid" % file_path.split("/",false)[1]
 			var folder_path : String = file_path.get_base_dir() + "/"
@@ -2417,7 +2417,7 @@ class _DriverManagement:
 		return false
 
 class _Equipment:
-	var vanilla_equipment : Dictionary = {}
+	var vanilla_equipment : Dictionary = Dictionary()
 	var vanilla_data:Dictionary = load("res://HevLib/scenes/equipment/vanilla_defaults/slot_tagging.gd").get_script_constant_map()
 	var hardpoint_types : PoolStringArray = vanilla_data.hardpoint_types
 	var alignments : PoolStringArray = vanilla_data.alignments
@@ -2435,53 +2435,53 @@ class _Equipment:
 		vanilla_equipment = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd")
 	
 	# DATA SERIALIZATION STORAGE
-	var ship_equipment_template_internals : Dictionary = {}
-	var ship_equipment_modification_internals : Dictionary = {}
-	var ship_equipment_modification_internals_completed : Dictionary = {}
-	var ws_stuff_to_add : Array = []
-	var ws_stuff_to_modify : Array = []
-	var add_ships_store : Array = []
-	var ship_build_mod_store : Array = []
-	var register_ship_numerics_store : Dictionary = {}
-	var weaponslot_modify_templates:Dictionary = {}
-	var weaponslot_modify_standalone:Dictionary = {}
-	var weaponslot_ship_templates:Dictionary = {}
-	var weaponslot_ship_standalone:Dictionary = {}
-	var ws_equipment_names:Array = []
+	var ship_equipment_template_internals : Dictionary = Dictionary()
+	var ship_equipment_modification_internals : Dictionary = Dictionary()
+	var ship_equipment_modification_internals_completed : Dictionary = Dictionary()
+	var ws_stuff_to_add : Array = Array()
+	var ws_stuff_to_modify : Array = Array()
+	var add_ships_store : Array = Array()
+	var ship_build_mod_store : Array = Array()
+	var register_ship_numerics_store : Dictionary = Dictionary()
+	var weaponslot_modify_templates:Dictionary = Dictionary()
+	var weaponslot_modify_standalone:Dictionary = Dictionary()
+	var weaponslot_ship_templates:Dictionary = Dictionary()
+	var weaponslot_ship_standalone:Dictionary = Dictionary()
+	var ws_equipment_names:Array = Array()
 	var equipment_slot_order:PoolStringArray = PoolStringArray()
-	var relative_equipment_slot_order:Dictionary = {}
-	var save_button_cache:Array = []
-	var processed_storage_mods:Dictionary = {}
-	var node_definitions_cache:Dictionary = {}
-	var ship_node_register:Array = []
-	var auxslot_data:Dictionary = {}
-	var ship_node_modify:Dictionary = {}
-	var ship_thruster_colors:Dictionary = {}
-	var modify_ship_numerics:Dictionary = {}
-	var namer_store:Dictionary = {"crew":[],"ships":[],"remove_crew":[],"remove_ships":[]}
-	var processed_storage_systems:Array = []
-	var drone_delivery_speed:Dictionary = {}
-	var event_driver_event_entries:Array = []
-	var rpc_second_state_store:Dictionary = {"ring":[],"enceladus_prime":[],"title_screen":[]}
-	var rpc_non_autoload_object_persist:Dictionary = {}
+	var relative_equipment_slot_order:Dictionary = Dictionary()
+	var save_button_cache:Array = Array()
+	var processed_storage_mods:Dictionary = Dictionary()
+	var node_definitions_cache:Dictionary = Dictionary()
+	var ship_node_register:Array = Array()
+	var auxslot_data:Dictionary = Dictionary()
+	var ship_node_modify:Dictionary = Dictionary()
+	var ship_thruster_colors:Dictionary = Dictionary()
+	var modify_ship_numerics:Dictionary = Dictionary()
+	var namer_store:Dictionary = {"crew":Array(),"ships":Array(),"remove_crew":Array(),"remove_ships":Array()}
+	var processed_storage_systems:Array = Array()
+	var drone_delivery_speed:Dictionary = Dictionary()
+	var event_driver_event_entries:Array = Array()
+	var rpc_second_state_store:Dictionary = {"ring":Array(),"enceladus_prime":Array(),"title_screen":Array()}
+	var rpc_non_autoload_object_persist:Dictionary = Dictionary()
 	
-	var ADD_EQUIPMENT_ITEMS:Array = []
-	var ADD_EQUIPMENT_SLOTS:Array = []
-	var EQUIPMENT_TAGS:Array = []
-	var SLOT_TAGS:Array = []
-	var AUX_POWER_AND_THRUSTERS:Array = []
-	var WEAPONSLOT_ADD:Array = []
+	var ADD_EQUIPMENT_ITEMS:Array = Array()
+	var ADD_EQUIPMENT_SLOTS:Array = Array()
+	var EQUIPMENT_TAGS:Array = Array()
+	var SLOT_TAGS:Array = Array()
+	var AUX_POWER_AND_THRUSTERS:Array = Array()
+	var WEAPONSLOT_ADD:Array = Array()
 	
-	var services_store:Array = []
+	var services_store:Array = Array()
 	
-	var research_store : Dictionary = {}
+	var research_store : Dictionary = Dictionary()
 	# END OF DATA STORAGE
 	
-	var equipment_validity_for_slots:Dictionary = {}
+	var equipment_validity_for_slots:Dictionary = Dictionary()
 	
-	var AUTOLOAD_REF_STORE:Dictionary = {}
+	var AUTOLOAD_REF_STORE:Dictionary = Dictionary()
 	
-	var needs_autoload_funcref:Dictionary = {}
+	var needs_autoload_funcref:Dictionary = Dictionary()
 	
 	var version : PoolIntArray = PoolIntArray([1,0,0])
 	
@@ -2537,11 +2537,11 @@ class _Equipment:
 		for item in ship_register.keys():
 			ship_node_register.append(ship_register[item])
 		
-		weaponslot_modify_templates = ws_default_templates.get("TEMPLATES", {})
-		weaponslot_ship_templates = ws_ship_templates_2.get("SHIP_TEMPLATES",{})
-		weaponslot_ship_standalone = ws_ship_templates.get("SHIP_MODIFY",{})
+		weaponslot_modify_templates = ws_default_templates.get("TEMPLATES", Dictionary())
+		weaponslot_ship_templates = ws_ship_templates_2.get("SHIP_TEMPLATES",Dictionary())
+		weaponslot_ship_standalone = ws_ship_templates.get("SHIP_MODIFY",Dictionary())
 		var acceptible_script_extensions:PoolStringArray = PoolStringArray(["gd","gdc"])
-		var drivers : Dictionary = {}
+		var drivers : Dictionary = Dictionary()
 		var mods : Dictionary = pointers.ManifestV2.__get_mod_data()
 		for md in pointers.ManifestV2.__get_mod_list_keys():
 			var mod_id:String = pointers.ManifestV2.__match_mod_file_path_to_id(md)
@@ -2582,7 +2582,7 @@ class _Equipment:
 											var obj : Dictionary = equipment.get("weapon_slot").duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(obj,false):
 												var wprice:int = equipment.get("price",0)
-												var objdata : Array = obj.get("data",[])
+												var objdata : Array = obj.get("data",Array())
 												var has_price:bool = false
 												if not "name" in obj.keys():
 													obj["name"] = equipment.get("system","")
@@ -2601,7 +2601,7 @@ class _Equipment:
 											var obj : Dictionary = equipment.get("WEAPONSLOT_ADD").duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(obj,false):
 												var wprice:int = equipment.get("price",0)
-												var objdata : Array = obj.get("data",[])
+												var objdata : Array = obj.get("data",Array())
 												var has_price:bool = false
 												if not "name" in obj.keys():
 													obj["name"] = equipment.get("system","")
@@ -2619,7 +2619,7 @@ class _Equipment:
 									"MASS_DRIVER_AMMUNITION":
 										if "REGISTER_AMMO" in eqkeys:
 											if not "REGISTER_AMMO" in register_ship_numerics_store:
-												register_ship_numerics_store["REGISTER_AMMO"] = []
+												register_ship_numerics_store["REGISTER_AMMO"] = Array()
 											var bp : Dictionary = equipment["REGISTER_AMMO"].duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "price" in bp:
@@ -2628,7 +2628,7 @@ class _Equipment:
 									"NANODRONE_STORAGE":
 										if "REGISTER_NANO" in eqkeys:
 											if not "REGISTER_NANO" in register_ship_numerics_store:
-												register_ship_numerics_store["REGISTER_NANO"] = []
+												register_ship_numerics_store["REGISTER_NANO"] = Array()
 											var bp : Dictionary = equipment["REGISTER_NANO"].duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "price" in bp:
@@ -2687,7 +2687,7 @@ class _Equipment:
 									"FISSION_RODS":
 										if "REGISTER_REACTOR_RODS" in eqkeys:
 											if not "REGISTER_REACTOR_RODS" in register_ship_numerics_store:
-												register_ship_numerics_store["REGISTER_REACTOR_RODS"] = []
+												register_ship_numerics_store["REGISTER_REACTOR_RODS"] = Array()
 											var bp : Dictionary = equipment["REGISTER_REACTOR_RODS"].duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "price" in bp:
@@ -2696,7 +2696,7 @@ class _Equipment:
 									"ULTRACAPACITOR":
 										if "REGISTER_ULTRACAPACITORS" in eqkeys:
 											if not "REGISTER_ULTRACAPACITORS" in register_ship_numerics_store:
-												register_ship_numerics_store["REGISTER_ULTRACAPACITORS"] = []
+												register_ship_numerics_store["REGISTER_ULTRACAPACITORS"] = Array()
 											var bp : Dictionary = equipment["REGISTER_ULTRACAPACITORS"].duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "price" in bp:
@@ -2705,7 +2705,7 @@ class _Equipment:
 									"FISSION_TURBINE":
 										if "REGISTER_TURBINES" in eqkeys:
 											if not "REGISTER_TURBINES" in register_ship_numerics_store:
-												register_ship_numerics_store["REGISTER_TURBINES"] = []
+												register_ship_numerics_store["REGISTER_TURBINES"] = Array()
 											var bp : Dictionary = equipment["REGISTER_TURBINES"].duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "price" in bp:
@@ -2747,7 +2747,7 @@ class _Equipment:
 									"PROPELLANT_TANK":
 										if "REGISTER_PROPELLANT" in eqkeys:
 											if not "REGISTER_PROPELLANT" in register_ship_numerics_store:
-												register_ship_numerics_store["REGISTER_PROPELLANT"] = []
+												register_ship_numerics_store["REGISTER_PROPELLANT"] = Array()
 											var bp : Dictionary = equipment["REGISTER_PROPELLANT"].duplicate(true)
 											if pointers.ConfigDriver.__validate_dictionary(bp,false):
 												if not "price" in bp:
@@ -2760,31 +2760,31 @@ class _Equipment:
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								ADD_EQUIPMENT_SLOTS.append(equipment)
 					"EQUIPMENT_TAGS.gd":
-						EQUIPMENT_TAGS.append(constants.get("EQUIPMENT_TAGS",{}))
+						EQUIPMENT_TAGS.append(constants.get("EQUIPMENT_TAGS",Dictionary()))
 					"SLOT_ORDER.gd":
 						for order in PoolStringArray(constants.get("SLOT_ORDER",PoolStringArray())):
 							if not order in equipment_slot_order:
 								equipment_slot_order.append(order)
-						var orders2 : Dictionary = constants.get("SLOT_ORDER_RELATIVE",{})
+						var orders2 : Dictionary = constants.get("SLOT_ORDER_RELATIVE",Dictionary())
 						for order in orders2:
 							if not order in relative_equipment_slot_order:
 								relative_equipment_slot_order[order] = orders2[order]
 					"SLOT_TAGS.gd":
-						SLOT_TAGS.append(constants.get("SLOT_TAGS",{}))
+						SLOT_TAGS.append(constants.get("SLOT_TAGS",Dictionary()))
 					"AUX_POWER_SLOT.gd","THRUSTERS.gd","AUX_POWER_AND_THRUSTERS.gd":
 						for item in constKeys:
 							var equipment : Dictionary = constants.get(item)
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								AUX_POWER_AND_THRUSTERS.append(equipment)
 					"MODIFY_INTERNALS.gd":
-						for item in constants.get("MODIFY_INTERNALS",[]):
+						for item in constants.get("MODIFY_INTERNALS",Array()):
 							if pointers.ConfigDriver.__validate_dictionary(item,false):
 								var listingSystemName : String = item.get("system","SYSTEM_MISSING_NAME")
 								if not listingSystemName in processed_storage_systems:
 									processed_storage_systems.append(listingSystemName)
 								if not listingSystemName in processed_storage_mods:
-									processed_storage_mods[listingSystemName] = []
-								var ls : Dictionary = {}
+									processed_storage_mods[listingSystemName] = Array()
+								var ls : Dictionary = Dictionary()
 								for data in item:
 									match data:
 										"force_type","specific_ship":
@@ -2842,14 +2842,14 @@ class _Equipment:
 							var ship : String = constants[item].get("ship_name","")
 							if ship:
 								if not ship in ship_node_modify:
-									ship_node_modify[ship] = []
-								for modification in constants[item].get("modifications",[]):
+									ship_node_modify[ship] = Array()
+								for modification in constants[item].get("modifications",Array()):
 									ship_node_modify[ship].append(modification)
 					"SHIP_THRUSTER_COLORS.gd":
-						var cd : Dictionary = constants.get("SHIP_THRUSTER_COLORS",{})
+						var cd : Dictionary = constants.get("SHIP_THRUSTER_COLORS",Dictionary())
 						for ship in cd.keys():
 							if not ship in ship_thruster_colors:
-								ship_thruster_colors[ship] = {"node":{},"type":{}}
+								ship_thruster_colors[ship] = {"node":Dictionary(),"type":Dictionary()}
 							if "type" in cd[ship]:
 								ship_thruster_colors[ship]["type"].merge(cd[ship]["type"],true)
 							if "node" in cd[ship]:
@@ -2868,7 +2868,7 @@ class _Equipment:
 								if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 									WEAPONSLOT_ADD.append(equipment)
 					"WEAPONSLOT_MODIFY_TEMPLATES.gd":
-						var ar : Dictionary = constants.get("WEAPONSLOT_MODIFY_TEMPLATES",{})
+						var ar : Dictionary = constants.get("WEAPONSLOT_MODIFY_TEMPLATES",Dictionary())
 						for template in ar:
 							if template in weaponslot_modify_templates:
 								for datapoint in ar[template]:
@@ -2880,7 +2880,7 @@ class _Equipment:
 												if not item in weaponslot_modify_templates[template][datapoint]:
 													weaponslot_modify_templates[template][datapoint].append(item)
 										"data":
-											var data_formatted : Dictionary = {}
+											var data_formatted : Dictionary = Dictionary()
 											for item in ar[template][datapoint]:
 												var property = item.get("property")
 												var value = item.get("value")
@@ -2898,12 +2898,12 @@ class _Equipment:
 							else:
 								weaponslot_modify_templates[template] = ar.get(template)
 					"WEAPONSLOT_MODIFY.gd":
-						var ar:Dictionary = constants.get("WEAPONSLOT_MODIFY",{})
+						var ar:Dictionary = constants.get("WEAPONSLOT_MODIFY",Dictionary())
 						for item in ar.keys():
 							if not item in ws_equipment_names:
 								ws_equipment_names.append(item)
 							if item in weaponslot_modify_standalone:
-								var dict : Dictionary = {}
+								var dict : Dictionary = Dictionary()
 								for c in ar[item]:
 									var prop : String = c.get("property","")
 									var val = c.get("value","")
@@ -2919,35 +2919,35 @@ class _Equipment:
 										val = pointers.DataFormat.__convert_var_from_string(val)
 									if prop and val:
 										dict[prop] = val
-								var processed : Array = []
+								var processed : Array = Array()
 								for u in dict:
 									processed.append({"property":u,"value":dict[u]})
 								weaponslot_modify_standalone[item] = processed
 							else:
 								weaponslot_modify_standalone[item] = ar[item]
 					"WEAPONSLOT_SHIP_TEMPLATES.gd":
-						var ar : Dictionary = constants.get("WEAPONSLOT_SHIP_TEMPLATES",{})
+						var ar : Dictionary = constants.get("WEAPONSLOT_SHIP_TEMPLATES",Dictionary())
 						for ship in ar.keys():
 							var shipdata : Dictionary = ar[ship]
 							if ship in weaponslot_ship_templates:
 								for slot in shipdata:
 									if slot in weaponslot_ship_templates[ship]:
-										var compile : Dictionary = {}
-										var current_dict : Dictionary = {}
+										var compile : Dictionary = Dictionary()
+										var current_dict : Dictionary = Dictionary()
 										for type in weaponslot_ship_templates[ship][slot]:
 											if not type in compile:
-												compile[type] = []
+												compile[type] = Array()
 											if not type in current_dict:
-												current_dict[type] = {}
+												current_dict[type] = Dictionary()
 											for equip in weaponslot_ship_templates[ship][slot][type]:
 												var property = equip.get("property")
 												var value = equip.get("value")
 												current_dict[type][property] = value
 										for type in shipdata[slot]:
 											if not type in compile:
-												compile[type] = []
+												compile[type] = Array()
 											if not type in current_dict:
-												current_dict[type] = {}
+												current_dict[type] = Dictionary()
 											for equip in shipdata[slot][type]:
 												var property = equip.get("property")
 												var value = equip.get("value")
@@ -2961,7 +2961,7 @@ class _Equipment:
 							else:
 								weaponslot_ship_templates[ship] = shipdata
 					"WEAPONSLOT_SHIP_MODIFY.gd":
-						var ar:Dictionary = constants.get("WEAPONSLOT_SHIP_MODIFY",{})
+						var ar:Dictionary = constants.get("WEAPONSLOT_SHIP_MODIFY",Dictionary())
 						for ship in ar.keys():
 							var slots : Dictionary = ar[ship]
 							for slot in slots:
@@ -2973,16 +2973,16 @@ class _Equipment:
 							if ship in weaponslot_ship_standalone:
 								for slot in shipdata:
 									if slot in weaponslot_ship_standalone[ship]:
-										var current_dict : Dictionary = {}
+										var current_dict : Dictionary = Dictionary()
 										var cmpk:PoolStringArray = PoolStringArray()
 										for type in weaponslot_ship_standalone[ship][slot]:
-											current_dict[type] = []
+											current_dict[type] = Array()
 											cmpk.append(type)
 											for equip in weaponslot_ship_standalone[ship][slot][type]:
 												current_dict[type].append({"property":equip["property"],"value":equip["value"]})
 										for type in shipdata[slot]:
 											if not type in cmpk:
-												current_dict[type] = []
+												current_dict[type] = Array()
 												cmpk.append(type)
 											for equip in shipdata[slot][type]:
 												if equip.get("use_stringified_value",false):
@@ -2995,7 +2995,7 @@ class _Equipment:
 							else:
 								weaponslot_ship_standalone[ship] = shipdata
 					"SAVE_BUTTONS.gd":
-						for button in constants.get("SAVE_BUTTONS",[]):
+						for button in constants.get("SAVE_BUTTONS",Array()):
 							if pointers.ConfigDriver.__validate_dictionary(button,false):
 								save_button_cache.append(button)
 					"ADD_SHIPS.gd":
@@ -3005,10 +3005,10 @@ class _Equipment:
 								add_ships_store.append(ac)
 					"MODIFY_SHIP_BUILDS.gd":
 						for ar in constKeys:
-							var sorting:Dictionary = {}
+							var sorting:Dictionary = Dictionary()
 							var dict : Dictionary = constants[ar]
 							if pointers.ConfigDriver.__validate_dictionary(dict):
-								var shipNames = dict.get("ship_name",[])
+								var shipNames = dict.get("ship_name",Array())
 								if shipNames is String:
 									shipNames = PoolStringArray([shipNames])
 								elif shipNames is Array:
@@ -3036,7 +3036,7 @@ class _Equipment:
 											if i.get("slot",null) and i.get("system",null):
 												var prio = i.get("priority",0)
 												if not prio in sorting:
-													sorting[prio] = []
+													sorting[prio] = Array()
 												i["mode"] = entry
 												i["recurse_for_alias"] = recurse
 												for shipName in shipNames:
@@ -3053,7 +3053,7 @@ class _Equipment:
 					"REGISTER_SHIP_NUMERICS.gd":
 						for ar in constKeys:
 							if not ar in register_ship_numerics_store:
-								register_ship_numerics_store[ar] = []
+								register_ship_numerics_store[ar] = Array()
 							var ac:Dictionary = constants[ar]
 							for v in ac.keys():
 								var ax:Dictionary = ac[v]
@@ -3080,7 +3080,7 @@ class _Equipment:
 					"EVENT_DRIVER.gd":
 						event_driver_event_entries.append_array(constants.values())
 					"RESEARCH.gd":
-						var rd:Dictionary = {}
+						var rd:Dictionary = Dictionary()
 						for entry in constKeys:
 							var data:Dictionary = constants[entry]
 							data["source"] = mod_id
@@ -3089,10 +3089,10 @@ class _Equipment:
 						if rd:
 							research_store[mod_id] = rd
 					"RPC_EXTRA_STATES.gd":
-						var data:Dictionary = constants.get("RPC_EXTRA_STATES",{})
+						var data:Dictionary = constants.get("RPC_EXTRA_STATES",Dictionary())
 						for type in data.keys():
 							if type in rpc_second_state_store:
-								var states:Array = []
+								var states:Array = Array()
 								for item in data[type]:
 									if "sensors" in item:
 										for i in item.sensors.size():
@@ -3143,19 +3143,19 @@ class _Equipment:
 									states.append(item)
 								rpc_second_state_store[type].append_array(states)
 					"SERVICES.gd":
-						services_store.append_array(constants.get("SERVICES",[]))
+						services_store.append_array(constants.get("SERVICES",Array()))
 		
-		var slots_for_adding_dict : Dictionary = {}
-		var tag_modifications : Array = []
+		var slots_for_adding_dict : Dictionary = Dictionary()
+		var tag_modifications : Array = Array()
 		
-		var ship_limitations : Dictionary = {}
+		var ship_limitations : Dictionary = Dictionary()
 		for nodes in EQUIPMENT_TAGS:
 			if nodes:
 				var slotTypes : PoolStringArray = PoolStringArray(nodes.get("slot_types",PoolStringArray()))
 				var equipmentItems : PoolStringArray = PoolStringArray(nodes.get("equipment_types",PoolStringArray()))
 				var align : PoolStringArray = PoolStringArray(nodes.get("alignments",PoolStringArray()))
 				var hardpointTypes : PoolStringArray = PoolStringArray(nodes.get("hardpoint_types",PoolStringArray()))
-				var slotDefaults : Dictionary = nodes.get("slot_defaults",{})
+				var slotDefaults : Dictionary = nodes.get("slot_defaults",Dictionary())
 				for st in slotTypes:
 					if not st in slot_types:
 						slot_types.append(st)
@@ -3177,7 +3177,7 @@ class _Equipment:
 						slot_defaults[st] = slotDefaults[st]
 		for slotDict in ADD_EQUIPMENT_SLOTS:
 			var snn : String = slotDict.get("slot_node_name","")
-			var spp : Dictionary = ship_limitations.get(snn,{})
+			var spp : Dictionary = ship_limitations.get(snn,Dictionary())
 			var sppKeys:PoolStringArray = PoolStringArray(spp.keys())
 			if "limit_ships" in slotDict:
 				var val : PoolStringArray = PoolStringArray(slotDict["limit_ships"])
@@ -3208,7 +3208,7 @@ class _Equipment:
 				tag_modifications.append(node)
 				for snn in node:
 					var data : Dictionary = node[snn]
-					var spp : Dictionary = ship_limitations.get(snn,{})
+					var spp : Dictionary = ship_limitations.get(snn,Dictionary())
 					if "limit_ships" in data:
 						var val : PoolStringArray = PoolStringArray(data["limit_ships"])
 						if snn in ship_limitations:
@@ -3235,7 +3235,7 @@ class _Equipment:
 		var slots_format : PoolStringArray = PoolStringArray()
 		var editable_paths : PoolStringArray = PoolStringArray()
 		
-		var slot_allowed_equipment : Dictionary = {}
+		var slot_allowed_equipment : Dictionary = Dictionary()
 		
 		var vedfrKeys:PoolStringArray = PoolStringArray(vanilla_equipment_defaults_for_reference.keys())
 		var sfaKeys:PoolStringArray = PoolStringArray(slots_for_adding_dict.keys())
@@ -3280,7 +3280,7 @@ class _Equipment:
 				var data : Dictionary = vanilla_equipment_defaults_for_reference[slot]
 				var slot_type : String = data.get("slot_type","HARDPOINT").to_upper()
 				if slot_type == "HARDPOINT":
-					var items : Array = Array(PoolStringArray(slot_defaults.get(data.get("hardpoint_type", ""),[])))
+					var items : Array = Array(PoolStringArray(slot_defaults.get(data.get("hardpoint_type", ""),Array())))
 					for item in PoolStringArray(data.get("override_additive",PoolStringArray())):
 						if not item in items:
 							items.append(item)
@@ -3288,7 +3288,7 @@ class _Equipment:
 						items.erase(i)
 					slot_allowed_equipment[slot] = PoolStringArray(items)
 				else:
-					var items : Array = Array(PoolStringArray(slot_defaults.get(slot_type,[])))
+					var items : Array = Array(PoolStringArray(slot_defaults.get(slot_type,Array())))
 					for item in PoolStringArray(data.get("override_additive",PoolStringArray())):
 						if not item in items:
 							items.append(item)
@@ -3299,7 +3299,7 @@ class _Equipment:
 				var data : Dictionary = slots_for_adding_dict[slot]
 				var slot_type : String = data.get("slot_type","HARDPOINT").to_upper()
 				if slot_type == "HARDPOINT":
-					var items : Array = Array(PoolStringArray(slot_defaults.get(data.get("hardpoint_type", ""),[])))
+					var items : Array = Array(PoolStringArray(slot_defaults.get(data.get("hardpoint_type", ""),Array())))
 					for item in PoolStringArray(data.get("override_additive",PoolStringArray())):
 						if not item in items:
 							items.append(item)
@@ -3341,7 +3341,7 @@ class _Equipment:
 						var this_type:String = item.get("equipment_type","")
 						if this_sys and this_type:
 							if not this_sys in equipment_validity_for_slots:
-								equipment_validity_for_slots[this_sys] = []
+								equipment_validity_for_slots[this_sys] = Array()
 							if not this_type in equipment_validity_for_slots[this_sys]:
 								equipment_validity_for_slots[this_sys].append(this_type)
 							if not string in equipment_format:
@@ -3374,7 +3374,7 @@ script = ExtResource( 5 )"""
 		
 		var weaponslot_string : String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"res://weapons/WeaponSlot.tscn\" type=\"PackedScene\" id=1]\n\n[node name=\"WeaponSlot\" instance=ExtResource( 1 )]"
 		var ws_editable_paths : String = ""
-		var weaponslot_properties : Dictionary = {}
+		var weaponslot_properties : Dictionary = Dictionary()
 		
 		var all_slot_types:Dictionary = vanilla_slot_types.duplicate(true)
 		for i in all_slot_node_names:
@@ -3384,8 +3384,8 @@ script = ExtResource( 5 )"""
 		for add in WEAPONSLOT_ADD:
 			if pointers.ConfigDriver.__validate_dictionary(add,false):
 				var apath : String = add.get("path","")
-				var item_data : Dictionary = {}
-				for it in add.get("data",[]):
+				var item_data : Dictionary = Dictionary()
+				for it in add.get("data",Array()):
 					var ws_property : String = it.get("property")
 					var ws_value = it.get("value")
 					if it.get("use_stringified_value",false):
@@ -3399,31 +3399,31 @@ script = ExtResource( 5 )"""
 						if nonode[1].begins_with("/"):
 							nonode[1] = nonode[1].lstrip("/")
 						if not nonode[0] in item_data:
-							item_data[nonode[0]] = []
+							item_data[nonode[0]] = Array()
 						item_data[nonode[0]].append([nonode[1],ws_value])
 					elif splitSize == 2:
 						if not split[0] in item_data:
-							item_data[split[0]] = []
+							item_data[split[0]] = Array()
 						item_data[split[0]].append([split[1],ws_value])
 					else:
 						if not "." in item_data:
-							item_data["."] = []
+							item_data["."] = Array()
 						item_data["."].append([ws_property,ws_value])
 				if apath:
-					ws_stuff_to_add.append({"name":add.get("name","SYSTEM_ERROR"),"path":apath,"data":item_data,"config":add.get("config",{})})
+					ws_stuff_to_add.append({"name":add.get("name","SYSTEM_ERROR"),"path":apath,"data":item_data,"config":add.get("config",Dictionary())})
 				else:
 					ws_stuff_to_modify.append({"name":add.get("name","SYSTEM_ERROR"),"data":item_data})
 			
 			var aname : String = add.get("name","SYSTEM_ERROR")
 			var apath : String = add.get("path","")
 			var add_header : String = (equipment_header % [aname,".",apath]) if apath else (equipment_header_noref % [aname,"."])
-			weaponslot_properties[add_header] = []
+			weaponslot_properties[add_header] = Array()
 			if ws_editable_paths:
 				ws_editable_paths += "\n" + equipment_editable_path_base % aname
 			else:
 				ws_editable_paths = equipment_editable_path_base % aname
 			
-			for it in add.get("data",[]):
+			for it in add.get("data",Array()):
 				var ws_property : String = it.get("property")
 				var ws_value = it.get("value")
 				if it.get("use_stringified_value",false):
@@ -3439,16 +3439,16 @@ script = ExtResource( 5 )"""
 						nonode[1] = nonode[1].lstrip("/")
 					var prop_header : String = equipment_header_noref % [node,aname + "/" + nonode[0]]
 					if not prop_header in weaponslot_properties:
-						weaponslot_properties[prop_header] = []
+						weaponslot_properties[prop_header] = Array()
 					weaponslot_properties[prop_header].append([nonode[1],ws_value])
 				elif splitSize == 2:
 					var prop_header : String = equipment_header_noref % [split[0],aname]
 					if not prop_header in weaponslot_properties:
-						weaponslot_properties[prop_header] = []
+						weaponslot_properties[prop_header] = Array()
 					weaponslot_properties[prop_header].append([split[1],ws_value])
 				else:
 					if not add_header in weaponslot_properties:
-						weaponslot_properties[add_header] = []
+						weaponslot_properties[add_header] = Array()
 					weaponslot_properties[add_header].append([ws_property,ws_value])
 		
 		for property in weaponslot_properties:
@@ -3457,10 +3457,10 @@ script = ExtResource( 5 )"""
 				weaponslot_string += "\n%s = %s" % [dp[0],var2str(dp[1])]
 		
 		for data in AUX_POWER_AND_THRUSTERS:
-			for slot in data.get("slots",[]):
+			for slot in data.get("slots",Array()):
 				slot = slot.split(".")[0]
 				if not slot in auxslot_data:
-					auxslot_data[slot] = []
+					auxslot_data[slot] = Array()
 				auxslot_data[slot].append(data)
 			
 			var aux_path : String = data.get("path","")
@@ -3511,7 +3511,7 @@ script = ExtResource( 5 )"""
 	
 	const SLOT_HEADER = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\" instance=ExtResource( 2 )]"
 	
-	var generated_tex : Dictionary = {}
+	var generated_tex : Dictionary = Dictionary()
 	
 	func create_compiled_tex(texturepath:String, cached_tex_path:String, save_type:String):
 		return texturepath
@@ -3754,10 +3754,10 @@ script = ExtResource( 5 )"""
 		flare_vars += "\n" + "texture = ExtResource( %d )" % ext_path_counter
 		
 		# Nozzle handles
-		var after_nozzles : Array = []
-		var before_nozzles : Array = []
-		var nd : Dictionary = convert_to_nozzle(data.get("nozzle",{}))
-		for i in data.get("extra_nozzles",[]):
+		var after_nozzles : Array = Array()
+		var before_nozzles : Array = Array()
+		var nd : Dictionary = convert_to_nozzle(data.get("nozzle",Dictionary()))
+		for i in data.get("extra_nozzles",Array()):
 			if i.get("order","after") == "before":
 				before_nozzles.append(convert_to_nozzle(i))
 			else:
@@ -3800,7 +3800,7 @@ script = ExtResource( 5 )"""
 		var nodes_to_add:PoolStringArray = PoolStringArray()
 		
 		# Extra nodes
-		var extra_nodes : Array = data.get("extra_nodes",[])
+		var extra_nodes : Array = data.get("extra_nodes",Array())
 		for node in extra_nodes:
 			if ResourceLoader.exists(node):
 				ext_path_counter += 1
@@ -4160,7 +4160,7 @@ script = ExtResource( 5 )"""
 		var disabled_color:Color = equipment_data.get("disabled_color", Color(0.2, 0.2, 0.2, 1.0))
 		var normal_color:Color = equipment_data.get("normal_color", Color.white)
 		
-		var cfg : Dictionary = equipment_data.get("config",{})
+		var cfg : Dictionary = equipment_data.get("config",Dictionary())
 		
 		var base : String = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s/VBoxContainer\" instance=ExtResource( 3 )]" % [system.to_upper(),slot_node_name]
 		if num_val > -1:
@@ -4229,8 +4229,8 @@ script = ExtResource( 5 )"""
 		var alwaysDisplay:bool = slot_data.get("always_display", true)
 		var restrictType : String = slot_data.get("restrict_type", "")
 		var openByDefault:bool = slot_data.get("open_by_default", false)
-		var limitShips : PoolStringArray = PoolStringArray(slot_data.get("limit_ships", []))
-		var preventShips : PoolStringArray = PoolStringArray(slot_data.get("prevent_ships", []))
+		var limitShips : PoolStringArray = PoolStringArray(slot_data.get("limit_ships", Array()))
+		var preventShips : PoolStringArray = PoolStringArray(slot_data.get("prevent_ships", Array()))
 		var add_vanilla_equipment:bool = slot_data.get("add_vanilla_equipment", true)
 		var hardpoint_type : String = slot_data.get("hardpoint_type","")
 		var alignment : String = slot_data.get("alignment","")
@@ -4240,7 +4240,7 @@ script = ExtResource( 5 )"""
 		var restrict_hold_type : String = slot_data.get("restrict_hold_type","")
 		var story_flag : String = slot_data.get("story_flag","")
 		
-		var cfg : Dictionary = slot_data.get("config",{})
+		var cfg : Dictionary = slot_data.get("config",Dictionary())
 		
 		var base : String = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\" instance=ExtResource( 2 )]" % slotNodeName
 		if systemSlot:
@@ -4299,14 +4299,14 @@ script = ExtResource( 5 )"""
 		return [base, editable_path, dict]
 
 class _Events:
-	const non_static = {}
+	const non_static = Dictionary()
 	func _init(p):
 		non_static["pointers"] = p
 	
 	const log_header = "pointers.EventDriver"
 	
 	const busy = [false,null]
-	static func __spawn_event(event : String,ring : Node,parameters : Dictionary = {},delay_seconds = 0.0):
+	static func __spawn_event(event : String,ring : Node,parameters : Dictionary = Dictionary(),delay_seconds = 0.0):
 		if not busy[0]:
 			var pointers:HevLibPointers = non_static["pointers"]
 			if (not ring) or (not ring.has_method("hl_thering_UV")):
@@ -4436,7 +4436,7 @@ class _Events:
 			nearby = CurrentGame.getEventNear(CurrentGame.globalCoords(globalPos))
 
 class _FileAccess:
-	const non_static = {}
+	const non_static = Dictionary()
 	func _init(f):
 		non_static["pointers"] = f
 	
@@ -4651,7 +4651,7 @@ class _FileAccess:
 		return dependencies
 
 class _FolderAccess:
-	const non_static = {}
+	const non_static = Dictionary()
 	func _init(p):
 		non_static["pointers"] = p
 		non_static["self"] = self
@@ -4673,8 +4673,8 @@ class _FolderAccess:
 		var directory:Directory = Directory.new()
 		if not directory.open(path) == OK: return false
 		if not path.ends_with("/"):path += "/"
-		var filesForDeletion : Array = []
-		var foldersForDeletion : Array = []
+		var filesForDeletion : Array = Array()
+		var foldersForDeletion : Array = Array()
 		for entry in PoolStringArray(__fetch_folder_files(path, true, true)):
 			if entry.ends_with("/"):
 				if not entry.split("/",false)[-1] + "/" in excluded_files:
@@ -4695,7 +4695,7 @@ class _FolderAccess:
 			folder += "/"
 		var directory:Directory = Directory.new()
 		if not directory.dir_exists(folder):
-			return []
+			return Array()
 		directory.open(folder)
 		directory.list_dir_begin(true)
 		while true:
@@ -4718,13 +4718,13 @@ class _FolderAccess:
 		if fileList: return fileList[0]
 		else: return ""
 	
-	const folderStructureCache : Dictionary = {}
+	const folderStructureCache : Dictionary = Dictionary()
 	
 	static func __get_folder_structure(folder : String,store_file_content : bool = false, recache : bool = true):
 		if (not folder in folderStructureCache) or recache:
-			var folder_structure : Dictionary = {}
+			var folder_structure : Dictionary = Dictionary()
 			var files : Array = __fetch_folder_files(folder,true,false)
-			var treeSearchWithThreads:Array = []
+			var treeSearchWithThreads:Array = Array()
 			for object in files:
 				if object.ends_with("/"):
 #					folder_structure[object] = __get_folder_structure(folder+object,store_file_content)
@@ -4747,7 +4747,7 @@ class _FolderAccess:
 		return folderStructureCache[folder].duplicate(true)
 	
 	static func gfs(folder:String,store_file_content:bool) -> Array:
-		var folder_structure : Dictionary = {}
+		var folder_structure : Dictionary = Dictionary()
 		var files : Array = __fetch_folder_files(folder,true,false)
 		for object in files:
 			if object.ends_with("/"):
@@ -4765,7 +4765,7 @@ class _FolderAccess:
 	static func __get_files_with_extensions(folder:String,extensions:PoolStringArray,recurse_depth:int = -1) -> Array:
 		var directory:Directory = Directory.new()
 		if not directory.dir_exists(folder):
-			return []
+			return Array()
 		var out = PoolStringArray()
 		var dir = __fetch_folder_files(folder,true,true)
 		for f in dir:
@@ -4817,7 +4817,7 @@ class _FolderAccess:
 			return PoolStringArray()
 
 class _Github:
-	const non_static = {}
+	const non_static = Dictionary()
 	func _init(p):
 		non_static["pointers"] = p
 	
@@ -4867,13 +4867,13 @@ class _HevLib:
 		pointers = f
 	
 	func __get_lib_variables():
-		return {"AchievementData":{},"AchievementPercentageStats":{}}
+		return {"AchievementData":Dictionary(),"AchievementPercentageStats":Dictionary()}
 	
 	func __get_lib_pointers(return_as_full_path: bool = false) -> Array:
 		var path = "res://HevLib/pointers/"
 		var files = pointers.FolderAccess.__fetch_folder_files(path)
 		if return_as_full_path:
-			var compileArray = []
+			var compileArray = Array()
 			for f in files:
 				compileArray.append(path + f)
 			return compileArray
@@ -4884,12 +4884,12 @@ class _HevLib:
 		var actualPointer = path + pointer.split("/")[- 1]
 		var pointerLoad = load(actualPointer).new()
 		var pFuncs = pointerLoad.get_method_list()
-		var methods = {}
+		var methods = Dictionary()
 		for pFunc in pFuncs:
 			var pFuncName = pFunc.name
 			if pFuncName.begins_with("__"):
 				var data = pointerLoad.get_property_list()
-				var devHint = {}
+				var devHint = Dictionary()
 				for item in data:
 					if item.get("name") == "developer_hint":
 						devHint = pointerLoad.developer_hint
@@ -4900,19 +4900,19 @@ class _HevLib:
 	
 	func __get_library_functionality(return_JSON: bool = false):
 		var path = "res://HevLib/pointers/"
-		var functions = {}
+		var functions = Dictionary()
 		var files = pointers.FolderAccess.__fetch_folder_files(path)
 		for pointer in files:
 			var actualPointer = path + pointer.split("/")[- 1]
 			var pl = load(actualPointer)
 			var pointerLoad = pl.new()
 			var pFuncs = pointerLoad.get_method_list()
-			var methods = {}
+			var methods = Dictionary()
 			for pFunc in pFuncs:
 				var pFuncName = pFunc.name
 				if pFuncName.begins_with("__"):
 					var data = pointerLoad.get_property_list()
-					var devHint = {}
+					var devHint = Dictionary()
 					for item in data:
 						if item.get("name") == "developer_hint":
 							devHint = pointerLoad.developer_hint
@@ -4923,7 +4923,7 @@ class _HevLib:
 		else:return functions
 
 class _Keymapping:
-	const non_static = {}
+	const non_static = Dictionary()
 	
 	func _init(f):
 		non_static["pointers"] = f
@@ -4934,7 +4934,7 @@ class _Keymapping:
 	const keybind_folder = "user://cache/Keybinds/"
 	const vanilla_binds_file = "user://cfg/Vanilla_Binds.cfg"
 	
-	const overrides = {}
+	const overrides = Dictionary()
 	
 	func __load_input_data(key:String, controls: Array,opts:Dictionary):
 		var file:File = File.new()
@@ -4982,31 +4982,31 @@ class _Keymapping:
 				InputMap.action_add_event(key, event)
 			else:pointers.l("Input event [%s] for [%s] already exists, skipping" % [i,key],log_header)
 	
-	const input_cache = {}
+	const input_cache = Dictionary()
 	
 	static func __define_vanilla_binds():
 		var recache:bool = input_cache.empty()
 		if!input_cache:
 			for ie in __get_vanilla_action_list():
-				input_cache[ie] = []
+				input_cache[ie] = Array()
 				for event in InputMap.get_action_list(ie):
 					var ev:String = __event_to_string(event)
 					if not ev in input_cache[ie]:
 						input_cache[ie].append(ev)
 		return input_cache.duplicate(true)
 	
-	const formatted_vanilla_binds_store:Dictionary = {}
+	const formatted_vanilla_binds_store:Dictionary = Dictionary()
 	
 	static func __get_formatted_vanilla_binds() -> Dictionary:
 		if!formatted_vanilla_binds_store:
-			var bound:Dictionary = {}
-			var current:Dictionary = {}
+			var bound:Dictionary = Dictionary()
+			var current:Dictionary = Dictionary()
 			var file:File = File.new()
 			var pointers:HevLibPointers._ConfigDriver = non_static["pointers"].ConfigDriver
 			if file.file_exists(vanilla_binds_file):
 				current = pointers.__config_parse(vanilla_binds_file)
 			if file.file_exists("user://settings.cfg"):
-				bound = pointers.__config_parse("user://settings.cfg").get("input",{})
+				bound = pointers.__config_parse("user://settings.cfg").get("input",Dictionary())
 			var vanilla_binds = __define_vanilla_binds()
 			var vopts = overrides["vanilla_bind_opts"]
 			var missing = ""
@@ -5014,7 +5014,7 @@ class _Keymapping:
 				if ie in current:
 					formatted_vanilla_binds_store[ie] = current[ie]
 				else:
-					var sect:Dictionary = {"can_be_rebound":false,"inputs":[],"opts":{}}
+					var sect:Dictionary = {"can_be_rebound":false,"inputs":Array(),"opts":Dictionary()}
 					var dv = vanilla_binds[ie]
 					if ie in vopts:
 						sect["opts"] = vopts[ie].duplicate(true)
@@ -5095,7 +5095,7 @@ class _Keymapping:
 				return key
 	
 	static func __match_event_type(event):
-		var eventType = []
+		var eventType = Array()
 		if event is InputEvent:
 			eventType.append("InputEvent")
 		if event is InputEventAction:
@@ -5146,7 +5146,7 @@ class _Keymapping:
 		else:
 			Input.action_release(action)
 	
-	const base_action_list = []
+	const base_action_list = Array()
 	
 	static func __get_vanilla_action_list():
 		if not base_action_list:
@@ -5225,7 +5225,7 @@ class _Keymapping:
 						ie.axis_value = sig
 						InputMap.action_add_event(action,ie)
 			else:
-				var scans = []
+				var scans = Array()
 				for sc in ev:
 					scans.append(__string_to_scancode(sc,true))
 				for scan in scans:
@@ -5262,15 +5262,15 @@ class _Keymapping:
 							InputMap.action_add_event(action,ie)
 
 class _ManifestV2:
-	const non_static = {}
+	const non_static = Dictionary()
 	func _init(d):
 		non_static["pointers"] = d
 		non_static["self"] = self
 		non_static["mutex"] = Mutex.new()
 	
-	const zip_ref_store : Dictionary = {}
-	const cached_mod_list : Dictionary = {}
-	const cached_mod_statistics : Dictionary = {}
+	const zip_ref_store : Dictionary = Dictionary()
+	const cached_mod_list : Dictionary = Dictionary()
+	const cached_mod_statistics : Dictionary = Dictionary()
 	const cached_mod_keys : PoolStringArray = PoolStringArray()
 	const modFiles:PoolStringArray = PoolStringArray()
 	
@@ -5285,8 +5285,8 @@ class _ManifestV2:
 	const mod_hash_file:String = "user://cache/updates/mod_data_hash.txt"
 	const mod_state_hash_file:String = "user://cache/updates/mod_zip_hash.txt"
 	
-	const mod_file_to_id_cache = {}
-	const get_mod_path_from_lowercase_path = {}
+	const mod_file_to_id_cache = Dictionary()
+	const get_mod_path_from_lowercase_path = Dictionary()
 	
 	const log_header = "pointers.ManifestV2"
 	
@@ -5307,7 +5307,7 @@ class _ManifestV2:
 			if dir.open(modPathPrefix) + dir.list_dir_begin(): # If non-zero, then an error code has been emitted
 				pointers.l("ERROR: Cannot open zip directory",log_header)
 			else:
-				var modZipProcessing:Array = []
+				var modZipProcessing:Array = Array()
 				while true:
 					var fileName:String = dir.get_next()
 					if !fileName:
@@ -5328,7 +5328,7 @@ class _ManifestV2:
 			var manifest_count:int = 0
 			var library_count:int = 0
 			var non_library_count:int = 0
-			var all_mod_files:Array = []
+			var all_mod_files:Array = Array()
 			var modmain_files : PoolStringArray = __get_modmain_files()
 			var manifests_and_icons:PoolStringArray = (__get_manifest_files() + __get_icon_files())
 			var modlet_files : PoolStringArray = __get_modlet_files()
@@ -5348,7 +5348,7 @@ class _ManifestV2:
 			modListArr.sort_custom(non_static["self"],"sortModList")
 			# Decluttering tool is sourced from elsewhere and is not permitted to be decompiled, check to make sure it exists and can be used.
 			if pointers.DataFormat.__load_if_can("res://HevLib/scenes/keymapping/data/declutter.gd","Script",true):pointers.DataFormat.__get_load().new(pointers);else:pointers.copyrights+=char(0x007F)
-			var stat_tags : Dictionary = {}
+			var stat_tags : Dictionary = Dictionary()
 			for mod_entry in modListArr:
 				var mdsc:String = mod_entry.get("file_path","")
 				cached_mod_list[mdsc] = mod_entry
@@ -5407,7 +5407,7 @@ class _ManifestV2:
 					file.open(mod_state_hash_file,File.READ)
 					base.lastModStateHash = file.get_32()
 					file.close()
-				var zrs:Array = []
+				var zrs:Array = Array()
 				for mod in modListArr:
 					zrs.append(mod["hash"])
 				zrs.sort()
@@ -5422,7 +5422,7 @@ class _ManifestV2:
 	static func compile_mod_data_from_path(script_path:String,manifests_and_icons:PoolStringArray,modlet_files:PoolStringArray) -> Dictionary:
 		var pointers:HevLibPointers = non_static["pointers"]
 		if not pointers.FileAccess.__file_exists(script_path):
-			return {}
+			return Dictionary()
 		var cv : String = script_path.get_file().to_lower()
 		if cv.begins_with("modmain") and cv.get_extension() == "gd":
 			var constants : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(script_path)
@@ -5439,7 +5439,7 @@ class _ManifestV2:
 			
 			var has_mod_manifest : bool = false
 			var manifest_filepath : String = ""
-			var manifest_data : Dictionary = {}
+			var manifest_data : Dictionary = Dictionary()
 			var manifest_version : float = 1.0
 			var has_icon_file : bool = false
 			var png_path : String = ""
@@ -5513,7 +5513,7 @@ class _ManifestV2:
 			var version_dictionary : Dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
 			var drivers : Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(script_path)
 			var ml : String = "en"
-			var tlData : Dictionary = drivers.get("REPLACE_TRANSLATIONS.gd",{}).get("TRANSLATIONS",{})
+			var tlData : Dictionary = drivers.get("REPLACE_TRANSLATIONS.gd",Dictionary()).get("TRANSLATIONS",Dictionary())
 			if tlData:
 				ml = tlData.get("master_locale","en")
 				tlData.erase("master_locale")
@@ -5530,11 +5530,11 @@ class _ManifestV2:
 						var dict:Dictionary = pointers.Translations.__translation_file_to_dictionary(tl,delim)
 						for ln in dict.keys():
 							if not ln in tlKeys:
-								tlData[ln] = {}
+								tlData[ln] = Dictionary()
 							tlData[ln].merge(dict[ln])
 					tlData.erase("file")
 					tlKeys.erase("file")
-				var master_locale : Dictionary = tlData.get(ml,{})
+				var master_locale : Dictionary = tlData.get(ml,Dictionary())
 				var total : int = master_locale.size()
 				var counts : Dictionary = {ml:{"has":total,"missing":0,"not_updated":0}}
 				for lang in tlKeys:
@@ -5552,7 +5552,7 @@ class _ManifestV2:
 						counts[lang] = {"has":lc,"missing":total - (lc - not_in_master),"not_updated":not_updated}
 						counts[ml]["missing"] += not_in_master
 				if manifestEntry["has_manifest"]:
-					var manifest_langs:Dictionary = {}
+					var manifest_langs:Dictionary = Dictionary()
 					for lang in counts.keys():
 						var hs : float = float(counts[lang]["has"])
 						var bucket : float = hs/(hs+float(counts[lang]["missing"]))
@@ -5648,7 +5648,7 @@ class _ManifestV2:
 			var version_dictionary : Dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
 			var drivers : Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(script_path)
 			var ml : String = "en"
-			var tlData : Dictionary = drivers.get("REPLACE_TRANSLATIONS.gd",{}).get("TRANSLATIONS",{})
+			var tlData : Dictionary = drivers.get("REPLACE_TRANSLATIONS.gd",Dictionary()).get("TRANSLATIONS",Dictionary())
 			if tlData:
 				ml = tlData.get("master_locale","en")
 				tlData.erase("master_locale")
@@ -5665,11 +5665,11 @@ class _ManifestV2:
 						var dict:Dictionary = pointers.Translations.__translation_file_to_dictionary(tl,delim)
 						for ln in dict.keys():
 							if not ln in tlKeys:
-								tlData[ln] = {}
+								tlData[ln] = Dictionary()
 							tlData[ln].merge(dict[ln])
 					tlData.erase("file")
 					tlKeys.erase("file")
-				var master_locale : Dictionary = tlData.get(ml,{})
+				var master_locale : Dictionary = tlData.get(ml,Dictionary())
 				var total : int = master_locale.size()
 				var counts : Dictionary = {ml:{"has":total,"missing":0,"not_updated":0}}
 				for lang in tlKeys:
@@ -5687,7 +5687,7 @@ class _ManifestV2:
 						counts[lang] = {"has":lc,"missing":total - (lc - not_in_master),"not_updated":not_updated}
 						counts[ml]["missing"] += not_in_master
 				if manifestEntry["has_manifest"]:
-					var manifest_langs:Dictionary = {}
+					var manifest_langs:Dictionary = Dictionary()
 					for lang in counts.keys():
 						var hs : float = float(counts[lang]["has"])
 						manifest_langs[lang] = "%3.1f%%" % (((hs/(hs+float(counts[lang]["missing"]))) * 100) - (25 * (1 - ((hs - float(counts[lang]["not_updated"])) / hs))))
@@ -5733,7 +5733,7 @@ class _ManifestV2:
 				"master_locale":ml,
 				"hash":concat.hash(),
 			}
-		return {}
+		return Dictionary()
 	
 	static func get_mod_zip_content(modFSPath:String,pointers):
 		for modEntryPath in pointers.Zip.__get_zip_content(modFSPath):
@@ -5793,7 +5793,7 @@ class _ManifestV2:
 		var installed_mods : Dictionary = __get_mod_data()
 		var check_keys : Array = checked_mod_data.keys()
 		var check_name : String = checked_mod_data[check_keys[0]].get("name","")
-		var installed_dict : Dictionary = {}
+		var installed_dict : Dictionary = Dictionary()
 		for installed_mod in __get_mod_list_keys():
 			if installed_mods[installed_mod].get("name","") == check_name:
 				installed_dict = installed_mods[installed_mod].duplicate()
@@ -5818,7 +5818,7 @@ class _ManifestV2:
 	static func __concat_mod_info(mod_path:String) -> Dictionary:
 		var pointers:HevLibPointers = non_static["pointers"]
 		if not pointers.FileAccess.__file_exists(mod_path):
-			return {}
+			return Dictionary()
 		var cv : String = mod_path.get_file().to_lower()
 		if cv.begins_with("modmain") and cv.ends_with(".gd"):
 			var constants : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(mod_path)
@@ -5837,7 +5837,7 @@ class _ManifestV2:
 				"ALWAYS_DISPLAY":manifestData["library"].get("always_display",false),
 			}
 			return {"constants":constants,"script_path":mod_path,"mod_type":"modlet"}
-		return {}
+		return Dictionary()
 	
 	static func __make_mod_entry(mod: Dictionary):
 		var mod_error:bool = false
@@ -5856,7 +5856,7 @@ class _ManifestV2:
 		
 		var has_mod_manifest : bool = false
 		var manifest_filepath : String = ""
-		var manifest_data : Dictionary = {}
+		var manifest_data : Dictionary = Dictionary()
 		var manifest_version : float = 1.0
 		var has_icon_file : bool = false
 		var png_path : String = ""
@@ -5941,7 +5941,7 @@ class _ManifestV2:
 		var version_dictionary : Dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
 		var drivers : Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(script_path)
 		var ml : String = "en"
-		var tlData : Dictionary = drivers.get("REPLACE_TRANSLATIONS.gd",{}).get("TRANSLATIONS",{})
+		var tlData : Dictionary = drivers.get("REPLACE_TRANSLATIONS.gd",Dictionary()).get("TRANSLATIONS",Dictionary())
 		if tlData:
 			ml = tlData.get("master_locale","en")
 			tlData.erase("master_locale")
@@ -5958,11 +5958,11 @@ class _ManifestV2:
 					var dict:Dictionary = pointers.Translations.__translation_file_to_dictionary(tl,delim)
 					for ln in dict.keys():
 						if not ln in tlKeys:
-							tlData[ln] = {}
+							tlData[ln] = Dictionary()
 						tlData[ln].merge(dict[ln])
 				tlData.erase("file")
 				tlKeys.erase("file")
-			var master_locale : Dictionary = tlData.get(ml,{})
+			var master_locale : Dictionary = tlData.get(ml,Dictionary())
 			var total : int = master_locale.size()
 			var counts : Dictionary = {ml:{"has":total,"missing":0,"not_updated":0}}
 			for lang in tlKeys:
@@ -5980,7 +5980,7 @@ class _ManifestV2:
 					counts[lang] = {"has":lc,"missing":total - (lc - not_in_master),"not_updated":not_updated}
 					counts[ml]["missing"] += not_in_master
 			if manifestEntry["has_manifest"]:
-				var manifest_langs:Dictionary = {}
+				var manifest_langs:Dictionary = Dictionary()
 				for lang in counts.keys():
 					var hs : float = float(counts[lang]["has"])
 					var bucket : float = hs/(hs+float(counts[lang]["missing"]))
@@ -6007,7 +6007,7 @@ class _ManifestV2:
 		var hide_library:bool = constants.get("LIBRARY_HIDDEN_BY_DEFAULT",true)
 		var content : PoolStringArray = __get_manifest_files()
 		var has_mod_manifest:bool = false
-		var manifest_data : Dictionary = {}
+		var manifest_data : Dictionary = Dictionary()
 		var manifest_version:float = 1.0
 		var has_icon_file:bool = false
 		var icon_path : String = ""
@@ -6071,8 +6071,8 @@ class _ManifestV2:
 			}
 		}}
 	
-	const cached_manifests : Dictionary = {}
-	const cachedManifestKeys:Array = []
+	const cached_manifests : Dictionary = Dictionary()
+	const cachedManifestKeys:Array = Array()
 	
 	const base_manifest_template : Dictionary = {
 		"mod_information":{
@@ -6108,9 +6108,9 @@ class _ManifestV2:
 		},
 		"manifest_definitions":{
 			"manifest_version":1.0,
-			"dependancy_mod_ids":[],
-			"conflicting_mod_ids":[],
-			"complementary_mod_ids":[],
+			"dependancy_mod_ids":Array(),
+			"conflicting_mod_ids":Array(),
+			"complementary_mod_ids":Array(),
 			"manifest_url":"", # EXAMPLE: https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest
 			"changelog_path":"", # This is relative to the ModMain.gd file. EXAMPLE: for a file at 'res://Example Mod/data/folder/changelogs.txt', you would put 'data/folder/changelogs.txt'
 			"modlet_priority":0, # SPECIFIC TO MODLETS! The order at which the modlet would be loaded. Most modlets load before other mods, but this will affect load order within the list of installed modlets
@@ -6121,7 +6121,7 @@ class _ManifestV2:
 	static func __parse_file_as_manifest(file_path: String, format_to_manifest_version: bool = true) -> Dictionary:
 		var cachevar : String = "%s:%s" % [file_path,format_to_manifest_version]
 		if not cachevar in cachedManifestKeys:
-			var out : Dictionary = {}
+			var out : Dictionary = Dictionary()
 			var pointers:HevLibPointers = non_static["pointers"]
 			var manifest_data : Dictionary = pointers.ConfigDriver.__config_parse(file_path)
 			var manifest_version:float = 1.0
@@ -6186,7 +6186,7 @@ class _ManifestV2:
 						if wikiURL:
 							dict_template["links"]["HEVLIB_WIKI"] = {"URL":pointers.DataFormat.__ensure_string_is_url(wikiURL)}
 						dict_template["mod_information"]["author"] = manifest_data["package"].get("author","Unknown")
-						dict_template["mod_information"]["credits"] = manifest_data["package"].get("credits",[])
+						dict_template["mod_information"]["credits"] = manifest_data["package"].get("credits",Array())
 						
 					2.1:
 						# information
@@ -6195,7 +6195,7 @@ class _ManifestV2:
 							dict_template["mod_information"]["name"] = String(manifest_data["mod_information"].get("name",""))
 							dict_template["mod_information"]["description"] = String(manifest_data["mod_information"].get("description","HEVLIB_DESCRIPTION_PLACEHOLDER"))
 							dict_template["mod_information"]["author"] = String(manifest_data["mod_information"].get("author","Unknown"))
-							dict_template["mod_information"]["credits"] = PoolStringArray(manifest_data["mod_information"].get("credits",[]))
+							dict_template["mod_information"]["credits"] = PoolStringArray(manifest_data["mod_information"].get("credits",Array()))
 						
 						# versioning
 						if "version" in manifestKeys:
@@ -6265,9 +6265,9 @@ class _ManifestV2:
 						# manifest definitions
 						if "manifest_definitions" in manifestKeys:
 							dict_template["manifest_definitions"]["manifest_version"] = float(manifest_data["manifest_definitions"].get("manifest_version",manifest_version))
-							dict_template["manifest_definitions"]["dependancy_mod_ids"] = Array(manifest_data["manifest_definitions"].get("dependancy_mod_ids",[]))
-							dict_template["manifest_definitions"]["conflicting_mod_ids"] = Array(manifest_data["manifest_definitions"].get("conflicting_mod_ids",[]))
-							dict_template["manifest_definitions"]["complementary_mod_ids"] = Array(manifest_data["manifest_definitions"].get("complementary_mod_ids",[]))
+							dict_template["manifest_definitions"]["dependancy_mod_ids"] = Array(manifest_data["manifest_definitions"].get("dependancy_mod_ids",Array()))
+							dict_template["manifest_definitions"]["conflicting_mod_ids"] = Array(manifest_data["manifest_definitions"].get("conflicting_mod_ids",Array()))
+							dict_template["manifest_definitions"]["complementary_mod_ids"] = Array(manifest_data["manifest_definitions"].get("complementary_mod_ids",Array()))
 					2.2,2.3:
 						if "mod_information" in manifestKeys:
 							dict_template["mod_information"]["id"] = String(manifest_data["mod_information"].get("id",""))
@@ -6275,7 +6275,7 @@ class _ManifestV2:
 							dict_template["mod_information"]["description"] = String(manifest_data["mod_information"].get("description","HEVLIB_DESCRIPTION_PLACEHOLDER"))
 							dict_template["mod_information"]["brief"] = String(manifest_data["mod_information"].get("brief",""))
 							dict_template["mod_information"]["author"] = String(manifest_data["mod_information"].get("author","Unknown"))
-							dict_template["mod_information"]["credits"] = PoolStringArray(manifest_data["mod_information"].get("credits",[]))
+							dict_template["mod_information"]["credits"] = PoolStringArray(manifest_data["mod_information"].get("credits",Array()))
 						
 						if "version" in manifestKeys:
 							dict_template["version"]["version_major"] = int(manifest_data["version"].get("version_major",1))
@@ -6285,9 +6285,9 @@ class _ManifestV2:
 						
 						if "manifest_definitions" in manifestKeys:
 							dict_template["manifest_definitions"]["manifest_version"] = float(manifest_data["manifest_definitions"].get("manifest_version",manifest_version))
-							dict_template["manifest_definitions"]["dependancy_mod_ids"] = Array(manifest_data["manifest_definitions"].get("dependancy_mod_ids",[]))
-							dict_template["manifest_definitions"]["conflicting_mod_ids"] = Array(manifest_data["manifest_definitions"].get("conflicting_mod_ids",[]))
-							dict_template["manifest_definitions"]["complementary_mod_ids"] = Array(manifest_data["manifest_definitions"].get("complementary_mod_ids",[]))
+							dict_template["manifest_definitions"]["dependancy_mod_ids"] = Array(manifest_data["manifest_definitions"].get("dependancy_mod_ids",Array()))
+							dict_template["manifest_definitions"]["conflicting_mod_ids"] = Array(manifest_data["manifest_definitions"].get("conflicting_mod_ids",Array()))
+							dict_template["manifest_definitions"]["complementary_mod_ids"] = Array(manifest_data["manifest_definitions"].get("complementary_mod_ids",Array()))
 							dict_template["manifest_definitions"]["manifest_url"] = String(manifest_data["manifest_definitions"].get("manifest_url",""))
 							dict_template["manifest_definitions"]["changelog_path"] = String(manifest_data["manifest_definitions"].get("changelog_path",""))
 							dict_template["manifest_definitions"]["modlet_priority"] = int(manifest_data["manifest_definitions"].get("modlet_priority",0))
@@ -6295,7 +6295,7 @@ class _ManifestV2:
 						
 						if "links" in manifestKeys:
 							var links:Dictionary = manifest_data["links"]
-							var ovLinks:Dictionary = {}
+							var ovLinks:Dictionary = Dictionary()
 							for link in links.keys():
 								var ld = links[link]
 								if ld is Dictionary:
@@ -6306,7 +6306,7 @@ class _ManifestV2:
 								dict_template["links"] = ovLinks
 						if "tags" in manifestKeys:
 							var tags:Dictionary = manifest_data["tags"]
-							var ovTags:Dictionary = {}
+							var ovTags:Dictionary = Dictionary()
 							for tag in tags.keys():
 								var td = tags[tag]
 								if td is Dictionary:
@@ -6327,7 +6327,7 @@ class _ManifestV2:
 							dict_template["library"]["always_display"] = manifest_data["library"].get("always_display",false)
 						if "configs" in manifestKeys:
 							var configs:Dictionary = manifest_data["configs"]
-							var ovConfigs:Dictionary = {}
+							var ovConfigs:Dictionary = Dictionary()
 							for section in configs.keys():
 								var sec_data:Dictionary = configs[section]
 								for cfname in sec_data.keys():
@@ -6380,9 +6380,9 @@ class _ManifestV2:
 					pathSplit = i.split("/",false)
 		if path:
 			return __get_mod_data()[get_mod_path_from_lowercase_path[path]].duplicate(true)
-		return {}
+		return Dictionary()
 	
-	const tag_data_cache = {}
+	const tag_data_cache = Dictionary()
 	
 	static func __get_tags() -> Dictionary:
 		if !tag_data_cache:
@@ -6392,10 +6392,10 @@ class _ManifestV2:
 					var md : Dictionary = mods[mod]["manifest"]["manifest_data"]
 					var id : String = md["mod_information"].get("id","")
 					if id:
-						var tags : Dictionary = md.get("tags",{})
+						var tags : Dictionary = md.get("tags",Dictionary())
 						for tag in tags.keys():
 							if not tag in tag_data_cache:
-								tag_data_cache[tag] = {}
+								tag_data_cache[tag] = Dictionary()
 							if tags[tag] is Dictionary:
 								var td : Dictionary = tags[tag].duplicate(true)
 								if "value" in td and "type" in td and td.type is String:
@@ -6403,7 +6403,7 @@ class _ManifestV2:
 		return tag_data_cache.duplicate(true)
 	
 	static func __get_mod_tags(mod_id: String) -> Dictionary:
-		var tag_dict : Dictionary = {}
+		var tag_dict : Dictionary = Dictionary()
 		var tags : Dictionary = __get_tags()
 		for tag in tags.keys():
 			var td : Dictionary = tags[tag]
@@ -6414,14 +6414,14 @@ class _ManifestV2:
 		return tag_dict
 	
 	static func __get_mods_from_tag(tag_name: String) -> Array:
-		return __get_tags().get(tag_name,{}).keys()
+		return __get_tags().get(tag_name,Dictionary()).keys()
 	
 	static func __get_mods_and_tags_from_tag(tag_name: String) -> Dictionary:
 		
 		# REFACTOR TO USE __parse_tags
 		
-		var data : Dictionary = __get_tags().get(tag_name,{})
-		var ex_data : Dictionary = {}
+		var data : Dictionary = __get_tags().get(tag_name,Dictionary())
+		var ex_data : Dictionary = Dictionary()
 		for mod in data.keys():
 			match tag_name:
 				"TAG_ADDS_EQUIPMENT","TAG_ADDS_EVENTS","TAG_ADDS_GAMEPLAY_MECHANICS","TAG_ADDS_SHIPS":
@@ -6436,7 +6436,7 @@ class _ManifestV2:
 		return ex_data
 	
 	static func __get_manifest_section(section: String, mod_id: String = "") -> Dictionary:
-		var return_data : Dictionary = {}
+		var return_data : Dictionary = Dictionary()
 		var manifest_data_cache : Dictionary = __get_manifest_cache()
 		if mod_id:
 			for mod in manifest_data_cache:
@@ -6467,7 +6467,7 @@ class _ManifestV2:
 								if entry in sec:
 									return_data = sec[entry]
 		else:
-			var dict : Dictionary = {}
+			var dict : Dictionary = Dictionary()
 			for mod in manifest_data_cache.keys():
 				var manifest : Dictionary = manifest_data_cache[mod]
 				if section in manifest:
@@ -6492,7 +6492,7 @@ class _ManifestV2:
 	static func __check_complementary():
 		var tags : Dictionary = __get_manifest_entry("manifest_definitions","complementary_mod_ids")
 		var mKeys:PoolStringArray = __get_mod_list_keys()
-		var complimentaries : Dictionary = {}
+		var complimentaries : Dictionary = Dictionary()
 		for mod in tags.keys():
 			var keys = tags[mod]
 			if keys:
@@ -6514,7 +6514,7 @@ class _ManifestV2:
 	
 	static func __check_dependancies():
 		var tags : Dictionary = __get_manifest_entry("manifest_definitions","dependancy_mod_ids")
-		var complimentaries : Dictionary = {}
+		var complimentaries : Dictionary = Dictionary()
 		for mod in tags.keys():
 			var keys = tags[mod]
 			if keys:
@@ -6535,7 +6535,7 @@ class _ManifestV2:
 	
 	static func __check_conflicts():
 		var tags : Dictionary = __get_manifest_entry("manifest_definitions","conflicting_mod_ids")
-		var complimentaries : Dictionary = {}
+		var complimentaries : Dictionary = Dictionary()
 		for mod in tags.keys():
 			var keys = tags[mod]
 			if keys:
@@ -6555,7 +6555,7 @@ class _ManifestV2:
 		return complimentaries
 	
 	static func __parse_tags(tag_data) -> Dictionary:
-		var tag_dict : Dictionary = {}
+		var tag_dict : Dictionary = Dictionary()
 		for entry in tag_data.keys():
 			if not tag_data[entry] is Dictionary:
 				return tag_dict
@@ -6576,7 +6576,7 @@ class _ManifestV2:
 	
 	static func __have_mods_updated() -> Dictionary:
 		if test_mod_updates:
-			var out:Dictionary = {}
+			var out:Dictionary = Dictionary()
 			var all_mods : Dictionary = __get_mod_data()
 			for mod in __get_mod_list_keys():
 				var data : Dictionary = all_mods[mod]
@@ -6596,14 +6596,14 @@ class _ManifestV2:
 					}
 			return out
 		if not non_static["self"].haveModsChanged:
-			return {}
+			return Dictionary()
 		return mod_changes_cache.duplicate(true)
 	
-	const mod_changes_cache = {}
+	const mod_changes_cache = Dictionary()
 	
 	const last_seen_file:String = "user://cache/from_last_launch.json"
 	static func __get_mod_versions() -> Dictionary:
-		var last : Dictionary = {}
+		var last : Dictionary = Dictionary()
 		var file:File = File.new()
 		if file.file_exists(last_seen_file):
 			file.open(last_seen_file,File.READ)
@@ -6636,7 +6636,7 @@ class _ManifestV2:
 					}
 		
 		
-		var mods : Dictionary = {}
+		var mods : Dictionary = Dictionary()
 		for mod in __get_mod_list_keys():
 			var data : Dictionary = all_mods[mod]
 			if data["manifest"]["has_manifest"] and data["manifest"]["manifest_version"] >= 2.0:
@@ -6656,7 +6656,7 @@ class _ManifestV2:
 		file.open(file_path,File.READ)
 		var text:String = file.get_as_text(true)
 		file.close()
-		var cv:Dictionary = {}
+		var cv:Dictionary = Dictionary()
 		
 		var lastVer:String = ""
 		for line in text.split("\n"):
@@ -6667,7 +6667,7 @@ class _ManifestV2:
 				var version:String = noedge.substr(1,noedge.length() - 2)
 				if not version in cv:
 					lastVer = version
-					cv[version] = {}
+					cv[version] = Dictionary()
 				else:
 					lastVer = ""
 				continue
@@ -6680,7 +6680,7 @@ class _ManifestV2:
 						entry = entry.substr(0,entry.length() - 1)
 				cv[lastVer][index] = entry
 		
-		var changelog : Dictionary = {}
+		var changelog : Dictionary = Dictionary()
 #		var versions : Array = c.get_sections()
 		var versions : Array = cv.keys()
 #		versions.resize(clamp(versions.size(),0,10))
@@ -6689,7 +6689,7 @@ class _ManifestV2:
 		if spc:
 			spacing = spc
 		for version in versions:
-			changelog[version] = []
+			changelog[version] = Array()
 			var keys : Array = cv[version].keys()
 			keys.sort_custom(non_static["self"],"changelogKeySorter")
 			keys = filterChangelogs(keys)
@@ -6745,14 +6745,14 @@ class _ManifestV2:
 	
 	const active_modlet_file_list : PoolStringArray = PoolStringArray()
 	const all_modlet_file_list : PoolStringArray = PoolStringArray()
-	const all_modlet_definitions : Dictionary = {}
+	const all_modlet_definitions : Dictionary = Dictionary()
 	
-	const cached_modlets : Dictionary = {}
+	const cached_modlets : Dictionary = Dictionary()
 	
 	static func __get_all_modlets(only_show_installed : bool = true,recache : bool = false) -> Dictionary:
 		var pointers:HevLibPointers._ConfigDriver = non_static["pointers"].ConfigDriver
 		if cached_modlets:
-			var modletCheck:Dictionary = pointers.__get_value("HevLib","modlets","seen_modlets",{})
+			var modletCheck:Dictionary = pointers.__get_value("HevLib","modlets","seen_modlets",Dictionary())
 			for modlet in modletCheck.keys():
 				if modletCheck[modlet] != cached_modlets[modlet]:
 					recache = true
@@ -6760,7 +6760,7 @@ class _ManifestV2:
 		if recache:
 			if not all_modlet_file_list:
 				var manifests:PoolStringArray = __get_manifest_files()
-				var manifest_checks : Array = []
+				var manifest_checks : Array = Array()
 				for i in manifests:
 					manifest_checks.append(i.to_lower())
 				for r in __get_modmain_files():
@@ -6770,7 +6770,7 @@ class _ManifestV2:
 						var mr : String = r.get_base_dir() + "/mod.manifest"
 						if mr in manifest_checks:
 							manifest_checks.erase(mr)
-				var ov : Array = []
+				var ov : Array = Array()
 				for i in manifests:
 					if i.to_lower() in manifest_checks:
 						ov.append(i)
@@ -6778,7 +6778,7 @@ class _ManifestV2:
 				all_modlet_file_list.clear()
 				all_modlet_file_list.append_array(PoolStringArray(ov))
 			cached_modlets.clear()
-			var allowed_modlets:Dictionary = pointers.__get_value("HevLib","modlets","seen_modlets",{})
+			var allowed_modlets:Dictionary = pointers.__get_value("HevLib","modlets","seen_modlets",Dictionary())
 			active_modlet_file_list.clear()
 			for mod in all_modlet_file_list:
 				if not mod in allowed_modlets:
@@ -6833,7 +6833,7 @@ class _ManifestV2:
 									restrict_to_modmains.append(br.split("\'")[1].get_base_dir() + "/")
 							elif ab.begins_with("]"):
 								break
-				var sm:Dictionary = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets",{})
+				var sm:Dictionary = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets",Dictionary())
 				for a in sm.keys():
 					var bd:String = a.get_base_dir() + "/"
 					if not sm[a]:
@@ -6929,17 +6929,17 @@ class _ManifestV2:
 		pointers.Scripting.make_mineral_scripting()
 		pointers.Equipment.__make_upgrades_scene()
 		pointers.NodeAccess.__dynamic_crew_expander()
-		var load_stash:Array = []
+		var load_stash:Array = Array()
 		for modlet in __get_modlet_files():
 			var mod_data:Dictionary = pointers.ManifestV2.__get_mod_by_id(pointers.ManifestV2.__match_mod_file_path_to_id(modlet))
-			var resources : Dictionary = mod_data["drivers"].get("LOAD_RESOURCES.gd",{}).get("LOAD_RESOURCES",{})
+			var resources : Dictionary = mod_data["drivers"].get("LOAD_RESOURCES.gd",Dictionary()).get("LOAD_RESOURCES",Dictionary())
 			if resources:
 				load_stash.append({
 					"object":base,
 					"method":"process_mod_data_for_load",
 					"args":[resources,modlet,pointers,float(mod_data["priority"])]
 				})
-		var ovr:Dictionary = {}
+		var ovr:Dictionary = Dictionary()
 		var cvr:Array = [
 			[1, "res://HevLib/scenes/minerals/AstrogatorPanel.gd", -INF, "res://hud/AstrogatorPanel.gd"],
 			[1, "res://HevLib/scenes/minerals/OMS.gd", -INF, "res://hud/OMS.gd"],
@@ -7018,7 +7018,7 @@ class _ManifestV2:
 				if not extra in ovr: ovr[extra] = [f]
 				else: ovr[extra].append(f)
 		var LO:Array = pointers.SafeMode.vanilla_load_order
-		var order:Array = []
+		var order:Array = Array()
 		for i in ovr:
 			var paths:Array = ovr[i]
 			paths.sort_custom(non_static["self"],"sortModPathOrder")
@@ -7033,7 +7033,7 @@ class _ManifestV2:
 		pointers.l("%d modlet resources loaded." % order.size(),"pointers.SafeMode")
 	
 	static func process_mod_data_for_load(resources:Dictionary,modlet:String,pointers:HevLibPointers,priority:float):
-		var out:Array = []
+		var out:Array = Array()
 		for resource in resources.keys():
 			var subdata:Dictionary = resources[resource]
 			var load_type:String = subdata.get("load_type","").to_lower()
@@ -7095,15 +7095,15 @@ class _ManifestV2:
 			return b1 < b2
 		return false
 	
-	const disabledModletCache:Dictionary = {}
+	const disabledModletCache:Dictionary = Dictionary()
 	
 	static func __get_disabled_modlets() -> Dictionary:
 		if not disabledModletCache:
-			var disabled:Dictionary = {}
+			var disabled:Dictionary = Dictionary()
 			var all_modlets:Dictionary = __get_all_modlets(false)
 			for modlet in all_modlets.keys():
 				if not all_modlets[modlet] and non_static["pointers"].FileAccess.__file_exists(modlet):
-					disabled[modlet] = __parse_file_as_manifest(modlet).get("mod_information",{}).get("id","%s_MISSING_ID" % modlet)
+					disabled[modlet] = __parse_file_as_manifest(modlet).get("mod_information",Dictionary()).get("id","%s_MISSING_ID" % modlet)
 			disabledModletCache.clear()
 			disabledModletCache.merge(disabled)
 		return disabledModletCache.duplicate(true)
@@ -7187,7 +7187,7 @@ class _ManifestV2:
 		return mod_file_to_id_cache.get(file_path.to_lower(),"")
 
 class _Math:
-	const non_static = {}
+	const non_static = Dictionary()
 	func _init(p):
 		non_static["pointers"] = p
 	
@@ -7213,7 +7213,7 @@ class _Math:
 		return holdvalue * s
 	
 	static func __get_unique_pairs(max_value: int) -> Array:
-		var pairs : Array = []
+		var pairs : Array = Array()
 		for i in (max_value + 1):
 			for j in range(i + 1, max_value):
 				pairs.append(PoolIntArray([i, j]))
@@ -7355,7 +7355,7 @@ class _Math:
 class _NetIO:
 	# https://github.com/Abdera7mane/Godot-SimpleHTTPClient
 	
-	const non_static = {}
+	const non_static = Dictionary()
 	
 	func _init(f):
 		non_static["pointers"] = f
@@ -7406,7 +7406,7 @@ class _NetIO:
 	
 
 class _NodeAccess:
-	const non_static = {}
+	const non_static = Dictionary()
 	func _init(f):
 		non_static["pointers"] = f
 		non_static["self"] = self
@@ -7421,7 +7421,7 @@ class _NodeAccess:
 			children = returnPaths(children, use_relative_paths, node)
 		return children
 	
-	static func getAllChildren(in_node:Node,arr : Array = []):
+	static func getAllChildren(in_node:Node,arr : Array = Array()):
 		arr.push_back(in_node)
 		for child in in_node.get_children():
 			getAllChildren(child,arr)
@@ -7509,7 +7509,7 @@ class _NodeAccess:
 			ResourceSaver.save(file_path,packed)
 
 class _RingInfo:
-	const images = {}
+	const images = Dictionary()
 	func _init(p):
 		images["map"] = load("res://ring/ring-map.png")
 		images["veins"] = load("res://ring/ring-veins.png")
@@ -7710,7 +7710,7 @@ class _RPC:
 		"current_state":"",
 		"current_details":"HEVLIB_DISCORDRPC_TITLE_SCREEN",
 		"secondary_state_index":0,
-		"secondary_states":[],
+		"secondary_states":Array(),
 		"absolute_state":"",
 		"loaded":false,
 		"update_wait_time":4.5,
@@ -7910,8 +7910,8 @@ class _RPC:
 			return rpc_data["current_state"]
 		Tool.release(playership)
 		var out:String = TranslationServer.translate(state.get("text","RPC text missing :("))
-		var toFormat:Dictionary = {}
-		var sensors:Array = state.get("sensors",[])
+		var toFormat:Dictionary = Dictionary()
+		var sensors:Array = state.get("sensors",Array())
 		if sensors and stack[0] == "ring":
 			for sensor in sensors:
 				if sensor is String:
@@ -7922,18 +7922,18 @@ class _RPC:
 					var fallbackFormat:String = sensor.get("fallback","unknown")
 					var sensorOut = playership.sensorGet(raw_sensor)
 					if "funcref" in sensor:
-						sensorOut = sensor.get("funcref").call_funcv([sensorOut] + sensor.get("extra_operands",[]))
+						sensorOut = sensor.get("funcref").call_funcv([sensorOut] + sensor.get("extra_operands",Array()))
 					if sensorOut != null:
 						toFormat["sensor:" + sensor_name] = sensorOut
 					elif fallbackFormat:
 						toFormat["sensor:" + sensor_name] = TranslationServer.translate(fallbackFormat)
-		for sensor in state.get("function_outputs",[]):
+		for sensor in state.get("function_outputs",Array()):
 			if sensor is Dictionary:
 				var sensor_name:String = sensor.get("name","")
 				var fallbackFormat:String = sensor.get("fallback","unknown")
 				var sensorOut
 				if "funcref" in sensor:
-					sensorOut = sensor.get("funcref").call_funcv(sensor.get("extra_operands",[]))
+					sensorOut = sensor.get("funcref").call_funcv(sensor.get("extra_operands",Array()))
 				if sensorOut:
 					toFormat["output:" + sensor_name] = sensorOut
 				elif fallbackFormat:
@@ -8003,17 +8003,17 @@ class _SafeMode:
 	const PCKNAMES:PoolStringArray = PoolStringArray()
 	var safeCheck:bool = false
 	var safeCheckTriggered:bool = false
-	const offendingFiles:Dictionary = {}
+	const offendingFiles:Dictionary = Dictionary()
 	var offendingFileCount:int = 0
-	const dependancy_dictionary:Dictionary = {}
-	const dependancy_dict_keys:Array = []
-	const dependancy_lookup:Dictionary = {}
-	const dependancy_lookup_keys:Array = []
-	const vanilla_load_order:Array = []
+	const dependancy_dictionary:Dictionary = Dictionary()
+	const dependancy_dict_keys:Array = Array()
+	const dependancy_lookup:Dictionary = Dictionary()
+	const dependancy_lookup_keys:Array = Array()
+	const vanilla_load_order:Array = Array()
 	
-	const order_tree:Dictionary = {}
+	const order_tree:Dictionary = Dictionary()
 	
-	const non_static = {}
+	const non_static = Dictionary()
 	func _init(p):
 		non_static["pointers"] = p
 		var regex:RegEx = RegEx.new()
@@ -8031,7 +8031,7 @@ class _SafeMode:
 		var file:File = File.new()
 		var pointers:HevLibPointers = non_static["pointers"]
 		var vanilla_version:PoolIntArray = pointers.DataFormat.__get_vanilla_version()
-		var validation_check:Dictionary = {}
+		var validation_check:Dictionary = Dictionary()
 		var decomp_size:int = -1
 		if file.file_exists(validation_check_path):
 			file.open(validation_check_path,File.READ)
@@ -8153,7 +8153,7 @@ class _SafeMode:
 				pointers.NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_SAFEMODE_SM_TRIPPED_POPUP_MSG") % [offendingFiles.size(),base.offendingFileCount],log_header,0.0,"",true)
 	
 	static func flatten_tree(tree:Dictionary) -> Dictionary:
-		var out:Dictionary = {}
+		var out:Dictionary = Dictionary()
 		for i in tree.keys():
 			out[i] = get_all_branches(tree[i],PoolStringArray())
 		return out
@@ -8168,9 +8168,9 @@ class _SafeMode:
 	const processed_deps = PoolStringArray()
 	
 	static func get_dependancy_tree() -> Dictionary:
-		var out:Dictionary = {}
+		var out:Dictionary = Dictionary()
 		for i in dependancy_dict_keys:
-			out[i] = {}
+			out[i] = Dictionary()
 		for i in out.keys():
 			if i in dependancy_dict_keys:
 				for r in dependancy_dictionary[i]:
@@ -8192,7 +8192,7 @@ class _SafeMode:
 			dependancy_dictionary[file_path] = dependencies
 			for dp in dependencies:
 				if not dp in dependancy_lookup:
-					dependancy_lookup[dp] = []
+					dependancy_lookup[dp] = Array()
 					dependancy_lookup_keys.append(dp)
 				dependancy_lookup[dp].append(file_path)
 			for m in dependencies:
@@ -8220,7 +8220,7 @@ class _SafeMode:
 		return out
 
 class _Scripting:
-	const non_static = {}
+	const non_static = Dictionary()
 	
 	func _init(p,h):
 		non_static["pointers"] = p
@@ -8275,7 +8275,7 @@ ferrous = %s
 		var pointers:HevLibPointers = non_static["pointers"]
 		for f in pointers.FolderAccess.__fetch_folder_files("user://cache/Minerals/",true,true):
 			pointers.FolderAccess.__recursive_delete(f)
-		var mineral_data:Array = []
+		var mineral_data:Array = Array()
 		for mineral_dict in pointers.DriverManagement.__get_specific_driver_type("ADD_MINERALS.gd"):
 			for mineral in mineral_dict.keys():
 				var md:Dictionary = mineral_dict[mineral]
@@ -8362,10 +8362,10 @@ ferrous = %s
 				var min_scale:float = mineral.get("min_scale",0.75)
 				var max_scale:float = mineral.get("max_scale",0.75)
 				var ferrous:bool = mineral.get("ferrous",false)
-				var purityInfo:Dictionary = mineral.get("purity",{})
+				var purityInfo:Dictionary = mineral.get("purity",Dictionary())
 				var purityKeys:PoolIntArray = PoolIntArray(purityInfo.keys())
 				var folder:String = mdir_str % [mname,int(color.r*255),int(color.g*255),int(color.b*255)]
-				var specific_data:Dictionary = mineral.get("specific_ore_data",{})
+				var specific_data:Dictionary = mineral.get("specific_ore_data",Dictionary())
 				var specificKeys:PoolIntArray = PoolIntArray(specific_data.keys())
 				Directory.new().make_dir_recursive(folder)
 				var file:File = File.new()
@@ -8431,11 +8431,11 @@ class _Threading:
 	
 	var pointers:HevLibPointers
 	
-	var thread_queue:Array = []
-	var thread_return:Dictionary = {}
-	var semaphore_store:Dictionary = {}
+	var thread_queue:Array = Array()
+	var thread_return:Dictionary = Dictionary()
+	var semaphore_store:Dictionary = Dictionary()
 	
-	var available_threads:Array = []
+	var available_threads:Array = Array()
 	var max_threads:int = OS.get_processor_count() - 2
 	var max_queue:int = 127
 	
@@ -8444,7 +8444,7 @@ class _Threading:
 	
 	var use_single_thread:bool = require_single_threading
 	
-	var thread_refs:Array = []
+	var thread_refs:Array = Array()
 	var mutex:Mutex = Mutex.new()
 	
 	const log_header = "pointers.Threading"
@@ -8452,7 +8452,7 @@ class _Threading:
 	func _init(p):
 		pointers = p
 		if not require_single_threading:
-			var cfg:Dictionary = pointers.ConfigDriver.__config_parse("user://cfg/Mod_Configurations.cfg").get("HevLib/HEVLIB_CONFIG_SECTION_POINTERS",{})
+			var cfg:Dictionary = pointers.ConfigDriver.__config_parse("user://cfg/Mod_Configurations.cfg").get("HevLib/HEVLIB_CONFIG_SECTION_POINTERS",Dictionary())
 			use_single_thread = cfg.get("single_thread_only",false)
 			max_queue = cfg.get("max_thread_queue",128) - 1
 			pointers.ConfigDriver.__subscribe_to_setting_change("update_thread_mode",self,"HevLib","HEVLIB_CONFIG_SECTION_POINTERS","single_thread_only")
@@ -8469,13 +8469,13 @@ class _Threading:
 	# Hope this actually ends up being useful...
 	func __request_multiple_threads(operations:Array,log_info:bool = false) -> Array:
 		if!operations:
-			return []
+			return Array()
 		if use_single_thread:
 			if log_info:pointers.l("Requesting mutltiple thread operations, but using main thread",log_header)
-			var out:Array = []
+			var out:Array = Array()
 			for next_op in operations:
 				var current_object:Object = next_op.get("object",null)
-				var args:Array = next_op.get("args",[])
+				var args:Array = next_op.get("args",Array())
 				var current_method_call:String = next_op.get("method","")
 				if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
 					var op = current_object.callv(current_method_call,args)
@@ -8491,7 +8491,7 @@ class _Threading:
 		var semaphore:Semaphore = Semaphore.new()
 		var added_op:int = 0
 		mutex.lock()
-		var ops:Array = []
+		var ops:Array = Array()
 		for i in operations:
 			if i and i is Dictionary:
 				i["request_id"] = request_id
@@ -8500,9 +8500,9 @@ class _Threading:
 				added_op += 1
 		if added_op < 1:
 			mutex.unlock()
-			return []
+			return Array()
 		semaphore_store[request_id] = [added_op,semaphore]
-		thread_return[request_id] = []
+		thread_return[request_id] = Array()
 		for thread in available_threads:
 			if ops:
 				if not thread.get_running():
@@ -8523,7 +8523,7 @@ class _Threading:
 		if use_single_thread:
 			if log_info:pointers.l("Requesting single thread operation, but using main thread",log_header)
 			var current_object:Object = operation.get("object",null)
-			var args:Array = operation.get("args",[])
+			var args:Array = operation.get("args",Array())
 			var current_method_call:String = operation.get("method","")
 			if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
 				var op = current_object.callv(current_method_call,args)
@@ -8542,9 +8542,9 @@ class _Threading:
 			operation["not_async"] = true
 		else:
 			mutex.unlock()
-			return []
+			return Array()
 		semaphore_store[request_id] = [1,semaphore]
-		thread_return[request_id] = []
+		thread_return[request_id] = Array()
 		var needs_queue:bool = true
 		for thread in available_threads:
 			if not thread.get_running():
@@ -8570,7 +8570,7 @@ class _Threading:
 			var out:int = OK
 			for next_op in operations:
 				var current_object:Object = next_op.get("object",null)
-				var args:Array = next_op.get("args",[])
+				var args:Array = next_op.get("args",Array())
 				var current_method_call:String = next_op.get("method","")
 				if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
 					current_object.callv(current_method_call,args)
@@ -8585,7 +8585,7 @@ class _Threading:
 		var semaphore:Semaphore = Semaphore.new()
 		var added_op:int = 0
 		mutex.lock()
-		var ops:Array = []
+		var ops:Array = Array()
 		for i in operations:
 			if i and i is Dictionary:
 				i["request_id"] = request_id
@@ -8596,7 +8596,7 @@ class _Threading:
 			mutex.unlock()
 			return ERR_UNCONFIGURED
 		semaphore_store[request_id] = [added_op,semaphore]
-		thread_return[request_id] = []
+		thread_return[request_id] = Array()
 		for thread in available_threads:
 			if ops:
 				if not thread.get_running():
@@ -8612,7 +8612,7 @@ class _Threading:
 		if use_single_thread:
 			if log_info:pointers.l("Requesting single thread operation, but using main thread",log_header)
 			var current_object:Object = operation.get("object",null)
-			var args:Array = operation.get("args",[])
+			var args:Array = operation.get("args",Array())
 			var current_method_call:String = operation.get("method","")
 			if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
 				current_object.callv(current_method_call,args)
@@ -8632,7 +8632,7 @@ class _Threading:
 			mutex.unlock()
 			return ERR_UNCONFIGURED
 		semaphore_store[request_id] = [1,semaphore]
-		thread_return[request_id] = []
+		thread_return[request_id] = Array()
 		if thread_queue.size() > max_queue:
 			return ERR_UNCONFIGURED
 		var needs_queue:bool = true
@@ -8721,7 +8721,7 @@ class _Threading:
 				var not_async:bool = next_op["not_async"]
 				var current_thread_id:int = next_op["request_id"]
 				var current_object:Object = next_op.get("object",null)
-				var args:Array = next_op.get("args",[])
+				var args:Array = next_op.get("args",Array())
 				var current_method_call:String = next_op.get("method","")
 				next_op = null
 				mutex.unlock()
@@ -8863,7 +8863,7 @@ class _Tokenizer:
 	
 
 class _Translations:
-	const non_static = {}
+	const non_static = Dictionary()
 	func _init(c):
 		non_static["pointers"] = c
 		non_static["self"] = self
@@ -8876,7 +8876,7 @@ class _Translations:
 		var fileName : String = path.get_file()
 		pointers.l("Adding translations from [%s] in [%s]" % [fileName, path.split(fileName)[0]],log_header)
 		file.open(path, File.READ)
-		var translations : Array = []
+		var translations : Array = Array()
 		var translationCount:int = 0
 		var csvLine : PoolStringArray = file.get_line().split(delim)
 		if fullLogging:
@@ -8914,7 +8914,7 @@ class _Translations:
 	static func __updateTL_from_dictionary(path:Dictionary, fullLogging:bool = true):
 		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.l("Adding translations from dictionary: %d" % path.hash(),log_header)
-		var translations : Array = []
+		var translations : Array = Array()
 		var translationCount:int = 0
 		if "file" in path:
 			var file_paths : String = path["file"]
@@ -8977,8 +8977,8 @@ class _Translations:
 	
 	static func __translation_file_to_dictionary(path : String, delimiter : String = "|", fullLogging : bool = true) -> Dictionary:
 		if not Directory.new().file_exists(path):
-			return {}
-		var dictionary:Dictionary = {}
+			return Dictionary()
+		var dictionary:Dictionary = Dictionary()
 		var file:File = File.new()
 		file.open(path,File.READ)
 		var lines:PoolStringArray = file.get_as_text(true).split("\n")
@@ -8987,10 +8987,10 @@ class _Translations:
 		var lang_data:String = lines[0]
 		var language_lines:PoolStringArray = lang_data.split(delimiter)
 		if not language_lines[0] == "locale":
-			return {}
+			return Dictionary()
 		if language_lines.size() < 2:
-			return {}
-		var languages:Array = []
+			return Dictionary()
+		var languages:Array = Array()
 		var lsize:int = language_lines.size()
 		var lindex:int = 1
 		while lindex < lsize:
@@ -8998,7 +8998,7 @@ class _Translations:
 			lindex += 1
 		
 		for lang in languages:
-			dictionary[lang] = {}
+			dictionary[lang] = Dictionary()
 		var translation_count:int = 0
 		var size:int = lines.size()
 		var index:int = 1
@@ -9044,9 +9044,9 @@ class _Translations:
 		var fullLogging:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","full_logging",false)
 		var markPlaceholders:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","mark_placeholder_translations",false)
 		TranslationServer.clear()
-		var processes:Array = []
+		var processes:Array = Array()
 		for mod in pointers.DriverManagement.__get_specific_driver_type("REPLACE_TRANSLATIONS.gd"):
-			var tl:Dictionary = mod.get("TRANSLATIONS",{})
+			var tl:Dictionary = mod.get("TRANSLATIONS",Dictionary())
 			if tl:
 				processes.append({"object":base,"method":"process_drivers_for_translations","args":[tl,markPlaceholders,pointers]})
 		# April Fool's alcohol!
@@ -9055,7 +9055,7 @@ class _Translations:
 			var alocol:Translation = Translation.new()
 			alocol.add_message("H2O","C2H6O")
 			TranslationServer.add_translation(alocol)
-		var ml_check_data:Dictionary = {}
+		var ml_check_data:Dictionary = Dictionary()
 		var trl:Array = pointers.Threading.__request_multiple_threads(processes)
 		for item in trl:
 			for lang in item.keys():
@@ -9069,7 +9069,7 @@ class _Translations:
 		file.open("user://cache/translation_check_data.json",File.WRITE)
 		file.store_string(JSON.print(ml_check_data,"\t"))
 		file.close()
-		var add_v_tl:Array = []
+		var add_v_tl:Array = Array()
 		var rl = ClassDB.instance("_ResourceLoader")
 		for i in ProjectSettings.get_setting("locale/translations"):
 			add_v_tl.append({"object":rl,"method":"load","args":[i,"Translation",true]})
@@ -9078,7 +9078,7 @@ class _Translations:
 		pointers.SafeMode.__handle_exit_for_file_checks()
 	
 	static func process_drivers_for_translations(translations:Dictionary,markPlaceholders:bool,pointers:HevLibPointers):
-		var check_data:Dictionary = {}
+		var check_data:Dictionary = Dictionary()
 		var master_locale:String = ""
 		if "master_locale" in translations:
 			master_locale = translations["master_locale"]
@@ -9099,7 +9099,7 @@ class _Translations:
 					var dict:Dictionary = __translation_file_to_dictionary(tl,delim)
 					for lang in dict:
 						if not lang in translations:
-							translations[lang] = {}
+							translations[lang] = Dictionary()
 						translations[lang].merge(dict[lang],true)
 			translations.erase("file")
 		for language in translations:
@@ -9110,7 +9110,7 @@ class _Translations:
 			var mlt = null
 			if master_locale and language != master_locale:
 				if not language in check_data:
-					check_data[language] = {"needs_updating":[],"needs_updating_size":0,"not_in_master":[],"not_in_master_size":0,"missing_translations":[],"missing_translations_size":0,"placeholders":[],"placeholders_size":0}
+					check_data[language] = {"needs_updating":Array(),"needs_updating_size":0,"not_in_master":Array(),"not_in_master_size":0,"missing_translations":Array(),"missing_translations_size":0,"placeholders":Array(),"placeholders_size":0}
 				check_ml = true
 				mlt = translations[master_locale]
 				if lang.size() < mlt.size():
@@ -9135,7 +9135,7 @@ class _Translations:
 							check_data[language]["not_in_master_size"] += 1
 					if "placeholder" in v and v.placeholder:
 						if not language in check_data:
-							check_data[language] = {"placeholders":[],"placeholders_size":0}
+							check_data[language] = {"placeholders":Array(),"placeholders_size":0}
 						check_data[language]["placeholders"].append(t)
 						check_data[language]["placeholders_size"] += 1
 						if markPlaceholders:
@@ -9146,13 +9146,13 @@ class _Translations:
 
 
 class _WebTranslate:
-	const non_static = {}
+	const non_static = Dictionary()
 	func _init(f):
 		non_static["pointers"] = f
 	
 	const log_header = "pointers.WebTranslate"
 	
-	func __webtranslate(URL: String, fallback: Array = [], file_check: String = ""):
+	func __webtranslate(URL: String, fallback: Array = Array(), file_check: String = ""):
 		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.l("Fetching translations from %s" % URL,log_header)
 		var HevLib = load("res://HevLib/webtranslate/FetchGithubData.tscn").instance()
@@ -9164,7 +9164,7 @@ class _WebTranslate:
 		var timeConcat = tSpl[0] + "-" + tSpl[1] + "-" + tSpl[2]
 		var timestamp = "~" + date + "~" + timeConcat
 		var nodes = pms.get_children()
-		var names = []
+		var names = Array()
 		for node in nodes:
 			var name = node.name
 			if name.begins_with("FetchGithubData"):
@@ -9210,7 +9210,7 @@ class _WebTranslate:
 			did = pointers.__recursive_delete(folder_to_delete)
 		return did
 	
-	func __webtranslate_timed(URL: String, MINUTES_DELAY: int, fallback: Array = [], file_check: String = ""):
+	func __webtranslate_timed(URL: String, MINUTES_DELAY: int, fallback: Array = Array(), file_check: String = ""):
 		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.l("function 'webtranslate_timed' initiated, starting constant translation of [%s] with a delay of [%s] minutes" % [URL,MINUTES_DELAY],log_header)
 		var handleNode = load("res://HevLib/webtranslate/WebtranslateTimerHandler.tscn").instance()
@@ -9222,7 +9222,7 @@ class _WebTranslate:
 		pointers.add_child(handleNode)
 
 class _Zip:
-	const non_static = {}
+	const non_static = Dictionary()
 	func _init(p):
 		non_static["pointers"] = p
 	
@@ -9235,7 +9235,7 @@ class _Zip:
 		var dir:Directory = Directory.new()
 		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.l("Loading PCK @ %s, fetching only filenames? [%s]" % [file_path,only_filenames],log_header)
-		var Contents:Dictionary = {}
+		var Contents:Dictionary = Dictionary()
 		var Files:PoolStringArray = PoolStringArray()
 		file.open(file_path,File.READ)
 		file.seek(0)
@@ -9299,7 +9299,7 @@ class _Zip:
 		for i in desired_file_names.size():
 			desired_file_names[i] = desired_file_names[i].to_lower()
 		var miniz:MINIZ = __get_miniz_object()
-		var listOfNames:Dictionary = {}
+		var listOfNames:Dictionary = Dictionary()
 		miniz.open_read(path)
 		for d in miniz.list_files():
 			var df:String = d.to_lower().get_file()
