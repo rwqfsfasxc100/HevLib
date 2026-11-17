@@ -111,7 +111,14 @@
 54=* A restart is now no longer needed when starting from a fresh config file when ran from the editor
 55=* Config updates now happen during the logging tick, rather than every physics frame.
 56=* Improved typing of empty arrays and dictionaries to provide a performance boost.
-60=* Updated credits
+57=* Fixed issue where flare position modifications for procedural thrusters were not being applied
+58=* Improved efficiency of the generation of procedural thrusters
+59=* Thruster colour modifications now are performed directly by the thruster itself, rather than its parent slot.
+59.1=* This prevents issues with lower-end devices would not have the colour change due to it being applied before the thruster was completely setup
+60=* Thruster colour modifications are now applied to the exhaust plume
+60.1=* Prevents the still-white plume from showing when the thruster is running on very low output (most notably variable thrust thrusters)
+60.2=* This provides a greater amount of colour fidelity, and improves interactions with HDR
+65=* Updated credits
 
 [1.17.8]
 

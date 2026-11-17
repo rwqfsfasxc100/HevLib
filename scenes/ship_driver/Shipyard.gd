@@ -56,8 +56,7 @@ func _ready():
 	yield(syPointers,"process_tick")
 	hl_shipdriver_resetter_timeout()
 	for tag in sys_slot_refs.keys():
-		var equipment:String = sys_slot_refs[tag]
-		for item in equipment:
+		for item in sys_slot_refs[tag]:
 			if not item in inverted_sys_slot_refs:
 				inverted_sys_slot_refs[item] = [tag]
 			elif not tag in inverted_sys_slot_refs[item]:
@@ -106,8 +105,8 @@ func _ready():
 					usedShipConfigs[ship_name].append(cfg)
 	for ship_name in alternates:
 		var usedConfigs:Array = Array()
-		for a in alternates[ship_name].keys():
-			var cfgalias = getShipAlias(a)
+		for a in alternates[ship_name]:
+			var cfgalias:String = getShipAlias(a)
 			if a in defaultShipConfig:
 				var cf:Dictionary = defaultShipConfig[a]
 				if "config" in cf:
@@ -236,9 +235,10 @@ func hl_shipyard_shipdriver_update():
 
 func hl_shipdriver_resetter_timeout():
 	for ship in ships:
+		var ship_path:String = ships[ship].resource_path
 		Tool.remove(ships[ship])
 		ships[ship] = null
-		ships[ship] = ResourceLoader.load(ships[ship].resource_path,"PackedScene")
+		ships[ship] = ResourceLoader.load(ship_path,"PackedScene")
 
 const wraparound:int = 0x0000FFFFFFFFFFFF
 

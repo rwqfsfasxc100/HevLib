@@ -213,7 +213,7 @@ func fetch_mod_updates():
 			var cm:int=curr.version_major
 			var cn:int=curr.version_minor
 			var cb:int=curr.version_bugfix
-			var ood:bool=true
+			var ood:bool=false
 			if major>cm:if(minor>0||bugfix>3||abs(major-cm)>1):ood=true
 			elif minor>cn:if(bugfix>cb+3||abs(minor-cn)>1):ood=true
 			elif bugfix>cb+9:ood=true
@@ -3621,46 +3621,32 @@ script = ExtResource( 5 )"""
 		thruster_vars += "\n" + "modulate = Color( %f , %f , %f , %f )" % [modulate.r,modulate.g,modulate.b,modulate.a]
 		var self_modulate:Color = Color(data.get("self_modulate",Color(1,1,1,0)))
 		thruster_vars += "\n" + "self_modulate = Color( %f , %f , %f , %f )" % [self_modulate.r,self_modulate.g,self_modulate.b,self_modulate.a]
-		var offset:Vector2 = Vector2(-32,-16)
-		var po = data.get("plume_offset",[-32,-16])
+		var po = data.get("plume_offset",Vector2(-32,-16))
 		if (po is Vector2) or ((po is Array or po is PoolIntArray or po is PoolRealArray) and po.size() > 1):
-			offset[0] = po[0]
-			offset[1] = po[1]
-		thruster_vars += "\n" + "offset = Vector2( %f , %f )" % [offset.x,offset.y]
+			thruster_vars += "\n" + "offset = Vector2( %f , %f )" % [po[0],po[1]]
 		thruster_vars += "\n" + "centered = " + ("true" if data.get("plume_centered",false) else "false")
 		thruster_vars += "\n" + "flip_h = " + ("true" if data.get("plume_flip_h",false) else "false")
 		thruster_vars += "\n" + "flip_v = " + ("true" if data.get("plume_flip_v",false) else "false")
 		thruster_vars += "\n" + "hframes = %d" % int(data.get("plume_horizontal_frames",8))
 		thruster_vars += "\n" + "vframes = %d" % int(data.get("plume_vertical_frames",1))
 		thruster_vars += "\n" + "frame = %d" % data.get("plume_frame",1)
-		var frame_coords:Vector2 = Vector2.RIGHT
-		var plumeFrameCoords = data.get("plume_frame_coords",frame_coords)
+		var plumeFrameCoords = data.get("plume_frame_coords",Vector2.RIGHT)
 		if (plumeFrameCoords is Vector2) or (plumeFrameCoords is Array and plumeFrameCoords.size() > 1):
-			frame_coords[0] = plumeFrameCoords[0]
-			frame_coords[1] = plumeFrameCoords[1]
-		thruster_vars += "\n" + "frame_coords = Vector2( %f , %f )" % [frame_coords.x,frame_coords.y]
+			thruster_vars += "\n" + "frame_coords = Vector2( %f , %f )" % [plumeFrameCoords[0],plumeFrameCoords[1]]
 		thruster_vars += "\n" + "region_enabled = " + ("true" if data.get("plume_region_enabled",false) else "false")
-		var region_rect:Rect2 = Rect2(0,0,0,0)
 		var plRect = data.get("plume_region_rect",Rect2(0,0,0,0))
 		if (plRect is Array or plRect is PoolIntArray or plRect is PoolRealArray) and plRect.size() > 3:
-			region_rect = Rect2(plRect[0],plRect[1],plRect[2],plRect[3])
+			thruster_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [plRect[0],plRect[1],plRect[2],plRect[3]]
 		elif plRect is Rect2:
-			region_rect = plRect
-		thruster_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [region_rect.position.x,region_rect.position.y,region_rect.size.x,region_rect.size.y]
+			thruster_vars += "\n" + "region_rect = Rect2( %f , %f , %f , %f )" % [plRect.position.x,plRect.position.y,plRect.size.x,plRect.size.y]
 		thruster_vars += "\n" + "region_filter_clip = " + ("true" if data.get("plume_region_filter_clip",false) else "false")
-		var position:Vector2 = Vector2(0,-3)
-		var tp = data.get("position",position)
+		var tp = data.get("position",Vector2(0,-3))
 		if tp is Vector2 or ((tp is Array or tp is PoolIntArray or tp is PoolRealArray) and tp.size() > 1):
-			position[0] = tp[0]
-			position[1] = tp[1]
-		thruster_vars += "\n" + "position = Vector2( %f , %f )" % [position.x,position.y]
+			thruster_vars += "\n" + "position = Vector2( %f , %f )" % [tp[0],tp[1]]
 		thruster_vars += "\n" + "rotation = %f" % deg2rad(data.get("rotation",0))
-		var scale:Vector2 = Vector2(0.2,0.2) if aux_type == "RCS" else Vector2(0.939,1.395)
-		var ts = data.get("scale",scale)
+		var ts = data.get("scale",Vector2(0.2,0.2) if aux_type == "RCS" else Vector2(0.939,1.395))
 		if ts is Vector2 or ((ts is Array or ts is PoolIntArray or ts is PoolRealArray) and ts.size() > 1):
-			scale[0] = ts[0]
-			scale[1] = ts[1]
-		thruster_vars += "\n" + "scale = Vector2( %f , %f )" % [scale.x,scale.y]
+			thruster_vars += "\n" + "scale = Vector2( %f , %f )" % [ts[0],ts[1]]
 		
 		var flare_vars : String = flare_header
 		# Flare programming
@@ -3680,17 +3666,12 @@ script = ExtResource( 5 )"""
 		flare_vars += "\n" + "offset = Vector2( %f , %f )" % [flare_offset.x,flare_offset.y]
 		flare_vars += "\n" + "texture_scale = %f" % data.get("flare_texture_scale",6)
 		flare_vars += "\n" + "rotation = %f" % deg2rad(data.get("flare_rotation",0))
-		var flare_position:Vector2 = Vector2.ZERO
 		var fp = data.get("flare_position",Vector2.ZERO)
 		if fp is Vector2 or ((fp is Array or fp is PoolIntArray or fp is PoolRealArray) and fp.size() > 1):
-			flare_position[0] = fp[0]
-			flare_position[1] = fp[1]
-		var flare_scale:Vector2 = Vector2.ONE
+			flare_vars += "\n" + "position = Vector2( %f , %f )" % [fp[0],fp[1]]
 		var fs = data.get("flare_scale",Vector2.ONE)
 		if fs is Vector2 or ((fs is Array or fs is PoolIntArray or fs is PoolRealArray) and fs.size() > 1):
-			flare_scale[0] = fs[0]
-			flare_scale[1] = fs[1]
-		flare_vars += "\n" + "scale = Vector2( %f , %f )" % [flare_scale.x,flare_scale.y]
+			flare_vars += "\n" + "scale = Vector2( %f , %f )" % [fs[0],fs[1]]
 		var flare_color:Color = Color(data.get("flare_color","3bafff"))
 		flare_vars += "\n" + "color = Color( %f , %f , %f , %f )" % [flare_color.r, flare_color.g, flare_color.b, flare_color.a]
 		
@@ -3942,8 +3923,7 @@ script = ExtResource( 5 )"""
 		if heat_scale is Vector2 or ((heat_scale is Array or heat_scale is PoolIntArray or heat_scale is PoolRealArray) and heat_scale.size() > 1):
 			nozzle_vars += "\n" + "scale = Vector2( %f , %f )" % [heat_scale[0],heat_scale[1]]
 		
-		var out : Array = [nozzle_vars,current_ext,ext_entries]
-		return out
+		return [nozzle_vars,current_ext,ext_entries]
 	
 	const nozzle_template = {
 		"peak_temperature":2500.0,
@@ -3993,7 +3973,7 @@ script = ExtResource( 5 )"""
 	func set_array_to_vector_or_rect(main,setter):
 		if setter is PoolIntArray or setter is PoolRealArray or setter is Array:
 			if main is Vector2:
-					return Vector2(setter[0],setter[1])
+				return Vector2(setter[0],setter[1])
 			elif main is Vector3:
 				return Vector3(setter[0],setter[1],setter[2])
 			elif main is Rect2:
@@ -6948,6 +6928,7 @@ class _ManifestV2:
 			[1, "res://HevLib/scenes/equipment/SystemBuyUI.gd", -INF, "res://enceladus/SystemBuyUI.gd"],
 			[1, "res://HevLib/scenes/equipment/UpgradeGroup.gd", -INF, "res://enceladus/UpgradeGroup.gd"],
 			[1, "res://HevLib/scenes/equipment/ThrusterSlot.gd", -INF, "res://ships/modules/ThrusterSlot.gd"],
+			[1, "res://HevLib/scenes/equipment/thruster.gd", -INF, "res://sfx/thruster.gd"],
 			[1, "res://HevLib/scenes/weaponslot/weapon_slot_handler.gd", -INF, "res://ships/WeaponSlot.gd"],
 			[1, "res://HevLib/scenes/equipment/ShipModificationDriver/AddNodes.gd", -INF, "res://ships/ship-ctrl.gd"],
 			[1, "res://HevLib/scenes/equipment/ShipModificationDriver/InternalStorageMod.gd", -INF, "res://ships/ship-ctrl.gd"],
@@ -7466,22 +7447,23 @@ class _NodeAccess:
 	
 	static func __exit(restart : bool = false, exit_message : String = "", exit_header : String = "", delay : float = 0.0,exit_url : String = "",use_os_error_message : bool = false):
 		var pointers:HevLibPointers = non_static["pointers"]
+		if restart:pointers.l(("restarting with message: %s" % exit_message) if exit_message else "exiting with restart",(exit_header) if (exit_header) else log_header)
+		else:pointers.l(("exiting with message: %s" % exit_message) if exit_message else "exiting",(exit_header) if (exit_header) else log_header)
 		if delay > 0.0 and pointers.is_inside_tree():
 			pointers.get_tree().create_timer(delay).connect("timeout",non_static["self"],"__exit",[restart,exit_message,exit_header,0.0,exit_url,use_os_error_message])
-		else:
-			if use_os_error_message and exit_message:
-				OS.alert(exit_message,exit_header)
-			if restart:
-				pointers.l(("restarting with message: %s" % exit_message) if exit_message else "exiting with restart",(exit_header) if (exit_header) else log_header)
-				OS.execute(OS.get_executable_path(), OS.get_cmdline_args(), false)
-			else: pointers.l(("exiting with message: %s" % exit_message) if exit_message else "exiting",(exit_header) if (exit_header) else log_header)
-			Debug.batchWrite()
-			pointers.storeLogCache()
-			if exit_url and pointers.DataFormat.__is_valid_url(exit_url):
-				OS.shell_open(exit_url)
-			if pointers.is_inside_tree():
-				yield(pointers,"process_tick")
-			OS.kill(OS.get_process_id())
+			return
+		if use_os_error_message and exit_message:
+			OS.alert(exit_message,exit_header)
+		Debug.batchWrite()
+		pointers.storeLogCache()
+		if restart:
+			OS.execute(OS.get_executable_path(), OS.get_cmdline_args(), false)
+			return
+		if exit_url and pointers.DataFormat.__is_valid_url(exit_url):
+			OS.shell_open(exit_url)
+		if pointers.is_inside_tree():
+			yield(pointers,"process_tick")
+		OS.kill(OS.get_process_id())
 	
 	const scene_extensions = PoolStringArray(["tscn","scn"])
 	

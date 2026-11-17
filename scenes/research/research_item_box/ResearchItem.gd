@@ -137,7 +137,7 @@ func initialize():
 		"isolated":
 			
 			var show_when = this_research_project.get("show_when")
-			var tasks = this_research_project.get("tasks",[])
+			var tasks = this_research_project.get("tasks",Array())
 			var initiation_price = this_research_project.get("initiation_price",100000)
 			
 			var unlock_story = this_research_project.get("unlock_story","")
@@ -204,26 +204,21 @@ func initialize():
 	if pointers.FileAccess.__file_exists(display_path):
 		match display_mode:
 			"sprite":
-				match display_path.get_extension().to_lower():
-					"png","jpg","jpeg","bmp","webp":
-						sprite_container.texture = pointers.FileAccess.__load_png(display_path)
-						sprite_container.visible = true
-						scene_container.visible = false
-					"stex":
-						var tex = StreamTexture.new()
-						tex.load_path = display_path
-						sprite_container.texture = tex
-						sprite_container.visible = true
-						scene_container.visible = false
-					_:
-						sprite_fallback = true
+				if display_path.get_extension().to_lower() in pointers.SUPPORTED_IMAGE_EXTENSIONS:
+					sprite_container.texture = pointers.FileAccess.__load_png(display_path)
+					sprite_container.visible = true
+					scene_container.visible = false
+				else:
+					sprite_fallback = true
 			"scene":
 				var scene = load(display_path)
 				if scene is PackedScene:
 					var inst = scene.instance()
 					var display_positioning = this_research_project.get("display_positioning",{})
-					var scale = display_positioning.get("scale",Vector2.ONE)
-					scene_offset.position = display_positioning.get("position",Vector2.ZERO) * scale
+					var scale_raw:Array = display_positioning.get("scale",[1,1])
+					var position_raw:Array = display_positioning.get("position",[0,0])
+					var scale:Vector2 = Vector2(scale_raw[0],scale_raw[1])
+					scene_offset.position = Vector2(position_raw[0],position_raw[1]) * scale
 					scene_offset.rotation = deg2rad(display_positioning.get("rotation",0.0))
 					scene_offset.scale = scale
 					pointers.NodeAccess.__remove_scripts(inst)
@@ -250,7 +245,7 @@ func exit():
 func getStory(story):
 	return int(CurrentGame.state.story.get(story, -1))
 
-var default_vp_positioning = {"position":Vector2(0,0),"rotation":90,"scale":Vector2(1,1)}
+var default_vp_positioning = {"position":[0,0],"rotation":90,"scale":[1,1]}
 
 func update_progress():
 	pass
@@ -262,7 +257,7 @@ func is_finished() -> bool:
 				return true
 		"isolated":
 			var failed = false
-			for task in this_research_project.get("tasks",[]):
+			for task in this_research_project.get("tasks",Array()):
 				match task.get("mode",""):
 					"story":
 						if getStory(task.get("story_flag","")) != task.get("story_max",1000):
@@ -305,14 +300,13 @@ func show_initiation_price():
 
 func recheck_vis():
 	if is_visible_in_tree():
-		var project_state = this_research_project.get("state",{})
+		var project_state = this_research_project.get("state",Dictionary())
 		start_container.visible = !(project_state.active or project_state.completed)
 		
 		
 		
 		if mark_for_completion:
-			var state = this_research_project.get("state",{})
-			if state.completed:
+			if project_state.completed:
 				icon_anim.stop()
 				$Icon/PanelContainer.self_modulate = Color(0,1,0,1)
 			else:

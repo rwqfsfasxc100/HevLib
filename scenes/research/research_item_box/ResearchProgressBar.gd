@@ -109,8 +109,7 @@ func set_progress():
 
 
 func _on_value_changed(how:float):
-	var value = int(clamp(how / (story_max - story_min),0,1) * 100)
-	$Button.text = "%d%%" % value
+	$Button.text = "%d%%" % int(clamp(how / (story_max - story_min),0,1) * 100)
 
 
 

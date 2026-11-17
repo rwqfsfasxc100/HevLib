@@ -285,6 +285,8 @@ func testing(modLoader:ModLoader,pointers):
 	var file:File = File.new()
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
 	
+	
+	
 	var t1=Time.get_ticks_usec()
 	for i in 100000:
 		pass

@@ -51,6 +51,7 @@ var aux_type : String = "MPDG"
 func loadPlaceholder():
 	hl_thrusterslot_modify()
 	.loadPlaceholder()
+var thruster_item:Node = null
 
 func hl_thrusterslot_modify():
 	var datastore:Dictionary = itsPointers.Equipment.auxslot_data
@@ -69,7 +70,6 @@ func hl_thrusterslot_modify():
 					aux_type = "TORCH"
 				"HYBRID":
 					aux_type = "AUX_HYBRID"
-			var item
 			if currentInstall == data.get("system","SYSTEM_NAME_MISSING"):
 				if itsPointers:
 					if not itsPointers.ConfigDriver.__validate_dictionary(data):
@@ -78,86 +78,85 @@ func hl_thrusterslot_modify():
 				if aux_path:
 					if itsPointers.DataFormat.__load_if_can(aux_path):
 						valid_scene = true
-						item = itsPointers.DataFormat.__get_load().instance()
+						thruster_item = itsPointers.DataFormat.__get_load().instance()
 					else:
 						itsPointers.l("ERROR: Failed to load custom thruster/aux scene at [%s], falling back to default of unit type (if possible)" % aux_path,"ThrusterSlotDriver")
 				if not valid_scene:
 					match aux_type:
 						"MPDG":
-							item = load(mpdg).instance()
+							thruster_item = load(mpdg).instance()
 						"SMES":
-							item = load(smes).instance()
+							thruster_item = load(smes).instance()
 						"AUX_HYBRID":
-							item = load(aux_hybrid).instance()
+							thruster_item = load(aux_hybrid).instance()
 						"RCS","TORCH":
 							var thrusterScene:String = exhaust_cache_path + aux_type + "/" + currentInstall + "_thruster.tscn"
 							if itsPointers.DataFormat.__load_if_can(thrusterScene):
-								item = itsPointers.DataFormat.__get_load().instance()
+								thruster_item = itsPointers.DataFormat.__get_load().instance()
 							else:
 								itsPointers.l("ERROR: Failed to load thruster at [%s], falling back to default thruster scene" % thrusterScene,"ThrusterSlotDriver")
-								item = load(thruster).instance()
+								thruster_item = load(thruster).instance()
 				
-				item.name = currentInstall
+				thruster_item.name = currentInstall
 				if not valid_scene:
-					item.command = data.get("command","m" if aux_type == "TORCH" else "")
-					item.systemName = currentInstall
-					item.mass = data.get("mass",0)
+					thruster_item.command = data.get("command","m" if aux_type == "TORCH" else "")
+					thruster_item.systemName = currentInstall
+					thruster_item.mass = data.get("mass",0)
 					
 					match aux_type:
 						"MPDG":
-							item.repairReplacementPrice = data.get("price",30000)
-							item.repairReplacementTime = data.get("repair_time",1)
-							item.repairFixPrice = data.get("fix_price",5000)
-							item.repairFixTime = data.get("fix_time",4)
-							item.thermal = data.get("thermal",500000.0)
-							item.windupTime = data.get("windup_time",2)
+							thruster_item.repairReplacementPrice = data.get("price",30000)
+							thruster_item.repairReplacementTime = data.get("repair_time",1)
+							thruster_item.repairFixPrice = data.get("fix_price",5000)
+							thruster_item.repairFixTime = data.get("fix_time",4)
+							thruster_item.thermal = data.get("thermal",500000.0)
+							thruster_item.windupTime = data.get("windup_time",2)
 							
-							item.powerSupply = data.get("power_supply",350000.0)
-							item.powerDraw = data.get("power_draw",50000.0)
+							thruster_item.powerSupply = data.get("power_supply",350000.0)
+							thruster_item.powerDraw = data.get("power_draw",50000.0)
 						"SMES":
 							
-							item.capacitorRatio = data.get("capacitor_ratio",0.9)
-							item.capacity = data.get("capacity",600000.0)
-							item.switchTime = data.get("switch_time",2)
+							thruster_item.capacitorRatio = data.get("capacitor_ratio",0.9)
+							thruster_item.capacity = data.get("capacity",600000.0)
+							thruster_item.switchTime = data.get("switch_time",2)
 							
-							item.powerSupply = data.get("power_supply",200000.0)
-							item.powerDraw = data.get("power_draw",50000.0)
-							item.repairReplacementPrice = data.get("price",40000)
-							item.repairReplacementTime = data.get("repair_time",1)
-							item.repairFixPrice = data.get("fix_price",25000)
-							item.repairFixTime = data.get("fix_time",4)
+							thruster_item.powerSupply = data.get("power_supply",200000.0)
+							thruster_item.powerDraw = data.get("power_draw",50000.0)
+							thruster_item.repairReplacementPrice = data.get("price",40000)
+							thruster_item.repairReplacementTime = data.get("repair_time",1)
+							thruster_item.repairFixPrice = data.get("fix_price",25000)
+							thruster_item.repairFixTime = data.get("fix_time",4)
 							
 						"AUX_HYBRID":
-							item.repairReplacementPrice = data.get("price",30000)
-							item.repairReplacementTime = data.get("repair_time",1)
-							item.repairFixPrice = data.get("fix_price",5000)
-							item.repairFixTime = data.get("fix_time",4)
+							thruster_item.repairReplacementPrice = data.get("price",30000)
+							thruster_item.repairReplacementTime = data.get("repair_time",1)
+							thruster_item.repairFixPrice = data.get("fix_price",5000)
+							thruster_item.repairFixTime = data.get("fix_time",4)
 							
-							item.smesPowerSupply = data.get("smes_power_supply",200000.0)
-							item.smesPowerDraw = data.get("smes_power_draw",50000.0)
-							item.smesCapacitorRatio = data.get("smes_capacitor_ratio",0.9)
-							item.smesCapacity = data.get("smes_capacity",600000.0)
-							item.smesSwitchTime = data.get("smes_switch_time",0.1)
+							thruster_item.smesPowerSupply = data.get("smes_power_supply",200000.0)
+							thruster_item.smesPowerDraw = data.get("smes_power_draw",50000.0)
+							thruster_item.smesCapacitorRatio = data.get("smes_capacitor_ratio",0.9)
+							thruster_item.smesCapacity = data.get("smes_capacity",600000.0)
+							thruster_item.smesSwitchTime = data.get("smes_switch_time",0.1)
 							
-							item.mpdgThermal = data.get("mpdg_thermal",500000.0)
-							item.mpdgWindupTime = data.get("mpdg_windup_time",2)
-							item.mpdgPowerSupply = data.get("mpdg_power_supply",350000.0)
-							item.mpdgPowerDraw = data.get("mpdg_power_draw",50000.0)
+							thruster_item.mpdgThermal = data.get("mpdg_thermal",500000.0)
+							thruster_item.mpdgWindupTime = data.get("mpdg_windup_time",2)
+							thruster_item.mpdgPowerSupply = data.get("mpdg_power_supply",350000.0)
+							thruster_item.mpdgPowerDraw = data.get("mpdg_power_draw",50000.0)
 						
 
 				match aux_type:
 					"RCS","TORCH":
 						# KEEP THIS CODE AND MAKE IT ALWAYS AVAILABLE
-						flare = item.get_node_or_null("Flare")
-						if flare:
-							var color_override = data.get("flare_override_color","")
-							if color_override:
-								fco = Color(color_override)
-								change_color = true
+						var color_override = data.get("flare_override_color","")
+						if color_override:
+							fco = Color(color_override)
+							change_color = true
+						hl_thrusterslot_get_colors()
 				
-				if item:
+				if thruster_item:
 					key = name + "_" + mounted
-					add_child(item)
+					add_child(thruster_item)
 					systemName = _getSystemName()
 					slotName = type
 					repairFixPrice = _getRepairFixPrice()
@@ -165,15 +164,7 @@ func hl_thrusterslot_modify():
 					repairReplacementPrice = _repairReplacementPrice()
 					repairReplacementTime = _repairReplacementTime()
 					mass = _getMass()
-	hl_thrusterslot_get_colors()
-
-func hl_thrusterslot_recolor():
-	if not flare:
-		for node in get_children():
-			if node.name.begins_with(name + "_"):
-				flare = node.get_node_or_null("Flare")
-	if flare:
-		flare.color = fco
+	
 
 func hl_thrusterslot_get_colors():
 	var color_data:Dictionary = itsPointers.Equipment.ship_thruster_colors
@@ -187,8 +178,7 @@ func hl_thrusterslot_get_colors():
 		if i == shipName:
 			hl_thrusterslot_modify_colors(d)
 	if change_color:
-		yield(itsPointers,"physics_process_tick")
-		call_deferred("hl_thrusterslot_recolor")
+		thruster_item.hl_exhaust_color_modification = fco
 
 func hl_thrusterslot_modify_colors(data):
 	if "type" in data:

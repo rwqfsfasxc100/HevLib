@@ -80,9 +80,10 @@ func init_research_on_save_load():
 		var mod_store:Dictionary = research_store[mod]
 		for entry in mod_store:
 			var research_entry:Dictionary = mod_store[entry].duplicate(true)
-			var mode:String = research_entry.mode
 			var id:String = research_entry["uid"]
 			if id in research_project_ids:
+				research_entry = research_state[id]
+				var mode:String = research_entry.mode
 				var rs:Dictionary = research_entry.state
 				if rs.completed:
 					complete_projects.append(research_entry)
@@ -104,6 +105,7 @@ func init_research_on_save_load():
 					"completed":false,
 				}
 				research_state[id] = research_entry
+				var mode:String = research_entry.mode
 				if research_entry.mode == "story_only":
 					var story:int = getStory(research_entry.story_flag)
 					if story > -1 and story < research_entry.progress_complete:
