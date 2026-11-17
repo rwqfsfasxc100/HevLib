@@ -260,12 +260,8 @@ var resource_path:String = ""
 var version_string:String = ""
 func _init(r,e,v,wbtl):
 	name = "HevLib~Pointers"
-	version_string = v
-	resource_path = r
-	equipment_modmain = e
-	webtranslate_modmain = wbtl
-	var hl_header:String = "HevLib %s" % version_string
-	l("Initializing pointers",hl_header)
+	version_string = v;resource_path = r;equipment_modmain = e;webtranslate_modmain = wbtl
+	l("Initializing pointers")
 	if Threading.require_single_threading:
 		l("2 or fewer logical CPU cores detected, forcing single thread mode.","pointers.Threading")
 	else:
@@ -279,15 +275,13 @@ func _init(r,e,v,wbtl):
 	dir.make_dir_recursive("user://cache/github_list/icon_cache")
 	dir.make_dir_recursive("user://cache/github_list/downloaded_zips")
 	dir.make_dir_recursive("user://cache/Event_Driver")
-	for i in FolderAccess.__fetch_folder_files("user://cache/updates/zip_cache/",false,true):
-		dir.remove(i)
-	for i in FolderAccess.__fetch_folder_files("user://cache/github_list/downloaded_zips/",false,true):
-		dir.remove(i)
+	for i in FolderAccess.__fetch_folder_files("user://cache/updates/zip_cache/",false,true):dir.remove(i)
+	for i in FolderAccess.__fetch_folder_files("user://cache/github_list/downloaded_zips/",false,true):dir.remove(i)
 	if!file.file_exists(releases_cache)||(Time.get_unix_time_from_system()-file.get_modified_time(releases_cache))>3600:
 		file.open(releases_cache,File.WRITE)
 		file.store_string("{}")
 		file.close()
-		l("Releases cache older than an hour, clearing",hl_header)
+		l("Releases cache older than an hour, clearing")
 	file.open("user://cache/Event_Driver/event_log.json",File.WRITE)
 	file.store_string("{}")
 	file.close()
@@ -298,10 +292,8 @@ func _init(r,e,v,wbtl):
 	file.store_string("")
 	file.close()
 	
-	if dir.dir_exists("user://cache/.HevLib_Cache/"):
-		FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/")
-	if dir.dir_exists("user://cache/.Mod_Menu_2_Cache/"):
-		FolderAccess.__recursive_delete("user://cache/.Mod_Menu_2_Cache/")
+	if dir.dir_exists("user://cache/.HevLib_Cache/"):FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/")
+	if dir.dir_exists("user://cache/.Mod_Menu_2_Cache/"):FolderAccess.__recursive_delete("user://cache/.Mod_Menu_2_Cache/")
 	
 	complementary = ManifestV2.__check_complementary()
 	dependancies = ManifestV2.__check_dependancies()
@@ -310,9 +302,7 @@ func _init(r,e,v,wbtl):
 	dependancies_keys = PoolStringArray(dependancies.keys())
 	conflicts_keys = PoolStringArray(conflicts.keys())
 	
-	FileAccess.__load_precached_mods()
-	ConfigDriver.__load_configs()
-	ManifestV2.__get_mod_versions()
+	FileAccess.__load_precached_mods();ConfigDriver.__load_configs()
 	ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",Array())
 	if is_editor:
 		ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","compile",false)
@@ -1077,6 +1067,7 @@ class _ConfigDriver:
 		c.save(cfg_file)
 		c.save(profiles_dir + current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",Dictionary()).get("profile_name","Default") + ".cfg")
 		pointers.l("Loaded [%s] mod configurations" % configs.size(),log_header)
+		pointers.ManifestV2.__get_mod_versions()
 	
 	static func __get_minmax_string_from_dict(requirement:Dictionary) -> String:
 		var MID:String = requirement.get("mod_id","")
@@ -4541,6 +4532,7 @@ class _FileAccess:
 						pointers.l(newmodmsg,log_header)
 				print(exitMsg)
 				pointers.NodeAccess.__exit(true,exitMsg,log_header)
+				return
 		else:
 			file.open(updateCacheFile,File.WRITE)
 			file.store_string("[]")
