@@ -1561,7 +1561,7 @@ class _DataFormat:
 	const function_prefixes = PoolStringArray(["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func "])
 	const all_prefixes = PoolStringArray(["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func ","onready ","var ","signal ","const ","export ","extends "])
 	static func __trim_scripts(file_path : String, get_detailed_operands : bool = false, trim_unnecessary_newlines : bool = false, recurse_through_base_scripts : bool = true):
-		var scr = ResourceLoader.load(file_path,"Script")
+		var scr:Script = load(file_path)
 		if scr:
 			return __trim_script_object(scr,get_detailed_operands,trim_unnecessary_newlines,recurse_through_base_scripts)
 		return ["extends Node",Array(),Array(),Array(),Array(),Array(),Array(),Array()]
@@ -1887,7 +1887,7 @@ class _DataFormat:
 	
 	static func __replace_resource(resource_path:String, original_path:String):
 		var pointers:HevLibPointers = non_statics["pointers"]
-		if not ResourceLoader.exists(resource_path) or not ResourceLoader.exists(original_path):
+		if not (ResourceLoader.exists(resource_path) and File.new().file_exists(original_path)):
 			pointers.l("Cannot replace resource at [%s] as it either does not exist or is not visible to the engine" % resource_path,log_header)
 			return
 		pointers.l("Replacing resource at [%s] with [%s], passing to ModMain" % [original_path,resource_path],log_header)
@@ -6893,11 +6893,6 @@ class _ManifestV2:
 			__get_mod_files()
 		return cached_icon_files
 	
-	enum LOAD_TYPE{
-		EXTEND_SCRIPT = 1,
-		REPLACE_RESOURCE = 2,
-	}
-	
 	static func __load_modlets() -> void:
 		var pointers:HevLibPointers = non_static["pointers"]
 		var base:_ManifestV2 = non_static["self"]
@@ -6915,99 +6910,111 @@ class _ManifestV2:
 					"method":"process_mod_data_for_load",
 					"args":[resources,modlet,pointers,float(mod_data["priority"])]
 				})
-		var ovr:Dictionary = Dictionary()
 		var cvr:Array = [
-			[1, "res://HevLib/scenes/minerals/AstrogatorPanel.gd", -INF, "res://hud/AstrogatorPanel.gd"],
-			[1, "res://HevLib/scenes/minerals/OMS.gd", -INF, "res://hud/OMS.gd"],
-			[1, "res://HevLib/scenes/minerals/CargoScanner.gd", -INF, "res://hud/CargoScanner.gd"],
-			[1, "res://HevLib/scenes/minerals/ProcessedCargoManifest.gd", -INF, "res://hud/trtl/ProcessedCargoManifest.gd"],
-			[1, "res://HevLib/scenes/minerals/TheRing.gd", -INF, "res://TheRing.gd"],
-			[1, "res://HevLib/scenes/research/Enceladus.gd", -INF, "res://enceladus/Enceladus.gd"],
-			[1, "res://HevLib/scenes/research/overhead_handle/CurrentGame.gd", -INF, "res://CurrentGame.gd"],
-			[1, "res://HevLib/scenes/equipment/SystemShipUpgradeUI.gd", -INF, "res://enceladus/SystemShipUpgradeUI.gd"],
-			[1, "res://HevLib/scenes/equipment/SystemBuyUI.gd", -INF, "res://enceladus/SystemBuyUI.gd"],
-			[1, "res://HevLib/scenes/equipment/UpgradeGroup.gd", -INF, "res://enceladus/UpgradeGroup.gd"],
-			[1, "res://HevLib/scenes/equipment/ThrusterSlot.gd", -INF, "res://ships/modules/ThrusterSlot.gd"],
-			[1, "res://HevLib/scenes/equipment/thruster.gd", -INF, "res://sfx/thruster.gd"],
-			[1, "res://HevLib/scenes/weaponslot/weapon_slot_handler.gd", -INF, "res://ships/WeaponSlot.gd"],
-			[1, "res://HevLib/scenes/equipment/ShipModificationDriver/AddNodes.gd", -INF, "res://ships/ship-ctrl.gd"],
-			[1, "res://HevLib/scenes/equipment/ShipModificationDriver/InternalStorageMod.gd", -INF, "res://ships/ship-ctrl.gd"],
-			[1, "res://HevLib/scenes/ship_driver/Shipyard.gd", -INF, "res://ships/Shipyard.gd"],
-			[1, "res://HevLib/scenes/ship_driver/CurrentGame.gd", -INF, "res://CurrentGame.gd"],
-			[1, "user://cache/Minerals/cg.gd", -INF, "res://CurrentGame.gd"],
-			[1, "user://cache/Minerals/as.gd", -INF, "res://AsteroidSpawner.gd"],
-			[2, "user://cache/Variable_Fetch/derelict_expansion.tscn", -INF, "res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"],
-			[2, "user://cache/Variable_Fetch/upgrades.tscn", -INF, "res://enceladus/Upgrades.tscn"],
-			[2, "user://cache/Variable_Fetch/ship_limitations.tscn", -INF, "res://enceladus/Upgrades.tscn"],
-			[1, "res://HevLib/scenes/ship_driver/TheRing.gd", -INF, "res://TheRing.gd"],
-			[1, "res://HevLib/scripts/Namer.gd", -INF, "res://namer/Namer.gd"],
-			[1, "res://HevLib/events/TheRing.gd", -INF, "res://TheRing.gd"],
-			[1, "res://HevLib/events/Game.gd", -INF, "res://Game.gd"],
-			[1, "res://HevLib/events/controls/camera.gd", -INF, "res://ships/camera.gd"],
-			[1, "res://HevLib/events/controls/ship-ctrl.gd", -INF, "res://ships/ship-ctrl.gd"],
-			[1, "res://HevLib/events/controls/CurrentGame.gd", -INF, "res://CurrentGame.gd"],
-			[2, "res://HevLib/events/chaos_map/RingTelescopeView.tscn", -INF, "res://hud/components/RingTelescopeView.tscn"],
-			[1, "user://cache/Variable_Fetch/st.gd", INF, "res://Settings.gd"],
-			[1, "res://HevLib/events/custom_events/TheRing.gd", -INF, "res://TheRing.gd"],
-			[2, "res://HevLib/scenes/notification_driver/Notifications.tscn", -INF, "res://achievement/Notifications.tscn"],
-			[1, "res://HevLib/scenes/notification_driver/CurrentGame.gd", -INF, "res://CurrentGame.gd"],
-			[1, "res://HevLib/scenes/better_title_screen/SaveSlotButton.gd", -INF, "res://SaveSlotButton.gd"],
-			[1, "res://HevLib/scenes/better_title_screen/CurrentlyPlaying.gd", -INF, "res://menu/CurrentlyPlaying.gd"],
-			[1, "res://HevLib/ui/ExtensionPopup.gd", -INF, "res://menu/ExtensionPopup.gd"],
-			[1, "res://HevLib/ui/mod_menu/titlescreen/TitleMenu.gd", -INF, "res://menu/TitleMenu.gd"],
-			[1, "res://HevLib/ui/mod_menu/titlescreen/DLClist.gd", -INF, "res://tools/DLClist.gd"],
-			[1, "res://HevLib/scripts/transit_tips/TransitTip.gd", -INF, "res://codex/TransitTip.gd"],
-			[1, "res://HevLib/scripts/easters/Screensaver.gd", -INF, "res://Screensaver.gd"],
-			[1, "res://HevLib/scripts/easters/TitleMenu.gd", -INF, "res://menu/TitleMenu.gd"],
-			[1, "res://HevLib/scenes/minerals/Summary.gd", -INF, "res://enceladus/Summary.gd"],
-			[1, "res://HevLib/scenes/rpc/Crew.gd", -INF, "res://enceladus/Crew.gd"],
-			[1, "res://HevLib/scenes/rpc/Dealer.gd", -INF, "res://enceladus/Dealer.gd"],
-			[1, "res://HevLib/scenes/rpc/DiveTarget.gd", -INF, "res://enceladus/DiveTarget.gd"],
-			[1, "res://HevLib/scenes/rpc/Enceladus.gd", -INF, "res://enceladus/Enceladus.gd"],
-			[1, "res://HevLib/scripts/Screensaver.gd", 1000, "res://Screensaver.gd"],
-			[1, "res://HevLib/scenes/rpc/Game.gd", -INF, "res://Game.gd"],
-			[1, "res://HevLib/scenes/rpc/Logs.gd", -INF, "res://enceladus/Logs.gd"],
-			[1, "res://HevLib/scenes/rpc/MineralMarket.gd", -INF, "res://enceladus/MineralMarket.gd"],
-			[1, "res://HevLib/scenes/rpc/Music.gd", -INF, "res://Music.gd"],
-			[1, "res://HevLib/scenes/rpc/PreFlightInspection.gd", -INF, "res://enceladus/PreFlightInspection.gd"],
-			[1, "res://HevLib/scenes/rpc/Repairs.gd", -INF, "res://enceladus/Repairs.gd"],
-			[1, "res://HevLib/scenes/rpc/Services.gd", -INF, "res://enceladus/Services.gd"],
-			[1, "res://HevLib/scenes/rpc/SimulationLayer.gd", -INF, "res://enceladus/Simulator/SimulationLayer.gd"],
-			[1, "res://HevLib/scenes/rpc/Summary.gd", -INF, "res://enceladus/Summary.gd"],
-			[1, "res://HevLib/scenes/rpc/TitleMenu.gd", -INF, "res://menu/TitleMenu.gd"],
-			[1, "res://HevLib/scenes/rpc/Tuning.gd", -INF, "res://enceladus/Tuning.gd"],
-			[1, "res://HevLib/scenes/rpc/Upgrades.gd", -INF, "res://enceladus/Upgrades.gd"],
-			[1, "res://HevLib/scenes/keymapping/bind_displays/AnalogAxisDisplay.gd", -INF, "res://hud/components/AnalogAxisDisplay.gd"],
-			[1, "res://HevLib/scenes/keymapping/bind_displays/GamepadKeybindDisplay.gd", -INF, "res://hud/components/GamepadKeybindDisplay.gd"],
-			[1, "res://HevLib/scenes/keymapping/bind_displays/KeybindDisplay.gd", -INF, "res://hud/components/KeybindDisplay.gd"],
-			[1, "res://HevLib/scenes/keymapping/bind_displays/MousebindDisplay.gd", -INF, "res://hud/components/MousebindDisplay.gd"],
-			[1, "res://HevLib/scripts/Boot.gd", -INF, "res://Boot.gd"],
-			[1, "res://HevLib/scenes/minerals/multiminerals/mineral.gd", -INF, "res://asteroids/mineral.gd"],
-			[1, "res://HevLib/scenes/minerals/multiminerals/MineralProcessingUnit.gd", -INF, "res://ships/modules/MineralProcessingUnit.gd"],
-			[1, "res://HevLib/scenes/minerals/multiminerals/AsteroidSpawner.gd", -INF, "res://AsteroidSpawner.gd"],
-			[1, "res://HevLib/scenes/service_driver/Services.gd", -INF, "res://enceladus/Services.gd"],
+			["res://HevLib/scenes/minerals/AstrogatorPanel.gd", -INF, "res://hud/AstrogatorPanel.gd"],
+			["res://HevLib/scenes/minerals/OMS.gd", -INF, "res://hud/OMS.gd"],
+			["res://HevLib/scenes/minerals/CargoScanner.gd", -INF, "res://hud/CargoScanner.gd"],
+			["res://HevLib/scenes/minerals/ProcessedCargoManifest.gd", -INF, "res://hud/trtl/ProcessedCargoManifest.gd"],
+			["res://HevLib/scenes/minerals/TheRing.gd", -INF, "res://TheRing.gd"],
+			["res://HevLib/scenes/research/Enceladus.gd", -INF, "res://enceladus/Enceladus.gd"],
+			["res://HevLib/scenes/research/overhead_handle/CurrentGame.gd", -INF, "res://CurrentGame.gd"],
+			["res://HevLib/scenes/equipment/SystemShipUpgradeUI.gd", -INF, "res://enceladus/SystemShipUpgradeUI.gd"],
+			["res://HevLib/scenes/equipment/SystemBuyUI.gd", -INF, "res://enceladus/SystemBuyUI.gd"],
+			["res://HevLib/scenes/equipment/UpgradeGroup.gd", -INF, "res://enceladus/UpgradeGroup.gd"],
+			["res://HevLib/scenes/equipment/ThrusterSlot.gd", -INF, "res://ships/modules/ThrusterSlot.gd"],
+			["res://HevLib/scenes/equipment/thruster.gd", -INF, "res://sfx/thruster.gd"],
+			["res://HevLib/scenes/weaponslot/weapon_slot_handler.gd", -INF, "res://ships/WeaponSlot.gd"],
+			["res://HevLib/scenes/equipment/ShipModificationDriver/AddNodes.gd", -INF, "res://ships/ship-ctrl.gd"],
+			["res://HevLib/scenes/equipment/ShipModificationDriver/InternalStorageMod.gd", -INF, "res://ships/ship-ctrl.gd"],
+			["res://HevLib/scenes/ship_driver/Shipyard.gd", -INF, "res://ships/Shipyard.gd"],
+			["res://HevLib/scenes/ship_driver/CurrentGame.gd", -INF, "res://CurrentGame.gd"],
+			["user://cache/Minerals/cg.gd", -INF, "res://CurrentGame.gd"],
+			["user://cache/Minerals/as.gd", -INF, "res://AsteroidSpawner.gd"],
+			["user://cache/Variable_Fetch/derelict_expansion.tscn", -INF, "res://comms/conversation/subtrees/DIALOG_DERELICT_RANDOM.tscn"],
+			["user://cache/Variable_Fetch/upgrades.tscn", -INF, "res://enceladus/Upgrades.tscn"],
+			["user://cache/Variable_Fetch/ship_limitations.tscn", -INF, "res://enceladus/Upgrades.tscn"],
+			["res://HevLib/scenes/ship_driver/TheRing.gd", -INF, "res://TheRing.gd"],
+			["res://HevLib/scripts/Namer.gd", -INF, "res://namer/Namer.gd"],
+			["res://HevLib/events/TheRing.gd", -INF, "res://TheRing.gd"],
+			["res://HevLib/events/Game.gd", -INF, "res://Game.gd"],
+			["res://HevLib/events/controls/camera.gd", -INF, "res://ships/camera.gd"],
+			["res://HevLib/events/controls/ship-ctrl.gd", -INF, "res://ships/ship-ctrl.gd"],
+			["res://HevLib/events/controls/CurrentGame.gd", -INF, "res://CurrentGame.gd"],
+			["res://HevLib/events/chaos_map/RingTelescopeView.tscn", -INF, "res://hud/components/RingTelescopeView.tscn"],
+			["user://cache/Variable_Fetch/st.gd", INF, "res://Settings.gd"],
+			["res://HevLib/events/custom_events/TheRing.gd", -INF, "res://TheRing.gd"],
+			["res://HevLib/scenes/notification_driver/Notifications.tscn", -INF, "res://achievement/Notifications.tscn"],
+			["res://HevLib/scenes/notification_driver/CurrentGame.gd", -INF, "res://CurrentGame.gd"],
+			["res://HevLib/scenes/better_title_screen/SaveSlotButton.gd", -INF, "res://SaveSlotButton.gd"],
+			["res://HevLib/scenes/better_title_screen/CurrentlyPlaying.gd", -INF, "res://menu/CurrentlyPlaying.gd"],
+			["res://HevLib/ui/ExtensionPopup.gd", -INF, "res://menu/ExtensionPopup.gd"],
+			["res://HevLib/ui/mod_menu/titlescreen/TitleMenu.gd", -INF, "res://menu/TitleMenu.gd"],
+			["res://HevLib/ui/mod_menu/titlescreen/DLClist.gd", -INF, "res://tools/DLClist.gd"],
+			["res://HevLib/scripts/transit_tips/TransitTip.gd", -INF, "res://codex/TransitTip.gd"],
+			["res://HevLib/scripts/easters/Screensaver.gd", -INF, "res://Screensaver.gd"],
+			["res://HevLib/scripts/easters/TitleMenu.gd", -INF, "res://menu/TitleMenu.gd"],
+			["res://HevLib/scenes/minerals/Summary.gd", -INF, "res://enceladus/Summary.gd"],
+			["res://HevLib/scenes/rpc/Crew.gd", -INF, "res://enceladus/Crew.gd"],
+			["res://HevLib/scenes/rpc/Dealer.gd", -INF, "res://enceladus/Dealer.gd"],
+			["res://HevLib/scenes/rpc/DiveTarget.gd", -INF, "res://enceladus/DiveTarget.gd"],
+			["res://HevLib/scenes/rpc/Enceladus.gd", -INF, "res://enceladus/Enceladus.gd"],
+			["res://HevLib/scripts/Screensaver.gd", 1000, "res://Screensaver.gd"],
+			["res://HevLib/scenes/rpc/Game.gd", -INF, "res://Game.gd"],
+			["res://HevLib/scenes/rpc/Logs.gd", -INF, "res://enceladus/Logs.gd"],
+			["res://HevLib/scenes/rpc/MineralMarket.gd", -INF, "res://enceladus/MineralMarket.gd"],
+			["res://HevLib/scenes/rpc/Music.gd", -INF, "res://Music.gd"],
+			["res://HevLib/scenes/rpc/PreFlightInspection.gd", -INF, "res://enceladus/PreFlightInspection.gd"],
+			["res://HevLib/scenes/rpc/Repairs.gd", -INF, "res://enceladus/Repairs.gd"],
+			["res://HevLib/scenes/rpc/Services.gd", -INF, "res://enceladus/Services.gd"],
+			["res://HevLib/scenes/rpc/SimulationLayer.gd", -INF, "res://enceladus/Simulator/SimulationLayer.gd"],
+			["res://HevLib/scenes/rpc/Summary.gd", -INF, "res://enceladus/Summary.gd"],
+			["res://HevLib/scenes/rpc/TitleMenu.gd", -INF, "res://menu/TitleMenu.gd"],
+			["res://HevLib/scenes/rpc/Tuning.gd", -INF, "res://enceladus/Tuning.gd"],
+			["res://HevLib/scenes/rpc/Upgrades.gd", -INF, "res://enceladus/Upgrades.gd"],
+			["res://HevLib/scenes/keymapping/bind_displays/AnalogAxisDisplay.gd", -INF, "res://hud/components/AnalogAxisDisplay.gd"],
+			["res://HevLib/scenes/keymapping/bind_displays/GamepadKeybindDisplay.gd", -INF, "res://hud/components/GamepadKeybindDisplay.gd"],
+			["res://HevLib/scenes/keymapping/bind_displays/KeybindDisplay.gd", -INF, "res://hud/components/KeybindDisplay.gd"],
+			["res://HevLib/scenes/keymapping/bind_displays/MousebindDisplay.gd", -INF, "res://hud/components/MousebindDisplay.gd"],
+			["res://HevLib/scripts/Boot.gd", -INF, "res://Boot.gd"],
+			["res://HevLib/scenes/minerals/multiminerals/mineral.gd", -INF, "res://asteroids/mineral.gd"],
+			["res://HevLib/scenes/minerals/multiminerals/MineralProcessingUnit.gd", -INF, "res://ships/modules/MineralProcessingUnit.gd"],
+			["res://HevLib/scenes/minerals/multiminerals/AsteroidSpawner.gd", -INF, "res://AsteroidSpawner.gd"],
+			["res://HevLib/scenes/service_driver/Services.gd", -INF, "res://enceladus/Services.gd"],
 		]
 		for r in pointers.Threading.__request_multiple_threads(load_stash):
 			cvr.append_array(r)
+		var ovr:Dictionary = Dictionary()
 		for f in cvr:
-			if f[0]:
-				var extra:String = f[3]
-				if not extra in ovr: ovr[extra] = [f]
-				else: ovr[extra].append(f)
+			var extra:String = f[2]
+			if not extra in ovr: ovr[extra] = [f]
+			else: ovr[extra].append(f)
 		var LO:Array = pointers.SafeMode.vanilla_load_order
 		var order:Array = Array()
+		var no_order:Array = Array()
 		for i in ovr:
 			var paths:Array = ovr[i]
 			paths.sort_custom(non_static["self"],"sortModPathOrder")
-			order.append([i,LO.find(i),paths])
+			var od:int = LO.find(i)
+			if od < 0:
+				no_order.append([i,paths])
+			else:
+				order.append([i,paths,od])
 		order.sort_custom(non_static["self"],"sortModLoadOrder")
-		for r in order:
-			for i in r[2]:
-				if i[0] == LOAD_TYPE.EXTEND_SCRIPT:
-					pointers.DataFormat.__override_script(i[1],r[0])
-				else:
-					pointers.DataFormat.__replace_resource(i[1],r[0])
+		var eqmm:Node = pointers.equipment_modmain
+		for t in pointers.Threading.__request_multiple_threads([
+			{"object":base,"method":"load_ordered","args":[order]},
+			{"object":base,"method":"load_ordered","args":[no_order]},
+		]):eqmm._savedObjects.append_array(t)
 		pointers.l("%d modlet resources loaded." % order.size(),"pointers.SafeMode")
+	
+	static func load_ordered(order:Array) -> Array:
+		var out:Array = Array()
+		for r in order:
+			for i in r[1]:
+				var sc:Resource = load(i[0])
+				sc.take_over_path(r[0])
+				out.append(sc)
+		return out
 	
 	static func process_mod_data_for_load(resources:Dictionary,modlet:String,pointers:HevLibPointers,priority:float):
 		var out:Array = Array()
@@ -7030,7 +7037,6 @@ class _ManifestV2:
 				var old_path : String = old if (old.begins_with("res:/")) else ("res:/" + ("" if old.begins_with("/") else "/") + old)
 				if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
 					out.append([
-						LOAD_TYPE.REPLACE_RESOURCE,
 						path,
 						subdata.get("priority",priority),
 						old_path,
@@ -7052,22 +7058,21 @@ class _ManifestV2:
 									ed = line.split("\"")[1]
 									break
 					out.append([
-						LOAD_TYPE.EXTEND_SCRIPT,
 						path,
 						subdata.get("priority",priority),
 						(ed if ed else path),
 					])
 		return out
 	static func sortModLoadOrder(a:Array,b:Array) -> bool:
-		return a[1] < b[1]
+		return a[2] < b[2]
 	
 	static func sortModPathOrder(a:Array,b:Array) -> bool:
-		var oa:float = a[2]
-		var ob:float = b[2]
+		var oa:float = a[1]
+		var ob:float = b[1]
 		if oa != ob:
 			return oa < ob
-		var b1:PoolByteArray = a[3].to_ascii()
-		var b2:PoolByteArray = b[3].to_ascii()
+		var b1:PoolByteArray = a[2].to_ascii()
+		var b2:PoolByteArray = b[2].to_ascii()
 		if b1 != b2:
 			return b1 < b2
 		return false
