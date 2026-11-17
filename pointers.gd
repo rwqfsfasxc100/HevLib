@@ -258,11 +258,12 @@ const SUPPORTED_IMAGE_EXTENSIONS = PoolStringArray(["png","stex","jpg","jpeg","b
 
 var resource_path:String = ""
 var version_string:String = ""
-func _init(r,e,v):
+func _init(r,e,v,wbtl):
 	name = "HevLib~Pointers"
 	version_string = v
 	resource_path = r
 	equipment_modmain = e
+	webtranslate_modmain = wbtl
 	var hl_header:String = "HevLib %s" % version_string
 	l("Initializing pointers",hl_header)
 	if Threading.require_single_threading:
@@ -309,6 +310,19 @@ func _init(r,e,v):
 	dependancies_keys = PoolStringArray(dependancies.keys())
 	conflicts_keys = PoolStringArray(conflicts.keys())
 	
+	FileAccess.__load_precached_mods()
+	ConfigDriver.__load_configs()
+	ManifestV2.__get_mod_versions()
+	ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",Array())
+	if is_editor:
+		ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","compile",false)
+		if!file.file_exists("res://VersionLabel.tscn"):
+			printerr("FAILED TO FETCH FILE SYSTEM")
+			l("ERROR! FAILED TO FETCH FILE SYSTEM")
+	
+	ManifestV2.__load_modlets()
+	
+	print("Pointers load: ",OS.get_ticks_msec())
 
 # Logging function used for cases where critial info must not be overwritten by game logs
 # cycling back to dv_log_0 (and yes this is from a specific bug report with AI slop code,

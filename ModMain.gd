@@ -42,30 +42,21 @@ const LIBRARY_HIDDEN_BY_DEFAULT=false
 const _savedObjects=Array()
 const strings=Array([null,"","",null])
 const MOD_VERSION_STRING="%d.%d.%d-%s"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX,MOD_VERSION_METADATA]if(MOD_VERSION_METADATA)else"%d.%d.%d"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX]
-func _init(modLoader=ModLoader):
+func _init(modLoader):
 	strings[0] = self
 	var modPath:String=get_script().resource_path.get_base_dir()+"/"
 	var pointers_dir:String=modPath+"pointers.gd"
 	if!file_exists(pointers_dir):
 		Debug.l("Folder structure not correct, exiting HevLib load");return
-	strings[1] = modPath;strings[2] = pointers_dir
+	strings[1] = modPath
+	strings[2] = pointers_dir
 	var directory:Directory=Directory.new();directory.make_dir_recursive(variables_folder)
 	for f in fetch_folder_files(variables_folder,false,true):directory.remove(f)
 	handle_pointer_cast_clearing(process_gdnative_plugins(),modLoader._modZipFiles)
 	var pointers:Node=load_pointers(modLoader)
-	pointers.FileAccess.__load_precached_mods();pointers.ConfigDriver.__load_configs()
 	
 #	testing(modLoader,pointers)
 	
-	pointers.ManifestV2.__get_mod_versions()
-	pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",Array())
-	
-	if OS.has_feature("editor"):
-		pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","compile",false)
-		if!File.new().file_exists("res://VersionLabel.tscn"):
-			printerr("FAILED TO FETCH FILE SYSTEM")
-			l("ERROR! FAILED TO FETCH FILE SYSTEM")
-	pointers.ManifestV2.__load_modlets()
 	yield(self,"ready")
 	var CRoot:Viewport=get_tree().get_root()
 	yield(CRoot,"ready")
@@ -274,12 +265,10 @@ static func fetch_folder_files(folder:String,showFolders:bool=false,returnFullPa
 				else:fileList.append(fileName)
 	return fileList
 static func file_exists(file_path):return(((File.new().file_exists(file_path)||ResourceLoader.exists(file_path))&&OS.get_user_data_dir().to_lower().ends_with("/dv")))
-static func load_pointers(modLoader:ModLoader):
+static func load_pointers(webtl):
 	var pointers_dir:String=strings[2]
-	var p:Node=load(pointers_dir).new(pointers_dir,strings[0],MOD_VERSION_STRING)
-	modLoader._savedObjects.push_front(p)
-	strings[3]=p
-	p.webtranslate_modmain=modLoader
+	var p:Node=load(pointers_dir).new(pointers_dir,strings[0],MOD_VERSION_STRING,webtl)
+	strings[3]=p;webtl._savedObjects.push_front(p)
 	return p
 func testing(modLoader:ModLoader,pointers):
 	var file:File = File.new()
