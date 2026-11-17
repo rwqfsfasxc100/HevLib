@@ -61,8 +61,6 @@ func _init(modLoader):
 	var CRoot:Viewport=get_tree().get_root()
 	yield(CRoot,"ready")
 	CRoot.add_child(pointers)
-	CRoot.add_child(load("res://HevLib/logging/_HevLib_Gamespace_Canvas.tscn").instance())
-	CRoot.add_child(load("res://HevLib/scenes/keymapping/keybind_interrupt.tscn").instance())
 static func installScriptExtension(path:String):
 	var childPath:String=strings[1]+path
 	var childScript:Script=ResourceLoader.load(childPath,"Script").new()
