@@ -401,17 +401,13 @@ func testing(modLoader:ModLoader):
 	
 	var pointers = strings[3]
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
-	var data = ["","","",""]
-	var out = ""
 	
 	var t1=Time.get_ticks_usec()
 	for i in 100000:
-		out += data[3]
+		pass
 	var t2=Time.get_ticks_usec()
 	for i in 100000:
-		var r:String = data[3]
-		if r:
-			out += r
+		pass
 	var t3=Time.get_ticks_usec()
 	var d1=t2-t1
 	var d2=t3-t2
