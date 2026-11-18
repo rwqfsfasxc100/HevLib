@@ -8243,7 +8243,7 @@ ferrous = %s
 onready var pointers=ModLoader._savedObjects[0]
 var hl_edallowall:bool=false
 func _ready():hl_edallowall=(pointers.is_editor&&pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","unlock_dlc",false))
-func hasDlc(dlc)->bool:return true if (pointers.is_editor&&hl_edallowall) else .hasDlc(dlc)
+func hasDlc(dlc)->bool:return true if (OS.has_feature("editor")&&hl_edallowall) else .hasDlc(dlc)
 """ if (pointers.is_editor) else "extends \"res://Settings.gd\"\n\n")
 		file.close()
 	
