@@ -265,7 +265,7 @@ func _init(r,e,v,w):
 	dependancies_keys = PoolStringArray(dependancies.keys())
 	conflicts_keys = PoolStringArray(conflicts.keys())
 	
-	FileAccess.__load_precached_mods()
+	if FileAccess.__load_precached_mods():return
 	ConfigDriver.__load_configs()
 	ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",Array())
 	if is_editor:
@@ -4496,7 +4496,7 @@ class _FileAccess:
 			non_static["pointers"].has_updated = true
 	const foundnewfiles:String = "new mods found, attempting to copy"
 	const exitMsg:String = "new and/or updated mods detected, rebooting game"
-	static func __load_precached_mods():
+	static func __load_precached_mods() -> bool:
 		var gameInstallDirectory:String = OS.get_executable_path().get_base_dir()
 		if OS.get_name() == "OSX":
 			gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
@@ -4518,11 +4518,12 @@ class _FileAccess:
 						pointers.l(newmodmsg,log_header)
 				print(exitMsg)
 				pointers.NodeAccess.__exit(true,exitMsg,log_header)
-				return
+				return true
 		else:
 			file.open(updateCacheFile,File.WRITE)
 			file.store_string("[]")
 			file.close()
+		return false
 	
 	
 	static func __get_uid_of_file(file_path:String) -> String:
@@ -9235,6 +9236,11 @@ class _Zip:
 		var miniz:MINIZ = __get_miniz_object()
 		if miniz.open_read(zip_path) == OK:
 			miniz.extract_all(dir_path)
+	
+	static func __write_to_hlz(data:Dictionary):
+		pass
+	
+	
 
 
 
