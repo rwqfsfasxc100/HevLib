@@ -383,41 +383,35 @@ static func get_crc_32(bytes:PoolByteArray)->int:
 		# Rare me splitting a variable that isn't an array or dictionary between lines.
 		# Impossible to read and work on otherwise so enjoy the readable code while you can:P
 		crc=(
-			T31[(crc&0xFF)^bytes[i]]^
-			T30[((crc>>8)&0xFF)^bytes[i+1]]^
-			T29[((crc>>16)&0xFF)^bytes[i+2]]^
-			T28[((crc>>24)&0xFF)^bytes[i+3]]^
-			T27[bytes[i+4]]^T26[bytes[i+5]]^
-			T25[bytes[i+6]]^T24[bytes[i+7]]^
-			T23[bytes[i+8]]^T22[bytes[i+9]]^
-			T21[bytes[i+10]]^T20[bytes[i+11]]^
-			T19[bytes[i+12]]^T18[bytes[i+13]]^
-			T17[bytes[i+14]]^T16[bytes[i+15]]^
-			T15[bytes[i+16]]^T14[bytes[i+17]]^
-			T13[bytes[i+18]]^T12[bytes[i+19]]^
-			T11[bytes[i+20]]^T10[bytes[i+21]]^
-			T9[bytes[i+22]]^T8[bytes[i+23]]^
-			T7[bytes[i+24]]^T6[bytes[i+25]]^
-			T5[bytes[i+26]]^T4[bytes[i+27]]^
-			T3[bytes[i+28]]^T2[bytes[i+29]]^
-			T1[bytes[i+30]]^T0[bytes[i+31]]
+			T31[(crc&0xFF)^bytes[i]]^T30[((crc>>8)&0xFF)^bytes[i+1]]^
+			T29[((crc>>16)&0xFF)^bytes[i+2]]^T28[((crc>>24)&0xFF)^bytes[i+3]]^
+			T27[bytes[i+4]]^T26[bytes[i+5]]^T25[bytes[i+6]]^T24[bytes[i+7]]^
+			T23[bytes[i+8]]^T22[bytes[i+9]]^T21[bytes[i+10]]^T20[bytes[i+11]]^
+			T19[bytes[i+12]]^T18[bytes[i+13]]^T17[bytes[i+14]]^T16[bytes[i+15]]^
+			T15[bytes[i+16]]^T14[bytes[i+17]]^T13[bytes[i+18]]^T12[bytes[i+19]]^
+			T11[bytes[i+20]]^T10[bytes[i+21]]^T9[bytes[i+22]]^T8[bytes[i+23]]^
+			T7[bytes[i+24]]^T6[bytes[i+25]]^T5[bytes[i+26]]^T4[bytes[i+27]]^
+			T3[bytes[i+28]]^T2[bytes[i+29]]^T1[bytes[i+30]]^T0[bytes[i+31]]
 		);i+=32
 	while i<size:
 		crc=T0[(crc^bytes[i])&0xFF]^(crc>>8);i+=1
 	return crc^0xFFFFFFFF
 func testing(modLoader:ModLoader):
-	return
+#	return
 	
 	var pointers = strings[3]
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
-	
+	var data = ["","","",""]
+	var out = ""
 	
 	var t1=Time.get_ticks_usec()
 	for i in 100000:
-		pass
+		out += data[3]
 	var t2=Time.get_ticks_usec()
 	for i in 100000:
-		pass
+		var r:String = data[3]
+		if r:
+			out += r
 	var t3=Time.get_ticks_usec()
 	var d1=t2-t1
 	var d2=t3-t2

@@ -8204,18 +8204,12 @@ ferrous = %s
 	
 	static func make_mineral_scripting() -> void:
 		var pointers:HevLibPointers = non_static["pointers"]
-		for f in pointers.FolderAccess.__fetch_folder_files("user://cache/Minerals/",true,true):
-			pointers.FolderAccess.__recursive_delete(f)
+		for f in pointers.FolderAccess.__fetch_folder_files("user://cache/Minerals/",true,true):pointers.FolderAccess.__recursive_delete(f)
 		var mineral_data:Array = Array()
 		for mineral_dict in pointers.DriverManagement.__get_specific_driver_type("ADD_MINERALS.gd"):
 			for mineral in mineral_dict.keys():
 				var md:Dictionary = mineral_dict[mineral]
-				if md.get("name",""):
-					mineral_data.append({
-						"object":non_static["self"],
-						"method":"process_mineral_dict",
-						"args":[md,pointers]
-					})
+				if md.get("name",""):mineral_data.append({"object":non_static["self"],"method":"process_mineral_dict","args":[md,pointers]})
 		
 		# Initialize info for mineral names, colours, and value
 		var trace_text:String = ""
@@ -8225,9 +8219,12 @@ ferrous = %s
 		
 		for mineral in pointers.Threading.__request_multiple_threads(mineral_data):
 			color_text += mineral[0]
-			price_text += mineral[1]
-			content += mineral[2]
-			trace_text += mineral[3]
+			var pt:String = mineral[1]
+			if pt:price_text += pt
+			var ct:String = mineral[2]
+			if ct:content += ct
+			var tt:String = mineral[3]
+			if tt:trace_text += tt
 		
 		var file:File = File.new()
 		# Builds the current game extension script
@@ -8261,10 +8258,9 @@ load("%s")
 ]"""
 	
 	static func process_mineral_dict(mineral:Dictionary,pointers:HevLibPointers) -> PoolStringArray:
-		var out:PoolStringArray = PoolStringArray(["","","",""])
 		var mname:String = mineral.get("name","")
 		var col:Color = mineral.get("color",Color.white)
-		out[0] = colour_str % [mname,mname,col.r,col.g,col.b]
+		var out:PoolStringArray = PoolStringArray([colour_str % [mname,mname,col.r,col.g,col.b],"","",""])
 		var price:float = mineral.get("price",0.0)
 		if price > 0.0:
 			# Only adds minerals to the ring if they have a value.
@@ -8312,49 +8308,29 @@ load("%s")
 						var idx:Dictionary = specific_data[i]
 						var cl:Color = idx.get("color",color)
 						var data:String = mineral_header_str % [
-							base,
-							i,
-							mname,
-							cl.r,
-							cl.g,
-							cl.b,
+							base,i,mname,cl.r,cl.g,cl.b,
 							idx.get("mass",mass),
 							idx.get("filler",filler_mineral),
 							idx.get("min_scale",min_scale),
 							idx.get("max_scale",max_scale),
-							"true" if idx.get("ferrous",ferrous) else "false",
-						]
+							"true" if idx.get("ferrous",ferrous) else "false"]
 						file.open(fn,File.WRITE)
 						file.store_string((data + "\npurity = %f" % purityInfo[i]) if (i in purityKeys) else data)
 						file.close()
-						mh += "load(\"%s\"),\n" % fn
 					else:
 						var data:String = mineral_header_str % [
-							base,
-							i,
-							mname,
-							color.r,
-							color.g,
-							color.b,
-							mass,
-							filler_mineral,
-							min_scale,
-							max_scale,
-							"true" if ferrous else "false",
-						]
+							base,i,mname,color.r,color.g,color.b,
+							mass,filler_mineral,min_scale,max_scale,
+							"true" if ferrous else "false"]
 						file.open(fn,File.WRITE)
 						file.store_string((data + "\npurity = %f" % purityInfo[i]) if (i in purityKeys) else data)
 						file.close()
-						mh += "load(\"%s\"),\n" % fn
+					mh += "load(\"%s\"),\n" % fn
 				out[2] = content_str % [mname,mname,mh + "]"]
 				out[3] = trace_str % [mname,mname]
 				pointers.l("adding mineral %s using handler [recolor]" % mname,log_header)
-			elif handle == "none":
-				pointers.l("mineral %s registered but not adding to ring" % mineral,log_header)
-			else:
-				pointers.l("mineral %s using incorrect handler, set price to 0.0 or less to prevent being registered to exist in the ring or crashes may happen" % mineral,log_header)
-		else:
-			pointers.l("adding only color references for mineral %s, value set to zero or below" % mineral,log_header)
+			else:pointers.l("mineral %s registered with price and colour but not adding to ring" % mineral,log_header)
+		else:pointers.l("adding only color references for mineral %s, value set to zero or below" % mineral,log_header)
 		return out
 
 class _Threading:
