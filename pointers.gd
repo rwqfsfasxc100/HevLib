@@ -9237,10 +9237,44 @@ class _Zip:
 		if miniz.open_read(zip_path) == OK:
 			miniz.extract_all(dir_path)
 	
-	static func __write_to_hlz(data:Dictionary):
-		pass
+	static func __write_hlz(data) -> String:
+		var aes:AESContext = AESContext.new()
+		var key:PoolByteArray = OS.get_unique_id().sha256_buffer()
+		if aes.start(AESContext.MODE_CBC_ENCRYPT,key.subarray(0,15),key.subarray(16,31)):
+			printerr("ZIP: CRITICAL ERROR - CANNOT WRITE HLZ")
+			return ""
+		var stream:StreamPeerBuffer = StreamPeerBuffer.new()
+		var toBytes:PoolByteArray = var2bytes(data,true)
+		stream.put_32(toBytes.size())
+		var forCmp:PoolByteArray = toBytes.compress(1)
+		var tbs:int = forCmp.size() % 16
+		stream.put_32(tbs)
+		if tbs:
+			var rem:int = 16 - tbs
+			var a:PoolByteArray = PoolByteArray()
+			a.resize(rem)
+			for i in rem:
+				a[i] = 0
+			forCmp.append_array(a)
+		stream.put_data(aes.update(forCmp))
+		return Marshalls.raw_to_base64(stream.data_array)
 	
-	
+	static func __read_hlz(data:String):
+		var stream:StreamPeerBuffer = StreamPeerBuffer.new()
+		stream.put_data(Marshalls.base64_to_raw(data))
+		var ssz:int = stream.get_size()
+		stream.seek(0)
+		var sz:int = stream.get_32()
+		var tbs:int = stream.get_32()
+		var bytes:PoolByteArray = stream.get_data(ssz - 8)[1]
+		var aes:AESContext = AESContext.new()
+		var key:PoolByteArray = OS.get_unique_id().sha256_buffer()
+		if aes.start(AESContext.MODE_CBC_DECRYPT,key.subarray(0,15),key.subarray(16,31)):
+			printerr("ZIP: CRITICAL ERROR - CANNOT READ HLZ")
+			return null
+		var out:PoolByteArray = aes.update(bytes)
+		out.resize(out.size() - tbs)
+		return bytes2var(out.decompress(sz,1))
 
 
 
