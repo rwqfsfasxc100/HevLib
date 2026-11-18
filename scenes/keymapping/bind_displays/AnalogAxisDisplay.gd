@@ -34,7 +34,7 @@ extends "res://hud/components/AnalogAxisDisplay.gd"
 
 export var display_direction = false
 
-var raw = ""
+var raw:String = ""
 
 var icon_path = "res://HevLib/ui/themes/icons/joy_map.stex"
 

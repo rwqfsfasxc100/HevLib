@@ -208,8 +208,8 @@ func recheck_availability():
 				d.name = i
 				keys.add_child(d)
 			elif i.begins_with("JoyAxis "):
-				var d = analogAxisDisplay.instance()
-				var raw = i.split("JoyAxis ")[1]
+				var d:Node = analogAxisDisplay.instance()
+				var raw:String = i.split("JoyAxis ")[1]
 				d.key = float(raw)
 				d.raw = raw
 				d.display_direction = true

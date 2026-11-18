@@ -107,7 +107,7 @@
 51.7=* `anticlockwise` (optional) -> (bool) Whether the circle should be drawn anti-clockwise of the `start` angle. Defaults to true
 51.8=* `include_center` (optional) -> (bool) Whether a point at (0,0) should be added. Defaults to true
 52=* Fixed rare issue where an event call would be skipped
-53=* Errors caused by double-loading are now more gracefully handled, and now have a unique log when it happens
+53=* Errors caused by double-loading are now more gracefully handled rather than crashing, and now have a unique log when it happens
 54=* A restart is now no longer needed when starting from a fresh config file when ran from the editor
 55=* Config updates now happen during the logging tick, rather than every physics frame.
 56=* Improved typing of empty arrays and dictionaries to provide a performance boost.
@@ -118,6 +118,14 @@
 60=* Thruster colour modifications are now applied to the exhaust plume
 60.1=* Prevents the still-white plume from showing when the thruster is running on very low output (most notably variable thrust thrusters)
 60.2=* This provides a greater amount of colour fidelity, and improves interactions with HDR
+61=* All library initialization is now centralized to the _init call of the library's ModMain
+62=* Overhauled processing of `LOAD_RESOURCES.gd`
+62.1=* All resources are now piped through the `__replace_resource` method. This removes the need for the `load_type
+62.2=* `original_path` is now used for both scripts and resourced in place of the equivalents in the old system.
+62.2.1=* Omitting this property still uses the default override path mapping to the manifest-relative path.
+62.3=* Script files keep the original extension scraper.
+62.4=* Script overrides now happen if the `original_path` property is set, removing the need for the additional bool
+62.4.1=* Script overrides can be used for faster extensions than regular script extensions as the destination file path is already known.
 65=* Updated credits
 
 [1.17.8]

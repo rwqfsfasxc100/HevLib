@@ -1793,88 +1793,77 @@ class _DataFormat:
 	
 	const _savedScriptObjects : Array = Array()
 	
-	static func __extend_script(file_path : String):
-		var pointers:HevLibPointers = non_statics["pointers"]
+	static func __extend_script(file_path : String,pointers:HevLibPointers = non_statics["pointers"]):
 		pointers.l("Attempting to install script extension at [%s]" % file_path,log_header)
 		if __load_if_can(file_path,"Script"):
 			var sc:Script = __get_load()
 			pointers.l("Script extension successful with length of %s, passing to compiler" % sc.get_source_code().length(),log_header)
-			__extend_script_with_script_object(sc)
+			__extend_script_with_script_object(sc,pointers)
 	
-	static func __compile_and_extend_script(source_code : String) -> void:
-		var pointers:HevLibPointers = non_statics["pointers"]
+	static func __compile_and_extend_script(source_code : String,pointers:HevLibPointers = non_statics["pointers"]) -> void:
 		pointers.l("Compiling script for script extension with length of %d" % source_code.length(),log_header)
-		pointers.equipment_modmain.installScriptExtensionFromSource(source_code)
+		pointers.equipment_modmain.installScriptExtensionFromSource(source_code,pointers)
 	
-	static func __extend_script_with_script_object(script : Script) -> void:
-		var pointers:HevLibPointers = non_statics["pointers"]
+	static func __extend_script_with_script_object(script : Script,pointers:HevLibPointers = non_statics["pointers"]) -> void:
 		pointers.l("Installing script extension with script %s" % str(script),log_header)
-		pointers.equipment_modmain.installScriptExtensionFromScript(script)
+		pointers.equipment_modmain.installScriptExtensionFromScript(script,pointers)
 	
-	static func __compile_and_extend_script_with_scene(source_code : String, scene_path = Array(), override : bool = false) -> void:
+	static func __compile_and_extend_script_with_scene(source_code : String, scene_path = Array(), override : bool = false,pointers:HevLibPointers = non_statics["pointers"]) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
-		var pointers:HevLibPointers = non_statics["pointers"]
 		pointers.l("Attempting to compile and extend script (with scene override) with script of length %d, [%d] scene path(s) to reload" % [source_code.length(),scene_path.size()],log_header)
-		__compile_and_extend_script(source_code)
+		__compile_and_extend_script(source_code,pointers)
 		for i in scene_path.size():
 			var sc:String = scene_path[i]
 			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],log_header)
-			__reload_scene(sc,override)
+			__reload_scene(sc,override,pointers)
 	
-	static func __extend_script_with_script_object_and_scene(script : Script, scene_path = Array(), override : bool = false) -> void:
+	static func __extend_script_with_script_object_and_scene(script : Script, scene_path = Array(), override : bool = false,pointers:HevLibPointers = non_statics["pointers"]) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
-		var pointers:HevLibPointers = non_statics["pointers"]
 		pointers.l("Attempting to extend script (with scene override) with script %s, [%d] scene path(s) to reload" % [str(script),scene_path.size()],log_header)
-		__extend_script_with_script_object(script)
+		__extend_script_with_script_object(script,pointers)
 		for i in scene_path.size():
 			var sc:String = scene_path[i]
 			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],log_header)
-			__reload_scene(sc,override)
+			__reload_scene(sc,override,pointers)
 	
-	static func __override_script(script_path : String, original_path : String):
-		var pointers:HevLibPointers = non_statics["pointers"]
+	static func __override_script(script_path : String, original_path : String,pointers:HevLibPointers = non_statics["pointers"]):
 		pointers.l("Attempting to install script override @ [%s], overwriting [%s]" % [script_path,original_path],log_header)
 		if __load_if_can(script_path,"Script"):
 			var sc:Script = __get_load()
 			pointers.l("Script override successful with length of %d, passing to compiler" % sc.get_source_code().length(),log_header)
-			__override_script_with_script_object(sc, original_path)
+			__override_script_with_script_object(sc, original_path,pointers)
 	
-	static func __compile_and_override_script(source_code : String, original_path : String) -> void:
-		var pointers:HevLibPointers = non_statics["pointers"]
+	static func __compile_and_override_script(source_code : String, original_path : String,pointers:HevLibPointers = non_statics["pointers"]) -> void:
 		pointers.l("Compiling script for script override overwriting [%s] with a length of %d" % [original_path,source_code.length()],log_header)
-		pointers.equipment_modmain.installScriptOverrideFromSource(source_code, original_path)
+		pointers.equipment_modmain.installScriptOverrideFromSource(source_code, original_path,pointers)
 	
-	static func __override_script_with_script_object(script : Script, original_path : String) -> void:
-		var pointers:HevLibPointers = non_statics["pointers"]
+	static func __override_script_with_script_object(script : Script, original_path : String,pointers:HevLibPointers = non_statics["pointers"]) -> void:
 		pointers.l("Installing script override with script %s, overwriting [%s]" % [str(script),original_path],log_header)
-		pointers.equipment_modmain.installScriptOverrideFromScript(script, original_path)
+		pointers.equipment_modmain.installScriptOverrideFromScript(script, original_path,pointers)
 	
-	static func __compile_and_override_script_with_scene(source_code : String, original_path : String, scene_path = Array(), override : bool = false) -> void:
+	static func __compile_and_override_script_with_scene(source_code : String, original_path : String, scene_path = Array(), override : bool = false,pointers:HevLibPointers = non_statics["pointers"]) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
-		var pointers:HevLibPointers = non_statics["pointers"]
 		pointers.l("Attempting to compile and overwrite [%s] (with scene override) with script of length %d, [%d] scene path(s) to reload" % [original_path,source_code.length(),scene_path.size()],log_header)
-		__compile_and_override_script(source_code, original_path)
+		__compile_and_override_script(source_code, original_path,pointers)
 		for i in scene_path.size():
 			var sc:String = scene_path[i]
 			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],log_header)
-			__reload_scene(sc,override)
+			__reload_scene(sc,override,pointers)
 	
-	static func __override_script_with_script_object_and_scene(script : Script, original_path : String, scene_path = Array(), override : bool = false) -> void:
+	static func __override_script_with_script_object_and_scene(script : Script, original_path : String, scene_path = Array(), override : bool = false,pointers:HevLibPointers = non_statics["pointers"]) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
-		var pointers:HevLibPointers = non_statics["pointers"]
 		pointers.l("Attempting to override overwriting [%s] (with scene override) with script %s, [%d] scene path(s) to reload" % [original_path,str(script),scene_path.size()],log_header)
-		__override_script_with_script_object(script, original_path)
+		__override_script_with_script_object(script, original_path,pointers)
 		for i in scene_path.size():
 			var sc:String = scene_path[i]
 			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],log_header)
-			__reload_scene(sc,override)
+			__reload_scene(sc,override,pointers)
 	
-	static func __reload_scene(scene_path : String, override : bool = false):
-		var pointers:HevLibPointers = non_statics["pointers"]
+	static func __reload_scene(scene_path : String, override : bool = false,pointers:HevLibPointers = non_statics["pointers"]):
 		pointers.l("Attempting to reload scene at [%s]" % scene_path,log_header)
 		if __load_if_can(scene_path,"PackedScene",override):
 			var scn = __get_load().instance()
@@ -1886,28 +1875,27 @@ class _DataFormat:
 					scn.queue_free()
 			var p : String = "[gd_scene load_steps=2 format=2]\n\n[ext_resource path=\"%s\" type=\"PackedScene\" id=1]\n\n[node name=\"%s\" instance=ExtResource( 1 )]" % [scene_path,root]
 			pointers.l("Successfully found data for reloading scene with root [%s], passing to scene replacer" % root,log_header)
-			__replace_scene(p,scene_path)
+			__replace_scene(p,scene_path,"",true,pointers)
 	
-	static func __replace_resource(resource_path:String, original_path:String):
-		var pointers:HevLibPointers = non_statics["pointers"]
+	static func __replace_resource(resource_path:String, original_path:String,pointers:HevLibPointers = non_statics["pointers"]):
 		if not (ResourceLoader.exists(resource_path) and File.new().file_exists(original_path)):
 			pointers.l("Cannot replace resource at [%s] as it either does not exist or is not visible to the engine" % resource_path,log_header)
 			return
 		pointers.l("Replacing resource at [%s] with [%s], passing to ModMain" % [original_path,resource_path],log_header)
-		pointers.equipment_modmain.replaceSceneLiteral(resource_path,original_path)
+		pointers.equipment_modmain.replaceSceneLiteral(resource_path,original_path,pointers)
 	
-	static func __replace_scene(scene_data:String,override_path:String = "",scene_file_path:String = "",cache_scene:bool = true) -> PackedScene:
-		var pointers:HevLibPointers = non_statics["pointers"]
+	static func __replace_scene(scene_data:String,override_path:String = "",scene_file_path:String = "",cache_scene:bool = true,pointers:HevLibPointers = non_statics["pointers"]) -> PackedScene:
 		var scene_replacement : String = (scene_file_path) if scene_file_path else ("user://cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec())
 		pointers.l("__replace scene called with [override: %s / store path: %s / force cache: %s]" % [override_path,scene_replacement,str(cache_scene)],log_header)
 		var file:File = File.new()
 		file.open(scene_replacement,File.WRITE)
 		file.store_string(scene_data)
 		file.close()
+		var eqmm = pointers.equipment_modmain
 		if override_path and ResourceLoader.exists(override_path):
-			pointers.equipment_modmain.replaceSceneLiteral(scene_replacement,override_path)
+			eqmm.replaceSceneLiteral(scene_replacement,override_path,pointers)
 		var scene : PackedScene = load(scene_replacement)
-		var store:Array = pointers.equipment_modmain._savedObjects
+		var store:Array = eqmm._savedObjects
 		if cache_scene and not scene in store:
 			store.append(scene)
 		if scene and scene.can_instance():
@@ -4600,8 +4588,8 @@ class _FileAccess:
 	const deeperSearch:PoolStringArray = PoolStringArray(["tres","tscn","gd","res"])
 	const resHex:String = "7265733a2f2f" # "res://".to_ascii().hex_encode()
 	
-	static func __get_dependancies_for_file(file_path:String,deep_search:bool = false,rl:Object = ClassDB.instance("_ResourceLoader")) -> PoolStringArray:
-		var dependencies:PoolStringArray = rl.get_dependencies(file_path)
+	static func __get_dependancies_for_file(file_path:String,deep_search:bool = false) -> PoolStringArray:
+		var dependencies:PoolStringArray = ResourceLoader.get_dependencies(file_path)
 		if deep_search and file_path.get_extension() in deeperSearch:
 			var nfp:String = file_path
 			if not non_static["pointers"].is_editor:
@@ -6998,74 +6986,46 @@ class _ManifestV2:
 		for i in ovr:
 			var paths:Array = ovr[i]
 			paths.sort_custom(non_static["self"],"sortModPathOrder")
-			var od:int = LO.find(i)
-			if od < 0:
-				no_order.append([i,paths])
-			else:
-				order.append([i,paths,od])
+			order.append([i,paths,LO.find(i)])
+			if LO.find(i) < 0:
+				no_order.append(i)
 		order.sort_custom(non_static["self"],"sortModLoadOrder")
-		var eqmm:Node = pointers.equipment_modmain
-		for t in pointers.Threading.__request_multiple_threads([
-			{"object":base,"method":"load_ordered","args":[order]},
-			{"object":base,"method":"load_ordered","args":[no_order]},
-		]):eqmm._savedObjects.append_array(t)
-		pointers.l("%d modlet resources loaded." % order.size(),"pointers.SafeMode")
-	
-	static func load_ordered(order:Array) -> Array:
-		var out:Array = Array()
 		for r in order:
 			for i in r[1]:
-				var sc:Resource = load(i[0])
-				sc.take_over_path(r[0])
-				out.append(sc)
-		return out
+				var path:String = i[0]
+				var ext:String = path.get_extension().to_lower()
+				if (ext == "gd" or ext == "gdc"):
+					pointers.DataFormat.__override_script(path,r[0],pointers)
+				else:
+					pointers.DataFormat.__replace_resource(path,r[0],pointers)
+		pointers.l("%d modlet resources loaded." % order.size(),"pointers.SafeMode")
 	
 	static func process_mod_data_for_load(resources:Dictionary,modlet:String,pointers:HevLibPointers,priority:float):
 		var out:Array = Array()
+		var file:File = File.new()
+		var mbd:String = modlet.get_base_dir()
 		for resource in resources.keys():
 			var subdata:Dictionary = resources[resource]
-			var load_type:String = subdata.get("load_type","").to_lower()
-			var file:File = File.new()
-			var is_resource:bool = false
-			if load_type == "scene" or load_type == "resource":is_resource = true
-			elif load_type != "script":
-				var re:String = resource.get_extension()
-				if re == "gd" or re == "gdc":pass
-				elif re in PoolStringArray(["tscn","res","tres","scn"]):
-					is_resource = true
-				else:
-					continue
-			if is_resource:
-				var path : String = resource if resource.begins_with("res://") else (modlet.get_base_dir() + ("" if resource.begins_with("/") else "/") + resource)
-				var old : String = subdata.get("original_path","res:/" + path.split(modlet.get_base_dir())[1])
-				var old_path : String = old if (old.begins_with("res:/")) else ("res:/" + ("" if old.begins_with("/") else "/") + old)
-				if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
-					out.append([
-						path,
-						subdata.get("priority",priority),
-						old_path,
-					])
-			else:
-				var path:String=resource if resource.begins_with("res://")else(modlet.get_base_dir()+(""if resource.begins_with("/")else"/")+resource)
-				if pointers.ConfigDriver.__validate_dictionary(subdata)&&pointers.FileAccess.__file_exists(path):
-					var ed:String = subdata.get("base_script_path","")
-					if subdata.get("override",false):
-						var op=subdata.get("override_path","res:/"+path.split(modlet.get_base_dir())[1])
-						ed = op if(op.begins_with("res:/"))else("res:/"+(""if op.begins_with("/")else"/")+op)
-					elif not ed:
-						file.open(path,File.READ)
-						var data:String = file.get_as_text(true)
-						file.close()
-						if "extends \"" in data:
-							for line in data.split("\n"):
-								if line.begins_with("extends \""):
-									ed = line.split("\"")[1]
-									break
-					out.append([
-						path,
-						subdata.get("priority",priority),
-						(ed if ed else path),
-					])
+			var path:String = resource if resource.begins_with("res://" ) else (mbd + ("" if resource.begins_with("/") else "/") + resource)
+			if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
+				var ed:String = subdata.get("original_path","")
+				if ed:
+					if not ed.begins_with("res:/"):
+						ed = "res:/" + ("" if ed.begins_with("/") else "/") + ed
+				elif path.get_extension() == "gd":
+					file.open(path,File.READ)
+					var data:String = file.get_as_text(true)
+					file.close()
+					if "extends \"" in data:
+						for line in data.split("\n"):
+							if line.begins_with("extends \""):
+								ed = line.split("\"")[1]
+								break
+				out.append([
+					path,
+					subdata.get("priority",priority),
+					(ed if ed else "res:/" + path.split(mbd)[1]),
+				])
 		return out
 	static func sortModLoadOrder(a:Array,b:Array) -> bool:
 		return a[2] < b[2]
@@ -8022,9 +7982,8 @@ class _SafeMode:
 			PCKNAMES.append_array(pointers.FolderAccess.__get_vanilla_script_and_scenes())
 			validation_check["vanilla_version"] = vanilla_version
 			validation_check["hevlib_cache_version"] = HEVLIB_CACHE_VERSION
-			var rl:Object = ClassDB.instance("_ResourceLoader")
 			for f in PCKNAMES:
-				get_dependancies_for_vanilla_file(f,rl)
+				get_dependancies_for_vanilla_file(f)
 			order_tree.merge(flatten_tree(get_dependancy_tree()))
 			vanilla_load_order.append_array(dependancy_dict_keys)
 			var vsize:int = vanilla_load_order.size()
@@ -8041,10 +8000,10 @@ class _SafeMode:
 							break
 				idx += 1
 			var data_to_store:PoolByteArray = var2bytes([
-				PCKNAMES,
-				vanilla_load_order,
-				dependancy_lookup,
-				dependancy_dictionary
+				JSON.print(PCKNAMES),
+				JSON.print(vanilla_load_order),
+				JSON.print(dependancy_lookup),
+				JSON.print(dependancy_dictionary)
 			])
 			decomp_size = data_to_store.size()
 			validation_check["decompressed_size"] = decomp_size
@@ -8060,10 +8019,10 @@ class _SafeMode:
 			file.open(sm_data_path,File.READ)
 			var data:Array = bytes2var(file.get_buffer(file.get_len()).decompress(decomp_size,1))
 			file.close()
-			PCKNAMES.append_array(data[0])
-			vanilla_load_order.append_array(data[1])
-			dependancy_lookup.merge(data[2])
-			dependancy_dictionary.merge(data[3])
+			PCKNAMES.append_array(JSON.parse(data[0]).result)
+			vanilla_load_order.append_array(JSON.parse(data[1]).result)
+			dependancy_lookup.merge(JSON.parse(data[2]).result)
+			dependancy_dictionary.merge(JSON.parse(data[3]).result)
 			dependancy_lookup_keys.append_array(dependancy_lookup.keys())
 			dependancy_dict_keys.append_array(dependancy_dictionary.keys())
 		
@@ -8152,13 +8111,13 @@ class _SafeMode:
 				processed_deps.append(i)
 		return out
 	
-	const binaryArr:PoolStringArray = PoolStringArray(["tres","tscn","gd"])
+	const binaryArr:PoolStringArray = PoolStringArray(["tres","tscn","gd","material"])
 	const deepSearchFor = PoolStringArray(["gd","gdc"])
 	
-	static func get_dependancies_for_vanilla_file(file_path:String,rl:Object = ClassDB.instance("_ResourceLoader")):
+	static func get_dependancies_for_vanilla_file(file_path:String):
 		if (not file_path in PCKNAMES) or (file_path in dependancy_dict_keys):
 			return
-		var dependencies:PoolStringArray = non_static["pointers"].FileAccess.__get_dependancies_for_file(file_path,file_path.get_extension() in deepSearchFor)
+		var dependencies:PoolStringArray = non_static["pointers"].FileAccess.__get_dependancies_for_file(file_path,file_path.get_extension().to_lower() in deepSearchFor)
 		if dependencies:
 			dependancy_dict_keys.append(file_path)
 			dependancy_dictionary[file_path] = dependencies
@@ -8169,7 +8128,7 @@ class _SafeMode:
 				dependancy_lookup[dp].append(file_path)
 			for m in dependencies:
 				if (m.get_extension() in binaryArr):
-					get_dependancies_for_vanilla_file(m,rl)
+					get_dependancies_for_vanilla_file(m)
 	
 	static func __lookup_vanilla_file_dependancies(dependancy) -> PoolStringArray:
 		return LDA(dependancy,PoolStringArray())
@@ -8283,8 +8242,23 @@ ferrous = %s
 		
 		# Builds the blank Settings extension
 		file.open("user://cache/Variable_Fetch/st.gd",File.WRITE)
-		file.store_string("extends \"res://Settings.gd\"\n\nfunc hasDlc(dlc) -> bool:return true if OS.has_feature(\"editor\") else .hasDlc(dlc)\n" if (pointers.is_editor and pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","unlock_dlc",false) == true) else "extends \"res://Settings.gd\"\n\n")
+		file.store_string("""extends "res://Settings.gd"
+onready var pointers=ModLoader._savedObjects[0]
+var hl_edallowall:bool=false
+func _ready():hl_edallowall=pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","unlock_dlc",false)
+func hasDlc(dlc)->bool:return true if hl_edallowall else .hasDlc(dlc)
+""" if (pointers.is_editor) else "extends \"res://Settings.gd\"\n\n")
 		file.close()
+	
+	const mineral_scene_txt = """[
+load("%s"),
+load("%s"),
+load("%s"),
+load("%s"),
+load("%s"),
+load("%s"),
+load("%s")
+]"""
 	
 	static func process_mineral_dict(mineral:Dictionary,pointers:HevLibPointers) -> PoolStringArray:
 		var out:PoolStringArray = PoolStringArray(["","","",""])
@@ -8301,15 +8275,15 @@ ferrous = %s
 			if handle == "scenes":
 				# Handle for providing a list of premade scene filepaths to use for the ores
 				out[2] = content_str % [mname,mname,
-					"[\n%s]" % PoolStringArray([
-						"load(\"%s\")" % mineral["ore_1"],
-						"load(\"%s\")" % mineral["ore_2"],
-						"load(\"%s\")" % mineral["ore_3"],
-						"load(\"%s\")" % mineral["ore_4"],
-						"load(\"%s\")" % mineral["ore_5"],
-						"load(\"%s\")" % mineral["ore_6"],
-						"load(\"%s\")" % mineral["ore_7"],
-					]).join(",\n")
+					mineral_scene_txt % [
+						mineral["ore_1"],
+						mineral["ore_2"],
+						mineral["ore_3"],
+						mineral["ore_4"],
+						mineral["ore_5"],
+						mineral["ore_6"],
+						mineral["ore_7"],
+					]
 				]
 				out[3] = trace_str % [mname,mname]
 				pointers.l("adding mineral %s using handler [scene]" % mname,log_header)
@@ -8361,10 +8335,8 @@ ferrous = %s
 							idx.get("max_scale",max_scale),
 							"true" if idx.get("ferrous",ferrous) else "false",
 						]
-						if i in purityKeys:
-							data += "\npurity = %f" % purityInfo[i]
 						file.open(fn,File.WRITE)
-						file.store_string(data)
+						file.store_string((data + "\npurity = %f" % purityInfo[i]) if (i in purityKeys) else data)
 						file.close()
 						mh += "load(\"%s\"),\n" % fn
 					else:
@@ -8381,10 +8353,8 @@ ferrous = %s
 							max_scale,
 							"true" if ferrous else "false",
 						]
-						if i in purityKeys:
-							data += "\npurity = %f" % purityInfo[i]
 						file.open(fn,File.WRITE)
-						file.store_string(data)
+						file.store_string((data + "\npurity = %f" % purityInfo[i]) if (i in purityKeys) else data)
 						file.close()
 						mh += "load(\"%s\"),\n" % fn
 				out[2] = content_str % [mname,mname,mh + "]"]

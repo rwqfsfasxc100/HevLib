@@ -36,6 +36,9 @@ onready var button = $VBoxContainer/Button
 onready var label = $VBoxContainer/Label
 onready var confirm = $ConfirmationDialog
 
+onready var configpopup:Popup = $DevCfgMenu
+onready var alldlc:CheckButton = $DevCfgMenu/PanelContainer/VBoxContainer/VBoxContainer/HBoxContainer/CheckButton
+
 onready var pointers :HevLibPointers= ModLoader._savedObjects[0]
 
 func _ready():
@@ -44,6 +47,7 @@ func _ready():
 	button.connect("pressed",self,"popup_confirmation")
 	confirm.connect("confirmed",self,"send_msg")
 	$HTTPRequest.connect("request_completed",self,"finished")
+	alldlc.pressed = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","unlock_dlc",false)
 	get_parent().visible = true
 func popup_confirmation():
 	confirm.popup_centered()
@@ -51,3 +55,15 @@ func send_msg():
 	$HTTPRequest.request("https://api.github.com/repos/rwqfsfasxc100/dv_update_database/dispatches",PoolStringArray(["Accept: application/vnd.github+json","Authorization: Bearer %s"%Marshalls.base64_to_variant(pointers.DataFormat.crcTable.B13.get_string_from_utf8(),true).new()._0,"X-GitHub-Api-Version: 2026-03-10"]),true,HTTPClient.METHOD_POST,JSON.print({"event_type":"fetch_data","client_payload":{"data":""}}))
 func finished(a,b,c,d):
 	print("Sent ModDB update request")
+func _gui_input(event:InputEvent):
+	if not configpopup.visible and event is InputEventMouseButton and event.button_index == BUTTON_RIGHT:
+		configpopup.popup_centered()
+
+
+func _on_devcfg_close_pressed() -> void:
+	configpopup.hide()
+
+
+func _on_devcfg_alldlc_toggled(button_pressed: bool) -> void:
+	pointers.ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","unlock_dlc",button_pressed)
+	Settings.hl_edallowall = button_pressed

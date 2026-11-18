@@ -1,16 +1,16 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=1]
 [ext_resource path="res://HevLib/ui/mod_menu/titlescreen/editor/DevPush.gd" type="Script" id=2]
 [ext_resource path="res://HevLib/ui/fonts/verdana/font-verdana.tres" type="DynamicFont" id=3]
 [ext_resource path="res://HevLib/ui/fonts/verdana/font-verdana-small.tres" type="DynamicFont" id=4]
+[ext_resource path="res://HevLib/ui/fonts/courier_new/font-courierbold-small.tres" type="DynamicFont" id=5]
 
 [node name="DevPushMenu" type="Popup"]
-visible = true
 margin_left = 50.0
 margin_top = 50.0
-margin_right = 90.0
-margin_bottom = 90.0
+margin_right = 361.0
+margin_bottom = 138.0
 mouse_filter = 2
 theme = ExtResource( 1 )
 popup_exclusive = true
@@ -25,6 +25,7 @@ margin_left = 5.0
 margin_top = 5.0
 margin_right = 306.0
 margin_bottom = 83.0
+mouse_filter = 2
 color = Color( 0, 0, 0, 0.980392 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="DevPush"]
@@ -58,3 +59,74 @@ dialog_text = "HEVLIB_DEV_PUSH_CONFIRM"
 dialog_autowrap = true
 
 [node name="HTTPRequest" type="HTTPRequest" parent="DevPush"]
+
+[node name="DevCfgMenu" type="Popup" parent="DevPush"]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 306.0
+margin_bottom = 83.0
+popup_exclusive = true
+
+[node name="PanelContainer" type="PanelContainer" parent="DevPush/DevCfgMenu"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 392.0
+margin_bottom = 208.0
+rect_min_size = Vector2( 384, 200 )
+
+[node name="ColorRect" type="ColorRect" parent="DevPush/DevCfgMenu/PanelContainer"]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 379.0
+margin_bottom = 195.0
+mouse_filter = 2
+color = Color( 0, 0, 0, 0.980392 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DevPush/DevCfgMenu/PanelContainer"]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 379.0
+margin_bottom = 195.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="DevPush/DevCfgMenu/PanelContainer/VBoxContainer"]
+margin_right = 374.0
+margin_bottom = 24.0
+custom_fonts/font = ExtResource( 5 )
+text = "HEVLIB_DEV_CFG_MENU"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DevPush/DevCfgMenu/PanelContainer/VBoxContainer"]
+margin_top = 28.0
+margin_right = 374.0
+margin_bottom = 158.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="DevPush/DevCfgMenu/PanelContainer/VBoxContainer/VBoxContainer"]
+margin_right = 374.0
+margin_bottom = 42.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="DevPush/DevCfgMenu/PanelContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+margin_top = 9.0
+margin_right = 284.0
+margin_bottom = 33.0
+size_flags_horizontal = 3
+custom_fonts/font = ExtResource( 5 )
+text = "HEVLIB_DEV_CFG_ALLDLC"
+
+[node name="CheckButton" type="CheckButton" parent="DevPush/DevCfgMenu/PanelContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+margin_left = 288.0
+margin_right = 374.0
+margin_bottom = 42.0
+
+[node name="Button" type="Button" parent="DevPush/DevCfgMenu/PanelContainer/VBoxContainer"]
+margin_top = 162.0
+margin_right = 374.0
+margin_bottom = 190.0
+custom_fonts/font = ExtResource( 5 )
+text = "HEVLIB_MODMENU_CLOSE"
+
+[connection signal="toggled" from="DevPush/DevCfgMenu/PanelContainer/VBoxContainer/VBoxContainer/HBoxContainer/CheckButton" to="DevPush" method="_on_devcfg_alldlc_toggled"]
+[connection signal="pressed" from="DevPush/DevCfgMenu/PanelContainer/VBoxContainer/Button" to="DevPush" method="_on_devcfg_close_pressed"]

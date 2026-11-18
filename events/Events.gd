@@ -90,7 +90,9 @@ func getPos():
 func _ready():
 	focusObject = CurrentGame.getPlayerShip()
 	if ring:
-		defaultTestSpecificStoryElement = ring.testSpecificStoryElement
+		var ts = ring.testSpecificStoryElement
+		if ts and ts is String:
+			defaultTestSpecificStoryElement = ts
 		defaultOdditiesEvery = ring.odditiesEvery
 		var value:float = defaultOdditiesEvery
 		
@@ -103,7 +105,7 @@ func addEvents():
 	
 	var events:Array = ring.get_children()
 	for indx in events.size():
-		var evnt:Dictionary = events[indx]
+		var evnt:Object = events[indx]
 		var ename:String = evnt.name
 		eventNames[indx + 1] = ename
 		event_objects[ename] = evnt

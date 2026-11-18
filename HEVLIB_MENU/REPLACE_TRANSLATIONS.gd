@@ -1939,6 +1939,14 @@ const TRANSLATIONS = {
 		"HEVLIB_CONFIG_MAX_THREAD_QUEUE_DESC": {
 			"string": "The maximum size of the thread queue before threads get blocked.\n\nOnly affects async operations. Multithread requests that block\nexecution will still run.",
 			"version_hash": 2760569008
+		},
+		"HEVLIB_DEV_CFG_MENU": {
+			"string": "Development configs",
+			"version_hash": 1012063921
+		},
+		"HEVLIB_DEV_CFG_ALLDLC": {
+			"string": "Treat DLC as available",
+			"version_hash": 522415629
 		}
 	},
 	"de": {
