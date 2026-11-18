@@ -8275,33 +8275,22 @@ load("%s")
 			if handle == "scenes":
 				# Handle for providing a list of premade scene filepaths to use for the ores
 				out[2] = content_str % [mname,mname,
-					mineral_scene_txt % [
-						mineral["ore_1"],
-						mineral["ore_2"],
-						mineral["ore_3"],
-						mineral["ore_4"],
-						mineral["ore_5"],
-						mineral["ore_6"],
-						mineral["ore_7"],
-					]
+					mineral_scene_txt % [mineral["ore_1"],
+						mineral["ore_2"],mineral["ore_3"],
+						mineral["ore_4"],mineral["ore_5"],
+						mineral["ore_6"],mineral["ore_7"]]
 				]
 				out[3] = trace_str % [mname,mname]
 				pointers.l("adding mineral %s using handler [scene]" % mname,log_header)
 			elif handle == "recolor":
 				var base:String = "fe"
 				match mineral.get("base","fe").to_lower():
-					"fe","iron":
-						base = "fe"
-					"v","vanadium":
-						base = "v"
-					"be","beryllium":
-						base = "be"
-					"pd","palladium":
-						base = "pd"
-					"pt","platinum":
-						base = "pt"
-					"w","tungsten","wolfram":
-						base = "w"
+					"fe","iron":base = "fe"
+					"v","vanadium":base = "v"
+					"be","beryllium":base = "be"
+					"pd","palladium":base = "pd"
+					"pt","platinum":base = "pt"
+					"w","tungsten","wolfram":base = "w"
 				var color:Color = mineral.get("color",Color.white)
 				var mass:float = mineral.get("mass",0.0)
 				var filler_mineral:String = mineral.get("filler","H2O")
