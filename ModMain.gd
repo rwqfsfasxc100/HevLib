@@ -402,6 +402,7 @@ func testing(modLoader:ModLoader):
 	var pointers = strings[3]
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
 	
+	
 	var t1=Time.get_ticks_usec()
 	for i in 100000:
 		pass
