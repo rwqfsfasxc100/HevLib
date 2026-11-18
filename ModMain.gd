@@ -397,7 +397,7 @@ static func get_crc_32(bytes:PoolByteArray)->int:
 		crc=T0[(crc^bytes[i])&0xFF]^(crc>>8);i+=1
 	return crc^0xFFFFFFFF
 func testing(modLoader:ModLoader):
-#	return
+	return
 	
 	var pointers = strings[3]
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
