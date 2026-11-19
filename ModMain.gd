@@ -38,8 +38,8 @@ const MOD_VERSION_BUGFIX=8
 const MOD_VERSION_METADATA=""
 const MOD_IS_LIBRARY=true
 const LIBRARY_HIDDEN_BY_DEFAULT=false
-var _savedObjects=Array()
-const strings=Array([null,"","",null,null])
+const _savedObjects=Array()
+const strings=Array([null,"","",null])
 const MOD_VERSION_STRING="%d.%d.%d-%s"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX,MOD_VERSION_METADATA]if(MOD_VERSION_METADATA)else"%d.%d.%d"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX]
 var file:File = File.new()
 var directory:Directory=Directory.new()
@@ -56,7 +56,6 @@ func _init(modLoader):
 		Debug.l("HevLib was not installed correctly, stopping library load to prevent catastrophic issues");return
 	strings[1] = modPath
 	strings[2] = pointers_dir
-	strings[4] = _savedObjects
 	directory.make_dir_recursive(variables_folder)
 	for f in fetch_folder_files(variables_folder,directory,false,true):directory.remove(f)
 	
@@ -265,31 +264,25 @@ static func installScriptExtensionFromSource(source_code:String,pointers):
 	out.set_source_code(source_code)
 	out.reload()
 	var parentPath:String=out.get_base_script().resource_path
-#	pointers.l("Installing script extension from [%s <- Source Code]"%parentPath)
 	out.take_over_path(parentPath)
-	strings[4].append(out)
+	_savedObjects.append(out)
 static func installScriptExtensionFromScript(out:Script,pointers):
 	var parentPath:String=out.get_base_script().resource_path
-#	pointers.l("Installing script extension from [%s <- %s]"%[parentPath,out])
 	out.take_over_path(parentPath)
-	strings[4].append(out)
+	_savedObjects.append(out)
 static func installScriptOverrideFromSource(source_code:String,original_path:String,pointers):
 	var out=GDScript.new()
 	out.set_source_code(source_code)
 	out.reload()
-#	pointers.l("Installing script override from [%s <- Source Code]"%original_path)
 	out.take_over_path(original_path)
-	strings[4].append(out)
+	_savedObjects.append(out)
 static func installScriptOverrideFromScript(out:Script,original_path:String,pointers):
-#	pointers.l("Installing script override from [%s <- %s]"%[original_path,out])
 	out.take_over_path(original_path)
-	strings[4].append(out)
+	_savedObjects.append(out)
 static func replaceSceneLiteral(newPath:String,oldPath:String,pointers):
-#	pointers.l("Updating scene literal:%s"%newPath)
 	var scene:Resource=load(newPath)
 	scene.take_over_path(oldPath)
-	strings[4].append(scene)
-#	pointers.l("Finished updating literal:%s"%oldPath)
+	_savedObjects.append(scene)
 static func l(msg:String,title:String=MOD_NAME):strings[3].l(msg,"%s V%s"%[title,MOD_VERSION_STRING])
 static func log_double_load_error(script_path:String):l("Script at [%s] is likely double loaded! Please check your zips!" % script_path)
 static func fetch_folder_files(folder:String,directory:Directory,showFolders:bool=false,returnFullPath:bool=false,globalizePath:bool=false)->PoolStringArray:

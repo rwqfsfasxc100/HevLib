@@ -132,7 +132,10 @@
 63.2=* Invalidates itself if there are changes in: HevLib version, game version, hardware, or OS.
 63.3=* By design, this should not be used for anything valuable, as any variable can change without notice and completely break the format.
 63.4=* Created/extracted respectively with the `__write_hlz` and `__read_hlz` in the `Zip` class, which input/output any variant for simplicity of use
-65=* Updated credits
+64=* Heavily reduced the number of logs produced during boot, which should make it easier to read in future
+65=* Driver validation is now hardcoded
+66=* Updated licensing.
+70=* Updated credits
 
 [1.17.8]
 
