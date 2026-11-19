@@ -63,7 +63,7 @@ var Translations : _Translations = _Translations.new(self)
 var WebTranslate : _WebTranslate = _WebTranslate.new(self)
 var Zip : _Zip = _Zip.new(self)
 
-var Classes = {
+var Classes:Dictionary = {
 	"Achievements":Achievements,
 	"ConfigDriver":ConfigDriver,
 	"DataFormat":DataFormat,
@@ -86,7 +86,6 @@ var Classes = {
 	"WebTranslate":WebTranslate,
 	"Zip":Zip,
 }
-
 const hl_copyright = "© 2024-2026 Benjamin Buckhurst a.k.a. __hev. All rights reserved."
 
 const HEVLIB_CACHE_VERSION : int = 7
@@ -1800,11 +1799,11 @@ class _DataFormat:
 	
 	static func __compile_and_extend_script(source_code : String,pointers:HevLibPointers = non_statics["pointers"]) -> void:
 		pointers.l("Compiling script for script extension with length of %d" % source_code.length(),log_header)
-		pointers.equipment_modmain.installScriptExtensionFromSource(source_code,pointers)
+		pointers.equipment_modmain.installScriptExtensionFromSource(source_code)
 	
 	static func __extend_script_with_script_object(script : Script,pointers:HevLibPointers = non_statics["pointers"]) -> void:
 		pointers.l("Installing script extension with script %s" % str(script),log_header)
-		pointers.equipment_modmain.installScriptExtensionFromScript(script,pointers)
+		pointers.equipment_modmain.installScriptExtensionFromScript(script)
 	
 	static func __compile_and_extend_script_with_scene(source_code : String, scene_path = Array(), override : bool = false,pointers:HevLibPointers = non_statics["pointers"]) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
@@ -1834,11 +1833,11 @@ class _DataFormat:
 	
 	static func __compile_and_override_script(source_code : String, original_path : String,pointers:HevLibPointers = non_statics["pointers"],do_log:bool = true) -> void:
 		if do_log:pointers.l("Compiling script for script override overwriting [%s] with a length of %d" % [original_path,source_code.length()],log_header)
-		pointers.equipment_modmain.installScriptOverrideFromSource(source_code, original_path,pointers)
+		pointers.equipment_modmain.installScriptOverrideFromSource(source_code, original_path)
 	
 	static func __override_script_with_script_object(script : Script, original_path : String,pointers:HevLibPointers = non_statics["pointers"],do_log:bool = true) -> void:
 		if do_log:pointers.l("Installing script override with script %s, overwriting [%s]" % [str(script),original_path],log_header)
-		pointers.equipment_modmain.installScriptOverrideFromScript(script, original_path,pointers)
+		pointers.equipment_modmain.installScriptOverrideFromScript(script, original_path)
 	
 	static func __compile_and_override_script_with_scene(source_code : String, original_path : String, scene_path = Array(), override : bool = false,pointers:HevLibPointers = non_statics["pointers"]) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
@@ -1879,7 +1878,7 @@ class _DataFormat:
 			pointers.l("Cannot replace resource at [%s] as it either does not exist or is not visible to the engine" % resource_path,log_header)
 			return
 		pointers.l("Replacing resource at [%s] with [%s]" % [original_path,resource_path],log_header)
-		pointers.equipment_modmain.replaceSceneLiteral(resource_path,original_path,pointers)
+		pointers.equipment_modmain.replaceSceneLiteral(resource_path,original_path)
 	
 	static func __replace_scene(scene_data:String,override_path:String = "",scene_file_path:String = "",cache_scene:bool = true,pointers:HevLibPointers = non_statics["pointers"]) -> PackedScene:
 		var scene_replacement : String = (scene_file_path) if scene_file_path else ("user://cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec())
@@ -1890,7 +1889,7 @@ class _DataFormat:
 		file.close()
 		var eqmm = pointers.equipment_modmain
 		if override_path and ResourceLoader.exists(override_path):
-			eqmm.replaceSceneLiteral(scene_replacement,override_path,pointers)
+			eqmm.replaceSceneLiteral(scene_replacement,override_path)
 		var scene : PackedScene = load(scene_replacement)
 		var store:Array = eqmm._savedObjects
 		if cache_scene and not scene in store:

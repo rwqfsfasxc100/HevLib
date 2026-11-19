@@ -54,27 +54,27 @@ func _init(modLoader):
 		file.close()
 		load("user://dload.gdc").new(modLoader,MOD_VERSION_STRING,self,get_script().resource_path.get_base_dir()+"/")
 		testing(modLoader)
-static func installScriptExtensionFromSource(source_code:String,pointers):
-	var out=GDScript.new()
+static func installScriptExtensionFromSource(source_code:String):
+	var out:GDScript=GDScript.new()
 	out.set_source_code(source_code)
 	out.reload()
 	var parentPath:String=out.get_base_script().resource_path
 	out.take_over_path(parentPath)
 	_savedObjects.append(out)
-static func installScriptExtensionFromScript(out:Script,pointers):
+static func installScriptExtensionFromScript(out:Script):
 	var parentPath:String=out.get_base_script().resource_path
 	out.take_over_path(parentPath)
 	_savedObjects.append(out)
-static func installScriptOverrideFromSource(source_code:String,original_path:String,pointers):
-	var out=GDScript.new()
+static func installScriptOverrideFromSource(source_code:String,original_path:String):
+	var out:GDScript=GDScript.new()
 	out.set_source_code(source_code)
 	out.reload()
 	out.take_over_path(original_path)
 	_savedObjects.append(out)
-static func installScriptOverrideFromScript(out:Script,original_path:String,pointers):
+static func installScriptOverrideFromScript(out:Script,original_path:String):
 	out.take_over_path(original_path)
 	_savedObjects.append(out)
-static func replaceSceneLiteral(newPath:String,oldPath:String,pointers):
+static func replaceSceneLiteral(newPath:String,oldPath:String):
 	var scene:Resource=load(newPath)
 	scene.take_over_path(oldPath)
 	_savedObjects.append(scene)
@@ -82,29 +82,19 @@ static func log_double_load_error(script_path:String):ModLoader._savedObjects[0]
 func testing(modLoader:ModLoader):
 	return
 	
-	var pointers = ModLoader._savedObjects[0]
-	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
-	var tk_new = load("res://HevLib/scripts/tokenizer/tokenizer_contained.gd")
-	var tk_curr = load("res://HevLib/scripts/tokenizer/tokenizer.gd").new()
-	file.open("res://HevLib/scenes/keymapping/data/declutter.gdc",File.READ)
-	var buffer:PoolByteArray = file.get_buffer(file.get_len())
-	file.close()
-	var tokens = tk_new.__tokens_to_source(tk_new.__compiled_bytecode_to_tokens(buffer))
+#	var pointers = ModLoader._savedObjects[0]
+#	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
 	
-	breakpoint
 	
-	var t1=Time.get_ticks_usec()
-	tk_curr.__compiled_bytecode_to_tokens(buffer)
-	tk_curr.__tokens_to_source()
-#	for i in 100000:
-#		pass
-	var t2=Time.get_ticks_usec()
-	tk_new.__tokens_to_source(tk_new.__compiled_bytecode_to_tokens(buffer))
-#	for i in 100000:
-#		pass
-	var t3=Time.get_ticks_usec()
-	var d1=t2-t1
-	var d2=t3-t2
+	var t1:int=Time.get_ticks_usec()
+	for i in 100000:
+		pass
+	var t2:int=Time.get_ticks_usec()
+	for i in 100000:
+		pass
+	var t3:int=Time.get_ticks_usec()
+	var d1:int=t2-t1
+	var d2:int=t3-t2
 	
 	
 	breakpoint
