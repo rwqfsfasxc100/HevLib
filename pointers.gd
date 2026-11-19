@@ -2432,10 +2432,7 @@ class _DriverManagement:
 	])
 	
 	static func __is_driver_file(file_path:String) -> bool:
-		var is_drv:bool = file_path.get_file().get_basename() in SUPPORTED_DRIVER_FILES
-		if not is_drv:
-			breakpoint
-		return (file_path.get_extension() in driver_ext and file_path.get_base_dir().split("/")[-1] + "/" in driver_dirs and is_drv)
+		return (file_path.get_extension() in driver_ext and file_path.get_base_dir().split("/")[-1] + "/" in driver_dirs and file_path.get_file().get_basename() in SUPPORTED_DRIVER_FILES)
 
 class _Equipment:
 	var vanilla_equipment : Dictionary = Dictionary()
