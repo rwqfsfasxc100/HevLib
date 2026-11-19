@@ -9244,9 +9244,9 @@ class _Zip:
 			miniz.extract_all(dir_path)
 	
 	static func __write_hlz(data,salt:PoolByteArray = PoolByteArray()) -> PoolByteArray:
-        if salt and salt.size() != 67:
-            printerr("ZIP: HLZ SALT IS WRONG")
-            return PoolByteArray()
+		if salt and salt.size() != 67:
+			printerr("ZIP: HLZ SALT IS WRONG")
+			return PoolByteArray()
 		var aes:AESContext = AESContext.new()
 		var uid:String = OS.get_unique_id()
 		var key:PoolByteArray = uid.sha256_buffer()
