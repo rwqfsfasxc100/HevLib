@@ -1,10 +1,9 @@
 # [license]
-# 3-Clause BSD NON-AI License
-# 
-# Copyright 2026 __hev (Benjamin Buckhurst)
+# SPDX-License-Identifier: LicenseRef-Proprietary
+# Copyright © 2026 __hev (Benjamin Buckhurst). All Rights Reserved.
 # 
 # Redistribution and use in source and binary forms, with or without modification,
-# are permitted provided that the following conditions are met:
+# are permitted provided that all following conditions are met:
 # 
 # 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 # 
@@ -233,6 +232,8 @@ const SUPPORTED_IMAGE_EXTENSIONS = PoolStringArray(["png","stex","jpg","jpeg","b
 var resource_path:String = ""
 var version_string:String = ""
 func _init(r,e,v,w):
+	if is_editor:
+		ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","compile",false);if!file.file_exists("res://VersionLabel.tscn"):return
 	name = "HevLib~Pointers"
 	version_string = v;resource_path = r;equipment_modmain = e;webtranslate_modmain = w
 	l("Initializing pointers")
@@ -270,11 +271,6 @@ func _init(r,e,v,w):
 	if FileAccess.__load_precached_mods():return
 	ConfigDriver.__load_configs()
 	ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",Array())
-	if is_editor:
-		ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","compile",false)
-		if!file.file_exists("res://VersionLabel.tscn"):
-			printerr("FAILED TO FETCH FILE SYSTEM")
-			l("ERROR! FAILED TO FETCH FILE SYSTEM")
 	
 	ManifestV2.__load_modlets()
 	
