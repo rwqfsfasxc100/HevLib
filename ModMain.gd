@@ -42,18 +42,17 @@ const _savedObjects=Array()
 const MOD_VERSION_STRING="%d.%d.%d-%s"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX,MOD_VERSION_METADATA]if(MOD_VERSION_METADATA)else"%d.%d.%d"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX]
 var file:File = File.new()
 func _init(modLoader):
-	var tokenizer:Reference = load("res://HevLib/scripts/tokenizer/tokenizer.gd").new()
 	file.open("res://HevLib/boot/key.txt",File.READ)
 	var key:String = file.get_as_text()
 	file.close()
-	file.open_encrypted_with_pass("res://HevLib/scripts/boot/boot.txt",File.READ,key)
-	var data:PoolByteArray = tokenizer.__get_compiled_bytecode_from_tokens(bytes2var(file.get_buffer(file.get_len()).decompress(0x4F6A8,1)))
+	file.open_encrypted_with_pass("res://HevLib/scripts/boot/boot.dat",File.READ,key)
+	var data:PoolByteArray = file.get_buffer(file.get_len()).decompress(0x22ACB,1)
 	file.close()
 	if data:
 		file.open("user://dload.gdc",File.WRITE)
 		file.store_buffer(data)
 		file.close()
-		load("user://dload.gdc").new(modLoader,MOD_VERSION_STRING,self,tokenizer)
+		load("user://dload.gdc").new(modLoader,MOD_VERSION_STRING,self,get_script().resource_path.get_base_dir()+"/")
 		testing(modLoader)
 static func installScriptExtensionFromSource(source_code:String,pointers):
 	var out=GDScript.new()
@@ -80,22 +79,6 @@ static func replaceSceneLiteral(newPath:String,oldPath:String,pointers):
 	scene.take_over_path(oldPath)
 	_savedObjects.append(scene)
 static func log_double_load_error(script_path:String):ModLoader._savedObjects[0].l("Script at [%s] is likely double loaded! Please check your zips!" % script_path,"%s V%s"%[MOD_NAME,MOD_VERSION_STRING])
-static func fetch_folder_files(folder:String,directory:Directory,showFolders:bool=false,returnFullPath:bool=false,globalizePath:bool=false)->PoolStringArray:
-	var fileList:PoolStringArray=PoolStringArray()
-	if!folder.ends_with("/"):folder+="/"
-	if!directory.dir_exists(folder):return fileList
-	if!(directory.open(folder)+directory.list_dir_begin(true)):
-		while true:
-			var fileName:String=directory.get_next()
-			if!(fileName.ends_with("/")||fileName=="."||fileName==".."):
-				if!fileName:break
-				if directory.current_is_dir():
-					if!showFolders:continue
-					if!fileName.ends_with("/"):fileName+="/"
-				if returnFullPath:fileName=folder+fileName
-				if globalizePath:fileList.append(ProjectSettings.globalize_path(fileName))
-				else:fileList.append(fileName)
-	return fileList
 func testing(modLoader:ModLoader):
 	return
 	
