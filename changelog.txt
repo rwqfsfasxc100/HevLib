@@ -126,6 +126,12 @@
 62.3=* Script files keep the original extension scraper.
 62.4=* Script overrides now happen if the `original_path` property is set, removing the need for the additional bool
 62.4.1=* Script overrides can be used for faster extensions than regular script extensions as the destination file path is already known.
+62.5=* Vanilla load order now has corruption protection and will be rebuilt if it's HLZ cannot be read.
+63=* Added HLZ data format.
+63.1=* Intended for use for non-persistent data, such as data sets compiled to reduce strain during runtime.
+63.2=* Invalidates itself if there are changes in: HevLib version, game version, hardware, or OS.
+63.3=* By design, this should not be used for anything valuable, as any variable can change without notice and completely break the format.
+63.4=* Created/extracted respectively with the `__write_hlz` and `__read_hlz` in the `Zip` class, which input/output any variant for simplicity of use
 65=* Updated credits
 
 [1.17.8]

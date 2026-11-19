@@ -102,6 +102,8 @@ signal physics_process_tick(delta)
 
 var os:Object = ClassDB.instance("_OS")
 
+
+
 func _physics_process(delta:float):
 	emit_signal("physics_process_tick",delta)
 	logging_current_frame_timer += 1
@@ -1829,25 +1831,24 @@ class _DataFormat:
 			__reload_scene(sc,override,pointers)
 	
 	static func __override_script(script_path : String, original_path : String,pointers:HevLibPointers = non_statics["pointers"]):
-		pointers.l("Attempting to install script override @ [%s], overwriting [%s]" % [script_path,original_path],log_header)
+		pointers.l("Installing script override @ [%s], overwriting [%s]" % [script_path,original_path],log_header)
 		if __load_if_can(script_path,"Script"):
 			var sc:Script = __get_load()
-			pointers.l("Script override successful with length of %d, passing to compiler" % sc.get_source_code().length(),log_header)
-			__override_script_with_script_object(sc, original_path,pointers)
+			__override_script_with_script_object(sc, original_path,pointers,false)
 	
-	static func __compile_and_override_script(source_code : String, original_path : String,pointers:HevLibPointers = non_statics["pointers"]) -> void:
-		pointers.l("Compiling script for script override overwriting [%s] with a length of %d" % [original_path,source_code.length()],log_header)
+	static func __compile_and_override_script(source_code : String, original_path : String,pointers:HevLibPointers = non_statics["pointers"],do_log:bool = true) -> void:
+		if do_log:pointers.l("Compiling script for script override overwriting [%s] with a length of %d" % [original_path,source_code.length()],log_header)
 		pointers.equipment_modmain.installScriptOverrideFromSource(source_code, original_path,pointers)
 	
-	static func __override_script_with_script_object(script : Script, original_path : String,pointers:HevLibPointers = non_statics["pointers"]) -> void:
-		pointers.l("Installing script override with script %s, overwriting [%s]" % [str(script),original_path],log_header)
+	static func __override_script_with_script_object(script : Script, original_path : String,pointers:HevLibPointers = non_statics["pointers"],do_log:bool = true) -> void:
+		if do_log:pointers.l("Installing script override with script %s, overwriting [%s]" % [str(script),original_path],log_header)
 		pointers.equipment_modmain.installScriptOverrideFromScript(script, original_path,pointers)
 	
 	static func __compile_and_override_script_with_scene(source_code : String, original_path : String, scene_path = Array(), override : bool = false,pointers:HevLibPointers = non_statics["pointers"]) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
 		pointers.l("Attempting to compile and overwrite [%s] (with scene override) with script of length %d, [%d] scene path(s) to reload" % [original_path,source_code.length(),scene_path.size()],log_header)
-		__compile_and_override_script(source_code, original_path,pointers)
+		__compile_and_override_script(source_code, original_path,pointers,false)
 		for i in scene_path.size():
 			var sc:String = scene_path[i]
 			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],log_header)
@@ -1881,7 +1882,7 @@ class _DataFormat:
 		if not (ResourceLoader.exists(resource_path) and File.new().file_exists(original_path)):
 			pointers.l("Cannot replace resource at [%s] as it either does not exist or is not visible to the engine" % resource_path,log_header)
 			return
-		pointers.l("Replacing resource at [%s] with [%s], passing to ModMain" % [original_path,resource_path],log_header)
+		pointers.l("Replacing resource at [%s] with [%s]" % [original_path,resource_path],log_header)
 		pointers.equipment_modmain.replaceSceneLiteral(resource_path,original_path,pointers)
 	
 	static func __replace_scene(scene_data:String,override_path:String = "",scene_file_path:String = "",cache_scene:bool = true,pointers:HevLibPointers = non_statics["pointers"]) -> PackedScene:
@@ -2292,9 +2293,6 @@ class _DriverManagement:
 	const non_static = Dictionary()
 	func _init(f):
 		non_static["pointers"] = f
-		var driver_file_regex:RegEx = RegEx.new()
-		driver_file_regex.compile("[a-z]")
-		non_static["regex"] = driver_file_regex
 		non_static["self"] = self
 	
 	const driver_store = Array()
@@ -2397,11 +2395,47 @@ class _DriverManagement:
 			dgck.append(file_path)
 		return driver_get_cache[file_path].duplicate(true)
 	
+	const SUPPORTED_DRIVER_FILES = PoolStringArray([
+		"ADD_EQUIPMENT_ITEMS",
+		"ADD_EQUIPMENT_SLOTS",
+		"ADD_MINERALS",
+		"ADD_SHIPS",
+		"AUX_POWER_AND_THRUSTERS",
+		"AUX_POWER_SLOT",
+		"DEFINED_CLASS_NAMES",
+		"DLL_MAPPER",
+		"EQUIPMENT_TAGS",
+		"EVENT_DRIVER",
+		"LOAD_RESOURCES",
+		"MODIFY_INTERNALS",
+		"MODIFY_SHIP_BUILDS",
+		"MODIFY_SHIP_NUMERICS",
+		"NAMER",
+		"NODE_DEFINITIONS",
+		"REGISTER_SHIP_NUMERICS",
+		"REPLACE_TRANSLATIONS",
+		"RESEARCH",
+		"RPC_EXTRA_STATES",
+		"SAVE_BUTTONS",
+		"SERVICES",
+		"SHIP_NODE_MODIFY",
+		"SHIP_NODE_REGISTER",
+		"SHIP_THRUSTER_COLORS",
+		"SLOT_ORDER",
+		"SLOT_TAGS",
+		"THRUSTERS",
+		"WEAPONSLOT_ADD",
+		"WEAPONSLOT_MODIFY_TEMPLATES",
+		"WEAPONSLOT_MODIFY",
+		"WEAPONSLOT_SHIP_TEMPLATES",
+		"WEAPONSLOT_SHIP_MODIFY",
+	])
+	
 	static func __is_driver_file(file_path:String) -> bool:
-		var fext:String = file_path.get_extension()
-		if(fext in driver_ext and file_path.get_base_dir().split("/")[-1] + "/" in driver_dirs and not non_static["regex"].search(file_path.get_file().rstrip("." + fext))):
-			return true
-		return false
+		var is_drv:bool = file_path.get_file().get_basename() in SUPPORTED_DRIVER_FILES
+		if not is_drv:
+			breakpoint
+		return (file_path.get_extension() in driver_ext and file_path.get_base_dir().split("/")[-1] + "/" in driver_dirs and is_drv)
 
 class _Equipment:
 	var vanilla_equipment : Dictionary = Dictionary()
@@ -2742,8 +2776,7 @@ class _Equipment:
 												register_ship_numerics_store["REGISTER_PROPELLANT"].append({equipment.get("num_val",0):bp})
 								ADD_EQUIPMENT_ITEMS.append(equipment)
 					"ADD_EQUIPMENT_SLOTS.gd":
-						for item in constKeys:
-							var equipment:Dictionary = constants[item]
+						for equipment in constants.values():
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								ADD_EQUIPMENT_SLOTS.append(equipment)
 					"EQUIPMENT_TAGS.gd":
@@ -2759,8 +2792,7 @@ class _Equipment:
 					"SLOT_TAGS.gd":
 						SLOT_TAGS.append(constants.get("SLOT_TAGS",Dictionary()))
 					"AUX_POWER_SLOT.gd","THRUSTERS.gd","AUX_POWER_AND_THRUSTERS.gd":
-						for item in constKeys:
-							var equipment : Dictionary = constants.get(item)
+						for equipment in constants.values():
 							if pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								AUX_POWER_AND_THRUSTERS.append(equipment)
 					"MODIFY_INTERNALS.gd":
@@ -2825,12 +2857,12 @@ class _Equipment:
 					"SHIP_NODE_REGISTER.gd":
 						ship_node_register.append_array(constants.values())
 					"SHIP_NODE_MODIFY.gd":
-						for item in constKeys:
-							var ship : String = constants[item].get("ship_name","")
+						for item in constants.values():
+							var ship : String = item.get("ship_name","")
 							if ship:
 								if not ship in ship_node_modify:
 									ship_node_modify[ship] = Array()
-								for modification in constants[item].get("modifications",Array()):
+								for modification in item.get("modifications",Array()):
 									ship_node_modify[ship].append(modification)
 					"SHIP_THRUSTER_COLORS.gd":
 						var cd : Dictionary = constants.get("SHIP_THRUSTER_COLORS",Dictionary())
@@ -2846,17 +2878,15 @@ class _Equipment:
 							if "config" in cd[ship]:
 								ship_thruster_colors[ship]["config"] = cd[ship]["config"]
 					"WEAPONSLOT_ADD.gd":
-						for item in constKeys:
-							var equipment : Dictionary = constants.get(item)
+						for equipment in constants.values():
 							var n : String = equipment.get("name","")
-							if n:
+							if n and pointers.ConfigDriver.__validate_dictionary(equipment,false):
 								if not n in ws_equipment_names:
 									ws_equipment_names.append(n)
-								if pointers.ConfigDriver.__validate_dictionary(equipment,false):
-									WEAPONSLOT_ADD.append(equipment)
+								WEAPONSLOT_ADD.append(equipment)
 					"WEAPONSLOT_MODIFY_TEMPLATES.gd":
 						var ar : Dictionary = constants.get("WEAPONSLOT_MODIFY_TEMPLATES",Dictionary())
-						for template in ar:
+						for template in ar.keys():
 							if template in weaponslot_modify_templates:
 								for datapoint in ar[template]:
 									match datapoint:
@@ -2986,15 +3016,13 @@ class _Equipment:
 							if pointers.ConfigDriver.__validate_dictionary(button,false):
 								save_button_cache.append(button)
 					"ADD_SHIPS.gd":
-						for ar in constKeys:
-							var ac : Dictionary = constants[ar]
+						for ac in constants.values():
 							if pointers.ConfigDriver.__validate_dictionary(ac,false):
 								add_ships_store.append(ac)
 					"MODIFY_SHIP_BUILDS.gd":
-						for ar in constKeys:
-							var sorting:Dictionary = Dictionary()
-							var dict : Dictionary = constants[ar]
+						for dict in constants.values():
 							if pointers.ConfigDriver.__validate_dictionary(dict):
+								var sorting:Dictionary = Dictionary()
 								var shipNames = dict.get("ship_name",Array())
 								if shipNames is String:
 									shipNames = PoolStringArray([shipNames])
@@ -3030,13 +3058,13 @@ class _Equipment:
 													i["ship_name"] = shipName
 													for _r in i.get("weight",1):
 														sorting[prio].append(i.duplicate(true))
-							var sKeys:Array = sorting.keys()
-							sKeys.sort()
-							for o in sKeys:
-								seed(sorting.hash())
-								sorting[o].shuffle()
-								for i in sorting[o]:
-									ship_build_mod_store.append(i)
+								var sKeys:Array = sorting.keys()
+								sKeys.sort()
+								for o in sKeys:
+									seed(sorting.hash())
+									sorting[o].shuffle()
+									for i in sorting[o]:
+										ship_build_mod_store.append(i)
 					"REGISTER_SHIP_NUMERICS.gd":
 						for ar in constKeys:
 							if not ar in register_ship_numerics_store:
@@ -3047,8 +3075,7 @@ class _Equipment:
 								if pointers.ConfigDriver.__validate_dictionary(ax,false):
 									register_ship_numerics_store[ar].append({v:ax})
 					"MODIFY_SHIP_NUMERICS.gd":
-						for item in constKeys:
-							var di : Dictionary = constants[item]
+						for di in constants.values():
 							var ship : String = di.get("ship_name","")
 							if ship:
 								if ship in modify_ship_numerics:
@@ -5287,13 +5314,13 @@ class _ManifestV2:
 					if modFSPath.get_extension() == "zip" and pointers.FileAccess.__file_exists(modFSPath):
 						modZipProcessing.append({"object":base,"method":"get_mod_zip_content","args":[modFSPath,pointers]})
 				dir.list_dir_end()
-				pointers.SafeMode.ready()
 				pointers.Threading.__request_multiple_threads(modZipProcessing)
 				var hls:String = zip_ref_store.get("res://HevLib/ModMain.gd","")
 				if hls&&hls.get_file()!="HevLib.zip":
 					pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.",log_header)
 			# Load translations
 			pointers.Translations.__inject_translations()
+			pointers.SafeMode.ready()
 			var manifest_count:int = 0
 			var library_count:int = 0
 			var non_library_count:int = 0
@@ -6988,8 +7015,6 @@ class _ManifestV2:
 			var paths:Array = ovr[i]
 			paths.sort_custom(non_static["self"],"sortModPathOrder")
 			order.append([i,paths,LO.find(i)])
-			if LO.find(i) < 0:
-				no_order.append(i)
 		order.sort_custom(non_static["self"],"sortModLoadOrder")
 		for r in order:
 			for i in r[1]:
@@ -7960,29 +7985,23 @@ class _SafeMode:
 		regex.compile(p.DataFormat.crcTable.B10.get_string_from_utf8())
 	
 	const safemode_dir = "user://cache/SafeMode/"
-	const validation_check_path:String = safemode_dir + "recache_validation.dat"
 	const sm_data_path:String = safemode_dir + "pck.dat"
 	
 	const log_header = "pointers.SafeMode"
 	var file:File = File.new()
 	func ready():
-		var vanilla_version:PoolIntArray = pointers.DataFormat.__get_vanilla_version()
-		var validation_check:Dictionary = Dictionary()
-		var decomp_size:int = -1
-		if file.file_exists(validation_check_path):
-			file.open(validation_check_path,File.READ)
-			validation_check = bytes2var(file.get_buffer(file.get_len()))
-			if validation_check:
-				decomp_size = validation_check["decompressed_size"]
+		var data = null
+		if file.file_exists(sm_data_path):
+			file.open(sm_data_path,File.READ)
+			data = pointers.Zip.__read_hlz(file.get_buffer(file.get_len()))
 			file.close()
-		if (validation_check and validation_check.get("hevlib_cache_version",-1) != HEVLIB_CACHE_VERSION) or decomp_size < 1 or pointers.ManifestV2.haveModsChanged or !deep_equal(PoolIntArray(validation_check.get("vanilla_version",PoolIntArray([1,0,0]))),vanilla_version) or !file.file_exists(validation_check_path) or !file.file_exists(sm_data_path):
+		
+		if not data is Array or pointers.ManifestV2.haveModsChanged:
 			pointers.l("Game has updated or cache is missing, rebuilding file info cache.",log_header)
 			pointers.FolderAccess.__recursive_delete(safemode_dir)
 			Directory.new().make_dir(safemode_dir)
 			var timerStart:int = Time.get_ticks_usec()
 			PCKNAMES.append_array(pointers.FolderAccess.__get_vanilla_script_and_scenes())
-			validation_check["vanilla_version"] = vanilla_version
-			validation_check["hevlib_cache_version"] = HEVLIB_CACHE_VERSION
 			for f in PCKNAMES:
 				get_dependancies_for_vanilla_file(f)
 			order_tree.merge(flatten_tree(get_dependancy_tree()))
@@ -8000,26 +8019,18 @@ class _SafeMode:
 							idx = i
 							break
 				idx += 1
-			var data_to_store:PoolByteArray = var2bytes([
+			var data_to_store:PoolByteArray = pointers.Zip.__write_hlz([
 				JSON.print(PCKNAMES),
 				JSON.print(vanilla_load_order),
 				JSON.print(dependancy_lookup),
 				JSON.print(dependancy_dictionary)
 			])
-			decomp_size = data_to_store.size()
-			validation_check["decompressed_size"] = decomp_size
 			file.open(sm_data_path,File.WRITE)
-			file.store_buffer(data_to_store.compress(1))
+			file.store_buffer(data_to_store)
 			file.close()
 			var timerEnd:int = Time.get_ticks_usec()-timerStart
 			pointers.l("Cache rebuilt in %d.%03d ms" % [int(floor(timerEnd / 1000.0)),timerEnd % 1000],log_header)
-			file.open(validation_check_path,File.WRITE)
-			file.store_buffer(var2bytes(validation_check))
-			file.close()
 		else:
-			file.open(sm_data_path,File.READ)
-			var data:Array = bytes2var(file.get_buffer(file.get_len()).decompress(decomp_size,1))
-			file.close()
 			PCKNAMES.append_array(JSON.parse(data[0]).result)
 			vanilla_load_order.append_array(JSON.parse(data[1]).result)
 			dependancy_lookup.merge(JSON.parse(data[2]).result)
@@ -9136,6 +9147,8 @@ class _Zip:
 	
 	const log_header = "pointers.Zip"
 	
+	
+	
 	# Port of the `load` method from hhyyrylainen's GodotPckTool
 	# https://github.com/hhyyrylainen/GodotPckTool
 	static func __load_pck(file_path:String,only_filenames:bool = false):
@@ -9237,13 +9250,16 @@ class _Zip:
 		if miniz.open_read(zip_path) == OK:
 			miniz.extract_all(dir_path)
 	
-	static func __write_hlz(data) -> String:
+	static func __write_hlz(data,salt:PoolByteArray = PoolByteArray()) -> PoolByteArray:
 		var aes:AESContext = AESContext.new()
-		var key:PoolByteArray = OS.get_unique_id().sha256_buffer()
+		var uid:String = OS.get_unique_id()
+		var key:PoolByteArray = uid.sha256_buffer()
 		if aes.start(AESContext.MODE_CBC_ENCRYPT,key.subarray(0,15),key.subarray(16,31)):
-			printerr("ZIP: CRITICAL ERROR - CANNOT WRITE HLZ")
-			return ""
+			printerr("ZIP: CANNOT START HLZ WRITE")
+			return PoolByteArray()
 		var stream:StreamPeerBuffer = StreamPeerBuffer.new()
+		var pointers:HevLibPointers = non_static["pointers"]
+		stream.put_data(salt if salt else ("HLS" + (uid + "%d.%d.%d" % Array(pointers.DataFormat.__get_vanilla_version()) + pointers.version_string).sha256_text()).to_ascii())
 		var toBytes:PoolByteArray = var2bytes(data,true)
 		stream.put_32(toBytes.size())
 		var forCmp:PoolByteArray = toBytes.compress(1)
@@ -9256,25 +9272,41 @@ class _Zip:
 			for i in rem:
 				a[i] = 0
 			forCmp.append_array(a)
-		stream.put_data(aes.update(forCmp))
-		return Marshalls.raw_to_base64(stream.data_array)
+		var ob:PoolByteArray = aes.update(forCmp)
+		stream.put_32(ob.size())
+		stream.put_data(ob.compress(1))
+		return stream.data_array
 	
-	static func __read_hlz(data:String):
+	static func __read_hlz(data:PoolByteArray,salt:PoolByteArray = PoolByteArray()):
+		if not data:
+			printerr("ZIP: HLZ IS EMPTY")
+			return null
 		var stream:StreamPeerBuffer = StreamPeerBuffer.new()
-		stream.put_data(Marshalls.base64_to_raw(data))
+		stream.put_data(data)
 		var ssz:int = stream.get_size()
 		stream.seek(0)
+		var uid:String = OS.get_unique_id()
+		var pointers:HevLibPointers = non_static["pointers"]
+		if PoolByteArray(stream.get_data(67)[1]) != (salt if salt else ("HLS" + (uid + "%d.%d.%d" % Array(pointers.DataFormat.__get_vanilla_version()) + pointers.version_string).sha256_text()).to_ascii()):
+			printerr("ZIP: SALT IS CORRUPTED")
+			return null
 		var sz:int = stream.get_32()
 		var tbs:int = stream.get_32()
-		var bytes:PoolByteArray = stream.get_data(ssz - 8)[1]
+		var tot:int = stream.get_32()
+		var bytes:PoolByteArray = stream.get_data(ssz - 8)[1].decompress(tot,1)
 		var aes:AESContext = AESContext.new()
-		var key:PoolByteArray = OS.get_unique_id().sha256_buffer()
+		var key:PoolByteArray = uid.sha256_buffer()
 		if aes.start(AESContext.MODE_CBC_DECRYPT,key.subarray(0,15),key.subarray(16,31)):
-			printerr("ZIP: CRITICAL ERROR - CANNOT READ HLZ")
+			printerr("ZIP: CANNOT START HLZ READ")
 			return null
 		var out:PoolByteArray = aes.update(bytes)
 		out.resize(out.size() - tbs)
-		return bytes2var(out.decompress(sz,1))
+		var btr:PoolByteArray = out.decompress(sz,1)
+		if btr:
+			return bytes2var(btr)
+		printerr("ZIP: CANNOT READ HLZ")
+		return null
+	
 
 
 

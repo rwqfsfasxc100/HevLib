@@ -32,32 +32,387 @@
 
 extends Reference
 
-var pos:int = 0
-var line:int = 1
-var length:int = 0
-
-func __source_to_tokens(source_code:String) -> bool:
+static func __source_to_tokens(source_code:String) -> Array:
+	var token_store:Array = Array()
 	source_code=source_code.replace("\r","")
-	var source_length:int = source_code.length()
-	pos = 0
-	line = 1
-	length = source_length
-	type_store.clear()
-	args_store.clear()
-	line_store.clear()
-	char_store.clear()
-	char_store.resize(source_length)
-	for i in source_length:
+	var length:int = source_code.length()
+	var char_store:PoolIntArray = PoolIntArray()
+	char_store.resize(length)
+	var position_store:Array = [0,1,length]
+	for i in length:
 		char_store[i] = source_code.ord_at(i)
 	while true:
-		if not next_token():
-			return false
-		if type_store[-1] == TK_EOF:
+		if not process_next_token(token_store,position_store,char_store):
+			return []
+		if token_store[-1][0] == TK_EOF:
 			break
-	return true
+	return token_store
 
-func __get_compiled_bytecode_from_tokens() -> PoolByteArray:
-	if not type_store.size():
+static func __tokens_to_source(tokens:Array) -> String:
+	var token_count:int = tokens.size()
+	var tab_ctr:PoolIntArray = PoolIntArray()
+	var nesting_level:PoolIntArray = PoolIntArray()
+	var depth_at:PoolIntArray = PoolIntArray()
+	
+	depth_at.resize(token_count)
+	tab_ctr.resize(token_count)
+	nesting_level.resize(token_count)
+	var depth:int = 0
+	var widths:Array = [0]
+	var level:int = 0
+	
+	var out:PoolStringArray = PoolStringArray()
+	var line:int = 1
+	var at_start:bool = true
+	var prev:int = -1
+	var prev_text:String = ""
+	var prev_unary:bool = false
+	var nodepath_state:int = 0
+	var cont_tabs:int = 0
+	
+	var func_size:int = func_index_array.size() - 1
+	
+	
+	for i in token_count:
+		var this_token:Array = tokens[i]
+		var t:int = this_token[0]
+		var t_line:int = this_token[1]
+		var t_arg = this_token[2]
+		depth_at[i] = depth
+		tab_ctr[i] = 0
+		nesting_level[i] = level
+		
+		if t == TK_PARENTHESIS_OPEN or t == TK_BRACKET_OPEN or t == TK_CURLY_BRACKET_OPEN:
+			depth += 1
+		elif t == TK_PARENTHESIS_CLOSE or t == TK_BRACKET_CLOSE or t == TK_CURLY_BRACKET_CLOSE:
+			var d1:int = depth - 1
+			depth = d1 if d1 > 0 else 0
+		elif t == TK_NEWLINE:
+			if (i + 1 < token_count and tokens[i + 1][0] == TK_EOF) or not (i + 1 > token_count - 1 or tokens[i + 1][0] != TK_NEWLINE):
+				tab_ctr[i] = 0
+			elif depth_at[i] > 0:
+				tab_ctr[i] = level + depth_at[i]
+			else:
+				while widths.size() > 1 and widths[-1] > t_arg:
+					widths.pop_back()
+				if widths[-1] < t_arg:
+					widths.append(t_arg)
+				level = widths.size() - 1
+				tab_ctr[i] = level
+				nesting_level[i] = level
+		
+		if t == TK_EOF:
+			break
+		if t == TK_EMPTY or t == TK_CURSOR:
+			i += 1
+			continue
+		if t == TK_ERROR:
+			printerr("SCRIPT DECOMPILE ERR: Token %d is an error token" % i)
+			return ""
+		if t < 0 or t > TK_CURSOR:
+			printerr("SCRIPT DECOMPILE ERR: Unknown token id %d at token %d" % [t, i])
+			return ""
+		if t == TK_NEWLINE:
+			for k in (t_arg - line - 1):
+				out.append("\\\n" if at_start else " \\\n")
+				at_start = true
+				line += 1
+			out.append("\n" + "\t".repeat(tab_ctr[i]))
+			var lsb:int = line + 1
+			line = t_line if t_line > lsb else lsb
+			at_start = true
+			cont_tabs = nesting_level[i] + 1
+			if depth_at[i] == 0:
+				prev = -1
+				prev_text = ""
+			prev_unary = false
+			nodepath_state = 0
+			i += 1
+			continue
+		
+		var text:String = ""
+		match t:
+			TK_IDENTIFIER:
+				if not t_arg is String or t_arg.empty():
+					printerr("SCRIPT DECOMPILE ERR: Identifier token %d has no name" % i)
+					return ""
+				text = t_arg
+			TK_CONSTANT:
+				match typeof(t_arg):
+					TYPE_NIL:
+						text = "null"
+					TYPE_BOOL:
+						text = "true" if t_arg else "false"
+					TYPE_INT:
+						if t_arg > -1:
+							text = str(t_arg)
+						else:
+							var hi:int = (t_arg >> 32) & 0xFFFFFFFF
+							var lo:int = t_arg & 0xFFFFFFFF
+							text = "0x%08X%08X" % [hi, lo]
+					TYPE_REAL:
+						text = float_to_string(t_arg)
+					TYPE_STRING:
+						text = escape_string_with_quotes(t_arg)
+					TYPE_NODE_PATH:
+						text = "@" + escape_string_with_quotes(str(t_arg))
+					var ty:
+						printerr("SCRIPT DECOMPILE ERR: Cannot write constant of type %d at token %d" % [ty, i])
+						return ""
+			TK_BUILT_IN_TYPE:
+				if not t_arg is int or not t_arg in type_names:
+					printerr("SCRIPT DECOMPILE ERR: Unknown built-in type id %s at token %d" % [t_arg, i])
+					return ""
+				text = type_names[t_arg]
+			TK_BUILT_IN_FUNC:
+				if not t_arg is int or t_arg < 0 or t_arg > func_size:
+					printerr("SCRIPT DECOMPILE ERR: Unknown built-in function id %s at token %d" % [t_arg, i])
+					return ""
+				text = func_index_array[t_arg]
+			var tkx:
+				if tkx in static_tokens:
+					text = static_tokens[t]
+				else:
+					printerr("SCRIPT DECOMPILE ERR: Token id %d at token %d has no source text" % [tkx, i])
+					return ""
+		
+		var skip_next:bool = false
+		if t == TK_COLON and i + 1 < token_count and tokens[i + 1][0] == TK_OP_ASSIGN:
+			text = ":="
+			skip_next = true
+		
+		var sep:String = ""
+		if not at_start and prev != -1:
+			sep = get_string_separator(i, prev, prev_unary, nodepath_state, token_count,tokens)
+			if sep.empty() and prev_text and text:
+				var a:String = prev_text[-1]
+				var b:String = text[0]
+				if a in operator_characters and b in operator_characters:
+					sep = " "
+		if nodepath_state == 1:
+			nodepath_state = 1 if t == TK_PERIOD else 2
+		elif nodepath_state == 2:
+			nodepath_state = 1 if (t == TK_OP_DIV and is_following_token_path(i + 1,token_count,t,t_arg)) else 0
+		if t == TK_COLON and skip_next and sep.empty():
+			sep = " "
+		
+		var delta:int = t_line - line
+		var raw_multiline:bool = false
+		var newline_count:int = 0
+		if t == TK_CONSTANT and t_arg is String:
+			newline_count = t_arg.count("\n")
+			if newline_count > 0 and delta > newline_count - 1:
+				raw_multiline = true
+		
+		var breaks:int = delta - (newline_count if raw_multiline else 0)
+		if breaks > 0:
+			for b in breaks:
+				out.append(("\\\n" if at_start else " \\\n"))
+				at_start = true
+			out.append("")
+			line += breaks
+			sep = ""
+		if raw_multiline:
+			text = "\"\"\"" + escape_string(t_arg, true) + "\"\"\""
+			line += newline_count
+		
+		if t == TK_DOLLAR:
+			nodepath_state = 1
+		
+		out.append(sep + text)
+		at_start = false
+		
+		prev_unary = false
+		if t == TK_OP_SUB or t == TK_OP_ADD:
+			prev_unary = (prev == -1) or not is_token_operand_end(prev,tokens)
+		elif t == TK_OP_BIT_INVERT:
+			prev_unary = true
+		prev = i
+		prev_text = text
+		i += 2 if skip_next else 1
+	var source:String = out.join("")
+	if source and not source.ends_with("\n"):
+		source += "\n"
+	return source
+static func __decast_source(source_code:String,class_names_to_clear:PoolStringArray,casting_to_replace:Dictionary) -> String:
+	source_code = source_code.replace("\r","")
+	var has_class_name:bool = (source_code.begins_with("class_name") or "\nclass_name" in source_code)
+	var needs_recompile:bool = has_class_name
+	var check_for_these_classes:PoolStringArray = PoolStringArray()
+	for i in class_names_to_clear:
+		if i in source_code:
+			needs_recompile = true
+	if not needs_recompile:
+		return source_code
+	
+	var tokens_to_compile:Array = Array()
+	var ov_tokens:Array = __source_to_tokens(source_code)
+	var ov_size:int = ov_tokens.size()
+	var need_class_name_handling:bool = has_class_name
+	
+	var idx:int = 0
+	while idx < ov_size:
+		var token:Array = ov_tokens[idx]
+		var this_type:int = token[0]
+		var this_line:int = token[1]
+		var this_arg = token[2]
+		
+		if this_type == TK_PR_VAR:
+			tokens_to_compile.append([this_type,this_line,this_arg])
+			var next_token:Array = ov_tokens[idx + 1]
+			tokens_to_compile.append([next_token[0],next_token[1],next_token[2]])
+			idx += 2
+			if ov_tokens[idx][0] == TK_COLON:
+				idx += 1
+				var nex_tok:int = ov_tokens[idx][0]
+				while not (nex_tok == TK_OP_ASSIGN or nex_tok == TK_NEWLINE or nex_tok == TK_EOF or nex_tok == TK_PR_SETGET):
+					idx += 1
+					nex_tok = ov_tokens[idx][0]
+				var nx:Array = ov_tokens[idx]
+				tokens_to_compile.append([nx[0],nx[1],nx[2]])
+				idx += 1
+		elif this_type == TK_PR_FUNCTION:
+			tokens_to_compile.append([this_type,this_line,this_arg])
+			var next_token:Array = ov_tokens[idx + 1]
+			tokens_to_compile.append([next_token[0],next_token[1],next_token[2]])
+			var next_token2:Array = ov_tokens[idx + 2]
+			tokens_to_compile.append([next_token2[0],next_token2[1],next_token2[2]])
+			idx += 3
+			var depth:int = 1
+			while depth > 0:
+				var cur_token:Array = ov_tokens[idx]
+				var cur_type:int = cur_token[0]
+				if cur_type == TK_PARENTHESIS_CLOSE or cur_type == TK_BRACKET_CLOSE or cur_type == TK_CURLY_BRACKET_CLOSE:
+					depth -= 1
+				elif cur_type == TK_PARENTHESIS_OPEN or cur_type == TK_BRACKET_OPEN or cur_type == TK_CURLY_BRACKET_OPEN:
+					depth += 1
+				elif depth == 1 and cur_type == TK_COLON:
+					var nex_arg = ov_tokens[idx + 1][2]
+					if nex_arg is String and nex_arg in class_names_to_clear:
+						idx += 2
+						var nex_type:int = ov_tokens[idx][0]
+						var cr:String = token_lookup[nex_type]
+						while not (nex_type == TK_COMMA or nex_type == TK_OP_ASSIGN or nex_type == TK_PARENTHESIS_CLOSE):
+							idx += 1
+							nex_type = ov_tokens[idx][0]
+						continue
+				var ixr:Array = ov_tokens[idx]
+				tokens_to_compile.append([ixr[0],ixr[1],ixr[2]])
+				idx += 1
+		elif this_type == TK_IDENTIFIER and this_arg in class_names_to_clear:
+			tokens_to_compile.append_array([
+				[TK_BUILT_IN_FUNC,this_line,76],
+				[TK_PARENTHESIS_OPEN,this_line,null],
+				[TK_CONSTANT,this_line,casting_to_replace[this_arg]],
+				[TK_PARENTHESIS_CLOSE,this_line,null]
+			])
+			idx += 1
+		elif this_type == TK_FORWARD_ARROW:
+			idx += 2
+		elif need_class_name_handling and this_type == TK_PR_CLASS_NAME:
+			idx += 2
+			need_class_name_handling = false
+		else:
+			tokens_to_compile.append([this_type,this_line,this_arg])
+			idx += 1
+	return __tokens_to_source(tokens_to_compile)
+static func __compiled_bytecode_to_tokens(gdc_bytes:PoolByteArray) -> Array:
+	var length:int = gdc_bytes.size()
+	if length < 24:
+		printerr("Data too short to be a GDScript token buffer (%d gdc_bytes)" % length)
+		return Array()
+	if gdc_bytes[0] != 0x47 or gdc_bytes[1] != 0x44 or gdc_bytes[2] != 0x53 or gdc_bytes[3] != 0x43:
+		printerr("Missing GDSC header")
+		return Array()
+	var position_store:Array = [4,1,length]
+	if get_uint32(gdc_bytes,position_store) != 13:
+		printerr("Unsupported bytecode version")
+		return Array()
+	var identifier_count:int = get_uint32(gdc_bytes,position_store)
+	var constant_count:int = get_uint32(gdc_bytes,position_store)
+	var line_count:int = get_uint32(gdc_bytes,position_store)
+	var token_count:int = get_uint32(gdc_bytes,position_store)
+	var rest:int = position_store[2] - position_store[0]
+	
+	if identifier_count * 4 > rest or constant_count * 4 > rest or line_count * 8 > rest or token_count > rest:
+		printerr("Header counts exceed the size of the data")
+		return Array()
+	
+	var identifiers:Array = Array()
+	for i in identifier_count:
+		var l:int = get_uint32(gdc_bytes,position_store)
+		if l > position_store[2] - position_store[0]:
+			printerr("Invalid identifier length %d" % l)
+			return Array()
+		var decoded:PoolByteArray = PoolByteArray()
+		for byte in get_next_bytes(l,gdc_bytes,position_store):
+			byte ^= 0xb6
+			if byte == 0:
+				break
+			decoded.append(byte)
+		identifiers.append(decoded.get_string_from_utf8())
+	
+	var constants:Array = Array()
+	for i in constant_count:
+		constants.append(get_const(gdc_bytes,position_store))
+	if line_count * 8 > position_store[2] - position_store[0]:
+		printerr("Invalid line count")
+		return Array()
+	
+	var line_at:Dictionary = Dictionary()
+	var line_list:PoolIntArray = PoolIntArray()
+	line_list.resize(line_count)
+	for i in line_count:
+		var v:int = get_uint32(gdc_bytes,position_store)
+		line_at[v] = get_uint32(gdc_bytes,position_store)
+		line_list[i] = v
+	
+	var tokens:Array = Array()
+	tokens.resize(token_count)
+	
+	var current_line:int = 1
+	for i in token_count:
+		var pos:int = position_store[0]
+		if length - pos < 1:
+			printerr("Unexpected end of data in token list")
+			return Array()
+		var value:int = 0
+		if gdc_bytes[pos] & 0x80:
+			if length - pos < 4:
+				printerr("Unexpected end of data in token list")
+				return Array()
+			value = get_uint32(gdc_bytes,position_store) & -129
+		else:
+			value = gdc_bytes[pos]
+			position_store[0] += 1
+		var type:int = value & 0xFF
+		var arg:int = value >> 8
+		if type > (TK_MAX - 1):
+			printerr("Unknown token id %d at token %d" % [type, i])
+			return Array()
+		var payload = null
+		match type:
+			TK_IDENTIFIER:
+				if arg < identifier_count:
+					payload = identifiers[arg]
+				else:
+					printerr("Identifier index %d out of range at token %d" % [arg, i])
+					return Array()
+			TK_CONSTANT:
+				if arg < constant_count:
+					payload = constants[arg]
+				else:
+					printerr("Constant index %d out of range at token %d" % [arg, i])
+					return Array()
+			TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_NEWLINE:
+				payload = arg
+		if i in line_list:
+			current_line = line_at[i]
+		tokens[i] = [type,current_line,payload]
+	return tokens
+static func __get_compiled_bytecode_from_tokens(tokens:Array) -> PoolByteArray:
+	var tks:int = tokens.size()
+	if not tks:
 		printerr("Token store is empty")
 		return PoolByteArray()
 	var identifier_map:Dictionary = Dictionary()
@@ -68,46 +423,48 @@ func __get_compiled_bytecode_from_tokens() -> PoolByteArray:
 	var line_numbers:PoolIntArray = PoolIntArray()
 	var token_array:PoolIntArray = PoolIntArray()
 	var line:int = -1
-	for k in type_store.size():
-		if line_store[k] != line:
-			line = line_store[k]
+	
+	for k in tks:
+		var current_token:Array = tokens[k]
+		var t:int = current_token[0]
+		var t_line:int = current_token[1]
+		var t_arg = current_token[2]
+		
+		if t_line != line:
+			line = t_line
 			line_tokens.append(k)
 			line_numbers.append(line)
-		var t:int = type_store[k]
-		var local_token:int = t
 		if t == TK_IDENTIFIER:
-			var id:String = args_store[k]
-			if not id in identifiers:
-				identifier_map[id] = identifiers.size()
-				identifiers.append(id)
-			local_token |= (identifier_map[id] << 8)
+			if not t_arg in identifiers:
+				identifier_map[t_arg] = identifiers.size()
+				identifiers.append(t_arg)
+			t |= (identifier_map[t_arg] << 8)
 		elif t == TK_CONSTANT:
-			var constant_val = args_store[k]
 			var key:String = ""
-			var ct:int = typeof(constant_val)
+			var ct:int = typeof(t_arg)
 			if ct == TYPE_NIL:
 				key = "nil"
 			elif ct == TYPE_BOOL:
-				key = "b" + str(constant_val)
+				key = "b" + str(t_arg)
 			elif ct == TYPE_INT:
-				key = "i" + str(constant_val)
+				key = "i" + str(t_arg)
 			elif ct == TYPE_REAL:
 				var tmp:StreamPeerBuffer = StreamPeerBuffer.new()
-				tmp.put_double(constant_val)
+				tmp.put_double(t_arg)
 				key = "f" + str(tmp.data_array)
 			elif ct == TYPE_STRING:
-				key = "s" + constant_val
+				key = "s" + t_arg
 			elif ct == TYPE_NODE_PATH:
-				key = "n" + str(constant_val)
+				key = "n" + str(t_arg)
 			else:
-				key = "?" + str(constant_val)
+				key = "?" + str(t_arg)
 			if not key in constants:
 				constant_map[key] = constants.size()
-				constants.append(constant_val)
-			local_token |= (constant_map[key] << 8)
+				constants.append(t_arg)
+			t |= (constant_map[key] << 8)
 		elif t == TK_BUILT_IN_TYPE or t == TK_BUILT_IN_FUNC or t == TK_NEWLINE:
-			local_token |= (args_store[k] << 8)
-		token_array.append(local_token)
+			t |= (t_arg << 8)
+		token_array.append(t)
 	var out:StreamPeerBuffer=StreamPeerBuffer.new()
 	out.put_u8(0x47) # G
 	out.put_u8(0x44) # D
@@ -127,9 +484,9 @@ func __get_compiled_bytecode_from_tokens() -> PoolByteArray:
 		out.put_u32(l + extra)
 		for b in cs:
 			out.put_u8(b ^ 0xb6)
-		out.put_u8(0 ^ 0xb6)
+		out.put_u8(182)
 		for e in extra:
-			out.put_u8(0 ^ 0xb6)
+			out.put_u8(182)
 	for v in constants:
 		var ctype:int = typeof(v)
 		if ctype == TYPE_NIL:
@@ -139,7 +496,7 @@ func __get_compiled_bytecode_from_tokens() -> PoolByteArray:
 			out.put_u32(1 if v else 0)
 		elif ctype == TYPE_INT:
 			if abs(v) > 2147483647:
-				out.put_u32(2 | (1 << 16))
+				out.put_u32(2 | 65536)
 				out.put_64(v)
 			else:
 				out.put_u32(2)
@@ -156,7 +513,7 @@ func __get_compiled_bytecode_from_tokens() -> PoolByteArray:
 				out.put_u32(3)
 				out.put_float(v)
 			else:
-				out.put_u32(3 | (1 << 16))
+				out.put_u32(3 | 65536)
 				out.put_double(v)
 		elif ctype == TYPE_STRING:
 			out.put_u32(4)
@@ -178,741 +535,20 @@ func __get_compiled_bytecode_from_tokens() -> PoolByteArray:
 		out.put_u32(line_tokens[k])
 		out.put_u32(line_numbers[k])
 	for tk in token_array:
-		if tk & ~0xFF:
+		if tk & -256:
 			out.put_u32(tk | 0x80)
 		else:
 			out.put_u8(tk)
 	return out.data_array
 
 func __get_token_string_name(token:int) -> String:
-	if token in token_list:
-		return token_lookup[token]
-	return ""
+	return token_lookup.get(token,"")
 
 func __is_static_token(token:int) -> bool:
 	return token in static_token_list
 
 func __get_static_token(token:int) -> String:
-	return static_tokens[token]
-
-func __compiled_bytecode_to_tokens(bytes:PoolByteArray) -> bool:
-	gdc_bytes.clear()
-	gdc_bytes.append_array(bytes)
-	length = bytes.size()
-	line = 1
-	pos = 0
-	
-	if length < 24:
-		printerr("Data too short to be a GDScript token buffer (%d gdc_bytes)" % length)
-		return false
-	if gdc_bytes[0] != 0x47 or gdc_bytes[1] != 0x44 or gdc_bytes[2] != 0x53 or gdc_bytes[3] != 0x43:
-		printerr("Missing GDSC header")
-		return false
-	pos = 4
-	if get_uint32() != 13:
-		printerr("Unsupported bytecode version")
-		return false
-	
-	var identifier_count:int = get_uint32()
-	var constant_count:int = get_uint32()
-	var line_count:int = get_uint32()
-	var token_count:int = get_uint32()
-	var rest:int = length - pos
-	
-	if identifier_count * 4 > rest or constant_count * 4 > rest or line_count * 8 > rest or token_count > rest:
-		printerr("Header counts exceed the size of the data")
-		return false
-	var identifiers:Array = Array()
-	for i in identifier_count:
-		var l:int = get_uint32()
-		if l > length - pos:
-			printerr("Invalid identifier length %d" % l)
-			return false
-		var decoded:PoolByteArray = PoolByteArray()
-		for byte in get_next_bytes(l):
-			byte ^= 0xb6
-			if byte == 0:
-				break
-			decoded.append(byte)
-		identifiers.append(decoded.get_string_from_utf8())
-	var constants:Array = Array()
-	for i in constant_count:
-		constants.append(get_const())
-	if line_count * 8 > length - pos:
-		printerr("Invalid line count")
-		return false
-	var line_at:Dictionary = Dictionary()
-	var line_list:PoolIntArray = PoolIntArray()
-	line_list.resize(line_count)
-	for i in line_count:
-		var v:int = get_uint32()
-		line_at[v] = get_uint32()
-		line_list[i] = v
-	type_store.resize(token_count)
-	args_store.resize(token_count)
-	line_store.resize(token_count)
-	
-	var current_line:int = 1
-	for i in token_count:
-		if length - pos < 1:
-			printerr("Unexpected end of data in token list")
-			return false
-		var value:int = 0
-		if gdc_bytes[pos] & 0x80:
-			if length - pos < 4:
-				printerr("Unexpected end of data in token list")
-				return false
-			value = get_uint32() & ~0x80
-		else:
-			value = gdc_bytes[pos]
-			pos += 1
-		var type:int = value & 0xFF
-		var arg:int = value >> 8
-		if type >= TK_MAX:
-			printerr("Unknown token id %d at token %d" % [type, i])
-			return false
-		var payload = null
-		match type:
-			TK_IDENTIFIER:
-				if arg < identifier_count:
-					payload = identifiers[arg]
-				else:
-					printerr("Identifier index %d out of range at token %d" % [arg, i])
-					return false
-			TK_CONSTANT:
-				if arg < constant_count:
-					payload = constants[arg]
-				else:
-					printerr("Constant index %d out of range at token %d" % [arg, i])
-					return false
-			TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_NEWLINE:
-				payload = arg
-		if i in line_list:
-			current_line = line_at[i]
-		type_store[i] = type
-		args_store[i] = payload
-		line_store[i] = current_line
-	return true
-
-func __tokens_to_source() -> String:
-	var token_count:int = type_store.size()
-	if token_count and args_store.size() != token_count or line_store.size() != token_count:
-		printerr("SCRIPT DECOMPILE ERR: type, args, and line stores must be the same size")
-		return ""
-	
-	var tab_ctr:PoolIntArray = PoolIntArray()
-	var nesting_level:PoolIntArray = PoolIntArray()
-	var depth_at:PoolIntArray = PoolIntArray()
-	
-	depth_at.resize(token_count)
-	tab_ctr.resize(token_count)
-	nesting_level.resize(token_count)
-	
-	var depth:int = 0
-	var widths:Array = [0]
-	var level:int = 0
-	for i in token_count:
-		var t:int = type_store[i]
-		depth_at[i] = depth
-		tab_ctr[i] = 0
-		nesting_level[i] = level
-		if t == TK_PARENTHESIS_OPEN or t == TK_BRACKET_OPEN or t == TK_CURLY_BRACKET_OPEN:
-			depth += 1
-		elif t == TK_PARENTHESIS_CLOSE or t == TK_BRACKET_CLOSE or t == TK_CURLY_BRACKET_CLOSE:
-			var d1:int = depth - 1
-			depth = d1 if d1 > 0 else 0
-		elif t == TK_NEWLINE:
-			if (i + 1 < token_count and type_store[i + 1] == TK_EOF) or not (i + 1 >= token_count or type_store[i + 1] != TK_NEWLINE):
-				tab_ctr[i] = 0
-			elif depth_at[i] > 0:
-				tab_ctr[i] = level + depth_at[i]
-			else:
-				var w:int = args_store[i]
-				while widths.size() > 1 and widths[-1] > w:
-					widths.pop_back()
-				if widths[-1] < w:
-					widths.append(w)
-				level = widths.size() - 1
-				tab_ctr[i] = level
-				nesting_level[i] = level
-	
-	var out:PoolStringArray = PoolStringArray()
-	var line:int = 1
-	var at_start:bool = true
-	var prev:int = -1
-	var prev_text:String = ""
-	var prev_unary:bool = false
-	var nodepath_state:int = 0
-	var cont_tabs:int = 0
-	
-	var func_size:int = func_index_array.size() - 1
-	var i:int = 0
-	while i < token_count:
-		var t:int = type_store[i]
-		if t == TK_EOF:
-			break
-		if t == TK_EMPTY or t == TK_CURSOR:
-			i += 1
-			continue
-		if t == TK_ERROR:
-			printerr("SCRIPT DECOMPILE ERR: Token %d is an error token" % i)
-			return ""
-		if t < 0 or t > TK_CURSOR:
-			printerr("SCRIPT DECOMPILE ERR: Unknown token id %d at token %d" % [t, i])
-			return ""
-		if t == TK_NEWLINE:
-			for k in (line_store[i] - line - 1):
-				out.append("\\\n" if at_start else " \\\n")
-				at_start = true
-				line += 1
-			out.append("\n" + "\t".repeat(tab_ctr[i]))
-			var lsa:int = line_store[i]
-			var lsb:int = line + 1
-			line = lsa if lsa > lsb else lsb
-			at_start = true
-			cont_tabs = nesting_level[i] + 1
-			if depth_at[i] == 0:
-				prev = -1
-				prev_text = ""
-			prev_unary = false
-			nodepath_state = 0
-			i += 1
-			continue
-		
-		var text:String = ""
-		match type_store[i]:
-			TK_IDENTIFIER:
-				var identifier = args_store[i]
-				if not identifier is String or identifier.empty():
-					printerr("SCRIPT DECOMPILE ERR: Identifier token %d has no name" % i)
-					return ""
-				text = identifier
-			TK_CONSTANT:
-				var v = args_store[i]
-				match typeof(v):
-					TYPE_NIL:
-						text = "null"
-					TYPE_BOOL:
-						text = "true" if v else "false"
-					TYPE_INT:
-						if v >= 0:
-							text = str(v)
-						else:
-							var hi:int = (v >> 32) & 0xFFFFFFFF
-							var lo:int = v & 0xFFFFFFFF
-							text = "0x%08X%08X" % [hi, lo]
-					TYPE_REAL:
-						text = float_to_string(v)
-					TYPE_STRING:
-						text = escape_string_with_quotes(v)
-					TYPE_NODE_PATH:
-						text = "@" + escape_string_with_quotes(str(v))
-					var ty:
-						printerr("SCRIPT DECOMPILE ERR: Cannot write constant of type %d at token %d" % [ty, i])
-						return ""
-			TK_BUILT_IN_TYPE:
-				var tid = args_store[i]
-				if not tid is int or not tid in type_names:
-					printerr("SCRIPT DECOMPILE ERR: Unknown built-in type id %s at token %d" % [tid, i])
-					return ""
-				text = type_names[tid]
-			TK_BUILT_IN_FUNC:
-				var fid = args_store[i]
-				if not fid is int or fid < 0 or fid > func_size:
-					printerr("SCRIPT DECOMPILE ERR: Unknown built-in function id %s at token %d" % [fid, i])
-					return ""
-				text = func_index_array[fid]
-			var tkx:
-				if tkx in static_tokens:
-					text = static_tokens[t]
-				else:
-					printerr("SCRIPT DECOMPILE ERR: Token id %d at token %d has no source text" % [tkx, i])
-					return ""
-		
-		var skip_next:bool = false
-		if t == TK_COLON and i + 1 < token_count and type_store[i + 1] == TK_OP_ASSIGN:
-			text = ":="
-			skip_next = true
-		
-		var sep:String = ""
-		if not at_start and prev != -1:
-			sep = get_string_separator(i, prev, prev_unary, nodepath_state, token_count)
-			if sep.empty() and prev_text and text:
-				var a:String = prev_text[-1]
-				var b:String = text[0]
-				if a in operator_characters and b in operator_characters:
-					sep = " "
-		if nodepath_state == 1:
-			nodepath_state = 1 if t == TK_PERIOD else 2
-		elif nodepath_state == 2:
-			nodepath_state = 1 if (t == TK_OP_DIV and is_following_token_path(i + 1,token_count)) else 0
-		if t == TK_COLON and skip_next and sep.empty():
-			sep = " "
-		
-		var delta:int = line_store[i] - line
-		var raw_multiline:bool = false
-		var newline_count:int = 0
-		if t == TK_CONSTANT and args_store[i] is String:
-			newline_count = args_store[i].count("\n")
-			if newline_count > 0 and delta >= newline_count:
-				raw_multiline = true
-		
-		var breaks:int = delta - (newline_count if raw_multiline else 0)
-		if breaks > 0:
-			for b in breaks:
-				out.append(("\\\n" if at_start else " \\\n"))
-				at_start = true
-			out.append("")
-			line += breaks
-			sep = ""
-		if raw_multiline:
-			text = "\"\"\"" + escape_string(args_store[i], true) + "\"\"\""
-			line += newline_count
-		
-		if t == TK_DOLLAR:
-			nodepath_state = 1
-		
-		out.append(sep + text)
-		at_start = false
-		
-		prev_unary = false
-		if t == TK_OP_SUB or t == TK_OP_ADD:
-			prev_unary = (prev == -1) or not is_token_operand_end(prev)
-		elif t == TK_OP_BIT_INVERT:
-			prev_unary = true
-		prev = i
-		prev_text = text
-		i += 2 if skip_next else 1
-	
-	var source:String = out.join("")
-	if source and not source.ends_with("\n"):
-		source += "\n"
-	
-	return source
-enum{
-	TK_EMPTY,TK_IDENTIFIER,TK_CONSTANT,TK_SELF,TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_OP_IN,TK_OP_EQUAL,
-	TK_OP_NOT_EQUAL,TK_OP_LESS,TK_OP_LESS_EQUAL,TK_OP_GREATER,TK_OP_GREATER_EQUAL,TK_OP_AND,TK_OP_OR,
-	TK_OP_NOT,TK_OP_ADD,TK_OP_SUB,TK_OP_MUL,TK_OP_DIV,TK_OP_MOD,TK_OP_SHIFT_LEFT,TK_OP_SHIFT_RIGHT,TK_OP_ASSIGN,
-	TK_OP_ASSIGN_ADD,TK_OP_ASSIGN_SUB,TK_OP_ASSIGN_MUL,TK_OP_ASSIGN_DIV,TK_OP_ASSIGN_MOD,TK_OP_ASSIGN_SHIFT_LEFT,
-	TK_OP_ASSIGN_SHIFT_RIGHT,TK_OP_ASSIGN_BIT_AND,TK_OP_ASSIGN_BIT_OR,TK_OP_ASSIGN_BIT_XOR,TK_OP_BIT_AND,
-	TK_OP_BIT_OR,TK_OP_BIT_XOR,TK_OP_BIT_INVERT,TK_CF_IF,TK_CF_ELIF,TK_CF_ELSE,TK_CF_FOR,TK_CF_WHILE,TK_CF_BREAK,
-	TK_CF_CONTINUE,TK_CF_PASS,TK_CF_RETURN,TK_CF_MATCH,TK_PR_FUNCTION,TK_PR_CLASS,TK_PR_CLASS_NAME,TK_PR_EXTENDS,
-	TK_PR_IS,TK_PR_ONREADY,TK_PR_TOOL,TK_PR_STATIC,TK_PR_EXPORT,TK_PR_SETGET,TK_PR_CONST,TK_PR_VAR,TK_PR_AS,
-	TK_PR_VOID,TK_PR_ENUM,TK_PR_PRELOAD,TK_PR_ASSERT,TK_PR_YIELD,TK_PR_SIGNAL,TK_PR_BREAKPOINT,TK_PR_REMOTE,
-	TK_PR_SYNC,TK_PR_MASTER,TK_PR_SLAVE,TK_PR_PUPPET,TK_PR_REMOTESYNC,TK_PR_MASTERSYNC,TK_PR_PUPPETSYNC,
-	TK_BRACKET_OPEN,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_OPEN,TK_CURLY_BRACKET_CLOSE,TK_PARENTHESIS_OPEN,
-	TK_PARENTHESIS_CLOSE,TK_COMMA,TK_SEMICOLON,TK_PERIOD,TK_QUESTION_MARK,TK_COLON,TK_DOLLAR,TK_FORWARD_ARROW,
-	TK_NEWLINE,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN,TK_ERROR,TK_EOF,TK_CURSOR,TK_MAX}
-
-const load_type_signature = PoolIntArray([TK_BUILT_IN_FUNC,TK_PARENTHESIS_OPEN,TK_CONSTANT,TK_PARENTHESIS_CLOSE])
-const load_args_signature = Array([76,null,"",null])
-
-func __decast_source(source_code:String,class_names_to_clear:PoolStringArray,casting_to_replace:Dictionary) -> String:
-	source_code = source_code.replace("\r","")
-	var has_class_name:bool = (source_code.begins_with("class_name") or "\nclass_name" in source_code)
-	var needs_recompile:bool = has_class_name
-	var check_for_these_classes:PoolStringArray = PoolStringArray()
-	for i in class_names_to_clear:
-		if i in source_code:
-			needs_recompile = true
-	if not needs_recompile:
-		return source_code
-	__source_to_tokens(source_code)
-
-	var token_count:int = type_store.size()
-	var idx:int = 0
-	var new_type_store:PoolIntArray = PoolIntArray()
-	var new_line_store:PoolIntArray = PoolIntArray()
-	var new_args_store:Array = Array()
-
-	var need_class_name_handling:bool = has_class_name
-	while idx < token_count:
-		var this_type:int = type_store[idx]
-		var this_type_literal:String = token_lookup[this_type]
-		var this_arg = args_store[idx]
-		var this_line:int = line_store[idx]
-		if this_type == TK_PR_VAR:
-			new_type_store.append(this_type)
-			new_args_store.append(this_arg)
-			new_line_store.append(this_line)
-			new_type_store.append(type_store[idx + 1])
-			new_args_store.append(args_store[idx + 1])
-			new_line_store.append(line_store[idx + 1])
-			idx += 2
-			if type_store[idx] == TK_COLON:
-				idx += 1
-				var nex_tok:int = type_store[idx]
-				while not (nex_tok == TK_OP_ASSIGN or nex_tok == TK_NEWLINE or nex_tok == TK_EOF or nex_tok == TK_PR_SETGET):
-					idx += 1
-					nex_tok = type_store[idx]
-				new_type_store.append(type_store[idx])
-				new_args_store.append(args_store[idx])
-				new_line_store.append(line_store[idx])
-				idx += 1
-		elif this_type == TK_PR_FUNCTION:
-			new_type_store.append(this_type)
-			new_args_store.append(this_arg)
-			new_line_store.append(this_line)
-			new_type_store.append(type_store[idx + 1])
-			new_args_store.append(args_store[idx + 1])
-			new_line_store.append(line_store[idx + 1])
-			new_type_store.append(type_store[idx + 2])
-			new_args_store.append(args_store[idx + 2])
-			new_line_store.append(line_store[idx + 2])
-			idx += 3
-			var depth:int = 1
-			while depth > 0:
-				var cur_type:int = type_store[idx]
-				var type:String = token_lookup[cur_type]
-				if cur_type == TK_PARENTHESIS_CLOSE or cur_type == TK_BRACKET_CLOSE or cur_type == TK_CURLY_BRACKET_CLOSE:
-					depth -= 1
-				elif cur_type == TK_PARENTHESIS_OPEN or cur_type == TK_BRACKET_OPEN or cur_type == TK_CURLY_BRACKET_OPEN:
-					depth += 1
-				elif depth == 1 and cur_type == TK_COLON:
-					var nex_arg = args_store[idx + 1]
-					if nex_arg is String and nex_arg in class_names_to_clear:
-						idx += 2
-						var nex_type:int = type_store[idx]
-						var cr:String = token_lookup[nex_type]
-						while not (nex_type == TK_COMMA or nex_type == TK_OP_ASSIGN or nex_type == TK_PARENTHESIS_CLOSE):
-							idx += 1
-							nex_type = type_store[idx]
-						continue
-				new_type_store.append(type_store[idx])
-				new_args_store.append(args_store[idx])
-				new_line_store.append(line_store[idx])
-				idx += 1
-		elif this_type == TK_IDENTIFIER and this_arg in class_names_to_clear:
-			new_type_store.append_array(load_type_signature)
-			new_args_store.append_array([76,null,casting_to_replace[this_arg],null])
-			new_line_store.append_array(PoolIntArray([this_line,this_line,this_line,this_line]))
-			idx += 1
-		elif this_type == TK_FORWARD_ARROW:
-			idx += 2
-		elif need_class_name_handling and this_type == TK_PR_CLASS_NAME:
-			idx += 2
-			need_class_name_handling = false
-		else:
-			new_args_store.append(this_arg)
-			new_type_store.append(this_type)
-			new_line_store.append(this_line)
-			idx += 1
-	type_store = new_type_store
-	args_store = new_args_store
-	line_store = new_line_store
-	return __tokens_to_source()
-
-const token_list = PoolIntArray([TK_EMPTY,TK_IDENTIFIER,TK_CONSTANT,TK_SELF,TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_OP_IN,TK_OP_EQUAL,
-	TK_OP_NOT_EQUAL,TK_OP_LESS,TK_OP_LESS_EQUAL,TK_OP_GREATER,TK_OP_GREATER_EQUAL,TK_OP_AND,TK_OP_OR,
-	TK_OP_NOT,TK_OP_ADD,TK_OP_SUB,TK_OP_MUL,TK_OP_DIV,TK_OP_MOD,TK_OP_SHIFT_LEFT,TK_OP_SHIFT_RIGHT,TK_OP_ASSIGN,
-	TK_OP_ASSIGN_ADD,TK_OP_ASSIGN_SUB,TK_OP_ASSIGN_MUL,TK_OP_ASSIGN_DIV,TK_OP_ASSIGN_MOD,TK_OP_ASSIGN_SHIFT_LEFT,
-	TK_OP_ASSIGN_SHIFT_RIGHT,TK_OP_ASSIGN_BIT_AND,TK_OP_ASSIGN_BIT_OR,TK_OP_ASSIGN_BIT_XOR,TK_OP_BIT_AND,
-	TK_OP_BIT_OR,TK_OP_BIT_XOR,TK_OP_BIT_INVERT,TK_CF_IF,TK_CF_ELIF,TK_CF_ELSE,TK_CF_FOR,TK_CF_WHILE,TK_CF_BREAK,
-	TK_CF_CONTINUE,TK_CF_PASS,TK_CF_RETURN,TK_CF_MATCH,TK_PR_FUNCTION,TK_PR_CLASS,TK_PR_CLASS_NAME,TK_PR_EXTENDS,
-	TK_PR_IS,TK_PR_ONREADY,TK_PR_TOOL,TK_PR_STATIC,TK_PR_EXPORT,TK_PR_SETGET,TK_PR_CONST,TK_PR_VAR,TK_PR_AS,
-	TK_PR_VOID,TK_PR_ENUM,TK_PR_PRELOAD,TK_PR_ASSERT,TK_PR_YIELD,TK_PR_SIGNAL,TK_PR_BREAKPOINT,TK_PR_REMOTE,
-	TK_PR_SYNC,TK_PR_MASTER,TK_PR_SLAVE,TK_PR_PUPPET,TK_PR_REMOTESYNC,TK_PR_MASTERSYNC,TK_PR_PUPPETSYNC,
-	TK_BRACKET_OPEN,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_OPEN,TK_CURLY_BRACKET_CLOSE,TK_PARENTHESIS_OPEN,
-	TK_PARENTHESIS_CLOSE,TK_COMMA,TK_SEMICOLON,TK_PERIOD,TK_QUESTION_MARK,TK_COLON,TK_DOLLAR,TK_FORWARD_ARROW,
-	TK_NEWLINE,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN,TK_ERROR,TK_EOF,TK_CURSOR,TK_MAX])
-const static_token_list = PoolIntArray([TK_SELF,TK_OP_IN,TK_OP_EQUAL,
-	TK_OP_NOT_EQUAL,TK_OP_LESS,TK_OP_LESS_EQUAL,TK_OP_GREATER,TK_OP_GREATER_EQUAL,TK_OP_AND,TK_OP_OR,
-	TK_OP_NOT,TK_OP_ADD,TK_OP_SUB,TK_OP_MUL,TK_OP_DIV,TK_OP_MOD,TK_OP_SHIFT_LEFT,TK_OP_SHIFT_RIGHT,TK_OP_ASSIGN,
-	TK_OP_ASSIGN_ADD,TK_OP_ASSIGN_SUB,TK_OP_ASSIGN_MUL,TK_OP_ASSIGN_DIV,TK_OP_ASSIGN_MOD,TK_OP_ASSIGN_SHIFT_LEFT,
-	TK_OP_ASSIGN_SHIFT_RIGHT,TK_OP_ASSIGN_BIT_AND,TK_OP_ASSIGN_BIT_OR,TK_OP_ASSIGN_BIT_XOR,TK_OP_BIT_AND,
-	TK_OP_BIT_OR,TK_OP_BIT_XOR,TK_OP_BIT_INVERT,TK_CF_IF,TK_CF_ELIF,TK_CF_ELSE,TK_CF_FOR,TK_CF_WHILE,TK_CF_BREAK,
-	TK_CF_CONTINUE,TK_CF_PASS,TK_CF_RETURN,TK_CF_MATCH,TK_PR_FUNCTION,TK_PR_CLASS,TK_PR_CLASS_NAME,TK_PR_EXTENDS,
-	TK_PR_IS,TK_PR_ONREADY,TK_PR_TOOL,TK_PR_STATIC,TK_PR_EXPORT,TK_PR_SETGET,TK_PR_CONST,TK_PR_VAR,TK_PR_AS,
-	TK_PR_VOID,TK_PR_ENUM,TK_PR_PRELOAD,TK_PR_ASSERT,TK_PR_YIELD,TK_PR_SIGNAL,TK_PR_BREAKPOINT,TK_PR_REMOTE,
-	TK_PR_SYNC,TK_PR_MASTER,TK_PR_SLAVE,TK_PR_PUPPET,TK_PR_REMOTESYNC,TK_PR_MASTERSYNC,TK_PR_PUPPETSYNC,
-	TK_BRACKET_OPEN,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_OPEN,TK_CURLY_BRACKET_CLOSE,TK_PARENTHESIS_OPEN,
-	TK_PARENTHESIS_CLOSE,TK_COMMA,TK_SEMICOLON,TK_PERIOD,TK_QUESTION_MARK,TK_COLON,TK_DOLLAR,TK_FORWARD_ARROW,
-	TK_NEWLINE,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN])
-const token_lookup = {
-	TK_EMPTY:"TK_EMPTY",
-	TK_IDENTIFIER:"TK_IDENTIFIER",
-	TK_CONSTANT:"TK_CONSTANT",
-	TK_SELF:"TK_SELF",
-	TK_BUILT_IN_TYPE:"TK_BUILT_IN_TYPE",
-	TK_BUILT_IN_FUNC:"TK_BUILT_IN_FUNC",
-	TK_OP_IN:"TK_OP_IN",
-	TK_OP_EQUAL:"TK_OP_EQUAL",
-	TK_OP_NOT_EQUAL:"TK_OP_NOT_EQUAL",
-	TK_OP_LESS:"TK_OP_LESS",
-	TK_OP_LESS_EQUAL:"TK_OP_LESS_EQUAL",
-	TK_OP_GREATER:"TK_OP_GREATER",
-	TK_OP_GREATER_EQUAL:"TK_OP_GREATER_EQUAL",
-	TK_OP_AND:"TK_OP_AND",
-	TK_OP_OR:"TK_OP_OR",
-	TK_OP_NOT:"TK_OP_NOT",
-	TK_OP_ADD:"TK_OP_ADD",
-	TK_OP_SUB:"TK_OP_SUB",
-	TK_OP_MUL:"TK_OP_MUL",
-	TK_OP_DIV:"TK_OP_DIV",
-	TK_OP_MOD:"TK_OP_MOD",
-	TK_OP_SHIFT_LEFT:"TK_OP_SHIFT_LEFT",
-	TK_OP_SHIFT_RIGHT:"TK_OP_SHIFT_RIGHT",
-	TK_OP_ASSIGN:"TK_OP_ASSIGN",
-	TK_OP_ASSIGN_ADD:"TK_OP_ASSIGN_ADD",
-	TK_OP_ASSIGN_SUB:"TK_OP_ASSIGN_SUB",
-	TK_OP_ASSIGN_MUL:"TK_OP_ASSIGN_MUL",
-	TK_OP_ASSIGN_DIV:"TK_OP_ASSIGN_DIV",
-	TK_OP_ASSIGN_MOD:"TK_OP_ASSIGN_MOD",
-	TK_OP_ASSIGN_SHIFT_LEFT:"TK_OP_ASSIGN_SHIFT_LEFT",
-	TK_OP_ASSIGN_SHIFT_RIGHT:"TK_OP_ASSIGN_SHIFT_RIGHT",
-	TK_OP_ASSIGN_BIT_AND:"TK_OP_ASSIGN_BIT_AND",
-	TK_OP_ASSIGN_BIT_OR:"TK_OP_ASSIGN_BIT_OR",
-	TK_OP_ASSIGN_BIT_XOR:"TK_OP_ASSIGN_BIT_XOR",
-	TK_OP_BIT_AND:"TK_OP_BIT_AND",
-	TK_OP_BIT_OR:"TK_OP_BIT_OR",
-	TK_OP_BIT_XOR:"TK_OP_BIT_XOR",
-	TK_OP_BIT_INVERT:"TK_OP_BIT_INVERT",
-	TK_CF_IF:"TK_CF_IF",
-	TK_CF_ELIF:"TK_CF_ELIF",
-	TK_CF_ELSE:"TK_CF_ELSE",
-	TK_CF_FOR:"TK_CF_FOR",
-	TK_CF_WHILE:"TK_CF_WHILE",
-	TK_CF_BREAK:"TK_CF_BREAK",
-	TK_CF_CONTINUE:"TK_CF_CONTINUE",
-	TK_CF_PASS:"TK_CF_PASS",
-	TK_CF_RETURN:"TK_CF_RETURN",
-	TK_CF_MATCH:"TK_CF_MATCH",
-	TK_PR_FUNCTION:"TK_PR_FUNCTION",
-	TK_PR_CLASS:"TK_PR_CLASS",
-	TK_PR_CLASS_NAME:"TK_PR_CLASS_NAME",
-	TK_PR_EXTENDS:"TK_PR_EXTENDS",
-	TK_PR_IS:"TK_PR_IS",
-	TK_PR_ONREADY:"TK_PR_ONREADY",
-	TK_PR_TOOL:"TK_PR_TOOL",
-	TK_PR_STATIC:"TK_PR_STATIC",
-	TK_PR_EXPORT:"TK_PR_EXPORT",
-	TK_PR_SETGET:"TK_PR_SETGET",
-	TK_PR_CONST:"TK_PR_CONST",
-	TK_PR_VAR:"TK_PR_VAR",
-	TK_PR_AS:"TK_PR_AS",
-	TK_PR_VOID:"TK_PR_VOID",
-	TK_PR_ENUM:"TK_PR_ENUM",
-	TK_PR_PRELOAD:"TK_PR_PRELOAD",
-	TK_PR_ASSERT:"TK_PR_ASSERT",
-	TK_PR_YIELD:"TK_PR_YIELD",
-	TK_PR_SIGNAL:"TK_PR_SIGNAL",
-	TK_PR_BREAKPOINT:"TK_PR_BREAKPOINT",
-	TK_PR_REMOTE:"TK_PR_REMOTE",
-	TK_PR_SYNC:"TK_PR_SYNC",
-	TK_PR_MASTER:"TK_PR_MASTER",
-	TK_PR_SLAVE:"TK_PR_SLAVE",
-	TK_PR_PUPPET:"TK_PR_PUPPET",
-	TK_PR_REMOTESYNC:"TK_PR_REMOTESYNC",
-	TK_PR_MASTERSYNC:"TK_PR_MASTERSYNC",
-	TK_PR_PUPPETSYNC:"TK_PR_PUPPETSYNC",
-	TK_BRACKET_OPEN:"TK_BRACKET_OPEN",
-	TK_BRACKET_CLOSE:"TK_BRACKET_CLOSE",
-	TK_CURLY_BRACKET_OPEN:"TK_CURLY_BRACKET_OPEN",
-	TK_CURLY_BRACKET_CLOSE:"TK_CURLY_BRACKET_CLOSE",
-	TK_PARENTHESIS_OPEN:"TK_PARENTHESIS_OPEN",
-	TK_PARENTHESIS_CLOSE:"TK_PARENTHESIS_CLOSE",
-	TK_COMMA:"TK_COMMA",
-	TK_SEMICOLON:"TK_SEMICOLON",
-	TK_PERIOD:"TK_PERIOD",
-	TK_QUESTION_MARK:"TK_QUESTION_MARK",
-	TK_COLON:"TK_COLON",
-	TK_DOLLAR:"TK_DOLLAR",
-	TK_FORWARD_ARROW:"TK_FORWARD_ARROW",
-	TK_NEWLINE:"TK_NEWLINE",
-	TK_CONST_PI:"TK_CONST_PI",
-	TK_CONST_TAU:"TK_CONST_TAU",
-	TK_WILDCARD:"TK_WILDCARD",
-	TK_CONST_INF:"TK_CONST_INF",
-	TK_CONST_NAN:"TK_CONST_NAN",
-	TK_ERROR:"TK_ERROR",
-	TK_EOF:"TK_EOF",
-	TK_CURSOR:"TK_CURSOR",
-}
-const static_tokens = {
-	TK_SELF:"self",
-	TK_OP_IN:"in",
-	TK_OP_EQUAL:"==",
-	TK_OP_NOT_EQUAL:"!=",
-	TK_OP_LESS:"<",
-	TK_OP_LESS_EQUAL:"<=",
-	TK_OP_GREATER:">",
-	TK_OP_GREATER_EQUAL:">=",
-	TK_OP_AND:"and",
-	TK_OP_OR:"or",
-	TK_OP_NOT:"not",
-	TK_OP_ADD:"+",
-	TK_OP_SUB:"-",
-	TK_OP_MUL:"*",
-	TK_OP_DIV:"/",
-	TK_OP_MOD:"%",
-	TK_OP_SHIFT_LEFT:"<<",
-	TK_OP_SHIFT_RIGHT:">>",
-	TK_OP_ASSIGN:"=",
-	TK_OP_ASSIGN_ADD:"+=",
-	TK_OP_ASSIGN_SUB:"-=",
-	TK_OP_ASSIGN_MUL:"*=",
-	TK_OP_ASSIGN_DIV:"/=",
-	TK_OP_ASSIGN_MOD:"%=",
-	TK_OP_ASSIGN_SHIFT_LEFT:"<<=",
-	TK_OP_ASSIGN_SHIFT_RIGHT:">>=",
-	TK_OP_ASSIGN_BIT_AND:"&=",
-	TK_OP_ASSIGN_BIT_OR:"|=",
-	TK_OP_ASSIGN_BIT_XOR:"^=",
-	TK_OP_BIT_AND:"&",
-	TK_OP_BIT_OR:"|",
-	TK_OP_BIT_XOR:"^",
-	TK_OP_BIT_INVERT:"~",
-	TK_CF_IF:"if",
-	TK_CF_ELIF:"elif",
-	TK_CF_ELSE:"else",
-	TK_CF_FOR:"for",
-	TK_CF_WHILE:"while",
-	TK_CF_BREAK:"break",
-	TK_CF_CONTINUE:"continue",
-	TK_CF_PASS:"pass",
-	TK_CF_RETURN:"return",
-	TK_CF_MATCH:"match",
-	TK_PR_FUNCTION:"func",
-	TK_PR_CLASS:"class",
-	TK_PR_CLASS_NAME:"class_name",
-	TK_PR_EXTENDS:"extends",
-	TK_PR_IS:"is",
-	TK_PR_ONREADY:"onready",
-	TK_PR_TOOL:"tool",
-	TK_PR_STATIC:"static",
-	TK_PR_EXPORT:"export",
-	TK_PR_SETGET:"setget",
-	TK_PR_CONST:"const",
-	TK_PR_VAR:"var",
-	TK_PR_AS:"as",
-	TK_PR_VOID:"void",
-	TK_PR_ENUM:"enum",
-	TK_PR_PRELOAD:"preload",
-	TK_PR_ASSERT:"assert",
-	TK_PR_YIELD:"yield",
-	TK_PR_SIGNAL:"signal",
-	TK_PR_BREAKPOINT:"breakpoint",
-	TK_PR_REMOTE:"remote",
-	TK_PR_SYNC:"sync",
-	TK_PR_MASTER:"master",
-	TK_PR_SLAVE:"slave",
-	TK_PR_PUPPET:"puppet",
-	TK_PR_REMOTESYNC:"remotesync",
-	TK_PR_MASTERSYNC:"mastersync",
-	TK_PR_PUPPETSYNC:"puppetsync",
-	TK_BRACKET_OPEN:"[",
-	TK_BRACKET_CLOSE:"]",
-	TK_CURLY_BRACKET_OPEN:"{",
-	TK_CURLY_BRACKET_CLOSE:"}",
-	TK_PARENTHESIS_OPEN:"(",
-	TK_PARENTHESIS_CLOSE:")",
-	TK_COMMA:",",
-	TK_SEMICOLON:";",
-	TK_PERIOD:".",
-	TK_QUESTION_MARK:"?",
-	TK_COLON:":",
-	TK_DOLLAR:"$",
-	TK_FORWARD_ARROW:"->",
-	TK_NEWLINE:"\n",
-	TK_CONST_PI:"PI",
-	TK_CONST_TAU:"TAU",
-	TK_WILDCARD:"_",
-	TK_CONST_INF:"INF",
-	TK_CONST_NAN:"NAN",
-}
-
-const func_index={
-	"sin":0,"cos":1,"tan":2,"sinh":3,"cosh":4,"tanh":5,"asin":6,"acos":7,"atan":8,"atan2":9,
-	"sqrt":10,"fmod":11,"fposmod":12,"posmod":13,"floor":14,"ceil":15,"round":16,"abs":17,"sign":18,"pow":19,
-	"log":20,"exp":21,"is_nan":22,"is_inf":23,"is_equal_approx":24,"is_zero_approx":25,"ease":26,"decimals":27,
-	"step_decimals":28,"stepify":29,"lerp":30,"lerp_angle":31,"inverse_lerp":32,"range_lerp":33,
-	"smoothstep":34,"move_toward":35,"dectime":36,"randomize":37,"randi":38,"randf":39,"rand_range":40,"seed":41,
-	"rand_seed":42,"deg2rad":43,"rad2deg":44,"linear2db":45,"db2linear":46,"polar2cartesian":47,
-	"cartesian2polar":48,"wrapi":49,"wrapf":50,"max":51,"min":52,"clamp":53,"nearest_po2":54,
-	"weakref":55,"funcref":56,"convert":57,"typeof":58,"type_exists":59,"char":60,"ord":61,"str":62,
-	"print":63,"printt":64,"prints":65,"printerr":66,"printraw":67,"print_debug":68,"push_error":69,
-	"push_warning":70,"var2str":71,"str2var":72,"var2bytes":73,"bytes2var":74,"range":75,"load":76,
-	"inst2dict":77,"dict2inst":78,"validate_json":79,"parse_json":80,"to_json":81,"hash":82,"Color8":83,"ColorN":84,
-	"print_stack":85,"get_stack":86,"instance_from_id":87,"len":88,"is_instance_valid":89,"deep_equal":90,
-}
-const func_index_array = PoolStringArray([
-	"sin","cos","tan","sinh","cosh","tanh","asin",
-	"acos","atan","atan2","sqrt","fmod","fposmod","posmod","floor","ceil",
-	"round","abs","sign","pow","log","exp","is_nan","is_inf","is_equal_approx",
-	"is_zero_approx","ease","decimals","step_decimals","stepify","lerp",
-	"lerp_angle","inverse_lerp","range_lerp","smoothstep","move_toward","dectime",
-	"randomize","randi","randf","rand_range","seed","rand_seed","deg2rad",
-	"rad2deg","linear2db","db2linear","polar2cartesian","cartesian2polar",
-	"wrapi","wrapf","max","min","clamp","nearest_po2","weakref","funcref",
-	"convert","typeof","type_exists","char","ord","str","print","printt","prints",
-	"printerr","printraw","print_debug","push_error","push_warning","var2str",
-	"str2var","var2bytes","bytes2var","range","load","inst2dict","dict2inst",
-	"validate_json","parse_json","to_json","hash","Color8","ColorN","print_stack",
-	"get_stack","instance_from_id","len","is_instance_valid","deep_equal",
-])
-const type_index={
-	"bool":TYPE_BOOL,"int":TYPE_INT,"float":TYPE_REAL,"String":TYPE_STRING,
-	"Vector2":TYPE_VECTOR2,"Rect2":TYPE_RECT2,"Vector3":TYPE_VECTOR3,"Transform2D":TYPE_TRANSFORM2D,
-	"Plane":TYPE_PLANE,"Quat":TYPE_QUAT,"AABB":TYPE_AABB,"Basis":TYPE_BASIS,
-	"Transform":TYPE_TRANSFORM,"Color":TYPE_COLOR,"NodePath":TYPE_NODE_PATH,"RID":TYPE_RID,
-	"Object":TYPE_OBJECT,"Dictionary":TYPE_DICTIONARY,"Array":TYPE_ARRAY,
-	"PoolByteArray":TYPE_RAW_ARRAY,"PoolIntArray":TYPE_INT_ARRAY,"PoolRealArray":TYPE_REAL_ARRAY,
-	"PoolStringArray":TYPE_STRING_ARRAY,"PoolVector2Array":TYPE_VECTOR2_ARRAY,
-	"PoolVector3Array":TYPE_VECTOR3_ARRAY,"PoolColorArray":TYPE_COLOR_ARRAY,
-}
-const type_index_array = PoolStringArray([
-	"bool","int","float","String","Vector2","Rect2","Vector3","Transform2D",
-	"Plane","Quat","AABB","Basis","Transform","Color","NodePath","RID",
-	"Object","Dictionary","Array","PoolByteArray","PoolIntArray","PoolRealArray",
-	"PoolStringArray","PoolVector2Array","PoolVector3Array","PoolColorArray",
-])
-const type_names = {
-	1:"bool",2:"int",3:"float",4:"String",5:"Vector2",6:"Rect2",7: "Vector3",
-	8:"Transform2D",9:"Plane",10:"Quat",11:"AABB",12:"Basis",13:"Transform",
-	14:"Color",15:"NodePath",16:"RID",17:"Object",18:"Dictionary",19:"Array",
-	20:"PoolByteArray",21:"PoolIntArray",22:"PoolRealArray",23:"PoolStringArray",
-	24: "PoolVector2Array", 25: "PoolVector3Array", 26: "PoolColorArray",
-}
-const keywords={
-	"in":TK_OP_IN,"not":TK_OP_NOT,"or":TK_OP_OR,"and":TK_OP_AND,
-	"func":TK_PR_FUNCTION,"class":TK_PR_CLASS,"class_name":TK_PR_CLASS_NAME,
-	"extends":TK_PR_EXTENDS,"is":TK_PR_IS,"onready":TK_PR_ONREADY,
-	"tool":TK_PR_TOOL,"static":TK_PR_STATIC,"export":TK_PR_EXPORT,
-	"setget":TK_PR_SETGET,"var":TK_PR_VAR,"as":TK_PR_AS,"void":TK_PR_VOID,
-	"preload":TK_PR_PRELOAD,"assert":TK_PR_ASSERT,"yield":TK_PR_YIELD,
-	"signal":TK_PR_SIGNAL,"breakpoint":TK_PR_BREAKPOINT,
-	"remote":TK_PR_REMOTE,"master":TK_PR_MASTER,"slave":TK_PR_SLAVE,
-	"puppet":TK_PR_PUPPET,"sync":TK_PR_SYNC,"remotesync":TK_PR_REMOTESYNC,
-	"mastersync":TK_PR_MASTERSYNC,"puppetsync":TK_PR_PUPPETSYNC,
-	"const":TK_PR_CONST,"enum":TK_PR_ENUM,
-	"if":TK_CF_IF,"elif":TK_CF_ELIF,"else":TK_CF_ELSE,"for":TK_CF_FOR,
-	"while":TK_CF_WHILE,"break":TK_CF_BREAK,"continue":TK_CF_CONTINUE,
-	"return":TK_CF_RETURN,"match":TK_CF_MATCH,"pass":TK_CF_PASS,
-	"self":TK_SELF,"PI":TK_CONST_PI,"TAU":TK_CONST_TAU,"_":TK_WILDCARD,
-	"INF":TK_CONST_INF,"NAN":TK_CONST_NAN,
-}
-const keyword_array = PoolStringArray([
-	"in","not","or","and","func","class","class_name","extends","is","onready",
-	"tool","static","export","setget","var","as","void","preload","assert","yield",
-	"signal","breakpoint","remote","master","slave","puppet","sync","remotesync",
-	"mastersync","puppetsync","const","enum","if","elif","else","for","while",
-	"break","continue","return","match","pass","self","PI","TAU","_","INF","NAN",
-])
-const compile_err_header="SCRIPT COMPILE ERR - line %d: %s"
-const decompile_err_header="SCRIPT DECOMPILE ERR - line %d: %s"
-enum{
-	KEY_HORIZONTALTAB=9,KEY_LINEFEED=10,KEY_CARRIAGERETURN=13,KEY_SINGLEQUOTE=39,
-	KEY_DOUBLEQUOTE=34,KEY_BELL=7,KEY_BACKSPACE=8,KEY_VERTICALTAB=11,KEY_FORMFEED=12,
-}
-
-const operator_characters = "+-*/%=<>!&|^~"
-
-var type_store:PoolIntArray = PoolIntArray()
-var args_store:Array = Array()
-var line_store:PoolIntArray = PoolIntArray()
-var char_store:PoolIntArray = PoolIntArray()
-
-var builtin_classes = ClassDB.get_class_list() + type_index_array
+	return static_tokens.get(token,"")
 
 static func stream_string(out:StreamPeerBuffer,s:String)->void:
 	var u:PoolByteArray = s.to_utf8()
@@ -922,73 +558,474 @@ static func stream_string(out:StreamPeerBuffer,s:String)->void:
 		out.put_u8(b)
 	for p in (4 - (bytesize % 4)) % 4:
 		out.put_u8(0)
-
-func next_token() -> bool:
-	if pos > length:
-		push_token(TK_EOF)
+static func get_string_data(gdc_bytes:PoolByteArray,position_store:Array) -> String:
+	var l:int = get_uint32(gdc_bytes,position_store)
+	if l == 0:
+		return ""
+	var raw:PoolByteArray = get_next_bytes(l,gdc_bytes,position_store)
+	var pad:int = (4 - (l % 4)) % 4
+	var pos:int = position_store[0]
+	if pos + pad > position_store[2]:
+		printerr("Unexpected end of data in string padding at offset %d" % pos)
+		return ""
+	position_store[0] += pad
+	return raw.get_string_from_utf8()
+static func get_const(gdc_bytes:PoolByteArray,position_store:Array):
+	var header:int = get_uint32(gdc_bytes,position_store)
+	var vtype:int = (header & 0xFF)
+	if vtype == TYPE_NIL:
+		return null
+	elif vtype == TYPE_BOOL:
+		return get_uint32(gdc_bytes,position_store) != 0
+	elif vtype == TYPE_INT:
+		if (header & 65536) != 0:
+			return get_uint32(gdc_bytes,position_store) | (get_uint32(gdc_bytes,position_store) << 32)
+		var v:int = get_uint32(gdc_bytes,position_store)
+		if v > 0x7FFFFFFF:
+			v -= 0x100000000
+		return v
+	elif vtype == TYPE_REAL:
+		var spb:StreamPeerBuffer = StreamPeerBuffer.new()
+		if (header & 65536) != 0:
+			spb.data_array = get_next_bytes(8,gdc_bytes,position_store)
+			return spb.get_double()
+		spb.data_array = get_next_bytes(4,gdc_bytes,position_store)
+		return spb.get_float()
+	elif vtype == TYPE_STRING:
+		return get_string_data(gdc_bytes,position_store)
+	elif vtype == TYPE_NODE_PATH:
+		var names:int = get_uint32(gdc_bytes,position_store)
+		if not (names & 0x80000000):
+			printerr("Old-format NodePath constants are not supported")
+			return null
+		var name_count:int = names & 0x7FFFFFFF
+		var subname_count:int = get_uint32(gdc_bytes,position_store)
+		var flags:int = get_uint32(gdc_bytes,position_store)
+		if name_count + subname_count > position_store[2] - position_store[0]:
+			printerr("Invalid NodePath constant")
+			return null
+		var name_list:PoolStringArray = PoolStringArray()
+		for i in name_count:
+			name_list.append(get_string_data(gdc_bytes,position_store))
+		var sub_list:PoolStringArray = PoolStringArray()
+		for i in subname_count:
+			sub_list.append(get_string_data(gdc_bytes,position_store))
+		var path:String = name_list.join("/")
+		if flags & 1:
+			path = "/" + path
+		if subname_count > 0:
+			path += ":" + sub_list.join(":")
+		return NodePath(path)
+	else:
+		printerr("Unsupported constant type %d at offset %d" % [vtype, position_store[0]])
+		return null
+static func get_next_bytes(byte_count: int,gdc_bytes:PoolByteArray,position_store:Array) -> PoolByteArray:
+	var pos:int = position_store[0]
+	var length:int = position_store[2]
+	if byte_count < 0 or pos + byte_count > length:
+		printerr("Unexpected end of data at offset %d" % pos)
+		position_store[0] = length
+		return PoolByteArray()
+	var out:PoolByteArray = PoolByteArray()
+	if byte_count > 0:
+		out = gdc_bytes.subarray(pos, pos + byte_count - 1)
+		position_store[0] += byte_count
+	return out
+static func get_uint32(gdc_bytes:PoolByteArray,position_store:Array) -> int:
+	var pos:int = position_store[0]
+	var length:int = position_store[2]
+	if pos + 4 > length:
+		printerr("Unexpected end of data at offset %d" % pos)
+		position_store[0] = length
+		return 0
+	position_store[0] += 4
+	return gdc_bytes[pos] | (gdc_bytes[pos + 1] << 8) | (gdc_bytes[pos + 2] << 16) | (gdc_bytes[pos + 3] << 24)
+static func float_to_string(d:float) -> String:
+	if is_nan(d):
+		return "NAN"
+	if is_inf(d):
+		return "INF" if d > 0 else "-INF"
+	if d < 0:
+		return "-" + float_to_string(-d)
+	if d == 0.0:
+		return "0.0"
+	if d >= 1e-4 and d < 1e15:
+		for k in 20:
+			var s:String = ("%." + str(k + 1) + "f") % d
+			var a:float = 0.0
+			var v = str2var(s)
+			if v is int or v is float:
+				a = float(v)
+			else:
+				a = s.to_float()
+			var bits:StreamPeerBuffer = StreamPeerBuffer.new()
+			bits.put_double(a)
+			bits.put_double(d)
+			bits.seek(0)
+			if bits.get_64() == bits.get_64():
+				return s
+	var e:int = int(floor(log(d) / log(10.0)))
+	for i in 2:
+		for f in PoolIntArray([0, 1, -1]):
+			var ex:int = e + f
+			var mantissa:float = d / pow(10.0, ex)
+			if i == 0 and (mantissa < 1.0 or mantissa >= 10.0):
+				continue
+			for p in 18:
+				var cand:String = (("%." + str(p) + "f") % mantissa) + "e" + str(ex)
+				var a:float = 0.0
+				var v = str2var(cand)
+				if v is int or v is float:
+					a = float(v)
+				else:
+					a = cand.to_float()
+				var bits:StreamPeerBuffer = StreamPeerBuffer.new()
+				bits.put_double(a)
+				bits.put_double(d)
+				bits.seek(0)
+				if bits.get_64() == bits.get_64():
+					return cand
+	return var2str(d)
+static func escape_string(s:String,keep_newlines:bool) -> String:
+	var out:String = ""
+	for k in s:
+		var code:int = ord(k)
+		if code == KEY_BACKSLASH: out += "\\\\"
+		elif code == KEY_DOUBLEQUOTE: out += "\\\""
+		elif code == KEY_LINEFEED: out += ("\n" if keep_newlines else "\\n")
+		elif code == KEY_HORIZONTALTAB: out += "\\t"
+		elif code == KEY_CARRIAGERETURN: out += "\\r"
+		elif code == KEY_BELL: out += "\\a"
+		elif code == KEY_BACKSPACE: out += "\\b"
+		elif code == KEY_VERTICALTAB: out += "\\v"
+		elif code == KEY_FORMFEED: out += "\\f"
+		elif code < KEY_SPACE or code == 0xFFFF: out += "\\u%04x" % code
+		else: out += k
+	return out
+static func is_token_operand_end(idx: int,tokens:Array) -> bool:
+	var tx:int = tokens[idx][0]
+	return (tx in operand_end_tokens) or (idx > 0 and tokens[idx - 1][0] == TK_PERIOD and tx in operand_word_tokens)
+static func is_following_token_path(idx: int,token_count:int,t:int,t_arg) -> bool:
+	if idx > token_count - 1:
+		return false
+	if t == TK_PERIOD or t in operand_word_tokens:
+		return true
+	return t == TK_CONSTANT and t_arg is String
+static func escape_string_with_quotes(s:String) -> String:
+	return "\"" + escape_string(s,false) + "\""
+static func get_string_separator(c:int,p:int,prev_unary:bool,nodepath_state:int,token_count:int,tokens:Array) -> String:
+	var c_tokens:Array = tokens[c]
+	var p_tokens:Array = tokens[p]
+	var ct:int = c_tokens[0]
+	var pt:int = p_tokens[0]
+	
+	if nodepath_state == 1:
+		if ct == TK_PERIOD or ct in operand_word_tokens or (ct == TK_CONSTANT and c_tokens[2] is String):
+			return ""
+	elif nodepath_state == 2:
+		if ct == TK_OP_DIV and is_following_token_path(c + 1,token_count,ct,c_tokens[2]):
+			return ""
+	if prev_unary or ct in closing_tokens:
+		return ""
+	if ct == TK_COMMA:
+		return " " if pt == TK_PR_SETGET else ""
+	if pt in opening_tokens:
+		return ""
+	if ct == TK_PERIOD:
+		if is_token_operand_end(p,tokens):
+			var p_arg = p_tokens[2]
+			return " " if (pt == TK_CONSTANT and p_arg is int or p_arg is float) else ""
+		return " "
+	if ct == TK_PARENTHESIS_OPEN:
+		return "" if ((pt in operand_callable_tokens) or (p > 0 and tokens[p - 1][0] == TK_PERIOD and pt in operand_word_tokens)) else " "
+	if ct == TK_BRACKET_OPEN:
+		return "" if is_token_operand_end(p,tokens) else " "
+	return " "
+static func get_char(offset:int,position_store:Array,char_store:PoolIntArray) -> int:
+	var pos:int = position_store[0] + offset
+	if pos < 0 or pos > position_store[2] - 1:
+		return 0
+	return char_store[pos]
+static func word_is_number(c:int) -> bool:
+	return c > 47 and c < 58
+static func word_is_alpha(c:int) -> bool:
+	return (c > 96 and c < 123) or (c > 64 and c < 91)
+static func word_is_tex(c:int) -> bool:
+	return (c > 96 and c < 123) or (c > 64 and c < 91) or (c > 47 and c < 58) or c == 95
+static func process_next_token(token_store:Array,position_store:Array,char_store:PoolIntArray) -> bool:
+	if position_store[0] > position_store[2]:
+		token_store.append([TK_EOF,position_store[1],null])
 		return true
 	while true:
-		var ch:int = get_char(0)
+		var ch:int = get_char(0,position_store,char_store)
 		if ch == 0:
-			push_token(TK_EOF)
+			token_store.append([TK_EOF,position_store[1],null])
 			return true
 		
 		if ch == KEY_BACKSLASH:
-			pos += 1
-			if get_char(0) != KEY_LINEFEED:
-				printerr(compile_err_header % [line,"Expected newline after '\\'."])
+			position_store[0] += 1
+			if get_char(0,position_store,char_store) != KEY_LINEFEED:
+				printerr(compile_err_header % [position_store[1],"Expected newline after '\\'."])
 				return false
-			pos += 1
-			line += 1
+			position_store[0] += 1
+			position_store[1] += 1
 			while true:
-				var cr:int = get_char(0)
+				var cr:int = get_char(0,position_store,char_store)
 				if not (cr == KEY_SPACE or cr == KEY_HORIZONTALTAB):
 					break
-				pos += 1
+				position_store[0] += 1
 			continue
 		
 		if ch == KEY_HORIZONTALTAB or ch == KEY_SPACE:
-			pos += 1
+			position_store[0] += 1
 			continue
 		
 		if ch == KEY_NUMBERSIGN:
-			while get_char(0) != KEY_LINEFEED:
-				pos += 1
-				if get_char(0) == 0:
-					push_token(TK_EOF)
-					return true
+			while get_char(0,position_store,char_store) != KEY_LINEFEED:
+				position_store[0] += 1
+				if get_char(0,position_store,char_store) == 0:
+					token_store.append([TK_EOF,position_store[1],null])
 			ch = KEY_LINEFEED
 		
 		if ch == KEY_LINEFEED:
-			line += 1
-			pos += 1
-			var used_spaces:bool = get_char(0) == KEY_SPACE
+			position_store[1] += 1
+			position_store[0] += 1
+			var used_spaces:bool = false
 			var i:int = 0
 			while true:
-				var wc:int = get_char(i)
+				var wc:int = get_char(i,position_store,char_store)
 				if wc == KEY_SPACE:
 					i += 1
+					used_spaces = true
 				elif wc == KEY_HORIZONTALTAB:
 					if used_spaces:
-						printerr(compile_err_header % [line,"Spaces used before tabs on a line"])
+						printerr(compile_err_header % [position_store[1],"Spaces used before tabs on a line"])
 						return false
 					i += 1
 				else:
 					break
-			push_token(TK_NEWLINE,i)
+			token_store.append([TK_NEWLINE,position_store[1],i])
 			return true
 		
 		if ch == KEY_AT or ch == KEY_DOUBLEQUOTE or ch == KEY_SINGLEQUOTE:
-			return read_string_token(ch)
+			var is_node_path:bool = false
+			if ch == KEY_AT:
+				var q:int = get_char(1,position_store,char_store)
+				if q != KEY_DOUBLEQUOTE and q != KEY_SINGLEQUOTE:
+					printerr(compile_err_header % [position_store[1],"Unexpected '@'"])
+					return false
+				position_store[0] += 1
+				is_node_path = true
+			var mode:int = 0
+			if get_char(0,position_store,char_store) == KEY_SINGLEQUOTE:
+				mode=1
+			var i:int=1
+			if mode == 0 and get_char(i,position_store,char_store) == KEY_DOUBLEQUOTE and get_char(i + 1,position_store,char_store) == KEY_DOUBLEQUOTE:
+				i += 2
+				mode = 2
+			var s:String = ""
+			while true:
+				var c:int = get_char(i,position_store,char_store)
+				if c == 0:
+					printerr(compile_err_header % [position_store[1],"Unterminated String"])
+					return false
+				elif (mode == 0 and c == KEY_DOUBLEQUOTE) or (mode == 1 and c == KEY_SINGLEQUOTE):
+					break
+				elif mode == 2 and c == KEY_DOUBLEQUOTE and get_char(i + 1,position_store,char_store) == KEY_DOUBLEQUOTE and get_char(i + 2,position_store,char_store) == KEY_DOUBLEQUOTE:
+					i+=2
+					break
+				elif mode != 2 and c == 10:
+					printerr(compile_err_header % [position_store[1],"Unexpected EOL at String."])
+					return false
+				elif c == 0xFFFF:
+					i -= 1
+					break
+				elif c == KEY_BACKSLASH:
+					i += 1
+					var nx:int = get_char(i,position_store,char_store)
+					if nx == 0:
+						printerr(compile_err_header % [position_store[1],"Unterminated String"])
+						return false
+					var res:int = 0
+					if nx == 97:res = 7 # a
+					elif nx == 98:res = 8 # b
+					elif nx == 116:res = 9 # t
+					elif nx == 110:res = 10 # n
+					elif nx == 118:res = 11 # v
+					elif nx == 102:res = 12 # f
+					elif nx == 114:res = 13 # r
+					elif nx == KEY_SINGLEQUOTE: res = KEY_SINGLEQUOTE
+					elif nx == KEY_DOUBLEQUOTE: res = KEY_DOUBLEQUOTE
+					elif nx == KEY_BACKSLASH: res = KEY_BACKSLASH
+					elif nx == KEY_SLASH: res = KEY_SLASH
+					elif nx == 117: # u
+						i += 1
+						for j in 4:
+							var hc:int = get_char(i + j,position_store,char_store)
+							if hc == 0:
+								printerr(compile_err_header % [position_store[1],"Unterminated String"])
+								return false
+							var v:int = 0
+							if hc > 47 and hc < 58:
+								v = hc - 48
+							elif hc > 96 and hc < 103:
+								v = hc - 87
+							elif hc > 64 and hc < 91:
+								v = hc - 55
+							else:
+								printerr(compile_err_header % [position_store[1],"Malformed hex constant in string"])
+								return false
+							res = (res << 4) | v
+						i += 3
+					else:
+						printerr(compile_err_header % [position_store[1],"Invalid escape sequence"])
+						return false
+					s += char(res)
+				else:
+					if c == KEY_LINEFEED:
+						position_store[1] += 1
+					s += char(c)
+				i += 1
+			position_store[0] += i
+			if is_node_path:
+				token_store.append([TK_CONSTANT,position_store[1],NodePath(s)])
+			else:
+				token_store.append([TK_CONSTANT,position_store[1],s])
+			position_store[0] += 1
+			return true
 		
-		if word_is_number(ch) or (ch == KEY_PERIOD and word_is_number(get_char(1))):
-			return read_number_token()
+		if word_is_number(ch) or (ch == KEY_PERIOD and word_is_number(get_char(1,position_store,char_store))):
+			var is_floating:bool = false
+			var is_signed:bool = false
+			var uses_exponent:bool = false
+			var uses_hex:bool = false
+			var uses_bin:bool = false
+			var s:String = ""
+			var i:int = 0
+			while true:
+				var c:int = get_char(i,position_store,char_store)
+				if c == KEY_PERIOD:
+					if is_floating or uses_exponent:
+						printerr(compile_err_header % [position_store[1],"Invalid numeric constant at '.'"])
+						return false
+					elif uses_bin:
+						printerr(compile_err_header % [position_store[1],"Invalid binary constant at '.'"])
+						return false
+					elif uses_hex:
+						printerr(compile_err_header % [position_store[1],"Invalid hexadecimal constant at '.'"])
+						return false
+					is_floating=true
+				elif c == 120: # x
+					if uses_hex or uses_bin or s.length() != 1 or not ((i == 1 and s[0] == "0") or (i == 2 and s[1] == "0" and s[0] == "-")):
+						printerr(compile_err_header % [position_store[1],"Invalid numeric constant at 'x'"])
+						return false
+					uses_hex=true
+				elif uses_hex and (c > 96 and c < 123) or (c > 64 and c < 91) or (c > 47 and c < 58):
+					pass
+				elif not uses_hex and c == 98: # b
+					if uses_bin or s.length() != 1 or not ((i == 1 and s[0] == "0") or (i == 2 and s[1] == "0" and s[0] == "-")):
+						printerr(compile_err_header % [position_store[1],"Invalid numeric constant at 'b'"])
+						return false
+					uses_bin=true
+				elif not uses_hex and c == 101: # e
+					if uses_exponent or uses_bin:
+						printerr(compile_err_header % [position_store[1],"Invalid numeric constant at 'e'"])
+						return false
+					uses_exponent=true
+				elif word_is_number(c):
+					pass
+				elif uses_bin and (c == KEY_0 or c == KEY_1):
+					pass
+				elif (c == KEY_MINUS or c == KEY_PLUS) and uses_exponent:
+					if is_signed:
+						printerr(compile_err_header % [position_store[1],"Invalid numeric constant at '-'"])
+						return false
+					is_signed=true
+				elif c == KEY_UNDERSCORE: # _ separator
+					i += 1
+					continue
+				else:
+					break
+				s += char(c)
+				i += 1
+			var last:int = s.ord_at(s.length() - 1) if s.length() > 0 else 0
+			if not (word_is_number(last) or (uses_hex and (last > 96 and last < 123) or (last > 64 and last < 91) or (last > 47 and last < 58))):
+				printerr(compile_err_header % [position_store[1],"Invalid numeric constant: "+s])
+				return false
+			position_store[0] += i
+			if uses_hex:
+				var v:int = 0
+				for k in range(2,s.length()):
+					var c:int = s.ord_at(k)
+					var d:int = 0
+					if c > 47 and c < 58:
+						d = c - 48
+					elif c > 96 and c < 103:
+						d = c - 87
+					else:
+						d = c - 55
+					if (v >> 59) != 0:
+						v = 9223372036854775807
+						break
+					v = (v << 4) | d
+				token_store.append([TK_CONSTANT,position_store[1],v])
+			elif uses_bin:
+				var v:int = 0
+				for k in range(2,s.length()):
+					var c:int = s.ord_at(k)
+					var d:int = 0
+					if c > 47 and c < 58:
+						d = c - 48
+					elif c > 96 and c < 103:
+						d = c - 87
+					else:
+						d = c - 55
+					if (v >> 62) != 0:
+						v = 9223372036854775807
+						break
+					v = (v << 1) | d
+				token_store.append([TK_CONSTANT,position_store[1],v])
+			elif is_floating or uses_exponent:
+				if s.begins_with("."):
+					s = "0" + s
+				var v = str2var(s)
+				if v is int or v is float:
+					token_store.append([TK_CONSTANT,position_store[1],float(v)])
+				else:
+					token_store.append([TK_CONSTANT,position_store[1],s.to_float()])
+			else:
+				token_store.append([TK_CONSTANT,position_store[1],s.to_int()])
+			return true
 		
 		if word_is_tex(ch):
-			return read_word_token(ch)
+			var s:String = char(ch)
+			var i:int = 1
+			while true:
+				var cv:int = get_char(i,position_store,char_store)
+				if word_is_tex(cv):
+					s += char(cv)
+					i += 1
+				else:
+					break
+			if s == "null":
+				token_store.append([TK_CONSTANT,position_store[1],null])
+			elif s == "true":
+				token_store.append([TK_CONSTANT,position_store[1],true])
+			elif s == "false":
+				token_store.append([TK_CONSTANT,position_store[1],false])
+			elif s in type_index_array:
+				token_store.append([TK_BUILT_IN_TYPE,position_store[1],type_index[s]])
+			elif s in func_index_array:
+				token_store.append([TK_BUILT_IN_FUNC,position_store[1],func_index[s]])
+			elif s in keyword_array:
+				token_store.append([keywords[s],position_store[1],null])
+			else:
+				token_store.append([TK_IDENTIFIER,position_store[1],s])
+			position_store[0] += s.length()
+			return true
 		
-		var n1:int = get_char(1)
-		var n2:int = get_char(2)
+		var n1:int = get_char(1,position_store,char_store)
+		var n2:int = get_char(2,position_store,char_store)
 		var tok:int = -1
 		var width:int = 1
 		if ch == KEY_SLASH:
@@ -1101,440 +1138,179 @@ func next_token() -> bool:
 		elif ch == KEY_PERIOD:
 			tok = TK_PERIOD
 		else:
-			printerr(compile_err_header % [line,"Unknown character"])
+			printerr(compile_err_header % [position_store[1],"Unknown character"])
 			return false
-		push_token(tok)
-		pos += width
+		token_store.append([tok,position_store[1],null])
+		position_store[0] += width
 		return true
 	return false
-
-func read_word_token(ch:int)->bool:
-	var s:String = char(ch)
-	var i:int = 1
-	while true:
-		var cv:int = get_char(i)
-		if word_is_tex(cv):
-			s += char(cv)
-			i += 1
-		else:
-			break
-	if s == "null":
-		push_token(TK_CONSTANT,null)
-	elif s == "true":
-		push_token(TK_CONSTANT,true)
-	elif s == "false":
-		push_token(TK_CONSTANT,false)
-	elif s in type_index_array:
-		push_token(TK_BUILT_IN_TYPE,type_index[s])
-	elif s in func_index_array:
-		push_token(TK_BUILT_IN_FUNC,func_index[s])
-	elif s in keyword_array:
-		push_token(keywords[s])
-	else:
-		push_token(TK_IDENTIFIER,s)
-	pos += s.length()
-	return true
-
-func read_number_token()->bool:
-	var is_floating:bool = false
-	var is_signed:bool = false
-	var uses_exponent:bool = false
-	var uses_hex:bool = false
-	var uses_bin:bool = false
-	var s:String = ""
-	var i:int = 0
-	while true:
-		var c:int = get_char(i)
-		if c == KEY_PERIOD:
-			if is_floating or uses_exponent:
-				printerr(compile_err_header % [line,"Invalid numeric constant at '.'"])
-				return false
-			elif uses_bin:
-				printerr(compile_err_header % [line,"Invalid binary constant at '.'"])
-				return false
-			elif uses_hex:
-				printerr(compile_err_header % [line,"Invalid hexadecimal constant at '.'"])
-				return false
-			is_floating=true
-		elif c == 120: # x
-			if uses_hex or uses_bin or s.length() != 1 or not ((i == 1 and s[0] == "0") or (i == 2 and s[1] == "0" and s[0] == "-")):
-				printerr(compile_err_header % [line,"Invalid numeric constant at 'x'"])
-				return false
-			uses_hex=true
-		elif uses_hex and (c >= KEY_0 and c <= KEY_9) or (c >= 97 and c <= 102) or (c >= KEY_A and c <= KEY_Z):
-			pass
-		elif not uses_hex and c==98: # b
-			if uses_bin or s.length() != 1 or not ((i == 1 and s[0] == "0") or (i == 2 and s[1] == "0" and s[0] == "-")):
-				printerr(compile_err_header % [line,"Invalid numeric constant at 'b'"])
-				return false
-			uses_bin=true
-		elif not uses_hex and c == 101: # e
-			if uses_exponent or uses_bin:
-				printerr(compile_err_header % [line,"Invalid numeric constant at 'e'"])
-				return false
-			uses_exponent=true
-		elif word_is_number(c):
-			pass
-		elif uses_bin and (c == KEY_0 or c == KEY_1):
-			pass
-		elif (c == KEY_MINUS or c == KEY_PLUS) and uses_exponent:
-			if is_signed:
-				printerr(compile_err_header % [line,"Invalid numeric constant at '-'"])
-				return false
-			is_signed=true
-		elif c == KEY_UNDERSCORE: # _ separator
-			i += 1
-			continue
-		else:
-			break
-		s += char(c)
-		i += 1
-	var last:int = s.ord_at(s.length() - 1) if s.length() > 0 else 0
-	if not (word_is_number(last) or (uses_hex and (last >= KEY_0 and last <= KEY_9) or (last >= 97 and last <= 102) or (last >= KEY_A and last <= KEY_Z))):
-		printerr(compile_err_header % [line,"Invalid numeric constant: "+s])
-		return false
-	pos += i
-	if uses_hex:
-		push_token(TK_CONSTANT,radixify(s,2,4))
-	elif uses_bin:
-		push_token(TK_CONSTANT,radixify(s,2,1))
-	elif is_floating or uses_exponent:
-		if s.begins_with("."):
-			s = "0" + s
-		var v = str2var(s)
-		if v is int or v is float:
-			push_token(TK_CONSTANT,float(v))
-		else:
-			push_token(TK_CONSTANT,s.to_float())
-	else:
-		push_token(TK_CONSTANT,s.to_int())
-	return true
-
-func read_string_token(ch:int)->bool:
-	var is_node_path:bool = false
-	if ch == KEY_AT:
-		var q:int = get_char(1)
-		if q != KEY_DOUBLEQUOTE and q != KEY_SINGLEQUOTE:
-			printerr(compile_err_header % [line,"Unexpected '@'"])
-			return false
-		pos += 1
-		is_node_path = true
-	var mode:int = 0
-	if get_char(0) == KEY_SINGLEQUOTE:
-		mode=1
-	var i:int=1
-	if mode == 0 and get_char(i) == KEY_DOUBLEQUOTE and get_char(i + 1) == KEY_DOUBLEQUOTE:
-		i += 2
-		mode = 2
-	var s:String = ""
-	while true:
-		var c:int = get_char(i)
-		if c == 0:
-			printerr(compile_err_header % [line,"Unterminated String"])
-			return false
-		elif (mode == 0 and c == KEY_DOUBLEQUOTE) or (mode == 1 and c == KEY_SINGLEQUOTE):
-			break
-		elif mode == 2 and c == KEY_DOUBLEQUOTE and get_char(i + 1) == KEY_DOUBLEQUOTE and get_char(i + 2) == KEY_DOUBLEQUOTE:
-			i+=2
-			break
-		elif mode != 2 and c == 10:
-			printerr(compile_err_header % [line,"Unexpected EOL at String."])
-			return false
-		elif c == 0xFFFF:
-			i -= 1
-			break
-		elif c == KEY_BACKSLASH:
-			i += 1
-			var nx:int = get_char(i)
-			if nx == 0:
-				printerr(compile_err_header % [line,"Unterminated String"])
-				return false
-			var res:int = 0
-			if nx == 97:res = 7 # a
-			elif nx == 98:res = 8 # b
-			elif nx == 116:res = 9 # t
-			elif nx == 110:res = 10 # n
-			elif nx == 118:res = 11 # v
-			elif nx == 102:res = 12 # f
-			elif nx == 114:res = 13 # r
-			elif nx == KEY_SINGLEQUOTE: res = KEY_SINGLEQUOTE
-			elif nx == KEY_DOUBLEQUOTE: res = KEY_DOUBLEQUOTE
-			elif nx == KEY_BACKSLASH: res = KEY_BACKSLASH
-			elif nx == KEY_SLASH: res = KEY_SLASH
-			elif nx == 117: # u
-				i += 1
-				for j in 4:
-					var hc:int = get_char(i + j)
-					if hc == 0:
-						printerr(compile_err_header % [line,"Unterminated String"])
-						return false
-					var v:int = 0
-					if hc >= KEY_0 and hc <= KEY_9:
-						v = hc - 48
-					elif hc >= 97 and hc <= 102:
-						v = hc - 97 + 10
-					elif hc >= KEY_A and hc <= KEY_Z:
-						v = hc - 65 + 10
-					else:
-						printerr(compile_err_header % [line,"Malformed hex constant in string"])
-						return false
-					res = (res << 4) | v
-				i += 3
-			else:
-				printerr(compile_err_header % [line,"Invalid escape sequence"])
-				return false
-			s += char(res)
-		else:
-			if c == KEY_LINEFEED:
-				line += 1
-			s += char(c)
-		i += 1
-	pos += i
-	if is_node_path:
-		push_token(TK_CONSTANT,NodePath(s))
-	else:
-		push_token(TK_CONSTANT,s)
-	pos += 1
-	return true
-
-static func radixify(s:String,start:int,radix_factor:int) -> int:
-	var v:int = 0
-	for k in range(start,s.length()):
-		var c:int = s.ord_at(k)
-		var d:int = 0
-		if c >= KEY_0 and c <= KEY_9:
-			d = c - 48
-		elif c >= 97 and c <= 102:
-			d = c - 97 + 10
-		else:
-			d = c - 65 + 10
-		if (v >> (63 - radix_factor)) != 0:
-			return 9223372036854775807
-		v = (v << radix_factor) | d
-	return v
-
-func push_token(type:int,arg = null) -> void:
-	type_store.append(type)
-	args_store.append(arg)
-	line_store.append(line)
-
-func get_char(offset:int) -> int:
-	var p:int = pos + offset
-	if p < 0 or p >= length:
-		return 0
-	return char_store[p]
-
-static func word_is_number(c:int) -> bool:
-	return c >= KEY_0 and c <= KEY_9
-
-static func word_is_alpha(c:int) -> bool:
-	return (c >= 97 and c <= 122) or (c >= KEY_A and c <= KEY_Z)
-
-static func word_is_tex(c:int) -> bool:
-	return (c >= 97 and c <= 122) or (c >= KEY_A and c<= KEY_Z) or (c >= KEY_0 and c <= KEY_9) or c == 95
-
-const gdc_bytes = PoolByteArray()
-func get_uint32() -> int:
-	if pos + 4 > length:
-		printerr("Unexpected end of data at offset %d" % pos)
-		pos = length
-		return 0
-	var v:int = gdc_bytes[pos] | (gdc_bytes[pos + 1] << 8) | (gdc_bytes[pos + 2] << 16) | (gdc_bytes[pos + 3] << 24)
-	pos += 4
-	return v
-
-func get_next_bytes(byte_count: int) -> PoolByteArray:
-	if byte_count < 0 or pos + byte_count > length:
-		printerr("Unexpected end of data at offset %d" % pos)
-		pos = length
-		return PoolByteArray()
-	var out:PoolByteArray = PoolByteArray()
-	if byte_count > 0:
-		out = gdc_bytes.subarray(pos, pos + byte_count - 1)
-	pos += byte_count
-	return out
-
-func get_string_data() -> String:
-	var l:int = get_uint32()
-	if l == 0:
-		return ""
-	var raw:PoolByteArray = get_next_bytes(l)
-	var pad:int = (4 - (l % 4)) % 4
-	if pos + pad > length:
-		printerr("Unexpected end of data in string padding at offset %d" % pos)
-		return ""
-	pos += pad
-	return raw.get_string_from_utf8()
-
-func get_const():
-	var header:int = get_uint32()
-	var vtype:int = (header & 0xFF)
-	if vtype == TYPE_NIL:
-		return null
-	elif vtype == TYPE_BOOL:
-		return get_uint32() != 0
-	elif vtype == TYPE_INT:
-		if (header & (1 << 16)) != 0:
-			return get_uint32() | (get_uint32() << 32)
-		var v:int = get_uint32()
-		if v >= 0x80000000:
-			v -= 0x100000000
-		return v
-	elif vtype == TYPE_REAL:
-		var spb:StreamPeerBuffer = StreamPeerBuffer.new()
-		if (header & (1 << 16)) != 0:
-			spb.data_array = get_next_bytes(8)
-			return spb.get_double()
-		spb.data_array = get_next_bytes(4)
-		return spb.get_float()
-	elif vtype == TYPE_STRING:
-		return get_string_data()
-	elif vtype == TYPE_NODE_PATH:
-		var names:int = get_uint32()
-		if not (names & 0x80000000):
-			printerr("Old-format NodePath constants are not supported")
-			return null
-		var name_count:int = names & 0x7FFFFFFF
-		var subname_count:int = get_uint32()
-		var flags:int = get_uint32()
-		if name_count + subname_count > length - pos:
-			printerr("Invalid NodePath constant")
-			return null
-		var name_list:PoolStringArray = PoolStringArray()
-		for i in name_count:
-			name_list.append(get_string_data())
-		var sub_list:PoolStringArray = PoolStringArray()
-		for i in subname_count:
-			sub_list.append(get_string_data())
-		var path:String = name_list.join("/")
-		if flags & 1:
-			path = "/" + path
-		if subname_count > 0:
-			path += ":" + sub_list.join(":")
-		return NodePath(path)
-	else:
-		printerr("Unsupported constant type %d at offset %d" % [vtype, pos])
-		return null
-
+enum{
+TK_EMPTY,TK_IDENTIFIER,TK_CONSTANT,TK_SELF,TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_OP_IN,TK_OP_EQUAL,
+TK_OP_NOT_EQUAL,TK_OP_LESS,TK_OP_LESS_EQUAL,TK_OP_GREATER,TK_OP_GREATER_EQUAL,TK_OP_AND,TK_OP_OR,
+TK_OP_NOT,TK_OP_ADD,TK_OP_SUB,TK_OP_MUL,TK_OP_DIV,TK_OP_MOD,TK_OP_SHIFT_LEFT,TK_OP_SHIFT_RIGHT,TK_OP_ASSIGN,
+TK_OP_ASSIGN_ADD,TK_OP_ASSIGN_SUB,TK_OP_ASSIGN_MUL,TK_OP_ASSIGN_DIV,TK_OP_ASSIGN_MOD,TK_OP_ASSIGN_SHIFT_LEFT,
+TK_OP_ASSIGN_SHIFT_RIGHT,TK_OP_ASSIGN_BIT_AND,TK_OP_ASSIGN_BIT_OR,TK_OP_ASSIGN_BIT_XOR,TK_OP_BIT_AND,
+TK_OP_BIT_OR,TK_OP_BIT_XOR,TK_OP_BIT_INVERT,TK_CF_IF,TK_CF_ELIF,TK_CF_ELSE,TK_CF_FOR,TK_CF_WHILE,TK_CF_BREAK,
+TK_CF_CONTINUE,TK_CF_PASS,TK_CF_RETURN,TK_CF_MATCH,TK_PR_FUNCTION,TK_PR_CLASS,TK_PR_CLASS_NAME,TK_PR_EXTENDS,
+TK_PR_IS,TK_PR_ONREADY,TK_PR_TOOL,TK_PR_STATIC,TK_PR_EXPORT,TK_PR_SETGET,TK_PR_CONST,TK_PR_VAR,TK_PR_AS,
+TK_PR_VOID,TK_PR_ENUM,TK_PR_PRELOAD,TK_PR_ASSERT,TK_PR_YIELD,TK_PR_SIGNAL,TK_PR_BREAKPOINT,TK_PR_REMOTE,
+TK_PR_SYNC,TK_PR_MASTER,TK_PR_SLAVE,TK_PR_PUPPET,TK_PR_REMOTESYNC,TK_PR_MASTERSYNC,TK_PR_PUPPETSYNC,
+TK_BRACKET_OPEN,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_OPEN,TK_CURLY_BRACKET_CLOSE,TK_PARENTHESIS_OPEN,
+TK_PARENTHESIS_CLOSE,TK_COMMA,TK_SEMICOLON,TK_PERIOD,TK_QUESTION_MARK,TK_COLON,TK_DOLLAR,TK_FORWARD_ARROW,
+TK_NEWLINE,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN,TK_ERROR,TK_EOF,TK_CURSOR,TK_MAX}
+const token_list = PoolIntArray([TK_EMPTY,TK_IDENTIFIER,TK_CONSTANT,TK_SELF,TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_OP_IN,TK_OP_EQUAL,
+TK_OP_NOT_EQUAL,TK_OP_LESS,TK_OP_LESS_EQUAL,TK_OP_GREATER,TK_OP_GREATER_EQUAL,TK_OP_AND,TK_OP_OR,
+TK_OP_NOT,TK_OP_ADD,TK_OP_SUB,TK_OP_MUL,TK_OP_DIV,TK_OP_MOD,TK_OP_SHIFT_LEFT,TK_OP_SHIFT_RIGHT,TK_OP_ASSIGN,
+TK_OP_ASSIGN_ADD,TK_OP_ASSIGN_SUB,TK_OP_ASSIGN_MUL,TK_OP_ASSIGN_DIV,TK_OP_ASSIGN_MOD,TK_OP_ASSIGN_SHIFT_LEFT,
+TK_OP_ASSIGN_SHIFT_RIGHT,TK_OP_ASSIGN_BIT_AND,TK_OP_ASSIGN_BIT_OR,TK_OP_ASSIGN_BIT_XOR,TK_OP_BIT_AND,
+TK_OP_BIT_OR,TK_OP_BIT_XOR,TK_OP_BIT_INVERT,TK_CF_IF,TK_CF_ELIF,TK_CF_ELSE,TK_CF_FOR,TK_CF_WHILE,TK_CF_BREAK,
+TK_CF_CONTINUE,TK_CF_PASS,TK_CF_RETURN,TK_CF_MATCH,TK_PR_FUNCTION,TK_PR_CLASS,TK_PR_CLASS_NAME,TK_PR_EXTENDS,
+TK_PR_IS,TK_PR_ONREADY,TK_PR_TOOL,TK_PR_STATIC,TK_PR_EXPORT,TK_PR_SETGET,TK_PR_CONST,TK_PR_VAR,TK_PR_AS,
+TK_PR_VOID,TK_PR_ENUM,TK_PR_PRELOAD,TK_PR_ASSERT,TK_PR_YIELD,TK_PR_SIGNAL,TK_PR_BREAKPOINT,TK_PR_REMOTE,
+TK_PR_SYNC,TK_PR_MASTER,TK_PR_SLAVE,TK_PR_PUPPET,TK_PR_REMOTESYNC,TK_PR_MASTERSYNC,TK_PR_PUPPETSYNC,
+TK_BRACKET_OPEN,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_OPEN,TK_CURLY_BRACKET_CLOSE,TK_PARENTHESIS_OPEN,
+TK_PARENTHESIS_CLOSE,TK_COMMA,TK_SEMICOLON,TK_PERIOD,TK_QUESTION_MARK,TK_COLON,TK_DOLLAR,TK_FORWARD_ARROW,
+TK_NEWLINE,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN,TK_ERROR,TK_EOF,TK_CURSOR,TK_MAX])
+const static_token_list = PoolIntArray([TK_SELF,TK_OP_IN,TK_OP_EQUAL,
+TK_OP_NOT_EQUAL,TK_OP_LESS,TK_OP_LESS_EQUAL,TK_OP_GREATER,TK_OP_GREATER_EQUAL,TK_OP_AND,TK_OP_OR,
+TK_OP_NOT,TK_OP_ADD,TK_OP_SUB,TK_OP_MUL,TK_OP_DIV,TK_OP_MOD,TK_OP_SHIFT_LEFT,TK_OP_SHIFT_RIGHT,TK_OP_ASSIGN,
+TK_OP_ASSIGN_ADD,TK_OP_ASSIGN_SUB,TK_OP_ASSIGN_MUL,TK_OP_ASSIGN_DIV,TK_OP_ASSIGN_MOD,TK_OP_ASSIGN_SHIFT_LEFT,
+TK_OP_ASSIGN_SHIFT_RIGHT,TK_OP_ASSIGN_BIT_AND,TK_OP_ASSIGN_BIT_OR,TK_OP_ASSIGN_BIT_XOR,TK_OP_BIT_AND,
+TK_OP_BIT_OR,TK_OP_BIT_XOR,TK_OP_BIT_INVERT,TK_CF_IF,TK_CF_ELIF,TK_CF_ELSE,TK_CF_FOR,TK_CF_WHILE,TK_CF_BREAK,
+TK_CF_CONTINUE,TK_CF_PASS,TK_CF_RETURN,TK_CF_MATCH,TK_PR_FUNCTION,TK_PR_CLASS,TK_PR_CLASS_NAME,TK_PR_EXTENDS,
+TK_PR_IS,TK_PR_ONREADY,TK_PR_TOOL,TK_PR_STATIC,TK_PR_EXPORT,TK_PR_SETGET,TK_PR_CONST,TK_PR_VAR,TK_PR_AS,
+TK_PR_VOID,TK_PR_ENUM,TK_PR_PRELOAD,TK_PR_ASSERT,TK_PR_YIELD,TK_PR_SIGNAL,TK_PR_BREAKPOINT,TK_PR_REMOTE,
+TK_PR_SYNC,TK_PR_MASTER,TK_PR_SLAVE,TK_PR_PUPPET,TK_PR_REMOTESYNC,TK_PR_MASTERSYNC,TK_PR_PUPPETSYNC,
+TK_BRACKET_OPEN,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_OPEN,TK_CURLY_BRACKET_CLOSE,TK_PARENTHESIS_OPEN,
+TK_PARENTHESIS_CLOSE,TK_COMMA,TK_SEMICOLON,TK_PERIOD,TK_QUESTION_MARK,TK_COLON,TK_DOLLAR,TK_FORWARD_ARROW,
+TK_NEWLINE,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN])
+const token_lookup = {
+TK_EMPTY:"TK_EMPTY",TK_IDENTIFIER:"TK_IDENTIFIER",TK_CONSTANT:"TK_CONSTANT",TK_SELF:"TK_SELF",
+TK_BUILT_IN_TYPE:"TK_BUILT_IN_TYPE",TK_BUILT_IN_FUNC:"TK_BUILT_IN_FUNC",TK_OP_IN:"TK_OP_IN",
+TK_OP_EQUAL:"TK_OP_EQUAL",TK_OP_NOT_EQUAL:"TK_OP_NOT_EQUAL",TK_OP_LESS:"TK_OP_LESS",
+TK_OP_LESS_EQUAL:"TK_OP_LESS_EQUAL",TK_OP_GREATER:"TK_OP_GREATER",TK_OP_GREATER_EQUAL:"TK_OP_GREATER_EQUAL",
+TK_OP_AND:"TK_OP_AND",TK_OP_OR:"TK_OP_OR",TK_OP_NOT:"TK_OP_NOT",TK_OP_ADD:"TK_OP_ADD",TK_OP_SUB:"TK_OP_SUB",
+TK_OP_MUL:"TK_OP_MUL",TK_OP_DIV:"TK_OP_DIV",TK_OP_MOD:"TK_OP_MOD",TK_OP_SHIFT_LEFT:"TK_OP_SHIFT_LEFT",
+TK_OP_SHIFT_RIGHT:"TK_OP_SHIFT_RIGHT",TK_OP_ASSIGN:"TK_OP_ASSIGN",TK_OP_ASSIGN_ADD:"TK_OP_ASSIGN_ADD",
+TK_OP_ASSIGN_SUB:"TK_OP_ASSIGN_SUB",TK_OP_ASSIGN_MUL:"TK_OP_ASSIGN_MUL",TK_OP_ASSIGN_DIV:"TK_OP_ASSIGN_DIV",
+TK_OP_ASSIGN_MOD:"TK_OP_ASSIGN_MOD",TK_OP_ASSIGN_SHIFT_LEFT:"TK_OP_ASSIGN_SHIFT_LEFT",
+TK_OP_ASSIGN_SHIFT_RIGHT:"TK_OP_ASSIGN_SHIFT_RIGHT",TK_OP_ASSIGN_BIT_AND:"TK_OP_ASSIGN_BIT_AND",
+TK_OP_ASSIGN_BIT_OR:"TK_OP_ASSIGN_BIT_OR",TK_OP_ASSIGN_BIT_XOR:"TK_OP_ASSIGN_BIT_XOR",
+TK_OP_BIT_AND:"TK_OP_BIT_AND",TK_OP_BIT_OR:"TK_OP_BIT_OR",TK_OP_BIT_XOR:"TK_OP_BIT_XOR",
+TK_OP_BIT_INVERT:"TK_OP_BIT_INVERT",TK_CF_IF:"TK_CF_IF",TK_CF_ELIF:"TK_CF_ELIF",TK_CF_ELSE:"TK_CF_ELSE",
+TK_CF_FOR:"TK_CF_FOR",TK_CF_WHILE:"TK_CF_WHILE",TK_CF_BREAK:"TK_CF_BREAK",TK_CF_CONTINUE:"TK_CF_CONTINUE",
+TK_CF_PASS:"TK_CF_PASS",TK_CF_RETURN:"TK_CF_RETURN",TK_CF_MATCH:"TK_CF_MATCH",TK_PR_FUNCTION:"TK_PR_FUNCTION",
+TK_PR_CLASS:"TK_PR_CLASS",TK_PR_CLASS_NAME:"TK_PR_CLASS_NAME",TK_PR_EXTENDS:"TK_PR_EXTENDS",
+TK_PR_IS:"TK_PR_IS",TK_PR_ONREADY:"TK_PR_ONREADY",TK_PR_TOOL:"TK_PR_TOOL",TK_PR_STATIC:"TK_PR_STATIC",
+TK_PR_EXPORT:"TK_PR_EXPORT",TK_PR_SETGET:"TK_PR_SETGET",TK_PR_CONST:"TK_PR_CONST",TK_PR_VAR:"TK_PR_VAR",
+TK_PR_AS:"TK_PR_AS",TK_PR_VOID:"TK_PR_VOID",TK_PR_ENUM:"TK_PR_ENUM",TK_PR_PRELOAD:"TK_PR_PRELOAD",
+TK_PR_ASSERT:"TK_PR_ASSERT",TK_PR_YIELD:"TK_PR_YIELD",TK_PR_SIGNAL:"TK_PR_SIGNAL",
+TK_PR_BREAKPOINT:"TK_PR_BREAKPOINT",TK_PR_REMOTE:"TK_PR_REMOTE",TK_PR_SYNC:"TK_PR_SYNC",
+TK_PR_MASTER:"TK_PR_MASTER",TK_PR_SLAVE:"TK_PR_SLAVE",TK_PR_PUPPET:"TK_PR_PUPPET",
+TK_PR_REMOTESYNC:"TK_PR_REMOTESYNC",TK_PR_MASTERSYNC:"TK_PR_MASTERSYNC",TK_PR_PUPPETSYNC:"TK_PR_PUPPETSYNC",
+TK_BRACKET_OPEN:"TK_BRACKET_OPEN",TK_BRACKET_CLOSE:"TK_BRACKET_CLOSE",TK_CURLY_BRACKET_OPEN:"TK_CURLY_BRACKET_OPEN",
+TK_CURLY_BRACKET_CLOSE:"TK_CURLY_BRACKET_CLOSE",TK_PARENTHESIS_OPEN:"TK_PARENTHESIS_OPEN",
+TK_PARENTHESIS_CLOSE:"TK_PARENTHESIS_CLOSE",TK_COMMA:"TK_COMMA",TK_SEMICOLON:"TK_SEMICOLON",
+TK_PERIOD:"TK_PERIOD",TK_QUESTION_MARK:"TK_QUESTION_MARK",TK_COLON:"TK_COLON",TK_DOLLAR:"TK_DOLLAR",
+TK_FORWARD_ARROW:"TK_FORWARD_ARROW",TK_NEWLINE:"TK_NEWLINE",TK_CONST_PI:"TK_CONST_PI",
+TK_CONST_TAU:"TK_CONST_TAU",TK_WILDCARD:"TK_WILDCARD",TK_CONST_INF:"TK_CONST_INF",
+TK_CONST_NAN:"TK_CONST_NAN",TK_ERROR:"TK_ERROR",TK_EOF:"TK_EOF",TK_CURSOR:"TK_CURSOR"}
+const static_tokens = {
+TK_SELF:"self",TK_OP_IN:"in",TK_OP_EQUAL:"==",TK_OP_NOT_EQUAL:"!=",TK_OP_LESS:"<",TK_OP_LESS_EQUAL:"<=",
+TK_OP_GREATER:">",TK_OP_GREATER_EQUAL:">=",TK_OP_AND:"and",TK_OP_OR:"or",TK_OP_NOT:"not",TK_OP_ADD:"+",
+TK_OP_SUB:"-",TK_OP_MUL:"*",TK_OP_DIV:"/",TK_OP_MOD:"%",TK_OP_SHIFT_LEFT:"<<",TK_OP_SHIFT_RIGHT:">>",
+TK_OP_ASSIGN:"=",TK_OP_ASSIGN_ADD:"+=",TK_OP_ASSIGN_SUB:"-=",TK_OP_ASSIGN_MUL:"*=",TK_OP_ASSIGN_DIV:"/=",
+TK_OP_ASSIGN_MOD:"%=",TK_OP_ASSIGN_SHIFT_LEFT:"<<=",TK_OP_ASSIGN_SHIFT_RIGHT:">>=",TK_OP_ASSIGN_BIT_AND:"&=",
+TK_OP_ASSIGN_BIT_OR:"|=",TK_OP_ASSIGN_BIT_XOR:"^=",TK_OP_BIT_AND:"&",TK_OP_BIT_OR:"|",TK_OP_BIT_XOR:"^",
+TK_OP_BIT_INVERT:"~",TK_CF_IF:"if",TK_CF_ELIF:"elif",TK_CF_ELSE:"else",TK_CF_FOR:"for",TK_CF_WHILE:"while",
+TK_CF_BREAK:"break",TK_CF_CONTINUE:"continue",TK_CF_PASS:"pass",TK_CF_RETURN:"return",TK_CF_MATCH:"match",
+TK_PR_FUNCTION:"func",TK_PR_CLASS:"class",TK_PR_CLASS_NAME:"class_name",TK_PR_EXTENDS:"extends",
+TK_PR_IS:"is",TK_PR_ONREADY:"onready",TK_PR_TOOL:"tool",TK_PR_STATIC:"static",TK_PR_EXPORT:"export",
+TK_PR_SETGET:"setget",TK_PR_CONST:"const",TK_PR_VAR:"var",TK_PR_AS:"as",TK_PR_VOID:"void",TK_PR_ENUM:"enum",
+TK_PR_PRELOAD:"preload",TK_PR_ASSERT:"assert",TK_PR_YIELD:"yield",TK_PR_SIGNAL:"signal",TK_PR_BREAKPOINT:"breakpoint",
+TK_PR_REMOTE:"remote",TK_PR_SYNC:"sync",TK_PR_MASTER:"master",TK_PR_SLAVE:"slave",TK_PR_PUPPET:"puppet",
+TK_PR_REMOTESYNC:"remotesync",TK_PR_MASTERSYNC:"mastersync",TK_PR_PUPPETSYNC:"puppetsync",TK_BRACKET_OPEN:"[",
+TK_BRACKET_CLOSE:"]",TK_CURLY_BRACKET_OPEN:"{",TK_CURLY_BRACKET_CLOSE:"}",TK_PARENTHESIS_OPEN:"(",
+TK_PARENTHESIS_CLOSE:")",TK_COMMA:",",TK_SEMICOLON:";",TK_PERIOD:".",TK_QUESTION_MARK:"?",TK_COLON:":",
+TK_DOLLAR:"$",TK_FORWARD_ARROW:"->",TK_NEWLINE:"\n",TK_CONST_PI:"PI",TK_CONST_TAU:"TAU",TK_WILDCARD:"_",
+TK_CONST_INF:"INF",TK_CONST_NAN:"NAN"}
+const func_index={
+"sin":0,"cos":1,"tan":2,"sinh":3,"cosh":4,"tanh":5,"asin":6,"acos":7,"atan":8,"atan2":9,
+"sqrt":10,"fmod":11,"fposmod":12,"posmod":13,"floor":14,"ceil":15,"round":16,"abs":17,"sign":18,"pow":19,
+"log":20,"exp":21,"is_nan":22,"is_inf":23,"is_equal_approx":24,"is_zero_approx":25,"ease":26,"decimals":27,
+"step_decimals":28,"stepify":29,"lerp":30,"lerp_angle":31,"inverse_lerp":32,"range_lerp":33,
+"smoothstep":34,"move_toward":35,"dectime":36,"randomize":37,"randi":38,"randf":39,"rand_range":40,"seed":41,
+"rand_seed":42,"deg2rad":43,"rad2deg":44,"linear2db":45,"db2linear":46,"polar2cartesian":47,
+"cartesian2polar":48,"wrapi":49,"wrapf":50,"max":51,"min":52,"clamp":53,"nearest_po2":54,
+"weakref":55,"funcref":56,"convert":57,"typeof":58,"type_exists":59,"char":60,"ord":61,"str":62,
+"print":63,"printt":64,"prints":65,"printerr":66,"printraw":67,"print_debug":68,"push_error":69,
+"push_warning":70,"var2str":71,"str2var":72,"var2bytes":73,"bytes2var":74,"range":75,"load":76,
+"inst2dict":77,"dict2inst":78,"validate_json":79,"parse_json":80,"to_json":81,"hash":82,"Color8":83,"ColorN":84,
+"print_stack":85,"get_stack":86,"instance_from_id":87,"len":88,"is_instance_valid":89,"deep_equal":90}
+const func_index_array = PoolStringArray([
+"sin","cos","tan","sinh","cosh","tanh","asin",
+"acos","atan","atan2","sqrt","fmod","fposmod","posmod","floor","ceil",
+"round","abs","sign","pow","log","exp","is_nan","is_inf","is_equal_approx",
+"is_zero_approx","ease","decimals","step_decimals","stepify","lerp",
+"lerp_angle","inverse_lerp","range_lerp","smoothstep","move_toward","dectime",
+"randomize","randi","randf","rand_range","seed","rand_seed","deg2rad",
+"rad2deg","linear2db","db2linear","polar2cartesian","cartesian2polar",
+"wrapi","wrapf","max","min","clamp","nearest_po2","weakref","funcref",
+"convert","typeof","type_exists","char","ord","str","print","printt","prints",
+"printerr","printraw","print_debug","push_error","push_warning","var2str",
+"str2var","var2bytes","bytes2var","range","load","inst2dict","dict2inst",
+"validate_json","parse_json","to_json","hash","Color8","ColorN","print_stack",
+"get_stack","instance_from_id","len","is_instance_valid","deep_equal"])
+const type_index={
+"bool":TYPE_BOOL,"int":TYPE_INT,"float":TYPE_REAL,"String":TYPE_STRING,
+"Vector2":TYPE_VECTOR2,"Rect2":TYPE_RECT2,"Vector3":TYPE_VECTOR3,"Transform2D":TYPE_TRANSFORM2D,
+"Plane":TYPE_PLANE,"Quat":TYPE_QUAT,"AABB":TYPE_AABB,"Basis":TYPE_BASIS,
+"Transform":TYPE_TRANSFORM,"Color":TYPE_COLOR,"NodePath":TYPE_NODE_PATH,"RID":TYPE_RID,
+"Object":TYPE_OBJECT,"Dictionary":TYPE_DICTIONARY,"Array":TYPE_ARRAY,
+"PoolByteArray":TYPE_RAW_ARRAY,"PoolIntArray":TYPE_INT_ARRAY,"PoolRealArray":TYPE_REAL_ARRAY,
+"PoolStringArray":TYPE_STRING_ARRAY,"PoolVector2Array":TYPE_VECTOR2_ARRAY,
+"PoolVector3Array":TYPE_VECTOR3_ARRAY,"PoolColorArray":TYPE_COLOR_ARRAY}
+const type_index_array = PoolStringArray([
+"bool","int","float","String","Vector2","Rect2","Vector3","Transform2D",
+"Plane","Quat","AABB","Basis","Transform","Color","NodePath","RID",
+"Object","Dictionary","Array","PoolByteArray","PoolIntArray","PoolRealArray",
+"PoolStringArray","PoolVector2Array","PoolVector3Array","PoolColorArray"])
+const type_names = {
+1:"bool",2:"int",3:"float",4:"String",5:"Vector2",6:"Rect2",7: "Vector3",
+8:"Transform2D",9:"Plane",10:"Quat",11:"AABB",12:"Basis",13:"Transform",
+14:"Color",15:"NodePath",16:"RID",17:"Object",18:"Dictionary",19:"Array",
+20:"PoolByteArray",21:"PoolIntArray",22:"PoolRealArray",23:"PoolStringArray",
+24: "PoolVector2Array", 25: "PoolVector3Array", 26: "PoolColorArray"}
+const keywords={
+"in":TK_OP_IN,"not":TK_OP_NOT,"or":TK_OP_OR,"and":TK_OP_AND,
+"func":TK_PR_FUNCTION,"class":TK_PR_CLASS,"class_name":TK_PR_CLASS_NAME,
+"extends":TK_PR_EXTENDS,"is":TK_PR_IS,"onready":TK_PR_ONREADY,
+"tool":TK_PR_TOOL,"static":TK_PR_STATIC,"export":TK_PR_EXPORT,
+"setget":TK_PR_SETGET,"var":TK_PR_VAR,"as":TK_PR_AS,"void":TK_PR_VOID,
+"preload":TK_PR_PRELOAD,"assert":TK_PR_ASSERT,"yield":TK_PR_YIELD,
+"signal":TK_PR_SIGNAL,"breakpoint":TK_PR_BREAKPOINT,
+"remote":TK_PR_REMOTE,"master":TK_PR_MASTER,"slave":TK_PR_SLAVE,
+"puppet":TK_PR_PUPPET,"sync":TK_PR_SYNC,"remotesync":TK_PR_REMOTESYNC,
+"mastersync":TK_PR_MASTERSYNC,"puppetsync":TK_PR_PUPPETSYNC,
+"const":TK_PR_CONST,"enum":TK_PR_ENUM,
+"if":TK_CF_IF,"elif":TK_CF_ELIF,"else":TK_CF_ELSE,"for":TK_CF_FOR,
+"while":TK_CF_WHILE,"break":TK_CF_BREAK,"continue":TK_CF_CONTINUE,
+"return":TK_CF_RETURN,"match":TK_CF_MATCH,"pass":TK_CF_PASS,
+"self":TK_SELF,"PI":TK_CONST_PI,"TAU":TK_CONST_TAU,"_":TK_WILDCARD,
+"INF":TK_CONST_INF,"NAN":TK_CONST_NAN}
+const keyword_array = PoolStringArray([
+"in","not","or","and","func","class","class_name","extends","is","onready",
+"tool","static","export","setget","var","as","void","preload","assert","yield",
+"signal","breakpoint","remote","master","slave","puppet","sync","remotesync",
+"mastersync","puppetsync","const","enum","if","elif","else","for","while",
+"break","continue","return","match","pass","self","PI","TAU","_","INF","NAN"])
+const compile_err_header="SCRIPT COMPILE ERR - line %d: %s"
+const decompile_err_header="SCRIPT DECOMPILE ERR - line %d: %s"
+enum{KEY_HORIZONTALTAB=9,KEY_LINEFEED=10,KEY_CARRIAGERETURN=13,KEY_SINGLEQUOTE=39,
+KEY_DOUBLEQUOTE=34,KEY_BELL=7,KEY_BACKSPACE=8,KEY_VERTICALTAB=11,KEY_FORMFEED=12}
+const operator_characters = "+-*/%=<>!&|^~"
 const operand_word_tokens = PoolIntArray([TK_IDENTIFIER,TK_SELF,TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_OP_IN,TK_OP_NOT,TK_OP_AND,TK_OP_OR,TK_CF_IF,TK_PR_PUPPETSYNC,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN])
 const operand_end_tokens = PoolIntArray([TK_IDENTIFIER,TK_CONSTANT,TK_SELF,TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_PARENTHESIS_CLOSE,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_CLOSE,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN])
 const operand_callable_tokens = PoolIntArray([TK_IDENTIFIER,TK_BUILT_IN_FUNC,TK_BUILT_IN_TYPE,TK_PARENTHESIS_CLOSE,TK_BRACKET_CLOSE,TK_PR_PRELOAD,TK_PR_YIELD,TK_PR_ASSERT,TK_PR_EXPORT])
-
-func float_to_string(d:float) -> String:
-	if is_nan(d):
-		return "NAN"
-	if is_inf(d):
-		return "INF" if d > 0 else "-INF"
-	if d < 0:
-		return "-" + float_to_string(-d)
-	if d == 0.0:
-		return "0.0"
-	if d >= 1e-4 and d < 1e15:
-		for k in 20:
-			var s:String = ("%." + str(k + 1) + "f") % d
-			var a:float = 0.0
-			var v = str2var(s)
-			if v is int or v is float:
-				a = float(v)
-			else:
-				a = s.to_float()
-			var bits:StreamPeerBuffer = StreamPeerBuffer.new()
-			bits.put_double(a)
-			bits.put_double(d)
-			bits.seek(0)
-			if bits.get_64() == bits.get_64():
-				return s
-	var e:int = int(floor(log(d) / log(10.0)))
-	for i in 2:
-		for f in PoolIntArray([0, 1, -1]):
-			var ex:int = e + f
-			var mantissa:float = d / pow(10.0, ex)
-			if i == 0 and (mantissa < 1.0 or mantissa >= 10.0):
-				continue
-			for p in 18:
-				var cand:String = (("%." + str(p) + "f") % mantissa) + "e" + str(ex)
-				var a:float = 0.0
-				var v = str2var(cand)
-				if v is int or v is float:
-					a = float(v)
-				else:
-					a = cand.to_float()
-				var bits:StreamPeerBuffer = StreamPeerBuffer.new()
-				bits.put_double(a)
-				bits.put_double(d)
-				bits.seek(0)
-				if bits.get_64() == bits.get_64():
-					return cand
-	return var2str(d)
-
-func escape_string(s:String,keep_newlines:bool) -> String:
-	var out:String = ""
-	for k in s:
-		var code:int = ord(k)
-		if code == KEY_BACKSLASH:
-			out += "\\\\"
-		elif code == KEY_DOUBLEQUOTE:
-			out += "\\\""
-		elif code == KEY_LINEFEED:
-			out += ("\n" if keep_newlines else "\\n")
-		elif code == KEY_HORIZONTALTAB:
-			out += "\\t"
-		elif code == KEY_CARRIAGERETURN:
-			out += "\\r"
-		elif code == KEY_BELL:
-			out += "\\a"
-		elif code == KEY_BACKSPACE:
-			out += "\\b"
-		elif code == KEY_VERTICALTAB:
-			out += "\\v"
-		elif code == KEY_FORMFEED:
-			out += "\\f"
-		else:
-			if code < KEY_SPACE or code == 0xFFFF:
-				out += "\\u%04x" % code
-			else:
-				out += k
-	return out
-
-func escape_string_with_quotes(s:String) -> String:
-	return "\"" + escape_string(s,false) + "\""
-
 const closing_tokens = PoolIntArray([TK_PARENTHESIS_CLOSE,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_CLOSE,TK_SEMICOLON,TK_COLON])
 const opening_tokens = PoolIntArray([TK_DOLLAR,TK_PERIOD,TK_PARENTHESIS_OPEN,TK_BRACKET_OPEN,TK_CURLY_BRACKET_OPEN])
-
-func get_string_separator(c:int,p:int,prev_unary:bool,nodepath_state:int,token_count:int) -> String:
-	var ct:int = type_store[c]
-	var pt:int = type_store[p]
-	
-	if nodepath_state == 1:
-		if ct == TK_PERIOD or ct in operand_word_tokens or (ct == TK_CONSTANT and args_store[c] is String):
-			return ""
-	elif nodepath_state == 2:
-		if ct == TK_OP_DIV and is_following_token_path(c + 1,token_count):
-			return ""
-	if prev_unary or ct in closing_tokens:
-		return ""
-	if ct == TK_COMMA:
-		return " " if pt == TK_PR_SETGET else ""
-	if pt in opening_tokens:
-		return ""
-	if ct == TK_PERIOD:
-		if is_token_operand_end(p):
-			return " " if (type_store[p] == TK_CONSTANT and args_store[p] is int or args_store[p] is float) else ""
-		return " "
-	if ct == TK_PARENTHESIS_OPEN:
-		return "" if ((type_store[p] in operand_callable_tokens) or (p > 0 and type_store[p - 1] == TK_PERIOD and type_store[p] in operand_word_tokens)) else " "
-	if ct == TK_BRACKET_OPEN:
-		return "" if is_token_operand_end(p) else " "
-	return " "
-
-func is_token_operand_end(idx: int) -> bool:
-	return (type_store[idx] in operand_end_tokens) or (idx > 0 and type_store[idx - 1] == TK_PERIOD and type_store[idx] in operand_word_tokens)
-
-func is_following_token_path(idx: int,token_count:int) -> bool:
-	if idx >= token_count:
-		return false
-	var t:int = type_store[idx]
-	if t == TK_PERIOD or t in operand_word_tokens:
-		return true
-	return t == TK_CONSTANT and args_store[idx] is String

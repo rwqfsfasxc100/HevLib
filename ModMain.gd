@@ -62,8 +62,8 @@ func _init(modLoader):
 	for f in fetch_folder_files(variables_folder,directory,false,true):directory.remove(f)
 	
 	var replacements:Dictionary=Dictionary()
-	var exePath:String=OS.get_executable_path().get_base_dir()+"/hevlib_dll_store/"
 	if!OS.has_feature("editor"):
+		var exePath:String=OS.get_executable_path().get_base_dir()+"/hevlib_dll_store/"
 		var all_libraries:PoolStringArray=PoolStringArray()
 		for first in fetch_folder_files("res://",directory,true):if first.ends_with("/"):
 			var mod_dir:String="res://"+first
@@ -266,31 +266,31 @@ static func installScriptExtensionFromSource(source_code:String,pointers):
 	out.set_source_code(source_code)
 	out.reload()
 	var parentPath:String=out.get_base_script().resource_path
-	pointers.l("Installing script extension from [%s <- Source Code]"%parentPath)
+#	pointers.l("Installing script extension from [%s <- Source Code]"%parentPath)
 	out.take_over_path(parentPath)
 	strings[4].append(out)
 static func installScriptExtensionFromScript(out:Script,pointers):
 	var parentPath:String=out.get_base_script().resource_path
-	pointers.l("Installing script extension from [%s <- %s]"%[parentPath,out])
+#	pointers.l("Installing script extension from [%s <- %s]"%[parentPath,out])
 	out.take_over_path(parentPath)
 	strings[4].append(out)
 static func installScriptOverrideFromSource(source_code:String,original_path:String,pointers):
 	var out=GDScript.new()
 	out.set_source_code(source_code)
 	out.reload()
-	pointers.l("Installing script override from [%s <- Source Code]"%original_path)
+#	pointers.l("Installing script override from [%s <- Source Code]"%original_path)
 	out.take_over_path(original_path)
 	strings[4].append(out)
 static func installScriptOverrideFromScript(out:Script,original_path:String,pointers):
-	pointers.l("Installing script override from [%s <- %s]"%[original_path,out])
+#	pointers.l("Installing script override from [%s <- %s]"%[original_path,out])
 	out.take_over_path(original_path)
 	strings[4].append(out)
 static func replaceSceneLiteral(newPath:String,oldPath:String,pointers):
-	pointers.l("Updating scene literal:%s"%newPath)
+#	pointers.l("Updating scene literal:%s"%newPath)
 	var scene:Resource=load(newPath)
 	scene.take_over_path(oldPath)
 	strings[4].append(scene)
-	pointers.l("Finished updating literal:%s"%oldPath)
+#	pointers.l("Finished updating literal:%s"%oldPath)
 static func l(msg:String,title:String=MOD_NAME):strings[3].l(msg,"%s V%s"%[title,MOD_VERSION_STRING])
 static func log_double_load_error(script_path:String):l("Script at [%s] is likely double loaded! Please check your zips!" % script_path)
 static func fetch_folder_files(folder:String,directory:Directory,showFolders:bool=false,returnFullPath:bool=false,globalizePath:bool=false)->PoolStringArray:
@@ -401,14 +401,24 @@ func testing(modLoader:ModLoader):
 	
 	var pointers = strings[3]
 	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
+	var tk_new = load("res://HevLib/scripts/tokenizer/tokenizer_contained.gd")
+	var tk_curr = load("res://HevLib/scripts/tokenizer/tokenizer.gd").new()
+	file.open("res://HevLib/scenes/keymapping/data/declutter.gdc",File.READ)
+	var buffer:PoolByteArray = file.get_buffer(file.get_len())
+	file.close()
+	var tokens = tk_new.__tokens_to_source(tk_new.__compiled_bytecode_to_tokens(buffer))
 	
+	breakpoint
 	
 	var t1=Time.get_ticks_usec()
-	for i in 100000:
-		pass
+	tk_curr.__compiled_bytecode_to_tokens(buffer)
+	tk_curr.__tokens_to_source()
+#	for i in 100000:
+#		pass
 	var t2=Time.get_ticks_usec()
-	for i in 100000:
-		pass
+	tk_new.__tokens_to_source(tk_new.__compiled_bytecode_to_tokens(buffer))
+#	for i in 100000:
+#		pass
 	var t3=Time.get_ticks_usec()
 	var d1=t2-t1
 	var d2=t3-t2
