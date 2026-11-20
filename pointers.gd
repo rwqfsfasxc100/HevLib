@@ -36,7 +36,6 @@ var http:HTTPRequest = HTTPRequest.new()
 
 var equipment_modmain:Node = null
 var webtranslate_modmain:Node = null
-var main_modmain:Node = null
 
 var Achievements : _Achievements = _Achievements.new(self,http)
 var ConfigDriver : _ConfigDriver = _ConfigDriver.new(self)
@@ -4858,17 +4857,15 @@ class _FolderAccess:
 		if not folder.ends_with("/"):
 			folder += "/"
 		var directory:Directory = Directory.new()
-		if not directory.dir_exists(folder):
+		if not directory.dir_exists(folder) or (directory.open(folder) + directory.list_dir_begin(true)):
 			return Array()
-		directory.open(folder)
-		directory.list_dir_begin(true)
 		while true:
 			var fileName : String = directory.get_next()
 			if not (fileName.ends_with("/") or fileName == "." or fileName == ".."):
 				if not fileName: break
 				if directory.current_is_dir():
 					if not showFolders: continue
-					if not fileName.ends_with("/"): fileName += "/"
+					fileName += "/"
 				if returnFullPath:
 					fileName = folder + fileName
 				if globalizePath:

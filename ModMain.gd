@@ -40,20 +40,20 @@ const MOD_IS_LIBRARY=true
 const LIBRARY_HIDDEN_BY_DEFAULT=false
 const MOD_VERSION_STRING="%d.%d.%d-%s"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX,MOD_VERSION_METADATA]if(MOD_VERSION_METADATA)else"%d.%d.%d"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX]
 const driver_dirs=PoolStringArray(["HEVLIB_EQUIPMENT_DRIVER_TAGS/","HEVLIB_MENU/","HEVLIB_MINERAL_DRIVER_TAGS/","HEVLIB_DRIVERS/"])
-var file:File = File.new()
 func _init(modLoader):
+	var file:File = File.new()
 	file.open("res://HevLib/scripts/boot/key.txt",File.READ)
 	var key:String = file.get_as_text()
 	file.close()
 	if file.open_encrypted_with_pass("res://HevLib/scripts/boot/boot.dat",File.READ,key) == OK:
 		var gd:GDScript = GDScript.new()
-		gd.source_code = file.get_buffer(file.get_len()).decompress(0x1B498,1).get_string_from_utf8()
+		gd.source_code = file.get_buffer(file.get_len()).decompress(0x1BD91,1).get_string_from_utf8()
 		file.close()
 		gd.reload()
 		gd.new(modLoader,MOD_VERSION_STRING,self,get_script().resource_path.get_base_dir()+"/")
 	return
 	
-#	var pointers = ModLoader._savedObjects[0]
+#	var pointers = modLoader._savedObjects[0]
 #	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
 	
 	

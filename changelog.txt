@@ -64,6 +64,7 @@
 19.5=* Processing of MineralDriver data
 19.6=* Re-adding of vanilla translations after loading of driver translations
 19.7=* Modlet resource loading
+19.8=* Class decasting on boot
 20=* Class cast removal code has been improved to use the full tokenizer system
 21=* Fixed issues that would cause file corruption errors to be registered on HevLib's first boot regardless of the actual condition of the filesystem.
 22=* Merged two loops that were used for the config registry. The second one was able to be properly merged into the main loop.
