@@ -39,7 +39,7 @@ var hl_sprite_overlay:Sprite
 var hl_mineraldriverminerak_uinit : bool = false
 func _ready():
 	if hl_mineraldriverminerak_uinit:
-		ModLoader._savedObjects[0].main_modmain.log_double_load_error(get_script().resource_path)
+		ModLoader._savedObjects[0].log_double_load_error(get_script().resource_path)
 	hl_mineraldriverminerak_uinit = true
 	hl_sprite_overlay = load("res://HevLib/scenes/minerals/icons/MineralOverlay.tscn").instance()
 	redraw_mineral_overlay_tex()

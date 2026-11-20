@@ -38,7 +38,7 @@ onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
 var hl_eqdrbuyui_uinit : bool = false
 func _ready():
 	if hl_eqdrbuyui_uinit:
-		pointers.main_modmain.log_double_load_error(get_script().resource_path)
+		pointers.log_double_load_error(get_script().resource_path)
 	hl_eqdrbuyui_uinit = true
 	for i in 6:
 		if not "systemGoodColor" in dealer:

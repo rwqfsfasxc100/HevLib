@@ -36,7 +36,7 @@ var hl_namerdriverhandler_uinit : bool = false
 func _ready():
 	var pointers:HevLibPointers = ModLoader._savedObjects[0]
 	if hl_namerdriverhandler_uinit:
-		pointers.main_modmain.log_double_load_error(get_script().resource_path)
+		pointers.log_double_load_error(get_script().resource_path)
 	hl_namerdriverhandler_uinit = true
 	var data:Dictionary = pointers.Equipment.namer_store
 	# Hardcoded

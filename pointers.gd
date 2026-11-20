@@ -322,6 +322,8 @@ const messagesPerFile:float = 1000.0
 func l(msg:String, title:String = "",vanilla_log:bool = true):
 	if vanilla_log:Debug.l(("[%s]: %s" % [title, msg]) if title else msg)
 	logCache += "[%s]: %s\n" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg]
+func log_double_load_error(script_path:String):
+	l("Script at [%s] is likely double loaded! Please check your zips!" % script_path,"HevLib V%s" % version_string)
 
 # Notetaking function used to mark an important event in the game's performance logs
 func n(msg:String, title:String = ""):

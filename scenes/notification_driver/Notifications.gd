@@ -63,7 +63,7 @@ onready var boxes:Dictionary = {
 var hl_notificationdriverhandler_uinit : bool = false
 func _ready():
 	if hl_notificationdriverhandler_uinit:
-		pointers.main_modmain.log_double_load_error(get_script().resource_path)
+		pointers.log_double_load_error(get_script().resource_path)
 	hl_notificationdriverhandler_uinit = true
 	CurrentGame.connect("generic_notification",self,"_notification_start")
 	

@@ -37,7 +37,7 @@ onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
 var hl_modmenu2transittiphandler_uinit : bool = false
 func _ready():
 	if hl_modmenu2transittiphandler_uinit:
-		pointers.main_modmain.log_double_load_error(get_script().resource_path)
+		pointers.log_double_load_error(get_script().resource_path)
 	hl_modmenu2transittiphandler_uinit = true
 	for i in tips:
 		list.append(base % (i + 1))

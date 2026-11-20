@@ -36,7 +36,7 @@ onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
 var mm2_titlemenu_uinit : bool = false
 func _ready():
 	if mm2_titlemenu_uinit:
-		pointers.main_modmain.log_double_load_error(get_script().resource_path)
+		pointers.log_double_load_error(get_script().resource_path)
 	mm2_titlemenu_uinit = true
 	add_child(update_timer)
 	update_timer.connect("timeout",self,"update_recheck")

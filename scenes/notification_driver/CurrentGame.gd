@@ -39,5 +39,5 @@ func send_notification(data:Dictionary):
 var hl_notificationdriversignalparser_uinit : bool = false
 func _ready():
 	if hl_notificationdriversignalparser_uinit:
-		ModLoader._savedObjects[0].main_modmain.log_double_load_error(get_script().resource_path)
+		ModLoader._savedObjects[0].log_double_load_error(get_script().resource_path)
 	hl_notificationdriversignalparser_uinit = true

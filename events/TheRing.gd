@@ -191,7 +191,7 @@ func logEvents():
 var hl_eventdriverintegrate_uinit : bool = false
 func _ready():
 	if hl_eventdriverintegrate_uinit:
-		pointers.main_modmain.log_double_load_error(get_script().resource_path)
+		pointers.log_double_load_error(get_script().resource_path)
 	hl_eventdriverintegrate_uinit = true
 	connect("tree_exiting",self,"wipe_lists")
 	file.open(event_log_file,File.WRITE)

@@ -35,6 +35,6 @@ var rpc_game_uinit : bool = false
 func _ready():
 	var pointers:HevLibPointers = ModLoader._savedObjects[0]
 	if rpc_game_uinit:
-		pointers.main_modmain.log_double_load_error(get_script().resource_path)
+		pointers.log_double_load_error(get_script().resource_path)
 	rpc_game_uinit = true
 	pointers.RPC.loader_changed("ring")

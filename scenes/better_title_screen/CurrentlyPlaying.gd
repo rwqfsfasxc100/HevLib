@@ -39,7 +39,7 @@ func _enter_tree() -> void:
 
 func _ready():
 	if hl_currhider_uinit:
-		pointers.main_modmain.log_double_load_error(get_script().resource_path)
+		pointers.log_double_load_error(get_script().resource_path)
 	hl_currhider_uinit = true
 	is_ready = true
 func _process(delta:float):

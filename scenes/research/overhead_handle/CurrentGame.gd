@@ -45,7 +45,7 @@ onready var active_mods:PoolStringArray = researchSysPointers.ManifestV2.__get_m
 var hl_researchoverhead_uinit : bool = false
 func _ready():
 	if hl_researchoverhead_uinit:
-		researchSysPointers.main_modmain.log_double_load_error(get_script().resource_path)
+		researchSysPointers.log_double_load_error(get_script().resource_path)
 	hl_researchoverhead_uinit = true
 	connect("newGame",self,"init_research_on_save_load")
 

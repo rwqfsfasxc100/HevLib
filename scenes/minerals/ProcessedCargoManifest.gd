@@ -36,7 +36,7 @@ onready var processed_cargo_limiter_obj = load("res://HevLib/scenes/minerals/Shi
 var hl_mineraldriverprocessedcargohainterrupthandler_uinit : bool = false
 func _ready():
 	if hl_mineraldriverprocessedcargohainterrupthandler_uinit:
-		hl_manifest_interrupt_pointers.main_modmain.log_double_load_error(get_script().resource_path)
+		hl_manifest_interrupt_pointers.log_double_load_error(get_script().resource_path)
 	hl_mineraldriverprocessedcargohainterrupthandler_uinit = true
 	processed_cargo_limiter_obj.ship = ship
 	ship = processed_cargo_limiter_obj

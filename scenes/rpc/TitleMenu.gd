@@ -35,6 +35,6 @@ var rpc_titlemenu_uinit : bool = false
 func _ready():
 	var pointers:HevLibPointers = ModLoader._savedObjects[0]
 	if rpc_titlemenu_uinit:
-		pointers.main_modmain.log_double_load_error(get_script().resource_path)
+		pointers.log_double_load_error(get_script().resource_path)
 	rpc_titlemenu_uinit = true
 	pointers.RPC.loader_changed("title_screen")

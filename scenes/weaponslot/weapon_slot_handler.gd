@@ -45,7 +45,7 @@ var file:File = File.new()
 var hl_weaponslotdriverdatafetcher_uinit : bool = false
 func _ready():
 	if hl_weaponslotdriverdatafetcher_uinit:
-		pointers.main_modmain.log_double_load_error(get_script().resource_path)
+		pointers.log_double_load_error(get_script().resource_path)
 	hl_weaponslotdriverdatafetcher_uinit = true
 	
 	shipName=ship.shipName

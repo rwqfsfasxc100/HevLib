@@ -35,7 +35,7 @@ var hl_shipdriverderelictadder_uinit : bool = false
 onready var hl_ring_shipdriver_additive_pointers:HevLibPointers = ModLoader._savedObjects[0]
 func _ready():
 	if hl_shipdriverderelictadder_uinit:
-		hl_ring_shipdriver_additive_pointers.main_modmain.log_double_load_error(get_script().resource_path)
+		hl_ring_shipdriver_additive_pointers.log_double_load_error(get_script().resource_path)
 	hl_shipdriverderelictadder_uinit = true
 	var derelict_handler:Script = load("res://HevLib/scenes/ship_driver/DerelictHandler.gd")
 	for index in 5:

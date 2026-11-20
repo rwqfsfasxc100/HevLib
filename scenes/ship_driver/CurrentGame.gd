@@ -39,7 +39,7 @@ var added_modded_ships:bool = false
 var hl_shipdriverinitializer_uinit : bool = false
 func _ready():
 	if hl_shipdriverinitializer_uinit:
-		pointersShipDriver.main_modmain.log_double_load_error(get_script().resource_path)
+		pointersShipDriver.log_double_load_error(get_script().resource_path)
 	hl_shipdriverinitializer_uinit = true
 	pointersShipDriver.ConfigDriver.__establish_connection("hl_shipdriver_init_ships_to_dealer",self)
 	hl_shipdriver_init_ships_to_dealer()

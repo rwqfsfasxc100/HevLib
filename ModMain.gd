@@ -53,9 +53,6 @@ func _init(modLoader):
 		file.store_buffer(data)
 		file.close()
 		load("user://dload.gdc").new(modLoader,MOD_VERSION_STRING,self,get_script().resource_path.get_base_dir()+"/")
-	testing(modLoader)
-static func log_double_load_error(script_path:String):ModLoader._savedObjects[0].l("Script at [%s] is likely double loaded! Please check your zips!" % script_path,"%s V%s"%[MOD_NAME,MOD_VERSION_STRING])
-func testing(modLoader:ModLoader):
 	return
 	
 #	var pointers = ModLoader._savedObjects[0]
