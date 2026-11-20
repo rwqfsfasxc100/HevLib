@@ -139,7 +139,9 @@
 67.1=* This is to prevent tampering to the most crucial code for booting and running HevLib.
 67.2=* Most notably, this covers the removal of non-vanilla class names.
 67.2.1=* Without this, most scripts built to interact with named scripts will fail on release builds.
-70=* Updated credits
+68=* All pointer constants are now stored in the main pointer script
+69=* Removed all script and resource extensions from the modmain as they're no longer needed
+75=* Updated credits
 
 [1.17.8]
 

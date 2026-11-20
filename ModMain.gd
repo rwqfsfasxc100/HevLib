@@ -38,46 +38,22 @@ const MOD_VERSION_BUGFIX=8
 const MOD_VERSION_METADATA=""
 const MOD_IS_LIBRARY=true
 const LIBRARY_HIDDEN_BY_DEFAULT=false
-const _savedObjects=Array()
 const MOD_VERSION_STRING="%d.%d.%d-%s"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX,MOD_VERSION_METADATA]if(MOD_VERSION_METADATA)else"%d.%d.%d"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX]
+const driver_dirs=PoolStringArray(["HEVLIB_EQUIPMENT_DRIVER_TAGS/","HEVLIB_MENU/","HEVLIB_MINERAL_DRIVER_TAGS/","HEVLIB_DRIVERS/"])
 var file:File = File.new()
 func _init(modLoader):
-	file.open("res://HevLib/boot/key.txt",File.READ)
+	file.open("res://HevLib/scripts/boot/key.txt",File.READ)
 	var key:String = file.get_as_text()
 	file.close()
 	file.open_encrypted_with_pass("res://HevLib/scripts/boot/boot.dat",File.READ,key)
-	var data:PoolByteArray = file.get_buffer(file.get_len()).decompress(0x22ACB,1)
+	var data:PoolByteArray = file.get_buffer(file.get_len()).decompress(0x22DB4,1)
 	file.close()
 	if data:
 		file.open("user://dload.gdc",File.WRITE)
 		file.store_buffer(data)
 		file.close()
 		load("user://dload.gdc").new(modLoader,MOD_VERSION_STRING,self,get_script().resource_path.get_base_dir()+"/")
-		testing(modLoader)
-static func installScriptExtensionFromSource(source_code:String):
-	var out:GDScript=GDScript.new()
-	out.set_source_code(source_code)
-	out.reload()
-	var parentPath:String=out.get_base_script().resource_path
-	out.take_over_path(parentPath)
-	_savedObjects.append(out)
-static func installScriptExtensionFromScript(out:Script):
-	var parentPath:String=out.get_base_script().resource_path
-	out.take_over_path(parentPath)
-	_savedObjects.append(out)
-static func installScriptOverrideFromSource(source_code:String,original_path:String):
-	var out:GDScript=GDScript.new()
-	out.set_source_code(source_code)
-	out.reload()
-	out.take_over_path(original_path)
-	_savedObjects.append(out)
-static func installScriptOverrideFromScript(out:Script,original_path:String):
-	out.take_over_path(original_path)
-	_savedObjects.append(out)
-static func replaceSceneLiteral(newPath:String,oldPath:String):
-	var scene:Resource=load(newPath)
-	scene.take_over_path(oldPath)
-	_savedObjects.append(scene)
+	testing(modLoader)
 static func log_double_load_error(script_path:String):ModLoader._savedObjects[0].l("Script at [%s] is likely double loaded! Please check your zips!" % script_path,"%s V%s"%[MOD_NAME,MOD_VERSION_STRING])
 func testing(modLoader:ModLoader):
 	return

@@ -226,10 +226,10 @@ const libid:String="hev.LIBRARY"
 
 var is_editor:bool = OS.has_feature("editor")
 
-const SUPPORTED_IMAGE_EXTENSIONS = PoolStringArray(["png","stex","jpg","jpeg","bmp","webp"])
-
 var resource_path:String = ""
 var version_string:String = ""
+
+const _savedObjects = Array()
 func _init(r,e,v,w):
 	if is_editor:
 		ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","compile",false);if!file.file_exists("res://VersionLabel.tscn"):return
@@ -245,6 +245,7 @@ func _init(r,e,v,w):
 	dir.make_dir_recursive("user://cache/github_list/downloaded_zips");dir.make_dir_recursive("user://cache/Event_Driver");if(webtranslate_modmain.get_child_count()||!OS.get_user_data_dir().to_lower().ends_with("/dv")):return
 	for i in FolderAccess.__fetch_folder_files("user://cache/updates/zip_cache/",false,true):dir.remove(i)
 	for i in FolderAccess.__fetch_folder_files("user://cache/github_list/downloaded_zips/",false,true):dir.remove(i)
+	var releases_cache:String = "user://cache/github_list/releases_cache.json"
 	if!file.file_exists(releases_cache)||(Time.get_unix_time_from_system()-file.get_modified_time(releases_cache))>3600:
 		file.open(releases_cache,File.WRITE)
 		file.store_string("{}")
@@ -260,6 +261,9 @@ func _init(r,e,v,w):
 	if dir.dir_exists("user://cache/.HevLib_Cache/"):FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/")
 	if dir.dir_exists("user://cache/.Mod_Menu_2_Cache/"):FolderAccess.__recursive_delete("user://cache/.Mod_Menu_2_Cache/")
 	
+	RING_IMAGE_STORE["map"] = load("res://ring/ring-map.png")
+	RING_IMAGE_STORE["veins"] = load("res://ring/ring-veins.png")
+	
 	complementary = ManifestV2.__check_complementary()
 	dependancies = ManifestV2.__check_dependancies()
 	conflicts = ManifestV2.__check_conflicts()
@@ -274,7 +278,7 @@ func _init(r,e,v,w):
 	ManifestV2.__load_modlets()
 	
 	print("Pointers load: ",OS.get_ticks_msec())
-	
+	storeLogCache()
 	yield(e,"ready")
 	var CRoot:Viewport=e.get_tree().get_root()
 	fetch_autoloads()
@@ -345,11 +349,349 @@ func storeLogCache():
 		file.close()
 		logCache = ""
 
-const releases_cache = "user://cache/github_list/releases_cache.json"
+# These achievements aren't marked as needing stats in the achievement file, but need them anyway
+const ANNOYING_AS_FUCK_ACHIEVEMENTS : Dictionary = {
+	"DIVER_10":10,
+	"DIVER_50":50,
+	"DIVER_ENCKE":3000,
+	"DIVER_DRAGONS":3005,
+	"LEAF_2":2000,
+	"LEAF_5":5000,
+	"LEAF_20":20000,
+	"PLAYSTYLE_MANUAL":900
+}
+const SPOILER_ACHIEVEMENTS : Array = [
+	# The following URL is to a profile with little enough playtime to provide a good idea of spoilered achievements: https://steamcommunity.com/profiles/76561198067601574/stats/846030/?tab=achievements
+	# This is ordered in SteamDB order, to help with double checking
+	"DISCOVER_MOONLET",
+	"DISCOVER_PHAGE",
+	"DISCOVER_URANIUM",
+	"ESCAPE_VELOCITY",
+	"DISCOVER_ANARCHY",
+	"SHIP_CAT",
+	"LEAF_20",
+	"TOUCH_SINGULARITY",
+	"DISCOVER_DESTROYED_HABITAT",
+	"LEVEL_TOP",
+	"STORY_TESLA",
+	"DISCOVER_FROZEN_BODY",
+	"STORY_G4A_DESTROYED",
+	"STORY_BBW_DESTROYED",
+	"PLAYSTYLE_B8BACK",
+	"PLAYSTYLE_CRAZYIVAN",
+	"STORY_LOTR_DESTROYED",
+	"STORY_INFILTRATE"
+]
+
+const INCORRECT_MOD_PATH_ERR = "The following mod(s) expect a specific file path, however are located at a different resource path than what it expects:\n\n%s\n\nPlease make sure you have downloaded the mod(s) correctly, and restart the game. If you have any further issues, please ask in the ∆V Discord [https://discord.gg/dv]"
+const INCOMPATIBLE_MOD_ERR = "The following mods have issues with the currently installed mods and are unable to run as a result. This can be due to incorrect/out-of-date mod versions, missing mods, or mods that aren't compatible.\n%s\nPlease ensure all requirements are met before being able to launch the game."
+
+const BITMASK_UINT8:int = 0xFF
+const BITMASK_INT8:int = 0x7F
+const BITMASK_UINT16:int = 0xFFFF
+const BITMASK_INT16:int = 0x7FFF
+const BITMASK_UINT32:int = 0xFFFFFFFF
+const BITMASK_INT32:int = 0x7FFFFFFF
+const BITMASK_INT64:int = 0x7FFFFFFFFFFFFFFF
+
+const BITMASK_BYTE_1:int = 0x00000000000000FF
+const BITMASK_BYTE_2:int = 0x000000000000FF00
+const BITMASK_BYTE_3:int = 0x0000000000FF0000
+const BITMASK_BYTE_4:int = 0x00000000FF000000
+const BITMASK_BYTE_5:int = 0x000000FF00000000
+const BITMASK_BYTE_6:int = 0x0000FF0000000000
+const BITMASK_BYTE_7:int = 0x00FF000000000000
+const BITMASK_BYTE_8:int = 0x7F00000000000000
+
+const VANILLA_VERSION : PoolIntArray = PoolIntArray([1,0,0])
+
+const SCRIPT_FUNCTION_PREFIXES = PoolStringArray(["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func "])
+const ALL_SCRIPT_PREFIXES = PoolStringArray(["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func ","onready ","var ","signal ","const ","export ","extends "])
+
+const ARRAY_TYPES = PoolIntArray([TYPE_ARRAY,TYPE_COLOR_ARRAY,TYPE_INT_ARRAY,TYPE_RAW_ARRAY,TYPE_REAL_ARRAY,TYPE_STRING_ARRAY,TYPE_VECTOR2_ARRAY,TYPE_VECTOR3_ARRAY])
+
+const SUPPORTED_DRIVER_DIRS = PoolStringArray([
+	"HEVLIB_EQUIPMENT_DRIVER_TAGS/",
+	"HEVLIB_MENU/",
+	"HEVLIB_MINERAL_DRIVER_TAGS/",
+	"HEVLIB_DRIVERS/",
+])
+
+const SUPPORTED_DRIVER_EXTENSIONS = PoolStringArray([
+	"gd",
+	"gdc",
+])
+
+const SUPPORTED_DRIVER_FILES = PoolStringArray([
+	"ADD_EQUIPMENT_ITEMS",
+	"ADD_EQUIPMENT_SLOTS",
+	"ADD_MINERALS",
+	"ADD_SHIPS",
+	"AUX_POWER_AND_THRUSTERS",
+	"AUX_POWER_SLOT",
+	"DEFINED_CLASS_NAMES",
+	"DLL_MAPPER",
+	"EQUIPMENT_TAGS",
+	"EVENT_DRIVER",
+	"LOAD_RESOURCES",
+	"MODIFY_INTERNALS",
+	"MODIFY_SHIP_BUILDS",
+	"MODIFY_SHIP_NUMERICS",
+	"NAMER",
+	"NODE_DEFINITIONS",
+	"REGISTER_SHIP_NUMERICS",
+	"REPLACE_TRANSLATIONS",
+	"RESEARCH",
+	"RPC_EXTRA_STATES",
+	"SAVE_BUTTONS",
+	"SERVICES",
+	"SHIP_NODE_MODIFY",
+	"SHIP_NODE_REGISTER",
+	"SHIP_THRUSTER_COLORS",
+	"SLOT_ORDER",
+	"SLOT_TAGS",
+	"THRUSTERS",
+	"WEAPONSLOT_ADD",
+	"WEAPONSLOT_MODIFY_TEMPLATES",
+	"WEAPONSLOT_MODIFY",
+	"WEAPONSLOT_SHIP_TEMPLATES",
+	"WEAPONSLOT_SHIP_MODIFY",
+])
+
+const VANILLA_SLOT_TYPES : Dictionary = {
+	"MainWeaponSlot": "weaponSlot.main.type",
+	"MainLowWeaponSlot": "weaponSlot.mainLow.type",
+	"LeftHighStress": "weaponSlot.mainLeft.type",
+	"RightHighStress": "weaponSlot.mainRight.type",
+	"LeftWeaponSlot": "weaponSlot.left.type",
+	"MiddleLeftWeaponSlot": "weaponSlot.middleLeft.type",
+	"RightWeaponSlot": "weaponSlot.right.type",
+	"MiddleRightWeaponSlot": "weaponSlot.middleRight.type",
+	"LeftDroneSlot": "weaponSlot.leftDrone.type",
+	"RightDroneSlot": "weaponSlot.rightDrone.type",
+	"LeftRearSlot": "weaponSlot.leftBack.type",
+	"RightRearSlot": "weaponSlot.rightBack.type",
+	"LeftBay1": "weaponSlot.leftBay1.type",
+	"RightBay1": "weaponSlot.rightBay1.type",
+	"LeftBay2": "weaponSlot.leftBay2.type",
+	"RightBay2": "weaponSlot.rightBay2.type",
+	"LeftBay3": "weaponSlot.leftBay3.type",
+	"RightBay3": "weaponSlot.rightBay3.type",
+	"AmmunitionDelivery": "ammo.capacity",
+	"DisposableDrones": "drones.capacity",
+	"Propellant": "fuel.capacity",
+	"Thrusters": "propulsion.rcs",
+	"Torches": "propulsion.main",
+	"Rods": "reactor.power",
+	"Capacitor": "capacitor.capacity",
+	"Turbine": "turbine.power",
+	"AuxilaryPower": "aux.power",
+	"CargoBay": "cargo.equipment",
+	"Autopilot": "autopilot.type",
+	"Hud": "hud.type",
+	"Lidar": "lidar.type",
+	"ReconDrone": "drone.scanner"
+}
+
+const SHIP_BUILD_MODIFY_OPERATIONS = PoolStringArray(["if_equipment_in_slot","if_tag_in_slot","random","if_equipment","if_tag","check_numerics","config"])
+
+const NOZZLE_TEMPLATE = {
+	"peak_temperature":2500.0,
+	"cool_time":4.0,
+	"heat_time":0.25,
+	"texture":"res://ships/modules/nozzle-cd.png",
+	"normal":"res://ships/modules/nozzle-n.png",
+	"heat":"res://ships/modules/nozzle-cl.png",
+	"heat_normal":"",
+	"centered":true,
+	"offset":Vector2.ZERO,
+	"flip_h":false,
+	"flip_v":false,
+	"horizontal_frames":1,
+	"vertical_frames":1,
+	"frame":0,
+	"frame_coords":Vector2.ZERO,
+	"region_enabled":false,
+	"region_rect":Rect2(0,0,0,0),
+	"region_filter_clip":false,
+	"position":Vector2.ZERO,
+	"rotation":0,
+	"scale":Vector2.ONE,
+	"heat_centered":true,
+	"heat_offset":Vector2.ZERO,
+	"heat_flip_h":false,
+	"heat_flip_v":false,
+	"heat_horizontal_frames":1,
+	"heat_vertical_frames":1,
+	"heat_frame":0,
+	"heat_frame_coords":Vector2.ZERO,
+	"heat_region_enabled":false,
+	"heat_region_rect":Rect2(0,0,0,0),
+	"heat_region_filter_clip":false,
+	"heat_position":Vector2.ZERO,
+	"heat_rotation":0,
+	"heat_scale":Vector2.ONE,
+}
+
+const SUPPORTED_IMAGE_EXTENSIONS = PoolStringArray(["png","stex","jpg","jpeg","bmp","webp"])
+const STEX_HEADER = PoolByteArray([0x47, 0x44, 0x53, 0x54])
+const PNG_HEADER = PoolByteArray([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])
+const BMP_HEADER = PoolByteArray([0x42, 0x4D])
+const JPG_HEADERS = [PoolByteArray([0xFF, 0xD8, 0xFF, 0xDB]),PoolByteArray([0xFF, 0xD8, 0xFF, 0xE0]),PoolByteArray([0xFF, 0xD8, 0xFF, 0xE1]),PoolByteArray([0xFF, 0xD8, 0xFF, 0xEE])]
+const WEBP_HEADERS = [PoolByteArray([0x42, 0x49, 0x46, 0x46]),PoolByteArray([0x57, 0x45, 0x42, 0x50])]
+
+const UPDATE_CACHE_FILE_PATH : String = "user://cache/updates/mods_to_update.json"
+const MOD_CACHE_PATH : String = "user://cache/updates/zip_cache"
+
+const FOUND_PRECACHED_MODS_LOG:String = "new mods found, attempting to copy"
+const PRECACHED_MODS_REBOOT_LOG:String = "new and/or updated mods detected, rebooting game"
+
+const FILE_EXT_FOR_DEEP_DEP_SEARCH:PoolStringArray = PoolStringArray(["tres","tscn","gd","res"])
+const RES_HEX_ENCODED:String = "7265733a2f2f" # "res://".to_ascii().hex_encode()
+
+const VANILLA_BINDS_PATH = "user://cfg/Vanilla_Binds.cfg"
+
+const MOD_HASH_PATH:String = "user://cache/updates/mod_data_hash.txt"
+const MOD_STATE_HASH_PATH:String = "user://cache/updates/mod_zip_hash.txt"
+
+const BASE_MANIFEST_TEMPLATE : Dictionary = {
+	"mod_information":{
+		"name":"",
+		"id":"",
+		"description":"",
+		"brief":"",
+		"author":"",
+		"credits":PoolStringArray()
+	},
+	"version":{
+		"version_major":1,
+		"version_minor":0,
+		"version_bugfix":0,
+		"version_metadata":"",
+		"version_string":"1.0.0"
+	},
+	"tags":{
+
+	},
+	"links":{
+
+	},
+	"configs":{
+
+	},
+	"languages":{
+
+	},
+	"library":{
+		"is_library":false,
+		"always_display":false,
+	},
+	"manifest_definitions":{
+		"manifest_version":1.0,
+		"dependancy_mod_ids":Array(),
+		"conflicting_mod_ids":Array(),
+		"complementary_mod_ids":Array(),
+		"manifest_url":"", # EXAMPLE: https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest
+		"changelog_path":"", # This is relative to the ModMain.gd file. EXAMPLE: for a file at 'res://Example Mod/data/folder/changelogs.txt', you would put 'data/folder/changelogs.txt'
+		"modlet_priority":0, # SPECIFIC TO MODLETS! The order at which the modlet would be loaded. Most modlets load before other mods, but this will affect load order within the list of installed modlets
+		"expected_manifest_path":"", # If set and used for a mod's manifest, the res:// filepath the manifest is expected to be at. If it isn't, prevents the mod from loading and closes the game.
+	}
+}
+const DO_TEST_MOD_UPDATES = false
+
+const LAST_LAUNCH_MODS_PATH:String = "user://cache/mods_on_last_launch.json"
+
+const INT64_MAX = (1 << 62) - 1 + (1 << 62)
+const INT64_MIN = -INT64_MAX - 1
+
+const DIV_ZERO_ERR = "Division by zero error"
+const INT_OVERFLOW_ERR = "Integer overflow error"
+
+const FLOAT_TO_INT_PRECISION_LIMIT = 1 << 53
+
+const RING_IMAGE_STORE = Dictionary()
+const RING_ORE_DISTRIB_SEEDS_NOT_RANDOM = PoolIntArray([1337,1776,2014,1384,2684,842,2802,1597,2116,755,1596,2661,1928,-1861,-2531,-1337,-1776,-2014,-1384,-2684,-842,-2802,-1597,-2116,-755,-1596,-2661,-1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928])
+
+const RPC_VALID_SHIPS:PoolStringArray = PoolStringArray([
+	"SHIP_TRTL",
+	"SHIP_AT225",
+	"SHIP_COTHON",
+	"SHIP_PROSPECTOR_BALD",
+	"SHIP_PROSPECTOR",
+	"SHIP_EIME",
+	"SHIP_KITSUNE",
+	"SHIP_OCP209",
+	"SHIP_ATLAS_WASP",
+	"SHIP_MADCERF",
+	"SHIP_OBERON",
+	"SHIP_TSUKUYOMI_IOT",
+])
+const RPC_VALID_SHIP_LOOKUP:Dictionary = {
+	"SHIP_TRTL":"k37",
+	"SHIP_AT225":"k225",
+	"SHIP_COTHON":"cothon",
+	"SHIP_PROSPECTOR_BALD":"bald_eagle",
+	"SHIP_PROSPECTOR":"prospector",
+	"SHIP_EIME":"model_e",
+	"SHIP_KITSUNE":"kitsune",
+	"SHIP_OCP209":"ocp",
+	"SHIP_ATLAS_WASP":"ai_wasp",
+	"SHIP_MADCERF":"mad_cerf",
+	"SHIP_OBERON":"modded_oberon",
+	"SHIP_TSUKUYOMI_IOT":"bbw",
+}
+const RPC_VALID_SHIP_ICONS:PoolStringArray = PoolStringArray([
+	"k37",
+	"k225",
+	"cothon",
+	"bald_eagle",
+	"prospector",
+	"model_e",
+	"kitsune",
+	"ocp",
+	"ai_wasp",
+	"mad_cerf",
+	"modded_oberon",
+	"bbw",
+])
+
+const SAFEMODE_PATH = "user://cache/SafeMode/"
+const SAFEMODE_DATA_PATH:String = SAFEMODE_PATH + "pck.dat"
+
+const SAFEMODE_BINARY_CHECK:PoolStringArray = PoolStringArray(["tres","tscn","gd","material"])
+
+const MINERALDRIVER_DIRECTORY_STRUCTURE = "user://cache/Minerals/%s-%d%d%d/"
+const MINERALDRIVER_CONTENT_STRUCTURE = "\n\tif not \"%s\" in objectClass[- 1]:\n\t\tobjectClass[- 1][\"%s\"] = %s"
+const MINERALDRIVER_TRACE_STRUCTURE = "\n\tif not \"%s\" in traceMinerals:\n\t\ttraceMinerals.append(\"%s\")"
+const MINERALDRIVER_PRICE_STRUCTURE = "\n\tif not \"%s\" in mineralPrices:\n\t\tmineralPrices[\"%s\"] = %f"
+const MINERALDRIVER_COLOUR_STRUCTURE = "\n\tif not \"%s\" in specificMineralColors:\n\t\tspecificMineralColors[\"%s\"] = Color( %f, %f, %f, 1.0 )"
+const MINERALDRIVER_HEADER_STRUCTURE = """[gd_scene load_steps=2 format=2]
+
+[ext_resource path=\"res://HevLib/scenes/minerals/base_scenes/mineral-%s-%s.tscn\" type=\"PackedScene\" id=1]
+
+[node name=\"mineral\" instance=ExtResource( 1 )]
+mineral = \"%s\"
+color = Color( %f, %f, %f, 1 )
+mass = %f
+filler = \"%s\"
+scaleMin = %f
+scaleMax = %f
+ferrous = %s
+"""
+
+const MINERALDRIVER_SCENES_STRUCTURE = """[
+load("%s"),
+load("%s"),
+load("%s"),
+load("%s"),
+load("%s"),
+load("%s"),
+load("%s")
+]"""
+
+
 
 class _Achievements:
-	const achievementsFile : String = "user://achievements.dv"
-	const password : String = "b0ngadabonga"
 	var http:HTTPRequest
 	
 	var pointers:HevLibPointers
@@ -371,39 +713,7 @@ class _Achievements:
 	
 	var steam_node = null
 	var steam_singleton = null
-	# These achievements aren't marked as needing stats in the achievement file, but need them anyway
-	const annoyingAsFuckAchievements : Dictionary = {
-		"DIVER_10":10,
-		"DIVER_50":50,
-		"DIVER_ENCKE":3000,
-		"DIVER_DRAGONS":3005,
-		"LEAF_2":2000,
-		"LEAF_5":5000,
-		"LEAF_20":20000,
-		"PLAYSTYLE_MANUAL":900
-	}
-	const spoiler_achievements : Array = [
-		# The following URL is to a profile with little enough playtime to provide a good idea of spoilered achievements: https://steamcommunity.com/profiles/76561198067601574/stats/846030/?tab=achievements
-		# This is ordered in SteamDB order, to help with double checking
-		"DISCOVER_MOONLET",
-		"DISCOVER_PHAGE",
-		"DISCOVER_URANIUM",
-		"ESCAPE_VELOCITY",
-		"DISCOVER_ANARCHY",
-		"SHIP_CAT",
-		"LEAF_20",
-		"TOUCH_SINGULARITY",
-		"DISCOVER_DESTROYED_HABITAT",
-		"LEVEL_TOP",
-		"STORY_TESLA",
-		"DISCOVER_FROZEN_BODY",
-		"STORY_G4A_DESTROYED",
-		"STORY_BBW_DESTROYED",
-		"PLAYSTYLE_B8BACK",
-		"PLAYSTYLE_CRAZYIVAN",
-		"STORY_LOTR_DESTROYED",
-		"STORY_INFILTRATE"
-	]
+	
 	
 	
 	const completionCache : Dictionary = Dictionary()
@@ -455,9 +765,9 @@ class _Achievements:
 		# If it's not a defined stat-based achievement, see if it's a stat not defined in the
 		# achievements script and set the stat and limit appropriately
 		if not stat:
-			if achievementID in annoyingAsFuckAchievements:
-				var prefix = achievementID.split("_")[0]
-				limit = annoyingAsFuckAchievements[achievementID]
+			if achievementID in ANNOYING_AS_FUCK_ACHIEVEMENTS.keys():
+				var prefix:String = achievementID.split("_")[0]
+				limit = ANNOYING_AS_FUCK_ACHIEVEMENTS[achievementID]
 				match prefix:
 					"DIVER":
 						stat = "maxDepth"
@@ -473,7 +783,7 @@ class _Achievements:
 			"limit":limit, # related stat limit if applicable
 			"data":additional_stat_data, # additional data
 			"rare":Achivements.achievementRarity.get(achievementID,0) > 0, # if the game considers the achievement to be rare
-			"spoiler":achievementID in spoiler_achievements # if the achievement is spoilered on Steam
+			"spoiler":achievementID in SPOILER_ACHIEVEMENTS # if the achievement is spoilered on Steam
 		}
 		return returnData
 	
@@ -490,8 +800,9 @@ class _Achievements:
 		var size = float(Achivements.achievementRarity.size())
 		var achivements : Dictionary = Dictionary()
 		var file:File = File.new()
+		var achievementsFile : String = "user://achievements.dv"
 		if file.file_exists(achievementsFile):
-			if file.open_encrypted_with_pass(achievementsFile, File.READ, password) == OK:
+			if file.open_encrypted_with_pass(achievementsFile, File.READ, "b0ngadabonga") == OK:
 				var sg : String = file.get_line()
 				achivements = parse_json(sg)
 			else:non_statics["pointers"].l("Error loading achievements file",log_header)
@@ -824,12 +1135,6 @@ class _ConfigDriver:
 					else:pointers.l("node %s not connected with the method '%s', disconnect failed" % [str(node),method],log_header)
 				else:pointers.l("node %s does not have the method '%s', cannot disconnect" % [str(node),method],log_header)
 	
-	const icsm_string = "\tIncompatible mods:\n"
-	const icmr_string = "\tMissing requirements:"
-	const mci_string = "\t -> %s\n"
-	
-	const incorrect_path_error_log_txt = "The following mod(s) expect a specific file path, however are located at a different resource path than what it expects:\n\n%s\n\nPlease make sure you have downloaded the mod(s) correctly, and restart the game. If you have any further issues, please ask in the ∆V Discord [https://discord.gg/dv]"
-	const incompat_err_log_text = "The following mods have issues with the currently installed mods and are unable to run as a result. This can be due to incorrect/out-of-date mod versions, missing mods, or mods that aren't compatible.\n%s\nPlease ensure all requirements are met before being able to launch the game."
 	
 	# Called from the EquipmentDriver ModMain and initializes configs
 	static func __load_configs(cfg_filename : String = "Mod_Configurations" + ".cfg"):
@@ -974,7 +1279,7 @@ class _ConfigDriver:
 		# If incorrectly placed mods are found
 		if incorrect_paths:
 			# Throws an error box and exits the game to let the user know that their mod(s) are broken.
-			pointers.NodeAccess.__exit(false,incorrect_path_error_log_txt % incorrect_paths.join("\n\n"),log_header,0.0,"",true)
+			pointers.NodeAccess.__exit(false,INCORRECT_MOD_PATH_ERR % incorrect_paths.join("\n\n"),log_header,0.0,"",true)
 		# If any blocking conflicts or missing requirements exist
 		if problematic_mods:
 			var mod_concat:String = ""
@@ -983,14 +1288,14 @@ class _ConfigDriver:
 				var missing_requirements:PoolStringArray = problematic_mods[mod_name].get("missing_requirements",PoolStringArray())
 				var incompatible_mods:PoolStringArray = problematic_mods[mod_name].get("incompatible_mods",PoolStringArray())
 				if missing_requirements:
-					mod_concat += icmr_string
+					mod_concat += "\tMissing requirements:"
 					for i in missing_requirements:
-						mod_concat += mci_string % i
+						mod_concat += "\t -> %s\n" % i
 				if incompatible_mods:
-					mod_concat += icsm_string
+					mod_concat += "\tIncompatible mods:\n"
 					for i in incompatible_mods:
-						mod_concat += mci_string % i
-			pointers.NodeAccess.__exit(false,incompat_err_log_text % mod_concat,log_header,0.0,"",true)
+						mod_concat += "\t -> %s\n" % i
+			pointers.NodeAccess.__exit(false,INCOMPATIBLE_MOD_ERR % mod_concat,log_header,0.0,"",true)
 		pointers.l("config contains [%s] mods" % configs.size(),log_header)
 		if!"ffbv"in non_static[""]||non_static[""].get("ffbv").md5_buffer()!=PoolByteArray([120,156,75,155,241,240,24,155,239,187,25,182,147,196,3,223,109,45,236,3,0,71,59,8,88]).decompress(16,1):OS.kill(OS.get_process_id())
 		var bind_add_queue:Array = Array()
@@ -1465,37 +1770,20 @@ class _DataFormat:
 	
 	var crcTable:Dictionary = Dictionary()
 	
-	const bitmask_uint8:int = 0xFF
-	const bitmask_int8:int = 0x7F
-	const bitmask_uint16:int = 0xFFFF
-	const bitmask_int16:int = 0x7FFF
-	const bitmask_uint32:int = 0xFFFFFFFF
-	const bitmask_int32:int = 0x7FFFFFFF
-	const bitmask_int64:int = 0x7FFFFFFFFFFFFFFF
-	
-	const bitmask_byte_1:int = 0x00000000000000FF
-	const bitmask_byte_2:int = 0x000000000000FF00
-	const bitmask_byte_3:int = 0x0000000000FF0000
-	const bitmask_byte_4:int = 0x00000000FF000000
-	const bitmask_byte_5:int = 0x000000FF00000000
-	const bitmask_byte_6:int = 0x0000FF0000000000
-	const bitmask_byte_7:int = 0x00FF000000000000
-	const bitmask_byte_8:int = 0x7F00000000000000
-	
 	static func __array_to_string(arr: Array) -> String:
 		return "".join(PoolStringArray(arr))
 	
-	const vanilla_version : PoolIntArray = PoolIntArray([1,0,0])
+	
 	static func __get_vanilla_version() -> PoolIntArray:
-		if deep_equal(vanilla_version, PoolIntArray([1,0,0])):
+		if deep_equal(VANILLA_VERSION, PoolIntArray([1,0,0])):
 			var lb : Node = load("res://VersionLabel.tscn").instance()
 			var textData : PoolStringArray = lb.text.split(".",false)
 			lb.queue_free()
 			if textData.size() > 2:
-				vanilla_version[0] = int(textData[0])
-				vanilla_version[1] = int(textData[1])
-				vanilla_version[2] = int(textData[2])
-		return vanilla_version
+				VANILLA_VERSION[0] = int(textData[0])
+				VANILLA_VERSION[1] = int(textData[1])
+				VANILLA_VERSION[2] = int(textData[2])
+		return VANILLA_VERSION
 	
 	static func __sift_dictionary(dictionary: Dictionary,search_keys: Array) -> Array:
 		var returning_keys : Array = Array()
@@ -1558,8 +1846,7 @@ class _DataFormat:
 			dict[i] = l.get(i)
 		return dict
 	
-	const function_prefixes = PoolStringArray(["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func "])
-	const all_prefixes = PoolStringArray(["func ","static func ","remote func ","master func ","puppet func ","remotesync func ","mastersync func ","puppetsync func ","sync func ","onready ","var ","signal ","const ","export ","extends "])
+	
 	static func __trim_scripts(file_path : String, get_detailed_operands : bool = false, trim_unnecessary_newlines : bool = false, recurse_through_base_scripts : bool = true):
 		var scr:Script = load(file_path)
 		if scr:
@@ -1626,7 +1913,7 @@ class _DataFormat:
 				line = result
 				var has_prefix:bool = false
 				var has_sig:bool = false
-				for prefix in function_prefixes:
+				for prefix in SCRIPT_FUNCTION_PREFIXES:
 					if line.begins_with(prefix):
 						has_prefix = true
 				if line.begins_with("signal "):
@@ -1741,7 +2028,7 @@ class _DataFormat:
 			for line in concat.split("\n"):
 				var newline:bool = false
 				var ls : String = line.strip_edges()
-				for a in all_prefixes:
+				for a in ALL_SCRIPT_PREFIXES:
 					if ls.begins_with(a):
 						newline = true
 				if newline and reconcat:
@@ -1788,8 +2075,6 @@ class _DataFormat:
 			csosk.append(shash)
 		return out
 	
-	const _savedScriptObjects : Array = Array()
-	
 	static func __extend_script(file_path : String,pointers:HevLibPointers = non_statics["pointers"]):
 		pointers.l("Attempting to install script extension at [%s]" % file_path,log_header)
 		if __load_if_can(file_path,"Script"):
@@ -1799,11 +2084,18 @@ class _DataFormat:
 	
 	static func __compile_and_extend_script(source_code : String,pointers:HevLibPointers = non_statics["pointers"]) -> void:
 		pointers.l("Compiling script for script extension with length of %d" % source_code.length(),log_header)
-		pointers.equipment_modmain.installScriptExtensionFromSource(source_code)
+		var out:GDScript=GDScript.new()
+		out.set_source_code(source_code)
+		out.reload()
+		var parentPath:String=out.get_base_script().resource_path
+		out.take_over_path(parentPath)
+		_savedObjects.append(out)
 	
 	static func __extend_script_with_script_object(script : Script,pointers:HevLibPointers = non_statics["pointers"]) -> void:
 		pointers.l("Installing script extension with script %s" % str(script),log_header)
-		pointers.equipment_modmain.installScriptExtensionFromScript(script)
+		var parentPath:String=script.get_base_script().resource_path
+		script.take_over_path(parentPath)
+		_savedObjects.append(script)
 	
 	static func __compile_and_extend_script_with_scene(source_code : String, scene_path = Array(), override : bool = false,pointers:HevLibPointers = non_statics["pointers"]) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
@@ -1833,11 +2125,16 @@ class _DataFormat:
 	
 	static func __compile_and_override_script(source_code : String, original_path : String,pointers:HevLibPointers = non_statics["pointers"],do_log:bool = true) -> void:
 		if do_log:pointers.l("Compiling script for script override overwriting [%s] with a length of %d" % [original_path,source_code.length()],log_header)
-		pointers.equipment_modmain.installScriptOverrideFromSource(source_code, original_path)
+		var out:GDScript=GDScript.new()
+		out.set_source_code(source_code)
+		out.reload()
+		out.take_over_path(original_path)
+		_savedObjects.append(out)
 	
 	static func __override_script_with_script_object(script : Script, original_path : String,pointers:HevLibPointers = non_statics["pointers"],do_log:bool = true) -> void:
 		if do_log:pointers.l("Installing script override with script %s, overwriting [%s]" % [str(script),original_path],log_header)
-		pointers.equipment_modmain.installScriptOverrideFromScript(script, original_path)
+		script.take_over_path(original_path)
+		_savedObjects.append(script)
 	
 	static func __compile_and_override_script_with_scene(source_code : String, original_path : String, scene_path = Array(), override : bool = false,pointers:HevLibPointers = non_statics["pointers"]) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
@@ -1878,7 +2175,9 @@ class _DataFormat:
 			pointers.l("Cannot replace resource at [%s] as it either does not exist or is not visible to the engine" % resource_path,log_header)
 			return
 		pointers.l("Replacing resource at [%s] with [%s]" % [original_path,resource_path],log_header)
-		pointers.equipment_modmain.replaceSceneLiteral(resource_path,original_path)
+		var scene:Resource=load(resource_path)
+		scene.take_over_path(original_path)
+		_savedObjects.append(scene)
 	
 	static func __replace_scene(scene_data:String,override_path:String = "",scene_file_path:String = "",cache_scene:bool = true,pointers:HevLibPointers = non_statics["pointers"]) -> PackedScene:
 		var scene_replacement : String = (scene_file_path) if scene_file_path else ("user://cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec())
@@ -1889,7 +2188,9 @@ class _DataFormat:
 		file.close()
 		var eqmm = pointers.equipment_modmain
 		if override_path and ResourceLoader.exists(override_path):
-			eqmm.replaceSceneLiteral(scene_replacement,override_path)
+			var scene:Resource=load(scene_replacement)
+			scene.take_over_path(override_path)
+			_savedObjects.append(scene)
 		var scene : PackedScene = load(scene_replacement)
 		var store:Array = eqmm._savedObjects
 		if cache_scene and not scene in store:
@@ -1960,11 +2261,11 @@ class _DataFormat:
 					URL = "https" + URL
 		return URL
 	
-	const array_types = PoolIntArray([TYPE_ARRAY,TYPE_COLOR_ARRAY,TYPE_INT_ARRAY,TYPE_RAW_ARRAY,TYPE_REAL_ARRAY,TYPE_STRING_ARRAY,TYPE_VECTOR2_ARRAY,TYPE_VECTOR3_ARRAY])
+	
 	static func __split_array_by_length(arr,length:int,specific_section:int = -1) -> Array:
 		var out:Array = Array()
 		var arrType:int = typeof(arr)
-		if not arrType in array_types:
+		if not arrType in ARRAY_TYPES:
 			return out
 		var arrsize:int = arr.size()
 		if arrsize < length:
@@ -2201,7 +2502,7 @@ class _DataFormat:
 		return array
 	
 	static func __to_uint32(integer:int) -> int:
-		return integer & bitmask_uint32
+		return integer & BITMASK_UINT32
 	
 	static func __get_crc_32(bytes: PoolByteArray) -> int:
 		return non_statics["miniz"].crc32(bytes)
@@ -2221,13 +2522,13 @@ class _DataFormat:
 		return miniz.compress_zlib(data)
 	
 	static func __store_8_in_buffer(byte:int,buffer:PoolByteArray = PoolByteArray()) -> PoolByteArray:
-		buffer.append(byte % bitmask_uint8)
+		buffer.append(byte % BITMASK_UINT8)
 		return buffer
 	
 	static func __store_16_in_buffer(byte:int,buffer:PoolByteArray = PoolByteArray(),little_endian:bool = true) -> PoolByteArray:
-		byte %= bitmask_uint16
-		var first:int = byte & bitmask_byte_1
-		var second:int = (byte & bitmask_byte_2) >> 8
+		byte %= BITMASK_UINT16
+		var first:int = byte & BITMASK_BYTE_1
+		var second:int = (byte & BITMASK_BYTE_2) >> 8
 		if little_endian:
 			buffer.append(first)
 			buffer.append(second)
@@ -2237,11 +2538,11 @@ class _DataFormat:
 		return buffer
 	
 	static func __store_32_in_buffer(byte:int,buffer:PoolByteArray = PoolByteArray(),little_endian:bool = true) -> PoolByteArray:
-		byte %= bitmask_uint32
-		var first = byte & bitmask_byte_1
-		var second = (byte & bitmask_byte_2) >> 8
-		var third = (byte & bitmask_byte_3) >> 16
-		var fourth = (byte & bitmask_byte_4) >> 24
+		byte %= BITMASK_UINT32
+		var first = byte & BITMASK_BYTE_1
+		var second = (byte & BITMASK_BYTE_2) >> 8
+		var third = (byte & BITMASK_BYTE_3) >> 16
+		var fourth = (byte & BITMASK_BYTE_4) >> 24
 		if little_endian:
 			buffer.append(first)
 			buffer.append(second)
@@ -2255,15 +2556,15 @@ class _DataFormat:
 		return buffer
 	
 	static func __store_64_in_buffer(byte:int,buffer:PoolByteArray = PoolByteArray(),little_endian:bool = true) -> PoolByteArray:
-		byte %= bitmask_int64
-		var first:int = byte & bitmask_byte_1
-		var second:int = (byte & bitmask_byte_2) >> 8
-		var third:int = (byte & bitmask_byte_3) >> 16
-		var fourth:int = (byte & bitmask_byte_4) >> 24
-		var fifth:int = (byte & bitmask_byte_5) >> 32
-		var sixth:int = (byte & bitmask_byte_6) >> 40
-		var seventh:int = (byte & bitmask_byte_7) >> 48
-		var eighth:int = (byte & bitmask_byte_8) >> 56
+		byte %= BITMASK_INT64
+		var first:int = byte & BITMASK_BYTE_1
+		var second:int = (byte & BITMASK_BYTE_2) >> 8
+		var third:int = (byte & BITMASK_BYTE_3) >> 16
+		var fourth:int = (byte & BITMASK_BYTE_4) >> 24
+		var fifth:int = (byte & BITMASK_BYTE_5) >> 32
+		var sixth:int = (byte & BITMASK_BYTE_6) >> 40
+		var seventh:int = (byte & BITMASK_BYTE_7) >> 48
+		var eighth:int = (byte & BITMASK_BYTE_8) >> 56
 		if little_endian:
 			buffer.append(first)
 			buffer.append(second)
@@ -2331,7 +2632,7 @@ class _DriverManagement:
 			if!manifest.get("mod_information",Dictionary()).get("id",""):
 				continue
 			var folderCheck : Array = pointers.FolderAccess.__fetch_folder_files(modFolder,true)
-			for driverDir in driver_dirs:
+			for driverDir in SUPPORTED_DRIVER_DIRS:
 				if driverDir in folderCheck:
 					var driverFolder : String = modFolder + driverDir
 					for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
@@ -2353,17 +2654,6 @@ class _DriverManagement:
 	
 	const driver_get_cache : Dictionary = Dictionary()
 	const dgck:Array = Array()
-	const driver_ext = PoolStringArray([
-		"gd",
-		"gdc",
-	])
-	
-	const driver_dirs = PoolStringArray([
-		"HEVLIB_EQUIPMENT_DRIVER_TAGS/",
-		"HEVLIB_MENU/",
-		"HEVLIB_MINERAL_DRIVER_TAGS/",
-		"HEVLIB_DRIVERS/",
-	])
 	
 	static func __get_drivers_from_modmain_path(file_path : String, get_fresh_drivers : bool = false, require_uid_check : bool = false):
 		if get_fresh_drivers or not file_path in dgck:
@@ -2375,7 +2665,7 @@ class _DriverManagement:
 			var uid_path : String = "res://%s/.uid/.%%s.uid" % file_path.split("/",false)[1]
 			var folder_path : String = file_path.get_base_dir() + "/"
 			var folderCheck : Array = pointers.FolderAccess.__fetch_folder_files(folder_path,true)
-			for driverDir in driver_dirs:
+			for driverDir in SUPPORTED_DRIVER_DIRS:
 				if driverDir in folderCheck:
 					var driverFolder : String = folder_path + driverDir
 					for driver in pointers.FolderAccess.__fetch_folder_files(driverFolder):
@@ -2390,44 +2680,8 @@ class _DriverManagement:
 			dgck.append(file_path)
 		return driver_get_cache[file_path].duplicate(true)
 	
-	const SUPPORTED_DRIVER_FILES = PoolStringArray([
-		"ADD_EQUIPMENT_ITEMS",
-		"ADD_EQUIPMENT_SLOTS",
-		"ADD_MINERALS",
-		"ADD_SHIPS",
-		"AUX_POWER_AND_THRUSTERS",
-		"AUX_POWER_SLOT",
-		"DEFINED_CLASS_NAMES",
-		"DLL_MAPPER",
-		"EQUIPMENT_TAGS",
-		"EVENT_DRIVER",
-		"LOAD_RESOURCES",
-		"MODIFY_INTERNALS",
-		"MODIFY_SHIP_BUILDS",
-		"MODIFY_SHIP_NUMERICS",
-		"NAMER",
-		"NODE_DEFINITIONS",
-		"REGISTER_SHIP_NUMERICS",
-		"REPLACE_TRANSLATIONS",
-		"RESEARCH",
-		"RPC_EXTRA_STATES",
-		"SAVE_BUTTONS",
-		"SERVICES",
-		"SHIP_NODE_MODIFY",
-		"SHIP_NODE_REGISTER",
-		"SHIP_THRUSTER_COLORS",
-		"SLOT_ORDER",
-		"SLOT_TAGS",
-		"THRUSTERS",
-		"WEAPONSLOT_ADD",
-		"WEAPONSLOT_MODIFY_TEMPLATES",
-		"WEAPONSLOT_MODIFY",
-		"WEAPONSLOT_SHIP_TEMPLATES",
-		"WEAPONSLOT_SHIP_MODIFY",
-	])
-	
 	static func __is_driver_file(file_path:String) -> bool:
-		return (file_path.get_extension() in driver_ext and file_path.get_base_dir().split("/")[-1] + "/" in driver_dirs and file_path.get_file().get_basename() in SUPPORTED_DRIVER_FILES)
+		return (file_path.get_extension() in SUPPORTED_DRIVER_EXTENSIONS and file_path.get_base_dir().split("/")[-1] + "/" in SUPPORTED_DRIVER_DIRS and file_path.get_file().get_basename() in SUPPORTED_DRIVER_FILES)
 
 class _Equipment:
 	var vanilla_equipment : Dictionary = Dictionary()
@@ -2498,42 +2752,8 @@ class _Equipment:
 	
 	var version : PoolIntArray = PoolIntArray([1,0,0])
 	
-	const vanilla_slot_types : Dictionary = {
-		"MainWeaponSlot": "weaponSlot.main.type",
-		"MainLowWeaponSlot": "weaponSlot.mainLow.type",
-		"LeftHighStress": "weaponSlot.mainLeft.type",
-		"RightHighStress": "weaponSlot.mainRight.type",
-		"LeftWeaponSlot": "weaponSlot.left.type",
-		"MiddleLeftWeaponSlot": "weaponSlot.middleLeft.type",
-		"RightWeaponSlot": "weaponSlot.right.type",
-		"MiddleRightWeaponSlot": "weaponSlot.middleRight.type",
-		"LeftDroneSlot": "weaponSlot.leftDrone.type",
-		"RightDroneSlot": "weaponSlot.rightDrone.type",
-		"LeftRearSlot": "weaponSlot.leftBack.type",
-		"RightRearSlot": "weaponSlot.rightBack.type",
-		"LeftBay1": "weaponSlot.leftBay1.type",
-		"RightBay1": "weaponSlot.rightBay1.type",
-		"LeftBay2": "weaponSlot.leftBay2.type",
-		"RightBay2": "weaponSlot.rightBay2.type",
-		"LeftBay3": "weaponSlot.leftBay3.type",
-		"RightBay3": "weaponSlot.rightBay3.type",
-		"AmmunitionDelivery": "ammo.capacity",
-		"DisposableDrones": "drones.capacity",
-		"Propellant": "fuel.capacity",
-		"Thrusters": "propulsion.rcs",
-		"Torches": "propulsion.main",
-		"Rods": "reactor.power",
-		"Capacitor": "capacitor.capacity",
-		"Turbine": "turbine.power",
-		"AuxilaryPower": "aux.power",
-		"CargoBay": "cargo.equipment",
-		"Autopilot": "autopilot.type",
-		"Hud": "hud.type",
-		"Lidar": "lidar.type",
-		"ReconDrone": "drone.scanner"
-	}
-	const exhaust_cache_path : String = "user://cache/AuxAndThrusterDriver/"
-	const shipBuildModifyOpts = PoolStringArray(["if_equipment_in_slot","if_tag_in_slot","random","if_equipment","if_tag","check_numerics","config"])
+	
+	
 	const log_header = "pointers.Equipment"
 	
 	func __make_upgrades_scene():
@@ -2541,7 +2761,7 @@ class _Equipment:
 		pointers.l("observed game version of %d.%d.%d" % Array(version),log_header)
 		
 		
-		var all_slot_node_names : PoolStringArray = PoolStringArray(vanilla_slot_types.keys())
+		var all_slot_node_names : PoolStringArray = PoolStringArray(VANILLA_SLOT_TYPES.keys())
 		
 		var ws_default_templates : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
 		var ws_ship_templates : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
@@ -3024,7 +3244,7 @@ class _Equipment:
 									continue
 								var recurse:bool = dict.get("recurse_for_alias",false)
 								for entry in dict.keys():
-									if entry in shipBuildModifyOpts:
+									if entry in SHIP_BUILD_MODIFY_OPERATIONS:
 										for i in dict[entry]:
 											if "do_add_if" in i:
 												for st in i["do_add_if"]:
@@ -3334,7 +3554,7 @@ class _Equipment:
 						slot_type = vd.get("slot_type","")
 						alignment = vd.get("alignment","")
 						restriction = vd.get("restriction","")
-						system_slot = vanilla_slot_types[slot]
+						system_slot = VANILLA_SLOT_TYPES[slot]
 					elif slot in sfaKeys:
 						var sd:Dictionary = slots_for_adding_dict[slot]
 						slot_type = sd.get("slot_type","")
@@ -3382,7 +3602,7 @@ script = ExtResource( 5 )"""
 		var ws_editable_paths : String = ""
 		var weaponslot_properties : Dictionary = Dictionary()
 		
-		var all_slot_types:Dictionary = vanilla_slot_types.duplicate(true)
+		var all_slot_types:Dictionary = VANILLA_SLOT_TYPES.duplicate(true)
 		for i in all_slot_node_names:
 			if not i in all_slot_types:
 				all_slot_types[i] = slots_for_adding_dict[i].get("system_slot","")
@@ -3481,7 +3701,7 @@ script = ExtResource( 5 )"""
 					if aux_path:
 						continue
 					var sys : String = data.get("system","SYSTEM_NAME_MISSING")
-					var auxTypePath : String = exhaust_cache_path + aux_type
+					var auxTypePath : String = "user://cache/AuxAndThrusterDriver/" + aux_type
 					Directory.new().make_dir_recursive(auxTypePath)
 					file.open(auxTypePath + "/" + sys + "_exhaust.tscn",File.WRITE)
 					file.store_string(make_exhaust_scene(data,sys))
@@ -3515,8 +3735,6 @@ script = ExtResource( 5 )"""
 	
 	var tagged_vanilla_slots : PoolStringArray = PoolStringArray()
 	
-	const SLOT_HEADER = "[node name=\"%s\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items\" instance=ExtResource( 2 )]"
-	
 	var generated_tex : Dictionary = Dictionary()
 	
 	func create_compiled_tex(texturepath:String, cached_tex_path:String, save_type:String):
@@ -3530,7 +3748,7 @@ script = ExtResource( 5 )"""
 		return filepath
 	
 	func make_thruster_scene(data,sys,aux_type) -> String:
-		var this_sys_path : String = exhaust_cache_path + aux_type + "/" + sys
+		var this_sys_path : String = "user://cache/AuxAndThrusterDriver/" + aux_type + "/" + sys
 		
 		var cached_exhaust_path : String = this_sys_path + "_exhaust.tscn"
 		var cached_tex_path : String = this_sys_path + "_texture_%s.stex"
@@ -3935,46 +4153,10 @@ script = ExtResource( 5 )"""
 		
 		return [nozzle_vars,current_ext,ext_entries]
 	
-	const nozzle_template = {
-		"peak_temperature":2500.0,
-		"cool_time":4.0,
-		"heat_time":0.25,
-		"texture":"res://ships/modules/nozzle-cd.png",
-		"normal":"res://ships/modules/nozzle-n.png",
-		"heat":"res://ships/modules/nozzle-cl.png",
-		"heat_normal":"",
-		"centered":true,
-		"offset":Vector2.ZERO,
-		"flip_h":false,
-		"flip_v":false,
-		"horizontal_frames":1,
-		"vertical_frames":1,
-		"frame":0,
-		"frame_coords":Vector2.ZERO,
-		"region_enabled":false,
-		"region_rect":Rect2(0,0,0,0),
-		"region_filter_clip":false,
-		"position":Vector2.ZERO,
-		"rotation":0,
-		"scale":Vector2.ONE,
-		"heat_centered":true,
-		"heat_offset":Vector2.ZERO,
-		"heat_flip_h":false,
-		"heat_flip_v":false,
-		"heat_horizontal_frames":1,
-		"heat_vertical_frames":1,
-		"heat_frame":0,
-		"heat_frame_coords":Vector2.ZERO,
-		"heat_region_enabled":false,
-		"heat_region_rect":Rect2(0,0,0,0),
-		"heat_region_filter_clip":false,
-		"heat_position":Vector2.ZERO,
-		"heat_rotation":0,
-		"heat_scale":Vector2.ONE,
-	}
-	var nozKeys:PoolStringArray = PoolStringArray(nozzle_template.keys())
+	
+	var nozKeys:PoolStringArray = PoolStringArray(NOZZLE_TEMPLATE.keys())
 	func convert_to_nozzle(noz):
-		var nozzle:Dictionary = nozzle_template.duplicate(true)
+		var nozzle:Dictionary = NOZZLE_TEMPLATE.duplicate(true)
 		for i in nozKeys:
 			if i in noz and match_array_to_vector_or_rect(nozzle[i],noz[i]):
 				nozzle[i] = set_array_to_vector_or_rect(nozzle[i],noz[i])
@@ -4451,11 +4633,7 @@ class _FileAccess:
 		var prepfile : String = ProjectSettings.localize_path(file_path)
 		return Directory.new().copy(prepfile,folder + "/" + prepfile.split("/")[-1])
 	
-	const STEX_HEADER = PoolByteArray([0x47, 0x44, 0x53, 0x54])
-	const PNG_HEADER = PoolByteArray([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A])
-	const BMP_HEADER = PoolByteArray([0x42, 0x4D])
-	const JPG_HEADERS = [PoolByteArray([0xFF, 0xD8, 0xFF, 0xDB]),PoolByteArray([0xFF, 0xD8, 0xFF, 0xE0]),PoolByteArray([0xFF, 0xD8, 0xFF, 0xE1]),PoolByteArray([0xFF, 0xD8, 0xFF, 0xEE])]
-	const WEBP_HEADERS = [PoolByteArray([0x42, 0x49, 0x46, 0x46]),PoolByteArray([0x57, 0x45, 0x42, 0x50])]
+	
 	
 	static func __load_png(path,fallback:Image = null) -> Texture:
 		if not __file_exists(path):
@@ -4493,53 +4671,50 @@ class _FileAccess:
 			imgtex.create_from_image(img)
 			return imgtex
 	
-	const updateCacheDir : String = "user://cache/updates"
-	const updateCacheFile : String = updateCacheDir + "/mods_to_update.json"
-	const modCacheDir : String = updateCacheDir + "/zip_cache"
+	
 	
 	static func __precache_mod_file(filepath:String):
 		var file:File = File.new()
 		filepath = ProjectSettings.localize_path(filepath)
 		if file.file_exists(filepath):
-			if filepath.get_base_dir() != modCacheDir:
-				if __copy_file(filepath,modCacheDir):
+			if filepath.get_base_dir() != MOD_CACHE_PATH:
+				if __copy_file(filepath,MOD_CACHE_PATH):
 					return
-				filepath = modCacheDir + "/" + filepath.get_file()
-			file.open(updateCacheFile,File.READ)
+				filepath = MOD_CACHE_PATH + "/" + filepath.get_file()
+			file.open(UPDATE_CACHE_FILE_PATH,File.READ)
 			var cache : Array = JSON.parse(file.get_as_text()).result
 			file.close()
 			if not filepath in cache: cache.append(filepath)
-			file.open(updateCacheFile,File.WRITE)
+			file.open(UPDATE_CACHE_FILE_PATH,File.WRITE)
 			file.store_string(JSON.print(cache))
 			file.close()
 			non_static["pointers"].has_updated = true
-	const foundnewfiles:String = "new mods found, attempting to copy"
-	const exitMsg:String = "new and/or updated mods detected, rebooting game"
+	
 	static func __load_precached_mods() -> bool:
 		var gameInstallDirectory:String = OS.get_executable_path().get_base_dir()
 		if OS.get_name() == "OSX":
 			gameInstallDirectory = gameInstallDirectory.get_base_dir().get_base_dir().get_base_dir()
 		var modPathPrefix:String = gameInstallDirectory + "/mods"
 		var file:File = File.new()
-		if file.file_exists(updateCacheFile):
-			var files_to_copy : PoolStringArray = PoolStringArray(JSON.parse(__get_file_content(updateCacheFile)).result)
-			file.open(updateCacheFile,File.WRITE)
+		if file.file_exists(UPDATE_CACHE_FILE_PATH):
+			var files_to_copy : PoolStringArray = PoolStringArray(JSON.parse(__get_file_content(UPDATE_CACHE_FILE_PATH)).result)
+			file.open(UPDATE_CACHE_FILE_PATH,File.WRITE)
 			file.store_string("[]")
 			file.close()
 			if files_to_copy:
-				print(foundnewfiles)
+				print(FOUND_PRECACHED_MODS_LOG)
 				var pointers:HevLibPointers = non_static["pointers"]
-				pointers.l(foundnewfiles,log_header)
+				pointers.l(FOUND_PRECACHED_MODS_LOG,log_header)
 				for mod in files_to_copy:
 					if file.file_exists(mod) and __copy_file(mod,modPathPrefix) == OK:
 						var newmodmsg:String = "copied new mod %s" % mod.get_file()
 						print(newmodmsg)
 						pointers.l(newmodmsg,log_header)
-				print(exitMsg)
-				pointers.NodeAccess.__exit(true,exitMsg,log_header)
+				print(PRECACHED_MODS_REBOOT_LOG)
+				pointers.NodeAccess.__exit(true,PRECACHED_MODS_REBOOT_LOG,log_header)
 				return true
 		else:
-			file.open(updateCacheFile,File.WRITE)
+			file.open(UPDATE_CACHE_FILE_PATH,File.WRITE)
 			file.store_string("[]")
 			file.close()
 		return false
@@ -4605,12 +4780,11 @@ class _FileAccess:
 			"gdc": return file_path.get_basename() + ".gd"
 		return file_path
 	
-	const deeperSearch:PoolStringArray = PoolStringArray(["tres","tscn","gd","res"])
-	const resHex:String = "7265733a2f2f" # "res://".to_ascii().hex_encode()
+	
 	
 	static func __get_dependancies_for_file(file_path:String,deep_search:bool = false) -> PoolStringArray:
 		var dependencies:PoolStringArray = ResourceLoader.get_dependencies(file_path)
-		if deep_search and file_path.get_extension() in deeperSearch:
+		if deep_search and file_path.get_extension() in FILE_EXT_FOR_DEEP_DEP_SEARCH:
 			var nfp:String = file_path
 			if not non_static["pointers"].is_editor:
 				if file_path.get_extension().to_lower() == "gd":
@@ -4622,13 +4796,13 @@ class _FileAccess:
 			var fileBytes:PoolByteArray = file.get_buffer(file.get_len())
 			file.close()
 			var bytecodeStr:String = fileBytes.hex_encode()
-			if resHex in bytecodeStr:
-				var hexArray:PoolStringArray = bytecodeStr.split(resHex)
+			if RES_HEX_ENCODED in bytecodeStr:
+				var hexArray:PoolStringArray = bytecodeStr.split(RES_HEX_ENCODED)
 				var buffer:int = 0
 				for idx in hexArray.size():
 					var hexText:String = hexArray[idx]
 					if idx > 0:
-						hexText = resHex + hexText
+						hexText = RES_HEX_ENCODED + hexText
 						var fn:String = fileBytes.subarray(buffer, buffer + hexText.length()/2.0 - 1).get_string_from_ascii().split("\"")[0]
 						if not fn in dependencies:
 							match fn.get_extension():
@@ -4919,8 +5093,7 @@ class _Keymapping:
 	
 	const log_header = "pointers.Keymapping"
 	
-	const keybind_folder = "user://cache/Keybinds/"
-	const vanilla_binds_file = "user://cfg/Vanilla_Binds.cfg"
+	
 	
 	const overrides = Dictionary()
 	
@@ -4991,8 +5164,8 @@ class _Keymapping:
 			var current:Dictionary = Dictionary()
 			var file:File = File.new()
 			var pointers:HevLibPointers._ConfigDriver = non_static["pointers"].ConfigDriver
-			if file.file_exists(vanilla_binds_file):
-				current = pointers.__config_parse(vanilla_binds_file)
+			if file.file_exists(VANILLA_BINDS_PATH):
+				current = pointers.__config_parse(VANILLA_BINDS_PATH)
 			if file.file_exists("user://settings.cfg"):
 				bound = pointers.__config_parse("user://settings.cfg").get("input",Dictionary())
 			var vanilla_binds = __define_vanilla_binds()
@@ -5018,7 +5191,7 @@ class _Keymapping:
 					formatted_vanilla_binds_store[ie] = sect
 			if missing:
 				printerr(missing)
-			pointers.__config_store(formatted_vanilla_binds_store,vanilla_binds_file)
+			pointers.__config_store(formatted_vanilla_binds_store,VANILLA_BINDS_PATH)
 		return formatted_vanilla_binds_store.duplicate(true)
 	
 	static func __event_to_string(event):
@@ -5270,8 +5443,7 @@ class _ManifestV2:
 	var currentModStateHash:int = 0
 	var lastModStateHash:int = 0
 	
-	const mod_hash_file:String = "user://cache/updates/mod_data_hash.txt"
-	const mod_state_hash_file:String = "user://cache/updates/mod_zip_hash.txt"
+	
 	
 	const mod_file_to_id_cache = Dictionary()
 	const get_mod_path_from_lowercase_path = Dictionary()
@@ -5380,19 +5552,19 @@ class _ManifestV2:
 			cached_mod_statistics["counts"] = {"total_mod_count":total_mod_count,"mods_using_manifests":manifest_count,"mods":non_library_count,"libraries":library_count}
 			cached_mod_statistics["tags"] = stat_tags
 			if not base.currentModHash:
-				if file.file_exists(mod_hash_file):
-					file.open(mod_hash_file,File.READ)
+				if file.file_exists(MOD_HASH_PATH):
+					file.open(MOD_HASH_PATH,File.READ)
 					base.lastModHash = file.get_32()
 					file.close()
 				base.currentModHash = cached_mod_list.hash()
-				file.open(mod_hash_file,File.WRITE)
+				file.open(MOD_HASH_PATH,File.WRITE)
 				file.store_32(base.currentModHash)
 				file.close()
 				if base.currentModHash != base.lastModHash:
 					base.haveModsChanged = true
 			if(not pointers.is_editor and not base.currentModStateHash):
-				if file.file_exists(mod_state_hash_file):
-					file.open(mod_state_hash_file,File.READ)
+				if file.file_exists(MOD_STATE_HASH_PATH):
+					file.open(MOD_STATE_HASH_PATH,File.READ)
 					base.lastModStateHash = file.get_32()
 					file.close()
 				var zrs:Array = Array()
@@ -5400,7 +5572,7 @@ class _ManifestV2:
 					zrs.append(mod["hash"])
 				zrs.sort()
 				base.currentModStateHash = zrs.hash()
-				file.open(mod_state_hash_file,File.WRITE)
+				file.open(MOD_STATE_HASH_PATH,File.WRITE)
 				file.store_32(base.currentModStateHash)
 				file.close()
 				if base.currentModStateHash != base.lastModStateHash:
@@ -5471,7 +5643,7 @@ class _ManifestV2:
 							var content_file:String = tcDir.plus_file(file)
 							has_mod_manifest = true
 							manifest_filepath = content_file
-							manifest_data = base_manifest_template.duplicate(true)
+							manifest_data = BASE_MANIFEST_TEMPLATE.duplicate(true)
 							var new_manifest_data:Dictionary = __parse_file_as_manifest(content_file)
 							manifest_data["mod_information"] = new_manifest_data["mod_information"]
 							manifest_data["version"] = new_manifest_data["version"]
@@ -5895,7 +6067,7 @@ class _ManifestV2:
 						var content_file:String = tcDir.plus_file(file)
 						has_mod_manifest = true
 						manifest_filepath = content_file
-						manifest_data = base_manifest_template.duplicate(true)
+						manifest_data = BASE_MANIFEST_TEMPLATE.duplicate(true)
 						var new_manifest_data:Dictionary = __parse_file_as_manifest(content_file)
 						manifest_data["mod_information"] = new_manifest_data["mod_information"]
 						manifest_data["version"] = new_manifest_data["version"]
@@ -6062,49 +6234,7 @@ class _ManifestV2:
 	const cached_manifests : Dictionary = Dictionary()
 	const cachedManifestKeys:Array = Array()
 	
-	const base_manifest_template : Dictionary = {
-		"mod_information":{
-			"name":"",
-			"id":"",
-			"description":"",
-			"brief":"",
-			"author":"",
-			"credits":PoolStringArray()
-		},
-		"version":{
-			"version_major":1,
-			"version_minor":0,
-			"version_bugfix":0,
-			"version_metadata":"",
-			"version_string":"1.0.0"
-		},
-		"tags":{
-
-		},
-		"links":{
-
-		},
-		"configs":{
-
-		},
-		"languages":{
-
-		},
-		"library":{
-			"is_library":false,
-			"always_display":false,
-		},
-		"manifest_definitions":{
-			"manifest_version":1.0,
-			"dependancy_mod_ids":Array(),
-			"conflicting_mod_ids":Array(),
-			"complementary_mod_ids":Array(),
-			"manifest_url":"", # EXAMPLE: https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest
-			"changelog_path":"", # This is relative to the ModMain.gd file. EXAMPLE: for a file at 'res://Example Mod/data/folder/changelogs.txt', you would put 'data/folder/changelogs.txt'
-			"modlet_priority":0, # SPECIFIC TO MODLETS! The order at which the modlet would be loaded. Most modlets load before other mods, but this will affect load order within the list of installed modlets
-			"expected_manifest_path":"", # If set and used for a mod's manifest, the res:// filepath the manifest is expected to be at. If it isn't, prevents the mod from loading and closes the game.
-		}
-	}
+	
 	
 	static func __parse_file_as_manifest(file_path: String, format_to_manifest_version: bool = true) -> Dictionary:
 		var cachevar : String = "%s:%s" % [file_path,format_to_manifest_version]
@@ -6120,7 +6250,7 @@ class _ManifestV2:
 				else:
 					manifest_version = 1.0
 			if format_to_manifest_version:
-				var dict_template:Dictionary = base_manifest_template.duplicate(true)
+				var dict_template:Dictionary = BASE_MANIFEST_TEMPLATE.duplicate(true)
 				var manifestKeys:PoolStringArray = PoolStringArray(manifest_data.keys())
 				match manifest_version:
 					1.0:
@@ -6560,10 +6690,10 @@ class _ManifestV2:
 					tag_dict[entry] = tag_data[entry].get("value")
 		return tag_dict
 	
-	const test_mod_updates = false
+	
 	
 	static func __have_mods_updated() -> Dictionary:
-		if test_mod_updates:
+		if DO_TEST_MOD_UPDATES:
 			var out:Dictionary = Dictionary()
 			var all_mods : Dictionary = __get_mod_data()
 			for mod in __get_mod_list_keys():
@@ -6589,12 +6719,12 @@ class _ManifestV2:
 	
 	const mod_changes_cache = Dictionary()
 	
-	const last_seen_file:String = "user://cache/from_last_launch.json"
+	
 	static func __get_mod_versions() -> Dictionary:
 		var last : Dictionary = Dictionary()
 		var file:File = File.new()
-		if file.file_exists(last_seen_file):
-			file.open(last_seen_file,File.READ)
+		if file.file_exists(LAST_LAUNCH_MODS_PATH):
+			file.open(LAST_LAUNCH_MODS_PATH,File.READ)
 			last = JSON.parse(file.get_as_text()).result
 			file.close()
 		var all_mods : Dictionary = __get_mod_data()
@@ -6632,7 +6762,7 @@ class _ManifestV2:
 				var info : Dictionary = manifest["mod_information"]
 				var version : Dictionary = manifest["version"]
 				mods[info["id"]] = {"name":info["name"],"version":{"major":version["version_major"],"minor":version["version_minor"],"bugfix":version["version_bugfix"]}}
-		file.open(last_seen_file,File.WRITE)
+		file.open(LAST_LAUNCH_MODS_PATH,File.WRITE)
 		file.store_string(JSON.print(mods))
 		file.close()
 		return mods
@@ -7218,11 +7348,7 @@ class _Math:
 			converted[r] = Vector2(float(array[index]),float(array[index + 1]))
 		return converted
 	
-	const int64_max = (1 << 62) - 1 + (1 << 62)
-	const int64_min = -int64_max - 1
 	
-	const err_div_zero = "Division by zero error"
-	const err_int_overflow = "Integer overflow error"
 	
 	static func __imax(a:int,b:int) -> int:
 		return a if a > b else b
@@ -7235,23 +7361,23 @@ class _Math:
 	
 	static func __idivide(num:int,denom:int) -> int:
 		if denom == 0:
-			non_static["pointers"].l(err_div_zero,log_header)
-			printerr(err_div_zero)
+			non_static["pointers"].l(DIV_ZERO_ERR,log_header)
+			printerr(DIV_ZERO_ERR)
 			return 0
 		if __are_float_operands_integer_equivalent(num,denom):
 			return int(float(num)/denom)
 		elif denom == 1:
 			return num
 		elif denom == -1:
-			if num == int64_min:
-				non_static["pointers"].l(err_int_overflow,log_header)
-				printerr(err_int_overflow)
-				return int64_max
+			if num == INT64_MIN:
+				non_static["pointers"].l(INT_OVERFLOW_ERR,log_header)
+				printerr(INT_OVERFLOW_ERR)
+				return INT64_MAX
 			return -num
 		var r:int = num if num < 0 else -num
 		var d:int = denom if denom < 0 else -denom
 		var shift:int = 0
-		var half:int = (int64_min >> 1) - 1
+		var half:int = (INT64_MIN >> 1) - 1
 		while d > half and (d << 1) > (r-1):
 			d <<= 1
 			shift += 1
@@ -7266,26 +7392,21 @@ class _Math:
 			return -nq
 		return nq
 	
-	
-	const precision_limit = 1 << 53
-	
 	static func __is_float_integer_equivalent(num:float) -> bool:
-		return abs(num) < precision_limit
+		return abs(num) < FLOAT_TO_INT_PRECISION_LIMIT
 	
 	static func __are_float_operands_integer_equivalent(a:int,b:int) -> bool:
-		return (abs(a) < precision_limit) and (abs(b) < precision_limit)
-	
-	const radianify = PI/180
+		return (abs(a) < FLOAT_TO_INT_PRECISION_LIMIT) and (abs(b) < FLOAT_TO_INT_PRECISION_LIMIT)
 	
 	static func __make_semicircle(radius:float,start:float,end:float,step:float,degrees:bool = true,anticlockwise:bool = true,include_center:bool = true) -> PoolVector2Array:
 		var out:PoolVector2Array = PoolVector2Array()
-		step = (abs(step) * radianify) if degrees else abs(step)
+		step = deg2rad(abs(step)) if degrees else abs(step)
 		if step <= 0:
 			return out
 		if include_center:
 			out.append(Vector2.ZERO)
-		start = fposmod((start * radianify) if degrees else start,TAU)
-		end = fposmod((end * radianify) if degrees else end,TAU)
+		start = fposmod(deg2rad(start) if degrees else start,TAU)
+		end = fposmod(deg2rad(end) if degrees else end,TAU)
 		if anticlockwise:
 			if end > start:
 				end -= TAU
@@ -7452,10 +7573,9 @@ class _NodeAccess:
 			yield(pointers,"process_tick")
 		OS.kill(OS.get_process_id())
 	
-	const scene_extensions = PoolStringArray(["tscn","scn"])
-	
 	static func __save_node_to_scene(node:Node,file_path:String):
-		if not file_path.get_extension() in scene_extensions:
+		var ext:String = file_path.get_extension()
+		if not ext == "tscn" or ext == "scn":
 			return
 		var packed:PackedScene = PackedScene.new()
 		__claim_child_ownership(node)
@@ -7463,20 +7583,17 @@ class _NodeAccess:
 			ResourceSaver.save(file_path,packed)
 
 class _RingInfo:
-	const images = Dictionary()
-	func _init(p):
-		images["map"] = load("res://ring/ring-map.png")
-		images["veins"] = load("res://ring/ring-veins.png")
 	
-	const pixelToKm = 10000
+	func _init(p):
+		pass
 	
 	static func __get_pixel_at(pos: Vector2) -> Color:
-		var image:Image = images.map.get_data()
+		var image:Image = RING_IMAGE_STORE.map.get_data()
 		var size:Vector2 = image.get_size()
 		var sx:float = size.x
-		var x:int = int(clamp(floor(pos.x / pixelToKm), 0, sx - 1))
+		var x:int = int(clamp(floor(pos.x / 10000.0), 0, sx - 1))
 		var sy:int = int(size.y)
-		var y:int = ((int(floor(pos.y / pixelToKm)) %sy) + sy) %sy
+		var y:int = ((int(floor(pos.y / 10000.0)) %sy) + sy) %sy
 		var x1:int = int(clamp(x + 1, 0, sx - 1))
 		var y1:int = (y + 1) % sy
 		
@@ -7490,8 +7607,8 @@ class _RingInfo:
 		var p01:Color = image.get_pixel(x, y1)
 		image.unlock()
 		
-		var cx:float = (pos.x - floor(pos.x / pixelToKm) * pixelToKm) / pixelToKm
-		var cy:float = (pos.y - floor(pos.y / pixelToKm) * pixelToKm) / pixelToKm
+		var cx:float = (pos.x - floor(pos.x / 10000.0) * 10000.0) / 10000.0
+		var cy:float = (pos.y - floor(pos.y / 10000.0) * 10000.0) / 10000.0
 		
 		var pu:Color = (p00 * (1 - cx) + p10 * (cx))
 		var pd:Color = (p01 * (1 - cx) + p11 * (cx))
@@ -7499,7 +7616,7 @@ class _RingInfo:
 		return (pu * (1 - cy) + pd * (cy))
 	
 	static func __get_vein_pixel_at(pos: Vector2) -> Color:
-		var veinImage:Image = images.veins.get_data()
+		var veinImage:Image = RING_IMAGE_STORE.veins.get_data()
 		var veinSize:Vector2 = veinImage.get_size()
 		var x:int = posmod(pos.x, veinSize.x)
 		var y:int = posmod(pos.y, veinSize.y)
@@ -7543,7 +7660,7 @@ class _RingInfo:
 	
 	const pix_values:PoolIntArray = PoolIntArray()
 	
-	const not_random_seeds = PoolIntArray([1337,1776,2014,1384,2684,842,2802,1597,2116,755,1596,2661,1928,-1861,-2531,-1337,-1776,-2014,-1384,-2684,-842,-2802,-1597,-2116,-755,-1596,-2661,-1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928,1861,-2531,1337,-1776,2014,-1384,2684,-842,2802,-1597,2116,-755,1596,-2661,1928])
+	
 	
 	static func get_pixel_values(pos:Vector2) -> PoolRealArray:
 		if!pix_values:
@@ -7553,12 +7670,12 @@ class _RingInfo:
 			pix_values[1] = - 2531.0
 			if mineral_size:
 				var random:bool = ModLoader._savedObjects[0].ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","randomize_minerals",false)
-				var nsi:int = not_random_seeds.size()
+				var nsi:int = RING_ORE_DISTRIB_SEEDS_NOT_RANDOM.size()
 				for i in mineral_size:
 					if random:
 						pix_values[i + 2] = ((randi() % 2250) + 750) * sign(randf() - 0.5)
 					else:
-						pix_values[i + 2] = not_random_seeds[i%nsi]
+						pix_values[i + 2] = RING_ORE_DISTRIB_SEEDS_NOT_RANDOM[i%nsi]
 		var pxSize:int = pix_values.size()
 		var out:PoolRealArray = PoolRealArray()
 		out.resize(pxSize * 4)
@@ -7590,7 +7707,7 @@ class _RPC:
 		if force_this_icon:
 			icon = ship
 		else:
-			if ship in validShipIcons:
+			if ship in RPC_VALID_SHIP_ICONS:
 				icon = ship
 			else:
 				match ship.to_lower():
@@ -7624,7 +7741,7 @@ class _RPC:
 			icon = how
 		else:
 			if how:
-				icon = icons["icon"]
+				icon = "icon"
 		if icon != rpc_data["current_small_icon"]:
 			rpc_data["pointers"].l("Changing small icon from %s to %s" % [rpc_data["current_small_icon"],icon],log_header)
 			rpc_data["current_small_icon"] = icon
@@ -7680,59 +7797,8 @@ class _RPC:
 		"err_count":0,
 	}
 	
-	const validShips:Dictionary = {
-		"SHIP_TRTL":"k37",
-		"SHIP_AT225":"k225",
-		"SHIP_COTHON":"cothon",
-		"SHIP_PROSPECTOR_BALD":"bald_eagle",
-		"SHIP_PROSPECTOR":"prospector",
-		"SHIP_EIME":"model_e",
-		"SHIP_KITSUNE":"kitsune",
-		"SHIP_OCP209":"ocp",
-		"SHIP_ATLAS_WASP":"ai_wasp",
-		"SHIP_MADCERF":"mad_cerf",
-		"SHIP_OBERON":"modded_oberon",
-		"SHIP_TSUKUYOMI_IOT":"bbw",
-	}
-	
-	const validShipIcons:PoolStringArray = PoolStringArray([
-		"k37",
-		"k225",
-		"cothon",
-		"bald_eagle",
-		"prospector",
-		"model_e",
-		"kitsune",
-		"ocp",
-		"ai_wasp",
-		"mad_cerf",
-		"modded_oberon",
-		"bbw",
-	])
-	
-	const icons:Dictionary = {
-		"ships":{
-			"SHIP_TRTL":"k37",
-			"SHIP_AT225":"k225",
-			"SHIP_COTHON":"cothon",
-			"SHIP_PROSPECTOR_BALD":"bald_eagle",
-			"SHIP_PROSPECTOR":"prospector",
-			"SHIP_EIME":"model_e",
-			"SHIP_KITSUNE":"kitsune",
-			"SHIP_OCP209":"ocp",
-			"SHIP_ATLAS_WASP":"ai_wasp",
-			"SHIP_MADCERF":"mad_cerf",
-			"SHIP_OBERON":"modded_oberon",
-			"SHIP_TSUKUYOMI_IOT":"bbw",
-		},
-		"icon":"icon",
-		"empty":"empty",
-		"ep":"enceladus_prime",
-		"unknown":"unknown"
-	}
-	
-	const discord_script:String = "res://HevLib Discord RPC/lib/discord.gd"
 	static func ready():
+		var discord_script:String = "res://HevLib Discord RPC/lib/discord.gd"
 		var pointers:HevLibPointers = rpc_data["pointers"]
 		if File.new().file_exists(discord_script) and pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","discord_rpc_enabled",true):
 			var discord = load(discord_script).new()
@@ -7836,12 +7902,12 @@ class _RPC:
 					
 				var shipIcon:String = "empty"
 				var thisShip:String = ""
-				if "baseShipName" in playership and playership.baseShipName in validShips:
+				if "baseShipName" in playership and playership.baseShipName in RPC_VALID_SHIPS:
 					thisShip = playership.baseShipName
-				if "shipName" in playership and playership.shipName in validShips:
+				if "shipName" in playership and playership.shipName in RPC_VALID_SHIPS:
 					thisShip = playership.shipName
-				if thisShip in validShips:
-					shipIcon = validShips[thisShip]
+				if thisShip in RPC_VALID_SHIPS:
+					shipIcon = RPC_VALID_SHIP_LOOKUP[thisShip]
 				current_icon = shipIcon
 		rpc_data["current_details"] = current_details
 		rpc_data["current_icon"] = current_icon
@@ -7976,22 +8042,21 @@ class _SafeMode:
 		pointers = p
 		regex.compile(p.DataFormat.crcTable.B10.get_string_from_utf8())
 	
-	const safemode_dir = "user://cache/SafeMode/"
-	const sm_data_path:String = safemode_dir + "pck.dat"
+	
 	
 	const log_header = "pointers.SafeMode"
 	var file:File = File.new()
 	func ready():
 		var data = null
-		if file.file_exists(sm_data_path):
-			file.open(sm_data_path,File.READ)
+		if file.file_exists(SAFEMODE_DATA_PATH):
+			file.open(SAFEMODE_DATA_PATH,File.READ)
 			data = pointers.Zip.__read_hlz(file.get_buffer(file.get_len()))
 			file.close()
 		
 		if not data is Array or pointers.ManifestV2.haveModsChanged:
 			pointers.l("Game has updated or cache is missing, rebuilding file info cache.",log_header)
-			pointers.FolderAccess.__recursive_delete(safemode_dir)
-			Directory.new().make_dir(safemode_dir)
+			pointers.FolderAccess.__recursive_delete(SAFEMODE_PATH)
+			Directory.new().make_dir(SAFEMODE_PATH)
 			var timerStart:int = Time.get_ticks_usec()
 			PCKNAMES.append_array(pointers.FolderAccess.__get_vanilla_script_and_scenes())
 			for f in PCKNAMES:
@@ -8017,7 +8082,7 @@ class _SafeMode:
 				JSON.print(dependancy_lookup),
 				JSON.print(dependancy_dictionary)
 			])
-			file.open(sm_data_path,File.WRITE)
+			file.open(SAFEMODE_DATA_PATH,File.WRITE)
 			file.store_buffer(data_to_store)
 			file.close()
 			var timerEnd:int = Time.get_ticks_usec()-timerStart
@@ -8115,13 +8180,13 @@ class _SafeMode:
 				processed_deps.append(i)
 		return out
 	
-	const binaryArr:PoolStringArray = PoolStringArray(["tres","tscn","gd","material"])
-	const deepSearchFor = PoolStringArray(["gd","gdc"])
+	
 	
 	static func get_dependancies_for_vanilla_file(file_path:String):
 		if (not file_path in PCKNAMES) or (file_path in dependancy_dict_keys):
 			return
-		var dependencies:PoolStringArray = non_static["pointers"].FileAccess.__get_dependancies_for_file(file_path,file_path.get_extension().to_lower() in deepSearchFor)
+		var fext:String = file_path.get_extension().to_lower()
+		var dependencies:PoolStringArray = non_static["pointers"].FileAccess.__get_dependancies_for_file(file_path,(fext == "gd" or fext == "gdc"))
 		if dependencies:
 			dependancy_dict_keys.append(file_path)
 			dependancy_dictionary[file_path] = dependencies
@@ -8131,7 +8196,7 @@ class _SafeMode:
 					dependancy_lookup_keys.append(dp)
 				dependancy_lookup[dp].append(file_path)
 			for m in dependencies:
-				if (m.get_extension() in binaryArr):
+				if (m.get_extension().to_lower() in SAFEMODE_BINARY_CHECK):
 					get_dependancies_for_vanilla_file(m)
 	
 	static func __lookup_vanilla_file_dependancies(dependancy) -> PoolStringArray:
@@ -8187,24 +8252,7 @@ class _Scripting:
 		out += "\nZip reference store: %s" % JSON.print(p.ManifestV2.zip_ref_store)
 		p.l("Device Information: [\n%s\n]" % out,log_header)
 	
-	const mdir_str = "user://cache/Minerals/%s-%d%d%d/"
-	const content_str = "\n\tif not \"%s\" in objectClass[- 1]:\n\t\tobjectClass[- 1][\"%s\"] = %s"
-	const trace_str = "\n\tif not \"%s\" in traceMinerals:\n\t\ttraceMinerals.append(\"%s\")"
-	const prices_str = "\n\tif not \"%s\" in mineralPrices:\n\t\tmineralPrices[\"%s\"] = %f"
-	const colour_str = "\n\tif not \"%s\" in specificMineralColors:\n\t\tspecificMineralColors[\"%s\"] = Color( %f, %f, %f, 1.0 )"
-	const mineral_header_str = """[gd_scene load_steps=2 format=2]
-
-[ext_resource path=\"res://HevLib/scenes/minerals/base_scenes/mineral-%s-%s.tscn\" type=\"PackedScene\" id=1]
-
-[node name=\"mineral\" instance=ExtResource( 1 )]
-mineral = \"%s\"
-color = Color( %f, %f, %f, 1 )
-mass = %f
-filler = \"%s\"
-scaleMin = %f
-scaleMax = %f
-ferrous = %s
-"""
+	
 	
 	static func make_mineral_scripting() -> void:
 		var pointers:HevLibPointers = non_static["pointers"]
@@ -8244,43 +8292,34 @@ ferrous = %s
 		# Builds the blank Settings extension
 		file.open("user://cache/Variable_Fetch/st.gd",File.WRITE)
 		file.store_string("""extends "res://Settings.gd"
-onready var pointers=ModLoader._savedObjects[0]
 var hl_edallowall:bool=false
-func _ready():hl_edallowall=(pointers.is_editor&&pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","unlock_dlc",false))
+func _ready():hl_edallowall=(OS.has_feature("editor")&&ModLoader._savedObjects[0].ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","unlock_dlc",false))
 func hasDlc(dlc)->bool:return true if (OS.has_feature("editor")&&hl_edallowall) else .hasDlc(dlc)
 """ if (pointers.is_editor) else "extends \"res://Settings.gd\"\n\n")
 		file.close()
 	
-	const mineral_scene_txt = """[
-load("%s"),
-load("%s"),
-load("%s"),
-load("%s"),
-load("%s"),
-load("%s"),
-load("%s")
-]"""
+	
 	
 	static func process_mineral_dict(mineral:Dictionary,pointers:HevLibPointers) -> PoolStringArray:
 		var mname:String = mineral.get("name","")
 		var col:Color = mineral.get("color",Color.white)
-		var out:PoolStringArray = PoolStringArray([colour_str % [mname,mname,col.r,col.g,col.b],"","",""])
+		var out:PoolStringArray = PoolStringArray([MINERALDRIVER_COLOUR_STRUCTURE % [mname,mname,col.r,col.g,col.b],"","",""])
 		var price:float = mineral.get("price",0.0)
 		if price > 0.0:
 			# Only adds minerals to the ring if they have a value.
 			# Useful if you only want to reference a mineral by name
 			# and a colour without it showing in the market, i.e. getScan()
-			out[1] = prices_str % [mname,mname,price]
+			out[1] = MINERALDRIVER_PRICE_STRUCTURE % [mname,mname,price]
 			var handle:String = mineral.get("handle","none")
 			if handle == "scenes":
 				# Handle for providing a list of premade scene filepaths to use for the ores
-				out[2] = content_str % [mname,mname,
-					mineral_scene_txt % [mineral["ore_1"],
+				out[2] = MINERALDRIVER_CONTENT_STRUCTURE % [mname,mname,
+					MINERALDRIVER_SCENES_STRUCTURE % [mineral["ore_1"],
 						mineral["ore_2"],mineral["ore_3"],
 						mineral["ore_4"],mineral["ore_5"],
 						mineral["ore_6"],mineral["ore_7"]]
 				]
-				out[3] = trace_str % [mname,mname]
+				out[3] = MINERALDRIVER_TRACE_STRUCTURE % [mname,mname]
 				pointers.l("adding mineral %s using handler [scene]" % mname,log_header)
 			elif handle == "recolor":
 				var base:String = "fe"
@@ -8299,7 +8338,7 @@ load("%s")
 				var ferrous:bool = mineral.get("ferrous",false)
 				var purityInfo:Dictionary = mineral.get("purity",Dictionary())
 				var purityKeys:PoolIntArray = PoolIntArray(purityInfo.keys())
-				var folder:String = mdir_str % [mname,int(color.r*255),int(color.g*255),int(color.b*255)]
+				var folder:String = MINERALDRIVER_DIRECTORY_STRUCTURE % [mname,int(color.r*255),int(color.g*255),int(color.b*255)]
 				var specific_data:Dictionary = mineral.get("specific_ore_data",Dictionary())
 				var specificKeys:PoolIntArray = PoolIntArray(specific_data.keys())
 				Directory.new().make_dir_recursive(folder)
@@ -8311,7 +8350,7 @@ load("%s")
 					if i in specificKeys:
 						var idx:Dictionary = specific_data[i]
 						var cl:Color = idx.get("color",color)
-						var data:String = mineral_header_str % [
+						var data:String = MINERALDRIVER_HEADER_STRUCTURE % [
 							base,i,mname,cl.r,cl.g,cl.b,
 							idx.get("mass",mass),
 							idx.get("filler",filler_mineral),
@@ -8322,7 +8361,7 @@ load("%s")
 						file.store_string((data + "\npurity = %f" % purityInfo[i]) if (i in purityKeys) else data)
 						file.close()
 					else:
-						var data:String = mineral_header_str % [
+						var data:String = MINERALDRIVER_HEADER_STRUCTURE % [
 							base,i,mname,color.r,color.g,color.b,
 							mass,filler_mineral,min_scale,max_scale,
 							"true" if ferrous else "false"]
@@ -8330,8 +8369,8 @@ load("%s")
 						file.store_string((data + "\npurity = %f" % purityInfo[i]) if (i in purityKeys) else data)
 						file.close()
 					mh += "load(\"%s\"),\n" % fn
-				out[2] = content_str % [mname,mname,mh + "]"]
-				out[3] = trace_str % [mname,mname]
+				out[2] = MINERALDRIVER_CONTENT_STRUCTURE % [mname,mname,mh + "]"]
+				out[3] = MINERALDRIVER_TRACE_STRUCTURE % [mname,mname]
 				pointers.l("adding mineral %s using handler [recolor]" % mname,log_header)
 			else:pointers.l("mineral %s registered with price and colour but not adding to ring" % mineral,log_header)
 		else:pointers.l("adding only color references for mineral %s, value set to zero or below" % mineral,log_header)
