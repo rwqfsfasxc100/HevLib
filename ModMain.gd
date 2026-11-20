@@ -51,7 +51,7 @@ func _init(modLoader):
 		file.close()
 		gd.reload()
 		gd.new(modLoader,MOD_VERSION_STRING,self,get_script().resource_path.get_base_dir()+"/")
-#	return
+	return
 	
 #	var pointers = ModLoader._savedObjects[0]
 #	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
