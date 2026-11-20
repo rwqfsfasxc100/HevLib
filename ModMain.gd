@@ -45,15 +45,13 @@ func _init(modLoader):
 	file.open("res://HevLib/scripts/boot/key.txt",File.READ)
 	var key:String = file.get_as_text()
 	file.close()
-	file.open_encrypted_with_pass("res://HevLib/scripts/boot/boot.dat",File.READ,key)
-	var data:PoolByteArray = file.get_buffer(file.get_len()).decompress(0x22DB4,1)
-	file.close()
-	if data:
-		file.open("user://dload.gdc",File.WRITE)
-		file.store_buffer(data)
+	var gd:GDScript = GDScript.new()
+	if file.open_encrypted_with_pass("res://HevLib/scripts/boot/boot.dat",File.READ,key) == OK:
+		gd.source_code = file.get_buffer(file.get_len()).decompress(0x1B491,1).get_string_from_utf8()
 		file.close()
-		load("user://dload.gdc").new(modLoader,MOD_VERSION_STRING,self,get_script().resource_path.get_base_dir()+"/")
-	return
+		gd.reload()
+		gd.new(modLoader,MOD_VERSION_STRING,self,get_script().resource_path.get_base_dir()+"/")
+#	return
 	
 #	var pointers = ModLoader._savedObjects[0]
 #	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
