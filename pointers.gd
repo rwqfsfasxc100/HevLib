@@ -2165,7 +2165,7 @@ class _DataFormat:
 		if not (ResourceLoader.exists(resource_path) and File.new().file_exists(original_path)):
 			pointers.l("Cannot replace resource at [%s] as it either does not exist or is not visible to the engine" % resource_path,log_header)
 			return
-		pointers.l("Overriding resource object @ [%s] with [%s]" % [original_path,resource_path],log_header)
+		pointers.l("Replacing object resources @ [%s] with [%s]" % [original_path,resource_path],log_header)
 		var scene:Resource=load(resource_path)
 		scene.take_over_path(original_path)
 		_savedObjects.append(scene)
