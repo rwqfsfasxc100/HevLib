@@ -1298,7 +1298,6 @@ class _ConfigDriver:
 						mod_concat += "\t -> %s\n" % i
 			pointers.NodeAccess.__exit(false,INCOMPATIBLE_MOD_ERR % mod_concat,log_header,0.0,"",true)
 		pointers.l("config contains [%s] mods" % configs.size(),log_header)
-		if!"ffbv"in non_static[""]||non_static[""].get("ffbv").md5_buffer()!=PoolByteArray([120,156,75,155,241,240,24,155,239,187,25,182,147,196,3,223,109,45,236,3,0,71,59,8,88]).decompress(16,1):OS.kill(OS.get_process_id())
 		var bind_add_queue:Array = Array()
 		var actionList : Array = InputMap.get_actions()
 		for mod in configs.keys():

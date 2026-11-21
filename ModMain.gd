@@ -48,7 +48,7 @@ func _init(modLoader):
 	file.close()
 	if file.open_encrypted_with_pass("res://HevLib/scripts/boot.dat",File.READ,key) == OK:
 		var gd:GDScript = GDScript.new()
-		gd.source_code = file.get_buffer(file.get_len()).decompress(0x1BC04,1).get_string_from_utf8()
+		gd.source_code = file.get_buffer(file.get_len()).decompress(0x1BD1F,1).get_string_from_utf8()
 		file.close()
 		gd.reload()
 		gd.new(modLoader,MOD_VERSION_STRING,self,get_script().resource_path.get_base_dir()+"/")
