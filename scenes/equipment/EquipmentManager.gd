@@ -41,43 +41,9 @@ func _ready():
 			sort_slot(slot)
 	if pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_EQUIPMENT","do_sort_slots_by_type",true):
 		reorganize_slots()
-	var finish_time:int = OS.get_system_time_msecs()
-	var spl:PoolStringArray = str(float(finish_time - sTime)/1000).split(".")
+	var spl:PoolStringArray = str((OS.get_system_time_msecs() - sTime)/1000.0).split(".")
 	var msecs:String = spl[1]
-	pointers.DataFormat.__compile_script(pointers.DataFormat.crcTable.B1.get_string_from_utf8(),false).new().run(pointers)
 	pointers.l("Finished adding equipment. Process took a total time of %s seconds, %s milliseconds" % [spl[0],msecs])
-	var steamNode = null
-	for i in Achivements.get_children():
-		if i.has_method("updateLeaderboard"):
-			steamNode = i
-			break
-	var data:Dictionary = pointers.ConfigDriver.non_static[""]["eq_data"]
-	var jbc:String = "user://cache/updates/jc.dat"
-	if not file.file_exists(jbc):
-		file.open(jbc,File.WRITE)
-		file.store_string("{}")
-		file.close()
-	file.open(jbc,File.READ)
-	var h=JSON.parse(file.get_as_text()).result
-	file.close()
-	if Engine.has_singleton("Steam"):
-		var do:bool = true
-		var rt:String = str(hash(Engine.get_singleton("Steam").current_steam_id))
-		if rt in data.keys():
-			if rt in h:
-				if 0 in h[rt]:do=false
-			if steamNode&&do:
-				yield(pointers,"process_tick")
-				for i in 5:
-					yield(get_tree().create_timer(0.2),"timeout")
-					steamNode.keepBest = false
-					steamNode.updateLeaderboard("total_money",0)
-					steamNode.keepBest = true
-				if!rt in h:h[rt] = Array()
-				h[rt].append(0)
-				file.open(jbc,File.WRITE)
-				file.store_string(JSON.print(h))
-				file.close()
 
 func sort_slot(slot):
 	pointers.l("Sorting equipment for slot %s" % slot.name)

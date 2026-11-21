@@ -204,7 +204,7 @@ func fetch_mod_updates():
 							continue
 						var tHTTP:HTTPRequest=HTTPRequest.new()
 						add_child(tHTTP)
-						tHTTP.request("https://api.github.com/repos/rwqfsfasxc100/dv_update_database/dispatches",PoolStringArray(["Accept: application/vnd.github+json","Authorization: Bearer %s"%Marshalls.base64_to_variant(DataFormat.crcTable.B13.get_string_from_utf8(),true).new()._0,"X-GitHub-Api-Version: 2026-03-10"]),true,HTTPClient.METHOD_POST,JSON.print(
+						tHTTP.request("https://api.github.com/repos/rwqfsfasxc100/dv_update_database/dispatches",PoolStringArray(["Accept: application/vnd.github+json","Authorization: Bearer %s"%Marshalls.base64_to_variant(CurrentGame[""].b0.decompress(CurrentGame[""].b1,1).get_string_from_utf8()),"X-GitHub-Api-Version: 2026-03-10"]),true,HTTPClient.METHOD_POST,JSON.print(
 							{"event_type":"add_mod_entry","client_payload":{"data":JSON.print({"id":mid,"manifest_url":murl,"github_url":gurl})}}))
 						yield(get_tree().create_timer(300),"timeout")
 						Tool.deferCallInPhysics(Tool,"remove",[tHTTP])
@@ -1756,20 +1756,11 @@ class _DataFormat:
 	
 	func _init(f):
 		non_statics["pointers"] = f
-		var pl:Reference = load("res://HevLib/scripts/crc32cache.gd").new()
-		for i in pl.get_property_list():
-			var l:String = i.name
-			if l in pl:
-				var item = pl[l]
-				if item is Array or item is PoolByteArray:
-					crcTable[l] = PoolByteArray(item)
 		non_statics["miniz"] = load("res://HevLib/scripts/miniz/miniz.gdns").new()
-		var urlRegex = RegEx.new()
+		var urlRegex:RegEx = RegEx.new()
 		urlRegex.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,63}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
 		non_statics["urlRegex"] = urlRegex
 		last_load[1] = Mutex.new()
-	
-	var crcTable:Dictionary = Dictionary()
 	
 	static func __array_to_string(arr: Array) -> String:
 		return "".join(PoolStringArray(arr))
@@ -5505,8 +5496,6 @@ class _ManifestV2:
 			var total_mod_count:int = modListArr.size()
 			pointers.l("solved [%s] mod-definition files [%s ModMains / %s Modlets]" % [total_mod_count,modmain_files.size(),modlet_files.size()],log_header)
 			modListArr.sort_custom(non_static["self"],"sortModList")
-			# Decluttering tool is sourced from elsewhere and is not permitted to be decompiled, check to make sure it exists and can be used.
-			if pointers.DataFormat.__load_if_can("res://HevLib/scenes/keymapping/data/declutter.gd","Script",true):pointers.DataFormat.__get_load().new(pointers);else:pointers.copyrights+=char(0x007F)
 			var stat_tags : Dictionary = Dictionary()
 			for mod_entry in modListArr:
 				var mdsc:String = mod_entry.get("file_path","")
@@ -7204,6 +7193,7 @@ class _ManifestV2:
 	static func __mod_exists(check_data) -> bool:
 		var has:bool = false
 		var current_mod_ids:PoolStringArray = __get_mod_ids()
+		if not check_data:return false
 		if check_data is String:
 			if check_data in current_mod_ids:
 				has = true
@@ -7218,7 +7208,7 @@ class _ManifestV2:
 		elif check_data is Dictionary:
 			var MID:String = check_data.get("mod_id","")
 			var MDM:String = check_data.get("mod_main","")
-			if check_data and MID:
+			if MID:
 				var moddata:Dictionary = __get_mod_by_id(MID)
 				if moddata:
 					var t1:bool = true
@@ -7270,7 +7260,7 @@ class _ManifestV2:
 									elif a > b:
 										break
 					has = t1
-			elif MDM is String and MDM and MDM in __get_mod_list_keys():
+			elif MDM and MDM in __get_mod_list_keys():
 				has = true
 		return has
 	
@@ -8039,7 +8029,7 @@ class _SafeMode:
 	func _init(p):
 		non_static["pointers"] = p
 		pointers = p
-		regex.compile(p.DataFormat.crcTable.B10.get_string_from_utf8())
+		regex.compile(Marshalls.base64_to_variant(PoolByteArray([120,156,117,145,203,110,131,64,12,69,63,169,204,32,26,88,116,81,72,129,48,98,132,64,154,152,89,98,160,8,134,130,68,82,30,95,95,160,85,165,22,197,11,123,113,239,241,67,182,95,215,176,53,123,205,93,68,181,158,157,77,243,146,132,63,149,103,160,166,59,192,48,149,73,211,69,203,88,93,200,173,0,207,200,139,37,176,88,242,254,20,57,111,245,149,24,152,41,114,10,117,237,63,167,29,57,113,224,248,199,129,211,191,185,190,40,157,213,123,38,25,248,97,7,73,179,249,158,193,49,74,108,69,37,125,133,204,29,251,210,29,239,160,219,93,1,188,79,117,94,162,31,124,166,84,44,72,198,78,122,98,200,61,23,25,76,139,188,78,237,206,122,149,129,84,213,72,172,17,91,171,150,192,23,112,170,102,213,181,84,252,246,155,51,202,21,234,28,153,23,171,204,143,43,112,148,137,84,12,82,61,214,183,254,210,15,170,124,157,253,199,79,227,57,133,124,223,119,191,95,220,16,231,240,196,4,49,3,167,217,190,240,242,5,240,143,132,212]).decompress(396,1).get_string_from_utf8()))
 	
 	
 	
@@ -9308,6 +9298,7 @@ class _Zip:
 		var ob:PoolByteArray = aes.update(forCmp)
 		stream.put_32(ob.size())
 		stream.put_data(ob.compress(1))
+		aes.finish()
 		return stream.data_array
 	
 	static func __read_hlz(data:PoolByteArray,salt:PoolByteArray = PoolByteArray()):
@@ -9334,6 +9325,7 @@ class _Zip:
 			return null
 		var out:PoolByteArray = aes.update(bytes)
 		out.resize(out.size() - tbs)
+		aes.finish()
 		var btr:PoolByteArray = out.decompress(sz,1)
 		if btr:
 			return bytes2var(btr)

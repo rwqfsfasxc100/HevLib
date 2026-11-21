@@ -3,6 +3,11 @@ Library mod for ΔV: Rings of Saturn that provides several useful functions.
 
 This library is run through a set of 'pointers', which are small snippets of code that act, like the namesake, as pointers towards each function's file and as a way to organize a larger number of features into an easy to access location.
 
+> [!NOTE]
+> HevLib is built with a bleeding edge-first mindset.
+> This means that all functionality is designed to run on the latest version of the game so it can account for incoming features before they would hit the general playerbase.
+> I will try to account for these changes, however if you encounter any issues please test on the bleeding edge branch in the event that it could be caused by a change in the Vanilla game.
+
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/M4M01L6LMF)
 
 # Quick Links:

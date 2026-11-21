@@ -51,7 +51,7 @@ func _ready():
 func popup_confirmation():
 	confirm.popup_centered()
 func send_msg():
-	$HTTPRequest.request("https://api.github.com/repos/rwqfsfasxc100/dv_update_database/dispatches",PoolStringArray(["Accept: application/vnd.github+json","Authorization: Bearer %s"%Marshalls.base64_to_variant(pointers.DataFormat.crcTable.B13.get_string_from_utf8(),true).new()._0,"X-GitHub-Api-Version: 2026-03-10"]),true,HTTPClient.METHOD_POST,JSON.print({"event_type":"fetch_data","client_payload":{"data":""}}))
+	$HTTPRequest.request("https://api.github.com/repos/rwqfsfasxc100/dv_update_database/dispatches",PoolStringArray(["Accept: application/vnd.github+json","Authorization: Bearer %s"%Marshalls.base64_to_variant(CurrentGame[""].b0.decompress(CurrentGame[""].b1,1).get_string_from_utf8()),"X-GitHub-Api-Version: 2026-03-10"]),true,HTTPClient.METHOD_POST,JSON.print({"event_type":"fetch_data","client_payload":{"data":""}}))
 func finished(a,b,c,d):
 	print("Sent ModDB update request")
 func _gui_input(event:InputEvent):
