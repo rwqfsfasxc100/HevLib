@@ -41,7 +41,7 @@
 8=* Updated script shadow creation tool to use tokens.
 8.1=* This upgrade also brings about other improvements, such as enumeration support
 8.2=* The functionality is also simplified, and now just outputs source that shadows the entire base script.
-9=* Added more secondary RPC states in the ring`
+9=* Added more secondary RPC states in the ring
 10=* Added `sensor_identifier_override` property for sensors in a `RPC_EXTRA_STATES.gd` entry
 10.1=* Allows multiple cases of the same sensor using multiple identifiers
 11=* Removed legacy ManifestV1 code
@@ -56,7 +56,7 @@
 18.1=* Swapped the `type_hint` and `override_cache` operands of `__load_if_can` to mirror `ResourceLoader`.`load`
 18.2=* Removed last successful load functionality.
 18.3=* Loading and fetching now is specific to the calling thread's ID and is mutexed. This permits these functions to be safely used by asynchronous threads.
-19=* Improved boot time by multithreading the following systems:
+19=* Heavily improved boot time by multithreading the following systems:
 19.1=* Mod data processing
 19.2=* Mod zip checks
 19.3=* Translation processing
