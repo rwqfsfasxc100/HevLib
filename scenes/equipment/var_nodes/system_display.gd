@@ -46,11 +46,10 @@ func getStatus():
 	return clamp(status,0.0,100.0)
 func getPower():
 	var value:float = 0.0
-	match typeof(power):
-		TYPE_INT:
-			value = power as float / 100.0
-		TYPE_REAL:
-			value = power
+	if power is int:
+		value = power / 100.0
+	elif power is float:
+		value = power
 	return value
 func _ready():
 	inspection = affect_inspection
