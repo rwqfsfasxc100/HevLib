@@ -7134,7 +7134,7 @@ class _ManifestV2:
 				var ed:String = subdata.get("original_path","")
 				if ed and not ed.begins_with("res:/"):
 					ed = "res:/" + ("" if ed.begins_with("/") else "/") + ed
-				elif path.get_extension() == "gd":
+				elif path.get_extension().to_lower() == "gd":
 					file.open(path,File.READ)
 					var data:String = file.get_as_text(true)
 					file.close()
