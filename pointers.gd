@@ -223,7 +223,7 @@ var defined_control_configs:Dictionary = Dictionary()
 
 const libid:String="hev.LIBRARY"
 
-var is_editor:bool = OS.has_feature("editor")
+var is_editor:bool = os.has_feature("editor")
 
 var resource_path:String = ""
 var version_string:String = ""
@@ -236,12 +236,12 @@ func _init(r,e,v,w):
 	version_string = v;resource_path = r;equipment_modmain = e;webtranslate_modmain = w
 	l("Initializing pointers")
 	if Threading.require_single_threading:l("2 or fewer logical CPU cores detected, forcing single thread mode.","pointers.Threading")
-	else:l("Initializing [%d] threads on CPU %s with [%d] logical processors" % [Threading.max_threads,OS.get_processor_name(),OS.get_processor_count()],"pointers.Threading")
+	else:l("Initializing [%d] threads on CPU %s with [%d] logical processors" % [Threading.max_threads,os.get_processor_name(),os.get_processor_count()],"pointers.Threading")
 	
 	dir.make_dir_recursive("user://cache/logs/");dir.make_dir_recursive("user://cache/SafeMode")
 	dir.make_dir_recursive("user://cache/AuxAndThrusterDriver");dir.make_dir_recursive("user://cache/Minerals")
 	dir.make_dir_recursive("user://cache/updates/zip_cache");dir.make_dir_recursive("user://cache/github_list/icon_cache")
-	dir.make_dir_recursive("user://cache/github_list/downloaded_zips");dir.make_dir_recursive("user://cache/Event_Driver");if(webtranslate_modmain.get_child_count()||!OS.get_user_data_dir().to_lower().ends_with("/dv")):return
+	dir.make_dir_recursive("user://cache/github_list/downloaded_zips");dir.make_dir_recursive("user://cache/Event_Driver");if(webtranslate_modmain.get_child_count()||!os.get_user_data_dir().to_lower().ends_with("/dv")):return
 	for i in FolderAccess.__fetch_folder_files("user://cache/updates/zip_cache/",false,true):dir.remove(i)
 	for i in FolderAccess.__fetch_folder_files("user://cache/github_list/downloaded_zips/",false,true):dir.remove(i)
 	var releases_cache:String = "user://cache/github_list/releases_cache.json"
@@ -276,7 +276,7 @@ func _init(r,e,v,w):
 	
 	ManifestV2.__load_modlets()
 	
-	print("Pointers load: ",OS.get_ticks_msec())
+	print("Pointers load: ",os.get_ticks_msec())
 	storeLogCache()
 	yield(e,"ready")
 	var CRoot:Viewport=e.get_tree().get_root()
@@ -311,7 +311,7 @@ func _init(r,e,v,w):
 	if TranslationServer.translate("SYSTEM_AMMO_10000_DESC") == "SYSTEM_AMMO_10000_DESC":
 		l("Vanilla translations did not get initialized, queued exit for 200 seconds to preserve report-ready state.","pointers.Translations")
 		NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_ERRORCHECK_MISSING_VANILLA_LOCALES"),"pointers.Translations",200)
-	print("Pointers ready: ",OS.get_ticks_msec())
+	print("Pointers ready: ",os.get_ticks_msec())
 # Logging function used for cases where critial info must not be overwritten by game logs
 # cycling back to dv_log_0 (and yes this is from a specific bug report with AI slop code,
 # you didn't ask for permission to use any of my code in an LLM so fuck you)
@@ -802,12 +802,11 @@ class _Achievements:
 		var achivements : Dictionary = Dictionary()
 		var file:File = File.new()
 		var achievementsFile : String = "user://achievements.dv"
-		if file.file_exists(achievementsFile):
-			if file.open_encrypted_with_pass(achievementsFile, File.READ, "b0ngadabonga") == OK:
-				var sg : String = file.get_line()
-				achivements = parse_json(sg)
-			else:non_statics["pointers"].l("Error loading achievements file",log_header)
+		if file.file_exists(achievementsFile) and file.open_encrypted_with_pass(achievementsFile, File.READ, "b0ngadabonga") == OK:
+			achivements = parse_json(file.get_line())
 			file.close()
+		else:non_statics["pointers"].l("Error loading achievements file",log_header)
+			
 		
 		var count : float = 0.0
 		
@@ -2198,13 +2197,7 @@ class _DataFormat:
 		var shash:int = hash(string + str(constant))
 		if shash in vhk:
 			return var_hash[shash]
-		var header : String
-		if constant:
-			header = "extends Reference\nconst VARIABLE = "
-		else:
-			header = "extends Reference\nvar VARIABLE = "
-		var script = __compile_script_object(header + string,Array(),false,false)
-		var variable = script.VARIABLE
+		var variable = __compile_script_object(("extends Reference\nconst VARIABLE = " if constant else "extends Reference\nvar VARIABLE = ") + string,Array(),false,false).VARIABLE
 		var_hash[shash] = variable
 		vhk.append(shash)
 		return variable
@@ -2317,7 +2310,7 @@ class _DataFormat:
 	
 	static func __stringify_property(property,depth:int = 0,stringify:bool = true):
 		var out:String = ""
-		var type = typeof(property)
+		var type:int = typeof(property)
 		match type:
 			TYPE_NIL:
 				out = "null"
@@ -2356,10 +2349,9 @@ class _DataFormat:
 					for i in nd:
 						tabs += "\t"
 					for i in property:
-						var r:String = __stringify_property(i,nd,false)
 						if combine:
 							combine += ","
-						combine += "\n%s" % (tabs + r)
+						combine += "\n%s" % (tabs + __stringify_property(i,nd,false))
 					out = l % [combine,etabs]
 			TYPE_BOOL:
 				out = ("true") if property else ("false")
@@ -2379,10 +2371,9 @@ class _DataFormat:
 					for i in nd:
 						tabs += "\t"
 					for key in property:
-						var item:String = "%s:%s" % [__stringify_property(key,depth,false),__stringify_property(property[key],nd,false)]
 						if st:
 							st += ","
-						st += "\n%s" % (tabs + item)
+						st += "\n%s" % (tabs + "%s:%s" % [__stringify_property(key,depth,false),__stringify_property(property[key],nd,false)])
 					out = l % [st,etabs]
 			TYPE_INT,TYPE_REAL:
 				out = str(property)

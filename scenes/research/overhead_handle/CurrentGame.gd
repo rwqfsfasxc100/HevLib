@@ -65,6 +65,9 @@ func advanceTimeBySeconds(seconds):
 	.advanceTimeBySeconds(seconds)
 	
 
+
+signal research_updated
+
 var active_projects:Array = Array()
 var inactive_projects:Array = Array()
 var complete_projects:Array = Array()
@@ -124,6 +127,4 @@ func get_inactive_research_projects() -> Array:
 
 func get_completed_research_projects() -> Array:
 	return complete_projects
-
-
 

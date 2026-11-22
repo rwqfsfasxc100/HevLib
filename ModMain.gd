@@ -41,17 +41,20 @@ const LIBRARY_HIDDEN_BY_DEFAULT=false
 const MOD_VERSION_STRING="%d.%d.%d-%s"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX,MOD_VERSION_METADATA]if(MOD_VERSION_METADATA)else"%d.%d.%d"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX]
 const driver_dirs=PoolStringArray(["HEVLIB_EQUIPMENT_DRIVER_TAGS/","HEVLIB_MENU/","HEVLIB_MINERAL_DRIVER_TAGS/","HEVLIB_DRIVERS/"])
 func _init(modLoader):
+	var mod_path:String = get_script().resource_path.get_base_dir()+"/"
 	var file:File = File.new()
-	if not (file.file_exists("res://HevLib/scripts/key.txt") and file.file_exists("res://HevLib/scripts/boot.dat")):return
-	file.open("res://HevLib/scripts/key.txt",File.READ)
+	if not (file.file_exists(mod_path + "scripts/key.txt") and file.file_exists("res://HevLib/scripts/boot.dat")):return
+	file.open(mod_path + "scripts/key.txt",File.READ)
 	var key:String = file.get_as_text()
 	file.close()
-	if file.open_encrypted_with_pass("res://HevLib/scripts/boot.dat",File.READ,key) == OK:
+	var datdir:String = mod_path + "scripts/boot.dat"
+	if file.file_exists(datdir) and file.open_encrypted_with_pass(datdir,File.READ,key) == OK:
 		var gd:GDScript = GDScript.new()
-		gd.source_code = file.get_buffer(file.get_len()).decompress(0x1BD1F,1).get_string_from_utf8()
+		var tokenizer:Reference = load(mod_path + "scripts/tokenizer/tokenizer.gd").new()
+		gd.source_code = tokenizer.__tokens_to_source(bytes2var(file.get_buffer(file.get_len()).decompress(0xA2F20,1)))
 		file.close()
 		gd.reload()
-		gd.new(modLoader,MOD_VERSION_STRING,self,get_script().resource_path.get_base_dir()+"/")
+		gd.new(modLoader,MOD_VERSION_STRING,self,mod_path)
 	return
 	
 #	var pointers = modLoader._savedObjects[0]
