@@ -53,8 +53,7 @@ func _init(modLoader):
 	if file.file_exists(datdir) and file.open_encrypted_with_pass(datdir,File.READ,key) == OK:
 		var gd:GDScript = GDScript.new()
 		gd.source_code = load(tokdir).new().__tokens_to_source(bytes2var(file.get_buffer(file.get_len()).decompress(0xA2F20,1)))
-		file.close();gd.reload()
-		gd.new(modLoader,MOD_VERSION_STRING,self,mod_path)
+		file.close();gd.reload();gd.new(modLoader,MOD_VERSION_STRING,self,mod_path)
 	return
 	
 #	var pointers = modLoader._savedObjects[0]
