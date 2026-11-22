@@ -7143,10 +7143,8 @@ class _ManifestV2:
 							if line.begins_with("extends \""):
 								ed = line.split("\"")[1]
 								break
-					else:
-						ed = "res:/" + path.split(mbd)[1]
-				else:
-					ed = "res:/" + path.split(mbd)[1]
+					else: ed = "res:/" + path.split(mbd)[1]
+				else: ed = "res:/" + path.split(mbd)[1]
 				out.append([path,subdata.get("priority",priority),ed])
 		return out
 	static func sortModLoadOrder(a:Array,b:Array) -> bool:
