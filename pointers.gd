@@ -7153,25 +7153,16 @@ class _ManifestV2:
 	static func sortModPathOrder(a:Array,b:Array) -> bool:
 		var oa:float = a[1]
 		var ob:float = b[1]
-		if oa != ob:
-			return oa < ob
-		var b1:PoolByteArray = a[2].to_ascii()
-		var b2:PoolByteArray = b[2].to_ascii()
-		if b1 != b2:
-			return b1 < b2
-		return false
+		return oa < ob if (oa != ob) else (a[2].to_ascii() < b[2].to_ascii())
 	
 	const disabledModletCache:Dictionary = Dictionary()
 	
 	static func __get_disabled_modlets() -> Dictionary:
 		if not disabledModletCache:
-			var disabled:Dictionary = Dictionary()
 			var all_modlets:Dictionary = __get_all_modlets(false)
 			for modlet in all_modlets.keys():
 				if not all_modlets[modlet] and non_static["pointers"].FileAccess.__file_exists(modlet):
-					disabled[modlet] = __parse_file_as_manifest(modlet).get("mod_information",Dictionary()).get("id","%s_MISSING_ID" % modlet)
-			disabledModletCache.clear()
-			disabledModletCache.merge(disabled)
+					disabledModletCache[modlet] = __parse_file_as_manifest(modlet).get("mod_information",Dictionary()).get("id","%s_MISSING_ID" % modlet)
 		return disabledModletCache.duplicate(true)
 	
 	static func __mod_exists(check_data) -> bool:
