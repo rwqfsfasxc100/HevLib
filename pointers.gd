@@ -7132,9 +7132,8 @@ class _ManifestV2:
 			var path:String = resource if resource.begins_with("res://" ) else (mbd + ("" if resource.begins_with("/") else "/") + resource)
 			if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
 				var ed:String = subdata.get("original_path","")
-				if ed:
-					if not ed.begins_with("res:/"):
-						ed = "res:/" + ("" if ed.begins_with("/") else "/") + ed
+				if ed and not ed.begins_with("res:/"):
+					ed = "res:/" + ("" if ed.begins_with("/") else "/") + ed
 				elif path.get_extension() == "gd":
 					file.open(path,File.READ)
 					var data:String = file.get_as_text(true)
