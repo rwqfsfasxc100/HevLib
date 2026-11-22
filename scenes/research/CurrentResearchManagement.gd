@@ -31,44 +31,62 @@
 
 extends MarginContainer
 
-onready var research_item:PackedScene = load("res://HevLib/scenes/research/research_item_box/ResearchItem.tscn")
+onready var research_item:PackedScene = load("res://HevLib/scenes/research/research_item_box/active/ResearchItem.tscn")
+onready var completed_research_item:PackedScene = load("res://HevLib/scenes/research/research_item_box/completed/ResearchItem.tscn")
 
 onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
-onready var current_mod_ids = pointers.ManifestV2.__get_mod_ids()
+onready var current_mod_ids:PoolStringArray = pointers.ManifestV2.__get_mod_ids()
 
-onready var active_list = $VBoxContainer/ActiveProjectsList/Projects
-onready var completed_list = $VBoxContainer/CompletedProjects/Projects
+onready var active_list:VBoxContainer = $VBoxContainer/ActiveProjectsList/Projects
+onready var completed_list:VBoxContainer = $VBoxContainer/CompletedProjects/Projects
 
-onready var active_projects_count_label = $VBoxContainer/MarginContainer/GridContainer/Active/ActiveValue 
-onready var completed_projects_count_label = $VBoxContainer/MarginContainer/GridContainer/Completed/CompletedValue 
+onready var active_projects_count_label:Label = $VBoxContainer/MarginContainer/GridContainer/Active/ActiveValue 
+onready var completed_projects_count_label:Label = $VBoxContainer/MarginContainer/GridContainer/Completed/CompletedValue 
 
-onready var show_completed_button = $VBoxContainer/MarginContainer2/HBoxContainer/CheckButton
+onready var show_completed_button:CheckButton = $VBoxContainer/MarginContainer2/HBoxContainer/CheckButton
 
-onready var completed_projects_header = $VBoxContainer/FinishedProjects
-onready var completed_projects_container = $VBoxContainer/CompletedProjects
+onready var completed_projects_header:Label = $VBoxContainer/FinishedProjects
+onready var completed_projects_container:VBoxContainer = $VBoxContainer/CompletedProjects
 
-var has_operated = false
+var project_mutex:Mutex = Mutex.new()
+var adding_flag:bool = false
 
 func _ready():
 	show_completed_button.connect("toggled",self,"toggle_completed_visibility")
 	connect("visibility_changed",self,"vis_changed")
-	_initialize()
+	add_projects()
+	CurrentGame.connect("research_project_reassignment",self,"add_projects")
 
-func _initialize():
+func add_projects():
+	Tool.deferCallInPhysics(self,"do_add_projects")
+
+func do_add_projects():
+	project_mutex.lock()
+	if adding_flag:
+		pointers.l("Already loading current projects","HevLib Research")
+		project_mutex.unlock()
+		return
+	adding_flag = true
+	for i in active_list.get_children() + completed_list.get_children():
+		Tool.remove(i)
 	for obj in CurrentGame.get_active_research_projects():
-		var p:Node = research_item.instance()
-		p.this_research_project = obj
-		p.name = obj.source + "|" + obj.name
-		completed_list.add_child(p)
-	for obj in CurrentGame.get_completed_research_projects():
-		var p:Node = research_item.instance()
+		var p:HBoxContainer = research_item.instance()
 		p.this_research_project = obj
 		p.name = obj.source + "|" + obj.name
 		active_list.add_child(p)
-		
+		if not is_visible_in_tree() and is_inside_tree():
+			yield(pointers,"physics_process_tick")
+	for obj in CurrentGame.get_completed_research_projects():
+		var p:HBoxContainer = completed_research_item.instance()
+		p.this_research_project = obj
+		p.name = obj.source + "|" + obj.name
+		completed_list.add_child(p)
+		if not is_visible_in_tree() and is_inside_tree():
+			yield(pointers,"physics_process_tick")
 	
 	
-	pass
+	
+	
 
 func vis_changed():
 	if is_visible_in_tree():

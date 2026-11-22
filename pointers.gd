@@ -7037,7 +7037,7 @@ class _ManifestV2:
 			["res://HevLib/scenes/minerals/ProcessedCargoManifest.gd", -INF, "res://hud/trtl/ProcessedCargoManifest.gd"],
 			["res://HevLib/scenes/minerals/TheRing.gd", -INF, "res://TheRing.gd"],
 			["res://HevLib/scenes/research/Enceladus.gd", -INF, "res://enceladus/Enceladus.gd"],
-			["res://HevLib/scenes/research/overhead_handle/CurrentGame.gd", -INF, "res://CurrentGame.gd"],
+			["res://HevLib/scenes/research/CurrentGame.gd", -INF, "res://CurrentGame.gd"],
 			["res://HevLib/scenes/equipment/SystemShipUpgradeUI.gd", -INF, "res://enceladus/SystemShipUpgradeUI.gd"],
 			["res://HevLib/scenes/equipment/SystemBuyUI.gd", -INF, "res://enceladus/SystemBuyUI.gd"],
 			["res://HevLib/scenes/equipment/UpgradeGroup.gd", -INF, "res://enceladus/UpgradeGroup.gd"],
@@ -7110,20 +7110,17 @@ class _ManifestV2:
 			else: ovr[extra].append(f)
 		var LO:Array = pointers.SafeMode.vanilla_load_order
 		var order:Array = Array()
-		var no_order:Array = Array()
 		for i in ovr:
 			var paths:Array = ovr[i]
-			paths.sort_custom(non_static["self"],"sortModPathOrder")
+			paths.sort_custom(base,"sortModPathOrder")
 			order.append([i,paths,LO.find(i)])
-		order.sort_custom(non_static["self"],"sortModLoadOrder")
+		order.sort_custom(base,"sortModLoadOrder")
 		for r in order:
 			for i in r[1]:
 				var path:String = i[0]
 				var ext:String = path.get_extension().to_lower()
-				if (ext == "gd" or ext == "gdc"):
-					pointers.DataFormat.__override_script(path,r[0],pointers)
-				else:
-					pointers.DataFormat.__replace_resource(path,r[0],pointers)
+				if (ext == "gd" or ext == "gdc"): pointers.DataFormat.__override_script(path,r[0],pointers)
+				else: pointers.DataFormat.__replace_resource(path,r[0],pointers)
 		pointers.l("%d modlet resources loaded." % order.size(),"pointers.SafeMode")
 	
 	static func process_mod_data_for_load(resources:Dictionary,modlet:String,pointers:HevLibPointers,priority:float):
@@ -7147,11 +7144,7 @@ class _ManifestV2:
 							if line.begins_with("extends \""):
 								ed = line.split("\"")[1]
 								break
-				out.append([
-					path,
-					subdata.get("priority",priority),
-					(ed if ed else "res:/" + path.split(mbd)[1]),
-				])
+				out.append([path,subdata.get("priority",priority),(ed if ed else "res:/" + path.split(mbd)[1])])
 		return out
 	static func sortModLoadOrder(a:Array,b:Array) -> bool:
 		return a[2] < b[2]

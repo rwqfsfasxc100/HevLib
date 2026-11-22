@@ -31,20 +31,20 @@
 
 extends MarginContainer
 
-onready var research_item = load("res://HevLib/scenes/research/research_item_box/ResearchItem.tscn")
+onready var research_item:PackedScene = load("res://HevLib/scenes/research/research_item_box/inactive/ResearchItem.tscn")
 var research_state:Dictionary = Dictionary()
 
 onready var pointers:HevLibPointers = ModLoader._savedObjects[0]
-onready var current_mod_ids = pointers.ManifestV2.__get_mod_ids()
+onready var current_mod_ids:PoolStringArray = pointers.ManifestV2.__get_mod_ids()
 
-onready var inactive_list = $Scroll/Items
+onready var inactive_list:VBoxContainer = $Scroll/Items
 
 func _ready() -> void:
 	_initialize()
 
 func _initialize():
 	for obj in CurrentGame.get_inactive_research_projects():
-		var p:Node = research_item.instance()
+		var p:HBoxContainer = research_item.instance()
 		p.this_research_project = obj
 		p.name = obj.source + "|" + obj.name
 		inactive_list.add_child(p)

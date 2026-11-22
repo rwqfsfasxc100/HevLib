@@ -67,6 +67,7 @@ func advanceTimeBySeconds(seconds):
 
 
 signal research_updated
+signal research_project_reassignment
 
 var active_projects:Array = Array()
 var inactive_projects:Array = Array()
