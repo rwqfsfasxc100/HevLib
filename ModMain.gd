@@ -42,15 +42,17 @@ const MOD_VERSION_STRING="%d.%d.%d-%s"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_
 const driver_dirs=PoolStringArray(["HEVLIB_EQUIPMENT_DRIVER_TAGS/","HEVLIB_MENU/","HEVLIB_MINERAL_DRIVER_TAGS/","HEVLIB_DRIVERS/"])
 func _init(modLoader):
 	var mod_path:String = get_script().resource_path.get_base_dir()+"/"
+	var datdir:String = mod_path + "scripts/boot.dat"
+	var tokdir:String = mod_path + "scripts/tokenizer/tokenizer.gd"
+	var keydir:String = mod_path + "scripts/key.dat"
 	var file:File = File.new()
-	if not (file.file_exists(mod_path + "scripts/key.txt") and file.file_exists("res://HevLib/scripts/boot.dat")):return
-	file.open(mod_path + "scripts/key.txt",File.READ)
+	if not (file.file_exists(keydir) and file.file_exists(datdir) and file.file_exists(tokdir)):return
+	file.open(keydir,File.READ)
 	var key:String = file.get_as_text()
 	file.close()
-	var datdir:String = mod_path + "scripts/boot.dat"
 	if file.file_exists(datdir) and file.open_encrypted_with_pass(datdir,File.READ,key) == OK:
 		var gd:GDScript = GDScript.new()
-		var tokenizer:Reference = load(mod_path + "scripts/tokenizer/tokenizer.gd").new()
+		var tokenizer:Reference = load(tokdir).new()
 		gd.source_code = tokenizer.__tokens_to_source(bytes2var(file.get_buffer(file.get_len()).decompress(0xA2F20,1)))
 		file.close()
 		gd.reload()
