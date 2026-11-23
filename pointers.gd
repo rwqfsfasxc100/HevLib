@@ -7168,10 +7168,6 @@ class _ManifestV2:
 			paths.sort_custom(base,"sortModPathOrder")
 			order.append([i,paths,LO.find(i)])
 		order.sort_custom(base,"sortModLoadOrder")
-		var file:File = File.new()
-		file.open("user://dump.json",File.WRITE)
-		file.store_string(JSON.print(order,"\t"))
-		file.close()
 		for r in order:
 			for i in r[1]:
 				var path:String = i[0]
