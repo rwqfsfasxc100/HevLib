@@ -7581,8 +7581,7 @@ class _NodeAccess:
 		pointers.storeLogCache()
 		if restart:
 			OS.execute(OS.get_executable_path(), OS.get_cmdline_args(), false)
-			return
-		if exit_url and pointers.DataFormat.__is_valid_url(exit_url):
+		elif exit_url and pointers.DataFormat.__is_valid_url(exit_url):
 			OS.shell_open(exit_url)
 		if pointers.is_inside_tree():
 			yield(pointers,"process_tick")
