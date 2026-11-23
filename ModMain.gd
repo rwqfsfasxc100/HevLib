@@ -41,8 +41,6 @@ const LIBRARY_HIDDEN_BY_DEFAULT=false
 const MOD_VERSION_STRING="%d.%d.%d-%s"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX,MOD_VERSION_METADATA]if(MOD_VERSION_METADATA)else"%d.%d.%d"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX]
 const driver_dirs=PoolStringArray(["HEVLIB_EQUIPMENT_DRIVER_TAGS/","HEVLIB_MENU/","HEVLIB_MINERAL_DRIVER_TAGS/","HEVLIB_DRIVERS/"])
 func _init(modLoader):
-	var dr = load("res://Test/compiled/input_data/compiler.gd").compile()
-	breakpoint
 	var mod_path:String = get_script().resource_path.get_base_dir()+"/"
 	var datdir:String = mod_path + "scripts/boot.dat"
 	var tokdir:String = mod_path + "scripts/tokenizer/tokenizer.gd"
