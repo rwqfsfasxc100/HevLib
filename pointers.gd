@@ -238,6 +238,8 @@ func _init(e,v,w):
 	if Threading.require_single_threading:l("2 or fewer logical CPU cores detected, forcing single thread mode.","pointers.Threading")
 	else:l("Initializing [%d] threads on CPU %s with [%d] logical processors" % [Threading.max_threads,os.get_processor_name(),os.get_processor_count()],"pointers.Threading")
 	
+	DataFormat.__get_vanilla_version()
+	
 	dir.make_dir_recursive("user://cache/logs/");dir.make_dir_recursive("user://cache/SafeMode")
 	dir.make_dir_recursive("user://cache/AuxAndThrusterDriver");dir.make_dir_recursive("user://cache/Minerals")
 	dir.make_dir_recursive("user://cache/updates/zip_cache");dir.make_dir_recursive("user://cache/github_list/icon_cache")
@@ -613,6 +615,8 @@ const BASE_MANIFEST_TEMPLATE : Dictionary = {
 		"changelog_path":"", # This is relative to the ModMain.gd file. EXAMPLE: for a file at 'res://Example Mod/data/folder/changelogs.txt', you would put 'data/folder/changelogs.txt'
 		"modlet_priority":0, # SPECIFIC TO MODLETS! The order at which the modlet would be loaded. Most modlets load before other mods, but this will affect load order within the list of installed modlets
 		"expected_manifest_path":"", # If set and used for a mod's manifest, the res:// filepath the manifest is expected to be at. If it isn't, prevents the mod from loading and closes the game.
+		"minimum_game_version":PoolIntArray([0,0,0]), # Minimum game version needed to run this mod, set above zero to use. This permits arbritrary values, as I have no means of automatically fetching the current stable/bleeding version.
+		"maximum_game_version":PoolIntArray([0,0,0]), # Maximum game version that can run this mod, set above zero to use. This should only be used if a bleeding edge version is known to perform a breaking change.
 	}
 }
 const DO_TEST_MOD_UPDATES = false
@@ -706,8 +710,6 @@ load("%s"),
 load("%s"),
 load("%s")
 ]"""
-
-
 
 class _Achievements:
 	var http:HTTPRequest
@@ -1246,11 +1248,19 @@ class _ConfigDriver:
 					if cfg.hash() != 177591:
 						configs[modName] = cfg
 				# Checking for mods that require specific filepaths
-				var expected_path:String = manifest["manifest_data"]["manifest_definitions"]["expected_manifest_path"]
+				var MD:Dictionary = manifest["manifest_data"]["manifest_definitions"]
+				if manifest_version >= 2.3:
+					var min_ver:PoolIntArray = PoolIntArray(MD["minimum_game_version"])
+					var max_ver:PoolIntArray = PoolIntArray(MD["maximum_game_version"])
+					if min_ver.size() > 2 and (min_ver[0] > 0 or min_ver[1] > 0 or min_ver[2] > 0) and pointers.DataFormat.__compare_version_arrays(min_ver,VANILLA_VERSION,false):
+						breakpoint
+					if max_ver.size() > 2 and(max_ver[0] > 0 or max_ver[1] > 0 or max_ver[2] > 0) and pointers.DataFormat.__compare_version_arrays(max_ver,VANILLA_VERSION,true):
+						breakpoint
+				var expected_path:String = MD["expected_manifest_path"]
 				var actual_path:String = manifest["manifest_file_path"]
 				if expected_path and expected_path.to_lower() != actual_path.to_lower():
 					incorrect_paths.append("%s: Expected manifest path: [%s]; actual manifest path: [%s]" % [manifest["manifest_data"]["mod_information"]["id"],expected_path,actual_path])
-				for requirement in manifest["manifest_data"]["manifest_definitions"]["dependancy_mod_ids"]:
+				for requirement in MD["dependancy_mod_ids"]:
 					if requirement is Array:
 						var doesHaveAny:bool = false
 						var needsEitherOf:PoolStringArray = PoolStringArray()
@@ -1269,7 +1279,7 @@ class _ConfigDriver:
 							var ov:String = __get_minmax_string_from_dict(requirement)
 							if ov:
 								missing_requirements.append(ov)
-				for incompat in manifest["manifest_data"]["manifest_definitions"]["conflicting_mod_ids"]:
+				for incompat in MD["conflicting_mod_ids"]:
 					if incompat is Array:
 						var doesHaveAny:bool = false
 						var needsEitherOf:PoolStringArray = PoolStringArray()
@@ -1804,16 +1814,38 @@ class _DataFormat:
 				returning_keys.append_array(__sift_dictionary(kdata,search_keys))
 		return returning_keys
 	
-	static func __compare_versions(primary_major : int,primary_minor : int,primary_bugfix : int, compare_major : int, compare_minor : int, compare_bugfix : int) -> bool:
-		if primary_major < compare_major:
-			return false
-		elif primary_major == compare_major:
-			if primary_minor < compare_minor:
+	static func __compare_versions(primary_major : int,primary_minor : int,primary_bugfix : int, compare_major : int, compare_minor : int, compare_bugfix : int,invert : bool = false) -> bool:
+		if invert:
+			if primary_major > compare_major:
 				return false
-			elif primary_minor == compare_minor:
-				if primary_bugfix < compare_bugfix:
+			elif primary_major == compare_major:
+				if primary_minor > compare_minor:
 					return false
-		return true
+				elif primary_minor == compare_minor:
+					if primary_bugfix > compare_bugfix:
+						return false
+			return true
+		else:
+			if primary_major < compare_major:
+				return false
+			elif primary_major == compare_major:
+				if primary_minor < compare_minor:
+					return false
+				elif primary_minor == compare_minor:
+					if primary_bugfix < compare_bugfix:
+						return false
+			return true
+	
+	static func __compare_version_arrays(primary:PoolIntArray, compare:PoolIntArray,invert:bool = false) -> bool:
+		if primary.size() < 3 or compare.size() < 3:
+			return false
+		var primary_major : int = primary[0]
+		var primary_minor : int = primary[1]
+		var primary_bugfix : int = primary[2]
+		var compare_major : int = compare[0]
+		var compare_minor : int = compare[1]
+		var compare_bugfix : int = compare[2]
+		return __compare_versions(primary_major,primary_minor,primary_bugfix, compare_major, compare_minor, compare_bugfix,invert)
 	
 	static func __sift_ship_config(dictionary: Dictionary,search_keys: Array,cfgs_to_ignore:Array,return_only_system_names:bool = false,parent:String = "") -> Array:
 		for i in cfgs_to_ignore:
@@ -2610,7 +2642,7 @@ class _DriverManagement:
 					continue
 				this_mod_data["id"] = id
 				this_mod_data["priority"] = mrv.get("modlet_priority",0)
-				this_mod_data["drivers"] = __get_drivers_from_modmain_path(manifest_path,false,manifest_ver >= 2.3)
+				this_mod_data["drivers"] = __get_drivers_from_modmain_path(manifest_path,false,manifest_ver >= 2.4)
 				this_mod_data["mod_directory"] = modFolder
 				if this_mod_data["drivers"] and ((not get_ids) or (get_ids and id in get_ids)):
 					driver_store.append(this_mod_data)
@@ -2750,15 +2782,14 @@ class _Equipment:
 	
 	var needs_autoload_funcref:Dictionary = Dictionary()
 	
-	var version : PoolIntArray = PoolIntArray([1,0,0])
+	
 	
 	
 	
 	const log_header = "pointers.Equipment"
 	
 	func __make_upgrades_scene():
-		version = pointers.DataFormat.__get_vanilla_version()
-		pointers.l("observed game version of %d.%d.%d" % Array(version),log_header)
+		pointers.l("observed game version of %d.%d.%d" % Array(VANILLA_VERSION),log_header)
 		
 		
 		var all_slot_node_names : PoolStringArray = PoolStringArray(VANILLA_SLOT_TYPES.keys())
@@ -4241,14 +4272,14 @@ script = ExtResource( 5 )"""
 	func confirm_equipment(equipment_node:Dictionary, slot_type, slot_alignment:String, slot_restriction:String, slot_allowed_equipment:PoolStringArray) -> bool:
 		if equipment_node.get("system","") in vanilla_data.min_version:
 			var data : Array = vanilla_data.min_version.get(equipment_node.system)
-			var failtext : String = "Equipment %s not adding due to old game version. Needed min version: %s ; observed game version: %s" % [str(equipment_node.get("system","")), str(data), str(version)]
-			if data[0] < version[0]:
+			var failtext : String = "Equipment %s not adding due to old game version. Needed min version: %s ; observed game version: %d.%d.%d" % [str(equipment_node.get("system","")), str(data), VANILLA_VERSION[0], VANILLA_VERSION[1], VANILLA_VERSION[2]]
+			if data[0] < VANILLA_VERSION[0]:
 				pass
-			elif data[0] == version[0]:
-				if data[1] < version[1]:
+			elif data[0] == VANILLA_VERSION[0]:
+				if data[1] < VANILLA_VERSION[1]:
 					pass
-				elif data[1] == version[1]:
-					if data[2] <= version[2]:
+				elif data[1] == VANILLA_VERSION[1]:
+					if data[2] <= VANILLA_VERSION[2]:
 						pass
 					else:
 						pointers.l(failtext,log_header)
@@ -6381,7 +6412,7 @@ class _ManifestV2:
 							dict_template["manifest_definitions"]["dependancy_mod_ids"] = Array(manifest_data["manifest_definitions"].get("dependancy_mod_ids",Array()))
 							dict_template["manifest_definitions"]["conflicting_mod_ids"] = Array(manifest_data["manifest_definitions"].get("conflicting_mod_ids",Array()))
 							dict_template["manifest_definitions"]["complementary_mod_ids"] = Array(manifest_data["manifest_definitions"].get("complementary_mod_ids",Array()))
-					2.2,2.3:
+					2.2,2.3,2.4:
 						if "mod_information" in manifestKeys:
 							dict_template["mod_information"]["id"] = String(manifest_data["mod_information"].get("id",""))
 							dict_template["mod_information"]["name"] = String(manifest_data["mod_information"].get("name",""))
@@ -6405,6 +6436,8 @@ class _ManifestV2:
 							dict_template["manifest_definitions"]["changelog_path"] = String(manifest_data["manifest_definitions"].get("changelog_path",""))
 							dict_template["manifest_definitions"]["modlet_priority"] = int(manifest_data["manifest_definitions"].get("modlet_priority",0))
 							dict_template["manifest_definitions"]["expected_manifest_path"] = String(manifest_data["manifest_definitions"].get("expected_manifest_path",""))
+							dict_template["manifest_definitions"]["minimum_game_version"] = PoolIntArray(manifest_data["manifest_definitions"].get("minimum_game_version",PoolIntArray([0,0,0])))
+							dict_template["manifest_definitions"]["maximum_game_version"] = PoolIntArray(manifest_data["manifest_definitions"].get("maximum_game_version",PoolIntArray([0,0,0])))
 						
 						if "links" in manifestKeys:
 							var links:Dictionary = manifest_data["links"]

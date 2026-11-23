@@ -10,8 +10,8 @@ credits=PoolStringArray( "HEVLIB_CREDITS_CONTRIBUTORS_HEADER", "HEVLIB_CREDITS_C
 [version]
 
 version_major=1
-version_minor=17
-version_bugfix=8
+version_minor=18
+version_bugfix=0
 
 [tags]
 
@@ -556,6 +556,7 @@ always_display=true
 
 [manifest_definitions]
 
-manifest_version=2.2
+manifest_version=2.3
 manifest_url="https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest"
 changelog_path="changelog.txt"
+maximum_game_version=PoolIntArray( 1, 90, 12 )

@@ -293,6 +293,18 @@ class DataFormat:
 						"compare_major -> (int) major version number of the compared version",
 						"compare_minor -> (int) minor version number of the compared version",
 						"compare_bugfix -> (int) bugfix version number of the compared version",
+						"invert (optional) -> (bool) whether the search should be primary <= compare rather than primary >= compare",
+					],
+					"return":[
+						"Bool that's true only when the primary version is equal or higher than the compared version"
+					]
+				},
+				"__compare_version_arrays":{
+					"description":"Compares two semantically formatted versions as PoolIntArrays. Primary version must be equal or newer than the checked version to return true, otherwise returns false. Both arrays must have at least 3 members, or else always returns false",
+					"args":[
+						"primary -> (PoolIntArray) primary version. Must contain at least 3 members or else the method fails",
+						"compare -> (PoolIntArray) compared version. Must contain at least 3 members or else the method fails",
+						"invert (optional) -> (bool) whether the search should be primary <= compare rather than primary >= compare",
 					],
 					"return":[
 						"Bool that's true only when the primary version is equal or higher than the compared version"

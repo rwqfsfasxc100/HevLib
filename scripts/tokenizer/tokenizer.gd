@@ -30,6 +30,7 @@
 # [/license]
 
 extends Reference
+class_name Tokenizer
 
 static func __source_to_tokens(source_code:String) -> Array:
 	var token_store:Array = Array()
