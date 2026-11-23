@@ -154,7 +154,7 @@
 71.1=* Equivalent to `DataFormat`.`__compare_versions`, just with two PoolIntArray inputs
 72=* Updated manifest to ManifestV2.3
 73=* Added means to invert the output of `DataFormat`.`__compare_versions` & `__compare_version_arrays`
-73.1=* Causes methods to compare as primary <= compare, rather than primary >= compare
+73.1=* Causes methods to compare as primary < compare, rather than primary >= compare
 74=* Added game version locks to the manifest definitions section of manifests
 74.1=* Used to prevent loading on game versions older or newer than those provided
 74.2=* Required if a feature or change from a bleeding-edge version breaks your mod in a way that cannot be fixed easily
