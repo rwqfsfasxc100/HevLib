@@ -225,15 +225,15 @@ const libid:String="hev.LIBRARY"
 
 var is_editor:bool = os.has_feature("editor")
 
-var resource_path:String = ""
+const resource_path:String = "res://HevLib/pointers.gd"
 var version_string:String = ""
 
 const _savedObjects = Array()
-func _init(r,e,v,w):
+func _init(e,v,w):
 	if is_editor:
 		ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","compile",false);if!file.file_exists("res://VersionLabel.tscn"):return
 	name = "HevLib~Pointers"
-	version_string = v;resource_path = r;equipment_modmain = e;webtranslate_modmain = w
+	version_string = v;equipment_modmain = e;webtranslate_modmain = w
 	l("Initializing pointers")
 	if Threading.require_single_threading:l("2 or fewer logical CPU cores detected, forcing single thread mode.","pointers.Threading")
 	else:l("Initializing [%d] threads on CPU %s with [%d] logical processors" % [Threading.max_threads,os.get_processor_name(),os.get_processor_count()],"pointers.Threading")
