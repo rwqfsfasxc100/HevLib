@@ -46,7 +46,7 @@ onready var completed_projects_count_label:Label = $VBoxContainer/MarginContaine
 onready var show_completed_button:CheckButton = $VBoxContainer/MarginContainer2/HBoxContainer/CheckButton
 
 onready var completed_projects_header:Label = $VBoxContainer/FinishedProjects
-onready var completed_projects_container:VBoxContainer = $VBoxContainer/CompletedProjects
+onready var completed_projects_container:ScrollContainer = $VBoxContainer/CompletedProjects
 
 var project_mutex:Mutex = Mutex.new()
 var adding_flag:bool = false

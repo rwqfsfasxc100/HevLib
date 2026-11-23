@@ -2163,7 +2163,7 @@ class _DataFormat:
 			__replace_scene(p,scene_path,"",true,pointers)
 	
 	static func __replace_resource(resource_path:String, original_path:String,pointers:HevLibPointers = non_statics["pointers"]):
-		if not (ResourceLoader.exists(resource_path) and File.new().file_exists(original_path)):
+		if not (ResourceLoader.exists(resource_path) or File.new().file_exists(original_path)):
 			pointers.l("Cannot replace resource at [%s] as it either does not exist or is not visible to the engine" % resource_path,log_header)
 			return
 		pointers.l("Replacing object resources @ [%s] with [%s]" % [original_path,resource_path],log_header)
@@ -3703,6 +3703,7 @@ script = ExtResource( 5 )"""
 			if pointers.DataFormat.__load_if_can(i,"Script"):
 				var sensorItems:Array = sensor_refs_to_write[i]
 				var refobject:Object = pointers.DataFormat.__get_load().new()
+				_savedObjects.append(refobject)
 				for sensorItem in sensorItems:
 					sensorItem["funcref"] = funcref(refobject,sensorItem.func_method_name)
 	
@@ -5519,25 +5520,15 @@ class _ManifestV2:
 				else:
 					non_library_count += 1
 			cached_mod_keys.append_array(cached_mod_list.keys())
-			if not "res://HevLib/ModMain.gd" in cached_mod_keys or not ResourceLoader.exists("res://HevLib/pointers.gd"):
-				if cached_mod_list.size():
-					pointers.NodeAccess.__exit(
-						false,
-						"Mod data was successfully fetched, but HevLib was not found. Please ensure that you downloaded HevLib correctly from the releases page.\n\nClosing this popup will crash the game & open HevLib's latest release page.",
-						"pointers.ManifestV2",
-						0.0,
-						"https://github.com/rwqfsfasxc100/HevLib/releases/latest",
-						true
-					)
-				else:
-					pointers.NodeAccess.__exit(
-						false,
-						"Mod data was not successfully fetched, assuming that a severe bug with HevLib filesystem querying on non-editor builds has occurred. You will need to manually update due to an issue of this severity.\n\nClosing this popup will crash the game & open Hev's bug report form so the issue can be addressed.",
-						"pointers.ManifestV2",
-						0.0,
-						"https://forms.gle/RmC4Zgonp6frFgnK7",
-						true
-					)
+			if not ("res://HevLib/ModMain.gd" in cached_mod_keys and ResourceLoader.exists("res://HevLib/pointers.gd")):
+				pointers.NodeAccess.__exit(
+					false,
+					"Mod data was not successfully fetched, assuming that a severe bug with HevLib filesystem querying on non-editor builds has occurred. You will need to manually update due to an issue of this severity.\n\nClosing this popup will crash the game & open Hev's bug report form so the issue can be addressed.",
+					"pointers.ManifestV2",
+					0.0,
+					"https://forms.gle/RmC4Zgonp6frFgnK7",
+					true
+				)
 			cached_mod_statistics["counts"] = {"total_mod_count":total_mod_count,"mods_using_manifests":manifest_count,"mods":non_library_count,"libraries":library_count}
 			cached_mod_statistics["tags"] = stat_tags
 			if not base.currentModHash:
