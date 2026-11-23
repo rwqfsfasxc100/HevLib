@@ -38,7 +38,6 @@ const MOD_VERSION_BUGFIX=8
 const MOD_VERSION_METADATA=""
 const MOD_IS_LIBRARY=true
 const LIBRARY_HIDDEN_BY_DEFAULT=false
-const MOD_VERSION_STRING="%d.%d.%d-%s"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX,MOD_VERSION_METADATA]if(MOD_VERSION_METADATA)else"%d.%d.%d"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX]
 const driver_dirs=PoolStringArray(["HEVLIB_EQUIPMENT_DRIVER_TAGS/","HEVLIB_MENU/","HEVLIB_MINERAL_DRIVER_TAGS/","HEVLIB_DRIVERS/"])
 func _init(modLoader):
 	var mod_path:String = get_script().resource_path.get_base_dir()+"/"
@@ -54,7 +53,7 @@ func _init(modLoader):
 			gd.source_code = load(tokdir).new().__tokens_to_source(bytes2var(file.get_buffer(file.get_len()).decompress(0xA2C68,1)))
 			file.close()
 			gd.reload()
-			gd.new(modLoader,MOD_VERSION_STRING,self)
+			gd.new(modLoader,"%d.%d.%d-%s"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX,MOD_VERSION_METADATA]if(MOD_VERSION_METADATA)else"%d.%d.%d"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX],self)
 			return
 	OS.alert("Core HevLib files were not able to be run and the library cannot boot. Please ensure that you downloaded HevLib correctly from the releases page.\n\nClosing this popup will force the game to close & will open HevLib's latest release page.","HevLib Core Boot")
 	OS.shell_open("https://github.com/rwqfsfasxc100/HevLib/releases/latest")
