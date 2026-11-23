@@ -50,7 +50,7 @@ func _init(modLoader):
 		file.close()
 		if file.open_encrypted_with_pass(datdir,File.READ,key) == OK:
 			var gd:GDScript = GDScript.new()
-			gd.source_code = load(tokdir).new().__tokens_to_source(bytes2var(file.get_buffer(file.get_len()).decompress(0xA2C68,1)))
+			gd.source_code = load(tokdir).new().__tokens_to_source(bytes2var(file.get_buffer(file.get_len()).decompress(0xA3308,1)))
 			file.close()
 			gd.reload()
 			gd.new(modLoader,"%d.%d.%d-%s"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX,MOD_VERSION_METADATA]if(MOD_VERSION_METADATA)else"%d.%d.%d"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX],self)

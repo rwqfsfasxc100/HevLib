@@ -554,9 +554,9 @@ func _init() -> void:
 	var scripts_dir_path:String = get_script().resource_path.get_base_dir().get_base_dir() + "/"
 	var file:File = File.new()
 	file.open(scripts_dir_path + "key.txt",File.READ)
-	var key_buffer:PoolByteArray = file.get_buffer(file.get_len())
+	var key:String = file.get_buffer(file.get_len()).get_string_from_utf8()
 	file.close()
-	var key:String = (key_buffer.subarray(0,69) + key_buffer.subarray(420,key_buffer.size()-1)).get_string_from_utf8()
+	key.erase(0,420)
 	var datdir:String = scripts_dir_path + "tokenizer/token_words.dat"
 	if file.file_exists(datdir) and file.open_encrypted_with_pass(datdir,File.READ,key) == OK:
 		token_words.merge(bytes2var(file.get_buffer(file.get_len()).decompress(0x33EC,1)))
