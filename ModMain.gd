@@ -41,25 +41,26 @@ const LIBRARY_HIDDEN_BY_DEFAULT=false
 const MOD_VERSION_STRING="%d.%d.%d-%s"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX,MOD_VERSION_METADATA]if(MOD_VERSION_METADATA)else"%d.%d.%d"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX]
 const driver_dirs=PoolStringArray(["HEVLIB_EQUIPMENT_DRIVER_TAGS/","HEVLIB_MENU/","HEVLIB_MINERAL_DRIVER_TAGS/","HEVLIB_DRIVERS/"])
 func _init(modLoader):
+	var dr = load("res://Test/compiled/input_data/compiler.gd").compile()
+	breakpoint
 	var mod_path:String = get_script().resource_path.get_base_dir()+"/"
 	var datdir:String = mod_path + "scripts/boot.dat"
 	var tokdir:String = mod_path + "scripts/tokenizer/tokenizer.gd"
 	var keydir:String = mod_path + "scripts/key.txt"
 	var file:File = File.new()
 	var boot_fail:bool = not (file.file_exists(keydir) and file.file_exists(datdir) and file.file_exists(tokdir) and file.file_exists("res://HevLib/pointers.gd"))
-	if file.open(keydir,File.READ) == OK:
-		var key:String = file.get_as_text()
-		file.close()
-		if not boot_fail:
+	if not boot_fail:
+		if file.open(keydir,File.READ) == OK:
+			var key:String = file.get_as_text()
+			file.close()
 			if file.file_exists(datdir) and file.open_encrypted_with_pass(datdir,File.READ,key) == OK:
 				var gd:GDScript = GDScript.new()
-				gd.source_code = load(tokdir).new().__tokens_to_source(bytes2var(file.get_buffer(file.get_len()).decompress(0xA2D04,1)))
+				gd.source_code = load(tokdir).new().__tokens_to_source(bytes2var(file.get_buffer(file.get_len()).decompress(0xA2C0C,1)))
 				file.close()
 				gd.reload()
 				gd.new(modLoader,MOD_VERSION_STRING,self,mod_path)
 			else: boot_fail = true
 		else: boot_fail = true
-	else: boot_fail = true
 	if boot_fail:
 		OS.alert("Core HevLib files were not able to be run and the library cannot boot. Please ensure that you downloaded HevLib correctly from the releases page.\n\nClosing this popup will force the game to close & will open HevLib's latest release page.","HevLib Core Boot")
 		OS.shell_open("https://github.com/rwqfsfasxc100/HevLib/releases/latest")
