@@ -245,7 +245,7 @@ func _init(r,e,v,w):
 	for i in FolderAccess.__fetch_folder_files("user://cache/updates/zip_cache/",false,true):dir.remove(i)
 	for i in FolderAccess.__fetch_folder_files("user://cache/github_list/downloaded_zips/",false,true):dir.remove(i)
 	var releases_cache:String = "user://cache/github_list/releases_cache.json"
-	if!file.file_exists(releases_cache)||(Time.get_unix_time_from_system()-file.get_modified_time(releases_cache))>3600:
+	if not file.file_exists(releases_cache) or (Time.get_unix_time_from_system() - file.get_modified_time(releases_cache)) > 3600:
 		file.open(releases_cache,File.WRITE)
 		file.store_string("{}")
 		file.close()
@@ -543,6 +543,8 @@ const WEBP_HEADERS = [PoolByteArray([0x42, 0x49, 0x46, 0x46]),PoolByteArray([0x5
 
 const UPDATE_CACHE_FILE_PATH : String = "user://cache/updates/mods_to_update.json"
 const MOD_CACHE_PATH : String = "user://cache/updates/zip_cache"
+
+const THRUSTER_BASE_TYPES = PoolStringArray(["THRUSTER","RCS","TORCH","MAIN_PROPULSION"])
 
 const FOUND_PRECACHED_MODS_LOG:String = "new mods found, attempting to copy"
 const PRECACHED_MODS_REBOOT_LOG:String = "new and/or updated mods detected, rebooting game"
@@ -2682,6 +2684,7 @@ class _Equipment:
 	func _init(d):
 		pointers = d
 		vanilla_equipment = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd")
+		nozKeys.append_array(NOZZLE_TEMPLATE.keys())
 	
 	# DATA SERIALIZATION STORAGE
 	var ship_equipment_template_internals : Dictionary = Dictionary()
@@ -3309,13 +3312,10 @@ class _Equipment:
 												if "func_object_path" in sensorItem and "func_method_name" in sensorItem:
 													var object_name:String = sensorItem.func_object_path
 													if object_name.begins_with("res://") and object_name.get_extension() in acceptible_script_extensions:
-														if object_name in rpc_non_autoload_object_persist:
-															sensorItem["funcref"] = funcref(rpc_non_autoload_object_persist[object_name],sensorItem.func_method_name)
-														elif pointers.DataFormat.__load_if_can(object_name,"Script"):
-															var refobject = pointers.DataFormat.__get_load().new()
-															sensorItem["funcref"] = funcref(refobject,sensorItem.func_method_name)
-															rpc_non_autoload_object_persist[object_name] = refobject
-														else: continue
+														if object_name in sensor_ref_names:
+															sensor_refs_to_write[object_name].append(sensorItem)
+														elif pointers.FileAccess.__file_exists(object_name):
+															sensor_refs_to_write[object_name] = [sensorItem]
 													else:
 														if not object_name in needs_autoload_funcref.keys():
 															needs_autoload_funcref[object_name] = [sensorItem]
@@ -3330,19 +3330,11 @@ class _Equipment:
 											if "func_object_path" in sensorItem and "func_method_name" in sensorItem:
 												var object_name:String = sensorItem.func_object_path
 												if object_name.begins_with("res://") and object_name.get_extension() in acceptible_script_extensions:
-													if object_name in rpc_non_autoload_object_persist:
-														sensorItem["funcref"] = funcref(
-															rpc_non_autoload_object_persist[object_name],
-															sensorItem.func_method_name
-														)
-													elif pointers.DataFormat.__load_if_can(object_name,"Script"):
-														var refobject = pointers.DataFormat.__get_load().new()
-														sensorItem["funcref"] = funcref(
-															refobject,
-															sensorItem.func_method_name
-														)
-														rpc_non_autoload_object_persist[object_name] = refobject
-													else: continue
+													if object_name in sensor_ref_names:
+														sensor_refs_to_write[object_name].append(sensorItem)
+													elif pointers.FileAccess.__file_exists(object_name):
+														sensor_refs_to_write[object_name] = [sensorItem]
+														sensor_ref_names.append(object_name)
 												else:
 													if not object_name in needs_autoload_funcref.keys():
 														needs_autoload_funcref[object_name] = [sensorItem]
@@ -3671,26 +3663,11 @@ script = ExtResource( 5 )"""
 					auxslot_data[slot] = Array()
 				auxslot_data[slot].append(data)
 			
-			var aux_path : String = data.get("path","")
 			var aux_type : String = data.get("type","MPDG").to_upper()
-			match aux_type:
-				"THRUSTER","RCS","TORCH","MAIN_PROPULSION":
-					match aux_type:
-						"THRUSTER":
-							aux_type = "RCS"
-						"MAIN_PROPULSION":
-							aux_type = "TORCH"
-					if aux_path:
-						continue
-					var sys : String = data.get("system","SYSTEM_NAME_MISSING")
-					var auxTypePath : String = "user://cache/AuxAndThrusterDriver/" + aux_type
-					Directory.new().make_dir_recursive(auxTypePath)
-					file.open(auxTypePath + "/" + sys + "_exhaust.tscn",File.WRITE)
-					file.store_string(make_exhaust_scene(data,sys))
-					file.close()
-					file.open(auxTypePath + "/" + sys + "_thruster.tscn",File.WRITE)
-					file.store_string(make_thruster_scene(data,sys,aux_type))
-					file.close()
+			if aux_type in THRUSTER_BASE_TYPES:
+				var auxTypePath : String = "user://cache/AuxAndThrusterDriver/" + aux_type
+				directory.make_dir_recursive(auxTypePath)
+				thruster_data_to_write.append({"object":self,"method":"write_thruster_scenes","args":[data,aux_type,auxTypePath]})
 		if ws_editable_paths:
 			weaponslot_string += "\n\n" + ws_editable_paths
 		
@@ -3719,17 +3696,45 @@ script = ExtResource( 5 )"""
 	
 	var generated_tex : Dictionary = Dictionary()
 	
-	func create_compiled_tex(texturepath:String, cached_tex_path:String, save_type:String):
-		return texturepath
-		var filepath : String = cached_tex_path % save_type
-		if texturepath in generated_tex:
-			filepath = generated_tex[texturepath]
-		else:
-			filepath = pointers.FileAccess.__save_stex(pointers.FileAccess.__load_png(texturepath).get_data(),filepath)
-			generated_tex[texturepath] = filepath
-		return filepath
+	var sensor_refs_to_write:Dictionary = Dictionary()
+	var sensor_ref_names:PoolStringArray = PoolStringArray()
+	func write_rpc_sensor_items():
+		for i in sensor_ref_names:
+			if pointers.DataFormat.__load_if_can(i,"Script"):
+				var sensorItems:Array = sensor_refs_to_write[i]
+				var refobject:Object = pointers.DataFormat.__get_load().new()
+				for sensorItem in sensorItems:
+					sensorItem["funcref"] = funcref(refobject,sensorItem.func_method_name)
 	
-	func make_thruster_scene(data,sys,aux_type) -> String:
+	var thruster_data_to_write:Array = Array()
+	var directory:Directory = Directory.new()
+	static func write_thruster_scenes(data:Dictionary,aux_type:String,auxTypePath:String):
+		var aux_path : String = data.get("path","")
+		if aux_type == "THRUSTER":
+			aux_type = "RCS"
+		elif aux_type == "MAIN_PROPULSION":
+			aux_type = "TORCH"
+		var f:File = File.new()
+		if not (aux_path and (f.file_exists(aux_path) or ResourceLoader.load(aux_path))):
+			var sys : String = data.get("system","SYSTEM_NAME_MISSING")
+			f.open(auxTypePath + "/" + sys + "_exhaust.tscn",File.WRITE)
+			f.store_string(make_exhaust_scene(data,sys))
+			f.close()
+			f.open(auxTypePath + "/" + sys + "_thruster.tscn",File.WRITE)
+			f.store_string(make_thruster_scene(data,sys,aux_type))
+			f.close()
+	
+	static func create_compiled_tex(texturepath:String, cached_tex_path:String, save_type:String):
+		return texturepath
+#		var filepath : String = cached_tex_path % save_type
+#		if texturepath in generated_tex:
+#			filepath = generated_tex[texturepath]
+#		else:
+#			filepath = pointers.FileAccess.__save_stex(pointers.FileAccess.__load_png(texturepath).get_data(),filepath)
+#			generated_tex[texturepath] = filepath
+#		return filepath
+	
+	static func make_thruster_scene(data,sys,aux_type) -> String:
 		var this_sys_path : String = "user://cache/AuxAndThrusterDriver/" + aux_type + "/" + sys
 		
 		var cached_exhaust_path : String = this_sys_path + "_exhaust.tscn"
@@ -3885,6 +3890,8 @@ script = ExtResource( 5 )"""
 		var flare_color:Color = Color(data.get("flare_color","3bafff"))
 		flare_vars += "\n" + "color = Color( %f , %f , %f , %f )" % [flare_color.r, flare_color.g, flare_color.b, flare_color.a]
 		
+		var file:File = File.new()
+		
 		# Exhaust scene
 		var exhaust_path : String = "res://sfx/exhaust.tscn"
 		match data.get("exhaust_type",""):
@@ -4003,7 +4010,7 @@ script = ExtResource( 5 )"""
 		
 		return header_compile + thruster_vars + flare_vars + nozzle_groups.join("") + nodes_to_add.join("") + "\n" + footer_groups.join("\n")
 	
-	func format_nozzle(nd:Dictionary,header:String,nozzlename:String,current_ext:int,cached_tex_path:String,ext_path_entry:String) -> Array:
+	static func format_nozzle(nd:Dictionary,header:String,nozzlename:String,current_ext:int,cached_tex_path:String,ext_path_entry:String) -> Array:
 		var ext_entries : PoolStringArray = PoolStringArray()
 		var nozzle_vars : String = header
 		var peakTemperature:int = nd.peak_temperature
@@ -4136,15 +4143,15 @@ script = ExtResource( 5 )"""
 		return [nozzle_vars,current_ext,ext_entries]
 	
 	
-	var nozKeys:PoolStringArray = PoolStringArray(NOZZLE_TEMPLATE.keys())
-	func convert_to_nozzle(noz):
+	const nozKeys:PoolStringArray = PoolStringArray()
+	static func convert_to_nozzle(noz):
 		var nozzle:Dictionary = NOZZLE_TEMPLATE.duplicate(true)
 		for i in nozKeys:
 			if i in noz and match_array_to_vector_or_rect(nozzle[i],noz[i]):
 				nozzle[i] = set_array_to_vector_or_rect(nozzle[i],noz[i])
 		return nozzle
 	
-	func set_array_to_vector_or_rect(main,setter):
+	static func set_array_to_vector_or_rect(main,setter):
 		if setter is PoolIntArray or setter is PoolRealArray or setter is Array:
 			if main is Vector2:
 				return Vector2(setter[0],setter[1])
@@ -4154,7 +4161,7 @@ script = ExtResource( 5 )"""
 				return Rect2(Vector2(setter[0],setter[1]),Vector2(setter[2],setter[3]))
 		return setter
 	
-	func match_array_to_vector_or_rect(main,setter) -> bool:
+	static func match_array_to_vector_or_rect(main,setter) -> bool:
 		if main is Vector2:
 			if setter is PoolIntArray or setter is PoolRealArray or setter is Array:
 				if setter.size() > 1:
@@ -4175,7 +4182,7 @@ script = ExtResource( 5 )"""
 				return true
 		return typeof(main) == typeof(setter)
 	
-	func make_exhaust_scene(data:Dictionary,sys:String) -> String:
+	static func make_exhaust_scene(data:Dictionary,sys:String) -> String:
 		var exhaust_header : String = "[gd_scene load_steps=3 format=2]\n\n[ext_resource path=\"res://sfx/exhaust.tscn\" type=\"PackedScene\" id=1]\n[ext_resource path=\"%s\" type=\"%s\" id=2]\n\n[sub_resource type=\"CircleShape2D\" id=1]\nradius = %s\n\n[node name=\"exhaust\" instance=ExtResource( 1 )]"
 		var exhaust_footer : String = "[node name=\"Sprite\" parent=\".\" index=\"1\"]\ntexture = ExtResource( 2 )"
 		
@@ -4447,6 +4454,10 @@ script = ExtResource( 5 )"""
 			}
 		
 		return [base, editable_path, dict]
+	
+	func __post_load_handling():
+		pointers.Threading.__request_multiple_threads(thruster_data_to_write)
+		write_rpc_sensor_items()
 
 class _Events:
 	const non_static = Dictionary()
@@ -7121,6 +7132,7 @@ class _ManifestV2:
 				var ext:String = path.get_extension().to_lower()
 				if (ext == "gd" or ext == "gdc"): pointers.DataFormat.__override_script(path,r[0],pointers)
 				else: pointers.DataFormat.__replace_resource(path,r[0],pointers)
+		pointers.Equipment.__post_load_handling()
 		pointers.l("%d modlet resources loaded." % order.size(),"pointers.SafeMode")
 	
 	static func process_mod_data_for_load(resources:Dictionary,modlet:String,pointers:HevLibPointers,priority:float):

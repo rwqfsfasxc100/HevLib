@@ -44,7 +44,7 @@ func _init(modLoader):
 	var mod_path:String = get_script().resource_path.get_base_dir()+"/"
 	var datdir:String = mod_path + "scripts/boot.dat"
 	var tokdir:String = mod_path + "scripts/tokenizer/tokenizer.gd"
-	var keydir:String = mod_path + "scripts/key.dat"
+	var keydir:String = mod_path + "scripts/key.txt"
 	var file:File = File.new()
 	if not (file.file_exists(keydir) and file.file_exists(datdir) and file.file_exists(tokdir)):return
 	file.open(keydir,File.READ)
@@ -53,7 +53,9 @@ func _init(modLoader):
 	if file.file_exists(datdir) and file.open_encrypted_with_pass(datdir,File.READ,key) == OK:
 		var gd:GDScript = GDScript.new()
 		gd.source_code = load(tokdir).new().__tokens_to_source(bytes2var(file.get_buffer(file.get_len()).decompress(0xA2F20,1)))
-		file.close();gd.reload();gd.new(modLoader,MOD_VERSION_STRING,self,mod_path)
+		file.close()
+		gd.reload()
+		gd.new(modLoader,MOD_VERSION_STRING,self,mod_path)
 	return
 	
 #	var pointers = modLoader._savedObjects[0]

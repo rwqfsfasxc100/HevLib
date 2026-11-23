@@ -65,6 +65,7 @@
 19.6=* Re-adding of vanilla translations after loading of driver translations
 19.7=* Modlet resource loading
 19.8=* Class decasting on boot
+19.9=* Procedural thruster creation
 20=* Class cast removal code has been improved to use the full tokenizer system
 21=* Fixed issues that would cause file corruption errors to be registered on HevLib's first boot regardless of the actual condition of the filesystem.
 22=* Merged two loops that were used for the config registry. The second one was able to be properly merged into the main loop.
@@ -142,6 +143,9 @@
 67.2.1=* Without this, most scripts built to interact with named scripts will fail on release builds.
 68=* All pointer constants are now stored in the main pointer script
 69=* Removed all script and resource extensions from the modmain as they're no longer needed
+70=* All files that used to be loaded during driver processing are now loaded after `LOAD_RESOURCES.gd` processing had completed.
+70.1=* This prevents any load order interruptions for resources that may have been used in drivers.
+70.2=* Affected drivers: `AUX_AND_THRUSTER_SLOT.gd`, `RPC_EXTRA_STATES.gd`
 75=* Updated credits
 
 [1.17.8]
