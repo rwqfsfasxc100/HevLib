@@ -1,3 +1,7 @@
+[1.18.1]
+
+1=* Fixed issue that would prevent the tokenizer module from being loaded on non-Windows systems
+
 [1.18.0]
 
 1=* Added `Threading` class.
