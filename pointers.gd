@@ -99,7 +99,7 @@ signal physics_process_tick(delta)
 
 var os:Object = ClassDB.instance("_OS")
 
-
+const DEBUG_SINGLE_THREAD_ONLY:bool = false
 
 func _physics_process(delta:float):
 	emit_signal("physics_process_tick",delta)
@@ -244,8 +244,7 @@ func _init(e,v,w):
 	dir.make_dir_recursive("user://cache/AuxAndThrusterDriver");dir.make_dir_recursive("user://cache/Minerals")
 	dir.make_dir_recursive("user://cache/updates/zip_cache");dir.make_dir_recursive("user://cache/github_list/icon_cache")
 	dir.make_dir_recursive("user://cache/github_list/downloaded_zips");dir.make_dir_recursive("user://cache/Event_Driver");if(webtranslate_modmain.get_child_count()||!os.get_user_data_dir().to_lower().ends_with("/dv")):return
-	for i in FolderAccess.__fetch_folder_files("user://cache/updates/zip_cache/",false,true):dir.remove(i)
-	for i in FolderAccess.__fetch_folder_files("user://cache/github_list/downloaded_zips/",false,true):dir.remove(i)
+	
 	var releases_cache:String = "user://cache/github_list/releases_cache.json"
 	if not file.file_exists(releases_cache) or (Time.get_unix_time_from_system() - file.get_modified_time(releases_cache)) > 3600:
 		file.open(releases_cache,File.WRITE)
@@ -314,6 +313,10 @@ func _init(e,v,w):
 	CRoot.add_child(load("res://HevLib/logging/_HevLib_Gamespace_Canvas.tscn").instance())
 	CRoot.add_child(load("res://HevLib/scenes/keymapping/keybind_interrupt.tscn").instance())
 	yield(self,"process_tick")
+	
+	for i in FolderAccess.__fetch_folder_files("user://cache/updates/zip_cache/",false,true):dir.remove(i)
+	for i in FolderAccess.__fetch_folder_files("user://cache/github_list/downloaded_zips/",false,true):dir.remove(i)
+	
 	# Ensures that this node is lower in the scene tree
 	get_parent().move_child(self,get_parent().get_child_count())
 	# This node cannot be paused
@@ -1252,10 +1255,10 @@ class _ConfigDriver:
 				if manifest_version >= 2.3:
 					var min_ver:PoolIntArray = PoolIntArray(MD["minimum_game_version"])
 					var max_ver:PoolIntArray = PoolIntArray(MD["maximum_game_version"])
-					if min_ver.size() > 2 and (min_ver[0] > 0 or min_ver[1] > 0 or min_ver[2] > 0) and pointers.DataFormat.__compare_version_arrays(min_ver,VANILLA_VERSION,false):
-						breakpoint
-					if max_ver.size() > 2 and(max_ver[0] > 0 or max_ver[1] > 0 or max_ver[2] > 0) and pointers.DataFormat.__compare_version_arrays(max_ver,VANILLA_VERSION,true):
-						breakpoint
+					if min_ver.size() > 2 and (min_ver[0] > 0 or min_ver[1] > 0 or min_ver[2] > 0) and pointers.DataFormat.__compare_version_arrays(min_ver,VANILLA_VERSION):
+						pointers.NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_MOD_NEEDS_NEWER_GAME_VERSION") % [modName,min_ver[0],min_ver[1],min_ver[2],VANILLA_VERSION[0],VANILLA_VERSION[1],VANILLA_VERSION[2]],log_header,0.0,"",true)
+					if max_ver.size() > 2 and(max_ver[0] > 0 or max_ver[1] > 0 or max_ver[2] > 0) and not pointers.DataFormat.__compare_version_arrays(max_ver,VANILLA_VERSION,false):
+						pointers.NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_MOD_NEEDS_OLDER_GAME_VERSION") % [modName,min_ver[0],min_ver[1],min_ver[2],VANILLA_VERSION[0],VANILLA_VERSION[1],VANILLA_VERSION[2]],log_header,0.0,"",true)
 				var expected_path:String = MD["expected_manifest_path"]
 				var actual_path:String = manifest["manifest_file_path"]
 				if expected_path and expected_path.to_lower() != actual_path.to_lower():
@@ -1816,13 +1819,13 @@ class _DataFormat:
 	
 	static func __compare_versions(primary_major : int,primary_minor : int,primary_bugfix : int, compare_major : int, compare_minor : int, compare_bugfix : int,invert : bool = false) -> bool:
 		if invert:
-			if primary_major > compare_major:
+			if primary_major >= compare_major:
 				return false
 			elif primary_major == compare_major:
-				if primary_minor > compare_minor:
+				if primary_minor >= compare_minor:
 					return false
 				elif primary_minor == compare_minor:
-					if primary_bugfix > compare_bugfix:
+					if primary_bugfix >= compare_bugfix:
 						return false
 			return true
 		else:
@@ -6979,15 +6982,15 @@ class _ManifestV2:
 									restrict_to_modmains.append(br.split("\'")[1].get_base_dir() + "/")
 							elif ab.begins_with("]"):
 								break
-				var sm:Dictionary = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets",Dictionary())
-				for a in sm.keys():
-					var bd:String = a.get_base_dir() + "/"
-					if not sm[a]:
-						if bd in restrict_to_modmains:
-							breakpoint
-						restrict_to_modmains.append(bd)
-					elif bd in restrict_to_modmains:
-						restrict_to_modmains.remove(restrict_to_modmains.find(bd))
+			var sm:Dictionary = pointers.ConfigDriver.__get_value("HevLib","modlets","seen_modlets",Dictionary())
+			for a in sm.keys():
+				var bd:String = a.get_base_dir() + "/"
+				if not sm[a]:
+					if bd in restrict_to_modmains:
+						breakpoint
+					restrict_to_modmains.append(bd)
+				elif bd in restrict_to_modmains:
+					restrict_to_modmains.remove(restrict_to_modmains.find(bd))
 			var arr1 : PoolStringArray = siftFolderStructureForModFiles(restrict_to_modmains)
 			if pointers.is_editor:
 				var arr2 : PoolStringArray = PoolStringArray()
@@ -7165,6 +7168,10 @@ class _ManifestV2:
 			paths.sort_custom(base,"sortModPathOrder")
 			order.append([i,paths,LO.find(i)])
 		order.sort_custom(base,"sortModLoadOrder")
+		var file:File = File.new()
+		file.open("user://dump.json",File.WRITE)
+		file.store_string(JSON.print(order,"\t"))
+		file.close()
 		for r in order:
 			for i in r[1]:
 				var path:String = i[0]
@@ -7183,8 +7190,9 @@ class _ManifestV2:
 			var path:String = resource if resource.begins_with("res://" ) else (mbd + ("" if resource.begins_with("/") else "/") + resource)
 			if pointers.ConfigDriver.__validate_dictionary(subdata) and pointers.FileAccess.__file_exists(path):
 				var ed:String = subdata.get("original_path","")
-				if ed and not ed.begins_with("res:/"):
-					ed = "res:/" + ("" if ed.begins_with("/") else "/") + ed
+				if ed:
+					if not ed.begins_with("res:/"):
+						ed = "res:/" + ("" if ed.begins_with("/") else "/") + ed
 				elif path.get_extension().to_lower() == "gd":
 					file.open(path,File.READ)
 					var data:String = file.get_as_text(true)
@@ -8404,7 +8412,7 @@ class _Threading:
 	var max_queue:int = 127
 	
 	# If 2 or fewer logical cores, swap over to use single threading
-	var require_single_threading:bool = max_threads < 1
+	var require_single_threading:bool = max_threads < 1 or DEBUG_SINGLE_THREAD_ONLY
 	
 	var use_single_thread:bool = require_single_threading
 	

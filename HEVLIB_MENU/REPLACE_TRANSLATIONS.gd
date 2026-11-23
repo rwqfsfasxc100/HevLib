@@ -1946,6 +1946,14 @@ const TRANSLATIONS = {
 		"HEVLIB_DEV_CFG_ALLDLC": {
 			"string": "Treat DLC as available",
 			"version_hash": 522415629
+		},
+		"HEVLIB_MOD_NEEDS_NEWER_GAME_VERSION": {
+			"string": "Mod [%s] needs a game version of at least [%d.%d.%d], you are running game version [%d.%d.%d].\n\nThis mod likely requires a feature added in the bleeding-edge branch.",
+			"version_hash": 3642395883
+		},
+		"HEVLIB_MOD_NEEDS_OLDER_GAME_VERSION": {
+			"string": "Mod [%s] needs a game version of at most [%d.%d.%d], you are running game version [%d.%d.%d].\n\nThis mod likely is wholly incompatible with a feature added in the bleeding-edge branch.",
+			"version_hash": 2586529651
 		}
 	},
 	"de": {

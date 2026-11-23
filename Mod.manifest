@@ -559,4 +559,4 @@ always_display=true
 manifest_version=2.3
 manifest_url="https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest"
 changelog_path="changelog.txt"
-maximum_game_version=PoolIntArray( 1, 90, 12 )
+minimum_game_version=PoolIntArray( 1, 90, 12 )
