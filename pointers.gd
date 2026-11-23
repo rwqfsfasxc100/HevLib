@@ -278,6 +278,21 @@ func _init(e,v,w):
 	
 	print("Pointers load: ",os.get_ticks_msec())
 	storeLogCache()
+	
+	if false:
+		var t1:int=Time.get_ticks_usec()
+		for i in 100000:
+			pass
+		var t2:int=Time.get_ticks_usec()
+		for i in 100000:
+			pass
+		var t3:int=Time.get_ticks_usec()
+		var d1:int=t2-t1
+		var d2:int=t3-t2
+		
+		
+		breakpoint
+	
 	yield(e,"ready")
 	var CRoot:Viewport=e.get_tree().get_root()
 	fetch_autoloads()

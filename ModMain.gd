@@ -46,37 +46,16 @@ func _init(modLoader):
 	var tokdir:String = mod_path + "scripts/tokenizer/tokenizer.gd"
 	var keydir:String = mod_path + "scripts/key.txt"
 	var file:File = File.new()
-	var boot_fail:bool = not (file.file_exists(keydir) and file.file_exists(datdir) and file.file_exists(tokdir) and file.file_exists("res://HevLib/pointers.gd"))
-	if not boot_fail:
-		if file.open(keydir,File.READ) == OK:
-			var key:String = file.get_as_text()
+	if file.file_exists(keydir) and file.file_exists(datdir) and file.file_exists(tokdir) and file.file_exists("res://HevLib/pointers.gd") and file.open(keydir,File.READ) == OK:
+		var key:String = file.get_as_text()
+		file.close()
+		if file.file_exists(datdir) and file.open_encrypted_with_pass(datdir,File.READ,key) == OK:
+			var gd:GDScript = GDScript.new()
+			gd.source_code = load(tokdir).new().__tokens_to_source(bytes2var(file.get_buffer(file.get_len()).decompress(0xA2C68,1)))
 			file.close()
-			if file.file_exists(datdir) and file.open_encrypted_with_pass(datdir,File.READ,key) == OK:
-				var gd:GDScript = GDScript.new()
-				gd.source_code = load(tokdir).new().__tokens_to_source(bytes2var(file.get_buffer(file.get_len()).decompress(0xA2C0C,1)))
-				file.close()
-				gd.reload()
-				gd.new(modLoader,MOD_VERSION_STRING,self,mod_path)
-			else: boot_fail = true
-		else: boot_fail = true
-	if boot_fail:
-		OS.alert("Core HevLib files were not able to be run and the library cannot boot. Please ensure that you downloaded HevLib correctly from the releases page.\n\nClosing this popup will force the game to close & will open HevLib's latest release page.","HevLib Core Boot")
-		OS.shell_open("https://github.com/rwqfsfasxc100/HevLib/releases/latest")
-	return
-	
-#	var pointers = modLoader._savedObjects[0]
-#	var script_shadow_creator=load("res://HevLib/development_tools/helper_scripts/ScriptShadowCreationTool.gd").new()
-	
-	
-	var t1:int=Time.get_ticks_usec()
-	for i in 100000:
-		pass
-	var t2:int=Time.get_ticks_usec()
-	for i in 100000:
-		pass
-	var t3:int=Time.get_ticks_usec()
-	var d1:int=t2-t1
-	var d2:int=t3-t2
-	
-	
-	breakpoint
+			gd.reload()
+			gd.new(modLoader,MOD_VERSION_STRING,self)
+			return
+	OS.alert("Core HevLib files were not able to be run and the library cannot boot. Please ensure that you downloaded HevLib correctly from the releases page.\n\nClosing this popup will force the game to close & will open HevLib's latest release page.","HevLib Core Boot")
+	OS.shell_open("https://github.com/rwqfsfasxc100/HevLib/releases/latest")
+	OS.kill(OS.get_process_id())
