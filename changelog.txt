@@ -1,3 +1,9 @@
+[1.18.2]
+
+1=* Inverted version check for minimum game version checks for mods
+2=* Changed how the tokenizer module fetches word data
+3=* Reloading of vanilla translations should now be more stable.
+
 [1.18.1]
 
 1=* Fixed issue that would prevent the tokenizer module from being loaded on non-Windows systems

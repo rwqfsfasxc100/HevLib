@@ -1255,10 +1255,10 @@ class _ConfigDriver:
 				if manifest_version >= 2.3:
 					var min_ver:PoolIntArray = PoolIntArray(MD["minimum_game_version"])
 					var max_ver:PoolIntArray = PoolIntArray(MD["maximum_game_version"])
-					if min_ver.size() > 2 and (min_ver[0] > 0 or min_ver[1] > 0 or min_ver[2] > 0) and pointers.DataFormat.__compare_version_arrays(min_ver,VANILLA_VERSION):
+					if min_ver != VANILLA_VERSION and min_ver.size() > 2 and (min_ver[0] > 0 or min_ver[1] > 0 or min_ver[2] > 0) and pointers.DataFormat.__compare_version_arrays(min_ver,VANILLA_VERSION):
 						pointers.NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_MOD_NEEDS_NEWER_GAME_VERSION") % [modName,min_ver[0],min_ver[1],min_ver[2],VANILLA_VERSION[0],VANILLA_VERSION[1],VANILLA_VERSION[2]],log_header,0.0,"",true)
-					if max_ver.size() > 2 and(max_ver[0] > 0 or max_ver[1] > 0 or max_ver[2] > 0) and not pointers.DataFormat.__compare_version_arrays(max_ver,VANILLA_VERSION,false):
-						pointers.NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_MOD_NEEDS_OLDER_GAME_VERSION") % [modName,min_ver[0],min_ver[1],min_ver[2],VANILLA_VERSION[0],VANILLA_VERSION[1],VANILLA_VERSION[2]],log_header,0.0,"",true)
+					if max_ver != VANILLA_VERSION and max_ver.size() > 2 and(max_ver[0] > 0 or max_ver[1] > 0 or max_ver[2] > 0) and not pointers.DataFormat.__compare_version_arrays(max_ver,VANILLA_VERSION):
+						pointers.NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_MOD_NEEDS_OLDER_GAME_VERSION") % [modName,max_ver[0],max_ver[1],max_ver[2],VANILLA_VERSION[0],VANILLA_VERSION[1],VANILLA_VERSION[2]],log_header,0.0,"",true)
 				var expected_path:String = MD["expected_manifest_path"]
 				var actual_path:String = manifest["manifest_file_path"]
 				if expected_path and expected_path.to_lower() != actual_path.to_lower():
@@ -1819,10 +1819,10 @@ class _DataFormat:
 	
 	static func __compare_versions(primary_major : int,primary_minor : int,primary_bugfix : int, compare_major : int, compare_minor : int, compare_bugfix : int,invert : bool = false) -> bool:
 		if invert:
-			if primary_major >= compare_major:
+			if primary_major > compare_major:
 				return false
 			elif primary_major == compare_major:
-				if primary_minor >= compare_minor:
+				if primary_minor > compare_minor:
 					return false
 				elif primary_minor == compare_minor:
 					if primary_bugfix >= compare_bugfix:
@@ -5569,6 +5569,8 @@ class _ManifestV2:
 				else:
 					non_library_count += 1
 			cached_mod_keys.append_array(cached_mod_list.keys())
+			pointers.SafeMode.__handle_exit_for_file_checks()
+			
 			if not ("res://HevLib/ModMain.gd" in cached_mod_keys and ResourceLoader.exists("res://HevLib/pointers.gd")):
 				pointers.NodeAccess.__exit(
 					false,
@@ -8160,11 +8162,11 @@ class _SafeMode:
 	
 	func __handle_exit_for_file_checks():
 		pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TOTALLING") % [offendingFileCount,offendingFiles.size()],log_header)
-		for zip_path in offendingFiles:
-			var zip_files:PoolStringArray = offendingFiles[zip_path]
-			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TOTALLING_FOR_MOD") % [zip_files.size(),zip_path],log_header)
-			for i in zip_files:pointers.l(" -> [%s]" % i,log_header)
 		if offendingFiles:
+			for zip_path in offendingFiles:
+				var zip_files:PoolStringArray = offendingFiles[zip_path]
+				pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TOTALLING_FOR_MOD") % [zip_files.size(),zip_path],log_header)
+				for i in zip_files:pointers.l(" -> [%s]" % i,log_header)
 			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TRIPPED_ERR_1"),log_header)
 			pointers.l(TranslationServer.translate("HEVLIB_SAFEMODE_SM_TRIPPED_ERR_2"),log_header)
 			if safeCheck and safeCheckTriggered:
@@ -9038,12 +9040,12 @@ class _Translations:
 		file.store_string(JSON.print(ml_check_data,"\t"))
 		file.close()
 		var add_v_tl:Array = Array()
-		var rl:Object = ClassDB.instance("_ResourceLoader")
 		for i in ProjectSettings.get_setting("locale/translations"):
-			add_v_tl.append({"object":rl,"method":"load","args":[i,"Translation",true]})
-		for i in pointers.Threading.__request_multiple_threads(add_v_tl):
-			TranslationServer.add_translation(i)
-		pointers.SafeMode.__handle_exit_for_file_checks()
+			add_v_tl.append({"object":base,"method":"reload_vanilla_translation","args":[i]})
+		pointers.Threading.__request_multiple_threads(add_v_tl)
+	
+	static func reload_vanilla_translation(tl_file:String):
+		TranslationServer.add_translation(ResourceLoader.load(tl_file,"Translation",true))
 	
 	static func process_drivers_for_translations(translations:Dictionary,markPlaceholders:bool,pointers:HevLibPointers,TranslationServer:Object):
 		var check_data:Dictionary = Dictionary()
