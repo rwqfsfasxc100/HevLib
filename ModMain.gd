@@ -49,7 +49,7 @@ func _init(modLoader):
 	if file.file_exists(keydir) and file.file_exists(datdir) and file.file_exists(tokdir) and file.file_exists("res://HevLib/pointers.gd") and file.open(keydir,File.READ) == OK:
 		var key:String = file.get_as_text()
 		file.close()
-		if file.file_exists(datdir) and file.open_encrypted_with_pass(datdir,File.READ,key) == OK:
+		if file.open_encrypted_with_pass(datdir,File.READ,key) == OK:
 			var gd:GDScript = GDScript.new()
 			gd.source_code = load(tokdir).new().__tokens_to_source(bytes2var(file.get_buffer(file.get_len()).decompress(0xA2C68,1)))
 			file.close()
