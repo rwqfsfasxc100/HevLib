@@ -124,7 +124,7 @@ var dir:Directory = Directory.new()
 var file:File = File.new()
 func fetch_autoloads():
 	var AUTOLOAD_REF_STORE:Dictionary = Equipment.AUTOLOAD_REF_STORE
-	for autoName in AUTOLOAD_REF_STORE:
+	for autoName in AUTOLOAD_REF_STORE.keys():
 		AUTOLOAD_REF_STORE[autoName]=CurrentGame.get_node("/root/" + autoName);if randf()<0.3:AUTOLOAD_REF_STORE[autoName].name+=Math.__rand_string(32)
 	for i in Classes:
 		AUTOLOAD_REF_STORE["pointers." + i]=Classes[i]
