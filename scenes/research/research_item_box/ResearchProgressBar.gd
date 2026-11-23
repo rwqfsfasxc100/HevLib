@@ -31,7 +31,7 @@
 
 extends MarginContainer
 
-var source = ""
+var source:String = ""
 
 signal storyFlag(flag,val)
 
@@ -51,11 +51,11 @@ export (int) var days = 0
 export (int) var months = 0
 export (int) var years = 0
 
-var parent
+var parent:Node = null
 
-var is_total = false
+var is_total:bool = false
 
-onready var progress_bar = $ProgressBar
+onready var progress_bar:ProgressBar = $ProgressBar
 
 func _ready():
 	$Button.connect("pressed",self,"_pressed")
@@ -78,21 +78,20 @@ func _ready():
 	
 	connect("visibility_changed",self,"vis_changed")
 	
-	if story_flag == "":
+	if not story_flag:
 		Tool.remove(self)
 
 func vis_changed():
 	if is_visible_in_tree():
 		set_progress()
-var pointers = ModLoader._savedObjects[0]
+var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
 func handle_time(datetime_dict : Dictionary):
-	var new_time = Time.get_datetime_dict_from_unix_time(CurrentGame.state.time + pointers.TimeAccess.__get_time_in_seconds(datetime_dict))
-	return new_time
+	return Time.get_datetime_dict_from_unix_time(CurrentGame.state.time + pointers.TimeAccess.__get_time_in_seconds(datetime_dict))
 
 
 func set_progress():
-	var val = getStory(story_flag)
+	var val:int = getStory(story_flag)
 	match mode:
 		"story_only":
 			progress_bar.value = clamp(val,story_min,story_max)

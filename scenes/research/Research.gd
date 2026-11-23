@@ -76,10 +76,6 @@ func hide():
 func _ready():
 	visible = false
 	get_parent().connect("hidefoka", self, "hide")
-	
-	if not CurrentGame.hl_research_enabled:
-		research_button.get_parent().remove_child(research_button)
-		Tool.remove(research_button)
 
 
 func _input(event):

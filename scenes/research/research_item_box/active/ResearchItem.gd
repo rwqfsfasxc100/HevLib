@@ -33,19 +33,16 @@ extends HBoxContainer
 
 export var this_research_project:Dictionary = Dictionary()
 
-onready var name_button = $Progress/Name
+onready var name_button:Button = $Progress/Name
 
-onready var sub_progress_container = $Progress/SubBarProgress/HBoxContainer/BarContainer
-onready var total_progress_container = $Progress/FullProgress
+onready var sub_progress_container:VBoxContainer = $Progress/SubBarProgress/HBoxContainer/BarContainer
+onready var total_progress_container:HBoxContainer = $Progress/FullProgress
 
-onready var start_button = $Progress/StartContainer/StartButton
-onready var start_container = $Progress/StartContainer
-onready var start_confirm = $Progress/StartContainer/StartConfirm
-onready var start_confirm_buy = $Progress/StartContainer/StartConfirm
-onready var start_confirm_cancel = $Progress/StartContainer/StartConfirm
+onready var start_button:Button = $Progress/StartContainer/StartButton
+onready var start_container:MarginContainer = $Progress/StartContainer
 
-onready var icon_anim = $IconAnimator
-onready var confirmation_player = $ConfirmationPlayer
+onready var icon_anim:AnimationPlayer = $IconAnimator
+onready var confirmation_player:AnimationPlayer = $ConfirmationPlayer
 
 var progress_bar:PackedScene = load("res://HevLib/scenes/research/research_item_box/ResearchProgressBar.tscn")
 
@@ -55,15 +52,15 @@ var progress_bars:Dictionary = Dictionary()
 
 var pointers:HevLibPointers = ModLoader._savedObjects[0]
 
-onready var sprite_container = $Icon/PanelContainer/TextureRect
-onready var scene_container = $Icon/PanelContainer/ViewportContainer
-onready var scene_offset = $Icon/PanelContainer/ViewportContainer/Viewport/Container/Rotation_offset
+onready var sprite_container:TextureRect = $Icon/PanelContainer/TextureRect
+onready var scene_container:ViewportContainer = $Icon/PanelContainer/ViewportContainer
+onready var scene_offset:Node2D = $Icon/PanelContainer/ViewportContainer/Viewport/Container/Rotation_offset
 
-onready var initiation_price_label = $Progress/StartContainer/StartConfirm/PanelContainer/Isolated/PriceLabel
-onready var isolated_confirm = $Progress/StartContainer/StartConfirm/PanelContainer/Isolated/BuyConfirm
-onready var isolated_cancel = $Progress/StartContainer/StartConfirm/PanelContainer/Isolated/BuyCancel
-onready var story_confirm = $Progress/StartContainer/StartConfirm/PanelContainer/Story/BuyConfirm
-onready var story_cancel = $Progress/StartContainer/StartConfirm/PanelContainer/Story/BuyCancel
+onready var initiation_price_label:Label = $Progress/StartContainer/StartConfirm/PanelContainer/Isolated/PriceLabel
+onready var isolated_confirm:Button = $Progress/StartContainer/StartConfirm/PanelContainer/Isolated/BuyConfirm
+onready var isolated_cancel:Button = $Progress/StartContainer/StartConfirm/PanelContainer/Isolated/BuyCancel
+onready var story_confirm:Button = $Progress/StartContainer/StartConfirm/PanelContainer/Story/BuyConfirm
+onready var story_cancel:Button = $Progress/StartContainer/StartConfirm/PanelContainer/Story/BuyCancel
 
 
 func _ready():
@@ -197,37 +194,32 @@ func initialize():
 	name_button.text = project_name
 	name_button.hint_tooltip = project_description
 	
-	var display_mode = this_research_project.get("display_mode","sprite")
+	var display_mode:String = this_research_project.get("display_mode","sprite")
 	var display_path:String = this_research_project.get("display_path","")
-	var sprite_fallback = false
+	var sprite_fallback:bool = true
 	if pointers.FileAccess.__file_exists(display_path):
-		match display_mode:
-			"sprite":
-				if display_path.get_extension().to_lower() in pointers.SUPPORTED_IMAGE_EXTENSIONS:
-					sprite_container.texture = pointers.FileAccess.__load_png(display_path)
-					sprite_container.visible = true
-					scene_container.visible = false
-				else:
-					sprite_fallback = true
-			"scene":
-				var scene = load(display_path)
-				if scene is PackedScene:
-					var inst = scene.instance()
-					var display_positioning = this_research_project.get("display_positioning",{})
-					var scale_raw:Array = display_positioning.get("scale",[1,1])
-					var position_raw:Array = display_positioning.get("position",[0,0])
-					var scale:Vector2 = Vector2(scale_raw[0],scale_raw[1])
-					scene_offset.position = Vector2(position_raw[0],position_raw[1]) * scale
-					scene_offset.rotation = deg2rad(display_positioning.get("rotation",0.0))
-					scene_offset.scale = scale
-					pointers.NodeAccess.__remove_scripts(inst)
-					scene_offset.add_child(inst)
-					sprite_container.visible = false
-					scene_container.visible = true
-				else:
-					sprite_fallback = true
-			_:
-				sprite_fallback = true
+		if display_mode == "sprite":
+			if display_path.get_extension().to_lower() in pointers.SUPPORTED_IMAGE_EXTENSIONS:
+				sprite_container.texture = pointers.FileAccess.__load_png(display_path)
+				sprite_container.visible = true
+				scene_container.visible = false
+				sprite_fallback = false
+		elif display_mode == "scene":
+			var scene:PackedScene = load(display_path)
+			if scene:
+				var inst:Node = scene.instance()
+				var display_positioning:Dictionary = this_research_project.get("display_positioning",{})
+				var scale_raw:Array = display_positioning.get("scale",[1,1])
+				var position_raw:Array = display_positioning.get("position",[0,0])
+				var scale:Vector2 = Vector2(scale_raw[0],scale_raw[1])
+				scene_offset.position = Vector2(position_raw[0],position_raw[1]) * scale
+				scene_offset.rotation = deg2rad(display_positioning.get("rotation",0.0))
+				scene_offset.scale = scale
+				pointers.NodeAccess.__remove_scripts(inst)
+				scene_offset.add_child(inst)
+				sprite_container.visible = false
+				scene_container.visible = true
+				sprite_fallback = false
 	if sprite_fallback:
 		sprite_container.visible = true
 		scene_container.visible = false
@@ -241,7 +233,7 @@ func handle_story(flag,value):
 func exit():
 	Tool.remove(self)
 
-func getStory(story):
+func getStory(story) -> int:
 	return int(CurrentGame.state.story.get(story, -1))
 
 var default_vp_positioning = {"position":[0,0],"rotation":90,"scale":[1,1]}
@@ -255,7 +247,6 @@ func is_finished() -> bool:
 			if getStory(this_research_project.get("story_flag","")) >= this_research_project.get("progress_complete",1000):
 				return true
 		"isolated":
-			var failed = false
 			for task in this_research_project.get("tasks",Array()):
 				match task.get("mode",""):
 					"story":
@@ -278,19 +269,17 @@ func is_finished() -> bool:
 	return false
 
 func start_pressed():
-	match this_research_project.get("mode","story_only"):
-		"isolated":
-			confirmation_player.play("ShowStartIsolated")
-		_:
-			confirmation_player.play("ShowStartStory")
+	if this_research_project.get("mode","story_only") == "isolated":
+		confirmation_player.play("ShowStartIsolated")
+	else:
+		confirmation_player.play("ShowStartStory")
 	
 	
 
 func show_initiation_price():
-	var value = this_research_project.get("initiation_price",100000)
+	var value:float = float(this_research_project.get("initiation_price",100000))
 	initiation_price_label.text = "%d E$" % value
-	var current_cash = CurrentGame.getMoney()
-	if value > current_cash:
+	if value > CurrentGame.getMoney():
 		isolated_confirm.disabled = true
 		isolated_confirm.hint_tooltip = "HEVLIB_INSUFFICIENT_FUNDS_TOOLTIP"
 	else:
@@ -299,7 +288,7 @@ func show_initiation_price():
 
 func recheck_vis():
 	if is_visible_in_tree():
-		var project_state = this_research_project.get("state",Dictionary())
+		var project_state:Dictionary = this_research_project.get("state",Dictionary())
 		start_container.visible = !(project_state.active or project_state.completed)
 		
 		
