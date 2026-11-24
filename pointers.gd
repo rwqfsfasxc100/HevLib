@@ -7379,8 +7379,6 @@ class _Math:
 			converted[r] = Vector2(float(array[index]),float(array[index + 1]))
 		return converted
 	
-	
-	
 	static func __imax(a:int,b:int) -> int:
 		return a if a > b else b
 	
