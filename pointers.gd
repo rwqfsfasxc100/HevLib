@@ -4211,12 +4211,9 @@ script = ExtResource( 5 )"""
 	
 	static func set_array_to_vector_or_rect(main,setter):
 		if setter is PoolIntArray or setter is PoolRealArray or setter is Array:
-			if main is Vector2:
-				return Vector2(setter[0],setter[1])
-			elif main is Vector3:
-				return Vector3(setter[0],setter[1],setter[2])
-			elif main is Rect2:
-				return Rect2(Vector2(setter[0],setter[1]),Vector2(setter[2],setter[3]))
+			if main is Vector2: return Vector2(setter[0],setter[1])
+			elif main is Vector3: return Vector3(setter[0],setter[1],setter[2])
+			elif main is Rect2: return Rect2(Vector2(setter[0],setter[1]),Vector2(setter[2],setter[3]))
 		return setter
 	
 	static func match_array_to_vector_or_rect(main,setter) -> bool:
@@ -8824,33 +8821,8 @@ class _Tokenizer:
 			return tk.__tokens_to_source()
 		return ""
 	
-	
-	
-	
-	
 	func __get_tokenizer():
 		return tokenizer_script.new()
-	
-	
-	
-	
-	enum{
-		TK_EMPTY,TK_IDENTIFIER,TK_CONSTANT,TK_SELF,TK_BUILT_IN_TYPE,TK_BUILT_IN_FUNC,TK_OP_IN,TK_OP_EQUAL,
-		TK_OP_NOT_EQUAL,TK_OP_LESS,TK_OP_LESS_EQUAL,TK_OP_GREATER,TK_OP_GREATER_EQUAL,TK_OP_AND,TK_OP_OR,
-		TK_OP_NOT,TK_OP_ADD,TK_OP_SUB,TK_OP_MUL,TK_OP_DIV,TK_OP_MOD,TK_OP_SHIFT_LEFT,TK_OP_SHIFT_RIGHT,TK_OP_ASSIGN,
-		TK_OP_ASSIGN_ADD,TK_OP_ASSIGN_SUB,TK_OP_ASSIGN_MUL,TK_OP_ASSIGN_DIV,TK_OP_ASSIGN_MOD,TK_OP_ASSIGN_SHIFT_LEFT,
-		TK_OP_ASSIGN_SHIFT_RIGHT,TK_OP_ASSIGN_BIT_AND,TK_OP_ASSIGN_BIT_OR,TK_OP_ASSIGN_BIT_XOR,TK_OP_BIT_AND,
-		TK_OP_BIT_OR,TK_OP_BIT_XOR,TK_OP_BIT_INVERT,TK_CF_IF,TK_CF_ELIF,TK_CF_ELSE,TK_CF_FOR,TK_CF_WHILE,TK_CF_BREAK,
-		TK_CF_CONTINUE,TK_CF_PASS,TK_CF_RETURN,TK_CF_MATCH,TK_PR_FUNCTION,TK_PR_CLASS,TK_PR_CLASS_NAME,TK_PR_EXTENDS,
-		TK_PR_IS,TK_PR_ONREADY,TK_PR_TOOL,TK_PR_STATIC,TK_PR_EXPORT,TK_PR_SETGET,TK_PR_CONST,TK_PR_VAR,TK_PR_AS,
-		TK_PR_VOID,TK_PR_ENUM,TK_PR_PRELOAD,TK_PR_ASSERT,TK_PR_YIELD,TK_PR_SIGNAL,TK_PR_BREAKPOINT,TK_PR_REMOTE,
-		TK_PR_SYNC,TK_PR_MASTER,TK_PR_SLAVE,TK_PR_PUPPET,TK_PR_REMOTESYNC,TK_PR_MASTERSYNC,TK_PR_PUPPETSYNC,
-		TK_BRACKET_OPEN,TK_BRACKET_CLOSE,TK_CURLY_BRACKET_OPEN,TK_CURLY_BRACKET_CLOSE,TK_PARENTHESIS_OPEN,
-		TK_PARENTHESIS_CLOSE,TK_COMMA,TK_SEMICOLON,TK_PERIOD,TK_QUESTION_MARK,TK_COLON,TK_DOLLAR,TK_FORWARD_ARROW,
-		TK_NEWLINE,TK_CONST_PI,TK_CONST_TAU,TK_WILDCARD,TK_CONST_INF,TK_CONST_NAN,TK_ERROR,TK_EOF,TK_CURSOR,TK_MAX
-	}
-	
-	
 	
 
 class _Translations:
@@ -9329,17 +9301,17 @@ class _Zip:
 			miniz.extract_all(dir_path)
 	
 	static func __write_hlz(data,salt:PoolByteArray = PoolByteArray()) -> PoolByteArray:
+		var pointers:HevLibPointers = non_static["pointers"]
 		if salt and salt.size() != 67:
-			printerr("ZIP: HLZ SALT IS WRONG")
+			pointers.l("ZIP ERROR: HLZ SALT IS WRONG")
 			return PoolByteArray()
 		var aes:AESContext = AESContext.new()
 		var uid:String = OS.get_unique_id()
 		var key:PoolByteArray = uid.sha256_buffer()
 		if aes.start(AESContext.MODE_CBC_ENCRYPT,key.subarray(0,15),key.subarray(16,31)):
-			printerr("ZIP: CANNOT START HLZ WRITE")
+			pointers.l("ZIP ERROR: CANNOT START HLZ WRITE")
 			return PoolByteArray()
 		var stream:StreamPeerBuffer = StreamPeerBuffer.new()
-		var pointers:HevLibPointers = non_static["pointers"]
 		stream.put_data(salt if salt else ("HLS" + (uid + "%d.%d.%d" % Array(pointers.DataFormat.__get_vanilla_version()) + pointers.version_string).sha256_text()).to_ascii())
 		var toBytes:PoolByteArray = var2bytes(data,true)
 		stream.put_32(toBytes.size())
@@ -9360,20 +9332,20 @@ class _Zip:
 		return stream.data_array
 	
 	static func __read_hlz(data:PoolByteArray,salt:PoolByteArray = PoolByteArray()):
+		var pointers:HevLibPointers = non_static["pointers"]
 		if not data:
-			printerr("ZIP: HLZ IS EMPTY")
+			pointers.l("ZIP ERROR: HLZ IS EMPTY")
 			return null
 		if salt and salt.size() != 67:
-			printerr("ZIP: HLZ SALT IS WRONG")
+			pointers.l("ZIP ERROR: HLZ SALT IS WRONG")
 			return null
 		var stream:StreamPeerBuffer = StreamPeerBuffer.new()
 		stream.put_data(data)
 		var ssz:int = stream.get_size()
 		stream.seek(0)
 		var uid:String = OS.get_unique_id()
-		var pointers:HevLibPointers = non_static["pointers"]
 		if PoolByteArray(stream.get_data(67)[1]) != (salt if salt else ("HLS" + (uid + "%d.%d.%d" % Array(pointers.DataFormat.__get_vanilla_version()) + pointers.version_string).sha256_text()).to_ascii()):
-			printerr("ZIP: SALT IS CORRUPTED")
+			pointers.l("ZIP ERROR: SALT IS CORRUPTED")
 			return null
 		var sz:int = stream.get_32()
 		var tbs:int = stream.get_32()
@@ -9382,7 +9354,7 @@ class _Zip:
 		var aes:AESContext = AESContext.new()
 		var key:PoolByteArray = uid.sha256_buffer()
 		if aes.start(AESContext.MODE_CBC_DECRYPT,key.subarray(0,15),key.subarray(16,31)):
-			printerr("ZIP: CANNOT START HLZ READ")
+			pointers.l("ZIP ERROR: CANNOT START HLZ READ")
 			return null
 		var out:PoolByteArray = aes.update(bytes)
 		out.resize(out.size() - tbs)
@@ -9390,7 +9362,7 @@ class _Zip:
 		var btr:PoolByteArray = out.decompress(sz,1)
 		if btr:
 			return bytes2var(btr)
-		printerr("ZIP: CANNOT READ HLZ")
+		pointers.l("ZIP ERROR: CANNOT READ HLZ")
 		return null
 	
 

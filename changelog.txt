@@ -1,3 +1,14 @@
+[1.18.5]
+
+1=* Added `Math`.`__normalize_special_numbers`
+1.1=* Intended for data serialization
+1.2=* Only handles `INF`, `-INF`, and `NAN` float values
+1.3=* INF and -INF are converted into the 64-bit int limit converted back into a float.
+1.4=* NAN is converted into zero
+2=* Removed unused token constants
+3=* HLZ read/write operations now log to the game/library logs instead of stdout
+4=* Fixed yield errors with the changelog menu
+
 [1.18.4]
 
 1=* Vanilla translations are now cached to the pointers script after load to prevent cases where they get unreferenced too early after being loaded
