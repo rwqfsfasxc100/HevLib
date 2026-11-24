@@ -57,5 +57,9 @@ func parse(path:String,current_page:int,page_size:int,LEFT:Button,RIGHT:Button,r
 			if not clearing:
 				refs.append(label)
 				add_child(label)
-			yield(pointers,"process_tick")
-		yield(pointers,"process_tick")
+			yield(self,"process_tick")
+		yield(self,"process_tick")
+
+signal process_tick
+func _process(delta: float) -> void:
+	emit_signal("process_tick")
