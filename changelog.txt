@@ -1,3 +1,7 @@
+[1.18.3]
+
+1=* Fixed an issue with the boot multithread module that would incorrectly hold a semaphore indefinitely, preventing game boot.
+
 [1.18.2]
 
 1=* Inverted version check for minimum game version checks for mods

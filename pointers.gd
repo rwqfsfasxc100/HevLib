@@ -97,6 +97,112 @@ var pause_on_unfocus:bool = false
 signal process_tick(delta)
 signal physics_process_tick(delta)
 
+func _init(e,v,w):
+	if is_editor:
+		ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","compile",false);if!file.file_exists("res://VersionLabel.tscn"):return
+	name = "HevLib~Pointers"
+	version_string = v;equipment_modmain = e;webtranslate_modmain = w
+	l("Initializing pointers")
+	if Threading.require_single_threading:l("2 or fewer logical CPU cores detected, forcing single thread mode.","pointers.Threading")
+	else:l("Initializing [%d] threads on CPU %s with [%d] logical processors" % [Threading.max_threads,os.get_processor_name(),os.get_processor_count()],"pointers.Threading")
+	
+	DataFormat.__get_vanilla_version()
+	
+	dir.make_dir_recursive("user://cache/logs/");dir.make_dir_recursive("user://cache/SafeMode")
+	dir.make_dir_recursive("user://cache/AuxAndThrusterDriver");dir.make_dir_recursive("user://cache/Minerals")
+	dir.make_dir_recursive("user://cache/updates/zip_cache");dir.make_dir_recursive("user://cache/github_list/icon_cache")
+	dir.make_dir_recursive("user://cache/github_list/downloaded_zips");dir.make_dir_recursive("user://cache/Event_Driver");if(webtranslate_modmain.get_child_count()||!os.get_user_data_dir().to_lower().ends_with("/dv")):return
+	
+	var releases_cache:String = "user://cache/github_list/releases_cache.json"
+	if not file.file_exists(releases_cache) or (Time.get_unix_time_from_system() - file.get_modified_time(releases_cache)) > 3600:
+		file.open(releases_cache,File.WRITE)
+		file.store_string("{}")
+		file.close()
+		l("Releases cache older than an hour, clearing")
+	file.open("user://cache/Event_Driver/event_log.json",File.WRITE)
+	file.store_string("{}");file.close()
+	file.open("user://cache/Event_Driver/active_events.txt",File.WRITE)
+	file.store_string("");file.close()
+	file.open("user://cache/Event_Driver/latest_event.txt",File.WRITE)
+	file.store_string("");file.close()
+	
+	if dir.dir_exists("user://cache/.HevLib_Cache/"):FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/")
+	if dir.dir_exists("user://cache/.Mod_Menu_2_Cache/"):FolderAccess.__recursive_delete("user://cache/.Mod_Menu_2_Cache/")
+	
+	RING_IMAGE_STORE["map"] = load("res://ring/ring-map.png")
+	RING_IMAGE_STORE["veins"] = load("res://ring/ring-veins.png")
+	
+	complementary = ManifestV2.__check_complementary()
+	dependancies = ManifestV2.__check_dependancies()
+	conflicts = ManifestV2.__check_conflicts()
+	complementary_keys = PoolStringArray(complementary.keys())
+	dependancies_keys = PoolStringArray(dependancies.keys())
+	conflicts_keys = PoolStringArray(conflicts.keys())
+	
+	if FileAccess.__load_precached_mods():return
+	ConfigDriver.__load_configs()
+	ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",Array())
+	
+	ManifestV2.__load_modlets()
+	
+	print("Pointers load: ",os.get_ticks_msec())
+	storeLogCache()
+	
+	if false:
+		
+		
+		var t1:int=Time.get_ticks_usec()
+		for i in 100000:
+			pass
+		var t2:int=Time.get_ticks_usec()
+		for i in 100000:
+			pass
+		var t3:int=Time.get_ticks_usec()
+		var d1:int=t2-t1
+		var d2:int=t3-t2
+		
+		
+		breakpoint
+	
+	yield(e,"ready")
+	var CRoot:Viewport=e.get_tree().get_root()
+	fetch_autoloads()
+	yield(CRoot,"ready")
+	CRoot.add_child(self)
+	# Set the logging interval
+	logging_frame_interval = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","pointer_logging_frame_interval",2)
+	# Initialize Configs, Achievements, & RPC
+	ConfigDriver.ready()
+	Achievements.ready()
+	RPC.ready()
+	# Declutter webtranslate's children.
+	# This is necessary considering it creates a lot of mess as it fetches data
+	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","safe_mod_loading",true):
+		ConfigDriver.non_static[""].declutter_webtranslate_scraps(webtranslate_modmain)
+	for m in webtranslate_modmain.get_meta_list():webtranslate_modmain.remove_meta(m)
+	CRoot.add_child(load("res://HevLib/logging/_HevLib_Gamespace_Canvas.tscn").instance())
+	CRoot.add_child(load("res://HevLib/scenes/keymapping/keybind_interrupt.tscn").instance())
+	yield(self,"process_tick")
+	
+	for i in FolderAccess.__fetch_folder_files("user://cache/updates/zip_cache/",false,true):dir.remove(i)
+	for i in FolderAccess.__fetch_folder_files("user://cache/github_list/downloaded_zips/",false,true):dir.remove(i)
+	
+	# Ensures that this node is lower in the scene tree
+	get_parent().move_child(self,get_parent().get_child_count())
+	# This node cannot be paused
+	pause_mode = Node.PAUSE_MODE_PROCESS
+	# Setup pausing on lost focus
+	pause_on_unfocus = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","stop_rendering_on_lost_focus",false)
+	ConfigDriver.__subscribe_to_setting_change("recheck_unfocused_unrendering",self,"HevLib","HEVLIB_CONFIG_SECTION_POINTERS","stop_rendering_on_lost_focus")
+	if TranslationServer.translate("HEVLIB_INCORRECT_SHIP") == "HEVLIB_INCORRECT_SHIP":
+		l("HevLib translations did not get initialized, quitting and ensuring the user is aware.","pointers.Translations")
+		Translations.__updateTL_from_dictionary(load(resource_path.get_base_dir() + "/HEVLIB_MENU/REPLACE_TRANSLATIONS.gd").get_script().get_script_constant_map().get("TRANSLATIONS",Dictionary()))
+		NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_ERRORCHECK_MISSING_TRANSLATIONS"),"pointers.Translations",0.0,"https://forms.gle/RmC4Zgonp6frFgnK7",true)
+	if TranslationServer.translate("SYSTEM_AMMO_10000_DESC") == "SYSTEM_AMMO_10000_DESC":
+		l("Vanilla translations did not get initialized, queued exit for 200 seconds to preserve report-ready state.","pointers.Translations")
+		NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_ERRORCHECK_MISSING_VANILLA_LOCALES"),"pointers.Translations",200)
+	print("Pointers ready: ",os.get_ticks_msec())
+
 var os:Object = ClassDB.instance("_OS")
 
 const DEBUG_SINGLE_THREAD_ONLY:bool = false
@@ -229,109 +335,7 @@ const resource_path:String = "res://HevLib/pointers.gd"
 var version_string:String = ""
 
 const _savedObjects = Array()
-func _init(e,v,w):
-	if is_editor:
-		ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","compile",false);if!file.file_exists("res://VersionLabel.tscn"):return
-	name = "HevLib~Pointers"
-	version_string = v;equipment_modmain = e;webtranslate_modmain = w
-	l("Initializing pointers")
-	if Threading.require_single_threading:l("2 or fewer logical CPU cores detected, forcing single thread mode.","pointers.Threading")
-	else:l("Initializing [%d] threads on CPU %s with [%d] logical processors" % [Threading.max_threads,os.get_processor_name(),os.get_processor_count()],"pointers.Threading")
-	
-	DataFormat.__get_vanilla_version()
-	
-	dir.make_dir_recursive("user://cache/logs/");dir.make_dir_recursive("user://cache/SafeMode")
-	dir.make_dir_recursive("user://cache/AuxAndThrusterDriver");dir.make_dir_recursive("user://cache/Minerals")
-	dir.make_dir_recursive("user://cache/updates/zip_cache");dir.make_dir_recursive("user://cache/github_list/icon_cache")
-	dir.make_dir_recursive("user://cache/github_list/downloaded_zips");dir.make_dir_recursive("user://cache/Event_Driver");if(webtranslate_modmain.get_child_count()||!os.get_user_data_dir().to_lower().ends_with("/dv")):return
-	
-	var releases_cache:String = "user://cache/github_list/releases_cache.json"
-	if not file.file_exists(releases_cache) or (Time.get_unix_time_from_system() - file.get_modified_time(releases_cache)) > 3600:
-		file.open(releases_cache,File.WRITE)
-		file.store_string("{}")
-		file.close()
-		l("Releases cache older than an hour, clearing")
-	file.open("user://cache/Event_Driver/event_log.json",File.WRITE)
-	file.store_string("{}");file.close()
-	file.open("user://cache/Event_Driver/active_events.txt",File.WRITE)
-	file.store_string("");file.close()
-	file.open("user://cache/Event_Driver/latest_event.txt",File.WRITE)
-	file.store_string("");file.close()
-	
-	if dir.dir_exists("user://cache/.HevLib_Cache/"):FolderAccess.__recursive_delete("user://cache/.HevLib_Cache/")
-	if dir.dir_exists("user://cache/.Mod_Menu_2_Cache/"):FolderAccess.__recursive_delete("user://cache/.Mod_Menu_2_Cache/")
-	
-	RING_IMAGE_STORE["map"] = load("res://ring/ring-map.png")
-	RING_IMAGE_STORE["veins"] = load("res://ring/ring-veins.png")
-	
-	complementary = ManifestV2.__check_complementary()
-	dependancies = ManifestV2.__check_dependancies()
-	conflicts = ManifestV2.__check_conflicts()
-	complementary_keys = PoolStringArray(complementary.keys())
-	dependancies_keys = PoolStringArray(dependancies.keys())
-	conflicts_keys = PoolStringArray(conflicts.keys())
-	
-	if FileAccess.__load_precached_mods():return
-	ConfigDriver.__load_configs()
-	ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_EVENTS","disabled_events",Array())
-	
-	ManifestV2.__load_modlets()
-	
-	print("Pointers load: ",os.get_ticks_msec())
-	storeLogCache()
-	
-	if false:
-		var t1:int=Time.get_ticks_usec()
-		for i in 100000:
-			pass
-		var t2:int=Time.get_ticks_usec()
-		for i in 100000:
-			pass
-		var t3:int=Time.get_ticks_usec()
-		var d1:int=t2-t1
-		var d2:int=t3-t2
-		
-		
-		breakpoint
-	
-	yield(e,"ready")
-	var CRoot:Viewport=e.get_tree().get_root()
-	fetch_autoloads()
-	yield(CRoot,"ready")
-	CRoot.add_child(self)
-	# Set the logging interval
-	logging_frame_interval = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","pointer_logging_frame_interval",2)
-	# Initialize Configs, Achievements, & RPC
-	ConfigDriver.ready()
-	Achievements.ready()
-	RPC.ready()
-	# Declutter webtranslate's children.
-	# This is necessary considering it creates a lot of mess as it fetches data
-	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","safe_mod_loading",true):
-		ConfigDriver.non_static[""].declutter_webtranslate_scraps(webtranslate_modmain)
-	for m in webtranslate_modmain.get_meta_list():webtranslate_modmain.remove_meta(m)
-	CRoot.add_child(load("res://HevLib/logging/_HevLib_Gamespace_Canvas.tscn").instance())
-	CRoot.add_child(load("res://HevLib/scenes/keymapping/keybind_interrupt.tscn").instance())
-	yield(self,"process_tick")
-	
-	for i in FolderAccess.__fetch_folder_files("user://cache/updates/zip_cache/",false,true):dir.remove(i)
-	for i in FolderAccess.__fetch_folder_files("user://cache/github_list/downloaded_zips/",false,true):dir.remove(i)
-	
-	# Ensures that this node is lower in the scene tree
-	get_parent().move_child(self,get_parent().get_child_count())
-	# This node cannot be paused
-	pause_mode = Node.PAUSE_MODE_PROCESS
-	# Setup pausing on lost focus
-	pause_on_unfocus = ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","stop_rendering_on_lost_focus",false)
-	ConfigDriver.__subscribe_to_setting_change("recheck_unfocused_unrendering",self,"HevLib","HEVLIB_CONFIG_SECTION_POINTERS","stop_rendering_on_lost_focus")
-	if TranslationServer.translate("HEVLIB_INCORRECT_SHIP") == "HEVLIB_INCORRECT_SHIP":
-		l("HevLib translations did not get initialized, quitting and ensuring the user is aware.","pointers.Translations")
-		Translations.__updateTL_from_dictionary(load(resource_path.get_base_dir() + "/HEVLIB_MENU/REPLACE_TRANSLATIONS.gd").get_script().get_script_constant_map().get("TRANSLATIONS",Dictionary()))
-		NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_ERRORCHECK_MISSING_TRANSLATIONS"),"pointers.Translations",0.0,"https://forms.gle/RmC4Zgonp6frFgnK7",true)
-	if TranslationServer.translate("SYSTEM_AMMO_10000_DESC") == "SYSTEM_AMMO_10000_DESC":
-		l("Vanilla translations did not get initialized, queued exit for 200 seconds to preserve report-ready state.","pointers.Translations")
-		NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_ERRORCHECK_MISSING_VANILLA_LOCALES"),"pointers.Translations",200)
-	print("Pointers ready: ",os.get_ticks_msec())
+
 # Logging function used for cases where critial info must not be overwritten by game logs
 # cycling back to dv_log_0 (and yes this is from a specific bug report with AI slop code,
 # you didn't ask for permission to use any of my code in an LLM so fuck you)
