@@ -7459,8 +7459,8 @@ class _Math:
 	func __normalize_special_numbers(number):
 		if number is float:
 			match var2str(number):
-				"inf":return float(INT64_MAX)
-				"inf_neg":return float(INT64_MIN)
+				"inf":return pow(2,63)
+				"inf_neg":return -pow(2,63)
 				"nan":return 0.0
 		return number
 	
