@@ -1,3 +1,10 @@
+[1.18.4]
+
+1=* Vanilla translations are now cached to the pointers script after load to prevent cases where they get unreferenced too early after being loaded
+2=* Improved speed of reloading vanilla translations by having them added to the server during the same thread operation as them being loaded.
+3=* Update handling is now faster as the data is now no longer cached as plain text
+4=* Translation check file now uses the built-in `var2str` method as it produces a more useful layout to tab-formatted `JSON`.`print`
+
 [1.18.3]
 
 1=* Fixed an issue with the boot multithread module that would incorrectly hold a semaphore indefinitely, preventing game boot.

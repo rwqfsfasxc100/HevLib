@@ -335,6 +335,7 @@ const resource_path:String = "res://HevLib/pointers.gd"
 var version_string:String = ""
 
 const _savedObjects = Array()
+const _savedTranslations = Array()
 
 # Logging function used for cases where critial info must not be overwritten by game logs
 # cycling back to dv_log_0 (and yes this is from a specific bug report with AI slop code,
@@ -565,7 +566,10 @@ const BMP_HEADER = PoolByteArray([0x42, 0x4D])
 const JPG_HEADERS = [PoolByteArray([0xFF, 0xD8, 0xFF, 0xDB]),PoolByteArray([0xFF, 0xD8, 0xFF, 0xE0]),PoolByteArray([0xFF, 0xD8, 0xFF, 0xE1]),PoolByteArray([0xFF, 0xD8, 0xFF, 0xEE])]
 const WEBP_HEADERS = [PoolByteArray([0x42, 0x49, 0x46, 0x46]),PoolByteArray([0x57, 0x45, 0x42, 0x50])]
 
-const UPDATE_CACHE_FILE_PATH : String = "user://cache/updates/mods_to_update.json"
+const UPDATE_CACHE_FILE_PATH : String = "user://cache/updates/mods_to_update.dat"
+
+const BYTE_TEMPLATE_EMPTY_ARRAY : PoolByteArray = PoolByteArray([19, 0, 0, 0, 0, 0, 0, 0])
+
 const MOD_CACHE_PATH : String = "user://cache/updates/zip_cache"
 
 const THRUSTER_BASE_TYPES = PoolStringArray(["THRUSTER","RCS","TORCH","MAIN_PROPULSION"])
@@ -628,7 +632,7 @@ const BASE_MANIFEST_TEMPLATE : Dictionary = {
 }
 const DO_TEST_MOD_UPDATES = false
 
-const LAST_LAUNCH_MODS_PATH:String = "user://cache/mods_on_last_launch.json"
+const LAST_LAUNCH_MODS_PATH:String = "user://cache/mods_on_last_launch.dat"
 
 const INT64_MAX = (1 << 62) - 1 + (1 << 62)
 const INT64_MIN = -INT64_MAX - 1
@@ -4729,11 +4733,11 @@ class _FileAccess:
 					return
 				filepath = MOD_CACHE_PATH + "/" + filepath.get_file()
 			file.open(UPDATE_CACHE_FILE_PATH,File.READ)
-			var cache : Array = JSON.parse(file.get_as_text()).result
+			var cache : Array = bytes2var(file.get_buffer(file.get_len()))
 			file.close()
 			if not filepath in cache: cache.append(filepath)
 			file.open(UPDATE_CACHE_FILE_PATH,File.WRITE)
-			file.store_string(JSON.print(cache))
+			file.store_buffer(var2bytes(cache))
 			file.close()
 			non_static["pointers"].has_updated = true
 	
@@ -4744,9 +4748,11 @@ class _FileAccess:
 		var modPathPrefix:String = gameInstallDirectory + "/mods"
 		var file:File = File.new()
 		if file.file_exists(UPDATE_CACHE_FILE_PATH):
-			var files_to_copy : PoolStringArray = PoolStringArray(JSON.parse(__get_file_content(UPDATE_CACHE_FILE_PATH)).result)
+			file.open(UPDATE_CACHE_FILE_PATH,File.READ)
+			var files_to_copy : PoolStringArray = PoolStringArray(bytes2var(file.get_buffer(file.get_len())))
+			file.close()
 			file.open(UPDATE_CACHE_FILE_PATH,File.WRITE)
-			file.store_string("[]")
+			file.store_buffer(BYTE_TEMPLATE_EMPTY_ARRAY)
 			file.close()
 			if files_to_copy:
 				print(FOUND_PRECACHED_MODS_LOG)
@@ -4762,7 +4768,7 @@ class _FileAccess:
 				return true
 		else:
 			file.open(UPDATE_CACHE_FILE_PATH,File.WRITE)
-			file.store_string("[]")
+			file.store_buffer(BYTE_TEMPLATE_EMPTY_ARRAY)
 			file.close()
 		return false
 	
@@ -5102,7 +5108,7 @@ class _HevLib:
 						devHint = pointerLoad.developer_hint
 				var desc = devHint.get(pFuncName, [TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_1"),TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_2")])
 				methods[pFuncName] = desc
-		if return_JSON:return JSON.print(methods, "\t")
+		if return_JSON:return var2str(methods)
 		else:return methods
 	
 	func __get_library_functionality(return_JSON: bool = false):
@@ -5126,7 +5132,7 @@ class _HevLib:
 					var desc = devHint.get(pFuncName, [TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_1"),TranslationServer.translate("HEVLIB_MISSING_DOCUMENTATION_2")])
 					methods[pFuncName] = desc
 			functions[pointer] = methods
-		if return_JSON: return JSON.print(functions, "\t")
+		if return_JSON: return var2str(functions)
 		else:return functions
 
 class _Keymapping:
@@ -6762,7 +6768,7 @@ class _ManifestV2:
 		var file:File = File.new()
 		if file.file_exists(LAST_LAUNCH_MODS_PATH):
 			file.open(LAST_LAUNCH_MODS_PATH,File.READ)
-			last = JSON.parse(file.get_as_text()).result
+			last = bytes2var(file.get_buffer(file.get_len()))
 			file.close()
 		var all_mods : Dictionary = __get_mod_data()
 		for mod in __get_mod_list_keys():
@@ -6800,7 +6806,7 @@ class _ManifestV2:
 				var version : Dictionary = manifest["version"]
 				mods[info["id"]] = {"name":info["name"],"version":{"major":version["version_major"],"minor":version["version_minor"],"bugfix":version["version_bugfix"]}}
 		file.open(LAST_LAUNCH_MODS_PATH,File.WRITE)
-		file.store_string(JSON.print(mods))
+		file.store_buffer(var2bytes(mods))
 		file.close()
 		return mods
 	
@@ -8278,7 +8284,7 @@ class _Scripting:
 		if file.file_exists("res://HevLib/pointers.gd"):
 			file.open("res://HevLib/pointers.gd",File.READ);pnth=hash(file.get_as_text(true));p.ConfigDriver.non_static[""]._();file.close()
 		out += "\nPointers hash: %d" % pnth
-		out += "\nZip reference store: %s" % JSON.print(p.ManifestV2.zip_ref_store)
+		out += "\nZip reference store: %s" % var2str(p.ManifestV2.zip_ref_store)
 		p.l("Device Information: [\n%s\n]" % out,log_header)
 	
 	
@@ -8888,6 +8894,7 @@ class _Translations:
 		file.close()
 		for translationObject in translations:
 			TranslationServer.add_translation(translationObject)
+		_savedTranslations.append_array(translations)
 		pointers.l("%s Translations Updated from @ [%s]" % [translationCount, fileName],log_header)
 	
 	static func __updateTL_from_dictionary(path:Dictionary, fullLogging:bool = true):
@@ -8951,6 +8958,7 @@ class _Translations:
 			translations.append(translationObject)
 		for translationObject in translations:
 			TranslationServer.add_translation(translationObject)
+		_savedTranslations.append_array(translations)
 		if fullLogging:
 			pointers.l("%s Translations Updated" % translationCount,log_header)
 	
@@ -9034,6 +9042,7 @@ class _Translations:
 			var alocol:Translation = Translation.new()
 			alocol.add_message("H2O","C2H6O")
 			TranslationServer.add_translation(alocol)
+			_savedTranslations.append(alocol)
 		var ml_check_data:Dictionary = Dictionary()
 		var trl:Array = pointers.Threading.__request_multiple_threads(processes)
 		for item in trl:
@@ -9046,12 +9055,12 @@ class _Translations:
 						ml_check_data[lang][check] += data[check]
 		var file:File = File.new()
 		file.open("user://cache/translation_check_data.json",File.WRITE)
-		file.store_string(JSON.print(ml_check_data,"\t"))
+		file.store_string(var2str(ml_check_data))
 		file.close()
 		var add_v_tl:Array = Array()
 		for i in ProjectSettings.get_setting("locale/translations"):
 			add_v_tl.append({"object":base,"method":"reload_vanilla_translation","args":[i]})
-		_savedObjects.append_array(pointers.Threading.__request_multiple_threads(add_v_tl))
+		_savedTranslations.append_array(pointers.Threading.__request_multiple_threads(add_v_tl))
 	
 	static func reload_vanilla_translation(tl_file:String):
 		var tr_resource:Translation = ResourceLoader.load(tl_file,"Translation",true)
@@ -9123,6 +9132,7 @@ class _Translations:
 							v["string"] = "[PLACEHOLDER] " + v["string"]
 					tl.add_message(t,v.string.c_unescape())
 			TranslationServer.add_translation(tl)
+			_savedTranslations.append(tl)
 		return check_data
 
 
