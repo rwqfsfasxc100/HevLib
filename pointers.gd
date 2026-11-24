@@ -9345,6 +9345,9 @@ class _Zip:
 		if not data:
 			printerr("ZIP: HLZ IS EMPTY")
 			return null
+		if salt and salt.size() != 67:
+			printerr("ZIP: HLZ SALT IS WRONG")
+			return null
 		var stream:StreamPeerBuffer = StreamPeerBuffer.new()
 		stream.put_data(data)
 		var ssz:int = stream.get_size()
