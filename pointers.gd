@@ -9051,10 +9051,12 @@ class _Translations:
 		var add_v_tl:Array = Array()
 		for i in ProjectSettings.get_setting("locale/translations"):
 			add_v_tl.append({"object":base,"method":"reload_vanilla_translation","args":[i]})
-		pointers.Threading.__request_multiple_threads(add_v_tl)
+		_savedObjects.append_array(pointers.Threading.__request_multiple_threads(add_v_tl))
 	
 	static func reload_vanilla_translation(tl_file:String):
-		TranslationServer.add_translation(ResourceLoader.load(tl_file,"Translation",true))
+		var tr_resource:Translation = ResourceLoader.load(tl_file,"Translation",true)
+		TranslationServer.add_translation(tr_resource)
+		return tr_resource
 	
 	static func process_drivers_for_translations(translations:Dictionary,markPlaceholders:bool,pointers:HevLibPointers,TranslationServer:Object):
 		var check_data:Dictionary = Dictionary()
