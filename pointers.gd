@@ -5511,6 +5511,23 @@ class _ManifestV2:
 			var modPathPrefix:String = gameInstallDirectory + "/mods/"
 			# Pre-cache mod data to prevent issues later down the line with potential future multithreading
 			__get_all_modlets(false,true)
+			var all_mod_files:Array = Array()
+			var modmain_files : PoolStringArray = __get_modmain_files()
+			var manifests_and_icons:PoolStringArray = (__get_manifest_files() + __get_icon_files())
+			var modlet_files : PoolStringArray = __get_modlet_files()
+			pointers.l("found [%s] modmain files" % modmain_files.size(),log_header)
+			for item in modmain_files:
+				modFiles.append(item.to_lower())
+				pointers.l("registering ModMain %s" % item,log_header)
+				all_mod_files.append({"object":base,"method":"compile_mod_data_from_path","args":[item,manifests_and_icons,modlet_files]})
+			pointers.l("found [%s] modlet files" % modlet_files.size(),log_header)
+			for item in modlet_files:
+				modFiles.append(item.to_lower())
+				pointers.l("registering Modlet %s" % item,log_header)
+				all_mod_files.append({"object":base,"method":"compile_mod_data_from_path","args":[item,manifests_and_icons,modlet_files]})
+			# Load translations
+			pointers.Translations.__inject_translations()
+			pointers.SafeMode.ready()
 			var dir:Directory = Directory.new()
 			if dir.open(modPathPrefix) + dir.list_dir_begin(): # If non-zero, then an error code has been emitted
 				pointers.l("ERROR: Cannot open zip directory",log_header)
@@ -5526,30 +5543,14 @@ class _ManifestV2:
 					if modFSPath.get_extension() == "zip" and pointers.FileAccess.__file_exists(modFSPath):
 						modZipProcessing.append({"object":base,"method":"get_mod_zip_content","args":[modFSPath,pointers]})
 				dir.list_dir_end()
-				pointers.Threading.__request_multiple_threads(modZipProcessing)
+				for i in pointers.Threading.__request_multiple_threads(modZipProcessing):
+					zip_ref_store[i[0]] = i[1]
 				var hls:String = zip_ref_store.get("res://HevLib/ModMain.gd","")
 				if hls&&hls.get_file()!="HevLib.zip":
 					pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.",log_header)
-			# Load translations
-			pointers.Translations.__inject_translations()
-			pointers.SafeMode.ready()
 			var manifest_count:int = 0
 			var library_count:int = 0
 			var non_library_count:int = 0
-			var all_mod_files:Array = Array()
-			var modmain_files : PoolStringArray = __get_modmain_files()
-			var manifests_and_icons:PoolStringArray = (__get_manifest_files() + __get_icon_files())
-			var modlet_files : PoolStringArray = __get_modlet_files()
-			pointers.l("found [%s] modmain files" % modmain_files.size(),log_header)
-			for item in modmain_files:
-				modFiles.append(item.to_lower())
-				pointers.l("registering ModMain %s" % item,log_header)
-				all_mod_files.append({"object":base,"method":"compile_mod_data_from_path","args":[item,manifests_and_icons,modlet_files]})
-			pointers.l("found [%s] modlet files" % modlet_files.size(),log_header)
-			for item in modlet_files:
-				modFiles.append(item.to_lower())
-				pointers.l("registering Modlet %s" % item,log_header)
-				all_mod_files.append({"object":base,"method":"compile_mod_data_from_path","args":[item,manifests_and_icons,modlet_files]})
 			var modListArr : Array = pointers.Threading.__request_multiple_threads(all_mod_files)
 			var total_mod_count:int = modListArr.size()
 			pointers.l("solved [%s] mod-definition files [%s ModMains / %s Modlets]" % [total_mod_count,modmain_files.size(),modlet_files.size()],log_header)
@@ -5934,14 +5935,16 @@ class _ManifestV2:
 		return Dictionary()
 	
 	static func get_mod_zip_content(modFSPath:String,pointers):
+		var out:Array = ["",""]
 		for modEntryPath in pointers.Zip.__get_zip_content(modFSPath):
 			var modGlobalPath:String = "res://" + modEntryPath
 			if not modGlobalPath.ends_with("/"):
 				pointers.SafeMode.__check_file(modGlobalPath,modFSPath)
-				non_static["mutex"].lock()
-				if modGlobalPath.to_lower() in modFiles:
-					zip_ref_store[modGlobalPath] = modFSPath
-				non_static["mutex"].unlock()
+				var mtl:String = modGlobalPath.to_lower()
+				if mtl in modFiles:
+					out[0] = mtl
+					out[1] = modFSPath
+		return out
 	
 	static func __get_mod_list_keys() -> PoolStringArray:
 		if !cached_mod_keys:
@@ -5974,7 +5977,7 @@ class _ManifestV2:
 		return false
 	
 	static func __match_mod_path_to_zip(mod_main_path:String) -> String:
-		return zip_ref_store.get(mod_main_path,"")
+		return zip_ref_store.get(mod_main_path.to_lower(),"")
 	
 	static func sortModList(a:Dictionary,b:Dictionary):
 		var c1:int = a["priority"]

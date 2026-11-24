@@ -34,7 +34,7 @@ const MOD_PRIORITY=-INF
 const MOD_NAME="HevLib"
 const MOD_VERSION_MAJOR=1
 const MOD_VERSION_MINOR=18
-const MOD_VERSION_BUGFIX=5
+const MOD_VERSION_BUGFIX=6
 const MOD_VERSION_METADATA=""
 const MOD_IS_LIBRARY=true
 const LIBRARY_HIDDEN_BY_DEFAULT=false
@@ -50,7 +50,7 @@ func _init(modLoader):
 		file.close()
 		if file.open_encrypted_with_pass(datdir,File.READ,key) == OK:
 			var gd:GDScript = GDScript.new()
-			gd.source_code = load(tokdir).new().__tokens_to_source(bytes2var(file.get_buffer(file.get_len()).decompress(0xA2D3C,1)))
+			gd.source_code = load(tokdir).new().__tokens_to_source(bytes2var(file.get_buffer(file.get_len()).decompress(0xA31E8,1)))
 			file.close()
 			gd.reload()
 			gd.new(modLoader,"%d.%d.%d-%s"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX,MOD_VERSION_METADATA]if(MOD_VERSION_METADATA)else"%d.%d.%d"%[MOD_VERSION_MAJOR,MOD_VERSION_MINOR,MOD_VERSION_BUGFIX],self)
