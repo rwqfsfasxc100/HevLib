@@ -7456,6 +7456,14 @@ class _Math:
 			out.append(__rotate_point(Vector2.UP * radius,end - 0.0001,false))
 		return out
 	
+	func __normalize_special_numbers(number):
+		if number is float:
+			match var2str(number):
+				"inf":return float(INT64_MAX)
+				"inf_neg":return float(INT64_MIN)
+				"nan":return 0.0
+		return number
+	
 
 class _NetIO:
 	# https://github.com/Abdera7mane/Godot-SimpleHTTPClient
