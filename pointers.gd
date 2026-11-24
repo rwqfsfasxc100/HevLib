@@ -8072,12 +8072,17 @@ class _SafeMode:
 	var file:File = File.new()
 	func ready():
 		var data = null
+		
+		var salt:PoolByteArray = pointers.DataFormat.__reserve_in_array(PoolByteArray(),67)
+		var vver:String = str(VANILLA_VERSION)
+		for i in vver.length():
+			salt[i] = ord(vver[i])
 		if file.file_exists(SAFEMODE_DATA_PATH):
 			file.open(SAFEMODE_DATA_PATH,File.READ)
-			data = pointers.Zip.__read_hlz(file.get_buffer(file.get_len()))
+			data = pointers.Zip.__read_hlz(file.get_buffer(file.get_len()),salt)
 			file.close()
 		
-		if not data is Array or pointers.ManifestV2.haveModsChanged:
+		if not data is Array:
 			pointers.l("Game has updated or cache is missing, rebuilding file info cache.",log_header)
 			pointers.FolderAccess.__recursive_delete(SAFEMODE_PATH)
 			Directory.new().make_dir(SAFEMODE_PATH)
@@ -8105,7 +8110,7 @@ class _SafeMode:
 				JSON.print(vanilla_load_order),
 				JSON.print(dependancy_lookup),
 				JSON.print(dependancy_dictionary)
-			])
+			],salt)
 			file.open(SAFEMODE_DATA_PATH,File.WRITE)
 			file.store_buffer(data_to_store)
 			file.close()
