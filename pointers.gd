@@ -7402,10 +7402,10 @@ class _Math:
 	
 	func __normalize_special_numbers(number):
 		if number is float:
-			match var2str(number):
-				"inf":return INT64_MAX_FLOAT
-				"inf_neg":return INT64_MIN_FLOAT
-				"nan":return 0.0
+			if is_nan(number):
+				return 0.0
+			if is_inf(number):
+				return INT64_MIN_FLOAT if number < 0 else INT64_MAX_FLOAT
 		return number
 	
 
