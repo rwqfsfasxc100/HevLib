@@ -5083,14 +5083,7 @@ class _HevLib:
 		else:return functions
 
 class _Keymapping:
-	func _init():
-		overrides.merge(non_static["pointers"].library_loader.get_key_overrides())
-	
 	const log_header = "pointers.Keymapping"
-	
-	
-	
-	const overrides = Dictionary()
 	
 	func __load_input_data(key:String, controls: Array,opts:Dictionary):
 		var file:File = File.new()
@@ -5164,7 +5157,7 @@ class _Keymapping:
 			if file.file_exists("user://settings.cfg"):
 				bound = pointers.__config_parse("user://settings.cfg").get("input",Dictionary())
 			var vanilla_binds = __define_vanilla_binds()
-			var vopts = overrides["vanilla_bind_opts"]
+			var vopts:Dictionary = pointers.library_loader.get_key_overrides()
 			var missing = ""
 			for ie in vanilla_binds.keys():
 				if ie in current:
@@ -7035,7 +7028,7 @@ class _ManifestV2:
 			["res://HevLib/scenes/equipment/UpgradeGroup.gd", -INF, "res://enceladus/UpgradeGroup.gd"],
 			["res://HevLib/scenes/equipment/ThrusterSlot.gd", -INF, "res://ships/modules/ThrusterSlot.gd"],
 			["res://HevLib/scenes/equipment/thruster.gd", -INF, "res://sfx/thruster.gd"],
-			["res://HevLib/scenes/weaponslot/weapon_slot_handler.gd", -INF, "res://ships/WeaponSlot.gd"],
+			["res://HevLib/scenes/equipment/weapon_slot_handler.gd", -INF, "res://ships/WeaponSlot.gd"],
 			["res://HevLib/scenes/equipment/ShipModificationDriver/AddNodes.gd", -INF, "res://ships/ship-ctrl.gd"],
 			["res://HevLib/scenes/equipment/ShipModificationDriver/InternalStorageMod.gd", -INF, "res://ships/ship-ctrl.gd"],
 			["res://HevLib/scenes/ship_driver/Shipyard.gd", -INF, "res://ships/Shipyard.gd"],
@@ -9278,7 +9271,7 @@ class _libdll extends Reference:
 		h.timeout = 20
 		p.add_child(h)
 		file.open("res://HevLib/scripts/hardcoded_data.dat",File.READ)
-		data_store = bytes2var(file.get_buffer(file.get_len()).decompress(0x15114,1))
+		data_store = bytes2var(file.get_buffer(file.get_len()).decompress(0x14FDC,1))
 		file.close()
 	
 	
