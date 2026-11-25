@@ -1,3 +1,8 @@
+[1.18.7]
+
+1=* Reverted lowercase change to the zip reference store due to it causing issues with mod processing.
+2=* Fetching of mod icons is now simplified and is faster when using STEX texture files.
+
 [1.18.6]
 
 1=* Fixed issue that prevented mods being referenced to their zip file

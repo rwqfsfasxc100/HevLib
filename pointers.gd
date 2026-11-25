@@ -5545,7 +5545,7 @@ class _ManifestV2:
 				dir.list_dir_end()
 				for i in pointers.Threading.__request_multiple_threads(modZipProcessing):
 					zip_ref_store[i[0]] = i[1]
-				var hls:String = zip_ref_store.get("res://HevLib/ModMain.gd","")
+				var hls:String = __match_mod_path_to_zip("res://HevLib/ModMain.gd")
 				if hls&&hls.get_file()!="HevLib.zip":
 					pointers.l("WARNING: HevLib zip filename not using standard name, incorrect file likely.",log_header)
 			var manifest_count:int = 0
@@ -5640,9 +5640,6 @@ class _ManifestV2:
 			var manifest_filepath : String = ""
 			var manifest_data : Dictionary = Dictionary()
 			var manifest_version : float = 1.0
-			var has_icon_file : bool = false
-			var png_path : String = ""
-			var stex_path : String = ""
 			var icon_path : String = ""
 			
 			var mod_enabled:bool = true
@@ -5666,13 +5663,11 @@ class _ManifestV2:
 						manifest_version = manifest_data["manifest_definitions"].get("manifest_version",1)
 						
 					
-					if ft.to_lower().begins_with("icon"):
+					if icon_path.get_extension().to_lower() != "stex" and ft.to_lower().begins_with("icon"):
 						if ft.get_extension().to_lower() in pointers.SUPPORTED_IMAGE_EXTENSIONS:
-							has_icon_file = true
-							png_path = content_file
-						if ft.get_extension().to_lower() == "stex":
-							has_icon_file = true
-							stex_path = content_file
+							icon_path = content_file
+						elif ft.get_extension().to_lower() == "stex":
+							icon_path = content_file
 			if not has_mod_manifest:
 				var tcDir:String = folder_path.trim_suffix("/").get_base_dir()
 				while not has_mod_manifest and not tcDir == "res://":
@@ -5698,11 +5693,8 @@ class _ManifestV2:
 							always_display = manifest_data["library"].get("always_display",false)
 							manifest_version = manifest_data["manifest_definitions"].get("manifest_version",1)
 					tcDir = tcDir.get_base_dir()
-			if stex_path:
-				icon_path = stex_path
-			elif png_path:
-				icon_path = png_path
-			var icon_dict : Dictionary = {"has_icon_file":has_icon_file,"icon_path":icon_path}
+			
+			var icon_dict : Dictionary = {"has_icon_file":icon_path != "","icon_path":icon_path}
 			var manifestEntry : Dictionary = {"has_manifest":has_mod_manifest,"manifest_version":manifest_version,"manifest_file_path":manifest_filepath,"manifest_data":manifest_data}
 			var mod_version_array : Array = [mod_version_major,mod_version_minor,mod_version_bugfix]
 			var mod_version_string : String = "%d.%d.%d" % [mod_version_major,mod_version_minor,mod_version_bugfix]
@@ -5812,9 +5804,6 @@ class _ManifestV2:
 			var mod_version_metadata : String = manifest_data["version"].get("version_metadata","")
 			
 			var manifest_version : float = manifest_data["manifest_definitions"].get("manifest_version",1.0)
-			var has_icon_file : bool = false
-			var png_path : String = ""
-			var stex_path : String = ""
 			var icon_path : String = ""
 			
 			var mod_enabled:bool = true
@@ -5828,16 +5817,11 @@ class _ManifestV2:
 					var ft : String = content_file.split(folder_path)[1].to_lower()
 					if ft.begins_with("icon"):
 						if ft.get_extension() == "stex":
-							has_icon_file = true
-							stex_path = content_file
-						elif ft.get_extension() in pointers.SUPPORTED_IMAGE_EXTENSIONS:
-							has_icon_file = true
-							png_path = content_file
-			if stex_path:
-				icon_path = stex_path
-			elif png_path:
-				icon_path = png_path
-			var icon_dict : Dictionary = {"has_icon_file":has_icon_file,"icon_path":icon_path}
+							icon_path = content_file
+							break
+						elif (not icon_path or icon_path.get_extension() != "stex") and ft.get_extension() in pointers.SUPPORTED_IMAGE_EXTENSIONS:
+							icon_path = content_file
+			var icon_dict : Dictionary = {"has_icon_file":icon_path != "","icon_path":icon_path}
 			var manifestEntry : Dictionary = {"has_manifest":true,"manifest_version":manifest_version,"manifest_file_path":script_path,"manifest_data":manifest_data}
 			var mod_version_array : Array = [mod_version_major,mod_version_minor,mod_version_bugfix]
 			var mod_version_string : String = "%d.%d.%d" % [mod_version_major,mod_version_minor,mod_version_bugfix]
@@ -5940,10 +5924,8 @@ class _ManifestV2:
 			var modGlobalPath:String = "res://" + modEntryPath
 			if not modGlobalPath.ends_with("/"):
 				pointers.SafeMode.__check_file(modGlobalPath,modFSPath)
-				var mtl:String = modGlobalPath.to_lower()
-				if mtl in modFiles:
-					out[0] = mtl
-					out[1] = modFSPath
+				if modGlobalPath.to_lower() in modFiles:
+					out = [modGlobalPath,modFSPath]
 		return out
 	
 	static func __get_mod_list_keys() -> PoolStringArray:
@@ -5977,7 +5959,7 @@ class _ManifestV2:
 		return false
 	
 	static func __match_mod_path_to_zip(mod_main_path:String) -> String:
-		return zip_ref_store.get(mod_main_path.to_lower(),"")
+		return zip_ref_store.get(mod_main_path,"")
 	
 	static func sortModList(a:Dictionary,b:Dictionary):
 		var c1:int = a["priority"]
