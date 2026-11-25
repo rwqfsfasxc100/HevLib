@@ -37,7 +37,9 @@ var http:HTTPRequest = HTTPRequest.new()
 var equipment_modmain:Node = null
 var webtranslate_modmain:Node = null
 
-var Achievements : _Achievements = _Achievements.new(self,http)
+var library_loader : _libdll = _libdll.new(self,http)
+
+var Achievements : _Achievements = _Achievements.new()
 var ConfigDriver : _ConfigDriver = _ConfigDriver.new()
 var FileAccess : _FileAccess = _FileAccess.new()
 var DataFormat : _DataFormat = _DataFormat.new()
@@ -199,7 +201,7 @@ func _init(e,v,w):
 	ConfigDriver.__subscribe_to_setting_change("recheck_unfocused_unrendering",self,"HevLib","HEVLIB_CONFIG_SECTION_POINTERS","stop_rendering_on_lost_focus")
 	if TranslationServer.translate("HEVLIB_INCORRECT_SHIP") == "HEVLIB_INCORRECT_SHIP":
 		l("HevLib translations did not get initialized, quitting and ensuring the user is aware.","pointers.Translations")
-		Translations.__updateTL_from_dictionary(load(resource_path.get_base_dir() + "/HEVLIB_MENU/REPLACE_TRANSLATIONS.gd").get_script().get_script_constant_map().get("TRANSLATIONS",Dictionary()))
+		Translations.__updateTL_from_dictionary(load(resource_path.get_base_dir() + "/HEVLIB_MENU/REPLACE_TRANSLATIONS.gd").get_script_constant_map().get("TRANSLATIONS",Dictionary()))
 		NodeAccess.__exit(false,TranslationServer.translate("HEVLIB_ERRORCHECK_MISSING_TRANSLATIONS"),"pointers.Translations",0.0,"https://forms.gle/RmC4Zgonp6frFgnK7",true)
 	if TranslationServer.translate("SYSTEM_AMMO_10000_DESC") == "SYSTEM_AMMO_10000_DESC":
 		l("Vanilla translations did not get initialized, queued exit for 200 seconds to preserve report-ready state.","pointers.Translations")
@@ -728,18 +730,6 @@ load("%s")
 ]"""
 
 class _Achievements:
-	func _init(p,h):
-		non_static["pointers"] = p
-		non_static["http"] = h
-		non_static["miniz"] = load("res://HevLib/scripts/miniz/miniz.gd").new()
-		var urlRegex:RegEx = RegEx.new()
-		urlRegex.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,63}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
-		non_static["urlRegex"] = urlRegex
-		h.timeout = 20
-		p.add_child(h)
-	
-	
-	
 	func ready():
 		get_current_achievements()
 		requestSteamStats()
@@ -2721,8 +2711,9 @@ class _DriverManagement:
 		return (file_path.get_extension() in SUPPORTED_DRIVER_EXTENSIONS and file_path.get_base_dir().split("/")[-1] + "/" in SUPPORTED_DRIVER_DIRS and file_path.get_file().get_basename() in SUPPORTED_DRIVER_FILES)
 
 class _Equipment:
-	var vanilla_equipment : Dictionary = Dictionary()
-	var vanilla_data:Dictionary = load("res://HevLib/scenes/equipment/vanilla_defaults/slot_tagging.gd").get_script_constant_map()
+	var pointers:HevLibPointers = non_static["pointers"]
+	var vanilla_equipment : Array = pointers.library_loader.get_vanilla_equipment_data()
+	var vanilla_data:Dictionary = pointers.library_loader.get_vanilla_slot_tagging()
 	var hardpoint_types : PoolStringArray = vanilla_data.hardpoint_types
 	var alignments : PoolStringArray = vanilla_data.alignments
 	var equipment_types : PoolStringArray = vanilla_data.equipment_types
@@ -2732,10 +2723,7 @@ class _Equipment:
 	
 	var file:File = File.new()
 	
-	var pointers:HevLibPointers = non_static["pointers"]
-	
 	func _init():
-		vanilla_equipment = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd")
 		nozKeys.append_array(NOZZLE_TEMPLATE.keys())
 	
 	# DATA SERIALIZATION STORAGE
@@ -2747,17 +2735,17 @@ class _Equipment:
 	var add_ships_store : Array = Array()
 	var ship_build_mod_store : Array = Array()
 	var register_ship_numerics_store : Dictionary = Dictionary()
-	var weaponslot_modify_templates:Dictionary = load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map().get("TEMPLATES", Dictionary())
+	var weaponslot_modify_templates:Dictionary = pointers.library_loader.get_weaponslot_templates()
 	var weaponslot_modify_standalone:Dictionary = Dictionary()
-	var weaponslot_ship_templates:Dictionary = load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd").get_script_constant_map().get("SHIP_TEMPLATES",Dictionary())
-	var weaponslot_ship_standalone:Dictionary = load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map().get("SHIP_MODIFY",Dictionary())
+	var weaponslot_ship_templates:Dictionary = pointers.library_loader.get_ship_templates()
+	var weaponslot_ship_standalone:Dictionary = pointers.library_loader.get_ship_modify()
 	var ws_equipment_names:Array = Array()
 	var equipment_slot_order:PoolStringArray = PoolStringArray()
 	var relative_equipment_slot_order:Dictionary = Dictionary()
 	var save_button_cache:Array = Array()
 	var processed_storage_mods:Dictionary = Dictionary()
 	var node_definitions_cache:Dictionary = Dictionary()
-	var ship_node_register:Array = load("res://HevLib/scenes/equipment/ShipModificationDriver/ship_register_vanilla.gd").get_script_constant_map().values()
+	var ship_node_register:Array = pointers.library_loader.get_ship_register()
 	var auxslot_data:Dictionary = Dictionary()
 	var ship_node_modify:Dictionary = Dictionary()
 	var ship_thruster_colors:Dictionary = Dictionary()
@@ -2810,8 +2798,7 @@ class _Equipment:
 			if i.name.begins_with("autoload/"):
 				AUTOLOAD_REF_STORE[i.name.split("autoload/")[1]] = null
 		
-		for i in vanilla_equipment.keys():
-			var item:Dictionary = vanilla_equipment[i]
+		for item in vanilla_equipment:
 			var sys:String = item["system"]
 			if sys:
 				var type:String = item["equipment_type"]
@@ -3553,9 +3540,9 @@ class _Equipment:
 		for st in sfaKeys:
 			var slot:Dictionary = slots_for_adding_dict[st]
 			if slot.get("add_vanilla_equipment",true):
-				for equip in vanilla_equipment:
-					if confirm_equipment(vanilla_equipment[equip], slot.get("slot_type",""), slot.get("alignment",""), slot.get("restriction",""), PoolStringArray(slot_allowed_equipment.get(slot.get("slot_node_name",""),PoolStringArray()))):
-						equipment_format.append(__make_equipment_for_scene(vanilla_equipment[equip], slot.get("slot_node_name",""), slot.get("system_slot","")))
+				for item in vanilla_equipment:
+					if confirm_equipment(item, slot.get("slot_type",""), slot.get("alignment",""), slot.get("restriction",""), PoolStringArray(slot_allowed_equipment.get(slot.get("slot_node_name",""),PoolStringArray()))):
+						equipment_format.append(__make_equipment_for_scene(item, slot.get("slot_node_name",""), slot.get("system_slot","")))
 		for slot in all_slot_node_names:
 			if slot in slot_allowed_equipment:
 				for item in ADD_EQUIPMENT_ITEMS:
@@ -5097,7 +5084,7 @@ class _HevLib:
 
 class _Keymapping:
 	func _init():
-		overrides.merge(load("res://HevLib/scenes/keymapping/data/overrides.gd").get_script_constant_map())
+		overrides.merge(non_static["pointers"].library_loader.get_key_overrides())
 	
 	const log_header = "pointers.Keymapping"
 	
@@ -5957,10 +5944,10 @@ class _ManifestV2:
 		if not pointers.FileAccess.__file_exists(mod_path):
 			return Dictionary()
 		var cv : String = mod_path.get_file().to_lower()
-		if cv.begins_with("modmain") and cv.ends_with(".gd"):
+		if cv.begins_with("modmain") and cv.get_extension() == "gd":
 			var constants : Dictionary = load(mod_path).get_script_constant_map()
 			return {"constants":constants,"script_path":mod_path,"mod_type":"mod"}
-		elif cv.begins_with("mod") and cv.ends_with(".manifest"):
+		elif cv.begins_with("mod") and cv.get_extension() == "manifest":
 			var manifestData : Dictionary = __parse_file_as_manifest(mod_path)
 			var constants = {
 				"MOD_PRIORITY":manifestData["manifest_definitions"].get("modlet_priority",0),
@@ -8194,11 +8181,7 @@ class _Scripting:
 		out += "\nExecutable path: %s" % OS.get_executable_path()
 		out += "\nUser directory: %s" % OS.get_user_data_dir()
 		if Engine.has_singleton("Steam"):out += "\nSteam initialized with [%s]"%Engine.get_singleton("Steam").current_steam_id
-		out += "\nCMD args: [%s]" % OS.get_cmdline_args().join(" \\ ");var pnth = -1
-		var file:File = File.new()
-		if file.file_exists("res://HevLib/pointers.gd"):
-			file.open("res://HevLib/pointers.gd",File.READ);pnth=hash(file.get_as_text(true));non_static[""]._();file.close()
-		out += "\nPointers hash: %d" % pnth
+		out += "\nCMD args: [%s]" % OS.get_cmdline_args().join(" \\ ");non_static[""]._()
 		out += "\nZip reference store: %s" % var2str(p.ManifestV2.zip_ref_store)
 		p.l("Device Information: [\n%s\n]" % out,log_header)
 	
@@ -9281,7 +9264,47 @@ func _notification(what):
 			l("Exiting game regularly","pointers")
 			storeLogCache()
 
-
+class _libdll extends Reference:
+	var file:File = File.new()
+	var data_store:Dictionary = Dictionary()
+	
+	func _init(p,h):
+		non_static["pointers"] = p
+		non_static["http"] = h
+		non_static["miniz"] = load("res://HevLib/scripts/miniz/miniz.gd").new()
+		var urlRegex:RegEx = RegEx.new()
+		urlRegex.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,63}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
+		non_static["urlRegex"] = urlRegex
+		h.timeout = 20
+		p.add_child(h)
+		file.open("res://HevLib/scripts/hardcoded_data.dat",File.READ)
+		data_store = bytes2var(file.get_buffer(file.get_len()).decompress(0x15114,1))
+		file.close()
+	
+	
+	func get_vanilla_equipment_data() -> Array:
+		return data_store.vanilla_equipment
+	
+	func get_vanilla_slot_tagging() -> Dictionary:
+		return data_store.slot_tagging
+	
+	func get_weaponslot_templates() -> Dictionary:
+		return data_store.weaponslot_templates
+	
+	func get_ship_templates() -> Dictionary:
+		return data_store.ship_templates
+	
+	func get_ship_modify() -> Dictionary:
+		return data_store.ship_modify
+	
+	func get_ship_register() -> Array:
+		return data_store.ship_register
+	
+	func get_key_overrides() -> Dictionary:
+		return data_store.key_overrides
+	
+	
+	
 
 
 
