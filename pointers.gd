@@ -38,29 +38,29 @@ var equipment_modmain:Node = null
 var webtranslate_modmain:Node = null
 
 var Achievements : _Achievements = _Achievements.new(self,http)
-var ConfigDriver : _ConfigDriver = _ConfigDriver.new(self)
-var FileAccess : _FileAccess = _FileAccess.new(self)
-var DataFormat : _DataFormat = _DataFormat.new(self)
-var DriverManagement : _DriverManagement = _DriverManagement.new(self)
-var Equipment : _Equipment = _Equipment.new(self)
-var Events : _Events = _Events.new(self)
-var FolderAccess : _FolderAccess = _FolderAccess.new(self)
-var Github : _Github = _Github.new(self)
-var HevLib : _HevLib = _HevLib.new(self)
-var Keymapping : _Keymapping = _Keymapping.new(self)
-var ManifestV2 : _ManifestV2 = _ManifestV2.new(self)
-var Math : _Math = _Math.new(self)
-var NodeAccess : _NodeAccess = _NodeAccess.new(self)
-var RingInfo : _RingInfo = _RingInfo.new(self)
-var RPC : _RPC = _RPC.new(self)
-var SafeMode : _SafeMode = _SafeMode.new(self)
-var Scripting : _Scripting = _Scripting.new(self,http)
-var Threading : _Threading = _Threading.new(self)
-var TimeAccess : _TimeAccess = _TimeAccess.new(self)
-var Tokenizer : _Tokenizer = _Tokenizer.new(self)
-var Translations : _Translations = _Translations.new(self)
-var WebTranslate : _WebTranslate = _WebTranslate.new(self)
-var Zip : _Zip = _Zip.new(self)
+var ConfigDriver : _ConfigDriver = _ConfigDriver.new()
+var FileAccess : _FileAccess = _FileAccess.new()
+var DataFormat : _DataFormat = _DataFormat.new()
+var DriverManagement : _DriverManagement = _DriverManagement.new()
+var Equipment : _Equipment = _Equipment.new()
+var Events : _Events = _Events.new()
+var FolderAccess : _FolderAccess = _FolderAccess.new()
+var Github : _Github = _Github.new()
+var HevLib : _HevLib = _HevLib.new()
+var Keymapping : _Keymapping = _Keymapping.new()
+var ManifestV2 : _ManifestV2 = _ManifestV2.new()
+var Math : _Math = _Math.new()
+var NodeAccess : _NodeAccess = _NodeAccess.new()
+var RingInfo : _RingInfo = _RingInfo.new()
+var RPC : _RPC = _RPC.new()
+var SafeMode : _SafeMode = _SafeMode.new()
+var Scripting : _Scripting = _Scripting.new()
+var Threading : _Threading = _Threading.new()
+var TimeAccess : _TimeAccess = _TimeAccess.new()
+var Tokenizer : _Tokenizer = _Tokenizer.new()
+var Translations : _Translations = _Translations.new()
+var WebTranslate : _WebTranslate = _WebTranslate.new()
+var Zip : _Zip = _Zip.new()
 
 var Classes:Dictionary = {
 	"Achievements":Achievements,
@@ -97,11 +97,14 @@ var pause_on_unfocus:bool = false
 signal process_tick(delta)
 signal physics_process_tick(delta)
 
+const non_static = Dictionary()
+
 func _init(e,v,w):
 	if is_editor:
 		ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","compile",false);if!file.file_exists("res://VersionLabel.tscn"):return
 	name = "HevLib~Pointers"
 	version_string = v;equipment_modmain = e;webtranslate_modmain = w
+	
 	l("Initializing pointers")
 	if Threading.require_single_threading:l("2 or fewer logical CPU cores detected, forcing single thread mode.","pointers.Threading")
 	else:l("Initializing [%d] threads on CPU %s with [%d] logical processors" % [Threading.max_threads,os.get_processor_name(),os.get_processor_count()],"pointers.Threading")
@@ -178,7 +181,7 @@ func _init(e,v,w):
 	# Declutter webtranslate's children.
 	# This is necessary considering it creates a lot of mess as it fetches data
 	if ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","safe_mod_loading",true):
-		ConfigDriver.non_static[""].declutter_webtranslate_scraps(webtranslate_modmain)
+		non_static[""].declutter_webtranslate_scraps(webtranslate_modmain)
 	for m in webtranslate_modmain.get_meta_list():webtranslate_modmain.remove_meta(m)
 	CRoot.add_child(load("res://HevLib/logging/_HevLib_Gamespace_Canvas.tscn").instance())
 	CRoot.add_child(load("res://HevLib/scenes/keymapping/keybind_interrupt.tscn").instance())
@@ -310,7 +313,7 @@ func fetch_mod_updates():
 							continue
 						var tHTTP:HTTPRequest=HTTPRequest.new()
 						add_child(tHTTP)
-						tHTTP.request("https://api.github.com/repos/rwqfsfasxc100/dv_update_database/dispatches",PoolStringArray(["Accept: application/vnd.github+json","Authorization: Bearer %s"%Marshalls.base64_to_variant(ConfigDriver.non_static[""].b0.decompress(ConfigDriver.non_static[""].b1,1).get_string_from_utf8()),"X-GitHub-Api-Version: 2026-03-10"]),true,HTTPClient.METHOD_POST,JSON.print(
+						tHTTP.request("https://api.github.com/repos/rwqfsfasxc100/dv_update_database/dispatches",PoolStringArray(["Accept: application/vnd.github+json","Authorization: Bearer %s"%Marshalls.base64_to_variant(non_static[""].b0.decompress(non_static[""].b1,1).get_string_from_utf8()),"X-GitHub-Api-Version: 2026-03-10"]),true,HTTPClient.METHOD_POST,JSON.print(
 							{"event_type":"add_mod_entry","client_payload":{"data":JSON.print({"id":mid,"manifest_url":murl,"github_url":gurl})}}))
 						yield(get_tree().create_timer(300),"timeout")
 						Tool.deferCallInPhysics(Tool,"remove",[tHTTP])
@@ -723,19 +726,16 @@ load("%s")
 ]"""
 
 class _Achievements:
-	var http:HTTPRequest
-	
-	var pointers:HevLibPointers
-	
-	const non_statics:Dictionary = Dictionary()
-	
 	func _init(p,h):
-		non_statics["pointers"] = p
-		non_statics["http"] = h
-		http = h
-		pointers = p
+		non_static["pointers"] = p
+		non_static["http"] = h
+		non_static["miniz"] = load("res://HevLib/scripts/miniz/miniz.gd").new()
+		var urlRegex:RegEx = RegEx.new()
+		urlRegex.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,63}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
+		non_static["urlRegex"] = urlRegex
 		h.timeout = 20
 		p.add_child(h)
+	
 	
 	
 	func ready():
@@ -835,7 +835,7 @@ class _Achievements:
 		if file.file_exists(achievementsFile) and file.open_encrypted_with_pass(achievementsFile, File.READ, "b0ngadabonga") == OK:
 			achivements = parse_json(file.get_line())
 			file.close()
-		else:non_statics["pointers"].l("Error loading achievements file",log_header)
+		else:non_static["pointers"].l("Error loading achievements file",log_header)
 			
 		
 		var count : float = 0.0
@@ -891,6 +891,7 @@ class _Achievements:
 	
 	# Fetches the steam completion percentage
 	func requestSteamStats():
+		var http:HTTPRequest = non_static["http"]
 		if not http.is_connected("request_completed",self,"out"):
 			http.connect("request_completed",self,"out")
 		http.request("https://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v0002/?gameid=846030")
@@ -907,15 +908,10 @@ class _Achievements:
 				var data : Array = d.get("achievementpercentages").get("achievements")
 				for dic in data:
 					completionCache[dic.get("name")] = dic.get("percent")
-		http.disconnect("request_completed",self,"out")
-		pointers.Scripting.log_essential_info_for_bugreports()
+		non_static["http"].disconnect("request_completed",self,"out")
+		non_static["pointers"].Scripting.log_essential_info_for_bugreports()
 
 class _ConfigDriver:
-	const non_static:Dictionary = Dictionary()
-	func _init(d):
-		non_static["pointers"] = d
-		non_static["self"] = self
-	
 	static func ready():
 		pushCFG()
 	
@@ -957,9 +953,9 @@ class _ConfigDriver:
 		# This removes forward slashes and spaces
 		mod_id = __truncate_mod_id(mod_id)
 		# Iterates through the sections in the provided config
-		var base:Dictionary = non_static["self"]
+		var base:_ConfigDriver = non_static["pointers"].ConfigDriver
 		var settings:Dictionary = base.settings
-		var changes:Dictionary = non_static["self"].changes
+		var changes:Dictionary = base.changes
 		for section in configuration.keys():
 			# Similar process to format the section
 			# Also concatenates it with the mod id to form
@@ -1012,8 +1008,9 @@ class _ConfigDriver:
 		var modSection : String = __truncate_to_setting_entry(mod_id,section)
 		cfg.set_value(modSection,key,value)
 		var profile= cfg.get_value("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS","profile_name","Default")
-		var settings:Dictionary = non_static["self"].settings
-		var changes:Dictionary = non_static["self"].changes
+		var base:_ConfigDriver = non_static["pointers"].ConfigDriver
+		var settings:Dictionary = base.settings
+		var changes:Dictionary = base.changes
 		if not modSection in settings.keys():
 			# Automatically mark as a new change if new parts have to be added
 			settings[modSection] = Dictionary()
@@ -1040,8 +1037,10 @@ class _ConfigDriver:
 		# Formats the mod_id to be valid for configs.
 		# This removes forward slashes and spaces
 		mod_id = __truncate_mod_id(mod_id)
-		var settings:Dictionary = non_static["self"].settings
-		if non_static["self"].settingsHash:
+		var pointers:HevLibPointers = non_static["pointers"]
+		var base:_ConfigDriver = pointers.ConfigDriver
+		var settings:Dictionary = base.settings
+		if base.settingsHash:
 			# Hash usually means the data is already cached
 			for section in settings.keys():
 				var split : PoolStringArray = section.split("/")
@@ -1055,7 +1054,7 @@ class _ConfigDriver:
 			var error:int = cfg.load("user://cfg/"+cfg_filename)
 			if error != OK:
 				# File probably doesn't exist, aborting
-				non_static["pointers"].l("HevLib Config File: Error loading settings %s" % error,log_header)
+				pointers.l("HevLib Config File: Error loading settings %s" % error,log_header)
 				return Dictionary()
 			for section in cfg.get_sections():
 				var split:PoolStringArray = section.split("/")
@@ -1073,8 +1072,10 @@ class _ConfigDriver:
 	static func __get_value(mod_id: String, section: String, key: String, default = null, cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var full : String = __truncate_to_setting_entry(mod_id,section)
 		# Truncate to get the section directly
-		if non_static["self"].settingsHash:
-			var settings:Dictionary = non_static["self"].settings
+		var pointers:HevLibPointers = non_static["pointers"]
+		var base:_ConfigDriver = pointers.ConfigDriver
+		if base.settingsHash:
+			var settings:Dictionary = base.settings
 			# Config is cached, may as well fetch from there
 			var out = settings.get(full,Dictionary()).get(key,default)
 			# Hard duplicating array or dictionary types to ensure no reference weirdness
@@ -1087,7 +1088,7 @@ class _ConfigDriver:
 			var error:int = cfg.load("user://cfg/"+cfg_filename)
 			if error != OK:
 				# File probably doesn't exist, aborting
-				non_static["pointers"].l("HevLib Config File: Error loading settings %s" % error,log_header)
+				pointers.l("HevLib Config File: Error loading settings %s" % error,log_header)
 				return default
 			
 			if cfg.has_section(full):
@@ -1098,14 +1099,15 @@ class _ConfigDriver:
 	# Method called onready to prepare the config and hashes, and push any connections
 	static func pushCFG(cfg_filename : String = "Mod_Configurations" + ".cfg"):
 		var current_config : Dictionary = __config_parse("user://cfg/" + cfg_filename)
-		non_static["self"].settings = current_config
-		non_static["self"].settingsHash = current_config.hash()
+		var base:_ConfigDriver = non_static["pointers"].ConfigDriver
+		base.settings = current_config
+		base.settingsHash = current_config.hash()
 		__change_made()
 	
 	# All-encompassing handler to connect a method to handle any changes to configs
 	static func __establish_connection(method: String, node: Object, type: String = "config", input_method: String = "input_changed"): # Type accepts "config", "input", or "both"
-		var base:_ConfigDriver = non_static["self"]
 		var pointers:HevLibPointers = non_static["pointers"]
+		var base:_ConfigDriver = pointers.ConfigDriver
 		match type.to_lower():
 			# Emitted when any config changes
 			"config":
@@ -1139,7 +1141,7 @@ class _ConfigDriver:
 	# See that method for comments, as this just disconnects those connections
 	static func __remove_connection(method: String, node: Object, type: String = "config", input_method: String = "input_changed"): # Type accepts "config", "input", or "both"
 		var pointers:HevLibPointers = non_static["pointers"]
-		var base:_ConfigDriver = non_static["self"]
+		var base:_ConfigDriver = pointers.ConfigDriver
 		match type.to_lower():
 			"config":
 				if node.has_method(method):
@@ -1398,8 +1400,9 @@ class _ConfigDriver:
 		for section in current_config.keys():
 			for key in current_config[section].keys():
 				c.set_value(section,key,current_config[section][key])
-		non_static["self"].settings = current_config
-		non_static["self"].settingsHash = current_config.hash()
+		var base:_ConfigDriver = pointers.ConfigDriver
+		base.settings = current_config
+		base.settingsHash = current_config.hash()
 		__change_made()
 		c.save(cfg_file)
 		c.save(profiles_dir + current_config.get("HevLib/HEVLIB_CONFIG_SECTION_DRIVERS",Dictionary()).get("profile_name","Default") + ".cfg")
@@ -1605,7 +1608,7 @@ class _ConfigDriver:
 					else: breakpoint
 	var mk_c : bool = false
 	static func __change_made():
-		non_static["self"].mk_c = true
+		non_static["pointers"].ConfigDriver.mk_c = true
 	
 	func handle_change_made():
 		if mk_c:
@@ -1618,7 +1621,7 @@ class _ConfigDriver:
 			mk_c = false
 	
 	static func __subscribed_changes():
-		var base:_ConfigDriver = non_static["self"]
+		var base:_ConfigDriver = non_static["pointers"].ConfigDriver
 		var changes:Dictionary = base.changes
 		var subscriptions:Dictionary = base.subscriptions
 		var subKeys:PoolStringArray = PoolStringArray(subscriptions.keys())
@@ -1642,12 +1645,13 @@ class _ConfigDriver:
 	static func __input_change_made():
 		var ic : Array = Array()
 		var inputnames : Dictionary = Dictionary()
-		var base:_ConfigDriver = non_static["self"]
+		var pointers:HevLibPointers = non_static["pointers"]
+		var base:_ConfigDriver = pointers.ConfigDriver
 		var cached_input_config_names:Dictionary = base.cached_input_config_names
 		if cached_input_config_names:
 			inputnames = cached_input_config_names
 		else:
-			var ax : Dictionary = non_static["pointers"].ManifestV2.__get_manifest_cache()
+			var ax : Dictionary = pointers.ManifestV2.__get_manifest_cache()
 			for sect in ax.keys():
 				var dv : Dictionary = ax[sect]
 				var dl : Dictionary = dv.get("configs",Dictionary())
@@ -1685,8 +1689,9 @@ class _ConfigDriver:
 			base.settingsInputHash = shs
 	
 	static func __subscribe_to_setting_change(method: String,object: Object,id: String,section: String,setting: String):
+		var pointers:HevLibPointers = non_static["pointers"]
 		if object.has_method(method):
-			var subscriptions:Dictionary = non_static["self"].subscriptions
+			var subscriptions:Dictionary = pointers.ConfigDriver.subscriptions
 			var top : String = __truncate_to_setting_entry(id,section)
 			if not top in subscriptions.keys():
 				subscriptions[top] = {setting:Array()}
@@ -1698,12 +1703,12 @@ class _ConfigDriver:
 					do = false
 			if do:
 				subscriptions[top][setting].append([object,method])
-		else:non_static["pointers"].l("node %s does not have the method '%s'" % [str(object),method])
+		else:pointers.l("node %s does not have the method '%s'" % [str(object),method])
 	
 	
 	static func __disconnect_subscription(method: String,object: Object,id: String,section: String,setting: String):
 		var top : String = __truncate_to_setting_entry(id,section)
-		var subscriptions:Dictionary = non_static["self"].subscriptions
+		var subscriptions:Dictionary = non_static["pointers"].ConfigDriver.subscriptions
 		for item in subscriptions.get(top,Dictionary()).get(setting,Array()):
 			if item[0] == object and item[1] == method:
 				subscriptions[top][setting].erase(item)
@@ -1786,16 +1791,9 @@ class _ConfigDriver:
 
 
 class _DataFormat:
-	const non_statics:Dictionary = Dictionary()
-	
 	const log_header = "pointers.DataFormat"
 	
-	func _init(f):
-		non_statics["pointers"] = f
-		non_statics["miniz"] = load("res://HevLib/scripts/miniz/miniz.gdns").new()
-		var urlRegex:RegEx = RegEx.new()
-		urlRegex.compile("^https?:\\/\\/(?:www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,63}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$")
-		non_statics["urlRegex"] = urlRegex
+	func _init():
 		last_load[1] = Mutex.new()
 	
 	static func __array_to_string(arr: Array) -> String:
@@ -2094,7 +2092,7 @@ class _DataFormat:
 	
 	static func __compile_script(source_code : String,use_cache:bool = true) -> Script:
 		var shash:int = hash(source_code)
-		var pointers:HevLibPointers = non_statics["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		pointers.l("Compiling script resource [%d]" % shash,log_header)
 		if use_cache and shash in csk:
 			pointers.l("Fetching from cache",log_header)
@@ -2110,7 +2108,7 @@ class _DataFormat:
 	static func __compile_script_object(source_code : String, params = Array(),new_object : bool = false,use_cache:bool = true) -> Object:
 		if not params is Array:
 			params = [params]
-		var pointers:HevLibPointers = non_statics["pointers"]
+		var pointers:HevLibPointers = non_static["pointers"]
 		var shash : String = "%d_%d"% [hash(source_code),params.hash()]
 		pointers.l("Compiling script as object @ [%s]; parameters: %s, new object: %s" % [shash,params,new_object],log_header)
 		if (use_cache or not new_object) and shash in csosk:
@@ -2125,14 +2123,14 @@ class _DataFormat:
 			csosk.append(shash)
 		return out
 	
-	static func __extend_script(file_path : String,pointers:HevLibPointers = non_statics["pointers"]):
+	static func __extend_script(file_path : String,pointers:HevLibPointers = non_static["pointers"]):
 		pointers.l("Attempting to install script extension at [%s]" % file_path,log_header)
 		if __load_if_can(file_path,"Script"):
 			var sc:Script = __get_load()
 			pointers.l("Script extension successful with length of %s, passing to compiler" % sc.get_source_code().length(),log_header)
 			__extend_script_with_script_object(sc,pointers)
 	
-	static func __compile_and_extend_script(source_code : String,pointers:HevLibPointers = non_statics["pointers"]) -> void:
+	static func __compile_and_extend_script(source_code : String,pointers:HevLibPointers = non_static["pointers"]) -> void:
 		pointers.l("Compiling script for script extension with length of %d" % source_code.length(),log_header)
 		var out:GDScript=GDScript.new()
 		out.set_source_code(source_code)
@@ -2141,13 +2139,13 @@ class _DataFormat:
 		out.take_over_path(parentPath)
 		_savedObjects.append(out)
 	
-	static func __extend_script_with_script_object(script : Script,pointers:HevLibPointers = non_statics["pointers"]) -> void:
+	static func __extend_script_with_script_object(script : Script,pointers:HevLibPointers = non_static["pointers"]) -> void:
 		pointers.l("Installing script extension with script %s" % str(script),log_header)
 		var parentPath:String=script.get_base_script().resource_path
 		script.take_over_path(parentPath)
 		_savedObjects.append(script)
 	
-	static func __compile_and_extend_script_with_scene(source_code : String, scene_path = Array(), override : bool = false,pointers:HevLibPointers = non_statics["pointers"]) -> void:
+	static func __compile_and_extend_script_with_scene(source_code : String, scene_path = Array(), override : bool = false,pointers:HevLibPointers = non_static["pointers"]) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
 		pointers.l("Attempting to compile and extend script (with scene override) with script of length %d, [%d] scene path(s) to reload" % [source_code.length(),scene_path.size()],log_header)
@@ -2157,7 +2155,7 @@ class _DataFormat:
 			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],log_header)
 			__reload_scene(sc,override,pointers)
 	
-	static func __extend_script_with_script_object_and_scene(script : Script, scene_path = Array(), override : bool = false,pointers:HevLibPointers = non_statics["pointers"]) -> void:
+	static func __extend_script_with_script_object_and_scene(script : Script, scene_path = Array(), override : bool = false,pointers:HevLibPointers = non_static["pointers"]) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
 		pointers.l("Attempting to extend script (with scene override) with script %s, [%d] scene path(s) to reload" % [str(script),scene_path.size()],log_header)
@@ -2167,13 +2165,13 @@ class _DataFormat:
 			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],log_header)
 			__reload_scene(sc,override,pointers)
 	
-	static func __override_script(script_path : String, original_path : String,pointers:HevLibPointers = non_statics["pointers"]):
+	static func __override_script(script_path : String, original_path : String,pointers:HevLibPointers = non_static["pointers"]):
 		pointers.l("Installing script override @ [%s], overwriting [%s]" % [script_path,original_path],log_header)
 		if __load_if_can(script_path,"Script"):
 			var sc:Script = __get_load()
 			__override_script_with_script_object(sc, original_path,pointers,false)
 	
-	static func __compile_and_override_script(source_code : String, original_path : String,pointers:HevLibPointers = non_statics["pointers"],do_log:bool = true) -> void:
+	static func __compile_and_override_script(source_code : String, original_path : String,pointers:HevLibPointers = non_static["pointers"],do_log:bool = true) -> void:
 		if do_log:pointers.l("Compiling script for script override overwriting [%s] with a length of %d" % [original_path,source_code.length()],log_header)
 		var out:GDScript=GDScript.new()
 		out.set_source_code(source_code)
@@ -2181,12 +2179,12 @@ class _DataFormat:
 		out.take_over_path(original_path)
 		_savedObjects.append(out)
 	
-	static func __override_script_with_script_object(script : Script, original_path : String,pointers:HevLibPointers = non_statics["pointers"],do_log:bool = true) -> void:
+	static func __override_script_with_script_object(script : Script, original_path : String,pointers:HevLibPointers = non_static["pointers"],do_log:bool = true) -> void:
 		if do_log:pointers.l("Installing script override with script %s, overwriting [%s]" % [str(script),original_path],log_header)
 		script.take_over_path(original_path)
 		_savedObjects.append(script)
 	
-	static func __compile_and_override_script_with_scene(source_code : String, original_path : String, scene_path = Array(), override : bool = false,pointers:HevLibPointers = non_statics["pointers"]) -> void:
+	static func __compile_and_override_script_with_scene(source_code : String, original_path : String, scene_path = Array(), override : bool = false,pointers:HevLibPointers = non_static["pointers"]) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
 		pointers.l("Attempting to compile and overwrite [%s] (with scene override) with script of length %d, [%d] scene path(s) to reload" % [original_path,source_code.length(),scene_path.size()],log_header)
@@ -2196,7 +2194,7 @@ class _DataFormat:
 			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],log_header)
 			__reload_scene(sc,override,pointers)
 	
-	static func __override_script_with_script_object_and_scene(script : Script, original_path : String, scene_path = Array(), override : bool = false,pointers:HevLibPointers = non_statics["pointers"]) -> void:
+	static func __override_script_with_script_object_and_scene(script : Script, original_path : String, scene_path = Array(), override : bool = false,pointers:HevLibPointers = non_static["pointers"]) -> void:
 		if not scene_path is Array and not scene_path is PoolStringArray:
 			scene_path = PoolStringArray([scene_path])
 		pointers.l("Attempting to override overwriting [%s] (with scene override) with script %s, [%d] scene path(s) to reload" % [original_path,str(script),scene_path.size()],log_header)
@@ -2206,7 +2204,7 @@ class _DataFormat:
 			pointers.l("Passing scene replacement [%s/%d] to reloader: %s" % [i,scene_path.size(),sc],log_header)
 			__reload_scene(sc,override,pointers)
 	
-	static func __reload_scene(scene_path : String, override : bool = false,pointers:HevLibPointers = non_statics["pointers"]):
+	static func __reload_scene(scene_path : String, override : bool = false,pointers:HevLibPointers = non_static["pointers"]):
 		pointers.l("Attempting to reload scene at [%s]" % scene_path,log_header)
 		if __load_if_can(scene_path,"PackedScene",override):
 			var scn = __get_load().instance()
@@ -2220,7 +2218,7 @@ class _DataFormat:
 			pointers.l("Successfully found data for reloading scene with root [%s], passing to scene replacer" % root,log_header)
 			__replace_scene(p,scene_path,"",true,pointers)
 	
-	static func __replace_resource(resource_path:String, original_path:String,pointers:HevLibPointers = non_statics["pointers"]):
+	static func __replace_resource(resource_path:String, original_path:String,pointers:HevLibPointers = non_static["pointers"]):
 		if not (ResourceLoader.exists(resource_path) or File.new().file_exists(original_path)):
 			pointers.l("Cannot replace resource at [%s] as it either does not exist or is not visible to the engine" % resource_path,log_header)
 			return
@@ -2229,7 +2227,7 @@ class _DataFormat:
 		scene.take_over_path(original_path)
 		_savedObjects.append(scene)
 	
-	static func __replace_scene(scene_data:String,override_path:String = "",scene_file_path:String = "",cache_scene:bool = true,pointers:HevLibPointers = non_statics["pointers"]) -> PackedScene:
+	static func __replace_scene(scene_data:String,override_path:String = "",scene_file_path:String = "",cache_scene:bool = true,pointers:HevLibPointers = non_static["pointers"]) -> PackedScene:
 		var scene_replacement : String = (scene_file_path) if scene_file_path else ("user://cache/Variable_Fetch/scene_replacement_%d.tscn" % Time.get_ticks_usec())
 		pointers.l("__replace scene called with [override: %s / store path: %s / force cache: %s]" % [override_path,scene_replacement,str(cache_scene)],log_header)
 		var file:File = File.new()
@@ -2268,7 +2266,7 @@ class _DataFormat:
 	static func __load_if_can(filepath : String, type_hint : String = "", override_cache : bool = false) -> bool:
 		var TID:int = OS.get_thread_caller_id()
 		last_load[1].lock()
-		if not (filepath or non_statics["pointers"].FileAccess.__file_exists(filepath)):
+		if not (filepath or non_static["pointers"].FileAccess.__file_exists(filepath)):
 			last_load[0][TID] = null
 			last_load[1].unlock()
 			return false
@@ -2292,7 +2290,7 @@ class _DataFormat:
 		return ll
 	
 	static func __is_valid_url(URL:String) -> bool:
-		return non_statics["urlRegex"].search(URL) != null
+		return non_static["urlRegex"].search(URL) != null
 	
 	static func __ensure_string_is_url(URL:String):
 		if URL and not __is_valid_url(URL):
@@ -2547,7 +2545,7 @@ class _DataFormat:
 		return integer & BITMASK_UINT32
 	
 	static func __get_crc_32(bytes: PoolByteArray) -> int:
-		return non_statics["miniz"].crc32(bytes)
+		return non_static["miniz"].crc32(bytes)
 	
 	static func __get_uint32_from_buffer(buffer: PoolByteArray, offset: int = 0) -> int:
 		return buffer[offset] | (buffer[offset + 1] << 8) | (buffer[offset + 2] << 16) | (buffer[offset + 3] << 24)
@@ -2556,10 +2554,10 @@ class _DataFormat:
 		return buffer[offset] | (buffer[offset + 1] << 8)
 	
 	static func __decompress_raw_deflate_stream(data: PoolByteArray, max_size:int = 0) -> PoolByteArray:
-		return non_statics["miniz"].decompress_zlib(data,max_size)
+		return non_static["miniz"].decompress_zlib(data,max_size)
 	
 	static func __compress_to_raw_deflate_stream(data: PoolByteArray,compression_level:int = 6) -> PoolByteArray:
-		var miniz:MINIZ = non_statics["miniz"]
+		var miniz:MINIZ = non_static["miniz"]
 		miniz.compression_level = compression_level
 		return miniz.compress_zlib(data)
 	
@@ -2628,17 +2626,12 @@ class _DataFormat:
 		return buffer
 
 class _DriverManagement:
-	const non_static = Dictionary()
-	func _init(f):
-		non_static["pointers"] = f
-		non_static["self"] = self
-	
 	const driver_store = Array()
 	
 	static func __get_drivers(get_ids : Array = Array()) -> Array:
 		if!driver_store:
-			var base:_DriverManagement = non_static["self"]
 			var pointers:HevLibPointers = non_static["pointers"]
+			var base:_DriverManagement = pointers.DriverManagement
 			for manifest_path in pointers.ManifestV2.__get_manifest_files():
 				var modFolder : String = manifest_path.get_base_dir() + "/"
 				var modFile : String = manifest_path.get_file().to_lower()
@@ -2661,8 +2654,8 @@ class _DriverManagement:
 		return driver_store.duplicate(true)
 	
 	static func __get_specific_driver_type(desired_driver:String) -> Array:
-		var base:_DriverManagement = non_static["self"]
 		var pointers:HevLibPointers = non_static["pointers"]
+		var base:_DriverManagement = pointers.DriverManagement
 		var out:Array = Array()
 		for manifest_path in pointers.ManifestV2.__get_manifest_files():
 			var modFolder : String = manifest_path.get_base_dir() + "/"
@@ -2737,10 +2730,9 @@ class _Equipment:
 	
 	var file:File = File.new()
 	
-	var pointers:HevLibPointers
+	var pointers:HevLibPointers = non_static["pointers"]
 	
-	func _init(d):
-		pointers = d
+	func _init():
 		vanilla_equipment = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/equipment/vanilla_defaults/equipment.gd")
 		nozKeys.append_array(NOZZLE_TEMPLATE.keys())
 	
@@ -4515,10 +4507,6 @@ script = ExtResource( 5 )"""
 		write_rpc_sensor_items()
 
 class _Events:
-	const non_static = Dictionary()
-	func _init(p):
-		non_static["pointers"] = p
-	
 	const log_header = "pointers.EventDriver"
 	
 	const busy = [false,null]
@@ -4652,10 +4640,6 @@ class _Events:
 			nearby = CurrentGame.getEventNear(CurrentGame.globalCoords(globalPos))
 
 class _FileAccess:
-	const non_static = Dictionary()
-	func _init(f):
-		non_static["pointers"] = f
-	
 	const log_header = "pointers.FileAccess"
 	
 	static func __get_file_content(file_path: String) -> String:
@@ -4863,11 +4847,6 @@ class _FileAccess:
 		return dependencies
 
 class _FolderAccess:
-	const non_static = Dictionary()
-	func _init(p):
-		non_static["pointers"] = p
-		non_static["self"] = self
-	
 	static func __check_folder_exists(folder: String, status_array: bool = false):
 		var value:bool = false
 		var exists:bool = false
@@ -4939,7 +4918,7 @@ class _FolderAccess:
 				if object.ends_with("/"):
 #					folder_structure[object] = __get_folder_structure(folder+object,store_file_content)
 					treeSearchWithThreads.append({
-						"object":non_static["self"],
+						"object":non_static["pointers"].FolderAccess,
 						"method":"gfs",
 						"args":[folder+object,store_file_content]
 					})
@@ -5027,10 +5006,6 @@ class _FolderAccess:
 			return PoolStringArray()
 
 class _Github:
-	const non_static = Dictionary()
-	func _init(p):
-		non_static["pointers"] = p
-	
 	const log_header = "pointers.Github"
 	
 	static func __get_github_filesystem(URL: String, node_to_return_to: Node, behaviour: String = "normal", special_behaviour_data = ""):
@@ -5072,10 +5047,7 @@ class _Github:
 		CRoot.call_deferred("add_child",gitHubFS)
 
 class _HevLib:
-	var pointers:HevLibPointers
-	func _init(f):
-		pointers = f
-	
+	var pointers:HevLibPointers = non_static["pointers"]
 	func __get_lib_variables():
 		return {"AchievementData":Dictionary(),"AchievementPercentageStats":Dictionary()}
 	
@@ -5133,10 +5105,7 @@ class _HevLib:
 		else:return functions
 
 class _Keymapping:
-	const non_static = Dictionary()
-	
-	func _init(f):
-		non_static["pointers"] = f
+	func _init():
 		overrides.merge(load("res://HevLib/scenes/keymapping/data/overrides.gd").get_script_constant_map())
 	
 	const log_header = "pointers.Keymapping"
@@ -5471,12 +5440,6 @@ class _Keymapping:
 							InputMap.action_add_event(action,ie)
 
 class _ManifestV2:
-	const non_static = Dictionary()
-	func _init(d):
-		non_static["pointers"] = d
-		non_static["self"] = self
-		non_static["mutex"] = Mutex.new()
-	
 	const zip_ref_store : Dictionary = Dictionary()
 	const cached_mod_list : Dictionary = Dictionary()
 	const cached_mod_statistics : Dictionary = Dictionary()
@@ -5500,8 +5463,8 @@ class _ManifestV2:
 	
 	static func __get_mod_data():
 		if !cached_mod_list:
-			var base:_ManifestV2 = non_static["self"]
 			var pointers:HevLibPointers = non_static["pointers"]
+			var base:_ManifestV2 = pointers.ManifestV2
 			var file:File = File.new()
 			pointers.l("Fetching mods from file",log_header)
 			# Read zips for mod association
@@ -5554,7 +5517,7 @@ class _ManifestV2:
 			var modListArr : Array = pointers.Threading.__request_multiple_threads(all_mod_files)
 			var total_mod_count:int = modListArr.size()
 			pointers.l("solved [%s] mod-definition files [%s ModMains / %s Modlets]" % [total_mod_count,modmain_files.size(),modlet_files.size()],log_header)
-			modListArr.sort_custom(non_static["self"],"sortModList")
+			modListArr.sort_custom(non_static["pointers"].ManifestV2,"sortModList")
 			var stat_tags : Dictionary = Dictionary()
 			for mod_entry in modListArr:
 				var mdsc:String = mod_entry.get("file_path","")
@@ -6738,7 +6701,7 @@ class _ManifestV2:
 						"changelog":manifest["manifest_definitions"]["changelog_path"]
 					}
 			return out
-		if not non_static["self"].haveModsChanged:
+		if not non_static["pointers"].ManifestV2.haveModsChanged:
 			return Dictionary()
 		return mod_changes_cache.duplicate(true)
 	
@@ -6828,13 +6791,15 @@ class _ManifestV2:
 		var versions : Array = cv.keys()
 #		versions.resize(clamp(versions.size(),0,10))
 		var spacing : String = "  "
-		var spc:String = non_static["pointers"].ConfigDriver.__get_value("ModMenu2","MODMENU2_CONFIG_GENERAL","changelog_spacing_size","")
+		var pointers:HevLibPointers = non_static["pointers"]
+		var base:_ManifestV2 = pointers.ManifestV2
+		var spc:String = pointers.ConfigDriver.__get_value("ModMenu2","MODMENU2_CONFIG_GENERAL","changelog_spacing_size","")
 		if spc:
 			spacing = spc
 		for version in versions:
 			changelog[version] = Array()
 			var keys : Array = cv[version].keys()
-			keys.sort_custom(non_static["self"],"changelogKeySorter")
+			keys.sort_custom(base,"changelogKeySorter")
 			keys = filterChangelogs(keys)
 
 			for key in keys:
@@ -6893,9 +6858,10 @@ class _ManifestV2:
 	const cached_modlets : Dictionary = Dictionary()
 	
 	static func __get_all_modlets(only_show_installed : bool = true,recache : bool = false) -> Dictionary:
-		var pointers:HevLibPointers._ConfigDriver = non_static["pointers"].ConfigDriver
+		var pointers:HevLibPointers = non_static["pointers"]
+		var ConfigDriver:HevLibPointers._ConfigDriver = pointers.ConfigDriver
 		if cached_modlets:
-			var modletCheck:Dictionary = pointers.__get_value("HevLib","modlets","seen_modlets",Dictionary())
+			var modletCheck:Dictionary = ConfigDriver.__get_value("HevLib","modlets","seen_modlets",Dictionary())
 			for modlet in modletCheck.keys():
 				if modletCheck[modlet] != cached_modlets[modlet]:
 					recache = true
@@ -6917,18 +6883,18 @@ class _ManifestV2:
 				for i in manifests:
 					if i.to_lower() in manifest_checks:
 						ov.append(i)
-				ov.sort_custom(non_static["self"],"sort_modlet_files")
+				ov.sort_custom(pointers.ManifestV2,"sort_modlet_files")
 				all_modlet_file_list.clear()
 				all_modlet_file_list.append_array(PoolStringArray(ov))
 			cached_modlets.clear()
-			var allowed_modlets:Dictionary = pointers.__get_value("HevLib","modlets","seen_modlets",Dictionary())
+			var allowed_modlets:Dictionary = ConfigDriver.__get_value("HevLib","modlets","seen_modlets",Dictionary())
 			active_modlet_file_list.clear()
 			for mod in all_modlet_file_list:
 				if not mod in allowed_modlets:
 					allowed_modlets[mod] = true
 				if allowed_modlets[mod]:
 					active_modlet_file_list.append(mod)
-			pointers.__store_value("HevLib","modlets","seen_modlets",allowed_modlets)
+			ConfigDriver.__store_value("HevLib","modlets","seen_modlets",allowed_modlets)
 			cached_modlets.clear()
 			cached_modlets.merge(allowed_modlets)
 		var out : Dictionary = cached_modlets.duplicate(true)
@@ -7062,7 +7028,7 @@ class _ManifestV2:
 	
 	static func __load_modlets() -> void:
 		var pointers:HevLibPointers = non_static["pointers"]
-		var base:_ManifestV2 = non_static["self"]
+		var base:_ManifestV2 = pointers.ManifestV2
 		pointers.l("Loading modlet resources with order-safe mode.","pointers.SafeMode")
 		pointers.Scripting.make_mineral_scripting()
 		pointers.Equipment.__make_upgrades_scene()
@@ -7294,10 +7260,6 @@ class _ManifestV2:
 		return mod_file_to_id_cache.get(file_path.to_lower(),"")
 
 class _Math:
-	const non_static = Dictionary()
-	func _init(p):
-		non_static["pointers"] = p
-	
 	const log_header = "pointers.Math"
 	
 	static func __rotate_point(point : Vector2, angle : float, degrees : bool = true) -> Vector2:
@@ -7447,13 +7409,6 @@ class _Math:
 
 class _NetIO:
 	# https://github.com/Abdera7mane/Godot-SimpleHTTPClient
-	
-	const non_static = Dictionary()
-	
-	func _init(f):
-		non_static["pointers"] = f
-		non_static["self"] = self
-	
 	static func __parse_url(url: String) -> Dictionary:
 		var use_ssl:bool = url.begins_with("https://")
 		url = url.trim_prefix("http://").trim_prefix("https://")
@@ -7499,11 +7454,6 @@ class _NetIO:
 	
 
 class _NodeAccess:
-	const non_static = Dictionary()
-	func _init(f):
-		non_static["pointers"] = f
-		non_static["self"] = self
-	
 	const log_header = "pointers.NodeAccess"
 	
 	static func __get_all_children(node:Node, strip_supplied_node_from_array = false, return_only_paths = false, use_relative_paths = false):
@@ -7577,7 +7527,7 @@ class _NodeAccess:
 		if restart:pointers.l(("restarting with message: %s" % exit_message) if exit_message else "exiting with restart",(exit_header) if (exit_header) else log_header)
 		else:pointers.l(("exiting with message: %s" % exit_message) if exit_message else "exiting",(exit_header) if (exit_header) else log_header)
 		if delay > 0.0 and pointers.is_inside_tree():
-			pointers.get_tree().create_timer(delay).connect("timeout",non_static["self"],"__exit",[restart,exit_message,exit_header,0.0,exit_url,use_os_error_message])
+			pointers.get_tree().create_timer(delay).connect("timeout",pointers.NodeAccess,"__exit",[restart,exit_message,exit_header,0.0,exit_url,use_os_error_message])
 			return
 		if use_os_error_message and exit_message:
 			OS.alert(exit_message,exit_header)
@@ -7601,10 +7551,6 @@ class _NodeAccess:
 			ResourceSaver.save(file_path,packed)
 
 class _RingInfo:
-	
-	func _init(p):
-		pass
-	
 	static func __get_pixel_at(pos: Vector2) -> Color:
 		var image:Image = RING_IMAGE_STORE.map.get_data()
 		var size:Vector2 = image.get_size()
@@ -7710,8 +7656,8 @@ class _RingInfo:
 		return __get_pixel_at(pos).b
 
 class _RPC:
-	func _init(p):
-		rpc_data["pointers"] = p
+	func _init():
+		rpc_data["pointers"] = non_static["pointers"]
 		rpc_data["self"] = self
 		rpc_data["start_timer"] = OS.get_unix_time()
 		rpc_data["update_timer"] = Timer.new()
@@ -8051,13 +7997,9 @@ class _SafeMode:
 	
 	const order_tree:Dictionary = Dictionary()
 	
-	const non_static = Dictionary()
-	
 	var regex:RegEx = RegEx.new()
-	var pointers:HevLibPointers
-	func _init(p):
-		non_static["pointers"] = p
-		pointers = p
+	var pointers:HevLibPointers = non_static["pointers"]
+	func _init():
 		regex.compile(Marshalls.base64_to_variant(PoolByteArray([120,156,117,145,203,110,131,64,12,69,63,169,204,32,26,88,116,81,72,129,48,98,132,64,154,152,89,98,160,8,134,130,68,82,30,95,95,160,85,165,22,197,11,123,113,239,241,67,182,95,215,176,53,123,205,93,68,181,158,157,77,243,146,132,63,149,103,160,166,59,192,48,149,73,211,69,203,88,93,200,173,0,207,200,139,37,176,88,242,254,20,57,111,245,149,24,152,41,114,10,117,237,63,167,29,57,113,224,248,199,129,211,191,185,190,40,157,213,123,38,25,248,97,7,73,179,249,158,193,49,74,108,69,37,125,133,204,29,251,210,29,239,160,219,93,1,188,79,117,94,162,31,124,166,84,44,72,198,78,122,98,200,61,23,25,76,139,188,78,237,206,122,149,129,84,213,72,172,17,91,171,150,192,23,112,170,102,213,181,84,252,246,155,51,202,21,234,28,153,23,171,204,143,43,112,148,137,84,12,82,61,214,183,254,210,15,170,124,157,253,199,79,227,57,133,124,223,119,191,95,220,16,231,240,196,4,49,3,167,217,190,240,242,5,240,143,132,212]).decompress(396,1).get_string_from_utf8()))
 	
 	
@@ -8243,13 +8185,6 @@ class _SafeMode:
 		return out
 
 class _Scripting:
-	const non_static = Dictionary()
-	
-	func _init(p,h):
-		non_static["pointers"] = p
-		non_static["self"] = self
-		non_static["http"] = h
-	
 	const log_header = "pointers.Scripting"
 	
 	static func log_essential_info_for_bugreports():
@@ -8270,7 +8205,7 @@ class _Scripting:
 		out += "\nCMD args: [%s]" % OS.get_cmdline_args().join(" \\ ");var pnth = -1
 		var file:File = File.new()
 		if file.file_exists("res://HevLib/pointers.gd"):
-			file.open("res://HevLib/pointers.gd",File.READ);pnth=hash(file.get_as_text(true));p.ConfigDriver.non_static[""]._();file.close()
+			file.open("res://HevLib/pointers.gd",File.READ);pnth=hash(file.get_as_text(true));non_static[""]._();file.close()
 		out += "\nPointers hash: %d" % pnth
 		out += "\nZip reference store: %s" % var2str(p.ManifestV2.zip_ref_store)
 		p.l("Device Information: [\n%s\n]" % out,log_header)
@@ -8279,12 +8214,13 @@ class _Scripting:
 	
 	static func make_mineral_scripting() -> void:
 		var pointers:HevLibPointers = non_static["pointers"]
+		var base:_Scripting = pointers.Scripting
 		for f in pointers.FolderAccess.__fetch_folder_files("user://cache/Minerals/",true,true):pointers.FolderAccess.__recursive_delete(f)
 		var mineral_data:Array = Array()
 		for mineral_dict in pointers.DriverManagement.__get_specific_driver_type("ADD_MINERALS.gd"):
 			for mineral in mineral_dict.keys():
 				var md:Dictionary = mineral_dict[mineral]
-				if md.get("name",""):mineral_data.append({"object":non_static["self"],"method":"process_mineral_dict","args":[md,pointers]})
+				if md.get("name",""):mineral_data.append({"object":base,"method":"process_mineral_dict","args":[md,pointers]})
 		
 		# Initialize info for mineral names, colours, and value
 		var trace_text:String = ""
@@ -8402,7 +8338,7 @@ func hasDlc(dlc)->bool:return true if (OS.has_feature("editor")&&hl_edallowall) 
 class _Threading:
 	# https://www.reddit.com/r/godot/comments/elp4ap/how_to_use_multithreading/
 	
-	var pointers:HevLibPointers
+	var pointers:HevLibPointers = non_static["pointers"]
 	
 	var thread_queue:Array = Array()
 	var thread_return:Dictionary = Dictionary()
@@ -8422,8 +8358,7 @@ class _Threading:
 	
 	const log_header = "pointers.Threading"
 	
-	func _init(p):
-		pointers = p
+	func _init():
 		if not require_single_threading:
 			var cfg:Dictionary = pointers.ConfigDriver.__config_parse("user://cfg/Mod_Configurations.cfg").get("HevLib/HEVLIB_CONFIG_SECTION_POINTERS",Dictionary())
 			use_single_thread = cfg.get("single_thread_only",false)
@@ -8743,9 +8678,6 @@ class _Threading:
 
 var copyrights:String = hl_copyright
 class _TimeAccess:
-	func _init(p):
-		pass
-	
 	static func __compare_dates(date:String, compare_to_this_date:String):
 		var difference : String = "newer"
 		var splitOne:PoolStringArray = date.split("T")
@@ -8783,9 +8715,6 @@ class _TimeAccess:
 		return {"time":dos_time, "date":dos_date}
 
 class _Tokenizer:
-	func _init(p):
-		pass
-	
 	var tokenizer_script:Script = load("res://HevLib/scripts/tokenizer/tokenizer.gd")
 	
 	func __compile_source_to_bytecode(source:String) -> PoolByteArray:
@@ -8811,11 +8740,6 @@ class _Tokenizer:
 	
 
 class _Translations:
-	const non_static = Dictionary()
-	func _init(c):
-		non_static["pointers"] = c
-		non_static["self"] = self
-	
 	const log_header = "pointers.Translations"
 	
 	static func __updateTL(path:String, delim:String = ",", fullLogging:bool = true):
@@ -8989,8 +8913,8 @@ class _Translations:
 		return dictionary
 	
 	static func __inject_translations():
-		var base:_Translations = non_static["self"]
 		var pointers:HevLibPointers = non_static["pointers"]
+		var base:_Translations = pointers.Translations
 		var fullLogging:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","full_logging",false)
 		var markPlaceholders:bool = pointers.ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DEBUG","mark_placeholder_translations",false)
 		TranslationServer.clear()
@@ -9100,10 +9024,6 @@ class _Translations:
 
 
 class _WebTranslate:
-	const non_static = Dictionary()
-	func _init(f):
-		non_static["pointers"] = f
-	
 	const log_header = "pointers.WebTranslate"
 	
 	func __webtranslate(URL: String, fallback: Array = Array(), file_check: String = ""):
@@ -9176,13 +9096,7 @@ class _WebTranslate:
 		pointers.add_child(handleNode)
 
 class _Zip:
-	const non_static = Dictionary()
-	func _init(p):
-		non_static["pointers"] = p
-	
 	const log_header = "pointers.Zip"
-	
-	
 	
 	# Port of the `load` method from hhyyrylainen's GodotPckTool
 	# https://github.com/hhyyrylainen/GodotPckTool
