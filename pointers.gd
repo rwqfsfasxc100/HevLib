@@ -639,6 +639,8 @@ const LAST_LAUNCH_MODS_PATH:String = "user://cache/mods_on_last_launch.dat"
 
 const INT64_MAX = (1 << 62) - 1 + (1 << 62)
 const INT64_MIN = -INT64_MAX - 1
+const INT64_MAX_FLOAT = 9223372036854775808.0
+const INT64_MIN_FLOAT = -9223372036854775808.0
 
 const DIV_ZERO_ERR = "Division by zero error"
 const INT_OVERFLOW_ERR = "Integer overflow error"
@@ -7401,8 +7403,8 @@ class _Math:
 	func __normalize_special_numbers(number):
 		if number is float:
 			match var2str(number):
-				"inf":return pow(2,63)
-				"inf_neg":return -pow(2,63)
+				"inf":return INT64_MAX_FLOAT
+				"inf_neg":return INT64_MIN_FLOAT
 				"nan":return 0.0
 		return number
 	
