@@ -2747,17 +2747,17 @@ class _Equipment:
 	var add_ships_store : Array = Array()
 	var ship_build_mod_store : Array = Array()
 	var register_ship_numerics_store : Dictionary = Dictionary()
-	var weaponslot_modify_templates:Dictionary = Dictionary()
+	var weaponslot_modify_templates:Dictionary = load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map().get("TEMPLATES", Dictionary())
 	var weaponslot_modify_standalone:Dictionary = Dictionary()
-	var weaponslot_ship_templates:Dictionary = Dictionary()
-	var weaponslot_ship_standalone:Dictionary = Dictionary()
+	var weaponslot_ship_templates:Dictionary = load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd").get_script_constant_map().get("SHIP_TEMPLATES",Dictionary())
+	var weaponslot_ship_standalone:Dictionary = load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map().get("SHIP_MODIFY",Dictionary())
 	var ws_equipment_names:Array = Array()
 	var equipment_slot_order:PoolStringArray = PoolStringArray()
 	var relative_equipment_slot_order:Dictionary = Dictionary()
 	var save_button_cache:Array = Array()
 	var processed_storage_mods:Dictionary = Dictionary()
 	var node_definitions_cache:Dictionary = Dictionary()
-	var ship_node_register:Array = Array()
+	var ship_node_register:Array = load("res://HevLib/scenes/equipment/ShipModificationDriver/ship_register_vanilla.gd").get_script_constant_map().values()
 	var auxslot_data:Dictionary = Dictionary()
 	var ship_node_modify:Dictionary = Dictionary()
 	var ship_thruster_colors:Dictionary = Dictionary()
@@ -2795,21 +2795,8 @@ class _Equipment:
 	
 	func __make_upgrades_scene():
 		pointers.l("observed game version of %d.%d.%d" % Array(VANILLA_VERSION),log_header)
-		
-		
 		var all_slot_node_names : PoolStringArray = PoolStringArray(VANILLA_SLOT_TYPES.keys())
 		
-		var ws_default_templates : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/templates.gd").get_script_constant_map()
-		var ws_ship_templates : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates.gd").get_script_constant_map()
-		var ws_ship_templates_2 : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd") #load("res://HevLib/scenes/weaponslot/data_storage/ship_templates_2.gd").get_script_constant_map()
-		var ship_register : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load("res://HevLib/scenes/equipment/ShipModificationDriver/ship_register_vanilla.gd") #load("res://HevLib/scenes/equipment/ShipModificationDriver/ship_register_vanilla.gd").get_script_constant_map()
-		for item in ship_register.keys():
-			ship_node_register.append(ship_register[item])
-		
-		weaponslot_modify_templates = ws_default_templates.get("TEMPLATES", Dictionary())
-		weaponslot_ship_templates = ws_ship_templates_2.get("SHIP_TEMPLATES",Dictionary())
-		weaponslot_ship_standalone = ws_ship_templates.get("SHIP_MODIFY",Dictionary())
-		var acceptible_script_extensions:PoolStringArray = PoolStringArray(["gd","gdc"])
 		var drivers : Dictionary = Dictionary()
 		var mods : Dictionary = pointers.ManifestV2.__get_mod_data()
 		for md in pointers.ManifestV2.__get_mod_list_keys():
@@ -3362,7 +3349,8 @@ class _Equipment:
 											if sensorItem is Dictionary:
 												if "func_object_path" in sensorItem and "func_method_name" in sensorItem:
 													var object_name:String = sensorItem.func_object_path
-													if object_name.begins_with("res://") and object_name.get_extension() in acceptible_script_extensions:
+													var fext:String = object_name.get_extension().to_lower()
+													if object_name.begins_with("res://") and (fext == "gd" or fext == "gdc"):
 														if object_name in sensor_ref_names:
 															sensor_refs_to_write[object_name].append(sensorItem)
 														elif pointers.FileAccess.__file_exists(object_name):
@@ -3380,7 +3368,8 @@ class _Equipment:
 											var sensorItem:Dictionary = item.function_outputs[i]
 											if "func_object_path" in sensorItem and "func_method_name" in sensorItem:
 												var object_name:String = sensorItem.func_object_path
-												if object_name.begins_with("res://") and object_name.get_extension() in acceptible_script_extensions:
+												var fext:String = object_name.get_extension().to_lower()
+												if object_name.begins_with("res://") and (fext == "gd" or fext == "gdc"):
 													if object_name in sensor_ref_names:
 														sensor_refs_to_write[object_name].append(sensorItem)
 													elif pointers.FileAccess.__file_exists(object_name):
@@ -3995,7 +3984,7 @@ script = ExtResource( 5 )"""
 		var flarepath : String = create_compiled_tex(flare_texture,cached_tex_path,"flare")
 		
 		ext_path_counter += 1
-		var flare_ext : String = ext_path_entry % [flarepath,"StreamTexture" if flarepath.ends_with(".stex") else "Texture",ext_path_counter]
+		var flare_ext : String = ext_path_entry % [flarepath,"StreamTexture" if flarepath.get_extension().to_lower() == "stex" else "Texture",ext_path_counter]
 		ext_entries.append(flare_ext)
 		flare_vars += "\n" + "texture = ExtResource( %d )" % ext_path_counter
 		
@@ -4084,13 +4073,13 @@ script = ExtResource( 5 )"""
 		var texturepath : String = create_compiled_tex(texture,cached_tex_path,"nozzle_texture")
 		
 		current_ext += 1
-		ext_entries.append(ext_path_entry % [texturepath,"StreamTexture" if texturepath.ends_with(".stex") else "Texture",current_ext])
+		ext_entries.append(ext_path_entry % [texturepath,"StreamTexture" if texturepath.get_extension().to_lower() == "stex" else "Texture",current_ext])
 		nozzle_vars += "\n" + "texture = ExtResource( %d )" % current_ext
 		
 		var normalpath : String = create_compiled_tex(normal,cached_tex_path,"nozzle_normal")
 		
 		current_ext += 1
-		ext_entries.append(ext_path_entry % [normalpath,"StreamTexture" if normalpath.ends_with(".stex") else "Texture",current_ext])
+		ext_entries.append(ext_path_entry % [normalpath,"StreamTexture" if normalpath.get_extension().to_lower() == "stex" else "Texture",current_ext])
 		nozzle_vars += "\n" + "normal_map = ExtResource( %d )" % current_ext
 		
 		var offset = nd.offset
@@ -5589,7 +5578,7 @@ class _ManifestV2:
 			return Dictionary()
 		var cv : String = script_path.get_file().to_lower()
 		if cv.begins_with("modmain") and cv.get_extension() == "gd":
-			var constants : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(script_path)
+			var constants : Dictionary = load(script_path).get_script_constant_map()
 			var folder_path : String = script_path.get_base_dir() + "/"
 			var mod_priority : int = constants.get("MOD_PRIORITY",0)
 			var mod_name : String = str(constants.get("MOD_NAME",script_path.split("/")[2]))
@@ -5710,9 +5699,9 @@ class _ManifestV2:
 				if manifestEntry["has_manifest"]:
 					var manifest_langs:Dictionary = Dictionary()
 					for lang in counts.keys():
-						var hs : float = float(counts[lang]["has"])
-						var bucket : float = hs/(hs+float(counts[lang]["missing"]))
-						manifest_langs[lang] = "%3.1f%%" % ((bucket * 100) - (25 * (1 - ((hs - float(counts[lang]["not_updated"])) / hs))))
+						var ctl:Dictionary = counts[lang]
+						var hs : float = float(ctl["has"])
+						manifest_langs[lang] = "%3.1f%%" % (((hs/(hs + ctl["missing"])) * 100) - (25 * (1 - ((hs - ctl["not_updated"]) / hs))))
 					manifestEntry["manifest_data"]["languages"] = manifest_langs
 			
 			var zip_path:String = __match_mod_path_to_zip(script_path)
@@ -5969,7 +5958,7 @@ class _ManifestV2:
 			return Dictionary()
 		var cv : String = mod_path.get_file().to_lower()
 		if cv.begins_with("modmain") and cv.ends_with(".gd"):
-			var constants : Dictionary = pointers.DataFormat.__get_script_constant_map_without_load(mod_path)
+			var constants : Dictionary = load(mod_path).get_script_constant_map()
 			return {"constants":constants,"script_path":mod_path,"mod_type":"mod"}
 		elif cv.begins_with("mod") and cv.ends_with(".manifest"):
 			var manifestData : Dictionary = __parse_file_as_manifest(mod_path)
@@ -6130,9 +6119,9 @@ class _ManifestV2:
 			if manifestEntry["has_manifest"]:
 				var manifest_langs:Dictionary = Dictionary()
 				for lang in counts.keys():
-					var hs : float = float(counts[lang]["has"])
-					var bucket : float = hs/(hs+float(counts[lang]["missing"]))
-					manifest_langs[lang] = "%3.1f%%" % ((bucket * 100) - (25 * (1 - ((hs - float(counts[lang]["not_updated"])) / hs))))
+					var cts:Dictionary = counts[lang]
+					var hs : float = float(cts["has"])
+					manifest_langs[lang] = "%3.1f%%" % (((hs/(hs + cts["missing"])) * 100) - (25 * (1 - ((hs - cts["not_updated"]) / hs))))
 				manifestEntry["manifest_data"]["languages"] = manifest_langs
 		if mod_error:
 			icon_dict = {"has_icon_file":false,"icon_path":""}
@@ -6141,7 +6130,7 @@ class _ManifestV2:
 
 	
 	static func __get_mod_data_from_files(script_path:String) -> Dictionary:
-		var constants : Dictionary = non_static["pointers"].DataFormat.__get_script_constant_map_without_load(script_path)
+		var constants : Dictionary = load(script_path).get_script_constant_map()
 		var folder_path : String = script_path.get_base_dir() + "/"
 		var mod_name : String = str(constants.get("MOD_NAME",script_path.split("/")[2]))
 		var legacy_mod_version : String = constants.get("MOD_VERSION","1.0.0")
@@ -6959,7 +6948,7 @@ class _ManifestV2:
 				var excludeDirs:PoolStringArray = PoolStringArray()
 				for i in arr1:
 					var r:String = i.get_file().to_lower()
-					if r.begins_with("modmain") and r.ends_with(".gd"):
+					if r.begins_with("modmain") and r.get_extension() == "gd":
 						var can : Script = load(i)
 						if not can.can_instance():
 							var vdir:String = i.get_base_dir()
@@ -7012,7 +7001,8 @@ class _ManifestV2:
 				out.append_array(siftFolderStructureForModFiles_legacy(structure[i],path + i,restricted_to_modmains))
 			else:
 				var f : String = i.to_lower()
-				if ((f.begins_with("modmain") and f.ends_with(".gd")) or (f.begins_with("mod") and f.ends_with(".manifest")) or (f.begins_with("icon") and (f.get_extension().to_lower() in non_static["pointers"].SUPPORTED_IMAGE_EXTENSIONS))):
+				var fext:String = f.get_extension()
+				if ((f.begins_with("modmain") and fext == "gd") or (f.begins_with("mod") and fext == "manifest") or (f.begins_with("icon") and (fext in non_static["pointers"].SUPPORTED_IMAGE_EXTENSIONS))):
 					out.append(path + i)
 		return out
 	
@@ -9072,7 +9062,7 @@ class _WebTranslate:
 				continue
 			var cFiles = pointers.__fetch_folder_files(file, false, true)
 			for f in cFiles:
-				if not f.ends_with(".file_check_cache"):
+				if not f.get_extension() == "file_check_cache":
 					continue
 				var fo = File.new()
 				fo.open(f,File.READ)
