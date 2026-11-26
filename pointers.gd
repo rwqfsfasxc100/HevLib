@@ -8355,7 +8355,6 @@ class _Threading:
 	var thread_return : Dictionary = Dictionary()
 	var semaphore_store : Dictionary = Dictionary()
 	
-	var available_threads : Array = Array()
 	var max_threads : int = OS.get_processor_count() - 2
 	var max_queue : int = 127
 	
@@ -8424,11 +8423,11 @@ class _Threading:
 			return Array()
 		semaphore_store[request_id] = [added_op,semaphore]
 		thread_return[request_id] = Array()
-		for thread in available_threads:
-			if ops:
-				if not thread.get_running():
-					thread.pop_post(ops.pop_front())
-					thread.semaphore.post()
+		for thread in thread_refs:
+			if ops and thread.mutex.try_lock() == OK:
+				thread.pop_post(ops.pop_front())
+				thread.semaphore.post()
+				thread.mutex.unlock()
 			else: break
 		if ops:
 			thread_queue.append_array(ops)
@@ -8469,10 +8468,11 @@ class _Threading:
 		semaphore_store[request_id] = [1,semaphore]
 		thread_return[request_id] = Array()
 		var needs_queue : bool = true
-		for thread in available_threads:
-			if not thread.get_running():
+		for thread in thread_refs:
+			if thread.mutex.try_lock() == OK:
 				thread.pop_post(operation)
 				thread.semaphore.post()
+				thread.mutex.unlock()
 				needs_queue = false
 				break
 		if needs_queue:
@@ -8522,11 +8522,11 @@ class _Threading:
 			return ERR_UNCONFIGURED
 		semaphore_store[request_id] = [added_op,semaphore]
 		thread_return[request_id] = Array()
-		for thread in available_threads:
-			if ops:
-				if not thread.get_running():
-					thread.pop_post(ops.pop_front())
-					thread.semaphore.post()
+		for thread in thread_refs:
+			if ops and thread.mutex.try_lock() == OK:
+				thread.pop_post(ops.pop_front())
+				thread.semaphore.post()
+				thread.mutex.unlock()
 			else: break
 		if ops:
 			thread_queue.append_array(ops)
@@ -8563,10 +8563,11 @@ class _Threading:
 		if thread_queue.size() > max_queue:
 			return ERR_UNCONFIGURED
 		var needs_queue : bool = true
-		for thread in available_threads:
-			if not thread.get_running():
+		for thread in thread_refs:
+			if thread.mutex.try_lock() == OK:
 				thread.pop_post(operation)
 				thread.semaphore.post()
+				thread.mutex.unlock()
 				needs_queue = false
 				break
 		if needs_queue:
@@ -8577,22 +8578,9 @@ class _Threading:
 	func _notification(what):
 		if what == NOTIFICATION_PREDELETE:
 			thread_queue.clear()
-			available_threads.clear()
 			thread_return.clear()
 			semaphore_store.clear()
 			thread_refs.clear()
-	
-	func claim_thread_for_process(thread,thread_id : int):
-		mutex.lock()
-		while thread in available_threads:
-			available_threads.erase(thread)
-		mutex.unlock()
-	
-	func set_thread_to_idle(thread,thread_id : int):
-		mutex.lock()
-		if not thread in available_threads:
-			available_threads.append(thread)
-		mutex.unlock()
 	
 	func call_single_thread(data: GDScriptFunctionState):
 		current_data_for_single_thread = data
@@ -8625,33 +8613,27 @@ class _Threading:
 			container = cv
 			thread.start(self,"running_thread")
 		
-		var running : bool = false
 		var quit : bool = false
 		var next_op = null
 		
 		func running_thread(a):
+			mutex.lock()
 			while true:
-				mutex.lock()
 				if not next_op is Dictionary:
-					running = false
 					mutex.unlock()
-					container.set_thread_to_idle(self,thread_id)
 					semaphore.wait()
-				else:
-					mutex.unlock()
+					mutex.lock()
 				
-				mutex.lock()
 				if quit:
 					mutex.unlock()
 					return
-				container.claim_thread_for_process(self,thread_id)
+				
 				var not_async : bool = next_op["not_async"]
 				var current_thread_id : int = next_op["request_id"]
 				var current_object : Object = next_op.get("object",null)
 				var args : Array = next_op.get("args",Array())
 				var current_method_call : String = next_op.get("method","")
 				next_op = null
-				mutex.unlock()
 				var out = null
 				if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
 					out = current_object.callv(current_method_call,args)
@@ -8664,9 +8646,8 @@ class _Threading:
 					cr[0] -= 1
 					if cr[0] < 1:
 						cr[1].post()
-				var next = container.thread_queue.pop_front()
+				pop_post(container.thread_queue.pop_front())
 				container.mutex.unlock()
-				pop_post(next)
 		
 		func _notification(what):
 			if what == NOTIFICATION_PREDELETE:
@@ -8679,20 +8660,7 @@ class _Threading:
 		func pop_post(data):
 			next_op = null
 			if data is Dictionary:
-				mutex.lock()
-				running = true
 				next_op = data.duplicate(true)
-				mutex.unlock()
-		
-		func set_running(how : bool):
-			mutex.lock()
-			running = how
-			mutex.unlock()
-		func get_running() -> bool:
-			mutex.lock()
-			var how : bool = running
-			mutex.unlock()
-			return how
 		
 
 var copyrights : String = hl_copyright
@@ -8941,7 +8909,7 @@ class _Translations:
 		for mod in pointers.DriverManagement.__get_specific_driver_type("REPLACE_TRANSLATIONS.gd"):
 			var tl : Dictionary = mod.get("TRANSLATIONS",Dictionary())
 			if tl:
-				processes.append({"object" : base,"method" : "process_drivers_for_translations","args" : [tl,markPlaceholders,pointers,TranslationServer]})
+				processes.append({"object" : base,"method" : "process_drivers_for_translations","args" : [tl,markPlaceholders,pointers]})
 		# April Fool's alcohol!
 		var date : Dictionary = Time.get_date_dict_from_system()
 		if date.month == 4 and date.day == 1:
