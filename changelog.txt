@@ -4,6 +4,7 @@
 1.1=* This not only results in a significantly smaller file size, but also faster load times as there is minimal processing compared to script constant maps.
 2=* Fixed issue where some configs would not show that they were modified and fail to display their reset button until updated
 3=* Fixed issue where int & float type configs would have a very large blankspace where the label could not be hovered/clicked for its tooltip
+4=* Threading class now uses a mutex try lock method of checking if threads are running to reduce spaghetti
 
 [1.18.7]
 
