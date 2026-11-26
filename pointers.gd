@@ -2145,7 +2145,7 @@ class _DataFormat:
 		var gd : GDScript = GDScript.new()
 		gd.set_source_code(source_code)
 		gd.reload()
-		var out = gd.callv("new",params)
+		var out : Object = gd.callv("new",params)
 		if use_cache:
 			compiled_script_object_storage[shash] = out
 			csosk.append(shash)
