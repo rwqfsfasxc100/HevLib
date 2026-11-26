@@ -95,7 +95,7 @@ func _ready():
 	SliderLabel.text = str(value)
 	var desc = str(CONFIG_DATA.get("description",""))
 	if volatile:
-		if desc != "":
+		if desc:
 			desc = TranslationServer.translate(desc) + "\n\n" + TranslationServer.translate("HEVLIB_SETTING_REQUIRES_RESTART")
 		else:
 			desc = "HEVLIB_SETTING_REQUIRES_RESTART"
@@ -119,7 +119,6 @@ func _draw():
 	refocus()
 
 func refocus():
-	label_button.rect_size = label.rect_size
 	if style == "slider":
 		spinbox.visible = false
 		slider.visible = true
@@ -128,6 +127,7 @@ func refocus():
 		spinbox.visible = true
 		slider.visible = false
 		SliderLabel.visible = false
+	label_button.rect_size = label.rect_size
 	if is_visible_in_tree():
 		yield(pointers,"process_tick")
 		pointers.ConfigDriver.set_button_focus(self,focus_button)
@@ -151,6 +151,7 @@ func _visibility_changed():
 
 
 func recheck_availability():
+	yield(pointers,"process_tick")
 	var v = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	slider.set("value" , float(v))
 	SliderLabel.text = str(v)

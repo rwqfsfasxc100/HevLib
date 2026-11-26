@@ -23,10 +23,10 @@ script = ExtResource( 4 )
 
 [node name="Label" type="Label" parent="."]
 margin_top = 6.0
-margin_right = 363.0
+margin_right = 354.0
 margin_bottom = 44.0
 size_flags_horizontal = 3
-text = "INT-FLOAT_NAME_MISSING"
+text = "INTFLOAT_MISSING_NAME"
 
 [node name="LABELBUTTON" type="Button" parent="Label"]
 margin_right = 10.0
@@ -38,13 +38,6 @@ flat = true
 focusAt = NodePath("../..")
 
 [node name="PlaySoundsOnTheseButtons" parent="Label/LABELBUTTON" instance=ExtResource( 3 )]
-
-[node name="Label2" type="Label" parent="."]
-margin_left = 367.0
-margin_top = 6.0
-margin_right = 377.0
-margin_bottom = 44.0
-size_flags_horizontal = 3
 
 [node name="reset" type="Button" parent="."]
 visible = false
@@ -67,8 +60,8 @@ focusAt = NodePath("../../..")
 [node name="PlaySoundsOnTheseButtons" parent="reset/TextureRect" instance=ExtResource( 3 )]
 
 [node name="SliderLabel" type="Label" parent="."]
-margin_left = 381.0
-margin_right = 481.0
+margin_left = 358.0
+margin_right = 458.0
 margin_bottom = 50.0
 rect_min_size = Vector2( 100, 50 )
 size_flags_horizontal = 4
@@ -76,8 +69,8 @@ align = 2
 valign = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
-margin_left = 485.0
-margin_right = 935.0
+margin_left = 462.0
+margin_right = 912.0
 margin_bottom = 50.0
 
 [node name="Focus" type="Button" parent="MarginContainer"]
@@ -148,8 +141,8 @@ one_shot = true
 [node name="AnimateAppear" parent="." instance=ExtResource( 5 )]
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
-margin_left = 939.0
-margin_right = 954.0
+margin_left = 916.0
+margin_right = 931.0
 margin_bottom = 50.0
 rect_min_size = Vector2( 15, 0 )
 

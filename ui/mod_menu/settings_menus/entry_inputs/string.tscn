@@ -24,7 +24,7 @@ margin_top = 6.0
 margin_right = 328.0
 margin_bottom = 44.0
 size_flags_horizontal = 3
-text = "STRING_NAME_MISSING"
+text = "STRING_MISSING_NAME"
 
 [node name="LABELBUTTON" type="Button" parent="Label"]
 margin_right = 10.0

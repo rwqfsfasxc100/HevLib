@@ -21,10 +21,10 @@ script = ExtResource( 4 )
 
 [node name="Label" type="Label" parent="."]
 margin_top = 6.0
-margin_right = 301.0
+margin_right = 329.0
 margin_bottom = 44.0
 size_flags_horizontal = 3
-text = "BOOL_NAME_MISSING"
+text = "ACTION_MISSING_NAME"
 
 [node name="LABELBUTTON" type="Button" parent="Label"]
 margin_right = 10.0
@@ -59,8 +59,8 @@ focusAt = NodePath("../../..")
 [node name="PlaySoundsOnTheseButtons" parent="reset/TextureRect" instance=ExtResource( 3 )]
 
 [node name="Button" type="Button" parent="."]
-margin_left = 305.0
-margin_right = 315.0
+margin_left = 333.0
+margin_right = 343.0
 margin_bottom = 50.0
 focus_neighbour_left = NodePath("../Label/LABELBUTTON")
 
@@ -77,8 +77,8 @@ focusAt = NodePath("../../..")
 [node name="ActionNode" type="Node" parent="."]
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
-margin_left = 319.0
-margin_right = 369.0
+margin_left = 347.0
+margin_right = 397.0
 margin_bottom = 50.0
 rect_min_size = Vector2( 50, 0 )
 

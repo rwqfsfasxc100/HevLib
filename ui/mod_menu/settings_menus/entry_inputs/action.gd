@@ -61,6 +61,7 @@ func _pressed():
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 
 func recheck_availability():
+	yield(pointers,"process_tick")
 	var requirements = PoolStringArray(CONFIG_DATA.get("requires_bools",[]))
 	if requirements.size() >= 1:
 		var show = true

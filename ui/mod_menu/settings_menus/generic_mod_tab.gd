@@ -53,8 +53,9 @@ func _ready():
 		tab.mod = mod
 		container.add_child(tab)
 		yield(pointers,"process_tick")
-		pass
-	
+	yield(pointers,"process_tick")
+	get_tree().call_group("hevlib_settings_tab","recheck_availability")
+
 #func _process(_delta):
 func _draw():
 	$MarginContainer.rect_size = rect_size

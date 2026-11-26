@@ -21,11 +21,11 @@ theme = ExtResource( 5 )
 script = ExtResource( 4 )
 
 [node name="Label" type="Label" parent="."]
-margin_right = 301.0
+margin_right = 308.0
 margin_bottom = 50.0
 size_flags_horizontal = 3
 size_flags_vertical = 1
-text = "BOOL_NAME_MISSING"
+text = "INPUT_MISSING_NAME"
 valign = 1
 
 [node name="LABELBUTTON" parent="Label" instance=ExtResource( 1 )]
@@ -61,8 +61,8 @@ focusAt = NodePath("../../..")
 [node name="PlaySoundsOnTheseButtons" parent="reset/TextureRect" instance=ExtResource( 3 )]
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
-margin_left = 305.0
-margin_right = 315.0
+margin_left = 312.0
+margin_right = 322.0
 margin_bottom = 50.0
 rect_min_size = Vector2( 10, 0 )
 

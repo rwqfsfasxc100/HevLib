@@ -68,6 +68,7 @@ func _ready():
 
 
 func recheck_availability():
+	yield(pointers,"process_tick")
 	line_edit.text = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	if line_edit.text != CONFIG_DATA.get("default",""):
 		reset_button.visible = true

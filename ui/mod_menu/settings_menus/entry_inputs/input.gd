@@ -59,7 +59,7 @@ func _ready():
 	add_to_group("hevlib_settings_tab",true)
 
 func recheck_availability():
-	
+	yield(pointers,"process_tick")
 	var default = Array(CONFIG_DATA.get("default",[]))
 	var values = Array(pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY))
 	var reset = false

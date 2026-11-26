@@ -76,6 +76,7 @@ func _toggled(color):
 	get_tree().call_group("hevlib_settings_tab","recheck_availability")
 
 func recheck_availability():
+	yield(pointers,"process_tick")
 	var col = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	if not CONFIG_DATA.get("edit_alpha",true):
 		col.a = 1

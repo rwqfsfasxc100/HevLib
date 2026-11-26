@@ -79,6 +79,7 @@ func _toggled(button_pressed):
 	bool_button.icon = tex
 
 func recheck_availability():
+	yield(pointers,"process_tick")
 	bool_button.pressed = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	if bool_button.pressed != CONFIG_DATA.get("default",false):
 		reset_button.visible = true
@@ -89,7 +90,7 @@ func recheck_availability():
 		label_button.focus_neighbour_right = label_button.get_path_to(bool_button)
 		bool_button.focus_neighbour_left = bool_button.get_path_to(label_button)
 	var requirements = PoolStringArray(CONFIG_DATA.get("requires_bools",[]))
-	if requirements.size() >= 1:
+	if requirements:
 		var show = true
 		var valid_options = 0
 		var true_valids = 0
@@ -155,9 +156,9 @@ func refocus():
 	
 
 func _visibility_changed():
+	refocus()
 	if get_position_in_parent() == 0:
 		label_button.grab_focus()
-	refocus()
 
 func triggerVolatile():
 	pointers.has_updated = true

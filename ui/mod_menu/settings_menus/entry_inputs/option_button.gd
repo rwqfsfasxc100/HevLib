@@ -76,6 +76,7 @@ func _ready():
 
 
 func recheck_availability():
+	yield(pointers,"process_tick")
 	var val = pointers.ConfigDriver.__get_value(CONFIG_MOD,CONFIG_SECTION,CONFIG_ENTRY)
 	
 	option_button.selected = find_int(val)
