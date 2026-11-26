@@ -70,6 +70,6 @@ func getScan():
 			#Detect that meterial
 			return type
 		#Otherwise, reduce the scan value and try the next material
-		scan -= cm[type]
+		scan -= composition[type]
 	#If nothing was detected for some reason, default to the filler
 	return filler
