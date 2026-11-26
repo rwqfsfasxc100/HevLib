@@ -1,10 +1,11 @@
 [1.18.8]
 
-1=* Hardcoded data has been moved outside of scripts and is now stored within a compressed file
-1.1=* This not only results in a significantly smaller file size, but also faster load times as there is minimal processing compared to script constant maps.
-2=* Fixed issue where some configs would not show that they were modified and fail to display their reset button until updated
-3=* Fixed issue where int & float type configs would have a very large blankspace where the label could not be hovered/clicked for its tooltip
-4=* Threading class now uses a mutex try lock method of checking if threads are running to reduce spaghetti
+1=* Fixed crash caused by trying to scan a mineral chunk with multiminerals enabled
+2=* Hardcoded data has been moved outside of scripts and is now stored within a compressed file
+2.1=* This not only results in a significantly smaller file size, but also faster load times as there is minimal processing compared to script constant maps.
+3=* Fixed issue where some configs would not show that they were modified and fail to display their reset button until updated
+4=* Fixed issue where int & float type configs would have a very large blankspace where the label could not be hovered/clicked for its tooltip
+5=* Threading class now uses a mutex try lock method of checking if threads are running to reduce spaghetti
 
 [1.18.7]
 
