@@ -40,7 +40,8 @@ var compression_level : int = 6 setget set_compression_level, get_compression_le
 
 
 func set_compression_level(level : int) -> void:
-	miniz.compression_level = level
+	if miniz:
+		miniz.compression_level = level
 
 
 func get_compression_level() -> int:
