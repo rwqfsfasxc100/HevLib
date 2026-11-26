@@ -8424,10 +8424,11 @@ class _Threading:
 		semaphore_store[request_id] = [added_op,semaphore]
 		thread_return[request_id] = Array()
 		for thread in thread_refs:
-			if ops and thread.mutex.try_lock() == OK:
-				thread.pop_post(ops.pop_front())
-				thread.semaphore.post()
-				thread.mutex.unlock()
+			if ops:
+				if thread.mutex.try_lock() == OK:
+					thread.pop_post(ops.pop_front())
+					thread.semaphore.post()
+					thread.mutex.unlock()
 			else: break
 		if ops:
 			thread_queue.append_array(ops)
@@ -8523,10 +8524,11 @@ class _Threading:
 		semaphore_store[request_id] = [added_op,semaphore]
 		thread_return[request_id] = Array()
 		for thread in thread_refs:
-			if ops and thread.mutex.try_lock() == OK:
-				thread.pop_post(ops.pop_front())
-				thread.semaphore.post()
-				thread.mutex.unlock()
+			if ops:
+				if thread.mutex.try_lock() == OK:
+					thread.pop_post(ops.pop_front())
+					thread.semaphore.post()
+					thread.mutex.unlock()
 			else: break
 		if ops:
 			thread_queue.append_array(ops)
