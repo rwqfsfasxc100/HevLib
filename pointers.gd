@@ -8545,9 +8545,8 @@ class _Threading:
 			if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
 				current_object.callv(current_method_call,args)
 				return OK
-			else:
-				printerr("Attempting to call thread with invalid object or function name")
-				return ERR_UNCONFIGURED
+			printerr("Attempting to call thread with invalid object or function name")
+			return ERR_UNCONFIGURED
 		var request_id : int = (operation.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
 		if log_info:
 			pointers.l("Requesting single async thread operation under request [%d]" % request_id,log_header)
