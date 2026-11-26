@@ -32,10 +32,10 @@
 extends Reference
 class_name Tokenizer
 
-static func __source_to_tokens(source_code:String) -> Array:
-	var token_store:Array = Array()
-	source_code=source_code.replace("\r","")
-	var length:int = source_code.length()
+static func __source_to_tokens(source_code : String) -> Array:
+	var token_store : Array = Array()
+	source_code = source_code.replace("\r","")
+	var length : int = source_code.length()
 	var char_store:PoolIntArray = PoolIntArray()
 	char_store.resize(length)
 	var position_store:Array = [0,1,length]

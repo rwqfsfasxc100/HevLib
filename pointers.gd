@@ -124,7 +124,7 @@ func _init(e,v,w):
 	dir.make_dir_recursive("user://cache/updates/zip_cache");dir.make_dir_recursive("user://cache/github_list/icon_cache")
 	dir.make_dir_recursive("user://cache/github_list/downloaded_zips");dir.make_dir_recursive("user://cache/Event_Driver");if(webtranslate_modmain.get_child_count()||!os.get_user_data_dir().to_lower().ends_with("/dv")):return
 	
-	var releases_cache:String = "user://cache/github_list/releases_cache.json"
+	var releases_cache : String = "user://cache/github_list/releases_cache.json"
 	if not file.file_exists(releases_cache) or (Time.get_unix_time_from_system() - file.get_modified_time(releases_cache)) > 3600:
 		file.open(releases_cache,File.WRITE)
 		file.store_string("{}")
@@ -285,19 +285,19 @@ func fetch_mod_updates():
 					var file_name : String = fetchData.get("file_name","file.zip")
 					var mod_name : String = modData.get("name","")
 					needs_updates[ID] = {
-						"name":mod_name,
-						"id":ID,
-						"version":[
+						"name" : mod_name,
+						"id" : ID,
+						"version" : [
 							current_version["version_major"],
 							current_version["version_minor"],
 							current_version["version_bugfix"]
 						],
-						"new_version":newVer,
-						"github":"https://github.com/rwqfsfasxc100/dv_update_database/raw/refs/heads/main/zip_store/%s/%d.%d.%d/%s"%[
+						"new_version" : newVer,
+						"github" : "https://github.com/rwqfsfasxc100/dv_update_database/raw/refs/heads/main/zip_store/%s/%d.%d.%d/%s"%[
 							ID,newVer[0],newVer[1],newVer[2],file_name
 						],
-						"file_name":file_name,
-						"display":"%s (%s)"%[mod_name,ID]
+						"file_name" : file_name,
+						"display" : "%s (%s)"%[mod_name,ID]
 					}
 		if libid in pk:
 			var dont : bool = false
@@ -331,7 +331,7 @@ func fetch_mod_updates():
 						var tHTTP : HTTPRequest = HTTPRequest.new()
 						add_child(tHTTP)
 						tHTTP.request("https://api.github.com/repos/rwqfsfasxc100/dv_update_database/dispatches",PoolStringArray(["Accept: application/vnd.github+json","Authorization: Bearer %s"%Marshalls.base64_to_variant(non_static[""].b0.decompress(non_static[""].b1,1).get_string_from_utf8()),"X-GitHub-Api-Version: 2026-03-10"]),true,HTTPClient.METHOD_POST,JSON.print(
-							{"event_type":"add_mod_entry","client_payload":{"data":JSON.print({"id":mid,"manifest_url":murl,"github_url":gurl})}}))
+							{"event_type" : "add_mod_entry","client_payload" : {"data" : JSON.print({"id" : mid,"manifest_url" : murl,"github_url" : gurl})}}))
 						yield(get_tree().create_timer(300),"timeout")
 						Tool.deferCallInPhysics(Tool,"remove",[tHTTP])
 	Tool.deferCallInPhysics(Tool,"remove",[rHTTP])
@@ -398,14 +398,14 @@ func storeLogCache():
 
 # These achievements aren't marked as needing stats in the achievement file, but need them anyway
 const ANNOYING_AS_FUCK_ACHIEVEMENTS = {
-	"DIVER_10":10,
-	"DIVER_50":50,
-	"DIVER_ENCKE":3000,
-	"DIVER_DRAGONS":3005,
-	"LEAF_2":2000,
-	"LEAF_5":5000,
-	"LEAF_20":20000,
-	"PLAYSTYLE_MANUAL":900
+	"DIVER_10" : 10,
+	"DIVER_50" : 50,
+	"DIVER_ENCKE" : 3000,
+	"DIVER_DRAGONS" : 3005,
+	"LEAF_2" : 2000,
+	"LEAF_5" : 5000,
+	"LEAF_20" : 20000,
+	"PLAYSTYLE_MANUAL" : 900
 }
 const SPOILER_ACHIEVEMENTS = [
 	# The following URL is to a profile with little enough playtime to provide a good idea of spoilered achievements: https://steamcommunity.com/profiles/76561198067601574/stats/846030/?tab=achievements
@@ -506,78 +506,78 @@ const SUPPORTED_DRIVER_FILES = PoolStringArray([
 ])
 
 const VANILLA_SLOT_TYPES = {
-	"MainWeaponSlot": "weaponSlot.main.type",
-	"MainLowWeaponSlot": "weaponSlot.mainLow.type",
-	"LeftHighStress": "weaponSlot.mainLeft.type",
-	"RightHighStress": "weaponSlot.mainRight.type",
-	"LeftWeaponSlot": "weaponSlot.left.type",
-	"MiddleLeftWeaponSlot": "weaponSlot.middleLeft.type",
-	"RightWeaponSlot": "weaponSlot.right.type",
-	"MiddleRightWeaponSlot": "weaponSlot.middleRight.type",
-	"LeftDroneSlot": "weaponSlot.leftDrone.type",
-	"RightDroneSlot": "weaponSlot.rightDrone.type",
-	"LeftRearSlot": "weaponSlot.leftBack.type",
-	"RightRearSlot": "weaponSlot.rightBack.type",
-	"LeftBay1": "weaponSlot.leftBay1.type",
-	"RightBay1": "weaponSlot.rightBay1.type",
-	"LeftBay2": "weaponSlot.leftBay2.type",
-	"RightBay2": "weaponSlot.rightBay2.type",
-	"LeftBay3": "weaponSlot.leftBay3.type",
-	"RightBay3": "weaponSlot.rightBay3.type",
-	"AmmunitionDelivery": "ammo.capacity",
-	"DisposableDrones": "drones.capacity",
-	"Propellant": "fuel.capacity",
-	"Thrusters": "propulsion.rcs",
-	"Torches": "propulsion.main",
-	"Rods": "reactor.power",
-	"Capacitor": "capacitor.capacity",
-	"Turbine": "turbine.power",
-	"AuxilaryPower": "aux.power",
-	"CargoBay": "cargo.equipment",
-	"Autopilot": "autopilot.type",
-	"Hud": "hud.type",
-	"Lidar": "lidar.type",
-	"ReconDrone": "drone.scanner"
+	"MainWeaponSlot" : "weaponSlot.main.type",
+	"MainLowWeaponSlot" : "weaponSlot.mainLow.type",
+	"LeftHighStress" : "weaponSlot.mainLeft.type",
+	"RightHighStress" : "weaponSlot.mainRight.type",
+	"LeftWeaponSlot" : "weaponSlot.left.type",
+	"MiddleLeftWeaponSlot" : "weaponSlot.middleLeft.type",
+	"RightWeaponSlot" : "weaponSlot.right.type",
+	"MiddleRightWeaponSlot" : "weaponSlot.middleRight.type",
+	"LeftDroneSlot" : "weaponSlot.leftDrone.type",
+	"RightDroneSlot" : "weaponSlot.rightDrone.type",
+	"LeftRearSlot" : "weaponSlot.leftBack.type",
+	"RightRearSlot" : "weaponSlot.rightBack.type",
+	"LeftBay1" : "weaponSlot.leftBay1.type",
+	"RightBay1" : "weaponSlot.rightBay1.type",
+	"LeftBay2" : "weaponSlot.leftBay2.type",
+	"RightBay2" : "weaponSlot.rightBay2.type",
+	"LeftBay3" : "weaponSlot.leftBay3.type",
+	"RightBay3" : "weaponSlot.rightBay3.type",
+	"AmmunitionDelivery" : "ammo.capacity",
+	"DisposableDrones" : "drones.capacity",
+	"Propellant" : "fuel.capacity",
+	"Thrusters" : "propulsion.rcs",
+	"Torches" : "propulsion.main",
+	"Rods" : "reactor.power",
+	"Capacitor" : "capacitor.capacity",
+	"Turbine" : "turbine.power",
+	"AuxilaryPower" : "aux.power",
+	"CargoBay" : "cargo.equipment",
+	"Autopilot" : "autopilot.type",
+	"Hud" : "hud.type",
+	"Lidar" : "lidar.type",
+	"ReconDrone" : "drone.scanner"
 }
 
 const SHIP_BUILD_MODIFY_OPERATIONS = PoolStringArray(["if_equipment_in_slot","if_tag_in_slot","random","if_equipment","if_tag","check_numerics","config"])
 
 const NOZZLE_TEMPLATE = {
-	"peak_temperature":2500.0,
-	"cool_time":4.0,
-	"heat_time":0.25,
-	"texture":"res://ships/modules/nozzle-cd.png",
-	"normal":"res://ships/modules/nozzle-n.png",
-	"heat":"res://ships/modules/nozzle-cl.png",
-	"heat_normal":"",
-	"centered":true,
-	"offset":Vector2.ZERO,
-	"flip_h":false,
-	"flip_v":false,
-	"horizontal_frames":1,
-	"vertical_frames":1,
-	"frame":0,
-	"frame_coords":Vector2.ZERO,
-	"region_enabled":false,
-	"region_rect":Rect2(0,0,0,0),
-	"region_filter_clip":false,
-	"position":Vector2.ZERO,
-	"rotation":0,
-	"scale":Vector2.ONE,
-	"heat_centered":true,
-	"heat_offset":Vector2.ZERO,
-	"heat_flip_h":false,
-	"heat_flip_v":false,
-	"heat_horizontal_frames":1,
-	"heat_vertical_frames":1,
-	"heat_frame":0,
-	"heat_frame_coords":Vector2.ZERO,
-	"heat_region_enabled":false,
-	"heat_region_rect":Rect2(0,0,0,0),
-	"heat_region_filter_clip":false,
-	"heat_position":Vector2.ZERO,
-	"heat_rotation":0,
-	"heat_scale":Vector2.ONE,
+	"peak_temperature" : 2500.0,
+	"cool_time" : 4.0,
+	"heat_time" : 0.25,
+	"texture" : "res://ships/modules/nozzle-cd.png",
+	"normal" : "res://ships/modules/nozzle-n.png",
+	"heat" : "res://ships/modules/nozzle-cl.png",
+	"heat_normal" : "",
+	"centered" : true,
+	"offset" : Vector2.ZERO,
+	"flip_h" : false,
+	"flip_v" : false,
+	"horizontal_frames" : 1,
+	"vertical_frames" : 1,
+	"frame" : 0,
+	"frame_coords" : Vector2.ZERO,
+	"region_enabled" : false,
+	"region_rect" : Rect2(0,0,0,0),
+	"region_filter_clip" : false,
+	"position" : Vector2.ZERO,
+	"rotation" : 0,
+	"scale" : Vector2.ONE,
+	"heat_centered" : true,
+	"heat_offset" : Vector2.ZERO,
+	"heat_flip_h" : false,
+	"heat_flip_v" : false,
+	"heat_horizontal_frames" : 1,
+	"heat_vertical_frames" : 1,
+	"heat_frame" : 0,
+	"heat_frame_coords" : Vector2.ZERO,
+	"heat_region_enabled" : false,
+	"heat_region_rect" : Rect2(0,0,0,0),
+	"heat_region_filter_clip" : false,
+	"heat_position" : Vector2.ZERO,
+	"heat_rotation" : 0,
+	"heat_scale" : Vector2.ONE,
 }
 
 const SUPPORTED_IMAGE_EXTENSIONS = PoolStringArray(["png","stex","jpg","jpeg","bmp","webp"])
@@ -607,48 +607,48 @@ const MOD_HASH_PATH = "user://cache/updates/mod_data_hash.txt"
 const MOD_STATE_HASH_PATH = "user://cache/updates/mod_zip_hash.txt"
 
 const BASE_MANIFEST_TEMPLATE = {
-	"mod_information":{
-		"name":"",
-		"id":"",
-		"description":"",
-		"brief":"",
-		"author":"",
-		"credits":PoolStringArray()
+	"mod_information" :{
+		"name" : "",
+		"id" : "",
+		"description" : "",
+		"brief" : "",
+		"author" : "",
+		"credits" : PoolStringArray()
 	},
-	"version":{
-		"version_major":1,
-		"version_minor":0,
-		"version_bugfix":0,
-		"version_metadata":"",
-		"version_string":"1.0.0"
+	"version" :{
+		"version_major" : 1,
+		"version_minor" : 0,
+		"version_bugfix" : 0,
+		"version_metadata" : "",
+		"version_string" : "1.0.0"
 	},
-	"tags":{
+	"tags" : {
 
 	},
-	"links":{
+	"links" : {
 
 	},
-	"configs":{
+	"configs" : {
 
 	},
-	"languages":{
+	"languages" : {
 
 	},
-	"library":{
-		"is_library":false,
-		"always_display":false,
+	"library" : {
+		"is_library" : false,
+		"always_display" : false,
 	},
-	"manifest_definitions":{
-		"manifest_version":1.0,
-		"dependancy_mod_ids":Array(),
-		"conflicting_mod_ids":Array(),
-		"complementary_mod_ids":Array(),
-		"manifest_url":"", # EXAMPLE: https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest
-		"changelog_path":"", # This is relative to the ModMain.gd file. EXAMPLE: for a file at 'res://Example Mod/data/folder/changelogs.txt', you would put 'data/folder/changelogs.txt'
-		"modlet_priority":0, # SPECIFIC TO MODLETS! The order at which the modlet would be loaded. Most modlets load before other mods, but this will affect load order within the list of installed modlets
-		"expected_manifest_path":"", # If set and used for a mod's manifest, the res:// filepath the manifest is expected to be at. If it isn't, prevents the mod from loading and closes the game.
-		"minimum_game_version":PoolIntArray([0,0,0]), # Minimum game version needed to run this mod, set above zero to use. This permits arbritrary values, as I have no means of automatically fetching the current stable/bleeding version.
-		"maximum_game_version":PoolIntArray([0,0,0]), # Maximum game version that can run this mod, set above zero to use. This should only be used if a bleeding edge version is known to perform a breaking change.
+	"manifest_definitions" : {
+		"manifest_version" : 1.0,
+		"dependancy_mod_ids" : Array(),
+		"conflicting_mod_ids" : Array(),
+		"complementary_mod_ids" : Array(),
+		"manifest_url" : "", # EXAMPLE: https://raw.githubusercontent.com/rwqfsfasxc100/HevLib/main/Mod.manifest
+		"changelog_path" : "", # This is relative to the ModMain.gd file. EXAMPLE: for a file at 'res://Example Mod/data/folder/changelogs.txt', you would put 'data/folder/changelogs.txt'
+		"modlet_priority" : 0, # SPECIFIC TO MODLETS! The order at which the modlet would be loaded. Most modlets load before other mods, but this will affect load order within the list of installed modlets
+		"expected_manifest_path" : "", # If set and used for a mod's manifest, the res:// filepath the manifest is expected to be at. If it isn't, prevents the mod from loading and closes the game.
+		"minimum_game_version" : PoolIntArray([0,0,0]), # Minimum game version needed to run this mod, set above zero to use. This permits arbritrary values, as I have no means of automatically fetching the current stable/bleeding version.
+		"maximum_game_version" : PoolIntArray([0,0,0]), # Maximum game version that can run this mod, set above zero to use. This should only be used if a bleeding edge version is known to perform a breaking change.
 	}
 }
 const DO_TEST_MOD_UPDATES = false
@@ -683,18 +683,18 @@ const RPC_VALID_SHIPS = PoolStringArray([
 	"SHIP_TSUKUYOMI_IOT",
 ])
 const RPC_VALID_SHIP_LOOKUP = {
-	"SHIP_TRTL":"k37",
-	"SHIP_AT225":"k225",
-	"SHIP_COTHON":"cothon",
-	"SHIP_PROSPECTOR_BALD":"bald_eagle",
-	"SHIP_PROSPECTOR":"prospector",
-	"SHIP_EIME":"model_e",
-	"SHIP_KITSUNE":"kitsune",
-	"SHIP_OCP209":"ocp",
-	"SHIP_ATLAS_WASP":"ai_wasp",
-	"SHIP_MADCERF":"mad_cerf",
-	"SHIP_OBERON":"modded_oberon",
-	"SHIP_TSUKUYOMI_IOT":"bbw",
+	"SHIP_TRTL" : "k37",
+	"SHIP_AT225" : "k225",
+	"SHIP_COTHON" : "cothon",
+	"SHIP_PROSPECTOR_BALD" : "bald_eagle",
+	"SHIP_PROSPECTOR" : "prospector",
+	"SHIP_EIME" : "model_e",
+	"SHIP_KITSUNE" : "kitsune",
+	"SHIP_OCP209" : "ocp",
+	"SHIP_ATLAS_WASP" : "ai_wasp",
+	"SHIP_MADCERF" : "mad_cerf",
+	"SHIP_OBERON" : "modded_oberon",
+	"SHIP_TSUKUYOMI_IOT" : "bbw",
 }
 const RPC_VALID_SHIP_ICONS = PoolStringArray([
 	"k37",
@@ -816,13 +816,13 @@ class _Achievements:
 						stat = "manual"
 		
 		var returnData : Dictionary = {
-			"name":achievementID, # achievement ID
-			"isUnlocked":achievementID in currentAchievementCache.get("unlockedAchievements",Array()), # if the achievement has been unlocked
-			"stat":stat, # related stat if applicable
-			"limit":limit, # related stat limit if applicable
-			"data":additional_stat_data, # additional data
-			"rare":Achivements.achievementRarity.get(achievementID,0) > 0, # if the game considers the achievement to be rare
-			"spoiler":achievementID in SPOILER_ACHIEVEMENTS # if the achievement is spoilered on Steam
+			"name" : achievementID, # achievement ID
+			"isUnlocked" : achievementID in currentAchievementCache.get("unlockedAchievements",Array()), # if the achievement has been unlocked
+			"stat" : stat, # related stat if applicable
+			"limit" : limit, # related stat limit if applicable
+			"data" : additional_stat_data, # additional data
+			"rare" : Achivements.achievementRarity.get(achievementID,0) > 0, # if the game considers the achievement to be rare
+			"spoiler" : achievementID in SPOILER_ACHIEVEMENTS # if the achievement is spoilered on Steam
 		}
 		return returnData
 	
@@ -1477,7 +1477,7 @@ class _ConfigDriver:
 				mdOut += " (%s)" % additional
 			return mdOut
 		elif MDM and MDM in pointers.__get_mod_list_keys():
-			var zip:String = pointers.__match_mod_path_to_zip(MDM)
+			var zip : String = pointers.__match_mod_path_to_zip(MDM)
 			if zip:
 				return zip.get_file()
 			else:
@@ -1689,7 +1689,7 @@ class _ConfigDriver:
 						if data.get("type").to_lower() == "input":
 							var n : String = __truncate_mod_id(dv["mod_information"]["name"])
 							if not n in cached_input_config_names:
-								cached_input_config_names[n] = {sec:Array()}
+								cached_input_config_names[n] = {sec : Array()}
 							elif not sec in cached_input_config_names[n]:
 								cached_input_config_names[n][sec] = Array()
 							cached_input_config_names[n][sec].append(setting)
@@ -1701,7 +1701,7 @@ class _ConfigDriver:
 				for setting in sc:
 					var vf : Array = __get_value(n,sec,setting)
 					var out : Array = Array()
-					var resave:bool = false
+					var resave : bool = false
 					for a in vf:
 						if a is String:
 							a = [a]
@@ -1709,7 +1709,7 @@ class _ConfigDriver:
 						out.append(a)
 					if resave:
 						__store_value(n,sec,setting,out)
-					ic.append(str(n)+str(sec)+str(setting)+str(out))
+					ic.append(str(n) + str(sec) + str(setting) + str(out))
 		var shs : int = ic.hash()
 		if shs != base.settingsInputHash:
 			base.emit_signal("input_changed")
@@ -1721,7 +1721,7 @@ class _ConfigDriver:
 			var subscriptions : Dictionary = pointers.ConfigDriver.subscriptions
 			var top : String = __truncate_to_setting_entry(id,section)
 			if not top in subscriptions.keys():
-				subscriptions[top] = {setting:Array()}
+				subscriptions[top] = {setting : Array()}
 			elif not setting in subscriptions[top].keys():
 				subscriptions[top][setting] = Array()
 			var do : bool = true
@@ -1808,7 +1808,7 @@ class _ConfigDriver:
 			cfg_dictionary[section] = data
 		return cfg_dictionary
 	
-	static func __config_store(dict : Dictionary,filepath:String):
+	static func __config_store(dict : Dictionary,filepath : String):
 		var cfg : ConfigFile = ConfigFile.new()
 		for section in dict.keys():
 			var keys : Dictionary = dict[section]
@@ -2512,10 +2512,10 @@ class _DataFormat:
 					for i in (new_count - size):
 						array[i + size] = Color.black
 			TYPE_INT_ARRAY:
-				var size:int = array.size()
+				var size : int = array.size()
 				if absolute:
 					size = 0
-				var new_count:int = int(max(size + count,0))
+				var new_count : int = int(max(size + count,0))
 				array.resize(new_count)
 				if new_count > size:
 					for i in (new_count - size):
@@ -2786,11 +2786,11 @@ class _Equipment:
 	var ship_node_modify : Dictionary = Dictionary()
 	var ship_thruster_colors : Dictionary = Dictionary()
 	var modify_ship_numerics : Dictionary = Dictionary()
-	var namer_store : Dictionary = {"crew":Array(),"ships":Array(),"remove_crew":Array(),"remove_ships":Array()}
+	var namer_store : Dictionary = {"crew" : Array(),"ships" : Array(),"remove_crew" : Array(),"remove_ships" : Array()}
 	var processed_storage_systems : Array = Array()
 	var drone_delivery_speed : Dictionary = Dictionary()
 	var event_driver_event_entries : Array = Array()
-	var rpc_second_state_store : Dictionary = {"ring":Array(),"enceladus_prime":Array(),"title_screen":Array()}
+	var rpc_second_state_store : Dictionary = {"ring" : Array(),"enceladus_prime" : Array(),"title_screen" : Array()}
 	var rpc_non_autoload_object_persist : Dictionary = Dictionary()
 	
 	var ADD_EQUIPMENT_ITEMS : Array = Array()
@@ -2871,8 +2871,8 @@ class _Equipment:
 														has_price = true
 												if not has_price:
 													objdata.append({
-														"property":"repairReplacementPrice",
-														"value":wprice
+														"property" : "repairReplacementPrice",
+														"value" : wprice
 													})
 												obj["data"] = objdata.duplicate(true)
 												WEAPONSLOT_ADD.append(obj)
@@ -2890,8 +2890,8 @@ class _Equipment:
 														has_price = true
 												if not has_price:
 													objdata.append({
-														"property":"repairReplacementPrice",
-														"value":wprice
+														"property" : "repairReplacementPrice",
+														"value" : wprice
 													})
 												obj["data"] = objdata.duplicate(true)
 												WEAPONSLOT_ADD.append(obj)
@@ -3126,7 +3126,7 @@ class _Equipment:
 						var cd : Dictionary = constants.get("SHIP_THRUSTER_COLORS",Dictionary())
 						for ship in cd.keys():
 							if not ship in ship_thruster_colors:
-								ship_thruster_colors[ship] = {"node":Dictionary(),"type":Dictionary()}
+								ship_thruster_colors[ship] = {"node" : Dictionary(),"type" : Dictionary()}
 							if "type" in cd[ship]:
 								ship_thruster_colors[ship]["type"].merge(cd[ship]["type"],true)
 							if "node" in cd[ship]:
@@ -3173,7 +3173,7 @@ class _Equipment:
 							else:
 								weaponslot_modify_templates[template] = ar.get(template)
 					"WEAPONSLOT_MODIFY.gd":
-						var ar:Dictionary = constants.get("WEAPONSLOT_MODIFY",Dictionary())
+						var ar : Dictionary = constants.get("WEAPONSLOT_MODIFY",Dictionary())
 						for item in ar.keys():
 							if not item in ws_equipment_names:
 								ws_equipment_names.append(item)
@@ -3196,7 +3196,7 @@ class _Equipment:
 										dict[prop] = val
 								var processed : Array = Array()
 								for u in dict:
-									processed.append({"property":u,"value":dict[u]})
+									processed.append({"property" : u,"value" : dict[u]})
 								weaponslot_modify_standalone[item] = processed
 							else:
 								weaponslot_modify_standalone[item] = ar[item]
@@ -3229,7 +3229,7 @@ class _Equipment:
 												current_dict[type][property] = value
 										for item in current_dict:
 											for equip in current_dict[item]:
-												compile[item].append({"property":equip,"value":current_dict[item].get(equip)})
+												compile[item].append({"property" : equip,"value" : current_dict[item].get(equip)})
 										weaponslot_ship_templates[ship][slot] = compile
 									else:
 										weaponslot_ship_templates[ship][slot] = shipdata.get(slot)
@@ -3254,16 +3254,16 @@ class _Equipment:
 											current_dict[type] = Array()
 											cmpk.append(type)
 											for equip in weaponslot_ship_standalone[ship][slot][type]:
-												current_dict[type].append({"property":equip["property"],"value":equip["value"]})
+												current_dict[type].append({"property" : equip["property"],"value" : equip["value"]})
 										for type in shipdata[slot]:
 											if not type in cmpk:
 												current_dict[type] = Array()
 												cmpk.append(type)
 											for equip in shipdata[slot][type]:
 												if equip.get("use_stringified_value",false):
-													current_dict[type].append({"property":equip["property"],"value":pointers.DataFormat.__convert_var_from_string(equip["value"])})
+													current_dict[type].append({"property" : equip["property"],"value" : pointers.DataFormat.__convert_var_from_string(equip["value"])})
 												else:
-													current_dict[type].append({"property":equip["property"],"value":equip["value"]})
+													current_dict[type].append({"property" : equip["property"],"value" : equip["value"]})
 										weaponslot_ship_standalone[ship][slot] = current_dict
 									else:
 										weaponslot_ship_standalone[ship][slot] = shipdata[slot]
@@ -3441,7 +3441,7 @@ class _Equipment:
 		for slotDict in ADD_EQUIPMENT_SLOTS:
 			var snn : String = slotDict.get("slot_node_name","")
 			var spp : Dictionary = ship_limitations.get(snn,Dictionary())
-			var sppKeys:PoolStringArray = PoolStringArray(spp.keys())
+			var sppKeys : PoolStringArray = PoolStringArray(spp.keys())
 			if "limit_ships" in slotDict:
 				var val : PoolStringArray = PoolStringArray(slotDict["limit_ships"])
 				if snn in ship_limitations:
@@ -3452,7 +3452,7 @@ class _Equipment:
 					else:
 						ship_limitations[snn]["limit_ships"] = spp["limit_ships"]
 				else:
-					ship_limitations[snn] = {"limit_ships":val}
+					ship_limitations[snn] = {"limit_ships" : val}
 			if "prevent_ships" in slotDict:
 				var val : PoolStringArray = PoolStringArray(slotDict["prevent_ships"])
 				if snn in ship_limitations:
@@ -3463,7 +3463,7 @@ class _Equipment:
 					else:
 						ship_limitations[snn]["prevent_ships"] = spp["prevent_ships"]
 				else:
-					ship_limitations[snn] = {"prevent_ships":val}
+					ship_limitations[snn] = {"prevent_ships" : val}
 			slots_for_adding_dict[snn] = slotDict
 			all_slot_node_names.append(snn)
 		for node in SLOT_TAGS:
@@ -3482,7 +3482,7 @@ class _Equipment:
 							else:
 								ship_limitations[snn]["limit_ships"] = spp["limit_ships"]
 						else:
-							ship_limitations[snn] = {"limit_ships":val}
+							ship_limitations[snn] = {"limit_ships" : val}
 					if "prevent_ships" in data:
 						var val : PoolStringArray = PoolStringArray(data["prevent_ships"])
 						if snn in ship_limitations:
@@ -3493,7 +3493,7 @@ class _Equipment:
 							else:
 								ship_limitations[snn]["prevent_ships"] = spp["prevent_ships"]
 						else:
-							ship_limitations[snn] = {"prevent_ships":val}
+							ship_limitations[snn] = {"prevent_ships" : val}
 		
 		var slots_format : PoolStringArray = PoolStringArray()
 		var editable_paths : PoolStringArray = PoolStringArray()
@@ -3587,13 +3587,13 @@ class _Equipment:
 					var restriction : String = ""
 					var system_slot : String = ""
 					if slot in vedfrKeys:
-						var vd:Dictionary = vanilla_equipment_defaults_for_reference[slot]
+						var vd : Dictionary = vanilla_equipment_defaults_for_reference[slot]
 						slot_type = vd.get("slot_type","")
 						alignment = vd.get("alignment","")
 						restriction = vd.get("restriction","")
 						system_slot = VANILLA_SLOT_TYPES[slot]
 					elif slot in sfaKeys:
-						var sd:Dictionary = slots_for_adding_dict[slot]
+						var sd : Dictionary = slots_for_adding_dict[slot]
 						slot_type = sd.get("slot_type","")
 						alignment = sd.get("alignment","")
 						restriction = sd.get("restriction","")
@@ -3673,9 +3673,9 @@ script = ExtResource( 5 )"""
 							item_data["."] = Array()
 						item_data["."].append([ws_property,ws_value])
 				if apath:
-					ws_stuff_to_add.append({"name":add.get("name","SYSTEM_ERROR"),"path":apath,"data":item_data,"config":add.get("config",Dictionary())})
+					ws_stuff_to_add.append({"name" : add.get("name","SYSTEM_ERROR"),"path" : apath,"data" : item_data,"config" : add.get("config",Dictionary())})
 				else:
-					ws_stuff_to_modify.append({"name":add.get("name","SYSTEM_ERROR"),"data":item_data})
+					ws_stuff_to_modify.append({"name" : add.get("name","SYSTEM_ERROR"),"data" : item_data})
 			
 			var aname : String = add.get("name","SYSTEM_ERROR")
 			var apath : String = add.get("path","")
@@ -3730,7 +3730,7 @@ script = ExtResource( 5 )"""
 			if aux_type in THRUSTER_BASE_TYPES:
 				var auxTypePath : String = "user://cache/AuxAndThrusterDriver/" + aux_type
 				directory.make_dir_recursive(auxTypePath)
-				thruster_data_to_write.append({"object":self,"method":"write_thruster_scenes","args":[data,aux_type,auxTypePath]})
+				thruster_data_to_write.append({"object" : self,"method" : "write_thruster_scenes","args" : [data,aux_type,auxTypePath]})
 		if ws_editable_paths:
 			weaponslot_string += "\n\n" + ws_editable_paths
 		
@@ -4504,15 +4504,15 @@ script = ExtResource( 5 )"""
 		base += "\n\n[node name=\"CheckButton\" parent=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s/VBoxContainer/HBoxContainer\"]\ntext = \"%s\"" % [slotNodeName,slotDisplayName]
 		
 		if hasNone:
-			base += "\n\n" + __make_equipment_for_scene({"system":"SYSTEM_NONE","default":true,"name":"None"}, slotNodeName, systemSlot)
+			base += "\n\n" + __make_equipment_for_scene({"system" : "SYSTEM_NONE","default" : true,"name" : "None"}, slotNodeName, systemSlot)
 		var editable_path : String = "[editable path=\"VB/MarginContainer/ScrollContainer/MarginContainer/Items/%s\"]" % slotNodeName
 		var dict : Dictionary = {
-				"add_vanilla_equipment":add_vanilla_equipment,
-				"hardpoint_type":hardpoint_type,
-				"alignment":alignment,
-				"restriction":restriction,
-				"override_additive":override_additive,
-				"override_subtractive":override_subtractive,
+				"add_vanilla_equipment" : add_vanilla_equipment,
+				"hardpoint_type" : hardpoint_type,
+				"alignment" : alignment,
+				"restriction" : restriction,
+				"override_additive" : override_additive,
+				"override_subtractive" : override_subtractive,
 			}
 		
 		return [base, editable_path, dict]
@@ -4566,7 +4566,7 @@ class _Events:
 						var pos : Vector2 = getPos(parameters)
 						event_node.canBeAt(pos)
 						var oddity = event_node.makeAt(pos)
-						var randomOddityKey:String = ""
+						var randomOddityKey : String = ""
 						if oddity:
 							ring.addNearbyOddity(event, oddity, pos)
 							if oddity is Array:
@@ -4875,7 +4875,7 @@ class _FolderAccess:
 			return [value,exists]
 		return value
 	
-	static func __recursive_delete(path : String, excluded_files :PoolStringArray = PoolStringArray()) -> bool:
+	static func __recursive_delete(path : String, excluded_files : PoolStringArray = PoolStringArray()) -> bool:
 		var directory : Directory = Directory.new()
 		if not directory.open(path) == OK: return false
 		if not path.ends_with("/"):path += "/"
@@ -4933,9 +4933,9 @@ class _FolderAccess:
 				if object.ends_with("/"):
 #					folder_structure[object] = __get_folder_structure(folder+object,store_file_content)
 					treeSearchWithThreads.append({
-						"object":non_static["pointers"].FolderAccess,
-						"method":"gfs",
-						"args":[folder+object,store_file_content]
+						"object" : non_static["pointers"].FolderAccess,
+						"method" : "gfs",
+						"args" : [folder+object,store_file_content]
 					})
 				else:
 					if store_file_content:
@@ -5062,7 +5062,7 @@ class _Github:
 class _HevLib:
 	var pointers : HevLibPointers = non_static["pointers"]
 	func __get_lib_variables():
-		return {"AchievementData":Dictionary(),"AchievementPercentageStats":Dictionary()}
+		return {"AchievementData" : Dictionary(),"AchievementPercentageStats" : Dictionary()}
 	
 	func __get_lib_pointers(return_as_full_path : bool = false) -> Array:
 		var path = "res://HevLib/pointers/"
@@ -5122,7 +5122,7 @@ class _Keymapping:
 	
 	func __load_input_data(key : String, controls : Array,opts : Dictionary):
 		var file : File = File.new()
-		non_static["pointers"].defined_control_configs[key] = {"controls":controls,"opts":opts}
+		non_static["pointers"].defined_control_configs[key] = {"controls" : controls,"opts" : opts}
 		for revis in controls:
 			__add_inputs_to_inputmap(key,revis)
 	
@@ -5199,12 +5199,12 @@ class _Keymapping:
 				if ie in current:
 					formatted_vanilla_binds_store[ie] = current[ie]
 				else:
-					var sect : Dictionary = {"can_be_rebound":false,"inputs":Array(),"opts":Dictionary()}
+					var sect : Dictionary = {"can_be_rebound" : false,"inputs" : Array(),"opts" : Dictionary()}
 					var dv = vanilla_binds[ie]
 					if ie in vopts:
 						sect["opts"] = vopts[ie].duplicate(true)
 					else:
-						missing += "\n\t\"" + ie + "\":{},"
+						missing += "\n\t\"" + ie + "\" : {},"
 						printerr("HevLib Keymapping: vanilla ActionEvent ",ie," does NOT have defined opt overrides.")
 					if ie in bound:
 						sect.can_be_rebound = true
@@ -5357,7 +5357,7 @@ class _Keymapping:
 			"ui_end",
 		])
 	
-	static func __get_opts_from_key_data(key_data):
+	static func __get_opts_from_key_data(key_data : Dictionary):
 #		var activation = key_data.get("activation","press") # can be `press`, `release`, or `both`. Defines when the keybind activates
 #		var context = key_data.get("context","in_game") # can be `in_game`, `in_menu`, or `both`. Defines whether the bind works in menus (OMS included) or in game
 #		var allow_empty_bind = key_data.get("allow_empty_bind",false) # Defines if an empty keybind is valid (always active)
@@ -5365,16 +5365,16 @@ class _Keymapping:
 		var order_sensitive = key_data.get("order_sensitive",true) # Defines if the keys have to be pressed in the order they were inputted
 		var exclusive = key_data.get("exclusive",false) # If true, then cancels other exclusive actions containing only part of the binds this action uses.
 		var opts = {
-#			"activation":activation,
-#			"context":context,
-#			"allow_empty_bind":allow_empty_bind,
-			"allow_extra_keys":allow_extra_keys,
-			"order_sensitive":order_sensitive,
-			"exclusive":exclusive
+#			"activation" : activation,
+#			"context" : context,
+#			"allow_empty_bind" : allow_empty_bind,
+			"allow_extra_keys" : allow_extra_keys,
+			"order_sensitive" : order_sensitive,
+			"exclusive" : exclusive
 		}
 		return opts
 	
-	static func __create_input_event(action : String, event : Array,opts :Dictionary):
+	static func __create_input_event(action : String, event : Array,opts : Dictionary):
 		for ev in event:
 			if opts.order_sensitive:
 				var scan = __string_to_scancode(ev[-1],true)
@@ -5489,12 +5489,12 @@ class _ManifestV2:
 			for item in modmain_files:
 				modFiles.append(item.to_lower())
 				pointers.l("registering ModMain %s" % item,log_header)
-				all_mod_files.append({"object":base,"method":"compile_mod_data_from_path","args":[item,manifests_and_icons,modlet_files]})
+				all_mod_files.append({"object" : base,"method" : "compile_mod_data_from_path","args" : [item,manifests_and_icons,modlet_files]})
 			pointers.l("found [%s] modlet files" % modlet_files.size(),log_header)
 			for item in modlet_files:
 				modFiles.append(item.to_lower())
 				pointers.l("registering Modlet %s" % item,log_header)
-				all_mod_files.append({"object":base,"method":"compile_mod_data_from_path","args":[item,manifests_and_icons,modlet_files]})
+				all_mod_files.append({"object" : base,"method" : "compile_mod_data_from_path","args" : [item,manifests_and_icons,modlet_files]})
 			# Load translations
 			pointers.Translations.__inject_translations()
 			pointers.SafeMode.ready()
@@ -5511,7 +5511,7 @@ class _ManifestV2:
 						continue
 					var modFSPath : String = modPathPrefix + fileName
 					if modFSPath.get_extension() == "zip" and pointers.FileAccess.__file_exists(modFSPath):
-						modZipProcessing.append({"object":base,"method":"get_mod_zip_content","args":[modFSPath,pointers]})
+						modZipProcessing.append({"object" : base,"method" : "get_mod_zip_content","args" : [modFSPath,pointers]})
 				dir.list_dir_end()
 				for i in pointers.Threading.__request_multiple_threads(modZipProcessing):
 					zip_ref_store[i[0]] = i[1]
@@ -5558,7 +5558,7 @@ class _ManifestV2:
 					"https://forms.gle/RmC4Zgonp6frFgnK7",
 					true
 				)
-			cached_mod_statistics["counts"] = {"total_mod_count":total_mod_count,"mods_using_manifests":manifest_count,"mods":non_library_count,"libraries":library_count}
+			cached_mod_statistics["counts"] = {"total_mod_count" : total_mod_count,"mods_using_manifests" : manifest_count,"mods" : non_library_count,"libraries" : library_count}
 			cached_mod_statistics["tags"] = stat_tags
 			if not base.currentModHash:
 				if file.file_exists(MOD_HASH_PATH):
@@ -5664,14 +5664,14 @@ class _ManifestV2:
 							manifest_version = manifest_data["manifest_definitions"].get("manifest_version",1)
 					tcDir = tcDir.get_base_dir()
 			
-			var icon_dict : Dictionary = {"has_icon_file":icon_path != "","icon_path":icon_path}
-			var manifestEntry : Dictionary = {"has_manifest":has_mod_manifest,"manifest_version":manifest_version,"manifest_file_path":manifest_filepath,"manifest_data":manifest_data}
+			var icon_dict : Dictionary = {"has_icon_file" : icon_path != "","icon_path" : icon_path}
+			var manifestEntry : Dictionary = {"has_manifest" : has_mod_manifest,"manifest_version" : manifest_version,"manifest_file_path" : manifest_filepath,"manifest_data" : manifest_data}
 			var mod_version_array : Array = [mod_version_major,mod_version_minor,mod_version_bugfix]
 			var mod_version_string : String = "%d.%d.%d" % [mod_version_major,mod_version_minor,mod_version_bugfix]
 			if mod_version_metadata:
 				mod_version_array.append(mod_version_metadata)
 				mod_version_string += "-%s" % mod_version_metadata
-			var version_dictionary : Dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
+			var version_dictionary : Dictionary = {"version_major" : mod_version_major,"version_minor" : mod_version_minor,"version_bugfix" : mod_version_bugfix,"version_metadata" : mod_version_metadata,"full_version_array" : mod_version_array,"full_version_string" : mod_version_string,"legacy_mod_version" : legacy_mod_version}
 			var drivers : Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(script_path)
 			var ml : String = "en"
 			var tlData : Dictionary = drivers.get("REPLACE_TRANSLATIONS.gd",Dictionary()).get("TRANSLATIONS",Dictionary())
@@ -5697,7 +5697,7 @@ class _ManifestV2:
 					tlKeys.erase("file")
 				var master_locale : Dictionary = tlData.get(ml,Dictionary())
 				var total : int = master_locale.size()
-				var counts : Dictionary = {ml:{"has":total,"missing":0,"not_updated":0}}
+				var counts : Dictionary = {ml:{"has" : total,"missing" : 0,"not_updated" : 0}}
 				for lang in tlKeys:
 					if lang != ml:
 						var langData : Dictionary = tlData[lang]
@@ -5710,7 +5710,7 @@ class _ManifestV2:
 							else:
 								if langData[l].get("version_hash",0) != hash(master_locale[l].get("string","")):
 									not_updated += 1
-						counts[lang] = {"has":lc,"missing":total - (lc - not_in_master),"not_updated":not_updated}
+						counts[lang] = {"has" : lc,"missing" : total - (lc - not_in_master),"not_updated" : not_updated}
 						counts[ml]["missing"] += not_in_master
 				if manifestEntry["has_manifest"]:
 					var manifest_langs : Dictionary = Dictionary()
@@ -5730,35 +5730,35 @@ class _ManifestV2:
 				file.close()
 			
 			var concat : Dictionary = {
-				"name":TranslationServer.translate(mod_name),
-				"priority":mod_priority,
-				"path":script_path,
-				"zip_path":zip_path,
-				"zip_size":zip_size,
-				"version":version_dictionary,
-				"type":"mod",
-				"enabled":true,
+				"name" : TranslationServer.translate(mod_name),
+				"priority" : mod_priority,
+				"path" : script_path,
+				"zip_path" : zip_path,
+				"zip_size" : zip_size,
+				"version" : version_dictionary,
+				"type" : "mod",
+				"enabled" : true,
 			}
 			if has_mod_manifest:
 				concat["id"] = manifestEntry["manifest_data"]["mod_information"]["id"]
 			
 			return {
-				"name":mod_name,
-				"priority":mod_priority,
-				"file_path":script_path,
-				"zip_path":zip_path,
-				"version_data":version_dictionary,
-				"mod_icon":icon_dict,
-				"library_information":{
-					"is_library":is_library,
-					"always_display":always_display
+				"name" : mod_name,
+				"priority" : mod_priority,
+				"file_path" : script_path,
+				"zip_path" : zip_path,
+				"version_data" : version_dictionary,
+				"mod_icon" : icon_dict,
+				"library_information" : {
+					"is_library" : is_library,
+					"always_display" : always_display
 				},
-				"manifest":manifestEntry,
-				"drivers":drivers,
-				"mod_type":"mod",
-				"enabled":true,
-				"master_locale":ml,
-				"hash":concat.hash(),
+				"manifest" : manifestEntry,
+				"drivers" : drivers,
+				"mod_type" : "mod",
+				"enabled" : true,
+				"master_locale" : ml,
+				"hash" : concat.hash(),
 			}
 		elif cv.begins_with("mod") and cv.ends_with(".manifest"):
 			var manifest_data : Dictionary = __parse_file_as_manifest(script_path)
@@ -5791,14 +5791,14 @@ class _ManifestV2:
 							break
 						elif (not icon_path or icon_path.get_extension() != "stex") and ft.get_extension() in pointers.SUPPORTED_IMAGE_EXTENSIONS:
 							icon_path = content_file
-			var icon_dict : Dictionary = {"has_icon_file":icon_path != "","icon_path":icon_path}
-			var manifestEntry : Dictionary = {"has_manifest":true,"manifest_version":manifest_version,"manifest_file_path":script_path,"manifest_data":manifest_data}
+			var icon_dict : Dictionary = {"has_icon_file" : icon_path != "","icon_path" : icon_path}
+			var manifestEntry : Dictionary = {"has_manifest" : true,"manifest_version" : manifest_version,"manifest_file_path" : script_path,"manifest_data" : manifest_data}
 			var mod_version_array : Array = [mod_version_major,mod_version_minor,mod_version_bugfix]
 			var mod_version_string : String = "%d.%d.%d" % [mod_version_major,mod_version_minor,mod_version_bugfix]
 			if mod_version_metadata:
 				mod_version_array.append(mod_version_metadata)
 				mod_version_string += "-%s" % mod_version_metadata
-			var version_dictionary : Dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
+			var version_dictionary : Dictionary = {"version_major" : mod_version_major,"version_minor" : mod_version_minor,"version_bugfix" : mod_version_bugfix,"version_metadata" : mod_version_metadata,"full_version_array" : mod_version_array,"full_version_string" : mod_version_string,"legacy_mod_version" : legacy_mod_version}
 			var drivers : Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(script_path)
 			var ml : String = "en"
 			var tlData : Dictionary = drivers.get("REPLACE_TRANSLATIONS.gd",Dictionary()).get("TRANSLATIONS",Dictionary())
@@ -5809,7 +5809,7 @@ class _ManifestV2:
 				if "file" in tlKeys:
 					var tlFiles : Dictionary = tlData["file"]
 					for tl in tlFiles.keys():
-						var delim:String = "|"
+						var delim : String = "|"
 						var d = tlFiles[tl]
 						if d is String:
 							delim = d
@@ -5824,7 +5824,7 @@ class _ManifestV2:
 					tlKeys.erase("file")
 				var master_locale : Dictionary = tlData.get(ml,Dictionary())
 				var total : int = master_locale.size()
-				var counts : Dictionary = {ml:{"has":total,"missing":0,"not_updated":0}}
+				var counts : Dictionary = {ml:{"has" : total,"missing" : 0,"not_updated" : 0}}
 				for lang in tlKeys:
 					if lang != ml:
 						var langData : Dictionary = tlData[lang]
@@ -5837,7 +5837,7 @@ class _ManifestV2:
 							else:
 								if langData[l].get("version_hash",0) != hash(master_locale[l].get("string","")):
 									not_updated += 1
-						counts[lang] = {"has":lc,"missing":total - (lc - not_in_master),"not_updated":not_updated}
+						counts[lang] = {"has" : lc,"missing" : total - (lc - not_in_master),"not_updated" : not_updated}
 						counts[ml]["missing"] += not_in_master
 				if manifestEntry["has_manifest"]:
 					var manifest_langs : Dictionary = Dictionary()
@@ -5857,34 +5857,34 @@ class _ManifestV2:
 				file.close()
 			
 			var concat : Dictionary = {
-				"name":TranslationServer.translate(mod_name),
-				"priority":mod_priority,
-				"path":script_path,
-				"zip_path":zip_path,
-				"zip_size":zip_size,
-				"version":version_dictionary,
-				"type":"modlet",
-				"enabled":mod_enabled,
-				"id":manifestEntry["manifest_data"]["mod_information"]["id"]
+				"name" : TranslationServer.translate(mod_name),
+				"priority" : mod_priority,
+				"path" : script_path,
+				"zip_path" : zip_path,
+				"zip_size" : zip_size,
+				"version" : version_dictionary,
+				"type" : "modlet",
+				"enabled" : mod_enabled,
+				"id" : manifestEntry["manifest_data"]["mod_information"]["id"]
 			}
 			
 			return {
-				"name":mod_name,
-				"priority":mod_priority,
-				"file_path":script_path,
-				"zip_path":zip_path,
-				"version_data":version_dictionary,
-				"mod_icon":{"has_icon_file":false,"icon_path":""} if mod_error else icon_dict,
-				"library_information":{
-					"is_library":manifest_data["library"].get("is_library",false),
-					"always_display":manifest_data["library"].get("always_display",false)
+				"name" : mod_name,
+				"priority" : mod_priority,
+				"file_path" : script_path,
+				"zip_path" : zip_path,
+				"version_data" : version_dictionary,
+				"mod_icon" : {"has_icon_file" : false,"icon_path" : ""} if mod_error else icon_dict,
+				"library_information" : {
+					"is_library" : manifest_data["library"].get("is_library",false),
+					"always_display" : manifest_data["library"].get("always_display",false)
 				},
-				"manifest":manifestEntry,
-				"drivers":drivers,
-				"mod_type":"unknown" if mod_error else "modlet",
-				"enabled":true,
-				"master_locale":ml,
-				"hash":concat.hash(),
+				"manifest" : manifestEntry,
+				"drivers" : drivers,
+				"mod_type" : "unknown" if mod_error else "modlet",
+				"enabled" : true,
+				"master_locale" : ml,
+				"hash" : concat.hash(),
 			}
 		return Dictionary()
 	
@@ -5974,21 +5974,21 @@ class _ManifestV2:
 			return Dictionary()
 		var cv : String = mod_path.get_file().to_lower()
 		if cv.begins_with("modmain") and cv.get_extension() == "gd":
-			return {"constants":load(mod_path).get_script_constant_map(),"script_path":mod_path,"mod_type":"mod"}
+			return {"constants" : load(mod_path).get_script_constant_map(),"script_path" : mod_path,"mod_type" : "mod"}
 		elif cv.begins_with("mod") and cv.get_extension() == "manifest":
 			var manifestData : Dictionary = __parse_file_as_manifest(mod_path)
 			var constants : Dictionary = {
-				"MOD_PRIORITY":manifestData["manifest_definitions"].get("modlet_priority",0),
-				"MOD_NAME":manifestData["mod_information"].get("name",mod_path.split("/",false)[1]),
-				"MOD_VERSION":manifestData["version"].get("version_string","1.0.0"),
-				"MOD_VERSION_MAJOR":manifestData["version"].get("version_major","1"),
-				"MOD_VERSION_MINOR":manifestData["version"].get("version_minor","0"),
-				"MOD_VERSION_BUGFIX":manifestData["version"].get("version_bugfix","0"),
-				"MOD_VERSION_METADATA":manifestData["version"].get("version_metadata",""),
-				"MOD_IS_LIBRARY":manifestData["library"].get("is_library",false),
-				"ALWAYS_DISPLAY":manifestData["library"].get("always_display",false),
+				"MOD_PRIORITY" : manifestData["manifest_definitions"].get("modlet_priority",0),
+				"MOD_NAME" : manifestData["mod_information"].get("name",mod_path.split("/",false)[1]),
+				"MOD_VERSION" : manifestData["version"].get("version_string","1.0.0"),
+				"MOD_VERSION_MAJOR" : manifestData["version"].get("version_major","1"),
+				"MOD_VERSION_MINOR" : manifestData["version"].get("version_minor","0"),
+				"MOD_VERSION_BUGFIX" : manifestData["version"].get("version_bugfix","0"),
+				"MOD_VERSION_METADATA" : manifestData["version"].get("version_metadata",""),
+				"MOD_IS_LIBRARY" : manifestData["library"].get("is_library",false),
+				"ALWAYS_DISPLAY" : manifestData["library"].get("always_display",false),
 			}
-			return {"constants":constants,"script_path":mod_path,"mod_type":"modlet"}
+			return {"constants" : constants,"script_path" : mod_path,"mod_type" : "modlet"}
 		return Dictionary()
 	
 	static func __make_mod_entry(mod : Dictionary):
@@ -6083,14 +6083,14 @@ class _ManifestV2:
 			icon_path = stex_path
 		elif png_path:
 			icon_path = png_path
-		var icon_dict : Dictionary = {"has_icon_file":has_icon_file,"icon_path":icon_path}
-		var manifestEntry : Dictionary = {"has_manifest":has_mod_manifest,"manifest_version":manifest_version,"manifest_file_path":manifest_filepath,"manifest_data":manifest_data}
+		var icon_dict : Dictionary = {"has_icon_file" : has_icon_file,"icon_path" : icon_path}
+		var manifestEntry : Dictionary = {"has_manifest" : has_mod_manifest,"manifest_version" : manifest_version,"manifest_file_path" : manifest_filepath,"manifest_data" : manifest_data}
 		var mod_version_array : Array = [mod_version_major,mod_version_minor,mod_version_bugfix]
 		var mod_version_string : String = "%d.%d.%d" % [mod_version_major,mod_version_minor,mod_version_bugfix]
 		if mod_version_metadata:
 			mod_version_array.append(mod_version_metadata)
 			mod_version_string += "-%s" % mod_version_metadata
-		var version_dictionary : Dictionary = {"version_major":mod_version_major,"version_minor":mod_version_minor,"version_bugfix":mod_version_bugfix,"version_metadata":mod_version_metadata,"full_version_array":mod_version_array,"full_version_string":mod_version_string,"legacy_mod_version":legacy_mod_version}
+		var version_dictionary : Dictionary = {"version_major" : mod_version_major,"version_minor" : mod_version_minor,"version_bugfix" : mod_version_bugfix,"version_metadata" : mod_version_metadata,"full_version_array" : mod_version_array,"full_version_string" : mod_version_string,"legacy_mod_version" : legacy_mod_version}
 		var drivers : Dictionary = pointers.DriverManagement.__get_drivers_from_modmain_path(script_path)
 		var ml : String = "en"
 		var tlData : Dictionary = drivers.get("REPLACE_TRANSLATIONS.gd",Dictionary()).get("TRANSLATIONS",Dictionary())
@@ -6116,7 +6116,7 @@ class _ManifestV2:
 				tlKeys.erase("file")
 			var master_locale : Dictionary = tlData.get(ml,Dictionary())
 			var total : int = master_locale.size()
-			var counts : Dictionary = {ml:{"has":total,"missing":0,"not_updated":0}}
+			var counts : Dictionary = {ml:{"has" : total,"missing" : 0,"not_updated" : 0}}
 			for lang in tlKeys:
 				if lang != ml:
 					var langData : Dictionary = tlData[lang]
@@ -6129,7 +6129,7 @@ class _ManifestV2:
 						else:
 							if langData[l].get("version_hash",0) != hash(master_locale[l].get("string","")):
 								not_updated += 1
-					counts[lang] = {"has":lc,"missing":total - (lc - not_in_master),"not_updated":not_updated}
+					counts[lang] = {"has" : lc,"missing" : total - (lc - not_in_master),"not_updated" : not_updated}
 					counts[ml]["missing"] += not_in_master
 			if manifestEntry["has_manifest"]:
 				var manifest_langs : Dictionary = Dictionary()
@@ -6139,9 +6139,9 @@ class _ManifestV2:
 					manifest_langs[lang] = "%3.1f%%" % (((hs/(hs + cts["missing"])) * 100) - (25 * (1 - ((hs - cts["not_updated"]) / hs))))
 				manifestEntry["manifest_data"]["languages"] = manifest_langs
 		if mod_error:
-			icon_dict = {"has_icon_file":false,"icon_path":""}
+			icon_dict = {"has_icon_file" : false,"icon_path" : ""}
 			mod["mod_type"] = "NULL"
-		return {"name":mod_name,"priority":mod_priority,"file_path":script_path,"zip_path":__match_mod_path_to_zip(script_path),"version_data":version_dictionary,"mod_icon":icon_dict,"library_information":{"is_library":is_library,"always_display":always_display},"manifest":manifestEntry,"drivers":drivers,"mod_type":mod["mod_type"],"enabled":mod_enabled,"master_locale":ml}
+		return {"name" : mod_name,"priority" : mod_priority,"file_path" : script_path,"zip_path" : __match_mod_path_to_zip(script_path),"version_data" : version_dictionary,"mod_icon" : icon_dict,"library_information" : {"is_library" : is_library,"always_display" : always_display},"manifest" : manifestEntry,"drivers" : drivers,"mod_type" : mod["mod_type"],"enabled" : mod_enabled,"master_locale" : ml}
 
 	
 	static func __get_mod_data_from_files(script_path : String) -> Dictionary:
@@ -6197,29 +6197,29 @@ class _ManifestV2:
 			mod_version_string = mod_version_string + "-" + mod_version_metadata
 		return {
 		script_path:{
-			"name":mod_name,
-			"priority":constants.get("MOD_PRIORITY",0),
-			"version_data":{
-				"version_major":mod_version_major,
-				"version_minor":mod_version_minor,
-				"version_bugfix":mod_version_bugfix,
-				"version_metadata":mod_version_metadata,
-				"full_version_array":mod_version_array,
-				"full_version_string":mod_version_string,
-				"legacy_mod_version":legacy_mod_version
+			"name" : mod_name,
+			"priority" : constants.get("MOD_PRIORITY",0),
+			"version_data" : {
+				"version_major" : mod_version_major,
+				"version_minor" : mod_version_minor,
+				"version_bugfix" : mod_version_bugfix,
+				"version_metadata" : mod_version_metadata,
+				"full_version_array" : mod_version_array,
+				"full_version_string" : mod_version_string,
+				"legacy_mod_version" : legacy_mod_version
 			},
-			"mod_icon":{
-				"has_icon_file":has_icon_file,
-				"icon_path":icon_path
+			"mod_icon" : {
+				"has_icon_file" : has_icon_file,
+				"icon_path" : icon_path
 			},
-			"library_information":{
-				"is_library":mod_is_library,
-				"keep_library_hidden":hide_library
+			"library_information" : {
+				"is_library" : mod_is_library,
+				"keep_library_hidden" : hide_library
 			},
-			"manifest":{
-				"has_manifest":has_mod_manifest,
-				"manifest_version":manifest_version,
-				"manifest_data":manifest_data
+			"manifest" : {
+				"has_manifest" : has_mod_manifest,
+				"manifest_version" : manifest_version,
+				"manifest_data" : manifest_data
 			}
 		}}
 	
@@ -6253,19 +6253,19 @@ class _ManifestV2:
 						if manifest_data["package"].get("github_homepage","") is String:
 							var url : String = manifest_data["package"]["github_homepage"]
 							if url:
-								dict_template["links"]["HEVLIB_GITHUB"] = {"URL":pointers.DataFormat.__ensure_string_is_url(url)}
+								dict_template["links"]["HEVLIB_GITHUB"] = {"URL" : pointers.DataFormat.__ensure_string_is_url(url)}
 						var discURL : String = manifest_data["package"].get("discord","")
 						if discURL:
-							dict_template["links"]["HEVLIB_DISCORD"] = {"URL":pointers.DataFormat.__ensure_string_is_url(discURL)}
+							dict_template["links"]["HEVLIB_DISCORD"] = {"URL" : pointers.DataFormat.__ensure_string_is_url(discURL)}
 						var nexusURL : String = manifest_data["package"].get("nexus","")
 						if nexusURL:
-							dict_template["links"]["HEVLIB_NEXUS"] = {"URL":pointers.DataFormat.__ensure_string_is_url(nexusURL)}
+							dict_template["links"]["HEVLIB_NEXUS"] = {"URL" : pointers.DataFormat.__ensure_string_is_url(nexusURL)}
 						var donationURL : String = manifest_data["package"].get("donations","")
 						if donationURL:
-							dict_template["links"]["HEVLIB_DONATIONS"] = {"URL":pointers.DataFormat.__ensure_string_is_url(donationURL)}
+							dict_template["links"]["HEVLIB_DONATIONS"] = {"URL" : pointers.DataFormat.__ensure_string_is_url(donationURL)}
 						var wikiURL : String = manifest_data["package"].get("wiki","")
 						if wikiURL:
-							dict_template["links"]["HEVLIB_WIKI"] = {"URL":pointers.DataFormat.__ensure_string_is_url(wikiURL)}
+							dict_template["links"]["HEVLIB_WIKI"] = {"URL" : pointers.DataFormat.__ensure_string_is_url(wikiURL)}
 						
 					2.0:
 						dict_template["mod_information"]["id"] = manifest_data["package"].get("id","")
@@ -6278,23 +6278,23 @@ class _ManifestV2:
 						if manifest_data["package"].get("github","") is Dictionary:
 							var url : String = manifest_data["package"]["github"]["link"]
 							if url:
-								dict_template["links"]["HEVLIB_GITHUB"] = {"URL":pointers.DataFormat.__ensure_string_is_url(url)}
+								dict_template["links"]["HEVLIB_GITHUB"] = {"URL" : pointers.DataFormat.__ensure_string_is_url(url)}
 						elif manifest_data["package"].get("github","") is String:
 							var url : String = manifest_data["package"]["github"]
 							if url:
-								dict_template["links"]["HEVLIB_GITHUB"] = {"URL":pointers.DataFormat.__ensure_string_is_url(url)}
+								dict_template["links"]["HEVLIB_GITHUB"] = {"URL" : pointers.DataFormat.__ensure_string_is_url(url)}
 						var discURL : String = manifest_data["package"].get("discord","")
 						if discURL:
-							dict_template["links"]["HEVLIB_DISCORD"] = {"URL":pointers.DataFormat.__ensure_string_is_url(discURL)}
+							dict_template["links"]["HEVLIB_DISCORD"] = {"URL" : pointers.DataFormat.__ensure_string_is_url(discURL)}
 						var nexusURL : String = manifest_data["package"].get("nexus","")
 						if nexusURL:
-							dict_template["links"]["HEVLIB_NEXUS"] = {"URL":pointers.DataFormat.__ensure_string_is_url(nexusURL)}
+							dict_template["links"]["HEVLIB_NEXUS"] = {"URL" : pointers.DataFormat.__ensure_string_is_url(nexusURL)}
 						var donationURL : String = manifest_data["package"].get("donations","")
 						if donationURL:
-							dict_template["links"]["HEVLIB_DONATIONS"] = {"URL":pointers.DataFormat.__ensure_string_is_url(donationURL)}
+							dict_template["links"]["HEVLIB_DONATIONS"] = {"URL" : pointers.DataFormat.__ensure_string_is_url(donationURL)}
 						var wikiURL : String = manifest_data["package"].get("wiki","")
 						if wikiURL:
-							dict_template["links"]["HEVLIB_WIKI"] = {"URL":pointers.DataFormat.__ensure_string_is_url(wikiURL)}
+							dict_template["links"]["HEVLIB_WIKI"] = {"URL" : pointers.DataFormat.__ensure_string_is_url(wikiURL)}
 						dict_template["mod_information"]["author"] = manifest_data["package"].get("author","Unknown")
 						dict_template["mod_information"]["credits"] = manifest_data["package"].get("credits",Array())
 						
@@ -6318,59 +6318,59 @@ class _ManifestV2:
 						if "tags" in manifestKeys:
 							var current_tags : Array = manifest_data["tags"].keys()
 							if "allow_achievements" in current_tags:
-								dict_template["tags"]["TAG_ALLOW_ACHIEVEMENTS"] = {"type":"boolean","value":manifest_data["tags"].get("allow_achievements")}
+								dict_template["tags"]["TAG_ALLOW_ACHIEVEMENTS"] = {"type" : "boolean","value" : manifest_data["tags"].get("allow_achievements")}
 							if "quality_of_life" in current_tags:
-								dict_template["tags"]["TAG_QOL"] = {"type":"boolean","value":manifest_data["tags"].get("quality_of_life")}
+								dict_template["tags"]["TAG_QOL"] = {"type" : "boolean","value" : manifest_data["tags"].get("quality_of_life")}
 							if "is_library_mod" in current_tags:
 								dict_template["library"]["is_library"] = manifest_data["tags"].get("is_library_mod")
 							if "uses_hevlib_research" in current_tags:
-								dict_template["tags"]["TAG_USING_HEVLIB_RESEARCH"] = {"type":"boolean","value":manifest_data["tags"].get("uses_hevlib_research")}
+								dict_template["tags"]["TAG_USING_HEVLIB_RESEARCH"] = {"type" : "boolean","value" : manifest_data["tags"].get("uses_hevlib_research")}
 							if "overhaul" in current_tags:
-								dict_template["tags"]["TAG_OVERHAUL"] = {"type":"bool","value":manifest_data["tags"].get("overhaul")}
+								dict_template["tags"]["TAG_OVERHAUL"] = {"type" : "bool","value" : manifest_data["tags"].get("overhaul")}
 							if "visual" in current_tags:
-								dict_template["tags"]["TAG_VISUAL"] = {"type":"bool","value":manifest_data["tags"].get("visual")}
+								dict_template["tags"]["TAG_VISUAL"] = {"type" : "bool","value" : manifest_data["tags"].get("visual")}
 							if "fun" in current_tags:
-								dict_template["tags"]["TAG_FUN"] = {"type":"bool","value":manifest_data["tags"].get("fun")}
+								dict_template["tags"]["TAG_FUN"] = {"type" : "bool","value" : manifest_data["tags"].get("fun")}
 							if "user_interface" in current_tags:
-								dict_template["tags"]["TAG_UI"] = {"type":"bool","value":manifest_data["tags"].get("user_interface")}
+								dict_template["tags"]["TAG_UI"] = {"type" : "bool","value" : manifest_data["tags"].get("user_interface")}
 							
 							if "adds_ships" in current_tags:
-								dict_template["tags"]["TAG_ADDS_SHIPS"] = {"type":"array","value":manifest_data["tags"].get("adds_ships")}
+								dict_template["tags"]["TAG_ADDS_SHIPS"] = {"type" : "array","value" : manifest_data["tags"].get("adds_ships")}
 							if "adds_equipment" in current_tags:
-								dict_template["tags"]["TAG_ADDS_EQUIPMENT"] = {"type":"array","value":manifest_data["tags"].get("adds_equipment")}
+								dict_template["tags"]["TAG_ADDS_EQUIPMENT"] = {"type" : "array","value" : manifest_data["tags"].get("adds_equipment")}
 							if "adds_gameplay_mechanics" in current_tags:
-								dict_template["tags"]["TAG_ADDS_GAMEPLAY_MECHANICS"] = {"type":"array","value":manifest_data["tags"].get("adds_gameplay_mechanics")}
+								dict_template["tags"]["TAG_ADDS_GAMEPLAY_MECHANICS"] = {"type" : "array","value" : manifest_data["tags"].get("adds_gameplay_mechanics")}
 							if "adds_events" in current_tags:
-								dict_template["tags"]["TAG_ADDS_EVENTS"] = {"type":"array","value":manifest_data["tags"].get("adds_events")}
+								dict_template["tags"]["TAG_ADDS_EVENTS"] = {"type" : "array","value" : manifest_data["tags"].get("adds_events")}
 							
 							if "handle_extra_crew" in current_tags:
-								dict_template["tags"]["TAG_HANDLE_EXTRA_CREW"] = {"type":"integer","value":manifest_data["tags"].get("handle_extra_crew")}
+								dict_template["tags"]["TAG_HANDLE_EXTRA_CREW"] = {"type" : "integer","value" : manifest_data["tags"].get("handle_extra_crew")}
 						
 						# links
 						if "links" in manifestKeys:
 							if manifest_data["links"].get("github","") is Dictionary:
 								var url : String = manifest_data["links"]["github"]["link"]
 								if url:
-									dict_template["links"]["HEVLIB_GITHUB"] = {"URL":pointers.DataFormat.__ensure_string_is_url(url)}
+									dict_template["links"]["HEVLIB_GITHUB"] = {"URL" : pointers.DataFormat.__ensure_string_is_url(url)}
 							elif manifest_data["links"].get("github","") is String:
 								var url : String = manifest_data["links"]["github"]
 								if url:
-									dict_template["links"]["HEVLIB_GITHUB"] = {"URL":pointers.DataFormat.__ensure_string_is_url(url)}
+									dict_template["links"]["HEVLIB_GITHUB"] = {"URL" : pointers.DataFormat.__ensure_string_is_url(url)}
 							var discURL : String = manifest_data["links"].get("discord","")
 							if discURL:
-								dict_template["links"]["HEVLIB_DISCORD"] = {"URL":pointers.DataFormat.__ensure_string_is_url(discURL)}
+								dict_template["links"]["HEVLIB_DISCORD"] = {"URL" : pointers.DataFormat.__ensure_string_is_url(discURL)}
 							var nexusURL : String = manifest_data["links"].get("nexus","")
 							if nexusURL:
-								dict_template["links"]["HEVLIB_NEXUS"] = {"URL":pointers.DataFormat.__ensure_string_is_url(nexusURL)}
+								dict_template["links"]["HEVLIB_NEXUS"] = {"URL" : pointers.DataFormat.__ensure_string_is_url(nexusURL)}
 							var donationURL : String = manifest_data["links"].get("donations","")
 							if donationURL:
-								dict_template["links"]["HEVLIB_DONATIONS"] = {"URL":pointers.DataFormat.__ensure_string_is_url(donationURL)}
+								dict_template["links"]["HEVLIB_DONATIONS"] = {"URL" : pointers.DataFormat.__ensure_string_is_url(donationURL)}
 							var wikiURL : String = manifest_data["links"].get("wiki","")
 							if wikiURL:
-								dict_template["links"]["HEVLIB_WIKI"] = {"URL":pointers.DataFormat.__ensure_string_is_url(wikiURL)}
+								dict_template["links"]["HEVLIB_WIKI"] = {"URL" : pointers.DataFormat.__ensure_string_is_url(wikiURL)}
 							var bugreportsURL : String = manifest_data["links"].get("bug_reports","")
 							if bugreportsURL:
-								dict_template["links"]["HEVLIB_BUGREPORTS"] = {"URL":pointers.DataFormat.__ensure_string_is_url(bugreportsURL)}
+								dict_template["links"]["HEVLIB_BUGREPORTS"] = {"URL" : pointers.DataFormat.__ensure_string_is_url(bugreportsURL)}
 						
 						# manifest definitions
 						if "manifest_definitions" in manifestKeys:
@@ -6697,14 +6697,14 @@ class _ManifestV2:
 					var info : Dictionary = manifest["mod_information"]
 					var version : Dictionary = manifest["version"]
 					out[info["id"]] = {
-						"name":info["name"],
-						"version":{
-							"major":version["version_major"],
-							"minor":version["version_minor"],
-							"bugfix":version["version_bugfix"]
+						"name" : info["name"],
+						"version" : {
+							"major" : version["version_major"],
+							"minor" : version["version_minor"],
+							"bugfix" : version["version_bugfix"]
 						},
-						"path":data["file_path"],
-						"changelog":manifest["manifest_definitions"]["changelog_path"]
+						"path" : data["file_path"],
+						"changelog" : manifest["manifest_definitions"]["changelog_path"]
 					}
 			return out
 		if not non_static["pointers"].ManifestV2.haveModsChanged:
@@ -6737,14 +6737,14 @@ class _ManifestV2:
 					(version["version_bugfix"] != last[id]["version"]["bugfix"])
 				)):
 					mod_changes_cache[id] = {
-						"name":info["name"],
-						"version":{
-							"major":version["version_major"],
-							"minor":version["version_minor"],
-							"bugfix":version["version_bugfix"]
+						"name" : info["name"],
+						"version" : {
+							"major" : version["version_major"],
+							"minor" : version["version_minor"],
+							"bugfix" : version["version_bugfix"]
 						},
-						"path":data["file_path"],
-						"changelog":manifest["manifest_definitions"]["changelog_path"]
+						"path" : data["file_path"],
+						"changelog" : manifest["manifest_definitions"]["changelog_path"]
 					}
 		
 		
@@ -6755,7 +6755,7 @@ class _ManifestV2:
 				var manifest : Dictionary = data["manifest"]["manifest_data"]
 				var info : Dictionary = manifest["mod_information"]
 				var version : Dictionary = manifest["version"]
-				mods[info["id"]] = {"name":info["name"],"version":{"major":version["version_major"],"minor":version["version_minor"],"bugfix":version["version_bugfix"]}}
+				mods[info["id"]] = {"name" : info["name"],"version" : {"major" : version["version_major"],"minor" : version["version_minor"],"bugfix" : version["version_bugfix"]}}
 		file.open(LAST_LAUNCH_MODS_PATH,File.WRITE)
 		file.store_buffer(var2bytes(mods))
 		file.close()
@@ -7046,9 +7046,9 @@ class _ManifestV2:
 			var resources : Dictionary = mod_data["drivers"].get("LOAD_RESOURCES.gd",Dictionary()).get("LOAD_RESOURCES",Dictionary())
 			if resources:
 				load_stash.append({
-					"object":base,
-					"method":"process_mod_data_for_load",
-					"args":[resources,modlet,pointers,float(mod_data["priority"])]
+					"object" : base,
+					"method" : "process_mod_data_for_load",
+					"args" : [resources,modlet,pointers,float(mod_data["priority"])]
 				})
 		var cvr : Array = [
 			["res://HevLib/scenes/minerals/AstrogatorPanel.gd", -INF, "res://hud/AstrogatorPanel.gd"],
@@ -7188,9 +7188,10 @@ class _ManifestV2:
 		return disabledModletCache.duplicate(true)
 	
 	static func __mod_exists(check_data) -> bool:
-		var has:bool = false
-		var current_mod_ids:PoolStringArray = __get_mod_ids()
-		if not check_data:return false
+		var has : bool = false
+		var current_mod_ids : PoolStringArray = __get_mod_ids()
+		if not check_data:
+			return false
 		if check_data is String:
 			if check_data in current_mod_ids:
 				has = true
@@ -7203,13 +7204,13 @@ class _ManifestV2:
 						has = true
 						break
 		elif check_data is Dictionary:
-			var MID:String = check_data.get("mod_id","")
-			var MDM:String = check_data.get("mod_main","")
+			var MID : String = check_data.get("mod_id","")
+			var MDM : String = check_data.get("mod_main","")
 			if MID:
-				var moddata:Dictionary = __get_mod_by_id(MID)
+				var moddata : Dictionary = __get_mod_by_id(MID)
 				if moddata:
-					var t1:bool = true
-					var ver_info:Array = moddata["version_data"]["full_version_array"]
+					var t1 : bool = true
+					var ver_info : Array = moddata["version_data"]["full_version_array"]
 					if("maximum_version" in check_data or "max_version" in check_data):
 						var minimum = check_data.get("maximum_version",check_data.get("max_version",[0,0,0]))
 						var mnm = null
@@ -7227,8 +7228,8 @@ class _ManifestV2:
 						if mnm != null:
 							for i in 3:
 								if t1:
-									var a = int(ver_info[i])
-									var b = int(mnm[i])
+									var a : int = int(ver_info[i])
+									var b : int = int(mnm[i])
 									if a > b:
 										t1 = false
 									elif a < b:
@@ -7250,8 +7251,8 @@ class _ManifestV2:
 						if mnm != null:
 							for i in 3:
 								if t1:
-									var a = int(ver_info[i])
-									var b = int(mnm[i])
+									var a : int = int(ver_info[i])
+									var b : int = int(mnm[i])
 									if a < b:
 										t1 = false
 									elif a > b:
@@ -7261,8 +7262,8 @@ class _ManifestV2:
 				has = true
 		return has
 	
-	static func __match_mod_file_path_to_id(file_path:String) -> String:
-		if !mod_file_to_id_cache:
+	static func __match_mod_file_path_to_id(file_path : String) -> String:
+		if not mod_file_to_id_cache:
 			__get_mod_data()
 		return mod_file_to_id_cache.get(file_path.to_lower(),"")
 
@@ -7273,12 +7274,13 @@ class _Math:
 		if degrees:angle = deg2rad(angle)
 		return Vector2((point.x*cos(-angle))-(point.y*sin(-angle)),(point.y*cos(-angle))+(point.x*sin(-angle)))
 	
-	static func __factorial(n:int) -> int:
-		var holdvalue:int = 0
-		var boolis:bool = true
-		var s:int = sign(n)
+	static func __factorial(n : int) -> int:
+		var holdvalue : int = 0
+		var boolis : bool = true
+		var s : int = sign(n)
 		n = abs(n)
-		if n < 2:return holdvalue * s
+		if n < 2:
+			return holdvalue * s
 		while n > 0:
 			if boolis:
 				boolis = false
@@ -7288,14 +7290,14 @@ class _Math:
 			n -= 1
 		return holdvalue * s
 	
-	static func __get_unique_pairs(max_value: int) -> Array:
+	static func __get_unique_pairs(max_value : int) -> Array:
 		var pairs : Array = Array()
 		for i in (max_value + 1):
 			for j in range(i + 1, max_value):
 				pairs.append(PoolIntArray([i, j]))
 		return pairs
 	
-	static func __mirror_vector(point:Vector2, reflection_angle : float = 0.0, use_degrees : bool = false, angle_offset : Vector2 = Vector2.ZERO, scale : Vector2 = Vector2.ONE) -> Vector2:
+	static func __mirror_vector(point : Vector2, reflection_angle : float = 0.0, use_degrees : bool = false, angle_offset : Vector2 = Vector2.ZERO, scale : Vector2 = Vector2.ONE) -> Vector2:
 		if use_degrees:
 			reflection_angle = deg2rad(reflection_angle)
 		point *= scale
@@ -7323,23 +7325,23 @@ class _Math:
 	
 	static func __convert_arr_to_vec2arr(array : Array) -> PoolVector2Array:
 		var converted : PoolVector2Array = PoolVector2Array()
-		var size:int = int(floor(array.size() / 2.0))
+		var size : int = int(floor(array.size() / 2.0))
 		converted.resize(size)
 		for r in size:
-			var index:int = r * 2
+			var index : int = r * 2
 			converted[r] = Vector2(float(array[index]),float(array[index + 1]))
 		return converted
 	
-	static func __imax(a:int,b:int) -> int:
+	static func __imax(a : int,b : int) -> int:
 		return a if a > b else b
 	
-	static func __imin(a:int,b:int) -> int:
+	static func __imin(a : int,b : int) -> int:
 		return a if a < b else b
 	
-	static func __iclamp(value:int,minimum:int,maximum:int) -> int:
+	static func __iclamp(value : int,minimum : int,maximum : int) -> int:
 		return __imax(__imin(value,maximum),minimum)
 	
-	static func __idivide(num:int,denom:int) -> int:
+	static func __idivide(num : int,denom : int) -> int:
 		if denom == 0:
 			non_static["pointers"].l(DIV_ZERO_ERR,log_header)
 			printerr(DIV_ZERO_ERR)
@@ -7354,14 +7356,14 @@ class _Math:
 				printerr(INT_OVERFLOW_ERR)
 				return INT64_MAX
 			return -num
-		var r:int = num if num < 0 else -num
-		var d:int = denom if denom < 0 else -denom
-		var shift:int = 0
-		var half:int = (INT64_MIN >> 1) - 1
+		var r : int = num if num < 0 else -num
+		var d : int = denom if denom < 0 else -denom
+		var shift : int = 0
+		var half : int = (INT64_MIN >> 1) - 1
 		while d > half and (d << 1) > (r-1):
 			d <<= 1
 			shift += 1
-		var nq:int = 0
+		var nq : int = 0
 		while shift > -1:
 			if d > (r-1):
 				r -= d
@@ -7422,7 +7424,7 @@ class _NetIO:
 		var path_delimiter : int = url.find("/")
 		if path_delimiter == -1:
 			path_delimiter = url.length()
-		var path :String = url.substr(path_delimiter)
+		var path : String = url.substr(path_delimiter)
 		if not path:
 			path = "/"
 		
@@ -7442,10 +7444,10 @@ class _NetIO:
 			)).to_int()) if has_port else -1
 		
 		return {
-			"host":host,
-			"port":port,
-			"path":path,
-			"use_ssl":use_ssl
+			"host" : host,
+			"port" : port,
+			"path" : path,
+			"use_ssl" : use_ssl
 		}
 	
 	
@@ -7631,7 +7633,7 @@ class _RingInfo:
 	static func get_chaos_at(pos : Vector2) -> float:
 		return __get_pixel_at(pos).r
 	
-	const pix_values:PoolIntArray = PoolIntArray()
+	const pix_values = PoolIntArray()
 	
 	
 	
@@ -7745,29 +7747,29 @@ class _RPC:
 	signal rpc_timer_complete()
 	
 	const rpc_data = {
-		"current_icon":"empty",
-		"current_icon_text":"",
-		"current_small_icon":"icon",
-		"current_small_icon_text":"",
-		"start_timer":0,
-		"end_timer":0,
-		"current_state":"",
-		"current_details":"HEVLIB_DISCORDRPC_TITLE_SCREEN",
-		"secondary_state_index":0,
-		"secondary_states":Array(),
-		"absolute_state":"",
-		"loaded":false,
-		"update_wait_time":4.5,
-		"reconnect_wait_time":3.0,
-		"err_update_wait_time":60.0,
-		"err_reconnect_wait_time":60.0,
-		"update_delay":4.5,
-		"reconnect_delay":3.0,
-		"update_timer":null,
-		"discord":null,
-		"activity":null,
-		"currentStack":0,
-		"err_count":0,
+		"current_icon" : "empty",
+		"current_icon_text" : "",
+		"current_small_icon" : "icon",
+		"current_small_icon_text" : "",
+		"start_timer" : 0,
+		"end_timer" : 0,
+		"current_state" : "",
+		"current_details" : "HEVLIB_DISCORDRPC_TITLE_SCREEN",
+		"secondary_state_index" : 0,
+		"secondary_states" : Array(),
+		"absolute_state" : "",
+		"loaded" : false,
+		"update_wait_time" : 4.5,
+		"reconnect_wait_time" : 3.0,
+		"err_update_wait_time" : 60.0,
+		"err_reconnect_wait_time" : 60.0,
+		"update_delay" : 4.5,
+		"reconnect_delay" : 3.0,
+		"update_timer" : null,
+		"discord" : null,
+		"activity" : null,
+		"currentStack" : 0,
+		"err_count" : 0,
 	}
 	
 	static func ready():
@@ -8226,7 +8228,7 @@ class _Scripting:
 			for mineral in mineral_dict.keys():
 				var md : Dictionary = mineral_dict[mineral]
 				if md.get("name",""):
-					mineral_data.append({"object":base,"method":"process_mineral_dict","args":[md,pointers]})
+					mineral_data.append({"object" : base,"method" : "process_mineral_dict","args" : [md,pointers]})
 		
 		# Initialize info for mineral names, colours, and value
 		var trace_text : String = ""
@@ -8260,7 +8262,7 @@ class _Scripting:
 		# Builds the blank Settings extension
 		file.open("user://cache/Variable_Fetch/st.gd",File.WRITE)
 		file.store_string("""extends "res://Settings.gd"
-var hl_edallowall:bool=false
+var hl_edallowall : bool=false
 func _ready():hl_edallowall=(OS.has_feature("editor")&&ModLoader._savedObjects[0].ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_DRIVERS","unlock_dlc",false))
 func hasDlc(dlc)->bool:return true if (OS.has_feature("editor")&&hl_edallowall) else .hasDlc(dlc)
 """ if (pointers.is_editor) else "extends \"res://Settings.gd\"\n\n")
@@ -8292,12 +8294,12 @@ func hasDlc(dlc)->bool:return true if (OS.has_feature("editor")&&hl_edallowall) 
 			elif handle == "recolor":
 				var base : String = "fe"
 				match mineral.get("base","fe").to_lower():
-					"fe","iron":base = "fe"
-					"v","vanadium":base = "v"
-					"be","beryllium":base = "be"
-					"pd","palladium":base = "pd"
-					"pt","platinum":base = "pt"
-					"w","tungsten","wolfram":base = "w"
+					"fe","iron" : base = "fe"
+					"v","vanadium" : base = "v"
+					"be","beryllium" : base = "be"
+					"pd","palladium" : base = "pd"
+					"pt","platinum" : base = "pt"
+					"w","tungsten","wolfram" : base = "w"
 				var color : Color = mineral.get("color",Color.white)
 				var mass : float = mineral.get("mass",0.0)
 				var filler_mineral : String = mineral.get("filler","H2O")
@@ -8682,7 +8684,7 @@ class _Threading:
 				next_op = data.duplicate(true)
 				mutex.unlock()
 		
-		func set_running(how:bool):
+		func set_running(how : bool):
 			mutex.lock()
 			running = how
 			mutex.unlock()
@@ -8729,7 +8731,7 @@ class _TimeAccess:
 	static func __get_dos_datetime(datetime : Dictionary = Time.get_datetime_dict_from_system()) -> Dictionary:
 		var dos_time : int = (datetime.hour << 11) | (datetime.minute << 5) | int(datetime.second / 2.0)
 		var dos_date : int = (int(max(datetime.year - 1980, 0)) << 9) | (datetime.month << 5) | datetime.day
-		return {"time":dos_time, "date":dos_date}
+		return {"time" : dos_time, "date" : dos_date}
 
 class _Tokenizer:
 	var tokenizer_script : Script = load("res://HevLib/scripts/tokenizer/tokenizer.gd")
@@ -8801,7 +8803,7 @@ class _Translations:
 		_savedTranslations.append_array(translations)
 		pointers.l("%s Translations Updated from @ [%s]" % [translationCount, fileName],log_header)
 	
-	static func __updateTL_from_dictionary(path:Dictionary, fullLogging:bool = true):
+	static func __updateTL_from_dictionary(path : Dictionary, fullLogging : bool = true):
 		var pointers : HevLibPointers = non_static["pointers"]
 		pointers.l("Adding translations from dictionary: %d" % path.hash(),log_header)
 		var translations : Array = Array()
@@ -8939,7 +8941,7 @@ class _Translations:
 		for mod in pointers.DriverManagement.__get_specific_driver_type("REPLACE_TRANSLATIONS.gd"):
 			var tl : Dictionary = mod.get("TRANSLATIONS",Dictionary())
 			if tl:
-				processes.append({"object":base,"method":"process_drivers_for_translations","args":[tl,markPlaceholders,pointers,TranslationServer]})
+				processes.append({"object" : base,"method" : "process_drivers_for_translations","args" : [tl,markPlaceholders,pointers,TranslationServer]})
 		# April Fool's alcohol!
 		var date : Dictionary = Time.get_date_dict_from_system()
 		if date.month == 4 and date.day == 1:
@@ -8963,7 +8965,7 @@ class _Translations:
 		file.close()
 		var add_v_tl : Array = Array()
 		for i in ProjectSettings.get_setting("locale/translations"):
-			add_v_tl.append({"object":base,"method":"reload_vanilla_translation","args":[i]})
+			add_v_tl.append({"object" : base,"method" : "reload_vanilla_translation","args" : [i]})
 		_savedTranslations.append_array(pointers.Threading.__request_multiple_threads(add_v_tl))
 	
 	static func reload_vanilla_translation(tl_file : String):
@@ -9004,7 +9006,7 @@ class _Translations:
 			var mlt = null
 			if master_locale and language != master_locale:
 				if not language in check_data:
-					check_data[language] = {"needs_updating":Array(),"needs_updating_size":0,"not_in_master":Array(),"not_in_master_size":0,"missing_translations":Array(),"missing_translations_size":0,"placeholders":Array(),"placeholders_size":0}
+					check_data[language] = {"needs_updating" : Array(),"needs_updating_size" : 0,"not_in_master" : Array(),"not_in_master_size" : 0,"missing_translations" : Array(),"missing_translations_size" : 0,"placeholders" : Array(),"placeholders_size" : 0}
 				check_ml = true
 				mlt = translations[master_locale]
 				if lang.size() < mlt.size():
@@ -9029,7 +9031,7 @@ class _Translations:
 							check_data[language]["not_in_master_size"] += 1
 					if "placeholder" in v and v.placeholder:
 						if not language in check_data:
-							check_data[language] = {"placeholders":Array(),"placeholders_size":0}
+							check_data[language] = {"placeholders" : Array(),"placeholders_size" : 0}
 						check_data[language]["placeholders"].append(t)
 						check_data[language]["placeholders_size"] += 1
 						if markPlaceholders:
@@ -9152,11 +9154,11 @@ class _Zip:
 				if read.size() != size:
 					printerr("reading file entry content failed (specified offset or data length is too large, pck may be corrupt or malformed)")
 				Contents[path] = {
-					"path":path,
-					"offset":offset,
-					"size":size,
-					"md5":md5,
-					"data":read
+					"path" : path,
+					"offset" : offset,
+					"size" : size,
+					"md5" : md5,
+					"data" : read
 				}
 				file.seek(oldPos)
 		pointers.l(("Finished fetching PCK data, found %d files" % Files.size()) if only_filenames else ("Finished fetching PCK data, fetched %d files" % Contents.size()),log_header)
