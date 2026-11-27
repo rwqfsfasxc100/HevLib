@@ -1,0 +1,122 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://HevLib/ui/mod_menu/achievement_menu/AchievementsMenu.gd" type="Script" id=1]
+[ext_resource path="res://HevLib/ui/mod_menu/AnimateAppear.tscn" type="PackedScene" id=2]
+[ext_resource path="res://HevLib/development_tools/control_and_ui/scrollbox_helpers/OmniScroll.gd" type="Script" id=3]
+[ext_resource path="res://menu/TabsWithGamepadControl.gd" type="Script" id=4]
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=5]
+
+[sub_resource type="Animation" id=1]
+resource_name = "Blink"
+length = 12.0
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 2, 4, 6, 8, 10, 12 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 0, 0, 1 ), Color( 1, 1, 0, 1 ), Color( 0, 1, 0, 1 ), Color( 0, 1, 1, 1 ), Color( 0, 0, 1, 1 ), Color( 1, 0, 1, 1 ), Color( 1, 0, 0, 1 ) ]
+}
+
+[sub_resource type="Animation" id=2]
+resource_name = "RESET"
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 1 ) ]
+}
+
+[node name="AchievementMenu" type="Popup"]
+visible = true
+margin_right = 1280.0
+margin_bottom = 720.0
+theme = ExtResource( 5 )
+popup_exclusive = true
+script = ExtResource( 1 )
+achievement_list_path = NodePath("base/VBoxContainer/TabContainer/Achievements/Scroll/VBoxContainer")
+achievement_count_path = NodePath("base/AchievementCount")
+stats_list_path = NodePath("base/VBoxContainer/TabContainer/Stats/Scroll/VBoxContainer")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_right = 1280.0
+margin_bottom = 720.0
+mouse_filter = 2
+color = Color( 0, 0, 0, 0.921569 )
+
+[node name="base" type="MarginContainer" parent="."]
+margin_right = 1280.0
+margin_bottom = 720.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="base"]
+margin_right = 1280.0
+margin_bottom = 720.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="TabContainer" type="TabContainer" parent="base/VBoxContainer"]
+margin_right = 1280.0
+margin_bottom = 720.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 4 )
+
+[node name="Achievements" type="VBoxContainer" parent="base/VBoxContainer/TabContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = 46.0
+
+[node name="Scroll" type="ScrollContainer" parent="base/VBoxContainer/TabContainer/Achievements"]
+margin_right = 1280.0
+margin_bottom = 674.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 3 )
+use_horizontal = false
+
+[node name="VBoxContainer" type="VBoxContainer" parent="base/VBoxContainer/TabContainer/Achievements/Scroll"]
+
+[node name="Stats" type="VBoxContainer" parent="base/VBoxContainer/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = 46.0
+
+[node name="Scroll" type="ScrollContainer" parent="base/VBoxContainer/TabContainer/Stats"]
+margin_right = 1280.0
+margin_bottom = 674.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 3 )
+use_horizontal = false
+
+[node name="VBoxContainer" type="VBoxContainer" parent="base/VBoxContainer/TabContainer/Stats/Scroll"]
+
+[node name="AchievementCount" type="Label" parent="base"]
+margin_right = 125.0
+margin_bottom = 38.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "%d / %d"
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="base/AchievementCount"]
+autoplay = "Blink"
+anims/Blink = SubResource( 1 )
+anims/RESET = SubResource( 2 )
+
+[node name="AnimateAppear" parent="." instance=ExtResource( 2 )]
+
+[connection signal="about_to_show" from="." to="." method="_about_to_show"]
+[connection signal="visibility_changed" from="." to="." method="_visibility_changed"]

@@ -6476,7 +6476,7 @@ class _ManifestV2:
 		var path : String = ""
 		var pathSplit : PoolStringArray = PoolStringArray()
 		for i in modFiles:
-			if id == mod_file_to_id_cache[i]:
+			if __match_mod_file_path_to_id(i) == id:
 				if path:
 					var split : PoolStringArray = i.split("/",false)
 					var splSize : int = split.size()
