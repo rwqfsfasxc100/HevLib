@@ -1,50 +1,123 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=10 format=2]
 
-[ext_resource path="res://enceladus/SmoothScrollTo.gd" type="Script" id=1]
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=1]
 [ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=2]
-[ext_resource path="res://HevLib/achievements/blank_achievement_icon_bg.stex" type="Texture" id=3]
-[ext_resource path="res://HevLib/achievements/blank_achievement_icon_fg.stex" type="Texture" id=4]
+[ext_resource path="res://HevLib/ui/mod_menu/achievement_menu/boxes/AchievementBox.gd" type="Script" id=3]
+[ext_resource path="res://HevLib/ui/fonts/verdana/font-verdana-small.tres" type="DynamicFont" id=4]
 [ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=5]
-[ext_resource path="res://HevLib/achievements/achievement_border.stex" type="Texture" id=6]
-[ext_resource path="res://menu/sfx/PlaySoundsOnTheseButtons.gd" type="Script" id=7]
+[ext_resource path="res://HevLib/ui/fonts/verdana/font-verdanabold-small.tres" type="DynamicFont" id=6]
+
+[sub_resource type="StreamTexture" id=1]
+flags = 4
+load_path = "res://HevLib/achievements/blank_achievement_icon_bg.stex"
+
+[sub_resource type="StreamTexture" id=2]
+flags = 4
+load_path = "res://HevLib/achievements/achievement_border.stex"
+
+[sub_resource type="StreamTexture" id=3]
+flags = 4
+load_path = "res://HevLib/achievements/blank_achievement_icon_fg.stex"
 
 [node name="AchievementBox" type="HBoxContainer"]
 margin_right = 1280.0
 margin_bottom = 130.0
 rect_min_size = Vector2( 0, 130 )
 size_flags_horizontal = 3
+theme = ExtResource( 1 )
+script = ExtResource( 3 )
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
+[node name="TextureProgress" type="TextureProgress" parent="."]
 margin_right = 130.0
 margin_bottom = 130.0
 rect_min_size = Vector2( 130, 130 )
-
-[node name="TextureProgress" type="TextureProgress" parent="PanelContainer"]
-margin_left = 5.0
-margin_top = 5.0
-margin_right = 125.0
-margin_bottom = 125.0
-texture_under = ExtResource( 3 )
-texture_over = ExtResource( 6 )
-texture_progress = ExtResource( 4 )
+texture_under = SubResource( 1 )
+texture_over = SubResource( 2 )
+texture_progress = SubResource( 3 )
 fill_mode = 8
+radial_initial_angle = 270.0
 nine_patch_stretch = true
 
-[node name="Button" type="Button" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="."]
 margin_left = 134.0
 margin_right = 1280.0
 margin_bottom = 130.0
+mouse_filter = 2
 size_flags_horizontal = 3
-text = "ACHIEVEMENT_NAME_EXAMPLE"
+
+[node name="Button" type="Button" parent="MarginContainer"]
+margin_right = 1146.0
+margin_bottom = 130.0
+size_flags_horizontal = 3
 align = 0
 
-[node name="SmoothScrollTo" type="Node" parent="Button" instance=ExtResource( 2 )]
-script = ExtResource( 1 )
-focusAt = NodePath("../..")
+[node name="SmoothScrollTo" parent="MarginContainer/Button" instance=ExtResource( 2 )]
+focusAt = NodePath("../../..")
 
-[node name="PlaySoundsOnTheseButtons" type="Node" parent="Button" instance=ExtResource( 5 )]
-pause_mode = 2
-script = ExtResource( 7 )
-tooltipLabelPath = NodePath("Separation/Tooltip/MarginContainer/PanelContainer/TooltipLabel")
-tooltipContainerPath = NodePath("Separation/Tooltip/MarginContainer")
-tooltipPositionPath = NodePath("Separation/Tooltip")
+[node name="PlaySoundsOnTheseButtons" parent="MarginContainer/Button" instance=ExtResource( 5 )]
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+margin_right = 1146.0
+margin_bottom = 130.0
+mouse_filter = 2
+size_flags_horizontal = 3
+
+[node name="Labels" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+margin_right = 571.0
+margin_bottom = 130.0
+mouse_filter = 2
+size_flags_horizontal = 3
+
+[node name="NAME" type="Label" parent="MarginContainer/HBoxContainer/Labels"]
+margin_right = 571.0
+margin_bottom = 32.0
+custom_fonts/font = ExtResource( 6 )
+
+[node name="DESC" type="Label" parent="MarginContainer/HBoxContainer/Labels"]
+margin_top = 36.0
+margin_right = 571.0
+margin_bottom = 130.0
+size_flags_vertical = 3
+custom_fonts/font = ExtResource( 4 )
+
+[node name="Progress" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+margin_left = 575.0
+margin_right = 1146.0
+margin_bottom = 130.0
+mouse_filter = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/Progress"]
+margin_top = 31.0
+margin_right = 571.0
+margin_bottom = 63.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+custom_fonts/font = ExtResource( 4 )
+align = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer/Progress"]
+margin_top = 67.0
+margin_right = 571.0
+margin_bottom = 99.0
+rect_min_size = Vector2( 0, 32 )
+size_flags_horizontal = 3
+
+[node name="ProgressBar" type="ProgressBar" parent="MarginContainer/HBoxContainer/Progress/MarginContainer"]
+margin_right = 571.0
+margin_bottom = 32.0
+size_flags_horizontal = 3
+size_flags_vertical = 1
+percent_visible = false
+
+[node name="SmoothScrollTo" parent="MarginContainer/HBoxContainer/Progress/MarginContainer/ProgressBar" instance=ExtResource( 2 )]
+focusAt = NodePath("../../../..")
+
+[node name="PlaySoundsOnTheseButtons" parent="MarginContainer/HBoxContainer/Progress/MarginContainer/ProgressBar" instance=ExtResource( 5 )]
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/Progress/MarginContainer"]
+margin_right = 571.0
+margin_bottom = 32.0
+custom_fonts/font = ExtResource( 4 )
+align = 1

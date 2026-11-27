@@ -46,16 +46,26 @@ onready var pointers : HevLibPointers = ModLoader._savedObjects[0]
 
 onready var achievement_names : PoolStringArray = PoolStringArray(Achivements.achievementRarity.keys())
 
+onready var achievement_box : PackedScene = load("res://HevLib/ui/mod_menu/achievement_menu/boxes/AchievementBox.tscn")
+
+
 var offset : Vector2 = Vector2(12,12)
 
+var achievement_boxes : Array = Array()
+
 func rebuild_achievement_list():
-	for i in achievement_list.get_children():
-		achievement_list.remove_child(i)
-		Tool.remove(i)
-	
-	
-	
-	breakpoint
+	if not achievement_boxes:
+		for i in achievement_names:
+			var box : HBoxContainer = achievement_box.instance()
+			box.name = i
+			box.achievement_id = i
+			achievement_boxes.append(box)
+			achievement_list.add_child(box)
+#		breakpoint
+#
+#
+#
+#	breakpoint
 
 func rebuild_stat_list():
 	for i in stats_list.get_children():

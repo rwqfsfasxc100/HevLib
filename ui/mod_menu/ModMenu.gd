@@ -76,6 +76,8 @@ func _unhandled_input(event):
 			$FilterPopup.cancel()
 		elif $ModSettingsMenu.visible:
 			$ModSettingsMenu.cancel()
+		elif $AchievementMenu.visible:
+			$AchievementMenu.cancel()
 		elif $ConflictMenu.visible:
 			$ConflictMenu.hide()
 		elif $DependancyMenu.visible:

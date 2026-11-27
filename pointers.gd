@@ -768,8 +768,8 @@ class _Achievements:
 		var statsWithAchievements = Achivements.statsWithAchievements
 		var storyAchievements = Achivements.storyAchievements
 		
-		var stat = null
-		var limit = null
+		var stat : String = ""
+		var limit : float = -1.0
 		var additional_stat_data = null
 		
 		# If the achievement is related to ship/equipment playtime,
@@ -780,7 +780,7 @@ class _Achievements:
 				for o in playtimeStats:
 					if p[0] == o[0]:
 						stat = o[1]
-						limit = p[1]
+						limit = float(p[1])
 						additional_stat_data = p[0]
 		
 		# If the achievement isn't playtime, check to see if it's related to other stats
@@ -792,7 +792,7 @@ class _Achievements:
 					var ac = ps[s]
 					if ac == achievementID:
 						stat = a
-						limit = s
+						limit = float(s)
 		
 		# If it's not a stat-based achievement, see if it's a story-related achievement and
 		# set the additional stat data to the dictionary containing story names and limits
@@ -805,9 +805,8 @@ class _Achievements:
 		# achievements script and set the stat and limit appropriately
 		if not stat:
 			if achievementID in ANNOYING_AS_FUCK_ACHIEVEMENTS.keys():
-				var prefix : String = achievementID.split("_")[0]
-				limit = ANNOYING_AS_FUCK_ACHIEVEMENTS[achievementID]
-				match prefix:
+				limit = float(ANNOYING_AS_FUCK_ACHIEVEMENTS[achievementID])
+				match achievementID.split("_")[0]:
 					"DIVER":
 						stat = "maxDepth"
 					"LEAF":
@@ -815,7 +814,7 @@ class _Achievements:
 					"PLAYSTYLE":
 						stat = "manual"
 		
-		var returnData : Dictionary = {
+		return {
 			"name" : achievementID, # achievement ID
 			"isUnlocked" : achievementID in currentAchievementCache.get("unlockedAchievements",Array()), # if the achievement has been unlocked
 			"stat" : stat, # related stat if applicable
@@ -824,7 +823,6 @@ class _Achievements:
 			"rare" : Achivements.achievementRarity.get(achievementID,0) > 0, # if the game considers the achievement to be rare
 			"spoiler" : achievementID in SPOILER_ACHIEVEMENTS # if the achievement is spoilered on Steam
 		}
-		return returnData
 	
 	# Fetches data about a stat
 	static func __get_stat_data(STAT : String) -> float:
@@ -6475,21 +6473,24 @@ class _ManifestV2:
 	static func __get_mod_by_id(id : String, case_sensitive : bool = true) -> Dictionary:
 		var path : String = ""
 		var pathSplit : PoolStringArray = PoolStringArray()
+		var pthSize : int = 0
 		for i in modFiles:
 			if __match_mod_file_path_to_id(i) == id:
 				if path:
 					var split : PoolStringArray = i.split("/",false)
 					var splSize : int = split.size()
-					var pthSize : int = pathSplit.size()
 					if splSize < pthSize:
 						path = i
 						pathSplit = split
+						pthSize = pathSplit.size()
 					elif splSize == pthSize and i < path:
 						path = i
 						pathSplit = split
+						pthSize = pathSplit.size()
 				else:
 					path = i
 					pathSplit = i.split("/",false)
+					pthSize = pathSplit.size()
 		if path:
 			return __get_mod_data()[get_mod_path_from_lowercase_path[path]].duplicate(true)
 		return Dictionary()

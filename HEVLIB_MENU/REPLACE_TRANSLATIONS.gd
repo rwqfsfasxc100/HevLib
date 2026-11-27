@@ -1966,6 +1966,98 @@ const TRANSLATIONS = {
 		"HEVLIB_ACHIEVEMENTMENU_BRIEF": {
 			"string": "Provides all achievement icons for HevLib menus that use it.",
 			"version_hash": 1587880161
+		},
+		"stat:PLAYTIME_CLASS_EMP": {
+			"string": "Time spent using microwave weapons",
+			"version_hash": 1581635982
+		},
+		"stat:PLAYTIME_CLASS_KINETIC": {
+			"string": "Time spent using kinetic weapons",
+			"version_hash": 651318536
+		},
+		"stat:PLAYTIME_CLASS_LASER": {
+			"string": "Time spent using mining lasers",
+			"version_hash": 3534574896
+		},
+		"stat:PLAYTIME_CLASS_PLASMA": {
+			"string": "Time spent using plasma throwers",
+			"version_hash": 2387153856
+		},
+		"stat:PLAYTIME_CLASS_SCOOP": {
+			"string": "Time spent flying with companions",
+			"version_hash": 689781402
+		},
+		"stat:PLAYTIME_SHIP_ATK225": {
+			"string": "Time spent flying an AT-K225 Titan",
+			"version_hash": 593217532
+		},
+		"stat:PLAYTIME_SHIP_COTHON": {
+			"string": "Time spent flying a Cothon-212",
+			"version_hash": 1217791637
+		},
+		"stat:PLAYTIME_SHIP_EIME": {
+			"string": "Time spent flying a Model E",
+			"version_hash": 511247102
+		},
+		"stat:PLAYTIME_SHIP_KITSUNE": {
+			"string": "Time spent flying a Kitsune",
+			"version_hash": 2007956363
+		},
+		"stat:PLAYTIME_SHIP_OCP209": {
+			"string": "Time spent flying an OCP",
+			"version_hash": 2085189656
+		},
+		"stat:PLAYTIME_SHIP_PROSPECTOR": {
+			"string": "Time spent flying an Eagle Prospector",
+			"version_hash": 3137268805
+		},
+		"stat:PLAYTIME_SHIP_PROSPECTOR_BALD": {
+			"string": "Time spent flying the Bald Eagle",
+			"version_hash": 4202963097
+		},
+		"stat:PLAYTIME_SHIP_TRTL": {
+			"string": "Time spent flying a K37 TNTRL",
+			"version_hash": 768969329
+		},
+		"stat:leaf": {
+			"string": "Total Leaf on the Wind score",
+			"version_hash": 3100498669
+		},
+		"stat:manual": {
+			"string": "Longest purely-manual flight",
+			"version_hash": 2480596171
+		},
+		"stat:maxDepth": {
+			"string": "Max depth reached",
+			"version_hash": 3351964684
+		},
+		"stat:max_insurance": {
+			"string": "Largest amount of insurance held at once (E$)",
+			"version_hash": 472574041
+		},
+		"stat:max_insurance_k": {
+			"string": "Largest amount of insurance held at once (thousands of E$)",
+			"version_hash": 2187040807
+		},
+		"stat:max_money": {
+			"string": "Largest amount of money held at once (E$)",
+			"version_hash": 4177247513
+		},
+		"stat:max_money_k": {
+			"string": "Largest amount of money held at once (thosuands of E$)",
+			"version_hash": 339266727
+		},
+		"stat:max_money_m": {
+			"string": "Largest amount of money held at once (millions of E$)",
+			"version_hash": 1743642389
+		},
+		"stat:max_players": {
+			"string": "Most players online at the same time",
+			"version_hash": 516791416
+		},
+		"stat:salvaged_ships": {
+			"string": "Number of ships salvaged",
+			"version_hash": 3176252177
 		}
 	},
 	"de": {
