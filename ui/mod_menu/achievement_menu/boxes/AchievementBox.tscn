@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=1]
 [ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=2]
@@ -6,6 +6,7 @@
 [ext_resource path="res://HevLib/ui/fonts/verdana/font-verdana-small.tres" type="DynamicFont" id=4]
 [ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=5]
 [ext_resource path="res://HevLib/ui/fonts/verdana/font-verdanabold-small.tres" type="DynamicFont" id=6]
+[ext_resource path="res://HevLib/ui/mod_menu/AnimateAppear.tscn" type="PackedScene" id=7]
 
 [sub_resource type="StreamTexture" id=1]
 flags = 4
@@ -19,7 +20,68 @@ load_path = "res://HevLib/achievements/achievement_border.stex"
 flags = 4
 load_path = "res://HevLib/achievements/blank_achievement_icon_fg.stex"
 
+[sub_resource type="Animation" id=4]
+resource_name = "hider"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.25, 0.5 ),
+"transitions": PoolRealArray( 4, 1, 14.9285 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ) ]
+}
+tracks/1/type = "method"
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0.25 ),
+"transitions": PoolRealArray( 1 ),
+"values": [ {
+"args": [  ],
+"method": "hider"
+} ]
+}
+
+[sub_resource type="Animation" id=5]
+resource_name = "show"
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.3, 1 ),
+"transitions": PoolRealArray( 1, 0.25, 4 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1.25, 1.25, 1.25, 1 ), Color( 1, 1, 1, 1 ) ]
+}
+
+[sub_resource type="Animation" id=6]
+resource_name = "show_flat"
+tracks/0/type = "value"
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.3, 1 ),
+"transitions": PoolRealArray( 1, 0.25, 4 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ), Color( 1, 1, 1, 1 ) ]
+}
+
 [node name="AchievementBox" type="HBoxContainer"]
+modulate = Color( 1, 1, 1, 0 )
 margin_right = 1280.0
 margin_bottom = 130.0
 rect_min_size = Vector2( 0, 130 )
@@ -130,3 +192,8 @@ size_flags_vertical = 5
 custom_fonts/font = ExtResource( 4 )
 align = 1
 valign = 1
+
+[node name="AnimateAppear" parent="." instance=ExtResource( 7 )]
+anims/hider = SubResource( 4 )
+anims/show = SubResource( 5 )
+anims/show_flat = SubResource( 6 )

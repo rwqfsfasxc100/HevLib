@@ -53,19 +53,8 @@ var offset : Vector2 = Vector2(12,12)
 
 var achievement_boxes : Array = Array()
 
-func rebuild_achievement_list():
-	if not achievement_boxes:
-		for i in achievement_names:
-			var box : HBoxContainer = achievement_box.instance()
-			box.name = i
-			box.achievement_id = i
-			achievement_boxes.append(box)
-			achievement_list.add_child(box)
-#		breakpoint
-#
-#
-#
-#	breakpoint
+onready var achievement_count_label : Label = $base/AchievementCount
+onready var achievement_count_label_animator : AnimationPlayer = $base/AchievementCount/AnimationPlayer
 
 func rebuild_stat_list():
 	for i in stats_list.get_children():
@@ -76,11 +65,37 @@ func rebuild_stat_list():
 	
 	breakpoint
 
+var completed_achievement_count : int = 0
+func redisplay_boxes():
+	if is_visible_in_tree():
+		set_process(true)
+		var num_achievements : int = achievement_names.size()
+		completed_achievement_count = 0
+		for i in achievement_boxes:
+			i.update_data()
+			achievement_count_label.text = "%d / %d" % [completed_achievement_count,num_achievements]
+			yield(self,"tick")
+		set_process(false)
+		if completed_achievement_count == num_achievements:
+			achievement_count_label_animator.play("Blink")
+		else:
+			achievement_count_label_animator.play("RESET")
+	else:
+		for i in achievement_boxes:
+			i.visible = false
+
 func _ready():
 	get_tree().get_root().connect("size_changed", self, "_on_resize")
 	Achivements.connect("achivedOffline",self,"rebuild_achievement_list")
 	Achivements.connect("stat",self,"rebuild_stat_list")
-	rebuild_achievement_list()
+	for i in achievement_names:
+		var box : HBoxContainer = achievement_box.instance()
+		box.name = i
+		box.achievement_id = i
+		box.menu_container = self
+		achievement_boxes.append(box)
+		achievement_list.add_child(box)
+	connect("visibility_changed",self,"redisplay_boxes")
 
 func _about_to_show():
 	lastFocus = get_focus_owner()
@@ -114,4 +129,8 @@ func _on_resize():
 		$base.rect_size = size - offset
 		$base.rect_position = offset/2
 		container.rect_size = size - offset
-	
+
+signal tick
+
+func _process(delta: float) -> void:
+	emit_signal("tick")

@@ -17,7 +17,14 @@ onready var progress_bar_label : Label = $MarginContainer/HBoxContainer/Progress
 
 onready var pointers : HevLibPointers = ModLoader._savedObjects[0]
 
+var uses_tooltip : bool = false
+
+var menu_container : Popup = null
+
 func _ready() -> void:
+	button.connect("pressed",self,"on_label_button_pressed")
+
+func update_data() -> void:
 	if achievement_id:
 		var name_format : String = "ACHIEVEMENT_" + achievement_id
 		name_label.text = name_format
@@ -49,11 +56,12 @@ func _ready() -> void:
 				icon.value = stat_value
 				progress_bar_label.text = Tool.readableTimeSpan(stat_value,true) + " / " + Tool.readableTimeSpan(stat_max,true)
 				var additional_data = associated_data.data
-				if additional_data is Array and additional_data:
+				if additional_data is Array:
 					var tooltip : String = TranslationServer.translate("HEVLIB_ACHDESC_SUPPORTED_HARDWARE")
 					for i in additional_data:
 						tooltip += "\n\t" + TranslationServer.translate(i)
 					progress_button.hint_tooltip = tooltip
+					uses_tooltip = true
 					handled_addit = true
 			elif stat.begins_with("max_money") or stat.begins_with("max_insurance"):
 				if stat.ends_with("_k"):
@@ -84,14 +92,15 @@ func _ready() -> void:
 			icon.max_value = 1
 			if is_unlocked:
 				icon.value = 1
+				menu_container.achievement_list.move_child(self,menu_container.completed_achievement_count)
+				menu_container.completed_achievement_count += 1
 			else:
 				icon.value = 0
 			progress_container.visible = false
-		
-		button.connect("pressed",self,"on_label_button_pressed")
-#		breakpoint
-
+	
+	visible = true
+	$AnimateAppear.play("show")
 func on_label_button_pressed():
-	if progress_container.visible and progress_button.hint_tooltip:
+	if uses_tooltip and progress_container.visible:
 		progress_button.grab_focus()
 
