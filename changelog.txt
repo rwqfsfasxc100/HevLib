@@ -1,3 +1,7 @@
+[1.18.9]
+
+1=* The `stat` and `limit` values from `Achievements`.`__get_achievement_data` are now always of string and float type respectively, with defaults of `""` and -1.0
+
 [1.18.8]
 
 1=* Fixed crash caused by trying to scan a mineral chunk with multiminerals enabled
