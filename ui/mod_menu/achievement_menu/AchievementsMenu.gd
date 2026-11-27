@@ -42,6 +42,10 @@ onready var achievement_count : Label = get_node_or_null(achievement_count_path)
 export (NodePath) var stats_list_path = NodePath()
 onready var stats_list : VBoxContainer = get_node_or_null(stats_list_path)
 
+onready var pointers : HevLibPointers = ModLoader._savedObjects[0]
+
+onready var achievement_names : PoolStringArray = PoolStringArray(Achivements.achievementRarity.keys())
+
 var offset : Vector2 = Vector2(12,12)
 
 func rebuild_achievement_list():
@@ -49,12 +53,15 @@ func rebuild_achievement_list():
 		achievement_list.remove_child(i)
 		Tool.remove(i)
 	
+	
+	
 	breakpoint
 
 func rebuild_stat_list():
 	for i in stats_list.get_children():
 		stats_list.remove_child(i)
 		Tool.remove(i)
+	
 	
 	
 	breakpoint

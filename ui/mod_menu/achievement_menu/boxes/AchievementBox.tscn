@@ -1,0 +1,50 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://enceladus/SmoothScrollTo.gd" type="Script" id=1]
+[ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=2]
+[ext_resource path="res://HevLib/achievements/blank_achievement_icon_bg.stex" type="Texture" id=3]
+[ext_resource path="res://HevLib/achievements/blank_achievement_icon_fg.stex" type="Texture" id=4]
+[ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=5]
+[ext_resource path="res://HevLib/achievements/achievement_border.stex" type="Texture" id=6]
+[ext_resource path="res://menu/sfx/PlaySoundsOnTheseButtons.gd" type="Script" id=7]
+
+[node name="AchievementBox" type="HBoxContainer"]
+margin_right = 1280.0
+margin_bottom = 130.0
+rect_min_size = Vector2( 0, 130 )
+size_flags_horizontal = 3
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+margin_right = 130.0
+margin_bottom = 130.0
+rect_min_size = Vector2( 130, 130 )
+
+[node name="TextureProgress" type="TextureProgress" parent="PanelContainer"]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 125.0
+margin_bottom = 125.0
+texture_under = ExtResource( 3 )
+texture_over = ExtResource( 6 )
+texture_progress = ExtResource( 4 )
+fill_mode = 8
+nine_patch_stretch = true
+
+[node name="Button" type="Button" parent="."]
+margin_left = 134.0
+margin_right = 1280.0
+margin_bottom = 130.0
+size_flags_horizontal = 3
+text = "ACHIEVEMENT_NAME_EXAMPLE"
+align = 0
+
+[node name="SmoothScrollTo" type="Node" parent="Button" instance=ExtResource( 2 )]
+script = ExtResource( 1 )
+focusAt = NodePath("../..")
+
+[node name="PlaySoundsOnTheseButtons" type="Node" parent="Button" instance=ExtResource( 5 )]
+pause_mode = 2
+script = ExtResource( 7 )
+tooltipLabelPath = NodePath("Separation/Tooltip/MarginContainer/PanelContainer/TooltipLabel")
+tooltipContainerPath = NodePath("Separation/Tooltip/MarginContainer")
+tooltipPositionPath = NodePath("Separation/Tooltip")

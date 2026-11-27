@@ -1954,6 +1954,18 @@ const TRANSLATIONS = {
 		"HEVLIB_MOD_NEEDS_OLDER_GAME_VERSION": {
 			"string": "Mod [%s] needs a game version of at most [%d.%d.%d], you are running game version [%d.%d.%d].\n\nThis mod likely is wholly incompatible with a feature added in the bleeding-edge branch.",
 			"version_hash": 2586529651
+		},
+		"HEVLIB_ACHIEVEMENTICONS_NAME": {
+			"string": "HevLib Achievement Icons",
+			"version_hash": 764881284
+		},
+		"HEVLIB_ACHIEVEMENTICONS_DESC": {
+			"string": "Provides all achievement icons for HevLib menus that use it.",
+			"version_hash": 1587880161
+		},
+		"HEVLIB_ACHIEVEMENTMENU_BRIEF": {
+			"string": "Provides all achievement icons for HevLib menus that use it.",
+			"version_hash": 1587880161
 		}
 	},
 	"de": {
