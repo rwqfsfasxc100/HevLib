@@ -763,10 +763,9 @@ class _Achievements:
 	
 	# Fetches data from a specific achievement.
 	static func __get_achievement_data(achievementID : String) -> Dictionary:
-		var playtimeStats = Achivements.playtimeStats
-		var playtimeAchievements = Achivements.playtimeAchievements
-		var statsWithAchievements = Achivements.statsWithAchievements
-		var storyAchievements = Achivements.storyAchievements
+		var playtimeStats : Array = Achivements.playtimeStats
+		var statsWithAchievements : Dictionary = Achivements.statsWithAchievements
+		var storyAchievements : Array = Achivements.storyAchievements
 		
 		var stat : String = ""
 		var limit : float = -1.0
@@ -775,31 +774,34 @@ class _Achievements:
 		# If the achievement is related to ship/equipment playtime,
 		# define the associated stat and limit to reach for the achievement
 		# and set the additional stat data part to the associated ship/equipment names
-		for p in playtimeAchievements:
+		for p in Achivements.playtimeAchievements:
 			if p[2] == achievementID:
 				for o in playtimeStats:
 					if p[0] == o[0]:
 						stat = o[1]
 						limit = float(p[1])
-						additional_stat_data = p[0]
+						additional_stat_data = p[0].duplicate(true)
+						break
 		
 		# If the achievement isn't playtime, check to see if it's related to other stats
 		# and define the stat and limit
 		if not stat:
-			for a in statsWithAchievements:
+			for a in statsWithAchievements.keys():
 				var ps = statsWithAchievements[a]
 				for s in ps:
 					var ac = ps[s]
 					if ac == achievementID:
 						stat = a
 						limit = float(s)
+						break
 		
 		# If it's not a stat-based achievement, see if it's a story-related achievement and
 		# set the additional stat data to the dictionary containing story names and limits
 		if not stat:
 			for a in storyAchievements:
 				if a[1] == achievementID:
-					additional_stat_data = a[0]
+					additional_stat_data = a[0].duplicate(true)
+					break
 		
 		# If it's not a defined stat-based achievement, see if it's a stat not defined in the
 		# achievements script and set the stat and limit appropriately

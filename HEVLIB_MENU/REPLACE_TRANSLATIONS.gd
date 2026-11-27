@@ -2036,20 +2036,20 @@ const TRANSLATIONS = {
 			"version_hash": 472574041
 		},
 		"stat:max_insurance_k": {
-			"string": "Largest amount of insurance held at once (thousands of E$)",
-			"version_hash": 2187040807
+			"string": "Largest amount of insurance held at once (E$)",
+			"version_hash": 472574041
 		},
 		"stat:max_money": {
 			"string": "Largest amount of money held at once (E$)",
 			"version_hash": 4177247513
 		},
 		"stat:max_money_k": {
-			"string": "Largest amount of money held at once (thosuands of E$)",
-			"version_hash": 339266727
+			"string": "Largest amount of money held at once (E$)",
+			"version_hash": 4177247513
 		},
 		"stat:max_money_m": {
-			"string": "Largest amount of money held at once (millions of E$)",
-			"version_hash": 1743642389
+			"string": "Largest amount of money held at once (E$)",
+			"version_hash": 4177247513
 		},
 		"stat:max_players": {
 			"string": "Most players online at the same time",
@@ -2058,6 +2058,10 @@ const TRANSLATIONS = {
 		"stat:salvaged_ships": {
 			"string": "Number of ships salvaged",
 			"version_hash": 3176252177
+		},
+		"HEVLIB_ACHDESC_SUPPORTED_HARDWARE": {
+			"string": "Supported hardware:",
+			"version_hash": 286551283
 		}
 	},
 	"de": {

@@ -72,6 +72,7 @@ size_flags_horizontal = 3
 margin_right = 571.0
 margin_bottom = 32.0
 custom_fonts/font = ExtResource( 6 )
+autowrap = true
 
 [node name="DESC" type="Label" parent="MarginContainer/HBoxContainer/Labels"]
 margin_top = 36.0
@@ -79,6 +80,7 @@ margin_right = 571.0
 margin_bottom = 130.0
 size_flags_vertical = 3
 custom_fonts/font = ExtResource( 4 )
+autowrap = true
 
 [node name="Progress" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 margin_left = 575.0
@@ -89,35 +91,42 @@ size_flags_horizontal = 3
 alignment = 1
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/Progress"]
-margin_top = 31.0
+margin_top = 26.0
 margin_right = 571.0
-margin_bottom = 63.0
+margin_bottom = 58.0
 size_flags_horizontal = 3
 size_flags_vertical = 1
 custom_fonts/font = ExtResource( 4 )
 align = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer/Progress"]
-margin_top = 67.0
+margin_top = 62.0
 margin_right = 571.0
-margin_bottom = 99.0
-rect_min_size = Vector2( 0, 32 )
+margin_bottom = 104.0
+rect_min_size = Vector2( 0, 42 )
 size_flags_horizontal = 3
 
 [node name="ProgressBar" type="ProgressBar" parent="MarginContainer/HBoxContainer/Progress/MarginContainer"]
 margin_right = 571.0
-margin_bottom = 32.0
+margin_bottom = 42.0
 size_flags_horizontal = 3
 size_flags_vertical = 1
 percent_visible = false
 
-[node name="SmoothScrollTo" parent="MarginContainer/HBoxContainer/Progress/MarginContainer/ProgressBar" instance=ExtResource( 2 )]
+[node name="Button" type="Button" parent="MarginContainer/HBoxContainer/Progress/MarginContainer"]
+margin_right = 571.0
+margin_bottom = 42.0
+flat = true
+
+[node name="SmoothScrollTo" parent="MarginContainer/HBoxContainer/Progress/MarginContainer/Button" instance=ExtResource( 2 )]
 focusAt = NodePath("../../../..")
 
-[node name="PlaySoundsOnTheseButtons" parent="MarginContainer/HBoxContainer/Progress/MarginContainer/ProgressBar" instance=ExtResource( 5 )]
+[node name="PlaySoundsOnTheseButtons" parent="MarginContainer/HBoxContainer/Progress/MarginContainer/Button" instance=ExtResource( 5 )]
 
 [node name="Label" type="Label" parent="MarginContainer/HBoxContainer/Progress/MarginContainer"]
 margin_right = 571.0
-margin_bottom = 32.0
+margin_bottom = 42.0
+size_flags_vertical = 5
 custom_fonts/font = ExtResource( 4 )
 align = 1
+valign = 1
