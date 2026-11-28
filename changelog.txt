@@ -16,6 +16,8 @@
 6.2=* Added `expect_value` boolean that throws errors to stdout if a value returns `null`. Defaults to false.
 7=* Fixed crash caused by modlet resource loading incorrectly splitting mod paths when providing a `res://` path that does not link to a file from the mod being read from.
 8=* Fixed issue that prevented portrait DLC from properly loading.
+9=* Added new subpackage: HevLib Achievement Icons
+9.1=* Provides the achievement icons for the new achievement menu without bloating file size
 
 [1.18.8]
 
