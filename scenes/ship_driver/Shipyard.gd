@@ -132,7 +132,10 @@ func _ready():
 				usedShipConfigs[ship_name].append(cfg.duplicate(true))
 			var cfgalias:String = getShipAlias(ship_name)
 			if cfgalias != ship_name:
-				usedShipConfigs[cfgalias].append(cfg.duplicate(true))
+				if cfgalias in usedShipConfigs:
+					usedShipConfigs[cfgalias].append(cfg.duplicate(true))
+				else:
+					usedShipConfigs[cfgalias] = [cfg.duplicate(true)]
 	
 	for ship in configAlias:
 		var baseShip:String = configAlias[ship]
