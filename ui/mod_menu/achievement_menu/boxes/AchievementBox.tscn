@@ -93,11 +93,13 @@ script = ExtResource( 3 )
 margin_right = 130.0
 margin_bottom = 130.0
 rect_min_size = Vector2( 130, 130 )
+allow_greater = true
+allow_lesser = true
 texture_under = SubResource( 1 )
 texture_over = SubResource( 2 )
 texture_progress = SubResource( 3 )
 fill_mode = 8
-radial_initial_angle = 270.0
+radial_initial_angle = 225.0
 nine_patch_stretch = true
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
@@ -114,7 +116,6 @@ size_flags_horizontal = 3
 align = 0
 
 [node name="SmoothScrollTo" parent="MarginContainer/Button" instance=ExtResource( 2 )]
-focusAt = NodePath("../../..")
 
 [node name="PlaySoundsOnTheseButtons" parent="MarginContainer/Button" instance=ExtResource( 5 )]
 
@@ -173,6 +174,8 @@ margin_right = 571.0
 margin_bottom = 42.0
 size_flags_horizontal = 3
 size_flags_vertical = 1
+allow_greater = true
+allow_lesser = true
 percent_visible = false
 
 [node name="Button" type="Button" parent="MarginContainer/HBoxContainer/Progress/MarginContainer"]
@@ -181,7 +184,6 @@ margin_bottom = 42.0
 flat = true
 
 [node name="SmoothScrollTo" parent="MarginContainer/HBoxContainer/Progress/MarginContainer/Button" instance=ExtResource( 2 )]
-focusAt = NodePath("../../../..")
 
 [node name="PlaySoundsOnTheseButtons" parent="MarginContainer/HBoxContainer/Progress/MarginContainer/Button" instance=ExtResource( 5 )]
 

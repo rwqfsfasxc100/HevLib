@@ -31,8 +31,10 @@
 
 extends Popup
 
-var pointers:HevLibPointers = ModLoader._savedObjects[0]
-var offset = Vector2(12,12)
+var pointers : HevLibPointers = ModLoader._savedObjects[0]
+var offset : Vector2 = Vector2(12,12)
+
+var is_in_game : bool = false
 
 const cache_folder = "user://cache/menu_filter_cache.json"
 var file : File = File.new()

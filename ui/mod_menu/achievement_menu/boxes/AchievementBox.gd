@@ -20,9 +20,11 @@ onready var pointers : HevLibPointers = ModLoader._savedObjects[0]
 var uses_tooltip : bool = false
 
 var menu_container : Popup = null
+var mod_menu : Popup = null
 
 func _ready() -> void:
 	button.connect("pressed",self,"on_label_button_pressed")
+	connect("visibility_changed",self,"_vis_changed")
 
 func update_data() -> void:
 	if achievement_id:
@@ -46,10 +48,7 @@ func update_data() -> void:
 		var handled_addit : bool = false
 		if stat and not is_unlocked:
 			var raw_stat : String = "stat:" + stat
-			progress_label.text = raw_stat
 			var stat_max : float = associated_data.limit
-			progress_bar.max_value = stat_max
-			icon.max_value = stat_max
 			if stat.begins_with("PLAYTIME_") or stat == "manual":
 				var stat_value : float = pointers.Achievements.__get_stat_data(raw_stat)
 				progress_bar.value = stat_value
@@ -65,12 +64,14 @@ func update_data() -> void:
 					handled_addit = true
 			elif stat.begins_with("max_money") or stat.begins_with("max_insurance"):
 				if stat.ends_with("_k"):
-					stat.trim_suffix("_k")
+					stat = stat.trim_suffix("_k")
+					raw_stat = raw_stat.trim_suffix("_k")
 					stat_max *= 1000.0
-				if stat.ends_with("_m"):
-					stat.trim_suffix("_m")
+				elif stat.ends_with("_m"):
+					stat = stat.trim_suffix("_m")
+					raw_stat = raw_stat.trim_suffix("_m")
 					stat_max *= 1000000.0
-				var stat_value : float = pointers.Achievements.__get_stat_data("stat:" + stat)
+				var stat_value : float = pointers.Achievements.__get_stat_data(raw_stat)
 				progress_bar.value = stat_value
 				icon.value = stat_value
 				progress_bar_label.text = CurrentGame.formatThousands(stat_value) + " E$ / " + CurrentGame.formatThousands(stat_max) + " E$"
@@ -78,7 +79,7 @@ func update_data() -> void:
 				var stat_value : float = pointers.Achievements.__get_stat_data(raw_stat)
 				progress_bar.value = stat_value
 				icon.value = stat_value
-				progress_bar_label.text = CurrentGame.formatThousandsWithDecimals(stat_value,1) + " km / " + CurrentGame.formatThousandsWithDecimals(stat_max,1) + " km"
+				progress_bar_label.text = CurrentGame.formatThousands(stat_value) + " km / " + CurrentGame.formatThousands(stat_max) + " km"
 			elif stat == "leaf" or stat == "max_players" or stat == "salvaged_ships":
 				var stat_value : float = pointers.Achievements.__get_stat_data(raw_stat)
 				progress_bar.value = stat_value
@@ -88,19 +89,57 @@ func update_data() -> void:
 				pointers.l("UNKNOWN STAT \"%s\": please double check if vanilla only and implement if so" % stat,"MM2 Achievement Menu")
 				
 				breakpoint
+			progress_label.text = raw_stat
+			progress_bar.max_value = stat_max
+			icon.max_value = stat_max
 		else:
 			icon.max_value = 1
 			if is_unlocked:
 				icon.value = 1
 				menu_container.achievement_list.move_child(self,menu_container.completed_achievement_count)
 				menu_container.completed_achievement_count += 1
+				progress_container.visible = false
 			else:
-				icon.value = 0
-			progress_container.visible = false
+				if mod_menu.is_in_game:
+					var additional_data = associated_data.data
+					if additional_data is Dictionary:
+						var t_max : int = 0
+						var t_val : int = 0
+						for story_flag in additional_data.keys():
+							var story_val : int = CurrentGame.getStory(story_flag)
+							if story_val > -1:
+								var story_data : Array = additional_data[story_flag]
+								if story_val > story_data[1]:
+									continue
+								var s_max : int = story_data[0]
+								t_max += s_max
+								t_val += min(story_val,s_max)
+						if t_max < 1:
+							progress_container.visible = false
+						else:
+							progress_bar.max_value = t_max
+							icon.max_value = t_max
+							icon.value = t_val
+							progress_bar.value = t_val
+							progress_label.text = "MM2_STORY_FLAG_STAT_" + achievement_id
+							pointers.l("Registered story-based achievement: " + progress_label.text,"MM2 Achievement Menu")
+							progress_bar_label.text = CurrentGame.formatThousands(t_val) + " / " + CurrentGame.formatThousands(t_max)
+					else:
+						progress_container.visible = false
+				else:
+					icon.value = 0
+					progress_container.visible = false
+			
 	
 	visible = true
 	$AnimateAppear.play("show")
+
+func _vis_changed():
+	if is_visible_in_tree() and get_position_in_parent() == 0:
+		button.emit_signal("pressed")
+
 func on_label_button_pressed():
+	button.get_child(0).call_deferred("scrollTo")
 	if uses_tooltip and progress_container.visible:
 		progress_button.grab_focus()
 

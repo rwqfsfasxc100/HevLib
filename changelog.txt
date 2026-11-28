@@ -1,6 +1,20 @@
 [1.18.9]
 
-1=* The `stat` and `limit` values from `Achievements`.`__get_achievement_data` are now always of string and float type respectively, with defaults of `""` and -1.0
+1=* Added Achievements menu
+1.1=* Accessible from the mod menu
+1.2=* Displays all achievements provided by Vanilla.
+1.3=* Progressable have their progress displayed with a labeled progress bar
+1.3.1=* Stat and playtime achievements will be displayed in their respective ship & equipment groups, and display all applicable hardware in the tooltip of the progress bar
+1.3.2=* Story-flag achievements only display their progress while a save is loaded.
+1.4=* Displays stat information on a second page
+2=* The `stat` and `limit` values from `Achievements`.`__get_achievement_data` are now always of string and float type respectively, with defaults of `""` and -1.0
+3=* Darkened all HevLib menu text by 10% and darkened HevLib tooltips by 30%
+4=* Fixed issue with manifest-less mods that could crash the game on occasion
+5=* Fixed issue if a used ship config alias didn't exist for a ship being added by ShipDriver
+6=* Improved logging for multithread operations
+6.1=* Prints to stdout as well as pointer logs when `log_info` is true
+6.2=* Added `expect_value` boolean that throws errors to stdout if a value returns `null`. Defaults to false.
+7=* Fixed crash caused by modlet resource loading incorrectly splitting mod paths when providing a `res://` path that does not link to a file from the mod being read from.
 
 [1.18.8]
 

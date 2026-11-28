@@ -67,7 +67,7 @@ size_flags_vertical = 3
 
 [node name="TabContainer" type="TabContainer" parent="base/VBoxContainer"]
 margin_right = 1280.0
-margin_bottom = 720.0
+margin_bottom = 666.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource( 4 )
@@ -79,7 +79,7 @@ margin_top = 46.0
 
 [node name="Scroll" type="ScrollContainer" parent="base/VBoxContainer/TabContainer/Achievements"]
 margin_right = 1280.0
-margin_bottom = 674.0
+margin_bottom = 620.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource( 3 )
@@ -87,7 +87,7 @@ use_horizontal = false
 
 [node name="VBoxContainer" type="VBoxContainer" parent="base/VBoxContainer/TabContainer/Achievements/Scroll"]
 margin_right = 1280.0
-margin_bottom = 674.0
+margin_bottom = 620.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -99,7 +99,7 @@ margin_top = 46.0
 
 [node name="Scroll" type="ScrollContainer" parent="base/VBoxContainer/TabContainer/Stats"]
 margin_right = 1280.0
-margin_bottom = 674.0
+margin_bottom = 620.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource( 3 )
@@ -107,9 +107,26 @@ use_horizontal = false
 
 [node name="VBoxContainer" type="VBoxContainer" parent="base/VBoxContainer/TabContainer/Stats/Scroll"]
 margin_right = 1280.0
-margin_bottom = 674.0
+margin_bottom = 620.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
+
+[node name="FooterButtons" type="HBoxContainer" parent="base/VBoxContainer"]
+margin_top = 670.0
+margin_right = 1280.0
+margin_bottom = 720.0
+rect_min_size = Vector2( 0, 50 )
+alignment = 1
+
+[node name="Close" type="Button" parent="base/VBoxContainer/FooterButtons"]
+margin_left = 440.0
+margin_right = 840.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 400, 0 )
+focus_neighbour_right = NodePath(".")
+focus_neighbour_bottom = NodePath(".")
+theme = ExtResource( 5 )
+text = "HEVLIB_MODMENU_CLOSE"
 
 [node name="AchievementCount" type="Label" parent="base"]
 margin_right = 125.0
@@ -127,3 +144,4 @@ anims/RESET = SubResource( 2 )
 
 [connection signal="about_to_show" from="." to="." method="_about_to_show"]
 [connection signal="visibility_changed" from="." to="." method="_visibility_changed"]
+[connection signal="pressed" from="base/VBoxContainer/FooterButtons/Close" to="." method="cancel"]

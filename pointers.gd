@@ -101,6 +101,8 @@ signal physics_process_tick(delta)
 
 const non_static = Dictionary()
 
+const DEBUG_SINGLE_THREAD_ONLY = false
+
 func _init(e,v,w):
 	if is_editor:
 		ConfigDriver.__store_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","compile",false)
@@ -222,8 +224,6 @@ func _init(e,v,w):
 
 var os : Object = ClassDB.instance("_OS")
 
-const DEBUG_SINGLE_THREAD_ONLY = false
-
 func _physics_process(delta : float):
 	emit_signal("physics_process_tick",delta)
 	logging_current_frame_timer += 1
@@ -260,7 +260,7 @@ func fetch_autoloads():
 const ood_err_text = "cannot collect version specific data. Is HevLib out of date?"
 signal updates_fetched
 func fetch_mod_updates():
-	var rHTTP : HTTPRequest=HTTPRequest.new()
+	var rHTTP : HTTPRequest = HTTPRequest.new()
 	add_child(rHTTP)
 	rHTTP.request("https://raw.githubusercontent.com/rwqfsfasxc100/dv_update_database/refs/heads/main/manifest_path_store.json")
 	var rba : Array = yield(rHTTP,"request_completed")
@@ -317,6 +317,7 @@ func fetch_mod_updates():
 			if ood:NodeAccess.__exit(false,ood_err_text,"pointers.SafeMode",60.0)
 		
 		emit_signal("updates_fetched")
+		yield(get_tree().create_timer(0.5),"timeout")
 		if not is_editor or ConfigDriver.__get_value("HevLib","HEVLIB_CONFIG_SECTION_POINTERS","always_send_new_mods",false):
 			var md : Dictionary = ManifestV2.__get_mod_data()
 			for mod in ManifestV2.__get_mod_list_keys():
@@ -360,20 +361,20 @@ const _savedTranslations = Array()
 # Logging function used for cases where critial info must not be overwritten by game logs
 # cycling back to dv_log_0 (and yes this is from a specific bug report with AI slop code,
 # you didn't ask for permission to use any of my code in an LLM so fuck you)
-var logCache : String = ""
+var logCache : PoolStringArray = PoolStringArray()
 var messageNr : int = 0
 const messagesPerFile = 1000.0
 func l(msg : String, title : String = "",vanilla_log : bool = true):
 	if vanilla_log:
 		Debug.l(("[%s]: %s" % [title, msg]) if title else msg)
-	logCache += "[%s]: %s\n" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg]
+	logCache.append("[%s]: %s\n" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg])
 func log_double_load_error(script_path : String):
 	l("Script at [%s] is likely double loaded! Please check your zips!" % script_path,"HevLib V%s" % version_string)
 
 # Notetaking function used to mark an important event in the game's performance logs
 func n(msg : String, title : String = ""):
 	Debug.n(("[%s]: %s" % [title, msg]) if title else msg)
-	logCache += "[%s]: %s\n" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg]
+	logCache.append("[%s]: %s\n" % [("%s %s" % [Debug.timeString(),title]) if title else Debug.timeString(),msg])
 
 const deviceinfocache = "user://cache/logs/pointer_logs_%d.txt"
 var currentFileName : String = ""
@@ -392,9 +393,9 @@ func storeLogCache():
 			file.close()
 		file.open(currentFileName, File.READ_WRITE)
 		file.seek_end()
-		file.store_string(logCache)
+		file.store_string(logCache.join("\n") + "\n")
 		file.close()
-		logCache = ""
+		logCache.clear()
 
 # These achievements aren't marked as needing stats in the achievement file, but need them anyway
 const ANNOYING_AS_FUCK_ACHIEVEMENTS = {
@@ -744,6 +745,17 @@ load("%s"),
 load("%s"),
 load("%s")
 ]"""
+
+const THREADING_MULTIREQUEST_SINGLETHREAD_LOG = "[%d] Requesting mutltiple thread operations, but using main thread"
+const THREADING_SINGLEREQUEST_SINGLETHREAD_LOG = "[%d] Requesting single thread operation, but using main thread"
+const THREADING_NULL_OBJ_ERR_LOG = "Attempting to call thread with invalid object or function name"
+const THREADING_MULTIREQUEST_NULL_RETURN_ERR_LOG = "[%d] %d/%d threads returned null when expecting an output @ [%s]"
+const THREADING_MULTIREQUEST_REQUEST_LOG = "[%d] Requesting multiple thread operations under request @ %d"
+const THREADING_MULTIREQUEST_ASYNC_REQUEST_LOG = "[%d] Requesting multiple async thread operations under request @ %d"
+
+const THREADING_SINGLEREQUEST_NULL_RETURN_ERR_LOG = "[%d] Thread returned null when expecting an output @ %s"
+const THREADING_SINGLEREQUEST_REQUEST_LOG = "[%d] Requesting single thread operation under request @ %d"
+const THREADING_SINGLEREQUEST_ASYNC_REQUEST_LOG = "[%d] Requesting single async thread operation under request @ %d"
 
 class _Achievements:
 	func ready():
@@ -3787,6 +3799,7 @@ script = ExtResource( 5 )"""
 			f.open(auxTypePath + "/" + sys + "_thruster.tscn",File.WRITE)
 			f.store_string(make_thruster_scene(data,sys,aux_type))
 			f.close()
+		return 0
 	
 	static func create_compiled_tex(texturepath : String, cached_tex_path : String, save_type : String):
 		return texturepath
@@ -4518,7 +4531,7 @@ script = ExtResource( 5 )"""
 		return [base, editable_path, dict]
 	
 	func __post_load_handling():
-		pointers.Threading.__request_multiple_threads(thruster_data_to_write)
+		pointers.Threading.__request_multiple_threads(thruster_data_to_write,true,true)
 		write_rpc_sensor_items()
 
 class _Events:
@@ -4945,7 +4958,7 @@ class _FolderAccess:
 						file.close()
 					else:
 						folder_structure[object] = "FILE"
-			for f in non_static["pointers"].Threading.__request_multiple_threads(treeSearchWithThreads):
+			for f in non_static["pointers"].Threading.__request_multiple_threads(treeSearchWithThreads,true,true):
 				folder_structure[f[1].split("/",false)[-1] + "/"] = f[0]
 			folderStructureCache[folder] = folder_structure
 		return folderStructureCache[folder].duplicate(true)
@@ -5513,7 +5526,7 @@ class _ManifestV2:
 					if modFSPath.get_extension() == "zip" and pointers.FileAccess.__file_exists(modFSPath):
 						modZipProcessing.append({"object" : base,"method" : "get_mod_zip_content","args" : [modFSPath,pointers]})
 				dir.list_dir_end()
-				for i in pointers.Threading.__request_multiple_threads(modZipProcessing):
+				for i in pointers.Threading.__request_multiple_threads(modZipProcessing,true,true):
 					zip_ref_store[i[0]] = i[1]
 				var hls : String = __match_mod_path_to_zip("res://HevLib/ModMain.gd")
 				if hls and hls.get_file() != "HevLib.zip":
@@ -5521,7 +5534,7 @@ class _ManifestV2:
 			var manifest_count : int = 0
 			var library_count : int = 0
 			var non_library_count : int = 0
-			var modListArr : Array = pointers.Threading.__request_multiple_threads(all_mod_files)
+			var modListArr : Array = pointers.Threading.__request_multiple_threads(all_mod_files,true,true)
 			var total_mod_count : int = modListArr.size()
 			pointers.l("solved [%s] mod-definition files [%s ModMains / %s Modlets]" % [total_mod_count,modmain_files.size(),modlet_files.size()],log_header)
 			modListArr.sort_custom(non_static["pointers"].ManifestV2,"sortModList")
@@ -7124,7 +7137,7 @@ class _ManifestV2:
 			["res://HevLib/scenes/minerals/multiminerals/AsteroidSpawner.gd", -INF, "res://AsteroidSpawner.gd"],
 			["res://HevLib/scenes/service_driver/Services.gd", -INF, "res://enceladus/Services.gd"],
 		]
-		for r in pointers.Threading.__request_multiple_threads(load_stash):
+		for r in pointers.Threading.__request_multiple_threads(load_stash,true,true):
 			cvr.append_array(r)
 		var ovr : Dictionary = Dictionary()
 		for f in cvr:
@@ -7168,8 +7181,8 @@ class _ManifestV2:
 							if line.begins_with("extends \""):
 								ed = line.split("\"")[1]
 								break
-					else: ed = "res:/" + path.split(mbd)[1]
-				else: ed = "res:/" + path.split(mbd)[1]
+					else: ed = "res:/" + path.split(mbd,false,1)[0]
+				else: ed = "res:/" + path.split(mbd,false,1)[0]
 				out.append([path,subdata.get("priority",priority),ed])
 		return out
 	static func sortModLoadOrder(a : Array,b : Array) -> bool:
@@ -8239,7 +8252,7 @@ class _Scripting:
 		var color_text : String = ""
 		var content : String = "extends \"res://AsteroidSpawner.gd\"\nfunc _init():\n\tpass"
 		
-		for mineral in pointers.Threading.__request_multiple_threads(mineral_data):
+		for mineral in pointers.Threading.__request_multiple_threads(mineral_data,true,true):
 			color_text += mineral[0]
 			var pt : String = mineral[1]
 			if pt:
@@ -8388,12 +8401,13 @@ class _Threading:
 	# This took me probably close to 2 weeks to fine tune, 1.5 days alone was chasing
 	# a bug caused by me testing with the single most thread-unsafe code I had
 	# Hope this actually ends up being useful...
-	func __request_multiple_threads(operations : Array,log_info : bool = false) -> Array:
+	func __request_multiple_threads(operations : Array,log_info : bool = false,expect_value : bool = false) -> Array:
 		if not operations:
 			return Array()
 		if use_single_thread:
 			if log_info:
-				pointers.l("Requesting mutltiple thread operations, but using main thread",log_header)
+				pointers.l(THREADING_MULTIREQUEST_SINGLETHREAD_LOG % OS.get_ticks_msec(),log_header)
+				print(THREADING_MULTIREQUEST_SINGLETHREAD_LOG % OS.get_ticks_msec())
 			var out : Array = Array()
 			for next_op in operations:
 				var current_object : Object = next_op.get("object",null)
@@ -8405,12 +8419,20 @@ class _Threading:
 						op = call_single_thread(op)
 					out.append(op)
 				else:
-					printerr("Attempting to call thread with invalid object or function name")
+					printerr(THREADING_NULL_OBJ_ERR_LOG)
 					out.append(null)
+			if expect_value:
+				var nullctr : int = 0
+				for i in out:
+					if i == null:
+						nullctr += 1
+				if nullctr != 0:
+					printerr(THREADING_MULTIREQUEST_NULL_RETURN_ERR_LOG % [OS.get_ticks_msec(),nullctr,operations.size(),operations])
 			return out
 		var request_id : int = (operations.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
 		if log_info:
-			pointers.l("Requesting multiple thread operations under request [%d] @ %d" % [request_id,OS.get_ticks_msec()],log_header)
+			pointers.l(THREADING_MULTIREQUEST_REQUEST_LOG % [OS.get_ticks_msec(),request_id],log_header)
+			print(THREADING_MULTIREQUEST_REQUEST_LOG % [OS.get_ticks_msec(),request_id])
 		var semaphore : Semaphore = Semaphore.new()
 		var added_op : int = 0
 		mutex.lock()
@@ -8441,12 +8463,20 @@ class _Threading:
 		var out : Array = thread_return[request_id]
 		thread_return.erase(request_id)
 		mutex.unlock()
+		if expect_value:
+			var nullctr : int = 0
+			for i in out:
+				if i == null:
+					nullctr += 1
+			if nullctr != 0:
+				printerr(THREADING_MULTIREQUEST_NULL_RETURN_ERR_LOG % [OS.get_ticks_msec(),nullctr,operations.size(),operations])
 		return out
 	
-	func __request_single_thread(operation : Dictionary,log_info : bool = false) -> Array:
+	func __request_single_thread(operation : Dictionary,log_info : bool = false,expect_value : bool = false) -> Array:
 		if use_single_thread:
 			if log_info:
-				pointers.l("Requesting single thread operation, but using main thread",log_header)
+				pointers.l(THREADING_SINGLEREQUEST_SINGLETHREAD_LOG % OS.get_ticks_msec(),log_header)
+				print(THREADING_SINGLEREQUEST_SINGLETHREAD_LOG % OS.get_ticks_msec())
 			var current_object : Object = operation.get("object",null)
 			var args : Array = operation.get("args",Array())
 			var current_method_call : String = operation.get("method","")
@@ -8454,12 +8484,15 @@ class _Threading:
 				var op = current_object.callv(current_method_call,args)
 				if op is GDScriptFunctionState:
 					op = call_single_thread(op)
+				if expect_value and op == null:
+					printerr(THREADING_SINGLEREQUEST_NULL_RETURN_ERR_LOG % [OS.get_ticks_msec(),operation])
 				return [op]
-			printerr("Attempting to call thread with invalid object or function name")
+			printerr(THREADING_NULL_OBJ_ERR_LOG)
 			return [null]
 		var request_id : int = (operation.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
 		if log_info:
-			pointers.l("Requesting single thread operation under request [%d]" % request_id,log_header)
+			pointers.l(THREADING_SINGLEREQUEST_REQUEST_LOG % [OS.get_ticks_msec(),request_id],log_header)
+			print(THREADING_SINGLEREQUEST_REQUEST_LOG % [OS.get_ticks_msec(),request_id])
 		var semaphore : Semaphore = Semaphore.new()
 		var added_op : int = 0
 		mutex.lock()
@@ -8487,6 +8520,8 @@ class _Threading:
 		var out : Array = thread_return[request_id]
 		thread_return.erase(request_id)
 		mutex.unlock()
+		if expect_value and out[0] == null:
+			printerr(THREADING_SINGLEREQUEST_NULL_RETURN_ERR_LOG % [OS.get_ticks_msec(),operation])
 		return out
 	
 	func __run_multiple_async_operations(operations : Array,log_info : bool = false) -> int:
@@ -8494,7 +8529,8 @@ class _Threading:
 			return ERR_UNCONFIGURED
 		if use_single_thread:
 			if log_info:
-				pointers.l("Requesting mutltiple thread operations, but using main thread",log_header)
+				pointers.l(THREADING_MULTIREQUEST_SINGLETHREAD_LOG % OS.get_ticks_msec(),log_header)
+				print(THREADING_MULTIREQUEST_SINGLETHREAD_LOG % OS.get_ticks_msec())
 			var out : int = OK
 			for next_op in operations:
 				var current_object : Object = next_op.get("object",null)
@@ -8503,14 +8539,15 @@ class _Threading:
 				if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
 					current_object.callv(current_method_call,args)
 				else:
-					printerr("Attempting to call thread with invalid object or function name")
+					printerr(THREADING_NULL_OBJ_ERR_LOG)
 					out = ERR_UNCONFIGURED
 			return out
 		if thread_queue.size() > max_queue:
 			return ERR_UNCONFIGURED
 		var request_id : int = (operations.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
 		if log_info:
-			pointers.l("Requesting multiple async thread operations under request [%d]" % request_id,log_header)
+			pointers.l(THREADING_MULTIREQUEST_ASYNC_REQUEST_LOG % [OS.get_ticks_msec(),request_id],log_header)
+			print(THREADING_MULTIREQUEST_ASYNC_REQUEST_LOG % [OS.get_ticks_msec(),request_id])
 		var semaphore : Semaphore = Semaphore.new()
 		var added_op : int = 0
 		mutex.lock()
@@ -8541,18 +8578,20 @@ class _Threading:
 	func __run_single_async_operation(operation : Dictionary,log_info : bool = false) -> int:
 		if use_single_thread:
 			if log_info:
-				pointers.l("Requesting single thread operation, but using main thread",log_header)
+				pointers.l(THREADING_SINGLEREQUEST_SINGLETHREAD_LOG,log_header)
+				print(THREADING_SINGLEREQUEST_SINGLETHREAD_LOG)
 			var current_object : Object = operation.get("object",null)
 			var args : Array = operation.get("args",Array())
 			var current_method_call : String = operation.get("method","")
 			if current_object != null and is_instance_valid(current_object) and not current_object.is_queued_for_deletion() and current_object.has_method(current_method_call):
 				current_object.callv(current_method_call,args)
 				return OK
-			printerr("Attempting to call thread with invalid object or function name")
+			printerr(THREADING_NULL_OBJ_ERR_LOG)
 			return ERR_UNCONFIGURED
 		var request_id : int = (operation.hash() + Time.get_ticks_usec()) & 0x7FFFFFFF
 		if log_info:
-			pointers.l("Requesting single async thread operation under request [%d]" % request_id,log_header)
+			pointers.l(THREADING_SINGLEREQUEST_ASYNC_REQUEST_LOG % [OS.get_ticks_msec(),request_id],log_header)
+			print(THREADING_SINGLEREQUEST_ASYNC_REQUEST_LOG % [OS.get_ticks_msec(),request_id])
 		var semaphore : Semaphore = Semaphore.new()
 		var added_op : int = 0
 		mutex.lock()
@@ -8922,7 +8961,7 @@ class _Translations:
 			TranslationServer.add_translation(alocol)
 			_savedTranslations.append(alocol)
 		var ml_check_data : Dictionary = Dictionary()
-		var trl : Array = pointers.Threading.__request_multiple_threads(processes)
+		var trl : Array = pointers.Threading.__request_multiple_threads(processes,true,true)
 		for item in trl:
 			for lang in item.keys():
 				if not lang in ml_check_data:
@@ -8938,7 +8977,7 @@ class _Translations:
 		var add_v_tl : Array = Array()
 		for i in ProjectSettings.get_setting("locale/translations"):
 			add_v_tl.append({"object" : base,"method" : "reload_vanilla_translation","args" : [i]})
-		_savedTranslations.append_array(pointers.Threading.__request_multiple_threads(add_v_tl))
+		_savedTranslations.append_array(pointers.Threading.__request_multiple_threads(add_v_tl,true,true))
 	
 	static func reload_vanilla_translation(tl_file : String):
 		var tr_resource:Translation = ResourceLoader.load(tl_file,"Translation",true)

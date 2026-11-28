@@ -1959,10 +1959,6 @@ const TRANSLATIONS = {
 			"string": "HevLib Achievement Icons",
 			"version_hash": 764881284
 		},
-		"HEVLIB_ACHIEVEMENTICONS_DESC": {
-			"string": "Provides all achievement icons for HevLib menus that use it.",
-			"version_hash": 1587880161
-		},
 		"HEVLIB_ACHIEVEMENTMENU_BRIEF": {
 			"string": "Provides all achievement icons for HevLib menus that use it.",
 			"version_hash": 1587880161
@@ -2036,20 +2032,20 @@ const TRANSLATIONS = {
 			"version_hash": 472574041
 		},
 		"stat:max_insurance_k": {
-			"string": "Largest amount of insurance held at once (E$)",
-			"version_hash": 472574041
+			"string": "Largest amount of insurance held at once (thousands of E$)",
+			"version_hash": 2187040807
 		},
 		"stat:max_money": {
 			"string": "Largest amount of money held at once (E$)",
 			"version_hash": 4177247513
 		},
 		"stat:max_money_k": {
-			"string": "Largest amount of money held at once (E$)",
-			"version_hash": 4177247513
+			"string": "Largest amount of money held at once (thousands of E$)",
+			"version_hash": 1360012519
 		},
 		"stat:max_money_m": {
-			"string": "Largest amount of money held at once (E$)",
-			"version_hash": 4177247513
+			"string": "Largest amount of money held at once (millions of E$)",
+			"version_hash": 1743642389
 		},
 		"stat:max_players": {
 			"string": "Most players online at the same time",
@@ -2062,6 +2058,42 @@ const TRANSLATIONS = {
 		"HEVLIB_ACHDESC_SUPPORTED_HARDWARE": {
 			"string": "Supported hardware:",
 			"version_hash": 286551283
+		},
+		"MODMENU_ACHIEVEMENT_MENU": {
+			"string": "Achievements",
+			"version_hash": 1769249505
+		},
+		"MM2_STORY_FLAG_STAT_STORY_TESLA": {
+			"string": "Teslas found",
+			"version_hash": 1724150541
+		},
+		"MM2_STORY_FLAG_STAT_STORY_SING": {
+			"string": "Verses sang",
+			"version_hash": 3207980198
+		},
+		"MM2_STORY_FLAG_STAT_STORY_MISSING_BOY": {
+			"string": "Clues found",
+			"version_hash": 3766359197
+		},
+		"MM2_STORY_FLAG_STAT_STORY_G4A_DESTROYED": {
+			"string": "Anarchy stations destroyed",
+			"version_hash": 1337848403
+		},
+		"MM2_STORY_FLAG_STAT_STORY_BBW_DESTROYED": {
+			"string": "Tsukuyomi-class frigates destroyed",
+			"version_hash": 2173713962
+		},
+		"MM2_STORY_FLAG_STAT_STORY_LOTR_DESTROYED": {
+			"string": "Faction headquarters destroyed",
+			"version_hash": 3402156773
+		},
+		"MM2_STORY_FLAG_STAT_STORY_INFILTRATE": {
+			"string": "Data packets gathered",
+			"version_hash": 2953338446
+		},
+		"MODMENU2_MOD_NAME": {
+			"string": "Mod Menu 2",
+			"version_hash": 2463002796
 		}
 	},
 	"de": {

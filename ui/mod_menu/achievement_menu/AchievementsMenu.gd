@@ -47,23 +47,15 @@ onready var pointers : HevLibPointers = ModLoader._savedObjects[0]
 onready var achievement_names : PoolStringArray = PoolStringArray(Achivements.achievementRarity.keys())
 
 onready var achievement_box : PackedScene = load("res://HevLib/ui/mod_menu/achievement_menu/boxes/AchievementBox.tscn")
-
+onready var stat_box : PackedScene = load("res://HevLib/ui/mod_menu/achievement_menu/boxes/StatBox.tscn")
 
 var offset : Vector2 = Vector2(12,12)
 
 var achievement_boxes : Array = Array()
+var stat_boxes : Array = Array()
 
 onready var achievement_count_label : Label = $base/AchievementCount
 onready var achievement_count_label_animator : AnimationPlayer = $base/AchievementCount/AnimationPlayer
-
-func rebuild_stat_list():
-	for i in stats_list.get_children():
-		stats_list.remove_child(i)
-		Tool.remove(i)
-	
-	
-	
-	breakpoint
 
 var completed_achievement_count : int = 0
 func redisplay_boxes():
@@ -79,6 +71,15 @@ func redisplay_boxes():
 		if completed_achievement_count == num_achievements:
 			achievement_count_label_animator.play("Blink")
 		else:
+			var locked : int = num_achievements - completed_achievement_count
+			var cc : Array = Array()
+			for ir in locked:
+				var i : HBoxContainer = achievement_list.get_child(completed_achievement_count + ir)
+				var icon : TextureProgress = i.icon
+				if icon.value > 0 and icon.value < icon.max_value:
+					cc.append(i)
+			for ir in range(cc.size(),0,-1):
+				achievement_list.move_child(cc[ir - 1],completed_achievement_count)
 			achievement_count_label_animator.play("RESET")
 	else:
 		for i in achievement_boxes:
@@ -86,16 +87,28 @@ func redisplay_boxes():
 
 func _ready():
 	get_tree().get_root().connect("size_changed", self, "_on_resize")
-	Achivements.connect("achivedOffline",self,"rebuild_achievement_list")
-	Achivements.connect("stat",self,"rebuild_stat_list")
 	for i in achievement_names:
 		var box : HBoxContainer = achievement_box.instance()
 		box.name = i
 		box.achievement_id = i
 		box.menu_container = self
+		box.mod_menu = mod_menu
 		achievement_boxes.append(box)
 		achievement_list.add_child(box)
+	for i in Achivements.achivements.keys():
+		if i.begins_with("stat:"):
+			var box : HBoxContainer = stat_box.instance()
+			box.name = i
+			box.stat_id = i
+			stat_boxes.append(box)
+			stats_list.add_child(box)
 	connect("visibility_changed",self,"redisplay_boxes")
+	connect("visibility_changed",self,"redisplay_stats")
+
+func redisplay_stats():
+	for i in stat_boxes:
+		i.update_data()
+		yield(self,"tick")
 
 func _about_to_show():
 	lastFocus = get_focus_owner()

@@ -1,0 +1,55 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://SmoothScrollTo.tscn" type="PackedScene" id=1]
+[ext_resource path="res://HevLib/ui/themes/hev_theme.tres" type="Theme" id=2]
+[ext_resource path="res://HevLib/ui/mod_menu/PlaySoundsOnTheseButtons.tscn" type="PackedScene" id=3]
+[ext_resource path="res://HevLib/ui/mod_menu/achievement_menu/boxes/StatBox.gd" type="Script" id=4]
+[ext_resource path="res://HevLib/ui/fonts/verdana/font-verdana-small.tres" type="DynamicFont" id=5]
+[ext_resource path="res://HevLib/ui/fonts/verdana/font-verdanabold-small.tres" type="DynamicFont" id=6]
+
+[node name="StatBox" type="HBoxContainer"]
+margin_right = 1280.0
+margin_bottom = 68.0
+rect_min_size = Vector2( 0, 65 )
+mouse_filter = 2
+size_flags_horizontal = 3
+theme = ExtResource( 2 )
+script = ExtResource( 4 )
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+margin_right = 1280.0
+margin_bottom = 68.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Button" type="Button" parent="MarginContainer"]
+margin_right = 1280.0
+margin_bottom = 68.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+align = 2
+
+[node name="SmoothScrollTo" parent="MarginContainer/Button" instance=ExtResource( 1 )]
+
+[node name="PlaySoundsOnTheseButtons" parent="MarginContainer/Button" instance=ExtResource( 3 )]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+margin_right = 1280.0
+margin_bottom = 68.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="NAME" type="Label" parent="MarginContainer/VBoxContainer"]
+margin_right = 1280.0
+margin_bottom = 32.0
+custom_fonts/font = ExtResource( 6 )
+autowrap = true
+
+[node name="DESC" type="Label" parent="MarginContainer/VBoxContainer"]
+margin_top = 36.0
+margin_right = 1280.0
+margin_bottom = 68.0
+size_flags_vertical = 3
+custom_fonts/font = ExtResource( 5 )
+autowrap = true
