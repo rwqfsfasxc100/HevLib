@@ -15,6 +15,7 @@
 6.1=* Prints to stdout as well as pointer logs when `log_info` is true
 6.2=* Added `expect_value` boolean that throws errors to stdout if a value returns `null`. Defaults to false.
 7=* Fixed crash caused by modlet resource loading incorrectly splitting mod paths when providing a `res://` path that does not link to a file from the mod being read from.
+8=* Fixed issue that prevented portrait DLC from properly loading.
 
 [1.18.8]
 

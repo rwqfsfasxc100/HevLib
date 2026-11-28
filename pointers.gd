@@ -7066,6 +7066,9 @@ class _ManifestV2:
 					"method" : "process_mod_data_for_load",
 					"args" : [resources,modlet,pointers,float(mod_data["priority"])]
 				})
+		var DLCLoader : Settings = load("res://Settings.gd").new()
+		DLCLoader.loadDLC()
+		DLCLoader.queue_free()
 		var cvr : Array = [
 			["res://HevLib/scenes/minerals/AstrogatorPanel.gd", -INF, "res://hud/AstrogatorPanel.gd"],
 			["res://HevLib/scenes/minerals/OMS.gd", -INF, "res://hud/OMS.gd"],
